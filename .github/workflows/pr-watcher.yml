@@ -1,0 +1,83 @@
+name: PR Watcher
+
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  pr-validation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate PR
+        id: validate
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          set -e
+          ERRORS=""
+          WARNINGS=""
+
+          # Check PR title follows conventional commits
+          if ! echo "$PR_TITLE" | grep -qE '^(feat|fix|refactor|chore|docs|test|style|perf|ci|build)(\([a-z-]+\))?: .+'; then
+            ERRORS="$ERRORS\n❌ PR title must follow conventional commits: feat|fix|refactor|chore|docs|test(scope): description"
+          fi
+
+          # Check for pip install (must use uv)
+          BAD_PIP=$(git diff origin/main...HEAD -- '*.py' '*.sh' '*.yaml' '*.yml' 2>/dev/null | grep '^+' | grep 'pip install ' | grep -v 'pip install uv' | grep -v '#' || true)
+          if [ -n "$BAD_PIP" ]; then
+            ERRORS="$ERRORS\n❌ Use 'uv pip install' not 'pip install'"
+          fi
+
+          # Check for os.getenv in source (not scripts/)
+          if git diff origin/main...HEAD -- 'api_contracts/**/*.py' 2>/dev/null | grep -q '^+.*os\.getenv'; then
+            ERRORS="$ERRORS\n❌ No os.getenv() in api_contracts/ source"
+          fi
+
+          # Check for hardcoded project IDs
+          if git diff origin/main...HEAD 2>/dev/null | grep -q 'central-element-'; then
+            ERRORS="$ERRORS\n❌ No hardcoded project IDs (use test-project in tests)"
+          fi
+
+          # Check version bump if schemas changed
+          SCHEMA_CHANGES=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^api_contracts/' | grep -v __init__ | wc -l)
+          VERSION_CHANGE=$(git diff origin/main...HEAD -- pyproject.toml 2>/dev/null | grep '^+.*version' | wc -l)
+          if [ "$SCHEMA_CHANGES" -gt 0 ] && [ "$VERSION_CHANGE" -eq 0 ]; then
+            WARNINGS="$WARNINGS\n⚠️ Schema files changed but version not bumped in pyproject.toml (required before next publish)"
+          fi
+
+          # Report results
+          if [ -n "$ERRORS" ]; then
+            echo "PR_STATUS=failed" >> $GITHUB_OUTPUT
+            echo -e "PR Validation Failed:$ERRORS"
+            exit 1
+          fi
+          echo "PR_STATUS=passed" >> $GITHUB_OUTPUT
+          if [ -n "$WARNINGS" ]; then
+            echo -e "Warnings:$WARNINGS"
+          fi
+          echo "PR validation passed"
+
+      - name: Comment on PR (on failure)
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ **PR Watcher**: Validation failed. See workflow logs for details.\n\nCommon fixes:\n- Use `bash scripts/quickmerge.sh "message"` for commits\n- Use `uv pip install` not `pip install`\n- Bump version in pyproject.toml if schemas changed'
+            })

@@ -11,13 +11,20 @@ authors = [{ name = "Ikenna Igboaka" }]
 readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
-    "pydantic>=2.0",
+    "pydantic>=2.0,<3.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/IggyIkenna/api-contracts"
+Repository = "https://github.com/IggyIkenna/api-contracts"
 
 [project.optional-dependencies]
 dev = [
     "pytest>=9.0.1",
     "pytest-cov>=7.0.0",
+    "pytest-asyncio>=0.25.0,<2.0.0",
+    "pytest-xdist>=3.5.0,<4.0.0",
+    "pytest-timeout>=2.2.0,<3.0.0",
     "ruff==0.15.0",
     "basedpyright>=1.20.0,<2.0.0",
     "vcrpy>=6.0.0",
@@ -37,7 +44,15 @@ exclude = ["tests*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
-addopts = "-v"
+python_classes = "Test*"
+python_functions = "test_*"
+addopts = "-v --strict-markers"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+    "smoke: Smoke tests",
+]
 
 [tool.ruff]
 line-length = 120
@@ -62,7 +77,8 @@ reportUnknownParameterType = "warning"
 reportUnknownMemberType = "warning"
 pythonVersion = "3.13"
 typeCheckingMode = "standard"
-
+include = ["api_contracts"]
+exclude = ["tests", "**/__pycache__", ".venv*", "build", "dist"]
 
 [tool.coverage.report]
 fail_under = 50  # Utility service
