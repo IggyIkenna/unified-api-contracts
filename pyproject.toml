@@ -81,7 +81,7 @@ include = ["api_contracts"]
 exclude = ["tests", "**/__pycache__", ".venv*", "build", "dist"]
 
 [tool.coverage.report]
-fail_under = 50  # Utility service
+fail_under = 70  # User requirement: 70%+ coverage
 show_missing = true
 skip_covered = false
 precision = 1

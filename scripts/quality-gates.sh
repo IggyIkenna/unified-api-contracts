@@ -14,7 +14,7 @@
 #
 # Requirements:
 #   - Python 3.13 (>=3.13,<3.14)
-MIN_COVERAGE=35
+MIN_COVERAGE=70
 #   - ruff, pytest, pytest-asyncio, pytest-mock installed
 #   - unified-cloud-services available (local or via GH_PAT)
 #
@@ -77,7 +77,10 @@ if [ -z "${GITHUB_ACTIONS:-}" ] && [ -z "${CI:-}" ] && [ -z "${CLOUD_BUILD:-}" ]
     fi
     command -v uv &>/dev/null || pip install uv --quiet
     if [ -f "pyproject.toml" ]; then
-        uv pip install -e ".[dev]" --quiet 2>/dev/null || uv pip install -e . --quiet 2>/dev/null || true
+        uv pip install -e ".[dev]" --quiet || {
+            echo -e "${RED}❌ uv pip install -e \".[dev]\" failed — dev deps (basedpyright, ruff) required for quality gates${NC}"
+            exit 1
+        }
     fi
 fi
 
@@ -406,9 +409,16 @@ echo "----------------------------------------------------------------------"
 TYPE_CHECK_STATUS=0
 
 # basedpyright = stricter fork, supports reportAny, aligns with Pylance/IDE (timeout 120s)
-if command -v basedpyright &> /dev/null; then
-    echo "Running: run_timeout 120 basedpyright api_contracts/ --level warning (tests excluded per audit)"
-    if run_timeout 120 basedpyright api_contracts/ --level warning 2>&1 | tee /tmp/basedpyright_output.txt; then
+# Prefer venv's basedpyright (installed via .[dev]); fallback to PATH
+BASEDPYRIGHT_CMD=""
+[ -f ".venv/bin/basedpyright" ] && BASEDPYRIGHT_CMD=".venv/bin/basedpyright"
+[ -z "$BASEDPYRIGHT_CMD" ] && [ -f ".venv/Scripts/basedpyright.exe" ] && BASEDPYRIGHT_CMD=".venv/Scripts/basedpyright.exe"
+[ -z "$BASEDPYRIGHT_CMD" ] && command -v basedpyright &>/dev/null && BASEDPYRIGHT_CMD="basedpyright"
+[ -z "$BASEDPYRIGHT_CMD" ] && $PYTHON_CMD -c "import basedpyright" 2>/dev/null && BASEDPYRIGHT_CMD="$PYTHON_CMD -m basedpyright"
+
+if [ -n "$BASEDPYRIGHT_CMD" ]; then
+    echo "Running: run_timeout 120 $BASEDPYRIGHT_CMD api_contracts/ (tests excluded per audit)"
+    if run_timeout 120 $BASEDPYRIGHT_CMD api_contracts/ 2>&1 | tee /tmp/basedpyright_output.txt; then
         echo -e "${GREEN}✅ Type checking PASSED${NC}"
         TYPE_CHECK_STATUS=0
     else
@@ -418,7 +428,7 @@ if command -v basedpyright &> /dev/null; then
     rm -f /tmp/basedpyright_output.txt
 else
     echo -e "${RED}❌ basedpyright not installed - type checking REQUIRED${NC}"
-    echo -e "${YELLOW}Install: uv pip install basedpyright${NC}"
+    echo -e "${YELLOW}Install: uv pip install -e \".[dev]\" (includes basedpyright)${NC}"
     TYPE_CHECK_STATUS=1
 fi
 
