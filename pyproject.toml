@@ -91,3 +91,6 @@ exclude_lines = [
     "@abstractmethod",
     "raise NotImplementedError",
 ]
+
+[tool.quality-gates]
+repo_arch_tier = "0"
