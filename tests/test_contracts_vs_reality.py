@@ -91,7 +91,7 @@ def test_at_least_one_example_per_contract_tested() -> None:
     assert len(examples) >= 1, "At least one example file should exist under api_contracts/*/examples/"
 
 
-@pytest.mark.skipif(
+@pytest.mark.skipif(  # reason: Live API verification only when LIVE_API_VERIFICATION=1
     os.environ.get("LIVE_API_VERIFICATION") != "1",
     reason="Live API verification only when LIVE_API_VERIFICATION=1",
 )

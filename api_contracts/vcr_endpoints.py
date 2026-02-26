@@ -47,7 +47,7 @@ def _post(
     cassette: str,
     response_path: str,
     schema_class: str,
-    json_body: dict | None = None,
+    json_body: dict[str, object] | None = None,
     key_env: str = "",
     header_name: str = "Authorization",
 ) -> VCREndpoint:
