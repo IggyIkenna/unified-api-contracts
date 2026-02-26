@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "api-contracts"
-version = "1.0.0"
+version = "1.1.0"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading services"
 requires-python = ">=3.13,<3.14"
 authors = [{ name = "Ikenna Igboaka" }]

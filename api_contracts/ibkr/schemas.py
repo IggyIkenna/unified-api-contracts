@@ -1,5 +1,6 @@
 """Pydantic schemas for TWS/ib_insync. Full surface: market data, order, position, account, errors, callbacks."""
 
+from decimal import Decimal
 from typing import Any
 
 from pydantic import BaseModel
@@ -107,3 +108,44 @@ class IBKRError(BaseModel):
     errorCode: int | None = None
     errorString: str | None = None
     advancedOrderRejectJson: str | None = None
+
+
+class IBKRContractDetails(BaseModel):
+    """IBKR contract details (TWS API: reqContractDetails).
+
+    Note: IBKR uses TWS API (not REST). These schemas represent the
+    normalized response for reference data purposes.
+    """
+
+    conid: int | None = None  # contract ID
+    symbol: str | None = None
+    secType: str | None = None  # STK, OPT, FUT, CASH, CFD
+    lastTradeDateOrContractMonth: str | None = None
+    strike: Decimal | float | None = None
+    right: str | None = None  # C=call, P=put
+    multiplier: str | None = None  # contract multiplier
+    exchange: str | None = None
+    currency: str | None = None
+    localSymbol: str | None = None
+    tradingClass: str | None = None
+    minTick: Decimal | float | None = None
+    longName: str | None = None
+    industry: str | None = None
+    category: str | None = None
+    subcategory: str | None = None
+    timeZoneId: str | None = None
+    underConid: int | None = None  # underlying contract id
+    evRule: str | None = None
+
+
+class IBKRCorporateAction(BaseModel):
+    """IBKR corporate action event (from IBKR statement/flex query)."""
+
+    conid: int | None = None
+    symbol: str
+    description: str | None = None
+    reportDate: str | None = None  # YYYY-MM-DD
+    currency: str | None = None
+    type: str | None = None  # Dividends, Splits, Mergers, BonusRights
+    amount: Decimal | None = None
+    actionDescription: str | None = None

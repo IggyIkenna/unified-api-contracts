@@ -129,3 +129,44 @@ class CoinbaseWebSocketHeartbeat(BaseModel):
     sequence_num: int | None = None
     current_time: str | None = None
     heartbeat_counter: int | None = None
+
+
+class CoinbaseProductInfo(BaseModel):
+    """Coinbase Advanced Trade product specification (REST: GET /api/v3/brokerage/products/{product_id})."""
+
+    product_id: str  # e.g. BTC-USD, ETH-USD
+    price: str | None = None
+    price_percentage_change_24h: str | None = None
+    volume_24h: str | None = None
+    volume_percentage_change_24h: str | None = None
+    base_increment: str | None = None  # minimum order size
+    quote_increment: str | None = None  # tick size
+    quote_min_size: str | None = None
+    quote_max_size: str | None = None
+    base_min_size: str | None = None
+    base_max_size: str | None = None
+    base_name: str | None = None
+    quote_name: str | None = None
+    watched: bool | None = None
+    is_disabled: bool | None = None
+    new: bool | None = None
+    status: str | None = None
+    cancel_only: bool | None = None
+    limit_only: bool | None = None
+    post_only: bool | None = None
+    trading_disabled: bool | None = None
+    auction_mode: bool | None = None
+    product_type: str | None = None  # SPOT, FUTURE
+    quote_currency_id: str | None = None
+    base_currency_id: str | None = None
+    fcm_trading_session_details: dict | None = None
+    mid_market_price: str | None = None
+    alias: str | None = None
+    alias_to: list[str] | None = None
+    base_display_symbol: str | None = None
+    quote_display_symbol: str | None = None
+    view_only: bool | None = None
+    price_increment: str | None = None
+    display_name: str | None = None
+    product_venue: str | None = None  # CBE, INTX
+    approximate_quote_24h_volume: str | None = None

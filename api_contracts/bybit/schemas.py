@@ -190,3 +190,28 @@ class BybitWebSocketPong(BaseModel):
     conn_id: str | None = None
     op: str = "pong"
     req_id: str | None = None
+
+
+class BybitInstrumentInfo(BaseModel):
+    """Bybit instrument specification (REST: GET /v5/market/instruments-info).
+
+    Works for category=spot, linear (USDT perp/futures), inverse, option.
+    """
+
+    symbol: str
+    contractType: str | None = None  # LinearPerpetual, LinearFutures, InversePerpetual, etc.
+    status: str | None = None  # Trading, Settling, Expired
+    baseCoin: str | None = None
+    quoteCoin: str | None = None
+    launchTime: str | None = None
+    deliveryTime: str | None = None  # ISO timestamp; perps have no delivery
+    deliveryFeeRate: str | None = None
+    priceScale: str | None = None
+    leverageFilter: dict | None = None
+    priceFilter: dict | None = None  # tickSize
+    lotSizeFilter: dict | None = None  # qtyStep, minOrderQty, maxOrderQty
+    unifiedMarginTrade: bool | None = None
+    fundingInterval: int | None = None  # minutes
+    settleCoin: str | None = None
+    optionsType: str | None = None  # Call or Put (for options)
+    strikePrice: str | None = None
