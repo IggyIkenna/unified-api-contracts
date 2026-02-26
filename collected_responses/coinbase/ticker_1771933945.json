@@ -1,0 +1,48 @@
+{
+  "endpoint": "ticker",
+  "timestamp": 1771933945.510737,
+  "venue": "coinbase",
+  "metadata": {
+    "url": "https://api.exchange.coinbase.com/products/BTC-USD/ticker",
+    "status_code": 200,
+    "headers": {
+      "Date": "Tue, 24 Feb 2026 11:52:25 GMT",
+      "Content-Type": "application/json; charset=utf-8",
+      "Content-Length": "160",
+      "Connection": "keep-alive",
+      "CF-RAY": "9d2ec1b75d6824ec-LHR",
+      "Accept-Ranges": "bytes",
+      "access-control-allow-headers": "Content-Type, Accept, cb-session, cb-fp, cb-form-factor",
+      "access-control-allow-methods": "GET,POST,DELETE,PUT",
+      "access-control-allow-origin": "*",
+      "access-control-expose-headers": "cb-before, cb-after, cb-gdpr",
+      "access-control-max-age": "7200",
+      "Cache-Control": "public, max-age=1, must-revalidate",
+      "Content-Encoding": "gzip",
+      "etag": "W/\"a0-mFZ9hLaG7Y8iBji6rxpsY7bAO1w\"",
+      "strict-transport-security": "max-age=15552000; includeSubDomains",
+      "x-content-type-options": "nosniff",
+      "x-dns-prefetch-control": "off",
+      "x-download-options": "noopen",
+      "x-frame-options": "SAMEORIGIN",
+      "x-xss-protection": "1; mode=block",
+      "vary": "accept-encoding",
+      "Age": "0",
+      "cf-cache-status": "HIT",
+      "Set-Cookie": "__cf_bm=fdotGQTmxtp.fA24QL6o8OordcdSTUJcqwzQ93XC.FM-1771933945-1.0.1.1-tTyTjmlS0cVy1WI4BGoTUxUwue.niCPj7cObFWWM0X0Uy9.GwF9qrDwSL_S1fBVDDVCVgxYJXbAoheLOKiWJjlYFtFNK9DCFNvBawvuwHIQ; path=/; expires=Tue, 24-Feb-26 12:22:25 GMT; domain=.exchange.coinbase.com; HttpOnly; Secure; SameSite=None",
+      "Report-To": "{\"endpoints\":[{\"url\":\"https:\\/\\/a.nel.cloudflare.com\\/report\\/v4?s=q4yOnOTjwh%2Bubcmi7CkraHJXN5EHXZXWvqpMqkhwGIWPyxEMtlXWNu3cIntyR9TYapohFY9BfOsgZxAeoK1LIjTDviNX%2FctX1snboBZ%2BVotohp1eJwFCnT8DtNC%2FuMyHVk2FZvfYMJ1ZC0U%3D\"}],\"group\":\"cf-nel\",\"max_age\":604800}",
+      "NEL": "{\"success_fraction\":0.01,\"report_to\":\"cf-nel\",\"max_age\":604800}",
+      "Server": "cloudflare"
+    }
+  },
+  "response": {
+    "ask": "63193.66",
+    "bid": "63193.65",
+    "volume": "13820.89728361",
+    "trade_id": 966762594,
+    "price": "63193.66",
+    "size": "0.00001783",
+    "time": "2026-02-24T11:52:23.556518475Z",
+    "rfq_volume": "234.391524"
+  }
+}

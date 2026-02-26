@@ -1,0 +1,72 @@
+{
+  "endpoint": "ticker",
+  "timestamp": 1771933953.077429,
+  "venue": "kraken",
+  "metadata": {
+    "url": "https://api.kraken.com/0/public/Ticker?pair=XBTUSD",
+    "status_code": 200,
+    "headers": {
+      "Date": "Tue, 24 Feb 2026 11:52:33 GMT",
+      "Content-Type": "application/json",
+      "Transfer-Encoding": "chunked",
+      "Connection": "keep-alive",
+      "Content-Encoding": "gzip",
+      "x-trace-id": "0ab2b917019c8f7e681e0073e9913618",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "Cache-Control": "max-age=2, public",
+      "m5aqrz6npgb-pad": "&8o.YOb#3e-Iqn0O4s|jGBf_~_*EUx09v8ei2",
+      "x-proxy": "gateway",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "CF-Cache-Status": "HIT",
+      "Age": "1",
+      "Last-Modified": "Tue, 24 Feb 2026 11:52:32 GMT",
+      "Set-Cookie": "__cf_bm=mB3T37QZxY79tb.ExM18Kgqvc9WJ6rP25Ida1IVAyZs-1771933953-1.0.1.1-3q947C55Iu4wte0bwXE0tj2k_ztIWAM6_NVOz6AFUlCWa7vNnXvh1WFIFL6n9m1kdqlnYFOFys88wD_laHqSjdSb61T3PP9K4KmaWfZnYBQ; path=/; expires=Tue, 24-Feb-26 12:22:33 GMT; domain=.kraken.com; HttpOnly; Secure; SameSite=None, _cfuvid=_f7OnWTjlrueGlGkHQfDPCRYnelpSOC2U8tVEW8aRPc-1771933953073-0.0.1.1-604800000; path=/; domain=.kraken.com; HttpOnly; Secure; SameSite=None",
+      "Vary": "Accept-Encoding",
+      "X-Content-Type-Options": "nosniff",
+      "Server": "cloudflare",
+      "CF-RAY": "9d2ec1e60952beba-LHR"
+    }
+  },
+  "response": {
+    "error": [],
+    "result": {
+      "XXBTZUSD": {
+        "a": [
+          "63196.10000",
+          "1",
+          "1.000"
+        ],
+        "b": [
+          "63196.00000",
+          "1",
+          "1.000"
+        ],
+        "c": [
+          "63196.10000",
+          "0.01239572"
+        ],
+        "v": [
+          "1423.90186134",
+          "3290.67402864"
+        ],
+        "p": [
+          "63494.69530",
+          "64274.57584"
+        ],
+        "t": [
+          35765,
+          71818
+        ],
+        "l": [
+          "62679.60000",
+          "62679.60000"
+        ],
+        "h": [
+          "64971.00000",
+          "66513.40000"
+        ],
+        "o": "64624.10000"
+      }
+    }
+  }
+}

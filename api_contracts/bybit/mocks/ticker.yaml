@@ -1,0 +1,48 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT
+  response:
+    body:
+      string: '{"retCode":0,"retMsg":"OK","result":{"category":"linear","list":[{"symbol":"BTCUSDT","lastPrice":"63105.50","indexPrice":"63144.33","markPrice":"63110.66","prevPrice24h":"65157.50","price24hPcnt":"-0.031492","highPrice24h":"66574.80","lowPrice24h":"62649.20","prevPrice1h":"63432.00","openInterest":"49725.559","openInterestValue":"3138212847.36","turnover24h":"7731087909.1578","volume24h":"119401.0010","fundingRate":"-0.00007326","nextFundingTime":"1771920000000","predictedDeliveryPrice":"","basisRate":"","deliveryFeeRate":"","deliveryTime":"0","ask1Size":"4.161","bid1Price":"63105.40","ask1Price":"63105.50","bid1Size":"0.768","basis":"","preOpenPrice":"","preQty":"","curPreListingPhase":"","fundingIntervalHour":"8","basisRateYear":"","fundingCap":"0.005"}]},"retExtInfo":{},"time":1771913467079}'
+    headers:
+      Connection:
+      - keep-alive
+      Content-Length:
+      - '805'
+      Content-Type:
+      - application/json; charset=utf-8
+      Date:
+      - Tue, 24 Feb 2026 06:11:07 GMT
+      Ret_code:
+      - '0'
+      Server:
+      - Openresty
+      Timenow:
+      - '1771913467079'
+      Traceid:
+      - 216af895ce020bb636446c7b3544ac1f
+      Via:
+      - 1.1 f540434760ad2ea93058ec4eb14cc0c4.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - eo2yTp2o8k2-yz7Wc3pi_IWer31clxppYOOjnqU5xLo-p5CAwfaIoQ==
+      X-Amz-Cf-Pop:
+      - LHR86-P2
+      X-Cache:
+      - Miss from cloudfront
+      x-cld-src:
+      - Loc-A
+    status:
+      code: 200
+      message: OK
+version: 1

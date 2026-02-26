@@ -1,0 +1,9 @@
+{
+  "coin": "BTC",
+  "markPx": "43250.5",
+  "midPx": "43250.0",
+  "prevDayPx": "42800.0",
+  "dayNtlVlm": "125000.5",
+  "funding": "0.0001",
+  "openInterest": "50000"
+}

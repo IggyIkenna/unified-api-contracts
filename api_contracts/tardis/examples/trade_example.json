@@ -1,0 +1,9 @@
+{
+  "timestamp": "2024-01-15T12:00:00Z",
+  "exchange": "BINANCE",
+  "symbol": "BTC-USDT",
+  "price": 43250.5,
+  "size": 0.1,
+  "side": "B",
+  "trade_id": "12345678"
+}

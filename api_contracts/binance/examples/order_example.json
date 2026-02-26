@@ -1,0 +1,13 @@
+{
+  "orderId": 987654321,
+  "clientOrderId": "client-abc-123",
+  "symbol": "BTCUSDT",
+  "side": "BUY",
+  "type": "LIMIT",
+  "status": "NEW",
+  "price": "43000.00",
+  "origQty": "0.01",
+  "executedQty": "0",
+  "time": 1705312800000,
+  "updateTime": 1705312800000
+}

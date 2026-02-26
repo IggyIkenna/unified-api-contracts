@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "api-contracts"
+version = "1.0.0"
+description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading services"
+requires-python = ">=3.13,<3.14"
+authors = [{ name = "Ikenna Igboaka" }]
+readme = "README.md"
+license = { text = "MIT" }
+dependencies = [
+    "pydantic>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.1",
+    "pytest-cov>=7.0.0",
+    "ruff==0.15.0",
+    "basedpyright>=1.20.0,<2.0.0",
+    "vcrpy>=6.0.0",
+    "requests>=2.31.0",
+    "pre-commit>=3.5.0",
+]
+# For live contract verification (install from workspace path, not PyPI):
+#   uv pip install -e ../unified-cloud-services -e ../unified-config-interface
+#   Then run: LIVE_API_VERIFICATION=1 python scripts/verify_contracts_vs_reality_live.py
+# UCI/UCS are not listed here so api-contracts remains installable without them.
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["api_contracts*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = "test_*.py"
+addopts = "-v"
+
+[tool.ruff]
+line-length = 120
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+ignore = ["E501"]  # line too long handled by formatter
+# N815/N803: camelCase/PascalCase required for API contracts mirroring external APIs (Binance, boto3, GCP SDK)
+[tool.ruff.lint.per-file-ignores]
+"api_contracts/**/schemas.py" = ["N815"]
+"api_contracts/cloud_sdks/*.py" = ["N803", "N815"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+[tool.basedpyright]
+# Enforce no Any/object — use specific types
+reportAny = "warning"
+reportUnknownVariableType = "warning"
+reportUnknownParameterType = "warning"
+reportUnknownMemberType = "warning"
+pythonVersion = "3.13"
+typeCheckingMode = "standard"
+
+
+[tool.coverage.report]
+fail_under = 50  # Utility service
+show_missing = true
+skip_covered = false
+precision = 1
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+    "raise NotImplementedError",
+]

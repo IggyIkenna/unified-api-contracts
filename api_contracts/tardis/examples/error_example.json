@@ -1,0 +1,5 @@
+{
+  "error": "unauthorized",
+  "message": "Invalid API key",
+  "code": 401
+}

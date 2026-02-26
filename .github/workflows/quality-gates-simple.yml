@@ -1,0 +1,41 @@
+name: Quality Gates (Simple)
+
+on: [pull_request, push]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install ruff bandit pytest pytest-cov pytest-timeout
+          pip install -e .
+          
+      - name: Ruff (with timeout)
+        run: timeout 60s ruff check . --output-format=github || true
+        
+      - name: Black format check
+        run: black --check --line-length=120 . || true
+        
+      - name: isort check
+        run: isort --check --profile=black . || true
+        
+      - name: Bandit security scan
+        run: bandit -r . -ll --exclude=tests || true
+        
+      - name: Check circular imports
+        run: |
+          python -c "import api_contracts; print('✅ Import successful')"
+          
+      - name: Tests with coverage
+        run: pytest --cov=api_contracts --cov-report=term-missing --cov-fail-under=35 --timeout=300 --tb=short

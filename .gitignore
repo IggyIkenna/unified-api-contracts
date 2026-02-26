@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+
+# Credentials and secrets
+*credentials*.json
+*.pem
+secrets/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build and dist
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Testing and coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# VCR cassettes may contain filtered secrets; keep in repo but never commit unfiltered
+# (per plan: filter authorization, x-api-key etc. before committing)
+
+# OS
+.DS_Store
+Thumbs.db

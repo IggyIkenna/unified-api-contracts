@@ -1,0 +1,15 @@
+{
+  "id": "order-123",
+  "clientOrderId": "client-456",
+  "timestamp": 1609459200000,
+  "symbol": "BTC/USDT",
+  "type": "limit",
+  "side": "buy",
+  "price": 50000.0,
+  "amount": 0.01,
+  "filled": 0.0,
+  "remaining": 0.01,
+  "average": null,
+  "status": "open",
+  "timeInForce": "GTC"
+}

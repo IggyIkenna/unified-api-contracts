@@ -1,0 +1,180 @@
+# Quality Gates for api-contracts
+#
+# This workflow runs the EXACT same checks as:
+#   - Local: ./scripts/quality-gates.sh
+#   - Cloud Build: cloudbuild.yaml
+#
+# All three MUST be kept in sync. If you change one, change all three.
+#
+name: Quality Gates
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality-gates:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Checkout dependencies
+        env:
+          GH_PAT: ${{ secrets.GH_PAT }}
+        run: |
+          if [ -n "$GH_PAT" ]; then
+            # Clone api-contracts to ../ (matches pyproject.toml path source)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/api-contracts.git ../api-contracts || echo "⚠️ Could not clone api-contracts (optional)"
+            # Clone unified-cloud-services to ../ (matches uv.lock path source)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/unified-cloud-services.git ../unified-cloud-services
+            echo "✅ Cloned unified-cloud-services"
+
+            # Clone unified-events-interface to ../ (matches pyproject.toml path source)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/unified-events-interface.git ../unified-events-interface
+            echo "✅ Cloned unified-events-interface"
+
+            # Clone unified-domain-services (required - StandardizedDomainCloudService)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/unified-domain-services.git ../unified-domain-services
+            echo "✅ Cloned unified-domain-services"
+
+            # Clone unified-config-interface to ../ (matches pyproject.toml dependency)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/unified-config-interface.git ../unified-config-interface
+            echo "✅ Cloned unified-config-interface"
+
+            # Clone unified-market-interface to ../ (matches pyproject.toml dependency)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/unified-market-interface.git ../unified-market-interface
+            echo "✅ Cloned unified-market-interface"
+
+            # Clone unified-trading-deployment-v2 (optional - for smoke tests)
+            git clone https://x-access-token:${GH_PAT}@github.com/IggyIkenna/unified-trading-deployment-v2.git ../unified-trading-deployment-v2 || echo "⚠️ Could not clone unified-trading-deployment-v2 (optional)"
+          else
+            echo "❌ GH_PAT not set" && exit 1
+          fi
+
+      - name: Install ripgrep (required for codex checks)
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install --system -e ../unified-cloud-services
+          uv pip install --system -e ../api-contracts 2>/dev/null || echo "⚠️ api-contracts not available"
+          uv pip install --system -e ../unified-events-interface
+          uv pip install --system -e ../unified-domain-services
+          uv pip install --system -e ../unified-config-interface
+          uv pip install --system -e ../unified-market-interface
+          uv pip install --system -e ../unified-trading-deployment-v2 2>/dev/null || echo "⚠️ unified-trading-deployment-v2 not available"
+          uv pip install --system -e . --no-deps
+          uv pip install --system pydantic pydantic-settings pandas numpy python-dateutil \
+            python-dotenv requests ccxt plotly web3 eth-abi databento boto3 \
+            exchange-calendars yfinance polars
+          uv pip install --system pytest pytest-cov pytest-asyncio pytest-mock pytest-timeout pytest-xdist ruff==0.15.0 basedpyright pip-audit>=2.7.0
+
+      # ========================================================================
+      # DEPENDENCY VULNERABILITY SCAN (pip-audit)
+      # ========================================================================
+      - name: Dependency vulnerability scan (pip-audit)
+        run: |
+          pip-audit || { echo "❌ pip-audit found vulnerabilities. Run: pip-audit --desc"; exit 1; }
+
+      # ========================================================================
+      # LINT + FORMAT - format first (fixes line length), then check --fix
+      # ========================================================================
+      - name: Lint and format check
+        run: |
+          ruff format --line-length 120 api_contracts/ tests/
+          ruff check --fix --line-length 120 api_contracts/ tests/
+          git diff --exit-code || {
+            echo "❌ Code not formatted. Run locally: ruff format --line-length 120 . && ruff check --fix --line-length 120 ."
+            git diff
+            exit 1
+          }
+          echo "✅ Lint and format check passed"
+
+      # ========================================================================
+      # TYPE CHECK (basedpyright - matches IDE strict mode)
+      # ========================================================================
+      - name: Type check (basedpyright)
+        run: |
+          basedpyright api_contracts/ --level warning || exit 1
+          echo "✅ Type check passed"
+
+      # ========================================================================
+      # UNIT TESTS - MUST PASS
+      # ========================================================================
+      - name: Run unit tests
+        run: |
+          echo "=== Running unit tests ==="
+          python -m pytest tests/unit/ -v --tb=short --timeout=60 -n auto \
+            --cov=api_contracts \
+            --cov-report=term-missing \
+            --cov-fail-under=35 \
+            --no-cov-on-fail
+          echo "✅ Unit tests passed"
+
+      # ========================================================================
+      # INTEGRATION TESTS - MUST PASS
+      # ========================================================================
+      - name: Run integration tests
+        run: |
+          echo "=== Running integration tests ==="
+          if [ -d "tests/integration" ]; then
+            python -m pytest tests/integration/ -v --tb=short --timeout=120 -n auto \
+              --ignore=tests/integration/test_performance.py \
+              -k "not api and not live and not download"
+            echo "✅ Integration tests passed"
+          else
+            echo "No integration tests directory found"
+          fi
+
+      # ========================================================================
+      # E2E TESTS - MUST PASS
+      # ========================================================================
+      - name: Run e2e tests
+        env:
+          CLOUD_MOCK_MODE: "true"
+          GOOGLE_CLOUD_PROJECT: "test-project"
+        run: |
+          echo "=== Running e2e tests ==="
+          if [ -d "tests/e2e" ]; then
+            python -m pytest tests/e2e/ -v --tb=short --timeout=180 -n auto
+            echo "✅ E2E tests passed"
+          else
+            echo "No e2e tests directory found"
+          fi
+
+      # ========================================================================
+      # SMOKE TESTS (shard combinatorics) - MUST PASS (if deployment configs available)
+      # ========================================================================
+      - name: Run smoke tests
+        env:
+          CLOUD_MOCK_MODE: "true"
+          GOOGLE_CLOUD_PROJECT: "test-project"
+          DEPLOYMENT_CONFIG_DIR: "../unified-trading-deployment-v2/configs"
+        run: |
+          echo "=== Running smoke tests ==="
+          if [ -d "tests/smoke" ] && [ -d "../unified-trading-deployment-v2/configs" ]; then
+            python -m pytest tests/smoke/ -v --tb=short --timeout=180 -n auto
+            echo "✅ Smoke tests passed"
+          else
+            echo "⚠️ Skipping smoke tests (deployment configs not available)"
+          fi
+
+      - name: Quality gates passed
+        run: |
+          echo ""
+          echo "======================================================================"
+          echo "✅ ALL QUALITY GATES PASSED"
+          echo "======================================================================"

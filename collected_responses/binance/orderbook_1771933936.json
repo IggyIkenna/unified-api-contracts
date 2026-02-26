@@ -1,0 +1,123 @@
+{
+  "endpoint": "orderbook",
+  "timestamp": 1771933936.393022,
+  "venue": "binance",
+  "metadata": {
+    "url": "https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=10",
+    "status_code": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8",
+      "Content-Length": "204",
+      "Connection": "keep-alive",
+      "Date": "Tue, 24 Feb 2026 11:52:16 GMT",
+      "Server": "nginx",
+      "x-mbx-uuid": "1f6e05e0-de40-48a0-8a96-571a8c6ce445",
+      "x-mbx-used-weight": "7",
+      "x-mbx-used-weight-1m": "7",
+      "content-encoding": "gzip",
+      "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-Xss-Protection": "1; mode=block",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'self'",
+      "X-Content-Security-Policy": "default-src 'self'",
+      "X-WebKit-CSP": "default-src 'self'",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "X-Cache": "Miss from cloudfront",
+      "Via": "1.1 0db2bc85aeb40b15cfa6f871a4dd5b5c.cloudfront.net (CloudFront)",
+      "X-Amz-Cf-Pop": "LHR82-P1",
+      "X-Amz-Cf-Id": "NHlcbFLMFS4xZxZWF2Br0MPM6LEM8jqJgPmeV_G_YNvHNLZjXJrovQ=="
+    }
+  },
+  "response": {
+    "lastUpdateId": 88622405526,
+    "bids": [
+      [
+        "63208.36000000",
+        "1.13496000"
+      ],
+      [
+        "63208.35000000",
+        "0.00043000"
+      ],
+      [
+        "63208.34000000",
+        "0.04996000"
+      ],
+      [
+        "63208.00000000",
+        "0.00008000"
+      ],
+      [
+        "63207.68000000",
+        "0.00242000"
+      ],
+      [
+        "63207.50000000",
+        "0.00017000"
+      ],
+      [
+        "63207.38000000",
+        "0.00018000"
+      ],
+      [
+        "63207.37000000",
+        "0.16203000"
+      ],
+      [
+        "63207.36000000",
+        "0.52245000"
+      ],
+      [
+        "63207.27000000",
+        "0.00166000"
+      ]
+    ],
+    "asks": [
+      [
+        "63208.37000000",
+        "0.74153000"
+      ],
+      [
+        "63208.38000000",
+        "0.00108000"
+      ],
+      [
+        "63209.16000000",
+        "0.00025000"
+      ],
+      [
+        "63209.33000000",
+        "0.00017000"
+      ],
+      [
+        "63209.34000000",
+        "0.00008000"
+      ],
+      [
+        "63209.36000000",
+        "0.00017000"
+      ],
+      [
+        "63209.37000000",
+        "0.00008000"
+      ],
+      [
+        "63209.38000000",
+        "0.00009000"
+      ],
+      [
+        "63209.39000000",
+        "0.00308000"
+      ],
+      [
+        "63209.45000000",
+        "0.00008000"
+      ]
+    ]
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "message": "Subgraph not found",
+  "locations": [{"line": 1, "column": 2}],
+  "path": ["pools"],
+  "extensions": null
+}

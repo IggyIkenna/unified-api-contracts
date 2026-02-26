@@ -1,0 +1,129 @@
+# Yahoo Finance Mock Data - AAPL Dividend History (2023-2024)
+# This mock simulates yfinance pandas Series structure for AAPL dividends
+# Based on actual AAPL dividend payments for realistic testing
+
+metadata:
+  ticker: "AAPL"
+  data_type: "dividends"  
+  period: "2023-01-01 to 2024-12-31"
+  source: "yfinance_mock"
+  description: "Apple Inc. quarterly dividend history"
+  total_records: 8
+
+# Raw dividend data as returned by yfinance ticker.dividends
+# Format: pandas Series with datetime index and dividend amounts
+dividends_series:
+  # 2023 Quarterly Dividends
+  "2023-02-10T00:00:00+00:00": 0.23  # Q1 2023 - Ex-dividend date Feb 10
+  "2023-05-12T00:00:00+00:00": 0.24  # Q2 2023 - Ex-dividend date May 12
+  "2023-08-11T00:00:00+00:00": 0.24  # Q3 2023 - Ex-dividend date Aug 11
+  "2023-11-10T00:00:00+00:00": 0.24  # Q4 2023 - Ex-dividend date Nov 10
+  
+  # 2024 Quarterly Dividends  
+  "2024-02-09T00:00:00+00:00": 0.24  # Q1 2024 - Ex-dividend date Feb 9
+  "2024-05-10T00:00:00+00:00": 0.25  # Q2 2024 - Ex-dividend date May 10
+  "2024-08-12T00:00:00+00:00": 0.25  # Q3 2024 - Ex-dividend date Aug 12  
+  "2024-11-08T00:00:00+00:00": 0.25  # Q4 2024 - Ex-dividend date Nov 8
+
+# Processed dividend records as parsed by CorporateActionsAdapter
+dividend_records:
+  - ticker: "AAPL"
+    ex_date: "2023-02-10"
+    pay_date: "2023-02-16" 
+    record_date: "2023-02-13"
+    declaration_date: "2023-02-02"
+    amount: 0.23
+    dividend_type: "regular"
+    currency: "USD" 
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2023-05-12"
+    pay_date: "2023-05-18"
+    record_date: "2023-05-15" 
+    declaration_date: "2023-05-04"
+    amount: 0.24
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2023-08-11"
+    pay_date: "2023-08-17"
+    record_date: "2023-08-14"
+    declaration_date: "2023-08-03"
+    amount: 0.24
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance" 
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2023-11-10"
+    pay_date: "2023-11-16"
+    record_date: "2023-11-13"
+    declaration_date: "2023-11-02"
+    amount: 0.24
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2024-02-09"
+    pay_date: "2024-02-15"
+    record_date: "2024-02-12"
+    declaration_date: "2024-02-01"
+    amount: 0.24
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2024-05-10"
+    pay_date: "2024-05-16"
+    record_date: "2024-05-13"
+    declaration_date: "2024-05-02"
+    amount: 0.25
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2024-08-12"
+    pay_date: "2024-08-18"
+    record_date: "2024-08-15"
+    declaration_date: "2024-08-01"
+    amount: 0.25
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+    
+  - ticker: "AAPL"
+    ex_date: "2024-11-08"
+    pay_date: "2024-11-14"
+    record_date: "2024-11-11"
+    declaration_date: "2024-10-31"
+    amount: 0.25
+    dividend_type: "regular"
+    currency: "USD"
+    source: "yfinance"
+    instrument_key: "NASDAQ:EQUITY:AAPL"
+
+# Usage notes for testing
+usage:
+  adapter_method: "fetch_dividends"
+  date_range: 
+    start: "2023-01-01"
+    end: "2024-12-31"
+  expected_count: 8
+  validation_points:
+    - "All dividends have amount > 0"
+    - "Ex-dates are in ascending order"
+    - "Quarterly frequency (roughly 3 months apart)"
+    - "Dividend increases from $0.23 to $0.25 over period"

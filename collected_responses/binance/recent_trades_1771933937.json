@@ -1,0 +1,128 @@
+{
+  "endpoint": "recent_trades",
+  "timestamp": 1771933937.215829,
+  "venue": "binance",
+  "metadata": {
+    "url": "https://api.binance.com/api/v3/trades?symbol=BTCUSDT&limit=10",
+    "status_code": 200,
+    "headers": {
+      "Content-Type": "application/json;charset=UTF-8",
+      "Content-Length": "314",
+      "Connection": "keep-alive",
+      "Date": "Tue, 24 Feb 2026 11:52:17 GMT",
+      "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+      "Server": "nginx",
+      "x-mbx-uuid": "06a0ca1e-58da-47cb-9cec-a28d4598b68a",
+      "x-mbx-used-weight": "32",
+      "x-mbx-used-weight-1m": "32",
+      "content-encoding": "gzip",
+      "Strict-Transport-Security": "max-age=31536000; includeSubdomains",
+      "X-Frame-Options": "SAMEORIGIN",
+      "X-Xss-Protection": "1; mode=block",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Security-Policy": "default-src 'self'",
+      "X-Content-Security-Policy": "default-src 'self'",
+      "X-WebKit-CSP": "default-src 'self'",
+      "Cache-Control": "no-cache, no-store, must-revalidate",
+      "Pragma": "no-cache",
+      "Expires": "0",
+      "Access-Control-Allow-Origin": "*",
+      "X-Cache": "Miss from cloudfront",
+      "Via": "1.1 4eb6cbcdfbae817ca4f1923b2dcf44b2.cloudfront.net (CloudFront)",
+      "X-Amz-Cf-Pop": "LHR82-P1",
+      "X-Amz-Cf-Id": "9AgRbROT_Co0E8L6mjuVhgGGXSN5jRWXFDLdpCS2gnqU5S-3HARUMA=="
+    }
+  },
+  "response": [
+    {
+      "id": 6008096886,
+      "price": "63208.37000000",
+      "qty": "0.15784000",
+      "quoteQty": "9976.80912080",
+      "time": 1771933936394,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096887,
+      "price": "63208.37000000",
+      "qty": "0.00023000",
+      "quoteQty": "14.53792510",
+      "time": 1771933936629,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096888,
+      "price": "63208.37000000",
+      "qty": "0.00016000",
+      "quoteQty": "10.11333920",
+      "time": 1771933936747,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096889,
+      "price": "63208.37000000",
+      "qty": "0.00024000",
+      "quoteQty": "15.17000880",
+      "time": 1771933936831,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096890,
+      "price": "63208.37000000",
+      "qty": "0.00015000",
+      "quoteQty": "9.48125550",
+      "time": 1771933936996,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096891,
+      "price": "63208.36000000",
+      "qty": "0.00079000",
+      "quoteQty": "49.93460440",
+      "time": 1771933937023,
+      "isBuyerMaker": true,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096892,
+      "price": "63208.36000000",
+      "qty": "0.00028000",
+      "quoteQty": "17.69834080",
+      "time": 1771933937038,
+      "isBuyerMaker": true,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096893,
+      "price": "63208.37000000",
+      "qty": "0.00080000",
+      "quoteQty": "50.56669600",
+      "time": 1771933937054,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096894,
+      "price": "63208.37000000",
+      "qty": "0.00056000",
+      "quoteQty": "35.39668720",
+      "time": 1771933937079,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    },
+    {
+      "id": 6008096895,
+      "price": "63208.37000000",
+      "qty": "0.05588000",
+      "quoteQty": "3532.08371560",
+      "time": 1771933937101,
+      "isBuyerMaker": false,
+      "isBestMatch": true
+    }
+  ]
+}

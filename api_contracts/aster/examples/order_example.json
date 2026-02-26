@@ -1,0 +1,9 @@
+{
+  "order_id": "ord-abc-123",
+  "market_id": "BTC-PERP",
+  "side": "buy",
+  "size": "0.1",
+  "price": "43250",
+  "status": "open",
+  "filled_size": "0"
+}

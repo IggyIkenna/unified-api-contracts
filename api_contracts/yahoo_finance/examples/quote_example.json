@@ -1,0 +1,9 @@
+{
+  "symbol": "AAPL",
+  "shortName": "Apple Inc.",
+  "regularMarketPrice": 185.5,
+  "regularMarketChange": 1.2,
+  "regularMarketVolume": 45000000,
+  "bid": 185.4,
+  "ask": 185.6
+}
