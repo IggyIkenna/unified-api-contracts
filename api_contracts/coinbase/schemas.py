@@ -50,15 +50,15 @@ class CoinbaseCandle(BaseModel):
     volume: Decimal
 
     @classmethod
-    def from_list(cls, candle_data: list) -> "CoinbaseCandle":
+    def from_list(cls, candle_data: list[int | float | Decimal]) -> "CoinbaseCandle":
         """Create CoinbaseCandle from list format returned by API."""
         return cls(
-            timestamp=candle_data[0],
-            low=candle_data[1],
-            high=candle_data[2],
-            open=candle_data[3],
-            close=candle_data[4],
-            volume=candle_data[5],
+            timestamp=int(candle_data[0]),
+            low=Decimal(str(candle_data[1])),
+            high=Decimal(str(candle_data[2])),
+            open=Decimal(str(candle_data[3])),
+            close=Decimal(str(candle_data[4])),
+            volume=Decimal(str(candle_data[5])),
         )
 
 

@@ -38,12 +38,12 @@ class KrakenOrderBookLevel(BaseModel):
     timestamp: int
 
     @classmethod
-    def from_list(cls, level_data: list) -> "KrakenOrderBookLevel":
+    def from_list(cls, level_data: list[int | float | Decimal]) -> "KrakenOrderBookLevel":
         """Create from [price, volume, timestamp] format."""
         return cls(
-            price=level_data[0],
-            volume=level_data[1],
-            timestamp=level_data[2],
+            price=Decimal(str(level_data[0])),
+            volume=Decimal(str(level_data[1])),
+            timestamp=int(level_data[2]),
         )
 
 
@@ -65,15 +65,15 @@ class KrakenTrade(BaseModel):
     miscellaneous: str  # additional info
 
     @classmethod
-    def from_list(cls, trade_data: list) -> "KrakenTrade":
+    def from_list(cls, trade_data: list[int | float | Decimal | str]) -> "KrakenTrade":
         """Create from [price, volume, time, buy/sell, market/limit, misc] format."""
         return cls(
-            price=trade_data[0],
-            volume=trade_data[1],
-            time=trade_data[2],
-            buy_sell=trade_data[3],
-            market_limit=trade_data[4],
-            miscellaneous=trade_data[5],
+            price=Decimal(str(trade_data[0])),
+            volume=Decimal(str(trade_data[1])),
+            time=float(trade_data[2]),
+            buy_sell=str(trade_data[3]),
+            market_limit=str(trade_data[4]),
+            miscellaneous=str(trade_data[5]),
         )
 
 
@@ -90,17 +90,17 @@ class KrakenOHLC(BaseModel):
     count: int  # number of trades
 
     @classmethod
-    def from_list(cls, ohlc_data: list) -> "KrakenOHLC":
+    def from_list(cls, ohlc_data: list[int | float | Decimal]) -> "KrakenOHLC":
         """Create from [time, open, high, low, close, vwap, volume, count] format."""
         return cls(
-            time=ohlc_data[0],
-            open=ohlc_data[1],
-            high=ohlc_data[2],
-            low=ohlc_data[3],
-            close=ohlc_data[4],
-            vwap=ohlc_data[5],
-            volume=ohlc_data[6],
-            count=ohlc_data[7],
+            time=int(ohlc_data[0]),
+            open=Decimal(str(ohlc_data[1])),
+            high=Decimal(str(ohlc_data[2])),
+            low=Decimal(str(ohlc_data[3])),
+            close=Decimal(str(ohlc_data[4])),
+            vwap=Decimal(str(ohlc_data[5])),
+            volume=Decimal(str(ohlc_data[6])),
+            count=int(ohlc_data[7]),
         )
 
 
