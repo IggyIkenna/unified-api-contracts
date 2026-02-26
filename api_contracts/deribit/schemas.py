@@ -241,3 +241,45 @@ class DeribitWebSocketHeartbeat(BaseModel):
     method: str  # "heartbeat" (server→client) or "public/test" (client→server response)
     params: dict[str, object] | None = None
     id: int | None = None
+
+
+class DeribitInstrumentInfoFull(BaseModel):
+    """Deribit full instrument specification (REST: GET /public/get_instrument or /public/get_instruments).
+
+    Covers futures, options, perpetuals for all currencies.
+    """
+
+    instrument_name: str
+    kind: str | None = None  # future, option, spot, future_combo, option_combo
+    instrument_type: str | None = None  # reversed_future, future, etc.
+    base_currency: str | None = None  # BTC, ETH, SOL, USDC
+    quote_currency: str | None = None  # USD, USDC
+    settlement_currency: str | None = None
+    creation_timestamp: int | None = None
+    expiration_timestamp: int | None = None  # ms; 32503708800000 = no expiry (perp)
+    strike: Decimal | float | None = None
+    option_type: str | None = None  # call or put
+    is_active: bool | None = None
+    settlement_period: str | None = None  # day, week, month
+    min_trade_amount: Decimal | float | None = None
+    tick_size: Decimal | float | None = None
+    contract_size: Decimal | float | None = None
+    taker_commission: Decimal | float | None = None
+    maker_commission: Decimal | float | None = None
+    block_trade_commission: Decimal | float | None = None
+
+
+class DeribitSettlementHistory(BaseModel):
+    """Deribit settlement history record (REST: /private/get_settlement_history_by_currency)."""
+
+    type: str  # settlement, delivery, bankruptcy
+    timestamp: int  # ms
+    instrument_name: str
+    position: Decimal | float | None = None
+    index_price: Decimal | float | None = None
+    mark_price: Decimal | float | None = None
+    session_profit_loss: Decimal | float | None = None
+    profit_loss: Decimal | float | None = None
+    funding: Decimal | float | None = None  # settlement only
+    session_bankruptcy: Decimal | float | None = None
+    socialized: Decimal | float | None = None
