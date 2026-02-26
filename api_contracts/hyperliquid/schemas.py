@@ -5,11 +5,22 @@ from pydantic import BaseModel
 from api_contracts.shared import ErrorAction
 
 
-class HyperliquidMeta(BaseModel):
-    """Universe/meta (instruments)."""
+class HyperliquidAssetInfo(BaseModel):
+    """Hyperliquid asset/perpetual metadata (REST POST /info, type='meta').
 
-    universe: list[dict] | None = None
-    info: dict | None = None
+    Response is a list of asset objects inside universe[].
+    """
+
+    name: str  # e.g. BTC, ETH
+    szDecimals: int | None = None  # decimal places for size
+    maxLeverage: int | None = None
+    onlyIsolated: bool | None = None
+
+
+class HyperliquidMeta(BaseModel):
+    """Hyperliquid exchange meta (POST /info, type='meta')."""
+
+    universe: list[HyperliquidAssetInfo] | None = None
 
 
 class HyperliquidTicker(BaseModel):

@@ -169,3 +169,30 @@ class KrakenWebSocketPing(BaseModel):
 
     method: str = "ping"
     req_id: int | None = None
+
+
+class KrakenAssetPairInfo(BaseModel):
+    """Kraken trading pair specification (REST: GET /0/public/AssetPairs)."""
+
+    altname: str | None = None  # shorter name e.g. XXBTZUSD
+    wsname: str | None = None  # WS name e.g. XBT/USD
+    aclass_base: str | None = None
+    base: str | None = None
+    aclass_quote: str | None = None
+    quote: str | None = None
+    lot: str | None = None
+    cost_decimals: int | None = None
+    pair_decimals: int | None = None
+    lot_decimals: int | None = None
+    lot_multiplier: int | None = None
+    leverage_buy: list[int] | None = None
+    leverage_sell: list[int] | None = None
+    fees: list[list[float]] | None = None
+    fees_maker: list[list[float]] | None = None
+    fee_volume_currency: str | None = None
+    margin_call: int | None = None
+    margin_stop: int | None = None
+    ordermin: str | None = None
+    costmin: str | None = None
+    tick_size: str | None = None
+    status: str | None = None  # online, cancel_only, post_only, limit_only, reduce_only

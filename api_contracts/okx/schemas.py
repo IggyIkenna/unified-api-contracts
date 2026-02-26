@@ -235,3 +235,33 @@ class OKXWebSocketPing(BaseModel):
     # OKX sends/receives raw string "ping" — not a JSON message
     # Server sends "pong" response. No pong within 30s → disconnect.
     pass
+
+
+class OKXInstrumentInfo(BaseModel):
+    """OKX instrument specification (REST: GET /api/v5/public/instruments).
+
+    instType: SPOT, MARGIN, SWAP, FUTURES, OPTION
+    """
+
+    instType: str
+    instId: str
+    uly: str | None = None  # underlying e.g. BTC-USD (SWAP/FUTURES/OPTION)
+    instFamily: str | None = None  # instrument family e.g. BTC-USD
+    category: str | None = None  # 1=standard, 2=standard, 3=non-standard
+    baseCcy: str | None = None  # SPOT only
+    quoteCcy: str | None = None  # SPOT only
+    settleCcy: str | None = None  # settlement currency
+    ctVal: str | None = None  # contract value in base currency
+    ctMult: str | None = None  # contract multiplier
+    ctValCcy: str | None = None  # currency of ctVal
+    optType: str | None = None  # C=call, P=put (OPTION only)
+    stk: str | None = None  # strike price (OPTION only)
+    listTime: str | None = None
+    expTime: str | None = None  # expiry time ms (FUTURES/OPTION)
+    lever: str | None = None  # max leverage
+    tickSz: str | None = None  # tick size
+    lotSz: str | None = None  # lot size (min trade)
+    minSz: str | None = None  # min order size
+    ctType: str | None = None  # linear or inverse
+    alias: str | None = None  # this_week, next_week, quarter, next_quarter
+    state: str | None = None  # live, suspend, preopen, test, expired
