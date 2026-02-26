@@ -332,3 +332,41 @@ class BinanceListenKeyCreate(BaseModel):
     """
 
     listenKey: str
+
+
+class BinanceInstrumentInfo(BaseModel):
+    """Binance instrument/contract specification (REST: GET /fapi/v1/exchangeInfo or /eapi/v1/exchangeInfo)."""
+
+    symbol: str
+    status: str  # TRADING, BREAK, END_OF_DAY
+    baseAsset: str | None = None
+    quoteAsset: str | None = None
+    contractType: str | None = None  # PERPETUAL, CURRENT_QUARTER, NEXT_QUARTER
+    deliveryDate: int | None = None  # timestamp ms; 4133404800000 = no expiry
+    onboardDate: int | None = None  # timestamp ms
+    contractSize: int | None = None  # 1 for standard
+    marginAsset: str | None = None
+    pricePrecision: int | None = None
+    quantityPrecision: int | None = None
+    baseAssetPrecision: int | None = None
+    quotePrecision: int | None = None
+    filters: list[dict] | None = None  # PRICE_FILTER, LOT_SIZE, etc.
+    underlyingType: str | None = None  # COIN or TOKEN (futures)
+
+
+class BinanceOptionInstrumentInfo(BaseModel):
+    """Binance European options instrument (REST: GET /eapi/v1/exchangeInfo)."""
+
+    id: int | None = None
+    contractId: int | None = None
+    underlying: str | None = None  # e.g. BTCUSDT
+    quoteAsset: str | None = None  # USDT
+    symbol: str | None = None  # e.g. BTC-200730-9000-C
+    unit: int | None = None  # number of tokens per contract
+    minQty: Decimal | None = None
+    maxQty: Decimal | None = None
+    priceScale: int | None = None
+    quantityScale: int | None = None
+    side: str | None = None  # CALL or PUT
+    strikePrice: Decimal | None = None
+    expiryDate: int | None = None  # timestamp ms
