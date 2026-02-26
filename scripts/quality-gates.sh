@@ -18,11 +18,26 @@ MIN_COVERAGE=35
 #   - ruff, pytest, pytest-asyncio, pytest-mock installed
 #   - unified-cloud-services available (local or via GH_PAT)
 #
-set -e  # Exit on any error
+set -e
+# Cross-platform timeout: works on macOS (no timeout cmd) and Linux
+run_timeout() {
+  local secs=$1
+  shift
+  if command -v timeout &>/dev/null; then
+    timeout "$secs" "$@"
+  elif command -v gtimeout &>/dev/null; then
+    gtimeout "$secs" "$@"
+  else
+    "$@"
+  fi
+}
+  # Exit on any error
 
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
+log_success() { echo -e "${GREEN}✅ $1${NC}"; }
+log_fail()    { echo -e "${RED}❌ $1${NC}"; }
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
@@ -392,8 +407,8 @@ TYPE_CHECK_STATUS=0
 
 # basedpyright = stricter fork, supports reportAny, aligns with Pylance/IDE (timeout 120s)
 if command -v basedpyright &> /dev/null; then
-    echo "Running: timeout 120 basedpyright api_contracts/ --level warning (tests excluded per audit)"
-    if timeout 120 basedpyright api_contracts/ --level warning 2>&1 | tee /tmp/basedpyright_output.txt; then
+    echo "Running: run_timeout 120 basedpyright api_contracts/ --level warning (tests excluded per audit)"
+    if run_timeout 120 basedpyright api_contracts/ --level warning 2>&1 | tee /tmp/basedpyright_output.txt; then
         echo -e "${GREEN}✅ Type checking PASSED${NC}"
         TYPE_CHECK_STATUS=0
     else
