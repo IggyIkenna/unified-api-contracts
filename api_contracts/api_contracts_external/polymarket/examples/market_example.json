@@ -1,0 +1,14 @@
+{
+  "conditionId": "0x1234567890abcdef",
+  "question": "Will X happen by end of 2025?",
+  "endDateIso": "2025-12-31T23:59:59Z",
+  "marketSlug": "will-x-happen-by-end-of-2025",
+  "tokens": [
+    {"tokenId": "token-yes-123", "outcome": "Yes", "price": 0.65},
+    {"tokenId": "token-no-456", "outcome": "No", "price": 0.35}
+  ],
+  "volume": 100000.0,
+  "liquidity": 50000.0,
+  "active": true,
+  "closed": false
+}

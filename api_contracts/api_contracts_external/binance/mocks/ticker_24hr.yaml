@@ -1,0 +1,74 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://fapi.binance.com/fapi/v1/ticker/24hr?symbol=BTCUSDT
+  response:
+    body:
+      string: '{"symbol":"BTCUSDT","priceChange":"-2043.10","priceChangePercent":"-3.135","weightedAvgPrice":"64842.51","lastPrice":"63125.90","lastQty":"0.016","openPrice":"65169.00","highPrice":"66574.50","lowPrice":"62655.00","volume":"251536.175","quoteVolume":"16310236559.65","openTime":1771827060000,"closeTime":1771913462073,"firstId":7322848564,"lastId":7329111118,"count":6255290}'
+    headers:
+      Access-Control-Allow-Credentials:
+      - 'true'
+      Access-Control-Allow-Headers:
+      - '*,clienttype,Content-Type,lang,x-ui-request-trace,bnc-uuid'
+      Access-Control-Allow-Methods:
+      - GET, POST, PUT, DELETE, OPTIONS
+      Access-Control-Allow-Origin:
+      - '*'
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Security-Policy:
+      - default-src 'self'
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Feb 2026 06:11:06 GMT
+      Server:
+      - Tengine
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Accept-Encoding
+      Via:
+      - 1.1 cb8e2cd001e8928a49dc551941d5c7da.cloudfront.net (CloudFront)
+      X-Amz-Cf-Id:
+      - n4KJojdT_VoxLW-pGQU9Xb4ygY5ARs11A0SIJf_yWWcbFaCcVRJQ7g==
+      X-Amz-Cf-Pop:
+      - LHR50-P1
+      X-Cache:
+      - Miss from cloudfront
+      cache-control:
+      - no-cache, no-store, must-revalidate
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      strict-transport-security:
+      - max-age=31536000; includeSubdomains
+      x-content-type-options:
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      x-mbx-used-weight-1m:
+      - '1'
+      x-response-time:
+      - 0ms
+      x-xss-protection:
+      - 1; mode=block
+      x-contract-schema-version:
+      - '1.0'
+    status:
+      code: 200
+      message: OK
+version: 1

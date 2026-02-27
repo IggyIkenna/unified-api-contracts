@@ -1,0 +1,30 @@
+{
+  "sportId": 29,
+  "last": 1730000000,
+  "leagues": [
+    {
+      "id": 12345,
+      "name": "NFL",
+      "homeCountry": "USA",
+      "sportId": 29
+    }
+  ],
+  "events": [
+    {
+      "id": 67890,
+      "leagueId": 12345,
+      "home": "Team A",
+      "away": "Team B",
+      "starts": "2025-02-28T18:00:00Z",
+      "status": "O",
+      "periods": [
+        {
+          "number": 0,
+          "moneyLine": {"home": -110, "away": 100},
+          "spread": {"home": -105, "away": -105, "hdp": -3.5},
+          "total": {"over": -110, "under": -110, "points": 45.5}
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "status": "SUCCESS",
+  "marketId": "1.23456789",
+  "instructionReports": [
+    {
+      "status": "SUCCESS",
+      "betId": "987654321",
+      "placedDate": "2025-02-28T14:30:00.000Z",
+      "averagePriceMatched": 2.5,
+      "sizeMatched": 10.0,
+      "orderStatus": "EXECUTABLE",
+      "instruction": {
+        "orderType": "LIMIT",
+        "selectionId": 12345,
+        "side": "BACK",
+        "limitOrder": {
+          "size": 10.0,
+          "price": 2.5,
+          "persistenceType": "LAPSE"
+        }
+      }
+    }
+  ]
+}

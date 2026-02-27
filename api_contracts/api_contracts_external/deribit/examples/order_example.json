@@ -1,0 +1,12 @@
+{
+  "order_id": "12345678",
+  "order_state": "open",
+  "instrument_name": "BTC-PERPETUAL",
+  "direction": "buy",
+  "amount": 0.1,
+  "price": 50000.0,
+  "filled_amount": 0,
+  "average_price": null,
+  "creation_timestamp": 1704067200000,
+  "info": {}
+}

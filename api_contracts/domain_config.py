@@ -1,7 +1,7 @@
 """
 Domain Configuration Protocols
 
-Protocol definitions for domain configuration objects used across unified-cloud-services.
+Protocol definitions for domain configuration objects used across unified-trading-services.
 Eliminates type errors from optional unified-config-interface dependency.
 """
 

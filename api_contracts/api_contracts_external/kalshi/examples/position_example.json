@@ -1,0 +1,9 @@
+{
+  "ticker": "KXCPI-24DEC-T3.2",
+  "position": 50,
+  "market_exposure_fp": "2250.00",
+  "realized_pnl_fp": "125.50",
+  "resting_orders_count": 1,
+  "total_traded": 60,
+  "event_ticker": "KXCPI-24DEC"
+}

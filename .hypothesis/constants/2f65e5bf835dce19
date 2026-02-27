@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/signals.py
+# hypothesis_version: 6.151.9
+
+['BORROW', 'BUY', 'DEPOSIT', 'LEND', 'REBALANCE', 'REPAY', 'SELL', 'SWAP', 'WITHDRAW', 'arrival', 'close', 'limit', 'market', 'mid', 'nanoseconds UTC', 'stop', 'stop_limit', 'twap', 'vwap']

@@ -1,12 +1,19 @@
 # Contributing to api-contracts
 
+## Package layout
+
+- **api_contracts_external/** — Raw venue schemas (binance, databento, tardis, etc.). Add new venues here.
+- **unified_normalised_contracts/** — Canonical schemas and `normalize.py` for raw→canonical conversion.
+- **internal/** — Service-to-service schemas (will move to unified-internal-contracts in Phase 2).
+
 ## Adding a new venue or API
 
 1. **Create directory**  
-   Add `api-contracts/<api>/` with:
+   Add `api_contracts/api_contracts_external/<venue>/` with:
    - `schemas.py` — Pydantic models for request/response (and errors, WebSocket payloads if applicable).
    - `examples/` — JSON (or CSV) examples; use `scripts/capture_api_responses.py` or per-API capture.
    - `mocks/` — VCR cassettes for tests (filter `authorization`, `x-api-key`, etc.).
+   - Add a `normalize_*` function in `unified_normalised_contracts/normalize.py` if the venue has trade/order types.
 
 2. **Use Context7**  
    Before defining schemas, look up the provider’s official API/SDK docs (Context7 or web). If docs are insufficient, run minimal real API calls and capture responses to infer/refine schemas.
@@ -19,7 +26,7 @@
 
 ## Capturing examples
 
-- Run `scripts/capture_api_responses.py` (or a per-API script) with small queries; write output to `api-contracts/<api>/examples/`.
+- Run `scripts/capture_api_responses.py` (or a per-API script) with small queries; write output to `api_contracts/api_contracts_external/<venue>/examples/`.
 - Use env or Secret Manager for API keys; never commit secrets. Scripts should filter sensitive headers before writing anything to disk if recording for VCR.
 
 ## Recording VCR cassettes

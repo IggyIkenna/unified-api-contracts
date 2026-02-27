@@ -1,0 +1,11 @@
+{
+  "ticker": "AAPL",
+  "ex_date": "2024-05-10",
+  "pay_date": "2024-05-16",
+  "record_date": "2024-05-13",
+  "declaration_date": "2024-05-02",
+  "amount": 0.25,
+  "dividend_type": "regular",
+  "currency": "USD",
+  "source": "yfinance"
+}

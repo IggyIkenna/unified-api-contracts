@@ -5,10 +5,11 @@ Test script to load and demonstrate Yahoo Finance mock data usage.
 This script shows how to load and use the mock data files in tests.
 """
 
-import yaml
-import pandas as pd
 from pathlib import Path
-from typing import Dict, Any
+from typing import Any, Dict
+
+import pandas as pd
+import yaml
 
 # Path to mock files
 MOCKS_DIR = Path(__file__).parent.parent / "api_contracts" / "yahoo_finance" / "mocks"

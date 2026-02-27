@@ -73,7 +73,8 @@ def test_all_examples_validate_against_contracts() -> None:
         data = json.loads(full_path.read_text())
         loader = _get_schema_for_example(api_name, data, example_filename=path.name)
         if loader is None:
-            failures.append(f"{api_name}: no schema for keys {list(data.keys())}")
+            keys_desc = list(data.keys()) if isinstance(data, dict) else f"array[{len(data)}]"
+            failures.append(f"{api_name}: no schema for {keys_desc}")
             continue
         mod_path, class_name = loader
         mod = __import__(mod_path, fromlist=[class_name])

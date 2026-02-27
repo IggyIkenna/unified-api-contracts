@@ -1,0 +1,25 @@
+{
+  "marketId": "1.23456789",
+  "isMarketDataDelayed": false,
+  "status": "OPEN",
+  "betDelay": 0,
+  "bspReconciled": false,
+  "complete": true,
+  "inPlay": false,
+  "numberOfWinners": 1,
+  "runners": [
+    {
+      "selectionId": 12345,
+      "handicap": 0,
+      "status": "ACTIVE",
+      "adjustmentFactor": 1.0,
+      "lastPriceTraded": 2.5,
+      "totalMatched": 15000.0,
+      "ex": {
+        "availableToBack": [{"price": 2.5, "size": 100.0}],
+        "availableToLay": [{"price": 2.52, "size": 80.0}]
+      }
+    }
+  ],
+  "runnersVacant": false
+}
