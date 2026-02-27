@@ -213,13 +213,13 @@ rg "GOOGLE_CLOUD_PROJECT" --type py --glob "!tests/**" "$SOURCE_DIR/" 2>/dev/nul
     && { log_fail "Use GCP_PROJECT_ID not GOOGLE_CLOUD_PROJECT"; V=$((V+1)); } || log_success "No GOOGLE_CLOUD_PROJECT usage"
 
 # Tier 0: no Tier 1+ imports
-TIER_VIOLATIONS=$(rg 'from unified_trading_services|from unified_domain_client|from unified_trading_services' \
+TIER_VIOLATIONS=$(rg 'from unified_trading_services|from unified_domain_client|from unified_internal_contracts' \
     --type py "${SOURCE_DIR}/" 2>/dev/null | grep -v __pycache__ || true)
 [[ -n "$TIER_VIOLATIONS" ]] && {
-    log_fail "Tier 0 violation: imports from Tier 1+ library:"
+    log_fail "Tier 0 violation: imports from Tier 1+ library (api-contracts must not import unified-internal-contracts or Tier 1+ libs):"
     echo "$TIER_VIOLATIONS" | head -5
     V=$((V+1))
-} || log_success "Tier 0 compliance: no Tier 1+ imports"
+} || log_success "Tier 0 compliance: no Tier 1+ imports (incl. unified-internal-contracts)"
 
 # No direct cloud SDK imports
 DIRECT_CLOUD=$(rg 'from google\.cloud import|^import boto3\b|^from boto3 import|^from botocore import' \

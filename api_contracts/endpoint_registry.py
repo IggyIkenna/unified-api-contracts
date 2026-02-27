@@ -16,6 +16,14 @@ from enum import StrEnum
 from pydantic import BaseModel
 
 
+class EndpointStatus(StrEnum):
+    """Endpoint availability status. Used to block unconfirmed or unlicensed sources."""
+
+    ACTIVE = "active"
+    BLACKLISTED_NO_AUTH = "blacklisted_no_auth"  # Schema complete; blocked until creds confirmed via VCR
+    BLACKLISTED_NO_FREE_SOURCE = "blacklisted_no_free_source"  # Blocked until licensed source procured
+
+
 class AccessMode(StrEnum):
     """How data is accessed from this endpoint."""
 
@@ -99,6 +107,8 @@ class EndpointSpec(BaseModel):
     """Pagination mechanism: 'cursor', 'offset_limit', 'page_number', 'link_header', 'next_page_token'"""
     max_lookback_days: int | None = None
     """Maximum historical lookback in days (None = unlimited). Important for free tier constraints."""
+    status: EndpointStatus = EndpointStatus.ACTIVE
+    """Endpoint status. BLACKLISTED_NO_AUTH = blocked until auth confirmed via VCR test."""
 
 
 # ---------------------------------------------------------------------------
@@ -397,5 +407,50 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "secType=BAG is IBKR's combination/spread contract type. All spread strategies "
             "(straddles, butterflies, calendar spreads, EFPs) use this. comboLegs define the legs."
         ),
+    ),
+    # --- DeFi Live (BLACKLISTED_NO_AUTH until creds confirmed via VCR) ---
+    EndpointSpec(
+        venue="thegraph",
+        endpoint_path="wss://gateway.thegraph.com/subgraphs/id/{subgraph_id}",
+        http_method="WS",
+        schema_class="TheGraphWsNext",
+        access_mode=AccessMode.STREAMING_WEBSOCKET,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="graphql-ws",
+        notes="GraphQL WS subscriptions → CanonicalLiquidityPool, CanonicalLendingRate.",
+        status=EndpointStatus.BLACKLISTED_NO_AUTH,
+    ),
+    EndpointSpec(
+        venue="pyth",
+        endpoint_path="wss://hermes.pyth.network/ws",
+        http_method="WS",
+        schema_class="PythWsNotification",
+        access_mode=AccessMode.STREAMING_WEBSOCKET,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="hermes",
+        notes="Pyth WS price feeds → CanonicalOraclePrice. Requires PYTH_API_KEY or public demo.",
+        status=EndpointStatus.BLACKLISTED_NO_AUTH,
+    ),
+    EndpointSpec(
+        venue="alchemy",
+        endpoint_path="wss://{network}.g.alchemy.com/v2/{api_key}",
+        http_method="WS",
+        schema_class="AlchemyWsNotification",
+        access_mode=AccessMode.STREAMING_WEBSOCKET,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes="alchemy_minedTransactions, eth_subscribe logs → DeFi events. Requires ALCHEMY_API_KEY.",
+        status=EndpointStatus.BLACKLISTED_NO_AUTH,
+    ),
+    EndpointSpec(
+        venue="bloxroute",
+        endpoint_path="wss://api.blxrbdn.com/ws",
+        http_method="WS",
+        schema_class="BloxrouteMempoolNotification",
+        access_mode=AccessMode.STREAMING_WEBSOCKET,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="bdn",
+        notes="newTxs, pendingTxs, arbOnlyMEV streams. Requires bloxroute auth.",
+        status=EndpointStatus.BLACKLISTED_NO_AUTH,
     ),
 ]

@@ -513,6 +513,7 @@ class S3QuotaInfo(BaseModel):
     QuotaCode: str | None = None
     Value: float | None = None
 
+
 # ===========================================================================
 # AWS CloudWatch Logs (equivalent of GCP Cloud Logging)
 # boto3 client: cloudwatch_logs = boto3.client('logs')
@@ -1194,6 +1195,7 @@ class AwsQuotaUsage(BaseModel):
     secrets_manager_secrets_count: int | None = None
     iam_roles_count: int | None = None
     cost_mtd_usd: float | None = None  # Month-to-date spend from Cost Explorer
+
 
 # ===========================================================================
 # AWS Cognito (equivalent of Firebase Auth + Google OAuth2 user management)

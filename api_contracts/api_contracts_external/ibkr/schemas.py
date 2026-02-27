@@ -22,6 +22,32 @@ class IBKRBar(BaseModel):
     average: float | None = None
 
 
+class IBKRReqHistoricalDataParams(BaseModel):
+    """Params for reqHistoricalData (TWS)."""
+
+    contract: dict[str, Any] | None = None
+    endDateTime: str | None = None
+    durationStr: str | None = None
+    barSizeSetting: str | None = None
+    whatToShow: str | None = None
+    useRTH: int | None = None
+    formatDate: int | None = None
+
+
+class IBKRBondMarketData(BaseModel):
+    """Bond market data from TWS (bid/ask, YTW, duration, convexity, DV01)."""
+
+    bid_price: float | None = None
+    ask_price: float | None = None
+    bid_yield: float | None = None
+    ask_yield: float | None = None
+    ytm: float | None = None
+    ytw: float | None = None
+    duration: float | None = None
+    convexity: float | None = None
+    dv01: float | None = None
+
+
 class IBKRTicker(BaseModel):
     """Live ticker (bid, ask, last, etc.)."""
 

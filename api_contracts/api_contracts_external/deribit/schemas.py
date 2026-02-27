@@ -20,6 +20,19 @@ class DeribitInstrument(BaseModel):
     info: dict | None = None
 
 
+class DeribitLiquidationOrder(BaseModel):
+    """Deribit liquidation (from user fills or order updates; no dedicated public channel).
+
+    Fields may come from fills with reduce_only/liquidation flags.
+    """
+
+    instrument_name: str | None = None
+    price: Decimal | float | None = None
+    amount: Decimal | float | None = None
+    side: str | None = None  # buy | sell
+    timestamp: int | None = None  # ms
+
+
 class DeribitTicker(BaseModel):
     """Deribit ticker (REST or WebSocket)."""
 
@@ -124,6 +137,33 @@ class DeribitPerpetualFunding(BaseModel):
     timestamp: int  # ms
     index_price: Decimal | float
     interest: Decimal | float  # current funding rate
+
+
+class DeribitInterestRate(BaseModel):
+    """Deribit REST get_interest_rate — borrow rates for spot margin."""
+
+    interest_rate: Decimal | float | None = None
+    underlying_price: Decimal | float | None = None
+    timestamp: int | None = None
+
+
+class DeribitOptionsChainEntry(BaseModel):
+    """Single option in chain (from /public/get_order_book or ticker)."""
+
+    instrument_name: str
+    strike: Decimal | float
+    expiry_timestamp: int
+    option_type: str  # call | put
+    bid: Decimal | float | None = None
+    ask: Decimal | float | None = None
+    last: Decimal | float | None = None
+    mark_price: Decimal | float | None = None
+    iv: Decimal | float | None = None
+    open_interest: Decimal | float | None = None
+    delta: Decimal | float | None = None
+    gamma: Decimal | float | None = None
+    theta: Decimal | float | None = None
+    vega: Decimal | float | None = None
 
 
 class DeribitMarkPriceOption(BaseModel):

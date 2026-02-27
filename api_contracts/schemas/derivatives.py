@@ -235,3 +235,104 @@ class ComboQuote(BaseModel):
     net_vega: Decimal | None = None
     net_theta: Decimal | None = None
     timestamp: datetime | None = None
+
+
+# ---------------------------------------------------------------------------
+# Liquidation schemas (per-venue: binance-futures, bybit, okx, deribit, hyperliquid, bitmex)
+# ---------------------------------------------------------------------------
+
+
+class LiquidationMessage(BaseModel):
+    """Canonical liquidation message — all CeFi venues (binance-futures, bybit, okx, deribit, hyperliquid, bitmex).
+
+    Required: exchange, symbol, timestamp, id, side, price, amount.
+    Hyperliquid adds: lid, liquidated_user, liquidated_ntl_pos,
+    liquidated_account_value, leverageType, liquidatedPositions.
+    """
+
+    exchange: str = Field(..., description="Venue identifier")
+    symbol: str = Field(..., description="Instrument symbol")
+    timestamp: datetime = Field(..., description="Liquidation timestamp")
+    local_timestamp: datetime | None = Field(None, description="Local exchange timestamp")
+    id: str = Field(..., description="Liquidation event ID")
+    side: str = Field(..., description="buy | sell")
+    price: Decimal = Field(..., description="Liquidation price")
+    amount: Decimal = Field(..., description="Liquidation size")
+    # Hyperliquid-specific
+    lid: str | None = Field(None, description="Hyperliquid liquidation ID")
+    liquidated_user: str | None = Field(None, description="Hyperliquid: liquidated account address")
+    liquidated_ntl_pos: Decimal | None = Field(None, description="Hyperliquid: notional position")
+    liquidated_account_value: Decimal | None = Field(None, description="Hyperliquid: account value at liquidation")
+    leverageType: str | None = Field(None, description="Hyperliquid: leverage type")
+    liquidatedPositions: list[dict[str, object]] | None = Field(None, description="Hyperliquid: liquidated positions")
+
+
+# ---------------------------------------------------------------------------
+# Derivative ticker (funding, OI, borrow rates — Tardis + Hyperliquid extras)
+# ---------------------------------------------------------------------------
+
+
+class DerivativeTickerMessage(BaseModel):
+    """Canonical derivative ticker — perps/futures funding, OI, mark/index.
+
+    Tardis: exchange, symbol, timestamp, funding_timestamp, funding_rate, predicted_funding_rate,
+    open_interest, last_price, index_price, mark_price.
+    Hyperliquid adds: dayNtlVlm, prevDayPx, oraclePx, midPx.
+    Deribit/Binance margin: borrow_long_rate, borrow_short_rate.
+    """
+
+    exchange: str = Field(..., description="Venue identifier")
+    symbol: str = Field(..., description="Instrument symbol")
+    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    local_timestamp: datetime | None = Field(None, description="Local exchange timestamp")
+    funding_timestamp: datetime | None = Field(None, description="Next funding time")
+    funding_rate: Decimal | None = Field(None, description="Current funding rate")
+    predicted_funding_rate: Decimal | None = Field(None, description="Predicted next funding rate")
+    open_interest: Decimal | None = Field(None, description="Open interest in contracts")
+    last_price: Decimal | None = Field(None, description="Last trade price")
+    index_price: Decimal | None = Field(None, description="Index price")
+    mark_price: Decimal | None = Field(None, description="Mark price")
+    # Borrow rates (Deribit, Binance margin)
+    borrow_long_rate: Decimal | None = Field(None, description="Borrow rate for long positions")
+    borrow_short_rate: Decimal | None = Field(None, description="Borrow rate for short positions")
+    # Hyperliquid-specific
+    oraclePx: Decimal | None = Field(None, description="Hyperliquid oracle price")
+    midPx: Decimal | None = Field(None, description="Hyperliquid mid price")
+    dayNtlVlm: Decimal | None = Field(None, description="Hyperliquid 24h notional volume")
+    prevDayPx: Decimal | None = Field(None, description="Hyperliquid previous day price")
+
+
+# ---------------------------------------------------------------------------
+# Index composition (Binance, OKX, Bybit — Deribit/HL/Databento/Tardis absent)
+# ---------------------------------------------------------------------------
+
+
+class IndexCompositionEntry(BaseModel):
+    """Single constituent of an index (e.g. BTCUSDT perp basket)."""
+
+    exchange: str = Field(..., description="Source exchange for this constituent")
+    symbol: str = Field(..., description="Symbol or spot pair")
+    price: Decimal = Field(..., description="Constituent price")
+    weight: Decimal = Field(..., description="Weight in index")
+    multiplier: Decimal | None = Field(None, description="Bybit: multiplier")
+
+
+class IndexCompositionSnapshot(BaseModel):
+    """Index composition snapshot — poll REST; no venue provides change time-series."""
+
+    index_symbol: str = Field(..., description="Index symbol e.g. BTCUSDT")
+    venue: str = Field(..., description="Venue that provided this snapshot")
+    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    constituents: list[IndexCompositionEntry] = Field(default_factory=list, description="Constituents")
+
+
+# ---------------------------------------------------------------------------
+# OHLCV source truth (Tardis=computed, direct exchanges=native)
+# ---------------------------------------------------------------------------
+
+
+class OHLCVSource(StrEnum):
+    """Source of OHLCV data. Tardis computes from ticks; direct exchanges provide native candles."""
+
+    NATIVE_CANDLE = "NATIVE_CANDLE"
+    COMPUTED_FROM_TICKS = "COMPUTED_FROM_TICKS"

@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import pytest
 import requests
-
 from api_contracts.binance.schemas import BinanceTicker
+
 from api_contracts.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 
 # Key Binance Spot REST endpoints per official docs (binance-docs.github.io)

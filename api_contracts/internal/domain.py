@@ -49,6 +49,7 @@ class AggressorSide(StrEnum):
 # Format: instrument_key = VENUE:INSTRUMENT_TYPE:SYMBOL
 # ---------------------------------------------------------------------------
 
+
 class InstrumentRecord(BaseModel):
     """Canonical instrument row (subset of INSTRUMENTS_SCHEMA columns).
 
@@ -135,6 +136,7 @@ class InstrumentRecord(BaseModel):
 # Market tick schemas — written to GCS parquet by market-tick-data-handler
 # Timestamps are int64 nanoseconds UTC
 # ---------------------------------------------------------------------------
+
 
 class MarketTrade(BaseModel):
     """Raw trade tick (TRADES_SCHEMA)."""
@@ -236,6 +238,7 @@ class QuoteRecord(BaseModel):
 # Uses Decimal for price precision (in-memory, not stored to parquet)
 # ---------------------------------------------------------------------------
 
+
 class CanonicalOrderBook(BaseModel):
     """Normalised order book (CanonicalOrderBook dataclass from unified-market-interface)."""
 
@@ -264,6 +267,7 @@ class CanonicalTrade(BaseModel):
 # ---------------------------------------------------------------------------
 # Processed candle schema from market-data-processing-service
 # ---------------------------------------------------------------------------
+
 
 class ProcessedCandle(BaseModel):
     """Output of market-data-processing-service (PROCESSED_CANDLE_SCHEMA)."""

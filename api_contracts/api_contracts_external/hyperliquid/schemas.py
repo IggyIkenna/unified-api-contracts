@@ -253,16 +253,29 @@ class HyperliquidMeta(BaseModel):
 
 
 class HyperliquidTicker(BaseModel):
-    """Ticker / mid / mark from HTTP API."""
+    """Ticker / mid / mark / oracle from HTTP API."""
 
     coin: str | None = None
     markPx: str | None = None
     midPx: str | None = None
+    oraclePx: str | None = None
     prevDayPx: str | None = None
     dayNtlVlm: str | None = None
     funding: str | None = None
     openInterest: str | None = None
     info: dict | None = None
+
+
+class HyperliquidMetaAndAssetCtx(BaseModel):
+    """Asset context: funding, OI, mark, oracle from metaAndAssetCtxs (POST /info)."""
+
+    funding: str | None = None
+    openInterest: str | None = None
+    markPx: str | None = None
+    midPx: str | None = None
+    oraclePx: str | None = None
+    prevDayPx: str | None = None
+    dayNtlVlm: str | None = None
 
 
 class HyperliquidOrder(BaseModel):

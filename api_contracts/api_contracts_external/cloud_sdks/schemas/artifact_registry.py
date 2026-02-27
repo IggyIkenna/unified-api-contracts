@@ -103,6 +103,7 @@ class ArtifactRegistryQuotaUsage(BaseModel):
 
 class DockerImage(BaseModel):
     """Docker container image in Artifact Registry."""
+
     name: str | None = None
     uri: str | None = None
     tags: list[str] | None = None
@@ -115,12 +116,14 @@ class DockerImage(BaseModel):
 
 class ListDockerImagesResponse(BaseModel):
     """Paginated Docker image list."""
+
     docker_images: list[DockerImage] | None = None
     next_page_token: str | None = None
 
 
 class NpmPackage(BaseModel):
     """NPM package in Artifact Registry."""
+
     name: str | None = None
     package_name: str | None = None
     version: str | None = None
@@ -131,6 +134,7 @@ class NpmPackage(BaseModel):
 
 class ArtifactRegistryCleanupPolicy(BaseModel):
     """Cleanup policy for automatic deletion of old images/packages."""
+
     id: str | None = None
     action: str | None = None
     most_recent_versions: dict | None = None

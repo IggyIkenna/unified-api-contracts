@@ -381,6 +381,16 @@ class DatabentoSymbol(BaseModel):
 DATABENTO_PRICE_DIVISOR = 1_000_000_000
 
 
+class DatabentoLiveSubscriptionParams(BaseModel):
+    """Live API subscription params (SType.LIVE). Same record types as batch."""
+
+    dataset: str = Field(..., description="Dataset ID e.g. GLBX.MDP3, XNAS.ITCH")
+    schema_name: str = Field(..., description="Schema name e.g. trades, mbp-1, ohlcv-1m")
+    symbols: list[str] = Field(default_factory=list, description="Symbols to subscribe")
+    stype_in: str | None = Field(None, description="Input symbol type: raw_symbol, instrument_id")
+    stype_out: str | None = Field(None, description="Output symbol type")
+
+
 class DatabentoError(BaseModel):
     """Databento API error.
 

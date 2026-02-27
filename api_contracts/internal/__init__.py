@@ -1,16 +1,15 @@
 """Internal API contracts — schemas for data flowing between services.
 
 Covers:
-- ``events``       : Lifecycle event envelopes, all 11+ event types, per-type metadata
 - ``domain``       : Instrument records, market ticks, order books, OHLCV, candles
 - ``execution``    : Orders, fills, execution instructions, execution results
 - ``signals``      : Strategy instructions, DeFi signals, GCS output records
-- ``risk``         : Risk metrics, alerts, exposure summaries, pre-trade checks, positions
-- ``features``     : Delta-one feature vectors, vol surface, futures term structure
-- ``ml``           : Model metadata, inference requests/results, training jobs
-- ``health``       : Health status, dependency checks, circuit breakers, error envelopes
+- ``health``       : Health status, dependency checks, circuit breakers
 - ``config``       : Config store records, change notifications, active pointers
-- ``pubsub``       : Typed Pub/Sub message bodies for every internal topic
+- ``sor``          : Smart order routing schemas
+
+NOTE: lifecycle events, features, ML, pubsub topics, and risk schemas live in
+``unified-internal-contracts`` (the SSOT for all internal cross-service contracts).
 """
 
 from api_contracts.internal.config import (
@@ -35,33 +34,6 @@ from api_contracts.internal.domain import (
     ProcessedCandle,
     QuoteRecord,
 )
-from api_contracts.internal.events import (
-    AuthFailureDetails,
-    AuthFailureEvent,
-    ConfigChangedDetails,
-    ConfigChangedEvent,
-    DataBroadcastDetails,
-    EventMetadata,
-    EventSeverity,
-    FailedDetails,
-    FailedEvent,
-    LifecycleEventEnvelope,
-    LifecycleEventType,
-    PersistenceCompletedDetails,
-    PersistenceStartedDetails,
-    ProcessingCompletedDetails,
-    ProcessingStartedDetails,
-    PubSubLifecycleEventMessage,
-    SecretAccessedDetails,
-    SecretAccessedEvent,
-    ServiceMode,
-    StartedDetails,
-    StartedEvent,
-    UploadCompletedDetails,
-    UploadStartedDetails,
-    ValidationCompletedDetails,
-    ValidationStartedDetails,
-)
 from api_contracts.internal.execution import (
     BenchmarkType,
     CandleCloseWarningMessage,
@@ -82,12 +54,6 @@ from api_contracts.internal.execution import (
     TimeInForce,
     TPHitMessage,
 )
-from api_contracts.internal.features import (
-    DeltaOneFeatureRecord,
-    FeatureSnapshotRequest,
-    FuturesTermStructureRecord,
-    OptionsIvRecord,
-)
 from api_contracts.internal.health import (
     CircuitBreakerEvent,
     CircuitBreakerState,
@@ -96,59 +62,8 @@ from api_contracts.internal.health import (
     DependencyFailure,
     DependencyReport,
     DependencyStatus,
-    EnhancedError,
-    ErrorCategory,
-    ErrorContext,
-    ErrorRecoveryStrategy,
-    ErrorSeverity,
     HealthStatusEnum,
     ServiceHealthStatus,
-)
-from api_contracts.internal.ml import (
-    InferenceRequest,
-    InferenceResult,
-    MLConfigDict,
-    ModelMetadata,
-    ModelType,
-    ModelVariantConfig,
-    TargetType,
-    TrainingJobRequest,
-    TrainingJobResult,
-    TrainingPeriod,
-)
-from api_contracts.internal.pubsub import (
-    CircuitBreakerEventMessage,
-    DerivativeTickerMessage,
-    ExecutionResultMessage,
-    FeatureUpdateMessage,
-    FillEventMessage,
-    HealthAlertMessage,
-    InternalPubSubTopic,
-    LiquidationMessage,
-    MarketTickMessage,
-    MLPredictionMessage,
-    OrderRequestMessage,
-    PositionUpdateMessage,
-    PubSubMessageEnvelope,
-    RiskAlertMessage,
-    ServiceLifecycleEventMessage,
-    StrategySignalMessage,
-)
-from api_contracts.internal.risk import (
-    AccountState,
-    AlertContextData,
-    AlertMessage,
-    AlertType,
-    Balance,
-    ExposureSummary,
-    InternalPosition,
-    MarginState,
-    PositionSide,
-    PreTradeCheckRequest,
-    PreTradeCheckResponse,
-    RiskMetrics,
-    RiskPosition,
-    RiskStatus,
 )
 from api_contracts.internal.signals import (
     DeFiSignal,
@@ -166,6 +81,19 @@ from api_contracts.internal.sor import (
 )
 
 __all__ = [
+    # execution
+    "BenchmarkType",
+    "CandleCloseWarningMessage",
+    "CanonicalFill",
+    "CanonicalOrder",
+    # domain
+    "CanonicalOrderBook",
+    "CanonicalTrade",
+    # health
+    "CircuitBreakerEvent",
+    "CircuitBreakerState",
+    "CircuitBreakerStateEnum",
+    "ComponentHealth",
     # config
     "ConfigChangeNotification",
     "ConfigStoreActivePointer",
@@ -173,132 +101,37 @@ __all__ = [
     "ConfigStoreRecord",
     "ConfigValidationResponse",
     "ConfigValidationResult",
-    # domain
-    "CanonicalOrderBook",
-    "CanonicalTrade",
+    # signals
+    "DeFiSignal",
+    "DeFiSignalRecord",
+    "DependencyFailure",
+    "DependencyReport",
+    "DependencyStatus",
     "DerivativeTicker",
-    "InstrumentRecord",
-    "InstrumentType",
-    "LiquidationRecord",
-    "MarketTrade",
-    "OhlcvBar",
-    "OptionType",
-    "OrderBookSnapshot5",
-    "ProcessedCandle",
-    "QuoteRecord",
-    # events
-    "AuthFailureDetails",
-    "AuthFailureEvent",
-    "ConfigChangedDetails",
-    "ConfigChangedEvent",
-    "DataBroadcastDetails",
-    "EventMetadata",
-    "EventSeverity",
-    "FailedDetails",
-    "FailedEvent",
-    "LifecycleEventEnvelope",
-    "LifecycleEventType",
-    "PersistenceCompletedDetails",
-    "PersistenceStartedDetails",
-    "ProcessingCompletedDetails",
-    "ProcessingStartedDetails",
-    "PubSubLifecycleEventMessage",
-    "SecretAccessedDetails",
-    "SecretAccessedEvent",
-    "ServiceMode",
-    "StartedDetails",
-    "StartedEvent",
-    "UploadCompletedDetails",
-    "UploadStartedDetails",
-    "ValidationCompletedDetails",
-    "ValidationStartedDetails",
-    # execution
-    "BenchmarkType",
-    "CanonicalFill",
-    "CanonicalOrder",
-    "CandleCloseWarningMessage",
     "ExecutionInstruction",
     "ExecutionResult",
     "ExecutionStatus",
     "FillEventPubSubPayload",
+    "HealthStatusEnum",
+    "InstructionRecord",
+    "InstrumentRecord",
+    "InstrumentType",
+    "LiquidationRecord",
     "ManualInstructionRequest",
     "ManualInstructionResponse",
+    "MarketTrade",
+    "OhlcvBar",
     "OperationType",
+    "OptionType",
+    "OrderBookSnapshot5",
     "OrderSide",
     "OrderStatus",
     "OrderSubmittedMessage",
     "OrderType",
+    "ProcessedCandle",
+    "QuoteRecord",
     "SLHitMessage",
-    "TPHitMessage",
-    "TimeInForce",
-    # features
-    "DeltaOneFeatureRecord",
-    "FeatureSnapshotRequest",
-    "FuturesTermStructureRecord",
-    "OptionsIvRecord",
-    # health
-    "CircuitBreakerEvent",
-    "CircuitBreakerState",
-    "CircuitBreakerStateEnum",
-    "ComponentHealth",
-    "DependencyFailure",
-    "DependencyReport",
-    "DependencyStatus",
-    "EnhancedError",
-    "ErrorCategory",
-    "ErrorContext",
-    "ErrorRecoveryStrategy",
-    "ErrorSeverity",
-    "HealthStatusEnum",
     "ServiceHealthStatus",
-    # ml
-    "InferenceRequest",
-    "InferenceResult",
-    "MLConfigDict",
-    "ModelMetadata",
-    "ModelType",
-    "ModelVariantConfig",
-    "TargetType",
-    "TrainingJobRequest",
-    "TrainingJobResult",
-    "TrainingPeriod",
-    # pubsub
-    "CircuitBreakerEventMessage",
-    "DerivativeTickerMessage",
-    "ExecutionResultMessage",
-    "FeatureUpdateMessage",
-    "FillEventMessage",
-    "HealthAlertMessage",
-    "InternalPubSubTopic",
-    "LiquidationMessage",
-    "MLPredictionMessage",
-    "MarketTickMessage",
-    "OrderRequestMessage",
-    "PositionUpdateMessage",
-    "PubSubMessageEnvelope",
-    "RiskAlertMessage",
-    "ServiceLifecycleEventMessage",
-    "StrategySignalMessage",
-    # risk
-    "AccountState",
-    "AlertContextData",
-    "AlertMessage",
-    "AlertType",
-    "Balance",
-    "ExposureSummary",
-    "InternalPosition",
-    "MarginState",
-    "PositionSide",
-    "PreTradeCheckRequest",
-    "PreTradeCheckResponse",
-    "RiskMetrics",
-    "RiskPosition",
-    "RiskStatus",
-    # signals
-    "DeFiSignal",
-    "DeFiSignalRecord",
-    "InstructionRecord",
-    "StrategyInstruction",
     # sor
     "SorChildOrder",
     "SorExecutionSummary",
@@ -306,4 +139,7 @@ __all__ = [
     "SorTwapSlice",
     "SorVenueCapacity",
     "SorVenueScore",
+    "StrategyInstruction",
+    "TPHitMessage",
+    "TimeInForce",
 ]

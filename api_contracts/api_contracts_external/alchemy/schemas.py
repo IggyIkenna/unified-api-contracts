@@ -254,3 +254,85 @@ class AlchemySimulationResult(BaseModel):
     error: dict | None = None
     gasUsed: str | None = None
     blockNumber: str | None = None
+
+
+# --- WebSocket subscriptions (eth_subscribe) ---
+class AlchemyWsNewHeads(BaseModel):
+    """newHeads: new block header. Emits on each new block (including reorgs)."""
+
+    number: str | None = None
+    hash: str | None = None
+    parentHash: str | None = None
+    nonce: str | None = None
+    sha3Uncles: str | None = None
+    logsBloom: str | None = None
+    transactionsRoot: str | None = None
+    stateRoot: str | None = None
+    receiptsRoot: str | None = None
+    miner: str | None = None
+    difficulty: str | None = None
+    totalDifficulty: str | None = None
+    extraData: str | None = None
+    size: str | None = None
+    gasLimit: str | None = None
+    gasUsed: str | None = None
+    timestamp: str | None = None
+    baseFeePerGas: str | None = None
+
+
+class AlchemyWsMinedTransaction(BaseModel):
+    """alchemy_minedTransactions: full tx or hash when mined. Supported: ETH, Arbitrum, Polygon, Optimism."""
+
+    hash: str | None = None
+    from_: str | None = Field(None, alias="from")
+    to: str | None = None
+    value: str | None = None
+    gas: str | None = None
+    gasPrice: str | None = None
+    input: str | None = None
+    blockHash: str | None = None
+    blockNumber: str | None = None
+    transactionIndex: str | None = None
+
+    model_config = {"populate_by_name": True}
+
+
+class AlchemyWsAddressActivity(BaseModel):
+    """address_activity: activity for monitored addresses (webhook-style)."""
+
+    from_: str | None = Field(None, alias="from")
+    to: str | None = None
+    value: str | None = None
+    blockNumber: str | None = None
+    transactionHash: str | None = None
+    category: str | None = None  # external | internal | token | erc20 | erc721 | erc1155
+
+    model_config = {"populate_by_name": True}
+
+
+class AlchemyWsLog(BaseModel):
+    """logs: log entry matching topic filter from eth_subscribe('logs', {...})."""
+
+    address: str | None = None
+    topics: list[str] | None = None
+    data: str | None = None
+    blockNumber: str | None = None
+    transactionHash: str | None = None
+    transactionIndex: str | None = None
+    blockHash: str | None = None
+    logIndex: str | None = None
+    removed: bool | None = None
+
+
+class AlchemyWsSubscriptionResult(BaseModel):
+    """Result from eth_subscribe: subscription ID."""
+
+    subscription: str | None = None
+
+
+class AlchemyWsNotification(BaseModel):
+    """WebSocket notification envelope (method + params)."""
+
+    jsonrpc: str = "2.0"
+    method: str | None = None
+    params: dict | None = None

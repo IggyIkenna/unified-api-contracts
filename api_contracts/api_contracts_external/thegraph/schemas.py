@@ -222,3 +222,57 @@ class SubgraphERC20Approval(BaseModel):
     timestamp: int | None = None
     transactionHash: str | None = None
     info: dict | None = None
+
+
+# --- WebSocket GraphQL subscription messages ---
+class TheGraphWsConnectionInit(BaseModel):
+    """GraphQL WS connection_init message (client → server)."""
+
+    type: str = "connection_init"
+    payload: dict | None = None
+
+
+class TheGraphWsConnectionAck(BaseModel):
+    """GraphQL WS connection_ack (server → client)."""
+
+    type: str = "connection_ack"
+    payload: dict | None = None
+
+
+class TheGraphWsSubscribe(BaseModel):
+    """GraphQL WS subscribe message (client → server)."""
+
+    type: str = "subscribe"
+    id: str | None = None
+    payload: dict | None = None  # { query: "...", variables?: {...} }
+
+
+class TheGraphWsNext(BaseModel):
+    """GraphQL WS next: subscription data payload (server → client)."""
+
+    type: str = "next"
+    id: str | None = None
+    payload: dict | None = None  # { data: {...}, errors?: [...] }
+
+
+class TheGraphWsError(BaseModel):
+    """GraphQL WS error message (server → client)."""
+
+    type: str = "error"
+    id: str | None = None
+    payload: dict | list | None = None
+
+
+class TheGraphWsComplete(BaseModel):
+    """GraphQL WS complete: subscription ended (server → client)."""
+
+    type: str = "complete"
+    id: str | None = None
+
+
+class TheGraphWsSubscriptionEnvelope(BaseModel):
+    """Generic GraphQL WS message envelope. type discriminates payload."""
+
+    type: str | None = None
+    id: str | None = None
+    payload: dict | list | None = None

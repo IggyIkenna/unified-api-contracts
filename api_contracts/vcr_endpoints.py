@@ -23,10 +23,10 @@ class VCREndpoint(TypedDict):
     schema_class: str
     key_env: str
     header_name: str
-    schema_version: NotRequired[str]       # bumped when response schema changes
-    json_body: NotRequired[dict]           # POST body
-    auth_query_param: NotRequired[str]     # key goes in URL query (e.g. apiKey) not header
-    is_internal_service: NotRequired[bool] # True for inter-service cassettes (local only)
+    schema_version: NotRequired[str]  # bumped when response schema changes
+    json_body: NotRequired[dict]  # POST body
+    auth_query_param: NotRequired[str]  # key goes in URL query (e.g. apiKey) not header
+    is_internal_service: NotRequired[bool]  # True for inter-service cassettes (local only)
 
 
 def _get(
@@ -88,6 +88,27 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             "BinanceTicker",
             schema_version="1.0",
         ),
+        _get(
+            "https://fapi.binance.com/fapi/v1/trades?symbol=BTCUSDT&limit=5",
+            "trades.yaml",
+            "0",
+            "BinanceTrade",
+            schema_version="1.0",
+        ),
+        _get(
+            "https://fapi.binance.com/fapi/v1/depth?symbol=BTCUSDT&limit=5",
+            "orderbook.yaml",
+            "",
+            "BinanceOrderBook",
+            schema_version="1.0",
+        ),
+        _get(
+            "https://fapi.binance.com/fapi/v1/premiumIndex?symbol=BTCUSDT",
+            "derivative_ticker.yaml",
+            "",
+            "BinancePremiumIndex",
+            schema_version="1.0",
+        ),
     ],
     "okx": [
         _get(
@@ -97,11 +118,41 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             "OKXTicker",
             schema_version="1.0",
         ),
+        # TODO: trades — add OKXTrade schema for GET /api/v5/market/trades
+        _get(
+            "https://www.okx.com/api/v5/market/books?instId=BTC-USDT-SWAP&sz=5",
+            "orderbook.yaml",
+            "data.0",
+            "OKXOrderBook",
+            schema_version="1.0",
+        ),
+        _get(
+            "https://www.okx.com/api/v5/public/funding-rate?instId=BTC-USDT-SWAP",
+            "derivative_ticker.yaml",
+            "data.0",
+            "OKXFundingRate",
+            schema_version="1.0",
+        ),
     ],
     "bybit": [
         _get(
             "https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT",
             "ticker.yaml",
+            "result.list.0",
+            "BybitTicker",
+            schema_version="1.0",
+        ),
+        # TODO: trades — add BybitTrade schema for GET /v5/market/recent-trade
+        _get(
+            "https://api.bybit.com/v5/market/orderbook?category=linear&symbol=BTCUSDT&limit=5",
+            "orderbook.yaml",
+            "result",
+            "BybitOrderBook",
+            schema_version="1.0",
+        ),
+        _get(
+            "https://api.bybit.com/v5/market/tickers?category=linear&symbol=BTCUSDT",
+            "derivative_ticker.yaml",
             "result.list.0",
             "BybitTicker",
             schema_version="1.0",
@@ -125,9 +176,36 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             json_body={"type": "meta"},
             schema_version="1.0",
         ),
+        _post(
+            "https://api.hyperliquid.xyz/info",
+            "l2_book.yaml",
+            "",
+            "HyperliquidL2Book",
+            json_body={"type": "l2Book", "coin": "BTC"},
+            schema_version="1.0",
+        ),
+        _post(
+            "https://api.hyperliquid.xyz/info",
+            "meta_and_asset_ctxs.yaml",
+            "0",
+            "HyperliquidMetaAndAssetCtx",
+            json_body={"type": "metaAndAssetCtxs"},
+            schema_version="1.0",
+        ),
+        _post(
+            "https://api.hyperliquid.xyz/info",
+            "candle_snapshot.yaml",
+            "0",
+            "HyperliquidCandle",
+            json_body={
+                "type": "candleSnapshot",
+                "req": {"coin": "BTC", "interval": "1m", "startTime": 1700000000000, "endTime": 1700003600000},
+            },
+            schema_version="1.0",
+        ),
     ],
     "yahoo_finance": [],  # Chart endpoint rate-limits; use examples/ for schema validation
-    "databento": [],      # Requires DATABENTO_API_KEY; set env var when recording
+    "databento": [],  # TODO: live SType.LIVE — requires DATABENTO_API_KEY; set env var when recording
     "tardis": [
         _get(
             "https://api.tardis.dev/v1/exchanges",
@@ -138,9 +216,11 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             header_name="Authorization",
             schema_version="1.0",
         ),
+        # TODO: liquidations, derivative_ticker — requires TARDIS_API_KEY + historical replay
     ],
     "thegraph": [],
-    "alchemy": [],
+    "alchemy": [],  # TODO: WS newHeads, minedTransactions, logs — requires ALCHEMY_API_KEY
+    "pyth": [],  # TODO: WS price feeds — requires PYTH_API_KEY or public demo
     "ccxt": [],
     "aster": [],
     "ibkr": [],
@@ -148,6 +228,9 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     # Sports / prediction markets
     # ------------------------------------------------------------------
     "betfair": [],  # All endpoints require auth; use examples/ for schema validation
+    "smarkets": [],  # TODO: REST + WS — requires SMARKETS_API_KEY
+    "betdaq": [],  # TODO: SOAP/REST — requires BETDAQ_API_KEY
+    "matchbook": [],  # TODO: REST — requires MATCHBOOK_API_KEY
     "pinnacle": [
         _get(
             "https://api.pinnacle.com/v2/sports/29/leagues",
@@ -187,8 +270,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     "odds_api": [
         {
             **_get(
-                "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
-                "?regions=us&oddsFormat=decimal",
+                "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?regions=us&oddsFormat=decimal",
                 "odds.yaml",
                 "0",
                 "OddsApiFixture",
@@ -285,7 +367,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "understat": [],        # HTML scraping endpoint, no standard REST cassette
+    "understat": [],  # HTML scraping endpoint, no standard REST cassette
     "open_meteo": [
         _get(
             "https://api.open-meteo.com/v1/forecast"
@@ -296,7 +378,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "transfermarkt": [],    # No official API — stub module only
+    "transfermarkt": [],  # No official API — stub module only
     # ------------------------------------------------------------------
     # Developer tools
     # ------------------------------------------------------------------

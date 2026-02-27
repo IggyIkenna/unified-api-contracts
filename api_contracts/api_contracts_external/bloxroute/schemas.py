@@ -89,6 +89,34 @@ class BloxrouteSubscribeParams(BaseModel):
     include: list[str] | None = Field(None, description="Fields to include in stream")
 
 
+# --- Stream types: arbOnlyMEV, newTxs, pendingTxs, mempool ---
+class BloxrouteNewTxParams(BaseModel):
+    """subscribe newTxs stream params. Emits full tx when seen by BDN."""
+
+    include: list[str] | None = Field(None, description="Fields: hash, tx_contents, etc.")
+    transaction: str | None = Field(None, description="Filter: raw tx bytes")
+
+
+class BloxroutePendingTxParams(BaseModel):
+    """subscribe pendingTxs stream params. Emits tx when entering mempool."""
+
+    include: list[str] | None = Field(None, description="Fields to include")
+
+
+class BloxrouteArbOnlyMevParams(BaseModel):
+    """subscribe arbOnlyMEV stream params. MEV opportunity notifications."""
+
+    include: list[str] | None = Field(None, description="Fields to include")
+
+
+class BloxrouteMempoolNotification(BaseModel):
+    """Mempool / newTxs / pendingTxs notification payload (stub)."""
+
+    tx_hash: str | None = None
+    tx_contents: dict | None = None
+    blockchain_network: str | None = None
+
+
 # --- Protect RPC endpoints ---
 class BloxrouteProtectEndpoints(BaseModel):
     """bloXroute Protect RPC endpoints (frontrunning protection).

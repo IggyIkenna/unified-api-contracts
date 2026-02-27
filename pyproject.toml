@@ -50,7 +50,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["api_contracts*"]
+include = ["api_contracts*", "api_contracts_external", "unified_normalised_contracts"]
 exclude = ["tests*"]
 
 [tool.pytest.ini_options]

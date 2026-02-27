@@ -128,6 +128,7 @@ ENDPOINT_SCHEMA_MAP: dict[tuple[str, str], str] = {
     ("okx", "delivery_exercise_history"): "OKXDeliveryExerciseHistory",
     # Bybit
     ("bybit", "ticker"): "BybitTicker",
+    ("bybit", "liquidation"): "BybitLiquidationOrder",
     ("bybit", "orderbook"): "BybitOrderBook",
     ("bybit", "mark_price_kline"): "BybitMarkPriceKline",
     ("bybit", "index_price_kline"): "BybitIndexPriceKline",
@@ -204,6 +205,7 @@ ENDPOINT_SCHEMA_MAP: dict[tuple[str, str], str] = {
     ("deribit", "risk_limit"): "DeribitRiskLimit",
     ("deribit", "session_bankruptcy"): "DeribitSessionBankruptcyDetails",
     ("deribit", "instrument"): "DeribitInstrument",
+    ("deribit", "liquidation"): "DeribitLiquidationOrder",
     ("deribit", "ticker"): "DeribitTicker",
     ("deribit", "orderbook"): "DeribitOrderBook",
     ("deribit", "order"): "DeribitOrder",

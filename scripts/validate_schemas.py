@@ -269,16 +269,7 @@ def _is_type_compatible(value: Any, schema_type: type) -> bool:
     if hasattr(schema_type, '__args__'):
         return any(_is_type_compatible(value, arg) for arg in schema_type.__args__)
 
-    if schema_type is str and isinstance(value, str):
-        return True
-    elif schema_type is int and isinstance(value, int):
-        return True
-    elif schema_type is float and isinstance(value, (int, float)):
-        return True
-    elif schema_type is bool and isinstance(value, bool):
-        return True
-
-    return False
+    return bool((schema_type is str and isinstance(value, str)) or (schema_type is int and isinstance(value, int)) or (schema_type is float and isinstance(value, (int, float))) or (schema_type is bool and isinstance(value, bool)))
 
 
 def generate_schema_class(venue: str, endpoint: str, sample_data: dict[str, Any] | list) -> str:

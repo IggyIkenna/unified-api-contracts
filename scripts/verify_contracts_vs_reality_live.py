@@ -19,7 +19,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
-def _load_config():  # noqa: ANN202
+def _load_config():
     """Load UnifiedCloudConfig from env (same as UMI/UOI)."""
     try:
         from unified_config_interface import UnifiedCloudConfig

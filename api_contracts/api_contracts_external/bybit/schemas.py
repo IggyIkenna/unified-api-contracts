@@ -40,6 +40,20 @@ class BybitTicker(BaseModel):
     info: dict | None = None
 
 
+class BybitLiquidationOrder(BaseModel):
+    """Bybit WebSocket liquidation order (topic: allLiquidation.{symbol}).
+
+    Subscription: {"op": "subscribe", "args": ["allLiquidation.BTCUSDT"]}
+    Push frequency: 500ms. Covers USDT, USDC, Inverse contracts.
+    """
+
+    T: int  # updated timestamp (ms)
+    s: str  # symbol
+    S: str  # position side: Buy | Sell (Buy = long liquidation)
+    v: str  # executed size
+    p: str  # bankruptcy price
+
+
 class BybitMarkPriceKline(BaseModel):
     """Bybit mark price kline (REST: GET /v5/market/mark-price-kline).
 

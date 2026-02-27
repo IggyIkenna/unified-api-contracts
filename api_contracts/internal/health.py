@@ -1,4 +1,4 @@
-"""Internal health check, dependency, and error-handling schemas."""
+"""Internal health check and dependency schemas."""
 
 from __future__ import annotations
 
@@ -63,73 +63,13 @@ class DependencyFailure(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Error handling schemas (from handle_api_errors / EnhancedError)
-# ---------------------------------------------------------------------------
-
-class ErrorCategory(StrEnum):
-    RATE_LIMIT = "rate_limit"
-    AUTHENTICATION = "authentication"
-    AUTHORIZATION = "authorization"
-    NOT_FOUND = "not_found"
-    VALIDATION = "validation"
-    TIMEOUT = "timeout"
-    NETWORK = "network"
-    SERVER_ERROR = "server_error"
-    DATA_QUALITY = "data_quality"
-    DEPENDENCY = "dependency"
-    UNKNOWN = "unknown"
-
-
-class ErrorSeverity(StrEnum):
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-
-class ErrorRecoveryStrategy(StrEnum):
-    RETRY = "retry"
-    RETRY_WITH_BACKOFF = "retry_with_backoff"
-    FALLBACK = "fallback"
-    FAIL_FAST = "fail_fast"
-    SKIP = "skip"
-    ALERT = "alert"
-
-
-class ErrorContext(BaseModel):
-    service: str | None = None
-    operation: str | None = None
-    venue: str | None = None
-    instrument_key: str | None = None
-    shard: str | None = None
-    retry_count: int = 0
-    timestamp: datetime | None = None
-    request_id: str | None = None
-    extra: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
-
-
-class EnhancedError(BaseModel):
-    """Serialised form of a handled API error (from handle_api_errors decorator)."""
-
-    error_type: str = "EnhancedError"
-    message: str
-    category: ErrorCategory
-    severity: ErrorSeverity
-    recovery_strategy: ErrorRecoveryStrategy
-    context: ErrorContext
-    retry_count: int = 0
-    max_retries: int = 3
-    original_error: dict[str, str] = Field(default_factory=dict)
-    additional_info: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
-
-
-# ---------------------------------------------------------------------------
 # Circuit breaker (standardised schema for future adoption)
 # ---------------------------------------------------------------------------
 
+
 class CircuitBreakerStateEnum(StrEnum):
-    CLOSED = "closed"        # Normal — requests flow through
-    OPEN = "open"            # Tripped — requests rejected immediately
+    CLOSED = "closed"  # Normal — requests flow through
+    OPEN = "open"  # Tripped — requests rejected immediately
     HALF_OPEN = "half_open"  # Probing — one request allowed through
 
 

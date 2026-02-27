@@ -206,7 +206,7 @@ class BinanceMarkPriceUpdate(BaseModel):
     s: str  # symbol
     p: Decimal  # mark price
     i: Decimal  # index price
-    P: Decimal  # estimated settle price (only on last funding)
+    P: Decimal | None = None  # estimated settle price (only on last funding)
     r: Decimal  # funding rate
     T: int  # next funding time (ms)
 
