@@ -50,8 +50,9 @@ pending a future refactor pass.
 | File | Lines | Rule | Description | Action |
 |------|-------|------|-------------|--------|
 | `api_contracts/coinbase/schemas.py` | 53–61 | `reportUnknownParameterType` / `reportUnknownArgumentType` | `CoinbaseCandle.from_list(cls, candle_data: list)` uses untyped `list` parameter. Subscript indexing on untyped list produces unknown-type arguments. | Phase 1b: type as `list[int \| str]` and use explicit `Decimal(str(...))` casts |
-| `api_contracts/kraken/schemas.py` | 96–103 | `reportUnknownArgumentType` | `KrakenOHLCV.from_list()` indexing untyped list produces 8 unknown-type arguments. | Phase 1b: same fix pattern as Coinbase |
 | `api_contracts/vcr_endpoints.py` | 50 | `reportUnknownParameterType` | `json_body: dict[Unknown, Unknown] \| None` — VCR infrastructure uses untyped JSON dicts for mock bodies. | Acceptable for test infrastructure; document as permanent exception |
+| `api_contracts/venue_manifest.py` | 28 | `reportAssignmentType` | VENUE_MANIFEST dict has mixed VenueContract and extended internal/fix/regulatory entries with extra keys (module, description, is_internal, etc.). | TypedDict does not support optional extra keys; refactor to Union or separate dicts in Phase 2 |
+| `api_contracts/api_contracts_external/cloud_sdks/schemas/iam.py` | 191 | `reportUnknownParameterType` | OAuth2Error(code, http_status) — code/http_status from untyped exception handler. | Mirror GCP IAM SDK; add explicit types in future cloud_sdks hardening |
 
 ---
 
@@ -61,7 +62,19 @@ None currently.
 
 ---
 
-## 2.5 Hardening Decisions
+## 2.5 File Size Exceptions (MAX_FILE_LINES=900)
+
+| File | Lines | Reason |
+|------|-------|--------|
+| `binance/schemas.py` | ~1033 | 52 schema classes; monolithic venue schema; split by SRP tracked |
+| `venue_manifest.py` | ~1058 | VENUE_MANIFEST dict; internal/fix/regulatory entries; split tracked |
+| `aws_schemas.py` | ~1422 | AWS SDK protocol stubs; split tracked |
+
+**Config:** `scripts/quality-gates.sh` — `continue` for these paths when under threshold.
+
+---
+
+## 2.6 Hardening Decisions
 
 - `api-contracts` has zero production service code — no retry logic, no GCS writes,
   no pubsub. Error handling rules (no bare `except:`, `@handle_api_errors`) do not

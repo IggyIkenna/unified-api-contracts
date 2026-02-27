@@ -1,0 +1,41 @@
+{
+  "marketId": "1.23456789",
+  "marketName": "Match Odds",
+  "marketStartTime": "2025-02-28T15:00:00.000Z",
+  "totalMatched": 50000.5,
+  "runners": [
+    {
+      "selectionId": 12345,
+      "runnerName": "Home",
+      "handicap": 0,
+      "sortPriority": 1
+    },
+    {
+      "selectionId": 12346,
+      "runnerName": "Draw",
+      "handicap": 0,
+      "sortPriority": 2
+    },
+    {
+      "selectionId": 12347,
+      "runnerName": "Away",
+      "handicap": 0,
+      "sortPriority": 3
+    }
+  ],
+  "eventType": {
+    "id": "1",
+    "name": "Soccer"
+  },
+  "competition": {
+    "id": "100",
+    "name": "Premier League"
+  },
+  "event": {
+    "id": "200",
+    "name": "Man Utd v Liverpool",
+    "countryCode": "GB",
+    "timezone": "Europe/London",
+    "openDate": "2025-02-28T15:00:00.000Z"
+  }
+}

@@ -8,7 +8,6 @@ from pydantic import ValidationError
 
 from api_contracts.binance.schemas import BinanceKline, BinanceTicker, BinanceTrade
 from api_contracts.coinbase.schemas import CoinbaseCandle, CoinbaseTicker
-from api_contracts.kraken.schemas import KrakenTickerResponse
 
 # Project root
 ROOT = Path(__file__).resolve().parent.parent
@@ -119,29 +118,6 @@ class TestSchemaValidation:
         else:
             pytest.skip("Real API response not available")
 
-    def test_kraken_ticker_validation(self):
-        """Test Kraken ticker schema validates real API response."""
-        response_file = COLLECTED_RESPONSES_DIR / "kraken" / "ticker_1771933953.json"
-
-        if response_file.exists():
-            with response_file.open() as f:
-                data = json.load(f)
-
-            # Should validate without errors
-            ticker_response = KrakenTickerResponse(**data["response"])
-            assert isinstance(ticker_response.error, list)
-            assert isinstance(ticker_response.result, dict)
-
-            # Check that we have ticker data
-            if ticker_response.result:
-                pair_name = next(iter(ticker_response.result.keys()))
-                ticker_data = ticker_response.result[pair_name]
-                assert hasattr(ticker_data, "a")  # ask
-                assert hasattr(ticker_data, "b")  # bid
-                assert hasattr(ticker_data, "c")  # last trade
-        else:
-            pytest.skip("Real API response not available")
-
     def test_schema_validation_coverage(self):
         """Test that we have good schema coverage across venues."""
         # Count schema classes
@@ -158,15 +134,10 @@ class TestSchemaValidation:
             # Add other Coinbase schemas as imported
         ]
 
-        kraken_schemas = [
-            KrakenTickerResponse
-            # Add other Kraken schemas as imported
-        ]
-
-        total_schemas = len(binance_schemas) + len(coinbase_schemas) + len(kraken_schemas)
+        total_schemas = len(binance_schemas) + len(coinbase_schemas)
 
         # Should have reasonable schema coverage
-        assert total_schemas >= 6, f"Expected at least 6 schemas, got {total_schemas}"
+        assert total_schemas >= 5, f"Expected at least 5 schemas, got {total_schemas}"
 
     def test_decimal_precision(self):
         """Test that financial fields use Decimal for precision."""

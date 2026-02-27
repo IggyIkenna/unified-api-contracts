@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/venue_constants.py
+# hypothesis_version: 6.151.9
+
+['AAVE-PLASMA', 'AAVE_V3', 'AAVE_V3_ETH', 'AERODROME-BASE', 'ASTER', 'BINANCE', 'BINANCE-FUTURES', 'BINANCE-SPOT', 'BYBIT', 'CBOE', 'CBOT', 'CME', 'COINBASE-SPOT', 'COMEX', 'CURVE-ETH', 'DERIBIT', 'EQUITY', 'ETF', 'ETHENA', 'ETHERFI', 'EULER-PLASMA', 'FLUID-PLASMA', 'FUTURE', 'HYPERLIQUID', 'ICE', 'LENDING', 'LIDO', 'MORPHO-ETHEREUM', 'NASDAQ', 'NYMEX', 'NYSE', 'OKX', 'OPTION', 'PERPETUAL', 'POOL', 'SPOT', 'STAKING', 'UNISWAPV2-ETH', 'UNISWAPV3-ETH', 'UNISWAPV4-ETH', 'UPBIT', 'XNAS', 'XNYS', 'cefi', 'defi', 'equities', 'etf', 'futures_chain', 'options_chain', 'perpetuals', 'pools', 'spot', 'tradfi']

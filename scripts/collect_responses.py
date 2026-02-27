@@ -3,7 +3,7 @@
 Collect real API responses using Context7 for schema validation.
 
 Uses unified-config-interface for configuration and Secret Manager for API keys.
-Collects responses for high-priority venues: Binance, Coinbase, Kraken.
+Collects responses for high-priority venues: Binance, Coinbase.
 Outputs to collected_responses/{venue}/*.json for later schema validation.
 
 Usage:
@@ -17,7 +17,7 @@ Usage:
     uv run python scripts/collect_responses.py --list
 
 Dependencies (install from workspace):
-    uv pip install -e ../unified-cloud-services -e ../unified-config-interface
+    uv pip install -e ../unified-trading-services -e ../unified-config-interface
     uv pip install requests ccxt
 """
 
@@ -38,7 +38,7 @@ ROOT = Path(__file__).resolve().parent.parent
 COLLECTED_RESPONSES_DIR = ROOT / "collected_responses"
 
 # High-priority venues for this phase
-SUPPORTED_VENUES = ["binance", "coinbase", "kraken"]
+SUPPORTED_VENUES = ["binance", "coinbase"]
 
 # Common endpoints to collect for each venue
 ENDPOINT_PATTERNS = {
@@ -69,19 +69,19 @@ def load_context7_config():
     except ImportError:
         print(
             "Context7 requires unified-config-interface. "
-            "Install: uv pip install -e ../unified-cloud-services -e ../unified-config-interface",
+            "Install: uv pip install -e ../unified-trading-services -e ../unified-config-interface",
             file=sys.stderr,
         )
         return None
 
 
 def get_secret_safely(config: object, secret_name: str) -> str | None:
-    """Get secret via Context7 (unified-cloud-services) safely."""
+    """Get secret via Context7 (unified-trading-services) safely."""
     if not config:
         return None
 
     try:
-        from unified_cloud_services import get_secret_with_fallback
+        from unified_trading_services import get_secret_with_fallback
 
         project_id = getattr(config, "gcp_project_id", None) or getattr(config, "project_id", None)
         if not project_id:
@@ -211,50 +211,6 @@ def collect_coinbase_responses(config: object) -> int:
     return 0 if collected > 0 else 1
 
 
-def collect_kraken_responses(config: object) -> int:
-    """Collect Kraken API responses."""
-    print("🔄 Collecting Kraken API responses...")
-
-    base_url = "https://api.kraken.com/0/public"
-
-    # Public endpoints
-    endpoints = {
-        "ticker": f"{base_url}/Ticker?pair=XBTUSD",
-        "orderbook": f"{base_url}/Depth?pair=XBTUSD&count=10",
-        "recent_trades": f"{base_url}/Trades?pair=XBTUSD",
-        "ohlc": f"{base_url}/OHLC?pair=XBTUSD&interval=60",
-        "exchange_info": f"{base_url}/AssetPairs",
-    }
-
-    collected = 0
-    for endpoint_name, url in endpoints.items():
-        try:
-            print(f"  Fetching {endpoint_name}...")
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-
-            save_response(
-                venue="kraken",
-                endpoint=endpoint_name,
-                data=response.json(),
-                metadata={
-                    "url": url,
-                    "status_code": response.status_code,
-                    "headers": dict(response.headers),
-                }
-            )
-            collected += 1
-
-            # Rate limiting courtesy
-            time.sleep(0.5)
-
-        except Exception as e:
-            print(f"❌ Failed to collect Kraken {endpoint_name}: {e}")
-
-    print(f"✅ Collected {collected}/5 Kraken endpoints")
-    return 0 if collected > 0 else 1
-
-
 def collect_all_venues(config: object) -> int:
     """Collect responses from all supported venues."""
     print("🚀 Starting API response collection for schema validation...")
@@ -263,7 +219,6 @@ def collect_all_venues(config: object) -> int:
     collectors = {
         "binance": collect_binance_responses,
         "coinbase": collect_coinbase_responses,
-        "kraken": collect_kraken_responses,
     }
 
     total_errors = 0
@@ -313,7 +268,6 @@ def main() -> int:
         collectors = {
             "binance": collect_binance_responses,
             "coinbase": collect_coinbase_responses,
-            "kraken": collect_kraken_responses,
         }
         return collectors[args.venue](config)
     else:

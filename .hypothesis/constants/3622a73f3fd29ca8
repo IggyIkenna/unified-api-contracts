@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/api_contracts_external/cloud_sdks/schemas/gcs.py
+# hypothesis_version: 6.151.9
+
+['Blob path/name', 'Bucket name', 'Byte range end', 'Byte range start', 'Content-Type', 'Custom metadata', 'Max results per page', 'Number of buckets', 'Page token', 'Prefix filter', 'Project ID', 'Requester pays', 'Total objects', 'Total storage bytes']

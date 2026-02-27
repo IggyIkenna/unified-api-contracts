@@ -1,0 +1,10 @@
+{
+  "ticker": "TSLA",
+  "effective_date": "2022-08-25",
+  "ratio": 3.0,
+  "split_from": 1,
+  "split_to": 3,
+  "is_reverse_split": false,
+  "adjustment_factor": 0.3333333333333333,
+  "source": "yfinance"
+}

@@ -1,0 +1,14 @@
+{
+  "open_time": 1704067200000,
+  "open_price": "50000.5",
+  "high_price": "50100.25",
+  "low_price": "49900.75",
+  "close_price": "50050.00",
+  "volume": "1000.5",
+  "close_time": 1704153600000,
+  "quote_asset_volume": "50025000.50",
+  "number_of_trades": 1000,
+  "taker_buy_base_asset_volume": "500.25",
+  "taker_buy_quote_asset_volume": "25012500.25",
+  "ignore": "0"
+}

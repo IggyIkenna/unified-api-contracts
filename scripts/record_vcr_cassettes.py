@@ -18,6 +18,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
+from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
 
 import requests
 from vcr import VCR
@@ -44,17 +45,54 @@ SECRET_HEADERS = [
 ]
 
 
+SECRET_QUERY_PARAMS = ["apikey", "api_key", "token"]
+
+
+def _filter_url_secrets(url: str) -> str:
+    """Replace secret query param values with [FILTERED]."""
+    parsed = urlparse(url)
+    if not parsed.query:
+        return url
+    params = parse_qs(parsed.query, keep_blank_values=True)
+    changed = False
+    for key in list(params.keys()):
+        if key.lower() in SECRET_QUERY_PARAMS:
+            params[key] = ["[FILTERED]"]
+            changed = True
+    if not changed:
+        return url
+    new_query = urlencode(params, doseq=True)
+    new = parsed._replace(query=new_query)
+    return urlunparse(new)
+
+
 def filter_request(request: requests.PreparedRequest) -> requests.PreparedRequest | None:
-    """Replace secret headers with [FILTERED] before recording."""
-    if request.headers is None:
-        return request
-    lower_headers = {k.lower(): k for k in request.headers}
-    for secret in SECRET_HEADERS:
-        if secret in lower_headers:
-            orig_key = lower_headers[secret]
-            request.headers[orig_key] = "[FILTERED]"
+    """Replace secret headers and query params with [FILTERED] before recording."""
+    if request.headers is not None:
+        lower_headers = {k.lower(): k for k in request.headers}
+        for secret in SECRET_HEADERS:
+            if secret in lower_headers:
+                orig_key = lower_headers[secret]
+                request.headers[orig_key] = "[FILTERED]"
+    if request.url:
+        filtered_url = _filter_url_secrets(request.url)
+        if filtered_url != request.url:
+            request.url = filtered_url
     return request
 
+
+
+
+def _inject_schema_version(cassette_path: Path, version: str) -> None:
+    """Append x-contract-schema-version to all response headers in cassette if not present."""
+    if not cassette_path.exists():
+        return
+    text = cassette_path.read_text()
+    if "x-contract-schema-version" in text.lower():
+        return
+    marker = "    status:\n"
+    inject = f"      x-contract-schema-version:\n      - '{version}'\n"
+    cassette_path.write_text(text.replace(marker, inject + marker))
 
 def make_vcr(cassette_dir: Path) -> VCR:
     return VCR(
@@ -94,25 +132,39 @@ def run() -> int:
                 skipped_no_key += 1
                 continue
             headers: dict[str, str] = {}
-            if key_env and os.environ.get(key_env):
-                header_name = ep.get("header_name") or "Authorization"
-                key = os.environ.get(key_env)
-                if header_name.lower() == "authorization" and key and not key.startswith("Bearer "):
-                    headers["Authorization"] = f"Bearer {key}"
+            params: dict[str, str] = {}
+            key = os.environ.get(key_env) if key_env else None
+            auth_query_param = ep.get("auth_query_param") or ""
+
+            if key_env and key:
+                if auth_query_param:
+                    params[auth_query_param] = key
                 else:
-                    headers[header_name] = key or ""
+                    header_name = ep.get("header_name") or "Authorization"
+                    if header_name.lower() == "authorization":
+                        if key.startswith("Bearer ") or key.startswith("Basic "):
+                            headers["Authorization"] = key
+                        else:
+                            headers["Authorization"] = f"Bearer {key}"
+                    else:
+                        headers[header_name] = key
 
             cassette_name = ep["cassette_name"]
             with vcr.use_cassette(cassette_name):
                 try:
                     if ep.get("method") == "POST":
                         body = ep.get("json_body")
-                        resp = requests.post(ep["url"], json=body, headers=headers or None, timeout=30)
+                        resp = requests.post(
+                            ep["url"], json=body, headers=headers or None, params=params or None, timeout=30
+                        )
                     else:
-                        resp = requests.get(ep["url"], headers=headers or None, timeout=30)
+                        resp = requests.get(
+                            ep["url"], headers=headers or None, params=params or None, timeout=30
+                        )
                     resp.raise_for_status()
                     recorded += 1
                     print(f"Recorded {venue}/{cassette_name}")
+                    _inject_schema_version(cassette_dir / cassette_name, ep.get("schema_version", "1.0"))
                 except Exception as e:
                     errors.append(f"{venue}/{cassette_name}: {e}")
 

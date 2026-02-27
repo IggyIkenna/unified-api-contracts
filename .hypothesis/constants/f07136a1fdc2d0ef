@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/schemas/rate_limits.py
+# hypothesis_version: 6.151.9
+
+[2.0, 10.0, 24.0, 30.0, 100, 2400, 5000, 10000, '10/s private', '120/5s', 'Remaining requests', 'Seconds to wait', 'Tier-dependent', 'Unix timestamp', 'Used in window', 'Venue identifier', 'api_football', 'binance', 'bybit', 'coinbase', 'databento', 'deribit', 'gcp_cloud_build', 'github', 'glassnode', 'hyperliquid', 'kalshi', 'okx', 'open_meteo', 'polymarket']

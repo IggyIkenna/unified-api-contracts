@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/shared/quota_types.py
+# hypothesis_version: 6.151.9
+
+['AWS service code', 'Current usage', 'GCP region', 'IN_USE_ADDRESSES', 'Quota identifier', 'Quota limit', 'SSD disk size in GB', 'SSD_TOTAL_GB', 'cloud_run', 'vCPU count', 'vm']

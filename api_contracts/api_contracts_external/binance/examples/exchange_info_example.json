@@ -1,0 +1,38 @@
+{
+  "timezone": "UTC",
+  "serverTime": 1704067200000,
+  "rateLimits": [
+    {
+      "rateLimitType": "REQUEST_WEIGHT",
+      "interval": "MINUTE",
+      "limit": 1200
+    },
+    {
+      "rateLimitType": "ORDERS",
+      "interval": "MINUTE",
+      "limit": 10
+    }
+  ],
+  "exchangeFilters": [],
+  "symbols": [
+    {
+      "symbol": "BTCUSDT",
+      "status": "TRADING",
+      "baseAsset": "BTC",
+      "baseAssetPrecision": 8,
+      "quoteAsset": "USDT",
+      "quotePrecision": 8,
+      "quoteAssetPrecision": 8,
+      "baseCommissionPrecision": 8,
+      "quoteCommissionPrecision": 8,
+      "orderTypes": ["LIMIT", "LIMIT_MAKER", "MARKET", "STOP_LOSS_LIMIT", "TAKE_PROFIT_LIMIT"],
+      "icebergAllowed": true,
+      "ocoAllowed": true,
+      "quoteOrderQtyMarketAllowed": true,
+      "allowTrailingStop": true,
+      "cancelReplaceAllowed": false,
+      "isSpotTradingAllowed": true,
+      "isMarginTradingAllowed": true
+    }
+  ]
+}

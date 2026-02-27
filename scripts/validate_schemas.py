@@ -147,15 +147,7 @@ def validate_venue_responses(venue: str) -> list[ValidationResult]:
         return results
 
     # Map endpoints to schema classes (venue-specific mappings)
-    if venue == "kraken":
-        endpoint_schema_map = {
-            "ticker": "KrakenTickerResponse",
-            "orderbook": "KrakenOrderBook",
-            "recent_trades": "KrakenTrade",
-            "ohlc": "KrakenOHLC",
-            "exchange_info": "KrakenAssetPair",
-        }
-    elif venue == "coinbase":
+    if venue == "coinbase":
         endpoint_schema_map = {
             "ticker": "CoinbaseTicker",
             "orderbook": "CoinbaseOrderBook",
@@ -378,7 +370,7 @@ def main() -> int:
     )
     parser.add_argument(
         "--venue",
-        choices=["binance", "coinbase", "kraken"],
+        choices=["binance", "coinbase"],
         help="Specific venue to validate (default: all)",
     )
     parser.add_argument(
@@ -395,7 +387,7 @@ def main() -> int:
 
     args = parser.parse_args()
 
-    venues = [args.venue] if args.venue else ["binance", "coinbase", "kraken"]
+    venues = [args.venue] if args.venue else ["binance", "coinbase"]
 
     all_results = []
     for venue in venues:

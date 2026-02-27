@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/shared/error_action.py
+# hypothesis_version: 6.151.9
+
+['fail_hard', 'ignore', 'reconnect', 'retry_backoff']

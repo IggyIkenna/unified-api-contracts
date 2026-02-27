@@ -4,6 +4,10 @@ Pydantic schemas, example JSON, and VCR cassette directories for external APIs u
 
 **✅ Schema Validation**: All schemas validated against real API responses using Context7 for accurate type definitions and Decimal precision for financial data.
 
+**Version = Mappings + Schemas + Endpoints**: The api-contracts package version (pyproject.toml) is the single source of truth for endpoint-to-schema mappings, base URLs, and all Pydantic schemas. When you bump the version, you version the entire contract surface. See [SCHEMA_VERSIONS.md](SCHEMA_VERSIONS.md).
+
+**Chain of events**: Config → SDK/API call → schema validation → adapter output. See [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md).
+
 ## Purpose
 
 - **Single source of truth** for external API request/response shapes (Databento, Tardis, CCXT, The Graph, OKX, Bybit, Upbit, Yahoo Finance, Alchemy, Hyperliquid, Aster, IBKR, etc.).
@@ -13,7 +17,24 @@ Pydantic schemas, example JSON, and VCR cassette directories for external APIs u
 
 ## Structure
 
-Per-API directories contain:
+```
+api_contracts/
+├── api_contracts_external/     # Raw: request, response, errors per venue
+│   ├── binance/
+│   ├── databento/
+│   ├── tardis/
+│   └── ...
+├── unified_normalised_contracts/  # Canonical: domain, execution, errors
+│   ├── domain.py
+│   ├── execution.py
+│   ├── errors.py
+│   └── normalize.py
+├── internal/                  # Internal service-to-service schemas
+├── schemas/                   # Shared cross-venue schemas
+└── ...
+```
+
+Per-venue directories (under `api_contracts_external/`) contain:
 
 - `schemas.py` — Pydantic models for request/response shapes.
 - `examples/` — Captured JSON (or CSV) from real or trial API calls.
@@ -25,11 +46,13 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a venue, capture examples,
 
 | Category | Venues |
 |----------|--------|
-| **High-Priority CeFi exchanges** | **✅ Binance, ✅ Coinbase, ✅ Kraken** (validated schemas) |
+| **High-Priority CeFi exchanges** | **✅ Binance, ✅ Coinbase** (validated schemas) |
 | Other CeFi exchanges | OKX, Bybit, Upbit (CCXT and/or REST) |
-| CeFi / TradFi data | Databento, Tardis, Yahoo Finance |
+| CeFi / TradFi data | Databento (~506 venues), Tardis, Yahoo Finance, Barchart (VIX 15m) |
 | DeFi | The Graph, Alchemy, Hyperliquid, Aster |
 | TradFi execution | Interactive Brokers (IBKR, TWS/ib_insync) |
+
+**TradFi**: IBKR + Databento only; no direct CME/NASDAQ/NYSE. See [docs/TRADFI_VENUE_NUANCES.md](docs/TRADFI_VENUE_NUANCES.md) for CCXT, IBKR, and Databento symbol formats; [docs/VIX_LIVE_RESEARCH.md](docs/VIX_LIVE_RESEARCH.md) for VIX live streaming research.
 
 See per-venue README or index under each directory for market data, order feed, position feed, errors, WebSocket, and FIX coverage.
 
@@ -41,6 +64,8 @@ Consumers use path dependency `../api-contracts` (see path-dependency-ci.mdc). E
 from api_contracts.databento.schemas import DatabentoTrade
 # validate raw response then map to canonical types
 ```
+
+**Backward compat:** `api_contracts.binance`, `api_contracts.databento`, etc. are aliased to `api_contracts.api_contracts_external.*`. Prefer `api_contracts.unified_normalised_contracts` for canonical schemas.
 
 ## Self-test: schemas and coverage
 
@@ -54,61 +79,25 @@ See `tests/test_venue_contract_coverage.py` and `tests/test_contracts_vs_reality
 
 ## Schema Validation & Collection
 
-### Automated Response Collection
+**Full flow**: [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md) — chain overview, schema validation pipeline (collect_responses → validate_schemas → api_contracts), VCR flow (record_vcr_cassettes → test_vcr_replay), live verification (`LIVE_API_VERIFICATION=1`), version alignment (SCHEMA_VERSIONS.md, [schema-validation] deps, check_sdk_version_alignment.py), ENDPOINT_SCHEMA_MAP, BASE_URLS, venue_manifest.
 
-Collect real API responses for schema validation:
-
-```bash
-# Collect all high-priority venues
-uv run python scripts/collect_responses.py
-
-# Collect specific venue 
-uv run python scripts/collect_responses.py --venue binance
-
-# List supported venues
-uv run python scripts/collect_responses.py --list
-```
-
-**Context7 Integration**: Uses `unified-config-interface` for secure API key management via Secret Manager.
-
-### Schema Validation
-
-Validate schemas against real API responses:
+**Quick commands:**
 
 ```bash
-# Validate all venues
-uv run python scripts/validate_schemas.py
+# Collect responses (LIVE_API_VERIFICATION=1 + API keys)
+LIVE_API_VERIFICATION=1 uv run python scripts/collect_responses.py [--venue binance]
 
-# Validate specific venue
-uv run python scripts/validate_schemas.py --venue coinbase
+# Validate schemas
+uv run python scripts/validate_schemas.py [--venue coinbase] [--generate-schemas]
 
-# Generate new schemas from responses
-uv run python scripts/validate_schemas.py --generate-schemas --venue kraken
+# Record VCR cassettes
+uv run python scripts/record_vcr_cassettes.py [--venue binance]
+
+# Live verification
+LIVE_API_VERIFICATION=1 uv run python scripts/verify_contracts_vs_reality_live.py
 ```
 
-**Features**:
-- **Type Safety**: Uses `Decimal` for financial precision instead of `float`
-- **Missing Field Detection**: Identifies fields missing from schemas
-- **Type Mismatch Analysis**: Reports incorrect field types
-- **Schema Generation**: Auto-generates schemas from real API responses
-
-### Quality Gates Integration
-
-Schema validation is integrated into quality gates:
-
-```bash
-# Run all quality checks including schema validation
-bash scripts/quality-gates.sh
-
-# Run only schema validation tests
-bash scripts/quality-gates.sh --test
-```
-
-**Validation Tests**: Located in `tests/test_schema_validation.py`, covering:
-- Real API response validation against schemas
-- Decimal precision for financial fields
-- Error handling for invalid data
-- Schema coverage across venues
+**Quality gates**: Schema validation tests in `tests/test_schema_validation.py` run via `bash scripts/quality-gates.sh`.
 
 ## Usage Patterns
 
@@ -221,7 +210,7 @@ bash scripts/quality-gates.sh --no-fix  # Verify
 ## Contract-vs-reality
 
 - **CI**: Validate all `examples/*.json` against the corresponding Pydantic models (no live calls).
-- **Optional live verification**: When `LIVE_API_VERIFICATION=1`, use the same config and Secret Manager as UMI/UOI (no duplication). Install from workspace: `uv pip install -e ../unified-cloud-services -e ../unified-config-interface`, then run `scripts/verify_contracts_vs_reality_live.py`. API keys are resolved via `config.get_secret(secret_field)` (unified-config-interface), which uses unified-cloud-services under the hood.
+- **Optional live verification**: When `LIVE_API_VERIFICATION=1`, use the same config and Secret Manager as UMI/UOI (no duplication). Install from workspace: `uv pip install -e ../unified-trading-services -e ../unified-config-interface`, then run `scripts/verify_contracts_vs_reality_live.py`. API keys are resolved via `config.get_secret(secret_field)` (unified-config-interface), which uses unified-trading-services under the hood.
 
 ## Permissions and collaborators
 
