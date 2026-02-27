@@ -64,12 +64,15 @@ def test_manifest_has_rest_websocket_fix_per_venue() -> None:
 
 
 def test_manifest_venues_match_api_contracts_dirs() -> None:
-    """Every venue in the manifest must have a corresponding api_contracts/<venue>/schemas.py."""
+    """Every venue in the manifest must have api_contracts/<venue>/schemas.py or schemas/."""
     root = Path(__file__).resolve().parent.parent
     api_root = root / "api_contracts"
     for venue in VENUE_MANIFEST:
         schemas_file = api_root / venue / "schemas.py"
-        assert schemas_file.exists(), f"api_contracts/{venue}/schemas.py missing"
+        schemas_dir = api_root / venue / "schemas"
+        assert schemas_file.exists() or (schemas_dir.is_dir() and (schemas_dir / "__init__.py").exists()), (
+            f"api_contracts/{venue}/schemas.py or schemas/ missing"
+        )
 
 
 def test_at_least_one_venue_has_rest() -> None:

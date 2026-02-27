@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
+from enum import StrEnum
+
+from pydantic import BaseModel, Field
 
 
 @dataclass
@@ -68,3 +71,167 @@ class OptionGreeks:
     theta: Decimal | None = None
     vega: Decimal | None = None
     rho: Decimal | None = None
+
+
+# =============================================================================
+# Pydantic models (API contracts for institutional derivatives)
+# =============================================================================
+
+
+class PositionRisk(BaseModel):
+    """Position risk metrics."""
+
+    liquidationPrice: Decimal | None = Field(None, description="Liquidation price")
+    bankruptcyPrice: Decimal | None = Field(None, description="Bankruptcy price")
+    maintenanceMarginRate: Decimal | None = Field(None, description="Maintenance margin rate")
+    initialMarginRate: Decimal | None = Field(None, description="Initial margin rate")
+    marginRatio: Decimal | None = Field(None, description="Current margin ratio")
+    adlRank: int | None = Field(None, description="Auto-deleveraging rank")
+    riskTier: int | None = Field(None, description="Risk tier")
+
+
+class InsuranceFundState(BaseModel):
+    """Insurance fund state snapshot."""
+
+    asset: str = Field(..., description="Asset symbol")
+    amount: Decimal = Field(..., description="Fund amount")
+    timestamp: datetime = Field(..., description="Snapshot timestamp")
+
+
+class LongShortRatio(BaseModel):
+    """Long/short ratio aggregate."""
+
+    longShortRatio: Decimal = Field(..., description="Ratio of long to short")
+    longAccount: Decimal = Field(..., description="Long account proportion")
+    shortAccount: Decimal = Field(..., description="Short account proportion")
+
+
+class OpenInterestHistory(BaseModel):
+    """Open interest history point."""
+
+    symbol: str = Field(..., description="Instrument symbol")
+    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    openInterest: Decimal = Field(..., description="Open interest value")
+
+
+class FundingRateHistory(BaseModel):
+    """Funding rate history point."""
+
+    fundingTime: datetime = Field(..., description="Funding timestamp")
+    rate: Decimal = Field(..., description="Funding rate")
+    markPrice: Decimal | None = Field(None, description="Mark price at funding")
+    indexPrice: Decimal | None = Field(None, description="Index price at funding")
+
+
+class SettlementEvent(BaseModel):
+    """Settlement event record."""
+
+    instrument: str = Field(..., description="Instrument symbol")
+    settlementPrice: Decimal = Field(..., description="Settlement price")
+    deliveryTime: datetime = Field(..., description="Delivery/settlement time")
+    cashFlow: Decimal | None = Field(None, description="Cash flow amount")
+    fee: Decimal | None = Field(None, description="Settlement fee")
+
+
+# --- Options volatility surface ---
+
+
+class VolSmilePoint(BaseModel):
+    """Single point on volatility smile (strike vs IV)."""
+
+    strike: Decimal = Field(..., description="Strike price")
+    impliedVol: Decimal = Field(..., description="Implied volatility")
+
+
+class VolSurfaceSlice(BaseModel):
+    """Volatility smile at a single expiry."""
+
+    expiry: datetime = Field(..., description="Expiry timestamp")
+    points: list[VolSmilePoint] = Field(default_factory=list, description="Strike/IV points")
+
+
+class VolTermStructure(BaseModel):
+    """Volatility term structure (expiry vs ATM IV)."""
+
+    expiry: datetime = Field(..., description="Expiry timestamp")
+    atmVol: Decimal = Field(..., description="At-the-money implied volatility")
+
+
+class VolSurface(BaseModel):
+    """Full volatility surface (smile + term structure)."""
+
+    symbol: str = Field(..., description="Underlying symbol")
+    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    slices: list[VolSurfaceSlice] = Field(default_factory=list, description="Smile slices per expiry")
+    termStructure: list[VolTermStructure] = Field(default_factory=list, description="Term structure")
+
+
+# ---------------------------------------------------------------------------
+# Multi-leg combo instrument schemas (cross-venue canonical)
+# ---------------------------------------------------------------------------
+
+
+class ComboStrategyType(StrEnum):
+    """Named options/futures spread strategy types."""
+
+    CALENDAR_SPREAD = "calendar_spread"  # same underlying, different expiries
+    RISK_REVERSAL = "risk_reversal"  # buy call + sell put (same expiry)
+    STRADDLE = "straddle"  # buy call + buy put (same strike/expiry)
+    STRANGLE = "strangle"  # buy OTM call + buy OTM put
+    BUTTERFLY = "butterfly"  # 3-leg: buy 1 + sell 2 + buy 1
+    CONDOR = "condor"  # 4-leg: bull spread + bear spread
+    BULL_CALL_SPREAD = "bull_call_spread"  # buy lower strike call + sell higher
+    BEAR_PUT_SPREAD = "bear_put_spread"  # buy higher strike put + sell lower
+    EFP = "efp"  # Exchange for Physical (IBKR): futures vs basket
+    CUSTOM = "custom"  # arbitrary legs (e.g. Deribit block trade)
+
+
+class ComboLeg(BaseModel):
+    """Single leg of a multi-leg instrument (venue-agnostic).
+
+    Maps to: DeribitComboLeg, IBKRComboLeg, OKXRfqLeg
+    """
+
+    instrument_id: str  # Venue-specific instrument identifier
+    direction: str  # "buy" | "sell"
+    ratio: int = 1  # Quantity multiplier (1 for equal-weighted legs)
+    venue: str | None = None  # For cross-venue combos
+
+
+class MultiLegInstrument(BaseModel):
+    """Normalized multi-leg/combo instrument (cross-venue canonical).
+
+    Maps to venue-specific types:
+    - Deribit: DeribitComboInstrument (kind=future_combo/option_combo)
+    - IBKR: IBKRComboContract (secType=BAG)
+    - OKX: OKXRfqCreateRequest (multi-leg via RFQ system)
+    - Binance: No native combo; use separate legs
+    """
+
+    combo_id: str | None = None  # Venue-assigned combo identifier
+    venue: str  # Primary venue
+    strategy_type: ComboStrategyType | None = None
+    underlying: str | None = None  # e.g. "BTC", "ETH", "SPX"
+    legs: list[ComboLeg]
+    block_trade_only: bool = False  # True = OTC/institutional block trade required
+    description: str | None = None  # Human-readable e.g. "BTC JUN/SEP calendar spread"
+    timestamp: datetime | None = None  # When this combo was created/observed
+
+
+class ComboQuote(BaseModel):
+    """Unified combo price + net greeks (cross-venue).
+
+    Net price = sum of (leg_price x direction_sign x ratio).
+    Net greeks = sum of per-leg greeks weighted by direction and ratio.
+    """
+
+    combo_id: str
+    venue: str
+    net_price: Decimal | None = None  # Net debit (positive) or credit (negative)
+    bid: Decimal | None = None  # Best bid for the combo as a unit
+    ask: Decimal | None = None  # Best ask for the combo as a unit
+    net_delta: Decimal | None = None  # Net portfolio delta
+    net_gamma: Decimal | None = None
+    net_vega: Decimal | None = None
+    net_theta: Decimal | None = None
+    timestamp: datetime | None = None

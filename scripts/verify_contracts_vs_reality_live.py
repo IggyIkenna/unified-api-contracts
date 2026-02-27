@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Optional live contract verification using config and Secret Manager (same pattern as UMI/UOI).
 
-Uses unified-config-interface for config and config.get_secret() (which uses unified-cloud-services).
+Uses unified-config-interface for config and config.get_secret() (which uses unified-trading-services).
 No duplication of API key resolution. Run only when LIVE_API_VERIFICATION=1.
 
 Install deps first (from workspace):
-  uv pip install -e ../unified-cloud-services -e ../unified-config-interface
+  uv pip install -e ../unified-trading-services -e ../unified-config-interface
   uv pip install -e ".[live]"
 Then: LIVE_API_VERIFICATION=1 uv run python scripts/verify_contracts_vs_reality_live.py
 """
@@ -28,7 +28,7 @@ def _load_config():  # noqa: ANN202
     except ImportError as e:
         print(
             "Live verification requires unified-config-interface (same config as UMI/UOI). "
-            "From workspace: uv pip install -e ../unified-cloud-services -e ../unified-config-interface",
+            "From workspace: uv pip install -e ../unified-trading-services -e ../unified-config-interface",
             file=sys.stderr,
         )
         raise SystemExit(0) from e
@@ -39,9 +39,9 @@ def _resolve_secrets_for_venues_with_config(config: object) -> tuple[list[str], 
     from api_contracts.venue_manifest import VENUE_MANIFEST
 
     try:
-        from unified_cloud_services import get_secret_with_fallback
+        from unified_trading_services import get_secret_with_fallback
     except ImportError as e:
-        return ([f"unified-cloud-services required for secrets: {e}"], [])
+        return ([f"unified-trading-services required for secrets: {e}"], [])
 
     project_id = getattr(config, "gcp_project_id", None) or getattr(config, "project_id", None)
     if not project_id:

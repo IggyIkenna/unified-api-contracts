@@ -38,3 +38,16 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
+
+# Security - Never commit credentials
+*-credentials.json
+*-service-account.json
+service-account*.json
+credentials*.json
+*secret*.json
+central-element-323112-*.json
+.env
+.env.local
+.env.*.local
+**/secrets/
+**/credentials/

@@ -13,12 +13,13 @@ Usage:
     python scripts/validate_yahoo_mocks.py
 """
 
+import logging
 import sys
-import yaml
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List
-import logging
+
+import yaml
 
 # Setup logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')

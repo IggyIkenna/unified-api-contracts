@@ -1,0 +1,9 @@
+{
+  "series_ticker": "KXCPI",
+  "title": "Consumer Price Index",
+  "category": "Economics",
+  "sub_category": "Inflation",
+  "frequency": "monthly",
+  "description": "Monthly CPI release markets",
+  "settlement_sources": ["BLS"]
+}

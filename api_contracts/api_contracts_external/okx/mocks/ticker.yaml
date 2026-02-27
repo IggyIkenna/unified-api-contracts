@@ -1,0 +1,71 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP
+  response:
+    body:
+      string: '{"code":"0","msg":"","data":[{"instType":"SWAP","instId":"BTC-USDT-SWAP","last":"63106.4","lastSz":"6.21","askPx":"63106.5","askSz":"179.81","bidPx":"63106.4","bidSz":"265.15","open24h":"65234.9","high24h":"66578","low24h":"62666","volCcy24h":"138673.9124","vol24h":"13867391.24","ts":"1771913465751","sodUtc0":"64624.8","sodUtc8":"65631.1"}]}'
+    headers:
+      CF-RAY:
+      - 9d2ccdbeabddae4b-LHR
+      Cache-Control:
+      - no-cache, no-store, max-age=0, must-revalidate
+      Connection:
+      - keep-alive
+      Content-Encoding:
+      - gzip
+      Content-Type:
+      - application/json
+      Date:
+      - Tue, 24 Feb 2026 06:11:06 GMT
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      b-locale:
+      - en_US
+      cf-cache-status:
+      - DYNAMIC
+      content-security-policy:
+      - frame-ancestors 'self'
+      expires:
+      - '0'
+      pragma:
+      - no-cache
+      set-cookie:
+      - __cf_bm=5QKuPSx6kZNwb60AkLp88UoFtTcRwAuGxUaS6B29aA0-1771913466.6665742-1.0.1.1-C22zx_uL1n1l6_GaCtoKBHRq83O2r2sbfhj7dB1SZdsX1XdCARUW543rDsL2NIIGkgLY4rKGpfhouxVvlMSa4enYogS5uSrxilBllL7kXsNtBOrhmYU60rA5D8hVyphX;
+        HttpOnly; Secure; Path=/; Domain=okx.com; Expires=Tue, 24 Feb 2026 06:41:06
+        GMT
+      strict-transport-security:
+      - max-age=31536000 ; includeSubDomains
+      - max-age=31536000; includeSubDomains
+      vary:
+      - Accept-Encoding
+      - Origin
+      x-brokerid:
+      - '0'
+      x-content-type-options:
+      - nosniff
+      - nosniff
+      x-frame-options:
+      - SAMEORIGIN
+      - DENY
+      x-xss-protection:
+      - 1; mode=block
+      - 1; mode=block
+      x-contract-schema-version:
+      - '1.0'
+    status:
+      code: 200
+      message: OK
+version: 1

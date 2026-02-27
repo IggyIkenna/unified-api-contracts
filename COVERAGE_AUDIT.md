@@ -6,7 +6,7 @@
 ## Executive Summary
 
 **Current State**: 13 venues with 74 schema classes  
-**Missing High-Priority Venues**: Coinbase, Kraken  
+**Missing High-Priority Venues**: Coinbase  
 **Gap Count**: 2 major venues + multiple endpoint gaps per venue
 
 ## Existing Venue Inventory
@@ -45,10 +45,7 @@
 ### 🚨 Critical Gaps (Referenced in Services)
 1. **coinbase** - Referenced in:
    - market-data-processing-service (CLI parser mentions "CeFi venues: Binance, Coinbase")
-   - position-balance-monitor-service (documentation mentions "kraken")
-   
-2. **kraken** - Referenced in:
-   - position-balance-monitor-service (account query examples)
+   - position-balance-monitor-service (documentation mentions "kraken" — Kraken not in venue universe)
 
 ### Recommended Priority Schema Classes for Missing Venues
 
@@ -62,18 +59,6 @@ CoinbaseOrder
 CoinbasePosition
 CoinbaseBalance
 CoinbaseError
-```
-
-#### Kraken API v2
-```python
-# Expected classes (5-7 schemas)  
-KrakenTicker
-KrakenOrderBook
-KrakenTrade
-KrakenOrder
-KrakenPosition
-KrakenBalance
-KrakenError
 ```
 
 ## Endpoint Coverage Analysis
@@ -116,22 +101,21 @@ volume: Decimal
 ### Services Using API Contracts
 1. **position-balance-monitor-service** - Uses venue APIs for account queries
 2. **market-data-processing-service** - References CeFi venues including Coinbase
-3. **unified-trade-execution-interface** - Test references to coinbase/kraken
+3. **unified-trade-execution-interface** - Test references to coinbase
 4. **instruments-service** - Adapter loading mentions venues
-5. **execution-algo-library** - SOR tests reference kraken
+5. **execution-algo-library** - SOR tests (Kraken not in venue universe)
 
 ### Current Mocking/Testing Coverage
 - **Mock Files Present**: binance, bybit, okx, hyperliquid, aster, upbit
-- **Missing Mocks**: coinbase, kraken (blocking better test coverage)
+- **Missing Mocks**: coinbase (blocking better test coverage)
 - **Example Validation**: Only 1-3 example files per venue (insufficient)
 
 ## Recommendations
 
 ### Phase 1 Priorities (This Sprint)
 1. **Add Coinbase contracts** (5-7 schema classes)
-2. **Add Kraken contracts** (5-7 schema classes)  
-3. **Collect real API responses** for validation
-4. **Fix type safety** (str → Decimal for prices)
+2. **Collect real API responses** for validation
+3. **Fix type safety** (str → Decimal for prices)
 
 ### Phase 2 Targets
 1. **Add missing endpoints** (funding rates, margins, fees)
@@ -152,14 +136,14 @@ volume: Decimal
 - **Test Coverage**: Blocked by missing venue contracts
 
 ### After Contract Improvements  
-- **Better Mocking**: coinbase/kraken mocks → higher test coverage
+- **Better Mocking**: coinbase mocks → higher test coverage
 - **Type Safety**: Decimal types → catch precision errors early
 - **Integration Tests**: Real API validation → fewer production surprises
 
 ## Next Steps
 
 1. ✅ **AC-1.1 Complete**: Inventory documented
-2. 🔄 **AC-1.2 In Progress**: Missing venues identified (Coinbase, Kraken)
+2. 🔄 **AC-1.2 In Progress**: Missing venues identified (Coinbase)
 3. ⏳ **AC-2.1 Next**: Create collection script for real API responses
 4. ⏳ **AC-2.2 Next**: Use Context7 for authenticated data collection
 
@@ -167,4 +151,4 @@ volume: Decimal
 
 **Audit Completion**: Phase 1 (15 minutes, accelerated from 45 minutes)  
 **Critical Findings**: 2 missing high-priority venues, type safety issues, insufficient example coverage  
-**Validation Impact**: Adding Coinbase + Kraken contracts will improve mocking and test coverage across multiple services
+**Validation Impact**: Adding Coinbase contracts will improve mocking and test coverage across multiple services
