@@ -25,6 +25,7 @@ class FirestoreDocument(BaseModel):
     representations after deserialization.
     Endpoint: GET projects/{p}/databases/{db}/documents/{collection}/{doc_id}
     """
+
     name: str | None = None
     fields: dict | None = None
     create_time: str | None = None
@@ -37,6 +38,7 @@ class FirestoreQuery(BaseModel):
     Used with collection.where(), order_by(), limit() chains via SDK.
     REST: POST documents:runQuery
     """
+
     collection: str | None = None
     filters: list[dict] | None = None
     order_by: list[dict] | None = None
@@ -50,6 +52,7 @@ class FirestoreWriteResult(BaseModel):
 
     Endpoint: PATCH documents/{path}
     """
+
     update_time: str | None = None
     document_id: str | None = None
     write_time: str | None = None
@@ -60,6 +63,7 @@ class FirestoreBatchWriteRequest(BaseModel):
 
     REST: POST documents:batchWrite
     """
+
     writes: list[dict] | None = None
 
 
@@ -70,6 +74,7 @@ class RealtimeDbEntry(BaseModel):
     REST: GET/PUT/PATCH/POST https://{project}.firebaseio.com/{path}.json
     Realtime updates via Server-Sent Events (?stream=true) or SDK listener.
     """
+
     path: str | None = None
     data: dict | str | list | float | bool | None = None
     etag: str | None = None
@@ -80,6 +85,7 @@ class FirebaseAuthUser(BaseModel):
 
     SDK: auth.get_user(uid) / auth.get_user_by_email(email)
     """
+
     uid: str | None = None
     email: str | None = None
     email_verified: bool | None = None
@@ -101,6 +107,7 @@ class FirebaseAuthToken(BaseModel):
 
     Used to authenticate requests from Firebase client SDKs.
     """
+
     uid: str | None = None
     iss: str | None = None
     aud: str | None = None
@@ -118,6 +125,7 @@ class FirebaseCustomToken(BaseModel):
 
     Used for server-to-client auth flows (backend mints token, client signs in).
     """
+
     token: str | None = None
     uid: str | None = None
     additional_claims: dict | None = None
@@ -125,6 +133,7 @@ class FirebaseCustomToken(BaseModel):
 
 class FirebaseCreateUserRequest(BaseModel):
     """Request to create a Firebase Auth user. auth.create_user(**params)."""
+
     email: str | None = None
     email_verified: bool | None = None
     password: str | None = None
@@ -141,6 +150,7 @@ class FcmMessage(BaseModel):
     SDK: messaging.send(Message(...))
     REST: POST https://fcm.googleapis.com/v1/projects/{project}/messages:send
     """
+
     token: str | None = None
     topic: str | None = None
     condition: str | None = None
@@ -157,6 +167,7 @@ class FcmSendResponse(BaseModel):
 
     SDK: messaging.send_multicast() returns BatchResponse.
     """
+
     message_id: str | None = None
     success_count: int | None = None
     failure_count: int | None = None
@@ -168,6 +179,7 @@ class FirebaseStorageObject(BaseModel):
 
     bucket = storage.bucket() - returns google.cloud.storage.Bucket
     """
+
     name: str | None = None
     bucket: str | None = None
     content_type: str | None = None
@@ -180,6 +192,7 @@ class FirebaseStorageObject(BaseModel):
 
 class FirebaseError(BaseModel):
     """Firebase Admin SDK / REST API error."""
+
     code: str | None = None
     message: str | None = None
     http_status: int | None = None

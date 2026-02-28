@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/health.py
+# hypothesis_version: 6.151.9
+
+[0.0, '1.0.0', 'closed', 'degraded', 'half_open', 'healthy', 'open', 'unhealthy']

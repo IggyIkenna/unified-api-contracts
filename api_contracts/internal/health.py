@@ -66,6 +66,7 @@ class DependencyFailure(BaseModel):
 # Error handling schemas (from handle_api_errors / EnhancedError)
 # ---------------------------------------------------------------------------
 
+
 class ErrorCategory(StrEnum):
     RATE_LIMIT = "rate_limit"
     AUTHENTICATION = "authentication"
@@ -127,9 +128,10 @@ class EnhancedError(BaseModel):
 # Circuit breaker (standardised schema for future adoption)
 # ---------------------------------------------------------------------------
 
+
 class CircuitBreakerStateEnum(StrEnum):
-    CLOSED = "closed"        # Normal — requests flow through
-    OPEN = "open"            # Tripped — requests rejected immediately
+    CLOSED = "closed"  # Normal — requests flow through
+    OPEN = "open"  # Tripped — requests rejected immediately
     HALF_OPEN = "half_open"  # Probing — one request allowed through
 
 

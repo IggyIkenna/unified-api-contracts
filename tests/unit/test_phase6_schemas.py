@@ -12,7 +12,6 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-
 from api_contracts.binance.schemas import BinanceIndexPriceKline, BinanceMarkPriceKline
 from api_contracts.ccxt.schemas import (
     CcxtBorrowRate,

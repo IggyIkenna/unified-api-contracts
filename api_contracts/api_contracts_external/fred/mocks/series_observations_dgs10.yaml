@@ -1,0 +1,20 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      User-Agent:
+      - python-httpx/0.27.0
+    method: GET
+    uri: https://api.stlouisfed.org/fred/series/observations?series_id=DGS10&api_key=abcdefghijklmnop&file_type=json&limit=1
+  response:
+    body:
+      string: '{"realtime_start":"2026-02-27","realtime_end":"2026-02-27","observation_start":"1600-01-01","observation_end":"9999-12-31","units":"lin","output_type":1,"file_type":"json","order_by":"observation_date","sort_order":"desc","count":1,"offset":0,"limit":1,"observations":[{"realtime_start":"2026-02-27","realtime_end":"2026-02-27","date":"2026-02-26","value":"4.52"}]}'
+    headers:
+      Content-Type:
+      - application/json
+    status:
+      code: 200
+      message: OK
+version: 1

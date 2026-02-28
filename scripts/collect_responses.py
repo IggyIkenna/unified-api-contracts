@@ -63,16 +63,9 @@ def load_context7_config():
         print("Set LIVE_API_VERIFICATION=1 to enable real API collection")
         return None
 
-    try:
-        from unified_config_interface import UnifiedCloudConfig
-        return UnifiedCloudConfig()
-    except ImportError:
-        print(
-            "Context7 requires unified-config-interface. "
-            "Install: uv pip install -e ../unified-trading-services -e ../unified-config-interface",
-            file=sys.stderr,
-        )
-        return None
+    from unified_config_interface import UnifiedCloudConfig
+
+    return UnifiedCloudConfig()
 
 
 def get_secret_safely(config: object, secret_name: str) -> str | None:
@@ -152,7 +145,7 @@ def collect_binance_responses(config: object) -> int:
                     "url": url,
                     "status_code": response.status_code,
                     "headers": dict(response.headers),
-                }
+                },
             )
             collected += 1
 
@@ -197,7 +190,7 @@ def collect_coinbase_responses(config: object) -> int:
                     "url": url,
                     "status_code": response.status_code,
                     "headers": dict(response.headers),
-                }
+                },
             )
             collected += 1
 

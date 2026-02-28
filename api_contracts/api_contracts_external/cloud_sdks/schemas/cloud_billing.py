@@ -22,6 +22,7 @@ class BillingAccount(BaseModel):
 
     One billing account can be linked to multiple projects.
     """
+
     name: str | None = None
     open: bool | None = None
     display_name: str | None = None
@@ -34,6 +35,7 @@ class ProjectBillingInfo(BaseModel):
 
     GET https://cloudbilling.googleapis.com/v1/projects/{project}/billingInfo
     """
+
     name: str | None = None
     project_id: str | None = None
     billing_account_name: str | None = None
@@ -45,6 +47,7 @@ class BillingService(BaseModel):
 
     GET https://cloudbilling.googleapis.com/v1/services
     """
+
     name: str | None = None
     service_id: str | None = None
     display_name: str | None = None
@@ -57,6 +60,7 @@ class BillingSku(BaseModel):
     GET https://cloudbilling.googleapis.com/v1/services/{id}/skus
     SKU = specific billable resource (e.g. "CPU allocation time")
     """
+
     name: str | None = None
     sku_id: str | None = None
     description: str | None = None
@@ -72,6 +76,7 @@ class BudgetAlert(BaseModel):
 
     REST: https://billingbudgets.googleapis.com/v1/billingAccounts/{ba}/budgets
     """
+
     name: str | None = None
     display_name: str | None = None
     budget_filter: dict | None = None
@@ -88,6 +93,7 @@ class BillingCostEntry(BaseModel):
     This captures the schema of each row in the export - used for downstream
     cost analysis queries.
     """
+
     billing_account_id: str | None = None
     service: dict | None = None
     sku: dict | None = None
@@ -116,6 +122,7 @@ class BillingCostSummary(BaseModel):
 
     Used for dashboards, budget reporting, and cost allocation.
     """
+
     period: str | None = None
     project_id: str | None = None
     service_description: str | None = None
@@ -130,6 +137,7 @@ class BillingCostSummary(BaseModel):
 
 class BillingError(BaseModel):
     """Cloud Billing API error."""
+
     code: int | None = None
     message: str | None = None
     status: str | None = None

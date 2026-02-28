@@ -31,12 +31,10 @@ def normalize_binance_trade(raw: BinanceTrade, venue: str = "binance", symbol: s
     )
 
 
-def normalize_databento_trade(
-    raw: DatabentoTrade, venue: str = "databento", symbol: str = ""
-) -> CanonicalTrade:
+def normalize_databento_trade(raw: DatabentoTrade, venue: str = "databento", symbol: str = "") -> CanonicalTrade:
     """Convert DatabentoTrade to CanonicalTrade."""
     ts = datetime.fromtimestamp(raw.ts_event / 1e9, tz=UTC)
-    price = Decimal(raw.price) / Decimal(1e9)
+    price = Decimal(raw.price) / Decimal("1e9")
     side = "sell" if raw.side == "A" else "buy"
     trade_id = str(raw.sequence) if raw.sequence is not None else f"{raw.ts_event}-{raw.instrument_id}"
     return CanonicalTrade(
@@ -75,7 +73,9 @@ def normalize_tardis_trade(raw: TardisTrade, venue: str | None = None, symbol: s
     )
 
 
-def normalize_trade(raw: BinanceTrade | DatabentoTrade | TardisTrade, venue: str = "", symbol: str = "") -> CanonicalTrade:
+def normalize_trade(
+    raw: BinanceTrade | DatabentoTrade | TardisTrade, venue: str = "", symbol: str = ""
+) -> CanonicalTrade:
     """Dispatch to venue-specific normalizer."""
     if isinstance(raw, BinanceTrade):
         return normalize_binance_trade(raw, venue=venue or "binance", symbol=symbol)

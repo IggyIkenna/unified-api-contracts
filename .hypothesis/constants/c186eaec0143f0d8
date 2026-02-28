@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/nautilus/schemas.py
+# hypothesis_version: 6.151.9
+
+['0', '1', 'Account ID', 'Account balance', 'Account currency', 'Account equity', 'Average entry price', 'Average fill price', 'BUY or SELL', 'CRYPTO', 'Commission amount', 'Commission currency', 'Contract multiplier', 'Exchange trade ID', 'Fill price', 'Fill quantity', 'Fill timestamp', 'Filled quantity', 'Free margin', 'Instrument ID', 'LONG, SHORT, or FLAT', 'MARKET', 'Order quantity', 'Position timestamp', 'Realized PnL', 'Strategy ID', 'Ticker symbol', 'Trading venue', 'USDT', 'Unrealized PnL', 'Used margin']

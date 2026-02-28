@@ -6,7 +6,7 @@ from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field
 
 
 class InstrumentType(StrEnum):
@@ -48,6 +48,7 @@ class AggressorSide(StrEnum):
 # Instrument — canonical row stored in GCS parquet by instruments-service
 # Format: instrument_key = VENUE:INSTRUMENT_TYPE:SYMBOL
 # ---------------------------------------------------------------------------
+
 
 class InstrumentRecord(BaseModel):
     """Canonical instrument row (subset of INSTRUMENTS_SCHEMA columns).
@@ -135,6 +136,7 @@ class InstrumentRecord(BaseModel):
 # Market tick schemas — written to GCS parquet by market-tick-data-handler
 # Timestamps are int64 nanoseconds UTC
 # ---------------------------------------------------------------------------
+
 
 class MarketTrade(BaseModel):
     """Raw trade tick (TRADES_SCHEMA)."""
@@ -236,6 +238,7 @@ class QuoteRecord(BaseModel):
 # Uses Decimal for price precision (in-memory, not stored to parquet)
 # ---------------------------------------------------------------------------
 
+
 class CanonicalOrderBook(BaseModel):
     """Normalised order book (CanonicalOrderBook dataclass from unified-market-interface)."""
 
@@ -250,12 +253,12 @@ class CanonicalOrderBook(BaseModel):
 class CanonicalTrade(BaseModel):
     """Normalised trade (CanonicalTrade dataclass from unified-market-interface)."""
 
-    venue: str
-    symbol: str
+    venue: str = Field(min_length=1)
+    symbol: str = Field(min_length=1)
     trade_id: str
-    timestamp: datetime
-    price: Decimal
-    quantity: Decimal
+    timestamp: AwareDatetime
+    price: Decimal = Field(gt=0)
+    quantity: Decimal = Field(gt=0)
     side: str = Field(description="buy or sell")
     buyer_maker: bool | None = None
     venue_trade_id: str | None = None
@@ -264,6 +267,7 @@ class CanonicalTrade(BaseModel):
 # ---------------------------------------------------------------------------
 # Processed candle schema from market-data-processing-service
 # ---------------------------------------------------------------------------
+
 
 class ProcessedCandle(BaseModel):
     """Output of market-data-processing-service (PROCESSED_CANDLE_SCHEMA)."""
