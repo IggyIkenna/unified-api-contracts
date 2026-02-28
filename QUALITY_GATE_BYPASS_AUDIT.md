@@ -42,6 +42,16 @@ The following `reportUnknown*` rules are set to `"warning"` rather than `"error"
 
 ---
 
+## 2.2b Any-type Decisions (resolved)
+
+| File | Fields | Resolution |
+|------|--------|-----------|
+| `api_contracts/domain_config.py` | `config: dict[str, Any]` in all Protocol classes | Changed to `dict[str, object]` — avoids `Any`, preserves extensibility; Protocol implementors can still satisfy with `dict[str, object]` or narrower |
+| `api_contracts/api_contracts_external/ibkr/schemas.py` | `contract`, `info` fields | Changed to `dict[str, str \| int \| float \| bool \| None]` — covers all TWS API primitive types |
+| `api_contracts/venue_manifest/internal_services.py` | `INTERNAL_CONTRACTS: dict[str, Any]` | Changed to `dict[str, ContractEntry]` using a `TypedDict` with `total=False` for optional fields — all known entry shapes captured; no `Any` remaining |
+
+---
+
 ## 2.3 Known Pre-existing Type Violations (basedpyright warnings)
 
 These violations existed before the Phase 1a–1e schema additions and are tracked here

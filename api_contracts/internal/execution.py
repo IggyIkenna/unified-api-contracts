@@ -36,10 +36,10 @@ class OrderStatus(StrEnum):
 
 
 class TimeInForce(StrEnum):
-    GTC = "GTC"   # Good till cancel
-    IOC = "IOC"   # Immediate or cancel
-    FOK = "FOK"   # Fill or kill
-    GTD = "GTD"   # Good till date
+    GTC = "GTC"  # Good till cancel
+    IOC = "IOC"  # Immediate or cancel
+    FOK = "FOK"  # Fill or kill
+    GTD = "GTD"  # Good till date
     POST_ONLY = "POST_ONLY"
 
 
@@ -76,6 +76,7 @@ class BenchmarkType(StrEnum):
 # ---------------------------------------------------------------------------
 # Order / Fill — canonical cross-venue (from unified-trade-execution-interface)
 # ---------------------------------------------------------------------------
+
 
 class CanonicalOrder(BaseModel):
     order_id: str
@@ -135,6 +136,7 @@ class FillEventPubSubPayload(BaseModel):
 # Execution instructions (strategy → execution routing)
 # ---------------------------------------------------------------------------
 
+
 class ExecutionInstruction(BaseModel):
     """Single atomic execution directive (from execution-services)."""
 
@@ -185,6 +187,7 @@ class ExecutionResult(BaseModel):
 # Backtest actor messages
 # ---------------------------------------------------------------------------
 
+
 class OrderSubmittedMessage(BaseModel):
     message_type: Literal["OrderSubmitted"] = "OrderSubmitted"
     order_id: str
@@ -222,6 +225,7 @@ class CandleCloseWarningMessage(BaseModel):
 # ---------------------------------------------------------------------------
 # REST API schemas (execution-services HTTP endpoints)
 # ---------------------------------------------------------------------------
+
 
 class ManualInstructionRequest(BaseModel):
     """POST /instructions body."""

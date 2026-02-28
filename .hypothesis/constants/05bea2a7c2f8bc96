@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/api_contracts_external/cloud_sdks/schemas/artifact_registry.py
+# hypothesis_version: 6.151.9
+
+['.../packages/{p}', '.../tags/{t}', '.../versions/{v}', 'DOCKER/PYTHON/NPM/GO', 'Project ID', 'createTime', 'displayName', 'kmsKeyName', 'nextPageToken', 'packageName', 'populate_by_name', 'relatedTags', 'updateTime', 'uploadTime']

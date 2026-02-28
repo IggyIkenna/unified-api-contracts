@@ -77,7 +77,9 @@ ignore = []  # E501 enforced (line-length 120)
 [tool.ruff.lint.per-file-ignores]
 "api_contracts/**/schemas.py" = ["N815"]
 "api_contracts/api_contracts_external/**/schemas.py" = ["N815"]
-"api_contracts/api_contracts_external/cloud_sdks/*.py" = ["N803", "N815"]
+"api_contracts/api_contracts_external/binance/*.py" = ["N815", "F403", "F405"]
+"api_contracts/api_contracts_external/cloud_sdks/*.py" = ["N803", "N815", "F403", "F405"]
+"api_contracts/api_contracts_external/cloud_sdks/**/*.py" = ["N803", "N815", "F403", "F405"]
 "api_contracts/schemas/protocol_sdks.py" = ["N815"]
 "api_contracts/schemas/accounts.py" = ["N815"]
 "api_contracts/schemas/cex_withdrawals.py" = ["N815"]
@@ -91,14 +93,15 @@ quote-style = "double"
 indent-style = "space"
 [tool.basedpyright]
 # Enforce no Any/object — use specific types
-reportAny = "warning"
+reportAny = "error"
 reportUnknownVariableType = "warning"
 reportUnknownParameterType = "warning"
 reportUnknownMemberType = "warning"
 pythonVersion = "3.13"
-typeCheckingMode = "standard"
+typeCheckingMode = "strict"
 include = ["api_contracts"]
 exclude = ["tests", "**/__pycache__", ".venv*", "build", "dist"]
+useLibraryCodeForTypes = true
 
 [tool.coverage.report]
 fail_under = 70  # Tier 0 uniformity

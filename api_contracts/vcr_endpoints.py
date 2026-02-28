@@ -23,10 +23,10 @@ class VCREndpoint(TypedDict):
     schema_class: str
     key_env: str
     header_name: str
-    schema_version: NotRequired[str]       # bumped when response schema changes
-    json_body: NotRequired[dict]           # POST body
-    auth_query_param: NotRequired[str]     # key goes in URL query (e.g. apiKey) not header
-    is_internal_service: NotRequired[bool] # True for inter-service cassettes (local only)
+    schema_version: NotRequired[str]  # bumped when response schema changes
+    json_body: NotRequired[dict]  # POST body
+    auth_query_param: NotRequired[str]  # key goes in URL query (e.g. apiKey) not header
+    is_internal_service: NotRequired[bool]  # True for inter-service cassettes (local only)
 
 
 def _get(
@@ -127,7 +127,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
         ),
     ],
     "yahoo_finance": [],  # Chart endpoint rate-limits; use examples/ for schema validation
-    "databento": [],      # Requires DATABENTO_API_KEY; set env var when recording
+    "databento": [],  # Requires DATABENTO_API_KEY; set env var when recording
     "tardis": [
         _get(
             "https://api.tardis.dev/v1/exchanges",
@@ -187,8 +187,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     "odds_api": [
         {
             **_get(
-                "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds"
-                "?regions=us&oddsFormat=decimal",
+                "https://api.the-odds-api.com/v4/sports/americanfootball_nfl/odds?regions=us&oddsFormat=decimal",
                 "odds.yaml",
                 "0",
                 "OddsApiFixture",
@@ -285,7 +284,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "understat": [],        # HTML scraping endpoint, no standard REST cassette
+    "understat": [],  # HTML scraping endpoint, no standard REST cassette
     "open_meteo": [
         _get(
             "https://api.open-meteo.com/v1/forecast"
@@ -296,7 +295,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "transfermarkt": [],    # No official API — stub module only
+    "transfermarkt": [],  # No official API — stub module only
     # ------------------------------------------------------------------
     # Developer tools
     # ------------------------------------------------------------------

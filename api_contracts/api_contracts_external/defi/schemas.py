@@ -23,11 +23,31 @@ from api_contracts.schemas.protocol_sdks import (
 AAVE_RATES_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "timestamp", "type": "datetime", "required": True, "description": "Data timestamp (UTC)"},
     {"name": "reserve", "type": "string", "required": True, "description": "Reserve address (e.g., WETH)"},
-    {"name": "liquidityRate", "type": "float64", "required": True, "description": "Supply APY (ray format, divide by 1e27)"},
-    {"name": "variableBorrowRate", "type": "float64", "required": True, "description": "Variable borrow APY (ray format)"},
-    {"name": "stableBorrowRate", "type": "float64", "required": False, "description": "Stable borrow APY (ray format, if available)"},
+    {
+        "name": "liquidityRate",
+        "type": "float64",
+        "required": True,
+        "description": "Supply APY (ray format, divide by 1e27)",
+    },
+    {
+        "name": "variableBorrowRate",
+        "type": "float64",
+        "required": True,
+        "description": "Variable borrow APY (ray format)",
+    },
+    {
+        "name": "stableBorrowRate",
+        "type": "float64",
+        "required": False,
+        "description": "Stable borrow APY (ray format, if available)",
+    },
     {"name": "liquidityIndex", "type": "float64", "required": True, "description": "Cumulative liquidity index"},
-    {"name": "variableBorrowIndex", "type": "float64", "required": True, "description": "Cumulative variable borrow index"},
+    {
+        "name": "variableBorrowIndex",
+        "type": "float64",
+        "required": True,
+        "description": "Cumulative variable borrow index",
+    },
 ]
 
 AAVE_ORACLE_PRICES_SCHEMA: list[dict[str, str | bool]] = [
@@ -41,7 +61,12 @@ AAVE_RISK_PARAMS_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "timestamp", "type": "datetime", "required": True, "description": "Data timestamp (UTC)"},
     {"name": "reserve", "type": "string", "required": True, "description": "Reserve address"},
     {"name": "ltv", "type": "float64", "required": True, "description": "Loan-to-value ratio (percentage)"},
-    {"name": "liquidationThreshold", "type": "float64", "required": True, "description": "Liquidation threshold (percentage)"},
+    {
+        "name": "liquidationThreshold",
+        "type": "float64",
+        "required": True,
+        "description": "Liquidation threshold (percentage)",
+    },
     {"name": "liquidationBonus", "type": "float64", "required": True, "description": "Liquidation bonus (percentage)"},
 ]
 
@@ -55,15 +80,30 @@ UNISWAP_SWAPS_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "pool", "type": "string", "required": True, "description": "Pool address"},
     {"name": "sender", "type": "string", "required": True, "description": "Transaction sender address"},
     {"name": "recipient", "type": "string", "required": True, "description": "Token recipient address"},
-    {"name": "amount0", "type": "float64", "required": True, "description": "Amount of token0 swapped (negative = out)"},
-    {"name": "amount1", "type": "float64", "required": True, "description": "Amount of token1 swapped (negative = out)"},
+    {
+        "name": "amount0",
+        "type": "float64",
+        "required": True,
+        "description": "Amount of token0 swapped (negative = out)",
+    },
+    {
+        "name": "amount1",
+        "type": "float64",
+        "required": True,
+        "description": "Amount of token1 swapped (negative = out)",
+    },
     {"name": "sqrtPriceX96", "type": "string", "required": True, "description": "sqrt(price) * 2^96 after swap"},
     {"name": "tick", "type": "int64", "required": True, "description": "Pool tick after swap"},
 ]
 
 UNISWAP_POOL_HOUR_DATA_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "id", "type": "string", "required": True, "description": "Pool hour data ID (pool-hour)"},
-    {"name": "periodStartUnix", "type": "int64", "required": True, "description": "Hour start timestamp (Unix seconds)"},
+    {
+        "name": "periodStartUnix",
+        "type": "int64",
+        "required": True,
+        "description": "Hour start timestamp (Unix seconds)",
+    },
     {"name": "pool", "type": "string", "required": True, "description": "Pool address"},
     {"name": "liquidity", "type": "string", "required": True, "description": "In-range liquidity (bigint as string)"},
     {"name": "sqrtPrice", "type": "string", "required": True, "description": "sqrt(price) * 2^96"},
@@ -94,7 +134,12 @@ LST_YIELDS_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "timestamp", "type": "datetime", "required": True, "description": "Data timestamp (UTC)"},
     {"name": "token", "type": "string", "required": True, "description": "LST token symbol"},
     {"name": "stakingApy", "type": "float64", "required": True, "description": "Base staking APY (percentage)"},
-    {"name": "rewardsApy", "type": "float64", "required": False, "description": "Additional rewards APY (EIGEN, ETHFI, etc.)"},
+    {
+        "name": "rewardsApy",
+        "type": "float64",
+        "required": False,
+        "description": "Additional rewards APY (EIGEN, ETHFI, etc.)",
+    },
     {"name": "totalApy", "type": "float64", "required": False, "description": "Total combined APY"},
 ]
 
@@ -114,7 +159,12 @@ ASTER_TRADES_SCHEMA: list[dict[str, str | bool]] = [
 ASTER_FUNDING_RATES_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "timestamp", "type": "int64", "required": True, "description": "Funding timestamp (Unix milliseconds)"},
     {"name": "symbol", "type": "string", "required": True, "description": "Trading pair symbol"},
-    {"name": "fundingRate", "type": "float64", "required": True, "description": "Funding rate (percentage per 8 hours)"},
+    {
+        "name": "fundingRate",
+        "type": "float64",
+        "required": True,
+        "description": "Funding rate (percentage per 8 hours)",
+    },
     {"name": "fundingTime", "type": "int64", "required": True, "description": "Next funding time (Unix milliseconds)"},
 ]
 
@@ -130,11 +180,21 @@ ASTER_OPEN_INTEREST_SCHEMA: list[dict[str, str | bool]] = [
 # =============================================================================
 
 BARCHART_OHLCV_15M_SCHEMA: list[dict[str, str | bool]] = [
-    {"name": "Time", "type": "string", "required": True, "description": "Timestamp in US Eastern Time (format: YYYY-MM-DD HH:MM)"},
+    {
+        "name": "Time",
+        "type": "string",
+        "required": True,
+        "description": "Timestamp in US Eastern Time (format: YYYY-MM-DD HH:MM)",
+    },
     {"name": "Open", "type": "float64", "required": True, "description": "Opening price"},
     {"name": "High", "type": "float64", "required": True, "description": "Highest price"},
     {"name": "Low", "type": "float64", "required": True, "description": "Lowest price"},
-    {"name": "Last", "type": "float64", "required": True, "description": "Closing price (Barchart uses 'Last' for close)"},
+    {
+        "name": "Last",
+        "type": "float64",
+        "required": True,
+        "description": "Closing price (Barchart uses 'Last' for close)",
+    },
     {"name": "Change", "type": "float64", "required": False, "description": "Price change (absolute)"},
     {"name": "%Change", "type": "string", "required": False, "description": "Price change (percentage)"},
     {"name": "Volume", "type": "float64", "required": False, "description": "Volume (typically 0 for VIX index)"},

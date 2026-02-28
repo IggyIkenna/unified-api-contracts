@@ -7,7 +7,8 @@ Property-based: all venues produce same core CanonicalTrade fields.
 from decimal import Decimal
 
 import pytest
-from hypothesis import given, strategies as st
+from hypothesis import given
+from hypothesis import strategies as st
 
 from api_contracts.api_contracts_external.binance.schemas import BinanceTrade
 from api_contracts.api_contracts_external.databento.schemas import DatabentoTrade

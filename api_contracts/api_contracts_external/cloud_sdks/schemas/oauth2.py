@@ -22,6 +22,7 @@ class OAuth2TokenResponse(BaseModel):
 
     Used for authorization code flow, refresh token flow, and service account JWT exchange.
     """
+
     access_token: str | None = None
     expires_in: int | None = None
     refresh_token: str | None = None
@@ -35,6 +36,7 @@ class OAuth2TokenIntrospect(BaseModel):
 
     Use GET ?access_token=... or ?id_token=... to inspect token validity.
     """
+
     azp: str | None = None
     aud: str | None = None
     sub: str | None = None
@@ -54,6 +56,7 @@ class ServiceAccountCredential(BaseModel):
     Generated via: gcloud iam service-accounts keys create key.json --iam-account=SA
     Used as GOOGLE_APPLICATION_CREDENTIALS env var or firebase_admin.credentials.Certificate.
     """
+
     type: str = "service_account"
     project_id: str | None = None
     private_key_id: str | None = None
@@ -73,6 +76,7 @@ class OAuth2AuthorizationRequest(BaseModel):
     Endpoint: GET https://accounts.google.com/o/oauth2/v2/auth
     Used for web/installed application flow (user consent screen).
     """
+
     client_id: str | None = None
     redirect_uri: str | None = None
     response_type: str = "code"
@@ -87,6 +91,7 @@ class OAuth2AuthorizationRequest(BaseModel):
 
 class OAuth2TokenRequest(BaseModel):
     """Token exchange request to https://oauth2.googleapis.com/token."""
+
     grant_type: str | None = None
     code: str | None = None
     redirect_uri: str | None = None
@@ -104,6 +109,7 @@ class WorkloadIdentityCredential(BaseModel):
     Config file: workload_identity_federation_config.json
     Endpoint: https://sts.googleapis.com/v1/token (token exchange)
     """
+
     type: str = "external_account"
     audience: str | None = None
     subject_token_type: str | None = None
@@ -119,6 +125,7 @@ class OidcToken(BaseModel):
 
     Used for Cloud Run auth, service-to-service calls, and Firebase Auth.
     """
+
     iss: str | None = None
     sub: str | None = None
     aud: str | None = None
@@ -132,6 +139,7 @@ class OidcToken(BaseModel):
 
 class OAuth2Error(BaseModel):
     """OAuth2 / token endpoint error response."""
+
     error: str | None = None
     error_description: str | None = None
     error_uri: str | None = None

@@ -507,6 +507,16 @@ class DeribitBlockTradeRequest(BaseModel):
     Nonce must be unique per request.
     """
 
-    nonce: str  # Unique identifier for this block trade
-    role: str  # "maker" | "taker"
-    trades: list[dict]  # [{instrument_name, amount, direction, price, type}]
+    nonce: str
+    role: str
+    trades: list[dict[str, object]]
+
+
+class DeribitLiquidationOrder(BaseModel):
+    """Deribit liquidation order from user fills WebSocket channel."""
+
+    instrument_name: str | None = None
+    price: float | None = None
+    amount: float | None = None
+    side: str | None = None
+    timestamp: int | None = None
