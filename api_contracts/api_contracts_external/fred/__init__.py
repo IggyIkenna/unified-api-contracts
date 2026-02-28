@@ -1,5 +1,5 @@
 """FRED (Federal Reserve Economic Data) API contracts."""
 
-from .schemas import FredSeriesObservationsResponse, FredObservation
+from .schemas import FredObservation, FredSeriesObservationsResponse
 
-__all__ = ["FredSeriesObservationsResponse", "FredObservation"]
+__all__ = ["FredObservation", "FredSeriesObservationsResponse"]

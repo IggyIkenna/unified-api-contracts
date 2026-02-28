@@ -20,10 +20,6 @@ class LifecycleEventType(StrEnum):
     PROCESSING_COMPLETED = "PROCESSING_COMPLETED"
     STOPPED = "STOPPED"
     FAILED = "FAILED"
-    # Batch-specific
-    UPLOAD_STARTED = "UPLOAD_STARTED"
-    UPLOAD_COMPLETED = "UPLOAD_COMPLETED"
-    # Live-specific (replace UPLOAD_*)
     DATA_BROADCAST = "DATA_BROADCAST"
     PERSISTENCE_STARTED = "PERSISTENCE_STARTED"
     PERSISTENCE_COMPLETED = "PERSISTENCE_COMPLETED"
@@ -91,20 +87,6 @@ class ProcessingCompletedDetails(BaseModel):
     rows: int | None = None
     duration_ms: float | None = None
     success: bool | None = None
-
-
-class UploadStartedDetails(BaseModel):
-    bucket: str | None = None
-    path: str | None = None
-    row_count: int | None = None
-
-
-class UploadCompletedDetails(BaseModel):
-    bucket: str | None = None
-    path: str | None = None
-    files_written: int | None = None
-    total_bytes: int | None = None
-    duration_ms: float | None = None
 
 
 class DataBroadcastDetails(BaseModel):

@@ -259,7 +259,7 @@ class AlchemySimulationResult(BaseModel):
 # --- WebSocket ---
 class AlchemyWsNotification(BaseModel):
     """Alchemy WebSocket notification message."""
-    
+
     method: str | None = None
     params: dict[str, object] | None = None
     id: str | None = None
@@ -268,7 +268,7 @@ class AlchemyWsNotification(BaseModel):
 
 class AlchemyWsMinedTransaction(BaseModel):
     """Mined transaction from alchemy_minedTransactions WebSocket."""
-    
+
     hash: str | None = None
     blockNumber: str | None = None
     to: str | None = None
@@ -277,13 +277,13 @@ class AlchemyWsMinedTransaction(BaseModel):
     value: str | None = None
     gas: str | None = None
     gasPrice: str | None = None
-    
+
     model_config = {"populate_by_name": True}
 
 
 class AlchemyWsLog(BaseModel):
     """Log from eth_subscribe logs WebSocket."""
-    
+
     address: str | None = None
     topics: list[str] | None = None
     data: str | None = None

@@ -40,7 +40,7 @@ class IBKRTicker(BaseModel):
 
 class IBKRBondMarketData(BaseModel):
     """Bond market data from IBKR TWS."""
-    
+
     bid: float | None = None
     ask: float | None = None
     last: float | None = None

@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 class OfrCdsSpreadIndex(BaseModel):
     """Single CDS spread observation from OFR."""
-    
+
     series_id: str | None = None
     date: str | None = None
     value: float | None = None
@@ -22,7 +22,7 @@ class OfrCdsSpreadIndex(BaseModel):
 
 class OfrCdsResponse(BaseModel):
     """OFR CDS response containing spread indices and financial stability data."""
-    
+
     data: list[OfrCdsSpreadIndex] | None = None
     metadata: dict[str, object] | None = None
     source: str | None = None
