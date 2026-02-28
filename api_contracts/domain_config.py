@@ -5,7 +5,7 @@ Protocol definitions for domain configuration objects used across unified-tradin
 Eliminates type errors from optional unified-config-interface dependency.
 """
 
-from typing import Any, Protocol
+from typing import Protocol
 
 
 class DomainConfigProtocol(Protocol):
@@ -20,8 +20,8 @@ class DomainConfigProtocol(Protocol):
     aws_region: str | None
     s3_bucket: str | None
 
-    # Generic config dict for extensibility
-    config: dict[str, Any]
+    # Generic config dict for extensibility — values are object (not Any) to avoid unsafe writes
+    config: dict[str, object]
 
     # Optional attributes from unified-config-interface
     data_type: str | None
@@ -35,7 +35,7 @@ class DataTypeConfigProtocol(Protocol):
     gcp_project_id: str
     gcs_bucket: str
     bigquery_dataset: str
-    config: dict[str, Any]
+    config: dict[str, object]
 
     # Data type specific
     data_type: str
@@ -49,7 +49,7 @@ class ExchangeInstrumentConfigProtocol(Protocol):
     gcp_project_id: str
     gcs_bucket: str
     bigquery_dataset: str
-    config: dict[str, Any]
+    config: dict[str, object]
 
     # Exchange specific
     exchange: str
@@ -69,5 +69,5 @@ class MLConfigProtocol(Protocol):
     # ML specific
     model_registry_bucket: str
     feature_store_dataset: str
-    training_pipeline_config: dict[str, Any]
-    config: dict[str, Any]
+    training_pipeline_config: dict[str, object]
+    config: dict[str, object]

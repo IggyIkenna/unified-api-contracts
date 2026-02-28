@@ -1,7 +1,6 @@
 """Pydantic schemas for TWS/ib_insync. Full surface: market data, order, position, account, errors, callbacks."""
 
 from decimal import Decimal
-from typing import Any
 
 from pydantic import BaseModel
 
@@ -53,7 +52,7 @@ class IBKROrder(BaseModel):
     status: str | None = None  # PendingSubmit, Submitted, Filled, Cancelled, etc.
     filledQuantity: float | None = None
     avgFillPrice: float | None = None
-    info: dict[str, Any] | None = None
+    info: dict[str, str | int | float | bool | None] | None = None
 
 
 # --- Position ---
@@ -61,14 +60,14 @@ class IBKRPosition(BaseModel):
     """Position from reqPositions / position update."""
 
     account: str | None = None
-    contract: dict | None = None  # conId, symbol, secType, exchange, etc.
+    contract: dict[str, str | int | float | bool | None] | None = None  # conId, symbol, secType, exchange, etc.
     position: float | None = None
     avgCost: float | None = None
     marketPrice: float | None = None
     marketValue: float | None = None
     unrealizedPNL: float | None = None
     realizedPNL: float | None = None
-    info: dict[str, Any] | None = None
+    info: dict[str, str | int | float | bool | None] | None = None
 
 
 # --- Account summary / balance ---

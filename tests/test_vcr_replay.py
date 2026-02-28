@@ -21,7 +21,7 @@ from vcr import VCR
 from api_contracts.vcr_endpoints import VCR_ENDPOINTS
 
 ROOT = Path(__file__).resolve().parent.parent
-MOCKS_BASE = ROOT / "api_contracts"
+MOCKS_BASE = ROOT / "api_contracts" / "api_contracts_external"
 
 SECRET_HEADERS = [
     "authorization",
@@ -218,8 +218,8 @@ def test_vcr_internal_service_replay(venue: str, ep: dict[str, Any]) -> None:
 
 def _resolve_schema_class(venue: str, schema_class_name: str) -> type:
     """Resolve schema class from venue module or fallback to internal module."""
-    # Try venue-specific module first
     venue_modules = [
+        f"api_contracts.api_contracts_external.{venue}.schemas",
         f"api_contracts.{venue}.schemas",
         "api_contracts.internal",
     ]

@@ -6,7 +6,7 @@ from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class InstrumentType(StrEnum):
@@ -250,15 +250,33 @@ class CanonicalOrderBook(BaseModel):
 class CanonicalTrade(BaseModel):
     """Normalised trade (CanonicalTrade dataclass from unified-market-interface)."""
 
-    venue: str
-    symbol: str
+    venue: str = Field(min_length=1, description="Venue identifier")
+    symbol: str = Field(min_length=1, description="Instrument symbol")
     trade_id: str
     timestamp: datetime
-    price: Decimal
-    quantity: Decimal
+    price: Decimal = Field(gt=0, description="Trade price (must be positive)")
+    quantity: Decimal = Field(gt=0, description="Trade quantity (must be positive)")
     side: str = Field(description="buy or sell")
     buyer_maker: bool | None = None
     venue_trade_id: str | None = None
+
+    @field_validator("timestamp")
+    @classmethod
+    def timestamp_must_be_aware(cls, v: datetime) -> datetime:
+        """Require timezone-aware UTC timestamps per utc-datetime.mdc."""
+        if v.tzinfo is None:
+            msg = "timestamp must be timezone-aware (UTC)"
+            raise ValueError(msg)
+        return v
+
+    @field_validator("price", "quantity")
+    @classmethod
+    def decimal_no_nan_inf(cls, v: Decimal) -> Decimal:
+        """Reject NaN and infinity from venue JSON."""
+        if v.is_nan() or v.is_infinite():
+            msg = "price and quantity must not be NaN or infinity"
+            raise ValueError(msg)
+        return v
 
 
 # ---------------------------------------------------------------------------
