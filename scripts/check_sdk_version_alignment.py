@@ -27,11 +27,11 @@ from typing import cast
 
 # SDK package -> api-contracts schema module (must exist)
 SDK_TO_SCHEMA_MODULE: dict[str, str] = {
-    "databento": "api_contracts.databento",
-    "tardis-client": "api_contracts.tardis",
-    "tardis_client": "api_contracts.tardis",
-    "ccxt": "api_contracts.ccxt",
-    "ib_insync": "api_contracts.ibkr",
+    "databento": "unified_api_contracts.databento",
+    "tardis-client": "unified_api_contracts.tardis",
+    "tardis_client": "unified_api_contracts.tardis",
+    "ccxt": "unified_api_contracts.ccxt",
+    "ib_insync": "unified_api_contracts.ibkr",
 }
 
 # All api-contracts consumers (relative to api-contracts root)
@@ -54,7 +54,7 @@ INTERFACES: list[tuple[str, Path]] = [
     ("features-delta-one-service", Path("../features-delta-one-service")),
     ("risk-and-exposure-service", Path("../risk-and-exposure-service")),
     ("strategy-service", Path("../strategy-service")),
-    ("alerting-system", Path("../alerting-system")),
+    ("alerting-service", Path("../alerting-service")),
     ("market-data-processing-service", Path("../market-data-processing-service")),
 ]
 
@@ -62,7 +62,7 @@ INTERFACES: list[tuple[str, Path]] = [
 def _repo_root() -> Path:
     """api-contracts repo root (parent of scripts/)."""
     root = Path(__file__).resolve().parent.parent
-    assert (root / "api_contracts").is_dir(), f"Expected api_contracts at {root}"
+    assert (root / "unified_api_contracts").is_dir(), f"Expected api_contracts at {root}"
     return root
 
 
@@ -206,10 +206,10 @@ def _heuristic_overlap(api_spec: str, iface_spec: str) -> bool:
 def _schema_module_exists(root: Path, module: str) -> bool:
     """Check that the schema module exists (e.g. api_contracts/ccxt/ or api_contracts_external/ccxt/)."""
     parts = module.split(".")
-    if parts[0] != "api_contracts":
+    if parts[0] != "unified_api_contracts":
         return False
     # Venues moved to api_contracts_external; check both locations
-    base = root / "api_contracts"
+    base = root / "unified_api_contracts"
     subdir = base / parts[1]
     if not subdir.exists():
         subdir = base / "api_contracts_external" / parts[1]
