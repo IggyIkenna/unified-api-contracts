@@ -6,7 +6,6 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-
 from api_contracts.binance.schemas import BinanceMarkPriceUpdate
 from api_contracts.bybit.schemas import BybitOrderUpdateWS
 from api_contracts.deribit.schemas import DeribitTickerFull

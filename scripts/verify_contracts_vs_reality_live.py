@@ -19,29 +19,18 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
-def _load_config():  # noqa: ANN202
+def _load_config():
     """Load UnifiedCloudConfig from env (same as UMI/UOI)."""
-    try:
-        from unified_config_interface import UnifiedCloudConfig
+    from unified_config_interface import UnifiedCloudConfig
 
-        return UnifiedCloudConfig()
-    except ImportError as e:
-        print(
-            "Live verification requires unified-config-interface (same config as UMI/UOI). "
-            "From workspace: uv pip install -e ../unified-trading-services -e ../unified-config-interface",
-            file=sys.stderr,
-        )
-        raise SystemExit(0) from e
+    return UnifiedCloudConfig()
 
 
 def _resolve_secrets_for_venues_with_config(config: object) -> tuple[list[str], list[str]]:
     """Resolve secrets via UCS get_secret_with_fallback (same as UMI/UOI). Uses config + Secret Manager only."""
-    from api_contracts.venue_manifest import VENUE_MANIFEST
+    from unified_trading_services import get_secret_with_fallback
 
-    try:
-        from unified_trading_services import get_secret_with_fallback
-    except ImportError as e:
-        return ([f"unified-trading-services required for secrets: {e}"], [])
+    from api_contracts.venue_manifest import VENUE_MANIFEST
 
     project_id = getattr(config, "gcp_project_id", None) or getattr(config, "project_id", None)
     if not project_id:

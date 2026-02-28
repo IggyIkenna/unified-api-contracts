@@ -101,6 +101,7 @@ class IamRole(BaseModel):
     Endpoint: GET https://iam.googleapis.com/v1/projects/{p}/roles/{r}
     Or predefined: GET https://iam.googleapis.com/v1/roles/{r}
     """
+
     name: str | None = None
     title: str | None = None
     description: str | None = None
@@ -115,24 +116,28 @@ class CreateCustomRoleRequest(BaseModel):
 
     POST https://iam.googleapis.com/v1/projects/{p}/roles
     """
+
     role_id: str | None = None
     role: IamRole | None = None
 
 
 class ListRolesResponse(BaseModel):
     """List of IAM roles."""
+
     roles: list[IamRole] | None = None
     next_page_token: str | None = None
 
 
 class IamAuditConfig(BaseModel):
     """Audit logging configuration for a GCP service in an IAM policy."""
+
     service: str | None = None
     audit_log_configs: list[dict] | None = None
 
 
 class ResourceIamPolicy(BaseModel):
     """IAM policy on a GCP resource (project, bucket, topic, etc.)."""
+
     version: int | None = None
     bindings: list[IamBinding] | None = None
     audit_configs: list[IamAuditConfig] | None = None
@@ -141,6 +146,7 @@ class ResourceIamPolicy(BaseModel):
 
 class OrgPolicy(BaseModel):
     """Organization policy constraint."""
+
     name: str | None = None
     spec: dict | None = None
     effective_policy: dict | None = None
@@ -150,6 +156,7 @@ class OrgPolicy(BaseModel):
 
 class WorkloadIdentityPool(BaseModel):
     """Workload Identity Pool - keyless auth for external workloads."""
+
     name: str | None = None
     display_name: str | None = None
     description: str | None = None
@@ -159,6 +166,7 @@ class WorkloadIdentityPool(BaseModel):
 
 class WorkloadIdentityPoolProvider(BaseModel):
     """OIDC or AWS provider within a Workload Identity Pool."""
+
     name: str | None = None
     display_name: str | None = None
     state: str | None = None
@@ -171,6 +179,7 @@ class WorkloadIdentityPoolProvider(BaseModel):
 
 class ServiceAccountImpersonationRequest(BaseModel):
     """Request to generate an access token by impersonating a service account."""
+
     name: str | None = None
     delegates: list[str] | None = None
     scope: list[str] | None = None
@@ -179,12 +188,14 @@ class ServiceAccountImpersonationRequest(BaseModel):
 
 class ServiceAccountImpersonationResponse(BaseModel):
     """Access token response from SA impersonation."""
+
     access_token: str | None = None
     expire_time: str | None = None
 
 
 class IamError(BaseModel):
     """IAM API error."""
+
     code: int | None = None
     message: str | None = None
     status: str | None = None

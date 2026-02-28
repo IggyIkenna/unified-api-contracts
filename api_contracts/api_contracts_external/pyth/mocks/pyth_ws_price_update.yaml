@@ -1,0 +1,26 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Accept:
+      - '*/*'
+      Accept-Encoding:
+      - gzip, deflate
+      Connection:
+      - keep-alive
+      User-Agent:
+      - python-requests/2.32.5
+    method: GET
+    uri: https://hermes.pyth.network/v2/updates/price/latest?ids%5B%5D=H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4GGKKG
+  response:
+    body:
+      string: '{"type":"price_update","price_account":"H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4GGKKG","price":51234.56,"conf":12.34,"status":"trading","publish_slot":123456789}'
+    headers:
+      Content-Type:
+      - application/json
+      x-contract-schema-version:
+      - '1.0'
+    status:
+      code: 200
+      message: OK
+version: 1

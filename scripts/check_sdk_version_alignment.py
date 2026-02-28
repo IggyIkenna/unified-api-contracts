@@ -74,11 +74,7 @@ def _parse_deps_from_pyproject(path: Path) -> dict[str, str]:
         data = cast(dict[str, object], tomllib.load(f))
     deps: dict[str, str] = {}
     project = data.get("project")
-    deps_list: list[str] = (
-        cast(list[str], project.get("dependencies", []))
-        if isinstance(project, dict)
-        else []
-    )
+    deps_list: list[str] = cast(list[str], project.get("dependencies", [])) if isinstance(project, dict) else []
     for spec in deps_list:
         pkg = re.split(r"[>=<~!]", spec)[0].strip()
         deps[pkg] = spec
@@ -107,14 +103,10 @@ def _parse_schema_validation_deps(root: Path) -> dict[str, str]:
     deps: dict[str, str] = {}
     project = data.get("project")
     opt_deps: dict[str, object] | None = (
-        cast(dict[str, object], project.get("optional-dependencies", {}))
-        if isinstance(project, dict)
-        else None
+        cast(dict[str, object], project.get("optional-dependencies", {})) if isinstance(project, dict) else None
     )
     schema_deps: list[str] = (
-        cast(list[str], opt_deps.get("schema-validation", []))
-        if isinstance(opt_deps, dict)
-        else []
+        cast(list[str], opt_deps.get("schema-validation", [])) if isinstance(opt_deps, dict) else []
     )
     for spec in schema_deps:
         pkg = re.split(r"[>=<~!]", spec)[0].strip()
@@ -150,31 +142,28 @@ def _version_ranges_overlap(api_spec: str, iface_spec: str) -> bool:
     """Check if two version specs overlap. Uses packaging if available, else heuristic."""
     api_ver = _extract_version_spec(api_spec)
     iface_ver = _extract_version_spec(iface_spec)
-    try:
-        from packaging.specifiers import SpecifierSet
-        from packaging.version import Version
+    from packaging.specifiers import SpecifierSet
+    from packaging.version import Version
 
-        api_ss = SpecifierSet(api_ver)
-        iface_ss = SpecifierSet(iface_ver)
-        # Try a version that satisfies api-contracts; if it also satisfies interface, overlap
-        for candidate in _candidate_versions(api_ver):
-            try:
-                v = Version(candidate)
-                if api_ss.contains(v) and iface_ss.contains(v):
-                    return True
-            except Exception:
-                continue
-        # Try a version that satisfies interface
-        for candidate in _candidate_versions(iface_ver):
-            try:
-                v = Version(candidate)
-                if api_ss.contains(v) and iface_ss.contains(v):
-                    return True
-            except Exception:
-                continue
-        return False
-    except ImportError:
-        return _heuristic_overlap(api_ver, iface_ver)
+    api_ss = SpecifierSet(api_ver)
+    iface_ss = SpecifierSet(iface_ver)
+    # Try a version that satisfies api-contracts; if it also satisfies interface, overlap
+    for candidate in _candidate_versions(api_ver):
+        try:
+            v = Version(candidate)
+            if api_ss.contains(v) and iface_ss.contains(v):
+                return True
+        except Exception:
+            continue
+    # Try a version that satisfies interface
+    for candidate in _candidate_versions(iface_ver):
+        try:
+            v = Version(candidate)
+            if api_ss.contains(v) and iface_ss.contains(v):
+                return True
+        except Exception:
+            continue
+    return False
 
 
 def _candidate_versions(spec: str) -> list[str]:
@@ -228,16 +217,13 @@ def _schema_module_exists(root: Path, module: str) -> bool:
 
 
 def _parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Check SDK version alignment between api-contracts and consumers."
-    )
+    parser = argparse.ArgumentParser(description="Check SDK version alignment between api-contracts and consumers.")
     parser.add_argument(
         "--interface-path",
         type=str,
         default=None,
         metavar="PATH",
-        help="Check only this interface (path resolved relative to cwd). "
-        "When omitted, check all INTERFACES.",
+        help="Check only this interface (path resolved relative to cwd). When omitted, check all INTERFACES.",
     )
     return parser.parse_args()
 
@@ -270,10 +256,7 @@ def main() -> int:
             (iface_path.name, iface_path),
         ]
     else:
-        interfaces_to_check = [
-            (name, (root / rel_path).resolve())
-            for name, rel_path in INTERFACES
-        ]
+        interfaces_to_check = [(name, (root / rel_path).resolve()) for name, rel_path in INTERFACES]
 
     for iface_name, iface_path in interfaces_to_check:
         if not iface_path.exists() or not (iface_path / "pyproject.toml").exists():
@@ -287,8 +270,7 @@ def main() -> int:
             iface_spec = iface_deps["api-contracts"]
             if not _version_satisfies_spec(api_version, iface_spec):
                 errors.append(
-                    f"{iface_name}: api-contracts {iface_spec} does not include "
-                    f"api-contracts version {api_version}"
+                    f"{iface_name}: api-contracts {iface_spec} does not include api-contracts version {api_version}"
                 )
 
         # SDK alignment (skip for interfaces that don't have those SDK deps)
@@ -299,10 +281,7 @@ def main() -> int:
 
             # api-contracts must have schemas for this SDK
             if not _schema_module_exists(root, schema_module):
-                errors.append(
-                    f"{iface_name}: uses {sdk_pkg} but api-contracts has no schemas "
-                    f"for {schema_module}"
-                )
+                errors.append(f"{iface_name}: uses {sdk_pkg} but api-contracts has no schemas for {schema_module}")
                 continue
 
             # api-contracts must have this SDK in schema-validation
@@ -315,10 +294,7 @@ def main() -> int:
 
             api_spec = api_deps[sdk_pkg]
             if not _version_ranges_overlap(api_spec, iface_spec):
-                errors.append(
-                    f"{iface_name}: {sdk_pkg} {iface_spec} does not overlap with "
-                    f"api-contracts {api_spec}"
-                )
+                errors.append(f"{iface_name}: {sdk_pkg} {iface_spec} does not overlap with api-contracts {api_spec}")
 
     if errors:
         for e in errors:

@@ -49,6 +49,7 @@ class ServiceMode(StrEnum):
 # Per-event metadata payloads (the ``details`` dict typed as a model)
 # ---------------------------------------------------------------------------
 
+
 class StartedDetails(BaseModel):
     """Metadata for STARTED events."""
 
@@ -167,6 +168,7 @@ class SecretAccessedDetails(BaseModel):
 # Event envelope — what GCSEventSink writes (one JSON line in JSONL)
 # ---------------------------------------------------------------------------
 
+
 class EventMetadata(BaseModel):
     """Inner metadata dict embedded in every event."""
 
@@ -201,6 +203,7 @@ class PubSubLifecycleEventMessage(BaseModel):
 # ---------------------------------------------------------------------------
 # Typed convenience wrappers for well-known event types
 # ---------------------------------------------------------------------------
+
 
 class StartedEvent(BaseModel):
     event: Literal[LifecycleEventType.STARTED] = LifecycleEventType.STARTED

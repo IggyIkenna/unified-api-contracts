@@ -38,6 +38,19 @@ class IBKRTicker(BaseModel):
     close: float | None = None
 
 
+class IBKRBondMarketData(BaseModel):
+    """Bond market data from IBKR TWS."""
+    
+    bid: float | None = None
+    ask: float | None = None
+    last: float | None = None
+    yield_to_maturity: float | None = None
+    coupon_rate: float | None = None
+    maturity_date: str | None = None
+    rating: str | None = None
+    price: float | None = None
+
+
 # --- Order ---
 class IBKROrder(BaseModel):
     """Order submission / status. Align with ib_insync order attributes."""

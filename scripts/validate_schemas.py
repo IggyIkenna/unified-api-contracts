@@ -79,12 +79,9 @@ def load_response_files(venue: str) -> dict[str, list[dict]]:
 
 def get_existing_schema(venue: str, schema_class_name: str) -> BaseModel | None:
     """Import and return existing schema class."""
-    try:
-        module_name = f"api_contracts.{venue}.schemas"
-        module = __import__(module_name, fromlist=[schema_class_name])
-        return getattr(module, schema_class_name, None)
-    except ImportError:
-        return None
+    module_name = f"api_contracts.{venue}.schemas"
+    module = __import__(module_name, fromlist=[schema_class_name])
+    return getattr(module, schema_class_name, None)
 
 
 def analyze_field_types(data: dict[str, Any]) -> dict[str, str]:
@@ -102,7 +99,7 @@ def analyze_field_types(data: dict[str, Any]) -> dict[str, str]:
             field_types[field] = "bool"
         elif isinstance(value, int):
             # Check if it looks like a timestamp
-            timestamp_fields = ['time', 'timestamp', 'opentime', 'closetime']
+            timestamp_fields = ["time", "timestamp", "opentime", "closetime"]
             if field.lower() in timestamp_fields or (str(value).isdigit() and len(str(value)) >= 10):
                 field_types[field] = "int  # timestamp"
             else:
@@ -111,7 +108,7 @@ def analyze_field_types(data: dict[str, Any]) -> dict[str, str]:
             field_types[field] = "float"
         elif isinstance(value, str):
             # Check if it's a numeric string (price/quantity)
-            if field.lower() in ['price', 'qty', 'quantity', 'volume', 'amount'] or is_numeric_string(value):
+            if field.lower() in ["price", "qty", "quantity", "volume", "amount"] or is_numeric_string(value):
                 field_types[field] = "Decimal  # Use Decimal for financial precision"
             else:
                 field_types[field] = "str"
@@ -194,7 +191,7 @@ def validate_venue_responses(venue: str) -> list[ValidationResult]:
                             # Handle nested lists (klines) vs dict lists (trades)
                             if isinstance(sample_response[0], list):
                                 # Special case for klines - use from_list method if available
-                                if hasattr(schema_class, 'from_list'):
+                                if hasattr(schema_class, "from_list"):
                                     schema_class.from_list(sample_response[0])
                                 else:
                                     # Can't validate positional data without from_list method
@@ -266,19 +263,15 @@ def _is_type_compatible(value: Any, schema_type: type) -> bool:
         return True  # Most fields are optional
 
     # Handle Union types (like str | None)
-    if hasattr(schema_type, '__args__'):
+    if hasattr(schema_type, "__args__"):
         return any(_is_type_compatible(value, arg) for arg in schema_type.__args__)
 
-    if schema_type is str and isinstance(value, str):
-        return True
-    elif schema_type is int and isinstance(value, int):
-        return True
-    elif schema_type is float and isinstance(value, (int, float)):
-        return True
-    elif schema_type is bool and isinstance(value, bool):
-        return True
-
-    return False
+    return (
+        (schema_type is str and isinstance(value, str))
+        or (schema_type is int and isinstance(value, int))
+        or (schema_type is float and isinstance(value, (int, float)))
+        or (schema_type is bool and isinstance(value, bool))
+    )
 
 
 def generate_schema_class(venue: str, endpoint: str, sample_data: dict[str, Any] | list) -> str:
@@ -302,7 +295,7 @@ def generate_schema_class(venue: str, endpoint: str, sample_data: dict[str, Any]
         imports.append("from decimal import Decimal")
 
     class_definition = f"""
-{' '.join(imports)}
+{" ".join(imports)}
 
 
 class {class_name}(BaseModel):

@@ -513,3 +513,13 @@ class BybitDeliveryRecord(BaseModel):
     size: str | None = None
     deliveryFee: str | None = None
     deliveryType: str | None = None  # delivery, adl
+
+
+class BybitLiquidationOrder(BaseModel):
+    """Bybit liquidation order (topic: allLiquidation WS stream)."""
+
+    s: str | None = None
+    S: str | None = None
+    v: str | None = None
+    p: str | None = None
+    T: int | None = None
