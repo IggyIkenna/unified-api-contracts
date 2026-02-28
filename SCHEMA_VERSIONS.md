@@ -43,15 +43,15 @@ The `internal_execution_services` VCR section records execution-services HTTP en
 
 ---
 
-## api-contracts Version = Mappings + Schemas + Endpoints
+## unified-api-contracts Version = Mappings + Schemas + Endpoints
 
-**The api-contracts package version (pyproject.toml) is the single source of truth for:**
-- Endpoint-to-schema mappings (`api_contracts/endpoints.py` ENDPOINT_SCHEMA_MAP)
-- Base URLs (`api_contracts/endpoints.py` BASE_URLS)
-- All Pydantic schemas in `api_contracts/*/schemas.py`
-- Venue manifest (`api_contracts/venue_manifest.py`)
+**The unified-api-contracts package version (pyproject.toml) is the single source of truth for:**
+- Endpoint-to-schema mappings (`unified_api_contracts/endpoints.py` ENDPOINT_SCHEMA_MAP)
+- Base URLs (`unified_api_contracts/endpoints.py` BASE_URLS)
+- All Pydantic schemas in `unified_api_contracts/*/schemas.py`
+- Venue manifest (`unified_api_contracts/venue_manifest.py`)
 
-When you bump `version` in pyproject.toml, you are versioning the entire contract surface. Consumers (UMI, UOI, services) depend on a specific api-contracts version for type safety and validation.
+When you bump `version` in pyproject.toml, you are versioning the entire contract surface. Consumers (UMI, UOI, services) depend on a specific unified-api-contracts version for type safety and validation.
 
 ## Pinned [schema-validation] Dependencies
 
@@ -66,7 +66,7 @@ Install with: `uv pip install -e ".[schema-validation]"`
 | ccxt      | >=4.5.24,<5.0.0 | Schema validation vs CCXT unified responses (optional) |
 | ib_insync | >=0.9.86  | Schema validation vs IBKR TWS/ib_insync (optional, UTEI) |
 
-**SDK pins are for schema-validation only.** Interfaces (UMI, market-tick-data-handler) may use different versions but must produce data that validates against api-contracts schemas.
+**SDK pins are for schema-validation only.** Interfaces (UMI, market-tick-data-service) may use different versions but must produce data that validates against unified-api-contracts schemas.
 
 For live API verification (LIVE_API_VERIFICATION=1), also install from workspace:
 `uv pip install -e ../unified-trading-services -e ../unified-config-interface`
@@ -75,7 +75,7 @@ For live API verification (LIVE_API_VERIFICATION=1), also install from workspace
 
 1. **collect_responses.py** — Fetches real API responses → `collected_responses/{venue}/*.json`
 2. **validate_schemas.py** — Validates responses against schemas; optionally `--generate-schemas` → `generated_schemas/`
-3. **api_contracts** — Canonical schemas; generated schemas are reviewed and promoted here
+3. **unified_api_contracts** — Canonical schemas; generated schemas are reviewed and promoted here
 
 See README "Schema Validation & Collection" for usage.
 
@@ -205,8 +205,8 @@ See README "Schema Validation & Collection" for usage.
 
 | Gap | Severity | Description |
 |-----|----------|-------------|
-| ~~OKXOrderBook~~ | ~~High~~ | **Resolved** — added to api_contracts/okx/schemas.py |
-| ~~BybitOrderBook~~ | ~~High~~ | **Resolved** — added to api_contracts/bybit/schemas.py |
+| ~~OKXOrderBook~~ | ~~High~~ | **Resolved** — added to unified_api_contracts/okx/schemas.py |
+| ~~BybitOrderBook~~ | ~~High~~ | **Resolved** — added to unified_api_contracts/bybit/schemas.py |
 | OKX trades REST | Low | GET /api/v5/market/trades — no schema; low priority |
 | Bybit trades REST | Low | GET /v5/market/recent-trade — no schema; low priority |
 | OKX candles REST | Low | GET /api/v5/market/candles — OKXCandleWS covers WS; REST format similar |
@@ -246,7 +246,7 @@ See README "Schema Validation & Collection" for usage.
 
 ## SDK/API Version Pins
 
-Per-venue/provider API versions and SDK pins used for schema validation. Interfaces (UMI, market-tick-data-handler) may use different SDK versions but must align with these schemas.
+Per-venue/provider API versions and SDK pins used for schema validation. Interfaces (UMI, market-tick-data-service) may use different SDK versions but must align with these schemas.
 
 | Provider/Venue | API Version | SDK Package | SDK Version | Schema→Version Mapping |
 |----------------|-------------|-------------|-------------|------------------------|
@@ -275,14 +275,14 @@ Per-venue/provider API versions and SDK pins used for schema validation. Interfa
 | Provider | API/Client | Recommended Version Pin | Workspace Usage |
 |---------|------------|------------------------|-----------------|
 | Databento | databento-python | `>=0.70.0` | unified-trading-services: >=0.70.0; unified-market-interface: >=0.32.0; instruments-service: >=0.20.0 |
-| Tardis | tardis-client (Python) | `>=1.3.7` | market-tick-data-handler: >=1.3.7 |
+| Tardis | tardis-client (Python) | `>=1.3.7` | market-tick-data-service: >=1.3.7 |
 
 **Databento API** (historical + live): https://hist.databento.com, https://feed.databento.com  
 **Tardis API** (HTTP + CSV datasets): https://api.tardis.dev/v1
 
 ### Databento: Endpoint/Dataset → Schema Mapping
 
-| Databento Schema (API) | api-contracts Schema | Status |
+| Databento Schema (API) | unified-api-contracts Schema | Status |
 |------------------------|----------------------|--------|
 | ohlcv-1s, ohlcv-1m, ohlcv-1h, ohlcv-1d | DatabentoOhlcvBar | ✓ Covered (rtype: 32=OHLCV-1M, 17=OHLCV-1S, etc.) |
 | trades | DatabentoTrade | ✓ Covered |
@@ -304,7 +304,7 @@ Per-venue/provider API versions and SDK pins used for schema validation. Interfa
 
 ### Tardis: Data Type → Schema Mapping
 
-| Tardis Data Type | api-contracts Schema | Status |
+| Tardis Data Type | unified-api-contracts Schema | Status |
 |------------------|----------------------|--------|
 | trades | TardisTrade, TARDIS_TRADES_SCHEMA | ✓ Covered |
 | book_snapshot_5 | TardisBookSnapshot5, TARDIS_BOOK_SNAPSHOT_5_SCHEMA | ✓ Covered |
@@ -329,7 +329,7 @@ Per-venue/provider API versions and SDK pins used for schema validation. Interfa
 ### Recommended Version Pins
 
 - **databento**: `>=0.70.0` — align all repos (unified-trading-services already uses this; unified-market-interface and instruments-service use lower).
-- **tardis-client**: `>=1.3.7` — keep current; market-tick-data-handler uses this.
+- **tardis-client**: `>=1.3.7` — keep current; market-tick-data-service uses this.
 
 ---
 
@@ -339,7 +339,7 @@ Per-venue/provider API versions and SDK pins used for schema validation. Interfa
 
 **Consumer pins (workspace):**
 - unified-market-interface: `ccxt>=4.0`
-- market-tick-data-handler: `ccxt>=4.5.24,<5.0.0`
+- market-tick-data-service: `ccxt>=4.5.24,<5.0.0`
 - unified-trade-execution-interface: `ccxt>=4.0`
 - unified-reference-data-interface: `ccxt>=4.0.0`
 
@@ -419,10 +419,10 @@ The following IBKR TWS API surfaces are complex and not yet modeled. Add schemas
 
 | Venue/Provider | Schema Module         | Package / API | Recommended Pin   | Last Validated |
 |----------------|-----------------------|---------------|-------------------|----------------|
-| CCXT           | api_contracts.ccxt    | ccxt          | >=4.4.0,<5.0.0    | 2026-02        |
-| IBKR           | api_contracts.ibkr    | ib_insync     | >=0.9.86          | 2026-02        |
+| CCXT           | unified_api_contracts.ccxt    | ccxt          | >=4.4.0,<5.0.0    | 2026-02        |
+| IBKR           | unified_api_contracts.ibkr    | ib_insync     | >=0.9.86          | 2026-02        |
 
-**Note:** api-contracts does not import ccxt or ib_insync. Version pins are for consumer repos (UMI, UTEI, etc.) and for schema-validation tests when collecting responses.
+**Note:** unified-api-contracts does not import ccxt or ib_insync. Version pins are for consumer repos (UMI, UTEI, etc.) and for schema-validation tests when collecting responses.
 
 ---
 
@@ -434,9 +434,9 @@ Schema–version alignment for DeFi data sources and MEV protection. Sources: Al
 
 | Provider      | API/Spec                    | Recommended Version Pin | Schema Module          |
 |---------------|-----------------------------|-------------------------|------------------------|
-| **Alchemy**   | Node API + Data APIs (v2)   | URL path `/v2`          | api_contracts.alchemy  |
-| **The Graph** | GraphQL API (subgraph)     | Gateway endpoint; Hosted deprecated Jun 2024 | api_contracts.thegraph |
-| **Flashbots** | JSON-RPC OpenRPC 1.2.4      | API spec 1.0.0          | api_contracts.mev      |
+| **Alchemy**   | Node API + Data APIs (v2)   | URL path `/v2`          | unified_api_contracts.alchemy  |
+| **The Graph** | GraphQL API (subgraph)     | Gateway endpoint; Hosted deprecated Jun 2024 | unified_api_contracts.thegraph |
+| **Flashbots** | JSON-RPC OpenRPC 1.2.4      | API spec 1.0.0          | unified_api_contracts.mev      |
 
 ### Alchemy
 
@@ -756,7 +756,7 @@ Schema–version alignment for sports betting and prediction market APIs.
 
 ## GCP and AWS Cloud SDK Schema–Version Alignment
 
-Schema–version verification for GCP (google-cloud-python: compute, run, storage, bigquery) and AWS (boto3: ec2, ecs, s3, glue) Cloud SDKs. api-contracts defines Pydantic request/response schemas in `api_contracts/cloud_sdks/`; these align with SDK resource shapes for validation and type safety.
+Schema–version verification for GCP (google-cloud-python: compute, run, storage, bigquery) and AWS (boto3: ec2, ecs, s3, glue) Cloud SDKs. unified-api-contracts defines Pydantic request/response schemas in `unified_api_contracts/cloud_sdks/`; these align with SDK resource shapes for validation and type safety.
 
 ### Version Targets
 
@@ -769,11 +769,11 @@ Schema–version verification for GCP (google-cloud-python: compute, run, storag
 | **AWS boto3** | boto3 | `>=1.40.70,<2.0.0` | unified-cloud-interface, unified-ml-interface, unified-config-interface |
 | **AWS botocore** | botocore | `>=1.34.0,<2.0.0` | unified-trading-services, unified-cloud-interface |
 
-**Note:** api-contracts does not depend on these SDKs. Version pins are for consumer repos (unified-trading-services, unified-cloud-interface, etc.) that use the schemas for validation.
+**Note:** unified-api-contracts does not depend on these SDKs. Version pins are for consumer repos (unified-trading-services, unified-cloud-interface, etc.) that use the schemas for validation.
 
 ### GCP: Resource → Schema Mapping
 
-| SDK | API Resource / Method | api-contracts Schema | Status |
+| SDK | API Resource / Method | unified-api-contracts Schema | Status |
 |-----|------------------------|----------------------|--------|
 | **Compute** | InstancesClient.insert() | InsertInstanceRequest, ComputeOperation | ✓ |
 | **Compute** | InstancesClient.get() | GetInstanceRequest, ComputeInstance | ✓ |
@@ -791,7 +791,7 @@ Schema–version verification for GCP (google-cloud-python: compute, run, storag
 
 ### AWS: Resource → Schema Mapping
 
-| SDK | API Method | api-contracts Schema | Status |
+| SDK | API Method | unified-api-contracts Schema | Status |
 |-----|------------|----------------------|--------|
 | **EC2** | run_instances | EC2RunInstancesRequest, EC2RunInstancesResponse | ✓ |
 | **EC2** | describe_instances | EC2DescribeInstancesRequest, EC2DescribeInstancesResponse, EC2Reservation, EC2Instance | ✓ |
@@ -831,7 +831,7 @@ Schema–version verification for GCP (google-cloud-python: compute, run, storag
 
 ### Quota Schemas (Monitoring)
 
-| SDK | api-contracts Schema | Purpose |
+| SDK | unified-api-contracts Schema | Purpose |
 |-----|----------------------|---------|
 | GCP Compute | GcpComputeQuotaUsage | instances_count, cpus_used, memory_mb_used, disks_count |
 | GCP Cloud Run | GcpCloudRunQuotaUsage | services_count, revisions_count, concurrent_requests |
