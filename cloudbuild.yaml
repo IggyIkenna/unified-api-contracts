@@ -22,7 +22,7 @@ steps:
     args:
       - '-c'
       - |
-        pip install ruff==0.15.0
+        uv pip install ruff==0.15.0
         [ -d api-contracts ] && cd api-contracts
         ruff check .
         ruff format --check .
@@ -36,7 +36,7 @@ steps:
       - '-c'
       - |
         set -e
-        pip install build
+        uv pip install build
         [ -d api-contracts ] && cd api-contracts
         python -m build --wheel --outdir dist/
         ls -lh dist/
