@@ -57,8 +57,6 @@ from api_contracts.internal.events import (
     ServiceMode,
     StartedDetails,
     StartedEvent,
-    UploadCompletedDetails,
-    UploadStartedDetails,
     ValidationCompletedDetails,
     ValidationStartedDetails,
 )
@@ -302,8 +300,6 @@ __all__ = [
     "TrainingJobRequest",
     "TrainingJobResult",
     "TrainingPeriod",
-    "UploadCompletedDetails",
-    "UploadStartedDetails",
     "ValidationCompletedDetails",
     "ValidationStartedDetails",
 ]

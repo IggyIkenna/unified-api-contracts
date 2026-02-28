@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 class OpenBBTreasuryPrice(BaseModel):
     """Single treasury price observation from OpenBB Platform."""
-    
+
     symbol: str | None = None
     name: str | None = None
     bid: float | None = None
@@ -23,7 +23,7 @@ class OpenBBTreasuryPrice(BaseModel):
 
 class OpenBBTreasuryPricesResponse(BaseModel):
     """OpenBB treasury prices response containing bond bid/ask/YTM data."""
-    
+
     results: list[OpenBBTreasuryPrice] | None = None
     provider: str | None = None
     warnings: list[str] | None = None

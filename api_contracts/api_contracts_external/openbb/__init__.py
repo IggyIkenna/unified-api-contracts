@@ -1,5 +1,5 @@
 """OpenBB Platform API contracts."""
 
-from .schemas import OpenBBTreasuryPricesResponse, OpenBBTreasuryPrice
+from .schemas import OpenBBTreasuryPrice, OpenBBTreasuryPricesResponse
 
-__all__ = ["OpenBBTreasuryPricesResponse", "OpenBBTreasuryPrice"]
+__all__ = ["OpenBBTreasuryPrice", "OpenBBTreasuryPricesResponse"]

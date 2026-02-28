@@ -11,14 +11,14 @@ from pydantic import BaseModel
 
 class EcbYieldCurveObservation(BaseModel):
     """Single yield curve observation from ECB SDMX dataflow response."""
-    
+
     period: str | None = None
     value: float | None = None
 
 
 class EcbDataflowObservation(BaseModel):
     """Single observation within ECB dataflow response data."""
-    
+
     observations: list[dict[str, str]] | None = None
     key: str | None = None
     attributes: list[str] | None = None
@@ -26,7 +26,7 @@ class EcbDataflowObservation(BaseModel):
 
 class EcbDataflowResponse(BaseModel):
     """ECB SDMX dataflow response containing yield curve observations."""
-    
+
     data: list[EcbDataflowObservation] | None = None
     structure: dict[str, object] | None = None
     header: dict[str, object] | None = None

@@ -11,7 +11,7 @@ from pydantic import BaseModel
 
 class FredObservation(BaseModel):
     """Single FRED observation from series observations response."""
-    
+
     date: str | None = None
     value: str | None = None  # "." means missing data in FRED
     series_id: str | None = None
@@ -19,7 +19,7 @@ class FredObservation(BaseModel):
 
 class FredSeriesObservationsResponse(BaseModel):
     """FRED series observations response containing yield curve/economic data."""
-    
+
     observations: list[FredObservation] | None = None
     count: int | None = None
     offset: int | None = None
