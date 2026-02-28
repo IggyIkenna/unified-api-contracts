@@ -3,7 +3,7 @@ requires = ["setuptools>=75", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "api-contracts"
+name = "unified-api-contracts"
 version = "1.1.0"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading services"
 requires-python = ">=3.13,<3.14"
@@ -15,12 +15,12 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/IggyIkenna/api-contracts"
-Repository = "https://github.com/IggyIkenna/api-contracts"
+Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
+Repository = "https://github.com/IggyIkenna/unified-api-contracts"
 
 [project.optional-dependencies]
 # Schema-validation: SDK pins for validating schemas against real API responses.
-# Interfaces (UMI, market-tick-data-handler) may use different versions but must align with schemas.
+# Interfaces (UMI, unified-trading-services) may use different versions but must align with schemas.
 schema-validation = [
     "requests>=2.31.0",
     "databento>=0.32.0",      # Databento Historical/Live API validation
@@ -46,11 +46,11 @@ dev = [
 # For live contract verification (install from workspace path, not PyPI):
 #   uv pip install -e ../unified-trading-services -e ../unified-config-interface
 #   Then run: LIVE_API_VERIFICATION=1 python scripts/verify_contracts_vs_reality_live.py
-# UCI/UCS are not listed here so api-contracts remains installable without them.
+# UCI/UCS are not listed here so unified-api-contracts remains installable without them.
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["api_contracts*"]
+include = ["unified_api_contracts*"]
 exclude = ["tests*"]
 
 [tool.pytest.ini_options]
@@ -75,18 +75,18 @@ select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
 ignore = []  # E501 enforced (line-length 120)
 # N815/N803: camelCase/PascalCase required for API contracts mirroring external APIs (Binance, boto3, GCP SDK)
 [tool.ruff.lint.per-file-ignores]
-"api_contracts/**/schemas.py" = ["N815"]
-"api_contracts/api_contracts_external/**/schemas.py" = ["N815"]
-"api_contracts/api_contracts_external/binance/*.py" = ["N815", "F403", "F405"]
-"api_contracts/api_contracts_external/cloud_sdks/*.py" = ["N803", "N815", "F403", "F405"]
-"api_contracts/api_contracts_external/cloud_sdks/**/*.py" = ["N803", "N815", "F403", "F405"]
-"api_contracts/schemas/protocol_sdks.py" = ["N815"]
-"api_contracts/schemas/accounts.py" = ["N815"]
-"api_contracts/schemas/cex_withdrawals.py" = ["N815"]
-"api_contracts/schemas/derivatives.py" = ["N815"]
-"api_contracts/schemas/transfers.py" = ["N815"]
-"api_contracts/mev/*.py" = ["N815"]
-"api_contracts/cloud_sdks/*.py" = ["N803", "N815"]
+"unified_api_contracts/**/schemas.py" = ["N815"]
+"unified_api_contracts/unified_api_contracts_external/**/schemas.py" = ["N815"]
+"unified_api_contracts/unified_api_contracts_external/binance/*.py" = ["N815", "F403", "F405"]
+"unified_api_contracts/unified_api_contracts_external/cloud_sdks/*.py" = ["N803", "N815", "F403", "F405"]
+"unified_api_contracts/unified_api_contracts_external/cloud_sdks/**/*.py" = ["N803", "N815", "F403", "F405"]
+"unified_api_contracts/schemas/protocol_sdks.py" = ["N815"]
+"unified_api_contracts/schemas/accounts.py" = ["N815"]
+"unified_api_contracts/schemas/cex_withdrawals.py" = ["N815"]
+"unified_api_contracts/schemas/derivatives.py" = ["N815"]
+"unified_api_contracts/schemas/transfers.py" = ["N815"]
+"unified_api_contracts/mev/*.py" = ["N815"]
+"unified_api_contracts/cloud_sdks/*.py" = ["N803", "N815"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -99,7 +99,7 @@ reportUnknownParameterType = "warning"
 reportUnknownMemberType = "warning"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
-include = ["api_contracts"]
+include = ["unified_api_contracts"]
 exclude = ["tests", "**/__pycache__", ".venv*", "build", "dist"]
 useLibraryCodeForTypes = true
 

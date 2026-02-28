@@ -239,87 +239,10 @@ if [ "$QUICK" = true ]; then
 elif command -v act &>/dev/null; then
     ACT_SECRETS=""
     [ -f ~/.secrets ] && ACT_SECRETS="--secret-file ~/.secrets"
-
-    # Detect container architecture.
-    # Apple Silicon (Darwin arm64) needs linux/amd64 emulation for GitHub Actions runners.
-    # Linux hosts (including friend devs on x86) use native architecture.
-    ACT_ARCH=""
-    if [[ "$(uname -s)" == "Darwin" ]] && [[ "$(uname -m)" == "arm64" ]]; then
-        ACT_ARCH="--container-architecture linux/amd64"
-        echo "[$REPO_NAME] 🍎 Apple Silicon detected — using linux/amd64 emulation"
-    elif [[ "$(uname -s)" == "Linux" ]]; then
-        echo "[$REPO_NAME] 🐧 Linux detected — using native architecture"
-    fi
-
-    # _pull_with_timeout pulls a Docker image in the background, monitoring every 10s.
-    # If no progress is detected for STALL_LIMIT seconds, kills the pull and returns 1.
-    _pull_with_timeout() {
-        local image="$1"
-        local stall_limit="${2:-60}"
-        local PULL_LOG
-        PULL_LOG=$(mktemp)
-
-        echo "[$REPO_NAME] 📦 Pulling $image (stall timeout: ${stall_limit}s)..."
-        docker pull "$image" >"$PULL_LOG" 2>&1 &
-        local PULL_PID=$!
-
-        local elapsed=0
-        local last_size=0
-        local stall_secs=0
-
-        while kill -0 "$PULL_PID" 2>/dev/null; do
-            sleep 10
-            elapsed=$((elapsed + 10))
-            local curr_size
-            curr_size=$(wc -c <"$PULL_LOG" 2>/dev/null || echo 0)
-            if [ "$curr_size" -eq "$last_size" ]; then
-                stall_secs=$((stall_secs + 10))
-                echo "[$REPO_NAME]   pull: no progress for ${stall_secs}s (${image})"
-                if [ "$stall_secs" -ge "$stall_limit" ]; then
-                    echo "[$REPO_NAME] ⚠️  Pull stalled ${stall_limit}s — aborting"
-                    kill "$PULL_PID" 2>/dev/null
-                    rm -f "$PULL_LOG"
-                    return 1
-                fi
-            else
-                stall_secs=0
-            fi
-            last_size=$curr_size
-        done
-
-        wait "$PULL_PID"
-        local rc=$?
-        rm -f "$PULL_LOG"
-        return $rc
-    }
-
-    # Try images in order: preferred medium runner → micro fallback.
-    # Once cached, --pull=false keeps subsequent runs instant.
-    ACT_IMAGE_ARGS=""
-    PREFERRED_IMAGE="catthehacker/ubuntu:act-22.04"
-    MICRO_IMAGE="node:16-buster-slim"
-
-    if docker image inspect "$PREFERRED_IMAGE" &>/dev/null; then
-        echo "[$REPO_NAME] ✅ Runner image cached ($PREFERRED_IMAGE) — skipping pull"
-    elif _pull_with_timeout "$PREFERRED_IMAGE" 60; then
-        echo "[$REPO_NAME] ✅ Pulled $PREFERRED_IMAGE"
+    if act -j quality-gates $ACT_SECRETS 2>/dev/null; then
+        echo "[$REPO_NAME] ✅ Act simulation PASSED"
     else
-        echo "[$REPO_NAME] ⚠️  Preferred image unavailable — trying micro fallback ($MICRO_IMAGE)"
-        if docker image inspect "$MICRO_IMAGE" &>/dev/null || _pull_with_timeout "$MICRO_IMAGE" 60; then
-            echo "[$REPO_NAME] ✅ Using micro runner: $MICRO_IMAGE"
-            ACT_IMAGE_ARGS="-P ubuntu-latest=$MICRO_IMAGE"
-        else
-            echo "[$REPO_NAME] ⚠️  All image pulls failed — skipping act simulation (CI is authoritative)"
-            ACT_IMAGE_ARGS="SKIP"
-        fi
-    fi
-
-    if [ "$ACT_IMAGE_ARGS" != "SKIP" ]; then
-        if act -j quality-gates $ACT_SECRETS $ACT_ARCH --pull=false $ACT_IMAGE_ARGS 2>/dev/null; then
-            echo "[$REPO_NAME] ✅ Act simulation PASSED"
-        else
-            echo "[$REPO_NAME] ⚠️  Act simulation failed (continuing — CI will be the authoritative check)"
-        fi
+        echo "[$REPO_NAME] ⚠️  Act simulation failed (continuing — CI will be the authoritative check)"
     fi
 else
     echo "[$REPO_NAME] ⚠️  act not installed (skipping — install: brew install act)"
