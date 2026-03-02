@@ -1,15 +1,19 @@
-.PHONY: help quality-gates test lint format typecheck coverage install clean
+.PHONY: help setup quality-gates test lint format typecheck coverage install clean
 
 help:
 	@echo "Available targets:"
+	@echo "  setup         - Full dev environment setup (Python 3.13 + uv + venv + deps)"
 	@echo "  quality-gates  - Run all quality gates (lint, format, typecheck, test with coverage)"
 	@echo "  test          - Run tests"
 	@echo "  lint          - Run ruff linter"
 	@echo "  format        - Run ruff formatter"
 	@echo "  typecheck     - Run basedpyright type checker"
 	@echo "  coverage      - Run tests with coverage reporting"
-	@echo "  install       - Install development dependencies"
+	@echo "  install       - Install development dependencies (assumes venv active)"
 	@echo "  clean         - Clean build artifacts"
+
+setup:
+	@bash scripts/setup.sh
 
 quality-gates:
 	@echo "Running quality gates..."
