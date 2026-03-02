@@ -6,10 +6,21 @@
 #   ./scripts/setup.sh           # Full setup (idempotent, safe to re-run)
 #   ./scripts/setup.sh --check   # Verify environment only, no installs
 #
-# Requirements:
-#   - Python 3.13 (apt, deadsnakes PPA, pyenv, mise, or brew)
-#   - uv (installed automatically if missing)
-#   - ripgrep (for quality gates)
+# Fast path: when .venv exists with Python 3.13 and uv.lock hasn't changed,
+# `uv sync` completes in ~20ms (audits installed packages, installs nothing).
+#
+# What this script does:
+#   1. Verifies Python 3.13 is available (with install instructions if not)
+#   2. Installs uv package manager if missing
+#   3. Checks for ripgrep (required by quality-gates.sh)
+#   4. Creates .venv with Python 3.13 (or validates existing one)
+#   5. Runs `uv sync --extra dev` to install from uv.lock (lockfile-pinned)
+#
+# The .venv is NOT committed (it's in .gitignore). The uv.lock IS committed
+# and pins every dependency version. `uv sync` reads the lockfile, so:
+#   - No new deps?  → ~20ms audit, installs nothing
+#   - New deps?     → installs only the diff
+#   - Wrong Python? → recreates venv, reinstalls everything
 #
 set -e
 
@@ -94,7 +105,7 @@ else
     log_ok "ripgrep found: $(rg --version | head -1)"
 fi
 
-# ── [4] Virtual environment ───────────────────────────────────────────────────
+# ── [4] Virtual environment + dependencies ────────────────────────────────────
 if [[ "$CHECK_ONLY" == "true" ]]; then
     if [[ -d ".venv" ]]; then
         VENV_PY=$(.venv/bin/python --version 2>&1 | awk '{print $2}' | cut -d'.' -f1,2)
@@ -109,44 +120,31 @@ if [[ "$CHECK_ONLY" == "true" ]]; then
         ERRORS=$((ERRORS + 1))
     fi
 else
-    log_info "Setting up virtual environment..."
-
     if [[ -z "$PYTHON_CMD" ]]; then
         log_fail "Cannot create venv — Python 3.13 not found (see above)"
         ERRORS=$((ERRORS + 1))
     else
+        # Handle wrong-version venv
         if [[ -d ".venv" ]]; then
             VENV_PY=$(.venv/bin/python --version 2>&1 | awk '{print $2}' | cut -d'.' -f1,2)
             if [[ "$VENV_PY" != "3.13" ]]; then
                 log_warn ".venv uses Python $VENV_PY — recreating with 3.13..."
                 rm -rf .venv
-                uv venv .venv --python "$PYTHON_CMD"
-                log_ok "Recreated .venv with Python 3.13"
-            else
-                log_ok ".venv already exists with Python 3.13"
             fi
-        else
-            uv venv .venv --python "$PYTHON_CMD"
-            log_ok "Created .venv with Python 3.13"
         fi
 
-        # ── [5] Install dependencies ─────────────────────────────────────────
-        log_info "Installing dev dependencies..."
-        source .venv/bin/activate
-        uv pip install -e ".[dev]" --quiet
-        log_ok "Dev dependencies installed"
+        # uv sync: creates venv if needed, installs from uv.lock, no-op if up to date
+        log_info "Syncing dependencies from uv.lock..."
+        SYNC_START=$(date +%s%N 2>/dev/null || date +%s)
+        uv sync --extra dev --python "$PYTHON_CMD"
+        SYNC_END=$(date +%s%N 2>/dev/null || date +%s)
 
-        # httpx for VCR tests
-        uv pip install httpx --quiet
-        log_ok "httpx installed (VCR tests)"
-
-        # ── [6] Lock file ────────────────────────────────────────────────────
-        if [[ -f "uv.lock" ]]; then
-            log_ok "uv.lock present"
+        # Calculate duration for user feedback
+        if [[ "$SYNC_START" =~ ^[0-9]{10,}$ ]]; then
+            SYNC_MS=$(( (SYNC_END - SYNC_START) / 1000000 ))
+            log_ok "Dependencies synced (${SYNC_MS}ms)"
         else
-            log_info "Generating uv.lock..."
-            uv lock
-            log_ok "uv.lock generated"
+            log_ok "Dependencies synced"
         fi
     fi
 fi

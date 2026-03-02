@@ -42,6 +42,7 @@ dev = [
     "requests>=2.31.0",
     "pre-commit>=3.5.0",
     "hypothesis>=6.0.0",
+    "httpx>=0.27.0",
 ]
 # For live contract verification (install from workspace path, not PyPI):
 #   uv pip install -e ../unified-trading-services -e ../unified-config-interface

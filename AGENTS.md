@@ -28,11 +28,11 @@ Commands are documented in the `Makefile` and `README.md`. Quick reference:
 
 ### Non-obvious caveats
 
+- **Use `uv sync`, not `uv pip install`** — `uv sync --extra dev` reads `uv.lock` and is a 16ms no-op when nothing changed. `uv pip install` ignores the lockfile and resolves from scratch. The setup script uses `uv sync`.
 - **Quality gates run `tests/unit/` only** — the full `tests/` directory includes alignment tests (`test_ac_uic_alignment.py`) that require the sibling `unified_internal_contracts` repo, which is unavailable in isolation. Expect ~79 failures from that file when running `pytest tests/`.
-- **VCR tests require `httpx`** — not in `[dev]` dependencies but needed for `tests/vcr/`. Install with `uv pip install httpx` if you need those tests.
 - **Pre-existing lint errors in tests** — `tests/test_ac_uic_alignment.py` has ~42 `N814` naming convention violations. These are pre-existing and will cause `ruff check` on tests to fail; the source directory (`unified_api_contracts/`) lints cleanly.
 - **basedpyright has pre-existing errors** — ~287 `reportMissingTypeArgument` errors across venue schemas. These are pre-existing in the codebase.
-- The venv must use Python 3.13: `uv venv .venv --python python3.13`.
+- The `.venv` is NOT committed (`.gitignore`). The `uv.lock` IS committed. `scripts/setup.sh` creates the venv from the lockfile.
 - Always activate the venv before running commands: `source .venv/bin/activate`.
 
 ---
