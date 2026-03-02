@@ -1,6 +1,6 @@
-"""Unit tests for api_contracts.nautilus schemas and mocks."""
+"""Unit tests for unified_api_contracts.nautilus schemas and mocks."""
 
-from api_contracts.nautilus import (
+from unified_api_contracts.nautilus import (
     mock_account,
     mock_cache,
     mock_clock,

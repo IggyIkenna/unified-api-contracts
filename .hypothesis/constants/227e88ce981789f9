@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/reference/instrument.py
+# hypothesis_version: 6.151.9
+
+['0.01', '1', 'active', 'call', 'commodity', 'crypto', 'delisted', 'equity', 'expired', 'fixed_income', 'futures', 'fx', 'halted', 'option', 'perp', 'put', 'spot']

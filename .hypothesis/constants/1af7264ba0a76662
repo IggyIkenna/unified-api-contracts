@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/unified_api_contracts_external/cloud_sdks/schemas/oauth2.py
+# hypothesis_version: 6.151.9
+
+[429, 'code', 'external_account', 'googleapis.com', 'invalid_grant', 'offline', 'service_account', 'token_expired']

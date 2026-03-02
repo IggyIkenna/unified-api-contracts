@@ -17,11 +17,11 @@ from pathlib import Path
 
 # Repo root = parent of scripts/
 REPO_ROOT = Path(__file__).resolve().parent.parent
-API_CONTRACTS_ROOT = REPO_ROOT / "api_contracts"
+API_CONTRACTS_ROOT = REPO_ROOT / "unified_api_contracts"
 
 _EXAMPLE_SCHEMA_LOADERS: dict[str, tuple[str, str]] = {
-    "databento": ("api_contracts.databento.schemas", "DatabentoOhlcvBar"),
-    "ccxt": ("api_contracts.ccxt.schemas", "CcxtOrder"),
+    "databento": ("unified_api_contracts.databento.schemas", "DatabentoOhlcvBar"),
+    "ccxt": ("unified_api_contracts.ccxt.schemas", "CcxtOrder"),
 }
 
 
@@ -29,9 +29,9 @@ def _get_schema_for_example(api_dir_name: str, data: dict) -> tuple[str, str] | 
     if api_dir_name in _EXAMPLE_SCHEMA_LOADERS:
         return _EXAMPLE_SCHEMA_LOADERS[api_dir_name]
     if "ts_event" in data and "close" in data and api_dir_name == "databento":
-        return ("api_contracts.databento.schemas", "DatabentoOhlcvBar")
+        return ("unified_api_contracts.databento.schemas", "DatabentoOhlcvBar")
     if "id" in data and "symbol" in data and api_dir_name == "ccxt":
-        return ("api_contracts.ccxt.schemas", "CcxtOrder")
+        return ("unified_api_contracts.ccxt.schemas", "CcxtOrder")
     return None
 
 
@@ -57,7 +57,7 @@ def validate_examples() -> list[str]:
             schema_class = getattr(mod, class_name)
             try:
                 schema_class.model_validate(data)
-            except Exception as e:
+            except (ConnectionError, TimeoutError, OSError, ValueError) as e:
                 errors.append(f"{path}: {e}")
     return errors
 

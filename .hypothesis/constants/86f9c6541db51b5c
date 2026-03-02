@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/messaging.py
+# hypothesis_version: 6.151.9
+
+['cross_vm', 'derivative-tickers', 'execution-results', 'feature-updates', 'fill-events-{venue}', 'health-alerts', 'in_process', 'liquidations', 'margin-warnings', 'market-ticks', 'ml-predictions', 'order-book-updates', 'order-requests', 'position-updates', 'positions', 'risk-alerts', 'same_vm', 'strategy-signals']

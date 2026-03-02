@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/sports/sources/open_meteo/schemas.py
+# hypothesis_version: 6.151.9
+
+['clear', 'cloudy', 'drizzle', 'fog', 'heavy_rain', 'partly_cloudy', 'rain', 'snow', 'thunderstorm']

@@ -30,8 +30,8 @@ How each venue is accessed (REST, WebSocket, FIX), constraints, and how to handl
 
 - **Usage**: HTTP GET/POST; request/response JSON (or CSV for Tardis).
 - **Constraints**: Rate limits per venue (see venue docs); use exponential backoff and respect Retry-After.
-- **In tests**: Use VCR cassettes in `api_contracts/<venue>/mocks/`; filter `Authorization`, `X-API-Key`, and other secret headers so cassettes are safe to commit.
-- **Schema**: Validate responses with `api_contracts.<venue>.schemas` before mapping to canonical types.
+- **In tests**: Use VCR cassettes in `unified_api_contracts/<venue>/mocks/`; filter `Authorization`, `X-API-Key`, and other secret headers so cassettes are safe to commit.
+- **Schema**: Validate responses with `unified_api_contracts.<venue>.schemas` before mapping to canonical types.
 
 ### WebSocket
 
@@ -45,7 +45,7 @@ How each venue is accessed (REST, WebSocket, FIX), constraints, and how to handl
 - **Usage**: Where offered (e.g. OKX, Bybit), FIX session over TCP; logon, order messages, etc.
 - **Constraints**: Session lifecycle; sequence numbers; FIX spec version per venue.
 - **In tests**: Mock FIX session or use recorded FIX log files; validate parsed FIX fields against our schemas where we model them.
-- **Schema**: Add FIX message or session schemas in api-contracts when we integrate a FIX adapter.
+- **Schema**: Add FIX message or session schemas in unified-api-contracts when we integrate a FIX adapter.
 
 ---
 
@@ -56,9 +56,9 @@ Each venue's `schemas.py` and `examples/` should cover:
 - **Market data**: ticker, order book, trades, OHLCV (where applicable).
 - **Order feed**: order submit response, order status, cancel (REST and/or WS).
 - **Position/balance**: positions, balances, margin (where applicable).
-- **Errors**: HTTP/API error payload; map to `api_contracts.<venue>.schemas.*Error`.
+- **Errors**: HTTP/API error payload; map to `unified_api_contracts.<venue>.schemas.*Error`.
 
-Examples in `api_contracts/<venue>/examples/` and VCR cassettes in `api_contracts/<venue>/mocks/` provide one validating example per endpoint type so we directly test every contracted shape.
+Examples in `unified_api_contracts/<venue>/examples/` and VCR cassettes in `unified_api_contracts/<venue>/mocks/` provide one validating example per endpoint type so we directly test every contracted shape.
 
 ---
 
@@ -66,4 +66,4 @@ Examples in `api_contracts/<venue>/examples/` and VCR cassettes in `api_contract
 
 - INDEX.md — per-venue contract index (market data, order, position, errors, WS, FIX).
 - CONTRIBUTING.md — how to add venues, capture examples, record VCR.
-- `api_contracts/venue_manifest.py` — `has_rest`, `has_websocket`, `has_fix` per venue.
+- `unified_api_contracts/venue_manifest.py` — `has_rest`, `has_websocket`, `has_fix` per venue.

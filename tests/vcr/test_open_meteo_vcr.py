@@ -8,7 +8,13 @@ import httpx
 import pytest
 from vcr import VCR
 
-CASSETTE_DIR = Path(__file__).parent.parent.parent / "api_contracts" / "api_contracts_external" / "open_meteo" / "mocks"
+CASSETTE_DIR = (
+    Path(__file__).parent.parent.parent
+    / "unified_api_contracts"
+    / "unified_api_contracts_external"
+    / "open_meteo"
+    / "mocks"
+)
 
 
 def test_open_meteo_market_data_cassette() -> None:

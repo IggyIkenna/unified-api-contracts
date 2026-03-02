@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/schemas/analytics.py
+# hypothesis_version: 6.151.9
+
+[252, '0-1', 'blockchain_metrics', 'call or put', 'carry', 'crisis', 'crypto_beta', 'dark_pool', 'defi_yield', 'high', 'insider_transactions', 'liquidity', 'low', 'macro', 'momentum', 'monthly', 'news_flow', 'normal', 'options_flow', 'quality', 'regression R^2', 'satellite', 'sentiment', 'size', 'social_media', 'technical', 'value', 'volatility', 'web_traffic']

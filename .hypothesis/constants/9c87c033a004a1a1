@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/prime_broker/schemas.py
+# hypothesis_version: 6.151.9
+
+['0', 'CCP or bilateral', 'USD', 'auth', 'auth_failure', 'credit', 'cumberland', 'falconx', 'genesis', 'hidden_road', 'limit', 'margin', 'margin_breach', 'omnibus', 'other', 'pending', 'price before PB fee', 'rate_limit', 'talos', 'token', 'unknown']

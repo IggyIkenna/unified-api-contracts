@@ -1,10 +1,10 @@
-# api-contracts
+# unified-api-contracts
 
 Pydantic schemas, example JSON, and VCR cassette directories for external APIs used by the unified-trading system (UMI, UOI, and services). Contracts cover the full venue surface: public market data, private order feed, position feed, errors, WebSockets, FIX, and corner cases for CeFi, DeFi, and TradFi.
 
 **✅ Schema Validation**: All schemas validated against real API responses using Context7 for accurate type definitions and Decimal precision for financial data.
 
-**Version = Mappings + Schemas + Endpoints**: The api-contracts package version (pyproject.toml) is the single source of truth for endpoint-to-schema mappings, base URLs, and all Pydantic schemas. When you bump the version, you version the entire contract surface. See [SCHEMA_VERSIONS.md](SCHEMA_VERSIONS.md).
+**Version = Mappings + Schemas + Endpoints**: The unified-api-contracts package version (pyproject.toml) is the single source of truth for endpoint-to-schema mappings, base URLs, and all Pydantic schemas. When you bump the version, you version the entire contract surface. See [SCHEMA_VERSIONS.md](SCHEMA_VERSIONS.md).
 
 **Chain of events**: Config → SDK/API call → schema validation → adapter output. See [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md).
 
@@ -18,8 +18,8 @@ Pydantic schemas, example JSON, and VCR cassette directories for external APIs u
 ## Structure
 
 ```
-api_contracts/
-├── api_contracts_external/     # Raw: request, response, errors per venue
+unified_api_contracts/
+├── unified_api_contracts_external/     # Raw: request, response, errors per venue
 │   ├── binance/
 │   ├── databento/
 │   ├── tardis/
@@ -34,7 +34,7 @@ api_contracts/
 └── ...
 ```
 
-Per-venue directories (under `api_contracts_external/`) contain:
+Per-venue directories (under `unified_api_contracts_external/`) contain:
 
 - `schemas.py` — Pydantic models for request/response shapes.
 - `examples/` — Captured JSON (or CSV) from real or trial API calls.
@@ -51,6 +51,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a venue, capture examples,
 | CeFi / TradFi data | Databento (~506 venues), Tardis, Yahoo Finance, Barchart (VIX 15m) |
 | DeFi | The Graph, Alchemy, Hyperliquid, Aster |
 | TradFi execution | Interactive Brokers (IBKR, TWS/ib_insync) |
+| Sports | Betfair, Pinnacle, Polymarket, Odds API, API-Football |
+
+**Sports schemas** in `unified_api_contracts/sports/`: canonical models (`CanonicalFixture`, `CanonicalOdds`, `SportsFeatureVector`), 8 source provider schemas, and cross-provider mapping schemas (`TeamMapping`, `FixtureMapping`, `PlayerMapping`).
 
 **TradFi**: IBKR + Databento only; no direct CME/NASDAQ/NYSE. See [docs/TRADFI_VENUE_NUANCES.md](docs/TRADFI_VENUE_NUANCES.md) for CCXT, IBKR, and Databento symbol formats; [docs/VIX_LIVE_RESEARCH.md](docs/VIX_LIVE_RESEARCH.md) for VIX live streaming research.
 
@@ -58,20 +61,20 @@ See per-venue README or index under each directory for market data, order feed, 
 
 ## Consuming from UMI / UOI
 
-Consumers use path dependency `../api-contracts` (see path-dependency-ci.mdc). Example:
+Consumers use path dependency `../unified-api-contracts` (see path-dependency-ci.mdc). Example:
 
 ```python
-from api_contracts.databento.schemas import DatabentoTrade
+from unified_api_contracts.databento.schemas import DatabentoTrade
 # validate raw response then map to canonical types
 ```
 
-**Backward compat:** `api_contracts.binance`, `api_contracts.databento`, etc. are aliased to `api_contracts.api_contracts_external.*`. Prefer `api_contracts.unified_normalised_contracts` for canonical schemas.
+**Backward compat:** `unified_api_contracts.binance`, `unified_api_contracts.databento`, etc. are aliased to `unified_api_contracts.unified_api_contracts_external.*`. Prefer `unified_api_contracts.unified_normalised_contracts` for canonical schemas.
 
 ## Self-test: schemas and coverage
 
 Quality gates run tests that ensure:
 
-- **Per-venue schema coverage**: Each venue’s `schemas.py` exports the response and error classes declared in `api_contracts/venue_manifest.py` (REST, WebSocket, FIX, and error types per venue).
+- **Per-venue schema coverage**: Each venue’s `schemas.py` exports the response and error classes declared in `unified_api_contracts/venue_manifest.py` (REST, WebSocket, FIX, and error types per venue).
 - **Example validation**: Every `examples/*.json` file validates against the correct Pydantic schema.
 - **Manifest consistency**: Venues declare `has_rest`, `has_websocket`, `has_fix`; at least one venue has REST and one has WebSocket.
 
@@ -79,7 +82,7 @@ See `tests/test_venue_contract_coverage.py` and `tests/test_contracts_vs_reality
 
 ## Schema Validation & Collection
 
-**Full flow**: [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md) — chain overview, schema validation pipeline (collect_responses → validate_schemas → api_contracts), VCR flow (record_vcr_cassettes → test_vcr_replay), live verification (`LIVE_API_VERIFICATION=1`), version alignment (SCHEMA_VERSIONS.md, [schema-validation] deps, check_sdk_version_alignment.py), ENDPOINT_SCHEMA_MAP, BASE_URLS, venue_manifest.
+**Full flow**: [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md) — chain overview, schema validation pipeline (collect_responses → validate_schemas → unified_api_contracts), VCR flow (record_vcr_cassettes → test_vcr_replay), live verification (`LIVE_API_VERIFICATION=1`), version alignment (SCHEMA_VERSIONS.md, [schema-validation] deps, check_sdk_version_alignment.py), ENDPOINT_SCHEMA_MAP, BASE_URLS, venue_manifest.
 
 **Quick commands:**
 
@@ -107,7 +110,7 @@ Always use `Decimal` for financial data to avoid floating-point precision errors
 
 ```python
 from decimal import Decimal
-from api_contracts.binance.schemas import BinanceTicker
+from unified_api_contracts.binance.schemas import BinanceTicker
 
 # ✅ Correct - preserves precision
 ticker = BinanceTicker(
@@ -130,7 +133,7 @@ ticker = BinanceTicker(
 Handle APIs that return arrays (klines, candles, trades):
 
 ```python
-from api_contracts.binance.schemas import BinanceKline
+from unified_api_contracts.binance.schemas import BinanceKline
 
 # Binance klines return [timestamp, open, high, low, close, volume, ...]
 kline_data = [1771898400000, "64160.26", "64500.00", "64000.00", "64109.81", "599.63527", ...]
@@ -145,8 +148,8 @@ print(kline.open_price)  # Decimal('64160.26')
 Standard error handling across venues:
 
 ```python
-from api_contracts.binance.schemas import BinanceError
-from api_contracts.coinbase.schemas import CoinbaseError
+from unified_api_contracts.binance.schemas import BinanceError
+from unified_api_contracts.coinbase.schemas import CoinbaseError
 
 try:
     # API call
@@ -166,7 +169,7 @@ except APIError as e:
 REST and WebSocket schemas are often compatible:
 
 ```python
-from api_contracts.binance.schemas import BinanceTicker
+from unified_api_contracts.binance.schemas import BinanceTicker
 
 # Same schema works for both REST and WebSocket
 rest_ticker = BinanceTicker(**rest_api_response)
@@ -220,7 +223,7 @@ GitHub usernames **CosmicTrader** and **datadodo** have Write/Maintain (or Admin
 
 If you are setting up the repo for the first time:
 
-1. Create a new GitHub repository (e.g. `unified-trading-api-contracts` or `api-contracts`) under the same org/owner as other unified-trading repos.
+1. Create a new GitHub repository (e.g. `unified-trading-unified-api-contracts` or `unified-api-contracts`) under the same org/owner as other unified-trading repos.
 2. Add collaborators **CosmicTrader** and **datadodo** with Write or Admin access (Settings → Collaborators).
 3. Push this directory: `git remote add origin <repo-url> && git push -u origin main`.
 

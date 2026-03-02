@@ -19,11 +19,14 @@ Use --interface-path to check a single interface (path resolved relative to cwd)
 from __future__ import annotations
 
 import argparse
+import logging
 import re
 import sys
 import tomllib
 from pathlib import Path
 from typing import cast
+
+logger = logging.getLogger(__name__)
 
 # SDK package -> api-contracts schema module (must exist)
 SDK_TO_SCHEMA_MODULE: dict[str, str] = {
@@ -134,7 +137,7 @@ def _version_satisfies_spec(version: str, spec: str) -> bool:
         v = Version(version)
         ss = SpecifierSet(spec_part)
         return ss.contains(v)
-    except Exception:
+    except (ConnectionError, TimeoutError, OSError, ValueError):
         return True  # Conservative: assume OK when uncertain
 
 
@@ -153,7 +156,8 @@ def _version_ranges_overlap(api_spec: str, iface_spec: str) -> bool:
             v = Version(candidate)
             if api_ss.contains(v) and iface_ss.contains(v):
                 return True
-        except Exception:
+        except (ConnectionError, TimeoutError, OSError, ValueError) as e:
+            logger.warning("Skipping item during version ranges overlap: %s", e)
             continue
     # Try a version that satisfies interface
     for candidate in _candidate_versions(iface_ver):
@@ -161,7 +165,8 @@ def _version_ranges_overlap(api_spec: str, iface_spec: str) -> bool:
             v = Version(candidate)
             if api_ss.contains(v) and iface_ss.contains(v):
                 return True
-        except Exception:
+        except (ConnectionError, TimeoutError, OSError, ValueError) as e:
+            logger.warning("Skipping item during version ranges overlap: %s", e)
             continue
     return False
 

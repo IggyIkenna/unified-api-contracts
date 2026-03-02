@@ -42,8 +42,8 @@ jobs:
           fi
 
           # Check for os.getenv in source (not scripts/)
-          if git diff origin/main...HEAD -- 'api_contracts/**/*.py' 2>/dev/null | grep -q '^+.*os\.getenv'; then
-            ERRORS="$ERRORS\n❌ No os.getenv() in api_contracts/ source"
+          if git diff origin/main...HEAD -- 'unified_api_contracts/**/*.py' 2>/dev/null | grep -q '^+.*os\.getenv'; then
+            ERRORS="$ERRORS\n❌ No os.getenv() in unified_api_contracts/ source"
           fi
 
           # Check for hardcoded project IDs
@@ -52,7 +52,7 @@ jobs:
           fi
 
           # Check version bump if schemas changed
-          SCHEMA_CHANGES=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^api_contracts/' | grep -v __init__ | wc -l)
+          SCHEMA_CHANGES=$(git diff origin/main...HEAD --name-only 2>/dev/null | grep -E '^unified_api_contracts/' | grep -v __init__ | wc -l)
           VERSION_CHANGE=$(git diff origin/main...HEAD -- pyproject.toml 2>/dev/null | grep '^+.*version' | wc -l)
           if [ "$SCHEMA_CHANGES" -gt 0 ] && [ "$VERSION_CHANGE" -eq 0 ]; then
             WARNINGS="$WARNINGS\n⚠️ Schema files changed but version not bumped in pyproject.toml (required before next publish)"

@@ -52,7 +52,7 @@ Exchange API (Binance, OKX, Bybit, etc.)
 ```
 Venue REST/WebSocket (Binance, OKX, Deribit, etc.)
     → Raw response (venue-specific format)
-    → api_contracts.<venue>.schemas validate
+    → unified_api_contracts.<venue>.schemas validate
     → Per-venue adapter maps to canonical types
     → UMI/UOI canonical output
 ```
@@ -133,9 +133,9 @@ Rows = data categories; columns = venues; cells = ✓ (have) / — (missing) / �
 
 ## References
 
-- `api_contracts/canonical_mappings.py` — DATA_SOURCE_TO_VENUES, VENUE_TO_DATA_SOURCE, DATASET_TO_CANONICAL_VENUE
-- `api_contracts/venue_manifest.py` — VenueContract (has_rest, has_websocket, response_schema_classes)
-- `api_contracts/endpoints.py` — BASE_URLS, ENDPOINT_SCHEMA_MAP
+- `unified_api_contracts/canonical_mappings.py` — DATA_SOURCE_TO_VENUES, VENUE_TO_DATA_SOURCE, DATASET_TO_CANONICAL_VENUE
+- `unified_api_contracts/venue_manifest.py` — VenueContract (has_rest, has_websocket, response_schema_classes)
+- `unified_api_contracts/endpoints.py` — BASE_URLS, ENDPOINT_SCHEMA_MAP
 - [INDEX.md](INDEX.md) — Per-venue contract index
 - [VENUE_DATA_TYPES.md](VENUE_DATA_TYPES.md) — trades, OHLCV, orderbook, ticker per venue
 - [TRANSPORT_AND_ENDPOINTS.md](TRANSPORT_AND_ENDPOINTS.md) — REST vs WebSocket vs FIX

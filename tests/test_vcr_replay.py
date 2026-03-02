@@ -18,10 +18,10 @@ import pytest
 import requests
 from vcr import VCR
 
-from api_contracts.vcr_endpoints import VCR_ENDPOINTS
+from unified_api_contracts.vcr_endpoints import VCR_ENDPOINTS
 
 ROOT = Path(__file__).resolve().parent.parent
-MOCKS_BASE = ROOT / "api_contracts"
+MOCKS_BASE = ROOT / "unified_api_contracts"
 
 SECRET_HEADERS = [
     "authorization",
@@ -220,8 +220,8 @@ def _resolve_schema_class(venue: str, schema_class_name: str) -> type:
     """Resolve schema class from venue module or fallback to internal module."""
     # Try venue-specific module first
     venue_modules = [
-        f"api_contracts.{venue}.schemas",
-        "api_contracts.internal",
+        f"unified_api_contracts.{venue}.schemas",
+        "unified_api_contracts.internal",
     ]
     for mod_path in venue_modules:
         try:

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Quality Gates for api-contracts (Tier 0)
+# Quality Gates for unified-api-contracts (Tier 0)
 # SSOT: unified-trading-codex/06-coding-standards/quality-gates-library-template.sh
 # Aligned with instruments-service and UCS methodology. NO SKIPS.
 #
@@ -15,8 +15,8 @@
 set -e
 
 # ── REPO-SPECIFIC SETTINGS ────────────────────────────────────────────────────
-PACKAGE_NAME="api-contracts"
-SOURCE_DIR="api_contracts"
+PACKAGE_NAME="unified-api-contracts"
+SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=70
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 REPO_ARCH_TIER="0"
@@ -77,7 +77,6 @@ SOURCE_DIRS="${STAGED:-$SOURCE_DIR/ tests/}"
 
 export CLOUD_MOCK_MODE="true"
 export GCP_PROJECT_ID="test-project"
-export GOOGLE_CLOUD_PROJECT="test-project"
 
 # ── [0] ENVIRONMENT ────────────────────────────────────────────────────────────
 log_section "[0/6] ENVIRONMENT"
@@ -136,7 +135,7 @@ fi
 
 # ── [3.6] SDK VERSION ALIGNMENT ───────────────────────────────────────────
 log_section "[3.6/6] SDK VERSION ALIGNMENT"
-ALIGN="${REPO_ROOT}/api-contracts/scripts/check_sdk_version_alignment.py"
+ALIGN="${REPO_ROOT}/unified-api-contracts/scripts/check_sdk_version_alignment.py"
 [ ! -f "$ALIGN" ] && ALIGN="${SCRIPT_DIR}/check_sdk_version_alignment.py"
 if [ -f "$ALIGN" ]; then
     $PYTHON_CMD "$ALIGN" && log_success "SDK version alignment PASSED" || { log_fail "SDK version alignment FAILED"; exit 1; }

@@ -18,7 +18,7 @@
 | ibkr | Yes | Yes | Yes | Yes | Callbacks | N/A | TWS/ib_insync, UMI+UOI+position monitor |
 | barchart | Yes (OHLCV 15m) | N/A | N/A | N/A | N/A | N/A | VIX index; manual CSV dumps |
 
-Schema files: `api_contracts/<venue>/schemas.py`. Examples: `api_contracts/<venue>/examples/`. VCR mocks: `api_contracts/<venue>/mocks/`.
+Schema files: `unified_api_contracts/<venue>/schemas.py`. Examples: `unified_api_contracts/<venue>/examples/`. VCR mocks: `unified_api_contracts/<venue>/mocks/`.
 
 - **Available inventory**: [API_CONTRACTS_AVAILABLE_INVENTORY.md](API_CONTRACTS_AVAILABLE_INVENTORY.md) — Full inventory of external APIs (CeFi, TradFi, DeFi, Sports, Cloud); schema coverage; gaps.
 - **Cross-venue matrix**: [CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md) — CCXT vs direct access; normalization flow; venue-unique exposure.

@@ -13,7 +13,7 @@ import pytest
 
 def test_prediction_market_arb_schemas() -> None:
     """Test CrossVenueLink, ProbabilityBucket, BucketMarket, SportsbookLink, NegRiskArbSignal."""
-    from api_contracts.schemas.prediction_market_arb import (
+    from unified_api_contracts.schemas.prediction_market_arb import (
         BucketMarket,
         CrossVenueLink,
         NegRiskArbSignal,
@@ -91,7 +91,7 @@ def test_prediction_market_arb_schemas() -> None:
 
 
 def test_databento_ohlcv_bar_schema() -> None:
-    from api_contracts.databento.schemas import DatabentoOhlcvBar
+    from unified_api_contracts.databento.schemas import DatabentoOhlcvBar
 
     example = {
         "ts_event": 1609459200000000000,
@@ -110,7 +110,7 @@ def test_databento_ohlcv_bar_schema() -> None:
 
 
 def test_ccxt_order_schema() -> None:
-    from api_contracts.ccxt.schemas import CcxtOrder
+    from unified_api_contracts.ccxt.schemas import CcxtOrder
 
     example = {
         "id": "order-123",
@@ -133,7 +133,7 @@ def test_ccxt_order_schema() -> None:
 
 def test_validate_examples_if_present() -> None:
     """Validate all JSON files under api_contracts/*/examples/ with the matching schema if we have a loader."""
-    root = Path(__file__).resolve().parent.parent / "api_contracts"
+    root = Path(__file__).resolve().parent.parent / "unified_api_contracts"
     if not root.exists():
         pytest.skip("api_contracts package not found")
 
@@ -142,18 +142,35 @@ def test_validate_examples_if_present() -> None:
         if not api_dir.is_dir():
             continue
         examples_dir = api_dir / "examples"
-        if not examples_dir.exists():
-            continue
-        for path in examples_dir.glob("*.json"):
-            data = json.loads(path.read_text())
-            if api_dir.name == "databento" and "ts_event" in data and "close" in data:
-                from api_contracts.databento.schemas import DatabentoOhlcvBar
+        if examples_dir.exists():
+            for path in examples_dir.glob("*.json"):
+                data = json.loads(path.read_text())
+                if api_dir.name == "databento" and "ts_event" in data and "close" in data:
+                    from unified_api_contracts.databento.schemas import DatabentoOhlcvBar
 
-                DatabentoOhlcvBar.model_validate(data)
-                validated += 1
-            elif api_dir.name == "ccxt" and "id" in data and "symbol" in data:
-                from api_contracts.ccxt.schemas import CcxtOrder
+                    DatabentoOhlcvBar.model_validate(data)
+                    validated += 1
+                elif api_dir.name == "ccxt" and "id" in data and "symbol" in data:
+                    from unified_api_contracts.ccxt.schemas import CcxtOrder
 
-                CcxtOrder.model_validate(data)
-                validated += 1
+                    CcxtOrder.model_validate(data)
+                    validated += 1
+        elif api_dir.name == "unified_api_contracts_external":
+            for vendor_dir in api_dir.iterdir():
+                if not vendor_dir.is_dir():
+                    continue
+                vendor_examples_dir = vendor_dir / "examples"
+                if vendor_examples_dir.exists():
+                    for path in vendor_examples_dir.glob("*.json"):
+                        data = json.loads(path.read_text())
+                        if vendor_dir.name == "databento" and "ts_event" in data and "close" in data:
+                            from unified_api_contracts.databento.schemas import DatabentoOhlcvBar
+
+                            DatabentoOhlcvBar.model_validate(data)
+                            validated += 1
+                        elif vendor_dir.name == "ccxt" and "id" in data and "symbol" in data:
+                            from unified_api_contracts.ccxt.schemas import CcxtOrder
+
+                            CcxtOrder.model_validate(data)
+                            validated += 1
     assert validated >= 1, "At least one example should validate"

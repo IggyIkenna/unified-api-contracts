@@ -115,7 +115,7 @@ jobs:
             
             **Next Steps**:
             1. Review validation report below
-            2. Update schemas in \`api_contracts/\` to match API reality
+            2. Update schemas in \`unified_api_contracts/\` to match API reality
             3. Ensure financial fields use \`Decimal\` for precision
             4. Re-run validation: \`python scripts/validate_schemas.py\`
             5. Update tests if needed
@@ -136,7 +136,7 @@ jobs:
               repo: context.repo.repo,
               title: `Schema Validation Failed: ${failedCount}/${totalCount} endpoints`,
               body: issueBody,
-              labels: ['bug', 'schema-drift', 'api-contracts']
+              labels: ['bug', 'schema-drift', 'unified-api-contracts']
             });
             
       - name: Post success comment

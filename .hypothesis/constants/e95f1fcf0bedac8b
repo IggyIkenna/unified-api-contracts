@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/events.py
+# hypothesis_version: 6.151.9
+
+['ALL', 'AUTH_FAILURE', 'COMPLETED', 'CONFIG_CHANGED', 'CRITICAL', 'DATA_BROADCAST', 'ERROR', 'EXECUTION', 'FAILED', 'INFO', 'MARKET_DATA', 'PERSISTENCE_STARTED', 'PROCESSING_COMPLETED', 'PROCESSING_STARTED', 'SECRET_ACCESSED', 'STARTED', 'STOPPED', 'VALIDATION_COMPLETED', 'VALIDATION_STARTED', 'WARNING', 'access', 'batch', 'client_order_id', 'correlation_id', 'duration_ms', 'error_category', 'exchange_timestamp', 'live', 'local_timestamp', 'preflight', 'sequence_number', 'service_version', 'stack_trace', 'venue_response_id']

@@ -10,11 +10,11 @@ import pytest
 from hypothesis import given
 from hypothesis import strategies as st
 
-from api_contracts.api_contracts_external.binance.schemas import BinanceTrade
-from api_contracts.api_contracts_external.databento.schemas import DatabentoTrade
-from api_contracts.api_contracts_external.tardis.schemas import TardisTrade
-from api_contracts.internal.domain import CanonicalTrade
-from api_contracts.unified_normalised_contracts.normalize import (
+from unified_api_contracts.internal.domain import CanonicalTrade
+from unified_api_contracts.unified_api_contracts_external.binance.schemas import BinanceTrade
+from unified_api_contracts.unified_api_contracts_external.databento.schemas import DatabentoTrade
+from unified_api_contracts.unified_api_contracts_external.tardis.schemas import TardisTrade
+from unified_api_contracts.unified_normalised_contracts.normalize import (
     normalize_binance_trade,
     normalize_databento_trade,
     normalize_tardis_trade,

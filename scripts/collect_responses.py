@@ -29,7 +29,6 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Any
 
 import requests
 
@@ -74,24 +73,26 @@ def get_secret_safely(config: object, secret_name: str) -> str | None:
         return None
 
     try:
-        from unified_trading_services import get_secret_with_fallback
+        from unified_trading_services import get_secret_client
 
         project_id = getattr(config, "gcp_project_id", None) or getattr(config, "project_id", None)
         if not project_id:
             print("Warning: No GCP project ID configured, using environment variables only")
             return os.getenv(secret_name)
 
-        return get_secret_with_fallback(
+        return get_secret_client(
             secret_name=secret_name,
             project_id=project_id,
             env_fallback_key=secret_name,
         )
-    except Exception as e:
+    except (ConnectionError, TimeoutError, OSError, ValueError) as e:
         print(f"Warning: Secret retrieval failed for {secret_name}: {e}")
         return os.getenv(secret_name)
 
 
-def save_response(venue: str, endpoint: str, data: dict[str, Any], metadata: dict[str, Any] | None = None) -> None:
+def save_response(
+    venue: str, endpoint: str, data: dict[str, object], metadata: dict[str, object] | None = None
+) -> None:
     """Save API response to JSON file with metadata."""
     output_dir = setup_output_dir(venue)
 
@@ -152,7 +153,7 @@ def collect_binance_responses(config: object) -> int:
             # Rate limiting courtesy
             time.sleep(0.5)
 
-        except Exception as e:
+        except (ConnectionError, TimeoutError, OSError, ValueError) as e:
             print(f"❌ Failed to collect Binance {endpoint_name}: {e}")
 
     print(f"✅ Collected {collected}/5 Binance endpoints")
@@ -197,7 +198,7 @@ def collect_coinbase_responses(config: object) -> int:
             # Rate limiting courtesy
             time.sleep(0.5)
 
-        except Exception as e:
+        except (ConnectionError, TimeoutError, OSError, ValueError) as e:
             print(f"❌ Failed to collect Coinbase {endpoint_name}: {e}")
 
     print(f"✅ Collected {collected}/5 Coinbase endpoints")

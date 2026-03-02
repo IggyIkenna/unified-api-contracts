@@ -13,12 +13,12 @@ from pathlib import Path
 
 import pytest
 
-from api_contracts.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
+from unified_api_contracts.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 
 
 def _repo_root() -> Path:
     root = Path(__file__).resolve().parent.parent.parent
-    assert (root / "api_contracts").is_dir()
+    assert (root / "unified_api_contracts").is_dir()
     return root
 
 

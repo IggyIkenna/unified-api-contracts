@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/nautilus/mocks.py
+# hypothesis_version: 6.151.9
+
+['0', '0.001', '0.01', '1', '1.0', '100000', '50000', 'BINANCE', 'BTC', 'BTCUSDT-PERP', 'BTCUSDT-PERP.BINANCE', 'BUY', 'CRYPTO', 'F-001', 'FILLED', 'LIMIT', 'LONG', 'O-001', 'P-001', 'SIM-001', 'USDT', 'strategy-001']

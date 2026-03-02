@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/unified_api_contracts_external/kalshi/schemas.py
+# hypothesis_version: 6.151.9
+
+[401, 403, 429, 500, 'active', 'amended', 'between', 'closed', 'custom', 'determined', 'disputed', 'finalized', 'functional', 'greater', 'greater_or_equal', 'inactive', 'initialized', 'less', 'less_or_equal', 'no', 'rate_limit_exceeded', 'scalar', 'structured', 'yes']

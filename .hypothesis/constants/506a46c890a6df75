@@ -1,0 +1,4 @@
+# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/sports/canonical/bookmaker.py
+# hypothesis_version: 6.151.9
+
+['0.00', '0.10', '0.20', '0.50', '1.00', '10000.00', '1xBet', '2.00', '25000.00', '50000.00', '888sport', 'Bet365', 'BetVictor', 'Betdaq Exchange', 'Betfair Exchange', 'Betfred', 'Betway', 'BoyleSports', 'Coral', 'EUR', 'GBP', 'Ladbrokes', 'Matchbook Exchange', 'Paddy Power', 'Pinnacle', 'Sky Bet', 'Smarkets Exchange', 'The Odds API', 'USD', 'Unibet', 'William Hill', 'aggregator', 'bet365', 'bet888sport', 'betdaq', 'betfair', 'betfred', 'betvictor', 'betway', 'bookmaker_api', 'boylesports', 'bwin', 'coral', 'exchange', 'ladbrokes', 'matchbook', 'odds_api', 'onexbet', 'paddypower', 'pinnacle', 'scraper', 'skybet', 'smarkets', 'unibet', 'williamhill']
