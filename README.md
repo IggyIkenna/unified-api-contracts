@@ -178,10 +178,29 @@ ws_ticker = BinanceTicker(**websocket_message_data)
 
 ## Development Setup
 
-### Installation
+### Quick start
 
 ```bash
-# Install dependencies
+# One-command setup: checks Python 3.13, installs uv, creates venv, installs all deps
+bash scripts/setup.sh
+
+# Or equivalently:
+make setup
+```
+
+The setup script is **idempotent** — safe to re-run anytime. Use `--check` to verify your environment without installing anything:
+
+```bash
+bash scripts/setup.sh --check
+```
+
+### Manual installation
+
+If you prefer manual steps or already have Python 3.13 and uv:
+
+```bash
+uv venv .venv --python python3.13
+source .venv/bin/activate
 uv pip install -e ".[dev]"
 
 # Install pre-commit hooks
