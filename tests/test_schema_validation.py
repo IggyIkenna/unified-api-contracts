@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 
 import pytest
-from api_contracts.binance.schemas import BinanceKline, BinanceTicker, BinanceTrade
-from api_contracts.coinbase.schemas import CoinbaseCandle, CoinbaseTicker
 from pydantic import ValidationError
+from unified_api_contracts.binance.schemas import BinanceKline, BinanceTicker, BinanceTrade
+from unified_api_contracts.coinbase.schemas import CoinbaseCandle, CoinbaseTicker
 
 # Project root
 ROOT = Path(__file__).resolve().parent.parent

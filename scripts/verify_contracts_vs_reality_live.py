@@ -27,10 +27,10 @@ def _load_config():
 
 
 def _resolve_secrets_for_venues_with_config(config: object) -> tuple[list[str], list[str]]:
-    """Resolve secrets via UCS get_secret_with_fallback (same as UMI/UOI). Uses config + Secret Manager only."""
-    from unified_trading_services import get_secret_with_fallback
+    """Resolve secrets via UCS get_secret_client (same as UMI/UOI). Uses config + Secret Manager only."""
+    from unified_trading_services import get_secret_client
 
-    from api_contracts.venue_manifest import VENUE_MANIFEST
+    from unified_api_contracts.venue_manifest import VENUE_MANIFEST
 
     project_id = getattr(config, "gcp_project_id", None) or getattr(config, "project_id", None)
     if not project_id:
@@ -53,16 +53,12 @@ def _resolve_secrets_for_venues_with_config(config: object) -> tuple[list[str], 
             errors.append(f"{venue}: {field} is empty or not a string")
             continue
         try:
-            secret = get_secret_with_fallback(
+            secret = get_secret_client(
                 project_id=project_id,
                 secret_name=secret_name,
-                fallback_env_var=None,
             )
-            if secret:
-                resolved.append(venue)
-            else:
-                errors.append(f"{venue}: secret {secret_name} not found or empty")
-        except Exception as e:
+            resolved.append(venue)
+        except (ConnectionError, TimeoutError, OSError, ValueError) as e:
             errors.append(f"{venue} ({secret_name}): {e}")
     return (errors, resolved)
 

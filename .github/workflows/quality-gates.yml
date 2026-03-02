@@ -1,4 +1,4 @@
-# Quality Gates for api-contracts
+# Quality Gates for unified-api-contracts
 #
 # This workflow runs the EXACT same checks as:
 #   - Local: ./scripts/quality-gates.sh
@@ -6,7 +6,7 @@
 #
 # All three MUST be kept in sync. If you change one, change all three.
 #
-# api-contracts has zero upstream Python dependencies (only pydantic).
+# unified-api-contracts has zero upstream Python dependencies (only pydantic).
 # No dependency repo clones needed.
 #
 name: Quality Gates

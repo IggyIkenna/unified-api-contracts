@@ -14,7 +14,7 @@ class TestEventLogging:
 
     def test_logging_configuration(self):
         """Test that logging is properly configured."""
-        logger = logging.getLogger("api_contracts")
+        logger = logging.getLogger("unified_api_contracts")
         assert logger is not None
         # Logger should have handlers or inherit from root
         assert len(logger.handlers) > 0 or logger.propagate

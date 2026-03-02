@@ -15,8 +15,8 @@ quality-gates:
 	@echo "Running quality gates..."
 	ruff check . --fix
 	ruff format .
-	basedpyright api_contracts/
-	pytest --cov=api_contracts --cov-report=term-missing
+	basedpyright unified_api_contracts/
+	pytest --cov=unified_api_contracts --cov-report=term-missing
 
 test:
 	pytest
@@ -28,10 +28,10 @@ format:
 	ruff format .
 
 typecheck:
-	basedpyright api_contracts/
+	basedpyright unified_api_contracts/
 
 coverage:
-	pytest --cov=api_contracts --cov-report=term-missing --cov-report=html
+	pytest --cov=unified_api_contracts --cov-report=term-missing --cov-report=html
 
 install:
 	uv pip install -e ".[dev]"

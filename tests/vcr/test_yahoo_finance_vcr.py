@@ -8,7 +8,11 @@ import httpx
 from vcr import VCR
 
 CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent / "api_contracts" / "api_contracts_external" / "yahoo_finance" / "mocks"
+    Path(__file__).parent.parent.parent
+    / "unified_api_contracts"
+    / "unified_api_contracts_external"
+    / "yahoo_finance"
+    / "mocks"
 )
 
 

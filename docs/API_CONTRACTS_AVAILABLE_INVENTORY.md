@@ -239,7 +239,7 @@
 
 **CCXT** provides a unified API across many exchanges. We have both **direct venue schemas** (Binance, OKX, Bybit, etc.) and **CCXT unified schemas** (CcxtOrder, CcxtTrade, etc.). Venues may be accessed via CCXT or direct REST/WebSocket.
 
-| Venue / Data Source | Access Method | api-contracts Module | Notes |
+| Venue / Data Source | Access Method | unified-api-contracts Module | Notes |
 |---------------------|--------------|---------------------|-------|
 | Binance (spot, futures) | Direct + CCXT | binance | Direct REST/WS preferred for full coverage; CCXT for unified path |
 | OKX                  | Direct + CCXT | okx                 | Direct v5 REST/WS; CCXT for unified |
@@ -259,7 +259,7 @@
 | Kucoin, Gate.io, Bitfinex, Huobi | CCXT only | ccxt | No direct schemas; use Ccxt* unified schemas |
 | Betfair, Pinnacle, Polymarket, Odds API, API-Football | Direct only | betfair, pinnacle, polymarket, odds_api, api_football | Sports; no CCXT |
 
-**CCXT unified schemas (api_contracts.ccxt):** CcxtOrder, CcxtTrade, CcxtBalance, CcxtBalanceResponse, CcxtPosition, CcxtMarket, CcxtTicker, CcxtOrderBook, CcxtFundingRate, CcxtFundingRateHistory, CcxtOpenInterest, CcxtOpenInterestHistory, CcxtOhlcv, CcxtAggTrade, CcxtLeverageTiers, CcxtLongShortRatio, CcxtGreeks, CcxtWithdrawal, CcxtDeposit, CcxtDepositAddress, CcxtLedger, CcxtTransfer, CcxtTradingFee, CcxtErrorPayload.
+**CCXT unified schemas (unified_api_contracts.ccxt):** CcxtOrder, CcxtTrade, CcxtBalance, CcxtBalanceResponse, CcxtPosition, CcxtMarket, CcxtTicker, CcxtOrderBook, CcxtFundingRate, CcxtFundingRateHistory, CcxtOpenInterest, CcxtOpenInterestHistory, CcxtOhlcv, CcxtAggTrade, CcxtLeverageTiers, CcxtLongShortRatio, CcxtGreeks, CcxtWithdrawal, CcxtDeposit, CcxtDepositAddress, CcxtLedger, CcxtTransfer, CcxtTradingFee, CcxtErrorPayload.
 
 ---
 
@@ -284,7 +284,7 @@ From full expansion plan and institutional gaps analysis. APIs we intend to supp
 | Alchemy NFT, Portfolio, Prices, Webhooks, Simulation | Gap | Add when integrating |
 | The Graph Pair, Gauge (Sushi, Curve, Balancer) | Gap | Subgraph-specific entities |
 | Flashbots eth_cancelPrivateTransaction | Gap | Simple params/result |
-| bloXroute, Titan (MEV) | Not contracted | Reverse-engineer specs into api_contracts/mev/ |
+| bloXroute, Titan (MEV) | Not contracted | Reverse-engineer specs into unified_api_contracts/mev/ |
 | Instadapp, Morpho flash loans (atomic) | Partial | Protocol payloads in protocol_sdks; full flow schemas TBD |
 
 ### TradFi
@@ -316,9 +316,9 @@ From full expansion plan and institutional gaps analysis. APIs we intend to supp
 
 ## File References
 
-- **Venue manifest:** `api_contracts/venue_manifest.py`
-- **Base URLs & endpoint map:** `api_contracts/endpoints.py`
+- **Venue manifest:** `unified_api_contracts/venue_manifest.py`
+- **Base URLs & endpoint map:** `unified_api_contracts/endpoints.py`
 - **Schema versions & pins:** `SCHEMA_VERSIONS.md`
-- **VCR endpoints:** `api_contracts/vcr_endpoints.py`
-- **Canonical mappings:** `api_contracts/canonical_mappings.py`
+- **VCR endpoints:** `unified_api_contracts/vcr_endpoints.py`
+- **Canonical mappings:** `unified_api_contracts/canonical_mappings.py`
 - **Chain of events:** `docs/API_CONTRACTS_CHAIN_OF_EVENTS.md`

@@ -29,7 +29,6 @@ import argparse
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 from pydantic import BaseModel, ValidationError
 
@@ -52,7 +51,7 @@ class ValidationResult:
         self.extra_fields: set[str] = set()
         self.type_mismatches: dict[str, tuple] = {}
         self.validation_errors: list[str] = []
-        self.sample_data: dict[str, Any] = {}
+        self.sample_data: dict[str, object] = {}
 
 
 def load_response_files(venue: str) -> dict[str, list[dict]]:
@@ -71,7 +70,7 @@ def load_response_files(venue: str) -> dict[str, list[dict]]:
                 if endpoint not in responses:
                     responses[endpoint] = []
                 responses[endpoint].append(data["response"])
-        except Exception as e:
+        except (ConnectionError, TimeoutError, OSError, ValueError) as e:
             print(f"Warning: Failed to load {file_path}: {e}")
 
     return responses
@@ -79,12 +78,12 @@ def load_response_files(venue: str) -> dict[str, list[dict]]:
 
 def get_existing_schema(venue: str, schema_class_name: str) -> BaseModel | None:
     """Import and return existing schema class."""
-    module_name = f"api_contracts.{venue}.schemas"
+    module_name = f"unified_api_contracts.{venue}.schemas"
     module = __import__(module_name, fromlist=[schema_class_name])
     return getattr(module, schema_class_name, None)
 
 
-def analyze_field_types(data: dict[str, Any]) -> dict[str, str]:
+def analyze_field_types(data: dict[str, object]) -> dict[str, str]:
     """Analyze field types from sample data and suggest proper Pydantic types."""
     field_types = {}
 
@@ -256,7 +255,7 @@ def validate_venue_responses(venue: str) -> list[ValidationResult]:
     return results
 
 
-def _is_type_compatible(value: Any, schema_type: type) -> bool:
+def _is_type_compatible(value: object, schema_type: type) -> bool:
     """Check if actual value is compatible with schema type annotation."""
     # Simplified type checking - could be more sophisticated
     if value is None:
@@ -274,7 +273,7 @@ def _is_type_compatible(value: Any, schema_type: type) -> bool:
     )
 
 
-def generate_schema_class(venue: str, endpoint: str, sample_data: dict[str, Any] | list) -> str:
+def generate_schema_class(venue: str, endpoint: str, sample_data: dict[str, object] | list) -> str:
     """Generate a complete Pydantic schema class from sample data."""
     class_name = f"{venue.capitalize()}{endpoint.replace('_', '').capitalize()}"
 

@@ -14,51 +14,58 @@ import pytest
 
 # Fallback map when venue not in manifest or example not in example_schema_map
 _EXAMPLE_SCHEMA_LOADERS: dict[str, tuple[str, str]] = {
-    "databento": ("api_contracts.databento.schemas", "DatabentoOhlcvBar"),
-    "ccxt": ("api_contracts.ccxt.schemas", "CcxtOrder"),
+    "databento": ("unified_api_contracts.databento.schemas", "DatabentoOhlcvBar"),
+    "ccxt": ("unified_api_contracts.ccxt.schemas", "CcxtOrder"),
 }
 
 
 def _api_contracts_root() -> Path:
     root = Path(__file__).resolve().parent.parent
-    assert (root / "api_contracts").is_dir(), f"api_contracts not found under {root}"
+    assert (root / "unified_api_contracts").is_dir(), f"api_contracts not found under {root}"
     return root
 
 
 def _discover_example_files() -> list[tuple[Path, str]]:
     """Return list of (path, api_dir_name) for each examples/*.json."""
     root = _api_contracts_root()
-    api_root = root / "api_contracts"
+    api_root = root / "unified_api_contracts"
     out: list[tuple[Path, str]] = []
     for api_dir in api_root.iterdir():
         if not api_dir.is_dir():
             continue
         examples_dir = api_dir / "examples"
-        if not examples_dir.exists():
-            continue
-        for path in examples_dir.glob("*.json"):
-            out.append((path, api_dir.name))
+        if examples_dir.exists():
+            for path in examples_dir.glob("*.json"):
+                out.append((path, api_dir.name))
+        elif api_dir.name == "unified_api_contracts_external":
+            for vendor_dir in api_dir.iterdir():
+                if not vendor_dir.is_dir():
+                    continue
+                vendor_examples_dir = vendor_dir / "examples"
+                if vendor_examples_dir.exists():
+                    for path in vendor_examples_dir.glob("*.json"):
+                        out.append((path, vendor_dir.name))
     return out
 
 
 def _get_schema_for_example(api_dir_name: str, data: dict, example_filename: str = "") -> tuple[str, str] | None:
     """Return (module_path, class_name) for the schema that can validate this example, or None."""
     try:
-        from api_contracts.venue_manifest import VENUE_MANIFEST
+        from unified_api_contracts.venue_manifest import VENUE_MANIFEST
 
         if api_dir_name in VENUE_MANIFEST:
             mapping = VENUE_MANIFEST[api_dir_name].get("example_schema_map") or {}
             if example_filename and example_filename in mapping:
                 class_name = mapping[example_filename]
-                return (f"api_contracts.{api_dir_name}.schemas", class_name)
+                return (f"unified_api_contracts.{api_dir_name}.schemas", class_name)
     except ImportError:
         pass
     if api_dir_name in _EXAMPLE_SCHEMA_LOADERS:
         return _EXAMPLE_SCHEMA_LOADERS[api_dir_name]
     if "ts_event" in data and "close" in data and api_dir_name == "databento":
-        return ("api_contracts.databento.schemas", "DatabentoOhlcvBar")
+        return ("unified_api_contracts.databento.schemas", "DatabentoOhlcvBar")
     if "id" in data and "symbol" in data and api_dir_name == "ccxt":
-        return ("api_contracts.ccxt.schemas", "CcxtOrder")
+        return ("unified_api_contracts.ccxt.schemas", "CcxtOrder")
     return None
 
 

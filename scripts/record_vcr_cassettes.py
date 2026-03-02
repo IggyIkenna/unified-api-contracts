@@ -25,7 +25,7 @@ from vcr import VCR
 
 # Project root
 ROOT = Path(__file__).resolve().parent.parent
-MOCKS_BASE = ROOT / "api_contracts"
+MOCKS_BASE = ROOT / "unified_api_contracts"
 
 # Headers to replace with [FILTERED] in cassettes (case-insensitive match)
 SECRET_HEADERS = [
@@ -108,7 +108,7 @@ def run() -> int:
     args = parser.parse_args()
 
     # Import after potential path setup
-    from api_contracts.vcr_endpoints import VCR_ENDPOINTS
+    from unified_api_contracts.vcr_endpoints import VCR_ENDPOINTS
 
     venues = [args.venue] if args.venue else list(VCR_ENDPOINTS.keys())
     recorded = 0
@@ -165,7 +165,7 @@ def run() -> int:
                     recorded += 1
                     print(f"Recorded {venue}/{cassette_name}")
                     _inject_schema_version(cassette_dir / cassette_name, ep.get("schema_version", "1.0"))
-                except Exception as e:
+                except (ConnectionError, TimeoutError, OSError, ValueError) as e:
                     errors.append(f"{venue}/{cassette_name}: {e}")
 
     if errors:

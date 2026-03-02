@@ -6,16 +6,16 @@ Ensures we can actually use the contracts: each venue exports the response and e
 from __future__ import annotations
 
 import importlib
-from pathlib import Path
 
 import pytest
 
-from api_contracts.venue_manifest import VENUE_MANIFEST
+from unified_api_contracts.venue_manifest import VENUE_MANIFEST
 
 
 def _schemas_module_for_venue(venue: str) -> str:
-    """Return the schemas module path for a venue (e.g. api_contracts.databento.schemas)."""
-    return f"api_contracts.{venue}.schemas"
+    """Return the schemas module path for a venue from the manifest."""
+    contract = VENUE_MANIFEST[venue]
+    return contract.get("module", f"unified_api_contracts.{venue}.schemas")
 
 
 @pytest.mark.parametrize("venue", list(VENUE_MANIFEST))
@@ -43,7 +43,7 @@ def test_venue_has_claimed_response_schemas(venue: str) -> None:
 def test_venue_has_claimed_error_schemas(venue: str) -> None:
     """Every error schema class listed in the manifest must exist in the venue's schemas module."""
     manifest = VENUE_MANIFEST[venue]
-    expected = manifest["error_schema_classes"]
+    expected = manifest.get("error_schema_classes", [])
     if not expected:
         return
     mod_path = _schemas_module_for_venue(venue)
@@ -53,8 +53,10 @@ def test_venue_has_claimed_error_schemas(venue: str) -> None:
 
 
 def test_manifest_has_rest_websocket_fix_per_venue() -> None:
-    """Every venue in the manifest must declare has_rest, has_websocket, has_fix."""
+    """Every external venue in the manifest must declare has_rest, has_websocket, has_fix."""
     for venue, contract in VENUE_MANIFEST.items():
+        if contract.get("is_internal", False):
+            continue
         assert "has_rest" in contract, f"{venue}: missing has_rest"
         assert "has_websocket" in contract, f"{venue}: missing has_websocket"
         assert "has_fix" in contract, f"{venue}: missing has_fix"
@@ -64,24 +66,20 @@ def test_manifest_has_rest_websocket_fix_per_venue() -> None:
 
 
 def test_manifest_venues_match_api_contracts_dirs() -> None:
-    """Every venue in the manifest must have api_contracts/<venue>/schemas.py or schemas/."""
-    root = Path(__file__).resolve().parent.parent
-    api_root = root / "api_contracts"
-    for venue in VENUE_MANIFEST:
-        schemas_file = api_root / venue / "schemas.py"
-        schemas_dir = api_root / venue / "schemas"
-        assert schemas_file.exists() or (schemas_dir.is_dir() and (schemas_dir / "__init__.py").exists()), (
-            f"api_contracts/{venue}/schemas.py or schemas/ missing"
-        )
+    """Every venue in the manifest must have an importable schemas module."""
+    for venue, contract in VENUE_MANIFEST.items():
+        mod_path = contract.get("module", f"unified_api_contracts.{venue}.schemas")
+        mod = importlib.import_module(mod_path)
+        assert mod is not None, f"{venue}: cannot import {mod_path}"
 
 
 def test_at_least_one_venue_has_rest() -> None:
     """At least one venue must claim REST (sanity check)."""
-    rest_count = sum(1 for c in VENUE_MANIFEST.values() if c["has_rest"])
+    rest_count = sum(1 for c in VENUE_MANIFEST.values() if c.get("has_rest", False))
     assert rest_count >= 1, "Manifest should have at least one venue with has_rest=True"
 
 
 def test_at_least_one_venue_has_websocket() -> None:
     """At least one venue must claim WebSocket (sanity check)."""
-    ws_count = sum(1 for c in VENUE_MANIFEST.values() if c["has_websocket"])
+    ws_count = sum(1 for c in VENUE_MANIFEST.values() if c.get("has_websocket", False))
     assert ws_count >= 1, "Manifest should have at least one venue with has_websocket=True"

@@ -22,7 +22,7 @@ from pathlib import Path
 
 # Project root (api-contracts repo)
 ROOT = Path(__file__).resolve().parent.parent
-EXAMPLES_BASE = ROOT / "api_contracts"
+EXAMPLES_BASE = ROOT / "unified_api_contracts"
 
 # APIs we can capture (extend per-API in separate functions)
 SUPPORTED_APIS = [

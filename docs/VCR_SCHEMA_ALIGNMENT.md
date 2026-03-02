@@ -6,17 +6,17 @@ This document lists **all data types** we need to contract, **every venue/data v
 
 ## Definitions
 
-- **VCR**: Live request recorded to `api_contracts/<venue>/mocks/<name>.yaml`; replayed in `tests/test_vcr_replay.py` and validated with the venue schema.
-- **Example**: Static JSON in `api_contracts/<venue>/examples/<name>.json`; validated in `tests/test_every_venue_endpoint.py` and `test_contracts_vs_reality.py`.
+- **VCR**: Live request recorded to `unified_api_contracts/<venue>/mocks/<name>.yaml`; replayed in `tests/test_vcr_replay.py` and validated with the venue schema.
+- **Example**: Static JSON in `unified_api_contracts/<venue>/examples/<name>.json`; validated in `tests/test_every_venue_endpoint.py` and `test_contracts_vs_reality.py`.
 - **Covered**: Schema has ≥1 VCR cassette or example that validates it.
 - **Missing**: Schema has no VCR and no example; needs either a new cassette (add to `vcr_endpoints.py` + record) or a new example file + `example_schema_map` entry.
 
 **Source of truth**
 
-- Schemas: `api_contracts/venue_manifest.py` → `response_schema_classes`, `error_schema_classes`, `example_schema_map`.
-- VCR config: `api_contracts/vcr_endpoints.py` → `VCR_ENDPOINTS`.
-- Existing cassettes: `api_contracts/<venue>/mocks/*.yaml`.
-- Existing examples: `api_contracts/<venue>/examples/*.json`.
+- Schemas: `unified_api_contracts/venue_manifest.py` → `response_schema_classes`, `error_schema_classes`, `example_schema_map`.
+- VCR config: `unified_api_contracts/vcr_endpoints.py` → `VCR_ENDPOINTS`.
+- Existing cassettes: `unified_api_contracts/<venue>/mocks/*.yaml`.
+- Existing examples: `unified_api_contracts/<venue>/examples/*.json`.
 
 ---
 
@@ -82,7 +82,7 @@ DeFi data shapes **depend on the venue** (subgraph schema, RPC API, or indexer).
 | Venue | Data types | Schema / notes |
 |-------|------------|----------------|
 | **The Graph** | Subgraph-specific; entity set depends on deployment. | **Uniswap-style:** SubgraphPool, SubgraphSwap, SubgraphToken. **Aave-style:** SubgraphReserve. Generic: TheGraphResponse, GraphQLError. Other subgraphs (e.g. Sushi, Curve) may have different entities (pairs, liquidity, gauges) — add schemas when we integrate. |
-| **Alchemy** | RPC, indexer APIs. | AlchemyRpcResponse (eth_blockNumber, etc.), AlchemyAssetTransfer (getAssetTransfers), AlchemyTokenBalance. NFT/other APIs not yet in api-contracts. |
+| **Alchemy** | RPC, indexer APIs. | AlchemyRpcResponse (eth_blockNumber, etc.), AlchemyAssetTransfer (getAssetTransfers), AlchemyTokenBalance. NFT/other APIs not yet in unified-api-contracts. |
 | **Other DeFi** | 0x, 1inch, Covalent, Dune, etc. | Not yet contracted; add venue-specific schemas when we integrate. |
 
 **The Graph (subgraph-by-subgraph):**
@@ -128,7 +128,7 @@ DeFi data shapes **depend on the venue** (subgraph schema, RPC API, or indexer).
 
 ## 3. Data type × vendor: schema + VCR + example coverage
 
-For each (data type, vendor) we show: **Schema** (exists in api-contracts?), **VCR** (cassette?), **Example** (example JSON?). Empty = missing.
+For each (data type, vendor) we show: **Schema** (exists in unified-api-contracts?), **VCR** (cassette?), **Example** (example JSON?). Empty = missing.
 
 ### 3.1 OHLCV / bars
 
@@ -545,7 +545,7 @@ Same as before: every schema in the venue manifest and its VCR/example status.
 ### 6.3 Concrete steps
 
 1. Add **missing examples** for every schema marked **Missing** in section 4; register in `venue_manifest.py` → `example_schema_map`.
-2. Add **VCR endpoints** in `api_contracts/vcr_endpoints.py` for every type that has an HTTP endpoint (public or key_env); run `uv run python scripts/record_vcr_cassettes.py` and commit `mocks/*.yaml`.
+2. Add **VCR endpoints** in `unified_api_contracts/vcr_endpoints.py` for every type that has an HTTP endpoint (public or key_env); run `uv run python scripts/record_vcr_cassettes.py` and commit `mocks/*.yaml`.
 3. **IBKR:** No HTTP; add static examples for IBKRTicker, IBKROrder, IBKRPosition, IBKRAccountValue, IBKRPortfolioItem, IBKRPnL.
 4. **YahooChartResult:** Add `yahoo_finance/examples/chart_result_example.json` and add to `example_schema_map`.
 5. Re-run **tests**: `pytest tests/test_every_venue_endpoint.py tests/test_contracts_vs_reality.py tests/test_vcr_replay.py -v`.

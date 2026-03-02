@@ -1,6 +1,6 @@
 # Quality Gate Bypass Audit
 
-This document records all intentional bypasses of quality gate rules in `api-contracts`.
+This document records all intentional bypasses of quality gate rules in `unified-api-contracts`.
 Every bypass must be justified and tracked here per workspace rules.
 
 ---
@@ -8,20 +8,20 @@ Every bypass must be justified and tracked here per workspace rules.
 ## 2.1 Ruff Config Bypasses
 
 ### N815 — camelCase field names in schemas.py files
-**Scope:** `api_contracts/**/schemas.py`
+**Scope:** `unified_api_contracts/**/schemas.py`
 **Rule:** `N815` (mixed-case variable name in class scope)
 **Reason:** External API field names are camelCase (Binance: `orderId`, OKX: `instId`, etc.).
 Renaming would break deserialization when using `model_validate(raw_api_response)`.
-**Config:** `[tool.ruff.lint.per-file-ignores] "api_contracts/**/schemas.py" = ["N815"]`
+**Config:** `[tool.ruff.lint.per-file-ignores] "unified_api_contracts/**/schemas.py" = ["N815"]`
 
 ### N803 — camelCase parameter names in cloud_sdks
-**Scope:** `api_contracts/cloud_sdks/*.py`
+**Scope:** `unified_api_contracts/cloud_sdks/*.py`
 **Rule:** `N803` (argument name should be lowercase)
 **Reason:** Protocol stubs mirror GCP/AWS SDK interfaces which use camelCase.
-**Config:** `[tool.ruff.lint.per-file-ignores] "api_contracts/cloud_sdks/*.py" = ["N803", "N815"]`
+**Config:** `[tool.ruff.lint.per-file-ignores] "unified_api_contracts/cloud_sdks/*.py" = ["N803", "N815"]`
 
 ### E741 — ambiguous variable name `l` in API schemas
-**Scope:** `api_contracts/binance/schemas.py`, `api_contracts/okx/schemas.py`
+**Scope:** `unified_api_contracts/binance/schemas.py`, `unified_api_contracts/okx/schemas.py`
 **Rule:** `E741` (ambiguous variable name)
 **Reason:** Field name `l` (lowercase L) is mandated by Binance EAPI options stream
 (`BinanceOptionTicker.l`) and OKX candle stream (`OKXCandleWS.l`). Cannot rename.
@@ -46,9 +46,9 @@ The following `reportUnknown*` rules are set to `"warning"` rather than `"error"
 
 | File | Fields | Resolution |
 |------|--------|-----------|
-| `api_contracts/domain_config.py` | `config: dict[str, Any]` in all Protocol classes | Changed to `dict[str, object]` — avoids `Any`, preserves extensibility; Protocol implementors can still satisfy with `dict[str, object]` or narrower |
-| `api_contracts/api_contracts_external/ibkr/schemas.py` | `contract`, `info` fields | Changed to `dict[str, str \| int \| float \| bool \| None]` — covers all TWS API primitive types |
-| `api_contracts/venue_manifest/internal_services.py` | `INTERNAL_CONTRACTS: dict[str, Any]` | Changed to `dict[str, ContractEntry]` using a `TypedDict` with `total=False` for optional fields — all known entry shapes captured; no `Any` remaining |
+| `unified_api_contracts/domain_config.py` | `config: dict[str, Any]` in all Protocol classes | Changed to `dict[str, object]` — avoids `Any`, preserves extensibility; Protocol implementors can still satisfy with `dict[str, object]` or narrower |
+| `unified_api_contracts/unified_api_contracts_external/ibkr/schemas.py` | `contract`, `info` fields | Changed to `dict[str, str \| int \| float \| bool \| None]` — covers all TWS API primitive types |
+| `unified_api_contracts/venue_manifest/internal_services.py` | `INTERNAL_CONTRACTS: dict[str, Any]` | Changed to `dict[str, ContractEntry]` using a `TypedDict` with `total=False` for optional fields — all known entry shapes captured; no `Any` remaining |
 
 ---
 
@@ -59,10 +59,10 @@ pending a future refactor pass.
 
 | File | Lines | Rule | Description | Action |
 |------|-------|------|-------------|--------|
-| `api_contracts/coinbase/schemas.py` | 53–61 | `reportUnknownParameterType` / `reportUnknownArgumentType` | `CoinbaseCandle.from_list(cls, candle_data: list)` uses untyped `list` parameter. Subscript indexing on untyped list produces unknown-type arguments. | Phase 1b: type as `list[int \| str]` and use explicit `Decimal(str(...))` casts |
-| `api_contracts/vcr_endpoints.py` | 50 | `reportUnknownParameterType` | `json_body: dict[Unknown, Unknown] \| None` — VCR infrastructure uses untyped JSON dicts for mock bodies. | Acceptable for test infrastructure; document as permanent exception |
-| `api_contracts/venue_manifest.py` | 28 | `reportAssignmentType` | VENUE_MANIFEST dict has mixed VenueContract and extended internal/fix/regulatory entries with extra keys (module, description, is_internal, etc.). | TypedDict does not support optional extra keys; refactor to Union or separate dicts in Phase 2 |
-| `api_contracts/api_contracts_external/cloud_sdks/schemas/iam.py` | 191 | `reportUnknownParameterType` | OAuth2Error(code, http_status) — code/http_status from untyped exception handler. | Mirror GCP IAM SDK; add explicit types in future cloud_sdks hardening |
+| `unified_api_contracts/coinbase/schemas.py` | 53–61 | `reportUnknownParameterType` / `reportUnknownArgumentType` | `CoinbaseCandle.from_list(cls, candle_data: list)` uses untyped `list` parameter. Subscript indexing on untyped list produces unknown-type arguments. | Phase 1b: type as `list[int \| str]` and use explicit `Decimal(str(...))` casts |
+| `unified_api_contracts/vcr_endpoints.py` | 50 | `reportUnknownParameterType` | `json_body: dict[Unknown, Unknown] \| None` — VCR infrastructure uses untyped JSON dicts for mock bodies. | Acceptable for test infrastructure; document as permanent exception |
+| `unified_api_contracts/venue_manifest.py` | 28 | `reportAssignmentType` | VENUE_MANIFEST dict has mixed VenueContract and extended internal/fix/regulatory entries with extra keys (module, description, is_internal, etc.). | TypedDict does not support optional extra keys; refactor to Union or separate dicts in Phase 2 |
+| `unified_api_contracts/unified_api_contracts_external/cloud_sdks/schemas/iam.py` | 191 | `reportUnknownParameterType` | OAuth2Error(code, http_status) — code/http_status from untyped exception handler. | Mirror GCP IAM SDK; add explicit types in future cloud_sdks hardening |
 
 ---
 
@@ -86,8 +86,8 @@ None currently.
 
 ## 2.6 Hardening Decisions
 
-- `api-contracts` has zero production service code — no retry logic, no GCS writes,
+- `unified-api-contracts` has zero production service code — no retry logic, no GCS writes,
   no pubsub. Error handling rules (no bare `except:`, `@handle_api_errors`) do not
   apply here. The library is pure schema definitions and VCR mocks.
-- `os.getenv()` is used only in `scripts/` (not in `api_contracts/` source code).
+- `os.getenv()` is used only in `scripts/` (not in `unified_api_contracts/` source code).
   This is acceptable for CLI scripts that run outside the service config system.

@@ -6,10 +6,10 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from api_contracts.binance.schemas import BinanceMarkPriceUpdate
-from api_contracts.bybit.schemas import BybitOrderUpdateWS
-from api_contracts.deribit.schemas import DeribitTickerFull
-from api_contracts.okx.schemas import OKXFundingRate
+from unified_api_contracts.binance.schemas import BinanceMarkPriceUpdate
+from unified_api_contracts.bybit.schemas import BybitOrderUpdateWS
+from unified_api_contracts.deribit.schemas import DeribitTickerFull
+from unified_api_contracts.okx.schemas import OKXFundingRate
 
 
 class TestAPIContractsCore:
@@ -19,7 +19,7 @@ class TestAPIContractsCore:
         """Test that schemas can be loaded successfully."""
         # Test that schema files can be loaded
         try:
-            from api_contracts.okx import schemas as okx_schemas
+            from unified_api_contracts.okx import schemas as okx_schemas
 
             assert hasattr(okx_schemas, "__file__")
         except ImportError:
@@ -38,7 +38,7 @@ class TestAPIContractsCore:
         for venue in venues:
             try:
                 # Try to import venue schema
-                __import__(f"api_contracts.{venue}.schemas")
+                __import__(f"unified_api_contracts.{venue}.schemas")
                 # If import succeeds, schema is available
                 assert True
             except ImportError:
@@ -48,7 +48,7 @@ class TestAPIContractsCore:
     def test_schema_file_existence(self):
         """Test that schema files exist."""
         # Get the api_contracts directory
-        api_contracts_path = Path(__file__).parent.parent.parent / "api_contracts"
+        api_contracts_path = Path(__file__).parent.parent.parent / "unified_api_contracts"
 
         if api_contracts_path.exists():
             venues = [d for d in api_contracts_path.iterdir() if d.is_dir() and not d.name.startswith("__")]

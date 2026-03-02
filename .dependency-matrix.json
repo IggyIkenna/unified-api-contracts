@@ -1,0 +1,5 @@
+{
+  "name": "unified-api-contracts",
+  "dependencies": [],
+  "notes": "Pure leaf library. Pydantic schemas and VCR mocks for external APIs. No workspace dependencies."
+}

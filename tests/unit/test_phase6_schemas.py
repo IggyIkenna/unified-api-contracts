@@ -12,22 +12,22 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from api_contracts.binance.schemas import BinanceIndexPriceKline, BinanceMarkPriceKline
-from api_contracts.ccxt.schemas import (
+from unified_api_contracts.binance.schemas import BinanceIndexPriceKline, BinanceMarkPriceKline
+from unified_api_contracts.ccxt.schemas import (
     CcxtBorrowRate,
     CcxtCurrency,
     CcxtInsuranceFund,
     CcxtLiquidation,
     CcxtSubaccount,
 )
-from api_contracts.tardis.schemas import (
+from unified_api_contracts.tardis.schemas import (
     TardisBookSnapshot25,
     TardisIncrementalBookL2,
     TardisQuotes,
 )
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-_EXTERNAL = ROOT / "api_contracts" / "api_contracts_external"
+_EXTERNAL = ROOT / "unified_api_contracts" / "unified_api_contracts_external"
 CCXT_EXAMPLES = _EXTERNAL / "ccxt" / "examples"
 BINANCE_EXAMPLES = _EXTERNAL / "binance" / "examples"
 TARDIS_EXAMPLES = _EXTERNAL / "tardis" / "examples"
