@@ -16,6 +16,8 @@ Commands are documented in the `Makefile` and `README.md`. Quick reference:
 
 | Task | Command |
 |------|---------|
+| **Full setup** | `bash scripts/setup.sh` or `make setup` |
+| Verify env | `bash scripts/setup.sh --check` |
 | Install deps | `uv pip install -e ".[dev]"` |
 | Lint (source) | `ruff check unified_api_contracts/` |
 | Lint + fix | `ruff check --fix unified_api_contracts/ tests/` |
