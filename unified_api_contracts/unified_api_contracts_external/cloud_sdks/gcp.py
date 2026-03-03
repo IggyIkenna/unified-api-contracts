@@ -1,7 +1,7 @@
 """
 GCP SDK Type Protocols
 
-Protocol definitions for Google Cloud SDK clients used in unified-trading-services.
+Protocol definitions for Google Cloud SDK clients used in unified-trading-library.
 Based on actual GCP API surface area from gcp_clients.py and cloud_auth_factory.py usage.
 """
 
@@ -64,7 +64,7 @@ class StorageClientProtocol(Protocol):
     """
     Protocol for google.cloud.storage.Client.
 
-    Defines methods used in unified-trading-services/core/gcp_clients.py.
+    Defines methods used in unified-trading-library/core/gcp_clients.py.
     """
 
     project: str | None
@@ -85,7 +85,7 @@ class BigQueryClientProtocol(Protocol):
     """
     Protocol for google.cloud.bigquery.Client.
 
-    Defines methods used in unified-trading-services/core/gcp_clients.py.
+    Defines methods used in unified-trading-library/core/gcp_clients.py.
     """
 
     project: str | None
@@ -106,7 +106,7 @@ class SecretManagerServiceClientProtocol(Protocol):
     """
     Protocol for google.cloud.secretmanager.SecretManagerServiceClient.
 
-    Defines methods used in unified-trading-services/core/secret_manager.py.
+    Defines methods used in unified-trading-library/core/secret_manager.py.
     """
 
     def list_secrets(

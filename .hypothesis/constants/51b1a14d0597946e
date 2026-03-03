@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/domain.py
-# hypothesis_version: 6.151.9
-
-['1', '1=buy 2=sell', '1=buyer 2=seller', '2', 'A_TOKEN', 'FUTURE', 'INDEX', 'LST', 'OPTION', 'PERPETUAL', 'SPOT_PAIR', 'SWAP', 'TRADE', 'ZERO_ALPHA', '[(price, qty), ...]', 'auction', 'buy or sell', 'call', 'closed', 'halted', 'nanoseconds UTC', 'normal', 'post_market', 'pre_market', 'put']

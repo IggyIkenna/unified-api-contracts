@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/schemas/errors.py
-# hypothesis_version: 6.151.9
-
-['EnhancedError', 'alert', 'authentication', 'authorization', 'critical', 'data_quality', 'dependency', 'fail_fast', 'fallback', 'high', 'low', 'medium', 'network', 'not_found', 'rate_limit', 'retry', 'retry_with_backoff', 'server_error', 'skip', 'timeout', 'unknown', 'validation']

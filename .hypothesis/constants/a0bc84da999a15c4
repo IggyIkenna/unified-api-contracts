@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/api_contracts_external/cloud_sdks/schemas/iam.py
-# hypothesis_version: 6.151.9
-
-[403, 404, 429, 'Policy to set', 'Resource name', 'displayName', 'keyAlgorithm', 'keyType', 'populate_by_name', 'privateKeyData', 'privateKeyType', 'projectId', 'uniqueId', 'updateMask', 'validAfterTime', 'validBeforeTime']

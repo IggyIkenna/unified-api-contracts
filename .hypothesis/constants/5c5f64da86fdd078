@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/api_contracts_external/github/__init__.py
-# hypothesis_version: 6.151.9
-
-['GitHubCheckRun', 'GitHubError', 'GitHubErrorAction', 'GitHubPullRequest', 'GitHubRateLimit', 'GitHubRelease', 'GitHubRepository', 'GitHubWebhookPayload', 'GitHubWorkflowJob', 'GitHubWorkflowRun']

@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/execution.py
-# hypothesis_version: 6.151.9
-
-['0', 'BORROW', 'BUY', 'CandleCloseWarning', 'DEPOSIT', 'FOK', 'GTC', 'GTD', 'IOC', 'ISO 8601 UTC', 'LEND', 'OrderSubmitted', 'POST_ONLY', 'REBALANCE', 'REPAY', 'SELL', 'SLHit', 'SWAP', 'TPHit', 'TRADE', 'WITHDRAW', 'arrival', 'buy', 'cancelled', 'close', 'completed', 'expired', 'failed', 'filled', 'limit', 'manual_strategy', 'market', 'mid', 'open', 'partial', 'partially_filled', 'pending', 'rejected', 'sell', 'stop', 'stop_limit', 'submitted', 'timeout', 'trailing_stop', 'twap', 'vwap']

@@ -1,7 +1,7 @@
 """Base URLs and endpoint-to-schema mapping for all venues.
 
 Cross-cutting infrastructure for TradFi (Databento ~506 venues, IBKR), CeFi, and DeFi.
-Used by collect_responses, validate_schemas, VCR recording, and schema validation.
+Used by VCR recording (scripts) and schema validation in the six interfaces.
 
 TradFi: IBKR + Databento only; no direct CME/NASDAQ/NYSE. Databento provides
 market data across ~506 venues via publisher_id; IBKR provides execution.
@@ -10,10 +10,9 @@ market data across ~506 venues via publisher_id; IBKR provides execution.
 from __future__ import annotations
 
 import types
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
-if TYPE_CHECKING:
-    from pydantic import BaseModel
+from pydantic import BaseModel
 
 # ---------------------------------------------------------------------------
 # Base URLs (REST APIs only; WebSocket/TWS use different connection models)
@@ -57,7 +56,7 @@ BASE_URLS: dict[str, str] = {
 
 # ---------------------------------------------------------------------------
 # (venue, endpoint) -> schema class name
-# Used by validate_schemas, collect_responses, VCR recording.
+# Used by VCR recording and schema validation in the six interfaces.
 # Endpoint = logical endpoint key (ticker, orderbook, ohlcv, etc.)
 # ---------------------------------------------------------------------------
 

@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/schemas/latency.py
-# hypothesis_version: 6.151.9
-
-[0.0, 'exchange_processing', 'fill_decode', 'market_data_decode', 'nanoseconds', 'network_receive', 'network_send', 'order_encoding', 'risk_check', 'signal_generation']

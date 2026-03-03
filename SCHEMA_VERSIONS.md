@@ -9,7 +9,7 @@ VCR cassettes are pinned to a schema version to detect stale cassettes before th
 ### How it works
 
 1. **`VCR_ENDPOINTS`** declares `schema_version: str` (e.g. `"1.0"`) per endpoint.
-2. **`scripts/record_vcr_cassettes.py`** injects an `x-contract-schema-version` response header into every cassette at record time.
+2. **Recording** is done in the six interfaces (they hold API keys); the recording script there should inject an `x-contract-schema-version` response header into every cassette at record time.
 3. **`tests/test_vcr_replay.py`** (`test_vcr_replay_schema_version_matches`) reads the header from the cassette YAML and asserts it matches the declared version. A mismatch is a hard test failure.
 
 ### When to bump `schema_version`
@@ -23,16 +23,7 @@ Existing cassettes without the header are **skipped** (pre-versioning cassettes)
 
 ### Re-recording cassettes
 
-```bash
-# Single venue
-python scripts/record_vcr_cassettes.py --venue binance
-
-# All venues (requires API keys in environment for key-gated endpoints)
-python scripts/record_vcr_cassettes.py
-
-# Internal services (requires running local service)
-python scripts/record_vcr_cassettes.py --venue internal_execution_services
-```
+VCR recording is done in the **six interfaces** (unified-market-interface, unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-cloud-interface). Run the interface repo’s recording script (e.g. per-venue or all venues); do not run recording from unified-api-contracts.
 
 ### Internal service cassettes
 
@@ -60,7 +51,7 @@ Install with: `uv pip install -e ".[schema-validation]"`
 | Package   | Version   | Purpose                          |
 |-----------|-----------|----------------------------------|
 | pydantic  | >=2.0,<3.0| Schema validation (core dep)     |
-| requests  | >=2.31.0  | collect_responses.py HTTP calls  |
+| requests  | >=2.31.0  | Optional; interfaces use for live validation  |
 | databento | >=0.32.0  | Schema validation vs Databento Historical/Live API (optional) |
 | tardis-client | >=1.3.7 | Schema validation vs Tardis HTTP API v1 (optional) |
 | ccxt      | >=4.5.24,<5.0.0 | Schema validation vs CCXT unified responses (optional) |
@@ -71,10 +62,10 @@ Install with: `uv pip install -e ".[schema-validation]"`
 For live API verification (LIVE_API_VERIFICATION=1), also install from workspace:
 `uv pip install -e ../unified-trading-services -e ../unified-config-interface`
 
-## Schema Validation Pipeline
+## Schema Validation Pipeline (live flow in interfaces)
 
 1. **collect_responses.py** — Fetches real API responses → `collected_responses/{venue}/*.json`
-2. **validate_schemas.py** — Validates responses against schemas; optionally `--generate-schemas` → `generated_schemas/`
+2. **Schema validation vs live responses** — Done in the six interfaces (integration tests).
 3. **unified_api_contracts** — Canonical schemas; generated schemas are reviewed and promoted here
 
 See README "Schema Validation & Collection" for usage.
@@ -146,7 +137,7 @@ See README "Schema Validation & Collection" for usage.
 |-----|----------|-------------|
 | BinanceSymbol missing fields | Low | API returns otoAllowed, opoAllowed, amendAllowed, pegInstructionsAllowed, filters. Schema has extra="ignore" (Pydantic default) so validation passes; add optional fields for completeness. |
 | Withdrawal schema duplication | Low | BinanceWithdrawRequest (cex_withdrawals) vs BinanceWithdrawalRequest (binance/). cex uses addressTag; binance uses name. API supports both addressTag and name. Consolidate or document. |
-| VCR vs collect_responses | Info | VCR uses fapi (USD-M) ticker; collect_responses uses api (Spot). Both validate against BinanceTicker (supports both). |
+| VCR vs live (interfaces) | Info | VCR uses fapi (USD-M) ticker; interfaces may use api (Spot). Both validate against BinanceTicker (supports both). |
 | !ticker@arr deprecation | Info | All Market Tickers Stream deprecated 2025-11; retire 2026-03-26. Use @ticker or !miniTicker@arr. |
 | /fapi/v3, /dapi/v3 endpoints | Info | New v3 account/balance/positionRisk exist; we use v2. v2 remains supported. |
 

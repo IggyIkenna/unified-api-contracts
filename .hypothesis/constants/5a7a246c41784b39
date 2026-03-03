@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/schemas/accounts.py
-# hypothesis_version: 6.151.9
-
-['Asset symbol', 'Blockchain network', 'Deposit address', 'Deposit amount', 'Fee tier level', 'Maker fee rate', 'Network fee charged', 'Sub-account ID', 'Sub-account email', 'Taker fee rate', 'Total equity (USD)', 'Transfer amount', 'Withdrawal amount']

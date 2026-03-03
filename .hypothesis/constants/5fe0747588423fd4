@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/api_contracts_external/github/schemas.py
-# hypothesis_version: 6.151.9
-
-[401, 403, 404, 429, 'Branch ref', 'Target branch', 'Unix timestamp', 'active/deleted', 'core/search/graphql', 'fail_hard', 'open/closed/merged', 'rate limit exceeded', 'retry_with_backoff', 'title/summary/text']

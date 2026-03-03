@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/regulatory/schemas.py
-# hypothesis_version: 6.151.9
-
-['CCP LEI or name', 'COMM', 'CRCY', 'CRDT', 'EQUI', 'FWAF', 'ILQD', 'INTR', 'ISO 4217', 'MEDIUM', 'NLIQ', 'OILQ', 'OTHR', 'PRIC', 'RFPT', 'SD/FX/EQ/IR/CR/CO', 'SIZE', 'USD', 'UTI — 52-char max', 'accepted', 'amended', 'asic', 'cancelled', 'cftc', 'dodd_frank', 'emir', 'front_running', 'layering', 'marking_the_close', 'mas', 'mifid_ii', 'momentum_ignition', 'open', 'pending', 'populate_by_name', 'pump_and_dump', 'rejected', 'sec', 'spoofing', 'submitted', 'usi', 'uti', 'wash_trading']

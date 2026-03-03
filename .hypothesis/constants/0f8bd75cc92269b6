@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/ml.py
-# hypothesis_version: 6.151.9
-
-['1h', 'ISO 8601 UTC', 'JSON-serialised dict', 'direction', 'ensemble', 'lightgbm', 'linear', 'neural_net', 'random_forest', 'regime', 'return', 'scheduled', 'signal', 'spread', 'volatility', 'xgboost']

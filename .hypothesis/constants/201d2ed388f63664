@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/unified_api_contracts_external/alchemy/schemas.py
-# hypothesis_version: 6.151.9
-
-[-32603, -32600, 429, 500, '2.0', 'Addresses to monitor', 'Webhook ID', 'chainId', 'createdAt', 'eventTypes', 'from', 'populate_by_name', 'skipEmptyMessages', 'webhookId', 'webhookType', 'webhookUrl']

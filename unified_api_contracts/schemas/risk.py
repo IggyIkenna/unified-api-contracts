@@ -1,7 +1,7 @@
 """Advanced quantitative risk schemas — VaR, CVaR, stress testing, P&L attribution, multi-asset margin.
 
-Extends the basic risk coverage in api_contracts/internal/risk.py with
-statistical and portfolio-level analytics.
+Statistical and portfolio-level analytics. Internal risk types (alerts, metrics, positions) live in
+unified-internal-contracts.
 """
 
 from __future__ import annotations

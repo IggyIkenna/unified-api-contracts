@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/events.py
-# hypothesis_version: 6.151.9
-
-['AUTH_FAILURE', 'CONFIG_CHANGED', 'CRITICAL', 'DATA_BROADCAST', 'ERROR', 'FAILED', 'INFO', 'PERSISTENCE_STARTED', 'PROCESSING_COMPLETED', 'PROCESSING_STARTED', 'SECRET_ACCESSED', 'STARTED', 'STOPPED', 'UPLOAD_COMPLETED', 'UPLOAD_STARTED', 'VALIDATION_COMPLETED', 'VALIDATION_STARTED', 'WARNING', 'access', 'batch', 'live', 'preflight']

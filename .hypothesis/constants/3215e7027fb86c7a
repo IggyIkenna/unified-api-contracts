@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/schemas/risk.py
-# hypothesis_version: 6.151.9
-
-[0.99, 252, '0', 'USD', 'VaR as % of NAV', 'filtered_historical', 'historical', 'monte_carlo', 'parametric']

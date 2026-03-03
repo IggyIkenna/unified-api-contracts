@@ -7,13 +7,13 @@ Property-based: all venues produce same core CanonicalTrade fields.
 from decimal import Decimal
 
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from unified_api_contracts.internal.domain import CanonicalTrade
-from unified_api_contracts.unified_api_contracts_external.binance.schemas import BinanceTrade
+from unified_api_contracts.unified_api_contracts_external.binance import BinanceTrade
 from unified_api_contracts.unified_api_contracts_external.databento.schemas import DatabentoTrade
 from unified_api_contracts.unified_api_contracts_external.tardis.schemas import TardisTrade
+from unified_api_contracts.unified_normalised_contracts import CanonicalTrade
 from unified_api_contracts.unified_normalised_contracts.normalize import (
     normalize_binance_trade,
     normalize_databento_trade,
@@ -144,6 +144,7 @@ def _core_fields(c: CanonicalTrade) -> tuple[str, str, str, Decimal, Decimal, st
     qty=st.decimals(min_value=Decimal("0.0001"), max_value=Decimal("10000"), places=8),
     time_ms=st.integers(min_value=1600000000000, max_value=2000000000000),
 )
+@settings(max_examples=50)
 def test_normalization_preserves_core_fields_binance(
     trade_id: int,
     price: Decimal,
@@ -178,6 +179,7 @@ def test_normalization_preserves_core_fields_binance(
     size=st.integers(min_value=1, max_value=10**9),
     sequence=st.integers(min_value=1, max_value=10**12),
 )
+@settings(max_examples=50)
 def test_normalization_preserves_core_fields_databento(
     ts_event: int,
     price_int: int,

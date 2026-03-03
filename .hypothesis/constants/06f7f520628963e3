@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/venue_manifest/defi.py
-# hypothesis_version: 6.151.9
-
-['AlchemyAssetTransfer', 'AlchemyBlock', 'AlchemyDecodedLog', 'AlchemyEnsResolution', 'AlchemyError', 'AlchemyGasOracle', 'AlchemyLog', 'AlchemyNFTMetadata', 'AlchemyNFTOwnership', 'AlchemyRpcResponse', 'AlchemyTokenBalance', 'AlchemyTokenMetadata', 'AlchemyTransaction', 'BloxrouteError', 'GraphQLError', 'SubgraphCurveGauge', 'SubgraphEthenaYield', 'SubgraphLidoRebase', 'SubgraphPool', 'SubgraphReserve', 'SubgraphSwap', 'SubgraphToken', 'TheGraphResponse', 'alchemy', 'alchemy_secret_name', 'bloxroute', 'config_secret_field', 'error_example.json', 'error_schema_classes', 'example_schema_map', 'has_fix', 'has_rest', 'has_websocket', 'thegraph', 'thegraph_secret_name']

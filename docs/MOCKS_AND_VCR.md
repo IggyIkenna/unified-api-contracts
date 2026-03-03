@@ -49,23 +49,11 @@ def vcr_filter_request(request):
 
 WebSocket: if the test library supports recording WS frames, store under the same `mocks/` with names like `ws_ticker_stream.yaml`. Otherwise mock the WS client and feed canned JSON validated by unified-api-contracts schemas.
 
-## Recording in this repo
+## Recording cassettes
 
-Run once (with network) to record or refresh cassettes:
+**VCR recording is done in the six interfaces** (unified-market-interface, unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-cloud-interface); they hold API keys. Do not run recording scripts from unified-api-contracts.
 
-```bash
-uv run python scripts/record_vcr_cassettes.py           # all venues with public endpoints
-uv run python scripts/record_vcr_cassettes.py --venue binance
-```
-
-For key-based venues (e.g. tardis), set the env var and run:
-
-```bash
-export TARDIS_API_KEY=your_key
-uv run python scripts/record_vcr_cassettes.py --venue tardis
-```
-
-Cassettes are written to `unified_api_contracts/<venue>/mocks/<name>.yaml`. Replay tests in `tests/test_vcr_replay.py` validate each recorded response against the venue schema. CI runs replay only (no live requests, no keys).
+**Contributing cassettes to AC:** Interfaces contribute cassettes to AC’s `mocks/` **via PR** (recommended) so one canonical location is used for replay and by all consumers. Run the interface’s recording script, then open a PR against unified-api-contracts adding/updating `unified_api_contracts_external/<venue>/mocks/*.yaml`. **SSOT:** `unified-trading-codex/02-data/vcr-cassette-ownership.md` (see “Contributing cassettes to AC mocks/ via PR”). Replay tests in AC (`tests/test_vcr_replay.py`) validate each recorded response; CI runs replay only (no live requests, no keys).
 
 ## References
 

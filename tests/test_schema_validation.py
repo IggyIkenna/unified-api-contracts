@@ -1,3 +1,4 @@
+# collected_responses/ is gitignored; live validation is in the six interfaces. Tests below skip if files absent.
 """Test schema validation against real API responses."""
 
 import json
@@ -5,7 +6,7 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from unified_api_contracts.binance.schemas import BinanceKline, BinanceTicker, BinanceTrade
+from unified_api_contracts.binance import BinanceKline, BinanceTicker, BinanceTrade
 from unified_api_contracts.coinbase.schemas import CoinbaseCandle, CoinbaseTicker
 
 # Project root

@@ -1,7 +1,7 @@
 """
 AWS SDK (boto3) Type Protocols
 
-Protocol definitions for boto3 clients used in unified-trading-services.
+Protocol definitions for boto3 clients used in unified-trading-library.
 Based on actual boto3 API surface area from aws_clients.py usage.
 """
 
@@ -28,7 +28,7 @@ class S3ClientProtocol(Protocol):
     """
     Protocol for boto3 S3 client.
 
-    Defines only the methods actually used in unified-trading-services/core/aws_clients.py.
+    Defines only the methods actually used in unified-trading-library/core/aws_clients.py.
     Prevents ~500+ unknown type errors from boto3's dynamic client.
     """
 
@@ -136,7 +136,7 @@ class SecretsManagerClientProtocol(Protocol):
     """
     Protocol for boto3 Secrets Manager client.
 
-    Placeholder - methods TBD based on actual usage in unified-trading-services.
+    Placeholder - methods TBD based on actual usage in unified-trading-library.
     """
 
     def get_secret_value(

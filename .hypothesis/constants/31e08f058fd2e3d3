@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/internal/risk.py
-# hypothesis_version: 6.151.9
-
-['CONCENTRATION_LIMIT', 'CRITICAL', 'DRAWDOWN_LIMIT', 'EXPOSURE_BREACH', 'FLAT', 'LIQUIDATION_RISK', 'LONG', 'MARGIN_WARNING', 'OK', 'PRE_TRADE_REJECTION', 'RISK_CRITICAL', 'RISK_WARNING', 'SHORT', 'WARNING']

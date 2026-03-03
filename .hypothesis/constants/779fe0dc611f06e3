@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/api_contracts_external/cloud_sdks/schemas/cloud_build.py
-# hypothesis_version: 6.151.9
-
-['Branch/tag filter', 'Project ID', 'Repository name', 'Step dependencies', 'buildTriggerId', 'cloudbuild.yaml path', 'createTime', 'finishTime', 'logUrl', 'logsBucket', 'nextPageToken', 'populate_by_name', 'projectId', 'pullRequest', 'secretEnv', 'serviceAccount', 'startTime', 'triggerId', 'waitFor']

@@ -22,7 +22,7 @@ Schema files: `unified_api_contracts/<venue>/schemas.py`. Examples: `unified_api
 
 - **Available inventory**: [API_CONTRACTS_AVAILABLE_INVENTORY.md](API_CONTRACTS_AVAILABLE_INVENTORY.md) — Full inventory of external APIs (CeFi, TradFi, DeFi, Sports, Cloud); schema coverage; gaps.
 - **Cross-venue matrix**: [CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md) — CCXT vs direct access; normalization flow; venue-unique exposure.
-- **Chain of events**: [API_CONTRACTS_CHAIN_OF_EVENTS.md](API_CONTRACTS_CHAIN_OF_EVENTS.md) — Config → SDK/API call → schema validation → adapter output; collect_responses, validate_schemas, VCR flow, live verification, version alignment.
+- **Chain of events**: [API_CONTRACTS_CHAIN_OF_EVENTS.md](API_CONTRACTS_CHAIN_OF_EVENTS.md) — Config → SDK/API call → schema validation → adapter output; VCR recording and live verification done in the six interfaces (unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-market-interface, unified-cloud-interface); AC does replay only; version alignment.
 - **Cross-venue matrix**: [CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md) — CCXT vs direct, normalization flow, venue-unique exposure, data source mapping, schema coverage.
 - **Per-venue data types**: [VENUE_DATA_TYPES.md](VENUE_DATA_TYPES.md) — trades, OHLCV, orderbook, ticker, funding, liquidations per venue.
 - **Transport and constraints**: [TRANSPORT_AND_ENDPOINTS.md](TRANSPORT_AND_ENDPOINTS.md) — REST vs WebSocket vs FIX per venue, rate limits, auth, how to handle each.

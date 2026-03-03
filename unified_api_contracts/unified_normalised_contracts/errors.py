@@ -1,13 +1,26 @@
-"""Canonical error schemas — grouped, human-readable.
+"""Canonical error schemas — self-contained (no internal or schemas imports)."""
 
-Phase 1: Thin wrapper over VenueErrorClassification and ErrorAction.
-Phase 2: Full CanonicalError, CanonicalRateLimitError with venue-agnostic codes.
-"""
+from __future__ import annotations
 
-from unified_api_contracts.schemas.errors import (
-    ErrorAction,
-    VenueErrorClassification,
-)
+from dataclasses import dataclass
+from enum import StrEnum
+
+
+class ErrorAction(StrEnum):
+    RETRY = "retry"
+    RECONNECT = "reconnect"
+    SKIP = "skip"
+    FAIL = "fail"
+
+
+@dataclass
+class VenueErrorClassification:
+    venue: str
+    error_code: str
+    retry_safe: bool
+    reconnect: bool
+    action: ErrorAction
+    description: str | None = None
 
 
 class CanonicalError:

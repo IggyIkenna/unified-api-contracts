@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/positions/cefi.py
-# hypothesis_version: 6.151.9
-
-['0', 'FLAT', 'FUTURE', 'LONG', 'OPTION', 'PERP', 'SHORT', 'SPOT', 'frozen', 'v1']

@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/schemas/derivatives.py
-# hypothesis_version: 6.151.9
-
-['Asset symbol', 'Bankruptcy price', 'Cash flow amount', 'Current margin ratio', 'Expiry timestamp', 'Fund amount', 'Funding rate', 'Funding timestamp', 'Implied volatility', 'Initial margin rate', 'Instrument symbol', 'Liquidation price', 'Open interest value', 'Risk tier', 'Settlement fee', 'Settlement price', 'Snapshot timestamp', 'Strike price', 'Strike/IV points', 'Term structure', 'Underlying symbol', 'bear_put_spread', 'bull_call_spread', 'butterfly', 'calendar_spread', 'condor', 'custom', 'efp', 'market', 'perpetual', 'risk_reversal', 'straddle', 'strangle']

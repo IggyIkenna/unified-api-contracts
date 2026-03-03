@@ -24,16 +24,16 @@ from unified_domain_client.clients.instruments import InstrumentsDomainClient
 
 ```bash
 # Check for violations
-python3 .cursor/scripts/check-import-patterns.py
+python3 scripts/check-import-patterns.py
 
 # Auto-fix all violations
-python3 .cursor/scripts/check-import-patterns.py --fix
+python3 scripts/check-import-patterns.py --fix
 
 # Fix through quality gates
 bash scripts/quality-gates.sh --fix
 
 # Fix specific directory
-python3 .cursor/scripts/check-import-patterns.py --fix src/
+python3 scripts/check-import-patterns.py --fix src/
 ```
 
 ### Why This Matters

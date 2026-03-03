@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/venue_manifest/tradfi.py
-# hypothesis_version: 6.151.9
-
-['BarchartOhlcv15m', 'IBKRAccountValue', 'IBKRBar', 'IBKRCommissionReport', 'IBKRContractDetails', 'IBKRError', 'IBKRExecution', 'IBKRHistoricalTick', 'IBKRMarketDepth', 'IBKROptionGreeks', 'IBKROrder', 'IBKRPnL', 'IBKRPnLHistory', 'IBKRPnLSingle', 'IBKRPortfolioItem', 'IBKRPosition', 'IBKRRealTimeBar', 'IBKRScannerData', 'IBKRSecDefOptParams', 'IBKRTicker', 'YahooChartResult', 'YahooDividends', 'YahooError', 'YahooOhlcv24h', 'YahooQuote', 'YahooSplits', 'bar_example.json', 'barchart', 'config_secret_field', 'error_example.json', 'error_schema_classes', 'example_schema_map', 'has_fix', 'has_rest', 'has_websocket', 'ibkr', 'quote_example.json', 'splits_example.json', 'yahoo_finance']

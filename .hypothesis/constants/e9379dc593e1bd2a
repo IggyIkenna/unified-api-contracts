@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/features.py
-# hypothesis_version: 6.151.9
-
-['1h', 'Empty = all groups', 'e.g., 1h, 4h, 1d', 'high, medium, low']

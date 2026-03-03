@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/venue_manifest/__init__.py
-# hypothesis_version: 6.151.9
-
-['CEFI_VENUES', 'DATA_PROVIDER_VENUES', 'DEFI_VENUES', 'INTERNAL_CONTRACTS', 'TRADFI_VENUES', 'VENUE_MANIFEST', 'VenueContract']

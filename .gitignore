@@ -2,12 +2,17 @@
 __pycache__/
 *.py[cod]
 *$py.class
+*.pyc
 *.so
 .venv/
 venv/
 .env
 .env.*
 !.env.example
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
 
 # Credentials and secrets
 *credentials*.json
@@ -19,6 +24,12 @@ secrets/
 .vscode/
 *.swp
 *.swo
+*.bak
+
+# Node / UI
+node_modules/
+.next/
+.turbo/
 
 # Build and dist
 build/
@@ -26,11 +37,16 @@ dist/
 *.egg-info/
 *.egg
 
+# Coverage
+coverage/
+.nyc_output/
+
 # Testing and coverage
 .coverage
 htmlcov/
-.pytest_cache/
 .tox/
+.hypothesis/
+.benchmarks/
 
 # VCR cassettes may contain filtered secrets; keep in repo but never commit unfiltered
 # (per plan: filter authorization, x-api-key etc. before committing)
@@ -51,3 +67,11 @@ central-element-323112-*.json
 .env.*.local
 **/secrets/
 **/credentials/
+
+# Generated / collected (scripts output)
+collected_responses/
+generated_schemas/
+
+# Workspace
+.venv-workspace/
+

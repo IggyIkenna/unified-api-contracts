@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-api-contracts/unified_api_contracts/unified_api_contracts_external/ccxt/schemas.py
-# hypothesis_version: 6.151.9
-
-['CcxtTrade', 'Exchange order ID', 'ExchangeError', 'ExchangeNotAvailable', 'NetworkError', 'RateLimitExceeded', 'RequestTimeout', 'allow', 'canceled', 'cancelled', 'closed', 'cross', 'expired', 'extra', 'hedge', 'isolated', 'limit', 'one-way', 'open', 'rate', 'rejected', 'timeout', 'unavailable']

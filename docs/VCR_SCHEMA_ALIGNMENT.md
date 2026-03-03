@@ -545,7 +545,7 @@ Same as before: every schema in the venue manifest and its VCR/example status.
 ### 6.3 Concrete steps
 
 1. Add **missing examples** for every schema marked **Missing** in section 4; register in `venue_manifest.py` → `example_schema_map`.
-2. Add **VCR endpoints** in `unified_api_contracts/vcr_endpoints.py` for every type that has an HTTP endpoint (public or key_env); run `uv run python scripts/record_vcr_cassettes.py` and commit `mocks/*.yaml`.
+2. Add **VCR endpoints** in `unified_api_contracts/vcr_endpoints.py` for every type that has an HTTP endpoint (public or key_env). Recording is done from the six interfaces; commit `mocks/*.yaml` (or the interface’s cassette dir) after recording.
 3. **IBKR:** No HTTP; add static examples for IBKRTicker, IBKROrder, IBKRPosition, IBKRAccountValue, IBKRPortfolioItem, IBKRPnL.
 4. **YahooChartResult:** Add `yahoo_finance/examples/chart_result_example.json` and add to `example_schema_map`.
 5. Re-run **tests**: `pytest tests/test_every_venue_endpoint.py tests/test_contracts_vs_reality.py tests/test_vcr_replay.py -v`.

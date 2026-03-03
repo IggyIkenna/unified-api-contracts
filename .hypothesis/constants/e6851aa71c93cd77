@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/unified-internal-contracts/unified_internal_contracts/schemas/audit.py
-# hypothesis_version: 6.151.9
-
-[365, 'ORDER_CANCELLED', 'ORDER_CREATED', 'ORDER_FILLED', 'ORDER_REJECTED', 'ORDER_UPDATED', 'SIGNAL_GENERATED', 'STRATEGY_INSTRUCTION', 'client', 'client_order_id', 'exchange_timestamp', 'fill_price', 'fill_quantity', 'position_snapshot', 'signal_source', 'strategy_id', 'venue_response_id']

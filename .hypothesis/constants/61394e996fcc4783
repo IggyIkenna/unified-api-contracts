@@ -1,4 +1,0 @@
-# file: /Users/ikennaigboaka/Documents/repos/unified-trading-system-repos/api-contracts/api_contracts/unified_normalised_contracts/errors.py
-# hypothesis_version: 6.151.9
-
-['CanonicalError', 'ErrorAction', 'RATE_LIMIT', 'Rate limit exceeded']

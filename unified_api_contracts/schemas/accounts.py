@@ -54,7 +54,7 @@ class SubAccount(BaseModel):
     """Sub-account entry."""
 
     id: str = Field(..., description="Sub-account ID")
-    email: str | None = Field(None, description="Sub-account email")
+    email: str | None = Field(default=None, description="Sub-account email", json_schema_extra={"pii": True})
     isFreeze: bool = Field(False, description="Whether sub-account is frozen")
 
 
