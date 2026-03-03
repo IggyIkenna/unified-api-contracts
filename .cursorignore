@@ -1,0 +1,10 @@
+**/.venv/**
+**/venv/**
+**/node_modules/**
+**/.next/**
+**/dist/**
+**/build/**
+**/.turbo/**
+**/__pycache__/**
+**/.cache/**
+**/.venv-workspace/**

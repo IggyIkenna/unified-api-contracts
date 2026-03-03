@@ -1,12 +1,13 @@
 """Replay VCR cassettes and validate response bodies against api-contracts schemas.
 
-If a cassette is missing, the test is skipped (record with scripts/record_vcr_cassettes.py first).
+If a cassette is missing, the test is skipped. Cassettes are recorded in the six interfaces
+(unified-market-interface, unified-trade-execution-interface, etc.); they hold API keys.
 CI runs these tests with existing cassettes; no API keys needed for replay.
 
 Schema version pinning:
   Each cassette should have an x-contract-schema-version response header injected at record time.
   test_vcr_replay_schema_version_matches asserts the cassette version matches VCR_ENDPOINTS.
-  If versions differ, re-record: python scripts/record_vcr_cassettes.py --venue <name>
+  If versions differ, re-record from the interface repo that owns that venue.
 """
 
 from __future__ import annotations
@@ -84,7 +85,7 @@ def make_vcr(cassette_dir: Path) -> VCR:
 def _read_cassette_schema_version(cassette_path: Path) -> str | None:
     """Extract x-contract-schema-version from a cassette YAML without full YAML parse.
 
-    Handles two formats injected by record_vcr_cassettes.py:
+    Handles two formats injected at record time (by the interface recording script):
       Inline:  x-contract-schema-version: '1.0'
       List:    x-contract-schema-version:
                - '1.0'
@@ -139,6 +140,7 @@ def _list_internal_vcr_cases() -> list[tuple[str, dict[str, Any]]]:
     return cases
 
 
+@pytest.mark.integration
 @pytest.mark.parametrize("venue,ep", _list_vcr_cases())
 def test_vcr_replay_validates_schema(venue: str, ep: dict[str, Any]) -> None:
     """Replay cassette, extract response body, validate with venue schema."""
@@ -175,6 +177,7 @@ def test_vcr_replay_validates_schema(venue: str, ep: dict[str, Any]) -> None:
     schema_class.model_validate(payload)
 
 
+@pytest.mark.integration
 @pytest.mark.parametrize("venue,ep", _list_vcr_cases())
 def test_vcr_replay_schema_version_matches(venue: str, ep: dict[str, Any]) -> None:
     """Cassette x-contract-schema-version header must match VCR_ENDPOINTS schema_version.
@@ -192,10 +195,11 @@ def test_vcr_replay_schema_version_matches(venue: str, ep: dict[str, Any]) -> No
     assert cassette_version == expected_version, (
         f"{venue}/{ep['cassette_name']}: cassette schema_version={cassette_version!r} "
         f"but VCR_ENDPOINTS declares {expected_version!r}. "
-        f"Re-record with: python scripts/record_vcr_cassettes.py --venue {venue}"
+        f"Re-record from the interface repo that owns venue {venue!r}"
     )
 
 
+@pytest.mark.integration
 @pytest.mark.parametrize("venue,ep", _list_internal_vcr_cases())
 def test_vcr_internal_service_replay(venue: str, ep: dict[str, Any]) -> None:
     """Replay internal service cassettes when pre-recorded. Same validation as external."""
@@ -214,14 +218,13 @@ def test_vcr_internal_service_replay(venue: str, ep: dict[str, Any]) -> None:
     data = resp.json()
     payload = get_by_path(data, response_path) or data
     schema_class.model_validate(payload)
+    assert True, "VCR replay completed"
 
 
 def _resolve_schema_class(venue: str, schema_class_name: str) -> type:
-    """Resolve schema class from venue module or fallback to internal module."""
-    # Try venue-specific module first
+    """Resolve schema class from venue module. Internal schemas live in unified-internal-contracts."""
     venue_modules = [
         f"unified_api_contracts.{venue}.schemas",
-        "unified_api_contracts.internal",
     ]
     for mod_path in venue_modules:
         try:

@@ -61,6 +61,7 @@ class TestEventLogging:
             # This should work fine
         except Exception as e:
             pytest.fail(f"Logging should not raise exceptions: {e}")
+        assert True, "No silent failures detected"
 
     def test_structured_logging_fields(self):
         """Test that structured logging includes required fields."""

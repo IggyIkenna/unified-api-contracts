@@ -43,7 +43,7 @@ INTERFACES: list[tuple[str, Path]] = [
     ("unified-trade-execution-interface", Path("../unified-trade-execution-interface")),
     ("unified-reference-data-interface", Path("../unified-reference-data-interface")),
     ("unified-cloud-interface", Path("../unified-cloud-interface")),
-    ("unified-trading-services", Path("../unified-trading-services")),
+    ("unified-trading-library", Path("../unified-trading-library")),
     ("market-tick-data-handler", Path("../market-tick-data-handler")),
     ("instruments-service", Path("../instruments-service")),
     ("execution-services", Path("../execution-services")),

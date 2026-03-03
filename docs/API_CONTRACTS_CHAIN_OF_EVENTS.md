@@ -1,6 +1,7 @@
 # API Contracts Chain of Events
 
 Single reference for the end-to-end flow from configuration through schema validation to adapter output. Interfaces (UMI, UOI) and services consume unified-api-contracts for type safety and validation.
+**Note:** Live API response collection, schema validation against live responses, and contract-vs-reality verification are done in the **six interfaces** that depend on AC (they hold API keys): unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-market-interface, unified-cloud-interface. AC holds only schemas and static examples; scripts in AC do not require API keys for those flows.
 
 ## 1. Chain Overview
 
@@ -15,71 +16,30 @@ Config (UnifiedCloudConfig) → SDK/API call → unified-api-contracts schema va
 
 ## 2. Schema Validation Pipeline
 
-### Flow: collect_responses → validate_schemas → unified_api_contracts canonical schemas
+Live response collection and schema validation against live APIs are performed in the **six interfaces** (unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-market-interface, unified-cloud-interface). AC holds only canonical schemas and static examples.
 
-| Step | Script | Input | Output |
-|------|--------|-------|--------|
-| 1 | `scripts/collect_responses.py` | Live API (requires `LIVE_API_VERIFICATION=1`, API keys) | `collected_responses/{venue}/*.json` |
-| 2 | `scripts/validate_schemas.py` | `collected_responses/` | Validation report; optionally `--generate-schemas` → `generated_schemas/` |
-| 3 | Manual review | `generated_schemas/` | Promote to `unified_api_contracts/{venue}/schemas.py` |
-
-**Commands:**
-
-```bash
-# Collect real API responses (requires LIVE_API_VERIFICATION=1 and API keys)
-LIVE_API_VERIFICATION=1 uv run python scripts/collect_responses.py
-LIVE_API_VERIFICATION=1 uv run python scripts/collect_responses.py --venue binance
-
-# Validate schemas against collected responses
-uv run python scripts/validate_schemas.py
-uv run python scripts/validate_schemas.py --venue coinbase
-
-# Generate draft schemas from responses
-uv run python scripts/validate_schemas.py --generate-schemas --venue coinbase
-```
-
-**Data flow:**
-
-- `collected_responses/` — Raw JSON from live APIs (gitignored or committed as samples).
-- `generated_schemas/` — Auto-generated Pydantic drafts; review and promote to `unified_api_contracts/`.
+**In AC:**
 - `unified_api_contracts/` — Canonical schemas; single source of truth for UMI, UOI, and services.
+- `collected_responses/` and `generated_schemas/` are gitignored; any local use is legacy; interfaces own live capture and validation.
 
 ## 3. VCR Flow
 
-### record_vcr_cassettes → test_vcr_replay
+**Recording** and **replay** are both performed by the **six interfaces** (they hold API keys for recording; they run replay in their CI). **unified-api-contracts does not run VCR tests** in its own CI.
 
-| Step | Script/Test | Purpose |
-|------|-------------|---------|
-| 1 | `scripts/record_vcr_cassettes.py` | Record live HTTP requests to `unified_api_contracts/<venue>/mocks/*.yaml` |
-| 2 | `tests/test_vcr_replay.py` | Replay cassettes and validate responses against venue schemas |
+| Step | Where | Purpose |
+|------|--------|---------|
+| 1 | Six interfaces | Record live HTTP requests → write cassettes; contribute to AC `mocks/` via PR; filter secrets. |
+| 2 | Six interfaces | **Replay** cassettes in interface CI: load AC schemas, read cassettes (from AC path or own repo), validate response body against schema. No API calls during replay (VCR returns the recorded response from the cassette file). |
 
-**Commands:**
+**Why no API calls during replay:** VCR intercepts HTTP. On replay it does not call the real URL; it reads the cassette and returns the saved response. So replay is deterministic and needs no keys.
 
-```bash
-# Record cassettes (requires network; secrets filtered in output)
-uv run python scripts/record_vcr_cassettes.py
-uv run python scripts/record_vcr_cassettes.py --venue binance
+**In AC:** AC holds schemas and `mocks/` (cassettes). Replay test code lives in AC (`tests/test_vcr_replay.py`, `tests/vcr/`) for **use by interfaces** (e.g. interface runs pytest against AC tree or imports the test). AC quality gates run only unit tests (e.g. `tests/unit/`); they do **not** run VCR replay. Interfaces invoke VCR replay in their integration/CI.
 
-# Replay (CI; no live calls)
-uv run pytest tests/test_vcr_replay.py -v
-```
-
-**Config:** `unified_api_contracts/vcr_endpoints.py` defines `VCR_ENDPOINTS` (url, method, cassette_name, response_path, schema_class, key_env). See [MOCKS_AND_VCR.md](MOCKS_AND_VCR.md) and [VCR_SCHEMA_ALIGNMENT.md](VCR_SCHEMA_ALIGNMENT.md).
+**Config:** `unified_api_contracts/vcr_endpoints.py` defines `VCR_ENDPOINTS`. See [MOCKS_AND_VCR.md](MOCKS_AND_VCR.md) and [VCR_SCHEMA_ALIGNMENT.md](VCR_SCHEMA_ALIGNMENT.md).
 
 ## 4. Live Verification
 
-When `LIVE_API_VERIFICATION=1`:
-
-- `scripts/collect_responses.py` — Fetches real API responses for schema validation.
-- `scripts/verify_contracts_vs_reality_live.py` — Validates contracts against live APIs using same config and Secret Manager as UMI/UOI.
-- `tests/test_contracts_vs_reality.py` — Runs live checks when env is set.
-
-**Setup:**
-
-```bash
-uv pip install -e ../unified-trading-services -e ../unified-config-interface
-LIVE_API_VERIFICATION=1 uv run python scripts/verify_contracts_vs_reality_live.py
-```
+Live verification and contract-vs-reality checks are run in the **six interfaces** (they hold API keys and run integration tests). In AC, `tests/test_contracts_vs_reality.py` runs example-based validation only; live checks are in the interfaces.
 
 ## 5. Version Alignment
 
@@ -94,7 +54,7 @@ Install: `uv pip install -e ".[schema-validation]"`
 | Package | Version | Purpose |
 |---------|---------|---------|
 | pydantic | >=2.0,<3.0 | Schema validation |
-| requests | >=2.31.0 | collect_responses HTTP |
+| requests | >=2.31.0 | Optional; interfaces use for live validation |
 | databento | >=0.32.0 | Databento API validation |
 | tardis-client | >=1.3.7 | Tardis HTTP API validation |
 | ccxt | >=4.5.24,<5.0.0 | CCXT unified response validation |
@@ -112,7 +72,7 @@ uv run python scripts/check_sdk_version_alignment.py
 
 ### ENDPOINT_SCHEMA_MAP
 
-`unified_api_contracts/endpoints.py` — `(venue, endpoint) → schema_class_name`. Used by collect_responses, validate_schemas, VCR recording, and schema validation.
+`unified_api_contracts/endpoints.py` — `(venue, endpoint) → schema_class_name`. Used by VCR recording (scripts) and schema validation in the six interfaces.
 
 Example: `("binance", "ticker")` → `"BinanceTicker"`.
 

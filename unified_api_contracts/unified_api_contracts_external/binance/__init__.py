@@ -1,7 +1,72 @@
 """Binance REST API contracts (market data, order, position when not via CCXT)."""
 
 # Re-export all schemas from split modules for backward compatibility
-from .account_schemas import *
-from .market_schemas import *
-from .order_schemas import *
-from .ws_schemas import *
+from .account_schemas import (
+    BinanceDepositAddress,
+    BinanceDepositHistory,
+    BinanceDualInvestmentProduct,
+    BinanceFeeRate,
+    BinanceIncome,
+    BinanceInternalTransfer,
+    BinanceMarginBalanceResponse,
+    BinancePapiAccount,
+    BinancePapiBalance,
+    BinancePapiPosition,
+    BinanceRealizedPnlResponse,
+    BinanceSubAccount,
+    BinanceSubAccountAssets,
+    BinanceWithdrawalHistory,
+    BinanceWithdrawalRequest,
+    BinanceWithdrawalResponse,
+)
+from .market_schemas import (
+    BinanceAggTrade,
+    BinanceDeliveryHistory,
+    BinanceDeliveryPrice,
+    BinanceExchangeInfo,
+    BinanceFundingRateHistory,
+    BinanceIndexPriceKline,
+    BinanceInstrumentInfo,
+    BinanceInsuranceFund,
+    BinanceInsuranceFundAsset,
+    BinanceKline,
+    BinanceMarkPriceKline,
+    BinanceOptionInstrumentInfo,
+    BinanceOptionMarkPrice,
+    BinanceOptionTicker,
+    BinanceOrderBook,
+    BinancePremiumIndex,
+    BinanceSymbol,
+    BinanceTicker,
+    BinanceTrade,
+)
+from .order_schemas import (
+    BinanceAdlQuantile,
+    BinanceCoinmOrderSubmitRequest,
+    BinanceCoinmOrderSubmitResponse,
+    BinanceEapiOrderSubmitRequest,
+    BinanceEapiOrderSubmitResponse,
+    BinanceEapiPosition,
+    BinanceError,
+    BinanceMyTrades,
+    BinanceOrder,
+    BinanceOrderCancelRequest,
+    BinanceOrderCancelResponse,
+    BinancePosition,
+    BinancePositionQueryResponse,
+    BinancePositionRisk,
+    BinanceSpotOrderSubmitRequest,
+    BinanceSpotOrderSubmitResponse,
+    BinanceUsdmOrderSubmitRequest,
+    BinanceUsdmOrderSubmitResponse,
+)
+from .ws_schemas import (
+    BinanceAccountUpdate,
+    BinanceLiquidationOrder,
+    BinanceListenKeyCreate,
+    BinanceMarkPriceUpdate,
+    BinanceOrderTradeUpdate,
+    BinanceWebSocketClose,
+    BinanceWebSocketPing,
+    BinanceWebSocketSubscribe,
+)

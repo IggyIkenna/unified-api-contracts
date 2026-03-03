@@ -4,7 +4,7 @@ Domain: CanonicalOrderBook, CanonicalTrade, InstrumentRecord, etc.
 Execution: CanonicalOrder, CanonicalFill, ExecutionInstruction, etc.
 Errors: CanonicalError, CanonicalRateLimitError (grouped).
 
-Re-exports from internal during Phase 1; will be extracted in Phase 2.
+Self-contained: no imports from unified_api_contracts.internal.
 """
 
 from .domain import (

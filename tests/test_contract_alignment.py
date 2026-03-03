@@ -3,8 +3,7 @@
 Verifies:
 - All exported Pydantic models can be instantiated (schema loads, no import errors)
 - Enum values are non-empty
-- Schema fields have proper type annotations (no bare ``Any``)
-- Internal subpackage (AC.internal) re-exports align with their source modules
+- Schema fields have proper type annotations (no bare ``Any``) in normalised contracts
 """
 
 from __future__ import annotations
@@ -146,168 +145,7 @@ class TestACSports:
 
 
 # ---------------------------------------------------------------------------
-# AC internal subpackage — ML, events, features, risk, pubsub, health, execution
-# ---------------------------------------------------------------------------
-
-
-class TestACInternalML:
-    """AC internal ML schemas are well-formed."""
-
-    def test_model_type_enum(self) -> None:
-        from unified_api_contracts.internal import ModelType
-
-        values = list(ModelType)
-        assert len(values) >= 5, "ModelType should have lightgbm, xgboost, random_forest, neural_net, linear, ensemble"
-
-    def test_target_type_enum(self) -> None:
-        from unified_api_contracts.internal import TargetType
-
-        values = list(TargetType)
-        assert len(values) >= 5
-
-    def test_model_variant_config_fields(self) -> None:
-        from unified_api_contracts.internal import ModelVariantConfig, TargetType
-
-        obj = ModelVariantConfig(
-            instrument_id="BTC-USDT",
-            timeframe="1h",
-            lookback_window=100,
-            target_type=TargetType.DIRECTION,
-            std_dev_threshold=2.0,
-            breakout_threshold=0.05,
-        )
-        assert obj.instrument_id == "BTC-USDT"
-
-    def test_training_period_fields(self) -> None:
-        from unified_api_contracts.internal import TrainingPeriod
-
-        obj = TrainingPeriod(start="2024-01-01", end="2024-12-31")
-        assert obj.start == "2024-01-01"
-
-
-class TestACInternalEvents:
-    """AC internal events schemas."""
-
-    def test_lifecycle_event_type_enum(self) -> None:
-        from unified_api_contracts.internal import LifecycleEventType
-
-        values = list(LifecycleEventType)
-        assert len(values) >= 10
-
-    def test_event_severity_enum(self) -> None:
-        from unified_api_contracts.internal import EventSeverity
-
-        values = list(EventSeverity)
-        assert {"INFO", "WARNING", "ERROR", "CRITICAL"} == {v.value for v in values}
-
-    def test_service_mode_enum(self) -> None:
-        from unified_api_contracts.internal import ServiceMode
-
-        assert set(ServiceMode) == {ServiceMode.BATCH, ServiceMode.LIVE}
-
-
-class TestACInternalHealth:
-    """AC internal health schemas."""
-
-    def test_error_category_enum(self) -> None:
-        from unified_api_contracts.internal import ErrorCategory
-
-        values = list(ErrorCategory)
-        assert len(values) >= 10
-
-    def test_error_severity_enum(self) -> None:
-        from unified_api_contracts.internal import ErrorSeverity
-
-        values = list(ErrorSeverity)
-        assert {"low", "medium", "high", "critical"} == {v.value for v in values}
-
-    def test_error_recovery_strategy_enum(self) -> None:
-        from unified_api_contracts.internal import ErrorRecoveryStrategy
-
-        values = list(ErrorRecoveryStrategy)
-        assert len(values) >= 5
-
-    def test_enhanced_error_instantiation(self) -> None:
-        from unified_api_contracts.internal import (
-            EnhancedError,
-            ErrorCategory,
-            ErrorContext,
-            ErrorRecoveryStrategy,
-            ErrorSeverity,
-        )
-
-        obj = EnhancedError(
-            message="test error",
-            category=ErrorCategory.TIMEOUT,
-            severity=ErrorSeverity.HIGH,
-            recovery_strategy=ErrorRecoveryStrategy.RETRY,
-            context=ErrorContext(service="test-svc"),
-        )
-        assert obj.category == ErrorCategory.TIMEOUT
-
-    def test_circuit_breaker_state_enum(self) -> None:
-        from unified_api_contracts.internal import CircuitBreakerStateEnum
-
-        values = list(CircuitBreakerStateEnum)
-        assert {"closed", "open", "half_open"} == {v.value for v in values}
-
-
-class TestACInternalRisk:
-    """AC internal risk schemas."""
-
-    def test_risk_status_enum(self) -> None:
-        from unified_api_contracts.internal import RiskStatus
-
-        values = list(RiskStatus)
-        assert {"OK", "WARNING", "CRITICAL"} == {v.value for v in values}
-
-    def test_alert_type_enum(self) -> None:
-        from unified_api_contracts.internal import AlertType
-
-        values = list(AlertType)
-        assert len(values) >= 6
-
-    def test_position_side_enum(self) -> None:
-        from unified_api_contracts.internal import PositionSide
-
-        values = list(PositionSide)
-        assert {"LONG", "SHORT", "FLAT"} == {v.value for v in values}
-
-
-class TestACInternalPubsub:
-    """AC internal pubsub schemas."""
-
-    def test_internal_pubsub_topic_enum(self) -> None:
-        from unified_api_contracts.internal import InternalPubSubTopic
-
-        values = list(InternalPubSubTopic)
-        assert len(values) >= 15
-
-
-class TestACInternalExecution:
-    """AC internal execution schemas."""
-
-    def test_order_side_enum(self) -> None:
-        from unified_api_contracts.internal import OrderSide
-
-        values = list(OrderSide)
-        assert len(values) >= 2
-
-    def test_order_type_enum(self) -> None:
-        from unified_api_contracts.internal import OrderType
-
-        values = list(OrderType)
-        assert len(values) >= 2
-
-    def test_execution_status_enum(self) -> None:
-        from unified_api_contracts.internal import ExecutionStatus
-
-        values = list(ExecutionStatus)
-        assert len(values) >= 2
-
-
-# ---------------------------------------------------------------------------
-# No bare ``Any`` in type annotations
+# No bare ``Any`` in type annotations (external + normalised only; internal moved to UIC)
 # ---------------------------------------------------------------------------
 
 
@@ -329,17 +167,13 @@ class TestNoAnyAnnotations:
     @pytest.mark.parametrize(
         "module_path",
         [
-            "unified_api_contracts.internal.ml",
-            "unified_api_contracts.internal.events",
-            "unified_api_contracts.internal.health",
-            "unified_api_contracts.internal.risk",
-            "unified_api_contracts.internal.pubsub",
-            "unified_api_contracts.internal.features",
-            "unified_api_contracts.internal.execution",
+            "unified_api_contracts.unified_normalised_contracts.domain",
+            "unified_api_contracts.unified_normalised_contracts.execution",
+            "unified_api_contracts.unified_normalised_contracts.errors",
         ],
     )
-    def test_no_bare_any_in_internal_models(self, module_path: str) -> None:
-        """Every field annotation in internal models must use a concrete type, not ``Any``."""
+    def test_no_bare_any_in_normalised_models(self, module_path: str) -> None:
+        """Every field annotation in normalised models must use a concrete type, not ``Any``."""
         from typing import Any
 
         models = self._models_from_module(module_path)

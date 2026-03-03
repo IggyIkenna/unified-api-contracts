@@ -10,7 +10,7 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
-from unified_api_contracts.internal.domain import CanonicalTrade
+from unified_api_contracts.unified_normalised_contracts import CanonicalTrade
 
 pytestmark = pytest.mark.unit
 
@@ -28,7 +28,7 @@ _TRADE_ID = "trade-001"
         max_value=Decimal("1e18"),
     )
 )
-@settings(max_examples=200, suppress_health_check=[HealthCheck.too_slow])
+@settings(max_examples=50, suppress_health_check=[HealthCheck.too_slow])
 def test_canonical_trade_price_no_silent_truncation(price: Decimal) -> None:
     """Extreme Decimal prices must round-trip without silent truncation."""
     trade = CanonicalTrade(

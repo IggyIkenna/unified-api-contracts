@@ -2,7 +2,7 @@
 
 Each entry: url, method, optional headers builder key (env var name), response_path to extract
 body for schema validation (e.g. '' = whole JSON, 'data.0' = first data element), schema class name.
-Used by scripts/record_vcr_cassettes.py and tests/test_vcr_replay.py.
+Recording is done in the six interfaces; AC uses this config for tests/test_vcr_replay.py (replay only).
 
 schema_version: bump this string when the response schema for this endpoint changes.
 Cassettes store x-contract-schema-version header; test_vcr_replay.py asserts they match.

@@ -2,6 +2,18 @@
 
 from __future__ import annotations
 
+# Binance venue name constants — always use these instead of bare "BINANCE"
+BINANCE_SPOT = "BINANCE-SPOT"
+BINANCE_FUTURES = "BINANCE-FUTURES"
+
+# Other CeFi exchange constants (VENUE-PRODUCT split)
+# Qualified names are canonical; bare names kept for backward compatibility.
+OKX_SPOT = "OKX-SPOT"
+OKX_FUTURES = "OKX-FUTURES"
+BYBIT_SPOT = "BYBIT-SPOT"
+BYBIT_FUTURES = "BYBIT-FUTURES"
+COINBASE_SPOT = "COINBASE-SPOT"
+
 # DEX Venues (for SWAP instruction type)
 # Fee is derived from pool_fee_tier in instrument definition, NOT maker/taker fees
 DEX_VENUES: set[str] = {
@@ -16,13 +28,19 @@ DEX_VENUES: set[str] = {
 # Uses maker_fee, taker_fee in venue config
 CLOB_VENUES: set[str] = {
     # CeFi
-    "BINANCE-SPOT",
-    "BINANCE-FUTURES",
-    "OKX",
-    "BYBIT",
+    BINANCE_SPOT,
+    BINANCE_FUTURES,
+    OKX_SPOT,
+    OKX_FUTURES,
+    BYBIT_SPOT,
+    BYBIT_FUTURES,
+    COINBASE_SPOT,
     "DERIBIT",
     "HYPERLIQUID",
     "ASTER",
+    # Backward compat: bare names still accepted for lookup
+    "OKX",
+    "BYBIT",
     # TradFi
     "NASDAQ",
     "NYSE",
@@ -62,11 +80,16 @@ ZERO_ALPHA_VENUES: set[str] = {
 # Map venue to its market category bucket (cefi/tradfi/defi)
 VENUE_CATEGORY_MAP: dict[str, str] = {
     # CeFi venues -> cefi bucket
-    "BINANCE": "cefi",
-    "BINANCE-SPOT": "cefi",
-    "BINANCE-FUTURES": "cefi",
+    "BINANCE": "cefi",  # backward compat — new code should use BINANCE-SPOT or BINANCE-FUTURES
+    BINANCE_SPOT: "cefi",
+    BINANCE_FUTURES: "cefi",
     "OKX": "cefi",
+    OKX_SPOT: "cefi",
+    OKX_FUTURES: "cefi",
     "BYBIT": "cefi",
+    BYBIT_SPOT: "cefi",
+    BYBIT_FUTURES: "cefi",
+    COINBASE_SPOT: "cefi",
     "HYPERLIQUID": "cefi",
     "DERIBIT": "cefi",
     "ASTER": "cefi",
@@ -104,13 +127,17 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
 # Map venue to supported instrument types
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     # CeFi spot
-    "BINANCE-SPOT": {"SPOT"},
-    "COINBASE-SPOT": {"SPOT"},
-    "OKX": {"SPOT", "PERPETUAL", "FUTURE", "OPTION"},
-    "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},
+    BINANCE_SPOT: {"SPOT"},
+    COINBASE_SPOT: {"SPOT"},
+    OKX_SPOT: {"SPOT"},
+    OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
+    "OKX": {"SPOT", "PERPETUAL", "FUTURE", "OPTION"},  # backward compat
+    BYBIT_SPOT: {"SPOT"},
+    BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
+    "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},  # backward compat
     "UPBIT": {"SPOT"},
     # CeFi derivatives
-    "BINANCE-FUTURES": {"PERPETUAL", "FUTURE"},
+    BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
     "DERIBIT": {"PERPETUAL", "FUTURE", "OPTION"},
     "HYPERLIQUID": {"PERPETUAL"},
     "ASTER": {"PERPETUAL"},

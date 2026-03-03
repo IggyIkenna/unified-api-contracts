@@ -61,7 +61,7 @@ See per-venue README or index under each directory for market data, order feed, 
 
 ## Consuming from UMI / UOI
 
-Consumers use path dependency `../unified-api-contracts` (see path-dependency-ci.mdc). Example:
+**Dependency and tier:** Canonical data is in `unified-trading-pm/workspace-manifest.json` (this repo is Tier 0, no workspace path deps). Consumers use path dependency `../unified-api-contracts` (see path-dependency-ci.mdc). Example:
 
 ```python
 from unified_api_contracts.databento.schemas import DatabentoTrade
@@ -82,25 +82,19 @@ See `tests/test_venue_contract_coverage.py` and `tests/test_contracts_vs_reality
 
 ## Schema Validation & Collection
 
-**Full flow**: [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md) — chain overview, schema validation pipeline (collect_responses → validate_schemas → unified_api_contracts), VCR flow (record_vcr_cassettes → test_vcr_replay), live verification (`LIVE_API_VERIFICATION=1`), version alignment (SCHEMA_VERSIONS.md, [schema-validation] deps, check_sdk_version_alignment.py), ENDPOINT_SCHEMA_MAP, BASE_URLS, venue_manifest.
+**Full flow**: [docs/API_CONTRACTS_CHAIN_OF_EVENTS.md](docs/API_CONTRACTS_CHAIN_OF_EVENTS.md) — chain overview, version alignment (SCHEMA_VERSIONS.md, [schema-validation] deps, check_sdk_version_alignment.py), ENDPOINT_SCHEMA_MAP, BASE_URLS, venue_manifest. **Live validation and VCR recording** are done in the interfaces that depend on AC (they hold API keys): unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-market-interface, unified-cloud-interface.
 
-**Quick commands:**
-
-```bash
-# Collect responses (LIVE_API_VERIFICATION=1 + API keys)
-LIVE_API_VERIFICATION=1 uv run python scripts/collect_responses.py [--venue binance]
-
-# Validate schemas
-uv run python scripts/validate_schemas.py [--venue coinbase] [--generate-schemas]
-
-# Record VCR cassettes
-uv run python scripts/record_vcr_cassettes.py [--venue binance]
-
-# Live verification
-LIVE_API_VERIFICATION=1 uv run python scripts/verify_contracts_vs_reality_live.py
-```
+**In-repo (AC):** Quality gates validate `examples/*.json` and schema coverage only; AC does not run VCR tests. Recording and replay are invoked by the six interfaces; they contribute cassettes to AC mocks via PR and run VCR replay in their CI (replay uses no API calls—VCR returns the saved response from the cassette).; SSOT: `unified-trading-codex/02-data/vcr-cassette-ownership.md`.
 
 **Quality gates**: Schema validation tests in `tests/test_schema_validation.py` run via `bash scripts/quality-gates.sh`.
+
+### Fast unit runs (no API calls)
+
+Unit tests are pure schema/normalization checks and should be quick. AC does not run VCR in CI (replay is invoked by the interfaces). If local runs feel slow:
+
+- **Hypothesis**: Default profile uses few examples; CI can set `HYPOTHESIS_PROFILE=ci` for more. See `tests/conftest.py`.
+- **VCR / integration**: VCR replay tests in AC are marked `@pytest.mark.integration` and are for use by interfaces; run only unit tests with `pytest -m "not integration"`.
+- **Collection**: Importing many venue packages adds ~0.5–1 s per test module.
 
 ## Usage Patterns
 
@@ -231,8 +225,8 @@ bash scripts/quality-gates.sh --no-fix  # Verify
 
 ## Contract-vs-reality
 
-- **CI**: Validate all `examples/*.json` against the corresponding Pydantic models (no live calls).
-- **Optional live verification**: When `LIVE_API_VERIFICATION=1`, use the same config and Secret Manager as UMI/UOI (no duplication). Install from workspace: `uv pip install -e ../unified-trading-services -e ../unified-config-interface`, then run `scripts/verify_contracts_vs_reality_live.py`. API keys are resolved via `config.get_secret(secret_field)` (unified-config-interface), which uses unified-trading-services under the hood.
+- **CI (in AC)**: Validate all `examples/*.json` against the corresponding Pydantic models (no live calls).
+- **Live verification**: Run in the **six interfaces** (unified-market-interface, unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-cloud-interface); they hold API keys and run integration tests with VCR recording and contract-vs-reality validation. Do not run live verification from AC as the primary path.
 
 ## Permissions and collaborators
 

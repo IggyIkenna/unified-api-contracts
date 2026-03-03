@@ -8,10 +8,11 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from unified_api_contracts.internal.domain import CanonicalTrade
-from unified_api_contracts.unified_api_contracts_external.binance.schemas import BinanceTrade
+from unified_api_contracts.unified_api_contracts_external.binance import BinanceTrade
 from unified_api_contracts.unified_api_contracts_external.databento.schemas import DatabentoTrade
 from unified_api_contracts.unified_api_contracts_external.tardis.schemas import TardisTrade
+
+from .domain import CanonicalTrade
 
 
 def normalize_binance_trade(raw: BinanceTrade, venue: str = "binance", symbol: str = "") -> CanonicalTrade:
@@ -81,6 +82,4 @@ def normalize_trade(
         return normalize_binance_trade(raw, venue=venue or "binance", symbol=symbol)
     if isinstance(raw, DatabentoTrade):
         return normalize_databento_trade(raw, venue=venue or "databento", symbol=symbol)
-    if isinstance(raw, TardisTrade):
-        return normalize_tardis_trade(raw, venue=venue or None, symbol=symbol or None)
-    raise TypeError(f"Unsupported raw type: {type(raw)}")
+    return normalize_tardis_trade(raw, venue=venue or None, symbol=symbol or None)

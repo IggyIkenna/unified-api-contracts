@@ -79,6 +79,7 @@ None currently.
 | `binance/schemas.py` | ~1033 | 52 schema classes; monolithic venue schema; split by SRP tracked |
 | `venue_manifest.py` | ~1058 | VENUE_MANIFEST dict; internal/fix/regulatory entries; split tracked |
 | `aws_schemas.py` | ~1422 | AWS SDK protocol stubs; split tracked |
+| `sports/canonical/features.py` | ~1197 | Pure Pydantic schema (`SportsFeatureVector`) with ~998 sport feature fields; splitting a single dataclass across files would reduce readability with no structural benefit |
 
 **Config:** `scripts/quality-gates.sh` — `continue` for these paths when under threshold.
 
