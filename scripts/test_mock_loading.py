@@ -13,31 +13,35 @@ import yaml
 # Path to mock files
 MOCKS_DIR = Path(__file__).parent.parent / "unified_api_contracts" / "yahoo_finance" / "mocks"
 
+
 def load_mock_data(mock_file: str) -> dict[str, object]:
     """Load mock data from YAML file."""
     file_path = MOCKS_DIR / mock_file
     with open(file_path) as f:
         return yaml.safe_load(f)
 
+
 def simulate_yfinance_dividends(mock_data: dict[str, object]) -> pd.Series:
     """Simulate yfinance dividends Series from mock data."""
     dividends_data = mock_data["dividends_series"]
 
     # Convert to pandas Series
-    dates = [pd.to_datetime(date_str, utc=True) for date_str in dividends_data.keys()]
+    dates = [pd.to_datetime(date_str, utc=True) for date_str in dividends_data]
     amounts = list(dividends_data.values())
 
     return pd.Series(amounts, index=dates, name="Dividends")
+
 
 def simulate_yfinance_splits(mock_data: dict[str, object]) -> pd.Series:
     """Simulate yfinance splits Series from mock data."""
     splits_data = mock_data["splits_series"]
 
     # Convert to pandas Series
-    dates = [pd.to_datetime(date_str, utc=True) for date_str in splits_data.keys()]
+    dates = [pd.to_datetime(date_str, utc=True) for date_str in splits_data]
     ratios = list(splits_data.values())
 
     return pd.Series(ratios, index=dates, name="Stock Splits")
+
 
 def simulate_yfinance_earnings(mock_data: dict[str, object]) -> pd.DataFrame:
     """Simulate yfinance earnings DataFrame from mock data."""
@@ -48,11 +52,12 @@ def simulate_yfinance_earnings(mock_data: dict[str, object]) -> pd.DataFrame:
     data_dict = earnings_data["data"]
 
     # Convert to DataFrame
-    dates = [pd.to_datetime(date_str, utc=True) for date_str in data_dict.keys()]
+    dates = [pd.to_datetime(date_str, utc=True) for date_str in data_dict]
     rows = list(data_dict.values())
 
     df = pd.DataFrame(rows, index=dates, columns=columns)
     return df
+
 
 def demonstrate_mock_usage():
     """Demonstrate how to use mock data in tests."""
@@ -79,7 +84,7 @@ def demonstrate_mock_usage():
     splits_series = simulate_yfinance_splits(tsla_mock)
     print(f"   Splits Series Shape: {splits_series.shape}")
     for i, (date, ratio) in enumerate(splits_series.items()):
-        print(f"   Split {i+1}: {ratio}:1 on {date.date()}")
+        print(f"   Split {i + 1}: {ratio}:1 on {date.date()}")
 
     # 3. Load MSFT earnings mock
     print("\n3. Loading MSFT Earnings Mock:")
@@ -112,7 +117,9 @@ def demonstrate_mock_usage():
     rate_limit_mock = load_mock_data("error_rate_limit.yaml")
     print(f"   Rate Limit Errors: {rate_limit_mock['metadata']['error_category']}")
     print(f"   HTTP 429 status: {rate_limit_mock['http_429_responses']['standard_rate_limit']['status_code']}")
-    print(f"   Retry after: {rate_limit_mock['http_429_responses']['standard_rate_limit']['headers']['Retry-After']} seconds")
+    retry = rate_limit_mock['http_429_responses']['standard_rate_limit']['headers']['Retry-After']
+    print(f"   Retry after: {retry} seconds")
+
 
 def show_testing_examples():
     """Show examples of how to use mocks in unit tests."""
@@ -130,22 +137,22 @@ class TestCorporateActions:
         # Load mock data
         mock_data = load_mock_data("dividends_aapl.yaml")
         dividends_series = simulate_yfinance_dividends(mock_data)
-        
+
         # Setup mock
         mock_ticker = unittest.mock.MagicMock()
         mock_yf.Ticker.return_value = mock_ticker
         mock_ticker.dividends = dividends_series
-        
+
         # Test adapter
         adapter = CorporateActionsAdapter()
         adapter._yf = mock_yf
-        
+
         dividends = adapter.fetch_dividends(
             ticker="AAPL",
             start_date=date(2023, 1, 1),
             end_date=date(2024, 12, 31)
         )
-        
+
         # Assertions
         assert len(dividends) == 8  # Expected from mock
         assert all(d.ticker == "AAPL" for d in dividends)
@@ -158,21 +165,22 @@ class TestCorporateActions:
     def test_invalid_symbol_handling(self, mock_yf):
         # Load error mock data
         error_mock = load_mock_data("error_invalid_symbol.yaml")
-        
+
         # Setup mock to raise exception
         mock_ticker = unittest.mock.MagicMock()
         mock_yf.Ticker.return_value = mock_ticker
         mock_ticker.dividends.side_effect = ValueError("No data found, symbol may be delisted")
-        
+
         # Test adapter
         adapter = CorporateActionsAdapter()
         adapter._yf = mock_yf
-        
+
         dividends = adapter.fetch_dividends("INVALID", date(2024,1,1), date(2024,12,31))
-        
+
         # Should return empty list, not raise exception
         assert dividends == []
     """)
+
 
 def validate_mock_compatibility():
     """Validate mocks are compatible with instruments-service models."""
@@ -216,6 +224,7 @@ def validate_mock_compatibility():
     for field in optional_fields:
         present = field in sample_record
         print(f"   {field} (optional): {'✓' if present else '○'}")
+
 
 if __name__ == "__main__":
     demonstrate_mock_usage()
