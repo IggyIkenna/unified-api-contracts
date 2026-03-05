@@ -14,6 +14,19 @@ class BybitMarket(BaseModel):
     info: dict[str, object] | None = None
 
 
+class BybitTrade(BaseModel):
+    """Bybit public trade (REST: GET /v5/market/recent-trade, WS: publicTrade.{symbol})."""
+
+    symbol: str | None = None
+    execId: str | None = None
+    execPrice: str | None = None
+    execQty: str | None = None
+    execValue: str | None = None
+    execTime: int | None = None  # timestamp (ms)
+    side: str | None = None  # Buy or Sell
+    isMaker: bool | None = None
+
+
 class BybitOrderBook(BaseModel):
     """Bybit order book (REST: GET /v5/market/orderbook, WS: orderbook.{depth}.{symbol}).
 

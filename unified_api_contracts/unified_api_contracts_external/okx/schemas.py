@@ -15,6 +15,17 @@ class OKXMarket(BaseModel):
     info: dict[str, object] | None = None
 
 
+class OKXTrade(BaseModel):
+    """OKX public trade (REST: GET /api/v5/market/trades)."""
+
+    instId: str | None = None
+    tradeId: str | None = None
+    px: str | None = None
+    sz: str | None = None
+    side: str | None = None  # buy or sell
+    ts: str | None = None  # timestamp (ms)
+
+
 class OKXOrderBook(BaseModel):
     """OKX order book (REST: GET /api/v5/market/books).
 

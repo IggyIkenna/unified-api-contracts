@@ -166,6 +166,9 @@ class CanonicalOrderBook(BaseModel):
     bids: list[tuple[Decimal, Decimal]] = Field(description="[(price, qty), ...]")
     asks: list[tuple[Decimal, Decimal]] = Field(description="[(price, qty), ...]")
     sequence_number: int | None = None
+    instrument_key: str | None = Field(default=None, description="VENUE:TYPE:SYMBOL")
+    levels: int | None = None
+    schema_version: str = "1.0"
 
 
 class CanonicalTrade(BaseModel):
@@ -180,6 +183,165 @@ class CanonicalTrade(BaseModel):
     side: str = Field(description="buy or sell")
     buyer_maker: bool | None = None
     venue_trade_id: str | None = None
+    instrument_key: str | None = Field(default=None, description="VENUE:TYPE:SYMBOL")
+    is_liquidation: bool | None = None
+    schema_version: str = "1.0"
+
+
+# ---------------------------------------------------------------------------
+# Additional canonical types
+# ---------------------------------------------------------------------------
+
+
+class CanonicalTicker(BaseModel):
+    """Normalised spot ticker — all venues."""
+
+    instrument_key: str
+    venue: str
+    timestamp: datetime
+    last_price: Decimal
+    bid_price: Decimal | None = None
+    ask_price: Decimal | None = None
+    volume_24h: Decimal | None = None
+    quote_volume_24h: Decimal | None = None
+    price_change_24h: Decimal | None = None
+    price_change_percent_24h: Decimal | None = None
+    schema_version: str = "1.0"
+
+
+class CanonicalLiquidation(BaseModel):
+    """Normalised liquidation event — all CeFi venues."""
+
+    instrument_key: str
+    venue: str
+    timestamp: datetime
+    side: str = Field(description="buy or sell")
+    price: Decimal
+    size: Decimal
+    order_id: str | None = None
+    liquidated_account_value: Decimal | None = None
+    liquidated_ntl_pos: Decimal | None = None
+    liquidated_user: str | None = Field(default=None, json_schema_extra={"pii": True})
+    schema_version: str = "1.0"
+
+
+class CanonicalDerivativeTicker(BaseModel):
+    """Normalised derivative ticker — perps/futures funding, OI, mark."""
+
+    instrument_key: str
+    venue: str
+    timestamp: datetime
+    mark_price: Decimal | None = None
+    index_price: Decimal | None = None
+    last_price: Decimal | None = None
+    funding_rate: Decimal | None = None
+    predicted_funding_rate: Decimal | None = None
+    funding_timestamp: datetime | None = None
+    next_funding_time: datetime | None = None
+    open_interest: Decimal | None = None
+    open_interest_value: Decimal | None = None
+    borrow_long_rate: Decimal | None = None
+    borrow_short_rate: Decimal | None = None
+    oracle_price: Decimal | None = None
+    mid_price: Decimal | None = None
+    day_ntl_volume: Decimal | None = None
+    prev_day_price: Decimal | None = None
+    basis: Decimal | None = None
+    basis_rate: Decimal | None = None
+    schema_version: str = "1.0"
+
+
+class CanonicalPosition(BaseModel):
+    """Normalised position — all venues."""
+
+    instrument_id: str
+    side: str = Field(description="LONG or SHORT")
+    quantity: Decimal
+    entry_price: Decimal
+    mark_price: Decimal
+    unrealized_pnl: Decimal
+    leverage: Decimal | None = None
+    venue: str | None = None
+    timestamp: datetime | None = None
+
+
+class CanonicalBalance(BaseModel):
+    """Normalised balance for a single currency."""
+
+    currency: str
+    free: Decimal
+    locked: Decimal
+    total: Decimal
+
+
+class CanonicalFundingRate(BaseModel):
+    """Normalised funding rate — perps/futures."""
+
+    venue: str
+    symbol: str
+    rate: Decimal
+    timestamp: datetime
+    next_funding_time: datetime | None = None
+
+
+class CanonicalOhlcvBar(BaseModel):
+    """Normalised OHLCV bar — all venues."""
+
+    timestamp: datetime
+    venue: str
+    symbol: str
+    open: float
+    high: float
+    low: float
+    close: float
+    volume: float
+    quote_volume: float | None = None
+    count: int | None = None
+    vwap: float | None = None
+
+
+class CanonicalMarketInfo(BaseModel):
+    """Normalised market/instrument metadata — all venues."""
+
+    instrument_key: str
+    venue: str
+    symbol: str
+    timestamp: datetime
+    tick_size: float | None = None
+    min_size: float | None = None
+    contract_size: float | None = None
+    base_asset: str | None = None
+    quote_asset: str | None = None
+    settle_asset: str | None = None
+
+
+class CanonicalOraclePrice(BaseModel):
+    """Normalised oracle price — DeFi."""
+
+    oracle: str
+    pair: str
+    price: Decimal
+    timestamp: datetime
+    chain: str = ""
+
+
+class CanonicalStakingRate(BaseModel):
+    """Normalised staking rate — DeFi."""
+
+    protocol: str
+    asset: str
+    apy: Decimal
+    timestamp: datetime
+    chain: str = ""
+
+
+class CanonicalWsMessage(BaseModel):
+    """Normalised WebSocket message — minimal envelope."""
+
+    channel: str
+    timestamp: datetime
+    venue: str
+    payload: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
 
 
 # ---------------------------------------------------------------------------
@@ -211,8 +373,19 @@ class ProcessedCandle(BaseModel):
 
 
 __all__ = [
+    "CanonicalBalance",
+    "CanonicalDerivativeTicker",
+    "CanonicalFundingRate",
+    "CanonicalLiquidation",
+    "CanonicalMarketInfo",
+    "CanonicalOhlcvBar",
+    "CanonicalOraclePrice",
     "CanonicalOrderBook",
+    "CanonicalPosition",
+    "CanonicalStakingRate",
+    "CanonicalTicker",
     "CanonicalTrade",
+    "CanonicalWsMessage",
     "InstrumentRecord",
     "InstrumentType",
     "MarketTrade",

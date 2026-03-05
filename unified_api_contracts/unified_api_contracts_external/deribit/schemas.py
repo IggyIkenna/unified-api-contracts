@@ -70,6 +70,18 @@ class DeribitPosition(BaseModel):
     info: dict[str, object] | None = None
 
 
+class DeribitTrade(BaseModel):
+    """Deribit public trade (get_last_trades_by_instrument)."""
+
+    trade_id: str | None = None
+    instrument_name: str | None = None
+    timestamp: int | None = None  # ms
+    price: Decimal | float | None = None
+    amount: Decimal | float | None = None
+    direction: str | None = None  # buy or sell
+    trade_seq: int | None = None
+
+
 class DeribitError(BaseModel):
     """Deribit API error payload."""
 

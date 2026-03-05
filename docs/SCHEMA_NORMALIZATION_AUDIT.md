@@ -5,6 +5,16 @@
 
 ---
 
+## Ideology
+
+- **UAC = normalization layer** — like an internal CCXT/TARDIS. unified-api-contracts maps raw venue responses to canonical types.
+- **Interfaces = venue routers** — raw never flows to services; interfaces return normalized data only.
+- **All response types** must have a normalization path.
+- **Full plan:** 
+- **Codex:** 02-data/contracts-scope-and-layout.md, 05-infrastructure/contracts-integration.md
+
+---
+
 ## 1. Terminology Clarification
 
 | Term | Meaning |
