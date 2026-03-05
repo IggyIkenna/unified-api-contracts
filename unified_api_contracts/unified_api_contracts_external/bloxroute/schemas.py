@@ -59,7 +59,7 @@ class BloxrouteError(BaseModel):
 
     code: int = Field(..., description="JSON-RPC error code (e.g. -32600 invalid request)")
     message: str = Field(..., description="Human-readable error message")
-    data: str | dict | None = Field(None, description="Optional error details")
+    data: str | dict[str, object] | None = Field(None, description="Optional error details")
 
 
 # --- subscribe (bdnBlocks, newTxs, pendingTxs) ---
@@ -105,3 +105,12 @@ class BloxrouteProtectEndpoints(BaseModel):
         "https://eth.rpc.blxrbdn.com",
         description="ETH Gas Protect RPC",
     )
+
+
+class BloxrouteMempoolNotification(BaseModel):
+    """bloXroute newTxs / pendingTxs stream notification."""
+
+    tx_hash: str | None = None
+    network: str | None = None
+    blockchain_network: str | None = None
+    tx_contents: dict[str, object] | None = None

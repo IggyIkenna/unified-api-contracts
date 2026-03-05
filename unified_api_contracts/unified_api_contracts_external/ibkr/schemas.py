@@ -41,7 +41,9 @@ class IBKRBondMarketData(BaseModel):
     """Bond market data from IBKR TWS."""
 
     bid: float | None = None
+    bid_price: float | None = None  # alias for bid (API uses bid_price)
     ask: float | None = None
+    ask_price: float | None = None  # alias for ask
     last: float | None = None
     yield_to_maturity: float | None = None
     coupon_rate: float | None = None
@@ -73,7 +75,7 @@ class IBKRPosition(BaseModel):
     """Position from reqPositions / position update."""
 
     account: str | None = None
-    contract: dict | None = None  # conId, symbol, secType, exchange, etc.
+    contract: dict[str, object] | None = None  # conId, symbol, secType, exchange, etc.
     position: float | None = None
     avgCost: float | None = None
     marketPrice: float | None = None
@@ -110,7 +112,7 @@ class IBKRPortfolioItem(BaseModel):
     """Portfolio item (holding)."""
 
     account: str | None = None
-    contract: dict | None = None
+    contract: dict[str, object] | None = None
     position: float | None = None
     marketPrice: float | None = None
     marketValue: float | None = None
@@ -228,7 +230,7 @@ class IBKRScannerData(BaseModel):
     """Scanner result row (TWS scannerData callback)."""
 
     rank: int | None = None
-    contractDetails: dict | None = None
+    contractDetails: dict[str, object] | None = None
     distance: str | None = None
     benchmark: str | None = None
     projection: str | None = None
@@ -439,7 +441,7 @@ class IBKRComboOrderRequest(BaseModel):
     total_quantity: float
     order_type: str  # "LMT", "MKT", "REL" (relative/pegged)
     lmt_price: float | None = None
-    smart_combo_routing_params: list[dict] | None = None  # [{tag, val}] pairs
+    smart_combo_routing_params: list[dict[str, object]] | None = None  # [{tag, val}] pairs
     # Delta-neutral hedging (auto-creates a hedge leg)
     delta_neutral_order_type: str | None = None  # "MKT" | "LMT"
     delta_neutral_aux_price: float | None = None

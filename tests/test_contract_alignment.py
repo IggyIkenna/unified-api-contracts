@@ -91,9 +91,7 @@ class TestACSchemas:
 
         from unified_api_contracts.schemas import WebSocketConnectionState
 
-        assert dataclasses.is_dataclass(WebSocketConnectionState), (
-            "WebSocketConnectionState must be a dataclass"
-        )
+        assert dataclasses.is_dataclass(WebSocketConnectionState), "WebSocketConnectionState must be a dataclass"
         field_names = {f.name for f in dataclasses.fields(WebSocketConnectionState)}
         assert "last_heartbeat" in field_names
         assert "reconnect_count" in field_names
@@ -108,37 +106,37 @@ class TestACSports:
     """Sports-betting schemas in unified_api_contracts.sports."""
 
     def test_odds_type_enum(self) -> None:
-        from unified_api_contracts.sports import OddsType
+        from unified_api_contracts.unified_api_contracts_external.sports import OddsType
 
         values = list(OddsType)
         assert len(values) > 0
 
     def test_outcome_type_enum(self) -> None:
-        from unified_api_contracts.sports import OutcomeType
+        from unified_api_contracts.unified_api_contracts_external.sports import OutcomeType
 
         values = list(OutcomeType)
         assert len(values) > 0
 
     def test_bookmaker_category_enum(self) -> None:
-        from unified_api_contracts.sports import BookmakerCategory
+        from unified_api_contracts.unified_api_contracts_external.sports import BookmakerCategory
 
         values = list(BookmakerCategory)
         assert len(values) > 0
 
     def test_arbitrage_status_enum(self) -> None:
-        from unified_api_contracts.sports import ArbitrageStatus
+        from unified_api_contracts.unified_api_contracts_external.sports import ArbitrageStatus
 
         values = list(ArbitrageStatus)
         assert len(values) > 0
 
     def test_bet_status_enum(self) -> None:
-        from unified_api_contracts.sports import BetStatus
+        from unified_api_contracts.unified_api_contracts_external.sports import BetStatus
 
         values = list(BetStatus)
         assert len(values) > 0
 
     def test_bookmaker_registry_populated(self) -> None:
-        from unified_api_contracts.sports import BOOKMAKER_REGISTRY
+        from unified_api_contracts.unified_api_contracts_external.sports import BOOKMAKER_REGISTRY
 
         assert isinstance(BOOKMAKER_REGISTRY, dict), "BOOKMAKER_REGISTRY must be a dict"
         assert len(BOOKMAKER_REGISTRY) > 0, "Registry must contain at least one bookmaker"

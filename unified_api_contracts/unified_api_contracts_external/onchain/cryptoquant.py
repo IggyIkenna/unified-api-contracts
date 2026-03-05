@@ -21,7 +21,7 @@ CRYPTOQUANT_RATE_LIMIT_PREMIUM = 1000  # requests per minute
 class CryptoQuantExchangeFlow(BaseModel):
     """Exchange inflow/outflow data point."""
 
-    datetime: datetime = Field(..., description="Data point timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Data point timestamp (UTC)")
     date: str = Field(..., description="Date in YYYY-MM-DD format")
     value: float = Field(..., description="Flow value in BTC or native asset")
     exchange: str | None = Field(None, description="Exchange name (e.g., binance, coinbase)")
@@ -39,7 +39,7 @@ class CryptoQuantExchangeFlowResponse(BaseModel):
 class CryptoQuantMinerMetrics(BaseModel):
     """Miner activity metrics."""
 
-    datetime: datetime = Field(..., description="Data point timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Data point timestamp (UTC)")
     date: str = Field(..., description="Date in YYYY-MM-DD format")
     miner_revenue: float | None = Field(None, description="Total miner revenue in USD")
     miner_revenue_btc: float | None = Field(None, description="Total miner revenue in BTC")
@@ -59,7 +59,7 @@ class CryptoQuantMinerMetricsResponse(BaseModel):
 class CryptoQuantReserveMetrics(BaseModel):
     """Exchange reserve metrics."""
 
-    datetime: datetime = Field(..., description="Data point timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Data point timestamp (UTC)")
     date: str = Field(..., description="Date in YYYY-MM-DD format")
     reserve: float = Field(..., description="Total exchange reserve in BTC or native asset")
     exchange: str | None = Field(None, description="Exchange name")
@@ -79,7 +79,7 @@ class CryptoQuantReserveMetricsResponse(BaseModel):
 class CryptoQuantWhaleMetrics(BaseModel):
     """Whale wallet activity metrics."""
 
-    datetime: datetime = Field(..., description="Data point timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Data point timestamp (UTC)")
     date: str = Field(..., description="Date in YYYY-MM-DD format")
     whale_count: int | None = Field(None, description="Number of whale addresses (>1000 BTC)")
     whale_balance: float | None = Field(None, description="Total whale balance in BTC")
@@ -98,7 +98,7 @@ class CryptoQuantWhaleMetricsResponse(BaseModel):
 class CryptoQuantStablecoinMetrics(BaseModel):
     """Stablecoin supply and flow metrics."""
 
-    datetime: datetime = Field(..., description="Data point timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Data point timestamp (UTC)")
     date: str = Field(..., description="Date in YYYY-MM-DD format")
     total_supply: float = Field(..., description="Total stablecoin supply in USD")
     supply_change_1d: float | None = Field(None, description="1-day supply change in USD")

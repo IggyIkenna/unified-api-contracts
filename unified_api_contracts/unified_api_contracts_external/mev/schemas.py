@@ -57,7 +57,7 @@ class FlashbotsCallBundleResult(BaseModel):
 
     bundleHash: str | None = None
     coinbaseDiff: str | None = Field(None, description="Total coinbase diff (wei hex)")
-    results: list[dict] | None = Field(None, description="Per-tx simulation results")
+    results: list[dict[str, object]] | None = Field(None, description="Per-tx simulation results")
     totalGasUsed: int | None = None
 
 
@@ -66,11 +66,11 @@ class FlashbotsPrivateTransactionPreferences(BaseModel):
     """Preferences for eth_sendPrivateTransaction."""
 
     fast: bool | None = Field(None, description="Send to all builders; MEV-Share 50% revenue")
-    privacy: dict | None = Field(
+    privacy: dict[str, object] | None = Field(
         None,
         description="hints: calldata|logs|function_selector|contract_address|hash|tx_hash|full; builders",
     )
-    validity: dict | None = Field(
+    validity: dict[str, object] | None = Field(
         None,
         description="refund: [{address, percent}] for backrun refund allocation",
     )
@@ -121,7 +121,7 @@ class MevShareBundleBodyItem(BaseModel):
     hash: str | None = Field(None, description="Tx or bundle hash (from event stream)")
     tx: str | None = Field(None, description="Signed tx (hex)")
     canRevert: bool | None = Field(None, description="Allow tx to revert or be discarded")
-    bundle: dict | None = Field(None, description="Nested MevSendBundleParams (recursive)")
+    bundle: dict[str, object] | None = Field(None, description="Nested MevSendBundleParams (recursive)")
 
 
 class MevShareInclusion(BaseModel):
@@ -146,11 +146,11 @@ class MevShareBundleParams(BaseModel):
         ...,
         description="Ordered txs/hashes/bundles; supports nesting",
     )
-    validity: dict | None = Field(
+    validity: dict[str, object] | None = Field(
         None,
         description="refund, refundConfig - post-inclusion predicates",
     )
-    privacy: dict | None = Field(
+    privacy: dict[str, object] | None = Field(
         None,
         description="hints: calldata|contract_address|logs|function_selector|hash|tx_hash; builders",
     )

@@ -24,7 +24,7 @@ class VCREndpoint(TypedDict):
     key_env: str
     header_name: str
     schema_version: NotRequired[str]  # bumped when response schema changes
-    json_body: NotRequired[dict]  # POST body
+    json_body: NotRequired[dict[str, object]]  # POST body
     auth_query_param: NotRequired[str]  # key goes in URL query (e.g. apiKey) not header
     is_internal_service: NotRequired[bool]  # True for inter-service cassettes (local only)
 

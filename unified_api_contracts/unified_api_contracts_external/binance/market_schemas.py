@@ -48,7 +48,7 @@ class BinanceOrderBook(BaseModel):
     lastUpdateId: int | None = None
     bids: list[list[str]] = []  # [[price, qty], ...]
     asks: list[list[str]] = []
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BinanceTrade(BaseModel):
@@ -133,8 +133,8 @@ class BinanceExchangeInfo(BaseModel):
 
     timezone: str
     serverTime: int  # timestamp
-    rateLimits: list[dict]
-    exchangeFilters: list[dict]
+    rateLimits: list[dict[str, object]]
+    exchangeFilters: list[dict[str, object]]
     symbols: list[BinanceSymbol]
 
 
@@ -315,7 +315,7 @@ class BinanceInstrumentInfo(BaseModel):
     quantityPrecision: int | None = None
     baseAssetPrecision: int | None = None
     quotePrecision: int | None = None
-    filters: list[dict] | None = None  # PRICE_FILTER, LOT_SIZE, etc.
+    filters: list[dict[str, object]] | None = None  # PRICE_FILTER, LOT_SIZE, etc.
     underlyingType: str | None = None  # COIN or TOKEN (futures)
 
 

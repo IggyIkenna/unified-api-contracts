@@ -27,7 +27,7 @@ class FirestoreDocument(BaseModel):
     """
 
     name: str | None = None
-    fields: dict | None = None
+    fields: dict[str, object] | None = None
     create_time: str | None = None
     update_time: str | None = None
 
@@ -40,11 +40,11 @@ class FirestoreQuery(BaseModel):
     """
 
     collection: str | None = None
-    filters: list[dict] | None = None
-    order_by: list[dict] | None = None
+    filters: list[dict[str, object]] | None = None
+    order_by: list[dict[str, object]] | None = None
     limit: int | None = None
     offset: int | None = None
-    start_after: dict | None = None
+    start_after: dict[str, object] | None = None
 
 
 class FirestoreWriteResult(BaseModel):
@@ -64,7 +64,7 @@ class FirestoreBatchWriteRequest(BaseModel):
     REST: POST documents:batchWrite
     """
 
-    writes: list[dict] | None = None
+    writes: list[dict[str, object]] | None = None
 
 
 class RealtimeDbEntry(BaseModel):
@@ -76,7 +76,7 @@ class RealtimeDbEntry(BaseModel):
     """
 
     path: str | None = None
-    data: dict | str | list | float | bool | None = None
+    data: dict[str, object] | str | list[object] | float | bool | None = None
     etag: str | None = None
 
 
@@ -93,8 +93,8 @@ class FirebaseAuthUser(BaseModel):
     phone_number: str | None = None
     photo_url: str | None = None
     disabled: bool | None = None
-    provider_data: list[dict] | None = None
-    custom_claims: dict | None = None
+    provider_data: list[dict[str, object]] | None = None
+    custom_claims: dict[str, object] | None = None
     tokens_valid_after_time: str | None = None
     creation_timestamp: int | None = None
     last_sign_in_timestamp: int | None = None
@@ -117,7 +117,7 @@ class FirebaseAuthToken(BaseModel):
     email_verified: bool | None = None
     name: str | None = None
     picture: str | None = None
-    firebase: dict | None = None
+    firebase: dict[str, object] | None = None
 
 
 class FirebaseCustomToken(BaseModel):
@@ -128,7 +128,7 @@ class FirebaseCustomToken(BaseModel):
 
     token: str | None = None
     uid: str | None = None
-    additional_claims: dict | None = None
+    additional_claims: dict[str, object] | None = None
 
 
 class FirebaseCreateUserRequest(BaseModel):
@@ -154,12 +154,12 @@ class FcmMessage(BaseModel):
     token: str | None = None
     topic: str | None = None
     condition: str | None = None
-    notification: dict | None = None
+    notification: dict[str, object] | None = None
     data: dict[str, str] | None = None
-    android: dict | None = None
-    apns: dict | None = None
-    webpush: dict | None = None
-    fcm_options: dict | None = None
+    android: dict[str, object] | None = None
+    apns: dict[str, object] | None = None
+    webpush: dict[str, object] | None = None
+    fcm_options: dict[str, object] | None = None
 
 
 class FcmSendResponse(BaseModel):
@@ -171,7 +171,7 @@ class FcmSendResponse(BaseModel):
     message_id: str | None = None
     success_count: int | None = None
     failure_count: int | None = None
-    responses: list[dict] | None = None
+    responses: list[dict[str, object]] | None = None
 
 
 class FirebaseStorageObject(BaseModel):

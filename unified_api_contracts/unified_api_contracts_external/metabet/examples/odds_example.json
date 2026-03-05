@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "event_id": "evt-001",
+      "home_team": "Team A",
+      "away_team": "Team B",
+      "commence_time": "2026-03-05T18:00:00Z",
+      "bookmaker": "book1",
+      "markets": [
+        {
+          "market": "h2h",
+          "outcomes": [
+            { "name": "Team A", "price": 1.85 },
+            { "name": "Team B", "price": 2.1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

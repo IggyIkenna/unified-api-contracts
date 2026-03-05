@@ -11,7 +11,7 @@ class BybitMarket(BaseModel):
     symbol: str | None = None
     baseCoin: str | None = None
     quoteCoin: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BybitOrderBook(BaseModel):
@@ -37,7 +37,7 @@ class BybitTicker(BaseModel):
     bid1Price: str | None = None
     ask1Price: str | None = None
     volume24h: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BybitMarkPriceKline(BaseModel):
@@ -101,7 +101,7 @@ class BybitOrder(BaseModel):
     orderStatus: str | None = None
     avgPrice: str | None = None
     cumExecQty: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BybitPosition(BaseModel):
@@ -113,7 +113,7 @@ class BybitPosition(BaseModel):
     entryPrice: str | None = None
     markPrice: str | None = None
     unrealisedPnl: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BybitError(BaseModel):
@@ -280,9 +280,9 @@ class BybitInstrumentInfo(BaseModel):
     deliveryTime: str | None = None  # ISO timestamp; perps have no delivery
     deliveryFeeRate: str | None = None
     priceScale: str | None = None
-    leverageFilter: dict | None = None
-    priceFilter: dict | None = None  # tickSize
-    lotSizeFilter: dict | None = None  # qtyStep, minOrderQty, maxOrderQty
+    leverageFilter: dict[str, object] | None = None
+    priceFilter: dict[str, object] | None = None  # tickSize
+    lotSizeFilter: dict[str, object] | None = None  # qtyStep, minOrderQty, maxOrderQty
     unifiedMarginTrade: bool | None = None
     fundingInterval: int | None = None  # minutes
     settleCoin: str | None = None

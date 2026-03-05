@@ -30,7 +30,7 @@ class TardisExchange(BaseModel):
     exchange: str | None = None
     name: str | None = None
     website: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class TardisInstrument(BaseModel):
@@ -39,7 +39,7 @@ class TardisInstrument(BaseModel):
     symbol: str | None = None
     exchange: str | None = None
     name: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class TardisTrade(BaseModel):
@@ -52,7 +52,7 @@ class TardisTrade(BaseModel):
     size: float | None = None
     side: str | None = None
     trade_id: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class TardisOrderBookLevel(BaseModel):

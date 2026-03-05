@@ -4,8 +4,10 @@ Execution testing: Order, Position, Instrument, Fill, Account + MockCache/MockCl
 Data schemas: NautilusTrader-optimized column schemas + instrument ID conversion.
 
 Usage:
-    from unified_api_contracts.unified_api_contracts_external.nautilus import Order, Position, MockCache, mock_order, mock_cache
-    from unified_api_contracts.unified_api_contracts_external.nautilus.data_schemas import NAUTILUS_TRADES_SCHEMA, convert_to_nautilus_instrument_id
+    # from unified_api_contracts...nautilus import Order, Position, MockCache, mock_order, mock_cache
+    # from unified_api_contracts...nautilus.data_schemas import (
+    #     NAUTILUS_TRADES_SCHEMA, convert_to_nautilus_instrument_id
+    # )
 """
 
 from .cache import Cache, MockCache

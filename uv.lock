@@ -2,9 +2,18 @@ version = 1
 revision = 3
 requires-python = "==3.13.*"
 resolution-markers = [
-    "sys_platform == 'win32'",
-    "sys_platform == 'emscripten'",
-    "sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "platform_python_implementation == 'PyPy' and sys_platform == 'win32'",
+    "platform_python_implementation != 'PyPy' and sys_platform == 'win32'",
+    "platform_python_implementation == 'PyPy' and sys_platform == 'emscripten'",
+    "platform_python_implementation != 'PyPy' and sys_platform == 'emscripten'",
+    "platform_python_implementation == 'PyPy' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+    "platform_python_implementation != 'PyPy' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
+
+[manifest]
+overrides = [
+    { name = "eth-abi", specifier = ">=5.0.1" },
+    { name = "gunicorn", specifier = ">=22.0.0" },
 ]
 
 [[package]]
@@ -1157,7 +1166,8 @@ dependencies = [
     { name = "certifi" },
     { name = "charset-normalizer" },
     { name = "idna" },
-    { name = "urllib3" },
+    { name = "urllib3", version = "1.26.20", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "urllib3", version = "2.6.3", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/c9/74/b3ff8e6c8446842c3f5c837e9c3dfcfe2018ea6ecef224c710c85ef728f4/requests-2.32.5.tar.gz", hash = "sha256:dbba0bac56e100853db0ea71b82b4dfd5fe2bf6d3754a8893c3af500cec7d7cf", size = 134517, upload-time = "2025-08-18T20:46:02.573Z" }
 wheels = [
@@ -1344,14 +1354,14 @@ schema-validation = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bandit", marker = "extra == 'dev'", specifier = ">=1.7.0" },
+    { name = "bandit", marker = "extra == 'dev'", specifier = ">=1.7.0,<2.0.0" },
     { name = "basedpyright", marker = "extra == 'dev'", specifier = ">=1.21.0,<2.0.0" },
     { name = "ccxt", marker = "extra == 'schema-validation'", specifier = ">=4.5.24,<5.0.0" },
     { name = "databento", marker = "extra == 'schema-validation'", specifier = ">=0.32.0" },
     { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28.1,<1.0.0" },
-    { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.0.0" },
+    { name = "hypothesis", marker = "extra == 'dev'", specifier = ">=6.0.0,<7.0.0" },
     { name = "ib-insync", marker = "extra == 'schema-validation'", specifier = ">=0.9.86" },
-    { name = "pip-audit", marker = "extra == 'dev'", specifier = ">=2.7.0" },
+    { name = "pip-audit", marker = "extra == 'dev'", specifier = ">=2.7.0,<3.0.0" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=3.0,<4.0.0" },
     { name = "pydantic", specifier = ">=2.12.5,<3.0.0" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.1,<10.0.0" },
@@ -1363,14 +1373,33 @@ requires-dist = [
     { name = "requests", marker = "extra == 'schema-validation'", specifier = ">=2.32.5,<3.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = "==0.15.0" },
     { name = "tardis-client", marker = "extra == 'schema-validation'", specifier = ">=1.3.7" },
-    { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6.0.0" },
+    { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6.0.0,<7.0.0" },
 ]
 provides-extras = ["schema-validation", "dev"]
 
 [[package]]
 name = "urllib3"
+version = "1.26.20"
+source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "platform_python_implementation == 'PyPy' and sys_platform == 'win32'",
+    "platform_python_implementation == 'PyPy' and sys_platform == 'emscripten'",
+    "platform_python_implementation == 'PyPy' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e4/e8/6ff5e6bc22095cfc59b6ea711b687e2b7ed4bdb373f7eeec370a97d7392f/urllib3-1.26.20.tar.gz", hash = "sha256:40c2dc0c681e47eb8f90e7e27bf6ff7df2e677421fd46756da1161c39ca70d32", size = 307380, upload-time = "2024-08-29T15:43:11.37Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/33/cf/8435d5a7159e2a9c83a95896ed596f68cf798005fe107cc655b5c5c14704/urllib3-1.26.20-py2.py3-none-any.whl", hash = "sha256:0ed14ccfbf1c30a9072c7ca157e4319b70d65f623e91e7b32fadb2853431016e", size = 144225, upload-time = "2024-08-29T15:43:08.921Z" },
+]
+
+[[package]]
+name = "urllib3"
 version = "2.6.3"
 source = { registry = "https://pypi.org/simple" }
+resolution-markers = [
+    "platform_python_implementation != 'PyPy' and sys_platform == 'win32'",
+    "platform_python_implementation != 'PyPy' and sys_platform == 'emscripten'",
+    "platform_python_implementation != 'PyPy' and sys_platform != 'emscripten' and sys_platform != 'win32'",
+]
 sdist = { url = "https://files.pythonhosted.org/packages/c7/24/5f1b3bdffd70275f6661c76461e25f024d5a38a46f04aaca912426a2b1d3/urllib3-2.6.3.tar.gz", hash = "sha256:1b62b6884944a57dbe321509ab94fd4d3b307075e0c2eae991ac71ee15ad38ed", size = 435556, upload-time = "2026-01-07T16:24:43.925Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/39/08/aaaad47bc4e9dc8c725e68f9d04865dbcb2052843ff09c97b08904852d84/urllib3-2.6.3-py3-none-any.whl", hash = "sha256:bf272323e553dfb2e87d9bfd225ca7b0f467b919d7bbd355436d3fd37cb0acd4", size = 131584, upload-time = "2026-01-07T16:24:42.685Z" },
@@ -1378,15 +1407,18 @@ wheels = [
 
 [[package]]
 name = "vcrpy"
-version = "8.1.1"
+version = "6.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyyaml" },
+    { name = "urllib3", version = "1.26.20", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "urllib3", version = "2.6.3", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
     { name = "wrapt" },
+    { name = "yarl" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b3/07/bcfd5ebd7cb308026ab78a353e091bd699593358be49197d39d004e5ad83/vcrpy-8.1.1.tar.gz", hash = "sha256:58e3053e33b423f3594031cb758c3f4d1df931307f1e67928e30cf352df7709f", size = 85770, upload-time = "2026-01-04T19:22:03.886Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/16/4e/fff59599826793f9e3460c22c0af0377abb27dc9781a7d5daca8cb03da25/vcrpy-6.0.2.tar.gz", hash = "sha256:88e13d9111846745898411dbc74a75ce85870af96dd320d75f1ee33158addc09", size = 85472, upload-time = "2024-10-07T13:07:31.617Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3a/d7/f79b05a5d728f8786876a7d75dfb0c5cae27e428081b2d60152fb52f155f/vcrpy-8.1.1-py3-none-any.whl", hash = "sha256:2d16f31ad56493efb6165182dd99767207031b0da3f68b18f975545ede8ac4b9", size = 42445, upload-time = "2026-01-04T19:22:02.532Z" },
+    { url = "https://files.pythonhosted.org/packages/da/ed/25d19705791d3fccc84423d564695421a75b4e08e8ab15a004a49068742d/vcrpy-6.0.2-py2.py3-none-any.whl", hash = "sha256:40370223861181bc76a5e5d4b743a95058bb1ad516c3c08570316ab592f56cad", size = 42431, upload-time = "2024-10-07T13:07:30.475Z" },
 ]
 
 [[package]]

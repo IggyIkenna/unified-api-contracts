@@ -4,6 +4,6 @@ Used by tests to assert we have the right schemas and by optional live verificat
 Align with docs/INDEX.md; update both if adding a venue or capability.
 """
 
-from .venue_manifest import VENUE_MANIFEST, VenueContract
+from .unified_api_contracts_external.venue_manifest import VENUE_MANIFEST, VenueContract
 
 __all__ = ["VENUE_MANIFEST", "VenueContract"]

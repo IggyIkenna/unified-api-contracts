@@ -65,10 +65,10 @@ class BillingSku(BaseModel):
     sku_id: str | None = None
     description: str | None = None
     service_display_name: str | None = None
-    category: dict | None = None
+    category: dict[str, object] | None = None
     service_regions: list[str] | None = None
-    pricing_info: list[dict] | None = None
-    geo_taxonomy: dict | None = None
+    pricing_info: list[dict[str, object]] | None = None
+    geo_taxonomy: dict[str, object] | None = None
 
 
 class BudgetAlert(BaseModel):
@@ -79,10 +79,10 @@ class BudgetAlert(BaseModel):
 
     name: str | None = None
     display_name: str | None = None
-    budget_filter: dict | None = None
-    amount: dict | None = None
-    threshold_rules: list[dict] | None = None
-    notifications_rule: dict | None = None
+    budget_filter: dict[str, object] | None = None
+    amount: dict[str, object] | None = None
+    threshold_rules: list[dict[str, object]] | None = None
+    notifications_rule: dict[str, object] | None = None
     etag: str | None = None
 
 
@@ -95,26 +95,26 @@ class BillingCostEntry(BaseModel):
     """
 
     billing_account_id: str | None = None
-    service: dict | None = None
-    sku: dict | None = None
+    service: dict[str, object] | None = None
+    sku: dict[str, object] | None = None
     usage_start_time: str | None = None
     usage_end_time: str | None = None
-    project: dict | None = None
-    labels: list[dict] | None = None
-    system_labels: list[dict] | None = None
-    location: dict | None = None
-    resource: dict | None = None
+    project: dict[str, object] | None = None
+    labels: list[dict[str, object]] | None = None
+    system_labels: list[dict[str, object]] | None = None
+    location: dict[str, object] | None = None
+    resource: dict[str, object] | None = None
     export_time: str | None = None
     cost: float | None = None
     currency: str | None = None
     currency_conversion_rate: float | None = None
-    usage: dict | None = None
-    credits: list[dict] | None = None
-    invoice: dict | None = None
+    usage: dict[str, object] | None = None
+    credits: list[dict[str, object]] | None = None
+    invoice: dict[str, object] | None = None
     cost_type: str | None = None
-    adjustment_info: dict | None = None
-    tags: list[dict] | None = None
-    price: dict | None = None
+    adjustment_info: dict[str, object] | None = None
+    tags: list[dict[str, object]] | None = None
+    price: dict[str, object] | None = None
 
 
 class BillingCostSummary(BaseModel):

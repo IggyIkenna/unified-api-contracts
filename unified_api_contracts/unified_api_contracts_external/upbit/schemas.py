@@ -11,7 +11,7 @@ class UpbitMarket(BaseModel):
     market: str | None = None
     korean_name: str | None = None
     english_name: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class UpbitTicker(BaseModel):
@@ -22,7 +22,7 @@ class UpbitTicker(BaseModel):
     bid_price: float | None = None
     ask_price: float | None = None
     acc_trade_volume_24h: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class UpbitOrder(BaseModel):
@@ -35,7 +35,7 @@ class UpbitOrder(BaseModel):
     state: str | None = None
     volume: str | None = None
     executed_volume: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class UpbitBalance(BaseModel):
@@ -44,7 +44,7 @@ class UpbitBalance(BaseModel):
     currency: str | None = None
     balance: float | None = None
     locked: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class UpbitWebSocketClose(BaseModel):
@@ -60,14 +60,14 @@ class UpbitWebSocketClose(BaseModel):
 class UpbitError(BaseModel):
     """Upbit API error."""
 
-    error: dict | None = None
+    error: dict[str, object] | None = None
     message: str | None = None
 
     @classmethod
     def classify(cls, error_key: str | None = None, http_status: int | None = None) -> ErrorAction:
         """Map Upbit error to retry action.
 
-        error_key: key from error dict (e.g. 'invalid_access_key', 'too_many_requests').
+        error_key: key from error dict[str, object] (e.g. 'invalid_access_key', 'too_many_requests').
         """
         if http_status == 429:
             return ErrorAction.RETRY_WITH_BACKOFF
@@ -189,7 +189,7 @@ class UpbitFeeRate(BaseModel):
     taker_fee_rate: float | None = None
     currency: str | None = None
     market: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class UpbitDeposit(BaseModel):
@@ -205,7 +205,7 @@ class UpbitDeposit(BaseModel):
     amount: str | None = None
     fee: str | None = None
     transaction_type: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class UpbitWithdrawal(BaseModel):
@@ -221,4 +221,4 @@ class UpbitWithdrawal(BaseModel):
     amount: str | None = None
     fee: str | None = None
     transaction_type: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
