@@ -2,23 +2,36 @@
 
 from __future__ import annotations
 
+import contextlib
 from datetime import UTC, datetime
 from decimal import Decimal
 
+from ...unified_api_contracts_external.aster.schemas import AsterOrderBook
 from ...unified_api_contracts_external.binance.market_schemas import BinanceOrderBook
 from ...unified_api_contracts_external.bybit.schemas import BybitOrderBook
 from ...unified_api_contracts_external.ccxt.schemas import CcxtOrderBook
 from ...unified_api_contracts_external.coinbase.schemas import CoinbaseOrderBook
-from ...unified_api_contracts_external.databento.schemas import DatabentoMbp1, DatabentoMbp10, DatabentoTbbo
+from ...unified_api_contracts_external.databento.schemas import (
+    DatabentoBbo1m,
+    DatabentoBbo1s,
+    DatabentoCmbp1,
+    DatabentoMbp1,
+    DatabentoMbp10,
+    DatabentoTbbo,
+)
 from ...unified_api_contracts_external.deribit.schemas import DeribitOrderBook
+from ...unified_api_contracts_external.hyperliquid.schemas import HyperliquidL2Book, HyperliquidL2Level
+from ...unified_api_contracts_external.kalshi.schemas import KalshiOrderBook
 from ...unified_api_contracts_external.okx.schemas import OKXOrderBook
+from ...unified_api_contracts_external.polymarket.schemas import PolymarketOrderBook
+from ...unified_api_contracts_external.smarkets.schemas import SmarketsOrderBook
 from ...unified_api_contracts_external.tardis.schemas import TardisOrderBook
 from ...unified_api_contracts_external.upbit.schemas import UpbitOrderBook
 from ..domain import CanonicalOrderBook
 
 
 def _to_levels(
-    rows: list[list[str]] | list[list[float]],
+    rows: list[list[str | float]] | list[list[str]] | list[list[float]],
 ) -> list[tuple[Decimal, Decimal]]:
     """Convert [[price, size], ...] to [(Decimal, Decimal), ...]."""
     out: list[tuple[Decimal, Decimal]] = []
@@ -147,6 +160,29 @@ def normalize_deribit_orderbook(
     )
 
 
+def normalize_aster_orderbook(
+    raw: AsterOrderBook,
+    venue: str = "aster",
+    symbol: str = "",
+    timestamp_ms: int | None = None,
+) -> CanonicalOrderBook:
+    """Convert AsterOrderBook to CanonicalOrderBook."""
+    ts = (
+        datetime.fromtimestamp(timestamp_ms / 1000.0, tz=UTC)
+        if timestamp_ms is not None
+        else (datetime.fromtimestamp(raw.timestamp / 1000.0, tz=UTC) if raw.timestamp else datetime.now(UTC))
+    )
+    bids = _to_levels(raw.bids or [])
+    asks = _to_levels(raw.asks or [])
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=symbol or (raw.market_id or ""),
+        timestamp=ts,
+        bids=bids,
+        asks=asks,
+    )
+
+
 def normalize_upbit_orderbook(
     raw: UpbitOrderBook,
     venue: str = "upbit",
@@ -238,6 +274,90 @@ def normalize_databento_tbbo_orderbook(
     )
 
 
+def normalize_databento_bbo1s_orderbook(
+    raw: DatabentoBbo1s, venue: str = "databento", symbol: str = ""
+) -> CanonicalOrderBook:
+    """Convert DatabentoBbo1s (1s BBO) to CanonicalOrderBook."""
+    ts = datetime.fromtimestamp(raw.ts_recv / 1e9, tz=UTC)
+    bids = [(_databento_price(raw.bid_px_00), Decimal(raw.bid_sz_00))]
+    asks = [(_databento_price(raw.ask_px_00), Decimal(raw.ask_sz_00))]
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=symbol or str(raw.instrument_id),
+        timestamp=ts,
+        bids=bids,
+        asks=asks,
+        sequence_number=raw.sequence,
+    )
+
+
+def normalize_databento_bbo1m_orderbook(
+    raw: DatabentoBbo1m, venue: str = "databento", symbol: str = ""
+) -> CanonicalOrderBook:
+    """Convert DatabentoBbo1m (1m BBO) to CanonicalOrderBook."""
+    ts = datetime.fromtimestamp(raw.ts_recv / 1e9, tz=UTC)
+    bids = [(_databento_price(raw.bid_px_00), Decimal(raw.bid_sz_00))]
+    asks = [(_databento_price(raw.ask_px_00), Decimal(raw.ask_sz_00))]
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=symbol or str(raw.instrument_id),
+        timestamp=ts,
+        bids=bids,
+        asks=asks,
+        sequence_number=raw.sequence,
+    )
+
+
+def normalize_databento_cmbp1_orderbook(
+    raw: DatabentoCmbp1, venue: str = "databento", symbol: str = ""
+) -> CanonicalOrderBook:
+    """Convert DatabentoCmbp1 (consolidated MBP-1) to CanonicalOrderBook."""
+    ts = datetime.fromtimestamp(raw.ts_recv / 1e9, tz=UTC)
+    bids = [(_databento_price(raw.bid_px_00), Decimal(raw.bid_sz_00))]
+    asks = [(_databento_price(raw.ask_px_00), Decimal(raw.ask_sz_00))]
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=symbol or str(raw.instrument_id),
+        timestamp=ts,
+        bids=bids,
+        asks=asks,
+    )
+
+
+def _hl_levels(levels: list[HyperliquidL2Level]) -> list[tuple[Decimal, Decimal]]:
+    """Convert a list of HyperliquidL2Level to [(price, size), ...]."""
+    out: list[tuple[Decimal, Decimal]] = []
+    for lvl in levels:
+        if lvl.px is not None and lvl.sz is not None:
+            out.append((Decimal(lvl.px), Decimal(lvl.sz)))
+    return out
+
+
+def normalize_hyperliquid_orderbook(
+    raw: HyperliquidL2Book,
+    venue: str = "hyperliquid",
+    symbol: str = "",
+) -> CanonicalOrderBook:
+    """Convert HyperliquidL2Book to CanonicalOrderBook.
+
+    HyperliquidL2Book.levels is [[bid_levels], [ask_levels]].
+    Timestamp is milliseconds since epoch.
+    All Hyperliquid markets are USDC-settled perps; symbol = coin + "-USDC-PERP".
+    """
+    ts = datetime.fromtimestamp(raw.time / 1000.0, tz=UTC) if raw.time is not None else datetime.now(UTC)
+    sym = symbol or (f"{raw.coin}-USDC-PERP" if raw.coin else "UNKNOWN")
+    levels = raw.levels or []
+    bids = _hl_levels(levels[0]) if len(levels) > 0 else []
+    asks = _hl_levels(levels[1]) if len(levels) > 1 else []
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=sym,
+        timestamp=ts,
+        bids=bids,
+        asks=asks,
+    )
+
+
 def _mbp10_levels(raw: DatabentoMbp10) -> tuple[list[tuple[Decimal, Decimal]], list[tuple[Decimal, Decimal]]]:
     """Extract bids/asks from DatabentoMbp10 levels 0-9."""
     bids: list[tuple[Decimal, Decimal]] = []
@@ -270,4 +390,96 @@ def normalize_databento_mbp10_orderbook(
         asks=asks,
         sequence_number=raw.sequence,
         levels=10,
+    )
+
+
+def normalize_kalshi_orderbook(
+    raw: KalshiOrderBook,
+    venue: str = "kalshi",
+    symbol: str = "",
+) -> CanonicalOrderBook:
+    """Convert KalshiOrderBook to CanonicalOrderBook.
+
+    Kalshi uses yes_dollars: [("price_str", "size_str"), ...] for bids/asks.
+    Yes bids are the bids; no_dollars (complement prices) form the asks.
+    """
+    sym = symbol or raw.ticker or ""
+    bids: list[tuple[Decimal, Decimal]] = []
+    asks: list[tuple[Decimal, Decimal]] = []
+    for entry in raw.yes_dollars or []:
+        if len(entry) >= 2:
+            with contextlib.suppress(Exception):
+                bids.append((Decimal(str(entry[0])), Decimal(str(entry[1]))))
+    for entry in raw.no_dollars or []:
+        if len(entry) >= 2:
+            with contextlib.suppress(Exception):
+                asks.append((Decimal(str(entry[0])), Decimal(str(entry[1]))))
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=sym,
+        timestamp=datetime.now(UTC),
+        bids=bids,
+        asks=asks,
+        sequence_number=None,
+        levels=len(bids) or len(asks) or 1,
+    )
+
+
+def normalize_polymarket_orderbook(
+    raw: PolymarketOrderBook,
+    venue: str = "polymarket",
+    symbol: str = "",
+) -> CanonicalOrderBook:
+    """Convert PolymarketOrderBook to CanonicalOrderBook.
+
+    Polymarket bids/asks: [[price, size], ...] as float lists.
+    """
+    sym = symbol or raw.market or raw.asset_id or ""
+    bids: list[tuple[Decimal, Decimal]] = []
+    asks: list[tuple[Decimal, Decimal]] = []
+    for entry in raw.bids or []:
+        if len(entry) >= 2:
+            with contextlib.suppress(Exception):
+                bids.append((Decimal(str(entry[0])), Decimal(str(entry[1]))))
+    for entry in raw.asks or []:
+        if len(entry) >= 2:
+            with contextlib.suppress(Exception):
+                asks.append((Decimal(str(entry[0])), Decimal(str(entry[1]))))
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=sym,
+        timestamp=datetime.now(UTC),
+        bids=bids,
+        asks=asks,
+        sequence_number=None,
+        levels=len(bids) or len(asks) or 1,
+    )
+
+
+def normalize_smarkets_orderbook(
+    raw: SmarketsOrderBook,
+    venue: str = "smarkets",
+    symbol: str = "",
+) -> CanonicalOrderBook:
+    """Convert SmarketsOrderBook to CanonicalOrderBook.
+
+    Smarkets backs/lays are lists of SmarketsPriceLevel (back=bid, lay=ask).
+    """
+    sym = symbol or (f"{raw.market_id}:{raw.runner_id}" if raw.runner_id else raw.market_id or "")
+    bids: list[tuple[Decimal, Decimal]] = []
+    asks: list[tuple[Decimal, Decimal]] = []
+    for level in raw.backs or []:
+        if level.price is not None and level.size is not None:
+            bids.append((Decimal(str(level.price)), Decimal(str(level.size))))
+    for level in raw.lays or []:
+        if level.price is not None and level.size is not None:
+            asks.append((Decimal(str(level.price)), Decimal(str(level.size))))
+    return CanonicalOrderBook(
+        venue=venue,
+        symbol=sym,
+        timestamp=datetime.now(UTC),
+        bids=bids,
+        asks=asks,
+        sequence_number=None,
+        levels=len(bids) or len(asks) or 1,
     )

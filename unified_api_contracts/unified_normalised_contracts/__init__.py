@@ -1,17 +1,23 @@
 """Canonical normalised schemas: one-hop normalisation from raw venue responses.
 
-Domain: CanonicalOrderBook, CanonicalTrade, InstrumentRecord, etc.
+Domain: CanonicalOrderBook, CanonicalTrade, InstrumentWarehouseRow, etc.
 Execution: CanonicalOrder, CanonicalFill, ExecutionInstruction, etc.
 Errors: CanonicalError, CanonicalRateLimitError (grouped).
 
 Self-contained: no imports from unified_api_contracts.internal.
+
+Note: InstrumentWarehouseRow was renamed from InstrumentRecord to avoid collision
+with UIC's InstrumentRecord (31-field, Decimal, normalized adapter contract).
 """
 
 from .domain import (
+    CanonicalDerivativeTicker,
+    CanonicalLiquidation,
     CanonicalOrderBook,
+    CanonicalTicker,
     CanonicalTrade,
-    InstrumentRecord,
     InstrumentType,
+    InstrumentWarehouseRow,
     MarketTrade,
     OrderBookSnapshot5,
     ProcessedCandle,
@@ -28,16 +34,20 @@ from .execution import (
 )
 
 __all__ = [
+    "CanonicalDerivativeTicker",
     "CanonicalError",
     "CanonicalFill",
+    "CanonicalLiquidation",
     "CanonicalOrder",
     "CanonicalOrderBook",
     "CanonicalRateLimitError",
+    "CanonicalTicker",
     "CanonicalTrade",
     "ExecutionInstruction",
     "ExecutionResult",
-    "InstrumentRecord",
     "InstrumentType",
+    # InstrumentWarehouseRow — renamed from InstrumentRecord to avoid collision with UIC's InstrumentRecord
+    "InstrumentWarehouseRow",
     "MarketTrade",
     "OrderBookSnapshot5",
     "OrderSide",

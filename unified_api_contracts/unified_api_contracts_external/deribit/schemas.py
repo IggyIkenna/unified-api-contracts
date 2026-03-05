@@ -532,3 +532,168 @@ class DeribitLiquidationOrder(BaseModel):
     amount: float | None = None
     side: str | None = None
     timestamp: int | None = None
+
+
+# === Migrated from unified-market-interface adapters ===
+
+
+class DeribitJsonRpcResponse(BaseModel, frozen=True):
+    """Generic Deribit JSON-RPC response envelope."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: object | None = None
+    error: DeribitError | None = None
+
+
+class DeribitOrderInfo(BaseModel, frozen=True):
+    """Order info returned in buy/sell result."""
+
+    order_id: str = ""
+    order_state: str = "open"
+    instrument_name: str = ""
+    direction: str = ""
+    amount: float = 0.0
+    price: float | None = None
+    filled_amount: float = 0.0
+    average_price: float = 0.0
+
+
+class DeribitOrderResult(BaseModel, frozen=True):
+    """Result payload for buy/sell endpoints."""
+
+    order: DeribitOrderInfo = DeribitOrderInfo()
+    trades: list["DeribitTradeFrozen"] = []
+
+
+class DeribitTradeFrozen(BaseModel, frozen=True):
+    """A single fill/trade returned by Deribit (frozen, API-boundary variant)."""
+
+    trade_id: str = ""
+    amount: float = 0.0
+    price: float = 0.0
+    fee: float = 0.0
+    timestamp: int = 0
+
+
+class DeribitOrderResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for buy/sell endpoints."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: DeribitOrderResult | None = None
+    error: DeribitError | None = None
+
+
+class DeribitCancelResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for cancel endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: DeribitOrderInfo | None = None
+    error: DeribitError | None = None
+
+
+class DeribitOrderStateResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for get_order_state endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: DeribitOrderInfo | None = None
+    error: DeribitError | None = None
+
+
+class DeribitPositionFrozen(BaseModel, frozen=True):
+    """A single position returned by get_positions (frozen, API-boundary variant).
+
+    Uses floating_profit_loss alias for unrealized_pnl per Deribit REST response.
+    """
+
+    instrument_name: str = ""
+    size: float = 0.0
+    average_price: float = 0.0
+    unrealized_pnl: float = 0.0
+
+    model_config = {"populate_by_name": True}
+
+
+class DeribitPositionsResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for get_positions endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: list[DeribitPositionFrozen] = []
+    error: DeribitError | None = None
+
+
+class DeribitOpenOrdersResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for get_open_orders endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: list[DeribitOrderInfo] = []
+    error: DeribitError | None = None
+
+
+class DeribitInstrumentFrozen(BaseModel, frozen=True):
+    """A single instrument returned by get_instruments (frozen, API-boundary variant)."""
+
+    instrument_name: str = ""
+    kind: str = ""
+    base_currency: str = ""
+    quote_currency: str = ""
+    expiration_timestamp: int | None = None
+    strike: float | None = None
+    option_type: str | None = None
+    tick_size: float | None = None
+    contract_size: float | None = None
+    min_trade_amount: float | None = None
+
+
+class DeribitInstrumentsResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for get_instruments endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: list[DeribitInstrumentFrozen] = []
+    error: DeribitError | None = None
+
+
+class DeribitTickerResult(BaseModel, frozen=True):
+    """Ticker data returned by Deribit REST ticker endpoint."""
+
+    last_price: float | None = None
+    best_bid_price: float | None = None
+    best_ask_price: float | None = None
+    mark_price: float | None = None
+    index_price: float | None = None
+    instrument_name: str = ""
+
+
+class DeribitTickerResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for ticker endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: DeribitTickerResult | None = None
+    error: DeribitError | None = None
+
+
+class DeribitAccountSummaryFrozen(BaseModel, frozen=True):
+    """Account summary data (frozen, API-boundary variant)."""
+
+    equity: float | None = None
+    available_funds: float | None = None
+    margin_balance: float | None = None
+    wallet_balance: float | None = None
+    initial_margin: float | None = None
+    maintenance_margin: float | None = None
+
+
+class DeribitAccountSummaryResponse(BaseModel, frozen=True):
+    """Full JSON-RPC response for get_account_summary endpoint."""
+
+    jsonrpc: str = "2.0"
+    id: int | None = None
+    result: DeribitAccountSummaryFrozen | None = None
+    error: DeribitError | None = None

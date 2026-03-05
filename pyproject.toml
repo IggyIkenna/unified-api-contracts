@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unified-api-contracts"
-version = "0.1.2"
+version = "0.1.7"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading library"
 requires-python = ">=3.13,<3.14"
 authors = [{ name = "Ikenna Igboaka" }]
@@ -85,6 +85,8 @@ ignore = []  # E501 enforced (line-length 120)
 [tool.ruff.lint.per-file-ignores]
 "unified_api_contracts/**/schemas.py" = ["N815"]
 "unified_api_contracts/unified_api_contracts_external/**/schemas.py" = ["N815"]
+"unified_api_contracts/unified_api_contracts_external/**/__init__.py" = ["N815"]
+"unified_api_contracts/unified_api_contracts_external/yahoo_finance/__init__.py" = ["N815"]
 "unified_api_contracts/unified_api_contracts_external/binance/*.py" = ["N815", "F403", "F405"]
 "unified_api_contracts/unified_api_contracts_external/cloud_sdks/*.py" = ["N803", "N815", "F403", "F405"]
 "unified_api_contracts/unified_api_contracts_external/cloud_sdks/**/*.py" = ["N803", "N815", "F403", "F405"]

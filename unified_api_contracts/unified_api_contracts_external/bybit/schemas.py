@@ -101,6 +101,35 @@ class BybitIndexPriceKline(BaseModel):
         )
 
 
+class BybitKline(BaseModel):
+    """Bybit OHLCV kline/candlestick (REST: GET /v5/market/kline).
+
+    Each candle: [startTime, openPrice, highPrice, lowPrice, closePrice, volume, turnover].
+    Sorted in reverse order by startTime (most recent first).
+    """
+
+    startTime: str  # timestamp ms (bar open time)
+    openPrice: str
+    highPrice: str
+    lowPrice: str
+    closePrice: str
+    volume: str  # base asset volume
+    turnover: str | None = None  # quote asset volume
+
+    @classmethod
+    def from_list(cls, row: list[str]) -> "BybitKline":
+        """Create from array [startTime, openPrice, highPrice, lowPrice, closePrice, volume, turnover]."""
+        return cls(
+            startTime=row[0],
+            openPrice=row[1],
+            highPrice=row[2],
+            lowPrice=row[3],
+            closePrice=row[4],
+            volume=row[5],
+            turnover=row[6] if len(row) > 6 else None,
+        )
+
+
 class BybitOrder(BaseModel):
     """Bybit order."""
 
