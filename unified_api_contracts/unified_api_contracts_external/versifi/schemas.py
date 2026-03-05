@@ -15,7 +15,43 @@ Cancellation: DELETE /v2/orders/{id} returns HTTP 204 + WebSocket confirmation.
 
 from __future__ import annotations
 
+import json
+from typing import cast
+
 from pydantic import BaseModel
+
+from ..binance.order_schemas import BinanceError
+from ..okx.schemas import OKXError
+
+# VersiFi passes the raw exchange error JSON as a string in reject_reason.
+# Binance errors: {"code": int, "msg": str}  (negative int codes e.g. -1100)
+# OKX errors:    {"code": str, "msg": str}   (string codes e.g. "51002")
+# Discriminator: if code parses as int → BinanceError, else → OKXError.
+VersiFiRejectReason = BinanceError | OKXError
+
+
+def parse_reject_reason(raw: str | None) -> VersiFiRejectReason | None:
+    """Parse a VersiFi reject_reason string into the typed exchange error.
+
+    Returns BinanceError if the underlying exchange code is an integer
+    (Binance/BINANCE_UNIFIED), OKXError if it is a string (OKX_SPOT/FUTURES),
+    or None if raw is absent or not valid JSON.
+    """
+    if not raw:
+        return None
+    try:
+        parsed: object = cast(object, json.loads(raw))
+    except (ValueError, TypeError):
+        return None
+    if not isinstance(parsed, dict):
+        return None
+    # Extract only the two fields we need, narrowing from dict[Unknown, Unknown]
+    items: list[tuple[object, object]] = list(parsed.items())  # type: ignore[union-attr]
+    field_map: dict[str, object] = {str(k): v for k, v in items if isinstance(k, str)}
+    code: object = field_map.get("code")
+    if isinstance(code, int) or (isinstance(code, str) and code.lstrip("-").isdigit()):
+        return BinanceError.model_validate(field_map)
+    return OKXError.model_validate(field_map)
 
 
 class VersiFiBasicOrderRequest(BaseModel):

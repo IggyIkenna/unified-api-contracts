@@ -39,6 +39,8 @@ from ...unified_api_contracts_external.versifi.schemas import (
     VersiFiOrderDetail,
     VersiFiOrderListItem,
     VersiFiOrderResponse,
+    VersiFiRejectReason,
+    parse_reject_reason,
 )
 from ..execution import (
     CanonicalFill,
@@ -127,6 +129,20 @@ def _parse_versifi_tif(tif: str | None) -> TimeInForce:
     if t in ("GTX", "POST_ON"):
         return TimeInForce.POST_ONLY
     return TimeInForce.GTC
+
+
+def resolve_versifi_reject_reason(raw: str | None) -> str | None:
+    """Parse VersiFi reject_reason string into a typed exchange error, then return msg.
+
+    Detects BinanceError (integer code) vs OKXError (string code) automatically.
+    Returns the exchange error message string, or the raw value if not JSON.
+    """
+    if not raw:
+        return None
+    parsed: VersiFiRejectReason | None = parse_reject_reason(raw)
+    if parsed is not None:
+        return parsed.msg or raw
+    return raw  # not JSON — pass through as-is
 
 
 def _ts_epoch_seconds_to_datetime(ts: int | None) -> datetime:
