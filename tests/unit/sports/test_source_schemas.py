@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import pytest
 
-from unified_api_contracts.sports.sources.api_football.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.api_football.schemas import (
     APIFootballEvent,
     APIFootballFixture,
     APIFootballLeague,
@@ -19,7 +19,7 @@ from unified_api_contracts.sports.sources.api_football.schemas import (
     APIFootballTeam,
     APIFootballVenue,
 )
-from unified_api_contracts.sports.sources.betfair.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.betfair.schemas import (
     BetfairExchangeOdds,
     BetfairMarket,
     BetfairMarketStatus,
@@ -27,7 +27,7 @@ from unified_api_contracts.sports.sources.betfair.schemas import (
     BetfairPrice,
     BetfairRunner,
 )
-from unified_api_contracts.sports.sources.footystats.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.footystats.schemas import (
     FootyStatsBTTS,
     FootyStatsLeague,
     FootyStatsMatch,
@@ -37,25 +37,25 @@ from unified_api_contracts.sports.sources.footystats.schemas import (
     FootyStatsReferee,
     FootyStatsTeam,
 )
-from unified_api_contracts.sports.sources.odds_api.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.odds_api.schemas import (
     OddsApiBookmaker,
     OddsApiEvent,
     OddsApiMarket,
     OddsApiOutcome,
 )
-from unified_api_contracts.sports.sources.open_meteo.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.open_meteo.schemas import (
     OpenMeteoForecast,
     OpenMeteoWeather,
     WeatherAtKickoff,
     WeatherCondition,
 )
-from unified_api_contracts.sports.sources.pinnacle.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.pinnacle.schemas import (
     PinnacleEvent,
     PinnacleLine,
     PinnacleMatchup,
     PinnacleOdds,
 )
-from unified_api_contracts.sports.sources.soccer_football_info.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.soccer_football_info.schemas import (
     SFILeague,
     SFIMatch,
     SFIMatchDominance,
@@ -63,7 +63,7 @@ from unified_api_contracts.sports.sources.soccer_football_info.schemas import (
     SFIMatchProgressiveStats,
     SFITeam,
 )
-from unified_api_contracts.sports.sources.understat.schemas import (
+from unified_api_contracts.unified_api_contracts_external.sports.sources.understat.schemas import (
     UnderstatMatch,
     UnderstatPlayerSeason,
     UnderstatShot,

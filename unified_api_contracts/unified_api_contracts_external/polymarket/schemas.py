@@ -256,7 +256,7 @@ class PolymarketGammaMarket(BaseModel):
     icon: str | None = None
     image: str | None = None
     # Rewards
-    rewards: dict | None = None
+    rewards: dict[str, object] | None = None
 
 
 class PolymarketGammaSeries(BaseModel):

@@ -169,7 +169,7 @@ class CoinbaseProductInfo(BaseModel):
     product_type: str | None = None  # SPOT, FUTURE
     quote_currency_id: str | None = None
     base_currency_id: str | None = None
-    fcm_trading_session_details: dict | None = None
+    fcm_trading_session_details: dict[str, object] | None = None
     mid_market_price: str | None = None
     alias: str | None = None
     alias_to: list[str] | None = None
@@ -299,7 +299,7 @@ class CoinbaseFeeSchedule(BaseModel):
     advanced_trade_only_fees: Decimal | float | None = None
     volume_breakdown: list[dict[str, object]] | None = None
     margin_rate: Decimal | float | None = None  # futures only
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class CoinbaseOrder(BaseModel):
@@ -318,7 +318,7 @@ class CoinbaseOrder(BaseModel):
     fee: str | None = None
     total_value_after_fees: str | None = None
     order_configuration: dict[str, object] | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class CoinbaseFill(BaseModel):
@@ -333,4 +333,4 @@ class CoinbaseFill(BaseModel):
     created_time: str | None = None
     liquidity: str | None = None  # maker, taker
     side: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None

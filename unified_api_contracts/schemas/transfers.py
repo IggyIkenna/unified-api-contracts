@@ -32,7 +32,7 @@ class EthSendRawTransactionResponse(BaseModel):
     jsonrpc: Literal["2.0"] = "2.0"
     id: int | str
     result: str | None = Field(None, description="Tx hash on success")
-    error: dict | None = Field(None, description="Error object on failure")
+    error: dict[str, object] | None = Field(None, description="Error object on failure")
 
 
 # --- eth_sendTransaction / eth_call transaction object (unsigned) ---

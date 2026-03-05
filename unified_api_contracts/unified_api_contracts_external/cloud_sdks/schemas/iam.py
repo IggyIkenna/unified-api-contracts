@@ -132,7 +132,7 @@ class IamAuditConfig(BaseModel):
     """Audit logging configuration for a GCP service in an IAM policy."""
 
     service: str | None = None
-    audit_log_configs: list[dict] | None = None
+    audit_log_configs: list[dict[str, object]] | None = None
 
 
 class ResourceIamPolicy(BaseModel):
@@ -148,8 +148,8 @@ class OrgPolicy(BaseModel):
     """Organization policy constraint."""
 
     name: str | None = None
-    spec: dict | None = None
-    effective_policy: dict | None = None
+    spec: dict[str, object] | None = None
+    effective_policy: dict[str, object] | None = None
     etag: str | None = None
     update_time: str | None = None
 
@@ -173,8 +173,8 @@ class WorkloadIdentityPoolProvider(BaseModel):
     disabled: bool | None = None
     attribute_mapping: dict[str, str] | None = None
     attribute_condition: str | None = None
-    oidc: dict | None = None
-    aws: dict | None = None
+    oidc: dict[str, object] | None = None
+    aws: dict[str, object] | None = None
 
 
 class ServiceAccountImpersonationRequest(BaseModel):

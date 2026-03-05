@@ -8,13 +8,13 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.sports.canonical.live import (
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.live import (
     LiveMatchState,
     LiveOddsUpdate,
     MatchPeriod,
     ScraperVersionMeta,
 )
-from unified_api_contracts.sports.canonical.odds import CanonicalOdds, OddsType
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds import CanonicalOdds, OddsType
 
 NOW = datetime.now(tz=UTC)
 
@@ -240,7 +240,7 @@ class TestScraperVersionMeta:
 @pytest.mark.unit
 class TestLiveSchemaExports:
     def test_import_from_canonical(self) -> None:
-        from unified_api_contracts.sports.canonical import (
+        from unified_api_contracts.unified_api_contracts_external.sports.canonical import (
             LiveMatchState,
             LiveOddsUpdate,
             MatchPeriod,

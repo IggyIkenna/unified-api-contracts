@@ -126,4 +126,4 @@ class CoinbaseWithdrawResponse(BaseModel):
 
     id: str | None = Field(None, description="Transaction ID")
     status: str | None = None
-    amount: dict | None = None
+    amount: dict[str, object] | None = None

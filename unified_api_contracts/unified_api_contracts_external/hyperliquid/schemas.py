@@ -262,7 +262,7 @@ class HyperliquidTicker(BaseModel):
     dayNtlVlm: str | None = None
     funding: str | None = None
     openInterest: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class HyperliquidOrder(BaseModel):
@@ -272,11 +272,11 @@ class HyperliquidOrder(BaseModel):
     side: str | None = None
     limitPx: str | None = None
     sz: str | None = None
-    orderType: dict | None = None
+    orderType: dict[str, object] | None = None
     oid: int | None = None
     timestamp: int | None = None
     status: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class HyperliquidPosition(BaseModel):
@@ -287,14 +287,14 @@ class HyperliquidPosition(BaseModel):
     positionValue: str | None = None
     unrealizedPnl: str | None = None
     szi: str | None = None  # size (signed)
-    leverage: dict | None = None
-    info: dict | None = None
+    leverage: dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 class HyperliquidError(BaseModel):
     """Hyperliquid API error."""
 
-    response: dict | None = None
+    response: dict[str, object] | None = None
     message: str | None = None
 
     @classmethod
@@ -315,7 +315,7 @@ class HyperliquidStatsRow(BaseModel):
     coin: str | None = None
     volume: str | float | None = None
     openInterest: str | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class HyperliquidWebSocketSubscribe(BaseModel):

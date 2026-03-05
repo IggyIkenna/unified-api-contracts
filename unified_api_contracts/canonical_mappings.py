@@ -265,7 +265,7 @@ DEFI_DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
 
 def get_defi_venue(dataset_or_subgraph: str) -> str | None:
     """Map DeFi dataset/subgraph identifier to canonical venue. Returns None if unknown."""
-    key = dataset_or_subgraph.lower().strip() if isinstance(dataset_or_subgraph, str) else ""
+    key = dataset_or_subgraph.lower().strip() if dataset_or_subgraph else ""
     return DEFI_DATASET_TO_CANONICAL_VENUE.get(key)
 
 

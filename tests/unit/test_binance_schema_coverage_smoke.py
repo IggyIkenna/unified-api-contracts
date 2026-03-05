@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 import requests
-from unified_api_contracts.binance.schemas import BinanceTicker
+from unified_api_contracts.binance import BinanceTicker
 
 from unified_api_contracts.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 

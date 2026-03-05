@@ -9,9 +9,9 @@ class GraphQLError(BaseModel):
     """GraphQL error entry."""
 
     message: str = Field(..., description="Error message")
-    locations: list[dict] | None = None
+    locations: list[dict[str, object]] | None = None
     path: list[str | int] | None = None
-    extensions: dict | None = None
+    extensions: dict[str, object] | None = None
 
     @classmethod
     def classify(cls, message: str | None = None, http_status: int | None = None) -> ErrorAction:
@@ -28,7 +28,7 @@ class GraphQLError(BaseModel):
 class TheGraphResponse(BaseModel):
     """Wrapper for GraphQL response (data + errors)."""
 
-    data: dict | None = None
+    data: dict[str, object] | None = None
     errors: list[GraphQLError] | None = None
 
 
@@ -37,15 +37,15 @@ class SubgraphPool(BaseModel):
     """Pool entity (Uniswap V2/V3 style)."""
 
     id: str | None = None
-    token0: dict | None = None
-    token1: dict | None = None
+    token0: dict[str, object] | None = None
+    token1: dict[str, object] | None = None
     reserve0: str | None = None
     reserve1: str | None = None
     totalSupply: str | None = None
     liquidity: str | None = None
     sqrtPriceX96: str | None = None
     tick: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class SubgraphSwap(BaseModel):
@@ -59,9 +59,9 @@ class SubgraphSwap(BaseModel):
     amountUSD: str | None = None
     sender: str | None = None
     to: str | None = None
-    pair: dict | None = None
+    pair: dict[str, object] | None = None
     timestamp: str | int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class SubgraphToken(BaseModel):
@@ -83,7 +83,7 @@ class SubgraphReserve(BaseModel):
     availableLiquidity: str | None = None
     totalBorrows: str | None = None
     liquidityRate: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class SubgraphAaveUserPosition(BaseModel):
@@ -91,14 +91,14 @@ class SubgraphAaveUserPosition(BaseModel):
 
     id: str | None = None
     user: str | None = None
-    reserve: dict | None = None
+    reserve: dict[str, object] | None = None
     currentATokenBalance: str | None = None
     currentTotalDebt: str | None = None
     scaledATokenBalance: str | None = None
     scaledVariableDebt: str | None = None
     principalStableDebt: str | None = None
     liquidityRate: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Uniswap V3 ---
@@ -107,9 +107,9 @@ class SubgraphUniV3Position(BaseModel):
 
     id: str | None = None
     owner: str | None = None
-    pool: dict | None = None
-    token0: dict | None = None
-    token1: dict | None = None
+    pool: dict[str, object] | None = None
+    token0: dict[str, object] | None = None
+    token1: dict[str, object] | None = None
     liquidity: str | None = None
     tickLower: int | None = None
     tickUpper: int | None = None
@@ -119,20 +119,20 @@ class SubgraphUniV3Position(BaseModel):
     withdrawnToken1: str | None = None
     collectedFeesToken0: str | None = None
     collectedFeesToken1: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class SubgraphUniV3PoolTick(BaseModel):
     """Uniswap V3 pool tick."""
 
     id: str | None = None
-    pool: dict | None = None
+    pool: dict[str, object] | None = None
     tickIdx: int | None = None
     liquidityGross: str | None = None
     liquidityNet: str | None = None
     price0: str | None = None
     price1: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Curve ---
@@ -140,11 +140,11 @@ class SubgraphCurveGauge(BaseModel):
     """Curve gauge (gauge voting / rewards)."""
 
     id: str | None = None
-    pool: dict | None = None
+    pool: dict[str, object] | None = None
     totalSupply: str | None = None
     workingSupply: str | None = None
     inflationRate: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class SubgraphCurveVotingEscrow(BaseModel):
@@ -154,7 +154,7 @@ class SubgraphCurveVotingEscrow(BaseModel):
     user: str | None = None
     lockedBalance: str | None = None
     unlockTime: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Morpho ---
@@ -163,11 +163,11 @@ class SubgraphMorphoPosition(BaseModel):
 
     id: str | None = None
     user: str | None = None
-    market: dict | None = None
+    market: dict[str, object] | None = None
     supplyShares: str | None = None
     borrowShares: str | None = None
     collateral: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Lido ---
@@ -179,7 +179,7 @@ class SubgraphLidoRebase(BaseModel):
     postTotalPooledEther: str | None = None
     timeElapsed: str | None = None
     sharesMintedAsFees: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Ethena ---
@@ -190,7 +190,7 @@ class SubgraphEthenaYield(BaseModel):
     amount: str | None = None
     apy: str | None = None
     timestamp: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- ERC20 ---
@@ -201,11 +201,11 @@ class SubgraphERC20Transfer(BaseModel):
     from_: str | None = Field(None, alias="from")
     to: str | None = None
     value: str | None = None
-    token: dict | None = None
+    token: dict[str, object] | None = None
     blockNumber: int | None = None
     timestamp: int | None = None
     transactionHash: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
     model_config = {"populate_by_name": True}
 
@@ -217,8 +217,17 @@ class SubgraphERC20Approval(BaseModel):
     owner: str | None = None
     spender: str | None = None
     value: str | None = None
-    token: dict | None = None
+    token: dict[str, object] | None = None
     blockNumber: int | None = None
     timestamp: int | None = None
     transactionHash: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
+
+
+class TheGraphWsNext(BaseModel):
+    """GraphQL WebSocket next message payload."""
+
+    type: str = "next"
+    id: str | None = None
+    payload: dict[str, object] | None = None
+    data: dict[str, object] | None = None

@@ -1,3 +1,10 @@
+[tool.uv]
+# pip-audit: eth-abi 4.2.1 GHSA-3qwc-47jf-5rf7 → 5.0.1; gunicorn 21.2.0 CVE-2024-* → 22.0.0
+override-dependencies = [
+    "eth-abi>=5.0.1",
+    "gunicorn>=22.0.0",
+]
+
 [build-system]
 requires = ["setuptools>=75", "wheel"]
 build-backend = "setuptools.build_meta"
@@ -36,12 +43,12 @@ dev = [
     "pytest-timeout>=2.4.0,<3.0.0",
     "ruff==0.15.0",
     "basedpyright>=1.21.0,<2.0.0",
-    "pip-audit>=2.7.0",
-    "bandit>=1.7.0",
-    "vcrpy>=6.0.0",
+    "pip-audit>=2.7.0,<3.0.0",
+    "bandit>=1.7.0,<2.0.0",
+    "vcrpy>=6.0.0,<7.0.0",
     "requests>=2.32.5,<3.0.0",
     "pre-commit>=3.0,<4.0.0",
-    "hypothesis>=6.0.0",
+    "hypothesis>=6.0.0,<7.0.0",
     "httpx>=0.28.1,<1.0.0",
 ]
 # For live contract verification (install from workspace path, not PyPI):
@@ -95,7 +102,7 @@ indent-style = "space"
 [tool.basedpyright]
 # Enforce no Any/object — use specific types
 reportAny = "error"
-reportUnknownVariableType = "warning"
+reportUnknownVariableType = "error"
 reportUnknownParameterType = "warning"
 reportUnknownMemberType = "warning"
 pythonVersion = "3.13"

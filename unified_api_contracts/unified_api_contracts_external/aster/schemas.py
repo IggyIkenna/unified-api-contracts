@@ -271,7 +271,7 @@ class AsterMarket(BaseModel):
     symbol: str | None = None
     base_asset: str | None = None
     quote_asset: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class AsterOrderBook(BaseModel):
@@ -281,7 +281,7 @@ class AsterOrderBook(BaseModel):
     bids: list[list[str | float]] | None = None
     asks: list[list[str | float]] | None = None
     timestamp: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class AsterOrder(BaseModel):
@@ -294,7 +294,7 @@ class AsterOrder(BaseModel):
     price: str | None = None
     status: str | None = None
     filled_size: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class AsterPosition(BaseModel):
@@ -305,7 +305,7 @@ class AsterPosition(BaseModel):
     size: str | None = None
     entry_price: str | None = None
     unrealized_pnl: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class AsterError(BaseModel):

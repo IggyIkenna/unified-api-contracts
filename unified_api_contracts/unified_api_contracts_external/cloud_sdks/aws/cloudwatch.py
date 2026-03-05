@@ -70,7 +70,7 @@ class CloudWatchInsightsQuery(BaseModel):
     queryString: str | None = None
     queryId: str | None = None
     status: str | None = None
-    results: list[list[dict]] | None = None
+    results: list[list[dict[str, object]]] | None = None
 
 
 class CloudWatchLogsQuotaUsage(BaseModel):

@@ -30,7 +30,7 @@ TICKER_VIX = "^VIX"  # CBOE Volatility Index
 class YahooFinanceMacroOhlcv(BaseModel):
     """OHLCV bar for macro instruments (DXY, yields, commodities)."""
 
-    datetime: datetime = Field(..., description="Bar timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Bar timestamp (UTC)")
     date: str = Field(..., description="Date in YYYY-MM-DD format")
     ticker: str = Field(..., description="Yahoo Finance ticker symbol")
     open: float | None = Field(None, description="Opening price")
@@ -54,7 +54,7 @@ class YahooFinanceMacroOhlcvResponse(BaseModel):
 class YahooFinanceDXYSnapshot(BaseModel):
     """Current DXY (US Dollar Index) snapshot."""
 
-    datetime: datetime = Field(..., description="Snapshot timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Snapshot timestamp (UTC)")
     ticker: str = Field(default=TICKER_DXY, description="DXY ticker symbol")
     price: float = Field(..., description="Current DXY value")
     change: float | None = Field(None, description="Absolute price change")
@@ -68,7 +68,7 @@ class YahooFinanceDXYSnapshot(BaseModel):
 class YahooFinanceYieldSnapshot(BaseModel):
     """Current Treasury yield snapshot."""
 
-    datetime: datetime = Field(..., description="Snapshot timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Snapshot timestamp (UTC)")
     ticker: str = Field(..., description="Yield ticker symbol (^TNX, ^IRX, ^TYX)")
     yield_value: float = Field(..., description="Yield value (e.g., 4.25 for 4.25%)")
     change: float | None = Field(None, description="Absolute yield change")
@@ -79,7 +79,7 @@ class YahooFinanceYieldSnapshot(BaseModel):
 class YahooFinanceYieldCurve(BaseModel):
     """Treasury yield curve snapshot (2Y, 10Y, 30Y)."""
 
-    datetime: datetime = Field(..., description="Snapshot timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Snapshot timestamp (UTC)")
     yield_2y: float = Field(..., description="2-Year Treasury yield (%)")
     yield_10y: float = Field(..., description="10-Year Treasury yield (%)")
     yield_30y: float = Field(..., description="30-Year Treasury yield (%)")
@@ -91,7 +91,7 @@ class YahooFinanceYieldCurve(BaseModel):
 class YahooFinanceCommoditySnapshot(BaseModel):
     """Current commodity price snapshot (gold, oil)."""
 
-    datetime: datetime = Field(..., description="Snapshot timestamp (UTC)")
+    timestamp_utc: datetime = Field(..., alias="datetime", description="Snapshot timestamp (UTC)")
     ticker: str = Field(..., description="Commodity ticker (GC=F, CL=F, BZ=F)")
     commodity: str = Field(..., description="Commodity name: gold, oil_wti, oil_brent")
     price: float = Field(..., description="Current price")

@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "event_id": "evt-001",
+      "home_team": "Team A",
+      "away_team": "Team B",
+      "commence_time": "2026-03-05T18:00:00Z",
+      "league": "league1",
+      "sport": "soccer"
+    }
+  ]
+}

@@ -12,7 +12,7 @@ class OKXMarket(BaseModel):
     instType: str | None = None  # SPOT, MARGIN, SWAP, FUTURES, OPTION
     baseCcy: str | None = None
     quoteCcy: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class OKXOrderBook(BaseModel):
@@ -36,7 +36,7 @@ class OKXTicker(BaseModel):
     bidPx: str | None = None
     askPx: str | None = None
     vol24h: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class OKXOrder(BaseModel):
@@ -52,7 +52,7 @@ class OKXOrder(BaseModel):
     state: str | None = None  # live, partially_filled, filled, canceled
     fillPx: str | None = None
     accFillSz: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class OKXPosition(BaseModel):
@@ -64,7 +64,7 @@ class OKXPosition(BaseModel):
     avgPx: str | None = None
     markPx: str | None = None
     upl: str | None = None  # unrealized PnL
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class OKXError(BaseModel):

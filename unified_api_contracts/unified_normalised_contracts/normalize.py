@@ -8,10 +8,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from unified_api_contracts.unified_api_contracts_external.binance import BinanceTrade
-from unified_api_contracts.unified_api_contracts_external.databento.schemas import DatabentoTrade
-from unified_api_contracts.unified_api_contracts_external.tardis.schemas import TardisTrade
-
+from ..unified_api_contracts_external.binance import BinanceTrade
+from ..unified_api_contracts_external.databento.schemas import DatabentoTrade
+from ..unified_api_contracts_external.tardis.schemas import TardisTrade
 from .domain import CanonicalTrade
 
 

@@ -21,7 +21,7 @@ class BinanceOrder(BaseModel):
     timeInForce: str | None = None
     time: int | None = None
     updateTime: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BinancePosition(BaseModel):
@@ -33,7 +33,7 @@ class BinancePosition(BaseModel):
     markPrice: str | None = None
     unRealizedProfit: str | None = None
     leverage: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class BinanceSpotOrderSubmitRequest(BaseModel):

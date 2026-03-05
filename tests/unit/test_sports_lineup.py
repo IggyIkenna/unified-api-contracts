@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts.sports.canonical.lineup import (
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.lineup import (
     CanonicalLineup,
     LineupPlayer,
 )

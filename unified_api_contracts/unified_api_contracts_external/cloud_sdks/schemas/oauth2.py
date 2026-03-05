@@ -114,9 +114,9 @@ class WorkloadIdentityCredential(BaseModel):
     audience: str | None = None
     subject_token_type: str | None = None
     token_url: str = "https://sts.googleapis.com/v1/token"
-    credential_source: dict | None = None
+    credential_source: dict[str, object] | None = None
     service_account_impersonation_url: str | None = None
-    service_account_impersonation: dict | None = None
+    service_account_impersonation: dict[str, object] | None = None
     scopes: list[str] | None = None
 
 

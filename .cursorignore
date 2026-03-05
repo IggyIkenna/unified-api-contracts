@@ -6,5 +6,11 @@
 **/build/**
 **/.turbo/**
 **/__pycache__/**
+**/.mypy_cache/**
+**/.hypothesis/**
+**/.ruff_cache/**
+**/.pytest_cache/**
 **/.cache/**
 **/.venv-workspace/**
+**/data/**
+**/logs/**

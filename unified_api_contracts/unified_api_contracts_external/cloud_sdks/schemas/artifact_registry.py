@@ -137,5 +137,5 @@ class ArtifactRegistryCleanupPolicy(BaseModel):
 
     id: str | None = None
     action: str | None = None
-    most_recent_versions: dict | None = None
-    condition: dict | None = None
+    most_recent_versions: dict[str, object] | None = None
+    condition: dict[str, object] | None = None

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts.sports.canonical.bookmaker import (
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import (
     BOOKMAKER_REGISTRY,
     BookmakerCategory,
     BookmakerInfo,
@@ -15,7 +15,7 @@ from unified_api_contracts.sports.canonical.bookmaker import (
 @pytest.mark.unit
 class TestBookmakerRegistry:
     def test_registry_has_20_entries(self) -> None:
-        assert len(BOOKMAKER_REGISTRY) == 20
+        assert len(BOOKMAKER_REGISTRY) == 23
 
     def test_registry_alias(self) -> None:
         assert BookmakerRegistry is BOOKMAKER_REGISTRY
@@ -45,7 +45,7 @@ class TestBookmakerRegistry:
 
     def test_scraper_count(self) -> None:
         scrapers = [k for k, v in BOOKMAKER_REGISTRY.items() if v.category == BookmakerCategory.SCRAPER]
-        assert len(scrapers) == 13
+        assert len(scrapers) == 14
 
     def test_all_have_required_fields(self) -> None:
         for key, info in BOOKMAKER_REGISTRY.items():

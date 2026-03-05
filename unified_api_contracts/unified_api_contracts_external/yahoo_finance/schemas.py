@@ -54,14 +54,14 @@ class YahooQuote(BaseModel):
     regularMarketVolume: int | None = None
     bid: float | None = None
     ask: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class YahooChartResult(BaseModel):
     """Chart/quote result wrapper."""
 
-    result: list | None = None
-    error: dict | None = None
+    result: list[object] | None = None
+    error: dict[str, object] | None = None
 
 
 class YahooError(BaseModel):

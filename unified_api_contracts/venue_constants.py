@@ -61,6 +61,9 @@ SPORTS_VENUES: set[str] = {
     "OPEN_METEO",
     "UNDERSTAT",
     "TRANSFERMARKT",
+    "SHARPAPI",
+    "ODDS_ENGINE",
+    "METABET",
 }
 
 # Zero-Alpha Venues (for LEND/BORROW/STAKE instruction types - lending, staking)
@@ -122,6 +125,9 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     "OPEN_METEO": "sports",
     "UNDERSTAT": "sports",
     "TRANSFERMARKT": "sports",
+    "SHARPAPI": "sports",
+    "ODDS_ENGINE": "sports",
+    "METABET": "sports",
 }
 
 # Map venue to supported instrument types

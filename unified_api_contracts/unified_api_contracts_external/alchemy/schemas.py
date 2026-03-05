@@ -10,8 +10,8 @@ class AlchemyRpcResponse(BaseModel):
 
     jsonrpc: str = "2.0"
     id: int | str | None = None
-    result: dict | list | str | int | float | bool | None = None
-    error: dict | None = None
+    result: dict[str, object] | list[object] | str | int | float | bool | None = None
+    error: dict[str, object] | None = None
 
 
 class AlchemyAssetTransfer(BaseModel):
@@ -24,7 +24,7 @@ class AlchemyAssetTransfer(BaseModel):
     value: float | None = None
     asset: str | None = None
     category: str | None = None
-    metadata: dict | None = None
+    metadata: dict[str, object] | None = None
 
     model_config = {"populate_by_name": True}
 
@@ -80,7 +80,7 @@ class AlchemyBlock(BaseModel):
     gasLimit: str | None = None
     gasUsed: str | None = None
     timestamp: str | None = None
-    transactions: list[str] | list[dict] | None = None
+    transactions: list[str] | list[dict[str, object]] | None = None
     uncles: list[str] | None = None
     baseFeePerGas: str | None = None
 
@@ -102,7 +102,7 @@ class AlchemyTransaction(BaseModel):
     maxFeePerGas: str | None = None
     maxPriorityFeePerGas: str | None = None
     type: str | None = None
-    accessList: list | None = None
+    accessList: list[object] | None = None
     chainId: str | None = None
 
     model_config = {"populate_by_name": True}
@@ -120,7 +120,7 @@ class AlchemyTransactionReceipt(BaseModel):
     cumulativeGasUsed: str | None = None
     gasUsed: str | None = None
     contractAddress: str | None = None
-    logs: list[dict] | None = None
+    logs: list[dict[str, object]] | None = None
     logsBloom: str | None = None
     type: str | None = None
     status: str | None = None
@@ -149,7 +149,7 @@ class AlchemyDecodedLog(BaseModel):
 
     name: str | None = None  # Transfer, Approval, Swap, Mint, Burn, etc.
     signature: str | None = None
-    decoded: dict | None = None  # event-specific params
+    decoded: dict[str, object] | None = None  # event-specific params
     address: str | None = None
     topics: list[str] | None = None
     data: str | None = None
@@ -173,7 +173,7 @@ class AlchemyEnsResolution(BaseModel):
     address: str | None = None
     name: str | None = None
     avatar: str | None = None
-    records: dict | None = None
+    records: dict[str, object] | None = None
 
 
 # --- NFT ---
@@ -184,7 +184,7 @@ class AlchemyNFTMetadata(BaseModel):
     description: str | None = None
     image: str | None = None
     external_url: str | None = None
-    attributes: list[dict] | None = None
+    attributes: list[dict[str, object]] | None = None
     animation_url: str | None = None
     background_color: str | None = None
 
@@ -197,7 +197,7 @@ class AlchemyNFTOwnership(BaseModel):
     balance: str | None = None
     owner: str | None = None
     tokenType: str | None = None
-    metadata: dict | None = None
+    metadata: dict[str, object] | None = None
 
 
 class AlchemyTokenMetadata(BaseModel):
@@ -250,8 +250,8 @@ class AlchemyWebhookCreateParams(BaseModel):
 class AlchemySimulationResult(BaseModel):
     """Transaction simulation result (alchemy_simulateAssetChanges / debug_trace)."""
 
-    changes: list[dict] | None = None
-    error: dict | None = None
+    changes: list[dict[str, object]] | None = None
+    error: dict[str, object] | None = None
     gasUsed: str | None = None
     blockNumber: str | None = None
 

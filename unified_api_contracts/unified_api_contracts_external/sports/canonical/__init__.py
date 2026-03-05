@@ -16,7 +16,9 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.betti
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import BookmakerInfo
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.events import CanonicalFixtureEvent
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.features import SportsFeatureVector
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.fixture_stats import CanonicalFixtureStatsDetail
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.fixture_stats import (
+    CanonicalFixtureStatsDetail,
+)
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.injury import CanonicalInjury
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.lineup import (
     CanonicalLineup,

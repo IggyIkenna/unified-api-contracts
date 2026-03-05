@@ -13,24 +13,24 @@ class DynamoDbTableDescription(BaseModel):
     CreationDateTime: str | None = None
     TableSizeBytes: int | None = None
     ItemCount: int | None = None
-    KeySchema: list[dict] | None = None
-    AttributeDefinitions: list[dict] | None = None
-    ProvisionedThroughput: dict | None = None
-    BillingModeSummary: dict | None = None
-    GlobalSecondaryIndexes: list[dict] | None = None
-    LocalSecondaryIndexes: list[dict] | None = None
-    StreamSpecification: dict | None = None
-    SSEDescription: dict | None = None
-    Replicas: list[dict] | None = None
+    KeySchema: list[dict[str, object]] | None = None
+    AttributeDefinitions: list[dict[str, object]] | None = None
+    ProvisionedThroughput: dict[str, object] | None = None
+    BillingModeSummary: dict[str, object] | None = None
+    GlobalSecondaryIndexes: list[dict[str, object]] | None = None
+    LocalSecondaryIndexes: list[dict[str, object]] | None = None
+    StreamSpecification: dict[str, object] | None = None
+    SSEDescription: dict[str, object] | None = None
+    Replicas: list[dict[str, object]] | None = None
 
 
 class DynamoDbGetItemRequest(BaseModel):
     """Get a single item by primary key. ddb.get_item()"""
 
     TableName: str | None = None
-    Key: dict | None = None
+    Key: dict[str, object] | None = None
     ProjectionExpression: str | None = None
-    ExpressionAttributeNames: dict | None = None
+    ExpressionAttributeNames: dict[str, object] | None = None
     ConsistentRead: bool | None = None
 
 
@@ -38,10 +38,10 @@ class DynamoDbPutItemRequest(BaseModel):
     """Put (create or replace) a single item. ddb.put_item()"""
 
     TableName: str | None = None
-    Item: dict | None = None
+    Item: dict[str, object] | None = None
     ConditionExpression: str | None = None
-    ExpressionAttributeNames: dict | None = None
-    ExpressionAttributeValues: dict | None = None
+    ExpressionAttributeNames: dict[str, object] | None = None
+    ExpressionAttributeValues: dict[str, object] | None = None
     ReturnValues: str | None = None
 
 
@@ -52,12 +52,12 @@ class DynamoDbQueryRequest(BaseModel):
     IndexName: str | None = None
     KeyConditionExpression: str | None = None
     FilterExpression: str | None = None
-    ExpressionAttributeNames: dict | None = None
-    ExpressionAttributeValues: dict | None = None
+    ExpressionAttributeNames: dict[str, object] | None = None
+    ExpressionAttributeValues: dict[str, object] | None = None
     ProjectionExpression: str | None = None
     Limit: int | None = None
     ScanIndexForward: bool | None = None
-    ExclusiveStartKey: dict | None = None
+    ExclusiveStartKey: dict[str, object] | None = None
     ConsistentRead: bool | None = None
     Select: str | None = None
 
@@ -65,17 +65,17 @@ class DynamoDbQueryRequest(BaseModel):
 class DynamoDbQueryResponse(BaseModel):
     """Query result. Equivalent of Firestore QuerySnapshot."""
 
-    Items: list[dict] | None = None
+    Items: list[dict[str, object]] | None = None
     Count: int | None = None
     ScannedCount: int | None = None
-    LastEvaluatedKey: dict | None = None
-    ConsumedCapacity: dict | None = None
+    LastEvaluatedKey: dict[str, object] | None = None
+    ConsumedCapacity: dict[str, object] | None = None
 
 
 class DynamoDbTransactWriteRequest(BaseModel):
     """Atomic multi-item write transaction. ddb.transact_write_items()"""
 
-    TransactItems: list[dict] | None = None
+    TransactItems: list[dict[str, object]] | None = None
     ReturnConsumedCapacity: str | None = None
     ReturnItemCollectionMetrics: str | None = None
     ClientRequestToken: str | None = None
@@ -89,7 +89,7 @@ class DynamoDbStreamRecord(BaseModel):
     eventSource: str | None = None
     awsRegion: str | None = None
     eventName: str | None = None
-    dynamodb: dict | None = None
+    dynamodb: dict[str, object] | None = None
     eventSourceARN: str | None = None
 
 

@@ -17,7 +17,7 @@ class DeribitInstrument(BaseModel):
     settlement_currency: str | None = None
     tick_size: Decimal | float | None = None
     min_trade_amount: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitTicker(BaseModel):
@@ -29,8 +29,8 @@ class DeribitTicker(BaseModel):
     index_price: Decimal | float | None = None
     best_bid_price: Decimal | float | None = None
     best_ask_price: Decimal | float | None = None
-    stats: dict | None = None
-    info: dict | None = None
+    stats: dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitOrderBook(BaseModel):
@@ -40,7 +40,7 @@ class DeribitOrderBook(BaseModel):
     bids: list[list[Decimal | float]] = []
     asks: list[list[Decimal | float]] = []
     change_id: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitOrder(BaseModel):
@@ -55,7 +55,7 @@ class DeribitOrder(BaseModel):
     filled_amount: Decimal | float | None = None
     average_price: Decimal | float | None = None
     creation_timestamp: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitPosition(BaseModel):
@@ -67,7 +67,7 @@ class DeribitPosition(BaseModel):
     average_price: Decimal | float | None = None
     mark_price: Decimal | float | None = None
     total_profit_loss: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitError(BaseModel):
@@ -75,7 +75,7 @@ class DeribitError(BaseModel):
 
     code: int | None = None
     message: str | None = None
-    data: dict | None = None
+    data: dict[str, object] | None = None
 
     @classmethod
     def classify(cls, code: int) -> ErrorAction:
@@ -327,7 +327,7 @@ class DeribitAccountSummary(BaseModel):
     delta_total: Decimal | float | None = None
     projected_delta_total: Decimal | float | None = None
     deposit_address: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitPortfolioMarginSummary(BaseModel):
@@ -348,7 +348,7 @@ class DeribitPortfolioMarginSummary(BaseModel):
     initial_margin: Decimal | float | None = None
     maintenance_margin: Decimal | float | None = None
     available_funds: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitVolatilityIndex(BaseModel):
@@ -367,10 +367,10 @@ class DeribitVolatilityIndex(BaseModel):
     high: Decimal | float | None = None
     low: Decimal | float | None = None
     close: Decimal | float | None = None
-    # REST candles: list of [timestamp, open, high, low, close]
+    # REST candles: list[object] of [timestamp, open, high, low, close]
     data: list[list[Decimal | float]] | None = None
     continuation: int | None = None  # pagination
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitFundingRateHistory(BaseModel):
@@ -384,7 +384,7 @@ class DeribitFundingRateHistory(BaseModel):
     funding_rate: Decimal | float
     index_price: Decimal | float | None = None
     mark_price: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitSettlementCashFlows(BaseModel):
@@ -404,7 +404,7 @@ class DeribitSettlementCashFlows(BaseModel):
     funding: Decimal | float | None = None
     session_bankruptcy: Decimal | float | None = None
     socialized: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitRiskLimit(BaseModel):
@@ -419,7 +419,7 @@ class DeribitRiskLimit(BaseModel):
     maintenance_margin: Decimal | float | None = None
     initial_margin: Decimal | float | None = None
     max_order_size: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 class DeribitSessionBankruptcyDetails(BaseModel):
@@ -435,7 +435,7 @@ class DeribitSessionBankruptcyDetails(BaseModel):
     position: Decimal | float | None = None
     mark_price: Decimal | float | None = None
     index_price: Decimal | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # ---------------------------------------------------------------------------

@@ -75,7 +75,7 @@ class CcxtOrder(BaseModel):
     reduceOnly: bool | None = None
     stopPrice: float | None = None
     trades: list["CcxtTrade"] | None = Field(None, description="List of fills for this order")
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Trade (fetch_my_trades item) ---
@@ -93,9 +93,9 @@ class CcxtTrade(BaseModel):
     price: float | None = None
     amount: float | None = None
     cost: float | None = None
-    fee: CcxtFee | dict | None = None
-    fees: list[CcxtFee | dict] | None = Field(None, description="Array of fees (multi-leg)")
-    info: dict | None = None
+    fee: CcxtFee | dict[str, object] | None = None
+    fees: list[CcxtFee | dict[str, object]] | None = Field(None, description="Array of fees (multi-leg)")
+    info: dict[str, object] | None = None
 
 
 # --- Balance (per-currency in fetch_balance) ---
@@ -117,10 +117,10 @@ class CcxtBalanceResponse(BaseModel):
 
     model_config = {"extra": "allow"}  # CCXT adds dynamic currency keys
 
-    info: list | dict | None = None
-    free: dict | None = None
-    used: dict | None = None
-    total: dict | None = None
+    info: list[object] | dict[str, object] | None = None
+    free: dict[str, object] | None = None
+    used: dict[str, object] | None = None
+    total: dict[str, object] | None = None
 
 
 # --- Position (fetch_positions item) ---
@@ -147,7 +147,7 @@ class CcxtPosition(BaseModel):
     maintenanceMargin: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Market (fetch_markets item) ---
@@ -172,11 +172,11 @@ class CcxtMarket(BaseModel):
     settleId: str | None = None
     linear: bool | None = None
     inverse: bool | None = None
-    precision: CcxtMarketPrecision | dict | None = None
-    limits: CcxtMarketLimits | dict | None = None
+    precision: CcxtMarketPrecision | dict[str, object] | None = None
+    limits: CcxtMarketLimits | dict[str, object] | None = None
     percentage: bool | None = None
-    fees: CcxtMarketFees | dict | None = None
-    info: dict | None = None
+    fees: CcxtMarketFees | dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Ticker (fetch_ticker) ---
@@ -190,7 +190,7 @@ class CcxtTicker(BaseModel):
     high: float | None = None
     low: float | None = None
     volume: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Order book (fetch_order_book) ---
@@ -203,7 +203,7 @@ class CcxtOrderBook(BaseModel):
     timestamp: int | None = None
     datetime: str | None = None
     nonce: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Funding rate (fetch_funding_rate) ---
@@ -214,7 +214,7 @@ class CcxtFundingRate(BaseModel):
     fundingRate: float | None = None
     fundingTimestamp: int | None = None
     fundingDatetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Funding rate history (fetch_funding_rate_history) ---
@@ -225,7 +225,7 @@ class CcxtFundingRateHistory(BaseModel):
     fundingRate: float | None = None
     fundingTimestamp: int | None = None
     fundingDatetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Open interest (fetch_open_interest) ---
@@ -237,7 +237,7 @@ class CcxtOpenInterest(BaseModel):
     openInterestValue: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Open interest history (fetch_open_interest_history) ---
@@ -249,7 +249,7 @@ class CcxtOpenInterestHistory(BaseModel):
     openInterestValue: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- OHLCV (fetch_ohlcv item) ---
@@ -262,7 +262,7 @@ class CcxtOhlcv(BaseModel):
     low: float | None = None
     close: float | None = None
     volume: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Aggregate trade (fetch_trades / public trades) ---
@@ -276,7 +276,7 @@ class CcxtAggTrade(BaseModel):
     side: str | None = None
     price: float | None = None
     amount: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Leverage tier (nested in CcxtLeverageTiers) ---
@@ -288,7 +288,7 @@ class CcxtLeverageTier(BaseModel):
     maxNotional: float | None = None
     maintenanceMarginRate: float | None = None
     maxLeverage: int | float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Leverage tiers (fetch_leverage_tiers) ---
@@ -297,7 +297,7 @@ class CcxtLeverageTiers(BaseModel):
 
     symbol: str | None = None
     tiers: list[CcxtLeverageTier] | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Long/short ratio (fetch_long_short_ratio) ---
@@ -310,7 +310,7 @@ class CcxtLongShortRatio(BaseModel):
     shortAccount: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Greeks (fetch_greeks / options) ---
@@ -323,7 +323,7 @@ class CcxtGreeks(BaseModel):
     theta: float | None = None
     vega: float | None = None
     timestamp: int | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Withdrawal (fetch_withdrawals / withdraw) ---
@@ -339,8 +339,8 @@ class CcxtWithdrawal(BaseModel):
     status: str | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    fee: CcxtFee | dict | None = None
-    info: dict | None = None
+    fee: CcxtFee | dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Deposit (fetch_deposits) ---
@@ -356,8 +356,8 @@ class CcxtDeposit(BaseModel):
     status: str | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    fee: CcxtFee | dict | None = None
-    info: dict | None = None
+    fee: CcxtFee | dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Deposit address (fetch_deposit_address) ---
@@ -368,7 +368,7 @@ class CcxtDepositAddress(BaseModel):
     address: str | None = None
     tag: str | None = None
     network: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Ledger (fetch_ledger / fetch_transactions) ---
@@ -380,10 +380,10 @@ class CcxtLedger(BaseModel):
     currency: str | None = None
     amount: float | None = None
     balance: float | None = None
-    fee: CcxtFee | dict | None = None
+    fee: CcxtFee | dict[str, object] | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Transfer (transfer) ---
@@ -398,7 +398,7 @@ class CcxtTransfer(BaseModel):
     timestamp: int | None = None
     datetime: str | None = None
     status: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Trading fee (fetch_trading_fee) ---
@@ -410,7 +410,7 @@ class CcxtTradingFee(BaseModel):
     taker: float | None = None
     percentage: bool | None = None
     tierBased: bool | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Borrow rate (fetch_borrow_rate / fetch_borrow_rates) ---
@@ -422,7 +422,7 @@ class CcxtBorrowRate(BaseModel):
     period: int | None = None  # milliseconds
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Borrow interest (fetch_borrow_interest) ---
@@ -434,7 +434,7 @@ class CcxtBorrowInterest(BaseModel):
     symbol: str | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Margin adjustment (add/reduce/set margin, fetch_margin_adjustment_history) ---
@@ -447,7 +447,7 @@ class CcxtMarginAdjustment(BaseModel):
     code: str | None = None
     symbol: str | None = None
     status: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Insurance fund (fetch_insurance_fund) ---
@@ -459,7 +459,7 @@ class CcxtInsuranceFund(BaseModel):
     balanceInUsd: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Liquidation (fetch_liquidations) ---
@@ -477,7 +477,7 @@ class CcxtLiquidation(BaseModel):
     contractSize: float | None = None
     baseValue: float | None = None
     quoteValue: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Settlement history (fetch_settlement_history) ---
@@ -488,7 +488,7 @@ class CcxtSettlementHistory(BaseModel):
     price: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Subaccount / Account (fetch_accounts / fetch_subaccounts) ---
@@ -499,7 +499,7 @@ class CcxtSubaccount(BaseModel):
     type: str | None = None  # main, margin, spot, subaccount
     name: str | None = None
     code: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Currency network (nested in CcxtCurrency) ---
@@ -514,8 +514,8 @@ class CcxtCurrencyNetwork(BaseModel):
     precision: int | float | None = None
     deposit: bool | None = None
     withdraw: bool | None = None
-    limits: dict | None = None
-    info: dict | None = None
+    limits: dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Currency (fetch_currencies item) ---
@@ -530,9 +530,9 @@ class CcxtCurrency(BaseModel):
     precision: int | float | None = None
     deposit: bool | None = None
     withdraw: bool | None = None
-    limits: dict | None = None
-    networks: dict[str, CcxtCurrencyNetwork | dict] | None = None
-    info: dict | None = None
+    limits: dict[str, object] | None = None
+    networks: dict[str, CcxtCurrencyNetwork | dict[str, object]] | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Option (fetch_option / fetch_option_chain) ---
@@ -555,16 +555,16 @@ class CcxtOption(BaseModel):
     percentage: float | None = None
     baseVolume: float | None = None
     quoteVolume: float | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Fees (fetch_fees - all fees) ---
 class CcxtFees(BaseModel):
     """CCXT fetch_fees response (trading, funding, etc.)."""
 
-    trading: dict[str, CcxtTradingFee | dict] | None = None  # symbol -> fee
-    funding: dict | None = None
-    info: dict | None = None
+    trading: dict[str, CcxtTradingFee | dict[str, object]] | None = None  # symbol -> fee
+    funding: dict[str, object] | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Volatility history (fetch_volatility_history, optional) ---
@@ -575,7 +575,7 @@ class CcxtVolatilityHistory(BaseModel):
     volatility: float | None = None
     timestamp: int | None = None
     datetime: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Leverage (set_leverage response) ---
@@ -585,7 +585,7 @@ class CcxtLeverage(BaseModel):
     symbol: str | None = None
     leverage: float | int | None = None
     marginMode: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
 
 # --- Error (CCXT exception payload) ---
@@ -594,7 +594,7 @@ class CcxtErrorPayload(BaseModel):
 
     code: str | None = None
     message: str | None = None
-    info: dict | None = None
+    info: dict[str, object] | None = None
 
     @classmethod
     def classify(cls, code: str | None = None, message: str | None = None) -> ErrorAction:

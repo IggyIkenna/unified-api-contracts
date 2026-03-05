@@ -283,6 +283,17 @@ BOOKMAKER_REGISTRY: dict[str, BookmakerInfo] = {
         max_bet_gbp=Decimal("50000.00"),
         scrape_url="https://www.bet365.com/",
     ),
+    "sbo": BookmakerInfo(
+        key="sbo",
+        display_name="SBOBet",
+        category=BookmakerCategory.SCRAPER,
+        currency="USD",
+        supports_live_betting=True,
+        supports_cash_out=True,
+        min_bet_gbp=Decimal("0.10"),
+        max_bet_gbp=Decimal("100000.00"),
+        scrape_url="https://www.sbobet.com/",
+    ),
 }
 
 # Alias for code that expects a registry-like name.
