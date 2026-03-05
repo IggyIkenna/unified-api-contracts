@@ -44,8 +44,13 @@ class MarketState(StrEnum):
 # ---------------------------------------------------------------------------
 
 
-class InstrumentRecord(BaseModel):
-    """Canonical instrument row (subset of INSTRUMENTS_SCHEMA columns)."""
+class InstrumentWarehouseRow(BaseModel):
+    """Canonical instrument row stored in GCS parquet (subset of INSTRUMENTS_SCHEMA columns).
+
+    Renamed from InstrumentRecord to avoid collision with UIC's InstrumentRecord
+    (31-field, Decimal, normalized adapter contract). UAC owns this type as the
+    output of instrument normalizers (normalize_databento_definition, etc.).
+    """
 
     instrument_key: str = Field(description="VENUE:INSTRUMENT_TYPE:SYMBOL")
     venue: str
@@ -300,6 +305,28 @@ class CanonicalOhlcvBar(BaseModel):
     vwap: float | None = None
 
 
+class CanonicalOptionsChainEntry(BaseModel):
+    """Normalised options chain entry — strike, greeks, bid/ask."""
+
+    timestamp: datetime
+    venue: str
+    symbol: str
+    underlying: str
+    strike: float
+    option_type: str = Field(description="call or put")
+    expiration: datetime | None = None
+    bid_price: float | None = None
+    ask_price: float | None = None
+    bid_size: float | None = None
+    ask_size: float | None = None
+    implied_volatility: float | None = None
+    delta: float | None = None
+    gamma: float | None = None
+    theta: float | None = None
+    vega: float | None = None
+    instrument_key: str | None = None
+
+
 class CanonicalMarketInfo(BaseModel):
     """Normalised market/instrument metadata — all venues."""
 
@@ -315,24 +342,13 @@ class CanonicalMarketInfo(BaseModel):
     settle_asset: str | None = None
 
 
-class CanonicalOraclePrice(BaseModel):
-    """Normalised oracle price — DeFi."""
+# CanonicalOraclePrice — owned by UIC (unified-internal-contracts/market_data/defi.py).
+# No UAC normalizer produces this type; it is only used in internal pub-sub messaging.
+# UIC re-exports it from unified_internal_contracts.market_data.
 
-    oracle: str
-    pair: str
-    price: Decimal
-    timestamp: datetime
-    chain: str = ""
-
-
-class CanonicalStakingRate(BaseModel):
-    """Normalised staking rate — DeFi."""
-
-    protocol: str
-    asset: str
-    apy: Decimal
-    timestamp: datetime
-    chain: str = ""
+# CanonicalStakingRate — owned by UIC (unified-internal-contracts/market_data/defi.py).
+# No UAC normalizer produces this type; it is only used in internal pub-sub messaging.
+# UIC re-exports it from unified_internal_contracts.market_data.
 
 
 class CanonicalWsMessage(BaseModel):
@@ -342,6 +358,50 @@ class CanonicalWsMessage(BaseModel):
     timestamp: datetime
     venue: str
     payload: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
+
+
+class WebSocketEvent(StrEnum):
+    CONNECT = "connect"
+    DISCONNECT = "disconnect"
+    PING = "ping"
+    PONG = "pong"
+    SUBSCRIBE = "subscribe"
+    UNSUBSCRIBE = "unsubscribe"
+    ERROR = "error"
+    RECONNECT = "reconnect"
+
+
+class CanonicalWebSocketLifecycle(BaseModel):
+    """Normalized WebSocket lifecycle event — connect, disconnect, ping/pong."""
+
+    venue: str
+    event: WebSocketEvent
+    timestamp: datetime
+    channel: str | None = None
+    reason: str | None = None
+    code: int | None = None  # WS close code
+    latency_ms: float | None = None
+    schema_version: str = "1.0"
+
+
+class FeeType(StrEnum):
+    """Canonical fee type (maker/taker/other)."""
+
+    MAKER = "maker"
+    TAKER = "taker"
+    OTHER = "other"
+
+
+class CanonicalFee(BaseModel):
+    """Normalised fee — all venues (rate or amount)."""
+
+    amount: Decimal = Field(description="Fee amount or rate (e.g. 0.001 for 0.1%)")
+    currency: str = Field(description="Fee currency (e.g. USDT, BTC)")
+    asset: str | None = Field(default=None, description="Asset symbol if different from currency")
+    fee_type: FeeType = Field(default=FeeType.OTHER, description="maker, taker, or other")
+    venue: str = Field(min_length=1)
+    timestamp: datetime | None = Field(default=None, description="Optional timestamp")
+    schema_version: str = "1.0"
 
 
 # ---------------------------------------------------------------------------
@@ -372,23 +432,98 @@ class ProcessedCandle(BaseModel):
     option_type: OptionType | None = None
 
 
+# ---------------------------------------------------------------------------
+# Sports and prediction market canonical schemas
+# ---------------------------------------------------------------------------
+
+
+class OddsFormat(StrEnum):
+    DECIMAL = "decimal"
+    AMERICAN = "american"
+    FRACTIONAL = "fractional"
+
+
+class CanonicalOdds(BaseModel):
+    """Normalized odds from any bookmaker/exchange."""
+
+    venue: str
+    event_id: str
+    market_id: str
+    selection_id: str
+    selection_name: str
+    decimal_odds: Decimal  # Always stored as decimal
+    timestamp: datetime
+    is_back: bool = True  # True = back/buy, False = lay/sell
+    available_size: Decimal | None = None
+    runner_name: str | None = None
+    event_name: str | None = None
+    sport: str | None = None
+    competition: str | None = None
+    schema_version: str = "1.0"
+
+
+class CanonicalBetMarket(BaseModel):
+    """Normalized betting market metadata."""
+
+    venue: str
+    market_id: str
+    event_id: str
+    market_name: str
+    event_name: str
+    sport: str | None = None
+    competition: str | None = None
+    status: str | None = None  # open, suspended, closed, settled
+    in_play: bool | None = None
+    timestamp: datetime
+    close_time: datetime | None = None
+    schema_version: str = "1.0"
+
+
+class CanonicalBetOrder(BaseModel):
+    """Normalized bet order/placement."""
+
+    venue: str
+    order_id: str
+    market_id: str
+    selection_id: str
+    side: str  # back or lay
+    price: Decimal  # decimal odds
+    size: Decimal  # stake
+    status: str  # unmatched, matched, cancelled, settled
+    timestamp: datetime
+    matched_size: Decimal | None = None
+    remaining_size: Decimal | None = None
+    schema_version: str = "1.0"
+
+
 __all__ = [
     "CanonicalBalance",
+    "CanonicalBetMarket",
+    "CanonicalBetOrder",
     "CanonicalDerivativeTicker",
+    "CanonicalFee",
     "CanonicalFundingRate",
     "CanonicalLiquidation",
     "CanonicalMarketInfo",
+    "CanonicalOdds",
     "CanonicalOhlcvBar",
-    "CanonicalOraclePrice",
+    # CanonicalOptionsChainEntry — UAC owns (produced by UAC normalizers in normalize/options.py)
+    "CanonicalOptionsChainEntry",
+    # CanonicalOraclePrice — owned by UIC; not exported from UAC
+    # CanonicalStakingRate — owned by UIC; not exported from UAC
     "CanonicalOrderBook",
     "CanonicalPosition",
-    "CanonicalStakingRate",
     "CanonicalTicker",
     "CanonicalTrade",
+    "CanonicalWebSocketLifecycle",
     "CanonicalWsMessage",
-    "InstrumentRecord",
+    "FeeType",
     "InstrumentType",
+    # InstrumentWarehouseRow — renamed from InstrumentRecord to avoid collision with UIC's InstrumentRecord
+    "InstrumentWarehouseRow",
     "MarketTrade",
+    "OddsFormat",
     "OrderBookSnapshot5",
     "ProcessedCandle",
+    "WebSocketEvent",
 ]

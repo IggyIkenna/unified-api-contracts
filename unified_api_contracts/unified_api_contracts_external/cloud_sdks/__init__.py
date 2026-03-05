@@ -7,16 +7,20 @@ Quota broker schemas for centralized quota management.
 """
 
 from .aws import S3ClientProtocol, SecretsManagerClientProtocol
-from .aws_schemas import (
+from .aws.ec2 import (
     EC2DescribeInstancesRequest,
     EC2DescribeInstancesResponse,
     EC2Instance,
     EC2RunInstancesRequest,
     EC2RunInstancesResponse,
+)
+from .aws.ecs import (
     ECSDescribeTasksRequest,
     ECSDescribeTasksResponse,
     ECSRunTaskRequest,
     ECSRunTaskResponse,
+)
+from .aws.glue import (
     GlueCreateTableRequest,
     GlueCreateTableResponse,
     GlueGetDatabaseRequest,
@@ -25,8 +29,12 @@ from .aws_schemas import (
     GlueGetTableResponse,
     GlueGetTablesRequest,
     GlueGetTablesResponse,
+)
+from .aws.lambda_ import (
     LambdaInvokeRequest,
     LambdaInvokeResponse,
+)
+from .aws.s3 import (
     S3CreateBucketRequest,
     S3CreateBucketResponse,
     S3GetObjectRequest,
@@ -35,6 +43,8 @@ from .aws_schemas import (
     S3ListObjectsV2Response,
     S3PutObjectRequest,
     S3PutObjectResponse,
+)
+from .aws.service_quotas import (
     ServiceQuota,
     ServiceQuotasGetServiceQuotaRequest,
     ServiceQuotasGetServiceQuotaResponse,

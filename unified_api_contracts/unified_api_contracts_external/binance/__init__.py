@@ -1,6 +1,5 @@
 """Binance REST API contracts (market data, order, position when not via CCXT)."""
 
-# Re-export all schemas from split modules for backward compatibility
 from .account_schemas import (
     BinanceDepositAddress as BinanceDepositAddress,
 )
@@ -184,3 +183,71 @@ from .ws_schemas import (
 from .ws_schemas import (
     BinanceWebSocketSubscribe as BinanceWebSocketSubscribe,
 )
+
+__all__ = [
+    # ws_schemas
+    "BinanceAccountUpdate",
+    # order_schemas
+    "BinanceAdlQuantile",
+    # market_schemas
+    "BinanceAggTrade",
+    "BinanceCoinmOrderSubmitRequest",
+    "BinanceCoinmOrderSubmitResponse",
+    "BinanceDeliveryHistory",
+    "BinanceDeliveryPrice",
+    # account_schemas
+    "BinanceDepositAddress",
+    "BinanceDepositHistory",
+    "BinanceDualInvestmentProduct",
+    "BinanceEapiOrderSubmitRequest",
+    "BinanceEapiOrderSubmitResponse",
+    "BinanceEapiPosition",
+    "BinanceError",
+    "BinanceExchangeInfo",
+    "BinanceFeeRate",
+    "BinanceFundingRateHistory",
+    "BinanceIncome",
+    "BinanceIndexPriceKline",
+    "BinanceInstrumentInfo",
+    "BinanceInsuranceFund",
+    "BinanceInsuranceFundAsset",
+    "BinanceInternalTransfer",
+    "BinanceKline",
+    "BinanceLiquidationOrder",
+    "BinanceListenKeyCreate",
+    "BinanceMarginBalanceResponse",
+    "BinanceMarkPriceKline",
+    "BinanceMarkPriceUpdate",
+    "BinanceMyTrades",
+    "BinanceOptionInstrumentInfo",
+    "BinanceOptionMarkPrice",
+    "BinanceOptionTicker",
+    "BinanceOrder",
+    "BinanceOrderBook",
+    "BinanceOrderCancelRequest",
+    "BinanceOrderCancelResponse",
+    "BinanceOrderTradeUpdate",
+    "BinancePapiAccount",
+    "BinancePapiBalance",
+    "BinancePapiPosition",
+    "BinancePosition",
+    "BinancePositionQueryResponse",
+    "BinancePositionRisk",
+    "BinancePremiumIndex",
+    "BinanceRealizedPnlResponse",
+    "BinanceSpotOrderSubmitRequest",
+    "BinanceSpotOrderSubmitResponse",
+    "BinanceSubAccount",
+    "BinanceSubAccountAssets",
+    "BinanceSymbol",
+    "BinanceTicker",
+    "BinanceTrade",
+    "BinanceUsdmOrderSubmitRequest",
+    "BinanceUsdmOrderSubmitResponse",
+    "BinanceWebSocketClose",
+    "BinanceWebSocketPing",
+    "BinanceWebSocketSubscribe",
+    "BinanceWithdrawalHistory",
+    "BinanceWithdrawalRequest",
+    "BinanceWithdrawalResponse",
+]
