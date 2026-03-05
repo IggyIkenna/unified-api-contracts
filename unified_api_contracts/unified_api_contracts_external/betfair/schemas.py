@@ -180,8 +180,8 @@ class BetfairRunner(BaseModel):
     last_price_traded: float | None = Field(None, alias="lastPriceTraded")
     total_matched: float | None = Field(None, alias="totalMatched")
     removal_date: str | None = Field(None, alias="removalDate")
-    ex: dict[str, object] | None = None  # availableToBack, availableToLay, tradedVolume
-    sp: dict[str, object] | None = None  # starting price
+    ex: dict[str, list[dict[str, float]]] | None = None  # availableToBack, availableToLay, tradedVolume
+    sp: dict[str, list[dict[str, float]]] | None = None  # starting price
 
 
 class BetfairMarketBook(BaseModel):

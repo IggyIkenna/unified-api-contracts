@@ -402,7 +402,26 @@ def get_schema_class_for_endpoint(venue: str, endpoint: str) -> type[BaseModel] 
         "defi": "defi",
     }
     module_name = module_map.get(venue, venue)
-    mod: types.ModuleType = cast(
+
+    # Binance split its schemas into sub-modules; try each in order
+    if module_name == "binance":
+        for sub in ("market_schemas", "order_schemas", "account_schemas", "ws_schemas"):
+            try:
+                mod = cast(
+                    types.ModuleType,
+                    __import__(
+                        f"unified_api_contracts.unified_api_contracts_external.{module_name}.{sub}",
+                        fromlist=[schema_name],
+                    ),
+                )
+                result = getattr(mod, schema_name, None)
+                if result is not None:
+                    return cast("type[BaseModel] | None", result)
+            except (ImportError, AttributeError):
+                continue
+        return None
+
+    mod = cast(
         types.ModuleType,
         __import__(f"unified_api_contracts.{module_name}.schemas", fromlist=[schema_name]),
     )
