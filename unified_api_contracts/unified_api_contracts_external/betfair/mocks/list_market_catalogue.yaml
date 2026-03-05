@@ -1,0 +1,34 @@
+interactions:
+  - request:
+      body:
+        '{"filter": {"eventTypeIds": ["1"]}, "marketProjection": ["RUNNER_DESCRIPTION",
+        "EVENT", "COMPETITION", "EVENT_TYPE"], "maxResults": 5}'
+      headers:
+        Accept:
+          - application/json
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        X-Application:
+          - "[FILTERED]"
+        X-Authentication:
+          - "[FILTERED]"
+      method: POST
+      uri: https://api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue/
+    response:
+      body:
+        string:
+          '[{"marketId":"1.23456789","marketName":"Match Odds","marketStartTime":"2025-02-28T15:00:00.000Z","totalMatched":50000.5,"runners":[{"selectionId":12345,"runnerName":"Home","handicap":0,"sortPriority":1},{"selectionId":12346,"runnerName":"Draw","handicap":0,"sortPriority":2},{"selectionId":12347,"runnerName":"Away","handicap":0,"sortPriority":3}],"eventType":{"id":"1","name":"Soccer"},"competition":{"id":"100","name":"Premier
+          League"},"event":{"id":"200","name":"Man Utd v Liverpool","countryCode":"GB","timezone":"Europe/London","openDate":"2025-02-28T15:00:00.000Z"}}]'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

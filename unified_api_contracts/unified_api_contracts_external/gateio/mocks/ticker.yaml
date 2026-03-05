@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.gateio.ws/api/v4/spot/tickers?currency_pair=BTC_USDT
+    response:
+      body:
+        string: '[{"currency_pair":"BTC_USDT","last":"72733.8","lowest_ask":"72733.9","lowest_size":"8.21786","highest_bid":"72733.8","highest_size":"7.505903","change_percentage":"1.97","base_volume":"20989.186127","quote_volume":"1526189038.7591589","high_24h":"74056.5","low_24h":"71210.1"}]'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

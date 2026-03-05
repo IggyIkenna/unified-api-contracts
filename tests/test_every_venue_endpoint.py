@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from unified_api_contracts.venue_manifest import VENUE_MANIFEST
+from unified_api_contracts.unified_api_contracts_external.venue_manifest import VENUE_MANIFEST
 
 
 def _api_contracts_root() -> Path:
