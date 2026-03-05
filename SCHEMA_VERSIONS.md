@@ -763,8 +763,8 @@ Schema–version verification for GCP (google-cloud-python: compute, run, storag
 
 | SDK               | Package               | Recommended Pin    | Workspace Usage                                                         |
 | ----------------- | --------------------- | ------------------ | ----------------------------------------------------------------------- |
-| **GCP Compute**   | google-cloud-compute  | `>=1.0.0,<2.0.0`   | unified-trading-deployment-v3                                           |
-| **GCP Cloud Run** | google-cloud-run      | `>=0.15.0,<1.0.0`  | unified-trading-deployment-v3                                           |
+| **GCP Compute**   | google-cloud-compute  | `>=1.0.0,<2.0.0`   | deployment-service                                                      |
+| **GCP Cloud Run** | google-cloud-run      | `>=0.15.0,<1.0.0`  | deployment-service                                                      |
 | **GCP Storage**   | google-cloud-storage  | `>=3.8.0,<4.0.0`   | unified-trading-services, unified-cloud-interface                       |
 | **GCP BigQuery**  | google-cloud-bigquery | `>=3.40.0,<4.0.0`  | unified-trading-services                                                |
 | **AWS boto3**     | boto3                 | `>=1.40.70,<2.0.0` | unified-cloud-interface, unified-ml-interface, unified-config-interface |
@@ -844,8 +844,8 @@ Schema–version verification for GCP (google-cloud-python: compute, run, storag
 
 | Package               | Recommended Pin    | Rationale                                                    |
 | --------------------- | ------------------ | ------------------------------------------------------------ |
-| google-cloud-compute  | `>=1.0.0,<2.0.0`   | Align with unified-trading-deployment-v3                     |
-| google-cloud-run      | `>=0.15.0,<1.0.0`  | Align with unified-trading-deployment-v3                     |
+| google-cloud-compute  | `>=1.0.0,<2.0.0`   | Align with deployment-service                                |
+| google-cloud-run      | `>=0.15.0,<1.0.0`  | Align with deployment-service                                |
 | google-cloud-storage  | `>=3.8.0,<4.0.0`   | Align with unified-trading-services, unified-cloud-interface |
 | google-cloud-bigquery | `>=3.40.0,<4.0.0`  | Align with unified-trading-services                          |
 | boto3                 | `>=1.40.70,<2.0.0` | Python 3.13 support; align with unified-cloud-interface      |

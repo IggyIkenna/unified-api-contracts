@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.bitget.com/api/v2/spot/market/tickers?symbol=BTCUSDT
+    response:
+      body:
+        string: '{"code":"00000","msg":"success","requestTime":1772716649857,"data":[{"open":"71388.9","symbol":"BTCUSDT","high24h":"74053.28","low24h":"71199.59","lastPr":"72716.96","quoteVolume":"395511001.22463","baseVolume":"5448.455762","usdtVolume":"395511001.22462901","ts":"1772716648054","bidPr":"72712.86","askPr":"72712.87","bidSz":"0.0072","askSz":"1.153138","openUtc":"72667.3","changeUtc24h":"0.00072","change24h":"0.0186"}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

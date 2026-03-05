@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin
+    response:
+      body:
+        string: '[{"id":"bitcoin","symbol":"btc","name":"Bitcoin","image":"https://coin-images.coingecko.com/coins/images/1/large/bitcoin.png?1696501400","current_price":72691,"market_cap":1454649479714,"market_cap_rank":1,"fully_diluted_valuation":1454649479714,"total_volume":70453846657,"high_24h":73953,"low_24h":71260,"price_change_24h":1357.89,"price_change_percentage_24h":1.90359,"market_cap_change_24h":25341415164,"market_cap_change_percentage_24h":1.77298,"circulating_supply":19998146.0,"total_supply":19998146.0,"max_supply":21000000.0,"ath":126080,"ath_change_percentage":-42.34512,"ath_date":"2025-10-06T18:57:42.558Z","atl":67.81,"atl_change_percentage":107099.9452,"atl_date":"2013-07-06T00:00:00.000Z","roi":null,"last_updated":"2026-03-05T13:16:54.751Z"}]'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

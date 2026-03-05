@@ -250,7 +250,7 @@ class TestLiveSchemaExports:
         assert all([LiveMatchState, LiveOddsUpdate, MatchPeriod, ScraperVersionMeta])
 
     def test_import_from_sports(self) -> None:
-        from unified_api_contracts.sports import (
+        from unified_api_contracts.unified_api_contracts_external.sports import (
             LiveMatchState,
             LiveOddsUpdate,
             MatchPeriod,
