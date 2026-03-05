@@ -1,7 +1,7 @@
 """CEX withdrawal schemas: Binance, OKX, Bybit, Upbit, Coinbase.
 
-Scope: Withdrawal request/response per venue. Aligned with Agent 3 (Orders/Positions).
-Excludes Kraken.
+Scope: Withdrawal request/response per venue. Aligned with Agent 3 (Orders/Positions). Venues in our universe only.
+
 """
 
 from __future__ import annotations
