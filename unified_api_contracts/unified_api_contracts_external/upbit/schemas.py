@@ -25,6 +25,36 @@ class UpbitTicker(BaseModel):
     info: dict[str, object] | None = None
 
 
+class UpbitTrade(BaseModel):
+    """Upbit public trade (REST: GET /v1/trades/ticks, WS: trade)."""
+
+    market: str | None = None
+    trade_price: float | None = None
+    trade_volume: float | None = None
+    sequential_id: int | None = None
+    timestamp: int | None = None  # ms
+    ask_bid: str | None = None  # BID=buy, ASK=sell
+
+
+class UpbitOrderBookUnit(BaseModel):
+    """Single level in Upbit order book (orderbook_units item)."""
+
+    ask_price: float | None = None
+    bid_price: float | None = None
+    ask_size: float | None = None
+    bid_size: float | None = None
+
+
+class UpbitOrderBook(BaseModel):
+    """Upbit order book (REST: GET /v1/orderbook)."""
+
+    market: str | None = None
+    timestamp: int | None = None
+    total_ask_size: float | None = None
+    total_bid_size: float | None = None
+    orderbook_units: list[UpbitOrderBookUnit] = []
+
+
 class UpbitOrder(BaseModel):
     """Upbit order."""
 

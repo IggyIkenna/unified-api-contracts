@@ -88,6 +88,7 @@ ignore = []  # E501 enforced (line-length 120)
 "unified_api_contracts/unified_api_contracts_external/binance/*.py" = ["N815", "F403", "F405"]
 "unified_api_contracts/unified_api_contracts_external/cloud_sdks/*.py" = ["N803", "N815", "F403", "F405"]
 "unified_api_contracts/unified_api_contracts_external/cloud_sdks/**/*.py" = ["N803", "N815", "F403", "F405"]
+"unified_api_contracts/unified_normalised_contracts/normalize/orders_fills.py" = ["F401"]
 "unified_api_contracts/schemas/protocol_sdks.py" = ["N815"]
 "unified_api_contracts/schemas/accounts.py" = ["N815"]
 "unified_api_contracts/schemas/cex_withdrawals.py" = ["N815"]
