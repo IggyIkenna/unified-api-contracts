@@ -1194,4 +1194,3 @@ class SportsFeatureVector(BaseModel):
     home_travel_band: int | None = None
     home_travel_fatigue: float | None = None
     schedule_rest_diff: int | None = None
-

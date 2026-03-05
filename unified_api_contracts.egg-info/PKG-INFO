@@ -147,9 +147,9 @@ ticker = BinanceTicker(
     # ...
 )
 
-# ❌ Wrong - loses precision
+# ❌ Wrong - loses precision  
 ticker = BinanceTicker(
-    symbol="BTCUSDT",
+    symbol="BTCUSDT", 
     lastPrice=50000.12345678,  # May lose precision
     # ...
 )
@@ -187,7 +187,7 @@ except APIError as e:
         error = BinanceError(**e.response)
         print(f"Binance error {error.code}: {error.msg}")
     elif venue == "coinbase":
-        error = CoinbaseError(**e.response)
+        error = CoinbaseError(**e.response)  
         print(f"Coinbase error: {error.message}")
 ```
 
