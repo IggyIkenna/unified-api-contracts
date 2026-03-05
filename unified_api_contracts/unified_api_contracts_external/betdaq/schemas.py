@@ -1,36 +1,80 @@
-"""Betdaq API response schemas."""
+"""Betdaq Exchange API: errors, selections, markets, orders, balances.
+
+Uses PascalCase JSON aliases matching Betdaq REST API conventions.
+
+Ref: https://docs.betdaq.com/
+"""
+
+from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
 
-class BetdaqPriceLevel(BaseModel):
-    """Single back/lay price level."""
+class BetdaqErrorResponse(BaseModel, frozen=True):
+    """Betdaq API error response."""
 
-    price: float | None = None
-    amount: float | None = None
-
-
-class BetdaqOdds(BaseModel):
-    """Betdaq odds schema."""
+    message: str = Field("", alias="Message")
+    error_code: str = Field("", alias="ErrorCode")
 
     model_config = {"populate_by_name": True}
 
-    selection_id: int | None = Field(None, alias="selectionId")
-    price: float | None = None
-    side: str | None = None
-    back_prices: list[BetdaqPriceLevel] | None = Field(None, alias="backPrices")
-    lay_prices: list[BetdaqPriceLevel] | None = Field(None, alias="layPrices")
+
+class BetdaqBackPrice(BaseModel, frozen=True):
+    """Betdaq back price — scaled integer representation."""
+
+    price: int = Field(0, alias="Price")
 
 
-class BetdaqMarket(BaseModel):
-    """Betdaq market schema."""
+class BetdaqSelection(BaseModel, frozen=True):
+    """Betdaq selection (runner) within a market."""
 
-    market_id: int | None = None
-    name: str | None = None
+    id: int | str = Field(0, alias="Id")
+    name: str = Field("", alias="Name")
+    reset_id: int = Field(0, alias="ResetId")
+    back_prices: list[BetdaqBackPrice] = Field(default_factory=list, alias="BackPrices")
 
 
-class BetdaqEvent(BaseModel):
-    """Betdaq event schema."""
+class BetdaqMarket(BaseModel, frozen=True):
+    """Betdaq market."""
 
-    event_id: int | None = None
-    name: str | None = None
+    id: int | str = Field(0, alias="Id")
+    name: str = Field("", alias="Name")
+    selections: list[BetdaqSelection] = Field(default_factory=list, alias="Selections")
+
+
+class BetdaqMarketsResponse(BaseModel, frozen=True):
+    """Betdaq markets response."""
+
+    markets: list[BetdaqMarket] = Field(default_factory=list, alias="Markets")
+
+    model_config = {"populate_by_name": True}
+
+
+class BetdaqOrder(BaseModel, frozen=True):
+    """Betdaq order result."""
+
+    id: int | str = Field(0, alias="Id")
+    result: int = Field(-1, alias="Result")
+
+
+class BetdaqOrdersResponse(BaseModel, frozen=True):
+    """Betdaq orders response."""
+
+    orders: list[BetdaqOrder] = Field(default_factory=list, alias="Orders")
+
+    model_config = {"populate_by_name": True}
+
+
+class BetdaqBalance(BaseModel, frozen=True):
+    """Betdaq account balance entry."""
+
+    currency: str = Field("", alias="Currency")
+    balance: int = Field(0, alias="Balance")
+
+
+class BetdaqBalancesResponse(BaseModel, frozen=True):
+    """Betdaq balances response."""
+
+    balances: list[BetdaqBalance] = Field(default_factory=list, alias="Balances")
+
+    model_config = {"populate_by_name": True}

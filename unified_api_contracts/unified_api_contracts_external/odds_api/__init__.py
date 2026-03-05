@@ -3,6 +3,7 @@
 from .schemas import (
     OddsApiBookmaker,
     OddsApiError,
+    OddsApiEvent,
     OddsApiFixture,
     OddsApiHistoricalOdds,
     OddsApiMarket,
@@ -12,6 +13,7 @@ from .schemas import (
 __all__ = [
     "OddsApiBookmaker",
     "OddsApiError",
+    "OddsApiEvent",
     "OddsApiFixture",
     "OddsApiHistoricalOdds",
     "OddsApiMarket",

@@ -19,26 +19,26 @@ class TestBinanceClassify:
 
     def test_retry_codes(self):
         """Transient errors map to RETRY_WITH_BACKOFF."""
-        from unified_api_contracts.binance.schemas import BinanceError
+        from unified_api_contracts.binance.order_schemas import BinanceError
 
         for code in (-1000, -1001, -1003, -1006, -1007, -1008):
             assert BinanceError.classify(code) == ErrorAction.RETRY_WITH_BACKOFF
 
     def test_reconnect_code(self):
         """Invalid listen key maps to RECONNECT."""
-        from unified_api_contracts.binance.schemas import BinanceError
+        from unified_api_contracts.binance.order_schemas import BinanceError
 
         assert BinanceError.classify(-1125) == ErrorAction.RECONNECT
 
     def test_ip_ban_retry(self):
         """IP ban (418) maps to RETRY_WITH_BACKOFF."""
-        from unified_api_contracts.binance.schemas import BinanceError
+        from unified_api_contracts.binance.order_schemas import BinanceError
 
         assert BinanceError.classify(418) == ErrorAction.RETRY_WITH_BACKOFF
 
     def test_fail_hard(self):
         """Unknown codes map to FAIL_HARD."""
-        from unified_api_contracts.binance.schemas import BinanceError
+        from unified_api_contracts.binance.order_schemas import BinanceError
 
         assert BinanceError.classify(-100) == ErrorAction.FAIL_HARD
         assert BinanceError.classify(400) == ErrorAction.FAIL_HARD

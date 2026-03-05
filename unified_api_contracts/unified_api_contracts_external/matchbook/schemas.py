@@ -1,36 +1,70 @@
-"""Matchbook API response schemas."""
+"""Matchbook Exchange API: authentication, events, markets, runners, prices, offers, balances.
 
-from pydantic import BaseModel
+Ref: https://www.matchbook.com/api-documentation
+"""
 
+from __future__ import annotations
 
-class MatchbookRunner(BaseModel):
-    """Matchbook runner/selection."""
-
-    id: int | None = None
-    name: str | None = None
-    selection_id: int | None = None
+from pydantic import BaseModel, Field
 
 
-class MatchbookOdds(BaseModel):
-    """Matchbook odds schema."""
+class MatchbookAuthResponse(BaseModel, frozen=True):
+    """Matchbook session authentication response."""
 
-    market_id: int | None = None
-    runner_id: int | None = None
-    runners: list[MatchbookRunner] | None = None
-    back_odds: list[dict[str, object]] | None = None
-    lay_odds: list[dict[str, object]] | None = None
+    session_token: str = Field("", alias="session-token")
+
+    model_config = {"populate_by_name": True}
 
 
-class MatchbookMarket(BaseModel):
-    """Matchbook market schema."""
+class MatchbookErrorResponse(BaseModel, frozen=True):
+    """Matchbook API error response."""
 
-    id: int | None = None
-    name: str | None = None
+    message: str = ""
+    code: str = ""
 
 
-class MatchbookEvent(BaseModel):
-    """Matchbook event schema."""
+class MatchbookBackPrice(BaseModel, frozen=True):
+    odds: float = 0.0
 
-    id: int | None = None
-    name: str | None = None
-    markets: list[MatchbookMarket] | None = None
+
+class MatchbookPrices(BaseModel, frozen=True):
+    back: list[MatchbookBackPrice] = []
+
+
+class MatchbookRunner(BaseModel, frozen=True):
+    id: str = ""
+    name: str = ""
+    type: str = ""
+    prices: MatchbookPrices = MatchbookPrices()
+
+
+class MatchbookMarket(BaseModel, frozen=True):
+    id: str = ""
+    type: str = ""
+    handicap: float = 0.0
+    runners: list[MatchbookRunner] = []
+
+
+class MatchbookEvent(BaseModel, frozen=True):
+    id: str = ""
+    name: str = ""
+
+
+class MatchbookEventsResponse(BaseModel, frozen=True):
+    events: list[MatchbookEvent] = []
+
+
+class MatchbookMarketsResponse(BaseModel, frozen=True):
+    markets: list[MatchbookMarket] = []
+
+
+class MatchbookOfferResponse(BaseModel, frozen=True):
+    id: str = ""
+
+
+class MatchbookBalanceInfo(BaseModel, frozen=True):
+    available: str = "0"
+
+
+class MatchbookAccountResponse(BaseModel, frozen=True):
+    balance: MatchbookBalanceInfo = MatchbookBalanceInfo()

@@ -10,7 +10,7 @@ import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
-from unified_api_contracts.unified_api_contracts_external.binance import BinanceTrade
+from unified_api_contracts.unified_api_contracts_external.binance.market_schemas import BinanceTrade
 from unified_api_contracts.unified_api_contracts_external.databento.schemas import DatabentoTrade
 from unified_api_contracts.unified_api_contracts_external.tardis.schemas import TardisTrade
 from unified_api_contracts.unified_normalised_contracts import CanonicalTrade

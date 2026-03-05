@@ -2,7 +2,7 @@
 Quota broker API schemas.
 
 Request/response types for the centralized quota-broker (Cloud Run IAM).
-Reference: unified-trading-deployment-v3/deployment/quota_broker_client.py
+Reference: deployment-service/deployment/quota_broker_client.py
 """
 
 from __future__ import annotations

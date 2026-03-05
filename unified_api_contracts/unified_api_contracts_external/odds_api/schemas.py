@@ -56,6 +56,15 @@ class OddsApiHistoricalOdds(BaseModel):
     bookmakers: list[OddsApiBookmaker] | None = None
 
 
+class OddsApiEvent(BaseModel, frozen=True):
+    """Event from The Odds API (execution adapter shape — frozen, non-optional)."""
+
+    id: str = ""
+    home_team: str = ""
+    away_team: str = ""
+    bookmakers: list[OddsApiBookmaker] = []
+
+
 class OddsApiError(BaseModel):
     """The Odds API error response."""
 

@@ -163,6 +163,13 @@ VENUE_ERROR_MAP: dict[str, list[VenueErrorClassification]] = {
         _v("bloxroute", "-32603", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Internal error"),
         _v("bloxroute", "429", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Rate limit exceeded"),
     ],
+    "versifi": [
+        _v("versifi", "400", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Bad request"),
+        _v("versifi", "401", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Unauthorized"),
+        _v("versifi", "404", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Order not found"),
+        _v("versifi", "409", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Conflict/duplicate order"),
+        _v("versifi", "500", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Internal server error"),
+    ],
 }
 
 
