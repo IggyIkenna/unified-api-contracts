@@ -1,7 +1,7 @@
 """
 Shared quota types for cloud resource management.
 
-Reference: unified-trading-deployment-v3/api/utils/quota_requirements.py
+Reference: deployment-api/utils/quota_requirements.py
 """
 
 from __future__ import annotations

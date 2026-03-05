@@ -6,7 +6,7 @@ from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
-from unified_api_contracts.binance import BinanceKline, BinanceTicker, BinanceTrade
+from unified_api_contracts.binance.market_schemas import BinanceKline, BinanceTicker, BinanceTrade
 from unified_api_contracts.coinbase.schemas import CoinbaseCandle, CoinbaseTicker
 
 # Project root

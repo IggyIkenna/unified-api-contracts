@@ -1,9 +1,25 @@
-"""Betdaq API schemas."""
+"""Betdaq Exchange API contracts."""
 
-from unified_api_contracts.unified_api_contracts_external.betdaq.schemas import (
-    BetdaqEvent,
+from .schemas import (
+    BetdaqBackPrice,
+    BetdaqBalance,
+    BetdaqBalancesResponse,
+    BetdaqErrorResponse,
     BetdaqMarket,
-    BetdaqOdds,
+    BetdaqMarketsResponse,
+    BetdaqOrder,
+    BetdaqOrdersResponse,
+    BetdaqSelection,
 )
 
-__all__ = ["BetdaqEvent", "BetdaqMarket", "BetdaqOdds"]
+__all__ = [
+    "BetdaqBackPrice",
+    "BetdaqBalance",
+    "BetdaqBalancesResponse",
+    "BetdaqErrorResponse",
+    "BetdaqMarket",
+    "BetdaqMarketsResponse",
+    "BetdaqOrder",
+    "BetdaqOrdersResponse",
+    "BetdaqSelection",
+]

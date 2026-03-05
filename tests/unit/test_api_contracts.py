@@ -6,7 +6,7 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from unified_api_contracts.binance import BinanceMarkPriceUpdate
+from unified_api_contracts.binance.ws_schemas import BinanceMarkPriceUpdate
 from unified_api_contracts.bybit.schemas import BybitOrderUpdateWS
 from unified_api_contracts.deribit.schemas import DeribitTickerFull
 from unified_api_contracts.okx.schemas import OKXFundingRate
