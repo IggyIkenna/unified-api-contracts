@@ -1,6 +1,6 @@
 # Runtime Topology SSOT
 
-RULE: Runtime messaging/storage/API interaction policy must live in `unified-trading-deployment-v3/configs/runtime-topology.yaml`. Code dependency DAG must live in `unified-trading-pm/workspace-manifest.json`. Do not hardcode runtime transport behavior in service repos or create service-to-service dependencies for live paths.
+RULE: Runtime messaging/storage/API interaction policy must live in `deployment-service/configs/runtime-topology.yaml`. Code dependency DAG must live in `unified-trading-pm/workspace-manifest.json`. Do not hardcode runtime transport behavior in service repos or create service-to-service dependencies for live paths.
 WHY: DAG boundaries stay clean only when runtime deployment topology is declarative and owned by deployment config.
 CODEX: 00-SSOT-INDEX.md, 04-architecture/TOPOLOGY-DAG.md, 04-architecture/batch-live-symmetry.md
 

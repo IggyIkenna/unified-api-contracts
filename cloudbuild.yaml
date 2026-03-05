@@ -4,23 +4,23 @@
 
 steps:
   # Step 0: Ensure unified-libraries repo exists
-  - name: 'gcr.io/cloud-builders/gcloud'
-    id: 'ensure-repo'
-    entrypoint: 'bash'
+  - name: "gcr.io/cloud-builders/gcloud"
+    id: "ensure-repo"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         gcloud artifacts repositories describe unified-libraries --location=asia-northeast1 &>/dev/null || \
           gcloud artifacts repositories create unified-libraries --repository-format=python --location=asia-northeast1 --description="Unified Python libraries"
-    waitFor: ['-']
+    waitFor: ["-"]
 
   # Step 1: Run lint check
-  - name: 'python:3.13-slim'
-    id: 'lint'
-    waitFor: ['ensure-repo']
-    entrypoint: 'bash'
+  - name: "python:3.13-slim"
+    id: "lint"
+    waitFor: ["ensure-repo"]
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         uv pip install ruff==0.15.0
         [ -d unified-api-contracts ] && cd unified-api-contracts
@@ -29,67 +29,67 @@ steps:
 
   # Step 2: Build Python package (wheel)
   # unified-api-contracts has zero upstream dependencies - no Artifact Registry install needed
-  - name: 'python:3.13-slim'
-    id: 'build-wheel'
-    entrypoint: 'bash'
+  - name: "python:3.13-slim"
+    id: "build-wheel"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         set -e
         uv pip install build
         [ -d unified-api-contracts ] && cd unified-api-contracts
         python -m build --wheel --outdir dist/
         ls -lh dist/
-    waitFor: ['lint']
+    waitFor: ["lint"]
 
   # Step 2.5: Store build metadata (version → commit mapping)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:alpine'
-    id: 'store-metadata'
-    entrypoint: 'bash'
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: "store-metadata"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         set -e
         apk add --no-cache python3
         [ -d unified-api-contracts ] && cd unified-api-contracts
-        
+
         WHEEL_FILE=$$(ls dist/*.whl)
         VERSION=$$(echo $$WHEEL_FILE | sed -n 's/.*-\([0-9.]*\)-.*/\1/p')
-        
+
         echo "{\"version\":\"$$VERSION\",\"commit\":\"$COMMIT_SHA\",\"short_sha\":\"$SHORT_SHA\",\"build_id\":\"$BUILD_ID\",\"timestamp\":\"$$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > /tmp/build-metadata.json
-        
+
         gsutil cp /tmp/build-metadata.json \
           gs://$PROJECT_ID-build-metadata/unified-api-contracts/versions/$$VERSION.json || true
-        
+
         echo "✓ Stored build metadata for version $$VERSION"
-    waitFor: ['build-wheel']
+    waitFor: ["build-wheel"]
 
   # Step 3: Publish Python package to Artifact Registry with version validation
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:alpine'
-    id: 'publish-python'
-    entrypoint: 'bash'
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: "publish-python"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         set -e
         apk add --no-cache python3 py3-pip jq
         pip3 install --break-system-packages twine keyrings.google-artifactregistry-auth
         [ -d unified-api-contracts ] && cd unified-api-contracts
-        
+
         WHEEL_FILE=$$(ls dist/*.whl)
         VERSION=$$(echo $$WHEEL_FILE | sed -n 's/.*-\([0-9.]*\)-.*/\1/p')
-        
+
         # Check if version exists
         EXISTING_VERSIONS=$$(gcloud artifacts versions list \
           --package=unified-api-contracts \
           --repository=unified-libraries \
           --location=asia-northeast1 \
           --format="value(VERSION)" 2>/dev/null || echo "")
-        
+
         if echo "$$EXISTING_VERSIONS" | grep -qx "$$VERSION"; then
           if gsutil cp gs://$PROJECT_ID-build-metadata/unified-api-contracts/versions/$$VERSION.json /tmp/existing-metadata.json 2>/dev/null; then
             EXISTING_COMMIT=$$(jq -r '.commit' /tmp/existing-metadata.json)
-            
+
             if [ "$$EXISTING_COMMIT" = "$COMMIT_SHA" ]; then
               echo "✓ Version $$VERSION already published from commit $COMMIT_SHA (idempotent)"
               exit 0
@@ -105,22 +105,22 @@ steps:
             exit 1
           fi
         fi
-        
+
         # Version doesn't exist - publish
         python3 -m twine upload \
           --repository-url https://asia-northeast1-python.pkg.dev/$PROJECT_ID/unified-libraries/ \
           --non-interactive \
           dist/*.whl
-        
+
         echo "✓ Successfully uploaded version $$VERSION from commit $COMMIT_SHA"
-    waitFor: ['store-metadata']
+    waitFor: ["store-metadata"]
 
   # Step 4: Notify deployment-v3 to update stable_versions.yaml (package version)
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk:alpine'
-    id: 'notify-deployment'
-    entrypoint: 'bash'
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: "notify-deployment"
+    entrypoint: "bash"
     args:
-      - '-c'
+      - "-c"
       - |
         set -e
         BASE=.; [ -d unified-api-contracts ] && BASE=unified-api-contracts
@@ -131,17 +131,17 @@ steps:
           curl -sS -X POST \
             -H "Authorization: token $$GH_PAT" \
             -H "Accept: application/vnd.github.v3+json" \
-            https://api.github.com/repos/IggyIkenna/unified-trading-deployment-v3/dispatches \
+            https://api.github.com/repos/IggyIkenna/deployment-service/dispatches \
             -d "{\"event_type\":\"library-published\",\"client_payload\":{\"package_name\":\"unified-api-contracts\",\"version\":\"$$VERSION\"}}"
-          echo "Notified deployment-v3: unified-api-contracts $$VERSION"
+          echo "Notified deployment-service: unified-api-contracts $$VERSION"
         else
           echo "Skipping dispatch (VERSION or GH_PAT not available)"
         fi
-    waitFor: ['publish-python']
+    waitFor: ["publish-python"]
     allowFailure: true
 
 options:
-  machineType: 'E2_HIGHCPU_8'
+  machineType: "E2_HIGHCPU_8"
   logging: CLOUD_LOGGING_ONLY
 
-timeout: '600s'
+timeout: "600s"

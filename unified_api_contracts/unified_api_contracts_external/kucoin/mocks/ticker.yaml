@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.kucoin.com/api/v1/market/orderbook/level1?symbol=BTC-USDT
+    response:
+      body:
+        string: '{"code":"200000","data":{"time":1772716632101,"sequence":"30240191715","price":"72729","size":"0.00014222","bestBid":"72735.6","bestBidSize":"0.40684362","bestAsk":"72735.7","bestAskSize":"0.06384504"}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

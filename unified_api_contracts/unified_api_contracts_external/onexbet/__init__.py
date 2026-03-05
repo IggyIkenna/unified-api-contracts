@@ -1,0 +1,1 @@
+"""1xBet API schemas."""
