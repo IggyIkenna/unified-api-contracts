@@ -68,7 +68,6 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "BYBIT",
         "COINBASE-SPOT",
         "UPBIT",
-        "KRAKEN",
         "KUCOIN",
         "GATEIO-SPOT",
         "BITFINEX-SPOT",
