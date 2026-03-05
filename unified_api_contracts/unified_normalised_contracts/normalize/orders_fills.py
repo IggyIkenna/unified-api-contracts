@@ -82,9 +82,13 @@ def _extract_ccxt_fee(trade: CcxtTrade) -> tuple[Decimal | None, str | None]:
         cost = fee.get("cost")
         currency = fee.get("currency")
         cost_val: str | float | Decimal | None = (
-            float(cost) if isinstance(cost, (int, float)) else
-            str(cost) if isinstance(cost, str) else
-            cost if isinstance(cost, Decimal) else None
+            float(cost)
+            if isinstance(cost, (int, float))
+            else str(cost)
+            if isinstance(cost, str)
+            else cost
+            if isinstance(cost, Decimal)
+            else None
         )
         return (
             _parse_decimal(cost_val) if cost_val is not None else None,
@@ -94,9 +98,13 @@ def _extract_ccxt_fee(trade: CcxtTrade) -> tuple[Decimal | None, str | None]:
         c = getattr(fee, "cost", None)
         curr = getattr(fee, "currency", None)
         c_val: str | float | Decimal | None = (
-            float(c) if isinstance(c, (int, float)) else
-            str(c) if isinstance(c, str) else
-            c if isinstance(c, Decimal) else None
+            float(c)
+            if isinstance(c, (int, float))
+            else str(c)
+            if isinstance(c, str)
+            else c
+            if isinstance(c, Decimal)
+            else None
         )
         return (_parse_decimal(c_val) if c_val is not None else None, curr)
     return None, None
