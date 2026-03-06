@@ -15,6 +15,7 @@ from .schemas import (
     PinnacleSettlementResponse,
     PinnacleSpreadEntry,
     PinnacleTotalEntry,
+    PinnacleTotals,
 )
 
 __all__ = [
@@ -32,4 +33,5 @@ __all__ = [
     "PinnacleSettlementResponse",
     "PinnacleSpreadEntry",
     "PinnacleTotalEntry",
+    "PinnacleTotals",
 ]

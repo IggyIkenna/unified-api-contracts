@@ -68,3 +68,11 @@ class MatchbookBalanceInfo(BaseModel, frozen=True):
 
 class MatchbookAccountResponse(BaseModel, frozen=True):
     balance: MatchbookBalanceInfo = MatchbookBalanceInfo()
+
+
+class MatchbookOdds(BaseModel, frozen=True):
+    """Matchbook odds — runner-level back/lay prices."""
+
+    runner_id: int | str | None = None
+    back_odds: list[dict[str, object]] = []
+    lay_odds: list[dict[str, object]] = []

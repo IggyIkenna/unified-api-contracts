@@ -128,6 +128,10 @@ class PinnacleSettlementResponse(BaseModel):
     settled_specials: list[dict[str, object]] | None = Field(None, alias="settledSpecials")
 
 
+# Alias for backward compatibility and adapter imports
+PinnacleTotals = PinnacleTotalEntry
+
+
 class PinnacleError(BaseModel):
     """Pinnacle API error response."""
 
