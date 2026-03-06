@@ -1,4 +1,19 @@
-"""Canonical domain schemas — self-contained (no internal imports)."""
+"""Canonical domain schemas — self-contained (no internal imports).
+
+Identifier convention
+---------------------
+``instrument_key``  — canonical cross-venue identifier in ``VENUE:TYPE:SYMBOL`` format
+                      (e.g. ``"binance:PERPETUAL:BTCUSDT"``). Used in all market-data
+                      canonical schemas (CanonicalTrade, CanonicalOrderBook, etc.) and
+                      in instruments-service output. Stable and human-readable.
+
+``instrument_id``   — venue-opaque identifier used only in *execution* schemas
+                      (CanonicalOrder, CanonicalFill, ExecutionInstruction). May be a
+                      venue-specific numeric/string ID. See execution.py for details.
+
+Never mix the two: market-data consumers use ``instrument_key``; execution adapters
+map venue-specific IDs via ``instrument_id`` defined in execution.py.
+"""
 
 from __future__ import annotations
 
@@ -242,7 +257,7 @@ class CanonicalDerivativeTicker(BaseModel):
     funding_rate: Decimal | None = None
     predicted_funding_rate: Decimal | None = None
     funding_timestamp: datetime | None = None
-    next_funding_time: datetime | None = None
+    next_funding_timestamp: datetime | None = None
     open_interest: Decimal | None = None
     open_interest_value: Decimal | None = None
     borrow_long_rate: Decimal | None = None
@@ -253,6 +268,7 @@ class CanonicalDerivativeTicker(BaseModel):
     prev_day_price: Decimal | None = None
     basis: Decimal | None = None
     basis_rate: Decimal | None = None
+    adl_rank: int | None = None
     schema_version: str = "1.0"
 
 
@@ -286,7 +302,8 @@ class CanonicalFundingRate(BaseModel):
     symbol: str
     rate: Decimal
     timestamp: datetime
-    next_funding_time: datetime | None = None
+    next_funding_timestamp: datetime | None = None
+    predicted_rate: Decimal | None = None
 
 
 class CanonicalOhlcvBar(BaseModel):
@@ -295,14 +312,14 @@ class CanonicalOhlcvBar(BaseModel):
     timestamp: datetime
     venue: str
     symbol: str
-    open: float
-    high: float
-    low: float
-    close: float
-    volume: float
-    quote_volume: float | None = None
+    open: Decimal
+    high: Decimal
+    low: Decimal
+    close: Decimal
+    volume: Decimal
+    quote_volume: Decimal | None = None
     count: int | None = None
-    vwap: float | None = None
+    vwap: Decimal | None = None
 
 
 class CanonicalOptionsChainEntry(BaseModel):

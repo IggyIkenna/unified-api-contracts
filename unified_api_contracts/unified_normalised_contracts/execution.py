@@ -1,4 +1,19 @@
-"""Canonical execution schemas — self-contained (no internal imports)."""
+"""Canonical execution schemas — self-contained (no internal imports).
+
+Identifier convention
+---------------------
+``instrument_id``   — venue-opaque execution identifier used in CanonicalOrder,
+                      CanonicalFill, and ExecutionInstruction. May be a numeric or
+                      string ID assigned by the venue (e.g. Binance symbol "BTCUSDT",
+                      Deribit contract name "BTC-PERPETUAL"). Execution adapters are
+                      responsible for mapping this to the canonical ``instrument_key``
+                      when bridging to market-data layer.
+
+``instrument_key``  — canonical cross-venue market-data identifier in
+                      ``VENUE:TYPE:SYMBOL`` format. Lives in domain.py schemas only;
+                      NOT used in execution schemas. Execution-to-market-data joins
+                      must go through the instruments-service lookup.
+"""
 
 from __future__ import annotations
 
