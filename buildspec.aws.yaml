@@ -37,9 +37,9 @@ phases:
         fi
 
       - echo "=== Building wheel ==="
-      - pip install build
+      - uv pip install build
       - python -m build --wheel --outdir dist/
 
 cache:
   paths:
-    - '/root/.cache/pip/**/*'
+    - "/root/.cache/pip/**/*"

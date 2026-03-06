@@ -484,6 +484,8 @@ log_step "GCP credentials (informational)"
 
 if [ -n "$GOOGLE_APPLICATION_CREDENTIALS" ] && [ -f "$GOOGLE_APPLICATION_CREDENTIALS" ]; then
     log_ok "GOOGLE_APPLICATION_CREDENTIALS set"
+elif [ -f "$HOME/.config/gcloud/application_default_credentials.json" ]; then
+    log_ok "ADC credentials (gcloud auth application-default login)"
 else
     log_warn "No GCP credentials detected — run: gcloud auth application-default login"
     # Only warn about SA JSON if credential-like files found in repo root
