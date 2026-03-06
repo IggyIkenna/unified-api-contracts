@@ -11,9 +11,11 @@ with UIC's InstrumentRecord (31-field, Decimal, normalized adapter contract).
 """
 
 from .domain import (
+    CanonicalBalance,
     CanonicalDerivativeTicker,
     CanonicalLiquidation,
     CanonicalOrderBook,
+    CanonicalPosition,
     CanonicalTicker,
     CanonicalTrade,
     InstrumentType,
@@ -34,12 +36,14 @@ from .execution import (
 )
 
 __all__ = [
+    "CanonicalBalance",
     "CanonicalDerivativeTicker",
     "CanonicalError",
     "CanonicalFill",
     "CanonicalLiquidation",
     "CanonicalOrder",
     "CanonicalOrderBook",
+    "CanonicalPosition",
     "CanonicalRateLimitError",
     "CanonicalTicker",
     "CanonicalTrade",
