@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from ...unified_api_contracts_external.aster.schemas import AsterKline
 from ...unified_api_contracts_external.barchart.schemas import BarchartOhlcv15m
@@ -20,9 +21,18 @@ from ...unified_api_contracts_external.yahoo_finance.schemas import YahooOhlcv24
 from ..domain import CanonicalOhlcvBar
 
 
-def _databento_price(px: int) -> float:
-    """Convert Databento fixed-point price to float."""
-    return float(px) / float(DATABENTO_PRICE_DIVISOR)
+def _d(value: float | str | int | Decimal | None) -> Decimal:
+    """Safely convert a value to Decimal for CanonicalOhlcvBar price/volume fields."""
+    if value is None:
+        return Decimal(0)
+    if isinstance(value, Decimal):
+        return value
+    return Decimal(str(value))
+
+
+def _databento_price(px: int) -> Decimal:
+    """Convert Databento fixed-point price to Decimal."""
+    return Decimal(str(float(px) / float(DATABENTO_PRICE_DIVISOR)))
 
 
 def normalize_databento_ohlcv_bar(
@@ -38,7 +48,7 @@ def normalize_databento_ohlcv_bar(
         high=_databento_price(raw.high),
         low=_databento_price(raw.low),
         close=_databento_price(raw.close),
-        volume=float(raw.volume),
+        volume=_d(raw.volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -55,12 +65,12 @@ def normalize_binance_kline(raw: BinanceKline, symbol: str, venue: str = "binanc
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=float(raw.open_price),
-        high=float(raw.high_price),
-        low=float(raw.low_price),
-        close=float(raw.close_price),
-        volume=float(raw.volume),
-        quote_volume=float(raw.quote_asset_volume),
+        open=_d(raw.open_price),
+        high=_d(raw.high_price),
+        low=_d(raw.low_price),
+        close=_d(raw.close_price),
+        volume=_d(raw.volume),
+        quote_volume=_d(raw.quote_asset_volume),
         count=raw.number_of_trades,
         vwap=None,
     )
@@ -72,16 +82,16 @@ def normalize_bybit_kline(raw: BybitKline, symbol: str, venue: str = "bybit") ->
     Bybit kline startTime is a string of milliseconds.
     """
     ts = datetime.fromtimestamp(int(raw.startTime) / 1000.0, tz=UTC)
-    quote_vol = float(raw.turnover) if raw.turnover is not None else None
+    quote_vol = _d(raw.turnover) if raw.turnover is not None else None
     return CanonicalOhlcvBar(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=float(raw.openPrice),
-        high=float(raw.highPrice),
-        low=float(raw.lowPrice),
-        close=float(raw.closePrice),
-        volume=float(raw.volume),
+        open=_d(raw.openPrice),
+        high=_d(raw.highPrice),
+        low=_d(raw.lowPrice),
+        close=_d(raw.closePrice),
+        volume=_d(raw.volume),
         quote_volume=quote_vol,
         count=None,
         vwap=None,
@@ -95,16 +105,16 @@ def normalize_okx_kline(raw: OKXCandleWS, symbol: str, venue: str = "okx") -> Ca
     volCcyQuote is the quote currency volume when available.
     """
     ts = datetime.fromtimestamp(int(raw.ts) / 1000.0, tz=UTC)
-    quote_vol = float(raw.volCcyQuote) if raw.volCcyQuote is not None else None
+    quote_vol = _d(raw.volCcyQuote) if raw.volCcyQuote is not None else None
     return CanonicalOhlcvBar(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=float(raw.o),
-        high=float(raw.h),
-        low=float(raw.l),
-        close=float(raw.c),
-        volume=float(raw.vol),
+        open=_d(raw.o),
+        high=_d(raw.h),
+        low=_d(raw.l),
+        close=_d(raw.c),
+        volume=_d(raw.vol),
         quote_volume=quote_vol,
         count=None,
         vwap=None,
@@ -125,11 +135,11 @@ def normalize_barchart_ohlcv(raw: BarchartOhlcv15m, venue: str = "barchart") -> 
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=raw.Open,
-        high=raw.High,
-        low=raw.Low,
-        close=raw.Last,
-        volume=raw.Volume if raw.Volume is not None else 0.0,
+        open=_d(raw.Open),
+        high=_d(raw.High),
+        low=_d(raw.Low),
+        close=_d(raw.Last),
+        volume=_d(raw.Volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -146,11 +156,11 @@ def normalize_yahoo_ohlcv(raw: YahooOhlcv, venue: str = "yahoo_finance") -> Cano
         timestamp=ts,
         venue=venue,
         symbol=raw.symbol,
-        open=raw.Open,
-        high=raw.High,
-        low=raw.Low,
-        close=raw.Close,
-        volume=raw.Volume,
+        open=_d(raw.Open),
+        high=_d(raw.High),
+        low=_d(raw.Low),
+        close=_d(raw.Close),
+        volume=_d(raw.Volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -164,11 +174,11 @@ def normalize_aster_kline(raw: AsterKline, symbol: str = "", venue: str = "aster
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=float(raw.open),
-        high=float(raw.high),
-        low=float(raw.low),
-        close=float(raw.close),
-        volume=float(raw.volume),
+        open=_d(raw.open),
+        high=_d(raw.high),
+        low=_d(raw.low),
+        close=_d(raw.close),
+        volume=_d(raw.volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -182,11 +192,11 @@ def normalize_ccxt_ohlcv(raw: CcxtOhlcv, symbol: str = "", venue: str = "ccxt") 
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=float(raw.open or 0),
-        high=float(raw.high or 0),
-        low=float(raw.low or 0),
-        close=float(raw.close or 0),
-        volume=float(raw.volume or 0),
+        open=_d(raw.open),
+        high=_d(raw.high),
+        low=_d(raw.low),
+        close=_d(raw.close),
+        volume=_d(raw.volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -203,11 +213,11 @@ def normalize_coinbase_candle(raw: CoinbaseCandle, symbol: str = "", venue: str 
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=float(raw.open),
-        high=float(raw.high),
-        low=float(raw.low),
-        close=float(raw.close),
-        volume=float(raw.volume),
+        open=_d(raw.open),
+        high=_d(raw.high),
+        low=_d(raw.low),
+        close=_d(raw.close),
+        volume=_d(raw.volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -227,11 +237,11 @@ def normalize_hyperliquid_candle(
         timestamp=ts,
         venue=venue,
         symbol=sym,
-        open=float(raw.o or 0),
-        high=float(raw.h or 0),
-        low=float(raw.low or 0),
-        close=float(raw.c or 0),
-        volume=float(raw.v or 0),
+        open=_d(raw.o),
+        high=_d(raw.h),
+        low=_d(raw.low),
+        close=_d(raw.c),
+        volume=_d(raw.v),
         quote_volume=None,
         count=raw.n,
         vwap=None,
@@ -253,11 +263,11 @@ def normalize_yahoo_finance_ohlcv24h(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=raw.Open or 0.0,
-        high=raw.High or 0.0,
-        low=raw.Low or 0.0,
-        close=raw.Close or 0.0,
-        volume=raw.Volume or 0.0,
+        open=_d(raw.Open),
+        high=_d(raw.High),
+        low=_d(raw.Low),
+        close=_d(raw.Close),
+        volume=_d(raw.Volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -280,11 +290,11 @@ def normalize_kalshi_candlestick(raw: KalshiCandlestick, symbol: str = "", venue
         timestamp=ts,
         venue=venue,
         symbol=sym,
-        open=float(raw.yes_open_dollars or 0),
-        high=float(raw.yes_high_dollars or 0),
-        low=float(raw.yes_low_dollars or 0),
-        close=float(raw.yes_close_dollars or 0),
-        volume=float(raw.volume_fp or 0),
+        open=_d(raw.yes_open_dollars),
+        high=_d(raw.yes_high_dollars),
+        low=_d(raw.yes_low_dollars),
+        close=_d(raw.yes_close_dollars),
+        volume=_d(raw.volume_fp),
         quote_volume=None,
         count=None,
         vwap=None,

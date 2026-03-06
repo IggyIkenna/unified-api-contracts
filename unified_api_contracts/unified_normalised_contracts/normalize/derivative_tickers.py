@@ -92,7 +92,7 @@ def normalize_binance_derivative_ticker(
     index_price: Decimal | None = None
     last_price: Decimal | None = None
     funding_rate: Decimal | None = None
-    next_funding_time: datetime | None = None
+    next_funding_timestamp: datetime | None = None
     timestamp: datetime = _now_utc()
 
     if isinstance(raw, BinancePremiumIndex):
@@ -100,7 +100,7 @@ def normalize_binance_derivative_ticker(
         mark_price = _to_decimal(raw.markPrice)
         index_price = _to_decimal(raw.indexPrice)
         funding_rate = _to_decimal(raw.lastFundingRate)
-        next_funding_time = _ms_to_utc(raw.nextFundingTime)
+        next_funding_timestamp = _ms_to_utc(raw.nextFundingTime)
         ts_dt = _ms_to_utc(raw.time)
         if ts_dt is not None:
             timestamp = ts_dt
@@ -109,7 +109,7 @@ def normalize_binance_derivative_ticker(
         symbol = raw.symbol
         last_price = _to_decimal(raw.lastPrice)
         funding_rate = _to_decimal(raw.lastFundingRate)
-        next_funding_time = _ms_to_utc(raw.nextFundingTime)
+        next_funding_timestamp = _ms_to_utc(raw.nextFundingTime)
         ts_dt = _ms_to_utc(raw.time or raw.closeTime)
         if ts_dt is not None:
             timestamp = ts_dt
@@ -123,7 +123,7 @@ def normalize_binance_derivative_ticker(
         index_price=index_price,
         last_price=last_price,
         funding_rate=funding_rate,
-        next_funding_time=next_funding_time,
+        next_funding_timestamp=next_funding_timestamp,
     )
 
 
@@ -184,7 +184,7 @@ def normalize_bybit_derivative_ticker(
         funding_rate=funding_rate_val,
         predicted_funding_rate=predicted_funding,
         funding_timestamp=funding_timestamp,
-        next_funding_time=next_funding_ts,
+        next_funding_timestamp=next_funding_ts,
         open_interest=open_interest,
         open_interest_value=open_interest_value,
     )
@@ -227,14 +227,14 @@ def normalize_okx_derivative_ticker(
 
     funding_rate_val: Decimal | None = None
     predicted_funding: Decimal | None = None
-    next_funding_time: datetime | None = None
+    next_funding_timestamp: datetime | None = None
     funding_timestamp: datetime | None = None
 
     if funding is not None:
         funding_rate_val = _to_decimal(funding.fundingRate)
         funding_timestamp = _ms_to_utc(funding.fundingTime)
         predicted_funding = _to_decimal(funding.nextFundingRate)
-        next_funding_time = _ms_to_utc(funding.nextFundingTime)
+        next_funding_timestamp = _ms_to_utc(funding.nextFundingTime)
 
     open_interest_val: Decimal | None = None
     open_interest_value_val: Decimal | None = None
@@ -252,7 +252,7 @@ def normalize_okx_derivative_ticker(
         funding_rate=funding_rate_val,
         predicted_funding_rate=predicted_funding,
         funding_timestamp=funding_timestamp,
-        next_funding_time=next_funding_time,
+        next_funding_timestamp=next_funding_timestamp,
         open_interest=open_interest_val,
         open_interest_value=open_interest_value_val,
     )
@@ -368,7 +368,7 @@ def normalize_aster_derivative_ticker(
     mark_price = _to_decimal(mark.markPrice) if mark.markPrice else None
     index_price = _to_decimal(mark.indexPrice) if mark.indexPrice else None
     funding_rate = _to_decimal(mark.lastFundingRate) if mark.lastFundingRate else None
-    next_funding_time = _ms_to_utc(mark.nextFundingTime) if mark.nextFundingTime else None
+    next_funding_timestamp = _ms_to_utc(mark.nextFundingTime) if mark.nextFundingTime else None
 
     open_interest: Decimal | None = None
     if oi is not None and oi.openInterest:
@@ -389,7 +389,7 @@ def normalize_aster_derivative_ticker(
         index_price=index_price,
         funding_rate=funding_rate,
         funding_timestamp=explicit_funding_dt,
-        next_funding_time=next_funding_time,
+        next_funding_timestamp=next_funding_timestamp,
         open_interest=open_interest,
     )
 
@@ -422,7 +422,7 @@ def normalize_tardis_derivative_ticker(
     index_price = _to_decimal(raw.get("indexPrice") or raw.get("index_price"))
     last_price = _to_decimal(raw.get("lastPrice") or raw.get("last_price"))
     funding_rate = _to_decimal(raw.get("fundingRate") or raw.get("funding_rate"))
-    next_funding_time = _ms_to_utc(raw.get("nextFundingTime") or raw.get("next_funding_time"))
+    next_funding_timestamp = _ms_to_utc(raw.get("nextFundingTime") or raw.get("next_funding_timestamp"))
     open_interest = _to_decimal(raw.get("openInterest") or raw.get("open_interest"))
     open_interest_value = _to_decimal(raw.get("openInterestValue") or raw.get("open_interest_value"))
 
@@ -434,7 +434,7 @@ def normalize_tardis_derivative_ticker(
         index_price=index_price,
         last_price=last_price,
         funding_rate=funding_rate,
-        next_funding_time=next_funding_time,
+        next_funding_timestamp=next_funding_timestamp,
         open_interest=open_interest,
         open_interest_value=open_interest_value,
     )
@@ -464,7 +464,7 @@ def normalize_ccxt_funding_rate(
         mark_price=None,
         index_price=None,
         funding_rate=funding_rate,
-        next_funding_time=None,
+        next_funding_timestamp=None,
         open_interest=None,
         open_interest_value=None,
         predicted_funding_rate=None,
