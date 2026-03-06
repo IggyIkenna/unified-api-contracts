@@ -81,7 +81,7 @@ steps:
         echo "{\"version\":\"$$VERSION\",\"commit\":\"$COMMIT_SHA\",\"short_sha\":\"$SHORT_SHA\",\"build_id\":\"$BUILD_ID\",\"timestamp\":\"$$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > /tmp/build-metadata.json
 
         gsutil cp /tmp/build-metadata.json \
-          gs://$PROJECT_ID-build-metadata/unified-api-contracts/versions/$$VERSION.json || true
+          gs://$PROJECT_ID-build-metadata/unified-api-contracts/versions/$$VERSION.json || true  # || true: cleanup step, failure is intentional (metadata storage non-blocking)
 
         echo "✓ Stored build metadata for version $$VERSION"
     waitFor: ["build-wheel"]
