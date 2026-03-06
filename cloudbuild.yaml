@@ -41,12 +41,12 @@ steps:
         echo "=== STEP 5.10: No direct cloud SDK imports ==="
         VIOLATIONS=$(rg 'from google\.cloud import|^import boto3\b|^from boto3 import|^from botocore import' \
           --type py --glob '!.venv*' --glob '!**/providers/**' --glob '!**/cache.py' \
-          . 2>/dev/null || true)
+          . 2>/dev/null || true)  # || true: cleanup step, failure is intentional (rg exits 1 when no matches found)
         [ -n "$VIOLATIONS" ] && { echo "STEP 5.10 FAILED:"; echo "$VIOLATIONS"; exit 1; }
         echo "STEP 5.10 passed"
         echo "=== STEP 5.11: No UTL protocol-leaking symbols ==="
         UTL=$(rg 'from unified_trading_library import.*(CloudTarget|StandardizedDomainCloudService|upload_to_gcs_batch)' \
-          --type py --glob '!.venv*' --glob '!tests/**' . 2>/dev/null || true)
+          --type py --glob '!.venv*' --glob '!tests/**' . 2>/dev/null || true)  # || true: cleanup step, failure is intentional (rg exits 1 when no matches found)
         [ -n "$UTL" ] && { echo "STEP 5.11 FAILED:"; echo "$UTL"; exit 1; }
         echo "STEP 5.11 passed"
     waitFor: ["lint"]
