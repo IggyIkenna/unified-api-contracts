@@ -19,11 +19,7 @@ FORBIDDEN_IMPORT = "unified_internal_contracts"
 
 
 def _all_uac_python_files() -> list[Path]:
-    return [
-        p
-        for p in UAC_SOURCE_ROOT.rglob("*.py")
-        if "__pycache__" not in p.parts and ".venv" not in str(p)
-    ]
+    return [p for p in UAC_SOURCE_ROOT.rglob("*.py") if "__pycache__" not in p.parts and ".venv" not in str(p)]
 
 
 @pytest.mark.parametrize("py_file", _all_uac_python_files(), ids=lambda p: str(p.relative_to(UAC_SOURCE_ROOT)))
