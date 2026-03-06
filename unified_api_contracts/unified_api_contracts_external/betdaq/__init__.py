@@ -5,10 +5,13 @@ from .schemas import (
     BetdaqBalance,
     BetdaqBalancesResponse,
     BetdaqErrorResponse,
+    BetdaqEvent,
     BetdaqMarket,
     BetdaqMarketsResponse,
+    BetdaqOdds,
     BetdaqOrder,
     BetdaqOrdersResponse,
+    BetdaqPriceLevel,
     BetdaqSelection,
 )
 
@@ -17,9 +20,12 @@ __all__ = [
     "BetdaqBalance",
     "BetdaqBalancesResponse",
     "BetdaqErrorResponse",
+    "BetdaqEvent",
     "BetdaqMarket",
     "BetdaqMarketsResponse",
+    "BetdaqOdds",
     "BetdaqOrder",
     "BetdaqOrdersResponse",
+    "BetdaqPriceLevel",
     "BetdaqSelection",
 ]
