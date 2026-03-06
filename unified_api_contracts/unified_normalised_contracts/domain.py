@@ -367,11 +367,11 @@ class CanonicalMarketInfo(BaseModel):
 
 # CanonicalOraclePrice — owned by UIC (unified-internal-contracts/market_data/defi.py).
 # No UAC normalizer produces this type; it is only used in internal pub-sub messaging.
-# UIC re-exports it from unified_internal_contracts.market_data.
+# Import from the UIC package: market_data submodule.
 
 # CanonicalStakingRate — owned by UIC (unified-internal-contracts/market_data/defi.py).
 # No UAC normalizer produces this type; it is only used in internal pub-sub messaging.
-# UIC re-exports it from unified_internal_contracts.market_data.
+# Import from the UIC package: market_data submodule.
 
 
 class CanonicalWsMessage(BaseModel):
