@@ -78,3 +78,32 @@ class BetdaqBalancesResponse(BaseModel, frozen=True):
     balances: list[BetdaqBalance] = Field(default_factory=list, alias="Balances")
 
     model_config = {"populate_by_name": True}
+
+
+class BetdaqPriceLevel(BaseModel, frozen=True):
+    """Betdaq price level (back or lay)."""
+
+    price: float | None = Field(None, alias="Price")
+    amount: float | None = Field(None, alias="Amount")
+
+    model_config = {"populate_by_name": True}
+
+
+class BetdaqOdds(BaseModel, frozen=True):
+    """Betdaq odds — selection-level back/lay prices."""
+
+    selection_id: int | str | None = Field(None, alias="SelectionId")
+    back_prices: list[BetdaqPriceLevel] = Field(default_factory=list, alias="BackPrices")
+    lay_prices: list[BetdaqPriceLevel] = Field(default_factory=list, alias="LayPrices")
+
+    model_config = {"populate_by_name": True}
+
+
+class BetdaqEvent(BaseModel, frozen=True):
+    """Betdaq event (e.g. a sports fixture)."""
+
+    id: int | str = Field(0, alias="Id")
+    name: str = Field("", alias="Name")
+    markets: list[BetdaqMarket] = Field(default_factory=list, alias="Markets")
+
+    model_config = {"populate_by_name": True}
