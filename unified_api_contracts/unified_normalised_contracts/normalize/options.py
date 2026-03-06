@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import contextlib
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from ...unified_api_contracts_external.databento.schemas import (
     DATABENTO_PRICE_DIVISOR,
@@ -27,8 +28,17 @@ from ...unified_api_contracts_external.yahoo_finance.schemas import (
 from ..domain import CanonicalOptionsChainEntry
 
 
-def _db_price(px: int) -> float:
-    return float(px) / float(DATABENTO_PRICE_DIVISOR)
+def _db_price(px: int) -> Decimal:
+    return Decimal(str(float(px) / float(DATABENTO_PRICE_DIVISOR)))
+
+
+def _d(value: float | int | str | Decimal | None) -> Decimal | None:
+    """Convert any numeric value to Decimal; return None for None."""
+    if value is None:
+        return None
+    if isinstance(value, Decimal):
+        return value
+    return Decimal(str(value))
 
 
 def normalize_databento_option_quote(
@@ -48,8 +58,8 @@ def normalize_databento_option_quote(
         expiration=exp,
         bid_price=_db_price(raw.bid_px_00),
         ask_price=_db_price(raw.ask_px_00),
-        bid_size=float(raw.bid_sz_00),
-        ask_size=float(raw.ask_sz_00),
+        bid_size=_d(raw.bid_sz_00),
+        ask_size=_d(raw.ask_sz_00),
         implied_volatility=_db_price(raw.implied_volatility) if raw.implied_volatility else None,
         delta=_db_price(raw.delta) if raw.delta else None,
         gamma=_db_price(raw.gamma) if raw.gamma else None,
@@ -76,8 +86,8 @@ def normalize_databento_cme_option_quote(
         expiration=exp,
         bid_price=_db_price(raw.bid_px_00),
         ask_price=_db_price(raw.ask_px_00),
-        bid_size=float(raw.bid_sz_00),
-        ask_size=float(raw.ask_sz_00),
+        bid_size=_d(raw.bid_sz_00),
+        ask_size=_d(raw.ask_sz_00),
         implied_volatility=_db_price(raw.implied_volatility) if raw.implied_volatility else None,
         delta=_db_price(raw.delta) if raw.delta else None,
         gamma=_db_price(raw.gamma) if raw.gamma else None,
@@ -108,7 +118,7 @@ def normalize_deribit_option_ticker(
         venue=venue,
         symbol=raw.instrument_name,
         underlying=underlying or raw.instrument_name.split("-")[0] if raw.instrument_name else "",
-        strike=float(raw.mark_price) if raw.mark_price is not None else 0.0,
+        strike=Decimal(str(raw.mark_price)) if raw.mark_price is not None else Decimal("0"),
         option_type=option_type,
         expiration=exp,
         bid_price=None,
@@ -134,13 +144,13 @@ def normalize_tardis_option_quote(raw: TardisOptionQuote, venue: str = "tardis")
         venue=venue,
         symbol=raw.symbol,
         underlying=(raw.underlying_price is not None and str(raw.underlying_price)) or raw.symbol.split("-")[0],
-        strike=float(raw.strike_price) if raw.strike_price is not None else 0.0,
+        strike=_d(raw.strike_price) or Decimal("0"),
         option_type=opt_type,
         expiration=exp,
-        bid_price=raw.bid_price,
-        ask_price=raw.ask_price,
-        bid_size=raw.bid_amount,
-        ask_size=raw.ask_amount,
+        bid_price=_d(raw.bid_price),
+        ask_price=_d(raw.ask_price),
+        bid_size=_d(raw.bid_amount),
+        ask_size=_d(raw.ask_amount),
         implied_volatility=raw.mark_iv,
         delta=raw.delta,
         gamma=raw.gamma,
@@ -164,11 +174,11 @@ def normalize_yahoo_option(raw: YahooOptionContract, venue: str = "yahoo_finance
         venue=venue,
         symbol=raw.contractSymbol,
         underlying=raw.underlying or raw.contractSymbol,
-        strike=raw.strike,
+        strike=_d(raw.strike) or Decimal("0"),
         option_type=opt_type,
         expiration=exp,
-        bid_price=raw.bid,
-        ask_price=raw.ask,
+        bid_price=_d(raw.bid),
+        ask_price=_d(raw.ask),
         bid_size=None,
         ask_size=None,
         implied_volatility=raw.impliedVolatility,
@@ -223,13 +233,13 @@ def normalize_ibkr_option_quote(
         venue=venue,
         symbol=symbol,
         underlying=underlying,
-        strike=float(raw.strike) if raw.strike is not None else 0.0,
+        strike=_d(raw.strike) if raw.strike is not None else Decimal("0"),
         option_type=opt_type,
         expiration=exp,
-        bid_price=bid,
-        ask_price=ask,
-        bid_size=float(bid_sz) if bid_sz is not None else None,
-        ask_size=float(ask_sz) if ask_sz is not None else None,
+        bid_price=_d(bid),
+        ask_price=_d(ask),
+        bid_size=_d(bid_sz),
+        ask_size=_d(ask_sz),
         implied_volatility=iv,
         delta=delta,
         gamma=gamma,
@@ -253,10 +263,10 @@ def normalize_deribit_mark_price_option(
     opt_type = "put" if instrument_name.endswith("-P") else "call"
     # Extract strike from instrument_name: e.g. "BTC-28JUN24-70000-C" → 70000
     parts = instrument_name.split("-")
-    strike = 0.0
+    strike: Decimal = Decimal("0")
     if len(parts) >= 3:
         with contextlib.suppress(ValueError, IndexError):
-            strike = float(parts[-2])
+            strike = Decimal(parts[-2])
     iv = float(raw.iv) if raw.iv is not None else None
     return CanonicalOptionsChainEntry(
         timestamp=ts,
@@ -299,11 +309,11 @@ def normalize_yahoo_finance_option(
         venue=venue,
         symbol=sym,
         underlying=raw.ticker or sym,
-        strike=raw.strike or 0.0,
+        strike=_d(raw.strike) or Decimal("0"),
         option_type=opt_type,
         expiration=exp,
-        bid_price=raw.bid,
-        ask_price=raw.ask,
+        bid_price=_d(raw.bid),
+        ask_price=_d(raw.ask),
         bid_size=None,
         ask_size=None,
         implied_volatility=raw.implied_volatility,

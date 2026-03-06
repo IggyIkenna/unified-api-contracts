@@ -109,6 +109,11 @@ class CanonicalOrder(BaseModel):
     average_fill_price: Decimal | None = None
     strategy_id: str | None = None
     client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    # Derivative-specific optional fields
+    reduce_only: bool | None = None
+    stop_price: Decimal | None = None
+    leverage: Decimal | None = None
+    margin_mode: str | None = Field(default=None, description="cross or isolated")
 
 
 class CanonicalFill(BaseModel):
@@ -127,6 +132,9 @@ class CanonicalFill(BaseModel):
     is_maker: bool | None = None
     strategy_id: str | None = None
     client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    fee_rate: Decimal | None = None
+    rebate: Decimal | None = None
+    realized_pnl: Decimal | None = None
 
 
 # ---------------------------------------------------------------------------
