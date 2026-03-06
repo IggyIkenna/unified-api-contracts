@@ -269,6 +269,12 @@ class CanonicalDerivativeTicker(BaseModel):
     basis: Decimal | None = None
     basis_rate: Decimal | None = None
     adl_rank: int | None = None
+    funding_interval_hours: int | None = Field(
+        default=None,
+        description="Funding interval in hours (e.g. 1 for Hyperliquid, 8 for Binance/OKX). "
+        "Required for correct cross-venue funding rate comparison.",
+    )
+    settlement_price: Decimal | None = None
     schema_version: str = "1.0"
 
 
@@ -329,13 +335,13 @@ class CanonicalOptionsChainEntry(BaseModel):
     venue: str
     symbol: str
     underlying: str
-    strike: float
+    strike: Decimal
     option_type: str = Field(description="call or put")
     expiration: datetime | None = None
-    bid_price: float | None = None
-    ask_price: float | None = None
-    bid_size: float | None = None
-    ask_size: float | None = None
+    bid_price: Decimal | None = None
+    ask_price: Decimal | None = None
+    bid_size: Decimal | None = None
+    ask_size: Decimal | None = None
     implied_volatility: float | None = None
     delta: float | None = None
     gamma: float | None = None
