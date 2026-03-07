@@ -94,6 +94,10 @@ from .unified_api_contracts_external.sports import (
     SignalSource,
     SportsError,
 )
+from .unified_normalised_contracts.execution import (
+    CanonicalFill,
+    CanonicalOrder,
+)
 from .unified_normalised_contracts.options import (
     NormalizedStrikeCoordinate,
     OptionChainSnapshot,
@@ -170,9 +174,11 @@ __all__ = [
     "BookmakerRegistry",
     "BookmakerUnavailableError",
     "CanonicalBookmakerMarket",
+    "CanonicalFill",
     "CanonicalFixture",
     "CanonicalLeague",
     "CanonicalOdds",
+    "CanonicalOrder",
     "CanonicalPlayer",
     "CanonicalReferee",
     "CanonicalSpread",
