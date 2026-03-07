@@ -16,7 +16,7 @@ on:
       - "unified_api_contracts/unified_normalised_contracts/**"
       - "unified_api_contracts/provider_api_versions.yaml"
       - "tests/vcr/test_schema_health.py"
-      - "scripts/generate_schema_version_matrix.py"
+      - "scripts/generate_schema_audit_matrix.py"
       - "scripts/update_schema_health_svg.py"
   pull_request:
     branches: [main]
@@ -67,7 +67,7 @@ jobs:
 
       - name: Generate schema version matrix
         run: |
-          python3 scripts/generate_schema_version_matrix.py
+          python3 scripts/generate_schema_audit_matrix.py
 
       - name: Update schema health SVG from test results
         run: |
@@ -75,10 +75,10 @@ jobs:
 
       - name: Check for red providers (hard fail)
         run: |
-          RED=$(python3 scripts/generate_schema_version_matrix.py --count-red)
+          RED=$(python3 scripts/generate_schema_audit_matrix.py --count-red)
           echo "Red provider count: $RED"
           if [ "$RED" -gt 0 ]; then
-            echo "::error::$RED provider(s) have red schema health. Run: python3 scripts/generate_schema_version_matrix.py"
+            echo "::error::$RED provider(s) have red schema health. Run: python3 scripts/generate_schema_audit_matrix.py"
             exit 1
           fi
 

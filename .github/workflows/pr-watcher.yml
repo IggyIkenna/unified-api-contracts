@@ -35,8 +35,8 @@ jobs:
             ERRORS="$ERRORS\n❌ PR title must follow conventional commits: feat|fix|refactor|chore|docs|test(scope): description"
           fi
 
-          # Check for pip install (must use uv)
-          BAD_PIP=$(git diff origin/main...HEAD -- '*.py' '*.sh' '*.yaml' '*.yml' 2>/dev/null | grep '^+' | grep 'pip install ' | grep -v 'pip install uv' | grep -v '#' || true)
+          # Check for pip install (must use uv) — exclude 'uv pip install' and '#' comments
+          BAD_PIP=$(git diff origin/main...HEAD -- '*.py' '*.sh' '*.yaml' '*.yml' 2>/dev/null | grep '^+' | grep 'pip install ' | grep -v 'uv pip install' | grep -v 'pip install uv' | grep -v '#' || true)
           if [ -n "$BAD_PIP" ]; then
             ERRORS="$ERRORS\n❌ Use 'uv pip install' not 'pip install'"
           fi
@@ -46,8 +46,8 @@ jobs:
             ERRORS="$ERRORS\n❌ No os.getenv() in unified_api_contracts/ source"
           fi
 
-          # Check for hardcoded project IDs
-          if git diff origin/main...HEAD 2>/dev/null | grep -q 'central-element-'; then
+          # Check for hardcoded project IDs — exclude quality-gates.sh which uses ID as a search pattern
+          if git diff origin/main...HEAD 2>/dev/null | grep -v 'quality-gates' | grep -q 'central-element-'; then
             ERRORS="$ERRORS\n❌ No hardcoded project IDs (use test-project in tests)"
           fi
 
