@@ -1,8 +1,10 @@
 """Bybit adapter: markets, tickers, order book, trades, order/position, errors, WebSocket, FIX."""
 
+__api_version__ = "v5"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class BybitMarket(BaseModel):

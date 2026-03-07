@@ -12,10 +12,16 @@ from ...unified_api_contracts_external.binance.market_schemas import (
 )
 from ...unified_api_contracts_external.bybit.schemas import BybitInstrumentInfo
 from ...unified_api_contracts_external.ccxt.schemas import CcxtMarket, CcxtMarketLimits
-from ...unified_api_contracts_external.coingecko.schemas import GlobalMarketData, GlobalMarketResponse
+from ...unified_api_contracts_external.coingecko.schemas import (
+    GlobalMarketData,
+    GlobalMarketResponse,
+)
 from ...unified_api_contracts_external.deribit.schemas import DeribitInstrument
 from ...unified_api_contracts_external.dydx.schemas import DydxPerpetualMarket
-from ...unified_api_contracts_external.fix.schemas import FixMarketDataRequest, FixMarketDataSnapshot
+from ...unified_api_contracts_external.fix.schemas import (
+    FixMarketDataRequest,
+    FixMarketDataSnapshot,
+)
 from ...unified_api_contracts_external.ibkr.schemas import IBKRContractDetails
 from ...unified_api_contracts_external.matchbook.schemas import MatchbookMarket
 from ...unified_api_contracts_external.metabet.schemas import MetabetMarket

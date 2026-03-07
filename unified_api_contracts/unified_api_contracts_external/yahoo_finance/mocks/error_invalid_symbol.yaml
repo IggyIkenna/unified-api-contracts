@@ -29,22 +29,22 @@ yfinance_exceptions:
     message: "No data found, symbol may be delisted"
     ticker: "INVALID"
     context: "When calling yf.Ticker('INVALID').dividends"
-    
+
   # HTTP 404 error from Yahoo API
   http_404_error:
-    exception_type: "requests.exceptions.HTTPError"  
+    exception_type: "requests.exceptions.HTTPError"
     status_code: 404
     message: "404 Client Error: Not Found"
     ticker: "NONEXISTENT"
     context: "HTTP request to Yahoo Finance API failed"
-    
+
   # Network timeout
   timeout_error:
     exception_type: "requests.exceptions.Timeout"
     message: "HTTPSConnectionPool(host='query1.finance.yahoo.com'): Read timed out."
     ticker: "AAPL"
     context: "Network timeout during API request"
-    
+
   # Connection error
   connection_error:
     exception_type: "requests.exceptions.ConnectionError"
@@ -56,20 +56,20 @@ yfinance_exceptions:
 empty_responses:
   # Empty dividends series
   empty_dividends:
-    ticker: "BERKB"  # Berkshire Hathaway B shares (no dividends)
+    ticker: "BERKB" # Berkshire Hathaway B shares (no dividends)
     response_type: "empty_series"
     data_type: "dividends"
     pandas_series: null
     description: "Stock that doesn't pay dividends"
-    
-  # Empty stock splits series  
+
+  # Empty stock splits series
   empty_splits:
-    ticker: "BRK.A"  # Berkshire Hathaway A shares (no splits)
+    ticker: "BRK.A" # Berkshire Hathaway A shares (no splits)
     response_type: "empty_series"
     data_type: "splits"
     pandas_series: null
     description: "Stock that has never split"
-    
+
   # Empty earnings data
   empty_earnings:
     ticker: "PRIVATE_CO" # Private company (hypothetical)
@@ -88,22 +88,22 @@ malformed_data:
       "2024-04-15T00:00:00+00:00": null
       "2024-07-15T00:00:00+00:00": 0.0
     description: "Dividend data with NaN/null values"
-    
+
   # Invalid split ratios
   invalid_splits:
     ticker: "BADSPLIT"
     splits_series:
-      "2024-06-01T00:00:00+00:00": 0.0   # Invalid - ratio cannot be 0
-      "2024-09-01T00:00:00+00:00": -2.0  # Invalid - ratio cannot be negative
+      "2024-06-01T00:00:00+00:00": 0.0 # Invalid - ratio cannot be 0
+      "2024-09-01T00:00:00+00:00": -2.0 # Invalid - ratio cannot be negative
     description: "Stock split data with invalid ratios"
-    
+
   # Malformed earnings data
   corrupt_earnings:
     ticker: "BADEARNINGS"
     earnings_dataframe:
       columns: ["Reported EPS", "EPS Estimate", "Surprise(%)"]
       data:
-        "invalid_date":  # Invalid date format
+        "invalid_date": # Invalid date format
           "Reported EPS": "not_a_number"
           "EPS Estimate": .inf
           "Surprise(%)": null
@@ -118,7 +118,7 @@ adapter_error_handling:
     result: []
     log_level: "ERROR"
     log_message: "Failed to fetch dividends for INVALID: No data found"
-    
+
   # Exception caught and logged
   exception_handling:
     method: "fetch_splits"
@@ -135,26 +135,26 @@ http_errors:
     status_code: 400
     message: "Bad Request"
     description: "Invalid ticker format sent to API"
-    
+
   # 404 Not Found
   not_found:
     status_code: 404
     message: "Not Found"
     description: "Ticker symbol not found in Yahoo Finance database"
-    
+
   # 429 Too Many Requests
   rate_limited:
     status_code: 429
     message: "Too Many Requests"
     description: "Rate limit exceeded"
-    retry_after: "60"  # seconds
-    
+    retry_after: "60" # seconds
+
   # 500 Internal Server Error
   server_error:
     status_code: 500
-    message: "Internal Server Error"  
+    message: "Internal Server Error"
     description: "Yahoo Finance API internal error"
-    
+
   # 503 Service Unavailable
   service_unavailable:
     status_code: 503

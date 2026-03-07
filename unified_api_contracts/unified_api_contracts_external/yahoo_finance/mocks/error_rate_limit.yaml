@@ -15,7 +15,7 @@ rate_limits:
     requests_per_minute: 100
     requests_per_second: 5
     burst_allowance: 10
-    
+
   strict_limits:
     requests_per_hour: 1000
     requests_per_minute: 50
@@ -29,21 +29,21 @@ http_429_responses:
     status_code: 429
     message: "Too Many Requests"
     headers:
-      "Retry-After": "60"  # Wait 60 seconds
+      "Retry-After": "60" # Wait 60 seconds
       "X-RateLimit-Limit": "2000"
       "X-RateLimit-Remaining": "0"
-      "X-RateLimit-Reset": "1708811400"  # Unix timestamp
+      "X-RateLimit-Reset": "1708811400" # Unix timestamp
     body:
       error:
         code: "RATE_LIMIT_EXCEEDED"
         description: "Request rate limit exceeded. Please retry after 60 seconds."
-        
+
   # Severe rate limit with longer wait
   severe_rate_limit:
     status_code: 429
     message: "Rate Limit Exceeded"
     headers:
-      "Retry-After": "3600"  # Wait 1 hour
+      "Retry-After": "3600" # Wait 1 hour
       "X-RateLimit-Limit": "2000"
       "X-RateLimit-Remaining": "0"
       "X-RateLimit-Reset": "1708815000"
@@ -51,13 +51,13 @@ http_429_responses:
       error:
         code: "HOURLY_LIMIT_EXCEEDED"
         description: "Hourly request limit exceeded. Please retry after 1 hour."
-        
+
   # Daily limit exceeded
   daily_limit:
     status_code: 429
     message: "Daily Limit Exceeded"
     headers:
-      "Retry-After": "86400"  # Wait 24 hours
+      "Retry-After": "86400" # Wait 24 hours
       "X-RateLimit-Limit": "10000"
       "X-RateLimit-Remaining": "0"
       "X-RateLimit-Reset": "1708897800"
@@ -74,14 +74,14 @@ yfinance_behaviors:
     message: "HTTPSConnectionPool(host='query1.finance.yahoo.com'): Connection refused"
     description: "IP temporarily blocked due to excessive requests"
     typical_duration: "15-60 minutes"
-    
+
   # Timeout due to throttling
   throttled_timeout:
     exception_type: "requests.exceptions.Timeout"
     message: "HTTPSConnectionPool(host='query1.finance.yahoo.com'): Read timed out. (read timeout=30)"
     description: "Request timed out due to server-side throttling"
     retry_strategy: "Exponential backoff"
-    
+
   # Empty responses during heavy throttling
   throttled_empty_response:
     response_type: "empty_data"
@@ -96,16 +96,16 @@ progressive_limits:
     status_code: 200
     headers:
       "X-RateLimit-Limit": "2000"
-      "X-RateLimit-Remaining": "50"  # Only 50 requests left
+      "X-RateLimit-Remaining": "50" # Only 50 requests left
       "X-RateLimit-Reset": "1708811400"
     warning_message: "Approaching rate limit. 50 requests remaining."
-    
+
   # Critical level - very few requests left
   critical:
     status_code: 200
     headers:
       "X-RateLimit-Limit": "2000"
-      "X-RateLimit-Remaining": "5"  # Only 5 requests left
+      "X-RateLimit-Remaining": "5" # Only 5 requests left
       "X-RateLimit-Reset": "1708811400"
     warning_message: "Critical: Only 5 requests remaining."
 
@@ -113,33 +113,33 @@ progressive_limits:
 adapter_rate_limiting:
   # Current configuration
   current_config:
-    rate_limit_delay: 0.1  # 100ms between requests
+    rate_limit_delay: 0.1 # 100ms between requests
     max_retries: 3
     backoff_factor: 2.0
-    
+
   # Rate limit scenarios for testing
   scenarios:
     # Normal operation with delays
     normal_operation:
       requests_sent: 100
-      delay_between_requests: 0.1  # seconds
-      total_time: 10.0  # seconds
+      delay_between_requests: 0.1 # seconds
+      total_time: 10.0 # seconds
       success_rate: 100
-      
+
     # Hit rate limit and retry
     hit_rate_limit:
       initial_requests: 50
       rate_limit_hit_after: 50
-      retry_delay: 60  # seconds
+      retry_delay: 60 # seconds
       retry_attempts: 3
       final_success_rate: 100
-      
+
     # Repeated rate limiting
     repeated_rate_limits:
       total_requests: 200
       rate_limits_encountered: 5
-      average_retry_delay: 120  # seconds
-      total_time: 900  # 15 minutes
+      average_retry_delay: 120 # seconds
+      total_time: 900 # 15 minutes
       final_success_rate: 95
 
 # Error messages and logging
@@ -147,15 +147,15 @@ error_messages:
   rate_limit_detected:
     log_level: "WARNING"
     message: "Rate limit detected for ticker {ticker}. Waiting {delay} seconds before retry."
-    
+
   retry_attempt:
     log_level: "INFO"
     message: "Retrying request for ticker {ticker} (attempt {attempt}/{max_attempts})"
-    
+
   rate_limit_exceeded:
     log_level: "ERROR"
     message: "Rate limit exceeded for ticker {ticker} after {max_attempts} attempts. Skipping."
-    
+
   ip_blocked:
     log_level: "ERROR"
     message: "IP appears to be blocked by Yahoo Finance. Consider using proxy or waiting longer."
@@ -164,21 +164,21 @@ error_messages:
 mitigation_strategies:
   # Exponential backoff
   exponential_backoff:
-    initial_delay: 1.0  # seconds
-    max_delay: 300.0   # 5 minutes
+    initial_delay: 1.0 # seconds
+    max_delay: 300.0 # 5 minutes
     backoff_factor: 2.0
-    jitter: true       # Add random jitter to avoid thundering herd
-    
+    jitter: true # Add random jitter to avoid thundering herd
+
   # Request batching
   request_batching:
     batch_size: 10
-    delay_between_batches: 5.0  # seconds
+    delay_between_batches: 5.0 # seconds
     parallel_requests: false
-    
+
   # Circuit breaker pattern
   circuit_breaker:
-    failure_threshold: 5      # Open circuit after 5 failures
-    recovery_timeout: 300.0   # Try again after 5 minutes
+    failure_threshold: 5 # Open circuit after 5 failures
+    recovery_timeout: 300.0 # Try again after 5 minutes
     half_open_max_requests: 3 # Allow 3 requests when half-open
 
 # Test scenarios
@@ -187,16 +187,16 @@ test_scenarios:
   respect_rate_limits:
     description: "Verify adapter waits between requests"
     test_requests: 10
-    expected_min_time: 1.0  # At least 1 second for 10 requests
+    expected_min_time: 1.0 # At least 1 second for 10 requests
     verification: "Measure time between requests"
-    
+
   # Test retry behavior
   retry_behavior:
     description: "Test handling of 429 responses"
-    mock_429_after: 3        # Return 429 after 3 successful requests
+    mock_429_after: 3 # Return 429 after 3 successful requests
     expected_retries: 3
     expected_final_success: true
-    
+
   # Test failure handling
   failure_handling:
     description: "Test behavior when rate limits persist"
@@ -212,13 +212,13 @@ usage:
     - "Verify retry mechanisms work correctly"
     - "Ensure graceful degradation under limits"
     - "Test logging of rate limit events"
-    
+
   mock_integration:
     - "Use in unit tests with mocked requests"
     - "Simulate 429 responses at specific intervals"
     - "Test exponential backoff timing"
     - "Verify circuit breaker behavior"
-    
+
   performance_testing:
     - "Load test with rate limit simulation"
     - "Measure adapter throughput under limits"

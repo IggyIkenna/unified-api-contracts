@@ -1,5 +1,7 @@
 """Manifold Markets API response schemas."""
 
+__api_version__ = "v0"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

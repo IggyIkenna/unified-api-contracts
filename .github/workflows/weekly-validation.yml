@@ -3,85 +3,85 @@ name: Weekly API Schema Validation
 on:
   schedule:
     # Run every Monday at 8 AM UTC
-    - cron: '0 8 * * 1'
-  workflow_dispatch:  # Allow manual trigger
+    - cron: "0 8 * * 1"
+  workflow_dispatch: # Allow manual trigger
 
 jobs:
   validate-schemas:
     name: Validate API schemas against live responses
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    
+
     permissions:
       contents: read
-      id-token: write  # For Google Cloud authentication
-      issues: write    # To create issues on validation failures
-    
+      id-token: write # For Google Cloud authentication
+      issues: write # To create issues on validation failures
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          
+          python-version: "3.13"
+
       - name: Install uv
         run: pip install uv
-        
+
       - name: Install dependencies
         run: |
           uv pip install --system -e ".[dev]"
           uv pip install --system requests
-          
+
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
           service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
-          
+
       - name: Set up Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
-        
+
       - name: Collect API responses
         env:
-          LIVE_API_VERIFICATION: '1'
+          LIVE_API_VERIFICATION: "1"
           GOOGLE_CLOUD_PROJECT: ${{ secrets.GCP_PROJECT_ID }}
         run: |
           echo "🔄 Collecting fresh API responses for schema validation..."
           python scripts/collect_responses.py || echo "⚠️ Some collections failed but continuing..."
-          
+
       - name: Validate schemas
         id: validation
         run: |
           echo "🔍 Validating schemas against collected responses..."
           python scripts/validate_schemas.py > validation_report.txt 2>&1 || echo "validation_failed=true" >> $GITHUB_OUTPUT
           cat validation_report.txt
-          
+
       - name: Run schema validation tests
         run: |
           echo "🧪 Running schema validation test suite..."
           python -m pytest tests/test_schema_validation.py -v
-          
+
       - name: Check for schema drift
         id: drift_check
         run: |
           echo "📊 Analyzing schema validation results..."
-          
+
           # Count validation failures
           failed_count=$(grep -c "❌" validation_report.txt || echo "0")
           total_count=$(grep -c "✅\|❌" validation_report.txt || echo "0")
-          
+
           echo "failed_count=$failed_count" >> $GITHUB_OUTPUT
           echo "total_count=$total_count" >> $GITHUB_OUTPUT
-          
+
           if [ "$failed_count" -gt "0" ]; then
             echo "schema_drift_detected=true" >> $GITHUB_OUTPUT
             echo "🚨 Schema drift detected: $failed_count/$total_count endpoints failed validation"
           else
             echo "✅ All schemas validate successfully: $total_count/$total_count endpoints passed"
           fi
-          
+
       - name: Upload validation artifacts
         uses: actions/upload-artifact@v4
         if: always()
@@ -91,7 +91,7 @@ jobs:
             validation_report.txt
             collected_responses/
           retention-days: 30
-          
+
       - name: Create issue for schema drift
         if: steps.drift_check.outputs.schema_drift_detected == 'true'
         uses: actions/github-script@v7
@@ -99,38 +99,38 @@ jobs:
           script: |
             const fs = require('fs');
             const report = fs.readFileSync('validation_report.txt', 'utf8');
-            
+
             const failedCount = '${{ steps.drift_check.outputs.failed_count }}';
             const totalCount = '${{ steps.drift_check.outputs.total_count }}';
-            
+
             const issueBody = `
             ## 🚨 API Schema Validation Failed
-            
+
             **Summary**: ${failedCount}/${totalCount} endpoint schemas failed validation against live API responses.
-            
-            **Impact**: 
+
+            **Impact**:
             - Type safety compromised for failing endpoints
             - Potential runtime errors in services using these contracts
             - Mocking may not reflect reality
-            
+
             **Next Steps**:
             1. Review validation report below
             2. Update schemas in \`unified_api_contracts/\` to match API reality
             3. Ensure financial fields use \`Decimal\` for precision
             4. Re-run validation: \`python scripts/validate_schemas.py\`
             5. Update tests if needed
-            
+
             **Validation Report**:
             \`\`\`
             ${report.slice(0, 4000)}${report.length > 4000 ? '... (truncated)' : ''}
             \`\`\`
-            
+
             **Artifacts**: Check the [workflow run](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for detailed validation results.
-            
+
             ---
             *This issue was automatically created by the weekly schema validation workflow.*
             `;
-            
+
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -138,7 +138,7 @@ jobs:
               body: issueBody,
               labels: ['bug', 'schema-drift', 'unified-api-contracts']
             });
-            
+
       - name: Post success comment
         if: steps.drift_check.outputs.schema_drift_detected != 'true'
         run: |

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared.quota_types import ComputeType
+from unified_api_contracts import ComputeType
 
 
 class QuotaBrokerAcquireRequest(BaseModel):

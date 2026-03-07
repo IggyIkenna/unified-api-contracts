@@ -15,6 +15,9 @@ Cancellation: DELETE /v2/orders/{id} returns HTTP 204 + WebSocket confirmation.
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 import json
 from typing import cast
 

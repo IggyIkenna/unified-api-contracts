@@ -1,5 +1,7 @@
 """Instadapp DeFi position aggregator schemas."""
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

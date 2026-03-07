@@ -1,22 +1,22 @@
 # Per-venue contract index
 
-| Venue | Market data | Order feed | Position feed | Errors | WebSocket | FIX | Notes |
-|-------|-------------|------------|---------------|--------|-----------|-----|-------|
-| databento | Yes | N/A | N/A | Yes | N/A | N/A | Historical, symbology |
-| tardis | Yes | N/A | N/A | Yes | If documented | N/A | Exchanges, instruments, trades, book |
-| ccxt | Yes | Yes | Yes | Yes | Per exchange | Per exchange | Shared for Binance, OKX, Bybit, Upbit, etc. |
-| binance | Yes | Yes | Yes | Yes | Yes | N/A | REST + WebSocket |
-| thegraph | Yes (subgraph) | N/A | N/A | Yes | N/A | N/A | GraphQL; Uniswap, Aave |
-| okx | Yes | Yes | Yes | Yes | Yes | If offered | UMI adapter |
-| bybit | Yes | Yes | Yes | Yes | Yes | If offered | UMI adapter |
-| yahoo_finance | Yes | N/A | N/A | Yes | N/A | N/A | TradFi adapter |
-| alchemy | RPC/API | N/A | N/A | Yes | N/A | N/A | DeFi fallback |
-| bloxroute | BDN/streams | N/A | N/A | Yes | Yes | N/A | Gateway-API, Cloud-API, Protect RPC |
-| hyperliquid | Yes | Yes | Yes | Yes | Yes | N/A | HTTP + S3 bucket |
-| aster | Yes | Yes | Yes | Yes | Yes | N/A | On-chain perps |
-| upbit | Yes | Yes | Yes | Yes | Yes | If offered | CeFi full surface |
-| ibkr | Yes | Yes | Yes | Yes | Callbacks | N/A | TWS/ib_insync, UMI+UOI+position monitor |
-| barchart | Yes (OHLCV 15m) | N/A | N/A | N/A | N/A | N/A | VIX index; manual CSV dumps |
+| Venue         | Market data     | Order feed | Position feed | Errors | WebSocket     | FIX          | Notes                                       |
+| ------------- | --------------- | ---------- | ------------- | ------ | ------------- | ------------ | ------------------------------------------- |
+| databento     | Yes             | N/A        | N/A           | Yes    | N/A           | N/A          | Historical, symbology                       |
+| tardis        | Yes             | N/A        | N/A           | Yes    | If documented | N/A          | Exchanges, instruments, trades, book        |
+| ccxt          | Yes             | Yes        | Yes           | Yes    | Per exchange  | Per exchange | Shared for Binance, OKX, Bybit, Upbit, etc. |
+| binance       | Yes             | Yes        | Yes           | Yes    | Yes           | N/A          | REST + WebSocket                            |
+| thegraph      | Yes (subgraph)  | N/A        | N/A           | Yes    | N/A           | N/A          | GraphQL; Uniswap, Aave                      |
+| okx           | Yes             | Yes        | Yes           | Yes    | Yes           | If offered   | UMI adapter                                 |
+| bybit         | Yes             | Yes        | Yes           | Yes    | Yes           | If offered   | UMI adapter                                 |
+| yahoo_finance | Yes             | N/A        | N/A           | Yes    | N/A           | N/A          | TradFi adapter                              |
+| alchemy       | RPC/API         | N/A        | N/A           | Yes    | N/A           | N/A          | DeFi fallback                               |
+| bloxroute     | BDN/streams     | N/A        | N/A           | Yes    | Yes           | N/A          | Gateway-API, Cloud-API, Protect RPC         |
+| hyperliquid   | Yes             | Yes        | Yes           | Yes    | Yes           | N/A          | HTTP + S3 bucket                            |
+| aster         | Yes             | Yes        | Yes           | Yes    | Yes           | N/A          | On-chain perps                              |
+| upbit         | Yes             | Yes        | Yes           | Yes    | Yes           | If offered   | CeFi full surface                           |
+| ibkr          | Yes             | Yes        | Yes           | Yes    | Callbacks     | N/A          | TWS/ib_insync, UMI+UOI+position monitor     |
+| barchart      | Yes (OHLCV 15m) | N/A        | N/A           | N/A    | N/A           | N/A          | VIX index; manual CSV dumps                 |
 
 Schema files: `unified_api_contracts/<venue>/schemas.py`. Examples: `unified_api_contracts/<venue>/examples/`. VCR mocks: `unified_api_contracts/<venue>/mocks/`.
 

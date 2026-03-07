@@ -7,6 +7,9 @@ Ref: https://docs.betdaq.com/
 
 from __future__ import annotations
 
+__api_version__ = "v2"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel, Field
 
 
@@ -37,9 +40,18 @@ class BetdaqSelection(BaseModel, frozen=True):
 class BetdaqMarket(BaseModel, frozen=True):
     """Betdaq market."""
 
+    marketId: int | str = Field(0)
+    marketName: str = Field("")
+    eventId: int | str = Field(0)
+    marketType: str = Field("")
+    status: str = Field("")
+    selectionCount: int = Field(0)
+    # Betdaq API uses PascalCase field names; aliases mirror the raw API surface
     id: int | str = Field(0, alias="Id")
     name: str = Field("", alias="Name")
     selections: list[BetdaqSelection] = Field(default_factory=list, alias="Selections")
+
+    model_config = {"populate_by_name": True}
 
 
 class BetdaqMarketsResponse(BaseModel, frozen=True):

@@ -1,1 +1,8 @@
-{"symbol":"BTCUSDT","balance":1250000.5,"balanceInUsd":1250000.5,"timestamp":1704067200000,"datetime":"2024-01-01T00:00:00.000Z","info":{}}
+{
+  "symbol": "BTCUSDT",
+  "balance": 1250000.5,
+  "balanceInUsd": 1250000.5,
+  "timestamp": 1704067200000,
+  "datetime": "2024-01-01T00:00:00.000Z",
+  "info": {}
+}

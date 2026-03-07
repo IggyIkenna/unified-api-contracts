@@ -6,6 +6,8 @@ Requires OpenBB API key / provider credentials.
 Used by unified-market-interface OpenBBAdapter for US Treasury bond bid/ask/YTM data.
 """
 
+__api_version__ = "v4"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

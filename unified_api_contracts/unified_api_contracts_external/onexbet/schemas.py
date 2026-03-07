@@ -5,6 +5,9 @@ Ref: 1xBet public pre-match odds API.
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel
 
 

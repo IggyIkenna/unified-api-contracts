@@ -5,9 +5,12 @@ Full surface: pools, swaps, reserves, errors (Uniswap V2/V3/V4, Balancer, Curve,
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class GraphQLError(BaseModel):

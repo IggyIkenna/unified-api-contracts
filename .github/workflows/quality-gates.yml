@@ -29,8 +29,8 @@ jobs:
       - name: Set up Python 3.13
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip'
+          python-version: "3.13"
+          cache: "pip"
 
       - name: Install uv
         run: pip install uv --quiet
@@ -39,7 +39,12 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y ripgrep
 
       - name: Install dependencies
-        run: uv pip install --system -e ".[dev]"
+        run: |
+          python -m venv .venv
+          uv pip install "pip>=26.0" -e ".[dev]"
+
+      - name: Add venv bin to PATH
+        run: echo "${{ github.workspace }}/.venv/bin" >> $GITHUB_PATH
 
       - name: Run quality gates
         run: bash scripts/quality-gates.sh --no-fix

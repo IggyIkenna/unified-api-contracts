@@ -4,8 +4,8 @@
   "timezone": "UTC",
   "date": "2025-02-28",
   "timestamp": 1730232000,
-  "venue": {"id": 1, "name": "Stadium Name", "city": "City"},
-  "status": {"long": "Match Finished", "short": "FT"},
+  "venue": { "id": 1, "name": "Stadium Name", "city": "City" },
+  "status": { "long": "Match Finished", "short": "FT" },
   "league": {
     "id": 39,
     "name": "Premier League",
@@ -15,12 +15,20 @@
     "season": 2025
   },
   "teams": {
-    "home": {"id": 33, "name": "Manchester United", "logo": "https://example.com/mu.png"},
-    "away": {"id": 40, "name": "Liverpool", "logo": "https://example.com/liv.png"}
+    "home": {
+      "id": 33,
+      "name": "Manchester United",
+      "logo": "https://example.com/mu.png"
+    },
+    "away": {
+      "id": 40,
+      "name": "Liverpool",
+      "logo": "https://example.com/liv.png"
+    }
   },
-  "goals": {"home": 2, "away": 1},
+  "goals": { "home": 2, "away": 1 },
   "score": {
-    "halftime": {"home": 1, "away": 0},
-    "fulltime": {"home": 2, "away": 1}
+    "halftime": { "home": 1, "away": 0 },
+    "fulltime": { "home": 2, "away": 1 }
   }
 }

@@ -1,28 +1,28 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Authorization:
-      - '[FILTERED]'
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python-requests/2.32.5
-    method: GET
-    uri: https://api.matchbook.com/edge/rest/events
-  response:
-    body:
-      string: '{"markets":[{"id":101,"eventId":202,"name":"Match Winner","marketType":"winner","status":"open","runners":[{"id":1,"name":"Arsenal","marketId":101,"status":"open"},{"id":2,"name":"Chelsea","marketId":101,"status":"open"}]}]}'
-    headers:
-      Content-Type:
-      - application/json
-      x-contract-schema-version:
-      - '1.0'
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - "[FILTERED]"
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.matchbook.com/edge/rest/events
+    response:
+      body:
+        string: '{"markets":[{"id":101,"eventId":202,"name":"Match Winner","marketType":"winner","status":"open","runners":[{"id":1,"name":"Arsenal","marketId":101,"status":"open"},{"id":2,"name":"Chelsea","marketId":101,"status":"open"}]}]}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
 version: 1

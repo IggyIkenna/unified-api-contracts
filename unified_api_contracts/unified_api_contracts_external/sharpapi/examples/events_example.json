@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "id": "nfl-2026-sb-kc-phi",
+      "sport": "NFL",
+      "home_team": "Kansas City Chiefs",
+      "away_team": "Philadelphia Eagles",
+      "start_time": "2026-02-01T23:30:00Z"
+    }
+  ],
+  "meta": {
+    "count": 1,
+    "total": 1,
+    "pagination": null,
+    "updated_at": null,
+    "filters": null
+  }
+}

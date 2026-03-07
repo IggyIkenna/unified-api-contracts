@@ -12,7 +12,10 @@ from decimal import Decimal
 from pathlib import Path
 
 import pytest
-from unified_api_contracts.binance.market_schemas import BinanceIndexPriceKline, BinanceMarkPriceKline
+from unified_api_contracts.binance.market_schemas import (
+    BinanceIndexPriceKline,
+    BinanceMarkPriceKline,
+)
 from unified_api_contracts.ccxt.schemas import (
     CcxtBorrowRate,
     CcxtCurrency,

@@ -2,12 +2,16 @@
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from typing import TypedDict
 
 
-class VenueContract(TypedDict):
+class VenueContract(TypedDict, total=False):
     """Per-venue contract claims."""
 
+    module: str
     has_rest: bool
     has_websocket: bool
     has_fix: bool
@@ -23,6 +27,7 @@ class VenueContract(TypedDict):
 
 CEFI_VENUES: dict[str, VenueContract] = {
     "binance": {
+        "module": "unified_api_contracts.unified_api_contracts_external.binance",
         "has_rest": True,
         "has_websocket": True,
         "has_fix": False,

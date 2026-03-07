@@ -1,1 +1,14 @@
-{"symbol":"BTCUSDT","timestamp":1704067200000,"datetime":"2024-01-01T00:00:00.000Z","price":42000.5,"amount":0.5,"side":"long","leverage":10,"contracts":0.5,"contractSize":1,"baseValue":21000.25,"quoteValue":21000.25,"info":{}}
+{
+  "symbol": "BTCUSDT",
+  "timestamp": 1704067200000,
+  "datetime": "2024-01-01T00:00:00.000Z",
+  "price": 42000.5,
+  "amount": 0.5,
+  "side": "long",
+  "leverage": 10,
+  "contracts": 0.5,
+  "contractSize": 1,
+  "baseValue": 21000.25,
+  "quoteValue": 21000.25,
+  "info": {}
+}

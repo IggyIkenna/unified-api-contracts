@@ -3,9 +3,11 @@
 Ref: https://the-odds-api.com/liveapi/guides/v4/
 """
 
+__api_version__ = "v4"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class OddsApiOutcome(BaseModel):

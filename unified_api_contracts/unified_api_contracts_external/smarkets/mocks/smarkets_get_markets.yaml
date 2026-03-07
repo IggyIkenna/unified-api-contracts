@@ -1,28 +1,28 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Authorization:
-      - '[FILTERED]'
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python-requests/2.32.5
-    method: GET
-    uri: https://api.smarkets.com/v3/markets/
-  response:
-    body:
-      string: '{"markets":[{"id":"123","name":"Match Winner","eventId":"456","marketType":"winner","state":"active","volume":12500.0}]}'
-    headers:
-      Content-Type:
-      - application/json
-      x-contract-schema-version:
-      - '1.0'
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - "[FILTERED]"
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.smarkets.com/v3/markets/
+    response:
+      body:
+        string: '{"markets":[{"id":"123","name":"Match Winner","eventId":"456","marketType":"winner","state":"active","volume":12500.0}]}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
 version: 1

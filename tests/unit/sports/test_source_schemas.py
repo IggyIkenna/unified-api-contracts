@@ -212,7 +212,13 @@ class TestFootyStatsSchemas:
         assert ou.over25 is None
 
     def test_odds_construct(self) -> None:
-        o = FootyStatsOdds(match_id=1, market_type="FT Result", market_option="1", bookmaker="bet365", odds_value=1.5)
+        o = FootyStatsOdds(
+            match_id=1,
+            market_type="FT Result",
+            market_option="1",
+            bookmaker="bet365",
+            odds_value=1.5,
+        )
         assert o.odds_value == 1.5
 
 

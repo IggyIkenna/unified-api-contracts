@@ -817,6 +817,7 @@ from .errors_alt import (  # noqa: E402
     normalize_understat_error,
     normalize_yahoo_finance_error,
 )
+from .errors_matchbook import normalize_matchbook_error  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # __all__
@@ -855,6 +856,7 @@ __all__ = [
     "normalize_kraken_error",
     "normalize_kucoin_error",
     "normalize_manifold_error",
+    "normalize_matchbook_error",
     "normalize_metabet_error",
     "normalize_mexc_error",
     "normalize_nautilus_error",

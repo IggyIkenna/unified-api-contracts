@@ -1,28 +1,28 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      Accept-Encoding:
-      - gzip, deflate
-      Authorization:
-      - '[FILTERED]'
-      Connection:
-      - keep-alive
-      User-Agent:
-      - python-requests/2.32.5
-    method: GET
-    uri: https://api.betdaq.com/v2.0/market/GetTopLevelEvents
-  response:
-    body:
-      string: '{"markets":[{"marketId":456,"marketName":"Match Winner","eventId":789,"marketType":"Match Odds","status":"active","selectionCount":3}]}'
-    headers:
-      Content-Type:
-      - application/json
-      x-contract-schema-version:
-      - '1.0'
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - "[FILTERED]"
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://api.betdaq.com/v2.0/market/GetTopLevelEvents
+    response:
+      body:
+        string: '{"markets":[{"marketId":456,"marketName":"Match Winner","eventId":789,"marketType":"Match Odds","status":"active","selectionCount":3}]}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
 version: 1

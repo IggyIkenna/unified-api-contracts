@@ -8,6 +8,8 @@ For UTS canonical names, use "BINANCE-SPOT" or "BINANCE-FUTURES" at the adapter 
 See unified_trade_execution_interface.venue_mapping for conversion helpers.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import UTC, datetime
 from decimal import Decimal
 

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from typing import TypedDict
 
 
@@ -44,7 +47,10 @@ DATA_PROVIDER_VENUES: dict[str, VenueContract] = {
             "DatabentoSymbol",
         ],
         "error_schema_classes": ["DatabentoError"],
-        "example_schema_map": {"ohlcv_bar_example.json": "DatabentoOhlcvBar", "error_example.json": "DatabentoError"},
+        "example_schema_map": {
+            "ohlcv_bar_example.json": "DatabentoOhlcvBar",
+            "error_example.json": "DatabentoError",
+        },
     },
     "tardis": {
         "has_rest": True,

@@ -5,9 +5,11 @@ Timestamp format: microseconds since epoch (μs). Side format: string ("buy" or 
 Ref: https://docs.tardis.dev/historical-data-details
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # =============================================================================
 # Tardis data types (CeFi exchanges: Binance, Bybit, OKX, Deribit, etc.)
@@ -331,7 +333,12 @@ class TardisError(BaseModel):
 TARDIS_TRADES_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
@@ -339,7 +346,12 @@ TARDIS_TRADES_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Local arrival timestamp in microseconds",
     },
     {"name": "id", "type": "string", "required": False, "description": "Trade ID (if available)"},
-    {"name": "side", "type": "string", "required": True, "description": "Trade side ('buy' or 'sell')"},
+    {
+        "name": "side",
+        "type": "string",
+        "required": True,
+        "description": "Trade side ('buy' or 'sell')",
+    },
     {"name": "price", "type": "float64", "required": True, "description": "Trade price"},
     {"name": "amount", "type": "float64", "required": True, "description": "Trade amount/quantity"},
 ]
@@ -347,17 +359,42 @@ TARDIS_TRADES_SCHEMA: list[dict[str, str | bool]] = [
 TARDIS_BOOK_SNAPSHOT_5_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
         "required": True,
         "description": "Local arrival timestamp in microseconds",
     },
-    {"name": "ask_price_0", "type": "float64", "required": True, "description": "Ask price at level 0"},
-    {"name": "ask_volume_0", "type": "float64", "required": True, "description": "Ask volume at level 0"},
-    {"name": "bid_price_0", "type": "float64", "required": True, "description": "Bid price at level 0"},
-    {"name": "bid_volume_0", "type": "float64", "required": True, "description": "Bid volume at level 0"},
+    {
+        "name": "ask_price_0",
+        "type": "float64",
+        "required": True,
+        "description": "Ask price at level 0",
+    },
+    {
+        "name": "ask_volume_0",
+        "type": "float64",
+        "required": True,
+        "description": "Ask volume at level 0",
+    },
+    {
+        "name": "bid_price_0",
+        "type": "float64",
+        "required": True,
+        "description": "Bid price at level 0",
+    },
+    {
+        "name": "bid_volume_0",
+        "type": "float64",
+        "required": True,
+        "description": "Bid volume at level 0",
+    },
 ]
 for level in range(1, 5):
     TARDIS_BOOK_SNAPSHOT_5_SCHEMA.extend(
@@ -392,14 +429,24 @@ for level in range(1, 5):
 TARDIS_LIQUIDATIONS_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
         "required": True,
         "description": "Local arrival timestamp in microseconds",
     },
-    {"name": "id", "type": "string", "required": False, "description": "Liquidation ID (if available)"},
+    {
+        "name": "id",
+        "type": "string",
+        "required": False,
+        "description": "Liquidation ID (if available)",
+    },
     {
         "name": "side",
         "type": "string",
@@ -413,26 +460,66 @@ TARDIS_LIQUIDATIONS_SCHEMA: list[dict[str, str | bool]] = [
 TARDIS_DERIVATIVE_TICKER_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
         "required": True,
         "description": "Local arrival timestamp in microseconds",
     },
-    {"name": "funding_timestamp", "type": "int64", "required": False, "description": "Funding timestamp (if provided)"},
-    {"name": "funding_rate", "type": "float64", "required": False, "description": "Current funding rate"},
-    {"name": "predicted_funding_rate", "type": "float64", "required": False, "description": "Predicted funding rate"},
-    {"name": "open_interest", "type": "float64", "required": False, "description": "Open interest value"},
-    {"name": "last_price", "type": "float64", "required": False, "description": "Last traded price"},
-    {"name": "index_price", "type": "float64", "required": False, "description": "Underlying index price"},
+    {
+        "name": "funding_timestamp",
+        "type": "int64",
+        "required": False,
+        "description": "Funding timestamp (if provided)",
+    },
+    {
+        "name": "funding_rate",
+        "type": "float64",
+        "required": False,
+        "description": "Current funding rate",
+    },
+    {
+        "name": "predicted_funding_rate",
+        "type": "float64",
+        "required": False,
+        "description": "Predicted funding rate",
+    },
+    {
+        "name": "open_interest",
+        "type": "float64",
+        "required": False,
+        "description": "Open interest value",
+    },
+    {
+        "name": "last_price",
+        "type": "float64",
+        "required": False,
+        "description": "Last traded price",
+    },
+    {
+        "name": "index_price",
+        "type": "float64",
+        "required": False,
+        "description": "Underlying index price",
+    },
     {"name": "mark_price", "type": "float64", "required": False, "description": "Mark price"},
 ]
 
 TARDIS_OPTIONS_CHAIN_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
@@ -440,20 +527,80 @@ TARDIS_OPTIONS_CHAIN_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Local arrival timestamp in microseconds",
     },
     {"name": "type", "type": "string", "required": True, "description": "Option type (put/call)"},
-    {"name": "strike_price", "type": "float64", "required": True, "description": "Strike price of the option"},
-    {"name": "expiration", "type": "int64", "required": True, "description": "Expiration timestamp in microseconds"},
-    {"name": "open_interest", "type": "float64", "required": False, "description": "Open interest for the option"},
-    {"name": "last_price", "type": "float64", "required": False, "description": "Last traded price"},
-    {"name": "bid_price", "type": "float64", "required": False, "description": "Best bid price for the option"},
+    {
+        "name": "strike_price",
+        "type": "float64",
+        "required": True,
+        "description": "Strike price of the option",
+    },
+    {
+        "name": "expiration",
+        "type": "int64",
+        "required": True,
+        "description": "Expiration timestamp in microseconds",
+    },
+    {
+        "name": "open_interest",
+        "type": "float64",
+        "required": False,
+        "description": "Open interest for the option",
+    },
+    {
+        "name": "last_price",
+        "type": "float64",
+        "required": False,
+        "description": "Last traded price",
+    },
+    {
+        "name": "bid_price",
+        "type": "float64",
+        "required": False,
+        "description": "Best bid price for the option",
+    },
     {"name": "bid_amount", "type": "float64", "required": False, "description": "Best bid amount"},
-    {"name": "bid_iv", "type": "float64", "required": False, "description": "Bid implied volatility"},
-    {"name": "ask_price", "type": "float64", "required": False, "description": "Best ask price for the option"},
+    {
+        "name": "bid_iv",
+        "type": "float64",
+        "required": False,
+        "description": "Bid implied volatility",
+    },
+    {
+        "name": "ask_price",
+        "type": "float64",
+        "required": False,
+        "description": "Best ask price for the option",
+    },
     {"name": "ask_amount", "type": "float64", "required": False, "description": "Best ask amount"},
-    {"name": "ask_iv", "type": "float64", "required": False, "description": "Ask implied volatility"},
-    {"name": "mark_price", "type": "float64", "required": False, "description": "Mark price of the option"},
-    {"name": "mark_iv", "type": "float64", "required": False, "description": "Mark implied volatility"},
-    {"name": "underlying_index", "type": "string", "required": False, "description": "Underlying instrument symbol"},
-    {"name": "underlying_price", "type": "float64", "required": False, "description": "Underlying asset price"},
+    {
+        "name": "ask_iv",
+        "type": "float64",
+        "required": False,
+        "description": "Ask implied volatility",
+    },
+    {
+        "name": "mark_price",
+        "type": "float64",
+        "required": False,
+        "description": "Mark price of the option",
+    },
+    {
+        "name": "mark_iv",
+        "type": "float64",
+        "required": False,
+        "description": "Mark implied volatility",
+    },
+    {
+        "name": "underlying_index",
+        "type": "string",
+        "required": False,
+        "description": "Underlying instrument symbol",
+    },
+    {
+        "name": "underlying_price",
+        "type": "float64",
+        "required": False,
+        "description": "Underlying asset price",
+    },
     {"name": "delta", "type": "float64", "required": False, "description": "Option delta"},
     {"name": "gamma", "type": "float64", "required": False, "description": "Option gamma"},
     {"name": "vega", "type": "float64", "required": False, "description": "Option vega"},
@@ -464,7 +611,12 @@ TARDIS_OPTIONS_CHAIN_SCHEMA: list[dict[str, str | bool]] = [
 TARDIS_INCREMENTAL_BOOK_L2_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
@@ -478,14 +630,29 @@ TARDIS_INCREMENTAL_BOOK_L2_SCHEMA: list[dict[str, str | bool]] = [
         "description": "True if initial snapshot; else incremental",
     },
     {"name": "side", "type": "string", "required": True, "description": "bid or ask"},
-    {"name": "price", "type": "float64", "required": True, "description": "Price level being updated"},
-    {"name": "amount", "type": "float64", "required": True, "description": "Updated amount; 0 = remove level"},
+    {
+        "name": "price",
+        "type": "float64",
+        "required": True,
+        "description": "Price level being updated",
+    },
+    {
+        "name": "amount",
+        "type": "float64",
+        "required": True,
+        "description": "Updated amount; 0 = remove level",
+    },
 ]
 
 TARDIS_QUOTES_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
@@ -501,17 +668,42 @@ TARDIS_QUOTES_SCHEMA: list[dict[str, str | bool]] = [
 TARDIS_BOOK_SNAPSHOT_25_SCHEMA: list[dict[str, str | bool]] = [
     {"name": "exchange", "type": "string", "required": True, "description": "Exchange identifier"},
     {"name": "symbol", "type": "string", "required": True, "description": "Symbol identifier"},
-    {"name": "timestamp", "type": "int64", "required": True, "description": "Exchange timestamp in microseconds"},
+    {
+        "name": "timestamp",
+        "type": "int64",
+        "required": True,
+        "description": "Exchange timestamp in microseconds",
+    },
     {
         "name": "local_timestamp",
         "type": "int64",
         "required": True,
         "description": "Local arrival timestamp in microseconds",
     },
-    {"name": "ask_price_0", "type": "float64", "required": True, "description": "Ask price at level 0"},
-    {"name": "ask_volume_0", "type": "float64", "required": True, "description": "Ask volume at level 0"},
-    {"name": "bid_price_0", "type": "float64", "required": True, "description": "Bid price at level 0"},
-    {"name": "bid_volume_0", "type": "float64", "required": True, "description": "Bid volume at level 0"},
+    {
+        "name": "ask_price_0",
+        "type": "float64",
+        "required": True,
+        "description": "Ask price at level 0",
+    },
+    {
+        "name": "ask_volume_0",
+        "type": "float64",
+        "required": True,
+        "description": "Ask volume at level 0",
+    },
+    {
+        "name": "bid_price_0",
+        "type": "float64",
+        "required": True,
+        "description": "Bid price at level 0",
+    },
+    {
+        "name": "bid_volume_0",
+        "type": "float64",
+        "required": True,
+        "description": "Bid volume at level 0",
+    },
 ]
 for level in range(1, 25):
     TARDIS_BOOK_SNAPSHOT_25_SCHEMA.extend(

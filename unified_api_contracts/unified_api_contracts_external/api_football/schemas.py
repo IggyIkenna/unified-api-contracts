@@ -5,9 +5,11 @@ Auth: x-apisports-key header
 Rate limit: 100 req/day (free), 7500/day (paid)
 """
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # ---------------------------------------------------------------------------
 # Rate limit (response headers)

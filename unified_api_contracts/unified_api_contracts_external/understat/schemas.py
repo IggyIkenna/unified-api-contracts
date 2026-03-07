@@ -5,9 +5,11 @@ Auth: None (public AJAX endpoints, browser-like headers)
 Leagues: EPL, La_Liga, Bundesliga, Serie_A, Ligue_1, RFPL
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class UnderstatLeague(BaseModel):

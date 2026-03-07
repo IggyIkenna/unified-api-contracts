@@ -48,7 +48,14 @@ from ...unified_api_contracts_external.kucoin.schemas import (
     KucoinTrade,
 )
 from ..domain import CanonicalOrderBook, CanonicalTrade
-from ..execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType, TimeInForce
+from ..execution import (
+    CanonicalFill,
+    CanonicalOrder,
+    OrderSide,
+    OrderStatus,
+    OrderType,
+    TimeInForce,
+)
 
 # ---------------------------------------------------------------------------
 # Shared helpers (mirror orders_fills.py helpers — kept local to avoid circular)
@@ -117,7 +124,13 @@ def _status(s: str | None) -> OrderStatus:
     s_lower = str(s).lower().replace("-", "_").replace(" ", "_")
     if s_lower in ("open", "live", "new", "active", "submitted", "best_effort_opened"):
         return OrderStatus.OPEN
-    if s_lower in ("partially_filled", "partial_filled", "partially fill", "partiallyfilled", "partial"):
+    if s_lower in (
+        "partially_filled",
+        "partial_filled",
+        "partially fill",
+        "partiallyfilled",
+        "partial",
+    ):
         return OrderStatus.PARTIALLY_FILLED
     if s_lower in ("closed", "filled", "done", "executed"):
         return OrderStatus.FILLED

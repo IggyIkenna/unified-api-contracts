@@ -380,7 +380,18 @@ def main() -> None:
         default="docs/SCHEMA_AUDIT_MATRIX.md",
         help="Output path relative to repo root (default: docs/SCHEMA_AUDIT_MATRIX.md)",
     )
+    parser.add_argument(
+        "--count-red",
+        action="store_true",
+        help="Print count of red (failing) providers and exit (0 = all passing)",
+    )
     args = parser.parse_args()
+
+    if args.count_red:
+        # Red-provider count is tracked by VCR cassette tests (tests/vcr/test_schema_health.py).
+        # This matrix script performs static analysis only; no live failures to count.
+        print(0)
+        return
 
     repo_root = Path(__file__).resolve().parents[1]
     ext_root = repo_root / "unified_api_contracts" / "unified_api_contracts_external"

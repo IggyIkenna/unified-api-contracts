@@ -5,9 +5,11 @@ wrappers (e.g. transfermarkt-scraper, mplsoccer). Market values are updated
 weekly. Use at your own risk; respect robots.txt and rate limits.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class TransfermarktPlayer(BaseModel):

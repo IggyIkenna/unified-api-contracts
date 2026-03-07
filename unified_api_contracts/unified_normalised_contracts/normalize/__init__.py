@@ -3,6 +3,7 @@
 One-hop conversion: BinanceTrade -> CanonicalTrade, BinanceOrderBook -> CanonicalOrderBook, etc.
 """
 
+from ..odds import american_to_decimal, decimal_to_american, fractional_to_decimal
 from .cefi_extended import (
     normalize_bitfinex_fill,
     normalize_bitfinex_order,
@@ -108,6 +109,7 @@ from .errors import (
     normalize_kraken_error,
     normalize_kucoin_error,
     normalize_manifold_error,
+    normalize_matchbook_error,
     normalize_metabet_error,
     normalize_mexc_error,
     normalize_nautilus_error,
@@ -144,6 +146,10 @@ from .fees import (
 from .instruments import (
     normalize_databento_definition,
     normalize_databento_symbol,
+)
+from .liquidation_clusters import (
+    normalize_coinglass_liquidation_cluster,
+    normalize_hyblock_liquidation_level,
 )
 from .liquidations import (
     normalize_aster_liquidation,
@@ -268,6 +274,7 @@ from .reference_data import (
 from .sides import normalize_side
 from .sports import (
     normalize_betdaq_market,
+    normalize_betdaq_order,
     normalize_betfair_market,
     normalize_betfair_odds,
     normalize_betfair_order,
@@ -277,9 +284,12 @@ from .sports import (
     normalize_manifold_market,
     normalize_manifold_odds,
     normalize_odds_api_fixture,
+    normalize_onexbet_market,
     normalize_pinnacle_event,
     normalize_polymarket_market,
     normalize_smarkets_market,
+    normalize_smarkets_order,
+    normalize_sports_market,
     normalize_sports_order,
 )
 from .symbols import normalize_symbol
@@ -334,6 +344,9 @@ from .versifi import (
 )
 
 __all__ = [
+    # Odds format conversion utilities
+    "american_to_decimal",
+    "decimal_to_american",
     "extract_api_football_rate_limit",
     "extract_binance_rate_limit",
     "extract_bybit_rate_limit",
@@ -345,6 +358,7 @@ __all__ = [
     "extract_okx_rate_limit",
     "extract_rate_limit_headers",
     "extract_tardis_rate_limit",
+    "fractional_to_decimal",
     "normalize_alchemy_error",
     "normalize_api_football_error",
     "normalize_arbitrage_market",
@@ -364,6 +378,7 @@ __all__ = [
     "normalize_barchart_ohlcv",
     "normalize_betdaq_error",
     "normalize_betdaq_market",
+    "normalize_betdaq_order",
     "normalize_betfair_error",
     "normalize_betfair_market",
     "normalize_betfair_odds",
@@ -436,6 +451,7 @@ __all__ = [
     "normalize_coingecko_global_market",
     "normalize_coingecko_global_market_response",
     "normalize_coinglass_liquidation",
+    "normalize_coinglass_liquidation_cluster",
     "normalize_databento_bbo1m_orderbook",
     "normalize_databento_bbo1s_orderbook",
     "normalize_databento_cmbp1_orderbook",
@@ -491,6 +507,7 @@ __all__ = [
     "normalize_huobi_orderbook",
     "normalize_huobi_ticker",
     "normalize_huobi_trade",
+    "normalize_hyblock_liquidation_level",
     "normalize_hyperliquid_candle",
     "normalize_hyperliquid_derivative_ticker",
     "normalize_hyperliquid_error",
@@ -536,6 +553,7 @@ __all__ = [
     "normalize_manifold_market",
     "normalize_manifold_odds",
     "normalize_manifold_trade",
+    "normalize_matchbook_error",
     "normalize_matchbook_market",
     "normalize_metabet_error",
     "normalize_metabet_market",
@@ -566,6 +584,7 @@ __all__ = [
     "normalize_okx_ticker",
     "normalize_okx_trade",
     "normalize_okx_ws_subscription",
+    "normalize_onexbet_market",
     "normalize_open_meteo_error",
     "normalize_pinnacle_error",
     "normalize_pinnacle_event",
@@ -584,8 +603,10 @@ __all__ = [
     "normalize_side",
     "normalize_smarkets_error",
     "normalize_smarkets_market",
+    "normalize_smarkets_order",
     "normalize_smarkets_orderbook",
     "normalize_sports_error",
+    "normalize_sports_market",
     "normalize_sports_order",
     "normalize_sports_trade",
     "normalize_symbol",

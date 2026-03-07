@@ -9,7 +9,9 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import BookmakerInfo
+from .bookmaker import (
+    BookmakerInfo,
+)
 
 
 class OddsType(StrEnum):

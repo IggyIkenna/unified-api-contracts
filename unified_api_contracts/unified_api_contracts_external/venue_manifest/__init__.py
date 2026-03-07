@@ -6,7 +6,7 @@ Align with docs/INDEX.md; update both if adding a venue or capability.
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import TypedDict, cast
 
 from .betting_sports import BETTING_SPORTS_VENUES
 from .cefi import CEFI_VENUES
@@ -32,14 +32,17 @@ class VenueContract(TypedDict):
     example_schema_map: dict[str, str]
 
 
-VENUE_MANIFEST: dict[str, VenueContract | ContractEntry] = {
-    **DATA_PROVIDER_VENUES,
-    **CEFI_VENUES,
-    **DEFI_VENUES,
-    **TRADFI_VENUES,
-    **BETTING_SPORTS_VENUES,
-    **INTERNAL_CONTRACTS,
-}
+VENUE_MANIFEST: dict[str, VenueContract | ContractEntry] = cast(
+    dict[str, VenueContract | ContractEntry],
+    {
+        **DATA_PROVIDER_VENUES,
+        **CEFI_VENUES,
+        **DEFI_VENUES,
+        **TRADFI_VENUES,
+        **BETTING_SPORTS_VENUES,
+        **INTERNAL_CONTRACTS,
+    },
+)
 
 
 __all__ = [

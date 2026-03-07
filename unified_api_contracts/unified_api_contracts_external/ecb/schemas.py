@@ -6,6 +6,8 @@ No auth required. SDMX 2.1 REST API.
 Used by unified-market-interface ECBAdapter for EU sovereign yield curves (OIS, ESTR).
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

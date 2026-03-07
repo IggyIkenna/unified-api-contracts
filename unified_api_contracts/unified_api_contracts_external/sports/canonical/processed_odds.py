@@ -7,8 +7,10 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.arbitrage import ArbitrageOpportunity
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds import CanonicalOdds
+from .arbitrage import (
+    ArbitrageOpportunity,
+)
+from .odds import CanonicalOdds
 
 
 class ProcessedOddsOutput(BaseModel):

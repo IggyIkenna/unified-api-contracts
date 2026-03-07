@@ -6,9 +6,11 @@ Response format: always list[{"t": int, "v": float | dict}]
 Free tier: daily (24h) resolution, 1-year history. Paid: 10min resolution, full history.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class GlassnodeTimeseriesPoint(BaseModel):

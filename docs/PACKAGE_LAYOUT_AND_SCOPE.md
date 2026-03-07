@@ -25,11 +25,11 @@ If a schema is only used for internal service-to-service contracts and is not ne
 
 Top-level packages under `unified_api_contracts/` should be grouped into three buckets:
 
-| Bucket | Purpose | Current / target contents |
-|--------|---------|---------------------------|
-| **shared** | Cross-venue shared types, errors, quotas | `shared/` (error_action, quota_types, etc.). Move generic bits from `schemas/`, `fix/`, `regulatory/` here where they are cross-venue and external. |
-| **unified_api_contracts_external** | Raw per-venue request/response/errors | All venue-specific schemas (binance, databento, ccxt, sports sources, etc.). `unified_normalised_contracts` lives alongside because this package **owns the schema mapping** (external → canonical). |
-| **unified_normalised_contracts** | Canonical domain/execution/errors + normalize | Already under `unified_api_contracts_external` conceptually; owns `normalize.py` and canonical types. |
+| Bucket                             | Purpose                                       | Current / target contents                                                                                                                                                                            |
+| ---------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **shared**                         | Cross-venue shared types, errors, quotas      | `shared/` (error_action, quota_types, etc.). Move generic bits from `schemas/`, `fix/`, `regulatory/` here where they are cross-venue and external.                                                  |
+| **unified_api_contracts_external** | Raw per-venue request/response/errors         | All venue-specific schemas (binance, databento, ccxt, sports sources, etc.). `unified_normalised_contracts` lives alongside because this package **owns the schema mapping** (external → canonical). |
+| **unified_normalised_contracts**   | Canonical domain/execution/errors + normalize | Already under `unified_api_contracts_external` conceptually; owns `normalize.py` and canonical types.                                                                                                |
 
 **Current top-level packages to rationalize:** `nautilus`, `prime_broker`, `fix`, `regulatory`, `schemas`, `sports`, `venue_manifest`. Each should either:
 
@@ -48,4 +48,4 @@ The **schemas/** directory should be split: external-facing parts → shared or 
 
 ## Refactor status
 
-**Not yet done.** This doc describes the *intended* layout and rules. The physical refactor (moving top-level packages into shared / unified_api_contracts_external / unified_normalised_contracts, and moving internal-only schemas to unified-internal-contracts) is pending. When doing it: (1) ensure nothing that mapping depends on (canonical ids, venues, normalised types) is moved to UIC, and (2) keep AC free of any `unified_internal_contracts` import.
+**Not yet done.** This doc describes the _intended_ layout and rules. The physical refactor (moving top-level packages into shared / unified_api_contracts_external / unified_normalised_contracts, and moving internal-only schemas to unified-internal-contracts) is pending. When doing it: (1) ensure nothing that mapping depends on (canonical ids, venues, normalised types) is moved to UIC, and (2) keep AC free of any `unified_internal_contracts` import.

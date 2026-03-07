@@ -36,16 +36,16 @@ def vcr_filter_request(request):
 
 ## Per-venue notes
 
-| Venue     | Auth header / param     | Suggested cassette names (REST)        |
-|----------|-------------------------|----------------------------------------|
-| databento| `Authorization` / key  | `timeseries_range.yaml`, `symbology.yaml` |
-| tardis   | API key in header/param| `exchanges.yaml`, `trades.yaml`, `orderbook.yaml` |
-| ccxt     | Exchange-specific      | `fetch_order_<exchange>.yaml`, `fetch_ticker.yaml` |
-| binance  | `X-MBX-APIKEY` + sig   | `ticker.yaml`, `order.yaml`, `position.yaml` |
-| thegraph | API key in URL/header  | `subgraph_query.yaml`                  |
-| okx      | `OK-ACCESS-KEY` etc.   | `ticker.yaml`, `order.yaml`            |
-| bybit    | `X-BAPI-API-KEY` etc.  | `ticker.yaml`, `order.yaml`            |
-| alchemy  | API key in URL         | `rpc_eth_blockNumber.yaml`             |
+| Venue     | Auth header / param     | Suggested cassette names (REST)                    |
+| --------- | ----------------------- | -------------------------------------------------- |
+| databento | `Authorization` / key   | `timeseries_range.yaml`, `symbology.yaml`          |
+| tardis    | API key in header/param | `exchanges.yaml`, `trades.yaml`, `orderbook.yaml`  |
+| ccxt      | Exchange-specific       | `fetch_order_<exchange>.yaml`, `fetch_ticker.yaml` |
+| binance   | `X-MBX-APIKEY` + sig    | `ticker.yaml`, `order.yaml`, `position.yaml`       |
+| thegraph  | API key in URL/header   | `subgraph_query.yaml`                              |
+| okx       | `OK-ACCESS-KEY` etc.    | `ticker.yaml`, `order.yaml`                        |
+| bybit     | `X-BAPI-API-KEY` etc.   | `ticker.yaml`, `order.yaml`                        |
+| alchemy   | API key in URL          | `rpc_eth_blockNumber.yaml`                         |
 
 WebSocket: if the test library supports recording WS frames, store under the same `mocks/` with names like `ws_ticker_stream.yaml`. Otherwise mock the WS client and feed canned JSON validated by unified-api-contracts schemas.
 

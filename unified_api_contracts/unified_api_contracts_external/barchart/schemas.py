@@ -6,6 +6,8 @@ Example path: market-tick-data-handler/data/vix/vix_intraday-15min_historical-da
 VIX live research: Databento index in development; IBKR TWS can stream. See docs/VIX_LIVE_RESEARCH.md.
 """
 
+__api_version__ = "v2"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
 

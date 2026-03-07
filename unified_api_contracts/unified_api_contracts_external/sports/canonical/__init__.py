@@ -13,13 +13,21 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.betti
     BettingSignal,
     SignalSource,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import BookmakerInfo
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.events import CanonicalFixtureEvent
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.features import SportsFeatureVector
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import (
+    BookmakerInfo,
+)
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.events import (
+    CanonicalFixtureEvent,
+)
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.features import (
+    SportsFeatureVector,
+)
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.fixture_stats import (
     CanonicalFixtureStatsDetail,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.injury import CanonicalInjury
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.injury import (
+    CanonicalInjury,
+)
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.lineup import (
     CanonicalLineup,
     LineupPlayer,
@@ -45,7 +53,9 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds 
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.player_stats import (
     CanonicalPlayerMatchStats,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.processed_odds import ProcessedOddsOutput
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.processed_odds import (
+    ProcessedOddsOutput,
+)
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.progressive import (
     CanonicalProgressiveOdds,
     CanonicalProgressiveStats,

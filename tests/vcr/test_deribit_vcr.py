@@ -48,7 +48,9 @@ def test_deribit_response_structure() -> None:
 
 def test_deribit_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.deribit.schemas import DeribitInstrument
+    from unified_api_contracts.unified_api_contracts_external.deribit.schemas import (
+        DeribitInstrument,
+    )
 
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists()

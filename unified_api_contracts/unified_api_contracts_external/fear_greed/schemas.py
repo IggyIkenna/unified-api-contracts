@@ -5,11 +5,13 @@ Endpoint: https://api.alternative.me/fng/?limit=N
 Note: crypto-specific, different from CNN Money stock Fear and Greed.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from enum import StrEnum
 
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class FearGreedClassification(StrEnum):

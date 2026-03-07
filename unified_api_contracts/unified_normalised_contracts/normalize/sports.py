@@ -6,7 +6,7 @@ import contextlib
 from datetime import UTC, datetime
 from decimal import Decimal
 
-from ...unified_api_contracts_external.betdaq.schemas import BetdaqMarket
+from ...unified_api_contracts_external.betdaq.schemas import BetdaqMarket, BetdaqOrder
 from ...unified_api_contracts_external.betfair.schemas import (
     BetfairCurrentOrderSummary,
     BetfairMarketCatalogue,
@@ -15,10 +15,14 @@ from ...unified_api_contracts_external.betfair.schemas import (
 from ...unified_api_contracts_external.kalshi.schemas import KalshiMarket, KalshiOrder
 from ...unified_api_contracts_external.manifold.schemas import ManifoldMarket
 from ...unified_api_contracts_external.odds_api.schemas import OddsApiFixture
+from ...unified_api_contracts_external.onexbet.schemas import OneXBetMarket
 from ...unified_api_contracts_external.pinnacle.schemas import PinnacleEvent
 from ...unified_api_contracts_external.polymarket.schemas import PolymarketMarket
-from ...unified_api_contracts_external.smarkets.schemas import SmarketsMarket
+from ...unified_api_contracts_external.smarkets.schemas import SmarketsMarket, SmarketsOrderResponse
 from ...unified_api_contracts_external.sports.canonical.betting import BetOrder
+from ...unified_api_contracts_external.sports.sources.betfair.schemas import (
+    BetfairMarket as BetfairSourceMarket,
+)
 from ..domain import CanonicalBetMarket, CanonicalBetOrder, CanonicalOdds
 
 
@@ -463,8 +467,103 @@ def normalize_sports_order(
     )
 
 
+def normalize_betdaq_order(raw: BetdaqOrder, venue: str = "betdaq") -> CanonicalBetOrder:
+    """Convert BetdaqOrder confirmation to CanonicalBetOrder.
+
+    BetdaqOrder is a placement acknowledgment receipt — only order ID and result code
+    are returned by the API. Price/size/market context is not included.
+    result == 0 means accepted; result == -1 means rejected.
+    """
+    status = "accepted" if raw.result >= 0 else "rejected"
+    return CanonicalBetOrder(
+        venue=venue,
+        order_id=str(raw.id or ""),
+        market_id="",
+        selection_id="",
+        side="back",
+        price=Decimal("1"),
+        size=Decimal("0"),
+        status=status,
+        timestamp=datetime.now(UTC),
+        matched_size=None,
+        remaining_size=None,
+    )
+
+
+def normalize_onexbet_market(raw: OneXBetMarket, venue: str = "onexbet") -> CanonicalBetMarket:
+    """Convert OneXBetMarket to CanonicalBetMarket.
+
+    OneXBetMarket has a name and a list of outcomes (selections); no distinct market ID is
+    provided by the API, so the name is used as market_id.
+    """
+    return CanonicalBetMarket(
+        venue=venue,
+        market_id=raw.name or "",
+        event_id=raw.name or "",
+        market_name=raw.name or "",
+        event_name=raw.name or "",
+        sport=None,
+        competition=None,
+        status=None,
+        in_play=None,
+        timestamp=datetime.now(UTC),
+        close_time=None,
+    )
+
+
+def normalize_smarkets_order(raw: SmarketsOrderResponse, venue: str = "smarkets") -> CanonicalBetOrder:
+    """Convert SmarketsOrderResponse acknowledgment to CanonicalBetOrder.
+
+    SmarketsOrderResponse is a placement acknowledgment — only the order ID is returned.
+    Price/size/market context is not included in the response.
+    """
+    return CanonicalBetOrder(
+        venue=venue,
+        order_id=raw.id or "",
+        market_id="",
+        selection_id="",
+        side="back",
+        price=Decimal("1"),
+        size=Decimal("0"),
+        status="submitted",
+        timestamp=datetime.now(UTC),
+        matched_size=None,
+        remaining_size=None,
+    )
+
+
+def normalize_sports_market(raw: BetfairSourceMarket, venue: str = "betfair") -> CanonicalBetMarket:
+    """Convert BetfairMarket (sports source schema) to CanonicalBetMarket.
+
+    BetfairMarket from sports/sources/betfair is a richer local exchange schema
+    with typed status, runners, and event metadata. Distinct from the external
+    BetfairMarketCatalogue used by normalize_betfair_market.
+    """
+    close_time: datetime | None = None
+    if raw.market_start_time is not None:
+        if raw.market_start_time.tzinfo is None:
+            close_time = raw.market_start_time.replace(tzinfo=UTC)
+        else:
+            close_time = raw.market_start_time
+    status_str: str | None = raw.status.value if raw.status is not None else None
+    return CanonicalBetMarket(
+        venue=venue,
+        market_id=raw.market_id,
+        event_id=raw.event_id or raw.market_id,
+        market_name=raw.market_name,
+        event_name=raw.event_name or raw.market_name,
+        sport=None,
+        competition=None,
+        status=status_str,
+        in_play=None,
+        timestamp=datetime.now(UTC),
+        close_time=close_time,
+    )
+
+
 __all__ = [
     "normalize_betdaq_market",
+    "normalize_betdaq_order",
     "normalize_betfair_market",
     "normalize_betfair_odds",
     "normalize_betfair_order",
@@ -474,8 +573,11 @@ __all__ = [
     "normalize_manifold_market",
     "normalize_manifold_odds",
     "normalize_odds_api_fixture",
+    "normalize_onexbet_market",
     "normalize_pinnacle_event",
     "normalize_polymarket_market",
     "normalize_smarkets_market",
+    "normalize_smarkets_order",
+    "normalize_sports_market",
     "normalize_sports_order",
 ]

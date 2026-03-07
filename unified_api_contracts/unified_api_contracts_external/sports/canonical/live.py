@@ -12,7 +12,7 @@ from typing import Self
 
 from pydantic import BaseModel, ConfigDict
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds import CanonicalOdds
+from .odds import CanonicalOdds
 
 
 class MatchPeriod(StrEnum):

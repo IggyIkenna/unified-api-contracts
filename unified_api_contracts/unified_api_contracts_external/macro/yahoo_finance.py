@@ -6,11 +6,13 @@ Free, no API key required. Rate limits: ~2000 requests/hour (unofficial).
 Used by unified-market-interface for macro indicators: DXY (US Dollar Index), Treasury yields, gold, oil.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # API Constants
 YAHOO_FINANCE_BASE_URL = "https://query1.finance.yahoo.com/v8/finance"

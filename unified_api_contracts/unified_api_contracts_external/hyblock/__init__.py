@@ -1,0 +1,1 @@
+"""Hyblock external API schemas."""

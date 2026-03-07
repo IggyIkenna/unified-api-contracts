@@ -1,8 +1,10 @@
 """Pydantic schemas for Yahoo Finance adapter responses. Full surface: market data, errors, edge cases."""
 
+__api_version__ = "v8"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class YahooOhlcv24h(BaseModel):

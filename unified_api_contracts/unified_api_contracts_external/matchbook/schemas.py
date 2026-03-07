@@ -5,6 +5,9 @@ Ref: https://www.matchbook.com/api-documentation
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel, Field
 
 
@@ -32,21 +35,24 @@ class MatchbookPrices(BaseModel, frozen=True):
 
 
 class MatchbookRunner(BaseModel, frozen=True):
-    id: str = ""
+    id: int | str = 0
     name: str = ""
     type: str = ""
     prices: MatchbookPrices = MatchbookPrices()
 
 
 class MatchbookMarket(BaseModel, frozen=True):
-    id: str = ""
+    id: int | str = 0
     type: str = ""
+    marketType: str | None = None  # API field name alias for type
     handicap: float = 0.0
     runners: list[MatchbookRunner] = []
+    status: str | None = None
+    eventId: int | str | None = None
 
 
 class MatchbookEvent(BaseModel, frozen=True):
-    id: str = ""
+    id: int | str = 0
     name: str = ""
 
 

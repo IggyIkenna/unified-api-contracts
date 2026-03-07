@@ -12,6 +12,8 @@ return 404 for some paths. Minimal stubs added for known endpoints.
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from typing import Literal
 
 from pydantic import BaseModel, Field

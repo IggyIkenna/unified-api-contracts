@@ -1,1 +1,8 @@
-{"currency":"USDT","rate":0.0001,"period":86400000,"timestamp":1704067200000,"datetime":"2024-01-01T00:00:00.000Z","info":{}}
+{
+  "currency": "USDT",
+  "rate": 0.0001,
+  "period": 86400000,
+  "timestamp": 1704067200000,
+  "datetime": "2024-01-01T00:00:00.000Z",
+  "info": {}
+}

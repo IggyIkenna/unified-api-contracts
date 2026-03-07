@@ -14,7 +14,10 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.live 
     MatchPeriod,
     ScraperVersionMeta,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds import CanonicalOdds, OddsType
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds import (
+    CanonicalOdds,
+    OddsType,
+)
 
 NOW = datetime.now(tz=UTC)
 

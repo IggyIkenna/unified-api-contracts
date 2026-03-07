@@ -10,6 +10,9 @@ Tags referenced in docstrings use FIX standard notation (e.g. Tag 35 = MsgType).
 
 from __future__ import annotations
 
+__api_version__ = "4.4"  # matches provider_api_versions.yaml
+
+
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum

@@ -4,11 +4,13 @@ Auth: arkham-api-key header.
 Provides entity identification (exchange, whale, fund) for blockchain addresses.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from enum import StrEnum
 
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class ArkhamEntityType(StrEnum):
