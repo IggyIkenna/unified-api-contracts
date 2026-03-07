@@ -71,7 +71,9 @@ jobs:
 
       - name: Update schema health SVG from test results
         run: |
-          python3 scripts/update_schema_health_svg.py schema-health-results.json
+          python3 scripts/update_schema_health_svg.py schema-health-results.json \
+            || true
+          # '|| true': SVG update is informational; matrix audit still enforced above
 
       - name: Check for red providers (hard fail)
         run: |
