@@ -74,7 +74,81 @@ class BetfairMarketCatalogue(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# REST: placeOrders (PlaceExecutionReport)
+# REST: placeOrders — request schemas
+# Ref: https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0d/Betting+API
+# ---------------------------------------------------------------------------
+
+
+class BetfairLimitOrder(BaseModel):
+    """Limit order sub-object in a place instruction."""
+
+    size: float | None = None
+    price: float | None = None
+    persistence_type: str | None = Field("LAPSE", alias="persistenceType")  # LAPSE | PERSIST | MARKET_ON_CLOSE
+    time_in_force: str | None = Field(None, alias="timeInForce")  # FILL_OR_KILL
+    min_fill_size: float | None = Field(None, alias="minFillSize")
+    bet_target_type: str | None = Field(None, alias="betTargetType")  # BACKERS_PROFIT | PAYOUT
+    bet_target_size: float | None = Field(None, alias="betTargetSize")
+    customer_order_ref: str | None = Field(None, alias="customerOrderRef")
+
+
+class BetfairPlaceInstruction(BaseModel):
+    """Single place instruction in a placeOrders request."""
+
+    order_type: str | None = Field("LIMIT", alias="orderType")  # LIMIT | LIMIT_ON_CLOSE | MARKET_ON_CLOSE
+    selection_id: int | None = Field(None, alias="selectionId")
+    handicap: float | None = None
+    side: str | None = None  # BACK | LAY
+    limit_order: BetfairLimitOrder | None = Field(None, alias="limitOrder")
+
+
+class BetfairPlaceOrdersRequest(BaseModel):
+    """Request body for placeOrders Betfair Betting API call."""
+
+    market_id: str | None = Field(None, alias="marketId")
+    instructions: list[BetfairPlaceInstruction] | None = None
+    customer_ref: str | None = Field(None, alias="customerRef")
+    market_version: dict[str, object] | None = Field(None, alias="marketVersion")
+    customer_strategy_ref: str | None = Field(None, alias="customerStrategyRef")
+    async_: bool | None = Field(None, alias="async")
+
+
+class BetfairCancelInstruction(BaseModel):
+    """Single cancel instruction in a cancelOrders request."""
+
+    bet_id: str | None = Field(None, alias="betId")
+    size_reduction: float | None = Field(None, alias="sizeReduction")
+
+
+class BetfairCancelOrdersRequest(BaseModel):
+    """Request body for cancelOrders Betfair Betting API call."""
+
+    market_id: str | None = Field(None, alias="marketId")
+    instructions: list[BetfairCancelInstruction] | None = None
+    customer_ref: str | None = Field(None, alias="customerRef")
+
+
+class BetfairCancelInstructionReport(BaseModel):
+    """Report for a single cancel instruction."""
+
+    status: str | None = None
+    error_code: str | None = Field(None, alias="errorCode")
+    instruction: dict[str, object] | None = None
+    size_cancelled: float | None = Field(None, alias="sizeCancelled")
+    cancelled_date: str | None = Field(None, alias="cancelledDate")
+
+
+class BetfairCancelOrdersResponse(BaseModel):
+    """cancelOrders response (CancelExecutionReport)."""
+
+    status: str | None = None
+    market_id: str | None = Field(None, alias="marketId")
+    error_code: str | None = Field(None, alias="errorCode")
+    instruction_reports: list[BetfairCancelInstructionReport] | None = Field(None, alias="instructionReports")
+
+
+# ---------------------------------------------------------------------------
+# REST: placeOrders — response schemas (PlaceExecutionReport)
 # ---------------------------------------------------------------------------
 
 

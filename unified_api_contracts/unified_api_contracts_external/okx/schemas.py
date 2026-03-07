@@ -400,6 +400,14 @@ class OKXInstrumentInfo(BaseModel):
     state: str | None = None  # live, suspend, preopen, test, expired
 
 
+class OKXInstrumentsResponse(BaseModel):
+    """OKX instruments API response (GET /api/v5/public/instruments)."""
+
+    code: str | None = None
+    msg: str | None = None
+    data: list[OKXInstrumentInfo] = []
+
+
 # --- CEX Order Submit / Ack / Cancel ---
 
 

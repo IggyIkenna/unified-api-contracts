@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from email.utils import parsedate_to_datetime
 
 from ..errors import RateLimitInfo
+
+_logger = logging.getLogger(__name__)
 
 
 def extract_rate_limit_headers(
@@ -93,7 +96,10 @@ def extract_binance_rate_limit(
                     venue="binance",
                 )
             except (ValueError, TypeError):
-                pass
+                _logger.debug(
+                    "Binance X-MBX-USED-WEIGHT-1M header %r is not a valid integer; skipping rate limit enrichment",
+                    weight_used,
+                )
     return info
 
 

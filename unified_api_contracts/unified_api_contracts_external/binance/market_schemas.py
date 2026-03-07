@@ -1,5 +1,7 @@
 """Binance market data schemas: tickers, order books, trades, klines."""
 
+from __future__ import annotations
+
 __api_version__ = "v3"  # matches provider_api_versions.yaml
 
 from decimal import Decimal
@@ -85,7 +87,7 @@ class BinanceKline(BaseModel):
     def from_list(
         cls,
         kline_data: list[int | str],
-    ) -> "BinanceKline":
+    ) -> BinanceKline:
         """Create BinanceKline from list format returned by Binance API.
 
         Binance REST/WebSocket returns: [open_time, open, high, low, close,
@@ -138,6 +140,19 @@ class BinanceExchangeInfo(BaseModel):
     rateLimits: list[dict[str, object]]
     exchangeFilters: list[dict[str, object]]
     symbols: list[BinanceSymbol]
+
+
+class BinanceFuturesExchangeInfo(BaseModel):
+    """Binance futures/options exchange info (REST: GET /fapi/v1/exchangeInfo or /eapi/v1/exchangeInfo).
+
+    Futures endpoint returns BinanceInstrumentInfo objects (with contractType, deliveryDate, filters, etc.).
+    Options endpoint returns optionSymbols (BinanceOptionInstrumentInfo objects).
+    """
+
+    timezone: str | None = None
+    serverTime: int | None = None
+    symbols: list[BinanceInstrumentInfo] | None = None
+    optionSymbols: list[BinanceOptionInstrumentInfo] | None = None
 
 
 class BinanceAggTrade(BaseModel):
@@ -204,7 +219,7 @@ class BinanceMarkPriceKline(BaseModel):
     def from_list(
         cls,
         kline_data: list[int | str],
-    ) -> "BinanceMarkPriceKline":
+    ) -> BinanceMarkPriceKline:
         """Create from array. USD-M: 6 fields; Coin-M: 12 fields."""
         if len(kline_data) >= 12:
             return cls(
@@ -254,7 +269,7 @@ class BinanceIndexPriceKline(BaseModel):
     def from_list(
         cls,
         kline_data: list[int | str],
-    ) -> "BinanceIndexPriceKline":
+    ) -> BinanceIndexPriceKline:
         """Create from array. USD-M: 6 fields; Coin-M: 12 fields."""
         if len(kline_data) >= 12:
             return cls(
@@ -401,3 +416,9 @@ class BinanceInsuranceFund(BaseModel):
 
     symbols: list[str] | None = None
     assets: list[BinanceInsuranceFundAsset] | None = None
+
+
+# Rebuild models that reference forward-declared classes.
+# Required because from __future__ import annotations defers evaluation and
+# Pydantic v2 cannot automatically resolve forward references without model_rebuild().
+BinanceFuturesExchangeInfo.model_rebuild()

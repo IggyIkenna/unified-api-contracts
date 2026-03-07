@@ -48,9 +48,9 @@ def parse_reject_reason(raw: str | None) -> VersiFiRejectReason | None:
         return None
     if not isinstance(parsed, dict):
         return None
-    # Extract only the two fields we need, narrowing from dict[Unknown, Unknown]
-    items: list[tuple[object, object]] = list(parsed.items())  # type: ignore[union-attr]
-    field_map: dict[str, object] = {str(k): v for k, v in items if isinstance(k, str)}
+    # Cast to a concrete dict type so basedpyright can resolve .items() without Unknown keys
+    parsed_dict: dict[str, object] = cast(dict[str, object], parsed)
+    field_map: dict[str, object] = dict(parsed_dict.items())
     code: object = field_map.get("code")
     if isinstance(code, int) or (isinstance(code, str) and code.lstrip("-").isdigit()):
         return BinanceError.model_validate(field_map)

@@ -275,3 +275,107 @@ class EulerUserPosition(BaseModel):
     borrowBalance: str | None = None
     collateralValue: str | None = None
     healthFactor: str | None = None
+
+
+# --- Uniswap V3 on-chain response shapes ---
+class UniswapV3QuoteResponse(BaseModel):
+    """Uniswap V3 QuoterV2.quoteExactInputSingle return value.
+
+    Decoded from eth_call to QuoterV2 (0x61fFE014bA17989E743c5F6cB21bF9697530B21e).
+    Fields are strings (wei amounts) or ints as returned by web3.py ABI decoder.
+    """
+
+    amountOut: str | None = None
+    sqrtPriceX96After: str | None = None
+    initializedTicksCrossed: int | None = None
+    gasEstimate: str | None = None
+
+
+class UniswapV3PoolStateResponse(BaseModel):
+    """Uniswap V3 Pool.slot0() + liquidity() call response.
+
+    Decoded from eth_call to pool contract.
+    """
+
+    sqrtPriceX96: str | None = None
+    tick: int | None = None
+    observationIndex: int | None = None
+    observationCardinality: int | None = None
+    feeProtocol: int | None = None
+    unlocked: bool | None = None
+    liquidity: str | None = None
+    feeGrowthGlobal0X128: str | None = None
+    feeGrowthGlobal1X128: str | None = None
+
+
+class UniswapV3SwapTxReceipt(BaseModel):
+    """Decoded on-chain receipt for Uniswap V3 exact-input swap.
+
+    Parsed from TransactionReceipt returned by web3.py after swap execution.
+    """
+
+    transactionHash: str | None = None
+    blockNumber: int | None = None
+    gasUsed: int | None = None
+    status: int | None = None  # 1 = success, 0 = reverted
+    amountIn: str | None = None
+    amountOut: str | None = None
+    sqrtPriceX96After: str | None = None
+    tickAfter: int | None = None
+
+
+# --- Lido on-chain response shapes ---
+class LidoSubmitResponse(BaseModel):
+    """Lido stETH.submit() transaction receipt.
+
+    Decoded from web3.py TransactionReceipt after staking ETH.
+    """
+
+    transactionHash: str | None = None
+    blockNumber: int | None = None
+    gasUsed: int | None = None
+    status: int | None = None  # 1 = success
+    stEthMinted: str | None = None  # stETH amount minted (wei string)
+
+
+class LidoWstEthWrapResponse(BaseModel):
+    """wstETH.wrap() transaction receipt.
+
+    Decoded from web3.py TransactionReceipt after wrapping stETH to wstETH.
+    """
+
+    transactionHash: str | None = None
+    blockNumber: int | None = None
+    gasUsed: int | None = None
+    status: int | None = None  # 1 = success
+    wstEthMinted: str | None = None  # wstETH amount minted (wei string)
+    stEthWrapped: str | None = None  # stETH consumed (wei string)
+
+
+# --- EtherFi on-chain response shapes ---
+class EtherFiStakeResponse(BaseModel):
+    """EtherFi LiquidityPool.deposit() transaction receipt.
+
+    Decoded from web3.py TransactionReceipt after staking ETH to receive weETH.
+    """
+
+    transactionHash: str | None = None
+    blockNumber: int | None = None
+    gasUsed: int | None = None
+    status: int | None = None  # 1 = success
+    eEthMinted: str | None = None  # eETH amount minted before wrapping (wei string)
+    weEthReceived: str | None = None  # weETH received (wei string)
+
+
+class EtherFiUnstakeResponse(BaseModel):
+    """EtherFi LiquidityPool.requestWithdraw() transaction receipt.
+
+    Decoded from web3.py TransactionReceipt after requesting withdrawal.
+    """
+
+    transactionHash: str | None = None
+    blockNumber: int | None = None
+    gasUsed: int | None = None
+    status: int | None = None  # 1 = success
+    requestId: str | None = None  # withdrawal NFT request ID
+    amountRequested: str | None = None  # ETH amount requested (wei string)

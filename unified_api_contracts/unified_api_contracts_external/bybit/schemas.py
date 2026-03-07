@@ -1,8 +1,10 @@
 """Bybit adapter: markets, tickers, order book, trades, order/position, errors, WebSocket, FIX."""
 
+from __future__ import annotations
+
 __api_version__ = "v5"  # matches provider_api_versions.yaml
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from unified_api_contracts import ErrorAction
 
@@ -68,7 +70,7 @@ class BybitMarkPriceKline(BaseModel):
     closePrice: str
 
     @classmethod
-    def from_list(cls, row: list[str]) -> "BybitMarkPriceKline":
+    def from_list(cls, row: list[str]) -> BybitMarkPriceKline:
         """Create from array [startTime, openPrice, highPrice, lowPrice, closePrice]."""
         return cls(
             startTime=row[0],
@@ -92,7 +94,7 @@ class BybitIndexPriceKline(BaseModel):
     closePrice: str
 
     @classmethod
-    def from_list(cls, row: list[str]) -> "BybitIndexPriceKline":
+    def from_list(cls, row: list[str]) -> BybitIndexPriceKline:
         """Create from array [startTime, openPrice, highPrice, lowPrice, closePrice]."""
         return cls(
             startTime=row[0],
@@ -119,7 +121,7 @@ class BybitKline(BaseModel):
     turnover: str | None = None  # quote asset volume
 
     @classmethod
-    def from_list(cls, row: list[str]) -> "BybitKline":
+    def from_list(cls, row: list[str]) -> BybitKline:
         """Create from array [startTime, openPrice, highPrice, lowPrice, closePrice, volume, turnover]."""
         return cls(
             startTime=row[0],
@@ -332,6 +334,18 @@ class BybitInstrumentInfo(BaseModel):
     settleCoin: str | None = None
     optionsType: str | None = None  # Call or Put (for options)
     strikePrice: str | None = None
+
+
+class BybitInstrumentsResult(BaseModel):
+    """Bybit instruments-info result wrapper."""
+
+    instruments: list[BybitInstrumentInfo] = Field(default_factory=list, alias="list")
+
+
+class BybitInstrumentsResponse(BaseModel):
+    """Bybit instruments-info API response (GET /v5/market/instruments-info)."""
+
+    result: BybitInstrumentsResult = BybitInstrumentsResult()
 
 
 # --- CEX Order Submit / Ack / Cancel ---

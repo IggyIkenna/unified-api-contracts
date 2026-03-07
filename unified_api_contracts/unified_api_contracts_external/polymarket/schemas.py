@@ -163,6 +163,55 @@ class PolymarketError(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# CLOB execution — POST /order, DELETE /order/{order_id}
+# Ref: https://docs.polymarket.com/#create-order
+# Auth: POLY_ADDRESS / POLY_SIGNATURE / POLY_TIMESTAMP / POLY_NONCE headers (L2 HMAC)
+# ---------------------------------------------------------------------------
+
+
+class PolymarketCLOBOrderRequest(BaseModel):
+    """Request body for POST clob.polymarket.com/order.
+
+    The order is a signed EIP-712 struct — the ``order`` field is the signed payload
+    produced by py-clob-client; ``orderType`` and ``owner`` are top-level envelope fields.
+    """
+
+    order: dict[str, object] | None = None  # signed EIP-712 order struct from py-clob-client
+    owner: str | None = None  # wallet address (maker)
+    order_type: str | None = Field(None, alias="orderType")  # GTC | GTD | FOK | IOC
+
+
+class PolymarketCLOBOrderResponse(BaseModel):
+    """Response from POST clob.polymarket.com/order.
+
+    Returned immediately on submission. Check ``status`` for acceptance.
+    """
+
+    success: bool | None = None
+    error_msg: str | None = Field(None, alias="errorMsg")
+    order_id: str | None = Field(None, alias="orderID")
+    transaction_hash: str | None = Field(None, alias="transactionHash")
+    status: str | None = None  # matched | unmatched | delayed | queued
+    matched_amount: str | None = Field(None, alias="matchedAmount")
+
+
+class PolymarketCLOBCancelResponse(BaseModel):
+    """Response from DELETE clob.polymarket.com/order/{order_id}."""
+
+    canceled: list[str] | None = None  # list of canceled order IDs
+    not_canceled: dict[str, str] | None = Field(None, alias="notCanceled")  # {order_id: reason}
+
+
+class PolymarketCLOBGetOrdersResponse(BaseModel):
+    """Response from GET clob.polymarket.com/orders — paginated open orders."""
+
+    limit: int | None = None
+    count: int | None = None
+    next_cursor: str | None = Field(None, alias="nextCursor")
+    data: list[PolymarketCLOBOrder] | None = None
+
+
+# ---------------------------------------------------------------------------
 # Gamma API schemas (market metadata, events, tags, resolution)
 # ---------------------------------------------------------------------------
 
@@ -529,3 +578,36 @@ class PolymarketPriceHistory(BaseModel):
 
     token_id: str | None = None
     history: list[PolymarketPricePoint] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Position schemas (Gamma API — authenticated)
+# ---------------------------------------------------------------------------
+
+
+class PolymarketPosition(BaseModel):
+    """User position from Gamma API.
+
+    Endpoint: GET gamma-api.polymarket.com/positions?user={address}
+    Auth: L2 HMAC headers (POLY_ADDRESS, POLY_SIGNATURE, POLY_TIMESTAMP, POLY_NONCE)
+
+    size: number of outcome tokens held (NOT USDC stake)
+    avg_price: average entry price (implied probability, 0.0-1.0)
+    initial_value: USDC value at entry (size * avg_price)
+    current_value: USDC value at current price (size * current_price)
+    cash_balance: realised proceeds from partial exits
+    """
+
+    asset_id: str | None = Field(None, alias="assetId")  # CLOB token ID
+    condition_id: str | None = Field(None, alias="conditionId")
+    market_slug: str | None = Field(None, alias="marketSlug")
+    question: str | None = None
+    outcome: str | None = None  # "Yes" | "No"
+    size: float | None = None  # outcome tokens held
+    avg_price: float | None = Field(None, alias="avgPrice")  # entry probability
+    initial_value: float | None = Field(None, alias="initialValue")  # USDC cost basis
+    current_value: float | None = Field(None, alias="currentValue")  # USDC mark value
+    cash_balance: float | None = Field(None, alias="cashBalance")  # realised proceeds
+    realized_pnl: float | None = Field(None, alias="realizedPnl")
+    unrealized_pnl: float | None = Field(None, alias="unrealizedPnl")
+    user: str | None = None  # wallet address

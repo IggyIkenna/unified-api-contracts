@@ -17,7 +17,7 @@ map venue-specific IDs via ``instrument_id`` defined in execution.py.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
 
@@ -312,6 +312,8 @@ class CanonicalPosition(BaseModel):
     leverage: Decimal | None = None
     venue: str | None = None
     timestamp: datetime | None = None
+    liquidation_price: Decimal | None = None
+    raw: dict[str, object] | None = None
 
 
 class CanonicalBalance(BaseModel):
@@ -321,6 +323,30 @@ class CanonicalBalance(BaseModel):
     free: Decimal
     locked: Decimal
     total: Decimal
+    venue: str | None = None
+    available: Decimal | None = None
+    timestamp: datetime | None = None
+    raw: dict[str, object] | None = None
+
+
+class CanonicalAccountSnapshot(BaseModel):
+    """Full account snapshot including balances and positions."""
+
+    venue: str
+    balances: list[CanonicalBalance] = []
+    positions: list[CanonicalPosition] = []
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+
+class CanonicalSettlement(BaseModel):
+    """Settlement event for a position or balance change."""
+
+    venue: str
+    asset: str
+    amount: Decimal
+    settlement_type: str  # "daily_pnl", "funding", "delivery"
+    timestamp: datetime
+    raw: dict[str, object] | None = None
 
 
 class CanonicalFundingRate(BaseModel):
@@ -542,6 +568,7 @@ class CanonicalBetOrder(BaseModel):
 
 
 __all__ = [
+    "CanonicalAccountSnapshot",
     "CanonicalBalance",
     "CanonicalBetMarket",
     "CanonicalBetOrder",
@@ -559,6 +586,7 @@ __all__ = [
     # CanonicalStakingRate — owned by UIC; not exported from UAC
     "CanonicalOrderBook",
     "CanonicalPosition",
+    "CanonicalSettlement",
     "CanonicalTicker",
     "CanonicalTrade",
     "CanonicalWebSocketLifecycle",

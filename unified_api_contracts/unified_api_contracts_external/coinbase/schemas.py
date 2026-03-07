@@ -143,6 +143,13 @@ class CoinbaseWebSocketClose(BaseModel):
     reason: str | None = None
 
 
+class CoinbaseProductsResponse(BaseModel):
+    """Coinbase Advanced Trade products list response (GET /api/v3/brokerage/products)."""
+
+    products: list["CoinbaseProductInfo"] = []
+    num_products: int | None = None
+
+
 class CoinbaseProductInfo(BaseModel):
     """Coinbase Advanced Trade product specification (REST: GET /api/v3/brokerage/products/{product_id})."""
 

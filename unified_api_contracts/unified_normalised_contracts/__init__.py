@@ -11,6 +11,7 @@ with UIC's InstrumentRecord (31-field, Decimal, normalized adapter contract).
 """
 
 from .domain import (
+    CanonicalAccountSnapshot,
     CanonicalBalance,
     CanonicalDerivativeTicker,
     CanonicalFundingRate,
@@ -18,6 +19,7 @@ from .domain import (
     CanonicalOhlcvBar,
     CanonicalOrderBook,
     CanonicalPosition,
+    CanonicalSettlement,
     CanonicalTicker,
     CanonicalTrade,
     InstrumentType,
@@ -28,8 +30,12 @@ from .domain import (
 )
 from .errors import CanonicalError, CanonicalRateLimitError
 from .execution import (
+    CanonicalAccountState,
     CanonicalFill,
+    CanonicalMarginState,
     CanonicalOrder,
+    CanonicalOrderAmendment,
+    CanonicalOrderRejection,
     ExecutionInstruction,
     ExecutionResult,
     OrderSide,
@@ -38,17 +44,23 @@ from .execution import (
 )
 
 __all__ = [
+    "CanonicalAccountSnapshot",
+    "CanonicalAccountState",
     "CanonicalBalance",
     "CanonicalDerivativeTicker",
     "CanonicalError",
     "CanonicalFill",
     "CanonicalFundingRate",
     "CanonicalLiquidation",
+    "CanonicalMarginState",
     "CanonicalOhlcvBar",
     "CanonicalOrder",
+    "CanonicalOrderAmendment",
     "CanonicalOrderBook",
+    "CanonicalOrderRejection",
     "CanonicalPosition",
     "CanonicalRateLimitError",
+    "CanonicalSettlement",
     "CanonicalTicker",
     "CanonicalTrade",
     "ExecutionInstruction",

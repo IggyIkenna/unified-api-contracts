@@ -64,6 +64,9 @@ from .market_schemas import (
     BinanceFundingRateHistory as BinanceFundingRateHistory,
 )
 from .market_schemas import (
+    BinanceFuturesExchangeInfo as BinanceFuturesExchangeInfo,
+)
+from .market_schemas import (
     BinanceIndexPriceKline as BinanceIndexPriceKline,
 )
 from .market_schemas import (
@@ -185,17 +188,13 @@ from .ws_schemas import (
 )
 
 __all__ = [
-    # ws_schemas
     "BinanceAccountUpdate",
-    # order_schemas
     "BinanceAdlQuantile",
-    # market_schemas
     "BinanceAggTrade",
     "BinanceCoinmOrderSubmitRequest",
     "BinanceCoinmOrderSubmitResponse",
     "BinanceDeliveryHistory",
     "BinanceDeliveryPrice",
-    # account_schemas
     "BinanceDepositAddress",
     "BinanceDepositHistory",
     "BinanceDualInvestmentProduct",
@@ -206,6 +205,7 @@ __all__ = [
     "BinanceExchangeInfo",
     "BinanceFeeRate",
     "BinanceFundingRateHistory",
+    "BinanceFuturesExchangeInfo",
     "BinanceIncome",
     "BinanceIndexPriceKline",
     "BinanceInstrumentInfo",

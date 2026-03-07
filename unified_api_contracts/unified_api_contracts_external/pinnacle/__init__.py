@@ -1,11 +1,16 @@
 """Pinnacle REST API contracts."""
 
 from .schemas import (
+    PinnacleBetEntry,
+    PinnacleBetRequest,
+    PinnacleBetResponse,
+    PinnacleCurrentBet,
     PinnacleError,
     PinnacleEvent,
     PinnacleFixtureEvent,
     PinnacleFixtureLeague,
     PinnacleFixturesResponse,
+    PinnacleGetBetsResponse,
     PinnacleLeague,
     PinnacleMoneyline,
     PinnacleOddsEvent,
@@ -19,11 +24,16 @@ from .schemas import (
 )
 
 __all__ = [
+    "PinnacleBetEntry",
+    "PinnacleBetRequest",
+    "PinnacleBetResponse",
+    "PinnacleCurrentBet",
     "PinnacleError",
     "PinnacleEvent",
     "PinnacleFixtureEvent",
     "PinnacleFixtureLeague",
     "PinnacleFixturesResponse",
+    "PinnacleGetBetsResponse",
     "PinnacleLeague",
     "PinnacleMoneyline",
     "PinnacleOddsEvent",
