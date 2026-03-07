@@ -29,7 +29,7 @@ set -e
 # ── REPO-SPECIFIC SETTINGS ────────────────────────────────────────────────────
 PACKAGE_NAME="unified-api-contracts"         # e.g. unified-trading-library
 SOURCE_DIR="unified_api_contracts"           # e.g. unified_trading_library  (underscore form)
-MIN_COVERAGE=70  # Template default — set to (actual coverage - 1%) after first test run. See test-coverage-targets.mdc
+MIN_COVERAGE=80  # Template default — set to (actual coverage - 1%) after first test run. See test-coverage-targets.mdc
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 
 # Path dependencies (libraries may have path deps to unified-api-contracts, unified-config-interface, etc.)
@@ -349,10 +349,11 @@ done
 [[ -n "$FSIZES" ]] && { log_fail "Function/class/method size exceeded:$FSIZES"; ((V++)); } || log_success "Function/class/method size OK"
 
 # Security: pip-audit (prefer project venv to avoid workspace transitive vulns)
+# --skip-editable: skip local packages not on PyPI (e.g. unified-api-contracts installed as -e .)
 if $PYTHON_CMD -c "import pip_audit" 2>/dev/null; then
-    $PYTHON_CMD -m pip_audit 2>/dev/null && log_success "pip-audit clean" || { log_fail "pip-audit vulnerabilities"; ((V++)); }
+    $PYTHON_CMD -m pip_audit --skip-editable 2>/dev/null && log_success "pip-audit clean" || { log_fail "pip-audit vulnerabilities"; ((V++)); }
 elif command -v pip-audit &>/dev/null; then
-    pip-audit 2>/dev/null && log_success "pip-audit clean" || { log_fail "pip-audit vulnerabilities"; ((V++)); }
+    pip-audit --skip-editable 2>/dev/null && log_success "pip-audit clean" || { log_fail "pip-audit vulnerabilities"; ((V++)); }
 else
     log_fail "pip-audit required: uv pip install pip-audit"; ((V++))
 fi
@@ -393,11 +394,10 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
     echo "$DOMAIN_CONTRACTS_IN_LIB" | head -5
 } || log_success "No misplaced domain BaseModel contracts in library"
 
-# 7. BYPASS — bare-true in quality gate scripts
-_BYPASS_PAT='\|\|true|\|\| true'
-BYPASS=$(rg "$_BYPASS_PAT" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "_BYPASS_PAT\|^#\|zombies\|pyright\|cleanup" || :)
-[[ -n "$BYPASS" ]] && { log_fail "bare-true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No bare-true quality gate bypasses"
+# 7. BYPASS — ||true in quality gate scripts
+BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
+    | grep -v "^#\|zombies\|pyright\|cleanup" || :)
+[[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
 # STEP 5.10 — Block direct cloud SDK imports outside UCI providers
