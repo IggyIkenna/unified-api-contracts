@@ -43,14 +43,13 @@ def parse_reject_reason(raw: str | None) -> VersiFiRejectReason | None:
     if not raw:
         return None
     try:
-        parsed: object = cast(object, json.loads(raw))
+        raw_data: object = cast(object, json.loads(raw))
     except (ValueError, TypeError):
         return None
-    if not isinstance(parsed, dict):
+    if not isinstance(raw_data, dict):
         return None
-    # Cast to a concrete dict type so basedpyright can resolve .items() without Unknown keys
-    parsed_dict: dict[str, object] = cast(dict[str, object], parsed)
-    field_map: dict[str, object] = dict(parsed_dict.items())
+    # Cast the narrowed dict[Unknown, Unknown] to dict[str, object] for typed access
+    field_map: dict[str, object] = cast(dict[str, object], raw_data)
     code: object = field_map.get("code")
     if isinstance(code, int) or (isinstance(code, str) and code.lstrip("-").isdigit()):
         return BinanceError.model_validate(field_map)

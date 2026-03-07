@@ -55,26 +55,17 @@ def normalize_kalshi_market(raw: KalshiMarket, venue: str = "kalshi") -> Canonic
 def normalize_kalshi_odds(raw: KalshiMarket, is_yes: bool = True, venue: str = "kalshi") -> CanonicalOdds:
     """Convert KalshiMarket to CanonicalOdds.
 
-    yes_bid/yes_ask/no_bid/no_ask are string fixed-point dollars (e.g. "0.4500").
-    Integer cent fields (yes_bid, yes_ask) are deprecated as of March 5, 2026.
+    yes_bid_dollars/yes_ask_dollars/no_bid_dollars/no_ask_dollars are string
+    fixed-point dollars (e.g. "0.4500").
     Converts probability to decimal odds: decimal = 1 / probability.
     """
     now = datetime.now(UTC)
-    # Prefer string fixed-point fields; fall back to deprecated integer cent fields
     if is_yes:
         price_str = raw.yes_bid_dollars or raw.yes_ask_dollars
-        if price_str is None and raw.yes_bid is not None:
-            price_str = str(raw.yes_bid / 100)
-        elif price_str is None and raw.yes_ask is not None:
-            price_str = str(raw.yes_ask / 100)
         selection_name = "Yes"
         selection_id = f"{raw.ticker or ''}-yes"
     else:
         price_str = raw.no_bid_dollars or raw.no_ask_dollars
-        if price_str is None and raw.no_bid is not None:
-            price_str = str(raw.no_bid / 100)
-        elif price_str is None and raw.no_ask is not None:
-            price_str = str(raw.no_ask / 100)
         selection_name = "No"
         selection_id = f"{raw.ticker or ''}-no"
 
@@ -378,7 +369,7 @@ def normalize_kalshi_order(raw: KalshiOrder, venue: str = "kalshi") -> Canonical
     side = "back"
     if raw.action == "sell" or raw.side == "no":
         side = "lay"
-    # Price: Kalshi uses integer cent fields (deprecated) — use yes_price in cents
+    # Price: Kalshi orders use integer cent fields (yes_price, no_price)
     price = Decimal("0.5")
     if raw.yes_price is not None:
         price = Decimal(str(raw.yes_price / 100))

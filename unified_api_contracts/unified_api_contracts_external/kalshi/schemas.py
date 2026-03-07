@@ -3,12 +3,10 @@
 Kalshi is a regulated US prediction exchange. API hierarchy: Series → Event → Market.
 Base URL: https://trading-api.kalshi.com/trade-api/v2
 
-CRITICAL versioning notes:
-- Integer cent fields (yes_bid, yes_ask, no_bid, no_ask, volume, open_interest) are
-  deprecated effective March 5, 2026. All code must use string fixed-point fields:
-  yes_bid_dollars ("0.4500"), volume_fp ("1234.00"), etc.
-- Historical data window shrinks from ~1 year to ~3 months around March 6, 2026.
-  Bulk-download /trade-api/v2/markets (historical), /trade-api/v2/fills before cutoff.
+Versioning notes:
+- String fixed-point fields are used for all prices: yes_bid_dollars ("0.4500"),
+  volume_fp ("1234.00"), etc. Integer cent fields were removed after March 5, 2026.
+- Historical data window is ~3 months (post-March 2026 cutoff).
 - Rate tiers: Basic 20/10 req/s read/write. Prime 400/400 req/s (requires 7.5% of
   exchange monthly volume).
 
@@ -79,7 +77,7 @@ class KalshiMarket(BaseModel):
 
     String fixed-point fields (yes_bid_dollars, yes_ask_dollars, no_bid_dollars,
     no_ask_dollars, volume_fp, open_interest_fp) use format "0.4500" representing
-    $0.45 per contract. Integer cent fields are deprecated March 5, 2026.
+    $0.45 per contract.
     """
 
     ticker: str | None = None
@@ -107,7 +105,7 @@ class KalshiMarket(BaseModel):
         | None
     ) = None
     result: Literal["yes", "no", "scalar", ""] | str | None = None
-    # String fixed-point prices (use these — integer fields deprecated Mar 5 2026)
+    # String fixed-point prices
     yes_bid_dollars: str | None = None  # e.g. "0.4500"
     yes_ask_dollars: str | None = None
     no_bid_dollars: str | None = None
@@ -116,7 +114,7 @@ class KalshiMarket(BaseModel):
     volume_fp: str | None = None  # e.g. "1234.00" total contracts traded
     open_interest_fp: str | None = None
     settlement_value_dollars: str | None = None
-    # Price structure (replaces deprecated tick_size integer)
+    # Price structure
     price_level_structure: str | None = None
     price_ranges: list[KalshiPriceRange] | None = None
     # Strike (for range/scalar markets)
@@ -137,13 +135,6 @@ class KalshiMarket(BaseModel):
     floor_strike: float | None = None
     cap_strike: float | None = None
     liquidity: str | None = None
-    # Deprecated integer cent fields (zero after March 5, 2026)
-    yes_bid: int | None = None
-    yes_ask: int | None = None
-    no_bid: int | None = None
-    no_ask: int | None = None
-    volume: int | None = None
-    open_interest: int | None = None
     expiration_time: str | None = None
     open_time: str | None = None
     close_time: str | None = None
@@ -158,14 +149,11 @@ class KalshiOrderBook(BaseModel):
     Endpoint: GET /trade-api/v2/markets/{ticker}/orderbook
 
     v2 format uses yes_dollars/no_dollars: [["0.45", "100.00"], ...] (price_str, size_str).
-    yes/no (integer cents) deprecated March 5, 2026.
     """
 
     ticker: str | None = None
     yes_dollars: list[tuple[str, str]] | None = None  # [("0.45", "100.00"), ...]
     no_dollars: list[tuple[str, str]] | None = None
-    yes: list[list[int]] | None = None  # [[price_cents, qty], ...] deprecated Mar 5 2026
-    no: list[list[int]] | None = None
 
 
 class KalshiTrade(BaseModel):
@@ -181,10 +169,6 @@ class KalshiTrade(BaseModel):
     count_fp: str | None = None  # number of contracts
     taker_side: Literal["yes", "no"] | str | None = None
     created_time: str | None = None
-    # Deprecated
-    count: int | None = None
-    yes_price: int | None = None
-    no_price: int | None = None
 
 
 class KalshiOrder(BaseModel):
@@ -225,10 +209,6 @@ class KalshiFill(BaseModel):
     fees_dollars: str | None = None
     is_taker: bool | None = None
     created_time: str | None = None
-    # Deprecated
-    count: int | None = None
-    yes_price: int | None = None
-    no_price: int | None = None
 
 
 class KalshiPosition(BaseModel):
@@ -238,7 +218,6 @@ class KalshiPosition(BaseModel):
     """
 
     ticker: str | None = None
-    position: int | None = None  # deprecated; use position_fp
     position_fp: str | None = None  # net YES contracts (negative = net NO)
     market_exposure_dollars: str | None = None
     realized_pnl_dollars: str | None = None
@@ -269,9 +248,6 @@ class KalshiBalance(BaseModel):
     balance_dollars: str | None = None
     payout_dollars: str | None = None
     subaccount: str | None = None
-    # Deprecated aliases
-    balance_fp: str | None = None
-    payout_fp: str | None = None
 
 
 class KalshiCandlestick(BaseModel):
