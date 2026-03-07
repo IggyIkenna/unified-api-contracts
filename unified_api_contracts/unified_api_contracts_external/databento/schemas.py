@@ -437,6 +437,29 @@ class DatabentoCMEOptionQuote(BaseModel):
     unit_of_measure: str | None = Field(None, description="Unit of measure (oz, MMBtu)")
 
 
+class DatabentoReferenceInstrument(BaseModel):
+    """Instrument definition from Databento REST reference endpoint.
+
+    Returned by GET https://hist.databento.com/v0/reference/instruments?dataset=...
+    This is a JSON REST response, distinct from DatabentoDefinition which is the
+    DBN binary format record.
+    """
+
+    instrument_id: int = Field(..., description="Databento internal instrument ID")
+    raw_symbol: str = Field(..., description="Raw exchange symbol e.g. ESZ4")
+    instrument_class: str = Field(
+        ..., description="B=bond, C=crypto, E=equity, F=future, N=fund/ETF, O=option, S=FX spot, T=spread, X=index"
+    )
+    dataset: str | None = Field(None, description="Dataset the instrument belongs to e.g. GLBX.MDP3")
+    currency: str | None = Field(None, description="Settlement/quote currency e.g. USD")
+    expiration: str | None = Field(None, description="Expiry as ISO datetime string e.g. 2024-12-20T00:00:00Z")
+    strike_price: float | None = Field(None, description="Strike price for options")
+    option_type: str | None = Field(None, description="C=call or P=put for options")
+    underlying: str | None = Field(None, description="Underlying symbol for derivatives")
+    min_price_increment: float | None = Field(None, description="Minimum tick size")
+    min_lot_size_round_lot: float | None = Field(None, description="Minimum round-lot size")
+
+
 # Price divisor for fixed-point conversion (1e9)
 DATABENTO_PRICE_DIVISOR = 1_000_000_000
 
