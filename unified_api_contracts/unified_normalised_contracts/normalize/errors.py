@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import contextlib
 import datetime as _dt
+import logging
 import re
 from collections.abc import Callable
 from email.utils import parsedate_to_datetime
@@ -34,6 +35,8 @@ from ..errors import (
     RateLimitInfo,
 )
 
+_logger = logging.getLogger(__name__)
+
 # ---------------------------------------------------------------------------
 # Header extraction
 # ---------------------------------------------------------------------------
@@ -54,7 +57,7 @@ def _parse_retry_after(value: str) -> float | None:
         # Attempt to parse integer seconds (may have decimals)
         return float(stripped)
     except ValueError:
-        pass
+        _logger.debug("Retry-After value %r is not a float; trying HTTP-date parse", stripped)
     try:
         # Attempt HTTP-date (RFC 7231)
         dt = parsedate_to_datetime(stripped)
@@ -115,7 +118,7 @@ def extract_rate_limit_headers(
                 used = int(raw_used)
                 remaining = max(0, limit - used)
             except ValueError:
-                pass
+                _logger.debug("X-RateLimit-Used header %r is not an integer; skipping computed remaining", raw_used)
 
     return RateLimitInfo(
         retry_after=retry_after,

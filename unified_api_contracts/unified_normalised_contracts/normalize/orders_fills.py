@@ -1,6 +1,7 @@
 """Order and fill normalizers: raw venue responses -> CanonicalOrder, CanonicalFill."""
 
 import contextlib
+import logging
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -31,6 +32,8 @@ from ..execution import (
     OrderType,
     TimeInForce,
 )
+
+_logger = logging.getLogger(__name__)
 
 
 def _parse_decimal(val: str | float | Decimal | None) -> Decimal:
@@ -496,7 +499,7 @@ def normalize_ibkr_execution(raw: IBKRExecution, instrument_id: str = "", venue:
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=UTC)
         except (ValueError, TypeError):
-            pass
+            _logger.debug("IBKR execution time %r is not a valid ISO datetime; using current UTC time", raw.time)
     return CanonicalFill(
         fill_id=str(raw.execId or ""),
         order_id=str(raw.orderId or ""),

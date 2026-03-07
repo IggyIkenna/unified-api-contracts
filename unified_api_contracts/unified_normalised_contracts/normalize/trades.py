@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import contextlib
+import logging
 from datetime import UTC, datetime
 from decimal import Decimal
 
@@ -28,6 +29,8 @@ from ...unified_api_contracts_external.tardis.schemas import TardisTrade
 from ...unified_api_contracts_external.upbit.schemas import UpbitTrade
 from ...unified_api_contracts_external.versifi.schemas import VersiFiChildOrderTrade
 from ..domain import CanonicalTrade
+
+_logger = logging.getLogger(__name__)
 
 
 def normalize_binance_trade(raw: BinanceTrade, venue: str = "binance", symbol: str = "") -> CanonicalTrade:
@@ -120,7 +123,7 @@ def normalize_coinbase_trade(raw: CoinbaseTrade, venue: str = "coinbase", symbol
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=UTC)
         except (ValueError, TypeError):
-            pass
+            _logger.debug("Coinbase trade time %r is not a valid ISO datetime; using current UTC time", raw.time)
     return CanonicalTrade(
         venue=venue,
         symbol=symbol or "UNKNOWN",
@@ -145,7 +148,7 @@ def normalize_ccxt_trade(raw: CcxtTrade, venue: str = "ccxt", symbol: str = "") 
             if ts.tzinfo is None:
                 ts = ts.replace(tzinfo=UTC)
         except (ValueError, TypeError):
-            pass
+            _logger.debug("CCXT trade datetime %r is not a valid ISO datetime; using current UTC time", raw.datetime)
     return CanonicalTrade(
         venue=venue,
         symbol=symbol or (raw.symbol or "") or "UNKNOWN",

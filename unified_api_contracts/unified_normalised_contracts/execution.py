@@ -201,13 +201,80 @@ class ExecutionResult(BaseModel):
     schema_version: str = CANONICAL_EXECUTION_RESULT_VERSION
 
 
+# ---------------------------------------------------------------------------
+# Account / Margin canonical schemas
+# ---------------------------------------------------------------------------
+# CanonicalPosition and CanonicalBalance are defined in domain.py.
+# They are imported here only for the type annotations in CanonicalAccountState.
+# No circular import: domain.py has no imports from execution.py.
+
+
+class CanonicalMarginState(BaseModel):
+    """Canonical margin account state — all venues."""
+
+    account_id: str
+    venue: str
+    timestamp: datetime
+    margin_level: Decimal
+    total_collateral: Decimal
+    total_debt: Decimal
+    available_margin: Decimal
+    liquidation_price: Decimal | None = None
+
+
+class CanonicalAccountState(BaseModel):
+    """Canonical complete account state — all venues.
+
+    ``positions`` and ``balances`` use the canonical types from domain.py.
+    The forward-reference strings are resolved by model_rebuild() at module end.
+    """
+
+    timestamp: datetime
+    venue: str
+    account_id: str
+    # Forward references resolved via model_rebuild() below
+    positions: list[object] = Field(default_factory=list)
+    balances: list[object] = Field(default_factory=list)
+    margins: CanonicalMarginState | None = None
+
+
+class CanonicalOrderRejection(BaseModel):
+    """Canonical order rejection event — all venues."""
+
+    venue: str
+    order_id: str
+    instrument_id: str
+    reason: str
+    error_code: str
+    retry_safe: bool
+    timestamp: datetime
+
+
+class CanonicalOrderAmendment(BaseModel):
+    """Canonical order amendment event — all venues."""
+
+    venue: str
+    order_id: str
+    instrument_id: str
+    original_quantity: Decimal
+    new_quantity: Decimal
+    original_price: Decimal | None
+    new_price: Decimal | None
+    timestamp: datetime
+    amendment_id: str = ""
+
+
 __all__ = [
     "CANONICAL_EXECUTION_INSTRUCTION_VERSION",
     "CANONICAL_EXECUTION_RESULT_VERSION",
     "CANONICAL_FILL_VERSION",
     "CANONICAL_ORDER_VERSION",
+    "CanonicalAccountState",
     "CanonicalFill",
+    "CanonicalMarginState",
     "CanonicalOrder",
+    "CanonicalOrderAmendment",
+    "CanonicalOrderRejection",
     "ExecutionInstruction",
     "ExecutionResult",
     "OrderSide",

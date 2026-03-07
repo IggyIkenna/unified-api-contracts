@@ -661,6 +661,27 @@ class DeribitInstrumentsResponse(BaseModel, frozen=True):
     error: DeribitError | None = None
 
 
+class DeribitGetInstrumentsResponse(BaseModel):
+    """Deribit JSON-RPC response for public/get_instruments (non-frozen variant).
+
+    result is a list of DeribitInstrumentInfoFull objects.
+    """
+
+    jsonrpc: str | None = None
+    id: int | None = None
+    result: list[DeribitInstrumentInfoFull] = []
+    error: DeribitError | None = None
+
+
+class DeribitGetInstrumentResponse(BaseModel):
+    """Deribit JSON-RPC response for public/get_instrument (single instrument)."""
+
+    jsonrpc: str | None = None
+    id: int | None = None
+    result: DeribitInstrumentInfoFull | None = None
+    error: DeribitError | None = None
+
+
 class DeribitTickerResult(BaseModel, frozen=True):
     """Ticker data returned by Deribit REST ticker endpoint."""
 
