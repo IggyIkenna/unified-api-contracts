@@ -1,8 +1,10 @@
 """Upbit: market data, order/position feed, errors, WebSocket, FIX, corner cases."""
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class UpbitMarket(BaseModel):

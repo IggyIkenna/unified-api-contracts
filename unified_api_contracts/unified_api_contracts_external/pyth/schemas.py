@@ -6,6 +6,8 @@ Used by unified-market-interface PythLiveAdapter for oracle price feeds.
 Pyth uses fixed-point arithmetic: actual_price = price * 10^expo.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

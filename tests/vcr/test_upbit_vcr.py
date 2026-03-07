@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import requests
+import httpx
 from vcr import VCR
 
 CASSETTE_DIR = (
@@ -29,7 +29,7 @@ def test_upbit_market_data_cassette() -> None:
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
     with _make_vcr().use_cassette(str(cassette_path)):
-        response = requests.get("https://api.upbit.com/v1/ticker?markets=KRW-BTC", timeout=10)
+        response = httpx.get("https://api.upbit.com/v1/ticker?markets=KRW-BTC")
         assert response.status_code == 200
         data = response.json()
         assert data is not None
@@ -42,8 +42,15 @@ def test_upbit_ticker_fields() -> None:
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
     with _make_vcr().use_cassette(str(cassette_path)):
-        response = requests.get("https://api.upbit.com/v1/ticker?markets=KRW-BTC", timeout=10)
+        response = httpx.get("https://api.upbit.com/v1/ticker?markets=KRW-BTC")
         data = response.json()
         ticker = data[0]
-        for field in ("market", "trade_price", "opening_price", "high_price", "low_price", "change"):
+        for field in (
+            "market",
+            "trade_price",
+            "opening_price",
+            "high_price",
+            "low_price",
+            "change",
+        ):
             assert field in ticker, f"Missing field: {field}"

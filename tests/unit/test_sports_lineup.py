@@ -136,7 +136,12 @@ def test_canonical_lineup_from_raw_nested_dict() -> None:
             {"player_id": "p-9", "player_name": "Erling Haaland", "shirt_number": 9},
         ],
         "substitutes": [
-            {"player_id": "p-47", "player_name": "Phil Foden", "shirt_number": 47, "is_substitute": True},
+            {
+                "player_id": "p-47",
+                "player_name": "Phil Foden",
+                "shirt_number": 47,
+                "is_substitute": True,
+            },
         ],
     }
     lineup = CanonicalLineup.from_raw(raw)

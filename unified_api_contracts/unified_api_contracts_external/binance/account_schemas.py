@@ -1,5 +1,7 @@
 """Binance account schemas: balances, margin, withdrawals, transfers."""
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

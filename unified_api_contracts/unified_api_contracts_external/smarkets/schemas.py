@@ -5,6 +5,9 @@ Ref: https://smarkets.com/developer-api
 
 from __future__ import annotations
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel
 
 
@@ -28,6 +31,10 @@ class SmarketsMarket(BaseModel, frozen=True):
     id: str = ""
     name: str = ""
     type: str = ""
+    state: str | None = None  # "active", "closed", etc.
+    eventId: str | None = None
+    marketType: str | None = None
+    volume: float | None = None
 
 
 class SmarketsMarketsResponse(BaseModel, frozen=True):

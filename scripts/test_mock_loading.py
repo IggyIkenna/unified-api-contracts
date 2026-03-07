@@ -117,7 +117,7 @@ def demonstrate_mock_usage():
     rate_limit_mock = load_mock_data("error_rate_limit.yaml")
     print(f"   Rate Limit Errors: {rate_limit_mock['metadata']['error_category']}")
     print(f"   HTTP 429 status: {rate_limit_mock['http_429_responses']['standard_rate_limit']['status_code']}")
-    retry = rate_limit_mock['http_429_responses']['standard_rate_limit']['headers']['Retry-After']
+    retry = rate_limit_mock["http_429_responses"]["standard_rate_limit"]["headers"]["Retry-After"]
     print(f"   Retry after: {retry} seconds")
 
 

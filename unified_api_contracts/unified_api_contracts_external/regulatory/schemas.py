@@ -6,6 +6,9 @@ and best execution monitoring obligations.
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from datetime import date, datetime
 from decimal import Decimal
 from enum import StrEnum

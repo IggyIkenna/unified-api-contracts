@@ -13,8 +13,8 @@ class DomainConfigProtocol(Protocol):
 
     # Core GCP configuration
     gcp_project_id: str
-    gcs_bucket: str
-    bigquery_dataset: str
+    storage_bucket: str
+    analytics_dataset: str
 
     # AWS configuration (optional)
     aws_region: str | None
@@ -33,8 +33,8 @@ class DataTypeConfigProtocol(Protocol):
     """Protocol for data type configuration."""
 
     gcp_project_id: str
-    gcs_bucket: str
-    bigquery_dataset: str
+    storage_bucket: str
+    analytics_dataset: str
     config: dict[str, object]
 
     # Data type specific
@@ -47,8 +47,8 @@ class ExchangeInstrumentConfigProtocol(Protocol):
     """Protocol for exchange instrument configuration."""
 
     gcp_project_id: str
-    gcs_bucket: str
-    bigquery_dataset: str
+    storage_bucket: str
+    analytics_dataset: str
     config: dict[str, object]
 
     # Exchange specific
@@ -62,8 +62,8 @@ class MLConfigProtocol(Protocol):
     """Protocol for ML pipeline configuration."""
 
     gcp_project_id: str
-    gcs_bucket: str
-    bigquery_dataset: str
+    storage_bucket: str
+    analytics_dataset: str
     vertex_ai_project: str | None
 
     # ML specific

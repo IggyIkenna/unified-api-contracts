@@ -42,7 +42,7 @@ class TestSportsExports:
 
         assert OddsType.H2H == "h2h"
 
-    def test_import_all_canonical_types(self) -> None:
+    def test_import_canonical_types_betting(self) -> None:
         from unified_api_contracts.unified_api_contracts_external.sports import (
             ArbitrageMarket,
             ArbitrageOpportunity,
@@ -54,18 +54,7 @@ class TestSportsExports:
             BookmakerCategory,
             BookmakerInfo,
             CanonicalBookmakerMarket,
-            CanonicalFixture,
-            CanonicalLeague,
-            CanonicalOdds,
-            CanonicalPlayer,
-            CanonicalReferee,
-            CanonicalTeam,
-            CanonicalVenue,
             ExpectedValue,
-            MarketStatus,
-            OddsType,
-            OutcomeType,
-            SignalSource,
         )
 
         assert all(
@@ -80,6 +69,27 @@ class TestSportsExports:
                 BookmakerCategory,
                 BookmakerInfo,
                 CanonicalBookmakerMarket,
+                ExpectedValue,
+            ]
+        )
+
+    def test_import_canonical_types_fixture(self) -> None:
+        from unified_api_contracts.unified_api_contracts_external.sports import (
+            CanonicalFixture,
+            CanonicalLeague,
+            CanonicalOdds,
+            CanonicalPlayer,
+            CanonicalReferee,
+            CanonicalTeam,
+            CanonicalVenue,
+            MarketStatus,
+            OddsType,
+            OutcomeType,
+            SignalSource,
+        )
+
+        assert all(
+            [
                 CanonicalFixture,
                 CanonicalLeague,
                 CanonicalOdds,
@@ -87,7 +97,6 @@ class TestSportsExports:
                 CanonicalReferee,
                 CanonicalTeam,
                 CanonicalVenue,
-                ExpectedValue,
                 MarketStatus,
                 OddsType,
                 OutcomeType,

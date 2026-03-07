@@ -1,10 +1,12 @@
 """Pydantic schemas for TWS/ib_insync. Full surface: market data, order, position, account, errors, callbacks."""
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from decimal import Decimal
 
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 # --- Market data (bars, ticker, order book) ---
@@ -41,9 +43,9 @@ class IBKRBondMarketData(BaseModel):
     """Bond market data from IBKR TWS."""
 
     bid: float | None = None
-    bid_price: float | None = None  # alias for bid (API uses bid_price)
+    bid_price: float | None = None  # IBKR TWS API field name (maps to canonical bid)
     ask: float | None = None
-    ask_price: float | None = None  # alias for ask
+    ask_price: float | None = None  # IBKR TWS API field name (maps to canonical ask)
     last: float | None = None
     yield_to_maturity: float | None = None
     coupon_rate: float | None = None

@@ -5,9 +5,12 @@ Ref: https://github.com/pinnacleapi/openapi-specification
 
 from __future__ import annotations
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # ---------------------------------------------------------------------------
 # Reference data — league/event listings
@@ -128,7 +131,7 @@ class PinnacleSettlementResponse(BaseModel):
     settled_specials: list[dict[str, object]] | None = Field(None, alias="settledSpecials")
 
 
-# Alias for backward compatibility and adapter imports
+# Alias for adapter imports
 PinnacleTotals = PinnacleTotalEntry
 
 

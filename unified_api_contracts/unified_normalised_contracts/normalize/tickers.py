@@ -147,7 +147,9 @@ def normalize_okx_ticker(raw: OKXTicker, instrument_key: str | None = None, venu
 
 
 def normalize_deribit_ticker(
-    raw: DeribitTicker | DeribitTickerFull, instrument_key: str | None = None, venue: str = "deribit"
+    raw: DeribitTicker | DeribitTickerFull,
+    instrument_key: str | None = None,
+    venue: str = "deribit",
 ) -> CanonicalTicker:
     ik = instrument_key or f"{venue}:OPTION:{raw.instrument_name or ''}"
     ts = datetime.now(UTC)

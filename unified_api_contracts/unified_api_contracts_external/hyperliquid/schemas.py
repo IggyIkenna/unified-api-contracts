@@ -1,8 +1,10 @@
 """Hyperliquid HTTP + S3/stats: market data, order/position, errors, WebSocket."""
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 # --- Nested types for user state ---

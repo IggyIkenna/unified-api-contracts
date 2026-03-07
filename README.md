@@ -44,14 +44,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a venue, capture examples,
 
 ## Venues covered
 
-| Category | Venues |
-|----------|--------|
-| **High-Priority CeFi exchanges** | **✅ Binance, ✅ Coinbase** (validated schemas) |
-| Other CeFi exchanges | OKX, Bybit, Upbit (CCXT and/or REST) |
-| CeFi / TradFi data | Databento (~506 venues), Tardis, Yahoo Finance, Barchart (VIX 15m) |
-| DeFi | The Graph, Alchemy, Hyperliquid, Aster |
-| TradFi execution | Interactive Brokers (IBKR, TWS/ib_insync) |
-| Sports | Betfair, Pinnacle, Polymarket, Odds API, API-Football |
+| Category                         | Venues                                                             |
+| -------------------------------- | ------------------------------------------------------------------ |
+| **High-Priority CeFi exchanges** | **✅ Binance, ✅ Coinbase** (validated schemas)                    |
+| Other CeFi exchanges             | OKX, Bybit, Upbit (CCXT and/or REST)                               |
+| CeFi / TradFi data               | Databento (~506 venues), Tardis, Yahoo Finance, Barchart (VIX 15m) |
+| DeFi                             | The Graph, Alchemy, Hyperliquid, Aster                             |
+| TradFi execution                 | Interactive Brokers (IBKR, TWS/ib_insync)                          |
+| Sports                           | Betfair, Pinnacle, Polymarket, Odds API, API-Football              |
 
 **Sports schemas** in `unified_api_contracts/sports/`: canonical models (`CanonicalFixture`, `CanonicalOdds`, `SportsFeatureVector`), 8 source provider schemas, and cross-provider mapping schemas (`TeamMapping`, `FixtureMapping`, `PlayerMapping`).
 
@@ -114,9 +114,9 @@ ticker = BinanceTicker(
     # ...
 )
 
-# ❌ Wrong - loses precision  
+# ❌ Wrong - loses precision
 ticker = BinanceTicker(
-    symbol="BTCUSDT", 
+    symbol="BTCUSDT",
     lastPrice=50000.12345678,  # May lose precision
     # ...
 )
@@ -154,7 +154,7 @@ except APIError as e:
         error = BinanceError(**e.response)
         print(f"Binance error {error.code}: {error.msg}")
     elif venue == "coinbase":
-        error = CoinbaseError(**e.response)  
+        error = CoinbaseError(**e.response)
         print(f"Coinbase error: {error.message}")
 ```
 

@@ -20,7 +20,10 @@ from ...unified_api_contracts_external.databento.schemas import (
     DatabentoTbbo,
 )
 from ...unified_api_contracts_external.deribit.schemas import DeribitOrderBook
-from ...unified_api_contracts_external.hyperliquid.schemas import HyperliquidL2Book, HyperliquidL2Level
+from ...unified_api_contracts_external.hyperliquid.schemas import (
+    HyperliquidL2Book,
+    HyperliquidL2Level,
+)
 from ...unified_api_contracts_external.kalshi.schemas import KalshiOrderBook
 from ...unified_api_contracts_external.okx.schemas import OKXOrderBook
 from ...unified_api_contracts_external.polymarket.schemas import PolymarketOrderBook
@@ -358,7 +361,9 @@ def normalize_hyperliquid_orderbook(
     )
 
 
-def _mbp10_levels(raw: DatabentoMbp10) -> tuple[list[tuple[Decimal, Decimal]], list[tuple[Decimal, Decimal]]]:
+def _mbp10_levels(
+    raw: DatabentoMbp10,
+) -> tuple[list[tuple[Decimal, Decimal]], list[tuple[Decimal, Decimal]]]:
     """Extract bids/asks from DatabentoMbp10 levels 0-9."""
     bids: list[tuple[Decimal, Decimal]] = []
     asks: list[tuple[Decimal, Decimal]] = []

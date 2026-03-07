@@ -48,7 +48,11 @@ def test_every_venue_endpoint_validates(venue: str, example_filename: str) -> No
     assert example_path.exists(), f"Missing example: {example_path}"
 
     schema_class_name = VENUE_MANIFEST[venue]["example_schema_map"][example_filename]
-    mod_path = f"unified_api_contracts.{venue}.schemas"
+    contract = VENUE_MANIFEST[venue]
+    mod_path = contract.get(
+        "module",
+        f"unified_api_contracts.unified_api_contracts_external.{venue}.schemas",
+    )
     mod = __import__(mod_path, fromlist=[schema_class_name])
     schema_class = getattr(mod, schema_class_name)
 

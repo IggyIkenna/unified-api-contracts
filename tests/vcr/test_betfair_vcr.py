@@ -101,7 +101,9 @@ def test_betfair_list_market_book_cassette() -> None:
 
 def test_betfair_market_book_schema() -> None:
     """Betfair market book validates against BetfairMarketBook schema with runners."""
-    from unified_api_contracts.unified_api_contracts_external.betfair.schemas import BetfairMarketBook
+    from unified_api_contracts.unified_api_contracts_external.betfair.schemas import (
+        BetfairMarketBook,
+    )
 
     cassette_path = CASSETTE_DIR / "list_market_book.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

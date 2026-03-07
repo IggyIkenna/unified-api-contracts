@@ -1,20 +1,20 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      User-Agent:
-      - python-httpx/0.27.0
-    method: GET
-    uri: https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d&range=1d
-  response:
-    body:
-      string: '{"chart":{"result":[{"meta":{"currency":"USD","symbol":"AAPL","exchangeName":"NMS","instrumentType":"EQUITY","firstTradeDate":345479400,"regularMarketTime":1740614400,"regularMarketPrice":220.84},"timestamp":[1740614400],"indicators":{"quote":[{"open":[218.5],"high":[221.2],"low":[218.1],"close":[220.84],"volume":[45234567]}]}}],"error":null}}'
-    headers:
-      Content-Type:
-      - application/json
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        User-Agent:
+          - python-httpx/0.27.0
+      method: GET
+      uri: https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d&range=1d
+    response:
+      body:
+        string: '{"chart":{"result":[{"meta":{"currency":"USD","symbol":"AAPL","exchangeName":"NMS","instrumentType":"EQUITY","firstTradeDate":345479400,"regularMarketTime":1740614400,"regularMarketPrice":220.84},"timestamp":[1740614400],"indicators":{"quote":[{"open":[218.5],"high":[221.2],"low":[218.1],"close":[220.84],"volume":[45234567]}]}}],"error":null}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
 version: 1

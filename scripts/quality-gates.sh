@@ -112,15 +112,15 @@ RUFF_VER=$($RUFF_CMD --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -
 # ── [1] AUTO-FIX ──────────────────────────────────────────────────────────────
 if [ "$RUN_LINT" = true ] && [ "$FIX_MODE" = true ]; then
     log_section "[1/6] AUTO-FIX"
-    run_timeout 30 $RUFF_CMD format --line-length 120 $SOURCE_DIRS || exit 1
-    run_timeout 30 $RUFF_CMD check --fix --line-length 120 $SOURCE_DIRS || exit 1
+    run_timeout 30 $RUFF_CMD format $SOURCE_DIRS || exit 1
+    run_timeout 30 $RUFF_CMD check --fix $SOURCE_DIRS || exit 1
     log_success "Auto-fix complete"
 fi
 
 # ── [2] LINT ───────────────────────────────────────────────────────────────────
 if [ "$RUN_LINT" = true ]; then
     log_section "[2/6] LINT"
-    run_timeout 30 $RUFF_CMD check --line-length 120 $SOURCE_DIRS && log_success "Lint PASSED" || { log_fail "Lint FAILED"; exit 1; }
+    run_timeout 30 $RUFF_CMD check $SOURCE_DIRS && log_success "Lint PASSED" || { log_fail "Lint FAILED"; exit 1; }
 fi
 
 # ── [3] TESTS ──────────────────────────────────────────────────────────────────
@@ -377,10 +377,92 @@ else
     log_fail "bandit required: uv add bandit"; V=$((V+1))
 fi
 
-# 7. BYPASS — ||true in quality gate scripts
-BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|zombies\|pyright\|cleanup\|log_fail\|:#" || :)
-[[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; V=$((V+1)); } || log_success "No ||true quality gate bypasses"
+# ============================================================
+# STEP 5.8 — No backward-compatibility re-export stubs
+# RULE: When moving a schema/module, update all consumers and delete the old file.
+# CODEX: cursor-rules/core/no-backward-compat-shims.mdc
+# ============================================================
+BACK_COMPAT=$(rg "# MIGRATED|backward compat|backward-compat|Re-export.*backward|re-export.*compat" \
+    --type py --glob "!tests/**" --glob "!.venv*" "$SOURCE_DIR/" 2>/dev/null || :)
+[[ -n "$BACK_COMPAT" ]] && {
+    log_fail "Backward-compat pattern found — eliminate re-export stubs, aliases, and compat shims"
+    log_fail "See: cursor-rules/core/no-backward-compat-shims.mdc"
+    echo "$BACK_COMPAT" | head -5
+    ((V++))
+} || log_success "No backward-compat stubs"
+
+# ============================================================
+# STEP 5.9 — Schema placement compliance
+# Domain data contracts (BaseModel/TypedDict/dataclass) must live in UIC domain/<service>/
+# External API schemas must live in UAC unified_api_contracts_external/<venue>/schemas.py
+# CODEX: 02-data/contracts-scope-and-layout.md, 02-data/schema-governance.md
+# ============================================================
+DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
+    --glob "!tests/**" --glob "!**/__init__.py" \
+    "$SOURCE_DIR/" 2>/dev/null | grep -v '#.*CORRECT-LOCAL' || :)
+[[ -n "$DOMAIN_CONTRACTS_IN_LIB" ]] && {
+    log_warn "Pydantic BaseModel subclasses found in library source — external API schemas belong in UAC; internal domain contracts in UIC"
+    log_warn "See: unified-trading-pm/plans/active/SCHEMA_CONTRACTS_AUDIT.md"
+    echo "$DOMAIN_CONTRACTS_IN_LIB" | head -5
+} || log_success "No misplaced domain BaseModel contracts in library"
+
+# 7. BYPASS check — detect bare-true bypass pattern in quality gate scripts
+_BYPASS_PAT='\|\|true|\|\| true'
+BYPASS=$(rg "$_BYPASS_PAT" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
+    | grep -v "_BYPASS_PAT\|grep -v\|^#\|zombies\|pyright\|cleanup" || :)
+[[ -n "$BYPASS" ]] && { log_fail "bare-true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No bare-true quality gate bypasses"
+
+# ============================================================
+# STEP 5.10 — Block direct cloud SDK imports outside UCI providers
+# Libraries that ARE unified_cloud_interface exclude their own providers/ and cache.py
+# ============================================================
+CLOUD_SDK_VIOLATIONS=$(rg "^from google\.cloud|^import boto3|^import botocore" \
+    --type py \
+    --glob '!.venv*' --glob '!**/.venv*/**' \
+    --glob '!tests' \
+    --glob '!*/providers/**' \
+    --glob '!*/cache.py' \
+    -l . 2>/dev/null || :)
+if [ -n "$CLOUD_SDK_VIOLATIONS" ]; then
+    log_fail "STEP 5.10: Direct cloud SDK imports found. Use unified_cloud_interface instead:"
+    echo "$CLOUD_SDK_VIOLATIONS"
+    ((V++))
+else
+    log_success "STEP 5.10: No direct cloud SDK imports"
+fi
+
+# ============================================================
+# STEP 5.11 — Block protocol-specific symbols in service/library code
+# ============================================================
+PROTOCOL_VIOLATIONS=$(rg "CloudTarget|upload_to_gcs_batch|gcs_bucket|bigquery_dataset|StandardizedDomainCloudService" \
+    --type py \
+    --glob '!.venv*' --glob '!**/.venv*/**' \
+    --glob '!tests' \
+    -l . 2>/dev/null || :)
+if [ -n "$PROTOCOL_VIOLATIONS" ]; then
+    log_fail "STEP 5.11: Protocol-specific symbols found. Use get_data_sink() / get_event_bus() from UCI instead:"
+    echo "$PROTOCOL_VIOLATIONS"
+    ((V++))
+else
+    log_success "STEP 5.11: No protocol-specific symbols in library code"
+fi
+
+# ============================================================
+# STEP 5.13 — Schema canonical name collision (advisory)
+# Libraries must not define Pydantic BaseModel subclasses with names
+# matching UAC unified_normalised_contracts or UIC public __all__.
+# CODEX: cursor-rules/core/schema-governance-index.mdc, 02-data/schema-governance.md
+# ============================================================
+SCHEMA_COLLISION=$(rg 'class\s+Canonical[A-Z]\w+\s*\(' \
+    --type py \
+    --glob '!.venv*' --glob '!**/.venv*/**' \
+    --glob '!tests' \
+    "$SOURCE_DIR/" 2>/dev/null | grep -v 'unified_api_contracts\|unified_internal_contracts' || :)
+if [ -n "$SCHEMA_COLLISION" ]; then
+    log_warn "STEP 5.13: Canonical* BaseModel subclass in library source — potential name collision with UAC/UIC canonical:"
+    log_warn "See: cursor-rules/core/schema-governance-index.mdc (Rule 5)"
+    echo "$SCHEMA_COLLISION" | head -5
+fi
 
 [[ $V -gt 0 ]] && { log_fail "Codex compliance FAILED: $V violations"; exit 1; }
 log_success "Codex compliance PASSED"

@@ -4,9 +4,11 @@ Streaming: https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0ni/
 REST: https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0ni/Betting+API
 """
 
+__api_version__ = "2.1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class BetfairPriceSize(BaseModel):

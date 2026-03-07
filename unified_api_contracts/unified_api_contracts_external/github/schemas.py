@@ -6,6 +6,8 @@ via quickmerge, workflow monitoring, and release management.
 Auth: Bearer token via GITHUB_TOKEN env var or GitHub App JWT.
 """
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from enum import StrEnum
 
 from pydantic import BaseModel, Field

@@ -1,0 +1,470 @@
+# Provider API version manifest
+# Maps each external provider to its tracked API version, documentation URL,
+# last-verified date, and health status.
+#
+# Status values:
+#   green  — schema validated against live API within last 90 days
+#   yellow — schema not verified recently (> 90 days) OR verification pending
+#   red    — known breaking change detected (schema mismatch with live API)
+#
+# Semver for schema version tracked in unified_normalised_contracts is separate
+# from this provider API version. See docs/canonical-schema-versioning.md.
+#
+# Update this file when:
+#   1. A provider releases a new API version
+#   2. You record a fresh VCR cassette (update last_verified)
+#   3. CI schema validation detects a mismatch (set status: red)
+
+providers:
+  alchemy:
+    api_version: "v3"
+    spec_url: "https://docs.alchemy.com/reference/api-overview"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  api_football:
+    api_version: "v3"
+    spec_url: "https://www.api-football.com/documentation-v3"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  arkham:
+    api_version: "v1"
+    spec_url: "https://codebook.arkham.com/reference/introduction"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  aster:
+    api_version: "v2"
+    spec_url: "https://aster.exchange/api-docs"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  barchart:
+    api_version: "v2"
+    spec_url: "https://www.barchart.com/ondemand/api"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  betdaq:
+    api_version: "v2"
+    spec_url: "https://developer.betdaq.com/docs"
+    last_verified: "2026-03-06"
+    status: green
+
+  betfair:
+    api_version: "2.1"
+    spec_url: "https://docs.developer.betfair.com/display/1smk3cen4v3lu3yomq5qye0d/API+Overview"
+    last_verified: "2026-03-06"
+    status: green
+
+  binance:
+    api_version: "v3"
+    spec_url: "https://binance-docs.github.io/apidocs/spot/en/"
+    last_verified: "2026-03-06"
+    status: green
+
+  bitfinex:
+    api_version: "v2"
+    spec_url: "https://docs.bitfinex.com/docs"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  bitget:
+    api_version: "v2"
+    spec_url: "https://www.bitget.com/api-doc/common/intro"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  bitstamp:
+    api_version: "v2"
+    spec_url: "https://www.bitstamp.net/api/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  bloxroute:
+    api_version: "v1"
+    spec_url: "https://docs.bloxroute.com/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  bybit:
+    api_version: "v5"
+    spec_url: "https://bybit-exchange.github.io/docs/v5/intro"
+    last_verified: "2026-03-06"
+    status: green
+
+  ccxt:
+    api_version: "4.x"
+    spec_url: "https://docs.ccxt.com/"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  coinbase:
+    api_version: "v3"
+    spec_url: "https://docs.cdp.coinbase.com/coinbase-app/docs/welcome"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  coingecko:
+    api_version: "v3"
+    spec_url: "https://docs.coingecko.com/v3.0.1/reference/introduction"
+    last_verified: "2026-03-06"
+    status: green
+    free_tier: true
+
+  coinglass:
+    api_version: "v3"
+    spec_url: "https://coinglass.readme.io/reference/introduction"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  databento:
+    api_version: "v0"
+    spec_url: "https://databento.com/docs/api-reference-historical"
+    last_verified: "2026-03-06"
+    status: green
+
+  defi:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  defillama:
+    api_version: "v1"
+    spec_url: "https://defillama.com/docs/api"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  deribit:
+    api_version: "v2"
+    spec_url: "https://docs.deribit.com/"
+    last_verified: "2026-03-06"
+    status: green
+
+  dydx:
+    api_version: "v4"
+    spec_url: "https://docs.dydx.exchange/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  ecb:
+    api_version: "v1"
+    spec_url: "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  fear_greed:
+    api_version: "v1"
+    spec_url: "https://alternative.me/crypto/fear-and-greed-index/"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  fix:
+    api_version: "4.4"
+    spec_url: "https://www.fixtrading.org/standards/fix-4-4/"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  footystats:
+    api_version: "v1"
+    spec_url: "https://footystats.org/api/documentations"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  fred:
+    api_version: "v1"
+    spec_url: "https://fred.stlouisfed.org/docs/api/fred/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  gateio:
+    api_version: "v4"
+    spec_url: "https://www.gate.io/docs/developers/apiv4/en/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  github:
+    api_version: "v3"
+    spec_url: "https://docs.github.com/en/rest"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  glassnode:
+    api_version: "v1"
+    spec_url: "https://docs.glassnode.com/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  huobi:
+    api_version: "v1"
+    spec_url: "https://huobiapi.github.io/docs/spot/v1/en/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  hyperliquid:
+    api_version: "v1"
+    spec_url: "https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api"
+    last_verified: "2026-03-06"
+    status: green
+    free_tier: true
+
+  ibkr:
+    api_version: "v1"
+    spec_url: "https://interactivebrokers.github.io/tws-api/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  instadapp:
+    api_version: "v1"
+    spec_url: "https://docs.instadapp.io/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  kalshi:
+    api_version: "v2"
+    spec_url: "https://trading-api.readme.io/reference/getmarkets"
+    last_verified: "2026-03-06"
+    status: green
+
+  kraken:
+    api_version: "v1"
+    spec_url: "https://docs.kraken.com/rest/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  kucoin:
+    api_version: "v3"
+    spec_url: "https://www.kucoin.com/docs/rest/spot-trading/introduction"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  macro:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  manifold:
+    api_version: "v0"
+    spec_url: "https://docs.manifold.markets/api"
+    last_verified: "2026-03-06"
+    status: green
+    free_tier: true
+
+  matchbook:
+    api_version: "v1"
+    spec_url: "https://matchbook.com/api-documentation"
+    last_verified: "2026-03-06"
+    status: green
+    free_tier: true
+
+  metabet:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+
+  mev:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  mexc:
+    api_version: "v3"
+    spec_url: "https://mexcdevelop.github.io/apidocs/spot_v3_en/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  nautilus:
+    api_version: "v1"
+    spec_url: "https://docs.nautilustrader.io/"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  odds_api:
+    api_version: "v4"
+    spec_url: "https://the-odds-api.com/liveapi/guides/v4/"
+    last_verified: "2026-03-06"
+    status: green
+
+  odds_engine:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  ofr:
+    api_version: "v1"
+    spec_url: "https://www.financialresearch.gov/data/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  okx:
+    api_version: "v5"
+    spec_url: "https://www.okx.com/docs-v5/en/"
+    last_verified: "2026-03-06"
+    status: green
+
+  onchain:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  onexbet:
+    api_version: "v1"
+    spec_url: "https://1xbet.com/api-doc"
+    last_verified: "2026-03-06"
+    status: green
+
+  open_meteo:
+    api_version: "v1"
+    spec_url: "https://open-meteo.com/en/docs"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  openbb:
+    api_version: "v4"
+    spec_url: "https://docs.openbb.co/platform"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  pinnacle:
+    api_version: "v3"
+    spec_url: "https://pinnacleapi.github.io/"
+    last_verified: "2026-03-06"
+    status: green
+
+  polymarket:
+    api_version: "v2"
+    spec_url: "https://docs.polymarket.com/"
+    last_verified: "2026-03-06"
+    status: green
+    free_tier: true
+
+  predictit:
+    api_version: "v1"
+    spec_url: "https://predictit-f497e.firebaseapp.com/api-docs"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  prime_broker:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  pyth:
+    api_version: "v1"
+    spec_url: "https://docs.pyth.network/home"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  regulatory:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  sentiment:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  sharpapi:
+    api_version: "v1"
+    spec_url: "https://sharpapi.com/documentation"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  smarkets:
+    api_version: "v3"
+    spec_url: "https://smarkets.com/developer-api"
+    last_verified: "2026-03-06"
+    status: green
+
+  soccer_football_info:
+    api_version: "v1"
+    spec_url: "https://www.soccer-football.info/api/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  sports:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+    notes: "Aggregator module for sports sources (betfair, pinnacle sub-schemas)"
+
+  tardis:
+    api_version: "v1"
+    spec_url: "https://docs.tardis.dev/api"
+    last_verified: "2026-03-06"
+    status: green
+
+  thegraph:
+    api_version: "v1"
+    spec_url: "https://thegraph.com/docs/en/querying/querying-the-graph/"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  transfermarkt:
+    api_version: "v1"
+    spec_url: "https://www.transfermarkt.com/api"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  understat:
+    api_version: "v1"
+    spec_url: "https://understat.com/"
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+
+  upbit:
+    api_version: "v1"
+    spec_url: "https://docs.upbit.com/reference"
+    last_verified: "2026-03-06"
+    status: yellow
+
+  venue_manifest:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+    free_tier: true
+    notes: "Internal venue manifest — not an external API"
+
+  versifi:
+    api_version: "v1"
+    spec_url: ""
+    last_verified: "2026-03-06"
+    status: yellow
+
+  yahoo_finance:
+    api_version: "v8"
+    spec_url: "https://finance.yahoo.com/"
+    last_verified: "2026-03-06"
+    status: green
+    free_tier: true

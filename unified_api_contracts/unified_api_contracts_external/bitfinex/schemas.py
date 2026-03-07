@@ -7,6 +7,9 @@ COUNT in order book: 0 means remove price level, >0 is count at that price.
 
 from __future__ import annotations
 
+__api_version__ = "v2"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel
 
 

@@ -71,6 +71,8 @@ class OptionGreeks:
     theta: Decimal | None = None
     vega: Decimal | None = None
     rho: Decimal | None = None
+    vanna: Decimal | None = None  # dDelta/dIV — delta sensitivity to implied vol moves
+    volga: Decimal | None = None  # dVega/dIV — vega sensitivity to implied vol (vol-of-vol risk)
 
 
 # =============================================================================

@@ -1,11 +1,11 @@
 # GCP Cloud SDK: Sync vs Async per Client
 
-| Client | Package | Sync | Async |
-|--------|---------|------|-------|
-| **Compute Engine** | `google-cloud-compute` | `InstancesClient` | `InstancesAsyncClient` (same package) |
-| **Cloud Run** | `google-cloud-run` | `ServicesClient`, `RevisionsClient` | `ServicesAsyncClient`, `RevisionsAsyncClient` |
-| **GCS** | `google-cloud-storage` | `Client` | No native async; use `asyncio.to_thread(client.method, ...)` |
-| **BigQuery** | `google-cloud-bigquery` | `Client` | No native async; use `asyncio.to_thread(client.query, ...)` |
+| Client             | Package                 | Sync                                | Async                                                        |
+| ------------------ | ----------------------- | ----------------------------------- | ------------------------------------------------------------ |
+| **Compute Engine** | `google-cloud-compute`  | `InstancesClient`                   | `InstancesAsyncClient` (same package)                        |
+| **Cloud Run**      | `google-cloud-run`      | `ServicesClient`, `RevisionsClient` | `ServicesAsyncClient`, `RevisionsAsyncClient`                |
+| **GCS**            | `google-cloud-storage`  | `Client`                            | No native async; use `asyncio.to_thread(client.method, ...)` |
+| **BigQuery**       | `google-cloud-bigquery` | `Client`                            | No native async; use `asyncio.to_thread(client.query, ...)`  |
 
 ## Usage
 

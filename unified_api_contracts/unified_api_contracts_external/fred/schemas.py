@@ -6,6 +6,8 @@ Free API key available at fred.stlouisfed.org. No subscription required.
 Used by unified-market-interface FredAdapter for US Treasury yields, TIPS, and yield curve observations.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

@@ -11,7 +11,10 @@ from ...unified_api_contracts_external.databento.schemas import (
     DatabentoCMEOptionQuote,
     DatabentoOptionQuote,
 )
-from ...unified_api_contracts_external.deribit.schemas import DeribitMarkPriceOption, DeribitOptionsGreeks
+from ...unified_api_contracts_external.deribit.schemas import (
+    DeribitMarkPriceOption,
+    DeribitOptionsGreeks,
+)
 from ...unified_api_contracts_external.ibkr.schemas import (
     IBKRContractDetails,
     IBKROptionGreeks,

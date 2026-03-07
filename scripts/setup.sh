@@ -382,7 +382,7 @@ else
         for dep in $DEPS; do
             DEP_PATH="$WORKSPACE_ROOT/$dep"
             if [ -d "$DEP_PATH" ] && [ -f "$DEP_PATH/pyproject.toml" ]; then
-                uv pip install -e "$DEP_PATH" --quiet 2>/dev/null && log_ok "$dep" || log_warn "$dep install failed"
+                uv pip install -e "$DEP_PATH" --reinstall --quiet 2>/dev/null && log_ok "$dep" || log_warn "$dep install failed"
             else
                 log_warn "$dep not found at $DEP_PATH — install from Artifact Registry if needed"
             fi

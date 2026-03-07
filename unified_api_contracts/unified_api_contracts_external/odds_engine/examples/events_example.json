@@ -1,0 +1,15 @@
+{
+  "data": [
+    {
+      "event_id": "nfl-2026-sb-kc-phi",
+      "event": "Kansas City Chiefs vs Philadelphia Eagles",
+      "event_start": "2026-02-01T23:30:00Z",
+      "home_team": "Kansas City Chiefs",
+      "away_team": "Philadelphia Eagles",
+      "league": "NFL"
+    }
+  ],
+  "meta": {
+    "response_ms": 18
+  }
+}

@@ -68,7 +68,11 @@ class TestEventLogging:
         logger = logging.getLogger("test_logger")
 
         # Test logging with extra fields
-        extra_fields = {"service": "api-contracts", "operation": "schema_validation", "venue": "test_venue"}
+        extra_fields = {
+            "service": "api-contracts",
+            "operation": "schema_validation",
+            "venue": "test_venue",
+        }
 
         with patch.object(logger, "info") as mock_info:
             logger.info("Schema validation completed", extra=extra_fields)

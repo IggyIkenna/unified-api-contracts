@@ -51,13 +51,20 @@ def _discover_example_files() -> list[tuple[Path, str]]:
 def _get_schema_for_example(api_dir_name: str, data: dict, example_filename: str = "") -> tuple[str, str] | None:
     """Return (module_path, class_name) for the schema that can validate this example, or None."""
     try:
-        from unified_api_contracts.unified_api_contracts_external.venue_manifest import VENUE_MANIFEST
+        from unified_api_contracts.unified_api_contracts_external.venue_manifest import (
+            VENUE_MANIFEST,
+        )
 
         if api_dir_name in VENUE_MANIFEST:
             mapping = VENUE_MANIFEST[api_dir_name].get("example_schema_map") or {}
             if example_filename and example_filename in mapping:
                 class_name = mapping[example_filename]
-                return (f"unified_api_contracts.{api_dir_name}.schemas", class_name)
+                contract = VENUE_MANIFEST[api_dir_name]
+                mod_path = contract.get(
+                    "module",
+                    f"unified_api_contracts.unified_api_contracts_external.{api_dir_name}.schemas",
+                )
+                return (mod_path, class_name)
     except ImportError:
         pass
     if api_dir_name in _EXAMPLE_SCHEMA_LOADERS:

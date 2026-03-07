@@ -58,7 +58,7 @@ def test_matchbook_market_fields() -> None:
 
 def test_matchbook_market_schema() -> None:
     """Matchbook market validates against api-contracts MatchbookMarket."""
-    from unified_api_contracts.matchbook.schemas import MatchbookMarket
+    from unified_api_contracts.unified_api_contracts_external.matchbook.schemas import MatchbookMarket
 
     cassette_path = CASSETTE_DIR / "matchbook_get_markets.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

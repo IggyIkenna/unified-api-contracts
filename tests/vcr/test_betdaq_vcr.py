@@ -58,7 +58,7 @@ def test_betdaq_market_fields() -> None:
 
 def test_betdaq_market_schema() -> None:
     """Betdaq market validates against api-contracts BetdaqMarket."""
-    from unified_api_contracts.betdaq.schemas import BetdaqMarket
+    from unified_api_contracts.unified_api_contracts_external.betdaq.schemas import BetdaqMarket
 
     cassette_path = CASSETTE_DIR / "betdaq_get_markets.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

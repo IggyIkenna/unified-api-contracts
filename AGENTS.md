@@ -14,17 +14,17 @@ This is a **pure Python schema library** (no running services, no databases, no 
 
 Commands are documented in the `Makefile` and `README.md`. Quick reference:
 
-| Task | Command |
-|------|---------|
-| **Full setup** | `bash scripts/setup.sh` or `make setup` |
-| Verify env | `bash scripts/setup.sh --check` |
-| Install deps | `uv pip install -e ".[dev]"` |
-| Lint (source) | `ruff check unified_api_contracts/` |
-| Lint + fix | `ruff check --fix unified_api_contracts/ tests/` |
-| Unit tests | `pytest tests/unit/ -v -n 2 --timeout=60` |
-| All tests | `pytest tests/ -v` |
-| Type check | `basedpyright unified_api_contracts/` |
-| Full quality gates | `bash scripts/quality-gates.sh` |
+| Task               | Command                                          |
+| ------------------ | ------------------------------------------------ |
+| **Full setup**     | `bash scripts/setup.sh` or `make setup`          |
+| Verify env         | `bash scripts/setup.sh --check`                  |
+| Install deps       | `uv pip install -e ".[dev]"`                     |
+| Lint (source)      | `ruff check unified_api_contracts/`              |
+| Lint + fix         | `ruff check --fix unified_api_contracts/ tests/` |
+| Unit tests         | `pytest tests/unit/ -v -n 2 --timeout=60`        |
+| All tests          | `pytest tests/ -v`                               |
+| Type check         | `basedpyright unified_api_contracts/`            |
+| Full quality gates | `bash scripts/quality-gates.sh`                  |
 
 ### Non-obvious caveats
 
@@ -41,14 +41,14 @@ Commands are documented in the `Makefile` and `README.md`. Quick reference:
 
 ### Current state (baseline)
 
-| Metric | Value |
-|--------|-------|
-| Total tests collected | **573** |
-| Passing (`PASSED`) | **485** |
-| Failing (`FAILED`) | **79** (all in `test_ac_uic_alignment.py`) |
-| Expected failures (`xfailed`) | **4** (3 in alignment, 1 elsewhere) |
-| Skipped | **5** (live API, VCR placeholder, etc.) |
-| **Effective pass rate** | **84.6%** (485/573) |
+| Metric                        | Value                                      |
+| ----------------------------- | ------------------------------------------ |
+| Total tests collected         | **573**                                    |
+| Passing (`PASSED`)            | **485**                                    |
+| Failing (`FAILED`)            | **79** (all in `test_ac_uic_alignment.py`) |
+| Expected failures (`xfailed`) | **4** (3 in alignment, 1 elsewhere)        |
+| Skipped                       | **5** (live API, VCR placeholder, etc.)    |
+| **Effective pass rate**       | **84.6%** (485/573)                        |
 
 Every single failure is caused by one thing: `tests/test_ac_uic_alignment.py` imports `unified_internal_contracts`, which is not (and must not be) a dependency of this Tier 0 library.
 
@@ -86,18 +86,18 @@ Move the entire file `tests/test_ac_uic_alignment.py` (82 tests) from `unified-a
 
 **What moves (all 82 tests across 10 test classes):**
 
-| Test class | Tests | What it checks |
-|------------|-------|----------------|
-| `TestMLEnumAlignment` | 4 | `ModelType`, `TargetType` enum member parity |
-| `TestMLModelAlignment` | 8 | `ModelVariantConfig`, `ModelMetadata`, `MLConfigDict`, `InferenceRequest/Result`, `TrainingJobRequest/Result`, `TrainingPeriod` field parity |
-| `TestEventsEnumAlignment` | 3 | `LifecycleEventType`, `EventSeverity`, `ServiceMode` enum parity |
-| `TestEventsModelAlignment` | 19 | 19 event detail/envelope models field parity |
-| `TestEventsModuleLevelConstants` | 1 (xfail) | `REQUIRED_EVENT_FIELDS` presence in AC |
-| `TestFeaturesAlignment` | 4 + 1 xfail + 1 skip | `DeltaOneFeatureRecord`, `OptionsIvRecord`, `FuturesTermStructureRecord`, `FeatureSnapshotRequest`, `CrossTimeframeFeatures`, `CrossInstrumentFeatures` |
-| `TestPubsubAlignment` | 16 | `InternalPubSubTopic` + 15 message models field parity |
-| `TestRiskAlignment` | 14 | `RiskStatus`, `AlertType`, `PositionSide` enums + 11 risk models |
-| `TestErrorSchemaAlignment` | 5 (1 xfail) | `ErrorCategory`, `ErrorSeverity`, `ErrorRecoveryStrategy`, `ErrorContext`, `EnhancedError` |
-| `TestMessagingTopicAlignment` | 2 | `MessagingTopic` ↔ `InternalPubSubTopic` parity |
+| Test class                       | Tests                | What it checks                                                                                                                                          |
+| -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TestMLEnumAlignment`            | 4                    | `ModelType`, `TargetType` enum member parity                                                                                                            |
+| `TestMLModelAlignment`           | 8                    | `ModelVariantConfig`, `ModelMetadata`, `MLConfigDict`, `InferenceRequest/Result`, `TrainingJobRequest/Result`, `TrainingPeriod` field parity            |
+| `TestEventsEnumAlignment`        | 3                    | `LifecycleEventType`, `EventSeverity`, `ServiceMode` enum parity                                                                                        |
+| `TestEventsModelAlignment`       | 19                   | 19 event detail/envelope models field parity                                                                                                            |
+| `TestEventsModuleLevelConstants` | 1 (xfail)            | `REQUIRED_EVENT_FIELDS` presence in AC                                                                                                                  |
+| `TestFeaturesAlignment`          | 4 + 1 xfail + 1 skip | `DeltaOneFeatureRecord`, `OptionsIvRecord`, `FuturesTermStructureRecord`, `FeatureSnapshotRequest`, `CrossTimeframeFeatures`, `CrossInstrumentFeatures` |
+| `TestPubsubAlignment`            | 16                   | `InternalPubSubTopic` + 15 message models field parity                                                                                                  |
+| `TestRiskAlignment`              | 14                   | `RiskStatus`, `AlertType`, `PositionSide` enums + 11 risk models                                                                                        |
+| `TestErrorSchemaAlignment`       | 5 (1 xfail)          | `ErrorCategory`, `ErrorSeverity`, `ErrorRecoveryStrategy`, `ErrorContext`, `EnhancedError`                                                              |
+| `TestMessagingTopicAlignment`    | 2                    | `MessagingTopic` ↔ `InternalPubSubTopic` parity                                                                                                        |
 
 #### Step 2: Delete `test_ac_uic_alignment.py` from unified-api-contracts
 
@@ -107,14 +107,14 @@ After the move is confirmed working in UIC's test suite, delete the file from th
 
 After removing the file, the test suite should look like:
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Total tests | 573 | 491 |
-| Passing | 485 | 485 |
-| Failing | 79 | **0** |
-| xfailed | 4 | 1 |
-| Skipped | 5 | 5 |
-| **Pass rate** | 84.6% | **100%** (excluding xfail/skip) |
+| Metric        | Before | After                           |
+| ------------- | ------ | ------------------------------- |
+| Total tests   | 573    | 491                             |
+| Passing       | 485    | 485                             |
+| Failing       | 79     | **0**                           |
+| xfailed       | 4      | 1                               |
+| Skipped       | 5      | 5                               |
+| **Pass rate** | 84.6%  | **100%** (excluding xfail/skip) |
 
 The 42 `N814` ruff lint errors also disappear, allowing `ruff check` to pass on the full `tests/` directory.
 
@@ -134,12 +134,12 @@ This picks up the VCR tests, schema validation tests, contract coverage tests, a
 
 ### Additional items for full clean-up (optional, lower priority)
 
-| Item | Files affected | Impact |
-|------|---------------|--------|
-| Add `httpx` to `[dev]` dependencies | `pyproject.toml` | VCR tests (`tests/vcr/`) currently require manual `uv pip install httpx`; adding it to dev deps makes them always runnable |
-| Fix basedpyright `reportMissingTypeArgument` | ~287 instances across venue `schemas.py` files | Change `dict` → `dict[str, ...]`, `list` → `list[...]` for strict type checking |
-| Resolve 3 `xfail` items in alignment tests (before moving to UIC) | `test_ac_uic_alignment.py` | `REQUIRED_EVENT_FIELDS`, `CrossTimeframeFeatures`, `EnhancedError.correlation_id` — known drift that AC should either adopt or document as intentional divergence |
-| Consolidate `unified_api_contracts/internal/` vs `unified_internal_contracts` | `internal/` module | Long-term: decide whether AC's `internal/` module is the SSOT (and UIC re-exports), or UIC is the SSOT (and AC drops the mirror). Eliminates drift entirely. |
+| Item                                                                          | Files affected                                 | Impact                                                                                                                                                            |
+| ----------------------------------------------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Add `httpx` to `[dev]` dependencies                                           | `pyproject.toml`                               | VCR tests (`tests/vcr/`) currently require manual `uv pip install httpx`; adding it to dev deps makes them always runnable                                        |
+| Fix basedpyright `reportMissingTypeArgument`                                  | ~287 instances across venue `schemas.py` files | Change `dict` → `dict[str, ...]`, `list` → `list[...]` for strict type checking                                                                                   |
+| Resolve 3 `xfail` items in alignment tests (before moving to UIC)             | `test_ac_uic_alignment.py`                     | `REQUIRED_EVENT_FIELDS`, `CrossTimeframeFeatures`, `EnhancedError.correlation_id` — known drift that AC should either adopt or document as intentional divergence |
+| Consolidate `unified_api_contracts/internal/` vs `unified_internal_contracts` | `internal/` module                             | Long-term: decide whether AC's `internal/` module is the SSOT (and UIC re-exports), or UIC is the SSOT (and AC drops the mirror). Eliminates drift entirely.      |
 
 ### Summary
 

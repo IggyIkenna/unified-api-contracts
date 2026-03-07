@@ -1,0 +1,5 @@
+{
+  "code": "NOT_FOUND",
+  "message": "Event not found",
+  "detail": "No event found for the given event_id"
+}

@@ -20,9 +20,9 @@
       "periods": [
         {
           "number": 0,
-          "moneyLine": {"home": -110, "away": 100},
-          "spread": {"home": -105, "away": -105, "hdp": -3.5},
-          "total": {"over": -110, "under": -110, "points": 45.5}
+          "moneyLine": { "home": -110, "away": 100 },
+          "spread": { "home": -105, "away": -105, "hdp": -3.5 },
+          "total": { "over": -110, "under": -110, "points": 45.5 }
         }
       ]
     }

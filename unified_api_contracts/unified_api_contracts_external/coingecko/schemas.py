@@ -10,6 +10,9 @@ Docs: https://docs.coingecko.com/reference/global
 
 from __future__ import annotations
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel, Field
 
 

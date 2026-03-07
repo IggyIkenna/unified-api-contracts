@@ -1,0 +1,100 @@
+name: Schema Health
+
+# Replay all VCR cassettes in unified_api_contracts_external/*/mocks/ and
+# validate response bodies against schemas. Updates docs/schema_health.svg.
+#
+# This job does NOT make live API calls — it replays stored cassettes only.
+# Interface repos record new cassettes (they hold API keys) and PR them here.
+# On merge to main, this job re-validates and updates the health matrix.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "unified_api_contracts/unified_api_contracts_external/**/mocks/*.yaml"
+      - "unified_api_contracts/unified_api_contracts_external/**/schemas*.py"
+      - "unified_api_contracts/unified_normalised_contracts/**"
+      - "unified_api_contracts/provider_api_versions.yaml"
+      - "tests/vcr/test_schema_health.py"
+      - "scripts/generate_schema_version_matrix.py"
+      - "scripts/update_schema_health_svg.py"
+  pull_request:
+    branches: [main]
+    paths:
+      - "unified_api_contracts/unified_api_contracts_external/**/mocks/*.yaml"
+      - "unified_api_contracts/unified_api_contracts_external/**/schemas*.py"
+  workflow_dispatch: # allow manual trigger
+  schedule:
+    # Weekly on Sundays at 02:00 UTC — catches providers going stale
+    - cron: "0 2 * * 0"
+
+jobs:
+  schema-health:
+    name: Schema Health Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install --system -e ".[test]"
+
+      - name: Run schema health integration tests
+        id: schema_tests
+        run: |
+          python3 -m pytest tests/vcr/test_schema_health.py \
+            -m integration \
+            -v \
+            --tb=short \
+            --json-report \
+            --json-report-file=schema-health-results.json \
+            --json-report-indent=2 \
+            -q \
+            || true
+          # '|| true': we want the SVG update to run even if tests fail;
+          # the 'red' cells in the SVG are the signal. The job fails below
+          # only if the --count-red gate says > 0 after the update.
+
+      - name: Generate schema version matrix
+        run: |
+          python3 scripts/generate_schema_version_matrix.py
+
+      - name: Update schema health SVG from test results
+        run: |
+          python3 scripts/update_schema_health_svg.py schema-health-results.json
+
+      - name: Check for red providers (hard fail)
+        run: |
+          RED=$(python3 scripts/generate_schema_version_matrix.py --count-red)
+          echo "Red provider count: $RED"
+          if [ "$RED" -gt 0 ]; then
+            echo "::error::$RED provider(s) have red schema health. Run: python3 scripts/generate_schema_version_matrix.py"
+            exit 1
+          fi
+
+      - name: Commit updated SVG and matrix (main branch only)
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update schema health matrix [skip ci]"
+          file_pattern: "docs/schema_health.svg docs/SCHEMA_VERSION_MATRIX.md"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+
+      - name: Upload test results artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: schema-health-results
+          path: schema-health-results.json
+          retention-days: 30
