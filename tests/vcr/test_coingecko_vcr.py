@@ -25,9 +25,7 @@ def test_coingecko_cassette() -> None:
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
     with VCR().use_cassette(str(cassette_path)):
-        response = httpx.get(
-            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=1&page=1"
-        )
+        response = httpx.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin")
         assert response.status_code == 200
         data = response.json()
         assert data is not None
@@ -38,8 +36,6 @@ def test_coingecko_response_structure() -> None:
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists()
     with VCR().use_cassette(str(cassette_path)):
-        response = httpx.get(
-            "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin&order=market_cap_desc&per_page=1&page=1"
-        )
+        response = httpx.get("https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin")
         data = response.json()
         assert isinstance(data, list) and len(data) > 0

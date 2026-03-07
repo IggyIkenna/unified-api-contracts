@@ -5,6 +5,9 @@ Huobi rebranded to HTX in 2023. API endpoints remain under huobi.com/htx.
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel
 
 

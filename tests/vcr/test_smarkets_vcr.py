@@ -58,7 +58,7 @@ def test_smarkets_market_fields() -> None:
 
 def test_smarkets_market_schema() -> None:
     """Smarkets market validates against api-contracts SmarketsMarket."""
-    from unified_api_contracts.smarkets.schemas import SmarketsMarket
+    from unified_api_contracts.unified_api_contracts_external.smarkets.schemas import SmarketsMarket
 
     cassette_path = CASSETTE_DIR / "smarkets_get_markets.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

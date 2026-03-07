@@ -11,7 +11,11 @@ from ...unified_api_contracts_external.binance.market_schemas import BinanceTrad
 from ...unified_api_contracts_external.bybit.schemas import BybitTrade
 from ...unified_api_contracts_external.ccxt.schemas import CcxtTrade
 from ...unified_api_contracts_external.coinbase.schemas import CoinbaseTrade
-from ...unified_api_contracts_external.databento.schemas import DATABENTO_PRICE_DIVISOR, DatabentoMbo, DatabentoTrade
+from ...unified_api_contracts_external.databento.schemas import (
+    DATABENTO_PRICE_DIVISOR,
+    DatabentoMbo,
+    DatabentoTrade,
+)
 from ...unified_api_contracts_external.deribit.schemas import DeribitTrade
 from ...unified_api_contracts_external.ibkr.schemas import IBKRExecution
 from ...unified_api_contracts_external.kalshi.schemas import KalshiTrade, KalshiWebSocketTradeMsg

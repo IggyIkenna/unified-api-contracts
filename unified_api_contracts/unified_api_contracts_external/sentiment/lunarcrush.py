@@ -6,11 +6,13 @@ Free API key available at lunarcrush.com. Rate limits: 50 requests/day (free tie
 Used by unified-market-interface for social media sentiment, influencer tracking, and social volume metrics.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # API Constants
 LUNARCRUSH_BASE_URL = "https://api.lunarcrush.com/v2"

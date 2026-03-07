@@ -19,7 +19,9 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookm
     BookmakerInfo,
     BookmakerRegistry,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.features import SportsFeatureVector
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.features import (
+    SportsFeatureVector,
+)
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.fixture import (
     CanonicalFixture,
     CanonicalLeague,

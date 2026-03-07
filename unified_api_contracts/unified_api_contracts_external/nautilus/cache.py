@@ -4,6 +4,8 @@ Mirrors NautilusTrader Cache interface for order, position, instrument, fill, an
 Reference: https://nautilustrader.io/docs/nightly/concepts/cache/
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from typing import Protocol
 
 from .schemas import Account, Fill, Instrument, Order, Position

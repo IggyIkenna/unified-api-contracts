@@ -6,21 +6,21 @@ How each venue is accessed (REST, WebSocket, FIX), constraints, and how to handl
 
 ## Summary matrix
 
-| Venue | REST | WebSocket | FIX | Auth | Rate limits | Notes |
-|-------|------|-----------|-----|------|-------------|-------|
-| databento | Yes (Historical API) | No | No | API key (header) | Per-key limits | Symbology REST; timeseries.get_range |
-| tardis | Yes (HTTP API, CSV) | If documented | No | API key | Per plan | Exchanges, instruments, trades, book |
-| ccxt | Yes (unified) | Per exchange | Per exchange | Exchange keys | Per exchange | fetch_* methods; WS via exchange |
-| binance | Yes | Yes (streams) | No | API key + secret | Weight-based | REST /fapi/*, /v3/*; WS wss:// |
-| thegraph | Yes (GraphQL HTTP) | No | No | API key (URL) | Per key | POST subgraph endpoint |
-| okx | Yes | Yes (private/public) | If offered | API key + secret + passphrase | Per endpoint | REST /api/*; WS wss:// |
-| bybit | Yes | Yes | If offered | API key + secret | Per category | REST /v5/*; WS wss:// |
-| yahoo_finance | Yes (HTTP) | No | No | Optional | Throttled | Quote/chart endpoints |
-| alchemy | Yes (JSON-RPC HTTP) | Optional (WSS) | No | API key | Per tier | RPC + optional WebSocket |
-| hyperliquid | Yes (HTTP) | Yes (info/trades/user) | No | Wallet/sig | Per IP | HTTP + S3 stats bucket |
-| aster | Yes (HTTP/RPC) | Yes (events) | No | Wallet | Per chain | On-chain perps |
-| upbit | Yes | Yes (ticker/trade) | If offered | API key + secret | Per endpoint | REST /v1/*; WS wss:// |
-| ibkr | No (TWS API) | Yes (callbacks) | No | TWS/Gateway login | Per connection | Single connection; ib_insync |
+| Venue         | REST                 | WebSocket              | FIX          | Auth                          | Rate limits    | Notes                                |
+| ------------- | -------------------- | ---------------------- | ------------ | ----------------------------- | -------------- | ------------------------------------ |
+| databento     | Yes (Historical API) | No                     | No           | API key (header)              | Per-key limits | Symbology REST; timeseries.get_range |
+| tardis        | Yes (HTTP API, CSV)  | If documented          | No           | API key                       | Per plan       | Exchanges, instruments, trades, book |
+| ccxt          | Yes (unified)        | Per exchange           | Per exchange | Exchange keys                 | Per exchange   | fetch\_\* methods; WS via exchange   |
+| binance       | Yes                  | Yes (streams)          | No           | API key + secret              | Weight-based   | REST /fapi/_, /v3/_; WS wss://       |
+| thegraph      | Yes (GraphQL HTTP)   | No                     | No           | API key (URL)                 | Per key        | POST subgraph endpoint               |
+| okx           | Yes                  | Yes (private/public)   | If offered   | API key + secret + passphrase | Per endpoint   | REST /api/\*; WS wss://              |
+| bybit         | Yes                  | Yes                    | If offered   | API key + secret              | Per category   | REST /v5/\*; WS wss://               |
+| yahoo_finance | Yes (HTTP)           | No                     | No           | Optional                      | Throttled      | Quote/chart endpoints                |
+| alchemy       | Yes (JSON-RPC HTTP)  | Optional (WSS)         | No           | API key                       | Per tier       | RPC + optional WebSocket             |
+| hyperliquid   | Yes (HTTP)           | Yes (info/trades/user) | No           | Wallet/sig                    | Per IP         | HTTP + S3 stats bucket               |
+| aster         | Yes (HTTP/RPC)       | Yes (events)           | No           | Wallet                        | Per chain      | On-chain perps                       |
+| upbit         | Yes                  | Yes (ticker/trade)     | If offered   | API key + secret              | Per endpoint   | REST /v1/\*; WS wss://               |
+| ibkr          | No (TWS API)         | Yes (callbacks)        | No           | TWS/Gateway login             | Per connection | Single connection; ib_insync         |
 
 ---
 

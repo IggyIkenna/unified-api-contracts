@@ -1,5 +1,7 @@
 """Sports-specific typed exceptions for the betting vertical."""
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 
 class SportsError(Exception):
     """Base error for all sports betting errors."""

@@ -1,8 +1,10 @@
 """Binance order management schemas: orders, positions, executions."""
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class BinanceOrder(BaseModel):

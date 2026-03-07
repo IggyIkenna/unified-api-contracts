@@ -12,7 +12,10 @@ from ...unified_api_contracts_external.binance.market_schemas import BinanceKlin
 from ...unified_api_contracts_external.bybit.schemas import BybitKline
 from ...unified_api_contracts_external.ccxt.schemas import CcxtOhlcv
 from ...unified_api_contracts_external.coinbase.schemas import CoinbaseCandle
-from ...unified_api_contracts_external.databento.schemas import DATABENTO_PRICE_DIVISOR, DatabentoOhlcvBar
+from ...unified_api_contracts_external.databento.schemas import (
+    DATABENTO_PRICE_DIVISOR,
+    DatabentoOhlcvBar,
+)
 from ...unified_api_contracts_external.hyperliquid.schemas import HyperliquidCandle
 from ...unified_api_contracts_external.kalshi.schemas import KalshiCandlestick
 from ...unified_api_contracts_external.okx.schemas import OKXCandleWS

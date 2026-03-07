@@ -1,0 +1,5 @@
+{
+  "code": "UNAUTHORIZED",
+  "message": "Invalid API key",
+  "docs": "https://docs.sharpapi.io/errors"
+}

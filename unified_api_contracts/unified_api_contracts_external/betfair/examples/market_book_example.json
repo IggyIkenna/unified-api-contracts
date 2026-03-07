@@ -16,8 +16,8 @@
       "lastPriceTraded": 2.5,
       "totalMatched": 15000.0,
       "ex": {
-        "availableToBack": [{"price": 2.5, "size": 100.0}],
-        "availableToLay": [{"price": 2.52, "size": 80.0}]
+        "availableToBack": [{ "price": 2.5, "size": 100.0 }],
+        "availableToLay": [{ "price": 2.52, "size": 80.0 }]
       }
     }
   ],

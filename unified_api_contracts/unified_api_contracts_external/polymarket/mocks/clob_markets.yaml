@@ -1,20 +1,20 @@
 interactions:
-- request:
-    body: null
-    headers:
-      Accept:
-      - '*/*'
-      User-Agent:
-      - python-httpx/0.27.0
-    method: GET
-    uri: https://clob.polymarket.com/markets?next_cursor=&limit=2
-  response:
-    body:
-      string: '{"limit":2,"count":2,"next_cursor":"abc123","data":[{"condition_id":"0xabc","question_id":"0xdef","description":"Will BTC exceed $100k by March 2026?","market_slug":"btc-100k-march-2026","end_date_iso":"2026-03-31T23:59:59Z","game_start_time":null,"seconds_delay":0,"fpmm":"0x123","active":true,"closed":false,"tokens":[{"token_id":"1","outcome":"Yes","price":0.35,"winner":false},{"token_id":"2","outcome":"No","price":0.65,"winner":false}]}]}'
-    headers:
-      Content-Type:
-      - application/json
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        User-Agent:
+          - python-httpx/0.27.0
+      method: GET
+      uri: https://clob.polymarket.com/markets?next_cursor=&limit=2
+    response:
+      body:
+        string: '{"limit":2,"count":2,"next_cursor":"abc123","data":[{"condition_id":"0xabc","question_id":"0xdef","description":"Will BTC exceed $100k by March 2026?","market_slug":"btc-100k-march-2026","end_date_iso":"2026-03-31T23:59:59Z","game_start_time":null,"seconds_delay":0,"fpmm":"0x123","active":true,"closed":false,"tokens":[{"token_id":"1","outcome":"Yes","price":0.35,"winner":false},{"token_id":"2","outcome":"No","price":0.65,"winner":false}]}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
 version: 1

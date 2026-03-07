@@ -11,7 +11,10 @@ from ...unified_api_contracts_external.ccxt.schemas import CcxtOrder, CcxtTrade
 from ...unified_api_contracts_external.coinbase.schemas import CoinbaseFill, CoinbaseOrder
 from ...unified_api_contracts_external.deribit.schemas import DeribitOrder
 from ...unified_api_contracts_external.fix.schemas import FixExecutionReport, FixNewOrderSingle
-from ...unified_api_contracts_external.hyperliquid.schemas import HyperliquidFill, HyperliquidOpenOrder
+from ...unified_api_contracts_external.hyperliquid.schemas import (
+    HyperliquidFill,
+    HyperliquidOpenOrder,
+)
 from ...unified_api_contracts_external.ibkr.schemas import IBKRExecution, IBKROrder
 from ...unified_api_contracts_external.kalshi.schemas import KalshiFill
 from ...unified_api_contracts_external.nautilus import Fill as NautilusFill
@@ -20,7 +23,14 @@ from ...unified_api_contracts_external.okx.schemas import OKXOrder
 from ...unified_api_contracts_external.polymarket.schemas import PolymarketCLOBOrder, PolymarketFill
 from ...unified_api_contracts_external.prime_broker.schemas import PrimeBrokerFill
 from ...unified_api_contracts_external.upbit.schemas import UpbitOrder
-from ..execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType, TimeInForce
+from ..execution import (
+    CanonicalFill,
+    CanonicalOrder,
+    OrderSide,
+    OrderStatus,
+    OrderType,
+    TimeInForce,
+)
 
 
 def _parse_decimal(val: str | float | Decimal | None) -> Decimal:

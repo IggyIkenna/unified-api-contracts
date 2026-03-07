@@ -121,13 +121,14 @@ def _normalize_hyperliquid(raw: str) -> str:
 # ---------------------------------------------------------------------------
 
 _KRAKEN_LEGACY = {
-    "XBT": "BTC",
-    "XDG": "DOGE",
+    # Longer/X-prefixed forms must come before shorter forms to avoid partial matches
     "XXBT": "BTC",
-    "XETH": "ETH",
     "XXRP": "XRP",
     "XXLM": "XLM",
+    "XETH": "ETH",
     "XLTC": "LTC",
+    "XDG": "DOGE",
+    "XBT": "BTC",
     "ZUSD": "USD",
     "ZEUR": "EUR",
     "ZGBP": "GBP",

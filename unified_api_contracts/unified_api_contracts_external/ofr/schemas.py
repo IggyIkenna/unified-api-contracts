@@ -6,6 +6,8 @@ No auth required. Free open data from the US Treasury OFR.
 Used by unified-market-interface OFRAdapter for CDS spread indices and financial stability data.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
 

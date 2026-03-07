@@ -1,5 +1,7 @@
 """Binance WebSocket schemas: private streams, order/account updates."""
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from decimal import Decimal
 
 from pydantic import BaseModel

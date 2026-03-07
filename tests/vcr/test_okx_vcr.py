@@ -12,12 +12,23 @@ CASSETTE_DIR = (
 )
 
 
+def _make_vcr() -> VCR:
+    """Strip Content-Encoding so pre-decoded cassette bodies are not double-decompressed."""
+
+    def _strip_encoding(response: dict) -> dict:  # type: ignore[type-arg]
+        response["headers"].pop("Content-Encoding", None)
+        response["headers"].pop("content-encoding", None)
+        return response
+
+    return VCR(before_record_response=_strip_encoding)
+
+
 def test_okx_swap_ticker_cassette() -> None:
     """Replay VCR cassette for OKX BTC-USDT-SWAP ticker."""
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
-    with VCR().use_cassette(str(cassette_path)):
+    with _make_vcr().use_cassette(str(cassette_path)):
         response = httpx.get("https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP")
         assert response.status_code == 200
         data = response.json()
@@ -29,7 +40,7 @@ def test_okx_ticker_envelope() -> None:
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
-    with VCR().use_cassette(str(cassette_path)):
+    with _make_vcr().use_cassette(str(cassette_path)):
         response = httpx.get("https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP")
         data = response.json()
         assert data["code"] == "0"
@@ -41,11 +52,20 @@ def test_okx_ticker_fields() -> None:
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
-    with VCR().use_cassette(str(cassette_path)):
+    with _make_vcr().use_cassette(str(cassette_path)):
         response = httpx.get("https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP")
         data = response.json()
         ticker = data["data"][0]
-        for field in ("instId", "instType", "last", "askPx", "bidPx", "open24h", "high24h", "low24h"):
+        for field in (
+            "instId",
+            "instType",
+            "last",
+            "askPx",
+            "bidPx",
+            "open24h",
+            "high24h",
+            "low24h",
+        ):
             assert field in ticker, f"Missing field: {field}"
         assert ticker["instId"] == "BTC-USDT-SWAP"
         assert float(ticker["last"]) > 0
@@ -58,7 +78,7 @@ def test_okx_ticker_schema() -> None:
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
-    with VCR().use_cassette(str(cassette_path)):
+    with _make_vcr().use_cassette(str(cassette_path)):
         response = httpx.get("https://www.okx.com/api/v5/market/ticker?instId=BTC-USDT-SWAP")
         data = response.json()
         raw_ticker = data["data"][0]

@@ -6,29 +6,29 @@ Package layout and the split between external (venue-specific), normalised (cano
 
 ## Placement rule (where new modules go)
 
-| Content type | Location | Examples |
-|--------------|----------|----------|
-| **Raw schemas for an external API, protocol, or venue** | **`unified_api_contracts_external/<name>/`** | binance, databento, ccxt, yahoo_finance, **prime_broker**, **fix**, **nautilus** (one dir per external surface). |
-| **Canonical domain/execution/error types** | **`unified_normalised_contracts/`** | domain.py, execution.py, errors.py, normalize.py. |
-| **Shared cross-venue schemas** (not mirroring a single external API) | **`schemas/`** | risk, latency, analytics, protocol_sdks, **regulatory**. |
-| **Small shared types** (enums, actions) used across the package | **`shared/`** | quota_types, error_action. |
-| **Venue/contract manifest** (which venues, endpoints, schema classes) | **`venue_manifest/`** at root | Package infrastructure; not external API or shared schema. |
-| **Sports domain** (canonical + per-source) | **`sports/`** at root | Exception: combines canonical types (`sports/canonical`) and source-specific schemas (`sports/sources`); long-term could align to external + normalised. |
+| Content type                                                          | Location                                     | Examples                                                                                                                                                 |
+| --------------------------------------------------------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Raw schemas for an external API, protocol, or venue**               | **`unified_api_contracts_external/<name>/`** | binance, databento, ccxt, yahoo_finance, **prime_broker**, **fix**, **nautilus** (one dir per external surface).                                         |
+| **Canonical domain/execution/error types**                            | **`unified_normalised_contracts/`**          | domain.py, execution.py, errors.py, normalize.py.                                                                                                        |
+| **Shared cross-venue schemas** (not mirroring a single external API)  | **`schemas/`**                               | risk, latency, analytics, protocol_sdks, **regulatory**.                                                                                                 |
+| **Small shared types** (enums, actions) used across the package       | **`shared/`**                                | quota_types, error_action.                                                                                                                               |
+| **Venue/contract manifest** (which venues, endpoints, schema classes) | **`venue_manifest/`** at root                | Package infrastructure; not external API or shared schema.                                                                                               |
+| **Sports domain** (canonical + per-source)                            | **`sports/`** at root                        | Exception: combines canonical types (`sports/canonical`) and source-specific schemas (`sports/sources`); long-term could align to external + normalised. |
 
 **Internal** (service-to-service) schemas live in **unified-internal-contracts**; AC is external + normalised only.
 
 ## Current top-level folders vs rule
 
-| Folder at root | Should live under | Notes |
-|----------------|-------------------|--------|
-| **prime_broker** | `unified_api_contracts_external/prime_broker` | External API (HiddenRoad, Talos, etc.). |
-| **fix** | `unified_api_contracts_external/fix` | FIX protocol (external). |
-| **nautilus** | `unified_api_contracts_external/nautilus` | NautilusTrader engine (external). |
-| **regulatory** | `schemas/regulatory` | Shared report formats (MiFID II, EMIR). |
-| **schemas** | (already correct) | Shared cross-venue. |
-| **shared** | (already correct) | Small shared types. |
-| **sports** | (exception at root) | Domain namespace: canonical + sources; optional future split. |
-| **venue_manifest** | (infrastructure at root) | Manifest/metadata; not a schema category. |
+| Folder at root     | Should live under                             | Notes                                                         |
+| ------------------ | --------------------------------------------- | ------------------------------------------------------------- |
+| **prime_broker**   | `unified_api_contracts_external/prime_broker` | External API (HiddenRoad, Talos, etc.).                       |
+| **fix**            | `unified_api_contracts_external/fix`          | FIX protocol (external).                                      |
+| **nautilus**       | `unified_api_contracts_external/nautilus`     | NautilusTrader engine (external).                             |
+| **regulatory**     | `schemas/regulatory`                          | Shared report formats (MiFID II, EMIR).                       |
+| **schemas**        | (already correct)                             | Shared cross-venue.                                           |
+| **shared**         | (already correct)                             | Small shared types.                                           |
+| **sports**         | (exception at root)                           | Domain namespace: canonical + sources; optional future split. |
+| **venue_manifest** | (infrastructure at root)                      | Manifest/metadata; not a schema category.                     |
 
 Migration of **prime_broker**, **fix**, **nautilus** into `unified_api_contracts_external/` and **regulatory** into `schemas/regulatory` would align the tree with the rule; all imports and `venue_manifest/internal_services.py` module paths would need updating. Until then, the rule above applies to **new** modules.
 

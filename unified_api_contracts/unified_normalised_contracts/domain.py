@@ -245,6 +245,28 @@ class CanonicalLiquidation(BaseModel):
     schema_version: str = "1.0"
 
 
+class CanonicalLiquidationCluster(BaseModel):
+    """Predicted forced-flow concentration at a price level.
+
+    Distinct from CanonicalLiquidation (observed event).  A cluster represents
+    where leveraged positions are estimated to be concentrated — used for
+    support/resistance and liquidity wall analytics.
+
+    Sources: CoinGlass liquidation heatmap, Hyblock liquidation level API.
+    """
+
+    instrument_key: str
+    venue: str
+    timestamp: datetime
+    price_level: Decimal = Field(description="Reference price for this cluster")
+    long_liq_usd: Decimal = Field(description="Estimated USD value of long liquidations at this level")
+    short_liq_usd: Decimal = Field(description="Estimated USD value of short liquidations at this level")
+    leverage_assumption: Decimal | None = Field(default=None, description="Assumed leverage used in cluster model")
+    cluster_strength: Decimal | None = Field(default=None, description="Normalised cluster intensity [0-1] if provided")
+    source: str = Field(description="Data provider: coinglass | hyblock")
+    schema_version: str = "1.0"
+
+
 class CanonicalDerivativeTicker(BaseModel):
     """Normalised derivative ticker — perps/futures funding, OI, mark."""
 
@@ -367,11 +389,11 @@ class CanonicalMarketInfo(BaseModel):
 
 # CanonicalOraclePrice — owned by UIC (unified-internal-contracts/market_data/defi.py).
 # No UAC normalizer produces this type; it is only used in internal pub-sub messaging.
-# UIC re-exports it from unified_internal_contracts.market_data.
+# UIC owns this type in its market_data module.
 
 # CanonicalStakingRate — owned by UIC (unified-internal-contracts/market_data/defi.py).
 # No UAC normalizer produces this type; it is only used in internal pub-sub messaging.
-# UIC re-exports it from unified_internal_contracts.market_data.
+# UIC owns this type in its market_data module.
 
 
 class CanonicalWsMessage(BaseModel):
@@ -527,6 +549,7 @@ __all__ = [
     "CanonicalFee",
     "CanonicalFundingRate",
     "CanonicalLiquidation",
+    "CanonicalLiquidationCluster",
     "CanonicalMarketInfo",
     "CanonicalOdds",
     "CanonicalOhlcvBar",

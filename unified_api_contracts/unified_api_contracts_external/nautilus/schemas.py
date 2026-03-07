@@ -7,6 +7,8 @@ Reference: https://github.com/nautechsystems/nautilus_trader
 Docs: https://nautilustrader.io/docs/latest/
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 from decimal import Decimal
 

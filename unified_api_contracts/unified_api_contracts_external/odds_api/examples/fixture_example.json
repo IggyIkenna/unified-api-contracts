@@ -15,16 +15,16 @@
           "key": "h2h",
           "lastUpdate": "2025-02-27T12:00:00Z",
           "outcomes": [
-            {"name": "Team A", "price": 1.91},
-            {"name": "Team B", "price": 1.95}
+            { "name": "Team A", "price": 1.91 },
+            { "name": "Team B", "price": 1.95 }
           ]
         },
         {
           "key": "spreads",
           "lastUpdate": "2025-02-27T12:00:00Z",
           "outcomes": [
-            {"name": "Team A", "price": 1.91, "point": -3.5},
-            {"name": "Team B", "price": 1.95, "point": 3.5}
+            { "name": "Team A", "price": 1.91, "point": -3.5 },
+            { "name": "Team B", "price": 1.95, "point": 3.5 }
           ]
         }
       ]

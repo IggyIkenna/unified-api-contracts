@@ -6,7 +6,7 @@ google.cloud.iam_v1. Used for service account management and permission checks.
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class ServiceAccount(BaseModel):

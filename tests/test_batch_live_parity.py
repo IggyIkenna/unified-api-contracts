@@ -58,9 +58,10 @@ def _assert_parity(live: CanonicalTrade, batch: CanonicalTrade, *, check_trade_i
     if check_trade_id:
         assert live.trade_id == batch.trade_id, f"trade_id mismatch: live={live.trade_id!r} batch={batch.trade_id!r}"
     # venue is allowed to differ in casing
-    assert live.venue.lower() == batch.venue.lower() or batch.venue.lower() in ("tardis", "databento"), (
-        f"Unexpected venue mismatch: {live.venue!r} vs {batch.venue!r}"
-    )
+    assert live.venue.lower() == batch.venue.lower() or batch.venue.lower() in (
+        "tardis",
+        "databento",
+    ), f"Unexpected venue mismatch: {live.venue!r} vs {batch.venue!r}"
 
 
 # ---------------------------------------------------------------------------

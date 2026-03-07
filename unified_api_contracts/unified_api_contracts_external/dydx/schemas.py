@@ -7,6 +7,9 @@ WS: wss://indexer.dydx.trade/v4/ws
 
 from __future__ import annotations
 
+__api_version__ = "v4"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel
 
 

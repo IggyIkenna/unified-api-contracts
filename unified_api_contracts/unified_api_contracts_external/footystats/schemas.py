@@ -4,9 +4,11 @@ Ref: https://api.football-data-api.com
 Auth: key query parameter
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class FootystatsLeague(BaseModel):

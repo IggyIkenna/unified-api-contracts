@@ -6,12 +6,12 @@
 
 ## Research Targets
 
-| Provider   | Status              | Notes                                           |
-|------------|---------------------|-------------------------------------------------|
+| Provider      | Status               | Notes                                                                   |
+| ------------- | -------------------- | ----------------------------------------------------------------------- |
 | **Databento** | Index in development | VIX options (OPRA) available; VIX index real-time/historical on roadmap |
-| **IBKR**   | Available           | TWS API streams VIX index/futures; requires market data subscription |
-| **CBOE**   | Direct              | CBOE direct feed; evaluate cost/coverage        |
-| **Others** | TBD                 | Document as we find them                        |
+| **IBKR**      | Available            | TWS API streams VIX index/futures; requires market data subscription    |
+| **CBOE**      | Direct               | CBOE direct feed; evaluate cost/coverage                                |
+| **Others**    | TBD                  | Document as we find them                                                |
 
 ## Barchart Batch (Current)
 

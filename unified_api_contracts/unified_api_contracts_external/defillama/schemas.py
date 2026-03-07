@@ -4,9 +4,11 @@ Free, no auth required.
 Multiple base URLs: api.llama.fi (TVL), stablecoins.llama.fi, yields.llama.fi, bridges.llama.fi
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class DefiLlamaProtocol(BaseModel):

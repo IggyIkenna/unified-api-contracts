@@ -4,9 +4,11 @@ Ref: https://rapidapi.com/soccer-football-info-soccer-football-info-default/api/
 Auth: x-rapidapi-key, x-rapidapi-host headers (RapidAPI)
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class SoccerFootballChampionship(BaseModel):

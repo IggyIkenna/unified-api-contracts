@@ -22,6 +22,53 @@ from unified_api_contracts.unified_api_contracts_external.sports.sources.odds_ap
 
 NOW = datetime.now(tz=UTC)
 
+_RAW_NESTED_EVENT: dict[str, object] = {
+    "event_id": "evt-002",
+    "sport_key": "soccer_epl",
+    "sport_title": "EPL",
+    "commence_time": NOW.isoformat(),
+    "home_team": "Man City",
+    "away_team": "Liverpool",
+    "bookmakers": [
+        {
+            "bookmaker_key": "bet365",
+            "bookmaker_title": "Bet365",
+            "last_update": NOW.isoformat(),
+            "markets": [
+                {
+                    "market_key": "h2h",
+                    "outcomes": [
+                        {"name": "Man City", "price": 2.10},
+                        {"name": "Draw", "price": 3.40},
+                        {"name": "Liverpool", "price": 3.20},
+                    ],
+                },
+                {
+                    "market_key": "spreads",
+                    "outcomes": [
+                        {"name": "Man City", "price": 1.91, "point": -0.5},
+                        {"name": "Liverpool", "price": 1.91, "point": 0.5},
+                    ],
+                },
+            ],
+        },
+        {
+            "bookmaker_key": "pinnacle",
+            "bookmaker_title": "Pinnacle",
+            "markets": [
+                {
+                    "market_key": "h2h",
+                    "outcomes": [
+                        {"name": "Man City", "price": 2.15},
+                        {"name": "Draw", "price": 3.50},
+                        {"name": "Liverpool", "price": 3.10},
+                    ],
+                },
+            ],
+        },
+    ],
+}
+
 
 # ---------------------------------------------------------------------------
 # ODOutcomeRaw
@@ -234,54 +281,8 @@ class TestODEventRaw:
         assert event.bookmakers[0].markets[1].outcomes[0].point == Decimal("2.5")
 
     def test_from_raw_nested(self) -> None:
-        """Construct deeply nested ODEventRaw from raw dict via from_raw / model_validate."""
-        raw = {
-            "event_id": "evt-002",
-            "sport_key": "soccer_epl",
-            "sport_title": "EPL",
-            "commence_time": NOW.isoformat(),
-            "home_team": "Man City",
-            "away_team": "Liverpool",
-            "bookmakers": [
-                {
-                    "bookmaker_key": "bet365",
-                    "bookmaker_title": "Bet365",
-                    "last_update": NOW.isoformat(),
-                    "markets": [
-                        {
-                            "market_key": "h2h",
-                            "outcomes": [
-                                {"name": "Man City", "price": 2.10},
-                                {"name": "Draw", "price": 3.40},
-                                {"name": "Liverpool", "price": 3.20},
-                            ],
-                        },
-                        {
-                            "market_key": "spreads",
-                            "outcomes": [
-                                {"name": "Man City", "price": 1.91, "point": -0.5},
-                                {"name": "Liverpool", "price": 1.91, "point": 0.5},
-                            ],
-                        },
-                    ],
-                },
-                {
-                    "bookmaker_key": "pinnacle",
-                    "bookmaker_title": "Pinnacle",
-                    "markets": [
-                        {
-                            "market_key": "h2h",
-                            "outcomes": [
-                                {"name": "Man City", "price": 2.15},
-                                {"name": "Draw", "price": 3.50},
-                                {"name": "Liverpool", "price": 3.10},
-                            ],
-                        },
-                    ],
-                },
-            ],
-        }
-        event = ODEventRaw.model_validate(raw)
+        """Construct deeply nested ODEventRaw from raw dict via model_validate."""
+        event = ODEventRaw.model_validate(_RAW_NESTED_EVENT)
         assert event.event_id == "evt-002"
         assert len(event.bookmakers) == 2
         assert event.bookmakers[0].bookmaker_key == "bet365"

@@ -88,6 +88,15 @@ class BenchmarkType(StrEnum):
 
 
 # ---------------------------------------------------------------------------
+# Canonical execution schema version constants
+# ---------------------------------------------------------------------------
+
+CANONICAL_ORDER_VERSION = "1.0.0"
+CANONICAL_FILL_VERSION = "1.0.0"
+CANONICAL_EXECUTION_INSTRUCTION_VERSION = "1.0.0"
+CANONICAL_EXECUTION_RESULT_VERSION = "1.0.0"
+
+# ---------------------------------------------------------------------------
 # Order / Fill — canonical cross-venue
 # ---------------------------------------------------------------------------
 
@@ -114,6 +123,7 @@ class CanonicalOrder(BaseModel):
     stop_price: Decimal | None = None
     leverage: Decimal | None = None
     margin_mode: str | None = Field(default=None, description="cross or isolated")
+    schema_version: str = CANONICAL_ORDER_VERSION
 
 
 class CanonicalFill(BaseModel):
@@ -135,6 +145,7 @@ class CanonicalFill(BaseModel):
     fee_rate: Decimal | None = None
     rebate: Decimal | None = None
     realized_pnl: Decimal | None = None
+    schema_version: str = CANONICAL_FILL_VERSION
 
 
 # ---------------------------------------------------------------------------
@@ -167,6 +178,7 @@ class ExecutionInstruction(BaseModel):
     priority_fee_gwei: float | None = None
     deadline_timestamp: datetime | None = None
     metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
+    schema_version: str = CANONICAL_EXECUTION_INSTRUCTION_VERSION
 
 
 class ExecutionResult(BaseModel):
@@ -186,9 +198,14 @@ class ExecutionResult(BaseModel):
     gas_price_gwei: float | None = None
     transaction_hash: str | None = None
     error_message: str | None = None
+    schema_version: str = CANONICAL_EXECUTION_RESULT_VERSION
 
 
 __all__ = [
+    "CANONICAL_EXECUTION_INSTRUCTION_VERSION",
+    "CANONICAL_EXECUTION_RESULT_VERSION",
+    "CANONICAL_FILL_VERSION",
+    "CANONICAL_ORDER_VERSION",
     "CanonicalFill",
     "CanonicalOrder",
     "ExecutionInstruction",

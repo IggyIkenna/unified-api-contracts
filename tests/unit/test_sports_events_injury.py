@@ -5,8 +5,12 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.events import CanonicalFixtureEvent
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.injury import CanonicalInjury
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.events import (
+    CanonicalFixtureEvent,
+)
+from unified_api_contracts.unified_api_contracts_external.sports.canonical.injury import (
+    CanonicalInjury,
+)
 
 pytestmark = pytest.mark.unit
 

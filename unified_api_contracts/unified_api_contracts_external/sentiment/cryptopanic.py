@@ -6,11 +6,13 @@ Free API key available at cryptopanic.com. Rate limits: 20 requests/minute (free
 Used by unified-market-interface for crypto news sentiment and social media aggregation.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # API Constants
 CRYPTOPANIC_BASE_URL = "https://cryptopanic.com/api/v1"

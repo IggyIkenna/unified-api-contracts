@@ -1,10 +1,12 @@
 """Coinbase Advanced Trade API: market data, trading, errors."""
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from decimal import Decimal
 
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class CoinbaseTicker(BaseModel):
@@ -31,7 +33,7 @@ class CoinbaseOrderBook(BaseModel):
 class CoinbaseTrade(BaseModel):
     """Coinbase trade from recent trades."""
 
-    time: str  # ISO timestamp
+    time: str | None = None  # ISO timestamp; None when timestamp is unavailable
     trade_id: int
     price: Decimal
     size: Decimal

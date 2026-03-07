@@ -10,6 +10,8 @@ Key differences from raw Tardis format:
 4. Instrument ID: canonical -> NautilusTrader format (BTCUSDT-PERP.BINANCE)
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 import logging
 
 logger = logging.getLogger(__name__)
@@ -27,14 +29,24 @@ NAUTILUS_TRADES_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Canonical instrument ID (e.g., BINANCE-FUTURES:PERPETUAL:BTC-USDT)",
     },
     {"name": "price", "type": "float64", "required": True, "description": "Trade price"},
-    {"name": "size", "type": "float64", "required": True, "description": "Trade size/quantity (renamed from 'amount')"},
+    {
+        "name": "size",
+        "type": "float64",
+        "required": True,
+        "description": "Trade size/quantity (renamed from 'amount')",
+    },
     {
         "name": "aggressor_side",
         "type": "int8",
         "required": True,
         "description": "Aggressor side: 1=buyer, 2=seller (converted from 'buy'/'sell')",
     },
-    {"name": "trade_id", "type": "string", "required": True, "description": "Trade ID (renamed from 'id')"},
+    {
+        "name": "trade_id",
+        "type": "string",
+        "required": True,
+        "description": "Trade ID (renamed from 'id')",
+    },
     {
         "name": "ts_event",
         "type": "int64",
@@ -50,40 +62,110 @@ NAUTILUS_TRADES_SCHEMA: list[dict[str, str | bool]] = [
 ]
 
 NAUTILUS_BOOK_SNAPSHOT_5_SCHEMA: list[dict[str, str | bool]] = [
-    {"name": "instrument_key", "type": "string", "required": True, "description": "Canonical instrument ID"},
-    {"name": "ts_event", "type": "int64", "required": True, "description": "Event timestamp in nanoseconds"},
-    {"name": "ts_init", "type": "int64", "required": True, "description": "Init/local timestamp in nanoseconds"},
+    {
+        "name": "instrument_key",
+        "type": "string",
+        "required": True,
+        "description": "Canonical instrument ID",
+    },
+    {
+        "name": "ts_event",
+        "type": "int64",
+        "required": True,
+        "description": "Event timestamp in nanoseconds",
+    },
+    {
+        "name": "ts_init",
+        "type": "int64",
+        "required": True,
+        "description": "Init/local timestamp in nanoseconds",
+    },
     *[
-        {"name": f"bid_price_{i}", "type": "float64", "required": False, "description": f"Bid price level {i}"}
+        {
+            "name": f"bid_price_{i}",
+            "type": "float64",
+            "required": False,
+            "description": f"Bid price level {i}",
+        }
         for i in range(5)
     ],
     *[
-        {"name": f"bid_size_{i}", "type": "float64", "required": False, "description": f"Bid size level {i}"}
+        {
+            "name": f"bid_size_{i}",
+            "type": "float64",
+            "required": False,
+            "description": f"Bid size level {i}",
+        }
         for i in range(5)
     ],
     *[
-        {"name": f"ask_price_{i}", "type": "float64", "required": False, "description": f"Ask price level {i}"}
+        {
+            "name": f"ask_price_{i}",
+            "type": "float64",
+            "required": False,
+            "description": f"Ask price level {i}",
+        }
         for i in range(5)
     ],
     *[
-        {"name": f"ask_size_{i}", "type": "float64", "required": False, "description": f"Ask size level {i}"}
+        {
+            "name": f"ask_size_{i}",
+            "type": "float64",
+            "required": False,
+            "description": f"Ask size level {i}",
+        }
         for i in range(5)
     ],
 ]
 
 NAUTILUS_LIQUIDATIONS_SCHEMA: list[dict[str, str | bool]] = [
-    {"name": "instrument_key", "type": "string", "required": True, "description": "Canonical instrument ID"},
+    {
+        "name": "instrument_key",
+        "type": "string",
+        "required": True,
+        "description": "Canonical instrument ID",
+    },
     {"name": "price", "type": "float64", "required": True, "description": "Liquidation price"},
     {"name": "size", "type": "float64", "required": True, "description": "Liquidation size"},
-    {"name": "aggressor_side", "type": "int8", "required": True, "description": "Side: 1=buy, 2=sell"},
-    {"name": "ts_event", "type": "int64", "required": True, "description": "Event timestamp in nanoseconds"},
-    {"name": "ts_init", "type": "int64", "required": True, "description": "Init timestamp in nanoseconds"},
+    {
+        "name": "aggressor_side",
+        "type": "int8",
+        "required": True,
+        "description": "Side: 1=buy, 2=sell",
+    },
+    {
+        "name": "ts_event",
+        "type": "int64",
+        "required": True,
+        "description": "Event timestamp in nanoseconds",
+    },
+    {
+        "name": "ts_init",
+        "type": "int64",
+        "required": True,
+        "description": "Init timestamp in nanoseconds",
+    },
 ]
 
 NAUTILUS_DERIVATIVE_TICKER_SCHEMA: list[dict[str, str | bool]] = [
-    {"name": "instrument_key", "type": "string", "required": True, "description": "Canonical instrument ID"},
-    {"name": "ts_event", "type": "int64", "required": True, "description": "Event timestamp in nanoseconds"},
-    {"name": "ts_init", "type": "int64", "required": True, "description": "Init timestamp in nanoseconds"},
+    {
+        "name": "instrument_key",
+        "type": "string",
+        "required": True,
+        "description": "Canonical instrument ID",
+    },
+    {
+        "name": "ts_event",
+        "type": "int64",
+        "required": True,
+        "description": "Event timestamp in nanoseconds",
+    },
+    {
+        "name": "ts_init",
+        "type": "int64",
+        "required": True,
+        "description": "Init timestamp in nanoseconds",
+    },
     {"name": "funding_rate", "type": "float64", "required": False, "description": "Funding rate"},
     {"name": "index_price", "type": "float64", "required": False, "description": "Index price"},
     {"name": "mark_price", "type": "float64", "required": False, "description": "Mark price"},
@@ -97,23 +179,78 @@ NAUTILUS_LIQUIDITY_SNAPSHOTS_SCHEMA: list[dict[str, str | bool]] = [
         "required": True,
         "description": "Pool instrument key (VENUE:POOL:PAIR@CHAIN)",
     },
-    {"name": "ts_event", "type": "int64", "required": True, "description": "Snapshot timestamp in nanoseconds (UTC)"},
-    {"name": "ts_init", "type": "int64", "required": True, "description": "Init timestamp in nanoseconds (UTC)"},
-    {"name": "liquidity", "type": "string", "required": True, "description": "In-range liquidity (bigint as string)"},
+    {
+        "name": "ts_event",
+        "type": "int64",
+        "required": True,
+        "description": "Snapshot timestamp in nanoseconds (UTC)",
+    },
+    {
+        "name": "ts_init",
+        "type": "int64",
+        "required": True,
+        "description": "Init timestamp in nanoseconds (UTC)",
+    },
+    {
+        "name": "liquidity",
+        "type": "string",
+        "required": True,
+        "description": "In-range liquidity (bigint as string)",
+    },
     {
         "name": "sqrt_price_x96",
         "type": "string",
         "required": True,
         "description": "sqrt(price) * 2^96 (bigint as string)",
     },
-    {"name": "token0_price", "type": "float64", "required": True, "description": "Price of token0 in terms of token1"},
-    {"name": "token1_price", "type": "float64", "required": True, "description": "Price of token1 in terms of token0"},
-    {"name": "tick", "type": "int64", "required": False, "description": "Current tick (Uniswap V3)"},
-    {"name": "tvl_usd", "type": "float64", "required": False, "description": "Total value locked in USD"},
-    {"name": "volume_token0", "type": "float64", "required": False, "description": "Volume of token0 for the hour"},
-    {"name": "volume_token1", "type": "float64", "required": False, "description": "Volume of token1 for the hour"},
-    {"name": "volume_usd", "type": "float64", "required": False, "description": "Volume in USD for the hour"},
-    {"name": "fees_usd", "type": "float64", "required": False, "description": "Fees collected in USD for the hour"},
+    {
+        "name": "token0_price",
+        "type": "float64",
+        "required": True,
+        "description": "Price of token0 in terms of token1",
+    },
+    {
+        "name": "token1_price",
+        "type": "float64",
+        "required": True,
+        "description": "Price of token1 in terms of token0",
+    },
+    {
+        "name": "tick",
+        "type": "int64",
+        "required": False,
+        "description": "Current tick (Uniswap V3)",
+    },
+    {
+        "name": "tvl_usd",
+        "type": "float64",
+        "required": False,
+        "description": "Total value locked in USD",
+    },
+    {
+        "name": "volume_token0",
+        "type": "float64",
+        "required": False,
+        "description": "Volume of token0 for the hour",
+    },
+    {
+        "name": "volume_token1",
+        "type": "float64",
+        "required": False,
+        "description": "Volume of token1 for the hour",
+    },
+    {
+        "name": "volume_usd",
+        "type": "float64",
+        "required": False,
+        "description": "Volume in USD for the hour",
+    },
+    {
+        "name": "fees_usd",
+        "type": "float64",
+        "required": False,
+        "description": "Fees collected in USD for the hour",
+    },
 ]
 
 NAUTILUS_SCHEMA_MAP: dict[str, list[dict[str, str | bool]]] = {

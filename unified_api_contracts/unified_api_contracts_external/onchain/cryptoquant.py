@@ -6,11 +6,13 @@ Paid API key required. Rate limits: 300 requests/minute (standard tier).
 Used by unified-market-interface for exchange flow data, miner metrics, and on-chain indicators.
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # API Constants
 CRYPTOQUANT_BASE_URL = "https://api.cryptoquant.com/v1"

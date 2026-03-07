@@ -1,1 +1,26 @@
-{"id":"USDT","code":"USDT","name":"Tether","active":true,"fee":0.0,"precision":8,"deposit":true,"withdraw":true,"limits":{},"networks":{"ERC20":{"id":"erc20","network":"ERC20","name":"Ethereum","active":true,"fee":1.0,"precision":6,"deposit":true,"withdraw":true,"limits":{},"info":{}}},"info":{}}
+{
+  "id": "USDT",
+  "code": "USDT",
+  "name": "Tether",
+  "active": true,
+  "fee": 0.0,
+  "precision": 8,
+  "deposit": true,
+  "withdraw": true,
+  "limits": {},
+  "networks": {
+    "ERC20": {
+      "id": "erc20",
+      "network": "ERC20",
+      "name": "Ethereum",
+      "active": true,
+      "fee": 1.0,
+      "precision": 6,
+      "deposit": true,
+      "withdraw": true,
+      "limits": {},
+      "info": {}
+    }
+  },
+  "info": {}
+}

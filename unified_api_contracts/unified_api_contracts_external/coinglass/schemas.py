@@ -8,6 +8,9 @@ Rate limit: 10 requests/minute on free tier.
 
 from __future__ import annotations
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
+
 from pydantic import BaseModel, Field
 
 

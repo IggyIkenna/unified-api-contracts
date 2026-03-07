@@ -3,11 +3,13 @@ funding_rate, open_interest, ohlcv, leverage_tiers, withdrawals, deposits, ledge
 borrow_rate, borrow_interest, margin_adjustment, insurance_fund, liquidation, settlement_history,
 subaccount, currency, option, fees."""
 
+__api_version__ = "4.x"  # matches provider_api_versions.yaml
+
 from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 # --- Order status (CCXT unified) ---
 CcxtOrderStatus = Literal["open", "closed", "canceled", "cancelled", "expired", "rejected"]
@@ -602,7 +604,13 @@ class CcxtErrorPayload(BaseModel):
 
         CCXT uses exchange-agnostic exception types.
         """
-        retry_types = {"RateLimitExceeded", "ExchangeNotAvailable", "ExchangeError", "NetworkError", "RequestTimeout"}
+        retry_types = {
+            "RateLimitExceeded",
+            "ExchangeNotAvailable",
+            "ExchangeError",
+            "NetworkError",
+            "RequestTimeout",
+        }
         if code and code in retry_types:
             return ErrorAction.RETRY_WITH_BACKOFF
         if message and any(x in (message or "").lower() for x in ("rate", "limit", "timeout", "unavailable")):

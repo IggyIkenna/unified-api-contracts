@@ -44,7 +44,9 @@ def test_predictit_response_structure() -> None:
 
 def test_predictit_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.predictit.schemas import PredictItMarket
+    from unified_api_contracts.unified_api_contracts_external.predictit.schemas import (
+        PredictItMarket,
+    )
 
     cassette_path = CASSETTE_DIR / "markets.yaml"
     assert cassette_path.exists()

@@ -40,7 +40,9 @@ def test_dydx_response_structure() -> None:
 
 def test_dydx_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.dydx.schemas import DydxPerpetualMarket
+    from unified_api_contracts.unified_api_contracts_external.dydx.schemas import (
+        DydxPerpetualMarket,
+    )
 
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists()

@@ -1,10 +1,12 @@
 """Deribit REST/WebSocket: market data, order/position, errors."""
 
+__api_version__ = "v2"  # matches provider_api_versions.yaml
+
 from decimal import Decimal
 
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class DeribitInstrument(BaseModel):

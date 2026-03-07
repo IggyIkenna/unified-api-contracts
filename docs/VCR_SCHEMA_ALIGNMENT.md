@@ -26,64 +26,64 @@ Everything that can be produced by data vendors and exchanges, and that we may n
 
 ### 1.1 Market data – time series / bars
 
-| Data type | Description | Typical fields |
-|-----------|-------------|----------------|
+| Data type     | Description                                     | Typical fields                           |
+| ------------- | ----------------------------------------------- | ---------------------------------------- |
 | **OHLCV bar** | Candlestick / aggregated bar (1s, 1m, 1h, etc.) | open, high, low, close, volume, ts_event |
 
 ### 1.2 Ticker: spot vs derivative, and ticker trades
 
-| Data type | Description | Typical fields |
-|-----------|-------------|----------------|
-| **Spot ticker / 24hr** | Spot summary quote | lastPrice, bidPrice, askPrice, volume, quoteVolume |
-| **Derivative ticker** | Perps/futures ticker (mark, index, funding, OI) | lastPrice, markPx, indexPx, funding, fundingRate, openInterest, nextFundingTime |
-| **Ticker with last trade** | Ticker that embeds last trade (price, size, time) | same as ticker + lastTradePrice, lastTradeQty, lastTradeTime |
-| **Trades (tape)** | Individual executed trades (separate from ticker) | price, size, side, ts_event, trade_id, sequence |
+| Data type                  | Description                                       | Typical fields                                                                  |
+| -------------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------- |
+| **Spot ticker / 24hr**     | Spot summary quote                                | lastPrice, bidPrice, askPrice, volume, quoteVolume                              |
+| **Derivative ticker**      | Perps/futures ticker (mark, index, funding, OI)   | lastPrice, markPx, indexPx, funding, fundingRate, openInterest, nextFundingTime |
+| **Ticker with last trade** | Ticker that embeds last trade (price, size, time) | same as ticker + lastTradePrice, lastTradeQty, lastTradeTime                    |
+| **Trades (tape)**          | Individual executed trades (separate from ticker) | price, size, side, ts_event, trade_id, sequence                                 |
 
 ### 1.3 Market data – top of book and depth
 
-| Data type | Description | Typical fields |
-|-----------|-------------|----------------|
-| **Top of book (BBO)** | Best bid and best ask only | bid_px, ask_px, bid_sz, ask_sz |
-| **MBP-1** | Market by price, 1 level (same as BBO) | best bid/ask price and size |
-| **MBP-5** | Market by price, 5 levels | bid/ask levels 0..4 (price, size per level) |
-| **MBP-10** | Market by price, 10 levels | bid/ask levels 0..9 |
-| **Order book snapshot (L2)** | Full or N-level depth snapshot | bids[], asks[] (price, size), timestamp |
+| Data type                    | Description                            | Typical fields                              |
+| ---------------------------- | -------------------------------------- | ------------------------------------------- |
+| **Top of book (BBO)**        | Best bid and best ask only             | bid_px, ask_px, bid_sz, ask_sz              |
+| **MBP-1**                    | Market by price, 1 level (same as BBO) | best bid/ask price and size                 |
+| **MBP-5**                    | Market by price, 5 levels              | bid/ask levels 0..4 (price, size per level) |
+| **MBP-10**                   | Market by price, 10 levels             | bid/ask levels 0..9                         |
+| **Order book snapshot (L2)** | Full or N-level depth snapshot         | bids[], asks[] (price, size), timestamp     |
 
 ### 1.4 Reference data / instrument data
 
-| Data type | Description | Typical fields |
-|-----------|-------------|----------------|
-| **Instrument / symbol list** | List of tradeable instruments | symbol, base, quote, exchange |
-| **Instrument definition** | Full contract/symbol metadata | raw_symbol, instrument_id, class, expiry, tick_size, lot_size, etc. |
-| **Type information** | Instrument/product type (spot, perp, future, option) | instrument_type, product_type, asset_class, option_style (e.g. American/European) |
-| **Contract specs** | Tick size, lot size, min notional, etc. | tick_size, lot_size, min_qty, max_qty, currency |
+| Data type                    | Description                                          | Typical fields                                                                    |
+| ---------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Instrument / symbol list** | List of tradeable instruments                        | symbol, base, quote, exchange                                                     |
+| **Instrument definition**    | Full contract/symbol metadata                        | raw_symbol, instrument_id, class, expiry, tick_size, lot_size, etc.               |
+| **Type information**         | Instrument/product type (spot, perp, future, option) | instrument_type, product_type, asset_class, option_style (e.g. American/European) |
+| **Contract specs**           | Tick size, lot size, min notional, etc.              | tick_size, lot_size, min_qty, max_qty, currency                                   |
 
 ### 1.5 Market data – derived and events
 
-| Data type | Description | Typical fields |
-|-----------|-------------|----------------|
-| **Funding rate** | Perpetual funding rate | funding, fundingRate, nextFundingTime |
-| **Open interest** | Open interest (perps/futures) | openInterest, symbol |
-| **Liquidations** | Liquidation events (where available) | price, size, side, time, liquidationId, symbol |
+| Data type         | Description                                     | Typical fields                                                                        |
+| ----------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Funding rate**  | Perpetual funding rate                          | funding, fundingRate, nextFundingTime                                                 |
+| **Open interest** | Open interest (perps/futures)                   | openInterest, symbol                                                                  |
+| **Liquidations**  | Liquidation events (where available)            | price, size, side, time, liquidationId, symbol                                        |
 | **Options chain** | Options surface (strikes, expiries, IV, greeks) | strikes[], expiries[], impliedVol, delta, gamma, theta, vega, openInterest per strike |
 
 ### 1.6 Execution and account
 
-| Data type | Description | Typical fields |
-|-----------|-------------|----------------|
-| **Order** | Order submit ack / status / fill | orderId, symbol, side, price, qty, status, filled, time |
-| **Position** | Open position | symbol, size, entryPrice, markPrice, unrealizedPnl |
-| **Balance** | Wallet/account balance | currency, free, used, total |
+| Data type    | Description                      | Typical fields                                          |
+| ------------ | -------------------------------- | ------------------------------------------------------- |
+| **Order**    | Order submit ack / status / fill | orderId, symbol, side, price, qty, status, filled, time |
+| **Position** | Open position                    | symbol, size, entryPrice, markPrice, unrealizedPnl      |
+| **Balance**  | Wallet/account balance           | currency, free, used, total                             |
 
 ### 1.7 DeFi data types by venue
 
 DeFi data shapes **depend on the venue** (subgraph schema, RPC API, or indexer). Below is what each venue exposes and what we contract.
 
-| Venue | Data types | Schema / notes |
-|-------|------------|----------------|
-| **The Graph** | Subgraph-specific; entity set depends on deployment. | **Uniswap-style:** SubgraphPool, SubgraphSwap, SubgraphToken. **Aave-style:** SubgraphReserve. Generic: TheGraphResponse, GraphQLError. Other subgraphs (e.g. Sushi, Curve) may have different entities (pairs, liquidity, gauges) — add schemas when we integrate. |
-| **Alchemy** | RPC, indexer APIs. | AlchemyRpcResponse (eth_blockNumber, etc.), AlchemyAssetTransfer (getAssetTransfers), AlchemyTokenBalance. NFT/other APIs not yet in unified-api-contracts. |
-| **Other DeFi** | 0x, 1inch, Covalent, Dune, etc. | Not yet contracted; add venue-specific schemas when we integrate. |
+| Venue          | Data types                                           | Schema / notes                                                                                                                                                                                                                                                      |
+| -------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The Graph**  | Subgraph-specific; entity set depends on deployment. | **Uniswap-style:** SubgraphPool, SubgraphSwap, SubgraphToken. **Aave-style:** SubgraphReserve. Generic: TheGraphResponse, GraphQLError. Other subgraphs (e.g. Sushi, Curve) may have different entities (pairs, liquidity, gauges) — add schemas when we integrate. |
+| **Alchemy**    | RPC, indexer APIs.                                   | AlchemyRpcResponse (eth_blockNumber, etc.), AlchemyAssetTransfer (getAssetTransfers), AlchemyTokenBalance. NFT/other APIs not yet in unified-api-contracts.                                                                                                         |
+| **Other DeFi** | 0x, 1inch, Covalent, Dune, etc.                      | Not yet contracted; add venue-specific schemas when we integrate.                                                                                                                                                                                                   |
 
 **The Graph (subgraph-by-subgraph):**
 
@@ -95,32 +95,32 @@ DeFi data shapes **depend on the venue** (subgraph schema, RPC API, or indexer).
 
 ### 1.8 Meta and errors
 
-| Data type | Description |
-|-----------|-------------|
-| **Exchange list** | List of supported exchanges (vendor) |
-| **Error payload** | API/HTTP error (code, message, details) |
+| Data type           | Description                                 |
+| ------------------- | ------------------------------------------- |
+| **Exchange list**   | List of supported exchanges (vendor)        |
+| **Error payload**   | API/HTTP error (code, message, details)     |
 | **Universe / meta** | Instrument universe (e.g. Hyperliquid meta) |
-| **Stats row** | Aggregated stats (e.g. daily volume row) |
+| **Stats row**       | Aggregated stats (e.g. daily volume row)    |
 
 ---
 
 ## 2. Data vendors and venues (who provides what)
 
-| Vendor | Type | OHLCV | Spot ticker | Deriv ticker | Trades | BBO/MBP-1 | MBP-5/10 | Order book | Reference / instrument | Type info | Funding/OI | Liquidations | Options chain | Order/Pos/Bal | DeFi (by venue) | Errors |
-|--------|-----|-------|-------------|--------------|--------|-----------|----------|------------|------------------------|-----------|------------|--------------|----------------|---------------|------------------|--------|
-| **Databento** | Historical | ✓ | — | — | ✓ | ✓ Mbp1 | MBP-5/10* | — | ✓ symbology, definition | in definition | — | — | — | — | — | — |
-| **TARDIS** | Historical | — | — | — | ✓ | — | — | ✓ | ✓ exchanges, instruments | — | — | — | — | — | — | ✓ |
-| **CCXT** | Unified | — | ✓ | per exchange | ✓ | — | — | ✓ | ✓ markets | in market | per exchange | — | — | ✓ | — | ✓ |
-| **Binance** | CeFi | — | ✓ | ✓ (futures) | ✓ | — | — | ✓ | — | — | ✓ | ✓ (futures) | — | ✓ | — | ✓ |
-| **OKX** | CeFi | — | ✓ | ✓ | ✓ | — | — | ✓ | ✓ instruments | instType | ✓ | ✓ | ✓ options | ✓ | — | ✓ |
-| **Bybit** | CeFi | — | ✓ | ✓ | ✓ | — | — | ✓ | ✓ | — | ✓ | ✓ | — | ✓ | — | ✓ |
-| **Upbit** | CeFi | — | ✓ | — | ✓ | — | — | ✓ | ✓ market/all | — | — | — | — | ✓ | — | ✓ |
-| **Hyperliquid** | On-chain perps | — | — | ✓ | ✓ | — | — | ✓ | ✓ meta | in meta | ✓ | ✓ | — | ✓ | — | ✓ |
-| **Aster** | On-chain perps | — | — | ✓ | — | — | — | ✓ | ✓ | — | — | — | — | ✓ | — | ✓ |
-| **The Graph** | DeFi subgraphs | — | — | — | — | — | — | — | — | — | — | — | — | — | ✓ subgraph-specific | ✓ |
-| **Alchemy** | DeFi RPC/API | — | — | — | — | — | — | — | — | — | — | — | — | — | ✓ RPC, transfers, balances | ✓ |
-| **Yahoo** | TradFi | ✓ chart | ✓ quote | — | — | — | — | — | — | — | — | — | — | — | — | ✓ |
-| **IBKR** | TradFi TWS | ✓ bars | ✓ ticker | — | — | — | — | — | — | ✓ | — | — | ✓ options | ✓ | — | ✓ |
+| Vendor          | Type           | OHLCV   | Spot ticker | Deriv ticker | Trades | BBO/MBP-1 | MBP-5/10   | Order book | Reference / instrument   | Type info     | Funding/OI   | Liquidations | Options chain | Order/Pos/Bal | DeFi (by venue)            | Errors |
+| --------------- | -------------- | ------- | ----------- | ------------ | ------ | --------- | ---------- | ---------- | ------------------------ | ------------- | ------------ | ------------ | ------------- | ------------- | -------------------------- | ------ |
+| **Databento**   | Historical     | ✓       | —           | —            | ✓      | ✓ Mbp1    | MBP-5/10\* | —          | ✓ symbology, definition  | in definition | —            | —            | —             | —             | —                          | —      |
+| **TARDIS**      | Historical     | —       | —           | —            | ✓      | —         | —          | ✓          | ✓ exchanges, instruments | —             | —            | —            | —             | —             | —                          | ✓      |
+| **CCXT**        | Unified        | —       | ✓           | per exchange | ✓      | —         | —          | ✓          | ✓ markets                | in market     | per exchange | —            | —             | ✓             | —                          | ✓      |
+| **Binance**     | CeFi           | —       | ✓           | ✓ (futures)  | ✓      | —         | —          | ✓          | —                        | —             | ✓            | ✓ (futures)  | —             | ✓             | —                          | ✓      |
+| **OKX**         | CeFi           | —       | ✓           | ✓            | ✓      | —         | —          | ✓          | ✓ instruments            | instType      | ✓            | ✓            | ✓ options     | ✓             | —                          | ✓      |
+| **Bybit**       | CeFi           | —       | ✓           | ✓            | ✓      | —         | —          | ✓          | ✓                        | —             | ✓            | ✓            | —             | ✓             | —                          | ✓      |
+| **Upbit**       | CeFi           | —       | ✓           | —            | ✓      | —         | —          | ✓          | ✓ market/all             | —             | —            | —            | —             | ✓             | —                          | ✓      |
+| **Hyperliquid** | On-chain perps | —       | —           | ✓            | ✓      | —         | —          | ✓          | ✓ meta                   | in meta       | ✓            | ✓            | —             | ✓             | —                          | ✓      |
+| **Aster**       | On-chain perps | —       | —           | ✓            | —      | —         | —          | ✓          | ✓                        | —             | —            | —            | —             | ✓             | —                          | ✓      |
+| **The Graph**   | DeFi subgraphs | —       | —           | —            | —      | —         | —          | —          | —                        | —             | —            | —            | —             | —             | ✓ subgraph-specific        | ✓      |
+| **Alchemy**     | DeFi RPC/API   | —       | —           | —            | —      | —         | —          | —          | —                        | —             | —            | —            | —             | —             | ✓ RPC, transfers, balances | ✓      |
+| **Yahoo**       | TradFi         | ✓ chart | ✓ quote     | —            | —      | —         | —          | —          | —                        | —             | —            | —            | —             | —             | —                          | ✓      |
+| **IBKR**        | TradFi TWS     | ✓ bars  | ✓ ticker    | —            | —      | —         | —          | —          | —                        | ✓             | —            | —            | ✓ options     | ✓             | —                          | ✓      |
 
 \* Databento supports MBP-5, MBP-10 in data; we currently have only Mbp1 schema.
 
@@ -132,40 +132,40 @@ For each (data type, vendor) we show: **Schema** (exists in unified-api-contract
 
 ### 3.1 OHLCV / bars
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Databento | DatabentoOhlcvBar | — | ✓ ohlcv_bar_example.json |
-| TARDIS | — | — | — |
-| CCXT | — | — | — |
-| Binance | — | — | — |
-| OKX | — | — | — |
-| Bybit | — | — | — |
-| Upbit | — | — | — |
-| Hyperliquid | — | — | — |
-| Yahoo | — | — | — |
-| IBKR | IBKRBar | — | ✓ bar_example.json |
+| Vendor      | Schema            | VCR | Example                  |
+| ----------- | ----------------- | --- | ------------------------ |
+| Databento   | DatabentoOhlcvBar | —   | ✓ ohlcv_bar_example.json |
+| TARDIS      | —                 | —   | —                        |
+| CCXT        | —                 | —   | —                        |
+| Binance     | —                 | —   | —                        |
+| OKX         | —                 | —   | —                        |
+| Bybit       | —                 | —   | —                        |
+| Upbit       | —                 | —   | —                        |
+| Hyperliquid | —                 | —   | —                        |
+| Yahoo       | —                 | —   | —                        |
+| IBKR        | IBKRBar           | —   | ✓ bar_example.json       |
 
 ### 3.2 Spot ticker / 24hr
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| CCXT | CcxtTicker | — | — |
+| Vendor  | Schema               | VCR                | Example               |
+| ------- | -------------------- | ------------------ | --------------------- |
+| CCXT    | CcxtTicker           | —                  | —                     |
 | Binance | BinanceTicker (spot) | ✓ ticker_24hr.yaml | ✓ ticker_example.json |
-| OKX | OKXTicker | ✓ ticker.yaml | ✓ ticker_example.json |
-| Bybit | BybitTicker | ✓ ticker.yaml | ✓ ticker_example.json |
-| Upbit | UpbitTicker | ✓ ticker.yaml | ✓ ticker_example.json |
-| Yahoo | YahooQuote | — | ✓ quote_example.json |
-| IBKR | IBKRTicker | — | — |
+| OKX     | OKXTicker            | ✓ ticker.yaml      | ✓ ticker_example.json |
+| Bybit   | BybitTicker          | ✓ ticker.yaml      | ✓ ticker_example.json |
+| Upbit   | UpbitTicker          | ✓ ticker.yaml      | ✓ ticker_example.json |
+| Yahoo   | YahooQuote           | —                  | ✓ quote_example.json  |
+| IBKR    | IBKRTicker           | —                  | —                     |
 
 ### 3.2b Derivative ticker (mark, funding, OI)
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Binance | BinanceTicker (futures 24hr) | — | — |
-| OKX | OKXTicker (swap/futures) | ✓ ticker.yaml (swap) | ✓ |
-| Bybit | BybitTicker (linear) | ✓ ticker.yaml | ✓ |
-| Hyperliquid | HyperliquidTicker (markPx, funding, openInterest) | — | ✓ ticker_example.json |
-| Aster | (in ticker/market) | — | — |
+| Vendor      | Schema                                            | VCR                  | Example               |
+| ----------- | ------------------------------------------------- | -------------------- | --------------------- |
+| Binance     | BinanceTicker (futures 24hr)                      | —                    | —                     |
+| OKX         | OKXTicker (swap/futures)                          | ✓ ticker.yaml (swap) | ✓                     |
+| Bybit       | BybitTicker (linear)                              | ✓ ticker.yaml        | ✓                     |
+| Hyperliquid | HyperliquidTicker (markPx, funding, openInterest) | —                    | ✓ ticker_example.json |
+| Aster       | (in ticker/market)                                | —                    | —                     |
 
 **Gap:** No dedicated DerivativeTicker schema; derivative-specific fields (markPx, indexPx, funding, openInterest) are often on the same ticker schema. Ensure examples/VCR include these fields where the venue is perps/futures.
 
@@ -175,176 +175,176 @@ Many tickers include last trade price/size/time. Same schemas as 3.2/3.2b; ensur
 
 ### 3.3 Top of book (BBO) / MBP-1
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Databento | DatabentoMbp1 | — | — |
-| TARDIS | (in OrderBook snapshot) | — | — |
-| CCXT | (in CcxtOrderBook) | — | — |
-| Binance | (in BinanceOrderBook) | — | — |
-| OKX | — | — | — |
-| Bybit | — | — | — |
-| Upbit | — | — | — |
-| Hyperliquid | — | — | — |
-| Aster | — | — | — |
+| Vendor      | Schema                  | VCR | Example |
+| ----------- | ----------------------- | --- | ------- |
+| Databento   | DatabentoMbp1           | —   | —       |
+| TARDIS      | (in OrderBook snapshot) | —   | —       |
+| CCXT        | (in CcxtOrderBook)      | —   | —       |
+| Binance     | (in BinanceOrderBook)   | —   | —       |
+| OKX         | —                       | —   | —       |
+| Bybit       | —                       | —   | —       |
+| Upbit       | —                       | —   | —       |
+| Hyperliquid | —                       | —   | —       |
+| Aster       | —                       | —   | —       |
 
 ### 3.4 Trades
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Databento | DatabentoTrade | — | — |
-| TARDIS | TardisTrade | — | ✓ trade_example.json |
-| CCXT | CcxtTrade | — | — |
-| Binance | BinanceTrade | — | — |
-| OKX | — | — | — |
-| Bybit | — | — | — |
-| Upbit | — | — | — |
-| Hyperliquid | — | — | — |
-| Aster | — | — | — |
+| Vendor      | Schema         | VCR | Example              |
+| ----------- | -------------- | --- | -------------------- |
+| Databento   | DatabentoTrade | —   | —                    |
+| TARDIS      | TardisTrade    | —   | ✓ trade_example.json |
+| CCXT        | CcxtTrade      | —   | —                    |
+| Binance     | BinanceTrade   | —   | —                    |
+| OKX         | —              | —   | —                    |
+| Bybit       | —              | —   | —                    |
+| Upbit       | —              | —   | —                    |
+| Hyperliquid | —              | —   | —                    |
+| Aster       | —              | —   | —                    |
 
 ### 3.5 MBP-5 / MBP-10 (multi-level depth)
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Databento | **No schema yet** (only Mbp1) | — | — |
-| TARDIS | (OrderBook has bids/asks arrays) | — | — |
-| CCXT | CcxtOrderBook | — | — |
-| Binance | BinanceOrderBook | — | — |
-| OKX | — | — | — |
-| Bybit | — | — | — |
-| Others | per-venue order book schema | — | — |
+| Vendor    | Schema                           | VCR | Example |
+| --------- | -------------------------------- | --- | ------- |
+| Databento | **No schema yet** (only Mbp1)    | —   | —       |
+| TARDIS    | (OrderBook has bids/asks arrays) | —   | —       |
+| CCXT      | CcxtOrderBook                    | —   | —       |
+| Binance   | BinanceOrderBook                 | —   | —       |
+| OKX       | —                                | —   | —       |
+| Bybit     | —                                | —   | —       |
+| Others    | per-venue order book schema      | —   | —       |
 
 **Gap:** Add Databento Mbp5 / Mbp10 schemas (or generic MbpN) if we consume multi-level MBP from Databento. Add VCR/examples for order book (depth) for Binance, OKX, Bybit, etc.
 
 ### 3.6 Order book snapshot (L2)
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| TARDIS | TardisOrderBook, TardisOrderBookLevel | — | — |
-| CCXT | CcxtOrderBook | — | — |
-| Binance | BinanceOrderBook | — | — |
-| OKX | — | — | — |
-| Bybit | — | — | — |
-| Upbit | — | — | — |
-| Hyperliquid | — | — | — |
-| Aster | AsterOrderBook | — | — |
+| Vendor      | Schema                                | VCR | Example |
+| ----------- | ------------------------------------- | --- | ------- |
+| TARDIS      | TardisOrderBook, TardisOrderBookLevel | —   | —       |
+| CCXT        | CcxtOrderBook                         | —   | —       |
+| Binance     | BinanceOrderBook                      | —   | —       |
+| OKX         | —                                     | —   | —       |
+| Bybit       | —                                     | —   | —       |
+| Upbit       | —                                     | —   | —       |
+| Hyperliquid | —                                     | —   | —       |
+| Aster       | AsterOrderBook                        | —   | —       |
 
 ### 3.7 Instrument / symbol list and definition
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Databento | DatabentoDefinition, DatabentoSymbol | — | — |
-| TARDIS | TardisExchange, TardisInstrument | ✓ exchanges.yaml (Exchange) | — |
-| CCXT | CcxtMarket | — | — |
-| Binance | — | — | — |
-| OKX | OKXMarket | — | — |
-| Bybit | BybitMarket | — | — |
-| Upbit | UpbitMarket | — | — |
-| Hyperliquid | HyperliquidMeta (universe) | ✓ meta.yaml | — |
-| Aster | AsterMarket | — | — |
+| Vendor      | Schema                               | VCR                         | Example |
+| ----------- | ------------------------------------ | --------------------------- | ------- |
+| Databento   | DatabentoDefinition, DatabentoSymbol | —                           | —       |
+| TARDIS      | TardisExchange, TardisInstrument     | ✓ exchanges.yaml (Exchange) | —       |
+| CCXT        | CcxtMarket                           | —                           | —       |
+| Binance     | —                                    | —                           | —       |
+| OKX         | OKXMarket                            | —                           | —       |
+| Bybit       | BybitMarket                          | —                           | —       |
+| Upbit       | UpbitMarket                          | —                           | —       |
+| Hyperliquid | HyperliquidMeta (universe)           | ✓ meta.yaml                 | —       |
+| Aster       | AsterMarket                          | —                           | —       |
 
 ### 3.8 Funding / open interest
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Hyperliquid | (in HyperliquidTicker: funding, openInterest) | — | ✓ ticker_example.json |
-| Others | Often in ticker or separate endpoint | — | — |
+| Vendor      | Schema                                        | VCR | Example               |
+| ----------- | --------------------------------------------- | --- | --------------------- |
+| Hyperliquid | (in HyperliquidTicker: funding, openInterest) | —   | ✓ ticker_example.json |
+| Others      | Often in ticker or separate endpoint          | —   | —                     |
 
 **Gap:** No dedicated FundingRate or OpenInterest schema per venue unless we add them.
 
 ### 3.8b Liquidations
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Binance | **No schema yet** | — | — |
-| OKX | **No schema yet** | — | — |
-| Bybit | **No schema yet** | — | — |
-| Hyperliquid | **No schema yet** | — | — |
-| Others (futures/perps) | — | — | — |
+| Vendor                 | Schema            | VCR | Example |
+| ---------------------- | ----------------- | --- | ------- |
+| Binance                | **No schema yet** | —   | —       |
+| OKX                    | **No schema yet** | —   | —       |
+| Bybit                  | **No schema yet** | —   | —       |
+| Hyperliquid            | **No schema yet** | —   | —       |
+| Others (futures/perps) | —                 | —   | —       |
 
 **Gap:** Add Liquidation or LiquidationEvent schema per venue that exposes liquidation feed (e.g. Binance futures, OKX, Bybit, Hyperliquid); add VCR or examples.
 
 ### 3.8c Options chain
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| OKX | **No schema yet** (options instruments/ticker) | — | — |
-| IBKR | **No schema yet** (options chain, greeks) | — | — |
-| Others | — | — | — |
+| Vendor | Schema                                         | VCR | Example |
+| ------ | ---------------------------------------------- | --- | ------- |
+| OKX    | **No schema yet** (options instruments/ticker) | —   | —       |
+| IBKR   | **No schema yet** (options chain, greeks)      | —   | —       |
+| Others | —                                              | —   | —       |
 
 **Gap:** Add OptionsChain, OptionStrike, or venue-specific options schemas (strikes, expiries, IV, greeks, OI per strike) for OKX options, IBKR options; add examples/VCR.
 
 ### 3.8d Reference data / instrument data / type information
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| Databento | DatabentoDefinition, DatabentoSymbol (instrument_class = type) | — | — |
-| TARDIS | TardisExchange, TardisInstrument | ✓ exchanges.yaml | — |
-| CCXT | CcxtMarket (type in market) | — | — |
-| Binance | — | — | — |
-| OKX | OKXMarket (instType) | — | — |
-| Bybit | BybitMarket | — | — |
-| Upbit | UpbitMarket | — | — |
-| Hyperliquid | HyperliquidMeta (universe: name, szDecimals, etc.) | ✓ meta.yaml | — |
-| Aster | AsterMarket | — | — |
-| IBKR | (contract details in position/order) | — | — |
+| Vendor      | Schema                                                         | VCR              | Example |
+| ----------- | -------------------------------------------------------------- | ---------------- | ------- |
+| Databento   | DatabentoDefinition, DatabentoSymbol (instrument_class = type) | —                | —       |
+| TARDIS      | TardisExchange, TardisInstrument                               | ✓ exchanges.yaml | —       |
+| CCXT        | CcxtMarket (type in market)                                    | —                | —       |
+| Binance     | —                                                              | —                | —       |
+| OKX         | OKXMarket (instType)                                           | —                | —       |
+| Bybit       | BybitMarket                                                    | —                | —       |
+| Upbit       | UpbitMarket                                                    | —                | —       |
+| Hyperliquid | HyperliquidMeta (universe: name, szDecimals, etc.)             | ✓ meta.yaml      | —       |
+| Aster       | AsterMarket                                                    | —                | —       |
+| IBKR        | (contract details in position/order)                           | —                | —       |
 
 **Gap:** Type information (instrument_type: spot, perp, future, option) is often inside market/instrument; ensure schemas and examples include it. Add VCR or examples for every venue’s instrument/market/list endpoint.
 
 ### 3.9 Order / position / balance
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| CCXT | CcxtOrder, CcxtPosition, CcxtBalance, CcxtBalanceResponse | — | ✓ fetch_order_example.json (Order) |
-| Binance | BinanceOrder, BinancePosition | — | ✓ order_example.json (Order) |
-| OKX | OKXOrder, OKXPosition | — | — |
-| Bybit | BybitOrder, BybitPosition | — | — |
-| Upbit | UpbitOrder, UpbitBalance | — | — |
-| Hyperliquid | HyperliquidOrder, HyperliquidPosition | — | — |
-| Aster | AsterOrder, AsterPosition | — | ✓ order_example.json (Order) |
-| IBKR | IBKROrder, IBKRPosition, IBKRAccountValue, IBKRPortfolioItem, IBKRPnL | — | ✓ bar/error only |
+| Vendor      | Schema                                                                | VCR | Example                            |
+| ----------- | --------------------------------------------------------------------- | --- | ---------------------------------- |
+| CCXT        | CcxtOrder, CcxtPosition, CcxtBalance, CcxtBalanceResponse             | —   | ✓ fetch_order_example.json (Order) |
+| Binance     | BinanceOrder, BinancePosition                                         | —   | ✓ order_example.json (Order)       |
+| OKX         | OKXOrder, OKXPosition                                                 | —   | —                                  |
+| Bybit       | BybitOrder, BybitPosition                                             | —   | —                                  |
+| Upbit       | UpbitOrder, UpbitBalance                                              | —   | —                                  |
+| Hyperliquid | HyperliquidOrder, HyperliquidPosition                                 | —   | —                                  |
+| Aster       | AsterOrder, AsterPosition                                             | —   | ✓ order_example.json (Order)       |
+| IBKR        | IBKROrder, IBKRPosition, IBKRAccountValue, IBKRPortfolioItem, IBKRPnL | —   | ✓ bar/error only                   |
 
 ### 3.10 DeFi by venue
 
 **The Graph (subgraph-specific; entity set depends on deployment)**
 
-| Data type | Schema | VCR | Example |
-|-----------|--------|-----|---------|
-| GraphQL response wrapper | TheGraphResponse | — | ✓ response_example.json |
-| GraphQL error | GraphQLError | — | ✓ graphql_error_example.json |
-| Uniswap-style pool | SubgraphPool | — | — |
-| Uniswap-style swap | SubgraphSwap | — | — |
-| Token (subgraph) | SubgraphToken | — | — |
-| Aave-style reserve | SubgraphReserve | — | — |
+| Data type                | Schema           | VCR | Example                      |
+| ------------------------ | ---------------- | --- | ---------------------------- |
+| GraphQL response wrapper | TheGraphResponse | —   | ✓ response_example.json      |
+| GraphQL error            | GraphQLError     | —   | ✓ graphql_error_example.json |
+| Uniswap-style pool       | SubgraphPool     | —   | —                            |
+| Uniswap-style swap       | SubgraphSwap     | —   | —                            |
+| Token (subgraph)         | SubgraphToken    | —   | —                            |
+| Aave-style reserve       | SubgraphReserve  | —   | —                            |
 
 Other subgraphs (Sushi, Curve, etc.) may expose different entities — add schemas when we integrate; each subgraph = different contract set.
 
 **Alchemy**
 
-| Data type | Schema | VCR | Example |
-|-----------|--------|-----|---------|
-| Generic RPC response | AlchemyRpcResponse | — | ✓ rpc_response_example.json |
-| Asset transfer | AlchemyAssetTransfer | — | — |
-| Token balance | AlchemyTokenBalance | — | — |
-| Error | AlchemyError | — | ✓ error_example.json |
+| Data type            | Schema               | VCR | Example                     |
+| -------------------- | -------------------- | --- | --------------------------- |
+| Generic RPC response | AlchemyRpcResponse   | —   | ✓ rpc_response_example.json |
+| Asset transfer       | AlchemyAssetTransfer | —   | —                           |
+| Token balance        | AlchemyTokenBalance  | —   | —                           |
+| Error                | AlchemyError         | —   | ✓ error_example.json        |
 
 Other Alchemy APIs (NFT, webhooks) — add schemas when we use them.
 
 ### 3.11 Errors
 
-| Vendor | Schema | VCR | Example |
-|--------|--------|-----|---------|
-| TARDIS | TardisError | — | ✓ |
-| CCXT | CcxtErrorPayload | — | — |
-| Binance | BinanceError | — | ✓ |
-| OKX | OKXError | — | ✓ |
-| Bybit | BybitError | — | ✓ |
-| Yahoo | YahooError | — | ✓ |
-| Alchemy | AlchemyError | — | ✓ |
-| Hyperliquid | HyperliquidError | — | ✓ |
-| Aster | AsterError | — | ✓ |
-| Upbit | UpbitError | — | ✓ |
-| IBKR | IBKRError | — | ✓ |
-| The Graph | GraphQLError | — | ✓ |
+| Vendor      | Schema           | VCR | Example |
+| ----------- | ---------------- | --- | ------- |
+| TARDIS      | TardisError      | —   | ✓       |
+| CCXT        | CcxtErrorPayload | —   | —       |
+| Binance     | BinanceError     | —   | ✓       |
+| OKX         | OKXError         | —   | ✓       |
+| Bybit       | BybitError       | —   | ✓       |
+| Yahoo       | YahooError       | —   | ✓       |
+| Alchemy     | AlchemyError     | —   | ✓       |
+| Hyperliquid | HyperliquidError | —   | ✓       |
+| Aster       | AsterError       | —   | ✓       |
+| Upbit       | UpbitError       | —   | ✓       |
+| IBKR        | IBKRError        | —   | ✓       |
+| The Graph   | GraphQLError     | —   | ✓       |
 
 ---
 
@@ -354,161 +354,161 @@ Same as before: every schema in the venue manifest and its VCR/example status.
 
 ### databento
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| DatabentoOhlcvBar | — | ohlcv_bar_example.json | Example only |
-| DatabentoTrade | — | — | **Missing** |
-| DatabentoMbp1 | — | — | **Missing** |
-| DatabentoDefinition | — | — | **Missing** |
-| DatabentoSymbol | — | — | **Missing** |
+| Schema              | VCR | Example                | Status       |
+| ------------------- | --- | ---------------------- | ------------ |
+| DatabentoOhlcvBar   | —   | ohlcv_bar_example.json | Example only |
+| DatabentoTrade      | —   | —                      | **Missing**  |
+| DatabentoMbp1       | —   | —                      | **Missing**  |
+| DatabentoDefinition | —   | —                      | **Missing**  |
+| DatabentoSymbol     | —   | —                      | **Missing**  |
 
 ### tardis
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| TardisExchange | exchanges.yaml | — | VCR only |
-| TardisInstrument | — | — | **Missing** |
-| TardisTrade | — | trade_example.json | Example only |
-| TardisOrderBookLevel | — | — | **Missing** |
-| TardisOrderBook | — | — | **Missing** |
-| TardisError | — | error_example.json | Example only |
+| Schema               | VCR            | Example            | Status       |
+| -------------------- | -------------- | ------------------ | ------------ |
+| TardisExchange       | exchanges.yaml | —                  | VCR only     |
+| TardisInstrument     | —              | —                  | **Missing**  |
+| TardisTrade          | —              | trade_example.json | Example only |
+| TardisOrderBookLevel | —              | —                  | **Missing**  |
+| TardisOrderBook      | —              | —                  | **Missing**  |
+| TardisError          | —              | error_example.json | Example only |
 
 ### ccxt
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| CcxtOrder | — | fetch_order_example.json | Example only |
-| CcxtTrade | — | — | **Missing** |
-| CcxtBalance | — | — | **Missing** |
-| CcxtBalanceResponse | — | — | **Missing** |
-| CcxtPosition | — | — | **Missing** |
-| CcxtMarket | — | — | **Missing** |
-| CcxtTicker | — | — | **Missing** |
-| CcxtOrderBook | — | — | **Missing** |
-| CcxtErrorPayload | — | — | **Missing** |
+| Schema              | VCR | Example                  | Status       |
+| ------------------- | --- | ------------------------ | ------------ |
+| CcxtOrder           | —   | fetch_order_example.json | Example only |
+| CcxtTrade           | —   | —                        | **Missing**  |
+| CcxtBalance         | —   | —                        | **Missing**  |
+| CcxtBalanceResponse | —   | —                        | **Missing**  |
+| CcxtPosition        | —   | —                        | **Missing**  |
+| CcxtMarket          | —   | —                        | **Missing**  |
+| CcxtTicker          | —   | —                        | **Missing**  |
+| CcxtOrderBook       | —   | —                        | **Missing**  |
+| CcxtErrorPayload    | —   | —                        | **Missing**  |
 
 ### binance
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| BinanceTicker | ticker_24hr.yaml | ticker_example.json | VCR + example |
-| BinanceOrderBook | — | — | **Missing** |
-| BinanceTrade | — | — | **Missing** |
-| BinanceOrder | — | order_example.json | Example only |
-| BinancePosition | — | — | **Missing** |
-| BinanceError | — | error_example.json | Example only |
+| Schema           | VCR              | Example             | Status        |
+| ---------------- | ---------------- | ------------------- | ------------- |
+| BinanceTicker    | ticker_24hr.yaml | ticker_example.json | VCR + example |
+| BinanceOrderBook | —                | —                   | **Missing**   |
+| BinanceTrade     | —                | —                   | **Missing**   |
+| BinanceOrder     | —                | order_example.json  | Example only  |
+| BinancePosition  | —                | —                   | **Missing**   |
+| BinanceError     | —                | error_example.json  | Example only  |
 
 ### thegraph
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| TheGraphResponse | — | response_example.json | Example only |
-| SubgraphPool | — | — | **Missing** |
-| SubgraphSwap | — | — | **Missing** |
-| SubgraphToken | — | — | **Missing** |
-| SubgraphReserve | — | — | **Missing** |
-| GraphQLError | — | graphql_error_example.json | Example only |
+| Schema           | VCR | Example                    | Status       |
+| ---------------- | --- | -------------------------- | ------------ |
+| TheGraphResponse | —   | response_example.json      | Example only |
+| SubgraphPool     | —   | —                          | **Missing**  |
+| SubgraphSwap     | —   | —                          | **Missing**  |
+| SubgraphToken    | —   | —                          | **Missing**  |
+| SubgraphReserve  | —   | —                          | **Missing**  |
+| GraphQLError     | —   | graphql_error_example.json | Example only |
 
 ### okx
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| OKXMarket | — | — | **Missing** |
-| OKXTicker | ticker.yaml | ticker_example.json | VCR + example |
-| OKXOrder | — | — | **Missing** |
-| OKXPosition | — | — | **Missing** |
-| OKXError | — | error_example.json | Example only |
+| Schema      | VCR         | Example             | Status        |
+| ----------- | ----------- | ------------------- | ------------- |
+| OKXMarket   | —           | —                   | **Missing**   |
+| OKXTicker   | ticker.yaml | ticker_example.json | VCR + example |
+| OKXOrder    | —           | —                   | **Missing**   |
+| OKXPosition | —           | —                   | **Missing**   |
+| OKXError    | —           | error_example.json  | Example only  |
 
 ### bybit
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| BybitMarket | — | — | **Missing** |
-| BybitTicker | ticker.yaml | ticker_example.json | VCR + example |
-| BybitOrder | — | — | **Missing** |
-| BybitPosition | — | — | **Missing** |
-| BybitError | — | error_example.json | Example only |
+| Schema        | VCR         | Example             | Status        |
+| ------------- | ----------- | ------------------- | ------------- |
+| BybitMarket   | —           | —                   | **Missing**   |
+| BybitTicker   | ticker.yaml | ticker_example.json | VCR + example |
+| BybitOrder    | —           | —                   | **Missing**   |
+| BybitPosition | —           | —                   | **Missing**   |
+| BybitError    | —           | error_example.json  | Example only  |
 
 ### yahoo_finance
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| YahooQuote | — | quote_example.json | Example only |
-| YahooChartResult | — | — | **Missing** |
-| YahooError | — | error_example.json | Example only |
+| Schema           | VCR | Example            | Status       |
+| ---------------- | --- | ------------------ | ------------ |
+| YahooQuote       | —   | quote_example.json | Example only |
+| YahooChartResult | —   | —                  | **Missing**  |
+| YahooError       | —   | error_example.json | Example only |
 
 ### alchemy
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| AlchemyRpcResponse | — | rpc_response_example.json | Example only |
-| AlchemyAssetTransfer | — | — | **Missing** |
-| AlchemyTokenBalance | — | — | **Missing** |
-| AlchemyError | — | error_example.json | Example only |
+| Schema               | VCR | Example                   | Status       |
+| -------------------- | --- | ------------------------- | ------------ |
+| AlchemyRpcResponse   | —   | rpc_response_example.json | Example only |
+| AlchemyAssetTransfer | —   | —                         | **Missing**  |
+| AlchemyTokenBalance  | —   | —                         | **Missing**  |
+| AlchemyError         | —   | error_example.json        | Example only |
 
 ### hyperliquid
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| HyperliquidMeta | meta.yaml | — | VCR only |
-| HyperliquidTicker | — | ticker_example.json | Example only |
-| HyperliquidOrder | — | — | **Missing** |
-| HyperliquidPosition | — | — | **Missing** |
-| HyperliquidStatsRow | — | — | **Missing** |
-| HyperliquidError | — | error_example.json | Example only |
+| Schema              | VCR       | Example             | Status       |
+| ------------------- | --------- | ------------------- | ------------ |
+| HyperliquidMeta     | meta.yaml | —                   | VCR only     |
+| HyperliquidTicker   | —         | ticker_example.json | Example only |
+| HyperliquidOrder    | —         | —                   | **Missing**  |
+| HyperliquidPosition | —         | —                   | **Missing**  |
+| HyperliquidStatsRow | —         | —                   | **Missing**  |
+| HyperliquidError    | —         | error_example.json  | Example only |
 
 ### aster
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| AsterMarket | — | — | **Missing** |
-| AsterOrderBook | — | — | **Missing** |
-| AsterOrder | — | order_example.json | Example only |
-| AsterPosition | — | — | **Missing** |
-| AsterError | — | error_example.json | Example only |
+| Schema         | VCR | Example            | Status       |
+| -------------- | --- | ------------------ | ------------ |
+| AsterMarket    | —   | —                  | **Missing**  |
+| AsterOrderBook | —   | —                  | **Missing**  |
+| AsterOrder     | —   | order_example.json | Example only |
+| AsterPosition  | —   | —                  | **Missing**  |
+| AsterError     | —   | error_example.json | Example only |
 
 ### upbit
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| UpbitMarket | — | — | **Missing** |
-| UpbitTicker | ticker.yaml | ticker_example.json | VCR + example |
-| UpbitOrder | — | — | **Missing** |
-| UpbitBalance | — | — | **Missing** |
-| UpbitError | — | error_example.json | Example only |
+| Schema       | VCR         | Example             | Status        |
+| ------------ | ----------- | ------------------- | ------------- |
+| UpbitMarket  | —           | —                   | **Missing**   |
+| UpbitTicker  | ticker.yaml | ticker_example.json | VCR + example |
+| UpbitOrder   | —           | —                   | **Missing**   |
+| UpbitBalance | —           | —                   | **Missing**   |
+| UpbitError   | —           | error_example.json  | Example only  |
 
 ### ibkr
 
-| Schema | VCR | Example | Status |
-|--------|-----|---------|--------|
-| IBKRBar | — | bar_example.json | Example only |
-| IBKRTicker | — | — | **Missing** |
-| IBKROrder | — | — | **Missing** |
-| IBKRPosition | — | — | **Missing** |
-| IBKRAccountValue | — | — | **Missing** |
-| IBKRPortfolioItem | — | — | **Missing** |
-| IBKRPnL | — | — | **Missing** |
-| IBKRError | — | error_example.json | Example only |
+| Schema            | VCR | Example            | Status       |
+| ----------------- | --- | ------------------ | ------------ |
+| IBKRBar           | —   | bar_example.json   | Example only |
+| IBKRTicker        | —   | —                  | **Missing**  |
+| IBKROrder         | —   | —                  | **Missing**  |
+| IBKRPosition      | —   | —                  | **Missing**  |
+| IBKRAccountValue  | —   | —                  | **Missing**  |
+| IBKRPortfolioItem | —   | —                  | **Missing**  |
+| IBKRPnL           | —   | —                  | **Missing**  |
+| IBKRError         | —   | error_example.json | Example only |
 
 ---
 
 ## 5. Summary counts
 
-| Venue | Response | Error | With VCR | Example only | Missing |
-|-------|----------|-------|----------|--------------|--------|
-| databento | 5 | 0 | 0 | 1 | 4 |
-| tardis | 5 | 1 | 1 | 2 | 3 |
-| ccxt | 8 | 1 | 0 | 1 | 8 |
-| binance | 5 | 1 | 1 | 3 | 3 |
-| thegraph | 5 | 1 | 0 | 2 | 4 |
-| okx | 4 | 1 | 1 | 2 | 2 |
-| bybit | 4 | 1 | 1 | 2 | 2 |
-| yahoo_finance | 2 | 1 | 0 | 2 | 1 |
-| alchemy | 3 | 1 | 0 | 2 | 2 |
-| hyperliquid | 5 | 1 | 1 | 2 | 3 |
-| aster | 4 | 1 | 0 | 2 | 2 |
-| upbit | 4 | 1 | 1 | 2 | 2 |
-| ibkr | 7 | 1 | 0 | 2 | 6 |
+| Venue         | Response | Error | With VCR | Example only | Missing |
+| ------------- | -------- | ----- | -------- | ------------ | ------- |
+| databento     | 5        | 0     | 0        | 1            | 4       |
+| tardis        | 5        | 1     | 1        | 2            | 3       |
+| ccxt          | 8        | 1     | 0        | 1            | 8       |
+| binance       | 5        | 1     | 1        | 3            | 3       |
+| thegraph      | 5        | 1     | 0        | 2            | 4       |
+| okx           | 4        | 1     | 1        | 2            | 2       |
+| bybit         | 4        | 1     | 1        | 2            | 2       |
+| yahoo_finance | 2        | 1     | 0        | 2            | 1       |
+| alchemy       | 3        | 1     | 0        | 2            | 2       |
+| hyperliquid   | 5        | 1     | 1        | 2            | 3       |
+| aster         | 4        | 1     | 0        | 2            | 2       |
+| upbit         | 4        | 1     | 1        | 2            | 2       |
+| ibkr          | 7        | 1     | 0        | 2            | 6       |
 
 **Total:** 61 response + 13 error = 74 schemas. **VCR cassettes:** 5. **Many types (trades, order book, MBP-5/10, order, position, balance, DeFi entities) have no or partial coverage.**
 

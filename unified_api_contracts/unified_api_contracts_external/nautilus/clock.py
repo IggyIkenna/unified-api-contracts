@@ -4,6 +4,8 @@ Mirrors NautilusTrader Clock interface for deterministic time in backtests.
 Reference: https://nautilustrader.io/docs/
 """
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import UTC, datetime
 from typing import Protocol
 

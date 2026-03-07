@@ -1,8 +1,10 @@
 """Pydantic schemas for Alchemy RPC/API response shapes. Full surface per plan."""
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class AlchemyRpcResponse(BaseModel):

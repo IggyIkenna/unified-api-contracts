@@ -55,10 +55,10 @@ Install with: `uv pip install -e ".[schema-validation]"`
 | ------------- | --------------- | ------------------------------------------------------------- |
 | pydantic      | >=2.12.5,<3.0.0 | Schema validation (core dep)                                  |
 | requests      | >=2.32.5,<3.0.0 | Optional; interfaces use for live validation                  |
-| databento     | >=0.32.0        | Schema validation vs Databento Historical/Live API (optional) |
-| tardis-client | >=1.3.7         | Schema validation vs Tardis HTTP API v1 (optional)            |
+| databento     | >=0.32.0,<1.0.0 | Schema validation vs Databento Historical/Live API (optional) |
+| tardis-client | >=1.3.7,<2.0.0  | Schema validation vs Tardis HTTP API v1 (optional)            |
 | ccxt          | >=4.5.24,<5.0.0 | Schema validation vs CCXT unified responses (optional)        |
-| ib_insync     | >=0.9.86        | Schema validation vs IBKR TWS/ib_insync (optional, UTEI)      |
+| ib_insync     | >=0.9.86,<1.0.0 | Schema validation vs IBKR TWS/ib_insync (optional, UTEI)      |
 
 **SDK pins are for schema-validation only.** Interfaces (UMI, market-tick-data-service) may use different versions but must produce data that validates against unified-api-contracts schemas.
 

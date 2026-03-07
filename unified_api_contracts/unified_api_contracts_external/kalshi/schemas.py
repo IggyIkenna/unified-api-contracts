@@ -18,11 +18,14 @@ amended → finalized
 
 from __future__ import annotations
 
+__api_version__ = "v2"  # matches provider_api_versions.yaml
+
+
 from typing import Literal
 
 from pydantic import BaseModel
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts import ErrorAction
 
 
 class KalshiPriceRange(BaseModel):

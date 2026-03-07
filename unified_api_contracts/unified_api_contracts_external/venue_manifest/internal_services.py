@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
+
 from typing import TypedDict
 
 
@@ -31,7 +34,7 @@ class ContractEntry(TypedDict, total=False):
 # AC provides external + normalised only; INTERNAL_CONTRACTS here lists other AC-owned contract groups.
 INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
     "fix": {
-        "module": "unified_api_contracts.fix.schemas",
+        "module": "unified_api_contracts.unified_api_contracts_external.fix.schemas",
         "description": (
             "FIX 4.2 / 4.4 / 5.0 message schemas for institutional order routing. "
             "Covers order management (NewOrderSingle, ExecutionReport, Cancel), "
@@ -74,7 +77,7 @@ INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
         },
     },
     "prime_broker": {
-        "module": "unified_api_contracts.prime_broker.schemas",
+        "module": "unified_api_contracts.unified_api_contracts_external.prime_broker.schemas",
         "description": (
             "Prime broker integration schemas — HiddenRoad / Talos / FalconX style. "
             "Covers credit accounts, cross-venue position netting, margin calls, "
@@ -99,7 +102,7 @@ INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
         "error_schema_classes": ["PrimeBrokerError"],
     },
     "regulatory": {
-        "module": "unified_api_contracts.regulatory.schemas",
+        "module": "unified_api_contracts.unified_api_contracts_external.regulatory.schemas",
         "description": (
             "Regulatory reporting schemas: MiFID II (RTS 22/27/28), EMIR, Dodd-Frank, "
             "trade surveillance, and best execution monitoring."

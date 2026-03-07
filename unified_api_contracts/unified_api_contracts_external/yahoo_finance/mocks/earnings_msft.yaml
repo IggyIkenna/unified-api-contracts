@@ -11,75 +11,75 @@ metadata:
   total_records: 8
 
 # Raw earnings data as returned by yfinance ticker.earnings_dates
-# Format: pandas DataFrame with datetime index and earnings columns  
+# Format: pandas DataFrame with datetime index and earnings columns
 earnings_dataframe:
   columns: ["Reported EPS", "EPS Estimate", "Surprise(%)", "Revenue"]
   data:
     # 2023 Quarterly Earnings
-    "2023-01-24T21:00:00+00:00":  # Q2 FY23 - After market close
+    "2023-01-24T21:00:00+00:00": # Q2 FY23 - After market close
       "Reported EPS": 2.32
-      "EPS Estimate": 2.29  
+      "EPS Estimate": 2.29
       "Surprise(%)": 1.31
-      "Revenue": 52747000000  # $52.747B
-      
-    "2023-04-25T21:00:00+00:00":  # Q3 FY23 - After market close
+      "Revenue": 52747000000 # $52.747B
+
+    "2023-04-25T21:00:00+00:00": # Q3 FY23 - After market close
       "Reported EPS": 2.45
       "EPS Estimate": 2.23
       "Surprise(%)": 9.87
-      "Revenue": 52857000000  # $52.857B
-      
-    "2023-07-25T21:00:00+00:00":  # Q4 FY23 - After market close  
+      "Revenue": 52857000000 # $52.857B
+
+    "2023-07-25T21:00:00+00:00": # Q4 FY23 - After market close
       "Reported EPS": 2.69
       "EPS Estimate": 2.55
       "Surprise(%)": 5.49
-      "Revenue": 56189000000  # $56.189B
-      
-    "2023-10-24T21:00:00+00:00":  # Q1 FY24 - After market close
+      "Revenue": 56189000000 # $56.189B
+
+    "2023-10-24T21:00:00+00:00": # Q1 FY24 - After market close
       "Reported EPS": 3.30
       "EPS Estimate": 3.10
       "Surprise(%)": 6.45
-      "Revenue": 56517000000  # $56.517B
-      
-    # 2024 Quarterly Earnings  
-    "2024-01-24T21:00:00+00:00":  # Q2 FY24 - After market close
+      "Revenue": 56517000000 # $56.517B
+
+    # 2024 Quarterly Earnings
+    "2024-01-24T21:00:00+00:00": # Q2 FY24 - After market close
       "Reported EPS": 2.93
       "EPS Estimate": 2.78
       "Surprise(%)": 5.40
-      "Revenue": 62020000000  # $62.020B
-      
-    "2024-04-24T21:00:00+00:00":  # Q3 FY24 - After market close
+      "Revenue": 62020000000 # $62.020B
+
+    "2024-04-24T21:00:00+00:00": # Q3 FY24 - After market close
       "Reported EPS": 2.94
       "EPS Estimate": 2.82
       "Surprise(%)": 4.26
-      "Revenue": 61858000000  # $61.858B
-      
-    "2024-07-24T21:00:00+00:00":  # Q4 FY24 - After market close
+      "Revenue": 61858000000 # $61.858B
+
+    "2024-07-24T21:00:00+00:00": # Q4 FY24 - After market close
       "Reported EPS": 2.95
       "EPS Estimate": 2.93
       "Surprise(%)": 0.68
-      "Revenue": 64728000000  # $64.728B
-      
-    "2024-10-23T21:00:00+00:00":  # Q1 FY25 - After market close
+      "Revenue": 64728000000 # $64.728B
+
+    "2024-10-23T21:00:00+00:00": # Q1 FY25 - After market close
       "Reported EPS": 3.30
       "EPS Estimate": 3.10
       "Surprise(%)": 6.45
-      "Revenue": 65585000000  # $65.585B
+      "Revenue": 65585000000 # $65.585B
 
 # Processed earnings records as parsed by CorporateActionsAdapter
 earnings_records:
   - ticker: "MSFT"
     earnings_date: "2023-01-24"
-    earnings_time: "AMC"  # After Market Close
+    earnings_time: "AMC" # After Market Close
     fiscal_quarter: "Q2 2023"
     fiscal_year: 2023
     reported_eps: 2.32
     estimated_eps: 2.29
     surprise_pct: 1.31
     revenue: 52747000000.0
-    estimated_revenue: 52000000000.0  # Estimated
+    estimated_revenue: 52000000000.0 # Estimated
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2023-04-25"
     earnings_time: "AMC"
@@ -92,7 +92,7 @@ earnings_records:
     estimated_revenue: 51000000000.0
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2023-07-25"
     earnings_time: "AMC"
@@ -105,7 +105,7 @@ earnings_records:
     estimated_revenue: 55000000000.0
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2023-10-24"
     earnings_time: "AMC"
@@ -118,7 +118,7 @@ earnings_records:
     estimated_revenue: 55500000000.0
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2024-01-24"
     earnings_time: "AMC"
@@ -131,7 +131,7 @@ earnings_records:
     estimated_revenue: 60000000000.0
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2024-04-24"
     earnings_time: "AMC"
@@ -144,7 +144,7 @@ earnings_records:
     estimated_revenue: 61000000000.0
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2024-07-24"
     earnings_time: "AMC"
@@ -157,7 +157,7 @@ earnings_records:
     estimated_revenue: 64500000000.0
     source: "yfinance"
     instrument_key: "NASDAQ:EQUITY:MSFT"
-    
+
   - ticker: "MSFT"
     earnings_date: "2024-10-23"
     earnings_time: "AMC"
@@ -176,14 +176,14 @@ edge_cases:
   # Earnings miss example
   earnings_miss:
     ticker: "MSFT"
-    earnings_date: "2025-01-24"  # Hypothetical
-    earnings_time: "BMO"  # Before Market Open
+    earnings_date: "2025-01-24" # Hypothetical
+    earnings_time: "BMO" # Before Market Open
     reported_eps: 2.80
     estimated_eps: 3.00
-    surprise_pct: -6.67  # Negative surprise
+    surprise_pct: -6.67 # Negative surprise
     revenue: 58000000000.0
     source: "yfinance"
-    
+
   # No earnings time specified
   no_time:
     ticker: "MSFT"
@@ -194,19 +194,19 @@ edge_cases:
     surprise_pct: 1.72
     revenue: 62000000000.0
     source: "yfinance"
-    
+
   # Missing revenue data
   missing_revenue:
     ticker: "MSFT"
     earnings_date: "2025-07-24"
-    earnings_time: "TNS"  # Time Not Supplied
+    earnings_time: "TNS" # Time Not Supplied
     reported_eps: 3.15
     estimated_eps: null
     surprise_pct: null
     revenue: null
     source: "yfinance"
 
-# Usage notes for testing  
+# Usage notes for testing
 usage:
   adapter_method: "fetch_earnings"
   date_range:

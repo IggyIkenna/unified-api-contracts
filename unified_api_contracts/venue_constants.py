@@ -7,7 +7,7 @@ BINANCE_SPOT = "BINANCE-SPOT"
 BINANCE_FUTURES = "BINANCE-FUTURES"
 
 # Other CeFi exchange constants (VENUE-PRODUCT split)
-# Qualified names are canonical; bare names kept for backward compatibility.
+# Qualified names are canonical; bare names preserved for existing consumers.
 OKX_SPOT = "OKX-SPOT"
 OKX_FUTURES = "OKX-FUTURES"
 BYBIT_SPOT = "BYBIT-SPOT"
@@ -83,7 +83,7 @@ ZERO_ALPHA_VENUES: set[str] = {
 # Map venue to its market category bucket (cefi/tradfi/defi)
 VENUE_CATEGORY_MAP: dict[str, str] = {
     # CeFi venues -> cefi bucket
-    "BINANCE": "cefi",  # backward compat — new code should use BINANCE-SPOT or BINANCE-FUTURES
+    "BINANCE": "cefi",  # legacy key — new code should use BINANCE-SPOT or BINANCE-FUTURES
     BINANCE_SPOT: "cefi",
     BINANCE_FUTURES: "cefi",
     "OKX": "cefi",
@@ -137,10 +137,10 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     COINBASE_SPOT: {"SPOT"},
     OKX_SPOT: {"SPOT"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
-    "OKX": {"SPOT", "PERPETUAL", "FUTURE", "OPTION"},  # backward compat
+    "OKX": {"SPOT", "PERPETUAL", "FUTURE", "OPTION"},  # legacy key
     BYBIT_SPOT: {"SPOT"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
-    "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},  # backward compat
+    "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},  # legacy key
     "UPBIT": {"SPOT"},
     # CeFi derivatives
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},

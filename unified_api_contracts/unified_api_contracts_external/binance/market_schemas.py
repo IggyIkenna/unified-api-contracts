@@ -1,5 +1,7 @@
 """Binance market data schemas: tickers, order books, trades, klines."""
 
+__api_version__ = "v3"  # matches provider_api_versions.yaml
+
 from decimal import Decimal
 
 from pydantic import BaseModel, Field
