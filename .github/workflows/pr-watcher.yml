@@ -46,13 +46,9 @@ jobs:
             ERRORS="$ERRORS\n❌ No os.getenv() in unified_api_contracts/ source"
           fi
 
-          # Check for hardcoded project IDs — exclude QG and workflow scripts that use ID as a search pattern
-          PROJ_ID_HITS=$(git diff origin/main...HEAD 2>/dev/null \
-            | grep '^+' \
-            | grep -v '^+++' \
-            | grep 'central-element-' \
-            | grep -v 'quality-gates\|pr-watcher' || true)
-          if [ -n "$PROJ_ID_HITS" ]; then
+          # Check for hardcoded project IDs in Python/shell source only
+          # (GHA YAML may reference the ID as a detection pattern — not a violation)
+          if git diff origin/main...HEAD -- '*.py' '*.sh' 2>/dev/null | grep -q 'central-element-'; then
             ERRORS="$ERRORS\n❌ No hardcoded project IDs (use test-project in tests)"
           fi
 
