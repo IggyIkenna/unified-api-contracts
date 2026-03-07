@@ -349,7 +349,7 @@ done
 [[ -n "$FSIZES" ]] && { log_fail "Function/class/method size exceeded:$FSIZES"; ((V++)); } || log_success "Function/class/method size OK"
 
 # Security: pip-audit — check output for actual CVEs; ignore non-zero exits from
-# editable/not-on-PyPI packages. Capture exit code separately to avoid bare || true.
+# editable/not-on-PyPI packages. Capture exit code separately (no bare-true).
 _AUDIT_OUT=""; _AUDIT_EC=0
 if $PYTHON_CMD -c "import pip_audit" 2>/dev/null; then
     _AUDIT_OUT=$($PYTHON_CMD -m pip_audit 2>&1); _AUDIT_EC=$? || :
@@ -400,10 +400,13 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
     echo "$DOMAIN_CONTRACTS_IN_LIB" | head -5
 } || log_success "No misplaced domain BaseModel contracts in library"
 
-# 7. BYPASS — ||true in quality gate scripts
-BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|zombies\|pyright\|cleanup" || :)
-[[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
+# 7. BYPASS — bare-true in quality gate scripts
+# Use _BYPASS_PAT variable so this block does not self-match; grep -v ":# " excludes comment lines
+# (rg output format is "filename:content" so ^# does not match comments — use ":# " instead)
+_BYPASS_PAT='\|\|true|\|\| true'
+BYPASS=$(rg "$_BYPASS_PAT" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
+    | grep -v "_BYPASS_PAT\|:# \|zombies\|pyright\|cleanup" || :)
+[[ -n "$BYPASS" ]] && { log_fail "bare-true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No bare-true quality gate bypasses"
 
 # ============================================================
 # STEP 5.10 — Block direct cloud SDK imports outside UCI providers
