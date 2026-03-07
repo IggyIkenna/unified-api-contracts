@@ -44,6 +44,42 @@ class TardisInstrument(BaseModel):
     info: dict[str, object] | None = None
 
 
+class TardisInstrumentDetail(BaseModel):
+    """Instrument entry from Tardis exchange detail endpoint.
+
+    Returned as items inside the ``instruments`` array of
+    GET https://api.tardis.dev/v1/exchanges/{exchange}.
+
+    Fields match the /v1/exchanges/{id} response shape, which is different
+    from the generic TardisInstrument used for other Tardis data endpoints.
+    """
+
+    id: str = Field(..., description="Instrument identifier e.g. BTCUSDT")
+    type: str = Field(..., description="perpetual, future, option, spot, combo")
+    baseCurrency: str | None = Field(None, description="Base currency e.g. BTC")
+    quoteCurrency: str | None = Field(None, description="Quote currency e.g. USDT")
+    availableSince: str | None = Field(None, description="ISO datetime of first available data")
+    availableTo: str | None = Field(None, description="ISO datetime of last available data; None if still active")
+    expiry: str | None = Field(None, description="Expiry datetime as ISO string; None for perps")
+    strikePrice: float | None = Field(None, description="Strike price for options")
+    optionType: str | None = Field(None, description="call or put for options")
+
+
+class TardisExchangeDetail(BaseModel):
+    """Exchange detail from Tardis exchange endpoint.
+
+    Returned by GET https://api.tardis.dev/v1/exchanges/{exchange}.
+    Contains exchange metadata and the full instrument list.
+    """
+
+    id: str = Field(..., description="Exchange identifier e.g. binance-futures")
+    name: str = Field(..., description="Human-readable exchange name")
+    availableSince: str | None = Field(None, description="ISO datetime of earliest available data")
+    instruments: list[TardisInstrumentDetail] = Field(
+        default_factory=list, description="All instruments available on this exchange"
+    )
+
+
 class TardisTrade(BaseModel):
     """Trade record (CSV or JSON). Field names follow Tardis HTTP API / downloadable CSV."""
 
