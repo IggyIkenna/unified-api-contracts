@@ -348,21 +348,20 @@ except: pass
 done
 [[ -n "$FSIZES" ]] && { log_fail "Function/class/method size exceeded:$FSIZES"; ((V++)); } || log_success "Function/class/method size OK"
 
-# Security: pip-audit — check output for actual CVEs; ignore editable/not-on-PyPI exits
-# (Internal packages installed with -e . are not on PyPI; pip-audit may exit non-zero for them)
+# Security: pip-audit — check output for actual CVEs; ignore non-zero exits from
+# editable/not-on-PyPI packages. Capture exit code separately to avoid bare || true.
+_AUDIT_OUT=""; _AUDIT_EC=0
 if $PYTHON_CMD -c "import pip_audit" 2>/dev/null; then
-    _AUDIT_OUT=$($PYTHON_CMD -m pip_audit 2>&1) || true
+    _AUDIT_OUT=$($PYTHON_CMD -m pip_audit 2>&1); _AUDIT_EC=$? || :
 elif command -v pip-audit &>/dev/null; then
-    _AUDIT_OUT=$(pip-audit 2>&1) || true
+    _AUDIT_OUT=$(pip-audit 2>&1); _AUDIT_EC=$? || :
 else
-    log_fail "pip-audit required: uv pip install pip-audit"; ((V++)); _AUDIT_OUT=""
+    log_fail "pip-audit required: uv pip install pip-audit"; ((V++))
 fi
-if [[ -n "$_AUDIT_OUT" ]]; then
-    if echo "$_AUDIT_OUT" | grep -q "CVE-"; then
-        log_fail "pip-audit vulnerabilities"; echo "$_AUDIT_OUT" | grep "CVE-" | head -5; ((V++))
-    else
-        log_success "pip-audit clean"
-    fi
+if echo "$_AUDIT_OUT" | grep -q "CVE-"; then
+    log_fail "pip-audit vulnerabilities"; echo "$_AUDIT_OUT" | grep "CVE-" | head -5; ((V++))
+elif [[ -n "$_AUDIT_OUT" ]]; then
+    log_success "pip-audit clean"
 fi
 
 # Security: bandit
