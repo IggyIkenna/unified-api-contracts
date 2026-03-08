@@ -1,7 +1,22 @@
-"""Derivatives market data schemas: futures, options, funding rates, liquidations."""
+"""Derivatives market data schemas: futures, options, funding rates, liquidations.
+
+DEPRECATION NOTICE
+------------------
+``FundingRate`` and ``Liquidation`` @dataclasses in this module are **deprecated**.
+
+- ``FundingRate`` → use :class:`unified_api_contracts.unified_normalised_contracts.domain.CanonicalFundingRate`
+  (Pydantic BaseModel, normalized, produced by UAC normalizers).
+  Note: ``next_funding_time`` was renamed to ``next_funding_timestamp`` in the canonical schema.
+- ``Liquidation`` → use :class:`unified_api_contracts.unified_normalised_contracts.domain.CanonicalLiquidation`
+  (Pydantic BaseModel, normalized, produced by UAC liquidation normalizers).
+
+These raw @dataclasses are not produced by any normalizer and have divergent field names
+from the canonical layer. They will be removed in a future release.
+"""
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass, field
 from datetime import datetime
 from decimal import Decimal
@@ -12,6 +27,12 @@ from pydantic import BaseModel, Field
 
 @dataclass
 class FundingRate:
+    """DEPRECATED: Use CanonicalFundingRate from unified_normalised_contracts.domain instead.
+
+    This raw @dataclass has divergent field names (next_funding_time vs
+    next_funding_timestamp in canonical) and is not produced by any normalizer.
+    """
+
     venue: str
     symbol: str
     rate: Decimal
@@ -19,9 +40,21 @@ class FundingRate:
     next_funding_time: datetime | None = None
     predicted_rate: Decimal | None = None
 
+    def __post_init__(self) -> None:
+        _msg = (
+            "FundingRate @dataclass is deprecated. "
+            "Use CanonicalFundingRate from unified_normalised_contracts.domain instead."
+        )
+        warnings.warn(_msg, DeprecationWarning, stacklevel=2)
+
 
 @dataclass
 class Liquidation:
+    """DEPRECATED: Use CanonicalLiquidation from unified_normalised_contracts.domain instead.
+
+    This raw @dataclass has divergent field names and is not produced by any normalizer.
+    """
+
     venue: str
     symbol: str
     side: str  # "buy" | "sell"
@@ -29,6 +62,13 @@ class Liquidation:
     price: Decimal
     timestamp: datetime
     order_type: str = "market"
+
+    def __post_init__(self) -> None:
+        _msg = (
+            "Liquidation @dataclass is deprecated. "
+            "Use CanonicalLiquidation from unified_normalised_contracts.domain instead."
+        )
+        warnings.warn(_msg, DeprecationWarning, stacklevel=2)
 
 
 @dataclass

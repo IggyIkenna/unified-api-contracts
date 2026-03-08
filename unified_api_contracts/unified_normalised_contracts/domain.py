@@ -13,6 +13,17 @@ Identifier convention
 
 Never mix the two: market-data consumers use ``instrument_key``; execution adapters
 map venue-specific IDs via ``instrument_id`` defined in execution.py.
+
+Datetime convention
+-------------------
+All canonical ``timestamp`` fields use ``AwareDatetime`` (Pydantic type alias for
+``datetime`` with tzinfo required). Normalizers must always produce timezone-aware
+datetimes (``datetime.now(UTC)`` or ``datetime.fromtimestamp(..., tz=UTC)``).
+Naive datetimes are rejected at validation time, preventing naive/aware comparison
+bugs in downstream consumers.
+
+Fields that accept ``AwareDatetime | None`` follow the same rule: when present, the
+value must be timezone-aware.
 """
 
 from __future__ import annotations
@@ -71,15 +82,15 @@ class InstrumentWarehouseRow(BaseModel):
     venue: str
     instrument_type: InstrumentType
     symbol: str
-    available_from_datetime: datetime
-    timestamp: datetime
+    available_from_datetime: AwareDatetime
+    timestamp: AwareDatetime
 
     instruction_type: InstructionType | None = None
     venue_type: str | None = None
     data_provider: str | None = None
     asset_class: str | None = None
     data_types: list[str] | None = None
-    available_to_datetime: datetime | None = None
+    available_to_datetime: AwareDatetime | None = None
     base_asset: str | None = None
     quote_asset: str | None = None
     settle_asset: str | None = None
@@ -95,7 +106,7 @@ class InstrumentWarehouseRow(BaseModel):
     contract_size: float | None = None
     strike: float | None = None
     option_type: OptionType | None = None
-    expiry: datetime | None = None
+    expiry: AwareDatetime | None = None
     underlying: str | None = None
     max_position_size: float | None = None
     max_leverage: float | None = None
@@ -182,7 +193,7 @@ class CanonicalOrderBook(BaseModel):
 
     venue: str
     symbol: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     bids: list[tuple[Decimal, Decimal]] = Field(description="[(price, qty), ...]")
     asks: list[tuple[Decimal, Decimal]] = Field(description="[(price, qty), ...]")
     sequence_number: int | None = None
@@ -218,7 +229,7 @@ class CanonicalTicker(BaseModel):
 
     instrument_key: str
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     last_price: Decimal
     bid_price: Decimal | None = None
     ask_price: Decimal | None = None
@@ -234,7 +245,7 @@ class CanonicalLiquidation(BaseModel):
 
     instrument_key: str
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     side: str = Field(description="buy or sell")
     price: Decimal
     size: Decimal
@@ -257,7 +268,7 @@ class CanonicalLiquidationCluster(BaseModel):
 
     instrument_key: str
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     price_level: Decimal = Field(description="Reference price for this cluster")
     long_liq_usd: Decimal = Field(description="Estimated USD value of long liquidations at this level")
     short_liq_usd: Decimal = Field(description="Estimated USD value of short liquidations at this level")
@@ -272,14 +283,14 @@ class CanonicalDerivativeTicker(BaseModel):
 
     instrument_key: str
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     mark_price: Decimal | None = None
     index_price: Decimal | None = None
     last_price: Decimal | None = None
     funding_rate: Decimal | None = None
     predicted_funding_rate: Decimal | None = None
-    funding_timestamp: datetime | None = None
-    next_funding_timestamp: datetime | None = None
+    funding_timestamp: AwareDatetime | None = None
+    next_funding_timestamp: AwareDatetime | None = None
     open_interest: Decimal | None = None
     open_interest_value: Decimal | None = None
     borrow_long_rate: Decimal | None = None
@@ -311,7 +322,7 @@ class CanonicalPosition(BaseModel):
     unrealized_pnl: Decimal
     leverage: Decimal | None = None
     venue: str | None = None
-    timestamp: datetime | None = None
+    timestamp: AwareDatetime | None = None
     liquidation_price: Decimal | None = None
     raw: dict[str, object] | None = None
 
@@ -325,7 +336,7 @@ class CanonicalBalance(BaseModel):
     total: Decimal
     venue: str | None = None
     available: Decimal | None = None
-    timestamp: datetime | None = None
+    timestamp: AwareDatetime | None = None
     raw: dict[str, object] | None = None
 
 
@@ -335,7 +346,7 @@ class CanonicalAccountSnapshot(BaseModel):
     venue: str
     balances: list[CanonicalBalance] = []
     positions: list[CanonicalPosition] = []
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    timestamp: AwareDatetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class CanonicalSettlement(BaseModel):
@@ -345,7 +356,7 @@ class CanonicalSettlement(BaseModel):
     asset: str
     amount: Decimal
     settlement_type: str  # "daily_pnl", "funding", "delivery"
-    timestamp: datetime
+    timestamp: AwareDatetime
     raw: dict[str, object] | None = None
 
 
@@ -355,15 +366,15 @@ class CanonicalFundingRate(BaseModel):
     venue: str
     symbol: str
     rate: Decimal
-    timestamp: datetime
-    next_funding_timestamp: datetime | None = None
+    timestamp: AwareDatetime
+    next_funding_timestamp: AwareDatetime | None = None
     predicted_rate: Decimal | None = None
 
 
 class CanonicalOhlcvBar(BaseModel):
     """Normalised OHLCV bar — all venues."""
 
-    timestamp: datetime
+    timestamp: AwareDatetime
     venue: str
     symbol: str
     open: Decimal
@@ -379,13 +390,13 @@ class CanonicalOhlcvBar(BaseModel):
 class CanonicalOptionsChainEntry(BaseModel):
     """Normalised options chain entry — strike, greeks, bid/ask."""
 
-    timestamp: datetime
+    timestamp: AwareDatetime
     venue: str
     symbol: str
     underlying: str
     strike: Decimal
     option_type: str = Field(description="call or put")
-    expiration: datetime | None = None
+    expiration: AwareDatetime | None = None
     bid_price: Decimal | None = None
     ask_price: Decimal | None = None
     bid_size: Decimal | None = None
@@ -404,7 +415,7 @@ class CanonicalMarketInfo(BaseModel):
     instrument_key: str
     venue: str
     symbol: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     tick_size: float | None = None
     min_size: float | None = None
     contract_size: float | None = None
@@ -426,7 +437,7 @@ class CanonicalWsMessage(BaseModel):
     """Normalised WebSocket message — minimal envelope."""
 
     channel: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     venue: str
     payload: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
 
@@ -447,7 +458,7 @@ class CanonicalWebSocketLifecycle(BaseModel):
 
     venue: str
     event: WebSocketEvent
-    timestamp: datetime
+    timestamp: AwareDatetime
     channel: str | None = None
     reason: str | None = None
     code: int | None = None  # WS close code
@@ -471,7 +482,7 @@ class CanonicalFee(BaseModel):
     asset: str | None = Field(default=None, description="Asset symbol if different from currency")
     fee_type: FeeType = Field(default=FeeType.OTHER, description="maker, taker, or other")
     venue: str = Field(min_length=1)
-    timestamp: datetime | None = Field(default=None, description="Optional timestamp")
+    timestamp: AwareDatetime | None = Field(default=None, description="Optional timestamp")
     schema_version: str = "1.0"
 
 
@@ -481,9 +492,16 @@ class CanonicalFee(BaseModel):
 
 
 class ProcessedCandle(BaseModel):
-    """Output of market-data-processing-service (PROCESSED_CANDLE_SCHEMA)."""
+    """Output of market-data-processing-service (PROCESSED_CANDLE_SCHEMA).
 
-    timestamp: datetime
+    NOTE: This is a parquet storage schema (float prices, nanosecond-resolution
+    timestamps from the processing pipeline). ``timestamp`` and ``expiration``
+    use ``AwareDatetime`` so that timezone-naive values are rejected at the
+    serialisation boundary; the underlying precision and float pricing are
+    intentional for the storage layer.
+    """
+
+    timestamp: AwareDatetime
     venue: str
     symbol: str
     instrument_id: str = Field(description="VENUE:TYPE:SYMBOL-QUOTE")
@@ -498,7 +516,7 @@ class ProcessedCandle(BaseModel):
     market_state: MarketState | None = None
     is_halted: bool | None = None
     is_auction: bool | None = None
-    expiration: datetime | None = None
+    expiration: AwareDatetime | None = None
     strike: float | None = None
     option_type: OptionType | None = None
 
@@ -523,7 +541,7 @@ class CanonicalOdds(BaseModel):
     selection_id: str
     selection_name: str
     decimal_odds: Decimal  # Always stored as decimal
-    timestamp: datetime
+    timestamp: AwareDatetime
     is_back: bool = True  # True = back/buy, False = lay/sell
     available_size: Decimal | None = None
     runner_name: str | None = None
@@ -545,8 +563,8 @@ class CanonicalBetMarket(BaseModel):
     competition: str | None = None
     status: str | None = None  # open, suspended, closed, settled
     in_play: bool | None = None
-    timestamp: datetime
-    close_time: datetime | None = None
+    timestamp: AwareDatetime
+    close_time: AwareDatetime | None = None
     schema_version: str = "1.0"
 
 
@@ -561,9 +579,124 @@ class CanonicalBetOrder(BaseModel):
     price: Decimal  # decimal odds
     size: Decimal  # stake
     status: str  # unmatched, matched, cancelled, settled
-    timestamp: datetime
+    timestamp: AwareDatetime
     matched_size: Decimal | None = None
     remaining_size: Decimal | None = None
+    schema_version: str = "1.0"
+
+
+# ---------------------------------------------------------------------------
+# Bonds / Fixed income / Yield curve canonical schemas (phase5-bonds-fx)
+# ---------------------------------------------------------------------------
+
+
+class CanonicalYieldCurvePoint(BaseModel):
+    """One point on a yield curve: date + yield (or spread) in basis points or percent.
+
+    Sources: FRED (US Treasuries), ECB (EU OIS/ESTR), OFR (CDS spreads), OpenBB (bond YTM).
+    """
+
+    timestamp: AwareDatetime
+    venue: str = Field(description="Data provider: fred | ecb | ofr | openbb | ibkr")
+    series_id: str = Field(description="Series identifier e.g. DGS10 (FRED), OIS5Y (ECB)")
+    tenor: str | None = Field(default=None, description="Tenor label e.g. 1Y, 5Y, 10Y")
+    value: Decimal = Field(description="Yield / rate / spread (units per provider docs)")
+    currency: str | None = None
+    schema_version: str = "1.0"
+
+
+class CanonicalBondData(BaseModel):
+    """Normalized bond bid/ask/YTM data row.
+
+    Sources: OpenBB treasury prices, IBKR bond data.
+    """
+
+    timestamp: AwareDatetime
+    venue: str = Field(description="Data provider: openbb | ibkr")
+    symbol: str = Field(description="Bond symbol or ISIN")
+    name: str | None = None
+    bid: Decimal | None = None
+    ask: Decimal | None = None
+    last: Decimal | None = None
+    yield_to_maturity: Decimal | None = None
+    currency: str | None = None
+    schema_version: str = "1.0"
+
+
+class CanonicalCdsSpread(BaseModel):
+    """Normalized CDS spread index observation.
+
+    Sources: OFR (Office of Financial Research) CDS spread indices.
+    """
+
+    timestamp: AwareDatetime
+    venue: str = "ofr"
+    series_id: str
+    index_name: str | None = None
+    tenor: str | None = None
+    sector: str | None = None
+    spread_bps: Decimal = Field(description="CDS spread in basis points")
+    schema_version: str = "1.0"
+
+
+# ---------------------------------------------------------------------------
+# Alternative data canonical schemas (phase5-data-alt)
+# ---------------------------------------------------------------------------
+
+
+class CanonicalOnChainMetric(BaseModel):
+    """Normalized on-chain analytics data point.
+
+    Sources: Glassnode, Arkham, DeFiLlama.
+    metric_type: mvrv | sopr | nvt | hodl_wave | exchange_reserves | realized_cap |
+                 thermocap | entity_flow | protocol_tvl | stablecoin | yield_pool
+    """
+
+    timestamp: AwareDatetime
+    venue: str = Field(description="Data provider: glassnode | arkham | defillama")
+    metric_type: str = Field(description="Metric identifier e.g. mvrv, nvt, sopr, protocol_tvl")
+    asset: str | None = Field(default=None, description="Asset the metric applies to e.g. BTC")
+    value: Decimal | None = Field(default=None, description="Primary metric value")
+    secondary_value: Decimal | None = Field(default=None, description="Secondary value when metric has 2 fields")
+    entity: str | None = Field(default=None, description="Entity name for entity-level metrics")
+    chain: str | None = None
+    raw: dict[str, float | int | str | None] | None = Field(default=None, description="Original fields as-is")
+    schema_version: str = "1.0"
+
+
+class CanonicalOraclePriceFeed(BaseModel):
+    """Normalized oracle price feed tick (Pyth Network).
+
+    price = mantissa * 10^expo (Pyth fixed-point convention).
+    """
+
+    timestamp: AwareDatetime
+    venue: str = "pyth"
+    feed_id: str = Field(description="Pyth price feed ID (hex)")
+    price: Decimal = Field(description="Actual price after fixed-point conversion")
+    confidence: Decimal | None = Field(default=None, description="Confidence interval (same units as price)")
+    schema_version: str = "1.0"
+
+
+# ---------------------------------------------------------------------------
+# Market state canonical schema (phase6-market-state)
+# ---------------------------------------------------------------------------
+
+
+class CanonicalMarketStateEvent(BaseModel):
+    """Normalized market state transition event.
+
+    Covers trading halts, auction phases, pre/post market sessions,
+    and market open/close events from any venue.
+    """
+
+    timestamp: AwareDatetime
+    venue: str
+    instrument_key: str = Field(description="VENUE:TYPE:SYMBOL")
+    state: MarketState
+    previous_state: MarketState | None = None
+    reason: str | None = Field(default=None, description="Halt reason or auction trigger")
+    scheduled_reopen: AwareDatetime | None = None
     schema_version: str = "1.0"
 
 
@@ -572,16 +705,21 @@ __all__ = [
     "CanonicalBalance",
     "CanonicalBetMarket",
     "CanonicalBetOrder",
+    "CanonicalBondData",
+    "CanonicalCdsSpread",
     "CanonicalDerivativeTicker",
     "CanonicalFee",
     "CanonicalFundingRate",
     "CanonicalLiquidation",
     "CanonicalLiquidationCluster",
     "CanonicalMarketInfo",
+    "CanonicalMarketStateEvent",
     "CanonicalOdds",
     "CanonicalOhlcvBar",
+    "CanonicalOnChainMetric",
     # CanonicalOptionsChainEntry — UAC owns (produced by UAC normalizers in normalize/options.py)
     "CanonicalOptionsChainEntry",
+    "CanonicalOraclePriceFeed",
     # CanonicalOraclePrice — owned by UIC; not exported from UAC
     # CanonicalStakingRate — owned by UIC; not exported from UAC
     "CanonicalOrderBook",
@@ -591,6 +729,7 @@ __all__ = [
     "CanonicalTrade",
     "CanonicalWebSocketLifecycle",
     "CanonicalWsMessage",
+    "CanonicalYieldCurvePoint",
     "FeeType",
     "InstrumentType",
     # InstrumentWarehouseRow — renamed from InstrumentRecord to avoid collision with UIC's InstrumentRecord
