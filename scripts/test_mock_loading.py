@@ -122,17 +122,25 @@ def demonstrate_mock_usage():
 
 
 def show_testing_examples():
-    """Show examples of how to use mocks in unit tests."""
-    print("\n🧪 Unit Test Examples:\n")
+    """Show examples of how to use mocks in unit tests.
+
+    NOTE: Actual test implementations belong in instruments-service/tests/ (T3 service).
+    UAC (T0 leaf) must not reference instruments_service directly.
+    These examples show generic yfinance mock patterns only.
+    """
+    print("\n Unit Test Examples:\n")
 
     print("# Example: Mock yfinance dividends in unit test")
     print("""
 import unittest.mock
 import pandas as pd
-from instruments_service.corporate_actions.adapter import CorporateActionsAdapter
+
+# In instruments-service tests, import from the service package directly:
+# from <service_package>.corporate_actions.adapter import CorporateActionsAdapter
+# NOTE: instruments_service imports belong in instruments-service/tests/, not UAC.
 
 class TestCorporateActions:
-    @patch("instruments_service.corporate_actions.adapter.CorporateActionsAdapter.yf")
+    @patch("<service_package>.corporate_actions.adapter.CorporateActionsAdapter.yf")
     def test_fetch_aapl_dividends(self, mock_yf):
         # Load mock data
         mock_data = load_mock_data("dividends_aapl.yaml")
@@ -161,7 +169,7 @@ class TestCorporateActions:
 
     print("\n# Example: Test error handling with invalid symbol")
     print("""
-    @patch("instruments_service.corporate_actions.adapter.CorporateActionsAdapter.yf")
+    @patch("<service_package>.corporate_actions.adapter.CorporateActionsAdapter.yf")
     def test_invalid_symbol_handling(self, mock_yf):
         # Load error mock data
         error_mock = load_mock_data("error_invalid_symbol.yaml")
