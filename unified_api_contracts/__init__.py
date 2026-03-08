@@ -61,6 +61,17 @@ from .trading_schemas import (
     VALID_MODES,
     VALID_TIMEFRAMES,
 )
+from .unified_api_contracts_external.betfair import (
+    BetfairCurrentOrderSummary,
+    BetfairListCurrentOrdersResponse,
+)
+from .unified_api_contracts_external.ibkr import (
+    IBKRAccountValue,
+    IBKRPosition,
+)
+from .unified_api_contracts_external.polymarket import (
+    PolymarketPosition,
+)
 from .unified_api_contracts_external.sports import (
     BOOKMAKER_REGISTRY,
     ArbitrageMarket,
@@ -93,6 +104,12 @@ from .unified_api_contracts_external.sports import (
     ScraperError,
     SignalSource,
     SportsError,
+)
+from .unified_normalised_contracts.domain import (
+    CanonicalAccountSnapshot,
+    CanonicalBalance,
+    CanonicalPosition,
+    CanonicalSettlement,
 )
 from .unified_normalised_contracts.execution import (
     CanonicalFill,
@@ -168,11 +185,15 @@ __all__ = [
     "BetOrder",
     "BetRejectedError",
     "BetStatus",
+    "BetfairCurrentOrderSummary",
+    "BetfairListCurrentOrdersResponse",
     "BettingSignal",
     "BookmakerCategory",
     "BookmakerInfo",
     "BookmakerRegistry",
     "BookmakerUnavailableError",
+    "CanonicalAccountSnapshot",
+    "CanonicalBalance",
     "CanonicalBookmakerMarket",
     "CanonicalFill",
     "CanonicalFixture",
@@ -180,7 +201,9 @@ __all__ = [
     "CanonicalOdds",
     "CanonicalOrder",
     "CanonicalPlayer",
+    "CanonicalPosition",
     "CanonicalReferee",
+    "CanonicalSettlement",
     "CanonicalSpread",
     "CanonicalTeam",
     "CanonicalVenue",
@@ -198,6 +221,8 @@ __all__ = [
     "FixtureNotFoundError",
     "FundingRate",
     "HeartbeatMessage",
+    "IBKRAccountValue",
+    "IBKRPosition",
     "LendingRate",
     "LidoSubmitResponse",
     "LidoWstEthWrapResponse",
@@ -216,6 +241,7 @@ __all__ = [
     "OptionsChain",
     "OraclePrice",
     "OutcomeType",
+    "PolymarketPosition",
     "ScraperError",
     "SettlementPrice",
     "SignalSource",

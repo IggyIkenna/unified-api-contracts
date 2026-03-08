@@ -3,6 +3,7 @@
 from .schemas import (
     BetfairAuthRequest,
     BetfairAuthResponse,
+    BetfairCurrentOrderSummary,
     BetfairError,
     BetfairListCurrentOrdersResponse,
     BetfairMarketBook,
@@ -20,6 +21,7 @@ from .schemas import (
 __all__ = [
     "BetfairAuthRequest",
     "BetfairAuthResponse",
+    "BetfairCurrentOrderSummary",
     "BetfairError",
     "BetfairListCurrentOrdersResponse",
     "BetfairMarketBook",
