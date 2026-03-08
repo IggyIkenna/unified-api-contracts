@@ -1,7 +1,7 @@
 """The Odds API v4 source schemas — events, bookmakers, markets, outcomes.
 
 Includes both the original float-based convenience wrappers (OddsApiOutcome, etc.)
-and the new Decimal-based raw source models (ODOutcomeRaw, etc.) migrated from
+and the new Decimal-based raw source models (ODOutcomeRaw, etc.) originally in
 sports-betting-services-previous.
 """
 
@@ -84,7 +84,7 @@ class OddsApiEvent(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# New Decimal-based raw source models (migrated from sports-betting-services-previous)
+# New Decimal-based raw source models (originally in sports-betting-services-previous)
 # ---------------------------------------------------------------------------
 
 _RawDict = dict[str, str | int | float | bool | None]
@@ -158,7 +158,7 @@ class ODOddsRaw(BaseModel):
     """Source model for individual odds snapshots from The Odds API v4.
 
     Represents a single flattened odds measurement: one bookmaker, one market,
-    one outcome, at one point in time.  Migrated from the legacy ODOdds
+    one outcome, at one point in time.  Originally in the legacy ODOdds
     SQLAlchemy model in sports-betting-services-previous.
     """
 
@@ -184,7 +184,7 @@ class ODOddsRaw(BaseModel):
 class ODTeamsRaw(BaseModel):
     """Maps Odds API team names to internal IDs.
 
-    Migrated from the legacy ODTeams SQLAlchemy model in
+    Originally in the legacy ODTeams SQLAlchemy model in
     sports-betting-services-previous.
     """
 

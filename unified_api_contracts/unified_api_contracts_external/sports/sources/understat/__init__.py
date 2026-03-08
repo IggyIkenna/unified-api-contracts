@@ -18,7 +18,7 @@ from unified_api_contracts.unified_api_contracts_external.sports.sources.underst
 )
 
 __all__ = [
-    # Raw US* schemas (migrated from sports-betting-services-previous)
+    # Raw US* schemas (originally in sports-betting-services-previous)
     "USMatchRaw",
     "USMatchRosterRaw",
     "USMatchShotRaw",

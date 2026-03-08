@@ -261,7 +261,7 @@ __all__ = [
     "classify_venue_error",
 ]
 
-# Backward compat: alias venue subpackages to unified_api_contracts_external
+# Alias venue subpackages to unified_api_contracts_external
 import sys
 from types import ModuleType
 from typing import cast

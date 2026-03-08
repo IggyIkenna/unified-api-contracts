@@ -1,4 +1,4 @@
-"""The Graph subgraph API response schemas. Migrated from unified-market-interface adapters.
+"""The Graph subgraph API response schemas. Originally in unified-market-interface adapters.
 
 Full surface: pools, swaps, reserves, errors (Uniswap V2/V3/V4, Balancer, Curve, Aave, Morpho).
 """
@@ -242,7 +242,7 @@ class TheGraphWsNext(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Migrated from unified-market-interface adapters/defi/_defi_graph_models.py
+# Originally in unified-market-interface adapters/defi/_defi_graph_models.py
 # Covers: Uniswap V2/V3/V4, Balancer, Curve subgraph schemas.
 # ---------------------------------------------------------------------------
 
