@@ -395,7 +395,7 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
 
 # 7. BYPASS — ||true in quality gate scripts
 BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|:[[:space:]]*#\|zombies\|pyright\|cleanup\|log_fail\|log_success\|BYPASS=\$(" || :)
+    | grep -v "^#\|zombies\|pyright\|cleanup\|BYPASS\|log_fail\|log_success\|: *#" || :)
 [[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
