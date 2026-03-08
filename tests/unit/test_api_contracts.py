@@ -17,13 +17,10 @@ class TestAPIContractsCore:
 
     def test_schema_loading(self):
         """Test that schemas can be loaded successfully."""
-        # Test that schema files can be loaded
-        try:
-            from unified_api_contracts.okx import schemas as okx_schemas
+        pytest.importorskip("unified_api_contracts.okx")
+        from unified_api_contracts.okx import schemas as okx_schemas
 
-            assert hasattr(okx_schemas, "__file__")
-        except ImportError:
-            pytest.skip("OKX schemas not available")
+        assert hasattr(okx_schemas, "__file__")
 
     def test_schema_validation_structure(self):
         """Test that schemas have expected structure."""
@@ -36,14 +33,7 @@ class TestAPIContractsCore:
         venues = ["okx", "hyperliquid", "ccxt", "upbit", "thegraph"]
 
         for venue in venues:
-            try:
-                # Try to import venue schema
-                __import__(f"unified_api_contracts.{venue}.schemas")
-                # If import succeeds, schema is available
-                assert True
-            except ImportError:
-                # Venue schema not available, but that's okay for testing
-                pass
+            pytest.importorskip(f"unified_api_contracts.{venue}.schemas")
 
     def test_schema_file_existence(self):
         """Test that schema files exist."""
