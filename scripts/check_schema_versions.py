@@ -17,8 +17,11 @@ Usage:
 from __future__ import annotations
 
 import ast
+import logging
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _NORMALISED = _REPO_ROOT / "unified_api_contracts" / "unified_normalised_contracts"
@@ -89,7 +92,7 @@ def check_file(path: Path, all_constants: dict[str, str]) -> int:
         else:
             # Bad: hard-coded string or reference to unknown constant
             if not _QUIET:
-                print(
+                logger.info(
                     f"MISMATCH  {path.name}:{class_name} — schema_version default "
                     f"'{default}' does not reference a CANONICAL_*_VERSION constant"
                 )
@@ -98,13 +101,14 @@ def check_file(path: Path, all_constants: dict[str, str]) -> int:
 
 
 def main() -> int:
+    logging.basicConfig(level=logging.INFO)
     # Collect all constants from all scanned files first (cross-file reference support)
     all_constants: dict[str, str] = {}
     trees: dict[Path, ast.Module] = {}
     for p in _FILES:
         if not p.exists():
             if not _QUIET:
-                print(f"SKIP  {p} (not found)")
+                logger.info(f"SKIP  {p} (not found)")
             continue
         source = p.read_text(encoding="utf-8")
         tree = ast.parse(source, filename=str(p))
@@ -117,10 +121,10 @@ def main() -> int:
         for class_name, default in defaults.items():
             if default in all_constants:
                 if not _QUIET:
-                    print(f"OK        {p.name}:{class_name} → {default} = {all_constants[default]!r}")
+                    logger.info(f"OK        {p.name}:{class_name} → {default} = {all_constants[default]!r}")
             else:
                 if not _QUIET:
-                    print(
+                    logger.info(
                         f"MISMATCH  {p.name}:{class_name} — schema_version default "
                         f"'{default}' does not reference a CANONICAL_*_VERSION constant"
                     )
@@ -128,9 +132,9 @@ def main() -> int:
 
     if not _QUIET:
         status = "PASS" if total_mismatches == 0 else "FAIL"
-        print(f"\n{status}: {total_mismatches} mismatch(es) found")
+        logger.info(f"\n{status}: {total_mismatches} mismatch(es) found")
     else:
-        print(total_mismatches)
+        logger.info(total_mismatches)
     return total_mismatches
 
 

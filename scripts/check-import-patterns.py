@@ -13,9 +13,12 @@ Usage:
 """
 
 import argparse
+import logging
 import re
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # External packages that should only use top-level imports
 EXTERNAL_PACKAGES = {
@@ -94,7 +97,7 @@ class ImportChecker:
 
         except Exception as e:
             if self.verbose:
-                print(f"Error checking {file_path}: {e}")
+                logger.info(f"Error checking {file_path}: {e}")
 
         return violations
 
@@ -131,7 +134,7 @@ class ImportChecker:
             return True
 
         except Exception as e:
-            print(f"Error fixing {file_path}: {e}")
+            logger.info(f"Error fixing {file_path}: {e}")
             return False
 
     def fix_violations(self) -> int:
@@ -150,39 +153,39 @@ class ImportChecker:
         for file_path, file_violations in violations_by_file.items():
             if self.fix_file(file_path, file_violations):
                 fixed_count += len(file_violations)
-                print(f"Fixed {len(file_violations)} violations in {file_path}")
+                logger.info(f"Fixed {len(file_violations)} violations in {file_path}")
 
         return fixed_count
 
     def print_summary(self) -> None:
         """Print summary of findings."""
-        print("\n" + "=" * 60)
-        print("Import Pattern Check Summary")
-        print("=" * 60)
-        print(f"Files checked: {self.files_checked}")
-        print(f"Files with violations: {len(self.files_with_violations)}")
-        print(f"Total violations: {len(self.violations)}")
+        logger.info("\n" + "=" * 60)
+        logger.info("Import Pattern Check Summary")
+        logger.info("=" * 60)
+        logger.info(f"Files checked: {self.files_checked}")
+        logger.info(f"Files with violations: {len(self.files_with_violations)}")
+        logger.info(f"Total violations: {len(self.violations)}")
 
         if self.violations:
-            print("\nViolations by package:")
+            logger.info("\nViolations by package:")
             package_counts = {}
             for v in self.violations:
                 package_counts[v.package] = package_counts.get(v.package, 0) + 1
             for package, count in sorted(package_counts.items()):
-                print(f"  {package}: {count}")
+                logger.info(f"  {package}: {count}")
 
     def print_violations(self) -> None:
         """Print detailed violation information."""
         if not self.violations:
             return
 
-        print("\nDetailed Violations:")
-        print("-" * 60)
+        logger.info("\nDetailed Violations:")
+        logger.info("-" * 60)
 
         for violation in self.violations:
-            print(f"\n{violation}")
-            print(f"  Original: {violation.original}")
-            print(f"  Fixed:    {violation.get_fixed_import()}")
+            logger.info(f"\n{violation}")
+            logger.info(f"  Original: {violation.original}")
+            logger.info(f"  Fixed:    {violation.get_fixed_import()}")
 
 
 def main():
@@ -210,17 +213,17 @@ def main():
         elif path_obj.is_dir():
             checker.check_directory(path_obj)
         else:
-            print(f"Warning: {path} is not a valid file or directory")
+            logger.info(f"Warning: {path} is not a valid file or directory")
 
     # Handle output based on mode
     if args.fix:
         if checker.violations:
             fixed_count = checker.fix_violations()
-            print(f"\n✅ Fixed {fixed_count} import violations")
+            logger.info(f"\n✅ Fixed {fixed_count} import violations")
             sys.exit(0)
         else:
             if not args.quiet:
-                print("✅ No import pattern violations found")
+                logger.info("✅ No import pattern violations found")
             sys.exit(0)
     else:
         if args.verbose:
@@ -230,12 +233,12 @@ def main():
             checker.print_summary()
 
         if checker.violations:
-            print("\n❌ Import pattern violations detected!")
-            print("To fix automatically, run: python check-import-patterns.py --fix")
+            logger.info("\n❌ Import pattern violations detected!")
+            logger.info("To fix automatically, run: python check-import-patterns.py --fix")
             sys.exit(1)
         else:
             if not args.quiet:
-                print("\n✅ No import pattern violations found")
+                logger.info("\n✅ No import pattern violations found")
             sys.exit(0)
 
 

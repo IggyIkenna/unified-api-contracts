@@ -20,8 +20,11 @@ If the JSON report is not provided or not found, the SVG is regenerated from YAM
 from __future__ import annotations
 
 import json
+import logging
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
@@ -82,6 +85,7 @@ def _extract_provider_results(report_path: Path) -> dict[str, str]:
 
 def main() -> int:
 
+    logging.basicConfig(level=logging.INFO)
     from generate_schema_version_matrix import (
         ProviderHealth,
         load_providers,
@@ -94,9 +98,9 @@ def main() -> int:
         report_path = Path(sys.argv[1])
         if report_path.exists():
             test_results = _extract_provider_results(report_path)
-            print(f"Loaded test results from {report_path}: {len(test_results)} providers")
+            logger.info(f"Loaded test results from {report_path}: {len(test_results)} providers")
         else:
-            print(f"WARN: report file {report_path} not found — using YAML status only")
+            logger.info(f"WARN: report file {report_path} not found — using YAML status only")
 
     providers = load_providers()
 
@@ -114,12 +118,12 @@ def main() -> int:
     red = [p for p in updated if p.computed_status == "red"]
     yellow = [p for p in updated if p.computed_status == "yellow"]
     green = [p for p in updated if p.computed_status == "green"]
-    print(f"SVG updated: {len(green)} green, {len(yellow)} yellow, {len(red)} red")
+    logger.info(f"SVG updated: {len(green)} green, {len(yellow)} yellow, {len(red)} red")
 
     if red:
-        print("RED providers:")
+        logger.info("RED providers:")
         for p in red:
-            print(f"  {p.name}")
+            logger.info(f"  {p.name}")
 
     return 0
 

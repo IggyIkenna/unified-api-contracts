@@ -8,10 +8,13 @@ Safe to re-run: skips any file that already contains __api_version__.
 
 from __future__ import annotations
 
+import logging
 import sys
 from pathlib import Path
 
 import yaml
+
+logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 YAML_PATH = REPO_ROOT / "unified_api_contracts" / "provider_api_versions.yaml"
@@ -74,6 +77,7 @@ def _add_version(file_path: Path, api_version: str) -> bool:
 
 
 def main() -> int:
+    logging.basicConfig(level=logging.INFO)
     with YAML_PATH.open() as fh:
         manifest = yaml.safe_load(fh)
 
@@ -97,20 +101,20 @@ def main() -> int:
         ]
 
         if not py_files:
-            print(f"  WARN: no schema .py files in {provider_name}/")
+            logger.info(f"  WARN: no schema .py files in {provider_name}/")
             continue
 
         for py_file in py_files:
             changed = _add_version(py_file, api_version)
             if changed:
                 modified += 1
-                print(f"  + {provider_name}/{py_file.name}  __api_version__ = {api_version!r}")
+                logger.info(f"  + {provider_name}/{py_file.name}  __api_version__ = {api_version!r}")
             else:
                 skipped += 1
 
-    print(f"\nDone: {modified} files modified, {skipped} already had __api_version__.")
+    logger.info(f"\nDone: {modified} files modified, {skipped} already had __api_version__.")
     if missing:
-        print(f"WARN: {len(missing)} provider(s) in YAML but no directory: {missing}")
+        logger.info(f"WARN: {len(missing)} provider(s) in YAML but no directory: {missing}")
     return 0
 
 
