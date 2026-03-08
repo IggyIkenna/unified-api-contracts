@@ -384,6 +384,55 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         ),
         available_from_date="2023-07-01",
     ),
+    # --- Betfair ---
+    EndpointSpec(
+        venue="betfair",
+        endpoint_path="https://identitysso.betfair.com/api/login",
+        http_method="POST",
+        schema_class="BetfairAuthResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes=(
+            "Interactive session login. Requires X-Application (app key from Secret Manager: "
+            "betfair-api-credentials) + form-encoded username/password. "
+            "Returns session token valid for ~8h. "
+            "Cert login endpoint: https://identitysso-cert.betfair.com/api/certlogin"
+        ),
+        requires_auth=True,
+    ),
+    EndpointSpec(
+        venue="betfair",
+        endpoint_path="https://api.betfair.com/exchange/betting/json-rpc/v1",
+        http_method="POST",
+        schema_class="BetfairMarketCatalogue",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v1",
+        notes=(
+            "JSON-RPC endpoint for listMarketCatalogue / listMarketBook. "
+            "Auth: X-Application (app key) + X-Authentication (session token). "
+            "Secret Manager key: betfair-api-credentials (JSON: {app_key, username, password}). "
+            "Status: KEY_NOT_IN_SM — must provision before cassette can be recorded."
+        ),
+        requires_auth=True,
+    ),
+    # --- Pinnacle ---
+    EndpointSpec(
+        venue="pinnacle",
+        endpoint_path="https://api.pinnacle.com/v1/odds",
+        http_method="GET",
+        schema_class="PinnacleOddsResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes=(
+            "Basic auth (username:password base64) via Authorization header. "
+            "Secret Manager key: pinnacle-api-credentials (JSON: {username, password}). "
+            "Status: KEY_NOT_IN_SM — must provision before cassette can be recorded."
+        ),
+        requires_auth=True,
+    ),
     # --- IBKR ---
     EndpointSpec(
         venue="ibkr",
