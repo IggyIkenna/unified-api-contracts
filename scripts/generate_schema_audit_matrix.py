@@ -21,8 +21,11 @@ from __future__ import annotations
 
 import argparse
 import ast
+import logging
 import sys
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Helpers — AST-based scanners (no exec/eval)
@@ -374,6 +377,7 @@ def build_summary_matrix(
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO)
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--output",
@@ -390,7 +394,7 @@ def main() -> None:
     if args.count_red:
         # Red-provider count is tracked by VCR cassette tests (tests/vcr/test_schema_health.py).
         # This matrix script performs static analysis only; no live failures to count.
-        print(0)
+        logger.info(0)
         return
 
     repo_root = Path(__file__).resolve().parents[1]
@@ -399,17 +403,17 @@ def main() -> None:
 
     providers = get_providers(ext_root)
     if not providers:
-        print(f"No provider directories found under {ext_root}", file=sys.stderr)
+        logger.error(f"No provider directories found under {ext_root}")
         sys.exit(1)
 
-    print(f"Found {len(providers)} providers.", file=sys.stderr)
+    logger.error(f"Found {len(providers)} providers.")
 
     provider_schemas: dict[str, dict[str, list[str]]] = {}
     for p in providers:
         provider_schemas[p] = get_provider_schemas(ext_root / p)
 
     normalizers = get_normalizer_coverage(norm_dir)
-    print(f"Found normalizers for providers: {sorted(normalizers.keys())}", file=sys.stderr)
+    logger.info(f"Found normalizers for providers: {sorted(normalizers.keys())}", file=sys.stderr)
 
     # Count gaps
     gap_count = 0
@@ -446,7 +450,7 @@ def main() -> None:
     out_path = repo_root / args.output
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(out, encoding="utf-8")
-    print(f"Wrote {out_path}")
+    logger.info(f"Wrote {out_path}")
     sys.exit(0)
 
 

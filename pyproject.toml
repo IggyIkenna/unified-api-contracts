@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unified-api-contracts"
-version = "0.1.112"
+version = "0.1.124"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading library"
 requires-python = ">=3.13,<3.14"
 authors = [{ name = "Ikenna Igboaka" }]
@@ -80,7 +80,8 @@ target-version = "py313"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "G"]
-ignore = []  # E501 enforced (line-length 120)
+ignore = ["G003", "G004"]  # E501; G004: f-strings in logger (print->logger migration)
+# G004: allow f-strings in logger (print->logger migration) enforced (line-length 120)
 # N815/N803: camelCase/PascalCase required for API contracts mirroring external APIs (Binance, boto3, GCP SDK)
 
 [tool.ruff.lint.mccabe]

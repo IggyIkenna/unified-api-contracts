@@ -234,6 +234,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    logging.basicConfig(level=logging.INFO)
     args = _parse_args()
     root = _repo_root()
     api_deps = _parse_schema_validation_deps(root)
@@ -243,16 +244,16 @@ def main() -> int:
     if args.interface_path is not None:
         iface_path = Path(args.interface_path).resolve()
         if not iface_path.exists():
-            print(f"ERROR: interface path does not exist: {iface_path}", file=sys.stderr)
+            logger.error(f"ERROR: interface path does not exist: {iface_path}")
             return 1
         if not iface_path.is_dir():
-            print(
+            logger.info(
                 f"ERROR: --interface-path must be a directory: {iface_path}",
                 file=sys.stderr,
             )
             return 1
         if not (iface_path / "pyproject.toml").exists():
-            print(
+            logger.info(
                 f"ERROR: no pyproject.toml at {iface_path}",
                 file=sys.stderr,
             )
@@ -303,9 +304,9 @@ def main() -> int:
 
     if errors:
         for e in errors:
-            print(f"ERROR: {e}", file=sys.stderr)
+            logger.error(f"ERROR: {e}")
         return 1
-    print("SDK version alignment OK")
+    logger.info("SDK version alignment OK")
     return 0
 
 

@@ -5,10 +5,13 @@ Test script to load and demonstrate Yahoo Finance mock data usage.
 This script shows how to load and use the mock data files in tests.
 """
 
+import logging
 from pathlib import Path
 
 import pandas as pd
 import yaml
+
+logger = logging.getLogger(__name__)
 
 # Path to mock files
 MOCKS_DIR = Path(__file__).parent.parent / "unified_api_contracts" / "yahoo_finance" / "mocks"
@@ -61,64 +64,64 @@ def simulate_yfinance_earnings(mock_data: dict[str, object]) -> pd.DataFrame:
 
 def demonstrate_mock_usage():
     """Demonstrate how to use mock data in tests."""
-    print("🧪 Yahoo Finance Mock Data Demonstration\n")
+    logger.info("🧪 Yahoo Finance Mock Data Demonstration\n")
 
     # 1. Load AAPL dividends mock
-    print("1. Loading AAPL Dividends Mock:")
+    logger.info("1. Loading AAPL Dividends Mock:")
     aapl_mock = load_mock_data("dividends_aapl.yaml")
-    print(f"   Ticker: {aapl_mock['metadata']['ticker']}")
-    print(f"   Total Records: {aapl_mock['metadata']['total_records']}")
+    logger.info(f"   Ticker: {aapl_mock['metadata']['ticker']}")
+    logger.info(f"   Total Records: {aapl_mock['metadata']['total_records']}")
 
     # Simulate yfinance dividends Series
     dividends_series = simulate_yfinance_dividends(aapl_mock)
-    print(f"   Dividends Series Shape: {dividends_series.shape}")
-    print(f"   Sample dividend: {dividends_series.iloc[0]} on {dividends_series.index[0].date()}")
+    logger.info(f"   Dividends Series Shape: {dividends_series.shape}")
+    logger.info(f"   Sample dividend: {dividends_series.iloc[0]} on {dividends_series.index[0].date()}")
 
     # 2. Load TSLA splits mock
-    print("\n2. Loading TSLA Splits Mock:")
+    logger.info("\n2. Loading TSLA Splits Mock:")
     tsla_mock = load_mock_data("splits_tsla.yaml")
-    print(f"   Ticker: {tsla_mock['metadata']['ticker']}")
-    print(f"   Total Records: {tsla_mock['metadata']['total_records']}")
+    logger.info(f"   Ticker: {tsla_mock['metadata']['ticker']}")
+    logger.info(f"   Total Records: {tsla_mock['metadata']['total_records']}")
 
     # Simulate yfinance splits Series
     splits_series = simulate_yfinance_splits(tsla_mock)
-    print(f"   Splits Series Shape: {splits_series.shape}")
+    logger.info(f"   Splits Series Shape: {splits_series.shape}")
     for i, (date, ratio) in enumerate(splits_series.items()):
-        print(f"   Split {i + 1}: {ratio}:1 on {date.date()}")
+        logger.info(f"   Split {i + 1}: {ratio}:1 on {date.date()}")
 
     # 3. Load MSFT earnings mock
-    print("\n3. Loading MSFT Earnings Mock:")
+    logger.info("\n3. Loading MSFT Earnings Mock:")
     msft_mock = load_mock_data("earnings_msft.yaml")
-    print(f"   Ticker: {msft_mock['metadata']['ticker']}")
-    print(f"   Total Records: {msft_mock['metadata']['total_records']}")
+    logger.info(f"   Ticker: {msft_mock['metadata']['ticker']}")
+    logger.info(f"   Total Records: {msft_mock['metadata']['total_records']}")
 
     # Simulate yfinance earnings DataFrame
     earnings_df = simulate_yfinance_earnings(msft_mock)
-    print(f"   Earnings DataFrame Shape: {earnings_df.shape}")
-    print(f"   Columns: {list(earnings_df.columns)}")
+    logger.info(f"   Earnings DataFrame Shape: {earnings_df.shape}")
+    logger.info(f"   Columns: {list(earnings_df.columns)}")
 
     # Show recent earnings
     latest_earnings = earnings_df.iloc[-1]
     latest_date = earnings_df.index[-1].date()
-    print(f"   Latest earnings ({latest_date}):")
-    print(f"     Reported EPS: ${latest_earnings['Reported EPS']}")
-    print(f"     Estimated EPS: ${latest_earnings['EPS Estimate']}")
-    print(f"     Surprise: {latest_earnings['Surprise(%)']}%")
+    logger.info(f"   Latest earnings ({latest_date}):")
+    logger.info(f"     Reported EPS: ${latest_earnings['Reported EPS']}")
+    logger.info(f"     Estimated EPS: ${latest_earnings['EPS Estimate']}")
+    logger.info(f"     Surprise: {latest_earnings['Surprise(%)']}%")
 
     # 4. Load error mocks
-    print("\n4. Loading Error Mocks:")
+    logger.info("\n4. Loading Error Mocks:")
 
     # Invalid symbol errors
     invalid_mock = load_mock_data("error_invalid_symbol.yaml")
-    print(f"   Invalid Symbol Errors: {invalid_mock['metadata']['error_category']}")
-    print(f"   Example exception: {invalid_mock['yfinance_exceptions']['no_data_exception']['exception_type']}")
+    logger.info(f"   Invalid Symbol Errors: {invalid_mock['metadata']['error_category']}")
+    logger.info(f"   Example exception: {invalid_mock['yfinance_exceptions']['no_data_exception']['exception_type']}")
 
     # Rate limit errors
     rate_limit_mock = load_mock_data("error_rate_limit.yaml")
-    print(f"   Rate Limit Errors: {rate_limit_mock['metadata']['error_category']}")
-    print(f"   HTTP 429 status: {rate_limit_mock['http_429_responses']['standard_rate_limit']['status_code']}")
+    logger.info(f"   Rate Limit Errors: {rate_limit_mock['metadata']['error_category']}")
+    logger.info(f"   HTTP 429 status: {rate_limit_mock['http_429_responses']['standard_rate_limit']['status_code']}")
     retry = rate_limit_mock["http_429_responses"]["standard_rate_limit"]["headers"]["Retry-After"]
-    print(f"   Retry after: {retry} seconds")
+    logger.info(f"   Retry after: {retry} seconds")
 
 
 def show_testing_examples():
@@ -128,12 +131,14 @@ def show_testing_examples():
     UAC (T0 leaf) must not reference instruments_service directly.
     These examples show generic yfinance mock patterns only.
     """
-    print("\n Unit Test Examples:\n")
+    logger.info("\n Unit Test Examples:\n")
 
-    print("# Example: Mock yfinance dividends in unit test")
-    print("""
+    logger.info("# Example: Mock yfinance dividends in unit test")
+    logger.info("""
 import unittest.mock
 import pandas as pd
+import logging
+logger = logging.getLogger(__name__)
 
 # In instruments-service tests, import from the service package directly:
 # from <service_package>.corporate_actions.adapter import CorporateActionsAdapter
@@ -167,8 +172,8 @@ class TestCorporateActions:
         assert all(d.amount > 0 for d in dividends)
     """)
 
-    print("\n# Example: Test error handling with invalid symbol")
-    print("""
+    logger.info("\n# Example: Test error handling with invalid symbol")
+    logger.info("""
     @patch("<service_package>.corporate_actions.adapter.CorporateActionsAdapter.yf")
     def test_invalid_symbol_handling(self, mock_yf):
         # Load error mock data
@@ -192,54 +197,55 @@ class TestCorporateActions:
 
 def validate_mock_compatibility():
     """Validate mocks are compatible with instruments-service models."""
-    print("\n🔍 Model Compatibility Check:\n")
+    logger.info("\n🔍 Model Compatibility Check:\n")
 
     # Check dividend record compatibility
     aapl_mock = load_mock_data("dividends_aapl.yaml")
     dividend_records = aapl_mock["dividend_records"]
 
-    print("✓ Dividend records have all required fields:")
+    logger.info("✓ Dividend records have all required fields:")
     required_fields = ["ticker", "ex_date", "amount", "dividend_type", "currency", "source"]
     sample_record = dividend_records[0]
     for field in required_fields:
         present = field in sample_record
-        print(f"   {field}: {'✓' if present else '✗'}")
+        logger.info(f"   {field}: {'✓' if present else '✗'}")
 
     # Check split record compatibility
     tsla_mock = load_mock_data("splits_tsla.yaml")
     split_records = tsla_mock["split_records"]
 
-    print("\n✓ Split records have all required fields:")
+    logger.info("\n✓ Split records have all required fields:")
     required_fields = ["ticker", "effective_date", "ratio", "split_from", "split_to", "source"]
     sample_record = split_records[0]
     for field in required_fields:
         present = field in sample_record
-        print(f"   {field}: {'✓' if present else '✗'}")
+        logger.info(f"   {field}: {'✓' if present else '✗'}")
 
     # Check earnings record compatibility
     msft_mock = load_mock_data("earnings_msft.yaml")
     earnings_records = msft_mock["earnings_records"]
 
-    print("\n✓ Earnings records have all required fields:")
+    logger.info("\n✓ Earnings records have all required fields:")
     required_fields = ["ticker", "earnings_date", "source"]
     optional_fields = ["reported_eps", "estimated_eps", "surprise_pct", "revenue"]
     sample_record = earnings_records[0]
 
     for field in required_fields:
         present = field in sample_record
-        print(f"   {field} (required): {'✓' if present else '✗'}")
+        logger.info(f"   {field} (required): {'✓' if present else '✗'}")
 
     for field in optional_fields:
         present = field in sample_record
-        print(f"   {field} (optional): {'✓' if present else '○'}")
+        logger.info(f"   {field} (optional): {'✓' if present else '○'}")
 
 
 if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
     demonstrate_mock_usage()
     show_testing_examples()
     validate_mock_compatibility()
 
-    print("\n🎉 Mock data validation complete!")
-    print("\nFiles created:")
+    logger.info("\n🎉 Mock data validation complete!")
+    logger.info("\nFiles created:")
     for mock_file in MOCKS_DIR.glob("*.yaml"):
-        print(f"   • {mock_file}")
+        logger.info(f"   • {mock_file}")
