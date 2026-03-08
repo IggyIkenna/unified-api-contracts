@@ -181,7 +181,7 @@ class TestCanonicalFixtureStatsDetailFrozen:
 
 
 # ---------------------------------------------------------------------------
-# CanonicalFixture — backward compatibility with new fields
+# CanonicalFixture — optional fields for schema evolution
 # ---------------------------------------------------------------------------
 
 
