@@ -102,7 +102,7 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
     "barchart": ["VIX"],
 }
 
-# --- VENUE_TO_DATA_SOURCE (migrated from unified-trading-library) ---
+# --- VENUE_TO_DATA_SOURCE (originally in unified-trading-library) ---
 VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "BINANCE-SPOT": "tardis",
     "BINANCE-FUTURES": "tardis",
@@ -412,7 +412,7 @@ def get_required_secrets(venues: list[str]) -> dict[str, str]:
 class DataSourceMapping:
     """Maps venues to their upstream data sources. Re-exports from canonical_mappings.
 
-    Migrated from unified-trading-library. All consumers import from api-contracts.
+    Originally in unified-trading-library. All consumers import from api-contracts.
     """
 
     VENUE_TO_DATA_SOURCE = VENUE_TO_DATA_SOURCE

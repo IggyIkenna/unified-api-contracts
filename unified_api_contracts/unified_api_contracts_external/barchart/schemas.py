@@ -1,4 +1,4 @@
-"""Pydantic schemas for Barchart data. Migrated from BARCHART_OHLCV_15M_SCHEMA (market-tick-data-handler).
+"""Pydantic schemas for Barchart data. Originally in BARCHART_OHLCV_15M_SCHEMA (market-tick-data-handler).
 
 Source: Manual CSV dumps from Barchart subscription. Used for VIX index (CBOE) historical 15-minute data.
 Example path: market-tick-data-handler/data/vix/vix_intraday-15min_historical-data-*.csv

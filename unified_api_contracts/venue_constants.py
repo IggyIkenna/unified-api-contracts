@@ -38,7 +38,7 @@ CLOB_VENUES: set[str] = {
     "DERIBIT",
     "HYPERLIQUID",
     "ASTER",
-    # Backward compat: bare names still accepted for lookup
+    # Bare names still accepted for lookup (legacy callers)
     "OKX",
     "BYBIT",
     # TradFi

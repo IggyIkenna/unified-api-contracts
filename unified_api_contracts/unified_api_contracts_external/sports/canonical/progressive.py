@@ -1,6 +1,6 @@
 """Canonical progressive match schemas — 30-second interval time-series snapshots.
 
-Migrated from SFMatchProgressiveStats / SFMatchProgressiveOdds in
+Originally in SFMatchProgressiveStats / SFMatchProgressiveOdds in
 sports-betting-services-previous.  These capture live match state at every
 30-second tick: team-level stats (possession, attacks, shots, cards, etc.)
 and market odds (1X2, Asian handicap, over/under, first-half markets).

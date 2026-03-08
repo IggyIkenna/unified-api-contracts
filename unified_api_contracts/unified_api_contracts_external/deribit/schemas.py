@@ -536,7 +536,7 @@ class DeribitLiquidationOrder(BaseModel):
     timestamp: int | None = None
 
 
-# === Migrated from unified-market-interface adapters ===
+# === Originally in unified-market-interface adapters ===
 
 
 class DeribitJsonRpcResponse(BaseModel, frozen=True):

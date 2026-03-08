@@ -1,6 +1,6 @@
 """Understat source schemas — xG data, shots, player seasons, team history.
 
-Includes both normalised Understat* models and raw US*Raw models migrated from
+Includes both normalised Understat* models and raw US*Raw models originally in
 sports-betting-services-previous USTeam/USMatch/USPlayer/etc.
 """
 
@@ -145,7 +145,7 @@ class UnderstatMatch(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Raw US* schemas — migrated from sports-betting-services-previous
+# Raw US* schemas — originally in sports-betting-services-previous
 # ---------------------------------------------------------------------------
 
 
