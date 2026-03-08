@@ -114,6 +114,7 @@ from .unified_normalised_contracts.domain import (
 from .unified_normalised_contracts.execution import (
     CanonicalFill,
     CanonicalOrder,
+    OrderStatus,
 )
 from .unified_normalised_contracts.options import (
     NormalizedStrikeCoordinate,
@@ -240,6 +241,7 @@ __all__ = [
     "OptionGreeks",
     "OptionsChain",
     "OraclePrice",
+    "OrderStatus",
     "OutcomeType",
     "PolymarketPosition",
     "ScraperError",
