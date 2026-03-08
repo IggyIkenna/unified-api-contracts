@@ -17,11 +17,10 @@ Identifier convention
 
 from __future__ import annotations
 
-from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field
 
 
 class OrderSide(StrEnum):
@@ -104,7 +103,7 @@ CANONICAL_EXECUTION_RESULT_VERSION = "1.0.0"
 class CanonicalOrder(BaseModel):
     order_id: str
     client_order_id: str | None = None
-    timestamp: datetime
+    timestamp: AwareDatetime
     venue: str
     instrument_id: str
     side: OrderSide
@@ -131,7 +130,7 @@ class CanonicalFill(BaseModel):
 
     fill_id: str
     order_id: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     venue: str
     instrument_id: str
     side: OrderSide
@@ -158,7 +157,7 @@ class ExecutionInstruction(BaseModel):
 
     instruction_id: str
     operation: OperationType
-    timestamp: datetime
+    timestamp: AwareDatetime
     from_venue: str | None = None
     to_venue: str | None = None
     instrument_id: str | None = None
@@ -176,7 +175,7 @@ class ExecutionInstruction(BaseModel):
     take_profit_price: Decimal | None = None
     gas_limit: int | None = None
     priority_fee_gwei: float | None = None
-    deadline_timestamp: datetime | None = None
+    deadline_timestamp: AwareDatetime | None = None
     metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
     schema_version: str = CANONICAL_EXECUTION_INSTRUCTION_VERSION
 
@@ -187,8 +186,8 @@ class ExecutionResult(BaseModel):
     instruction_id: str
     operation: OperationType
     status: ExecutionStatus
-    timestamp_submitted: datetime
-    timestamp_completed: datetime | None = None
+    timestamp_submitted: AwareDatetime
+    timestamp_completed: AwareDatetime | None = None
     actual_execution_price: Decimal | None = None
     benchmark_price: Decimal | None = None
     amount_executed: Decimal | None = None
@@ -214,7 +213,7 @@ class CanonicalMarginState(BaseModel):
 
     account_id: str
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     margin_level: Decimal
     total_collateral: Decimal
     total_debt: Decimal
@@ -229,7 +228,7 @@ class CanonicalAccountState(BaseModel):
     The forward-reference strings are resolved by model_rebuild() at module end.
     """
 
-    timestamp: datetime
+    timestamp: AwareDatetime
     venue: str
     account_id: str
     # Forward references resolved via model_rebuild() below
@@ -247,7 +246,7 @@ class CanonicalOrderRejection(BaseModel):
     reason: str
     error_code: str
     retry_safe: bool
-    timestamp: datetime
+    timestamp: AwareDatetime
 
 
 class CanonicalOrderAmendment(BaseModel):
@@ -260,7 +259,7 @@ class CanonicalOrderAmendment(BaseModel):
     new_quantity: Decimal
     original_price: Decimal | None
     new_price: Decimal | None
-    timestamp: datetime
+    timestamp: AwareDatetime
     amendment_id: str = ""
 
 
