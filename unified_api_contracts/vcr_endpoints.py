@@ -13,6 +13,8 @@ from __future__ import annotations
 from typing import NotRequired, TypedDict
 
 
+# orphan: kept because it is used internally to type VCR_ENDPOINTS and the _get/_post helpers
+# in this module; downstream consumers import VCR_ENDPOINTS (the constant) not VCREndpoint
 class VCREndpoint(TypedDict):
     """Single request to record/replay and validate."""
 
