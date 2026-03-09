@@ -13,6 +13,8 @@ with UIC's InstrumentRecord (31-field, Decimal, normalized adapter contract).
 from .domain import (
     CanonicalAccountSnapshot,
     CanonicalBalance,
+    CanonicalComboBet,
+    CanonicalComboLeg,
     CanonicalDerivativeTicker,
     CanonicalFundingRate,
     CanonicalLiquidation,
@@ -25,6 +27,7 @@ from .domain import (
     InstrumentType,
     InstrumentWarehouseRow,
     MarketTrade,
+    OddsFormat,
     OrderBookSnapshot5,
     ProcessedCandle,
 )
@@ -42,11 +45,14 @@ from .execution import (
     OrderStatus,
     OrderType,
 )
+from .odds import american_to_decimal, decimal_to_american
 
 __all__ = [
     "CanonicalAccountSnapshot",
     "CanonicalAccountState",
     "CanonicalBalance",
+    "CanonicalComboBet",
+    "CanonicalComboLeg",
     "CanonicalDerivativeTicker",
     "CanonicalError",
     "CanonicalFill",
@@ -69,9 +75,12 @@ __all__ = [
     # InstrumentWarehouseRow — renamed from InstrumentRecord to avoid collision with UIC's InstrumentRecord
     "InstrumentWarehouseRow",
     "MarketTrade",
+    "OddsFormat",
     "OrderBookSnapshot5",
     "OrderSide",
     "OrderStatus",
     "OrderType",
     "ProcessedCandle",
+    "american_to_decimal",
+    "decimal_to_american",
 ]

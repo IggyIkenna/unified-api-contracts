@@ -108,14 +108,18 @@ from .unified_api_contracts_external.sports import (
 from .unified_normalised_contracts.domain import (
     CanonicalAccountSnapshot,
     CanonicalBalance,
+    CanonicalComboBet,
+    CanonicalComboLeg,
     CanonicalPosition,
     CanonicalSettlement,
+    OddsFormat,
 )
 from .unified_normalised_contracts.execution import (
     CanonicalFill,
     CanonicalOrder,
     OrderStatus,
 )
+from .unified_normalised_contracts.odds import american_to_decimal, decimal_to_american
 from .unified_normalised_contracts.options import (
     NormalizedStrikeCoordinate,
     OptionChainSnapshot,
@@ -196,6 +200,8 @@ __all__ = [
     "CanonicalAccountSnapshot",
     "CanonicalBalance",
     "CanonicalBookmakerMarket",
+    "CanonicalComboBet",
+    "CanonicalComboLeg",
     "CanonicalFill",
     "CanonicalFixture",
     "CanonicalLeague",
@@ -235,6 +241,7 @@ __all__ = [
     "MorphoUserPosition",
     "NormalizedStrikeCoordinate",
     "OddsChangedError",
+    "OddsFormat",
     "OddsType",
     "OptionChainSnapshot",
     "OptionContract",
@@ -258,7 +265,9 @@ __all__ = [
     "UnsubscribeRequest",
     "VenueErrorClassification",
     "WebSocketConnectionState",
+    "american_to_decimal",
     "classify_venue_error",
+    "decimal_to_american",
 ]
 
 # Alias venue subpackages to unified_api_contracts_external

@@ -31,6 +31,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import AwareDatetime, BaseModel, Field
 
@@ -582,7 +583,39 @@ class CanonicalBetOrder(BaseModel):
     timestamp: AwareDatetime
     matched_size: Decimal | None = None
     remaining_size: Decimal | None = None
+    american_odds: int | None = None
+    odds_format: OddsFormat = OddsFormat.DECIMAL
     schema_version: str = "1.0"
+
+
+class CanonicalComboLeg(BaseModel, frozen=True):
+    """One leg of a multi-leg combo bet or options combo."""
+
+    venue: str
+    market_id: str
+    selection_id: str
+    side: Literal["back", "lay"]
+    decimal_odds: Decimal
+    american_odds: int | None = None
+    stake: Decimal
+    odds_format: OddsFormat = OddsFormat.DECIMAL
+
+
+class CanonicalComboBet(BaseModel, frozen=True):
+    """Multi-leg combo bet or options spread.
+
+    ``net_premium`` MAY BE NEGATIVE for options combos where the short leg
+    premium exceeds the long leg cost (e.g. risk reversals, straddles).
+    """
+
+    venue: str
+    order_id: str
+    legs: tuple[CanonicalComboLeg, ...]
+    combined_decimal_odds: Decimal
+    total_stake: Decimal
+    net_premium: Decimal | None = None  # MAY BE NEGATIVE for options combos
+    status: str
+    timestamp: datetime
 
 
 # ---------------------------------------------------------------------------
@@ -707,6 +740,8 @@ __all__ = [
     "CanonicalBetOrder",
     "CanonicalBondData",
     "CanonicalCdsSpread",
+    "CanonicalComboBet",
+    "CanonicalComboLeg",
     "CanonicalDerivativeTicker",
     "CanonicalFee",
     "CanonicalFundingRate",
