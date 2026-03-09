@@ -21,7 +21,13 @@ from dataclasses import dataclass, field
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import AwareDatetime, BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+
+
+class _DerivativesBase(BaseModel):
+    """Base for all derivatives schemas — rejects unknown fields."""
+
+    model_config = ConfigDict(extra="forbid")
 
 
 @dataclass
@@ -119,7 +125,7 @@ class OptionGreeks:
 # =============================================================================
 
 
-class PositionRisk(BaseModel):
+class PositionRisk(_DerivativesBase):
     """Position risk metrics."""
 
     liquidationPrice: Decimal | None = Field(None, description="Liquidation price")
@@ -131,7 +137,7 @@ class PositionRisk(BaseModel):
     riskTier: int | None = Field(None, description="Risk tier")
 
 
-class InsuranceFundState(BaseModel):
+class InsuranceFundState(_DerivativesBase):
     """Insurance fund state snapshot."""
 
     asset: str = Field(..., description="Asset symbol")
@@ -139,7 +145,7 @@ class InsuranceFundState(BaseModel):
     timestamp: AwareDatetime = Field(..., description="Snapshot timestamp")
 
 
-class LongShortRatio(BaseModel):
+class LongShortRatio(_DerivativesBase):
     """Long/short ratio aggregate."""
 
     longShortRatio: Decimal = Field(..., description="Ratio of long to short")
@@ -147,7 +153,7 @@ class LongShortRatio(BaseModel):
     shortAccount: Decimal = Field(..., description="Short account proportion")
 
 
-class OpenInterestHistory(BaseModel):
+class OpenInterestHistory(_DerivativesBase):
     """Open interest history point."""
 
     symbol: str = Field(..., description="Instrument symbol")
@@ -155,7 +161,7 @@ class OpenInterestHistory(BaseModel):
     openInterest: Decimal = Field(..., description="Open interest value")
 
 
-class FundingRateHistory(BaseModel):
+class FundingRateHistory(_DerivativesBase):
     """Funding rate history point."""
 
     fundingTime: AwareDatetime = Field(..., description="Funding timestamp")
@@ -164,7 +170,7 @@ class FundingRateHistory(BaseModel):
     indexPrice: Decimal | None = Field(None, description="Index price at funding")
 
 
-class SettlementEvent(BaseModel):
+class SettlementEvent(_DerivativesBase):
     """Settlement event record."""
 
     instrument: str = Field(..., description="Instrument symbol")
@@ -177,28 +183,28 @@ class SettlementEvent(BaseModel):
 # --- Options volatility surface ---
 
 
-class VolSmilePoint(BaseModel):
+class VolSmilePoint(_DerivativesBase):
     """Single point on volatility smile (strike vs IV)."""
 
     strike: Decimal = Field(..., description="Strike price")
     impliedVol: Decimal = Field(..., description="Implied volatility")
 
 
-class VolSurfaceSlice(BaseModel):
+class VolSurfaceSlice(_DerivativesBase):
     """Volatility smile at a single expiry."""
 
     expiry: AwareDatetime = Field(..., description="Expiry timestamp")
     points: list[VolSmilePoint] = Field(default_factory=list, description="Strike/IV points")
 
 
-class VolTermStructure(BaseModel):
+class VolTermStructure(_DerivativesBase):
     """Volatility term structure (expiry vs ATM IV)."""
 
     expiry: AwareDatetime = Field(..., description="Expiry timestamp")
     atmVol: Decimal = Field(..., description="At-the-money implied volatility")
 
 
-class VolSurface(BaseModel):
+class VolSurface(_DerivativesBase):
     """Full volatility surface (smile + term structure)."""
 
     symbol: str = Field(..., description="Underlying symbol")
@@ -227,7 +233,7 @@ class ComboStrategyType(StrEnum):
     CUSTOM = "custom"  # arbitrary legs (e.g. Deribit block trade)
 
 
-class ComboLeg(BaseModel):
+class ComboLeg(_DerivativesBase):
     """Single leg of a multi-leg instrument (venue-agnostic).
 
     Maps to: DeribitComboLeg, IBKRComboLeg, OKXRfqLeg
@@ -239,7 +245,7 @@ class ComboLeg(BaseModel):
     venue: str | None = None  # For cross-venue combos
 
 
-class MultiLegInstrument(BaseModel):
+class MultiLegInstrument(_DerivativesBase):
     """Normalized multi-leg/combo instrument (cross-venue canonical).
 
     Maps to venue-specific types:
@@ -259,7 +265,7 @@ class MultiLegInstrument(BaseModel):
     timestamp: AwareDatetime | None = None  # When this combo was created/observed
 
 
-class ComboQuote(BaseModel):
+class ComboQuote(_DerivativesBase):
     """Unified combo price + net greeks (cross-venue).
 
     Net price = sum of (leg_price x direction_sign x ratio).

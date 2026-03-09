@@ -33,7 +33,13 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import AwareDatetime, BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+
+
+class _CanonicalBase(BaseModel):
+    """Base for all canonical normalised schemas — rejects unknown fields."""
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class InstrumentType(StrEnum):
@@ -71,7 +77,7 @@ class MarketState(StrEnum):
 # ---------------------------------------------------------------------------
 
 
-class InstrumentWarehouseRow(BaseModel):
+class InstrumentWarehouseRow(_CanonicalBase):
     """Canonical instrument row stored in GCS parquet (subset of INSTRUMENTS_SCHEMA columns).
 
     Renamed from InstrumentRecord to avoid collision with UIC's InstrumentRecord
@@ -139,7 +145,7 @@ class InstrumentWarehouseRow(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class MarketTrade(BaseModel):
+class MarketTrade(_CanonicalBase):
     """Raw trade tick (TRADES_SCHEMA)."""
 
     instrument_key: str
@@ -151,12 +157,12 @@ class MarketTrade(BaseModel):
     ts_init: int = Field(description="nanoseconds UTC")
 
 
-class BookLevel(BaseModel):
+class BookLevel(_CanonicalBase):
     price: float
     size: float
 
 
-class OrderBookSnapshot5(BaseModel):
+class OrderBookSnapshot5(_CanonicalBase):
     """Top-5 order book snapshot (BOOK_SNAPSHOT_5_SCHEMA)."""
 
     instrument_key: str
@@ -189,7 +195,7 @@ class OrderBookSnapshot5(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class CanonicalOrderBook(BaseModel):
+class CanonicalOrderBook(_CanonicalBase):
     """Normalised order book (CanonicalOrderBook from unified-market-interface)."""
 
     venue: str
@@ -203,7 +209,7 @@ class CanonicalOrderBook(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalTrade(BaseModel):
+class CanonicalTrade(_CanonicalBase):
     """Normalised trade (CanonicalTrade from unified-market-interface)."""
 
     venue: str = Field(min_length=1)
@@ -225,7 +231,7 @@ class CanonicalTrade(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class CanonicalTicker(BaseModel):
+class CanonicalTicker(_CanonicalBase):
     """Normalised spot ticker — all venues."""
 
     instrument_key: str
@@ -241,7 +247,7 @@ class CanonicalTicker(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalLiquidation(BaseModel):
+class CanonicalLiquidation(_CanonicalBase):
     """Normalised liquidation event — all CeFi venues."""
 
     instrument_key: str
@@ -257,7 +263,7 @@ class CanonicalLiquidation(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalLiquidationCluster(BaseModel):
+class CanonicalLiquidationCluster(_CanonicalBase):
     """Predicted forced-flow concentration at a price level.
 
     Distinct from CanonicalLiquidation (observed event).  A cluster represents
@@ -279,7 +285,7 @@ class CanonicalLiquidationCluster(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalDerivativeTicker(BaseModel):
+class CanonicalDerivativeTicker(_CanonicalBase):
     """Normalised derivative ticker — perps/futures funding, OI, mark."""
 
     instrument_key: str
@@ -312,7 +318,7 @@ class CanonicalDerivativeTicker(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalPosition(BaseModel):
+class CanonicalPosition(_CanonicalBase):
     """Normalised position — all venues."""
 
     instrument_id: str
@@ -328,7 +334,7 @@ class CanonicalPosition(BaseModel):
     raw: dict[str, object] | None = None
 
 
-class CanonicalBalance(BaseModel):
+class CanonicalBalance(_CanonicalBase):
     """Normalised balance for a single currency."""
 
     currency: str
@@ -341,7 +347,7 @@ class CanonicalBalance(BaseModel):
     raw: dict[str, object] | None = None
 
 
-class CanonicalAccountSnapshot(BaseModel):
+class CanonicalAccountSnapshot(_CanonicalBase):
     """Full account snapshot including balances and positions."""
 
     venue: str
@@ -350,7 +356,7 @@ class CanonicalAccountSnapshot(BaseModel):
     timestamp: AwareDatetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
-class CanonicalSettlement(BaseModel):
+class CanonicalSettlement(_CanonicalBase):
     """Settlement event for a position or balance change."""
 
     venue: str
@@ -361,7 +367,7 @@ class CanonicalSettlement(BaseModel):
     raw: dict[str, object] | None = None
 
 
-class CanonicalFundingRate(BaseModel):
+class CanonicalFundingRate(_CanonicalBase):
     """Normalised funding rate — perps/futures."""
 
     venue: str
@@ -372,7 +378,7 @@ class CanonicalFundingRate(BaseModel):
     predicted_rate: Decimal | None = None
 
 
-class CanonicalOhlcvBar(BaseModel):
+class CanonicalOhlcvBar(_CanonicalBase):
     """Normalised OHLCV bar — all venues."""
 
     timestamp: AwareDatetime
@@ -388,7 +394,7 @@ class CanonicalOhlcvBar(BaseModel):
     vwap: Decimal | None = None
 
 
-class CanonicalOptionsChainEntry(BaseModel):
+class CanonicalOptionsChainEntry(_CanonicalBase):
     """Normalised options chain entry — strike, greeks, bid/ask."""
 
     timestamp: AwareDatetime
@@ -410,7 +416,7 @@ class CanonicalOptionsChainEntry(BaseModel):
     instrument_key: str | None = None
 
 
-class CanonicalMarketInfo(BaseModel):
+class CanonicalMarketInfo(_CanonicalBase):
     """Normalised market/instrument metadata — all venues."""
 
     instrument_key: str
@@ -434,7 +440,7 @@ class CanonicalMarketInfo(BaseModel):
 # UIC owns this type in its market_data module.
 
 
-class CanonicalWsMessage(BaseModel):
+class CanonicalWsMessage(_CanonicalBase):
     """Normalised WebSocket message — minimal envelope."""
 
     channel: str
@@ -454,7 +460,7 @@ class WebSocketEvent(StrEnum):
     RECONNECT = "reconnect"
 
 
-class CanonicalWebSocketLifecycle(BaseModel):
+class CanonicalWebSocketLifecycle(_CanonicalBase):
     """Normalized WebSocket lifecycle event — connect, disconnect, ping/pong."""
 
     venue: str
@@ -475,7 +481,7 @@ class FeeType(StrEnum):
     OTHER = "other"
 
 
-class CanonicalFee(BaseModel):
+class CanonicalFee(_CanonicalBase):
     """Normalised fee — all venues (rate or amount)."""
 
     amount: Decimal = Field(description="Fee amount or rate (e.g. 0.001 for 0.1%)")
@@ -492,7 +498,7 @@ class CanonicalFee(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class ProcessedCandle(BaseModel):
+class ProcessedCandle(_CanonicalBase):
     """Output of market-data-processing-service (PROCESSED_CANDLE_SCHEMA).
 
     NOTE: This is a parquet storage schema (float prices, nanosecond-resolution
@@ -533,7 +539,7 @@ class OddsFormat(StrEnum):
     FRACTIONAL = "fractional"
 
 
-class CanonicalOdds(BaseModel):
+class CanonicalOdds(_CanonicalBase):
     """Normalized odds from any bookmaker/exchange."""
 
     venue: str
@@ -552,7 +558,7 @@ class CanonicalOdds(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalBetMarket(BaseModel):
+class CanonicalBetMarket(_CanonicalBase):
     """Normalized betting market metadata."""
 
     venue: str
@@ -569,7 +575,7 @@ class CanonicalBetMarket(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalBetOrder(BaseModel):
+class CanonicalBetOrder(_CanonicalBase):
     """Normalized bet order/placement."""
 
     venue: str
@@ -588,7 +594,7 @@ class CanonicalBetOrder(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalComboLeg(BaseModel, frozen=True):
+class CanonicalComboLeg(_CanonicalBase, frozen=True):
     """One leg of a multi-leg combo bet or options combo."""
 
     venue: str
@@ -601,7 +607,7 @@ class CanonicalComboLeg(BaseModel, frozen=True):
     odds_format: OddsFormat = OddsFormat.DECIMAL
 
 
-class CanonicalComboBet(BaseModel, frozen=True):
+class CanonicalComboBet(_CanonicalBase, frozen=True):
     """Multi-leg combo bet or options spread.
 
     ``net_premium`` MAY BE NEGATIVE for options combos where the short leg
@@ -623,7 +629,7 @@ class CanonicalComboBet(BaseModel, frozen=True):
 # ---------------------------------------------------------------------------
 
 
-class CanonicalYieldCurvePoint(BaseModel):
+class CanonicalYieldCurvePoint(_CanonicalBase):
     """One point on a yield curve: date + yield (or spread) in basis points or percent.
 
     Sources: FRED (US Treasuries), ECB (EU OIS/ESTR), OFR (CDS spreads), OpenBB (bond YTM).
@@ -638,7 +644,7 @@ class CanonicalYieldCurvePoint(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalBondData(BaseModel):
+class CanonicalBondData(_CanonicalBase):
     """Normalized bond bid/ask/YTM data row.
 
     Sources: OpenBB treasury prices, IBKR bond data.
@@ -656,7 +662,7 @@ class CanonicalBondData(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalCdsSpread(BaseModel):
+class CanonicalCdsSpread(_CanonicalBase):
     """Normalized CDS spread index observation.
 
     Sources: OFR (Office of Financial Research) CDS spread indices.
@@ -677,7 +683,7 @@ class CanonicalCdsSpread(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class CanonicalOnChainMetric(BaseModel):
+class CanonicalOnChainMetric(_CanonicalBase):
     """Normalized on-chain analytics data point.
 
     Sources: Glassnode, Arkham, DeFiLlama.
@@ -697,7 +703,7 @@ class CanonicalOnChainMetric(BaseModel):
     schema_version: str = "1.0"
 
 
-class CanonicalOraclePriceFeed(BaseModel):
+class CanonicalOraclePriceFeed(_CanonicalBase):
     """Normalized oracle price feed tick (Pyth Network).
 
     price = mantissa * 10^expo (Pyth fixed-point convention).
@@ -716,7 +722,7 @@ class CanonicalOraclePriceFeed(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class CanonicalMarketStateEvent(BaseModel):
+class CanonicalMarketStateEvent(_CanonicalBase):
     """Normalized market state transition event.
 
     Covers trading halts, auction phases, pre/post market sessions,
