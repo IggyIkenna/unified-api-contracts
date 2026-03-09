@@ -283,14 +283,17 @@ class KalshiWebSocketTickerMsg(BaseModel):
     """WebSocket ticker channel message (public, no auth required).
 
     Subscribe: {"id": 1, "cmd": "subscribe", "params": {"channels": ["ticker"], "market_tickers": ["TICKER"]}}
+
+    All price fields use string fixed-point dollars (e.g. "0.4500") as of March 2026.
+    Integer cent fields (yes_bid, yes_ask, yes_price as int) were removed from the API.
     """
 
     type: str | None = None  # "ticker"
     seq: int | None = None
     market_ticker: str | None = None
-    yes_bid: int | None = None  # cents
-    yes_ask: int | None = None
-    yes_price: int | None = None  # last traded price
+    yes_bid_dollars: str | None = None  # e.g. "0.4500"
+    yes_ask_dollars: str | None = None  # e.g. "0.4600"
+    yes_price_dollars: str | None = None  # last traded price e.g. "0.4500"
     volume: int | None = None
     open_interest: int | None = None
     ts: int | None = None  # Unix ms
@@ -300,25 +303,32 @@ class KalshiWebSocketOrderbookDeltaMsg(BaseModel):
     """WebSocket orderbook_delta channel message.
 
     Sent on every orderbook change; reconstruct full book from deltas.
+
+    price_dollars uses string fixed-point dollars (e.g. "0.4500") as of March 2026.
+    Integer cent price field was removed from the API.
     """
 
     type: str | None = None  # "orderbook_delta"
     seq: int | None = None
     market_ticker: str | None = None
-    price: int | None = None  # cents
+    price_dollars: str | None = None  # e.g. "0.4500"
     delta: int | None = None  # positive = add, negative = remove
     side: str | None = None  # "yes" | "no"
     ts: int | None = None
 
 
 class KalshiWebSocketTradeMsg(BaseModel):
-    """WebSocket trade channel message."""
+    """WebSocket trade channel message.
+
+    yes_price_dollars uses string fixed-point dollars (e.g. "0.4500") as of March 2026.
+    Integer cent yes_price field was removed from the API.
+    """
 
     type: str | None = None  # "trade"
     seq: int | None = None
     trade_id: str | None = None
     market_ticker: str | None = None
-    yes_price: int | None = None  # cents
+    yes_price_dollars: str | None = None  # e.g. "0.4500"
     count: int | None = None
     taker_side: str | None = None  # "yes" | "no"
     ts: int | None = None

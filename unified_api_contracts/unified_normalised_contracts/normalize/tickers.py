@@ -427,14 +427,14 @@ def normalize_kalshi_ticker(
 ) -> CanonicalTicker:
     """Convert KalshiWebSocketTickerMsg to CanonicalTicker.
 
-    Kalshi prices are in cents (integer). Divide by 100 to get dollar price.
+    Kalshi prices are string fixed-point dollars (e.g. "0.4500") as of March 2026.
     Volume and open_interest in integer contracts.
     """
     sym = raw.market_ticker or ""
     ik = instrument_key or f"{venue}:MARKET:{sym}"
-    last = Decimal(str(raw.yes_price or 0)) / Decimal("100")
-    bid = Decimal(str(raw.yes_bid or 0)) / Decimal("100") if raw.yes_bid is not None else None
-    ask = Decimal(str(raw.yes_ask or 0)) / Decimal("100") if raw.yes_ask is not None else None
+    last = Decimal(raw.yes_price_dollars or "0")
+    bid = Decimal(raw.yes_bid_dollars) if raw.yes_bid_dollars is not None else None
+    ask = Decimal(raw.yes_ask_dollars) if raw.yes_ask_dollars is not None else None
     ts = datetime.fromtimestamp((raw.ts or 0) / 1000.0, tz=UTC) if raw.ts else datetime.now(UTC)
     return CanonicalTicker(
         instrument_key=ik,

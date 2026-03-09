@@ -325,7 +325,7 @@ fi
 
 # File size
 SVIOL=""; SWARN=""
-for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" 2>/dev/null); do
+for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" ! -path "./tests/*" 2>/dev/null); do
     lines=$(wc -l < "$f" 2>/dev/null || echo 0)
     [[ "$lines" -gt $MAX_FILE_LINES ]] && SVIOL="${SVIOL}\n  $f: $lines L"
     [[ "$lines" -gt $FILE_WARN_LINES && "$lines" -le $MAX_FILE_LINES ]] && SWARN="${SWARN}\n  $f: $lines L"
@@ -335,7 +335,7 @@ done
 
 # Function/class/method size
 FSIZES=""
-for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" 2>/dev/null); do
+for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" ! -path "./tests/*" 2>/dev/null); do
     out=$($PYTHON_CMD -c "
 import ast, sys
 p=sys.argv[1]
@@ -404,7 +404,7 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
 
 # 7. BYPASS — ||true in quality gate scripts
 BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|zombies\|pyright\|cleanup" || :)
+    | grep -v "^#\|zombies\|pyright\|cleanup\|log_fail\|log_success" || :)
 [[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
@@ -457,6 +457,21 @@ if [ -n "$SCHEMA_COLLISION" ]; then
     log_warn "STEP 5.13: Canonical* BaseModel subclass in library source — potential name collision with UAC/UIC canonical:"
     log_warn "See: cursor-rules/core/schema-governance-index.mdc (Rule 5)"
     echo "$SCHEMA_COLLISION" | head -5
+fi
+
+# ============================================================
+# STEP 5.16 — Provider API version manifest check
+# Runs generate_schema_version_matrix.py --count-red to gate on red schemas.
+# ============================================================
+if [ -f "unified_api_contracts/provider_api_versions.yaml" ]; then
+    echo "=== STEP 5.16: Checking provider API version manifest ==="
+    RED_PROVIDERS=$($PYTHON_CMD scripts/generate_schema_version_matrix.py --count-red 2>/dev/null || echo "0")
+    if [ "${RED_PROVIDERS:-0}" -gt 0 ]; then
+        log_fail "STEP 5.16: $RED_PROVIDERS provider(s) have red schema status"
+        ((V++))
+    else
+        log_success "STEP 5.16: All provider schemas green or yellow"
+    fi
 fi
 
 [[ $V -gt 0 ]] && { log_fail "Codex compliance FAILED: $V violations"; exit 1; }

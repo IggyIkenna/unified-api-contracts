@@ -325,12 +325,13 @@ def normalize_kalshi_ws_trade(
 ) -> CanonicalTrade:
     """Convert KalshiWebSocketTradeMsg to CanonicalTrade.
 
-    yes_price in cents (int). count in integer contracts.
+    yes_price_dollars is string fixed-point dollars (e.g. "0.4500") as of March 2026.
+    count in integer contracts.
     """
     sym = symbol or raw.market_ticker or "UNKNOWN"
     ts = datetime.fromtimestamp((raw.ts or 0) / 1000.0, tz=UTC) if raw.ts else datetime.now(UTC)
     side = "buy" if (raw.taker_side or "").lower() == "yes" else "sell"
-    price = Decimal(str(raw.yes_price or 0)) / Decimal("100")
+    price = Decimal(raw.yes_price_dollars or "0")
     qty = Decimal(str(raw.count or 0))
     return CanonicalTrade(
         venue=venue,
