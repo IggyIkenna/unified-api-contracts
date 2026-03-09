@@ -11,6 +11,7 @@ from .canonical_mappings import (
 from .endpoint_registry import (
     ENDPOINT_REGISTRY,
     AccessMode,
+    CassetteStatus,
     DataAvailability,
     EndpointSpec,
     ResponseFormat,
@@ -280,6 +281,7 @@ __all__ = [
     "CanonicalSpread",
     "CanonicalTeam",
     "CanonicalVenue",
+    "CassetteStatus",
     "CoinbaseProductInfo",
     "CoinbaseProductsResponse",
     "CompoundV3MarketInfo",
