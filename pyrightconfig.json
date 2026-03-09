@@ -4,5 +4,6 @@
   "include": ["unified_api_contracts"],
   "reportAny": "error",
   "venvPath": ".",
-  "venv": ".venv"
+  "venv": ".venv",
+  "exclude": ["tests"]
 }
