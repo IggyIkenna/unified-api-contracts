@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 from enum import StrEnum
 from typing import Self

@@ -6,6 +6,8 @@ Raw schemas mirror the FootyStats API JSON structure with all fields optional ex
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 from decimal import Decimal
 from typing import Self
