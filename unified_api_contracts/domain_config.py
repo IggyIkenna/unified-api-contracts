@@ -3,71 +3,11 @@ Domain Configuration Protocols
 
 Protocol definitions for domain configuration objects used across unified-trading-library.
 Eliminates type errors from optional unified-config-interface dependency.
+
+NOTE (2026-03-09): All four Protocol classes (DomainConfigProtocol, DataTypeConfigProtocol,
+ExchangeInstrumentConfigProtocol, MLConfigProtocol) were confirmed orphans — no downstream
+repo imports them.  instruments-service and strategy-service reference the name only in
+docstrings, not in import statements.  The classes have been removed.  If a consumer needs
+structural typing against config objects, define a Protocol in that consumer's own module or
+in unified-trading-library.
 """
-
-from typing import Protocol
-
-
-class DomainConfigProtocol(Protocol):
-    """Protocol for domain-specific configuration objects."""
-
-    # Core GCP configuration
-    gcp_project_id: str
-    storage_bucket: str
-    analytics_dataset: str
-
-    # AWS configuration (optional)
-    aws_region: str | None
-    s3_bucket: str | None
-
-    # Generic config dict for extensibility
-    config: dict[str, object]
-
-    # Optional attributes from unified-config-interface
-    data_type: str | None
-    exchange: str | None
-    environment: str | None
-
-
-class DataTypeConfigProtocol(Protocol):
-    """Protocol for data type configuration."""
-
-    gcp_project_id: str
-    storage_bucket: str
-    analytics_dataset: str
-    config: dict[str, object]
-
-    # Data type specific
-    data_type: str
-    retention_days: int
-    compression_enabled: bool
-
-
-class ExchangeInstrumentConfigProtocol(Protocol):
-    """Protocol for exchange instrument configuration."""
-
-    gcp_project_id: str
-    storage_bucket: str
-    analytics_dataset: str
-    config: dict[str, object]
-
-    # Exchange specific
-    exchange: str
-    instrument_type: str
-    market_hours: dict[str, str]
-    timezone: str
-
-
-class MLConfigProtocol(Protocol):
-    """Protocol for ML pipeline configuration."""
-
-    gcp_project_id: str
-    storage_bucket: str
-    analytics_dataset: str
-    vertex_ai_project: str | None
-
-    # ML specific
-    model_registry_bucket: str
-    feature_store_dataset: str
-    training_pipeline_config: dict[str, object]
-    config: dict[str, object]
