@@ -65,9 +65,26 @@ from .unified_api_contracts_external.betfair import (
     BetfairCurrentOrderSummary,
     BetfairListCurrentOrdersResponse,
 )
+from .unified_api_contracts_external.binance.market_schemas import (
+    BinanceFuturesExchangeInfo,
+    BinanceInstrumentInfo,
+    BinanceOptionInstrumentInfo,
+)
+from .unified_api_contracts_external.databento.schemas import (
+    DatabentoReferenceInstrument,
+)
+from .unified_api_contracts_external.deribit.schemas import (
+    DeribitGetInstrumentResponse,
+    DeribitGetInstrumentsResponse,
+    DeribitInstrumentInfoFull,
+)
 from .unified_api_contracts_external.ibkr import (
     IBKRAccountValue,
     IBKRPosition,
+)
+from .unified_api_contracts_external.ibkr.schemas import (
+    IBKRContractDetails,
+    IBKRCorporateAction,
 )
 from .unified_api_contracts_external.polymarket import (
     PolymarketPosition,
@@ -193,6 +210,9 @@ __all__ = [
     "BetfairCurrentOrderSummary",
     "BetfairListCurrentOrdersResponse",
     "BettingSignal",
+    "BinanceFuturesExchangeInfo",
+    "BinanceInstrumentInfo",
+    "BinanceOptionInstrumentInfo",
     "BookmakerCategory",
     "BookmakerInfo",
     "BookmakerRegistry",
@@ -219,6 +239,10 @@ __all__ = [
     "ComputeType",
     "DataSourceMapping",
     "DatabentoError",
+    "DatabentoReferenceInstrument",
+    "DeribitGetInstrumentResponse",
+    "DeribitGetInstrumentsResponse",
+    "DeribitInstrumentInfoFull",
     "ErrorAction",
     "EtherFiStakeResponse",
     "EtherFiUnstakeResponse",
@@ -229,6 +253,8 @@ __all__ = [
     "FundingRate",
     "HeartbeatMessage",
     "IBKRAccountValue",
+    "IBKRContractDetails",
+    "IBKRCorporateAction",
     "IBKRPosition",
     "LendingRate",
     "LidoSubmitResponse",

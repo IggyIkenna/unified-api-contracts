@@ -262,7 +262,11 @@ DEFI_DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
 }
 
 
-def get_defi_venue(dataset_or_subgraph: str) -> str | None:
+def get_defi_venue(
+    dataset_or_subgraph: str,
+) -> (
+    str | None
+):  # orphan: kept for API surface completeness; wraps DEFI_DATASET_TO_CANONICAL_VENUE; no current downstream consumer
     """Map DeFi dataset/subgraph identifier to canonical venue. Returns None if unknown."""
     key = dataset_or_subgraph.lower().strip() if dataset_or_subgraph else ""
     return DEFI_DATASET_TO_CANONICAL_VENUE.get(key)
@@ -377,12 +381,20 @@ def get_data_source_for_venue(venue: str) -> str | None:
     return VENUE_TO_DATA_SOURCE.get(venue.upper())
 
 
-def get_venues_for_data_source(data_source: str) -> list[str]:
+def get_venues_for_data_source(
+    data_source: str,
+) -> list[
+    str
+]:  # orphan: kept for API surface completeness; inverse of get_data_source_for_venue; no current downstream consumer
     """Get venues served by a data source."""
     return DATA_SOURCE_TO_VENUES.get(data_source, [])
 
 
-def get_canonical_venue_for_dataset(dataset_id: str) -> str | None:
+def get_canonical_venue_for_dataset(
+    dataset_id: str,
+) -> (
+    str | None
+):  # orphan: kept for API surface completeness; wraps DATASET_TO_CANONICAL_VENUE; no current downstream consumer
     """Get canonical venue for a Databento dataset_id or Tardis exchange name."""
     key = dataset_id.strip()
     return DATASET_TO_CANONICAL_VENUE.get(key) or DATASET_TO_CANONICAL_VENUE.get(key.lower())

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -52,7 +53,7 @@ def test_prediction_market_arb_schemas() -> None:
         buckets=[bucket],
     )
     assert len(pb.buckets) == 1
-    assert pb.buckets[0].yes_ask == 0.08
+    assert pb.buckets[0].yes_ask == Decimal("0.08")
 
     # SportsbookLink
     sl = SportsbookLink(

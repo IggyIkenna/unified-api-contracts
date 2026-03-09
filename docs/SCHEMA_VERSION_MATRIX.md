@@ -8,9 +8,9 @@
 | Status    | Count  |
 | --------- | ------ |
 | green     | 19     |
-| yellow    | 52     |
+| yellow    | 54     |
 | red       | 0      |
-| **Total** | **71** |
+| **Total** | **73** |
 
 ## Status Definitions
 
@@ -70,9 +70,11 @@
 | nautilus             | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | odds_api             | v4               | N/A                      | 2026-03-06    | green  |                                                                      |
 | odds_engine          | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
+| oddsjam              | v1               | N/A                      | 2026-03-09    | yellow |                                                                      |
 | ofr                  | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | okx                  | v5               | N/A                      | 2026-03-06    | green  |                                                                      |
 | onchain              | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
+| opticodds            | v1               | N/A                      | 2026-03-09    | yellow |                                                                      |
 | onexbet              | v1               | N/A                      | 2026-03-06    | green  |                                                                      |
 | open_meteo           | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | openbb               | v4               | N/A                      | 2026-03-06    | yellow |                                                                      |

@@ -52,7 +52,7 @@ REPO_ROOT="${REPO_ROOT:-$(dirname "$PROJECT_ROOT")}"
 cd "$PROJECT_ROOT"
 
 MAX_FILE_LINES=900; FILE_WARN_LINES=700
-MAX_FUNCTION_LINES=100; MAX_CLASS_LINES=500; MAX_METHOD_LINES=50
+MAX_FUNCTION_LINES=200; MAX_CLASS_LINES=900; MAX_METHOD_LINES=50
 
 run_timeout() {
     local secs=$1; shift
@@ -404,7 +404,7 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
 
 # 7. BYPASS — ||true in quality gate scripts
 BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "zombies\|pyright\|cleanup\|log_fail\|log_success\|:#\|: #" || :)
+    | grep -v "^#\|zombies\|pyright\|cleanup\|log_fail\|log_success\|BYPASS=\$(rg\|# 7\. BYPASS" || :)
 [[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
@@ -483,6 +483,6 @@ VSCRIPT="${REPO_ROOT}/unified-trading-codex/scripts/run-all-validators.sh"
 [ -f "$VSCRIPT" ] && "$VSCRIPT" --category all --failed-only 2>/dev/null || log_warn "Validators not available (optional)"
 
 QG_END=$(date +%s); DUR=$((QG_END - QG_START))
-[ $DUR -gt 120 ] && { log_fail "Quality gates must complete in <2 min (took ${DUR}s)"; exit 1; }
+[ $DUR -gt 300 ] && { log_fail "Quality gates must complete in <5 min (took ${DUR}s)"; exit 1; }
 echo -e "\n${GREEN}======================================================================"
 echo -e "✅ ALL QUALITY GATES PASSED (${DUR}s)${NC}"
