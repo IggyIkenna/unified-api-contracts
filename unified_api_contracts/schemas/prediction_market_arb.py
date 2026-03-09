@@ -22,10 +22,10 @@ Two primary arb patterns:
 
 from __future__ import annotations
 
-from datetime import datetime
+from decimal import Decimal
 from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import AwareDatetime, BaseModel
 
 # ---------------------------------------------------------------------------
 # 3.1 Direct Same-Market Arb (Kalshi vs Polymarket)
@@ -46,7 +46,7 @@ class CrossVenueLink(BaseModel):
     link_type: Literal["identical", "equivalent", "related", "correlated"]
     basis_bps: float  # Current price difference in basis points
     verified_by: str  # "manual" | "nlp_similarity" | "structured_match"
-    created_at: datetime
+    created_at: AwareDatetime
 
 
 # ---------------------------------------------------------------------------
@@ -62,14 +62,14 @@ class BucketMarket(BaseModel):
     """
 
     market_id: str
-    lower_bound: float | None = None  # None = negative infinity
-    upper_bound: float | None = None  # None = positive infinity
+    lower_bound: Decimal | None = None  # None = negative infinity
+    upper_bound: Decimal | None = None  # None = positive infinity
     include_lower: bool = True
     include_upper: bool = True
-    yes_bid: float
-    yes_ask: float
-    no_bid: float | None = None
-    no_ask: float | None = None
+    yes_bid: Decimal
+    yes_ask: Decimal
+    no_bid: Decimal | None = None
+    no_ask: Decimal | None = None
 
 
 class ProbabilityBucket(BaseModel):
@@ -102,10 +102,10 @@ class SportsbookLink(BaseModel):
     sportsbook: str  # "pinnacle", "draftkings", "betfair"
     sportsbook_event_id: str
     sportsbook_market_type: str  # "moneyline", "spread", "total"
-    sportsbook_implied_prob: float
-    polymarket_yes_mid: float
+    sportsbook_implied_prob: Decimal
+    polymarket_yes_mid: Decimal
     discrepancy_bps: float
-    captured_at: datetime
+    captured_at: AwareDatetime
 
 
 # ---------------------------------------------------------------------------
@@ -120,8 +120,8 @@ class NegRiskBucket(BaseModel):
     range_description: str | None = None  # e.g. "> $3200"
     token_id: str | None = None  # Polymarket CLOB token ID for YES outcome
     condition_id: str | None = None
-    yes_ask: float | None = None  # Current ask price (implied probability, 0-1)
-    yes_bid: float | None = None
+    yes_ask: Decimal | None = None  # Current ask price (implied probability, 0-1)
+    yes_bid: Decimal | None = None
     liquidity_usd: float | None = None
 
 
@@ -142,13 +142,13 @@ class NegRiskArbSignal(BaseModel):
     expiry: str  # ISO 8601 date or datetime
     venue: str = "polymarket"
     buckets: list[NegRiskBucket]
-    sum_of_asks: float  # Sum of all YES ask prices; < 1.0 = arb exists
-    yes_ask_sum: float | None = None  # Alias for sum_of_asks; (1.0 - yes_ask_sum) * 10000 = arb_bps
-    no_bid_sum: float | None = None  # Sum of NO bid prices; = 1 - yes_ask_sum at fair value
+    sum_of_asks: Decimal  # Sum of all YES ask prices; < 1.0 = arb exists
+    yes_ask_sum: Decimal | None = None  # Alias for sum_of_asks; (1.0 - yes_ask_sum) * 10000 = arb_bps
+    no_bid_sum: Decimal | None = None  # Sum of NO bid prices; = 1 - yes_ask_sum at fair value
     arb_bps: float | None = None  # (1.0 - yes_ask_sum) * 10000
     bucket_markets: list[str] | None = None  # condition_ids or market IDs in the group
-    capital_required_usdc: float | None = None  # Capital needed to buy all buckets
-    expected_profit_usdc: float | None = None  # Expected profit at resolution
+    capital_required_usdc: Decimal | None = None  # Capital needed to buy all buckets
+    expected_profit_usdc: Decimal | None = None  # Expected profit at resolution
     implied_profit_pct: float  # (1.0 - sum_of_asks) * 100
     estimated_capital_usd: float | None = None  # Capital needed; prefer capital_required_usdc
     requires_lock_up_days: int | None = None  # Days until market resolution
@@ -161,7 +161,7 @@ class CrossVenueArbLeg(BaseModel):
 
     venue: str  # "kalshi", "polymarket", "pinnacle", "betfair"
     side: str  # "yes_buy", "no_buy", "back", "lay"
-    price: float  # Ask price (probability) for the action
+    price: Decimal  # Ask price (probability) for the action
     market_ticker: str | None = None  # Kalshi ticker
     condition_id: str | None = None  # Polymarket condition_id
     event_id: str | None = None  # Sports book event ID
@@ -186,7 +186,7 @@ class CrossVenueArbSignal(BaseModel):
     underlying_category: str | None = None  # "fed_rate", "sports_nba", "crypto_btc", "politics_us"
     expiry: str | None = None
     legs: list[CrossVenueArbLeg]
-    total_cost: float  # Sum of leg costs; < 1.0 = guaranteed profit
+    total_cost: Decimal  # Sum of leg costs; < 1.0 = guaranteed profit
     implied_profit_pct: float  # (1.0 - total_cost) * 100
     requires_lock_up_days: int | None = None
     detected_at: str | None = None
