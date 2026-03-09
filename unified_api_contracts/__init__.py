@@ -65,10 +65,22 @@ from .unified_api_contracts_external.betfair import (
     BetfairCurrentOrderSummary,
     BetfairListCurrentOrdersResponse,
 )
+from .unified_api_contracts_external.betfair.schemas import (
+    BetfairMarketCatalogue,
+    BetfairRunnerCatalog,
+)
 from .unified_api_contracts_external.binance.market_schemas import (
     BinanceFuturesExchangeInfo,
     BinanceInstrumentInfo,
     BinanceOptionInstrumentInfo,
+)
+from .unified_api_contracts_external.bybit.schemas import (
+    BybitInstrumentInfo,
+    BybitInstrumentsResponse,
+)
+from .unified_api_contracts_external.coinbase.schemas import (
+    CoinbaseProductInfo,
+    CoinbaseProductsResponse,
 )
 from .unified_api_contracts_external.databento.schemas import (
     DatabentoReferenceInstrument,
@@ -78,6 +90,10 @@ from .unified_api_contracts_external.deribit.schemas import (
     DeribitGetInstrumentsResponse,
     DeribitInstrumentInfoFull,
 )
+from .unified_api_contracts_external.hyperliquid.schemas import (
+    HyperliquidAssetInfo,
+    HyperliquidMeta,
+)
 from .unified_api_contracts_external.ibkr import (
     IBKRAccountValue,
     IBKRPosition,
@@ -86,8 +102,21 @@ from .unified_api_contracts_external.ibkr.schemas import (
     IBKRContractDetails,
     IBKRCorporateAction,
 )
+from .unified_api_contracts_external.okx.schemas import (
+    OKXInstrumentInfo,
+    OKXInstrumentsResponse,
+)
+from .unified_api_contracts_external.polygon.schemas import (
+    PolygonOptionContract,
+    PolygonOptionContractsResponse,
+    PolygonTicker,
+    PolygonTickersResponse,
+)
 from .unified_api_contracts_external.polymarket import (
     PolymarketPosition,
+)
+from .unified_api_contracts_external.polymarket.schemas import (
+    PolymarketGammaMarket,
 )
 from .unified_api_contracts_external.sports import (
     BOOKMAKER_REGISTRY,
@@ -121,6 +150,10 @@ from .unified_api_contracts_external.sports import (
     ScraperError,
     SignalSource,
     SportsError,
+)
+from .unified_api_contracts_external.tardis.schemas import (
+    TardisExchangeDetail,
+    TardisInstrumentDetail,
 )
 from .unified_normalised_contracts.domain import (
     CanonicalAccountSnapshot,
@@ -209,6 +242,8 @@ __all__ = [
     "BetStatus",
     "BetfairCurrentOrderSummary",
     "BetfairListCurrentOrdersResponse",
+    "BetfairMarketCatalogue",
+    "BetfairRunnerCatalog",
     "BettingSignal",
     "BinanceFuturesExchangeInfo",
     "BinanceInstrumentInfo",
@@ -217,6 +252,8 @@ __all__ = [
     "BookmakerInfo",
     "BookmakerRegistry",
     "BookmakerUnavailableError",
+    "BybitInstrumentInfo",
+    "BybitInstrumentsResponse",
     "CanonicalAccountSnapshot",
     "CanonicalBalance",
     "CanonicalBookmakerMarket",
@@ -234,6 +271,8 @@ __all__ = [
     "CanonicalSpread",
     "CanonicalTeam",
     "CanonicalVenue",
+    "CoinbaseProductInfo",
+    "CoinbaseProductsResponse",
     "CompoundV3MarketInfo",
     "CompoundV3UserPosition",
     "ComputeType",
@@ -252,6 +291,8 @@ __all__ = [
     "FixtureNotFoundError",
     "FundingRate",
     "HeartbeatMessage",
+    "HyperliquidAssetInfo",
+    "HyperliquidMeta",
     "IBKRAccountValue",
     "IBKRContractDetails",
     "IBKRCorporateAction",
@@ -266,6 +307,8 @@ __all__ = [
     "MorphoMarketParams",
     "MorphoUserPosition",
     "NormalizedStrikeCoordinate",
+    "OKXInstrumentInfo",
+    "OKXInstrumentsResponse",
     "OddsChangedError",
     "OddsFormat",
     "OddsType",
@@ -276,6 +319,11 @@ __all__ = [
     "OraclePrice",
     "OrderStatus",
     "OutcomeType",
+    "PolygonOptionContract",
+    "PolygonOptionContractsResponse",
+    "PolygonTicker",
+    "PolygonTickersResponse",
+    "PolymarketGammaMarket",
     "PolymarketPosition",
     "ScraperError",
     "SettlementPrice",
@@ -285,6 +333,8 @@ __all__ = [
     "StakingRate",
     "SubscribeRequest",
     "Swap",
+    "TardisExchangeDetail",
+    "TardisInstrumentDetail",
     "UniswapV3PoolStateResponse",
     "UniswapV3QuoteResponse",
     "UniswapV3SwapTxReceipt",
