@@ -594,7 +594,7 @@ class CanonicalBetOrder(_CanonicalBase):
     schema_version: str = "1.0"
 
 
-class CanonicalComboLeg(_CanonicalBase, frozen=True):
+class CanonicalComboLeg(_CanonicalBase):
     """One leg of a multi-leg combo bet or options combo."""
 
     venue: str
@@ -607,7 +607,7 @@ class CanonicalComboLeg(_CanonicalBase, frozen=True):
     odds_format: OddsFormat = OddsFormat.DECIMAL
 
 
-class CanonicalComboBet(_CanonicalBase, frozen=True):
+class CanonicalComboBet(_CanonicalBase):
     """Multi-leg combo bet or options spread.
 
     ``net_premium`` MAY BE NEGATIVE for options combos where the short leg
