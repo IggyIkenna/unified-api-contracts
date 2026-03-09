@@ -27,8 +27,45 @@ steps:
         ruff check .
         ruff format --check .
 
-  # Step 2: Build Python package (wheel)
-  # unified-api-contracts has zero upstream dependencies - no Artifact Registry install needed
+  # Step 1.5: Clone unified-trading-pm for quality-gates base scripts
+  # quality-gates.sh sources ${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh.
+  # In Cloud Build the source is at /workspace, so WORKSPACE_ROOT=/workspace. We clone
+  # unified-trading-pm into /workspace/unified-trading-pm so the path resolves correctly.
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: "clone-pm-scripts"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        set -e
+        GH_PAT=$$(gcloud secrets versions access latest --secret=GH_PAT --project=$PROJECT_ID 2>/dev/null || echo "")
+        if [ -n "$$GH_PAT" ] && [ ! -d "/workspace/unified-trading-pm" ]; then
+          git clone --depth=1 \
+            "https://$$GH_PAT@github.com/IggyIkenna/unified-trading-pm.git" \
+            /workspace/unified-trading-pm
+          echo "Cloned unified-trading-pm to /workspace/unified-trading-pm"
+        else
+          echo "Skipping clone (PAT unavailable or already cloned)"
+        fi
+    waitFor: ["lint"]
+
+  # Step 2: Run full quality gates (replaces inline lint/cloud-sdk checks)
+  # WORKSPACE_ROOT overridden to /workspace so quality-gates.sh resolves base-library.sh correctly.
+  - name: "python:3.13-slim"
+    id: "quality-gates"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        set -e
+        apt-get update -qq && apt-get install -y --no-install-recommends git ripgrep
+        pip install --quiet uv
+        [ -d unified-api-contracts ] && cd unified-api-contracts
+        uv pip install --system -e ".[dev]" --quiet
+        CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
+          WORKSPACE_ROOT=/workspace \
+          bash scripts/quality-gates.sh --no-fix --quick
+    waitFor: ["clone-pm-scripts"]
 
   # Cloud SDK isolation — STEP 5.10/5.11 (hard-fail on violations)
   - name: "debian:bookworm-slim"
@@ -49,7 +86,7 @@ steps:
           --type py --glob '!.venv*' --glob '!tests/**' . 2>/dev/null || true)
         [ -n "$UTL" ] && { echo "STEP 5.11 FAILED:"; echo "$UTL"; exit 1; }
         echo "STEP 5.11 passed"
-    waitFor: ["lint"]
+    waitFor: ["quality-gates"]
 
   - name: "python:3.13-slim"
     id: "build-wheel"
@@ -62,7 +99,7 @@ steps:
         [ -d unified-api-contracts ] && cd unified-api-contracts
         python -m build --wheel --outdir dist/
         ls -lh dist/
-    waitFor: ["lint"]
+    waitFor: ["quality-gates", "cloud-sdk-isolation-check"]
 
   # Step 2.5: Store build metadata (version → commit mapping)
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
