@@ -20,7 +20,13 @@ from __future__ import annotations
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import AwareDatetime, BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
+
+
+class _CanonicalBase(BaseModel):
+    """Base for all canonical execution schemas — rejects unknown fields."""
+
+    model_config = ConfigDict(extra="forbid")
 
 
 class OrderSide(StrEnum):
@@ -100,7 +106,7 @@ CANONICAL_EXECUTION_RESULT_VERSION = "1.0.0"
 # ---------------------------------------------------------------------------
 
 
-class CanonicalOrder(BaseModel):
+class CanonicalOrder(_CanonicalBase):
     order_id: str
     client_order_id: str | None = None
     timestamp: AwareDatetime
@@ -125,7 +131,7 @@ class CanonicalOrder(BaseModel):
     schema_version: str = CANONICAL_ORDER_VERSION
 
 
-class CanonicalFill(BaseModel):
+class CanonicalFill(_CanonicalBase):
     """Fill record — also used as Pub/Sub fill-events-{venue} message body."""
 
     fill_id: str
@@ -152,7 +158,7 @@ class CanonicalFill(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class ExecutionInstruction(BaseModel):
+class ExecutionInstruction(_CanonicalBase):
     """Single atomic execution directive (from execution-services)."""
 
     instruction_id: str
@@ -180,7 +186,7 @@ class ExecutionInstruction(BaseModel):
     schema_version: str = CANONICAL_EXECUTION_INSTRUCTION_VERSION
 
 
-class ExecutionResult(BaseModel):
+class ExecutionResult(_CanonicalBase):
     """Result of a single ExecutionInstruction."""
 
     instruction_id: str
@@ -208,7 +214,7 @@ class ExecutionResult(BaseModel):
 # No circular import: domain.py has no imports from execution.py.
 
 
-class CanonicalMarginState(BaseModel):
+class CanonicalMarginState(_CanonicalBase):
     """Canonical margin account state — all venues."""
 
     account_id: str
@@ -221,7 +227,7 @@ class CanonicalMarginState(BaseModel):
     liquidation_price: Decimal | None = None
 
 
-class CanonicalAccountState(BaseModel):
+class CanonicalAccountState(_CanonicalBase):
     """Canonical complete account state — all venues.
 
     ``positions`` and ``balances`` use the canonical types from domain.py.
@@ -237,7 +243,7 @@ class CanonicalAccountState(BaseModel):
     margins: CanonicalMarginState | None = None
 
 
-class CanonicalOrderRejection(BaseModel):
+class CanonicalOrderRejection(_CanonicalBase):
     """Canonical order rejection event — all venues."""
 
     venue: str
@@ -249,7 +255,7 @@ class CanonicalOrderRejection(BaseModel):
     timestamp: AwareDatetime
 
 
-class CanonicalOrderAmendment(BaseModel):
+class CanonicalOrderAmendment(_CanonicalBase):
     """Canonical order amendment event — all venues."""
 
     venue: str
