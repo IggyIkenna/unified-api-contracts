@@ -9,6 +9,7 @@ from .accounts import (
     SubAccount,
     WithdrawalRecord,
 )
+from .commodity import CommoditySignal, FactorValue, RegimeState
 from .defi import LendingRate, LiquidityPool, OraclePrice, StakingRate, Swap
 from .derivatives import (
     FundingRate,
@@ -92,6 +93,7 @@ __all__ = [
     "AaveV3UserAccountData",
     "AaveV3UserReserveData",
     "BucketMarket",
+    "CommoditySignal",
     "CompoundV3MarketInfo",
     "CompoundV3UserPosition",
     "CrossVenueArbLeg",
@@ -106,6 +108,7 @@ __all__ = [
     "EulerUserPosition",
     "EulerVaultData",
     "ExchangeFeeSchedule",
+    "FactorValue",
     "FundingRate",
     "FundingRateHistory",
     "HealthPingResponse",
@@ -133,6 +136,7 @@ __all__ = [
     "PredictionMarketUniverse",
     "ProbabilityBucket",
     "RateLimitResponse",
+    "RegimeState",
     "SettlementEvent",
     "SettlementPrice",
     "SportsbookLink",
