@@ -141,7 +141,7 @@ if [ "$RUN_TESTS" = true ]; then
 
     # SKIP_NO_REASON: @pytest.mark.skip must have a reason comment on the preceding line
     SKIP_NO_REASON=$(rg "@pytest\.mark\.skip" --type py tests/ -B 1 2>/dev/null \
-        | grep -v "# reason:\|# noqa\|^--\|skipif" | grep "@pytest\.mark\.skip" || :)
+        | grep -v "# reason:\|# noqa\|^--" | grep "@pytest\.mark\.skip" || :)
     [[ -n "$SKIP_NO_REASON" ]] && { log_fail "pytest.mark.skip without reason comment — add '# reason: ...' above"; echo "$SKIP_NO_REASON" | head -3; exit 1; }
     log_success "All pytest.mark.skip have reason comments"
 fi
@@ -171,7 +171,7 @@ if [ "$SKIP_TYPECHECK" != "true" ]; then
     command -v basedpyright &>/dev/null || { log_fail "basedpyright required: uv pip install basedpyright"; exit 1; }
     export BASEDPYRIGHT_CACHE_DIR="${TMPDIR:-/tmp}/basedpyright-cache/${PACKAGE_NAME:-$(basename "$PWD")}"
     mkdir -p "$BASEDPYRIGHT_CACHE_DIR"
-    basedpyright "$SOURCE_DIR/" 2>&1 && log_success "Type check PASSED" || { log_fail "Type check FAILED/timeout"; exit 1; }
+    run_timeout 120 basedpyright "$SOURCE_DIR/" 2>&1 && log_success "Type check PASSED" || { log_fail "Type check FAILED/timeout"; exit 1; }
 fi
 [ "$SKIP_TYPECHECK" = "true" ] && echo -e "${YELLOW}⚠️  Type check SKIPPED (--skip-typecheck flag)${NC}"
 
@@ -404,7 +404,7 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
 
 # 7. BYPASS — ||true in quality gate scripts
 BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|zombies\|pyright\|cleanup\|BYPASS\|log_fail\|log_success\|: *#" || :)
+    | grep -v "^#\|zombies\|pyright\|cleanup" || :)
 [[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
@@ -468,6 +468,6 @@ VSCRIPT="${REPO_ROOT}/unified-trading-codex/scripts/run-all-validators.sh"
 [ -f "$VSCRIPT" ] && "$VSCRIPT" --category all --failed-only 2>/dev/null || log_warn "Validators not available (optional)"
 
 QG_END=$(date +%s); DUR=$((QG_END - QG_START))
-[ $DUR -gt 300 ] && { log_fail "Quality gates must complete in <5 min (took ${DUR}s)"; exit 1; }
+[ $DUR -gt 120 ] && { log_fail "Quality gates must complete in <2 min (took ${DUR}s)"; exit 1; }
 echo -e "\n${GREEN}======================================================================"
 echo -e "✅ ALL QUALITY GATES PASSED (${DUR}s)${NC}"
