@@ -97,7 +97,7 @@ Move the entire file `tests/test_ac_uic_alignment.py` (82 tests) from `unified-a
 | `TestPubsubAlignment`            | 16                   | `InternalPubSubTopic` + 15 message models field parity                                                                                                  |
 | `TestRiskAlignment`              | 14                   | `RiskStatus`, `AlertType`, `PositionSide` enums + 11 risk models                                                                                        |
 | `TestErrorSchemaAlignment`       | 5 (1 xfail)          | `ErrorCategory`, `ErrorSeverity`, `ErrorRecoveryStrategy`, `ErrorContext`, `EnhancedError`                                                              |
-| `TestMessagingTopicAlignment`    | 2                    | `MessagingTopic` ↔ `InternalPubSubTopic` parity                                                                                                        |
+| `TestMessagingTopicAlignment`    | 2                    | `MessagingTopic` ↔ `InternalPubSubTopic` parity                                                                                                         |
 
 #### Step 2: Delete `test_ac_uic_alignment.py` from unified-api-contracts
 
