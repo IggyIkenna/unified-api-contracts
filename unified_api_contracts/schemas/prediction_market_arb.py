@@ -44,7 +44,7 @@ class CrossVenueLink(BaseModel):
     venue_b: str
     market_id_b: str
     link_type: Literal["identical", "equivalent", "related", "correlated"]
-    basis_bps: float  # Current price difference in basis points
+    basis_bps: Decimal  # Current price difference in basis points
     verified_by: str  # "manual" | "nlp_similarity" | "structured_match"
     created_at: AwareDatetime
 
@@ -104,7 +104,7 @@ class SportsbookLink(BaseModel):
     sportsbook_market_type: str  # "moneyline", "spread", "total"
     sportsbook_implied_prob: Decimal
     polymarket_yes_mid: Decimal
-    discrepancy_bps: float
+    discrepancy_bps: Decimal
     captured_at: AwareDatetime
 
 
@@ -122,7 +122,7 @@ class NegRiskBucket(BaseModel):
     condition_id: str | None = None
     yes_ask: Decimal | None = None  # Current ask price (implied probability, 0-1)
     yes_bid: Decimal | None = None
-    liquidity_usd: float | None = None
+    liquidity_usd: Decimal | None = None
 
 
 class NegRiskArbSignal(BaseModel):
@@ -145,12 +145,12 @@ class NegRiskArbSignal(BaseModel):
     sum_of_asks: Decimal  # Sum of all YES ask prices; < 1.0 = arb exists
     yes_ask_sum: Decimal | None = None  # Alias for sum_of_asks; (1.0 - yes_ask_sum) * 10000 = arb_bps
     no_bid_sum: Decimal | None = None  # Sum of NO bid prices; = 1 - yes_ask_sum at fair value
-    arb_bps: float | None = None  # (1.0 - yes_ask_sum) * 10000
+    arb_bps: Decimal | None = None  # (1.0 - yes_ask_sum) * 10000
     bucket_markets: list[str] | None = None  # condition_ids or market IDs in the group
     capital_required_usdc: Decimal | None = None  # Capital needed to buy all buckets
     expected_profit_usdc: Decimal | None = None  # Expected profit at resolution
-    implied_profit_pct: float  # (1.0 - sum_of_asks) * 100
-    estimated_capital_usd: float | None = None  # Capital needed; prefer capital_required_usdc
+    implied_profit_pct: Decimal  # (1.0 - sum_of_asks) * 100
+    estimated_capital_usd: Decimal | None = None  # Capital needed; prefer capital_required_usdc
     requires_lock_up_days: int | None = None  # Days until market resolution
     is_exhaustive: bool | None = None  # Whether ranges provably cover the full distribution
     detected_at: str | None = None  # ISO 8601 timestamp when signal was detected
@@ -165,7 +165,7 @@ class CrossVenueArbLeg(BaseModel):
     market_ticker: str | None = None  # Kalshi ticker
     condition_id: str | None = None  # Polymarket condition_id
     event_id: str | None = None  # Sports book event ID
-    liquidity_usd: float | None = None
+    liquidity_usd: Decimal | None = None
 
 
 class CrossVenueArbSignal(BaseModel):
@@ -187,7 +187,7 @@ class CrossVenueArbSignal(BaseModel):
     expiry: str | None = None
     legs: list[CrossVenueArbLeg]
     total_cost: Decimal  # Sum of leg costs; < 1.0 = guaranteed profit
-    implied_profit_pct: float  # (1.0 - total_cost) * 100
+    implied_profit_pct: Decimal  # (1.0 - total_cost) * 100
     requires_lock_up_days: int | None = None
     detected_at: str | None = None
     notes: str | None = None  # e.g. "Lock-up ~60 days for June gold futures resolution"
