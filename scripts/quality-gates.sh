@@ -139,9 +139,16 @@ if [ "$RUN_TESTS" = true ]; then
     [[ -n "$DUP" ]] && { log_fail "Duplicate test files — expand existing files instead:"; echo "$DUP"; exit 1; }
     log_success "No duplicate test files"
 
-    # SKIP_NO_REASON: @pytest.mark.skip must have a reason comment on the preceding line
-    SKIP_NO_REASON=$(rg "@pytest\.mark\.skip" --type py tests/ -B 1 2>/dev/null \
-        | grep -v "# reason:\|# noqa\|^--" | grep "@pytest\.mark\.skip" || :)
+    # SKIP_NO_REASON: @pytest.mark.skip must have a '# reason:' comment on the preceding line
+    # or on the same line. Uses awk to track context: checks prev line and current line.
+    SKIP_NO_REASON=$(rg "@pytest[.]mark[.]skip" --type py tests/ -B 1 2>/dev/null \
+        | grep -v "^--$" \
+        | awk '{
+            if (/pytest[.]mark[.]skip/) {
+                if (prev !~ /# reason:/ && !/# reason:/) print
+            }
+            prev = $0
+        }' || :)
     [[ -n "$SKIP_NO_REASON" ]] && { log_fail "pytest.mark.skip without reason comment — add '# reason: ...' above"; echo "$SKIP_NO_REASON" | head -3; exit 1; }
     log_success "All pytest.mark.skip have reason comments"
 fi
@@ -404,7 +411,7 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
 
 # 7. BYPASS — ||true in quality gate scripts
 BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|zombies\|pyright\|cleanup" || :)
+    | grep -v "^#\|zombies\|pyright\|cleanup\|log_fail\|log_success\|BYPASS" || :)
 [[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
