@@ -18,11 +18,10 @@ from __future__ import annotations
 
 import warnings
 from dataclasses import dataclass, field
-from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import AwareDatetime, BaseModel, Field
 
 
 @dataclass
@@ -36,8 +35,8 @@ class FundingRate:
     venue: str
     symbol: str
     rate: Decimal
-    timestamp: datetime
-    next_funding_time: datetime | None = None
+    timestamp: AwareDatetime
+    next_funding_time: AwareDatetime | None = None
     predicted_rate: Decimal | None = None
 
     def __post_init__(self) -> None:
@@ -60,7 +59,7 @@ class Liquidation:
     side: str  # "buy" | "sell"
     quantity: Decimal
     price: Decimal
-    timestamp: datetime
+    timestamp: AwareDatetime
     order_type: str = "market"
 
     def __post_init__(self) -> None:
@@ -76,7 +75,7 @@ class SettlementPrice:
     venue: str
     symbol: str
     price: Decimal
-    settlement_time: datetime
+    settlement_time: AwareDatetime
     contract_type: str = "perpetual"  # "perpetual" | "quarterly" | "monthly"
 
 
@@ -84,11 +83,11 @@ class SettlementPrice:
 class OptionsChain:
     venue: str
     underlying: str
-    expiry: datetime
+    expiry: AwareDatetime
     strikes: list[Decimal] = field(default_factory=list)
     calls: dict[str, OptionContract] = field(default_factory=dict)
     puts: dict[str, OptionContract] = field(default_factory=dict)
-    timestamp: datetime | None = None
+    timestamp: AwareDatetime | None = None
 
 
 @dataclass
@@ -137,7 +136,7 @@ class InsuranceFundState(BaseModel):
 
     asset: str = Field(..., description="Asset symbol")
     amount: Decimal = Field(..., description="Fund amount")
-    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    timestamp: AwareDatetime = Field(..., description="Snapshot timestamp")
 
 
 class LongShortRatio(BaseModel):
@@ -152,14 +151,14 @@ class OpenInterestHistory(BaseModel):
     """Open interest history point."""
 
     symbol: str = Field(..., description="Instrument symbol")
-    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    timestamp: AwareDatetime = Field(..., description="Snapshot timestamp")
     openInterest: Decimal = Field(..., description="Open interest value")
 
 
 class FundingRateHistory(BaseModel):
     """Funding rate history point."""
 
-    fundingTime: datetime = Field(..., description="Funding timestamp")
+    fundingTime: AwareDatetime = Field(..., description="Funding timestamp")
     rate: Decimal = Field(..., description="Funding rate")
     markPrice: Decimal | None = Field(None, description="Mark price at funding")
     indexPrice: Decimal | None = Field(None, description="Index price at funding")
@@ -170,7 +169,7 @@ class SettlementEvent(BaseModel):
 
     instrument: str = Field(..., description="Instrument symbol")
     settlementPrice: Decimal = Field(..., description="Settlement price")
-    deliveryTime: datetime = Field(..., description="Delivery/settlement time")
+    deliveryTime: AwareDatetime = Field(..., description="Delivery/settlement time")
     cashFlow: Decimal | None = Field(None, description="Cash flow amount")
     fee: Decimal | None = Field(None, description="Settlement fee")
 
@@ -188,14 +187,14 @@ class VolSmilePoint(BaseModel):
 class VolSurfaceSlice(BaseModel):
     """Volatility smile at a single expiry."""
 
-    expiry: datetime = Field(..., description="Expiry timestamp")
+    expiry: AwareDatetime = Field(..., description="Expiry timestamp")
     points: list[VolSmilePoint] = Field(default_factory=list, description="Strike/IV points")
 
 
 class VolTermStructure(BaseModel):
     """Volatility term structure (expiry vs ATM IV)."""
 
-    expiry: datetime = Field(..., description="Expiry timestamp")
+    expiry: AwareDatetime = Field(..., description="Expiry timestamp")
     atmVol: Decimal = Field(..., description="At-the-money implied volatility")
 
 
@@ -203,7 +202,7 @@ class VolSurface(BaseModel):
     """Full volatility surface (smile + term structure)."""
 
     symbol: str = Field(..., description="Underlying symbol")
-    timestamp: datetime = Field(..., description="Snapshot timestamp")
+    timestamp: AwareDatetime = Field(..., description="Snapshot timestamp")
     slices: list[VolSurfaceSlice] = Field(default_factory=list, description="Smile slices per expiry")
     termStructure: list[VolTermStructure] = Field(default_factory=list, description="Term structure")
 
@@ -257,7 +256,7 @@ class MultiLegInstrument(BaseModel):
     legs: list[ComboLeg]
     block_trade_only: bool = False  # True = OTC/institutional block trade required
     description: str | None = None  # Human-readable e.g. "BTC JUN/SEP calendar spread"
-    timestamp: datetime | None = None  # When this combo was created/observed
+    timestamp: AwareDatetime | None = None  # When this combo was created/observed
 
 
 class ComboQuote(BaseModel):
@@ -276,4 +275,4 @@ class ComboQuote(BaseModel):
     net_gamma: Decimal | None = None
     net_vega: Decimal | None = None
     net_theta: Decimal | None = None
-    timestamp: datetime | None = None
+    timestamp: AwareDatetime | None = None

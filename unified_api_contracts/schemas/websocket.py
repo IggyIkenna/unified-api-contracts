@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+
+from pydantic import AwareDatetime
 
 
 @dataclass
@@ -12,7 +13,7 @@ class HealthPingResponse:
 
     status: str  # ok, healthy, etc.
     latency_ms: float | None = None
-    timestamp: datetime | None = None
+    timestamp: AwareDatetime | None = None
 
 
 @dataclass
@@ -21,7 +22,7 @@ class WebSocketConnectionOpened:
 
     venue: str
     url: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     connection_id: str | None = None
 
 
@@ -32,7 +33,7 @@ class WebSocketConnectionClosed:
     venue: str
     code: int
     reason: str | None = None
-    timestamp: datetime | None = None
+    timestamp: AwareDatetime | None = None
     was_clean: bool = False
 
 
@@ -41,7 +42,7 @@ class WebSocketPingFrame:
     """WebSocket ping frame (client→server or server→client)."""
 
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     payload: bytes | None = None
 
 
@@ -50,7 +51,7 @@ class WebSocketPongFrame:
     """WebSocket pong frame (response to ping)."""
 
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     payload: bytes | None = None
 
 
@@ -72,7 +73,7 @@ class UnsubscribeRequest:
 @dataclass
 class HeartbeatMessage:
     venue: str
-    timestamp: datetime
+    timestamp: AwareDatetime
     ping_interval_seconds: float = 20.0
 
 
@@ -80,6 +81,6 @@ class HeartbeatMessage:
 class WebSocketConnectionState:
     venue: str
     connected: bool
-    last_heartbeat: datetime | None = None
+    last_heartbeat: AwareDatetime | None = None
     reconnect_count: int = 0
     subscriptions: list[str] = field(default_factory=list)
