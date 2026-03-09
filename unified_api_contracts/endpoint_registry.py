@@ -54,6 +54,24 @@ class ResponseFormat(StrEnum):
     TEXT = "text"  # plain text
 
 
+class CassetteStatus(StrEnum):
+    """VCR cassette recording status for this endpoint.
+
+    RECORDED       — cassette YAML exists in the venue's mocks/ directory; replay works offline.
+    AUTH_BLOCKED   — endpoint requires an API key / session token stored in Secret Manager;
+                     cassette cannot be recorded in CI until the key is provisioned.
+                     Secret Manager key name documented in ``notes``.
+    NOT_APPLICABLE — endpoint cannot be cassette-recorded: WebSocket streams, binary batch
+                     downloads (DBN, Parquet, CSV-GZ), or on-chain eth_call RPC calls.
+    PENDING        — public endpoint where a cassette has not been recorded yet but could be.
+    """
+
+    RECORDED = "recorded"
+    AUTH_BLOCKED = "auth_blocked"
+    NOT_APPLICABLE = "not_applicable"
+    PENDING = "pending"
+
+
 class EndpointSpec(BaseModel):
     """Metadata for a single API endpoint, with versioning and access tagging.
 
@@ -74,6 +92,7 @@ class EndpointSpec(BaseModel):
             data_availability=DataAvailability.BOTH,
             version="v2",
             notes="Integer cent fields deprecated March 5 2026; use yes_bid_dollars",
+            cassette_status=CassetteStatus.RECORDED,
         )
     """
 
@@ -99,6 +118,8 @@ class EndpointSpec(BaseModel):
     """Pagination mechanism: 'cursor', 'offset_limit', 'page_number', 'link_header', 'next_page_token'"""
     max_lookback_days: int | None = None
     """Maximum historical lookback in days (None = unlimited). Important for free tier constraints."""
+    cassette_status: CassetteStatus = CassetteStatus.PENDING
+    """VCR cassette recording status. Set to RECORDED once the mocks/ YAML is committed."""
 
 
 # ---------------------------------------------------------------------------
@@ -121,6 +142,8 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "migrate to yes_bid_dollars (string fixed-point). "
             "Historical window shrinks to ~3 months same date."
         ),
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="kalshi",
@@ -134,6 +157,8 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         pagination_style="cursor",
         max_lookback_days=90,
         notes="Bulk-download historical markets before March 6 2026 when window shrinks.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="kalshi",
@@ -145,6 +170,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="v2",
         notes="Public channels: ticker, trade, orderbook_delta, market_lifecycle_v2. Private: fill, market_positions.",
         requires_auth=False,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
     ),
     EndpointSpec(
         venue="kalshi",
@@ -155,8 +181,11 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         data_availability=DataAvailability.HISTORICAL_ONLY,
         version="v2",
         max_lookback_days=90,
-        notes="Bulk-download fill history before March 6 2026 window shrink.",
+        notes=(
+            "Bulk-download fill history before March 6 2026 window shrink. Secret Manager key: kalshi-api-credentials."
+        ),
         requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- Polymarket ---
     EndpointSpec(
@@ -169,6 +198,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="gamma-v1",
         notes="Gamma API events: questions, outcomes, volumes, resolution. No auth required.",
         requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -180,6 +210,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="gamma-v1",
         notes="Gamma API has full market metadata including tags, neg_risk, resolution_source. No auth required.",
         requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -191,6 +222,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="gamma-v1",
         notes="Gamma API market tags. No auth required.",
         requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -205,6 +237,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         notes="CLOB era only: from Nov 21 2022. AMM era (pre-Nov 2022) has splits/merges only, no price series.",
         available_from_date="2022-11-21",
         requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -214,7 +247,12 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.STREAMING_WEBSOCKET,
         data_availability=DataAvailability.LIVE_ONLY,
         version="clob-v1",
-        notes="Live order book streaming. Auth via L2 HMAC-SHA256 POLY_* headers.",
+        notes=(
+            "Live order book streaming. Auth via L2 HMAC-SHA256 POLY_* headers. "
+            "Secret Manager key: polymarket-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
     ),
     # --- Databento ---
     EndpointSpec(
@@ -228,8 +266,11 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         response_format=ResponseFormat.DBN_ZST,
         notes=(
             "Batch download; returns zstd-compressed DBN file. Use dbn Python library to decode. "
-            "Each rtype maps to a different schema (rtype=32 = ohlcv-1h, rtype=10 = mbp-10, etc.)."
+            "Each rtype maps to a different schema (rtype=32 = ohlcv-1h, rtype=10 = mbp-10, etc.). "
+            "Secret Manager key: databento-api-key."
         ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
     ),
     EndpointSpec(
         venue="databento",
@@ -239,7 +280,12 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.STREAMING_WEBSOCKET,
         data_availability=DataAvailability.LIVE_ONLY,
         version="v0",
-        notes="Live streaming of same schemas as batch. Requires separate live API key.",
+        notes=(
+            "Live streaming of same schemas as batch. Requires separate live API key. "
+            "Secret Manager key: databento-live-api-key."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
     ),
     # --- Tardis ---
     EndpointSpec(
@@ -253,8 +299,10 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         response_format=ResponseFormat.CSV_GZIP,
         notes=(
             "Full-day gzip CSV files. Must download entire day; no streaming partial. "
-            "Memory-efficient: stream decompress."
+            "Memory-efficient: stream decompress. Secret Manager key: tardis-api-key."
         ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- Barchart ---
     EndpointSpec(
@@ -271,6 +319,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "Timestamps in US Eastern Time."
         ),
         requires_auth=False,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
     ),
     # --- The Graph / Subgraph ---
     EndpointSpec(
@@ -287,6 +336,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "(subgraph-specific). Goldsky subgraphs used for Polymarket on-chain history."
         ),
         requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     # --- Glassnode ---
     EndpointSpec(
@@ -302,8 +352,10 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         notes=(
             "Auth via ?api_key=KEY query param. Free tier limited to daily (24h) resolution and "
             "1-year history. Paid tier: 10-minute resolution, full history. "
-            "Response always: list[{t: int, v: float|dict}]."
+            "Response always: list[{t: int, v: float|dict}]. Secret Manager key: glassnode-api-key."
         ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- alternative.me Fear & Greed ---
     EndpointSpec(
@@ -319,6 +371,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "Use ?limit=N for history, ?limit=1 for latest (includes time_until_update)."
         ),
         requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     # --- Hyperliquid ---
     EndpointSpec(
@@ -329,7 +382,13 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.REST_POLLING,
         data_availability=DataAvailability.LIVE_ONLY,
         version=None,
-        notes="All REST endpoints are POST to /info with JSON body {type: ..., ...}. No separate GET endpoints.",
+        notes=(
+            "All REST endpoints are POST to /info with JSON body {type: ..., ...}. "
+            "No separate GET endpoints. Public endpoints: no auth. Private (account/orders): "
+            "auth via EIP-712 signature. Secret Manager key: hyperliquid-api-credentials."
+        ),
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     # --- OKX ---
     EndpointSpec(
@@ -342,8 +401,11 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="v5",
         notes=(
             "For OPTION instType: returns per-instrument greeks (delta, gamma, vega, theta, "
-            "markVol, bidVol, askVol). OKX v5 unifies spot/margin/swap/futures/options in one API."
+            "markVol, bidVol, askVol). OKX v5 unifies spot/margin/swap/futures/options in one API. "
+            "Public market endpoints do not require auth."
         ),
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="okx",
@@ -353,9 +415,27 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.REST_POLLING,
         data_availability=DataAvailability.LIVE_ONLY,
         version="v5",
-        notes="Multi-leg block trades via RFQ system. OKX has no native combo instrument type; multi-leg done via RFQ.",
+        notes=(
+            "Multi-leg block trades via RFQ system. OKX has no native combo instrument type; "
+            "multi-leg done via RFQ. Auth: OK-ACCESS-KEY/SIGN/TIMESTAMP/PASSPHRASE headers. "
+            "Secret Manager key: okx-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- Binance ---
+    EndpointSpec(
+        venue="binance",
+        endpoint_path="https://api.binance.com/api/v3/ticker/24hr",
+        http_method="GET",
+        schema_class="BinanceTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes="Public 24hr ticker. No auth required for market data.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
     EndpointSpec(
         venue="binance",
         endpoint_path="https://eapi.binance.com/eapi/v1/order",
@@ -366,8 +446,68 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="eapi-v1",
         notes=(
             "European options API. Separate endpoint/base URL from spot (api.binance.com) and "
-            "futures (fapi/dapi). Requires options trading permission in account."
+            "futures (fapi/dapi). Requires options trading permission in account. "
+            "Auth: X-MBX-APIKEY header. Secret Manager key: binance-api-credentials."
         ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Bybit ---
+    EndpointSpec(
+        venue="bybit",
+        endpoint_path="https://api.bybit.com/v5/market/tickers",
+        http_method="GET",
+        schema_class="BybitTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v5",
+        notes="Public market tickers. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="bybit",
+        endpoint_path="https://api.bybit.com/v5/order/create",
+        http_method="POST",
+        schema_class="BybitOrderSubmitRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v5",
+        notes=(
+            "Unified account order submission (spot/linear/inverse/option). "
+            "Auth: X-BAPI-API-KEY + HMAC-SHA256 signature. "
+            "Secret Manager key: bybit-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Kraken ---
+    EndpointSpec(
+        venue="kraken",
+        endpoint_path="https://api.kraken.com/0/public/Ticker",
+        http_method="GET",
+        schema_class="KrakenTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v0",
+        notes="Public ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="kraken",
+        endpoint_path="https://api.kraken.com/0/private/AddOrder",
+        http_method="POST",
+        schema_class="KrakenOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v0",
+        notes=(
+            "Private order submission. Auth: API-Key + API-Sign (HMAC-SHA512 nonce+payload). "
+            "Secret Manager key: kraken-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- Deribit ---
     EndpointSpec(
@@ -383,6 +523,294 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "Combo instruments added Q3 2023."
         ),
         available_from_date="2023-07-01",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="deribit",
+        endpoint_path="/private/buy",
+        http_method="GET",
+        schema_class="DeribitOrderResult",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version=None,
+        notes=(
+            "Private order placement (spot, perp, option). Auth: OAuth2 client_credentials flow. "
+            "client_id and client_secret from Secret Manager key: deribit-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Coinbase ---
+    EndpointSpec(
+        venue="coinbase",
+        endpoint_path="https://api.coinbase.com/api/v3/brokerage/products",
+        http_method="GET",
+        schema_class="CoinbaseProduct",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v3",
+        notes="Public product list. No auth required for market data.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
+    ),
+    EndpointSpec(
+        venue="coinbase",
+        endpoint_path="https://api.coinbase.com/api/v3/brokerage/orders",
+        http_method="POST",
+        schema_class="CoinbaseOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes=(
+            "Advanced Trade order placement. Auth: CDP API key + EC private key (JWT). "
+            "Secret Manager key: coinbase-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Bitstamp ---
+    EndpointSpec(
+        venue="bitstamp",
+        endpoint_path="https://www.bitstamp.net/api/v2/ticker/{currency_pair}/",
+        http_method="GET",
+        schema_class="BitstampTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes="Public ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="bitstamp",
+        endpoint_path="https://www.bitstamp.net/api/v2/buy/{currency_pair}/",
+        http_method="POST",
+        schema_class="BitstampOrderResult",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes=(
+            "Private order placement. Auth: HMAC-SHA256 API key + secret. Secret Manager key: bitstamp-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Bitget ---
+    EndpointSpec(
+        venue="bitget",
+        endpoint_path="https://api.bitget.com/api/v2/spot/market/tickers",
+        http_method="GET",
+        schema_class="BitgetTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes="Public tickers. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="bitget",
+        endpoint_path="https://api.bitget.com/api/v2/spot/trade/place-order",
+        http_method="POST",
+        schema_class="BitgetOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes=(
+            "Private spot order. Auth: ACCESS-KEY + HMAC-SHA256 signature + PASSPHRASE. "
+            "Secret Manager key: bitget-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Bitfinex ---
+    EndpointSpec(
+        venue="bitfinex",
+        endpoint_path="https://api-pub.bitfinex.com/v2/ticker/{symbol}",
+        http_method="GET",
+        schema_class="BitfinexTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v2",
+        notes="Public ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="bitfinex",
+        endpoint_path="https://api.bitfinex.com/v2/auth/r/orders",
+        http_method="POST",
+        schema_class="BitfinexOrder",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.HISTORICAL_ONLY,
+        version="v2",
+        notes=(
+            "Private order history. Auth: bfx-apikey + HMAC-SHA384 bfx-signature. "
+            "Secret Manager key: bitfinex-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Gate.io ---
+    EndpointSpec(
+        venue="gateio",
+        endpoint_path="https://api.gateio.ws/api/v4/spot/tickers",
+        http_method="GET",
+        schema_class="GateIOTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v4",
+        notes="Public tickers. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="gateio",
+        endpoint_path="https://api.gateio.ws/api/v4/spot/orders",
+        http_method="POST",
+        schema_class="GateIOOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v4",
+        notes=("Private spot order. Auth: KEY + HMAC-SHA512 signature. Secret Manager key: gateio-api-credentials."),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- KuCoin ---
+    EndpointSpec(
+        venue="kucoin",
+        endpoint_path="https://api.kucoin.com/api/v1/market/allTickers",
+        http_method="GET",
+        schema_class="KuCoinTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes="Public tickers. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="kucoin",
+        endpoint_path="https://api.kucoin.com/api/v1/orders",
+        http_method="POST",
+        schema_class="KuCoinOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes=(
+            "Private order submission. Auth: KC-API-KEY + HMAC-SHA256 + KC-API-PASSPHRASE. "
+            "Secret Manager key: kucoin-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- MEXC ---
+    EndpointSpec(
+        venue="mexc",
+        endpoint_path="https://api.mexc.com/api/v3/ticker/24hr",
+        http_method="GET",
+        schema_class="MEXCTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes="Public 24hr ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="mexc",
+        endpoint_path="https://api.mexc.com/api/v3/order",
+        http_method="POST",
+        schema_class="MEXCOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v3",
+        notes=("Private order. Auth: X-MEXC-APIKEY + HMAC-SHA256 signature. Secret Manager key: mexc-api-credentials."),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Huobi ---
+    EndpointSpec(
+        venue="huobi",
+        endpoint_path="https://api.huobi.pro/market/detail/merged",
+        http_method="GET",
+        schema_class="HuobiTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes="Public merged ticker. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="huobi",
+        endpoint_path="https://api.huobi.pro/v1/order/orders/place",
+        http_method="POST",
+        schema_class="HuobiOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes=(
+            "Private order. Auth: AccessKeyId + HMAC-SHA256 signature + Timestamp. "
+            "Secret Manager key: huobi-api-credentials."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- dYdX ---
+    EndpointSpec(
+        venue="dydx",
+        endpoint_path="https://indexer.dydx.trade/v4/markets",
+        http_method="GET",
+        schema_class="DydxMarket",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v4",
+        notes="Public dYdX v4 (Cosmos chain) markets via indexer. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="dydx",
+        endpoint_path="https://indexer.dydx.trade/v4/orders",
+        http_method="POST",
+        schema_class="DydxOrderRequest",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v4",
+        notes=(
+            "Private order placement. Auth: cosmos-sdk signed tx via dydx-v4-client. "
+            "Secret Manager key: dydx-api-credentials (mnemonic or private key)."
+        ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- Odds API ---
+    EndpointSpec(
+        venue="odds_api",
+        endpoint_path="https://api.the-odds-api.com/v4/sports/{sport}/odds",
+        http_method="GET",
+        schema_class="OddsAPIEvent",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v4",
+        notes=("Auth via ?apiKey=KEY query param. 500 free requests/month. Secret Manager key: odds-api-key."),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
+    ),
+    # --- api-football ---
+    EndpointSpec(
+        venue="api_football",
+        endpoint_path="https://v3.football.api-sports.io/fixtures",
+        http_method="GET",
+        schema_class="APIFootballFixture",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v3",
+        notes=("Auth: x-apisports-key header. 100 requests/day free. Secret Manager key: api-football-api-key."),
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- Betfair ---
     EndpointSpec(
@@ -400,6 +828,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "Cert login endpoint: https://identitysso-cert.betfair.com/api/certlogin"
         ),
         requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     EndpointSpec(
         venue="betfair",
@@ -416,6 +845,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "Status: KEY_NOT_IN_SM — must provision before cassette can be recorded."
         ),
         requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- Pinnacle ---
     EndpointSpec(
@@ -432,6 +862,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
             "Status: KEY_NOT_IN_SM — must provision before cassette can be recorded."
         ),
         requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- IBKR ---
     EndpointSpec(
@@ -444,7 +875,65 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="tws-api",
         notes=(
             "secType=BAG is IBKR's combination/spread contract type. All spread strategies "
-            "(straddles, butterflies, calendar spreads, EFPs) use this. comboLegs define the legs."
+            "(straddles, butterflies, calendar spreads, EFPs) use this. comboLegs define the legs. "
+            "Auth via TWS Gateway API key. Secret Manager key: ibkr-api-credentials."
         ),
+        requires_auth=True,
+        cassette_status=CassetteStatus.NOT_APPLICABLE,
+    ),
+    # --- Upbit ---
+    EndpointSpec(
+        venue="upbit",
+        endpoint_path="https://api.upbit.com/v1/ticker",
+        http_method="GET",
+        schema_class="UpbitTicker",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.LIVE_ONLY,
+        version="v1",
+        notes="Public ticker. No auth required for market data.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    # --- DeFiLlama ---
+    EndpointSpec(
+        venue="defillama",
+        endpoint_path="https://api.llama.fi/protocols",
+        http_method="GET",
+        schema_class="DefiLlamaProtocol",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v1",
+        notes="Free, no auth. TVL and protocol metadata for all tracked protocols.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    # --- Open-Meteo ---
+    EndpointSpec(
+        venue="open_meteo",
+        endpoint_path="https://api.open-meteo.com/v1/forecast",
+        http_method="GET",
+        schema_class="OpenMeteoResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v1",
+        notes="Free, no auth. Weather forecast for commodity and sports modelling.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    # --- CoinGecko ---
+    EndpointSpec(
+        venue="coingecko",
+        endpoint_path="https://api.coingecko.com/api/v3/coins/markets",
+        http_method="GET",
+        schema_class="CoinGeckoMarket",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v3",
+        notes=(
+            "Free tier: no auth, 30 calls/min. Pro: x-cg-pro-api-key header. "
+            "Secret Manager key: coingecko-api-key (optional for free tier)."
+        ),
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
     ),
 ]
