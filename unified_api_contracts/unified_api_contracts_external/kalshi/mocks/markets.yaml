@@ -1,0 +1,28 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://trading-api.kalshi.com/trade-api/v2/markets?limit=1&status=open
+    response:
+      body:
+        string: '{"markets":[{"ticker":"KXCPI-26MAR-T2.9","event_ticker":"KXCPI-26MAR","market_type":"binary","title":"Will CPI YoY be above 2.9%?","subtitle":"March 2026 CPI release","result":null,"status":"active","yes_bid_dollars":"0.4600","yes_ask_dollars":"0.4700","no_bid_dollars":"0.5300","no_ask_dollars":"0.5400","volume_fp":"2567.00","open_interest_fp":"891.00","liquidity":"15000.00","yes_bid":46,"yes_ask":47,"no_bid":53,"no_ask":54,"volume":2567,"open_interest":891,"expiration_time":"2026-04-10T12:30:00Z","open_time":"2026-02-01T00:00:00Z","close_time":"2026-04-10T12:30:00Z","resolution_source":"BLS","can_close_early":false,"expected_expiration_time":"2026-04-10T12:30:00Z","strike_type":"range","floor_strike":2.5,"cap_strike":3.0}],"cursor":""}'
+      headers:
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 09 Mar 2026 03:00:00 GMT
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1
