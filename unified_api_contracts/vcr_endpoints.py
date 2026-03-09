@@ -141,7 +141,22 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "thegraph": [],
+    "thegraph": [
+        _post(
+            "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v2",
+            "pools_query.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": (
+                    "{ pools(first: 2, orderBy: totalValueLockedUSD, orderDirection: desc)"
+                    " { id token0 { id symbol decimals } token1 { id symbol decimals }"
+                    " reserve0 reserve1 reserveUSD token0Price token1Price } }"
+                )
+            },
+            schema_version="1.0",
+        ),
+    ],
     "alchemy": [],
     "ccxt": [],
     "aster": [],
