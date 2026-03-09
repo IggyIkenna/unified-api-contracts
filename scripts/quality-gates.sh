@@ -323,9 +323,9 @@ if [ -f "pyproject.toml" ]; then
     grep -q "reportUnknown" pyproject.toml || { log_fail "pyproject.toml [tool.basedpyright] must include reportUnknown*"; ((V++)); }
 fi
 
-# File size
+# File size (exclude build artifacts)
 SVIOL=""; SWARN=""
-for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" 2>/dev/null); do
+for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" ! -path "./build/*" 2>/dev/null); do
     lines=$(wc -l < "$f" 2>/dev/null || echo 0)
     [[ "$lines" -gt $MAX_FILE_LINES ]] && SVIOL="${SVIOL}\n  $f: $lines L"
     [[ "$lines" -gt $FILE_WARN_LINES && "$lines" -le $MAX_FILE_LINES ]] && SWARN="${SWARN}\n  $f: $lines L"
@@ -333,9 +333,9 @@ done
 [[ -n "$SVIOL" ]] && { log_fail "Files exceed $MAX_FILE_LINES lines:$SVIOL"; ((V++)); } || log_success "File size OK"
 [[ -n "$SWARN" ]] && log_warn "Approaching limit:$SWARN"
 
-# Function/class/method size
+# Function/class/method size (exclude build artifacts)
 FSIZES=""
-for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" 2>/dev/null); do
+for f in $(find . -name "*.py" ! -path "./.venv/*" ! -path "./scripts/*" ! -path "./.git/*" ! -path "./build/*" 2>/dev/null); do
     out=$($PYTHON_CMD -c "
 import ast, sys
 p=sys.argv[1]
@@ -366,9 +366,9 @@ else
     log_fail "pip-audit required: uv pip install pip-audit"; ((V++))
 fi
 
-# Security: bandit
-if command -v bandit &>/dev/null; then
-    run_timeout 30 bandit -r "$SOURCE_DIR/" -ll 2>/dev/null && log_success "bandit clean" || { log_fail "bandit issues"; ((V++)); }
+# Security: bandit (use python -m bandit for venv reliability)
+if $PYTHON_CMD -c "import bandit" 2>/dev/null; then
+    run_timeout 30 $PYTHON_CMD -m bandit -r "$SOURCE_DIR/" -ll 2>/dev/null && log_success "bandit clean" || { log_fail "bandit issues"; ((V++)); }
 else
     log_fail "bandit required: uv pip install bandit"; ((V++))
 fi
