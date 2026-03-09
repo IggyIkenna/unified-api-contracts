@@ -402,9 +402,9 @@ DOMAIN_CONTRACTS_IN_LIB=$(rg 'class \w+\(BaseModel\)' --type py \
     echo "$DOMAIN_CONTRACTS_IN_LIB" | head -5
 } || log_success "No misplaced domain BaseModel contracts in library"
 
-# 7. BYPASS — ||true in quality gate scripts
+# 7. BYPASS — ||true in quality gate scripts (exclude comment and log_fail line containing "||true")
 BYPASS=$(rg "\|\|true|\|\| true" --glob "**/quality-gates.sh" --glob "**/quality-gates.yml" . 2>/dev/null \
-    | grep -v "^#\|zombies\|pyright\|cleanup" || :)
+    | grep -v "BYPASS —\|fix the root cause\|zombies\|pyright\|cleanup" || :)
 [[ -n "$BYPASS" ]] && { log_fail "||true bypass in quality gates — fix the root cause"; echo "$BYPASS" | head -3; ((V++)); } || log_success "No ||true quality gate bypasses"
 
 # ============================================================
