@@ -6,6 +6,8 @@ sports-betting-services-previous USTeam/USMatch/USPlayer/etc.
 
 from __future__ import annotations
 
+__api_version__ = "v1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 from typing import Self
 

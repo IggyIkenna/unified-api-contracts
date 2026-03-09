@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+__api_version__ = "2.1"  # matches provider_api_versions.yaml
+
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
