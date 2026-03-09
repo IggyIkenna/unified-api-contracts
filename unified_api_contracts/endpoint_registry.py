@@ -16,10 +16,6 @@ from enum import StrEnum
 from pydantic import BaseModel
 
 
-# orphan: kept because ENDPOINT_REGISTRY below encodes substantive per-venue endpoint metadata
-# (deprecation dates, auth details, response formats) that is not yet consumed by any service
-# but serves as canonical reference documentation. See plan todo uac-endpoint-registry-consumer
-# in stub_completion_interfaces_and_infra.plan.md.
 class AccessMode(StrEnum):
     """How data is accessed from this endpoint."""
 
@@ -31,7 +27,6 @@ class AccessMode(StrEnum):
     ON_CHAIN = "on_chain"  # Direct smart contract calls / eth_call
 
 
-# orphan: kept because it is used by EndpointSpec below; see uac-endpoint-registry-consumer todo
 class DataAvailability(StrEnum):
     """Temporal data availability of this endpoint."""
 
@@ -40,7 +35,6 @@ class DataAvailability(StrEnum):
     BOTH = "both"
 
 
-# orphan: kept because it is used by EndpointSpec below; see uac-endpoint-registry-consumer todo
 class ResponseFormat(StrEnum):
     """Serialization format of the response body."""
 
@@ -60,7 +54,6 @@ class ResponseFormat(StrEnum):
     TEXT = "text"  # plain text
 
 
-# orphan: kept because it is used by ENDPOINT_REGISTRY below; see uac-endpoint-registry-consumer todo
 class EndpointSpec(BaseModel):
     """Metadata for a single API endpoint, with versioning and access tagging.
 
