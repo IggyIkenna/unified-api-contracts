@@ -24,7 +24,7 @@ import importlib
 import logging
 import math
 import sys
-from datetime import date, timedelta
+from datetime import date
 from pathlib import Path
 from typing import NamedTuple
 
@@ -97,7 +97,7 @@ def _import_schema_version(provider_name: str) -> str:
             ver = getattr(mod, "__api_version__", None)
             if ver is not None:
                 return str(ver)
-        except Exception:  # noqa: BLE001 – expected for missing modules
+        except Exception:
             pass
 
     return "N/A"
