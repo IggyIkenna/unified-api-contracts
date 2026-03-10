@@ -12,11 +12,14 @@ from .accounts import (
 from .commodity import CommoditySignal, FactorValue, RegimeState
 from .defi import LendingRate, LiquidityPool, OraclePrice, StakingRate, Swap
 from .derivatives import (
+    ComboLeg,
+    ComboStrategyType,
     FundingRate,
     FundingRateHistory,
     InsuranceFundState,
     Liquidation,
     LongShortRatio,
+    MultiLegInstrument,
     OpenInterestHistory,
     OptionContract,
     OptionGreeks,
@@ -93,6 +96,8 @@ __all__ = [
     "AaveV3UserAccountData",
     "AaveV3UserReserveData",
     "BucketMarket",
+    "ComboLeg",
+    "ComboStrategyType",
     "CommoditySignal",
     "CompoundV3MarketInfo",
     "CompoundV3UserPosition",
@@ -124,6 +129,7 @@ __all__ = [
     "LongShortRatio",
     "MorphoMarketParams",
     "MorphoUserPosition",
+    "MultiLegInstrument",
     "NegRiskArbSignal",
     "NegRiskBucket",
     "OpenInterestHistory",
