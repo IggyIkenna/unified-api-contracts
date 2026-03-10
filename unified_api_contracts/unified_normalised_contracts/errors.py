@@ -279,6 +279,32 @@ class CanonicalSchemaError(CanonicalError):
         )
 
 
+class CanonicalUnknownVenueError(CanonicalError):
+    """Fired when a venue returns an error code not in VENUE_ERROR_MAP.
+
+    Callers must explicitly handle this error; action defaults to FAIL.
+    The raw_code and raw_message fields capture the original venue response
+    so ops can review and add missing codes to the canonical map.
+    """
+
+    def __init__(
+        self,
+        raw_code: str,
+        raw_message: str,
+        venue: str,
+        endpoint: str | None = None,
+    ) -> None:
+        super().__init__(
+            code="UNKNOWN_VENUE_ERROR",
+            message=f"Unknown venue error from {venue}: [{raw_code}] {raw_message}",
+            action=ErrorAction.FAIL,
+            venue=venue,
+        )
+        self.raw_code = raw_code
+        self.raw_message = raw_message
+        self.endpoint = endpoint
+
+
 __all__ = [
     "CanonicalAuthenticationError",
     "CanonicalAuthorizationError",
@@ -300,6 +326,7 @@ __all__ = [
     "CanonicalSchemaError",
     "CanonicalServiceUnavailableError",
     "CanonicalSizeLimitError",
+    "CanonicalUnknownVenueError",
     "ErrorAction",
     "RateLimitInfo",
     "VenueErrorClassification",
