@@ -72,6 +72,25 @@ SCAN_FILES: list[str] = [
 #   internal-base: abstract/private base class, not part of public surface
 #   normalizer-impl: internal normalizer implementation class (not a schema)
 #   narrow-util: narrow utility class used only internally
+#   analytics-specialty: alternative-data + factor analytics; no active service consumer yet
+#     → tracked for future adoption in: pnl-attribution-service, features-cross-instrument-service
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   cex-withdrawal: per-venue CEX withdraw request/response; used only by execution-service
+#     internals via venue adapter — not promoted until cross-service adoption confirmed
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   latency-specialty: sub-millisecond + co-location latency metrics; execution-service only
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   prediction-market-arb: Polymarket/Betfair arb signal schemas; features-sports-service only
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   protocol-sdk-action: DeFi protocol action parameter types (AaveDepositParams, etc.)
+#     used only inside features-onchain-service's DeFi execution layer — not cross-service
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   rate-limit: venue rate-limit spec; consumed internally by UMI adapters, not service-level
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   eth-transfer: raw Ethereum tx + ERC20 calldata; features-onchain-service only
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+#   ws-internal: WebSocket server-side ping/health sentinel; not a client-facing schema
+#     → plan: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
 EXEMPT_MISSING: frozenset[str] = frozenset(
     [
         # internal-base: private base classes used by the schema hierarchy
@@ -95,6 +114,90 @@ EXEMPT_MISSING: frozenset[str] = frozenset(
         "PolymarketNormalizer",
         # narrow-util: version sentinel types not exported at surface level
         "SchemaVersion",
+        # analytics-specialty: factor + alternative data analytics schemas
+        # target services: pnl-attribution-service, features-cross-instrument-service
+        "FactorType",
+        "AlternativeDataType",
+        "CorrelationRegime",
+        "FactorExposure",
+        "FactorAttributionRecord",
+        "FactorAttributionModel",
+        "CrossAssetCorrelationMatrix",
+        "CorrelationRegimeChange",
+        "SentimentScore",
+        "SatelliteObservation",
+        "OptionsFlowRecord",
+        "DarkPoolPrintRecord",
+        "AlternativeDataSignal",
+        # cex-withdrawal: per-venue CEX withdraw request/response types
+        # target service: execution-service (venue adapter layer)
+        "BinanceWithdrawRequest",
+        "BinanceWithdrawResponse",
+        "OKXWithdrawRequest",
+        "OKXWithdrawResponse",
+        "BybitWithdrawRequest",
+        "BybitWithdrawResponse",
+        "UpbitWithdrawRequest",
+        "UpbitWithdrawResponse",
+        "CoinbaseWithdrawRequest",
+        "CoinbaseWithdrawResponse",
+        # latency-specialty: sub-millisecond, co-location, and network jitter metrics
+        # target service: execution-service (latency monitoring layer)
+        "LatencyComponent",
+        "LatencyPercentile",
+        "TickToTradeMetric",
+        "OrderLatencyRecord",
+        "CoLocationPerformanceMetric",
+        "NetworkJitterMetric",
+        "SubMillisecondLatencyRecord",
+        "LatencyBenchmarkReport",
+        # prediction-market-arb: Polymarket/Betfair cross-venue arb signal schemas
+        # target service: features-sports-service (arb signal pipeline)
+        "CrossVenueLink",
+        "BucketMarket",
+        "ProbabilityBucket",
+        "SportsbookLink",
+        "NegRiskBucket",
+        "NegRiskArbSignal",
+        "CrossVenueArbLeg",
+        "CrossVenueArbSignal",
+        "PredictionMarketUniverse",
+        # protocol-sdk-action: DeFi protocol action parameter types (send-side only)
+        # target service: features-onchain-service (DeFi execution layer)
+        "AaveDepositParams",
+        "AaveBorrowParams",
+        "AaveRepayParams",
+        "AaveFlashLoanParams",
+        "MorphoSupplyParams",
+        "MorphoBorrowParams",
+        "MorphoRepayParams",
+        "MorphoFlashLoanParams",
+        "EulerDepositParams",
+        "EulerBorrowParams",
+        "EulerRepayParams",
+        "FluidDepositParams",
+        "FluidBorrowParams",
+        "FluidRepayParams",
+        "LidoSubmitParams",
+        "LidoRequestWithdrawalsParams",
+        "CurveDepositParams",
+        "CurveWithdrawParams",
+        "CurveSwapParams",
+        # rate-limit: venue rate-limit spec; consumed inside UMI adapter, not cross-service
+        # target service: unified-market-interface (adapter layer)
+        "HttpRateLimitHeaders",
+        "VenueRateLimitSpec",
+        # eth-transfer: raw Ethereum tx calldata and ERC20 transfer types
+        # target service: features-onchain-service (onchain transfer layer)
+        "EthSendRawTransactionRequest",
+        "EthSendRawTransactionResponse",
+        "EthTransactionRequest",
+        "EthSendTransactionRequest",
+        "Erc20TransferCalldata",
+        "Erc20TransferFromCalldata",
+        # ws-internal: server-side WebSocket health ping sentinel (not a client-facing schema)
+        # target service: unified-market-interface (WS health layer)
+        "HealthPingResponse",
     ]
 )
 
