@@ -10,6 +10,7 @@ PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=82
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
+MAX_DURATION=360  # schema-heavy repo — tests+typecheck routinely ~300s; base default 120s too low
 LOCAL_DEPS=()
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
