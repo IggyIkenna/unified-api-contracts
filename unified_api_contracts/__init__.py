@@ -335,6 +335,7 @@ from .unified_normalised_contracts.errors import (
     CanonicalSchemaError,
     CanonicalServiceUnavailableError,
     CanonicalSizeLimitError,
+    CanonicalUnknownVenueError,
     RateLimitInfo,
 )
 from .unified_normalised_contracts.execution import (
@@ -512,6 +513,7 @@ __all__ = [
     "CanonicalTeam",
     "CanonicalTicker",
     "CanonicalTrade",
+    "CanonicalUnknownVenueError",
     "CanonicalVenue",
     "CanonicalWebSocketLifecycle",
     "CanonicalWsMessage",
