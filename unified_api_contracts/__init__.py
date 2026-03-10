@@ -179,8 +179,12 @@ from .unified_normalised_contracts.domain import (
     OddsFormat,
 )
 from .unified_normalised_contracts.execution import (
+    CanonicalAccountState,
     CanonicalFill,
+    CanonicalMarginState,
     CanonicalOrder,
+    CanonicalOrderAmendment,
+    CanonicalOrderRejection,
     OrderStatus,
 )
 from .unified_normalised_contracts.odds import american_to_decimal, decimal_to_american
@@ -271,6 +275,7 @@ __all__ = [
     "BybitInstrumentInfo",
     "BybitInstrumentsResponse",
     "CanonicalAccountSnapshot",
+    "CanonicalAccountState",
     "CanonicalBalance",
     "CanonicalBookmakerMarket",
     "CanonicalComboBet",
@@ -278,8 +283,11 @@ __all__ = [
     "CanonicalFill",
     "CanonicalFixture",
     "CanonicalLeague",
+    "CanonicalMarginState",
     "CanonicalOdds",
     "CanonicalOrder",
+    "CanonicalOrderAmendment",
+    "CanonicalOrderRejection",
     "CanonicalPlayer",
     "CanonicalPosition",
     "CanonicalReferee",
