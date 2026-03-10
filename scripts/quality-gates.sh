@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 # Repo-specific settings only. Body: unified-trading-pm/scripts/quality-gates-base/base-library.sh
+# SSOT: unified-trading-codex/06-coding-standards/quality-gates-library-template.sh
+#
+# Instructions for a new library:
+#   1. Copy this to scripts/quality-gates.sh in your repo (rollout-quality-gates-unified.py does this)
+#   2. SOURCE_DIR is set automatically by rollout; set PACKAGE_NAME and MIN_COVERAGE manually
+#   3. Add LOCAL_DEPS entries if your library has local editable deps
 PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=80
