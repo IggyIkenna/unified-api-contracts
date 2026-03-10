@@ -165,6 +165,7 @@ from .unified_api_contracts_external.sports import (
     SignalSource,
     SportsError,
 )
+from .unified_api_contracts_external.sports.canonical.mappings import TeamMapping
 from .unified_api_contracts_external.tardis.schemas import (
     TardisExchangeDetail,
     TardisInstrumentDetail,
@@ -174,6 +175,7 @@ from .unified_normalised_contracts.domain import (
     CanonicalBalance,
     CanonicalComboBet,
     CanonicalComboLeg,
+    CanonicalOptionsChainEntry,
     CanonicalPosition,
     CanonicalSettlement,
     OddsFormat,
@@ -285,6 +287,7 @@ __all__ = [
     "CanonicalLeague",
     "CanonicalMarginState",
     "CanonicalOdds",
+    "CanonicalOptionsChainEntry",
     "CanonicalOrder",
     "CanonicalOrderAmendment",
     "CanonicalOrderRejection",
@@ -369,6 +372,7 @@ __all__ = [
     "Swap",
     "TardisExchangeDetail",
     "TardisInstrumentDetail",
+    "TeamMapping",
     "UniswapV3PoolStateResponse",
     "UniswapV3QuoteResponse",
     "UniswapV3SwapTxReceipt",
