@@ -4,11 +4,11 @@
 #
 # Instructions for a new library:
 #   1. Copy this to scripts/quality-gates.sh in your repo (rollout-quality-gates-unified.py does this)
-#   2. SOURCE_DIR is set automatically by rollout; set PACKAGE_NAME and MIN_COVERAGE manually
+#   2. SOURCE_DIR, PACKAGE_NAME, and MIN_COVERAGE are set automatically by rollout (floor=80)
 #   3. Add LOCAL_DEPS entries if your library has local editable deps
 PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
-MIN_COVERAGE=80
+MIN_COVERAGE=82
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
