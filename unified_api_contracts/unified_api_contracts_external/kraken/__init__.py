@@ -18,7 +18,7 @@ __all__ = [
     "KrakenOrderBook",
     "KrakenOrderBookLevel",
     "KrakenOrderBookWS",
-    "KrakenOrderBook_WS",  # backward-compatible alias
+    "KrakenOrderBook_WS",  # underscore name for Kraken WS API consumers
     "KrakenTicker",
     "KrakenTrade",
     "KrakenTradeDescr",

@@ -88,7 +88,7 @@ class KrakenOrderBookWS(BaseModel):
     c: str | None = None  # checksum
 
 
-# Backward-compatible alias (underscore name matches Kraken WS API naming convention)
+# KrakenOrderBook_WS: underscore name matches Kraken WS API naming convention; retained for consumers
 KrakenOrderBook_WS = KrakenOrderBookWS
 
 

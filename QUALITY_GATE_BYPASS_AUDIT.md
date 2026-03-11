@@ -5,6 +5,20 @@ Every bypass must be justified and tracked here per workspace rules.
 
 ---
 
+## 3.1 File Size Bypass
+
+### schemas/errors.py — 1819 lines (exceeds 900-line limit)
+
+**Scope:** `unified_api_contracts/schemas/errors.py`
+**Rule:** MAX_FILE_LINES=900
+**Reason:** `errors.py` is a venue error-code data registry (lookup table mapping ~1800 venue-specific
+error codes to retry/reconnect classifications). Splitting by venue would require a subdirectory of
+20+ small files with no reduction in complexity. The file is purely declarative data — it has no
+logic complexity and no function exceeds 50 lines. `SIZE_EXTRA_EXCLUDES` set in `quality-gates.sh`.
+**Config:** `SIZE_EXTRA_EXCLUDES=("./unified_api_contracts/schemas/errors.py")` in `scripts/quality-gates.sh`
+
+---
+
 ## 2.1 Ruff Config Bypasses
 
 ### N815 — camelCase field names in schemas.py files

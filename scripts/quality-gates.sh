@@ -11,5 +11,8 @@ SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
+# errors.py is a data registry file (venue error-code lookup table) — inherently large;
+# splitting would harm discoverability without reducing complexity (QUALITY_GATE_BYPASS_AUDIT.md §3.1)
+SIZE_EXTRA_EXCLUDES=("./unified_api_contracts/schemas/errors.py")
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
