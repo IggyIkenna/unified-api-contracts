@@ -8,16 +8,17 @@ Scope: Venues in our universe; TradFi via Databento (~506 venues); DeFi = Euler,
 
 from __future__ import annotations
 
+from decimal import Decimal
 from typing import TypedDict
 
 
 class ContractSpec(TypedDict, total=False):
     """Contract specification: tick size, lot size, expiry format per venue."""
 
-    tick_size: float
-    lot_size: float
-    min_qty: float
-    max_qty: float
+    tick_size: Decimal
+    lot_size: Decimal
+    min_qty: Decimal
+    max_qty: Decimal
     expiry_format: str  # e.g. "YYYYMM", "YYYY-MM-DD"
 
 
@@ -328,27 +329,59 @@ SYMBOLOGY_BY_VENUE: dict[str, dict[str, str]] = {
 
 # --- CONTRACT_SPECS_BY_VENUE ---
 CONTRACT_SPECS_BY_VENUE: dict[str, ContractSpec] = {
-    "BINANCE-SPOT": {"tick_size": 0.01, "lot_size": 0.00001, "min_qty": 0.00001, "max_qty": 9000.0},
-    "BINANCE-FUTURES": {"tick_size": 0.01, "lot_size": 0.001, "min_qty": 0.001, "max_qty": 1000.0},
+    "BINANCE-SPOT": {
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.00001"),
+        "min_qty": Decimal("0.00001"),
+        "max_qty": Decimal("9000.0"),
+    },
+    "BINANCE-FUTURES": {
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.001"),
+        "min_qty": Decimal("0.001"),
+        "max_qty": Decimal("1000.0"),
+    },
     "OKX": {
-        "tick_size": 0.01,
-        "lot_size": 0.001,
-        "min_qty": 0.001,
-        "max_qty": 1000.0,
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.001"),
+        "min_qty": Decimal("0.001"),
+        "max_qty": Decimal("1000.0"),
         "expiry_format": "YYYY-MM-DD",
     },
-    "BYBIT": {"tick_size": 0.01, "lot_size": 0.001, "min_qty": 0.001, "max_qty": 100.0},
+    "BYBIT": {
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.001"),
+        "min_qty": Decimal("0.001"),
+        "max_qty": Decimal("100.0"),
+    },
     "DERIBIT": {
-        "tick_size": 0.01,
-        "lot_size": 0.1,
-        "min_qty": 0.1,
-        "max_qty": 10000.0,
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.1"),
+        "min_qty": Decimal("0.1"),
+        "max_qty": Decimal("10000.0"),
         "expiry_format": "DDMMMYY",
     },
-    "CME": {"tick_size": 5.0, "lot_size": 0.01, "min_qty": 0.01, "expiry_format": "YYYYMM"},
-    "COINBASE-SPOT": {"tick_size": 0.01, "lot_size": 0.00001, "min_qty": 0.00001},
-    "HYPERLIQUID": {"tick_size": 0.01, "lot_size": 0.001, "min_qty": 0.001},
-    "ASTER": {"tick_size": 0.01, "lot_size": 0.001, "min_qty": 0.001},
+    "CME": {
+        "tick_size": Decimal("5.0"),
+        "lot_size": Decimal("0.01"),
+        "min_qty": Decimal("0.01"),
+        "expiry_format": "YYYYMM",
+    },
+    "COINBASE-SPOT": {
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.00001"),
+        "min_qty": Decimal("0.00001"),
+    },
+    "HYPERLIQUID": {
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.001"),
+        "min_qty": Decimal("0.001"),
+    },
+    "ASTER": {
+        "tick_size": Decimal("0.01"),
+        "lot_size": Decimal("0.001"),
+        "min_qty": Decimal("0.001"),
+    },
 }
 
 # --- DATA_SOURCE_TO_SECRET ---
