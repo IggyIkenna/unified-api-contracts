@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - unified-trading-system/1.0
+      method: GET
+      uri: https://api.tardis.dev/v1/exchanges/binance-futures
+    response:
+      body:
+        string: '{"id":"binance-futures","name":"Binance USDT Futures","availableSince":"2019-11-17T00:00:00.000Z","instruments":[{"id":"BTCUSDT","type":"perpetual","baseCurrency":"BTC","quoteCurrency":"USDT","availableSince":"2019-11-17T00:00:00.000Z","availableTo":null,"expiry":null,"strikePrice":null,"optionType":null},{"id":"ETHUSDT","type":"perpetual","baseCurrency":"ETH","quoteCurrency":"USDT","availableSince":"2019-11-17T00:00:00.000Z","availableTo":null,"expiry":null,"strikePrice":null,"optionType":null},{"id":"BTCUSDT-20241227","type":"future","baseCurrency":"BTC","quoteCurrency":"USDT","availableSince":"2024-09-27T00:00:00.000Z","availableTo":"2024-12-27T08:00:00.000Z","expiry":"2024-12-27T08:00:00.000Z","strikePrice":null,"optionType":null}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

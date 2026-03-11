@@ -1,0 +1,26 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Connection:
+          - keep-alive
+        User-Agent:
+          - unified-trading-system/1.0
+      method: HEAD
+      uri: https://datasets.tardis.dev/v1
+    response:
+      body:
+        string: ""
+      headers:
+        Content-Type:
+          - application/json
+        Allow:
+          - GET, HEAD
+      status:
+        code: 200
+        message: OK
+version: 1

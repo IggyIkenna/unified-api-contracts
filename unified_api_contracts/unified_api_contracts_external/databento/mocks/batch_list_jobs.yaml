@@ -1,0 +1,26 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - Basic STUB_API_KEY
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://hist.databento.com/v0/batch.list_jobs?states=queued,processing,done
+    response:
+      body:
+        string: "[]"
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

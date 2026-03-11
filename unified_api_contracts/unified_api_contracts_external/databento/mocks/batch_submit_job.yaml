@@ -1,0 +1,28 @@
+interactions:
+  - request:
+      body: '{"dataset":"GLBX.MDP3","schema":"ohlcv-1m","stype_in":"raw_symbol","stype_out":"instrument_id","symbols":"ESZ4","start":"2024-01-15","end":"2024-01-16","encoding":"dbn","compression":"zstd","split_duration":"day"}'
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - Basic STUB_API_KEY
+        Connection:
+          - keep-alive
+        Content-Type:
+          - application/json
+        User-Agent:
+          - python-requests/2.32.5
+      method: POST
+      uri: https://hist.databento.com/v0/batch.submit_job
+    response:
+      body:
+        string: '{"id":"stub-job-id-0001","state":"queued","dataset":"GLBX.MDP3","schema":"ohlcv-1m","start":"2024-01-15T00:00:00Z","end":"2024-01-16T00:00:00Z","symbols":["ESZ4"],"stype_in":"raw_symbol","stype_out":"instrument_id","encoding":"dbn","compression":"zstd","split_duration":"day","created_at":"2024-01-15T08:00:00Z","expires_at":"2024-01-22T08:00:00Z","actual_size":0,"actual_num_records":0,"cost":0,"files":[]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

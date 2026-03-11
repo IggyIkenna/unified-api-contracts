@@ -1,0 +1,30 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - Basic STUB_API_KEY
+        Connection:
+          - keep-alive
+        User-Agent:
+          - python-requests/2.32.5
+      method: GET
+      uri: https://hist.databento.com/v0/timeseries.get_range?dataset=GLBX.MDP3&schema=ohlcv-1m&stype_in=raw_symbol&stype_out=instrument_id&symbols=ESZ4&start=2024-01-15&end=2024-01-16
+    response:
+      body:
+        # Stub: real response is DBN binary (zstd-compressed).
+        # Tests should inject fixture DBNStore objects directly via mock.
+        string: ""
+      headers:
+        Content-Type:
+          - application/octet-stream
+        X-Databento-Schema:
+          - ohlcv-1m
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -1,0 +1,31 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        Accept-Encoding:
+          - gzip, deflate
+        Authorization:
+          - Bearer STUB_API_KEY
+        Connection:
+          - keep-alive
+        User-Agent:
+          - unified-trading-system/1.0
+      method: GET
+      uri: https://datasets.tardis.dev/v1/binance-futures/trades/2024/01/15/BTCUSDT.csv.gz
+    response:
+      body:
+        # Minimal valid gzip-compressed CSV stub (base64-encoded).
+        # Real data would be: exchange,symbol,timestamp,local_timestamp,id,side,price,amount
+        # Stub returns empty body — tests should override this with fixture data.
+        string: ""
+      headers:
+        Content-Type:
+          - application/gzip
+        Content-Disposition:
+          - attachment; filename="BTCUSDT.csv.gz"
+      status:
+        code: 200
+        message: OK
+version: 1
