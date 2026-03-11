@@ -56,7 +56,9 @@ jobs:
           echo "✅ unified-trading-pm cloned for quality-gates base scripts"
 
       - name: Run quality gates
-        run: bash scripts/quality-gates.sh --no-fix
+        run: |
+          export PATH="$(pwd)/.venv/bin:$PATH"
+          bash scripts/quality-gates.sh --no-fix
         env:
           CLOUD_BUILD: "true"
           GCP_PROJECT_ID: "test-project"
