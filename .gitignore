@@ -44,7 +44,7 @@ __pycache__/
 .mypy_cache/
 .hypothesis/
 .ruff_cache/
-.cache
+.cache/
 *.egg-info/
 .eggs/
 *.egg
