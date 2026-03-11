@@ -453,90 +453,96 @@ class TestModuleImports:
     """Verify every normalize submodule imports cleanly."""
 
     def test_cefi_extended_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            cefi_extended,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import cefi_extended
+
+        assert cefi_extended is not None
 
     def test_connectivity_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            connectivity,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import connectivity
+
+        assert connectivity is not None
 
     def test_derivative_tickers_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            derivative_tickers,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import derivative_tickers
+
+        assert derivative_tickers is not None
 
     def test_errors_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            errors,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import errors
+
+        assert errors is not None
 
     def test_fees_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import fees  # noqa: F401
+        from unified_api_contracts.unified_normalised_contracts.normalize import fees
+
+        assert fees is not None
 
     def test_instruments_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            instruments,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import instruments
+
+        assert instruments is not None
 
     def test_liquidations_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            liquidations,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import liquidations
+
+        assert liquidations is not None
 
     def test_ohlcv_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import ohlcv  # noqa: F401
+        from unified_api_contracts.unified_normalised_contracts.normalize import ohlcv
+
+        assert ohlcv is not None
 
     def test_options_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            options,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import options
+
+        assert options is not None
 
     def test_orderbooks_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            orderbooks,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import orderbooks
+
+        assert orderbooks is not None
 
     def test_orders_fills_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            orders_fills,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import orders_fills
+
+        assert orders_fills is not None
 
     def test_rate_limits_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            rate_limits,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import rate_limits
+
+        assert rate_limits is not None
 
     def test_reference_data_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            reference_data,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import reference_data
+
+        assert reference_data is not None
 
     def test_sides_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import sides  # noqa: F401
+        from unified_api_contracts.unified_normalised_contracts.normalize import sides
+
+        assert sides is not None
 
     def test_sports_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            sports,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import sports
+
+        assert sports is not None
 
     def test_symbols_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            symbols,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import symbols
+
+        assert symbols is not None
 
     def test_tickers_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            tickers,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import tickers
+
+        assert tickers is not None
 
     def test_trades_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            trades,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import trades
+
+        assert trades is not None
 
     def test_versifi_imports(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize import (
-            versifi,  # noqa: F401
-        )
+        from unified_api_contracts.unified_normalised_contracts.normalize import versifi
+
+        assert versifi is not None

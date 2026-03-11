@@ -2,7 +2,7 @@
 
 __api_version__ = "v5"  # matches provider_api_versions.yaml
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 from unified_api_contracts import ErrorAction
 
@@ -148,10 +148,12 @@ class OKXCandleWS(BaseModel):
     IMPORTANT: Subscribe on wss://ws.okx.com:8443/ws/v5/business (NOT /public).
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     ts: str  # timestamp (ms) — bar open time
     o: str  # open
     h: str  # high
-    l: str  # low  # noqa: E741
+    low: str = Field(alias="l")  # low (alias matches OKX API field "l")
     c: str  # close
     vol: str  # volume (contracts)
     volCcy: str | None = None  # volume in currency
@@ -165,10 +167,12 @@ class OKXMarkPriceKline(BaseModel):
     Also WS channel mark-price-candle1D, etc. Format: [ts, o, h, l, c, confirm].
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     ts: str  # timestamp (ms)
     o: str  # open
     h: str  # high
-    l: str  # low  # noqa: E741
+    low: str = Field(alias="l")  # low (alias matches OKX API field "l")
     c: str  # close
     confirm: str  # "0"=unclosed, "1"=closed
 
@@ -191,10 +195,12 @@ class OKXIndexPriceKline(BaseModel):
     Same format as mark price. WS channel index-candle30m, etc.
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     ts: str  # timestamp (ms)
     o: str  # open
     h: str  # high
-    l: str  # low  # noqa: E741
+    low: str = Field(alias="l")  # low (alias matches OKX API field "l")
     c: str  # close
     confirm: str  # "0"=unclosed, "1"=closed
 

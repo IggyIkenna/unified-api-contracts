@@ -34,6 +34,42 @@ from ..errors import (
     ErrorAction,
     RateLimitInfo,
 )
+from .errors_alt import (
+    normalize_api_football_error,
+    normalize_arkham_error,
+    normalize_aster_error,
+    normalize_betdaq_error,
+    normalize_bitfinex_error,
+    normalize_bitget_error,
+    normalize_bitstamp_error,
+    normalize_bloxroute_error,
+    normalize_cloud_sdks_error,
+    normalize_databento_error,
+    normalize_defillama_error,
+    normalize_dydx_error,
+    normalize_fix_error,
+    normalize_footystats_error,
+    normalize_gateio_error,
+    normalize_github_error,
+    normalize_glassnode_error,
+    normalize_manifold_error,
+    normalize_metabet_error,
+    normalize_nautilus_error,
+    normalize_odds_api_error,
+    normalize_odds_engine_error,
+    normalize_open_meteo_error,
+    normalize_pinnacle_error,
+    normalize_prime_broker_error,
+    normalize_regulatory_error,
+    normalize_sharpapi_error,
+    normalize_smarkets_error,
+    normalize_sports_error,
+    normalize_thegraph_error,
+    normalize_transfermarkt_error,
+    normalize_understat_error,
+    normalize_yahoo_finance_error,
+)
+from .errors_matchbook import normalize_matchbook_error
 
 _logger = logging.getLogger(__name__)
 
@@ -780,47 +816,6 @@ def normalize_huobi_error(
     except ValueError:
         return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
 
-
-# ---------------------------------------------------------------------------
-# Part 2 venues — imported from errors_alt to keep this file under 900 lines
-# ---------------------------------------------------------------------------
-
-from .errors_alt import (  # noqa: E402
-    normalize_api_football_error,
-    normalize_arkham_error,
-    normalize_aster_error,
-    normalize_betdaq_error,
-    normalize_bitfinex_error,
-    normalize_bitget_error,
-    normalize_bitstamp_error,
-    normalize_bloxroute_error,
-    normalize_cloud_sdks_error,
-    normalize_databento_error,
-    normalize_defillama_error,
-    normalize_dydx_error,
-    normalize_fix_error,
-    normalize_footystats_error,
-    normalize_gateio_error,
-    normalize_github_error,
-    normalize_glassnode_error,
-    normalize_manifold_error,
-    normalize_metabet_error,
-    normalize_nautilus_error,
-    normalize_odds_api_error,
-    normalize_odds_engine_error,
-    normalize_open_meteo_error,
-    normalize_pinnacle_error,
-    normalize_prime_broker_error,
-    normalize_regulatory_error,
-    normalize_sharpapi_error,
-    normalize_smarkets_error,
-    normalize_sports_error,
-    normalize_thegraph_error,
-    normalize_transfermarkt_error,
-    normalize_understat_error,
-    normalize_yahoo_finance_error,
-)
-from .errors_matchbook import normalize_matchbook_error  # noqa: E402
 
 # ---------------------------------------------------------------------------
 # __all__

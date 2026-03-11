@@ -10,6 +10,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
 from unified_api_contracts.unified_api_contracts_external.sports.sources.odds_api.schemas import (
     ODBookmakerRaw,
@@ -94,7 +95,7 @@ class TestODOutcomeRaw:
 
     def test_frozen(self) -> None:
         o = ODOutcomeRaw(name="Home", price=Decimal("1.50"))
-        with pytest.raises(Exception):  # noqa: B017 — ValidationError on frozen
+        with pytest.raises(ValidationError):
             o.name = "Away"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -141,7 +142,7 @@ class TestODMarketRaw:
 
     def test_frozen(self) -> None:
         m = ODMarketRaw(market_key="totals")
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             m.market_key = "h2h"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -206,7 +207,7 @@ class TestODBookmakerRaw:
 
     def test_frozen(self) -> None:
         b = ODBookmakerRaw(bookmaker_key="pk", bookmaker_title="PK")
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             b.bookmaker_key = "other"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -299,7 +300,7 @@ class TestODEventRaw:
             home_team="A",
             away_team="B",
         )
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             e.event_id = "e2"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -415,7 +416,7 @@ class TestODOddsRaw:
             outcome_name="A",
             outcome_price=Decimal("1.50"),
         )
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             o.market = "spreads"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -481,7 +482,7 @@ class TestODTeamsRaw:
             od_team_id="t1",
             team_name="Team",
         )
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             t.team_name = "Other"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:

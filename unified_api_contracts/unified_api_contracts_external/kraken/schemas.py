@@ -7,7 +7,7 @@ __api_version__ = "v1"  # matches provider_api_versions.yaml
 
 from decimal import Decimal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class KrakenTradeDescr(BaseModel):
@@ -78,7 +78,7 @@ class KrakenOrderBook(BaseModel):
     asks: list[list[str]] = []
 
 
-class KrakenOrderBook_WS(BaseModel):  # noqa: N801
+class KrakenOrderBookWS(BaseModel):
     """Kraken WebSocket order book snapshot/update (WS: book-10, book-25, etc.)."""
 
     as_: list[list[str]] = []  # asks snapshot (field name "as" is reserved)
@@ -86,6 +86,10 @@ class KrakenOrderBook_WS(BaseModel):  # noqa: N801
     a: list[list[str]] = []  # asks update
     b: list[list[str]] = []  # bids update
     c: str | None = None  # checksum
+
+
+# Backward-compatible alias (underscore name matches Kraken WS API naming convention)
+KrakenOrderBook_WS = KrakenOrderBookWS
 
 
 class KrakenOrder(BaseModel):
@@ -124,13 +128,15 @@ class KrakenTicker(BaseModel):
     o: open price today
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     a: list[str] = []  # ask
     b: list[str] = []  # bid
     c: list[str] = []  # last trade closed
     v: list[str] = []  # volume
     p: list[str] = []  # vwap
     t: list[int] = []  # num trades
-    l: list[str] = []  # low  # noqa: E741
+    low: list[str] = Field(default=[], alias="l")  # low (alias matches Kraken API field "l")
     h: list[str] = []  # high
     o: str | None = None  # open
 
@@ -158,7 +164,8 @@ __all__ = [
     "KrakenOrder",
     "KrakenOrderBook",
     "KrakenOrderBookLevel",
-    "KrakenOrderBook_WS",
+    "KrakenOrderBookWS",
+    "KrakenOrderBook_WS",  # backward-compatible alias
     "KrakenTicker",
     "KrakenTrade",
     "KrakenTradeDescr",

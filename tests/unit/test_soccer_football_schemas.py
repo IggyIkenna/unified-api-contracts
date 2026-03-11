@@ -9,6 +9,7 @@ from __future__ import annotations
 from decimal import Decimal
 
 import pytest
+from pydantic import ValidationError
 
 from unified_api_contracts.unified_api_contracts_external.sports.sources.soccer_football_info.schemas import (
     SFLeagueRaw,
@@ -71,7 +72,7 @@ class TestSFLeagueRaw:
 
     def test_frozen(self) -> None:
         lg = SFLeagueRaw(sf_league_id="a", sf_season_id="b", league_name="PL")
-        with pytest.raises(Exception):  # noqa: B017 — ValidationError from frozen
+        with pytest.raises(ValidationError):
             lg.league_name = "Changed"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -134,7 +135,7 @@ class TestSFTeamRaw:
 
     def test_frozen(self) -> None:
         t = SFTeamRaw(sf_team_id="t1", sf_league_id="l1", sf_season_id="s1", team_name="X")
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             t.team_name = "Y"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -246,7 +247,7 @@ class TestSFMatchRaw:
             sf_away_id="a1",
             away_name="B",
         )
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             m.ft_home = 5  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -302,7 +303,7 @@ class TestSFMatchEventRaw:
 
     def test_frozen(self) -> None:
         e = SFMatchEventRaw(sf_match_id="m1", event_type="corner", timer="10", team="A")
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             e.team = "B"  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -337,7 +338,7 @@ class TestSFMatchDominanceRaw:
 
     def test_frozen(self) -> None:
         d = SFMatchDominanceRaw(sf_match_id="m1", timer="10:00", team_a_dominance=10.0, team_b_dominance=10.0)
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             d.team_a_dominance = 20.0  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -407,7 +408,7 @@ class TestSFMatchProgressiveStatsRaw:
 
     def test_frozen(self) -> None:
         ps = SFMatchProgressiveStatsRaw(sf_match_id="m1", timer="10:00", team="A")
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             ps.goals = 1  # type: ignore[misc]
 
     def test_round_trip(self) -> None:
@@ -508,7 +509,7 @@ class TestSFMatchProgressiveOddsRaw:
 
     def test_frozen(self) -> None:
         po = SFMatchProgressiveOddsRaw(sf_match_id="m1", timer="00:00")
-        with pytest.raises(Exception):  # noqa: B017
+        with pytest.raises(ValidationError):
             po.home_win = Decimal("1.50")  # type: ignore[misc]
 
     def test_round_trip(self) -> None:

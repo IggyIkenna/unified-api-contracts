@@ -6,7 +6,7 @@ __api_version__ = "v3"  # matches provider_api_versions.yaml
 
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BinanceTicker(BaseModel):
@@ -360,13 +360,15 @@ class BinanceOptionTicker(BaseModel):
     Stream: <symbol>@ticker (options WebSocket)
     """
 
+    model_config = ConfigDict(populate_by_name=True)
+
     e: str  # event type = "ticker"
     E: int  # event time
     T: int  # transaction time
     s: str  # option symbol e.g. BTC-200730-9000-C
     o: Decimal  # open price
     h: Decimal  # highest price
-    l: Decimal  # lowest price  # noqa: E741
+    low: Decimal = Field(alias="l")  # lowest price (alias matches Binance API field "l")
     c: Decimal  # latest price
     V: Decimal  # trading volume (contracts)
     A: Decimal  # trading amount (USDT)

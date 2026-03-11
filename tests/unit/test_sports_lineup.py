@@ -6,6 +6,7 @@ Validates construction, from_raw with nested dicts, and frozen immutability.
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
 from unified_api_contracts.unified_api_contracts_external.sports.canonical.lineup import (
     CanonicalLineup,
@@ -68,7 +69,7 @@ def test_lineup_player_from_raw() -> None:
 def test_lineup_player_frozen() -> None:
     """LineupPlayer must be immutable (frozen)."""
     player = LineupPlayer(player_id="p-101")
-    with pytest.raises(Exception):  # noqa: B017
+    with pytest.raises(ValidationError):
         player.player_id = "p-999"  # type: ignore[misc]
 
 
@@ -162,7 +163,7 @@ def test_canonical_lineup_from_raw_nested_dict() -> None:
 def test_canonical_lineup_frozen() -> None:
     """CanonicalLineup must be immutable (frozen)."""
     lineup = CanonicalLineup(fixture_id="fix-1", team_id="t-10")
-    with pytest.raises(Exception):  # noqa: B017
+    with pytest.raises(ValidationError):
         lineup.fixture_id = "fix-999"  # type: ignore[misc]
 
 
@@ -174,5 +175,5 @@ def test_canonical_lineup_frozen_nested() -> None:
         team_id="t-10",
         starting=(starter,),
     )
-    with pytest.raises(Exception):  # noqa: B017
+    with pytest.raises(ValidationError):
         lineup.starting = ()  # type: ignore[misc]

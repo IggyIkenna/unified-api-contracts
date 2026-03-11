@@ -6,7 +6,7 @@ Consumers should import ENDPOINT_REGISTRY from endpoint_registry, not from this 
 
 from __future__ import annotations
 
-from .endpoint_registry import (
+from ._endpoint_registry_types import (
     AccessMode,
     CassetteStatus,
     DataAvailability,

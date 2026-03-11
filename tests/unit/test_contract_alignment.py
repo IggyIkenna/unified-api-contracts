@@ -12,6 +12,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal
 
+import pytest
+
 # ---------------------------------------------------------------------------
 # CanonicalOrder
 # ---------------------------------------------------------------------------
@@ -356,6 +358,3 @@ class TestCanonicalOrderFillCompatibility:
                 quantity=Decimal("1"),
                 side="buy",
             )
-
-
-import pytest  # noqa: E402

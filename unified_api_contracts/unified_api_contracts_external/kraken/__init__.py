@@ -6,6 +6,7 @@ from unified_api_contracts.unified_api_contracts_external.kraken.schemas import 
     KrakenOrderBook,
     KrakenOrderBook_WS,
     KrakenOrderBookLevel,
+    KrakenOrderBookWS,
     KrakenTicker,
     KrakenTrade,
     KrakenTradeDescr,
@@ -16,7 +17,8 @@ __all__ = [
     "KrakenOrder",
     "KrakenOrderBook",
     "KrakenOrderBookLevel",
-    "KrakenOrderBook_WS",
+    "KrakenOrderBookWS",
+    "KrakenOrderBook_WS",  # backward-compatible alias
     "KrakenTicker",
     "KrakenTrade",
     "KrakenTradeDescr",

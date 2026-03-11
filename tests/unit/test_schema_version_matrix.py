@@ -12,17 +12,8 @@ from pathlib import Path
 from types import ModuleType
 from unittest.mock import MagicMock, patch
 
-_REPO_ROOT = Path(__file__).resolve().parents[2]
-_SCRIPTS_DIR = _REPO_ROOT / "scripts"
-
-# Ensure the scripts directory is importable
-if str(_SCRIPTS_DIR) not in sys.path:
-    sys.path.insert(0, str(_SCRIPTS_DIR))
-
-if str(_REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(_REPO_ROOT))
-
-from generate_schema_version_matrix import (  # noqa: E402
+# sys.path for scripts/ is configured in tests/conftest.py (loaded by pytest before test modules)
+from generate_schema_version_matrix import (
     ProviderHealth,
     _compute_status,
     _import_schema_version,
@@ -30,6 +21,10 @@ from generate_schema_version_matrix import (  # noqa: E402
     write_matrix_md,
     write_svg,
 )
+
+# Module paths — used in integration tests that invoke the script as a subprocess
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_SCRIPTS_DIR = _REPO_ROOT / "scripts"
 
 # ---------------------------------------------------------------------------
 # Helpers

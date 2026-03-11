@@ -119,7 +119,7 @@ class TestBinanceTardis:
         assert self._batch().quantity == self._QTY
 
 
-class TestBinanceTardis_Sell:  # noqa: N801
+class TestBinanceTardisSell:
     """Verify sell-side parity Binance live vs Tardis."""
 
     def test_sell_parity(self) -> None:

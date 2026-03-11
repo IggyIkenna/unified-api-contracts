@@ -56,6 +56,27 @@ from ..execution import (
     OrderType,
     TimeInForce,
 )
+from .cefi_extended2 import (
+    normalize_bitget_fill,
+    normalize_bitget_order,
+    normalize_bitget_orderbook,
+    normalize_bitget_trade,
+    normalize_deribit_fill,
+    normalize_dydx_fill,
+    normalize_dydx_order,
+    normalize_dydx_orderbook,
+    normalize_dydx_trade,
+    normalize_huobi_fill,
+    normalize_huobi_order,
+    normalize_huobi_orderbook,
+    normalize_huobi_trade,
+    normalize_mexc_fill,
+    normalize_mexc_order,
+    normalize_mexc_orderbook,
+    normalize_mexc_trade,
+    normalize_okx_fill,
+    normalize_upbit_fill,
+)
 
 # ---------------------------------------------------------------------------
 # Shared helpers (mirror orders_fills.py helpers — kept local to avoid circular)
@@ -628,28 +649,6 @@ def normalize_bitstamp_fill(raw: BitstampFill, symbol: str = "", venue: str = "b
         is_maker=None,
     )
 
-
-from .cefi_extended2 import (  # noqa: E402
-    normalize_bitget_fill,
-    normalize_bitget_order,
-    normalize_bitget_orderbook,
-    normalize_bitget_trade,
-    normalize_deribit_fill,
-    normalize_dydx_fill,
-    normalize_dydx_order,
-    normalize_dydx_orderbook,
-    normalize_dydx_trade,
-    normalize_huobi_fill,
-    normalize_huobi_order,
-    normalize_huobi_orderbook,
-    normalize_huobi_trade,
-    normalize_mexc_fill,
-    normalize_mexc_order,
-    normalize_mexc_orderbook,
-    normalize_mexc_trade,
-    normalize_okx_fill,
-    normalize_upbit_fill,
-)
 
 __all__ = [
     # Bitfinex
