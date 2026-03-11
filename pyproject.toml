@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unified-api-contracts"
-version = "0.2.28"
+version = "0.2.30"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading library"
 requires-python = ">=3.13,<3.14"
 authors = [{ name = "Ikenna Igboaka" }]
@@ -121,7 +121,7 @@ exclude = ["**/__pycache__", ".venv*", "build", "dist"]
 useLibraryCodeForTypes = true
 
 [tool.coverage.report]
-fail_under = 80  # Contracts are critical; enforce >=80%
+fail_under = 84
 show_missing = true
 skip_covered = false
 precision = 1
