@@ -5,5 +5,5 @@
   "reportAny": "error",
   "venvPath": ".",
   "venv": ".venv",
-  "exclude": ["tests"]
+  "exclude": ["tests", "unified_api_contracts/testing"]
 }

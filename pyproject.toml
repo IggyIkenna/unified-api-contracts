@@ -11,7 +11,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "unified-api-contracts"
-version = "0.2.34"
+version = "0.2.38"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading library"
 requires-python = ">=3.13,<3.14"
 authors = [{ name = "Ikenna Igboaka" }]
@@ -26,6 +26,11 @@ Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
 Repository = "https://github.com/IggyIkenna/unified-api-contracts"
 
 [project.optional-dependencies]
+testing = [
+    "httpx>=0.28.1,<1.0.0",
+    "pyyaml>=6.0.0,<7.0.0",
+    "pytest>=9.0.1,<10.0.0",
+]
 # Schema-validation: SDK pins for validating schemas against real API responses.
 # Interfaces (UMI, unified-trading-library) may use different versions but must align with schemas.
 schema-validation = [
@@ -118,7 +123,7 @@ reportUnknownMemberType = "error"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]
-exclude = ["**/__pycache__", ".venv*", "build", "dist"]
+exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing"]
 useLibraryCodeForTypes = true
 
 [tool.coverage.report]

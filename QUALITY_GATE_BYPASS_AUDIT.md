@@ -115,3 +115,16 @@ None currently.
   apply here. The library is pure schema definitions and VCR mocks.
 - `os.getenv()` is used only in `scripts/` (not in `unified_api_contracts/` source code).
   This is acceptable for CLI scripts that run outside the service config system.
+
+---
+
+## 2.7 Broad `except Exception` in testing utilities
+
+**Scope:** `unified_api_contracts/testing/detect_cassette_drift.py`
+**Rule:** broad except Exception (codex step 5.8)
+**Reason:** `_build_model_registry()` must tolerate import errors when walking the full UAC
+package (some submodules require optional SDK deps). The exception is swallowed intentionally
+to continue the registry walk. `_validate_cassette()` must tolerate any Pydantic validation
+error to report drift without crashing the drift scan. These are testing-only utilities
+that perform best-effort introspection — fail-loud semantics would defeat the purpose.
+**Config:** None — exceptions documented here per bypass protocol.

@@ -14,5 +14,7 @@ LOCAL_DEPS=()
 # errors.py is a data registry file (venue error-code lookup table) — inherently large;
 # splitting would harm discoverability without reducing complexity (QUALITY_GATE_BYPASS_AUDIT.md §3.1)
 SIZE_EXTRA_EXCLUDES=("./unified_api_contracts/schemas/errors.py")
+# testing/ utilities use broad except for best-effort introspection — see QUALITY_GATE_BYPASS_AUDIT.md §2.7
+BROAD_EXCEPT_EXTRA_EXCLUDES=("unified_api_contracts/testing/**")
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
