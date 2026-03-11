@@ -180,7 +180,7 @@ class ExecutionInstruction(_CanonicalBase):
     stop_loss_price: Decimal | None = None
     take_profit_price: Decimal | None = None
     gas_limit: int | None = None
-    priority_fee_gwei: float | None = None
+    priority_fee_gwei: Decimal | None = None
     deadline_timestamp: AwareDatetime | None = None
     metadata: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
     schema_version: str = CANONICAL_EXECUTION_INSTRUCTION_VERSION
@@ -198,9 +198,9 @@ class ExecutionResult(_CanonicalBase):
     benchmark_price: Decimal | None = None
     amount_executed: Decimal | None = None
     amount_received: Decimal | None = None
-    slippage_bps: float | None = None
+    slippage_bps: Decimal | None = None
     gas_used: int | None = None
-    gas_price_gwei: float | None = None
+    gas_price_gwei: Decimal | None = None
     transaction_hash: str | None = None
     error_message: str | None = None
     schema_version: str = CANONICAL_EXECUTION_RESULT_VERSION
