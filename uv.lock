@@ -1321,7 +1321,7 @@ wheels = [
 
 [[package]]
 name = "unified-api-contracts"
-version = "0.1.194"
+version = "0.2.20"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic" },
