@@ -6,8 +6,8 @@ override-dependencies = [
 ]
 
 [build-system]
-requires = ["setuptools>=75,<82", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "unified-api-contracts"
@@ -26,11 +26,6 @@ Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
 Repository = "https://github.com/IggyIkenna/unified-api-contracts"
 
 [project.optional-dependencies]
-testing = [
-    "httpx>=0.28.1,<1.0.0",
-    "pyyaml>=6.0.0,<7.0.0",
-    "pytest>=9.0.1,<10.0.0",
-]
 # Schema-validation: SDK pins for validating schemas against real API responses.
 # Interfaces (UMI, unified-trading-library) may use different versions but must align with schemas.
 schema-validation = [
@@ -61,11 +56,6 @@ dev = [
 #   uv pip install -e ../unified-trading-library -e ../unified-config-interface
 #   Live verification is run in the six interfaces (see README).
 # UCI/UCS are not listed here so unified-api-contracts remains installable without them.
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["unified_api_contracts*"]
-exclude = ["tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
