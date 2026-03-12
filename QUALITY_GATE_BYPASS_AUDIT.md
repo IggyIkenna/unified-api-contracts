@@ -127,4 +127,5 @@ package (some submodules require optional SDK deps). The exception is swallowed 
 to continue the registry walk. `_validate_cassette()` must tolerate any Pydantic validation
 error to report drift without crashing the drift scan. These are testing-only utilities
 that perform best-effort introspection — fail-loud semantics would defeat the purpose.
-**Config:** None — exceptions documented here per bypass protocol.
+**Config:** `BROAD_EXCEPT_EXTRA_EXCLUDES=("unified_api_contracts/testing/detect_cassette_drift.py")`
+in `scripts/quality-gates.sh` — file excluded from the broad-except rg scan via `--glob !<path>`.
