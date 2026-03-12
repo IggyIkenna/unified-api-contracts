@@ -100,7 +100,7 @@ def test_schema_validation_deps_match_schema_versions() -> None:
             py_ver = _version_spec(schema_validation[pkg])
             assert py_ver == version, f"{pkg}: pyproject has {py_ver}, SCHEMA_VERSIONS.md expects {version}"
 
-    assert "requests" in schema_validation, "requests must be in [project.optional-dependencies] schema-validation"
+    assert "requests" in core, "requests must be in [project.dependencies]"
 
 
 @pytest.mark.unit
