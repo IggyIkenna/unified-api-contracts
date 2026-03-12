@@ -66,6 +66,11 @@ steps:
         pip install --no-cache-dir -e . 2>&1; PIP_EXIT=$$?
         echo "=== pip install exit: $$PIP_EXIT ==="
         [ "$$PIP_EXIT" -ne 0 ] && exit "$$PIP_EXIT"
+        echo "=== basedpyright version ==="
+        basedpyright --version 2>&1 || true
+        echo "=== basedpyright direct run ==="
+        basedpyright unified_api_contracts/ 2>&1; BP_EXIT=$$?
+        echo "=== basedpyright exit: $$BP_EXIT ==="
         echo "=== Starting quality-gates ==="
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
           WORKSPACE_ROOT=/workspace REPO_ROOT=/workspace \
