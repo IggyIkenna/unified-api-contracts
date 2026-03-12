@@ -63,6 +63,8 @@ steps:
         mkdir -p /root/.config/pip
         printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
         pip install --no-cache-dir -e .
+        # Upgrade pip to eliminate CVE-2026-1703 (pip 25.3 → 26.0)
+        pip install --quiet "pip>=26.0"
         echo "=== pip install done ==="
         # Create minimal .venv stub so basedpyright detects a venv at project root
         # (basedpyright 1.38.2 exits 3 when no .venv — even with 0 type errors)
