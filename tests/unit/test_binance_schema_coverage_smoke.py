@@ -46,11 +46,12 @@ def test_binance_key_endpoints_have_schemas() -> None:
 
 @pytest.mark.smoke
 @pytest.mark.unit
+@pytest.mark.enable_socket
 def test_binance_ticker_validates_against_live_api() -> None:
     """Fetch Binance ticker from live API and validate with BinanceTicker schema.
 
     Uses live API (equivalent to Context7 docs verification). Skips if network
-    unavailable (e.g. CI without outbound).
+    unavailable (e.g. CI without outbound). Requires socket enabled (pytest-socket).
     """
     try:
         resp = requests.get(
