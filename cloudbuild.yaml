@@ -64,8 +64,8 @@ steps:
         printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
         pip install --no-cache-dir -e .
         set +e
-        echo "=== basedpyright standalone ==="
-        basedpyright unified_api_contracts/ 2>&1
+        echo "=== basedpyright json ==="
+        basedpyright --outputjson unified_api_contracts/ 2>&1
         BP_EXIT=$$?
         echo "=== bp exit: $$BP_EXIT ==="
         echo "=== quality-gates run ==="
