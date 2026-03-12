@@ -59,7 +59,7 @@ markers = [
 [tool.ruff]
 line-length = 120
 target-version = "py313"
-exclude = [".cursor", ".venv", "build", "dist"]
+exclude = [".cursor", ".venv", "build", "dist", "scripts"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "G"]
@@ -101,7 +101,6 @@ pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]
 exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing"]
-useLibraryCodeForTypes = true
 
 [tool.coverage.report]
 fail_under = 84
