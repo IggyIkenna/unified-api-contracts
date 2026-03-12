@@ -24,7 +24,6 @@ steps:
       - |
         pip install uv
         uv pip install --system ruff==0.15.0
-        [ -d unified-api-contracts ] && cd unified-api-contracts
         ruff check .
         ruff format --check .
 
@@ -63,7 +62,6 @@ steps:
         pip install --quiet uv keyrings.google-artifactregistry-auth
         mkdir -p /root/.config/pip
         printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
-        [ -d unified-api-contracts ] && cd unified-api-contracts
         pip install --no-cache-dir --quiet -e .
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
           WORKSPACE_ROOT=/workspace \
@@ -99,7 +97,6 @@ steps:
       - |
         set -e
         pip install uv && uv pip install --system build
-        [ -d unified-api-contracts ] && cd unified-api-contracts
         python -m build --wheel --outdir dist/
         ls -lh dist/
     waitFor: ["quality-gates", "cloud-sdk-isolation-check"]
@@ -113,7 +110,6 @@ steps:
       - |
         set -e
         apk add --no-cache python3
-        [ -d unified-api-contracts ] && cd unified-api-contracts
 
         WHEEL_FILE=$$(ls dist/*.whl)
         VERSION=$$(echo $$WHEEL_FILE | sed -n 's/.*-\([0-9.]*\)-.*/\1/p')
@@ -136,7 +132,6 @@ steps:
         set -e
         apk add --no-cache python3 py3-pip jq
         pip3 install --break-system-packages twine keyrings.google-artifactregistry-auth
-        [ -d unified-api-contracts ] && cd unified-api-contracts
 
         WHEEL_FILE=$$(ls dist/*.whl)
         VERSION=$$(echo $$WHEEL_FILE | sed -n 's/.*-\([0-9.]*\)-.*/\1/p')
@@ -185,8 +180,7 @@ steps:
       - "-c"
       - |
         set -e
-        BASE=.; [ -d unified-api-contracts ] && BASE=unified-api-contracts
-        WHEEL_FILE=$$(ls $$BASE/dist/*.whl 2>/dev/null | head -1)
+        WHEEL_FILE=$$(ls dist/*.whl 2>/dev/null | head -1)
         VERSION=$$(echo $$WHEEL_FILE | sed -n 's/.*-\([0-9.]*\)-.*/\1/p')
         GH_PAT=$$(gcloud secrets versions access latest --secret=GH_PAT --project=$PROJECT_ID 2>/dev/null || echo "")
         if [ -n "$$VERSION" ] && [ -n "$$GH_PAT" ]; then
