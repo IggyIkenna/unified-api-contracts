@@ -71,7 +71,7 @@ steps:
         echo "=== quality-gates run ==="
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
           WORKSPACE_ROOT=/workspace REPO_ROOT=/workspace \
-          bash scripts/quality-gates.sh --no-fix --quick 2>&1
+          bash -x scripts/quality-gates.sh --no-fix --quick 2>&1
         QG_EXIT=$$?
         echo "=== qg exit: $$QG_EXIT ==="
         exit "$$QG_EXIT"
