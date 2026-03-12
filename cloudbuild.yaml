@@ -64,7 +64,7 @@ steps:
         printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
         pip install --no-cache-dir --quiet -e .
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
-          WORKSPACE_ROOT=/workspace \
+          WORKSPACE_ROOT=/workspace REPO_ROOT=/workspace \
           bash scripts/quality-gates.sh --no-fix --quick
     waitFor: ["clone-pm-scripts"]
 
