@@ -277,6 +277,9 @@ from .unified_api_contracts_external.tardis.schemas import (
     TardisExchangeDetail,
     TardisInstrumentDetail,
 )
+from .unified_api_contracts_external.upbit.schemas import (
+    UpbitBalanceQueryResponse,
+)
 from .unified_normalised_contracts.domain import (
     BookLevel,
     CanonicalAccountSnapshot,
@@ -698,6 +701,7 @@ __all__ = [
     "UniswapV3QuoteResponse",
     "UniswapV3SwapTxReceipt",
     "UnsubscribeRequest",
+    "UpbitBalanceQueryResponse",
     "UpbitWithdrawRequest",
     "UpbitWithdrawResponse",
     "VaRMethod",
