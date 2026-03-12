@@ -63,9 +63,15 @@ steps:
         mkdir -p /root/.config/pip
         printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
         pip install --no-cache-dir -e .
+        echo "=== basedpyright standalone ==="
+        basedpyright unified_api_contracts/ 2>&1; BP_EXIT=$$?
+        echo "=== bp exit: $$BP_EXIT ==="
+        set +e
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
           WORKSPACE_ROOT=/workspace REPO_ROOT=/workspace \
-          bash scripts/quality-gates.sh --no-fix --quick
+          bash scripts/quality-gates.sh --no-fix --quick 2>&1; QG_EXIT=$$?
+        echo "=== qg exit: $$QG_EXIT ==="
+        exit "$$QG_EXIT"
     waitFor: ["clone-pm-scripts"]
 
   # Cloud SDK isolation — STEP 5.10/5.11 (hard-fail on violations)
