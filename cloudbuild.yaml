@@ -28,9 +28,9 @@ steps:
         ruff format --check .
 
   # Step 1.5: Clone unified-trading-pm for quality-gates base scripts
-  # quality-gates.sh sources ${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh.
-  # In Cloud Build the source is at /workspace, so WORKSPACE_ROOT=/workspace. We clone
-  # unified-trading-pm into /workspace/unified-trading-pm so the path resolves correctly.
+  # Clone to /tmp/unified-trading-pm (NOT inside /workspace) so quality-gate scans
+  # from /workspace don't pick up PM scripts as false positives. WORKSPACE_ROOT=/tmp
+  # makes quality-gates.sh resolve base-library.sh at /tmp/unified-trading-pm/scripts/...
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
     id: "clone-pm-scripts"
     entrypoint: "bash"
@@ -39,18 +39,19 @@ steps:
       - |
         set -e
         GH_PAT=$$(gcloud secrets versions access latest --secret=GH_PAT --project=$PROJECT_ID 2>/dev/null || echo "")
-        if [ -n "$$GH_PAT" ] && [ ! -d "/workspace/unified-trading-pm" ]; then
+        if [ -n "$$GH_PAT" ] && [ ! -d "/tmp/unified-trading-pm" ]; then
           git clone --depth=1 \
             "https://$$GH_PAT@github.com/IggyIkenna/unified-trading-pm.git" \
-            /workspace/unified-trading-pm
-          echo "Cloned unified-trading-pm to /workspace/unified-trading-pm"
+            /tmp/unified-trading-pm
+          echo "Cloned unified-trading-pm to /tmp/unified-trading-pm"
         else
           echo "Skipping clone (PAT unavailable or already cloned)"
         fi
     waitFor: ["lint"]
 
   # Step 2: Run full quality gates (replaces inline lint/cloud-sdk checks)
-  # WORKSPACE_ROOT overridden to /workspace so quality-gates.sh resolves base-library.sh correctly.
+  # WORKSPACE_ROOT=/tmp so quality-gates.sh resolves base-library.sh at /tmp/unified-trading-pm/...
+  # REPO_ROOT=/tmp for the same reason (check-import-patterns.py path resolution).
   - name: "python:3.13-slim"
     id: "quality-gates"
     entrypoint: "bash"
@@ -73,7 +74,7 @@ steps:
         ln -sfn "$(which python3)" .venv/bin/python3
         echo "=== venv stub created, starting quality gates ==="
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
-          WORKSPACE_ROOT=/workspace REPO_ROOT=/workspace \
+          WORKSPACE_ROOT=/tmp REPO_ROOT=/tmp \
           bash scripts/quality-gates.sh --no-fix --quick
     waitFor: ["clone-pm-scripts"]
 
