@@ -53,6 +53,7 @@ jobs:
           export PATH="$(pwd)/.venv/bin:$PATH"
           bash scripts/quality-gates.sh --no-fix
         env:
+          CLOUD_PROVIDER: "local"
           CLOUD_BUILD: "true"
           GCP_PROJECT_ID: "test-project"
           CLOUD_MOCK_MODE: "true"

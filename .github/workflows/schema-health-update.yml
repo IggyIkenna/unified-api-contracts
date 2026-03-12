@@ -75,7 +75,7 @@ jobs:
         with:
           name: schema-health-artifacts
           path: schema_artifacts/umi/
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
           repository: ${{ github.repository_owner }}/unified-market-interface
           run-id: ${{ inputs.umi_run_id }}
         continue-on-error: true
@@ -88,7 +88,7 @@ jobs:
           name: schema-health-artifacts
           path: schema_artifacts/umi/
           repo: ${{ github.repository_owner }}/unified-market-interface
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           if_no_artifact_found: warn
         continue-on-error: true
 
@@ -102,7 +102,7 @@ jobs:
         with:
           name: schema-health-artifacts
           path: schema_artifacts/usei/
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.GH_PAT }}
           repository: ${{ github.repository_owner }}/unified-sports-execution-interface
           run-id: ${{ inputs.usei_run_id }}
         continue-on-error: true
@@ -115,7 +115,7 @@ jobs:
           name: schema-health-artifacts
           path: schema_artifacts/usei/
           repo: ${{ github.repository_owner }}/unified-sports-execution-interface
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GH_PAT }}
           if_no_artifact_found: warn
         continue-on-error: true
 
