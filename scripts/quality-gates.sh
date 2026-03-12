@@ -12,13 +12,4 @@ MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
-
-# Exclude testing utilities that must use broad except Exception for best-effort introspection.
-# detect_cassette_drift.py walks the full UAC package and must tolerate import errors from
-# optional SDK deps and any Pydantic validation error during drift scanning.
-# Documented in QUALITY_GATE_BYPASS_AUDIT.md § 2.7.
-BROAD_EXCEPT_EXTRA_EXCLUDES=(
-    "unified_api_contracts/testing/detect_cassette_drift.py"
-)
-
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

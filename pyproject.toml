@@ -19,23 +19,11 @@ readme = "README.md"
 license = { text = "MIT" }
 dependencies = [
     "pydantic>=2.12.5,<3.0.0",
-]
-
-[project.urls]
-Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
-Repository = "https://github.com/IggyIkenna/unified-api-contracts"
-
-[project.optional-dependencies]
-# Schema-validation: SDK pins for validating schemas against real API responses.
-# Interfaces (UMI, unified-trading-library) may use different versions but must align with schemas.
-schema-validation = [
     "requests>=2.32.5,<3.0.0",
-    "databento>=0.32.0,<1.0.0",      # Databento Historical/Live API validation
-    "tardis-client>=1.3.7,<2.0.0",   # Tardis HTTP API v1 validation
-    "ccxt>=4.5.24,<5.0.0",    # CCXT unified response validation
-    "ib_insync>=0.9.86,<1.0.0",      # IBKR TWS/ib_insync schema validation (UTEI)
-]
-dev = [
+    "databento>=0.32.0,<1.0.0",
+    "tardis-client>=1.3.7,<2.0.0",
+    "ccxt>=4.5.24,<5.0.0",
+    "ib_insync>=0.9.86,<1.0.0",
     "pytest>=9.0.1,<10.0.0",
     "pytest-cov>=7.0.0,<8.0.0",
     "pytest-asyncio>=0.25.0,<2.0.0",
@@ -47,16 +35,14 @@ dev = [
     "pip-audit>=2.7.0,<3.0.0",
     "bandit>=1.7.0,<2.0.0",
     "vcrpy>=8.0.0,<9.0.0",
-    "requests>=2.32.5,<3.0.0",
     "pre-commit>=3.0,<4.0.0",
     "hypothesis>=6.0.0,<7.0.0",
     "httpx>=0.28.1,<1.0.0",
 ]
-# For live contract verification (install from workspace path, not PyPI):
-#   uv pip install -e ../unified-trading-library -e ../unified-config-interface
-#   Live verification is run in the six interfaces (see README).
-# UCI/UCS are not listed here so unified-api-contracts remains installable without them.
 
+[project.urls]
+Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
+Repository = "https://github.com/IggyIkenna/unified-api-contracts"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = "test_*.py"
