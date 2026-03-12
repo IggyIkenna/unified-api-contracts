@@ -209,7 +209,11 @@ from .unified_api_contracts_external.deribit.schemas import (
 )
 from .unified_api_contracts_external.hyperliquid.schemas import (
     HyperliquidAssetInfo,
+    HyperliquidFill,
     HyperliquidMeta,
+    HyperliquidOpenOrder,
+    HyperliquidPosition,
+    HyperliquidUserState,
 )
 from .unified_api_contracts_external.ibkr import (
     IBKRAccountValue,
@@ -587,7 +591,11 @@ __all__ = [
     "HeartbeatMessage",
     "HttpRateLimitHeaders",
     "HyperliquidAssetInfo",
+    "HyperliquidFill",
     "HyperliquidMeta",
+    "HyperliquidOpenOrder",
+    "HyperliquidPosition",
+    "HyperliquidUserState",
     "IBKRAccountValue",
     "IBKRContractDetails",
     "IBKRCorporateAction",
