@@ -22,7 +22,8 @@ steps:
     args:
       - "-c"
       - |
-        uv pip install ruff==0.15.0
+        pip install uv
+        uv pip install --system ruff==0.15.0
         [ -d unified-api-contracts ] && cd unified-api-contracts
         ruff check .
         ruff format --check .
@@ -59,9 +60,11 @@ steps:
       - |
         set -e
         apt-get update -qq && apt-get install -y --no-install-recommends git ripgrep
-        pip install --quiet uv
+        pip install --quiet uv keyrings.google-artifactregistry-auth
+        mkdir -p /root/.config/pip
+        printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
         [ -d unified-api-contracts ] && cd unified-api-contracts
-        uv pip install --system -e ".[dev]" --quiet
+        pip install --no-cache-dir --quiet -e .
         CLOUD_BUILD=true CLOUD_MOCK_MODE=true GCP_PROJECT_ID=$PROJECT_ID \
           WORKSPACE_ROOT=/workspace \
           bash scripts/quality-gates.sh --no-fix --quick
@@ -76,15 +79,15 @@ steps:
       - |
         apt-get update -qq && apt-get install -y --no-install-recommends ripgrep
         echo "=== STEP 5.10: No direct cloud SDK imports ==="
-        VIOLATIONS=$(rg 'from google\.cloud import|^import boto3\b|^from boto3 import|^from botocore import' \
+        VIOLATIONS=$$(rg 'from google\.cloud import|^import boto3\b|^from boto3 import|^from botocore import' \
           --type py --glob '!.venv*' --glob '!**/providers/**' --glob '!**/cache.py' \
           . 2>/dev/null || true)
-        [ -n "$VIOLATIONS" ] && { echo "STEP 5.10 FAILED:"; echo "$VIOLATIONS"; exit 1; }
+        [ -n "$$VIOLATIONS" ] && { echo "STEP 5.10 FAILED:"; echo "$$VIOLATIONS"; exit 1; }
         echo "STEP 5.10 passed"
         echo "=== STEP 5.11: No UTL protocol-leaking symbols ==="
-        UTL=$(rg 'from unified_trading_library import.*(CloudTarget|StandardizedDomainCloudService|upload_to_gcs_batch)' \
+        UTL=$$(rg 'from unified_trading_library import.*(CloudTarget|StandardizedDomainCloudService|upload_to_gcs_batch)' \
           --type py --glob '!.venv*' --glob '!tests/**' . 2>/dev/null || true)
-        [ -n "$UTL" ] && { echo "STEP 5.11 FAILED:"; echo "$UTL"; exit 1; }
+        [ -n "$$UTL" ] && { echo "STEP 5.11 FAILED:"; echo "$$UTL"; exit 1; }
         echo "STEP 5.11 passed"
     waitFor: ["quality-gates"]
 
@@ -95,7 +98,7 @@ steps:
       - "-c"
       - |
         set -e
-        uv pip install build
+        pip install uv && uv pip install --system build
         [ -d unified-api-contracts ] && cd unified-api-contracts
         python -m build --wheel --outdir dist/
         ls -lh dist/
