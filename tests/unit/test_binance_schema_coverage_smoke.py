@@ -64,6 +64,7 @@ def test_binance_key_endpoints_have_schemas() -> None:
 
 @pytest.mark.smoke
 @pytest.mark.unit
+@pytest.mark.enable_socket
 def test_binance_ticker_validates_against_live_api() -> None:
     """Validate BinanceTicker schema parses correctly against cassette fixture data.
 
