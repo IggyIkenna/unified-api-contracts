@@ -178,6 +178,7 @@ from .trading_schemas import (
     VALID_MODES,
     VALID_TIMEFRAMES,
 )
+from .unified_api_contracts_external.aster.schemas import AsterExchangeInfo
 from .unified_api_contracts_external.betfair import (
     BetfairCurrentOrderSummary,
     BetfairListCurrentOrdersResponse,
@@ -185,6 +186,13 @@ from .unified_api_contracts_external.betfair import (
 from .unified_api_contracts_external.betfair.schemas import (
     BetfairMarketCatalogue,
     BetfairRunnerCatalog,
+)
+from .unified_api_contracts_external.binance import (
+    BinanceLiquidationOrder,
+    BinanceMarkPriceUpdate,
+    BinanceOrderBook,
+    BinanceTicker,
+    BinanceTrade,
 )
 from .unified_api_contracts_external.binance.market_schemas import (
     BinanceFuturesExchangeInfo,
@@ -194,22 +202,60 @@ from .unified_api_contracts_external.binance.market_schemas import (
 from .unified_api_contracts_external.bybit.schemas import (
     BybitInstrumentInfo,
     BybitInstrumentsResponse,
+    BybitLiquidationOrder,
+    BybitOrderBook,
+    BybitTicker,
+)
+from .unified_api_contracts_external.ccxt.schemas import (
+    CcxtAggTrade,
+    CcxtFundingRate,
+    CcxtMarket,
+    CcxtOhlcv,
+    CcxtOpenInterest,
+    CcxtOrderBook,
+    CcxtTicker,
+    CcxtTrade,
 )
 from .unified_api_contracts_external.coinbase.schemas import (
+    CoinbaseOrderBook,
     CoinbaseProductInfo,
     CoinbaseProductsResponse,
+    CoinbaseTicker,
+    CoinbaseTrade,
+)
+from .unified_api_contracts_external.coinglass.schemas import (
+    LiquidationHeatmapRequest,
+    LiquidationHeatmapResponse,
+    LiquidationLevel,
 )
 from .unified_api_contracts_external.databento.schemas import (
     DatabentoReferenceInstrument,
 )
 from .unified_api_contracts_external.deribit.schemas import (
+    DeribitAccountSummaryResponse,
+    DeribitCancelResponse,
     DeribitGetInstrumentResponse,
     DeribitGetInstrumentsResponse,
     DeribitInstrumentInfoFull,
+    DeribitInstrumentsResponse,
+    DeribitOpenOrdersResponse,
+    DeribitOrderResponse,
+    DeribitOrderStateResponse,
+    DeribitPositionsResponse,
+    DeribitTickerResponse,
+)
+from .unified_api_contracts_external.hyblock.schemas import (
+    HyblockLiquidationLevelEntry,
+    HyblockLiquidationLevelRequest,
+    HyblockLiquidationLevelResponse,
+    HyblockOIClusterEntry,
+    HyblockOIClusterRequest,
+    HyblockOIClusterResponse,
 )
 from .unified_api_contracts_external.hyperliquid.schemas import (
     HyperliquidAssetInfo,
     HyperliquidFill,
+    HyperliquidFundingHistoryEntry,
     HyperliquidMeta,
     HyperliquidOpenOrder,
     HyperliquidPosition,
@@ -223,9 +269,24 @@ from .unified_api_contracts_external.ibkr.schemas import (
     IBKRContractDetails,
     IBKRCorporateAction,
 )
+from .unified_api_contracts_external.kalshi.schemas import (
+    KalshiMarket,
+    KalshiOrderBook,
+    KalshiTrade,
+)
+from .unified_api_contracts_external.manifold.schemas import (
+    ManifoldMarket,
+    ManifoldPrice,
+    ManifoldTrade,
+)
 from .unified_api_contracts_external.okx.schemas import (
+    OKXFundingRate,
     OKXInstrumentInfo,
     OKXInstrumentsResponse,
+    OKXLiquidationOrder,
+    OKXMarkPrice,
+    OKXOrderBook,
+    OKXTicker,
 )
 from .unified_api_contracts_external.polygon.schemas import (
     PolygonOptionContract,
@@ -274,11 +335,13 @@ from .unified_api_contracts_external.sports import (
 )
 from .unified_api_contracts_external.sports.canonical.mappings import TeamMapping
 from .unified_api_contracts_external.tardis.schemas import (
+    TardisAvailableSymbol,
     TardisExchangeDetail,
     TardisInstrumentDetail,
 )
 from .unified_api_contracts_external.upbit.schemas import (
     UpbitBalanceQueryResponse,
+    UpbitTicker,
 )
 from .unified_normalised_contracts.domain import (
     BookLevel,
@@ -362,6 +425,10 @@ from .unified_normalised_contracts.execution import (
     OrderType,
     TimeInForce,
 )
+from .unified_normalised_contracts.normalize.liquidation_clusters import (
+    normalize_coinglass_liquidation_cluster,
+    normalize_hyblock_liquidation_level,
+)
 from .unified_normalised_contracts.odds import american_to_decimal, decimal_to_american
 from .unified_normalised_contracts.options import (
     NormalizedStrikeCoordinate,
@@ -437,6 +504,7 @@ __all__ = [
     "ArbitrageMarket",
     "ArbitrageOpportunity",
     "ArbitrageStatus",
+    "AsterExchangeInfo",
     "BenchmarkType",
     "BetExecution",
     "BetOrder",
@@ -449,7 +517,12 @@ __all__ = [
     "BettingSignal",
     "BinanceFuturesExchangeInfo",
     "BinanceInstrumentInfo",
+    "BinanceLiquidationOrder",
+    "BinanceMarkPriceUpdate",
     "BinanceOptionInstrumentInfo",
+    "BinanceOrderBook",
+    "BinanceTicker",
+    "BinanceTrade",
     "BinanceWithdrawRequest",
     "BinanceWithdrawResponse",
     "BookLevel",
@@ -460,6 +533,9 @@ __all__ = [
     "BucketMarket",
     "BybitInstrumentInfo",
     "BybitInstrumentsResponse",
+    "BybitLiquidationOrder",
+    "BybitOrderBook",
+    "BybitTicker",
     "BybitWithdrawRequest",
     "BybitWithdrawResponse",
     "CanonicalAccountSnapshot",
@@ -526,9 +602,20 @@ __all__ = [
     "CanonicalWsMessage",
     "CanonicalYieldCurvePoint",
     "CassetteStatus",
+    "CcxtAggTrade",
+    "CcxtFundingRate",
+    "CcxtMarket",
+    "CcxtOhlcv",
+    "CcxtOpenInterest",
+    "CcxtOrderBook",
+    "CcxtTicker",
+    "CcxtTrade",
     "CoLocationPerformanceMetric",
+    "CoinbaseOrderBook",
     "CoinbaseProductInfo",
     "CoinbaseProductsResponse",
+    "CoinbaseTicker",
+    "CoinbaseTrade",
     "CoinbaseWithdrawRequest",
     "CoinbaseWithdrawResponse",
     "ComboLeg",
@@ -555,9 +642,17 @@ __all__ = [
     "DatabentoReferenceInstrument",
     "DepositAddress",
     "DepositRecord",
+    "DeribitAccountSummaryResponse",
+    "DeribitCancelResponse",
     "DeribitGetInstrumentResponse",
     "DeribitGetInstrumentsResponse",
     "DeribitInstrumentInfoFull",
+    "DeribitInstrumentsResponse",
+    "DeribitOpenOrdersResponse",
+    "DeribitOrderResponse",
+    "DeribitOrderStateResponse",
+    "DeribitPositionsResponse",
+    "DeribitTickerResponse",
     "EndpointSpec",
     "Erc20TransferCalldata",
     "Erc20TransferFromCalldata",
@@ -593,8 +688,15 @@ __all__ = [
     "HealthPingResponse",
     "HeartbeatMessage",
     "HttpRateLimitHeaders",
+    "HyblockLiquidationLevelEntry",
+    "HyblockLiquidationLevelRequest",
+    "HyblockLiquidationLevelResponse",
+    "HyblockOIClusterEntry",
+    "HyblockOIClusterRequest",
+    "HyblockOIClusterResponse",
     "HyperliquidAssetInfo",
     "HyperliquidFill",
+    "HyperliquidFundingHistoryEntry",
     "HyperliquidMeta",
     "HyperliquidOpenOrder",
     "HyperliquidPosition",
@@ -608,6 +710,9 @@ __all__ = [
     "InstrumentWarehouseRow",
     "InsuranceFundState",
     "InternalTransfer",
+    "KalshiMarket",
+    "KalshiOrderBook",
+    "KalshiTrade",
     "LatencyBenchmarkReport",
     "LatencyComponent",
     "LatencyPercentile",
@@ -617,8 +722,14 @@ __all__ = [
     "LidoSubmitResponse",
     "LidoWstEthWrapResponse",
     "Liquidation",
+    "LiquidationHeatmapRequest",
+    "LiquidationHeatmapResponse",
+    "LiquidationLevel",
     "LiquidityPool",
     "LongShortRatio",
+    "ManifoldMarket",
+    "ManifoldPrice",
+    "ManifoldTrade",
     "MarketClosedError",
     "MarketState",
     "MarketStatus",
@@ -635,8 +746,13 @@ __all__ = [
     "NegRiskBucket",
     "NetworkJitterMetric",
     "NormalizedStrikeCoordinate",
+    "OKXFundingRate",
     "OKXInstrumentInfo",
     "OKXInstrumentsResponse",
+    "OKXLiquidationOrder",
+    "OKXMarkPrice",
+    "OKXOrderBook",
+    "OKXTicker",
     "OKXWithdrawRequest",
     "OKXWithdrawResponse",
     "OddsChangedError",
@@ -692,6 +808,7 @@ __all__ = [
     "SubMillisecondLatencyRecord",
     "SubscribeRequest",
     "Swap",
+    "TardisAvailableSymbol",
     "TardisExchangeDetail",
     "TardisInstrumentDetail",
     "TeamMapping",
@@ -702,6 +819,7 @@ __all__ = [
     "UniswapV3SwapTxReceipt",
     "UnsubscribeRequest",
     "UpbitBalanceQueryResponse",
+    "UpbitTicker",
     "UpbitWithdrawRequest",
     "UpbitWithdrawResponse",
     "VaRMethod",
@@ -724,6 +842,8 @@ __all__ = [
     "american_to_decimal",
     "classify_venue_error",
     "decimal_to_american",
+    "normalize_coinglass_liquidation_cluster",
+    "normalize_hyblock_liquidation_level",
 ]
 
 # Alias venue subpackages to unified_api_contracts_external

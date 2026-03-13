@@ -65,19 +65,51 @@ class TardisInstrumentDetail(BaseModel):
     optionType: str | None = Field(None, description="call or put for options")
 
 
+class TardisAvailableSymbol(BaseModel):
+    """Minimal symbol info from GET /v1/exchanges/:exchange availableSymbols array.
+
+    Ref: https://docs.tardis.dev/api/http — /exchanges/:exchange response.
+    """
+
+    id: str = Field("", description="Symbol id e.g. btcusdt")
+    type: str | None = Field(None, description="perpetual, spot, future, option")
+    availableSince: str | None = Field(None, description="ISO datetime of first available data")
+    availableTo: str | None = Field(None, description="ISO datetime of last available data; None if active")
+
+
 class TardisExchangeDetail(BaseModel):
     """Exchange detail from Tardis exchange endpoint.
 
     Returned by GET https://api.tardis.dev/v1/exchanges/{exchange}.
-    Contains exchange metadata and the full instrument list.
+    Ref: https://docs.tardis.dev/api/http — response has availableSymbols.
     """
 
     id: str = Field(..., description="Exchange identifier e.g. binance-futures")
     name: str = Field(..., description="Human-readable exchange name")
+    enabled: bool | None = Field(None, description="Whether exchange is enabled")
     availableSince: str | None = Field(None, description="ISO datetime of earliest available data")
-    instruments: list[TardisInstrumentDetail] = Field(
-        default_factory=list, description="All instruments available on this exchange"
+    availableSymbols: list[TardisAvailableSymbol] = Field(
+        default_factory=list, description="Available symbols (id, type, availableSince)"
     )
+    availableChannels: list[str] | None = Field(None, description="Available data channels")
+    datasets: dict[str, object] | None = Field(None, description="CSV datasets info")
+    incidentReports: list[dict[str, object]] | None = Field(None, description="Incident history")
+
+    @property
+    def instruments(self) -> list[TardisInstrumentDetail]:
+        """Backward compat: map availableSymbols to TardisInstrumentDetail (minimal fields).
+
+        URDI and other consumers expect .instruments; API returns availableSymbols.
+        """
+        return [
+            TardisInstrumentDetail(
+                id=s.id,
+                type=s.type,
+                availableSince=s.availableSince,
+                availableTo=s.availableTo,
+            )
+            for s in self.availableSymbols
+        ]
 
 
 class TardisTrade(BaseModel):

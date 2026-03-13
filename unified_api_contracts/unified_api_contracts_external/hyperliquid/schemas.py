@@ -246,6 +246,7 @@ class HyperliquidAssetInfo(BaseModel):
     szDecimals: int | None = None  # decimal places for size
     maxLeverage: int | None = None
     onlyIsolated: bool | None = None
+    isDelisted: bool | None = None
 
 
 class HyperliquidMeta(BaseModel):
