@@ -70,6 +70,7 @@ from .errors import (
     WebSocketCloseInfo,
     classify_venue_error,
 )
+from .health import ServiceHealthResponse
 from .latency import (
     CoLocationPerformanceMetric,
     LatencyBenchmarkReport,
@@ -277,6 +278,7 @@ __all__ = [
     "RiskLimitBreach",
     "SatelliteObservation",
     "SentimentScore",
+    "ServiceHealthResponse",
     "SettlementEvent",
     "SettlementPrice",
     "SpanMarginLeg",
