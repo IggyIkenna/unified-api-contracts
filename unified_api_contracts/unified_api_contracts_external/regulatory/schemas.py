@@ -98,6 +98,12 @@ class BestExecutionRecord(BaseModel):
     execution_quality_score: float | None = None
     algo_used: str | None = None
     client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    execution_service_version: str | None = Field(
+        default=None, description="Deployed execution-service version at time of order"
+    )
+    strategy_service_version: str | None = Field(
+        default=None, description="Deployed strategy-service version at time of signal"
+    )
 
 
 # ---------------------------------------------------------------------------
