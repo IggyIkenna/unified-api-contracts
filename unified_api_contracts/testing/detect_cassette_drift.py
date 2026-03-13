@@ -27,7 +27,7 @@ import sys
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 
 import unified_api_contracts as _uac_pkg
 
@@ -54,13 +54,13 @@ def _build_model_registry() -> dict[str, type]:
     ):
         try:
             mod = importlib.import_module(modname)
-        except Exception:
+        except (ImportError, ModuleNotFoundError, AttributeError, OSError):
             continue
         for _attr, obj in inspect.getmembers(mod, inspect.isclass):
             try:
                 if issubclass(obj, BaseModel) and obj is not BaseModel:
                     registry[obj.__name__.lower()] = obj
-            except Exception:
+            except TypeError:
                 pass
     return registry
 
@@ -127,7 +127,7 @@ def _validate_cassette(
                 else:
                     model.model_validate(data)
 
-            except Exception as exc:
+            except ValidationError as exc:
                 errors.append(f"{cassette_path.name}[interaction={idx}]: {type(exc).__name__}: {exc}")
         else:
             if isinstance(response_body, str):
