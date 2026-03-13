@@ -11,8 +11,5 @@ SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
-# Bypass: detect_cassette_drift.py uses broad except Exception intentionally for
-# best-effort introspection during cassette drift scanning. See QUALITY_GATE_BYPASS_AUDIT.md §2.7
-BROAD_EXCEPT_EXTRA_EXCLUDES=("unified_api_contracts/testing/detect_cassette_drift.py")
-WORKSPACE_ROOT="${WORKSPACE_ROOT:-$(cd "$(git rev-parse --show-toplevel)/.." && pwd)}"
+WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

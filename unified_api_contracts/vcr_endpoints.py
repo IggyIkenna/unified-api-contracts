@@ -158,6 +158,210 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
         ),
     ],
     "alchemy": [],
+    # ------------------------------------------------------------------
+    # DeFi protocols — The Graph subgraphs
+    # ------------------------------------------------------------------
+    "thegraph_aave": [
+        _post(
+            "https://gateway.thegraph.com/api/{THE_GRAPH_API_KEY}/subgraphs/id/GQFbb95cE6d8mV989mL5figjaGaKCQB3xqYrr1bRyXqF",
+            "aave_v3_reserves.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": (
+                    "{ reserves(first: 5, orderBy: totalLiquidity, orderDirection: desc)"
+                    " { id name symbol decimals liquidityRate variableBorrowRate"
+                    "   totalLiquidity totalCurrentVariableDebt } }"
+                )
+            },
+            key_env="THE_GRAPH_API_KEY",
+            schema_version="1.0",
+        ),
+    ],
+    "thegraph_morpho": [
+        _post(
+            "https://api.thegraph.com/subgraphs/name/morpho-association/morpho-blue",
+            "morpho_markets.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": (
+                    "{ markets(first: 5, orderBy: totalValueLockedUSD, orderDirection: desc)"
+                    " { id loanToken { id symbol decimals } collateralToken { id symbol decimals }"
+                    "   lltv totalSupplyAssets totalBorrowAssets } }"
+                )
+            },
+            schema_version="1.0",
+        ),
+    ],
+    "thegraph_uniswap_v3": [
+        _post(
+            "https://gateway.thegraph.com/api/{THE_GRAPH_API_KEY}/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+            "uniswap_v3_pools.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": (
+                    "{ pools(first: 5, orderBy: totalValueLockedUSD, orderDirection: desc)"
+                    " { id token0 { id symbol decimals } token1 { id symbol decimals }"
+                    "   feeTier liquidity sqrtPrice tick totalValueLockedUSD } }"
+                )
+            },
+            key_env="THE_GRAPH_API_KEY",
+            schema_version="1.0",
+        ),
+    ],
+    "thegraph_uniswap_v4": [
+        _post(
+            "https://gateway.thegraph.com/api/{THE_GRAPH_API_KEY}/subgraphs/id/DiYPVdygkfjDWhbxGSqAQxwBKmfKnkWQojqeM3iEwqCK",
+            "uniswap_v4_pools.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": (
+                    "{ pools(first: 5, orderBy: totalValueLockedUSD, orderDirection: desc)"
+                    " { id token0 { id symbol } token1 { id symbol }"
+                    "   fee liquidity totalValueLockedUSD } }"
+                )
+            },
+            key_env="THE_GRAPH_API_KEY",
+            schema_version="1.0",
+        ),
+    ],
+    "thegraph_instadapp": [
+        _post(
+            "https://api.thegraph.com/subgraphs/name/instadapp/dsa-v2",
+            "dsa_accounts.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": "{ accounts(first: 5) { id owner { id } version createdAt } }"
+            },
+            schema_version="1.0",
+        ),
+    ],
+    "thegraph_balancer": [
+        _post(
+            "https://api-v3.balancer.fi/graphql",
+            "balancer_pools.yaml",
+            "data",
+            "TheGraphResponse",
+            json_body={
+                "query": (
+                    "{ pools(first: 5, orderBy: totalLiquidity, orderDirection: desc)"
+                    " { id name symbol poolType totalLiquidity totalSwapVolume } }"
+                )
+            },
+            schema_version="1.0",
+        ),
+    ],
+    # ------------------------------------------------------------------
+    # DeFi protocols — Alchemy RPC (eth_call / eth_getLogs)
+    # ------------------------------------------------------------------
+    "alchemy_eth_call": [
+        _post(
+            "https://eth-mainnet.g.alchemy.com/v2/{ALCHEMY_API_KEY}",
+            "aave_v3_user_data.yaml",
+            "",
+            "AlchemyRpcResponse",
+            json_body={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "eth_call",
+                "params": [
+                    {
+                        "to": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+                        "data": "0xbf92857c0000000000000000000000000000000000000000000000000000000000000000",
+                    },
+                    "latest",
+                ],
+            },
+            key_env="ALCHEMY_API_KEY",
+            header_name="Authorization",
+            schema_version="1.0",
+        ),
+    ],
+    "alchemy_eth_getlogs": [
+        _post(
+            "https://eth-mainnet.g.alchemy.com/v2/{ALCHEMY_API_KEY}",
+            "aave_v3_supply_logs.yaml",
+            "",
+            "AlchemyRpcResponse",
+            json_body={
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": "eth_getLogs",
+                "params": [
+                    {
+                        "address": "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2",
+                        "topics": ["0x2b627736bca15cd5381dcf80b0bf11fd197d01a037c52b927a881a10fb73ba61"],
+                        "fromBlock": "latest",
+                        "toBlock": "latest",
+                    }
+                ],
+            },
+            key_env="ALCHEMY_API_KEY",
+            header_name="Authorization",
+            schema_version="1.0",
+        ),
+    ],
+    # ------------------------------------------------------------------
+    # DeFi protocols — DefiLlama additional endpoints
+    # (defillama entry above has protocols + chains; add TVL + yields here)
+    # ------------------------------------------------------------------
+    "defillama_tvl": [
+        _get(
+            "https://api.llama.fi/tvl/aave",
+            "aave_tvl.yaml",
+            "",
+            "DefiLlamaTvlValue",
+            schema_version="1.0",
+        ),
+    ],
+    "defillama_yields": [
+        _get(
+            "https://yields.llama.fi/pools",
+            "pools.yaml",
+            "data.0",
+            "DefiLlamaYieldPool",
+            schema_version="1.0",
+        ),
+    ],
+    # ------------------------------------------------------------------
+    # DeFi protocols — AaveScan analytics
+    # ------------------------------------------------------------------
+    "aavescan": [
+        _get(
+            "https://aavescan.com/api/v1/market-data",
+            "market_data.yaml",
+            "",
+            "AaveScanMarketData",
+            key_env="AAVESCAN_API_KEY",
+            header_name="X-API-Key",
+            schema_version="1.0",
+        ),
+    ],
+    # ------------------------------------------------------------------
+    # Hyperliquid testnet (TESTNET_MODE=true)
+    # ------------------------------------------------------------------
+    "hyperliquid_testnet": [
+        _post(
+            "https://api.hyperliquid-testnet.xyz/info",
+            "meta.yaml",
+            "",
+            "HyperliquidMeta",
+            json_body={"type": "meta"},
+            schema_version="1.0",
+        ),
+        _post(
+            "https://api.hyperliquid-testnet.xyz/info",
+            "all_mids.yaml",
+            "",
+            "HyperliquidAllMids",
+            json_body={"type": "allMids"},
+            schema_version="1.0",
+        ),
+    ],
     "ccxt": [],
     "aster": [],
     "ibkr": [],
@@ -411,6 +615,23 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     "fear_greed:fng": "FearGreedReading",
     "arkham:entity": "ArkhamEntity",
     "defillama:protocol": "DefiLlamaProtocol",
+    "defillama_tvl:tvl": "DefiLlamaTvlValue",
+    "defillama_yields:pool": "DefiLlamaYieldPool",
+    # DeFi protocol subgraphs (The Graph)
+    "thegraph_aave:reserves": "TheGraphResponse",
+    "thegraph_morpho:markets": "TheGraphResponse",
+    "thegraph_uniswap_v3:pools": "TheGraphResponse",
+    "thegraph_uniswap_v4:pools": "TheGraphResponse",
+    "thegraph_instadapp:accounts": "TheGraphResponse",
+    "thegraph_balancer:pools": "TheGraphResponse",
+    # Alchemy RPC
+    "alchemy_eth_call:response": "AlchemyRpcResponse",
+    "alchemy_eth_getlogs:response": "AlchemyRpcResponse",
+    # AaveScan
+    "aavescan:market_data": "AaveScanMarketData",
+    # Hyperliquid testnet
+    "hyperliquid_testnet:meta": "HyperliquidMeta",
+    "hyperliquid_testnet:all_mids": "HyperliquidAllMids",
     # Sports
     "api_football:league": "ApiFootballLeague",
     "footystats:league": "FootystatsLeague",
