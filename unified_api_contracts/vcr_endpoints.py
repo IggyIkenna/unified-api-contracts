@@ -234,9 +234,7 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             "dsa_accounts.yaml",
             "data",
             "TheGraphResponse",
-            json_body={
-                "query": "{ accounts(first: 5) { id owner { id } version createdAt } }"
-            },
+            json_body={"query": "{ accounts(first: 5) { id owner { id } version createdAt } }"},
             schema_version="1.0",
         ),
     ],

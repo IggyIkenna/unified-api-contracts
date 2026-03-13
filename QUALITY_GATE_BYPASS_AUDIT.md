@@ -5,20 +5,6 @@ Every bypass must be justified and tracked here per workspace rules.
 
 ---
 
-## 3.1 File Size Bypass
-
-### schemas/errors.py — 1819 lines (exceeds 900-line limit)
-
-**Scope:** `unified_api_contracts/schemas/errors.py`
-**Rule:** MAX_FILE_LINES=900
-**Reason:** `errors.py` is a venue error-code data registry (lookup table mapping ~1800 venue-specific
-error codes to retry/reconnect classifications). Splitting by venue would require a subdirectory of
-20+ small files with no reduction in complexity. The file is purely declarative data — it has no
-logic complexity and no function exceeds 50 lines. `SIZE_EXTRA_EXCLUDES` set in `quality-gates.sh`.
-**Config:** `SIZE_EXTRA_EXCLUDES=("./unified_api_contracts/schemas/errors.py")` in `scripts/quality-gates.sh`
-
----
-
 ## 2.1 Ruff Config Bypasses
 
 ### N815 — camelCase field names in schemas.py files
@@ -115,17 +101,3 @@ None currently.
   apply here. The library is pure schema definitions and VCR mocks.
 - `os.getenv()` is used only in `scripts/` (not in `unified_api_contracts/` source code).
   This is acceptable for CLI scripts that run outside the service config system.
-
----
-
-## 2.7 Broad `except Exception` in testing utilities
-
-**Scope:** `unified_api_contracts/testing/detect_cassette_drift.py`
-**Rule:** broad except Exception (codex step 5.8)
-**Reason:** `_build_model_registry()` must tolerate import errors when walking the full UAC
-package (some submodules require optional SDK deps). The exception is swallowed intentionally
-to continue the registry walk. `_validate_cassette()` must tolerate any Pydantic validation
-error to report drift without crashing the drift scan. These are testing-only utilities
-that perform best-effort introspection — fail-loud semantics would defeat the purpose.
-**Config:** `BROAD_EXCEPT_EXTRA_EXCLUDES=("unified_api_contracts/testing/detect_cassette_drift.py")`
-in `scripts/quality-gates.sh` — file excluded from the broad-except rg scan via `--glob !<path>`.
