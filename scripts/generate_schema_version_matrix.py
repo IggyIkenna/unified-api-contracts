@@ -97,7 +97,7 @@ def _import_schema_version(provider_name: str) -> str:
             ver = getattr(mod, "__api_version__", None)
             if ver is not None:
                 return str(ver)
-        except Exception:
+        except (ImportError, AttributeError):
             pass
 
     return "N/A"
