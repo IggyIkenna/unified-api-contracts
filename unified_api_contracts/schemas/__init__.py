@@ -1,6 +1,84 @@
 """API contract schemas — re-exports from canonical locations."""
 
-from unified_api_contracts.canonical.domain.account import (
+from unified_api_contracts.canonical.crosscutting.analytics import (
+    AlternativeDataSignal,
+    AlternativeDataType,
+    CorrelationRegime,
+    CorrelationRegimeChange,
+    CrossAssetCorrelationMatrix,
+    DarkPoolPrintRecord,
+    FactorAttributionModel,
+    FactorAttributionRecord,
+    FactorExposure,
+    FactorType,
+    OptionsFlowRecord,
+    SatelliteObservation,
+    SentimentScore,
+)
+from unified_api_contracts.canonical.crosscutting.connectivity import (
+    HealthPingResponse,
+    HeartbeatMessage,
+    SubscribeRequest,
+    UnsubscribeRequest,
+    WebSocketConnectionClosed,
+    WebSocketConnectionOpened,
+    WebSocketConnectionState,
+    WebSocketPingFrame,
+    WebSocketPongFrame,
+)
+from unified_api_contracts.canonical.crosscutting.errors import (
+    DATABENTO_ERROR_MAP,
+    VENUE_ERROR_MAP,
+    DatabentoError,
+    ErrorAction,
+    RateLimitResponse,
+    VenueErrorClassification,
+    WebSocketCloseInfo,
+    classify_venue_error,
+)
+from unified_api_contracts.canonical.crosscutting.latency import (
+    CoLocationPerformanceMetric,
+    LatencyBenchmarkReport,
+    LatencyComponent,
+    LatencyPercentile,
+    NetworkJitterMetric,
+    OrderLatencyRecord,
+    SubMillisecondLatencyRecord,
+    TickToTradeMetric,
+)
+from unified_api_contracts.canonical.crosscutting.rate_limits import (
+    HttpRateLimitHeaders,
+    VenueRateLimitSpec,
+)
+from unified_api_contracts.canonical.crosscutting.risk import (
+    MultiAssetMarginCalculation,
+    PnLAttributionRecord,
+    RealTimePnLRecord,
+    RiskLimitBreach,
+    SpanMarginLeg,
+    StressScenario,
+    StressTestResult,
+    VaRMethod,
+    VaRRequest,
+    VaRResult,
+)
+from unified_api_contracts.canonical.domain.derivatives import (
+    ComboLeg,
+    ComboQuote,
+    ComboStrategyType,
+    FundingRateHistory,
+    InsuranceFundState,
+    LongShortRatio,
+    MultiLegInstrument,
+    OpenInterestHistory,
+    PositionRisk,
+    SettlementEvent,
+    VolSmilePoint,
+    VolSurface,
+    VolSurfaceSlice,
+    VolTermStructure,
+)
+from unified_api_contracts.canonical.domain.position import (
     BinanceWithdrawRequest,
     BinanceWithdrawResponse,
     BybitWithdrawRequest,
@@ -25,85 +103,6 @@ from unified_api_contracts.canonical.domain.account import (
     UpbitWithdrawResponse,
     WithdrawalRecord,
 )
-from unified_api_contracts.canonical.domain.analytics import (
-    AlternativeDataSignal,
-    AlternativeDataType,
-    CorrelationRegime,
-    CorrelationRegimeChange,
-    CrossAssetCorrelationMatrix,
-    DarkPoolPrintRecord,
-    FactorAttributionModel,
-    FactorAttributionRecord,
-    FactorExposure,
-    FactorType,
-    OptionsFlowRecord,
-    SatelliteObservation,
-    SentimentScore,
-)
-from unified_api_contracts.canonical.domain.connectivity import (
-    HealthPingResponse,
-    HeartbeatMessage,
-    SubscribeRequest,
-    UnsubscribeRequest,
-    WebSocketConnectionClosed,
-    WebSocketConnectionOpened,
-    WebSocketConnectionState,
-    WebSocketPingFrame,
-    WebSocketPongFrame,
-)
-from unified_api_contracts.canonical.domain.derivatives import (
-    ComboLeg,
-    ComboQuote,
-    ComboStrategyType,
-    FundingRateHistory,
-    InsuranceFundState,
-    LongShortRatio,
-    MultiLegInstrument,
-    OpenInterestHistory,
-    PositionRisk,
-    SettlementEvent,
-    VolSmilePoint,
-    VolSurface,
-    VolSurfaceSlice,
-    VolTermStructure,
-)
-from unified_api_contracts.canonical.domain.latency import (
-    CoLocationPerformanceMetric,
-    LatencyBenchmarkReport,
-    LatencyComponent,
-    LatencyPercentile,
-    NetworkJitterMetric,
-    OrderLatencyRecord,
-    SubMillisecondLatencyRecord,
-    TickToTradeMetric,
-)
-from unified_api_contracts.canonical.domain.rate_limits import (
-    HttpRateLimitHeaders,
-    VenueRateLimitSpec,
-)
-from unified_api_contracts.canonical.domain.risk import (
-    MultiAssetMarginCalculation,
-    PnLAttributionRecord,
-    RealTimePnLRecord,
-    RiskLimitBreach,
-    SpanMarginLeg,
-    StressScenario,
-    StressTestResult,
-    VaRMethod,
-    VaRRequest,
-    VaRResult,
-)
-from unified_api_contracts.canonical.errors import (
-    DATABENTO_ERROR_MAP,
-    VENUE_ERROR_MAP,
-    DatabentoError,
-    ErrorAction,
-    RateLimitResponse,
-    VenueErrorClassification,
-    WebSocketCloseInfo,
-    classify_venue_error,
-)
-from unified_api_contracts.config.venue_rate_limits import VENUE_RATE_LIMITS
 from unified_api_contracts.external.polymarket.arb_schemas import (
     BucketMarket,
     CrossVenueArbLeg,
@@ -152,6 +151,7 @@ from unified_api_contracts.external.protocol_sdks.schemas import (
     UniswapV3QuoteResponse,
     UniswapV3SwapTxReceipt,
 )
+from unified_api_contracts.registry.venue_rate_limits import VENUE_RATE_LIMITS
 
 __all__ = [
     "DATABENTO_ERROR_MAP",

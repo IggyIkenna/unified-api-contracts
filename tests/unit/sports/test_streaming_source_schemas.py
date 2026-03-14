@@ -8,12 +8,12 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.external.sports.sources.oddsjam.schemas import (
+from unified_api_contracts.external.oddsjam.schemas import (
     OddsJamGame,
     OddsJamMarket,
     OddsJamOdds,
 )
-from unified_api_contracts.external.sports.sources.opticodds.schemas import (
+from unified_api_contracts.external.opticodds.schemas import (
     OpticOddsFixture,
     OpticOddsMarket,
     OpticOddsSportsbook,
@@ -200,7 +200,7 @@ class TestOddsJamSchemas:
 @pytest.mark.unit
 class TestStreamingSourceExports:
     def test_import_opticodds(self) -> None:
-        from unified_api_contracts.external.sports.sources.opticodds import (
+        from unified_api_contracts.external.opticodds import (
             OpticOddsFixture,
             OpticOddsMarket,
             OpticOddsSportsbook,
@@ -209,7 +209,7 @@ class TestStreamingSourceExports:
         assert all([OpticOddsFixture, OpticOddsMarket, OpticOddsSportsbook])
 
     def test_import_oddsjam(self) -> None:
-        from unified_api_contracts.external.sports.sources.oddsjam import (
+        from unified_api_contracts.external.oddsjam import (
             OddsJamGame,
             OddsJamMarket,
             OddsJamOdds,

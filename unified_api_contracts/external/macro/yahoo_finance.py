@@ -12,7 +12,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 # API Constants
 YAHOO_FINANCE_BASE_URL = "https://query1.finance.yahoo.com/v8/finance"

@@ -23,7 +23,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 
 class KalshiPriceRange(BaseModel):

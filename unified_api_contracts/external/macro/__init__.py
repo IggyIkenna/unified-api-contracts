@@ -1,6 +1,6 @@
 """Macro data source schemas (Yahoo Finance DXY, yields, commodities)."""
 
-from unified_api_contracts.external.macro.yahoo_finance import (
+from unified_api_contracts.external.yahoo_finance.schemas import (
     DXY_STRONG_DOLLAR,
     DXY_WEAK_DOLLAR,
     GOLD_SAFE_HAVEN_THRESHOLD,

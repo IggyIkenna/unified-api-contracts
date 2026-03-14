@@ -1,6 +1,6 @@
 """FootyStats source schemas — canonical and raw API response models."""
 
-from unified_api_contracts.external.sports.sources.footystats.schemas import (
+from unified_api_contracts.external.footystats.schemas import (
     FootyStatsBTTS,
     FootyStatsLeague,
     FootyStatsMatch,

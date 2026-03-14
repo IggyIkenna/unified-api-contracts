@@ -7,7 +7,7 @@ __api_version__ = "v2"  # matches provider_api_versions.yaml
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 
 class AsterAggTrade(BaseModel):

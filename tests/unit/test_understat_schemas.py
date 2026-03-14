@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.external.sports.sources.understat.schemas import (
+from unified_api_contracts.external.understat.schemas import (
     USMatchRaw,
     USMatchRosterRaw,
     USMatchShotRaw,
@@ -491,31 +491,31 @@ class TestInitExports:
     """Verify all Raw schemas are importable from the package __init__."""
 
     def test_import_from_package(self) -> None:
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USMatchRaw as _USMatchRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USMatchRosterRaw as _USMatchRosterRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USMatchShotRaw as _USMatchShotRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USPlayerMatchRaw as _USPlayerMatchRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USPlayerRaw as _USPlayerRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USPlayerSeasonRaw as _USPlayerSeasonRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USPlayerShotRaw as _USPlayerShotRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USTeamHistoryRaw as _USTeamHistoryRaw,
         )
-        from unified_api_contracts.external.sports.sources.understat import (
+        from unified_api_contracts.external.understat import (
             USTeamRaw as _USTeamRaw,
         )
 

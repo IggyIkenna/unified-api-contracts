@@ -1,6 +1,19 @@
 """Soccer-Football-Info API contracts."""
 
 from .schemas import (
+    SFILeague,
+    SFIMatch,
+    SFIMatchDominance,
+    SFIMatchProgressiveOdds,
+    SFIMatchProgressiveStats,
+    SFITeam,
+    SFLeagueRaw,
+    SFMatchDominanceRaw,
+    SFMatchEventRaw,
+    SFMatchProgressiveOddsRaw,
+    SFMatchProgressiveStatsRaw,
+    SFMatchRaw,
+    SFTeamRaw,
     SoccerFootballChampionship,
     SoccerFootballCountry,
     SoccerFootballError,
@@ -13,6 +26,19 @@ from .schemas import (
 )
 
 __all__ = [
+    "SFILeague",
+    "SFIMatch",
+    "SFIMatchDominance",
+    "SFIMatchProgressiveOdds",
+    "SFIMatchProgressiveStats",
+    "SFITeam",
+    "SFLeagueRaw",
+    "SFMatchDominanceRaw",
+    "SFMatchEventRaw",
+    "SFMatchProgressiveOddsRaw",
+    "SFMatchProgressiveStatsRaw",
+    "SFMatchRaw",
+    "SFTeamRaw",
     "SoccerFootballChampionship",
     "SoccerFootballCountry",
     "SoccerFootballError",

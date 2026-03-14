@@ -1,4 +1,5 @@
-"""Sports betting schemas — canonical types and source-specific schemas."""
+"""Temporary facade -- re-exports from canonical/domain/sports/ during migration.
+Deleted in Phase 3 (p3-delete-emptied-dirs)."""
 
 from unified_api_contracts.canonical.domain.bookmaker_registry import (
     BOOKMAKER_REGISTRY,
@@ -17,29 +18,29 @@ from unified_api_contracts.canonical.domain.sports import (
     PlayerMapping,
     TeamMapping,
 )
-from unified_api_contracts.external.sports.canonical.arbitrage import (
+from unified_api_contracts.canonical.domain.sports.arbitrage import (
     ArbitrageMarket,
     ArbitrageOpportunity,
     ArbitrageStatus,
     ExpectedValue,
 )
-from unified_api_contracts.external.sports.canonical.betting import (
+from unified_api_contracts.canonical.domain.sports.betting import (
     BetExecution,
     BetOrder,
     BetStatus,
     BettingSignal,
     SignalSource,
 )
-from unified_api_contracts.external.sports.canonical.features import (
+from unified_api_contracts.canonical.domain.sports.features import (
     SportsFeatureVector,
 )
-from unified_api_contracts.external.sports.canonical.live import (
+from unified_api_contracts.canonical.domain.sports.live import (
     LiveMatchState,
     LiveOddsUpdate,
     MatchPeriod,
     ScraperVersionMeta,
 )
-from unified_api_contracts.external.sports.canonical.odds import (
+from unified_api_contracts.canonical.domain.sports.odds import (
     CanonicalBookmakerMarket,
     CanonicalOdds,
     MarketStatus,

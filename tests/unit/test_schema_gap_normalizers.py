@@ -97,7 +97,7 @@ class TestSchemaGapNormalizers:
         from unified_api_contracts.canonical.normalize.sports import (
             normalize_sports_market,
         )
-        from unified_api_contracts.external.sports.sources.betfair.schemas import (
+        from unified_api_contracts.external.betfair.schemas import (
             BetfairMarket,
             BetfairMarketStatus,
         )

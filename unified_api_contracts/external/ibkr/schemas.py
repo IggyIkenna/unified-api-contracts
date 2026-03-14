@@ -6,7 +6,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel
 
-from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 
 # --- Market data (bars, ticker, order book) ---

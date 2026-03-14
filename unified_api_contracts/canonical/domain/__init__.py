@@ -1,15 +1,6 @@
-"""Canonical domain schemas — sports, market, instruments, derivatives, account, and more."""
+"""Canonical domain schemas — sports, market, reference, derivatives, position, and more."""
 
-from unified_api_contracts.canonical.domain._base import CanonicalBase
-from unified_api_contracts.canonical.domain.account import (
-    CanonicalAccountSnapshot,
-    CanonicalBalance,
-    CanonicalFee,
-    CanonicalPosition,
-    CanonicalSettlement,
-    FeeType,
-)
-from unified_api_contracts.canonical.domain.analytics import (
+from unified_api_contracts.canonical.crosscutting.analytics import (
     AlternativeDataSignal,
     AlternativeDataType,
     CorrelationRegime,
@@ -24,11 +15,7 @@ from unified_api_contracts.canonical.domain.analytics import (
     SatelliteObservation,
     SentimentScore,
 )
-from unified_api_contracts.canonical.domain.bookmaker_registry import (
-    BOOKMAKER_REGISTRY,
-    BookmakerRegistry,
-)
-from unified_api_contracts.canonical.domain.connectivity import (
+from unified_api_contracts.canonical.crosscutting.connectivity import (
     CanonicalWebSocketLifecycle,
     CanonicalWsMessage,
     HealthPingResponse,
@@ -41,6 +28,37 @@ from unified_api_contracts.canonical.domain.connectivity import (
     WebSocketEvent,
     WebSocketPingFrame,
     WebSocketPongFrame,
+)
+from unified_api_contracts.canonical.crosscutting.latency import (
+    CoLocationPerformanceMetric,
+    LatencyBenchmarkReport,
+    LatencyComponent,
+    LatencyPercentile,
+    NetworkJitterMetric,
+    OrderLatencyRecord,
+    SubMillisecondLatencyRecord,
+    TickToTradeMetric,
+)
+from unified_api_contracts.canonical.crosscutting.rate_limits import (
+    HttpRateLimitHeaders,
+    VenueRateLimitSpec,
+)
+from unified_api_contracts.canonical.crosscutting.risk import (
+    MultiAssetMarginCalculation,
+    PnLAttributionRecord,
+    RealTimePnLRecord,
+    RiskLimitBreach,
+    SpanMarginLeg,
+    StressScenario,
+    StressTestResult,
+    VaRMethod,
+    VaRRequest,
+    VaRResult,
+)
+from unified_api_contracts.canonical.domain._base import CanonicalBase
+from unified_api_contracts.canonical.domain.bookmaker_registry import (
+    BOOKMAKER_REGISTRY,
+    BookmakerRegistry,
 )
 from unified_api_contracts.canonical.domain.derivatives import (
     CanonicalDerivativeTicker,
@@ -63,6 +81,23 @@ from unified_api_contracts.canonical.domain.derivatives import (
     VolSurfaceSlice,
     VolTermStructure,
 )
+from unified_api_contracts.canonical.domain.execution import (
+    BenchmarkType,
+    CanonicalAccountState,
+    CanonicalFill,
+    CanonicalMarginState,
+    CanonicalOrder,
+    CanonicalOrderAmendment,
+    CanonicalOrderRejection,
+    ExecutionInstruction,
+    ExecutionResult,
+    ExecutionStatus,
+    OperationType,
+    OrderSide,
+    OrderStatus,
+    OrderType,
+    TimeInForce,
+)
 from unified_api_contracts.canonical.domain.infrastructure import (
     INFRA_CANONICAL_TO_PROVIDER,
     CanonicalCloudStorage,
@@ -77,23 +112,6 @@ from unified_api_contracts.canonical.domain.infrastructure import (
     CloudProvider,
     ComputeTarget,
     ScalingMode,
-)
-from unified_api_contracts.canonical.domain.instruments import (
-    CanonicalInstrument,
-    InstructionType,
-    InstrumentType,
-    InstrumentWarehouseRow,
-    OptionType,
-)
-from unified_api_contracts.canonical.domain.latency import (
-    CoLocationPerformanceMetric,
-    LatencyBenchmarkReport,
-    LatencyComponent,
-    LatencyPercentile,
-    NetworkJitterMetric,
-    OrderLatencyRecord,
-    SubMillisecondLatencyRecord,
-    TickToTradeMetric,
 )
 from unified_api_contracts.canonical.domain.market import (
     BookLevel,
@@ -110,21 +128,20 @@ from unified_api_contracts.canonical.domain.onchain import (
     CanonicalOnChainMetric,
     CanonicalOraclePriceFeed,
 )
-from unified_api_contracts.canonical.domain.rate_limits import (
-    HttpRateLimitHeaders,
-    VenueRateLimitSpec,
+from unified_api_contracts.canonical.domain.position import (
+    CanonicalAccountSnapshot,
+    CanonicalBalance,
+    CanonicalFee,
+    CanonicalPosition,
+    CanonicalSettlement,
+    FeeType,
 )
-from unified_api_contracts.canonical.domain.risk import (
-    MultiAssetMarginCalculation,
-    PnLAttributionRecord,
-    RealTimePnLRecord,
-    RiskLimitBreach,
-    SpanMarginLeg,
-    StressScenario,
-    StressTestResult,
-    VaRMethod,
-    VaRRequest,
-    VaRResult,
+from unified_api_contracts.canonical.domain.reference import (
+    CanonicalInstrument,
+    InstructionType,
+    InstrumentType,
+    InstrumentWarehouseRow,
+    OptionType,
 )
 from unified_api_contracts.canonical.domain.sports import (
     BookmakerCategory,
@@ -160,11 +177,13 @@ __all__ = [
     "INFRA_CANONICAL_TO_PROVIDER",
     "AlternativeDataSignal",
     "AlternativeDataType",
+    "BenchmarkType",
     "BookLevel",
     "BookmakerCategory",
     "BookmakerInfo",
     "BookmakerRegistry",
     "CanonicalAccountSnapshot",
+    "CanonicalAccountState",
     "CanonicalBalance",
     "CanonicalBase",
     "CanonicalBetMarket",
@@ -180,12 +199,14 @@ __all__ = [
     "CanonicalContainerRegistry",
     "CanonicalDerivativeTicker",
     "CanonicalFee",
+    "CanonicalFill",
     "CanonicalFixture",
     "CanonicalFundingRate",
     "CanonicalInstrument",
     "CanonicalLeague",
     "CanonicalLiquidation",
     "CanonicalLiquidationCluster",
+    "CanonicalMarginState",
     "CanonicalMarketStateEvent",
     "CanonicalMessageQueue",
     "CanonicalOLAPTable",
@@ -194,7 +215,10 @@ __all__ = [
     "CanonicalOnChainMetric",
     "CanonicalOptionsChainEntry",
     "CanonicalOraclePriceFeed",
+    "CanonicalOrder",
+    "CanonicalOrderAmendment",
     "CanonicalOrderBook",
+    "CanonicalOrderRejection",
     "CanonicalPlayer",
     "CanonicalPosition",
     "CanonicalReferee",
@@ -219,6 +243,9 @@ __all__ = [
     "CorrelationRegimeChange",
     "CrossAssetCorrelationMatrix",
     "DarkPoolPrintRecord",
+    "ExecutionInstruction",
+    "ExecutionResult",
+    "ExecutionStatus",
     "FactorAttributionModel",
     "FactorAttributionRecord",
     "FactorExposure",
@@ -246,10 +273,14 @@ __all__ = [
     "OddsFormat",
     "OddsType",
     "OpenInterestHistory",
+    "OperationType",
     "OptionType",
     "OptionsFlowRecord",
     "OrderBookSnapshot5",
     "OrderLatencyRecord",
+    "OrderSide",
+    "OrderStatus",
+    "OrderType",
     "OutcomeType",
     "PlayerMapping",
     "PnLAttributionRecord",
@@ -267,6 +298,7 @@ __all__ = [
     "SubscribeRequest",
     "TeamMapping",
     "TickToTradeMetric",
+    "TimeInForce",
     "UnsubscribeRequest",
     "VaRMethod",
     "VaRRequest",

@@ -80,8 +80,33 @@ max-complexity = 7
 "unified_api_contracts/external/**/__init__.py" = ["N815"]
 "unified_api_contracts/external/**/schemas.py" = ["N815"]
 "unified_api_contracts/canonical/domain/account.py" = ["N815", "RUF012"]
+"unified_api_contracts/canonical/domain/position/__init__.py" = ["N815", "RUF012"]
 "unified_api_contracts/canonical/domain/derivatives.py" = ["N815"]
+"unified_api_contracts/canonical/domain/derivatives/__init__.py" = ["N815"]
 "unified_api_contracts/canonical/normalize/orders_fills.py" = ["F401"]
+"unified_api_contracts/normalize_utils/*.py" = ["N815", "N803"]
+"unified_api_contracts/normalize_utils/errors/*.py" = ["N815"]
+# Root-level domain facades (Phase 2 citadel)
+"unified_api_contracts/market.py" = ["F403", "F405"]
+"unified_api_contracts/execution.py" = ["F403", "F405"]
+"unified_api_contracts/reference.py" = ["F403", "F405"]
+"unified_api_contracts/sports.py" = ["F403", "F405"]
+"unified_api_contracts/sports_reference.py" = ["F403", "F405"]
+"unified_api_contracts/position.py" = ["F403", "F405"]
+"unified_api_contracts/features.py" = ["F403", "F405"]
+"unified_api_contracts/derivatives.py" = ["F403", "F405"]
+"unified_api_contracts/infrastructure.py" = ["F403", "F405"]
+"unified_api_contracts/errors.py" = ["F403", "F405"]
+"unified_api_contracts/rate_limits.py" = ["F403", "F405"]
+"unified_api_contracts/connectivity.py" = ["F403", "F405"]
+"unified_api_contracts/latency.py" = ["F403", "F405"]
+"unified_api_contracts/odds.py" = ["F403", "F405"]
+"unified_api_contracts/options.py" = ["F403", "F405"]
+# Transition facades at canonical level
+"unified_api_contracts/canonical/execution.py" = ["F403", "F405"]
+"unified_api_contracts/canonical/options.py" = ["F403", "F405"]
+"unified_api_contracts/canonical/odds.py" = ["F403", "F405"]
+"unified_api_contracts/canonical/spread.py" = ["F403", "F405"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -97,6 +122,44 @@ pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]
 exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing"]
+
+[tool.coverage.run]
+# Transitional: exclude new-path copies until old paths are removed (citadel phase 1)
+omit = [
+    "unified_api_contracts/normalize_utils/*",
+    "unified_api_contracts/normalize_utils/errors/*",
+    "unified_api_contracts/canonical/crosscutting/*",
+    "unified_api_contracts/canonical/crosscutting/errors/*",
+    "unified_api_contracts/registry/venue_manifest/*",
+    "unified_api_contracts/registry/venue_rate_limits.py",
+    "unified_api_contracts/registry/provider_modes.py",
+    # Root-level and canonical-level facades (thin re-exports, citadel phase 2)
+    "unified_api_contracts/market.py",
+    "unified_api_contracts/execution.py",
+    "unified_api_contracts/reference.py",
+    "unified_api_contracts/sports.py",
+    "unified_api_contracts/sports_reference.py",
+    "unified_api_contracts/position.py",
+    "unified_api_contracts/features.py",
+    "unified_api_contracts/derivatives.py",
+    "unified_api_contracts/infrastructure.py",
+    "unified_api_contracts/errors.py",
+    "unified_api_contracts/rate_limits.py",
+    "unified_api_contracts/connectivity.py",
+    "unified_api_contracts/latency.py",
+    "unified_api_contracts/odds.py",
+    "unified_api_contracts/options.py",
+    "unified_api_contracts/canonical/execution.py",
+    "unified_api_contracts/canonical/options.py",
+    "unified_api_contracts/canonical/odds.py",
+    "unified_api_contracts/canonical/spread.py",
+    # Domain sub-packages created in citadel phase 2 (moved from flat files)
+    "unified_api_contracts/canonical/domain/position/*",
+    "unified_api_contracts/canonical/domain/reference/*",
+    "unified_api_contracts/canonical/domain/market/spread.py",
+    # Old sports canonical files (duplicated at new paths, deleted in Phase 5)
+    "unified_api_contracts/external/sports/canonical/*",
+]
 
 [tool.coverage.report]
 fail_under = 84

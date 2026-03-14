@@ -1,6 +1,6 @@
 """Soccer Football Info source schemas — public re-exports."""
 
-from unified_api_contracts.external.sports.sources.soccer_football_info.schemas import (
+from unified_api_contracts.external.soccer_football_info.schemas import (
     SFILeague,
     SFIMatch,
     SFIMatchDominance,

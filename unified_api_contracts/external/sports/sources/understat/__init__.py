@@ -1,6 +1,6 @@
 """Understat source schemas — public API surface."""
 
-from unified_api_contracts.external.sports.sources.understat.schemas import (
+from unified_api_contracts.external.understat.schemas import (
     UnderstatMatch,
     UnderstatPlayerSeason,
     UnderstatShot,

@@ -9,7 +9,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 # --- Order status (CCXT unified) ---
 CcxtOrderStatus = Literal["open", "closed", "canceled", "cancelled", "expired", "rejected"]

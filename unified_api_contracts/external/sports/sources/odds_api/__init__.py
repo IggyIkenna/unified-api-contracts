@@ -1,6 +1,6 @@
 """The Odds API v4 source schemas — public re-exports."""
 
-from unified_api_contracts.external.sports.sources.odds_api.schemas import (
+from unified_api_contracts.external.odds_api.schemas import (
     ODBookmakerRaw,
     OddsApiBookmaker,
     OddsApiEvent,

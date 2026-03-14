@@ -12,6 +12,9 @@ from ...external.betfair.schemas import (
     BetfairMarketCatalogue,
     BetfairRunner,
 )
+from ...external.betfair.schemas import (
+    BetfairMarket as BetfairSourceMarket,
+)
 from ...external.kalshi.schemas import KalshiMarket, KalshiOrder
 from ...external.manifold.schemas import ManifoldMarket
 from ...external.odds_api.schemas import OddsApiFixture
@@ -20,9 +23,6 @@ from ...external.pinnacle.schemas import PinnacleEvent
 from ...external.polymarket.schemas import PolymarketMarket
 from ...external.smarkets.schemas import SmarketsMarket, SmarketsOrderResponse
 from ...external.sports.canonical.betting import BetOrder
-from ...external.sports.sources.betfair.schemas import (
-    BetfairMarket as BetfairSourceMarket,
-)
 from ..domain import CanonicalBetMarket, CanonicalBetOrder, CanonicalOdds
 
 

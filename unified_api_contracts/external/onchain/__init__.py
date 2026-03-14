@@ -1,6 +1,6 @@
 """On-chain data source schemas (CryptoQuant)."""
 
-from unified_api_contracts.external.onchain.cryptoquant import (
+from unified_api_contracts.external.cryptoquant.schemas import (
     CRYPTOQUANT_BASE_URL,
     CRYPTOQUANT_RATE_LIMIT_PREMIUM,
     CRYPTOQUANT_RATE_LIMIT_STANDARD,

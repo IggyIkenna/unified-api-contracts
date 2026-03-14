@@ -1,6 +1,6 @@
 """Shared types and utilities — re-exports from config/."""
 
-from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 from unified_api_contracts.config.quota_types import (
     AwsQuotaExceeded,
     AwsServiceQuota,

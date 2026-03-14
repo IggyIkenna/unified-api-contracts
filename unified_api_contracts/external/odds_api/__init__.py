@@ -1,6 +1,7 @@
 """The Odds API contracts."""
 
 from .schemas import (
+    ODBookmakerRaw,
     OddsApiBookmaker,
     OddsApiError,
     OddsApiEvent,
@@ -8,9 +9,20 @@ from .schemas import (
     OddsApiHistoricalOdds,
     OddsApiMarket,
     OddsApiOutcome,
+    ODEventRaw,
+    ODMarketRaw,
+    ODOddsRaw,
+    ODOutcomeRaw,
+    ODTeamsRaw,
 )
 
 __all__ = [
+    "ODBookmakerRaw",
+    "ODEventRaw",
+    "ODMarketRaw",
+    "ODOddsRaw",
+    "ODOutcomeRaw",
+    "ODTeamsRaw",
     "OddsApiBookmaker",
     "OddsApiError",
     "OddsApiEvent",
