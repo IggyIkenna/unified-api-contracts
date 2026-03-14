@@ -87,7 +87,7 @@ def _import_schema_version(provider_name: str) -> str:
 
     # Try the multi-file package (external contracts)
     module_paths = [
-        f"unified_api_contracts.unified_api_contracts_external.{provider_name}",
+        f"unified_api_contracts.external.{provider_name}",
         f"unified_api_contracts.schemas.{provider_name}",
     ]
 

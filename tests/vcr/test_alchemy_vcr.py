@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "alchemy"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "alchemy" / "mocks"
 
 _SUBSCRIBE_BODY = (
     b'{"jsonrpc":"2.0","id":1,"method":"eth_subscribe",'
@@ -60,7 +54,7 @@ def test_alchemy_ws_subscription_structure() -> None:
 
 def test_alchemy_ws_log_schema() -> None:
     """Alchemy subscription result validates against AlchemyWsLog schema."""
-    from unified_api_contracts.unified_api_contracts_external.alchemy.schemas import AlchemyWsLog
+    from unified_api_contracts.external.alchemy.schemas import AlchemyWsLog
 
     cassette_path = CASSETTE_DIR / "alchemy_ws_eth_subscription.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

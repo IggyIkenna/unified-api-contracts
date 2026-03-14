@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "deribit"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "deribit" / "mocks"
 
 
 def test_deribit_cassette() -> None:
@@ -48,7 +42,7 @@ def test_deribit_response_structure() -> None:
 
 def test_deribit_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.deribit.schemas import (
+    from unified_api_contracts.external.deribit.schemas import (
         DeribitInstrument,
     )
 

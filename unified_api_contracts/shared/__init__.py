@@ -1,7 +1,7 @@
-"""Shared types and utilities for api-contracts schemas."""
+"""Shared types and utilities — re-exports from config/."""
 
-from .error_action import ErrorAction
-from .quota_types import (
+from unified_api_contracts.canonical.errors import ErrorAction
+from unified_api_contracts.config.quota_types import (
     AwsQuotaExceeded,
     AwsServiceQuota,
     ComputeType,

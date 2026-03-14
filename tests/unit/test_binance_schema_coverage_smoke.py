@@ -9,7 +9,7 @@ from __future__ import annotations
 import pytest
 from unified_api_contracts.binance.market_schemas import BinanceTicker
 
-from unified_api_contracts.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
+from unified_api_contracts.registry.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 
 # Key Binance Spot REST endpoints per official docs (binance-docs.github.io)
 BINANCE_KEY_ENDPOINTS = [

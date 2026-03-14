@@ -30,7 +30,7 @@ from unified_api_contracts.tardis.schemas import (
 )
 
 ROOT = Path(__file__).resolve().parent.parent.parent
-_EXTERNAL = ROOT / "unified_api_contracts" / "unified_api_contracts_external"
+_EXTERNAL = ROOT / "unified_api_contracts" / "external"
 CCXT_EXAMPLES = _EXTERNAL / "ccxt" / "examples"
 BINANCE_EXAMPLES = _EXTERNAL / "binance" / "examples"
 TARDIS_EXAMPLES = _EXTERNAL / "tardis" / "examples"

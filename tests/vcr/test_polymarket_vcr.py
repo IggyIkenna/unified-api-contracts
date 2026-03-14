@@ -7,13 +7,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "polymarket"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "polymarket" / "mocks"
 
 
 def test_polymarket_market_data_cassette() -> None:

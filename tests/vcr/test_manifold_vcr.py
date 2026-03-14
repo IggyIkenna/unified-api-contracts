@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "manifold"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "manifold" / "mocks"
 
 
 def test_manifold_cassette() -> None:
@@ -43,7 +37,7 @@ def test_manifold_response_structure() -> None:
 
 def test_manifold_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.manifold.schemas import ManifoldMarket
+    from unified_api_contracts.external.manifold.schemas import ManifoldMarket
 
     cassette_path = CASSETTE_DIR / "markets.yaml"
     assert cassette_path.exists()

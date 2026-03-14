@@ -1,0 +1,869 @@
+"""Venue classification constants for the unified trading system."""
+
+from __future__ import annotations
+
+from enum import StrEnum
+
+# CeFi Exchange Constants (VENUE-PRODUCT split)
+BINANCE_SPOT = "BINANCE-SPOT"
+BINANCE_FUTURES = "BINANCE-FUTURES"
+OKX_SPOT = "OKX-SPOT"
+OKX_FUTURES = "OKX-FUTURES"
+BYBIT_SPOT = "BYBIT-SPOT"
+BYBIT_FUTURES = "BYBIT-FUTURES"
+COINBASE_SPOT = "COINBASE-SPOT"
+DERIBIT = "DERIBIT"
+HYPERLIQUID = "HYPERLIQUID"
+ASTER = "ASTER"
+
+# TradFi Exchange Constants
+NASDAQ = "NASDAQ"
+NYSE = "NYSE"
+CME = "CME"
+CBOT = "CBOT"
+NYMEX = "NYMEX"
+COMEX = "COMEX"
+ICE = "ICE"
+CBOE = "CBOE"
+XNAS = "XNAS"
+XNYS = "XNYS"
+
+# DEX Constants
+UNISWAPV2_ETH = "UNISWAPV2-ETH"
+UNISWAPV3_ETH = "UNISWAPV3-ETH"
+UNISWAPV4_ETH = "UNISWAPV4-ETH"
+CURVE_ETH = "CURVE-ETH"
+AERODROME_BASE = "AERODROME-BASE"
+
+# DeFi Lending/Staking Constants
+AAVE_V3 = "AAVE_V3"
+AAVE_V3_ETH = "AAVE_V3_ETH"
+MORPHO_ETHEREUM = "MORPHO-ETHEREUM"
+EULER_PLASMA = "EULER-PLASMA"
+FLUID_PLASMA = "FLUID-PLASMA"
+AAVE_PLASMA = "AAVE-PLASMA"
+LIDO = "LIDO"
+ETHERFI = "ETHERFI"
+ETHENA = "ETHENA"
+
+# Sports Betting Exchanges — two-sided markets with API access
+BETFAIR = "BETFAIR"
+SMARKETS = "SMARKETS"
+MATCHBOOK = "MATCHBOOK"
+BETDAQ = "BETDAQ"
+
+# Prediction Markets — crypto/blockchain-based prediction exchanges
+POLYMARKET = "POLYMARKET"
+KALSHI = "KALSHI"
+NOVIG = "NOVIG"
+BETOPENLY = "BETOPENLY"
+PROPHETX = "PROPHETX"
+
+# Sports Bookmaker APIs — proper REST API for bet placement
+PINNACLE = "PINNACLE"
+ONEXBET = "ONEXBET"
+
+# Sports Bookmakers — US (web-form / scraper-based bet placement)
+DRAFTKINGS = "DRAFTKINGS"
+FANDUEL = "FANDUEL"
+BETMGM = "BETMGM"
+BOVADA = "BOVADA"
+CAESARS = "CAESARS"
+BETRIVERS = "BETRIVERS"
+BETONLINEAG = "BETONLINEAG"
+BETUS = "BETUS"
+LOWVIG = "LOWVIG"
+MYBOOKIEAG = "MYBOOKIEAG"
+FANATICS = "FANATICS"
+BALLYBET = "BALLYBET"
+BETANYSPORTS = "BETANYSPORTS"
+BETPARX = "BETPARX"
+ESPNBET = "ESPNBET"
+FLIFF = "FLIFF"
+HARDROCKBET = "HARDROCKBET"
+REBET = "REBET"
+
+# Daily Fantasy Sports (DFS) — US prop-based platforms
+PRIZEPICKS = "PRIZEPICKS"
+UNDERDOG = "UNDERDOG"
+DRAFTKINGS_PICK6 = "DRAFTKINGS_PICK6"
+BETR_DFS = "BETR_DFS"
+
+# Sports Bookmakers — UK (web-form / scraper-based bet placement)
+BET365 = "BET365"
+WILLIAMHILL = "WILLIAMHILL"
+LADBROKES = "LADBROKES"
+CORAL = "CORAL"
+PADDYPOWER = "PADDYPOWER"
+SKYBET = "SKYBET"
+BETWAY = "BETWAY"
+BETVICTOR = "BETVICTOR"
+BOYLESPORTS = "BOYLESPORTS"
+BET888SPORT = "BET888SPORT"
+UNIBET = "UNIBET"
+BETFRED = "BETFRED"
+CASUMO = "CASUMO"
+GROSVENOR = "GROSVENOR"
+LEOVEGAS = "LEOVEGAS"
+LIVESCOREBET = "LIVESCOREBET"
+VIRGINBET = "VIRGINBET"
+
+# Sports Bookmakers — EU (web-form / scraper-based bet placement)
+BETCLIC = "BETCLIC"
+BETSSON = "BETSSON"
+COOLBET = "COOLBET"
+EVERYGAME = "EVERYGAME"
+GTBETS = "GTBETS"
+MARATHONBET = "MARATHONBET"
+NORDICBET = "NORDICBET"
+PARIONSSPORT = "PARIONSSPORT"
+PMU = "PMU"
+SUPRABETS = "SUPRABETS"
+TIPICO = "TIPICO"
+WINAMAX = "WINAMAX"
+CODERE = "CODERE"
+NETBET = "NETBET"
+BWIN = "BWIN"
+SBOBET = "SBOBET"
+
+# Sports Bookmakers — SE (web-form / scraper-based)
+ATG = "ATG"
+MRGREEN = "MRGREEN"
+SVENSKASPEL = "SVENSKASPEL"
+
+# Sports Bookmakers — AU (web-form / scraper-based)
+BETR_AU = "BETR_AU"
+BETRIGHT = "BETRIGHT"
+DABBLE = "DABBLE"
+NEDS = "NEDS"
+PLAYUP = "PLAYUP"
+POINTSBET = "POINTSBET"
+SPORTSBET_AU = "SPORTSBET_AU"
+TAB = "TAB"
+TABTOUCH = "TABTOUCH"
+
+# Sports Data / Odds Aggregator Sources — read-only, no bet placement
+API_FOOTBALL = "API_FOOTBALL"
+ODDS_API = "ODDS_API"
+FOOTYSTATS = "FOOTYSTATS"
+SOCCER_FOOTBALL_INFO = "SOCCER_FOOTBALL_INFO"
+OPEN_METEO = "OPEN_METEO"
+UNDERSTAT = "UNDERSTAT"
+TRANSFERMARKT = "TRANSFERMARKT"
+SHARPAPI = "SHARPAPI"
+ODDS_ENGINE = "ODDS_ENGINE"
+METABET = "METABET"
+OPTICODDS = "OPTICODDS"
+ODDSJAM = "ODDSJAM"
+
+# Sports Venue Sub-Sets — grouped by execution semantics
+SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, SMARKETS, MATCHBOOK, BETDAQ}
+
+SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
+
+SPORTS_BOOKMAKER_API_VENUES: set[str] = {PINNACLE, ONEXBET}
+
+SPORTS_BOOKMAKER_WEB_VENUES: set[str] = {
+    # US
+    DRAFTKINGS,
+    FANDUEL,
+    BETMGM,
+    BOVADA,
+    CAESARS,
+    BETRIVERS,
+    BETONLINEAG,
+    BETUS,
+    LOWVIG,
+    MYBOOKIEAG,
+    FANATICS,
+    BALLYBET,
+    BETANYSPORTS,
+    BETPARX,
+    ESPNBET,
+    FLIFF,
+    HARDROCKBET,
+    REBET,
+    # UK
+    BET365,
+    WILLIAMHILL,
+    LADBROKES,
+    CORAL,
+    PADDYPOWER,
+    SKYBET,
+    BETWAY,
+    BETVICTOR,
+    BOYLESPORTS,
+    BET888SPORT,
+    UNIBET,
+    BETFRED,
+    CASUMO,
+    GROSVENOR,
+    LEOVEGAS,
+    LIVESCOREBET,
+    VIRGINBET,
+    # EU
+    BETCLIC,
+    BETSSON,
+    COOLBET,
+    EVERYGAME,
+    GTBETS,
+    MARATHONBET,
+    NORDICBET,
+    PARIONSSPORT,
+    PMU,
+    SUPRABETS,
+    TIPICO,
+    WINAMAX,
+    CODERE,
+    NETBET,
+    BWIN,
+    SBOBET,
+    # SE
+    ATG,
+    MRGREEN,
+    SVENSKASPEL,
+    # AU
+    BETR_AU,
+    BETRIGHT,
+    DABBLE,
+    NEDS,
+    PLAYUP,
+    POINTSBET,
+    SPORTSBET_AU,
+    TAB,
+    TABTOUCH,
+}
+
+SPORTS_DFS_VENUES: set[str] = {PRIZEPICKS, UNDERDOG, DRAFTKINGS_PICK6, BETR_DFS}
+
+SPORTS_DATA_VENUES: set[str] = {
+    API_FOOTBALL,
+    ODDS_API,
+    FOOTYSTATS,
+    SOCCER_FOOTBALL_INFO,
+    OPEN_METEO,
+    UNDERSTAT,
+    TRANSFERMARKT,
+    SHARPAPI,
+    ODDS_ENGINE,
+    METABET,
+    OPTICODDS,
+    ODDSJAM,
+}
+
+SPORTS_BET_PLACEMENT_VENUES: set[str] = (
+    SPORTS_EXCHANGE_VENUES | SPORTS_PREDICTION_MARKET_VENUES | SPORTS_BOOKMAKER_API_VENUES | SPORTS_BOOKMAKER_WEB_VENUES
+)
+
+SPORTS_VENUES: set[str] = SPORTS_BET_PLACEMENT_VENUES | SPORTS_DFS_VENUES | SPORTS_DATA_VENUES
+
+# Venue Sets — grouped by execution semantics (non-sports)
+
+DEX_VENUES: set[str] = {
+    UNISWAPV2_ETH,
+    UNISWAPV3_ETH,
+    UNISWAPV4_ETH,
+    CURVE_ETH,
+    AERODROME_BASE,
+}
+
+CLOB_VENUES: set[str] = {
+    BINANCE_SPOT,
+    BINANCE_FUTURES,
+    OKX_SPOT,
+    OKX_FUTURES,
+    BYBIT_SPOT,
+    BYBIT_FUTURES,
+    COINBASE_SPOT,
+    DERIBIT,
+    HYPERLIQUID,
+    ASTER,
+    "OKX",
+    "BYBIT",
+    NASDAQ,
+    NYSE,
+    CME,
+    ICE,
+    CBOE,
+}
+
+ZERO_ALPHA_VENUES: set[str] = {
+    AAVE_V3,
+    AAVE_V3_ETH,
+    MORPHO_ETHEREUM,
+    EULER_PLASMA,
+    FLUID_PLASMA,
+    AAVE_PLASMA,
+    LIDO,
+    ETHERFI,
+    ETHENA,
+}
+
+# Venue -> Market Category
+VENUE_CATEGORY_MAP: dict[str, str] = {
+    "BINANCE": "cefi",
+    BINANCE_SPOT: "cefi",
+    BINANCE_FUTURES: "cefi",
+    "OKX": "cefi",
+    OKX_SPOT: "cefi",
+    OKX_FUTURES: "cefi",
+    "BYBIT": "cefi",
+    BYBIT_SPOT: "cefi",
+    BYBIT_FUTURES: "cefi",
+    COINBASE_SPOT: "cefi",
+    HYPERLIQUID: "cefi",
+    DERIBIT: "cefi",
+    ASTER: "cefi",
+    NASDAQ: "tradfi",
+    NYSE: "tradfi",
+    CME: "tradfi",
+    CBOT: "tradfi",
+    NYMEX: "tradfi",
+    COMEX: "tradfi",
+    ICE: "tradfi",
+    CBOE: "tradfi",
+    XNAS: "tradfi",
+    XNYS: "tradfi",
+    UNISWAPV2_ETH: "defi",
+    UNISWAPV3_ETH: "defi",
+    UNISWAPV4_ETH: "defi",
+    CURVE_ETH: "defi",
+    AERODROME_BASE: "defi",
+    AAVE_V3: "defi",
+    AAVE_V3_ETH: "defi",
+    MORPHO_ETHEREUM: "defi",
+    EULER_PLASMA: "defi",
+    FLUID_PLASMA: "defi",
+    AAVE_PLASMA: "defi",
+    LIDO: "defi",
+    ETHERFI: "defi",
+    ETHENA: "defi",
+}
+VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
+
+# Venue -> Supported Instrument Types
+INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
+    BINANCE_SPOT: {"SPOT"},
+    COINBASE_SPOT: {"SPOT"},
+    OKX_SPOT: {"SPOT"},
+    OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
+    "OKX": {"SPOT", "PERPETUAL", "FUTURE", "OPTION"},
+    BYBIT_SPOT: {"SPOT"},
+    BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
+    "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},
+    "UPBIT": {"SPOT"},
+    BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
+    DERIBIT: {"PERPETUAL", "FUTURE", "OPTION"},
+    HYPERLIQUID: {"PERPETUAL"},
+    ASTER: {"PERPETUAL"},
+    NASDAQ: {"EQUITY", "ETF", "INDEX"},
+    NYSE: {"EQUITY", "ETF", "INDEX"},
+    CME: {"FUTURE", "OPTION", "INDEX"},
+    CBOT: {"FUTURE", "OPTION"},
+    NYMEX: {"FUTURE", "OPTION"},
+    COMEX: {"FUTURE", "OPTION"},
+    CBOE: {"EQUITY", "ETF", "OPTION", "INDEX"},
+    XNAS: {"EQUITY", "ETF"},
+    XNYS: {"EQUITY", "ETF"},
+    UNISWAPV2_ETH: {"POOL"},
+    UNISWAPV3_ETH: {"POOL"},
+    UNISWAPV4_ETH: {"POOL"},
+    CURVE_ETH: {"POOL"},
+    AERODROME_BASE: {"POOL"},
+    AAVE_V3: {"LENDING"},
+    AAVE_V3_ETH: {"LENDING"},
+    MORPHO_ETHEREUM: {"LENDING"},
+    EULER_PLASMA: {"LENDING"},
+    FLUID_PLASMA: {"LENDING"},
+    LIDO: {"STAKING"},
+    ETHERFI: {"STAKING"},
+    ETHENA: {"STAKING"},
+}
+
+INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
+    "PERPETUAL": "perpetuals",
+    "SPOT": "spot",
+    "ETF": "etf",
+    "EQUITY": "equities",
+    "INDEX": "indices",
+    "FUTURE": "futures_chain",
+    "OPTION": "options_chain",
+    "POOL": "pools",
+    "LENDING": "lending",
+    "STAKING": "staking",
+}
+
+# Venue Capabilities — what actions each venue supports
+
+
+class VenueCapability(StrEnum):
+    SPOT_TRADE = "spot_trade"
+    PERP_TRADE = "perp_trade"
+    FUTURES_TRADE = "futures_trade"
+    OPTIONS_TRADE = "options_trade"
+    SWAP = "swap"
+    LEND = "lend"
+    BORROW = "borrow"
+    STAKE = "stake"
+    UNSTAKE = "unstake"
+    FLASH_LOAN = "flash_loan"
+    PROVIDE_LIQUIDITY = "provide_liquidity"
+    SPORTS_EXCHANGE = "sports_exchange"
+    SPORTS_BOOKMAKER_API = "sports_bookmaker_api"
+    SPORTS_BOOKMAKER_WEB = "sports_bookmaker_web"
+    PREDICTION_MARKET = "prediction_market"
+    SPORTS_DFS = "sports_dfs"
+    SPORTS_DATA = "sports_data"
+
+
+VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
+    BINANCE_SPOT: {VenueCapability.SPOT_TRADE},
+    COINBASE_SPOT: {VenueCapability.SPOT_TRADE},
+    OKX_SPOT: {VenueCapability.SPOT_TRADE},
+    BYBIT_SPOT: {VenueCapability.SPOT_TRADE},
+    BINANCE_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    OKX_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    BYBIT_FUTURES: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE},
+    DERIBIT: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    HYPERLIQUID: {VenueCapability.PERP_TRADE},
+    ASTER: {VenueCapability.PERP_TRADE},
+    NASDAQ: {VenueCapability.SPOT_TRADE},
+    NYSE: {VenueCapability.SPOT_TRADE},
+    CME: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    CBOT: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    NYMEX: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    COMEX: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    ICE: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
+    CBOE: {VenueCapability.SPOT_TRADE, VenueCapability.OPTIONS_TRADE},
+    UNISWAPV2_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    UNISWAPV3_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    UNISWAPV4_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    CURVE_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    AERODROME_BASE: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    AAVE_V3: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
+    AAVE_V3_ETH: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
+    MORPHO_ETHEREUM: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
+    EULER_PLASMA: {VenueCapability.LEND, VenueCapability.BORROW},
+    FLUID_PLASMA: {VenueCapability.LEND, VenueCapability.BORROW},
+    AAVE_PLASMA: {VenueCapability.LEND, VenueCapability.BORROW},
+    LIDO: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
+    ETHERFI: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
+    ETHENA: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
+}
+VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_EXCHANGE} for v in SPORTS_EXCHANGE_VENUES})
+VENUE_CAPABILITIES.update({v: {VenueCapability.PREDICTION_MARKET} for v in SPORTS_PREDICTION_MARKET_VENUES})
+VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_BOOKMAKER_API} for v in SPORTS_BOOKMAKER_API_VENUES})
+VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_BOOKMAKER_WEB} for v in SPORTS_BOOKMAKER_WEB_VENUES})
+VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_DFS} for v in SPORTS_DFS_VENUES})
+VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_DATA} for v in SPORTS_DATA_VENUES})
+
+# DeFi Protocol Classification
+
+
+class DefiProtocolType(StrEnum):
+    DEX_AMM = "dex_amm"
+    LENDING = "lending"
+    LIQUID_STAKING = "liquid_staking"
+    YIELD = "yield"
+
+
+VENUE_PROTOCOL_TYPE: dict[str, DefiProtocolType] = {
+    UNISWAPV2_ETH: DefiProtocolType.DEX_AMM,
+    UNISWAPV3_ETH: DefiProtocolType.DEX_AMM,
+    UNISWAPV4_ETH: DefiProtocolType.DEX_AMM,
+    CURVE_ETH: DefiProtocolType.DEX_AMM,
+    AERODROME_BASE: DefiProtocolType.DEX_AMM,
+    AAVE_V3: DefiProtocolType.LENDING,
+    AAVE_V3_ETH: DefiProtocolType.LENDING,
+    MORPHO_ETHEREUM: DefiProtocolType.LENDING,
+    EULER_PLASMA: DefiProtocolType.LENDING,
+    FLUID_PLASMA: DefiProtocolType.LENDING,
+    AAVE_PLASMA: DefiProtocolType.LENDING,
+    LIDO: DefiProtocolType.LIQUID_STAKING,
+    ETHERFI: DefiProtocolType.LIQUID_STAKING,
+    ETHENA: DefiProtocolType.YIELD,
+}
+
+# Venue -> Blockchain (DeFi smart order routing: shared wallet)
+
+VENUE_CHAIN_MAP: dict[str, str] = {
+    UNISWAPV2_ETH: "ethereum",
+    UNISWAPV3_ETH: "ethereum",
+    UNISWAPV4_ETH: "ethereum",
+    CURVE_ETH: "ethereum",
+    AERODROME_BASE: "base",
+    AAVE_V3: "ethereum",
+    AAVE_V3_ETH: "ethereum",
+    MORPHO_ETHEREUM: "ethereum",
+    EULER_PLASMA: "ethereum",
+    FLUID_PLASMA: "ethereum",
+    AAVE_PLASMA: "ethereum",
+    LIDO: "ethereum",
+    ETHERFI: "ethereum",
+    ETHENA: "ethereum",
+    HYPERLIQUID: "hyperliquid_l1",
+}
+
+SHARED_WALLET_GROUPS: dict[str, set[str]] = {}
+for _venue, _chain in VENUE_CHAIN_MAP.items():
+    SHARED_WALLET_GROUPS.setdefault(_chain, set()).add(_venue)
+
+DEX_FEE_TIERS: dict[str, list[int]] = {
+    UNISWAPV2_ETH: [30],
+    UNISWAPV3_ETH: [1, 5, 30, 100],
+    UNISWAPV4_ETH: [1, 5, 30, 100],
+    CURVE_ETH: [1, 4],
+    AERODROME_BASE: [1, 5, 30, 100],
+}
+
+# Venue Fee Model
+
+
+class VenueFeeModel(StrEnum):
+    MAKER_TAKER = "maker_taker"
+    POOL_FEE = "pool_fee"
+    RATE_BASED = "rate_based"
+    COMMISSION = "commission"
+
+
+VENUE_FEE_MODEL_MAP: dict[str, VenueFeeModel] = {
+    BINANCE_SPOT: VenueFeeModel.MAKER_TAKER,
+    BINANCE_FUTURES: VenueFeeModel.MAKER_TAKER,
+    OKX_SPOT: VenueFeeModel.MAKER_TAKER,
+    OKX_FUTURES: VenueFeeModel.MAKER_TAKER,
+    BYBIT_SPOT: VenueFeeModel.MAKER_TAKER,
+    BYBIT_FUTURES: VenueFeeModel.MAKER_TAKER,
+    COINBASE_SPOT: VenueFeeModel.MAKER_TAKER,
+    DERIBIT: VenueFeeModel.MAKER_TAKER,
+    HYPERLIQUID: VenueFeeModel.MAKER_TAKER,
+    ASTER: VenueFeeModel.MAKER_TAKER,
+    NASDAQ: VenueFeeModel.COMMISSION,
+    NYSE: VenueFeeModel.COMMISSION,
+    CME: VenueFeeModel.COMMISSION,
+    CBOT: VenueFeeModel.COMMISSION,
+    NYMEX: VenueFeeModel.COMMISSION,
+    COMEX: VenueFeeModel.COMMISSION,
+    ICE: VenueFeeModel.COMMISSION,
+    CBOE: VenueFeeModel.COMMISSION,
+    UNISWAPV2_ETH: VenueFeeModel.POOL_FEE,
+    UNISWAPV3_ETH: VenueFeeModel.POOL_FEE,
+    UNISWAPV4_ETH: VenueFeeModel.POOL_FEE,
+    CURVE_ETH: VenueFeeModel.POOL_FEE,
+    AERODROME_BASE: VenueFeeModel.POOL_FEE,
+    AAVE_V3: VenueFeeModel.RATE_BASED,
+    AAVE_V3_ETH: VenueFeeModel.RATE_BASED,
+    MORPHO_ETHEREUM: VenueFeeModel.RATE_BASED,
+    EULER_PLASMA: VenueFeeModel.RATE_BASED,
+    FLUID_PLASMA: VenueFeeModel.RATE_BASED,
+    AAVE_PLASMA: VenueFeeModel.RATE_BASED,
+    LIDO: VenueFeeModel.RATE_BASED,
+    ETHERFI: VenueFeeModel.RATE_BASED,
+    ETHENA: VenueFeeModel.RATE_BASED,
+}
+VENUE_FEE_MODEL_MAP.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, VenueFeeModel.COMMISSION))
+VENUE_FEE_MODEL_MAP.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, VenueFeeModel.COMMISSION))
+VENUE_FEE_MODEL_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, VenueFeeModel.COMMISSION))
+VENUE_FEE_MODEL_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, VenueFeeModel.COMMISSION))
+
+# Instruction Type -> Valid Domains / Instrument Types (canonical rules)
+
+INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
+    "TRADE": {"cefi", "tradfi"},
+    "SWAP": {"defi"},
+    "LEND": {"defi"},
+    "BORROW": {"defi"},
+    "STAKE": {"defi"},
+    "UNSTAKE": {"defi"},
+    "FLASH_LOAN": {"defi"},
+    "TRANSFER": {"defi"},
+    "BET": {"sports"},
+}
+
+INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
+    "TRADE": {"PERPETUAL", "SPOT", "SPOT_PAIR", "FUTURE", "OPTION", "EQUITY", "ETF", "INDEX"},
+    "SWAP": {"POOL"},
+    "LEND": {"LENDING"},
+    "BORROW": {"LENDING"},
+    "STAKE": {"STAKING"},
+    "UNSTAKE": {"STAKING"},
+    "FLASH_LOAN": {"LENDING"},
+    "TRANSFER": {"SPOT", "SPOT_PAIR"},
+    "BET": {"FIXED_ODDS", "EXCHANGE_ODDS", "SPREAD", "OVER_UNDER", "OUTRIGHT", "PROP"},
+}
+
+# Alpha Classification
+
+
+class AlphaProfile(StrEnum):
+    ZERO_ALPHA = "zero_alpha"
+    ALPHA_SEEKING = "alpha_seeking"
+
+
+VENUE_ALPHA_PROFILE: dict[str, AlphaProfile] = {
+    BINANCE_SPOT: AlphaProfile.ALPHA_SEEKING,
+    BINANCE_FUTURES: AlphaProfile.ALPHA_SEEKING,
+    OKX_SPOT: AlphaProfile.ALPHA_SEEKING,
+    OKX_FUTURES: AlphaProfile.ALPHA_SEEKING,
+    BYBIT_SPOT: AlphaProfile.ALPHA_SEEKING,
+    BYBIT_FUTURES: AlphaProfile.ALPHA_SEEKING,
+    COINBASE_SPOT: AlphaProfile.ALPHA_SEEKING,
+    DERIBIT: AlphaProfile.ALPHA_SEEKING,
+    HYPERLIQUID: AlphaProfile.ALPHA_SEEKING,
+    ASTER: AlphaProfile.ALPHA_SEEKING,
+    NASDAQ: AlphaProfile.ALPHA_SEEKING,
+    NYSE: AlphaProfile.ALPHA_SEEKING,
+    CME: AlphaProfile.ALPHA_SEEKING,
+    CBOT: AlphaProfile.ALPHA_SEEKING,
+    NYMEX: AlphaProfile.ALPHA_SEEKING,
+    COMEX: AlphaProfile.ALPHA_SEEKING,
+    ICE: AlphaProfile.ALPHA_SEEKING,
+    CBOE: AlphaProfile.ALPHA_SEEKING,
+    UNISWAPV2_ETH: AlphaProfile.ALPHA_SEEKING,
+    UNISWAPV3_ETH: AlphaProfile.ALPHA_SEEKING,
+    UNISWAPV4_ETH: AlphaProfile.ALPHA_SEEKING,
+    CURVE_ETH: AlphaProfile.ALPHA_SEEKING,
+    AERODROME_BASE: AlphaProfile.ALPHA_SEEKING,
+    AAVE_V3: AlphaProfile.ZERO_ALPHA,
+    AAVE_V3_ETH: AlphaProfile.ZERO_ALPHA,
+    MORPHO_ETHEREUM: AlphaProfile.ZERO_ALPHA,
+    EULER_PLASMA: AlphaProfile.ZERO_ALPHA,
+    FLUID_PLASMA: AlphaProfile.ZERO_ALPHA,
+    AAVE_PLASMA: AlphaProfile.ZERO_ALPHA,
+    LIDO: AlphaProfile.ZERO_ALPHA,
+    ETHERFI: AlphaProfile.ZERO_ALPHA,
+    ETHENA: AlphaProfile.ZERO_ALPHA,
+}
+VENUE_ALPHA_PROFILE.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, AlphaProfile.ALPHA_SEEKING))
+VENUE_ALPHA_PROFILE.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, AlphaProfile.ALPHA_SEEKING))
+VENUE_ALPHA_PROFILE.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, AlphaProfile.ALPHA_SEEKING))
+VENUE_ALPHA_PROFILE.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, AlphaProfile.ZERO_ALPHA))
+
+# Sports Venue Classification
+
+
+class SportsVenueType(StrEnum):
+    """How we connect to a sports venue for bet placement."""
+
+    EXCHANGE_API = "exchange_api"
+    BOOKMAKER_API = "bookmaker_api"
+    PREDICTION_MARKET_API = "prediction_market_api"
+    WEB_SCRAPER = "web_scraper"
+    DFS_PLATFORM = "dfs_platform"
+    DATA_ONLY = "data_only"
+
+
+class SportsAuthMethod(StrEnum):
+    """Authentication mechanism for placing bets at the venue."""
+
+    API_KEY = "api_key"
+    SESSION_TOKEN = "session_token"
+    LOGIN_CREDENTIALS = "login_credentials"
+    WALLET_SIGNATURE = "wallet_signature"
+    OAUTH2 = "oauth2"
+    NONE = "none"
+
+
+SPORTS_VENUE_TYPE_MAP: dict[str, SportsVenueType] = {}
+SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, SportsVenueType.EXCHANGE_API))
+SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, SportsVenueType.PREDICTION_MARKET_API))
+SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, SportsVenueType.BOOKMAKER_API))
+SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsVenueType.WEB_SCRAPER))
+SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsVenueType.DFS_PLATFORM))
+SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.DATA_ONLY))
+
+SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
+    BETFAIR: SportsAuthMethod.SESSION_TOKEN,
+    SMARKETS: SportsAuthMethod.API_KEY,
+    MATCHBOOK: SportsAuthMethod.API_KEY,
+    BETDAQ: SportsAuthMethod.API_KEY,
+    POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
+    KALSHI: SportsAuthMethod.API_KEY,
+    NOVIG: SportsAuthMethod.API_KEY,
+    BETOPENLY: SportsAuthMethod.API_KEY,
+    PROPHETX: SportsAuthMethod.API_KEY,
+    PINNACLE: SportsAuthMethod.API_KEY,
+    ONEXBET: SportsAuthMethod.API_KEY,
+    ODDS_API: SportsAuthMethod.API_KEY,
+    OPTICODDS: SportsAuthMethod.API_KEY,
+    ODDSJAM: SportsAuthMethod.API_KEY,
+    API_FOOTBALL: SportsAuthMethod.API_KEY,
+}
+SPORTS_AUTH_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsAuthMethod.LOGIN_CREDENTIALS))
+SPORTS_AUTH_MAP.update(dict.fromkeys(SPORTS_DFS_VENUES, SportsAuthMethod.LOGIN_CREDENTIALS))
+SPORTS_AUTH_MAP.update(
+    dict.fromkeys(
+        (FOOTYSTATS, SOCCER_FOOTBALL_INFO, OPEN_METEO, UNDERSTAT, TRANSFERMARKT, SHARPAPI, ODDS_ENGINE, METABET),
+        SportsAuthMethod.NONE,
+    )
+)
+
+SPORTS_CAPTCHA_RISK: set[str] = {
+    BET365,
+    WILLIAMHILL,
+    LADBROKES,
+    CORAL,
+    PADDYPOWER,
+    SKYBET,
+    BOVADA,
+    DRAFTKINGS,
+    FANDUEL,
+    BETMGM,
+    SBOBET,
+    BET888SPORT,
+}
+
+# Canonical Venue Key -> The Odds API bookmaker key(s) -- for VCR recording
+
+ODDS_API_KEY_MAP: dict[str, list[str]] = {
+    BETFAIR: ["betfair_ex_uk", "betfair_ex_eu", "betfair_ex_au"],
+    SMARKETS: ["smarkets"],
+    MATCHBOOK: ["matchbook"],
+    POLYMARKET: ["polymarket"],
+    KALSHI: ["kalshi"],
+    NOVIG: ["novig"],
+    BETOPENLY: ["betopenly"],
+    PROPHETX: ["prophetx"],
+    PINNACLE: ["pinnacle"],
+    ONEXBET: ["onexbet"],
+    DRAFTKINGS: ["draftkings"],
+    FANDUEL: ["fanduel"],
+    BETMGM: ["betmgm"],
+    BOVADA: ["bovada"],
+    CAESARS: ["williamhill_us"],
+    BETRIVERS: ["betrivers"],
+    BETONLINEAG: ["betonlineag"],
+    BETUS: ["betus"],
+    LOWVIG: ["lowvig"],
+    MYBOOKIEAG: ["mybookieag"],
+    FANATICS: ["fanatics"],
+    BALLYBET: ["ballybet"],
+    BETANYSPORTS: ["betanysports"],
+    BETPARX: ["betparx"],
+    ESPNBET: ["espnbet"],
+    FLIFF: ["fliff"],
+    HARDROCKBET: ["hardrockbet"],
+    REBET: ["rebet"],
+    PRIZEPICKS: ["prizepicks"],
+    UNDERDOG: ["underdog"],
+    DRAFTKINGS_PICK6: ["pick6"],
+    BETR_DFS: ["betr_us_dfs"],
+    BET365: ["bet365_au"],
+    WILLIAMHILL: ["williamhill"],
+    LADBROKES: ["ladbrokes_uk", "ladbrokes_au"],
+    CORAL: ["coral"],
+    PADDYPOWER: ["paddypower"],
+    SKYBET: ["skybet"],
+    BETWAY: ["betway"],
+    BETVICTOR: ["betvictor"],
+    BOYLESPORTS: ["boylesports"],
+    BET888SPORT: ["sport888", "sport888_se"],
+    UNIBET: ["unibet_uk", "unibet_fr", "unibet_it", "unibet_nl", "unibet_se", "unibet"],
+    CASUMO: ["casumo"],
+    GROSVENOR: ["grosvenor"],
+    LEOVEGAS: ["leovegas", "leovegas_se"],
+    LIVESCOREBET: ["livescorebet"],
+    VIRGINBET: ["virginbet"],
+    BETCLIC: ["betclic_fr"],
+    BETSSON: ["betsson"],
+    COOLBET: ["coolbet"],
+    EVERYGAME: ["everygame"],
+    GTBETS: ["gtbets"],
+    MARATHONBET: ["marathonbet"],
+    NORDICBET: ["nordicbet"],
+    PARIONSSPORT: ["parionssport_fr"],
+    PMU: ["pmu_fr"],
+    SUPRABETS: ["suprabets"],
+    TIPICO: ["tipico_de"],
+    WINAMAX: ["winamax_fr", "winamax_de"],
+    CODERE: ["codere_it"],
+    NETBET: ["netbet_fr"],
+    ATG: ["atg_se"],
+    MRGREEN: ["mrgreen_se"],
+    SVENSKASPEL: ["svenskaspel_se"],
+    BETR_AU: ["betr_au"],
+    BETRIGHT: ["betright"],
+    DABBLE: ["dabble_au"],
+    NEDS: ["neds"],
+    PLAYUP: ["playup"],
+    POINTSBET: ["pointsbetau"],
+    SPORTSBET_AU: ["sportsbet"],
+    TAB: ["tab"],
+    TABTOUCH: ["tabtouch"],
+}
+
+ODDS_API_REGION_MAP: dict[str, list[str]] = {
+    BETFAIR: ["uk", "eu", "au"],
+    SMARKETS: ["uk"],
+    MATCHBOOK: ["uk", "eu"],
+    POLYMARKET: ["us_ex"],
+    KALSHI: ["us_ex"],
+    NOVIG: ["us_ex"],
+    BETOPENLY: ["us_ex"],
+    PROPHETX: ["us_ex"],
+    PINNACLE: ["eu"],
+    ONEXBET: ["eu"],
+    DRAFTKINGS: ["us"],
+    FANDUEL: ["us"],
+    BETMGM: ["us"],
+    BOVADA: ["us"],
+    CAESARS: ["us"],
+    BETRIVERS: ["us"],
+    BETONLINEAG: ["us", "eu"],
+    BETUS: ["us"],
+    LOWVIG: ["us"],
+    MYBOOKIEAG: ["us", "eu"],
+    FANATICS: ["us"],
+    BALLYBET: ["us2"],
+    BETANYSPORTS: ["us2", "eu"],
+    BETPARX: ["us2"],
+    ESPNBET: ["us2"],
+    FLIFF: ["us2"],
+    HARDROCKBET: ["us2"],
+    REBET: ["us2"],
+    PRIZEPICKS: ["us_dfs"],
+    UNDERDOG: ["us_dfs"],
+    DRAFTKINGS_PICK6: ["us_dfs"],
+    BETR_DFS: ["us_dfs"],
+    BET365: ["au"],
+    WILLIAMHILL: ["uk", "eu"],
+    LADBROKES: ["uk", "au"],
+    CORAL: ["uk"],
+    PADDYPOWER: ["uk"],
+    SKYBET: ["uk"],
+    BETWAY: ["uk"],
+    BETVICTOR: ["uk", "eu"],
+    BOYLESPORTS: ["uk"],
+    BET888SPORT: ["uk", "se"],
+    UNIBET: ["uk", "eu", "fr", "se", "au"],
+    CASUMO: ["uk"],
+    GROSVENOR: ["uk"],
+    LEOVEGAS: ["uk", "se"],
+    LIVESCOREBET: ["uk"],
+    VIRGINBET: ["uk"],
+    BETCLIC: ["eu", "fr"],
+    BETSSON: ["eu", "se"],
+    COOLBET: ["eu"],
+    EVERYGAME: ["eu"],
+    GTBETS: ["eu"],
+    MARATHONBET: ["eu"],
+    NORDICBET: ["eu", "se"],
+    PARIONSSPORT: ["eu", "fr"],
+    PMU: ["eu", "fr"],
+    SUPRABETS: ["eu"],
+    TIPICO: ["eu"],
+    WINAMAX: ["eu", "fr"],
+    CODERE: ["eu"],
+    NETBET: ["fr"],
+    ATG: ["se"],
+    MRGREEN: ["se"],
+    SVENSKASPEL: ["se"],
+    BETR_AU: ["au"],
+    BETRIGHT: ["au"],
+    DABBLE: ["au"],
+    NEDS: ["au"],
+    PLAYUP: ["au"],
+    POINTSBET: ["au"],
+    SPORTSBET_AU: ["au"],
+    TAB: ["au"],
+    TABTOUCH: ["au"],
+}

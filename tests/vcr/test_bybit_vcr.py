@@ -7,9 +7,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent / "unified_api_contracts" / "unified_api_contracts_external" / "bybit" / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "bybit" / "mocks"
 
 
 def test_bybit_linear_ticker_cassette() -> None:

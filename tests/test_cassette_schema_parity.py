@@ -1,6 +1,6 @@
 """Cassette -> UAC schema parity tests (Plan #60 H5.2).
 
-Validates every committed VCR cassette YAML in unified_api_contracts_external/<venue>/mocks/
+Validates every committed VCR cassette YAML in external/<venue>/mocks/
 has a valid, non-empty JSON response body. Zero network calls -- pure file I/O.
 
 Checks performed per cassette:
@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Root of the cassette tree relative to this test file
 _REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
-_MOCKS_BASE: Final[Path] = _REPO_ROOT / "unified_api_contracts" / "unified_api_contracts_external"
+_MOCKS_BASE: Final[Path] = _REPO_ROOT / "unified_api_contracts" / "external"
 
 # Content-Type prefixes that indicate binary or non-JSON bodies (empty body OK)
 _NON_JSON_CONTENT_TYPES: Final[tuple[str, ...]] = (
@@ -51,7 +51,7 @@ _NON_JSON_CONTENT_TYPES: Final[tuple[str, ...]] = (
 
 
 def _collect_cassette_paths() -> list[Path]:
-    """Return all *.yaml files under unified_api_contracts_external/<venue>/mocks/."""
+    """Return all *.yaml files under external/<venue>/mocks/."""
     return sorted(_MOCKS_BASE.glob("*/mocks/*.yaml"))
 
 
@@ -89,7 +89,7 @@ def test_cassette_glob_finds_files() -> None:
     """Assert the cassette glob finds at least one YAML file -- catches path regressions."""
     assert len(_ALL_CASSETTES) > 0, (
         f"No cassette YAML files found under {_MOCKS_BASE}. "
-        "Check that unified_api_contracts_external exists and contains <venue>/mocks/*.yaml files."
+        "Check that external exists and contains <venue>/mocks/*.yaml files."
     )
 
 

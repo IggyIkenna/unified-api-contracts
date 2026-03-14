@@ -37,7 +37,7 @@ def _discover_example_files() -> list[tuple[Path, str]]:
         if examples_dir.exists():
             for path in examples_dir.glob("*.json"):
                 out.append((path, api_dir.name))
-        elif api_dir.name == "unified_api_contracts_external":
+        elif api_dir.name == "external":
             for vendor_dir in api_dir.iterdir():
                 if not vendor_dir.is_dir():
                     continue
@@ -50,7 +50,7 @@ def _discover_example_files() -> list[tuple[Path, str]]:
 
 def _get_schema_for_example(api_dir_name: str, data: dict, example_filename: str = "") -> tuple[str, str] | None:
     """Return (module_path, class_name) for the schema that can validate this example, or None."""
-    from unified_api_contracts.unified_api_contracts_external.venue_manifest import (
+    from unified_api_contracts.external.venue_manifest import (
         VENUE_MANIFEST,
     )
 
@@ -61,7 +61,7 @@ def _get_schema_for_example(api_dir_name: str, data: dict, example_filename: str
             contract = VENUE_MANIFEST[api_dir_name]
             mod_path = contract.get(
                 "module",
-                f"unified_api_contracts.unified_api_contracts_external.{api_dir_name}.schemas",
+                f"unified_api_contracts.external.{api_dir_name}.schemas",
             )
             return (mod_path, class_name)
     if api_dir_name in _EXAMPLE_SCHEMA_LOADERS:

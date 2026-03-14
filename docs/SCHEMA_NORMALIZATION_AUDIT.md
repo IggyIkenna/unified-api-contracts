@@ -20,8 +20,8 @@
 | Term                               | Meaning                                                                                                                                            |
 | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **unified_api_contracts.egg-info** | Build artifact from `pip install -e .` / `uv pip install -e .`. Contains package metadata. **Not** a schema package. Should be in `.gitignore`.    |
-| **unified_api_contracts_external** | Raw external schemas — per-venue Pydantic models for API request/response shapes (BinanceTrade, OkxOrder, etc.).                                   |
-| **unified_normalised_contracts**   | Canonical schemas — CanonicalTrade, CanonicalOrder, CanonicalOrderBook, CanonicalFill, etc. One-hop normalisation target.                          |
+| **external**                       | Raw external schemas — per-venue Pydantic models for API request/response shapes (BinanceTrade, OkxOrder, etc.).                                   |
+| **canonical**                      | Canonical schemas — CanonicalTrade, CanonicalOrder, CanonicalOrderBook, CanonicalFill, etc. One-hop normalisation target.                          |
 | **"Extended"**                     | Not a package. In sports schemas, "Extended" is a field-naming convention (e.g. "Extended HT features", "Team Extended") for extra/derived fields. |
 | **sports/canonical**               | Cross-source normalised sports types (CanonicalFixture, CanonicalOdds, CanonicalBookmakerMarket) — separate domain from trading canonical.         |
 
@@ -30,8 +30,8 @@
 ## 2. Package Structure
 
 unified_api_contracts/
-unified_api_contracts_external/ # Raw external schemas (60+ providers)
-unified_normalised_contracts/ # Trading canonical schemas
+external/ # Raw external schemas (60+ providers)
+canonical/ # Trading canonical schemas
 schemas/ # Shared cross-venue
 canonical_mappings.py # DataSourceMapping, VENUE_TO_DATA_SOURCE
 

@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from unified_api_contracts.unified_api_contracts_external.venue_manifest import VENUE_MANIFEST
+from unified_api_contracts.external.venue_manifest import VENUE_MANIFEST
 
 
 def _api_contracts_root() -> Path:
@@ -36,7 +36,7 @@ def test_every_venue_endpoint_validates(venue: str, example_filename: str) -> No
     """Each (venue, endpoint) has an example that validates against the contracted schema."""
     root = _api_contracts_root()
     old_path = root / "unified_api_contracts" / venue / "examples" / example_filename
-    new_path = root / "unified_api_contracts" / "unified_api_contracts_external" / venue / "examples" / example_filename
+    new_path = root / "unified_api_contracts" / "external" / venue / "examples" / example_filename
 
     if old_path.exists():
         example_path = old_path
@@ -51,7 +51,7 @@ def test_every_venue_endpoint_validates(venue: str, example_filename: str) -> No
     contract = VENUE_MANIFEST[venue]
     mod_path = contract.get(
         "module",
-        f"unified_api_contracts.unified_api_contracts_external.{venue}.schemas",
+        f"unified_api_contracts.external.{venue}.schemas",
     )
     mod = __import__(mod_path, fromlist=[schema_class_name])
     schema_class = getattr(mod, schema_class_name)

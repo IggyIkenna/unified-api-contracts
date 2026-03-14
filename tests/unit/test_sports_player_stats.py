@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.player_stats import (
+from unified_api_contracts.external.sports.canonical.player_stats import (
     CanonicalPlayerMatchStats,
 )
 

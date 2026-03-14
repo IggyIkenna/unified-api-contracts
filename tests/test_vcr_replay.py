@@ -19,7 +19,7 @@ import pytest
 import requests
 from vcr import VCR
 
-from unified_api_contracts.vcr_endpoints import VCR_ENDPOINTS
+from unified_api_contracts.testing.vcr_endpoints import VCR_ENDPOINTS
 
 ROOT = Path(__file__).resolve().parent.parent
 MOCKS_BASE = ROOT / "unified_api_contracts"

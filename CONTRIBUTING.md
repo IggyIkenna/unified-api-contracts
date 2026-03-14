@@ -2,18 +2,18 @@
 
 ## Package layout
 
-- **unified_api_contracts_external/** — Raw venue schemas (binance, databento, tardis, etc.). Add new venues here.
-- **unified_normalised_contracts/** — Canonical schemas and `normalize.py` for raw→canonical conversion.
+- **external/** — Raw venue schemas (binance, databento, tardis, etc.). Add new venues here.
+- **canonical/** — Canonical schemas and `normalize.py` for raw→canonical conversion.
 - Service-to-service (internal) schemas live in **unified-internal-contracts**; AC is external + normalised only.
 
 ## Adding a new venue or API
 
 1. **Create directory**  
-   Add `unified_api_contracts/unified_api_contracts_external/<venue>/` with:
+   Add `unified_api_contracts/external/<venue>/` with:
    - `schemas.py` — Pydantic models for request/response (and errors, WebSocket payloads if applicable).
    - `examples/` — JSON (or CSV) examples; add manually or capture from the interface that uses the venue (interfaces hold API keys).
    - `mocks/` — VCR cassettes for tests (filter `authorization`, `x-api-key`, etc.).
-   - Add a `normalize_*` function in `unified_normalised_contracts/normalize.py` if the venue has trade/order types.
+   - Add a `normalize_*` function in `canonical/normalize.py` if the venue has trade/order types.
    - **VCR cassettes** under `mocks/` are recorded from the **six interfaces** (they hold API keys), not from AC scripts.
 
 2. **Use Context7**  

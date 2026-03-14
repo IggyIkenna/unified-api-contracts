@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "bitstamp"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "bitstamp" / "mocks"
 
 
 def test_bitstamp_cassette() -> None:
@@ -43,7 +37,7 @@ def test_bitstamp_response_is_dict() -> None:
 
 def test_bitstamp_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.bitstamp.schemas import BitstampTicker
+    from unified_api_contracts.external.bitstamp.schemas import BitstampTicker
 
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists()

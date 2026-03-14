@@ -17,7 +17,7 @@ Plan reference: `unified-trading-pm/plans/active/defi_dev_testnet_data_rollout_2
 | **Tenderly fork**      | Hosted mainnet fork. Persistent, team-shareable, web dashboard. Used for dev Cloud Run deployment. Free tier: 50 txns/day.                                                     |
 | **Dry-run**            | Order logged/published as event but no on-chain tx sent. Used when fork unavailable for a protocol.                                                                            |
 | **Sepolia**            | Ethereum public testnet (chain_id 11155111). Prices fake, liquidity fake. **Only valid for tx-mechanics testing** (signing, broadcast, receipt parsing). NOT for strategy/PnL. |
-| **VCR cassette**       | Real HTTP response recorded from the API and committed to `unified_api_contracts_external/{venue}/mocks/`. Replayed in CI with no live keys.                                   |
+| **VCR cassette**       | Real HTTP response recorded from the API and committed to `external/{venue}/mocks/`. Replayed in CI with no live keys.                                                         |
 
 ---
 

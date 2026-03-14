@@ -8,42 +8,42 @@ import pytest
 @pytest.mark.unit
 class TestSportsExports:
     def test_import_canonical_fixture(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import CanonicalFixture
+        from unified_api_contracts.external.sports import CanonicalFixture
 
         assert CanonicalFixture is not None
 
     def test_import_canonical_odds(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import CanonicalOdds
+        from unified_api_contracts.external.sports import CanonicalOdds
 
         assert CanonicalOdds is not None
 
     def test_import_bet_order(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import BetOrder
+        from unified_api_contracts.external.sports import BetOrder
 
         assert BetOrder is not None
 
     def test_import_bet_execution(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import BetExecution
+        from unified_api_contracts.external.sports import BetExecution
 
         assert BetExecution is not None
 
     def test_import_arbitrage_opportunity(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import ArbitrageOpportunity
+        from unified_api_contracts.external.sports import ArbitrageOpportunity
 
         assert ArbitrageOpportunity is not None
 
     def test_import_bookmaker_registry(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import BookmakerRegistry
+        from unified_api_contracts.external.sports import BookmakerRegistry
 
-        assert len(BookmakerRegistry) == 23
+        assert len(BookmakerRegistry) == 81
 
     def test_import_odds_type(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import OddsType
+        from unified_api_contracts.external.sports import OddsType
 
         assert OddsType.H2H == "h2h"
 
     def test_import_canonical_types_betting(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import (
+        from unified_api_contracts.external.sports import (
             ArbitrageMarket,
             ArbitrageOpportunity,
             ArbitrageStatus,
@@ -74,7 +74,7 @@ class TestSportsExports:
         )
 
     def test_import_canonical_types_fixture(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import (
+        from unified_api_contracts.external.sports import (
             CanonicalFixture,
             CanonicalLeague,
             CanonicalOdds,
@@ -105,7 +105,7 @@ class TestSportsExports:
         )
 
     def test_import_errors(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import (
+        from unified_api_contracts.external.sports import (
             BetRejectedError,
             BookmakerUnavailableError,
             FixtureNotFoundError,

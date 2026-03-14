@@ -12,7 +12,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.sources.odds_api.schemas import (
+from unified_api_contracts.external.sports.sources.odds_api.schemas import (
     ODBookmakerRaw,
     ODEventRaw,
     ODMarketRaw,

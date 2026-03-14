@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "smarkets"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "smarkets" / "mocks"
 
 
 def test_smarkets_markets_cassette() -> None:
@@ -58,7 +52,7 @@ def test_smarkets_market_fields() -> None:
 
 def test_smarkets_market_schema() -> None:
     """Smarkets market validates against api-contracts SmarketsMarket."""
-    from unified_api_contracts.unified_api_contracts_external.smarkets.schemas import SmarketsMarket
+    from unified_api_contracts.external.smarkets.schemas import SmarketsMarket
 
     cassette_path = CASSETTE_DIR / "smarkets_get_markets.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "gateio"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "gateio" / "mocks"
 
 
 def test_gateio_cassette() -> None:
@@ -43,7 +37,7 @@ def test_gateio_response_structure() -> None:
 
 def test_gateio_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.gateio.schemas import GateioTicker
+    from unified_api_contracts.external.gateio.schemas import GateioTicker
 
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists()

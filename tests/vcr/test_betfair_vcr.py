@@ -11,13 +11,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "betfair"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "betfair" / "mocks"
 
 _LIST_CATALOGUE_BODY = (
     b'{"filter": {"eventTypeIds": ["1"]}, '
@@ -63,7 +57,7 @@ def test_betfair_market_catalogue_fields() -> None:
 
 def test_betfair_market_catalogue_schema() -> None:
     """Betfair market catalogue validates against BetfairMarketCatalogue schema."""
-    from unified_api_contracts.unified_api_contracts_external.betfair.schemas import (
+    from unified_api_contracts.external.betfair.schemas import (
         BetfairMarketCatalogue,
     )
 
@@ -101,7 +95,7 @@ def test_betfair_list_market_book_cassette() -> None:
 
 def test_betfair_market_book_schema() -> None:
     """Betfair market book validates against BetfairMarketBook schema with runners."""
-    from unified_api_contracts.unified_api_contracts_external.betfair.schemas import (
+    from unified_api_contracts.external.betfair.schemas import (
         BetfairMarketBook,
     )
 

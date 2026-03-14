@@ -10,11 +10,11 @@ Algorithm:
 
 Scope: scans only core directories where classes ARE expected to be promoted to __all__:
   - unified_api_contracts/schemas/
-  - unified_api_contracts/unified_normalised_contracts/
+  - unified_api_contracts/canonical/
   - unified_api_contracts/trading_schemas.py
 
 Intentionally NOT scanned (vendor-specific, narrow use):
-  - unified_api_contracts_external/  — 40+ venue subdirs; classes here are deliberately
+  - external/  — 40+ venue subdirs; classes here are deliberately
     NOT promoted to top-level __all__ unless explicitly curated
 
 Usage:
@@ -54,11 +54,11 @@ EXCLUDE_DIRS = frozenset(
 )
 
 # Directories within unified_api_contracts/ to scan (relative to package root).
-# unified_api_contracts_external/ is deliberately excluded — vendor-specific schemas
+# external/ is deliberately excluded — vendor-specific schemas
 # are not expected to be promoted to top-level __all__ unless curated.
 SCAN_SUBDIRS: list[str] = [
     "schemas",
-    "unified_normalised_contracts",
+    "canonical",
 ]
 
 # Individual files to scan at the package root level.
@@ -81,10 +81,11 @@ EXEMPT_MISSING: frozenset[str] = frozenset(
     [
         # internal-base: private base classes used by the schema hierarchy
         "_CanonicalBase",
+        "CanonicalBase",
         "_ExternalBase",
         "_NormalisedBase",
         # normalizer-impl: NormalizerBase and concrete normalizer classes live in
-        # unified_normalised_contracts/normalize/ — these are implementation, not schemas
+        # canonical/normalize/ — these are implementation, not schemas
         "NormalizerBase",
         "BinanceFuturesNormalizer",
         "BinanceSpotNormalizer",
@@ -124,7 +125,7 @@ def collect_defined_classes(pkg_root: Path) -> dict[str, str]:
     """AST-scan scoped UAC source directories and return {class_name: relative_file_path}.
 
     Skips __init__.py files — they re-export, not define.
-    Only scans SCAN_SUBDIRS and SCAN_FILES (not unified_api_contracts_external/).
+    Only scans SCAN_SUBDIRS and SCAN_FILES (not external/).
     """
     defined: dict[str, str] = {}
 

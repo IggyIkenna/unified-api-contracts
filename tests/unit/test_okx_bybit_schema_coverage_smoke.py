@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
+from unified_api_contracts.registry.endpoints import ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 
 OKX_PHASE6_ENDPOINTS = [
     "mark_price_kline",

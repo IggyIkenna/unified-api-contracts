@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="992" height="448" font-family="monospace" font-size="11">
   <rect width="992" height="448" fill="#fafafa" rx="4"/>
   <text x="496" y="30" text-anchor="middle" font-size="14" font-weight="bold" fill="#333">
-    Schema Health Matrix — 2026-03-09
+    Schema Health Matrix — 2026-03-14
   </text>
   <g>
     <rect x="4" y="44" width="120" height="36" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5" rx="3"/>

@@ -7,9 +7,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent / "unified_api_contracts" / "unified_api_contracts_external" / "pyth" / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "pyth" / "mocks"
 
 # BTC/USD Pyth price feed ID
 _BTC_USD_FEED_ID = "H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4GGKKG"

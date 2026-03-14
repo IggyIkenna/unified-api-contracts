@@ -1,7 +1,7 @@
 # UAC Canonical Schema Changelog
 
 Tracks per-type version bumps for all canonical Pydantic types in
-`unified_normalised_contracts/domain.py` and `execution.py`.
+`canonical/domain.py` and `execution.py`.
 
 Semver rules: MAJOR = breaking (required field add/remove/type-change/rename);
 MINOR = optional field added, new Enum member; PATCH = docs/metadata only.

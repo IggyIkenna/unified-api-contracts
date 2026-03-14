@@ -26,13 +26,7 @@ import httpx
 import pytest
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "betfair"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "betfair" / "mocks"
 
 _BETFAIR_APP_KEY = os.environ.get("BETFAIR_APP_KEY", "")
 _BETFAIR_SESSION_TOKEN = os.environ.get("BETFAIR_SESSION_TOKEN", "")
@@ -86,7 +80,7 @@ def test_betfair_live_list_market_catalogue() -> None:
 )
 def test_betfair_live_catalogue_runners() -> None:
     """Each catalogue market has runners from live/cassette data."""
-    from unified_api_contracts.unified_api_contracts_external.betfair.schemas import (
+    from unified_api_contracts.external.betfair.schemas import (
         BetfairMarketCatalogue,
     )
 

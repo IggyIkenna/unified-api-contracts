@@ -3,9 +3,9 @@
 Generate schema audit matrix: Provider x Schema Type -> mapped/gap status.
 
 Scans:
-  - unified_api_contracts_external/<provider>/schemas.py (and sub-modules)
+  - external/<provider>/schemas.py (and sub-modules)
     for Pydantic model class names using ast (no exec/eval).
-  - unified_normalised_contracts/normalize/*.py
+  - canonical/normalize/*.py
     for `def normalize_*` function signatures.
 
 Matches normalize_<provider>_<schema_lower> to <Provider><Schema> classes,
@@ -398,22 +398,22 @@ def main() -> None:
         return
 
     repo_root = Path(__file__).resolve().parents[1]
-    ext_root = repo_root / "unified_api_contracts" / "unified_api_contracts_external"
-    norm_dir = repo_root / "unified_api_contracts" / "unified_normalised_contracts" / "normalize"
+    ext_root = repo_root / "unified_api_contracts" / "external"
+    norm_dir = repo_root / "unified_api_contracts" / "canonical" / "normalize"
 
     providers = get_providers(ext_root)
     if not providers:
         logger.error(f"No provider directories found under {ext_root}")
         sys.exit(1)
 
-    logger.error(f"Found {len(providers)} providers.")
+    logger.info(f"Found {len(providers)} providers.")
 
     provider_schemas: dict[str, dict[str, list[str]]] = {}
     for p in providers:
         provider_schemas[p] = get_provider_schemas(ext_root / p)
 
     normalizers = get_normalizer_coverage(norm_dir)
-    logger.info(f"Found normalizers for providers: {sorted(normalizers.keys())}", file=sys.stderr)
+    logger.info(f"Found normalizers for providers: {sorted(normalizers.keys())}")
 
     # Count gaps
     gap_count = 0

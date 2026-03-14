@@ -10,7 +10,7 @@ from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_normalised_contracts import CanonicalTrade
+from unified_api_contracts.canonical import CanonicalTrade
 
 pytestmark = pytest.mark.unit
 

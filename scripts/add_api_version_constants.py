@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 YAML_PATH = REPO_ROOT / "unified_api_contracts" / "provider_api_versions.yaml"
-EXTERNAL_DIR = REPO_ROOT / "unified_api_contracts" / "unified_api_contracts_external"
+EXTERNAL_DIR = REPO_ROOT / "unified_api_contracts" / "external"
 
 # Files to skip (not external API schema files)
 SKIP_DIRS = {"__pycache__", "cloud_sdks", "examples", "mocks"}

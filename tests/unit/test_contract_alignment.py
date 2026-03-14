@@ -23,7 +23,7 @@ class TestCanonicalOrder:
     """CanonicalOrder: required fields, Decimal prices, AwareDatetime timestamp."""
 
     def test_import_and_instantiate(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts.canonical.execution import CanonicalOrder, OrderSide, OrderType
 
         order = CanonicalOrder(
             order_id="ord-001",
@@ -39,7 +39,7 @@ class TestCanonicalOrder:
         assert order.instrument_id == "BTCUSDT"
 
     def test_required_fields_present(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalOrder
+        from unified_api_contracts.canonical.execution import CanonicalOrder
 
         fields = CanonicalOrder.model_fields
         # Core required fields must exist
@@ -47,7 +47,7 @@ class TestCanonicalOrder:
             assert required in fields, f"CanonicalOrder missing required field: {required}"
 
     def test_quantity_is_decimal(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts.canonical.execution import CanonicalOrder, OrderSide, OrderType
 
         order = CanonicalOrder(
             order_id="ord-002",
@@ -65,7 +65,7 @@ class TestCanonicalOrder:
     def test_timestamp_is_timezone_aware(self) -> None:
         from pydantic import ValidationError
 
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts.canonical.execution import CanonicalOrder, OrderSide, OrderType
 
         # Naive datetime must be rejected by AwareDatetime
         try:
@@ -84,7 +84,7 @@ class TestCanonicalOrder:
             pass  # expected — naive datetime rejected
 
     def test_schema_version_constant(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import (
+        from unified_api_contracts.canonical.execution import (
             CANONICAL_ORDER_VERSION,
             CanonicalOrder,
             OrderSide,
@@ -113,7 +113,7 @@ class TestCanonicalFill:
     """CanonicalFill: required fields, Decimal price/quantity, AwareDatetime."""
 
     def test_import_and_instantiate(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalFill, OrderSide
+        from unified_api_contracts.canonical.execution import CanonicalFill, OrderSide
 
         fill = CanonicalFill(
             fill_id="fill-001",
@@ -129,14 +129,14 @@ class TestCanonicalFill:
         assert fill.venue == "binance"
 
     def test_required_fields_present(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalFill
+        from unified_api_contracts.canonical.execution import CanonicalFill
 
         fields = CanonicalFill.model_fields
         for required in ("fill_id", "order_id", "timestamp", "venue", "instrument_id", "side", "price", "quantity"):
             assert required in fields, f"CanonicalFill missing required field: {required}"
 
     def test_price_and_quantity_are_decimal(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalFill, OrderSide
+        from unified_api_contracts.canonical.execution import CanonicalFill, OrderSide
 
         fill = CanonicalFill(
             fill_id="fill-002",
@@ -156,7 +156,7 @@ class TestCanonicalFill:
         assert isinstance(fill.fee, Decimal)
 
     def test_timestamp_is_timezone_aware(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import CanonicalFill, OrderSide
+        from unified_api_contracts.canonical.execution import CanonicalFill, OrderSide
 
         fill = CanonicalFill(
             fill_id="fill-003",
@@ -180,7 +180,7 @@ class TestCanonicalTrade:
     """CanonicalTrade: required fields, Decimal prices, AwareDatetime, symbol+venue."""
 
     def test_import_and_instantiate(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTrade
+        from unified_api_contracts.canonical.domain import CanonicalTrade
 
         trade = CanonicalTrade(
             venue="binance",
@@ -195,14 +195,14 @@ class TestCanonicalTrade:
         assert trade.symbol == "BTCUSDT"
 
     def test_required_fields_symbol_timestamp_venue(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTrade
+        from unified_api_contracts.canonical.domain import CanonicalTrade
 
         fields = CanonicalTrade.model_fields
         for required in ("symbol", "timestamp", "venue", "price", "quantity"):
             assert required in fields, f"CanonicalTrade missing field: {required}"
 
     def test_price_fields_are_decimal(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTrade
+        from unified_api_contracts.canonical.domain import CanonicalTrade
 
         trade = CanonicalTrade(
             venue="kraken",
@@ -217,7 +217,7 @@ class TestCanonicalTrade:
         assert isinstance(trade.quantity, Decimal), "quantity must be Decimal, not float"
 
     def test_timestamp_is_aware(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTrade
+        from unified_api_contracts.canonical.domain import CanonicalTrade
 
         trade = CanonicalTrade(
             venue="coinbase",
@@ -234,7 +234,7 @@ class TestCanonicalTrade:
         """venue and symbol have min_length=1 constraint."""
         from pydantic import ValidationError
 
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTrade
+        from unified_api_contracts.canonical.domain import CanonicalTrade
 
         with pytest.raises((ValidationError, ValueError)):
             CanonicalTrade(
@@ -257,7 +257,7 @@ class TestCanonicalTicker:
     """CanonicalTicker: required fields, Decimal last_price, AwareDatetime, venue."""
 
     def test_import_and_instantiate(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTicker
+        from unified_api_contracts.canonical.domain import CanonicalTicker
 
         ticker = CanonicalTicker(
             instrument_key="binance:SPOT_PAIR:BTCUSDT",
@@ -269,14 +269,14 @@ class TestCanonicalTicker:
         assert ticker.last_price == Decimal("50000.00")
 
     def test_required_fields_present(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTicker
+        from unified_api_contracts.canonical.domain import CanonicalTicker
 
         fields = CanonicalTicker.model_fields
         for required in ("instrument_key", "venue", "timestamp", "last_price"):
             assert required in fields, f"CanonicalTicker missing required field: {required}"
 
     def test_last_price_is_decimal(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTicker
+        from unified_api_contracts.canonical.domain import CanonicalTicker
 
         ticker = CanonicalTicker(
             instrument_key="okx:SPOT_PAIR:ETHUSDT",
@@ -291,7 +291,7 @@ class TestCanonicalTicker:
         assert isinstance(ticker.ask_price, Decimal)
 
     def test_timestamp_is_timezone_aware(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTicker
+        from unified_api_contracts.canonical.domain import CanonicalTicker
 
         ticker = CanonicalTicker(
             instrument_key="bybit:PERPETUAL:BTCUSDT",
@@ -311,7 +311,7 @@ class TestCanonicalOrderFillCompatibility:
     """Fill links back to Order via shared fields — verify compatibility."""
 
     def test_order_id_links_order_to_fill(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.execution import (
+        from unified_api_contracts.canonical.execution import (
             CanonicalFill,
             CanonicalOrder,
             OrderSide,
@@ -346,7 +346,7 @@ class TestCanonicalOrderFillCompatibility:
         """price must be >0 per Field(gt=0)."""
         from pydantic import ValidationError
 
-        from unified_api_contracts.unified_normalised_contracts.domain import CanonicalTrade
+        from unified_api_contracts.canonical.domain import CanonicalTrade
 
         with pytest.raises((ValidationError, ValueError)):
             CanonicalTrade(

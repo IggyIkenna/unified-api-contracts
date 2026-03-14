@@ -69,8 +69,8 @@ the premium paid for long legs. Examples:
 When receiving American odds from a provider:
 
 ```python
-from unified_api_contracts.unified_normalised_contracts.odds import american_to_decimal
-from unified_api_contracts.unified_normalised_contracts.domain import OddsFormat
+from unified_api_contracts.canonical.odds import american_to_decimal
+from unified_api_contracts.canonical.domain import OddsFormat
 
 # Store both the source format and the decimal equivalent
 canonical_order = CanonicalBetOrder(

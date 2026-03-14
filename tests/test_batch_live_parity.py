@@ -21,18 +21,8 @@ from decimal import Decimal
 
 import pytest
 
-from unified_api_contracts.unified_api_contracts_external.binance.market_schemas import BinanceTrade
-from unified_api_contracts.unified_api_contracts_external.bybit.schemas import BybitTrade
-from unified_api_contracts.unified_api_contracts_external.coinbase.schemas import CoinbaseTrade
-from unified_api_contracts.unified_api_contracts_external.databento.schemas import (
-    DATABENTO_PRICE_DIVISOR,
-    DatabentoTrade,
-)
-from unified_api_contracts.unified_api_contracts_external.deribit.schemas import DeribitTrade
-from unified_api_contracts.unified_api_contracts_external.okx.schemas import OKXTrade
-from unified_api_contracts.unified_api_contracts_external.tardis.schemas import TardisTrade
-from unified_api_contracts.unified_normalised_contracts import CanonicalTrade
-from unified_api_contracts.unified_normalised_contracts.normalize import (
+from unified_api_contracts.canonical import CanonicalTrade
+from unified_api_contracts.canonical.normalize import (
     normalize_binance_trade,
     normalize_bybit_trade,
     normalize_coinbase_trade,
@@ -41,6 +31,16 @@ from unified_api_contracts.unified_normalised_contracts.normalize import (
     normalize_okx_trade,
     normalize_tardis_trade,
 )
+from unified_api_contracts.external.binance.market_schemas import BinanceTrade
+from unified_api_contracts.external.bybit.schemas import BybitTrade
+from unified_api_contracts.external.coinbase.schemas import CoinbaseTrade
+from unified_api_contracts.external.databento.schemas import (
+    DATABENTO_PRICE_DIVISOR,
+    DatabentoTrade,
+)
+from unified_api_contracts.external.deribit.schemas import DeribitTrade
+from unified_api_contracts.external.okx.schemas import OKXTrade
+from unified_api_contracts.external.tardis.schemas import TardisTrade
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -418,12 +418,12 @@ class TestSymbolNormalizationParity:
         ],
     )
     def test_symbol_canonical_form(self, venue: str, raw: str, expected: str) -> None:
-        from unified_api_contracts.unified_normalised_contracts.normalize import normalize_symbol
+        from unified_api_contracts.canonical.normalize import normalize_symbol
 
         assert normalize_symbol(venue, raw) == expected
 
     def test_unknown_venue_passthrough(self) -> None:
-        from unified_api_contracts.unified_normalised_contracts.normalize import normalize_symbol
+        from unified_api_contracts.canonical.normalize import normalize_symbol
 
         assert normalize_symbol("unknown_venue", "btcusdt") == "BTCUSDT"
 
@@ -458,13 +458,13 @@ class TestSideNormalizationParity:
         ],
     )
     def test_side_canonical_form(self, raw: str | int | None, expected: str) -> None:
-        from unified_api_contracts.unified_normalised_contracts.normalize import normalize_side
+        from unified_api_contracts.canonical.normalize import normalize_side
 
         assert normalize_side(raw) == expected  # type: ignore[arg-type]
 
     def test_live_batch_side_agreement_binance(self) -> None:
         """BinanceTrade isBuyerMaker=True (seller is taker) must equal Tardis side='sell'."""
-        from unified_api_contracts.unified_normalised_contracts.normalize import normalize_side
+        from unified_api_contracts.canonical.normalize import normalize_side
 
         # isBuyerMaker=True → buyer is maker → seller is taker → side = "sell"
         binance_side = "sell" if True else "buy"  # mirrors normalize_binance_trade logic

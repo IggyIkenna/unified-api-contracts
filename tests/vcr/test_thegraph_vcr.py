@@ -7,18 +7,12 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-from unified_api_contracts.unified_api_contracts_external.thegraph.schemas import (
+from unified_api_contracts.external.thegraph.schemas import (
     SubgraphPool,
     TheGraphResponse,
 )
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "thegraph"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "thegraph" / "mocks"
 
 _POOLS_QUERY = (
     "{ pools(first: 2, orderBy: totalValueLockedUSD, orderDirection: desc)"

@@ -7,13 +7,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "binance"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "binance" / "mocks"
 
 
 def _make_vcr() -> VCR:
@@ -55,7 +49,7 @@ def test_binance_futures_ticker_fields() -> None:
 
 def test_binance_futures_ticker_schema() -> None:
     """Binance futures ticker validates against api-contracts BinanceFuturesTicker."""
-    from unified_api_contracts.unified_api_contracts_external.binance.market_schemas import (
+    from unified_api_contracts.external.binance.market_schemas import (
         BinanceTicker as BinanceFuturesTicker,
     )
 

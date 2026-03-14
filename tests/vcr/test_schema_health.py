@@ -21,7 +21,7 @@ import pytest
 import yaml as pyyaml
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXTERNAL_DIR = REPO_ROOT / "unified_api_contracts" / "unified_api_contracts_external"
+EXTERNAL_DIR = REPO_ROOT / "unified_api_contracts" / "external"
 YAML_PATH = REPO_ROOT / "unified_api_contracts" / "provider_api_versions.yaml"
 
 pytestmark = pytest.mark.integration
@@ -94,7 +94,7 @@ class TestBinanceSchemaHealth(_BaseSchemaHealthTest):
         cassette = EXTERNAL_DIR / "binance" / "mocks" / "ticker_24hr.yaml"
         if not cassette.exists():
             pytest.skip("Cassette not recorded yet")
-        from unified_api_contracts.unified_api_contracts_external.binance.market_schemas import (
+        from unified_api_contracts.external.binance.market_schemas import (
             BinanceTicker as BinanceFuturesTicker,
         )
 

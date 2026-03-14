@@ -10,9 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent / "unified_api_contracts" / "unified_api_contracts_external" / "mexc" / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "mexc" / "mocks"
 
 
 def test_mexc_cassette() -> None:
@@ -39,7 +37,7 @@ def test_mexc_response_is_dict() -> None:
 
 def test_mexc_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.mexc.schemas import MexcTicker
+    from unified_api_contracts.external.mexc.schemas import MexcTicker
 
     cassette_path = CASSETTE_DIR / "ticker.yaml"
     assert cassette_path.exists()

@@ -17,13 +17,7 @@ import httpx
 import pytest
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "tardis"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "tardis" / "mocks"
 
 _TARDIS_API_KEY = os.environ.get("TARDIS_API_KEY", "")
 _HAS_TARDIS_KEY = bool(_TARDIS_API_KEY)

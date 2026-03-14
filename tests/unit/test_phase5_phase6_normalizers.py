@@ -1,8 +1,8 @@
-"""Unit tests for phase5 (bonds_fx, alt_data) and phase6 (market_state) normalizers.
+"""Unit tests for phase5 (tradfi, onchain) and phase6 (market_state) normalizers.
 
 Covers:
-- bonds_fx: FRED, ECB, OFR, OpenBB normalizers
-- alt_data: Glassnode, Arkham, Pyth, DeFiLlama normalizers
+- tradfi: FRED, ECB, OFR, OpenBB normalizers
+- onchain: Glassnode, Arkham, Pyth, DeFiLlama normalizers
 - market_state: Binance, Bybit, OKX, Deribit, Coinbase, IBKR, Kalshi, Betfair normalizers
 """
 
@@ -12,20 +12,20 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 # ---------------------------------------------------------------------------
-# bonds_fx — FRED
+# tradfi — FRED
 # ---------------------------------------------------------------------------
 
 
 class TestFredNormalizers:
     def test_normalize_fred_observation_valid(self):
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalYieldCurvePoint,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_observation,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredObservation,
         )
 
         raw = FredObservation(date="2024-01-15", value="4.25", series_id="DGS10")
@@ -39,11 +39,11 @@ class TestFredNormalizers:
         assert result.timestamp.tzinfo is not None
 
     def test_normalize_fred_observation_missing_sentinel(self):
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_observation,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredObservation,
         )
 
         raw = FredObservation(date="2024-01-15", value=".", series_id="DGS10")
@@ -51,11 +51,11 @@ class TestFredNormalizers:
         assert result is None
 
     def test_normalize_fred_observation_empty_value(self):
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_observation,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredObservation,
         )
 
         raw = FredObservation(date="2024-01-15", value="", series_id="DGS2")
@@ -63,11 +63,11 @@ class TestFredNormalizers:
         assert result is None
 
     def test_normalize_fred_observation_none_value(self):
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_observation,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredObservation,
         )
 
         raw = FredObservation(date="2024-01-15", value=None, series_id="DGS2")
@@ -75,15 +75,15 @@ class TestFredNormalizers:
         assert result is None
 
     def test_normalize_fred_series_response(self):
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredObservation,
-            FredSeriesObservationsResponse,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalYieldCurvePoint,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_series_response,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredObservation,
+            FredSeriesObservationsResponse,
         )
 
         obs = [
@@ -97,11 +97,11 @@ class TestFredNormalizers:
         assert all(isinstance(r, CanonicalYieldCurvePoint) for r in results)
 
     def test_normalize_fred_series_response_empty(self):
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredSeriesObservationsResponse,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_series_response,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredSeriesObservationsResponse,
         )
 
         raw = FredSeriesObservationsResponse(observations=[])
@@ -110,11 +110,11 @@ class TestFredNormalizers:
 
     def test_normalize_fred_observation_uses_raw_series_id(self):
         """series_id falls back to raw.series_id when not provided."""
-        from unified_api_contracts.unified_api_contracts_external.fred.schemas import (
-            FredObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_fred_observation,
+        )
+        from unified_api_contracts.external.fred.schemas import (
+            FredObservation,
         )
 
         raw = FredObservation(date="2024-03-01", value="5.0", series_id="DGS30")
@@ -124,20 +124,20 @@ class TestFredNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# bonds_fx — ECB
+# tradfi — ECB
 # ---------------------------------------------------------------------------
 
 
 class TestEcbNormalizers:
     def test_normalize_ecb_yield_curve_observation_full_date(self):
-        from unified_api_contracts.unified_api_contracts_external.ecb.schemas import (
-            EcbYieldCurveObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalYieldCurvePoint,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ecb_yield_curve_observation,
+        )
+        from unified_api_contracts.external.ecb.schemas import (
+            EcbYieldCurveObservation,
         )
 
         raw = EcbYieldCurveObservation(period="2024-06-15", value=3.5)
@@ -150,11 +150,11 @@ class TestEcbNormalizers:
         assert result.timestamp.day == 15
 
     def test_normalize_ecb_yield_curve_observation_year_month(self):
-        from unified_api_contracts.unified_api_contracts_external.ecb.schemas import (
-            EcbYieldCurveObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ecb_yield_curve_observation,
+        )
+        from unified_api_contracts.external.ecb.schemas import (
+            EcbYieldCurveObservation,
         )
 
         raw = EcbYieldCurveObservation(period="2024-06", value=3.5)
@@ -164,11 +164,11 @@ class TestEcbNormalizers:
         assert result.timestamp.day == 1  # defaults to first of month
 
     def test_normalize_ecb_yield_curve_observation_none_value(self):
-        from unified_api_contracts.unified_api_contracts_external.ecb.schemas import (
-            EcbYieldCurveObservation,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ecb_yield_curve_observation,
+        )
+        from unified_api_contracts.external.ecb.schemas import (
+            EcbYieldCurveObservation,
         )
 
         raw = EcbYieldCurveObservation(period="2024-06-15", value=None)
@@ -176,15 +176,15 @@ class TestEcbNormalizers:
         assert result is None
 
     def test_normalize_ecb_dataflow_response(self):
-        from unified_api_contracts.unified_api_contracts_external.ecb.schemas import (
-            EcbDataflowObservation,
-            EcbDataflowResponse,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalYieldCurvePoint,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ecb_dataflow_response,
+        )
+        from unified_api_contracts.external.ecb.schemas import (
+            EcbDataflowObservation,
+            EcbDataflowResponse,
         )
 
         # EcbDataflowObservation observations are dict[str, str]
@@ -199,11 +199,11 @@ class TestEcbNormalizers:
         assert all(r.currency == "EUR" for r in results)
 
     def test_normalize_ecb_dataflow_response_empty(self):
-        from unified_api_contracts.unified_api_contracts_external.ecb.schemas import (
-            EcbDataflowResponse,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ecb_dataflow_response,
+        )
+        from unified_api_contracts.external.ecb.schemas import (
+            EcbDataflowResponse,
         )
 
         raw = EcbDataflowResponse(data=[])
@@ -212,20 +212,20 @@ class TestEcbNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# bonds_fx — OFR CDS
+# tradfi — OFR CDS
 # ---------------------------------------------------------------------------
 
 
 class TestOfrNormalizers:
     def test_normalize_ofr_cds_spread_valid(self):
-        from unified_api_contracts.unified_api_contracts_external.ofr.schemas import (
-            OfrCdsSpreadIndex,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalCdsSpread,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ofr_cds_spread,
+        )
+        from unified_api_contracts.external.ofr.schemas import (
+            OfrCdsSpreadIndex,
         )
 
         raw = OfrCdsSpreadIndex(
@@ -244,11 +244,11 @@ class TestOfrNormalizers:
         assert result.sector == "IG"
 
     def test_normalize_ofr_cds_spread_none_value(self):
-        from unified_api_contracts.unified_api_contracts_external.ofr.schemas import (
-            OfrCdsSpreadIndex,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ofr_cds_spread,
+        )
+        from unified_api_contracts.external.ofr.schemas import (
+            OfrCdsSpreadIndex,
         )
 
         raw = OfrCdsSpreadIndex(date="2024-03-01", series_id="CDX.NA.IG", value=None)
@@ -256,15 +256,15 @@ class TestOfrNormalizers:
         assert result is None
 
     def test_normalize_ofr_cds_response(self):
-        from unified_api_contracts.unified_api_contracts_external.ofr.schemas import (
-            OfrCdsResponse,
-            OfrCdsSpreadIndex,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalCdsSpread,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_ofr_cds_response,
+        )
+        from unified_api_contracts.external.ofr.schemas import (
+            OfrCdsResponse,
+            OfrCdsSpreadIndex,
         )
 
         items = [
@@ -279,20 +279,20 @@ class TestOfrNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# bonds_fx — OpenBB Treasury
+# tradfi — OpenBB Treasury
 # ---------------------------------------------------------------------------
 
 
 class TestOpenBBNormalizers:
     def test_normalize_openbb_treasury_price_valid(self):
-        from unified_api_contracts.unified_api_contracts_external.openbb.schemas import (
-            OpenBBTreasuryPrice,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalBondData,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_openbb_treasury_price,
+        )
+        from unified_api_contracts.external.openbb.schemas import (
+            OpenBBTreasuryPrice,
         )
 
         raw = OpenBBTreasuryPrice(
@@ -312,11 +312,11 @@ class TestOpenBBNormalizers:
         assert result.yield_to_maturity == Decimal("4.25")
 
     def test_normalize_openbb_treasury_price_no_symbol_no_name(self):
-        from unified_api_contracts.unified_api_contracts_external.openbb.schemas import (
-            OpenBBTreasuryPrice,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_openbb_treasury_price,
+        )
+        from unified_api_contracts.external.openbb.schemas import (
+            OpenBBTreasuryPrice,
         )
 
         raw = OpenBBTreasuryPrice(symbol=None, name=None, date="2024-03-01")
@@ -324,15 +324,15 @@ class TestOpenBBNormalizers:
         assert result is None
 
     def test_normalize_openbb_treasury_prices_response(self):
-        from unified_api_contracts.unified_api_contracts_external.openbb.schemas import (
-            OpenBBTreasuryPrice,
-            OpenBBTreasuryPricesResponse,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalBondData,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.bonds_fx import (
+        from unified_api_contracts.canonical.normalize.tradfi import (
             normalize_openbb_treasury_prices_response,
+        )
+        from unified_api_contracts.external.openbb.schemas import (
+            OpenBBTreasuryPrice,
+            OpenBBTreasuryPricesResponse,
         )
 
         items = [
@@ -346,20 +346,20 @@ class TestOpenBBNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# alt_data — Glassnode
+# onchain — Glassnode
 # ---------------------------------------------------------------------------
 
 
 class TestGlassnodeNormalizers:
     def test_normalize_glassnode_mvrv(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            MvrvRatio,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_mvrv,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            MvrvRatio,
         )
 
         raw = MvrvRatio(timestamp=1704067200, mvrv=2.5)
@@ -372,14 +372,14 @@ class TestGlassnodeNormalizers:
         assert result.timestamp.tzinfo is not None
 
     def test_normalize_glassnode_timeseries_point(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            GlassnodeTimeseriesPoint,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_timeseries_point,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            GlassnodeTimeseriesPoint,
         )
 
         raw = GlassnodeTimeseriesPoint(t=1704067200, v=1234567890.0)
@@ -389,11 +389,11 @@ class TestGlassnodeNormalizers:
         assert result.asset == "ETH"
 
     def test_normalize_glassnode_timeseries_point_none_v(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            GlassnodeTimeseriesPoint,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_timeseries_point,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            GlassnodeTimeseriesPoint,
         )
 
         raw = GlassnodeTimeseriesPoint(t=1704067200, v=None)
@@ -401,14 +401,14 @@ class TestGlassnodeNormalizers:
         assert result is None
 
     def test_normalize_glassnode_sopr(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            SoprMetric,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_sopr,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            SoprMetric,
         )
 
         raw = SoprMetric(timestamp=1704067200, sopr=1.02)
@@ -417,11 +417,11 @@ class TestGlassnodeNormalizers:
         assert result.metric_type == "sopr"
 
     def test_normalize_glassnode_nvt(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            NvtRatio,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_nvt,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            NvtRatio,
         )
 
         raw = NvtRatio(timestamp=1704067200, nvt=55.0)
@@ -430,11 +430,11 @@ class TestGlassnodeNormalizers:
         assert result.metric_type == "nvt"
 
     def test_normalize_glassnode_nvt_signal(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            NvtSignal,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_nvt_signal,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            NvtSignal,
         )
 
         raw = NvtSignal(timestamp=1704067200, nvt_signal=65.0)
@@ -443,11 +443,11 @@ class TestGlassnodeNormalizers:
         assert result.metric_type == "nvt_signal"
 
     def test_normalize_glassnode_exchange_reserves(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            ExchangeReserves,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_exchange_reserves,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            ExchangeReserves,
         )
 
         raw = ExchangeReserves(timestamp=1704067200, asset="BTC", balance_sum=500000.0, net_flow_24h=-1000.0)
@@ -457,11 +457,11 @@ class TestGlassnodeNormalizers:
         assert result.secondary_value == Decimal("-1000.0")
 
     def test_normalize_glassnode_realized_cap(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            RealizedCap,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_realized_cap,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            RealizedCap,
         )
 
         raw = RealizedCap(timestamp=1704067200, realized_cap_usd=400000000000.0)
@@ -470,11 +470,11 @@ class TestGlassnodeNormalizers:
         assert result.metric_type == "realized_cap"
 
     def test_normalize_glassnode_thermocap(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            ThermoCap,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_thermocap,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            ThermoCap,
         )
 
         raw = ThermoCap(timestamp=1704067200, thermocap_usd=50000000000.0)
@@ -483,11 +483,11 @@ class TestGlassnodeNormalizers:
         assert result.metric_type == "thermocap"
 
     def test_normalize_glassnode_mvrv_z_score(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            MvrvZScore,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_mvrv_z_score,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            MvrvZScore,
         )
 
         raw = MvrvZScore(timestamp=1704067200, mvrv_z_score=1.5)
@@ -496,11 +496,11 @@ class TestGlassnodeNormalizers:
         assert result.metric_type == "mvrv_z_score"
 
     def test_normalize_glassnode_hodl_wave(self):
-        from unified_api_contracts.unified_api_contracts_external.glassnode.schemas import (
-            HodlWave,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_glassnode_hodl_wave,
+        )
+        from unified_api_contracts.external.glassnode.schemas import (
+            HodlWave,
         )
 
         raw = HodlWave(
@@ -525,20 +525,20 @@ class TestGlassnodeNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# alt_data — Arkham
+# onchain — Arkham
 # ---------------------------------------------------------------------------
 
 
 class TestArkhamNormalizers:
     def test_normalize_arkham_token_flow(self):
-        from unified_api_contracts.unified_api_contracts_external.arkham.schemas import (
-            ArkhamTokenFlow,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_arkham_token_flow,
+        )
+        from unified_api_contracts.external.arkham.schemas import (
+            ArkhamTokenFlow,
         )
 
         raw = ArkhamTokenFlow(
@@ -561,14 +561,14 @@ class TestArkhamNormalizers:
         assert result.venue == "arkham"
 
     def test_normalize_arkham_net_flow(self):
-        from unified_api_contracts.unified_api_contracts_external.arkham.schemas import (
-            ArkhamNetFlow,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_arkham_net_flow,
+        )
+        from unified_api_contracts.external.arkham.schemas import (
+            ArkhamNetFlow,
         )
 
         raw = ArkhamNetFlow(
@@ -586,11 +586,11 @@ class TestArkhamNormalizers:
         assert result.entity == "binance"
 
     def test_normalize_arkham_net_flow_none_net(self):
-        from unified_api_contracts.unified_api_contracts_external.arkham.schemas import (
-            ArkhamNetFlow,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_arkham_net_flow,
+        )
+        from unified_api_contracts.external.arkham.schemas import (
+            ArkhamNetFlow,
         )
 
         raw = ArkhamNetFlow(
@@ -606,14 +606,14 @@ class TestArkhamNormalizers:
         assert result is None
 
     def test_normalize_arkham_alert_event(self):
-        from unified_api_contracts.unified_api_contracts_external.arkham.schemas import (
-            ArkhamAlertEvent,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_arkham_alert_event,
+        )
+        from unified_api_contracts.external.arkham.schemas import (
+            ArkhamAlertEvent,
         )
 
         raw = ArkhamAlertEvent(
@@ -635,20 +635,20 @@ class TestArkhamNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# alt_data — Pyth
+# onchain — Pyth
 # ---------------------------------------------------------------------------
 
 
 class TestPythNormalizers:
     def test_normalize_pyth_price_feed_valid(self):
-        from unified_api_contracts.unified_api_contracts_external.pyth.schemas import (
-            PythPriceFeed,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOraclePriceFeed,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_pyth_price_feed,
+        )
+        from unified_api_contracts.external.pyth.schemas import (
+            PythPriceFeed,
         )
 
         # price = 4200000 * 10^-2 = 42000.00
@@ -666,11 +666,11 @@ class TestPythNormalizers:
         assert result.timestamp.tzinfo is not None
 
     def test_normalize_pyth_price_feed_none_price(self):
-        from unified_api_contracts.unified_api_contracts_external.pyth.schemas import (
-            PythPriceFeed,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_pyth_price_feed,
+        )
+        from unified_api_contracts.external.pyth.schemas import (
+            PythPriceFeed,
         )
 
         raw = PythPriceFeed(
@@ -684,11 +684,11 @@ class TestPythNormalizers:
         assert result is None
 
     def test_normalize_pyth_price_feed_negative_expo(self):
-        from unified_api_contracts.unified_api_contracts_external.pyth.schemas import (
-            PythPriceFeed,
-        )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_pyth_price_feed,
+        )
+        from unified_api_contracts.external.pyth.schemas import (
+            PythPriceFeed,
         )
 
         # price = 1000 * 10^-8 = 0.00001000
@@ -705,20 +705,20 @@ class TestPythNormalizers:
 
 
 # ---------------------------------------------------------------------------
-# alt_data — DeFiLlama
+# onchain — DeFiLlama
 # ---------------------------------------------------------------------------
 
 
 class TestDefiLlamaNormalizers:
     def test_normalize_defillama_protocol(self):
-        from unified_api_contracts.unified_api_contracts_external.defillama.schemas import (
-            DefiLlamaProtocol,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_defillama_protocol,
+        )
+        from unified_api_contracts.external.defillama.schemas import (
+            DefiLlamaProtocol,
         )
 
         raw = DefiLlamaProtocol(
@@ -736,14 +736,14 @@ class TestDefiLlamaNormalizers:
         assert result.venue == "defillama"
 
     def test_normalize_defillama_chain_tvl(self):
-        from unified_api_contracts.unified_api_contracts_external.defillama.schemas import (
-            DefiLlamaChainTvl,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_defillama_chain_tvl,
+        )
+        from unified_api_contracts.external.defillama.schemas import (
+            DefiLlamaChainTvl,
         )
 
         # DefiLlamaChainTvl uses `name` for chain name
@@ -754,14 +754,14 @@ class TestDefiLlamaNormalizers:
         assert result.chain == "Ethereum"
 
     def test_normalize_defillama_tvl_history_point(self):
-        from unified_api_contracts.unified_api_contracts_external.defillama.schemas import (
-            DefiLlamaTvlHistoryPoint,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_defillama_tvl_history_point,
+        )
+        from unified_api_contracts.external.defillama.schemas import (
+            DefiLlamaTvlHistoryPoint,
         )
 
         raw = DefiLlamaTvlHistoryPoint(date=1704067200, totalLiquidityUSD=28000000000.0)
@@ -771,14 +771,14 @@ class TestDefiLlamaNormalizers:
         assert result.entity == "Aave"
 
     def test_normalize_defillama_yield_pool(self):
-        from unified_api_contracts.unified_api_contracts_external.defillama.schemas import (
-            DefiLlamaYieldPool,
-        )
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalOnChainMetric,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.alt_data import (
+        from unified_api_contracts.canonical.normalize.onchain import (
             normalize_defillama_yield_pool,
+        )
+        from unified_api_contracts.external.defillama.schemas import (
+            DefiLlamaYieldPool,
         )
 
         raw = DefiLlamaYieldPool(
@@ -802,11 +802,11 @@ class TestDefiLlamaNormalizers:
 
 class TestMarketStateNormalizers:
     def test_normalize_binance_trading(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import (
+        from unified_api_contracts.canonical.domain import (
             CanonicalMarketStateEvent,
             MarketState,
         )
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -817,8 +817,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "binance:SPOT:BTCUSDT"
 
     def test_normalize_binance_halt(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -826,8 +826,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.HALTED
 
     def test_normalize_binance_auction_match(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -835,8 +835,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.AUCTION
 
     def test_normalize_binance_pre_trading(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -844,8 +844,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.PRE_MARKET
 
     def test_normalize_bybit_trading(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_bybit_market_state,
         )
 
@@ -854,8 +854,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "bybit:PERPETUAL:BTCUSDT"
 
     def test_normalize_bybit_closed(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_bybit_market_state,
         )
 
@@ -863,8 +863,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.CLOSED
 
     def test_normalize_okx_live(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_okx_market_state,
         )
 
@@ -873,8 +873,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "okx:PERPETUAL:BTC-USDT-SWAP"
 
     def test_normalize_okx_suspend(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_okx_market_state,
         )
 
@@ -882,8 +882,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.HALTED
 
     def test_normalize_deribit_open(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_deribit_market_state,
         )
 
@@ -891,8 +891,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.NORMAL
 
     def test_normalize_deribit_closed(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_deribit_market_state,
         )
 
@@ -900,8 +900,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.CLOSED
 
     def test_normalize_coinbase_online(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_coinbase_market_state,
         )
 
@@ -910,8 +910,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "coinbase:SPOT:BTC-USD"
 
     def test_normalize_coinbase_offline(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_coinbase_market_state,
         )
 
@@ -919,8 +919,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.HALTED
 
     def test_normalize_ibkr_open(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_ibkr_market_state,
         )
 
@@ -929,8 +929,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "ibkr:SPOT:AAPL"
 
     def test_normalize_ibkr_afterhours(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_ibkr_market_state,
         )
 
@@ -938,7 +938,7 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.POST_MARKET
 
     def test_normalize_ibkr_futures_type_map(self):
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_ibkr_market_state,
         )
 
@@ -946,8 +946,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "ibkr:FUTURE:ES"
 
     def test_normalize_kalshi_open(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_kalshi_market_state,
         )
 
@@ -956,8 +956,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "kalshi:PREDICTION:BTCZ-25JAN31-T50000"
 
     def test_normalize_kalshi_paused(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_kalshi_market_state,
         )
 
@@ -965,8 +965,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.HALTED
 
     def test_normalize_betfair_open(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_betfair_market_state,
         )
 
@@ -975,8 +975,8 @@ class TestMarketStateNormalizers:
         assert result.instrument_key == "betfair:MARKET:1.234567"
 
     def test_normalize_betfair_suspended(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_betfair_market_state,
         )
 
@@ -984,8 +984,8 @@ class TestMarketStateNormalizers:
         assert result.state == MarketState.HALTED
 
     def test_normalize_betfair_inactive_pre_market(self):
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_betfair_market_state,
         )
 
@@ -994,7 +994,7 @@ class TestMarketStateNormalizers:
 
     def test_normalize_market_state_with_timestamp(self):
         """Custom timestamp propagates correctly."""
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -1004,8 +1004,8 @@ class TestMarketStateNormalizers:
 
     def test_normalize_market_state_with_previous_state(self):
         """previous_state field propagates."""
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -1020,8 +1020,8 @@ class TestMarketStateNormalizers:
 
     def test_normalize_market_state_case_insensitive(self):
         """State lookup is case-insensitive (raw_state.upper())."""
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 
@@ -1030,8 +1030,8 @@ class TestMarketStateNormalizers:
 
     def test_normalize_market_state_unknown_falls_back_to_normal(self):
         """Unknown states fall back to NORMAL per generic helper default."""
-        from unified_api_contracts.unified_normalised_contracts.domain import MarketState
-        from unified_api_contracts.unified_normalised_contracts.normalize.market_state import (
+        from unified_api_contracts.canonical.domain import MarketState
+        from unified_api_contracts.canonical.normalize.market_state import (
             normalize_binance_market_state,
         )
 

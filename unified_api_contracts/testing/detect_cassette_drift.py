@@ -6,7 +6,7 @@ available). Writes a JSON report and exits 0 (no drift) or 1 (drift detected).
 
 Usage:
     python -m unified_api_contracts.testing.detect_cassette_drift \\
-        --cassette-dir unified-api-contracts/unified_api_contracts_external \\
+        --cassette-dir unified-api-contracts/external \\
         --output-json drift_report.json
 
     python -m unified_api_contracts.testing.detect_cassette_drift \\

@@ -14,7 +14,7 @@ import yaml
 logger = logging.getLogger(__name__)
 
 # Path to mock files
-MOCKS_DIR = Path(__file__).parent.parent / "unified_api_contracts" / "yahoo_finance" / "mocks"
+MOCKS_DIR = Path(__file__).parent.parent / "unified_api_contracts" / "external" / "yahoo_finance" / "mocks"
 
 
 def load_mock_data(mock_file: str) -> dict[str, object]:

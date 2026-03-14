@@ -1,15 +1,31 @@
-"""API contract schemas."""
+"""API contract schemas — re-exports from canonical locations."""
 
-from .accounts import (
+from unified_api_contracts.canonical.domain.account import (
+    BinanceWithdrawRequest,
+    BinanceWithdrawResponse,
+    BybitWithdrawRequest,
+    BybitWithdrawResponse,
+    CoinbaseWithdrawRequest,
+    CoinbaseWithdrawResponse,
     DepositAddress,
     DepositRecord,
+    Erc20TransferCalldata,
+    Erc20TransferFromCalldata,
+    EthSendRawTransactionRequest,
+    EthSendRawTransactionResponse,
+    EthSendTransactionRequest,
+    EthTransactionRequest,
     ExchangeFeeSchedule,
     InternalTransfer,
+    OKXWithdrawRequest,
+    OKXWithdrawResponse,
     PortfolioMarginAccount,
     SubAccount,
+    UpbitWithdrawRequest,
+    UpbitWithdrawResponse,
     WithdrawalRecord,
 )
-from .analytics import (
+from unified_api_contracts.canonical.domain.analytics import (
     AlternativeDataSignal,
     AlternativeDataType,
     CorrelationRegime,
@@ -24,54 +40,34 @@ from .analytics import (
     SatelliteObservation,
     SentimentScore,
 )
-from .cex_withdrawals import (
-    BinanceWithdrawRequest,
-    BinanceWithdrawResponse,
-    BybitWithdrawRequest,
-    BybitWithdrawResponse,
-    CoinbaseWithdrawRequest,
-    CoinbaseWithdrawResponse,
-    OKXWithdrawRequest,
-    OKXWithdrawResponse,
-    UpbitWithdrawRequest,
-    UpbitWithdrawResponse,
+from unified_api_contracts.canonical.domain.connectivity import (
+    HealthPingResponse,
+    HeartbeatMessage,
+    SubscribeRequest,
+    UnsubscribeRequest,
+    WebSocketConnectionClosed,
+    WebSocketConnectionOpened,
+    WebSocketConnectionState,
+    WebSocketPingFrame,
+    WebSocketPongFrame,
 )
-from .commodity import CommoditySignal, FactorValue, RegimeState
-from .defi import LendingRate, LiquidityPool, OraclePrice, StakingRate, Swap
-from .derivatives import (
+from unified_api_contracts.canonical.domain.derivatives import (
     ComboLeg,
     ComboQuote,
     ComboStrategyType,
-    FundingRate,
     FundingRateHistory,
     InsuranceFundState,
-    Liquidation,
     LongShortRatio,
     MultiLegInstrument,
     OpenInterestHistory,
-    OptionContract,
-    OptionGreeks,
-    OptionsChain,
     PositionRisk,
     SettlementEvent,
-    SettlementPrice,
     VolSmilePoint,
     VolSurface,
     VolSurfaceSlice,
     VolTermStructure,
 )
-from .errors import (
-    DATABENTO_ERROR_MAP,
-    VENUE_ERROR_MAP,
-    DatabentoError,
-    ErrorAction,
-    RateLimitResponse,
-    VenueErrorClassification,
-    WebSocketCloseInfo,
-    classify_venue_error,
-)
-from .health import ServiceHealthResponse
-from .latency import (
+from unified_api_contracts.canonical.domain.latency import (
     CoLocationPerformanceMetric,
     LatencyBenchmarkReport,
     LatencyComponent,
@@ -81,7 +77,34 @@ from .latency import (
     SubMillisecondLatencyRecord,
     TickToTradeMetric,
 )
-from .prediction_market_arb import (
+from unified_api_contracts.canonical.domain.rate_limits import (
+    HttpRateLimitHeaders,
+    VenueRateLimitSpec,
+)
+from unified_api_contracts.canonical.domain.risk import (
+    MultiAssetMarginCalculation,
+    PnLAttributionRecord,
+    RealTimePnLRecord,
+    RiskLimitBreach,
+    SpanMarginLeg,
+    StressScenario,
+    StressTestResult,
+    VaRMethod,
+    VaRRequest,
+    VaRResult,
+)
+from unified_api_contracts.canonical.errors import (
+    DATABENTO_ERROR_MAP,
+    VENUE_ERROR_MAP,
+    DatabentoError,
+    ErrorAction,
+    RateLimitResponse,
+    VenueErrorClassification,
+    WebSocketCloseInfo,
+    classify_venue_error,
+)
+from unified_api_contracts.config.venue_rate_limits import VENUE_RATE_LIMITS
+from unified_api_contracts.external.polymarket.arb_schemas import (
     BucketMarket,
     CrossVenueArbLeg,
     CrossVenueArbSignal,
@@ -92,7 +115,7 @@ from .prediction_market_arb import (
     ProbabilityBucket,
     SportsbookLink,
 )
-from .protocol_sdks import (
+from unified_api_contracts.external.protocol_sdks.schemas import (
     AaveBorrowParams,
     AaveDepositParams,
     AaveFlashLoanParams,
@@ -129,42 +152,6 @@ from .protocol_sdks import (
     UniswapV3QuoteResponse,
     UniswapV3SwapTxReceipt,
 )
-from .rate_limits import (
-    VENUE_RATE_LIMITS,
-    HttpRateLimitHeaders,
-    VenueRateLimitSpec,
-)
-from .risk import (
-    MultiAssetMarginCalculation,
-    PnLAttributionRecord,
-    RealTimePnLRecord,
-    RiskLimitBreach,
-    SpanMarginLeg,
-    StressScenario,
-    StressTestResult,
-    VaRMethod,
-    VaRRequest,
-    VaRResult,
-)
-from .transfers import (
-    Erc20TransferCalldata,
-    Erc20TransferFromCalldata,
-    EthSendRawTransactionRequest,
-    EthSendRawTransactionResponse,
-    EthSendTransactionRequest,
-    EthTransactionRequest,
-)
-from .websocket import (
-    HealthPingResponse,
-    HeartbeatMessage,
-    SubscribeRequest,
-    UnsubscribeRequest,
-    WebSocketConnectionClosed,
-    WebSocketConnectionOpened,
-    WebSocketConnectionState,
-    WebSocketPingFrame,
-    WebSocketPongFrame,
-)
 
 __all__ = [
     "DATABENTO_ERROR_MAP",
@@ -190,7 +177,6 @@ __all__ = [
     "ComboLeg",
     "ComboQuote",
     "ComboStrategyType",
-    "CommoditySignal",
     "CompoundV3MarketInfo",
     "CompoundV3UserPosition",
     "CorrelationRegime",
@@ -225,11 +211,9 @@ __all__ = [
     "FactorAttributionRecord",
     "FactorExposure",
     "FactorType",
-    "FactorValue",
     "FluidBorrowParams",
     "FluidDepositParams",
     "FluidRepayParams",
-    "FundingRate",
     "FundingRateHistory",
     "HealthPingResponse",
     "HeartbeatMessage",
@@ -239,13 +223,10 @@ __all__ = [
     "LatencyBenchmarkReport",
     "LatencyComponent",
     "LatencyPercentile",
-    "LendingRate",
     "LidoRequestWithdrawalsParams",
     "LidoSubmitParams",
     "LidoSubmitResponse",
     "LidoWstEthWrapResponse",
-    "Liquidation",
-    "LiquidityPool",
     "LongShortRatio",
     "MorphoBorrowParams",
     "MorphoFlashLoanParams",
@@ -261,11 +242,7 @@ __all__ = [
     "OKXWithdrawRequest",
     "OKXWithdrawResponse",
     "OpenInterestHistory",
-    "OptionContract",
-    "OptionGreeks",
-    "OptionsChain",
     "OptionsFlowRecord",
-    "OraclePrice",
     "OrderLatencyRecord",
     "PnLAttributionRecord",
     "PortfolioMarginAccount",
@@ -274,22 +251,17 @@ __all__ = [
     "ProbabilityBucket",
     "RateLimitResponse",
     "RealTimePnLRecord",
-    "RegimeState",
     "RiskLimitBreach",
     "SatelliteObservation",
     "SentimentScore",
-    "ServiceHealthResponse",
     "SettlementEvent",
-    "SettlementPrice",
     "SpanMarginLeg",
     "SportsbookLink",
-    "StakingRate",
     "StressScenario",
     "StressTestResult",
     "SubAccount",
     "SubMillisecondLatencyRecord",
     "SubscribeRequest",
-    "Swap",
     "TickToTradeMetric",
     "UniswapV3PoolStateResponse",
     "UniswapV3QuoteResponse",

@@ -11,7 +11,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.sources.soccer_football_info.schemas import (
+from unified_api_contracts.external.sports.sources.soccer_football_info.schemas import (
     SFLeagueRaw,
     SFMatchDominanceRaw,
     SFMatchEventRaw,
@@ -545,7 +545,7 @@ class TestSFMatchProgressiveOddsRaw:
 
 class TestImportSmoke:
     def test_all_raw_models_importable_from_package(self) -> None:
-        import unified_api_contracts.unified_api_contracts_external.sports.sources.soccer_football_info as sfi_pkg
+        import unified_api_contracts.external.sports.sources.soccer_football_info as sfi_pkg
 
         # Verify package re-exports resolve to the same classes
         assert sfi_pkg.SFLeagueRaw is SFLeagueRaw
@@ -557,7 +557,7 @@ class TestImportSmoke:
         assert sfi_pkg.SFMatchProgressiveOddsRaw is SFMatchProgressiveOddsRaw
 
     def test_all_clean_models_importable_from_package(self) -> None:
-        import unified_api_contracts.unified_api_contracts_external.sports.sources.soccer_football_info as sfi_pkg
+        import unified_api_contracts.external.sports.sources.soccer_football_info as sfi_pkg
 
         assert sfi_pkg.SFILeague is not None
         assert sfi_pkg.SFIMatch is not None

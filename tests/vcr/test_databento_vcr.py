@@ -17,13 +17,7 @@ import httpx
 import pytest
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "databento"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "databento" / "mocks"
 
 _DATABENTO_API_KEY = os.environ.get("DATABENTO_API_KEY", "")
 _HAS_DATABENTO_KEY = bool(_DATABENTO_API_KEY)

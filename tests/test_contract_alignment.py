@@ -106,37 +106,37 @@ class TestACSports:
     """Sports-betting schemas in unified_api_contracts.sports."""
 
     def test_odds_type_enum(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import OddsType
+        from unified_api_contracts.external.sports import OddsType
 
         values = list(OddsType)
         assert len(values) > 0
 
     def test_outcome_type_enum(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import OutcomeType
+        from unified_api_contracts.external.sports import OutcomeType
 
         values = list(OutcomeType)
         assert len(values) > 0
 
     def test_bookmaker_category_enum(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import BookmakerCategory
+        from unified_api_contracts.external.sports import BookmakerCategory
 
         values = list(BookmakerCategory)
         assert len(values) > 0
 
     def test_arbitrage_status_enum(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import ArbitrageStatus
+        from unified_api_contracts.external.sports import ArbitrageStatus
 
         values = list(ArbitrageStatus)
         assert len(values) > 0
 
     def test_bet_status_enum(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import BetStatus
+        from unified_api_contracts.external.sports import BetStatus
 
         values = list(BetStatus)
         assert len(values) > 0
 
     def test_bookmaker_registry_populated(self) -> None:
-        from unified_api_contracts.unified_api_contracts_external.sports import BOOKMAKER_REGISTRY
+        from unified_api_contracts.external.sports import BOOKMAKER_REGISTRY
 
         assert isinstance(BOOKMAKER_REGISTRY, dict), "BOOKMAKER_REGISTRY must be a dict"
         assert len(BOOKMAKER_REGISTRY) > 0, "Registry must contain at least one bookmaker"
@@ -165,9 +165,9 @@ class TestNoAnyAnnotations:
     @pytest.mark.parametrize(
         "module_path",
         [
-            "unified_api_contracts.unified_normalised_contracts.domain",
-            "unified_api_contracts.unified_normalised_contracts.execution",
-            "unified_api_contracts.unified_normalised_contracts.errors",
+            "unified_api_contracts.canonical.domain",
+            "unified_api_contracts.canonical.execution",
+            "unified_api_contracts.canonical.errors",
         ],
     )
     def test_no_bare_any_in_normalised_models(self, module_path: str) -> None:

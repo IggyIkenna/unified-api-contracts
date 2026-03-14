@@ -8,24 +8,24 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.arbitrage import (
+from unified_api_contracts.external.sports.canonical.arbitrage import (
     ArbitrageMarket,
     ArbitrageOpportunity,
     ArbitrageStatus,
     ExpectedValue,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.betting import (
+from unified_api_contracts.external.sports.canonical.betting import (
     BetExecution,
     BetOrder,
     BetStatus,
     BettingSignal,
     SignalSource,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import (
+from unified_api_contracts.external.sports.canonical.bookmaker import (
     BookmakerCategory,
     BookmakerInfo,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.fixture import (
+from unified_api_contracts.external.sports.canonical.fixture import (
     CanonicalFixture,
     CanonicalLeague,
     CanonicalPlayer,
@@ -33,7 +33,7 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.fixtu
     CanonicalTeam,
     CanonicalVenue,
 )
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.odds import (
+from unified_api_contracts.external.sports.canonical.odds import (
     CanonicalBookmakerMarket,
     CanonicalOdds,
     MarketStatus,

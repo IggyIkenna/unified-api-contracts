@@ -7,7 +7,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.sources.footystats.schemas import (
+from unified_api_contracts.external.sports.sources.footystats.schemas import (
     FTLeagueStatsRaw,
     FTLineupEventRaw,
     FTLineupRaw,

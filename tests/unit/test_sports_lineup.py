@@ -8,7 +8,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.lineup import (
+from unified_api_contracts.external.sports.canonical.lineup import (
     CanonicalLineup,
     LineupPlayer,
 )

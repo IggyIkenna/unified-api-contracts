@@ -19,12 +19,12 @@ Pydantic schemas, example JSON, and VCR cassette directories for external APIs u
 
 ```
 unified_api_contracts/
-├── unified_api_contracts_external/     # Raw: request, response, errors per venue
+├── external/     # Raw: request, response, errors per venue
 │   ├── binance/
 │   ├── databento/
 │   ├── tardis/
 │   └── ...
-├── unified_normalised_contracts/  # Canonical: domain, execution, errors
+├── canonical/  # Canonical: domain, execution, errors
 │   ├── domain.py
 │   ├── execution.py
 │   ├── errors.py
@@ -34,7 +34,7 @@ unified_api_contracts/
 └── ...
 ```
 
-Per-venue directories (under `unified_api_contracts_external/`) contain:
+Per-venue directories (under `external/`) contain:
 
 - `schemas.py` — Pydantic models for request/response shapes.
 - `examples/` — Captured JSON (or CSV) from real or trial API calls.
@@ -68,7 +68,7 @@ from unified_api_contracts.databento.schemas import DatabentoTrade
 # validate raw response then map to canonical types
 ```
 
-**Backward compat:** `unified_api_contracts.binance`, `unified_api_contracts.databento`, etc. are aliased to `unified_api_contracts.unified_api_contracts_external.*`. Prefer `unified_api_contracts.unified_normalised_contracts` for canonical schemas.
+**Backward compat:** `unified_api_contracts.binance`, `unified_api_contracts.databento`, etc. are aliased to `unified_api_contracts.external.*`. Prefer `unified_api_contracts.canonical` for canonical schemas.
 
 ## Self-test: schemas and coverage
 

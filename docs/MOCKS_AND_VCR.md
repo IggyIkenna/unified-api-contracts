@@ -53,7 +53,7 @@ WebSocket: if the test library supports recording WS frames, store under the sam
 
 **VCR recording is done in the six interfaces** (unified-market-interface, unified-trade-execution-interface, unified-sports-execution-interface, unified-reference-data-interface, unified-position-interface, unified-cloud-interface); they hold API keys. Do not run recording scripts from unified-api-contracts.
 
-**Contributing cassettes to AC:** Interfaces contribute cassettes to AC’s `mocks/` **via PR** (recommended) so one canonical location is used for replay and by all consumers. Run the interface’s recording script, then open a PR against unified-api-contracts adding/updating `unified_api_contracts_external/<venue>/mocks/*.yaml`. **SSOT:** `unified-trading-codex/02-data/vcr-cassette-ownership.md` (see “Contributing cassettes to AC mocks/ via PR”). Replay tests in AC (`tests/test_vcr_replay.py`) validate each recorded response; CI runs replay only (no live requests, no keys).
+**Contributing cassettes to AC:** Interfaces contribute cassettes to AC’s `mocks/` **via PR** (recommended) so one canonical location is used for replay and by all consumers. Run the interface’s recording script, then open a PR against unified-api-contracts adding/updating `external/<venue>/mocks/*.yaml`. **SSOT:** `unified-trading-codex/02-data/vcr-cassette-ownership.md` (see “Contributing cassettes to AC mocks/ via PR”). Replay tests in AC (`tests/test_vcr_replay.py`) validate each recorded response; CI runs replay only (no live requests, no keys).
 
 ## References
 

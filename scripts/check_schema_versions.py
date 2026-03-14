@@ -1,6 +1,6 @@
 """Check that schema_version field defaults match their module-level version constants.
 
-Scans UAC unified_normalised_contracts/domain.py and execution.py for:
+Scans UAC canonical/domain.py and execution.py for:
   - CANONICAL_*_VERSION = "x.y.z" constants
   - Pydantic class fields: schema_version: str = CANONICAL_*_VERSION
 
@@ -24,12 +24,21 @@ from pathlib import Path
 logger = logging.getLogger(__name__)
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
-_NORMALISED = _REPO_ROOT / "unified_api_contracts" / "unified_normalised_contracts"
+_NORMALISED = _REPO_ROOT / "unified_api_contracts" / "canonical"
 
-_FILES = [
-    _NORMALISED / "domain.py",
-    _NORMALISED / "execution.py",
-]
+def _get_files() -> list[Path]:
+    """Collect all canonical schema files that may contain CANONICAL_*_VERSION constants."""
+    files: list[Path] = []
+    domain_dir = _NORMALISED / "domain"
+    if domain_dir.is_dir():
+        files.extend(f for f in sorted(domain_dir.glob("*.py")) if not f.name.startswith("_"))
+    execution = _NORMALISED / "execution.py"
+    if execution.exists():
+        files.append(execution)
+    return files
+
+
+_FILES = _get_files()
 
 _QUIET = "--quiet" in sys.argv
 

@@ -14,7 +14,7 @@ import pytest
 
 def test_prediction_market_arb_schemas() -> None:
     """Test CrossVenueLink, ProbabilityBucket, BucketMarket, SportsbookLink, NegRiskArbSignal."""
-    from unified_api_contracts.schemas.prediction_market_arb import (
+    from unified_api_contracts.external.polymarket.arb_schemas import (
         BucketMarket,
         CrossVenueLink,
         NegRiskArbSignal,
@@ -156,7 +156,7 @@ def test_validate_examples_if_present() -> None:
 
                     CcxtOrder.model_validate(data)
                     validated += 1
-        elif api_dir.name == "unified_api_contracts_external":
+        elif api_dir.name == "external":
             for vendor_dir in api_dir.iterdir():
                 if not vendor_dir.is_dir():
                     continue

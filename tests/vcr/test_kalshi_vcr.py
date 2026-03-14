@@ -7,18 +7,12 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-from unified_api_contracts.unified_api_contracts_external.kalshi.schemas import (
+from unified_api_contracts.external.kalshi.schemas import (
     KalshiMarket,
     KalshiOrderBook,
 )
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "kalshi"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "kalshi" / "mocks"
 
 
 def test_kalshi_markets_cassette() -> None:

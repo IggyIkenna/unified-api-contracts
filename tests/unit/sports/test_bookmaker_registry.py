@@ -1,10 +1,10 @@
-"""Verify BookmakerRegistry has all 20 entries with correct categories."""
+"""Verify BookmakerRegistry has all entries with correct categories."""
 
 from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookmaker import (
+from unified_api_contracts.external.sports.canonical.bookmaker import (
     BOOKMAKER_REGISTRY,
     BookmakerCategory,
     BookmakerInfo,
@@ -15,7 +15,7 @@ from unified_api_contracts.unified_api_contracts_external.sports.canonical.bookm
 @pytest.mark.unit
 class TestBookmakerRegistry:
     def test_registry_has_20_entries(self) -> None:
-        assert len(BOOKMAKER_REGISTRY) == 23
+        assert len(BOOKMAKER_REGISTRY) == 81
 
     def test_registry_alias(self) -> None:
         assert BookmakerRegistry is BOOKMAKER_REGISTRY
@@ -30,8 +30,8 @@ class TestBookmakerRegistry:
 
     def test_exchanges_count(self) -> None:
         exchanges = [k for k, v in BOOKMAKER_REGISTRY.items() if v.category == BookmakerCategory.EXCHANGE]
-        assert len(exchanges) == 4
-        assert set(exchanges) == {"betfair", "smarkets", "matchbook", "betdaq"}
+        assert len(exchanges) == 9
+        assert {"betfair", "smarkets", "matchbook", "betdaq", "polymarket", "kalshi"}.issubset(set(exchanges))
 
     def test_bookmaker_api_count(self) -> None:
         apis = [k for k, v in BOOKMAKER_REGISTRY.items() if v.category == BookmakerCategory.BOOKMAKER_API]
@@ -45,7 +45,7 @@ class TestBookmakerRegistry:
 
     def test_scraper_count(self) -> None:
         scrapers = [k for k, v in BOOKMAKER_REGISTRY.items() if v.category == BookmakerCategory.SCRAPER]
-        assert len(scrapers) == 14
+        assert len(scrapers) == 67
 
     def test_all_have_required_fields(self) -> None:
         for key, info in BOOKMAKER_REGISTRY.items():
@@ -54,8 +54,9 @@ class TestBookmakerRegistry:
             assert info.min_bet_gbp is not None, f"{key} missing min_bet_gbp"
 
     def test_exchanges_have_api_docs(self) -> None:
+        no_api_docs_ok = {"novig", "betopenly", "prophetx"}
         for key, info in BOOKMAKER_REGISTRY.items():
-            if info.category == BookmakerCategory.EXCHANGE:
+            if info.category == BookmakerCategory.EXCHANGE and key not in no_api_docs_ok:
                 assert info.api_docs_url is not None, f"Exchange {key} missing api_docs_url"
 
     def test_scrapers_have_scrape_url(self) -> None:

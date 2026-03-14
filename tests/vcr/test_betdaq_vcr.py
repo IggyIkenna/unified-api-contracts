@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "betdaq"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "betdaq" / "mocks"
 
 
 def test_betdaq_markets_cassette() -> None:
@@ -58,7 +52,7 @@ def test_betdaq_market_fields() -> None:
 
 def test_betdaq_market_schema() -> None:
     """Betdaq market validates against api-contracts BetdaqMarket."""
-    from unified_api_contracts.unified_api_contracts_external.betdaq.schemas import BetdaqMarket
+    from unified_api_contracts.external.betdaq.schemas import BetdaqMarket
 
     cassette_path = CASSETTE_DIR / "betdaq_get_markets.yaml"
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"

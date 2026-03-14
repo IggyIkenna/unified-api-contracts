@@ -10,13 +10,7 @@ from pathlib import Path
 import httpx
 from vcr import VCR
 
-CASSETTE_DIR = (
-    Path(__file__).parent.parent.parent
-    / "unified_api_contracts"
-    / "unified_api_contracts_external"
-    / "predictit"
-    / "mocks"
-)
+CASSETTE_DIR = Path(__file__).parent.parent.parent / "unified_api_contracts" / "external" / "predictit" / "mocks"
 
 
 def test_predictit_cassette() -> None:
@@ -44,7 +38,7 @@ def test_predictit_response_structure() -> None:
 
 def test_predictit_schema_validation() -> None:
     """Response validates against api-contracts schema."""
-    from unified_api_contracts.unified_api_contracts_external.predictit.schemas import (
+    from unified_api_contracts.external.predictit.schemas import (
         PredictItMarket,
     )
 
