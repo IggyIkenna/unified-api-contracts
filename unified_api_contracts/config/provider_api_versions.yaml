@@ -6,6 +6,10 @@
 #   green  — schema validated against live API within last 90 days
 #   yellow — schema not verified recently (> 90 days) OR verification pending
 #   red    — known breaking change detected (schema mismatch with live API)
+#   dormant — no schemas.py exists; provider module is a placeholder
+#
+# cassette_status values (optional):
+#   pending — schemas.py exists but no VCR cassettes recorded yet
 #
 # Semver for schema version tracked in unified_normalised_contracts is separate
 # from this provider API version. See docs/canonical-schema-versioning.md.
@@ -20,8 +24,8 @@ providers:
     api_version: "v3"
     spec_url: "https://docs.alchemy.com/reference/api-overview"
     ui_docs_url: "https://dashboard.alchemy.com/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [live, historical]
     has_testnet: true
     testnet_keys_we_have: true
@@ -36,8 +40,8 @@ providers:
   api_football:
     api_version: "v3"
     spec_url: "https://www.api-football.com/documentation-v3"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [live, historical]
 
   arkham:
@@ -45,19 +49,21 @@ providers:
     spec_url: "https://codebook.arkham.com/reference/introduction"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   aster:
     api_version: "v2"
     spec_url: "https://aster.exchange/api-docs"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     modes: [live, historical]
 
   barchart:
     api_version: "v2"
     spec_url: "https://www.barchart.com/ondemand/api"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [historical]
 
   betdaq:
@@ -94,26 +100,26 @@ providers:
   bitfinex:
     api_version: "v2"
     spec_url: "https://docs.bitfinex.com/docs"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   bitget:
     api_version: "v2"
     spec_url: "https://www.bitget.com/api-doc/common/intro"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   bitstamp:
     api_version: "v2"
     spec_url: "https://www.bitstamp.net/api/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   bloxroute:
     api_version: "v1"
     spec_url: "https://docs.bloxroute.com/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [live, historical]
 
   bybit:
@@ -128,14 +134,15 @@ providers:
     spec_url: "https://docs.ccxt.com/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     modes: [historical]
     free_tier: true
 
   coinbase:
     api_version: "v3"
     spec_url: "https://docs.cdp.coinbase.com/coinbase-app/docs/welcome"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [live, historical]
 
   coingecko:
@@ -155,15 +162,15 @@ providers:
   defi:
     api_version: "v1"
     spec_url: ""
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     free_tier: true
 
   defillama:
     api_version: "v1"
     spec_url: "https://defillama.com/docs/api"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     free_tier: true
 
   deribit:
@@ -176,30 +183,30 @@ providers:
   dydx:
     api_version: "v4"
     spec_url: "https://docs.dydx.exchange/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   ecb:
     api_version: "v1"
     spec_url: "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [historical]
     free_tier: true
 
   fear_greed:
     api_version: "v1"
     spec_url: "https://alternative.me/crypto/fear-and-greed-index/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [historical]
     free_tier: true
 
   fix:
     api_version: "4.4"
     spec_url: "https://www.fixtrading.org/standards/fix-4-4/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     free_tier: true
 
   footystats:
@@ -207,39 +214,42 @@ providers:
     spec_url: "https://footystats.org/api/documentations"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     modes: [historical]
 
   fred:
     api_version: "v1"
     spec_url: "https://fred.stlouisfed.org/docs/api/fred/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
     modes: [historical]
 
   gateio:
     api_version: "v4"
     spec_url: "https://www.gate.io/docs/developers/apiv4/en/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   github:
     api_version: "v3"
     spec_url: "https://docs.github.com/en/rest"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   glassnode:
     api_version: "v1"
     spec_url: "https://docs.glassnode.com/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     modes: [historical]
 
   huobi:
     api_version: "v1"
     spec_url: "https://huobiapi.github.io/docs/spot/v1/en/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   hyperliquid:
     api_version: "v1"
@@ -254,12 +264,13 @@ providers:
     spec_url: "https://interactivebrokers.github.io/tws-api/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   instadapp:
     api_version: "v1"
     spec_url: "https://docs.instadapp.io/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   kalshi:
     api_version: "v2"
@@ -271,20 +282,20 @@ providers:
   kraken:
     api_version: "v1"
     spec_url: "https://docs.kraken.com/rest/"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   kucoin:
     api_version: "v3"
     spec_url: "https://www.kucoin.com/docs/rest/spot-trading/introduction"
-    last_verified: "2026-03-06"
-    status: yellow
+    last_verified: "2026-03-15"
+    status: green
 
   macro:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
-    status: yellow
+    status: dormant
     free_tier: true
 
   manifold:
