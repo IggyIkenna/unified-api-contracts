@@ -299,7 +299,6 @@ ZERO_ALPHA_VENUES: set[str] = {
     ETHENA,
 }
 
-# Venue -> Market Category
 VENUE_CATEGORY_MAP: dict[str, str] = {
     "BINANCE": "cefi",
     BINANCE_SPOT: "cefi",
@@ -341,7 +340,6 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
 }
 VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 
-# Venue -> Supported Instrument Types
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT"},
     COINBASE_SPOT: {"SPOT"},
@@ -407,8 +405,6 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PREDICTION_MARKET": "prediction_markets",
     "PROP": "props",
 }
-
-# Venue Capabilities — what actions each venue supports
 
 
 class VenueCapability(StrEnum):
@@ -500,7 +496,6 @@ VENUE_PROTOCOL_TYPE: dict[str, DefiProtocolType] = {
 }
 
 # Venue -> Blockchain (DeFi smart order routing: shared wallet)
-
 VENUE_CHAIN_MAP: dict[str, str] = {
     UNISWAPV2_ETH: "ethereum",
     UNISWAPV3_ETH: "ethereum",
@@ -711,6 +706,26 @@ SPORTS_AUTH_MAP.update(
         SportsAuthMethod.NONE,
     )
 )
+
+
+class SportsAggregatorType(StrEnum):
+    """Classification of sports venue role in the execution chain."""
+
+    DIRECT_EXECUTION = "direct_execution"
+    ODDS_AGGREGATOR = "odds_aggregator"
+    EXECUTION_AGGREGATOR = "execution_aggregator"
+    POSITION_AGGREGATOR = "position_aggregator"
+
+
+VENUE_AGGREGATOR_TYPE: dict[str, SportsAggregatorType] = {
+    **dict.fromkeys(
+        {ODDS_API, OPTICODDS, ODDSJAM, SHARPAPI, METABET, ODDS_ENGINE}, SportsAggregatorType.ODDS_AGGREGATOR
+    ),
+    **dict.fromkeys(
+        SPORTS_EXCHANGE_VENUES | SPORTS_BOOKMAKER_API_VENUES | SPORTS_PREDICTION_MARKET_VENUES,
+        SportsAggregatorType.DIRECT_EXECUTION,
+    ),
+}
 
 SPORTS_CAPTCHA_RISK: set[str] = {
     BET365,
