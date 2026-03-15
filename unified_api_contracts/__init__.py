@@ -1,4 +1,4 @@
-"""API contracts: Pydantic schemas and VCR mocks for external APIs (Databento, Tardis, CCXT, The Graph, etc.)."""
+"""API contracts: Pydantic schemas and VCR mocks for external APIs."""
 
 import sys
 from types import ModuleType
@@ -203,12 +203,16 @@ from .canonical.domain.market.spread import (
     SpreadLeg,
 )
 from .canonical.domain.position import (
+    AggregatedPosition,
     BinanceWithdrawRequest,
     BinanceWithdrawResponse,
     BybitWithdrawRequest,
     BybitWithdrawResponse,
     CoinbaseWithdrawRequest,
     CoinbaseWithdrawResponse,
+    DeFiAggregatedHealth,
+    DeFiLPAggregatedMetrics,
+    DeFiStakingAggregatedMetrics,
     DepositAddress,
     DepositRecord,
     Erc20TransferCalldata,
@@ -221,12 +225,19 @@ from .canonical.domain.position import (
     InternalTransfer,
     OKXWithdrawRequest,
     OKXWithdrawResponse,
+    PortfolioGreeksSnapshot,
     PortfolioMarginAccount,
+    PortfolioPnLAttribution,
+    PortfolioView,
+    ProtocolHealthBreakdown,
+    RiskGroupSummary,
     SubAccount,
     UpbitWithdrawRequest,
     UpbitWithdrawResponse,
+    VenuePositionBreakdown,
     WithdrawalRecord,
 )
+from .canonical.domain.sports.arb import SportsArbLeg, SportsArbPosition
 from .canonical.domain.sports.arbitrage import (
     ArbitrageMarket,
     ArbitrageOpportunity,
@@ -515,6 +526,7 @@ __all__ = [
     "AaveV3UserAccountData",
     "AaveV3UserReserveData",
     "AccessMode",
+    "AggregatedPosition",
     "AlternativeDataSignal",
     "AlternativeDataType",
     "ArbitrageMarket",
@@ -667,6 +679,9 @@ __all__ = [
     "DataSourceMapping",
     "DatabentoError",
     "DatabentoReferenceInstrument",
+    "DeFiAggregatedHealth",
+    "DeFiLPAggregatedMetrics",
+    "DeFiStakingAggregatedMetrics",
     "DepositAddress",
     "DepositRecord",
     "DeribitAccountSummaryResponse",
@@ -799,14 +814,19 @@ __all__ = [
     "PolygonTickersResponse",
     "PolymarketGammaMarket",
     "PolymarketPosition",
+    "PortfolioGreeksSnapshot",
     "PortfolioMarginAccount",
+    "PortfolioPnLAttribution",
+    "PortfolioView",
     "PositionRisk",
     "PredictionMarketUniverse",
     "ProbabilityBucket",
+    "ProtocolHealthBreakdown",
     "RateLimitInfo",
     "RateLimitResponse",
     "RealTimePnLRecord",
     "ResponseFormat",
+    "RiskGroupSummary",
     "RiskLimitBreach",
     "SatelliteObservation",
     "ScalingMode",
@@ -815,6 +835,8 @@ __all__ = [
     "SettlementEvent",
     "SignalSource",
     "SpanMarginLeg",
+    "SportsArbLeg",
+    "SportsArbPosition",
     "SportsError",
     "SportsbookLink",
     "SpreadLeg",
@@ -843,6 +865,7 @@ __all__ = [
     "VenueCategory",
     "VenueErrorClassification",
     "VenueExecutionProfile",
+    "VenuePositionBreakdown",
     "VenueRateLimitSpec",
     "VolSmilePoint",
     "VolSurface",
@@ -863,14 +886,12 @@ __all__ = [
 
 # fmt: off
 _VENUES = [
-    "alchemy", "api_football", "arkham", "aster", "barchart", "betfair",
-    "binance", "bloxroute", "bybit", "ccxt", "aws", "gcp", "coinbase",
-    "cryptoquant", "databento", "defi", "defillama", "deribit", "fear_greed",
-    "footystats", "github", "glassnode", "hyperliquid", "ibkr", "kalshi",
-    "mev", "metabet", "nautilus", "odds_api", "odds_engine", "oddsjam",
-    "okx", "open_meteo", "opticodds", "pinnacle", "polymarket",
-    "soccer_football_info", "sharpapi", "tardis", "thegraph",
-    "transfermarkt", "understat", "upbit", "yahoo_finance",
+    "alchemy", "api_football", "arkham", "aster", "barchart", "betfair", "binance", "bloxroute",
+    "bybit", "ccxt", "aws", "gcp", "coinbase", "cryptoquant", "databento", "defi", "defillama",
+    "deribit", "fear_greed", "footystats", "github", "glassnode", "hyperliquid", "ibkr", "kalshi",
+    "mev", "metabet", "nautilus", "odds_api", "odds_engine", "oddsjam", "okx", "open_meteo",
+    "opticodds", "pinnacle", "polymarket", "soccer_football_info", "sharpapi", "tardis",
+    "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
 ]
 # fmt: on
 for _v in _VENUES:

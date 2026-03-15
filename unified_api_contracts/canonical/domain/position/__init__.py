@@ -59,6 +59,230 @@ class CanonicalSettlement(CanonicalBase):
     raw: dict[str, object] | None = None
 
 
+# ---------------------------------------------------------------------------
+# Cross-venue position aggregation schemas
+# ---------------------------------------------------------------------------
+
+
+class VenuePositionBreakdown(CanonicalBase):
+    """Per-venue component of an aggregated cross-venue position."""
+
+    venue: str
+    quantity: Decimal
+    side: str = Field(description="LONG or SHORT")
+    entry_price: Decimal
+    mark_price: Decimal
+    unrealized_pnl: Decimal
+    leverage: Decimal | None = None
+    instrument_type: str | None = None
+    strategy_id: str | None = None
+    margin_type: str | None = None
+    chain: str | None = None
+
+
+class AggregatedPosition(CanonicalBase):
+    """Cross-venue aggregated position for a single instrument.
+
+    Net position computed from per-venue constituents. Published to
+    AGGREGATED_POSITIONS PubSub topic by position-balance-monitor-service.
+    """
+
+    instrument_id: str
+    asset_class: str | None = None
+    instrument_type: str | None = None
+    strategy_id: str | None = None
+    margin_type: str | None = None
+    underlying: str | None = None
+    denomination_currency: str = "USD"
+    expiry: AwareDatetime | None = None
+    risk_group_id: str | None = None
+
+    net_quantity: Decimal = Field(description="Signed net quantity across all venues")
+    net_side: str = Field(description="LONG, SHORT, or FLAT")
+    gross_quantity: Decimal = Field(description="Sum of abs(quantity) across venues")
+    per_venue: list[VenuePositionBreakdown] = Field(default_factory=list)
+    weighted_avg_entry_price: Decimal = Decimal("0")
+    total_unrealized_pnl: Decimal = Decimal("0")
+    total_realized_pnl: Decimal = Decimal("0")
+    mark_price: Decimal = Decimal("0")
+    timestamp: AwareDatetime | None = None
+    client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+
+    @property
+    def quantity(self) -> Decimal:
+        """PositionQuantityProtocol: net position quantity."""
+        return self.net_quantity
+
+    @property
+    def price(self) -> Decimal:
+        """PositionQuantityProtocol: average entry price."""
+        return self.weighted_avg_entry_price
+
+    @property
+    def symbol(self) -> str:
+        """PositionQuantityProtocol: instrument identifier."""
+        return self.instrument_id
+
+
+class UnderlyingGreeksBreakdown(CanonicalBase):
+    """Per-underlying Greeks aggregation — same underlying nets at correlation=1."""
+
+    underlying: str
+    delta: Decimal = Decimal("0")
+    gamma: Decimal = Decimal("0")
+    theta: Decimal = Decimal("0")
+    vega: Decimal = Decimal("0")
+    rho: Decimal = Decimal("0")
+    position_count: int = 0
+
+
+class PortfolioGreeksSnapshot(CanonicalBase):
+    """Portfolio-level Greeks with per-underlying breakdown."""
+
+    total_delta: Decimal = Decimal("0")
+    total_gamma: Decimal = Decimal("0")
+    total_theta: Decimal = Decimal("0")
+    total_vega: Decimal = Decimal("0")
+    total_rho: Decimal = Decimal("0")
+    per_underlying: list[UnderlyingGreeksBreakdown] = Field(default_factory=list)
+    timestamp: AwareDatetime | None = None
+
+
+class PortfolioPnLAttribution(CanonicalBase):
+    """Portfolio-level PnL attribution across all 11 dimensions."""
+
+    delta_pnl: Decimal = Decimal("0")
+    gamma_pnl: Decimal = Decimal("0")
+    theta_pnl: Decimal = Decimal("0")
+    vega_pnl: Decimal = Decimal("0")
+    rho_pnl: Decimal = Decimal("0")
+    funding_pnl: Decimal = Decimal("0")
+    basis_pnl: Decimal = Decimal("0")
+    interest_rate_pnl: Decimal = Decimal("0")
+    carry_pnl: Decimal = Decimal("0")
+    fx_pnl: Decimal = Decimal("0")
+    residual_pnl: Decimal = Decimal("0")
+    total_pnl: Decimal = Decimal("0")
+    by_asset_class: dict[str, Decimal] = Field(default_factory=dict)
+    by_strategy: dict[str, Decimal] = Field(default_factory=dict)
+    timestamp: AwareDatetime | None = None
+
+
+class RiskGroupSummary(CanonicalBase):
+    """Risk group aggregation for positions sharing the same underlying."""
+
+    risk_group_id: str
+    underlying: str
+    asset_class: str
+    net_delta: Decimal = Decimal("0")
+    net_gamma: Decimal = Decimal("0")
+    net_theta: Decimal = Decimal("0")
+    net_vega: Decimal = Decimal("0")
+    gross_exposure: Decimal = Decimal("0")
+    net_exposure: Decimal = Decimal("0")
+    position_count: int = 0
+    venues: list[str] = Field(default_factory=list)
+    instruments: list[str] = Field(default_factory=list)
+
+
+class PortfolioView(CanonicalBase):
+    """Full portfolio snapshot across all venues, asset classes, and risk groups."""
+
+    client_id: str = Field(..., json_schema_extra={"pii": True})
+    snapshot_id: str
+    timestamp: AwareDatetime
+    positions: list[AggregatedPosition] = Field(default_factory=list)
+    balances: list[CanonicalBalance] = Field(default_factory=list)
+
+    total_equity_usd: Decimal = Decimal("0")
+    total_unrealized_pnl: Decimal = Decimal("0")
+    total_realized_pnl: Decimal = Decimal("0")
+    gross_exposure: Decimal = Decimal("0")
+    net_exposure: Decimal = Decimal("0")
+    diversified_exposure: Decimal = Decimal("0")
+    venue_count: int = 0
+    instrument_count: int = 0
+
+    asset_class_exposures: dict[str, Decimal] = Field(default_factory=dict)
+    strategy_exposures: dict[str, Decimal] = Field(default_factory=dict)
+
+    portfolio_greeks: PortfolioGreeksSnapshot | None = None
+    pnl_attribution: PortfolioPnLAttribution | None = None
+    risk_groups: list[RiskGroupSummary] = Field(default_factory=list)
+
+    portfolio_duration: Decimal | None = None
+
+
+class ProtocolHealthBreakdown(CanonicalBase):
+    """Per-protocol DeFi lending health metrics."""
+
+    protocol: str
+    chain: str
+    collateral_usd: Decimal = Decimal("0")
+    debt_usd: Decimal = Decimal("0")
+    health_factor: Decimal | None = None
+    ltv_ratio: Decimal | None = None
+    net_apy: Decimal = Decimal("0")
+
+
+class DeFiAggregatedHealth(CanonicalBase):
+    """Combined DeFi lending health factor across protocols and chains."""
+
+    client_id: str = Field(..., json_schema_extra={"pii": True})
+    protocols: list[ProtocolHealthBreakdown] = Field(default_factory=list)
+    combined_collateral_usd: Decimal = Decimal("0")
+    combined_debt_usd: Decimal = Decimal("0")
+    combined_health_factor: Decimal | None = None
+    weighted_net_apy: Decimal = Decimal("0")
+    riskiest_protocol: str | None = None
+    per_chain_health: dict[str, Decimal] = Field(default_factory=dict)
+    timestamp: AwareDatetime | None = None
+
+
+class LPProtocolBreakdown(CanonicalBase):
+    """Per-protocol DeFi LP metrics."""
+
+    protocol: str
+    chain: str
+    total_value_usd: Decimal = Decimal("0")
+    fees_earned_usd: Decimal = Decimal("0")
+    impermanent_loss_usd: Decimal = Decimal("0")
+    pool_count: int = 0
+
+
+class DeFiLPAggregatedMetrics(CanonicalBase):
+    """Combined DeFi LP metrics across Uniswap/Curve/Balancer."""
+
+    client_id: str = Field(..., json_schema_extra={"pii": True})
+    total_lp_value_usd: Decimal = Decimal("0")
+    total_fees_earned_usd: Decimal = Decimal("0")
+    total_impermanent_loss_usd: Decimal = Decimal("0")
+    protocols: list[LPProtocolBreakdown] = Field(default_factory=list)
+    timestamp: AwareDatetime | None = None
+
+
+class StakingProtocolBreakdown(CanonicalBase):
+    """Per-protocol DeFi staking metrics."""
+
+    protocol: str
+    chain: str
+    staked_value_usd: Decimal = Decimal("0")
+    rewards_earned_usd: Decimal = Decimal("0")
+    apy: Decimal = Decimal("0")
+    lock_end: AwareDatetime | None = None
+
+
+class DeFiStakingAggregatedMetrics(CanonicalBase):
+    """Combined DeFi staking metrics across Lido/EtherFi/etc."""
+
+    client_id: str = Field(..., json_schema_extra={"pii": True})
+    total_staked_value_usd: Decimal = Decimal("0")
+    total_rewards_earned_usd: Decimal = Decimal("0")
+    weighted_apy: Decimal = Decimal("0")
+    protocols: list[StakingProtocolBreakdown] = Field(default_factory=list)
+    timestamp: AwareDatetime | None = None
+
+
 class FeeType(StrEnum):
     MAKER = "maker"
     TAKER = "taker"

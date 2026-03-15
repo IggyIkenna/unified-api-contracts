@@ -17,6 +17,8 @@ from typing import Literal, Self
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
 from .._base import CanonicalBase
+from .arb import SportsArbLeg as SportsArbLeg
+from .arb import SportsArbPosition as SportsArbPosition
 from .betting import BetExecution as BetExecution
 from .betting import BetOrder as BetOrder
 from .betting import BetSide as BetSide
