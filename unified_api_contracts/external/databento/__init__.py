@@ -1,1 +1,3 @@
-"""Databento API contracts: Pydantic models + raw column schemas for DataFrame validation."""
+"""External Databento schemas."""
+
+from unified_api_contracts.external.databento.schemas import *

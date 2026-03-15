@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 
-from ..canonical.execution import OrderSide, OrderStatus, OrderType, TimeInForce
+from ..canonical.domain.execution import OrderSide, OrderStatus, OrderType, TimeInForce
 
 # ---------------------------------------------------------------------------
 # Decimal conversion

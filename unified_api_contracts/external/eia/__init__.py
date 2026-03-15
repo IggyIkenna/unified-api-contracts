@@ -1,1 +1,3 @@
-"""EIA (U.S. Energy Information Administration) API v2 schemas."""
+"""External Eia schemas."""
+
+from unified_api_contracts.external.eia.schemas import *

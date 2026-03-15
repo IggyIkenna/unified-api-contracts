@@ -124,8 +124,7 @@ from .domain import (
     WebSocketPingFrame,
     WebSocketPongFrame,
 )
-from .errors import CanonicalError, CanonicalRateLimitError
-from .execution import (
+from .domain.execution import (
     CanonicalAccountState,
     CanonicalFill,
     CanonicalMarginState,
@@ -138,7 +137,8 @@ from .execution import (
     OrderStatus,
     OrderType,
 )
-from .odds import american_to_decimal, decimal_to_american
+from .domain.sports.odds_canonical import american_to_decimal, decimal_to_american
+from .errors import CanonicalError, CanonicalRateLimitError
 
 __all__ = [
     "BOOKMAKER_REGISTRY",

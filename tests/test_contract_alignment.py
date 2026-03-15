@@ -62,26 +62,26 @@ class TestACSchemas:
     """unified_api_contracts.schemas models are well-formed."""
 
     def test_funding_rate_instantiation(self) -> None:
-        from unified_api_contracts.schemas import FundingRate
+        from unified_api_contracts import FundingRateHistory
 
-        obj = FundingRate(symbol="BTC-PERP", venue="binance", rate=0.0001, timestamp="2025-01-01T00:00:00Z")
-        assert obj.symbol == "BTC-PERP"
+        obj = FundingRateHistory(fundingTime="2025-01-01T00:00:00Z", rate="0.0001")
+        assert obj.rate
 
     def test_heartbeat_message_instantiation(self) -> None:
-        from unified_api_contracts.schemas import HeartbeatMessage
+        from unified_api_contracts import HeartbeatMessage
 
         obj = HeartbeatMessage(venue="binance", timestamp="2025-01-01T00:00:00Z")
         assert obj.venue == "binance"
 
     def test_subscribe_request_instantiation(self) -> None:
-        from unified_api_contracts.schemas import SubscribeRequest
+        from unified_api_contracts import SubscribeRequest
 
         obj = SubscribeRequest(venue="binance", channel="trades", symbols=["BTC/USDT"])
         assert obj.channel == "trades"
         assert obj.venue == "binance"
 
     def test_error_action_enum_non_empty(self) -> None:
-        from unified_api_contracts.schemas import ErrorAction
+        from unified_api_contracts import ErrorAction
 
         values = list(ErrorAction)
         assert len(values) > 0, "ErrorAction enum must have at least one member"
@@ -89,7 +89,7 @@ class TestACSchemas:
     def test_websocket_connection_state_is_dataclass(self) -> None:
         import dataclasses
 
-        from unified_api_contracts.schemas import WebSocketConnectionState
+        from unified_api_contracts import WebSocketConnectionState
 
         assert dataclasses.is_dataclass(WebSocketConnectionState), "WebSocketConnectionState must be a dataclass"
         field_names = {f.name for f in dataclasses.fields(WebSocketConnectionState)}
@@ -106,37 +106,37 @@ class TestACSports:
     """Sports-betting schemas in unified_api_contracts.sports."""
 
     def test_odds_type_enum(self) -> None:
-        from unified_api_contracts.external.sports import OddsType
+        from unified_api_contracts import OddsType
 
         values = list(OddsType)
         assert len(values) > 0
 
     def test_outcome_type_enum(self) -> None:
-        from unified_api_contracts.external.sports import OutcomeType
+        from unified_api_contracts import OutcomeType
 
         values = list(OutcomeType)
         assert len(values) > 0
 
     def test_bookmaker_category_enum(self) -> None:
-        from unified_api_contracts.external.sports import BookmakerCategory
+        from unified_api_contracts import BookmakerCategory
 
         values = list(BookmakerCategory)
         assert len(values) > 0
 
     def test_arbitrage_status_enum(self) -> None:
-        from unified_api_contracts.external.sports import ArbitrageStatus
+        from unified_api_contracts import ArbitrageStatus
 
         values = list(ArbitrageStatus)
         assert len(values) > 0
 
     def test_bet_status_enum(self) -> None:
-        from unified_api_contracts.external.sports import BetStatus
+        from unified_api_contracts import BetStatus
 
         values = list(BetStatus)
         assert len(values) > 0
 
     def test_bookmaker_registry_populated(self) -> None:
-        from unified_api_contracts.external.sports import BOOKMAKER_REGISTRY
+        from unified_api_contracts import BOOKMAKER_REGISTRY
 
         assert isinstance(BOOKMAKER_REGISTRY, dict), "BOOKMAKER_REGISTRY must be a dict"
         assert len(BOOKMAKER_REGISTRY) > 0, "Registry must contain at least one bookmaker"

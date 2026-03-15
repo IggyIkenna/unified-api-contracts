@@ -12,7 +12,7 @@ from pathlib import Path
 
 import pytest
 
-from unified_api_contracts.external.venue_manifest import VENUE_MANIFEST
+from unified_api_contracts.registry.venue_manifest import VENUE_MANIFEST
 
 
 def _api_contracts_root() -> Path:
@@ -38,12 +38,23 @@ def test_every_venue_endpoint_validates(venue: str, example_filename: str) -> No
     old_path = root / "unified_api_contracts" / venue / "examples" / example_filename
     new_path = root / "unified_api_contracts" / "external" / venue / "examples" / example_filename
 
+    # Also try the module-derived path (e.g. cloud_sdks -> external/gcp/)
+    contract = VENUE_MANIFEST[venue]
+    mod_path = contract.get("module", "")
+    if mod_path:
+        mod_parts = mod_path.replace(".", "/")
+        mod_example_path = root / mod_parts / "examples" / example_filename
+    else:
+        mod_example_path = new_path  # fallback, same as new_path
+
     if old_path.exists():
         example_path = old_path
     elif new_path.exists():
         example_path = new_path
+    elif mod_example_path.exists():
+        example_path = mod_example_path
     else:
-        pytest.fail(f"Missing example: tried {old_path} and {new_path}")
+        pytest.fail(f"Missing example: tried {old_path}, {new_path}, and {mod_example_path}")
 
     assert example_path.exists(), f"Missing example: {example_path}"
 

@@ -1,1 +1,7 @@
-"""Barchart API contracts (OHLCV 15m, VIX index, manual CSV dumps)."""
+"""External Barchart schemas."""
+
+from unified_api_contracts.external.barchart.schemas import *
+
+from .schemas import (
+    BarchartOhlcv15m,
+)

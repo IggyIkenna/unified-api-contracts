@@ -10,6 +10,9 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from .compute import ComputeType as ComputeType
+from .compute import VmQuotaShape as VmQuotaShape
+
 
 class _InfraBase(BaseModel):
     model_config = ConfigDict(extra="forbid")

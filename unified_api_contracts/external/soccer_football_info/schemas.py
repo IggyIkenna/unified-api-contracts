@@ -115,6 +115,7 @@ class SoccerFootballError(BaseModel):
 # Source schemas (merged from external/sports/sources/soccer_football_info/)
 # =============================================================================
 
+
 class SFILeague(BaseModel):
     """Soccer Football Info league data."""
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts.external.sports.canonical.bookmaker import (
+from unified_api_contracts.canonical.domain.sports.bookmaker import (
     BOOKMAKER_REGISTRY,
     BookmakerCategory,
     BookmakerInfo,

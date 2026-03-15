@@ -1,1 +1,14 @@
-"""CCXT unified exchange API contracts (fetch_order, fetch_balance, fetch_positions, etc.)."""
+"""External Ccxt schemas."""
+
+from unified_api_contracts.external.ccxt.schemas import *
+
+from .schemas import (
+    CcxtAggTrade,
+    CcxtFundingRate,
+    CcxtMarket,
+    CcxtOhlcv,
+    CcxtOpenInterest,
+    CcxtOrderBook,
+    CcxtTicker,
+    CcxtTrade,
+)

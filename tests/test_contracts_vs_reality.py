@@ -16,6 +16,7 @@ import pytest
 _EXAMPLE_SCHEMA_LOADERS: dict[str, tuple[str, str]] = {
     "databento": ("unified_api_contracts.databento.schemas", "DatabentoOhlcvBar"),
     "ccxt": ("unified_api_contracts.ccxt.schemas", "CcxtOrder"),
+    "gcp": ("unified_api_contracts.external.gcp.bigquery", "BqQuotaUsage"),
 }
 
 
@@ -50,7 +51,7 @@ def _discover_example_files() -> list[tuple[Path, str]]:
 
 def _get_schema_for_example(api_dir_name: str, data: dict, example_filename: str = "") -> tuple[str, str] | None:
     """Return (module_path, class_name) for the schema that can validate this example, or None."""
-    from unified_api_contracts.external.venue_manifest import (
+    from unified_api_contracts.registry.venue_manifest import (
         VENUE_MANIFEST,
     )
 

@@ -1,1 +1,3 @@
-"""Aster on-chain perps API contracts (UMI adapter)."""
+"""External Aster schemas."""
+
+from unified_api_contracts.external.aster.schemas import *

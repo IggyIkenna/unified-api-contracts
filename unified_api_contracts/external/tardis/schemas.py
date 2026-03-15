@@ -97,7 +97,7 @@ class TardisExchangeDetail(BaseModel):
 
     @property
     def instruments(self) -> list[TardisInstrumentDetail]:
-        """Backward compat: map availableSymbols to TardisInstrumentDetail (minimal fields).
+        """Map availableSymbols response to TardisInstrumentDetail (current API field name).
 
         URDI and other consumers expect .instruments; API returns availableSymbols.
         """

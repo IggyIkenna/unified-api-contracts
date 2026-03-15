@@ -1,1 +1,3 @@
-"""Polygon.io API contracts: tickers, option contracts, reference data."""
+"""External Polygon schemas."""
+
+from unified_api_contracts.external.polygon.schemas import *

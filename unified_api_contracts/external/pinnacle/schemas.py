@@ -271,6 +271,7 @@ class PinnacleCurrentBet(BaseModel):
 # Source schemas (merged from external/sports/sources/pinnacle/)
 # =============================================================================
 
+
 class PinnacleEventSource(BaseModel):
     """Pinnacle sports event (source schema, simplified)."""
 

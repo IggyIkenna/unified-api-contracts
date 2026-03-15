@@ -38,6 +38,13 @@ from unified_api_contracts.external.thegraph.schemas import (
     GraphV2SwapTransaction,
 )
 
+from .schemas import (
+    SubgraphPool,
+    SubgraphReserve,
+    TheGraphResponse,
+    TheGraphWsNext,
+)
+
 __all__ = [
     "GraphBalancerDynamicData",
     "GraphBalancerPool",
@@ -74,4 +81,8 @@ __all__ = [
     "GraphV2SwapPair",
     "GraphV2SwapPairToken",
     "GraphV2SwapTransaction",
+    "SubgraphPool",
+    "SubgraphReserve",
+    "TheGraphResponse",
+    "TheGraphWsNext",
 ]

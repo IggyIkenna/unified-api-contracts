@@ -25,7 +25,14 @@ from ...canonical.domain import (
     MarketState,
     WebSocketEvent,
 )
-from ...canonical.execution import CanonicalFill, CanonicalOrder
+from ...canonical.domain.execution import (
+    CanonicalFill,
+    CanonicalOrder,
+    OrderSide,
+    OrderStatus,
+    OrderType,
+    TimeInForce,
+)
 from ...normalize_utils._helpers import (
     _d,
     _to_decimal,
@@ -53,16 +60,12 @@ from ..binance.ws_schemas import BinanceLiquidationOrder
 
 def _normalize_side(s: str | None) -> str:
     """Side helper for orders/fills (returns enum, import-free)."""
-    from ...canonical.execution import OrderSide
-
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short") else OrderSide.BUY
 
 
 def _normalize_order_type(t: str | None) -> str:
-    from ...canonical.execution import OrderType
-
     if not t:
         return OrderType.LIMIT
     t = str(t).lower()
@@ -78,8 +81,6 @@ def _normalize_order_type(t: str | None) -> str:
 
 
 def _normalize_order_status(s: str | None) -> str:
-    from ...canonical.execution import OrderStatus
-
     if not s:
         return OrderStatus.PENDING
     s = str(s).lower()
@@ -99,8 +100,6 @@ def _normalize_order_status(s: str | None) -> str:
 
 
 def _normalize_tif(tif: str | None) -> str:
-    from ...canonical.execution import TimeInForce
-
     if not tif:
         return TimeInForce.GTC
     t = str(tif).upper()

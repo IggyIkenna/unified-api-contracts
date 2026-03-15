@@ -9,7 +9,7 @@ import importlib
 
 import pytest
 
-from unified_api_contracts.external.venue_manifest import VENUE_MANIFEST
+from unified_api_contracts.registry.venue_manifest import VENUE_MANIFEST
 
 
 def _schemas_module_for_venue(venue: str) -> str:

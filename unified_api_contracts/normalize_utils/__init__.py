@@ -3,7 +3,7 @@
 One-hop conversion: BinanceTrade -> CanonicalTrade, BinanceOrderBook -> CanonicalOrderBook, etc.
 """
 
-from ..canonical.odds import american_to_decimal, decimal_to_american, fractional_to_decimal
+from ..canonical.domain.sports.odds_canonical import american_to_decimal, decimal_to_american, fractional_to_decimal
 from .cefi_extended import (
     normalize_bitfinex_fill,
     normalize_bitfinex_order,

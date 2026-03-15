@@ -11,15 +11,15 @@ from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from unified_api_contracts.canonical import CanonicalTrade
-from unified_api_contracts.canonical.normalize import (
+from unified_api_contracts.external.binance.market_schemas import BinanceTrade
+from unified_api_contracts.external.databento.schemas import DatabentoTrade
+from unified_api_contracts.external.tardis.schemas import TardisTrade
+from unified_api_contracts.normalize_utils import (
     normalize_binance_trade,
     normalize_databento_trade,
     normalize_tardis_trade,
     normalize_trade,
 )
-from unified_api_contracts.external.binance.market_schemas import BinanceTrade
-from unified_api_contracts.external.databento.schemas import DatabentoTrade
-from unified_api_contracts.external.tardis.schemas import TardisTrade
 
 # Venues with trade normalization
 ALL_TRADE_VENUES = ("binance", "databento", "tardis")

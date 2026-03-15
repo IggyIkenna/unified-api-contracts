@@ -119,6 +119,7 @@ class FootystatsError(BaseModel):
 # Source schemas (merged from external/sports/sources/footystats/)
 # =============================================================================
 
+
 class FootyStatsLeague(BaseModel):
     """FootyStats league data."""
 

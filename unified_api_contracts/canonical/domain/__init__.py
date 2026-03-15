@@ -56,10 +56,6 @@ from unified_api_contracts.canonical.crosscutting.risk import (
     VaRResult,
 )
 from unified_api_contracts.canonical.domain._base import CanonicalBase
-from unified_api_contracts.canonical.domain.bookmaker_registry import (
-    BOOKMAKER_REGISTRY,
-    BookmakerRegistry,
-)
 from unified_api_contracts.canonical.domain.derivatives import (
     CanonicalDerivativeTicker,
     CanonicalFundingRate,
@@ -98,6 +94,10 @@ from unified_api_contracts.canonical.domain.execution import (
     OrderType,
     TimeInForce,
 )
+from unified_api_contracts.canonical.domain.features import (
+    CanonicalFeatureRecord,
+    FeatureMetadata,
+)
 from unified_api_contracts.canonical.domain.infrastructure import (
     INFRA_CANONICAL_TO_PROVIDER,
     CanonicalCloudStorage,
@@ -123,6 +123,11 @@ from unified_api_contracts.canonical.domain.market import (
     MarketState,
     MarketTrade,
     OrderBookSnapshot5,
+)
+from unified_api_contracts.canonical.domain.market.tradfi import (
+    CanonicalBondData,
+    CanonicalCdsSpread,
+    CanonicalYieldCurvePoint,
 )
 from unified_api_contracts.canonical.domain.onchain import (
     CanonicalOnChainMetric,
@@ -166,10 +171,9 @@ from unified_api_contracts.canonical.domain.sports import (
     PlayerMapping,
     TeamMapping,
 )
-from unified_api_contracts.canonical.domain.tradfi import (
-    CanonicalBondData,
-    CanonicalCdsSpread,
-    CanonicalYieldCurvePoint,
+from unified_api_contracts.canonical.domain.sports.bookmaker_registry import (
+    BOOKMAKER_REGISTRY,
+    BookmakerRegistry,
 )
 
 __all__ = [
@@ -198,6 +202,7 @@ __all__ = [
     "CanonicalComputeService",
     "CanonicalContainerRegistry",
     "CanonicalDerivativeTicker",
+    "CanonicalFeatureRecord",
     "CanonicalFee",
     "CanonicalFill",
     "CanonicalFixture",
@@ -250,6 +255,7 @@ __all__ = [
     "FactorAttributionRecord",
     "FactorExposure",
     "FactorType",
+    "FeatureMetadata",
     "FeeType",
     "FixtureMapping",
     "FundingRateHistory",

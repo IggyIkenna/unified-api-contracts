@@ -1,1 +1,3 @@
-"""DeFi protocol schemas: Pydantic lending models + raw column schemas for DataFrame validation."""
+"""External Defi schemas."""
+
+from unified_api_contracts.external.defi.schemas import *

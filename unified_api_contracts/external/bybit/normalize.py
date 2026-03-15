@@ -23,7 +23,7 @@ from ...canonical.domain import (
     MarketState,
     WebSocketEvent,
 )
-from ...canonical.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
+from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
 from ...normalize_utils._helpers import _d, _to_decimal, _to_levels, _ts_ms_to_datetime
 from ...normalize_utils.market_state import _BYBIT_STATE_MAP, normalize_market_state
 from ..bybit.schemas import (
@@ -246,7 +246,9 @@ def normalize_bybit_derivative_ticker(
     predicted_funding = _to_decimal(info.get("predictedFundingRate"))
 
     ts_raw = info.get("ts")
-    timestamp: datetime = _ms_to_utc(int(ts_raw)) or datetime.now(UTC) if isinstance(ts_raw, (int, float)) else datetime.now(UTC)
+    timestamp: datetime = (
+        _ms_to_utc(int(ts_raw)) or datetime.now(UTC) if isinstance(ts_raw, (int, float)) else datetime.now(UTC)
+    )
 
     funding_timestamp: datetime | None = None
     if funding is not None:

@@ -25,7 +25,7 @@ from unified_api_contracts.external.betfair.schemas import (
     BetfairMarketStatus,
     BetfairOrder,
     BetfairPrice,
-    BetfairRunner,
+    BetfairRunnerSource,
 )
 from unified_api_contracts.external.footystats.schemas import (
     FootyStatsBTTS,
@@ -50,7 +50,7 @@ from unified_api_contracts.external.open_meteo.schemas import (
     WeatherCondition,
 )
 from unified_api_contracts.external.pinnacle.schemas import (
-    PinnacleEvent,
+    PinnacleEventSource,
     PinnacleLine,
     PinnacleMatchup,
     PinnacleOdds,
@@ -64,9 +64,9 @@ from unified_api_contracts.external.soccer_football_info.schemas import (
     SFITeam,
 )
 from unified_api_contracts.external.understat.schemas import (
-    UnderstatMatch,
+    UnderstatMatchSource,
     UnderstatPlayerSeason,
-    UnderstatShot,
+    UnderstatShotSource,
     UnderstatTeamHistory,
     UnderstatXGData,
 )
@@ -225,7 +225,7 @@ class TestFootyStatsSchemas:
 @pytest.mark.unit
 class TestUnderstatSchemas:
     def test_match_from_raw(self) -> None:
-        m = UnderstatMatch.from_raw(
+        m = UnderstatMatchSource.from_raw(
             {
                 "fixture_id": 1,
                 "date": NOW.isoformat(),
@@ -241,7 +241,7 @@ class TestUnderstatSchemas:
         assert m.league == "EPL"
 
     def test_shot_construct(self) -> None:
-        s = UnderstatShot(
+        s = UnderstatShotSource(
             shot_id=1,
             fixture_id=1,
             player_id=1,
@@ -358,7 +358,7 @@ class TestBetfairSchemas:
         assert p.price == Decimal("2.50")
 
     def test_runner_construct(self) -> None:
-        r = BetfairRunner(selection_id=12345, runner_name="Man Utd")
+        r = BetfairRunnerSource(selection_id=12345, runner_name="Man Utd")
         assert r.back_prices == []
 
     def test_market_construct(self) -> None:
@@ -393,7 +393,7 @@ class TestBetfairSchemas:
 @pytest.mark.unit
 class TestPinnacleSchemas:
     def test_event_construct(self) -> None:
-        e = PinnacleEvent(event_id=1, sport_id=29, league_id=1, starts=NOW, home="A", away="B")
+        e = PinnacleEventSource(event_id=1, sport_id=29, league_id=1, starts=NOW, home="A", away="B")
         assert e.event_id == 1
 
     def test_line_construct(self) -> None:
@@ -429,22 +429,16 @@ class TestOddsApiSchemas:
 
     def test_event_construct(self) -> None:
         e = OddsApiEvent(
-            event_id="evt1",
-            sport_key="soccer_epl",
-            sport_title="EPL",
-            commence_time=NOW,
+            id="evt1",
             home_team="A",
             away_team="B",
             bookmakers=[],
         )
-        assert e.sport_key == "soccer_epl"
+        assert e.id == "evt1"
 
     def test_event_round_trip(self) -> None:
         e = OddsApiEvent(
-            event_id="evt1",
-            sport_key="soccer_epl",
-            sport_title="EPL",
-            commence_time=NOW,
+            id="evt1",
             home_team="A",
             away_team="B",
             bookmakers=[],

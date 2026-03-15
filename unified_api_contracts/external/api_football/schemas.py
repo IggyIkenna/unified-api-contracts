@@ -267,6 +267,7 @@ class ApiFootballError(BaseModel):
 # Source schemas (merged from external/sports/sources/api_football/)
 # =============================================================================
 
+
 class APIFootballVenue(BaseModel):
     """API-Football venue data."""
 

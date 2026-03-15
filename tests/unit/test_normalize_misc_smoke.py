@@ -14,7 +14,7 @@ class TestRateLimitExtractors:
     """Smoke test all rate limit extractors."""
 
     def test_binance_mbx_weight(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_binance_rate_limit,
         )
 
@@ -24,7 +24,7 @@ class TestRateLimitExtractors:
         assert info.venue == "binance"
 
     def test_binance_standard_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_binance_rate_limit,
         )
 
@@ -32,7 +32,7 @@ class TestRateLimitExtractors:
         assert info.limit == 100
 
     def test_bybit_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_bybit_rate_limit,
         )
 
@@ -42,7 +42,7 @@ class TestRateLimitExtractors:
         assert info.venue == "bybit"
 
     def test_okx_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_okx_rate_limit,
         )
 
@@ -51,7 +51,7 @@ class TestRateLimitExtractors:
         assert info.venue == "okx"
 
     def test_deribit_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_deribit_rate_limit,
         )
 
@@ -60,7 +60,7 @@ class TestRateLimitExtractors:
         assert info.venue == "deribit"
 
     def test_deribit_ws_rate_limit(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_deribit_ws_rate_limit,
         )
 
@@ -68,7 +68,7 @@ class TestRateLimitExtractors:
         assert info.retry_after == 10.0
 
     def test_deribit_ws_rate_limit_retryafter_alt(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_deribit_ws_rate_limit,
         )
 
@@ -76,7 +76,7 @@ class TestRateLimitExtractors:
         assert info.retry_after == 5.0
 
     def test_deribit_ws_rate_limit_empty(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_deribit_ws_rate_limit,
         )
 
@@ -84,7 +84,7 @@ class TestRateLimitExtractors:
         assert info.retry_after is None
 
     def test_coinbase_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_coinbase_rate_limit,
         )
 
@@ -93,7 +93,7 @@ class TestRateLimitExtractors:
         assert info.venue == "coinbase"
 
     def test_hyperliquid_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_hyperliquid_rate_limit,
         )
 
@@ -102,7 +102,7 @@ class TestRateLimitExtractors:
         assert info.venue == "hyperliquid"
 
     def test_tardis_headers(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_tardis_rate_limit,
         )
 
@@ -111,7 +111,7 @@ class TestRateLimitExtractors:
         assert info.venue == "tardis"
 
     def test_api_football_rate_limit(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_api_football_rate_limit,
         )
 
@@ -122,7 +122,7 @@ class TestRateLimitExtractors:
         assert info.remaining == 90
 
     def test_github_rate_limit(self):
-        from unified_api_contracts.canonical.normalize.rate_limits import (
+        from unified_api_contracts.normalize_utils.rate_limits import (
             extract_github_rate_limit,
         )
 
@@ -140,7 +140,7 @@ class TestConnectivityNormalizers:
     """Smoke test WS lifecycle normalizers."""
 
     def test_ws_connect(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_ws_connect,
         )
 
@@ -149,7 +149,7 @@ class TestConnectivityNormalizers:
         assert result.event.value == "connect"
 
     def test_ws_disconnect(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_ws_disconnect,
         )
 
@@ -157,7 +157,7 @@ class TestConnectivityNormalizers:
         assert result.code == 1000
 
     def test_ws_ping(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_ws_ping,
         )
 
@@ -165,7 +165,7 @@ class TestConnectivityNormalizers:
         assert result.latency_ms == 5.3
 
     def test_ws_pong(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_ws_pong,
         )
 
@@ -173,7 +173,7 @@ class TestConnectivityNormalizers:
         assert result.event.value == "pong"
 
     def test_binance_ws_subscription_success(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_binance_ws_subscription,
         )
 
@@ -181,7 +181,7 @@ class TestConnectivityNormalizers:
         assert result.event.value == "subscribe"
 
     def test_binance_ws_subscription_error(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_binance_ws_subscription,
         )
 
@@ -189,7 +189,7 @@ class TestConnectivityNormalizers:
         assert result.event.value == "error"
 
     def test_bybit_ws_subscription(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_bybit_ws_subscription,
         )
 
@@ -197,7 +197,7 @@ class TestConnectivityNormalizers:
         assert normalize_bybit_ws_subscription(False).event.value == "error"
 
     def test_okx_ws_subscription(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_okx_ws_subscription,
         )
 
@@ -206,7 +206,7 @@ class TestConnectivityNormalizers:
         assert normalize_okx_ws_subscription("error").event.value == "error"
 
     def test_deribit_ws_heartbeat(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_deribit_ws_heartbeat,
         )
 
@@ -214,7 +214,7 @@ class TestConnectivityNormalizers:
         assert normalize_deribit_ws_heartbeat("test_request").event.value == "pong"
 
     def test_coinbase_ws_subscription(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_coinbase_ws_subscription,
         )
 
@@ -222,7 +222,7 @@ class TestConnectivityNormalizers:
         assert normalize_coinbase_ws_subscription("error").event.value == "error"
 
     def test_hyperliquid_ws_subscription(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_hyperliquid_ws_subscription,
         )
 
@@ -230,7 +230,7 @@ class TestConnectivityNormalizers:
         assert normalize_hyperliquid_ws_subscription("failed").event.value == "error"
 
     def test_tardis_ws_subscription(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_tardis_ws_subscription,
         )
 
@@ -238,7 +238,7 @@ class TestConnectivityNormalizers:
         assert normalize_tardis_ws_subscription(False).event.value == "error"
 
     def test_aster_ws_subscription(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_aster_ws_subscription,
         )
 
@@ -246,7 +246,7 @@ class TestConnectivityNormalizers:
         assert normalize_aster_ws_subscription("UNSUBSCRIBE").event.value == "unsubscribe"
 
     def test_ws_close_functions(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_aster_ws_close,
             normalize_ibkr_ws_close,
             normalize_kalshi_ws_lifecycle,
@@ -268,7 +268,7 @@ class TestConnectivityNormalizers:
         )
 
     def test_versifi_ws_message(self):
-        from unified_api_contracts.canonical.normalize.connectivity import (
+        from unified_api_contracts.normalize_utils.connectivity import (
             normalize_versifi_ws_message,
         )
 
@@ -283,7 +283,7 @@ class TestConnectivityNormalizers:
 
 class TestSideNormalizer:
     def test_buy_variants(self):
-        from unified_api_contracts.canonical.normalize.sides import (
+        from unified_api_contracts.normalize_utils.sides import (
             normalize_side,
         )
 
@@ -291,7 +291,7 @@ class TestSideNormalizer:
             assert normalize_side(raw) == "buy"
 
     def test_sell_variants(self):
-        from unified_api_contracts.canonical.normalize.sides import (
+        from unified_api_contracts.normalize_utils.sides import (
             normalize_side,
         )
 
@@ -306,21 +306,21 @@ class TestSideNormalizer:
 
 class TestSymbolNormalizer:
     def test_binance_spot(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("binance", "BTCUSDT") == "BTC-USDT"
 
     def test_binance_perp(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("binance", "BTCUSDT_PERP") == "BTC-USDT-PERP"
 
     def test_binance_unknown_quote(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
@@ -328,28 +328,28 @@ class TestSymbolNormalizer:
         assert isinstance(result, str)
 
     def test_okx_swap(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("okx", "BTC-USDT-SWAP") == "BTC-USDT-PERP"
 
     def test_okx_spot(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("okx", "BTC-USDT") == "BTC-USDT"
 
     def test_deribit_perp(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("deribit", "BTC-PERPETUAL") == "BTC-PERP"
 
     def test_deribit_future(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
@@ -357,14 +357,14 @@ class TestSymbolNormalizer:
         assert "BTC" in result
 
     def test_hyperliquid_perp(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("hyperliquid", "BTC") == "BTC-USDC-PERP"
 
     def test_kraken_legacy(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
@@ -372,7 +372,7 @@ class TestSymbolNormalizer:
         assert "BTC" in result
 
     def test_kraken_futures(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
@@ -380,28 +380,28 @@ class TestSymbolNormalizer:
         assert "BTC" in result or "PERP" in result
 
     def test_gateio(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("gateio", "BTC_USDT") == "BTC-USDT"
 
     def test_kucoin(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("kucoin", "BTC-USDT") == "BTC-USDT"
 
     def test_bitfinex_t_prefix(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("bitfinex", "tBTCUSD") == "BTC-USD"
 
     def test_dydx_perp(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
@@ -409,35 +409,35 @@ class TestSymbolNormalizer:
         assert normalize_symbol("dydx", "ETH-USD-PERP") == "ETH-USD-PERP"
 
     def test_tardis_passthrough(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("tardis", "btcusdt") == "BTCUSDT"
 
     def test_databento_passthrough(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("databento", "btcusdt") == "BTCUSDT"
 
     def test_unknown_venue(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("unknown_venue", "btcusdt") == "BTCUSDT"
 
     def test_bybit(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("bybit", "BTCUSDT") == "BTC-USDT"
 
     def test_coinbase(self):
-        from unified_api_contracts.canonical.normalize.symbols import (
+        from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
@@ -453,91 +453,91 @@ class TestModuleImports:
     """Verify every normalize submodule imports cleanly."""
 
     def test_cefi_extended_imports(self):
-        from unified_api_contracts.canonical.normalize import cefi_extended
+        from unified_api_contracts.normalize_utils import cefi_extended
 
         assert cefi_extended is not None
 
     def test_connectivity_imports(self):
-        from unified_api_contracts.canonical.normalize import connectivity
+        from unified_api_contracts.normalize_utils import connectivity
 
         assert connectivity is not None
 
     def test_derivative_tickers_imports(self):
-        from unified_api_contracts.canonical.normalize import derivative_tickers
+        from unified_api_contracts.normalize_utils import derivative_tickers
 
         assert derivative_tickers is not None
 
     def test_errors_imports(self):
-        from unified_api_contracts.canonical.normalize import errors
+        from unified_api_contracts.normalize_utils import errors
 
         assert errors is not None
 
     def test_fees_imports(self):
-        from unified_api_contracts.canonical.normalize import fees
+        from unified_api_contracts.normalize_utils import fees
 
         assert fees is not None
 
     def test_instruments_imports(self):
-        from unified_api_contracts.canonical.normalize import instruments
+        from unified_api_contracts.normalize_utils import instruments
 
         assert instruments is not None
 
     def test_liquidations_imports(self):
-        from unified_api_contracts.canonical.normalize import liquidations
+        from unified_api_contracts.normalize_utils import liquidations
 
         assert liquidations is not None
 
     def test_ohlcv_imports(self):
-        from unified_api_contracts.canonical.normalize import ohlcv
+        from unified_api_contracts.normalize_utils import ohlcv
 
         assert ohlcv is not None
 
     def test_options_imports(self):
-        from unified_api_contracts.canonical.normalize import options
+        from unified_api_contracts.normalize_utils import options
 
         assert options is not None
 
     def test_orderbooks_imports(self):
-        from unified_api_contracts.canonical.normalize import orderbooks
+        from unified_api_contracts.normalize_utils import orderbooks
 
         assert orderbooks is not None
 
     def test_orders_fills_imports(self):
-        from unified_api_contracts.canonical.normalize import orders_fills
+        from unified_api_contracts.normalize_utils import orders_fills
 
         assert orders_fills is not None
 
     def test_rate_limits_imports(self):
-        from unified_api_contracts.canonical.normalize import rate_limits
+        from unified_api_contracts.normalize_utils import rate_limits
 
         assert rate_limits is not None
 
     def test_sides_imports(self):
-        from unified_api_contracts.canonical.normalize import sides
+        from unified_api_contracts.normalize_utils import sides
 
         assert sides is not None
 
     def test_sports_imports(self):
-        from unified_api_contracts.canonical.normalize import sports
+        from unified_api_contracts.normalize_utils import sports
 
         assert sports is not None
 
     def test_symbols_imports(self):
-        from unified_api_contracts.canonical.normalize import symbols
+        from unified_api_contracts.normalize_utils import symbols
 
         assert symbols is not None
 
     def test_tickers_imports(self):
-        from unified_api_contracts.canonical.normalize import tickers
+        from unified_api_contracts.normalize_utils import tickers
 
         assert tickers is not None
 
     def test_trades_imports(self):
-        from unified_api_contracts.canonical.normalize import trades
+        from unified_api_contracts.normalize_utils import trades
 
         assert trades is not None
 
     def test_versifi_imports(self):
-        from unified_api_contracts.canonical.normalize import versifi
+        from unified_api_contracts.normalize_utils import versifi
 
         assert versifi is not None

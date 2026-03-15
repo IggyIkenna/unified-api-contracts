@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from unified_api_contracts.external.sports.errors import (
+from unified_api_contracts.canonical.domain.sports.errors import (
     BetRejectedError,
     BookmakerUnavailableError,
     FixtureNotFoundError,

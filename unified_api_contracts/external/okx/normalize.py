@@ -23,7 +23,7 @@ from ...canonical.domain import (
     MarketState,
     WebSocketEvent,
 )
-from ...canonical.execution import (
+from ...canonical.domain.execution import (
     CanonicalFill,
     CanonicalOrder,
     OrderSide,

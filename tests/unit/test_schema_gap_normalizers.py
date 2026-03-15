@@ -22,10 +22,10 @@ from unified_api_contracts.canonical.errors import (
 class TestSchemaGapNormalizers:
     def test_normalize_betdaq_order_accepted(self) -> None:
         from unified_api_contracts.canonical.domain import CanonicalBetOrder
-        from unified_api_contracts.canonical.normalize.sports import (
+        from unified_api_contracts.external.betdaq.schemas import BetdaqOrder
+        from unified_api_contracts.normalize_utils.sports import (
             normalize_betdaq_order,
         )
-        from unified_api_contracts.external.betdaq.schemas import BetdaqOrder
 
         order = BetdaqOrder(Id=12345, Result=0)
         result = normalize_betdaq_order(order)
@@ -35,17 +35,17 @@ class TestSchemaGapNormalizers:
         assert result.venue == "betdaq"
 
     def test_normalize_betdaq_order_rejected(self) -> None:
-        from unified_api_contracts.canonical.normalize.sports import (
+        from unified_api_contracts.external.betdaq.schemas import BetdaqOrder
+        from unified_api_contracts.normalize_utils.sports import (
             normalize_betdaq_order,
         )
-        from unified_api_contracts.external.betdaq.schemas import BetdaqOrder
 
         order = BetdaqOrder(Id=99, Result=-1)
         result = normalize_betdaq_order(order)
         assert result.status == "rejected"
 
     def test_normalize_matchbook_error_known_codes(self) -> None:
-        from unified_api_contracts.canonical.normalize.errors import (
+        from unified_api_contracts.normalize_utils.errors import (
             normalize_matchbook_error,
         )
 
@@ -58,12 +58,12 @@ class TestSchemaGapNormalizers:
 
     def test_normalize_onexbet_market(self) -> None:
         from unified_api_contracts.canonical.domain import CanonicalBetMarket
-        from unified_api_contracts.canonical.normalize.sports import (
-            normalize_onexbet_market,
-        )
         from unified_api_contracts.external.onexbet.schemas import (
             OneXBetMarket,
             OneXBetOutcome,
+        )
+        from unified_api_contracts.normalize_utils.sports import (
+            normalize_onexbet_market,
         )
 
         market = OneXBetMarket(name="1x2", outcomes=[OneXBetOutcome(name="Home", price=1.85)])
@@ -75,11 +75,11 @@ class TestSchemaGapNormalizers:
 
     def test_normalize_smarkets_order(self) -> None:
         from unified_api_contracts.canonical.domain import CanonicalBetOrder
-        from unified_api_contracts.canonical.normalize.sports import (
-            normalize_smarkets_order,
-        )
         from unified_api_contracts.external.smarkets.schemas import (
             SmarketsOrderResponse,
+        )
+        from unified_api_contracts.normalize_utils.sports import (
+            normalize_smarkets_order,
         )
 
         order = SmarketsOrderResponse(id="ord_abc123")
@@ -94,12 +94,12 @@ class TestSchemaGapNormalizers:
         from decimal import Decimal
 
         from unified_api_contracts.canonical.domain import CanonicalBetMarket
-        from unified_api_contracts.canonical.normalize.sports import (
-            normalize_sports_market,
-        )
         from unified_api_contracts.external.betfair.schemas import (
             BetfairMarket,
             BetfairMarketStatus,
+        )
+        from unified_api_contracts.normalize_utils.sports import (
+            normalize_sports_market,
         )
 
         market = BetfairMarket(

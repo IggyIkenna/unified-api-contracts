@@ -5,10 +5,10 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.external.sports.canonical.events import (
+from unified_api_contracts.canonical.domain.sports.events import (
     CanonicalFixtureEvent,
 )
-from unified_api_contracts.external.sports.canonical.injury import (
+from unified_api_contracts.canonical.domain.sports.injury import (
     CanonicalInjury,
 )
 

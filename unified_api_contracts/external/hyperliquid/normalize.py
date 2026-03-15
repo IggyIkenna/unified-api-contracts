@@ -19,7 +19,7 @@ from ...canonical.domain import (
     FeeType,
     WebSocketEvent,
 )
-from ...canonical.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
+from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
 from ...normalize_utils._helpers import _d, _to_decimal, _ts_ms_to_datetime
 from ..hyperliquid.schemas import (
     HyperliquidCandle,

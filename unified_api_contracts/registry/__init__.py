@@ -1,7 +1,14 @@
-"""Registry package: endpoint registry, endpoints, venue constants."""
+"""Registry package: endpoint registry, endpoints, venue constants, capabilities."""
 
 from __future__ import annotations
 
+from .capability import (
+    CapabilityResolutionError,
+    SourceCapability,
+    register_capability,
+    resolve_capability,
+)
+from .capability_data import CAPABILITY_DECLARATIONS, bootstrap_capabilities
 from .endpoint_registry import (
     ENDPOINT_REGISTRY,
     AccessMode,
@@ -209,6 +216,7 @@ __all__ = [
     "BYBIT_FUTURES",
     "BYBIT_SPOT",
     "CAESARS",
+    "CAPABILITY_DECLARATIONS",
     "CASUMO",
     "CBOE",
     "CBOT",
@@ -330,14 +338,19 @@ __all__ = [
     "ZERO_ALPHA_VENUES",
     "AccessMode",
     "AlphaProfile",
+    "CapabilityResolutionError",
     "CassetteStatus",
     "DataAvailability",
     "DefiProtocolType",
     "EndpointSpec",
     "ResponseFormat",
+    "SourceCapability",
     "SportsAuthMethod",
     "SportsVenueType",
     "VenueCapability",
     "VenueFeeModel",
+    "bootstrap_capabilities",
     "get_schema_class_for_endpoint",
+    "register_capability",
+    "resolve_capability",
 ]

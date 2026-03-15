@@ -17,6 +17,10 @@ from typing import Literal, Self
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
 from .._base import CanonicalBase
+from .live import LiveMatchState as LiveMatchState
+from .live import LiveOddsUpdate as LiveOddsUpdate
+from .live import MatchPeriod as MatchPeriod
+from .live import ScraperVersionMeta as ScraperVersionMeta
 
 
 class BookmakerCategory(StrEnum):

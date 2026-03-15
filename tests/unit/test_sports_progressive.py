@@ -11,7 +11,7 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.external.sports.canonical.progressive import (
+from unified_api_contracts.canonical.domain.sports.progressive import (
     CanonicalProgressiveOdds,
     CanonicalProgressiveStats,
 )

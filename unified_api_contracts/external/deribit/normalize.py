@@ -23,7 +23,7 @@ from ...canonical.domain import (
     MarketState,
     WebSocketEvent,
 )
-from ...canonical.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
+from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
 from ...normalize_utils._helpers import _d, _to_decimal, _to_levels, _ts_ms, _ts_ms_to_datetime
 from ...normalize_utils._helpers import _side as _side_helper
 from ...normalize_utils.market_state import _DERIBIT_STATE_MAP, normalize_market_state

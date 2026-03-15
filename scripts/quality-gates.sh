@@ -11,5 +11,6 @@ SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
+UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

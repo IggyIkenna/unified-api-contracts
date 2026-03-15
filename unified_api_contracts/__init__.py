@@ -165,7 +165,11 @@ from .canonical.domain import (
     WebSocketPingFrame,
     WebSocketPongFrame,
 )
-from .canonical.execution import (
+from .canonical.domain.derivatives.options import (
+    NormalizedStrikeCoordinate,
+    OptionChainSnapshot,
+)
+from .canonical.domain.execution import (
     BenchmarkType,
     CanonicalAccountState,
     CanonicalFill,
@@ -182,15 +186,33 @@ from .canonical.execution import (
     OrderType,
     TimeInForce,
 )
-from .canonical.options import (
-    NormalizedStrikeCoordinate,
-    OptionChainSnapshot,
-)
-from .canonical.spread import (
+from .canonical.domain.infrastructure.compute import ComputeType
+from .canonical.domain.market.spread import (
     CanonicalSpread,
     SpreadLeg,
 )
-from .config.log_level import LogLevel
+from .canonical.domain.sports.arbitrage import (
+    ArbitrageMarket,
+    ArbitrageOpportunity,
+    ArbitrageStatus,
+    ExpectedValue,
+)
+from .canonical.domain.sports.betting import (
+    BetExecution,
+    BetOrder,
+    BetStatus,
+    BettingSignal,
+    SignalSource,
+)
+from .canonical.domain.sports.errors import (
+    BetRejectedError,
+    BookmakerUnavailableError,
+    FixtureNotFoundError,
+    MarketClosedError,
+    OddsChangedError,
+    ScraperError,
+    SportsError,
+)
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
     CONFIG_SCHEMA,
@@ -327,24 +349,6 @@ from .external.polymarket import (
 from .external.polymarket.schemas import (
     PolymarketGammaMarket,
 )
-from .external.sports import (
-    ArbitrageMarket,
-    ArbitrageOpportunity,
-    ArbitrageStatus,
-    BetExecution,
-    BetOrder,
-    BetRejectedError,
-    BetStatus,
-    BettingSignal,
-    BookmakerUnavailableError,
-    ExpectedValue,
-    FixtureNotFoundError,
-    MarketClosedError,
-    OddsChangedError,
-    ScraperError,
-    SignalSource,
-    SportsError,
-)
 from .external.tardis.schemas import (
     TardisAvailableSymbol,
     TardisExchangeDetail,
@@ -452,7 +456,6 @@ from .schemas import (
     WithdrawalRecord,
     classify_venue_error,
 )
-from .shared import ComputeType
 
 __all__ = [
     "BINANCE_FUTURES",
@@ -731,7 +734,6 @@ __all__ = [
     "LiquidationHeatmapRequest",
     "LiquidationHeatmapResponse",
     "LiquidationLevel",
-    "LogLevel",
     "LongShortRatio",
     "ManifoldMarket",
     "ManifoldPrice",
@@ -882,7 +884,6 @@ _VENUES = [
     "polymarket",
     "soccer_football_info",
     "sharpapi",
-    "sports",
     "tardis",
     "thegraph",
     "transfermarkt",

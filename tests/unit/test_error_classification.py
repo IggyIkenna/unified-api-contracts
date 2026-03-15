@@ -1,6 +1,6 @@
 """Unit tests for ErrorAction and venue error classify() methods."""
 
-from unified_api_contracts.shared import ErrorAction
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 
 class TestErrorAction:

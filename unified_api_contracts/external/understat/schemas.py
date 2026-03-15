@@ -136,6 +136,7 @@ class UnderstatError(BaseModel):
 # Source schemas (merged from external/sports/sources/understat/)
 # =============================================================================
 
+
 class UnderstatXGData(BaseModel):
     """Understat xG summary for a match."""
 

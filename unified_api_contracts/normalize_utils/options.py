@@ -1,5 +1,6 @@
 """Options chain normalizers: raw venue option quote -> CanonicalOptionsChainEntry."""
 
+# --- Functions without external counterparts (kept inline) ---
 from __future__ import annotations
 
 import contextlib
@@ -7,97 +8,21 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 from ..canonical.domain import CanonicalOptionsChainEntry
-from ..external.databento.schemas import (
-    DATABENTO_PRICE_DIVISOR,
-    DatabentoCMEOptionQuote,
-    DatabentoOptionQuote,
+from ..external.databento.normalize import (
+    normalize_databento_cme_option_quote,
+    normalize_databento_option_quote,
 )
 from ..external.deribit.schemas import (
     DeribitMarkPriceOption,
     DeribitOptionsGreeks,
 )
-from ..external.ibkr.schemas import (
-    IBKRContractDetails,
-    IBKROptionGreeks,
-    IBKRTicker,
+from ..external.ibkr.normalize import normalize_ibkr_option_quote
+from ..external.tardis.normalize import normalize_tardis_option_quote
+from ..external.yahoo_finance.normalize import (
+    normalize_yahoo_finance_option,
+    normalize_yahoo_finance_options_chain,
+    normalize_yahoo_option,
 )
-from ..external.tardis import TardisOptionQuote
-from ..external.yahoo_finance import YahooOptionContract
-from ..external.yahoo_finance.schemas import (
-    YahooOptionContract as YahooOptionContractSchema,
-)
-from ..external.yahoo_finance.schemas import (
-    YahooOptionsChain,
-)
-
-
-def _db_price(px: int) -> Decimal:
-    return Decimal(str(float(px) / float(DATABENTO_PRICE_DIVISOR)))
-
-
-def _d(value: float | int | str | Decimal | None) -> Decimal | None:
-    """Convert any numeric value to Decimal; return None for None."""
-    if value is None:
-        return None
-    if isinstance(value, Decimal):
-        return value
-    return Decimal(str(value))
-
-
-def normalize_databento_option_quote(
-    raw: DatabentoOptionQuote, venue: str = "databento", symbol: str = ""
-) -> CanonicalOptionsChainEntry:
-    """Convert DatabentoOptionQuote (OPRA) to CanonicalOptionsChainEntry."""
-    ts = datetime.fromtimestamp(raw.ts_event / 1e9, tz=UTC)
-    opt_type = "call" if (raw.option_type or "C").upper() == "C" else "put"
-    exp = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC) if raw.expiration else None
-    return CanonicalOptionsChainEntry(
-        timestamp=ts,
-        venue=venue,
-        symbol=symbol or str(raw.instrument_id),
-        underlying=raw.underlying,
-        strike=_db_price(raw.strike_price),
-        option_type=opt_type,
-        expiration=exp,
-        bid_price=_db_price(raw.bid_px_00),
-        ask_price=_db_price(raw.ask_px_00),
-        bid_size=_d(raw.bid_sz_00),
-        ask_size=_d(raw.ask_sz_00),
-        implied_volatility=float(_db_price(raw.implied_volatility)) if raw.implied_volatility else None,
-        delta=float(_db_price(raw.delta)) if raw.delta else None,
-        gamma=float(_db_price(raw.gamma)) if raw.gamma else None,
-        theta=float(_db_price(raw.theta)) if raw.theta else None,
-        vega=float(_db_price(raw.vega)) if raw.vega else None,
-        instrument_key=f"{venue}:OPTION:{symbol or raw.instrument_id}",
-    )
-
-
-def normalize_databento_cme_option_quote(
-    raw: DatabentoCMEOptionQuote, venue: str = "databento", symbol: str = ""
-) -> CanonicalOptionsChainEntry:
-    """Convert DatabentoCMEOptionQuote (CME) to CanonicalOptionsChainEntry."""
-    ts = datetime.fromtimestamp(raw.ts_event / 1e9, tz=UTC)
-    opt_type = "call" if (raw.option_type or "C").upper() == "C" else "put"
-    exp = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC) if raw.expiration else None
-    return CanonicalOptionsChainEntry(
-        timestamp=ts,
-        venue=venue,
-        symbol=symbol or str(raw.instrument_id),
-        underlying=raw.underlying,
-        strike=_db_price(raw.strike_price),
-        option_type=opt_type,
-        expiration=exp,
-        bid_price=_db_price(raw.bid_px_00),
-        ask_price=_db_price(raw.ask_px_00),
-        bid_size=_d(raw.bid_sz_00),
-        ask_size=_d(raw.ask_sz_00),
-        implied_volatility=float(_db_price(raw.implied_volatility)) if raw.implied_volatility else None,
-        delta=float(_db_price(raw.delta)) if raw.delta else None,
-        gamma=float(_db_price(raw.gamma)) if raw.gamma else None,
-        theta=float(_db_price(raw.theta)) if raw.theta else None,
-        vega=float(_db_price(raw.vega)) if raw.vega else None,
-        instrument_key=f"{venue}:OPTION:{symbol or raw.instrument_id}",
-    )
 
 
 def normalize_deribit_option_ticker(
@@ -134,121 +59,6 @@ def normalize_deribit_option_ticker(
         theta=float(raw.theta) if raw.theta is not None else None,
         vega=float(raw.vega) if raw.vega is not None else None,
         instrument_key=f"{venue}:OPTION:{raw.instrument_name}",
-    )
-
-
-def normalize_tardis_option_quote(raw: TardisOptionQuote, venue: str = "tardis") -> CanonicalOptionsChainEntry:
-    """Convert TardisOptionQuote to CanonicalOptionsChainEntry."""
-    ts = datetime.fromtimestamp(raw.timestamp / 1000.0, tz=UTC)
-    exp = datetime.fromtimestamp(raw.expiration / 1000.0, tz=UTC) if raw.expiration is not None else None
-    opt_type = (raw.option_type or "call").lower()
-    return CanonicalOptionsChainEntry(
-        timestamp=ts,
-        venue=venue,
-        symbol=raw.symbol,
-        underlying=(raw.underlying_price is not None and str(raw.underlying_price)) or raw.symbol.split("-")[0],
-        strike=_d(raw.strike_price) or Decimal("0"),
-        option_type=opt_type,
-        expiration=exp,
-        bid_price=_d(raw.bid_price),
-        ask_price=_d(raw.ask_price),
-        bid_size=_d(raw.bid_amount),
-        ask_size=_d(raw.ask_amount),
-        implied_volatility=raw.mark_iv,
-        delta=raw.delta,
-        gamma=raw.gamma,
-        theta=raw.theta,
-        vega=raw.vega,
-        instrument_key=f"{venue}:OPTION:{raw.symbol}",
-    )
-
-
-def normalize_yahoo_option(raw: YahooOptionContract, venue: str = "yahoo_finance") -> CanonicalOptionsChainEntry:
-    """Convert YahooOptionContract to CanonicalOptionsChainEntry."""
-    ts = (
-        datetime.fromtimestamp(raw.lastTradeDate / 1000.0, tz=UTC)
-        if raw.lastTradeDate is not None
-        else datetime.now(tz=UTC)
-    )
-    exp = datetime.fromtimestamp(raw.expiration / 1000.0, tz=UTC) if raw.expiration is not None else None
-    opt_type = (raw.option_type or "call").lower()
-    return CanonicalOptionsChainEntry(
-        timestamp=ts,
-        venue=venue,
-        symbol=raw.contractSymbol,
-        underlying=raw.underlying or raw.contractSymbol,
-        strike=_d(raw.strike) or Decimal("0"),
-        option_type=opt_type,
-        expiration=exp,
-        bid_price=_d(raw.bid),
-        ask_price=_d(raw.ask),
-        bid_size=None,
-        ask_size=None,
-        implied_volatility=raw.impliedVolatility,
-        delta=None,
-        gamma=None,
-        theta=None,
-        vega=None,
-        instrument_key=f"{venue}:OPTION:{raw.contractSymbol}",
-    )
-
-
-def normalize_ibkr_option_quote(
-    raw: IBKRContractDetails,
-    ticker: IBKRTicker | None = None,
-    greeks: IBKROptionGreeks | None = None,
-    venue: str = "ibkr",
-) -> CanonicalOptionsChainEntry:
-    """Convert IBKRContractDetails (+ optional live ticker + greeks) to CanonicalOptionsChainEntry.
-
-    IBKRContractDetails carries the static option contract definition (strike, right, expiry).
-    IBKRTicker carries live bid/ask. IBKROptionGreeks carries computed greeks.
-    """
-    ts = datetime.now(tz=UTC)
-    opt_type = "put" if (raw.right or "C").upper() == "P" else "call"
-    # IBKR expiry format: YYYYMMDD or YYYYMM
-    exp: datetime | None = None
-    if raw.lastTradeDateOrContractMonth:
-        raw_exp = raw.lastTradeDateOrContractMonth.strip()
-        try:
-            if len(raw_exp) == 8:
-                exp = datetime.strptime(raw_exp, "%Y%m%d").replace(tzinfo=UTC)
-            elif len(raw_exp) == 6:
-                exp = datetime.strptime(raw_exp, "%Y%m").replace(tzinfo=UTC)
-        except ValueError:
-            exp = None
-
-    bid = ticker.bid if ticker is not None else None
-    ask = ticker.ask if ticker is not None else None
-    bid_sz = ticker.bidSize if ticker is not None else None
-    ask_sz = ticker.askSize if ticker is not None else None
-    iv = greeks.impliedVol if greeks is not None else None
-    delta = greeks.delta if greeks is not None else None
-    gamma = greeks.gamma if greeks is not None else None
-    theta = greeks.theta if greeks is not None else None
-    vega = greeks.vega if greeks is not None else None
-
-    symbol = raw.localSymbol or raw.symbol or str(raw.conid or "")
-    underlying = raw.symbol or ""
-
-    return CanonicalOptionsChainEntry(
-        timestamp=ts,
-        venue=venue,
-        symbol=symbol,
-        underlying=underlying,
-        strike=_d(raw.strike) or Decimal("0"),
-        option_type=opt_type,
-        expiration=exp,
-        bid_price=_d(bid),
-        ask_price=_d(ask),
-        bid_size=_d(bid_sz),
-        ask_size=_d(ask_sz),
-        implied_volatility=iv,
-        delta=delta,
-        gamma=gamma,
-        theta=theta,
-        vega=vega,
-        instrument_key=f"{venue}:OPTION:{symbol}",
     )
 
 
@@ -290,58 +100,6 @@ def normalize_deribit_mark_price_option(
         vega=None,
         instrument_key=f"{venue}:OPTION:{instrument_name}",
     )
-
-
-def normalize_yahoo_finance_option(
-    raw: YahooOptionContractSchema,
-    venue: str = "yahoo_finance",
-) -> CanonicalOptionsChainEntry:
-    """Convert YahooOptionContract (from schemas.py) to CanonicalOptionsChainEntry.
-
-    This is the newer schema format with snake_case fields (from ticker.option_chain()).
-    """
-    ts = datetime.now(tz=UTC)
-    exp: datetime | None = None
-    if raw.expiration:
-        with contextlib.suppress(ValueError, AttributeError):
-            exp = datetime.fromisoformat(raw.expiration.replace("Z", "+00:00"))
-    sym = raw.contract_symbol or raw.ticker or ""
-    opt_type = (raw.option_type or "call").lower()
-    return CanonicalOptionsChainEntry(
-        timestamp=ts,
-        venue=venue,
-        symbol=sym,
-        underlying=raw.ticker or sym,
-        strike=_d(raw.strike) or Decimal("0"),
-        option_type=opt_type,
-        expiration=exp,
-        bid_price=_d(raw.bid),
-        ask_price=_d(raw.ask),
-        bid_size=None,
-        ask_size=None,
-        implied_volatility=raw.implied_volatility,
-        delta=None,
-        gamma=None,
-        theta=None,
-        vega=None,
-        instrument_key=f"{venue}:OPTION:{sym}",
-    )
-
-
-def normalize_yahoo_finance_options_chain(
-    raw: YahooOptionsChain,
-    venue: str = "yahoo_finance",
-) -> list[CanonicalOptionsChainEntry]:
-    """Convert YahooOptionsChain to a list of CanonicalOptionsChainEntry.
-
-    Iterates both calls and puts lists, yielding one entry per contract.
-    """
-    results: list[CanonicalOptionsChainEntry] = []
-    for contract in raw.calls or []:
-        results.append(normalize_yahoo_finance_option(contract, venue=venue))
-    for contract in raw.puts or []:
-        results.append(normalize_yahoo_finance_option(contract, venue=venue))
-    return results
 
 
 __all__ = [

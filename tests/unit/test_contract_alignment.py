@@ -23,7 +23,7 @@ class TestCanonicalOrder:
     """CanonicalOrder: required fields, Decimal prices, AwareDatetime timestamp."""
 
     def test_import_and_instantiate(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts import CanonicalOrder, OrderSide, OrderType
 
         order = CanonicalOrder(
             order_id="ord-001",
@@ -39,7 +39,7 @@ class TestCanonicalOrder:
         assert order.instrument_id == "BTCUSDT"
 
     def test_required_fields_present(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalOrder
+        from unified_api_contracts import CanonicalOrder
 
         fields = CanonicalOrder.model_fields
         # Core required fields must exist
@@ -47,7 +47,7 @@ class TestCanonicalOrder:
             assert required in fields, f"CanonicalOrder missing required field: {required}"
 
     def test_quantity_is_decimal(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts import CanonicalOrder, OrderSide, OrderType
 
         order = CanonicalOrder(
             order_id="ord-002",
@@ -65,7 +65,7 @@ class TestCanonicalOrder:
     def test_timestamp_is_timezone_aware(self) -> None:
         from pydantic import ValidationError
 
-        from unified_api_contracts.canonical.execution import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts import CanonicalOrder, OrderSide, OrderType
 
         # Naive datetime must be rejected by AwareDatetime
         try:
@@ -84,12 +84,8 @@ class TestCanonicalOrder:
             pass  # expected — naive datetime rejected
 
     def test_schema_version_constant(self) -> None:
-        from unified_api_contracts.canonical.execution import (
-            CANONICAL_ORDER_VERSION,
-            CanonicalOrder,
-            OrderSide,
-            OrderType,
-        )
+        from unified_api_contracts import CanonicalOrder, OrderSide, OrderType
+        from unified_api_contracts.canonical.domain.execution import CANONICAL_ORDER_VERSION
 
         order = CanonicalOrder(
             order_id="ord-004",
@@ -113,7 +109,7 @@ class TestCanonicalFill:
     """CanonicalFill: required fields, Decimal price/quantity, AwareDatetime."""
 
     def test_import_and_instantiate(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalFill, OrderSide
+        from unified_api_contracts import CanonicalFill, OrderSide
 
         fill = CanonicalFill(
             fill_id="fill-001",
@@ -129,14 +125,14 @@ class TestCanonicalFill:
         assert fill.venue == "binance"
 
     def test_required_fields_present(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalFill
+        from unified_api_contracts import CanonicalFill
 
         fields = CanonicalFill.model_fields
         for required in ("fill_id", "order_id", "timestamp", "venue", "instrument_id", "side", "price", "quantity"):
             assert required in fields, f"CanonicalFill missing required field: {required}"
 
     def test_price_and_quantity_are_decimal(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalFill, OrderSide
+        from unified_api_contracts import CanonicalFill, OrderSide
 
         fill = CanonicalFill(
             fill_id="fill-002",
@@ -156,7 +152,7 @@ class TestCanonicalFill:
         assert isinstance(fill.fee, Decimal)
 
     def test_timestamp_is_timezone_aware(self) -> None:
-        from unified_api_contracts.canonical.execution import CanonicalFill, OrderSide
+        from unified_api_contracts import CanonicalFill, OrderSide
 
         fill = CanonicalFill(
             fill_id="fill-003",
@@ -311,7 +307,7 @@ class TestCanonicalOrderFillCompatibility:
     """Fill links back to Order via shared fields — verify compatibility."""
 
     def test_order_id_links_order_to_fill(self) -> None:
-        from unified_api_contracts.canonical.execution import (
+        from unified_api_contracts import (
             CanonicalFill,
             CanonicalOrder,
             OrderSide,

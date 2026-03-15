@@ -21,6 +21,7 @@ from .schemas import (
     YIELD_10Y_HIGH,
     YIELD_10Y_LOW,
     YIELD_CURVE_INVERSION_THRESHOLD,
+    YahooChartResult,
     YahooFinanceCommoditySnapshot,
     YahooFinanceDXYSnapshot,
     YahooFinanceError,

@@ -1,1 +1,7 @@
-"""Hyperliquid API contracts (HTTP + stats/S3 bucket response shapes)."""
+"""External Hyperliquid schemas."""
+
+from unified_api_contracts.external.hyperliquid.schemas import *
+
+from .schemas import (
+    HyperliquidMeta,
+)

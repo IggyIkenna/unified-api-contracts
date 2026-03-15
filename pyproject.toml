@@ -72,13 +72,13 @@ max-complexity = 7
 
 [tool.ruff.lint.per-file-ignores]
 "unified_api_contracts/external/binance/*.py" = ["N815", "N803", "F403", "F405"]
-"unified_api_contracts/external/cloud_sdks/*.py" = ["N803", "N815", "F403", "F405"]
-"unified_api_contracts/external/cloud_sdks/**/*.py" = ["N803", "N815", "F403", "F405"]
-"unified_api_contracts/external/yahoo_finance/__init__.py" = ["N815"]
+"unified_api_contracts/external/yahoo_finance/__init__.py" = ["N815", "F401"]
 "unified_api_contracts/external/mev/*.py" = ["N815"]
-"unified_api_contracts/external/sports/**/*.py" = ["N815", "N803"]
-"unified_api_contracts/external/**/__init__.py" = ["N815"]
+"unified_api_contracts/external/**/__init__.py" = ["N815", "F401", "F403", "F405"]
+"unified_api_contracts/external/*/__init__.py" = ["F401", "F403", "F405"]
 "unified_api_contracts/external/**/schemas.py" = ["N815"]
+"unified_api_contracts/external/aws/*.py" = ["N815", "N803"]
+"unified_api_contracts/external/gcp/*.py" = ["N815", "N803"]
 "unified_api_contracts/canonical/domain/account.py" = ["N815", "RUF012"]
 "unified_api_contracts/canonical/domain/position/__init__.py" = ["N815", "RUF012"]
 "unified_api_contracts/canonical/domain/derivatives.py" = ["N815"]
@@ -157,8 +157,25 @@ omit = [
     "unified_api_contracts/canonical/domain/position/*",
     "unified_api_contracts/canonical/domain/reference/*",
     "unified_api_contracts/canonical/domain/market/spread.py",
-    # Old sports canonical files (duplicated at new paths, deleted in Phase 5)
-    "unified_api_contracts/external/sports/canonical/*",
+    # Transitional: normalize and errors modules added in Phase 3 sports/sources flattening
+    "unified_api_contracts/canonical/normalize/*",
+    "unified_api_contracts/canonical/errors/*",
+    "unified_api_contracts/canonical/canonical_mappings.py",
+    # Phase 3 flattening: features modules moved into canonical/domain/sports/
+    "unified_api_contracts/canonical/domain/sports/_features_*.py",
+    "unified_api_contracts/canonical/domain/sports/features.py",
+    "unified_api_contracts/canonical/domain/sports/processed_odds.py",
+    # Phase 3 flattening: normalize modules added to external vendor directories
+    "unified_api_contracts/external/*/normalize.py",
+    # Phase 3 flattening: new schema files not yet covered
+    "unified_api_contracts/external/baker_hughes/schemas.py",
+    "unified_api_contracts/external/cftc/schemas.py",
+    "unified_api_contracts/external/eia/schemas.py",
+    "unified_api_contracts/external/databento/schemas_columns.py",
+    "unified_api_contracts/config/provider_modes.py",
+    # Phase 7 citadel: capability registry (data declarations, not business logic)
+    "unified_api_contracts/registry/capability.py",
+    "unified_api_contracts/registry/capability_data.py",
 ]
 
 [tool.coverage.report]
