@@ -10,6 +10,7 @@ from .._base import CanonicalBase
 class InstrumentType(StrEnum):
     SPOT_PAIR = "SPOT_PAIR"
     PERPETUAL = "PERPETUAL"
+    PERP = "PERP"  # Legacy alias — prefer PERPETUAL. Required by UCI parity.
     FUTURE = "FUTURE"
     OPTION = "OPTION"
     LST = "LST"
