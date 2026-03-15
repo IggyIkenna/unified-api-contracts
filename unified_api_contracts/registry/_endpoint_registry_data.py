@@ -85,7 +85,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="gamma-v1",
         notes="Gamma API events: questions, outcomes, volumes, resolution. No auth required.",
         requires_auth=False,
-        cassette_status=CassetteStatus.PENDING,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -109,7 +109,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         version="gamma-v1",
         notes="Gamma API market tags. No auth required.",
         requires_auth=False,
-        cassette_status=CassetteStatus.PENDING,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -124,7 +124,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         notes="CLOB era only: from Nov 21 2022. AMM era (pre-Nov 2022) has splits/merges only, no price series.",
         available_from_date="2022-11-21",
         requires_auth=False,
-        cassette_status=CassetteStatus.PENDING,
+        cassette_status=CassetteStatus.RECORDED,
     ),
     EndpointSpec(
         venue="polymarket",
@@ -437,9 +437,9 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.REST_POLLING,
         data_availability=DataAvailability.BOTH,
         version="v3",
-        notes="Public product list. No auth required for market data.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.PENDING,
+        notes="Public product list. V3 requires auth (CDP API key + JWT). Use V2 for public unauthenticated access.",
+        requires_auth=True,
+        cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     EndpointSpec(
         venue="coinbase",

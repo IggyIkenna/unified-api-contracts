@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from ..canonical.domain import CanonicalBetMarket, CanonicalBetOrder
-from ..canonical.domain.sports.betting import BetOrder
+from ..canonical.domain.sports.betting import BetOrder, BetSide
 from ..external.betdaq.normalize import (
     normalize_betdaq_market,
     normalize_betdaq_order,
@@ -35,6 +35,7 @@ from ..external.smarkets.normalize import (
     normalize_smarkets_market,
     normalize_smarkets_order,
 )
+from ..registry.venue_constants import SPORTS_EXCHANGE_VENUES
 
 # ---------------------------------------------------------------------------
 # Sports domain — no external venue equivalent
@@ -44,19 +45,23 @@ from ..external.smarkets.normalize import (
 def normalize_sports_order(
     raw: BetOrder,
     venue: str = "sports",
+    side: BetSide = BetSide.BACK,
 ) -> CanonicalBetOrder:
     """Convert BetOrder (sports canonical) to CanonicalBetOrder.
 
     BetOrder represents a bet to be placed at a bookmaker or exchange.
     requested_odds is the price; stake is the size.
+
+    Exchange venues (Betfair, Smarkets, etc.) support both back and lay;
+    bookmakers only support back.
     """
-    # Convert decimal odds to implied probability for consistency
+    effective_side = side if venue.upper() in SPORTS_EXCHANGE_VENUES else BetSide.BACK
     return CanonicalBetOrder(
         venue=venue or raw.bookmaker_key,
         order_id=raw.order_id,
         market_id=raw.fixture_id,
         selection_id=raw.selection,
-        side="back",  # sports bets are always backing
+        side=effective_side.value,
         price=raw.requested_odds,
         size=raw.stake,
         status="pending",

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "101259",
+    "label": "Health and Human Services",
+    "slug": "health-and-human-services",
+    "createdAt": "2024-11-13T19:58:34.318816Z",
+    "updatedAt": "2026-03-09T22:21:41.828275Z",
+    "requiresTranslation": false
+  },
+  {
+    "id": "101842",
+    "label": "Sweeden",
+    "slug": "sweeden",
+    "createdAt": "2025-02-10T21:54:06.650573Z",
+    "updatedAt": "2026-03-09T22:21:41.830021Z",
+    "requiresTranslation": false
+  }
+]
