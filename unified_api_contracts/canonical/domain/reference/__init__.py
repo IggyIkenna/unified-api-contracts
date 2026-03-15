@@ -15,6 +15,20 @@ class InstrumentType(StrEnum):
     LST = "LST"
     A_TOKEN = "A_TOKEN"
     INDEX = "INDEX"
+    # TradFi
+    BOND = "BOND"
+    EQUITY = "EQUITY"
+    ETF = "ETF"
+    COMMODITY = "COMMODITY"
+    CURRENCY = "CURRENCY"
+    CDS = "CDS"
+    # UCI parity
+    SPOT_ASSET = "SPOT_ASSET"
+    YIELD_BEARING = "YIELD_BEARING"
+    DEBT_TOKEN = "DEBT_TOKEN"
+    POOL = "POOL"
+    LENDING = "LENDING"
+    STAKING = "STAKING"
 
 
 class OptionType(StrEnum):

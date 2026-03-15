@@ -131,7 +131,7 @@ VENUE_EXECUTION_REGISTRY: dict[str, VenueExecutionProfile] = {
         odds_api_key=None,
         display_name="Betdaq",
         primary_execution_method=ExecutionMethod.REST_API,
-        api_base_url=None,
+        api_base_url="https://api.betdaq.com",
         api_docs_url="https://www.betdaq.com/",
         credential_type=CredentialType.USERNAME_PASSWORD,
         venue_category=VenueCategory.EXCHANGE,
@@ -876,7 +876,6 @@ VENUE_EXECUTION_REGISTRY: dict[str, VenueExecutionProfile] = {
         min_bet_currency="USD",
         withdrawal_fee="0",
     ),
-
     # ── US Exchanges (REST API) ────────────────────────────────────────────
     "polymarket": VenueExecutionProfile(
         venue_key="polymarket",

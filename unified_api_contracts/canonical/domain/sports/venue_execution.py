@@ -10,6 +10,7 @@ from decimal import Decimal
 from enum import StrEnum
 
 from .._base import CanonicalBase
+from .betting import CommissionModel
 
 
 class ExecutionMethod(StrEnum):
@@ -160,7 +161,7 @@ class VenueExecutionProfile(CanonicalBase):
     account_limiting_severity: str | None = None
 
     # Fees
-    commission_model: str | None = None
+    commission_model: CommissionModel | None = None
     commission_rate: Decimal | None = None
     commission_notes: str | None = None
     withdrawal_fee: Decimal | None = None

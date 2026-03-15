@@ -110,19 +110,20 @@ def _parse_decimal(val: str | float | Decimal | None) -> Decimal:
 
 def _ibkr_instrument_type(sec_type: str | None) -> str:
     mapping: dict[str, str] = {
-        "STK": "SPOT",
-        "CASH": "SPOT",
-        "CFD": "SPOT",
-        "IND": "SPOT",
-        "FUND": "SPOT",
-        "CMDTY": "SPOT",
+        "STK": "EQUITY",
+        "CASH": "CURRENCY",
+        "CFD": "SPOT_PAIR",
+        "IND": "INDEX",
+        "FUND": "ETF",
+        "CMDTY": "COMMODITY",
         "FUT": "FUTURE",
         "OPT": "OPTION",
+        "FOP": "OPTION",
         "WAR": "OPTION",
         "BAG": "FUTURE",
-        "BOND": "SPOT",
+        "BOND": "BOND",
     }
-    return mapping.get((sec_type or "").upper(), "SPOT")
+    return mapping.get((sec_type or "").upper(), "SPOT_PAIR")
 
 
 # ---------------------------------------------------------------------------
@@ -350,8 +351,16 @@ def normalize_ibkr_market_state(
     venue: str = "ibkr",
 ) -> CanonicalMarketStateEvent:
     """Normalize an IBKR trading phase string to CanonicalMarketStateEvent."""
-    type_map = {"STK": "SPOT", "FUT": "FUTURE", "OPT": "OPTION", "CASH": "SPOT"}
-    inst_type = type_map.get(sec_type.upper(), "SPOT")
+    type_map = {
+        "STK": "EQUITY",
+        "FUT": "FUTURE",
+        "OPT": "OPTION",
+        "CASH": "CURRENCY",
+        "IND": "INDEX",
+        "CMDTY": "COMMODITY",
+        "BOND": "BOND",
+    }
+    inst_type = type_map.get(sec_type.upper(), "SPOT_PAIR")
     ik = f"{venue}:{inst_type}:{symbol}"
     return normalize_market_state(
         raw_state=trading_phase,

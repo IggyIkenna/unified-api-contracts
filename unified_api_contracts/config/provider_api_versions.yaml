@@ -329,9 +329,34 @@ providers:
 
   odds_api:
     api_version: "v4"
+    previous_version: "v3"
     spec_url: "https://the-odds-api.com/liveapi/guides/v4/"
     last_verified: "2026-03-06"
     status: green
+    modes: [live, historical]
+    data_started: "2018-01-01"
+    v3_era_cutoff: "2023-01-01"
+    v3_era_markets: [h2h, spreads, totals]
+    v3_era_interval_minutes: 10
+    v4_era_markets:
+      [
+        h2h,
+        spreads,
+        totals,
+        btts,
+        draw_no_bet,
+        double_chance,
+        player_props,
+        outrights,
+      ]
+    v4_era_interval_minutes: 5
+    data_fidelity_notes: >
+      Live-capture service — historical data fidelity is bounded by what was
+      actually collected at the time. Pre-2023 data was captured under v3
+      (h2h/spreads/totals only, ~10min polling). Post-2023 has full v4 market
+      coverage (~5min polling). Querying btts/draw_no_bet/double_chance for
+      pre-2023 events returns empty — the data was never captured. All queries
+      use the v4 endpoint regardless of era.
 
   odds_engine:
     api_version: "v1"

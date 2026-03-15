@@ -5,7 +5,19 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from ...canonical.domain import CanonicalBetMarket, CanonicalInstrument
+from ...canonical.domain.sports.odds import OddsType
 from .schemas import OddsApiFixture, OddsApiMarket
+
+_MARKET_KEY_MAP: dict[str, OddsType] = {
+    "h2h": OddsType.H2H,
+    "spreads": OddsType.ASIAN_HANDICAP,
+    "totals": OddsType.OVER_UNDER,
+    "btts": OddsType.BOTH_TEAMS_SCORE,
+    "draw_no_bet": OddsType.DRAW_NO_BET,
+    "double_chance": OddsType.DOUBLE_CHANCE,
+    "outrights": OddsType.OUTRIGHT,
+    "correct_score": OddsType.CORRECT_SCORE,
+}
 
 
 def normalize_odds_api_market(

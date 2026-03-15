@@ -17,10 +17,22 @@ from typing import Literal, Self
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
 from .._base import CanonicalBase
+from .betting import BetExecution as BetExecution
+from .betting import BetOrder as BetOrder
+from .betting import BetSide as BetSide
+from .betting import BetStatus as BetStatus
+from .betting import BettingSignal as BettingSignal
+from .betting import CLVRecord as CLVRecord
+from .betting import CommissionModel as CommissionModel
+from .betting import SignalSource as SignalSource
 from .live import LiveMatchState as LiveMatchState
 from .live import LiveOddsUpdate as LiveOddsUpdate
 from .live import MatchPeriod as MatchPeriod
 from .live import ScraperVersionMeta as ScraperVersionMeta
+from .odds import CanonicalBookmakerMarket as CanonicalBookmakerMarket
+from .odds import MarketStatus as MarketStatus
+from .odds import OddsType as OddsType
+from .odds import OutcomeType as OutcomeType
 from .odds_api_mapping import ODDS_API_KEY_TO_VENUE as ODDS_API_KEY_TO_VENUE
 from .odds_api_mapping import ODDS_API_KEY_TO_VENUE_CATEGORY as ODDS_API_KEY_TO_VENUE_CATEGORY
 from .venue_execution import (
@@ -342,51 +354,3 @@ class PlayerMapping(BaseModel):
     footystats_player_id: str | None = None
     understat_player_id: int | None = None
     soccer_football_player_id: int | None = None
-
-
-class OddsType(StrEnum):
-    """Supported betting market types."""
-
-    H2H = "h2h"
-    OVER_UNDER = "over_under"
-    ASIAN_HANDICAP = "asian_handicap"
-    BOTH_TEAMS_SCORE = "both_teams_score"
-    CORRECT_SCORE = "correct_score"
-    OUTRIGHT = "outright"
-
-
-class OutcomeType(StrEnum):
-    """Possible bet outcomes."""
-
-    HOME = "home"
-    DRAW = "draw"
-    AWAY = "away"
-    OVER = "over"
-    UNDER = "under"
-    YES = "yes"
-    NO = "no"
-
-
-class MarketStatus(StrEnum):
-    """Status of an odds market."""
-
-    ACTIVE = "active"
-    SUSPENDED = "suspended"
-    CLOSED = "closed"
-    SETTLED = "settled"
-
-
-class CanonicalBookmakerMarket(BaseModel):
-    """Single bookmaker offering for a specific market."""
-
-    model_config = ConfigDict(frozen=True)
-
-    bookmaker_key: str
-    market: OddsType
-    outcomes: dict[str, Decimal]
-    margin: Decimal | None = None
-    last_updated_utc: datetime | None = None
-
-    @classmethod
-    def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:
-        return cls.model_validate(data)

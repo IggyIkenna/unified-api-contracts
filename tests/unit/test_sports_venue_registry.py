@@ -28,9 +28,13 @@ def test_all_venues_have_commission_data() -> None:
 
 def test_exchange_venues_have_api_url() -> None:
     for key, profile in VENUE_EXECUTION_REGISTRY.items():
-        if profile.venue_category and profile.venue_category.value == "exchange":
-            if profile.primary_execution_method and profile.primary_execution_method.value == "rest_api":
-                assert profile.api_base_url, f"{key}: exchange with REST API missing api_base_url"
+        if (
+            profile.venue_category
+            and profile.venue_category.value == "exchange"
+            and profile.primary_execution_method
+            and profile.primary_execution_method.value == "rest_api"
+        ):
+            assert profile.api_base_url, f"{key}: exchange with REST API missing api_base_url"
 
 
 def test_scraper_venues_have_login_url() -> None:

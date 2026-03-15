@@ -358,10 +358,11 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     ASTER: {"PERPETUAL"},
     NASDAQ: {"EQUITY", "ETF", "INDEX"},
     NYSE: {"EQUITY", "ETF", "INDEX"},
-    CME: {"FUTURE", "OPTION", "INDEX"},
-    CBOT: {"FUTURE", "OPTION"},
-    NYMEX: {"FUTURE", "OPTION"},
-    COMEX: {"FUTURE", "OPTION"},
+    CME: {"FUTURE", "OPTION", "INDEX", "BOND"},
+    CBOT: {"FUTURE", "OPTION", "BOND"},
+    NYMEX: {"FUTURE", "OPTION", "COMMODITY"},
+    COMEX: {"FUTURE", "OPTION", "COMMODITY"},
+    ICE: {"FUTURE", "OPTION", "COMMODITY"},
     CBOE: {"EQUITY", "ETF", "OPTION", "INDEX"},
     XNAS: {"EQUITY", "ETF"},
     XNYS: {"EQUITY", "ETF"},
@@ -379,6 +380,11 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     ETHERFI: {"STAKING"},
     ETHENA: {"STAKING"},
 }
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"EXCHANGE_ODDS"} for v in SPORTS_EXCHANGE_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"PREDICTION_MARKET"} for v in SPORTS_PREDICTION_MARKET_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"FIXED_ODDS"} for v in SPORTS_BOOKMAKER_API_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"FIXED_ODDS"} for v in SPORTS_BOOKMAKER_WEB_VENUES})
+INSTRUMENT_TYPES_BY_VENUE.update({v: {"PROP"} for v in SPORTS_DFS_VENUES})
 
 INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PERPETUAL": "perpetuals",
@@ -391,6 +397,14 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "POOL": "pools",
     "LENDING": "lending",
     "STAKING": "staking",
+    "BOND": "bonds",
+    "COMMODITY": "commodities",
+    "CURRENCY": "currencies",
+    "CDS": "cds",
+    "EXCHANGE_ODDS": "exchange_odds",
+    "FIXED_ODDS": "fixed_odds",
+    "PREDICTION_MARKET": "prediction_markets",
+    "PROP": "props",
 }
 
 # Venue Capabilities — what actions each venue supports
@@ -580,7 +594,7 @@ INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
 }
 
 INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
-    "TRADE": {"PERPETUAL", "SPOT", "SPOT_PAIR", "FUTURE", "OPTION", "EQUITY", "ETF", "INDEX"},
+    "TRADE": {"PERPETUAL", "SPOT", "SPOT_PAIR", "FUTURE", "OPTION", "EQUITY", "ETF", "INDEX", "BOND", "COMMODITY"},
     "SWAP": {"POOL"},
     "LEND": {"LENDING"},
     "BORROW": {"LENDING"},

@@ -23,6 +23,14 @@ class OddsType(StrEnum):
     BOTH_TEAMS_SCORE = "both_teams_score"
     CORRECT_SCORE = "correct_score"
     OUTRIGHT = "outright"
+    HALF_TIME_RESULT = "half_time_result"
+    FIRST_HALF_OVER_UNDER = "first_half_over_under"
+    CORNERS = "corners"
+    CARDS = "cards"
+    PLAYER_PROPS = "player_props"
+    DRAW_NO_BET = "draw_no_bet"
+    DOUBLE_CHANCE = "double_chance"
+    GOAL_SCORER = "goal_scorer"
 
 
 class OutcomeType(StrEnum):

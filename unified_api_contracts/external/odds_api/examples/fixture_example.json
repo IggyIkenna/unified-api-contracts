@@ -26,6 +26,14 @@
             { "name": "Team A", "price": 1.91, "point": -3.5 },
             { "name": "Team B", "price": 1.95, "point": 3.5 }
           ]
+        },
+        {
+          "key": "btts",
+          "lastUpdate": "2025-02-27T12:00:00Z",
+          "outcomes": [
+            { "name": "Yes", "price": 1.83 },
+            { "name": "No", "price": 1.91 }
+          ]
         }
       ]
     }

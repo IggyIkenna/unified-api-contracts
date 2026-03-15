@@ -26,6 +26,25 @@ class BetStatus(StrEnum):
     REJECTED = "rejected"
 
 
+class BetSide(StrEnum):
+    """Side of a bet: back (for outcome) or lay (against outcome)."""
+
+    BACK = "back"
+    LAY = "lay"
+
+
+class CommissionModel(StrEnum):
+    """Fee model for a sports venue."""
+
+    NET_WINNINGS_PCT = "net_winnings_pct"
+    BUILT_INTO_ODDS = "built_into_odds"
+    NOTIONAL_PCT = "notional_pct"
+    FLAT_FEE = "flat_fee"
+    MAKER_TAKER = "maker_taker"
+    LOW_VIG_EXCHANGE = "low_vig_exchange"
+    EXCHANGE_COMMISSION = "exchange_commission"
+
+
 class SignalSource(StrEnum):
     """Origin of a betting signal."""
 

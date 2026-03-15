@@ -673,16 +673,42 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
-    # --- Odds API ---
+    # --- Odds API (v4 endpoint, but data fidelity varies by era) ---
+    #
+    # All queries use v4. However the Odds API is a live-capture service — it
+    # records odds snapshots in real time, so historical data fidelity is bounded
+    # by what was actually collected at the time:
+    #
+    #   Pre-2023 (v3 era):
+    #     - Markets: h2h, spreads, totals ONLY (no btts/draw_no_bet/double_chance/player_props)
+    #     - Polling interval: ~10 minutes
+    #     - Querying btts for a 2021 match will return empty — the data was never captured
+    #
+    #   Post-2023 (v4 era):
+    #     - Markets: h2h, spreads, totals, btts, draw_no_bet, double_chance, player_props, outrights
+    #     - Polling interval: ~5 minutes
+    #
+    # Consumers should check available_from_date and v3_era_cutoff to avoid
+    # querying markets or intervals that don't exist for the requested time range.
+    #
     EndpointSpec(
         venue="odds_api",
         endpoint_path="https://api.the-odds-api.com/v4/sports/{sport}/odds",
         http_method="GET",
         schema_class="OddsAPIEvent",
         access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
+        data_availability=DataAvailability.BOTH,
         version="v4",
-        notes=("Auth via ?apiKey=KEY query param. 500 free requests/month. Secret Manager key: odds-api-key."),
+        available_from_date="2018-01-01",
+        notes=(
+            "Auth via ?apiKey=KEY query param. 500 free requests/month. "
+            "Secret Manager key: odds-api-key. "
+            "DATA FIDELITY WARNING: Pre-2023 data was captured under v3 constraints — "
+            "only h2h/spreads/totals markets at ~10min intervals. "
+            "btts, draw_no_bet, double_chance, player_props only exist from ~2023 onward. "
+            "Querying these markets for pre-2023 events returns empty. "
+            "Post-2023 data has full v4 market coverage at ~5min intervals."
+        ),
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),

@@ -62,7 +62,16 @@ def _d_opt(value: float | int | str | Decimal | None) -> Decimal | None:
 def _instrument_class_to_type(ic: str | None) -> InstrumentType:
     if not ic:
         return InstrumentType.SPOT_PAIR
-    m = {"F": InstrumentType.FUTURE, "O": InstrumentType.OPTION, "S": InstrumentType.SPOT_PAIR}
+    m = {
+        "F": InstrumentType.FUTURE,
+        "O": InstrumentType.OPTION,
+        "S": InstrumentType.SPOT_PAIR,
+        "B": InstrumentType.BOND,
+        "E": InstrumentType.EQUITY,
+        "N": InstrumentType.ETF,
+        "X": InstrumentType.INDEX,
+        "C": InstrumentType.COMMODITY,
+    }
     return m.get(ic.upper(), InstrumentType.SPOT_PAIR)
 
 
