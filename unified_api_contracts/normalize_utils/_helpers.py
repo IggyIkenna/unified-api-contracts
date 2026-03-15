@@ -165,6 +165,10 @@ def _tif(t: str | None) -> TimeInForce:
     return TimeInForce.GTC
 
 
+# Public aliases for cross-module use (avoids reportPrivateUsage when importing)
+to_decimal = _to_decimal
+unix_sec_to_utc = _ts_sec
+
 __all__ = [
     "_d",
     "_databento_price",
@@ -178,4 +182,6 @@ __all__ = [
     "_ts_ms",
     "_ts_ms_to_datetime",
     "_ts_sec",
+    "to_decimal",
+    "unix_sec_to_utc",
 ]

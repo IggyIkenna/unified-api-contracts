@@ -1,6 +1,5 @@
 """Sports and prediction market normalizers."""
 
-# --- Functions without external counterparts (kept inline) ---
 from __future__ import annotations
 
 from datetime import UTC, datetime
@@ -28,6 +27,7 @@ from ..external.manifold.normalize import (
     normalize_manifold_market,
     normalize_manifold_odds,
 )
+from ..external.odds_api.normalize import normalize_odds_api_fixture
 from ..external.onexbet.normalize import normalize_onexbet_market
 from ..external.pinnacle.normalize import normalize_pinnacle_event
 from ..external.polymarket.normalize import normalize_polymarket_market
@@ -35,6 +35,10 @@ from ..external.smarkets.normalize import (
     normalize_smarkets_market,
     normalize_smarkets_order,
 )
+
+# ---------------------------------------------------------------------------
+# Sports domain — no external venue equivalent
+# ---------------------------------------------------------------------------
 
 
 def normalize_sports_order(
@@ -102,6 +106,7 @@ __all__ = [
     "normalize_kalshi_order",
     "normalize_manifold_market",
     "normalize_manifold_odds",
+    "normalize_odds_api_fixture",
     "normalize_onexbet_market",
     "normalize_pinnacle_event",
     "normalize_polymarket_market",

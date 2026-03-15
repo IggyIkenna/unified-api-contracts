@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-# --- Functions without external counterparts (kept inline) ---
-from datetime import UTC, datetime
+from datetime import UTC
 
 from ..canonical.domain.execution import (
     CanonicalFill,
+    OrderSide,
 )
+from ..canonical.domain.execution.prime_broker import PrimeBrokerFill
 from ..external.aster.normalize import normalize_aster_order
 from ..external.binance.normalize import (
     normalize_binance_fill,
@@ -44,22 +45,22 @@ from ..external.nautilus.normalize import (
     normalize_nautilus_fill,
     normalize_nautilus_order,
 )
-from ..external.okx.normalize import (
-    _normalize_side,  # needed by normalize_prime_broker_fill
-    normalize_okx_order,
-)
+from ..external.okx.normalize import normalize_okx_order
 from ..external.polymarket.normalize import (
     normalize_polymarket_fill,
     normalize_polymarket_order,
 )
-from ..external.prime_broker.schemas import PrimeBrokerFill
 from ..external.upbit.normalize import normalize_upbit_order
 
+# ---------------------------------------------------------------------------
+# Prime Broker — no external/prime_broker/normalize.py; keep inline
+# ---------------------------------------------------------------------------
 
-def _ts_ms_to_datetime(ts: int | None) -> datetime:
-    if ts is None:
-        return datetime.now(UTC)
-    return datetime.fromtimestamp(ts / 1000.0, tz=UTC)
+
+def _normalize_side(s: str | None) -> OrderSide:
+    if not s:
+        return OrderSide.BUY
+    return OrderSide.SELL if str(s).lower() in ("sell", "short") else OrderSide.BUY
 
 
 def normalize_prime_broker_fill(raw: PrimeBrokerFill, venue: str | None = None) -> CanonicalFill:

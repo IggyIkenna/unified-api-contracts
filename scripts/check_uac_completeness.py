@@ -85,7 +85,7 @@ EXEMPT_MISSING: frozenset[str] = frozenset(
         "_ExternalBase",
         "_NormalisedBase",
         # normalizer-impl: NormalizerBase and concrete normalizer classes live in
-        # canonical/normalize/ — these are implementation, not schemas
+        # normalize_utils/ and external/*/normalize.py — these are implementation, not schemas
         "NormalizerBase",
         "BinanceFuturesNormalizer",
         "BinanceSpotNormalizer",

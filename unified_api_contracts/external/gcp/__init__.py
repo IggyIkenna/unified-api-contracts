@@ -129,6 +129,13 @@ from .iam import (
     TestIamPermissionsRequest,
     TestIamPermissionsResponse,
 )
+from .normalize import (
+    normalize_gcp_artifact_repository_to_registry,
+    normalize_gcp_cloud_build_to_job,
+    normalize_gcp_compute_instance_to_vm,
+    normalize_gcp_gcs_blob_list_to_storage,
+    normalize_gcp_storage_bucket,
+)
 from .oauth2 import (
     OAuth2AuthorizationRequest,
     OAuth2Error,
@@ -299,4 +306,9 @@ __all__ = [
     "UptimeCheckConfig",
     "WorkloadIdentityCredential",
     "WriteLogEntriesRequest",
+    "normalize_gcp_artifact_repository_to_registry",
+    "normalize_gcp_cloud_build_to_job",
+    "normalize_gcp_compute_instance_to_vm",
+    "normalize_gcp_gcs_blob_list_to_storage",
+    "normalize_gcp_storage_bucket",
 ]

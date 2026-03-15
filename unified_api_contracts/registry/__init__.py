@@ -7,6 +7,7 @@ from .capability import (
     SourceCapability,
     register_capability,
     resolve_capability,
+    validate_mode_env_auth,
 )
 from .capability_data import CAPABILITY_DECLARATIONS, bootstrap_capabilities
 from .endpoint_registry import (
@@ -353,4 +354,5 @@ __all__ = [
     "get_schema_class_for_endpoint",
     "register_capability",
     "resolve_capability",
+    "validate_mode_env_auth",
 ]

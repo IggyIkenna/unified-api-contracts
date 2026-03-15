@@ -1,49 +1,40 @@
 # Architecture
 
-**SSOT for constraints and layout:** unified-trading-codex/02-data/contracts-scope-and-layout.md. **Full layout and refactor plan:** [PACKAGE_LAYOUT_AND_SCOPE.md](PACKAGE_LAYOUT_AND_SCOPE.md).
+**SSOT for constraints and layout:** unified-trading-codex/02-data/contracts-scope-and-layout.md. **Full layout:** [PACKAGE_LAYOUT_AND_SCOPE.md](PACKAGE_LAYOUT_AND_SCOPE.md).
 
-Package layout and the split between external (venue-specific), normalised (canonical), and shared contracts.
+## Package structure
+
+The package is organized into six top-level directories plus root facade files:
+
+| Directory              | Purpose                                                                 | Contents                                                                                                                                                                                                                                      |
+| ---------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Root facade files**  | Domain-level re-exports for consumer convenience                        | `market.py`, `execution.py`, `reference.py`, `sports.py`, `position.py`, `features.py`, `derivatives.py`, `infrastructure.py`, `connectivity.py`, `latency.py`, `options.py`, `odds.py`, `errors.py`, `rate_limits.py`, `sports_reference.py` |
+| **`canonical/`**       | Canonical domain types, crosscutting types, errors                      | `domain/{market,execution,reference,sports,position,features,derivatives,infrastructure,onchain}/`, `crosscutting/{analytics,connectivity,latency,rate_limits,risk}`, `errors/{cefi,defi,altdata,sports}`, `canonical_mappings.py`            |
+| **`external/`**        | Raw per-source request/response/error schemas + per-source normalize.py | 79 source directories (binance, databento, hyperliquid, betfair, fix, gcp, etc.)                                                                                                                                                              |
+| **`normalize_utils/`** | Shared normalization helpers used by per-source normalize.py files      | 25 modules (ohlcv, tickers, orderbooks, trades, symbols, instruments, options, sports, onchain, etc.)                                                                                                                                         |
+| **`registry/`**        | Venue/capability/endpoint registry and manifest                         | `capability.py`, `capability_data.py`, `endpoint_registry.py`, `venue_constants.py`, `venue_rate_limits.py`, `venue_manifest/{cefi,defi,tradfi,betting_sports,data_providers,internal_services}.py`                                           |
+| **`config/`**          | Validation configuration                                                | `trading_validation.py`                                                                                                                                                                                                                       |
+| **`testing/`**         | Test infrastructure exported for consumers                              | `conftest_helper.py`, `fault_injection.py`, `detect_cassette_drift.py`, `network_block_plugin.py`, `vcr_endpoints.py`                                                                                                                         |
 
 ## Placement rule (where new modules go)
 
-| Content type                                                          | Location                      | Examples                                                                                                                                                 |
-| --------------------------------------------------------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Raw schemas for an external API, protocol, or venue**               | **`external/<name>/`**        | binance, databento, ccxt, yahoo_finance, **prime_broker**, **fix**, **nautilus** (one dir per external surface).                                         |
-| **Canonical domain/execution/error types**                            | **`canonical/`**              | domain.py, execution.py, errors.py, normalize.py.                                                                                                        |
-| **Shared cross-venue schemas** (not mirroring a single external API)  | **`schemas/`**                | risk, latency, analytics, protocol_sdks, **regulatory**.                                                                                                 |
-| **Small shared types** (enums, actions) used across the package       | **`shared/`**                 | quota_types, error_action.                                                                                                                               |
-| **Venue/contract manifest** (which venues, endpoints, schema classes) | **`venue_manifest/`** at root | Package infrastructure; not external API or shared schema.                                                                                               |
-| **Sports domain** (canonical + per-source)                            | **`sports/`** at root         | Exception: combines canonical types (`sports/canonical`) and source-specific schemas (`sports/sources`); long-term could align to external + normalised. |
+| Content type                                            | Location                           | Examples                                                                                       |
+| ------------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Raw schemas for an external API, protocol, or venue** | **`external/<name>/`**             | binance, databento, ccxt, fix, nautilus, prime_broker, regulatory                              |
+| **Normalization for a specific source**                 | **`external/<name>/normalize.py`** | Each source's normalize.py maps raw schemas to canonical types                                 |
+| **Shared normalization helpers**                        | **`normalize_utils/`**             | ohlcv.py, tickers.py, orderbooks.py, symbols.py                                                |
+| **Canonical domain types**                              | **`canonical/domain/<domain>/`**   | market, execution, sports, position, features, derivatives, reference, infrastructure, onchain |
+| **Canonical crosscutting types**                        | **`canonical/crosscutting/`**      | analytics, connectivity, latency, rate_limits, risk                                            |
+| **Canonical error types**                               | **`canonical/errors/`**            | cefi.py, defi.py, altdata.py, sports.py                                                        |
+| **Root facade re-exports**                              | **Root `.py` files**               | `market.py`, `execution.py` -- re-export from canonical for convenience                        |
+| **Venue/capability/endpoint metadata**                  | **`registry/`**                    | capability.py, venue_constants.py, endpoint_registry.py                                        |
+| **Venue manifest data**                                 | **`registry/venue_manifest/`**     | cefi.py, defi.py, tradfi.py, betting_sports.py                                                 |
 
 **Internal** (service-to-service) schemas live in **unified-internal-contracts**; AC is external + normalised only.
 
-## Current top-level folders vs rule
-
-| Folder at root     | Should live under        | Notes                                                         |
-| ------------------ | ------------------------ | ------------------------------------------------------------- |
-| **prime_broker**   | `external/prime_broker`  | External API (HiddenRoad, Talos, etc.).                       |
-| **fix**            | `external/fix`           | FIX protocol (external).                                      |
-| **nautilus**       | `external/nautilus`      | NautilusTrader engine (external).                             |
-| **regulatory**     | `schemas/regulatory`     | Shared report formats (MiFID II, EMIR).                       |
-| **schemas**        | (already correct)        | Shared cross-venue.                                           |
-| **shared**         | (already correct)        | Small shared types.                                           |
-| **sports**         | (exception at root)      | Domain namespace: canonical + sources; optional future split. |
-| **venue_manifest** | (infrastructure at root) | Manifest/metadata; not a schema category.                     |
-
-Migration of **prime_broker**, **fix**, **nautilus** into `external/` and **regulatory** into `schemas/regulatory` would align the tree with the rule; all imports and `venue_manifest/internal_services.py` module paths would need updating. Until then, the rule above applies to **new** modules.
-
-## Package layout
-
-- **`unified_api_contracts/`** — Root package.
-  - **`external/`** — Raw request/response/error schemas per venue or external system (Binance, Databento, Tardis, CCXT, etc.). Per-venue dirs contain `schemas.py`, `examples/`, `mocks/` (VCR cassettes; recording done in interfaces). **prime_broker**, **fix**, **nautilus** belong here per rule (currently at root).
-  - **`canonical/`** — Canonical domain, execution, and error types (self-contained; no internal imports).
-  - **`schemas/`** — Shared cross-venue schemas (risk, latency, analytics, regulatory, etc.). **regulatory** belongs here per rule (currently at root).
-  - **`shared/`** — Small shared types (enums, actions).
-  - **`venue_manifest/`** — Manifest of venues and contract coverage (infrastructure).
-  - **`sports/`** — Sports domain (canonical + sources); exception at root.
-  - Internal service-to-service schemas live in **unified-internal-contracts**; AC is external + normalised only.
-
 ## External vs normalised
 
-- **External**: Venue- or protocol-specific Pydantic models matching provider APIs. Use for parsing and validating raw API responses before mapping to canonical types.
-- **Normalised**: Canonical types used by UMI/UOI and services. See `unified_api_contracts.canonical` and [README Structure](../README.md#structure), [docs/INDEX.md](INDEX.md), [docs/CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md).
+- **External**: Venue- or protocol-specific Pydantic models matching provider APIs. Use for parsing and validating raw API responses before mapping to canonical types. Each `external/{source}/` directory contains `schemas.py` and `normalize.py`.
+- **Normalised**: Canonical types used by UMI/UOI and services. Organized under `canonical/domain/` by domain (market, execution, sports, etc.) and `canonical/crosscutting/` for cross-domain concerns. Root facade files (`market.py`, `execution.py`, etc.) re-export these for convenience.
+
+See [README Structure](../README.md#structure), [docs/INDEX.md](INDEX.md), [docs/CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md).

@@ -1,6 +1,5 @@
 """Options chain normalizers: raw venue option quote -> CanonicalOptionsChainEntry."""
 
-# --- Functions without external counterparts (kept inline) ---
 from __future__ import annotations
 
 import contextlib
@@ -23,6 +22,10 @@ from ..external.yahoo_finance.normalize import (
     normalize_yahoo_finance_options_chain,
     normalize_yahoo_option,
 )
+
+# ---------------------------------------------------------------------------
+# Deribit — option-specific normalizers not yet in external/deribit/normalize.py
+# ---------------------------------------------------------------------------
 
 
 def normalize_deribit_option_ticker(

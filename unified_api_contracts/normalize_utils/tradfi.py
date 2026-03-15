@@ -5,34 +5,54 @@ Covers:
 - ECB (European Central Bank SDMX REST) — EU OIS/ESTR yield curve
 - OFR (Office of Financial Research) — CDS spread indices
 - OpenBB Platform — Treasury bond bid/ask/YTM data
-
-All monetary / rate values are converted to Decimal for precision.
 """
 
 from __future__ import annotations
 
+# Baker Hughes (already external)
+from ..external.baker_hughes.normalize import normalize_baker_hughes_rig_count
+
+# CFTC (already external)
+from ..external.cftc.normalize import (
+    normalize_cftc_cot_report,
+    normalize_cftc_managed_money_position,
+)
+
+# ECB
 from ..external.ecb.normalize import (
     normalize_ecb_dataflow_response,
     normalize_ecb_yield_curve_observation,
 )
+
+# FRED
 from ..external.fred.normalize import (
     normalize_fred_observation,
     normalize_fred_series_response,
 )
+
+# OFR
 from ..external.ofr.normalize import (
     normalize_ofr_cds_response,
     normalize_ofr_cds_spread,
 )
+
+# OpenBB
 from ..external.openbb.normalize import (
-    _parse_date_to_utc,
     normalize_openbb_treasury_price,
     normalize_openbb_treasury_prices_response,
 )
-from ..external.tardis.normalize import _to_decimal
+
+# Polygon (already external)
+from ..external.polygon.normalize import (
+    normalize_polygon_aggregate,
+    normalize_polygon_aggregates_response,
+    normalize_polygon_ticker,
+)
 
 __all__ = [
-    "_parse_date_to_utc",
-    "_to_decimal",
+    "normalize_baker_hughes_rig_count",
+    "normalize_cftc_cot_report",
+    "normalize_cftc_managed_money_position",
     "normalize_ecb_dataflow_response",
     "normalize_ecb_yield_curve_observation",
     "normalize_fred_observation",
@@ -41,4 +61,7 @@ __all__ = [
     "normalize_ofr_cds_spread",
     "normalize_openbb_treasury_price",
     "normalize_openbb_treasury_prices_response",
+    "normalize_polygon_aggregate",
+    "normalize_polygon_aggregates_response",
+    "normalize_polygon_ticker",
 ]

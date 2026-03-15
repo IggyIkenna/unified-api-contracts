@@ -6,7 +6,7 @@ Exercises every normalizer with minimal valid inputs to ensure:
 3. Coverage > 0% for all normalize modules (driving total coverage above 70%)
 """
 
-from unified_api_contracts.canonical.errors import (
+from unified_api_contracts.canonical.crosscutting.errors import (
     CanonicalAuthenticationError,
     CanonicalAuthorizationError,
     CanonicalError,

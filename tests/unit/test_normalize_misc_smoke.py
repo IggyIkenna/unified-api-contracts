@@ -3,7 +3,7 @@
 Continuation of test_normalize_smoke.py — split to keep files under size limit.
 """
 
-from unified_api_contracts.canonical.errors import RateLimitInfo
+from unified_api_contracts.canonical.crosscutting.errors import RateLimitInfo
 
 # ---------------------------------------------------------------------------
 # Rate limits module

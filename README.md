@@ -19,26 +19,42 @@ Pydantic schemas, example JSON, and VCR cassette directories for external APIs u
 
 ```
 unified_api_contracts/
-├── external/     # Raw: request, response, errors per venue
-│   ├── binance/
-│   ├── databento/
-│   ├── tardis/
+├── market.py, execution.py, ...   # Root facade files (domain re-exports)
+├── canonical/                     # Canonical types
+│   ├── domain/                    # Per-domain canonical types
+│   │   ├── market/                #   Market data (spread, tradfi)
+│   │   ├── execution/             #   Execution (base, defi, prime_broker, sports, trade)
+│   │   ├── sports/                #   Sports (fixtures, odds, features, mappings, etc.)
+│   │   ├── reference/             #   Reference data
+│   │   ├── position/              #   Position types
+│   │   ├── features/              #   Feature models
+│   │   ├── derivatives/           #   Derivatives / options
+│   │   ├── infrastructure/        #   Infra (ci, compute)
+│   │   └── onchain/               #   On-chain types
+│   ├── crosscutting/              # Cross-domain: analytics, connectivity, latency, risk
+│   ├── errors/                    # Canonical errors: cefi, defi, altdata, sports
+│   └── canonical_mappings.py      # Cross-venue mapping tables
+├── external/                      # Raw per-source schemas (79 source dirs)
+│   ├── binance/                   #   Each contains: schemas.py, normalize.py,
+│   ├── databento/                 #   examples/, mocks/
+│   ├── hyperliquid/
+│   ├── betfair/
 │   └── ...
-├── canonical/  # Canonical: domain, execution, errors
-│   ├── domain.py
-│   ├── execution.py
-│   ├── errors.py
-│   └── normalize.py
-├── internal/                  # Internal service-to-service schemas
-├── schemas/                   # Shared cross-venue schemas
-└── ...
+├── normalize_utils/               # Shared normalization helpers (25 modules)
+├── registry/                      # Venue/capability/endpoint registry
+│   ├── capability.py, capability_data.py
+│   ├── endpoint_registry.py, venue_constants.py
+│   └── venue_manifest/            # Manifest data by category
+├── config/                        # Validation config
+└── testing/                       # Test infrastructure for consumers
 ```
 
-Per-venue directories (under `external/`) contain:
+Per-source directories (under `external/`) contain:
 
-- `schemas.py` — Pydantic models for request/response shapes.
-- `examples/` — Captured JSON (or CSV) from real or trial API calls.
-- `mocks/` — VCR cassettes for replay in tests.
+- `schemas.py` -- Pydantic models for request/response shapes.
+- `normalize.py` -- Maps raw venue schemas to canonical types.
+- `examples/` -- Captured JSON (or CSV) from real or trial API calls.
+- `mocks/` -- VCR cassettes for replay in tests.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a venue, capture examples, and record VCR.
 
@@ -53,7 +69,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a venue, capture examples,
 | TradFi execution                 | Interactive Brokers (IBKR, TWS/ib_insync)                          |
 | Sports                           | Betfair, Pinnacle, Polymarket, Odds API, API-Football              |
 
-**Sports schemas** in `unified_api_contracts/sports/`: canonical models (`CanonicalFixture`, `CanonicalOdds`, `SportsFeatureVector`), 8 source provider schemas, and cross-provider mapping schemas (`TeamMapping`, `FixtureMapping`, `PlayerMapping`).
+**Sports schemas** in `unified_api_contracts/canonical/domain/sports/`: canonical models (fixtures, odds, features, mappings, etc.) and per-source sports schemas in `external/{betfair,pinnacle,polymarket,odds_api,...}/`.
 
 **TradFi**: IBKR + Databento only; no direct CME/NASDAQ/NYSE. See [docs/TRADFI_VENUE_NUANCES.md](docs/TRADFI_VENUE_NUANCES.md) for CCXT, IBKR, and Databento symbol formats; [docs/VIX_LIVE_RESEARCH.md](docs/VIX_LIVE_RESEARCH.md) for VIX live streaming research.
 
@@ -64,17 +80,22 @@ See per-venue README or index under each directory for market data, order feed, 
 **Dependency and tier:** Canonical data is in `unified-trading-pm/workspace-manifest.json` (this repo is Tier 0, no workspace path deps). Consumers use path dependency `../unified-api-contracts` (see path-dependency-ci.mdc). Example:
 
 ```python
-from unified_api_contracts.databento.schemas import DatabentoTrade
-# validate raw response then map to canonical types
+# Canonical types via root facade files (preferred for consumers)
+from unified_api_contracts.market import CanonicalTicker
+from unified_api_contracts.execution import CanonicalOrder
+from unified_api_contracts.sports import CanonicalFixture
+
+# Raw venue schemas (for interface-level parsing)
+from unified_api_contracts.external.binance.schemas import BinanceTicker
 ```
 
-**Backward compat:** `unified_api_contracts.binance`, `unified_api_contracts.databento`, etc. are aliased to `unified_api_contracts.external.*`. Prefer `unified_api_contracts.canonical` for canonical schemas.
+**Import rule:** Consumer repos import from domain facade files (`unified_api_contracts.market`, `unified_api_contracts.execution`, etc.). Do not import from `unified_api_contracts.canonical.*` or `unified_api_contracts.normalize_utils.*` directly -- those are UAC-internal.
 
 ## Self-test: schemas and coverage
 
 Quality gates run tests that ensure:
 
-- **Per-venue schema coverage**: Each venue’s `schemas.py` exports the response and error classes declared in `unified_api_contracts/venue_manifest.py` (REST, WebSocket, FIX, and error types per venue).
+- **Per-venue schema coverage**: Each venue’s `schemas.py` exports the response and error classes declared in the `registry/venue_manifest/` data files (REST, WebSocket, FIX, and error types per venue).
 - **Example validation**: Every `examples/*.json` file validates against the correct Pydantic schema.
 - **Manifest consistency**: Venues declare `has_rest`, `has_websocket`, `has_fix`; at least one venue has REST and one has WebSocket.
 
@@ -104,9 +125,9 @@ Always use `Decimal` for financial data to avoid floating-point precision errors
 
 ```python
 from decimal import Decimal
-from unified_api_contracts.binance.schemas import BinanceTicker
+from unified_api_contracts.external.binance.schemas import BinanceTicker
 
-# ✅ Correct - preserves precision
+# Correct - preserves precision
 ticker = BinanceTicker(
     symbol="BTCUSDT",
     lastPrice=Decimal("50000.12345678"),  # 8 decimal places preserved
@@ -114,7 +135,7 @@ ticker = BinanceTicker(
     # ...
 )
 
-# ❌ Wrong - loses precision
+# Wrong - loses precision
 ticker = BinanceTicker(
     symbol="BTCUSDT",
     lastPrice=50000.12345678,  # May lose precision
@@ -127,7 +148,7 @@ ticker = BinanceTicker(
 Handle APIs that return arrays (klines, candles, trades):
 
 ```python
-from unified_api_contracts.binance.schemas import BinanceKline
+from unified_api_contracts.external.binance.schemas import BinanceKline
 
 # Binance klines return [timestamp, open, high, low, close, volume, ...]
 kline_data = [1771898400000, "64160.26", "64500.00", "64000.00", "64109.81", "599.63527", ...]
@@ -142,8 +163,8 @@ print(kline.open_price)  # Decimal('64160.26')
 Standard error handling across venues:
 
 ```python
-from unified_api_contracts.binance.schemas import BinanceError
-from unified_api_contracts.coinbase.schemas import CoinbaseError
+from unified_api_contracts.external.binance.schemas import BinanceError
+from unified_api_contracts.external.coinbase.schemas import CoinbaseError
 
 try:
     # API call
@@ -163,7 +184,7 @@ except APIError as e:
 REST and WebSocket schemas are often compatible:
 
 ```python
-from unified_api_contracts.binance.schemas import BinanceTicker
+from unified_api_contracts.external.binance.schemas import BinanceTicker
 
 # Same schema works for both REST and WebSocket
 rest_ticker = BinanceTicker(**rest_api_response)
@@ -195,7 +216,7 @@ If you prefer manual steps or already have Python 3.13 and uv:
 ```bash
 uv venv .venv --python python3.13
 source .venv/bin/activate
-uv pip install -e ".[dev]"
+uv pip install -e .
 
 # Install pre-commit hooks
 pre-commit install

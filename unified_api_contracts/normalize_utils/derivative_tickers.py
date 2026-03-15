@@ -18,17 +18,9 @@ from ..external.ccxt.normalize import normalize_ccxt_funding_rate
 from ..external.deribit.normalize import normalize_deribit_derivative_ticker
 from ..external.hyperliquid.normalize import normalize_hyperliquid_derivative_ticker
 from ..external.okx.normalize import normalize_okx_derivative_ticker
-from ..external.tardis.normalize import (
-    _ms_to_utc,
-    _now_utc,
-    _to_decimal,
-    normalize_tardis_derivative_ticker,
-)
+from ..external.tardis.normalize import normalize_tardis_derivative_ticker
 
 __all__ = [
-    "_ms_to_utc",
-    "_now_utc",
-    "_to_decimal",
     "normalize_aster_derivative_ticker",
     "normalize_binance_derivative_ticker",
     "normalize_bybit_derivative_ticker",

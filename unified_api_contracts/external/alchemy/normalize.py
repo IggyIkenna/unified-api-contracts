@@ -83,26 +83,45 @@ def normalize_alchemy_asset_transfer(
     raw: AlchemyAssetTransfer,
     chain: str,
     venue: str = "alchemy",
+    address: str | None = None,
 ) -> CanonicalTrade | None:
     """Normalize AlchemyAssetTransfer to CanonicalTrade.
 
-    Treats asset transfer as a trade: quantity = value, price = 1.
-    blockNum/timestamp are hex; value may be float (already converted) or need hex handling.
+    Maps: blockNum->timestamp via metadata.blockTimestamp if present else now;
+    hash->trade_id; value->quantity; price=1; side from from_/to when address provided;
+    symbol from asset. Returns None if hash or value missing.
     """
-    if raw.value is None or raw.value <= 0:
+    if raw.hash is None or raw.hash == "":
         return None
-    qty = _d(raw.value)
+    if raw.value is None:
+        return None
+    qty: Decimal | None
+    if isinstance(raw.value, str) and raw.value.strip().lower().startswith("0x"):
+        qty = _hex_to_decimal(raw.value)
+    else:
+        qty = _d(raw.value)
     if qty is None or qty <= 0:
         return None
     ts = datetime.now(UTC)
+    if raw.metadata and "blockTimestamp" in raw.metadata:
+        bt = raw.metadata["blockTimestamp"]
+        ts = _hex_to_ts(bt if isinstance(bt, (str, int)) or bt is None else str(bt))
+    side = "sell"
+    if address is not None:
+        if raw.from_ and address.lower() == raw.from_.lower():
+            side = "sell"
+        elif raw.to and address.lower() == raw.to.lower():
+            side = "buy"
+        else:
+            side = "sell"
     return CanonicalTrade(
         venue=venue,
         symbol=raw.asset or "ETH",
-        trade_id=raw.hash or "",
+        trade_id=raw.hash,
         timestamp=ts,
         price=Decimal("1"),
         quantity=qty,
-        side="sell",
+        side=side,
         buyer_maker=None,
         venue_trade_id=raw.hash,
         instrument_key=f"{venue}:{chain}:{raw.asset or 'ETH'}",
@@ -119,14 +138,19 @@ def normalize_alchemy_token_balance(
 ) -> CanonicalBalance | None:
     """Normalize AlchemyTokenBalance to CanonicalBalance.
 
-    tokenBalance is hex string (wei/smallest unit); convert via _hex_to_decimal.
+    Maps tokenBalance (hex str) -> total/free/locked via _hex_to_decimal;
+    currency from symbol or contractAddress; timestamp=now.
+    Returns None if tokenBalance missing.
     """
+    if raw.tokenBalance is None or raw.tokenBalance == "":
+        return None
     bal = _hex_to_decimal(raw.tokenBalance)
     if bal is None:
         return None
     decimals = raw.decimals or 18
     divisor = Decimal(10) ** decimals
     total = bal / divisor
+    currency = raw.symbol or raw.contractAddress or "UNKNOWN"
     raw_dict: dict[str, object] = {
         "contractAddress": raw.contractAddress,
         "tokenBalance": raw.tokenBalance,
@@ -135,7 +159,7 @@ def normalize_alchemy_token_balance(
         "name": raw.name,
     }
     return CanonicalBalance(
-        currency=raw.symbol or raw.name or "UNKNOWN",
+        currency=currency,
         free=total,
         locked=Decimal("0"),
         total=total,
@@ -153,13 +177,15 @@ def normalize_alchemy_block_to_metric(
 ) -> CanonicalOnChainMetric | None:
     """Normalize AlchemyBlock to CanonicalOnChainMetric (block-level metric).
 
-    metric_type = "block"
-    value = gasUsed, secondary_value = gasLimit.
-    timestamp from block timestamp (hex).
+    metric_type="block"; value=block number (hex_to_int); timestamp from block timestamp (hex).
+    Returns None if number or timestamp missing.
     """
+    if raw.number is None or raw.timestamp is None:
+        return None
+    block_num = _hex_to_int(raw.number)
+    if block_num is None:
+        return None
     ts = _hex_to_ts(raw.timestamp)
-    gas_used = _hex_to_decimal(raw.gasUsed)
-    gas_limit = _hex_to_decimal(raw.gasLimit)
     raw_dict: dict[str, float | int | str | None] = {
         "number": raw.number,
         "hash": raw.hash,
@@ -172,8 +198,8 @@ def normalize_alchemy_block_to_metric(
         venue=venue,
         metric_type="block",
         asset=None,
-        value=gas_used,
-        secondary_value=gas_limit,
+        value=Decimal(str(block_num)),
+        secondary_value=None,
         entity=raw.hash,
         chain=chain,
         raw=raw_dict,
@@ -185,14 +211,18 @@ def normalize_alchemy_transaction_to_metric(
     raw: AlchemyTransaction,
     chain: str,
     venue: str = "alchemy",
+    block: AlchemyBlock | None = None,
 ) -> CanonicalOnChainMetric | None:
     """Normalize AlchemyTransaction to CanonicalOnChainMetric (tx-level metric).
 
-    metric_type = "transaction"
-    value = value (wei), secondary_value = gasUsed or gas.
+    metric_type="transaction"; value=gas (hex_to_decimal) as gasUsed-like;
+    timestamp from block if block param provided else now.
+    Returns None if hash missing.
     """
-    val = _hex_to_decimal(raw.value)
-    gas = _hex_to_decimal(raw.gas)
+    if raw.hash is None or raw.hash == "":
+        return None
+    gas_val = _hex_to_decimal(raw.gas)
+    ts = _hex_to_ts(block.timestamp) if block and block.timestamp else datetime.now(UTC)
     raw_dict: dict[str, float | int | str | None] = {
         "hash": raw.hash,
         "blockNumber": raw.blockNumber,
@@ -203,12 +233,12 @@ def normalize_alchemy_transaction_to_metric(
         "gasPrice": raw.gasPrice,
     }
     return CanonicalOnChainMetric(
-        timestamp=datetime.now(UTC),
+        timestamp=ts,
         venue=venue,
         metric_type="transaction",
         asset=None,
-        value=val,
-        secondary_value=gas,
+        value=gas_val,
+        secondary_value=None,
         entity=raw.hash,
         chain=chain,
         raw=raw_dict,

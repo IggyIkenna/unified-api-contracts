@@ -1,4 +1,4 @@
-"""Prime broker integration schemas — HiddenRoad / Talos / FalconX style."""
+"""Prime broker schemas — credit intermediation, cross-venue netting, settlement."""
 
 from .schemas import (
     CollateralAsset,

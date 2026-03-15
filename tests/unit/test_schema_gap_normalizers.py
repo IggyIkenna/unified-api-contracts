@@ -10,7 +10,7 @@ Gaps resolved:
 
 from __future__ import annotations
 
-from unified_api_contracts.canonical.errors import (
+from unified_api_contracts.canonical.crosscutting.errors import (
     CanonicalAuthenticationError,
     CanonicalAuthorizationError,
     CanonicalError,

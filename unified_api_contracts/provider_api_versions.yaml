@@ -376,13 +376,6 @@ providers:
     status: yellow
     free_tier: true
 
-  prime_broker:
-    api_version: "v1"
-    spec_url: ""
-    last_verified: "2026-03-06"
-    status: yellow
-    free_tier: true
-
   pyth:
     api_version: "v1"
     spec_url: "https://docs.pyth.network/home"

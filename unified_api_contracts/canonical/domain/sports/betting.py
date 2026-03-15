@@ -91,9 +91,38 @@ class BetExecution(BaseModel):
     filled_stake: Decimal | None = None
     bookmaker_ref: str | None = None
     error_message: str | None = None
+    odds_at_placement: Decimal | None = None
+    closing_odds: Decimal | None = None
+    closing_line_source: str | None = None
+    clv_edge_pct: Decimal | None = None
     executed_at_utc: datetime
 
     @classmethod
     def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:
         """Construct from a flat dictionary."""
         return cls.model_validate(data)
+
+
+class CLVRecord(BaseModel):
+    """Aggregated CLV tracking for model validation.
+
+    CLV (Closing Line Value) measures whether bets consistently beat the closing line.
+    A positive mean_clv over 500+ bets is strong evidence of a genuine edge.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    model_version: str
+    sport_key: str
+    market_type: str
+    bookmaker_key: str | None = None
+    period_start: datetime
+    period_end: datetime
+    total_bets: int
+    bets_beating_close: int
+    mean_clv_pct: Decimal
+    median_clv_pct: Decimal
+    clv_hit_rate: Decimal
+    total_stake: Decimal
+    total_pnl: Decimal
+    roi_pct: Decimal

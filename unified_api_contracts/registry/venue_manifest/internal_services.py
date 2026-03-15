@@ -77,7 +77,7 @@ INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
         },
     },
     "prime_broker": {
-        "module": "unified_api_contracts.external.prime_broker.schemas",
+        "module": "unified_api_contracts.canonical.domain.execution.prime_broker",
         "description": (
             "Prime broker integration schemas — HiddenRoad / Talos / FalconX style. "
             "Covers credit accounts, cross-venue position netting, margin calls, "

@@ -4,6 +4,20 @@ One-hop conversion: BinanceTrade -> CanonicalTrade, BinanceOrderBook -> Canonica
 """
 
 from ..canonical.domain.sports.odds_canonical import american_to_decimal, decimal_to_american, fractional_to_decimal
+from ..external.eia.normalize import (
+    normalize_eia_crude_storage_report,
+    normalize_eia_series_observation,
+    normalize_eia_series_observation_to_ohlcv,
+    normalize_eia_storage_report,
+)
+from ..external.fear_greed.normalize import (
+    normalize_fear_greed_reading,
+)
+from ..external.open_meteo.normalize import (
+    normalize_open_meteo_forecast,
+    normalize_open_meteo_weather,
+    normalize_open_meteo_weather_multi,
+)
 from .cefi_extended import (
     normalize_bitfinex_fill,
     normalize_bitfinex_order,
@@ -142,6 +156,18 @@ from .fees import (
     normalize_hyperliquid_fee,
     normalize_okx_fee_rate,
     normalize_upbit_fee_rate,
+)
+from .infrastructure import (
+    normalize_aws_codebuild_to_job,
+    normalize_aws_ec2_instance_to_vm,
+    normalize_aws_ecr_repository_to_registry,
+    normalize_aws_s3_bucket_to_storage,
+    normalize_aws_s3_list_to_storage,
+    normalize_gcp_artifact_repository_to_registry,
+    normalize_gcp_cloud_build_to_job,
+    normalize_gcp_compute_instance_to_vm,
+    normalize_gcp_gcs_blob_list_to_storage,
+    normalize_gcp_storage_bucket,
 )
 from .instruments import (
     normalize_arbitrage_market,
@@ -418,6 +444,11 @@ __all__ = [
     "normalize_aster_trade",
     "normalize_aster_ws_close",
     "normalize_aster_ws_subscription",
+    "normalize_aws_codebuild_to_job",
+    "normalize_aws_ec2_instance_to_vm",
+    "normalize_aws_ecr_repository_to_registry",
+    "normalize_aws_s3_bucket_to_storage",
+    "normalize_aws_s3_list_to_storage",
     "normalize_barchart_ohlcv",
     "normalize_betdaq_error",
     "normalize_betdaq_market",
@@ -542,6 +573,11 @@ __all__ = [
     # TradFi normalizers (tradfi)
     "normalize_ecb_dataflow_response",
     "normalize_ecb_yield_curve_observation",
+    "normalize_eia_crude_storage_report",
+    "normalize_eia_series_observation",
+    "normalize_eia_series_observation_to_ohlcv",
+    "normalize_eia_storage_report",
+    "normalize_fear_greed_reading",
     "normalize_fix_error",
     "normalize_fix_execution_report_to_fill",
     "normalize_fix_execution_report_to_order",
@@ -557,6 +593,11 @@ __all__ = [
     "normalize_gateio_orderbook",
     "normalize_gateio_ticker",
     "normalize_gateio_trade",
+    "normalize_gcp_artifact_repository_to_registry",
+    "normalize_gcp_cloud_build_to_job",
+    "normalize_gcp_compute_instance_to_vm",
+    "normalize_gcp_gcs_blob_list_to_storage",
+    "normalize_gcp_storage_bucket",
     "normalize_github_error",
     "normalize_glassnode_error",
     "normalize_glassnode_exchange_reserves",
@@ -660,6 +701,9 @@ __all__ = [
     "normalize_okx_ws_subscription",
     "normalize_onexbet_market",
     "normalize_open_meteo_error",
+    "normalize_open_meteo_forecast",
+    "normalize_open_meteo_weather",
+    "normalize_open_meteo_weather_multi",
     "normalize_openbb_treasury_price",
     "normalize_openbb_treasury_prices_response",
     "normalize_pinnacle_error",

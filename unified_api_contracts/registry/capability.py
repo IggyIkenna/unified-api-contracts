@@ -9,6 +9,7 @@ __all__ = [
     "SourceCapability",
     "register_capability",
     "resolve_capability",
+    "validate_mode_env_auth",
 ]
 
 
@@ -50,3 +51,44 @@ def resolve_capability(source: str) -> SourceCapability:
     if source not in _CAPABILITIES:
         raise CapabilityResolutionError(source, "*")
     return _CAPABILITIES[source]
+
+
+def validate_mode_env_auth(
+    capability: SourceCapability,
+    mode: str | None = None,
+    env: str | None = None,
+) -> None:
+    """Validate mode/env against capability. Raises UTL error classes on mismatch.
+
+    Args:
+        capability: The resolved SourceCapability for the data source.
+        mode: If provided, validates "live" or "batch" against capability flags.
+        env: If provided, validates "testnet" against capability flags.
+
+    Raises:
+        UnsupportedModeError: When the source does not support the requested mode.
+        UnsupportedEnvironmentError: When the source does not support the requested env.
+    """
+    if mode and mode == "live" and not capability.supports_live:
+        from unified_trading_library import UnsupportedModeError  # noqa: qg-inside-import
+
+        supported: list[str] = []
+        if capability.supports_batch:
+            supported.append("batch")
+        raise UnsupportedModeError(capability.source, mode, supported)
+
+    if mode and mode == "batch" and not capability.supports_batch:
+        from unified_trading_library import UnsupportedModeError  # noqa: qg-inside-import
+
+        supported = []
+        if capability.supports_live:
+            supported.append("live")
+        raise UnsupportedModeError(capability.source, mode, supported)
+
+    if env and env == "testnet" and not capability.supports_testnet:
+        from unified_trading_library import UnsupportedEnvironmentError  # noqa: qg-inside-import
+
+        supported_envs: list[str] = []
+        if capability.supports_mainnet:
+            supported_envs.append("mainnet")
+        raise UnsupportedEnvironmentError(capability.source, env, supported_envs)

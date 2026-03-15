@@ -107,6 +107,13 @@ from unified_api_contracts.external.aws.lambda_ import (
     LambdaInvokeRequest,
     LambdaInvokeResponse,
 )
+from unified_api_contracts.external.aws.normalize import (
+    normalize_aws_codebuild_to_job,
+    normalize_aws_ec2_instance_to_vm,
+    normalize_aws_ecr_repository_to_registry,
+    normalize_aws_s3_bucket_to_storage,
+    normalize_aws_s3_list_to_storage,
+)
 from unified_api_contracts.external.aws.protocols import (
     PaginatorProtocol,
     S3ClientProtocol,
@@ -274,4 +281,9 @@ __all__ = [
     "SqsReceiveMessageRequest",
     "SqsSendMessageRequest",
     "SqsSendMessageResponse",
+    "normalize_aws_codebuild_to_job",
+    "normalize_aws_ec2_instance_to_vm",
+    "normalize_aws_ecr_repository_to_registry",
+    "normalize_aws_s3_bucket_to_storage",
+    "normalize_aws_s3_list_to_storage",
 ]

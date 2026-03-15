@@ -2,7 +2,7 @@
 """Check schema organization: flag UAC schemas that should be in UIC (internal-only).
 
 Schemas in unified_api_contracts/schemas/ must be used in at least one of:
-  (a) canonical/normalize/
+  (a) normalize_utils/
   (b) external/
   (c) tests/
 
@@ -25,13 +25,13 @@ WORKSPACE_ROOT = Path(
 )
 REPO_ROOT = WORKSPACE_ROOT / "unified-api-contracts"
 SCHEMAS_DIR = REPO_ROOT / "unified_api_contracts" / "schemas"
-NORMALIZE_DIR = REPO_ROOT / "unified_api_contracts" / "canonical" / "normalize"
+NORMALIZE_UTILS_DIR = REPO_ROOT / "unified_api_contracts" / "normalize_utils"
 EXTERNAL_DIR = REPO_ROOT / "unified_api_contracts" / "external"
 TESTS_DIR = REPO_ROOT / "tests"
 
 # Directories to search for schema usage (relative to REPO_ROOT)
 SEARCH_DIRS = [
-    NORMALIZE_DIR,
+    NORMALIZE_UTILS_DIR,
     EXTERNAL_DIR,
     TESTS_DIR,
 ]

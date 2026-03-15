@@ -35,6 +35,32 @@ class PolygonTicker(BaseModel):
     description: str | None = None
 
 
+class PolygonAggregate(BaseModel):
+    """Single OHLCV bar from GET /v3/aggs/ticker/{ticker}/range/...
+
+    Ref: https://polygon.io/docs/stocks/get_v3_aggs_ticker__ticker__range
+    """
+
+    o: float | None = None  # open
+    h: float | None = None  # high
+    l: float | None = None  # low  # noqa: E741
+    c: float | None = None  # close
+    v: float | None = None  # volume
+    vw: float | None = None  # vwap
+    t: int | None = None  # timestamp (ms)
+    n: int | None = None  # number of items in aggregate
+
+
+class PolygonAggregatesResponse(BaseModel):
+    """Response from GET /v3/aggs/ticker/{ticker}/range/..."""
+
+    results: list[PolygonAggregate] | None = None
+    status: str | None = None
+    ticker: str | None = None
+    query_count: int | None = Field(None, alias="queryCount")
+    results_count: int | None = Field(None, alias="resultsCount")
+
+
 class PolygonTickersResponse(BaseModel):
     """Paginated response from GET /v3/reference/tickers."""
 

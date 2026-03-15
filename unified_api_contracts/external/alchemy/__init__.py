@@ -1,10 +1,25 @@
-"""External Alchemy schemas."""
+"""External Alchemy schemas and normalizers."""
 
-from unified_api_contracts.external.alchemy.schemas import *
-
+from .normalize import (
+    normalize_alchemy_asset_transfer,
+    normalize_alchemy_block_to_metric,
+    normalize_alchemy_token_balance,
+    normalize_alchemy_transaction_to_metric,
+)
 from .schemas import (
     AlchemyRpcResponse,
     AlchemyWsLog,
     AlchemyWsMinedTransaction,
     AlchemyWsNotification,
 )
+
+__all__ = [
+    "AlchemyRpcResponse",
+    "AlchemyWsLog",
+    "AlchemyWsMinedTransaction",
+    "AlchemyWsNotification",
+    "normalize_alchemy_asset_transfer",
+    "normalize_alchemy_block_to_metric",
+    "normalize_alchemy_token_balance",
+    "normalize_alchemy_transaction_to_metric",
+]

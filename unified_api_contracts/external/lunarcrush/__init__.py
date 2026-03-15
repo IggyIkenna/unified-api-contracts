@@ -1,20 +1,6 @@
-"""Sentiment data source schemas (CryptoPanic, LunarCrush)."""
+"""LunarCrush social sentiment API schemas."""
 
-from unified_api_contracts.external.sentiment.cryptopanic import (
-    CRYPTOPANIC_BASE_URL,
-    CRYPTOPANIC_RATE_LIMIT_FREE,
-    CRYPTOPANIC_RATE_LIMIT_PRO,
-    SENTIMENT_NEGATIVE_THRESHOLD,
-    SENTIMENT_NEUTRAL_RANGE,
-    SENTIMENT_POSITIVE_THRESHOLD,
-    CryptoPanicCurrency,
-    CryptoPanicError,
-    CryptoPanicPost,
-    CryptoPanicPostsResponse,
-    CryptoPanicRequestParams,
-    CryptoPanicVote,
-)
-from unified_api_contracts.external.sentiment.lunarcrush import (
+from unified_api_contracts.external.lunarcrush.schemas import (
     LUNARCRUSH_BASE_URL,
     LUNARCRUSH_GALAXY_SCORE_STRONG,
     LUNARCRUSH_GALAXY_SCORE_WEAK,
@@ -35,9 +21,6 @@ from unified_api_contracts.external.sentiment.lunarcrush import (
 )
 
 __all__ = [
-    "CRYPTOPANIC_BASE_URL",
-    "CRYPTOPANIC_RATE_LIMIT_FREE",
-    "CRYPTOPANIC_RATE_LIMIT_PRO",
     "LUNARCRUSH_BASE_URL",
     "LUNARCRUSH_GALAXY_SCORE_STRONG",
     "LUNARCRUSH_GALAXY_SCORE_WEAK",
@@ -47,17 +30,6 @@ __all__ = [
     "LUNARCRUSH_SENTIMENT_BULLISH",
     "LUNARCRUSH_SENTIMENT_NEUTRAL_HIGH",
     "LUNARCRUSH_SENTIMENT_NEUTRAL_LOW",
-    "SENTIMENT_NEGATIVE_THRESHOLD",
-    "SENTIMENT_NEUTRAL_RANGE",
-    "SENTIMENT_POSITIVE_THRESHOLD",
-    # CryptoPanic
-    "CryptoPanicCurrency",
-    "CryptoPanicError",
-    "CryptoPanicPost",
-    "CryptoPanicPostsResponse",
-    "CryptoPanicRequestParams",
-    "CryptoPanicVote",
-    # LunarCrush
     "LunarCrushAssetMetrics",
     "LunarCrushAssetsResponse",
     "LunarCrushError",

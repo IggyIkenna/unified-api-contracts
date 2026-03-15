@@ -5,7 +5,7 @@ Generate schema audit matrix: Provider x Schema Type -> mapped/gap status.
 Scans:
   - external/<provider>/schemas.py (and sub-modules)
     for Pydantic model class names using ast (no exec/eval).
-  - canonical/normalize/*.py
+  - normalize_utils/**/*.py and external/<provider>/normalize.py
     for `def normalize_*` function signatures.
 
 Matches normalize_<provider>_<schema_lower> to <Provider><Schema> classes,
@@ -195,18 +195,25 @@ def get_provider_schemas(provider_dir: Path) -> dict[str, list[str]]:
     return result
 
 
-def get_normalizer_coverage(norm_dir: Path) -> dict[str, dict[str, list[str]]]:
+def get_normalizer_coverage(uac_root: Path) -> dict[str, dict[str, list[str]]]:
     """Return mapping of provider -> category -> list of normalizer function names.
 
-    Parses all normalize/*.py files using ast.
+    Parses normalize_utils/**/*.py and external/<provider>/normalize.py using ast.
     Includes extract_* functions under the 'RateLimit' category.
     """
     result: dict[str, dict[str, list[str]]] = {}
 
-    if not norm_dir.exists():
-        return result
+    py_files: list[Path] = []
+    norm_utils = uac_root / "normalize_utils"
+    if norm_utils.exists():
+        py_files.extend(norm_utils.rglob("*.py"))
+    ext_root = uac_root / "external"
+    if ext_root.exists():
+        for p in ext_root.iterdir():
+            if p.is_dir() and (p / "normalize.py").exists():
+                py_files.append(p / "normalize.py")
 
-    for py in norm_dir.glob("*.py"):
+    for py in py_files:
         if py.name.startswith("_"):
             continue
 
@@ -399,7 +406,7 @@ def main() -> None:
 
     repo_root = Path(__file__).resolve().parents[1]
     ext_root = repo_root / "unified_api_contracts" / "external"
-    norm_dir = repo_root / "unified_api_contracts" / "canonical" / "normalize"
+    uac_root = repo_root / "unified_api_contracts"
 
     providers = get_providers(ext_root)
     if not providers:
@@ -412,7 +419,7 @@ def main() -> None:
     for p in providers:
         provider_schemas[p] = get_provider_schemas(ext_root / p)
 
-    normalizers = get_normalizer_coverage(norm_dir)
+    normalizers = get_normalizer_coverage(uac_root)
     logger.info(f"Found normalizers for providers: {sorted(normalizers.keys())}")
 
     # Count gaps
