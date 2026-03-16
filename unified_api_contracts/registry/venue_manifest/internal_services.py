@@ -121,25 +121,6 @@ INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
         ],
         "error_schema_classes": ["TradeReportingError"],
     },
-    "risk_analytics": {
-        "module": "unified_api_contracts.canonical.crosscutting.risk",
-        "description": (
-            "Advanced quantitative risk schemas: VaR (historical, parametric, Monte Carlo), "
-            "CVaR, stress testing, SPAN multi-asset margin, P&L attribution."
-        ),
-        "is_internal": True,
-        "has_vcr_cassettes": False,
-        "cassette_schema_version": "1.0",
-        "response_schema_classes": [
-            "VaRRequest",
-            "VaRResult",
-            "StressScenario",
-            "StressTestResult",
-            "PnLAttributionRecord",
-            "RealTimePnLRecord",
-            "RiskLimitBreach",
-        ],
-    },
     "latency": {
         "module": "unified_api_contracts.canonical.crosscutting.latency",
         "description": (

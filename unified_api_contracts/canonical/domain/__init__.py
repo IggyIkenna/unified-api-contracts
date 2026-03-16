@@ -1,21 +1,31 @@
 """Canonical domain schemas — sports, market, reference, derivatives, position, and more."""
 
-from unified_api_contracts.canonical.crosscutting.analytics import (
-    AlternativeDataSignal,
-    AlternativeDataType,
-    DarkPoolPrintRecord,
-    OptionsFlowRecord,
-    SatelliteObservation,
-    SentimentScore,
+from ..crosscutting.analytics import (
+    AlternativeDataSignal as AlternativeDataSignal,
 )
-from unified_api_contracts.canonical.crosscutting.connectivity import (
+from ..crosscutting.analytics import (
+    AlternativeDataType as AlternativeDataType,
+)
+from ..crosscutting.analytics import (
+    DarkPoolPrintRecord as DarkPoolPrintRecord,
+)
+from ..crosscutting.analytics import (
+    OptionsFlowRecord as OptionsFlowRecord,
+)
+from ..crosscutting.analytics import (
+    SatelliteObservation as SatelliteObservation,
+)
+from ..crosscutting.analytics import (
+    SentimentScore as SentimentScore,
+)
+from ..crosscutting.connectivity import (
     CanonicalWebSocketLifecycle,
     HealthPingResponse,
     WebSocketConnectionClosed,
     WebSocketConnectionOpened,
     WebSocketEvent,
 )
-from unified_api_contracts.canonical.crosscutting.latency import (
+from ..crosscutting.latency import (
     CoLocationPerformanceMetric,
     LatencyBenchmarkReport,
     LatencyComponent,
@@ -25,12 +35,12 @@ from unified_api_contracts.canonical.crosscutting.latency import (
     SubMillisecondLatencyRecord,
     TickToTradeMetric,
 )
-from unified_api_contracts.canonical.crosscutting.rate_limits import (
+from ..crosscutting.rate_limits import (
     HttpRateLimitHeaders,
     VenueRateLimitSpec,
 )
-from unified_api_contracts.canonical.domain._base import CanonicalBase
-from unified_api_contracts.canonical.domain.derivatives import (
+from ._base import CanonicalBase
+from .derivatives import (
     CanonicalDerivativeTicker,
     CanonicalFundingRate,
     CanonicalLiquidation,
@@ -51,11 +61,11 @@ from unified_api_contracts.canonical.domain.derivatives import (
     VolSurfaceSlice,
     VolTermStructure,
 )
-from unified_api_contracts.canonical.domain.derivatives.options import (
+from .derivatives.options import (
     NormalizedStrikeCoordinate,
     OptionChainSnapshot,
 )
-from unified_api_contracts.canonical.domain.execution import (
+from .execution import (
     BenchmarkType,
     CanonicalAccountState,
     CanonicalFill,
@@ -72,11 +82,11 @@ from unified_api_contracts.canonical.domain.execution import (
     OrderType,
     TimeInForce,
 )
-from unified_api_contracts.canonical.domain.features import (
+from .features import (
     CanonicalFeatureRecord,
     FeatureMetadata,
 )
-from unified_api_contracts.canonical.domain.infrastructure import (
+from .infrastructure import (
     INFRA_CANONICAL_TO_PROVIDER,
     CanonicalCloudStorage,
     CanonicalComputeJob,
@@ -95,8 +105,8 @@ from unified_api_contracts.canonical.domain.infrastructure import (
     ScalingMode,
     SourceControlProvider,
 )
-from unified_api_contracts.canonical.domain.infrastructure.compute import ComputeType
-from unified_api_contracts.canonical.domain.market import (
+from .infrastructure.compute import ComputeType
+from .market import (
     BookLevel,
     CanonicalMarketStateEvent,
     CanonicalOhlcvBar,
@@ -107,20 +117,20 @@ from unified_api_contracts.canonical.domain.market import (
     MarketTrade,
     OrderBookSnapshot5,
 )
-from unified_api_contracts.canonical.domain.market.spread import (
+from .market.spread import (
     CanonicalSpread,
     SpreadLeg,
 )
-from unified_api_contracts.canonical.domain.market.tradfi import (
+from .market.tradfi import (
     CanonicalBondData,
     CanonicalCdsSpread,
     CanonicalYieldCurvePoint,
 )
-from unified_api_contracts.canonical.domain.onchain import (
+from .onchain import (
     CanonicalOnChainMetric,
     CanonicalOraclePriceFeed,
 )
-from unified_api_contracts.canonical.domain.position import (
+from .position import (
     AggregatedPosition,
     BinanceWithdrawRequest,
     BinanceWithdrawResponse,
@@ -164,14 +174,14 @@ from unified_api_contracts.canonical.domain.position import (
     VenuePositionBreakdown,
     WithdrawalRecord,
 )
-from unified_api_contracts.canonical.domain.prediction import (
+from .prediction import (
     CanonicalPredictionMarket,
     MappingRule,
     OrphanDetector,
     PredictionMarketCategory,
     PredictionMarketMapper,
 )
-from unified_api_contracts.canonical.domain.reference import (
+from .reference import (
     CanonicalInstrument,
     InstructionType,
     InstrumentType,
@@ -179,7 +189,7 @@ from unified_api_contracts.canonical.domain.reference import (
     OptionType,
     Sport,
 )
-from unified_api_contracts.canonical.domain.sports import (
+from .sports import (
     ODDS_API_KEY_TO_VENUE,
     ODDS_API_KEY_TO_VENUE_CATEGORY,
     VENUE_EXECUTION_REGISTRY,
@@ -219,17 +229,17 @@ from unified_api_contracts.canonical.domain.sports import (
     VenueCategory,
     VenueExecutionProfile,
 )
-from unified_api_contracts.canonical.domain.sports.arbitrage import (
+from .sports.arbitrage import (
     ArbitrageMarket,
     ArbitrageOpportunity,
     ArbitrageStatus,
     ExpectedValue,
 )
-from unified_api_contracts.canonical.domain.sports.bookmaker_registry import (
+from .sports.bookmaker_registry import (
     BOOKMAKER_REGISTRY,
     BookmakerRegistry,
 )
-from unified_api_contracts.canonical.domain.sports.errors import (
+from .sports.errors import (
     BetRejectedError,
     BookmakerUnavailableError,
     FixtureNotFoundError,
