@@ -30,6 +30,11 @@ class InstrumentType(StrEnum):
     POOL = "POOL"
     LENDING = "LENDING"
     STAKING = "STAKING"
+    # Sports / Prediction Markets
+    PREDICTION_MARKET = "PREDICTION_MARKET"
+    EXCHANGE_ODDS = "EXCHANGE_ODDS"
+    FIXED_ODDS = "FIXED_ODDS"
+    PROP = "PROP"
 
 
 class OptionType(StrEnum):
@@ -41,6 +46,35 @@ class InstructionType(StrEnum):
     TRADE = "TRADE"
     SWAP = "SWAP"
     ZERO_ALPHA = "ZERO_ALPHA"
+    PREDICTION_BET = "PREDICTION_BET"
+    SPORTS_BET = "SPORTS_BET"
+    SPORTS_EXCHANGE_ORDER = "SPORTS_EXCHANGE_ORDER"
+    FUTURES_ROLL = "FUTURES_ROLL"
+    OPTIONS_COMBO = "OPTIONS_COMBO"
+
+
+class Sport(StrEnum):
+    """Canonical sport identifiers used across all sports strategies."""
+
+    FOOTBALL = "FOOTBALL"
+    BASKETBALL = "BASKETBALL"
+    BASEBALL = "BASEBALL"
+    HOCKEY = "HOCKEY"
+    TENNIS = "TENNIS"
+    CRICKET = "CRICKET"
+    RUGBY = "RUGBY"
+    GOLF = "GOLF"
+    MMA = "MMA"
+    BOXING = "BOXING"
+    MOTORSPORT = "MOTORSPORT"
+    AMERICAN_FOOTBALL = "AMERICAN_FOOTBALL"
+    HANDBALL = "HANDBALL"
+    VOLLEYBALL = "VOLLEYBALL"
+    TABLE_TENNIS = "TABLE_TENNIS"
+    DARTS = "DARTS"
+    SNOOKER = "SNOOKER"
+    ESPORTS = "ESPORTS"
+    SOCCER = "SOCCER"
 
 
 class CanonicalInstrument(CanonicalBase):

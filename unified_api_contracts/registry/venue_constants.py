@@ -587,6 +587,11 @@ INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
     "FLASH_LOAN": {"defi"},
     "TRANSFER": {"defi"},
     "BET": {"sports"},
+    "PREDICTION_BET": {"sports"},
+    "SPORTS_BET": {"sports"},
+    "SPORTS_EXCHANGE_ORDER": {"sports"},
+    "FUTURES_ROLL": {"cefi", "tradfi"},
+    "OPTIONS_COMBO": {"cefi", "tradfi"},
 }
 
 INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
@@ -599,6 +604,11 @@ INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
     "FLASH_LOAN": {"LENDING"},
     "TRANSFER": {"SPOT", "SPOT_PAIR"},
     "BET": {"FIXED_ODDS", "EXCHANGE_ODDS", "SPREAD", "OVER_UNDER", "OUTRIGHT", "PROP"},
+    "PREDICTION_BET": {"PREDICTION_MARKET"},
+    "SPORTS_BET": {"FIXED_ODDS", "PROP"},
+    "SPORTS_EXCHANGE_ORDER": {"EXCHANGE_ODDS"},
+    "FUTURES_ROLL": {"FUTURE"},
+    "OPTIONS_COMBO": {"OPTION"},
 }
 
 # Alpha Classification

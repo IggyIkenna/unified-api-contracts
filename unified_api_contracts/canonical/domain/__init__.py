@@ -151,6 +151,7 @@ from unified_api_contracts.canonical.domain.reference import (
     InstrumentType,
     InstrumentWarehouseRow,
     OptionType,
+    Sport,
 )
 from unified_api_contracts.canonical.domain.sports import (
     ODDS_API_KEY_TO_VENUE,
@@ -318,6 +319,7 @@ __all__ = [
     "SentimentScore",
     "SettlementEvent",
     "SpanMarginLeg",
+    "Sport",
     "StressScenario",
     "StressTestResult",
     "SubMillisecondLatencyRecord",
