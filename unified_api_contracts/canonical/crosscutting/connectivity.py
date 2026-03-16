@@ -1,20 +1,11 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
 
-from pydantic import AwareDatetime, Field
+from pydantic import AwareDatetime
 
 from ..domain._base import CanonicalBase
-
-
-class CanonicalWsMessage(CanonicalBase):
-    """Normalised WebSocket message — minimal envelope."""
-
-    channel: str
-    timestamp: AwareDatetime
-    venue: str
-    payload: dict[str, str | int | float | bool | None] = Field(default_factory=dict)
 
 
 class WebSocketEvent(StrEnum):
@@ -71,46 +62,67 @@ class WebSocketConnectionClosed:
     was_clean: bool = False
 
 
-@dataclass
-class WebSocketPingFrame:
-    venue: str
-    timestamp: AwareDatetime
-    payload: bytes | None = None
+class WebSocketConnectionState(StrEnum):
+    """WebSocket connection state machine states."""
+
+    CONNECTING = "connecting"
+    CONNECTED = "connected"
+    DISCONNECTING = "disconnecting"
+    DISCONNECTED = "disconnected"
+    RECONNECTING = "reconnecting"
 
 
-@dataclass
-class WebSocketPongFrame:
-    venue: str
-    timestamp: AwareDatetime
-    payload: bytes | None = None
+class CanonicalWsMessage(CanonicalBase):
+    """Normalized WebSocket message envelope."""
 
-
-@dataclass
-class SubscribeRequest:
     venue: str
     channel: str
-    symbols: list[str] = field(default_factory=list)
-    params: dict[str, str] = field(default_factory=dict)
-
-
-@dataclass
-class UnsubscribeRequest:
-    venue: str
-    channel: str
-    symbols: list[str] = field(default_factory=list)
+    timestamp: AwareDatetime
+    payload: str
+    message_type: str = "data"
+    sequence: int | None = None
+    schema_version: str = "1.0"
 
 
 @dataclass
 class HeartbeatMessage:
+    """WebSocket heartbeat/keepalive message."""
+
     venue: str
     timestamp: AwareDatetime
-    ping_interval_seconds: float = 20.0
+    interval_ms: int = 30000
 
 
 @dataclass
-class WebSocketConnectionState:
+class SubscribeRequest:
+    """WebSocket channel subscription request."""
+
+    channels: list[str]
     venue: str
-    connected: bool
-    last_heartbeat: AwareDatetime | None = None
-    reconnect_count: int = 0
-    subscriptions: list[str] = field(default_factory=list)
+    auth_token: str | None = None
+
+
+@dataclass
+class UnsubscribeRequest:
+    """WebSocket channel unsubscription request."""
+
+    channels: list[str]
+    venue: str
+
+
+@dataclass
+class WebSocketPingFrame:
+    """WebSocket ping frame."""
+
+    venue: str
+    timestamp: AwareDatetime
+    payload: bytes = b""
+
+
+@dataclass
+class WebSocketPongFrame:
+    """WebSocket pong frame."""
+
+    venue: str
+    timestamp: AwareDatetime
+    payload: bytes = b""

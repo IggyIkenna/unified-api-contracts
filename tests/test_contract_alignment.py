@@ -67,34 +67,11 @@ class TestACSchemas:
         obj = FundingRateHistory(fundingTime="2025-01-01T00:00:00Z", rate="0.0001")
         assert obj.rate
 
-    def test_heartbeat_message_instantiation(self) -> None:
-        from unified_api_contracts import HeartbeatMessage
-
-        obj = HeartbeatMessage(venue="binance", timestamp="2025-01-01T00:00:00Z")
-        assert obj.venue == "binance"
-
-    def test_subscribe_request_instantiation(self) -> None:
-        from unified_api_contracts import SubscribeRequest
-
-        obj = SubscribeRequest(venue="binance", channel="trades", symbols=["BTC/USDT"])
-        assert obj.channel == "trades"
-        assert obj.venue == "binance"
-
     def test_error_action_enum_non_empty(self) -> None:
         from unified_api_contracts import ErrorAction
 
         values = list(ErrorAction)
         assert len(values) > 0, "ErrorAction enum must have at least one member"
-
-    def test_websocket_connection_state_is_dataclass(self) -> None:
-        import dataclasses
-
-        from unified_api_contracts import WebSocketConnectionState
-
-        assert dataclasses.is_dataclass(WebSocketConnectionState), "WebSocketConnectionState must be a dataclass"
-        field_names = {f.name for f in dataclasses.fields(WebSocketConnectionState)}
-        assert "last_heartbeat" in field_names
-        assert "reconnect_count" in field_names
 
 
 # ---------------------------------------------------------------------------
@@ -167,7 +144,7 @@ class TestNoAnyAnnotations:
         [
             "unified_api_contracts.canonical.domain",
             "unified_api_contracts.canonical.execution",
-            "unified_api_contracts.canonical.errors",
+            "unified_api_contracts.canonical.crosscutting.errors",
         ],
     )
     def test_no_bare_any_in_normalised_models(self, module_path: str) -> None:

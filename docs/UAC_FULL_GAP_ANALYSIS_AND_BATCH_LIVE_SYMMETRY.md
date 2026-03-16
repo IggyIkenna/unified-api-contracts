@@ -26,7 +26,6 @@
 | fix          | —     | —         | —      | ✓     | ✓    | —   | —     |
 | prime_broker | —     | —         | —      | —     | ✓    | —   | —     |
 | nautilus     | —     | —         | —      | ✓     | ✓    | —   | —     |
-| versifi      | —     | —         | —      | ✓     | ✓    | —   | ✓     |
 
 **Gaps:** Hyperliquid orderbook; Tardis ticker/order/fill; Databento ticker/order/fill/fee/error; aster/upbit errors; fix/prime_broker/nautilus errors.
 
@@ -109,7 +108,7 @@
 
 ### 1.6 Errors (50+ Venues)
 
-**Implemented (~15):** alchemy, betfair, binance, bybit, ccxt, coinbase, deribit, hyperliquid, ibkr, kalshi, okx, polymarket, tardis, upbit, versifi.
+**Implemented (~14):** alchemy, betfair, binance, bybit, ccxt, coinbase, deribit, hyperliquid, ibkr, kalshi, okx, polymarket, tardis, upbit.
 
 **Gaps:** kraken, kucoin, gateio, bitfinex, bitstamp, mexc, huobi, bitget, dydx, databento, fix, prime_broker, nautilus, betdaq, smarkets, pinnacle, manifold, predictit, aster, and all alt-data providers.
 

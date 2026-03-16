@@ -101,11 +101,6 @@ EXEMPT_CLASSES = frozenset(
         "DataAvailability",
         "ResponseFormat",
         "DataSourceMapping",
-        # ws-protocol: WebSocket connection control messages — used via framework, not by class name import
-        "HeartbeatMessage",
-        "SubscribeRequest",
-        "UnsubscribeRequest",
-        "WebSocketConnectionState",
         # registry-spec: endpoint registry specification type, accessed programmatically via ENDPOINT_REGISTRY
         "EndpointSpec",
         # re-exported-via-uic: terminal services import OddsFormat from unified_internal_contracts (UIC re-exports)

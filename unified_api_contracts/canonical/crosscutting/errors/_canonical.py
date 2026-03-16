@@ -1,26 +1,10 @@
-"""Canonical error schemas — self-contained (no internal or schemas imports)."""
+"""Canonical error schemas — imports shared types from _types."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from enum import StrEnum
 
-
-class ErrorAction(StrEnum):
-    RETRY = "retry"
-    RECONNECT = "reconnect"
-    SKIP = "skip"
-    FAIL = "fail"
-
-
-@dataclass
-class VenueErrorClassification:
-    venue: str
-    error_code: str
-    retry_safe: bool
-    reconnect: bool
-    action: ErrorAction
-    description: str | None = None
+from ._types import ErrorAction, VenueErrorClassification
 
 
 @dataclass
