@@ -390,7 +390,9 @@ INSTRUMENT_TYPES_BY_VENUE.update({v: {"PROP"} for v in SPORTS_DFS_VENUES})
 
 INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PERPETUAL": "perpetuals",
+    "PERP": "perpetuals",
     "SPOT": "spot",
+    "SPOT_PAIR": "spot_pairs",
     "ETF": "etf",
     "EQUITY": "equities",
     "INDEX": "indices",
@@ -403,6 +405,11 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "COMMODITY": "commodities",
     "CURRENCY": "currencies",
     "CDS": "cds",
+    "SPOT_ASSET": "spot_assets",
+    "YIELD_BEARING": "yield_bearing",
+    "DEBT_TOKEN": "debt_tokens",
+    "LST": "lst",
+    "A_TOKEN": "a_tokens",
     "EXCHANGE_ODDS": "exchange_odds",
     "FIXED_ODDS": "fixed_odds",
     "PREDICTION_MARKET": "prediction_markets",
@@ -598,14 +605,15 @@ INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
 }
 
 INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
-    "TRADE": {"PERPETUAL", "SPOT", "SPOT_PAIR", "FUTURE", "OPTION", "EQUITY", "ETF", "INDEX", "BOND", "COMMODITY"},
+    "TRADE": {"PERPETUAL", "SPOT", "SPOT_PAIR", "FUTURE", "OPTION", "EQUITY", "ETF", "INDEX", "BOND", "COMMODITY", "CURRENCY", "CDS"},
     "SWAP": {"POOL"},
     "LEND": {"LENDING"},
     "BORROW": {"LENDING"},
     "STAKE": {"STAKING"},
     "UNSTAKE": {"STAKING"},
     "FLASH_LOAN": {"LENDING"},
-    "TRANSFER": {"SPOT", "SPOT_PAIR"},
+    "ZERO_ALPHA": {"YIELD_BEARING", "DEBT_TOKEN", "LST", "A_TOKEN", "LENDING", "STAKING"},
+    "TRANSFER": {"SPOT", "SPOT_PAIR", "SPOT_ASSET"},
     "BET": {"FIXED_ODDS", "EXCHANGE_ODDS", "SPREAD", "OVER_UNDER", "OUTRIGHT", "PROP"},
     "PREDICTION_BET": {"PREDICTION_MARKET"},
     "SPORTS_BET": {"FIXED_ODDS", "PROP"},

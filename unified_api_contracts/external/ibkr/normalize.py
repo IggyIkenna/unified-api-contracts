@@ -357,6 +357,7 @@ def normalize_ibkr_market_state(
         "OPT": "OPTION",
         "CASH": "CURRENCY",
         "IND": "INDEX",
+        "FUND": "ETF",
         "CMDTY": "COMMODITY",
         "BOND": "BOND",
     }
