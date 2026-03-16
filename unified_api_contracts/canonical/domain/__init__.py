@@ -39,6 +39,11 @@ from ..crosscutting.rate_limits import (
     HttpRateLimitHeaders,
     VenueRateLimitSpec,
 )
+from ..crosscutting.risk_taxonomy import (
+    RISK_TYPE_CATEGORIES,
+    RiskCategory,
+    RiskType,
+)
 from ._base import CanonicalBase
 from .derivatives import (
     CanonicalDerivativeTicker,
@@ -254,6 +259,7 @@ __all__ = [
     "INFRA_CANONICAL_TO_PROVIDER",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
+    "RISK_TYPE_CATEGORIES",
     "VENUE_EXECUTION_REGISTRY",
     "AccountVerificationLevel",
     "AggregatedPosition",
@@ -411,7 +417,9 @@ __all__ = [
     "PredictionMarketCategory",
     "PredictionMarketMapper",
     "ProtocolHealthBreakdown",
+    "RiskCategory",
     "RiskGroupSummary",
+    "RiskType",
     "SatelliteObservation",
     "ScalingMode",
     "ScraperError",
