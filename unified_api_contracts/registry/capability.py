@@ -27,6 +27,7 @@ class SourceCapability(BaseModel):
     auth_scope: list[str] = []  # ["api_key", "oauth", "cert", "none"]
     auth_environments: dict[str, str] = {}  # {"test": "testnet_key", "prod": "prod_key"}
     operations: dict[str, list[str]] = {}  # {"market": ["ticker", "orderbook"], ...}
+    supported_testing_stages: list[str] = []  # TestingStage string values this source supports
 
 
 class CapabilityResolutionError(RuntimeError):

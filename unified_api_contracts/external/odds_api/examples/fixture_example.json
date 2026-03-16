@@ -1,7 +1,7 @@
 {
   "id": "abc123",
-  "sportKey": "americanfootball_nfl",
-  "sportTitle": "NFL",
+  "sportKey": "soccer_epl",
+  "sportTitle": "EPL",
   "commenceTime": "2025-02-28T18:00:00Z",
   "homeTeam": "Team A",
   "awayTeam": "Team B",
@@ -16,15 +16,16 @@
           "lastUpdate": "2025-02-27T12:00:00Z",
           "outcomes": [
             { "name": "Team A", "price": 1.91 },
-            { "name": "Team B", "price": 1.95 }
+            { "name": "Draw", "price": 3.40 },
+            { "name": "Team B", "price": 4.20 }
           ]
         },
         {
           "key": "spreads",
           "lastUpdate": "2025-02-27T12:00:00Z",
           "outcomes": [
-            { "name": "Team A", "price": 1.91, "point": -3.5 },
-            { "name": "Team B", "price": 1.95, "point": 3.5 }
+            { "name": "Team A", "price": 1.91, "point": -0.5 },
+            { "name": "Team B", "price": 1.95, "point": 0.5 }
           ]
         },
         {
@@ -33,6 +34,23 @@
           "outcomes": [
             { "name": "Yes", "price": 1.83 },
             { "name": "No", "price": 1.91 }
+          ]
+        },
+        {
+          "key": "draw_no_bet",
+          "lastUpdate": "2025-02-27T12:00:00Z",
+          "outcomes": [
+            { "name": "Team A", "price": 1.45 },
+            { "name": "Team B", "price": 2.65 }
+          ]
+        },
+        {
+          "key": "double_chance",
+          "lastUpdate": "2025-02-27T12:00:00Z",
+          "outcomes": [
+            { "name": "Team A or Draw", "price": 1.25 },
+            { "name": "Team B or Draw", "price": 1.55 },
+            { "name": "Team A or Team B", "price": 1.30 }
           ]
         }
       ]

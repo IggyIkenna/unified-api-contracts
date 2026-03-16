@@ -18,6 +18,7 @@ COINBASE_SPOT = "COINBASE-SPOT"
 DERIBIT = "DERIBIT"
 HYPERLIQUID = "HYPERLIQUID"
 ASTER = "ASTER"
+UPBIT = "UPBIT"
 
 # TradFi Exchange Constants
 NASDAQ = "NASDAQ"
@@ -281,6 +282,7 @@ CLOB_VENUES: set[str] = {
     DERIBIT,
     HYPERLIQUID,
     ASTER,
+    UPBIT,
     "OKX",
     "BYBIT",
     NASDAQ,
@@ -316,6 +318,7 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     HYPERLIQUID: "cefi",
     DERIBIT: "cefi",
     ASTER: "cefi",
+    UPBIT: "cefi",
     NASDAQ: "tradfi",
     NYSE: "tradfi",
     CME: "tradfi",
@@ -352,7 +355,7 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BYBIT_SPOT: {"SPOT"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
     "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},
-    "UPBIT": {"SPOT"},
+    UPBIT: {"SPOT"},
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
     DERIBIT: {"PERPETUAL", "FUTURE", "OPTION"},
     HYPERLIQUID: {"PERPETUAL"},
@@ -461,6 +464,7 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     DERIBIT: {VenueCapability.PERP_TRADE, VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     HYPERLIQUID: {VenueCapability.PERP_TRADE},
     ASTER: {VenueCapability.PERP_TRADE},
+    UPBIT: {VenueCapability.SPOT_TRADE},
     NASDAQ: {VenueCapability.SPOT_TRADE},
     NYSE: {VenueCapability.SPOT_TRADE},
     CME: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
@@ -599,6 +603,7 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
             VenueOrderCapability.STOP_LIMIT,
         }
     ),
+    UPBIT: _CEFI_BASIC,
     # TradFi exchanges
     NASDAQ: _TRADFI_EXCHANGE,
     NYSE: _TRADFI_EXCHANGE,
@@ -716,6 +721,7 @@ VENUE_FEE_MODEL_MAP: dict[str, VenueFeeModel] = {
     DERIBIT: VenueFeeModel.MAKER_TAKER,
     HYPERLIQUID: VenueFeeModel.MAKER_TAKER,
     ASTER: VenueFeeModel.MAKER_TAKER,
+    UPBIT: VenueFeeModel.MAKER_TAKER,
     NASDAQ: VenueFeeModel.COMMISSION,
     NYSE: VenueFeeModel.COMMISSION,
     CME: VenueFeeModel.COMMISSION,
@@ -819,6 +825,7 @@ VENUE_ALPHA_PROFILE: dict[str, AlphaProfile] = {
     DERIBIT: AlphaProfile.ALPHA_SEEKING,
     HYPERLIQUID: AlphaProfile.ALPHA_SEEKING,
     ASTER: AlphaProfile.ALPHA_SEEKING,
+    UPBIT: AlphaProfile.ALPHA_SEEKING,
     NASDAQ: AlphaProfile.ALPHA_SEEKING,
     NYSE: AlphaProfile.ALPHA_SEEKING,
     CME: AlphaProfile.ALPHA_SEEKING,

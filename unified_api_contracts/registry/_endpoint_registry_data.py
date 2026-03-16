@@ -431,6 +431,18 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
     # --- Coinbase ---
     EndpointSpec(
         venue="coinbase",
+        endpoint_path="https://api.exchange.coinbase.com/products",
+        http_method="GET",
+        schema_class="CoinbaseExchangeProduct",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="exchange-v1",
+        notes="Coinbase Exchange (formerly Pro) public products list. No auth required.",
+        requires_auth=False,
+        cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="coinbase",
         endpoint_path="https://api.coinbase.com/api/v3/brokerage/products",
         http_method="GET",
         schema_class="CoinbaseProduct",

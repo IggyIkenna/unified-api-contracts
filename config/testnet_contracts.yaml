@@ -1,0 +1,42 @@
+# Testnet Contract Registry — known testnet contract addresses for DeFi protocols.
+#
+# Format: chain_id -> protocol -> contract_name -> address
+# Used by TestnetContractRegistry (unified-config-interface) to auto-detect
+# testnet environments and route DeFi connectors accordingly.
+#
+# Sources:
+#   Aave V3 Sepolia/Holesky: https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
+#   Uniswap V3 Sepolia: https://docs.uniswap.org/contracts/v3/reference/deployments
+#   EigenLayer Holesky: https://github.com/Layr-Labs/eigenlayer-contracts/blob/dev/README.md
+#   Lido Holesky: https://docs.lido.fi/deployed-contracts/holesky/
+
+# Sepolia (chain_id: 11155111)
+11155111:
+  aave_v3:
+    pool: "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951"
+    pool_addresses_provider: "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A"
+    oracle: "0x2da88497588bf726262D3eB1B2bF4060B0cf0fCe"
+    a_token: "0x16dA4541aD1807f4443d92D26044C1147406EB80"
+  uniswap_v3:
+    factory: "0x0227628f3F023bb0B980b67D528571c95c6DaC1c"
+    swap_router: "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E"
+    nft_position_manager: "0x1238536071E1c677A632429e3655c799b22cDA52"
+    quoter_v2: "0xEd1f6473345F45b75F8179591dd5bA1888781034"
+
+# Holesky (chain_id: 17000)
+17000:
+  aave_v3:
+    pool: "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951"
+    pool_addresses_provider: "0x012bAC54348C0E635dCAc9D5FB99f06F24136C9A"
+    oracle: "0x2da88497588bf726262D3eB1B2bF4060B0cf0fCe"
+  eigenlayer:
+    delegation_manager: "0xA44151489861Fe9e3055d95adC98FbD462B948e7"
+    strategy_manager: "0xdfB5f6CE42aAA7830E94ECFCcAd411beF4d4D5b6"
+    slasher: "0xcAe751b75833ef09627549868A04E32134C4E9A6"
+    eigenpod_manager: "0x30770d7E3e71112d7A6b7259542D1f680a70e315"
+    avs_directory: "0x055733000064333CaDDbC92763c58BF0192fFeBf"
+  lido:
+    steth: "0x3F1c547b21f65e10480dE3ad8E19fAAC46C95034"
+    wsteth: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D"
+    withdrawal_queue: "0xc7cc160b58F8Bb0baC94b80847E2CF2800565C50"
+    lido_locator: "0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8"

@@ -317,12 +317,14 @@ providers:
     spec_url: ""
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   mev:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   mexc:
@@ -330,12 +332,14 @@ providers:
     spec_url: "https://mexcdevelop.github.io/apidocs/spot_v3_en/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   nautilus:
     api_version: "v1"
     spec_url: "https://docs.nautilustrader.io/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   odds_api:
@@ -374,6 +378,7 @@ providers:
     spec_url: ""
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   oddsjam:
@@ -381,12 +386,14 @@ providers:
     spec_url: "https://oddsjam.com/api"
     last_verified: "2026-03-09"
     status: yellow
+    cassette_status: pending
 
   ofr:
     api_version: "v1"
     spec_url: "https://www.financialresearch.gov/data/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   okx:
     api_version: "v5"
@@ -399,7 +406,7 @@ providers:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
-    status: yellow
+    status: dormant
     free_tier: true
 
   opticodds:
@@ -407,6 +414,7 @@ providers:
     spec_url: "https://opticodds.com/api-docs/"
     last_verified: "2026-03-09"
     status: yellow
+    cassette_status: pending
 
   onexbet:
     api_version: "v1"
@@ -419,6 +427,7 @@ providers:
     spec_url: "https://open-meteo.com/en/docs"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     modes: [historical]
     free_tier: true
 
@@ -427,6 +436,7 @@ providers:
     spec_url: "https://docs.openbb.co/platform"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   pinnacle:
     api_version: "v3"
@@ -447,6 +457,7 @@ providers:
     spec_url: "https://predictit-f497e.firebaseapp.com/api-docs"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   prime_broker:
@@ -454,6 +465,7 @@ providers:
     spec_url: ""
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   pyth:
@@ -461,19 +473,21 @@ providers:
     spec_url: "https://docs.pyth.network/home"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   regulatory:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   sentiment:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
-    status: yellow
+    status: dormant
     free_tier: true
 
   sharpapi:
@@ -481,6 +495,7 @@ providers:
     spec_url: "https://sharpapi.com/documentation"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   smarkets:
     api_version: "v3"
@@ -493,12 +508,13 @@ providers:
     spec_url: "https://www.soccer-football.info/api/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   sports:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
-    status: yellow
+    status: dormant
     free_tier: true
     notes: "Aggregator module for sports sources (betfair, pinnacle sub-schemas)"
 
@@ -514,18 +530,21 @@ providers:
     spec_url: "https://thegraph.com/docs/en/querying/querying-the-graph/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   transfermarkt:
     api_version: "v1"
     spec_url: "https://www.transfermarkt.com/api"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   understat:
     api_version: "v1"
     spec_url: "https://understat.com/"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
     free_tier: true
 
   upbit:
@@ -533,12 +552,13 @@ providers:
     spec_url: "https://docs.upbit.com/reference"
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   venue_manifest:
     api_version: "v1"
     spec_url: ""
     last_verified: "2026-03-06"
-    status: yellow
+    status: dormant
     free_tier: true
     notes: "Internal venue manifest — not an external API"
 
@@ -547,6 +567,7 @@ providers:
     spec_url: ""
     last_verified: "2026-03-06"
     status: yellow
+    cassette_status: pending
 
   yahoo_finance:
     api_version: "v8"
