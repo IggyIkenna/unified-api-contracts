@@ -438,6 +438,19 @@ class VenueCapability(StrEnum):
     SPORTS_DATA = "sports_data"
 
 
+class VenueOrderCapability(StrEnum):
+    """Order-type-level sub-capabilities for venues."""
+
+    POST_ONLY = "post_only"
+    REDUCE_ONLY = "reduce_only"
+    CANCEL_REPLACE = "cancel_replace"
+    BATCH_PLACE = "batch_place"
+    STOP_LIMIT = "stop_limit"
+    TRAILING_STOP = "trailing_stop"
+    ICEBERG = "iceberg"
+    TWAP = "twap"
+
+
 VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     BINANCE_SPOT: {VenueCapability.SPOT_TRADE},
     COINBASE_SPOT: {VenueCapability.SPOT_TRADE},
@@ -478,6 +491,152 @@ VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_BOOKMAKER_API} for v in SP
 VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_BOOKMAKER_WEB} for v in SPORTS_BOOKMAKER_WEB_VENUES})
 VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_DFS} for v in SPORTS_DFS_VENUES})
 VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_DATA} for v in SPORTS_DATA_VENUES})
+
+# ---------------------------------------------------------------------------
+# Venue Order-Type Sub-Capabilities
+# ---------------------------------------------------------------------------
+
+_CEFI_FULL: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.POST_ONLY,
+        VenueOrderCapability.REDUCE_ONLY,
+        VenueOrderCapability.CANCEL_REPLACE,
+        VenueOrderCapability.BATCH_PLACE,
+        VenueOrderCapability.STOP_LIMIT,
+        VenueOrderCapability.TRAILING_STOP,
+        VenueOrderCapability.ICEBERG,
+        VenueOrderCapability.TWAP,
+    }
+)
+
+_CEFI_STANDARD: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.POST_ONLY,
+        VenueOrderCapability.REDUCE_ONLY,
+        VenueOrderCapability.CANCEL_REPLACE,
+        VenueOrderCapability.STOP_LIMIT,
+    }
+)
+
+_CEFI_BASIC: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.POST_ONLY,
+        VenueOrderCapability.STOP_LIMIT,
+    }
+)
+
+_TRADFI_EXCHANGE: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.CANCEL_REPLACE,
+        VenueOrderCapability.STOP_LIMIT,
+        VenueOrderCapability.TRAILING_STOP,
+        VenueOrderCapability.ICEBERG,
+        VenueOrderCapability.TWAP,
+    }
+)
+
+_TRADFI_DERIVATIVES: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.CANCEL_REPLACE,
+        VenueOrderCapability.STOP_LIMIT,
+        VenueOrderCapability.ICEBERG,
+    }
+)
+
+_DEX_AMM: frozenset[VenueOrderCapability] = frozenset[VenueOrderCapability]()
+
+_DEFI_LENDING: frozenset[VenueOrderCapability] = frozenset[VenueOrderCapability]()
+
+_DEFI_STAKING: frozenset[VenueOrderCapability] = frozenset[VenueOrderCapability]()
+
+_SPORTS_EXCHANGE: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.CANCEL_REPLACE,
+        VenueOrderCapability.BATCH_PLACE,
+    }
+)
+
+_PREDICTION_MARKET: frozenset[VenueOrderCapability] = frozenset(
+    {
+        VenueOrderCapability.BATCH_PLACE,
+    }
+)
+
+_SPORTS_BOOKMAKER: frozenset[VenueOrderCapability] = frozenset[VenueOrderCapability]()
+
+VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
+    # CeFi exchanges -- full featured
+    BINANCE_SPOT: _CEFI_FULL,
+    BINANCE_FUTURES: _CEFI_FULL,
+    OKX_SPOT: _CEFI_FULL,
+    OKX_FUTURES: _CEFI_FULL,
+    BYBIT_SPOT: _CEFI_FULL,
+    BYBIT_FUTURES: _CEFI_FULL,
+    COINBASE_SPOT: _CEFI_STANDARD,
+    DERIBIT: frozenset(
+        {
+            VenueOrderCapability.POST_ONLY,
+            VenueOrderCapability.REDUCE_ONLY,
+            VenueOrderCapability.CANCEL_REPLACE,
+            VenueOrderCapability.STOP_LIMIT,
+            VenueOrderCapability.TRAILING_STOP,
+        }
+    ),
+    HYPERLIQUID: frozenset(
+        {
+            VenueOrderCapability.POST_ONLY,
+            VenueOrderCapability.REDUCE_ONLY,
+            VenueOrderCapability.CANCEL_REPLACE,
+            VenueOrderCapability.BATCH_PLACE,
+            VenueOrderCapability.STOP_LIMIT,
+            VenueOrderCapability.TWAP,
+        }
+    ),
+    ASTER: frozenset(
+        {
+            VenueOrderCapability.POST_ONLY,
+            VenueOrderCapability.REDUCE_ONLY,
+            VenueOrderCapability.CANCEL_REPLACE,
+            VenueOrderCapability.STOP_LIMIT,
+        }
+    ),
+    # TradFi exchanges
+    NASDAQ: _TRADFI_EXCHANGE,
+    NYSE: _TRADFI_EXCHANGE,
+    CME: _TRADFI_DERIVATIVES,
+    CBOT: _TRADFI_DERIVATIVES,
+    NYMEX: _TRADFI_DERIVATIVES,
+    COMEX: _TRADFI_DERIVATIVES,
+    ICE: _TRADFI_DERIVATIVES,
+    CBOE: _TRADFI_EXCHANGE,
+    # DEX / AMM venues (no order-level sub-capabilities)
+    UNISWAPV2_ETH: _DEX_AMM,
+    UNISWAPV3_ETH: _DEX_AMM,
+    UNISWAPV4_ETH: _DEX_AMM,
+    CURVE_ETH: _DEX_AMM,
+    AERODROME_BASE: _DEX_AMM,
+    # DeFi lending
+    AAVE_V3: _DEFI_LENDING,
+    AAVE_V3_ETH: _DEFI_LENDING,
+    MORPHO_ETHEREUM: _DEFI_LENDING,
+    EULER_PLASMA: _DEFI_LENDING,
+    FLUID_PLASMA: _DEFI_LENDING,
+    AAVE_PLASMA: _DEFI_LENDING,
+    # DeFi staking
+    LIDO: _DEFI_STAKING,
+    ETHERFI: _DEFI_STAKING,
+    ETHENA: _DEFI_STAKING,
+}
+# Sports exchanges
+VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, _SPORTS_EXCHANGE))
+# Prediction markets
+VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, _PREDICTION_MARKET))
+# Bookmaker API / web venues
+VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, _SPORTS_BOOKMAKER))
+VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, _SPORTS_BOOKMAKER))
+# DFS and data venues
+VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_DFS_VENUES, frozenset[VenueOrderCapability]()))
+VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_DATA_VENUES, frozenset[VenueOrderCapability]()))
 
 # DeFi Protocol Classification
 
@@ -603,10 +762,26 @@ INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
     "SPORTS_EXCHANGE_ORDER": {"sports"},
     "FUTURES_ROLL": {"cefi", "tradfi"},
     "OPTIONS_COMBO": {"cefi", "tradfi"},
+    "ADD_LIQUIDITY": {"defi"},
+    "REMOVE_LIQUIDITY": {"defi"},
+    "COLLECT_FEES": {"defi"},
 }
 
 INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
-    "TRADE": {"PERPETUAL", "SPOT", "SPOT_PAIR", "FUTURE", "OPTION", "EQUITY", "ETF", "INDEX", "BOND", "COMMODITY", "CURRENCY", "CDS"},
+    "TRADE": {
+        "PERPETUAL",
+        "SPOT",
+        "SPOT_PAIR",
+        "FUTURE",
+        "OPTION",
+        "EQUITY",
+        "ETF",
+        "INDEX",
+        "BOND",
+        "COMMODITY",
+        "CURRENCY",
+        "CDS",
+    },
     "SWAP": {"POOL"},
     "LEND": {"LENDING"},
     "BORROW": {"LENDING"},
@@ -621,6 +796,9 @@ INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
     "SPORTS_EXCHANGE_ORDER": {"EXCHANGE_ODDS"},
     "FUTURES_ROLL": {"FUTURE"},
     "OPTIONS_COMBO": {"OPTION"},
+    "ADD_LIQUIDITY": {"POOL"},
+    "REMOVE_LIQUIDITY": {"POOL"},
+    "COLLECT_FEES": {"POOL"},
 }
 
 # Alpha Classification
@@ -766,50 +944,60 @@ SPORTS_CAPTCHA_RISK: set[str] = {
 
 # Supported market types per sports venue category.
 # Maps each venue to the frozenset of OddsType markets it supports.
-_EXCHANGE_MARKET_TYPES: frozenset[OddsType] = frozenset({
-    OddsType.H2H,
-    OddsType.OVER_UNDER,
-    OddsType.ASIAN_HANDICAP,
-    OddsType.BOTH_TEAMS_SCORE,
-    OddsType.CORRECT_SCORE,
-    OddsType.DRAW_NO_BET,
-    OddsType.DOUBLE_CHANCE,
-    OddsType.GOAL_SCORER,
-    OddsType.PLAYER_PROPS,
-    OddsType.HALF_TIME_RESULT,
-    OddsType.FIRST_HALF_OVER_UNDER,
-    OddsType.CORNERS,
-    OddsType.CARDS,
-})
+_EXCHANGE_MARKET_TYPES: frozenset[OddsType] = frozenset(
+    {
+        OddsType.H2H,
+        OddsType.OVER_UNDER,
+        OddsType.ASIAN_HANDICAP,
+        OddsType.BOTH_TEAMS_SCORE,
+        OddsType.CORRECT_SCORE,
+        OddsType.DRAW_NO_BET,
+        OddsType.DOUBLE_CHANCE,
+        OddsType.GOAL_SCORER,
+        OddsType.PLAYER_PROPS,
+        OddsType.HALF_TIME_RESULT,
+        OddsType.FIRST_HALF_OVER_UNDER,
+        OddsType.CORNERS,
+        OddsType.CARDS,
+    }
+)
 
-_PREDICTION_MARKET_TYPES: frozenset[OddsType] = frozenset({
-    OddsType.H2H,
-    OddsType.OVER_UNDER,
-    OddsType.OUTRIGHT,
-})
+_PREDICTION_MARKET_TYPES: frozenset[OddsType] = frozenset(
+    {
+        OddsType.H2H,
+        OddsType.OVER_UNDER,
+        OddsType.OUTRIGHT,
+    }
+)
 
-_BOOKMAKER_API_MARKET_TYPES: frozenset[OddsType] = frozenset({
-    OddsType.H2H,
-    OddsType.OVER_UNDER,
-    OddsType.ASIAN_HANDICAP,
-    OddsType.BOTH_TEAMS_SCORE,
-    OddsType.DRAW_NO_BET,
-    OddsType.DOUBLE_CHANCE,
-    OddsType.PLAYER_PROPS,
-    OddsType.OUTRIGHT,
-    OddsType.CORRECT_SCORE,
-})
+_BOOKMAKER_API_MARKET_TYPES: frozenset[OddsType] = frozenset(
+    {
+        OddsType.H2H,
+        OddsType.OVER_UNDER,
+        OddsType.ASIAN_HANDICAP,
+        OddsType.BOTH_TEAMS_SCORE,
+        OddsType.DRAW_NO_BET,
+        OddsType.DOUBLE_CHANCE,
+        OddsType.PLAYER_PROPS,
+        OddsType.OUTRIGHT,
+        OddsType.CORRECT_SCORE,
+    }
+)
 
-_BOOKMAKER_WEB_MARKET_TYPES: frozenset[OddsType] = frozenset({
-    OddsType.H2H,
-    OddsType.OVER_UNDER,
-    OddsType.ASIAN_HANDICAP,
-    OddsType.BOTH_TEAMS_SCORE,
-})
+_BOOKMAKER_WEB_MARKET_TYPES: frozenset[OddsType] = frozenset(
+    {
+        OddsType.H2H,
+        OddsType.OVER_UNDER,
+        OddsType.ASIAN_HANDICAP,
+        OddsType.BOTH_TEAMS_SCORE,
+    }
+)
 
-_DFS_MARKET_TYPES: frozenset[OddsType] = frozenset({
-    OddsType.PLAYER_PROPS,
-})
+_DFS_MARKET_TYPES: frozenset[OddsType] = frozenset(
+    {
+        OddsType.PLAYER_PROPS,
+    }
+)
 
 SUPPORTED_MARKET_TYPES: dict[str, frozenset[OddsType]] = {}
 SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, _EXCHANGE_MARKET_TYPES))

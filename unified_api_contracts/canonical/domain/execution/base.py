@@ -72,6 +72,9 @@ class OperationType(StrEnum):
     WITHDRAW = "WITHDRAW"
     DEPOSIT = "DEPOSIT"
     REBALANCE = "REBALANCE"
+    ADD_LIQUIDITY = "ADD_LIQUIDITY"
+    REMOVE_LIQUIDITY = "REMOVE_LIQUIDITY"
+    COLLECT_FEES = "COLLECT_FEES"
 
 
 class ExecutionStatus(StrEnum):

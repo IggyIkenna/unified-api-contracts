@@ -19,6 +19,13 @@ from .endpoint_registry import (
     ResponseFormat,
 )
 from .endpoints import BASE_URLS, ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
+from .instruction_constraints import (
+    INSTRUCTION_CONSTRAINTS,
+    ConstraintOrderType,
+    InstructionConstraint,
+    InstructionValidationError,
+    validate_instruction,
+)
 from .venue_constants import (
     AAVE_PLASMA,
     AAVE_V3,
@@ -166,6 +173,7 @@ from .venue_constants import (
     VENUE_CATEGORY_MAP,
     VENUE_CHAIN_MAP,
     VENUE_FEE_MODEL_MAP,
+    VENUE_ORDER_CAPABILITIES,
     VENUE_PROTOCOL_TYPE,
     VIRGINBET,
     WILLIAMHILL,
@@ -179,6 +187,7 @@ from .venue_constants import (
     SportsVenueType,
     VenueCapability,
     VenueFeeModel,
+    VenueOrderCapability,
 )
 
 __all__ = [
@@ -253,6 +262,7 @@ __all__ = [
     "HARDROCKBET",
     "HYPERLIQUID",
     "ICE",
+    "INSTRUCTION_CONSTRAINTS",
     "INSTRUCTION_VALID_DOMAINS",
     "INSTRUCTION_VALID_INSTRUMENT_TYPES",
     "INSTRUMENT_TYPES_BY_VENUE",
@@ -332,6 +342,7 @@ __all__ = [
     "VENUE_CATEGORY_MAP",
     "VENUE_CHAIN_MAP",
     "VENUE_FEE_MODEL_MAP",
+    "VENUE_ORDER_CAPABILITIES",
     "VENUE_PROTOCOL_TYPE",
     "VIRGINBET",
     "WILLIAMHILL",
@@ -343,18 +354,23 @@ __all__ = [
     "AlphaProfile",
     "CapabilityResolutionError",
     "CassetteStatus",
+    "ConstraintOrderType",
     "DataAvailability",
     "DefiProtocolType",
     "EndpointSpec",
+    "InstructionConstraint",
+    "InstructionValidationError",
     "ResponseFormat",
     "SourceCapability",
     "SportsAuthMethod",
     "SportsVenueType",
     "VenueCapability",
     "VenueFeeModel",
+    "VenueOrderCapability",
     "bootstrap_capabilities",
     "get_schema_class_for_endpoint",
     "register_capability",
     "resolve_capability",
+    "validate_instruction",
     "validate_mode_env_auth",
 ]

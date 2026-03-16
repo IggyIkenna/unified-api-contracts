@@ -73,9 +73,7 @@ class TestInstrumentTypesByVenue:
         valid_values.add("SPOT")
         for venue, types in INSTRUMENT_TYPES_BY_VENUE.items():
             for t in types:
-                assert t in valid_values, (
-                    f"Venue {venue} references invalid InstrumentType: {t}"
-                )
+                assert t in valid_values, f"Venue {venue} references invalid InstrumentType: {t}"
 
     def test_no_empty_type_sets(self) -> None:
         for venue, types in INSTRUMENT_TYPES_BY_VENUE.items():
@@ -102,9 +100,7 @@ class TestDabentoNormalizer:
         }
         for code, expected_type in expected.items():
             result = _instrument_class_to_type(code)
-            assert result == expected_type, (
-                f"Databento code '{code}' mapped to {result}, expected {expected_type}"
-            )
+            assert result == expected_type, f"Databento code '{code}' mapped to {result}, expected {expected_type}"
 
     def test_none_defaults_to_spot_pair(self) -> None:
         from unified_api_contracts.external.databento.normalize import (
@@ -153,9 +149,7 @@ class TestIbkrNormalizer:
         }
         for sec_type, expected_type in expected.items():
             result = _ibkr_instrument_type(sec_type)
-            assert result == expected_type, (
-                f"IBKR sec_type '{sec_type}' mapped to {result}, expected {expected_type}"
-            )
+            assert result == expected_type, f"IBKR sec_type '{sec_type}' mapped to {result}, expected {expected_type}"
 
     def test_none_defaults_to_spot_pair(self) -> None:
         from unified_api_contracts.external.ibkr.normalize import (
@@ -182,9 +176,7 @@ class TestIbkrNormalizer:
             symbol="SPY",
             sec_type="FUND",
         )
-        assert "ETF" in result.instrument_key, (
-            f"Expected ETF in instrument_key, got {result.instrument_key}"
-        )
+        assert "ETF" in result.instrument_key, f"Expected ETF in instrument_key, got {result.instrument_key}"
 
     def test_ibkr_market_state_type_map_all_sec_types(self) -> None:
         """The type_map in normalize_ibkr_market_state covers key IBKR sec types."""
@@ -222,22 +214,14 @@ class TestInstrumentTypeFolderMap:
         for member in InstrumentType:
             if member.value not in INSTRUMENT_TYPE_FOLDER_MAP:
                 missing.append(member.value)
-        assert not missing, (
-            f"InstrumentType members missing from INSTRUMENT_TYPE_FOLDER_MAP: {missing}"
-        )
+        assert not missing, f"InstrumentType members missing from INSTRUMENT_TYPE_FOLDER_MAP: {missing}"
 
     def test_folder_values_are_valid_directory_names(self) -> None:
         """Folder names should be lowercase, no spaces, filesystem-safe."""
         for itype, folder in INSTRUMENT_TYPE_FOLDER_MAP.items():
-            assert folder == folder.lower(), (
-                f"Folder for {itype} should be lowercase: {folder}"
-            )
-            assert " " not in folder, (
-                f"Folder for {itype} should not contain spaces: {folder}"
-            )
-            assert folder.isidentifier() or "_" in folder, (
-                f"Folder for {itype} should be a valid identifier: {folder}"
-            )
+            assert folder == folder.lower(), f"Folder for {itype} should be lowercase: {folder}"
+            assert " " not in folder, f"Folder for {itype} should not contain spaces: {folder}"
+            assert folder.isidentifier() or "_" in folder, f"Folder for {itype} should be a valid identifier: {folder}"
 
     def test_no_duplicate_folder_names(self) -> None:
         """Different instrument types should not map to the same folder (except PERP/PERPETUAL alias)."""
@@ -247,9 +231,7 @@ class TestInstrumentTypeFolderMap:
             if folder in seen:
                 existing = seen[folder]
                 pair = tuple(sorted([existing, itype]))
-                assert pair in allowed_aliases, (
-                    f"Duplicate folder name '{folder}' for {existing} and {itype}"
-                )
+                assert pair in allowed_aliases, f"Duplicate folder name '{folder}' for {existing} and {itype}"
             else:
                 seen[folder] = itype
 
@@ -266,6 +248,4 @@ class TestInstructionValidInstrumentTypes:
         valid_values.add("OUTRIGHT")
         for instruction, types in INSTRUCTION_VALID_INSTRUMENT_TYPES.items():
             for t in types:
-                assert t in valid_values, (
-                    f"Instruction {instruction} references invalid InstrumentType: {t}"
-                )
+                assert t in valid_values, f"Instruction {instruction} references invalid InstrumentType: {t}"

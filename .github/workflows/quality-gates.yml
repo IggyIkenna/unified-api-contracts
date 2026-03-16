@@ -11,5 +11,4 @@ jobs:
     uses: IggyIkenna/unified-trading-pm/.github/workflows/python-quality-gates.yml@live-defi-rollout
     with:
       dep_repos: ""
-    secrets:
-      GH_PAT: ${{ secrets.GH_PAT }}
+    secrets: inherit

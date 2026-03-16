@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 from decimal import Decimal
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 
@@ -63,7 +64,7 @@ pytestmark = pytest.mark.unit
 class TestOddsTypeEnum:
     """All OddsType values are valid and include the 8 new members."""
 
-    EXPECTED_MEMBERS = {
+    EXPECTED_MEMBERS: ClassVar[set[str]] = {
         "H2H",
         "OVER_UNDER",
         "ASIAN_HANDICAP",
@@ -336,15 +337,11 @@ class TestSupportedMarketTypes:
     def test_all_values_are_odds_type(self) -> None:
         for venue, types in SUPPORTED_MARKET_TYPES.items():
             for odds_type in types:
-                assert isinstance(odds_type, OddsType), (
-                    f"Venue {venue} has non-OddsType value: {odds_type}"
-                )
+                assert isinstance(odds_type, OddsType), f"Venue {venue} has non-OddsType value: {odds_type}"
 
     def test_all_bet_placement_venues_covered(self) -> None:
         for venue in SPORTS_BET_PLACEMENT_VENUES:
-            assert venue in SUPPORTED_MARKET_TYPES, (
-                f"Bet placement venue {venue} missing from SUPPORTED_MARKET_TYPES"
-            )
+            assert venue in SUPPORTED_MARKET_TYPES, f"Bet placement venue {venue} missing from SUPPORTED_MARKET_TYPES"
 
 
 # ---------------------------------------------------------------------------
@@ -411,7 +408,7 @@ class TestBttsCassette:
         data = json.loads(self.CASSETTE_PATH.read_text())
         total_btts = 0
         for entry in data:
-            fixture = OddsApiFixture.model_validate(entry)
+            OddsApiFixture.model_validate(entry)  # validates without assignment
             for raw_bookmaker in entry.get("bookmakers", []):
                 bookmaker = OddsApiBookmaker.model_validate(raw_bookmaker)
                 results = normalize_btts_outcomes(bookmaker)

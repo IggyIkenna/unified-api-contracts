@@ -35,9 +35,20 @@ def test_prediction_market_venues_present() -> None:
 def test_scraper_venues_present() -> None:
     """UK bookmaker scraper venues must be in the manifest."""
     scraper_keys = [
-        "skybet", "coral", "paddypower", "betfred", "betvictor",
-        "boylesports", "bwin", "ladbrokes", "williamhill", "betway",
-        "unibet", "bet888sport", "bet365", "sbo",
+        "skybet",
+        "coral",
+        "paddypower",
+        "betfred",
+        "betvictor",
+        "boylesports",
+        "bwin",
+        "ladbrokes",
+        "williamhill",
+        "betway",
+        "unibet",
+        "bet888sport",
+        "bet365",
+        "sbo",
     ]
     for key in scraper_keys:
         assert key in BETTING_SPORTS_VENUES, f"Scraper venue {key} missing"
@@ -68,9 +79,20 @@ def test_all_venue_contracts_have_required_fields() -> None:
 def test_scraper_venues_have_no_rest() -> None:
     """Scraper-based venues should have has_rest=False."""
     scraper_keys = [
-        "skybet", "coral", "paddypower", "betfred", "betvictor",
-        "boylesports", "bwin", "ladbrokes", "williamhill", "betway",
-        "unibet", "bet888sport", "bet365", "sbo",
+        "skybet",
+        "coral",
+        "paddypower",
+        "betfred",
+        "betvictor",
+        "boylesports",
+        "bwin",
+        "ladbrokes",
+        "williamhill",
+        "betway",
+        "unibet",
+        "bet888sport",
+        "bet365",
+        "sbo",
     ]
     for key in scraper_keys:
         contract = BETTING_SPORTS_VENUES[key]
