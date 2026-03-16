@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from ..canonical.domain.sports.odds import OddsType
 from ._odds_api_maps import ODDS_API_KEY_MAP as ODDS_API_KEY_MAP
 from ._odds_api_maps import ODDS_API_REGION_MAP as ODDS_API_REGION_MAP
 
@@ -762,3 +763,57 @@ SPORTS_CAPTCHA_RISK: set[str] = {
     SBOBET,
     BET888SPORT,
 }
+
+# Supported market types per sports venue category.
+# Maps each venue to the frozenset of OddsType markets it supports.
+_EXCHANGE_MARKET_TYPES: frozenset[OddsType] = frozenset({
+    OddsType.H2H,
+    OddsType.OVER_UNDER,
+    OddsType.ASIAN_HANDICAP,
+    OddsType.BOTH_TEAMS_SCORE,
+    OddsType.CORRECT_SCORE,
+    OddsType.DRAW_NO_BET,
+    OddsType.DOUBLE_CHANCE,
+    OddsType.GOAL_SCORER,
+    OddsType.PLAYER_PROPS,
+    OddsType.HALF_TIME_RESULT,
+    OddsType.FIRST_HALF_OVER_UNDER,
+    OddsType.CORNERS,
+    OddsType.CARDS,
+})
+
+_PREDICTION_MARKET_TYPES: frozenset[OddsType] = frozenset({
+    OddsType.H2H,
+    OddsType.OVER_UNDER,
+    OddsType.OUTRIGHT,
+})
+
+_BOOKMAKER_API_MARKET_TYPES: frozenset[OddsType] = frozenset({
+    OddsType.H2H,
+    OddsType.OVER_UNDER,
+    OddsType.ASIAN_HANDICAP,
+    OddsType.BOTH_TEAMS_SCORE,
+    OddsType.DRAW_NO_BET,
+    OddsType.DOUBLE_CHANCE,
+    OddsType.PLAYER_PROPS,
+    OddsType.OUTRIGHT,
+    OddsType.CORRECT_SCORE,
+})
+
+_BOOKMAKER_WEB_MARKET_TYPES: frozenset[OddsType] = frozenset({
+    OddsType.H2H,
+    OddsType.OVER_UNDER,
+    OddsType.ASIAN_HANDICAP,
+    OddsType.BOTH_TEAMS_SCORE,
+})
+
+_DFS_MARKET_TYPES: frozenset[OddsType] = frozenset({
+    OddsType.PLAYER_PROPS,
+})
+
+SUPPORTED_MARKET_TYPES: dict[str, frozenset[OddsType]] = {}
+SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, _EXCHANGE_MARKET_TYPES))
+SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, _PREDICTION_MARKET_TYPES))
+SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_API_VENUES, _BOOKMAKER_API_MARKET_TYPES))
+SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, _BOOKMAKER_WEB_MARKET_TYPES))
+SUPPORTED_MARKET_TYPES.update(dict.fromkeys(SPORTS_DFS_VENUES, _DFS_MARKET_TYPES))

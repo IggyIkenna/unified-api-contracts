@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from decimal import Decimal
 
 from ...canonical.domain import CanonicalBetMarket, CanonicalInstrument
-from ...canonical.domain.sports.odds import OddsType
-from .schemas import OddsApiFixture, OddsApiMarket
+from ...canonical.domain.sports.odds import CanonicalBookmakerMarket, OddsType, OutcomeType
+from .schemas import OddsApiBookmaker, OddsApiFixture, OddsApiMarket
 
 _MARKET_KEY_MAP: dict[str, OddsType] = {
     "h2h": OddsType.H2H,
@@ -17,6 +18,13 @@ _MARKET_KEY_MAP: dict[str, OddsType] = {
     "double_chance": OddsType.DOUBLE_CHANCE,
     "outrights": OddsType.OUTRIGHT,
     "correct_score": OddsType.CORRECT_SCORE,
+}
+
+# BTTS outcomes from The Odds API use "Yes"/"No" names which map to
+# OutcomeType.YES / OutcomeType.NO.
+_BTTS_OUTCOME_MAP: dict[str, str] = {
+    "Yes": OutcomeType.YES,
+    "No": OutcomeType.NO,
 }
 
 
@@ -72,7 +80,38 @@ def normalize_odds_api_fixture(raw: OddsApiFixture, venue: str = "odds_api") -> 
     )
 
 
+def normalize_btts_outcomes(
+    bookmaker: OddsApiBookmaker,
+) -> list[CanonicalBookmakerMarket]:
+    """Extract BTTS markets from a bookmaker response, mapping Yes/No outcomes.
+
+    Returns a CanonicalBookmakerMarket for each BTTS market found in the
+    bookmaker's market list. The outcome names "Yes" and "No" are normalised
+    to OutcomeType.YES and OutcomeType.NO.
+    """
+    results: list[CanonicalBookmakerMarket] = []
+    if not bookmaker.markets:
+        return results
+    for market in bookmaker.markets:
+        if market.key != "btts":
+            continue
+        outcomes: dict[str, Decimal] = {}
+        for outcome in market.outcomes or []:
+            name = _BTTS_OUTCOME_MAP.get(outcome.name or "", outcome.name or "")
+            price = Decimal(str(outcome.price)) if outcome.price is not None else Decimal("0")
+            outcomes[name] = price
+        results.append(
+            CanonicalBookmakerMarket(
+                bookmaker_key=bookmaker.key or "",
+                market=OddsType.BOTH_TEAMS_SCORE,
+                outcomes=outcomes,
+            )
+        )
+    return results
+
+
 __all__ = [
+    "normalize_btts_outcomes",
     "normalize_odds_api_fixture",
     "normalize_odds_api_market",
 ]

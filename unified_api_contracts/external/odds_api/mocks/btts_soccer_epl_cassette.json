@@ -1,20 +1,20 @@
 [
   {
     "id": "btts_test_001",
-    "sport_key": "soccer_epl",
-    "sport_title": "EPL",
-    "commence_time": "2025-03-15T15:00:00Z",
-    "home_team": "Arsenal",
-    "away_team": "Chelsea",
+    "sportKey": "soccer_epl",
+    "sportTitle": "EPL",
+    "commenceTime": "2025-03-15T15:00:00Z",
+    "homeTeam": "Arsenal",
+    "awayTeam": "Chelsea",
     "bookmakers": [
       {
         "key": "pinnacle",
         "title": "Pinnacle",
-        "last_update": "2025-03-15T14:30:00Z",
+        "lastUpdate": "2025-03-15T14:30:00Z",
         "markets": [
           {
             "key": "btts",
-            "last_update": "2025-03-15T14:30:00Z",
+            "lastUpdate": "2025-03-15T14:30:00Z",
             "outcomes": [
               { "name": "Yes", "price": 1.72 },
               { "name": "No", "price": 2.05 }
@@ -25,11 +25,11 @@
       {
         "key": "betfair_ex_uk",
         "title": "Betfair Exchange",
-        "last_update": "2025-03-15T14:28:00Z",
+        "lastUpdate": "2025-03-15T14:28:00Z",
         "markets": [
           {
             "key": "btts",
-            "last_update": "2025-03-15T14:28:00Z",
+            "lastUpdate": "2025-03-15T14:28:00Z",
             "outcomes": [
               { "name": "Yes", "price": 1.75 },
               { "name": "No", "price": 2.1 }
@@ -40,11 +40,11 @@
       {
         "key": "bet365",
         "title": "Bet365",
-        "last_update": "2025-03-15T14:25:00Z",
+        "lastUpdate": "2025-03-15T14:25:00Z",
         "markets": [
           {
             "key": "btts",
-            "last_update": "2025-03-15T14:25:00Z",
+            "lastUpdate": "2025-03-15T14:25:00Z",
             "outcomes": [
               { "name": "Yes", "price": 1.7 },
               { "name": "No", "price": 2.0 }
