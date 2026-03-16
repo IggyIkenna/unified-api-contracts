@@ -1,0 +1,407 @@
+"""Sports, prediction markets, and sports reference data capability declarations."""
+
+from __future__ import annotations
+
+from ..capability import SourceCapability
+
+# ---------------------------------------------------------------------------
+# Sports / prediction markets (13)
+# ---------------------------------------------------------------------------
+
+_BETFAIR = SourceCapability(
+    source="betfair",
+    domains=["market", "execution", "reference"],
+    crosscutting=["errors", "rate_limits", "latency"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key", "cert"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["list_market_catalogue", "list_market_book", "list_runner_book", "streaming"],
+        "execution": ["place_orders", "cancel_orders", "replace_orders", "list_current_orders"],
+        "reference": ["list_event_types", "list_competitions", "list_events", "list_countries", "list_venues"],
+    },
+)
+
+_BETDAQ = SourceCapability(
+    source="betdaq",
+    domains=["market", "execution", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["list_markets", "get_prices", "streaming"],
+        "execution": ["place_orders", "cancel_orders", "settle_orders"],
+        "reference": ["list_sports", "list_events"],
+    },
+)
+
+_PINNACLE = SourceCapability(
+    source="pinnacle",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["odds", "fixtures", "settled_fixtures", "line"],
+        "reference": ["sports", "leagues", "periods"],
+    },
+)
+
+_KALSHI = SourceCapability(
+    source="kalshi",
+    domains=["market", "execution", "position", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=True,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"test": "demo_key", "prod": "prod_key"},
+    operations={
+        "market": ["markets", "market_orderbook", "trades", "series", "ws_orderbook"],
+        "execution": ["create_order", "cancel_order", "batch_create_orders"],
+        "position": ["portfolio", "positions", "fills", "settlements"],
+        "reference": ["events", "series", "categories"],
+    },
+)
+
+_POLYMARKET = SourceCapability(
+    source="polymarket",
+    domains=["market", "execution", "position", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["markets", "orderbook", "prices", "trades", "ws_prices"],
+        "execution": ["create_order", "cancel_order", "open_orders"],
+        "position": ["positions", "balances", "pnl"],
+        "reference": ["events", "markets_metadata", "tags"],
+    },
+)
+
+_ODDS_API = SourceCapability(
+    source="odds_api",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["odds", "scores", "historical_odds"],
+        "reference": ["sports", "participants"],
+    },
+)
+
+_ODDS_ENGINE = SourceCapability(
+    source="odds_engine",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["markets", "odds_lines"],
+        "reference": ["sports", "leagues"],
+    },
+)
+
+_ODDSJAM = SourceCapability(
+    source="oddsjam",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["odds", "game_lines", "player_props", "arb_opportunities"],
+        "reference": ["sports", "leagues", "books"],
+    },
+)
+
+_OPTICODDS = SourceCapability(
+    source="opticodds",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["odds", "fixtures", "player_props"],
+        "reference": ["sports", "leagues", "books"],
+    },
+)
+
+_MATCHBOOK = SourceCapability(
+    source="matchbook",
+    domains=["market", "execution", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["events", "markets", "runners", "prices"],
+        "execution": ["offer", "cancel_offer", "current_offers"],
+        "reference": ["sports", "events_list"],
+    },
+)
+
+_SMARKETS = SourceCapability(
+    source="smarkets",
+    domains=["market", "execution", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["events", "markets", "quotes", "streaming"],
+        "execution": ["create_order", "cancel_order", "open_orders"],
+        "reference": ["sports", "competitions"],
+    },
+)
+
+_MANIFOLD = SourceCapability(
+    source="manifold",
+    domains=["market", "execution", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["markets", "market_bets", "trades", "odds"],
+        "execution": ["bet", "cancel_bet", "sell_shares"],
+        "reference": ["users", "groups", "tags"],
+    },
+)
+
+_PREDICTIT = SourceCapability(
+    source="predictit",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],
+    auth_environments={},
+    operations={
+        "market": ["markets", "market_contracts", "price_history"],
+        "reference": ["all_markets"],
+    },
+)
+
+_ONEXBET = SourceCapability(
+    source="onexbet",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],
+    auth_environments={},
+    operations={
+        "market": ["prematch_odds", "live_odds"],
+        "reference": ["sports", "tournaments"],
+    },
+)
+
+_METABET = SourceCapability(
+    source="metabet",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["markets", "instruments"],
+        "reference": ["sports", "markets_list"],
+    },
+)
+
+# ---------------------------------------------------------------------------
+# Sports reference data (5)
+# ---------------------------------------------------------------------------
+
+_API_FOOTBALL = SourceCapability(
+    source="api_football",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["fixtures", "odds", "predictions"],
+        "reference": ["leagues", "teams", "players", "venues", "standings"],
+    },
+)
+
+_FOOTYSTATS = SourceCapability(
+    source="footystats",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["matches", "odds"],
+        "reference": ["leagues", "teams", "players", "standings"],
+    },
+)
+
+_SOCCER_FOOTBALL_INFO = SourceCapability(
+    source="soccer_football_info",
+    domains=["reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "reference": ["fixtures", "teams", "leagues", "players", "referees", "venues"],
+    },
+)
+
+_TRANSFERMARKT = SourceCapability(
+    source="transfermarkt",
+    domains=["reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],
+    auth_environments={},
+    operations={
+        "reference": ["players", "teams", "transfers", "market_values"],
+    },
+)
+
+_UNDERSTAT = SourceCapability(
+    source="understat",
+    domains=["reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],
+    auth_environments={},
+    operations={
+        "reference": ["fixtures", "teams", "leagues", "players", "xg_stats"],
+    },
+)
+
+_SHARPAPI = SourceCapability(
+    source="sharpapi",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["odds", "markets"],
+        "reference": ["sports", "leagues"],
+    },
+)
+
+
+# ---------------------------------------------------------------------------
+# Ordered list -- Sports
+# ---------------------------------------------------------------------------
+
+SPORTS_CAPABILITIES: list[SourceCapability] = [
+    # Sports / prediction markets
+    _BETFAIR,
+    _BETDAQ,
+    _PINNACLE,
+    _KALSHI,
+    _POLYMARKET,
+    _ODDS_API,
+    _ODDS_ENGINE,
+    _ODDSJAM,
+    _OPTICODDS,
+    _MATCHBOOK,
+    _SMARKETS,
+    _MANIFOLD,
+    _PREDICTIT,
+    _ONEXBET,
+    _METABET,
+    # Sports reference data
+    _API_FOOTBALL,
+    _FOOTYSTATS,
+    _SOCCER_FOOTBALL_INFO,
+    _TRANSFERMARKT,
+    _UNDERSTAT,
+    _SHARPAPI,
+]
