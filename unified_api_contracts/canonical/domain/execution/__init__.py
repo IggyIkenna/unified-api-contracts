@@ -1,6 +1,7 @@
 """Canonical execution domain — re-exports from sub-modules."""
 
 from .base import (
+    CANONICAL_EXECUTION_ALPHA_VERSION,
     CANONICAL_EXECUTION_INSTRUCTION_VERSION,
     CANONICAL_EXECUTION_RESULT_VERSION,
     CANONICAL_FILL_VERSION,
@@ -8,6 +9,7 @@ from .base import (
     BenchmarkType,
     CanonicalFill,
     CanonicalOrder,
+    ExecutionAlpha,
     ExecutionInstruction,
     ExecutionResult,
     ExecutionStatus,
@@ -25,6 +27,7 @@ from .trade import (
 )
 
 __all__ = [
+    "CANONICAL_EXECUTION_ALPHA_VERSION",
     "CANONICAL_EXECUTION_INSTRUCTION_VERSION",
     "CANONICAL_EXECUTION_RESULT_VERSION",
     "CANONICAL_FILL_VERSION",
@@ -36,6 +39,7 @@ __all__ = [
     "CanonicalOrder",
     "CanonicalOrderAmendment",
     "CanonicalOrderRejection",
+    "ExecutionAlpha",
     "ExecutionInstruction",
     "ExecutionResult",
     "ExecutionStatus",

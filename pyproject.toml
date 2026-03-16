@@ -104,6 +104,7 @@ max-complexity = 7
 "unified_api_contracts/latency.py" = ["F403", "F405"]
 "unified_api_contracts/odds.py" = ["F403", "F405"]
 "unified_api_contracts/options.py" = ["F403", "F405"]
+"unified_api_contracts/prediction.py" = ["F403", "F405"]
 # Transition facades at canonical level
 "unified_api_contracts/canonical/execution.py" = ["F403", "F405"]
 "unified_api_contracts/canonical/options.py" = ["F403", "F405"]

@@ -204,3 +204,34 @@ class ExecutionResult(_CanonicalBase):
     transaction_hash: str | None = None
     error_message: str | None = None
     schema_version: str = CANONICAL_EXECUTION_RESULT_VERSION
+
+
+# ---------------------------------------------------------------------------
+# Execution Alpha — quality metrics returned for every execution
+# ---------------------------------------------------------------------------
+
+CANONICAL_EXECUTION_ALPHA_VERSION = "1.0.0"
+
+
+class ExecutionAlpha(_CanonicalBase):
+    """Execution quality metrics returned for every execution.
+
+    Captures how well an instruction was executed relative to arrival price.
+    One ExecutionAlpha is produced per executed instruction regardless of type.
+    """
+
+    strategy_id: str
+    instruction_id: str
+    instruction_type: str  # InstructionType value (TRADE, SWAP, OPTIONS_COMBO, etc.)
+    venue: str
+    algo_used: str  # TWAP, VWAP, SOR, BENCHMARK_FILL, BEST_PRICE, etc.
+    arrival_price: Decimal
+    fill_price: Decimal
+    execution_alpha_bps: Decimal  # fill improvement vs arrival (positive = better)
+    slippage_bps: Decimal
+    market_impact_bps: Decimal
+    timing_alpha_bps: Decimal
+    fill_rate_pct: Decimal
+    latency_ms: Decimal
+    fees_bps: Decimal
+    schema_version: str = CANONICAL_EXECUTION_ALPHA_VERSION

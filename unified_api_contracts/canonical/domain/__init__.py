@@ -145,6 +145,13 @@ from unified_api_contracts.canonical.domain.position import (
     CanonicalSettlement,
     FeeType,
 )
+from unified_api_contracts.canonical.domain.prediction import (
+    CanonicalPredictionMarket,
+    MappingRule,
+    OrphanDetector,
+    PredictionMarketCategory,
+    PredictionMarketMapper,
+)
 from unified_api_contracts.canonical.domain.reference import (
     CanonicalInstrument,
     InstructionType,
@@ -245,6 +252,7 @@ __all__ = [
     "CanonicalOrderRejection",
     "CanonicalPlayer",
     "CanonicalPosition",
+    "CanonicalPredictionMarket",
     "CanonicalReferee",
     "CanonicalScheduledJob",
     "CanonicalSecretStore",
@@ -291,6 +299,7 @@ __all__ = [
     "LatencyComponent",
     "LatencyPercentile",
     "LongShortRatio",
+    "MappingRule",
     "MarketState",
     "MarketStatus",
     "MarketTrade",
@@ -308,10 +317,13 @@ __all__ = [
     "OrderSide",
     "OrderStatus",
     "OrderType",
+    "OrphanDetector",
     "OutcomeType",
     "PlayerMapping",
     "PnLAttributionRecord",
     "PositionRisk",
+    "PredictionMarketCategory",
+    "PredictionMarketMapper",
     "RealTimePnLRecord",
     "RiskLimitBreach",
     "SatelliteObservation",
