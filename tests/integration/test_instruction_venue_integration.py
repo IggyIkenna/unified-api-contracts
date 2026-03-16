@@ -34,13 +34,12 @@ class TestInstructionVenueIntegration:
         trade_categories = INSTRUCTION_CONSTRAINTS["TRADE"]["venue_categories"]
 
         for venue, caps in VENUE_CAPABILITIES.items():
-            if VENUE_CATEGORY_MAP.get(venue) in trade_categories:
-                if caps & trade_caps:
-                    # Should be valid
-                    validate_instruction(
-                        instruction_type="TRADE",
-                        venue_category=VENUE_CATEGORY_MAP[venue],
-                    )
+            if VENUE_CATEGORY_MAP.get(venue) in trade_categories and caps & trade_caps:
+                # Should be valid
+                validate_instruction(
+                    instruction_type="TRADE",
+                    venue_category=VENUE_CATEGORY_MAP[venue],
+                )
 
     def test_swap_venues_have_swap_capability(self) -> None:
         """DEX venues used for SWAP should have VenueCapability.SWAP."""

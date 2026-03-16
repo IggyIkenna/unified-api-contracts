@@ -42,6 +42,9 @@ from unified_api_contracts.external.odds_api.schemas import (
     OddsApiMarket,
     OddsApiOutcome,
 )
+from unified_api_contracts.registry._sports_venue_constants import (
+    SUPPORTED_MARKET_TYPES,
+)
 from unified_api_contracts.registry.venue_constants import (
     INSTRUMENT_TYPES_BY_VENUE,
     SPORTS_BET_PLACEMENT_VENUES,
@@ -50,7 +53,6 @@ from unified_api_contracts.registry.venue_constants import (
     SPORTS_DFS_VENUES,
     SPORTS_EXCHANGE_VENUES,
     SPORTS_PREDICTION_MARKET_VENUES,
-    SUPPORTED_MARKET_TYPES,
 )
 
 pytestmark = pytest.mark.unit
