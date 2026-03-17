@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..capability import SourceCapability
+from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
 # TradFi (6)
@@ -25,6 +25,18 @@ _IBKR = SourceCapability(
         "position": ["portfolio", "positions", "account_summary", "pnl"],
         "reference": ["contract_details", "matching_symbols", "market_rules"],
     },
+    base_urls={"mainnet": "localhost:4001", "testnet": "localhost:4002"},
+    margin_model={"mainnet": "portfolio", "testnet": "portfolio"},
+    operation_details={
+        "place_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token", notes="TWS/Gateway connection; port 4001 live, 4002 paper"),
+            "testnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token", data_fidelity="production", notes="Paper trading uses real market data with simulated execution"),
+        }),
+        "market_data": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token"),
+            "testnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token", data_fidelity="production"),
+        }),
+    },
 )
 
 _DATABENTO = SourceCapability(
@@ -42,6 +54,12 @@ _DATABENTO = SourceCapability(
         "market": ["mbp_1", "mbp_10", "trades", "ohlcv", "tbbo", "imbalance", "statistics"],
         "reference": ["symbology", "datasets", "metadata", "publishers"],
     },
+    base_urls={"mainnet": "https://hist.databento.com"},
+    operation_details={
+        "mbp_1": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
+    },
 )
 
 _FRED = SourceCapability(
@@ -57,6 +75,12 @@ _FRED = SourceCapability(
     auth_environments={"prod": "prod_key"},
     operations={
         "reference": ["series", "observations", "releases", "categories", "tags", "sources"],
+    },
+    base_urls={"mainnet": "https://api.stlouisfed.org"},
+    operation_details={
+        "observations": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
     },
 )
 
@@ -75,6 +99,12 @@ _POLYGON = SourceCapability(
         "market": ["aggregates", "trades", "quotes", "last_trade", "last_quote", "snapshot", "ws_trades", "ws_quotes"],
         "reference": ["tickers", "ticker_details", "exchanges", "conditions", "dividends", "splits"],
     },
+    base_urls={"mainnet": "https://api.polygon.io"},
+    operation_details={
+        "aggregates": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
+    },
 )
 
 _BARCHART = SourceCapability(
@@ -91,6 +121,12 @@ _BARCHART = SourceCapability(
     operations={
         "market": ["ohlcv", "quotes", "dividends", "earnings"],
         "reference": ["symbols", "sectors", "indices"],
+    },
+    base_urls={"mainnet": "https://ondemand.websol.barchart.com"},
+    operation_details={
+        "ohlcv": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
     },
 )
 
@@ -109,6 +145,12 @@ _YAHOO_FINANCE = SourceCapability(
         "market": ["ohlcv", "options_chain", "streaming_quotes"],
         "reference": ["ticker_info", "balance_sheet", "income_statement", "cash_flow"],
     },
+    base_urls={"mainnet": "https://query1.finance.yahoo.com"},
+    operation_details={
+        "ohlcv": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+        }),
+    },
 )
 
 _ECB = SourceCapability(
@@ -126,6 +168,8 @@ _ECB = SourceCapability(
         "market": ["yield_curve"],
         "reference": ["exchange_rates", "interest_rates", "monetary_aggregates"],
     },
+    base_urls={"mainnet": "https://data-api.ecb.europa.eu"},
+    operation_details={},
 )
 
 _OPENBB = SourceCapability(
@@ -143,6 +187,8 @@ _OPENBB = SourceCapability(
         "market": ["bond_data", "yield_curves", "fixed_income"],
         "reference": ["bond_indices", "government_bonds"],
     },
+    base_urls={},
+    operation_details={},
 )
 
 _OFR = SourceCapability(
@@ -160,6 +206,8 @@ _OFR = SourceCapability(
         "market": ["cds_spreads", "repo_rates"],
         "reference": ["financial_stability_data"],
     },
+    base_urls={"mainnet": "https://data.financialresearch.gov"},
+    operation_details={},
 )
 
 _REGULATORY = SourceCapability(
@@ -177,6 +225,8 @@ _REGULATORY = SourceCapability(
         "market": ["trade_reports"],
         "reference": ["regulatory_filings", "compliance_data"],
     },
+    base_urls={},
+    operation_details={},
 )
 
 

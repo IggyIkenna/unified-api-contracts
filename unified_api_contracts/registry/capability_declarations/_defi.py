@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..capability import SourceCapability
+from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
 # DeFi protocols (5)
@@ -23,6 +23,17 @@ _UNISWAP = SourceCapability(
         "market": ["pool_state", "tick_data", "swap_events", "liquidity_positions", "prices"],
         "reference": ["factory", "pools", "tokens", "fee_tiers"],
     },
+    base_urls={"mainnet": "https://api.thegraph.com/subgraphs/name/uniswap", "testnet": "https://api.thegraph.com/subgraphs/name/uniswap"},
+    operation_details={
+        "pool_state": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic", notes="Sepolia subgraph — different pool addresses, low liquidity"),
+        }),
+        "swap_events": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
+        }),
+    },
 )
 
 _AAVE = SourceCapability(
@@ -41,6 +52,37 @@ _AAVE = SourceCapability(
         "position": ["user_account_data", "health_factor", "collateral", "debt"],
         "reference": ["reserves_list", "protocol_data", "incentives"],
     },
+    base_urls={"mainnet": "https://aave-api-v2.aave.com", "testnet": "https://aave-api-v2.aave.com"},
+    operation_details={
+        "reserve_data": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none", notes="Read-only eth_call via Alchemy/Infura RPC"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none", data_fidelity="synthetic", notes="Sepolia — different contract addresses via testnet_contracts.yaml"),
+        }),
+        "user_account_data": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none", data_fidelity="synthetic"),
+        }),
+        "health_factor": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none", data_fidelity="synthetic"),
+        }),
+        "supply": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key", data_fidelity="synthetic"),
+        }),
+        "borrow": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key", data_fidelity="synthetic"),
+        }),
+        "repay": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key", data_fidelity="synthetic"),
+        }),
+        "flash_loan": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key", notes="Atomic — all-or-nothing within single tx"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key", data_fidelity="synthetic"),
+        }),
+    },
 )
 
 _CURVE = SourceCapability(
@@ -57,6 +99,17 @@ _CURVE = SourceCapability(
     operations={
         "market": ["pool_state", "exchange_rates", "volumes", "virtual_price", "liquidity"],
         "reference": ["registry", "pools", "gauges", "factory_pools"],
+    },
+    base_urls={"mainnet": "https://api.curve.fi"},
+    operation_details={
+        "pool_state": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
+        }),
+        "exchange": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="wallet_private_key", data_fidelity="synthetic"),
+        }),
     },
 )
 
@@ -77,6 +130,22 @@ _DYDX = SourceCapability(
         "position": ["account", "positions", "fills", "funding_payments"],
         "reference": ["markets", "stats"],
     },
+    base_urls={"mainnet": "https://indexer.dydx.trade", "testnet": "https://indexer.v4testnet.dydx.exchange"},
+    margin_model={"mainnet": "cross", "testnet": "cross"},
+    operation_details={
+        "place_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+            "testnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key", data_fidelity="synthetic"),
+        }),
+        "cancel_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+            "testnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+        }),
+        "orderbook": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
+        }),
+    },
 )
 
 _INSTADAPP = SourceCapability(
@@ -94,6 +163,13 @@ _INSTADAPP = SourceCapability(
         "market": ["reserve_data", "rates"],
         "position": ["smart_account", "positions", "balances"],
         "reference": ["protocols", "tokens"],
+    },
+    base_urls={"mainnet": "https://api.instadapp.io"},
+    operation_details={
+        "smart_account": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="on_chain", required_credential="none", data_fidelity="synthetic"),
+        }),
     },
 )
 
@@ -116,6 +192,13 @@ _PYTH = SourceCapability(
         "market": ["price_feed", "latest_price", "price_updates", "ws_price_updates"],
         "reference": ["price_feeds", "asset_types"],
     },
+    base_urls={"mainnet": "https://hermes.pyth.network", "testnet": "https://hermes-beta.pyth.network"},
+    operation_details={
+        "price_feed": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="production", notes="Pyth testnet feeds track real prices"),
+        }),
+    },
 )
 
 _BLOXROUTE = SourceCapability(
@@ -132,6 +215,13 @@ _BLOXROUTE = SourceCapability(
     operations={
         "market": ["oracle_price_feed", "pending_txns", "new_txns", "ws_pending_txns"],
         "reference": ["network_info"],
+    },
+    base_urls={"mainnet": "https://virginia.eth.blxrbdn.com"},
+    operation_details={
+        "pending_txns": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            "testnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"),
+        }),
     },
 )
 
@@ -150,6 +240,12 @@ _MEV = SourceCapability(
         "market": ["bundle_results", "mev_metrics", "flashbots_blocks"],
         "reference": ["searchers", "builders"],
     },
+    base_urls={"mainnet": "https://relay.flashbots.net"},
+    operation_details={
+        "bundle_results": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+        }),
+    },
 )
 
 _VERSIFI = SourceCapability(
@@ -167,6 +263,13 @@ _VERSIFI = SourceCapability(
         "market": ["trades", "ws_trades"],
         "execution": ["orders", "fills"],
         "reference": ["instruments"],
+    },
+    base_urls={"mainnet": "https://api.versifi.com", "testnet": "https://testnet.versifi.com"},
+    operation_details={
+        "orders": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
+        }),
     },
 )
 

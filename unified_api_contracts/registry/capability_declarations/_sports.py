@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ..capability import SourceCapability
+from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
 # Sports / prediction markets (13)
@@ -24,6 +24,15 @@ _BETFAIR = SourceCapability(
         "execution": ["place_orders", "cancel_orders", "replace_orders", "list_current_orders"],
         "reference": ["list_event_types", "list_competitions", "list_events", "list_countries", "list_venues"],
     },
+    base_urls={"mainnet": "https://api.betfair.com/exchange"},
+    operation_details={
+        "place_orders": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="cert", notes="Requires X-Application header + client SSL cert"),
+        }),
+        "list_market_book": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
+    },
 )
 
 _BETDAQ = SourceCapability(
@@ -42,6 +51,12 @@ _BETDAQ = SourceCapability(
         "execution": ["place_orders", "cancel_orders", "settle_orders"],
         "reference": ["list_sports", "list_events"],
     },
+    base_urls={"mainnet": "https://api.betdaq.com"},
+    operation_details={
+        "place_orders": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
+    },
 )
 
 _PINNACLE = SourceCapability(
@@ -58,6 +73,12 @@ _PINNACLE = SourceCapability(
     operations={
         "market": ["odds", "fixtures", "settled_fixtures", "line"],
         "reference": ["sports", "leagues", "periods"],
+    },
+    base_urls={"mainnet": "https://api.pinnacle.com"},
+    operation_details={
+        "odds": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
     },
 )
 
@@ -78,6 +99,17 @@ _KALSHI = SourceCapability(
         "position": ["portfolio", "positions", "fills", "settlements"],
         "reference": ["events", "series", "categories"],
     },
+    base_urls={"mainnet": "https://trading-api.kalshi.com", "testnet": "https://demo-trading-api.kalshi.co"},
+    operation_details={
+        "create_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
+        }),
+        "markets": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
+        }),
+    },
 )
 
 _POLYMARKET = SourceCapability(
@@ -97,6 +129,18 @@ _POLYMARKET = SourceCapability(
         "position": ["positions", "balances", "pnl"],
         "reference": ["events", "markets_metadata", "tags"],
     },
+    base_urls={"mainnet": "https://clob.polymarket.com"},
+    operation_details={
+        "create_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key", notes="L1 auth: wallet private key → EIP-712 → CLOB credentials; L2 auth: HMAC per request"),
+        }),
+        "cancel_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+        }),
+        "markets": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+        }),
+    },
 )
 
 _ODDS_API = SourceCapability(
@@ -114,6 +158,8 @@ _ODDS_API = SourceCapability(
         "market": ["odds", "scores", "historical_odds"],
         "reference": ["sports", "participants"],
     },
+    base_urls={"mainnet": "https://api.the-odds-api.com"},
+    operation_details={},
 )
 
 _ODDS_ENGINE = SourceCapability(
@@ -131,6 +177,8 @@ _ODDS_ENGINE = SourceCapability(
         "market": ["markets", "odds_lines"],
         "reference": ["sports", "leagues"],
     },
+    base_urls={"mainnet": "https://api.oddsengine.com"},
+    operation_details={},
 )
 
 _ODDSJAM = SourceCapability(
@@ -148,6 +196,8 @@ _ODDSJAM = SourceCapability(
         "market": ["odds", "game_lines", "player_props", "arb_opportunities"],
         "reference": ["sports", "leagues", "books"],
     },
+    base_urls={"mainnet": "https://api.oddsjam.com"},
+    operation_details={},
 )
 
 _OPTICODDS = SourceCapability(
@@ -165,6 +215,8 @@ _OPTICODDS = SourceCapability(
         "market": ["odds", "fixtures", "player_props"],
         "reference": ["sports", "leagues", "books"],
     },
+    base_urls={"mainnet": "https://api.opticodds.com"},
+    operation_details={},
 )
 
 _MATCHBOOK = SourceCapability(
@@ -182,6 +234,12 @@ _MATCHBOOK = SourceCapability(
         "market": ["events", "markets", "runners", "prices"],
         "execution": ["offer", "cancel_offer", "current_offers"],
         "reference": ["sports", "events_list"],
+    },
+    base_urls={"mainnet": "https://api.matchbook.com"},
+    operation_details={
+        "offer": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
     },
 )
 
@@ -201,6 +259,12 @@ _SMARKETS = SourceCapability(
         "execution": ["create_order", "cancel_order", "open_orders"],
         "reference": ["sports", "competitions"],
     },
+    base_urls={"mainnet": "https://api.smarkets.com"},
+    operation_details={
+        "create_order": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
+    },
 )
 
 _MANIFOLD = SourceCapability(
@@ -219,6 +283,12 @@ _MANIFOLD = SourceCapability(
         "execution": ["bet", "cancel_bet", "sell_shares"],
         "reference": ["users", "groups", "tags"],
     },
+    base_urls={"mainnet": "https://api.manifold.markets"},
+    operation_details={
+        "bet": OperationDetail(environments={
+            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+        }),
+    },
 )
 
 _PREDICTIT = SourceCapability(
@@ -236,6 +306,8 @@ _PREDICTIT = SourceCapability(
         "market": ["markets", "market_contracts", "price_history"],
         "reference": ["all_markets"],
     },
+    base_urls={"mainnet": "https://www.predictit.org/api"},
+    operation_details={},
 )
 
 _ONEXBET = SourceCapability(
@@ -253,6 +325,8 @@ _ONEXBET = SourceCapability(
         "market": ["prematch_odds", "live_odds"],
         "reference": ["sports", "tournaments"],
     },
+    base_urls={"mainnet": "https://1xbet.com/api"},
+    operation_details={},
 )
 
 _METABET = SourceCapability(
@@ -270,6 +344,8 @@ _METABET = SourceCapability(
         "market": ["markets", "instruments"],
         "reference": ["sports", "markets_list"],
     },
+    base_urls={"mainnet": "https://api.metabet.io"},
+    operation_details={},
 )
 
 # ---------------------------------------------------------------------------
@@ -291,6 +367,8 @@ _API_FOOTBALL = SourceCapability(
         "market": ["fixtures", "odds", "predictions"],
         "reference": ["leagues", "teams", "players", "venues", "standings"],
     },
+    base_urls={"mainnet": "https://v3.football.api-sports.io"},
+    operation_details={},
 )
 
 _FOOTYSTATS = SourceCapability(
@@ -308,6 +386,8 @@ _FOOTYSTATS = SourceCapability(
         "market": ["matches", "odds"],
         "reference": ["leagues", "teams", "players", "standings"],
     },
+    base_urls={"mainnet": "https://api.football-data-api.com"},
+    operation_details={},
 )
 
 _SOCCER_FOOTBALL_INFO = SourceCapability(
@@ -324,6 +404,8 @@ _SOCCER_FOOTBALL_INFO = SourceCapability(
     operations={
         "reference": ["fixtures", "teams", "leagues", "players", "referees", "venues"],
     },
+    base_urls={"mainnet": "https://api.soccer-football.info"},
+    operation_details={},
 )
 
 _TRANSFERMARKT = SourceCapability(
@@ -340,6 +422,8 @@ _TRANSFERMARKT = SourceCapability(
     operations={
         "reference": ["players", "teams", "transfers", "market_values"],
     },
+    base_urls={"mainnet": "https://www.transfermarkt.com"},
+    operation_details={},
 )
 
 _UNDERSTAT = SourceCapability(
@@ -356,6 +440,8 @@ _UNDERSTAT = SourceCapability(
     operations={
         "reference": ["fixtures", "teams", "leagues", "players", "xg_stats"],
     },
+    base_urls={"mainnet": "https://understat.com"},
+    operation_details={},
 )
 
 _SHARPAPI = SourceCapability(
@@ -373,6 +459,8 @@ _SHARPAPI = SourceCapability(
         "market": ["odds", "markets"],
         "reference": ["sports", "leagues"],
     },
+    base_urls={"mainnet": "https://api.sharpapi.com"},
+    operation_details={},
 )
 
 

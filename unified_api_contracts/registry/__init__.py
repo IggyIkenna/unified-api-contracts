@@ -14,10 +14,14 @@ from ._sports_venue_constants import (
 )
 from .capability import (
     CapabilityResolutionError,
+    OperationDetail,
+    OperationEnvDetail,
     SourceCapability,
+    UnsupportedOperationError,
     register_capability,
     resolve_capability,
     validate_mode_env_auth,
+    validate_operation,
 )
 from .capability_data import CAPABILITY_DECLARATIONS, bootstrap_capabilities
 from .endpoint_registry import (
@@ -370,11 +374,14 @@ __all__ = [
     "ExchangeInstrumentConfig",
     "InstructionConstraint",
     "InstructionValidationError",
+    "OperationDetail",
+    "OperationEnvDetail",
     "ResponseFormat",
     "SourceCapability",
     "SportsAggregatorType",
     "SportsAuthMethod",
     "SportsVenueType",
+    "UnsupportedOperationError",
     "VenueCapability",
     "VenueFeeModel",
     "VenueMapping",
@@ -385,4 +392,5 @@ __all__ = [
     "resolve_capability",
     "validate_instruction",
     "validate_mode_env_auth",
+    "validate_operation",
 ]
