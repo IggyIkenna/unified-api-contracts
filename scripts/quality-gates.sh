@@ -12,5 +12,12 @@ MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
+
+# venue_mapping.py uses .get() defaults for safe dataclass field defaults (not os.getenv fallback)
+# cassette_orphan_checker.py + mock_replay.py are test tooling (not production code)
+EMPTY_STR_EXCLUDE_GLOBS=("!**/venue_mapping.py" "!**/cassette_orphan_checker.py" "!**/mock_replay.py")
+EMPTY_DICT_LIST_EXCLUDE_GLOBS=("!**/venue_mapping.py" "!**/mock_replay.py")
+PRINT_EXCLUDE_GLOBS=("!**/cassette_orphan_checker.py")
+
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

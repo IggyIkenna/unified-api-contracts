@@ -441,8 +441,11 @@ from .registry import (
     AccessMode,
     CassetteStatus,
     DataAvailability,
+    DataTypeConfig,
     EndpointSpec,
+    ExchangeInstrumentConfig,
     ResponseFormat,
+    VenueMapping,
 )
 
 __all__ = [
@@ -642,6 +645,7 @@ __all__ = [
     "DarkPoolPrintRecord",
     "DataAvailability",
     "DataSourceMapping",
+    "DataTypeConfig",
     "DatabentoError",
     "DatabentoReferenceInstrument",
     "DeFiAggregatedHealth",
@@ -676,6 +680,7 @@ __all__ = [
     "EulerUserPosition",
     "EulerVaultData",
     "ExchangeFeeSchedule",
+    "ExchangeInstrumentConfig",
     "ExecutionInstruction",
     "ExecutionResult",
     "ExecutionStatus",
@@ -823,6 +828,7 @@ __all__ = [
     "VenueCategory",
     "VenueErrorClassification",
     "VenueExecutionProfile",
+    "VenueMapping",
     "VenuePositionBreakdown",
     "VenueRateLimitSpec",
     "VolSmilePoint",

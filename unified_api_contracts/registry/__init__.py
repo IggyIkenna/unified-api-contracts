@@ -194,6 +194,7 @@ from .venue_constants import (
     VenueFeeModel,
     VenueOrderCapability,
 )
+from .venue_mapping import DataTypeConfig, ExchangeInstrumentConfig, VenueMapping
 
 __all__ = [
     "AAVE_PLASMA",
@@ -363,8 +364,10 @@ __all__ = [
     "CassetteStatus",
     "ConstraintOrderType",
     "DataAvailability",
+    "DataTypeConfig",
     "DefiProtocolType",
     "EndpointSpec",
+    "ExchangeInstrumentConfig",
     "InstructionConstraint",
     "InstructionValidationError",
     "ResponseFormat",
@@ -374,6 +377,7 @@ __all__ = [
     "SportsVenueType",
     "VenueCapability",
     "VenueFeeModel",
+    "VenueMapping",
     "VenueOrderCapability",
     "bootstrap_capabilities",
     "get_schema_class_for_endpoint",

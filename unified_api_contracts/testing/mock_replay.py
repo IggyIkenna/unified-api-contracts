@@ -59,15 +59,11 @@ def replay_cassette(
     parsed = yaml.safe_load(content)
 
     if not isinstance(parsed, dict) or "interactions" not in parsed:
-        raise ValueError(
-            f"Cassette {cassette_name} is not a valid VCR cassette"
-        )
+        raise ValueError(f"Cassette {cassette_name} is not a valid VCR cassette")
 
     interactions = parsed["interactions"]
     if not isinstance(interactions, list) or len(interactions) == 0:
-        raise ValueError(
-            f"Cassette {cassette_name} has no interactions to replay"
-        )
+        raise ValueError(f"Cassette {cassette_name} has no interactions to replay")
 
     registered: list[responses_lib.BaseResponse] = []
 

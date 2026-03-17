@@ -80,21 +80,14 @@ def load_cassette(
     parsed = yaml.safe_load(content)
 
     if not isinstance(parsed, dict) or "interactions" not in parsed:
-        raise ValueError(
-            f"Cassette {cassette_path.name} is not a valid VCR cassette "
-            "(missing 'interactions' key)"
-        )
+        raise ValueError(f"Cassette {cassette_path.name} is not a valid VCR cassette (missing 'interactions' key)")
 
     interactions = parsed["interactions"]
     if not isinstance(interactions, list):
-        raise ValueError(
-            f"Cassette {cassette_path.name}: 'interactions' must be a list"
-        )
+        raise ValueError(f"Cassette {cassette_path.name}: 'interactions' must be a list")
 
     if len(interactions) == 0:
-        raise ValueError(
-            f"Cassette {cassette_path.name} is a stub (empty interactions)"
-        )
+        raise ValueError(f"Cassette {cassette_path.name} is a stub (empty interactions)")
 
     if interaction_index >= len(interactions):
         raise ValueError(
@@ -112,22 +105,17 @@ def load_cassette(
     response = interaction.get("response")
     if not isinstance(response, dict):
         raise ValueError(
-            f"Cassette {cassette_path.name} interaction[{interaction_index}]: "
-            "missing or malformed 'response'"
+            f"Cassette {cassette_path.name} interaction[{interaction_index}]: missing or malformed 'response'"
         )
 
     body = response.get("body")
     if not isinstance(body, dict):
-        raise ValueError(
-            f"Cassette {cassette_path.name} interaction[{interaction_index}]: "
-            "missing or malformed 'body'"
-        )
+        raise ValueError(f"Cassette {cassette_path.name} interaction[{interaction_index}]: missing or malformed 'body'")
 
     body_string = body.get("string")
     if not isinstance(body_string, str) or not body_string.strip():
         raise ValueError(
-            f"Cassette {cassette_path.name} interaction[{interaction_index}]: "
-            "body string is empty or not a string"
+            f"Cassette {cassette_path.name} interaction[{interaction_index}]: body string is empty or not a string"
         )
 
     return json.loads(body_string)
@@ -146,7 +134,5 @@ def load_cassette_raw(
     content = cassette_path.read_text(encoding="utf-8")
     parsed = yaml.safe_load(content)
     if not isinstance(parsed, dict):
-        raise ValueError(
-            f"Cassette {cassette_path.name}: expected dict at root"
-        )
+        raise ValueError(f"Cassette {cassette_path.name}: expected dict at root")
     return parsed

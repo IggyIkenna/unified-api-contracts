@@ -119,10 +119,7 @@ def find_missing_cassettes(
         # Only check .yaml files that look like cassette names
         if name.endswith(".yaml") and name not in all_cassette_names:
             # Exclude known non-cassette YAML references (config files, etc.)
-            if any(
-                skip in name.lower()
-                for skip in ["config", "settings", "pyproject", "docker"]
-            ):
+            if any(skip in name.lower() for skip in ["config", "settings", "pyproject", "docker"]):
                 continue
             missing.append(name)
     return missing
@@ -147,17 +144,14 @@ def run_orphan_check(warn_only: bool = True) -> int:
     orphans = find_orphan_cassettes(cassette_map, referenced)
     missing = find_missing_cassettes(cassette_map, referenced)
 
-    print(f"[cassette-orphan-check] Scanned {total_cassettes} cassettes "
-          f"across {len(cassette_map)} venues")
-    print(f"[cassette-orphan-check] Found {len(referenced)} cassette "
-          f"references in test files")
+    print(f"[cassette-orphan-check] Scanned {total_cassettes} cassettes across {len(cassette_map)} venues")
+    print(f"[cassette-orphan-check] Found {len(referenced)} cassette references in test files")
 
     exit_code = 0
 
     if orphans:
         level = "WARN" if warn_only else "FAIL"
-        print(f"\n[cassette-orphan-check] {level}: {len(orphans)} orphan "
-              f"cassette(s) with no test reference:")
+        print(f"\n[cassette-orphan-check] {level}: {len(orphans)} orphan cassette(s) with no test reference:")
         for venue, path in orphans:
             print(f"  {venue}/mocks/{path.name}")
         if not warn_only:
@@ -167,8 +161,7 @@ def run_orphan_check(warn_only: bool = True) -> int:
 
     if missing:
         level = "WARN" if warn_only else "FAIL"
-        print(f"\n[cassette-orphan-check] {level}: {len(missing)} cassette "
-              f"reference(s) with no matching file:")
+        print(f"\n[cassette-orphan-check] {level}: {len(missing)} cassette reference(s) with no matching file:")
         for name in missing:
             print(f"  {name}")
         if not warn_only:
