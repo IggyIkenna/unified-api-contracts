@@ -198,7 +198,12 @@ from .venue_constants import (
     VenueFeeModel,
     VenueOrderCapability,
 )
-from .venue_context import VenueContext, compose_validation, resolve_venue_context
+from .venue_context import (
+    VenueContext,
+    compose_validation,
+    requires_operation_validation,
+    resolve_venue_context,
+)
 from .venue_mapping import DataTypeConfig, ExchangeInstrumentConfig, VenueMapping
 
 __all__ = [
@@ -392,6 +397,7 @@ __all__ = [
     "compose_validation",
     "get_schema_class_for_endpoint",
     "register_capability",
+    "requires_operation_validation",
     "resolve_capability",
     "resolve_venue_context",
     "validate_instruction",

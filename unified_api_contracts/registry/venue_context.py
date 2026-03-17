@@ -8,15 +8,26 @@ Bridges three registries into one VenueContext object:
 Consumers call ``resolve_venue_context()`` to get everything they need before
 executing against a venue, or ``compose_validation()`` to validate an instruction
 end-to-end (structural + runtime) in one call.
+
+The ``requires_operation_validation`` decorator can be applied to service methods
+to automatically call ``validate_operation()`` before the method body, blocking
+on ``UnsupportedOperationError`` and gracefully degrading on all other exceptions.
 """
 
 from __future__ import annotations
+
+import functools
+import inspect
+import logging
+from collections.abc import Callable
+from typing import TypeVar
 
 from pydantic import BaseModel
 
 from .capability import (
     CapabilityResolutionError,
     OperationEnvDetail,
+    UnsupportedOperationError,
     resolve_capability,
     validate_operation,
 )
@@ -25,11 +36,158 @@ from .instruction_constraints import (
 )
 from .venue_constants import VENUE_CATEGORY_MAP
 
+_logger = logging.getLogger(__name__)
+
+_F = TypeVar("_F", bound=Callable[..., object])
+
 __all__ = [
     "VenueContext",
     "compose_validation",
+    "requires_operation_validation",
     "resolve_venue_context",
 ]
+
+
+def _resolve_venue_value(
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+    sig: inspect.Signature,
+    *,
+    venue_param: str | None,
+    venue_attr: str | None,
+) -> str:
+    """Extract the venue string from method arguments or an attribute on *self*.
+
+    When *venue_attr* is given (e.g. ``"self.venue_id"``), the value is read from
+    the first positional argument (assumed to be *self*) by traversing the
+    dot-separated attribute chain.
+
+    When *venue_param* is given, it is resolved from the call signature by name or
+    by position.
+    """
+    if venue_attr is not None:
+        parts = venue_attr.split(".")
+        # First part must be "self" — the first positional arg
+        obj = args[0]
+        for attr_name in parts[1:]:
+            obj = getattr(obj, attr_name)
+        return str(obj)
+
+    if venue_param is not None:
+        bound = sig.bind(*args, **kwargs)
+        bound.apply_defaults()
+        return str(bound.arguments[venue_param])
+
+    msg = "Either venue_param or venue_attr must be provided"
+    raise TypeError(msg)
+
+
+def _resolve_env_value(
+    args: tuple[object, ...],
+    kwargs: dict[str, object],
+    sig: inspect.Signature,
+    *,
+    env_param: str,
+) -> str:
+    """Extract the env string from method arguments."""
+    bound = sig.bind(*args, **kwargs)
+    bound.apply_defaults()
+    return str(bound.arguments[env_param])
+
+
+def requires_operation_validation(
+    *,
+    venue_param: str | None = None,
+    venue_attr: str | None = None,
+    operation_name: str,
+    env_param: str = "env",
+) -> Callable[[_F], _F]:
+    """Decorator that validates an operation before the decorated method runs.
+
+    Calls ``validate_operation(venue, operation_name, env)`` before the wrapped
+    method body.
+
+    - **UnsupportedOperationError** is re-raised (hard block).
+    - All other exceptions from the validation call are logged and swallowed
+      (graceful degradation) so that a missing registry entry does not break
+      callers.
+
+    Works on both sync and async methods.
+
+    Args:
+        venue_param: Name of the method parameter that holds the venue string.
+            Mutually exclusive with *venue_attr*.
+        venue_attr: Dot-separated attribute path on *self* (e.g. ``"self.venue_id"``).
+            Mutually exclusive with *venue_param*.
+        operation_name: Fixed operation name passed to ``validate_operation()``.
+        env_param: Name of the method parameter that holds the environment string.
+            Defaults to ``"env"``.
+
+    Example — venue from parameter::
+
+        @requires_operation_validation(venue_param="venue", operation_name="place_order")
+        async def place_order(self, venue: str, symbol: str, env: str = "mainnet"):
+            ...
+
+    Example — venue from self attribute::
+
+        @requires_operation_validation(venue_attr="self.venue_id", operation_name="supply")
+        def supply(self, amount: float, env: str = "mainnet"):
+            ...
+    """
+    if venue_param is None and venue_attr is None:
+        msg = "Either venue_param or venue_attr must be provided"
+        raise TypeError(msg)
+    if venue_param is not None and venue_attr is not None:
+        msg = "venue_param and venue_attr are mutually exclusive"
+        raise TypeError(msg)
+
+    def decorator(fn: _F) -> _F:
+        sig = inspect.signature(fn)
+
+        if inspect.iscoroutinefunction(fn):
+
+            @functools.wraps(fn)
+            async def async_wrapper(*args: object, **kwargs: object) -> object:
+                try:
+                    venue = _resolve_venue_value(
+                        args, kwargs, sig, venue_param=venue_param, venue_attr=venue_attr
+                    )
+                    env = _resolve_env_value(args, kwargs, sig, env_param=env_param)
+                    validate_operation(venue, operation_name, env)
+                except UnsupportedOperationError:
+                    raise
+                except Exception:
+                    _logger.debug(
+                        "Operation validation skipped for %s (graceful degradation)",
+                        operation_name,
+                        exc_info=True,
+                    )
+                return await fn(*args, **kwargs)
+
+            return async_wrapper  # type: ignore[return-value]
+
+        @functools.wraps(fn)
+        def sync_wrapper(*args: object, **kwargs: object) -> object:
+            try:
+                venue = _resolve_venue_value(
+                    args, kwargs, sig, venue_param=venue_param, venue_attr=venue_attr
+                )
+                env = _resolve_env_value(args, kwargs, sig, env_param=env_param)
+                validate_operation(venue, operation_name, env)
+            except UnsupportedOperationError:
+                raise
+            except Exception:
+                _logger.debug(
+                    "Operation validation skipped for %s (graceful degradation)",
+                    operation_name,
+                    exc_info=True,
+                )
+            return fn(*args, **kwargs)
+
+        return sync_wrapper  # type: ignore[return-value]
+
+    return decorator
 
 
 class VenueContext(BaseModel):

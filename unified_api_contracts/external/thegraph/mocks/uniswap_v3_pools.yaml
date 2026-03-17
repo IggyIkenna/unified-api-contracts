@@ -1,0 +1,16 @@
+interactions:
+- request:
+    body: '{"query":"{ pools(first: 10, orderBy: totalValueLockedUSD, orderDirection: desc) { id token0 { symbol } token1 { symbol } } }"}'
+    headers:
+      Content-Type: application/json
+    method: POST
+    uri: https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV
+  response:
+    body:
+      string: '{"data":{"pools":[{"id":"0x277667eb3e34f134adf870be9550e9f323d0dc24","token0":{"symbol":"ease.org"},"token1":{"symbol":"ez-cvxsteCRV"}},{"id":"0x8c0411f2ad5470a66cb2e9c64536cfb8dcd54d51","token0":{"symbol":"ease.org"},"token1":{"symbol":"ez-yvCurve-IronBank"}},{"id":"0x055284a4ca6532ecc219ac06b577d540c686669d","token0":{"symbol":"ease.org"},"token1":{"symbol":"ez-SLP-WBTC-WETH"}},{"id":"0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640","token0":{"symbol":"USDC"},"token1":{"symbol":"WETH"}},{"id":"0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8","token0":{"symbol":"USDC"},"token1":{"symbol":"WETH"}},{"id":"0x4e68ccd3e89f51c3074ca5072bbac773960dfa36","token0":{"symbol":"WETH"},"token1":{"symbol":"USDT"}},{"id":"0xcbcdf9626bc03e24f779434178a73a0b4bad62ed","token0":{"symbol":"WBTC"},"token1":{"symbol":"WETH"}},{"id":"0x99ac8ca7087fa4a2a1fb6357269965a2014abc35","token0":{"symbol":"WBTC"},"token1":{"symbol":"USDC"}},{"id":"0x4585fe77225b41b697c938b018e2ac67ac5a20c0","token0":{"symbol":"WBTC"},"token1":{"symbol":"WETH"}},{"id":"0x11b815efb8f581194ae79006d24e0d814b7697f6","token0":{"symbol":"WETH"},"token1":{"symbol":"USDT"}}]}}'
+    headers:
+      Content-Type: application/json
+    status:
+      code: 200
+      message: OK
+version: 1
