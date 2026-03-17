@@ -26,12 +26,20 @@ _BETFAIR = SourceCapability(
     },
     base_urls={"mainnet": "https://api.betfair.com/exchange"},
     operation_details={
-        "place_orders": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="cert", notes="Requires X-Application header + client SSL cert"),
-        }),
-        "list_market_book": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "place_orders": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="api_key_header",
+                    required_credential="cert",
+                    notes="Requires X-Application header + client SSL cert",
+                ),
+            }
+        ),
+        "list_market_book": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -53,9 +61,11 @@ _BETDAQ = SourceCapability(
     },
     base_urls={"mainnet": "https://api.betdaq.com"},
     operation_details={
-        "place_orders": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "place_orders": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -76,9 +86,11 @@ _PINNACLE = SourceCapability(
     },
     base_urls={"mainnet": "https://api.pinnacle.com"},
     operation_details={
-        "odds": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "odds": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -101,14 +113,22 @@ _KALSHI = SourceCapability(
     },
     base_urls={"mainnet": "https://trading-api.kalshi.com", "testnet": "https://demo-trading-api.kalshi.co"},
     operation_details={
-        "create_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
-        "markets": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
-        }),
+        "create_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "markets": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -131,15 +151,25 @@ _POLYMARKET = SourceCapability(
     },
     base_urls={"mainnet": "https://clob.polymarket.com"},
     operation_details={
-        "create_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key", notes="L1 auth: wallet private key → EIP-712 → CLOB credentials; L2 auth: HMAC per request"),
-        }),
-        "cancel_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
-        }),
-        "markets": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
+        "create_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="eip712",
+                    required_credential="wallet_private_key",
+                    notes="L1 auth: wallet private key → EIP-712 → CLOB credentials; L2 auth: HMAC per request",
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+            }
+        ),
+        "markets": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
     },
 )
 
@@ -237,9 +267,11 @@ _MATCHBOOK = SourceCapability(
     },
     base_urls={"mainnet": "https://api.matchbook.com"},
     operation_details={
-        "offer": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "offer": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -261,9 +293,11 @@ _SMARKETS = SourceCapability(
     },
     base_urls={"mainnet": "https://api.smarkets.com"},
     operation_details={
-        "create_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "create_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -285,9 +319,11 @@ _MANIFOLD = SourceCapability(
     },
     base_urls={"mainnet": "https://api.manifold.markets"},
     operation_details={
-        "bet": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "bet": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 

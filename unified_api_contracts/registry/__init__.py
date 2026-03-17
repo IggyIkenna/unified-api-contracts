@@ -198,6 +198,7 @@ from .venue_constants import (
     VenueFeeModel,
     VenueOrderCapability,
 )
+from .venue_context import VenueContext, compose_validation, resolve_venue_context
 from .venue_mapping import DataTypeConfig, ExchangeInstrumentConfig, VenueMapping
 
 __all__ = [
@@ -383,13 +384,16 @@ __all__ = [
     "SportsVenueType",
     "UnsupportedOperationError",
     "VenueCapability",
+    "VenueContext",
     "VenueFeeModel",
     "VenueMapping",
     "VenueOrderCapability",
     "bootstrap_capabilities",
+    "compose_validation",
     "get_schema_class_for_endpoint",
     "register_capability",
     "resolve_capability",
+    "resolve_venue_context",
     "validate_instruction",
     "validate_mode_env_auth",
     "validate_operation",

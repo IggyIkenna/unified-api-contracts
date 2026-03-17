@@ -25,18 +25,33 @@ _ALCHEMY = SourceCapability(
     },
     base_urls={"mainnet": "https://eth-mainnet.g.alchemy.com", "testnet": "https://eth-sepolia.g.alchemy.com"},
     operation_details={
-        "token_balances": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic", notes="Sepolia testnet — different token addresses, test balances"),
-        }),
-        "token_transfers": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"),
-        }),
-        "transaction_receipts": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"),
-        }),
+        "token_balances": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="api_key_header",
+                    required_credential="api_key",
+                    data_fidelity="synthetic",
+                    notes="Sepolia testnet — different token addresses, test balances",
+                ),
+            }
+        ),
+        "token_transfers": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "transaction_receipts": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -57,9 +72,11 @@ _THEGRAPH = SourceCapability(
     },
     base_urls={"mainnet": "https://gateway.thegraph.com"},
     operation_details={
-        "subgraph_query": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "subgraph_query": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -80,9 +97,11 @@ _COINGECKO = SourceCapability(
     },
     base_urls={"mainnet": "https://api.coingecko.com"},
     operation_details={
-        "price": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "price": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -103,9 +122,11 @@ _COINGLASS = SourceCapability(
     },
     base_urls={"mainnet": "https://open-api-v3.coinglass.com"},
     operation_details={
-        "liquidations": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "liquidations": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -126,9 +147,11 @@ _GLASSNODE = SourceCapability(
     },
     base_urls={"mainnet": "https://api.glassnode.com"},
     operation_details={
-        "on_chain_metrics": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "on_chain_metrics": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -149,9 +172,11 @@ _ARKHAM = SourceCapability(
     },
     base_urls={"mainnet": "https://api.arkhamintelligence.com"},
     operation_details={
-        "on_chain_metrics": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "on_chain_metrics": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -172,9 +197,11 @@ _CRYPTOQUANT = SourceCapability(
     },
     base_urls={"mainnet": "https://api.cryptoquant.com"},
     operation_details={
-        "on_chain_metrics": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "on_chain_metrics": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -195,9 +222,11 @@ _HYBLOCK = SourceCapability(
     },
     base_urls={"mainnet": "https://api.hyblock.co"},
     operation_details={
-        "liquidation_clusters": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "liquidation_clusters": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -218,12 +247,16 @@ _DEFILLAMA = SourceCapability(
     },
     base_urls={"mainnet": "https://api.llama.fi"},
     operation_details={
-        "tvl": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
-        "yields": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
+        "tvl": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "yields": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
     },
 )
 
@@ -286,9 +319,11 @@ _EIA = SourceCapability(
     },
     base_urls={"mainnet": "https://api.eia.gov"},
     operation_details={
-        "energy_data": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "energy_data": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -385,9 +420,11 @@ _GITHUB = SourceCapability(
     },
     base_urls={"mainnet": "https://api.github.com"},
     operation_details={
-        "repositories": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "repositories": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 

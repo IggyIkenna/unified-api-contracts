@@ -28,22 +28,34 @@ _BINANCE = SourceCapability(
     base_urls={"mainnet": "https://api.binance.com", "testnet": "https://testnet.binance.vision"},
     margin_model={"mainnet": "cross", "testnet": "cross"},
     operation_details={
-        "new_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
-        "cancel_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
-        "ticker": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
-        }),
-        "account": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "new_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
+        "ticker": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "account": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -67,18 +79,26 @@ _BYBIT = SourceCapability(
     base_urls={"mainnet": "https://api.bybit.com", "testnet": "https://api-testnet.bybit.com"},
     margin_model={"mainnet": "cross", "testnet": "cross"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
-        "cancel_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
-        "wallet_balance": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
+        "wallet_balance": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -102,14 +122,23 @@ _OKX = SourceCapability(
     base_urls={"mainnet": "https://www.okx.com", "testnet": "https://www.okx.com"},
     margin_model={"mainnet": "cross", "testnet": "cross"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic", notes="OKX testnet uses same URL with x-simulated-trading header"),
-        }),
-        "cancel_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256",
+                    required_credential="api_key",
+                    data_fidelity="synthetic",
+                    notes="OKX testnet uses same URL with x-simulated-trading header",
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -133,10 +162,14 @@ _COINBASE = SourceCapability(
     base_urls={"mainnet": "https://api.coinbase.com", "testnet": "https://api-public.sandbox.exchange.coinbase.com"},
     margin_model={},
     operation_details={
-        "create_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
+        "create_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -160,18 +193,28 @@ _DERIBIT = SourceCapability(
     base_urls={"mainnet": "https://www.deribit.com", "testnet": "https://test.deribit.com"},
     margin_model={"mainnet": "portfolio", "testnet": "portfolio"},
     operation_details={
-        "buy": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
-        "sell": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
-        "cancel": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "buy": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "sell": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "cancel": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -194,54 +237,88 @@ _HYPERLIQUID = SourceCapability(
     base_urls={"mainnet": "https://api.hyperliquid.xyz", "testnet": "https://api.hyperliquid-testnet.xyz"},
     margin_model={"mainnet": "cross", "testnet": "unified"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
-            "testnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet", data_fidelity="synthetic"),
-        }),
-        "cancel_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
-            "testnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
-        }),
-        "modify_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
-            "testnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
-        }),
-        "usd_class_transfer": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="user_signed", required_credential="main_wallet"),
-            "testnet": OperationEnvDetail(supported=False, notes="API wallet cannot transfer; requires main wallet key or use UI"),
-        }),
-        "withdraw": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="user_signed", required_credential="main_wallet"),
-            "testnet": OperationEnvDetail(signing_scheme="user_signed", required_credential="main_wallet"),
-        }),
-        "all_mids": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
-        }),
-        "l2_book": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none", data_fidelity="synthetic"),
-        }),
-        "user_state": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none", notes="Public — pass user address as param"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
-        "clearinghouse_state": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
-        "funding_history": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
-        "open_orders": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
-        "order_status": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-            "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="l1_action", required_credential="api_wallet", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
+                "testnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
+            }
+        ),
+        "modify_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
+                "testnet": OperationEnvDetail(signing_scheme="l1_action", required_credential="api_wallet"),
+            }
+        ),
+        "usd_class_transfer": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="user_signed", required_credential="main_wallet"),
+                "testnet": OperationEnvDetail(
+                    supported=False, notes="API wallet cannot transfer; requires main wallet key or use UI"
+                ),
+            }
+        ),
+        "withdraw": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="user_signed", required_credential="main_wallet"),
+                "testnet": OperationEnvDetail(signing_scheme="user_signed", required_credential="main_wallet"),
+            }
+        ),
+        "all_mids": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "l2_book": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "user_state": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", notes="Public — pass user address as param"
+                ),
+                "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "clearinghouse_state": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "funding_history": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "open_orders": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "order_status": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
     },
 )
 
@@ -264,9 +341,11 @@ _BITFINEX = SourceCapability(
     },
     base_urls={"mainnet": "https://api-pub.bitfinex.com"},
     operation_details={
-        "submit_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha384", required_credential="api_key"),
-        }),
+        "submit_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha384", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -290,10 +369,17 @@ _BITGET = SourceCapability(
     base_urls={"mainnet": "https://api.bitget.com", "testnet": "https://api.bitget.com"},
     margin_model={"mainnet": "cross"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic", notes="Testnet uses same base URL with simulated header"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256",
+                    required_credential="api_key",
+                    data_fidelity="synthetic",
+                    notes="Testnet uses same base URL with simulated header",
+                ),
+            }
+        ),
     },
 )
 
@@ -316,9 +402,11 @@ _BITSTAMP = SourceCapability(
     },
     base_urls={"mainnet": "https://www.bitstamp.net"},
     operation_details={
-        "buy_market": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "buy_market": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -341,9 +429,11 @@ _KRAKEN = SourceCapability(
     },
     base_urls={"mainnet": "https://api.kraken.com"},
     operation_details={
-        "add_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
-        }),
+        "add_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -366,10 +456,14 @@ _GATEIO = SourceCapability(
     },
     base_urls={"mainnet": "https://api.gateio.ws", "testnet": "https://fx-api-testnet.gateio.ws"},
     operation_details={
-        "create_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key", data_fidelity="synthetic"),
-        }),
+        "create_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha512", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -392,9 +486,11 @@ _HUOBI = SourceCapability(
     },
     base_urls={"mainnet": "https://api.huobi.pro"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -417,10 +513,14 @@ _KUCOIN = SourceCapability(
     },
     base_urls={"mainnet": "https://api.kucoin.com", "testnet": "https://openapi-sandbox.kucoin.com"},
     operation_details={
-        "post_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
+        "post_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -443,9 +543,11 @@ _MEXC = SourceCapability(
     },
     base_urls={"mainnet": "https://api.mexc.com"},
     operation_details={
-        "create_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-        }),
+        "create_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -477,9 +579,11 @@ _UPBIT = SourceCapability(
     },
     base_urls={"mainnet": "https://api.upbit.com"},
     operation_details={
-        "orders": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="jwt", required_credential="api_key"),
-        }),
+        "orders": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="jwt", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -532,9 +636,11 @@ _TARDIS = SourceCapability(
     },
     base_urls={"mainnet": "https://api.tardis.dev"},
     operation_details={
-        "trades": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "trades": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -568,10 +674,14 @@ _ASTER = SourceCapability(
     base_urls={"mainnet": "https://api.aster.finance", "testnet": "https://testnet-api.aster.finance"},
     margin_model={"mainnet": "cross", "testnet": "cross"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -597,10 +707,14 @@ _FIX = SourceCapability(
     },
     base_urls={},
     operation_details={
-        "new_order_single": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="fix_logon", required_credential="cert"),
-            "testnet": OperationEnvDetail(signing_scheme="fix_logon", required_credential="cert", data_fidelity="synthetic"),
-        }),
+        "new_order_single": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="fix_logon", required_credential="cert"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="fix_logon", required_credential="cert", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 
@@ -622,10 +736,14 @@ _NAUTILUS = SourceCapability(
     },
     base_urls={},
     operation_details={
-        "submit_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
-            "testnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"),
-        }),
+        "submit_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
     },
 )
 

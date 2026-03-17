@@ -28,14 +28,29 @@ _IBKR = SourceCapability(
     base_urls={"mainnet": "localhost:4001", "testnet": "localhost:4002"},
     margin_model={"mainnet": "portfolio", "testnet": "portfolio"},
     operation_details={
-        "place_order": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token", notes="TWS/Gateway connection; port 4001 live, 4002 paper"),
-            "testnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token", data_fidelity="production", notes="Paper trading uses real market data with simulated execution"),
-        }),
-        "market_data": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token"),
-            "testnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token", data_fidelity="production"),
-        }),
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="ib_gateway",
+                    required_credential="session_token",
+                    notes="TWS/Gateway connection; port 4001 live, 4002 paper",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="ib_gateway",
+                    required_credential="session_token",
+                    data_fidelity="production",
+                    notes="Paper trading uses real market data with simulated execution",
+                ),
+            }
+        ),
+        "market_data": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="ib_gateway", required_credential="session_token"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="ib_gateway", required_credential="session_token", data_fidelity="production"
+                ),
+            }
+        ),
     },
 )
 
@@ -56,9 +71,11 @@ _DATABENTO = SourceCapability(
     },
     base_urls={"mainnet": "https://hist.databento.com"},
     operation_details={
-        "mbp_1": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "mbp_1": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -78,9 +95,11 @@ _FRED = SourceCapability(
     },
     base_urls={"mainnet": "https://api.stlouisfed.org"},
     operation_details={
-        "observations": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "observations": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -101,9 +120,11 @@ _POLYGON = SourceCapability(
     },
     base_urls={"mainnet": "https://api.polygon.io"},
     operation_details={
-        "aggregates": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "aggregates": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -124,9 +145,11 @@ _BARCHART = SourceCapability(
     },
     base_urls={"mainnet": "https://ondemand.websol.barchart.com"},
     operation_details={
-        "ohlcv": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-        }),
+        "ohlcv": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+            }
+        ),
     },
 )
 
@@ -147,9 +170,11 @@ _YAHOO_FINANCE = SourceCapability(
     },
     base_urls={"mainnet": "https://query1.finance.yahoo.com"},
     operation_details={
-        "ohlcv": OperationDetail(environments={
-            "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-        }),
+        "ohlcv": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
     },
 )
 
