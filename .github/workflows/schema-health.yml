@@ -28,6 +28,10 @@ on:
     # Weekly on Sundays at 02:00 UTC — catches providers going stale
     - cron: "0 2 * * 0"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   schema-health:
     name: Schema Health Validation

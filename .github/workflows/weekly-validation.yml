@@ -6,6 +6,10 @@ on:
     - cron: "0 8 * * 1"
   workflow_dispatch: # Allow manual trigger
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate-schemas:
     name: Validate API schemas against live responses
