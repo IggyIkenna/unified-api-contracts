@@ -319,6 +319,48 @@ _HYPERLIQUID = SourceCapability(
                 "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
             }
         ),
+        "spot_transfer": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="user_signed_eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="production",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="user_signed_eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="synthetic",
+                ),
+            }
+        ),
+        "approve_agent": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="user_signed_eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="production",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="user_signed_eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="synthetic",
+                ),
+            }
+        ),
+        "approve_builder_fee": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="user_signed_eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="production",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="user_signed_eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="synthetic",
+                ),
+            }
+        ),
     },
 )
 
@@ -454,7 +496,7 @@ _GATEIO = SourceCapability(
         "position": ["spot_accounts", "futures_accounts", "positions"],
         "reference": ["list_currency_pairs", "get_currency_pair"],
     },
-    base_urls={"mainnet": "https://api.gateio.ws", "testnet": "https://fx-api-testnet.gateio.ws"},
+    base_urls={"mainnet": "https://api.gateio.ws", "testnet": "https://api-testnet.gateapi.io"},
     operation_details={
         "create_order": OperationDetail(
             environments={

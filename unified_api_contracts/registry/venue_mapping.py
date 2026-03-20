@@ -23,8 +23,10 @@ class VenueMapping:
     """CANONICAL venue to exchange API mappings (centralized business logic)"""
 
     # ALL possible Tardis exchange endpoints (we'll call each to get complete data)
+    # Aligned with DATA_SOURCE_TO_VENUES["tardis"] in canonical_mappings.py (19 canonical venues)
     all_tardis_exchanges: list[str] = field(
         default_factory=lambda: [
+            # Tier 1: Primary exchanges (highest liquidity)
             "binance",
             "binance-futures",  # BINANCE split
             "deribit",  # DERIBIT unified
@@ -33,8 +35,19 @@ class VenueMapping:
             "okex",
             "okex-futures",
             "okex-swap",  # OKX needs all endpoints for complete data
-            "upbit",  # Upbit (Korean exchange) - spot only, for kimchi premium
             "coinbase",  # Coinbase - spot only, for coinbase premium
+            # Tier 2: Regional / specialist exchanges
+            "upbit",  # Upbit (Korean exchange) - spot only, for kimchi premium
+            "bitfinex",  # Bitfinex - spot
+            "gemini",  # Gemini - spot
+            "bitstamp",  # Bitstamp - spot
+            # Tier 3: Additional CeFi exchanges
+            "huobi",  # Huobi/HTX - spot
+            "huobi-dm",  # Huobi/HTX - derivatives (futures/swaps)
+            "gate-io",  # Gate.io - spot
+            "gate-io-futures",  # Gate.io - futures
+            "bitmex",  # BitMEX - derivatives
+            "phemex",  # Phemex - spot + derivatives
         ]
     )
 
@@ -126,17 +139,30 @@ class VenueMapping:
             "DERIBIT": "deribit",
             "BYBIT": "bybit",  # Unified
             "OKX": "okx",  # Unified
-            "HYPERLIQUID": "hyperliquid",  # CCXT supports Hyperliquid
-            "UPBIT": "upbit",  # Korean exchange (spot only)
-            "COINBASE": "coinbase",  # Coinbase (spot only)
+            "HYPERLIQUID": "hyperliquid",
+            "UPBIT": "upbit",
+            "COINBASE": "coinbase",
+            # Tier 2
+            "BITFINEX-SPOT": "bitfinex",
+            "GEMINI-SPOT": "gemini",
+            "BITSTAMP-SPOT": "bitstamp",
+            # Tier 3
+            "HUOBI-SPOT": "htx",  # Huobi rebranded to HTX
+            "HUOBI-FUTURES": "htx",
+            "GATEIO-SPOT": "gateio",
+            "GATEIO-FUTURES": "gateio",
+            "BITMEX": "bitmex",
+            "PHEMEX-SPOT": "phemex",
             # Note: ASTER not in CCXT yet
         }
     )
 
-    # Reverse mapping for imports
+    # Reverse mapping: Tardis exchange endpoint → canonical venue name
+    # Aligned with DATA_SOURCE_TO_VENUES["tardis"] in canonical_mappings.py
     tardis_to_venue: dict[str, str] = field(
         default_factory=lambda: {
-            "binance": "BINANCE-SPOT",  # Fixed: binance spot should be BINANCE-SPOT
+            # Tier 1
+            "binance": "BINANCE-SPOT",
             "binance-futures": "BINANCE-FUTURES",
             "deribit": "DERIBIT",
             "bybit": "BYBIT",
@@ -144,8 +170,19 @@ class VenueMapping:
             "okex": "OKX",
             "okex-futures": "OKX",
             "okex-swap": "OKX",
-            "upbit": "UPBIT",  # Korean exchange (spot only)
-            "coinbase": "COINBASE",  # Coinbase (spot only)
+            "coinbase": "COINBASE",
+            # Tier 2
+            "upbit": "UPBIT",
+            "bitfinex": "BITFINEX-SPOT",
+            "gemini": "GEMINI-SPOT",
+            "bitstamp": "BITSTAMP-SPOT",
+            # Tier 3
+            "huobi": "HUOBI-SPOT",
+            "huobi-dm": "HUOBI-FUTURES",
+            "gate-io": "GATEIO-SPOT",
+            "gate-io-futures": "GATEIO-FUTURES",
+            "bitmex": "BITMEX",
+            "phemex": "PHEMEX-SPOT",
         }
     )
 
@@ -182,7 +219,7 @@ class VenueMapping:
     # Adapters should use these instead of hardcoding dates
     venue_start_dates: dict[str, str] = field(
         default_factory=lambda: {
-            # CEFI - Tardis exchanges
+            # CEFI - Tardis exchanges (Tier 1)
             "BINANCE-SPOT": "2017-07-14",
             "BINANCE-FUTURES": "2019-09-13",
             "DERIBIT": "2016-06-01",
@@ -190,6 +227,17 @@ class VenueMapping:
             "OKX": "2017-05-31",
             "UPBIT": "2017-10-24",
             "COINBASE": "2015-01-26",
+            # CEFI - Tardis exchanges (Tier 2)
+            "BITFINEX-SPOT": "2013-01-14",
+            "GEMINI-SPOT": "2015-10-08",
+            "BITSTAMP-SPOT": "2011-08-18",
+            # CEFI - Tardis exchanges (Tier 3)
+            "HUOBI-SPOT": "2013-09-01",
+            "HUOBI-FUTURES": "2018-12-10",
+            "GATEIO-SPOT": "2017-04-01",
+            "GATEIO-FUTURES": "2019-10-01",
+            "BITMEX": "2014-11-24",
+            "PHEMEX-SPOT": "2019-11-25",
             # CEFI - On-chain CLOBs
             "HYPERLIQUID": "2023-04-15",
             "ASTER": "2024-10-01",
@@ -435,12 +483,28 @@ class VenueMapping:
             ("UPBIT", "SPOT_PAIR"): "upbit",
             # Coinbase (spot only - for coinbase premium)
             ("COINBASE", "SPOT_PAIR"): "coinbase",
+            # Tier 2 exchanges (spot only)
+            ("BITFINEX-SPOT", "SPOT_PAIR"): "bitfinex",
+            ("GEMINI-SPOT", "SPOT_PAIR"): "gemini",
+            ("BITSTAMP-SPOT", "SPOT_PAIR"): "bitstamp",
+            # Tier 3 exchanges
+            ("HUOBI-SPOT", "SPOT_PAIR"): "huobi",
+            ("HUOBI-FUTURES", "PERPETUAL"): "huobi-dm",
+            ("HUOBI-FUTURES", "FUTURE"): "huobi-dm",
+            ("GATEIO-SPOT", "SPOT_PAIR"): "gate-io",
+            ("GATEIO-FUTURES", "PERPETUAL"): "gate-io-futures",
+            ("GATEIO-FUTURES", "FUTURE"): "gate-io-futures",
+            ("BITMEX", "PERPETUAL"): "bitmex",
+            ("BITMEX", "FUTURE"): "bitmex",
+            ("PHEMEX-SPOT", "SPOT_PAIR"): "phemex",
+            ("PHEMEX-SPOT", "PERPETUAL"): "phemex",
         }
     )
 
     # Which Tardis exchanges map to which instrument types (for filtering)
     tardis_exchange_instrument_types: dict[str, list[str]] = field(
         default_factory=lambda: {
+            # Tier 1
             "binance": ["SPOT_PAIR"],
             "binance-futures": ["PERPETUAL", "FUTURE"],
             "okex": ["SPOT_PAIR"],
@@ -449,8 +513,19 @@ class VenueMapping:
             "bybit": ["PERPETUAL", "FUTURE"],
             "bybit-spot": ["SPOT_PAIR"],
             "deribit": ["SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"],
-            "upbit": ["SPOT_PAIR"],  # Spot only (Korean exchange)
-            "coinbase": ["SPOT_PAIR"],  # Spot only
+            "coinbase": ["SPOT_PAIR"],
+            # Tier 2
+            "upbit": ["SPOT_PAIR"],
+            "bitfinex": ["SPOT_PAIR"],
+            "gemini": ["SPOT_PAIR"],
+            "bitstamp": ["SPOT_PAIR"],
+            # Tier 3
+            "huobi": ["SPOT_PAIR"],
+            "huobi-dm": ["PERPETUAL", "FUTURE"],
+            "gate-io": ["SPOT_PAIR"],
+            "gate-io-futures": ["PERPETUAL", "FUTURE"],
+            "bitmex": ["PERPETUAL", "FUTURE"],
+            "phemex": ["SPOT_PAIR", "PERPETUAL"],
         }
     )
 

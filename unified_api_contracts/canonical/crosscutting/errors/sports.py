@@ -88,6 +88,38 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.FAIL,
             desc="Request payload exceeds size limit",
         ),
+        ve(
+            "betfair",
+            "429",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="HTTP rate limit exceeded",
+        ),
+        ve(
+            "betfair",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "betfair",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "betfair",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Internal server error",
+        ),
     ],
     "kalshi": [
         ve(

@@ -146,14 +146,6 @@
 | MEV-Share   | mev-share.flashbots.net | 2            | MevShareBundleParams, MevShareBundleResult                                                                                                                                    | —                                          |
 | MEV Blocker | RPC endpoints           | 1            | MevBlockerEndpoints                                                                                                                                                           | —                                          |
 
-### bloXroute BDN
-
-| Venue Key | Base URL / Endpoint                          | Schema Count | Key Schemas                                                                                                                                               | Gaps                                                        |
-| --------- | -------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| bloxroute | api.blxrbdn.com, eth-protect.rpc.blxrbdn.com | 7            | BloxrouteTxSubmitParams, BloxrouteTxSubmitResult, BloxrouteJsonRpcResponse, BloxrouteBdnBlocksParams, BloxrouteSubscribeParams, BloxrouteProtectEndpoints | bdnBlocks/newTxs stream payload schemas (need live samples) |
-
-**Error:** BloxrouteError
-
 ### Protocol SDKs (Aave, Compound, Morpho, Euler)
 
 | Protocol    | Source                   | Schema Count | Key Schemas                                                     | Gaps |

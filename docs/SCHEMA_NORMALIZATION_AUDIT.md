@@ -53,7 +53,7 @@ Missing normalizers: No normalize_order, normalize_orderbook, normalize_fill for
 ### 3.2 Orphaned External Providers (~57)
 
 CeFi: okx, bybit, coinbase, upbit, ccxt, deribit, nautilus
-DeFi: thegraph, aster, hyperliquid, alchemy, bloxroute
+DeFi: thegraph, aster, hyperliquid, alchemy
 TradFi: ibkr
 Sports/Betting: matchbook, betfair, betdaq, smarkets, kalshi, polymarket, predictit, pinnacle
 Data/Alt: api_football, footystats, understat, barchart, fred, glassnode, open_meteo, coingecko

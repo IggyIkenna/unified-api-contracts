@@ -111,13 +111,17 @@ _KALSHI = SourceCapability(
         "position": ["portfolio", "positions", "fills", "settlements"],
         "reference": ["events", "series", "categories"],
     },
-    base_urls={"mainnet": "https://trading-api.kalshi.com", "testnet": "https://demo-trading-api.kalshi.co"},
+    base_urls={"mainnet": "https://trading-api.kalshi.com", "testnet": "https://demo-api.kalshi.co"},
     operation_details={
         "create_order": OperationDetail(
             environments={
-                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha256", required_credential="api_key"),
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="rsa_pkcs1v15_sha256", required_credential="rsa_private_key"
+                ),
                 "testnet": OperationEnvDetail(
-                    signing_scheme="hmac_sha256", required_credential="api_key", data_fidelity="synthetic"
+                    signing_scheme="rsa_pkcs1v15_sha256",
+                    required_credential="rsa_private_key",
+                    data_fidelity="synthetic",
                 ),
             }
         ),
@@ -269,7 +273,7 @@ _MATCHBOOK = SourceCapability(
     operation_details={
         "offer": OperationDetail(
             environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+                "mainnet": OperationEnvDetail(signing_scheme="session_auth", required_credential="username_password"),
             }
         ),
     },

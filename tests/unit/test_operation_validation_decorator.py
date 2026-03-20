@@ -80,9 +80,7 @@ class TestSyncDecorated:
     """@requires_operation_validation on a regular (sync) function."""
 
     def test_sync_function_passes_through(self, _test_source: SourceCapability) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         def place_order(venue: str, symbol: str, env: str = "mainnet") -> str:
             return f"placed:{symbol}"
 
@@ -90,9 +88,7 @@ class TestSyncDecorated:
         assert result == "placed:BTC-USD"
 
     def test_sync_preserves_return_value(self, _test_source: SourceCapability) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         def place_order(venue: str, symbol: str, env: str = "mainnet") -> dict[str, str]:
             return {"status": "ok", "symbol": symbol}
 
@@ -110,9 +106,7 @@ class TestAsyncDecorated:
 
     @pytest.mark.asyncio()
     async def test_async_function_passes_through(self, _test_source: SourceCapability) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         async def place_order(venue: str, symbol: str, env: str = "mainnet") -> str:
             return f"async_placed:{symbol}"
 
@@ -121,9 +115,7 @@ class TestAsyncDecorated:
 
     @pytest.mark.asyncio()
     async def test_async_preserves_return_value(self, _test_source: SourceCapability) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         async def place_order(venue: str, symbol: str, env: str = "mainnet") -> dict[str, str]:
             return {"status": "ok", "symbol": symbol}
 
@@ -140,9 +132,7 @@ class TestUnsupportedOperationPropagates:
     """UnsupportedOperationError must NOT be swallowed."""
 
     def test_sync_raises_unsupported(self, _test_source: SourceCapability) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         def place_order(venue: str, symbol: str, env: str = "mainnet") -> str:
             return f"placed:{symbol}"
 
@@ -157,9 +147,7 @@ class TestUnsupportedOperationPropagates:
 
     @pytest.mark.asyncio()
     async def test_async_raises_unsupported(self, _test_source: SourceCapability) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         async def place_order(venue: str, symbol: str, env: str = "mainnet") -> str:
             return f"placed:{symbol}"
 
@@ -181,9 +169,7 @@ class TestGracefulDegradation:
     """Non-UnsupportedOperationError exceptions are swallowed."""
 
     def test_sync_unknown_source_degrades_gracefully(self) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         def place_order(venue: str, symbol: str, env: str = "mainnet") -> str:
             return f"placed:{symbol}"
 
@@ -194,9 +180,7 @@ class TestGracefulDegradation:
 
     @pytest.mark.asyncio()
     async def test_async_unknown_source_degrades_gracefully(self) -> None:
-        @requires_operation_validation(
-            venue_param="venue", operation_name="place_order", env_param="env"
-        )
+        @requires_operation_validation(venue_param="venue", operation_name="place_order", env_param="env")
         async def place_order(venue: str, symbol: str, env: str = "mainnet") -> str:
             return f"async_placed:{symbol}"
 
@@ -217,9 +201,7 @@ class TestVenueAttrExtraction:
             def __init__(self, venue_id: str) -> None:
                 self.venue_id = venue_id
 
-            @requires_operation_validation(
-                venue_attr="self.venue_id", operation_name="supply", env_param="env"
-            )
+            @requires_operation_validation(venue_attr="self.venue_id", operation_name="supply", env_param="env")
             def supply(self, amount: float, env: str = "mainnet") -> str:
                 return f"supplied:{amount}"
 
@@ -233,9 +215,7 @@ class TestVenueAttrExtraction:
             def __init__(self, venue_id: str) -> None:
                 self.venue_id = venue_id
 
-            @requires_operation_validation(
-                venue_attr="self.venue_id", operation_name="supply", env_param="env"
-            )
+            @requires_operation_validation(venue_attr="self.venue_id", operation_name="supply", env_param="env")
             async def supply(self, amount: float, env: str = "mainnet") -> str:
                 return f"supplied:{amount}"
 
@@ -254,9 +234,7 @@ class TestVenueAttrExtraction:
             def __init__(self, config: VenueConfig) -> None:
                 self.config = config
 
-            @requires_operation_validation(
-                venue_attr="self.config.venue_id", operation_name="supply", env_param="env"
-            )
+            @requires_operation_validation(venue_attr="self.config.venue_id", operation_name="supply", env_param="env")
             def supply(self, amount: float, env: str = "mainnet") -> str:
                 return f"supplied:{amount}"
 
@@ -271,9 +249,7 @@ class TestVenueAttrExtraction:
             def __init__(self, venue_id: str) -> None:
                 self.venue_id = venue_id
 
-            @requires_operation_validation(
-                venue_attr="self.venue_id", operation_name="place_order", env_param="env"
-            )
+            @requires_operation_validation(venue_attr="self.venue_id", operation_name="place_order", env_param="env")
             def place_order(self, symbol: str, env: str = "mainnet") -> str:
                 return f"placed:{symbol}"
 
@@ -296,6 +272,4 @@ class TestDecoratorArgValidation:
 
     def test_both_venue_param_and_venue_attr_raises(self) -> None:
         with pytest.raises(TypeError, match="mutually exclusive"):
-            requires_operation_validation(
-                venue_param="venue", venue_attr="self.venue_id", operation_name="place_order"
-            )
+            requires_operation_validation(venue_param="venue", venue_attr="self.venue_id", operation_name="place_order")

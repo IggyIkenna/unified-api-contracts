@@ -378,6 +378,7 @@ class GraphUniswapV2Pair(BaseModel, frozen=True):
     reserve0: str | float = 0
     reserve1: str | float = 0
     reserveUSD: str | float = 0
+    volumeUSD: str | float = 0
     txCount: str | int = 0
     createdAtTimestamp: str | int | None = None
 

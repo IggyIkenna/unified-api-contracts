@@ -397,7 +397,6 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "ccxt": None,
     "ibkr": None,
     "glassnode": "GLASSNODE_API_KEY",
-    "arkham": "ARKHAM_API_KEY",
     "defillama": None,
     "betfair": "BETFAIR_API_KEY",
     "coingecko": "COINGECKO_API_KEY",

@@ -94,7 +94,6 @@ from .errors import (
     extract_rate_limit_headers,
     normalize_alchemy_error,
     normalize_api_football_error,
-    normalize_arkham_error,
     normalize_aster_error,
     normalize_betdaq_error,
     normalize_betfair_error,
@@ -102,7 +101,6 @@ from .errors import (
     normalize_bitfinex_error,
     normalize_bitget_error,
     normalize_bitstamp_error,
-    normalize_bloxroute_error,
     normalize_bybit_error,
     normalize_ccxt_error,
     normalize_cloud_sdks_error,
@@ -236,9 +234,6 @@ from .ohlcv import (
     normalize_yahoo_ohlcv,
 )
 from .onchain import (
-    normalize_arkham_alert_event,
-    normalize_arkham_net_flow,
-    normalize_arkham_token_flow,
     normalize_defillama_chain_tvl,
     normalize_defillama_protocol,
     normalize_defillama_tvl_history_point,
@@ -253,7 +248,6 @@ from .onchain import (
     normalize_glassnode_sopr,
     normalize_glassnode_thermocap,
     normalize_glassnode_timeseries_point,
-    normalize_pyth_price_feed,
 )
 from .options import (
     normalize_databento_cme_option_quote,
@@ -427,11 +421,6 @@ __all__ = [
     "normalize_alchemy_error",
     "normalize_api_football_error",
     "normalize_arbitrage_market",
-    # Alt data normalizers (phase5-data-alt)
-    "normalize_arkham_alert_event",
-    "normalize_arkham_error",
-    "normalize_arkham_net_flow",
-    "normalize_arkham_token_flow",
     "normalize_aster_derivative_ticker",
     "normalize_aster_error",
     "normalize_aster_exchange_info",
@@ -491,7 +480,6 @@ __all__ = [
     "normalize_bitstamp_orderbook",
     "normalize_bitstamp_ticker",
     "normalize_bitstamp_trade",
-    "normalize_bloxroute_error",
     "normalize_bybit_derivative_ticker",
     "normalize_bybit_error",
     "normalize_bybit_fee_rate",
@@ -717,7 +705,6 @@ __all__ = [
     "normalize_predictit_market",
     "normalize_prime_broker_error",
     "normalize_prime_broker_fill",
-    "normalize_pyth_price_feed",
     "normalize_regulatory_error",
     "normalize_regulatory_trade_report",
     "normalize_sharpapi_error",

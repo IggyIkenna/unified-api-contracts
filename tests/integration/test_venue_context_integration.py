@@ -304,7 +304,7 @@ class TestComposeValidationPredictionBet:
     """PREDICTION_BET + KALSHI + LIMIT + PREDICTION_MARKET + testnet."""
 
     def test_prediction_bet_kalshi_testnet(self) -> None:
-        """Returns hmac_sha256 signing with synthetic data."""
+        """Returns rsa_pkcs1v15_sha256 signing with synthetic data."""
         result = compose_validation(
             venue="KALSHI",
             instruction_type="PREDICTION_BET",
@@ -314,7 +314,7 @@ class TestComposeValidationPredictionBet:
             instrument_type="PREDICTION_MARKET",
         )
         assert isinstance(result, OperationEnvDetail)
-        assert result.signing_scheme == "hmac_sha256"
+        assert result.signing_scheme == "rsa_pkcs1v15_sha256"
         assert result.data_fidelity == "synthetic"
 
 

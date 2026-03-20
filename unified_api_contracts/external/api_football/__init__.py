@@ -1,5 +1,9 @@
 """API-Football contracts."""
 
+from .player_name import (
+    get_canonical_player_name_from_api_football,
+    get_canonical_referee_name_from_api_football,
+)
 from .schemas import (
     ApiFootballError,
     APIFootballEvent,
@@ -36,8 +40,31 @@ from .schemas import (
     APIFootballVenue,
     ApiFootballVenue,
 )
+from .stadium_mappings import (
+    API_FOOTBALL_TO_CANONICAL_STADIUMS,
+    get_canonical_stadium_name_from_api_football,
+)
+from .team_mappings import (
+    API_FOOTBALL_TO_CANONICAL,
+    API_FOOTBALL_TO_CANONICAL_BUNDESLIGA,
+    API_FOOTBALL_TO_CANONICAL_EPL,
+    BETFAIR_TO_CANONICAL,
+    BUNDESLIGA_TEAM_ALIASES,
+    EPL_TEAM_ALIASES,
+    get_canonical_team_name_from_api_football,
+    get_canonical_team_name_from_betfair,
+)
+from .team_name_corrections import TEAM_NAME_CORRECTIONS
 
 __all__ = [
+    "API_FOOTBALL_TO_CANONICAL",
+    "API_FOOTBALL_TO_CANONICAL_BUNDESLIGA",
+    "API_FOOTBALL_TO_CANONICAL_EPL",
+    "API_FOOTBALL_TO_CANONICAL_STADIUMS",
+    "BETFAIR_TO_CANONICAL",
+    "BUNDESLIGA_TEAM_ALIASES",
+    "EPL_TEAM_ALIASES",
+    "TEAM_NAME_CORRECTIONS",
     "APIFootballEvent",
     "APIFootballFixture",
     "APIFootballLeague",
@@ -72,4 +99,9 @@ __all__ = [
     "ApiFootballTeam",
     "ApiFootballTeamWithWinner",
     "ApiFootballVenue",
+    "get_canonical_player_name_from_api_football",
+    "get_canonical_referee_name_from_api_football",
+    "get_canonical_stadium_name_from_api_football",
+    "get_canonical_team_name_from_api_football",
+    "get_canonical_team_name_from_betfair",
 ]

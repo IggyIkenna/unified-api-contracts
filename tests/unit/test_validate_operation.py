@@ -329,7 +329,7 @@ class TestCrossDomainSpotChecks:
 
     def test_kalshi_testnet_synthetic(self) -> None:
         detail = validate_operation("kalshi", "create_order", "testnet")
-        assert detail.signing_scheme == "hmac_sha256"
+        assert detail.signing_scheme == "rsa_pkcs1v15_sha256"
         assert detail.data_fidelity == "synthetic"
 
 

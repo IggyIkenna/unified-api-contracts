@@ -43,474 +43,213 @@
       "LIDO": "defi",
       "ETHERFI": "defi",
       "ETHENA": "defi",
-      "OPTICODDS": "sports",
-      "ODDSJAM": "sports",
-      "FANDUEL": "sports",
-      "KALSHI": "sports",
-      "FLIFF": "sports",
-      "PLAYUP": "sports",
-      "UNIBET": "sports",
-      "FANATICS": "sports",
-      "MRGREEN": "sports",
-      "TABTOUCH": "sports",
-      "API_FOOTBALL": "sports",
-      "FOOTYSTATS": "sports",
-      "LOWVIG": "sports",
-      "CASUMO": "sports",
-      "BET888SPORT": "sports",
-      "METABET": "sports",
-      "SKYBET": "sports",
-      "BETFAIR": "sports",
-      "GROSVENOR": "sports",
-      "PADDYPOWER": "sports",
       "MYBOOKIEAG": "sports",
-      "BETDAQ": "sports",
-      "BETCLIC": "sports",
-      "MATCHBOOK": "sports",
-      "VIRGINBET": "sports",
-      "PMU": "sports",
-      "BETOPENLY": "sports",
-      "LADBROKES": "sports",
-      "CODERE": "sports",
-      "SOCCER_FOOTBALL_INFO": "sports",
-      "WILLIAMHILL": "sports",
-      "BOYLESPORTS": "sports",
-      "DRAFTKINGS_PICK6": "sports",
-      "ODDS_API": "sports",
-      "SMARKETS": "sports",
-      "BETR_AU": "sports",
-      "DABBLE": "sports",
-      "COOLBET": "sports",
-      "TIPICO": "sports",
-      "CAESARS": "sports",
-      "BETUS": "sports",
-      "BETR_DFS": "sports",
-      "SUPRABETS": "sports",
-      "SBOBET": "sports",
+      "FLIFF": "sports",
+      "BETFAIR": "sports",
       "SHARPAPI": "sports",
-      "REBET": "sports",
-      "NETBET": "sports",
-      "ESPNBET": "sports",
-      "BETRIGHT": "sports",
-      "POINTSBET": "sports",
-      "PROPHETX": "sports",
-      "BALLYBET": "sports",
-      "ATG": "sports",
-      "UNDERSTAT": "sports",
-      "BET365": "sports",
-      "CORAL": "sports",
-      "GTBETS": "sports",
-      "SVENSKASPEL": "sports",
-      "ONEXBET": "sports",
-      "OPEN_METEO": "sports",
-      "BETSSON": "sports",
-      "BETRIVERS": "sports",
-      "HARDROCKBET": "sports",
-      "NORDICBET": "sports",
-      "PARIONSSPORT": "sports",
-      "BETONLINEAG": "sports",
-      "PINNACLE": "sports",
-      "BETFRED": "sports",
-      "MARATHONBET": "sports",
-      "PRIZEPICKS": "sports",
-      "DRAFTKINGS": "sports",
-      "TRANSFERMARKT": "sports",
-      "NEDS": "sports",
       "BETANYSPORTS": "sports",
+      "API_FOOTBALL": "sports",
+      "CAESARS": "sports",
+      "BALLYBET": "sports",
+      "GTBETS": "sports",
+      "DABBLE": "sports",
+      "DRAFTKINGS_PICK6": "sports",
       "UNDERDOG": "sports",
-      "BOVADA": "sports",
-      "WINAMAX": "sports",
-      "BETVICTOR": "sports",
-      "TAB": "sports",
-      "ODDS_ENGINE": "sports",
-      "BETWAY": "sports",
+      "PADDYPOWER": "sports",
+      "NORDICBET": "sports",
       "LEOVEGAS": "sports",
-      "EVERYGAME": "sports",
-      "BETPARX": "sports",
-      "BETMGM": "sports",
-      "POLYMARKET": "sports",
-      "LIVESCOREBET": "sports",
-      "SPORTSBET_AU": "sports",
+      "BETDAQ": "sports",
+      "ATG": "sports",
+      "BETWAY": "sports",
+      "BETONLINEAG": "sports",
+      "BETVICTOR": "sports",
+      "WILLIAMHILL": "sports",
+      "ESPNBET": "sports",
+      "BOVADA": "sports",
+      "TABTOUCH": "sports",
+      "UNDERSTAT": "sports",
+      "TRANSFERMARKT": "sports",
+      "HARDROCKBET": "sports",
+      "FOOTYSTATS": "sports",
+      "FANDUEL": "sports",
+      "BET888SPORT": "sports",
+      "BETCLIC": "sports",
+      "SUPRABETS": "sports",
+      "BETR_DFS": "sports",
+      "NETBET": "sports",
+      "BETUS": "sports",
+      "ONEXBET": "sports",
+      "BETFRED": "sports",
+      "BETOPENLY": "sports",
+      "BETRIVERS": "sports",
+      "OPTICODDS": "sports",
+      "BOYLESPORTS": "sports",
+      "WINAMAX": "sports",
+      "PINNACLE": "sports",
+      "SBOBET": "sports",
+      "PLAYUP": "sports",
+      "COOLBET": "sports",
+      "VIRGINBET": "sports",
+      "UNIBET": "sports",
+      "KALSHI": "sports",
+      "SKYBET": "sports",
+      "ODDS_ENGINE": "sports",
+      "CASUMO": "sports",
+      "OPEN_METEO": "sports",
+      "SMARKETS": "sports",
+      "SVENSKASPEL": "sports",
+      "PRIZEPICKS": "sports",
+      "MATCHBOOK": "sports",
       "BWIN": "sports",
-      "NOVIG": "sports"
+      "BETSSON": "sports",
+      "BET365": "sports",
+      "MARATHONBET": "sports",
+      "CODERE": "sports",
+      "PARIONSSPORT": "sports",
+      "LOWVIG": "sports",
+      "FANATICS": "sports",
+      "ODDS_API": "sports",
+      "NEDS": "sports",
+      "BETRIGHT": "sports",
+      "POLYMARKET": "sports",
+      "LADBROKES": "sports",
+      "CORAL": "sports",
+      "DRAFTKINGS": "sports",
+      "MRGREEN": "sports",
+      "ODDSJAM": "sports",
+      "EVERYGAME": "sports",
+      "SOCCER_FOOTBALL_INFO": "sports",
+      "GROSVENOR": "sports",
+      "NOVIG": "sports",
+      "SPORTSBET_AU": "sports",
+      "PROPHETX": "sports",
+      "METABET": "sports",
+      "BETR_AU": "sports",
+      "REBET": "sports",
+      "TAB": "sports",
+      "PMU": "sports",
+      "POINTSBET": "sports",
+      "TIPICO": "sports",
+      "LIVESCOREBET": "sports",
+      "BETPARX": "sports",
+      "BETMGM": "sports"
     },
     "instrument_types_by_venue": {
-      "BINANCE-SPOT": [
-        "SPOT"
-      ],
-      "COINBASE-SPOT": [
-        "SPOT"
-      ],
-      "OKX-SPOT": [
-        "SPOT"
-      ],
-      "OKX-FUTURES": [
-        "PERPETUAL",
-        "OPTION",
-        "FUTURE"
-      ],
-      "OKX": [
-        "SPOT",
-        "PERPETUAL",
-        "OPTION",
-        "FUTURE"
-      ],
-      "BYBIT-SPOT": [
-        "SPOT"
-      ],
-      "BYBIT-FUTURES": [
-        "PERPETUAL",
-        "FUTURE"
-      ],
-      "BYBIT": [
-        "SPOT",
-        "PERPETUAL",
-        "FUTURE"
-      ],
-      "UPBIT": [
-        "SPOT"
-      ],
-      "BINANCE-FUTURES": [
-        "PERPETUAL",
-        "FUTURE"
-      ],
-      "DERIBIT": [
-        "PERPETUAL",
-        "OPTION",
-        "FUTURE"
-      ],
-      "HYPERLIQUID": [
-        "PERPETUAL"
-      ],
-      "ASTER": [
-        "PERPETUAL"
-      ],
-      "NASDAQ": [
-        "INDEX",
-        "ETF",
-        "EQUITY"
-      ],
-      "NYSE": [
-        "INDEX",
-        "ETF",
-        "EQUITY"
-      ],
-      "CME": [
-        "INDEX",
-        "OPTION",
-        "BOND",
-        "FUTURE"
-      ],
-      "CBOT": [
-        "OPTION",
-        "BOND",
-        "FUTURE"
-      ],
-      "NYMEX": [
-        "COMMODITY",
-        "OPTION",
-        "FUTURE"
-      ],
-      "COMEX": [
-        "COMMODITY",
-        "OPTION",
-        "FUTURE"
-      ],
-      "ICE": [
-        "COMMODITY",
-        "OPTION",
-        "FUTURE"
-      ],
-      "CBOE": [
-        "INDEX",
-        "OPTION",
-        "ETF",
-        "EQUITY"
-      ],
-      "XNAS": [
-        "ETF",
-        "EQUITY"
-      ],
-      "XNYS": [
-        "ETF",
-        "EQUITY"
-      ],
-      "UNISWAPV2-ETH": [
-        "POOL"
-      ],
-      "UNISWAPV3-ETH": [
-        "POOL"
-      ],
-      "UNISWAPV4-ETH": [
-        "POOL"
-      ],
-      "CURVE-ETH": [
-        "POOL"
-      ],
-      "AERODROME-BASE": [
-        "POOL"
-      ],
-      "AAVE_V3": [
-        "LENDING"
-      ],
-      "AAVE_V3_ETH": [
-        "LENDING"
-      ],
-      "MORPHO-ETHEREUM": [
-        "LENDING"
-      ],
-      "EULER-PLASMA": [
-        "LENDING"
-      ],
-      "FLUID-PLASMA": [
-        "LENDING"
-      ],
-      "AAVE-PLASMA": [
-        "LENDING"
-      ],
-      "LIDO": [
-        "STAKING"
-      ],
-      "ETHERFI": [
-        "STAKING"
-      ],
-      "ETHENA": [
-        "STAKING"
-      ],
-      "BETFAIR": [
-        "EXCHANGE_ODDS"
-      ],
-      "SMARKETS": [
-        "EXCHANGE_ODDS"
-      ],
-      "MATCHBOOK": [
-        "EXCHANGE_ODDS"
-      ],
-      "BETDAQ": [
-        "EXCHANGE_ODDS"
-      ],
-      "KALSHI": [
-        "PREDICTION_MARKET"
-      ],
-      "BETOPENLY": [
-        "PREDICTION_MARKET"
-      ],
-      "PROPHETX": [
-        "PREDICTION_MARKET"
-      ],
-      "POLYMARKET": [
-        "PREDICTION_MARKET"
-      ],
-      "NOVIG": [
-        "PREDICTION_MARKET"
-      ],
-      "ONEXBET": [
-        "FIXED_ODDS"
-      ],
-      "PINNACLE": [
-        "FIXED_ODDS"
-      ],
-      "FANDUEL": [
-        "FIXED_ODDS"
-      ],
-      "FLIFF": [
-        "FIXED_ODDS"
-      ],
-      "PLAYUP": [
-        "FIXED_ODDS"
-      ],
-      "UNIBET": [
-        "FIXED_ODDS"
-      ],
-      "NETBET": [
-        "FIXED_ODDS"
-      ],
-      "ESPNBET": [
-        "FIXED_ODDS"
-      ],
-      "BETRIGHT": [
-        "FIXED_ODDS"
-      ],
-      "POINTSBET": [
-        "FIXED_ODDS"
-      ],
-      "FANATICS": [
-        "FIXED_ODDS"
-      ],
-      "BALLYBET": [
-        "FIXED_ODDS"
-      ],
-      "MRGREEN": [
-        "FIXED_ODDS"
-      ],
-      "ATG": [
-        "FIXED_ODDS"
-      ],
-      "TABTOUCH": [
-        "FIXED_ODDS"
-      ],
-      "BET365": [
-        "FIXED_ODDS"
-      ],
-      "LOWVIG": [
-        "FIXED_ODDS"
-      ],
-      "CORAL": [
-        "FIXED_ODDS"
-      ],
-      "GTBETS": [
-        "FIXED_ODDS"
-      ],
-      "CASUMO": [
-        "FIXED_ODDS"
-      ],
-      "SVENSKASPEL": [
-        "FIXED_ODDS"
-      ],
-      "BET888SPORT": [
-        "FIXED_ODDS"
-      ],
-      "BETSSON": [
-        "FIXED_ODDS"
-      ],
-      "BETRIVERS": [
-        "FIXED_ODDS"
-      ],
-      "SKYBET": [
-        "FIXED_ODDS"
-      ],
-      "GROSVENOR": [
-        "FIXED_ODDS"
-      ],
-      "HARDROCKBET": [
-        "FIXED_ODDS"
-      ],
-      "PADDYPOWER": [
-        "FIXED_ODDS"
-      ],
-      "MYBOOKIEAG": [
-        "FIXED_ODDS"
-      ],
-      "NORDICBET": [
-        "FIXED_ODDS"
-      ],
-      "PARIONSSPORT": [
-        "FIXED_ODDS"
-      ],
-      "BETONLINEAG": [
-        "FIXED_ODDS"
-      ],
-      "BETCLIC": [
-        "FIXED_ODDS"
-      ],
-      "BETFRED": [
-        "FIXED_ODDS"
-      ],
-      "MARATHONBET": [
-        "FIXED_ODDS"
-      ],
-      "DRAFTKINGS": [
-        "FIXED_ODDS"
-      ],
-      "VIRGINBET": [
-        "FIXED_ODDS"
-      ],
-      "PMU": [
-        "FIXED_ODDS"
-      ],
-      "BETANYSPORTS": [
-        "FIXED_ODDS"
-      ],
-      "NEDS": [
-        "FIXED_ODDS"
-      ],
-      "LADBROKES": [
-        "FIXED_ODDS"
-      ],
-      "CODERE": [
-        "FIXED_ODDS"
-      ],
-      "BOVADA": [
-        "FIXED_ODDS"
-      ],
-      "WINAMAX": [
-        "FIXED_ODDS"
-      ],
-      "WILLIAMHILL": [
-        "FIXED_ODDS"
-      ],
-      "BOYLESPORTS": [
-        "FIXED_ODDS"
-      ],
-      "BETVICTOR": [
-        "FIXED_ODDS"
-      ],
-      "TAB": [
-        "FIXED_ODDS"
-      ],
-      "BETR_AU": [
-        "FIXED_ODDS"
-      ],
-      "DABBLE": [
-        "FIXED_ODDS"
-      ],
-      "COOLBET": [
-        "FIXED_ODDS"
-      ],
-      "TIPICO": [
-        "FIXED_ODDS"
-      ],
-      "BETWAY": [
-        "FIXED_ODDS"
-      ],
-      "LEOVEGAS": [
-        "FIXED_ODDS"
-      ],
-      "CAESARS": [
-        "FIXED_ODDS"
-      ],
-      "BETUS": [
-        "FIXED_ODDS"
-      ],
-      "EVERYGAME": [
-        "FIXED_ODDS"
-      ],
-      "BETPARX": [
-        "FIXED_ODDS"
-      ],
-      "SUPRABETS": [
-        "FIXED_ODDS"
-      ],
-      "BETMGM": [
-        "FIXED_ODDS"
-      ],
-      "LIVESCOREBET": [
-        "FIXED_ODDS"
-      ],
-      "SPORTSBET_AU": [
-        "FIXED_ODDS"
-      ],
-      "BWIN": [
-        "FIXED_ODDS"
-      ],
-      "SBOBET": [
-        "FIXED_ODDS"
-      ],
-      "REBET": [
-        "FIXED_ODDS"
-      ],
-      "BETR_DFS": [
-        "PROP"
-      ],
-      "DRAFTKINGS_PICK6": [
-        "PROP"
-      ],
-      "PRIZEPICKS": [
-        "PROP"
-      ],
-      "UNDERDOG": [
-        "PROP"
-      ]
+      "BINANCE-SPOT": ["SPOT"],
+      "COINBASE-SPOT": ["SPOT"],
+      "OKX-SPOT": ["SPOT"],
+      "OKX-FUTURES": ["PERPETUAL", "FUTURE", "OPTION"],
+      "OKX": ["OPTION", "FUTURE", "PERPETUAL", "SPOT"],
+      "BYBIT-SPOT": ["SPOT"],
+      "BYBIT-FUTURES": ["PERPETUAL", "FUTURE"],
+      "BYBIT": ["PERPETUAL", "FUTURE", "SPOT"],
+      "UPBIT": ["SPOT"],
+      "BINANCE-FUTURES": ["PERPETUAL", "FUTURE"],
+      "DERIBIT": ["PERPETUAL", "FUTURE", "OPTION"],
+      "HYPERLIQUID": ["PERPETUAL"],
+      "ASTER": ["PERPETUAL"],
+      "NASDAQ": ["ETF", "INDEX", "EQUITY"],
+      "NYSE": ["ETF", "INDEX", "EQUITY"],
+      "CME": ["BOND", "INDEX", "FUTURE", "OPTION"],
+      "CBOT": ["BOND", "FUTURE", "OPTION"],
+      "NYMEX": ["COMMODITY", "FUTURE", "OPTION"],
+      "COMEX": ["COMMODITY", "FUTURE", "OPTION"],
+      "ICE": ["COMMODITY", "FUTURE", "OPTION"],
+      "CBOE": ["ETF", "INDEX", "EQUITY", "OPTION"],
+      "XNAS": ["ETF", "EQUITY"],
+      "XNYS": ["ETF", "EQUITY"],
+      "UNISWAPV2-ETH": ["POOL"],
+      "UNISWAPV3-ETH": ["POOL"],
+      "UNISWAPV4-ETH": ["POOL"],
+      "CURVE-ETH": ["POOL"],
+      "AERODROME-BASE": ["POOL"],
+      "AAVE_V3": ["LENDING"],
+      "AAVE_V3_ETH": ["LENDING"],
+      "MORPHO-ETHEREUM": ["LENDING"],
+      "EULER-PLASMA": ["LENDING"],
+      "FLUID-PLASMA": ["LENDING"],
+      "AAVE-PLASMA": ["LENDING"],
+      "LIDO": ["STAKING"],
+      "ETHERFI": ["STAKING"],
+      "ETHENA": ["STAKING"],
+      "SMARKETS": ["EXCHANGE_ODDS"],
+      "BETDAQ": ["EXCHANGE_ODDS"],
+      "MATCHBOOK": ["EXCHANGE_ODDS"],
+      "BETFAIR": ["EXCHANGE_ODDS"],
+      "PROPHETX": ["PREDICTION_MARKET"],
+      "NOVIG": ["PREDICTION_MARKET"],
+      "BETOPENLY": ["PREDICTION_MARKET"],
+      "KALSHI": ["PREDICTION_MARKET"],
+      "POLYMARKET": ["PREDICTION_MARKET"],
+      "PINNACLE": ["FIXED_ODDS"],
+      "ONEXBET": ["FIXED_ODDS"],
+      "CASUMO": ["FIXED_ODDS"],
+      "MYBOOKIEAG": ["FIXED_ODDS"],
+      "FLIFF": ["FIXED_ODDS"],
+      "SVENSKASPEL": ["FIXED_ODDS"],
+      "BETANYSPORTS": ["FIXED_ODDS"],
+      "CAESARS": ["FIXED_ODDS"],
+      "BALLYBET": ["FIXED_ODDS"],
+      "GTBETS": ["FIXED_ODDS"],
+      "DABBLE": ["FIXED_ODDS"],
+      "BWIN": ["FIXED_ODDS"],
+      "BETSSON": ["FIXED_ODDS"],
+      "PADDYPOWER": ["FIXED_ODDS"],
+      "BET365": ["FIXED_ODDS"],
+      "NORDICBET": ["FIXED_ODDS"],
+      "MARATHONBET": ["FIXED_ODDS"],
+      "LEOVEGAS": ["FIXED_ODDS"],
+      "CODERE": ["FIXED_ODDS"],
+      "PARIONSSPORT": ["FIXED_ODDS"],
+      "LOWVIG": ["FIXED_ODDS"],
+      "ATG": ["FIXED_ODDS"],
+      "FANATICS": ["FIXED_ODDS"],
+      "BETONLINEAG": ["FIXED_ODDS"],
+      "BETWAY": ["FIXED_ODDS"],
+      "BETVICTOR": ["FIXED_ODDS"],
+      "LIVESCOREBET": ["FIXED_ODDS"],
+      "WILLIAMHILL": ["FIXED_ODDS"],
+      "ESPNBET": ["FIXED_ODDS"],
+      "BOVADA": ["FIXED_ODDS"],
+      "NEDS": ["FIXED_ODDS"],
+      "TABTOUCH": ["FIXED_ODDS"],
+      "BETRIGHT": ["FIXED_ODDS"],
+      "HARDROCKBET": ["FIXED_ODDS"],
+      "LADBROKES": ["FIXED_ODDS"],
+      "CORAL": ["FIXED_ODDS"],
+      "FANDUEL": ["FIXED_ODDS"],
+      "DRAFTKINGS": ["FIXED_ODDS"],
+      "BET888SPORT": ["FIXED_ODDS"],
+      "UNIBET": ["FIXED_ODDS"],
+      "BETCLIC": ["FIXED_ODDS"],
+      "SUPRABETS": ["FIXED_ODDS"],
+      "NETBET": ["FIXED_ODDS"],
+      "MRGREEN": ["FIXED_ODDS"],
+      "BETUS": ["FIXED_ODDS"],
+      "EVERYGAME": ["FIXED_ODDS"],
+      "BETFRED": ["FIXED_ODDS"],
+      "GROSVENOR": ["FIXED_ODDS"],
+      "BETRIVERS": ["FIXED_ODDS"],
+      "SPORTSBET_AU": ["FIXED_ODDS"],
+      "BOYLESPORTS": ["FIXED_ODDS"],
+      "WINAMAX": ["FIXED_ODDS"],
+      "BETR_AU": ["FIXED_ODDS"],
+      "SBOBET": ["FIXED_ODDS"],
+      "REBET": ["FIXED_ODDS"],
+      "PLAYUP": ["FIXED_ODDS"],
+      "TAB": ["FIXED_ODDS"],
+      "PMU": ["FIXED_ODDS"],
+      "POINTSBET": ["FIXED_ODDS"],
+      "TIPICO": ["FIXED_ODDS"],
+      "COOLBET": ["FIXED_ODDS"],
+      "VIRGINBET": ["FIXED_ODDS"],
+      "SKYBET": ["FIXED_ODDS"],
+      "BETPARX": ["FIXED_ODDS"],
+      "BETMGM": ["FIXED_ODDS"],
+      "PRIZEPICKS": ["PROP"],
+      "BETR_DFS": ["PROP"],
+      "DRAFTKINGS_PICK6": ["PROP"],
+      "UNDERDOG": ["PROP"]
     },
     "instrument_type_folder_map": {
       "PERPETUAL": "perpetuals",
@@ -865,10 +604,7 @@
     }
   },
   "uac_enums": {
-    "OrderSide": [
-      "buy",
-      "sell"
-    ],
+    "OrderSide": ["buy", "sell"],
     "OrderType": [
       "market",
       "limit",
@@ -887,13 +623,7 @@
       "rejected",
       "expired"
     ],
-    "TimeInForce": [
-      "GTC",
-      "IOC",
-      "FOK",
-      "GTD",
-      "POST_ONLY"
-    ],
+    "TimeInForce": ["GTC", "IOC", "FOK", "GTD", "POST_ONLY"],
     "ExecutionStatus": [
       "pending",
       "submitted",
@@ -985,11 +715,7 @@
       "ESPORTS",
       "SOCCER"
     ],
-    "OddsFormat": [
-      "decimal",
-      "american",
-      "fractional"
-    ],
+    "OddsFormat": ["decimal", "american", "fractional"],
     "OddsType": [
       "h2h",
       "over_under",
@@ -1017,39 +743,13 @@
       "cancelled",
       "rejected"
     ],
-    "BetSide": [
-      "back",
-      "lay"
-    ],
-    "OptionType": [
-      "call",
-      "put"
-    ],
-    "FeeType": [
-      "maker",
-      "taker",
-      "other"
-    ],
-    "CloudProvider": [
-      "gcp",
-      "aws"
-    ],
-    "ComputeTarget": [
-      "cloud_service",
-      "cloud_job",
-      "vm"
-    ],
-    "ScalingMode": [
-      "always_on",
-      "auto_scale",
-      "scale_to_zero",
-      "manual"
-    ],
-    "VenueCategory": [
-      "exchange",
-      "bookmaker_api",
-      "scraper"
-    ],
+    "BetSide": ["back", "lay"],
+    "OptionType": ["call", "put"],
+    "FeeType": ["maker", "taker", "other"],
+    "CloudProvider": ["gcp", "aws"],
+    "ComputeTarget": ["cloud_service", "cloud_job", "vm"],
+    "ScalingMode": ["always_on", "auto_scale", "scale_to_zero", "manual"],
+    "VenueCategory": ["exchange", "bookmaker_api", "scraper"],
     "AlternativeDataType": [
       "sentiment",
       "satellite",
@@ -1093,10 +793,7 @@
       "operational",
       "domain_specific"
     ],
-    "SignalSource": [
-      "arbitrage",
-      "ml_model"
-    ],
+    "SignalSource": ["arbitrage", "ml_model"],
     "BookmakerCategory": [
       "exchange",
       "bookmaker_api",
@@ -1116,21 +813,8 @@
       "abandoned",
       "postponed"
     ],
-    "OutcomeType": [
-      "home",
-      "draw",
-      "away",
-      "over",
-      "under",
-      "yes",
-      "no"
-    ],
-    "MarketStatus": [
-      "active",
-      "suspended",
-      "closed",
-      "settled"
-    ],
+    "OutcomeType": ["home", "draw", "away", "over", "under", "yes", "no"],
+    "MarketStatus": ["active", "suspended", "closed", "settled"],
     "PredictionMarketCategory": [
       "politics",
       "financial",
@@ -1152,49 +836,18 @@
       "DRAWDOWN_LIMIT",
       "CONCENTRATION_LIMIT"
     ],
-    "AssetClass": [
-      "crypto",
-      "equity",
-      "fx",
-      "commodity",
-      "fixed_income"
-    ],
-    "BookType": [
-      "L1_MBP",
-      "L2_MBP",
-      "AMM",
-      "ALPHA_ZERO"
-    ],
-    "CloudProvider": [
-      "gcp",
-      "aws",
-      "local"
-    ],
-    "ComputeType": [
-      "cloud_run",
-      "vm",
-      "batch",
-      "ec2"
-    ],
-    "CorrelationRegime": [
-      "low",
-      "normal",
-      "high",
-      "crisis"
-    ],
+    "AssetClass": ["crypto", "equity", "fx", "commodity", "fixed_income"],
+    "BookType": ["L0_TOB", "L1_MBP", "L2_MBP", "AMM", "ALPHA_ZERO"],
+    "CloudProvider": ["gcp", "aws", "local"],
+    "ComputeType": ["cloud_run", "vm", "batch", "ec2"],
+    "CorrelationRegime": ["low", "normal", "high", "crisis"],
     "CustomRiskEvaluationMethod": [
       "rate_sensitivity",
       "scenario_pnl",
       "threshold_breach"
     ],
-    "DataMode": [
-      "mock",
-      "real"
-    ],
-    "DataSourceConstraint": [
-      "DATABENTO_ONLY",
-      "ANY"
-    ],
+    "DataMode": ["mock", "real"],
+    "DataSourceConstraint": ["DATABENTO_ONLY", "ANY"],
     "DataType": [
       "trades",
       "book_snapshot_5",
@@ -1221,15 +874,7 @@
       "cancelled",
       "timed_out"
     ],
-    "DurationBucket": [
-      "overnight",
-      "1w",
-      "1m",
-      "3m",
-      "6m",
-      "1y",
-      "2y+"
-    ],
+    "DurationBucket": ["overnight", "1w", "1m", "3m", "6m", "1y", "2y+"],
     "EmergencyExitType": [
       "market_close",
       "atomic_unwind",
@@ -1270,26 +915,9 @@
       "alert",
       "dead_letter"
     ],
-    "ErrorSeverity": [
-      "low",
-      "medium",
-      "high",
-      "critical"
-    ],
-    "EventSeverity": [
-      "DEBUG",
-      "INFO",
-      "WARNING",
-      "ERROR",
-      "CRITICAL"
-    ],
-    "ExecutionMode": [
-      "AGGRESSIVE",
-      "PASSIVE",
-      "NEUTRAL",
-      "TWAP",
-      "VWAP"
-    ],
+    "ErrorSeverity": ["low", "medium", "high", "critical"],
+    "EventSeverity": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    "ExecutionMode": ["AGGRESSIVE", "PASSIVE", "NEUTRAL", "TWAP", "VWAP"],
     "FactorType": [
       "momentum",
       "value",
@@ -1304,11 +932,7 @@
       "sentiment",
       "technical"
     ],
-    "FeeType": [
-      "exchange",
-      "prime_broker",
-      "clearing"
-    ],
+    "FeeType": ["exchange", "prime_broker", "clearing"],
     "GasCostAction": [
       "SWAP",
       "SUPPLY",
@@ -1319,18 +943,8 @@
       "REPAY",
       "LIQUIDATE"
     ],
-    "InstrumentStatus": [
-      "active",
-      "halted",
-      "expired",
-      "delisted"
-    ],
-    "InstrumentType": [
-      "spot",
-      "perp",
-      "futures",
-      "option"
-    ],
+    "InstrumentStatus": ["active", "halted", "expired", "delisted"],
+    "InstrumentType": ["spot", "perp", "futures", "option"],
     "InternalPubSubTopic": [
       "fill-events-{venue}",
       "order-requests",
@@ -1399,18 +1013,9 @@
       "AGENT_FIX_APPLIED",
       "AGENT_FIX_FAILED"
     ],
-    "LogLevel": [
-      "DEBUG",
-      "INFO",
-      "WARNING",
-      "ERROR",
-      "CRITICAL"
-    ],
-    "MarginType": [
-      "linear",
-      "inverse",
-      "quanto"
-    ],
+    "LogLevel": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    "MarginType": ["linear", "inverse", "quanto"],
+    "MarketCategory": ["CEFI", "TRADFI", "DEFI", "SPORTS"],
     "MarketState": [
       "normal",
       "halted",
@@ -1419,18 +1024,8 @@
       "post_market",
       "closed"
     ],
-    "MatchingFeeType": [
-      "asymmetric",
-      "symmetric",
-      "pool",
-      "lending",
-      "none"
-    ],
-    "MessagingScope": [
-      "in_process",
-      "same_vm",
-      "cross_vm"
-    ],
+    "MatchingFeeType": ["asymmetric", "symmetric", "pool", "lending", "none"],
+    "MessagingScope": ["in_process", "same_vm", "cross_vm"],
     "MessagingTopic": [
       "fill-events-{venue}",
       "order-requests",
@@ -1468,26 +1063,10 @@
       "linear",
       "ensemble"
     ],
-    "MultiLegExecutionMode": [
-      "SEQUENTIAL",
-      "LEADER_FOLLOWER",
-      "PARALLEL"
-    ],
-    "OHLCVSource": [
-      "NATIVE_CANDLE",
-      "COMPUTED_FROM_TICKS"
-    ],
-    "OptionType": [
-      "call",
-      "put"
-    ],
-    "OrderType": [
-      "LIMIT",
-      "IOC",
-      "FOK",
-      "MAX_SLIPPAGE",
-      "MARKET"
-    ],
+    "MultiLegExecutionMode": ["SEQUENTIAL", "LEADER_FOLLOWER", "PARALLEL"],
+    "OHLCVSource": ["NATIVE_CANDLE", "COMPUTED_FROM_TICKS"],
+    "OptionType": ["call", "put"],
+    "OrderType": ["LIMIT", "IOC", "FOK", "MAX_SLIPPAGE", "MARKET"],
     "Permission": [
       "trade:view",
       "trade:execute",
@@ -1511,16 +1090,8 @@
       "system:health_view",
       "system:admin"
     ],
-    "PhaseMode": [
-      "phase1",
-      "phase2",
-      "phase3"
-    ],
-    "PositionSide": [
-      "LONG",
-      "SHORT",
-      "FLAT"
-    ],
+    "PhaseMode": ["phase1", "phase2", "phase3"],
+    "PositionSide": ["LONG", "SHORT", "FLAT"],
     "PredictionMarketUseCase": [
       "binary_outcome",
       "multi_outcome",
@@ -1543,26 +1114,18 @@
       "underlying",
       "instrument"
     ],
-    "RiskStatus": [
-      "OK",
-      "WARNING",
-      "CRITICAL"
-    ],
-    "RuntimeMode": [
-      "live",
-      "batch"
-    ],
-    "ServiceMode": [
-      "batch",
-      "live"
-    ],
+    "RiskStatus": ["OK", "WARNING", "CRITICAL"],
+    "RuntimeMode": ["live", "batch"],
+    "ServiceMode": ["batch", "live"],
     "SettlementType": [
       "funding_8h",
       "funding_continuous",
       "seasonal_weekly",
       "aave_index",
       "staking_yield",
+      "lst_yield",
       "transaction_fee",
+      "gas_rebate",
       "liquidation",
       "lp_fee",
       "flash_loan_fee"
@@ -1591,6 +1154,18 @@
       "STAGING",
       "LIVE_REAL"
     ],
+    "Timeframe": [
+      "15s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "4h",
+      "24h",
+      "1d"
+    ],
     "TriggerEventType": [
       "FEATURE_UPDATE",
       "ODDS_CHANGE",
@@ -1602,18 +1177,8 @@
       "MARKET_TICK",
       "CUSTOM"
     ],
-    "UrgencyLevel": [
-      "LOW",
-      "MEDIUM",
-      "HIGH",
-      "CRITICAL"
-    ],
-    "UserRole": [
-      "viewer",
-      "operator",
-      "admin",
-      "super_admin"
-    ],
+    "UrgencyLevel": ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+    "UserRole": ["viewer", "operator", "admin", "super_admin"],
     "VMEventType": [
       "VM_PREEMPTED",
       "VM_DELETED",
@@ -1637,12 +1202,7 @@
       "monte_carlo",
       "filtered_historical"
     ],
-    "VenueCategory": [
-      "cefi",
-      "tradfi",
-      "defi",
-      "onchain_perps"
-    ]
+    "VenueCategory": ["cefi", "tradfi", "defi", "onchain_perps"]
   },
   "config_schemas": {
     "UnifiedCloudConfig": {
@@ -1771,6 +1331,11 @@
         "testing_stage": {
           "type": "<class 'str'>",
           "default": "'MOCK'",
+          "required": false
+        },
+        "enabled_categories": {
+          "type": "list[str]",
+          "default": "['CEFI', 'TRADFI', 'DEFI']",
           "required": false
         },
         "otel_exporter_otlp_endpoint": {
@@ -2066,25 +1631,9 @@
         "MAX_SLIPPAGE",
         "BENCHMARK_FILL"
       ],
-      "valid_categories": [
-        "cefi",
-        "tradfi",
-        "defi"
-      ],
-      "valid_modes": [
-        "SCE",
-        "HUF"
-      ],
-      "valid_timeframes": [
-        "1M",
-        "5M",
-        "15M",
-        "30M",
-        "1H",
-        "4H",
-        "8H",
-        "24H"
-      ],
+      "valid_categories": ["cefi", "tradfi", "defi"],
+      "valid_modes": ["SCE", "HUF"],
+      "valid_timeframes": ["1M", "5M", "15M", "30M", "1H", "4H", "8H", "24H"],
       "valid_book_types": [
         "L1_MBP",
         "L2_MBP",
@@ -2152,15 +1701,8 @@
       "STAGING",
       "LIVE_REAL"
     ],
-    "runtime_modes": [
-      "LIVE",
-      "BATCH"
-    ],
-    "cloud_providers": [
-      "GCP",
-      "AWS",
-      "LOCAL"
-    ]
+    "runtime_modes": ["LIVE", "BATCH"],
+    "cloud_providers": ["GCP", "AWS", "LOCAL"]
   },
   "service_port_registry": {
     "deployment": {
@@ -2265,6 +1807,14 @@
       "api_port": null,
       "api_module": null,
       "$note": "Self-contained Next.js app with built-in API routes (Firebase Auth + Firestore). No separate API service. Uses port 3000 (Next.js default) instead of 5184 to match Next.js convention."
+    },
+    "user-management": {
+      "ui": "user-management-ui",
+      "ui_port": 5184,
+      "api": null,
+      "api_port": 8017,
+      "api_module": null,
+      "$note": "Admin UI for user lifecycle management (onboard/modify/offboard). OAuth admin auth. Mock mode uses client-side fetch intercepts. Backend API TBD \u2014 currently calls external APIs (GitHub, Slack, MS Graph, GCP) via mock layer."
     }
   }
 }

@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2","data":"0xbf92857c000000000000000000000000992ebFe04DB05f964C45BCE3D73Ca4c81715a79f"},"latest"],"id":1}'
+      headers:
+        Content-Type:
+          - application/json
+      method: POST
+      uri: https://eth-mainnet.g.alchemy.com/v2/{ALCHEMY_API_KEY}
+    response:
+      body:
+        string: '{"jsonrpc":"2.0","id":1,"result":"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"}'
+      headers:
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 17 Mar 2026 19:02:08 GMT
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -217,54 +217,6 @@ def normalize_api_football_error(
 
 
 # ---------------------------------------------------------------------------
-# Arkham Intelligence
-# ---------------------------------------------------------------------------
-
-
-def normalize_arkham_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "arkham",
-) -> CanonicalError:
-    """Map an Arkham API error to a CanonicalError subclass."""
-    code = str(error_code)
-    try:
-        return from_http_status(int(code), message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
-# bloXroute (JSON-RPC error codes)
-# ---------------------------------------------------------------------------
-
-
-BLOXROUTE_MAP: dict[str, type[CanonicalInvalidRequestError | CanonicalInternalServerError]] = {
-    "-32600": CanonicalInvalidRequestError,  # Invalid Request
-    "-32601": CanonicalInvalidRequestError,  # Method not found
-    "-32602": CanonicalInvalidRequestError,  # Invalid params
-    "-32603": CanonicalInternalServerError,  # Internal error
-    "-32700": CanonicalInvalidRequestError,  # Parse error
-}
-
-
-def normalize_bloxroute_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "bloxroute",
-) -> CanonicalError:
-    """Map a bloXroute JSON-RPC error code to a CanonicalError subclass."""
-    code = str(error_code)
-    cls = BLOXROUTE_MAP.get(code)
-    if cls is not None:
-        return cls(message=message or code, venue=venue)
-    try:
-        return from_http_status(int(code), message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # Cloud SDKs (IAM / OAuth2)
 # ---------------------------------------------------------------------------
 

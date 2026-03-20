@@ -28,12 +28,6 @@ providers:
     last_verified: "2026-03-06"
     status: yellow
 
-  arkham:
-    api_version: "v1"
-    spec_url: "https://codebook.arkham.com/reference/introduction"
-    last_verified: "2026-03-06"
-    status: yellow
-
   aster:
     api_version: "v2"
     spec_url: "https://aster.exchange/api-docs"
@@ -79,12 +73,6 @@ providers:
   bitstamp:
     api_version: "v2"
     spec_url: "https://www.bitstamp.net/api/"
-    last_verified: "2026-03-06"
-    status: yellow
-
-  bloxroute:
-    api_version: "v1"
-    spec_url: "https://docs.bloxroute.com/"
     last_verified: "2026-03-06"
     status: yellow
 
@@ -375,12 +363,6 @@ providers:
     last_verified: "2026-03-06"
     status: yellow
     free_tier: true
-
-  pyth:
-    api_version: "v1"
-    spec_url: "https://docs.pyth.network/home"
-    last_verified: "2026-03-06"
-    status: yellow
 
   regulatory:
     api_version: "v1"

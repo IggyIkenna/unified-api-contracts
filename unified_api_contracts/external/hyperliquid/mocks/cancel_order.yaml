@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"action":{"type":"cancel","cancels":[{"a":4,"o":987654321}]},"nonce":1773773925000,"signature":{"r":"0x0000000000000000000000000000000000000000000000000000000000000000","s":"0x0000000000000000000000000000000000000000000000000000000000000000","v":28},"vaultAddress":"0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f"}'
+      headers:
+        Content-Type:
+          - application/json
+      method: POST
+      uri: https://api.hyperliquid-testnet.xyz/exchange
+    response:
+      body:
+        string: '{"status":"ok","response":{"type":"cancel","data":{"statuses":["success"]}}}'
+      headers:
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 17 Mar 2026 19:02:11 GMT
+      status:
+        code: 200
+        message: OK
+version: 1

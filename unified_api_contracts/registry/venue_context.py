@@ -24,6 +24,12 @@ from typing import TypeVar
 
 from pydantic import BaseModel
 
+from ._sports_venue_constants import (
+    SPORTS_AUTH_MAP,
+    SPORTS_CAPTCHA_RISK,
+    SPORTS_VENUE_TYPE_MAP,
+    SUPPORTED_MARKET_TYPES,
+)
 from .capability import (
     CapabilityResolutionError,
     OperationEnvDetail,
@@ -150,9 +156,7 @@ def requires_operation_validation(
             @functools.wraps(fn)
             async def async_wrapper(*args: object, **kwargs: object) -> object:
                 try:
-                    venue = _resolve_venue_value(
-                        args, kwargs, sig, venue_param=venue_param, venue_attr=venue_attr
-                    )
+                    venue = _resolve_venue_value(args, kwargs, sig, venue_param=venue_param, venue_attr=venue_attr)
                     env = _resolve_env_value(args, kwargs, sig, env_param=env_param)
                     validate_operation(venue, operation_name, env)
                 except UnsupportedOperationError:
@@ -170,9 +174,7 @@ def requires_operation_validation(
         @functools.wraps(fn)
         def sync_wrapper(*args: object, **kwargs: object) -> object:
             try:
-                venue = _resolve_venue_value(
-                    args, kwargs, sig, venue_param=venue_param, venue_attr=venue_attr
-                )
+                venue = _resolve_venue_value(args, kwargs, sig, venue_param=venue_param, venue_attr=venue_attr)
                 env = _resolve_env_value(args, kwargs, sig, env_param=env_param)
                 validate_operation(venue, operation_name, env)
             except UnsupportedOperationError:
@@ -205,7 +207,7 @@ class VenueContext(BaseModel):
 
     # Execution pattern (derived)
     execution_pattern: str = "unknown"
-    """Derived execution pattern: "clob_api", "on_chain_tx", "web_scraper", "data_only", "fix_protocol", "ib_gateway"."""
+    """Derived execution pattern: clob_api, on_chain_tx, web_scraper, data_only, fix_protocol, ib_gateway."""
 
     # Operation detail (from capability registry)
     operation_env_detail: OperationEnvDetail | None = None
@@ -310,13 +312,6 @@ def resolve_venue_context(
     supported_market_types_list: list[str] = []
 
     if venue_category == "sports":
-        from ._sports_venue_constants import (
-            SPORTS_AUTH_MAP,
-            SPORTS_CAPTCHA_RISK,
-            SPORTS_VENUE_TYPE_MAP,
-            SUPPORTED_MARKET_TYPES,
-        )
-
         sports_venue_type = SPORTS_VENUE_TYPE_MAP.get(venue)
         sports_auth_method = SPORTS_AUTH_MAP.get(venue)
         captcha_risk = venue in SPORTS_CAPTCHA_RISK

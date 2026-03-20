@@ -97,8 +97,6 @@
 | understat  | —      | —          | —                   |
 | glassnode  | —      | —          | —                   |
 | coingecko  | —      | —          | —                   |
-| arkham     | —      | —          | —                   |
-| pyth       | —      | —          | —                   |
 | defillama  | —      | —          | —                   |
 | regulatory | —      | —          | —                   |
 
@@ -249,13 +247,13 @@ Add `tests/test_batch_live_parity.py`:
 ### Phase G — Alt Data
 
 - [ ] Canonical types (CanonicalBondData, CanonicalYieldCurve, CanonicalMacroSeries, etc.)
-- [ ] External schemas for fred, ofr, ecb, openbb, barchart, footystats, understat, glassnode, coingecko, arkham, pyth, defillama, regulatory
+- [ ] External schemas for fred, ofr, ecb, openbb, barchart, footystats, understat, glassnode, coingecko, defillama, regulatory
 - [ ] Normalizers for each
 
 ### Phase H — Errors & Rate Limits
 
 - [x] Error normalizers: kraken, kucoin, gateio, bitfinex, bitstamp, mexc, huobi, bitget, dydx, databento, fix, prime_broker, nautilus, aster, betdaq, smarkets, pinnacle, manifold (18 new; 35 total including previous 15+2)
-- [ ] Remaining: predictit, matchbook, odds_api, openbb, fred, ofr, ecb, glassnode, coingecko, arkham, pyth, defillama, regulatory (alt-data venues)
+- [ ] Remaining: predictit, matchbook, odds_api, openbb, fred, ofr, ecb, glassnode, coingecko, defillama, regulatory (alt-data venues)
 - [ ] Full rate limit handling per RATE_LIMIT_HANDLING_GAPS.md §4
 
 ### Phase I — Connectivity & Market State

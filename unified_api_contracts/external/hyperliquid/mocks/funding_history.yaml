@@ -1,16 +1,16 @@
 interactions:
-- request:
-    body: '{"type":"fundingHistory","coin":"ETH","startTime":1773662508838}'
-    headers:
-      Content-Type: application/json
-    method: POST
-    uri: https://api.hyperliquid.xyz/info
-  response:
-    body:
-      string: '[{"coin":"ETH","fundingRate":"-0.000005063","premium":"-0.0005405039","time":1773666000000},{"coin":"ETH","fundingRate":"-0.0000065004","premium":"-0.0005520033","time":1773669600099},{"coin":"ETH","fundingRate":"-0.0000104411","premium":"-0.0005835285","time":1773673200013},{"coin":"ETH","fundingRate":"-0.0000171063","premium":"-0.0006368501","time":1773676800033},{"coin":"ETH","fundingRate":"-0.0000101503","premium":"-0.0005812027","time":1773680400023},{"coin":"ETH","fundingRate":"-0.000000664","premium":"-0.0005053124","time":1773684000045},{"coin":"ETH","fundingRate":"-0.0000053163","premium":"-0.0005425304","time":1773687600080},{"coin":"ETH","fundingRate":"-0.0000033069","premium":"-0.0005264551","time":1773691200001},{"coin":"ETH","fundingRate":"0.0000005777","premium":"-0.0004953785","time":1773694800032},{"coin":"ETH","fundingRate":"-0.0000211093","premium":"-0.0006688746","time":1773698400000},{"coin":"ETH","fundingRate":"-0.0000310959","premium":"-0.000748767","time":1773702000003},{"coin":"ETH","fundingRate":"-0.0000196189","premium":"-0.0006569515","time":1773705600034},{"coin":"ETH","fundingRate":"-0.0000333359","premium":"-0.0007666874","time":1773709200045},{"coin":"ETH","fundingRate":"-0.000035707","premium":"-0.000785656","time":1773712800050},{"coin":"ETH","fundingRate":"-0.0000259039","premium":"-0.0007072314","time":1773716400010},{"coin":"ETH","fundingRate":"-0.0000211818","premium":"-0.0006694547","time":1773720000073},{"coin":"ETH","fundingRate":"-0.000014028","premium":"-0.0006122237","time":1773723600048},{"coin":"ETH","fundingRate":"-0.0000081663","premium":"-0.0005653301","time":1773727200113},{"coin":"ETH","fundingRate":"-0.0000032205","premium":"-0.0005257641","time":1773730800039},{"coin":"ETH","fundingRate":"-0.0000014461","premium":"-0.0005115686","time":1773734400000},{"coin":"ETH","fundingRate":"0.0000093224","premium":"-0.0004254209","time":1773738000002},{"coin":"ETH","fundingRate":"0.0000116632","premium":"-0.0004066946","time":1773741600075},{"coin":"ETH","fundingRate":"0.0000024539","premium":"-0.0004803687","time":1773745200115},{"coin":"ETH","fundingRate":"0.0000071234","premium":"-0.0004430127","time":1773748800006}]'
-    headers:
-      Content-Type: application/json
-    status:
-      code: 200
-      message: OK
+  - request:
+      body: '{"type":"fundingHistory","coin":"ETH","startTime":1773662508838}'
+      headers:
+        Content-Type: application/json
+      method: POST
+      uri: https://api.hyperliquid.xyz/info
+    response:
+      body:
+        string: '[{"coin":"ETH","fundingRate":"-0.000005063","premium":"-0.0005405039","time":1773666000000},{"coin":"ETH","fundingRate":"-0.0000065004","premium":"-0.0005520033","time":1773669600099},{"coin":"ETH","fundingRate":"-0.0000104411","premium":"-0.0005835285","time":1773673200013},{"coin":"ETH","fundingRate":"-0.0000171063","premium":"-0.0006368501","time":1773676800033},{"coin":"ETH","fundingRate":"-0.0000101503","premium":"-0.0005812027","time":1773680400023},{"coin":"ETH","fundingRate":"-0.000000664","premium":"-0.0005053124","time":1773684000045},{"coin":"ETH","fundingRate":"-0.0000053163","premium":"-0.0005425304","time":1773687600080},{"coin":"ETH","fundingRate":"-0.0000033069","premium":"-0.0005264551","time":1773691200001},{"coin":"ETH","fundingRate":"0.0000005777","premium":"-0.0004953785","time":1773694800032},{"coin":"ETH","fundingRate":"-0.0000211093","premium":"-0.0006688746","time":1773698400000},{"coin":"ETH","fundingRate":"-0.0000310959","premium":"-0.000748767","time":1773702000003},{"coin":"ETH","fundingRate":"-0.0000196189","premium":"-0.0006569515","time":1773705600034},{"coin":"ETH","fundingRate":"-0.0000333359","premium":"-0.0007666874","time":1773709200045},{"coin":"ETH","fundingRate":"-0.000035707","premium":"-0.000785656","time":1773712800050},{"coin":"ETH","fundingRate":"-0.0000259039","premium":"-0.0007072314","time":1773716400010},{"coin":"ETH","fundingRate":"-0.0000211818","premium":"-0.0006694547","time":1773720000073},{"coin":"ETH","fundingRate":"-0.000014028","premium":"-0.0006122237","time":1773723600048},{"coin":"ETH","fundingRate":"-0.0000081663","premium":"-0.0005653301","time":1773727200113},{"coin":"ETH","fundingRate":"-0.0000032205","premium":"-0.0005257641","time":1773730800039},{"coin":"ETH","fundingRate":"-0.0000014461","premium":"-0.0005115686","time":1773734400000},{"coin":"ETH","fundingRate":"0.0000093224","premium":"-0.0004254209","time":1773738000002},{"coin":"ETH","fundingRate":"0.0000116632","premium":"-0.0004066946","time":1773741600075},{"coin":"ETH","fundingRate":"0.0000024539","premium":"-0.0004803687","time":1773745200115},{"coin":"ETH","fundingRate":"0.0000071234","premium":"-0.0004430127","time":1773748800006}]'
+      headers:
+        Content-Type: application/json
+      status:
+        code: 200
+        message: OK
 version: 1

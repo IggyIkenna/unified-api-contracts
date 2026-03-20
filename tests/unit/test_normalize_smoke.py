@@ -368,24 +368,6 @@ class TestErrorNormalizersProviders:
         assert isinstance(normalize_api_football_error(429), CanonicalRateLimitError)
         assert isinstance(normalize_api_football_error("NOCODE"), CanonicalError)
 
-    def test_arkham_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_arkham_error,
-        )
-
-        assert isinstance(normalize_arkham_error(403), CanonicalAuthorizationError)
-        assert isinstance(normalize_arkham_error("NOCODE"), CanonicalError)
-
-    def test_bloxroute_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_bloxroute_error,
-        )
-
-        assert isinstance(normalize_bloxroute_error("-32600"), CanonicalInvalidRequestError)
-        assert isinstance(normalize_bloxroute_error("-32603"), CanonicalInternalServerError)
-        assert isinstance(normalize_bloxroute_error(401), CanonicalAuthenticationError)
-        assert isinstance(normalize_bloxroute_error("NOCODE"), CanonicalError)
-
     def test_cloud_sdks_known(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_cloud_sdks_error,

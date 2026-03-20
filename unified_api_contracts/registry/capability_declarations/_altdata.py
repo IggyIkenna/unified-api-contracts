@@ -155,31 +155,6 @@ _GLASSNODE = SourceCapability(
     },
 )
 
-_ARKHAM = SourceCapability(
-    source="arkham",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["on_chain_metrics", "whale_alerts", "entity_transfers"],
-        "reference": ["entities", "addresses", "exchange_flows"],
-    },
-    base_urls={"mainnet": "https://api.arkhamintelligence.com"},
-    operation_details={
-        "on_chain_metrics": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            }
-        ),
-    },
-)
-
 _CRYPTOQUANT = SourceCapability(
     source="cryptoquant",
     domains=["market", "reference"],
@@ -440,7 +415,6 @@ ALTDATA_CAPABILITIES: list[SourceCapability] = [
     _COINGECKO,
     _COINGLASS,
     _GLASSNODE,
-    _ARKHAM,
     _CRYPTOQUANT,
     _HYBLOCK,
     _DEFILLAMA,

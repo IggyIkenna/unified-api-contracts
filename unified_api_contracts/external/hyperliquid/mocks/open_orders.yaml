@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"type":"openOrders","user":"0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f"}'
+      headers:
+        Content-Type:
+          - application/json
+      method: POST
+      uri: https://api.hyperliquid-testnet.xyz/info
+    response:
+      body:
+        string: '[{"coin":"ETH","limitPx":"2309.0","oid":987654321,"side":"B","sz":"0.01","timestamp":1773773921934}]'
+      headers:
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 17 Mar 2026 19:02:10 GMT
+      status:
+        code: 200
+        message: OK
+version: 1

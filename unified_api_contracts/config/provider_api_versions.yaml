@@ -44,13 +44,6 @@ providers:
     status: green
     modes: [live, historical]
 
-  arkham:
-    api_version: "v1"
-    spec_url: "https://codebook.arkham.com/reference/introduction"
-    last_verified: "2026-03-06"
-    status: yellow
-    cassette_status: pending
-
   aster:
     api_version: "v2"
     spec_url: "https://aster.exchange/api-docs"
@@ -114,13 +107,6 @@ providers:
     spec_url: "https://www.bitstamp.net/api/"
     last_verified: "2026-03-15"
     status: green
-
-  bloxroute:
-    api_version: "v1"
-    spec_url: "https://docs.bloxroute.com/"
-    last_verified: "2026-03-15"
-    status: green
-    modes: [live, historical]
 
   bybit:
     api_version: "v5"
@@ -467,13 +453,6 @@ providers:
     status: yellow
     cassette_status: pending
     free_tier: true
-
-  pyth:
-    api_version: "v1"
-    spec_url: "https://docs.pyth.network/home"
-    last_verified: "2026-03-06"
-    status: yellow
-    cassette_status: pending
 
   regulatory:
     api_version: "v1"

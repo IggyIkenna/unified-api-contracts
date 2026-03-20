@@ -2,7 +2,93 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
+
+
+class DeFiDataSource(StrEnum):
+    """Supported data sources for DeFi protocol access.
+
+    Classifies external data providers used by DeFi connectors to resolve
+    RPC endpoints, The Graph subgraphs, and other data access methods.
+    """
+
+    ALCHEMY = "alchemy"
+    SELF_HOSTED = "self_hosted"
+    THEGRAPH = "thegraph"
+    HYPERLIQUID_API = "hyperliquid_api"  # Hyperliquid REST/WebSocket
+
+
+# ---------------------------------------------------------------------------
+# The Graph subgraph IDs (SSOT)
+#
+# Consolidated from UMI adapters (aave_utils.py, uniswap_v3_adapter.py,
+# uniswapv2_adapter.py, uniswapv4_adapter.py, balancer_adapter.py,
+# morpho_adapter.py, curve_adapter.py) and UMI clients/subgraph_service.py.
+# All callers should import from here instead of hardcoding IDs.
+#
+# Format: protocol -> chain -> subgraph ID
+# Default chain is "ETHEREUM" when protocol only has one deployment.
+# ---------------------------------------------------------------------------
+SUBGRAPH_IDS: dict[str, dict[str, str]] = {
+    "aave_v3": {
+        "ETHEREUM": "Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g",
+    },
+    "uniswap_v2": {
+        "ETHEREUM": "A3Np3RQbaBA6oKJgiwDJeo5T3zrYfGHPWFYayMwtNDum",
+    },
+    "uniswap_v3": {
+        "ETHEREUM": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+        "ARBITRUM": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+        "BASE": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
+    },
+    "uniswap_v4": {
+        "ETHEREUM": "DiYPVdygkfjDWhbxGSqAQxwBKmfKnkWQojqeM2rkLb3G",
+    },
+    "balancer": {
+        "ETHEREUM": "C4ayEZP2yTXRAB8vSaTrgN4m9anTe9Mdm2ViyiAuV9TV",
+    },
+    "morpho": {
+        "ETHEREUM": "8Lz789DP5VKLXumTMTgygjU2xtuzx8AhbaacgN5PYCAs",
+    },
+    "curve": {
+        "ETHEREUM": "3fy93eAT56UJsRCEht8iFhfi6wjHWXtZ9dnnbQmvFopF",
+    },
+}
+
+
+def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
+    """Look up a subgraph ID by protocol and chain.
+
+    Args:
+        protocol: Protocol slug (e.g. "aave_v3", "uniswap_v3").
+        chain: Chain name (e.g. "ETHEREUM", "ARBITRUM"). Defaults to "ETHEREUM".
+
+    Returns:
+        Subgraph ID string, or None if not found.
+    """
+    protocol_ids = SUBGRAPH_IDS.get(protocol)
+    if protocol_ids is None:
+        return None
+    return protocol_ids.get(chain.upper())
+
+
+# ---------------------------------------------------------------------------
+# Chain-specific Alchemy RPC URL templates (SSOT)
+#
+# Used by execution-service to resolve a fully-qualified RPC URL before
+# injecting it into UDEI connector config.  Interfaces never touch these
+# directly — they receive a pre-resolved ``rpc_url`` from the service layer.
+# ---------------------------------------------------------------------------
+CHAIN_RPC_TEMPLATES: dict[int, str] = {
+    1: "https://eth-mainnet.g.alchemy.com/v2/{api_key}",
+    11155111: "https://eth-sepolia.g.alchemy.com/v2/{api_key}",
+    42161: "https://arb-mainnet.g.alchemy.com/v2/{api_key}",
+    10: "https://opt-mainnet.g.alchemy.com/v2/{api_key}",
+    137: "https://polygon-mainnet.g.alchemy.com/v2/{api_key}",
+    8453: "https://base-mainnet.g.alchemy.com/v2/{api_key}",
+}
 
 # ---------------------------------------------------------------------------
 # DeFi protocols (5)
@@ -73,7 +159,7 @@ _AAVE = SourceCapability(
                 "mainnet": OperationEnvDetail(
                     signing_scheme="on_chain",
                     required_credential="none",
-                    notes="Read-only eth_call via Alchemy/Infura RPC",
+                    notes="Read-only eth_call via Alchemy RPC",
                 ),
                 "testnet": OperationEnvDetail(
                     signing_scheme="on_chain",
@@ -249,67 +335,8 @@ _INSTADAPP = SourceCapability(
 )
 
 # ---------------------------------------------------------------------------
-# DeFi data / on-chain analytics (5)
+# DeFi data / on-chain analytics (4)
 # ---------------------------------------------------------------------------
-
-_PYTH = SourceCapability(
-    source="pyth",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=True,
-    supports_mainnet=True,
-    auth_scope=["none"],
-    auth_environments={},
-    operations={
-        "market": ["price_feed", "latest_price", "price_updates", "ws_price_updates"],
-        "reference": ["price_feeds", "asset_types"],
-    },
-    base_urls={"mainnet": "https://hermes.pyth.network", "testnet": "https://hermes-beta.pyth.network"},
-    operation_details={
-        "price_feed": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-                "testnet": OperationEnvDetail(
-                    signing_scheme="none",
-                    required_credential="none",
-                    data_fidelity="production",
-                    notes="Pyth testnet feeds track real prices",
-                ),
-            }
-        ),
-    },
-)
-
-_BLOXROUTE = SourceCapability(
-    source="bloxroute",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits", "connectivity"],
-    supports_live=True,
-    supports_batch=False,
-    supports_historical=False,
-    supports_testnet=True,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"test": "testnet_key", "prod": "prod_key"},
-    operations={
-        "market": ["oracle_price_feed", "pending_txns", "new_txns", "ws_pending_txns"],
-        "reference": ["network_info"],
-    },
-    base_urls={"mainnet": "https://virginia.eth.blxrbdn.com"},
-    operation_details={
-        "pending_txns": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-                "testnet": OperationEnvDetail(
-                    signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"
-                ),
-            }
-        ),
-    },
-)
 
 _MEV = SourceCapability(
     source="mev",
@@ -378,8 +405,6 @@ DEFI_CAPABILITIES: list[SourceCapability] = [
     _DYDX,
     _INSTADAPP,
     # DeFi data / on-chain analytics
-    _PYTH,
-    _BLOXROUTE,
     _MEV,
     _VERSIFI,
 ]
