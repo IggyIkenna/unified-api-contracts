@@ -18,6 +18,24 @@ Barchart is a manual CSV download service, NOT a live API integration.
 Files were downloaded and uploaded to GCS manually. Barchart is discontinuing
 this offering — no new Barchart data will be available after BARCHART_VIX_LAST_DATE.
 Do NOT build automated Barchart fetching; use Yahoo Finance or Databento instead.
+
+!! KNOWN DATA GAP — VIX 15m — MANDATORY CONSUMER CONTRACT !!
+─────────────────────────────────────────────────────────────
+Dates from 2025-11-13 until approximately (today - 60 days) have NO 15-minute
+VIX source anywhere. Neither Barchart nor Yahoo Finance covers this window:
+  - Barchart ended:       2025-11-12 (service discontinued)
+  - Yahoo Finance starts: today - 59 days (hard server-side rolling window)
+  - FRED VIXCLS:          daily only — no intraday
+
+get_vix_15m_source(date) returns "GAP_NO_SOURCE" for these dates.
+
+ALL consumers MUST handle "GAP_NO_SOURCE" by returning:
+  - empty DataFrame (pd.DataFrame())
+  - NaN / None values
+  - zero-length list
+
+NEVER raise an exception for GAP_NO_SOURCE dates. This is expected, permanent,
+and unrecoverable — the data simply does not exist at 15m granularity.
 """
 
 from __future__ import annotations
@@ -50,6 +68,13 @@ BARCHART_VIX_FILE_COUNT: int = 12  # source CSV files (each covers ~6 months)
 # No fixed start date; always (today - 59 days) at earliest.
 YAHOO_VIX_15M_WINDOW_DAYS: int = 60
 
+# !! KNOWN GAP: 2025-11-13 → ~(today - 60d) — NO 15m VIX source exists !!
+# This is the first date of the permanent gap. Last gap date is dynamic:
+#   (today - YAHOO_VIX_15M_WINDOW_DAYS) - 1 day
+# Use get_vix_15m_source(date) → "GAP_NO_SOURCE" to detect. Consumers MUST
+# return empty DataFrame / NaN for gap dates. Do NOT raise.
+VIX_15M_GAP_FIRST_DATE: date = date(2025, 11, 13)
+
 VIX_15M_SOURCE_HISTORY: list[SourceWindow] = [
     SourceWindow(
         source="BARCHART_CSV",
@@ -64,15 +89,22 @@ VIX_15M_SOURCE_HISTORY: list[SourceWindow] = [
         ),
     ),
     SourceWindow(
+        # !! KNOWN PERMANENT GAP — NO 15m VIX DATA EXISTS FOR THESE DATES !!
+        # Gap duration: ~2 months as of 2026-03-20; shrinks by 1 day/day as
+        # Yahoo Finance's rolling window advances. Will eventually close to 0.
+        # FRED VIXCLS is daily-only — no 15m granularity available anywhere.
+        # Consumers MUST return empty DataFrame / NaN. Do NOT raise.
         source="GAP_NO_SOURCE",
-        first_date=date(2025, 11, 13),
+        first_date=VIX_15M_GAP_FIRST_DATE,  # 2025-11-13
         # last_date is dynamic: (today - YAHOO_VIX_15M_WINDOW_DAYS) - 1 day.
-        # Cannot be a compile-time constant; compute at runtime.
+        # Cannot be a compile-time constant; compute at runtime via is_vix_15m_gap_date().
         last_date=None,
         note=(
-            "Small gap (~2 months) between Barchart end (2025-11-12) and Yahoo "
-            "Finance 15m window start (~today - 59 days). Only daily VIXCLS from "
-            "FRED is available for this range."
+            "PERMANENT GAP — NO 15m SOURCE EXISTS. "
+            "Barchart ended 2025-11-12 (service discontinued). "
+            "Yahoo Finance's 60-day rolling window starts ~today-59d. "
+            "Only daily VIXCLS (FRED) is available for this range — no intraday. "
+            "Consumers MUST return empty DataFrame / NaN, never raise."
         ),
     ),
     SourceWindow(
@@ -97,6 +129,26 @@ def get_vix_15m_source(query_date: date) -> str:
     """Return the canonical data source name for VIX 15m on a given date.
 
     Returns one of: "BARCHART_CSV", "YAHOO_FINANCE", "GAP_NO_SOURCE".
+
+    !! MANDATORY CONSUMER CONTRACT for "GAP_NO_SOURCE" !!
+    ─────────────────────────────────────────────────────
+    When this function returns "GAP_NO_SOURCE", the queried date falls in the
+    known permanent gap (2025-11-13 → ~today-60d) where NO 15m VIX data exists
+    from ANY source.
+
+    Callers MUST:
+      - return an empty DataFrame (pd.DataFrame())
+      - return NaN / None for scalar lookups
+      - return [] for list-based APIs
+
+    Callers MUST NOT:
+      - raise an exception
+      - retry with a different source
+      - fall back to daily VIXCLS (different granularity)
+
+    This gap is permanent and unrecoverable for 15m granularity. The only
+    available data for this range is daily VIXCLS from FRED — a different
+    data product not covered by this function.
     """
     from datetime import UTC, datetime, timedelta  # noqa: qg-inside-import (runtime only)
 
@@ -108,6 +160,19 @@ def get_vix_15m_source(query_date: date) -> str:
     if query_date >= yahoo_start:
         return "YAHOO_FINANCE"
     return "GAP_NO_SOURCE"
+
+
+def is_vix_15m_gap_date(query_date: date) -> bool:
+    """Return True if query_date falls in the known VIX 15m data gap.
+
+    The gap runs from 2025-11-13 (first date after Barchart ended) until
+    approximately today - 60 days (where Yahoo Finance's rolling window begins).
+    No 15m VIX data exists for gap dates from any source.
+
+    Consumers that check this before querying can log a warning and return
+    empty / NaN without needing to attempt a fetch.
+    """
+    return get_vix_15m_source(query_date) == "GAP_NO_SOURCE"
 
 
 def get_yahoo_vix_15m_start() -> date:
