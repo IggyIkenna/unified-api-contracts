@@ -34,6 +34,7 @@ from .data_source_continuity import (
     BARCHART_VIX_FILE_COUNT,
     BARCHART_VIX_FIRST_DATE,
     BARCHART_VIX_LAST_DATE,
+    VIX_15M_GAP_FIRST_DATE,
     VIX_15M_SOURCE_HISTORY,
     VIX_DATA_TYPE,
     VIX_DEV_BUCKET,
@@ -44,6 +45,7 @@ from .data_source_continuity import (
     SourceWindow,
     get_vix_15m_source,
     get_yahoo_vix_15m_start,
+    is_vix_15m_gap_date,
 )
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
 from .endpoint_registry import (
@@ -413,6 +415,7 @@ __all__ = [
     "VENUE_ORDER_CAPABILITIES",
     "VENUE_PROTOCOL_TYPE",
     "VIRGINBET",
+    "VIX_15M_GAP_FIRST_DATE",
     "VIX_15M_SOURCE_HISTORY",
     "VIX_DATA_TYPE",
     "VIX_DEV_BUCKET",
@@ -459,6 +462,7 @@ __all__ = [
     "get_subgraph_id",
     "get_vix_15m_source",
     "get_yahoo_vix_15m_start",
+    "is_vix_15m_gap_date",
     "register_capability",
     "requires_operation_validation",
     "resolve_capability",
