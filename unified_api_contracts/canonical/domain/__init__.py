@@ -245,35 +245,6 @@ from .sports import (
     VenueCategory,
     VenueExecutionProfile,
 )
-from .sports._features_league_halftime_goals import (
-    GoalTimingFeaturesMixin,
-    HalftimeFeaturesMixin,
-    LeagueFeaturesMixin,
-    SeasonContextFeaturesMixin,
-)
-from .sports._features_promoted_synthetic_schedule import (
-    PromotedTeamFeaturesMixin,
-    ScheduleFatigueFeaturesMixin,
-    SyntheticXGFeaturesMixin,
-)
-from .sports._features_team_h2h import (
-    H2HFeaturesMixin,
-    TeamFeaturesMixin,
-)
-from .sports._features_venue_referee_player_odds import (
-    OddsFeaturesMixin,
-    PlayerLineupFeaturesMixin,
-    RefereeFeaturesMixin,
-    VenueContextFeaturesMixin,
-)
-from .sports._features_xg_advanced_market import (
-    AdvancedStatsFeaturesMixin,
-    ManagerFeaturesMixin,
-    MarketEfficiencyFeaturesMixin,
-    TeamStyleFeaturesMixin,
-    WeatherFeaturesMixin,
-    XGFeaturesMixin,
-)
 from .sports.arbitrage import (
     ArbitrageMarket,
     ArbitrageOpportunity,
@@ -298,7 +269,6 @@ from .sports.errors import (
     SportsError,
 )
 from .sports.events import CanonicalFixtureEvent
-from .sports.features import SportsFeatureVector
 from .sports.fixture_stats import CanonicalFixtureStatsDetail
 from .sports.injury import CanonicalInjury
 from .sports.lineup import (
@@ -326,7 +296,6 @@ __all__ = [
     "RISK_TYPE_CATEGORIES",
     "VENUE_EXECUTION_REGISTRY",
     "AccountVerificationLevel",
-    "AdvancedStatsFeaturesMixin",
     "AggregatedPosition",
     "AlternativeDataSignal",
     "AlternativeDataType",
@@ -450,9 +419,6 @@ __all__ = [
     "FixtureMapping",
     "FixtureNotFoundError",
     "FundingRateHistory",
-    "GoalTimingFeaturesMixin",
-    "H2HFeaturesMixin",
-    "HalftimeFeaturesMixin",
     "HealthPingResponse",
     "HttpRateLimitHeaders",
     "InstructionType",
@@ -464,15 +430,12 @@ __all__ = [
     "LatencyBenchmarkReport",
     "LatencyComponent",
     "LatencyPercentile",
-    "LeagueFeaturesMixin",
     "LineupPlayer",
     "LiveMatchState",
     "LiveOddsUpdate",
     "LongShortRatio",
-    "ManagerFeaturesMixin",
     "MappingRule",
     "MarketClosedError",
-    "MarketEfficiencyFeaturesMixin",
     "MarketState",
     "MarketStatus",
     "MarketTrade",
@@ -484,7 +447,6 @@ __all__ = [
     "OKXWithdrawRequest",
     "OKXWithdrawResponse",
     "OddsChangedError",
-    "OddsFeaturesMixin",
     "OddsFormat",
     "OddsType",
     "OpenInterestHistory",
@@ -499,7 +461,6 @@ __all__ = [
     "OrderType",
     "OrphanDetector",
     "OutcomeType",
-    "PlayerLineupFeaturesMixin",
     "PlayerMapping",
     "PortfolioGreeksSnapshot",
     "PortfolioMarginAccount",
@@ -515,18 +476,14 @@ __all__ = [
     "PrimeBrokerPosition",
     "PrimeBrokerProvider",
     "ProcessedOddsOutput",
-    "PromotedTeamFeaturesMixin",
     "ProtocolHealthBreakdown",
-    "RefereeFeaturesMixin",
     "RiskCategory",
     "RiskGroupSummary",
     "RiskType",
     "SatelliteObservation",
     "ScalingMode",
-    "ScheduleFatigueFeaturesMixin",
     "ScraperError",
     "ScraperVersionMeta",
-    "SeasonContextFeaturesMixin",
     "SentimentScore",
     "SettlementEvent",
     "SignalSource",
@@ -535,22 +492,17 @@ __all__ = [
     "SportsArbLeg",
     "SportsArbPosition",
     "SportsError",
-    "SportsFeatureVector",
     "SpreadLeg",
     "StakingProtocolBreakdown",
     "SubAccount",
     "SubMillisecondLatencyRecord",
-    "SyntheticXGFeaturesMixin",
-    "TeamFeaturesMixin",
     "TeamMapping",
-    "TeamStyleFeaturesMixin",
     "TickToTradeMetric",
     "TimeInForce",
     "UnderlyingGreeksBreakdown",
     "UpbitWithdrawRequest",
     "UpbitWithdrawResponse",
     "VenueCategory",
-    "VenueContextFeaturesMixin",
     "VenueExecutionProfile",
     "VenuePositionBreakdown",
     "VenueRateLimitSpec",
@@ -559,10 +511,8 @@ __all__ = [
     "VolSurface",
     "VolSurfaceSlice",
     "VolTermStructure",
-    "WeatherFeaturesMixin",
     "WebSocketConnectionClosed",
     "WebSocketConnectionOpened",
     "WebSocketEvent",
     "WithdrawalRecord",
-    "XGFeaturesMixin",
 ]
