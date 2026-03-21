@@ -329,3 +329,119 @@ class TestCcxtClassify:
         from unified_api_contracts.ccxt.schemas import CcxtErrorPayload
 
         assert CcxtErrorPayload.classify(code="InvalidOrder") == ErrorAction.FAIL
+
+
+class TestClassifyVenueError:
+    """Test classify_venue_error() for VENUE_ERROR_MAP completeness."""
+
+    def test_aave_plasma_429_returns_retry(self):
+        """aave_plasma venue: 429 maps to RETRY."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("aave_plasma", "429")
+        assert result is not None
+        assert result.action == ErrorAction.RETRY
+
+    def test_aave_plasma_mirrors_aave_v3_codes(self):
+        """aave_plasma has same error codes as aave_v3."""
+        from unified_api_contracts.canonical.crosscutting.errors import VENUE_ERROR_MAP
+
+        aave_v3_codes = {c.error_code for c in VENUE_ERROR_MAP["aave_v3"]}
+        aave_plasma_codes = {c.error_code for c in VENUE_ERROR_MAP["aave_plasma"]}
+        # aave_plasma mirrors aave_v3 core codes (minus subgraph/auth/query/indexing)
+        core_codes = {
+            "INSUFFICIENT_COLLATERAL",
+            "INSUFFICIENT_BALANCE",
+            "NO_COLLATERAL_DEPOSITED",
+            "ASSET_NOT_SUPPORTED",
+            "ZERO_AMOUNT",
+            "TX_REVERTED",
+            "GAS_ESTIMATION_FAILED",
+            "SLIPPAGE_EXCEEDED",
+            "FLASH_LOAN_RECEIVER_INVALID",
+            "FLASH_LOAN_INSUFFICIENT_LIQUIDITY",
+            "NO_OUTSTANDING_DEBT",
+            "BORROW_CAP_EXCEEDED",
+            "SUPPLY_CAP_EXCEEDED",
+            "PRICE_ORACLE_SENTINEL",
+            "400",
+            "401",
+            "429",
+            "500",
+            "-32603",
+        }
+        assert core_codes <= aave_v3_codes
+        assert core_codes <= aave_plasma_codes
+
+    def test_all_18_venues_in_venue_error_map(self):
+        """All 18 venues from the error code audit exist in VENUE_ERROR_MAP."""
+        from unified_api_contracts.canonical.crosscutting.errors import VENUE_ERROR_MAP
+
+        expected_venues = [
+            "api_football",
+            "pinnacle",
+            "odds_api",
+            "odds_engine",
+            "oddsjam",
+            "opticodds",
+            "sharpapi",
+            "matchbook",
+            "metabet",
+            "manifold",
+            "predictit",
+            "polygon",
+            "transfermarkt",
+            "footystats",
+            "soccerfootball_info",
+            "understat",
+            "open_meteo",
+            "fear_greed",
+        ]
+        for venue in expected_venues:
+            assert venue in VENUE_ERROR_MAP, f"Missing venue: {venue}"
+            # Each venue must have at least 400, 401, 429, 500 codes
+            codes = {c.error_code for c in VENUE_ERROR_MAP[venue]}
+            for required_code in ["400", "429", "500"]:
+                assert required_code in codes, f"Venue {venue} missing code {required_code}"
+
+    def test_new_venues_429_returns_retry(self):
+        """All 10 newly added venues: 429 maps to RETRY."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        new_venues = [
+            "odds_engine",
+            "oddsjam",
+            "opticodds",
+            "sharpapi",
+            "matchbook",
+            "metabet",
+            "manifold",
+            "predictit",
+            "polygon",
+            "fear_greed",
+        ]
+        for venue in new_venues:
+            result = classify_venue_error(venue, "429")
+            assert result is not None, f"classify_venue_error({venue!r}, '429') returned None"
+            assert result.action == ErrorAction.RETRY, f"{venue}: 429 should be RETRY"
+
+    def test_new_venues_400_returns_fail(self):
+        """All 10 newly added venues: 400 maps to FAIL."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        new_venues = [
+            "odds_engine",
+            "oddsjam",
+            "opticodds",
+            "sharpapi",
+            "matchbook",
+            "metabet",
+            "manifold",
+            "predictit",
+            "polygon",
+            "fear_greed",
+        ]
+        for venue in new_venues:
+            result = classify_venue_error(venue, "400")
+            assert result is not None, f"classify_venue_error({venue!r}, '400') returned None"
+            assert result.action == ErrorAction.FAIL, f"{venue}: 400 should be FAIL"
