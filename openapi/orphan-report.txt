@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
-# Generated from 16 services
-# Total schemas in spec: 149
-# Orphaned models: 546
+# Generated from 11 services
+# Total schemas in spec: 68
+# Orphaned models: 541
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -10,7 +10,6 @@ UAC: AaveRepayParams
 UAC: AaveV3ReserveData
 UAC: AaveV3UserAccountData
 UAC: AaveV3UserReserveData
-UAC: AdvancedStatsFeaturesMixin
 UAC: AlternativeDataSignal
 UAC: ArbitrageMarket
 UAC: ArbitrageOpportunity
@@ -162,6 +161,7 @@ UAC: EulerRepayParams
 UAC: EulerUserPosition
 UAC: EulerVaultData
 UAC: ExchangeFeeSchedule
+UAC: ExecutionAlpha
 UAC: ExecutionInstruction
 UAC: ExecutionResult
 UAC: ExpectedValue
@@ -171,9 +171,6 @@ UAC: FluidBorrowParams
 UAC: FluidDepositParams
 UAC: FluidRepayParams
 UAC: FundingRateHistory
-UAC: GoalTimingFeaturesMixin
-UAC: H2HFeaturesMixin
-UAC: HalftimeFeaturesMixin
 UAC: HttpRateLimitHeaders
 UAC: HyblockLiquidationLevelEntry
 UAC: HyblockLiquidationLevelRequest
@@ -199,7 +196,6 @@ UAC: KalshiOrderBook
 UAC: KalshiTrade
 UAC: LatencyBenchmarkReport
 UAC: LatencyPercentile
-UAC: LeagueFeaturesMixin
 UAC: LidoRequestWithdrawalsParams
 UAC: LidoSubmitParams
 UAC: LidoSubmitResponse
@@ -211,12 +207,10 @@ UAC: LiquidationLevel
 UAC: LiveMatchState
 UAC: LiveOddsUpdate
 UAC: LongShortRatio
-UAC: ManagerFeaturesMixin
 UAC: ManifoldMarket
 UAC: ManifoldPrice
 UAC: ManifoldTrade
 UAC: MappingRule
-UAC: MarketEfficiencyFeaturesMixin
 UAC: MarketTrade
 UAC: MorphoBorrowParams
 UAC: MorphoFlashLoanParams
@@ -239,13 +233,11 @@ UAC: OKXOrderBook
 UAC: OKXTicker
 UAC: OKXWithdrawRequest
 UAC: OKXWithdrawResponse
-UAC: OddsFeaturesMixin
 UAC: OpenInterestHistory
 UAC: OptionChainSnapshot
 UAC: OptionsFlowRecord
 UAC: OrderBookSnapshot5
 UAC: OrderLatencyRecord
-UAC: PlayerLineupFeaturesMixin
 UAC: PlayerMapping
 UAC: PolygonOptionContract
 UAC: PolygonOptionContractsResponse
@@ -263,27 +255,19 @@ UAC: PrimeBrokerMarginCall
 UAC: PrimeBrokerPosition
 UAC: ProbabilityBucket
 UAC: ProcessedOddsOutput
-UAC: PromotedTeamFeaturesMixin
 UAC: RateLimitResponse
-UAC: RefereeFeaturesMixin
 UAC: SatelliteObservation
-UAC: ScheduleFatigueFeaturesMixin
 UAC: ScraperVersionMeta
-UAC: SeasonContextFeaturesMixin
 UAC: SentimentScore
 UAC: SettlementEvent
-UAC: SportsFeatureVector
 UAC: SportsbookLink
 UAC: SpreadLeg
 UAC: SubAccount
 UAC: SubMillisecondLatencyRecord
-UAC: SyntheticXGFeaturesMixin
 UAC: TardisAvailableSymbol
 UAC: TardisExchangeDetail
 UAC: TardisInstrumentDetail
-UAC: TeamFeaturesMixin
 UAC: TeamMapping
-UAC: TeamStyleFeaturesMixin
 UAC: TickToTradeMetric
 UAC: UniswapV3PoolStateResponse
 UAC: UniswapV3QuoteResponse
@@ -292,7 +276,6 @@ UAC: UpbitBalanceQueryResponse
 UAC: UpbitTicker
 UAC: UpbitWithdrawRequest
 UAC: UpbitWithdrawResponse
-UAC: VenueContextFeaturesMixin
 UAC: VenueExecutionProfile
 UAC: VenueRateLimitSpec
 UAC: VmQuotaShape
@@ -300,10 +283,8 @@ UAC: VolSmilePoint
 UAC: VolSurface
 UAC: VolSurfaceSlice
 UAC: VolTermStructure
-UAC: WeatherFeaturesMixin
 UAC: WebSocketCloseInfo
 UAC: WithdrawalRecord
-UAC: XGFeaturesMixin
 UIC: AaveBorrowParams
 UIC: AaveDepositParams
 UIC: AaveFlashLoanParams
@@ -314,7 +295,9 @@ UIC: AaveV3UserReserveData
 UIC: AccountState
 UIC: AgentEventDetails
 UIC: AggregatedPositionMessage
+UIC: AlertContextData
 UIC: AlertEvent
+UIC: AlertMessage
 UIC: AuditRequirement
 UIC: AuditRetention
 UIC: AuthFailureDetails
@@ -347,6 +330,7 @@ UIC: CanonicalTicker
 UIC: CanonicalTrade
 UIC: CanonicalYieldCurve
 UIC: CascadeDispatchDetails
+UIC: CatBoostHyperparams
 UIC: CategorizedErrorDetails
 UIC: CeFiPosition
 UIC: CircuitBreakerConfigRegistry
@@ -391,6 +375,8 @@ UIC: EODSettlementTrigger
 UIC: EmergencyExitPlaybook
 UIC: EmergencyExitStep
 UIC: EnhancedError
+UIC: EnsembleConfig
+UIC: EnsembleMember
 UIC: Erc20TransferCalldata
 UIC: Erc20TransferFromCalldata
 UIC: ErrorContext
@@ -428,6 +414,7 @@ UIC: FuturesTermStructureRecord
 UIC: GasCostEstimate
 UIC: GreeksExposure
 UIC: HealthAlertMessage
+UIC: HuberHyperparams
 UIC: HyperparameterConfig
 UIC: InferenceRequest
 UIC: InferenceResult
@@ -445,6 +432,8 @@ UIC: LidoSubmitParams
 UIC: LidoSubmitResponse
 UIC: LidoWstEthWrapResponse
 UIC: LifecycleEventEnvelope
+UIC: LightGBMHyperparams
+UIC: LimitCheckResult
 UIC: LiquidationBandEntry
 UIC: LiquidationBandPredictionSnapshot
 UIC: LiquidationMessage
@@ -477,9 +466,11 @@ UIC: PersistenceCompletedDetails
 UIC: PersistenceStartedDetails
 UIC: PnLAttributionRecord
 UIC: PnLBreakdown
+UIC: PoissonGLMHyperparams
 UIC: PortfolioMarginAccount
 UIC: PositionUpdateMessage
 UIC: PreTradeCheckRequest
+UIC: PreTradeCheckResponse
 UIC: PredictionMarketUniverse
 UIC: ProbabilityBucket
 UIC: ProcessingCompletedDetails
@@ -492,6 +483,7 @@ UIC: RegimeStateRecord
 UIC: ResourceMetricsSnapshot
 UIC: RestartDetectedDetails
 UIC: RestartDetectedEvent
+UIC: RidgeHyperparams
 UIC: RiskAlertMessage
 UIC: RiskMetrics
 UIC: RiskPnLNode
@@ -507,6 +499,7 @@ UIC: SpanMarginLeg
 UIC: SportsBetEvent
 UIC: SportsBetResult
 UIC: SportsBookUpdate
+UIC: SportsFeatureVector
 UIC: SportsOddsTick
 UIC: SportsVenueScore
 UIC: SportsVenueSelection
@@ -524,6 +517,7 @@ UIC: TestingStageConfig
 UIC: TrainingJobRequest
 UIC: TrainingJobResult
 UIC: TrainingPeriod
+UIC: TrainingPipelineConfig
 UIC: TriggerEvent
 UIC: TriggerSubscription
 UIC: UniswapV3PoolStateResponse
@@ -548,4 +542,5 @@ UIC: WebSocketPongEvent
 UIC: WebSocketReconnectEvent
 UIC: WebSocketSubscribeAckEvent
 UIC: WithdrawalRecord
+UIC: XGBoostHyperparams
 UIC: YieldCurveTenor

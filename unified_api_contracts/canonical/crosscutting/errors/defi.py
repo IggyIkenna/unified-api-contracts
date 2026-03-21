@@ -2,7 +2,22 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 from ._types import ErrorAction, VenueErrorClassification, ve
+
+
+class DefiAlertType(StrEnum):
+    """Canonical DeFi alert type enum.
+
+    Used by alerting-service DeFi rules to classify alert categories.
+    """
+
+    HEALTH_FACTOR_CRITICAL = "health_factor_critical"
+    WEETH_DEPEG = "weeth_depeg"
+    AAVE_UTILIZATION_SPIKE = "aave_utilization_spike"
+    FUNDING_RATE_FLIP = "funding_rate_flip"
+    FEATURE_STALE = "feature_stale"
 
 
 class DefiErrorCode:
