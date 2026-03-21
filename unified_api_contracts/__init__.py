@@ -10,8 +10,11 @@ from .canonical.canonical_mappings import (
     DATASET_TO_CANONICAL_VENUE,
     SYMBOL_MAPPINGS,
     VENUE_TO_DATA_SOURCE,
+    VENUE_TO_DATA_SOURCES,
     ContractSpec,
     DataSourceMapping,
+    DataSourceRoute,
+    get_data_sources_for_venue,
 )
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
@@ -483,6 +486,8 @@ from .registry import (
     SPACE_TO_DOT_SYMBOLS,
     SPORTS_VENUES,
     TIMEFRAMES,
+    TRADFI_DATA_BINDINGS,
+    TRADFI_INSTRUMENTS,
     TRADFI_INSTRUMENTS_CONFIG,
     TRADFI_VENUE_MAPPINGS,
     VENUE_CATEGORY_MAP,
@@ -494,7 +499,9 @@ from .registry import (
     DataTypeConfig,
     EndpointSpec,
     ExchangeInstrumentConfig,
+    ProviderBinding,
     ResponseFormat,
+    TradFiInstrumentDef,
     VenueMapping,
 )
 
@@ -537,6 +544,8 @@ __all__ = [
     "SPORTS_VENUES",
     "SYMBOL_MAPPINGS",
     "TIMEFRAMES",
+    "TRADFI_DATA_BINDINGS",
+    "TRADFI_INSTRUMENTS",
     "TRADFI_INSTRUMENTS_CONFIG",
     "TRADFI_VENUE_MAPPINGS",
     "VALID_ALGORITHMS",
@@ -550,6 +559,7 @@ __all__ = [
     "VENUE_ERROR_MAP",
     "VENUE_EXECUTION_REGISTRY",
     "VENUE_TO_DATA_SOURCE",
+    "VENUE_TO_DATA_SOURCES",
     "ZERO_ALPHA_VENUES",
     "AaveBorrowParams",
     "AaveDepositParams",
@@ -725,6 +735,7 @@ __all__ = [
     "DarkPoolPrintRecord",
     "DataAvailability",
     "DataSourceMapping",
+    "DataSourceRoute",
     "DataTypeConfig",
     "DatabentoError",
     "DatabentoReferenceInstrument",
@@ -887,6 +898,7 @@ __all__ = [
     "ProbabilityBucket",
     "ProcessedOddsOutput",
     "ProtocolHealthBreakdown",
+    "ProviderBinding",
     "RateLimitInfo",
     "RateLimitResponse",
     "ResponseFormat",
@@ -916,6 +928,7 @@ __all__ = [
     "TeamMapping",
     "TickToTradeMetric",
     "TimeInForce",
+    "TradFiInstrumentDef",
     "UnderlyingGreeksBreakdown",
     "UniswapV3PoolStateResponse",
     "UniswapV3QuoteResponse",
@@ -943,6 +956,7 @@ __all__ = [
     "american_to_decimal",
     "classify_venue_error",
     "decimal_to_american",
+    "get_data_sources_for_venue",
 ]
 
 # fmt: off

@@ -9,7 +9,9 @@ Scope: Venues in our universe; TradFi via Databento (~506 venues); DeFi = Euler,
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TypedDict
+from typing import Literal, TypedDict
+
+from pydantic import BaseModel
 
 
 class ContractSpec(TypedDict, total=False):
@@ -156,6 +158,85 @@ VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "FX": "yfinance",
     "VIX": "barchart",
 }
+
+
+# --- DataSourceRoute: typed 1:N venue→source mapping ---
+
+
+class DataSourceRoute(BaseModel, frozen=True):
+    """One data source route for a venue, with use-case qualifier."""
+
+    provider: str  # tardis, databento, ccxt, yahoo_finance, etc.
+    use_for: Literal["historical", "live", "execution", "all"] = "all"
+
+
+# 1:N mapping — venues that have multiple data sources.
+# Venues not listed here have a single source (use VENUE_TO_DATA_SOURCE).
+VENUE_TO_DATA_SOURCES: dict[str, list[DataSourceRoute]] = {
+    # CeFi: Tardis for historical, CCXT for live/execution
+    "BINANCE-SPOT": [
+        DataSourceRoute(provider="tardis", use_for="historical"),
+        DataSourceRoute(provider="ccxt", use_for="live"),
+        DataSourceRoute(provider="ccxt", use_for="execution"),
+    ],
+    "BINANCE-FUTURES": [
+        DataSourceRoute(provider="tardis", use_for="historical"),
+        DataSourceRoute(provider="ccxt", use_for="live"),
+        DataSourceRoute(provider="ccxt", use_for="execution"),
+    ],
+    "DERIBIT": [
+        DataSourceRoute(provider="tardis", use_for="historical"),
+        DataSourceRoute(provider="ccxt", use_for="live"),
+        DataSourceRoute(provider="ccxt", use_for="execution"),
+    ],
+    "BYBIT": [
+        DataSourceRoute(provider="tardis", use_for="historical"),
+        DataSourceRoute(provider="ccxt", use_for="live"),
+        DataSourceRoute(provider="ccxt", use_for="execution"),
+    ],
+    "OKX": [
+        DataSourceRoute(provider="tardis", use_for="historical"),
+        DataSourceRoute(provider="ccxt", use_for="live"),
+        DataSourceRoute(provider="ccxt", use_for="execution"),
+    ],
+    # CBOE: Databento for some data, Barchart/Yahoo for VIX index
+    "CBOE": [
+        DataSourceRoute(provider="databento", use_for="historical"),
+        DataSourceRoute(provider="barchart", use_for="historical"),
+        DataSourceRoute(provider="yahoo_finance", use_for="live"),
+    ],
+    # TradFi: Databento + IBKR for execution
+    "CME": [
+        DataSourceRoute(provider="databento", use_for="historical"),
+        DataSourceRoute(provider="databento", use_for="live"),
+        DataSourceRoute(provider="ibkr", use_for="execution"),
+    ],
+    "ICE": [
+        DataSourceRoute(provider="databento", use_for="historical"),
+        DataSourceRoute(provider="databento", use_for="live"),
+        DataSourceRoute(provider="ibkr", use_for="execution"),
+    ],
+}
+
+
+def get_data_sources_for_venue(
+    venue: str,
+    use_for: str | None = None,
+) -> list[DataSourceRoute]:
+    """Get data source routes for a venue, optionally filtered by use_for.
+
+    Falls back to VENUE_TO_DATA_SOURCE for venues not in the 1:N mapping.
+    """
+    routes = VENUE_TO_DATA_SOURCES.get(venue.upper())
+    if routes is None:
+        primary = VENUE_TO_DATA_SOURCE.get(venue.upper())
+        if primary is None:
+            return []
+        routes = [DataSourceRoute(provider=primary)]
+    if use_for is not None:
+        return [r for r in routes if r.use_for in (use_for, "all")]
+    return list(routes)
+
 
 # --- DATASET_TO_CANONICAL_VENUE ---
 # Databento dataset_id → canonical venue (TradFi ~506 venues)

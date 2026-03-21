@@ -3,11 +3,20 @@
 Databento parent/options symbol validation, exchange code mappings,
 ETF classification, and TradFi venue instrument definitions.
 
+Instrument identity is separated from data-source-specific bindings:
+- TRADFI_INSTRUMENTS: provider-agnostic identity (what the instrument IS)
+- TRADFI_DATA_BINDINGS: per-provider config (WHERE to get data for it)
+- TRADFI_VENUE_MAPPINGS: flattened merged view (identity + primary binding as dicts)
+
 Previously scattered across instruments-service config files.
 Centralized here as the system SSOT per UAC registry pattern.
 """
 
 from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel
 
 # --- Databento parent symbol validation ---
 # Maps canonical underlying names (both exchange codes and human-readable aliases)
@@ -174,488 +183,275 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "T": "WTI",
 }
 
-# --- TradFi venue instrument definitions ---
-# Databento symbols to venues/datasets (from instruments-service Issue #90)
-TRADFI_VENUE_MAPPINGS: list[dict[str, str | None]] = [
-    {
-        "symbol": "ES.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SP500",
-        "code": "ES",
-    },
-    {
-        "symbol": "NQ.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "NASDAQ100",
-        "code": "NQ",
-    },
-    {
-        "symbol": "RTY.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "RUSSELL2000",
-        "code": "RTY",
-    },
-    {
-        "symbol": "YM.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "DOW",
-        "code": "YM",
-    },
-    {
-        "symbol": "CL.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "CRUDE",
-        "code": "CL",
-    },
-    {
-        "symbol": "NG.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "NATGAS",
-        "code": "NG",
-    },
-    {
-        "symbol": "RB.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "GASOLINE",
-        "code": "RB",
-    },
-    {
-        "symbol": "HO.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "HEATINGOIL",
-        "code": "HO",
-    },
-    {
-        "symbol": "GC.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "GOLD",
-        "code": "GC",
-    },
-    {
-        "symbol": "SI.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SILVER",
-        "code": "SI",
-    },
-    {
-        "symbol": "HG.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "COPPER",
-        "code": "HG",
-    },
-    {
-        "symbol": "PL.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "PLATINUM",
-        "code": "PL",
-    },
-    {
-        "symbol": "ZC.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "CORN",
-        "code": "ZC",
-    },
-    {
-        "symbol": "ZW.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "WHEAT",
-        "code": "ZW",
-    },
-    {
-        "symbol": "ZS.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SOYBEAN",
-        "code": "ZS",
-    },
-    {
-        "symbol": "ZM.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SOYMEAL",
-        "code": "ZM",
-    },
-    {
-        "symbol": "ZL.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SOYOIL",
-        "code": "ZL",
-    },
-    {
-        "symbol": "ZB.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "TBOND",
-        "code": "ZB",
-    },
-    {
-        "symbol": "ZN.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "TNOTE10Y",
-        "code": "ZN",
-    },
-    {
-        "symbol": "ZF.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "TNOTE5Y",
-        "code": "ZF",
-    },
-    {
-        "symbol": "ZT.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "TNOTE2Y",
-        "code": "ZT",
-    },
-    {
-        "symbol": "6E.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "EUR",
-        "code": "6E",
-    },
-    {
-        "symbol": "6J.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "JPY",
-        "code": "6J",
-    },
-    {
-        "symbol": "6B.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "GBP",
-        "code": "6B",
-    },
-    {
-        "symbol": "6C.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "CAD",
-        "code": "6C",
-    },
-    {
-        "symbol": "6A.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "AUD",
-        "code": "6A",
-    },
-    {
-        "symbol": "6S.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "CHF",
-        "code": "6S",
-    },
-    {
-        "symbol": "6L.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "BRL",
-        "code": "6L",
-    },
-    {
-        "symbol": "6N.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "NZD",
-        "code": "6N",
-    },
-    {
-        "symbol": "6Z.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "ZAR",
-        "code": "6Z",
-    },
-    {
-        "symbol": "6M.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "MXN",
-        "code": "6M",
-    },
+# ---------------------------------------------------------------------------
+# Instrument identity / data-source binding types
+# ---------------------------------------------------------------------------
+
+
+class TradFiInstrumentDef(BaseModel, frozen=True):
+    """Provider-agnostic instrument identity — what the instrument IS."""
+
+    symbol: str  # Canonical symbol (ES.FUT, VIX-USD, SPY)
+    venue: str  # Exchange/venue (CME, CBOE, ICE)
+    instrument_type: str  # FUTURE, INDEX, OPTION, EQUITY, ETF
+    base_asset: str  # Human-readable base (SP500, VIX, GOLD)
+    quote_asset: str = "USD"
+    underlying: str | None = None  # Underlying asset (e.g., ES for EW1.OPT)
+    data_source: str = ""  # Provenance: which source generated this definition (for replay)
+
+
+class ProviderBinding(BaseModel, frozen=True):
+    """Data-source-specific config for an instrument — WHERE to get data."""
+
+    provider: str  # databento, yahoo_finance, fred, barchart, ibkr
+    use_for: Literal["historical", "live", "execution", "all"] = "all"
+    dataset: str | None = None  # Databento dataset (GLBX.MDP3, IFUS.IMPACT)
+    stype: str | None = None  # Databento stype (parent, raw_symbol)
+    exchange_code: str | None = None  # Databento exchange code (ES, CL)
+    ticker: str | None = None  # Yahoo Finance ticker (^VIX)
+    series: str | None = None  # FRED series (VIXCLS)
+    instrument_key: str | None = None  # Canonical GCS key (CBOE:INDEX:VIX-USD)
+
+
+def get_bindings_for_symbol(symbol: str) -> list[ProviderBinding]:
+    """Return all provider bindings for a given instrument symbol."""
+    return list(TRADFI_DATA_BINDINGS.get(symbol, []))
+
+
+def get_primary_binding(symbol: str, provider: str | None = None) -> ProviderBinding | None:
+    """Return the first binding matching provider (or first overall if provider is None)."""
+    bindings = TRADFI_DATA_BINDINGS.get(symbol, [])
+    if provider is not None:
+        return next((b for b in bindings if b.provider == provider), None)
+    return bindings[0] if bindings else None
+
+
+# ---------------------------------------------------------------------------
+# Layer 1: Instrument identity (provider-agnostic)
+# ---------------------------------------------------------------------------
+
+
+def _fut(symbol: str, venue: str, base: str, underlying: str | None = None) -> TradFiInstrumentDef:
+    return TradFiInstrumentDef(
+        symbol=symbol,
+        venue=venue,
+        instrument_type="FUTURE",
+        base_asset=base,
+        data_source="databento",
+        underlying=underlying,
+    )
+
+
+def _opt(symbol: str, venue: str, base: str, underlying: str | None = None) -> TradFiInstrumentDef:
+    return TradFiInstrumentDef(
+        symbol=symbol,
+        venue=venue,
+        instrument_type="OPTION",
+        base_asset=base,
+        data_source="databento",
+        underlying=underlying,
+    )
+
+
+TRADFI_INSTRUMENTS: list[TradFiInstrumentDef] = [
+    # CME Index Futures
+    _fut("ES.FUT", "CME", "SP500"),
+    _fut("NQ.FUT", "CME", "NASDAQ100"),
+    _fut("RTY.FUT", "CME", "RUSSELL2000"),
+    _fut("YM.FUT", "CME", "DOW"),
+    # CME Energy
+    _fut("CL.FUT", "CME", "CRUDE"),
+    _fut("NG.FUT", "CME", "NATGAS"),
+    _fut("RB.FUT", "CME", "GASOLINE"),
+    _fut("HO.FUT", "CME", "HEATINGOIL"),
+    # CME Metals
+    _fut("GC.FUT", "CME", "GOLD"),
+    _fut("SI.FUT", "CME", "SILVER"),
+    _fut("HG.FUT", "CME", "COPPER"),
+    _fut("PL.FUT", "CME", "PLATINUM"),
+    # CME Grains
+    _fut("ZC.FUT", "CME", "CORN"),
+    _fut("ZW.FUT", "CME", "WHEAT"),
+    _fut("ZS.FUT", "CME", "SOYBEAN"),
+    _fut("ZM.FUT", "CME", "SOYMEAL"),
+    _fut("ZL.FUT", "CME", "SOYOIL"),
+    # CME Interest Rates
+    _fut("ZB.FUT", "CME", "TBOND"),
+    _fut("ZN.FUT", "CME", "TNOTE10Y"),
+    _fut("ZF.FUT", "CME", "TNOTE5Y"),
+    _fut("ZT.FUT", "CME", "TNOTE2Y"),
+    # CME Currencies
+    _fut("6E.FUT", "CME", "EUR"),
+    _fut("6J.FUT", "CME", "JPY"),
+    _fut("6B.FUT", "CME", "GBP"),
+    _fut("6C.FUT", "CME", "CAD"),
+    _fut("6A.FUT", "CME", "AUD"),
+    _fut("6S.FUT", "CME", "CHF"),
+    _fut("6L.FUT", "CME", "BRL"),
+    _fut("6N.FUT", "CME", "NZD"),
+    _fut("6Z.FUT", "CME", "ZAR"),
+    _fut("6M.FUT", "CME", "MXN"),
     # CME Livestock
-    {
-        "symbol": "LE.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "LIVECATTLE",
-        "code": "LE",
-    },
-    {
-        "symbol": "HE.FUT",
-        "venue": "CME",
-        "type": "FUTURE",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "LEANHOGS",
-        "code": "HE",
-    },
-    # CBOE (Chicago Board Options Exchange) - Volatility Index
-    {
-        "symbol": "VIX-USD",
-        "venue": "CBOE",
-        "type": "INDEX",
-        "instrument_key": "CBOE:INDEX:VIX-USD",  # canonical key used in GCS and feature services
-        "yahoo_ticker": "^VIX",  # Yahoo Finance ticker for 15m intraday data
-        "fred_series": "VIXCLS",  # FRED series for daily historical data
-        "base": "VIX",
-        "description": "CBOE Volatility Index — measures 30-day implied volatility of S&P 500 options. "
-        "Calculated index (not traded). Data: Barchart CSV 2020-01-02→2025-11-12 in GCS, "
-        "then Yahoo Finance 15m rolling window. See data_source_continuity.py.",
-    },
-    # CFE (CBOE Futures Exchange) - Volatility Futures
-    {
-        "symbol": "VX.FUT",
-        "venue": "CFE",
-        "type": "FUTURE",
-        "dataset": "XCBF.MDP3",
-        "stype": "parent",
-        "base": "VIX",
-        "code": "VX",
-    },
-    {
-        "symbol": "ES.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SP500",
-        "code": "ES",
-    },
-    {
-        "symbol": "NQ.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "NASDAQ100",
-        "code": "NQ",
-    },
-    {
-        "symbol": "CL.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "CRUDE",
-        "code": "CL",
-    },
-    {
-        "symbol": "GC.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "GOLD",
-        "code": "GC",
-    },
-    {
-        "symbol": "EW1.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SP500",
-        "code": "EW1",
-        "underlying": "ES",
-    },
-    {
-        "symbol": "EW2.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SP500",
-        "code": "EW2",
-        "underlying": "ES",
-    },
-    {
-        "symbol": "EW3.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SP500",
-        "code": "EW3",
-        "underlying": "ES",
-    },
-    {
-        "symbol": "EW4.OPT",
-        "venue": "CME",
-        "type": "OPTION",
-        "dataset": "GLBX.MDP3",
-        "stype": "parent",
-        "base": "SP500",
-        "code": "EW4",
-        "underlying": "ES",
-    },
-    {
-        "symbol": "CT.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFUS.IMPACT",
-        "stype": "parent",
-        "base": "COTTON",
-        "code": "CT",
-    },
-    {
-        "symbol": "CC.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFUS.IMPACT",
-        "stype": "parent",
-        "base": "COCOA",
-        "code": "CC",
-    },
-    {
-        "symbol": "KC.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFUS.IMPACT",
-        "stype": "parent",
-        "base": "COFFEE",
-        "code": "KC",
-    },
-    {
-        "symbol": "SB.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFUS.IMPACT",
-        "stype": "parent",
-        "base": "SUGAR",
-        "code": "SB",
-    },
-    {
-        "symbol": "OJ.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFUS.IMPACT",
-        "stype": "parent",
-        "base": "ORANGEJUICE",
-        "code": "OJ",
-    },
-    {
-        "symbol": "DX.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFUS.IMPACT",
-        "stype": "parent",
-        "base": "DOLLARINDEX",
-        "code": "DX",
-    },
-    {
-        "symbol": "BRN.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFEU.IMPACT",
-        "stype": "parent",
-        "base": "BRENT",
-        "code": "BRN",
-    },
-    {
-        "symbol": "G.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFEU.IMPACT",
-        "stype": "parent",
-        "base": "GASOIL",
-        "code": "G",
-    },
-    {
-        "symbol": "T.FUT",
-        "venue": "ICE",
-        "type": "FUTURE",
-        "dataset": "IFEU.IMPACT",
-        "stype": "parent",
-        "base": "WTI",
-        "code": "T",
-    },
+    _fut("LE.FUT", "CME", "LIVECATTLE"),
+    _fut("HE.FUT", "CME", "LEANHOGS"),
+    # CBOE — Volatility Index (calculated, not traded)
+    TradFiInstrumentDef(
+        symbol="VIX-USD",
+        venue="CBOE",
+        instrument_type="INDEX",
+        base_asset="VIX",
+        data_source="yahoo_finance",
+    ),
+    # CFE — Volatility Futures (traded on CBOE Futures Exchange)
+    _fut("VX.FUT", "CFE", "VIX"),
+    # Options
+    _opt("ES.OPT", "CME", "SP500"),
+    _opt("NQ.OPT", "CME", "NASDAQ100"),
+    _opt("CL.OPT", "CME", "CRUDE"),
+    _opt("GC.OPT", "CME", "GOLD"),
+    _opt("EW1.OPT", "CME", "SP500", underlying="ES"),
+    _opt("EW2.OPT", "CME", "SP500", underlying="ES"),
+    _opt("EW3.OPT", "CME", "SP500", underlying="ES"),
+    _opt("EW4.OPT", "CME", "SP500", underlying="ES"),
+    # ICE Futures US
+    _fut("CT.FUT", "ICE", "COTTON"),
+    _fut("CC.FUT", "ICE", "COCOA"),
+    _fut("KC.FUT", "ICE", "COFFEE"),
+    _fut("SB.FUT", "ICE", "SUGAR"),
+    _fut("OJ.FUT", "ICE", "ORANGEJUICE"),
+    _fut("DX.FUT", "ICE", "DOLLARINDEX"),
+    # ICE Futures Europe
+    _fut("BRN.FUT", "ICE", "BRENT"),
+    _fut("G.FUT", "ICE", "GASOIL"),
+    _fut("T.FUT", "ICE", "WTI"),
 ]
+
+# ---------------------------------------------------------------------------
+# Layer 2: Data source bindings (provider-specific)
+# ---------------------------------------------------------------------------
+
+
+def _db(dataset: str, stype: str, code: str) -> ProviderBinding:
+    """Shorthand for a Databento binding."""
+    return ProviderBinding(provider="databento", dataset=dataset, stype=stype, exchange_code=code)
+
+
+# Map instrument symbol -> list of provider bindings
+TRADFI_DATA_BINDINGS: dict[str, list[ProviderBinding]] = {
+    # CME futures (all via Databento GLBX.MDP3)
+    "ES.FUT": [_db("GLBX.MDP3", "parent", "ES")],
+    "NQ.FUT": [_db("GLBX.MDP3", "parent", "NQ")],
+    "RTY.FUT": [_db("GLBX.MDP3", "parent", "RTY")],
+    "YM.FUT": [_db("GLBX.MDP3", "parent", "YM")],
+    "CL.FUT": [_db("GLBX.MDP3", "parent", "CL")],
+    "NG.FUT": [_db("GLBX.MDP3", "parent", "NG")],
+    "RB.FUT": [_db("GLBX.MDP3", "parent", "RB")],
+    "HO.FUT": [_db("GLBX.MDP3", "parent", "HO")],
+    "GC.FUT": [_db("GLBX.MDP3", "parent", "GC")],
+    "SI.FUT": [_db("GLBX.MDP3", "parent", "SI")],
+    "HG.FUT": [_db("GLBX.MDP3", "parent", "HG")],
+    "PL.FUT": [_db("GLBX.MDP3", "parent", "PL")],
+    "ZC.FUT": [_db("GLBX.MDP3", "parent", "ZC")],
+    "ZW.FUT": [_db("GLBX.MDP3", "parent", "ZW")],
+    "ZS.FUT": [_db("GLBX.MDP3", "parent", "ZS")],
+    "ZM.FUT": [_db("GLBX.MDP3", "parent", "ZM")],
+    "ZL.FUT": [_db("GLBX.MDP3", "parent", "ZL")],
+    "ZB.FUT": [_db("GLBX.MDP3", "parent", "ZB")],
+    "ZN.FUT": [_db("GLBX.MDP3", "parent", "ZN")],
+    "ZF.FUT": [_db("GLBX.MDP3", "parent", "ZF")],
+    "ZT.FUT": [_db("GLBX.MDP3", "parent", "ZT")],
+    "6E.FUT": [_db("GLBX.MDP3", "parent", "6E")],
+    "6J.FUT": [_db("GLBX.MDP3", "parent", "6J")],
+    "6B.FUT": [_db("GLBX.MDP3", "parent", "6B")],
+    "6C.FUT": [_db("GLBX.MDP3", "parent", "6C")],
+    "6A.FUT": [_db("GLBX.MDP3", "parent", "6A")],
+    "6S.FUT": [_db("GLBX.MDP3", "parent", "6S")],
+    "6L.FUT": [_db("GLBX.MDP3", "parent", "6L")],
+    "6N.FUT": [_db("GLBX.MDP3", "parent", "6N")],
+    "6Z.FUT": [_db("GLBX.MDP3", "parent", "6Z")],
+    "6M.FUT": [_db("GLBX.MDP3", "parent", "6M")],
+    "LE.FUT": [_db("GLBX.MDP3", "parent", "LE")],
+    "HE.FUT": [_db("GLBX.MDP3", "parent", "HE")],
+    # VIX index — multiple sources (historical Barchart, ongoing Yahoo, daily FRED)
+    "VIX-USD": [
+        ProviderBinding(
+            provider="barchart",
+            use_for="historical",
+            instrument_key="CBOE:INDEX:VIX-USD",
+        ),
+        ProviderBinding(
+            provider="yahoo_finance",
+            use_for="live",
+            ticker="^VIX",
+            instrument_key="CBOE:INDEX:VIX-USD",
+        ),
+        ProviderBinding(
+            provider="fred",
+            use_for="historical",
+            series="VIXCLS",
+        ),
+    ],
+    # VX futures (CBOE Futures Exchange via Databento)
+    "VX.FUT": [_db("XCBF.MDP3", "parent", "VX")],
+    # Options (CME via Databento)
+    "ES.OPT": [_db("GLBX.MDP3", "parent", "ES")],
+    "NQ.OPT": [_db("GLBX.MDP3", "parent", "NQ")],
+    "CL.OPT": [_db("GLBX.MDP3", "parent", "CL")],
+    "GC.OPT": [_db("GLBX.MDP3", "parent", "GC")],
+    "EW1.OPT": [_db("GLBX.MDP3", "parent", "EW1")],
+    "EW2.OPT": [_db("GLBX.MDP3", "parent", "EW2")],
+    "EW3.OPT": [_db("GLBX.MDP3", "parent", "EW3")],
+    "EW4.OPT": [_db("GLBX.MDP3", "parent", "EW4")],
+    # ICE Futures US
+    "CT.FUT": [_db("IFUS.IMPACT", "parent", "CT")],
+    "CC.FUT": [_db("IFUS.IMPACT", "parent", "CC")],
+    "KC.FUT": [_db("IFUS.IMPACT", "parent", "KC")],
+    "SB.FUT": [_db("IFUS.IMPACT", "parent", "SB")],
+    "OJ.FUT": [_db("IFUS.IMPACT", "parent", "OJ")],
+    "DX.FUT": [_db("IFUS.IMPACT", "parent", "DX")],
+    # ICE Futures Europe
+    "BRN.FUT": [_db("IFEU.IMPACT", "parent", "BRN")],
+    "G.FUT": [_db("IFEU.IMPACT", "parent", "G")],
+    "T.FUT": [_db("IFEU.IMPACT", "parent", "T")],
+}
+
+# ---------------------------------------------------------------------------
+# Flattened merged view (identity + primary binding as dicts)
+# ---------------------------------------------------------------------------
+
+
+def _build_venue_mappings() -> list[dict[str, str | None]]:
+    """Merge identity + primary binding into flat dicts consumed by downstream services."""
+    result: list[dict[str, str | None]] = []
+    for inst in TRADFI_INSTRUMENTS:
+        entry: dict[str, str | None] = {
+            "symbol": inst.symbol,
+            "venue": inst.venue,
+            "type": inst.instrument_type,
+            "base": inst.base_asset,
+        }
+        if inst.underlying is not None:
+            entry["underlying"] = inst.underlying
+        bindings = TRADFI_DATA_BINDINGS.get(inst.symbol, [])
+        if bindings:
+            primary = bindings[0]
+            if primary.dataset is not None:
+                entry["dataset"] = primary.dataset
+            if primary.stype is not None:
+                entry["stype"] = primary.stype
+            if primary.exchange_code is not None:
+                entry["code"] = primary.exchange_code
+            if primary.ticker is not None:
+                entry["yahoo_ticker"] = primary.ticker
+            if primary.series is not None:
+                entry["fred_series"] = primary.series
+            if primary.instrument_key is not None:
+                entry["instrument_key"] = primary.instrument_key
+        result.append(entry)
+    return result
+
+
+TRADFI_VENUE_MAPPINGS: list[dict[str, str | None]] = _build_venue_mappings()
 
 # --- Known ETF tickers ---
 KNOWN_ETFS: set[str] = {
@@ -717,8 +513,9 @@ TRADFI_INSTRUMENTS_CONFIG: list[dict[str, str | None]] = TRADFI_VENUE_MAPPINGS
 
 # Named constant for the VIX index instrument definition — import this directly
 # rather than scanning TRADFI_VENUE_MAPPINGS.
-VIX_INDEX_INSTRUMENT: dict[str, str] = next(
-    d
-    for d in TRADFI_VENUE_MAPPINGS  # type: ignore[assignment]
-    if d.get("instrument_key") == "CBOE:INDEX:VIX-USD"
+VIX_INDEX_INSTRUMENT: dict[str, str | None] = next(
+    d for d in TRADFI_VENUE_MAPPINGS if d.get("instrument_key") == "CBOE:INDEX:VIX-USD"
 )
+
+# Named constant for the VIX instrument identity (typed)
+VIX_INSTRUMENT: TradFiInstrumentDef = next(inst for inst in TRADFI_INSTRUMENTS if inst.symbol == "VIX-USD")

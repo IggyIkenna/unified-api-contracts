@@ -183,6 +183,38 @@ def get_yahoo_vix_15m_start() -> date:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# General-purpose temporal source resolution
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Registry of instrument+data_type → resolver function.
+# Each resolver takes a date and returns a source name string.
+_SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
+    ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
+}
+
+
+def get_source_for_instrument(
+    instrument_key: str,
+    data_type: str,
+    query_date: date,
+) -> str | None:
+    """Resolve data source for an instrument+data_type on a given date.
+
+    Returns the source name (e.g. "BARCHART_CSV", "YAHOO_FINANCE"),
+    "GAP_NO_SOURCE" for known gaps, or None if no temporal resolver is
+    registered (caller should fall back to VENUE_TO_DATA_SOURCE).
+    """
+    from collections.abc import Callable  # noqa: qg-inside-import
+
+    resolver = _SOURCE_RESOLVERS.get((instrument_key, data_type))
+    if resolver is None:
+        return None
+    assert callable(resolver)
+    typed_resolver: Callable[[date], str] = resolver  # type: ignore[assignment]
+    return typed_resolver(query_date)
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # GCS bucket constants (referenced by backfill/migration scripts)
 # ──────────────────────────────────────────────────────────────────────────────
 
