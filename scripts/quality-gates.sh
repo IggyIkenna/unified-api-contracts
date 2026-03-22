@@ -12,28 +12,6 @@ MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
-
-# venue_mapping.py uses .get() defaults for safe dataclass field defaults (not os.getenv fallback)
-# cassette_orphan_checker.py + mock_replay.py are test tooling (not production code)
-# __init__.py is a schema-registry aggregator that exports all UAC symbols -- legitimately large
-# defi.py is a comprehensive DeFi error classification module (1055L); splitting would harm readability
-# See QUALITY_GATE_BYPASS_AUDIT.md § 2.5
-SIZE_EXTRA_EXCLUDES=(
-    "./${SOURCE_DIR}/__init__.py"
-    "./${SOURCE_DIR}/canonical/crosscutting/errors/defi.py"
-)
-
-# data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants
-# (documentation/reference for backfill migration scripts). Not runtime os.getenv() violations.
-GCP_PROJECT_ID_EXCLUDE_GLOBS=("!**/registry/data_source_continuity.py")
-
-# venue_context.py uses broad except Exception for typed re-raise at the execution boundary
-# See QUALITY_GATE_BYPASS_AUDIT.md § 2.6
 BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py")
-
-EMPTY_STR_EXCLUDE_GLOBS=("!**/venue_mapping.py" "!**/cassette_orphan_checker.py" "!**/mock_replay.py")
-EMPTY_DICT_LIST_EXCLUDE_GLOBS=("!**/venue_mapping.py" "!**/mock_replay.py")
-PRINT_EXCLUDE_GLOBS=("!**/cassette_orphan_checker.py")
-
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

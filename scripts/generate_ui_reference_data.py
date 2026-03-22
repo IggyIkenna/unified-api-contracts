@@ -171,6 +171,23 @@ def _serialize_representative_sample() -> dict[str, Any]:
     }
 
 
+def _serialize_uic_deployment_enums() -> dict[str, list[str]]:
+    """Serialize UIC deployment enums for the UI."""
+    from unified_internal_contracts.domain.deployment_service import (
+        DeploymentCluster,
+        DeploymentOperationMode,
+        DeploymentStatus,
+        DeploymentTier,
+    )
+
+    return {
+        "DeploymentCluster": sorted(e.value for e in DeploymentCluster),
+        "DeploymentTier": sorted(e.value for e in DeploymentTier),
+        "DeploymentOperationMode": sorted(e.value for e in DeploymentOperationMode),
+        "DeploymentStatus": sorted(e.value for e in DeploymentStatus),
+    }
+
+
 def generate() -> dict[str, Any]:
     """Generate the complete ui-reference-data structure."""
     version = _get_version()
@@ -179,7 +196,7 @@ def generate() -> dict[str, Any]:
         "_meta": {
             "version": version,
             "generator": "generate_ui_reference_data.py",
-            "registry_count": 14,
+            "registry_count": 15,
         },
         # ── 4 existing registries (pre-audit baseline) ──
         "venue_error_map": {
@@ -278,6 +295,12 @@ def generate() -> dict[str, Any]:
             "version": version,
             "description": "SSOT for mock/test instrument selection — Layer 1 of 3-layer architecture",
             "entries": _serialize_representative_sample(),
+        },
+        "deployment_enums": {
+            "registry_name": "deployment_enums",
+            "version": version,
+            "description": "Deployment clusters, tiers, operation modes, statuses from UIC",
+            "entries": _serialize_uic_deployment_enums(),
         },
     }
 
