@@ -379,26 +379,12 @@ class TestSymbolNormalizer:
         result = normalize_symbol("kraken", "PI_XBTUSD")
         assert "BTC" in result or "PERP" in result
 
-    def test_gateio(self):
-        from unified_api_contracts.normalize_utils.symbols import (
-            normalize_symbol,
-        )
-
-        assert normalize_symbol("gateio", "BTC_USDT") == "BTC-USDT"
-
     def test_kucoin(self):
         from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,
         )
 
         assert normalize_symbol("kucoin", "BTC-USDT") == "BTC-USDT"
-
-    def test_bitfinex_t_prefix(self):
-        from unified_api_contracts.normalize_utils.symbols import (
-            normalize_symbol,
-        )
-
-        assert normalize_symbol("bitfinex", "tBTCUSD") == "BTC-USD"
 
     def test_dydx_perp(self):
         from unified_api_contracts.normalize_utils.symbols import (

@@ -248,7 +248,6 @@
 | Barchart                                              | Direct only   | barchart                                              | CSV; no CCXT                                                      |
 | The Graph                                             | Direct only   | thegraph                                              | GraphQL; no CCXT                                                  |
 | Alchemy                                               | Direct only   | alchemy                                               | JSON-RPC; no CCXT                                                 |
-| Kucoin, Gate.io, Bitfinex, Huobi                      | CCXT only     | ccxt                                                  | No direct schemas; use Ccxt\* unified schemas                     |
 | Betfair, Pinnacle, Polymarket, Odds API, API-Football | Direct only   | betfair, pinnacle, polymarket, odds_api, api_football | Sports; no CCXT                                                   |
 
 **CCXT unified schemas (unified_api_contracts.ccxt):** CcxtOrder, CcxtTrade, CcxtBalance, CcxtBalanceResponse, CcxtPosition, CcxtMarket, CcxtTicker, CcxtOrderBook, CcxtFundingRate, CcxtFundingRateHistory, CcxtOpenInterest, CcxtOpenInterestHistory, CcxtOhlcv, CcxtAggTrade, CcxtLeverageTiers, CcxtLongShortRatio, CcxtGreeks, CcxtWithdrawal, CcxtDeposit, CcxtDepositAddress, CcxtLedger, CcxtTransfer, CcxtTradingFee, CcxtErrorPayload.

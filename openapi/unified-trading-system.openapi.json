@@ -65,7 +65,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -109,7 +109,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -162,7 +162,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -215,7 +215,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -259,7 +259,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -361,7 +361,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -404,7 +404,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -464,7 +464,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -522,7 +522,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -570,7 +570,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -630,7 +630,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -672,7 +672,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -727,7 +727,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -777,7 +777,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -837,7 +837,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -879,7 +879,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -932,7 +932,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1036,7 +1036,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1084,7 +1084,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1150,7 +1150,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1198,7 +1198,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1256,7 +1256,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1326,7 +1326,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1395,7 +1395,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1462,7 +1462,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1529,7 +1529,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1596,7 +1596,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1644,7 +1644,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1692,7 +1692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1797,7 +1797,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -1991,7 +1991,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2113,7 +2113,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2180,7 +2180,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2338,7 +2338,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2430,7 +2430,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2512,7 +2512,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2606,7 +2606,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2750,7 +2750,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2839,7 +2839,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2931,7 +2931,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -2975,7 +2975,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3074,7 +3074,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3200,7 +3200,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3271,7 +3271,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3320,7 +3320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3360,7 +3360,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3421,7 +3421,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3467,7 +3467,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3554,7 +3554,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3612,7 +3612,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3670,7 +3670,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3716,7 +3716,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3768,7 +3768,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3838,7 +3838,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3897,7 +3897,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -3939,7 +3939,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4001,7 +4001,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4061,7 +4061,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4109,7 +4109,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4159,7 +4159,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4209,7 +4209,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4276,7 +4276,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4329,7 +4329,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4385,7 +4385,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4431,7 +4431,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4489,7 +4489,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4755,7 +4755,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4810,7 +4810,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -4937,7 +4937,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5032,7 +5032,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5145,7 +5145,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5192,7 +5192,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5240,7 +5240,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5298,7 +5298,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5346,7 +5346,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5378,7 +5378,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5488,7 +5488,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5535,7 +5535,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5606,7 +5606,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5654,7 +5654,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5745,7 +5745,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5805,7 +5805,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5881,7 +5881,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -5955,7 +5955,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6073,7 +6073,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6121,7 +6121,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6178,7 +6178,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6286,7 +6286,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6334,7 +6334,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6404,7 +6404,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6471,7 +6471,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6529,7 +6529,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6585,7 +6585,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6627,7 +6627,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6720,7 +6720,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6809,7 +6809,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6905,7 +6905,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -6952,7 +6952,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7012,7 +7012,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7090,7 +7090,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7137,7 +7137,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7197,7 +7197,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7275,7 +7275,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7307,7 +7307,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7509,7 +7509,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7571,7 +7571,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7668,7 +7668,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7725,7 +7725,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7821,7 +7821,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7878,7 +7878,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -7962,7 +7962,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8046,7 +8046,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8130,7 +8130,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8238,7 +8238,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8286,7 +8286,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8349,7 +8349,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8510,7 +8510,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8572,7 +8572,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8736,7 +8736,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8802,7 +8802,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8863,7 +8863,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -8954,7 +8954,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9015,7 +9015,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9065,7 +9065,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9115,7 +9115,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9165,7 +9165,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9346,7 +9346,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9390,7 +9390,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9445,7 +9445,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9512,7 +9512,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9574,7 +9574,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9611,7 +9611,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9728,7 +9728,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9805,7 +9805,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9848,7 +9848,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9896,7 +9896,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -9957,7 +9957,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10028,7 +10028,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10089,7 +10089,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10223,7 +10223,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10334,7 +10334,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10423,7 +10423,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10476,7 +10476,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10667,7 +10667,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10721,7 +10721,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10765,7 +10765,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10810,7 +10810,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10854,7 +10854,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10898,7 +10898,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10941,7 +10941,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -10994,7 +10994,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11032,7 +11032,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11171,7 +11171,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11226,7 +11226,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11418,7 +11418,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11459,7 +11459,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11500,7 +11500,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11565,7 +11565,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11606,7 +11606,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11647,7 +11647,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11692,7 +11692,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11882,7 +11882,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11957,7 +11957,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -11996,7 +11996,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
@@ -12037,13 +12037,2495 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
                 }
               }
             }
           }
         },
         "tags": ["position-balance-monitor-service"]
+      }
+    },
+    "/execution-results-api/api/v1/results/buckets": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "List Buckets",
+        "description": "List available GCS buckets for a project.\n\nFilters to execution-store buckets by default. Pass empty string for all buckets.",
+        "operationId": "list_buckets_api_v1_results_buckets_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "GCP Project ID",
+              "title": "Project Id"
+            },
+            "description": "GCP Project ID"
+          },
+          {
+            "name": "filter_prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter buckets by prefix (empty for all)",
+              "default": "execution-store",
+              "title": "Filter Prefix"
+            },
+            "description": "Filter buckets by prefix (empty for all)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BucketsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/results/prefixes": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "List Prefixes",
+        "description": "List prefixes (folders) within a GCS bucket.\n\nReturns folder-like prefixes for navigation.",
+        "operationId": "list_prefixes_api_v1_results_prefixes_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "GCS bucket name",
+              "title": "Bucket"
+            },
+            "description": "GCS bucket name"
+          },
+          {
+            "name": "parent_prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Parent prefix to list under",
+              "default": "",
+              "title": "Parent Prefix"
+            },
+            "description": "Parent prefix to list under"
+          },
+          {
+            "name": "delimiter",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Delimiter for folder-like listing",
+              "default": "/",
+              "title": "Delimiter"
+            },
+            "description": "Delimiter for folder-like listing"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_PrefixesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/results": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "List Results",
+        "description": "List backtest results from GCS or local directory.\n\nFor GCS: provide bucket and optional prefix\nFor local: provide directory path",
+        "operationId": "list_results_api_v1_results_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": ["gcs", "local"],
+              "type": "string",
+              "description": "Data source",
+              "default": "gcs",
+              "title": "Source"
+            },
+            "description": "Data source"
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "GCS bucket name",
+              "title": "Bucket"
+            },
+            "description": "GCS bucket name"
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Path prefix (new: results/, legacy: backtest_results/)",
+              "default": "results/",
+              "title": "Prefix"
+            },
+            "description": "Path prefix (new: results/, legacy: backtest_results/)"
+          },
+          {
+            "name": "directory",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local directory path",
+              "title": "Directory"
+            },
+            "description": "Local directory path"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Max results to return",
+              "default": 100,
+              "title": "Limit"
+            },
+            "description": "Max results to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_ResultsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/results/files": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "List Files",
+        "description": "List files (not folders) within a GCS bucket prefix.\n\nReturns actual file paths for config selection.",
+        "operationId": "list_files_api_v1_results_files_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "GCS bucket name",
+              "title": "Bucket"
+            },
+            "description": "GCS bucket name"
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Prefix to list files under",
+              "default": "",
+              "title": "Prefix"
+            },
+            "description": "Prefix to list files under"
+          },
+          {
+            "name": "suffix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "File suffix filter",
+              "default": ".json",
+              "title": "Suffix"
+            },
+            "description": "File suffix filter"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_FilesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/results/local-default-directory": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "Get Local Default Directory",
+        "description": "Get suggested local directory for loading results in UI.",
+        "operationId": "get_local_default_directory_api_v1_results_local_default_directory_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_LocalDefaultDirectoryResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/results/execution_alpha": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "Get Execution Alpha",
+        "description": "Get execution alpha data for a specific backtest run.\n\nReturns entry/exit fills with slippage, equity curve, and summary metrics.",
+        "operationId": "get_execution_alpha_api_v1_results_execution_alpha_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "run_path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Run folder path (GCS prefix or local path)",
+              "title": "Run Path"
+            },
+            "description": "Run folder path (GCS prefix or local path)"
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": ["gcs", "local"],
+              "type": "string",
+              "description": "Data source",
+              "default": "gcs",
+              "title": "Source"
+            },
+            "description": "Data source"
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "GCS bucket name (for source=gcs)",
+              "title": "Bucket"
+            },
+            "description": "GCS bucket name (for source=gcs)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/results/{result_id}": {
+      "get": {
+        "tags": ["Results"],
+        "summary": "Get Result Details",
+        "description": "Get full details for a specific result.\n\nIncludes orders, fills, equity curve, timeline, and execution alpha.",
+        "operationId": "get_result_details_api_v1_results__result_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "result_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Result Id"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": ["gcs", "local"],
+              "type": "string",
+              "default": "gcs",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "bucket",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Bucket"
+            }
+          },
+          {
+            "name": "prefix",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Prefix"
+            }
+          },
+          {
+            "name": "directory",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Directory"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_ResultDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/analysis/performance": {
+      "get": {
+        "tags": ["Analysis"],
+        "summary": "Get Performance",
+        "description": "Get overall performance metrics. Returns mock data when CLOUD_MOCK_MODE=true.",
+        "operationId": "get_performance_api_v1_analysis_performance_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Get Performance Api V1 Analysis Performance Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/analysis/aggregate": {
+      "post": {
+        "tags": ["Analysis"],
+        "summary": "Aggregate Results",
+        "description": "Aggregate results by a dimension.\n\nGroups results by algorithm, strategy, timeframe, etc. and\ncalculates summary statistics for each group.",
+        "operationId": "aggregate_results_api_v1_analysis_aggregate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_AggregateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_AggregateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/analysis/distribution": {
+      "post": {
+        "tags": ["Analysis"],
+        "summary": "Get Distribution",
+        "description": "Get distribution of a metric.\n\nReturns histogram bins and statistics (mean, median, std, etc.)",
+        "operationId": "get_distribution_api_v1_analysis_distribution_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_DistributionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_DistributionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/analysis/timeseries": {
+      "post": {
+        "tags": ["Analysis"],
+        "summary": "Get Timeseries",
+        "description": "Get time series of a metric.\n\nReturns cumulative values over time, optionally grouped by date or hour.",
+        "operationId": "get_timeseries_api_v1_analysis_timeseries_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_TimeSeriesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_TimeSeriesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/analysis/heatmap": {
+      "post": {
+        "tags": ["Analysis"],
+        "summary": "Get Heatmap",
+        "description": "Get heatmap data for two dimensions.\n\nReturns a matrix of values for visualization as a heatmap.",
+        "operationId": "get_heatmap_api_v1_analysis_heatmap_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_HeatmapRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HeatmapResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/analysis/best-configs": {
+      "get": {
+        "tags": ["Analysis"],
+        "summary": "Get Best Configs",
+        "description": "Get best performing configs.\n\nRanks configs by the specified metric and returns top N.",
+        "operationId": "get_best_configs_api_v1_analysis_best_configs_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "result_ids",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Comma-separated result IDs",
+              "title": "Result Ids"
+            },
+            "description": "Comma-separated result IDs"
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": ["net_alpha_bps", "sharpe_ratio", "win_rate", "pnl"],
+              "type": "string",
+              "description": "Sort metric",
+              "default": "net_alpha_bps",
+              "title": "Sort By"
+            },
+            "description": "Sort metric"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Number of results",
+              "default": 10,
+              "title": "Limit"
+            },
+            "description": "Number of results"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BestConfigsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/backtest/results": {
+      "get": {
+        "tags": ["Backtest"],
+        "summary": "List Backtest Results",
+        "description": "List completed backtest results. Returns mock data when CLOUD_MOCK_MODE=true.",
+        "operationId": "list_backtest_results_api_v1_backtest_results_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/backtest/run": {
+      "post": {
+        "tags": ["Backtest"],
+        "summary": "Run Backtest",
+        "description": "Run a single backtest.\n\nAccepts a GCS config path and execution parameters.\nReturns a job ID for tracking progress.\n\nExample:\n    POST /api/v1/backtest/run\n    {\n        \"config_gcs_path\": \"gs://execution-store-.../configs/V1/.../BENCHMARK_V1.json\",  # noqa: gs-uri\n        \"start_date\": \"2023-05-23\",\n        \"end_date\": \"2023-05-24\",\n        \"fast_mode\": true\n    }",
+        "operationId": "run_backtest_api_v1_backtest_run_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_BacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BacktestJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/backtest/batch": {
+      "post": {
+        "tags": ["Backtest"],
+        "summary": "Run Batch Backtest",
+        "description": "Run batch backtests.\n\nAccepts up to 10 GCS config paths and runs them in parallel.\nReturns a batch ID and individual job IDs.",
+        "operationId": "run_batch_backtest_api_v1_backtest_batch_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_BatchBacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BatchJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/backtest/run-local": {
+      "post": {
+        "tags": ["Backtest"],
+        "summary": "Run Local Backtest",
+        "description": "Run a single backtest with local config JSON.\n\nAccepts config content directly (not from GCS).\nUseful for running backtests with uploaded/modified configs.\n\nExample:\n    POST /api/v1/backtest/run-local\n    {\n        \"config_json\": {\"config_id\": \"...\", \"strategy_id\": \"...\", ...},\n        \"start_date\": \"2023-05-23\",\n        \"end_date\": \"2023-05-24\"\n    }",
+        "operationId": "run_local_backtest_api_v1_backtest_run_local_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_LocalBacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BacktestJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/backtest/batch-local": {
+      "post": {
+        "tags": ["Backtest"],
+        "summary": "Run Batch Local Backtest",
+        "description": "Run batch backtests with local config JSONs.\n\nAccepts up to 10 config JSONs and runs them in parallel.\nReturns a batch ID and individual job IDs.",
+        "operationId": "run_batch_local_backtest_api_v1_backtest_batch_local_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_BatchLocalBacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BatchJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/backtest/run-exact-cli": {
+      "post": {
+        "tags": ["Backtest"],
+        "summary": "Run Exact Cli Backtest",
+        "description": "Run backtest with exact CLI command (for testing/comparison).\n\nThis endpoint runs the exact same CLI command as would be executed manually,\nincluding the --upload-gcs flag, to ensure 100% identical execution for log comparison.\n\nExample:\n    POST /api/v1/backtest/run-exact-cli\n    {\n        \"config_gcs_path\": \"gs://execution-store-.../configs/V2/.../config.json\",  # noqa: gs-uri\n        \"start_date\": \"2023-05-23T00:00:00Z\",\n        \"end_date\": \"2023-05-23T00:05:00Z\",\n        \"upload_gcs\": true\n    }",
+        "operationId": "run_exact_cli_backtest_api_v1_backtest_run_exact_cli_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_ExactCliBacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_BacktestJobResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/backtest/status/{job_id}": {
+      "get": {
+        "tags": ["Backtest"],
+        "summary": "Get Job Status",
+        "description": "Get status of a backtest job.\n\nReturns current status, progress percentage, logs, and result path when complete.\n\nArgs:\n    job_id: Job ID to get status for\n    full_logs: If True, return all logs instead of just the last 20 lines (default: False)",
+        "operationId": "get_job_status_api_v1_backtest_status__job_id__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "job_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Job Id"
+            }
+          },
+          {
+            "name": "full_logs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Full Logs"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_JobStatusResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/backtest/mass-deploy": {
+      "post": {
+        "tags": ["Backtest"],
+        "summary": "Mass Deploy",
+        "description": "Trigger mass deployment via unified-trading-deployment-v2.\n\nThis endpoint calls the UTD-v2 CLI to deploy backtests across Cloud Run Jobs.\nUses sharding for parallel execution across many machines.\n\nExample:\n    POST /api/v1/backtest/mass-deploy\n    {\n        \"config_folders\": [\"configs/V1/CEFI_BTC_momentum-macd/SCE/5M/\"],\n        \"start_date\": \"2023-05-23\",\n        \"end_date\": \"2023-05-25\",\n        \"force\": false\n    }",
+        "operationId": "mass_deploy_api_v1_backtest_mass_deploy_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_MassDeployRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_MassDeployResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/validate/config": {
+      "post": {
+        "tags": ["Validation"],
+        "summary": "Validate Config",
+        "description": "Validate a backtest config.\n\nChecks:\n- Valid strategy_id format\n- Valid config_id format\n- Execution section uses new format\n- Algorithm horizon <= strategy timeframe",
+        "operationId": "validate_config_api_v1_validate_config_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_ConfigValidationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_ConfigValidationResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/validate/dependencies": {
+      "post": {
+        "tags": ["Validation"],
+        "summary": "Check Dependencies",
+        "description": "Check upstream dependencies for a config.\n\nVerifies:\n- Strategy instructions exist for strategy_id/date\n- Market tick data exists for instruments\n- Instrument definitions exist for venues",
+        "operationId": "check_dependencies_api_v1_validate_dependencies_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_DependencyCheckRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_DependencyCheckResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/algorithms": {
+      "get": {
+        "tags": ["Config Generation"],
+        "summary": "Get Algorithms",
+        "description": "Get available algorithms and their parameter grids.\n\nNOTE(extraction): Requires execution_services.config.grid_generator.",
+        "operationId": "get_algorithms_api_v1_config_algorithms_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_AlgorithmsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/strategies": {
+      "get": {
+        "tags": ["Config Generation"],
+        "summary": "Get Strategies",
+        "description": "Get available strategy variants for config generation.\n\nNOTE(extraction): Requires execution_services.config.grid_generator.",
+        "operationId": "get_strategies_api_v1_config_strategies_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "modes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "SCE,HUF",
+              "title": "Modes"
+            }
+          },
+          {
+            "name": "timeframes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "5M,15M",
+              "title": "Timeframes"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_StrategiesResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/config/generate": {
+      "post": {
+        "tags": ["Config Generation"],
+        "summary": "Generate Configs",
+        "description": "Generate configs for a single strategy.\n\nNOTE(extraction): Requires execution_services.config.grid_generator.",
+        "operationId": "generate_configs_api_v1_config_generate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_GenerateConfigRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_GenerateConfigResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/generate-all": {
+      "post": {
+        "tags": ["Config Generation"],
+        "summary": "Generate All Configs",
+        "description": "Generate all configs for all strategies.\n\nNOTE(extraction): Requires execution_services.config.grid_generator.",
+        "operationId": "generate_all_configs_api_v1_config_generate_all_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_GenerateAllRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_GenerateAllResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/system/cores": {
+      "get": {
+        "tags": ["Config Generation"],
+        "summary": "Get System Cores",
+        "description": "Get number of CPU cores available on the system.",
+        "operationId": "get_system_cores_api_v1_config_system_cores_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/users": {
+      "get": {
+        "tags": ["Config Generation"],
+        "summary": "List User Configs",
+        "description": "List all user-specific config directories.\n\nNOTE(extraction): Config directory paths are relative to this service, not execution-service.",
+        "operationId": "list_user_configs_api_v1_config_users_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_UserConfigsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/sources": {
+      "get": {
+        "tags": ["Config Generation"],
+        "summary": "Get Config Sources",
+        "description": "Get all available config sources (V1, V2, and user directories).",
+        "operationId": "get_config_sources_api_v1_config_sources_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_ConfigSourcesResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/config/users/{username}/configs": {
+      "get": {
+        "tags": ["Config Generation"],
+        "summary": "Get User Config List",
+        "description": "List all configs for a specific user.",
+        "operationId": "get_user_config_list_api_v1_config_users__username__configs_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "username",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Username"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/strategies": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "List Strategies",
+        "description": "List all available strategies with their dates.\n\nReturns strategies from the strategy-store bucket with their available instruction dates.",
+        "operationId": "list_strategies_api_v1_data_strategies_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "max_strategies",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 500,
+              "minimum": 1,
+              "description": "Max strategies to return",
+              "default": 100,
+              "title": "Max Strategies"
+            },
+            "description": "Max strategies to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Data Browsing"],
+        "summary": "Create Strategy",
+        "description": "Create a new strategy. Persists in mock state when CLOUD_MOCK_MODE=true.",
+        "operationId": "create_strategy_api_v1_data_strategies_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Strategy"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Create Strategy Api V1 Data Strategies Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/instructions": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "Get Instructions",
+        "description": "Get instructions for a strategy on a specific date.\n\nReturns instruction records with timestamp, signal, and metadata.",
+        "operationId": "get_instructions_api_v1_data_instructions_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "strategy_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Strategy ID",
+              "title": "Strategy Id"
+            },
+            "description": "Strategy ID"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Date (YYYY-MM-DD)",
+              "title": "Date"
+            },
+            "description": "Date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Data Browsing"],
+        "summary": "Create Instruction",
+        "description": "Create a new instruction. Persists in mock state when CLOUD_MOCK_MODE=true.",
+        "operationId": "create_instruction_api_v1_data_instructions_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": true,
+                "title": "Instruction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Create Instruction Api V1 Data Instructions Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/configs": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "List Configs",
+        "description": "List all available configs in the execution bucket.\n\nReturns configs from V1/ and V2/ folders. V2 is recommended (comprehensive multi-instruction support).\nUse the version parameter to filter by specific version.",
+        "operationId": "list_configs_api_v1_data_configs_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "max_configs",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Max configs to return",
+              "default": 200,
+              "title": "Max Configs"
+            },
+            "description": "Max configs to return"
+          },
+          {
+            "name": "version",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "description": "Config version to filter (V1, V2, or None for all)",
+              "title": "Version"
+            },
+            "description": "Config version to filter (V1, V2, or None for all)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/configs/content": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "Get Config Content",
+        "description": "Get content of a specific config file.\n\nReturns the config JSON and any validation errors.",
+        "operationId": "get_config_content_api_v1_data_configs_content_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "GCS path to config file",
+              "title": "Path"
+            },
+            "description": "GCS path to config file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/configs/validate": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "Validate Config",
+        "description": "Validate a specific config against the schema.\n\nReturns validation status and any errors.",
+        "operationId": "validate_config_api_v1_data_configs_validate_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "path",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "GCS path to config file",
+              "title": "Path"
+            },
+            "description": "GCS path to config file"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/instruments": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "List Instrument Categories",
+        "description": "List available instrument definition categories and dates.\n\nReturns categories (cefi, tradfi, defi) with their available dates.",
+        "operationId": "list_instrument_categories_api_v1_data_instruments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/data/instruments/data": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "Get Instrument Definitions",
+        "description": "Get instrument definitions for a category and date.\n\nReturns instrument records with ID, venue, and metadata.",
+        "operationId": "get_instrument_definitions_api_v1_data_instruments_data_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Category (cefi, tradfi, defi)",
+              "title": "Category"
+            },
+            "description": "Category (cefi, tradfi, defi)"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Date (YYYY-MM-DD)",
+              "title": "Date"
+            },
+            "description": "Date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/tick-data": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "List Tick Data Categories",
+        "description": "List available market tick data categories, instrument types, and dates.\n\nReturns categories with their available instrument types and dates.",
+        "operationId": "list_tick_data_categories_api_v1_data_tick_data_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/api/v1/data/tick-data/instruments": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "List Tick Data Instruments",
+        "description": "List available instruments for tick data.\n\nReturns instrument IDs available for the given category, type, and date.",
+        "operationId": "list_tick_data_instruments_api_v1_data_tick_data_instruments_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Category (cefi, tradfi, defi)",
+              "title": "Category"
+            },
+            "description": "Category (cefi, tradfi, defi)"
+          },
+          {
+            "name": "instrument_type",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Instrument type (perpetuals, spot, etc.)",
+              "title": "Instrument Type"
+            },
+            "description": "Instrument type (perpetuals, spot, etc.)"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Date (YYYY-MM-DD)",
+              "title": "Date"
+            },
+            "description": "Date (YYYY-MM-DD)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/data/tick-data/ticks": {
+      "get": {
+        "tags": ["Data Browsing"],
+        "summary": "Get Tick Data",
+        "description": "Get tick data for an instrument.\n\nSupports downsampling via sample_rate parameter for faster loading.\nHigher sample_rate values mean less data but faster response.",
+        "operationId": "get_tick_data_api_v1_data_tick_data_ticks_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Category (cefi, tradfi, defi)",
+              "title": "Category"
+            },
+            "description": "Category (cefi, tradfi, defi)"
+          },
+          {
+            "name": "instrument_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Full instrument ID",
+              "title": "Instrument Id"
+            },
+            "description": "Full instrument ID"
+          },
+          {
+            "name": "date",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "Date (YYYY-MM-DD)",
+              "title": "Date"
+            },
+            "description": "Date (YYYY-MM-DD)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100000,
+              "minimum": 1,
+              "description": "Max records to return",
+              "default": 10000,
+              "title": "Limit"
+            },
+            "description": "Max records to return"
+          },
+          {
+            "name": "sample_rate",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "minimum": 1,
+              "description": "Downsample rate (1=all, 100=every 100th)",
+              "default": 1,
+              "title": "Sample Rate"
+            },
+            "description": "Downsample rate (1=all, 100=every 100th)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/fills": {
+      "get": {
+        "tags": ["Fills"],
+        "summary": "List Fills",
+        "operationId": "list_fills_api_v1_fills_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Id"
+            }
+          },
+          {
+            "name": "strategy_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Strategy Id"
+            }
+          },
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Venue"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 1000,
+              "default": 100,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExecutionResults_FillRecord"
+                  },
+                  "title": "Response List Fills Api V1 Fills Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Fills"],
+        "summary": "Record Fill",
+        "operationId": "record_fill_api_v1_fills_post",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExecutionResults_RecordFillRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_FillRecord"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/fills/stream": {
+      "get": {
+        "tags": ["Fills"],
+        "summary": "Stream Fills",
+        "operationId": "stream_fills_api_v1_fills_stream_get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Client Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExecutionResults_HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/stream/fills": {
+      "get": {
+        "tags": ["Streaming"],
+        "summary": "Stream Fills",
+        "description": "Stream fill events via Server-Sent Events.",
+        "operationId": "stream_fills_api_v1_stream_fills_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ]
+      }
+    },
+    "/execution-results-api/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Health check endpoint.",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Health Check Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/health": {
+      "get": {
+        "summary": "Health Check",
+        "description": "Health check endpoint.",
+        "operationId": "health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Health Check Api V1 Health Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/readiness": {
+      "get": {
+        "summary": "Readiness Check",
+        "description": "Readiness probe \u2014 returns 503 if service is not ready to handle requests.",
+        "operationId": "readiness_check_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Readiness Check Readiness Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1/readiness": {
+      "get": {
+        "summary": "Readiness Check",
+        "description": "Readiness probe \u2014 returns 503 if service is not ready to handle requests.",
+        "operationId": "readiness_check_api_v1_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Readiness Check Api V1 Readiness Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-results-api/api/v1": {
+      "get": {
+        "summary": "Api Info",
+        "description": "API info endpoint.",
+        "operationId": "api_info_api_v1_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Api Info Api V1 Get"
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -15321,6 +17803,2353 @@
         ],
         "title": "VenuePositionBreakdown",
         "description": "Per-venue component of an aggregated cross-venue position."
+      },
+      "ExecutionResults_AggregateRequest": {
+        "properties": {
+          "result_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Result Ids"
+          },
+          "group_by": {
+            "type": "string",
+            "enum": [
+              "algorithm",
+              "strategy",
+              "timeframe",
+              "category",
+              "asset",
+              "mode"
+            ],
+            "title": "Group By"
+          }
+        },
+        "type": "object",
+        "required": ["result_ids", "group_by"],
+        "title": "AggregateRequest",
+        "description": "Request for aggregation analysis."
+      },
+      "ExecutionResults_AggregateResponse": {
+        "properties": {
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_AggregatedGroup"
+            },
+            "type": "array",
+            "title": "Groups"
+          },
+          "summary": {
+            "$ref": "#/components/schemas/ExecutionResults_OverallSummary"
+          }
+        },
+        "type": "object",
+        "required": ["groups", "summary"],
+        "title": "AggregateResponse",
+        "description": "Response for aggregation analysis."
+      },
+      "ExecutionResults_AggregatedGroup": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "mean_alpha": {
+            "type": "number",
+            "title": "Mean Alpha"
+          },
+          "std_alpha": {
+            "type": "number",
+            "title": "Std Alpha"
+          },
+          "min_alpha": {
+            "type": "number",
+            "title": "Min Alpha"
+          },
+          "max_alpha": {
+            "type": "number",
+            "title": "Max Alpha"
+          },
+          "total_alpha_usd": {
+            "type": "number",
+            "title": "Total Alpha Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "count",
+          "mean_alpha",
+          "std_alpha",
+          "min_alpha",
+          "max_alpha",
+          "total_alpha_usd"
+        ],
+        "title": "AggregatedGroup",
+        "description": "Aggregated statistics for a group."
+      },
+      "ExecutionResults_AlgorithmInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "instruction_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Instruction Types"
+          },
+          "parameters": {
+            "additionalProperties": {
+              "items": {},
+              "type": "array"
+            },
+            "type": "object",
+            "title": "Parameters"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": ["name", "instruction_types", "parameters", "description"],
+        "title": "AlgorithmInfo",
+        "description": "Information about an algorithm."
+      },
+      "ExecutionResults_AlgorithmsResponse": {
+        "properties": {
+          "algorithms": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_AlgorithmInfo"
+            },
+            "type": "array",
+            "title": "Algorithms"
+          }
+        },
+        "type": "object",
+        "required": ["algorithms"],
+        "title": "AlgorithmsResponse",
+        "description": "Response with available algorithms."
+      },
+      "ExecutionResults_BacktestJobResponse": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued", "running", "completed", "failed"],
+            "title": "Status",
+            "default": "queued"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": ["job_id"],
+        "title": "BacktestJobResponse",
+        "description": "Response for backtest job creation."
+      },
+      "ExecutionResults_BacktestRequest": {
+        "properties": {
+          "config_gcs_path": {
+            "type": "string",
+            "title": "Config Gcs Path"
+          },
+          "start_date": {
+            "type": "string",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "title": "End Date"
+          },
+          "skip_dependency_check": {
+            "type": "boolean",
+            "title": "Skip Dependency Check",
+            "default": false
+          },
+          "skip_preflight": {
+            "type": "boolean",
+            "title": "Skip Preflight",
+            "default": false
+          },
+          "upload_gcs": {
+            "type": "boolean",
+            "title": "Upload Gcs",
+            "default": true
+          },
+          "strategy_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Strategy Id"
+          }
+        },
+        "type": "object",
+        "required": ["config_gcs_path", "start_date", "end_date"],
+        "title": "BacktestRequest",
+        "description": "Request to run a single backtest."
+      },
+      "ExecutionResults_BatchBacktestRequest": {
+        "properties": {
+          "config_gcs_paths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Config Gcs Paths"
+          },
+          "start_date": {
+            "type": "string",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "title": "End Date"
+          },
+          "parallel": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Parallel",
+            "default": 4
+          }
+        },
+        "type": "object",
+        "required": ["config_gcs_paths", "start_date", "end_date"],
+        "title": "BatchBacktestRequest",
+        "description": "Request to run batch backtests."
+      },
+      "ExecutionResults_BatchJobResponse": {
+        "properties": {
+          "batch_id": {
+            "type": "string",
+            "title": "Batch Id"
+          },
+          "jobs": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_JobInfo"
+            },
+            "type": "array",
+            "title": "Jobs"
+          }
+        },
+        "type": "object",
+        "required": ["batch_id", "jobs"],
+        "title": "BatchJobResponse",
+        "description": "Response for batch backtest job creation."
+      },
+      "ExecutionResults_BatchLocalBacktestRequest": {
+        "properties": {
+          "config_jsons": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Config Jsons"
+          },
+          "start_date": {
+            "type": "string",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "title": "End Date"
+          },
+          "parallel": {
+            "type": "integer",
+            "maximum": 10.0,
+            "minimum": 1.0,
+            "title": "Parallel",
+            "default": 4
+          }
+        },
+        "type": "object",
+        "required": ["config_jsons", "start_date", "end_date"],
+        "title": "BatchLocalBacktestRequest",
+        "description": "Request to run batch backtests with local config JSONs."
+      },
+      "ExecutionResults_BestConfigsResponse": {
+        "properties": {
+          "configs": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_RankedConfig"
+            },
+            "type": "array",
+            "title": "Configs"
+          }
+        },
+        "type": "object",
+        "required": ["configs"],
+        "title": "BestConfigsResponse",
+        "description": "Response for best configs ranking."
+      },
+      "ExecutionResults_BucketInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location",
+            "default": ""
+          },
+          "storage_class": {
+            "type": "string",
+            "title": "Storage Class",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": ["name"],
+        "title": "BucketInfo",
+        "description": "GCS bucket information."
+      },
+      "ExecutionResults_BucketsResponse": {
+        "properties": {
+          "buckets": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_BucketInfo"
+            },
+            "type": "array",
+            "title": "Buckets"
+          },
+          "project_id": {
+            "type": "string",
+            "title": "Project Id"
+          }
+        },
+        "type": "object",
+        "required": ["buckets", "project_id"],
+        "title": "BucketsResponse",
+        "description": "Response for bucket listing."
+      },
+      "ExecutionResults_ConfigSourceEntry": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "type": {
+            "type": "string",
+            "title": "Type"
+          },
+          "path": {
+            "type": "string",
+            "title": "Path"
+          },
+          "gcs_path": {
+            "type": "string",
+            "title": "Gcs Path"
+          },
+          "config_count": {
+            "type": "integer",
+            "title": "Config Count"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "username": {
+            "type": "string",
+            "title": "Username"
+          }
+        },
+        "type": "object",
+        "required": ["name", "type", "path", "gcs_path", "config_count"],
+        "title": "ConfigSourceEntry",
+        "description": "Typed dict for a config source entry."
+      },
+      "ExecutionResults_ConfigSourcesResponse": {
+        "properties": {
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_ConfigSourceEntry"
+            },
+            "type": "array",
+            "title": "Sources"
+          }
+        },
+        "type": "object",
+        "required": ["sources"],
+        "title": "ConfigSourcesResponse",
+        "description": "Response with available config sources (global + users)."
+      },
+      "ExecutionResults_ConfigValidationRequest": {
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          }
+        },
+        "type": "object",
+        "required": ["config"],
+        "title": "ConfigValidationRequest",
+        "description": "Request to validate a config."
+      },
+      "ExecutionResults_ConfigValidationResponse": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Errors",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": ["valid"],
+        "title": "ConfigValidationResponse",
+        "description": "Response for config validation."
+      },
+      "ExecutionResults_DependencyCheck": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "available": {
+            "type": "boolean",
+            "title": "Available"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "checked_path": {
+            "type": "string",
+            "title": "Checked Path"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": ["name", "service", "available", "message", "checked_path"],
+        "title": "DependencyCheck",
+        "description": "Single dependency check result."
+      },
+      "ExecutionResults_DependencyCheckRequest": {
+        "properties": {
+          "config": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config"
+          },
+          "date": {
+            "type": "string",
+            "title": "Date"
+          }
+        },
+        "type": "object",
+        "required": ["config", "date"],
+        "title": "DependencyCheckRequest",
+        "description": "Request to check dependencies."
+      },
+      "ExecutionResults_DependencyCheckResponse": {
+        "properties": {
+          "all_available": {
+            "type": "boolean",
+            "title": "All Available"
+          },
+          "required_available": {
+            "type": "boolean",
+            "title": "Required Available"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_DependencyCheck"
+            },
+            "type": "array",
+            "title": "Checks"
+          }
+        },
+        "type": "object",
+        "required": ["all_available", "required_available", "checks"],
+        "title": "DependencyCheckResponse",
+        "description": "Response for dependency check."
+      },
+      "ExecutionResults_DistributionRequest": {
+        "properties": {
+          "result_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Result Ids"
+          },
+          "metric": {
+            "type": "string",
+            "enum": ["net_alpha_bps", "gross_alpha_bps", "pnl", "sharpe_ratio"],
+            "title": "Metric",
+            "default": "net_alpha_bps"
+          },
+          "bins": {
+            "type": "integer",
+            "maximum": 100.0,
+            "minimum": 10.0,
+            "title": "Bins",
+            "default": 50
+          }
+        },
+        "type": "object",
+        "required": ["result_ids"],
+        "title": "DistributionRequest",
+        "description": "Request for distribution analysis."
+      },
+      "ExecutionResults_DistributionResponse": {
+        "properties": {
+          "histogram": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_HistogramBin"
+            },
+            "type": "array",
+            "title": "Histogram"
+          },
+          "stats": {
+            "$ref": "#/components/schemas/ExecutionResults_DistributionStats"
+          }
+        },
+        "type": "object",
+        "required": ["histogram", "stats"],
+        "title": "DistributionResponse",
+        "description": "Response for distribution analysis."
+      },
+      "ExecutionResults_DistributionStats": {
+        "properties": {
+          "mean": {
+            "type": "number",
+            "title": "Mean"
+          },
+          "median": {
+            "type": "number",
+            "title": "Median"
+          },
+          "std": {
+            "type": "number",
+            "title": "Std"
+          },
+          "min": {
+            "type": "number",
+            "title": "Min"
+          },
+          "max": {
+            "type": "number",
+            "title": "Max"
+          },
+          "skewness": {
+            "type": "number",
+            "title": "Skewness",
+            "default": 0.0
+          },
+          "kurtosis": {
+            "type": "number",
+            "title": "Kurtosis",
+            "default": 0.0
+          },
+          "percentile_5": {
+            "type": "number",
+            "title": "Percentile 5",
+            "default": 0.0
+          },
+          "percentile_95": {
+            "type": "number",
+            "title": "Percentile 95",
+            "default": 0.0
+          }
+        },
+        "type": "object",
+        "required": ["mean", "median", "std", "min", "max"],
+        "title": "DistributionStats",
+        "description": "Distribution statistics."
+      },
+      "ExecutionResults_EquityPoint": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "portfolio_value": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Portfolio Value"
+          },
+          "cash": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Cash",
+            "default": "0"
+          },
+          "positions_value": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Positions Value",
+            "default": "0"
+          }
+        },
+        "type": "object",
+        "required": ["timestamp", "portfolio_value"],
+        "title": "EquityPoint",
+        "description": "Equity curve data point."
+      },
+      "ExecutionResults_ErrorInfo": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "details": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Details"
+          },
+          "is_known_error": {
+            "type": "boolean",
+            "title": "Is Known Error",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": ["category", "message", "details"],
+        "title": "ErrorInfo",
+        "description": "Structured error information."
+      },
+      "ExecutionResults_ExactCliBacktestRequest": {
+        "properties": {
+          "config_gcs_path": {
+            "type": "string",
+            "title": "Config Gcs Path"
+          },
+          "start_date": {
+            "type": "string",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "title": "End Date"
+          },
+          "upload_gcs": {
+            "type": "boolean",
+            "title": "Upload Gcs",
+            "default": true
+          },
+          "skip_dependency_check": {
+            "type": "boolean",
+            "title": "Skip Dependency Check",
+            "default": false
+          },
+          "skip_preflight": {
+            "type": "boolean",
+            "title": "Skip Preflight",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["config_gcs_path", "start_date", "end_date"],
+        "title": "ExactCliBacktestRequest",
+        "description": "Request to run backtest with exact CLI command (for testing/comparison)."
+      },
+      "ExecutionResults_ExecutionAlpha": {
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/ExecutionResults_ExecutionAlphaSummary"
+          },
+          "entry_fills": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_FillAlpha"
+            },
+            "type": "array",
+            "title": "Entry Fills",
+            "default": []
+          },
+          "exit_fills": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_FillAlpha"
+            },
+            "type": "array",
+            "title": "Exit Fills",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": ["summary"],
+        "title": "ExecutionAlpha",
+        "description": "Full execution alpha details."
+      },
+      "ExecutionResults_ExecutionAlphaSummary": {
+        "properties": {
+          "vw_net_alpha_bps": {
+            "type": "number",
+            "title": "Vw Net Alpha Bps",
+            "default": 0.0
+          },
+          "vw_gross_alpha_bps": {
+            "type": "number",
+            "title": "Vw Gross Alpha Bps",
+            "default": 0.0
+          },
+          "vw_entry_alpha_bps": {
+            "type": "number",
+            "title": "Vw Entry Alpha Bps",
+            "default": 0.0
+          },
+          "vw_exit_alpha_bps": {
+            "type": "number",
+            "title": "Vw Exit Alpha Bps",
+            "default": 0.0
+          },
+          "vw_total_costs_bps": {
+            "type": "number",
+            "title": "Vw Total Costs Bps",
+            "default": 0.0
+          },
+          "net_alpha_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Net Alpha Usd",
+            "default": "0"
+          },
+          "total_notional_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Notional Usd",
+            "default": "0"
+          },
+          "total_gas_costs_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Gas Costs Usd",
+            "default": "0"
+          }
+        },
+        "type": "object",
+        "title": "ExecutionAlphaSummary",
+        "description": "Execution alpha summary."
+      },
+      "ExecutionResults_FilesResponse": {
+        "properties": {
+          "files": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Files"
+          },
+          "bucket": {
+            "type": "string",
+            "title": "Bucket"
+          },
+          "prefix": {
+            "type": "string",
+            "title": "Prefix"
+          }
+        },
+        "type": "object",
+        "required": ["files", "bucket", "prefix"],
+        "title": "FilesResponse",
+        "description": "Response for file listing within a GCS bucket prefix."
+      },
+      "ExecutionResults_Fill": {
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "title": "Order Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Price"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          },
+          "alpha_bps": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Alpha Bps"
+          }
+        },
+        "type": "object",
+        "required": ["order_id", "timestamp", "side", "price", "quantity"],
+        "title": "Fill",
+        "description": "Fill record."
+      },
+      "ExecutionResults_FillAlpha": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Price"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          },
+          "benchmark_price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Benchmark Price"
+          },
+          "alpha_bps": {
+            "type": "number",
+            "title": "Alpha Bps"
+          },
+          "notional": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Notional"
+          }
+        },
+        "type": "object",
+        "required": [
+          "timestamp",
+          "side",
+          "price",
+          "quantity",
+          "benchmark_price",
+          "alpha_bps",
+          "notional"
+        ],
+        "title": "FillAlpha",
+        "description": "Fill-level alpha."
+      },
+      "ExecutionResults_FillRecord": {
+        "properties": {
+          "fill_id": {
+            "type": "string",
+            "title": "Fill Id"
+          },
+          "order_id": {
+            "type": "string",
+            "title": "Order Id"
+          },
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "strategy_id": {
+            "type": "string",
+            "title": "Strategy Id"
+          },
+          "venue": {
+            "type": "string",
+            "title": "Venue"
+          },
+          "instrument": {
+            "type": "string",
+            "title": "Instrument"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Quantity"
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Price"
+          },
+          "fee": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Fee"
+          },
+          "fee_currency": {
+            "type": "string",
+            "title": "Fee Currency"
+          },
+          "filled_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Filled At"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "fill_id",
+          "order_id",
+          "client_id",
+          "strategy_id",
+          "venue",
+          "instrument",
+          "side",
+          "quantity",
+          "price",
+          "fee",
+          "fee_currency",
+          "filled_at",
+          "created_at"
+        ],
+        "title": "FillRecord"
+      },
+      "ExecutionResults_FilterOptions": {
+        "properties": {
+          "categories": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Categories",
+            "default": []
+          },
+          "assets": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Assets",
+            "default": []
+          },
+          "strategies": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Strategies",
+            "default": []
+          },
+          "algorithms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Algorithms",
+            "default": []
+          },
+          "timeframes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Timeframes",
+            "default": []
+          },
+          "instruction_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Instruction Types",
+            "default": []
+          },
+          "modes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modes",
+            "default": []
+          }
+        },
+        "type": "object",
+        "title": "FilterOptions",
+        "description": "Available filter options."
+      },
+      "ExecutionResults_GenerateAllRequest": {
+        "properties": {
+          "modes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Modes",
+            "description": "Execution modes",
+            "default": ["SCE", "HUF"]
+          },
+          "timeframes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Timeframes",
+            "description": "Timeframes",
+            "default": ["5M", "15M"]
+          },
+          "upload_gcs": {
+            "type": "boolean",
+            "title": "Upload Gcs",
+            "description": "Upload to GCS",
+            "default": false
+          },
+          "output_dir": {
+            "type": "string",
+            "title": "Output Dir",
+            "description": "Local output directory",
+            "default": "./configs/generated"
+          },
+          "cleanup": {
+            "type": "boolean",
+            "title": "Cleanup",
+            "description": "Clean old configs first",
+            "default": false
+          },
+          "max_per_algo": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Per Algo",
+            "description": "Max configs per algorithm"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "description": "Preview without generating",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "GenerateAllRequest",
+        "description": "Request to generate all configs across strategies, modes, timeframes."
+      },
+      "ExecutionResults_GenerateAllResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "total_configs": {
+            "type": "integer",
+            "title": "Total Configs",
+            "default": 0
+          },
+          "total_strategies": {
+            "type": "integer",
+            "title": "Total Strategies",
+            "default": 0
+          },
+          "by_category": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Category"
+          },
+          "by_mode": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Mode"
+          },
+          "by_timeframe": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Timeframe"
+          },
+          "by_algorithm": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "By Algorithm"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["success", "message"],
+        "title": "GenerateAllResponse",
+        "description": "Response from generate-all."
+      },
+      "ExecutionResults_GenerateConfigRequest": {
+        "properties": {
+          "strategy_id": {
+            "type": "string",
+            "title": "Strategy Id",
+            "description": "Full strategy ID"
+          },
+          "algorithms": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Algorithms",
+            "description": "Algorithms to include (empty = all)"
+          },
+          "instruction_type": {
+            "type": "string",
+            "enum": ["TRADE", "SWAP", "LEND", "BORROW", "STAKE"],
+            "title": "Instruction Type",
+            "description": "Instruction type",
+            "default": "TRADE"
+          },
+          "custom_grids": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": {
+                    "items": {},
+                    "type": "array"
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Grids",
+            "description": "Custom parameter grids per algorithm"
+          },
+          "max_per_algo": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Per Algo",
+            "description": "Max configs per algorithm"
+          },
+          "upload_gcs": {
+            "type": "boolean",
+            "title": "Upload Gcs",
+            "description": "Upload to GCS",
+            "default": false
+          },
+          "save_local": {
+            "type": "boolean",
+            "title": "Save Local",
+            "description": "Save locally",
+            "default": true
+          },
+          "output_dir": {
+            "type": "string",
+            "title": "Output Dir",
+            "description": "Local output directory",
+            "default": "./configs/generated"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "description": "Preview without generating",
+            "default": false
+          },
+          "username": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Username",
+            "description": "Username for user-specific config directory"
+          }
+        },
+        "type": "object",
+        "required": ["strategy_id"],
+        "title": "GenerateConfigRequest",
+        "description": "Request to generate configs for a single strategy."
+      },
+      "ExecutionResults_GenerateConfigResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "total_configs": {
+            "type": "integer",
+            "title": "Total Configs",
+            "default": 0
+          },
+          "config_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Config Ids"
+          },
+          "saved_paths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Saved Paths"
+          },
+          "gcs_paths": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Gcs Paths"
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["success", "message"],
+        "title": "GenerateConfigResponse",
+        "description": "Response from config generation."
+      },
+      "ExecutionResults_HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "ExecutionResults_HeatmapRequest": {
+        "properties": {
+          "result_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Result Ids"
+          },
+          "row_dimension": {
+            "type": "string",
+            "enum": ["algorithm", "strategy"],
+            "title": "Row Dimension",
+            "default": "algorithm"
+          },
+          "col_dimension": {
+            "type": "string",
+            "enum": ["timeframe", "asset", "mode", "category"],
+            "title": "Col Dimension",
+            "default": "timeframe"
+          },
+          "metric": {
+            "type": "string",
+            "enum": ["net_alpha_bps", "gross_alpha_bps", "pnl"],
+            "title": "Metric",
+            "default": "net_alpha_bps"
+          }
+        },
+        "type": "object",
+        "required": ["result_ids"],
+        "title": "HeatmapRequest",
+        "description": "Request for heatmap analysis."
+      },
+      "ExecutionResults_HeatmapResponse": {
+        "properties": {
+          "rows": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rows"
+          },
+          "cols": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Cols"
+          },
+          "values": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": ["rows", "cols", "values"],
+        "title": "HeatmapResponse",
+        "description": "Response for heatmap analysis."
+      },
+      "ExecutionResults_HistogramBin": {
+        "properties": {
+          "bin_start": {
+            "type": "number",
+            "title": "Bin Start"
+          },
+          "bin_end": {
+            "type": "number",
+            "title": "Bin End"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          }
+        },
+        "type": "object",
+        "required": ["bin_start", "bin_end", "count"],
+        "title": "HistogramBin",
+        "description": "Histogram bin."
+      },
+      "ExecutionResults_JobInfo": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "config_id": {
+            "type": "string",
+            "title": "Config Id"
+          },
+          "config_path": {
+            "type": "string",
+            "title": "Config Path"
+          }
+        },
+        "type": "object",
+        "required": ["job_id", "config_id", "config_path"],
+        "title": "JobInfo",
+        "description": "Job info for batch."
+      },
+      "ExecutionResults_JobStatusResponse": {
+        "properties": {
+          "job_id": {
+            "type": "string",
+            "title": "Job Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["queued", "running", "completed", "failed"],
+            "title": "Status"
+          },
+          "progress": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Progress"
+          },
+          "phase": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phase"
+          },
+          "result_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Result Path"
+          },
+          "gcs_result_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gcs Result Path"
+          },
+          "errors": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/ExecutionResults_ErrorInfo"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Errors"
+          },
+          "execution_time_secs": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Time Secs"
+          },
+          "logs": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Logs"
+          }
+        },
+        "type": "object",
+        "required": ["job_id", "status"],
+        "title": "JobStatusResponse",
+        "description": "Response for job status query."
+      },
+      "ExecutionResults_LocalBacktestRequest": {
+        "properties": {
+          "config_json": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Config Json"
+          },
+          "start_date": {
+            "type": "string",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "type": "string",
+            "title": "End Date"
+          },
+          "skip_dependency_check": {
+            "type": "boolean",
+            "title": "Skip Dependency Check",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["config_json", "start_date", "end_date"],
+        "title": "LocalBacktestRequest",
+        "description": "Request to run a single backtest with local config JSON."
+      },
+      "ExecutionResults_LocalDefaultDirectoryResponse": {
+        "properties": {
+          "directory": {
+            "type": "string",
+            "title": "Directory"
+          },
+          "reason": {
+            "type": "string",
+            "title": "Reason"
+          },
+          "exists": {
+            "type": "boolean",
+            "title": "Exists"
+          }
+        },
+        "type": "object",
+        "required": ["directory", "reason", "exists"],
+        "title": "LocalDefaultDirectoryResponse",
+        "description": "Response for local default directory suggestion."
+      },
+      "ExecutionResults_MassDeployRequest": {
+        "properties": {
+          "config_folders": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Config Folders",
+            "description": "GCS prefixes for config folders"
+          },
+          "start_date": {
+            "type": "string",
+            "title": "Start Date",
+            "description": "Start date YYYY-MM-DD"
+          },
+          "end_date": {
+            "type": "string",
+            "title": "End Date",
+            "description": "End date YYYY-MM-DD"
+          },
+          "force": {
+            "type": "boolean",
+            "title": "Force",
+            "description": "Override existing results",
+            "default": false
+          },
+          "dry_run": {
+            "type": "boolean",
+            "title": "Dry Run",
+            "description": "Preview without deploying",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["config_folders", "start_date", "end_date"],
+        "title": "MassDeployRequest",
+        "description": "Request to trigger mass deployment via unified-trading-deployment-v2."
+      },
+      "ExecutionResults_MassDeployResponse": {
+        "properties": {
+          "deployment_id": {
+            "type": "string",
+            "title": "Deployment Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "config_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Config Count"
+          },
+          "command": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Command"
+          }
+        },
+        "type": "object",
+        "required": ["deployment_id", "status", "message"],
+        "title": "MassDeployResponse",
+        "description": "Response from mass deployment."
+      },
+      "ExecutionResults_Order": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Price"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Amount"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "parent_order_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Order Id"
+          },
+          "exec_algorithm": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exec Algorithm"
+          }
+        },
+        "type": "object",
+        "required": ["id", "timestamp", "side", "price", "amount", "status"],
+        "title": "Order",
+        "description": "Order record."
+      },
+      "ExecutionResults_OverallSummary": {
+        "properties": {
+          "total_results": {
+            "type": "integer",
+            "title": "Total Results"
+          },
+          "mean_alpha_bps": {
+            "type": "number",
+            "title": "Mean Alpha Bps"
+          },
+          "median_alpha_bps": {
+            "type": "number",
+            "title": "Median Alpha Bps"
+          },
+          "std_alpha_bps": {
+            "type": "number",
+            "title": "Std Alpha Bps"
+          },
+          "min_alpha_bps": {
+            "type": "number",
+            "title": "Min Alpha Bps"
+          },
+          "max_alpha_bps": {
+            "type": "number",
+            "title": "Max Alpha Bps"
+          },
+          "positive_pct": {
+            "type": "number",
+            "title": "Positive Pct"
+          },
+          "total_alpha_usd": {
+            "type": "number",
+            "title": "Total Alpha Usd"
+          },
+          "total_notional_usd": {
+            "type": "number",
+            "title": "Total Notional Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_results",
+          "mean_alpha_bps",
+          "median_alpha_bps",
+          "std_alpha_bps",
+          "min_alpha_bps",
+          "max_alpha_bps",
+          "positive_pct",
+          "total_alpha_usd",
+          "total_notional_usd"
+        ],
+        "title": "OverallSummary",
+        "description": "Overall summary statistics."
+      },
+      "ExecutionResults_PrefixInfo": {
+        "properties": {
+          "prefix": {
+            "type": "string",
+            "title": "Prefix"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "has_results": {
+            "type": "boolean",
+            "title": "Has Results",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": ["prefix", "name"],
+        "title": "PrefixInfo",
+        "description": "GCS prefix (folder) information."
+      },
+      "ExecutionResults_PrefixesResponse": {
+        "properties": {
+          "prefixes": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_PrefixInfo"
+            },
+            "type": "array",
+            "title": "Prefixes"
+          },
+          "bucket": {
+            "type": "string",
+            "title": "Bucket"
+          },
+          "parent_prefix": {
+            "type": "string",
+            "title": "Parent Prefix"
+          }
+        },
+        "type": "object",
+        "required": ["prefixes", "bucket", "parent_prefix"],
+        "title": "PrefixesResponse",
+        "description": "Response for prefix listing."
+      },
+      "ExecutionResults_RankedConfig": {
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "result_id": {
+            "type": "string",
+            "title": "Result Id"
+          },
+          "config_id": {
+            "type": "string",
+            "title": "Config Id"
+          },
+          "algorithm": {
+            "type": "string",
+            "title": "Algorithm"
+          },
+          "net_alpha_bps": {
+            "type": "number",
+            "title": "Net Alpha Bps"
+          },
+          "pnl": {
+            "type": "number",
+            "title": "Pnl"
+          },
+          "sharpe_ratio": {
+            "type": "number",
+            "title": "Sharpe Ratio"
+          },
+          "total_trades": {
+            "type": "integer",
+            "title": "Total Trades"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rank",
+          "result_id",
+          "config_id",
+          "algorithm",
+          "net_alpha_bps",
+          "pnl",
+          "sharpe_ratio",
+          "total_trades"
+        ],
+        "title": "RankedConfig",
+        "description": "Ranked configuration."
+      },
+      "ExecutionResults_RecordFillRequest": {
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "title": "Order Id"
+          },
+          "client_id": {
+            "type": "string",
+            "title": "Client Id"
+          },
+          "strategy_id": {
+            "type": "string",
+            "title": "Strategy Id"
+          },
+          "venue": {
+            "type": "string",
+            "title": "Venue"
+          },
+          "instrument": {
+            "type": "string",
+            "title": "Instrument"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Price"
+          },
+          "fee": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Fee",
+            "default": "0"
+          },
+          "fee_currency": {
+            "type": "string",
+            "title": "Fee Currency",
+            "default": "USD"
+          }
+        },
+        "type": "object",
+        "required": [
+          "order_id",
+          "client_id",
+          "strategy_id",
+          "venue",
+          "instrument",
+          "side",
+          "quantity",
+          "price"
+        ],
+        "title": "RecordFillRequest"
+      },
+      "ExecutionResults_ResultDetails": {
+        "properties": {
+          "summary": {
+            "$ref": "#/components/schemas/ExecutionResults_ResultSummary"
+          },
+          "orders": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_Order"
+            },
+            "type": "array",
+            "title": "Orders",
+            "default": []
+          },
+          "fills": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_Fill"
+            },
+            "type": "array",
+            "title": "Fills",
+            "default": []
+          },
+          "equity_curve": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_EquityPoint"
+            },
+            "type": "array",
+            "title": "Equity Curve",
+            "default": []
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_TimelineEvent"
+            },
+            "type": "array",
+            "title": "Timeline",
+            "default": []
+          },
+          "execution_alpha": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ExecutionResults_ExecutionAlpha"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": ["summary"],
+        "title": "ResultDetails",
+        "description": "Full result details for deep dive."
+      },
+      "ExecutionResults_ResultSummary": {
+        "properties": {
+          "result_id": {
+            "type": "string",
+            "title": "Result Id"
+          },
+          "config_id": {
+            "type": "string",
+            "title": "Config Id"
+          },
+          "strategy_id": {
+            "type": "string",
+            "title": "Strategy Id"
+          },
+          "run_id": {
+            "type": "string",
+            "title": "Run Id",
+            "default": ""
+          },
+          "date": {
+            "type": "string",
+            "title": "Date",
+            "default": ""
+          },
+          "run_path": {
+            "type": "string",
+            "title": "Run Path",
+            "default": ""
+          },
+          "bucket": {
+            "type": "string",
+            "title": "Bucket",
+            "default": ""
+          },
+          "category": {
+            "type": "string",
+            "title": "Category",
+            "default": ""
+          },
+          "asset": {
+            "type": "string",
+            "title": "Asset",
+            "default": ""
+          },
+          "strategy_description": {
+            "type": "string",
+            "title": "Strategy Description",
+            "default": ""
+          },
+          "mode": {
+            "type": "string",
+            "title": "Mode",
+            "default": ""
+          },
+          "timeframe": {
+            "type": "string",
+            "title": "Timeframe",
+            "default": ""
+          },
+          "algorithm": {
+            "type": "string",
+            "title": "Algorithm",
+            "default": ""
+          },
+          "instruction_type": {
+            "type": "string",
+            "title": "Instruction Type",
+            "default": "TRADE"
+          },
+          "net_alpha_bps": {
+            "type": "number",
+            "title": "Net Alpha Bps",
+            "default": 0.0
+          },
+          "gross_alpha_bps": {
+            "type": "number",
+            "title": "Gross Alpha Bps",
+            "default": 0.0
+          },
+          "total_costs_bps": {
+            "type": "number",
+            "title": "Total Costs Bps",
+            "default": 0.0
+          },
+          "net_alpha_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Net Alpha Usd",
+            "default": "0"
+          },
+          "total_notional_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Notional Usd",
+            "default": "0"
+          },
+          "pnl": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Pnl",
+            "default": "0"
+          },
+          "sharpe_ratio": {
+            "type": "number",
+            "title": "Sharpe Ratio",
+            "default": 0.0
+          },
+          "win_rate": {
+            "type": "number",
+            "title": "Win Rate",
+            "default": 0.0
+          },
+          "total_trades": {
+            "type": "integer",
+            "title": "Total Trades",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": ["result_id", "config_id", "strategy_id"],
+        "title": "ResultSummary",
+        "description": "Summary of a backtest result."
+      },
+      "ExecutionResults_ResultsResponse": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_ResultSummary"
+            },
+            "type": "array",
+            "title": "Results"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          },
+          "filters": {
+            "$ref": "#/components/schemas/ExecutionResults_FilterOptions"
+          }
+        },
+        "type": "object",
+        "required": ["results", "total", "filters"],
+        "title": "ResultsResponse",
+        "description": "Response for results list."
+      },
+      "ExecutionResults_StrategiesResponse": {
+        "properties": {
+          "strategies": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Strategies"
+          },
+          "total": {
+            "type": "integer",
+            "title": "Total"
+          }
+        },
+        "type": "object",
+        "required": ["strategies", "total"],
+        "title": "StrategiesResponse",
+        "description": "Response with available strategies."
+      },
+      "ExecutionResults_TimeSeriesPoint": {
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          }
+        },
+        "type": "object",
+        "required": ["timestamp", "value"],
+        "title": "TimeSeriesPoint",
+        "description": "Time series data point."
+      },
+      "ExecutionResults_TimeSeriesRequest": {
+        "properties": {
+          "result_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Result Ids"
+          },
+          "metric": {
+            "type": "string",
+            "enum": ["cumulative_alpha_usd", "pnl"],
+            "title": "Metric",
+            "default": "cumulative_alpha_usd"
+          },
+          "group_by": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": ["date", "hour"]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Group By",
+            "default": "date"
+          }
+        },
+        "type": "object",
+        "required": ["result_ids"],
+        "title": "TimeSeriesRequest",
+        "description": "Request for time series analysis."
+      },
+      "ExecutionResults_TimeSeriesResponse": {
+        "properties": {
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionResults_TimeSeriesPoint"
+            },
+            "type": "array",
+            "title": "Series"
+          }
+        },
+        "type": "object",
+        "required": ["series"],
+        "title": "TimeSeriesResponse",
+        "description": "Response for time series analysis."
+      },
+      "ExecutionResults_TimelineEvent": {
+        "properties": {
+          "ts": {
+            "type": "string",
+            "title": "Ts"
+          },
+          "event": {
+            "type": "string",
+            "title": "Event"
+          },
+          "data": {
+            "$ref": "#/components/schemas/ExecutionResults_TimelineEventData"
+          }
+        },
+        "type": "object",
+        "required": ["ts", "event", "data"],
+        "title": "TimelineEvent",
+        "description": "Timeline event."
+      },
+      "ExecutionResults_TimelineEventData": {
+        "properties": {
+          "order_id": {
+            "type": "string",
+            "title": "Order Id"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side"
+          },
+          "amount": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Amount"
+          },
+          "price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Price"
+          },
+          "fill_price": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Fill Price"
+          },
+          "fill_quantity": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Fill Quantity"
+          },
+          "alpha_bps": {
+            "type": "number",
+            "title": "Alpha Bps"
+          },
+          "instruction_id": {
+            "type": "string",
+            "title": "Instruction Id"
+          },
+          "operation_type": {
+            "type": "string",
+            "title": "Operation Type"
+          },
+          "venue": {
+            "type": "string",
+            "title": "Venue"
+          },
+          "error_code": {
+            "type": "string",
+            "title": "Error Code"
+          },
+          "error_message": {
+            "type": "string",
+            "title": "Error Message"
+          },
+          "realized_pnl": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Realized Pnl"
+          },
+          "unrealized_pnl": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Unrealized Pnl"
+          },
+          "metadata": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Metadata"
+          }
+        },
+        "type": "object",
+        "title": "TimelineEventData",
+        "description": "Data payload for timeline events."
+      },
+      "ExecutionResults_UserConfigsResponse": {
+        "properties": {
+          "users": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Users"
+          },
+          "user_configs": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "type": "object",
+            "title": "User Configs"
+          }
+        },
+        "type": "object",
+        "required": ["users", "user_configs"],
+        "title": "UserConfigsResponse",
+        "description": "Response with user config directories."
+      },
+      "ExecutionResults_ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": ["loc", "msg", "type"],
+        "title": "ValidationError"
       }
     }
   },

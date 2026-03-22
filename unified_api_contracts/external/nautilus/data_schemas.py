@@ -284,7 +284,6 @@ EXCHANGE_NAME_MAP: dict[str, str] = {
     "upbit": "UPBIT",
     "huobi": "HUOBI",
     "ftx": "FTX",
-    "bitmex": "BITMEX",
     "kucoin": "KUCOIN",
     "gate": "GATE",
     "bitget": "BITGET",

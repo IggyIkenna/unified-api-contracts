@@ -33,13 +33,23 @@ from unified_api_contracts.canonical.crosscutting.risk_taxonomy import (
 )
 from unified_api_contracts.registry import (
     CAPABILITY_DECLARATIONS,
+    CEFI_BASE_ASSETS,
     CHAIN_RPC_TEMPLATES,
+    CME_MONTH_CODES,
     DATA_TYPES_BY_CATEGORY,
+    DEFI_INSTRUMENTS,
+    DEFI_LENDING_ASSETS,
+    DEFI_POOL_PAIRS,
     DEFI_PROTOCOLS,
     DEFI_VENUE_TO_PROTOCOL,
     INSTRUCTION_CONSTRAINTS,
+    OPTIONS_CHAIN_CONFIG,
+    QUARTERLY_MONTHS,
+    SPORTS_LEAGUES,
     SUBGRAPH_IDS,
     TIMEFRAMES,
+    TRADFI_EQUITIES,
+    TRADFI_FUTURES,
     VENUES_BY_CATEGORY,
 )
 from unified_api_contracts.registry.venue_rate_limits import VENUE_RATE_LIMITS
@@ -142,6 +152,25 @@ def _serialize_defi_protocol_registry() -> dict[str, Any]:
     }
 
 
+def _serialize_representative_sample() -> dict[str, Any]:
+    """Serialize REPRESENTATIVE_INSTRUMENT_SAMPLE to JSON-safe dict."""
+    return {
+        "cefi_base_assets": CEFI_BASE_ASSETS,
+        "tradfi_equities": {k: v for k, v in sorted(TRADFI_EQUITIES.items())},
+        "tradfi_futures": {
+            k: [list(spec) for spec in specs]
+            for k, specs in sorted(TRADFI_FUTURES.items())
+        },
+        "defi_instruments": {k: v for k, v in sorted(DEFI_INSTRUMENTS.items())},
+        "defi_lending_assets": DEFI_LENDING_ASSETS,
+        "defi_pool_pairs": [list(pair) for pair in DEFI_POOL_PAIRS],
+        "sports_leagues": SPORTS_LEAGUES,
+        "options_chain_config": {k: v for k, v in sorted(OPTIONS_CHAIN_CONFIG.items())},
+        "cme_month_codes": {str(k): v for k, v in sorted(CME_MONTH_CODES.items())},
+        "quarterly_months": QUARTERLY_MONTHS,
+    }
+
+
 def generate() -> dict[str, Any]:
     """Generate the complete ui-reference-data structure."""
     version = _get_version()
@@ -150,7 +179,7 @@ def generate() -> dict[str, Any]:
         "_meta": {
             "version": version,
             "generator": "generate_ui_reference_data.py",
-            "registry_count": 13,
+            "registry_count": 14,
         },
         # ── 4 existing registries (pre-audit baseline) ──
         "venue_error_map": {
@@ -243,6 +272,12 @@ def generate() -> dict[str, Any]:
             "version": version,
             "description": "TradFi instrument definitions and data provider bindings",
             "entries": _build_tradfi_symbology(),
+        },
+        "representative_instrument_sample": {
+            "registry_name": "representative_instrument_sample",
+            "version": version,
+            "description": "SSOT for mock/test instrument selection — Layer 1 of 3-layer architecture",
+            "entries": _serialize_representative_sample(),
         },
     }
 

@@ -203,26 +203,6 @@ class TestErrorNormalizersExchanges:
         assert isinstance(normalize_kucoin_error(401), CanonicalAuthenticationError)
         assert isinstance(normalize_kucoin_error("NOCODE"), CanonicalError)
 
-    def test_gateio_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_gateio_error,
-        )
-
-        assert isinstance(normalize_gateio_error("RATE_LIMIT"), CanonicalRateLimitError)
-        assert isinstance(normalize_gateio_error("BALANCE_NOT_ENOUGH"), CanonicalInsufficientBalanceError)
-        assert isinstance(normalize_gateio_error(500), CanonicalInternalServerError)
-        assert isinstance(normalize_gateio_error("NOCODE"), CanonicalError)
-
-    def test_bitfinex_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_bitfinex_error,
-        )
-
-        assert isinstance(normalize_bitfinex_error("ERR_RATE_LIMIT"), CanonicalRateLimitError)
-        assert isinstance(normalize_bitfinex_error("ERR_NOT_ENOUGH_BALANCE"), CanonicalInsufficientBalanceError)
-        assert isinstance(normalize_bitfinex_error(500), CanonicalInternalServerError)
-        assert isinstance(normalize_bitfinex_error("NOCODE"), CanonicalError)
-
     def test_bitstamp_known_and_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_bitstamp_error,

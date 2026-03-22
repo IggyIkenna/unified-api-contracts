@@ -27,9 +27,9 @@ class TestMeta:
         assert reference_data["_meta"]["version"] != "unknown"
 
     def test_meta_registry_count(self, reference_data: dict) -> None:
-        assert reference_data["_meta"]["registry_count"] == 13
+        assert reference_data["_meta"]["registry_count"] == 14
 
-    def test_all_13_registries_present(self, reference_data: dict) -> None:
+    def test_all_registries_present(self, reference_data: dict) -> None:
         expected = {
             "venue_error_map",
             "instruction_constraints",
@@ -44,6 +44,7 @@ class TestMeta:
             "data_pipeline_config",
             "error_classifications",
             "tradfi_symbology",
+            "representative_instrument_sample",
         }
         actual = set(reference_data.keys()) - {"_meta"}
         assert actual == expected
@@ -199,6 +200,30 @@ class TestTradfiSymbology:
         assert "symbol" in inst
         assert "instrument_type" in inst
         assert "venue" in inst
+
+
+class TestRepresentativeInstrumentSample:
+    def test_cefi_base_assets(self, reference_data: dict) -> None:
+        entries = reference_data["representative_instrument_sample"]["entries"]
+        assert len(entries["cefi_base_assets"]) >= 3
+
+    def test_tradfi_equities(self, reference_data: dict) -> None:
+        entries = reference_data["representative_instrument_sample"]["entries"]
+        assert len(entries["tradfi_equities"]) > 0
+
+    def test_defi_instruments(self, reference_data: dict) -> None:
+        entries = reference_data["representative_instrument_sample"]["entries"]
+        assert len(entries["defi_instruments"]) > 0
+
+    def test_sports_leagues(self, reference_data: dict) -> None:
+        entries = reference_data["representative_instrument_sample"]["entries"]
+        assert len(entries["sports_leagues"]) > 0
+
+    def test_options_chain_config(self, reference_data: dict) -> None:
+        entries = reference_data["representative_instrument_sample"]["entries"]
+        config = entries["options_chain_config"]
+        assert "atm_price_usd" in config
+        assert "strike_interval_usd" in config
 
 
 class TestDeterminism:

@@ -90,12 +90,6 @@ providers:
       public: [binance-api-key]
       private: [binance-secret-key]
 
-  bitfinex:
-    api_version: "v2"
-    spec_url: "https://docs.bitfinex.com/docs"
-    last_verified: "2026-03-15"
-    status: green
-
   bitget:
     api_version: "v2"
     spec_url: "https://www.bitget.com/api-doc/common/intro"
@@ -209,12 +203,6 @@ providers:
     last_verified: "2026-03-15"
     status: green
     modes: [historical]
-
-  gateio:
-    api_version: "v4"
-    spec_url: "https://www.gate.io/docs/developers/apiv4/en/"
-    last_verified: "2026-03-15"
-    status: green
 
   github:
     api_version: "v3"

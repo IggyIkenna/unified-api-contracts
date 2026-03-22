@@ -156,16 +156,6 @@ def _normalize_kraken(raw: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Gate.io
-# ---------------------------------------------------------------------------
-
-
-def _normalize_gateio(raw: str) -> str:
-    """BTC_USDT -> BTC-USDT, BTC_USDT_20240329 -> BTC-USDT-20240329."""
-    return raw.upper().replace("_", "-")
-
-
-# ---------------------------------------------------------------------------
 # KuCoin
 # ---------------------------------------------------------------------------
 
@@ -173,27 +163,6 @@ def _normalize_gateio(raw: str) -> str:
 def _normalize_kucoin(raw: str) -> str:
     """BTC-USDT -> BTC-USDT (already dash-separated)."""
     return raw.upper()
-
-
-# ---------------------------------------------------------------------------
-# Bitfinex
-# ---------------------------------------------------------------------------
-
-
-def _normalize_bitfinex(raw: str) -> str:
-    """tBTCUSD -> BTC-USD, tBTCUST -> BTC-USDT."""
-    upper = raw.upper()
-    if upper.startswith("T"):
-        inner = upper[1:]
-        if ":" in inner:
-            base, quote = inner.split(":", 1)
-            quote = quote.replace("UST", "USDT")
-            return f"{base}-{quote}"
-        if len(inner) == 6:
-            base, quote = inner[:3], inner[3:]
-            quote = quote.replace("UST", "USDT")
-            return f"{base}-{quote}"
-    return upper
 
 
 # ---------------------------------------------------------------------------
@@ -240,9 +209,6 @@ _VENUE_MAP: dict[str, Callable[[str], str]] = {
     "hyperliquid": _normalize_hyperliquid,
     "kraken": _normalize_kraken,
     "kucoin": _normalize_kucoin,
-    "gateio": _normalize_gateio,
-    "gate": _normalize_gateio,
-    "bitfinex": _normalize_bitfinex,
     "dydx": _normalize_dydx,
     "tardis": _normalize_tardis,
     "databento": _normalize_databento,

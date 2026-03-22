@@ -58,12 +58,6 @@ providers:
     last_verified: "2026-03-06"
     status: green
 
-  bitfinex:
-    api_version: "v2"
-    spec_url: "https://docs.bitfinex.com/docs"
-    last_verified: "2026-03-06"
-    status: yellow
-
   bitget:
     api_version: "v2"
     spec_url: "https://www.bitget.com/api-doc/common/intro"
@@ -170,12 +164,6 @@ providers:
   fred:
     api_version: "v1"
     spec_url: "https://fred.stlouisfed.org/docs/api/fred/"
-    last_verified: "2026-03-06"
-    status: yellow
-
-  gateio:
-    api_version: "v4"
-    spec_url: "https://www.gate.io/docs/developers/apiv4/en/"
     last_verified: "2026-03-06"
     status: yellow
 

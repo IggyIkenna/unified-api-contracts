@@ -364,32 +364,6 @@ _HYPERLIQUID = SourceCapability(
     },
 )
 
-_BITFINEX = SourceCapability(
-    source="bitfinex",
-    domains=["market", "execution", "position", "reference"],
-    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["ticker", "orderbook", "trades", "candles", "ws_ticker", "ws_book", "ws_trades"],
-        "execution": ["submit_order", "cancel_order", "update_order", "open_orders", "order_history"],
-        "position": ["wallets", "positions", "fills"],
-        "reference": ["symbols", "tickers_history"],
-    },
-    base_urls={"mainnet": "https://api-pub.bitfinex.com"},
-    operation_details={
-        "submit_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha384", required_credential="api_key"),
-            }
-        ),
-    },
-)
 
 _BITGET = SourceCapability(
     source="bitget",
@@ -474,36 +448,6 @@ _KRAKEN = SourceCapability(
         "add_order": OperationDetail(
             environments={
                 "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
-            }
-        ),
-    },
-)
-
-_GATEIO = SourceCapability(
-    source="gateio",
-    domains=["market", "execution", "position", "reference"],
-    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=True,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"test": "testnet_key", "prod": "prod_key"},
-    operations={
-        "market": ["ticker", "orderbook", "trades", "candlesticks", "ws_tickers", "ws_order_book", "ws_trades"],
-        "execution": ["create_order", "cancel_order", "list_orders", "get_order"],
-        "position": ["spot_accounts", "futures_accounts", "positions"],
-        "reference": ["list_currency_pairs", "get_currency_pair"],
-    },
-    base_urls={"mainnet": "https://api.gateio.ws", "testnet": "https://api-testnet.gateapi.io"},
-    operation_details={
-        "create_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
-                "testnet": OperationEnvDetail(
-                    signing_scheme="hmac_sha512", required_credential="api_key", data_fidelity="synthetic"
-                ),
             }
         ),
     },
@@ -802,11 +746,9 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _COINBASE,
     _DERIBIT,
     _HYPERLIQUID,
-    _BITFINEX,
     _BITGET,
     _BITSTAMP,
     _KRAKEN,
-    _GATEIO,
     _HUOBI,
     _KUCOIN,
     _MEXC,

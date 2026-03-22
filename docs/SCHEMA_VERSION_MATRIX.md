@@ -31,7 +31,6 @@
 | betdaq               | v2               | N/A                      | 2026-03-06    | green  |                                                                      |
 | betfair              | 2.1              | N/A                      | 2026-03-06    | green  |                                                                      |
 | binance              | v3               | N/A                      | 2026-03-06    | green  |                                                                      |
-| bitfinex             | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | bitget               | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | bitstamp             | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | bybit                | v5               | N/A                      | 2026-03-06    | green  |                                                                      |

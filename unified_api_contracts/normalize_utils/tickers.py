@@ -10,14 +10,12 @@ from __future__ import annotations
 # Re-exports from per-source normalize.py  (noqa: F401 keeps ruff happy)
 from unified_api_contracts.external.aster.normalize import normalize_aster_ticker  # noqa: F401
 from unified_api_contracts.external.binance.normalize import normalize_binance_ticker  # noqa: F401
-from unified_api_contracts.external.bitfinex.normalize import normalize_bitfinex_ticker  # noqa: F401
 from unified_api_contracts.external.bitget.normalize import normalize_bitget_ticker  # noqa: F401
 from unified_api_contracts.external.bitstamp.normalize import normalize_bitstamp_ticker  # noqa: F401
 from unified_api_contracts.external.bybit.normalize import normalize_bybit_ticker  # noqa: F401
 from unified_api_contracts.external.ccxt.normalize import normalize_ccxt_ticker  # noqa: F401
 from unified_api_contracts.external.coinbase.normalize import normalize_coinbase_ticker  # noqa: F401
 from unified_api_contracts.external.deribit.normalize import normalize_deribit_ticker  # noqa: F401
-from unified_api_contracts.external.gateio.normalize import normalize_gateio_ticker  # noqa: F401
 from unified_api_contracts.external.huobi.normalize import normalize_huobi_ticker  # noqa: F401
 from unified_api_contracts.external.hyperliquid.normalize import normalize_hyperliquid_ticker  # noqa: F401
 from unified_api_contracts.external.ibkr.normalize import normalize_ibkr_ticker  # noqa: F401

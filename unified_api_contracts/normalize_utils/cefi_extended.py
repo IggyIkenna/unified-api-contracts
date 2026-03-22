@@ -1,4 +1,4 @@
-"""CeFi extended normalizers: Kraken, KuCoin, Gate.io, Bitfinex, Bitstamp, MEXC, Huobi/HTX, Bitget, dYdX.
+"""Extended CeFi venue normalizers — re-exports from per-venue modules.
 
 Each venue provides:
   - normalize_{venue}_trade    -> CanonicalTrade
@@ -17,16 +17,6 @@ modules (single source of truth). This file re-exports them for unified access.
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
-# Bitfinex — from external/bitfinex/normalize.py
-# ---------------------------------------------------------------------------
-from ..external.bitfinex.normalize import (
-    normalize_bitfinex_fill,
-    normalize_bitfinex_order,
-    normalize_bitfinex_orderbook,
-    normalize_bitfinex_trade,
-)
-
-# ---------------------------------------------------------------------------
 # Bitstamp — from external/bitstamp/normalize.py
 # ---------------------------------------------------------------------------
 from ..external.bitstamp.normalize import (
@@ -34,16 +24,6 @@ from ..external.bitstamp.normalize import (
     normalize_bitstamp_order,
     normalize_bitstamp_orderbook,
     normalize_bitstamp_trade,
-)
-
-# ---------------------------------------------------------------------------
-# Gate.io — from external/gateio/normalize.py
-# ---------------------------------------------------------------------------
-from ..external.gateio.normalize import (
-    normalize_gateio_fill,
-    normalize_gateio_order,
-    normalize_gateio_orderbook,
-    normalize_gateio_trade,
 )
 
 # ---------------------------------------------------------------------------
@@ -92,11 +72,6 @@ from .cefi_extended2 import (
 )
 
 __all__ = [
-    # Bitfinex
-    "normalize_bitfinex_fill",
-    "normalize_bitfinex_order",
-    "normalize_bitfinex_orderbook",
-    "normalize_bitfinex_trade",
     # Bitget
     "normalize_bitget_fill",
     "normalize_bitget_order",
@@ -114,11 +89,6 @@ __all__ = [
     "normalize_dydx_order",
     "normalize_dydx_orderbook",
     "normalize_dydx_trade",
-    # Gate.io
-    "normalize_gateio_fill",
-    "normalize_gateio_order",
-    "normalize_gateio_orderbook",
-    "normalize_gateio_trade",
     # Huobi / HTX
     "normalize_huobi_fill",
     "normalize_huobi_order",
