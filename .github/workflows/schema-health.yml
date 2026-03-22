@@ -51,7 +51,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install uv
-          uv pip install --system -e ".[test]"
+          uv pip install --system -e "."
 
       - name: Run schema health integration tests
         id: schema_tests

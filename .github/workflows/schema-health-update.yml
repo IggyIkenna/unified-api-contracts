@@ -64,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install uv
-          uv pip install --system -e ".[test]"
+          uv pip install --system -e "."
 
       - name: Create schema_artifacts directory
         run: mkdir -p schema_artifacts
