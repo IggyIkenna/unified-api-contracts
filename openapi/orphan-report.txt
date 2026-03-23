@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
-# Generated from 11 services
-# Total schemas in spec: 68
-# Orphaned models: 541
+# Generated from 10 services
+# Total schemas in spec: 93
+# Orphaned models: 554
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -132,6 +132,7 @@ UAC: CurveDepositParams
 UAC: CurveSwapParams
 UAC: CurveWithdrawParams
 UAC: DarkPoolPrintRecord
+UAC: DataSourceRoute
 UAC: DatabentoReferenceInstrument
 UAC: DepositAddress
 UAC: DepositRecord
@@ -255,6 +256,7 @@ UAC: PrimeBrokerMarginCall
 UAC: PrimeBrokerPosition
 UAC: ProbabilityBucket
 UAC: ProcessedOddsOutput
+UAC: ProviderBinding
 UAC: RateLimitResponse
 UAC: SatelliteObservation
 UAC: ScraperVersionMeta
@@ -269,6 +271,7 @@ UAC: TardisExchangeDetail
 UAC: TardisInstrumentDetail
 UAC: TeamMapping
 UAC: TickToTradeMetric
+UAC: TradFiInstrumentDef
 UAC: UniswapV3PoolStateResponse
 UAC: UniswapV3QuoteResponse
 UAC: UniswapV3SwapTxReceipt
@@ -295,13 +298,14 @@ UIC: AaveV3UserReserveData
 UIC: AccountState
 UIC: AgentEventDetails
 UIC: AggregatedPositionMessage
-UIC: AlertContextData
 UIC: AlertEvent
-UIC: AlertMessage
 UIC: AuditRequirement
 UIC: AuditRetention
 UIC: AuthFailureDetails
 UIC: AuthFailureEvent
+UIC: BackfillSpec
+UIC: BacktestExperimentConfig
+UIC: BacktestFixedConfig
 UIC: Balance
 UIC: BetCancelledEvent
 UIC: BetFilledEvent
@@ -365,6 +369,7 @@ UIC: DeFiLPPosition
 UIC: DeFiLendingPosition
 UIC: DeFiStakingPosition
 UIC: DeadLetterRecord
+UIC: DefiAlert
 UIC: DeltaOneFeatureRecord
 UIC: DeploymentDetails
 UIC: DeploymentState
@@ -413,12 +418,15 @@ UIC: FluidRepayParams
 UIC: FuturesTermStructureRecord
 UIC: GasCostEstimate
 UIC: GreeksExposure
+UIC: GridDimensions
 UIC: HealthAlertMessage
 UIC: HuberHyperparams
 UIC: HyperparameterConfig
 UIC: InferenceRequest
 UIC: InferenceResult
 UIC: InstrumentDefinition
+UIC: InstrumentFaultRule
+UIC: InstrumentOverride
 UIC: InstrumentRecord
 UIC: InternalOptionsChainSnapshot
 UIC: InternalPosition
@@ -433,11 +441,12 @@ UIC: LidoSubmitResponse
 UIC: LidoWstEthWrapResponse
 UIC: LifecycleEventEnvelope
 UIC: LightGBMHyperparams
-UIC: LimitCheckResult
 UIC: LiquidationBandEntry
 UIC: LiquidationBandPredictionSnapshot
 UIC: LiquidationMessage
 UIC: MLConfigDict
+UIC: MLModelScorecard
+UIC: MLPrediction
 UIC: MLPredictionMessage
 UIC: ManualInstruction
 UIC: MarginHealthSnapshot
@@ -445,6 +454,7 @@ UIC: MarginState
 UIC: MarketTickMessage
 UIC: MetaSignalRecord
 UIC: ModelDegradationAlert
+UIC: ModelMetadata
 UIC: ModelVariantConfig
 UIC: MorphoBorrowParams
 UIC: MorphoFlashLoanParams
@@ -470,7 +480,6 @@ UIC: PoissonGLMHyperparams
 UIC: PortfolioMarginAccount
 UIC: PositionUpdateMessage
 UIC: PreTradeCheckRequest
-UIC: PreTradeCheckResponse
 UIC: PredictionMarketUniverse
 UIC: ProbabilityBucket
 UIC: ProcessingCompletedDetails
@@ -479,6 +488,7 @@ UIC: PubSubLifecycleEventMessage
 UIC: PubSubMessageEnvelope
 UIC: QualityGateDetails
 UIC: RealTimePnLRecord
+UIC: ReconciliationResolution
 UIC: RegimeStateRecord
 UIC: ResourceMetricsSnapshot
 UIC: RestartDetectedDetails
@@ -507,11 +517,14 @@ UIC: SportsbookLink
 UIC: StartedDetails
 UIC: StartedEvent
 UIC: StoppedDetails
+UIC: StrategyModeParams
 UIC: StrategyRiskProfile
 UIC: StrategySignalMessage
+UIC: StrategySpec
 UIC: StressScenario
 UIC: StressTestResult
 UIC: SubAccount
+UIC: TargetTypeParams
 UIC: TermStructureExposure
 UIC: TestingStageConfig
 UIC: TrainingJobRequest

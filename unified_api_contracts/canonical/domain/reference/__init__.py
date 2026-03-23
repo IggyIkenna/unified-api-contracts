@@ -135,6 +135,7 @@ class CanonicalInstrument(CanonicalBase):
     auction_close_utc: str | None = None
     early_close_utc: str | None = None
     session_date_tag: str | None = None
+    market_category: str | None = None
 
 
 InstrumentWarehouseRow = CanonicalInstrument
