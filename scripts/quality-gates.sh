@@ -14,5 +14,7 @@ LOCAL_DEPS=("unified-internal-contracts")
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
 BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py")
 SIZE_EXTRA_EXCLUDES=("*/canonical/crosscutting/errors/defi.py" "*/__init__.py")
+# data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants
+GCP_PROJECT_ID_EXCLUDE_GLOBS=("!**/registry/data_source_continuity.py")
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

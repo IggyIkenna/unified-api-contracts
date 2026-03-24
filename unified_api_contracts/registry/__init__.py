@@ -94,6 +94,7 @@ from .tradfi_symbology import (
     get_bindings_for_symbol,
     get_primary_binding,
 )
+from .tradfi_ticker_universe import TRADFI_TICKER_UNIVERSE
 from .venue_constants import (
     AAVE_PLASMA,
     AAVE_V3,
@@ -427,6 +428,7 @@ __all__ = [
     "TRADFI_FUTURES",
     "TRADFI_INSTRUMENTS",
     "TRADFI_INSTRUMENTS_CONFIG",
+    "TRADFI_TICKER_UNIVERSE",
     "TRADFI_VENUE_MAPPINGS",
     "TRANSFERMARKT",
     "UNDERDOG",

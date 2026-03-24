@@ -86,12 +86,13 @@ None currently.
 
 ## 2.5 File Size Exceptions (MAX_FILE_LINES=900)
 
-| File                                | Lines | Reason                                                                                                                                                                      |
-| ----------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sports/canonical/features.py`      | ~1196 | Pure Pydantic schema (`SportsFeatureVector`) with ~998 sport feature fields; splitting a single dataclass across files would reduce readability with no structural benefit  |
-| `unified_api_contracts/__init__.py` | ~998  | Schema-registry root aggregator that re-exports all UAC public symbols across 80+ external source domains; splitting the root facade would break the Citadel import surface |
+| File                                                          | Lines | Reason                                                                                                                                                                      |
+| ------------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sports/canonical/features.py`                                | ~1196 | Pure Pydantic schema (`SportsFeatureVector`) with ~998 sport feature fields; splitting a single dataclass across files would reduce readability with no structural benefit  |
+| `unified_api_contracts/__init__.py`                           | ~998  | Schema-registry root aggregator that re-exports all UAC public symbols across 80+ external source domains; splitting the root facade would break the Citadel import surface |
+| `unified_api_contracts/canonical/crosscutting/errors/defi.py` | 1224  | Consolidated DeFi canonical error classes (one class per on-chain error code); splitting across files would scatter related error hierarchy with no structural benefit      |
 
-**Config:** `scripts/quality-gates.sh` — `SIZE_EXTRA_EXCLUDES` excludes `__init__.py` from the file size check.
+**Config:** `scripts/quality-gates.sh` — `SIZE_EXTRA_EXCLUDES` excludes `__init__.py` and `defi.py` from the file size check.
 
 ---
 
