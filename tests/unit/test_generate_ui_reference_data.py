@@ -27,7 +27,7 @@ class TestMeta:
         assert reference_data["_meta"]["version"] != "unknown"
 
     def test_meta_registry_count(self, reference_data: dict) -> None:
-        assert reference_data["_meta"]["registry_count"] == 14
+        assert reference_data["_meta"]["registry_count"] == 15
 
     def test_all_registries_present(self, reference_data: dict) -> None:
         expected = {
@@ -42,6 +42,7 @@ class TestMeta:
             "capability_declarations",
             "venue_capabilities",
             "data_pipeline_config",
+            "deployment_enums",
             "error_classifications",
             "tradfi_symbology",
             "representative_instrument_sample",

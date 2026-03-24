@@ -226,7 +226,7 @@ class TestInstrumentTypeFolderMap:
     def test_no_duplicate_folder_names(self) -> None:
         """Different instrument types should not map to the same folder (except PERP/PERPETUAL alias)."""
         seen: dict[str, str] = {}
-        allowed_aliases = {("PERPETUAL", "PERP")}
+        allowed_aliases = {("PERP", "PERPETUAL")}
         for itype, folder in INSTRUMENT_TYPE_FOLDER_MAP.items():
             if folder in seen:
                 existing = seen[folder]
