@@ -15,6 +15,7 @@ from .canonical.canonical_mappings import (
     DataSourceMapping,
     DataSourceRoute,
     get_data_sources_for_venue,
+    get_required_secrets,
 )
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
