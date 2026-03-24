@@ -453,20 +453,27 @@ CONTRACT_SPECS_BY_VENUE: dict[str, ContractSpec] = {
 
 # --- DATA_SOURCE_TO_SECRET ---
 DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
-    "tardis": "TARDIS_API_KEY",
-    "databento": "DATABENTO_API_KEY",
-    "aster": None,
-    "hyperliquid": None,
-    "thegraph": "THE_GRAPH_API_KEY",
-    "alchemy": "ALCHEMY_API_KEY",
+    "tardis": "tardis-api-key",
+    "databento": "databento-api-key",
+    "aster": "aster-api-key",
+    "hyperliquid": "hyperliquid-trade-key",
+    "thegraph": "thegraph-api-key",
+    "alchemy": "alchemy-api-key",
     "yfinance": None,
-    "barchart": "BARCHART_API_KEY",
+    "barchart": None,
     "ccxt": None,
-    "ibkr": None,
-    "glassnode": "GLASSNODE_API_KEY",
+    "ibkr": "ibkr-account-credentials",
+    "glassnode": None,
     "defillama": None,
-    "betfair": "BETFAIR_API_KEY",
-    "coingecko": "COINGECKO_API_KEY",
+    "betfair": "betfair-api-key",
+    "coingecko": None,
+    "rpc": None,
+    "balancer_api_v3": None,
+    "api_football": "api-football-api-key",
+    "polygon": "polygon-api-key",
+    "polymarket": "polymarket-api-key",
+    "cryptoquant": "cryptoquant-api-key",
+    "fred": "fred-api-key",
 }
 
 
