@@ -27,6 +27,20 @@ from .betting import BettingSignal as BettingSignal
 from .betting import CLVRecord as CLVRecord
 from .betting import CommissionModel as CommissionModel
 from .betting import SignalSource as SignalSource
+from .canonical_ids import (
+    ODDS_API_MARKET_TO_CANONICAL as ODDS_API_MARKET_TO_CANONICAL,
+)
+from .canonical_ids import (
+    ODDS_API_OUTCOME_TO_CANONICAL as ODDS_API_OUTCOME_TO_CANONICAL,
+)
+from .canonical_ids import build_fixture_id as build_fixture_id
+from .canonical_ids import build_instrument_id as build_instrument_id
+from .canonical_ids import build_league_id as build_league_id
+from .canonical_ids import build_player_id as build_player_id
+from .canonical_ids import build_referee_id as build_referee_id
+from .canonical_ids import build_season_id as build_season_id
+from .canonical_ids import build_team_id as build_team_id
+from .canonical_ids import build_venue_id as build_venue_id
 from .league_classification_data import DEFAULT_CLASSIFICATION_REGISTRY as DEFAULT_CLASSIFICATION_REGISTRY
 from .league_classification_data import LEAGUE_CLASSIFICATION_DATA as LEAGUE_CLASSIFICATION_DATA
 from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
@@ -125,7 +139,12 @@ class OddsFormat(StrEnum):
 
 
 class CanonicalOdds(CanonicalBase):
-    """Normalized odds from any bookmaker/exchange."""
+    """Normalized odds from any bookmaker/exchange.
+
+    Canonical instrument ID format for odds markets:
+        {fixture_id}::{market_type}::{outcome}::{bookmaker_key}
+    Example: "1034567::h2h::home::betfair_ex_uk"
+    """
 
     venue: str
     event_id: str
@@ -206,7 +225,10 @@ class CanonicalComboBet(CanonicalBase):
 
 
 class CanonicalVenue(BaseModel):
-    """Normalised venue/stadium across all data sources."""
+    """Normalised venue/stadium across all data sources.
+
+    Canonical venue_id format: SCREAMING_SNAKE_CASE (e.g. ANFIELD, ALLIANZ_ARENA).
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -226,7 +248,10 @@ class CanonicalVenue(BaseModel):
 
 
 class CanonicalReferee(BaseModel):
-    """Normalised referee across all data sources."""
+    """Normalised referee across all data sources.
+
+    Canonical referee_id format: {LASTNAME}_{INITIAL} (e.g. ATKINSON_M, OLIVER_M).
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -240,7 +265,11 @@ class CanonicalReferee(BaseModel):
 
 
 class CanonicalPlayer(BaseModel):
-    """Normalised player across all data sources."""
+    """Normalised player across all data sources.
+
+    Canonical player_id format: {LASTNAME}_{INITIAL} or {LASTNAME}_{FIRSTNAME}
+    (e.g. PICKFORD_J, FERNANDES_BRUNO). Diacritics stripped via NFKD normalization.
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -260,7 +289,10 @@ class CanonicalPlayer(BaseModel):
 
 
 class CanonicalTeam(BaseModel):
-    """Normalised team across all data sources."""
+    """Normalised team across all data sources.
+
+    Canonical team_id format: SCREAMING_SNAKE_CASE (e.g. MAN_CITY, TOTTENHAM, DORTMUND).
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -278,7 +310,10 @@ class CanonicalTeam(BaseModel):
 
 
 class CanonicalLeague(BaseModel):
-    """Normalised league/competition across all data sources."""
+    """Normalised league/competition across all data sources.
+
+    Canonical league_id format: {COUNTRY_CODE}_{LEAGUE_ABBR} (e.g. EPL, BUN, ENG_CHAMPIONSHIP).
+    """
 
     model_config = ConfigDict(frozen=True)
 
@@ -294,7 +329,11 @@ class CanonicalLeague(BaseModel):
 
 
 class CanonicalFixture(BaseModel):
-    """Normalised fixture/match across all data sources."""
+    """Normalised fixture/match across all data sources.
+
+    Canonical fixture_id format: {api_football_fixture_id} as string (e.g. "1034567").
+    Season format: {YYYY}/{YY} (e.g. "2024/25").
+    """
 
     model_config = ConfigDict(frozen=True)
 

@@ -980,6 +980,7 @@ __all__ = [
     "classify_venue_error",
     "decimal_to_american",
     "get_data_sources_for_venue",
+    "get_required_secrets",
 ]
 
 # fmt: off

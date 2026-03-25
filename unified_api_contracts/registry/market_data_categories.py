@@ -48,6 +48,11 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
     ],
+    "prediction": [
+        "prediction_trades",  # CLOB trade fills (price, size, side, timestamp)
+        "prediction_book_snapshot",  # Order book snapshot (bids/asks)
+        "prediction_market_metadata",  # Market metadata (question, outcomes, status)
+    ],
 }
 
 # Venues per category
@@ -100,6 +105,11 @@ VENUES_BY_CATEGORY: dict[str, list[str]] = {
         "DRAFTKINGS",
         "FANDUEL",
         "BET365",
+    ],
+    "prediction": [
+        # Prediction markets (binary / multi-outcome)
+        "POLYMARKET",
+        "KALSHI",
     ],
 }
 

@@ -308,6 +308,14 @@ class PolymarketGammaMarket(BaseModel):
     image: str | None = None
     # Rewards
     rewards: dict[str, object] | None = None
+    # Sports-specific fields (present on soccer/NBA/NFL etc. markets)
+    sports_market_type: str | None = Field(None, alias="sportsMarketType")  # moneyline|spreads|totals|btts
+    line: float | None = None  # Spread/total value (e.g. -1.5, 2.5)
+    game_start_time: str | None = Field(None, alias="gameStartTime")  # ISO datetime of fixture kickoff
+    game_id: int | None = Field(None, alias="gameId")  # Polymarket internal game ID
+    group_item_title: str | None = Field(None, alias="groupItemTitle")  # Outcome label
+    # Series (league/competition grouping — populated from nested events[].series[])
+    series_slug: str | None = None  # e.g. "premier-league-2025" (extracted from events)
 
 
 class PolymarketGammaSeries(BaseModel):
