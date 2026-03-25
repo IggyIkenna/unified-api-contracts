@@ -69,8 +69,7 @@ class VenueMapping:
             "UNISWAPV3-ETH",  # Uniswap V3 Ethereum
             "UNISWAPV4-ETH",  # Uniswap V4 Ethereum (launched January 31, 2025)
             "CURVE-ETH",  # Curve Ethereum (MetaRegistry RPC)
-            # FUTURE IMPLEMENTATION - NOT MVP
-            # "BALANCER-ETH",  # Balancer V2 Ethereum - TODO(GH-BACKLOG): Future implementation
+            "BALANCER-ETH",  # Balancer V2/V3 Ethereum (API v3 GraphQL)
             # Lending protocols
             "AAVE_V3_ETH",  # AAVE V3 Ethereum
             "MORPHO-ETHEREUM",  # Morpho lending protocol (Ethereum)
@@ -188,8 +187,7 @@ class VenueMapping:
             "UNISWAPV3-ETH": "the_graph",
             "UNISWAPV4-ETH": "the_graph",
             "CURVE-ETH": "rpc",  # Curve MetaRegistry RPC (The Graph deprecated)
-            # FUTURE IMPLEMENTATION - NOT MVP
-            # "BALANCER-ETH": "the_graph",  # TODO(GH-BACKLOG): Future implementation
+            "BALANCER-ETH": "balancer_api_v3",  # Balancer API v3 GraphQL (public, no key)
             # DeFi venues using protocol SDKs
             "AAVE_V3_ETH": "protocol_sdk",
             "MORPHO-ETHEREUM": "protocol_sdk",
@@ -237,8 +235,7 @@ class VenueMapping:
             "UNISWAPV3-ETH": "2021-05-05",
             "UNISWAPV4-ETH": "2024-11-01",
             "CURVE-ETH": "2020-01-20",  # Curve Ethereum (MetaRegistry RPC)
-            # FUTURE IMPLEMENTATION - NOT MVP
-            # "BALANCER-ETH": "2020-03-31",  # TODO(GH-BACKLOG): Future implementation
+            "BALANCER-ETH": "2020-03-31",  # Balancer Ethereum (API v3 GraphQL)
             # DeFi - Lending protocols
             "AAVE_V3_ETH": "2023-01-27",
             "MORPHO-ETHEREUM": "2024-01-08",
