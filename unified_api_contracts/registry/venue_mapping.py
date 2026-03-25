@@ -60,27 +60,25 @@ class VenueMapping:
         ]
     )
 
-    # DeFi venues (multi-chain support: Ethereum, Plasma)
+    # DeFi venues — canonical PROTOCOL-CHAIN format (matches URDI CANONICAL_VENUE_TO_ADAPTER)
     # Note: HYPERLIQUID and ASTER moved to all_cefi_onchain_clob_venues
     all_defi_venues: list[str] = field(
         default_factory=lambda: [
             # Ethereum DEX protocols (swaps)
-            "UNISWAPV2-ETH",  # Uniswap V2 Ethereum
-            "UNISWAPV3-ETH",  # Uniswap V3 Ethereum
-            "UNISWAPV4-ETH",  # Uniswap V4 Ethereum (launched January 31, 2025)
-            "CURVE-ETH",  # Curve Ethereum (MetaRegistry RPC)
-            "BALANCER-ETH",  # Balancer V2/V3 Ethereum (API v3 GraphQL)
+            "UNISWAPV2-ETHEREUM",
+            "UNISWAPV3-ETHEREUM",
+            "UNISWAPV4-ETHEREUM",
+            "CURVE-ETHEREUM",
+            "BALANCER-ETHEREUM",
             # Lending protocols
-            "AAVE_V3_ETH",  # AAVE V3 Ethereum
-            "MORPHO-ETHEREUM",  # Morpho lending protocol (Ethereum)
-            # Plasma lending protocols
-            "EULER-PLASMA",  # Euler lending (Plasma)
-            "FLUID-PLASMA",  # Fluid lending (Plasma)
-            "AAVE-PLASMA",  # AAVE Plasma market (Plasma)
+            "AAVEV3-ETHEREUM",
+            "MORPHO-ETHEREUM",
+            "EULER-ETHEREUM",
+            "FLUID-ETHEREUM",
             # LST/Yield protocols
-            "ETHERFI",  # EtherFi LST (Ethereum)
-            "LIDO",  # Lido LST (Ethereum)
-            "ETHENA",  # Ethena synthetic dollars (Ethereum)
+            "LIDO-ETHEREUM",
+            "ETHERFI-ETHEREUM",
+            "ETHENA-ETHEREUM",
         ]
     )
 
@@ -182,21 +180,19 @@ class VenueMapping:
             # DeFi venues with direct API integration
             "HYPERLIQUID": "hyperliquid_api",  # Hyperliquid REST/WebSocket API + S3 archive
             "ASTER": "aster_api",  # Aster REST API
-            # DeFi venues using The Graph
-            "UNISWAPV2-ETH": "the_graph",
-            "UNISWAPV3-ETH": "the_graph",
-            "UNISWAPV4-ETH": "the_graph",
-            "CURVE-ETH": "rpc",  # Curve MetaRegistry RPC (The Graph deprecated)
-            "BALANCER-ETH": "balancer_api_v3",  # Balancer API v3 GraphQL (public, no key)
-            # DeFi venues using protocol SDKs
-            "AAVE_V3_ETH": "protocol_sdk",
-            "MORPHO-ETHEREUM": "protocol_sdk",
-            "EULER-PLASMA": "protocol_sdk",
-            "FLUID-PLASMA": "protocol_sdk",
-            "AAVE-PLASMA": "protocol_sdk",
-            "ETHERFI": "protocol_sdk",
-            "LIDO": "protocol_sdk",
-            "ETHENA": "protocol_sdk",
+            # DeFi venues — canonical PROTOCOL-CHAIN format
+            "UNISWAPV2-ETHEREUM": "the_graph",
+            "UNISWAPV3-ETHEREUM": "the_graph",
+            "UNISWAPV4-ETHEREUM": "the_graph",
+            "CURVE-ETHEREUM": "rpc",
+            "BALANCER-ETHEREUM": "balancer_api_v3",
+            "AAVEV3-ETHEREUM": "the_graph",
+            "MORPHO-ETHEREUM": "the_graph",
+            "EULER-ETHEREUM": "the_graph",
+            "FLUID-ETHEREUM": "the_graph",
+            "LIDO-ETHEREUM": "protocol_sdk",
+            "ETHERFI-ETHEREUM": "protocol_sdk",
+            "ETHENA-ETHEREUM": "protocol_sdk",
         }
     )
 
@@ -230,22 +226,21 @@ class VenueMapping:
             "NYSE": "2020-01-01",
             "ICE": "2018-12-23",
             "FX": "2020-01-01",  # OTC Foreign Exchange (KRW/USD via Yahoo Finance)
-            # DeFi - DEX protocols
-            "UNISWAPV2-ETH": "2020-05-18",
-            "UNISWAPV3-ETH": "2021-05-05",
-            "UNISWAPV4-ETH": "2024-11-01",
-            "CURVE-ETH": "2020-01-20",  # Curve Ethereum (MetaRegistry RPC)
-            "BALANCER-ETH": "2020-03-31",  # Balancer Ethereum (API v3 GraphQL)
+            # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
+            "UNISWAPV2-ETHEREUM": "2020-05-18",
+            "UNISWAPV3-ETHEREUM": "2021-05-05",
+            "UNISWAPV4-ETHEREUM": "2025-01-31",
+            "CURVE-ETHEREUM": "2020-01-20",
+            "BALANCER-ETHEREUM": "2020-03-31",
             # DeFi - Lending protocols
-            "AAVE_V3_ETH": "2023-01-27",
+            "AAVEV3-ETHEREUM": "2023-01-27",
             "MORPHO-ETHEREUM": "2024-01-08",
-            "EULER-PLASMA": "2024-03-01",
-            "FLUID-PLASMA": "2024-06-01",
-            "AAVE-PLASMA": "2024-03-01",
+            "EULER-ETHEREUM": "2023-12-18",
+            "FLUID-ETHEREUM": "2024-03-01",
             # DeFi - LST/Yield protocols
-            "LIDO": "2020-12-18",
-            "ETHERFI": "2024-01-01",
-            "ETHENA": "2024-02-16",
+            "LIDO-ETHEREUM": "2020-12-18",
+            "ETHERFI-ETHEREUM": "2023-11-01",
+            "ETHENA-ETHEREUM": "2024-02-19",
         }
     )
 
@@ -323,7 +318,7 @@ class VenueMapping:
         Get the launch/start date for a venue.
 
         Args:
-            venue: Canonical venue name (e.g., "ETHERFI", "UNISWAPV3-ETH")
+            venue: Canonical venue name (e.g., "ETHERFI-ETHEREUM", "UNISWAPV3-ETHEREUM")
 
         Returns:
             ISO date string (YYYY-MM-DD) or None if venue not found
@@ -613,17 +608,21 @@ class ExchangeInstrumentConfig:
             # CeFi - On-chain CLOBs
             "HYPERLIQUID": ["PERPETUAL"],  # Perpetuals only (NO liquidations endpoint)
             "ASTER": ["PERPETUAL"],  # Perpetuals only (NO liquidations - endpoint disabled)
-            # DeFi - DEX protocols
-            "UNISWAPV2-ETH": ["POOL"],
-            "UNISWAPV3-ETH": ["POOL"],
-            "UNISWAPV4-ETH": ["POOL"],
+            # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
+            "UNISWAPV2-ETHEREUM": ["POOL"],
+            "UNISWAPV3-ETHEREUM": ["POOL"],
+            "UNISWAPV4-ETHEREUM": ["POOL"],
+            "CURVE-ETHEREUM": ["POOL"],
+            "BALANCER-ETHEREUM": ["POOL"],
             # DeFi - Lending protocols
-            "AAVE_V3_ETH": ["A_TOKEN", "DEBT_TOKEN"],
+            "AAVEV3-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             "MORPHO-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
-            # DeFi - LST protocols
-            "LIDO": ["LST"],
-            "ETHERFI": ["LST"],
-            "ETHENA": ["YIELD_BEARING"],
+            "EULER-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
+            "FLUID-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
+            # DeFi - LST/Yield protocols
+            "LIDO-ETHEREUM": ["LST"],
+            "ETHERFI-ETHEREUM": ["LST"],
+            "ETHENA-ETHEREUM": ["YIELD_BEARING"],
         }
     )
 
