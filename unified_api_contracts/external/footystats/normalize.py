@@ -14,6 +14,9 @@ from unified_api_contracts.canonical.domain.sports import (
     CanonicalFixture,
     CanonicalLeague,
     CanonicalTeam,
+    build_fixture_id,
+    build_league_id,
+    build_team_id,
 )
 from unified_api_contracts.normalize_utils._helpers import _to_decimal, _ts_sec
 
@@ -21,13 +24,14 @@ from .schemas import FootyStatsMatch, FootyStatsOdds
 
 
 def normalize_footystats_match(raw: FootyStatsMatch, venue: str = "footystats") -> CanonicalFixture:
-    """Convert FootyStatsMatch to CanonicalFixture."""
-    fixture_id = str(raw.match_id or "")
+    """Convert FootyStatsMatch to CanonicalFixture with human-readable canonical IDs."""
     kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix > 0 else datetime.now(UTC)
 
+    home_name = raw.home_name or ""
+    away_name = raw.away_name or ""
     home_team = CanonicalTeam(
-        team_id=str(raw.home_id or ""),
-        name=raw.home_name or "",
+        team_id=build_team_id(home_name),
+        name=home_name,
         short_name=None,
         country=None,
         founded=None,
@@ -35,8 +39,8 @@ def normalize_footystats_match(raw: FootyStatsMatch, venue: str = "footystats") 
         venue=None,
     )
     away_team = CanonicalTeam(
-        team_id=str(raw.away_id or ""),
-        name=raw.away_name or "",
+        team_id=build_team_id(away_name),
+        name=away_name,
         short_name=None,
         country=None,
         founded=None,
@@ -45,12 +49,17 @@ def normalize_footystats_match(raw: FootyStatsMatch, venue: str = "footystats") 
     )
 
     league = CanonicalLeague(
-        league_id=str(raw.competition_id or ""),
+        league_id=build_league_id("", str(raw.competition_id or "")),
         name="",
         country="",
         league_type=None,
         logo_url=None,
     )
+
+    date_str = kickoff_utc.strftime("%Y%m%d")
+    fixture_id = build_fixture_id(
+        league.league_id, home_team.team_id, away_team.team_id, date_str,
+    ) if home_team.team_id and away_team.team_id else str(raw.match_id or "")
 
     return CanonicalFixture(
         fixture_id=fixture_id,

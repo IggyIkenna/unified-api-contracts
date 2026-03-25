@@ -87,6 +87,20 @@ POLYMARKET_SERIES_TO_LEAGUE: dict[str, str] = {
     "fifa-friendly": "FIFA_FRIENDLY",
     "uef-qualifiers": "UEF_QUALIFIERS",
     "ofc": "OFC",
+    # Non-soccer sports (series slug → league_id)
+    "nba-2026": "NBA",
+    "nhl-2026": "NHL",
+    "nfl-2025": "NFL",
+    "mlb-games": "MLB",
+    "ncaa-cbb": "NCAA_CBB",
+    "ufc": "UFC",
+    "atp": "ATP",
+    "wta": "WTA",
+    "dota-2": "DOTA2",
+    "counter-strike": "CS2",
+    "league-of-legends": "LOL",
+    "valorant": "VALORANT",
+    "euroleague-basketball": "EUROLEAGUE",
 }
 
 # Reverse lookup: canonical league_id → Polymarket series slug (first match)

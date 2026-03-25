@@ -33,8 +33,11 @@ from .canonical_ids import (
 from .canonical_ids import (
     ODDS_API_OUTCOME_TO_CANONICAL as ODDS_API_OUTCOME_TO_CANONICAL,
 )
+from .canonical_ids import build_crypto_prediction_id as build_crypto_prediction_id
 from .canonical_ids import build_fixture_id as build_fixture_id
 from .canonical_ids import build_instrument_id as build_instrument_id
+from .canonical_ids import build_macro_prediction_id as build_macro_prediction_id
+from .canonical_ids import build_prediction_instrument_id as build_prediction_instrument_id
 from .canonical_ids import build_league_id as build_league_id
 from .canonical_ids import build_player_id as build_player_id
 from .canonical_ids import build_referee_id as build_referee_id
@@ -332,7 +335,7 @@ class CanonicalFixture(BaseModel):
     """Normalised fixture/match across all data sources.
 
     Canonical fixture_id format: {api_football_fixture_id} as string (e.g. "1034567").
-    Season format: {YYYY}/{YY} (e.g. "2024/25").
+    Season format: {YYYY}-{YY} (e.g. "2024-25"). Hyphen, not slash — safe for GCS paths.
     """
 
     model_config = ConfigDict(frozen=True)

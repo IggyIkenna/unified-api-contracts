@@ -27,6 +27,11 @@ from .schemas import (
     PolymarketToken,
     PolymarketTrade,
 )
+from .settlement_registry import (
+    SETTLEMENT_REGISTRY,
+    SettlementSource,
+    get_settlement_source,
+)
 from .sports_mappings import (
     POLYMARKET_MARKET_TYPE_MAP,
     POLYMARKET_SERIES_TO_LEAGUE,
@@ -51,6 +56,7 @@ __all__ = [
     "POLYMARKET_SPX_TIMEFRAMES",
     "POLYMARKET_TEAM_TO_CANONICAL",
     "POLYMARKET_TIMEFRAMES",
+    "SETTLEMENT_REGISTRY",
     "PolymarketCLOBOrder",
     "PolymarketError",
     "PolymarketFill",
@@ -65,9 +71,11 @@ __all__ = [
     "PolymarketResolution",
     "PolymarketToken",
     "PolymarketTrade",
+    "SettlementSource",
     "get_canonical_league_for_polymarket_series",
     "get_canonical_team_for_polymarket",
     "get_polymarket_series_for_league",
     "get_polymarket_sports_tag_for_league",
     "get_polymarket_tags_for_underlying",
+    "get_settlement_source",
 ]

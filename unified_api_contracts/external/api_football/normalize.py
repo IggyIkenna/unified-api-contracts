@@ -12,10 +12,12 @@ from unified_api_contracts.canonical.domain import CanonicalBetMarket, Canonical
 from unified_api_contracts.canonical.domain.sports import (
     CanonicalFixture,
     CanonicalLeague,
+    CanonicalReferee,
     CanonicalTeam,
     CanonicalVenue,
     build_fixture_id,
     build_league_id,
+    build_referee_id,
     build_season_id,
     build_team_id,
     build_venue_id,
@@ -23,6 +25,18 @@ from unified_api_contracts.canonical.domain.sports import (
 from unified_api_contracts.normalize_utils._helpers import _iso, _to_decimal, _ts_ms_to_datetime
 
 from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue
+
+
+def _extract_referee(raw: ApiFootballFixture) -> CanonicalReferee | None:
+    """Extract referee from API-Football fixture response."""
+    ref_name = raw.referee
+    if not ref_name:
+        return None
+    return CanonicalReferee(
+        referee_id=build_referee_id(str(ref_name)),
+        name=str(ref_name),
+        nationality=None,
+    )
 
 
 def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_football") -> CanonicalFixture:
@@ -157,7 +171,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
         league=league,
         kickoff_utc=kickoff_utc,
         venue=venue_obj,
-        referee=None,
+        referee=_extract_referee(raw),
         season=season_str,
         match_week=None,
         source=venue,

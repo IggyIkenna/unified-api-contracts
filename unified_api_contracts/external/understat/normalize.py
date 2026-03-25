@@ -17,6 +17,11 @@ from unified_api_contracts.canonical.domain import (
     CanonicalTeam,
 )
 from unified_api_contracts.canonical.domain.features import FeatureMetadata
+from unified_api_contracts.canonical.domain.sports import (
+    build_league_id,
+    build_player_id,
+    build_team_id,
+)
 
 from .schemas import (
     UnderstatMatch,
@@ -84,7 +89,7 @@ def normalize_understat_league(
 ) -> CanonicalLeague:
     """Build CanonicalLeague from Understat context (league_name/season)."""
     return CanonicalLeague(
-        league_id=_safe_str(league_name),
+        league_id=build_league_id("", league_name),
         name=league_name,
         country="unknown",
         league_type=None,
@@ -96,10 +101,11 @@ def normalize_understat_team(
     raw: UnderstatTeam,
     venue: str = "understat",
 ) -> CanonicalTeam:
-    """Convert UnderstatTeam to CanonicalTeam."""
+    """Convert UnderstatTeam to CanonicalTeam with human-readable ID."""
+    team_name = _safe_str(raw.title or raw.short_title)
     return CanonicalTeam(
-        team_id=_safe_str(raw.id),
-        name=_safe_str(raw.title or raw.short_title),
+        team_id=build_team_id(team_name),
+        name=team_name,
         short_name=_safe_str(raw.short_title) or None,
         country=None,
         founded=None,
@@ -118,11 +124,18 @@ def normalize_understat_player(
     if name_raw is not None and "USPlayer" in type(raw).__name__:
         name_raw = None
     name = cast(str | None, name_raw)
+    # Build canonical player ID: LASTNAME_INITIAL
+    full_name = name or ""
+    parts = full_name.split() if full_name else []
+    last = parts[-1] if parts else ""
+    first = parts[0] if len(parts) > 1 else ""
+    canonical_pid = build_player_id(last, first) if last else _safe_str(player_id)
+
     return CanonicalPlayer(
-        player_id=_safe_str(player_id),
-        name=name or "",
-        first_name=None,
-        last_name=None,
+        player_id=canonical_pid,
+        name=full_name,
+        first_name=first or None,
+        last_name=last or None,
         nationality=None,
         position=getattr(raw, "position", None),
         date_of_birth=None,

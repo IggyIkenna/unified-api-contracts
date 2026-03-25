@@ -10,7 +10,7 @@ Three-API architecture:
 
 __api_version__ = "v2"  # matches provider_api_versions.yaml
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
@@ -252,6 +252,24 @@ class PolymarketGammaTag(BaseModel):
     requires_translation: bool | None = Field(None, alias="requiresTranslation")
 
 
+def _parse_json_string_list(v: list[str] | str | None) -> list[str] | None:
+    """Parse a JSON-encoded string list from Gamma API (e.g. '["Yes","No"]' → ["Yes","No"])."""
+    if v is None:
+        return None
+    if isinstance(v, list):
+        return v
+    if isinstance(v, str):
+        try:
+            import json
+
+            parsed = json.loads(v)
+            if isinstance(parsed, list):
+                return [str(x) for x in parsed]
+        except (json.JSONDecodeError, ValueError):
+            pass
+    return None
+
+
 class PolymarketGammaMarket(BaseModel):
     """Full market metadata from Polymarket Gamma API.
 
@@ -260,7 +278,15 @@ class PolymarketGammaMarket(BaseModel):
 
     This is the primary metadata source. CLOB API has trading data but minimal metadata.
     No auth required. Aligns with /markets, /markets/{id}, /markets/slug/{slug}.
+
+    Note: Gamma API returns ``outcomes``, ``outcomePrices``, and ``clobTokenIds``
+    as JSON-encoded strings (e.g. ``'["Yes","No"]'``), not native lists.
+    The ``field_validator`` handles both formats.
+
+    Extra fields from the API are silently ignored (``extra="ignore"``).
     """
+
+    model_config = {"extra": "ignore", "populate_by_name": True}
 
     id: str | None = None
     condition_id: str | None = Field(None, alias="conditionId")
@@ -268,17 +294,19 @@ class PolymarketGammaMarket(BaseModel):
     question: str | None = None
     description: str | None = None
     market_slug: str | None = Field(None, alias="marketSlug")
-    outcomes: list[str] | None = None  # e.g. ["Yes", "No"] or ["$0-$100", "$100-$200", ...]
-    outcome_prices: list[str] | None = Field(None, alias="outcomePrices")  # string decimals
+    outcomes: list[str] | None = None  # e.g. ["Yes", "No"] — may arrive as JSON string
+    outcome_prices: list[str] | None = Field(None, alias="outcomePrices")
     clob_token_ids: list[str] | None = Field(None, alias="clobTokenIds")
     market_maker_address: str | None = Field(None, alias="marketMakerAddress")
-    best_bid: str | None = Field(None, alias="bestBid")
-    best_ask: str | None = Field(None, alias="bestAsk")
-    last_trade_price: str | None = Field(None, alias="lastTradePrice")
-    spread: str | None = None
+    best_bid: str | float | None = Field(None, alias="bestBid")
+    best_ask: str | float | None = Field(None, alias="bestAsk")
+    last_trade_price: str | float | None = Field(None, alias="lastTradePrice")
+    spread: str | float | None = None
     volume_num: float | None = Field(None, alias="volumeNum")
+    volume: str | float | None = None  # Gamma API sometimes returns volume as string
     volume_24hr: float | None = Field(None, alias="volume24hr")
     liquidity_num: float | None = Field(None, alias="liquidityNum")
+    liquidity: str | float | None = None  # Gamma API sometimes returns as string
     # Tags (inconsistently applied; use question text as fallback)
     tags: list[PolymarketGammaTag] | None = None
     # Neg-risk / bucket arb fields
@@ -316,6 +344,11 @@ class PolymarketGammaMarket(BaseModel):
     group_item_title: str | None = Field(None, alias="groupItemTitle")  # Outcome label
     # Series (league/competition grouping — populated from nested events[].series[])
     series_slug: str | None = None  # e.g. "premier-league-2025" (extracted from events)
+
+    @field_validator("outcomes", "outcome_prices", "clob_token_ids", mode="before")
+    @classmethod
+    def _parse_json_string_lists(cls, v: list[str] | str | None) -> list[str] | None:
+        return _parse_json_string_list(v)
 
 
 class PolymarketGammaSeries(BaseModel):

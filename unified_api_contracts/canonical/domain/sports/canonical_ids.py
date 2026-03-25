@@ -17,12 +17,12 @@ Canonical ID Formats::
     Player:     {LAST}_{INITIAL}                 → SAKA_B, FERNANDES_BRUNO
     Referee:    {LAST}_{INITIAL}                 → OLIVER_M
     Venue:      SCREAMING_SNAKE_CASE             → EMIRATES_STADIUM
-    Season:     {YYYY}/{YY}                      → 2025/26
+    Season:     {YYYY}-{YY}                       → 2025-26
     Instrument: FOOTBALL:{BK}:{MKT}:{LG}:{SN}:{H}-{A}::{SEL}
 
 Instrument example::
 
-    FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:ENG_PREMIER_LEAGUE:2025/26:ARSENAL-CHELSEA::HOME
+    FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:ENG_PREMIER_LEAGUE:2025-26:ARSENAL-CHELSEA::HOME
 
 Human-readable so anyone can understand what it represents without a lookup.
 """
@@ -154,16 +154,19 @@ def build_venue_id(venue_name: str) -> str:
 
 
 def build_season_id(start_year: int) -> str:
-    """Build canonical season ID: {YYYY}/{YY}.
+    """Build canonical season ID: {YYYY}-{YY}.
+
+    Uses hyphen (not slash) to avoid GCS path separator and BigQuery
+    external table partition issues.
 
     Args:
         start_year: Season start year (e.g. 2025).
 
     Returns:
-        Season ID, e.g. "2025/26".
+        Season ID, e.g. "2025-26".
     """
     end_yy = (start_year + 1) % 100
-    return f"{start_year}/{end_yy:02d}"
+    return f"{start_year}-{end_yy:02d}"
 
 
 def build_instrument_id(
@@ -236,3 +239,76 @@ ODDS_API_OUTCOME_TO_CANONICAL: dict[str, str] = {
     "Yes": "YES",
     "No": "NO",
 }
+
+
+# ---------------------------------------------------------------------------
+# Polymarket market type → canonical SCREAMING_SNAKE_CASE
+# ---------------------------------------------------------------------------
+
+POLYMARKET_MARKET_TO_CANONICAL: dict[str, str] = {
+    "moneyline": "MATCH_ODDS",
+    "spreads": "ASIAN_HANDICAP",
+    "totals": "OVER_UNDER",
+    "btts": "BOTH_TEAMS_TO_SCORE",
+}
+
+
+def build_prediction_instrument_id(
+    venue: str,
+    market_type: str,
+    league_id: str,
+    season: str,
+    home_team_id: str,
+    away_team_id: str,
+    selection: str,
+    point: float | None = None,
+) -> str:
+    """Build canonical instrument ID for a prediction market sports position.
+
+    Uses the SAME format as ``build_instrument_id()`` so that:
+    - ``FOOTBALL:POLYMARKET:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME``
+    - ``FOOTBALL:BETFAIR_EX_UK:MATCH_ODDS:EPL:2025-26:ARSENAL-CHELSEA::HOME``
+    share the same fixture part and differ only in venue.
+
+    Arb detection = GROUP BY everything except venue, compare prices.
+    """
+    return build_instrument_id(
+        bookmaker_key=venue,
+        market_type=market_type,
+        league_id=league_id,
+        season=season,
+        home_team_id=home_team_id,
+        away_team_id=away_team_id,
+        selection=selection,
+        sport="FOOTBALL",
+        point=point,
+    )
+
+
+def build_crypto_prediction_id(
+    venue: str,
+    asset: str,
+    timeframe: str,
+    window_end: str,
+) -> str:
+    """Build canonical instrument ID for a crypto up/down prediction market.
+
+    Format: PREDICTION:{VENUE}:UP_DOWN:{ASSET}:{TIMEFRAME}:{WINDOW_END}
+    Example: PREDICTION:POLYMARKET:UP_DOWN:BTC:5M:1774230900
+    """
+    return f"PREDICTION:{_slug(venue)}:UP_DOWN:{_slug(asset)}:{_slug(timeframe)}:{window_end}"
+
+
+def build_macro_prediction_id(
+    venue: str,
+    index: str,
+    timeframe: str,
+    date: str,
+) -> str:
+    """Build canonical instrument ID for a macro/equity up/down prediction market.
+
+    Format: PREDICTION:{VENUE}:UP_DOWN:{INDEX}:{TIMEFRAME}:{DATE}
+    Example: PREDICTION:POLYMARKET:UP_DOWN:SPX:1D:20260325
+    """
+    date_digits = re.sub(r"[^0-9]", "", date)[:8]
+    return f"PREDICTION:{_slug(venue)}:UP_DOWN:{_slug(index)}:{_slug(timeframe)}:{date_digits}"
