@@ -16,6 +16,8 @@ Sports market types on Polymarket (``sportsMarketType`` field):
 
 from __future__ import annotations
 
+import re
+
 POLYMARKET_SPORTS_TAG_SLUGS: frozenset[str] = frozenset(
     {
         "soccer",
@@ -42,65 +44,106 @@ POLYMARKET_SPORTS_TAG_SLUGS: frozenset[str] = frozenset(
 # Series slug → canonical league_id (SSOT)
 # ---------------------------------------------------------------------------
 
+# ---------------------------------------------------------------------------
+# Prediction leagues with confirmed Polymarket coverage (SSOT)
+# ---------------------------------------------------------------------------
+# Only these leagues have sports markets on Polymarket. Services should skip
+# leagues not in this set to avoid wasted API calls. Verified by scanning
+# 9 days of Polymarket data (2026-03-18 to 2026-03-26).
+POLYMARKET_PREDICTION_LEAGUES: frozenset[str] = frozenset(
+    {
+        "EPL",
+        "ENG_CHAMPIONSHIP",
+        "LA_LIGA",
+        "SEGUNDA_DIVISION",
+        "BUNDESLIGA",
+        "BUNDESLIGA_2",
+        "SERIE_A",
+        "SERIE_B",
+        "LIGUE_1",
+        "LIGUE_2",
+        "EREDIVISIE",
+        "PRIMEIRA_LIGA",
+        "SCOTTISH_PREMIERSHIP",
+        "SUPER_LIG",
+        "DANISH_SUPERLIGA",
+        "ELITESERIEN",
+        "MLS",
+        "LIGA_MX",
+        "ARGENTINA_PRIMERA",
+        "BRASILEIRAO",
+        "A_LEAGUE",
+        "J1_LEAGUE",
+        "K_LEAGUE_1",
+    }
+)
+
+# ---------------------------------------------------------------------------
+# Series slug → canonical league_id (SSOT)
+# ---------------------------------------------------------------------------
+
 POLYMARKET_SERIES_TO_LEAGUE: dict[str, str] = {
-    # England
+    # England — canonical IDs from PREDICTION_LEAGUES registry
     "premier-league-2025": "EPL",
     "efl-championship": "ENG_CHAMPIONSHIP",
-    "efa-2025": "FA_CUP",
     # Spain
-    "la-liga-2025": "LAL",
-    "la-liga-2": "SPA_SEGUNDA",
-    "copa-del-rey": "COPA_DEL_REY",
+    "la-liga-2025": "LA_LIGA",
+    "la-liga-2": "SEGUNDA_DIVISION",
     # Germany
-    "bundesliga-2025": "BUN",
-    "bundesliga-2": "GER_2BUNDESLIGA",
+    "bundesliga-2025": "BUNDESLIGA",
+    "bundesliga-2": "BUNDESLIGA_2",
     # Italy
-    "serie-a-2025": "SEA",
+    "serie-a-2025": "SERIE_A",
+    "serie-b": "SERIE_B",
     # France
-    "ligue-1-2025": "FL1",
-    "ligue-2": "FR_LIGUE_2",
-    # Other Europe
-    "scottish-premiership": "SCO_PREM",
-    "primeira-liga": "POR_PRIMEIRA",
-    "denmark-superliga": "DEN_SUPERLIGA",
-    "norway-eliteserien": "NOR_ELITESERIEN",
-    "tur-2025": "TUR_SUPER_LIG",
-    "rus-2025": "RUS_PREMIER",
+    "ligue-1-2025": "LIGUE_1",
+    "ligue-2": "LIGUE_2",
+    # Netherlands
+    "ere-2025": "EREDIVISIE",
+    "eredivisie-2025": "EREDIVISIE",
+    # Portugal
+    "primeira-liga": "PRIMEIRA_LIGA",
+    "primeira-liga-2025": "PRIMEIRA_LIGA",
+    # Belgium
+    "jupiler-pro-league-2025": "JUPILER_PRO",
+    # Scotland
+    "scottish-premiership": "SCOTTISH_PREMIERSHIP",
+    "scottish-premiership-2025": "SCOTTISH_PREMIERSHIP",
+    # Turkey
+    "tur-2025": "SUPER_LIG",
+    "super-lig-2025": "SUPER_LIG",
+    # Greece
+    "greek-super-league-2025": "GREEK_SUPER_LEAGUE",
+    # Denmark
+    "denmark-superliga": "DANISH_SUPERLIGA",
+    "danish-superliga-2025": "DANISH_SUPERLIGA",
+    # Norway
+    "norway-eliteserien": "ELITESERIEN",
+    "eliteserien-2025": "ELITESERIEN",
+    # Sweden
+    "allsvenskan-2025": "ALLSVENSKAN",
+    # Austria
+    "austrian-bundesliga-2025": "AUSTRIAN_BUNDESLIGA",
+    # Switzerland
+    "swiss-super-league-2025": "SWISS_SUPER_LEAGUE",
+    # Poland
+    "ekstraklasa-2025": "EKSTRAKLASA",
     # Americas
     "mls-2025": "MLS",
-    "primera-a": "COL_PRIMERA_A",
-    "primera-divisin-argentina": "ARG_PRIMERA",
+    "mex-2025": "LIGA_MX",
+    "liga-mx-2025": "LIGA_MX",
+    "primera-divisin-argentina": "ARGENTINA_PRIMERA",
+    "argentina-primera-division-2025": "ARGENTINA_PRIMERA",
+    "brazil-serie-a": "BRASILEIRAO",
+    "brasileirao-2025": "BRASILEIRAO",
+    "chile-primera-2025": "CHILE_PRIMERA",
     # Asia / Oceania
-    "a-league-soccer": "AUS_ALEAGUE",
-    "k-league": "KOR_KLEAGUE",
-    "japan-j2-league": "JPN_J2",
-    "saudi-professional-league": "SAU_PRO_LEAGUE",
-    "liga-1": "IDN_LIGA_1",
-    # International / Continental
-    "ucl-2025": "UCL",
-    "ucl": "UCL",
-    "uel-2025": "UEL",
-    "europa-conference-league": "UECL",
-    "womens-champions-league": "UWCL",
-    "concacaf": "CONCACAF",
-    "sud-2025": "COPA_SUDAMERICANA",
-    "fifa-friendly": "FIFA_FRIENDLY",
-    "uef-qualifiers": "UEF_QUALIFIERS",
-    "ofc": "OFC",
-    # Non-soccer sports (series slug → league_id)
-    "nba-2026": "NBA",
-    "nhl-2026": "NHL",
-    "nfl-2025": "NFL",
-    "mlb-games": "MLB",
-    "ncaa-cbb": "NCAA_CBB",
-    "ufc": "UFC",
-    "atp": "ATP",
-    "wta": "WTA",
-    "dota-2": "DOTA2",
-    "counter-strike": "CS2",
-    "league-of-legends": "LOL",
-    "valorant": "VALORANT",
-    "euroleague-basketball": "EUROLEAGUE",
+    "a-league-soccer": "A_LEAGUE",
+    "a-league-2025": "A_LEAGUE",
+    "japan-j-league": "J1_LEAGUE",
+    "j1-league-2025": "J1_LEAGUE",
+    "k-league": "K_LEAGUE_1",
+    "k-league-2025": "K_LEAGUE_1",
 }
 
 # Reverse lookup: canonical league_id → Polymarket series slug (first match)
@@ -133,16 +176,15 @@ def get_polymarket_sports_tag_for_league(league_id: str) -> str | None:
     league_to_tag: dict[str, str] = {
         "EPL": "premier-league",
         "ENG_CHAMPIONSHIP": "efl-championship",
-        "BUN": "bundesliga",
-        "LAL": "la-liga",
-        "SEA": "serie-a",
-        "FL1": "ligue-1",
-        "UCL": "champions-league",
-        "UEL": "champions-league",
+        "BUNDESLIGA": "bundesliga",
+        "LA_LIGA": "la-liga",
+        "SERIE_A": "serie-a",
+        "LIGUE_1": "ligue-1",
         "MLS": "mls",
-        "NBA": "nba",
-        "NFL": "nfl",
-        "MLB": "mlb",
+        "EREDIVISIE": "eredivisie",
+        "PRIMEIRA_LIGA": "primeira-liga",
+        "SCOTTISH_PREMIERSHIP": "scottish-premiership",
+        "A_LEAGUE": "a-league",
     }
     return league_to_tag.get(league_id)
 
@@ -412,7 +454,6 @@ def get_canonical_team_for_polymarket(polymarket_team_name: str) -> str | None:
     if result is not None:
         return result
     # 3. Strip common suffixes and retry
-    import re
     stripped = re.sub(r"\s+(FC|CF|SC|SK|JK|AFC|SV|AC|SS|US|AS|RC|CD|UD|RCD|CA|SSC|CFC|BC)$", "", upper).strip()
     if stripped != upper:
         result = _POLYMARKET_LOOKUP.get(stripped)

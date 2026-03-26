@@ -10,6 +10,8 @@ Three-API architecture:
 
 __api_version__ = "v2"  # matches provider_api_versions.yaml
 
+import json
+
 from pydantic import BaseModel, Field, field_validator
 
 from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
@@ -260,8 +262,6 @@ def _parse_json_string_list(v: list[str] | str | None) -> list[str] | None:
         return v
     if isinstance(v, str):
         try:
-            import json
-
             parsed = json.loads(v)
             if isinstance(parsed, list):
                 return [str(x) for x in parsed]
@@ -344,6 +344,9 @@ class PolymarketGammaMarket(BaseModel):
     group_item_title: str | None = Field(None, alias="groupItemTitle")  # Outcome label
     # Series (league/competition grouping — populated from nested events[].series[])
     series_slug: str | None = None  # e.g. "premier-league-2025" (extracted from events)
+    # Event-level fields (populated from nested events[] in _fetch_page before validation)
+    event_title: str | None = None  # e.g. "Arsenal vs. Chelsea" (extracted from events[0].title)
+    event_slug: str | None = None  # e.g. "epl-ars-che-2026-03-22" (extracted from events[0].slug)
 
     @field_validator("outcomes", "outcome_prices", "clob_token_ids", mode="before")
     @classmethod
