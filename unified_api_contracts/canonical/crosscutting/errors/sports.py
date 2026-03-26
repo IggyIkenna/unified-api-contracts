@@ -418,9 +418,9 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Requested weather variable not available for location",
         ),
     ],
-    "soccerfootball_info": [
+    "soccer_football_info": [
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "429",
             retry=True,
             reconnect=False,
@@ -428,7 +428,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Rate limit exceeded",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "401",
             retry=False,
             reconnect=False,
@@ -436,7 +436,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Unauthorized — invalid API key",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "400",
             retry=False,
             reconnect=False,
@@ -444,7 +444,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Bad request — invalid parameters",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "500",
             retry=True,
             reconnect=False,
@@ -452,7 +452,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Internal server error",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "RAPIDAPI_SUBSCRIPTION_EXPIRED",
             retry=False,
             reconnect=False,
@@ -460,7 +460,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="RapidAPI 403 — subscription expired",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "ENDPOINT_NOT_FOUND",
             retry=False,
             reconnect=False,
@@ -468,7 +468,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Wrong URL path — e.g. /api/v1/leagues/ does not exist",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "GZIP_DECODE_ERROR",
             retry=True,
             reconnect=False,
@@ -476,7 +476,7 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
             desc="Response decompression failed",
         ),
         ve(
-            "soccerfootball_info",
+            "soccer_football_info",
             "PAGINATION_LIMIT",
             retry=True,
             reconnect=False,

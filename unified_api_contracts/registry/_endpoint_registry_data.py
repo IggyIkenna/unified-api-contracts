@@ -788,9 +788,21 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.REST_POLLING,
         data_availability=DataAvailability.BOTH,
         version="v1",
-        notes="Free, no auth. Weather forecast for commodity and sports modelling.",
+        notes="Free, no auth. Weather forecast (recent + future dates).",
         requires_auth=False,
         cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="open_meteo",
+        endpoint_path="https://archive-api.open-meteo.com/v1/archive",
+        http_method="GET",
+        schema_class="OpenMeteoResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v1",
+        notes="Free, no auth. Historical weather (dates older than ~3 months).",
+        requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
     ),
     # --- CoinGecko ---
     EndpointSpec(

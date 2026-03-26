@@ -392,7 +392,7 @@ class TestClassifyVenueError:
             "polygon",
             "transfermarkt",
             "footystats",
-            "soccerfootball_info",
+            "soccer_football_info",
             "understat",
             "open_meteo",
             "fear_greed",

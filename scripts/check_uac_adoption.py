@@ -103,7 +103,7 @@ EXEMPT_CLASSES = frozenset(
         "DataSourceMapping",
         # registry-spec: endpoint registry specification type, accessed programmatically via ENDPOINT_REGISTRY
         "EndpointSpec",
-        # re-exported-via-uic: terminal services import OddsFormat from unified_internal_contracts (UIC re-exports)
+        # re-exported-via-uic: terminal services import OddsFormat from unified_api_contracts.internal (UIC re-exports)
         "OddsFormat",
     ]
 )

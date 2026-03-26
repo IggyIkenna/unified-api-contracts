@@ -14,10 +14,12 @@ class DefiAlertType(StrEnum):
     """
 
     HEALTH_FACTOR_CRITICAL = "health_factor_critical"
+    POSITION_LIQUIDATED = "position_liquidated"
     WEETH_DEPEG = "weeth_depeg"
     AAVE_UTILIZATION_SPIKE = "aave_utilization_spike"
     FUNDING_RATE_FLIP = "funding_rate_flip"
     FEATURE_STALE = "feature_stale"
+    TX_SIMULATION_FAILED = "tx_simulation_failed"
 
 
 class DefiErrorCode:

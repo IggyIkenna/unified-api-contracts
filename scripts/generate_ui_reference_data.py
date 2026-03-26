@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import json
 import sys
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
@@ -24,7 +23,6 @@ sys.path.insert(0, str(_repo_root))
 
 from unified_api_contracts.canonical.crosscutting.errors import (
     VENUE_ERROR_MAP,
-    VenueErrorClassification,
 )
 from unified_api_contracts.canonical.crosscutting.risk_taxonomy import (
     RISK_TYPE_CATEGORIES,
@@ -135,10 +133,7 @@ def _serialize_capability_declarations() -> list[dict[str, Any]]:
             "supports_live": cap.supports_live,
             "supports_batch": cap.supports_batch,
             "supports_testnet": cap.supports_testnet,
-            "operations": {
-                domain: sorted(ops)
-                for domain, ops in sorted(cap.operations.items())
-            },
+            "operations": {domain: sorted(ops) for domain, ops in sorted(cap.operations.items())},
         }
         result.append(entry)
     return result
@@ -157,10 +152,7 @@ def _serialize_representative_sample() -> dict[str, Any]:
     return {
         "cefi_base_assets": CEFI_BASE_ASSETS,
         "tradfi_equities": {k: v for k, v in sorted(TRADFI_EQUITIES.items())},
-        "tradfi_futures": {
-            k: [list(spec) for spec in specs]
-            for k, specs in sorted(TRADFI_FUTURES.items())
-        },
+        "tradfi_futures": {k: [list(spec) for spec in specs] for k, specs in sorted(TRADFI_FUTURES.items())},
         "defi_instruments": {k: v for k, v in sorted(DEFI_INSTRUMENTS.items())},
         "defi_lending_assets": DEFI_LENDING_ASSETS,
         "defi_pool_pairs": [list(pair) for pair in DEFI_POOL_PAIRS],
@@ -172,13 +164,20 @@ def _serialize_representative_sample() -> dict[str, Any]:
 
 
 def _serialize_uic_deployment_enums() -> dict[str, list[str]]:
-    """Serialize UIC deployment enums for the UI."""
-    from unified_internal_contracts.domain.deployment_service import (
-        DeploymentCluster,
-        DeploymentOperationMode,
-        DeploymentStatus,
-        DeploymentTier,
-    )
+    """Serialize UIC deployment enums for the UI.
+
+    Returns empty dict if unified-internal-contracts is not installed
+    (UAC is T0 — cannot depend on UIC).
+    """
+    try:
+        from unified_api_contracts.internal.domain.deployment_service import (
+            DeploymentCluster,
+            DeploymentOperationMode,
+            DeploymentStatus,
+            DeploymentTier,
+        )
+    except ImportError:
+        return {}
 
     return {
         "DeploymentCluster": sorted(e.value for e in DeploymentCluster),
@@ -215,12 +214,8 @@ def generate() -> dict[str, Any]:
             "registry_name": "market_data_categories",
             "version": version,
             "entries": {
-                "data_types_by_category": {
-                    k: sorted(v) for k, v in sorted(DATA_TYPES_BY_CATEGORY.items())
-                },
-                "venues_by_category": {
-                    k: sorted(v) for k, v in sorted(VENUES_BY_CATEGORY.items())
-                },
+                "data_types_by_category": {k: sorted(v) for k, v in sorted(DATA_TYPES_BY_CATEGORY.items())},
+                "venues_by_category": {k: sorted(v) for k, v in sorted(VENUES_BY_CATEGORY.items())},
                 "timeframes": TIMEFRAMES,
             },
         },
@@ -342,12 +337,14 @@ def _build_tradfi_symbology() -> dict[str, Any]:
 
     instruments = []
     for inst in sorted(TRADFI_INSTRUMENTS, key=lambda x: x.symbol):
-        instruments.append({
-            "symbol": inst.symbol,
-            "base_asset": inst.base_asset,
-            "venue": inst.venue,
-            "instrument_type": inst.instrument_type,
-        })
+        instruments.append(
+            {
+                "symbol": inst.symbol,
+                "base_asset": inst.base_asset,
+                "venue": inst.venue,
+                "instrument_type": inst.instrument_type,
+            }
+        )
 
     venue_count = len(TRADFI_VENUE_MAPPINGS) if TRADFI_VENUE_MAPPINGS else 0
 

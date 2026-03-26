@@ -67,7 +67,7 @@ def _sources(*names: str) -> frozenset[str]:
 # Prediction leagues with all 7 sources
 PRED_FULL: frozenset[str] = _sources(
     "api_football",
-    "soccerfootball_info",
+    "soccer_football_info",
     "footystats",
     "transfermarkt",
     "understat",
@@ -78,7 +78,7 @@ PRED_FULL: frozenset[str] = _sources(
 # Prediction leagues — all sources except Understat
 PRED_NO_UNDERSTAT: frozenset[str] = _sources(
     "api_football",
-    "soccerfootball_info",
+    "soccer_football_info",
     "footystats",
     "transfermarkt",
     "odds_api",
@@ -88,7 +88,7 @@ PRED_NO_UNDERSTAT: frozenset[str] = _sources(
 # Prediction leagues — no FootyStats (subscription limit)
 PRED_NO_FOOTYSTATS: frozenset[str] = _sources(
     "api_football",
-    "soccerfootball_info",
+    "soccer_football_info",
     "transfermarkt",
     "odds_api",
     "open_meteo",

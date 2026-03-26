@@ -57,9 +57,16 @@ def normalize_footystats_match(raw: FootyStatsMatch, venue: str = "footystats") 
     )
 
     date_str = kickoff_utc.strftime("%Y%m%d")
-    fixture_id = build_fixture_id(
-        league.league_id, home_team.team_id, away_team.team_id, date_str,
-    ) if home_team.team_id and away_team.team_id else str(raw.match_id or "")
+    fixture_id = (
+        build_fixture_id(
+            league.league_id,
+            home_team.team_id,
+            away_team.team_id,
+            date_str,
+        )
+        if home_team.team_id and away_team.team_id
+        else str(raw.match_id or "")
+    )
 
     return CanonicalFixture(
         fixture_id=fixture_id,

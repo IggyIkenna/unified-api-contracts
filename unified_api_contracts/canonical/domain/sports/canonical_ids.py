@@ -97,19 +97,26 @@ def build_fixture_id(
     home_team_id: str,
     away_team_id: str,
     date_str: str,
+    time_str: str = "",
 ) -> str:
-    """Build canonical fixture ID: {LEAGUE}:{HOME}_v_{AWAY}:{YYYYMMDD}.
+    """Build canonical fixture ID: {LEAGUE}:{HOME}_v_{AWAY}:{YYYYMMDD_HHMM}.
 
     Args:
         league_id: Canonical league ID (e.g. "ENG_PREMIER_LEAGUE").
         home_team_id: Canonical home team ID (e.g. "ARSENAL").
         away_team_id: Canonical away team ID (e.g. "CHELSEA").
-        date_str: Date in any parseable format; only YYYYMMDD digits used.
+        date_str: Date in any parseable format; YYYYMMDD digits extracted.
+        time_str: Optional kickoff time. Accepts "HH:MM", "HHMM", or "HH:MM:SS".
+            If empty, only the date is used (backwards compatible).
 
     Returns:
-        Canonical fixture ID, e.g. "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322".
+        Canonical fixture ID, e.g. "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322_1500".
+        Without time: "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322".
     """
     date_digits = re.sub(r"[^0-9]", "", date_str)[:8]
+    if time_str:
+        time_digits = re.sub(r"[^0-9]", "", time_str)[:4]
+        return f"{league_id}:{home_team_id}_v_{away_team_id}:{date_digits}_{time_digits}"
     return f"{league_id}:{home_team_id}_v_{away_team_id}:{date_digits}"
 
 
@@ -206,10 +213,7 @@ def build_instrument_id(
     if point is not None:
         market = f"{market}_{_handicap_str(point)}"
 
-    return (
-        f"{sport}:{venue}:{market}:{league_id}:"
-        f"{season}:{home_team_id}-{away_team_id}::{sel}"
-    )
+    return f"{sport}:{venue}:{market}:{league_id}:{season}:{home_team_id}-{away_team_id}::{sel}"
 
 
 # ---------------------------------------------------------------------------

@@ -153,12 +153,16 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     # Build human-readable fixture ID: ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322
     # Falls back to raw API-Football numeric ID if team/league names are empty
     date_str = kickoff_utc.strftime("%Y%m%d")
-    canonical_fixture_id = build_fixture_id(
-        league_id=league.league_id,
-        home_team_id=home_team.team_id,
-        away_team_id=away_team.team_id,
-        date_str=date_str,
-    ) if home_team.team_id and away_team.team_id else raw_fixture_id
+    canonical_fixture_id = (
+        build_fixture_id(
+            league_id=league.league_id,
+            home_team_id=home_team.team_id,
+            away_team_id=away_team.team_id,
+            date_str=date_str,
+        )
+        if home_team.team_id and away_team.team_id
+        else raw_fixture_id
+    )
 
     # Build canonical season: YYYY/YY
     season_raw = raw.league.season if raw.league else None

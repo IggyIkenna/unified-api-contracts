@@ -39,6 +39,10 @@ dependencies = [
     "hypothesis>=6.0.0,<7.0.0",
     "httpx>=0.28.1,<1.0.0",
     "pyyaml>=6.0.1,<7.0.0",
+    "pandas>=2.3.0,<3.0.0",
+    "numpy>=2.3.0,<2.4.0",
+    "pyarrow>=23.0.0,<24.0.0",
+    "pandas-stubs>=2.2.0,<3.0.0",
 ]
 
 [project.urls]
@@ -106,6 +110,13 @@ max-complexity = 7
 "unified_api_contracts/odds.py" = ["F403", "F405"]
 "unified_api_contracts/options.py" = ["F403", "F405"]
 "unified_api_contracts/prediction.py" = ["F403", "F405"]
+# Internal contracts (merged from unified-internal-contracts)
+"unified_api_contracts/internal/testing/seed_*.py" = ["C901", "E501", "B007", "RUF002", "B905"]
+"unified_api_contracts/internal/testing/seed_validator.py" = ["C901", "E501"]
+"unified_api_contracts/internal/domain/cefi_accounts/schemas.py" = ["N815"]
+"unified_api_contracts/internal/domain/defi/eth_transfers.py" = ["N815"]
+"unified_api_contracts/internal/domain/defi/protocol_sdks.py" = ["N815"]
+"unified_api_contracts/internal/domain/execution_service/cex_withdrawals.py" = ["N815"]
 # Transition facades at canonical level
 "unified_api_contracts/canonical/execution.py" = ["F403", "F405"]
 "unified_api_contracts/canonical/options.py" = ["F403", "F405"]
@@ -125,7 +136,7 @@ reportUnknownMemberType = "error"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]
-exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing"]
+exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing", "unified_api_contracts/internal/testing/**", "unified_api_contracts/internal/testing"]
 
 [tool.coverage.run]
 # Transitional: exclude new-path copies until old paths are removed (citadel phase 1)
@@ -180,6 +191,8 @@ omit = [
     # Phase 7 citadel: capability registry (data declarations, not business logic)
     "unified_api_contracts/registry/capability.py",
     "unified_api_contracts/registry/capability_data.py",
+    # Internal contracts (merged from unified-internal-contracts) — coverage tracked separately
+    "unified_api_contracts/internal/*",
 ]
 
 [tool.coverage.report]

@@ -528,6 +528,24 @@ from .registry import (
     get_databento_symbols_for_venue,
     get_required_datasets,
 )
+from .sports import (
+    BUNDESLIGA_TEAM_ALIASES as BUNDESLIGA_TEAM_ALIASES,
+)
+from .sports import (
+    CANONICAL_TO_ODDS_API_BUNDESLIGA as CANONICAL_TO_ODDS_API_BUNDESLIGA,
+)
+from .sports import (
+    CANONICAL_TO_ODDS_API_EPL as CANONICAL_TO_ODDS_API_EPL,
+)
+from .sports import (
+    CANONICAL_TO_UNDERSTAT_EPL as CANONICAL_TO_UNDERSTAT_EPL,
+)
+from .sports import (
+    EPL_TEAM_ALIASES as EPL_TEAM_ALIASES,
+)
+from .sports import (
+    get_prediction_leagues as get_prediction_leagues,
+)
 
 __all__ = [
     "BINANCE_FUTURES",

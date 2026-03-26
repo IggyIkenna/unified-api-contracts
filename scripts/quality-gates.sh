@@ -12,7 +12,13 @@ MIN_COVERAGE=84
 PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
-BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py")
+BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py" "**/mapping_resolver.py")
+# Internal testing uses lazy imports to avoid hard UTL dep
+INSIDE_EXTRA_EXCLUDES=("**/internal/testing/**" "**/mapping_resolver.py")
+# __init__.py is 998L of re-exports (T0 facade); errors/defi.py is 1224L of error class defs
+SIZE_EXTRA_EXCLUDES=("./${SOURCE_DIR}/__init__.py" "./${SOURCE_DIR}/canonical/crosscutting/errors/defi.py" "./${SOURCE_DIR}/internal/__init__.py" "./${SOURCE_DIR}/internal/testing/*")
+# pygments CVE-2026-4539: no fix version available (2.19.2 is latest); transitive via pytest+rich
+PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-4539"
 # data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants
 GCP_PROJECT_ID_EXCLUDE_GLOBS=("!**/registry/data_source_continuity.py")
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
