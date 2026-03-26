@@ -38,12 +38,10 @@ class VenueMapping:
             "coinbase",  # Coinbase - spot only, for coinbase premium
             # Tier 2: Regional / specialist exchanges
             "upbit",  # Upbit (Korean exchange) - spot only, for kimchi premium
-            "gemini",  # Gemini - spot
             "bitstamp",  # Bitstamp - spot
             # Tier 3: Additional CeFi exchanges
             "huobi",  # Huobi/HTX - spot
             "huobi-dm",  # Huobi/HTX - derivatives (futures/swaps)
-            "phemex",  # Phemex - spot + derivatives
         ]
     )
 
@@ -136,12 +134,10 @@ class VenueMapping:
             "UPBIT": "upbit",
             "COINBASE": "coinbase",
             # Tier 2
-            "GEMINI-SPOT": "gemini",
             "BITSTAMP-SPOT": "bitstamp",
             # Tier 3
             "HUOBI-SPOT": "htx",  # Huobi rebranded to HTX
             "HUOBI-FUTURES": "htx",
-            "PHEMEX-SPOT": "phemex",
             # Note: ASTER not in CCXT yet
         }
     )
@@ -162,12 +158,10 @@ class VenueMapping:
             "coinbase": "COINBASE",
             # Tier 2
             "upbit": "UPBIT",
-            "gemini": "GEMINI-SPOT",
             "bitstamp": "BITSTAMP-SPOT",
             # Tier 3
             "huobi": "HUOBI-SPOT",
             "huobi-dm": "HUOBI-FUTURES",
-            "phemex": "PHEMEX-SPOT",
         }
     )
 
@@ -210,12 +204,10 @@ class VenueMapping:
             "UPBIT": "2017-10-24",
             "COINBASE": "2015-01-26",
             # CEFI - Tardis exchanges (Tier 2)
-            "GEMINI-SPOT": "2015-10-08",
             "BITSTAMP-SPOT": "2011-08-18",
             # CEFI - Tardis exchanges (Tier 3)
             "HUOBI-SPOT": "2013-09-01",
             "HUOBI-FUTURES": "2018-12-10",
-            "PHEMEX-SPOT": "2019-11-25",
             # CEFI - On-chain CLOBs
             "HYPERLIQUID": "2023-04-15",
             "ASTER": "2024-10-01",
@@ -460,14 +452,11 @@ class VenueMapping:
             # Coinbase (spot only - for coinbase premium)
             ("COINBASE", "SPOT_PAIR"): "coinbase",
             # Tier 2 exchanges (spot only)
-            ("GEMINI-SPOT", "SPOT_PAIR"): "gemini",
             ("BITSTAMP-SPOT", "SPOT_PAIR"): "bitstamp",
             # Tier 3 exchanges
             ("HUOBI-SPOT", "SPOT_PAIR"): "huobi",
             ("HUOBI-FUTURES", "PERPETUAL"): "huobi-dm",
             ("HUOBI-FUTURES", "FUTURE"): "huobi-dm",
-            ("PHEMEX-SPOT", "SPOT_PAIR"): "phemex",
-            ("PHEMEX-SPOT", "PERPETUAL"): "phemex",
         }
     )
 
@@ -486,12 +475,10 @@ class VenueMapping:
             "coinbase": ["SPOT_PAIR"],
             # Tier 2
             "upbit": ["SPOT_PAIR"],
-            "gemini": ["SPOT_PAIR"],
             "bitstamp": ["SPOT_PAIR"],
             # Tier 3
             "huobi": ["SPOT_PAIR"],
             "huobi-dm": ["PERPETUAL", "FUTURE"],
-            "phemex": ["SPOT_PAIR", "PERPETUAL"],
         }
     )
 

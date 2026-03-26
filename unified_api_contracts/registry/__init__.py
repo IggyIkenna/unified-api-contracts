@@ -30,6 +30,11 @@ from .capability_declarations import (
     DeFiDataSource,
     get_subgraph_id,
 )
+from .cefi_instrument_universe import (  # noqa: F401
+    CEFI_ACCEPTED_QUOTE_ASSETS,
+    CEFI_BASE_ASSET_UNIVERSE,
+    CEFI_OPTIONS_UNDERLYINGS,
+)
 from .data_source_continuity import (
     BARCHART_VIX_FILE_COUNT,
     BARCHART_VIX_FIRST_DATE,
@@ -47,6 +52,7 @@ from .data_source_continuity import (
     get_yahoo_vix_15m_start,
     is_vix_15m_gap_date,
 )
+from .defi_major_assets import DEFI_MAJOR_ASSET_SYMBOLS, DEX_VENUE_KEYWORDS  # noqa: F401
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
 from .endpoint_registry import (
     ENDPOINT_REGISTRY,
@@ -76,6 +82,15 @@ from .representative_sample import (
     SPORTS_LEAGUES,
     TRADFI_EQUITIES,
     TRADFI_FUTURES,
+)
+from .tradfi_instrument_universe import (  # noqa: F401
+    FX_SPOT_PAIRS,
+    TRADFI_DATABENTO_INSTRUMENTS,
+    DatabentoInstrumentDef,
+    FxSpotPairDef,
+    get_databento_symbols_for_dataset,
+    get_databento_symbols_for_venue,
+    get_required_datasets,
 )
 from .tradfi_symbology import (
     DATABENTO_VALID_OPTIONS_SYMBOLS,
