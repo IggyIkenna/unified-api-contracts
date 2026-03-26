@@ -48,6 +48,7 @@ class DatabentoInstrumentDef:
     dataset: str
     stype_in: str
     base_asset: str
+    asset_class: str = "commodity"
     exchange_code: str | None = None
     underlying: str | None = None
 
@@ -71,29 +72,31 @@ class FxSpotPairDef:
 # CME futures — index, commodity, fixed-income, FX futures
 # ---------------------------------------------------------------------------
 _CME_INDEX_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("ES.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SP500", "ES"),
-    DatabentoInstrumentDef("NQ.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NASDAQ100", "NQ"),
-    DatabentoInstrumentDef("RTY.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "RUSSELL2000", "RTY"),
-    DatabentoInstrumentDef("YM.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "DOW", "YM"),
-    DatabentoInstrumentDef("NKD.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NIKKEI225", "NKD"),
+    DatabentoInstrumentDef("ES.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SP500", "equity", "ES"),
+    DatabentoInstrumentDef("NQ.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NASDAQ100", "equity", "NQ"),
+    DatabentoInstrumentDef("RTY.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "RUSSELL2000", "equity", "RTY"),
+    DatabentoInstrumentDef("YM.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "DOW", "equity", "YM"),
+    DatabentoInstrumentDef("NKD.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NIKKEI225", "equity", "NKD"),
 ]
 
 _CME_SECTOR_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("XAF.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ENERGY_SECTOR", "XAF"),
-    DatabentoInstrumentDef("XAK.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TECH_SECTOR", "XAK"),
-    DatabentoInstrumentDef("XAY.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CONSUMER_DISC_SECTOR", "XAY"),
-    DatabentoInstrumentDef("XAP.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CONSUMER_STAPLES_SECTOR", "XAP"),
-    DatabentoInstrumentDef("XAV.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "HEALTHCARE_SECTOR", "XAV"),
-    DatabentoInstrumentDef("XAI.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "INDUSTRIALS_SECTOR", "XAI"),
-    DatabentoInstrumentDef("XAB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "MATERIALS_SECTOR", "XAB"),
-    DatabentoInstrumentDef("XAU.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "UTILITIES_SECTOR", "XAU"),
+    DatabentoInstrumentDef("XAF.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ENERGY_SECTOR", "equity", "XAF"),
+    DatabentoInstrumentDef("XAK.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TECH_SECTOR", "equity", "XAK"),
+    DatabentoInstrumentDef("XAY.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CONSUMER_DISC_SECTOR", "equity", "XAY"),
+    DatabentoInstrumentDef(
+        "XAP.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CONSUMER_STAPLES_SECTOR", "equity", "XAP"
+    ),
+    DatabentoInstrumentDef("XAV.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "HEALTHCARE_SECTOR", "equity", "XAV"),
+    DatabentoInstrumentDef("XAI.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "INDUSTRIALS_SECTOR", "equity", "XAI"),
+    DatabentoInstrumentDef("XAB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "MATERIALS_SECTOR", "equity", "XAB"),
+    DatabentoInstrumentDef("XAU.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "UTILITIES_SECTOR", "equity", "XAU"),
 ]
 
 _CME_TREASURY_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("ZT.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_2Y", "ZT"),
-    DatabentoInstrumentDef("ZF.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_5Y", "ZF"),
-    DatabentoInstrumentDef("ZN.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_10Y", "ZN"),
-    DatabentoInstrumentDef("ZB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_30Y", "ZB"),
+    DatabentoInstrumentDef("ZT.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_2Y", "fixed_income", "ZT"),
+    DatabentoInstrumentDef("ZF.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_5Y", "fixed_income", "ZF"),
+    DatabentoInstrumentDef("ZN.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_10Y", "fixed_income", "ZN"),
+    DatabentoInstrumentDef("ZB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "TREASURY_30Y", "fixed_income", "ZB"),
 ]
 
 _CME_COMMODITY_FUTURES: list[DatabentoInstrumentDef] = [
@@ -115,21 +118,21 @@ _CME_COMMODITY_FUTURES: list[DatabentoInstrumentDef] = [
 ]
 
 _CME_FX_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("6E.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "EUR", "6E"),
-    DatabentoInstrumentDef("6B.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GBP", "6B"),
-    DatabentoInstrumentDef("6J.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "JPY", "6J"),
-    DatabentoInstrumentDef("6A.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "AUD", "6A"),
-    DatabentoInstrumentDef("6C.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CAD", "6C"),
-    DatabentoInstrumentDef("6N.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NZD", "6N"),
-    DatabentoInstrumentDef("6S.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CHF", "6S"),
-    DatabentoInstrumentDef("6M.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "MXN", "6M"),
-    DatabentoInstrumentDef("6Z.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ZAR", "6Z"),
-    DatabentoInstrumentDef("6L.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BRL", "6L"),
+    DatabentoInstrumentDef("6E.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "EUR", "fx", "6E"),
+    DatabentoInstrumentDef("6B.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GBP", "fx", "6B"),
+    DatabentoInstrumentDef("6J.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "JPY", "fx", "6J"),
+    DatabentoInstrumentDef("6A.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "AUD", "fx", "6A"),
+    DatabentoInstrumentDef("6C.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CAD", "fx", "6C"),
+    DatabentoInstrumentDef("6N.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NZD", "fx", "6N"),
+    DatabentoInstrumentDef("6S.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CHF", "fx", "6S"),
+    DatabentoInstrumentDef("6M.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "MXN", "fx", "6M"),
+    DatabentoInstrumentDef("6Z.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ZAR", "fx", "6Z"),
+    DatabentoInstrumentDef("6L.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BRL", "fx", "6L"),
 ]
 
 _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("BTC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BTC", "BTC"),
-    DatabentoInstrumentDef("ETH.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "ETH"),
+    DatabentoInstrumentDef("BTC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BTC", "crypto", "BTC"),
+    DatabentoInstrumentDef("ETH.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "crypto", "ETH"),
 ]
 
 # CME options — disabled for now (5,990 instruments per day, too much data).
