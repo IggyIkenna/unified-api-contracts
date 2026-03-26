@@ -5,7 +5,7 @@ Provides canonical venue mappings, data type configurations, and exchange settin
 used across all services in the unified trading system.
 
 This is the SSOT for venue identity concepts. Previously duplicated in:
-- unified-config-interface/unified_config_interface/venue_config.py
+- unified-config-interface/unified_trading_library.config_interface/venue_config.py
 - unified-market-interface/unified_market_interface/models/venue_config.py
 
 Moved to unified-api-contracts (T0) because venue identity is a contracts-level

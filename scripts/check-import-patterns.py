@@ -22,9 +22,9 @@ logger = logging.getLogger(__name__)
 
 # External packages that should only use top-level imports
 EXTERNAL_PACKAGES = {
-    "unified_config_interface",
+    "unified_trading_library.config_interface",
     "unified_config_service",
-    "unified_events_interface",
+    "unified_trading_library.events_interface",
     "unified_domain_client",
     "unified_trading_library",
     "unified_market_interface",

@@ -38,7 +38,7 @@ class InstrumentKey:
     Used for canonical instrument identification across all services.
 
     Fields use plain ``str`` so this class has no dependency on
-    ``unified_config_interface`` enums — callers that need enum-validated
+    ``unified_trading_library.config_interface`` enums — callers that need enum-validated
     fields should use ``unified_domain_client.schemas.instrument_key``
     which wraps this class with Venue/InstrumentType enum coercion.
 
