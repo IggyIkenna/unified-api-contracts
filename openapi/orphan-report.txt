@@ -1,6 +1,6 @@
 # Orphan Report: Domain models not exposed by any service endpoint
-# Generated from 22 services
-# Total schemas in spec: 38
+# Generated from 25 services
+# Total schemas in spec: 78
 # Orphaned models: 573
 
 UAC: AaveBorrowParams
