@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
-# Generated from 10 services
-# Total schemas in spec: 93
-# Orphaned models: 554
+# Generated from 22 services
+# Total schemas in spec: 38
+# Orphaned models: 573
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -10,6 +10,7 @@ UAC: AaveRepayParams
 UAC: AaveV3ReserveData
 UAC: AaveV3UserAccountData
 UAC: AaveV3UserReserveData
+UAC: AggregatedPosition
 UAC: AlternativeDataSignal
 UAC: ArbitrageMarket
 UAC: ArbitrageOpportunity
@@ -44,6 +45,7 @@ UAC: BybitWithdrawResponse
 UAC: CLVRecord
 UAC: CanonicalAccountSnapshot
 UAC: CanonicalAccountState
+UAC: CanonicalBalance
 UAC: CanonicalBase
 UAC: CanonicalBetMarket
 UAC: CanonicalBetOrder
@@ -134,6 +136,9 @@ UAC: CurveWithdrawParams
 UAC: DarkPoolPrintRecord
 UAC: DataSourceRoute
 UAC: DatabentoReferenceInstrument
+UAC: DeFiAggregatedHealth
+UAC: DeFiLPAggregatedMetrics
+UAC: DeFiStakingAggregatedMetrics
 UAC: DepositAddress
 UAC: DepositRecord
 UAC: DeribitAccountSummaryResponse
@@ -195,6 +200,7 @@ UAC: InternalTransfer
 UAC: KalshiMarket
 UAC: KalshiOrderBook
 UAC: KalshiTrade
+UAC: LPProtocolBreakdown
 UAC: LatencyBenchmarkReport
 UAC: LatencyPercentile
 UAC: LidoRequestWithdrawalsParams
@@ -246,7 +252,10 @@ UAC: PolygonTicker
 UAC: PolygonTickersResponse
 UAC: PolymarketGammaMarket
 UAC: PolymarketPosition
+UAC: PortfolioGreeksSnapshot
 UAC: PortfolioMarginAccount
+UAC: PortfolioPnLAttribution
+UAC: PortfolioView
 UAC: PositionRisk
 UAC: PredictionMarketUniverse
 UAC: PrimeBrokerAccount
@@ -256,14 +265,19 @@ UAC: PrimeBrokerMarginCall
 UAC: PrimeBrokerPosition
 UAC: ProbabilityBucket
 UAC: ProcessedOddsOutput
+UAC: ProtocolHealthBreakdown
 UAC: ProviderBinding
 UAC: RateLimitResponse
+UAC: RiskGroupSummary
 UAC: SatelliteObservation
 UAC: ScraperVersionMeta
 UAC: SentimentScore
 UAC: SettlementEvent
+UAC: SportsArbLeg
+UAC: SportsArbPosition
 UAC: SportsbookLink
 UAC: SpreadLeg
+UAC: StakingProtocolBreakdown
 UAC: SubAccount
 UAC: SubMillisecondLatencyRecord
 UAC: TardisAvailableSymbol
@@ -272,6 +286,7 @@ UAC: TardisInstrumentDetail
 UAC: TeamMapping
 UAC: TickToTradeMetric
 UAC: TradFiInstrumentDef
+UAC: UnderlyingGreeksBreakdown
 UAC: UniswapV3PoolStateResponse
 UAC: UniswapV3QuoteResponse
 UAC: UniswapV3SwapTxReceipt
@@ -280,6 +295,7 @@ UAC: UpbitTicker
 UAC: UpbitWithdrawRequest
 UAC: UpbitWithdrawResponse
 UAC: VenueExecutionProfile
+UAC: VenuePositionBreakdown
 UAC: VenueRateLimitSpec
 UAC: VmQuotaShape
 UAC: VolSmilePoint
@@ -307,6 +323,7 @@ UIC: BackfillSpec
 UIC: BacktestExperimentConfig
 UIC: BacktestFixedConfig
 UIC: Balance
+UIC: BalanceReconciliationSnapshot
 UIC: BetCancelledEvent
 UIC: BetFilledEvent
 UIC: BetPlacedEvent
@@ -376,6 +393,7 @@ UIC: DeploymentState
 UIC: DepositAddress
 UIC: DepositRecord
 UIC: DerivativeTickerMessage
+UIC: DeviationState
 UIC: EODSettlementTrigger
 UIC: EmergencyExitPlaybook
 UIC: EmergencyExitStep
@@ -476,6 +494,7 @@ UIC: PersistenceCompletedDetails
 UIC: PersistenceStartedDetails
 UIC: PnLAttributionRecord
 UIC: PnLBreakdown
+UIC: PnLReconciliationSnapshot
 UIC: PoissonGLMHyperparams
 UIC: PortfolioMarginAccount
 UIC: PositionUpdateMessage

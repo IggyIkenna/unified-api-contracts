@@ -6,7 +6,14 @@ from unified_api_contracts.internal.domain.defi.eth_transfers import (
     EthSendTransactionRequest,
     EthTransactionRequest,
 )
-from unified_api_contracts.internal.domain.defi.gas_cost import GasCostAction, GasCostEstimate
+from unified_api_contracts.internal.domain.defi.gas_cost import (
+    BlockGasFee,
+    EthBalanceImpact,
+    GasCostAction,
+    GasCostEstimate,
+    GasFeeSnapshot,
+    InstructionGasCost,
+)
 from unified_api_contracts.internal.domain.defi.protocol_data import (
     LendingRate,
     LiquidityPool,
@@ -48,6 +55,15 @@ from unified_api_contracts.internal.domain.defi.protocol_sdks import (
     UniswapV3QuoteResponse,
     UniswapV3SwapTxReceipt,
 )
+from unified_api_contracts.internal.domain.defi.transfers import (
+    AlchemyTransferRecord,
+    AlchemyTransfersResponse,
+    BridgeProtocol,
+    TransferConfirmation,
+    TransferRecord,
+    TransferStatus,
+    TransferType,
+)
 from unified_api_contracts.internal.domain.features_onchain.eth_transfers import (
     Erc20TransferCalldata,
     EthSendRawTransactionRequest,
@@ -65,6 +81,10 @@ __all__ = [
     "AaveV3ReserveData",
     "AaveV3UserAccountData",
     "AaveV3UserReserveData",
+    "AlchemyTransferRecord",
+    "AlchemyTransfersResponse",
+    "BlockGasFee",
+    "BridgeProtocol",
     "CompoundV3MarketInfo",
     "CompoundV3UserPosition",
     "CurveDepositParams",
@@ -72,6 +92,7 @@ __all__ = [
     "CurveWithdrawParams",
     "Erc20TransferCalldata",
     "Erc20TransferFromCalldata",
+    "EthBalanceImpact",
     "EthSendRawTransactionRequest",
     "EthSendRawTransactionResponse",
     "EthSendTransactionRequest",
@@ -88,6 +109,8 @@ __all__ = [
     "FluidRepayParams",
     "GasCostAction",
     "GasCostEstimate",
+    "GasFeeSnapshot",
+    "InstructionGasCost",
     "LendingRate",
     "LidoRequestWithdrawalsParams",
     "LidoSubmitParams",
@@ -102,6 +125,10 @@ __all__ = [
     "MorphoUserPosition",
     "OraclePrice",
     "StakingRate",
+    "TransferConfirmation",
+    "TransferRecord",
+    "TransferStatus",
+    "TransferType",
     "UniswapV3PoolStateResponse",
     "UniswapV3QuoteResponse",
     "UniswapV3SwapTxReceipt",

@@ -15,6 +15,7 @@ Usage:
 
 from __future__ import annotations
 
+import fnmatch
 import json
 import logging
 from datetime import UTC, date, datetime, timedelta
@@ -280,7 +281,7 @@ class SyntheticDataGenerator:
             apy[i] = max(0.0, apy[i - 1] + mean_rev + noise)
 
         # Deferred import: UTL depends on UCI; eager import creates circular chain.
-        from unified_trading_library import (
+        from unified_trading_library import (  # noqa: qg-inside-import
             apy_to_cumulative_index,
         )
 
@@ -346,7 +347,7 @@ class SyntheticDataGenerator:
                 apy[i] = max(0.001, apy[i - 1] + mean_rev + noise)
 
             # Deferred import: UTL depends on UCI; eager import creates circular chain.
-            from unified_trading_library import staking_rate_to_index
+            from unified_trading_library import staking_rate_to_index  # noqa: qg-inside-import
 
             apy_list: list[float] = [float(v) for v in apy]
             index_values = staking_rate_to_index(apy_list, timestamps, base=1.0)
@@ -612,8 +613,6 @@ class SyntheticDataGenerator:
     @staticmethod
     def _matches_any_pattern(key: str, patterns: list[str]) -> bool:
         """Check if instrument_key matches any of the glob patterns."""
-        import fnmatch
-
         return any(fnmatch.fnmatch(key, p) or p == key for p in patterns)
 
     def generate_tick_trades(

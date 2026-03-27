@@ -39,7 +39,7 @@ _league_mapping_df: pd.DataFrame | None = None
 def _get_mapping_bucket() -> str:
     """Resolve the instruments-store-sports bucket name."""
     try:
-        from unified_trading_library import UnifiedCloudConfig
+        from unified_trading_library import UnifiedCloudConfig  # noqa: qg-inside-import
 
         cfg = UnifiedCloudConfig()
         project = cfg.gcp_project_id or "test-project"

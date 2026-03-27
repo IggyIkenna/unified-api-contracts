@@ -7,6 +7,7 @@ produces identical synthetic data — the seed is baked into the YAML.
 
 from __future__ import annotations
 
+import fnmatch
 from enum import StrEnum
 from pathlib import Path
 
@@ -80,8 +81,6 @@ class FaultConfig(BaseModel):
 
         Checks per-instrument rules first, falls back to global rate.
         """
-        import fnmatch
-
         for rule in self.instrument_faults:
             if fnmatch.fnmatch(instrument_key, rule.pattern):
                 override = getattr(rule, field, None)
