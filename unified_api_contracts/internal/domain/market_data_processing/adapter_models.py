@@ -200,6 +200,11 @@ class CandleOutput:
     # DeFi yield fields
     yield_apy: object = None
 
+    # Data quality / staleness (seconds since last real observation)
+    # Used by vol surface fitters to weight/exclude stale LOCF data.
+    # 0 = fresh observation in this interval. >0 = LOCF-filled, stale by N seconds.
+    staleness_seconds: object = None
+
     def to_dataframe(self) -> pd.DataFrame:
         """Convert non-None array fields to a pandas DataFrame.
 
