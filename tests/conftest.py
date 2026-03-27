@@ -73,7 +73,11 @@ def mock_secret_client(monkeypatch: pytest.MonkeyPatch) -> MagicMock | None:
     """Prevent real secret access when UCI is on the path (e.g. workspace). No-op otherwise."""
     import importlib.util
 
-    if importlib.util.find_spec("unified_trading_library.config_interface") is None:
+    try:
+        spec = importlib.util.find_spec("unified_trading_library.config_interface")
+    except ModuleNotFoundError:
+        return None
+    if spec is None:
         return None
     mock = MagicMock(return_value="fake-secret-value")
     monkeypatch.setattr("unified_trading_library.config_interface.get_secret", mock, raising=False)
