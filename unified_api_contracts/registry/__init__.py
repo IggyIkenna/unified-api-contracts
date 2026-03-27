@@ -86,8 +86,10 @@ from .representative_sample import (
 from .tradfi_instrument_universe import (  # noqa: F401
     FX_SPOT_PAIRS,
     TRADFI_DATABENTO_INSTRUMENTS,
+    YAHOO_INDICES,
     DatabentoInstrumentDef,
     FxSpotPairDef,
+    YahooIndexDef,
     get_databento_symbols_for_dataset,
     get_databento_symbols_for_venue,
     get_required_datasets,

@@ -181,6 +181,26 @@ FX_SPOT_PAIRS: list[FxSpotPairDef] = [
     FxSpotPairDef("KRW", "USD", "KRWUSD=X"),
 ]
 
+
+@dataclass(frozen=True, slots=True)
+class YahooIndexDef:
+    """A static index definition fetched via Yahoo Finance (daily close).
+
+    Used for indices that aren't directly tradeable via Databento
+    but are needed for features (VIX, DXY, etc.).
+    """
+
+    symbol: str
+    venue: str
+    base_asset: str
+    yahoo_ticker: str
+    asset_class: str = "equity"
+
+
+YAHOO_INDICES: list[YahooIndexDef] = [
+    YahooIndexDef("VIX", "CBOE", "VIX", "^VIX", "equity"),
+]
+
 # ---------------------------------------------------------------------------
 # Exchange code → human-readable name (for display / grouping)
 # ---------------------------------------------------------------------------
