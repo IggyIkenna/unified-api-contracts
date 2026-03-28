@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
-# Generated from 24 services
-# Total schemas in spec: 81
-# Orphaned models: 575
+# Generated from 25 services
+# Total schemas in spec: 85
+# Orphaned models: 573
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -179,11 +179,8 @@ UAC: FluidRepayParams
 UAC: FundingRateHistory
 UAC: HttpRateLimitHeaders
 UAC: HyblockLiquidationLevelEntry
-UAC: HyblockLiquidationLevelRequest
 UAC: HyblockLiquidationLevelResponse
 UAC: HyblockOIClusterEntry
-UAC: HyblockOIClusterRequest
-UAC: HyblockOIClusterResponse
 UAC: HyperliquidAssetInfo
 UAC: HyperliquidFill
 UAC: HyperliquidFundingHistoryEntry
@@ -208,7 +205,6 @@ UAC: LidoSubmitParams
 UAC: LidoSubmitResponse
 UAC: LidoWstEthWrapResponse
 UAC: LineupPlayer
-UAC: LiquidationHeatmapRequest
 UAC: LiquidationHeatmapResponse
 UAC: LiquidationLevel
 UAC: LiveMatchState
@@ -395,6 +391,9 @@ UIC: DepositRecord
 UIC: DerivativeTickerMessage
 UIC: DeviationState
 UIC: DriftMarketInfo
+UIC: DriftOrderParams
+UIC: DriftOrderResult
+UIC: DriftPosition
 UIC: EODSettlementTrigger
 UIC: EmergencyExitPlaybook
 UIC: EmergencyExitStep
@@ -445,7 +444,6 @@ UIC: InferenceRequest
 UIC: InferenceResult
 UIC: InstrumentDefinition
 UIC: InstrumentFaultRule
-UIC: InstrumentOverride
 UIC: InstrumentRecord
 UIC: InternalOptionsChainSnapshot
 UIC: InternalPosition

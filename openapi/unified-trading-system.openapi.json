@@ -13190,6 +13190,703 @@
         }
       }
     },
+    "/execution-service/manual/instruction": {
+      "post": {
+        "tags": [
+          "execution-service",
+          "manual-trading"
+        ],
+        "summary": "Submit Manual Instruction",
+        "description": "Submit manual instruction from operator UI.\n\nValidates request, logs event, routes to orchestrator (same path as automated strategies).\n\nArgs:\n    request: Manual instruction request\n    http_request: FastAPI request object\n\nReturns:\n    Instruction ID and status\n\nRaises:\n    HTTPException: If validation fails or execution errors",
+        "operationId": "submit_manual_instruction_manual_instruction_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ManualInstructionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManualInstructionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-service/manual/cancel": {
+      "post": {
+        "tags": [
+          "execution-service",
+          "manual-trading"
+        ],
+        "summary": "Cancel Manual Instruction",
+        "description": "Cancel manual instruction.\n\nArgs:\n    request: Cancel instruction request\n\nReturns:\n    Instruction ID and status\n\nRaises:\n    HTTPException: If orchestrator not initialized",
+        "operationId": "cancel_manual_instruction_manual_cancel_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelInstructionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Cancel Manual Instruction Manual Cancel Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-service/manual/amend": {
+      "post": {
+        "tags": [
+          "execution-service",
+          "manual-trading"
+        ],
+        "summary": "Amend Manual Instruction",
+        "description": "Amend manual instruction.\n\nArgs:\n    request: Amend instruction request\n\nReturns:\n    Instruction ID and status\n\nRaises:\n    HTTPException: If orchestrator not initialized",
+        "operationId": "amend_manual_instruction_manual_amend_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AmendInstructionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Amend Manual Instruction Manual Amend Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-service/manual/instructions/{instruction_id}": {
+      "get": {
+        "tags": [
+          "execution-service",
+          "manual-trading"
+        ],
+        "summary": "Get Instruction Status",
+        "description": "Get status of manual instruction.\n\nArgs:\n    instruction_id: Instruction ID\n\nReturns:\n    Instruction status and fills",
+        "operationId": "get_instruction_status_manual_instructions__instruction_id__get",
+        "parameters": [
+          {
+            "name": "instruction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Instruction Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Instruction Status Manual Instructions  Instruction Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-service/manual/venues": {
+      "get": {
+        "tags": [
+          "execution-service",
+          "manual-trading"
+        ],
+        "summary": "Get Supported Venues",
+        "description": "Return dynamically resolved venue list from UAC capability registry.",
+        "operationId": "get_supported_venues_manual_venues_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "type": "object",
+                  "title": "Response Get Supported Venues Manual Venues Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-service/manual/algos": {
+      "get": {
+        "tags": [
+          "execution-service",
+          "manual-trading"
+        ],
+        "summary": "Get Supported Algos",
+        "description": "Return supported execution algorithms.\n\nReturns a default algo list. Per-venue refinement can be added later.",
+        "operationId": "get_supported_algos_manual_algos_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "type": "object",
+                  "title": "Response Get Supported Algos Manual Algos Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/execution-service/kill-switch/activate": {
+      "post": {
+        "summary": "Activate Kill Switch",
+        "operationId": "activate_kill_switch_kill_switch_activate_post",
+        "parameters": [
+          {
+            "name": "auto_deactivate_after_minutes",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Auto Deactivate After Minutes"
+            }
+          },
+          {
+            "name": "api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Api-Key"
+            }
+          },
+          {
+            "name": "X-Service-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/kill-switch/deactivate": {
+      "post": {
+        "summary": "Deactivate Kill Switch",
+        "operationId": "deactivate_kill_switch_kill_switch_deactivate_post",
+        "parameters": [
+          {
+            "name": "api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Api-Key"
+            }
+          },
+          {
+            "name": "X-Service-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/kill-switch/status": {
+      "get": {
+        "summary": "Kill Switch Status",
+        "operationId": "kill_switch_status_kill_switch_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/health": {
+      "get": {
+        "summary": "Health",
+        "description": "Liveness probe \u2014 returns 200 when the process is running.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "boolean"
+                      }
+                    ]
+                  },
+                  "type": "object",
+                  "title": "Response Health Health Get"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/ready": {
+      "get": {
+        "summary": "Ready",
+        "description": "Readiness probe \u2014 returns 200 only when order recovery is complete.\n\nReturns 503 with status=starting if recovery has not yet finished.\nReturns 200 with status=ready once recovery is complete.",
+        "operationId": "ready_ready_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/readiness": {
+      "get": {
+        "summary": "Readiness",
+        "description": "Readiness probe \u2014 verifies critical subsystems are initialised.\n\nChecks:\n- Auth and limiter are wired (startup event has completed).\nRaises 503 if the service is not ready to handle requests.",
+        "operationId": "readiness_readiness_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/admin/drain": {
+      "post": {
+        "summary": "Admin Drain",
+        "description": "Activate drain mode \u2014 complete in-flight orders, reject new with 503.\n\nCalled by deployment workflows before a rolling update.",
+        "operationId": "admin_drain_admin_drain_post",
+        "parameters": [
+          {
+            "name": "api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Api-Key"
+            }
+          },
+          {
+            "name": "X-Service-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "title": "Response Admin Drain Admin Drain Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/admin/resume": {
+      "post": {
+        "summary": "Admin Resume",
+        "description": "Exit drain mode \u2014 resume accepting new orders.\n\nCalled by deployment workflows after a rolling update completes.",
+        "operationId": "admin_resume_admin_resume_post",
+        "parameters": [
+          {
+            "name": "api-key",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Api-Key"
+            }
+          },
+          {
+            "name": "X-Service-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Service-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "title": "Response Admin Resume Admin Resume Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/admin/drain/status": {
+      "get": {
+        "summary": "Admin Drain Status",
+        "description": "Return current drain mode status.",
+        "operationId": "admin_drain_status_admin_drain_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "boolean"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
+                  },
+                  "type": "object",
+                  "title": "Response Admin Drain Status Admin Drain Status Get"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
+    "/execution-service/admin/positions/snapshot": {
+      "get": {
+        "summary": "Admin Positions Snapshot",
+        "description": "Return serialized snapshot of all open positions.\n\nCalled by reconcile-positions.sh before and after deploy to diff.",
+        "operationId": "admin_positions_snapshot_admin_positions_snapshot_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object",
+                  "title": "Response Admin Positions Snapshot Admin Positions Snapshot Get"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "execution-service"
+        ]
+      }
+    },
     "/risk-and-exposure-service/health": {
       "get": {
         "tags": [
@@ -18664,6 +19361,298 @@
         "title": "UserInfo",
         "description": "User info returned after login."
       },
+      "AmendInstructionRequest": {
+        "properties": {
+          "instruction_id": {
+            "type": "string",
+            "title": "Instruction Id",
+            "description": "ID of instruction to amend"
+          },
+          "new_quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "New Quantity",
+            "description": "New quantity"
+          },
+          "new_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Price",
+            "description": "New limit price"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "title": "Reason",
+            "description": "Reason for amendment (FCA audit)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instruction_id",
+          "new_quantity",
+          "reason"
+        ],
+        "title": "AmendInstructionRequest",
+        "description": "Request schema for amending manual instruction."
+      },
+      "CancelInstructionRequest": {
+        "properties": {
+          "instruction_id": {
+            "type": "string",
+            "title": "Instruction Id",
+            "description": "ID of instruction to cancel"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "title": "Reason",
+            "description": "Reason for cancellation (FCA audit)"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instruction_id",
+          "reason"
+        ],
+        "title": "CancelInstructionRequest",
+        "description": "Request schema for cancelling manual instruction."
+      },
+      "ManualInstructionRequest": {
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "title": "Client Id",
+            "description": "Client ID (for multi-tenant tracking)",
+            "pii": true
+          },
+          "strategy_id": {
+            "type": "string",
+            "title": "Strategy Id",
+            "description": "Strategy ID (default: manual_strategy)",
+            "default": "manual_strategy"
+          },
+          "instruction_type": {
+            "type": "string",
+            "title": "Instruction Type",
+            "description": "TRADE, SWAP, LEND, BORROW, STAKE, etc.",
+            "default": "TRADE"
+          },
+          "venue": {
+            "type": "string",
+            "title": "Venue",
+            "description": "Venue (binance, deribit, bybit, etc.)"
+          },
+          "instrument_id": {
+            "type": "string",
+            "title": "Instrument Id",
+            "description": "Instrument (BTC-USDT, ETH-USD-PERP, etc.)"
+          },
+          "side": {
+            "type": "string",
+            "title": "Side",
+            "description": "BUY or SELL"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "number",
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              }
+            ],
+            "title": "Quantity",
+            "description": "Order quantity (must be > 0)"
+          },
+          "price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Price",
+            "description": "Limit price (None = market order)"
+          },
+          "algo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Algo",
+            "description": "Algorithm (MARKET, TWAP, VWAP, ICEBERG)"
+          },
+          "algo_params": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Algo Params",
+            "description": "Algorithm parameters"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 10,
+            "title": "Reason",
+            "description": "Reason for this manual instruction (FCA audit requirement)",
+            "default": "manual_trade"
+          },
+          "execution_mode": {
+            "type": "string",
+            "title": "Execution Mode",
+            "description": "execute (route to venue) or record_only (direct fill recording)",
+            "default": "execute"
+          },
+          "portfolio_id": {
+            "type": "string",
+            "title": "Portfolio Id",
+            "description": "Portfolio/book identifier",
+            "default": ""
+          },
+          "category": {
+            "type": "string",
+            "title": "Category",
+            "description": "Instrument category (cefi, defi, sports, prediction)",
+            "default": ""
+          },
+          "counterparty": {
+            "type": "string",
+            "title": "Counterparty",
+            "description": "OTC counterparty identifier",
+            "default": ""
+          },
+          "source_reference": {
+            "type": "string",
+            "title": "Source Reference",
+            "description": "External trade ID (exchange ref, broker confirm)",
+            "default": ""
+          }
+        },
+        "type": "object",
+        "required": [
+          "client_id",
+          "venue",
+          "instrument_id",
+          "side",
+          "quantity"
+        ],
+        "title": "ManualInstructionRequest",
+        "description": "Request schema for manual instruction entry.\n\nSupports two execution modes:\n- execute: route to venue via orchestrator (normal flow, same as automated)\n- record_only: skip venue, record fill directly (OTC, missed trades, simulation)",
+        "example": {
+          "algo": "TWAP",
+          "algo_params": {
+            "duration_minutes": 30,
+            "num_slices": 10
+          },
+          "category": "cefi",
+          "client_id": "client_123",
+          "counterparty": "",
+          "execution_mode": "execute",
+          "instruction_type": "TRADE",
+          "instrument_id": "BTC-USDT",
+          "portfolio_id": "",
+          "price": 50000.0,
+          "quantity": 1.5,
+          "reason": "portfolio_rebalancing_trade",
+          "side": "BUY",
+          "source_reference": "",
+          "strategy_id": "manual_strategy",
+          "venue": "binance"
+        }
+      },
+      "ManualInstructionResponse": {
+        "properties": {
+          "instruction_id": {
+            "type": "string",
+            "title": "Instruction Id",
+            "description": "Generated instruction ID"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "SUBMITTED, REJECTED, FAILED"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message",
+            "description": "Status message"
+          },
+          "estimated_completion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimated Completion",
+            "description": "Estimated completion time (ISO format)"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error",
+            "description": "Error message if failed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "instruction_id",
+          "status",
+          "message"
+        ],
+        "title": "ManualInstructionResponse",
+        "description": "Response schema for manual instruction submission.",
+        "example": {
+          "estimated_completion": "2026-02-16T10:40:45Z",
+          "instruction_id": "manual-20260216-103045-ABC123",
+          "message": "Instruction submitted successfully",
+          "status": "SUBMITTED"
+        }
+      },
       "AlertContextData": {
         "properties": {
           "client_id": {
@@ -20787,6 +21776,10 @@
     {
       "name": "alerting-service",
       "description": "alerting-service"
+    },
+    {
+      "name": "execution-service",
+      "description": "Execution Services API"
     },
     {
       "name": "risk-and-exposure-service",

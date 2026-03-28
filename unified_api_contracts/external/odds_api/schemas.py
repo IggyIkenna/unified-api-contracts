@@ -25,6 +25,8 @@ class OddsApiOutcome(BaseModel):
 class OddsApiMarket(BaseModel):
     """Market from The Odds API."""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     key: str | None = None
     last_update: str | None = Field(None, alias="lastUpdate")
     outcomes: list[OddsApiOutcome] | None = None
@@ -32,6 +34,8 @@ class OddsApiMarket(BaseModel):
 
 class OddsApiBookmaker(BaseModel):
     """Bookmaker from The Odds API."""
+
+    model_config = ConfigDict(populate_by_name=True)
 
     key: str | None = None
     title: str | None = None

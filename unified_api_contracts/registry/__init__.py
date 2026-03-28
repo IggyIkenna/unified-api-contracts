@@ -61,7 +61,13 @@ from .data_source_continuity import (
     get_yahoo_vix_15m_start,
     is_vix_15m_gap_date,
 )
-from .defi_major_assets import DEFI_MAJOR_ASSET_SYMBOLS, DEX_VENUE_KEYWORDS  # noqa: F401
+from .defi_major_assets import (  # noqa: F401
+    DEFI_MAJOR_ASSET_ADDRESS_LIST,
+    DEFI_MAJOR_ASSET_ADDRESSES,
+    DEFI_MAJOR_ASSET_SYMBOLS,
+    DEX_VENUE_KEYWORDS,
+)
+from .session_times import SessionTimes, get_session_times, is_trading_hours  # noqa: F401
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
 from .endpoint_registry import (
     ENDPOINT_REGISTRY,

@@ -490,7 +490,7 @@
           "standard"
         ],
         "version": "0.1.22",
-        "ci_status": "FAILING",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": 53,
         "testing_level": "integration",
         "status": "active",
@@ -556,7 +556,7 @@
           "standard"
         ],
         "version": "0.3.1",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 73,
         "testing_level": "integration",
         "status": "active",
@@ -843,7 +843,7 @@
           "cross-domain"
         ],
         "version": "0.1.20",
-        "ci_status": "FAILING",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": 85,
         "testing_level": "unit",
         "status": "active",
@@ -910,7 +910,7 @@
           "standard"
         ],
         "version": "1.2.0",
-        "ci_status": "FAILING",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": 93,
         "testing_level": "none",
         "status": "active",
