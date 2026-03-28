@@ -13190,703 +13190,6 @@
         }
       }
     },
-    "/execution-service/manual/instruction": {
-      "post": {
-        "tags": [
-          "execution-service",
-          "manual-trading"
-        ],
-        "summary": "Submit Manual Instruction",
-        "description": "Submit manual instruction from operator UI.\n\nValidates request, logs event, routes to orchestrator (same path as automated strategies).\n\nArgs:\n    request: Manual instruction request\n    http_request: FastAPI request object\n\nReturns:\n    Instruction ID and status\n\nRaises:\n    HTTPException: If validation fails or execution errors",
-        "operationId": "submit_manual_instruction_manual_instruction_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ManualInstructionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ManualInstructionResponse"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/execution-service/manual/cancel": {
-      "post": {
-        "tags": [
-          "execution-service",
-          "manual-trading"
-        ],
-        "summary": "Cancel Manual Instruction",
-        "description": "Cancel manual instruction.\n\nArgs:\n    request: Cancel instruction request\n\nReturns:\n    Instruction ID and status\n\nRaises:\n    HTTPException: If orchestrator not initialized",
-        "operationId": "cancel_manual_instruction_manual_cancel_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CancelInstructionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "type": "object",
-                  "title": "Response Cancel Manual Instruction Manual Cancel Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/execution-service/manual/amend": {
-      "post": {
-        "tags": [
-          "execution-service",
-          "manual-trading"
-        ],
-        "summary": "Amend Manual Instruction",
-        "description": "Amend manual instruction.\n\nArgs:\n    request: Amend instruction request\n\nReturns:\n    Instruction ID and status\n\nRaises:\n    HTTPException: If orchestrator not initialized",
-        "operationId": "amend_manual_instruction_manual_amend_post",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AmendInstructionRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "type": "string"
-                  },
-                  "type": "object",
-                  "title": "Response Amend Manual Instruction Manual Amend Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/execution-service/manual/instructions/{instruction_id}": {
-      "get": {
-        "tags": [
-          "execution-service",
-          "manual-trading"
-        ],
-        "summary": "Get Instruction Status",
-        "description": "Get status of manual instruction.\n\nArgs:\n    instruction_id: Instruction ID\n\nReturns:\n    Instruction status and fills",
-        "operationId": "get_instruction_status_manual_instructions__instruction_id__get",
-        "parameters": [
-          {
-            "name": "instruction_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Instruction Id"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": true,
-                  "title": "Response Get Instruction Status Manual Instructions  Instruction Id  Get"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/execution-service/manual/venues": {
-      "get": {
-        "tags": [
-          "execution-service",
-          "manual-trading"
-        ],
-        "summary": "Get Supported Venues",
-        "description": "Return dynamically resolved venue list from UAC capability registry.",
-        "operationId": "get_supported_venues_manual_venues_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "items": {
-                      "type": "string"
-                    },
-                    "type": "array"
-                  },
-                  "type": "object",
-                  "title": "Response Get Supported Venues Manual Venues Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/execution-service/manual/algos": {
-      "get": {
-        "tags": [
-          "execution-service",
-          "manual-trading"
-        ],
-        "summary": "Get Supported Algos",
-        "description": "Return supported execution algorithms.\n\nReturns a default algo list. Per-venue refinement can be added later.",
-        "operationId": "get_supported_algos_manual_algos_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "items": {
-                      "type": "string"
-                    },
-                    "type": "array"
-                  },
-                  "type": "object",
-                  "title": "Response Get Supported Algos Manual Algos Get"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/execution-service/kill-switch/activate": {
-      "post": {
-        "summary": "Activate Kill Switch",
-        "operationId": "activate_kill_switch_kill_switch_activate_post",
-        "parameters": [
-          {
-            "name": "auto_deactivate_after_minutes",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "integer"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Auto Deactivate After Minutes"
-            }
-          },
-          {
-            "name": "api-key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Api-Key"
-            }
-          },
-          {
-            "name": "X-Service-Token",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Service-Token"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/kill-switch/deactivate": {
-      "post": {
-        "summary": "Deactivate Kill Switch",
-        "operationId": "deactivate_kill_switch_kill_switch_deactivate_post",
-        "parameters": [
-          {
-            "name": "api-key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Api-Key"
-            }
-          },
-          {
-            "name": "X-Service-Token",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Service-Token"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/kill-switch/status": {
-      "get": {
-        "summary": "Kill Switch Status",
-        "operationId": "kill_switch_status_kill_switch_status_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/health": {
-      "get": {
-        "summary": "Health",
-        "description": "Liveness probe \u2014 returns 200 when the process is running.",
-        "operationId": "health_health_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "boolean"
-                      }
-                    ]
-                  },
-                  "type": "object",
-                  "title": "Response Health Health Get"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/ready": {
-      "get": {
-        "summary": "Ready",
-        "description": "Readiness probe \u2014 returns 200 only when order recovery is complete.\n\nReturns 503 with status=starting if recovery has not yet finished.\nReturns 200 with status=ready once recovery is complete.",
-        "operationId": "ready_ready_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/readiness": {
-      "get": {
-        "summary": "Readiness",
-        "description": "Readiness probe \u2014 verifies critical subsystems are initialised.\n\nChecks:\n- Auth and limiter are wired (startup event has completed).\nRaises 503 if the service is not ready to handle requests.",
-        "operationId": "readiness_readiness_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/admin/drain": {
-      "post": {
-        "summary": "Admin Drain",
-        "description": "Activate drain mode \u2014 complete in-flight orders, reject new with 503.\n\nCalled by deployment workflows before a rolling update.",
-        "operationId": "admin_drain_admin_drain_post",
-        "parameters": [
-          {
-            "name": "api-key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Api-Key"
-            }
-          },
-          {
-            "name": "X-Service-Token",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Service-Token"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "title": "Response Admin Drain Admin Drain Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/admin/resume": {
-      "post": {
-        "summary": "Admin Resume",
-        "description": "Exit drain mode \u2014 resume accepting new orders.\n\nCalled by deployment workflows after a rolling update completes.",
-        "operationId": "admin_resume_admin_resume_post",
-        "parameters": [
-          {
-            "name": "api-key",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Api-Key"
-            }
-          },
-          {
-            "name": "X-Service-Token",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "X-Service-Token"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "title": "Response Admin Resume Admin Resume Post"
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/admin/drain/status": {
-      "get": {
-        "summary": "Admin Drain Status",
-        "description": "Return current drain mode status.",
-        "operationId": "admin_drain_status_admin_drain_status_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": {
-                    "anyOf": [
-                      {
-                        "type": "string"
-                      },
-                      {
-                        "type": "boolean"
-                      },
-                      {
-                        "type": "null"
-                      }
-                    ]
-                  },
-                  "type": "object",
-                  "title": "Response Admin Drain Status Admin Drain Status Get"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
-    "/execution-service/admin/positions/snapshot": {
-      "get": {
-        "summary": "Admin Positions Snapshot",
-        "description": "Return serialized snapshot of all open positions.\n\nCalled by reconcile-positions.sh before and after deploy to diff.",
-        "operationId": "admin_positions_snapshot_admin_positions_snapshot_get",
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "additionalProperties": true,
-                  "type": "object",
-                  "title": "Response Admin Positions Snapshot Admin Positions Snapshot Get"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "execution-service"
-        ]
-      }
-    },
     "/risk-and-exposure-service/health": {
       "get": {
         "tags": [
@@ -14713,6 +14016,612 @@
                   },
                   "type": "array",
                   "title": "Response Auto Recon History Reconciliation Auto Recon History Get"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/reconciliation/snapshots/history": {
+      "get": {
+        "tags": [
+          "position-balance-monitor-service",
+          "reconciliation"
+        ],
+        "summary": "Reconciliation Snapshot History",
+        "description": "Query persistent reconciliation snapshots with full filtering.\n\nUnlike /balances and /pnl (which return in-memory cache), this endpoint\nqueries the database directly. Supports date range, instrument, and status\nfiltering with pagination.\n\nPOD reconciliation: pair this with /trades to pinpoint exactly where\nreconciliation breaks occurred.",
+        "operationId": "reconciliation_snapshot_history_reconciliation_snapshots_history_get",
+        "parameters": [
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by venue",
+              "title": "Venue"
+            },
+            "description": "Filter by venue"
+          },
+          {
+            "name": "instrument",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by instrument",
+              "title": "Instrument"
+            },
+            "description": "Filter by instrument"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by status (MATCH/DISCREPANCY/CRITICAL)",
+              "title": "Status"
+            },
+            "description": "Filter by status (MATCH/DISCREPANCY/CRITICAL)"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start of date range (ISO 8601)",
+              "title": "Start Date"
+            },
+            "description": "Start of date range (ISO 8601)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End of date range (ISO 8601)",
+              "title": "End Date"
+            },
+            "description": "End of date range (ISO 8601)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000,
+              "minimum": 1,
+              "description": "Max results",
+              "default": 200,
+              "title": "Limit"
+            },
+            "description": "Max results"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Reconciliation Snapshot History Reconciliation Snapshots History Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/nav-snapshot/trigger": {
+      "post": {
+        "tags": [
+          "position-balance-monitor-service",
+          "nav-snapshot"
+        ],
+        "summary": "Trigger Nav Snapshot",
+        "description": "Build and deliver a NAV snapshot immediately.",
+        "operationId": "trigger_nav_snapshot_nav_snapshot_trigger_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Trigger Nav Snapshot Nav Snapshot Trigger Post"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/nav-snapshot/preview": {
+      "get": {
+        "tags": [
+          "position-balance-monitor-service",
+          "nav-snapshot"
+        ],
+        "summary": "Preview Nav Snapshot",
+        "description": "Build a NAV snapshot without delivering (dry run).",
+        "operationId": "preview_nav_snapshot_nav_snapshot_preview_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FundNAVSnapshot"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/trades": {
+      "get": {
+        "tags": [
+          "position-balance-monitor-service",
+          "trades"
+        ],
+        "summary": "List Trades",
+        "description": "Query trade/fill history with filtering and pagination.\n\nReturns fills ordered by fill_timestamp descending (most recent first).\nPOD uses this to reconcile their balance calculations against our trade history.",
+        "operationId": "list_trades_trades_get",
+        "parameters": [
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by venue (e.g. BINANCE)",
+              "title": "Venue"
+            },
+            "description": "Filter by venue (e.g. BINANCE)"
+          },
+          {
+            "name": "instrument",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by instrument (e.g. BTC-USDT)",
+              "title": "Instrument"
+            },
+            "description": "Filter by instrument (e.g. BTC-USDT)"
+          },
+          {
+            "name": "client_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by client ID",
+              "title": "Client Id"
+            },
+            "description": "Filter by client ID"
+          },
+          {
+            "name": "strategy_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by strategy ID",
+              "title": "Strategy Id"
+            },
+            "description": "Filter by strategy ID"
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Start of date range (ISO 8601)",
+              "title": "Start Date"
+            },
+            "description": "Start of date range (ISO 8601)"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "End of date range (ISO 8601)",
+              "title": "End Date"
+            },
+            "description": "End of date range (ISO 8601)"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5000,
+              "minimum": 1,
+              "description": "Max results (default 500)",
+              "default": 500,
+              "title": "Limit"
+            },
+            "description": "Max results (default 500)"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Pagination offset",
+              "default": 0,
+              "title": "Offset"
+            },
+            "description": "Pagination offset"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response List Trades Trades Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/trades/count": {
+      "get": {
+        "tags": [
+          "position-balance-monitor-service",
+          "trades"
+        ],
+        "summary": "Trade Count",
+        "description": "Count fills matching the given filters.",
+        "operationId": "trade_count_trades_count_get",
+        "parameters": [
+          {
+            "name": "venue",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Venue"
+            }
+          },
+          {
+            "name": "instrument",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Instrument"
+            }
+          },
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Start Date"
+            }
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "End Date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "title": "Response Trade Count Trades Count Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/trades/summary": {
+      "get": {
+        "tags": [
+          "position-balance-monitor-service",
+          "trades"
+        ],
+        "summary": "Trade Summary",
+        "description": "Aggregate trade activity for a period (trade count, volume, fees).",
+        "operationId": "trade_summary_trades_summary_get",
+        "parameters": [
+          {
+            "name": "start_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Period start",
+              "title": "Start Date"
+            },
+            "description": "Period start"
+          },
+          {
+            "name": "end_date",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Period end",
+              "title": "End Date"
+            },
+            "description": "Period end"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Trade Summary Trades Summary Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/position-balance-monitor-service/trades/{fill_id}": {
+      "get": {
+        "tags": [
+          "position-balance-monitor-service",
+          "trades"
+        ],
+        "summary": "Get Trade",
+        "description": "Get a single fill by fill_id.",
+        "operationId": "get_trade_trades__fill_id__get",
+        "parameters": [
+          {
+            "name": "fill_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Fill Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": true,
+                  "title": "Response Get Trade Trades  Fill Id  Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -18755,298 +18664,6 @@
         "title": "UserInfo",
         "description": "User info returned after login."
       },
-      "AmendInstructionRequest": {
-        "properties": {
-          "instruction_id": {
-            "type": "string",
-            "title": "Instruction Id",
-            "description": "ID of instruction to amend"
-          },
-          "new_quantity": {
-            "anyOf": [
-              {
-                "type": "number",
-                "exclusiveMinimum": 0.0
-              },
-              {
-                "type": "string",
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
-              }
-            ],
-            "title": "New Quantity",
-            "description": "New quantity"
-          },
-          "new_price": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string",
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "New Price",
-            "description": "New limit price"
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 10,
-            "title": "Reason",
-            "description": "Reason for amendment (FCA audit)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "instruction_id",
-          "new_quantity",
-          "reason"
-        ],
-        "title": "AmendInstructionRequest",
-        "description": "Request schema for amending manual instruction."
-      },
-      "CancelInstructionRequest": {
-        "properties": {
-          "instruction_id": {
-            "type": "string",
-            "title": "Instruction Id",
-            "description": "ID of instruction to cancel"
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 10,
-            "title": "Reason",
-            "description": "Reason for cancellation (FCA audit)"
-          }
-        },
-        "type": "object",
-        "required": [
-          "instruction_id",
-          "reason"
-        ],
-        "title": "CancelInstructionRequest",
-        "description": "Request schema for cancelling manual instruction."
-      },
-      "ManualInstructionRequest": {
-        "properties": {
-          "client_id": {
-            "type": "string",
-            "title": "Client Id",
-            "description": "Client ID (for multi-tenant tracking)",
-            "pii": true
-          },
-          "strategy_id": {
-            "type": "string",
-            "title": "Strategy Id",
-            "description": "Strategy ID (default: manual_strategy)",
-            "default": "manual_strategy"
-          },
-          "instruction_type": {
-            "type": "string",
-            "title": "Instruction Type",
-            "description": "TRADE, SWAP, LEND, BORROW, STAKE, etc.",
-            "default": "TRADE"
-          },
-          "venue": {
-            "type": "string",
-            "title": "Venue",
-            "description": "Venue (binance, deribit, bybit, etc.)"
-          },
-          "instrument_id": {
-            "type": "string",
-            "title": "Instrument Id",
-            "description": "Instrument (BTC-USDT, ETH-USD-PERP, etc.)"
-          },
-          "side": {
-            "type": "string",
-            "title": "Side",
-            "description": "BUY or SELL"
-          },
-          "quantity": {
-            "anyOf": [
-              {
-                "type": "number",
-                "exclusiveMinimum": 0.0
-              },
-              {
-                "type": "string",
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
-              }
-            ],
-            "title": "Quantity",
-            "description": "Order quantity (must be > 0)"
-          },
-          "price": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "string",
-                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Price",
-            "description": "Limit price (None = market order)"
-          },
-          "algo": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Algo",
-            "description": "Algorithm (MARKET, TWAP, VWAP, ICEBERG)"
-          },
-          "algo_params": {
-            "anyOf": [
-              {
-                "additionalProperties": true,
-                "type": "object"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Algo Params",
-            "description": "Algorithm parameters"
-          },
-          "reason": {
-            "type": "string",
-            "minLength": 10,
-            "title": "Reason",
-            "description": "Reason for this manual instruction (FCA audit requirement)",
-            "default": "manual_trade"
-          },
-          "execution_mode": {
-            "type": "string",
-            "title": "Execution Mode",
-            "description": "execute (route to venue) or record_only (direct fill recording)",
-            "default": "execute"
-          },
-          "portfolio_id": {
-            "type": "string",
-            "title": "Portfolio Id",
-            "description": "Portfolio/book identifier",
-            "default": ""
-          },
-          "category": {
-            "type": "string",
-            "title": "Category",
-            "description": "Instrument category (cefi, defi, sports, prediction)",
-            "default": ""
-          },
-          "counterparty": {
-            "type": "string",
-            "title": "Counterparty",
-            "description": "OTC counterparty identifier",
-            "default": ""
-          },
-          "source_reference": {
-            "type": "string",
-            "title": "Source Reference",
-            "description": "External trade ID (exchange ref, broker confirm)",
-            "default": ""
-          }
-        },
-        "type": "object",
-        "required": [
-          "client_id",
-          "venue",
-          "instrument_id",
-          "side",
-          "quantity"
-        ],
-        "title": "ManualInstructionRequest",
-        "description": "Request schema for manual instruction entry.\n\nSupports two execution modes:\n- execute: route to venue via orchestrator (normal flow, same as automated)\n- record_only: skip venue, record fill directly (OTC, missed trades, simulation)",
-        "example": {
-          "algo": "TWAP",
-          "algo_params": {
-            "duration_minutes": 30,
-            "num_slices": 10
-          },
-          "category": "cefi",
-          "client_id": "client_123",
-          "counterparty": "",
-          "execution_mode": "execute",
-          "instruction_type": "TRADE",
-          "instrument_id": "BTC-USDT",
-          "portfolio_id": "",
-          "price": 50000.0,
-          "quantity": 1.5,
-          "reason": "portfolio_rebalancing_trade",
-          "side": "BUY",
-          "source_reference": "",
-          "strategy_id": "manual_strategy",
-          "venue": "binance"
-        }
-      },
-      "ManualInstructionResponse": {
-        "properties": {
-          "instruction_id": {
-            "type": "string",
-            "title": "Instruction Id",
-            "description": "Generated instruction ID"
-          },
-          "status": {
-            "type": "string",
-            "title": "Status",
-            "description": "SUBMITTED, REJECTED, FAILED"
-          },
-          "message": {
-            "type": "string",
-            "title": "Message",
-            "description": "Status message"
-          },
-          "estimated_completion": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Estimated Completion",
-            "description": "Estimated completion time (ISO format)"
-          },
-          "error": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Error",
-            "description": "Error message if failed"
-          }
-        },
-        "type": "object",
-        "required": [
-          "instruction_id",
-          "status",
-          "message"
-        ],
-        "title": "ManualInstructionResponse",
-        "description": "Response schema for manual instruction submission.",
-        "example": {
-          "estimated_completion": "2026-02-16T10:40:45Z",
-          "instruction_id": "manual-20260216-103045-ABC123",
-          "message": "Instruction submitted successfully",
-          "status": "SUBMITTED"
-        }
-      },
       "AlertContextData": {
         "properties": {
           "client_id": {
@@ -19859,6 +19476,341 @@
         "title": "VaRResponse",
         "description": "Response body for GET /risk/var."
       },
+      "AssetBalanceSummary": {
+        "properties": {
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "description": "Asset symbol (e.g. BTC, ETH, USDT)"
+          },
+          "free": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Free",
+            "description": "Available for trading"
+          },
+          "locked": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Locked",
+            "description": "Locked in open orders / collateral"
+          },
+          "total": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total",
+            "description": "free + locked"
+          },
+          "usd_value": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Usd Value",
+            "description": "Total converted to USD at mark price"
+          }
+        },
+        "type": "object",
+        "required": [
+          "currency",
+          "free",
+          "locked",
+          "total",
+          "usd_value"
+        ],
+        "title": "AssetBalanceSummary",
+        "description": "Per-asset balance across all venues for a fund."
+      },
+      "DeFiHealthSummary": {
+        "properties": {
+          "total_collateral_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Collateral Usd",
+            "description": "Total collateral deposited across protocols",
+            "default": "0"
+          },
+          "total_debt_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Debt Usd",
+            "description": "Total debt across protocols",
+            "default": "0"
+          },
+          "weighted_health_factor": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weighted Health Factor",
+            "description": "Weighted average health factor (Aave-style)"
+          },
+          "total_staked_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Staked Usd",
+            "description": "Total staked value (Lido, EtherFi)",
+            "default": "0"
+          },
+          "total_lp_value_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Lp Value Usd",
+            "description": "Total LP position value (Uniswap, Curve)",
+            "default": "0"
+          }
+        },
+        "type": "object",
+        "title": "DeFiHealthSummary",
+        "description": "DeFi-specific health metrics for the fund (Aave, Morpho, etc.)."
+      },
+      "FundNAVSnapshot": {
+        "properties": {
+          "snapshot_id": {
+            "type": "string",
+            "title": "Snapshot Id",
+            "description": "Unique snapshot identifier (UUID)"
+          },
+          "fund_id": {
+            "type": "string",
+            "title": "Fund Id",
+            "description": "Fund identifier in Odum's system"
+          },
+          "fund_name": {
+            "type": "string",
+            "title": "Fund Name",
+            "description": "Human-readable fund name",
+            "default": ""
+          },
+          "client_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Client Ids",
+            "description": "Client IDs that roll up into this fund",
+            "pii": true
+          },
+          "snapshot_timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Snapshot Timestamp",
+            "description": "NAV cut-off timestamp (UTC)"
+          },
+          "previous_snapshot_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Snapshot Id",
+            "description": "ID of the previous snapshot (for delta tracking)"
+          },
+          "frequency": {
+            "$ref": "#/components/schemas/NAVSnapshotFrequency",
+            "description": "Snapshot cadence",
+            "default": "DAILY"
+          },
+          "nav_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Nav Usd",
+            "description": "Net Asset Value in USD (total_equity)"
+          },
+          "nav_change_usd": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nav Change Usd",
+            "description": "NAV change since previous snapshot"
+          },
+          "nav_change_pct": {
+            "anyOf": [
+              {
+                "type": "string",
+                "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nav Change Pct",
+            "description": "NAV change as percentage"
+          },
+          "asset_balances": {
+            "items": {
+              "$ref": "#/components/schemas/AssetBalanceSummary"
+            },
+            "type": "array",
+            "title": "Asset Balances",
+            "description": "Per-asset balance breakdown"
+          },
+          "venue_balances": {
+            "items": {
+              "$ref": "#/components/schemas/VenueBalanceSummary"
+            },
+            "type": "array",
+            "title": "Venue Balances",
+            "description": "Per-venue balance breakdown"
+          },
+          "position_summary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PositionSummary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Aggregated position statistics"
+          },
+          "defi_health": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/DeFiHealthSummary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DeFi-specific health metrics"
+          },
+          "trade_activity": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TradeActivitySummary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Trade activity since last snapshot"
+          },
+          "asset_class_exposures_usd": {
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+            },
+            "type": "object",
+            "title": "Asset Class Exposures Usd",
+            "description": "Exposure by asset class (CeFi, DeFi, TradFi, etc.)"
+          },
+          "strategy_exposures_usd": {
+            "additionalProperties": {
+              "type": "string",
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$"
+            },
+            "type": "object",
+            "title": "Strategy Exposures Usd",
+            "description": "Exposure by strategy ID"
+          },
+          "schema_version": {
+            "type": "string",
+            "title": "Schema Version",
+            "description": "Schema version for evolution",
+            "default": "1.0"
+          },
+          "source_service": {
+            "type": "string",
+            "title": "Source Service",
+            "description": "Service that produced this snapshot",
+            "default": "position-balance-monitor-service"
+          },
+          "reconciliation_status": {
+            "type": "string",
+            "title": "Reconciliation Status",
+            "description": "CLEAN if no active discrepancies, DISCREPANCY if unresolved",
+            "default": "CLEAN"
+          }
+        },
+        "type": "object",
+        "required": [
+          "snapshot_id",
+          "fund_id",
+          "snapshot_timestamp",
+          "nav_usd"
+        ],
+        "title": "FundNAVSnapshot",
+        "description": "NAV snapshot payload pushed to external operations partners.\n\nThis is the contract between Odum's position-balance-monitor-service and\nexternal operations partners (e.g. POD/Elysium). At each NAV cut-off point,\na snapshot is built from cross-venue balances and positions, then POSTed\nto the configured webhook endpoint.\n\nThe operations partner uses this to compute official NAV, update smart contract\nsettlement layers, and generate investor reports."
+      },
+      "NAVSnapshotFrequency": {
+        "type": "string",
+        "enum": [
+          "HOURLY",
+          "DAILY",
+          "WEEKLY",
+          "ON_DEMAND"
+        ],
+        "title": "NAVSnapshotFrequency",
+        "description": "How often NAV snapshots are produced."
+      },
+      "PositionSummary": {
+        "properties": {
+          "total_positions": {
+            "type": "integer",
+            "title": "Total Positions",
+            "description": "Count of open positions"
+          },
+          "gross_exposure_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Gross Exposure Usd",
+            "description": "Sum of abs(notional) across all positions"
+          },
+          "net_exposure_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Net Exposure Usd",
+            "description": "Net directional exposure in USD"
+          },
+          "total_unrealized_pnl_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Unrealized Pnl Usd",
+            "description": "Sum of unrealized P&L across positions"
+          },
+          "total_realized_pnl_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Realized Pnl Usd",
+            "description": "Sum of realized P&L since last snapshot"
+          },
+          "long_count": {
+            "type": "integer",
+            "title": "Long Count",
+            "description": "Number of long positions",
+            "default": 0
+          },
+          "short_count": {
+            "type": "integer",
+            "title": "Short Count",
+            "description": "Number of short positions",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "total_positions",
+          "gross_exposure_usd",
+          "net_exposure_usd",
+          "total_unrealized_pnl_usd",
+          "total_realized_pnl_usd"
+        ],
+        "title": "PositionSummary",
+        "description": "Aggregated position statistics for the fund."
+      },
       "ReconciliationAction": {
         "type": "string",
         "enum": [
@@ -19977,6 +19929,93 @@
         ],
         "title": "ResolveResponse",
         "description": "Response after resolving a deviation."
+      },
+      "TradeActivitySummary": {
+        "properties": {
+          "trade_count": {
+            "type": "integer",
+            "title": "Trade Count",
+            "description": "Number of trades since last snapshot",
+            "default": 0
+          },
+          "total_volume_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Volume Usd",
+            "description": "Total traded volume in USD",
+            "default": "0"
+          },
+          "total_fees_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Fees Usd",
+            "description": "Total fees paid in USD",
+            "default": "0"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start",
+            "description": "Start of the activity window"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End",
+            "description": "End of the activity window (= snapshot timestamp)"
+          }
+        },
+        "type": "object",
+        "title": "TradeActivitySummary",
+        "description": "Trade activity since the previous NAV snapshot."
+      },
+      "VenueBalanceSummary": {
+        "properties": {
+          "venue": {
+            "type": "string",
+            "title": "Venue",
+            "description": "Venue identifier (e.g. BINANCE, AAVE_V3_ETHEREUM)"
+          },
+          "total_usd": {
+            "type": "string",
+            "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+            "title": "Total Usd",
+            "description": "Total balance at this venue in USD"
+          },
+          "position_count": {
+            "type": "integer",
+            "title": "Position Count",
+            "description": "Number of open positions at this venue"
+          },
+          "asset_count": {
+            "type": "integer",
+            "title": "Asset Count",
+            "description": "Number of distinct assets held"
+          }
+        },
+        "type": "object",
+        "required": [
+          "venue",
+          "total_usd",
+          "position_count",
+          "asset_count"
+        ],
+        "title": "VenueBalanceSummary",
+        "description": "Per-venue balance summary for a fund."
       },
       "BatchResultResponse": {
         "properties": {
@@ -20748,10 +20787,6 @@
     {
       "name": "alerting-service",
       "description": "alerting-service"
-    },
-    {
-      "name": "execution-service",
-      "description": "Execution Services API"
     },
     {
       "name": "risk-and-exposure-service",

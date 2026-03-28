@@ -9,7 +9,6 @@ The position-balance-monitor-service builds these snapshots and pushes them via 
 
 from __future__ import annotations
 
-from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
@@ -71,33 +70,21 @@ class DeFiHealthSummary(BaseModel, frozen=True):
     total_collateral_usd: Decimal = Field(
         default=Decimal("0"), description="Total collateral deposited across protocols"
     )
-    total_debt_usd: Decimal = Field(
-        default=Decimal("0"), description="Total debt across protocols"
-    )
+    total_debt_usd: Decimal = Field(default=Decimal("0"), description="Total debt across protocols")
     weighted_health_factor: Decimal | None = Field(
         default=None, description="Weighted average health factor (Aave-style)"
     )
-    total_staked_usd: Decimal = Field(
-        default=Decimal("0"), description="Total staked value (Lido, EtherFi)"
-    )
-    total_lp_value_usd: Decimal = Field(
-        default=Decimal("0"), description="Total LP position value (Uniswap, Curve)"
-    )
+    total_staked_usd: Decimal = Field(default=Decimal("0"), description="Total staked value (Lido, EtherFi)")
+    total_lp_value_usd: Decimal = Field(default=Decimal("0"), description="Total LP position value (Uniswap, Curve)")
 
 
 class TradeActivitySummary(BaseModel, frozen=True):
     """Trade activity since the previous NAV snapshot."""
 
     trade_count: int = Field(default=0, description="Number of trades since last snapshot")
-    total_volume_usd: Decimal = Field(
-        default=Decimal("0"), description="Total traded volume in USD"
-    )
-    total_fees_usd: Decimal = Field(
-        default=Decimal("0"), description="Total fees paid in USD"
-    )
-    period_start: AwareDatetime | None = Field(
-        default=None, description="Start of the activity window"
-    )
+    total_volume_usd: Decimal = Field(default=Decimal("0"), description="Total traded volume in USD")
+    total_fees_usd: Decimal = Field(default=Decimal("0"), description="Total fees paid in USD")
+    period_start: AwareDatetime | None = Field(default=None, description="Start of the activity window")
     period_end: AwareDatetime | None = Field(
         default=None, description="End of the activity window (= snapshot timestamp)"
     )
@@ -107,17 +94,11 @@ class WebhookDeliveryConfig(BaseModel, frozen=True):
     """Configuration for webhook delivery to an external operations partner."""
 
     webhook_url: str = Field(description="HTTPS endpoint to POST the NAV snapshot")
-    auth_header_name: str = Field(
-        default="X-API-Key", description="HTTP header name for authentication"
-    )
-    auth_header_value_secret: str = Field(
-        description="Secret Manager secret name containing the auth token"
-    )
+    auth_header_name: str = Field(default="X-API-Key", description="HTTP header name for authentication")
+    auth_header_value_secret: str = Field(description="Secret Manager secret name containing the auth token")
     timeout_seconds: int = Field(default=30, description="HTTP request timeout")
     retry_count: int = Field(default=3, description="Number of retries on failure")
-    ops_partner_name: str = Field(
-        default="pod", description="Identifier for the operations partner (for logging)"
-    )
+    ops_partner_name: str = Field(default="pod", description="Identifier for the operations partner (for logging)")
 
 
 class FundNAVSnapshot(BaseModel, frozen=True):
@@ -147,43 +128,25 @@ class FundNAVSnapshot(BaseModel, frozen=True):
     previous_snapshot_id: str | None = Field(
         default=None, description="ID of the previous snapshot (for delta tracking)"
     )
-    frequency: NAVSnapshotFrequency = Field(
-        default=NAVSnapshotFrequency.DAILY, description="Snapshot cadence"
-    )
+    frequency: NAVSnapshotFrequency = Field(default=NAVSnapshotFrequency.DAILY, description="Snapshot cadence")
 
     # NAV
     nav_usd: Decimal = Field(description="Net Asset Value in USD (total_equity)")
-    nav_change_usd: Decimal | None = Field(
-        default=None, description="NAV change since previous snapshot"
-    )
-    nav_change_pct: Decimal | None = Field(
-        default=None, description="NAV change as percentage"
-    )
+    nav_change_usd: Decimal | None = Field(default=None, description="NAV change since previous snapshot")
+    nav_change_pct: Decimal | None = Field(default=None, description="NAV change as percentage")
 
     # Breakdowns
-    asset_balances: list[AssetBalanceSummary] = Field(
-        default_factory=list, description="Per-asset balance breakdown"
-    )
-    venue_balances: list[VenueBalanceSummary] = Field(
-        default_factory=list, description="Per-venue balance breakdown"
-    )
-    position_summary: PositionSummary | None = Field(
-        default=None, description="Aggregated position statistics"
-    )
-    defi_health: DeFiHealthSummary | None = Field(
-        default=None, description="DeFi-specific health metrics"
-    )
-    trade_activity: TradeActivitySummary | None = Field(
-        default=None, description="Trade activity since last snapshot"
-    )
+    asset_balances: list[AssetBalanceSummary] = Field(default_factory=list, description="Per-asset balance breakdown")
+    venue_balances: list[VenueBalanceSummary] = Field(default_factory=list, description="Per-venue balance breakdown")
+    position_summary: PositionSummary | None = Field(default=None, description="Aggregated position statistics")
+    defi_health: DeFiHealthSummary | None = Field(default=None, description="DeFi-specific health metrics")
+    trade_activity: TradeActivitySummary | None = Field(default=None, description="Trade activity since last snapshot")
 
     # Exposure by asset class / strategy
     asset_class_exposures_usd: dict[str, Decimal] = Field(
         default_factory=dict, description="Exposure by asset class (CeFi, DeFi, TradFi, etc.)"
     )
-    strategy_exposures_usd: dict[str, Decimal] = Field(
-        default_factory=dict, description="Exposure by strategy ID"
-    )
+    strategy_exposures_usd: dict[str, Decimal] = Field(default_factory=dict, description="Exposure by strategy ID")
 
     # Metadata
     schema_version: str = Field(default="1.0", description="Schema version for evolution")

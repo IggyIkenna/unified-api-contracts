@@ -11,7 +11,7 @@ from decimal import Decimal
 from typing import cast
 from uuid import uuid4
 
-from unified_api_contracts.internal import SettlementType
+from unified_api_contracts.internal.execution import SettlementType
 
 
 @dataclass
@@ -94,9 +94,7 @@ class SettlementDelta:
         # Parse timestamp
         ts_val = data.get("timestamp")
         timestamp: datetime = (
-            datetime.fromisoformat(ts_val.rstrip("Z"))
-            if isinstance(ts_val, str)
-            else cast(datetime, ts_val)
+            datetime.fromisoformat(ts_val.rstrip("Z")) if isinstance(ts_val, str) else cast(datetime, ts_val)
         )
 
         metadata: dict[str, str | int | float | bool | None] = cast(
@@ -288,21 +286,15 @@ class PnLAttribution:
         """Parse timestamp, period_start, and period_end from dict."""
         ts_val = data.get("timestamp")
         timestamp: datetime = (
-            datetime.fromisoformat(ts_val.rstrip("Z"))
-            if isinstance(ts_val, str)
-            else cast(datetime, ts_val)
+            datetime.fromisoformat(ts_val.rstrip("Z")) if isinstance(ts_val, str) else cast(datetime, ts_val)
         )
         ps_val = data.get("period_start")
         period_start: datetime | None = (
-            datetime.fromisoformat(ps_val.rstrip("Z"))
-            if isinstance(ps_val, str)
-            else cast("datetime | None", ps_val)
+            datetime.fromisoformat(ps_val.rstrip("Z")) if isinstance(ps_val, str) else cast("datetime | None", ps_val)
         )
         pe_val = data.get("period_end")
         period_end: datetime | None = (
-            datetime.fromisoformat(pe_val.rstrip("Z"))
-            if isinstance(pe_val, str)
-            else cast("datetime | None", pe_val)
+            datetime.fromisoformat(pe_val.rstrip("Z")) if isinstance(pe_val, str) else cast("datetime | None", pe_val)
         )
         return timestamp, period_start, period_end
 

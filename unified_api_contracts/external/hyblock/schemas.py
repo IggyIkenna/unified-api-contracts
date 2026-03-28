@@ -72,20 +72,5 @@ class HyblockOIClusterResponse(BaseModel):
     timestamp_ms: int = Field(description="Data timestamp in milliseconds since epoch")
 
 
-class HyblockLiquidationLevelRequest(BaseModel):
-    """Request parameters for Hyblock liquidation levels endpoint."""
 
-    symbol: str = Field(description="Trading symbol, e.g. BTCUSDT")
-    exchange: str = Field(default="binance", description="Exchange name (lower-case)")
-    range_pct: float = Field(
-        default=10.0,
-        description="Price range percentage above and below current price",
-    )
-
-
-class HyblockOIClusterRequest(BaseModel):
-    """Request parameters for Hyblock OI cluster endpoint."""
-
-    symbol: str = Field(description="Trading symbol, e.g. BTCUSDT")
-    exchange: str = Field(default="binance", description="Exchange name (lower-case)")
-    band_count: int = Field(default=20, description="Number of price bands to return")
+# HyblockLiquidationLevelRequest and HyblockOIClusterRequest removed — no consumers.

@@ -2,6 +2,8 @@
 
 from unified_api_contracts.internal.domain.strategy_service.instruction import (
     DeFiSignal as StrategyDeFiSignal,
+)
+from unified_api_contracts.internal.domain.strategy_service.instruction import (
     FuturesRollInstruction,
     OptionsComboInstruction,
     PredictionBetInstruction,

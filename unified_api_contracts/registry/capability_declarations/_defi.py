@@ -45,11 +45,21 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "BSC": "7Jk85XgkV1MQ7u56hD8rr65rfASbayJXopugWkUoBMnZ",
         "ZKSYNC": "ENYSc8G3WvrbhWH8UZHrqPWYRcuyCaNmaTmoVp7uzabM",
     },
-    # compound_v3: subgraph IDs need verification — adapter not yet implemented
-    "morpho": {
+    "compound_v3": {  # Verified from github.com/papercliplabs/compound-v3-subgraph
+        "ETHEREUM": "5nwMCSHaTqG3Kd2gHznbTXEnZ9QNWsssQfbHhDqQSQFp",
+        "ARBITRUM": "Ff7ha9ELmpmg81D6nYxy4t8aGP26dPztqD1LDJNPqjLS",
+        "BASE": "2hcXhs36pTBDVUmk5K2Zkr6N4UYGwaHuco2a6jyTsijo",
+        "POLYGON": "AaFtUWKfFdj2x8nnE3RxTSJkHwGHvawH3VWFBykCGzLs",
+        "OPTIMISM": "FhHNkfh5z6Z2WCEBxB6V3s8RPxnJfWZ9zAfM5bVvbvbb",
+        "SCROLL": "6aRGn6noEdin1krLfYTnLMYaCoTujL7cHekARE4Ndxng",
+    },
+    "morpho": {  # Verified from docs.morpho.org/tools/offchain/subgraphs/
         "ETHEREUM": "8Lz789DP5VKLXumTMTgygjU2xtuzx8AhbaacgN5PYCAs",
-        # Multi-chain: Morpho uses its own API (not The Graph) for Base/ARB/POLY/OP
-        # The adapter already handles this via morpho.org API
+        "BASE": "71ZTy1veF9twER9CLMnPWeLQ7GZcwKsjmygejrgKirqs",
+        "ARBITRUM": "XsJn88DNCHJ1kgTqYeTgHMSK4LuG1LR75339QVeQ26",
+        "OPTIMISM": "5y8d3K3vVCR7r5YwANGCjupLc3hUge54XvhYMEq3Jmq1",
+        "POLYGON": "EhFokmwryNs7qbvostceRqVdjc3petuD13mmdUiMBw8Y",
+        "SCROLL": "Aic7prLAxhtipUEbLu5BhDDWf4LssT9n3DG4fT9yCRqm",
     },
     "euler_v2": {
         # Euler uses Goldsky (not The Graph). Adapter queries Goldsky URLs directly.
@@ -66,18 +76,26 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "uniswap_v3": {  # Verified via The Graph gateway
         "ETHEREUM": "5zvR82QoaXYFyDEKLZ9t6v9adgnptxYpKpSbxtgVENFV",
         "ARBITRUM": "FbCGRftH4a3yZugY7TnbYgPJVEv2LvMT6oF1fxPe9aJM",
-        "BASE": "FUbEPQw1oMghy39fwWBFY5fE6MXPXZQtjncQy2cXdrNS",
+        "BASE": "HMuAwufqZ1YCRmzL2SfHTVkzZovC9VL2UAKhjvRqKiR1",  # UniV3-Base (official schema)
         "OPTIMISM": "Cghf4LfVqPiFw6fp6Y5X5Ubc8UpmUhSfJL82zwiBFLaj",
         "POLYGON": "3hCPRGf4z88VC5rsBKU5AA9FBBq5nF3jbKJG7VZCbhjm",
     },
     "uniswap_v4": {
         "ETHEREUM": "DiYPVdygkfjDWhbxGSqAQxwBKmfKnkWQojqeM2rkLb3G",
     },
-    "balancer": {  # Non-ETH IDs need verification
+    "balancer": {  # Verified from docs-v2.balancer.fi/reference/subgraph/
         "ETHEREUM": "C4ayEZP2yTXRAB8vSaTrgN4m9anTe9Mdm2ViyiAuV9TV",
+        "ARBITRUM": "98cQDy6tufTJtshDCuhh9z2kWXsQWBHVh2bqnLHsGAeS",
+        "POLYGON": "H9oPAbXnobBRq1cB3HDmbZ1E8MWQyJYQjT1QDJMrdbNp",
+        "OPTIMISM": "FsmdxmvBJLGjUQPxKMRtcWKzuCNpomKuMTbSbtRtggZ7",
+        "AVALANCHE": "7asfmtQA1KYu6CP7YVm5kv4bGxVyfAHEiptt2HMFgkHu",
+        "BASE": "E7XyutxXVLrp8njmjF16Hh38PCJuHm12RRyMt5ma4ctX",
     },
-    "curve": {  # Curve uses its own API, not The Graph subgraphs
+    "curve": {  # Verified from thegraph.com/explorer (Messari schema)
         "ETHEREUM": "3fy93eAT56UJsRCEht8iFhfi6wjHWXtZ9dnnbQmvFopF",
+        "OPTIMISM": "CXDZPduZE6nWuWEkSzWkRoJSSJ6CneSqiDxdnhhURShX",
+        "AVALANCHE": "2Vt8WtdXNZUEeaVtzyEd1dpioJf44nvomzkd4HhubfKS",
+        # ARB/POLY only on hosted service (deprecated) — use api.curve.fi instead
     },
 }
 
@@ -141,11 +159,25 @@ CHAIN_RPC_TEMPLATES: dict[int, str] = {
 # Gas is paid in the native token — ETH on L2s, BNB/MATIC/AVAX on alt-L1s
 # ---------------------------------------------------------------------------
 CHAIN_NATIVE_GAS_TOKEN: dict[int, str] = {
-    1: "ETH", 10: "ETH", 56: "BNB", 130: "ETH", 137: "MATIC",
-    324: "ETH", 480: "ETH", 1101: "ETH", 2741: "ETH",
-    8453: "ETH", 34443: "ETH", 42161: "ETH", 43114: "AVAX",
-    57073: "ETH", 59144: "ETH", 81457: "ETH", 534352: "ETH",
-    7777777: "ETH", 11155111: "ETH",
+    1: "ETH",
+    10: "ETH",
+    56: "BNB",
+    130: "ETH",
+    137: "MATIC",
+    324: "ETH",
+    480: "ETH",
+    1101: "ETH",
+    2741: "ETH",
+    8453: "ETH",
+    34443: "ETH",
+    42161: "ETH",
+    43114: "AVAX",
+    57073: "ETH",
+    59144: "ETH",
+    81457: "ETH",
+    534352: "ETH",
+    7777777: "ETH",
+    11155111: "ETH",
 }
 
 # ---------------------------------------------------------------------------
@@ -156,9 +188,9 @@ CHAIN_NATIVE_GAS_TOKEN: dict[int, str] = {
 WETH_ADDRESSES: dict[int, str] = {
     1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
     10: "0x4200000000000000000000000000000000000006",
-    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",       # WBNB
+    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",  # WBNB
     130: "0x4200000000000000000000000000000000000006",
-    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",      # WMATIC
+    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",  # WMATIC
     324: "0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91",
     480: "0x4200000000000000000000000000000000000006",
     1101: "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9",
@@ -166,7 +198,7 @@ WETH_ADDRESSES: dict[int, str] = {
     8453: "0x4200000000000000000000000000000000000006",
     34443: "0x4200000000000000000000000000000000000006",
     42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",    # WAVAX
+    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",  # WAVAX
     57073: "0x4200000000000000000000000000000000000006",
     59144: "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
     81457: "0x4300000000000000000000000000000000000004",
@@ -201,6 +233,111 @@ def get_native_gas_token(chain_id: int) -> str:
 def get_weth_address(chain_id: int) -> str | None:
     """Get the WETH (wrapped native) contract address for a chain."""
     return WETH_ADDRESSES.get(chain_id)
+
+
+# ---------------------------------------------------------------------------
+# Non-EVM chains (SSOT)
+#
+# Solana and Bitcoin are fundamentally different from EVM chains:
+# - Different RPC protocols, transaction models, token standards
+# - Separate adapter stacks required (not The Graph subgraphs)
+# - Chain IDs are conventional strings, not EVM uint256
+# ---------------------------------------------------------------------------
+
+
+class NonEvmChain(StrEnum):
+    """Non-EVM chain identifiers."""
+
+    SOLANA = "SOLANA"
+    BITCOIN = "BITCOIN"
+
+
+# Solana RPC URL templates (Alchemy, Helius, QuickNode)
+SOLANA_RPC_TEMPLATES: dict[str, str] = {
+    "alchemy": "https://solana-mainnet.g.alchemy.com/v2/{api_key}",
+    "helius": "https://mainnet.helius-rpc.com/?api-key={api_key}",
+}
+
+# Solana key program/token addresses
+SOLANA_TOKEN_ADDRESSES: dict[str, str] = {
+    "WSOL": "So11111111111111111111111111111111111111112",
+    "USDC": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    "USDT": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "WBTC_PORTAL": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
+    "CBBTC": "cbbtcn3Keb2DW3ZsmLmrsPGsRRhQ3HmFsRJhKqLm1bq",
+}
+
+# Solana DeFi protocol metadata for adapter discovery
+SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
+    "raydium": {
+        "name": "Raydium",
+        "type": "dex",
+        "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
+        "data_source": "helius",
+    },
+    "orca": {
+        "name": "Orca (Whirlpool)",
+        "type": "dex",
+        "program_id": "whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",
+        "api_url": "https://api.mainnet.orca.so",
+        "data_source": "orca_api",
+    },
+    "marinade": {
+        "name": "Marinade Finance",
+        "type": "liquid_staking",
+        "program_id": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
+        "data_source": "helius",
+    },
+    "kamino": {
+        "name": "Kamino Finance",
+        "type": "lending",
+        "program_id": "KLend2g3cP87ber41GXWsSZQhDqc7juFGkhGJk2HRFUj",
+        "data_source": "helius",
+    },
+    "jupiter": {
+        "name": "Jupiter",
+        "type": "aggregator",
+        "api_url": "https://quote-api.jup.ag/v6",
+        "data_source": "jupiter_api",
+    },
+    "jito": {
+        "name": "Jito",
+        "type": "liquid_staking",
+        "program_id": "Jito4APyf642JPZPx3hGc6WWJ8zPKtRbRs4P3eg9gB",
+        "data_source": "helius",
+    },
+}
+
+# Bitcoin metadata — native BTC DeFi is minimal; we focus on wrapped BTC on EVM.
+# Stacks (STX) has some Bitcoin DeFi but is too small for our system.
+BITCOIN_RPC_TEMPLATES: dict[str, str] = {
+    "blockstream": "https://blockstream.info/api",
+    "mempool": "https://mempool.space/api",
+}
+
+# Wrapped BTC tokens on EVM chains (already in WBTC_ADDRESSES / CBBTC_ADDRESSES above)
+# tBTC is another wrapped BTC option on Ethereum
+TBTC_ADDRESSES: dict[int, str] = {
+    1: "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
+    42161: "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",
+    137: "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",
+    10: "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",
+    8453: "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",
+}
+
+
+def get_solana_rpc_url(provider: str = "alchemy", api_key: str = "") -> str | None:
+    """Get a Solana RPC URL for the given provider."""
+    template = SOLANA_RPC_TEMPLATES.get(provider)
+    if template is None:
+        return None
+    return template.format(api_key=api_key)
+
+
+def get_solana_token_address(symbol: str) -> str | None:
+    """Get a Solana SPL token address by symbol."""
+    return SOLANA_TOKEN_ADDRESSES.get(symbol.upper())
+
 
 # ---------------------------------------------------------------------------
 # DeFi protocols (5)

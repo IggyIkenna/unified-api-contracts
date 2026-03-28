@@ -15,9 +15,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import cast
 
-from unified_api_contracts.internal.domain.execution_service.types import PositionType
-
-from unified_api_contracts.internal.domain.execution_service.types import ensure_dict
+from unified_api_contracts.internal.domain.execution_service.types import PositionType, ensure_dict
 
 
 @dataclass

@@ -1,5 +1,9 @@
 """Execution-service internal domain contracts."""
 
+from unified_api_contracts.internal.domain.execution_service.defi_position import (
+    DeFiPosition,
+    PositionPortfolio,
+)
 from unified_api_contracts.internal.domain.execution_service.execution_result import (
     ExecutionResult,
     SignalExecutionResult,
@@ -27,6 +31,10 @@ from unified_api_contracts.internal.domain.execution_service.results import (
     DeFiSwapResult,
     DeFiTxResult,
 )
+from unified_api_contracts.internal.domain.execution_service.signal import (
+    AtomicLeg,
+    DeFiSignal,
+)
 from unified_api_contracts.internal.domain.execution_service.types import (
     BenchmarkType,
     ExecutionInstruction,
@@ -37,14 +45,6 @@ from unified_api_contracts.internal.domain.execution_service.types import (
 )
 from unified_api_contracts.internal.domain.execution_service.types import (
     OrderType as ExecutionOrderType,
-)
-from unified_api_contracts.internal.domain.execution_service.defi_position import (
-    DeFiPosition,
-    PositionPortfolio,
-)
-from unified_api_contracts.internal.domain.execution_service.signal import (
-    AtomicLeg,
-    DeFiSignal,
 )
 
 __all__ = [

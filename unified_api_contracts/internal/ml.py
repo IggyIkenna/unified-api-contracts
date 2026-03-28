@@ -587,71 +587,8 @@ class ModelDegradationAlert(BaseModel):
     details: dict[str, float | str | int | None] = Field(default_factory=dict)
 
 
-class MLModelScorecard(BaseModel):
-    """Standardized model performance metrics emitted by ml-training-service.
-
-    Cross-service contract consumed by ml-inference-service (model selection),
-    alerting-service (degradation monitoring), and trading-analytics-api (dashboards).
-    """
-
-    model_id: str
-    instrument_id: str
-    timeframe: str
-    target_type: str  # swing_high, swing_low, direction, etc.
-    # Classification metrics
-    accuracy: float = 0.0
-    precision_class_0: float = 0.0
-    precision_class_1: float = 0.0
-    precision_class_2: float = 0.0
-    recall_class_0: float = 0.0
-    recall_class_1: float = 0.0
-    recall_class_2: float = 0.0
-    f1_macro: float = 0.0
-    f1_weighted: float = 0.0
-    auc_roc: float = 0.0
-    # Feature importance
-    top_features: list[str] = Field(default_factory=list)
-    feature_count: int = 0
-    # Training metadata
-    train_samples: int = 0
-    test_samples: int = 0
-    training_duration_seconds: float = 0.0
-    trained_at: datetime | None = None
-    # Validation
-    walk_forward_sharpe: float = 0.0
-    out_of_sample_accuracy: float = 0.0
-
-
-class MLPrediction(BaseModel):
-    """Standardized prediction output from ml-inference-service.
-
-    Cross-service contract consumed by strategy-service (signal generation)
-    and execution-service (order routing decisions).
-    """
-
-    prediction_id: str
-    model_id: str
-    instrument_id: str
-    timeframe: str
-    timestamp: datetime
-    predicted_class: int  # 0=neither, 1=breakout, 2=reversion
-    confidence: float = Field(ge=0.0, le=1.0)
-    class_probabilities: dict[str, float] = Field(default_factory=dict)
-    features_used: int = 0
-
-
-class BackfillSpec(BaseModel):
-    """Per-service lookback requirements for transitioning from batch to live.
-
-    When a service starts in live mode, it needs historical data to warm up
-    indicators, ML models, etc. This spec declares what each service needs.
-    Cross-service contract used by deployment-service (orchestration) and
-    execution-service (readiness checks).
-    """
-
-    service_name: str
-    min_lookback_days: int = Field(..., description="Minimum history needed")
-    recommended_lookback_days: int = Field(..., description="Recommended for full accuracy")
-    required_upstream_services: list[str] = Field(default_factory=list)
-    warm_up_features: list[str] = Field(default_factory=list, description="Feature groups needed")
-    can_start_cold: bool = Field(default=False, description="Can start without history (degraded)")
+# MLModelScorecard, MLPrediction, BackfillSpec — SSOT: domain/ml/schemas.py
+# Re-exported here for backwards compatibility.
+from unified_api_contracts.internal.domain.ml.schemas import BackfillSpec as BackfillSpec
+from unified_api_contracts.internal.domain.ml.schemas import MLModelScorecard as MLModelScorecard
+from unified_api_contracts.internal.domain.ml.schemas import MLPrediction as MLPrediction

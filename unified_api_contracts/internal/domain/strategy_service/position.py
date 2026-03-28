@@ -205,9 +205,7 @@ class StrategyPosition:
     def _parse_enums(data: dict[str, object]) -> tuple[PositionType, PositionSide]:
         """Parse position_type and side enums from dict values."""
         pt_val = data.get("position_type")
-        position_type: PositionType = (
-            PositionType(pt_val) if isinstance(pt_val, str) else cast(PositionType, pt_val)
-        )
+        position_type: PositionType = PositionType(pt_val) if isinstance(pt_val, str) else cast(PositionType, pt_val)
         side_val = data.get("side")
         side: PositionSide = (
             PositionSide(side_val)
@@ -221,9 +219,7 @@ class StrategyPosition:
         """Parse timestamp and entry_timestamp from dict values."""
         ts_val = data.get("timestamp")
         timestamp: datetime = (
-            datetime.fromisoformat(ts_val.rstrip("Z"))
-            if isinstance(ts_val, str)
-            else cast(datetime, ts_val)
+            datetime.fromisoformat(ts_val.rstrip("Z")) if isinstance(ts_val, str) else cast(datetime, ts_val)
         )
         ets_val = data.get("entry_timestamp")
         entry_timestamp: datetime | None = (

@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
-# Generated from 25 services
-# Total schemas in spec: 78
-# Orphaned models: 573
+# Generated from 24 services
+# Total schemas in spec: 81
+# Orphaned models: 575
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -394,6 +394,7 @@ UIC: DepositAddress
 UIC: DepositRecord
 UIC: DerivativeTickerMessage
 UIC: DeviationState
+UIC: DriftMarketInfo
 UIC: EODSettlementTrigger
 UIC: EmergencyExitPlaybook
 UIC: EmergencyExitStep
@@ -573,6 +574,7 @@ UIC: WebSocketPingEvent
 UIC: WebSocketPongEvent
 UIC: WebSocketReconnectEvent
 UIC: WebSocketSubscribeAckEvent
+UIC: WebhookDeliveryConfig
 UIC: WithdrawalRecord
 UIC: XGBoostHyperparams
 UIC: YieldCurveTenor

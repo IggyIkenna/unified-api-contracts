@@ -490,7 +490,7 @@
           "standard"
         ],
         "version": "0.1.22",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 53,
         "testing_level": "integration",
         "status": "active",
@@ -843,7 +843,7 @@
           "cross-domain"
         ],
         "version": "0.1.20",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 85,
         "testing_level": "unit",
         "status": "active",
@@ -969,9 +969,12 @@
       },
       "deployment-ui": {
         "type": "ui",
-        "tier": "T3",
+        "tier": 3,
         "role": "Deployment management UI",
-        "tags": [],
+        "tags": [
+          "infrastructure",
+          "deployment"
+        ],
         "version": "0.1.0",
         "ci_status": "BASELINE_RECORDED",
         "coverage_pct": null,

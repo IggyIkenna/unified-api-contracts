@@ -15,5 +15,15 @@ UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allo
 BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py" "**/mapping_resolver.py")
 # data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants
 GCP_PROJECT_ID_EXCLUDE_GLOBS=("!**/registry/data_source_continuity.py")
+# __init__.py: re-export facades (large by design); defi errors: comprehensive catalog; synthetic/generators: data-heavy
+SIZE_EXTRA_EXCLUDES=(
+    "./unified_api_contracts/__init__.py"
+    "./unified_api_contracts/internal/__init__.py"
+    "./unified_api_contracts/canonical/crosscutting/errors/defi.py"
+    "./unified_api_contracts/internal/testing/synthetic.py"
+    "./unified_api_contracts/internal/testing/instrument_generator.py"
+)
+# requests CVE-2026-25645: no fix version available yet
+PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645"
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"

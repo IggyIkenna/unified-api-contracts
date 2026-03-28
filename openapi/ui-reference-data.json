@@ -44,96 +44,96 @@
       "LIDO": "defi",
       "ETHERFI": "defi",
       "ETHENA": "defi",
-      "KALSHI": "sports",
-      "PARIONSSPORT": "sports",
-      "MARATHONBET": "sports",
-      "BETRIGHT": "sports",
-      "FANDUEL": "sports",
-      "REBET": "sports",
-      "PLAYUP": "sports",
-      "BETPARX": "sports",
-      "BETSSON": "sports",
-      "FOOTYSTATS": "sports",
-      "HARDROCKBET": "sports",
-      "BETFAIR": "sports",
-      "SPORTSBET_AU": "sports",
-      "DRAFTKINGS_PICK6": "sports",
+      "VIRGINBET": "sports",
+      "UNDERSTAT": "sports",
       "CASUMO": "sports",
-      "ODDSJAM": "sports",
-      "DABBLE": "sports",
+      "SBOBET": "sports",
+      "BETFRED": "sports",
+      "BETSSON": "sports",
+      "OPEN_METEO": "sports",
+      "FANDUEL": "sports",
+      "WILLIAMHILL": "sports",
+      "PLAYUP": "sports",
+      "SMARKETS": "sports",
+      "GROSVENOR": "sports",
+      "ATG": "sports",
+      "LADBROKES": "sports",
+      "SUPRABETS": "sports",
+      "BOVADA": "sports",
+      "API_FOOTBALL": "sports",
+      "PARIONSSPORT": "sports",
+      "CORAL": "sports",
       "BOYLESPORTS": "sports",
       "UNIBET": "sports",
-      "PMU": "sports",
-      "BETDAQ": "sports",
-      "BETANYSPORTS": "sports",
-      "API_FOOTBALL": "sports",
-      "UNDERSTAT": "sports",
-      "MATCHBOOK": "sports",
-      "BETUS": "sports",
+      "FLIFF": "sports",
       "UNDERDOG": "sports",
+      "BETWAY": "sports",
+      "LOWVIG": "sports",
       "BET888SPORT": "sports",
-      "BETOPENLY": "sports",
-      "BETONLINEAG": "sports",
-      "BETMGM": "sports",
-      "CORAL": "sports",
-      "NETBET": "sports",
-      "PADDYPOWER": "sports",
-      "BETRIVERS": "sports",
+      "ODDSJAM": "sports",
+      "BETPARX": "sports",
+      "SVENSKASPEL": "sports",
+      "OPTICODDS": "sports",
+      "EVERYGAME": "sports",
+      "PINNACLE": "sports",
+      "BETR_AU": "sports",
+      "MYBOOKIEAG": "sports",
+      "BETRIGHT": "sports",
+      "MATCHBOOK": "sports",
+      "LEOVEGAS": "sports",
+      "PMU": "sports",
+      "BETFAIR": "sports",
+      "BET365": "sports",
+      "BETANYSPORTS": "sports",
+      "BETCLIC": "sports",
+      "KALSHI": "sports",
+      "POINTSBET": "sports",
+      "REBET": "sports",
+      "ODDS_ENGINE": "sports",
+      "PRIZEPICKS": "sports",
+      "DRAFTKINGS_PICK6": "sports",
       "GTBETS": "sports",
-      "OPEN_METEO": "sports",
-      "BETR_DFS": "sports",
-      "BWIN": "sports",
+      "BETDAQ": "sports",
+      "ODDS_API": "sports",
+      "LIVESCOREBET": "sports",
+      "METABET": "sports",
+      "BETVICTOR": "sports",
       "TABTOUCH": "sports",
       "FANATICS": "sports",
-      "WILLIAMHILL": "sports",
-      "SHARPAPI": "sports",
-      "ATG": "sports",
-      "BALLYBET": "sports",
-      "LOWVIG": "sports",
-      "POLYMARKET": "sports",
-      "BET365": "sports",
-      "NORDICBET": "sports",
-      "DRAFTKINGS": "sports",
-      "BETCLIC": "sports",
-      "OPTICODDS": "sports",
-      "GROSVENOR": "sports",
-      "POINTSBET": "sports",
-      "TRANSFERMARKT": "sports",
-      "PROPHETX": "sports",
-      "LADBROKES": "sports",
-      "MYBOOKIEAG": "sports",
-      "COOLBET": "sports",
-      "BOVADA": "sports",
-      "SMARKETS": "sports",
-      "ONEXBET": "sports",
-      "TAB": "sports",
-      "LIVESCOREBET": "sports",
-      "PINNACLE": "sports",
-      "SUPRABETS": "sports",
-      "ODDS_API": "sports",
-      "SOCCER_FOOTBALL_INFO": "sports",
-      "METABET": "sports",
-      "MRGREEN": "sports",
       "NEDS": "sports",
-      "ESPNBET": "sports",
-      "FLIFF": "sports",
+      "FOOTYSTATS": "sports",
+      "SOCCER_FOOTBALL_INFO": "sports",
+      "NETBET": "sports",
+      "BETOPENLY": "sports",
       "CAESARS": "sports",
-      "BETR_AU": "sports",
-      "SKYBET": "sports",
-      "BETVICTOR": "sports",
-      "SBOBET": "sports",
-      "PRIZEPICKS": "sports",
-      "EVERYGAME": "sports",
-      "BETWAY": "sports",
-      "SVENSKASPEL": "sports",
+      "HARDROCKBET": "sports",
       "CODERE": "sports",
-      "TIPICO": "sports",
-      "VIRGINBET": "sports",
+      "TAB": "sports",
+      "TRANSFERMARKT": "sports",
+      "PADDYPOWER": "sports",
+      "SPORTSBET_AU": "sports",
+      "ONEXBET": "sports",
+      "POLYMARKET": "sports",
+      "MRGREEN": "sports",
       "WINAMAX": "sports",
-      "LEOVEGAS": "sports",
-      "ODDS_ENGINE": "sports",
-      "BETFRED": "sports",
-      "NOVIG": "sports"
+      "DABBLE": "sports",
+      "ESPNBET": "sports",
+      "BWIN": "sports",
+      "BETONLINEAG": "sports",
+      "NORDICBET": "sports",
+      "SHARPAPI": "sports",
+      "BETMGM": "sports",
+      "COOLBET": "sports",
+      "NOVIG": "sports",
+      "MARATHONBET": "sports",
+      "PROPHETX": "sports",
+      "TIPICO": "sports",
+      "BALLYBET": "sports",
+      "DRAFTKINGS": "sports",
+      "BETUS": "sports",
+      "BETR_DFS": "sports",
+      "BETRIVERS": "sports",
+      "SKYBET": "sports"
     },
     "instrument_types_by_venue": {
       "BINANCE-SPOT": [
@@ -146,15 +146,15 @@
         "SPOT"
       ],
       "OKX-FUTURES": [
+        "PERPETUAL",
         "FUTURE",
-        "OPTION",
-        "PERPETUAL"
+        "OPTION"
       ],
       "OKX": [
         "PERPETUAL",
         "FUTURE",
-        "SPOT",
-        "OPTION"
+        "OPTION",
+        "SPOT"
       ],
       "BYBIT-SPOT": [
         "SPOT"
@@ -165,8 +165,8 @@
       ],
       "BYBIT": [
         "FUTURE",
-        "SPOT",
-        "PERPETUAL"
+        "PERPETUAL",
+        "SPOT"
       ],
       "UPBIT": [
         "SPOT"
@@ -176,9 +176,9 @@
         "PERPETUAL"
       ],
       "DERIBIT": [
+        "PERPETUAL",
         "FUTURE",
-        "OPTION",
-        "PERPETUAL"
+        "OPTION"
       ],
       "HYPERLIQUID": [
         "PERPETUAL"
@@ -197,36 +197,36 @@
         "ETF"
       ],
       "CME": [
-        "INDEX",
         "FUTURE",
-        "OPTION",
-        "BOND"
+        "INDEX",
+        "BOND",
+        "OPTION"
       ],
       "CBOT": [
         "FUTURE",
-        "OPTION",
-        "BOND"
+        "BOND",
+        "OPTION"
       ],
       "NYMEX": [
-        "COMMODITY",
         "FUTURE",
+        "COMMODITY",
         "OPTION"
       ],
       "COMEX": [
-        "COMMODITY",
         "FUTURE",
+        "COMMODITY",
         "OPTION"
       ],
       "ICE": [
-        "COMMODITY",
         "FUTURE",
+        "COMMODITY",
         "OPTION"
       ],
       "CBOE": [
+        "OPTION",
         "INDEX",
         "EQUITY",
-        "ETF",
-        "OPTION"
+        "ETF"
       ],
       "XNAS": [
         "EQUITY",
@@ -290,13 +290,13 @@
       "SMARKETS": [
         "EXCHANGE_ODDS"
       ],
-      "KALSHI": [
-        "PREDICTION_MARKET"
-      ],
       "PROPHETX": [
         "PREDICTION_MARKET"
       ],
       "BETOPENLY": [
+        "PREDICTION_MARKET"
+      ],
+      "KALSHI": [
         "PREDICTION_MARKET"
       ],
       "NOVIG": [
@@ -311,202 +311,202 @@
       "ONEXBET": [
         "FIXED_ODDS"
       ],
-      "BET365": [
-        "FIXED_ODDS"
-      ],
-      "PARIONSSPORT": [
-        "FIXED_ODDS"
-      ],
-      "MARATHONBET": [
-        "FIXED_ODDS"
-      ],
-      "DRAFTKINGS": [
-        "FIXED_ODDS"
-      ],
-      "FANDUEL": [
-        "FIXED_ODDS"
-      ],
-      "REBET": [
-        "FIXED_ODDS"
-      ],
-      "BETCLIC": [
-        "FIXED_ODDS"
-      ],
-      "BETPARX": [
-        "FIXED_ODDS"
-      ],
-      "BETRIGHT": [
-        "FIXED_ODDS"
-      ],
-      "PLAYUP": [
-        "FIXED_ODDS"
-      ],
-      "GROSVENOR": [
-        "FIXED_ODDS"
-      ],
-      "BETSSON": [
-        "FIXED_ODDS"
-      ],
-      "POINTSBET": [
-        "FIXED_ODDS"
-      ],
-      "HARDROCKBET": [
-        "FIXED_ODDS"
-      ],
-      "SPORTSBET_AU": [
-        "FIXED_ODDS"
-      ],
-      "LADBROKES": [
-        "FIXED_ODDS"
-      ],
-      "MYBOOKIEAG": [
-        "FIXED_ODDS"
-      ],
-      "COOLBET": [
-        "FIXED_ODDS"
-      ],
-      "ATG": [
+      "VIRGINBET": [
         "FIXED_ODDS"
       ],
       "CASUMO": [
         "FIXED_ODDS"
       ],
-      "BOVADA": [
-        "FIXED_ODDS"
-      ],
-      "TAB": [
-        "FIXED_ODDS"
-      ],
-      "DABBLE": [
-        "FIXED_ODDS"
-      ],
-      "BOYLESPORTS": [
-        "FIXED_ODDS"
-      ],
       "LIVESCOREBET": [
-        "FIXED_ODDS"
-      ],
-      "UNIBET": [
-        "FIXED_ODDS"
-      ],
-      "PMU": [
-        "FIXED_ODDS"
-      ],
-      "SUPRABETS": [
-        "FIXED_ODDS"
-      ],
-      "BETANYSPORTS": [
-        "FIXED_ODDS"
-      ],
-      "MRGREEN": [
-        "FIXED_ODDS"
-      ],
-      "BETUS": [
-        "FIXED_ODDS"
-      ],
-      "NEDS": [
-        "FIXED_ODDS"
-      ],
-      "ESPNBET": [
-        "FIXED_ODDS"
-      ],
-      "FLIFF": [
-        "FIXED_ODDS"
-      ],
-      "CAESARS": [
-        "FIXED_ODDS"
-      ],
-      "BET888SPORT": [
-        "FIXED_ODDS"
-      ],
-      "SKYBET": [
-        "FIXED_ODDS"
-      ],
-      "BETVICTOR": [
-        "FIXED_ODDS"
-      ],
-      "BETONLINEAG": [
-        "FIXED_ODDS"
-      ],
-      "BETMGM": [
         "FIXED_ODDS"
       ],
       "SBOBET": [
         "FIXED_ODDS"
       ],
-      "BETR_AU": [
+      "BETFRED": [
         "FIXED_ODDS"
       ],
-      "EVERYGAME": [
+      "BETSSON": [
         "FIXED_ODDS"
       ],
-      "CORAL": [
-        "FIXED_ODDS"
-      ],
-      "BETWAY": [
-        "FIXED_ODDS"
-      ],
-      "NETBET": [
-        "FIXED_ODDS"
-      ],
-      "SVENSKASPEL": [
-        "FIXED_ODDS"
-      ],
-      "PADDYPOWER": [
-        "FIXED_ODDS"
-      ],
-      "CODERE": [
-        "FIXED_ODDS"
-      ],
-      "TIPICO": [
-        "FIXED_ODDS"
-      ],
-      "VIRGINBET": [
-        "FIXED_ODDS"
-      ],
-      "BETRIVERS": [
-        "FIXED_ODDS"
-      ],
-      "GTBETS": [
-        "FIXED_ODDS"
-      ],
-      "WINAMAX": [
-        "FIXED_ODDS"
-      ],
-      "BWIN": [
-        "FIXED_ODDS"
-      ],
-      "FANATICS": [
-        "FIXED_ODDS"
-      ],
-      "WILLIAMHILL": [
-        "FIXED_ODDS"
-      ],
-      "LEOVEGAS": [
+      "BETVICTOR": [
         "FIXED_ODDS"
       ],
       "TABTOUCH": [
         "FIXED_ODDS"
       ],
-      "BETFRED": [
+      "FANATICS": [
         "FIXED_ODDS"
       ],
-      "BALLYBET": [
+      "NEDS": [
+        "FIXED_ODDS"
+      ],
+      "NETBET": [
+        "FIXED_ODDS"
+      ],
+      "FANDUEL": [
+        "FIXED_ODDS"
+      ],
+      "CAESARS": [
+        "FIXED_ODDS"
+      ],
+      "HARDROCKBET": [
+        "FIXED_ODDS"
+      ],
+      "WILLIAMHILL": [
+        "FIXED_ODDS"
+      ],
+      "GROSVENOR": [
+        "FIXED_ODDS"
+      ],
+      "CODERE": [
+        "FIXED_ODDS"
+      ],
+      "ATG": [
+        "FIXED_ODDS"
+      ],
+      "PLAYUP": [
+        "FIXED_ODDS"
+      ],
+      "TAB": [
+        "FIXED_ODDS"
+      ],
+      "LADBROKES": [
+        "FIXED_ODDS"
+      ],
+      "PADDYPOWER": [
+        "FIXED_ODDS"
+      ],
+      "BOVADA": [
+        "FIXED_ODDS"
+      ],
+      "SUPRABETS": [
+        "FIXED_ODDS"
+      ],
+      "PARIONSSPORT": [
+        "FIXED_ODDS"
+      ],
+      "CORAL": [
+        "FIXED_ODDS"
+      ],
+      "SPORTSBET_AU": [
+        "FIXED_ODDS"
+      ],
+      "BOYLESPORTS": [
+        "FIXED_ODDS"
+      ],
+      "MRGREEN": [
+        "FIXED_ODDS"
+      ],
+      "UNIBET": [
+        "FIXED_ODDS"
+      ],
+      "FLIFF": [
+        "FIXED_ODDS"
+      ],
+      "WINAMAX": [
+        "FIXED_ODDS"
+      ],
+      "BETWAY": [
+        "FIXED_ODDS"
+      ],
+      "DABBLE": [
+        "FIXED_ODDS"
+      ],
+      "ESPNBET": [
         "FIXED_ODDS"
       ],
       "LOWVIG": [
         "FIXED_ODDS"
       ],
+      "BWIN": [
+        "FIXED_ODDS"
+      ],
+      "BET888SPORT": [
+        "FIXED_ODDS"
+      ],
+      "BETONLINEAG": [
+        "FIXED_ODDS"
+      ],
       "NORDICBET": [
+        "FIXED_ODDS"
+      ],
+      "BETMGM": [
+        "FIXED_ODDS"
+      ],
+      "BETPARX": [
+        "FIXED_ODDS"
+      ],
+      "COOLBET": [
+        "FIXED_ODDS"
+      ],
+      "EVERYGAME": [
+        "FIXED_ODDS"
+      ],
+      "MARATHONBET": [
+        "FIXED_ODDS"
+      ],
+      "SVENSKASPEL": [
+        "FIXED_ODDS"
+      ],
+      "BETR_AU": [
+        "FIXED_ODDS"
+      ],
+      "TIPICO": [
+        "FIXED_ODDS"
+      ],
+      "MYBOOKIEAG": [
+        "FIXED_ODDS"
+      ],
+      "BALLYBET": [
+        "FIXED_ODDS"
+      ],
+      "BETRIGHT": [
+        "FIXED_ODDS"
+      ],
+      "LEOVEGAS": [
+        "FIXED_ODDS"
+      ],
+      "PMU": [
+        "FIXED_ODDS"
+      ],
+      "BET365": [
+        "FIXED_ODDS"
+      ],
+      "DRAFTKINGS": [
+        "FIXED_ODDS"
+      ],
+      "BETUS": [
+        "FIXED_ODDS"
+      ],
+      "BETANYSPORTS": [
+        "FIXED_ODDS"
+      ],
+      "BETCLIC": [
+        "FIXED_ODDS"
+      ],
+      "POINTSBET": [
+        "FIXED_ODDS"
+      ],
+      "BETRIVERS": [
+        "FIXED_ODDS"
+      ],
+      "REBET": [
+        "FIXED_ODDS"
+      ],
+      "SKYBET": [
+        "FIXED_ODDS"
+      ],
+      "GTBETS": [
         "FIXED_ODDS"
       ],
       "BETR_DFS": [
         "PROP"
       ],
-      "PRIZEPICKS": [
+      "UNDERDOG": [
         "PROP"
       ],
-      "UNDERDOG": [
+      "PRIZEPICKS": [
         "PROP"
       ],
       "DRAFTKINGS_PICK6": [
@@ -1318,8 +1318,13 @@
     "ExecutionOrderType": [
       "MARKET",
       "LIMIT",
+      "IOC",
+      "FOK",
+      "MAX_SLIPPAGE",
       "STOP_LIMIT",
       "STOP_MARKET",
+      "TRAILING_STOP_LIMIT",
+      "TRAILING_TAKE_PROFIT",
       "TWAP",
       "VWAP"
     ],
@@ -1375,7 +1380,9 @@
       "REMOVE_LIQUIDITY",
       "FLASH_BORROW",
       "FLASH_REPAY",
-      "ATOMIC_BUNDLE"
+      "ATOMIC_BUNDLE",
+      "WRAP",
+      "UNWRAP"
     ],
     "InstructionType": [
       "TRADE",
@@ -1578,6 +1585,18 @@
       "SEQUENTIAL",
       "LEADER_FOLLOWER",
       "PARALLEL"
+    ],
+    "NAVSnapshotFrequency": [
+      "HOURLY",
+      "DAILY",
+      "WEEKLY",
+      "ON_DEMAND"
+    ],
+    "NAVSnapshotStatus": [
+      "PENDING",
+      "DELIVERED",
+      "FAILED",
+      "ACKNOWLEDGED"
     ],
     "OHLCVSource": [
       "NATIVE_CANDLE",

@@ -185,12 +185,6 @@ class AccountState(BaseModel):
     margin: MarginState | None = None
 
 
-# PnLBreakdown and GreeksExposure SSOT: unified_api_contracts.internal.risk
-# Re-exported here for backwards compatibility.
-from unified_api_contracts.internal.risk import GreeksExposure as GreeksExposure
-from unified_api_contracts.internal.risk import PnLBreakdown as PnLBreakdown
-
-
 class CircuitBreakerEvent(BaseModel):
     """Runtime event emitted on circuit breaker state transitions.
 

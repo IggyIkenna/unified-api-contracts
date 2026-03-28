@@ -336,7 +336,6 @@ from .external.coinbase.schemas import (
     CoinbaseTrade,
 )
 from .external.coinglass.schemas import (
-    LiquidationHeatmapRequest,
     LiquidationHeatmapResponse,
     LiquidationLevel,
 )
@@ -356,11 +355,8 @@ from .external.deribit.schemas import (
 )
 from .external.hyblock.schemas import (
     HyblockLiquidationLevelEntry,
-    HyblockLiquidationLevelRequest,
     HyblockLiquidationLevelResponse,
     HyblockOIClusterEntry,
-    HyblockOIClusterRequest,
-    HyblockOIClusterResponse,
 )
 from .external.hyperliquid.schemas import (
     HyperliquidAssetInfo,
@@ -853,11 +849,8 @@ __all__ = [
     "HealthPingResponse",
     "HttpRateLimitHeaders",
     "HyblockLiquidationLevelEntry",
-    "HyblockLiquidationLevelRequest",
     "HyblockLiquidationLevelResponse",
     "HyblockOIClusterEntry",
-    "HyblockOIClusterRequest",
-    "HyblockOIClusterResponse",
     "HyperliquidAssetInfo",
     "HyperliquidFill",
     "HyperliquidFundingHistoryEntry",
@@ -885,7 +878,6 @@ __all__ = [
     "LidoSubmitResponse",
     "LidoWstEthWrapResponse",
     "LineupPlayer",
-    "LiquidationHeatmapRequest",
     "LiquidationHeatmapResponse",
     "LiquidationLevel",
     "LiveMatchState",

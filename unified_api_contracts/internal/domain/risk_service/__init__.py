@@ -17,14 +17,12 @@ from unified_api_contracts.internal.domain.risk_service.risk import (
     EODSettlementTrigger,
     ExposureSummary,
     ExtendedPnLAttribution,
-    GreeksExposure,
     InternalPosition,
     KillSwitchScope,
     LimitCheckResult,
     MarginHealthSnapshot,
     MarginState,
     MultiAssetMarginCalculation,
-    PnLBreakdown,
     PositionSide,
     PreTradeCheckRequest,
     PreTradeCheckResponse,
@@ -38,6 +36,7 @@ from unified_api_contracts.internal.domain.risk_service.risk import (
     StrategyRiskProfile,
     TermStructureExposure,
 )
+from unified_api_contracts.internal.risk import GreeksExposure, PnLBreakdown
 
 __all__ = [
     "AccountState",

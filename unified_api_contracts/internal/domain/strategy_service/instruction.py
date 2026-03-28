@@ -105,9 +105,7 @@ class StrategyInstruction:
             "allowed_venues": self.allowed_venues,
             "gas_limit": self.gas_limit,
             "priority_fee_gwei": self.priority_fee_gwei,
-            "deadline_timestamp": self.deadline_timestamp.isoformat()
-            if self.deadline_timestamp
-            else None,
+            "deadline_timestamp": self.deadline_timestamp.isoformat() if self.deadline_timestamp else None,
             "metadata": self.metadata,
         }
 
@@ -117,9 +115,7 @@ class StrategyInstruction:
     ) -> tuple[OperationType, BenchmarkType, OrderType]:
         """Parse operation, benchmark_type, and order_type enums from dict."""
         op_val = data.get("operation")
-        operation: OperationType = (
-            OperationType(op_val) if isinstance(op_val, str) else cast(OperationType, op_val)
-        )
+        operation: OperationType = OperationType(op_val) if isinstance(op_val, str) else cast(OperationType, op_val)
         bench_val = data.get("benchmark_type")
         benchmark_type: BenchmarkType = (
             BenchmarkType(bench_val)
@@ -128,9 +124,7 @@ class StrategyInstruction:
         )
         order_val = data.get("order_type")
         order_type: OrderType = (
-            OrderType(order_val)
-            if isinstance(order_val, str)
-            else cast(OrderType, order_val) or OrderType.MARKET
+            OrderType(order_val) if isinstance(order_val, str) else cast(OrderType, order_val) or OrderType.MARKET
         )
         return operation, benchmark_type, order_type
 
@@ -139,9 +133,7 @@ class StrategyInstruction:
         """Parse timestamp and deadline_timestamp from dict."""
         ts_val = data.get("timestamp")
         timestamp: datetime = (
-            datetime.fromisoformat(ts_val.rstrip("Z"))
-            if isinstance(ts_val, str)
-            else cast(datetime, ts_val)
+            datetime.fromisoformat(ts_val.rstrip("Z")) if isinstance(ts_val, str) else cast(datetime, ts_val)
         )
         deadline_val = data.get("deadline_timestamp")
         deadline_timestamp: datetime | None = (
@@ -238,9 +230,7 @@ class DeFiSignal:
         flash_repays = [i for i in self.instructions if i.operation == OperationType.FLASH_REPAY]
 
         if flash_borrows and len(flash_borrows) != len(flash_repays):
-            raise ValueError(
-                "Atomic signals with flash loans must have paired FLASH_BORROW/FLASH_REPAY"
-            )
+            raise ValueError("Atomic signals with flash loans must have paired FLASH_BORROW/FLASH_REPAY")
 
         # Verify FLASH_BORROW comes before FLASH_REPAY
         if flash_borrows and flash_repays:
@@ -249,9 +239,7 @@ class DeFiSignal:
 
             for bi, ri in zip(borrow_indices, repay_indices, strict=False):
                 if bi >= ri:
-                    raise ValueError(
-                        "FLASH_BORROW must come before FLASH_REPAY in instruction order"
-                    )
+                    raise ValueError("FLASH_BORROW must come before FLASH_REPAY in instruction order")
 
     def to_dict(self) -> dict[str, object]:
         """Convert to dictionary for serialization."""
@@ -262,9 +250,7 @@ class DeFiSignal:
             "is_atomic": self.is_atomic,
             "instructions": [i.to_dict() for i in self.instructions],
             "expected_apy": str(self.expected_apy) if self.expected_apy else None,
-            "ethena_benchmark_apy": str(self.ethena_benchmark_apy)
-            if self.ethena_benchmark_apy
-            else None,
+            "ethena_benchmark_apy": str(self.ethena_benchmark_apy) if self.ethena_benchmark_apy else None,
             "max_total_slippage_bps": self.max_total_slippage_bps,
             "total_gas_budget": self.total_gas_budget,
             "metadata": self.metadata,
@@ -291,9 +277,7 @@ class DeFiSignal:
         # Parse timestamp
         ts_val = data.get("timestamp")
         timestamp: datetime = (
-            datetime.fromisoformat(ts_val.rstrip("Z"))
-            if isinstance(ts_val, str)
-            else cast(datetime, ts_val)
+            datetime.fromisoformat(ts_val.rstrip("Z")) if isinstance(ts_val, str) else cast(datetime, ts_val)
         )
 
         metadata: dict[str, str | int | float | bool | None] = cast(
