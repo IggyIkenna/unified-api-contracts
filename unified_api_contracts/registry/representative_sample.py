@@ -246,7 +246,7 @@ TRADFI_FUTURES_SPECS: list[dict[str, str | float]] = [
 DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
     # Aave V3 ETH — aTokens
     {
-        "venue": "AAVE_V3_ETH",
+        "venue": "AAVEV3-ETHEREUM",
         "symbol": "aWETH",
         "underlying": "WETH",
         "type": "A_TOKEN",
@@ -255,7 +255,7 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
         "available_from": "2023-01-27",
     },
     {
-        "venue": "AAVE_V3_ETH",
+        "venue": "AAVEV3-ETHEREUM",
         "symbol": "aUSDC",
         "underlying": "USDC",
         "type": "A_TOKEN",
@@ -264,7 +264,7 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
         "available_from": "2023-01-27",
     },
     {
-        "venue": "AAVE_V3_ETH",
+        "venue": "AAVEV3-ETHEREUM",
         "symbol": "aUSDT",
         "underlying": "USDT",
         "type": "A_TOKEN",
@@ -274,21 +274,21 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
     },
     # Aave V3 ETH — Debt tokens
     {
-        "venue": "AAVE_V3_ETH",
+        "venue": "AAVEV3-ETHEREUM",
         "symbol": "variableDebtWETH",
         "underlying": "WETH",
         "type": "DEBT_TOKEN",
         "available_from": "2023-01-27",
     },
     {
-        "venue": "AAVE_V3_ETH",
+        "venue": "AAVEV3-ETHEREUM",
         "symbol": "variableDebtUSDC",
         "underlying": "USDC",
         "type": "DEBT_TOKEN",
         "available_from": "2023-01-27",
     },
     {
-        "venue": "AAVE_V3_ETH",
+        "venue": "AAVEV3-ETHEREUM",
         "symbol": "variableDebtUSDT",
         "underlying": "USDT",
         "type": "DEBT_TOKEN",
@@ -304,7 +304,7 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
     },
     # Uniswap V3
     {
-        "venue": "UNISWAPV3-ETH",
+        "venue": "UNISWAPV3-ETHEREUM",
         "symbol": "USDT-ETH-3000",
         "underlying": "ETH",
         "type": "POOL",
@@ -316,7 +316,7 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
     },
     # Uniswap V2
     {
-        "venue": "UNISWAPV2-ETH",
+        "venue": "UNISWAPV2-ETHEREUM",
         "symbol": "USDT-ETH",
         "underlying": "ETH",
         "type": "POOL",
@@ -327,7 +327,7 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
     },
     # Uniswap V4
     {
-        "venue": "UNISWAPV4-ETH",
+        "venue": "UNISWAPV4-ETHEREUM",
         "symbol": "USDT-ETH",
         "underlying": "ETH",
         "type": "POOL",
@@ -355,7 +355,7 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
     },
     # Curve
     {
-        "venue": "CURVE-ETH",
+        "venue": "CURVE-ETHEREUM",
         "symbol": "3pool",
         "underlying": "DAI",
         "type": "POOL",
@@ -381,7 +381,13 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
         "available_from": "2024-04-02",
     },
     # Euler
-    {"venue": "EULER-ETH", "symbol": "eUSDC", "underlying": "USDC", "type": "POOL", "available_from": "2024-03-04"},
+    {
+        "venue": "EULER-ETHEREUM",
+        "symbol": "eUSDC",
+        "underlying": "USDC",
+        "type": "POOL",
+        "available_from": "2024-03-04",
+    },
 ]
 
 # ---------------------------------------------------------------------------

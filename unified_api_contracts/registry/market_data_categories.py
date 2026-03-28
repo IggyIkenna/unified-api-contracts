@@ -84,13 +84,13 @@ VENUES_BY_CATEGORY: dict[str, list[str]] = {
     ],
     "defi": [
         # DEX protocols (swaps)
-        "UNISWAPV2-ETH",
-        "UNISWAPV3-ETH",
-        "UNISWAPV4-ETH",
-        "CURVE-ETH",  # Curve Ethereum (MetaRegistry RPC)
-        # FUTURE: BALANCER-ETH (The Graph deprecated)
+        "UNISWAPV2-ETHEREUM",
+        "UNISWAPV3-ETHEREUM",
+        "UNISWAPV4-ETHEREUM",
+        "CURVE-ETHEREUM",  # Curve Ethereum (MetaRegistry RPC)
+        # FUTURE: BALANCER-ETHEREUM (The Graph deprecated)
         # Lending protocols
-        "AAVE_V3_ETH",
+        "AAVEV3-ETHEREUM",
         "MORPHO-ETHEREUM",
         # FUTURE: EULER-PLASMA, FLUID-PLASMA (adapters not implemented)
         # LST/Yield protocols
@@ -118,3 +118,105 @@ ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_CATEGORY.values(
 
 # All supported venues (union of all categories)
 ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_CATEGORY.values() for v in vs})
+
+
+# --- Venue → Category reverse lookup ---
+
+VENUE_TO_CATEGORY: dict[str, str] = {venue: cat for cat, venues in VENUES_BY_CATEGORY.items() for venue in venues}
+
+
+# --- Feature-group → data_type mappings (SSOT for all feature services) ---
+# Previously hardcoded in features-delta-one-service orchestrator.
+
+FEATURE_GROUP_DATA_TYPES: dict[str, str] = {
+    # Default (CEFI) — most feature groups use trades
+    "technical_indicators": "trades",
+    "moving_averages": "trades",
+    "oscillators": "trades",
+    "volatility_realized": "trades",
+    "momentum": "trades",
+    "volume_analysis": "trades",
+    "vwap": "trades",
+    "candlestick_patterns": "trades",
+    "market_structure": "trades",
+    "returns": "trades",
+    "round_numbers": "trades",
+    "streaks": "trades",
+    "microstructure": "book_snapshot_5",
+    "funding_oi": "derivative_ticker",
+    "liquidations": "liquidations",
+    "futures_basis": "trades",
+    "volume_flow": "trades",
+    "temporal": "trades",
+    "economic_events": "trades",
+    "targets": "trades",
+    # S/R level system feature groups
+    "supply_demand_zones": "trades",
+    "fibonacci": "trades",
+    "level_confluence": "trades",
+    "market_structure_sequence": "trades",
+    # ML feature enhancement
+    "risk_reward": "trades",
+    "wedge_quality": "trades",
+}
+
+# Category-specific overrides (applied on top of FEATURE_GROUP_DATA_TYPES)
+FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
+    "tradfi": {
+        "microstructure": "tbbo",  # Top of Book for TradFi equities
+    },
+    "defi": {
+        "technical_indicators": "oracle_prices",
+        "moving_averages": "oracle_prices",
+        "oscillators": "oracle_prices",
+        "volatility_realized": "oracle_prices",
+        "momentum": "oracle_prices",
+        "volume_analysis": "swaps",
+        "vwap": "swaps",
+        "candlestick_patterns": "oracle_prices",
+        "market_structure": "oracle_prices",
+        "returns": "oracle_prices",
+        "round_numbers": "oracle_prices",
+        "streaks": "oracle_prices",
+        "microstructure": "swaps",
+        "funding_oi": "derivative_ticker",
+        "liquidations": "derivative_ticker",
+        "temporal": "oracle_prices",
+        "economic_events": "oracle_prices",
+        "targets": "oracle_prices",
+    },
+}
+
+
+def resolve_data_type_for_feature_group(feature_group: str, category: str) -> str:
+    """Resolve the correct data type for a feature group in a given category.
+
+    Uses FEATURE_GROUP_DATA_TYPES as base, with per-category overrides.
+    This is the SSOT — services should not hardcode data type mappings.
+    """
+    cat_lower = category.lower()
+    overrides = FEATURE_GROUP_DATA_TYPE_OVERRIDES.get(cat_lower, {})
+    if feature_group in overrides:
+        return overrides[feature_group]
+    return FEATURE_GROUP_DATA_TYPES.get(feature_group, "trades")
+
+
+def get_valid_data_types_for_venue(venue: str) -> list[str]:
+    """Return the valid data types for a venue based on its category.
+
+    Looks up the venue's category, then returns the data types for that category.
+    """
+    cat = VENUE_TO_CATEGORY.get(venue, "")
+    return DATA_TYPES_BY_CATEGORY.get(cat, [])
+
+
+def validate_data_type_for_venue(venue: str, data_type: str) -> bool:
+    """Check if a data type is valid for a venue.
+
+    Returns True if the data type is in the venue's category's allowed data types.
+    Returns True for unknown venues (permissive — validation is advisory).
+    """
+    valid = get_valid_data_types_for_venue(venue)
+    if not valid:
+        return True  # Unknown venue — don't block
+    return data_type in valid

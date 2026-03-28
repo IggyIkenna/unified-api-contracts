@@ -9,16 +9,19 @@ from ._defi import (
     CHAIN_RPC_TEMPLATES,
     DEFI_CAPABILITIES,
     SOLANA_DEFI_PROTOCOLS,
+    SOLANA_MINT_TO_SYMBOL,
     SOLANA_RPC_TEMPLATES,
     SOLANA_TOKEN_ADDRESSES,
     SUBGRAPH_IDS,
     TBTC_ADDRESSES,
     DeFiDataSource,
     NonEvmChain,
+    get_solana_protocol_url,
     get_solana_rpc_url,
     get_solana_token_address,
     get_subgraph_id,
     get_supported_chains_for_protocol,
+    resolve_solana_mint,
 )
 from ._sports import SPORTS_CAPABILITIES
 from ._tradfi import TRADFI_CAPABILITIES
@@ -30,6 +33,7 @@ __all__ = [
     "CHAIN_RPC_TEMPLATES",
     "DEFI_CAPABILITIES",
     "SOLANA_DEFI_PROTOCOLS",
+    "SOLANA_MINT_TO_SYMBOL",
     "SOLANA_RPC_TEMPLATES",
     "SOLANA_TOKEN_ADDRESSES",
     "SPORTS_CAPABILITIES",
@@ -38,8 +42,10 @@ __all__ = [
     "TRADFI_CAPABILITIES",
     "DeFiDataSource",
     "NonEvmChain",
+    "get_solana_protocol_url",
     "get_solana_rpc_url",
     "get_solana_token_address",
     "get_subgraph_id",
     "get_supported_chains_for_protocol",
+    "resolve_solana_mint",
 ]

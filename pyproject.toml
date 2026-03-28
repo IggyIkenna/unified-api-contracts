@@ -93,6 +93,8 @@ max-complexity = 7
 "unified_api_contracts/canonical/normalize/orders_fills.py" = ["F401"]
 "unified_api_contracts/normalize_utils/*.py" = ["N815", "N803"]
 "unified_api_contracts/normalize_utils/errors/*.py" = ["N815"]
+# Root __init__.py re-exports all public symbols — F401 is expected
+"unified_api_contracts/__init__.py" = ["F401"]
 # Root-level domain facades (Phase 2 citadel)
 "unified_api_contracts/market.py" = ["F403", "F405"]
 "unified_api_contracts/execution.py" = ["F403", "F405"]

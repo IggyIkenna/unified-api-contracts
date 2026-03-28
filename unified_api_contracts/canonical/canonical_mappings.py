@@ -306,15 +306,15 @@ DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
 # --- DEFI_DATASET_TO_CANONICAL_VENUE ---
 # DeFi: dataset/subgraph/chain → canonical venue. Scope: Euler, Fluid, ERC20, BTC only.
 DEFI_DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
-    "uniswap-v2-ethereum": "UNISWAPV2-ETH",
-    "uniswap-v3-ethereum": "UNISWAPV3-ETH",
-    "uniswap-v4-ethereum": "UNISWAPV4-ETH",
-    "uniswap/uniswap-v2": "UNISWAPV2-ETH",
-    "uniswap/uniswap-v3": "UNISWAPV3-ETH",
-    "curve-ethereum": "CURVE-ETH",
-    "curvefi/curve-ethereum": "CURVE-ETH",
+    "uniswap-v2-ethereum": "UNISWAPV2-ETHEREUM",
+    "uniswap-v3-ethereum": "UNISWAPV3-ETHEREUM",
+    "uniswap-v4-ethereum": "UNISWAPV4-ETHEREUM",
+    "uniswap/uniswap-v2": "UNISWAPV2-ETHEREUM",
+    "uniswap/uniswap-v3": "UNISWAPV3-ETHEREUM",
+    "curve-ethereum": "CURVE-ETHEREUM",
+    "curvefi/curve-ethereum": "CURVE-ETHEREUM",
     "aerodrome-base": "AERODROME-BASE",
-    "aave-v3-ethereum": "AAVE_V3_ETH",
+    "aave-v3-ethereum": "AAVEV3-ETHEREUM",
     "aave-v3": "AAVE_V3",
     "morpho-ethereum": "MORPHO-ETHEREUM",
     "morpho-org/morpho-blue": "MORPHO-ETHEREUM",

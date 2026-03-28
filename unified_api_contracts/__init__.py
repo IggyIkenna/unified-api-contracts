@@ -461,6 +461,8 @@ from .external.upbit.schemas import (
 )
 from .normalize_utils import american_to_decimal, decimal_to_american
 from .registry import (
+    ALL_DATA_TYPES,
+    ALL_VENUES,
     BINANCE_FUTURES,
     BINANCE_SPOT,
     BYBIT_FUTURES,
@@ -508,6 +510,7 @@ from .registry import (
     TRADFI_TICKER_UNIVERSE,
     TRADFI_VENUE_MAPPINGS,
     VENUE_CATEGORY_MAP,
+    VENUE_TO_CATEGORY,
     VENUES_BY_CATEGORY,
     ZERO_ALPHA_VENUES,
     AccessMode,
@@ -520,14 +523,17 @@ from .registry import (
     FxSpotPairDef,
     ProviderBinding,
     ResponseFormat,
+    SessionTimes,
     TradFiInstrumentDef,
     VenueMapping,
-    SessionTimes,
     get_databento_symbols_for_dataset,
     get_databento_symbols_for_venue,
     get_required_datasets,
     get_session_times,
+    get_valid_data_types_for_venue,
     is_trading_hours,
+    resolve_data_type_for_feature_group,
+    validate_data_type_for_venue,
 )
 from .sports import (
     BUNDESLIGA_TEAM_ALIASES as BUNDESLIGA_TEAM_ALIASES,
@@ -549,6 +555,8 @@ from .sports import (
 )
 
 __all__ = [
+    "ALL_DATA_TYPES",
+    "ALL_VENUES",
     "BINANCE_FUTURES",
     "BINANCE_SPOT",
     "BOOKMAKER_REGISTRY",
@@ -567,8 +575,8 @@ __all__ = [
     "DATA_TYPES_BY_CATEGORY",
     "DEFI_INSTRUMENTS",
     "DEFI_LENDING_ASSETS",
-    "DEFI_MAJOR_ASSET_ADDRESS_LIST",
     "DEFI_MAJOR_ASSET_ADDRESSES",
+    "DEFI_MAJOR_ASSET_ADDRESS_LIST",
     "DEFI_MAJOR_ASSET_SYMBOLS",
     "DEX_VENUES",
     "DEX_VENUE_KEYWORDS",
@@ -605,6 +613,7 @@ __all__ = [
     "VENUE_CATEGORY_MAP",
     "VENUE_ERROR_MAP",
     "VENUE_EXECUTION_REGISTRY",
+    "VENUE_TO_CATEGORY",
     "VENUE_TO_DATA_SOURCE",
     "VENUE_TO_DATA_SOURCES",
     "ZERO_ALPHA_VENUES",

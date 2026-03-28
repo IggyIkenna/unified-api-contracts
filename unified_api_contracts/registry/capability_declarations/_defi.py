@@ -258,22 +258,52 @@ SOLANA_RPC_TEMPLATES: dict[str, str] = {
     "helius": "https://mainnet.helius-rpc.com/?api-key={api_key}",
 }
 
-# Solana key program/token addresses
+# Solana key program/token addresses (symbol → mint)
 SOLANA_TOKEN_ADDRESSES: dict[str, str] = {
     "WSOL": "So11111111111111111111111111111111111111112",
+    "SOL": "So11111111111111111111111111111111111111112",
     "USDC": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     "USDT": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "WETH": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
     "WBTC_PORTAL": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
     "CBBTC": "cbbtcn3Keb2DW3ZsmLmrsPGsRRhQ3HmFsRJhKqLm1bq",
+    "MSOL": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
+    "JITOSOL": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+    "BNSOL": "BNso1VUJnh4zcfpZa6986Ea66P6TCp59hvtNJ8b1X85",
+    "JUP": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
+    "HNT": "hntyVP6YFm1Hg25TN9WGLqM12b8TQv3TXsxg8HBatYS",
+    "RNDR": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
+    "KMNO": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+    "PYTH": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
 }
 
-# Solana DeFi protocol metadata for adapter discovery
+# Reverse mapping: mint → symbol (for parsing on-chain / API responses)
+SOLANA_MINT_TO_SYMBOL: dict[str, str] = {v: k for k, v in SOLANA_TOKEN_ADDRESSES.items()}
+# Fix WSOL/SOL collision — prefer SOL
+SOLANA_MINT_TO_SYMBOL["So11111111111111111111111111111111111111112"] = "SOL"
+
+# Solana DeFi protocol metadata — SSOT for all API endpoints.
+# Services import these URLs; never hardcode them.
 SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
+    "drift": {
+        "name": "Drift Protocol",
+        "type": "perps_dex",
+        "program_id": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+        "api_url": "https://data.api.drift.trade",
+        "dlob_url": "https://dlob.drift.trade",
+        "ws_url": "wss://dlob.drift.trade/ws",
+        "s3_historical_url": (
+            "https://drift-historical-data-v2.s3.eu-west-1.amazonaws.com"
+            "/program/dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH"
+        ),
+        "data_source": "drift_api",
+    },
     "raydium": {
         "name": "Raydium",
         "type": "dex",
         "program_id": "675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8",
-        "data_source": "helius",
+        "api_url": "https://api-v3.raydium.io",
+        "data_source": "raydium_api",
     },
     "orca": {
         "name": "Orca (Whirlpool)",
@@ -286,18 +316,20 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "name": "Marinade Finance",
         "type": "liquid_staking",
         "program_id": "MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD",
-        "data_source": "helius",
+        "api_url": "https://api.marinade.finance",
+        "data_source": "marinade_api",
     },
     "kamino": {
         "name": "Kamino Finance",
         "type": "lending",
         "program_id": "KLend2g3cP87ber41GXWsSZQhDqc7juFGkhGJk2HRFUj",
-        "data_source": "helius",
+        "api_url": "https://api.kamino.finance",
+        "data_source": "kamino_api",
     },
     "jupiter": {
         "name": "Jupiter",
         "type": "aggregator",
-        "api_url": "https://quote-api.jup.ag/v6",
+        "api_url": "https://lite-api.jup.ag/swap/v1",
         "data_source": "jupiter_api",
     },
     "jito": {
@@ -307,6 +339,25 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "data_source": "helius",
     },
 }
+
+
+def get_solana_protocol_url(protocol: str, url_type: str = "api_url") -> str | None:
+    """Get a Solana DeFi protocol URL by protocol name and URL type.
+
+    Args:
+        protocol: Protocol key (drift, raydium, orca, kamino, marinade, jupiter).
+        url_type: URL type key (api_url, dlob_url, ws_url, s3_historical_url).
+    """
+    proto = SOLANA_DEFI_PROTOCOLS.get(protocol)
+    if proto is None:
+        return None
+    return proto.get(url_type)
+
+
+def resolve_solana_mint(mint: str) -> str:
+    """Resolve a Solana token mint address to its symbol, or return the mint truncated."""
+    return SOLANA_MINT_TO_SYMBOL.get(mint, mint[:8] if mint else "")
+
 
 # Bitcoin metadata — native BTC DeFi is minimal; we focus on wrapped BTC on EVM.
 # Stacks (STX) has some Bitcoin DeFi but is too small for our system.

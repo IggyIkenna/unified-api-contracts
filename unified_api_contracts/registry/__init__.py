@@ -28,16 +28,19 @@ from .capability_declarations import (
     BITCOIN_RPC_TEMPLATES,
     CHAIN_RPC_TEMPLATES,
     SOLANA_DEFI_PROTOCOLS,
+    SOLANA_MINT_TO_SYMBOL,
     SOLANA_RPC_TEMPLATES,
     SOLANA_TOKEN_ADDRESSES,
     SUBGRAPH_IDS,
     TBTC_ADDRESSES,
     DeFiDataSource,
     NonEvmChain,
+    get_solana_protocol_url,
     get_solana_rpc_url,
     get_solana_token_address,
     get_subgraph_id,
     get_supported_chains_for_protocol,
+    resolve_solana_mint,
 )
 from .cefi_instrument_universe import (  # noqa: F401
     CEFI_ACCEPTED_QUOTE_ASSETS,
@@ -67,7 +70,6 @@ from .defi_major_assets import (  # noqa: F401
     DEFI_MAJOR_ASSET_SYMBOLS,
     DEX_VENUE_KEYWORDS,
 )
-from .session_times import SessionTimes, get_session_times, is_trading_hours  # noqa: F401
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
 from .endpoint_registry import (
     ENDPOINT_REGISTRY,
@@ -85,7 +87,19 @@ from .instruction_constraints import (
     InstructionValidationError,
     validate_instruction,
 )
-from .market_data_categories import DATA_TYPES_BY_CATEGORY, TIMEFRAMES, VENUES_BY_CATEGORY
+from .market_data_categories import (  # noqa: F401
+    ALL_DATA_TYPES,
+    ALL_VENUES,
+    DATA_TYPES_BY_CATEGORY,
+    FEATURE_GROUP_DATA_TYPE_OVERRIDES,
+    FEATURE_GROUP_DATA_TYPES,
+    TIMEFRAMES,
+    VENUE_TO_CATEGORY,
+    VENUES_BY_CATEGORY,
+    get_valid_data_types_for_venue,
+    resolve_data_type_for_feature_group,
+    validate_data_type_for_venue,
+)
 from .representative_sample import (
     CEFI_BASE_ASSETS,
     CME_MONTH_CODES,
@@ -98,6 +112,7 @@ from .representative_sample import (
     TRADFI_EQUITIES,
     TRADFI_FUTURES,
 )
+from .session_times import SessionTimes, get_session_times, is_trading_hours  # noqa: F401
 from .tradfi_instrument_universe import (  # noqa: F401
     FX_SPOT_PAIRS,
     TRADFI_DATABENTO_INSTRUMENTS,
@@ -435,6 +450,7 @@ __all__ = [
     "SMARKETS",
     "SOCCER_FOOTBALL_INFO",
     "SOLANA_DEFI_PROTOCOLS",
+    "SOLANA_MINT_TO_SYMBOL",
     "SOLANA_RPC_TEMPLATES",
     "SOLANA_TOKEN_ADDRESSES",
     "SPACE_TO_DOT_SYMBOLS",
@@ -535,6 +551,7 @@ __all__ = [
     "get_bindings_for_symbol",
     "get_primary_binding",
     "get_schema_class_for_endpoint",
+    "get_solana_protocol_url",
     "get_solana_rpc_url",
     "get_solana_token_address",
     "get_subgraph_id",
@@ -545,6 +562,7 @@ __all__ = [
     "register_capability",
     "requires_operation_validation",
     "resolve_capability",
+    "resolve_solana_mint",
     "resolve_venue_context",
     "validate_instruction",
     "validate_mode_env_auth",
