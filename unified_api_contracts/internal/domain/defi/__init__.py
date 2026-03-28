@@ -12,6 +12,7 @@ from unified_api_contracts.internal.domain.defi.gas_cost import (
     GasCostAction,
     GasCostEstimate,
     GasFeeSnapshot,
+    GasTokenBalanceImpact,
     InstructionGasCost,
 )
 from unified_api_contracts.internal.domain.defi.protocol_data import (
@@ -110,6 +111,7 @@ __all__ = [
     "GasCostAction",
     "GasCostEstimate",
     "GasFeeSnapshot",
+    "GasTokenBalanceImpact",
     "InstructionGasCost",
     "LendingRate",
     "LidoRequestWithdrawalsParams",

@@ -10,6 +10,7 @@ from ._defi import (
     SUBGRAPH_IDS,
     DeFiDataSource,
     get_subgraph_id,
+    get_supported_chains_for_protocol,
 )
 from ._sports import SPORTS_CAPABILITIES
 from ._tradfi import TRADFI_CAPABILITIES
@@ -24,4 +25,5 @@ __all__ = [
     "TRADFI_CAPABILITIES",
     "DeFiDataSource",
     "get_subgraph_id",
+    "get_supported_chains_for_protocol",
 ]

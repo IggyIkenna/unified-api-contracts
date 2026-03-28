@@ -13,13 +13,6 @@ PYTEST_WORKERS=${PYTEST_WORKERS:-2}
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
 BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py" "**/mapping_resolver.py")
-# internal/testing/ generators and facade __init__.py re-export lists exceed size limits by design
-SIZE_EXTRA_EXCLUDES=(
-    "./unified_api_contracts/internal/testing/*"
-    "./unified_api_contracts/__init__.py"
-    "./unified_api_contracts/internal/__init__.py"
-    "./unified_api_contracts/canonical/crosscutting/errors/defi.py"
-)
 # data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants
 GCP_PROJECT_ID_EXCLUDE_GLOBS=("!**/registry/data_source_continuity.py")
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"

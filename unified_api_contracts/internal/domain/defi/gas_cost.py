@@ -24,6 +24,8 @@ class GasCostAction(StrEnum):
     FLASH_BORROW = "FLASH_BORROW"
     FLASH_REPAY = "FLASH_REPAY"
     ATOMIC_BUNDLE = "ATOMIC_BUNDLE"
+    WRAP = "WRAP"
+    UNWRAP = "UNWRAP"
 
 
 class GasCostEstimate(BaseModel):
@@ -74,10 +76,13 @@ class InstructionGasCost(BaseModel):
     eth_price_usd: Decimal
     block_number: int
     timestamp: datetime
+    # Chain-aware fields (populated for non-ETH gas token chains)
+    native_token: str | None = None
+    gas_cost_native: Decimal | None = None
 
 
 class EthBalanceImpact(BaseModel):
-    """Impact of gas deduction on wallet ETH balance."""
+    """Impact of gas deduction on wallet ETH balance (ETH-native chains)."""
 
     wallet_address: str
     chain_id: int
@@ -87,3 +92,18 @@ class EthBalanceImpact(BaseModel):
     eth_balance_after: Decimal
     creates_eth_debt: bool
     debt_amount_eth: Decimal | None = None
+
+
+class GasTokenBalanceImpact(BaseModel):
+    """Impact of gas deduction on wallet native token balance (any chain)."""
+
+    wallet_address: str
+    chain_id: int
+    instruction_id: str
+    native_token: str
+    gas_cost_native: Decimal
+    gas_cost_usd: Decimal | None = None
+    native_balance_before: Decimal
+    native_balance_after: Decimal
+    creates_debt: bool
+    debt_amount_native: Decimal | None = None

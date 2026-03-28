@@ -29,6 +29,7 @@ from .capability_declarations import (
     SUBGRAPH_IDS,
     DeFiDataSource,
     get_subgraph_id,
+    get_supported_chains_for_protocol,
 )
 from .cefi_instrument_universe import (  # noqa: F401
     CEFI_ACCEPTED_QUOTE_ASSETS,
@@ -515,6 +516,7 @@ __all__ = [
     "get_primary_binding",
     "get_schema_class_for_endpoint",
     "get_subgraph_id",
+    "get_supported_chains_for_protocol",
     "get_vix_15m_source",
     "get_yahoo_vix_15m_start",
     "is_vix_15m_gap_date",
