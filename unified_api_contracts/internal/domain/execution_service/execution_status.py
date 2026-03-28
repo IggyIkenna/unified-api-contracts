@@ -12,10 +12,10 @@ details.
 
 from __future__ import annotations
 
-from enum import Enum
+from enum import StrEnum
 
 
-class ServiceExecutionStatus(Enum):
+class ServiceExecutionStatus(StrEnum):
     """Status of instruction execution within the execution engine."""
 
     PENDING = "PENDING"

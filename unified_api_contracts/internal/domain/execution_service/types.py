@@ -24,7 +24,7 @@ from typing import cast
 # ---------------------------------------------------------------------------
 
 
-class BenchmarkType(Enum):
+class BenchmarkType(StrEnum):
     """Types of benchmark prices for execution comparison."""
 
     ORACLE = "ORACLE"
@@ -90,7 +90,7 @@ class BenchmarkType(Enum):
 # ---------------------------------------------------------------------------
 
 
-class OperationType(Enum):
+class OperationType(StrEnum):
     """
     Enumeration of supported operation types.
 
@@ -231,7 +231,7 @@ class OperationType(Enum):
 # ---------------------------------------------------------------------------
 
 
-class OrderType(Enum):
+class OrderType(StrEnum):
     """Order types for TRADE operations on execution instructions."""
 
     MARKET = "MARKET"
@@ -252,7 +252,7 @@ class OrderType(Enum):
 # ---------------------------------------------------------------------------
 
 
-class PositionType(Enum):
+class PositionType(StrEnum):
     """Types of positions across all instrument categories.
 
     Covers DeFi protocol positions, CeFi instrument types, and wallet holdings.
@@ -299,7 +299,7 @@ class PositionType(Enum):
 # ---------------------------------------------------------------------------
 
 
-class PositionSide(Enum):
+class PositionSide(StrEnum):
     """Directional side of a position.
 
     Used by strategy-service and execution-service for position tracking.
@@ -367,7 +367,7 @@ class InstructionType(StrEnum):
 # ---------------------------------------------------------------------------
 
 
-def _ensure_dict(
+def ensure_dict(
     val: dict[str, object] | None,
 ) -> dict[str, object]:
     """Return val if dict, else {} (explicit None check for optional metadata)."""
@@ -515,7 +515,7 @@ class ExecutionInstruction:
             deadline_timestamp=datetime.fromisoformat(cast(str, data["deadline_timestamp"]))
             if data.get("deadline_timestamp")
             else None,
-            metadata=_ensure_dict(cast("dict[str, object] | None", data.get("metadata"))),
+            metadata=ensure_dict(cast("dict[str, object] | None", data.get("metadata"))),
         )
 
 
@@ -527,4 +527,5 @@ __all__ = [
     "OrderType",
     "PositionSide",
     "PositionType",
+    "ensure_dict",
 ]

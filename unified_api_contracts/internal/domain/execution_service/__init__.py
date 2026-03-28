@@ -38,8 +38,17 @@ from unified_api_contracts.internal.domain.execution_service.types import (
 from unified_api_contracts.internal.domain.execution_service.types import (
     OrderType as ExecutionOrderType,
 )
+from unified_api_contracts.internal.domain.execution_service.defi_position import (
+    DeFiPosition,
+    PositionPortfolio,
+)
+from unified_api_contracts.internal.domain.execution_service.signal import (
+    AtomicLeg,
+    DeFiSignal,
+)
 
 __all__ = [
+    "AtomicLeg",
     "BenchmarkType",
     "CeFiOpenOrder",
     "CeFiOrderFill",
@@ -48,6 +57,8 @@ __all__ = [
     "CeFiVenuePosition",
     "DeFiConnectorStateDict",
     "DeFiPoolStateResult",
+    "DeFiPosition",
+    "DeFiSignal",
     "DeFiSwapQuoteResult",
     "DeFiSwapResult",
     "DeFiTxResult",
@@ -62,6 +73,7 @@ __all__ = [
     "MultiLegExecutionResult",
     "MultiLegInstruction",
     "OperationType",
+    "PositionPortfolio",
     "PositionSide",
     "PositionType",
     "ServiceExecutionStatus",
