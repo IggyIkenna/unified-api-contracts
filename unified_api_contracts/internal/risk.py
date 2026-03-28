@@ -187,28 +187,41 @@ class AccountState(BaseModel):
 
 
 class PnLBreakdown(BaseModel):
-    """6-dimension PnL breakdown per position or portfolio slice.
+    """Full PnL breakdown per position or portfolio slice.
 
     Dimensions follow the standard attribution model:
     - delta_pnl: PnL attributable to directional price moves (delta x dS).
     - funding_pnl: Cumulative funding payments received / paid (perpetual swaps).
     - basis_pnl: Cash-futures or cash-perp basis convergence contribution.
     - interest_rate_pnl: PnL from interest-rate curve moves (bonds, rate swaps).
-    - greeks_pnl: Higher-order options PnL (gamma, vega, theta decay).
+    - greeks_delta_pnl / greeks_gamma_pnl / greeks_theta_pnl / greeks_vega_pnl:
+      Per-greek options PnL breakdown.
+    - realized_pnl / unrealized_pnl: Closed vs open position PnL.
     - mark_to_market_pnl: Total MTM PnL — sum of all attribution dimensions
       plus any residual unexplained PnL.
     """
 
     instrument_id: str
-    client_id: str = Field(..., json_schema_extra={"pii": True})
+    client_id: str = Field(default="", json_schema_extra={"pii": True})
     strategy_id: str | None = None
-    timestamp: datetime
-    delta_pnl: Decimal = Field(default=Decimal("0"), description="Directional delta PnL")
+    timestamp: datetime | None = None
+    instrument_type: str = ""
+    underlying: str = ""
+    asset_class: str = ""
+    account_id: str = ""
+    realized_pnl: Decimal = Field(default=Decimal("0"), description="Closed position PnL")
+    unrealized_pnl: Decimal = Field(default=Decimal("0"), description="Open position PnL")
+    delta_pnl: Decimal | None = Field(default=None, description="Directional delta PnL")
     funding_pnl: Decimal = Field(default=Decimal("0"), description="Funding payment PnL")
-    basis_pnl: Decimal = Field(default=Decimal("0"), description="Cash-futures basis PnL")
-    interest_rate_pnl: Decimal = Field(default=Decimal("0"), description="Interest-rate curve PnL")
-    greeks_pnl: Decimal = Field(default=Decimal("0"), description="Higher-order options Greeks PnL")
-    mark_to_market_pnl: Decimal = Field(description="Total MTM PnL including residual")
+    funding_rate_pnl: Decimal | None = Field(default=None, description="Funding rate PnL (alias)")
+    basis_pnl: Decimal | None = Field(default=None, description="Cash-futures basis PnL")
+    interest_rate_pnl: Decimal | None = Field(default=None, description="Interest-rate curve PnL")
+    greeks_pnl: Decimal = Field(default=Decimal("0"), description="Aggregate options Greeks PnL")
+    greeks_delta_pnl: Decimal | None = Field(default=None, description="Options delta PnL")
+    greeks_gamma_pnl: Decimal | None = Field(default=None, description="Options gamma PnL")
+    greeks_theta_pnl: Decimal | None = Field(default=None, description="Options theta PnL")
+    greeks_vega_pnl: Decimal | None = Field(default=None, description="Options vega PnL")
+    mark_to_market_pnl: Decimal | None = Field(default=None, description="Total MTM PnL including residual")
     currency: str = "USD"
 
 
@@ -223,18 +236,19 @@ class GreeksExposure(BaseModel):
     - rho: Sensitivity to a 1-percentage-point move in the risk-free rate.
     """
 
-    instrument_id: str
-    client_id: str = Field(..., json_schema_extra={"pii": True})
+    instrument_id: str = ""
+    client_id: str = Field(default="", json_schema_extra={"pii": True})
     strategy_id: str | None = None
-    timestamp: datetime
-    delta: float = Field(
-        description="Option delta (unitless, range -1 to +1 for vanilla options)"
-    )  # greeks-sensitivity: float-ok
-    gamma: float = Field(description="Option gamma")  # greeks-sensitivity: float-ok
-    theta: float = Field(description="Daily theta (currency units per day)")  # greeks-sensitivity: float-ok
-    vega: float = Field(description="Vega per 1pp IV move")  # greeks-sensitivity: float-ok
-    rho: float = Field(description="Rho per 1pp rate move")  # greeks-sensitivity: float-ok
-    underlying_price: Decimal | None = None
+    timestamp: datetime | None = None
+    delta: Decimal = Field(
+        default=Decimal("0"),
+        description="Option delta (unitless, range -1 to +1 for vanilla options)",
+    )
+    gamma: Decimal = Field(default=Decimal("0"), description="Option gamma")
+    theta: Decimal = Field(default=Decimal("0"), description="Daily theta (currency units per day)")
+    vega: Decimal = Field(default=Decimal("0"), description="Vega per 1pp IV move")
+    rho: Decimal = Field(default=Decimal("0"), description="Rho per 1pp rate move")
+    underlying_price: Decimal = Field(default=Decimal("0"))
     position_quantity: Decimal | None = None
 
 

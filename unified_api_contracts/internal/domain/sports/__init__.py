@@ -14,13 +14,23 @@ from unified_api_contracts.internal.domain.sports.execution import (
     CanonicalSportsOrder,
     SportsBetEvent,
 )
+from unified_api_contracts.internal.domain.sports.risk import (
+    BetSide,
+    SportsBetPnL,
+    SportsBetPosition,
+    SportsExposure,
+)
 
 __all__ = [
     "BetCancelledEvent",
     "BetFilledEvent",
     "BetPlacedEvent",
     "BetSettledEvent",
+    "BetSide",
     "CanonicalSportsFill",
     "CanonicalSportsOrder",
     "SportsBetEvent",
+    "SportsBetPnL",
+    "SportsBetPosition",
+    "SportsExposure",
 ]

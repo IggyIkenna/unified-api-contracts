@@ -185,56 +185,10 @@ class AccountState(BaseModel):
     margin: MarginState | None = None
 
 
-class PnLBreakdown(BaseModel):
-    """6-dimension PnL breakdown per position or portfolio slice.
-
-    Dimensions follow the standard attribution model:
-    - delta_pnl: PnL attributable to directional price moves (delta x dS).
-    - funding_pnl: Cumulative funding payments received / paid (perpetual swaps).
-    - basis_pnl: Cash-futures or cash-perp basis convergence contribution.
-    - interest_rate_pnl: PnL from interest-rate curve moves (bonds, rate swaps).
-    - greeks_pnl: Higher-order options PnL (gamma, vega, theta decay).
-    - mark_to_market_pnl: Total MTM PnL — sum of all attribution dimensions
-      plus any residual unexplained PnL.
-    """
-
-    instrument_id: str
-    client_id: str = Field(..., json_schema_extra={"pii": True})
-    strategy_id: str | None = None
-    timestamp: datetime
-    delta_pnl: Decimal = Field(default=Decimal("0"), description="Directional delta PnL")
-    funding_pnl: Decimal = Field(default=Decimal("0"), description="Funding payment PnL")
-    basis_pnl: Decimal = Field(default=Decimal("0"), description="Cash-futures basis PnL")
-    interest_rate_pnl: Decimal = Field(default=Decimal("0"), description="Interest-rate curve PnL")
-    greeks_pnl: Decimal = Field(default=Decimal("0"), description="Higher-order options Greeks PnL")
-    mark_to_market_pnl: Decimal = Field(description="Total MTM PnL including residual")
-    currency: str = "USD"
-
-
-class GreeksExposure(BaseModel):
-    """Options Greeks exposure per position.
-
-    All Greeks are expressed in the position's native currency unless noted:
-    - delta: Rate of change of option price with respect to underlying price.
-    - gamma: Rate of change of delta with respect to underlying price.
-    - theta: Time decay — change in option price per calendar day.
-    - vega: Sensitivity to a 1-percentage-point move in implied volatility.
-    - rho: Sensitivity to a 1-percentage-point move in the risk-free rate.
-    """
-
-    instrument_id: str
-    client_id: str = Field(..., json_schema_extra={"pii": True})
-    strategy_id: str | None = None
-    timestamp: datetime
-    delta: float = Field(
-        description="Option delta (unitless, range -1 to +1 for vanilla options)"
-    )  # greeks-sensitivity: float-ok
-    gamma: float = Field(description="Option gamma")  # greeks-sensitivity: float-ok
-    theta: float = Field(description="Daily theta (currency units per day)")  # greeks-sensitivity: float-ok
-    vega: float = Field(description="Vega per 1pp IV move")  # greeks-sensitivity: float-ok
-    rho: float = Field(description="Rho per 1pp rate move")  # greeks-sensitivity: float-ok
-    underlying_price: Decimal | None = None
-    position_quantity: Decimal | None = None
+# PnLBreakdown and GreeksExposure SSOT: unified_api_contracts.internal.risk
+# Re-exported here for backwards compatibility.
+from unified_api_contracts.internal.risk import GreeksExposure as GreeksExposure
+from unified_api_contracts.internal.risk import PnLBreakdown as PnLBreakdown
 
 
 class CircuitBreakerEvent(BaseModel):
