@@ -130,6 +130,36 @@ from unified_api_contracts.internal.domain.defi import (
 from unified_api_contracts.internal.domain.defi import (
     EthSendRawTransactionRequest as EthSendRawTransactionRequest,
 )
+from unified_api_contracts.internal.domain.defi import (
+    DriftMarketInfo as DriftMarketInfo,
+)
+from unified_api_contracts.internal.domain.defi import (
+    DriftMarketType as DriftMarketType,
+)
+from unified_api_contracts.internal.domain.defi import (
+    DriftOrderParams as DriftOrderParams,
+)
+from unified_api_contracts.internal.domain.defi import (
+    DriftOrderResult as DriftOrderResult,
+)
+from unified_api_contracts.internal.domain.defi import (
+    DriftOrderSide as DriftOrderSide,
+)
+from unified_api_contracts.internal.domain.defi import (
+    DriftPosition as DriftPosition,
+)
+from unified_api_contracts.internal.domain.defi import (
+    JupiterRoutePlanStep as JupiterRoutePlanStep,
+)
+from unified_api_contracts.internal.domain.defi import (
+    JupiterSwapQuote as JupiterSwapQuote,
+)
+from unified_api_contracts.internal.domain.defi import (
+    JupiterSwapResult as JupiterSwapResult,
+)
+from unified_api_contracts.internal.domain.defi import (
+    SolanaTransactionResult as SolanaTransactionResult,
+)
 from unified_api_contracts.internal.domain.derivatives.options import (
     OptionContract,
     OptionGreeks,
@@ -158,10 +188,8 @@ from unified_api_contracts.internal.domain.execution_service.execution_preferenc
     UrgencyLevel,
 )
 from unified_api_contracts.internal.domain.execution_service.execution_result import (
-    ExecutionResult as ServiceExecutionResult,
-)
-from unified_api_contracts.internal.domain.execution_service.execution_result import (
-    SignalExecutionResult as ServiceSignalExecutionResult,
+    ExecutionResult,
+    SignalExecutionResult,
 )
 from unified_api_contracts.internal.domain.execution_service.execution_status import (
     ServiceExecutionStatus,
@@ -198,13 +226,9 @@ from unified_api_contracts.internal.domain.execution_service.types import (
     OperationType,
 )
 from unified_api_contracts.internal.domain.execution_service.types import (
-    OrderType as ExecutionOrderType,
-)
-from unified_api_contracts.internal.domain.execution_service.types import (
-    PositionSide as ExecutionPositionSide,
-)
-from unified_api_contracts.internal.domain.execution_service.types import (
-    PositionType as ExecutionPositionType,
+    OrderType,
+    PositionSide,
+    PositionType,
 )
 from unified_api_contracts.internal.domain.features_commodity import (
     CommodityFeatureRequest as CommodityFeatureRequest,
@@ -613,8 +637,6 @@ from unified_api_contracts.internal.sports import (
 from unified_api_contracts.internal.testing.scenario_config import (
     FaultConfig,
     InstrumentFaultRule,
-    InstrumentOverride,
-    InstrumentOverrideAction,
     ScenarioConfig,
 )
 from unified_api_contracts.internal.testing.seed_validator import (
@@ -807,9 +829,7 @@ __all__ = [
     "ExchangeFeeSchedule",
     "ExecutionInstruction",
     "ExecutionMode",
-    "ExecutionOrderType",
-    "ExecutionPositionSide",
-    "ExecutionPositionType",
+    "ExecutionResult",
     "ExecutionPreferencesConfig",
     "ExecutionResultMessage",
     "ExposureData",
@@ -859,8 +879,6 @@ __all__ = [
     "InstrumentInfo",
     "InstrumentKey",
     "InstrumentMetadata",
-    "InstrumentOverride",
-    "InstrumentOverrideAction",
     "InstrumentRecord",
     "InstrumentStatus",
     "InstrumentType",
@@ -938,6 +956,7 @@ __all__ = [
     "OrderData",
     "OrderEvent",
     "OrderRequestMessage",
+    "OrderType",
     "PairSpreadFeatureRecord",
     "Permission",
     "PersistenceCompletedDetails",
@@ -956,6 +975,7 @@ __all__ = [
     "PositionSide",
     "PositionSnapshot",
     "PositionSummary",
+    "PositionType",
     "PositionUpdateMessage",
     "PreTradeCheckRequest",
     "PreTradeCheckResponse",
@@ -997,12 +1017,11 @@ __all__ = [
     "SecretAccessedDetails",
     "SecretAccessedEvent",
     "SeedDataWriter",
-    "ServiceExecutionResult",
     "ServiceExecutionStatus",
     "ServiceHealthResponse",
     "ServiceLifecycleEventMessage",
     "ServiceMode",
-    "ServiceSignalExecutionResult",
+    "SignalExecutionResult",
     "SettlementPrice",
     "SettlementType",
     "ShardEvent",
