@@ -4,6 +4,12 @@ from unified_api_contracts.internal.reference.circuit_breaker_config import (
     CircuitBreakerConfigRegistry,
     VenueCircuitBreakerConfig,
 )
+from unified_api_contracts.internal.reference.corporate_actions import (
+    DividendRecord,
+    DividendType,
+    EarningsResultRecord,
+    StockSplitRecord,
+)
 from unified_api_contracts.internal.reference.data_freshness import (
     ALL_FRESHNESS_CONTRACTS,
     FEATURE_FRESHNESS,
@@ -43,6 +49,9 @@ __all__ = [
     "ClientPrimeBrokerLink",
     "DataFreshnessContract",
     "DataStalenessError",
+    "DividendRecord",
+    "DividendType",
+    "EarningsResultRecord",
     "FeeScheduleEntry",
     "FeeType",
     "InstrumentDefinition",
@@ -54,6 +63,7 @@ __all__ = [
     "OnchainDataFreshnessConfig",
     "OptionType",
     "PrimeBrokerEntity",
+    "StockSplitRecord",
     "UniverseSnapshot",
     "VenueCircuitBreakerConfig",
 ]

@@ -61,7 +61,7 @@ class TestInstructionVenueIntegration:
             assert "defi" in constraint["venue_categories"]
 
             # Verify DEX venues have POOL in their instrument types
-            for venue in ("UNISWAPV3-ETH", "CURVE-ETH", "AERODROME-BASE"):
+            for venue in ("UNISWAPV3-ETHEREUM", "CURVE-ETHEREUM", "AERODROME-BASE"):
                 if venue in INSTRUMENT_TYPES_BY_VENUE:
                     assert "POOL" in INSTRUMENT_TYPES_BY_VENUE[venue], f"{venue} should support POOL for LP operations"
 

@@ -83,20 +83,52 @@ VENUES_BY_CATEGORY: dict[str, list[str]] = {
         "YAHOO_FINANCE",  # VIX 15m ongoing: rolling 60-day window; KRW/USD daily rates
     ],
     "defi": [
-        # DEX protocols (swaps)
+        # --- DEX protocols (swaps + liquidity) ---
         "UNISWAPV2-ETHEREUM",
         "UNISWAPV3-ETHEREUM",
+        "UNISWAPV3-ARBITRUM",
+        "UNISWAPV3-BASE",
+        "UNISWAPV3-OPTIMISM",
+        "UNISWAPV3-POLYGON",
         "UNISWAPV4-ETHEREUM",
-        "CURVE-ETHEREUM",  # Curve Ethereum (MetaRegistry RPC)
-        # FUTURE: BALANCER-ETHEREUM (The Graph deprecated)
-        # Lending protocols
+        "CURVE-ETHEREUM",
+        "CURVE-AVALANCHE",
+        "CURVE-OPTIMISM",
+        "BALANCER-ETHEREUM",
+        "BALANCER-ARBITRUM",
+        "BALANCER-AVALANCHE",
+        "BALANCER-BASE",
+        "BALANCER-OPTIMISM",
+        "BALANCER-POLYGON",
+        # --- Lending protocols ---
         "AAVEV3-ETHEREUM",
+        "AAVEV3-ARBITRUM",
+        "AAVEV3-AVALANCHE",
+        "AAVEV3-BASE",
+        "AAVEV3-BSC",
+        "AAVEV3-LINEA",
+        "AAVEV3-OPTIMISM",
+        "AAVEV3-POLYGON",
+        "AAVEV3-SCROLL",
+        "AAVEV3-ZKSYNC",
+        "COMPOUNDV3-ETHEREUM",
+        "COMPOUNDV3-ARBITRUM",
+        "COMPOUNDV3-BASE",
+        "COMPOUNDV3-OPTIMISM",
+        "COMPOUNDV3-POLYGON",
+        "COMPOUNDV3-SCROLL",
         "MORPHO-ETHEREUM",
-        # FUTURE: EULER-PLASMA, FLUID-PLASMA (adapters not implemented)
-        # LST/Yield protocols
-        "LIDO",
-        "ETHERFI",
-        "ETHENA",
+        "MORPHO-ARBITRUM",
+        "MORPHO-BASE",
+        "MORPHO-OPTIMISM",
+        "MORPHO-POLYGON",
+        "MORPHO-SCROLL",
+        "EULER-ETHEREUM",
+        "FLUID-ETHEREUM",
+        # --- LST/Yield protocols ---
+        "LIDO-ETHEREUM",
+        "ETHERFI-ETHEREUM",
+        "ETHENA-ETHEREUM",
     ],
     "sports": [
         # Sports betting exchanges and bookmakers

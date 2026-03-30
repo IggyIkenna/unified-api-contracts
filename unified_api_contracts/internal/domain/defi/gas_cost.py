@@ -107,3 +107,31 @@ class GasTokenBalanceImpact(BaseModel):
     native_balance_after: Decimal
     creates_debt: bool
     debt_amount_native: Decimal | None = None
+
+
+class GasCostRecord(BaseModel):
+    """Canonical gas cost record used across batch/live/fork modes.
+
+    Same schema regardless of source — only the ``source`` field differs:
+    - "gcs_historical": from MTDS gas fee collection (eth_feeHistory)
+    - "tx_receipt": from live execution tx receipt
+    - "fork_receipt": from Tenderly fork execution
+    """
+
+    chain_id: int
+    chain_name: str
+    gas_price_gwei: Decimal
+    gas_used: int
+    gas_cost_eth: Decimal
+    gas_cost_usd: Decimal
+    priority_fee_gwei: Decimal = Decimal("0")
+    timestamp: datetime
+    source: str  # "gcs_historical" | "tx_receipt" | "fork_receipt"
+    block_number: int | None = None
+    tx_hash: str | None = None
+    # Solana-specific
+    priority_fee_lamports: int | None = None
+    compute_units: int | None = None
+    # BTC-specific
+    sat_per_vbyte: Decimal | None = None
+    fee_rate_btc_per_kb: Decimal | None = None

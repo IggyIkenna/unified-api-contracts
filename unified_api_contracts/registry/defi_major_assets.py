@@ -27,14 +27,29 @@ DEFI_MAJOR_ASSET_SYMBOLS: frozenset[str] = frozenset({
     # Major DeFi governance / Aave collateral
     "AAVE", "LINK", "UNI", "MKR", "CRV", "SNX", "BAL", "LDO", "RPL",
     "COMP", "YFI", "SUSHI", "1INCH", "FXS",
-    # Other liquid assets on Aave
-    "SOL", "MATIC", "WMATIC",
+    # Other liquid assets on Aave / multi-chain
+    "SOL", "MATIC", "WMATIC", "AVAX", "WAVAX", "BNB", "WBNB",
+    # Solana liquid staking + top ecosystem tokens
+    "WSOL", "MSOL", "STSOL", "JITOSOL", "BSOL", "JSOL",
+    "JUP", "RAY", "ORCA", "BONK", "PYTH", "JTO", "WIF", "HNT",
+    "MNDE",  # Marinade governance (LP pairs)
+    # Bridging tokens (cross-chain standards)
+    "WETH.E", "USDC.E", "USDT.E",  # Avalanche/Polygon bridged variants
 })
 # fmt: on
 
 # DEX keyword detection — venues containing these are treated as DEX pools
 # where BOTH base and quote must be in the whitelist
-DEX_VENUE_KEYWORDS: frozenset[str] = frozenset({"UNISWAP", "BALANCER", "CURVE"})
+DEX_VENUE_KEYWORDS: frozenset[str] = frozenset(
+    {
+        "UNISWAP",
+        "BALANCER",
+        "CURVE",  # EVM
+        "ORCA",
+        "RAYDIUM",
+        "KAMINO",  # Solana
+    }
+)
 
 # Ethereum mainnet contract addresses for GraphQL token-address filtering.
 # Used by Uniswap V2/V3/V4, Balancer, Curve subgraph queries to filter pools

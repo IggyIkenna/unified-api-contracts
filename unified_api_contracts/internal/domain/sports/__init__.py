@@ -5,6 +5,13 @@ market ID, selection ID, handicap, odds format).  Base CanonicalOrder fields
 are unchanged so generic execution-service code works without modification.
 """
 
+from unified_api_contracts.internal.domain.sports.arb_config import (
+    EXCHANGE_COMMISSION_RATES,
+    EXCHANGE_VENUES,
+    ArbitrageStrategyConfig,
+    VenueAllocationWeights,
+    VenueBalance,
+)
 from unified_api_contracts.internal.domain.sports.execution import (
     BetCancelledEvent,
     BetFilledEvent,
@@ -22,6 +29,9 @@ from unified_api_contracts.internal.domain.sports.risk import (
 )
 
 __all__ = [
+    "EXCHANGE_COMMISSION_RATES",
+    "EXCHANGE_VENUES",
+    "ArbitrageStrategyConfig",
     "BetCancelledEvent",
     "BetFilledEvent",
     "BetPlacedEvent",
@@ -33,4 +43,6 @@ __all__ = [
     "SportsBetPnL",
     "SportsBetPosition",
     "SportsExposure",
+    "VenueAllocationWeights",
+    "VenueBalance",
 ]

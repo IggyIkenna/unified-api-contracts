@@ -1,19 +1,19 @@
 {
   "summary": {
-    "alive": 603,
-    "test_only": 19,
+    "alive": 621,
+    "test_only": 18,
     "import_chain_only": 45,
-    "dead": 180,
-    "total": 847
+    "dead": 159,
+    "total": 843
   },
   "dead_types": [
     {
-      "name": "ALL_FRESHNESS_CONTRACTS",
-      "source": "UIC"
+      "name": "ALL_DATA_TYPES",
+      "source": "UAC"
     },
     {
-      "name": "AccessMode",
-      "source": "UAC"
+      "name": "ALL_FRESHNESS_CONTRACTS",
+      "source": "UIC"
     },
     {
       "name": "AsterExchangeInfo",
@@ -120,15 +120,7 @@
       "source": "UAC"
     },
     {
-      "name": "COINBASE_SPOT",
-      "source": "UAC"
-    },
-    {
       "name": "CONFIG_SCHEMA",
-      "source": "UAC"
-    },
-    {
-      "name": "CassetteStatus",
       "source": "UAC"
     },
     {
@@ -204,22 +196,6 @@
       "source": "UAC"
     },
     {
-      "name": "DATABENTO_ERROR_MAP",
-      "source": "UAC"
-    },
-    {
-      "name": "DATABENTO_VALID_OPTIONS_SYMBOLS",
-      "source": "UAC"
-    },
-    {
-      "name": "DATABENTO_VALID_PARENT_SYMBOLS",
-      "source": "UAC"
-    },
-    {
-      "name": "DATASET_TO_CANONICAL_VENUE",
-      "source": "UAC"
-    },
-    {
       "name": "DATA_SOURCE_TO_SECRET",
       "source": "UAC"
     },
@@ -240,19 +216,15 @@
       "source": "UAC"
     },
     {
+      "name": "DEFI_MAJOR_ASSET_ADDRESSES",
+      "source": "UAC"
+    },
+    {
+      "name": "DEFI_MAJOR_ASSET_ADDRESS_LIST",
+      "source": "UAC"
+    },
+    {
       "name": "DEFI_MAJOR_ASSET_SYMBOLS",
-      "source": "UAC"
-    },
-    {
-      "name": "DEFI_POOL_PAIRS",
-      "source": "UAC"
-    },
-    {
-      "name": "DEFI_PROTOCOLS",
-      "source": "UAC"
-    },
-    {
-      "name": "DEFI_VENUE_TO_PROTOCOL",
       "source": "UAC"
     },
     {
@@ -261,14 +233,6 @@
     },
     {
       "name": "DEX_VENUE_KEYWORDS",
-      "source": "UAC"
-    },
-    {
-      "name": "DataAvailability",
-      "source": "UAC"
-    },
-    {
-      "name": "DatabentoInstrumentDef",
       "source": "UAC"
     },
     {
@@ -320,11 +284,11 @@
       "source": "UIC"
     },
     {
-      "name": "DriftOrderSide",
+      "name": "DividendType",
       "source": "UIC"
     },
     {
-      "name": "DriftOrderType",
+      "name": "DriftOrderSide",
       "source": "UIC"
     },
     {
@@ -332,8 +296,12 @@
       "source": "UAC"
     },
     {
-      "name": "EXCHANGE_CODE_TO_NAME",
-      "source": "UAC"
+      "name": "EXCHANGE_COMMISSION_RATES",
+      "source": "UIC"
+    },
+    {
+      "name": "EXCHANGE_VENUES",
+      "source": "UIC"
     },
     {
       "name": "EXECUTION_AUDIT",
@@ -364,27 +332,7 @@
       "source": "UIC"
     },
     {
-      "name": "FxSpotPairDef",
-      "source": "UAC"
-    },
-    {
-      "name": "HyblockLiquidationLevelEntry",
-      "source": "UAC"
-    },
-    {
-      "name": "HyblockLiquidationLevelResponse",
-      "source": "UAC"
-    },
-    {
-      "name": "HyblockOIClusterEntry",
-      "source": "UAC"
-    },
-    {
       "name": "HyperliquidFill",
-      "source": "UAC"
-    },
-    {
-      "name": "HyperliquidFundingHistoryEntry",
       "source": "UAC"
     },
     {
@@ -398,10 +346,6 @@
     {
       "name": "HyperliquidUserState",
       "source": "UAC"
-    },
-    {
-      "name": "HyperparameterConfigUnion",
-      "source": "UIC"
     },
     {
       "name": "IBKRCorporateAction",
@@ -446,6 +390,10 @@
     {
       "name": "KalshiTrade",
       "source": "UAC"
+    },
+    {
+      "name": "KaminoBorrowParams",
+      "source": "UIC"
     },
     {
       "name": "LiquidationHeatmapResponse",
@@ -524,10 +472,6 @@
       "source": "UAC"
     },
     {
-      "name": "OPTIONS_CHAIN_CONFIG",
-      "source": "UAC"
-    },
-    {
       "name": "OnchainDataFreshnessConfig",
       "source": "UIC"
     },
@@ -544,7 +488,15 @@
       "source": "UIC"
     },
     {
+      "name": "PolygonDividendsResponse",
+      "source": "UAC"
+    },
+    {
       "name": "PolygonOptionContractsResponse",
+      "source": "UAC"
+    },
+    {
+      "name": "PolygonSplitsResponse",
       "source": "UAC"
     },
     {
@@ -554,10 +506,6 @@
     {
       "name": "PrimeBrokerEntity",
       "source": "UIC"
-    },
-    {
-      "name": "ProviderBinding",
-      "source": "UAC"
     },
     {
       "name": "QUARTERLY_MONTHS",
@@ -572,23 +520,7 @@
       "source": "UAC"
     },
     {
-      "name": "ResponseFormat",
-      "source": "UAC"
-    },
-    {
-      "name": "SPACE_TO_DOT_SYMBOLS",
-      "source": "UAC"
-    },
-    {
-      "name": "SPORTS_LEAGUES",
-      "source": "UAC"
-    },
-    {
       "name": "SPORTS_VENUES",
-      "source": "UAC"
-    },
-    {
-      "name": "SYMBOL_MAPPINGS",
       "source": "UAC"
     },
     {
@@ -616,10 +548,6 @@
       "source": "UAC"
     },
     {
-      "name": "TRADFI_DATA_BINDINGS",
-      "source": "UAC"
-    },
-    {
       "name": "TRADFI_EQUITIES",
       "source": "UAC"
     },
@@ -632,15 +560,7 @@
       "source": "UAC"
     },
     {
-      "name": "TRADFI_INSTRUMENTS_CONFIG",
-      "source": "UAC"
-    },
-    {
       "name": "TRADFI_TICKER_UNIVERSE",
-      "source": "UAC"
-    },
-    {
-      "name": "TRADFI_VENUE_MAPPINGS",
       "source": "UAC"
     },
     {
@@ -656,8 +576,8 @@
       "source": "UIC"
     },
     {
-      "name": "TradFiInstrumentDef",
-      "source": "UAC"
+      "name": "UniverseSnapshot",
+      "source": "UIC"
     },
     {
       "name": "UnsubscribeRequest",
@@ -696,6 +616,10 @@
       "source": "UAC"
     },
     {
+      "name": "VENUE_TO_CATEGORY",
+      "source": "UAC"
+    },
+    {
       "name": "VENUE_TO_DATA_SOURCE",
       "source": "UAC"
     },
@@ -717,14 +641,6 @@
     },
     {
       "name": "ZERO_ALPHA_VENUES",
-      "source": "UAC"
-    },
-    {
-      "name": "get_databento_symbols_for_dataset",
-      "source": "UAC"
-    },
-    {
-      "name": "get_required_datasets",
       "source": "UAC"
     }
   ],
@@ -1167,13 +1083,6 @@
       ]
     },
     {
-      "name": "UniverseSnapshot",
-      "source": "UIC",
-      "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/instruments-service/tests/reference_data/unit/test_schemas.py"
-      ]
-    },
-    {
       "name": "UpbitBalanceQueryResponse",
       "source": "UAC",
       "test_files": [
@@ -1197,6 +1106,13 @@
     }
   ],
   "alive_types": [
+    {
+      "name": "ALL_VENUES",
+      "source": "UAC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
     {
       "name": "AaveBorrowParams",
       "source": "UAC",
@@ -1270,7 +1186,7 @@
     {
       "name": "AggregatedPosition",
       "source": "UAC",
-      "instantiation_count": 2,
+      "instantiation_count": 3,
       "annotation_count": 6,
       "isinstance_count": 0
     },
@@ -1352,6 +1268,13 @@
       "isinstance_count": 0
     },
     {
+      "name": "ArbitrageStrategyConfig",
+      "source": "UIC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "AssetBalanceSummary",
       "source": "UIC",
       "instantiation_count": 1,
@@ -1403,7 +1326,7 @@
     {
       "name": "Balance",
       "source": "UIC",
-      "instantiation_count": 31,
+      "instantiation_count": 32,
       "annotation_count": 9,
       "isinstance_count": 0
     },
@@ -2724,6 +2647,13 @@
       "isinstance_count": 0
     },
     {
+      "name": "DividendRecord",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "DriftMarketInfo",
       "source": "UIC",
       "instantiation_count": 1,
@@ -2770,6 +2700,13 @@
       "source": "UIC",
       "instantiation_count": 16,
       "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "EarningsResultRecord",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -3287,7 +3224,14 @@
       "name": "HyperparameterConfig",
       "source": "UIC",
       "instantiation_count": 19,
-      "annotation_count": 4,
+      "annotation_count": 5,
+      "isinstance_count": 0
+    },
+    {
+      "name": "HyperparameterConfigUnion",
+      "source": "UIC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3400,6 +3344,20 @@
       "source": "UAC",
       "instantiation_count": 8,
       "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "KaminoDepositParams",
+      "source": "UIC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "KaminoReserve",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3956,10 +3914,17 @@
       "isinstance_count": 0
     },
     {
+      "name": "OrcaWhirlpoolInfo",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
       "name": "Order",
       "source": "UIC",
       "instantiation_count": 54,
-      "annotation_count": 67,
+      "annotation_count": 66,
       "isinstance_count": 7
     },
     {
@@ -4110,10 +4075,24 @@
       "isinstance_count": 0
     },
     {
+      "name": "PolygonDividend",
+      "source": "UAC",
+      "instantiation_count": 0,
+      "annotation_count": 2,
+      "isinstance_count": 0
+    },
+    {
       "name": "PolygonOptionContract",
       "source": "UAC",
       "instantiation_count": 0,
       "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "PolygonSplit",
+      "source": "UAC",
+      "instantiation_count": 0,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -4369,6 +4348,13 @@
       "isinstance_count": 0
     },
     {
+      "name": "RaydiumPoolInfo",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
       "name": "RealTimePnLRecord",
       "source": "UIC",
       "instantiation_count": 16,
@@ -4484,7 +4470,7 @@
       "name": "RiskMetrics",
       "source": "UIC",
       "instantiation_count": 18,
-      "annotation_count": 3,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
@@ -4505,7 +4491,7 @@
       "name": "RiskStatus",
       "source": "UIC",
       "instantiation_count": 17,
-      "annotation_count": 18,
+      "annotation_count": 19,
       "isinstance_count": 0
     },
     {
@@ -4663,6 +4649,13 @@
       "isinstance_count": 0
     },
     {
+      "name": "SolanaStakePoolInfo",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
       "name": "SourceControlProvider",
       "source": "UAC",
       "instantiation_count": 8,
@@ -4705,6 +4698,13 @@
       "isinstance_count": 0
     },
     {
+      "name": "SportsBetPosition",
+      "source": "UIC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "SportsBetResult",
       "source": "UIC",
       "instantiation_count": 9,
@@ -4722,6 +4722,13 @@
       "name": "SportsError",
       "source": "UAC",
       "instantiation_count": 8,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "SportsExposure",
+      "source": "UIC",
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4808,6 +4815,13 @@
       "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 1
+    },
+    {
+      "name": "StockSplitRecord",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
     },
     {
       "name": "StoppedDetails",
@@ -5167,6 +5181,20 @@
       "isinstance_count": 0
     },
     {
+      "name": "VenueAllocationWeights",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "VenueBalance",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "VenueBalanceSummary",
       "source": "UIC",
       "instantiation_count": 1,
@@ -5209,9 +5237,16 @@
       "isinstance_count": 0
     },
     {
+      "name": "VenueLedgerEntry",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "VenueMapping",
       "source": "UAC",
-      "instantiation_count": 13,
+      "instantiation_count": 14,
       "annotation_count": 0,
       "isinstance_count": 0
     },

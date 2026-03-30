@@ -49,7 +49,7 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "ETHEREUM": "5nwMCSHaTqG3Kd2gHznbTXEnZ9QNWsssQfbHhDqQSQFp",
         "ARBITRUM": "Ff7ha9ELmpmg81D6nYxy4t8aGP26dPztqD1LDJNPqjLS",
         "BASE": "2hcXhs36pTBDVUmk5K2Zkr6N4UYGwaHuco2a6jyTsijo",
-        "POLYGON": "AaFtUWKfFdj2x8nnE3RxTSJkHwGHvawH3VWFBykCGzLs",
+        # POLYGON removed: subgraph returns 0 markets (Compound V3 not active on Polygon)
         "OPTIMISM": "FhHNkfh5z6Z2WCEBxB6V3s8RPxnJfWZ9zAfM5bVvbvbb",
         "SCROLL": "6aRGn6noEdin1krLfYTnLMYaCoTujL7cHekARE4Ndxng",
     },
@@ -129,16 +129,17 @@ def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
 # directly — they receive a pre-resolved ``rpc_url`` from the service layer.
 # ---------------------------------------------------------------------------
 CHAIN_RPC_TEMPLATES: dict[int, str] = {
-    # ── Tier 1: Core ETH-native L2s ───────────────────────────────
+    # ── Tier 1: Core ETH + L2s (strategy-critical) ───────────────
     1: "https://eth-mainnet.g.alchemy.com/v2/{api_key}",
     10: "https://opt-mainnet.g.alchemy.com/v2/{api_key}",
     8453: "https://base-mainnet.g.alchemy.com/v2/{api_key}",
     42161: "https://arb-mainnet.g.alchemy.com/v2/{api_key}",
-    # ── Tier 2: Major non-ETH chains ──────────────────────────────
+    # ── Tier 2: Major non-ETH EVM chains ─────────────────────────
     56: "https://bnb-mainnet.g.alchemy.com/v2/{api_key}",
     137: "https://polygon-mainnet.g.alchemy.com/v2/{api_key}",
     43114: "https://avax-mainnet.g.alchemy.com/v2/{api_key}",
-    # ── Tier 3: ETH-native L2s + zkEVMs ───────────────────────────
+    100: "https://gnosis-mainnet.g.alchemy.com/v2/{api_key}",
+    # ── Tier 3: ETH-native L2s + zkEVMs ──────────────────────────
     130: "https://unichain-mainnet.g.alchemy.com/v2/{api_key}",
     324: "https://zksync-mainnet.g.alchemy.com/v2/{api_key}",
     480: "https://worldchain-mainnet.g.alchemy.com/v2/{api_key}",
@@ -150,9 +151,36 @@ CHAIN_RPC_TEMPLATES: dict[int, str] = {
     81457: "https://blast-mainnet.g.alchemy.com/v2/{api_key}",
     534352: "https://scroll-mainnet.g.alchemy.com/v2/{api_key}",
     7777777: "https://zora-mainnet.g.alchemy.com/v2/{api_key}",
-    # ── Testnets ──────────────────────────────────────────────────
-    11155111: "https://eth-sepolia.g.alchemy.com/v2/{api_key}",
+    # ── Testnets (EVM) — same key, different endpoints ───────────
+    11155111: "https://eth-sepolia.g.alchemy.com/v2/{api_key}",  # ETH Sepolia
+    11155420: "https://opt-sepolia.g.alchemy.com/v2/{api_key}",  # OP Sepolia
+    84532: "https://base-sepolia.g.alchemy.com/v2/{api_key}",  # Base Sepolia
+    421614: "https://arb-sepolia.g.alchemy.com/v2/{api_key}",  # Arbitrum Sepolia
+    80002: "https://polygon-amoy.g.alchemy.com/v2/{api_key}",  # Polygon Amoy
+    43113: "https://avax-fuji.g.alchemy.com/v2/{api_key}",  # Avalanche Fuji
+    300: "https://zksync-sepolia.g.alchemy.com/v2/{api_key}",  # zkSync Sepolia
+    168587773: "https://blast-sepolia.g.alchemy.com/v2/{api_key}",  # Blast Sepolia
+    534351: "https://scroll-sepolia.g.alchemy.com/v2/{api_key}",  # Scroll Sepolia
+    59141: "https://linea-sepolia.g.alchemy.com/v2/{api_key}",  # Linea Sepolia
 }
+
+# ---------------------------------------------------------------------------
+# Solana RPC templates — same pattern as EVM, keyed by network name.
+# Uses the same alchemy-api-key from Secret Manager (one key covers all chains).
+# SSOT for all Solana RPC URLs — services import from here, never hardcode.
+# ---------------------------------------------------------------------------
+SOLANA_RPC_TEMPLATES: dict[str, str] = {
+    # ── Mainnet ──────────────────────────────────────────────────
+    "alchemy": "https://solana-mainnet.g.alchemy.com/v2/{api_key}",
+    "helius": "https://mainnet.helius-rpc.com/?api-key={api_key}",
+    # ── Devnet (Solana testnet equivalent) ────────────────────────
+    "alchemy_devnet": "https://solana-devnet.g.alchemy.com/v2/{api_key}",
+    "helius_devnet": "https://devnet.helius-rpc.com/?api-key={api_key}",
+    "public_devnet": "https://api.devnet.solana.com",
+}
+
+# All RPC templates use secret: alchemy-api-key (DATA_SOURCE_TO_SECRET in canonical_mappings)
+# Same key works for EVM + Solana on Alchemy.
 
 # ---------------------------------------------------------------------------
 # Chain native gas tokens (SSOT)
@@ -252,29 +280,51 @@ class NonEvmChain(StrEnum):
     BITCOIN = "BITCOIN"
 
 
-# Solana RPC URL templates (Alchemy, Helius, QuickNode)
-SOLANA_RPC_TEMPLATES: dict[str, str] = {
-    "alchemy": "https://solana-mainnet.g.alchemy.com/v2/{api_key}",
-    "helius": "https://mainnet.helius-rpc.com/?api-key={api_key}",
-}
+# Solana RPC templates — SSOT is SOLANA_RPC_TEMPLATES defined above (line ~162)
+# alongside CHAIN_RPC_TEMPLATES for consistency.
 
 # Solana key program/token addresses (symbol → mint)
 SOLANA_TOKEN_ADDRESSES: dict[str, str] = {
+    # Native + wrapped
     "WSOL": "So11111111111111111111111111111111111111112",
     "SOL": "So11111111111111111111111111111111111111112",
+    # Stablecoins
     "USDC": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
     "USDT": "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    "PYUSD": "2b1kV6DkPAnxd5ixfnExCx2PdhTtQER4hSsd53Ky7Adr",
+    "USDE": "DEkqHyPN7GMRJ5cAU54aqYySacfiMkNy3asF1JEvp2up",
+    "SUSDE": "Eh6XEPhSwoLv5kaAtbuvv6EaVHm11Yjhed2BNSHBBBiA",
+    "USDH": "USDH1SM1ojwWUga67PBrgQe7PYQMjdiBJKgnGFmsDs7F",
+    "EURC": "HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr",
+    # BTC wrapped
     "WETH": "7vfCXTUXx5WJV5JADk17DUJ4ksgau7utNKj4b963voxs",
+    "WBTC": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
     "WBTC_PORTAL": "3NZ9JMVBmGAqocybic2c7LQCJScmgsAZ6vQqTDzcqmJh",
     "CBBTC": "cbbtcn3Keb2DW3ZsmLmrsPGsRRhQ3HmFsRJhKqLm1bq",
+    "TBTC": "6DNSN2BJsaPFdFFc1zP37kkeNe4Usc1Sqkzr9C9vPWcU",
+    # Liquid staking
     "MSOL": "mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",
     "JITOSOL": "J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",
+    "BSOL": "bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
+    "STSOL": "7dHbWXmci3dT8UFYWYZweBLXgycu7Y3iL6trKn1Y7ARj",
+    "JSOL": "7Q2afV64in6N6SeZsAAB81TJzwpeLmhBf8u3mE2ip1Fh",
     "BNSOL": "BNso1VUJnh4zcfpZa6986Ea66P6TCp59hvtNJ8b1X85",
+    # Top ecosystem tokens
     "JUP": "JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",
-    "HNT": "hntyVP6YFm1Hg25TN9WGLqM12b8TQv3TXsxg8HBatYS",
-    "RNDR": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
-    "KMNO": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+    "JTO": "jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",
+    "RAY": "4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",
+    "ORCA": "orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",
+    "BONK": "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
     "PYTH": "HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",
+    "HNT": "hntyVP6YFm1Hg25TN9WGLqM12b8TQv3TXsxg8HBatYS",
+    "WIF": "EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",
+    "MNDE": "MNDEFzGvMt87ueuHvVU9VcTqsAP5b3fTGPsHuuPA5ey",
+    "KMNO": "KMNo3nJsBXfcpJTVhZcXLW7RmTwTt4GVFE7suUBo9sS",
+    "RNDR": "rndrizKT3MK1iimdxRdWabcF7Zg7AR5T4nud4EkHBof",
+    # Bridged
+    "AVAX": "AUrMpCDYYcPuGMvN8P8PQkpHf3AqiL54ziiPPWQr3XXR",
+    "WSTETH": "ZScHuTtqZukUrtZS43teTKGs2VqkKL8k4QCouR2n6Uo",
+    "BNB": "9gP2kCy3wA1ctvYWQk75guqXuHfrEomqydHLtcTCqiLa",
 }
 
 # Reverse mapping: mint → symbol (for parsing on-chain / API responses)
@@ -355,8 +405,12 @@ def get_solana_protocol_url(protocol: str, url_type: str = "api_url") -> str | N
 
 
 def resolve_solana_mint(mint: str) -> str:
-    """Resolve a Solana token mint address to its symbol, or return the mint truncated."""
-    return SOLANA_MINT_TO_SYMBOL.get(mint, mint[:8] if mint else "")
+    """Resolve a Solana token mint address to its symbol.
+
+    Returns empty string for unknown mints — callers should reject instruments
+    where either token can't be resolved to a known symbol.
+    """
+    return SOLANA_MINT_TO_SYMBOL.get(mint, "")
 
 
 # Bitcoin metadata — native BTC DeFi is minimal; we focus on wrapped BTC on EVM.

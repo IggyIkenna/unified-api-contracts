@@ -1,21 +1,20 @@
 {
   "summary": {
-    "total_modules": 1940,
-    "reachable": 943,
-    "orphan": 540,
-    "dead_branch": 457,
+    "total_modules": 1964,
+    "reachable": 958,
+    "orphan": 545,
+    "dead_branch": 461,
     "services_audited": 25,
-    "elapsed_seconds": 66.9
+    "elapsed_seconds": 49.2
   },
   "services": {
     "alerting-service": {
       "total": 48,
-      "reachable": 21,
+      "reachable": 26,
       "orphan_modules": [
         "alerting_service/api/__init__.py",
         "alerting_service/api/routes/__init__.py",
         "alerting_service/api/routes/alerts.py",
-        "alerting_service/api/routes/delivery_status.py",
         "alerting_service/api/routes/health.py",
         "alerting_service/api/routes/system_status.py",
         "alerting_service/auth.py",
@@ -31,15 +30,11 @@
         "alerting_service/subscribers/__init__.py"
       ],
       "dead_branch_modules": [
-        "alerting_service/api/routes/mock_data.py",
-        "alerting_service/api/routes/mock_state.py",
         "alerting_service/core/alert_store.py",
         "alerting_service/core/system_health_aggregator.py",
-        "alerting_service/engine/mock_data_provider.py",
         "alerting_service/rules/data_freshness_rules.py",
         "alerting_service/rules/defi_rules.py",
         "alerting_service/rules/reconciliation_rules.py",
-        "alerting_service/rules/risk_threshold_rules.py",
         "alerting_service/rules/sports_rules.py"
       ],
       "entry_points": [
@@ -197,7 +192,7 @@
       ]
     },
     "deployment-service": {
-      "total": 95,
+      "total": 96,
       "reachable": 50,
       "orphan_modules": [
         "deployment_service/advisor.py",
@@ -235,6 +230,7 @@
         "deployment_service/cli/utils/data_status_processing.py",
         "deployment_service/cli/utils/data_status_scanning.py",
         "deployment_service/cli/utils/data_status_venue_utils.py",
+        "deployment_service/cli/utils/manifest_reader.py",
         "deployment_service/deployment/monitoring.py",
         "deployment_service/deployment/orchestrator.py",
         "deployment_service/deployment/progress.py",
@@ -257,8 +253,8 @@
       ]
     },
     "execution-service": {
-      "total": 550,
-      "reachable": 324,
+      "total": 560,
+      "reachable": 326,
       "orphan_modules": [
         "execution_service/adapters/__init__.py",
         "execution_service/algorithms/algo_library_adapter.py",
@@ -280,6 +276,7 @@
         "execution_service/config/grid_builder.py",
         "execution_service/config/grid_generator_cli.py",
         "execution_service/config/grid_v2_registry.py",
+        "execution_service/custody/__init__.py",
         "execution_service/data/__init__.py",
         "execution_service/data/catalog_resolution.py",
         "execution_service/data/config/__init__.py",
@@ -296,6 +293,10 @@
         "execution_service/defi_execution/protocols/bridge.py",
         "execution_service/defi_execution/protocols/drift.py",
         "execution_service/defi_execution/protocols/jupiter.py",
+        "execution_service/defi_execution/protocols/kamino.py",
+        "execution_service/defi_execution/protocols/marinade.py",
+        "execution_service/defi_execution/protocols/orca.py",
+        "execution_service/defi_execution/protocols/raydium.py",
         "execution_service/defi_execution/protocols/weth.py",
         "execution_service/engine/backtest/actors/__init__.py",
         "execution_service/engine/backtest/actors/tp_sl_generator.py",
@@ -391,6 +392,9 @@
         "execution_service/config/grid_generator_v2.py",
         "execution_service/config/grid_utils.py",
         "execution_service/config/live_loader.py",
+        "execution_service/custody/base.py",
+        "execution_service/custody/factory.py",
+        "execution_service/custody/mock.py",
         "execution_service/data/builder.py",
         "execution_service/data/cache_manager.py",
         "execution_service/data/config/_utils.py",
@@ -587,7 +591,7 @@
     },
     "features-delta-one-service": {
       "total": 85,
-      "reachable": 58,
+      "reachable": 59,
       "orphan_modules": [
         "features_delta_one_service/adapters/__init__.py",
         "features_delta_one_service/api/__init__.py",
@@ -596,7 +600,6 @@
         "features_delta_one_service/app/calculators/trendline.py",
         "features_delta_one_service/app/calculators/weekly_anchors.py",
         "features_delta_one_service/app/core/__init__.py",
-        "features_delta_one_service/app/core/futures_roll_adjuster.py",
         "features_delta_one_service/app/core/multi_period_features.py",
         "features_delta_one_service/app/core/timeframe_resampler.py",
         "features_delta_one_service/app/pubsub/__init__.py",
@@ -700,8 +703,8 @@
       ]
     },
     "features-sports-service": {
-      "total": 77,
-      "reachable": 21,
+      "total": 78,
+      "reachable": 24,
       "orphan_modules": [
         "features_sports_service/adapters/__init__.py",
         "features_sports_service/api/__init__.py",
@@ -714,7 +717,6 @@
         "features_sports_service/calculators/league_calculator.py",
         "features_sports_service/calculators/ml_predictions.py",
         "features_sports_service/calculators/multisource_xg_calculator.py",
-        "features_sports_service/calculators/odds_calculator.py",
         "features_sports_service/calculators/player_lineup_calculator.py",
         "features_sports_service/calculators/poisson_xg_calculator.py",
         "features_sports_service/calculators/promoted_team_handler.py",
@@ -747,7 +749,6 @@
         "features_sports_service/cli/_providers.py",
         "features_sports_service/cli/_sync_runners.py",
         "features_sports_service/cli/batch_fetch.py",
-        "features_sports_service/data/gcs_reader.py",
         "features_sports_service/data/loader.py",
         "features_sports_service/engine/mock_data_provider.py",
         "features_sports_service/live/feature_cache.py",
@@ -814,8 +815,8 @@
       ]
     },
     "instruments-service": {
-      "total": 72,
-      "reachable": 65,
+      "total": 73,
+      "reachable": 66,
       "orphan_modules": [
         "instruments_service/adapters/__init__.py",
         "instruments_service/api/__init__.py",
@@ -915,13 +916,16 @@
       ]
     },
     "market-tick-data-service": {
-      "total": 14,
-      "reachable": 10,
+      "total": 17,
+      "reachable": 12,
       "orphan_modules": [
         "market_tick_data_service/api/__init__.py",
         "market_tick_data_service/cli/__init__.py",
         "market_tick_data_service/cli/handlers/__init__.py",
         "market_tick_data_service/config_reloaders.py"
+      ],
+      "dead_branch_modules": [
+        "market_tick_data_service/adapters/hyperliquid_s3.py"
       ],
       "entry_points": [
         "market_tick_data_service/cli/main.py",
@@ -1031,8 +1035,8 @@
       ]
     },
     "position-balance-monitor-service": {
-      "total": 78,
-      "reachable": 51,
+      "total": 80,
+      "reachable": 52,
       "orphan_modules": [
         "position_balance_monitor_service/adapters/__init__.py",
         "position_balance_monitor_service/api/__init__.py",
@@ -1054,6 +1058,7 @@
         "position_balance_monitor_service/core/pnl_attribution_aggregator.py",
         "position_balance_monitor_service/core/risk_group_aggregator.py",
         "position_balance_monitor_service/core/transfer_reconciler.py",
+        "position_balance_monitor_service/core/treasury_monitor.py",
         "position_balance_monitor_service/engine/__init__.py",
         "position_balance_monitor_service/position_interface/adapters/__init__.py"
       ],
@@ -1110,7 +1115,7 @@
       ]
     },
     "strategy-service": {
-      "total": 153,
+      "total": 159,
       "reachable": 9,
       "orphan_modules": [
         "strategy_service/adapters/__init__.py",
@@ -1155,6 +1160,8 @@
         "strategy_service/engine/strategies/rel_vol/__init__.py",
         "strategy_service/engine/strategies/rel_vol/rel_vol_strategy.py",
         "strategy_service/engine/strategies/sports/backtest_engine.py",
+        "strategy_service/engine/strategies/sports/sports_backtest_runner.py",
+        "strategy_service/engine/strategies/sports/venue_allocator.py",
         "strategy_service/engine/strategies/stat_arb/__init__.py",
         "strategy_service/engine/strategies/stat_arb/stat_arb_strategy.py",
         "strategy_service/engine/strategies/tradfi_ml/__init__.py",
@@ -1175,6 +1182,7 @@
         "strategy_service/adapters/fill_subscriber.py",
         "strategy_service/adapters/live_data_source.py",
         "strategy_service/cli/handlers/batch_handler.py",
+        "strategy_service/cli/handlers/batch_utils.py",
         "strategy_service/cli/handlers/live_handler.py",
         "strategy_service/compliance/compliance_reporter.py",
         "strategy_service/engine/backtest/backtest_engine.py",
@@ -1199,11 +1207,13 @@
         "strategy_service/engine/core/signal_vector/timing_signal.py",
         "strategy_service/engine/core/signal_vector/vol_signal.py",
         "strategy_service/engine/core/strategies/base_strategy_manager.py",
+        "strategy_service/engine/core/strategy_config_loader.py",
         "strategy_service/engine/core/testing_stage_gate.py",
         "strategy_service/engine/core/trade_alert_builder.py",
         "strategy_service/engine/core/validation_service.py",
         "strategy_service/engine/fill_source.py",
         "strategy_service/engine/mock_data_provider.py",
+        "strategy_service/engine/mock_signal_generators.py",
         "strategy_service/engine/position_client.py",
         "strategy_service/engine/rebalancing/defi_vault_rebalancer.py",
         "strategy_service/engine/rebalancing/defi_yield_monitor.py",
@@ -1220,6 +1230,7 @@
         "strategy_service/engine/strategies/defi_amm_lp.py",
         "strategy_service/engine/strategies/defi_base.py",
         "strategy_service/engine/strategies/defi_basis.py",
+        "strategy_service/engine/strategies/defi_ethena_benchmark.py",
         "strategy_service/engine/strategies/defi_lending.py",
         "strategy_service/engine/strategies/defi_recursive_basis.py",
         "strategy_service/engine/strategies/defi_staked_basis.py",
@@ -1353,9 +1364,7 @@
         "unified_trading_api/services/live_service.py",
         "unified_trading_api/services/mock_service.py"
       ],
-      "entry_points": [
-        "unified_trading_api/__init__.py"
-      ]
+      "entry_points": ["unified_trading_api/__init__.py"]
     }
   }
 }

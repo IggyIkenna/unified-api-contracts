@@ -98,6 +98,53 @@ class PolygonOptionContractsResponse(BaseModel):
     next_url: str | None = Field(None, alias="next_url")
 
 
+class PolygonDividend(BaseModel):
+    """Single dividend record from GET /v3/reference/dividends.
+
+    Ref: https://polygon.io/docs/stocks/get_v3_reference_dividends
+    """
+
+    ticker: str | None = None
+    ex_dividend_date: str | None = Field(None, alias="ex_dividend_date")
+    pay_date: str | None = Field(None, alias="pay_date")
+    record_date: str | None = Field(None, alias="record_date")
+    declaration_date: str | None = Field(None, alias="declaration_date")
+    cash_amount: float | None = Field(None, alias="cash_amount")
+    currency: str | None = None
+    dividend_type: str | None = Field(None, alias="dividend_type")  # CD, SC, LT, ST
+    frequency: int | None = None  # 1=annual, 2=semi, 4=quarterly, 12=monthly
+
+
+class PolygonSplit(BaseModel):
+    """Single stock split record from GET /v3/reference/splits.
+
+    Ref: https://polygon.io/docs/stocks/get_v3_reference_splits
+    """
+
+    ticker: str | None = None
+    execution_date: str | None = Field(None, alias="execution_date")
+    split_from: float | None = Field(None, alias="split_from")
+    split_to: float | None = Field(None, alias="split_to")
+
+
+class PolygonDividendsResponse(BaseModel):
+    """Paginated response from GET /v3/reference/dividends."""
+
+    results: list[PolygonDividend] | None = None
+    status: str | None = None
+    request_id: str | None = Field(None, alias="request_id")
+    next_url: str | None = Field(None, alias="next_url")
+
+
+class PolygonSplitsResponse(BaseModel):
+    """Paginated response from GET /v3/reference/splits."""
+
+    results: list[PolygonSplit] | None = None
+    status: str | None = None
+    request_id: str | None = Field(None, alias="request_id")
+    next_url: str | None = Field(None, alias="next_url")
+
+
 class PolygonError(BaseModel):
     """Polygon.io API error response."""
 

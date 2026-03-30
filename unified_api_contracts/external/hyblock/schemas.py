@@ -72,5 +72,4 @@ class HyblockOIClusterResponse(BaseModel):
     timestamp_ms: int = Field(description="Data timestamp in milliseconds since epoch")
 
 
-
 # HyblockLiquidationLevelRequest and HyblockOIClusterRequest removed — no consumers.

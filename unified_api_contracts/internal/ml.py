@@ -12,6 +12,11 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
+# MLModelScorecard, MLPrediction, BackfillSpec — SSOT: domain/ml/schemas.py
+from unified_api_contracts.internal.domain.ml.schemas import BackfillSpec as BackfillSpec
+from unified_api_contracts.internal.domain.ml.schemas import MLModelScorecard as MLModelScorecard
+from unified_api_contracts.internal.domain.ml.schemas import MLPrediction as MLPrediction
+
 
 class TargetType(StrEnum):
     DIRECTION = "direction"
@@ -43,6 +48,8 @@ class ModelType(StrEnum):
     HUBER = "huber"
     POISSON_GLM = "poisson_glm"
     RIDGE = "ridge"
+    SIGNAL_VECTOR_META = "signal_vector_meta"
+    META_CASCADE = "meta_cascade"
 
 
 class TrainingPhase(StrEnum):
@@ -587,8 +594,22 @@ class ModelDegradationAlert(BaseModel):
     details: dict[str, float | str | int | None] = Field(default_factory=dict)
 
 
-# MLModelScorecard, MLPrediction, BackfillSpec — SSOT: domain/ml/schemas.py
-# Re-exported here for backwards compatibility.
-from unified_api_contracts.internal.domain.ml.schemas import BackfillSpec as BackfillSpec
-from unified_api_contracts.internal.domain.ml.schemas import MLModelScorecard as MLModelScorecard
-from unified_api_contracts.internal.domain.ml.schemas import MLPrediction as MLPrediction
+class SignalVectorMetaFeatures:
+    """Allowed feature names for the signal-vector meta-model.
+
+    Enforces orthogonality: only signal vector outputs are valid meta inputs,
+    never the raw features consumed by per-timeframe base models.
+    """
+
+    ALLOWED_FEATURE_NAMES: frozenset[str] = frozenset(
+        {
+            "direction_signal",
+            "vol_signal",
+            "timing_signal",
+            "sizing_confidence",
+            "regime_state",
+            # Cascade outputs (from CascadeMetaModelTrainer)
+            "cascade_meta_signal",
+            "cascade_meta_confidence",
+        }
+    )

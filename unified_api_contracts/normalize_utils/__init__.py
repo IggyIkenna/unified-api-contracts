@@ -311,26 +311,41 @@ from .rate_limits import (
     extract_tardis_rate_limit,
 )
 from .sides import normalize_side
-from .sports import (
-    normalize_betdaq_market,
-    normalize_betdaq_order,
-    normalize_betfair_market,
-    normalize_betfair_odds,
-    normalize_betfair_order,
-    normalize_kalshi_market,
-    normalize_kalshi_odds,
-    normalize_kalshi_order,
-    normalize_manifold_market,
-    normalize_manifold_odds,
-    normalize_odds_api_fixture,
-    normalize_onexbet_market,
-    normalize_pinnacle_event,
-    normalize_polymarket_market,
-    normalize_smarkets_market,
-    normalize_smarkets_order,
-    normalize_sports_market,
-    normalize_sports_order,
-)
+
+# Sports normalizers are lazy-imported to break circular dependency:
+# normalize_utils.__init__ → sports → betfair.normalize → normalize_utils.errors._utils
+# The _utils import triggers normalize_utils.__init__ again (circular).
+# Lazy import defers sports loading until first access.
+_SPORTS_NAMES = [
+    "normalize_betdaq_market",
+    "normalize_betdaq_order",
+    "normalize_betfair_market",
+    "normalize_betfair_odds",
+    "normalize_betfair_order",
+    "normalize_kalshi_market",
+    "normalize_kalshi_odds",
+    "normalize_kalshi_order",
+    "normalize_manifold_market",
+    "normalize_manifold_odds",
+    "normalize_odds_api_fixture",
+    "normalize_onexbet_market",
+    "normalize_pinnacle_event",
+    "normalize_polymarket_market",
+    "normalize_smarkets_market",
+    "normalize_smarkets_order",
+    "normalize_sports_market",
+    "normalize_sports_order",
+]
+
+
+def __getattr__(name: str):
+    if name in _SPORTS_NAMES:
+        from . import sports as _sports
+
+        return getattr(_sports, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 from .symbols import normalize_symbol
 from .tickers import (
     normalize_aster_ticker,

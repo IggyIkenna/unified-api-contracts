@@ -22,6 +22,7 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/canonical/crosscutting/errors/defi.py"
     "./unified_api_contracts/internal/testing/synthetic.py"
     "./unified_api_contracts/internal/testing/instrument_generator.py"
+    "./unified_api_contracts/external/api_football/team_mappings.py"
 )
 # requests CVE-2026-25645: no fix version available yet
 PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645"

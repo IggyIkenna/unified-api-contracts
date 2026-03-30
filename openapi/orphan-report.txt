@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
 # Generated from 25 services
 # Total schemas in spec: 85
-# Orphaned models: 573
+# Orphaned models: 586
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -178,12 +178,8 @@ UAC: FluidDepositParams
 UAC: FluidRepayParams
 UAC: FundingRateHistory
 UAC: HttpRateLimitHeaders
-UAC: HyblockLiquidationLevelEntry
-UAC: HyblockLiquidationLevelResponse
-UAC: HyblockOIClusterEntry
 UAC: HyperliquidAssetInfo
 UAC: HyperliquidFill
-UAC: HyperliquidFundingHistoryEntry
 UAC: HyperliquidMeta
 UAC: HyperliquidOpenOrder
 UAC: HyperliquidPosition
@@ -242,8 +238,12 @@ UAC: OptionsFlowRecord
 UAC: OrderBookSnapshot5
 UAC: OrderLatencyRecord
 UAC: PlayerMapping
+UAC: PolygonDividend
+UAC: PolygonDividendsResponse
 UAC: PolygonOptionContract
 UAC: PolygonOptionContractsResponse
+UAC: PolygonSplit
+UAC: PolygonSplitsResponse
 UAC: PolygonTicker
 UAC: PolygonTickersResponse
 UAC: PolymarketGammaMarket
@@ -262,7 +262,6 @@ UAC: PrimeBrokerPosition
 UAC: ProbabilityBucket
 UAC: ProcessedOddsOutput
 UAC: ProtocolHealthBreakdown
-UAC: ProviderBinding
 UAC: RateLimitResponse
 UAC: RiskGroupSummary
 UAC: SatelliteObservation
@@ -281,7 +280,6 @@ UAC: TardisExchangeDetail
 UAC: TardisInstrumentDetail
 UAC: TeamMapping
 UAC: TickToTradeMetric
-UAC: TradFiInstrumentDef
 UAC: UnderlyingGreeksBreakdown
 UAC: UniswapV3PoolStateResponse
 UAC: UniswapV3QuoteResponse
@@ -311,6 +309,7 @@ UIC: AccountState
 UIC: AgentEventDetails
 UIC: AggregatedPositionMessage
 UIC: AlertEvent
+UIC: ArbitrageStrategyConfig
 UIC: AuditRequirement
 UIC: AuditRetention
 UIC: AuthFailureDetails
@@ -390,11 +389,13 @@ UIC: DepositAddress
 UIC: DepositRecord
 UIC: DerivativeTickerMessage
 UIC: DeviationState
+UIC: DividendRecord
 UIC: DriftMarketInfo
 UIC: DriftOrderParams
 UIC: DriftOrderResult
 UIC: DriftPosition
 UIC: EODSettlementTrigger
+UIC: EarningsResultRecord
 UIC: EmergencyExitPlaybook
 UIC: EmergencyExitStep
 UIC: EnhancedError
@@ -448,6 +449,9 @@ UIC: InstrumentRecord
 UIC: InternalOptionsChainSnapshot
 UIC: InternalPosition
 UIC: InternalTransfer
+UIC: KaminoBorrowParams
+UIC: KaminoDepositParams
+UIC: KaminoReserve
 UIC: KillSwitchScope
 UIC: LegExecutionResult
 UIC: LegInstruction
@@ -487,6 +491,7 @@ UIC: OKXWithdrawResponse
 UIC: OnchainDataFreshnessConfig
 UIC: OnchainFeatureRecord
 UIC: OptionsIvRecord
+UIC: OrcaWhirlpoolInfo
 UIC: OrderRequestMessage
 UIC: PairSpreadFeatureRecord
 UIC: PersistenceCompletedDetails
@@ -505,6 +510,7 @@ UIC: ProcessingStartedDetails
 UIC: PubSubLifecycleEventMessage
 UIC: PubSubMessageEnvelope
 UIC: QualityGateDetails
+UIC: RaydiumPoolInfo
 UIC: RealTimePnLRecord
 UIC: ReconciliationResolution
 UIC: RegimeStateRecord
@@ -523,10 +529,13 @@ UIC: SecretAccessedEvent
 UIC: ServiceLifecycleEventMessage
 UIC: ShardEvent
 UIC: SignalVectorRecord
+UIC: SolanaStakePoolInfo
 UIC: SpanMarginLeg
 UIC: SportsBetEvent
+UIC: SportsBetPosition
 UIC: SportsBetResult
 UIC: SportsBookUpdate
+UIC: SportsExposure
 UIC: SportsFeatureVector
 UIC: SportsOddsTick
 UIC: SportsVenueScore
@@ -534,6 +543,7 @@ UIC: SportsVenueSelection
 UIC: SportsbookLink
 UIC: StartedDetails
 UIC: StartedEvent
+UIC: StockSplitRecord
 UIC: StoppedDetails
 UIC: StrategyModeParams
 UIC: StrategyRiskProfile
@@ -561,7 +571,10 @@ UIC: VaRRequest
 UIC: VaRResult
 UIC: ValidationCompletedDetails
 UIC: ValidationStartedDetails
+UIC: VenueAllocationWeights
+UIC: VenueBalance
 UIC: VenueCircuitBreakerConfig
+UIC: VenueLedgerEntry
 UIC: VenuePositionBreakdownMessage
 UIC: VersionBumpDetails
 UIC: VolSurfaceTermStructureRecord

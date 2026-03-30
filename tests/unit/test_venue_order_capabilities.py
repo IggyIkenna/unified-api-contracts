@@ -44,7 +44,13 @@ class TestVenueOrderCapabilities:
 
     def test_dex_venues_have_empty_order_capabilities(self) -> None:
         """DEX/AMM venues should have empty order capability sets."""
-        dex_venues = ["UNISWAPV2-ETH", "UNISWAPV3-ETH", "UNISWAPV4-ETH", "CURVE-ETH", "AERODROME-BASE"]
+        dex_venues = [
+            "UNISWAPV2-ETHEREUM",
+            "UNISWAPV3-ETHEREUM",
+            "UNISWAPV4-ETHEREUM",
+            "CURVE-ETHEREUM",
+            "AERODROME-BASE",
+        ]
         for venue in dex_venues:
             if venue in VENUE_ORDER_CAPABILITIES:
                 assert len(VENUE_ORDER_CAPABILITIES[venue]) == 0, (

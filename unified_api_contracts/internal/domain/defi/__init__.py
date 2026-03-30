@@ -11,6 +11,7 @@ from unified_api_contracts.internal.domain.defi.gas_cost import (
     EthBalanceImpact,
     GasCostAction,
     GasCostEstimate,
+    GasCostRecord,
     GasFeeSnapshot,
     GasTokenBalanceImpact,
     InstructionGasCost,
@@ -56,6 +57,14 @@ from unified_api_contracts.internal.domain.defi.protocol_sdks import (
     UniswapV3QuoteResponse,
     UniswapV3SwapTxReceipt,
 )
+from unified_api_contracts.internal.domain.defi.rate_model import (
+    AavePoolParams,
+    RateImpactResult,
+    compute_borrow_rate,
+    compute_supply_rate,
+    compute_utilization,
+    simulate_rate_impact,
+)
 from unified_api_contracts.internal.domain.defi.solana import (
     DriftMarketInfo,
     DriftMarketType,
@@ -98,6 +107,7 @@ __all__ = [
     "AaveBorrowParams",
     "AaveDepositParams",
     "AaveFlashLoanParams",
+    "AavePoolParams",
     "AaveRepayParams",
     "AaveV3ReserveData",
     "AaveV3UserAccountData",
@@ -137,6 +147,7 @@ __all__ = [
     "FluidRepayParams",
     "GasCostAction",
     "GasCostEstimate",
+    "GasCostRecord",
     "GasFeeSnapshot",
     "GasTokenBalanceImpact",
     "InstructionGasCost",
@@ -160,6 +171,7 @@ __all__ = [
     "MorphoUserPosition",
     "OraclePrice",
     "OrcaWhirlpoolInfo",
+    "RateImpactResult",
     "RaydiumPoolInfo",
     "SolanaChainId",
     "SolanaStakePoolInfo",

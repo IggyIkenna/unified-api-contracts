@@ -143,7 +143,8 @@ class VenueMapping:
     )
 
     # Reverse mapping: Tardis exchange endpoint → canonical venue name
-    # Aligned with DATA_SOURCE_TO_VENUES["tardis"] in canonical_mappings.py
+    # Each Tardis exchange MUST map to a DISTINCT canonical venue so instruments
+    # are distinguishable after date filtering (no venue-collapse).
     tardis_to_venue: dict[str, str] = field(
         default_factory=lambda: {
             # Tier 1
@@ -152,16 +153,13 @@ class VenueMapping:
             "deribit": "DERIBIT",
             "bybit": "BYBIT",
             "bybit-spot": "BYBIT",
-            "okex": "OKX",
-            "okex-futures": "OKX",
-            "okex-swap": "OKX",
-            "coinbase": "COINBASE",
+            "okex": "OKX-SPOT",
+            "okex-swap": "OKX-SWAP",
+            "okex-futures": "OKX-FUTURES",
+            "coinbase": "COINBASE-SPOT",
             # Tier 2
             "upbit": "UPBIT",
-            "bitstamp": "BITSTAMP-SPOT",
-            # Tier 3
-            "huobi": "HUOBI-SPOT",
-            "huobi-dm": "HUOBI-FUTURES",
+            "hyperliquid": "HYPERLIQUID",
         }
     )
 
@@ -366,22 +364,58 @@ class VenueMapping:
         return venue_to_exchanges
 
     def get_tardis_exchange_for_venue(self, canonical_venue: str) -> str | None:
+        """Get Tardis exchange name for a canonical venue.
+
+        Handles suffixed venues (OKX-SPOT → okex, OKX-FUTURES → okex-futures,
+        COINBASE-SPOT → coinbase, BINANCE-SPOT → binance).
+
+        Uses the instrument_type_to_tardis mapping for suffixed venues,
+        falls back to direct tardis_to_venue lookup for simple names.
         """
-        Get primary Tardis exchange name for a canonical venue.
+        upper = canonical_venue.upper()
 
-        For venues with multiple Tardis endpoints (e.g., OKX), returns the first/primary one.
-        For simple venues like UPBIT, COINBASE, returns the single Tardis exchange name.
-
-        Args:
-            canonical_venue: Canonical venue name (e.g., "UPBIT", "COINBASE", "OKX")
-
-        Returns:
-            Tardis exchange name (lowercase) or None if not found
-        """
-        # Direct lookup in reverse mapping
+        # Direct exact match first (e.g. DERIBIT, BYBIT, UPBIT)
         for tardis_exchange, venue in self.tardis_to_venue.items():
-            if venue == canonical_venue:
+            if venue == upper:
                 return tardis_exchange
+
+        # Handle suffixed venues: OKX-SPOT, OKX-FUTURES, COINBASE-SPOT, etc.
+        # Use venue_instrument_type_to_tardis mapping
+        if "-" in upper:
+            parts = upper.rsplit("-", 1)
+            base_venue = parts[0]  # OKX, COINBASE, BINANCE
+            suffix = parts[1]  # SPOT, FUTURES
+
+            # Map suffix to instrument type
+            suffix_to_type = {
+                "SPOT": "SPOT_PAIR",
+                "SWAP": "PERPETUAL",
+                "FUTURES": "FUTURE",
+                "OPTIONS": "OPTION",
+            }
+            inst_type = suffix_to_type.get(suffix, suffix)
+
+            # Try full canonical name first (e.g. BINANCE-SPOT, SPOT_PAIR)
+            tardis_name = self.venue_instrument_type_to_tardis.get((upper, inst_type))
+            if tardis_name:
+                return tardis_name
+
+            # Try base venue (e.g. OKX, SPOT_PAIR) — OKX-SPOT → (OKX, SPOT_PAIR)
+            tardis_name = self.venue_instrument_type_to_tardis.get((base_venue, inst_type))
+            if tardis_name:
+                return tardis_name
+
+            # Try base venue + PERPETUAL (for FUTURES suffix)
+            if suffix == "FUTURES":
+                tardis_name = self.venue_instrument_type_to_tardis.get((base_venue, "PERPETUAL"))
+                if tardis_name:
+                    return tardis_name
+
+            # Fallback: try base venue in direct mapping
+            for tardis_exchange, venue in self.tardis_to_venue.items():
+                if venue == base_venue:
+                    return tardis_exchange
+
         return None
 
     def convert_to_tardis_exchange(self, exchange_or_venue: str) -> str:

@@ -230,7 +230,16 @@ _HYPERLIQUID = SourceCapability(
     auth_scope=["api_key"],
     auth_environments={"test": "testnet_key", "prod": "prod_key"},
     operations={
-        "market": ["all_mids", "l2_book", "candles", "recent_trades", "ws_trades", "ws_l2_book"],
+        "market": [
+            "all_mids",
+            "l2_book",
+            "candles",
+            "recent_trades",
+            "ws_trades",
+            "ws_l2_book",
+            "derivative_ticker",
+            "funding_rates",
+        ],
         "execution": ["place_order", "cancel_order", "modify_order", "open_orders", "order_status"],
         "position": ["user_state", "clearinghouse_state", "funding_history"],
     },
@@ -305,6 +314,30 @@ _HYPERLIQUID = SourceCapability(
             environments={
                 "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
                 "testnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "derivative_ticker": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Funding rates, OI, mark/index price. Sources: S3 archive (historical) + REST API (recent)",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "funding_rates": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="8-hourly funding rates via info.funding_history(). No API key required.",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
             }
         ),
         "open_orders": OperationDetail(

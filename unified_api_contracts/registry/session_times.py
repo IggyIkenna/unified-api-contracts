@@ -50,7 +50,7 @@ class SessionWindow:
     is_24_7: bool = False
 
 
-# CME Globex: Sunday 5pm CT – Friday 4pm CT (with daily break 4pm-5pm CT)
+# CME Globex: Sunday 5pm CT - Friday 4pm CT (with daily break 4pm-5pm CT)
 _CME_SESSION = SessionWindow(
     timezone=_CT,
     open_time=time(17, 0),
@@ -59,7 +59,7 @@ _CME_SESSION = SessionWindow(
     close_weekday=5,  # Friday
 )
 
-# NYSE / NASDAQ: 9:30am – 4pm ET, Monday – Friday
+# NYSE / NASDAQ: 9:30am - 4pm ET, Monday - Friday
 _NYSE_SESSION = SessionWindow(
     timezone=_ET,
     open_time=time(9, 30),
@@ -68,7 +68,7 @@ _NYSE_SESSION = SessionWindow(
     close_weekday=5,
 )
 
-# CBOE: 8:30am – 3:15pm CT for options (SPX)
+# CBOE: 8:30am - 3:15pm CT for options (SPX)
 _CBOE_SESSION = SessionWindow(
     timezone=_CT,
     open_time=time(8, 30),
@@ -167,8 +167,8 @@ def get_session_times(exchange: str, target_date: datetime) -> SessionTimes:
         )
 
     # Localize to exchange timezone
-    local_dt = target_date.astimezone(session.timezone) if target_date.tzinfo else target_date.replace(
-        tzinfo=session.timezone
+    local_dt = (
+        target_date.astimezone(session.timezone) if target_date.tzinfo else target_date.replace(tzinfo=session.timezone)
     )
     local_date = local_dt.date()
 
@@ -212,11 +212,11 @@ def is_trading_hours(exchange: str, dt: datetime) -> bool:
     # Check weekday (ISO: 1=Mon..7=Sun)
     iso_weekday = local_dt.isoweekday()
 
-    # For CME-style sessions (Sun 17:00 – Fri 16:00):
+    # For CME-style sessions (Sun 17:00 - Fri 16:00):
     if session.open_time > session.close_time:
         # Session wraps midnight. Two windows:
-        # 1. open_time → midnight (e.g., 17:00–23:59)
-        # 2. midnight → close_time (e.g., 00:00–16:00)
+        # 1. open_time → midnight (e.g., 17:00-23:59)
+        # 2. midnight → close_time (e.g., 00:00-16:00)
         local_time = local_dt.time()
 
         # Weekend check: closed Sat all day, Sun before open_time
@@ -227,12 +227,10 @@ def is_trading_hours(exchange: str, dt: datetime) -> bool:
         if iso_weekday == 5 and local_time >= session.close_time:  # Friday after close
             return False
 
-        # During the week: open except during daily maintenance (close→open same day)
-        if session.close_time <= local_time < session.open_time:
-            return False
-        return True
+        # During the week: open except during daily maintenance (close->open same day)
+        return not (session.close_time <= local_time < session.open_time)
 
-    # Standard session (NYSE: 9:30–16:00, same day)
+    # Standard session (NYSE: 9:30-16:00, same day)
     if iso_weekday > 5:  # Weekend
         return False
     local_time = local_dt.time()

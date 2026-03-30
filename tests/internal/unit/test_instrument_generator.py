@@ -397,7 +397,7 @@ class TestDefi:
 
     def test_uniswap_v3_fee_tier(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
-        uni_v3 = [i for i in instruments if i.venue == "UNISWAPV3-ETH"]
+        uni_v3 = [i for i in instruments if i.venue == "UNISWAPV3-ETHEREUM"]
         assert len(uni_v3) == 1
         assert uni_v3[0].pool_fee_tier == "3000"
 
@@ -425,13 +425,13 @@ class TestDefi:
         expected = {
             "AAVE_V3_ETH",
             "COMPOUND_V3_ETH",
-            "UNISWAPV3-ETH",
-            "UNISWAPV2-ETH",
-            "UNISWAPV4-ETH",
+            "UNISWAPV3-ETHEREUM",
+            "UNISWAPV2-ETHEREUM",
+            "UNISWAPV4-ETHEREUM",
             "LIDO",
             "ETHERFI",
             "MORPHO-ETHEREUM",
-            "CURVE-ETH",
+            "CURVE-ETHEREUM",
             "ETHENA",
             "EULER-ETH",
         }
@@ -443,7 +443,7 @@ class TestDefi:
 
     def test_curve_3pool(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
-        curve = [i for i in instruments if i.venue == "CURVE-ETH"]
+        curve = [i for i in instruments if i.venue == "CURVE-ETHEREUM"]
         assert len(curve) == 1
         assert curve[0].instrument_type == InstrumentType.POOL
         assert curve[0].symbol == "3pool"

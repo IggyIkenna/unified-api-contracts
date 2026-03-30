@@ -3,21 +3,21 @@ UAC / UIC Type Usage Audit Report
 ========================================================================
 
 Workspace: /Users/ikennaigboaka/Code/unified-trading-system-repos
-Elapsed:   8.1s
+Elapsed:   12.9s
 
 SUMMARY
 ----------------------------------------
-  ALIVE:              603
-  TEST_ONLY:           19
+  ALIVE:              621
+  TEST_ONLY:           18
   IMPORT_CHAIN_ONLY:   45
-  DEAD:               180
-  TOTAL:              847
+  DEAD:               159
+  TOTAL:              843
 
 
 DEAD TYPES (no external usage)
 ----------------------------------------
+  [UAC] ALL_DATA_TYPES
   [UIC] ALL_FRESHNESS_CONTRACTS
-  [UAC] AccessMode
   [UAC] AsterExchangeInfo
   [UIC] AuditRequirement
   [UIC] AuditRetention
@@ -44,9 +44,7 @@ DEAD TYPES (no external usage)
   [UAC] CEFI_OPTIONS_UNDERLYINGS
   [UAC] CLOB_VENUES
   [UAC] CME_MONTH_CODES
-  [UAC] COINBASE_SPOT
   [UAC] CONFIG_SCHEMA
-  [UAC] CassetteStatus
   [UAC] CcxtAggTrade
   [UAC] CcxtFundingRate
   [UAC] CcxtMarket
@@ -65,23 +63,16 @@ DEAD TYPES (no external usage)
   [UAC] CoinbaseProductsResponse
   [UAC] CoinbaseTicker
   [UAC] CoinbaseTrade
-  [UAC] DATABENTO_ERROR_MAP
-  [UAC] DATABENTO_VALID_OPTIONS_SYMBOLS
-  [UAC] DATABENTO_VALID_PARENT_SYMBOLS
-  [UAC] DATASET_TO_CANONICAL_VENUE
   [UAC] DATA_SOURCE_TO_SECRET
   [UAC] DATA_SOURCE_TO_VENUES
   [UAC] DATA_TYPES_BY_CATEGORY
   [UAC] DEFI_INSTRUMENTS
   [UAC] DEFI_LENDING_ASSETS
+  [UAC] DEFI_MAJOR_ASSET_ADDRESSES
+  [UAC] DEFI_MAJOR_ASSET_ADDRESS_LIST
   [UAC] DEFI_MAJOR_ASSET_SYMBOLS
-  [UAC] DEFI_POOL_PAIRS
-  [UAC] DEFI_PROTOCOLS
-  [UAC] DEFI_VENUE_TO_PROTOCOL
   [UAC] DEX_VENUES
   [UAC] DEX_VENUE_KEYWORDS
-  [UAC] DataAvailability
-  [UAC] DatabentoInstrumentDef
   [UAC] DatabentoReferenceInstrument
   [UIC] DeFiConnectorStateDict
   [UIC] DeFiHealthSummary
@@ -94,10 +85,11 @@ DEAD TYPES (no external usage)
   [UAC] DeribitGetInstrumentResponse
   [UAC] DeribitGetInstrumentsResponse
   [UIC] DeviationStatus
+  [UIC] DividendType
   [UIC] DriftOrderSide
-  [UIC] DriftOrderType
   [UAC] ENDPOINT_REGISTRY
-  [UAC] EXCHANGE_CODE_TO_NAME
+  [UIC] EXCHANGE_COMMISSION_RATES
+  [UIC] EXCHANGE_VENUES
   [UIC] EXECUTION_AUDIT
   [UAC] EndpointSpec
   [UIC] EnvVars
@@ -105,16 +97,10 @@ DEAD TYPES (no external usage)
   [UIC] FEATURE_FRESHNESS
   [UAC] FX_SPOT_PAIRS
   [UIC] FileReport
-  [UAC] FxSpotPairDef
-  [UAC] HyblockLiquidationLevelEntry
-  [UAC] HyblockLiquidationLevelResponse
-  [UAC] HyblockOIClusterEntry
   [UAC] HyperliquidFill
-  [UAC] HyperliquidFundingHistoryEntry
   [UAC] HyperliquidMeta
   [UAC] HyperliquidOpenOrder
   [UAC] HyperliquidUserState
-  [UIC] HyperparameterConfigUnion
   [UAC] IBKRCorporateAction
   [UAC] INFRA_CANONICAL_TO_PROVIDER
   [UAC] INSTRUCTION_SCHEMA
@@ -126,6 +112,7 @@ DEAD TYPES (no external usage)
   [UAC] KalshiMarket
   [UAC] KalshiOrderBook
   [UAC] KalshiTrade
+  [UIC] KaminoBorrowParams
   [UAC] LiquidationHeatmapResponse
   [UAC] LiquidationLevel
   [UIC] MARKET_TICK_FRESHNESS
@@ -145,40 +132,33 @@ DEAD TYPES (no external usage)
   [UAC] OKX_FUTURES
   [UAC] OKX_SPOT
   [UAC] OPTIONAL_CONFIG_FIELDS
-  [UAC] OPTIONS_CHAIN_CONFIG
   [UIC] OnchainDataFreshnessConfig
   [UIC] OperationalMode
   [UIC] OptionContract
   [UIC] OrderBookSnapshot
+  [UAC] PolygonDividendsResponse
   [UAC] PolygonOptionContractsResponse
+  [UAC] PolygonSplitsResponse
   [UAC] PolygonTickersResponse
   [UIC] PrimeBrokerEntity
-  [UAC] ProviderBinding
   [UAC] QUARTERLY_MONTHS
   [UAC] REQUIRED_CONFIG_FIELDS
   [UAC] RateLimitInfo
-  [UAC] ResponseFormat
-  [UAC] SPACE_TO_DOT_SYMBOLS
-  [UAC] SPORTS_LEAGUES
   [UAC] SPORTS_VENUES
-  [UAC] SYMBOL_MAPPINGS
   [UIC] ServiceExecutionStatus
   [UIC] ServiceHealthResponse
   [UIC] SettlementPrice
   [UIC] StrategyModeParams
   [UIC] TIMEFRAME_TO_SECONDS
   [UAC] TRADFI_DATABENTO_INSTRUMENTS
-  [UAC] TRADFI_DATA_BINDINGS
   [UAC] TRADFI_EQUITIES
   [UAC] TRADFI_FUTURES
   [UAC] TRADFI_INSTRUMENTS
-  [UAC] TRADFI_INSTRUMENTS_CONFIG
   [UAC] TRADFI_TICKER_UNIVERSE
-  [UAC] TRADFI_VENUE_MAPPINGS
   [UAC] TardisAvailableSymbol
   [UIC] TargetTypeParams
   [UIC] TickReplayEngine
-  [UAC] TradFiInstrumentDef
+  [UIC] UniverseSnapshot
   [UIC] UnsubscribeRequest
   [UAC] UpbitTicker
   [UAC] VALID_BOOK_TYPES
@@ -188,14 +168,13 @@ DEAD TYPES (no external usage)
   [UAC] VALID_TIMEFRAMES
   [UAC] VENUES_BY_CATEGORY
   [UAC] VENUE_CATEGORY_MAP
+  [UAC] VENUE_TO_CATEGORY
   [UAC] VENUE_TO_DATA_SOURCE
   [UAC] VENUE_TO_DATA_SOURCES
   [UIC] VM_INFRASTRUCTURE_EVENTS
   [UAC] WebSocketConnectionClosed
   [UAC] WebSocketConnectionOpened
   [UAC] ZERO_ALPHA_VENUES
-  [UAC] get_databento_symbols_for_dataset
-  [UAC] get_required_datasets
 
 TEST-ONLY TYPES (used only in test files)
 ----------------------------------------
@@ -231,8 +210,6 @@ TEST-ONLY TYPES (used only in test files)
            files: system-integration-tests/tests/smoke/test_mock_data_chain.py
   [UAC] TardisExchangeDetail
            files: instruments-service/tests/reference_data/unit/test_coverage_gaps_adapters.py
-  [UIC] UniverseSnapshot
-           files: instruments-service/tests/reference_data/unit/test_schemas.py
   [UAC] UpbitBalanceQueryResponse
            files: position-balance-monitor-service/tests/position_interface/integration/test_library_deps_integration.py
   [UAC] VolSurface
@@ -294,14 +271,14 @@ IMPORT-CHAIN-ONLY TYPES (only in __init__.py re-exports)
 
 ALIVE TYPES (top 20 by instantiation count)
 ----------------------------------------
-  [UIC] Order                                              inst=54  annot=67
+  [UIC] Order                                              inst=54  annot=66
   [UAC] VenueExecutionProfile                              inst=40  annot=1
   [UAC] classify_venue_error                               inst=34  annot=0
   [UIC] AlertMessage                                       inst=34  annot=17
   [UIC] InstrumentRecord                                   inst=34  annot=38
   [UIC] AccountState                                       inst=32  annot=0
+  [UIC] Balance                                            inst=32  annot=9
   [UIC] MarginState                                        inst=32  annot=17
-  [UIC] Balance                                            inst=31  annot=9
   [UIC] ErrorContext                                       inst=31  annot=1
   [UIC] EnhancedError                                      inst=30  annot=3
   [UAC] ExecutionResult                                    inst=27  annot=16

@@ -38,5 +38,4 @@ class LiquidationHeatmapResponse(BaseModel):
     timestamp_ms: int = Field(description="Data timestamp in milliseconds since epoch")
 
 
-
 # LiquidationHeatmapRequest removed — no consumers.

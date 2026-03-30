@@ -63,6 +63,13 @@ class RiskMetrics(BaseModel):
     leverage_status: RiskStatus
     concentration_status: RiskStatus
     drawdown_status: RiskStatus
+    health_factor: Decimal | None = Field(default=None, description="DeFi lending health factor (collateral/debt)")
+    health_factor_status: RiskStatus | None = None
+    weighted_ltv: Decimal | None = Field(default=None, description="Weighted loan-to-value ratio across DeFi positions")
+    delta_composite: dict[str, Decimal] = Field(
+        default_factory=dict,
+        description="Net delta exposure per underlying asset (e.g. {'ETH': Decimal('-0.05')})",
+    )
     var_1d: Decimal | None = None
     var_5d: Decimal | None = None
     expected_shortfall: Decimal | None = None
@@ -221,6 +228,9 @@ class PnLBreakdown(BaseModel):
     greeks_gamma_pnl: Decimal | None = Field(default=None, description="Options gamma PnL")
     greeks_theta_pnl: Decimal | None = Field(default=None, description="Options theta PnL")
     greeks_vega_pnl: Decimal | None = Field(default=None, description="Options vega PnL")
+    gas_cost_usd: Decimal | None = Field(default=None, description="Total gas cost in USD for this instrument")
+    slippage_bps: int | None = Field(default=None, description="Execution slippage in basis points")
+    residual_pnl: Decimal | None = Field(default=None, description="Unexplained PnL = total - sum(components)")
     mark_to_market_pnl: Decimal | None = Field(default=None, description="Total MTM PnL including residual")
     currency: str = "USD"
 

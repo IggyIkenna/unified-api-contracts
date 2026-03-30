@@ -229,26 +229,25 @@ class TestComposeValidationHappyPath:
 
 
 class TestComposeValidationSwapUniswap:
-    """SWAP + UNISWAPV3_ETH: structural validation passes, runtime depends on source resolution.
+    """SWAP + UNISWAPV3-ETHEREUM: structural validation passes, capability resolution fails.
 
-    UNISWAPV3-ETH lowercases to "uniswapv3_eth"; the capability source is "uniswap".
-    The alias resolution strips the "eth" suffix yielding "uniswapv3", which still
-    doesn't match "uniswap". This means compose_validation raises CapabilityResolutionError.
-    We test that structural validation (SWAP + MARKET + POOL + defi) passes by verifying
-    the error is CapabilityResolutionError (not InstructionValidationError).
+    UNISWAPV3-ETHEREUM lowercases to "uniswapv3_ethereum"; the capability source
+    resolves to "uniswapv3" which has no declared capabilities (the source is "uniswap").
+    We test that structural validation passes by verifying the error is
+    CapabilityResolutionError (not InstructionValidationError).
     """
 
     def test_swap_uniswap_pool_market_raises_capability_error(self) -> None:
-        """SWAP + UNISWAPV3-ETH + MARKET + POOL + mainnet raises CapabilityResolutionError.
+        """SWAP + UNISWAPV3-ETHEREUM + MARKET + POOL + mainnet raises CapabilityResolutionError.
 
         Structural validation passes (SWAP allows MARKET, POOL, defi), but
-        the source alias "uniswapv3_eth" does not resolve to a registered capability.
+        the source alias "uniswapv3" does not resolve to a registered capability.
         """
         from unified_api_contracts.registry.capability import CapabilityResolutionError
 
         with pytest.raises(CapabilityResolutionError):
             compose_validation(
-                venue="UNISWAPV3-ETH",
+                venue="UNISWAPV3-ETHEREUM",
                 instruction_type="SWAP",
                 operation="swap_events",
                 env="mainnet",
@@ -331,7 +330,7 @@ class TestResolveVenueContextParametrized:
         [
             ("HYPERLIQUID", "cefi"),
             ("AAVE_V3", "defi"),
-            ("UNISWAPV3-ETH", "defi"),
+            ("UNISWAPV3-ETHEREUM", "defi"),
             ("BETFAIR", "sports"),
             ("DRAFTKINGS", "sports"),
             ("KALSHI", "sports"),

@@ -393,8 +393,12 @@ from .external.okx.schemas import (
     OKXTicker,
 )
 from .external.polygon.schemas import (
+    PolygonDividend,
+    PolygonDividendsResponse,
     PolygonOptionContract,
     PolygonOptionContractsResponse,
+    PolygonSplit,
+    PolygonSplitsResponse,
     PolygonTicker,
     PolygonTickersResponse,
 )
@@ -920,8 +924,12 @@ __all__ = [
     "OrphanDetector",
     "OutcomeType",
     "PlayerMapping",
+    "PolygonDividend",
+    "PolygonDividendsResponse",
     "PolygonOptionContract",
     "PolygonOptionContractsResponse",
+    "PolygonSplit",
+    "PolygonSplitsResponse",
     "PolygonTicker",
     "PolygonTickersResponse",
     "PolymarketGammaMarket",

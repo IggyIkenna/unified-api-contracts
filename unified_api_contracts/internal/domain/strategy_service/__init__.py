@@ -12,6 +12,10 @@ from unified_api_contracts.internal.domain.strategy_service.instruction import (
     StrategyInstruction,
     TransferInstruction,
 )
+from unified_api_contracts.internal.domain.strategy_service.instrument_intent import (
+    ResolvedInstruments,
+    StrategyInstrumentIntent,
+)
 from unified_api_contracts.internal.domain.strategy_service.pnl import (
     PnLAttribution,
     PnLSummary,
@@ -38,12 +42,14 @@ __all__ = [
     "PnLSummary",
     "PositionSnapshot",
     "PredictionBetInstruction",
+    "ResolvedInstruments",
     "SettlementDelta",
     "SettlementType",
     "SportsBetInstruction",
     "SportsExchangeOrderInstruction",
     "StrategyDeFiSignal",
     "StrategyInstruction",
+    "StrategyInstrumentIntent",
     "StrategyModeParams",
     "StrategyPosition",
     "TransferInstruction",

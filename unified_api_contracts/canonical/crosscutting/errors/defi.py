@@ -20,6 +20,7 @@ class DefiAlertType(StrEnum):
     FUNDING_RATE_FLIP = "funding_rate_flip"
     FEATURE_STALE = "feature_stale"
     TX_SIMULATION_FAILED = "tx_simulation_failed"
+    RATE_DEVIATION = "rate_deviation"
 
 
 class DefiErrorCode:

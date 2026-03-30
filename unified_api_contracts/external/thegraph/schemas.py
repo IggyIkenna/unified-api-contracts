@@ -262,14 +262,29 @@ class GraphToken(BaseModel, frozen=True):
 
 
 class GraphUniswapPool(BaseModel, frozen=True):
-    """Pool object from Uniswap V3/V4 subgraph."""
+    """Pool object from Uniswap V3/V4 subgraph.
+
+    Fields for concentrated liquidity IL calculation:
+    - sqrtPrice / tick: exact pool price (for LP value computation)
+    - feeGrowthGlobal: cumulative fee accrual per unit liquidity (exact fee P&L)
+    - volumeUSD / volumeToken0 / volumeToken1: for fee APY estimation
+    """
 
     id: str = ""
     token0: GraphToken = Field(default_factory=GraphToken)
     token1: GraphToken = Field(default_factory=GraphToken)
     feeTier: str | int | None = None
     liquidity: str = "0"
+    sqrtPrice: str = "0"
+    tick: str | int | None = None
+    feeGrowthGlobal0X128: str = "0"
+    feeGrowthGlobal1X128: str = "0"
+    volumeUSD: str = "0"
+    volumeToken0: str = "0"
+    volumeToken1: str = "0"
     totalValueLockedUSD: str = "0"
+    totalValueLockedToken0: str = "0"
+    totalValueLockedToken1: str = "0"
     createdAtTimestamp: str | int | None = None
 
 
@@ -283,6 +298,54 @@ class GraphUniswapPoolsResponse(BaseModel, frozen=True):
     """Full GraphQL response for Uniswap pool queries."""
 
     data: GraphUniswapPoolsData = Field(default_factory=GraphUniswapPoolsData)
+    errors: list[object] | None = None
+
+
+# ---------------------------------------------------------------------------
+# Uniswap V3/V4 position models (for exact fee tracking via feeGrowthInside)
+# ---------------------------------------------------------------------------
+
+
+class GraphUniswapPosition(BaseModel, frozen=True):
+    """LP position from Uniswap V3/V4 subgraph (NonfungiblePositionManager NFT).
+
+    feeGrowthInside fields give EXACT fee accrual per unit liquidity
+    within the position's tick range — no volume-based estimation needed.
+
+    Data sources:
+    - Historical: Uniswap V3 subgraph `positions` entity
+    - Live: on-chain eth_call to NonfungiblePositionManager.positions(tokenId)
+    """
+
+    id: str = ""
+    owner: str = ""
+    pool: GraphUniswapPool = Field(default_factory=GraphUniswapPool)
+    tickLower: str | int = 0
+    tickUpper: str | int = 0
+    liquidity: str = "0"
+    depositedToken0: str = "0"
+    depositedToken1: str = "0"
+    withdrawnToken0: str = "0"
+    withdrawnToken1: str = "0"
+    collectedFeesToken0: str = "0"
+    collectedFeesToken1: str = "0"
+    feeGrowthInside0LastX128: str = "0"
+    feeGrowthInside1LastX128: str = "0"
+    transaction: GraphSwapTransaction | None = None
+
+
+class GraphUniswapPositionsData(BaseModel, frozen=True):
+    """The 'data' wrapper for Uniswap position queries."""
+
+    positions: list[GraphUniswapPosition] = Field(default_factory=list)
+
+
+class GraphUniswapPositionsResponse(BaseModel, frozen=True):
+    """Full GraphQL response for Uniswap position queries."""
+
+    data: GraphUniswapPositionsData = Field(
+        default_factory=GraphUniswapPositionsData,
+    )
     errors: list[object] | None = None
 
 

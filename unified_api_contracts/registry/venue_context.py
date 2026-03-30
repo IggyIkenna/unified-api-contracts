@@ -19,6 +19,7 @@ from __future__ import annotations
 import functools
 import inspect
 import logging
+import re
 from collections.abc import Callable
 from typing import TypeVar
 
@@ -290,6 +291,11 @@ def resolve_venue_context(
     # Try without version suffix (e.g. "aave_v3" → "aave")
     if len(parts) == 2 and parts[1].startswith("v"):
         candidates.append(parts[0])
+    # Strip trailing version from protocol names (aavev3 → aave, compoundv3 → compound)
+    for c in list(candidates):
+        stripped = re.sub(r"v\d+$", "", c)
+        if stripped and stripped != c:
+            candidates.append(stripped)
     candidates.append(venue.lower())
 
     # Try to resolve capability
@@ -408,6 +414,11 @@ def compose_validation(
             candidates.append(parts[0])
     if len(parts) == 2 and parts[1].startswith("v"):
         candidates.append(parts[0])
+    # Strip trailing version from protocol names (aavev3 → aave, compoundv3 → compound)
+    for c in list(candidates):
+        stripped = re.sub(r"v\d+$", "", c)
+        if stripped and stripped != c:
+            candidates.append(stripped)
     candidates.append(venue.lower())
 
     for alias in dict.fromkeys(candidates):

@@ -62,6 +62,13 @@ class RiskMetrics(BaseModel):
     leverage_status: RiskStatus
     concentration_status: RiskStatus
     drawdown_status: RiskStatus
+    health_factor: Decimal | None = Field(default=None, description="DeFi lending health factor (collateral/debt)")
+    health_factor_status: RiskStatus | None = None
+    weighted_ltv: Decimal | None = Field(default=None, description="Weighted loan-to-value ratio across DeFi positions")
+    delta_composite: dict[str, Decimal] = Field(
+        default_factory=dict,
+        description="Net delta exposure per underlying asset (e.g. {'ETH': Decimal('-0.05')})",
+    )
     var_1d: Decimal | None = None
     var_5d: Decimal | None = None
     expected_shortfall: Decimal | None = None

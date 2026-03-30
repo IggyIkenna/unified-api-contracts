@@ -10,11 +10,7 @@
       {
         "class_name": "DeploymentApiConfig",
         "module": "deployment_api.deployment_api_config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 143,
         "fields": {
           "service_name": {
@@ -144,11 +140,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -743,11 +735,7 @@
       {
         "class_name": "ClientReportingApiConfig",
         "module": "client_reporting_api.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 83,
         "fields": {
           "service_name": {
@@ -877,11 +865,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -1176,12 +1160,8 @@
       {
         "class_name": "AlertingSystemConfig",
         "module": "alerting_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
-        "field_count": 91,
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
+        "field_count": 92,
         "fields": {
           "service_name": {
             "type": "<class 'str'>",
@@ -1310,11 +1290,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -1592,6 +1568,11 @@
             "default": false,
             "required": false
           },
+          "config_store_bucket": {
+            "type": "<class 'str'>",
+            "default": "",
+            "required": false
+          },
           "slack_webhook_url": {
             "type": "<class 'str'>",
             "default": "",
@@ -1649,11 +1630,7 @@
       {
         "class_name": "ExecutionServicesConfig",
         "module": "execution_service.service_config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 140,
         "fields": {
           "service_name": {
@@ -1783,11 +1760,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -2339,17 +2312,12 @@
           },
           "auth_allowed_domains": {
             "type": "list[str]",
-            "default": [
-              "company.com"
-            ],
+            "default": ["company.com"],
             "required": false
           },
           "auth_admin_groups": {
             "type": "list[str]",
-            "default": [
-              "admins@company.com",
-              "execution-admins@company.com"
-            ],
+            "default": ["admins@company.com", "execution-admins@company.com"],
             "required": false
           },
           "auth_group_permissions": {
@@ -2372,11 +2340,7 @@
                 "trade",
                 "manual-instruction"
               ],
-              "developers@company.com": [
-                "read",
-                "write",
-                "debug"
-              ],
+              "developers@company.com": ["read", "write", "debug"],
               "admins@company.com": [
                 "admin",
                 "read",
@@ -2403,11 +2367,7 @@
       {
         "class_name": "OrderInterfaceConfig",
         "module": "execution_service.trade_execution.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 88,
         "fields": {
           "service_name": {
@@ -2537,11 +2497,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -2884,11 +2840,7 @@
       {
         "class_name": "RiskAndExposureServiceConfig",
         "module": "risk_and_exposure_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 110,
         "fields": {
           "service_name": {
@@ -3018,11 +2970,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -3452,11 +3400,7 @@
       {
         "class_name": "PositionBalanceMonitorServiceConfig",
         "module": "position_balance_monitor_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 123,
         "fields": {
           "service_name": {
@@ -3586,11 +3530,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -4085,11 +4025,7 @@
       {
         "class_name": "DeploymentConfig",
         "module": "deployment_service.deployment_config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 140,
         "fields": {
           "service_name": {
@@ -4219,11 +4155,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -4803,11 +4735,7 @@
       {
         "class_name": "PnlAttributionServiceConfig",
         "module": "pnl_attribution_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 84,
         "fields": {
           "service_name": {
@@ -4937,11 +4865,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -5241,11 +5165,7 @@
       {
         "class_name": "StrategyServiceConfig",
         "module": "strategy_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 93,
         "fields": {
           "service_name": {
@@ -5375,11 +5295,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -5960,11 +5876,7 @@
       {
         "class_name": "FeaturesSportsServiceConfig",
         "module": "features_sports_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 82,
         "fields": {
           "service_name": {
@@ -6094,11 +6006,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -6388,11 +6296,7 @@
       {
         "class_name": "FeaturesCrossInstrumentConfig",
         "module": "features_cross_instrument_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 89,
         "fields": {
           "service_name": {
@@ -6522,11 +6426,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -6816,15 +6716,7 @@
           },
           "supported_timeframes": {
             "type": "list[str]",
-            "default": [
-              "15s",
-              "1m",
-              "5m",
-              "15m",
-              "1h",
-              "4h",
-              "24h"
-            ],
+            "default": ["15s", "1m", "5m", "15m", "1h", "4h", "24h"],
             "required": false
           },
           "enabled_feature_groups": {
@@ -6864,11 +6756,7 @@
       {
         "class_name": "FeaturesDeltaOneConfig",
         "module": "features_delta_one_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 89,
         "fields": {
           "service_name": {
@@ -6998,11 +6886,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -7287,15 +7171,7 @@
           },
           "supported_timeframes": {
             "type": "list[str]",
-            "default": [
-              "15s",
-              "1m",
-              "5m",
-              "15m",
-              "1h",
-              "4h",
-              "24h"
-            ],
+            "default": ["15s", "1m", "5m", "15m", "1h", "4h", "24h"],
             "required": false
           },
           "enabled_feature_groups": {
@@ -7354,11 +7230,7 @@
       {
         "class_name": "CalendarFeaturesConfig",
         "module": "features_calendar_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 88,
         "fields": {
           "service_name": {
@@ -7488,11 +7360,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -7812,11 +7680,7 @@
       {
         "class_name": "CommodityFeaturesConfig",
         "module": "features_commodity_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 89,
         "fields": {
           "service_name": {
@@ -7946,11 +7810,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -8230,10 +8090,7 @@
           },
           "enabled_commodities": {
             "type": "list[str]",
-            "default": [
-              "NG",
-              "CL"
-            ],
+            "default": ["NG", "CL"],
             "required": false
           },
           "enabled_factor_groups": {
@@ -8284,11 +8141,7 @@
       {
         "class_name": "FeaturesMtfConfig",
         "module": "features_multi_timeframe_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 91,
         "fields": {
           "service_name": {
@@ -8418,11 +8271,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -8707,14 +8556,7 @@
           },
           "supported_timeframes": {
             "type": "list[str]",
-            "default": [
-              "1m",
-              "5m",
-              "15m",
-              "1h",
-              "4h",
-              "1d"
-            ],
+            "default": ["1m", "5m", "15m", "1h", "4h", "1d"],
             "required": false
           },
           "enabled_feature_groups": {
@@ -8794,11 +8636,7 @@
       {
         "class_name": "MarketDataProcessingServiceConfig",
         "module": "market_data_processing_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 99,
         "fields": {
           "service_name": {
@@ -8928,11 +8766,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -9307,11 +9141,7 @@
       {
         "class_name": "ReconConfig",
         "module": "batch_live_reconciliation_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 86,
         "fields": {
           "service_name": {
@@ -9441,11 +9271,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -9755,12 +9581,8 @@
       {
         "class_name": "InferenceConfig",
         "module": "ml_inference_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
-        "field_count": 105,
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
+        "field_count": 106,
         "fields": {
           "service_name": {
             "type": "<class 'str'>",
@@ -9889,11 +9711,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -10171,6 +9989,11 @@
             "default": false,
             "required": false
           },
+          "config_store_bucket": {
+            "type": "<class 'str'>",
+            "default": "",
+            "required": false
+          },
           "model_cache_size": {
             "type": "<class 'int'>",
             "default": 10,
@@ -10218,14 +10041,7 @@
           },
           "enabled_timeframes": {
             "type": "list[str]",
-            "default": [
-              "1m",
-              "5m",
-              "15m",
-              "1h",
-              "4h",
-              "1d"
-            ],
+            "default": ["1m", "5m", "15m", "1h", "4h", "1d"],
             "required": false
           },
           "training_categories": {
@@ -10305,11 +10121,7 @@
       {
         "class_name": "TradingAgentConfig",
         "module": "trading_agent_service.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 103,
         "fields": {
           "service_name": {
@@ -10439,11 +10251,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -10838,10 +10646,7 @@
       {
         "class_name": "UnifiedCloudConfig",
         "module": "unified_trading_library.config_interface.cloud_config",
-        "bases": [
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["_ApiClientFields", "BaseConfig"],
         "field_count": 81,
         "fields": {
           "service_name": {
@@ -10971,11 +10776,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -11281,11 +11082,7 @@
       {
         "class_name": "MLTrainingConfig",
         "module": "unified_trading_library.config_interface.ml_config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 98,
         "fields": {
           "service_name": {
@@ -11415,11 +11212,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {
@@ -11718,9 +11511,7 @@
           },
           "tradfi_instruments": {
             "type": "list[str]",
-            "default": [
-              "NASDAQ:ETF:SPY-USD"
-            ],
+            "default": ["NASDAQ:ETF:SPY-USD"],
             "required": false
           },
           "auxiliary_instrument_ids": {
@@ -11730,13 +11521,7 @@
           },
           "timeframes": {
             "type": "list[str]",
-            "default": [
-              "1m",
-              "5m",
-              "15m",
-              "1h",
-              "4h"
-            ],
+            "default": ["1m", "5m", "15m", "1h", "4h"],
             "required": false
           },
           "default_target_type_params": {
@@ -11808,9 +11593,7 @@
       {
         "class_name": "InstrumentDomainConfig",
         "module": "unified_trading_library.config_interface.domain_configs",
-        "bases": [
-          "BaseConfig"
-        ],
+        "bases": ["BaseConfig"],
         "field_count": 8,
         "fields": {
           "service_name": {
@@ -11858,9 +11641,7 @@
       {
         "class_name": "StrategyDomainConfig",
         "module": "unified_trading_library.config_interface.domain_configs",
-        "bases": [
-          "BaseConfig"
-        ],
+        "bases": ["BaseConfig"],
         "field_count": 6,
         "fields": {
           "service_name": {
@@ -11898,9 +11679,7 @@
       {
         "class_name": "ClientDomainConfig",
         "module": "unified_trading_library.config_interface.domain_configs",
-        "bases": [
-          "BaseConfig"
-        ],
+        "bases": ["BaseConfig"],
         "field_count": 6,
         "fields": {
           "service_name": {
@@ -11938,9 +11717,7 @@
       {
         "class_name": "VenueDomainConfig",
         "module": "unified_trading_library.config_interface.domain_configs",
-        "bases": [
-          "BaseConfig"
-        ],
+        "bases": ["BaseConfig"],
         "field_count": 6,
         "fields": {
           "service_name": {
@@ -12026,11 +11803,7 @@
       {
         "class_name": "MarketDataProviderConfig",
         "module": "unified_market_interface.config",
-        "bases": [
-          "UnifiedCloudConfig",
-          "_ApiClientFields",
-          "BaseConfig"
-        ],
+        "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 138,
         "fields": {
           "service_name": {
@@ -12160,11 +11933,7 @@
           },
           "enabled_categories": {
             "type": "list[str]",
-            "default": [
-              "CEFI",
-              "TRADFI",
-              "DEFI"
-            ],
+            "default": ["CEFI", "TRADFI", "DEFI"],
             "required": false
           },
           "otel_exporter_otlp_endpoint": {

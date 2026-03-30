@@ -418,13 +418,13 @@ class TestOddsApiSchemas:
     def test_market_construct(self) -> None:
         m = OddsApiMarket(
             key="h2h",
-            last_update=NOW,
+            last_update=NOW.isoformat(),
             outcomes=[OddsApiOutcome(name="A", price=1.5)],
         )
         assert len(m.outcomes) == 1
 
     def test_bookmaker_construct(self) -> None:
-        b = OddsApiBookmaker(key="pinnacle", title="Pinnacle", last_update=NOW, markets=[])
+        b = OddsApiBookmaker(key="pinnacle", title="Pinnacle", last_update=NOW.isoformat(), markets=[])
         assert b.markets == []
 
     def test_event_construct(self) -> None:
