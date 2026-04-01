@@ -65,7 +65,8 @@ steps:
         # parent = /. Symlink /unified-trading-pm → /workspace/unified-trading-pm so
         # the resolved path /unified-trading-pm/scripts/... works.
         git init -q .
-        git add -A && git commit -q -m "init" --allow-empty
+        git config user.email "build@cloud" && git config user.name "Cloud Build"
+        git commit -q --allow-empty -m "init"
         ln -sfn /workspace/unified-trading-pm /unified-trading-pm
         pip install --quiet uv keyrings.google-artifactregistry-auth
         mkdir -p /root/.config/pip
