@@ -160,12 +160,6 @@ from unified_api_contracts.internal.domain.defi import (
 from unified_api_contracts.internal.domain.defi import (
     SolanaTransactionResult as SolanaTransactionResult,
 )
-from unified_api_contracts.internal.domain.derivatives.options import (
-    OptionContract,
-    OptionGreeks,
-    OptionsChain,
-    SettlementPrice,
-)
 from unified_api_contracts.internal.domain.events_service.lifecycle import (
     RestartDetectedDetails,
     RestartDetectedEvent,
@@ -248,7 +242,6 @@ from unified_api_contracts.internal.domain.features_sports import (
     SportsFeatureVector,
 )
 from unified_api_contracts.internal.domain.health.service_health import ServiceHealthResponse
-from unified_api_contracts.internal.domain.market_data_api import OrderBookSnapshot
 from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
     CandleOutput,
     InstrumentInfo,
@@ -327,6 +320,7 @@ from unified_api_contracts.internal.domain.sports.risk import (
     SportsExposure,
 )
 from unified_api_contracts.internal.domain.strategy_service import (
+    ClientStrategyOverride,
     StrategyModeParams,
 )
 from unified_api_contracts.internal.domain.strategy_service.domain_events import (
@@ -342,8 +336,11 @@ from unified_api_contracts.internal.domain.strategy_service.monitoring import (
     OrderData,
     PnLData,
     PositionData,
+    RebalanceCostEstimate,
     RiskData,
+    ShareClassConfig,
     StrategyDecisionData,
+    StrategyNAV,
 )
 from unified_api_contracts.internal.domain.strategy_service.order import Order
 from unified_api_contracts.internal.domain.strategy_service.signal_vector import (
@@ -391,9 +388,11 @@ from unified_api_contracts.internal.events import (
     SecretAccessedDetails,
     SecretAccessedEvent,
     ServiceMode,
+    ShardIncompleteDetails,
     StartedDetails,
     StartedEvent,
     StoppedDetails,
+    UpstreamNotReadyDetails,
     ValidationCompletedDetails,
     ValidationStartedDetails,
     VersionBumpDetails,
@@ -495,6 +494,7 @@ from unified_api_contracts.internal.positions import (
     DeFiLPPosition,
     DeFiStakingPosition,
     LendingEntry,
+    RewardPosition,
 )
 from unified_api_contracts.internal.pubsub import (
     AggregatedPositionMessage,
@@ -545,6 +545,7 @@ from unified_api_contracts.internal.reference import (
     FeeType,
     InstrumentDefinition,
     InstrumentKey,
+    InstrumentLeg,
     InstrumentRecord,
     InstrumentStatus,
     InstrumentType,
@@ -555,6 +556,7 @@ from unified_api_contracts.internal.reference import (
     StockSplitRecord,
     UniverseSnapshot,
     VenueCircuitBreakerConfig,
+    validate_instrument_records,
 )
 from unified_api_contracts.internal.reporting import ClientConfig, CredentialsRegistry, FeeStructure
 from unified_api_contracts.internal.risk import (
@@ -747,6 +749,7 @@ __all__ = [
     "ClientFeeSchedule",
     "ClientPrimeBrokerLink",
     "ClientRiskTolerance",
+    "ClientStrategyOverride",
     "CloudProvider",
     "CoachRecord",
     "CoinbaseWithdrawRequest",
@@ -895,6 +898,7 @@ __all__ = [
     "InstrumentFaultRule",
     "InstrumentInfo",
     "InstrumentKey",
+    "InstrumentLeg",
     "InstrumentMetadata",
     "InstrumentRecord",
     "InstrumentStatus",
@@ -965,15 +969,11 @@ __all__ = [
     "OnchainFeatureRecord",
     "OperationType",
     "OperationalMode",
-    "OptionContract",
-    "OptionGreeks",
     "OptionType",
-    "OptionsChain",
     "OptionsIvRecord",
     "OraclePrice",
     "OrcaWhirlpoolInfo",
     "Order",
-    "OrderBookSnapshot",
     "OrderData",
     "OrderEvent",
     "OrderRequestMessage",
@@ -1012,6 +1012,7 @@ __all__ = [
     "QualityGateDetails",
     "RaydiumPoolInfo",
     "RealTimePnLRecord",
+    "RebalanceCostEstimate",
     "ReconciliationAction",
     "ReconciliationResolution",
     "RefereeRecord",
@@ -1020,6 +1021,7 @@ __all__ = [
     "ResourceMetricsSnapshot",
     "RestartDetectedDetails",
     "RestartDetectedEvent",
+    "RewardPosition",
     "RidgeHyperparams",
     "RiskAggregationLevel",
     "RiskAlertMessage",
@@ -1043,10 +1045,12 @@ __all__ = [
     "ServiceHealthResponse",
     "ServiceLifecycleEventMessage",
     "ServiceMode",
-    "SettlementPrice",
     "SettlementType",
     "ShardEvent",
+    "ShardIncompleteDetails",
+    "ShareClassConfig",
     "SignalExecutionResult",
+    "SignalVectorMetaFeatures",
     "SignalVectorRecord",
     "SolanaStakePoolInfo",
     "SpanMarginLeg",
@@ -1070,6 +1074,7 @@ __all__ = [
     "StrategyDecision",
     "StrategyDecisionData",
     "StrategyModeParams",
+    "StrategyNAV",
     "StrategyRiskProfile",
     "StrategySignalMessage",
     "StrategySpec",
@@ -1105,6 +1110,7 @@ __all__ = [
     "UnsubscribeRequest",
     "UpbitWithdrawRequest",
     "UpbitWithdrawResponse",
+    "UpstreamNotReadyDetails",
     "UrgencyLevel",
     "UserProfile",
     "UserRole",
@@ -1142,4 +1148,5 @@ __all__ = [
     "aggregate_notional",
     "aggregate_positions",
     "validate_feature_columns_not_null",
+    "validate_instrument_records",
 ]

@@ -19,14 +19,6 @@ from ..external.open_meteo.normalize import (
     normalize_open_meteo_weather_multi,
 )
 from .cefi_extended import (
-    normalize_bitstamp_fill,
-    normalize_bitstamp_order,
-    normalize_bitstamp_orderbook,
-    normalize_bitstamp_trade,
-    normalize_kraken_fill,
-    normalize_kraken_order,
-    normalize_kraken_orderbook,
-    normalize_kraken_trade,
     normalize_kucoin_fill,
     normalize_kucoin_order,
     normalize_kucoin_orderbook,
@@ -91,7 +83,6 @@ from .errors import (
     normalize_betfair_error,
     normalize_binance_error,
     normalize_bitget_error,
-    normalize_bitstamp_error,
     normalize_bybit_error,
     normalize_ccxt_error,
     normalize_cloud_sdks_error,
@@ -108,7 +99,6 @@ from .errors import (
     normalize_hyperliquid_error,
     normalize_ibkr_error,
     normalize_kalshi_error,
-    normalize_kraken_error,
     normalize_kucoin_error,
     normalize_manifold_error,
     normalize_matchbook_error,
@@ -144,18 +134,6 @@ from .fees import (
     normalize_hyperliquid_fee,
     normalize_okx_fee_rate,
     normalize_upbit_fee_rate,
-)
-from .infrastructure import (
-    normalize_aws_codebuild_to_job,
-    normalize_aws_ec2_instance_to_vm,
-    normalize_aws_ecr_repository_to_registry,
-    normalize_aws_s3_bucket_to_storage,
-    normalize_aws_s3_list_to_storage,
-    normalize_gcp_artifact_repository_to_registry,
-    normalize_gcp_cloud_build_to_job,
-    normalize_gcp_compute_instance_to_vm,
-    normalize_gcp_gcs_blob_list_to_storage,
-    normalize_gcp_storage_bucket,
 )
 from .instruments import (
     normalize_arbitrage_market,
@@ -311,47 +289,11 @@ from .rate_limits import (
     extract_tardis_rate_limit,
 )
 from .sides import normalize_side
-
-# Sports normalizers are lazy-imported to break circular dependency:
-# normalize_utils.__init__ → sports → betfair.normalize → normalize_utils.errors._utils
-# The _utils import triggers normalize_utils.__init__ again (circular).
-# Lazy import defers sports loading until first access.
-_SPORTS_NAMES = [
-    "normalize_betdaq_market",
-    "normalize_betdaq_order",
-    "normalize_betfair_market",
-    "normalize_betfair_odds",
-    "normalize_betfair_order",
-    "normalize_kalshi_market",
-    "normalize_kalshi_odds",
-    "normalize_kalshi_order",
-    "normalize_manifold_market",
-    "normalize_manifold_odds",
-    "normalize_odds_api_fixture",
-    "normalize_onexbet_market",
-    "normalize_pinnacle_event",
-    "normalize_polymarket_market",
-    "normalize_smarkets_market",
-    "normalize_smarkets_order",
-    "normalize_sports_market",
-    "normalize_sports_order",
-]
-
-
-def __getattr__(name: str):
-    if name in _SPORTS_NAMES:
-        from . import sports as _sports
-
-        return getattr(_sports, name)
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
-
-
 from .symbols import normalize_symbol
 from .tickers import (
     normalize_aster_ticker,
     normalize_binance_ticker,
     normalize_bitget_ticker,
-    normalize_bitstamp_ticker,
     normalize_bybit_ticker,
     normalize_ccxt_ticker,
     normalize_coinbase_ticker,
@@ -360,7 +302,6 @@ from .tickers import (
     normalize_hyperliquid_ticker,
     normalize_ibkr_ticker,
     normalize_kalshi_ticker,
-    normalize_kraken_ticker,
     normalize_kucoin_ticker,
     normalize_mexc_ticker,
     normalize_okx_ticker,
@@ -405,6 +346,40 @@ from .versifi import (
     normalize_versifi_trade_to_fill,
 )
 
+# Sports normalizers are lazy-imported to break circular dependency:
+# normalize_utils.__init__ → sports → betfair.normalize → normalize_utils.errors._utils
+# The _utils import triggers normalize_utils.__init__ again (circular).
+# Lazy import defers sports loading until first access.
+_SPORTS_NAMES = [
+    "normalize_betdaq_market",
+    "normalize_betdaq_order",
+    "normalize_betfair_market",
+    "normalize_betfair_odds",
+    "normalize_betfair_order",
+    "normalize_kalshi_market",
+    "normalize_kalshi_odds",
+    "normalize_kalshi_order",
+    "normalize_manifold_market",
+    "normalize_manifold_odds",
+    "normalize_odds_api_fixture",
+    "normalize_onexbet_market",
+    "normalize_pinnacle_event",
+    "normalize_polymarket_market",
+    "normalize_smarkets_market",
+    "normalize_smarkets_order",
+    "normalize_sports_market",
+    "normalize_sports_order",
+]
+
+
+def __getattr__(name: str):
+    if name in _SPORTS_NAMES:
+        from . import sports as _sports
+
+        return getattr(_sports, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
+
 __all__ = [
     # Odds format conversion utilities
     "american_to_decimal",
@@ -436,11 +411,6 @@ __all__ = [
     "normalize_aster_trade",
     "normalize_aster_ws_close",
     "normalize_aster_ws_subscription",
-    "normalize_aws_codebuild_to_job",
-    "normalize_aws_ec2_instance_to_vm",
-    "normalize_aws_ecr_repository_to_registry",
-    "normalize_aws_s3_bucket_to_storage",
-    "normalize_aws_s3_list_to_storage",
     "normalize_barchart_ohlcv",
     "normalize_betdaq_error",
     "normalize_betdaq_market",
@@ -471,12 +441,6 @@ __all__ = [
     "normalize_bitget_orderbook",
     "normalize_bitget_ticker",
     "normalize_bitget_trade",
-    "normalize_bitstamp_error",
-    "normalize_bitstamp_fill",
-    "normalize_bitstamp_order",
-    "normalize_bitstamp_orderbook",
-    "normalize_bitstamp_ticker",
-    "normalize_bitstamp_trade",
     "normalize_bybit_derivative_ticker",
     "normalize_bybit_error",
     "normalize_bybit_fee_rate",
@@ -572,11 +536,6 @@ __all__ = [
     "normalize_footystats_error",
     "normalize_fred_observation",
     "normalize_fred_series_response",
-    "normalize_gcp_artifact_repository_to_registry",
-    "normalize_gcp_cloud_build_to_job",
-    "normalize_gcp_compute_instance_to_vm",
-    "normalize_gcp_gcs_blob_list_to_storage",
-    "normalize_gcp_storage_bucket",
     "normalize_github_error",
     "normalize_glassnode_error",
     "normalize_glassnode_exchange_reserves",
@@ -627,12 +586,6 @@ __all__ = [
     "normalize_kalshi_trade",
     "normalize_kalshi_ws_lifecycle",
     "normalize_kalshi_ws_trade",
-    "normalize_kraken_error",
-    "normalize_kraken_fill",
-    "normalize_kraken_order",
-    "normalize_kraken_orderbook",
-    "normalize_kraken_ticker",
-    "normalize_kraken_trade",
     "normalize_kucoin_error",
     "normalize_kucoin_fill",
     "normalize_kucoin_order",

@@ -13,7 +13,7 @@ from decimal import Decimal
 from pydantic import BaseModel, Field
 
 
-class DividendType(str, enum.Enum):
+class DividendType(enum.StrEnum):
     """Dividend classification type."""
 
     REGULAR = "REGULAR"

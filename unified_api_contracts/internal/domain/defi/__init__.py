@@ -94,6 +94,16 @@ from unified_api_contracts.internal.domain.defi.transfers import (
     TransferStatus,
     TransferType,
 )
+from unified_api_contracts.internal.domain.defi.wallet_config import (
+    ChainWalletMapping,
+    ShareClassWalletMapping,
+    TradingWalletConfig,
+    WalletMappingConfig,
+    wallet_config_gcs_path,
+)
+from unified_api_contracts.internal.domain.defi.wallet_config import (
+    WalletConfig as CustodianWalletConfig,
+)
 from unified_api_contracts.internal.domain.features_onchain.eth_transfers import (
     Erc20TransferCalldata,
     EthSendRawTransactionRequest,
@@ -116,11 +126,13 @@ __all__ = [
     "AlchemyTransfersResponse",
     "BlockGasFee",
     "BridgeProtocol",
+    "ChainWalletMapping",
     "CompoundV3MarketInfo",
     "CompoundV3UserPosition",
     "CurveDepositParams",
     "CurveSwapParams",
     "CurveWithdrawParams",
+    "CustodianWalletConfig",
     "DriftMarketInfo",
     "DriftMarketType",
     "DriftOrderParams",
@@ -173,10 +185,12 @@ __all__ = [
     "OrcaWhirlpoolInfo",
     "RateImpactResult",
     "RaydiumPoolInfo",
+    "ShareClassWalletMapping",
     "SolanaChainId",
     "SolanaStakePoolInfo",
     "SolanaTransactionResult",
     "StakingRate",
+    "TradingWalletConfig",
     "TransferConfirmation",
     "TransferRecord",
     "TransferStatus",
@@ -184,4 +198,10 @@ __all__ = [
     "UniswapV3PoolStateResponse",
     "UniswapV3QuoteResponse",
     "UniswapV3SwapTxReceipt",
+    "WalletMappingConfig",
+    "compute_borrow_rate",
+    "compute_supply_rate",
+    "compute_utilization",
+    "simulate_rate_impact",
+    "wallet_config_gcs_path",
 ]

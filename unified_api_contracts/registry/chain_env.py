@@ -95,10 +95,7 @@ def resolve_chain_id(chain_name: str, env: str = "mainnet") -> int:
         ValueError: If chain_name is not recognized.
     """
     chain_upper = chain_name.upper()
-    if env == "testnet":
-        chain_ids = TESTNET_CHAIN_IDS
-    else:
-        chain_ids = MAINNET_CHAIN_IDS
+    chain_ids = TESTNET_CHAIN_IDS if env == "testnet" else MAINNET_CHAIN_IDS
 
     if chain_upper not in chain_ids:
         msg = f"Unknown chain: {chain_name!r}. Known chains: {sorted(chain_ids.keys())}"

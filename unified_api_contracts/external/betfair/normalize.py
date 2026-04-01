@@ -36,8 +36,12 @@ from unified_api_contracts.canonical.domain import (
 
 # Direct submodule imports to avoid circular import via normalize_utils.__init__
 # (normalize_utils.__init__ → sports → betfair.normalize → normalize_utils)
-from unified_api_contracts.normalize_utils.errors._utils import from_http_status  # noqa: direct-submodule
-from unified_api_contracts.normalize_utils.market_state import normalize_market_state  # noqa: direct-submodule
+from unified_api_contracts.normalize_utils.errors._utils import (
+    from_http_status,  # direct submodule to avoid circular import
+)
+from unified_api_contracts.normalize_utils.market_state import (
+    normalize_market_state,  # direct submodule to avoid circular import
+)
 
 from .schemas import (
     BetfairCurrentOrderSummary,
@@ -276,8 +280,9 @@ BETFAIR_MARKET_TYPE_TO_MARKET_KEY: dict[str, tuple[str, float | None]] = {
     "OVER_UNDER_75": ("totals", 7.5),
     "OVER_UNDER_85": ("totals", 8.5),
     "BOTH_TEAMS_TO_SCORE": ("btts", None),
-    # ASIAN_HANDICAP omitted — point value not in market_type name,
-    # requires definition.hc from streaming data (not yet captured by parser).
+    # ASIAN_HANDICAP: point comes from streaming data's definition.handicap / .hc field,
+    # not from the market_type name. None signals "read point from data".
+    "ASIAN_HANDICAP": ("spreads", None),
 }
 
 # OddsPapi integer market_id for each market_key+point.
@@ -294,6 +299,61 @@ _TOTALS_POINTS_TO_MARKET_ID: dict[float, int] = {
     8.5: 122,
 }
 _MARKET_KEY_TO_ID: dict[str, int] = {"h2h": 101, "btts": 104}
+
+# Asian Handicap points → OddsPapi market_id.
+# Must stay in sync with oddspapi_to_sampled_fast.py _AH list.
+_AH_POINTS = [
+    -6,
+    -5.75,
+    -5.5,
+    -5.25,
+    -5,
+    -4.75,
+    -4.5,
+    -4.25,
+    -4,
+    -3.75,
+    -3.5,
+    -3.25,
+    -3,
+    -2.75,
+    -2.5,
+    -2.25,
+    -2,
+    -1.75,
+    -1.5,
+    -1.25,
+    -1,
+    -0.75,
+    -0.5,
+    -0.25,
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1,
+    1.25,
+    1.5,
+    1.75,
+    2,
+    2.25,
+    2.5,
+    2.75,
+    3,
+    3.25,
+    3.5,
+    3.75,
+    4,
+    4.25,
+    4.5,
+    4.75,
+    5,
+    5.25,
+    5.5,
+    5.75,
+    6,
+]
+_AH_POINTS_TO_MARKET_ID: dict[float, int] = {h: 1024 + i * 2 for i, h in enumerate(_AH_POINTS)}
 
 # Canonical outcome_id (matches OddsPapi convention).
 _OUTCOME_NAME_TO_ID: dict[str, int] = {
@@ -373,6 +433,14 @@ def resolve_betfair_runner_to_outcome(
             return "AWAY"
         return rn
 
+    # ASIAN_HANDICAP: runner names are team names → HOME/AWAY (no draw)
+    if market_type == "ASIAN_HANDICAP":
+        if home_team and _team_name_matches(rn, home_team):
+            return "HOME"
+        if away_team and _team_name_matches(rn, away_team):
+            return "AWAY"
+        return rn
+
     return rn
 
 
@@ -392,9 +460,7 @@ def _team_name_matches(runner: str, team: str) -> bool:
     # First-word match for multi-word names
     r_first = r.split()[0] if r else ""
     t_first = t.split()[0] if t else ""
-    if len(r_first) >= 4 and r_first == t_first:
-        return True
-    return False
+    return bool(len(r_first) >= 4 and r_first == t_first)
 
 
 def betfair_market_id_for(market_key: str, point: float | None) -> int:
@@ -409,6 +475,8 @@ def betfair_market_id_for(market_key: str, point: float | None) -> int:
     """
     if market_key == "totals" and point is not None:
         return _TOTALS_POINTS_TO_MARKET_ID.get(point, 0)
+    if market_key == "spreads" and point is not None:
+        return _AH_POINTS_TO_MARKET_ID.get(point, 0)
     return _MARKET_KEY_TO_ID.get(market_key, 0)
 
 
@@ -431,6 +499,11 @@ def betfair_outcome_id_for(outcome_name: str, market_key: str, point: float | No
         mid = _TOTALS_POINTS_TO_MARKET_ID.get(point, 0)
         if mid > 0:
             return mid if outcome_name == "OVER" else mid + 1
+    # Spreads (Asian Handicap): HOME = market_id (even), AWAY = market_id + 1 (odd)
+    if market_key == "spreads" and point is not None:
+        mid = _AH_POINTS_TO_MARKET_ID.get(point, 0)
+        if mid > 0:
+            return mid if outcome_name == "HOME" else mid + 1
     return 0
 
 

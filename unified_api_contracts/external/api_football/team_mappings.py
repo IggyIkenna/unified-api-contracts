@@ -130,7 +130,7 @@ BUNDESLIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "LEVERKUSEN": ["LEVERKUSEN", "BAYER LEVERKUSEN", "Bayer Leverkusen"],
     "MAINZ": ["MAINZ", "MAINZ 05", "FSV MAINZ 05", "FSV Mainz 05", "Mainz 05"],
     "PADERBORN": ["PADERBORN", "SC PADERBORN", "SC Paderborn 07"],
-    "LEIPZIG": ["LEIPZIG", "RB LEIPZIG", "RB Leipzig"],
+    "LEIPZIG": ["LEIPZIG", "RB LEIPZIG", "RB Leipzig", "RasenBallsport Leipzig"],
     "SCHALKE": ["SCHALKE", "SCHALKE 04", "FC SCHALKE 04", "Schalke 04", "FC Schalke 04"],
     "ST_PAULI": ["ST PAULI", "ST. PAULI", "FC ST PAULI", "FC St. Pauli", "St Pauli"],
     "STUTTGART": ["STUTTGART", "VFB STUTTGART", "VfB Stuttgart"],
@@ -242,7 +242,14 @@ LIGUE_1_TEAM_ALIASES: dict[str, list[str]] = {
     "AUXERRE": ["AUXERRE", "AJ Auxerre", "Auxerre"],
     "ANGERS": ["ANGERS", "Angers SCO", "Angers"],
     "LE_HAVRE": ["LE HAVRE", "Le Havre", "Le Havre AC"],
-    "SAINT_ETIENNE": ["SAINT-ETIENNE", "SAINT ETIENNE", "AS Saint-Etienne", "Saint-Etienne"],
+    "SAINT_ETIENNE": [
+        "SAINT-ETIENNE",
+        "SAINT ETIENNE",
+        "AS Saint-Etienne",
+        "Saint-Etienne",
+        "St Etienne",
+        "AS St-Etienne",
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -395,7 +402,7 @@ MLS_TEAM_ALIASES: dict[str, list[str]] = {
 
 AUSTRIAN_BUNDESLIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "RB_SALZBURG": ["RB SALZBURG", "Red Bull Salzburg", "FC Salzburg"],
-    "STURM_GRAZ": ["STURM GRAZ", "SK Sturm Graz"],
+    "STURM_GRAZ": ["STURM GRAZ", "SK Sturm Graz", "Sturm Graz II", "SK Sturm Graz II"],
     "AUSTRIA_WIEN": ["AUSTRIA WIEN", "AUSTRIA VIENNA", "Austria Wien", "Austria Vienna"],
     "RAPID_WIEN": ["RAPID WIEN", "RAPID VIENNA", "Rapid Wien", "Rapid Vienna"],
     "WOLFSBERGER": ["WOLFSBERGER", "Wolfsberger AC"],
@@ -690,7 +697,7 @@ SUPER_LIG_TEAM_ALIASES: dict[str, list[str]] = {
 
 ALLSVENSKAN_TEAM_ALIASES: dict[str, list[str]] = {
     "MALMO": ["MALMO", "Malmo FF"],
-    "AIK": ["AIK", "AIK Stockholm"],
+    "AIK": ["AIK", "AIK Stockholm", "AIK Solna"],
     "DJURGARDEN": ["DJURGARDEN", "Djurgardens IF"],
     "HAMMARBY": ["HAMMARBY", "Hammarby IF"],
     "IFK_GOTEBORG": ["IFK GOTEBORG", "IFK Gothenburg"],
@@ -705,6 +712,7 @@ ALLSVENSKAN_TEAM_ALIASES: dict[str, list[str]] = {
     "DEGERFORS": ["DEGERFORS", "Degerfors IF"],
     "BROMMAPOJKARNA": ["BROMMAPOJKARNA", "IF Brommapojkarna"],
     "VASTERAAS": ["VASTERAAS", "Vasteras SK"],
+    "SUNDSVALL": ["SUNDSVALL", "GIF Sundsvall"],
 }
 
 # ---------------------------------------------------------------------------
@@ -892,6 +900,7 @@ LIGUE_2_TEAM_ALIASES: dict[str, list[str]] = {
     "PARIS_FC": ["PARIS FC", "Paris FC"],
     "RED_STAR": ["RED STAR", "Red Star FC"],
     "BASTIA": ["BASTIA", "SC Bastia"],
+    "NANCY": ["NANCY", "AS Nancy", "AS Nancy-Lorraine", "Nancy-Lorraine"],
 }
 
 # ---------------------------------------------------------------------------
@@ -2020,6 +2029,32 @@ _CROSS_PROVIDER_ALIASES: dict[str, str] = {
     "Queretaro FC": "QUERETARO",
     # MLS
     "Saint Louis City SC": "ST_LOUIS_CITY",
+    # API-Football Turkish variants (diacritics differ from OddsPapi)
+    "Kasımpaşa": "KASIMPASA",  # noqa: RUF001 - Turkish dotless-i is intentional
+    "Gençlerbirliği S.K.": "GENCLERBIRLIGI",
+    "Başakşehir": "ISTANBUL_BASAKSEHIR",
+    "Eyüpspor": "EYUPSPOR",
+    "Beşiktaş": "BESIKTAS",
+    "Fenerbahçe": "FENERBAHCE",
+    "Göztepe": "GOZTEPE",
+    "Fatih Karagümrük": "KARAGUMRUK",
+    "Istanbul Basaksehir": "ISTANBUL_BASAKSEHIR",
+    # API-Football Brazilian variants
+    "Vasco DA Gama": "VASCO",
+    "Atletico Paranaense": "ATHLETICO_PR",
+    "Atletico-MG": "ATLETICO_MG",
+    "Chapecoense-sc": "CHAPECOENSE",
+    "RB Bragantino": "BRAGANTINO",
+    "Club America": "AMERICA",
+    "U.N.A.M. - Pumas": "PUMAS_UNAM",
+    # API-Football name variants that differ from OddsPapi
+    "Stockport County": "STOCKPORT",
+    "Accrington ST": "ACCRINGTON",
+    "Stade Brestois 29": "BREST",
+    "Estac Troyes": "TROYES",
+    "RED Star FC 93": "RED_STAR",
+    "Clermont Foot": "CLERMONT",
+    "Northampton": "NORTHAMPTON",
     # Australian
     "Adelaide United FC": "ADELAIDE_UNITED",
     "Brisbane Roar FC": "BRISBANE_ROAR",

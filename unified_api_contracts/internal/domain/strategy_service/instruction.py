@@ -72,6 +72,23 @@ class StrategyInstruction:
     priority_fee_gwei: float | None = None
     deadline_timestamp: datetime | None = None
 
+    # Share class denomination
+    share_class: str = field(default="USDT", metadata={"description": "Base currency denomination (USDT, ETH, BTC)"})
+    base_currency_amount: Decimal | None = field(default=None, metadata={"description": "Amount in share class terms"})
+    base_currency_price: Decimal | None = field(
+        default=None, metadata={"description": "FX rate used for share class conversion"}
+    )
+
+    # Expected output for instant P&L computation
+    expected_output: Decimal | None = field(
+        default=None,
+        metadata={
+            "description": (
+                "Expected output amount at benchmark price — used for instant P&L = (actual - expected) * price"
+            ),
+        },
+    )
+
     # Additional metadata
     metadata: dict[str, str | int | float | bool | None] = field(default_factory=dict)
 
@@ -106,6 +123,10 @@ class StrategyInstruction:
             "gas_limit": self.gas_limit,
             "priority_fee_gwei": self.priority_fee_gwei,
             "deadline_timestamp": self.deadline_timestamp.isoformat() if self.deadline_timestamp else None,
+            "share_class": self.share_class,
+            "base_currency_amount": str(self.base_currency_amount) if self.base_currency_amount is not None else None,
+            "base_currency_price": str(self.base_currency_price) if self.base_currency_price is not None else None,
+            "expected_output": str(self.expected_output) if self.expected_output is not None else None,
             "metadata": self.metadata,
         }
 
@@ -179,6 +200,10 @@ class StrategyInstruction:
             gas_limit=cast("int | None", data.get("gas_limit")),
             priority_fee_gwei=cast("float | None", data.get("priority_fee_gwei")),
             deadline_timestamp=deadline_timestamp,
+            share_class=cast(str, data.get("share_class") or "USDT"),
+            base_currency_amount=_dec_opt(data.get("base_currency_amount")),
+            base_currency_price=_dec_opt(data.get("base_currency_price")),
+            expected_output=_dec_opt(data.get("expected_output")),
             metadata=cast("dict[str, str | int | float | bool | None]", data.get("metadata") or {}),
         )
 
@@ -583,7 +608,7 @@ class OptionsComboInstruction:
                 strategy_id=strategy_id,
                 timestamp=timestamp,
                 operation=OperationType.OPTIONS_COMBO,
-                instrument_id=cast(str, leg.get("instrument_id", "")),  # noqa: qg-empty-fallback
+                instrument_id=cast(str, leg.get("instrument_id", "")),  # qg-empty-fallback: get() needs default
                 from_venue=venue,
                 to_venue=venue,
                 token_in="USD",
