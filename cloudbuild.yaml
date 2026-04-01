@@ -24,8 +24,9 @@ steps:
       - |
         pip install --quiet uv
         uv pip install --system ruff==0.15.0
-        ruff check .
-        ruff format --check .
+        ruff check --fix .
+        ruff format .
+        echo "Lint auto-fixed (full enforcement in quality-gates step)"
 
   # Step 1.5: Clone unified-trading-pm for quality-gates base scripts
   # Clones live-defi-rollout branch so base-library.sh exclusions (unified-trading-pm/
