@@ -60,6 +60,13 @@ steps:
       - |
         set -e
         apt-get update -qq && apt-get install -y --no-install-recommends git ripgrep
+        # Init git repo so quality-gates.sh can derive WORKSPACE_ROOT via git rev-parse.
+        # QG computes WORKSPACE_ROOT = parent(git-root). Source is at /workspace so
+        # parent = /. Symlink /unified-trading-pm → /workspace/unified-trading-pm so
+        # the resolved path /unified-trading-pm/scripts/... works.
+        git init -q .
+        git add -A && git commit -q -m "init" --allow-empty
+        ln -sfn /workspace/unified-trading-pm /unified-trading-pm
         pip install --quiet uv keyrings.google-artifactregistry-auth
         mkdir -p /root/.config/pip
         printf '[global]\nextra-index-url = https://asia-northeast1-python.pkg.dev/%s/unified-libraries/simple/\n' "$PROJECT_ID" > /root/.config/pip/pip.conf
