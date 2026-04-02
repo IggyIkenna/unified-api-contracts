@@ -287,7 +287,7 @@ def normalize_databento_definition(raw: DatabentoDefinition, venue: str = "datab
     symbol = raw.raw_symbol
     instrument_key = f"{venue}:{itype.value}:{symbol}"
     expiry = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC) if raw.expiration else None
-    strike = float(raw.strike_price) / 1e9 if raw.strike_price else None
+    strike = Decimal(str(raw.strike_price)) / Decimal("1000000000") if raw.strike_price else None
     return CanonicalInstrument(
         instrument_key=instrument_key,
         venue=venue,

@@ -1,5 +1,8 @@
 """Strategy service domain schemas — cross-service data contracts."""
 
+from unified_api_contracts.internal.domain.strategy_service.client_config import (
+    ClientStrategyOverride,
+)
 from unified_api_contracts.internal.domain.strategy_service.instruction import (
     DeFiSignal as StrategyDeFiSignal,
 )
@@ -36,6 +39,7 @@ from unified_api_contracts.internal.domain.strategy_service.trigger_subscription
 )
 
 __all__ = [
+    "ClientStrategyOverride",
     "FuturesRollInstruction",
     "OptionsComboInstruction",
     "PnLAttribution",

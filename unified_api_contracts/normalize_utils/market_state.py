@@ -85,7 +85,7 @@ _BINANCE_STATE_MAP: dict[str, MarketState] = {
 def normalize_binance_market_state(
     status: str,
     symbol: str,
-    instrument_type: str = "SPOT",
+    instrument_type: str = "SPOT_PAIR",
     previous_state: MarketState | None = None,
     reason: str | None = None,
     timestamp: datetime | None = None,
@@ -344,8 +344,8 @@ def normalize_ibkr_market_state(
         timestamp:     Event time.
         venue:         Venue tag.
     """
-    type_map = {"STK": "SPOT", "FUT": "FUTURE", "OPT": "OPTION", "CASH": "SPOT"}
-    inst_type = type_map.get(sec_type.upper(), "SPOT")
+    type_map = {"STK": "SPOT_PAIR", "FUT": "FUTURE", "OPT": "OPTION", "CASH": "SPOT_PAIR"}
+    inst_type = type_map.get(sec_type.upper(), "SPOT_PAIR")
     ik = f"{venue}:{inst_type}:{symbol}"
     return normalize_market_state(
         raw_state=trading_phase,

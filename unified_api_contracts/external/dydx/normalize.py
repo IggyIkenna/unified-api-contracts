@@ -172,14 +172,14 @@ def normalize_dydx_perpetual_market(
     """Normalize DydxPerpetualMarket to CanonicalInstrument."""
     sym = raw.market or ""
     ik = f"{venue.upper()}:PERP:{sym}"
-    tick_size: float | None = None
+    tick_size: Decimal | None = None
     if raw.tickSize is not None:
         with contextlib.suppress(ValueError, TypeError):
-            tick_size = float(raw.tickSize)
-    min_size: float | None = None
+            tick_size = Decimal(str(raw.tickSize))
+    min_size: Decimal | None = None
     if raw.stepSize is not None:
         with contextlib.suppress(ValueError, TypeError):
-            min_size = float(raw.stepSize)
+            min_size = Decimal(str(raw.stepSize))
     return CanonicalInstrument(
         instrument_key=ik,
         venue=venue,

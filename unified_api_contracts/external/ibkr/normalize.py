@@ -177,12 +177,12 @@ def normalize_ibkr_contract_details(
     symbol = raw.localSymbol or raw.symbol or ""
     instrument_key = f"{venue.upper()}:{instrument_type}:{symbol}"
 
-    tick_size = float(raw.minTick) if raw.minTick is not None else None
+    tick_size = Decimal(str(raw.minTick)) if raw.minTick is not None else None
 
-    contract_size: float | None = None
+    contract_size: Decimal | None = None
     if raw.multiplier is not None:
         try:
-            contract_size = float(raw.multiplier)
+            contract_size = Decimal(str(raw.multiplier))
         except (ValueError, TypeError):
             contract_size = None
 

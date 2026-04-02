@@ -8,7 +8,7 @@ class TestRiskTaxonomy:
         assert RiskType.DELTA == "delta"
         assert RiskType.VOLGA == "volga"
         assert RiskType.EDGE_DECAY == "edge_decay"
-        assert len(RiskType) == 23
+        assert len(RiskType) == 31
 
     def test_risk_category_enum(self) -> None:
         assert len(RiskCategory) == 5

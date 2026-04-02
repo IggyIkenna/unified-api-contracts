@@ -3,29 +3,24 @@ UAC / UIC Type Usage Audit Report
 ========================================================================
 
 Workspace: /Users/ikennaigboaka/Code/unified-trading-system-repos
-Elapsed:   12.9s
+Elapsed:   28.2s
 
 SUMMARY
 ----------------------------------------
   ALIVE:              621
   TEST_ONLY:           18
-  IMPORT_CHAIN_ONLY:   45
-  DEAD:               159
-  TOTAL:              843
+  IMPORT_CHAIN_ONLY:   35
+  DEAD:               155
+  TOTAL:              829
 
 
 DEAD TYPES (no external usage)
 ----------------------------------------
-  [UAC] ALL_DATA_TYPES
   [UIC] ALL_FRESHNESS_CONTRACTS
   [UAC] AsterExchangeInfo
   [UIC] AuditRequirement
   [UIC] AuditRetention
-  [UAC] BINANCE_FUTURES
-  [UAC] BINANCE_SPOT
   [UAC] BOOKMAKER_REGISTRY
-  [UAC] BYBIT_FUTURES
-  [UAC] BYBIT_SPOT
   [UIC] BackfillSpec
   [UIC] BalanceReconciliationStatus
   [UAC] BinanceLiquidationOrder
@@ -59,6 +54,7 @@ DEAD TYPES (no external usage)
   [UIC] CeFiVenuePosition
   [UIC] ClientFeeSchedule
   [UIC] ClientPrimeBrokerLink
+  [UIC] ClientStrategyOverride
   [UAC] CoinbaseOrderBook
   [UAC] CoinbaseProductsResponse
   [UAC] CoinbaseTicker
@@ -73,7 +69,6 @@ DEAD TYPES (no external usage)
   [UAC] DEFI_MAJOR_ASSET_SYMBOLS
   [UAC] DEX_VENUES
   [UAC] DEX_VENUE_KEYWORDS
-  [UAC] DatabentoReferenceInstrument
   [UIC] DeFiConnectorStateDict
   [UIC] DeFiHealthSummary
   [UIC] DeFiPoolStateResult
@@ -97,13 +92,12 @@ DEAD TYPES (no external usage)
   [UIC] FEATURE_FRESHNESS
   [UAC] FX_SPOT_PAIRS
   [UIC] FileReport
+  [UIC] GasCostRecord
   [UAC] HyperliquidFill
   [UAC] HyperliquidMeta
   [UAC] HyperliquidOpenOrder
   [UAC] HyperliquidUserState
   [UAC] IBKRCorporateAction
-  [UAC] INFRA_CANONICAL_TO_PROVIDER
-  [UAC] INSTRUCTION_SCHEMA
   [UAC] INSTRUMENT_TYPES_BY_VENUE
   [UAC] INSTRUMENT_TYPE_FOLDER_MAP
   [UIC] InstrumentFaultRule
@@ -116,8 +110,6 @@ DEAD TYPES (no external usage)
   [UAC] LiquidationHeatmapResponse
   [UAC] LiquidationLevel
   [UIC] MARKET_TICK_FRESHNESS
-  [UIC] MLModelScorecard
-  [UIC] MLPrediction
   [UIC] ML_FRESHNESS
   [UAC] ManifoldMarket
   [UAC] ManifoldPrice
@@ -134,8 +126,6 @@ DEAD TYPES (no external usage)
   [UAC] OPTIONAL_CONFIG_FIELDS
   [UIC] OnchainDataFreshnessConfig
   [UIC] OperationalMode
-  [UIC] OptionContract
-  [UIC] OrderBookSnapshot
   [UAC] PolygonDividendsResponse
   [UAC] PolygonOptionContractsResponse
   [UAC] PolygonSplitsResponse
@@ -144,23 +134,29 @@ DEAD TYPES (no external usage)
   [UAC] QUARTERLY_MONTHS
   [UAC] REQUIRED_CONFIG_FIELDS
   [UAC] RateLimitInfo
+  [UIC] RebalanceCostEstimate
+  [UAC] SHARE_CLASS_BASE_ASSETS
   [UAC] SPORTS_VENUES
   [UIC] ServiceExecutionStatus
   [UIC] ServiceHealthResponse
-  [UIC] SettlementPrice
+  [UIC] ShardIncompleteDetails
+  [UAC] ShareClass
+  [UIC] ShareClassConfig
+  [UIC] SignalVectorMetaFeatures
   [UIC] StrategyModeParams
+  [UIC] StrategyNAV
   [UIC] TIMEFRAME_TO_SECONDS
   [UAC] TRADFI_DATABENTO_INSTRUMENTS
   [UAC] TRADFI_EQUITIES
   [UAC] TRADFI_FUTURES
   [UAC] TRADFI_INSTRUMENTS
   [UAC] TRADFI_TICKER_UNIVERSE
-  [UAC] TardisAvailableSymbol
   [UIC] TargetTypeParams
   [UIC] TickReplayEngine
   [UIC] UniverseSnapshot
   [UIC] UnsubscribeRequest
   [UAC] UpbitTicker
+  [UIC] UpstreamNotReadyDetails
   [UAC] VALID_BOOK_TYPES
   [UAC] VALID_CATEGORIES
   [UAC] VALID_INSTRUCTION_TYPES
@@ -218,35 +214,25 @@ TEST-ONLY TYPES (used only in test files)
 IMPORT-CHAIN-ONLY TYPES (only in __init__.py re-exports)
 ----------------------------------------
   [UAC] BookLevel
-  [UAC] CanonicalBetMarket
-  [UAC] CanonicalBetOrder
-  [UAC] CanonicalCloudStorage
   [UAC] CanonicalComboBet
   [UAC] CanonicalComboLeg
-  [UAC] CanonicalComputeJob
   [UAC] CanonicalComputeService
-  [UAC] CanonicalContainerRegistry
   [UAC] CanonicalFee
   [UAC] CanonicalLiquidationCluster
   [UAC] CanonicalMarketStateEvent
-  [UAC] CanonicalMessageQueue
-  [UAC] CanonicalOLAPTable
   [UAC] CanonicalOhlcvBar
   [UAC] CanonicalOnChainMetric
   [UAC] CanonicalPlayer
   [UAC] CanonicalReferee
-  [UAC] CanonicalScheduledJob
-  [UAC] CanonicalSecretStore
   [UAC] CanonicalSettlement
-  [UAC] CanonicalVirtualMachine
   [UAC] ComboQuote
   [UAC] ComputeTarget
   [UAC] FixtureMapping
   [UAC] FundingRateHistory
-  [UAC] InstrumentType
   [UAC] InsuranceFundState
   [UAC] LongShortRatio
   [UAC] MarketTrade
+  [UAC] MultiLegInstrument
   [UAC] ODDS_API_KEY_TO_VENUE
            chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py
   [UAC] ODDS_API_KEY_TO_VENUE_CATEGORY
@@ -271,25 +257,25 @@ IMPORT-CHAIN-ONLY TYPES (only in __init__.py re-exports)
 
 ALIVE TYPES (top 20 by instantiation count)
 ----------------------------------------
-  [UIC] Order                                              inst=54  annot=66
+  [UIC] Order                                              inst=53  annot=62
   [UAC] VenueExecutionProfile                              inst=40  annot=1
-  [UAC] classify_venue_error                               inst=34  annot=0
-  [UIC] AlertMessage                                       inst=34  annot=17
-  [UIC] InstrumentRecord                                   inst=34  annot=38
+  [UIC] InstrumentRecord                                   inst=36  annot=41
+  [UAC] classify_venue_error                               inst=35  annot=0
+  [UIC] AlertMessage                                       inst=35  annot=19
+  [UIC] ErrorContext                                       inst=33  annot=1
   [UIC] AccountState                                       inst=32  annot=0
   [UIC] Balance                                            inst=32  annot=9
+  [UIC] EnhancedError                                      inst=32  annot=3
   [UIC] MarginState                                        inst=32  annot=17
-  [UIC] ErrorContext                                       inst=31  annot=1
-  [UIC] EnhancedError                                      inst=30  annot=3
-  [UAC] ExecutionResult                                    inst=27  annot=16
-  [UIC] MockScenario                                       inst=25  annot=1
   [UAC] ComputeType                                        inst=24  annot=18
+  [UAC] ExecutionResult                                    inst=24  annot=18
+  [UIC] CandleOutput                                       inst=24  annot=0
+  [UIC] MockScenario                                       inst=24  annot=1
   [UIC] ModelVariantConfig                                 inst=24  annot=18
-  [UIC] CandleOutput                                       inst=23  annot=0
   [UAC] ScraperError                                       inst=22  annot=0
   [UIC] MarketCategory                                     inst=22  annot=23
-  [UAC] CanonicalFill                                      inst=21  annot=12
-  [UIC] ExecutionMode                                      inst=21  annot=11
+  [UAC] CanonicalFill                                      inst=20  annot=10
+  [UIC] ExecutionMode                                      inst=20  annot=10
   [UIC] InferenceRequest                                   inst=20  annot=1
 
 ========================================================================

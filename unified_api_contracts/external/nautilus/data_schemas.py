@@ -291,10 +291,9 @@ EXCHANGE_NAME_MAP: dict[str, str] = {
 
 INSTRUMENT_TYPE_SUFFIX_MAP: dict[str, str] = {
     "PERPETUAL": "PERP",
-    "PERP": "PERP",
     "FUTURE": "FUT",
     "FUT": "FUT",
-    "SPOT": "SPOT",
+    "SPOT_PAIR": "SPOT",
     "OPTION": "OPT",
     "OPT": "OPT",
 }

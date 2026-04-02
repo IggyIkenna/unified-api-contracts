@@ -70,6 +70,10 @@ class RiskMetrics(BaseModel):
         default_factory=dict,
         description="Net delta exposure per underlying asset (e.g. {'ETH': Decimal('-0.05')})",
     )
+    share_class: str | None = Field(default=None, description="Base currency denomination (USDT, ETH, BTC)")
+    account_equity_share_class: Decimal | None = Field(
+        default=None, description="Account equity in share class currency"
+    )
     var_1d: Decimal | None = None
     var_5d: Decimal | None = None
     expected_shortfall: Decimal | None = None
@@ -233,6 +237,12 @@ class PnLBreakdown(BaseModel):
     residual_pnl: Decimal | None = Field(default=None, description="Unexplained PnL = total - sum(components)")
     mark_to_market_pnl: Decimal | None = Field(default=None, description="Total MTM PnL including residual")
     currency: str = "USD"
+    share_class: str | None = Field(default=None, description="Base currency denomination (USDT, ETH, BTC)")
+    share_class_pnl: Decimal | None = Field(default=None, description="P&L denominated in share class base currency")
+    fx_attribution_pnl: Decimal | None = Field(
+        default=None, description="P&L attributable to FX movement vs share class"
+    )
+    lst_yield_pnl: Decimal | None = Field(default=None, description="P&L from LST ratio appreciation (staking yield)")
 
 
 class GreeksExposure(BaseModel):
@@ -618,7 +628,7 @@ class MarginHealthSnapshot(BaseModel):
     timestamp: datetime
     venue: str
     venue_type: str = Field(description="cefi | defi | tradfi")
-    position_type: str = Field(description="A_TOKEN | DEBT_TOKEN | PERP | SPOT | OPTIONS")
+    position_type: str = Field(description="A_TOKEN | DEBT_TOKEN | PERPETUAL | SPOT | FUTURE | OPTION")
     health_factor: Decimal | None = Field(default=None, description="DeFi: Aave HF = collateral * liq_threshold / debt")
     ltv_ratio: Decimal | None = Field(default=None, description="debt / collateral")
     collateral_usd: Decimal = Decimal("0")

@@ -30,7 +30,6 @@ class TestInstrumentTypeEnum:
         expected = {
             "SPOT_PAIR",
             "PERPETUAL",
-            "PERP",
             "FUTURE",
             "OPTION",
             "LST",
@@ -68,9 +67,6 @@ class TestInstrumentTypesByVenue:
 
     def test_all_venue_types_are_valid_instrument_types(self) -> None:
         valid_values = {m.value for m in InstrumentType}
-        # SPOT is used in venue mappings but is not a separate InstrumentType member;
-        # it is equivalent to SPOT_PAIR in the enum. Allow it as a legacy alias.
-        valid_values.add("SPOT")
         for venue, types in INSTRUMENT_TYPES_BY_VENUE.items():
             for t in types:
                 assert t in valid_values, f"Venue {venue} references invalid InstrumentType: {t}"
@@ -224,16 +220,11 @@ class TestInstrumentTypeFolderMap:
             assert folder.isidentifier() or "_" in folder, f"Folder for {itype} should be a valid identifier: {folder}"
 
     def test_no_duplicate_folder_names(self) -> None:
-        """Different instrument types should not map to the same folder (except PERP/PERPETUAL alias)."""
+        """Different instrument types should not map to the same folder."""
         seen: dict[str, str] = {}
-        allowed_aliases = {("PERP", "PERPETUAL")}
         for itype, folder in INSTRUMENT_TYPE_FOLDER_MAP.items():
-            if folder in seen:
-                existing = seen[folder]
-                pair = tuple(sorted([existing, itype]))
-                assert pair in allowed_aliases, f"Duplicate folder name '{folder}' for {existing} and {itype}"
-            else:
-                seen[folder] = itype
+            assert folder not in seen, f"Duplicate folder name '{folder}' for {seen.get(folder)} and {itype}"
+            seen[folder] = itype
 
 
 class TestInstructionValidInstrumentTypes:
@@ -242,7 +233,6 @@ class TestInstructionValidInstrumentTypes:
     def test_all_referenced_types_are_valid(self) -> None:
         valid_values = {m.value for m in InstrumentType}
         # Allow legacy aliases used in venue mappings
-        valid_values.add("SPOT")
         valid_values.add("SPREAD")
         valid_values.add("OVER_UNDER")
         valid_values.add("OUTRIGHT")

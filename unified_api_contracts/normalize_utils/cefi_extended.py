@@ -17,26 +17,6 @@ modules (single source of truth). This file re-exports them for unified access.
 from __future__ import annotations
 
 # ---------------------------------------------------------------------------
-# Bitstamp — from external/bitstamp/normalize.py
-# ---------------------------------------------------------------------------
-from ..external.bitstamp.normalize import (
-    normalize_bitstamp_fill,
-    normalize_bitstamp_order,
-    normalize_bitstamp_orderbook,
-    normalize_bitstamp_trade,
-)
-
-# ---------------------------------------------------------------------------
-# Kraken — from external/kraken/normalize.py
-# ---------------------------------------------------------------------------
-from ..external.kraken.normalize import (
-    normalize_kraken_fill,
-    normalize_kraken_order,
-    normalize_kraken_orderbook,
-    normalize_kraken_trade,
-)
-
-# ---------------------------------------------------------------------------
 # KuCoin — from external/kucoin/normalize.py
 # ---------------------------------------------------------------------------
 from ..external.kucoin.normalize import (
@@ -77,11 +57,6 @@ __all__ = [
     "normalize_bitget_order",
     "normalize_bitget_orderbook",
     "normalize_bitget_trade",
-    # Bitstamp
-    "normalize_bitstamp_fill",
-    "normalize_bitstamp_order",
-    "normalize_bitstamp_orderbook",
-    "normalize_bitstamp_trade",
     # Deribit fill
     "normalize_deribit_fill",
     # dYdX
@@ -94,11 +69,6 @@ __all__ = [
     "normalize_huobi_order",
     "normalize_huobi_orderbook",
     "normalize_huobi_trade",
-    # Kraken
-    "normalize_kraken_fill",
-    "normalize_kraken_order",
-    "normalize_kraken_orderbook",
-    "normalize_kraken_trade",
     # KuCoin
     "normalize_kucoin_fill",
     "normalize_kucoin_order",

@@ -1,84 +1,25 @@
-"""Integration tests for capability.py's UTL dependency.
+"""Tests for capability.py's error classes and validation logic.
 
-Tests that validate_mode_env_auth() correctly imports and raises
-UnsupportedModeError and UnsupportedEnvironmentError from
-unified-trading-library when mode/env is unsupported by a capability.
+Tests that validate_mode_env_auth() correctly raises UnsupportedModeError
+and UnsupportedEnvironmentError when mode/env is unsupported by a capability.
 
-Since UAC is T0 and UTL is T1 (not in UAC's venv), we mock the UTL
-module to verify the lazy import + raise wiring works correctly.
+Error classes are now defined directly in UAC's registry.capability module
+(no UTL dependency needed).
 """
 
 from __future__ import annotations
-
-import sys
-import types
 
 import pytest
 
 from unified_api_contracts.registry.capability import (
     CapabilityResolutionError,
     SourceCapability,
+    UnsupportedEnvironmentError,
+    UnsupportedModeError,
     register_capability,
     resolve_capability,
     validate_mode_env_auth,
 )
-
-# ---------------------------------------------------------------------------
-# Stub UTL error classes for mock injection
-# ---------------------------------------------------------------------------
-
-
-class _StubUnsupportedModeError(RuntimeError):
-    """Test stub matching UTL's UnsupportedModeError constructor."""
-
-    def __init__(self, source: str, requested_mode: str, supported_modes: list[str]) -> None:
-        self.source = source
-        self.requested_mode = requested_mode
-        self.supported_modes = supported_modes
-        self.suggested_resolution = f"Use one of: {', '.join(supported_modes)}"
-        super().__init__(f"{source} does not support mode '{requested_mode}'. Supported: {supported_modes}")
-
-
-class _StubUnsupportedEnvironmentError(RuntimeError):
-    """Test stub matching UTL's UnsupportedEnvironmentError constructor."""
-
-    def __init__(self, source: str, requested_env: str, supported_envs: list[str]) -> None:
-        self.source = source
-        self.requested_env = requested_env
-        self.supported_envs = supported_envs
-        self.suggested_resolution = f"Use one of: {', '.join(supported_envs)}"
-        super().__init__(f"{source} does not support environment '{requested_env}'. Supported: {supported_envs}")
-
-
-# ---------------------------------------------------------------------------
-# Fixture: inject a mock unified_trading_library module
-# ---------------------------------------------------------------------------
-
-
-@pytest.fixture(autouse=True)
-def _mock_utl_module():
-    """Inject a mock unified_trading_library module into sys.modules.
-
-    capability.py does ``from unified_trading_library import UnsupportedModeError``
-    inside function bodies. We inject a fake module so that import resolves
-    to our stub classes, verifying the wiring without a real UTL install.
-    """
-    had_utl = "unified_trading_library" in sys.modules
-    original = sys.modules.get("unified_trading_library")
-
-    mock_mod = types.ModuleType("unified_trading_library")
-    mock_mod.UnsupportedModeError = _StubUnsupportedModeError  # type: ignore[attr-defined]
-    mock_mod.UnsupportedEnvironmentError = _StubUnsupportedEnvironmentError  # type: ignore[attr-defined]
-    sys.modules["unified_trading_library"] = mock_mod
-
-    yield
-
-    # Restore original state
-    if had_utl and original is not None:
-        sys.modules["unified_trading_library"] = original
-    else:
-        sys.modules.pop("unified_trading_library", None)
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -185,15 +126,15 @@ class TestCapabilityRegistryRoundTrip:
 
 
 # ---------------------------------------------------------------------------
-# Test: validate_mode_env_auth raises UTL error classes via lazy import
+# Test: validate_mode_env_auth raises error classes
 # ---------------------------------------------------------------------------
 
 
-class TestValidateModeEnvAuthRaisesUTLErrors:
-    """validate_mode_env_auth must lazy-import and raise UTL error classes."""
+class TestValidateModeEnvAuthErrors:
+    """validate_mode_env_auth must raise appropriate error classes."""
 
     def test_live_on_batch_only_raises_unsupported_mode_error(self, batch_only_cap: SourceCapability) -> None:
-        with pytest.raises(_StubUnsupportedModeError) as exc_info:
+        with pytest.raises(UnsupportedModeError) as exc_info:
             validate_mode_env_auth(batch_only_cap, mode="live")
 
         err = exc_info.value
@@ -204,7 +145,7 @@ class TestValidateModeEnvAuthRaisesUTLErrors:
         assert isinstance(err.suggested_resolution, str)
 
     def test_batch_on_live_only_raises_unsupported_mode_error(self, live_only_cap: SourceCapability) -> None:
-        with pytest.raises(_StubUnsupportedModeError) as exc_info:
+        with pytest.raises(UnsupportedModeError) as exc_info:
             validate_mode_env_auth(live_only_cap, mode="batch")
 
         err = exc_info.value
@@ -213,7 +154,7 @@ class TestValidateModeEnvAuthRaisesUTLErrors:
         assert "live" in err.supported_modes
 
     def test_testnet_on_mainnet_only_raises_unsupported_env_error(self, mainnet_only_cap: SourceCapability) -> None:
-        with pytest.raises(_StubUnsupportedEnvironmentError) as exc_info:
+        with pytest.raises(UnsupportedEnvironmentError) as exc_info:
             validate_mode_env_auth(mainnet_only_cap, env="testnet")
 
         err = exc_info.value
@@ -224,7 +165,7 @@ class TestValidateModeEnvAuthRaisesUTLErrors:
 
     def test_unsupported_mode_error_message_format(self, batch_only_cap: SourceCapability) -> None:
         """The error message must include source name and supported modes."""
-        with pytest.raises(_StubUnsupportedModeError) as exc_info:
+        with pytest.raises(UnsupportedModeError) as exc_info:
             validate_mode_env_auth(batch_only_cap, mode="live")
 
         msg = str(exc_info.value)

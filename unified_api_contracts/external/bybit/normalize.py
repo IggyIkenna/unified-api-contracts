@@ -334,7 +334,7 @@ def _bybit_instrument_type(raw: BybitInstrumentInfo) -> str:
         return "FUTURE"
     if raw.optionsType is not None:
         return "OPTION"
-    return "SPOT"
+    return "SPOT_PAIR"
 
 
 def normalize_bybit_market(
@@ -345,16 +345,16 @@ def normalize_bybit_market(
     instrument_type = _bybit_instrument_type(raw)
     symbol = raw.symbol
     instrument_key = f"{venue.upper()}:{instrument_type}:{symbol}"
-    tick_size: float | None = None
-    min_size: float | None = None
+    tick_size: Decimal | None = None
+    min_size: Decimal | None = None
     if raw.priceFilter:
         raw_tick = raw.priceFilter.get("tickSize")
         if raw_tick is not None:
-            tick_size = float(str(raw_tick))
+            tick_size = Decimal(str(raw_tick))
     if raw.lotSizeFilter:
         raw_min_qty = raw.lotSizeFilter.get("minOrderQty")
         if raw_min_qty is not None:
-            min_size = float(str(raw_min_qty))
+            min_size = Decimal(str(raw_min_qty))
     return CanonicalInstrument(
         instrument_key=instrument_key,
         venue=venue,

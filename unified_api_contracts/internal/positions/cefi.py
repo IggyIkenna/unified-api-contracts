@@ -16,7 +16,7 @@ class CeFiPosition(BaseModel):
     instrument_key: str = Field(..., description="venue:symbol e.g. binance:BTC-USDT-PERP")
     venue: str
     symbol: str
-    instrument_type: Literal["SPOT", "PERP", "FUTURE", "OPTION"]
+    instrument_type: Literal["SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"]
     side: Literal["LONG", "SHORT", "FLAT"]
     size: Decimal = Field(..., description="Absolute position size")
     entry_price: Decimal

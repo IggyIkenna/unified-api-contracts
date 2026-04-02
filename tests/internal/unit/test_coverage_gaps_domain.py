@@ -548,7 +548,7 @@ class TestInstrumentDefinitionShortMonth:
         inst = InstrumentDefinition(
             instrument_key="deribit:option:ETH-USD-27MAR25-3500-C",
             venue="deribit",
-            instrument_type="option",
+            instrument_type="OPTION",
             symbol="ETH-USD-27MAR25-3500-C",
             available_from_datetime="2025-01-01T00:00:00Z",
         )
@@ -563,7 +563,7 @@ class TestInstrumentDefinitionShortMonth:
         inst = InstrumentDefinition(
             instrument_key="deribit:option:BTC-USD-28JUN25-60000-P",
             venue="deribit",
-            instrument_type="option",
+            instrument_type="OPTION",
             symbol="BTC-USD-28JUN25-60000-P",
             available_from_datetime="2025-01-01T00:00:00Z",
         )

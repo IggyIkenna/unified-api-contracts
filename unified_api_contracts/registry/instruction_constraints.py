@@ -53,7 +53,6 @@ INSTRUCTION_CONSTRAINTS: dict[str, InstructionConstraint] = {
         instrument_types=frozenset(
             {
                 "PERPETUAL",
-                "SPOT",
                 "SPOT_PAIR",
                 "FUTURE",
                 "OPTION",

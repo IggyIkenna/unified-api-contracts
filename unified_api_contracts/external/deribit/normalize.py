@@ -283,7 +283,7 @@ def _deribit_instrument_type(kind: str | None) -> str:
     mapping: dict[str, str] = {
         "future": "FUTURE",
         "option": "OPTION",
-        "spot": "SPOT",
+        "spot": "SPOT_PAIR",
         "perpetual": "PERPETUAL",
         "future_combo": "FUTURE",
         "option_combo": "OPTION",
@@ -299,8 +299,8 @@ def normalize_deribit_instrument(
     instrument_type = _deribit_instrument_type(raw.kind)
     symbol = raw.instrument_name or ""
     instrument_key = f"{venue.upper()}:{instrument_type}:{symbol}"
-    tick_size = float(raw.tick_size) if raw.tick_size is not None else None
-    min_size = float(raw.min_trade_amount) if raw.min_trade_amount is not None else None
+    tick_size = Decimal(str(raw.tick_size)) if raw.tick_size is not None else None
+    min_size = Decimal(str(raw.min_trade_amount)) if raw.min_trade_amount is not None else None
     return CanonicalInstrument(
         instrument_key=instrument_key,
         venue=venue,

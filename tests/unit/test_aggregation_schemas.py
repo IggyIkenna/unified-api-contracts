@@ -65,7 +65,7 @@ def test_aggregated_position_round_trip() -> None:
     """AggregatedPosition serializes and deserializes without data loss."""
     pos = _make_aggregated_position(
         asset_class="crypto",
-        instrument_type="perpetual",
+        instrument_type="PERPETUAL",
         strategy_id="trend-v1",
         underlying="BTC",
         denomination_currency="USD",

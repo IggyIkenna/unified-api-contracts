@@ -15,6 +15,8 @@ __all__ = [
     "OperationDetail",
     "OperationEnvDetail",
     "SourceCapability",
+    "UnsupportedEnvironmentError",
+    "UnsupportedModeError",
     "UnsupportedOperationError",
     "register_capability",
     "resolve_capability",
@@ -137,6 +139,28 @@ class CapabilityResolutionError(RuntimeError):
         super().__init__(f"No capability declared for {source}.{operation}")
 
 
+class UnsupportedModeError(RuntimeError):
+    """Source doesn't support the requested mode (e.g., live for a batch-only source)."""
+
+    def __init__(self, source: str, requested_mode: str, supported_modes: list[str]) -> None:
+        self.source = source
+        self.requested_mode = requested_mode
+        self.supported_modes = supported_modes
+        self.suggested_resolution = f"Use one of: {', '.join(supported_modes)}"
+        super().__init__(f"{source} does not support mode '{requested_mode}'. Supported: {supported_modes}")
+
+
+class UnsupportedEnvironmentError(RuntimeError):
+    """Source doesn't support the requested environment."""
+
+    def __init__(self, source: str, requested_env: str, supported_envs: list[str]) -> None:
+        self.source = source
+        self.requested_env = requested_env
+        self.supported_envs = supported_envs
+        self.suggested_resolution = f"Use one of: {', '.join(supported_envs)}"
+        super().__init__(f"{source} does not support environment '{requested_env}'. Supported: {supported_envs}")
+
+
 _CAPABILITIES: dict[str, SourceCapability] = {}
 
 
@@ -169,24 +193,18 @@ def validate_mode_env_auth(
         UnsupportedEnvironmentError: When the source does not support the requested env.
     """
     if mode and mode == "live" and not capability.supports_live:
-        from unified_trading_library import UnsupportedModeError  # noqa: qg-inside-import
-
         supported: list[str] = []
         if capability.supports_batch:
             supported.append("batch")
         raise UnsupportedModeError(capability.source, mode, supported)
 
     if mode and mode == "batch" and not capability.supports_batch:
-        from unified_trading_library import UnsupportedModeError  # noqa: qg-inside-import
-
         supported = []
         if capability.supports_live:
             supported.append("live")
         raise UnsupportedModeError(capability.source, mode, supported)
 
     if env and env == "testnet" and not capability.supports_testnet:
-        from unified_trading_library import UnsupportedEnvironmentError  # noqa: qg-inside-import
-
         supported_envs: list[str] = []
         if capability.supports_mainnet:
             supported_envs.append("mainnet")

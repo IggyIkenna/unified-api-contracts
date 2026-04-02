@@ -41,6 +41,16 @@ class RiskType(StrEnum):
     MARKET_SUSPENSION = "market_suspension"
     PROTOCOL_RISK = "protocol_risk"
     IMPERMANENT_LOSS = "impermanent_loss"
+    # DeFi-specific
+    ORACLE_DEPEG = "oracle_depeg"
+    STABLECOIN_DEPEG = "stablecoin_depeg"
+    BORROW_RATE_SPREAD = "borrow_rate_spread"
+    WITHDRAWAL_DELAY = "withdrawal_delay"
+    EMERGENCY_CLOSE_COST = "emergency_close_cost"
+    REBALANCE_COST = "rebalance_cost"
+    # Share class / currency
+    BASE_CURRENCY_DRIFT = "base_currency_drift"
+    MARGIN_CURRENCY_MISMATCH = "margin_currency_mismatch"
 
 
 class RiskCategory(StrEnum):
@@ -86,5 +96,13 @@ RISK_TYPE_CATEGORIES: dict[RiskCategory, list[RiskType]] = {
         RiskType.MARKET_SUSPENSION,
         RiskType.PROTOCOL_RISK,
         RiskType.IMPERMANENT_LOSS,
+        RiskType.ORACLE_DEPEG,
+        RiskType.STABLECOIN_DEPEG,
+        RiskType.BORROW_RATE_SPREAD,
+        RiskType.WITHDRAWAL_DELAY,
+        RiskType.EMERGENCY_CLOSE_COST,
+        RiskType.REBALANCE_COST,
+        RiskType.BASE_CURRENCY_DRIFT,
+        RiskType.MARGIN_CURRENCY_MISMATCH,
     ],
 }

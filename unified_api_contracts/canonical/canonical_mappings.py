@@ -3,7 +3,7 @@
 ALL mappings live in api-contracts; interfaces and services import from here only.
 Single source of truth for data source ↔ venue, dataset ↔ venue, and symbol normalization.
 
-Scope: Venues in our universe; TradFi via Databento (~506 venues); DeFi = Euler, Fluid, ERC20, BTC only.
+Scope: Venues in our universe; TradFi via Databento (~506 venues); DeFi = Fluid, ERC20, BTC only.
 """
 
 from __future__ import annotations
@@ -36,7 +36,6 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "OKX-SPOT",
         "OKX-FUTURES",
         "OKX-SWAP",
-        "BITSTAMP-SPOT",
         "HUOBI-SPOT",
         "HUOBI-FUTURES",
         "PHEMEX-FUTURES",
@@ -87,7 +86,6 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "CURVE-ETHEREUM",
         "BALANCER-ETHEREUM",
         "MORPHO-ETHEREUM",
-        "EULER-ETHEREUM",
         "FLUID-ETHEREUM",
         "LIDO-ETHEREUM",
         "ETHERFI-ETHEREUM",
@@ -135,7 +133,6 @@ VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "CURVE-ETHEREUM": "rpc",
     "BALANCER-ETHEREUM": "balancer_api_v3",
     "MORPHO-ETHEREUM": "thegraph",
-    "EULER-ETHEREUM": "thegraph",
     "FLUID-ETHEREUM": "thegraph",
     "LIDO-ETHEREUM": "thegraph",
     "ETHERFI-ETHEREUM": "thegraph",
@@ -229,7 +226,7 @@ def get_data_sources_for_venue(
 
 # --- DATASET_TO_CANONICAL_VENUE ---
 # Databento dataset_id → canonical venue (TradFi ~506 venues)
-# Tardis exchange → canonical venue (CeFi; DeFi = Euler, Fluid, ERC20, BTC only)
+# Tardis exchange → canonical venue (CeFi; DeFi = Fluid, ERC20, BTC only)
 # Ref: https://databento.com/docs/standards-and-conventions/common-fields-enums-types
 # Ref: https://docs.tardis.dev/historical-data-details
 DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
@@ -295,13 +292,12 @@ DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
     "coinbase": "COINBASE-SPOT",
     "hyperliquid": "HYPERLIQUID",
     "aster": "ASTER",
-    # Tardis: DeFi (Euler, Fluid, ERC20, BTC only)
-    "euler": "EULER-PLASMA",
+    # Tardis: DeFi (Fluid, ERC20, BTC only)
     "fluid": "FLUID-PLASMA",
 }
 
 # --- DEFI_DATASET_TO_CANONICAL_VENUE ---
-# DeFi: dataset/subgraph/chain → canonical venue. Scope: Euler, Fluid, ERC20, BTC only.
+# DeFi: dataset/subgraph/chain → canonical venue. Scope: Fluid, ERC20, BTC only.
 DEFI_DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
     "uniswap-v2-ethereum": "UNISWAPV2-ETHEREUM",
     "uniswap-v3-ethereum": "UNISWAPV3-ETHEREUM",
@@ -315,7 +311,6 @@ DEFI_DATASET_TO_CANONICAL_VENUE: dict[str, str] = {
     "aave-v3": "AAVE_V3",
     "morpho-ethereum": "MORPHO-ETHEREUM",
     "morpho-org/morpho-blue": "MORPHO-ETHEREUM",
-    "euler-plasma": "EULER-PLASMA",
     "fluid-plasma": "FLUID-PLASMA",
     "aave-plasma": "AAVE-PLASMA",
     "lido-ethereum": "LIDO",

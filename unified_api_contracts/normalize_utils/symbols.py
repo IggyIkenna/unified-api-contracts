@@ -117,45 +117,6 @@ def _normalize_hyperliquid(raw: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Kraken
-# ---------------------------------------------------------------------------
-
-_KRAKEN_LEGACY = {
-    # Longer/X-prefixed forms must come before shorter forms to avoid partial matches
-    "XXBT": "BTC",
-    "XXRP": "XRP",
-    "XXLM": "XLM",
-    "XETH": "ETH",
-    "XLTC": "LTC",
-    "XDG": "DOGE",
-    "XBT": "BTC",
-    "ZUSD": "USD",
-    "ZEUR": "EUR",
-    "ZGBP": "GBP",
-}
-
-
-def _normalize_kraken(raw: str) -> str:
-    """XXBTZUSD -> BTC-USD, XBTUSD -> BTC-USD."""
-    upper = raw.upper()
-    # Futures: PI_XBTUSD -> BTC-USD-PERP
-    if upper.startswith("PI_"):
-        inner = upper[3:]
-        for old, new in _KRAKEN_LEGACY.items():
-            inner = inner.replace(old, new)
-        if len(inner) == 6:
-            return f"{inner[:3]}-{inner[3:]}-PERP"
-    # Spot pairs (6 or 8 chars with legacy prefixes)
-    normalized = upper
-    for old, new in _KRAKEN_LEGACY.items():
-        normalized = normalized.replace(old, new)
-    if len(normalized) == 6:
-        return f"{normalized[:3]}-{normalized[3:]}"
-    # Try splitting on known quotes
-    return _normalize_binance(normalized)
-
-
-# ---------------------------------------------------------------------------
 # KuCoin
 # ---------------------------------------------------------------------------
 
@@ -207,7 +168,6 @@ _VENUE_MAP: dict[str, Callable[[str], str]] = {
     "okx": _normalize_okx,
     "deribit": _normalize_deribit,
     "hyperliquid": _normalize_hyperliquid,
-    "kraken": _normalize_kraken,
     "kucoin": _normalize_kucoin,
     "dydx": _normalize_dydx,
     "tardis": _normalize_tardis,

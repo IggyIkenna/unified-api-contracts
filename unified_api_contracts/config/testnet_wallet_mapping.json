@@ -1,0 +1,95 @@
+{
+  "custodian": "mock",
+  "chain_env": "testnet",
+  "reserve_pct": "20",
+  "min_threshold_pct": "10",
+  "max_threshold_pct": "30",
+  "share_classes": {
+    "USDC": {
+      "share_class": "USDC",
+      "treasury_wallet": {
+        "wallet_id": "vault-usdc-sep",
+        "address": "0x742d35Cc6634C0532925a3b844Bc9e7595f2bD1e",
+        "chain": "ETHEREUM",
+        "label": "USDC Treasury (Sepolia)"
+      },
+      "trading_wallets": [
+        {
+          "wallet_id": "trading-aave-sep",
+          "address": "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+          "strategy_id": "AAVE_LENDING",
+          "chain": "ETHEREUM"
+        },
+        {
+          "wallet_id": "trading-basis-sep",
+          "address": "0xdD2FD4581271e230360230F9337D5c0430Bf44C0",
+          "strategy_id": "BASIS_TRADE",
+          "chain": "ETHEREUM"
+        },
+        {
+          "wallet_id": "trading-l2-basis-sep",
+          "address": "0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
+          "strategy_id": "L2_BASIS",
+          "chain": "ARBITRUM"
+        }
+      ]
+    },
+    "ETH": {
+      "share_class": "ETH",
+      "treasury_wallet": {
+        "wallet_id": "vault-eth-sep",
+        "address": "0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
+        "chain": "ETHEREUM",
+        "label": "ETH Treasury (Sepolia)"
+      },
+      "trading_wallets": [
+        {
+          "wallet_id": "trading-recursive-sep",
+          "address": "0xbDA5747bFD65F08deb54cb465eB87D40e51B197E",
+          "strategy_id": "RECURSIVE_STAKED_BASIS",
+          "chain": "ETHEREUM"
+        }
+      ]
+    },
+    "SOL": {
+      "share_class": "SOL",
+      "treasury_wallet": {
+        "wallet_id": "vault-sol-devnet",
+        "address": "7EcDhSYGxXyscszYEp35KHN8vvw3svAuLKTzXwCFLtV",
+        "chain": "SOLANA",
+        "label": "SOL Treasury (Devnet)"
+      },
+      "trading_wallets": [
+        {
+          "wallet_id": "trading-sol-basis-devnet",
+          "address": "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS",
+          "strategy_id": "SOL_BASIS",
+          "chain": "SOLANA"
+        },
+        {
+          "wallet_id": "trading-kamino-devnet",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL",
+          "strategy_id": "SOL_LENDING",
+          "chain": "SOLANA"
+        }
+      ]
+    },
+    "BTC": {
+      "share_class": "BTC",
+      "treasury_wallet": {
+        "wallet_id": "vault-btc-testnet",
+        "address": "tb1qw508d6qejxtdg4y5r3zarvary0c5xw7kxpjzsx",
+        "chain": "BITCOIN",
+        "label": "BTC Treasury (Testnet)"
+      },
+      "trading_wallets": [
+        {
+          "wallet_id": "trading-btc-lending-testnet",
+          "address": "tb1qrp33g0q5b5698ahp5jnf0y5eme49nqkrf2gpft",
+          "strategy_id": "BTC_LENDING",
+          "chain": "BITCOIN"
+        }
+      ]
+    }
+  }
+}

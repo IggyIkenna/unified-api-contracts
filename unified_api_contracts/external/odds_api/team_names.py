@@ -3,21 +3,18 @@
 from __future__ import annotations
 
 CANONICAL_TO_ODDS_API_EPL: dict[str, str] = {
-    # Big 6
     "ARSENAL": "Arsenal",
     "CHELSEA": "Chelsea",
     "LIVERPOOL": "Liverpool",
     "MAN_CITY": "Manchester City",
     "MAN_UNITED": "Manchester United",
     "TOTTENHAM": "Tottenham Hotspur",
-    # Established clubs
     "ASTON_VILLA": "Aston Villa",
     "EVERTON": "Everton",
     "LEICESTER": "Leicester City",
     "NEWCASTLE": "Newcastle United",
     "WEST_HAM": "West Ham United",
     "WOLVES": "Wolverhampton Wanderers",
-    # Mid-table / recently promoted (2016-2026)
     "BOURNEMOUTH": "Bournemouth",
     "BRENTFORD": "Brentford",
     "BRIGHTON": "Brighton and Hove Albion",
@@ -31,7 +28,6 @@ CANONICAL_TO_ODDS_API_EPL: dict[str, str] = {
     "SUNDERLAND": "Sunderland",
     "IPSWICH": "Ipswich Town",
     "WATFORD": "Watford",
-    # Relegated / historic
     "CARDIFF": "Cardiff",
     "HUDDERSFIELD": "Huddersfield",
     "HULL_CITY": "Hull City",
@@ -47,12 +43,10 @@ CANONICAL_TO_ODDS_API_EPL: dict[str, str] = {
 }
 
 CANONICAL_TO_ODDS_API_BUNDESLIGA: dict[str, str] = {
-    # Top clubs
     "BAYERN": "Bayern Munich",
     "DORTMUND": "Borussia Dortmund",
     "LEIPZIG": "RB Leipzig",
     "LEVERKUSEN": "Bayer Leverkusen",
-    # Established clubs
     "FRANKFURT": "Eintracht Frankfurt",
     "FREIBURG": "SC Freiburg",
     "HOFFENHEIM": "TSG Hoffenheim",
@@ -268,9 +262,12 @@ CANONICAL_TO_ODDS_API_SERIE_A: dict[str, str] = {
     "FROSINONE": "Frosinone",
     # Serie B
     "SUDTIROL": "Südtirol",
+    "AVELLINO": "Avellino",
     "BARI": "Bari",
     "BRESCIA": "Brescia",
+    "CARRARESE": "Carrarese",
     "PALERMO": "Palermo",
+    "PESCARA": "Pescara",
     "SAMPDORIA": "Sampdoria",
     "SPEZIA": "Spezia",
 }
@@ -337,6 +334,7 @@ CANONICAL_TO_ODDS_API_PRIMEIRA_LIGA: dict[str, str] = {
     "MOREIRENSE": "Moreirense",
     "ESTORIL": "Estoril",
     "ESTRELA_AMADORA": "Estrela Amadora",
+    "ALVERCA": "Alverca",
 }
 
 CANONICAL_TO_ODDS_API_JUPILER_PRO: dict[str, str] = {
@@ -355,6 +353,8 @@ CANONICAL_TO_ODDS_API_JUPILER_PRO: dict[str, str] = {
     "CHARLEROI": "Charleroi",
     "LEUVEN": "OH Leuven",
     "KORTRIJK": "Kortrijk",
+    "DENDER": "Dender",
+    "RAAL_LA_LOUVIERE": "RAAL La Louvière",
 }
 
 CANONICAL_TO_ODDS_API_DANISH_SUPERLIGA: dict[str, str] = {
@@ -370,6 +370,8 @@ CANONICAL_TO_ODDS_API_DANISH_SUPERLIGA: dict[str, str] = {
     "LYNGBY": "Lyngby",
     "HVIDOVRE": "Hvidovre",
     "VEJLE": "Vejle",
+    "FREDERICIA": "FC Fredericia",
+    "SONDERJYSKE": "SonderjyskE",
 }
 
 CANONICAL_TO_ODDS_API_MLS: dict[str, str] = {
@@ -436,6 +438,7 @@ CANONICAL_TO_ODDS_API_ELITESERIEN: dict[str, str] = {
     "KRISTIANSUND": "Kristiansund BK",
     "HAMKAM": "HamKam",
     "ODD": "Odd",
+    "VALERENGA": "Vålerenga",
 }
 
 CANONICAL_TO_ODDS_API_SWISS_SUPER_LEAGUE: dict[str, str] = {
@@ -531,6 +534,7 @@ CANONICAL_TO_ODDS_API_ARGENTINA_PRIMERA: dict[str, str] = {
     "ROSARIO_CENTRAL": "Rosario Central",
     "TIGRE": "Tigre",
     "UNION_SANTA_FE": "Union",
+    "ESTUDIANTES_RIO_CUARTO": "Estudiantes de Río Cuarto",
 }
 
 CANONICAL_TO_ODDS_API_BRASILEIRAO: dict[str, str] = {
@@ -559,6 +563,8 @@ CANONICAL_TO_ODDS_API_BRASILEIRAO: dict[str, str] = {
     "BRAGANTINO": "Bragantino",
     "VITORIA": "Vitoria",
     "CRICIUMA": "Criciuma",
+    "MIRASSOL": "Mirassol",
+    "REMO": "Remo",
 }
 
 CANONICAL_TO_ODDS_API_GREEK_SUPER_LEAGUE: dict[str, str] = {
@@ -578,6 +584,7 @@ CANONICAL_TO_ODDS_API_GREEK_SUPER_LEAGUE: dict[str, str] = {
     "IONIKOS": "Ionikos",
     "LEVADIAKOS": "Levadiakos",
     "GIANNINA": "PAS Giannina",
+    "KIFISIA": "AE Kifisia FC",
 }
 
 CANONICAL_TO_ODDS_API_EKSTRAKLASA: dict[str, str] = {
@@ -597,6 +604,8 @@ CANONICAL_TO_ODDS_API_EKSTRAKLASA: dict[str, str] = {
     "KORONA_KIELCE": "Korona Kielce",
     "MOTOR_LUBLIN": "Motor Lublin",
     "RADOMIAK": "Radomiak Radom",
+    "NIECIECZA": "Nieciecza",
+    "ARKA_GDYNIA": "Arka Gdynia",
 }
 
 CANONICAL_TO_ODDS_API_SUPER_LIG: dict[str, str] = {

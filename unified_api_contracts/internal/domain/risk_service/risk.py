@@ -565,7 +565,7 @@ class MarginHealthSnapshot(BaseModel):
     timestamp: datetime
     venue: str
     venue_type: str = Field(description="cefi | defi | tradfi")
-    position_type: str = Field(description="A_TOKEN | DEBT_TOKEN | PERP | SPOT | OPTIONS")
+    position_type: str = Field(description="A_TOKEN | DEBT_TOKEN | PERPETUAL | SPOT | FUTURE | OPTION")
     health_factor: Decimal | None = Field(default=None, description="DeFi: Aave HF = collateral * liq_threshold / debt")
     ltv_ratio: Decimal | None = Field(default=None, description="debt / collateral")
     collateral_usd: Decimal = Decimal("0")

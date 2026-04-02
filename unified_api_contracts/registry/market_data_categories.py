@@ -123,12 +123,12 @@ VENUES_BY_CATEGORY: dict[str, list[str]] = {
         "MORPHO-OPTIMISM",
         "MORPHO-POLYGON",
         "MORPHO-SCROLL",
-        "EULER-ETHEREUM",
         "FLUID-ETHEREUM",
         # --- LST/Yield protocols ---
         "LIDO-ETHEREUM",
         "ETHERFI-ETHEREUM",
         "ETHENA-ETHEREUM",
+        "JITO-SOLANA",
     ],
     "sports": [
         # Sports betting exchanges and bookmakers

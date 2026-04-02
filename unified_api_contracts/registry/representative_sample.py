@@ -380,14 +380,6 @@ DEFI_INSTRUMENT_SPECS: list[dict[str, str | float | int]] = [
         "staked_underlying": "USDe",
         "available_from": "2024-04-02",
     },
-    # Euler
-    {
-        "venue": "EULER-ETHEREUM",
-        "symbol": "eUSDC",
-        "underlying": "USDC",
-        "type": "POOL",
-        "available_from": "2024-03-04",
-    },
 ]
 
 # ---------------------------------------------------------------------------

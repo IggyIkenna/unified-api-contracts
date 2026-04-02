@@ -77,6 +77,12 @@ class ExecutionResult:
     # Slippage
     slippage_bps: int | None = None
 
+    # Expected output (from strategy instruction, for instant P&L)
+    expected_output: Decimal | None = None
+
+    # Gas cost in USD (computed at fill time using ETH price)
+    gas_cost_usd: Decimal | None = None
+
     # On-chain details
     transaction_hash: str | None = None
     block_number: int | None = None
@@ -87,6 +93,12 @@ class ExecutionResult:
     # Algorithm and venue info
     algorithm_used: str | None = None
     venues_used: list[str] = field(default_factory=list)
+
+    # Share class passthrough — identifies which fund share class this fill belongs to
+    share_class: str = "USDT"
+
+    # FX rate at time of execution (for non-USDT share classes to convert to base currency)
+    base_currency_price: Decimal | None = None
 
     # Direct execution alpha (when calculated explicitly, not from prices)
     _explicit_execution_alpha_bps: Decimal | None = None
@@ -112,6 +124,15 @@ class ExecutionResult:
 
         if self.gas_price_gwei is not None and not isinstance(self.gas_price_gwei, Decimal):  # pyright: ignore[reportUnnecessaryIsInstance]
             self.gas_price_gwei = Decimal(str(self.gas_price_gwei))
+
+        if self.base_currency_price is not None and not isinstance(self.base_currency_price, Decimal):  # pyright: ignore[reportUnnecessaryIsInstance]
+            self.base_currency_price = Decimal(str(self.base_currency_price))
+
+        if self.expected_output is not None and not isinstance(self.expected_output, Decimal):  # pyright: ignore[reportUnnecessaryIsInstance]
+            self.expected_output = Decimal(str(self.expected_output))
+
+        if self.gas_cost_usd is not None and not isinstance(self.gas_cost_usd, Decimal):  # pyright: ignore[reportUnnecessaryIsInstance]
+            self.gas_cost_usd = Decimal(str(self.gas_cost_usd))
 
     @property
     def is_success(self) -> bool:
@@ -210,6 +231,54 @@ class ExecutionResult:
         return total
 
     @property
+    def gross_alpha_bps(self) -> int | None:
+        """Price improvement vs benchmark BEFORE costs. Alias for execution_alpha_bps."""
+        alpha = self.execution_alpha_bps
+        return int(alpha) if alpha is not None else None
+
+    @property
+    def net_alpha_bps(self) -> int | None:
+        """Price improvement vs benchmark AFTER all costs (gas + fee + slippage).
+
+        net = gross - cost_bps
+        cost_bps = (gas_cost_usd + trading_fee) / notional * 10000
+        """
+        gross = self.gross_alpha_bps
+        if gross is None:
+            return None
+
+        notional = self.amount_executed * self.actual_execution_price
+        if notional <= 0:
+            return gross
+
+        total_cost_usd = self.trading_fee
+        if self.gas_cost_usd is not None:
+            total_cost_usd += self.gas_cost_usd
+
+        cost_bps = int(total_cost_usd / notional * 10000)
+        return gross - cost_bps
+
+    @property
+    def instant_pnl_usd(self) -> Decimal | None:
+        """Instant P&L in USD = (actual_received - expected_output) * price - gas - fees.
+
+        Zero in batch (benchmark fill = oracle price).
+        Non-zero in live (real execution has slippage/MEV).
+        """
+        if self.expected_output is None or self.amount_received is None:
+            return None
+
+        output_delta = self.amount_received - self.expected_output
+        pnl = output_delta * self.actual_execution_price
+
+        # Subtract costs
+        if self.gas_cost_usd is not None:
+            pnl -= self.gas_cost_usd
+        pnl -= self.trading_fee
+
+        return pnl
+
+    @property
     def fill_rate(self) -> Decimal:
         """Calculate fill rate (amount_executed / amount_requested)."""
         if self.amount_requested == 0:
@@ -248,7 +317,14 @@ class ExecutionResult:
             "error_message": self.error_message,
             "algorithm_used": self.algorithm_used,
             "venues_used": self.venues_used,
+            "share_class": self.share_class,
+            "base_currency_price": str(self.base_currency_price) if self.base_currency_price else None,
+            "expected_output": str(self.expected_output) if self.expected_output is not None else None,
+            "gas_cost_usd": str(self.gas_cost_usd) if self.gas_cost_usd is not None else None,
             "execution_alpha_bps": (str(self.execution_alpha_bps) if self.execution_alpha_bps else None),
+            "gross_alpha_bps": self.gross_alpha_bps,
+            "net_alpha_bps": self.net_alpha_bps,
+            "instant_pnl_usd": str(self.instant_pnl_usd) if self.instant_pnl_usd is not None else None,
             "fill_rate": str(self.fill_rate),
             "metadata": self.metadata,
         }

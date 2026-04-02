@@ -1,7 +1,7 @@
 # Orphan Report: Domain models not exposed by any service endpoint
 # Generated from 25 services
-# Total schemas in spec: 85
-# Orphaned models: 586
+# Total schemas in spec: 88
+# Orphaned models: 574
 
 UAC: AaveBorrowParams
 UAC: AaveDepositParams
@@ -52,12 +52,9 @@ UAC: CanonicalBetOrder
 UAC: CanonicalBondData
 UAC: CanonicalBookmakerMarket
 UAC: CanonicalCdsSpread
-UAC: CanonicalCloudStorage
 UAC: CanonicalComboBet
 UAC: CanonicalComboLeg
-UAC: CanonicalComputeJob
 UAC: CanonicalComputeService
-UAC: CanonicalContainerRegistry
 UAC: CanonicalDerivativeTicker
 UAC: CanonicalFeatureRecord
 UAC: CanonicalFee
@@ -74,8 +71,6 @@ UAC: CanonicalLiquidation
 UAC: CanonicalLiquidationCluster
 UAC: CanonicalMarginState
 UAC: CanonicalMarketStateEvent
-UAC: CanonicalMessageQueue
-UAC: CanonicalOLAPTable
 UAC: CanonicalOdds
 UAC: CanonicalOhlcvBar
 UAC: CanonicalOnChainMetric
@@ -93,15 +88,12 @@ UAC: CanonicalProgressiveStats
 UAC: CanonicalPullRequest
 UAC: CanonicalReferee
 UAC: CanonicalRepository
-UAC: CanonicalScheduledJob
-UAC: CanonicalSecretStore
 UAC: CanonicalSettlement
 UAC: CanonicalSpread
 UAC: CanonicalTeam
 UAC: CanonicalTicker
 UAC: CanonicalTrade
 UAC: CanonicalVenue
-UAC: CanonicalVirtualMachine
 UAC: CanonicalWebSocketLifecycle
 UAC: CanonicalWorkflowRun
 UAC: CanonicalYieldCurvePoint
@@ -113,7 +105,6 @@ UAC: CcxtOpenInterest
 UAC: CcxtOrderBook
 UAC: CcxtTicker
 UAC: CcxtTrade
-UAC: CoLocationPerformanceMetric
 UAC: CoinbaseOrderBook
 UAC: CoinbaseProductInfo
 UAC: CoinbaseProductsResponse
@@ -135,8 +126,6 @@ UAC: CurveSwapParams
 UAC: CurveWithdrawParams
 UAC: DarkPoolPrintRecord
 UAC: DataSourceRoute
-UAC: DatabentoReferenceInstrument
-UAC: DeFiAggregatedHealth
 UAC: DeFiLPAggregatedMetrics
 UAC: DeFiStakingAggregatedMetrics
 UAC: DepositAddress
@@ -194,8 +183,6 @@ UAC: KalshiMarket
 UAC: KalshiOrderBook
 UAC: KalshiTrade
 UAC: LPProtocolBreakdown
-UAC: LatencyBenchmarkReport
-UAC: LatencyPercentile
 UAC: LidoRequestWithdrawalsParams
 UAC: LidoSubmitParams
 UAC: LidoSubmitResponse
@@ -261,7 +248,6 @@ UAC: PrimeBrokerMarginCall
 UAC: PrimeBrokerPosition
 UAC: ProbabilityBucket
 UAC: ProcessedOddsOutput
-UAC: ProtocolHealthBreakdown
 UAC: RateLimitResponse
 UAC: RiskGroupSummary
 UAC: SatelliteObservation
@@ -274,12 +260,9 @@ UAC: SportsbookLink
 UAC: SpreadLeg
 UAC: StakingProtocolBreakdown
 UAC: SubAccount
-UAC: SubMillisecondLatencyRecord
-UAC: TardisAvailableSymbol
 UAC: TardisExchangeDetail
 UAC: TardisInstrumentDetail
 UAC: TeamMapping
-UAC: TickToTradeMetric
 UAC: UnderlyingGreeksBreakdown
 UAC: UniswapV3PoolStateResponse
 UAC: UniswapV3QuoteResponse
@@ -353,6 +336,7 @@ UIC: CircuitBreakerConfigRegistry
 UIC: CircuitBreakerEvent
 UIC: CircuitBreakerEventMessage
 UIC: ClientRiskTolerance
+UIC: ClientStrategyOverride
 UIC: CoinbaseWithdrawRequest
 UIC: CoinbaseWithdrawResponse
 UIC: CommoditySignal
@@ -436,6 +420,7 @@ UIC: FluidDepositParams
 UIC: FluidRepayParams
 UIC: FuturesTermStructureRecord
 UIC: GasCostEstimate
+UIC: GasCostRecord
 UIC: GreeksExposure
 UIC: GridDimensions
 UIC: HealthAlertMessage
@@ -445,6 +430,7 @@ UIC: InferenceRequest
 UIC: InferenceResult
 UIC: InstrumentDefinition
 UIC: InstrumentFaultRule
+UIC: InstrumentLeg
 UIC: InstrumentRecord
 UIC: InternalOptionsChainSnapshot
 UIC: InternalPosition
@@ -517,6 +503,7 @@ UIC: RegimeStateRecord
 UIC: ResourceMetricsSnapshot
 UIC: RestartDetectedDetails
 UIC: RestartDetectedEvent
+UIC: RewardPosition
 UIC: RidgeHyperparams
 UIC: RiskAlertMessage
 UIC: RiskMetrics
@@ -528,6 +515,7 @@ UIC: SecretAccessedDetails
 UIC: SecretAccessedEvent
 UIC: ServiceLifecycleEventMessage
 UIC: ShardEvent
+UIC: ShardIncompleteDetails
 UIC: SignalVectorRecord
 UIC: SolanaStakePoolInfo
 UIC: SpanMarginLeg
@@ -546,7 +534,6 @@ UIC: StartedEvent
 UIC: StockSplitRecord
 UIC: StoppedDetails
 UIC: StrategyModeParams
-UIC: StrategyRiskProfile
 UIC: StrategySignalMessage
 UIC: StrategySpec
 UIC: StressScenario
@@ -567,6 +554,7 @@ UIC: UniswapV3SwapTxReceipt
 UIC: UniverseSnapshot
 UIC: UpbitWithdrawRequest
 UIC: UpbitWithdrawResponse
+UIC: UpstreamNotReadyDetails
 UIC: VaRRequest
 UIC: VaRResult
 UIC: ValidationCompletedDetails

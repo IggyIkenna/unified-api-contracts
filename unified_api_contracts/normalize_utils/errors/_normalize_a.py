@@ -479,50 +479,6 @@ def normalize_versifi_error(
 
 
 # ---------------------------------------------------------------------------
-# Kraken
-# ---------------------------------------------------------------------------
-
-KRAKEN_MAP: dict[str, Callable[..., CanonicalError]] = {
-    "EGeneral:Too many requests": CanonicalRateLimitError,
-    "EAPI:Rate limit exceeded": CanonicalRateLimitError,
-    "EAPI:Invalid key": CanonicalAuthenticationError,
-    "EAPI:Invalid signature": CanonicalAuthenticationError,
-    "EAPI:Invalid nonce": CanonicalAuthenticationError,
-    "EOrder:Insufficient funds": CanonicalInsufficientBalanceError,
-    "EOrder:Order minimum not met": CanonicalSizeLimitError,
-    "EOrder:Orders limit exceeded": CanonicalRateLimitError,
-    "EOrder:Rate limit exceeded": CanonicalRateLimitError,
-    "EOrder:Unknown order": CanonicalOrderRejectedError,
-    "EOrder:Cannot open position": CanonicalOrderRejectedError,
-    "EService:Unavailable": CanonicalServiceUnavailableError,
-    "EService:Busy": CanonicalServiceUnavailableError,
-    "EService:Market in cancel_only mode": CanonicalMarketClosedError,
-    "EService:Market in post_only mode": CanonicalMarketClosedError,
-    "EService:Deadline elapsed": CanonicalServiceUnavailableError,
-    "429": CanonicalRateLimitError,
-    "401": CanonicalAuthenticationError,
-    "403": CanonicalAuthorizationError,
-}
-
-
-def normalize_kraken_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "kraken",
-) -> CanonicalError:
-    """Map a Kraken REST/WS error string or HTTP status to a CanonicalError subclass."""
-    code = str(error_code)
-    cls = KRAKEN_MAP.get(code)
-    if cls is not None:
-        return cls(message=message or code, venue=venue)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # KuCoin
 # ---------------------------------------------------------------------------
 

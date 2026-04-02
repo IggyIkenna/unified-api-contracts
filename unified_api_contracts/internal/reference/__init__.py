@@ -27,6 +27,7 @@ from unified_api_contracts.internal.reference.fee_schedule import (
 )
 from unified_api_contracts.internal.reference.instrument import (
     AssetClass,
+    InstrumentLeg,
     InstrumentRecord,
     InstrumentStatus,
     InstrumentType,
@@ -35,6 +36,7 @@ from unified_api_contracts.internal.reference.instrument import (
 )
 from unified_api_contracts.internal.reference.instrument_definition import InstrumentDefinition
 from unified_api_contracts.internal.reference.instrument_key import InstrumentKey
+from unified_api_contracts.internal.reference.instrument_validation import validate_instrument_records
 from unified_api_contracts.internal.reference.onchain_freshness import OnchainDataFreshnessConfig
 from unified_api_contracts.internal.reference.universe_snapshot import UniverseSnapshot
 
@@ -56,6 +58,7 @@ __all__ = [
     "FeeType",
     "InstrumentDefinition",
     "InstrumentKey",
+    "InstrumentLeg",
     "InstrumentRecord",
     "InstrumentStatus",
     "InstrumentType",
@@ -66,4 +69,5 @@ __all__ = [
     "StockSplitRecord",
     "UniverseSnapshot",
     "VenueCircuitBreakerConfig",
+    "validate_instrument_records",
 ]
