@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
+from datetime import datetime
 
 # ---------------------------------------------------------------------------
 # EPL: canonical_team_id → list of known Betfair/display name variations
@@ -814,6 +815,106 @@ ENG_LOWER_TEAM_ALIASES: dict[str, list[str]] = {
 }
 
 # ---------------------------------------------------------------------------
+# English Championship (league 40): canonical_team_id → name variations
+# ---------------------------------------------------------------------------
+
+ENG_CHAMPIONSHIP_TEAM_ALIASES: dict[str, list[str]] = {
+    "BIRMINGHAM": ["BIRMINGHAM", "BIRMINGHAM CITY", "Birmingham City"],
+    "BLACKBURN": ["BLACKBURN", "BLACKBURN ROVERS", "Blackburn Rovers"],
+    "BRISTOL_CITY": ["BRISTOL CITY", "Bristol City"],
+    "CHARLTON": ["CHARLTON", "CHARLTON ATHLETIC", "Charlton Athletic"],
+    "COVENTRY": ["COVENTRY", "COVENTRY CITY", "Coventry City"],
+    "DERBY": ["DERBY", "DERBY COUNTY", "Derby County"],
+    "HULL_CITY": ["HULL CITY", "HULL", "Hull City"],
+    "IPSWICH": ["IPSWICH", "IPSWICH TOWN", "Ipswich Town"],
+    "LEEDS": ["LEEDS", "LEEDS UNITED", "LEEDS UTD", "Leeds United"],
+    "LEICESTER": ["LEICESTER", "LEICESTER CITY", "Leicester City"],
+    "MIDDLESBROUGH": ["MIDDLESBROUGH", "BORO", "Middlesbrough"],
+    "MILLWALL": ["MILLWALL", "MILLWALL FC", "Millwall FC"],
+    "NORWICH": ["NORWICH", "NORWICH CITY", "Norwich City"],
+    "OXFORD_UNITED": ["OXFORD UNITED", "OXFORD UTD", "Oxford United"],
+    "PORTSMOUTH": ["PORTSMOUTH", "POMPEY", "Portsmouth FC"],
+    "PRESTON": ["PRESTON", "PRESTON NORTH END", "Preston North End", "PNE"],
+    "QPR": ["QPR", "QUEENS PARK RANGERS", "Queens Park Rangers"],
+    "SHEFFIELD_UNITED": [
+        "SHEFFIELD UNITED",
+        "SHEFF UTD",
+        "SHEFFIELD UTD",
+        "Sheffield United",
+        "Sheffield Utd",
+    ],
+    "SHEFFIELD_WEDNESDAY": ["SHEFFIELD WEDNESDAY", "SHEFF WED", "Sheffield Wednesday"],
+    "SOUTHAMPTON": ["SOUTHAMPTON", "SOUTHAMPTON FC", "Southampton FC"],
+    "STOKE_CITY": ["STOKE CITY", "STOKE", "Stoke City"],
+    "SWANSEA": ["SWANSEA", "SWANSEA CITY", "Swansea City"],
+    "WATFORD": ["WATFORD", "WATFORD FC", "Watford FC"],
+    "WEST_BROM": ["WEST BROM", "WEST BROMWICH ALBION", "West Bromwich Albion", "WBA"],
+    "WREXHAM": ["WREXHAM", "WREXHAM AFC", "Wrexham AFC"],
+}
+
+# ---------------------------------------------------------------------------
+# English League One (league 41): canonical_team_id → name variations
+# ---------------------------------------------------------------------------
+
+ENG_LEAGUE_ONE_TEAM_ALIASES: dict[str, list[str]] = {
+    "AFC_WIMBLEDON": ["AFC WIMBLEDON", "AFC Wimbledon"],
+    "BARNSLEY": ["BARNSLEY", "BARNSLEY FC", "Barnsley FC"],
+    "BLACKPOOL": ["BLACKPOOL", "BLACKPOOL FC", "Blackpool FC"],
+    "BOLTON": ["BOLTON", "BOLTON WANDERERS", "Bolton Wanderers"],
+    "BRADFORD": ["BRADFORD", "BRADFORD CITY", "Bradford City"],
+    "BURTON": ["BURTON", "BURTON ALBION", "Burton Albion"],
+    "CARDIFF": ["CARDIFF", "CARDIFF CITY", "Cardiff City"],
+    "DONCASTER": ["DONCASTER", "DONCASTER ROVERS", "Doncaster Rovers"],
+    "EXETER": ["EXETER", "EXETER CITY", "Exeter City"],
+    "HUDDERSFIELD": ["HUDDERSFIELD", "HUDDERSFIELD TOWN", "Huddersfield Town"],
+    "LEYTON_ORIENT": ["LEYTON ORIENT", "Leyton Orient"],
+    "LINCOLN": ["LINCOLN", "LINCOLN CITY", "Lincoln City"],
+    "LUTON": ["LUTON", "LUTON TOWN", "Luton Town"],
+    "MANSFIELD": ["MANSFIELD", "MANSFIELD TOWN", "Mansfield Town"],
+    "NORTHAMPTON": ["NORTHAMPTON", "NORTHAMPTON TOWN", "Northampton Town"],
+    "PETERBOROUGH": ["PETERBOROUGH", "PETERBOROUGH UNITED", "Peterborough United"],
+    "PLYMOUTH": ["PLYMOUTH", "PLYMOUTH ARGYLE", "Plymouth Argyle"],
+    "PORT_VALE": ["PORT VALE", "Port Vale"],
+    "READING": ["READING", "READING FC", "Reading"],
+    "ROTHERHAM": ["ROTHERHAM", "ROTHERHAM UNITED", "Rotherham United"],
+    "STEVENAGE": ["STEVENAGE", "STEVENAGE FC", "Stevenage FC"],
+    "STOCKPORT": ["STOCKPORT", "STOCKPORT COUNTY", "Stockport County"],
+    "WIGAN": ["WIGAN", "WIGAN ATHLETIC", "Wigan Athletic"],
+    "WYCOMBE": ["WYCOMBE", "WYCOMBE WANDERERS", "Wycombe Wanderers"],
+}
+
+# ---------------------------------------------------------------------------
+# English League Two (league 42): canonical_team_id → name variations
+# ---------------------------------------------------------------------------
+
+ENG_LEAGUE_TWO_TEAM_ALIASES: dict[str, list[str]] = {
+    "ACCRINGTON": ["ACCRINGTON", "ACCRINGTON STANLEY", "Accrington Stanley"],
+    "BARNET": ["BARNET", "BARNET FC", "Barnet FC"],
+    "BARROW": ["BARROW", "BARROW AFC", "Barrow AFC"],
+    "BRISTOL_ROVERS": ["BRISTOL ROVERS", "Bristol Rovers"],
+    "BROMLEY": ["BROMLEY", "BROMLEY FC", "Bromley FC"],
+    "CAMBRIDGE_UNITED": ["CAMBRIDGE UNITED", "CAMBRIDGE UTD", "Cambridge United"],
+    "CHELTENHAM": ["CHELTENHAM", "CHELTENHAM TOWN", "Cheltenham Town"],
+    "CHESTERFIELD": ["CHESTERFIELD", "CHESTERFIELD FC", "Chesterfield FC"],
+    "COLCHESTER": ["COLCHESTER", "COLCHESTER UNITED", "Colchester United"],
+    "CRAWLEY": ["CRAWLEY", "CRAWLEY TOWN", "Crawley Town"],
+    "CREWE": ["CREWE", "CREWE ALEXANDRA", "Crewe Alexandra"],
+    "FLEETWOOD": ["FLEETWOOD", "FLEETWOOD TOWN", "Fleetwood Town"],
+    "GILLINGHAM": ["GILLINGHAM", "GILLINGHAM FC", "Gillingham FC"],
+    "GRIMSBY": ["GRIMSBY", "GRIMSBY TOWN", "Grimsby Town"],
+    "HARROGATE": ["HARROGATE", "HARROGATE TOWN", "Harrogate Town"],
+    "MK_DONS": ["MK DONS", "MILTON KEYNES DONS", "Milton Keynes Dons"],
+    "NEWPORT": ["NEWPORT", "NEWPORT COUNTY", "Newport County"],
+    "NOTTS_COUNTY": ["NOTTS COUNTY", "Notts County"],
+    "OLDHAM": ["OLDHAM", "OLDHAM ATHLETIC", "Oldham Athletic"],
+    "SALFORD": ["SALFORD", "SALFORD CITY", "Salford City"],
+    "SHREWSBURY": ["SHREWSBURY", "SHREWSBURY TOWN", "Shrewsbury Town"],
+    "SWINDON": ["SWINDON", "SWINDON TOWN", "Swindon Town"],
+    "TRANMERE": ["TRANMERE", "TRANMERE ROVERS", "Tranmere Rovers"],
+    "WALSALL": ["WALSALL", "WALSALL FC", "Walsall FC"],
+}
+
+# ---------------------------------------------------------------------------
 # Bundesliga 2 / 3. Liga: additional German lower-tier teams
 # ---------------------------------------------------------------------------
 
@@ -834,6 +935,33 @@ BUNDESLIGA_2_TEAM_ALIASES: dict[str, list[str]] = {
     "MAGDEBURG": ["MAGDEBURG", "1. FC Magdeburg"],
     "ULMER": ["ULMER", "SSV Ulm 1846"],
     "REGENSBURG": ["REGENSBURG", "SSV Jahn Regensburg"],
+}
+
+# ---------------------------------------------------------------------------
+# 3. Liga (Germany, league 80): canonical_team_id → name variations
+# ---------------------------------------------------------------------------
+
+LIGA_3_TEAM_ALIASES: dict[str, list[str]] = {
+    "AACHEN": ["AACHEN", "ALEMANNIA AACHEN", "Alemannia Aachen"],
+    "ARMINIA_BIELEFELD": ["ARMINIA BIELEFELD", "BIELEFELD", "Arminia Bielefeld"],
+    "COTTBUS": ["COTTBUS", "ENERGIE COTTBUS", "Energie Cottbus"],
+    "DRESDEN": ["DRESDEN", "DYNAMO DRESDEN", "Dynamo Dresden"],
+    "DUISBURG": ["DUISBURG", "MSV DUISBURG", "MSV Duisburg"],
+    "ERZGEBIRGE_AUE": ["ERZGEBIRGE AUE", "AUE", "Erzgebirge Aue"],
+    "HANSA_ROSTOCK": ["HANSA ROSTOCK", "ROSTOCK", "Hansa Rostock"],
+    "INGOLSTADT": ["INGOLSTADT", "FC INGOLSTADT 04", "FC Ingolstadt 04"],
+    "MANNHEIM": ["MANNHEIM", "WALDHOF MANNHEIM", "Waldhof Mannheim", "SV Waldhof Mannheim"],
+    "MUNSTER": ["MUNSTER", "SC PREUSSEN MUNSTER", "SC Preußen Münster", "Preußen Münster"],
+    "OSNABRUECK": ["OSNABRUECK", "VFL OSNABRUECK", "VfL Osnabrück", "Osnabrück"],
+    "REGENSBURG": ["REGENSBURG", "SSV JAHN REGENSBURG", "SSV Jahn Regensburg"],
+    "ROT_WEISS_ESSEN": ["ROT-WEISS ESSEN", "ROT WEISS ESSEN", "Rot-Weiss Essen"],
+    "SAARBRUECKEN": ["SAARBRUECKEN", "1. FC SAARBRUECKEN", "1. FC Saarbrücken", "FC Saarbrücken"],
+    "SANDHAUSEN": ["SANDHAUSEN", "SV SANDHAUSEN", "SV Sandhausen"],
+    "UNTERHACHING": ["UNTERHACHING", "SPVGG UNTERHACHING", "SpVgg Unterhaching"],
+    "VERL": ["VERL", "SC VERL", "SC Verl"],
+    "VIKTORIA_KOELN": ["VIKTORIA KOELN", "VIKTORIA KOLN", "Viktoria Köln", "Viktoria Koln"],
+    "WEHEN_WIESBADEN": ["WEHEN WIESBADEN", "SV WEHEN WIESBADEN", "SV Wehen Wiesbaden"],
+    "WUERZBURGER_KICKERS": ["WUERZBURGER KICKERS", "Würzburger Kickers", "Wurzburger Kickers"],
 }
 
 # ---------------------------------------------------------------------------
@@ -958,7 +1086,11 @@ ALL_LEAGUE_ALIASES: list[dict[str, list[str]]] = [
     K_LEAGUE_1_TEAM_ALIASES,
     CHILE_PRIMERA_TEAM_ALIASES,
     ENG_LOWER_TEAM_ALIASES,
+    ENG_CHAMPIONSHIP_TEAM_ALIASES,
+    ENG_LEAGUE_ONE_TEAM_ALIASES,
+    ENG_LEAGUE_TWO_TEAM_ALIASES,
     BUNDESLIGA_2_TEAM_ALIASES,
+    LIGA_3_TEAM_ALIASES,
     SEGUNDA_DIVISION_TEAM_ALIASES,
     SERIE_B_TEAM_ALIASES,
     LIGUE_2_TEAM_ALIASES,
@@ -1860,6 +1992,164 @@ API_FOOTBALL_TO_CANONICAL_CHILE_PRIMERA: dict[str, str] = {
     "Union La Calera": "LA_CALERA",
 }
 
+# ---------------------------------------------------------------------------
+# English Championship (league 40) — API-Football display name → canonical
+# ---------------------------------------------------------------------------
+
+API_FOOTBALL_TO_CANONICAL_ENG_CHAMPIONSHIP: dict[str, str] = {
+    "Birmingham": "BIRMINGHAM",
+    "Birmingham City": "BIRMINGHAM",
+    "Blackburn": "BLACKBURN",
+    "Blackburn Rovers": "BLACKBURN",
+    "Bristol City": "BRISTOL_CITY",
+    "Charlton": "CHARLTON",
+    "Charlton Athletic": "CHARLTON",
+    "Coventry": "COVENTRY",
+    "Coventry City": "COVENTRY",
+    "Derby": "DERBY",
+    "Derby County": "DERBY",
+    "Hull City": "HULL_CITY",
+    "Ipswich": "IPSWICH",
+    "Ipswich Town": "IPSWICH",
+    "Leeds": "LEEDS",
+    "Leeds United": "LEEDS",
+    "Leicester": "LEICESTER",
+    "Leicester City": "LEICESTER",
+    "Middlesbrough": "MIDDLESBROUGH",
+    "Millwall": "MILLWALL",
+    "Norwich": "NORWICH",
+    "Norwich City": "NORWICH",
+    "Oxford United": "OXFORD_UNITED",
+    "Portsmouth": "PORTSMOUTH",
+    "Preston": "PRESTON",
+    "Preston North End": "PRESTON",
+    "QPR": "QPR",
+    "Queens Park Rangers": "QPR",
+    "Sheffield Utd": "SHEFFIELD_UNITED",
+    "Sheffield United": "SHEFFIELD_UNITED",
+    "Sheffield Wednesday": "SHEFFIELD_WEDNESDAY",
+    "Southampton": "SOUTHAMPTON",
+    "Stoke City": "STOKE_CITY",
+    "Swansea": "SWANSEA",
+    "Swansea City": "SWANSEA",
+    "Watford": "WATFORD",
+    "West Brom": "WEST_BROM",
+    "West Bromwich Albion": "WEST_BROM",
+    "Wrexham": "WREXHAM",
+}
+
+# ---------------------------------------------------------------------------
+# English League One (league 41) — API-Football display name → canonical
+# ---------------------------------------------------------------------------
+
+API_FOOTBALL_TO_CANONICAL_ENG_LEAGUE_ONE: dict[str, str] = {
+    "AFC Wimbledon": "AFC_WIMBLEDON",
+    "Barnsley": "BARNSLEY",
+    "Blackpool": "BLACKPOOL",
+    "Bolton": "BOLTON",
+    "Bolton Wanderers": "BOLTON",
+    "Bradford": "BRADFORD",
+    "Bradford City": "BRADFORD",
+    "Burton Albion": "BURTON",
+    "Cardiff": "CARDIFF",
+    "Cardiff City": "CARDIFF",
+    "Doncaster": "DONCASTER",
+    "Doncaster Rovers": "DONCASTER",
+    "Exeter City": "EXETER",
+    "Huddersfield": "HUDDERSFIELD",
+    "Huddersfield Town": "HUDDERSFIELD",
+    "Leyton Orient": "LEYTON_ORIENT",
+    "Lincoln": "LINCOLN",
+    "Lincoln City": "LINCOLN",
+    "Luton": "LUTON",
+    "Luton Town": "LUTON",
+    "Mansfield Town": "MANSFIELD",
+    "Northampton": "NORTHAMPTON",
+    "Northampton Town": "NORTHAMPTON",
+    "Peterborough": "PETERBOROUGH",
+    "Peterborough United": "PETERBOROUGH",
+    "Plymouth": "PLYMOUTH",
+    "Plymouth Argyle": "PLYMOUTH",
+    "Port Vale": "PORT_VALE",
+    "Reading": "READING",
+    "Rotherham": "ROTHERHAM",
+    "Rotherham United": "ROTHERHAM",
+    "Stevenage": "STEVENAGE",
+    "Stockport County": "STOCKPORT",
+    "Wigan": "WIGAN",
+    "Wigan Athletic": "WIGAN",
+    "Wycombe": "WYCOMBE",
+    "Wycombe Wanderers": "WYCOMBE",
+}
+
+# ---------------------------------------------------------------------------
+# English League Two (league 42) — API-Football display name → canonical
+# ---------------------------------------------------------------------------
+
+API_FOOTBALL_TO_CANONICAL_ENG_LEAGUE_TWO: dict[str, str] = {
+    "Accrington ST": "ACCRINGTON",
+    "Accrington Stanley": "ACCRINGTON",
+    "Barnet": "BARNET",
+    "Barrow": "BARROW",
+    "Bristol Rovers": "BRISTOL_ROVERS",
+    "Bromley": "BROMLEY",
+    "Cambridge United": "CAMBRIDGE_UNITED",
+    "Cheltenham": "CHELTENHAM",
+    "Cheltenham Town": "CHELTENHAM",
+    "Chesterfield": "CHESTERFIELD",
+    "Colchester": "COLCHESTER",
+    "Colchester United": "COLCHESTER",
+    "Crawley Town": "CRAWLEY",
+    "Crewe": "CREWE",
+    "Crewe Alexandra": "CREWE",
+    "Fleetwood Town": "FLEETWOOD",
+    "Gillingham": "GILLINGHAM",
+    "Grimsby": "GRIMSBY",
+    "Grimsby Town": "GRIMSBY",
+    "Harrogate Town": "HARROGATE",
+    "Milton Keynes Dons": "MK_DONS",
+    "Newport County": "NEWPORT",
+    "Notts County": "NOTTS_COUNTY",
+    "Oldham": "OLDHAM",
+    "Oldham Athletic": "OLDHAM",
+    "Salford City": "SALFORD",
+    "Shrewsbury": "SHREWSBURY",
+    "Shrewsbury Town": "SHREWSBURY",
+    "Swindon Town": "SWINDON",
+    "Tranmere": "TRANMERE",
+    "Tranmere Rovers": "TRANMERE",
+    "Walsall": "WALSALL",
+}
+
+# ---------------------------------------------------------------------------
+# German 3. Liga (league 80) — API-Football display name → canonical
+# ---------------------------------------------------------------------------
+
+API_FOOTBALL_TO_CANONICAL_LIGA_3: dict[str, str] = {
+    "Alemannia Aachen": "AACHEN",
+    "Arminia Bielefeld": "ARMINIA_BIELEFELD",
+    "Energie Cottbus": "COTTBUS",
+    "Dynamo Dresden": "DRESDEN",
+    "MSV Duisburg": "DUISBURG",
+    "Erzgebirge Aue": "ERZGEBIRGE_AUE",
+    "Hansa Rostock": "HANSA_ROSTOCK",
+    "FC Ingolstadt 04": "INGOLSTADT",
+    "Waldhof Mannheim": "MANNHEIM",
+    "VfL Osnabrück": "OSNABRUECK",
+    "VfL Osnabrueck": "OSNABRUECK",
+    "SSV Jahn Regensburg": "REGENSBURG",
+    "Rot-Weiss Essen": "ROT_WEISS_ESSEN",
+    "1. FC Saarbrücken": "SAARBRUECKEN",
+    "FC Saarbrucken": "SAARBRUECKEN",
+    "SV Sandhausen": "SANDHAUSEN",
+    "SpVgg Unterhaching": "UNTERHACHING",
+    "SC Verl": "VERL",
+    "Viktoria Köln": "VIKTORIA_KOELN",
+    "Viktoria Koln": "VIKTORIA_KOELN",
+    "SV Wehen Wiesbaden": "WEHEN_WIESBADEN",
+    "Würzburger Kickers": "WUERZBURGER_KICKERS",
+}
+
 # Combined API-Football → canonical (all leagues)
 API_FOOTBALL_TO_CANONICAL: dict[str, str] = {
     **API_FOOTBALL_TO_CANONICAL_EPL,
@@ -1887,6 +2177,10 @@ API_FOOTBALL_TO_CANONICAL: dict[str, str] = {
     **API_FOOTBALL_TO_CANONICAL_J1_LEAGUE,
     **API_FOOTBALL_TO_CANONICAL_K_LEAGUE_1,
     **API_FOOTBALL_TO_CANONICAL_CHILE_PRIMERA,
+    **API_FOOTBALL_TO_CANONICAL_ENG_CHAMPIONSHIP,
+    **API_FOOTBALL_TO_CANONICAL_ENG_LEAGUE_ONE,
+    **API_FOOTBALL_TO_CANONICAL_ENG_LEAGUE_TWO,
+    **API_FOOTBALL_TO_CANONICAL_LIGA_3,
 }
 
 # ---------------------------------------------------------------------------
@@ -2251,8 +2545,6 @@ def validate_fixture_alignment(
 
     # Kickoff alignment check
     if kickoff_a and kickoff_b:
-        from datetime import datetime
-
         try:
             dt_a = datetime.fromisoformat(kickoff_a.replace("Z", "+00:00"))
             dt_b = datetime.fromisoformat(kickoff_b.replace("Z", "+00:00"))
@@ -2283,6 +2575,9 @@ __all__ = [
     "API_FOOTBALL_TO_CANONICAL_DANISH_SUPERLIGA",
     "API_FOOTBALL_TO_CANONICAL_EKSTRAKLASA",
     "API_FOOTBALL_TO_CANONICAL_ELITESERIEN",
+    "API_FOOTBALL_TO_CANONICAL_ENG_CHAMPIONSHIP",
+    "API_FOOTBALL_TO_CANONICAL_ENG_LEAGUE_ONE",
+    "API_FOOTBALL_TO_CANONICAL_ENG_LEAGUE_TWO",
     "API_FOOTBALL_TO_CANONICAL_EPL",
     "API_FOOTBALL_TO_CANONICAL_EREDIVISIE",
     "API_FOOTBALL_TO_CANONICAL_GREEK_SUPER_LEAGUE",
@@ -2290,6 +2585,7 @@ __all__ = [
     "API_FOOTBALL_TO_CANONICAL_JUPILER_PRO",
     "API_FOOTBALL_TO_CANONICAL_K_LEAGUE_1",
     "API_FOOTBALL_TO_CANONICAL_LA_LIGA",
+    "API_FOOTBALL_TO_CANONICAL_LIGA_3",
     "API_FOOTBALL_TO_CANONICAL_LIGA_MX",
     "API_FOOTBALL_TO_CANONICAL_LIGUE_1",
     "API_FOOTBALL_TO_CANONICAL_MLS",
@@ -2310,6 +2606,9 @@ __all__ = [
     "EERSTE_DIVISIE_TEAM_ALIASES",
     "EKSTRAKLASA_TEAM_ALIASES",
     "ELITESERIEN_TEAM_ALIASES",
+    "ENG_CHAMPIONSHIP_TEAM_ALIASES",
+    "ENG_LEAGUE_ONE_TEAM_ALIASES",
+    "ENG_LEAGUE_TWO_TEAM_ALIASES",
     "ENG_LOWER_TEAM_ALIASES",
     "EPL_TEAM_ALIASES",
     "EREDIVISIE_TEAM_ALIASES",
@@ -2318,6 +2617,7 @@ __all__ = [
     "JUPILER_PRO_TEAM_ALIASES",
     "K_LEAGUE_1_TEAM_ALIASES",
     "LA_LIGA_TEAM_ALIASES",
+    "LIGA_3_TEAM_ALIASES",
     "LIGA_MX_TEAM_ALIASES",
     "LIGUE_1_TEAM_ALIASES",
     "LIGUE_2_TEAM_ALIASES",

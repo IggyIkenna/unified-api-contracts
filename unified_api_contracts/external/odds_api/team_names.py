@@ -1,20 +1,6 @@
-"""Canonical team ID → The Odds API / Understat display name mappings.
-
-Used for:
-- CLV tracking: matching OddsAPI team names back to canonical IDs
-- Understat xG data joins: mapping canonical IDs to Understat's display names
-
-Covers all 33 prediction leagues (2014-2026).
-
-Source: Ported from footballbets/utils/mapping.py (CANONICAL_TO_ODDS_API_*
-        and CANONICAL_TO_UNDERSTAT_*)
-"""
+"""Canonical team ID mappings for Odds API and Understat names."""
 
 from __future__ import annotations
-
-# ---------------------------------------------------------------------------
-# Canonical → OddsAPI display name
-# ---------------------------------------------------------------------------
 
 CANONICAL_TO_ODDS_API_EPL: dict[str, str] = {
     # Big 6
@@ -95,6 +81,127 @@ CANONICAL_TO_ODDS_API_BUNDESLIGA: dict[str, str] = {
     "SCHALKE": "Schalke 04",
     "ST_PAULI": "FC St. Pauli",
     "PREUSSEN_MUNSTER": "SC Preußen Münster",
+}
+
+# ---------------------------------------------------------------------------
+# English Championship (league 40)
+# ---------------------------------------------------------------------------
+
+CANONICAL_TO_ODDS_API_ENG_CHAMPIONSHIP: dict[str, str] = {
+    "BIRMINGHAM": "Birmingham City",
+    "BLACKBURN": "Blackburn Rovers",
+    "BRISTOL_CITY": "Bristol City",
+    "CHARLTON": "Charlton Athletic",
+    "COVENTRY": "Coventry City",
+    "DERBY": "Derby County",
+    "HULL_CITY": "Hull City",
+    "IPSWICH": "Ipswich Town",
+    "LEICESTER": "Leicester City",
+    "LEEDS": "Leeds United",
+    "MIDDLESBROUGH": "Middlesbrough",
+    "MILLWALL": "Millwall",
+    "NORWICH": "Norwich City",
+    "OXFORD_UNITED": "Oxford United",
+    "PORTSMOUTH": "Portsmouth",
+    "PRESTON": "Preston North End",
+    "QPR": "QPR",
+    "SHEFFIELD_UNITED": "Sheffield United",
+    "SHEFFIELD_WEDNESDAY": "Sheffield Wednesday",
+    "SOUTHAMPTON": "Southampton",
+    "STOKE_CITY": "Stoke",
+    "SWANSEA": "Swansea",
+    "WATFORD": "Watford",
+    "WEST_BROM": "West Brom",
+    "WREXHAM": "Wrexham",
+}
+
+# ---------------------------------------------------------------------------
+# English League One (league 41)
+# ---------------------------------------------------------------------------
+
+CANONICAL_TO_ODDS_API_ENG_LEAGUE_ONE: dict[str, str] = {
+    "AFC_WIMBLEDON": "AFC Wimbledon",
+    "BARNSLEY": "Barnsley",
+    "BLACKPOOL": "Blackpool",
+    "BOLTON": "Bolton Wanderers",
+    "BRADFORD": "Bradford City",
+    "BURTON": "Burton Albion",
+    "CARDIFF": "Cardiff",
+    "DONCASTER": "Doncaster Rovers",
+    "EXETER": "Exeter City",
+    "HUDDERSFIELD": "Huddersfield",
+    "LEYTON_ORIENT": "Leyton Orient",
+    "LINCOLN": "Lincoln City",
+    "LUTON": "Luton",
+    "MANSFIELD": "Mansfield Town",
+    "NORTHAMPTON": "Northampton Town",
+    "PETERBOROUGH": "Peterborough United",
+    "PLYMOUTH": "Plymouth Argyle",
+    "PORT_VALE": "Port Vale",
+    "READING": "Reading",
+    "ROTHERHAM": "Rotherham United",
+    "STEVENAGE": "Stevenage",
+    "STOCKPORT": "Stockport County",
+    "WIGAN": "Wigan",
+    "WYCOMBE": "Wycombe Wanderers",
+}
+
+# ---------------------------------------------------------------------------
+# English League Two (league 42)
+# ---------------------------------------------------------------------------
+
+CANONICAL_TO_ODDS_API_ENG_LEAGUE_TWO: dict[str, str] = {
+    "ACCRINGTON": "Accrington Stanley",
+    "BARNET": "Barnet",
+    "BARROW": "Barrow",
+    "BRISTOL_ROVERS": "Bristol Rovers",
+    "BROMLEY": "Bromley",
+    "CAMBRIDGE_UNITED": "Cambridge United",
+    "CHELTENHAM": "Cheltenham Town",
+    "CHESTERFIELD": "Chesterfield",
+    "COLCHESTER": "Colchester United",
+    "CRAWLEY": "Crawley Town",
+    "CREWE": "Crewe Alexandra",
+    "FLEETWOOD": "Fleetwood Town",
+    "GILLINGHAM": "Gillingham",
+    "GRIMSBY": "Grimsby Town",
+    "HARROGATE": "Harrogate Town",
+    "MK_DONS": "Milton Keynes Dons",
+    "NEWPORT": "Newport County",
+    "NOTTS_COUNTY": "Notts County",
+    "OLDHAM": "Oldham Athletic",
+    "SALFORD": "Salford City",
+    "SHREWSBURY": "Shrewsbury Town",
+    "SWINDON": "Swindon Town",
+    "TRANMERE": "Tranmere Rovers",
+    "WALSALL": "Walsall",
+}
+
+# ---------------------------------------------------------------------------
+# German 3. Liga (league 80)
+# ---------------------------------------------------------------------------
+
+CANONICAL_TO_ODDS_API_LIGA_3: dict[str, str] = {
+    "AACHEN": "Alemannia Aachen",
+    "ARMINIA_BIELEFELD": "Arminia Bielefeld",
+    "COTTBUS": "Energie Cottbus",
+    "DRESDEN": "Dynamo Dresden",
+    "DUISBURG": "MSV Duisburg",
+    "ERZGEBIRGE_AUE": "Erzgebirge Aue",
+    "HANSA_ROSTOCK": "Hansa Rostock",
+    "INGOLSTADT": "FC Ingolstadt 04",
+    "MANNHEIM": "Waldhof Mannheim",
+    "MUNSTER": "SC Preußen Münster",
+    "OSNABRUECK": "VfL Osnabrück",
+    "REGENSBURG": "SSV Jahn Regensburg",
+    "ROT_WEISS_ESSEN": "Rot-Weiss Essen",
+    "SANDHAUSEN": "SV Sandhausen",
+    "SAARBRUECKEN": "1. FC Saarbrücken",
+    "UNTERHACHING": "SpVgg Unterhaching",
+    "VERL": "SC Verl",
+    "VIKTORIA_KOELN": "Viktoria Köln",
+    "WEHEN_WIESBADEN": "SV Wehen Wiesbaden",
+    "WUERZBURGER_KICKERS": "Würzburger Kickers",
 }
 
 CANONICAL_TO_ODDS_API_LA_LIGA: dict[str, str] = {
@@ -667,12 +774,12 @@ CANONICAL_TO_UNDERSTAT_BUNDESLIGA: dict[str, str] = {
 
 _LEAGUE_ID_TO_ODDS_API_DICT: dict[int, dict[str, str]] = {
     39: CANONICAL_TO_ODDS_API_EPL,
-    40: CANONICAL_TO_ODDS_API_EPL,  # Championship shares EPL mappings
-    41: CANONICAL_TO_ODDS_API_EPL,  # League One
-    42: CANONICAL_TO_ODDS_API_EPL,  # League Two
+    40: CANONICAL_TO_ODDS_API_ENG_CHAMPIONSHIP,
+    41: CANONICAL_TO_ODDS_API_ENG_LEAGUE_ONE,
+    42: CANONICAL_TO_ODDS_API_ENG_LEAGUE_TWO,
     78: CANONICAL_TO_ODDS_API_BUNDESLIGA,
     79: CANONICAL_TO_ODDS_API_BUNDESLIGA,  # 2. Bundesliga
-    80: CANONICAL_TO_ODDS_API_BUNDESLIGA,  # 3. Liga
+    80: CANONICAL_TO_ODDS_API_LIGA_3,
     140: CANONICAL_TO_ODDS_API_LA_LIGA,
     141: CANONICAL_TO_ODDS_API_LA_LIGA,  # Segunda
     135: CANONICAL_TO_ODDS_API_SERIE_A,
@@ -758,6 +865,9 @@ __all__ = [
     "CANONICAL_TO_ODDS_API_DANISH_SUPERLIGA",
     "CANONICAL_TO_ODDS_API_EKSTRAKLASA",
     "CANONICAL_TO_ODDS_API_ELITESERIEN",
+    "CANONICAL_TO_ODDS_API_ENG_CHAMPIONSHIP",
+    "CANONICAL_TO_ODDS_API_ENG_LEAGUE_ONE",
+    "CANONICAL_TO_ODDS_API_ENG_LEAGUE_TWO",
     "CANONICAL_TO_ODDS_API_EPL",
     "CANONICAL_TO_ODDS_API_EREDIVISIE",
     "CANONICAL_TO_ODDS_API_GREEK_SUPER_LEAGUE",
@@ -765,6 +875,7 @@ __all__ = [
     "CANONICAL_TO_ODDS_API_JUPILER_PRO",
     "CANONICAL_TO_ODDS_API_K_LEAGUE_1",
     "CANONICAL_TO_ODDS_API_LA_LIGA",
+    "CANONICAL_TO_ODDS_API_LIGA_3",
     "CANONICAL_TO_ODDS_API_LIGA_MX",
     "CANONICAL_TO_ODDS_API_LIGUE_1",
     "CANONICAL_TO_ODDS_API_MLS",

@@ -19,6 +19,13 @@ from unified_api_contracts.internal.domain.execution_service.types import (
     OrderType,
 )
 
+MetadataValue = str | int | float | bool | None
+MetadataMap = dict[str, MetadataValue]
+
+
+def _metadata_or_empty(metadata: MetadataMap | None) -> MetadataMap:
+    return {} if metadata is None else metadata
+
 
 @dataclass
 class StrategyInstruction:
@@ -90,7 +97,7 @@ class StrategyInstruction:
     )
 
     # Additional metadata
-    metadata: dict[str, str | int | float | bool | None] = field(default_factory=dict)
+    metadata: MetadataMap = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Generate instruction_id if not provided."""
@@ -204,7 +211,7 @@ class StrategyInstruction:
             base_currency_amount=_dec_opt(data.get("base_currency_amount")),
             base_currency_price=_dec_opt(data.get("base_currency_price")),
             expected_output=_dec_opt(data.get("expected_output")),
-            metadata=cast("dict[str, str | int | float | bool | None]", data.get("metadata") or {}),
+            metadata=_metadata_or_empty(cast("MetadataMap | None", data.get("metadata"))),
         )
 
 
@@ -238,7 +245,7 @@ class DeFiSignal:
     total_gas_budget: int | None = None
 
     # Additional metadata
-    metadata: dict[str, str | int | float | bool | None] = field(default_factory=dict)
+    metadata: MetadataMap = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         """Generate signal_id if not provided."""
@@ -305,9 +312,7 @@ class DeFiSignal:
             datetime.fromisoformat(ts_val.rstrip("Z")) if isinstance(ts_val, str) else cast(datetime, ts_val)
         )
 
-        metadata: dict[str, str | int | float | bool | None] = cast(
-            "dict[str, str | int | float | bool | None]", data.get("metadata") or {}
-        )
+        metadata = _metadata_or_empty(cast("MetadataMap | None", data.get("metadata")))
 
         return cls(
             signal_id=cast(str, data.get("signal_id") or ""),
@@ -352,7 +357,7 @@ class TransferInstruction:
         token: str,
         quantity: Decimal,
         transfer_reason: str,
-        metadata: dict[str, str | int | float | bool | None] | None = None,
+        metadata: MetadataMap | None = None,
     ) -> "TransferInstruction":
         """Create a TRANSFER instruction for moving assets between venues.
 
@@ -369,9 +374,9 @@ class TransferInstruction:
         Returns:
             TransferInstruction wrapping a StrategyInstruction with TRANSFER operation.
         """
-        combined_metadata: dict[str, str | int | float | bool | None] = {
+        combined_metadata: MetadataMap = {
             "transfer_reason": transfer_reason,
-            **(metadata or {}),
+            **_metadata_or_empty(metadata),
         }
         instr = StrategyInstruction(
             instruction_id="",
@@ -414,7 +419,7 @@ class PredictionBetInstruction:
         amount: Decimal,
         max_cost_usd: Decimal,
         limit_price: Decimal | None = None,
-        metadata: dict[str, str | int | float | bool | None] | None = None,
+        metadata: MetadataMap | None = None,
     ) -> "PredictionBetInstruction":
         instr = StrategyInstruction(
             instruction_id="",
@@ -428,7 +433,7 @@ class PredictionBetInstruction:
             amount=amount,
             limit_price=limit_price,
             order_type=OrderType.LIMIT if limit_price else OrderType.MARKET,
-            metadata=metadata or {},
+            metadata=_metadata_or_empty(metadata),
         )
         return PredictionBetInstruction(
             instruction=instr,
@@ -463,7 +468,7 @@ class SportsBetInstruction:
         decimal_odds: Decimal,
         amount: Decimal,
         stake_fraction: Decimal,
-        metadata: dict[str, str | int | float | bool | None] | None = None,
+        metadata: MetadataMap | None = None,
     ) -> "SportsBetInstruction":
         instr = StrategyInstruction(
             instruction_id="",
@@ -475,7 +480,7 @@ class SportsBetInstruction:
             to_venue=venue,
             token_in="GBP",
             amount=amount,
-            metadata=metadata or {},
+            metadata=_metadata_or_empty(metadata),
         )
         return SportsBetInstruction(
             instruction=instr,
@@ -511,7 +516,7 @@ class SportsExchangeOrderInstruction:
         decimal_odds: Decimal,
         amount: Decimal,
         persistence_type: str = "LAPSE",
-        metadata: dict[str, str | int | float | bool | None] | None = None,
+        metadata: MetadataMap | None = None,
     ) -> "SportsExchangeOrderInstruction":
         instr = StrategyInstruction(
             instruction_id="",
@@ -525,7 +530,7 @@ class SportsExchangeOrderInstruction:
             amount=amount,
             limit_price=decimal_odds,
             order_type=OrderType.LIMIT,
-            metadata=metadata or {},
+            metadata=_metadata_or_empty(metadata),
         )
         return SportsExchangeOrderInstruction(
             instruction=instr,
@@ -557,7 +562,7 @@ class FuturesRollInstruction:
         amount: Decimal,
         direction: "Literal['LONG', 'SHORT', 'FLAT']",
         roll_spread: Decimal | None = None,
-        metadata: dict[str, str | int | float | bool | None] | None = None,
+        metadata: MetadataMap | None = None,
     ) -> "FuturesRollInstruction":
         instr = StrategyInstruction(
             instruction_id="",
@@ -570,7 +575,7 @@ class FuturesRollInstruction:
             token_in="USD",
             amount=amount,
             direction=direction,
-            metadata=metadata or {},
+            metadata=_metadata_or_empty(metadata),
         )
         return FuturesRollInstruction(
             instruction=instr,
@@ -599,24 +604,30 @@ class OptionsComboInstruction:
         legs: list[dict[str, object]],
         combo_type: str,
         net_premium: Decimal | None = None,
-        metadata: dict[str, str | int | float | bool | None] | None = None,
+        metadata: MetadataMap | None = None,
     ) -> "OptionsComboInstruction":
         built_legs: list[StrategyInstruction] = []
         for leg in legs:
+            instrument_id_val = leg.get("instrument_id")
+            if not isinstance(instrument_id_val, str) or not instrument_id_val:
+                raise ValueError("Each options combo leg requires a non-empty instrument_id")
+            amount_val = leg.get("amount")
+            if amount_val is None:
+                raise ValueError(f"Missing amount for options combo leg {instrument_id_val}")
             instr = StrategyInstruction(
                 instruction_id="",
                 strategy_id=strategy_id,
                 timestamp=timestamp,
                 operation=OperationType.OPTIONS_COMBO,
-                instrument_id=cast(str, leg.get("instrument_id", "")),  # qg-empty-fallback: get() needs default
+                instrument_id=instrument_id_val,
                 from_venue=venue,
                 to_venue=venue,
                 token_in="USD",
-                amount=Decimal(str(leg.get("amount", "0"))),
+                amount=Decimal(str(amount_val)),
                 direction=cast("Literal['LONG', 'SHORT', 'FLAT'] | None", leg.get("direction")),
                 limit_price=Decimal(str(leg["limit_price"])) if leg.get("limit_price") else None,
                 order_type=OrderType.LIMIT,
-                metadata=metadata or {},
+                metadata=_metadata_or_empty(metadata),
             )
             built_legs.append(instr)
         return OptionsComboInstruction(

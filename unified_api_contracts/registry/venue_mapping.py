@@ -71,7 +71,6 @@ class VenueMapping:
             # Lending protocols
             "AAVEV3-ETHEREUM",
             "MORPHO-ETHEREUM",
-            "EULER-ETHEREUM",
             "FLUID-ETHEREUM",
             # LST/Yield protocols
             "LIDO-ETHEREUM",
@@ -180,7 +179,6 @@ class VenueMapping:
             "BALANCER-ETHEREUM": "balancer_api_v3",
             "AAVEV3-ETHEREUM": "the_graph",
             "MORPHO-ETHEREUM": "the_graph",
-            "EULER-ETHEREUM": "the_graph",
             "FLUID-ETHEREUM": "the_graph",
             "LIDO-ETHEREUM": "protocol_sdk",
             "ETHERFI-ETHEREUM": "protocol_sdk",
@@ -225,7 +223,6 @@ class VenueMapping:
             # DeFi - Lending protocols
             "AAVEV3-ETHEREUM": "2023-01-27",
             "MORPHO-ETHEREUM": "2024-01-08",
-            "EULER-ETHEREUM": "2023-12-18",
             "FLUID-ETHEREUM": "2024-03-01",
             # DeFi - LST/Yield protocols
             "LIDO-ETHEREUM": "2020-12-18",
@@ -363,6 +360,33 @@ class VenueMapping:
             venue_to_exchanges[canonical_venue].append(tardis_exchange)
         return venue_to_exchanges
 
+    def _get_direct_tardis_match(self, canonical_venue: str) -> str | None:
+        for tardis_exchange, venue in self.tardis_to_venue.items():
+            if venue == canonical_venue:
+                return tardis_exchange
+        return None
+
+    def _get_suffixed_tardis_match(self, canonical_venue: str) -> str | None:
+        if "-" not in canonical_venue:
+            return None
+        base_venue, suffix = canonical_venue.rsplit("-", 1)
+        suffix_to_type = {
+            "SPOT": "SPOT_PAIR",
+            "SWAP": "PERPETUAL",
+            "FUTURES": "FUTURE",
+            "OPTIONS": "OPTION",
+        }
+        inst_type = suffix_to_type.get(suffix, suffix)
+        for venue_key in (canonical_venue, base_venue):
+            tardis_name = self.venue_instrument_type_to_tardis.get((venue_key, inst_type))
+            if tardis_name:
+                return tardis_name
+        if suffix == "FUTURES":
+            futures_fallback = self.venue_instrument_type_to_tardis.get((base_venue, "PERPETUAL"))
+            if futures_fallback:
+                return futures_fallback
+        return self._get_direct_tardis_match(base_venue)
+
     def get_tardis_exchange_for_venue(self, canonical_venue: str) -> str | None:
         """Get Tardis exchange name for a canonical venue.
 
@@ -373,50 +397,10 @@ class VenueMapping:
         falls back to direct tardis_to_venue lookup for simple names.
         """
         upper = canonical_venue.upper()
-
-        # Direct exact match first (e.g. DERIBIT, BYBIT, UPBIT)
-        for tardis_exchange, venue in self.tardis_to_venue.items():
-            if venue == upper:
-                return tardis_exchange
-
-        # Handle suffixed venues: OKX-SPOT, OKX-FUTURES, COINBASE-SPOT, etc.
-        # Use venue_instrument_type_to_tardis mapping
-        if "-" in upper:
-            parts = upper.rsplit("-", 1)
-            base_venue = parts[0]  # OKX, COINBASE, BINANCE
-            suffix = parts[1]  # SPOT, FUTURES
-
-            # Map suffix to instrument type
-            suffix_to_type = {
-                "SPOT": "SPOT_PAIR",
-                "SWAP": "PERPETUAL",
-                "FUTURES": "FUTURE",
-                "OPTIONS": "OPTION",
-            }
-            inst_type = suffix_to_type.get(suffix, suffix)
-
-            # Try full canonical name first (e.g. BINANCE-SPOT, SPOT_PAIR)
-            tardis_name = self.venue_instrument_type_to_tardis.get((upper, inst_type))
-            if tardis_name:
-                return tardis_name
-
-            # Try base venue (e.g. OKX, SPOT_PAIR) — OKX-SPOT → (OKX, SPOT_PAIR)
-            tardis_name = self.venue_instrument_type_to_tardis.get((base_venue, inst_type))
-            if tardis_name:
-                return tardis_name
-
-            # Try base venue + PERPETUAL (for FUTURES suffix)
-            if suffix == "FUTURES":
-                tardis_name = self.venue_instrument_type_to_tardis.get((base_venue, "PERPETUAL"))
-                if tardis_name:
-                    return tardis_name
-
-            # Fallback: try base venue in direct mapping
-            for tardis_exchange, venue in self.tardis_to_venue.items():
-                if venue == base_venue:
-                    return tardis_exchange
-
-        return None
+        direct_match = self._get_direct_tardis_match(upper)
+        if direct_match:
+            return direct_match
+        return self._get_suffixed_tardis_match(upper)
 
     def convert_to_tardis_exchange(self, exchange_or_venue: str) -> str:
         """
@@ -638,7 +622,6 @@ class ExchangeInstrumentConfig:
             # DeFi - Lending protocols
             "AAVEV3-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             "MORPHO-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
-            "EULER-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             "FLUID-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             # DeFi - LST/Yield protocols
             "LIDO-ETHEREUM": ["LST"],

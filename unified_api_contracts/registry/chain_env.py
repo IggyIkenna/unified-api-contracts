@@ -135,5 +135,8 @@ def resolve_rpc_url(chain_name: str, env: str = "mainnet", alchemy_api_key: str 
 
 def get_block_explorer_url(chain_name: str, env: str = "mainnet") -> str:
     """Get block explorer base URL for a chain and environment."""
-    env_urls = BLOCK_EXPLORER_URLS.get(env, BLOCK_EXPLORER_URLS.get("mainnet", {}))
+    mainnet_urls = BLOCK_EXPLORER_URLS.get("mainnet")
+    if mainnet_urls is None:
+        return ""
+    env_urls = BLOCK_EXPLORER_URLS.get(env, mainnet_urls)
     return env_urls.get(chain_name.upper(), "")

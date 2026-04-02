@@ -1,27 +1,8 @@
-"""Domain schemas for instruments-service.
-
-Canonical output schema definitions for GCS parquet outputs and the
-SchemaDefinition enforcement descriptor for the instruments domain.
-
-SchemaDefinition / ColumnSchema objects are parquet write enforcement descriptors.
-They live here so that any service or tool importing from UIC gets the single
-source of truth for the instruments output contract.
-
-Pydantic row-level models (InstrumentDefinition, InstrumentKey) are in
-``unified_api_contracts.internal.reference`` and re-exported from the top-level package.
-
-Categories:
-    CEFI: Centralized exchange instruments (Tardis data)
-    TRADFI: Traditional finance instruments (Databento data)
-    DEFI: Decentralized finance instruments (on-chain data)
-"""
+"""Domain schemas for instruments-service outputs."""
 
 from __future__ import annotations
 
 from unified_api_contracts.internal.schema_definition import ColumnSchema, SchemaDefinition
-
-# INSTRUMENTS OUTPUT SCHEMA — columns with dimension-aware nullability rules.
-# Key dimensions: category (CEFI, TRADFI, DEFI)
 
 INSTRUMENTS_SCHEMA = SchemaDefinition(
     name="instruments",
@@ -29,9 +10,6 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
     description="Instrument definitions for all categories (CEFI, TRADFI, DEFI)",
     dimension_keys=["category"],
     columns=[
-        # ======================================================================
-        # REQUIRED CORE FIELDS (always NOT NULL)
-        # ======================================================================
         ColumnSchema(
             name="instrument_key",
             dtype="string",
@@ -68,9 +46,6 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
             nullable=False,
             description="Generation timestamp when instrument definition was created/stored",
         ),
-        # ======================================================================
-        # EXECUTION INSTRUCTION TYPE
-        # ======================================================================
         ColumnSchema(
             name="instruction_type",
             dtype="string",
@@ -80,9 +55,6 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
                 "TRADE (CLOB), SWAP (DEX), or ZERO_ALPHA (lending/staking)"
             ),
         ),
-        # ======================================================================
-        # METADATA FIELDS
-        # ======================================================================
         ColumnSchema(
             name="venue_type",
             dtype="string",
@@ -158,10 +130,10 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
             description="Symbol format used by Tardis API",
         ),
         ColumnSchema(
-            name="inverse",
-            dtype="bool",
+            name="margin_type",
+            dtype="string",
             nullable=True,
-            description="Whether this is an inverse contract",
+            description="Settlement/margin type: LINEAR, INVERSE, or QUANTO",
         ),
         ColumnSchema(name="tick_size", dtype="string", nullable=True, description="Minimum price increment"),
         ColumnSchema(name="min_size", dtype="string", nullable=True, description="Minimum order size"),
@@ -393,6 +365,24 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
             description="Early close time as ISO datetime in UTC on shortened days (TRADFI only)",
         ),
         ColumnSchema(
+            name="pre_market_open_utc",
+            dtype="string",
+            nullable=True,
+            description="Pre-market session open as ISO datetime in UTC (TRADFI only)",
+        ),
+        ColumnSchema(
+            name="post_market_close_utc",
+            dtype="string",
+            nullable=True,
+            description="Post-market session close as ISO datetime in UTC (TRADFI only)",
+        ),
+        ColumnSchema(
+            name="timezone",
+            dtype="string",
+            nullable=True,
+            description="Exchange timezone (e.g. America/New_York, UTC). TradFi only.",
+        ),
+        ColumnSchema(
             name="session_date_tag",
             dtype="string",
             nullable=True,
@@ -525,11 +515,11 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Symbol format used by Tardis API",
     },
     {
-        "name": "inverse",
-        "type": "bool",
+        "name": "margin_type",
+        "type": "string",
         "required": False,
-        "default": False,
-        "description": "Whether this is an inverse contract",
+        "default": "",
+        "description": "Settlement/margin type: LINEAR, INVERSE, or QUANTO",
     },
     {
         "name": "strike",
@@ -803,6 +793,34 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "required": False,
         "nullable": True,
         "description": "Exchange holiday calendar identifier (TradFi only)",
+    },
+    {
+        "name": "pre_market_open_utc",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Pre-market session open as ISO datetime in UTC (TradFi only)",
+    },
+    {
+        "name": "post_market_close_utc",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Post-market session close as ISO datetime in UTC (TradFi only)",
+    },
+    {
+        "name": "timezone",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Exchange timezone e.g. America/New_York (TradFi only, UTC for CeFi/DeFi)",
+    },
+    {
+        "name": "legs",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "JSON array of leg definitions for COMBO instruments. Each leg: {instrument_key, side, ratio}",
     },
     {
         "name": "timestamp",
