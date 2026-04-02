@@ -21,7 +21,7 @@ from unified_api_contracts.internal.reference.instrument_definition import (
 SPOT_MINIMAL = {
     "instrument_key": "binance:spot:BTC-USDT",
     "venue": "binance",
-    "instrument_type": "spot",
+    "instrument_type": "SPOT_PAIR",
     "symbol": "BTC-USDT",
     "available_from_datetime": "2020-01-01T00:00:00Z",
 }
@@ -264,7 +264,7 @@ class TestAutoExtractExpiry:
         inst = InstrumentDefinition(
             instrument_key="binance:future:BTC-USDT-240329",
             venue="binance",
-            instrument_type="future",
+            instrument_type="FUTURE",
             symbol="BTC-USDT-240329",
             available_from_datetime="2024-01-01T00:00:00Z",
         )
@@ -275,7 +275,7 @@ class TestAutoExtractExpiry:
         inst = InstrumentDefinition(
             instrument_key="deribit:future:BTC-29MAR24",
             venue="deribit",
-            instrument_type="future",
+            instrument_type="FUTURE",
             symbol="BTC-29MAR24",
             available_from_datetime="2024-01-01T00:00:00Z",
         )
@@ -287,7 +287,7 @@ class TestAutoExtractExpiry:
         inst = InstrumentDefinition(
             instrument_key="binance:future:BTC-USDT-240329",
             venue="binance",
-            instrument_type="future",
+            instrument_type="FUTURE",
             symbol="BTC-USDT-240329",
             available_from_datetime="2024-01-01T00:00:00Z",
             expiry="2024-09-27T08:00:00Z",
@@ -311,7 +311,7 @@ class TestAutoExtractOptionInfo:
         inst = InstrumentDefinition(
             instrument_key="deribit:option:BTC-240329-50000-C",
             venue="deribit",
-            instrument_type="option",
+            instrument_type="OPTION",
             symbol="BTC-240329-50000-C",
             available_from_datetime="2024-01-01T00:00:00Z",
         )
@@ -322,7 +322,7 @@ class TestAutoExtractOptionInfo:
         inst = InstrumentDefinition(
             instrument_key="deribit:option:BTC-240329-50000-PUT",
             venue="deribit",
-            instrument_type="option",
+            instrument_type="OPTION",
             symbol="BTC-240329-50000-PUT",
             available_from_datetime="2024-01-01T00:00:00Z",
         )
@@ -333,7 +333,7 @@ class TestAutoExtractOptionInfo:
         inst = InstrumentDefinition(
             instrument_key="deribit:option:BTC-240329-50000-C",
             venue="deribit",
-            instrument_type="option",
+            instrument_type="OPTION",
             symbol="BTC-240329-50000-C",
             available_from_datetime="2024-01-01T00:00:00Z",
             strike="45000",
@@ -347,7 +347,7 @@ class TestAutoExtractOptionInfo:
         inst = InstrumentDefinition(
             instrument_key="unknown:option:SOMEKEY",
             venue="unknown",
-            instrument_type="option",
+            instrument_type="OPTION",
             symbol="SOMEKEY",
             available_from_datetime="2024-01-01T00:00:00Z",
         )
@@ -392,7 +392,7 @@ class TestValidateRequiredFields:
         inst = InstrumentDefinition(
             instrument_key="binance:spot:BTC-USDT",
             venue="binance",
-            instrument_type="spot",
+            instrument_type="SPOT_PAIR",
             symbol="BTC-USDT",
             available_from_datetime="2020-01-01T00:00:00Z",
             base_asset="BTC",

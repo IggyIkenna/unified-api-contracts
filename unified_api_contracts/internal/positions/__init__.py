@@ -4,6 +4,7 @@ from .cefi import CeFiPosition
 from .defi_lending import DeFiLendingPosition, LendingEntry
 from .defi_lp import DeFiLPPosition
 from .defi_staking import DeFiStakingPosition
+from .reward_position import RewardPosition
 
 __all__ = [
     "CeFiPosition",
@@ -11,4 +12,5 @@ __all__ = [
     "DeFiLendingPosition",
     "DeFiStakingPosition",
     "LendingEntry",
+    "RewardPosition",
 ]

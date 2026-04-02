@@ -147,6 +147,10 @@ class OperationType(StrEnum):
     SPORTS_BET = "SPORTS_BET"
     SPORTS_EXCHANGE_ORDER = "SPORTS_EXCHANGE_ORDER"
 
+    # REWARD OPERATIONS (DeFi protocol rewards)
+    CLAIM_REWARD = "CLAIM_REWARD"
+    SELL_REWARD = "SELL_REWARD"
+
     # HELPER METHODS
 
     @classmethod
@@ -195,6 +199,11 @@ class OperationType(StrEnum):
         return [cls.PREDICTION_BET]
 
     @classmethod
+    def reward_operations(cls) -> list[OperationType]:
+        """Get all reward-related operations."""
+        return [cls.CLAIM_REWARD, cls.SELL_REWARD]
+
+    @classmethod
     def requires_atomic(cls, op: OperationType) -> bool:
         """Check if operation requires atomic execution."""
         return op in cls.flash_loan_operations()
@@ -222,6 +231,8 @@ class OperationType(StrEnum):
             cls.SPORTS_BET: "ODDS",
             cls.SPORTS_EXCHANGE_ORDER: "ODDS",
             cls.PREDICTION_BET: "MID",
+            cls.CLAIM_REWARD: "ORACLE",
+            cls.SELL_REWARD: "ARRIVAL",
         }
         return _benchmark_map.get(op, "ORACLE")
 
@@ -411,6 +422,9 @@ class ExecutionInstruction:
     priority_fee_gwei: Decimal | None = None
     deadline_timestamp: datetime | None = None
 
+    # Share class passthrough — identifies which fund share class originated this instruction
+    share_class: str = "USDT"
+
     # Additional metadata
     metadata: dict[str, object] = field(default_factory=dict)
 
@@ -490,6 +504,7 @@ class ExecutionInstruction:
             "gas_limit": self.gas_limit,
             "priority_fee_gwei": str(self.priority_fee_gwei) if self.priority_fee_gwei else None,
             "deadline_timestamp": self.deadline_timestamp.isoformat() if self.deadline_timestamp else None,
+            "share_class": self.share_class,
             "metadata": self.metadata,
         }
 
@@ -515,6 +530,7 @@ class ExecutionInstruction:
             deadline_timestamp=datetime.fromisoformat(cast(str, data["deadline_timestamp"]))
             if data.get("deadline_timestamp")
             else None,
+            share_class=cast(str, data.get("share_class", "USDT")),
             metadata=ensure_dict(cast("dict[str, object] | None", data.get("metadata"))),
         )
 

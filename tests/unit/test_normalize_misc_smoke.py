@@ -363,22 +363,6 @@ class TestSymbolNormalizer:
 
         assert normalize_symbol("hyperliquid", "BTC") == "BTC-USDC-PERP"
 
-    def test_kraken_legacy(self):
-        from unified_api_contracts.normalize_utils.symbols import (
-            normalize_symbol,
-        )
-
-        result = normalize_symbol("kraken", "XXBTZUSD")
-        assert "BTC" in result
-
-    def test_kraken_futures(self):
-        from unified_api_contracts.normalize_utils.symbols import (
-            normalize_symbol,
-        )
-
-        result = normalize_symbol("kraken", "PI_XBTUSD")
-        assert "BTC" in result or "PERP" in result
-
     def test_kucoin(self):
         from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,

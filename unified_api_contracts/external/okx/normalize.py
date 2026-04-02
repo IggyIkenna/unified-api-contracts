@@ -348,13 +348,13 @@ def normalize_okx_fee_rate(
 
 def _okx_instrument_type(inst_type: str | None) -> str:
     mapping: dict[str, str] = {
-        "SPOT": "SPOT",
-        "MARGIN": "SPOT",
+        "SPOT": "SPOT_PAIR",
+        "MARGIN": "SPOT_PAIR",
         "SWAP": "PERPETUAL",
         "FUTURES": "FUTURE",
         "OPTION": "OPTION",
     }
-    return mapping.get((inst_type or "").upper(), "SPOT")
+    return mapping.get((inst_type or "").upper(), "SPOT_PAIR")
 
 
 def normalize_okx_market(
@@ -365,9 +365,13 @@ def normalize_okx_market(
     instrument_type = _okx_instrument_type(raw.instType)
     symbol = raw.instId
     instrument_key = f"{venue.upper()}:{instrument_type}:{symbol}"
-    tick_size = float(raw.tickSz) if raw.tickSz is not None else None
-    min_size = float(raw.minSz) if raw.minSz is not None else (float(raw.lotSz) if raw.lotSz is not None else None)
-    contract_size = float(raw.ctVal) if raw.ctVal is not None else None
+    tick_size = Decimal(str(raw.tickSz)) if raw.tickSz is not None else None
+    min_size = (
+        Decimal(str(raw.minSz))
+        if raw.minSz is not None
+        else (Decimal(str(raw.lotSz)) if raw.lotSz is not None else None)
+    )
+    contract_size = Decimal(str(raw.ctVal)) if raw.ctVal is not None else None
     return CanonicalInstrument(
         instrument_key=instrument_key,
         venue=venue,

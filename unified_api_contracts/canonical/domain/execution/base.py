@@ -85,6 +85,9 @@ class OperationType(StrEnum):
     REMOVE_LIQUIDITY = "REMOVE_LIQUIDITY"
     REBALANCE_RANGE = "REBALANCE_RANGE"
     COLLECT_FEES = "COLLECT_FEES"
+    # DeFi — Rewards
+    CLAIM_REWARD = "CLAIM_REWARD"
+    SELL_REWARD = "SELL_REWARD"
     # Cross-cutting
     TRANSFER = "TRANSFER"
     TRADE = "TRADE"

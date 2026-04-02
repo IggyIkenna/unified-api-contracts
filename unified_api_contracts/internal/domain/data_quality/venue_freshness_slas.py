@@ -73,7 +73,6 @@ _DEFI_SLAS: list[VenueFreshnessSLA] = [
     VenueFreshnessSLA("balancer", VenueCategory.DEFI, 30),
     VenueFreshnessSLA("curve", VenueCategory.DEFI, 30),
     VenueFreshnessSLA("ethena", VenueCategory.DEFI, 60),
-    VenueFreshnessSLA("euler", VenueCategory.DEFI, 60),
     VenueFreshnessSLA("fluid", VenueCategory.DEFI, 60),
     VenueFreshnessSLA("etherfi", VenueCategory.DEFI, 300),
     VenueFreshnessSLA("lido", VenueCategory.DEFI, 300),

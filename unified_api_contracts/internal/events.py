@@ -42,6 +42,10 @@ class LifecycleEventType(StrEnum):
     DATA_READY = "DATA_READY"
     PREDICTIONS_READY = "PREDICTIONS_READY"
     STRATEGY_SIGNALS_READY = "STRATEGY_SIGNALS_READY"
+    # Pipeline data availability
+    UPSTREAM_NOT_READY = "UPSTREAM_NOT_READY"
+    SHARD_INCOMPLETE = "SHARD_INCOMPLETE"
+    WRITE_FAILED = "WRITE_FAILED"
     # CI/CD pipeline lifecycle
     QG_PASSED = "QG_PASSED"
     QG_FAILED = "QG_FAILED"
@@ -174,6 +178,26 @@ class AuthFailureDetails(BaseModel):
     ip_address: str | None = None
     endpoint: str | None = None
     attempt_count: int | None = None
+
+
+class UpstreamNotReadyDetails(BaseModel):
+    """Details for UPSTREAM_NOT_READY — upstream data missing for a pipeline stage."""
+
+    upstream_dataset: str = Field(description="PATH_REGISTRY key (e.g. raw_tick_data, instruments)")
+    upstream_service: str = Field(description="Service that should have written the data")
+    date: str = Field(description="Date for which data is missing (YYYY-MM-DD)")
+    category: str = Field(default="", description="Market category (cefi, defi, tradfi)")
+    message: str = Field(default="", description="Human-readable description of what's missing")
+    required: bool = Field(default=True, description="True=blocking, False=advisory")
+
+
+class ShardIncompleteDetails(BaseModel):
+    """Details for SHARD_INCOMPLETE — expected venues missing after write."""
+
+    date: str
+    expected: int = Field(description="Number of expected shards/venues")
+    written: int = Field(description="Number of actually written shards/venues")
+    missing: list[str] = Field(default_factory=list, description="List of missing venue/shard names")
 
 
 class ConfigChangedDetails(BaseModel):

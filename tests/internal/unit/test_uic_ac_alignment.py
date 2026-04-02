@@ -299,7 +299,7 @@ class TestUICExportsResolve:
         rec = InstrumentRecord(
             instrument_key="BINANCE:SPOT:BTCUSDT",
             venue="binance",
-            instrument_type="spot",
+            instrument_type="SPOT_PAIR",
             symbol="BTC/USDT",
             raw_symbol="BTCUSDT",
         )

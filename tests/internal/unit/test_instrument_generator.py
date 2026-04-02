@@ -371,7 +371,7 @@ class TestDefi:
         """Aave instruments should use WETH, not ETH."""
         instruments = gen.generate_defi(REF_DATE)
         aave_a_tokens = [
-            i for i in instruments if i.venue == "AAVE_V3_ETH" and i.instrument_type == InstrumentType.A_TOKEN
+            i for i in instruments if i.venue == "AAVEV3-ETHEREUM" and i.instrument_type == InstrumentType.A_TOKEN
         ]
         eth_underlying = [i for i in aave_a_tokens if i.base_asset == "WETH"]
         assert len(eth_underlying) >= 1, "Aave aTokens should use WETH not ETH"
@@ -386,7 +386,7 @@ class TestDefi:
     def test_ltv_set_for_aave(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
         aave_a_tokens = [
-            i for i in instruments if i.venue == "AAVE_V3_ETH" and i.instrument_type == InstrumentType.A_TOKEN
+            i for i in instruments if i.venue == "AAVEV3-ETHEREUM" and i.instrument_type == InstrumentType.A_TOKEN
         ]
         assert len(aave_a_tokens) == 3
         for inst in aave_a_tokens:
@@ -423,7 +423,7 @@ class TestDefi:
         instruments = gen.generate_defi(REF_DATE)
         venues = {i.venue for i in instruments}
         expected = {
-            "AAVE_V3_ETH",
+            "AAVEV3-ETHEREUM",
             "COMPOUND_V3_ETH",
             "UNISWAPV3-ETHEREUM",
             "UNISWAPV2-ETHEREUM",
@@ -433,13 +433,12 @@ class TestDefi:
             "MORPHO-ETHEREUM",
             "CURVE-ETHEREUM",
             "ETHENA",
-            "EULER-ETH",
         }
         assert venues == expected
 
     def test_count(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
-        assert len(instruments) == 19
+        assert len(instruments) == 18
 
     def test_curve_3pool(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
@@ -463,15 +462,6 @@ class TestDefi:
         # sUSDe should have underlying set to USDe
         susde = next(i for i in ethena if i.symbol == "sUSDe")
         assert susde.underlying == "USDe"
-
-    def test_euler_lending_vault(self, gen: InstrumentGenerator) -> None:
-        instruments = gen.generate_defi(REF_DATE)
-        euler = [i for i in instruments if i.venue == "EULER-ETH"]
-        assert len(euler) == 1
-        assert euler[0].instrument_type == InstrumentType.POOL
-        assert euler[0].symbol == "eUSDC"
-        assert euler[0].base_asset == "USDC"
-        assert euler[0].pool_address is not None
 
 
 # ---------------------------------------------------------------------------

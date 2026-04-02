@@ -538,42 +538,6 @@ def normalize_yahoo_finance_error(
 
 
 # ---------------------------------------------------------------------------
-# Bitstamp
-# ---------------------------------------------------------------------------
-
-BITSTAMP_MAP: dict[str, Callable[..., CanonicalError]] = {
-    "API0001": CanonicalInvalidRequestError,
-    "API0002": CanonicalAuthenticationError,  # Authentication failed
-    "API0005": CanonicalAuthenticationError,  # Invalid signature
-    "API0006": CanonicalAuthenticationError,  # Nonce too small
-    "API0008": CanonicalInvalidRequestError,  # Wrong nonce
-    "UAPI0001": CanonicalInsufficientBalanceError,
-    "429": CanonicalRateLimitError,
-    "401": CanonicalAuthenticationError,
-    "403": CanonicalAuthorizationError,
-    "500": CanonicalInternalServerError,
-    "503": CanonicalServiceUnavailableError,
-}
-
-
-def normalize_bitstamp_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "bitstamp",
-) -> CanonicalError:
-    """Map a Bitstamp REST error code to a CanonicalError subclass."""
-    code = str(error_code)
-    cls = BITSTAMP_MAP.get(code)
-    if cls is not None:
-        return cls(message=message or code, venue=venue)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # Matchbook
 # ---------------------------------------------------------------------------
 

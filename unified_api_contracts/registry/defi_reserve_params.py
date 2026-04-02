@@ -15,6 +15,10 @@ Format: asset → {max_ltv, liquidation_threshold, liquidation_bonus, reserve_fa
 
 Health Factor = Σ(collateral_i * liquidation_threshold_i) / total_debt
 LTV = total_debt / total_collateral
+
+E-Mode (Efficiency Mode): When collateral and debt are in the same asset category
+(e.g., ETH-correlated: weETH collateral + WETH debt), Aave V3 allows significantly
+higher LTV (~93% vs 72.5% standard). This dramatically changes leverage calculations.
 """
 
 from __future__ import annotations
@@ -31,6 +35,18 @@ class ReserveParams:
     liquidation_threshold: Decimal
     liquidation_bonus: Decimal
     reserve_factor: Decimal
+
+
+@dataclass(frozen=True)
+class EModeCategory:
+    """Aave V3 E-Mode category with elevated risk parameters."""
+
+    category_id: int
+    label: str
+    max_ltv: Decimal
+    liquidation_threshold: Decimal
+    liquidation_bonus: Decimal
+    assets: frozenset[str]
 
 
 # Aave V3 Ethereum Mainnet reserve parameters
@@ -103,6 +119,59 @@ AAVE_V3_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
 }
 
 
+# ── E-Mode Categories (Aave V3 Ethereum) ──────────────────────────────────
+# Source: Aave governance, on-chain getEModeCategoryData()
+# Category 1: ETH-correlated — weETH, wstETH, cbETH, WETH all in same bucket
+# Category 2: Stablecoins — USDC, USDT, DAI
+AAVE_V3_EMODE_CATEGORIES: list[EModeCategory] = [
+    EModeCategory(
+        category_id=1,
+        label="ETH_CORRELATED",
+        max_ltv=Decimal("0.93"),
+        liquidation_threshold=Decimal("0.95"),
+        liquidation_bonus=Decimal("0.01"),
+        assets=frozenset({"WETH", "WEETH", "WSTETH", "CBETH"}),
+    ),
+    EModeCategory(
+        category_id=2,
+        label="STABLECOIN",
+        max_ltv=Decimal("0.97"),
+        liquidation_threshold=Decimal("0.975"),
+        liquidation_bonus=Decimal("0.01"),
+        assets=frozenset({"USDC", "USDT", "DAI"}),
+    ),
+]
+
+# Lookup: asset → E-Mode category
+_ASSET_EMODE_MAP: dict[str, EModeCategory] = {}
+for _cat in AAVE_V3_EMODE_CATEGORIES:
+    for _asset in _cat.assets:
+        _ASSET_EMODE_MAP[_asset] = _cat
+
+
+def get_emode_category(asset: str) -> EModeCategory | None:
+    """Get the E-Mode category for an asset, or None if not in any E-Mode category."""
+    return _ASSET_EMODE_MAP.get(asset.upper())
+
+
+def get_emode_params(collateral_asset: str, debt_asset: str) -> EModeCategory | None:
+    """Get E-Mode parameters when collateral and debt are in the same category.
+
+    Returns the EModeCategory if both assets share an E-Mode category (enabling
+    higher LTV/liquidation thresholds), or None if they're in different categories
+    or neither is in an E-Mode category.
+
+    Example:
+        get_emode_params("WEETH", "WETH") → ETH_CORRELATED (93% LTV, 95% liq)
+        get_emode_params("WEETH", "USDC") → None (different categories)
+    """
+    collateral_cat = _ASSET_EMODE_MAP.get(collateral_asset.upper())
+    debt_cat = _ASSET_EMODE_MAP.get(debt_asset.upper())
+    if collateral_cat is not None and collateral_cat is debt_cat:
+        return collateral_cat
+    return None
+
+
 def get_reserve_params(asset: str, chain: str = "ETHEREUM") -> ReserveParams | None:
     """Look up reserve parameters for an asset.
 
@@ -139,6 +208,7 @@ def get_reserve_params(asset: str, chain: str = "ETHEREUM") -> ReserveParams | N
 def compute_health_factor(
     collateral_positions: list[tuple[str, Decimal, Decimal]],
     debt_positions: list[tuple[str, Decimal, Decimal]],
+    emode_category: EModeCategory | None = None,
 ) -> tuple[Decimal, Decimal]:
     """Compute health factor and LTV from positions + protocol params.
 
@@ -148,9 +218,12 @@ def compute_health_factor(
     Args:
         collateral_positions: List of (instrument_id, quantity, price_usd)
         debt_positions: List of (instrument_id, quantity, price_usd)
+        emode_category: If provided, uses E-Mode liquidation thresholds for
+            assets in this category (significantly higher than standard).
+            Pass the result of get_emode_params(collateral, debt).
 
     Returns:
-        Tuple of (health_factor, ltv). HF = Decimal("Infinity") if no debt.
+        Tuple of (health_factor, ltv). HF = Decimal("NaN") if no debt.
     """
     total_collateral_usd = Decimal("0")
     weighted_threshold_usd = Decimal("0")
@@ -159,21 +232,60 @@ def compute_health_factor(
     for inst_id, qty, price in collateral_positions:
         value = abs(qty) * price
         total_collateral_usd += value
-        params = get_reserve_params(inst_id)
-        if params:
-            weighted_threshold_usd += value * params.liquidation_threshold
-        else:
-            # Unknown asset — use conservative threshold
-            weighted_threshold_usd += value * Decimal("0.70")
 
-    for inst_id, qty, price in debt_positions:
+        # E-Mode: use elevated threshold if asset is in the E-Mode category
+        asset_upper = _extract_asset_symbol(inst_id)
+        if emode_category is not None and asset_upper in emode_category.assets:
+            weighted_threshold_usd += value * emode_category.liquidation_threshold
+        else:
+            params = get_reserve_params(inst_id)
+            if params:
+                weighted_threshold_usd += value * params.liquidation_threshold
+            else:
+                weighted_threshold_usd += value * Decimal("0.70")
+
+    for _inst_id, qty, price in debt_positions:
         total_debt_usd += abs(qty) * price
 
     if total_debt_usd == 0:
-        # No debt → not liquidatable. Return NaN so graphs don't blow up.
-        return Decimal("NaN"), Decimal("0")
+        # No debt — lending only. HF is Infinity (no liquidation risk), LTV is 0.
+        return Decimal("Infinity"), Decimal("0")
 
     health_factor = weighted_threshold_usd / total_debt_usd
     ltv = total_debt_usd / total_collateral_usd if total_collateral_usd > 0 else Decimal("Infinity")
 
     return health_factor, ltv
+
+
+def _extract_asset_symbol(inst_id: str) -> str:
+    """Extract the base asset symbol from an instrument ID.
+
+    Handles formats like:
+    - "WETH" → "WETH"
+    - "AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM" → "WEETH"
+    - "AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM" → "WETH"
+    - "AAVE_V3_WEETH_A_TOKEN" → "WEETH"
+    - "AAVE_V3_WETH_DEBT_TOKEN" → "WETH"
+    """
+    upper = inst_id.upper()
+
+    # Colon-delimited format: AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM
+    if ":" in upper:
+        parts = upper.split(":")
+        if len(parts) >= 3:
+            token_name = parts[2].split("@")[0]
+            if token_name.startswith("A") and not token_name.startswith("AAVE"):
+                token_name = token_name[1:]
+            if token_name.startswith("DEBT"):
+                token_name = token_name[4:]
+            return token_name
+        return upper
+
+    # Underscore suffix format: AAVE_V3_WEETH_A_TOKEN / AAVE_V3_WETH_DEBT_TOKEN
+    for suffix in ("_A_TOKEN", "_DEBT_TOKEN", "_VARIABLE_DEBT"):
+        if upper.endswith(suffix):
+            core = upper[: -len(suffix)]
+            parts = core.rsplit("_", 1)
+            return parts[-1] if parts else upper
+
+    return upper

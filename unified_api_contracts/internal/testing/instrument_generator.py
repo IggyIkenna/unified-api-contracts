@@ -32,6 +32,7 @@ from __future__ import annotations
 import calendar
 import fnmatch
 from datetime import UTC, date, datetime, timedelta
+from decimal import Decimal
 
 import numpy as np
 
@@ -130,7 +131,7 @@ def _deterministic_address(rng: np.random.Generator) -> str:
 
 def _defi_data_types(itype: InstrumentType, venue: str) -> list[str]:
     """Return data_types for a DeFi instrument based on type and venue."""
-    if itype == InstrumentType.POOL and venue not in ("COMPOUND_V3_ETH", "EULER-ETH"):
+    if itype == InstrumentType.POOL and venue != "COMPOUND_V3_ETH":
         return ["apy", "tvl", "liquidity"] if venue == "CURVE-ETHEREUM" else ["ohlcv", "liquidity"]
     return ["apy", "tvl"]
 
@@ -330,7 +331,7 @@ class InstrumentGenerator:
                         asset_class="tradfi_futures",
                         market_category="TRADFI",
                         exchange_raw_symbol=cme_symbol,
-                        contract_size=float(tspec["contract_size"]),
+                        contract_size=Decimal(str(tspec["contract_size"])),
                         expiry=expiry_dt,
                         available_from_datetime=expiry_dt - timedelta(days=365),
                         available_to_datetime=None,
@@ -399,7 +400,7 @@ class InstrumentGenerator:
                             asset_class="crypto_cefi",
                             market_category="CEFI",
                             exchange_raw_symbol=symbol,
-                            strike=float(strike_val),
+                            strike=Decimal(str(strike_val)),
                             option_type=opt_type,
                             expiry=expiry_dt,
                             underlying=_underlying,

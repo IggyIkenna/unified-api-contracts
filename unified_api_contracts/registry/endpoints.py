@@ -302,7 +302,7 @@ ENDPOINT_SCHEMA_MAP: dict[tuple[str, str], str] = {
     ("mev", "send_bundle"): "FlashbotsBundleParams",
     ("mev", "call_bundle"): "FlashbotsCallBundleParams",
     ("mev", "mev_share_bundle"): "MevShareBundleParams",
-    # DeFi protocol lending (Aave, Compound, Morpho, Euler)
+    # DeFi protocol lending (Aave, Compound, Morpho)
     ("defi", "aave_reserve"): "AaveV3ReserveData",
     ("defi", "aave_user_account"): "AaveV3UserAccountData",
     ("defi", "aave_user_reserve"): "AaveV3UserReserveData",
@@ -310,8 +310,6 @@ ENDPOINT_SCHEMA_MAP: dict[tuple[str, str], str] = {
     ("defi", "compound_user_position"): "CompoundV3UserPosition",
     ("defi", "morpho_market"): "MorphoMarketParams",
     ("defi", "morpho_user_position"): "MorphoUserPosition",
-    ("defi", "euler_vault"): "EulerVaultData",
-    ("defi", "euler_user_position"): "EulerUserPosition",
     # Sports: Betfair, Pinnacle, Polymarket, Odds API, API-Football
     ("betfair", "auth"): "BetfairAuthResponse",
     ("betfair", "market_book"): "BetfairMarketBook",

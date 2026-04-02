@@ -634,7 +634,7 @@ class TestMarketStateNormalizers:
         assert isinstance(result, CanonicalMarketStateEvent)
         assert result.state == MarketState.NORMAL
         assert result.venue == "binance"
-        assert result.instrument_key == "binance:SPOT:BTCUSDT"
+        assert result.instrument_key == "binance:SPOT_PAIR:BTCUSDT"
 
     def test_normalize_binance_halt(self):
         from unified_api_contracts.canonical.domain import MarketState
@@ -746,7 +746,7 @@ class TestMarketStateNormalizers:
 
         result = normalize_ibkr_market_state(trading_phase="OPEN", symbol="AAPL")
         assert result.state == MarketState.NORMAL
-        assert result.instrument_key == "ibkr:SPOT:AAPL"
+        assert result.instrument_key == "ibkr:SPOT_PAIR:AAPL"
 
     def test_normalize_ibkr_afterhours(self):
         from unified_api_contracts.canonical.domain import MarketState

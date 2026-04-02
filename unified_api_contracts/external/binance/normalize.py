@@ -351,14 +351,14 @@ def _binance_filter_value(
     filters: list[dict[str, object]] | None,
     filter_type: str,
     key: str,
-) -> float | None:
+) -> Decimal | None:
     if not filters:
         return None
     for f in filters:
         if f.get("filterType") == filter_type:
             raw_val = f.get(key)
             if raw_val is not None:
-                return float(str(raw_val))
+                return Decimal(str(raw_val))
     return None
 
 
@@ -369,8 +369,8 @@ def _binance_instrument_type(raw: BinanceInstrumentInfo | BinanceSymbol) -> str:
             return "PERPETUAL"
         if contract_type in ("CURRENT_QUARTER", "NEXT_QUARTER", "DELIVERY"):
             return "FUTURE"
-        return "SPOT"
-    return "SPOT"
+        return "SPOT_PAIR"
+    return "SPOT_PAIR"
 
 
 def normalize_binance_symbol(
@@ -381,16 +381,16 @@ def normalize_binance_symbol(
     instrument_type = _binance_instrument_type(raw)
     symbol = raw.symbol
     instrument_key = f"{venue.upper()}:{instrument_type}:{symbol}"
-    tick_size: float | None = None
-    min_size: float | None = None
+    tick_size: Decimal | None = None
+    min_size: Decimal | None = None
     if isinstance(raw, BinanceInstrumentInfo) and raw.filters:
         tick_size = _binance_filter_value(raw.filters, "PRICE_FILTER", "tickSize")
         min_size = _binance_filter_value(raw.filters, "LOT_SIZE", "minQty")
     base_asset = raw.baseAsset
     quote_asset = raw.quoteAsset
-    contract_size: float | None = None
+    contract_size: Decimal | None = None
     if isinstance(raw, BinanceInstrumentInfo) and raw.contractSize is not None:
-        contract_size = float(raw.contractSize)
+        contract_size = Decimal(str(raw.contractSize))
     return CanonicalInstrument(
         instrument_key=instrument_key,
         venue=venue,
@@ -451,7 +451,7 @@ def normalize_binance_liquidation(
 def normalize_binance_market_state(
     status: str,
     symbol: str,
-    instrument_type: str = "SPOT",
+    instrument_type: str = "SPOT_PAIR",
     previous_state: MarketState | None = None,
     reason: str | None = None,
     timestamp: datetime | None = None,

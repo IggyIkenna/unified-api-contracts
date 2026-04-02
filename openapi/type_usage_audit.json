@@ -2,15 +2,11 @@
   "summary": {
     "alive": 621,
     "test_only": 18,
-    "import_chain_only": 45,
-    "dead": 159,
-    "total": 843
+    "import_chain_only": 35,
+    "dead": 155,
+    "total": 829
   },
   "dead_types": [
-    {
-      "name": "ALL_DATA_TYPES",
-      "source": "UAC"
-    },
     {
       "name": "ALL_FRESHNESS_CONTRACTS",
       "source": "UIC"
@@ -28,23 +24,7 @@
       "source": "UIC"
     },
     {
-      "name": "BINANCE_FUTURES",
-      "source": "UAC"
-    },
-    {
-      "name": "BINANCE_SPOT",
-      "source": "UAC"
-    },
-    {
       "name": "BOOKMAKER_REGISTRY",
-      "source": "UAC"
-    },
-    {
-      "name": "BYBIT_FUTURES",
-      "source": "UAC"
-    },
-    {
-      "name": "BYBIT_SPOT",
       "source": "UAC"
     },
     {
@@ -180,6 +160,10 @@
       "source": "UIC"
     },
     {
+      "name": "ClientStrategyOverride",
+      "source": "UIC"
+    },
+    {
       "name": "CoinbaseOrderBook",
       "source": "UAC"
     },
@@ -233,10 +217,6 @@
     },
     {
       "name": "DEX_VENUE_KEYWORDS",
-      "source": "UAC"
-    },
-    {
-      "name": "DatabentoReferenceInstrument",
       "source": "UAC"
     },
     {
@@ -332,6 +312,10 @@
       "source": "UIC"
     },
     {
+      "name": "GasCostRecord",
+      "source": "UIC"
+    },
+    {
       "name": "HyperliquidFill",
       "source": "UAC"
     },
@@ -349,14 +333,6 @@
     },
     {
       "name": "IBKRCorporateAction",
-      "source": "UAC"
-    },
-    {
-      "name": "INFRA_CANONICAL_TO_PROVIDER",
-      "source": "UAC"
-    },
-    {
-      "name": "INSTRUCTION_SCHEMA",
       "source": "UAC"
     },
     {
@@ -405,14 +381,6 @@
     },
     {
       "name": "MARKET_TICK_FRESHNESS",
-      "source": "UIC"
-    },
-    {
-      "name": "MLModelScorecard",
-      "source": "UIC"
-    },
-    {
-      "name": "MLPrediction",
       "source": "UIC"
     },
     {
@@ -480,14 +448,6 @@
       "source": "UIC"
     },
     {
-      "name": "OptionContract",
-      "source": "UIC"
-    },
-    {
-      "name": "OrderBookSnapshot",
-      "source": "UIC"
-    },
-    {
       "name": "PolygonDividendsResponse",
       "source": "UAC"
     },
@@ -520,6 +480,14 @@
       "source": "UAC"
     },
     {
+      "name": "RebalanceCostEstimate",
+      "source": "UIC"
+    },
+    {
+      "name": "SHARE_CLASS_BASE_ASSETS",
+      "source": "UAC"
+    },
+    {
       "name": "SPORTS_VENUES",
       "source": "UAC"
     },
@@ -532,11 +500,27 @@
       "source": "UIC"
     },
     {
-      "name": "SettlementPrice",
+      "name": "ShardIncompleteDetails",
+      "source": "UIC"
+    },
+    {
+      "name": "ShareClass",
+      "source": "UAC"
+    },
+    {
+      "name": "ShareClassConfig",
+      "source": "UIC"
+    },
+    {
+      "name": "SignalVectorMetaFeatures",
       "source": "UIC"
     },
     {
       "name": "StrategyModeParams",
+      "source": "UIC"
+    },
+    {
+      "name": "StrategyNAV",
       "source": "UIC"
     },
     {
@@ -564,10 +548,6 @@
       "source": "UAC"
     },
     {
-      "name": "TardisAvailableSymbol",
-      "source": "UAC"
-    },
-    {
       "name": "TargetTypeParams",
       "source": "UIC"
     },
@@ -586,6 +566,10 @@
     {
       "name": "UpbitTicker",
       "source": "UAC"
+    },
+    {
+      "name": "UpstreamNotReadyDetails",
+      "source": "UIC"
     },
     {
       "name": "VALID_BOOK_TYPES",
@@ -651,21 +635,6 @@
       "chain": []
     },
     {
-      "name": "CanonicalBetMarket",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalBetOrder",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalCloudStorage",
-      "source": "UAC",
-      "chain": []
-    },
-    {
       "name": "CanonicalComboBet",
       "source": "UAC",
       "chain": []
@@ -676,17 +645,7 @@
       "chain": []
     },
     {
-      "name": "CanonicalComputeJob",
-      "source": "UAC",
-      "chain": []
-    },
-    {
       "name": "CanonicalComputeService",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalContainerRegistry",
       "source": "UAC",
       "chain": []
     },
@@ -702,16 +661,6 @@
     },
     {
       "name": "CanonicalMarketStateEvent",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalMessageQueue",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalOLAPTable",
       "source": "UAC",
       "chain": []
     },
@@ -736,22 +685,7 @@
       "chain": []
     },
     {
-      "name": "CanonicalScheduledJob",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalSecretStore",
-      "source": "UAC",
-      "chain": []
-    },
-    {
       "name": "CanonicalSettlement",
-      "source": "UAC",
-      "chain": []
-    },
-    {
-      "name": "CanonicalVirtualMachine",
       "source": "UAC",
       "chain": []
     },
@@ -776,11 +710,6 @@
       "chain": []
     },
     {
-      "name": "InstrumentType",
-      "source": "UAC",
-      "chain": []
-    },
-    {
       "name": "InsuranceFundState",
       "source": "UAC",
       "chain": []
@@ -792,6 +721,11 @@
     },
     {
       "name": "MarketTrade",
+      "source": "UAC",
+      "chain": []
+    },
+    {
+      "name": "MultiLegInstrument",
       "source": "UAC",
       "chain": []
     },
@@ -1117,28 +1051,28 @@
       "name": "AaveBorrowParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveDepositParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveFlashLoanParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveRepayParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -1214,8 +1148,8 @@
     {
       "name": "AlertMessage",
       "source": "UIC",
-      "instantiation_count": 34,
-      "annotation_count": 17,
+      "instantiation_count": 35,
+      "annotation_count": 19,
       "isinstance_count": 0
     },
     {
@@ -1283,9 +1217,9 @@
     },
     {
       "name": "AssetClass",
-      "source": "UIC",
+      "source": "UAC",
       "instantiation_count": 2,
-      "annotation_count": 5,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
@@ -1368,7 +1302,7 @@
     {
       "name": "BetOrder",
       "source": "UAC",
-      "instantiation_count": 9,
+      "instantiation_count": 10,
       "annotation_count": 19,
       "isinstance_count": 0
     },
@@ -1411,7 +1345,7 @@
       "name": "BetfairCurrentOrderSummary",
       "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -1425,7 +1359,7 @@
       "name": "BetfairMarketCatalogue",
       "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 2,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -1488,7 +1422,7 @@
       "name": "BookmakerInfo",
       "source": "UAC",
       "instantiation_count": 16,
-      "annotation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -1543,7 +1477,7 @@
     {
       "name": "CandleOutput",
       "source": "UIC",
-      "instantiation_count": 23,
+      "instantiation_count": 24,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1586,6 +1520,20 @@
       "name": "CanonicalBase",
       "source": "UAC",
       "instantiation_count": 16,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "CanonicalBetMarket",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "CanonicalBetOrder",
+      "source": "UAC",
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1655,8 +1603,8 @@
     {
       "name": "CanonicalFill",
       "source": "UAC",
-      "instantiation_count": 21,
-      "annotation_count": 12,
+      "instantiation_count": 20,
+      "annotation_count": 10,
       "isinstance_count": 0
     },
     {
@@ -2136,13 +2084,6 @@
       "isinstance_count": 0
     },
     {
-      "name": "CoLocationPerformanceMetric",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
       "name": "CoachRecord",
       "source": "UIC",
       "instantiation_count": 16,
@@ -2187,15 +2128,15 @@
     {
       "name": "ComboLeg",
       "source": "UAC",
-      "instantiation_count": 1,
-      "annotation_count": 2,
+      "instantiation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ComboStrategyType",
       "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -2468,7 +2409,7 @@
       "name": "DeFiAggregatedHealth",
       "source": "UAC",
       "instantiation_count": 1,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -2489,7 +2430,7 @@
       "name": "DeFiLendingPosition",
       "source": "UIC",
       "instantiation_count": 8,
-      "annotation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -2733,7 +2674,7 @@
     {
       "name": "EnhancedError",
       "source": "UIC",
-      "instantiation_count": 30,
+      "instantiation_count": 32,
       "annotation_count": 3,
       "isinstance_count": 0
     },
@@ -2789,7 +2730,7 @@
     {
       "name": "ErrorContext",
       "source": "UIC",
-      "instantiation_count": 31,
+      "instantiation_count": 33,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -2915,8 +2856,8 @@
     {
       "name": "ExecutionInstruction",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 15,
+      "instantiation_count": 10,
+      "annotation_count": 17,
       "isinstance_count": 0
     },
     {
@@ -2929,8 +2870,8 @@
     {
       "name": "ExecutionMode",
       "source": "UIC",
-      "instantiation_count": 21,
-      "annotation_count": 11,
+      "instantiation_count": 20,
+      "annotation_count": 10,
       "isinstance_count": 0
     },
     {
@@ -2943,8 +2884,8 @@
     {
       "name": "ExecutionResult",
       "source": "UAC",
-      "instantiation_count": 27,
-      "annotation_count": 16,
+      "instantiation_count": 24,
+      "annotation_count": 18,
       "isinstance_count": 0
     },
     {
@@ -3294,7 +3235,7 @@
       "name": "InstrumentInfo",
       "source": "UIC",
       "instantiation_count": 12,
-      "annotation_count": 25,
+      "annotation_count": 26,
       "isinstance_count": 0
     },
     {
@@ -3305,17 +3246,31 @@
       "isinstance_count": 0
     },
     {
+      "name": "InstrumentLeg",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 3,
+      "isinstance_count": 0
+    },
+    {
       "name": "InstrumentMetadata",
       "source": "UIC",
-      "instantiation_count": 9,
-      "annotation_count": 25,
+      "instantiation_count": 8,
+      "annotation_count": 26,
       "isinstance_count": 0
     },
     {
       "name": "InstrumentRecord",
       "source": "UIC",
-      "instantiation_count": 34,
-      "annotation_count": 38,
+      "instantiation_count": 36,
+      "annotation_count": 41,
+      "isinstance_count": 0
+    },
+    {
+      "name": "InstrumentType",
+      "source": "UAC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3375,21 +3330,7 @@
       "isinstance_count": 0
     },
     {
-      "name": "LatencyBenchmarkReport",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
       "name": "LatencyComponent",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LatencyPercentile",
       "source": "UAC",
       "instantiation_count": 8,
       "annotation_count": 8,
@@ -3405,15 +3346,15 @@
     {
       "name": "LegExecutionResult",
       "source": "UIC",
-      "instantiation_count": 9,
-      "annotation_count": 9,
+      "instantiation_count": 8,
+      "annotation_count": 8,
       "isinstance_count": 0
     },
     {
       "name": "LegInstruction",
       "source": "UIC",
       "instantiation_count": 8,
-      "annotation_count": 9,
+      "annotation_count": 8,
       "isinstance_count": 0
     },
     {
@@ -3448,7 +3389,7 @@
       "name": "LidoSubmitParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3557,6 +3498,20 @@
       "isinstance_count": 0
     },
     {
+      "name": "MLModelScorecard",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "MLPrediction",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "MLPredictionMessage",
       "source": "UIC",
       "instantiation_count": 16,
@@ -3600,9 +3555,9 @@
     },
     {
       "name": "MarginType",
-      "source": "UIC",
+      "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 3,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3671,7 +3626,7 @@
     {
       "name": "MockScenario",
       "source": "UIC",
-      "instantiation_count": 25,
+      "instantiation_count": 24,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -3707,14 +3662,14 @@
       "name": "MorphoBorrowParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MorphoFlashLoanParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3728,14 +3683,14 @@
       "name": "MorphoRepayParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MorphoSupplyParams",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3762,7 +3717,7 @@
     {
       "name": "MultiLegExecutionResult",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 8,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3770,13 +3725,6 @@
       "name": "MultiLegInstruction",
       "source": "UIC",
       "instantiation_count": 8,
-      "annotation_count": 1,
-      "isinstance_count": 0
-    },
-    {
-      "name": "MultiLegInstrument",
-      "source": "UAC",
-      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3804,8 +3752,8 @@
     {
       "name": "NormalizedStrikeCoordinate",
       "source": "UAC",
-      "instantiation_count": 11,
-      "annotation_count": 3,
+      "instantiation_count": 12,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
@@ -3861,7 +3809,7 @@
       "name": "OperationType",
       "source": "UAC",
       "instantiation_count": 8,
-      "annotation_count": 13,
+      "annotation_count": 12,
       "isinstance_count": 0
     },
     {
@@ -3872,24 +3820,10 @@
       "isinstance_count": 0
     },
     {
-      "name": "OptionGreeks",
-      "source": "UIC",
-      "instantiation_count": 0,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
       "name": "OptionType",
       "source": "UAC",
-      "instantiation_count": 1,
-      "annotation_count": 1,
-      "isinstance_count": 0
-    },
-    {
-      "name": "OptionsChain",
-      "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 0,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -3923,8 +3857,8 @@
     {
       "name": "Order",
       "source": "UIC",
-      "instantiation_count": 54,
-      "annotation_count": 66,
+      "instantiation_count": 53,
+      "annotation_count": 62,
       "isinstance_count": 7
     },
     {
@@ -3959,7 +3893,7 @@
       "name": "OrderSide",
       "source": "UAC",
       "instantiation_count": 13,
-      "annotation_count": 22,
+      "annotation_count": 21,
       "isinstance_count": 1
     },
     {
@@ -4162,21 +4096,21 @@
       "name": "PositionSide",
       "source": "UIC",
       "instantiation_count": 17,
-      "annotation_count": 20,
+      "annotation_count": 19,
       "isinstance_count": 0
     },
     {
       "name": "PositionSnapshot",
       "source": "UIC",
-      "instantiation_count": 2,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "PositionSummary",
       "source": "UIC",
-      "instantiation_count": 1,
-      "annotation_count": 0,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -4418,6 +4352,13 @@
       "isinstance_count": 0
     },
     {
+      "name": "RewardPosition",
+      "source": "UIC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "RidgeHyperparams",
       "source": "UIC",
       "instantiation_count": 2,
@@ -4469,8 +4410,8 @@
     {
       "name": "RiskMetrics",
       "source": "UIC",
-      "instantiation_count": 18,
-      "annotation_count": 4,
+      "instantiation_count": 19,
+      "annotation_count": 5,
       "isinstance_count": 0
     },
     {
@@ -4491,7 +4432,7 @@
       "name": "RiskStatus",
       "source": "UIC",
       "instantiation_count": 17,
-      "annotation_count": 19,
+      "annotation_count": 20,
       "isinstance_count": 0
     },
     {
@@ -4848,7 +4789,7 @@
       "name": "StrategyRiskProfile",
       "source": "UIC",
       "instantiation_count": 16,
-      "annotation_count": 0,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -4895,13 +4836,6 @@
     },
     {
       "name": "SubAccount",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "SubMillisecondLatencyRecord",
       "source": "UAC",
       "instantiation_count": 8,
       "annotation_count": 0,
@@ -4960,14 +4894,14 @@
       "name": "TestingStage",
       "source": "UIC",
       "instantiation_count": 8,
-      "annotation_count": 9,
+      "annotation_count": 8,
       "isinstance_count": 0
     },
     {
       "name": "TestingStageConfig",
       "source": "UIC",
       "instantiation_count": 8,
-      "annotation_count": 1,
+      "annotation_count": 0,
       "isinstance_count": 0
     },
     {
@@ -4975,13 +4909,6 @@
       "source": "UIC",
       "instantiation_count": 1,
       "annotation_count": 1,
-      "isinstance_count": 0
-    },
-    {
-      "name": "TickToTradeMetric",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
       "isinstance_count": 0
     },
     {
@@ -4995,7 +4922,7 @@
       "name": "Timeframe",
       "source": "UIC",
       "instantiation_count": 8,
-      "annotation_count": 33,
+      "annotation_count": 34,
       "isinstance_count": 0
     },
     {
@@ -5246,7 +5173,7 @@
     {
       "name": "VenueMapping",
       "source": "UAC",
-      "instantiation_count": 14,
+      "instantiation_count": 15,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -5414,7 +5341,7 @@
     {
       "name": "classify_venue_error",
       "source": "UAC",
-      "instantiation_count": 34,
+      "instantiation_count": 35,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -5448,6 +5375,13 @@
     },
     {
       "name": "validate_feature_columns_not_null",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "validate_instrument_records",
       "source": "UIC",
       "instantiation_count": 1,
       "annotation_count": 0,

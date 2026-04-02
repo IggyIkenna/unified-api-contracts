@@ -297,6 +297,7 @@ PRIMEIRA_LIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "MOREIRENSE": ["MOREIRENSE", "Moreirense FC", "Moreirense"],
     "ESTORIL": ["ESTORIL", "Estoril Praia", "Estoril"],
     "ESTRELA_AMADORA": ["ESTRELA AMADORA", "Estrela da Amadora", "Estrela Amadora"],
+    "ALVERCA": ["ALVERCA", "FC Alverca", "Alverca"],
 }
 
 # ---------------------------------------------------------------------------
@@ -329,6 +330,8 @@ JUPILER_PRO_TEAM_ALIASES: dict[str, list[str]] = {
     "CHARLEROI": ["CHARLEROI", "Sporting Charleroi", "Charleroi"],
     "LEUVEN": ["LEUVEN", "OH Leuven", "Oud-Heverlee Leuven"],
     "KORTRIJK": ["KORTRIJK", "KV Kortrijk", "Kortrijk"],
+    "DENDER": ["DENDER", "Dender EH", "FCV Dender EH", "Dender"],
+    "RAAL_LA_LOUVIERE": ["RAAL LA LOUVIERE", "RAAL La Louvière", "RAAL La Louviere"],
 }
 
 # ---------------------------------------------------------------------------
@@ -348,6 +351,8 @@ DANISH_SUPERLIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "LYNGBY": ["LYNGBY", "Lyngby BK"],
     "HVIDOVRE": ["HVIDOVRE", "Hvidovre IF"],
     "VEJLE": ["VEJLE", "Vejle BK"],
+    "FREDERICIA": ["FREDERICIA", "FC Fredericia", "Fredericia"],
+    "SONDERJYSKE": ["SONDERJYSKE", "SonderjyskE", "SønderjyskE", "Sonderjyske"],
 }
 
 # ---------------------------------------------------------------------------
@@ -436,6 +441,7 @@ ELITESERIEN_TEAM_ALIASES: dict[str, list[str]] = {
     "KRISTIANSUND": ["KRISTIANSUND", "Kristiansund BK"],
     "HAMKAM": ["HAMKAM", "HamKam"],
     "ODD": ["ODD", "Odds BK"],
+    "VALERENGA": ["VALERENGA", "Vålerenga", "Valerenga IF", "Vålerenga IF"],
 }
 
 # ---------------------------------------------------------------------------
@@ -578,6 +584,12 @@ ARGENTINA_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
     "ROSARIO_CENTRAL": ["ROSARIO CENTRAL", "Rosario Central"],
     "TIGRE": ["TIGRE", "CA Tigre"],
     "UNION_SANTA_FE": ["UNION", "UNION SANTA FE", "Union de Santa Fe"],
+    "ESTUDIANTES_RIO_CUARTO": [
+        "ESTUDIANTES DE RIO CUARTO",
+        "Estudiantes de Río Cuarto",
+        "Estudiantes Rio Cuarto",
+        "Estudiantes RC",
+    ],
 }
 
 # ---------------------------------------------------------------------------
@@ -610,6 +622,8 @@ BRASILEIRAO_TEAM_ALIASES: dict[str, list[str]] = {
     "BRAGANTINO": ["BRAGANTINO", "Red Bull Bragantino"],
     "VITORIA": ["VITORIA", "EC Vitoria"],
     "CRICIUMA": ["CRICIUMA", "Criciuma EC"],
+    "MIRASSOL": ["MIRASSOL", "Mirassol FC SP", "Mirassol FC", "Mirassol"],
+    "REMO": ["REMO", "Clube do Remo PA", "Clube do Remo", "Remo"],
 }
 
 # ---------------------------------------------------------------------------
@@ -638,6 +652,7 @@ GREEK_SUPER_LEAGUE_TEAM_ALIASES: dict[str, list[str]] = {
     "IONIKOS": ["IONIKOS", "Ionikos FC"],
     "LEVADIAKOS": ["LEVADIAKOS", "Levadiakos FC"],
     "GIANNINA": ["GIANNINA", "PAS Giannina"],
+    "KIFISIA": ["KIFISIA", "AE Kifisia FC", "AE Kifisia", "Kifisia"],
 }
 
 # ---------------------------------------------------------------------------
@@ -663,6 +678,8 @@ EKSTRAKLASA_TEAM_ALIASES: dict[str, list[str]] = {
     "RADOMIAK": ["RADOMIAK", "Radomiak Radom"],
     "PUSZCZA_NIEPOLOMICE": ["PUSZCZA NIEPOLOMICE", "Puszcza Niepolomice"],
     "GORNIK_LECZNA": ["GORNIK LECZNA", "Gornik Leczna"],
+    "NIECIECZA": ["NIECIECZA", "Bruk-Bet Nieciecza", "Termalica Nieciecza", "Nieciecza"],
+    "ARKA_GDYNIA": ["ARKA GDYNIA", "Arka Gdynia"],
 }
 
 # ---------------------------------------------------------------------------
@@ -1006,6 +1023,9 @@ SERIE_B_TEAM_ALIASES: dict[str, list[str]] = {
     "SAMPDORIA": ["SAMPDORIA", "UC Sampdoria"],
     "SPEZIA": ["SPEZIA", "Spezia Calcio"],
     "TERNANA": ["TERNANA", "Ternana Calcio"],
+    "AVELLINO": ["AVELLINO", "US Avellino", "Avellino"],
+    "CARRARESE": ["CARRARESE", "Carrarese Calcio"],
+    "PESCARA": ["PESCARA", "Delfino Pescara", "Pescara Calcio"],
 }
 
 # ---------------------------------------------------------------------------
@@ -1497,6 +1517,8 @@ API_FOOTBALL_TO_CANONICAL_PRIMEIRA_LIGA: dict[str, str] = {
     "Estoril Praia": "ESTORIL",
     "Estoril": "ESTORIL",
     "Estrela da Amadora": "ESTRELA_AMADORA",
+    "FC Alverca": "ALVERCA",
+    "Alverca": "ALVERCA",
 }
 
 API_FOOTBALL_TO_CANONICAL_JUPILER_PRO: dict[str, str] = {
@@ -1528,6 +1550,11 @@ API_FOOTBALL_TO_CANONICAL_JUPILER_PRO: dict[str, str] = {
     "Charleroi": "CHARLEROI",
     "OH Leuven": "LEUVEN",
     "KV Kortrijk": "KORTRIJK",
+    "Dender EH": "DENDER",
+    "FCV Dender EH": "DENDER",
+    "Dender": "DENDER",
+    "RAAL La Louvière": "RAAL_LA_LOUVIERE",
+    "RAAL La Louviere": "RAAL_LA_LOUVIERE",
 }
 
 API_FOOTBALL_TO_CANONICAL_DANISH_SUPERLIGA: dict[str, str] = {
@@ -1549,6 +1576,11 @@ API_FOOTBALL_TO_CANONICAL_DANISH_SUPERLIGA: dict[str, str] = {
     "Lyngby BK": "LYNGBY",
     "Hvidovre IF": "HVIDOVRE",
     "Vejle BK": "VEJLE",
+    "FC Fredericia": "FREDERICIA",
+    "Fredericia": "FREDERICIA",
+    "SonderjyskE": "SONDERJYSKE",
+    "SønderjyskE": "SONDERJYSKE",
+    "Sonderjyske": "SONDERJYSKE",
 }
 
 API_FOOTBALL_TO_CANONICAL_MLS: dict[str, str] = {
@@ -1637,6 +1669,10 @@ API_FOOTBALL_TO_CANONICAL_ELITESERIEN: dict[str, str] = {
     "Kristiansund BK": "KRISTIANSUND",
     "HamKam": "HAMKAM",
     "Odds BK": "ODD",
+    "Vålerenga": "VALERENGA",
+    "Valerenga IF": "VALERENGA",
+    "Vålerenga IF": "VALERENGA",
+    "Valerenga": "VALERENGA",
 }
 
 API_FOOTBALL_TO_CANONICAL_SWISS_SUPER_LEAGUE: dict[str, str] = {
@@ -1773,6 +1809,9 @@ API_FOOTBALL_TO_CANONICAL_ARGENTINA_PRIMERA: dict[str, str] = {
     "CA Tigre": "TIGRE",
     "Tigre": "TIGRE",
     "Union de Santa Fe": "UNION_SANTA_FE",
+    "Estudiantes de Río Cuarto": "ESTUDIANTES_RIO_CUARTO",
+    "Estudiantes Rio Cuarto": "ESTUDIANTES_RIO_CUARTO",
+    "Estudiantes RC": "ESTUDIANTES_RIO_CUARTO",
 }
 
 API_FOOTBALL_TO_CANONICAL_BRASILEIRAO: dict[str, str] = {
@@ -1823,6 +1862,12 @@ API_FOOTBALL_TO_CANONICAL_BRASILEIRAO: dict[str, str] = {
     "Vitoria": "VITORIA",
     "Criciuma EC": "CRICIUMA",
     "Criciuma": "CRICIUMA",
+    "Mirassol FC SP": "MIRASSOL",
+    "Mirassol FC": "MIRASSOL",
+    "Mirassol": "MIRASSOL",
+    "Clube do Remo PA": "REMO",
+    "Clube do Remo": "REMO",
+    "Remo": "REMO",
 }
 
 API_FOOTBALL_TO_CANONICAL_GREEK_SUPER_LEAGUE: dict[str, str] = {
@@ -1858,6 +1903,9 @@ API_FOOTBALL_TO_CANONICAL_GREEK_SUPER_LEAGUE: dict[str, str] = {
     "Levadiakos FC": "LEVADIAKOS",
     "Levadiakos": "LEVADIAKOS",
     "PAS Giannina": "GIANNINA",
+    "AE Kifisia FC": "KIFISIA",
+    "AE Kifisia": "KIFISIA",
+    "Kifisia": "KIFISIA",
 }
 
 API_FOOTBALL_TO_CANONICAL_EKSTRAKLASA: dict[str, str] = {
@@ -1882,6 +1930,10 @@ API_FOOTBALL_TO_CANONICAL_EKSTRAKLASA: dict[str, str] = {
     "Korona Kielce": "KORONA_KIELCE",
     "Motor Lublin": "MOTOR_LUBLIN",
     "Radomiak Radom": "RADOMIAK",
+    "Bruk-Bet Nieciecza": "NIECIECZA",
+    "Termalica Nieciecza": "NIECIECZA",
+    "Nieciecza": "NIECIECZA",
+    "Arka Gdynia": "ARKA_GDYNIA",
 }
 
 API_FOOTBALL_TO_CANONICAL_SUPER_LIG: dict[str, str] = {

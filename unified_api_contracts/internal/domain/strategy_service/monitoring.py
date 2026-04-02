@@ -189,11 +189,89 @@ class StrategyDecisionData:
     metadata: dict[str, object] = field(default_factory=dict)
 
 
+@dataclass
+class StrategyNAV:
+    """Net asset value snapshot with share-class currency conversion.
+
+    Attributes:
+        strategy_id: Strategy that this NAV belongs to.
+        timestamp: ISO-8601 timestamp of the snapshot.
+        nav_in_share_class: NAV denominated in the strategy's share class currency.
+        nav_in_usd: NAV converted to USD for cross-strategy comparison.
+        base_currency_fx_rate: FX rate from share class to USD.
+        delta_vs_base: Absolute deviation of NAV vs base currency benchmark.
+        delta_vs_base_pct: Percentage deviation of NAV vs base currency benchmark.
+        delta_rebalance_needed: Whether delta exceeds the rebalance threshold.
+        pnl_share_class: P&L in share class currency since inception.
+        pnl_usd: P&L in USD since inception.
+    """
+
+    strategy_id: str
+    timestamp: str
+    nav_in_share_class: Decimal = Decimal("0")
+    nav_in_usd: Decimal = Decimal("0")
+    base_currency_fx_rate: Decimal = Decimal("1")
+    delta_vs_base: Decimal = Decimal("0")
+    delta_vs_base_pct: Decimal = Decimal("0")
+    delta_rebalance_needed: bool = False
+    pnl_share_class: Decimal = Decimal("0")
+    pnl_usd: Decimal = Decimal("0")
+
+
+@dataclass
+class ShareClassConfig:
+    """Configuration for share-class currency management.
+
+    Attributes:
+        share_class: The base currency denomination (USDT, ETH, BTC).
+        delta_rebalance_threshold_pct: Percentage threshold triggering a rebalance.
+        delta_rebalance_min_notional_usd: Minimum notional USD to trigger a rebalance.
+        treasury_base_asset: The specific asset used for treasury denomination.
+    """
+
+    share_class: str = "USDT"
+    delta_rebalance_threshold_pct: Decimal = Decimal("2.0")
+    delta_rebalance_min_notional_usd: Decimal = Decimal("1000")
+    treasury_base_asset: str = "USDT"
+
+
+@dataclass
+class RebalanceCostEstimate:
+    """Estimated cost of a rebalance or emergency close operation.
+
+    Attributes:
+        strategy_id: Strategy being rebalanced.
+        action: "REBALANCE" or "EMERGENCY_CLOSE".
+        estimated_gas_usd: Estimated gas cost in USD.
+        estimated_slippage_usd: Estimated slippage cost in USD.
+        estimated_bridge_fees_usd: Estimated cross-chain bridge fees in USD.
+        estimated_exchange_fees_usd: Estimated exchange/DEX fees in USD.
+        total_estimated_cost_usd: Sum of all cost components.
+        total_as_pct_of_nav: Total cost as a percentage of strategy NAV.
+        estimated_time_minutes: Estimated time to complete the operation.
+        instructions_count: Number of execution instructions needed.
+    """
+
+    strategy_id: str
+    action: str
+    estimated_gas_usd: Decimal = Decimal("0")
+    estimated_slippage_usd: Decimal = Decimal("0")
+    estimated_bridge_fees_usd: Decimal = Decimal("0")
+    estimated_exchange_fees_usd: Decimal = Decimal("0")
+    total_estimated_cost_usd: Decimal = Decimal("0")
+    total_as_pct_of_nav: Decimal = Decimal("0")
+    estimated_time_minutes: int = 0
+    instructions_count: int = 0
+
+
 __all__ = [
     "ExposureData",
     "OrderData",
     "PnLData",
     "PositionData",
+    "RebalanceCostEstimate",
     "RiskData",
+    "ShareClassConfig",
     "StrategyDecisionData",
+    "StrategyNAV",
 ]

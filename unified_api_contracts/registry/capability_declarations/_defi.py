@@ -53,17 +53,14 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "OPTIMISM": "FhHNkfh5z6Z2WCEBxB6V3s8RPxnJfWZ9zAfM5bVvbvbb",
         "SCROLL": "6aRGn6noEdin1krLfYTnLMYaCoTujL7cHekARE4Ndxng",
     },
-    "morpho": {  # Verified from docs.morpho.org/tools/offchain/subgraphs/
+    "morpho": {
+        # Morpho adapter uses blue-api.morpho.org (NOT The Graph subgraphs).
+        # IDs here are subgraph IDs from docs.morpho.org but only used to declare
+        # which chains instruments-service should query. Only list chains where
+        # Morpho Blue has markets with major assets (DEFI_MAJOR_ASSET_SYMBOLS).
+        # ARBITRUM/OPTIMISM/POLYGON/SCROLL: 0 major-asset markets as of 2026-03.
         "ETHEREUM": "8Lz789DP5VKLXumTMTgygjU2xtuzx8AhbaacgN5PYCAs",
         "BASE": "71ZTy1veF9twER9CLMnPWeLQ7GZcwKsjmygejrgKirqs",
-        "ARBITRUM": "XsJn88DNCHJ1kgTqYeTgHMSK4LuG1LR75339QVeQ26",
-        "OPTIMISM": "5y8d3K3vVCR7r5YwANGCjupLc3hUge54XvhYMEq3Jmq1",
-        "POLYGON": "EhFokmwryNs7qbvostceRqVdjc3petuD13mmdUiMBw8Y",
-        "SCROLL": "Aic7prLAxhtipUEbLu5BhDDWf4LssT9n3DG4fT9yCRqm",
-    },
-    "euler_v2": {
-        # Euler uses Goldsky (not The Graph). Adapter queries Goldsky URLs directly.
-        "ETHEREUM": "euler-v2-mainnet",
     },
     "fluid": {
         "ETHEREUM": "fluid-mainnet",
@@ -181,6 +178,21 @@ SOLANA_RPC_TEMPLATES: dict[str, str] = {
 
 # All RPC templates use secret: alchemy-api-key (DATA_SOURCE_TO_SECRET in canonical_mappings)
 # Same key works for EVM + Solana on Alchemy.
+
+# ---------------------------------------------------------------------------
+# Protected RPC URLs for MEV-resistant transaction submission (SSOT)
+#
+# Used by execution-service MEV protection layer (mev/protection.py).
+# Connectors must NOT hardcode these — import from here.
+# ETHEREUM: Flashbots Protect (free, no auth needed, blocks sandwich attacks)
+# ETHEREUM_BUNDLE: Flashbots Bundle relay (requires ethers signing for bundles)
+# MEV_BLOCKER: CoW Protocol MEV Blocker (aggregates multiple builders)
+# ---------------------------------------------------------------------------
+PROTECTED_RPC_URLS: dict[str, str] = {
+    "ETHEREUM": "https://rpc.flashbots.net",  # Flashbots Protect (MEV Blocker)
+    "ETHEREUM_BUNDLE": "https://relay.flashbots.net",  # Flashbots Bundle relay
+    "MEV_BLOCKER": "https://rpc.mevblocker.io",  # CoW Protocol MEV Blocker
+}
 
 # ---------------------------------------------------------------------------
 # Chain native gas tokens (SSOT)
@@ -385,6 +397,7 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
     "jito": {
         "name": "Jito",
         "type": "liquid_staking",
+        "api_url": "https://kobe.mainnet.jito.network",
         "program_id": "Jito4APyf642JPZPx3hGc6WWJ8zPKtRbRs4P3eg9gB",
         "data_source": "helius",
     },

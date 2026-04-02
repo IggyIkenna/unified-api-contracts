@@ -43,7 +43,6 @@ AERODROME_BASE = "AERODROME-BASE"
 AAVE_V3 = "AAVE_V3"
 AAVE_V3_ETH = "AAVEV3-ETHEREUM"
 MORPHO_ETHEREUM = "MORPHO-ETHEREUM"
-EULER_PLASMA = "EULER-PLASMA"
 FLUID_PLASMA = "FLUID-PLASMA"
 AAVE_PLASMA = "AAVE-PLASMA"
 LIDO = "LIDO"
@@ -296,7 +295,6 @@ ZERO_ALPHA_VENUES: set[str] = {
     AAVE_V3,
     AAVE_V3_ETH,
     MORPHO_ETHEREUM,
-    EULER_PLASMA,
     FLUID_PLASMA,
     AAVE_PLASMA,
     LIDO,
@@ -337,7 +335,6 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     AAVE_V3: "defi",
     AAVE_V3_ETH: "defi",
     MORPHO_ETHEREUM: "defi",
-    EULER_PLASMA: "defi",
     FLUID_PLASMA: "defi",
     AAVE_PLASMA: "defi",
     LIDO: "defi",
@@ -347,15 +344,15 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
 VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
-    BINANCE_SPOT: {"SPOT"},
-    COINBASE_SPOT: {"SPOT"},
-    OKX_SPOT: {"SPOT"},
+    BINANCE_SPOT: {"SPOT_PAIR"},
+    COINBASE_SPOT: {"SPOT_PAIR"},
+    OKX_SPOT: {"SPOT_PAIR"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
-    "OKX": {"SPOT", "PERPETUAL", "FUTURE", "OPTION"},
-    BYBIT_SPOT: {"SPOT"},
+    "OKX": {"SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"},
+    BYBIT_SPOT: {"SPOT_PAIR"},
     BYBIT_FUTURES: {"PERPETUAL", "FUTURE"},
-    "BYBIT": {"SPOT", "PERPETUAL", "FUTURE"},
-    UPBIT: {"SPOT"},
+    "BYBIT": {"SPOT_PAIR", "PERPETUAL", "FUTURE"},
+    UPBIT: {"SPOT_PAIR"},
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
     DERIBIT: {"PERPETUAL", "FUTURE", "OPTION"},
     HYPERLIQUID: {"PERPETUAL"},
@@ -378,7 +375,6 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     AAVE_V3: {"LENDING"},
     AAVE_V3_ETH: {"LENDING"},
     MORPHO_ETHEREUM: {"LENDING"},
-    EULER_PLASMA: {"LENDING"},
     FLUID_PLASMA: {"LENDING"},
     AAVE_PLASMA: {"LENDING"},
     LIDO: {"STAKING"},
@@ -393,8 +389,6 @@ INSTRUMENT_TYPES_BY_VENUE.update({v: {"PROP"} for v in SPORTS_DFS_VENUES})
 
 INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PERPETUAL": "perpetuals",
-    "PERP": "perpetuals",
-    "SPOT": "spot",
     "SPOT_PAIR": "spot_pairs",
     "ETF": "etf",
     "EQUITY": "equities",
@@ -417,6 +411,7 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "FIXED_ODDS": "fixed_odds",
     "PREDICTION_MARKET": "prediction_markets",
     "PROP": "props",
+    "COMBO": "combos",
 }
 
 
@@ -481,7 +476,6 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     AAVE_V3: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
     AAVE_V3_ETH: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
     MORPHO_ETHEREUM: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
-    EULER_PLASMA: {VenueCapability.LEND, VenueCapability.BORROW},
     FLUID_PLASMA: {VenueCapability.LEND, VenueCapability.BORROW},
     AAVE_PLASMA: {VenueCapability.LEND, VenueCapability.BORROW},
     LIDO: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
@@ -623,7 +617,6 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     AAVE_V3: _DEFI_LENDING,
     AAVE_V3_ETH: _DEFI_LENDING,
     MORPHO_ETHEREUM: _DEFI_LENDING,
-    EULER_PLASMA: _DEFI_LENDING,
     FLUID_PLASMA: _DEFI_LENDING,
     AAVE_PLASMA: _DEFI_LENDING,
     # DeFi staking
@@ -661,7 +654,6 @@ VENUE_PROTOCOL_TYPE: dict[str, DefiProtocolType] = {
     AAVE_V3: DefiProtocolType.LENDING,
     AAVE_V3_ETH: DefiProtocolType.LENDING,
     MORPHO_ETHEREUM: DefiProtocolType.LENDING,
-    EULER_PLASMA: DefiProtocolType.LENDING,
     FLUID_PLASMA: DefiProtocolType.LENDING,
     AAVE_PLASMA: DefiProtocolType.LENDING,
     LIDO: DefiProtocolType.LIQUID_STAKING,
@@ -679,7 +671,6 @@ VENUE_CHAIN_MAP: dict[str, str] = {
     AAVE_V3: "ethereum",
     AAVE_V3_ETH: "ethereum",
     MORPHO_ETHEREUM: "ethereum",
-    EULER_PLASMA: "ethereum",
     FLUID_PLASMA: "ethereum",
     AAVE_PLASMA: "ethereum",
     LIDO: "ethereum",
@@ -738,7 +729,6 @@ VENUE_FEE_MODEL_MAP: dict[str, VenueFeeModel] = {
     AAVE_V3: VenueFeeModel.RATE_BASED,
     AAVE_V3_ETH: VenueFeeModel.RATE_BASED,
     MORPHO_ETHEREUM: VenueFeeModel.RATE_BASED,
-    EULER_PLASMA: VenueFeeModel.RATE_BASED,
     FLUID_PLASMA: VenueFeeModel.RATE_BASED,
     AAVE_PLASMA: VenueFeeModel.RATE_BASED,
     LIDO: VenueFeeModel.RATE_BASED,
@@ -775,7 +765,6 @@ INSTRUCTION_VALID_DOMAINS: dict[str, set[str]] = {
 INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
     "TRADE": {
         "PERPETUAL",
-        "SPOT",
         "SPOT_PAIR",
         "FUTURE",
         "OPTION",
@@ -794,7 +783,7 @@ INSTRUCTION_VALID_INSTRUMENT_TYPES: dict[str, set[str]] = {
     "UNSTAKE": {"STAKING"},
     "FLASH_LOAN": {"LENDING"},
     "ZERO_ALPHA": {"YIELD_BEARING", "DEBT_TOKEN", "LST", "A_TOKEN", "LENDING", "STAKING"},
-    "TRANSFER": {"SPOT", "SPOT_PAIR", "SPOT_ASSET"},
+    "TRANSFER": {"SPOT_PAIR", "SPOT_ASSET"},
     "BET": {"FIXED_ODDS", "EXCHANGE_ODDS", "SPREAD", "OVER_UNDER", "OUTRIGHT", "PROP"},
     "PREDICTION_BET": {"PREDICTION_MARKET"},
     "SPORTS_BET": {"FIXED_ODDS", "PROP"},
@@ -842,7 +831,6 @@ VENUE_ALPHA_PROFILE: dict[str, AlphaProfile] = {
     AAVE_V3: AlphaProfile.ZERO_ALPHA,
     AAVE_V3_ETH: AlphaProfile.ZERO_ALPHA,
     MORPHO_ETHEREUM: AlphaProfile.ZERO_ALPHA,
-    EULER_PLASMA: AlphaProfile.ZERO_ALPHA,
     FLUID_PLASMA: AlphaProfile.ZERO_ALPHA,
     AAVE_PLASMA: AlphaProfile.ZERO_ALPHA,
     LIDO: AlphaProfile.ZERO_ALPHA,

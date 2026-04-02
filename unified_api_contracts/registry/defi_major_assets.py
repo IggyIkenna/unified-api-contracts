@@ -27,6 +27,8 @@ DEFI_MAJOR_ASSET_SYMBOLS: frozenset[str] = frozenset({
     # Major DeFi governance / Aave collateral
     "AAVE", "LINK", "UNI", "MKR", "CRV", "SNX", "BAL", "LDO", "RPL",
     "COMP", "YFI", "SUSHI", "1INCH", "FXS",
+    # EigenLayer + EtherFi governance tokens (reward tokens for restaking)
+    "EIGEN", "ETHFI",
     # Other liquid assets on Aave / multi-chain
     "SOL", "MATIC", "WMATIC", "AVAX", "WAVAX", "BNB", "WBNB",
     # Solana liquid staking + top ecosystem tokens
@@ -98,6 +100,9 @@ DEFI_MAJOR_ASSET_ADDRESSES: dict[str, str] = {
     "COMP": "0xc00e94Cb662C3520282E6f5717214004A7f26888",
     "1INCH": "0x111111111117dC0aa78b770fA6A738034120C302",
     "FXS": "0x3432B6A60D23Ca0dFCa7761B7ab56459D9C964D0",
+    # EigenLayer + EtherFi governance tokens (reward tokens for restaking)
+    "EIGEN": "0xec53bF9167f50cDEB3Ae105f56099aaaB9061F83",
+    "ETHFI": "0xFe0c30065B384F05761f15d0CC899D4F9F9Cc0eB",
 }
 # fmt: on
 

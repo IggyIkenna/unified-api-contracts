@@ -29,7 +29,7 @@ class TestMarginHealth:
             timestamp=datetime.now(UTC),
             venue="binance",
             venue_type="cefi",
-            position_type="PERP",
+            position_type="PERPETUAL",
             margin_usage_pct=Decimal("65.5"),
             collateral_usd=Decimal("50000"),
             liquidation_price=Decimal("55000"),

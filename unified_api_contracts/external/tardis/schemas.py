@@ -45,13 +45,15 @@ class TardisInstrument(BaseModel):
 
 
 class TardisInstrumentDetail(BaseModel):
-    """Instrument entry from Tardis exchange detail endpoint.
+    """Instrument from Tardis instruments metadata API.
 
-    Returned as items inside the ``instruments`` array of
-    GET https://api.tardis.dev/v1/exchanges/{exchange}.
+    Returned by GET https://api.tardis.dev/v1/instruments/{exchange}
+    or GET https://api.tardis.dev/v1/instruments/{exchange}/{symbol_id}.
 
-    Fields match the /v1/exchanges/{id} response shape, which is different
-    from the generic TardisInstrument used for other Tardis data endpoints.
+    Also constructed from the simpler ``availableSymbols`` array of
+    GET /v1/exchanges/{exchange} (fields beyond the basic set will be None).
+
+    Ref: https://docs.tardis.dev/api/instruments-metadata-api
     """
 
     id: str
@@ -63,6 +65,16 @@ class TardisInstrumentDetail(BaseModel):
     expiry: str | None = None
     strikePrice: float | None = None
     optionType: str | None = None
+    # Instrument specification fields (from /v1/instruments endpoint)
+    priceIncrement: float | None = None
+    amountIncrement: float | None = None
+    minTradeAmount: float | None = None
+    contractMultiplier: float | None = None
+    inverse: bool | None = None
+    contractType: str | None = None
+    active: bool | None = None
+    makerFee: float | None = None
+    takerFee: float | None = None
 
 
 class TardisAvailableSymbol(BaseModel):

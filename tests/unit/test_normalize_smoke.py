@@ -183,16 +183,6 @@ class TestErrorNormalizersExchanges:
         assert isinstance(normalize_versifi_error(401), CanonicalAuthenticationError)
         assert isinstance(normalize_versifi_error("NOCODE"), CanonicalError)
 
-    def test_kraken_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_kraken_error,
-        )
-
-        assert isinstance(normalize_kraken_error("EAPI:Rate limit exceeded"), CanonicalRateLimitError)
-        assert isinstance(normalize_kraken_error("429"), CanonicalRateLimitError)
-        assert isinstance(normalize_kraken_error(401), CanonicalAuthenticationError)
-        assert isinstance(normalize_kraken_error("UNKNOWN_STR"), CanonicalError)
-
     def test_kucoin_known_and_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_kucoin_error,
@@ -202,16 +192,6 @@ class TestErrorNormalizersExchanges:
         assert isinstance(normalize_kucoin_error("200004"), CanonicalInsufficientBalanceError)
         assert isinstance(normalize_kucoin_error(401), CanonicalAuthenticationError)
         assert isinstance(normalize_kucoin_error("NOCODE"), CanonicalError)
-
-    def test_bitstamp_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_bitstamp_error,
-        )
-
-        assert isinstance(normalize_bitstamp_error("API0002"), CanonicalAuthenticationError)
-        assert isinstance(normalize_bitstamp_error("429"), CanonicalRateLimitError)
-        assert isinstance(normalize_bitstamp_error(403), CanonicalAuthorizationError)
-        assert isinstance(normalize_bitstamp_error("NOCODE"), CanonicalError)
 
     def test_mexc_known_and_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (

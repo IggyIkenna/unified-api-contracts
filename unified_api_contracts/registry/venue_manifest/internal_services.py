@@ -131,13 +131,9 @@ INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
         "has_vcr_cassettes": False,
         "cassette_schema_version": "1.0",
         "response_schema_classes": [
-            "TickToTradeMetric",
             "OrderLatencyRecord",
-            "CoLocationPerformanceMetric",
             "NetworkJitterMetric",
-            "SubMillisecondLatencyRecord",
-            "LatencyPercentile",
-            "LatencyBenchmarkReport",
+            "LatencyComponent",
         ],
     },
     "analytics": {

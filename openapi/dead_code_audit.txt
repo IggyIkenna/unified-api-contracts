@@ -3,15 +3,15 @@ Dead Code Audit Report
 ========================================================================
 
 Workspace: /Users/ikennaigboaka/Code/unified-trading-system-repos
-Elapsed:   49.2s
+Elapsed:   564.4s
 
 SUMMARY
 ----------------------------------------
   Services audited:     25
-  Total modules:      1964
-  Reachable:           958
-  Orphan modules:      545
-  Dead branches:       461
+  Total modules:      1948
+  Reachable:          1060
+  Orphan modules:      453
+  Dead branches:       435
 
 SERVICES WITH DEAD CODE
 ----------------------------------------
@@ -43,18 +43,12 @@ SERVICES WITH DEAD CODE
       - alerting_service/rules/reconciliation_rules.py
       - alerting_service/rules/sports_rules.py
 
-  batch-live-reconciliation-service (25 modules, 16 reachable)
+  batch-live-reconciliation-service (25 modules, 22 reachable)
     Entry points: batch_live_reconciliation_service/cli/main.py, batch_live_reconciliation_service/__main__.py, batch_live_reconciliation_service/api/main.py, batch_live_reconciliation_service/config.py, batch_live_reconciliation_service/__init__.py
-    ORPHAN_MODULE (9):
-      - batch_live_reconciliation_service/api/__init__.py
+    ORPHAN_MODULE (3):
       - batch_live_reconciliation_service/api/resolution_api.py
       - batch_live_reconciliation_service/auth_s2s.py
-      - batch_live_reconciliation_service/cli/__init__.py
-      - batch_live_reconciliation_service/cli/handlers/__init__.py
       - batch_live_reconciliation_service/config_reloaders.py
-      - batch_live_reconciliation_service/engine/__init__.py
-      - batch_live_reconciliation_service/models/__init__.py
-      - batch_live_reconciliation_service/stages/__init__.py
 
   client-reporting-api (31 modules, 22 reachable)
     Entry points: client_reporting_api/__main__.py, client_reporting_api/api/main.py, client_reporting_api/config.py, client_reporting_api/__init__.py
@@ -69,7 +63,7 @@ SERVICES WITH DEAD CODE
       - client_reporting_api/core/tranche_router.py
       - client_reporting_api/main.py
 
-  deployment-api (93 modules, 2 reachable)
+  deployment-api (94 modules, 2 reachable)
     Entry points: deployment_api/__main__.py, deployment_api/__init__.py
     ORPHAN_MODULE (28):
       - deployment_api/app_config.py
@@ -100,7 +94,7 @@ SERVICES WITH DEAD CODE
       - deployment_api/workers/__init__.py
       - deployment_api/workers/deployment_processor.py
       - deployment_api/workers/deployment_worker.py
-    DEAD_BRANCH (63):
+    DEAD_BRANCH (64):
       - deployment_api/auth.py
       - deployment_api/background_sync.py
       - deployment_api/clients/__init__.py
@@ -120,6 +114,7 @@ SERVICES WITH DEAD CODE
       - deployment_api/routes/_cloud_builds_history.py
       - deployment_api/routes/_cloud_builds_trigger.py
       - deployment_api/routes/_cloud_builds_types.py
+      - deployment_api/routes/_code_builds_aws.py
       - deployment_api/routes/batch_cache_manager.py
       - deployment_api/routes/batch_config_utils.py
       - deployment_api/routes/batch_query_engine.py
@@ -216,9 +211,9 @@ SERVICES WITH DEAD CODE
       - deployment_service/services/status_service.py
       - deployment_service/shard_builder.py
 
-  execution-service (560 modules, 326 reachable)
+  execution-service (559 modules, 328 reachable)
     Entry points: execution_service/cli/main.py, execution_service/__main__.py, execution_service/api/main.py, execution_service/api/app.py, execution_service/__init__.py
-    ORPHAN_MODULE (113):
+    ORPHAN_MODULE (106):
       - execution_service/adapters/__init__.py
       - execution_service/algorithms/algo_library_adapter.py
       - execution_service/algorithms/impl/__init__.py
@@ -245,14 +240,13 @@ SERVICES WITH DEAD CODE
       - execution_service/data/config/__init__.py
       - execution_service/data/converter_bars.py
       - execution_service/data/converter_utils.py
-      - execution_service/data/defi_nautilus_verification.py
-      - execution_service/data/defi_test_data_generator.py
       - execution_service/data/loader_gcs.py
       - execution_service/data/loader_local.py
       - execution_service/data/loader_transforms.py
       - execution_service/data/loaders/__init__.py
-      - execution_service/data/tradfi_test_data_generator.py
+      - execution_service/data/schema_validator.py
       - execution_service/data/tranche_router.py
+      - execution_service/defi_execution/mev/__init__.py
       - execution_service/defi_execution/protocols/bridge.py
       - execution_service/defi_execution/protocols/drift.py
       - execution_service/defi_execution/protocols/jupiter.py
@@ -263,16 +257,12 @@ SERVICES WITH DEAD CODE
       - execution_service/defi_execution/protocols/weth.py
       - execution_service/engine/backtest/actors/__init__.py
       - execution_service/engine/backtest/actors/tp_sl_generator.py
-      - execution_service/engine/backtest/almgren_chriss_sweep.py
       - execution_service/engine/backtest/fill_models/__init__.py
-      - execution_service/engine/backtest/parallel_algo_runner.py
-      - execution_service/engine/backtest/passive_aggressive_hybrid.py
       - execution_service/engine/backtest/progress_display.py
       - execution_service/engine/execution/__init__.py
       - execution_service/engine/execution_alpha/__init__.py
       - execution_service/engine/handlers/__init__.py
       - execution_service/engine/instruction_convert.py
-      - execution_service/engine/latency_recorder.py
       - execution_service/engine/live/__init__.py
       - execution_service/engine/live/order_converter.py
       - execution_service/engine/live/persistence/__init__.py
@@ -280,19 +270,16 @@ SERVICES WITH DEAD CODE
       - execution_service/engine/modes/__init__.py
       - execution_service/engine/modes/batch/__init__.py
       - execution_service/engine/modes/live/__init__.py
-      - execution_service/engine/multileg_builder.py
-      - execution_service/engine/order_priority.py
-      - execution_service/engine/orphan_monitor.py
-      - execution_service/engine/pnl_monitor.py
       - execution_service/engine/preflight.py
+      - execution_service/engine/preprocessors/__init__.py
+      - execution_service/engine/reference_pricing.py
       - execution_service/engine/risk/__init__.py
       - execution_service/engine/routing/__init__.py
-      - execution_service/engine/spread_imbalance_tracker.py
       - execution_service/engine/startup/__init__.py
+      - execution_service/engine/unwind_cost.py
       - execution_service/engine/validation/__init__.py
       - execution_service/engine/validation/data_availability_validator.py
       - execution_service/engine/validation/instrument_validator.py
-      - execution_service/engine/venue_failover.py
       - execution_service/instruments/__init__.py
       - execution_service/instruments/config_creator.py
       - execution_service/instruments/gcs_creator.py
@@ -304,6 +291,7 @@ SERVICES WITH DEAD CODE
       - execution_service/orchestration/__init__.py
       - execution_service/orders/__init__.py
       - execution_service/orders/fills/__init__.py
+      - execution_service/providers/__init__.py
       - execution_service/results/__init__.py
       - execution_service/results/report_timeline_extractor.py
       - execution_service/results/result_formatter.py
@@ -332,7 +320,7 @@ SERVICES WITH DEAD CODE
       - execution_service/venues/lido.py
       - execution_service/venues/morpho.py
       - execution_service/venues/uniswap.py
-    DEAD_BRANCH (121):
+    DEAD_BRANCH (125):
       - execution_service/adapters/algorithm_factory.py
       - execution_service/adapters/matching_adapter.py
       - execution_service/adapters/sports_router.py
@@ -355,7 +343,9 @@ SERVICES WITH DEAD CODE
       - execution_service/config/grid_utils.py
       - execution_service/config/live_loader.py
       - execution_service/custody/base.py
+      - execution_service/custody/copper.py
       - execution_service/custody/factory.py
+      - execution_service/custody/local_key.py
       - execution_service/custody/mock.py
       - execution_service/data/builder.py
       - execution_service/data/cache_manager.py
@@ -368,14 +358,13 @@ SERVICES WITH DEAD CODE
       - execution_service/data/converter_base.py
       - execution_service/data/converter_orderbook.py
       - execution_service/data/converter_trades.py
-      - execution_service/data/defi_schema_validator.py
       - execution_service/data/loaders/base.py
       - execution_service/data/loaders/defi.py
       - execution_service/data/loaders/instruments.py
       - execution_service/data/loaders/tick_data.py
-      - execution_service/data/nautilus_verification.py
-      - execution_service/data/schema_validator.py
-      - execution_service/data/tradfi_schema_validator.py
+      - execution_service/defi_execution/mev/flashbots.py
+      - execution_service/defi_execution/mev/no_protection.py
+      - execution_service/defi_execution/mev/private_mempool.py
       - execution_service/defi_execution/protocols/solana_base.py
       - execution_service/engine/backtest/actors/actor_messages.py
       - execution_service/engine/backtest/actors/execution_alpha_verifier_actor.py
@@ -390,7 +379,6 @@ SERVICES WITH DEAD CODE
       - execution_service/engine/backtest/engine/__init__.py
       - execution_service/engine/backtest/fill_models/dex_fill_model.py
       - execution_service/engine/circuit_breaker.py
-      - execution_service/engine/concurrent.py
       - execution_service/engine/live/algo_selector.py
       - execution_service/engine/live/config.py
       - execution_service/engine/live/factory.py
@@ -404,7 +392,6 @@ SERVICES WITH DEAD CODE
       - execution_service/engine/live/protocols.py
       - execution_service/engine/live/risk.py
       - execution_service/engine/live/router.py
-      - execution_service/engine/mock_data_provider.py
       - execution_service/engine/modes/batch/data_sink.py
       - execution_service/engine/modes/batch/data_source.py
       - execution_service/engine/modes/batch/matching_engine.py
@@ -413,6 +400,7 @@ SERVICES WITH DEAD CODE
       - execution_service/engine/modes/live/data_source.py
       - execution_service/engine/modes/live/matching_engine.py
       - execution_service/engine/modes/live/trigger.py
+      - execution_service/engine/preprocessors/wrap_preprocessor.py
       - execution_service/engine/risk/pre_trade.py
       - execution_service/engine/risk/pre_trade_client.py
       - execution_service/engine/risk/risk_checker.py
@@ -423,6 +411,10 @@ SERVICES WITH DEAD CODE
       - execution_service/instruments/tradfi_creator.py
       - execution_service/orders/oms.py
       - execution_service/orders/tracker.py
+      - execution_service/providers/base.py
+      - execution_service/providers/benchmark.py
+      - execution_service/providers/factory.py
+      - execution_service/providers/tenderly.py
       - execution_service/services/account_history_client.py
       - execution_service/services/benchmark_service.py
       - execution_service/services/funding_rate_tracker.py
@@ -455,9 +447,9 @@ SERVICES WITH DEAD CODE
       - execution_service/venues/deribit_websocket.py
       - execution_service/venues/registry.py
 
-  features-calendar-service (43 modules, 25 reachable)
+  features-calendar-service (43 modules, 26 reachable)
     Entry points: features_calendar_service/cli/main.py, features_calendar_service/__main__.py, features_calendar_service/api/main.py, features_calendar_service/config.py, features_calendar_service/__init__.py
-    ORPHAN_MODULE (11):
+    ORPHAN_MODULE (10):
       - features_calendar_service/adapters/__init__.py
       - features_calendar_service/api/__init__.py
       - features_calendar_service/auth_s2s.py
@@ -465,7 +457,6 @@ SERVICES WITH DEAD CODE
       - features_calendar_service/cli/handlers/corporate_actions_handler.py
       - features_calendar_service/cli/handlers/economic_results_handler.py
       - features_calendar_service/config_reloaders.py
-      - features_calendar_service/engine/__init__.py
       - features_calendar_service/models.py
       - features_calendar_service/monitors/__init__.py
       - features_calendar_service/service.py
@@ -478,12 +469,10 @@ SERVICES WITH DEAD CODE
       - features_calendar_service/engine/calculators/economic_results_calculator.py
       - features_calendar_service/monitors/feature_freshness.py
 
-  features-commodity-service (38 modules, 25 reachable)
+  features-commodity-service (38 modules, 27 reachable)
     Entry points: features_commodity_service/cli/main.py, features_commodity_service/api/main.py, features_commodity_service/config.py, features_commodity_service/__init__.py
-    ORPHAN_MODULE (11):
-      - features_commodity_service/api/__init__.py
+    ORPHAN_MODULE (9):
       - features_commodity_service/auth_s2s.py
-      - features_commodity_service/cli/__init__.py
       - features_commodity_service/cli/handlers/__init__.py
       - features_commodity_service/config_reloaders.py
       - features_commodity_service/engine/__init__.py
@@ -496,13 +485,11 @@ SERVICES WITH DEAD CODE
       - features_commodity_service/engine/regime/hmm_detector.py
       - features_commodity_service/monitors/feature_freshness.py
 
-  features-cross-instrument-service (39 modules, 25 reachable)
+  features-cross-instrument-service (39 modules, 27 reachable)
     Entry points: features_cross_instrument_service/cli/main.py, features_cross_instrument_service/api/main.py, features_cross_instrument_service/config.py, features_cross_instrument_service/__init__.py
-    ORPHAN_MODULE (10):
-      - features_cross_instrument_service/api/__init__.py
+    ORPHAN_MODULE (8):
       - features_cross_instrument_service/app/__init__.py
       - features_cross_instrument_service/auth_s2s.py
-      - features_cross_instrument_service/cli/__init__.py
       - features_cross_instrument_service/cli/handlers/__init__.py
       - features_cross_instrument_service/config_reloaders.py
       - features_cross_instrument_service/engine/__init__.py
@@ -515,26 +502,19 @@ SERVICES WITH DEAD CODE
       - features_cross_instrument_service/monitors/feature_freshness.py
       - features_cross_instrument_service/schemas/output_schemas.py
 
-  features-delta-one-service (85 modules, 59 reachable)
+  features-delta-one-service (85 modules, 66 reachable)
     Entry points: features_delta_one_service/cli/main.py, features_delta_one_service/__main__.py, features_delta_one_service/api/main.py, features_delta_one_service/config.py, features_delta_one_service/__init__.py
-    ORPHAN_MODULE (20):
+    ORPHAN_MODULE (13):
       - features_delta_one_service/adapters/__init__.py
-      - features_delta_one_service/api/__init__.py
-      - features_delta_one_service/app/__init__.py
       - features_delta_one_service/app/calculators/liquidation_levels.py
       - features_delta_one_service/app/calculators/trendline.py
       - features_delta_one_service/app/calculators/weekly_anchors.py
-      - features_delta_one_service/app/core/__init__.py
       - features_delta_one_service/app/core/multi_period_features.py
       - features_delta_one_service/app/core/timeframe_resampler.py
-      - features_delta_one_service/app/pubsub/__init__.py
       - features_delta_one_service/app/utils/__init__.py
       - features_delta_one_service/auth_s2s.py
-      - features_delta_one_service/cli/__init__.py
-      - features_delta_one_service/cli/handlers/__init__.py
       - features_delta_one_service/cli/handlers/target_handler.py
       - features_delta_one_service/config_reloaders.py
-      - features_delta_one_service/engine/__init__.py
       - features_delta_one_service/models.py
       - features_delta_one_service/monitors/__init__.py
       - features_delta_one_service/service.py
@@ -546,65 +526,34 @@ SERVICES WITH DEAD CODE
       - features_delta_one_service/engine/mock_data_provider.py
       - features_delta_one_service/monitors/feature_freshness.py
 
-  features-multi-timeframe-service (33 modules, 24 reachable)
+  features-multi-timeframe-service (33 modules, 27 reachable)
     Entry points: features_multi_timeframe_service/cli/main.py, features_multi_timeframe_service/api/main.py, features_multi_timeframe_service/config.py, features_multi_timeframe_service/__init__.py
-    ORPHAN_MODULE (8):
-      - features_multi_timeframe_service/api/__init__.py
+    ORPHAN_MODULE (5):
       - features_multi_timeframe_service/auth_s2s.py
-      - features_multi_timeframe_service/cli/__init__.py
       - features_multi_timeframe_service/config_reloaders.py
-      - features_multi_timeframe_service/engine/__init__.py
       - features_multi_timeframe_service/monitors/__init__.py
       - features_multi_timeframe_service/schemas/__init__.py
       - features_multi_timeframe_service/schemas/output_schemas.py
     DEAD_BRANCH (1):
       - features_multi_timeframe_service/monitors/feature_freshness.py
 
-  features-onchain-service (52 modules, 18 reachable)
+  features-onchain-service (54 modules, 46 reachable)
     Entry points: features_onchain_service/cli/main.py, features_onchain_service/__main__.py, features_onchain_service/api/main.py, features_onchain_service/config.py, features_onchain_service/__init__.py
-    ORPHAN_MODULE (13):
-      - features_onchain_service/adapters/__init__.py
+    ORPHAN_MODULE (6):
       - features_onchain_service/adapters/dex_swap_adapter.py
-      - features_onchain_service/api/__init__.py
-      - features_onchain_service/app/__init__.py
-      - features_onchain_service/app/calculators/__init__.py
-      - features_onchain_service/app/core/__init__.py
       - features_onchain_service/auth_s2s.py
-      - features_onchain_service/cli/__init__.py
       - features_onchain_service/config_reloaders.py
-      - features_onchain_service/engine/__init__.py
       - features_onchain_service/engine/validation/__init__.py
       - features_onchain_service/models.py
       - features_onchain_service/monitors/__init__.py
-    DEAD_BRANCH (21):
-      - features_onchain_service/adapters/cryptoquant_adapter.py
-      - features_onchain_service/adapters/data_sink_adapter.py
-      - features_onchain_service/adapters/data_source_adapter.py
-      - features_onchain_service/adapters/defillama_adapter.py
-      - features_onchain_service/adapters/defillama_yields_adapter.py
-      - features_onchain_service/adapters/onchain_loader.py
-      - features_onchain_service/adapters/onchain_writer.py
-      - features_onchain_service/app/calculators/aave_lending_calculator.py
-      - features_onchain_service/app/calculators/aave_risk_calculator.py
-      - features_onchain_service/app/calculators/aave_utilization_calculator.py
-      - features_onchain_service/app/calculators/base.py
-      - features_onchain_service/app/calculators/cryptoquant_exchange_flow.py
-      - features_onchain_service/app/calculators/defillama_tvl.py
-      - features_onchain_service/app/calculators/fear_greed.py
-      - features_onchain_service/app/calculators/flash_loan_calculator.py
-      - features_onchain_service/app/calculators/lst_staking_calculator.py
-      - features_onchain_service/app/calculators/macro_sentiment_calculator.py
-      - features_onchain_service/app/calculators/protocol_rewards_calculator.py
+    DEAD_BRANCH (2):
       - features_onchain_service/engine/mock_data_provider.py
       - features_onchain_service/monitors/feature_freshness.py
-      - features_onchain_service/schemas/output_schemas.py
 
-  features-sports-service (78 modules, 24 reachable)
+  features-sports-service (78 modules, 27 reachable)
     Entry points: features_sports_service/cli/main.py, features_sports_service/api/main.py, features_sports_service/config.py, features_sports_service/__init__.py
-    ORPHAN_MODULE (35):
+    ORPHAN_MODULE (32):
       - features_sports_service/adapters/__init__.py
-      - features_sports_service/api/__init__.py
-      - features_sports_service/app/__init__.py
       - features_sports_service/arb/__init__.py
       - features_sports_service/auth_s2s.py
       - features_sports_service/calculators/advanced_stats_calculator.py
@@ -625,7 +574,6 @@ SERVICES WITH DEAD CODE
       - features_sports_service/calculators/team_xg.py
       - features_sports_service/calculators/venue_context.py
       - features_sports_service/calculators/weather_calculator.py
-      - features_sports_service/cli/__init__.py
       - features_sports_service/cli/batch_write.py
       - features_sports_service/config_reloaders.py
       - features_sports_service/data/__init__.py
@@ -658,52 +606,30 @@ SERVICES WITH DEAD CODE
       - features_sports_service/tracking/_registry_data_b_part3.py
       - features_sports_service/tracking/_registry_types.py
 
-  features-volatility-service (49 modules, 20 reachable)
+  features-volatility-service (49 modules, 36 reachable)
     Entry points: features_volatility_service/cli/main.py, features_volatility_service/__main__.py, features_volatility_service/api/main.py, features_volatility_service/config.py, features_volatility_service/__init__.py
-    ORPHAN_MODULE (16):
-      - features_volatility_service/adapters/__init__.py
-      - features_volatility_service/api/__init__.py
+    ORPHAN_MODULE (9):
       - features_volatility_service/auth_s2s.py
-      - features_volatility_service/calculators/__init__.py
       - features_volatility_service/calculators/base_volatility.py
       - features_volatility_service/calculators/tradfi_vol_surface.py
       - features_volatility_service/calculators/vol_surface_term_structure.py
-      - features_volatility_service/cli/__init__.py
-      - features_volatility_service/cli/handlers/__init__.py
       - features_volatility_service/config_reloaders.py
-      - features_volatility_service/core/__init__.py
       - features_volatility_service/core/volatility_orchestration.py
-      - features_volatility_service/engine/__init__.py
       - features_volatility_service/engine/validation/__init__.py
       - features_volatility_service/monitors/__init__.py
       - features_volatility_service/service.py
-    DEAD_BRANCH (13):
-      - features_volatility_service/adapters/data_sink_adapter.py
-      - features_volatility_service/adapters/data_source_adapter.py
-      - features_volatility_service/calculators/gex_calculator.py
+    DEAD_BRANCH (4):
       - features_volatility_service/calculators/realized_vol_calculator.py
-      - features_volatility_service/calculators/second_order_greeks.py
-      - features_volatility_service/calculators/vrp_calculator.py
-      - features_volatility_service/core/orchestration_service.py
       - features_volatility_service/engine/mock_data_provider.py
-      - features_volatility_service/io/__init__.py
-      - features_volatility_service/io/loader.py
-      - features_volatility_service/io/writer.py
       - features_volatility_service/models.py
       - features_volatility_service/monitors/feature_freshness.py
 
-  instruments-service (73 modules, 66 reachable)
+  instruments-service (78 modules, 77 reachable)
     Entry points: instruments_service/cli/main.py, instruments_service/__main__.py, instruments_service/api/main.py, instruments_service/__init__.py
-    ORPHAN_MODULE (7):
-      - instruments_service/adapters/__init__.py
-      - instruments_service/api/__init__.py
-      - instruments_service/cli/__init__.py
-      - instruments_service/cli/handlers/__init__.py
-      - instruments_service/reference_data/adapters/__init__.py
+    ORPHAN_MODULE (1):
       - instruments_service/reference_data/adapters/sports/_normalizer.py
-      - instruments_service/reference_data/adapters/sports/adapters/__init__.py
 
-  market-data-processing-service (98 modules, 31 reachable)
+  market-data-processing-service (99 modules, 31 reachable)
     Entry points: market_data_processing_service/cli/main.py, market_data_processing_service/__main__.py, market_data_processing_service/api/main.py, market_data_processing_service/config.py, market_data_processing_service/__init__.py
     ORPHAN_MODULE (28):
       - market_data_processing_service/api/__init__.py
@@ -734,7 +660,7 @@ SERVICES WITH DEAD CODE
       - market_data_processing_service/monitors/__init__.py
       - market_data_processing_service/schemas/__init__.py
       - market_data_processing_service/utils/__init__.py
-    DEAD_BRANCH (39):
+    DEAD_BRANCH (40):
       - market_data_processing_service/app/adapters/cefi/book_snapshot_adapter.py
       - market_data_processing_service/app/adapters/cefi/derivative_adapter.py
       - market_data_processing_service/app/adapters/cefi/futures_chain_adapter.py
@@ -743,6 +669,7 @@ SERVICES WITH DEAD CODE
       - market_data_processing_service/app/adapters/cefi/trades_adapter.py
       - market_data_processing_service/app/adapters/defi/book_snapshot_adapter.py
       - market_data_processing_service/app/adapters/defi/flash_loan_adapter.py
+      - market_data_processing_service/app/adapters/defi/fx_rate_adapter.py
       - market_data_processing_service/app/adapters/defi/lending_adapter.py
       - market_data_processing_service/app/adapters/defi/liquidity_adapter.py
       - market_data_processing_service/app/adapters/defi/market_state_adapter.py
@@ -855,9 +782,9 @@ SERVICES WITH DEAD CODE
       - pnl_attribution_service/engine/types.py
       - pnl_attribution_service/metrics.py
 
-  position-balance-monitor-service (80 modules, 52 reachable)
+  position-balance-monitor-service (82 modules, 56 reachable)
     Entry points: position_balance_monitor_service/cli/main.py, position_balance_monitor_service/__main__.py, position_balance_monitor_service/api/main.py, position_balance_monitor_service/config.py, position_balance_monitor_service/__init__.py
-    ORPHAN_MODULE (23):
+    ORPHAN_MODULE (21):
       - position_balance_monitor_service/adapters/__init__.py
       - position_balance_monitor_service/api/__init__.py
       - position_balance_monitor_service/api/margin_health.py
@@ -869,7 +796,6 @@ SERVICES WITH DEAD CODE
       - position_balance_monitor_service/cli/service_entry.py
       - position_balance_monitor_service/config_reloaders.py
       - position_balance_monitor_service/core/correlation_config.py
-      - position_balance_monitor_service/core/defi_health_aggregator.py
       - position_balance_monitor_service/core/defi_lp_aggregator.py
       - position_balance_monitor_service/core/defi_staking_aggregator.py
       - position_balance_monitor_service/core/fee_reconciliation_engine.py
@@ -878,7 +804,6 @@ SERVICES WITH DEAD CODE
       - position_balance_monitor_service/core/pnl_attribution_aggregator.py
       - position_balance_monitor_service/core/risk_group_aggregator.py
       - position_balance_monitor_service/core/transfer_reconciler.py
-      - position_balance_monitor_service/core/treasury_monitor.py
       - position_balance_monitor_service/engine/__init__.py
       - position_balance_monitor_service/position_interface/adapters/__init__.py
     DEAD_BRANCH (5):
@@ -888,12 +813,10 @@ SERVICES WITH DEAD CODE
       - position_balance_monitor_service/core/sports_position_tracker.py
       - position_balance_monitor_service/engine/mock_data_provider.py
 
-  risk-and-exposure-service (49 modules, 27 reachable)
+  risk-and-exposure-service (49 modules, 31 reachable)
     Entry points: risk_and_exposure_service/cli/main.py, risk_and_exposure_service/__main__.py, risk_and_exposure_service/api/main.py, risk_and_exposure_service/config.py, risk_and_exposure_service/__init__.py
-    ORPHAN_MODULE (15):
+    ORPHAN_MODULE (11):
       - risk_and_exposure_service/adapters/__init__.py
-      - risk_and_exposure_service/api/__init__.py
-      - risk_and_exposure_service/cli/__init__.py
       - risk_and_exposure_service/cli/handlers/__init__.py
       - risk_and_exposure_service/cli/parser.py
       - risk_and_exposure_service/config_reloaders.py
@@ -903,8 +826,6 @@ SERVICES WITH DEAD CODE
       - risk_and_exposure_service/core/greeks_risk.py
       - risk_and_exposure_service/core/monte_carlo_var.py
       - risk_and_exposure_service/core/risk_dimensions/__init__.py
-      - risk_and_exposure_service/engine/__init__.py
-      - risk_and_exposure_service/engine/orchestrator.py
       - risk_and_exposure_service/engine/sports_risk.py
     DEAD_BRANCH (7):
       - risk_and_exposure_service/adapters/alert_adapter.py
@@ -915,79 +836,48 @@ SERVICES WITH DEAD CODE
       - risk_and_exposure_service/core/risk_dimensions/spread.py
       - risk_and_exposure_service/core/risk_dimensions/venue_protocol.py
 
-  strategy-service (159 modules, 9 reachable)
+  strategy-service (133 modules, 14 reachable)
     Entry points: strategy_service/__main__.py, strategy_service/api/main.py, strategy_service/config.py, strategy_service/__init__.py
-    ORPHAN_MODULE (58):
-      - strategy_service/adapters/__init__.py
+    ORPHAN_MODULE (32):
       - strategy_service/adapters/sports_feature_subscriber.py
-      - strategy_service/api/__init__.py
-      - strategy_service/auth_s2s.py
-      - strategy_service/cli/__init__.py
       - strategy_service/cli/grid_generator.py
       - strategy_service/cli/handlers/__init__.py
-      - strategy_service/compliance/__init__.py
       - strategy_service/core/__init__.py
       - strategy_service/core/portfolio_view_consumer.py
       - strategy_service/engine/__init__.py
       - strategy_service/engine/backtest/__init__.py
-      - strategy_service/engine/core/__init__.py
-      - strategy_service/engine/core/adapters/__init__.py
       - strategy_service/engine/core/backtest/__init__.py
       - strategy_service/engine/core/components/__init__.py
       - strategy_service/engine/core/components/pnl_residual_emitter.py
       - strategy_service/engine/core/config_loader.py
-      - strategy_service/engine/core/csv_data_provider.py
       - strategy_service/engine/core/engine/__init__.py
       - strategy_service/engine/core/engine/trigger_router.py
       - strategy_service/engine/core/gcs_storage_service.py
       - strategy_service/engine/core/order_batch_storage.py
-      - strategy_service/engine/core/pm_commentary.py
       - strategy_service/engine/core/signal_publisher.py
       - strategy_service/engine/core/signal_vector/__init__.py
       - strategy_service/engine/core/strategies/__init__.py
       - strategy_service/engine/data/__init__.py
       - strategy_service/engine/data/base_loader.py
       - strategy_service/engine/infrastructure/logging/domain_event_logger.py
-      - strategy_service/engine/liquidation_checker.py
-      - strategy_service/engine/rebalancing/__init__.py
-      - strategy_service/engine/routing/__init__.py
       - strategy_service/engine/strategies/__init__.py
-      - strategy_service/engine/strategies/cross_exchange/__init__.py
-      - strategy_service/engine/strategies/cross_exchange/cross_exchange_strategy.py
       - strategy_service/engine/strategies/mean_reversion/__init__.py
+      - strategy_service/engine/strategies/options_market_making/__init__.py
       - strategy_service/engine/strategies/options_ml/__init__.py
       - strategy_service/engine/strategies/prediction_arb/__init__.py
-      - strategy_service/engine/strategies/rel_vol/__init__.py
-      - strategy_service/engine/strategies/rel_vol/rel_vol_strategy.py
       - strategy_service/engine/strategies/sports/backtest_engine.py
       - strategy_service/engine/strategies/sports/sports_backtest_runner.py
       - strategy_service/engine/strategies/sports/venue_allocator.py
-      - strategy_service/engine/strategies/stat_arb/__init__.py
-      - strategy_service/engine/strategies/stat_arb/stat_arb_strategy.py
       - strategy_service/engine/strategies/tradfi_ml/__init__.py
-      - strategy_service/engine/strategies/tradfi_ml_directional.py
-      - strategy_service/engine/strategies/volatility/__init__.py
-      - strategy_service/engine/strategies/volatility/vol_surface_strategy.py
-      - strategy_service/engine/visualization/__init__.py
-      - strategy_service/engine/visualization/strategy_plotter.py
       - strategy_service/models/__init__.py
-      - strategy_service/pre_crash_checkpoint.py
-      - strategy_service/signal_generation/__init__.py
-      - strategy_service/signal_generation/async_klines.py
-      - strategy_service/signal_generation/window_planner.py
       - strategy_service/validation/__init__.py
-    DEAD_BRANCH (92):
-      - strategy_service/adapters/broadcast_sink.py
+    DEAD_BRANCH (87):
       - strategy_service/adapters/fill_subscriber.py
-      - strategy_service/adapters/live_data_source.py
       - strategy_service/cli/handlers/batch_handler.py
       - strategy_service/cli/handlers/batch_utils.py
       - strategy_service/cli/handlers/live_handler.py
-      - strategy_service/compliance/compliance_reporter.py
-      - strategy_service/engine/backtest/backtest_engine.py
-      - strategy_service/engine/backtest/fill_simulator.py
-      - strategy_service/engine/backtest/flash_loan_simulator.py
-      - strategy_service/engine/core/adapters/archive_backtest_adapter.py
+      - strategy_service/compliance/__init__.py
+      - strategy_service/engine/core/__init__.py
       - strategy_service/engine/core/cloud_data_provider.py
       - strategy_service/engine/core/cloud_strategy_storage.py
       - strategy_service/engine/core/components/exposure_monitor.py
@@ -998,6 +888,7 @@ SERVICES WITH DEAD CODE
       - strategy_service/engine/core/components/utility_manager.py
       - strategy_service/engine/core/dependency_checker.py
       - strategy_service/engine/core/gcs_feature_provider.py
+      - strategy_service/engine/core/market_hours_utils.py
       - strategy_service/engine/core/output_builders.py
       - strategy_service/engine/core/pnl_calculator.py
       - strategy_service/engine/core/settlement_service.py
@@ -1007,28 +898,24 @@ SERVICES WITH DEAD CODE
       - strategy_service/engine/core/signal_vector/vol_signal.py
       - strategy_service/engine/core/strategies/base_strategy_manager.py
       - strategy_service/engine/core/strategy_config_loader.py
-      - strategy_service/engine/core/testing_stage_gate.py
       - strategy_service/engine/core/trade_alert_builder.py
       - strategy_service/engine/core/validation_service.py
-      - strategy_service/engine/fill_source.py
-      - strategy_service/engine/mock_data_provider.py
-      - strategy_service/engine/mock_signal_generators.py
       - strategy_service/engine/position_client.py
-      - strategy_service/engine/rebalancing/defi_vault_rebalancer.py
-      - strategy_service/engine/rebalancing/defi_yield_monitor.py
-      - strategy_service/engine/rebalancing/gas_estimator.py
-      - strategy_service/engine/rebalancing/portfolio_rebalancer.py
-      - strategy_service/engine/routing/cross_chain_sor.py
       - strategy_service/engine/strategies/_defi_recursive_basis_mixins.py
       - strategy_service/engine/strategies/base_strategy.py
       - strategy_service/engine/strategies/btc_basis.py
       - strategy_service/engine/strategies/btc_lending.py
+      - strategy_service/engine/strategies/cefi_market_making.py
+      - strategy_service/engine/strategies/cefi_ml_directional.py
       - strategy_service/engine/strategies/cefi_momentum.py
       - strategy_service/engine/strategies/cross_chain_sor.py
       - strategy_service/engine/strategies/cross_chain_yield_arb.py
+      - strategy_service/engine/strategies/cross_exchange/__init__.py
+      - strategy_service/engine/strategies/cross_exchange/cross_exchange_strategy.py
       - strategy_service/engine/strategies/defi_amm_lp.py
       - strategy_service/engine/strategies/defi_base.py
       - strategy_service/engine/strategies/defi_basis.py
+      - strategy_service/engine/strategies/defi_enhancements.py
       - strategy_service/engine/strategies/defi_ethena_benchmark.py
       - strategy_service/engine/strategies/defi_lending.py
       - strategy_service/engine/strategies/defi_recursive_basis.py
@@ -1036,10 +923,13 @@ SERVICES WITH DEAD CODE
       - strategy_service/engine/strategies/l2_basis.py
       - strategy_service/engine/strategies/mean_reversion/mean_reversion_strategy.py
       - strategy_service/engine/strategies/multichain_lending.py
+      - strategy_service/engine/strategies/options_market_making/options_mm_strategy.py
       - strategy_service/engine/strategies/options_ml/options_ml_strategy.py
       - strategy_service/engine/strategies/prediction/__init__.py
       - strategy_service/engine/strategies/prediction/prediction_mapping.py
       - strategy_service/engine/strategies/prediction_arb/prediction_arb_strategy.py
+      - strategy_service/engine/strategies/rel_vol/__init__.py
+      - strategy_service/engine/strategies/rel_vol/rel_vol_strategy.py
       - strategy_service/engine/strategies/sol_basis.py
       - strategy_service/engine/strategies/sol_concentrated_lp.py
       - strategy_service/engine/strategies/sol_lending.py
@@ -1053,52 +943,43 @@ SERVICES WITH DEAD CODE
       - strategy_service/engine/strategies/sports/ml_sports_strategy.py
       - strategy_service/engine/strategies/sports/sports_base.py
       - strategy_service/engine/strategies/sports/value_betting.py
+      - strategy_service/engine/strategies/stat_arb/__init__.py
+      - strategy_service/engine/strategies/stat_arb/stat_arb_strategy.py
       - strategy_service/engine/strategies/tradfi_ml/tradfi_ml_directional_strategy.py
+      - strategy_service/engine/strategies/tradfi_ml_directional.py
       - strategy_service/engine/strategies/tradfi_momentum.py
+      - strategy_service/engine/strategies/volatility/__init__.py
+      - strategy_service/engine/strategies/volatility/vol_surface_strategy.py
       - strategy_service/metrics.py
       - strategy_service/models/instruction.py
       - strategy_service/models/output_schemas.py
       - strategy_service/models/pnl.py
       - strategy_service/models/position.py
-      - strategy_service/signal_generation/benchmark.py
-      - strategy_service/signal_generation/gcs_klines.py
-      - strategy_service/signal_generation/indicators.py
-      - strategy_service/signal_generation/klines.py
-      - strategy_service/signal_generation/strategies.py
       - strategy_service/types.py
       - strategy_service/validation/backtest_pit_guard.py
       - strategy_service/validation/data_certification.py
       - strategy_service/validation/freshness_gate.py
 
-  trading-agent-service (36 modules, 19 reachable)
+  trading-agent-service (36 modules, 27 reachable)
     Entry points: trading_agent_service/cli/main.py, trading_agent_service/__main__.py, trading_agent_service/api/main.py, trading_agent_service/config.py, trading_agent_service/__init__.py
-    ORPHAN_MODULE (16):
+    ORPHAN_MODULE (8):
       - trading_agent_service/adapters/__init__.py
       - trading_agent_service/adapters/execution_adapter.py
       - trading_agent_service/adapters/features_adapter.py
       - trading_agent_service/adapters/risk_adapter.py
-      - trading_agent_service/api/__init__.py
-      - trading_agent_service/app/__init__.py
-      - trading_agent_service/app/ledger/__init__.py
-      - trading_agent_service/app/loops/__init__.py
       - trading_agent_service/app/orchestrator.py
-      - trading_agent_service/app/strategy/__init__.py
       - trading_agent_service/auth_s2s.py
-      - trading_agent_service/cli/__init__.py
-      - trading_agent_service/cli/handlers/__init__.py
       - trading_agent_service/config_reloaders.py
-      - trading_agent_service/engine/__init__.py
       - trading_agent_service/metrics.py
     DEAD_BRANCH (1):
       - trading_agent_service/engine/mock_data_provider.py
 
   unified-trading-api (48 modules, 1 reachable)
     Entry points: unified_trading_api/__init__.py
-    ORPHAN_MODULE (28):
+    ORPHAN_MODULE (27):
       - unified_trading_api/main.py
       - unified_trading_api/middleware/__init__.py
       - unified_trading_api/mock_data/__init__.py
-      - unified_trading_api/mock_data/generate_sample_reports.py
       - unified_trading_api/models/__init__.py
       - unified_trading_api/routes/admin.py
       - unified_trading_api/routes/alerts.py
@@ -1123,7 +1004,7 @@ SERVICES WITH DEAD CODE
       - unified_trading_api/routes/users.py
       - unified_trading_api/routes/websocket.py
       - unified_trading_api/services/__init__.py
-    DEAD_BRANCH (19):
+    DEAD_BRANCH (20):
       - unified_trading_api/middleware/auth.py
       - unified_trading_api/middleware/entitlement.py
       - unified_trading_api/middleware/latency.py
@@ -1143,6 +1024,7 @@ SERVICES WITH DEAD CODE
       - unified_trading_api/services/factory.py
       - unified_trading_api/services/live_service.py
       - unified_trading_api/services/mock_service.py
+      - unified_trading_api/services/period_aggregation.py
 
 ========================================================================
 END OF REPORT

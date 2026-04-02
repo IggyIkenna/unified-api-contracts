@@ -229,31 +229,30 @@ class TestComposeValidationHappyPath:
 
 
 class TestComposeValidationSwapUniswap:
-    """SWAP + UNISWAPV3-ETHEREUM: structural validation passes, capability resolution fails.
+    """SWAP + UNISWAPV3-ETHEREUM: structural + capability resolution both pass.
 
-    UNISWAPV3-ETHEREUM lowercases to "uniswapv3_ethereum"; the capability source
-    resolves to "uniswapv3" which has no declared capabilities (the source is "uniswap").
-    We test that structural validation passes by verifying the error is
-    CapabilityResolutionError (not InstructionValidationError).
+    UNISWAPV3-ETHEREUM lowercases to "uniswapv3_ethereum"; the candidate chain
+    strips the chain suffix to "uniswapv3", then strips the version suffix to
+    "uniswap", which is a registered SourceCapability with swap_events support.
     """
 
-    def test_swap_uniswap_pool_market_raises_capability_error(self) -> None:
-        """SWAP + UNISWAPV3-ETHEREUM + MARKET + POOL + mainnet raises CapabilityResolutionError.
+    def test_swap_uniswap_pool_market_resolves_successfully(self) -> None:
+        """SWAP + UNISWAPV3-ETHEREUM + MARKET + POOL + mainnet resolves via 'uniswap' source.
 
-        Structural validation passes (SWAP allows MARKET, POOL, defi), but
-        the source alias "uniswapv3" does not resolve to a registered capability.
+        Structural validation passes (SWAP allows MARKET, POOL, defi), and
+        the candidate chain uniswapv3_ethereum -> uniswapv3 -> uniswap resolves
+        to the registered 'uniswap' SourceCapability which supports swap_events.
         """
-        from unified_api_contracts.registry.capability import CapabilityResolutionError
-
-        with pytest.raises(CapabilityResolutionError):
-            compose_validation(
-                venue="UNISWAPV3-ETHEREUM",
-                instruction_type="SWAP",
-                operation="swap_events",
-                env="mainnet",
-                order_type="MARKET",
-                instrument_type="POOL",
-            )
+        result = compose_validation(
+            venue="UNISWAPV3-ETHEREUM",
+            instruction_type="SWAP",
+            operation="swap_events",
+            env="mainnet",
+            order_type="MARKET",
+            instrument_type="POOL",
+        )
+        assert isinstance(result, OperationEnvDetail)
+        assert result.signing_scheme == "none"
 
 
 class TestComposeValidationUnsupportedOperation:

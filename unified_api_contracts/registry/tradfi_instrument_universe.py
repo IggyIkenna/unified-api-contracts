@@ -100,21 +100,21 @@ _CME_TREASURY_FUTURES: list[DatabentoInstrumentDef] = [
 ]
 
 _CME_COMMODITY_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("GC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GOLD", "GC"),
-    DatabentoInstrumentDef("CL.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CRUDE", "CL"),
-    DatabentoInstrumentDef("NG.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NATGAS", "NG"),
-    DatabentoInstrumentDef("HO.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "HEATING_OIL", "HO"),
-    DatabentoInstrumentDef("RB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GASOLINE", "RB"),
-    DatabentoInstrumentDef("SI.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SILVER", "SI"),
-    DatabentoInstrumentDef("HG.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COPPER", "HG"),
-    DatabentoInstrumentDef("CT.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COTTON", "CT"),
-    DatabentoInstrumentDef("ZS.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEANS", "ZS"),
-    DatabentoInstrumentDef("ZC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CORN", "ZC"),
-    DatabentoInstrumentDef("ZW.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "WHEAT", "ZW"),
-    DatabentoInstrumentDef("ZL.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEAN_OIL", "ZL"),
-    DatabentoInstrumentDef("ZM.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEAN_MEAL", "ZM"),
-    DatabentoInstrumentDef("LE.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "LIVECATTLE", "LE"),
-    DatabentoInstrumentDef("HE.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "LEANHOGS", "HE"),
+    DatabentoInstrumentDef("GC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GOLD", "commodity", "GC"),
+    DatabentoInstrumentDef("CL.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CRUDE", "commodity", "CL"),
+    DatabentoInstrumentDef("NG.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "NATGAS", "commodity", "NG"),
+    DatabentoInstrumentDef("HO.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "HEATING_OIL", "commodity", "HO"),
+    DatabentoInstrumentDef("RB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GASOLINE", "commodity", "RB"),
+    DatabentoInstrumentDef("SI.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SILVER", "commodity", "SI"),
+    DatabentoInstrumentDef("HG.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COPPER", "commodity", "HG"),
+    DatabentoInstrumentDef("CT.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COTTON", "commodity", "CT"),
+    DatabentoInstrumentDef("ZS.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEANS", "commodity", "ZS"),
+    DatabentoInstrumentDef("ZC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CORN", "commodity", "ZC"),
+    DatabentoInstrumentDef("ZW.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "WHEAT", "commodity", "ZW"),
+    DatabentoInstrumentDef("ZL.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEAN_OIL", "commodity", "ZL"),
+    DatabentoInstrumentDef("ZM.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEAN_MEAL", "commodity", "ZM"),
+    DatabentoInstrumentDef("LE.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "LIVECATTLE", "commodity", "LE"),
+    DatabentoInstrumentDef("HE.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "LEANHOGS", "commodity", "HE"),
 ]
 
 _CME_FX_FUTURES: list[DatabentoInstrumentDef] = [
@@ -135,20 +135,47 @@ _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("ETH.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "crypto", "ETH"),
 ]
 
-# CME options — disabled for now (5,990 instruments per day, too much data).
-# Revisit when options strategy is implemented.
-# _CME_SP500_OPTIONS: list[DatabentoInstrumentDef] = [
-#     DatabentoInstrumentDef("ES.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "ES"),
-#     DatabentoInstrumentDef("EW1.OPT", ... "EW5.OPT"),
-# ]
-_CME_SP500_OPTIONS: list[DatabentoInstrumentDef] = []
+# CME ES options — full E-mini S&P 500 options surface.
+# Databento parent symbology: [ROOT].OPT fetches all strikes/expiries for that product.
+#
+# Product codes (CME Group / Databento asset field):
+#   ES   = Quarterly options (3rd Friday of quarter month)
+#   EW   = Weekly options (Friday expiry, end-of-week)
+#   EW1  = Monday weekly options
+#   EW2  = Wednesday weekly options
+#   EW4  = Tuesday weekly options
+#   E1A  = Monday daily (0DTE)
+#   E2A  = Tuesday daily
+#   E3A  = Wednesday daily
+#   E4A  = Thursday daily
+#   E5A  = Friday daily
+#   EOM  = End-of-month options (last business day)
+#
+# Together these give 2+ full volatility surfaces (quarterly + weekly/daily).
+_CME_ES_OPTIONS: list[DatabentoInstrumentDef] = [
+    # Quarterly (standard monthly/quarterly — 3rd Friday)
+    DatabentoInstrumentDef("ES.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "ES"),
+    # Weekly options (Mon/Tue/Wed/Fri expiries)
+    DatabentoInstrumentDef("EW.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "EW"),
+    DatabentoInstrumentDef("EW1.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "EW1"),
+    DatabentoInstrumentDef("EW2.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "EW2"),
+    DatabentoInstrumentDef("EW4.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "EW4"),
+    # Daily options (0DTE — Mon through Fri)
+    DatabentoInstrumentDef("E1A.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "E1A"),
+    DatabentoInstrumentDef("E2A.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "E2A"),
+    DatabentoInstrumentDef("E3A.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "E3A"),
+    DatabentoInstrumentDef("E4A.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "E4A"),
+    DatabentoInstrumentDef("E5A.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "E5A"),
+    # End-of-month options (last business day)
+    DatabentoInstrumentDef("EOM.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "EOM"),
+]
 
 # ---------------------------------------------------------------------------
 # ICE futures
 # ---------------------------------------------------------------------------
 _ICE_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("BRN.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "BRENT", "BRN"),
-    DatabentoInstrumentDef("G.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "GASOIL", "G"),
+    DatabentoInstrumentDef("BRN.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "BRENT", "commodity", "BRN"),
+    DatabentoInstrumentDef("G.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "GASOIL", "commodity", "G"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -169,7 +196,7 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CME_COMMODITY_FUTURES,
     *_CME_FX_FUTURES,
     *_CME_CRYPTO_FUTURES,
-    *_CME_SP500_OPTIONS,
+    *_CME_ES_OPTIONS,
     *_ICE_FUTURES,
     *_CBOE_INSTRUMENTS,
 ]

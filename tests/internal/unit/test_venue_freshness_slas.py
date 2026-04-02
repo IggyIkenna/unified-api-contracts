@@ -48,7 +48,6 @@ class TestVenueFreshnessSLARegistry:
             "balancer",
             "curve",
             "ethena",
-            "euler",
             "fluid",
             "etherfi",
             "lido",

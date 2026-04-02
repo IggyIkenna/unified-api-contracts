@@ -280,12 +280,9 @@ class SyntheticDataGenerator:
             noise = params["sigma"] * np.sqrt(dt) * float(self._rng.standard_normal())
             apy[i] = max(0.0, apy[i - 1] + mean_rev + noise)
 
-        # Deferred import: UTL depends on UCI; eager import creates circular chain.
-        from unified_trading_library import (  # noqa: qg-inside-import
-            apy_to_cumulative_index,
-        )
+        from unified_api_contracts.internal.index_utils import apy_to_cumulative_index
 
-        # Convert APY series to cumulative liquidity index via UTL
+        # Convert APY series to cumulative liquidity index
         apy_list: list[float] = [float(v) for v in apy]
         liquidity_index = apy_to_cumulative_index(apy_list, timestamps, base=1.0)
 
@@ -346,8 +343,7 @@ class SyntheticDataGenerator:
                 noise = params["sigma"] * np.sqrt(dt) * float(self._rng.standard_normal())
                 apy[i] = max(0.001, apy[i - 1] + mean_rev + noise)
 
-            # Deferred import: UTL depends on UCI; eager import creates circular chain.
-            from unified_trading_library import staking_rate_to_index  # noqa: qg-inside-import
+            from unified_api_contracts.internal.index_utils import staking_rate_to_index
 
             apy_list: list[float] = [float(v) for v in apy]
             index_values = staking_rate_to_index(apy_list, timestamps, base=1.0)

@@ -375,16 +375,16 @@ def _ccxt_instrument_type(raw: CcxtMarket) -> str:
     if raw.futures:
         return "FUTURE"
     if raw.spot:
-        return "SPOT"
+        return "SPOT_PAIR"
     type_str = (raw.type or "").lower()
     type_map: dict[str, str] = {
-        "spot": "SPOT",
+        "spot": "SPOT_PAIR",
         "swap": "PERPETUAL",
         "future": "FUTURE",
         "futures": "FUTURE",
         "option": "OPTION",
     }
-    return type_map.get(type_str, "SPOT")
+    return type_map.get(type_str, "SPOT_PAIR")
 
 
 def normalize_ccxt_market(
@@ -396,18 +396,18 @@ def normalize_ccxt_market(
     symbol = raw.symbol or raw.id or ""
     instrument_key = f"{venue.upper()}:{instrument_type}:{symbol}"
 
-    tick_size: float | None = None
-    min_size: float | None = None
+    tick_size: Decimal | None = None
+    min_size: Decimal | None = None
 
     if raw.precision is not None:
         price_prec = raw.precision.get("price") if isinstance(raw.precision, dict) else raw.precision.price
         if price_prec is not None:
-            tick_size = float(str(price_prec))
+            tick_size = Decimal(str(price_prec))
 
     if isinstance(raw.limits, CcxtMarketLimits) and raw.limits.amount is not None:
         _min = raw.limits.amount.get("min")
         if _min is not None:
-            min_size = float(_min)
+            min_size = Decimal(str(_min))
 
     return CanonicalInstrument(
         instrument_key=instrument_key,
@@ -416,7 +416,7 @@ def normalize_ccxt_market(
         timestamp=datetime.now(UTC),
         tick_size=tick_size,
         min_size=min_size,
-        contract_size=float(raw.contractSize) if raw.contractSize is not None else None,
+        contract_size=Decimal(str(raw.contractSize)) if raw.contractSize is not None else None,
         base_asset=raw.base,
         quote_asset=raw.quote,
         settle_asset=raw.settle,
