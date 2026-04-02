@@ -70,12 +70,6 @@
     <title>bitstamp — v2 — yellow (verified 2026-03-06)</title>
   </g>
   <g>
-    <rect x="376" y="84" width="120" height="36" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5" rx="3"/>
-    <text x="436" y="98" text-anchor="middle" fill="#333" font-size="10">bloxroute</text>
-    <text x="436" y="111" text-anchor="middle" fill="#ff9800" font-weight="bold" font-size="10">~ v1</text>
-    <title>bloxroute — v1 — yellow (verified 2026-03-06)</title>
-  </g>
-  <g>
     <rect x="500" y="84" width="120" height="36" fill="#e8f5e9" stroke="#4caf50" stroke-width="1.5" rx="3"/>
     <text x="560" y="98" text-anchor="middle" fill="#333" font-size="10">bybit</text>
     <text x="560" y="111" text-anchor="middle" fill="#4caf50" font-weight="bold" font-size="10">v v5</text>
@@ -350,12 +344,6 @@
     <text x="188" y="338" text-anchor="middle" fill="#333" font-size="10">prime_broker</text>
     <text x="188" y="351" text-anchor="middle" fill="#ff9800" font-weight="bold" font-size="10">~ v1</text>
     <title>prime_broker — v1 — yellow (verified 2026-03-06)</title>
-  </g>
-  <g>
-    <rect x="252" y="324" width="120" height="36" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5" rx="3"/>
-    <text x="312" y="338" text-anchor="middle" fill="#333" font-size="10">pyth</text>
-    <text x="312" y="351" text-anchor="middle" fill="#ff9800" font-weight="bold" font-size="10">~ v1</text>
-    <title>pyth — v1 — yellow (verified 2026-03-06)</title>
   </g>
   <g>
     <rect x="376" y="324" width="120" height="36" fill="#fff3e0" stroke="#ff9800" stroke-width="1.5" rx="3"/>

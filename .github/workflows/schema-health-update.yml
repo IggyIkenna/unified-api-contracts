@@ -34,6 +34,10 @@ on:
     # Weekly on Sundays at 04:00 UTC (after the schema-health.yml at 02:00)
     - cron: "0 4 * * 0"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   schema-health-update:
     name: Download Artifacts & Update SVG
@@ -60,7 +64,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install uv
-          uv pip install --system -e ".[test]"
+          uv pip install --system -e "."
 
       - name: Create schema_artifacts directory
         run: mkdir -p schema_artifacts

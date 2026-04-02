@@ -53,7 +53,6 @@ Tables list external schema classes, file path, canonical target, normalizer exi
 | tardis      | TardisTrade, TardisOrderBook                            | tardis/schemas.py         | Canonical\*                   | yes        | —                    |
 | aster       | AsterTrade, AsterOrderBook, AsterOrder, AsterTicker24hr | aster/schemas.py          | Canonical\*                   | no         | P1                   |
 | hyperliquid | HyperliquidOrder, HyperliquidFill, HyperliquidTicker    | hyperliquid/schemas.py    | Canonical\*                   | no         | P1                   |
-| bloxroute   | (schemas)                                               | bloxroute/schemas.py      | CanonicalTrade, etc.          | no         | P2                   |
 | thegraph    | (schemas)                                               | thegraph/schemas.py       | —                             | no         | P2                   |
 | alchemy     | AlchemyTransaction, etc.                                | alchemy/schemas.py        | —                             | no         | P2                   |
 | nautilus    | Order, Fill                                             | nautilus/schemas.py       | CanonicalOrder, CanonicalFill | no         | P2 (engine-internal) |
@@ -203,8 +202,6 @@ See §2.17 for full error taxonomy (CanonicalRateLimitError, CanonicalNetworkErr
 | glassnode    | (schemas)                           | glassnode/schemas.py    | —                               | no         | P3       |
 | open_meteo   | (schemas)                           | open_meteo/schemas.py   | —                               | no         | P3       |
 | coingecko    | (schemas)                           | coingecko/schemas.py    | —                               | no         | P3       |
-| arkham       | ArkhamEntity, TokenFlow, etc.       | arkham/schemas.py       | —                               | no         | P3       |
-| pyth         | (schemas)                           | pyth/schemas.py         | —                               | no         | P2       |
 | openbb       | (schemas)                           | openbb/schemas.py       | —                               | no         | P3       |
 | defillama    | (schemas)                           | defillama/schemas.py    | —                               | no         | P2       |
 | regulatory   | MifidIITradeReport, EmirTradeReport | regulatory/schemas.py   | —                               | no         | P2       |
@@ -442,7 +439,7 @@ See §2.17 for full error taxonomy (CanonicalRateLimitError, CanonicalNetworkErr
 | Provider                                                                                                                                                                                                  | Error Schema | Has classify() | Normalizes? |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | -------------- | ----------- |
 | binance, ccxt, okx, bybit, deribit, coinbase, upbit, ibkr, hyperliquid, aster, kalshi, polymarket, databento, tardis, alchemy, yahoo, thegraph, defillama, pinnacle, betfair, odds_api, api_football, ... | \*Error      | Most yes       | **NO**      |
-| bloxroute, sharpapi, odds_engine, metabet, aws                                                                                                                                                            | \*Error      | No             | **NO**      |
+| sharpapi, odds_engine, metabet, aws                                                                                                                                                                       | \*Error      | No             | **NO**      |
 
 **Gap:** Full error normalization is missing. Add normalize/errors.py with normalize\_<provider>\_error for every venue. Map venue errors to the expanded taxonomy. Batch and live must both normalize for consistent handling.
 

@@ -523,59 +523,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
-    # --- Bitfinex ---
-    EndpointSpec(
-        venue="bitfinex",
-        endpoint_path="https://api-pub.bitfinex.com/v2/ticker/{symbol}",
-        http_method="GET",
-        schema_class="BitfinexTicker",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v2",
-        notes="Public ticker. No auth required.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
-    EndpointSpec(
-        venue="bitfinex",
-        endpoint_path="https://api.bitfinex.com/v2/auth/r/orders",
-        http_method="POST",
-        schema_class="BitfinexOrder",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.HISTORICAL_ONLY,
-        version="v2",
-        notes=(
-            "Private order history. Auth: bfx-apikey + HMAC-SHA384 bfx-signature. "
-            "Secret Manager key: bitfinex-api-credentials."
-        ),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
-    # --- Gate.io ---
-    EndpointSpec(
-        venue="gateio",
-        endpoint_path="https://api.gateio.ws/api/v4/spot/tickers",
-        http_method="GET",
-        schema_class="GateIOTicker",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v4",
-        notes="Public tickers. No auth required.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
-    EndpointSpec(
-        venue="gateio",
-        endpoint_path="https://api.gateio.ws/api/v4/spot/orders",
-        http_method="POST",
-        schema_class="GateIOOrderRequest",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v4",
-        notes=("Private spot order. Auth: KEY + HMAC-SHA512 signature. Secret Manager key: gateio-api-credentials."),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
     # --- KuCoin ---
     EndpointSpec(
         venue="kucoin",
@@ -841,9 +788,21 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         access_mode=AccessMode.REST_POLLING,
         data_availability=DataAvailability.BOTH,
         version="v1",
-        notes="Free, no auth. Weather forecast for commodity and sports modelling.",
+        notes="Free, no auth. Weather forecast (recent + future dates).",
         requires_auth=False,
         cassette_status=CassetteStatus.RECORDED,
+    ),
+    EndpointSpec(
+        venue="open_meteo",
+        endpoint_path="https://archive-api.open-meteo.com/v1/archive",
+        http_method="GET",
+        schema_class="OpenMeteoResponse",
+        access_mode=AccessMode.REST_POLLING,
+        data_availability=DataAvailability.BOTH,
+        version="v1",
+        notes="Free, no auth. Historical weather (dates older than ~3 months).",
+        requires_auth=False,
+        cassette_status=CassetteStatus.PENDING,
     ),
     # --- CoinGecko ---
     EndpointSpec(

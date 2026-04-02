@@ -1,0 +1,18 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+      method: GET
+      uri: https://data.financialresearch.gov/v1/series/timeseries?mnemonic=FNYR-SOFR-A&start_date=2025-01-01
+    response:
+      body:
+        string: '[["2025-01-02",4.4],["2025-01-03",4.31],["2025-01-06",4.27],["2025-01-07",4.27],["2025-01-08",4.29],["2025-01-09",4.3],["2025-01-10",4.3],["2025-01-13",4.29],["2025-01-14",4.28],["2025-01-15",4.28]]'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

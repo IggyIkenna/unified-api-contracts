@@ -1,5 +1,16 @@
 """Polymarket CLOB API contracts."""
 
+from .crypto_macro_mappings import (
+    ALL_PREDICTION_UNDERLYINGS,
+    POLYMARKET_BTC_TIMEFRAMES,
+    POLYMARKET_CRYPTO_TAG_SLUGS,
+    POLYMARKET_MACRO_TAG_SLUGS,
+    POLYMARKET_SERIES_SLUGS,
+    POLYMARKET_SLUG_PATTERNS,
+    POLYMARKET_SPX_TIMEFRAMES,
+    POLYMARKET_TIMEFRAMES,
+    get_polymarket_tags_for_underlying,
+)
 from .schemas import (
     PolymarketCLOBOrder,
     PolymarketError,
@@ -16,8 +27,38 @@ from .schemas import (
     PolymarketToken,
     PolymarketTrade,
 )
+from .settlement_registry import (
+    SETTLEMENT_REGISTRY,
+    SettlementSource,
+    get_settlement_source,
+)
+from .sports_mappings import (
+    POLYMARKET_MARKET_TYPE_MAP,
+    POLYMARKET_PREDICTION_LEAGUES,
+    POLYMARKET_SERIES_TO_LEAGUE,
+    POLYMARKET_SPORTS_TAG_SLUGS,
+    POLYMARKET_TEAM_TO_CANONICAL,
+    get_canonical_league_for_polymarket_series,
+    get_canonical_team_for_polymarket,
+    get_polymarket_series_for_league,
+    get_polymarket_sports_tag_for_league,
+)
 
 __all__ = [
+    "ALL_PREDICTION_UNDERLYINGS",
+    "POLYMARKET_BTC_TIMEFRAMES",
+    "POLYMARKET_CRYPTO_TAG_SLUGS",
+    "POLYMARKET_MACRO_TAG_SLUGS",
+    "POLYMARKET_MARKET_TYPE_MAP",
+    "POLYMARKET_PREDICTION_LEAGUES",
+    "POLYMARKET_SERIES_SLUGS",
+    "POLYMARKET_SERIES_TO_LEAGUE",
+    "POLYMARKET_SLUG_PATTERNS",
+    "POLYMARKET_SPORTS_TAG_SLUGS",
+    "POLYMARKET_SPX_TIMEFRAMES",
+    "POLYMARKET_TEAM_TO_CANONICAL",
+    "POLYMARKET_TIMEFRAMES",
+    "SETTLEMENT_REGISTRY",
     "PolymarketCLOBOrder",
     "PolymarketError",
     "PolymarketFill",
@@ -32,4 +73,11 @@ __all__ = [
     "PolymarketResolution",
     "PolymarketToken",
     "PolymarketTrade",
+    "SettlementSource",
+    "get_canonical_league_for_polymarket_series",
+    "get_canonical_team_for_polymarket",
+    "get_polymarket_series_for_league",
+    "get_polymarket_sports_tag_for_league",
+    "get_polymarket_tags_for_underlying",
+    "get_settlement_source",
 ]

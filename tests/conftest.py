@@ -1,7 +1,7 @@
 """Pytest configuration for unified-api-contracts.
 
 Provides:
-- Optional mock for unified_config_interface.get_secret when UCI is present (e.g. workspace)
+- Optional mock for unified_trading_library.config_interface.get_secret when UCI is present (e.g. workspace)
 - Hypothesis profiles: default (fast, few examples), ci (more examples for CI)
 - sys.path setup for scripts/ directory (needed by test_schema_version_matrix.py)
 - --block-network flag to block socket connections in CI (credential-free enforcement)
@@ -73,8 +73,12 @@ def mock_secret_client(monkeypatch: pytest.MonkeyPatch) -> MagicMock | None:
     """Prevent real secret access when UCI is on the path (e.g. workspace). No-op otherwise."""
     import importlib.util
 
-    if importlib.util.find_spec("unified_config_interface") is None:
+    try:
+        spec = importlib.util.find_spec("unified_trading_library.config_interface")
+    except ModuleNotFoundError:
+        return None
+    if spec is None:
         return None
     mock = MagicMock(return_value="fake-secret-value")
-    monkeypatch.setattr("unified_config_interface.get_secret", mock, raising=False)
+    monkeypatch.setattr("unified_trading_library.config_interface.get_secret", mock, raising=False)
     return mock

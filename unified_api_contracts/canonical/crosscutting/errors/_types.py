@@ -66,6 +66,14 @@ DATABENTO_ERROR_MAP: dict[str, DatabentoError] = {
     "AUTH_FAILURE": DatabentoError("AUTH_FAILURE", "Authentication failed", retry_safe=False, reconnect=False),
     "CONNECTION_RESET": DatabentoError("CONNECTION_RESET", "Connection reset", retry_safe=True, reconnect=True),
     "SUBSCRIPTION_ERROR": DatabentoError("SUBSCRIPTION_ERROR", "Subscription failed", retry_safe=True, reconnect=False),
+    "VALIDATION_ERROR": DatabentoError(
+        "VALIDATION_ERROR",
+        "Request validation failed (e.g. date range, T+2 embargo)",
+        retry_safe=False,
+        reconnect=False,
+    ),
+    "NOT_FOUND": DatabentoError("NOT_FOUND", "Dataset or resource not found", retry_safe=False, reconnect=False),
+    "SERVER_ERROR": DatabentoError("SERVER_ERROR", "Databento internal server error", retry_safe=True, reconnect=False),
 }
 
 

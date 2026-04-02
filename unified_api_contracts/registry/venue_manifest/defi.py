@@ -81,20 +81,4 @@ DEFI_VENUES: dict[str, VenueContract] = {
             "error_example.json": "AlchemyError",
         },
     },
-    "bloxroute": {
-        "has_rest": True,
-        "has_websocket": True,
-        "has_fix": False,
-        "config_secret_field": "bloxroute_secret_name",
-        "response_schema_classes": [
-            "BloxrouteTxSubmitParams",
-            "BloxrouteTxSubmitResult",
-            "BloxrouteJsonRpcResponse",
-            "BloxrouteBdnBlocksParams",
-            "BloxrouteSubscribeParams",
-            "BloxrouteProtectEndpoints",
-        ],
-        "error_schema_classes": ["BloxrouteError"],
-        "example_schema_map": {"error_example.json": "BloxrouteError"},
-    },
 }

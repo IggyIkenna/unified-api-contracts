@@ -111,8 +111,6 @@
 
 **Implemented (~15):** alchemy, betfair, binance, bybit, ccxt, coinbase, deribit, hyperliquid, ibkr, kalshi, okx, polymarket, tardis, upbit, versifi.
 
-**Gaps:** kraken, kucoin, gateio, bitfinex, bitstamp, mexc, huobi, bitget, dydx, databento, fix, prime_broker, nautilus, betdaq, smarkets, pinnacle, manifold, predictit, aster, and all alt-data providers.
-
 ---
 
 ### 1.7 Rate Limits, Connectivity, Market State
@@ -255,7 +253,6 @@ Add `tests/test_batch_live_parity.py`:
 
 ### Phase H — Errors & Rate Limits
 
-- [x] Error normalizers: kraken, kucoin, gateio, bitfinex, bitstamp, mexc, huobi, bitget, dydx, databento, fix, prime_broker, nautilus, aster, betdaq, smarkets, pinnacle, manifold (18 new; 35 total including previous 15+2)
 - [ ] Remaining: predictit, matchbook, odds_api, openbb, fred, ofr, ecb, glassnode, coingecko, arkham, pyth, defillama, regulatory (alt-data venues)
 - [ ] Full rate limit handling per RATE_LIMIT_HANDLING_GAPS.md §4
 

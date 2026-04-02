@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"action":{"type":"order","orders":[{"a":4,"b":true,"p":"2309","s":"0.01","r":false,"t":{"limit":{"tif":"Gtc"}}}],"grouping":"na"},"nonce":1773773921934,"signature":{"r":"0x0000000000000000000000000000000000000000000000000000000000000000","s":"0x0000000000000000000000000000000000000000000000000000000000000000","v":28},"vaultAddress":"0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f"}'
+      headers:
+        Content-Type:
+          - application/json
+      method: POST
+      uri: https://api.hyperliquid-testnet.xyz/exchange
+    response:
+      body:
+        string: '{"status":"ok","response":{"type":"order","data":{"statuses":[{"resting":{"oid":987654321}}]}}}'
+      headers:
+        Content-Type:
+          - application/json
+        Date:
+          - Tue, 17 Mar 2026 19:02:09 GMT
+      status:
+        code: 200
+        message: OK
+version: 1

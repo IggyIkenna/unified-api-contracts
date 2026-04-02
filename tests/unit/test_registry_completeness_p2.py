@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+from typing import ClassVar
 
 import pytest
 import yaml
@@ -112,18 +113,13 @@ class TestProviderApiVersionsYaml:
     """provider_api_versions.yaml has valid structure and status values."""
 
     CONFIG_YAML_PATH = (
-        Path(__file__).resolve().parents[2]
-        / "unified_api_contracts"
-        / "config"
-        / "provider_api_versions.yaml"
+        Path(__file__).resolve().parents[2] / "unified_api_contracts" / "config" / "provider_api_versions.yaml"
     )
 
-    VALID_STATUSES = {"green", "yellow", "red", "dormant"}
+    VALID_STATUSES: ClassVar[set[str]] = {"green", "yellow", "red", "dormant"}
 
     def test_yaml_file_exists(self) -> None:
-        assert self.CONFIG_YAML_PATH.exists(), (
-            f"provider_api_versions.yaml not found at {self.CONFIG_YAML_PATH}"
-        )
+        assert self.CONFIG_YAML_PATH.exists(), f"provider_api_versions.yaml not found at {self.CONFIG_YAML_PATH}"
 
     def test_yaml_loads(self) -> None:
         data = yaml.safe_load(self.CONFIG_YAML_PATH.read_text())
@@ -145,8 +141,7 @@ class TestProviderApiVersionsYaml:
         for name, spec in providers.items():
             status = spec["status"]
             assert status in self.VALID_STATUSES, (
-                f"Provider {name} has invalid status '{status}'; "
-                f"expected one of {self.VALID_STATUSES}"
+                f"Provider {name} has invalid status '{status}'; expected one of {self.VALID_STATUSES}"
             )
 
     def test_no_yellow_providers_with_schemas_and_cassettes(self) -> None:
@@ -161,15 +156,13 @@ class TestProviderApiVersionsYaml:
                 continue
             provider_dir = external_root / name
             has_schema = (provider_dir / "schemas.py").exists()
-            has_cassette = any(
-                (provider_dir / "mocks").glob("*cassette*")
-            ) if (provider_dir / "mocks").exists() else False
+            has_cassette = (
+                any((provider_dir / "mocks").glob("*cassette*")) if (provider_dir / "mocks").exists() else False
+            )
             if has_schema and has_cassette:
                 violations.append(name)
 
-        assert not violations, (
-            f"Providers with schemas + cassettes should be green, not yellow: {violations}"
-        )
+        assert not violations, f"Providers with schemas + cassettes should be green, not yellow: {violations}"
 
     def test_dormant_providers_have_no_schemas(self) -> None:
         """Dormant providers should not have a schemas.py."""
@@ -278,9 +271,7 @@ def _extract_market_keys(fixture_data: dict[str, object]) -> set[str]:
     return keys
 
 
-def _find_market(
-    fixture_data: dict[str, object], market_key: str
-) -> dict[str, object] | None:
+def _find_market(fixture_data: dict[str, object], market_key: str) -> dict[str, object] | None:
     """Find a specific market by key in a fixture JSON dict."""
     bookmakers = fixture_data.get("bookmakers", [])
     if not isinstance(bookmakers, list):

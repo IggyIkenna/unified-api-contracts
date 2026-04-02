@@ -11,7 +11,6 @@
 | bybit         | Yes             | Yes        | Yes           | Yes    | Yes           | If offered   | UMI adapter                                 |
 | yahoo_finance | Yes             | N/A        | N/A           | Yes    | N/A           | N/A          | TradFi adapter                              |
 | alchemy       | RPC/API         | N/A        | N/A           | Yes    | N/A           | N/A          | DeFi fallback                               |
-| bloxroute     | BDN/streams     | N/A        | N/A           | Yes    | Yes           | N/A          | Gateway-API, Cloud-API, Protect RPC         |
 | hyperliquid   | Yes             | Yes        | Yes           | Yes    | Yes           | N/A          | HTTP + S3 bucket                            |
 | aster         | Yes             | Yes        | Yes           | Yes    | Yes           | N/A          | On-chain perps                              |
 | upbit         | Yes             | Yes        | Yes           | Yes    | Yes           | If offered   | CeFi full surface                           |

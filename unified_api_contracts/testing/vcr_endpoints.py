@@ -451,17 +451,6 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "arkham": [
-        _get(
-            "https://api.arkhamintelligence.com/intelligence/address/0xbe0eb53f46cd790cd13851d5eff43d12404d33e8",
-            "entity.yaml",
-            "",
-            "ArkhamEntity",
-            key_env="ARKHAM_API_KEY",
-            header_name="API-Key",
-            schema_version="1.0",
-        ),
-    ],
     "defillama": [
         _get(
             "https://api.llama.fi/protocols",
@@ -611,7 +600,6 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     "glassnode:timeseries": "GlassnodeTimeseriesPoint",
     "glassnode:metric": "GlassnodeMetricResponse",
     "fear_greed:fng": "FearGreedReading",
-    "arkham:entity": "ArkhamEntity",
     "defillama:protocol": "DefiLlamaProtocol",
     "defillama_tvl:tvl": "DefiLlamaTvlValue",
     "defillama_yields:pool": "DefiLlamaYieldPool",

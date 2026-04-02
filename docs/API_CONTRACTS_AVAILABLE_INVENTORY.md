@@ -146,14 +146,6 @@
 | MEV-Share   | mev-share.flashbots.net | 2            | MevShareBundleParams, MevShareBundleResult                                                                                                                                    | —                                          |
 | MEV Blocker | RPC endpoints           | 1            | MevBlockerEndpoints                                                                                                                                                           | —                                          |
 
-### bloXroute BDN
-
-| Venue Key | Base URL / Endpoint                          | Schema Count | Key Schemas                                                                                                                                               | Gaps                                                        |
-| --------- | -------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| bloxroute | api.blxrbdn.com, eth-protect.rpc.blxrbdn.com | 7            | BloxrouteTxSubmitParams, BloxrouteTxSubmitResult, BloxrouteJsonRpcResponse, BloxrouteBdnBlocksParams, BloxrouteSubscribeParams, BloxrouteProtectEndpoints | bdnBlocks/newTxs stream payload schemas (need live samples) |
-
-**Error:** BloxrouteError
-
 ### Protocol SDKs (Aave, Compound, Morpho, Euler)
 
 | Protocol    | Source                   | Schema Count | Key Schemas                                                     | Gaps |
@@ -256,7 +248,6 @@
 | Barchart                                              | Direct only   | barchart                                              | CSV; no CCXT                                                      |
 | The Graph                                             | Direct only   | thegraph                                              | GraphQL; no CCXT                                                  |
 | Alchemy                                               | Direct only   | alchemy                                               | JSON-RPC; no CCXT                                                 |
-| Kucoin, Gate.io, Bitfinex, Huobi                      | CCXT only     | ccxt                                                  | No direct schemas; use Ccxt\* unified schemas                     |
 | Betfair, Pinnacle, Polymarket, Odds API, API-Football | Direct only   | betfair, pinnacle, polymarket, odds_api, api_football | Sports; no CCXT                                                   |
 
 **CCXT unified schemas (unified_api_contracts.ccxt):** CcxtOrder, CcxtTrade, CcxtBalance, CcxtBalanceResponse, CcxtPosition, CcxtMarket, CcxtTicker, CcxtOrderBook, CcxtFundingRate, CcxtFundingRateHistory, CcxtOpenInterest, CcxtOpenInterestHistory, CcxtOhlcv, CcxtAggTrade, CcxtLeverageTiers, CcxtLongShortRatio, CcxtGreeks, CcxtWithdrawal, CcxtDeposit, CcxtDepositAddress, CcxtLedger, CcxtTransfer, CcxtTradingFee, CcxtErrorPayload.

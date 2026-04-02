@@ -512,28 +512,6 @@ Schema–version alignment for DeFi data sources and MEV protection. Sources: Al
 
 **eth_cancelPrivateTransaction** (FlashbotsCancelPrivateTransactionParams): txHash (required). Cancels a previously submitted private tx; must be signed by same key
 
-### bloXroute BDN
-
-**Target:** Gateway-API, Cloud-API, Protect RPC for Ethereum/BSC. Docs: docs.bloxroute.com (some paths return 404).
-
-**Endpoints:**
-
-- **Cloud-API:** `https://api.blxrbdn.com` (HTTPS POST), `wss://api.blxrbdn.com/ws` (WebSocket)
-- **Protect RPC:** `https://eth-protect.rpc.blxrbdn.com` (frontrunning protection), `https://eth.rpc.blxrbdn.com` (Gas Protect)
-- **Regional:** `wss://virginia.eth.blxrbdn.com/ws`, `wss://virginia.bsc.blxrbdn.com/ws`
-
-**Endpoint → Schema Mapping**
-
-| bloXroute Method / Stream   | Endpoint Key      | Schema Class              | Status    |
-| --------------------------- | ----------------- | ------------------------- | --------- |
-| blxr_tx (submit tx)         | tx_submit         | BloxrouteTxSubmitResult   | ✅        |
-| subscribe bdnBlocks         | bdn_blocks        | BloxrouteBdnBlocksParams  | ✅        |
-| subscribe newTxs/pendingTxs | subscribe         | BloxrouteSubscribeParams  | ✅ (stub) |
-| Protect RPC URLs            | protect_endpoints | BloxrouteProtectEndpoints | ✅        |
-| JSON-RPC error              | —                 | BloxrouteError            | ✅        |
-
-**Gaps:** Full streaming payload schemas (bdnBlocks block body, newTxs tx format) require live samples; docs.bloxroute.com returns 404 for some paths. BloxrouteSubscribeParams is a minimal stub.
-
 ### DeFi / MEV Schema Gaps Summary
 
 | Provider    | Gap                                                           | Priority | Notes                                                      |
@@ -541,18 +519,16 @@ Schema–version alignment for DeFi data sources and MEV protection. Sources: Al
 | Alchemy     | Portfolio API, Prices API                                     | Low      | Add schemas when integrating                               |
 | The Graph   | SubgraphProtocolTvlSnapshot, Pair, protocol-specific entities | Low      | Sushi, Curve, Balancer subgraphs                           |
 | MEV Blocker | GET /tx/{hash} transaction status                             | Low      | status, hash, rpc_timestamp, transaction, backruns, refund |
-| bloXroute   | bdnBlocks/newTxs stream payload schemas                       | Low      | Minimal stubs added; full schemas need live samples        |
 | Endpoints   | BASE_URLS thegraph → gateway.thegraph.com                     | Medium   | Hosted Service deprecated                                  |
 
 ### DeFi / MEV Endpoint Inventory (Context7 Discovery)
 
-| Provider        | Endpoints Contracted                                                                                                                                                | Endpoints Not Contracted                                          |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| **Alchemy**     | Node RPC, getAssetTransfers, getTokenBalances, createWebhook, Block/Tx/Log, GasOracle, Simulation, NFT                                                              | Portfolio, Prices, deleteWebhook, listWebhooks                    |
-| **The Graph**   | GraphQL (entity-specific: Pool, Swap, Token, Reserve, AaveUserPosition, UniV3Position, CurveGauge, MorphoPosition, LidoRebase, EthenaYield, ERC20Transfer/Approval) | SubgraphProtocolTvlSnapshot, protocol-specific entities           |
-| **Flashbots**   | eth_sendBundle, eth_callBundle, eth_sendPrivateTransaction, eth_cancelPrivateTransaction, mev_sendBundle                                                            | eth_sendPrivateRawTransaction (alias)                             |
-| **MEV Blocker** | Endpoint URLs (fast, noreverts, fullprivacy, maxbackruns, nochecks); eth_sendRawTransaction                                                                         | GET /tx/{hash} status                                             |
-| **bloXroute**   | blxr_tx, subscribe (bdnBlocks, newTxs, pendingTxs), Protect RPC URLs                                                                                                | Full stream payload schemas; Solana Trader API (separate product) |
+| Provider        | Endpoints Contracted                                                                                                                                                | Endpoints Not Contracted                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **Alchemy**     | Node RPC, getAssetTransfers, getTokenBalances, createWebhook, Block/Tx/Log, GasOracle, Simulation, NFT                                                              | Portfolio, Prices, deleteWebhook, listWebhooks          |
+| **The Graph**   | GraphQL (entity-specific: Pool, Swap, Token, Reserve, AaveUserPosition, UniV3Position, CurveGauge, MorphoPosition, LidoRebase, EthenaYield, ERC20Transfer/Approval) | SubgraphProtocolTvlSnapshot, protocol-specific entities |
+| **Flashbots**   | eth_sendBundle, eth_callBundle, eth_sendPrivateTransaction, eth_cancelPrivateTransaction, mev_sendBundle                                                            | eth_sendPrivateRawTransaction (alias)                   |
+| **MEV Blocker** | Endpoint URLs (fast, noreverts, fullprivacy, maxbackruns, nochecks); eth_sendRawTransaction                                                                         | GET /tx/{hash} status                                   |
 
 ### Recommended Version Pins (DeFi)
 
@@ -561,7 +537,6 @@ Schema–version alignment for DeFi data sources and MEV protection. Sources: Al
 | Alchemy   | Base URL `/v2`; no SDK — HTTP/JSON-RPC direct                   |
 | The Graph | Gateway endpoint; GraphQL Oct 2021 spec (validation)            |
 | Flashbots | OpenRPC spec 1.0.0; Protect docs for eth_sendPrivateTransaction |
-| bloXroute | Cloud-API api.blxrbdn.com; JSON-RPC 2.0; docs.bloxroute.com     |
 
 ---
 

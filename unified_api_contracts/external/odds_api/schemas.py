@@ -25,6 +25,8 @@ class OddsApiOutcome(BaseModel):
 class OddsApiMarket(BaseModel):
     """Market from The Odds API."""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     key: str | None = None
     last_update: str | None = Field(None, alias="lastUpdate")
     outcomes: list[OddsApiOutcome] | None = None
@@ -33,6 +35,8 @@ class OddsApiMarket(BaseModel):
 class OddsApiBookmaker(BaseModel):
     """Bookmaker from The Odds API."""
 
+    model_config = ConfigDict(populate_by_name=True)
+
     key: str | None = None
     title: str | None = None
     last_update: str | None = Field(None, alias="lastUpdate")
@@ -40,7 +44,12 @@ class OddsApiBookmaker(BaseModel):
 
 
 class OddsApiFixture(BaseModel):
-    """Fixture from The Odds API."""
+    """Fixture from The Odds API.
+
+    Accepts both camelCase (v4 docs) and snake_case (actual responses).
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     id: str | None = None
     sport_key: str | None = Field(None, alias="sportKey")
@@ -53,6 +62,8 @@ class OddsApiFixture(BaseModel):
 
 class OddsApiHistoricalOdds(BaseModel):
     """Historical odds from The Odds API."""
+
+    model_config = ConfigDict(populate_by_name=True)
 
     sport_key: str | None = Field(None, alias="sportKey")
     sport_title: str | None = Field(None, alias="sportTitle")

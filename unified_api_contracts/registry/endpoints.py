@@ -50,7 +50,6 @@ BASE_URLS: dict[str, str] = {
     "thegraph": "https://api.thegraph.com",
     "alchemy": "https://eth-mainnet.g.alchemy.com/v2",
     "mev": "https://relay.flashbots.net",
-    "bloxroute": "https://api.blxrbdn.com",
     # CCXT: per-exchange; no single base URL
 }
 
@@ -303,11 +302,6 @@ ENDPOINT_SCHEMA_MAP: dict[tuple[str, str], str] = {
     ("mev", "send_bundle"): "FlashbotsBundleParams",
     ("mev", "call_bundle"): "FlashbotsCallBundleParams",
     ("mev", "mev_share_bundle"): "MevShareBundleParams",
-    # bloXroute BDN (Gateway-API, Cloud-API, Protect RPC)
-    ("bloxroute", "tx_submit"): "BloxrouteTxSubmitResult",
-    ("bloxroute", "bdn_blocks"): "BloxrouteBdnBlocksParams",
-    ("bloxroute", "subscribe"): "BloxrouteSubscribeParams",
-    ("bloxroute", "protect_endpoints"): "BloxrouteProtectEndpoints",
     # DeFi protocol lending (Aave, Compound, Morpho, Euler)
     ("defi", "aave_reserve"): "AaveV3ReserveData",
     ("defi", "aave_user_account"): "AaveV3UserAccountData",
@@ -398,7 +392,6 @@ def get_schema_class_for_endpoint(venue: str, endpoint: str) -> type[BaseModel] 
         "thegraph": "thegraph",
         "alchemy": "alchemy",
         "mev": "mev",
-        "bloxroute": "bloxroute",
         "defi": "defi",
     }
     module_name = module_map.get(venue, venue)

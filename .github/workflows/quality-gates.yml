@@ -6,9 +6,27 @@ on:
   pull_request:
     branches: [main, staging]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   quality-gates:
     uses: IggyIkenna/unified-trading-pm/.github/workflows/python-quality-gates.yml@live-defi-rollout
     with:
       dep_repos: ""
     secrets: inherit
+
+  # Notify unified-trading-system-ui to regenerate OpenAPI TypeScript types
+  notify-ui-openapi-sync:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
+    needs: quality-gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch to unified-trading-system-ui
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GH_PAT }}" \
+            https://api.github.com/repos/IggyIkenna/unified-trading-system-ui/dispatches \
+            -d '{"event_type": "uac-openapi-updated", "client_payload": {"version": "${{ github.sha }}", "branch": "${{ github.ref_name }}"}}'

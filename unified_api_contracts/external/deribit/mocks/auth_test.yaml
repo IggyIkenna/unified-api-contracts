@@ -1,0 +1,18 @@
+interactions:
+  - request:
+      body: '{"jsonrpc":"2.0","method":"public/auth","params":{"grant_type":"client_credentials","client_id":"test-key","client_secret":"test-secret"},"id":1}'
+      headers:
+        Content-Type:
+          - application/json
+      method: POST
+      uri: https://test.deribit.com/api/v2/public/auth
+    response:
+      body:
+        string: '{"jsonrpc":"2.0","result":{"access_token":"test-access-token","expires_in":31536000,"refresh_token":"test-refresh-token","scope":"connection mainaccount","token_type":"bearer"},"testnet":true,"usIn":1705000000000000,"usOut":1705000000001000,"usDiff":1000}'
+      headers:
+        Content-Type:
+          - application/json; charset=utf-8
+      status:
+        code: 200
+        message: OK
+version: 1

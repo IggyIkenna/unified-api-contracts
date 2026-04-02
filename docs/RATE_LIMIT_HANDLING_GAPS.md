@@ -28,7 +28,6 @@
 | databento     | RATE_LIMIT               | RETRY  |
 | hyperliquid   | RATE_LIMIT               | RETRY  |
 | aster         | 429                      | RETRY  |
-| bloxroute     | 429                      | RETRY  |
 
 ### 1.2 Schemas
 

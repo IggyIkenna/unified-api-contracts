@@ -12,17 +12,42 @@ from unified_api_contracts.canonical.domain import CanonicalBetMarket, Canonical
 from unified_api_contracts.canonical.domain.sports import (
     CanonicalFixture,
     CanonicalLeague,
+    CanonicalReferee,
     CanonicalTeam,
     CanonicalVenue,
+    build_fixture_id,
+    build_league_id,
+    build_referee_id,
+    build_season_id,
+    build_team_id,
+    build_venue_id,
 )
 from unified_api_contracts.normalize_utils._helpers import _iso, _to_decimal, _ts_ms_to_datetime
 
 from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue
 
 
+def _extract_referee(raw: ApiFootballFixture) -> CanonicalReferee | None:
+    """Extract referee from API-Football fixture response."""
+    ref_name = raw.referee
+    if not ref_name:
+        return None
+    return CanonicalReferee(
+        referee_id=build_referee_id(str(ref_name)),
+        name=str(ref_name),
+        nationality=None,
+    )
+
+
 def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_football") -> CanonicalFixture:
-    """Convert ApiFootballFixture to CanonicalFixture."""
-    fixture_id = str(raw.id or "")
+    """Convert ApiFootballFixture to CanonicalFixture.
+
+    Uses canonical ID builders for human-readable IDs:
+      - league_id: build_league_id(country, name) → "ENG_PREMIER_LEAGUE"
+      - team_id: build_team_id(name) → "ARSENAL"
+      - fixture_id: build_fixture_id(league, home, away, date) → "ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322"
+    """
+    raw_fixture_id = str(raw.id or "")
     kickoff_utc: datetime
     if raw.date:
         kickoff_utc = _iso(raw.date)
@@ -42,7 +67,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
         away_raw = raw.teams.get("away")
         if home_raw:
             home_team = CanonicalTeam(
-                team_id=str(home_raw.id or ""),
+                team_id=build_team_id(home_raw.name or ""),
                 name=home_raw.name or "",
                 short_name=home_raw.code,
                 country=home_raw.country,
@@ -52,7 +77,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
             )
         if away_raw:
             away_team = CanonicalTeam(
-                team_id=str(away_raw.id or ""),
+                team_id=build_team_id(away_raw.name or ""),
                 name=away_raw.name or "",
                 short_name=away_raw.code,
                 country=away_raw.country,
@@ -64,7 +89,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     league = CanonicalLeague(league_id="", name="", country="", league_type=None, logo_url=None)
     if raw.league:
         league = CanonicalLeague(
-            league_id=str(raw.league.id or ""),
+            league_id=build_league_id(raw.league.country or "", raw.league.name or ""),
             name=raw.league.name or "",
             country=raw.league.country or "",
             league_type=raw.league.type,
@@ -76,9 +101,10 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
         v = raw.venue
         _city = v.get("city")
         _country = v.get("country")
+        _vname = str(v.get("name") or "")
         venue_obj = CanonicalVenue(
-            venue_id=str(v.get("id") or ""),
-            name=str(v.get("name") or ""),
+            venue_id=build_venue_id(_vname) if _vname else "",
+            name=_vname,
             city=str(_city) if _city is not None else None,
             country=str(_country) if _country is not None else None,
             capacity=None,
@@ -89,9 +115,10 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
         )
     elif hasattr(raw.venue, "id") and raw.venue is not None:
         v = raw.venue
+        _vname2 = getattr(v, "name", "") or ""
         venue_obj = CanonicalVenue(
-            venue_id=str(getattr(v, "id", "") or ""),
-            name=getattr(v, "name", "") or "",
+            venue_id=build_venue_id(_vname2) if _vname2 else "",
+            name=_vname2,
             city=getattr(v, "city", None),
             country=getattr(v, "country", None) if hasattr(v, "country") else None,
             capacity=None,
@@ -123,15 +150,33 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
         else:
             status = getattr(raw.status, "long", None) or getattr(raw.status, "short", None)
 
+    # Build human-readable fixture ID: ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322
+    # Falls back to raw API-Football numeric ID if team/league names are empty
+    date_str = kickoff_utc.strftime("%Y%m%d")
+    canonical_fixture_id = (
+        build_fixture_id(
+            league_id=league.league_id,
+            home_team_id=home_team.team_id,
+            away_team_id=away_team.team_id,
+            date_str=date_str,
+        )
+        if home_team.team_id and away_team.team_id
+        else raw_fixture_id
+    )
+
+    # Build canonical season: YYYY/YY
+    season_raw = raw.league.season if raw.league else None
+    season_str = build_season_id(int(str(season_raw))) if season_raw else ""
+
     return CanonicalFixture(
-        fixture_id=fixture_id,
+        fixture_id=canonical_fixture_id,
         home_team=home_team,
         away_team=away_team,
         league=league,
         kickoff_utc=kickoff_utc,
         venue=venue_obj,
-        referee=None,
-        season=str(raw.league.season or "") if raw.league else "",
+        referee=_extract_referee(raw),
+        season=season_str,
         match_week=None,
         source=venue,
         status=status,

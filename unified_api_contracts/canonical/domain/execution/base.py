@@ -63,18 +63,32 @@ class TimeInForce(StrEnum):
 
 
 class OperationType(StrEnum):
+    # CeFi / TradFi
     BUY = "BUY"
     SELL = "SELL"
+    # DeFi — DEX
     SWAP = "SWAP"
+    # DeFi — Lending
     LEND = "LEND"
     BORROW = "BORROW"
     REPAY = "REPAY"
     WITHDRAW = "WITHDRAW"
     DEPOSIT = "DEPOSIT"
-    REBALANCE = "REBALANCE"
+    # DeFi — Staking / LST
+    STAKE = "STAKE"
+    UNSTAKE = "UNSTAKE"
+    # DeFi — Flash Loans (atomic)
+    FLASH_BORROW = "FLASH_BORROW"
+    FLASH_REPAY = "FLASH_REPAY"
+    # DeFi — LP
     ADD_LIQUIDITY = "ADD_LIQUIDITY"
     REMOVE_LIQUIDITY = "REMOVE_LIQUIDITY"
+    REBALANCE_RANGE = "REBALANCE_RANGE"
     COLLECT_FEES = "COLLECT_FEES"
+    # Cross-cutting
+    TRANSFER = "TRANSFER"
+    TRADE = "TRADE"
+    REBALANCE = "REBALANCE"
 
 
 class ExecutionStatus(StrEnum):

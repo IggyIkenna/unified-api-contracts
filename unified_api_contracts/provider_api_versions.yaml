@@ -28,12 +28,6 @@ providers:
     last_verified: "2026-03-06"
     status: yellow
 
-  arkham:
-    api_version: "v1"
-    spec_url: "https://codebook.arkham.com/reference/introduction"
-    last_verified: "2026-03-06"
-    status: yellow
-
   aster:
     api_version: "v2"
     spec_url: "https://aster.exchange/api-docs"
@@ -64,12 +58,6 @@ providers:
     last_verified: "2026-03-06"
     status: green
 
-  bitfinex:
-    api_version: "v2"
-    spec_url: "https://docs.bitfinex.com/docs"
-    last_verified: "2026-03-06"
-    status: yellow
-
   bitget:
     api_version: "v2"
     spec_url: "https://www.bitget.com/api-doc/common/intro"
@@ -79,12 +67,6 @@ providers:
   bitstamp:
     api_version: "v2"
     spec_url: "https://www.bitstamp.net/api/"
-    last_verified: "2026-03-06"
-    status: yellow
-
-  bloxroute:
-    api_version: "v1"
-    spec_url: "https://docs.bloxroute.com/"
     last_verified: "2026-03-06"
     status: yellow
 
@@ -182,12 +164,6 @@ providers:
   fred:
     api_version: "v1"
     spec_url: "https://fred.stlouisfed.org/docs/api/fred/"
-    last_verified: "2026-03-06"
-    status: yellow
-
-  gateio:
-    api_version: "v4"
-    spec_url: "https://www.gate.io/docs/developers/apiv4/en/"
     last_verified: "2026-03-06"
     status: yellow
 
@@ -375,12 +351,6 @@ providers:
     last_verified: "2026-03-06"
     status: yellow
     free_tier: true
-
-  pyth:
-    api_version: "v1"
-    spec_url: "https://docs.pyth.network/home"
-    last_verified: "2026-03-06"
-    status: yellow
 
   regulatory:
     api_version: "v1"

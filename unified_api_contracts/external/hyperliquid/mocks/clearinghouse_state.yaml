@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: '{"type":"clearinghouseState","user":"0x0000000000000000000000000000000000000001"}'
+      headers:
+        Accept:
+          - "*/*"
+        Content-Type:
+          - application/json
+        User-Agent:
+          - python-requests/2.32.5
+      method: POST
+      uri: https://api.hyperliquid.xyz/info
+    response:
+      body:
+        string: '{"marginSummary":{"accountValue":"10000.00","totalNtlPos":"3500.00","totalRawUsd":"9800.00","totalMarginUsed":"700.00"},"crossMarginSummary":{"accountValue":"10000.00","totalNtlPos":"3500.00","totalRawUsd":"9800.00","totalMarginUsed":"700.00"},"crossMaintenanceMarginUsed":"500.00","withdrawable":"9300.00","assetPositions":[{"position":{"coin":"ETH","szi":"1.0000","entryPx":"3400.0","positionValue":"3500.00","unrealizedPnl":"100.00","returnOnEquity":"0.0143","liquidationPx":"2200.0","marginUsed":"700.00","maxLeverage":50,"leverage":{"type":"cross","value":5,"rawUsd":"700.00"}},"type":"oneWay"}]}'
+      headers:
+        Content-Type:
+          - application/json
+        Date:
+          - Wed, 25 Feb 2026 08:00:00 GMT
+      status:
+        code: 200
+        message: OK
+version: 1

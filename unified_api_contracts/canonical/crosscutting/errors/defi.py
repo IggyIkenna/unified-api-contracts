@@ -2,7 +2,52 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
+
 from ._types import ErrorAction, VenueErrorClassification, ve
+
+
+class DefiAlertType(StrEnum):
+    """Canonical DeFi alert type enum.
+
+    Used by alerting-service DeFi rules to classify alert categories.
+    """
+
+    HEALTH_FACTOR_CRITICAL = "health_factor_critical"
+    POSITION_LIQUIDATED = "position_liquidated"
+    WEETH_DEPEG = "weeth_depeg"
+    AAVE_UTILIZATION_SPIKE = "aave_utilization_spike"
+    FUNDING_RATE_FLIP = "funding_rate_flip"
+    FEATURE_STALE = "feature_stale"
+    TX_SIMULATION_FAILED = "tx_simulation_failed"
+    RATE_DEVIATION = "rate_deviation"
+
+
+class DefiErrorCode:
+    """Known DeFi error codes for structured error classification.
+
+    These codes are used by UDEI connectors (aave.py, etc.) to classify
+    on-chain revert reasons into structured error codes. Execution-service
+    routes on the code prefix (FAIL/RETRY/SKIP) via classify_venue_error().
+
+    Each constant aligns with the aave_v3 venue error classifications in
+    VENUE_ERRORS_DEFI below.
+    """
+
+    INSUFFICIENT_COLLATERAL = "INSUFFICIENT_COLLATERAL"
+    INSUFFICIENT_BALANCE = "INSUFFICIENT_BALANCE"
+    NO_COLLATERAL_DEPOSITED = "NO_COLLATERAL_DEPOSITED"
+    ASSET_NOT_SUPPORTED = "ASSET_NOT_SUPPORTED"
+    ZERO_AMOUNT = "ZERO_AMOUNT"
+    TX_REVERTED = "TX_REVERTED"
+    GAS_ESTIMATION_FAILED = "GAS_ESTIMATION_FAILED"
+    SLIPPAGE_EXCEEDED = "SLIPPAGE_EXCEEDED"
+    FLASH_LOAN_RECEIVER_INVALID = "FLASH_LOAN_RECEIVER_INVALID"
+    FLASH_LOAN_INSUFFICIENT_LIQUIDITY = "FLASH_LOAN_INSUFFICIENT_LIQUIDITY"
+    NO_OUTSTANDING_DEBT = "NO_OUTSTANDING_DEBT"
+    BORROW_CAP_EXCEEDED = "BORROW_CAP_EXCEEDED"
+    SUPPLY_CAP_EXCEEDED = "SUPPLY_CAP_EXCEEDED"
+
 
 VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
     "balancer": [
@@ -32,11 +77,35 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "balancer",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "balancer",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "balancer",
             "429",
             retry=True,
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Rate limit exceeded",
+        ),
+        ve(
+            "balancer",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
         ),
         ve(
             "balancer",
@@ -66,6 +135,46 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "curve",
+            "RPC_ERROR",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="JSON-RPC error from Ethereum node",
+        ),
+        ve(
+            "curve",
+            "TIMEOUT",
+            retry=True,
+            reconnect=True,
+            action=ErrorAction.RECONNECT,
+            desc="RPC call timed out",
+        ),
+        ve(
+            "curve",
+            "CONNECTION_ERROR",
+            retry=True,
+            reconnect=True,
+            action=ErrorAction.RECONNECT,
+            desc="Network connection failure to RPC endpoint",
+        ),
+        ve(
+            "curve",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "curve",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "curve",
             "429",
             retry=True,
             reconnect=False,
@@ -90,6 +199,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
     ],
     "ethena": [
+        ve(
+            "ethena",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
         ve(
             "ethena",
             "429",
@@ -142,11 +259,43 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "euler",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request — malformed query or invalid parameters",
+        ),
+        ve(
+            "euler",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "euler",
+            "ADAPTER_ERROR",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Adapter implementation error (e.g. missing method)",
+        ),
+        ve(
+            "euler",
             "429",
             retry=True,
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Rate limit exceeded",
+        ),
+        ve(
+            "euler",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
         ),
         ve(
             "euler",
@@ -158,6 +307,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
     ],
     "fluid": [
+        ve(
+            "fluid",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
         ve(
             "fluid",
             "429",
@@ -194,6 +351,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
     "etherfi": [
         ve(
             "etherfi",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "etherfi",
             "429",
             retry=True,
             reconnect=False,
@@ -226,6 +391,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
     ],
     "lido": [
+        ve(
+            "lido",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
         ve(
             "lido",
             "429",
@@ -278,6 +451,22 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "morpho",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request — malformed GraphQL query or invalid parameters",
+        ),
+        ve(
+            "morpho",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "morpho",
             "429",
             retry=True,
             reconnect=False,
@@ -300,6 +489,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.RETRY,
             desc="Server error",
         ),
+        ve(
+            "morpho",
+            "SUBGRAPH_NOT_FOUND",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Morpho subgraph not found or unavailable",
+        ),
     ],
     "uniswap_v2": [
         ve(
@@ -320,11 +517,67 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "uniswap_v2",
+            "SUBGRAPH_NOT_FOUND",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Subgraph not found or invalid ID",
+        ),
+        ve(
+            "uniswap_v2",
+            "AUTH_FAILURE",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="API key invalid, malformed, or not found",
+        ),
+        ve(
+            "uniswap_v2",
+            "QUERY_ERROR",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="GraphQL query syntax or schema error",
+        ),
+        ve(
+            "uniswap_v2",
+            "INDEXING_ERROR",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Subgraph indexing in progress or stale",
+        ),
+        ve(
+            "uniswap_v2",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "uniswap_v2",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "uniswap_v2",
             "429",
             retry=True,
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Rate limit exceeded",
+        ),
+        ve(
+            "uniswap_v2",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
         ),
         ve(
             "uniswap_v2",
@@ -362,11 +615,67 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "uniswap_v3",
+            "SUBGRAPH_NOT_FOUND",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Subgraph not found or invalid ID",
+        ),
+        ve(
+            "uniswap_v3",
+            "AUTH_FAILURE",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="API key invalid, malformed, or not found",
+        ),
+        ve(
+            "uniswap_v3",
+            "QUERY_ERROR",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="GraphQL query syntax or schema error",
+        ),
+        ve(
+            "uniswap_v3",
+            "INDEXING_ERROR",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Subgraph indexing in progress or stale",
+        ),
+        ve(
+            "uniswap_v3",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "uniswap_v3",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "uniswap_v3",
             "429",
             retry=True,
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Rate limit exceeded",
+        ),
+        ve(
+            "uniswap_v3",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
         ),
         ve(
             "uniswap_v3",
@@ -396,11 +705,67 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "uniswap_v4",
+            "SUBGRAPH_NOT_FOUND",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Subgraph not found or invalid ID",
+        ),
+        ve(
+            "uniswap_v4",
+            "AUTH_FAILURE",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="API key invalid, malformed, or not found",
+        ),
+        ve(
+            "uniswap_v4",
+            "QUERY_ERROR",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="GraphQL query syntax or schema error",
+        ),
+        ve(
+            "uniswap_v4",
+            "INDEXING_ERROR",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Subgraph indexing in progress or stale",
+        ),
+        ve(
+            "uniswap_v4",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "uniswap_v4",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "uniswap_v4",
             "429",
             retry=True,
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Rate limit exceeded",
+        ),
+        ve(
+            "uniswap_v4",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
         ),
         ve(
             "uniswap_v4",
@@ -419,6 +784,86 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
             reconnect=False,
             action=ErrorAction.FAIL,
             desc="Health factor below 1 — liquidation risk",
+        ),
+        ve(
+            "aave_v3",
+            "INSUFFICIENT_BALANCE",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Token balance too low for the requested operation",
+        ),
+        ve(
+            "aave_v3",
+            "NO_COLLATERAL_DEPOSITED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="No collateral deposited — cannot borrow",
+        ),
+        ve(
+            "aave_v3",
+            "ASSET_NOT_SUPPORTED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Token not supported by AAVE V3 pool",
+        ),
+        ve(
+            "aave_v3",
+            "ZERO_AMOUNT",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Operation amount must be greater than zero",
+        ),
+        ve(
+            "aave_v3",
+            "TX_REVERTED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="On-chain transaction reverted",
+        ),
+        ve(
+            "aave_v3",
+            "GAS_ESTIMATION_FAILED",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Gas estimation failed — node may be congested",
+        ),
+        ve(
+            "aave_v3",
+            "SLIPPAGE_EXCEEDED",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Slippage tolerance exceeded during execution",
+        ),
+        ve(
+            "aave_v3",
+            "FLASH_LOAN_RECEIVER_INVALID",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Flash loan receiver is not a valid contract",
+        ),
+        ve(
+            "aave_v3",
+            "FLASH_LOAN_INSUFFICIENT_LIQUIDITY",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Insufficient pool liquidity for flash loan amount",
+        ),
+        ve(
+            "aave_v3",
+            "NO_OUTSTANDING_DEBT",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.SKIP,
+            desc="No outstanding debt to repay — operation is a no-op",
         ),
         ve(
             "aave_v3",
@@ -446,11 +891,51 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
         ),
         ve(
             "aave_v3",
-            "-32603",
+            "SUBGRAPH_NOT_FOUND",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Subgraph not found or invalid ID",
+        ),
+        ve(
+            "aave_v3",
+            "AUTH_FAILURE",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="API key invalid, malformed, or not found",
+        ),
+        ve(
+            "aave_v3",
+            "QUERY_ERROR",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="GraphQL query syntax or schema error",
+        ),
+        ve(
+            "aave_v3",
+            "INDEXING_ERROR",
             retry=True,
             reconnect=False,
             action=ErrorAction.RETRY,
-            desc="RPC internal error — retry",
+            desc="Subgraph indexing in progress or stale",
+        ),
+        ve(
+            "aave_v3",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "aave_v3",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
         ),
         ve(
             "aave_v3",
@@ -459,6 +944,176 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Rate limit exceeded",
+        ),
+        ve(
+            "aave_v3",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
+        ),
+        ve(
+            "aave_v3",
+            "-32603",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="RPC internal error — retry",
+        ),
+    ],
+    "aave_plasma": [
+        ve(
+            "aave_plasma",
+            "INSUFFICIENT_COLLATERAL",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Health factor below 1 — liquidation risk",
+        ),
+        ve(
+            "aave_plasma",
+            "INSUFFICIENT_BALANCE",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Token balance too low for the requested operation",
+        ),
+        ve(
+            "aave_plasma",
+            "NO_COLLATERAL_DEPOSITED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="No collateral deposited — cannot borrow",
+        ),
+        ve(
+            "aave_plasma",
+            "ASSET_NOT_SUPPORTED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Token not supported by AAVE Plasma pool",
+        ),
+        ve(
+            "aave_plasma",
+            "ZERO_AMOUNT",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Operation amount must be greater than zero",
+        ),
+        ve(
+            "aave_plasma",
+            "TX_REVERTED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="On-chain transaction reverted",
+        ),
+        ve(
+            "aave_plasma",
+            "GAS_ESTIMATION_FAILED",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Gas estimation failed — node may be congested",
+        ),
+        ve(
+            "aave_plasma",
+            "SLIPPAGE_EXCEEDED",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Slippage tolerance exceeded during execution",
+        ),
+        ve(
+            "aave_plasma",
+            "FLASH_LOAN_RECEIVER_INVALID",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Flash loan receiver is not a valid contract",
+        ),
+        ve(
+            "aave_plasma",
+            "FLASH_LOAN_INSUFFICIENT_LIQUIDITY",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Insufficient pool liquidity for flash loan amount",
+        ),
+        ve(
+            "aave_plasma",
+            "NO_OUTSTANDING_DEBT",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.SKIP,
+            desc="No outstanding debt to repay — operation is a no-op",
+        ),
+        ve(
+            "aave_plasma",
+            "BORROW_CAP_EXCEEDED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Borrow cap for asset reached",
+        ),
+        ve(
+            "aave_plasma",
+            "SUPPLY_CAP_EXCEEDED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Supply cap for asset reached",
+        ),
+        ve(
+            "aave_plasma",
+            "PRICE_ORACLE_SENTINEL",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Oracle price feed stale — retry",
+        ),
+        ve(
+            "aave_plasma",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "aave_plasma",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "aave_plasma",
+            "429",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Rate limit exceeded",
+        ),
+        ve(
+            "aave_plasma",
+            "500",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Server error",
+        ),
+        ve(
+            "aave_plasma",
+            "-32603",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="RPC internal error — retry",
         ),
     ],
     "instadapp": [
@@ -469,6 +1124,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
             reconnect=False,
             action=ErrorAction.FAIL,
             desc="DSProxy execution failed — revert in spell",
+        ),
+        ve(
+            "instadapp",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
         ),
         ve(
             "instadapp",
@@ -506,6 +1169,22 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
     "defillama": [
         ve(
             "defillama",
+            "400",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Bad request",
+        ),
+        ve(
+            "defillama",
+            "401",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Unauthorized",
+        ),
+        ve(
+            "defillama",
             "429",
             retry=True,
             reconnect=False,
@@ -535,6 +1214,14 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="Service temporarily unavailable",
+        ),
+        ve(
+            "defillama",
+            "-32603",
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="RPC internal error — retry",
         ),
     ],
 }

@@ -16,8 +16,8 @@
           "lastUpdate": "2025-02-27T12:00:00Z",
           "outcomes": [
             { "name": "Team A", "price": 1.91 },
-            { "name": "Draw", "price": 3.40 },
-            { "name": "Team B", "price": 4.20 }
+            { "name": "Draw", "price": 3.4 },
+            { "name": "Team B", "price": 4.2 }
           ]
         },
         {
@@ -50,7 +50,7 @@
           "outcomes": [
             { "name": "Team A or Draw", "price": 1.25 },
             { "name": "Team B or Draw", "price": 1.55 },
-            { "name": "Team A or Team B", "price": 1.30 }
+            { "name": "Team A or Team B", "price": 1.3 }
           ]
         }
       ]

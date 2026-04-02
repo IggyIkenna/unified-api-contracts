@@ -1,4 +1,10 @@
-"""Source capability registry -- declares what each external source provides."""
+"""Source capability registry -- declares what each external source provides.
+
+Layers of granularity (coarse → fine):
+  1. SourceCapability  — per-source (e.g. "hyperliquid"): domains, live/batch/testnet flags
+  2. operation_details — per-operation (e.g. "place_order"): signing, credential, env support
+  3. EndpointSpec      — per-HTTP-endpoint (e.g. POST /info): schema, cassette, rate limit
+"""
 
 from __future__ import annotations
 
@@ -6,11 +12,91 @@ from pydantic import BaseModel
 
 __all__ = [
     "CapabilityResolutionError",
+    "OperationDetail",
+    "OperationEnvDetail",
     "SourceCapability",
+    "UnsupportedOperationError",
     "register_capability",
     "resolve_capability",
     "validate_mode_env_auth",
+    "validate_operation",
 ]
+
+
+# ---------------------------------------------------------------------------
+# Operation-level environment detail
+# ---------------------------------------------------------------------------
+
+
+class OperationEnvDetail(BaseModel):
+    """Per-environment detail for a single operation on a single source.
+
+    Captures the facts that differ between testnet and mainnet for an operation,
+    such as signing scheme, required credential type, and data fidelity.
+
+    String fields use free-form values (not enums) to avoid maintenance burden.
+    Common values are documented below for consistency.
+
+    signing_scheme common values:
+        "hmac_sha256"   — HMAC-SHA256 (most CeFi REST APIs)
+        "ed25519"       — Ed25519 signature (some CeFi)
+        "l1_action"     — Hyperliquid L1 phantom agent (msgpack + EIP-712)
+        "user_signed"   — Hyperliquid user-signed action (EIP-712 direct)
+        "eip712"        — EIP-712 typed data (Polymarket L1, DeFi)
+        "on_chain"      — Web3 transaction signing (DeFi smart contracts)
+        "api_key_header" — API key in HTTP header (data-only sources)
+        "fix_logon"     — FIX protocol session logon
+        "ib_gateway"    — Interactive Brokers TWS/Gateway connection
+        "none"          — No authentication required
+
+    required_credential common values:
+        "api_key"           — Standard API key + secret pair
+        "api_wallet"        — Agent wallet (can trade, cannot transfer/withdraw)
+        "main_wallet"       — Main wallet (full access including transfers)
+        "wallet_private_key" — Web3 wallet private key for on-chain signing
+        "oauth_token"       — OAuth2 bearer token
+        "cert"              — Client certificate (mTLS)
+        "session_token"     — Session-based auth
+        "none"              — No credentials required
+
+    data_fidelity common values:
+        "production"        — Real production data
+        "synthetic"         — Fake test tokens/prices (testnet)
+        "production_mirror" — Fork of production state (Anvil/Tenderly)
+        "delayed"           — Real data with delay
+    """
+
+    supported: bool = True
+    signing_scheme: str | None = None
+    required_credential: str | None = None
+    base_url: str | None = None
+    data_fidelity: str | None = None
+    notes: str | None = None
+
+
+class OperationDetail(BaseModel):
+    """Per-operation capability detail, keyed by environment.
+
+    Example::
+
+        OperationDetail(environments={
+            "mainnet": OperationEnvDetail(
+                signing_scheme="l1_action",
+                required_credential="api_wallet",
+            ),
+            "testnet": OperationEnvDetail(
+                supported=False,
+                notes="API wallet cannot transfer; use UI",
+            ),
+        })
+    """
+
+    environments: dict[str, OperationEnvDetail] = {}
+
+
+# ---------------------------------------------------------------------------
+# Source-level capability
+# ---------------------------------------------------------------------------
 
 
 class SourceCapability(BaseModel):
@@ -28,6 +114,18 @@ class SourceCapability(BaseModel):
     auth_environments: dict[str, str] = {}  # {"test": "testnet_key", "prod": "prod_key"}
     operations: dict[str, list[str]] = {}  # {"market": ["ticker", "orderbook"], ...}
     supported_testing_stages: list[str] = []  # TestingStage string values this source supports
+
+    # --- New: operation-level detail (optional, backwards-compatible) ---
+    operation_details: dict[str, OperationDetail] = {}
+    """Per-operation environment detail. Keyed by operation name (must match a value
+    in ``operations``). When absent for an operation, falls back to source-level flags."""
+
+    base_urls: dict[str, str] = {}
+    """Per-environment base URLs. e.g. {"mainnet": "https://api.x.com", "testnet": "https://testnet.x.com"}"""
+
+    margin_model: dict[str, str] = {}
+    """Per-environment margin model. e.g. {"mainnet": "cross", "testnet": "unified"}
+    Common values: "cross", "isolated", "unified", "portfolio", "none"."""
 
 
 class CapabilityResolutionError(RuntimeError):
@@ -93,3 +191,59 @@ def validate_mode_env_auth(
         if capability.supports_mainnet:
             supported_envs.append("mainnet")
         raise UnsupportedEnvironmentError(capability.source, env, supported_envs)
+
+
+def validate_operation(
+    source: str,
+    operation: str,
+    env: str = "mainnet",
+) -> OperationEnvDetail:
+    """Validate and return environment detail for a specific operation on a source.
+
+    If ``operation_details`` has an entry for this operation+env, return it (and raise
+    if ``supported=False``). Otherwise fall back to source-level ``validate_mode_env_auth``.
+
+    Args:
+        source: Source identifier (e.g. "hyperliquid").
+        operation: Operation name (e.g. "place_order", "usd_class_transfer").
+        env: Environment — "mainnet" or "testnet".
+
+    Returns:
+        OperationEnvDetail with signing/credential info for the caller.
+
+    Raises:
+        CapabilityResolutionError: If source not registered.
+        UnsupportedOperationError: If operation is explicitly unsupported in this env.
+    """
+    cap = resolve_capability(source)
+
+    detail = cap.operation_details.get(operation)
+    if detail is None:
+        # No per-operation detail — fall back to source-level check
+        validate_mode_env_auth(cap, env=env)
+        return OperationEnvDetail()
+
+    env_detail = detail.environments.get(env)
+    if env_detail is None:
+        # Operation exists but no entry for this env — fall back to source-level
+        validate_mode_env_auth(cap, env=env)
+        return OperationEnvDetail()
+
+    if not env_detail.supported:
+        raise UnsupportedOperationError(source, operation, env, env_detail.notes)
+
+    return env_detail
+
+
+class UnsupportedOperationError(RuntimeError):
+    """Raised when an operation is explicitly unsupported in the requested environment."""
+
+    def __init__(self, source: str, operation: str, env: str, notes: str | None = None) -> None:
+        self.source = source
+        self.operation = operation
+        self.env = env
+        self.notes = notes
+        msg = f"{source}.{operation} is not supported on {env}"
+        if notes:
+            msg += f": {notes}"
+        super().__init__(msg)

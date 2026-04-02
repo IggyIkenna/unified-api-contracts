@@ -86,15 +86,31 @@ None currently.
 
 ## 2.5 File Size Exceptions (MAX_FILE_LINES=900)
 
-| File                           | Lines | Reason                                                                                                                                                                     |
-| ------------------------------ | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sports/canonical/features.py` | ~1196 | Pure Pydantic schema (`SportsFeatureVector`) with ~998 sport feature fields; splitting a single dataclass across files would reduce readability with no structural benefit |
+| File                                                          | Lines | Reason                                                                                                                                                                      |
+| ------------------------------------------------------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `sports/canonical/features.py`                                | ~1196 | Pure Pydantic schema (`SportsFeatureVector`) with ~998 sport feature fields; splitting a single dataclass across files would reduce readability with no structural benefit  |
+| `unified_api_contracts/__init__.py`                           | ~998  | Schema-registry root aggregator that re-exports all UAC public symbols across 80+ external source domains; splitting the root facade would break the Citadel import surface |
+| `unified_api_contracts/canonical/crosscutting/errors/defi.py` | 1224  | Consolidated DeFi canonical error classes (one class per on-chain error code); splitting across files would scatter related error hierarchy with no structural benefit      |
 
-**Config:** `scripts/quality-gates.sh` — `continue` for these paths when under threshold.
+**Config:** `scripts/quality-gates.sh` — `SIZE_EXTRA_EXCLUDES` excludes `__init__.py` and `defi.py` from the file size check.
 
 ---
 
-## 2.6 Hardening Decisions
+## 2.6 Broad except Exception (venue_context.py)
+
+**Scope:** `unified_api_contracts/registry/venue_context.py` — two `except Exception` clauses
+**Rule:** QG warns on `broad except Exception`
+**Reason:** The venue context resolver is called at the execution boundary. Catching broad exceptions
+is intentional defensive programming: a resolution failure (e.g. missing capability entry) must never
+crash the caller; instead it raises `CapabilityResolutionError` (typed exception) for the bad-path case
+and logs the raw exception detail. This is not swallowing errors — every branch either re-raises as
+a typed error or returns a fallback. UAC has zero production service code (pure schema+registry library)
+so the typical service-layer concerns don't apply here.
+**Decision:** Accept; document here per QG requirement.
+
+---
+
+## 2.7 Hardening Decisions
 
 - `unified-api-contracts` has zero production service code — no retry logic, no GCS writes,
   no pubsub. Error handling rules (no bare `except:`, `@handle_api_errors`) do not

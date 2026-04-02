@@ -1,0 +1,521 @@
+"""TradFi symbology reference data (SSOT).
+
+Databento parent/options symbol validation, exchange code mappings,
+ETF classification, and TradFi venue instrument definitions.
+
+Instrument identity is separated from data-source-specific bindings:
+- TRADFI_INSTRUMENTS: provider-agnostic identity (what the instrument IS)
+- TRADFI_DATA_BINDINGS: per-provider config (WHERE to get data for it)
+- TRADFI_VENUE_MAPPINGS: flattened merged view (identity + primary binding as dicts)
+
+Previously scattered across instruments-service config files.
+Centralized here as the system SSOT per UAC registry pattern.
+"""
+
+from __future__ import annotations
+
+from typing import Literal
+
+from pydantic import BaseModel
+
+# --- Databento parent symbol validation ---
+# Maps canonical underlying names (both exchange codes and human-readable aliases)
+# to (databento_parent_symbol, dataset) tuples.
+DATABENTO_VALID_PARENT_SYMBOLS: dict[str, tuple[str, str]] = {
+    # CME Index Futures
+    "ES": ("ES.FUT", "GLBX.MDP3"),
+    "SP500": ("ES.FUT", "GLBX.MDP3"),
+    "NQ": ("NQ.FUT", "GLBX.MDP3"),
+    "NASDAQ100": ("NQ.FUT", "GLBX.MDP3"),
+    "RTY": ("RTY.FUT", "GLBX.MDP3"),
+    "RUSSELL2000": ("RTY.FUT", "GLBX.MDP3"),
+    "YM": ("YM.FUT", "GLBX.MDP3"),
+    "DOW": ("YM.FUT", "GLBX.MDP3"),
+    # CME Energy
+    "CL": ("CL.FUT", "GLBX.MDP3"),
+    "CRUDE": ("CL.FUT", "GLBX.MDP3"),
+    "NG": ("NG.FUT", "GLBX.MDP3"),
+    "NATGAS": ("NG.FUT", "GLBX.MDP3"),
+    "RB": ("RB.FUT", "GLBX.MDP3"),
+    "GASOLINE": ("RB.FUT", "GLBX.MDP3"),
+    "HO": ("HO.FUT", "GLBX.MDP3"),
+    "HEATINGOIL": ("HO.FUT", "GLBX.MDP3"),
+    # CME Metals
+    "GC": ("GC.FUT", "GLBX.MDP3"),
+    "GOLD": ("GC.FUT", "GLBX.MDP3"),
+    "SI": ("SI.FUT", "GLBX.MDP3"),
+    "SILVER": ("SI.FUT", "GLBX.MDP3"),
+    "HG": ("HG.FUT", "GLBX.MDP3"),
+    "COPPER": ("HG.FUT", "GLBX.MDP3"),
+    "PL": ("PL.FUT", "GLBX.MDP3"),
+    "PLATINUM": ("PL.FUT", "GLBX.MDP3"),
+    # CME Grains
+    "ZC": ("ZC.FUT", "GLBX.MDP3"),
+    "CORN": ("ZC.FUT", "GLBX.MDP3"),
+    "ZW": ("ZW.FUT", "GLBX.MDP3"),
+    "WHEAT": ("ZW.FUT", "GLBX.MDP3"),
+    "ZS": ("ZS.FUT", "GLBX.MDP3"),
+    "SOYBEAN": ("ZS.FUT", "GLBX.MDP3"),
+    "ZM": ("ZM.FUT", "GLBX.MDP3"),
+    "SOYMEAL": ("ZM.FUT", "GLBX.MDP3"),
+    "ZL": ("ZL.FUT", "GLBX.MDP3"),
+    "SOYOIL": ("ZL.FUT", "GLBX.MDP3"),
+    # CME Interest Rates
+    "ZB": ("ZB.FUT", "GLBX.MDP3"),
+    "TBOND": ("ZB.FUT", "GLBX.MDP3"),
+    "ZN": ("ZN.FUT", "GLBX.MDP3"),
+    "TNOTE10Y": ("ZN.FUT", "GLBX.MDP3"),
+    "ZF": ("ZF.FUT", "GLBX.MDP3"),
+    "TNOTE5Y": ("ZF.FUT", "GLBX.MDP3"),
+    "ZT": ("ZT.FUT", "GLBX.MDP3"),
+    "TNOTE2Y": ("ZT.FUT", "GLBX.MDP3"),
+    # CME Currencies
+    "6E": ("6E.FUT", "GLBX.MDP3"),
+    "EUR": ("6E.FUT", "GLBX.MDP3"),
+    "6J": ("6J.FUT", "GLBX.MDP3"),
+    "JPY": ("6J.FUT", "GLBX.MDP3"),
+    "6B": ("6B.FUT", "GLBX.MDP3"),
+    "GBP": ("6B.FUT", "GLBX.MDP3"),
+    "6C": ("6C.FUT", "GLBX.MDP3"),
+    "CAD": ("6C.FUT", "GLBX.MDP3"),
+    "6A": ("6A.FUT", "GLBX.MDP3"),
+    "AUD": ("6A.FUT", "GLBX.MDP3"),
+    "6S": ("6S.FUT", "GLBX.MDP3"),
+    "CHF": ("6S.FUT", "GLBX.MDP3"),
+    "6M": ("6M.FUT", "GLBX.MDP3"),
+    "MXN": ("6M.FUT", "GLBX.MDP3"),
+    "6N": ("6N.FUT", "GLBX.MDP3"),
+    "NZD": ("6N.FUT", "GLBX.MDP3"),
+    "6L": ("6L.FUT", "GLBX.MDP3"),
+    "BRL": ("6L.FUT", "GLBX.MDP3"),
+    "6Z": ("6Z.FUT", "GLBX.MDP3"),
+    "ZAR": ("6Z.FUT", "GLBX.MDP3"),
+    # CME Livestock
+    "LE": ("LE.FUT", "GLBX.MDP3"),
+    "LIVECATTLE": ("LE.FUT", "GLBX.MDP3"),
+    "HE": ("HE.FUT", "GLBX.MDP3"),
+    "LEANHOGS": ("HE.FUT", "GLBX.MDP3"),
+    # CFE (CBOE Futures Exchange) - Volatility Futures
+    "VX": ("VX.FUT", "XCBF.MDP3"),
+    "VIX_FUT": ("VX.FUT", "XCBF.MDP3"),
+    # ICE Futures US (IFUS.IMPACT)
+    "CT": ("CT.FUT", "IFUS.IMPACT"),
+    "COTTON": ("CT.FUT", "IFUS.IMPACT"),
+    "CC": ("CC.FUT", "IFUS.IMPACT"),
+    "COCOA": ("CC.FUT", "IFUS.IMPACT"),
+    "KC": ("KC.FUT", "IFUS.IMPACT"),
+    "COFFEE": ("KC.FUT", "IFUS.IMPACT"),
+    "SB": ("SB.FUT", "IFUS.IMPACT"),
+    "SUGAR": ("SB.FUT", "IFUS.IMPACT"),
+    "OJ": ("OJ.FUT", "IFUS.IMPACT"),
+    "ORANGEJUICE": ("OJ.FUT", "IFUS.IMPACT"),
+    "DX": ("DX.FUT", "IFUS.IMPACT"),
+    "DOLLARINDEX": ("DX.FUT", "IFUS.IMPACT"),
+    # ICE Futures Europe
+    "BRN": ("BRN.FUT", "IFEU.IMPACT"),
+    "BRENT": ("BRN.FUT", "IFEU.IMPACT"),
+    "G": ("G.FUT", "IFEU.IMPACT"),
+    "GASOIL": ("G.FUT", "IFEU.IMPACT"),
+    "T": ("T.FUT", "IFEU.IMPACT"),
+    "WTI": ("T.FUT", "IFEU.IMPACT"),
+}
+
+# --- Databento options symbol validation ---
+DATABENTO_VALID_OPTIONS_SYMBOLS: dict[str, tuple[str, str]] = {
+    "ES": ("ES.OPT", "GLBX.MDP3"),
+    "SP500": ("ES.OPT", "GLBX.MDP3"),
+    "NQ": ("NQ.OPT", "GLBX.MDP3"),
+    "NASDAQ100": ("NQ.OPT", "GLBX.MDP3"),
+    "CL": ("CL.OPT", "GLBX.MDP3"),
+    "CRUDE": ("CL.OPT", "GLBX.MDP3"),
+    "GC": ("GC.OPT", "GLBX.MDP3"),
+    "GOLD": ("GC.OPT", "GLBX.MDP3"),
+}
+
+# --- Exchange code to human-readable name ---
+EXCHANGE_CODE_TO_NAME: dict[str, str] = {
+    "ES": "SP500",
+    "NQ": "NASDAQ100",
+    "RTY": "RUSSELL2000",
+    "YM": "DOW",
+    "CL": "CRUDE",
+    "NG": "NATGAS",
+    "RB": "GASOLINE",
+    "HO": "HEATINGOIL",
+    "GC": "GOLD",
+    "SI": "SILVER",
+    "HG": "COPPER",
+    "PL": "PLATINUM",
+    "ZC": "CORN",
+    "ZW": "WHEAT",
+    "ZS": "SOYBEAN",
+    "ZM": "SOYMEAL",
+    "ZL": "SOYOIL",
+    "ZB": "TBOND",
+    "ZN": "TNOTE10Y",
+    "ZF": "TNOTE5Y",
+    "ZT": "TNOTE2Y",
+    "6E": "EUR",
+    "6J": "JPY",
+    "6B": "GBP",
+    "6C": "CAD",
+    "6A": "AUD",
+    "6S": "CHF",
+    "6L": "BRL",
+    "6N": "NZD",
+    "6Z": "ZAR",
+    "6M": "MXN",
+    "LE": "LIVECATTLE",
+    "HE": "LEANHOGS",
+    "VX": "VIX",
+    "EW1": "SP500",
+    "EW2": "SP500",
+    "EW3": "SP500",
+    "EW4": "SP500",
+    "CT": "COTTON",
+    "CC": "COCOA",
+    "KC": "COFFEE",
+    "SB": "SUGAR",
+    "OJ": "ORANGEJUICE",
+    "DX": "DOLLARINDEX",
+    "BRN": "BRENT",
+    "G": "GASOIL",
+    "T": "WTI",
+}
+
+# ---------------------------------------------------------------------------
+# Instrument identity / data-source binding types
+# ---------------------------------------------------------------------------
+
+
+class TradFiInstrumentDef(BaseModel, frozen=True):
+    """Provider-agnostic instrument identity — what the instrument IS."""
+
+    symbol: str  # Canonical symbol (ES.FUT, VIX-USD, SPY)
+    venue: str  # Exchange/venue (CME, CBOE, ICE)
+    instrument_type: str  # FUTURE, INDEX, OPTION, EQUITY, ETF
+    base_asset: str  # Human-readable base (SP500, VIX, GOLD)
+    quote_asset: str = "USD"
+    underlying: str | None = None  # Underlying asset (e.g., ES for EW1.OPT)
+    data_source: str = ""  # Provenance: which source generated this definition (for replay)
+
+
+class ProviderBinding(BaseModel, frozen=True):
+    """Data-source-specific config for an instrument — WHERE to get data."""
+
+    provider: str  # databento, yahoo_finance, fred, barchart, ibkr
+    use_for: Literal["historical", "live", "execution", "all"] = "all"
+    dataset: str | None = None  # Databento dataset (GLBX.MDP3, IFUS.IMPACT)
+    stype: str | None = None  # Databento stype (parent, raw_symbol)
+    exchange_code: str | None = None  # Databento exchange code (ES, CL)
+    ticker: str | None = None  # Yahoo Finance ticker (^VIX)
+    series: str | None = None  # FRED series (VIXCLS)
+    instrument_key: str | None = None  # Canonical GCS key (CBOE:INDEX:VIX-USD)
+
+
+def get_bindings_for_symbol(symbol: str) -> list[ProviderBinding]:
+    """Return all provider bindings for a given instrument symbol."""
+    return list(TRADFI_DATA_BINDINGS.get(symbol, []))
+
+
+def get_primary_binding(symbol: str, provider: str | None = None) -> ProviderBinding | None:
+    """Return the first binding matching provider (or first overall if provider is None)."""
+    bindings = TRADFI_DATA_BINDINGS.get(symbol, [])
+    if provider is not None:
+        return next((b for b in bindings if b.provider == provider), None)
+    return bindings[0] if bindings else None
+
+
+# ---------------------------------------------------------------------------
+# Layer 1: Instrument identity (provider-agnostic)
+# ---------------------------------------------------------------------------
+
+
+def _fut(symbol: str, venue: str, base: str, underlying: str | None = None) -> TradFiInstrumentDef:
+    return TradFiInstrumentDef(
+        symbol=symbol,
+        venue=venue,
+        instrument_type="FUTURE",
+        base_asset=base,
+        data_source="databento",
+        underlying=underlying,
+    )
+
+
+def _opt(symbol: str, venue: str, base: str, underlying: str | None = None) -> TradFiInstrumentDef:
+    return TradFiInstrumentDef(
+        symbol=symbol,
+        venue=venue,
+        instrument_type="OPTION",
+        base_asset=base,
+        data_source="databento",
+        underlying=underlying,
+    )
+
+
+TRADFI_INSTRUMENTS: list[TradFiInstrumentDef] = [
+    # CME Index Futures
+    _fut("ES.FUT", "CME", "SP500"),
+    _fut("NQ.FUT", "CME", "NASDAQ100"),
+    _fut("RTY.FUT", "CME", "RUSSELL2000"),
+    _fut("YM.FUT", "CME", "DOW"),
+    # CME Energy
+    _fut("CL.FUT", "CME", "CRUDE"),
+    _fut("NG.FUT", "CME", "NATGAS"),
+    _fut("RB.FUT", "CME", "GASOLINE"),
+    _fut("HO.FUT", "CME", "HEATINGOIL"),
+    # CME Metals
+    _fut("GC.FUT", "CME", "GOLD"),
+    _fut("SI.FUT", "CME", "SILVER"),
+    _fut("HG.FUT", "CME", "COPPER"),
+    _fut("PL.FUT", "CME", "PLATINUM"),
+    # CME Grains
+    _fut("ZC.FUT", "CME", "CORN"),
+    _fut("ZW.FUT", "CME", "WHEAT"),
+    _fut("ZS.FUT", "CME", "SOYBEAN"),
+    _fut("ZM.FUT", "CME", "SOYMEAL"),
+    _fut("ZL.FUT", "CME", "SOYOIL"),
+    # CME Interest Rates
+    _fut("ZB.FUT", "CME", "TBOND"),
+    _fut("ZN.FUT", "CME", "TNOTE10Y"),
+    _fut("ZF.FUT", "CME", "TNOTE5Y"),
+    _fut("ZT.FUT", "CME", "TNOTE2Y"),
+    # CME Currencies
+    _fut("6E.FUT", "CME", "EUR"),
+    _fut("6J.FUT", "CME", "JPY"),
+    _fut("6B.FUT", "CME", "GBP"),
+    _fut("6C.FUT", "CME", "CAD"),
+    _fut("6A.FUT", "CME", "AUD"),
+    _fut("6S.FUT", "CME", "CHF"),
+    _fut("6L.FUT", "CME", "BRL"),
+    _fut("6N.FUT", "CME", "NZD"),
+    _fut("6Z.FUT", "CME", "ZAR"),
+    _fut("6M.FUT", "CME", "MXN"),
+    # CME Livestock
+    _fut("LE.FUT", "CME", "LIVECATTLE"),
+    _fut("HE.FUT", "CME", "LEANHOGS"),
+    # CBOE — Volatility Index (calculated, not traded)
+    TradFiInstrumentDef(
+        symbol="VIX-USD",
+        venue="CBOE",
+        instrument_type="INDEX",
+        base_asset="VIX",
+        data_source="yahoo_finance",
+    ),
+    # CFE — Volatility Futures (traded on CBOE Futures Exchange)
+    _fut("VX.FUT", "CFE", "VIX"),
+    # Options
+    _opt("ES.OPT", "CME", "SP500"),
+    _opt("NQ.OPT", "CME", "NASDAQ100"),
+    _opt("CL.OPT", "CME", "CRUDE"),
+    _opt("GC.OPT", "CME", "GOLD"),
+    _opt("EW1.OPT", "CME", "SP500", underlying="ES"),
+    _opt("EW2.OPT", "CME", "SP500", underlying="ES"),
+    _opt("EW3.OPT", "CME", "SP500", underlying="ES"),
+    _opt("EW4.OPT", "CME", "SP500", underlying="ES"),
+    # ICE Futures US
+    _fut("CT.FUT", "ICE", "COTTON"),
+    _fut("CC.FUT", "ICE", "COCOA"),
+    _fut("KC.FUT", "ICE", "COFFEE"),
+    _fut("SB.FUT", "ICE", "SUGAR"),
+    _fut("OJ.FUT", "ICE", "ORANGEJUICE"),
+    _fut("DX.FUT", "ICE", "DOLLARINDEX"),
+    # ICE Futures Europe
+    _fut("BRN.FUT", "ICE", "BRENT"),
+    _fut("G.FUT", "ICE", "GASOIL"),
+    _fut("T.FUT", "ICE", "WTI"),
+]
+
+# ---------------------------------------------------------------------------
+# Layer 2: Data source bindings (provider-specific)
+# ---------------------------------------------------------------------------
+
+
+def _db(dataset: str, stype: str, code: str) -> ProviderBinding:
+    """Shorthand for a Databento binding."""
+    return ProviderBinding(provider="databento", dataset=dataset, stype=stype, exchange_code=code)
+
+
+# Map instrument symbol -> list of provider bindings
+TRADFI_DATA_BINDINGS: dict[str, list[ProviderBinding]] = {
+    # CME futures (all via Databento GLBX.MDP3)
+    "ES.FUT": [_db("GLBX.MDP3", "parent", "ES")],
+    "NQ.FUT": [_db("GLBX.MDP3", "parent", "NQ")],
+    "RTY.FUT": [_db("GLBX.MDP3", "parent", "RTY")],
+    "YM.FUT": [_db("GLBX.MDP3", "parent", "YM")],
+    "CL.FUT": [_db("GLBX.MDP3", "parent", "CL")],
+    "NG.FUT": [_db("GLBX.MDP3", "parent", "NG")],
+    "RB.FUT": [_db("GLBX.MDP3", "parent", "RB")],
+    "HO.FUT": [_db("GLBX.MDP3", "parent", "HO")],
+    "GC.FUT": [_db("GLBX.MDP3", "parent", "GC")],
+    "SI.FUT": [_db("GLBX.MDP3", "parent", "SI")],
+    "HG.FUT": [_db("GLBX.MDP3", "parent", "HG")],
+    "PL.FUT": [_db("GLBX.MDP3", "parent", "PL")],
+    "ZC.FUT": [_db("GLBX.MDP3", "parent", "ZC")],
+    "ZW.FUT": [_db("GLBX.MDP3", "parent", "ZW")],
+    "ZS.FUT": [_db("GLBX.MDP3", "parent", "ZS")],
+    "ZM.FUT": [_db("GLBX.MDP3", "parent", "ZM")],
+    "ZL.FUT": [_db("GLBX.MDP3", "parent", "ZL")],
+    "ZB.FUT": [_db("GLBX.MDP3", "parent", "ZB")],
+    "ZN.FUT": [_db("GLBX.MDP3", "parent", "ZN")],
+    "ZF.FUT": [_db("GLBX.MDP3", "parent", "ZF")],
+    "ZT.FUT": [_db("GLBX.MDP3", "parent", "ZT")],
+    "6E.FUT": [_db("GLBX.MDP3", "parent", "6E")],
+    "6J.FUT": [_db("GLBX.MDP3", "parent", "6J")],
+    "6B.FUT": [_db("GLBX.MDP3", "parent", "6B")],
+    "6C.FUT": [_db("GLBX.MDP3", "parent", "6C")],
+    "6A.FUT": [_db("GLBX.MDP3", "parent", "6A")],
+    "6S.FUT": [_db("GLBX.MDP3", "parent", "6S")],
+    "6L.FUT": [_db("GLBX.MDP3", "parent", "6L")],
+    "6N.FUT": [_db("GLBX.MDP3", "parent", "6N")],
+    "6Z.FUT": [_db("GLBX.MDP3", "parent", "6Z")],
+    "6M.FUT": [_db("GLBX.MDP3", "parent", "6M")],
+    "LE.FUT": [_db("GLBX.MDP3", "parent", "LE")],
+    "HE.FUT": [_db("GLBX.MDP3", "parent", "HE")],
+    # VIX index — multiple sources (historical Barchart, ongoing Yahoo, daily FRED)
+    "VIX-USD": [
+        ProviderBinding(
+            provider="barchart",
+            use_for="historical",
+            instrument_key="CBOE:INDEX:VIX-USD",
+        ),
+        ProviderBinding(
+            provider="yahoo_finance",
+            use_for="live",
+            ticker="^VIX",
+            instrument_key="CBOE:INDEX:VIX-USD",
+        ),
+        ProviderBinding(
+            provider="fred",
+            use_for="historical",
+            series="VIXCLS",
+        ),
+    ],
+    # VX futures (CBOE Futures Exchange via Databento)
+    "VX.FUT": [_db("XCBF.MDP3", "parent", "VX")],
+    # Options (CME via Databento)
+    "ES.OPT": [_db("GLBX.MDP3", "parent", "ES")],
+    "NQ.OPT": [_db("GLBX.MDP3", "parent", "NQ")],
+    "CL.OPT": [_db("GLBX.MDP3", "parent", "CL")],
+    "GC.OPT": [_db("GLBX.MDP3", "parent", "GC")],
+    "EW1.OPT": [_db("GLBX.MDP3", "parent", "EW1")],
+    "EW2.OPT": [_db("GLBX.MDP3", "parent", "EW2")],
+    "EW3.OPT": [_db("GLBX.MDP3", "parent", "EW3")],
+    "EW4.OPT": [_db("GLBX.MDP3", "parent", "EW4")],
+    # ICE Futures US
+    "CT.FUT": [_db("IFUS.IMPACT", "parent", "CT")],
+    "CC.FUT": [_db("IFUS.IMPACT", "parent", "CC")],
+    "KC.FUT": [_db("IFUS.IMPACT", "parent", "KC")],
+    "SB.FUT": [_db("IFUS.IMPACT", "parent", "SB")],
+    "OJ.FUT": [_db("IFUS.IMPACT", "parent", "OJ")],
+    "DX.FUT": [_db("IFUS.IMPACT", "parent", "DX")],
+    # ICE Futures Europe
+    "BRN.FUT": [_db("IFEU.IMPACT", "parent", "BRN")],
+    "G.FUT": [_db("IFEU.IMPACT", "parent", "G")],
+    "T.FUT": [_db("IFEU.IMPACT", "parent", "T")],
+}
+
+# ---------------------------------------------------------------------------
+# Flattened merged view (identity + primary binding as dicts)
+# ---------------------------------------------------------------------------
+
+
+def _build_venue_mappings() -> list[dict[str, str | None]]:
+    """Merge identity + primary binding into flat dicts consumed by downstream services."""
+    result: list[dict[str, str | None]] = []
+    for inst in TRADFI_INSTRUMENTS:
+        entry: dict[str, str | None] = {
+            "symbol": inst.symbol,
+            "venue": inst.venue,
+            "type": inst.instrument_type,
+            "base": inst.base_asset,
+        }
+        if inst.underlying is not None:
+            entry["underlying"] = inst.underlying
+        bindings = TRADFI_DATA_BINDINGS.get(inst.symbol, [])
+        if bindings:
+            primary = bindings[0]
+            if primary.dataset is not None:
+                entry["dataset"] = primary.dataset
+            if primary.stype is not None:
+                entry["stype"] = primary.stype
+            if primary.exchange_code is not None:
+                entry["code"] = primary.exchange_code
+            if primary.ticker is not None:
+                entry["yahoo_ticker"] = primary.ticker
+            if primary.series is not None:
+                entry["fred_series"] = primary.series
+            if primary.instrument_key is not None:
+                entry["instrument_key"] = primary.instrument_key
+        result.append(entry)
+    return result
+
+
+TRADFI_VENUE_MAPPINGS: list[dict[str, str | None]] = _build_venue_mappings()
+
+# --- Known ETF tickers ---
+KNOWN_ETFS: set[str] = {
+    "SPY",
+    "QQQ",
+    "IVV",
+    "VOO",
+    "VTI",
+    "DIA",
+    "IWM",
+    "EEM",
+    "VEA",
+    "VWO",
+    "GLD",
+    "SLV",
+    "USO",
+    "UNG",
+    "TLT",
+    "IEF",
+    "SHY",
+    "LQD",
+    "HYG",
+    "JNK",
+    "XLF",
+    "XLE",
+    "XLK",
+    "XLV",
+    "XLI",
+    "XLY",
+    "XLP",
+    "XLB",
+    "XLU",
+    "XLRE",
+    "VNQ",
+    "IBB",
+    "SMH",
+    "ARKK",
+    "ARKG",
+    "ARKW",
+    "ARKF",
+    "ARKQ",
+    "IBIT",
+    "FBTC",
+    "ARKB",
+    "GBTC",
+    "BITO",
+}
+
+# --- Space-to-dot symbol normalization ---
+SPACE_TO_DOT_SYMBOLS: dict[str, str] = {
+    "BRK B": "BRK.B",
+    "BF B": "BF.B",
+    "BRK A": "BRK.A",
+    "BF A": "BF.A",
+}
+
+# Backward-compatible alias
+TRADFI_INSTRUMENTS_CONFIG: list[dict[str, str | None]] = TRADFI_VENUE_MAPPINGS
+
+# Named constant for the VIX index instrument definition — import this directly
+# rather than scanning TRADFI_VENUE_MAPPINGS.
+VIX_INDEX_INSTRUMENT: dict[str, str | None] = next(
+    d for d in TRADFI_VENUE_MAPPINGS if d.get("instrument_key") == "CBOE:INDEX:VIX-USD"
+)
+
+# Named constant for the VIX instrument identity (typed)
+VIX_INSTRUMENT: TradFiInstrumentDef = next(inst for inst in TRADFI_INSTRUMENTS if inst.symbol == "VIX-USD")

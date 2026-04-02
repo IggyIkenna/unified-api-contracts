@@ -26,16 +26,13 @@
 | -------------------- | ---------------- | ------------------------ | ------------- | ------ | -------------------------------------------------------------------- |
 | alchemy              | v3               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | api_football         | v3               | N/A                      | 2026-03-06    | yellow |                                                                      |
-| arkham               | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | aster                | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | barchart             | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | betdaq               | v2               | N/A                      | 2026-03-06    | green  |                                                                      |
 | betfair              | 2.1              | N/A                      | 2026-03-06    | green  |                                                                      |
 | binance              | v3               | N/A                      | 2026-03-06    | green  |                                                                      |
-| bitfinex             | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | bitget               | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | bitstamp             | v2               | N/A                      | 2026-03-06    | yellow |                                                                      |
-| bloxroute            | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | bybit                | v5               | N/A                      | 2026-03-06    | green  |                                                                      |
 | ccxt                 | 4.x              | N/A                      | 2026-03-06    | yellow |                                                                      |
 | coinbase             | v3               | N/A                      | 2026-03-06    | yellow |                                                                      |
@@ -82,7 +79,6 @@
 | polymarket           | v2               | N/A                      | 2026-03-06    | green  |                                                                      |
 | predictit            | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | prime_broker         | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
-| pyth                 | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | regulatory           | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | sentiment            | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |
 | sharpapi             | v1               | N/A                      | 2026-03-06    | yellow |                                                                      |

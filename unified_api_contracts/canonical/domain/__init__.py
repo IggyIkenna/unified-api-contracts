@@ -87,6 +87,18 @@ from .execution import (
     OrderType,
     TimeInForce,
 )
+from .execution.base import ExecutionAlpha
+from .execution.prime_broker import (
+    CollateralAsset,
+    CrossMarginNettingResult,
+    NetClearingInstruction,
+    PrimeBrokerAccount,
+    PrimeBrokerError,
+    PrimeBrokerFill,
+    PrimeBrokerMarginCall,
+    PrimeBrokerPosition,
+    PrimeBrokerProvider,
+)
 from .features import (
     CanonicalFeatureRecord,
     FeatureMetadata,
@@ -110,7 +122,7 @@ from .infrastructure import (
     ScalingMode,
     SourceControlProvider,
 )
-from .infrastructure.compute import ComputeType
+from .infrastructure.compute import ComputeType, VmQuotaShape
 from .market import (
     BookLevel,
     CanonicalMarketStateEvent,
@@ -133,7 +145,6 @@ from .market.tradfi import (
 )
 from .onchain import (
     CanonicalOnChainMetric,
-    CanonicalOraclePriceFeed,
 )
 from .position import (
     AggregatedPosition,
@@ -240,6 +251,10 @@ from .sports.arbitrage import (
     ArbitrageStatus,
     ExpectedValue,
 )
+from .sports.betting import (
+    BetSide,
+    CommissionModel,
+)
 from .sports.bookmaker_registry import (
     BOOKMAKER_REGISTRY,
     BookmakerRegistry,
@@ -252,6 +267,25 @@ from .sports.errors import (
     OddsChangedError,
     ScraperError,
     SportsError,
+)
+from .sports.events import CanonicalFixtureEvent
+from .sports.fixture_stats import CanonicalFixtureStatsDetail
+from .sports.injury import CanonicalInjury
+from .sports.lineup import (
+    CanonicalLineup,
+    LineupPlayer,
+)
+from .sports.live import (
+    LiveMatchState,
+    LiveOddsUpdate,
+    MatchPeriod,
+    ScraperVersionMeta,
+)
+from .sports.player_stats import CanonicalPlayerMatchStats
+from .sports.processed_odds import ProcessedOddsOutput
+from .sports.progressive import (
+    CanonicalProgressiveOdds,
+    CanonicalProgressiveStats,
 )
 
 __all__ = [
@@ -273,6 +307,7 @@ __all__ = [
     "BetExecution",
     "BetOrder",
     "BetRejectedError",
+    "BetSide",
     "BetStatus",
     "BettingSignal",
     "BinanceWithdrawRequest",
@@ -305,9 +340,13 @@ __all__ = [
     "CanonicalFee",
     "CanonicalFill",
     "CanonicalFixture",
+    "CanonicalFixtureEvent",
+    "CanonicalFixtureStatsDetail",
     "CanonicalFundingRate",
+    "CanonicalInjury",
     "CanonicalInstrument",
     "CanonicalLeague",
+    "CanonicalLineup",
     "CanonicalLiquidation",
     "CanonicalLiquidationCluster",
     "CanonicalMarginState",
@@ -318,15 +357,19 @@ __all__ = [
     "CanonicalOhlcvBar",
     "CanonicalOnChainMetric",
     "CanonicalOptionsChainEntry",
-    "CanonicalOraclePriceFeed",
     "CanonicalOrder",
     "CanonicalOrderAmendment",
     "CanonicalOrderBook",
     "CanonicalOrderRejection",
     "CanonicalPlayer",
+    "CanonicalPlayerMatchStats",
     "CanonicalPosition",
     "CanonicalPredictionMarket",
+    "CanonicalProgressiveOdds",
+    "CanonicalProgressiveStats",
+    "CanonicalPullRequest",
     "CanonicalReferee",
+    "CanonicalRepository",
     "CanonicalScheduledJob",
     "CanonicalSecretStore",
     "CanonicalSettlement",
@@ -337,17 +380,21 @@ __all__ = [
     "CanonicalVenue",
     "CanonicalVirtualMachine",
     "CanonicalWebSocketLifecycle",
+    "CanonicalWorkflowRun",
     "CanonicalYieldCurvePoint",
     "CloudProvider",
     "CoLocationPerformanceMetric",
     "CoinbaseWithdrawRequest",
     "CoinbaseWithdrawResponse",
+    "CollateralAsset",
     "ComboLeg",
     "ComboQuote",
     "ComboStrategyType",
+    "CommissionModel",
     "ComputeTarget",
     "ComputeType",
     "CredentialType",
+    "CrossMarginNettingResult",
     "DarkPoolPrintRecord",
     "DeFiAggregatedHealth",
     "DeFiLPAggregatedMetrics",
@@ -361,6 +408,7 @@ __all__ = [
     "EthSendTransactionRequest",
     "EthTransactionRequest",
     "ExchangeFeeSchedule",
+    "ExecutionAlpha",
     "ExecutionInstruction",
     "ExecutionMethod",
     "ExecutionResult",
@@ -382,13 +430,18 @@ __all__ = [
     "LatencyBenchmarkReport",
     "LatencyComponent",
     "LatencyPercentile",
+    "LineupPlayer",
+    "LiveMatchState",
+    "LiveOddsUpdate",
     "LongShortRatio",
     "MappingRule",
     "MarketClosedError",
     "MarketState",
     "MarketStatus",
     "MarketTrade",
+    "MatchPeriod",
     "MultiLegInstrument",
+    "NetClearingInstruction",
     "NetworkJitterMetric",
     "NormalizedStrikeCoordinate",
     "OKXWithdrawRequest",
@@ -416,6 +469,13 @@ __all__ = [
     "PositionRisk",
     "PredictionMarketCategory",
     "PredictionMarketMapper",
+    "PrimeBrokerAccount",
+    "PrimeBrokerError",
+    "PrimeBrokerFill",
+    "PrimeBrokerMarginCall",
+    "PrimeBrokerPosition",
+    "PrimeBrokerProvider",
+    "ProcessedOddsOutput",
     "ProtocolHealthBreakdown",
     "RiskCategory",
     "RiskGroupSummary",
@@ -423,9 +483,11 @@ __all__ = [
     "SatelliteObservation",
     "ScalingMode",
     "ScraperError",
+    "ScraperVersionMeta",
     "SentimentScore",
     "SettlementEvent",
     "SignalSource",
+    "SourceControlProvider",
     "Sport",
     "SportsArbLeg",
     "SportsArbPosition",
@@ -444,6 +506,7 @@ __all__ = [
     "VenueExecutionProfile",
     "VenuePositionBreakdown",
     "VenueRateLimitSpec",
+    "VmQuotaShape",
     "VolSmilePoint",
     "VolSurface",
     "VolSurfaceSlice",

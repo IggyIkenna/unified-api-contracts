@@ -3,6 +3,7 @@
 override-dependencies = [
     "eth-abi>=5.0.1",
     "gunicorn>=22.0.0",
+    "aiohttp>=3.13.4",
 ]
 
 [build-system]
@@ -11,7 +12,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "unified-api-contracts"
-version = "0.2.38"
+version = "0.1.20"
 description = "Pydantic schemas and VCR mocks for external APIs used by UMI, UOI, and unified-trading library"
 requires-python = ">=3.13,<3.14"
 authors = [{ name = "Ikenna Igboaka" }]
@@ -38,7 +39,11 @@ dependencies = [
     "pre-commit>=3.0,<4.0.0",
     "hypothesis>=6.0.0,<7.0.0",
     "httpx>=0.28.1,<1.0.0",
-    "pyyaml>=6.0.0,<7.0.0",
+    "pyyaml>=6.0.1,<7.0.0",
+    "pandas>=2.3.0,<3.0.0",
+    "numpy>=2.3.0,<2.4.0",
+    "pyarrow>=23.0.0,<24.0.0",
+    "pandas-stubs>=2.2.0,<3.0.0",
 ]
 
 [project.urls]
@@ -89,6 +94,10 @@ max-complexity = 7
 "unified_api_contracts/canonical/normalize/orders_fills.py" = ["F401"]
 "unified_api_contracts/normalize_utils/*.py" = ["N815", "N803"]
 "unified_api_contracts/normalize_utils/errors/*.py" = ["N815"]
+# Root __init__.py re-exports all public symbols — F401 is expected
+"unified_api_contracts/__init__.py" = ["F401"]
+# Registry __init__.py re-exports symbols from sub-modules
+"unified_api_contracts/registry/__init__.py" = ["F401"]
 # Root-level domain facades (Phase 2 citadel)
 "unified_api_contracts/market.py" = ["F403", "F405"]
 "unified_api_contracts/execution.py" = ["F403", "F405"]
@@ -106,6 +115,13 @@ max-complexity = 7
 "unified_api_contracts/odds.py" = ["F403", "F405"]
 "unified_api_contracts/options.py" = ["F403", "F405"]
 "unified_api_contracts/prediction.py" = ["F403", "F405"]
+# Internal contracts (merged from unified-internal-contracts)
+"unified_api_contracts/internal/testing/seed_*.py" = ["C901", "E501", "B007", "RUF002", "B905"]
+"unified_api_contracts/internal/testing/seed_validator.py" = ["C901", "E501"]
+"unified_api_contracts/internal/domain/cefi_accounts/schemas.py" = ["N815"]
+"unified_api_contracts/internal/domain/defi/eth_transfers.py" = ["N815"]
+"unified_api_contracts/internal/domain/defi/protocol_sdks.py" = ["N815"]
+"unified_api_contracts/internal/domain/execution_service/cex_withdrawals.py" = ["N815"]
 # Transition facades at canonical level
 "unified_api_contracts/canonical/execution.py" = ["F403", "F405"]
 "unified_api_contracts/canonical/options.py" = ["F403", "F405"]
@@ -125,7 +141,7 @@ reportUnknownMemberType = "error"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]
-exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing"]
+exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing", "unified_api_contracts/internal/testing/**", "unified_api_contracts/internal/testing"]
 
 [tool.coverage.run]
 # Transitional: exclude new-path copies until old paths are removed (citadel phase 1)
@@ -180,6 +196,8 @@ omit = [
     # Phase 7 citadel: capability registry (data declarations, not business logic)
     "unified_api_contracts/registry/capability.py",
     "unified_api_contracts/registry/capability_data.py",
+    # Internal contracts (merged from unified-internal-contracts) — coverage tracked separately
+    "unified_api_contracts/internal/*",
 ]
 
 [tool.coverage.report]
