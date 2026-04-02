@@ -77,10 +77,6 @@ CANONICAL_TO_ODDS_API_BUNDESLIGA: dict[str, str] = {
     "PREUSSEN_MUNSTER": "SC Preußen Münster",
 }
 
-# ---------------------------------------------------------------------------
-# English Championship (league 40)
-# ---------------------------------------------------------------------------
-
 CANONICAL_TO_ODDS_API_ENG_CHAMPIONSHIP: dict[str, str] = {
     "BIRMINGHAM": "Birmingham City",
     "BLACKBURN": "Blackburn Rovers",
@@ -108,10 +104,6 @@ CANONICAL_TO_ODDS_API_ENG_CHAMPIONSHIP: dict[str, str] = {
     "WEST_BROM": "West Brom",
     "WREXHAM": "Wrexham",
 }
-
-# ---------------------------------------------------------------------------
-# English League One (league 41)
-# ---------------------------------------------------------------------------
 
 CANONICAL_TO_ODDS_API_ENG_LEAGUE_ONE: dict[str, str] = {
     "AFC_WIMBLEDON": "AFC Wimbledon",
@@ -234,6 +226,11 @@ CANONICAL_TO_ODDS_API_LA_LIGA: dict[str, str] = {
     "OVIEDO": "Oviedo",
     "CADIZ": "Cadiz",
     "GRANADA": "Granada",
+    "CASTELLON": "CD Castellón",
+    "CULTURAL_LEONESA": "Cultural Leonesa",
+    "DEPORTIVO_LA_CORUNA": "Deportivo La Coruña",
+    "MALAGA": "Málaga",
+    "CEUTA": "AD Ceuta FC",
 }
 
 CANONICAL_TO_ODDS_API_SERIE_A: dict[str, str] = {
@@ -535,6 +532,7 @@ CANONICAL_TO_ODDS_API_ARGENTINA_PRIMERA: dict[str, str] = {
     "TIGRE": "Tigre",
     "UNION_SANTA_FE": "Union",
     "ESTUDIANTES_RIO_CUARTO": "Estudiantes de Río Cuarto",
+    "DEPORTIVO_RIESTRA": "Deportivo Riestra",
 }
 
 CANONICAL_TO_ODDS_API_BRASILEIRAO: dict[str, str] = {
