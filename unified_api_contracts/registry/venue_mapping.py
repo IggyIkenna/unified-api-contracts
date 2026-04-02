@@ -208,26 +208,60 @@ class VenueMapping:
             "HYPERLIQUID": "2023-04-15",
             "ASTER": "2024-10-01",
             # TradFi - Databento
-            "CME": "2020-01-01",
-            "CBOE": "2020-01-01",
-            "NASDAQ": "2020-01-01",
-            "NYSE": "2020-01-01",
+            # Start dates reflect actual dataset availability, not exchange founding
+            "CME": "2020-01-01",  # GLBX.MDP3 available from ~2017
+            "CBOE": "2020-01-01",  # Barchart provider
+            "NASDAQ": "2023-03-28",  # DBEQ.BASIC dataset starts 2023-03-28
+            "NYSE": "2023-03-28",  # DBEQ.BASIC dataset starts 2023-03-28
             "ICE": "2018-12-23",
             "FX": "2020-01-01",  # OTC Foreign Exchange (KRW/USD via Yahoo Finance)
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
             "UNISWAPV2-ETHEREUM": "2020-05-18",
             "UNISWAPV3-ETHEREUM": "2021-05-05",
+            "UNISWAPV3-ARBITRUM": "2021-09-01",
+            "UNISWAPV3-POLYGON": "2021-12-22",
+            "UNISWAPV3-OPTIMISM": "2022-01-13",
+            "UNISWAPV3-BASE": "2023-08-09",
             "UNISWAPV4-ETHEREUM": "2025-01-31",
             "CURVE-ETHEREUM": "2020-01-20",
+            "CURVE-AVALANCHE": "2021-11-10",
+            "CURVE-OPTIMISM": "2022-07-18",
             "BALANCER-ETHEREUM": "2020-03-31",
+            "BALANCER-POLYGON": "2021-07-01",
+            "BALANCER-ARBITRUM": "2021-09-14",
+            "BALANCER-OPTIMISM": "2022-06-23",
+            "BALANCER-AVALANCHE": "2022-04-05",
+            "BALANCER-BASE": "2023-08-09",
             # DeFi - Lending protocols
             "AAVEV3-ETHEREUM": "2023-01-27",
+            "AAVEV3-POLYGON": "2023-01-27",
+            "AAVEV3-AVALANCHE": "2023-01-27",
+            "AAVEV3-ARBITRUM": "2023-03-16",
+            "AAVEV3-OPTIMISM": "2023-03-16",
+            "AAVEV3-BASE": "2024-02-01",
+            "AAVEV3-BSC": "2024-08-22",
+            "AAVEV3-SCROLL": "2024-10-02",
+            "AAVEV3-LINEA": "2024-11-07",
+            "AAVEV3-ZKSYNC": "2024-08-06",
+            "COMPOUNDV3-ETHEREUM": "2022-08-26",
+            "COMPOUNDV3-ARBITRUM": "2023-06-28",
+            "COMPOUNDV3-BASE": "2023-08-09",
+            "COMPOUNDV3-OPTIMISM": "2024-01-18",
+            "COMPOUNDV3-SCROLL": "2024-10-15",
             "MORPHO-ETHEREUM": "2024-01-08",
+            "MORPHO-BASE": "2024-06-26",
             "FLUID-ETHEREUM": "2024-03-01",
             # DeFi - LST/Yield protocols
             "LIDO-ETHEREUM": "2020-12-18",
             "ETHERFI-ETHEREUM": "2023-11-01",
             "ETHENA-ETHEREUM": "2024-02-19",
+            # DeFi - Solana protocols
+            "DRIFT-SOLANA": "2021-11-08",
+            "ORCA-SOLANA": "2021-03-08",
+            "RAYDIUM-SOLANA": "2021-02-21",
+            "KAMINO-SOLANA": "2024-01-15",
+            "JITO-SOLANA": "2023-11-28",
+            "MARINADE-SOLANA": "2021-08-01",
         }
     )
 
