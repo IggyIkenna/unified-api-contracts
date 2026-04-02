@@ -590,6 +590,7 @@ ARGENTINA_PRIMERA_TEAM_ALIASES: dict[str, list[str]] = {
         "Estudiantes Rio Cuarto",
         "Estudiantes RC",
     ],
+    "DEPORTIVO_RIESTRA": ["DEPORTIVO RIESTRA", "Deportivo Riestra", "CSyD Riestra"],
 }
 
 # ---------------------------------------------------------------------------
@@ -745,7 +746,7 @@ J1_LEAGUE_TEAM_ALIASES: dict[str, list[str]] = {
     "KASHIMA_ANTLERS": ["KASHIMA ANTLERS", "Kashima Antlers"],
     "FC_TOKYO": ["FC TOKYO", "FC Tokyo"],
     "NAGOYA_GRAMPUS": ["NAGOYA GRAMPUS", "Nagoya Grampus"],
-    "SANFRECCE_HIROSHIMA": ["SANFRECCE HIROSHIMA", "Sanfrecce Hiroshima"],
+    "SANFRECCE_HIROSHIMA": ["SANFRECCE HIROSHIMA", "Sanfrecce Hiroshima", "Hiroshima Sanfrecce FC"],
     "CEREZO_OSAKA": ["CEREZO OSAKA", "Cerezo Osaka"],
     "GAMBA_OSAKA": ["GAMBA OSAKA", "Gamba Osaka"],
     "CONSADOLE_SAPPORO": ["CONSADOLE SAPPORO", "Hokkaido Consadole Sapporo"],
@@ -1003,6 +1004,11 @@ SEGUNDA_DIVISION_TEAM_ALIASES: dict[str, list[str]] = {
     "ALBACETE": ["ALBACETE", "Albacete Balompie"],
     "CADIZ": ["CADIZ", "Cadiz CF"],
     "GRANADA": ["GRANADA", "Granada CF"],
+    "CASTELLON": ["CASTELLON", "CD Castellón", "CD Castellon", "Castellon"],
+    "CULTURAL_LEONESA": ["CULTURAL LEONESA", "Cultural Leonesa", "Cultural y Deportiva Leonesa"],
+    "DEPORTIVO_LA_CORUNA": ["DEPORTIVO LA CORUNA", "Deportivo La Coruña", "Deportivo La Coruna", "RC Deportivo"],
+    "MALAGA": ["MALAGA", "Málaga", "Malaga CF", "Málaga CF"],
+    "CEUTA": ["CEUTA", "AD Ceuta FC", "AD Ceuta", "Ceuta"],
 }
 
 # ---------------------------------------------------------------------------
