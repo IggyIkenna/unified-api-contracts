@@ -192,75 +192,74 @@ class VenueMapping:
     venue_start_dates: dict[str, str] = field(
         default_factory=lambda: {
             # CEFI - Tardis exchanges (Tier 1)
-            "BINANCE-SPOT": "2017-07-14",
-            "BINANCE-FUTURES": "2019-09-13",
-            "DERIBIT": "2016-06-01",
-            "BYBIT": "2018-03-01",
-            "OKX": "2017-05-31",
-            "UPBIT": "2017-10-24",
-            "COINBASE": "2015-01-26",
-            # CEFI - Tardis exchanges (Tier 2)
-            "BITSTAMP-SPOT": "2011-08-18",
-            # CEFI - Tardis exchanges (Tier 3)
-            "HUOBI-SPOT": "2013-09-01",
-            "HUOBI-FUTURES": "2018-12-10",
+            # Start dates = earliest manifest data, NOT exchange founding dates
+            "BINANCE-SPOT": "2020-01-01",
+            "BINANCE-FUTURES": "2020-01-01",
+            "DERIBIT": "2020-01-01",
+            "BYBIT": "2020-01-01",
+            "OKX-SPOT": "2020-01-01",
+            "OKX-FUTURES": "2020-01-01",
+            "OKX-SWAP": "2020-01-01",
+            "UPBIT": "2021-03-03",
+            "COINBASE-SPOT": "2020-01-01",
             # CEFI - On-chain CLOBs
-            "HYPERLIQUID": "2023-04-15",
+            "HYPERLIQUID": "2023-11-01",
             "ASTER": "2024-10-01",
             # TradFi - Databento
-            # Start dates reflect actual dataset availability, not exchange founding
-            "CME": "2020-01-01",  # GLBX.MDP3 available from ~2017
-            "CBOE": "2020-01-01",  # Barchart provider
-            "NASDAQ": "2023-03-28",  # DBEQ.BASIC dataset starts 2023-03-28
-            "NYSE": "2023-03-28",  # DBEQ.BASIC dataset starts 2023-03-28
-            "ICE": "2018-12-23",
-            "FX": "2020-01-01",  # OTC Foreign Exchange (KRW/USD via Yahoo Finance)
+            # Start dates = earliest manifest data
+            "CME": "2020-01-01",
+            "CBOE": "2026-03-01",  # Only recent data so far
+            "NASDAQ": "2023-04-15",
+            "NYSE": "2023-04-15",
+            "ICE": "2020-01-01",
+            "FX": "2020-01-01",
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
-            "UNISWAPV2-ETHEREUM": "2020-05-18",
-            "UNISWAPV3-ETHEREUM": "2021-05-05",
-            "UNISWAPV3-ARBITRUM": "2021-09-01",
-            "UNISWAPV3-POLYGON": "2021-12-22",
-            "UNISWAPV3-OPTIMISM": "2022-01-13",
-            "UNISWAPV3-BASE": "2023-08-09",
-            "UNISWAPV4-ETHEREUM": "2025-01-31",
+            # Start dates = earliest manifest data
+            "UNISWAPV2-ETHEREUM": "2020-05-06",
+            "UNISWAPV3-ETHEREUM": "2026-03-01",  # Only recent data so far
+            "UNISWAPV3-ARBITRUM": "2021-06-18",
+            "UNISWAPV3-POLYGON": "2026-03-01",  # Only recent data so far
+            "UNISWAPV3-OPTIMISM": "2021-11-12",
+            "UNISWAPV3-BASE": "2023-09-07",
+            "UNISWAPV4-ETHEREUM": "2026-03-01",  # Only recent data so far
             "CURVE-ETHEREUM": "2020-01-20",
-            "CURVE-AVALANCHE": "2021-11-10",
-            "CURVE-OPTIMISM": "2022-07-18",
-            "BALANCER-ETHEREUM": "2020-03-31",
-            "BALANCER-POLYGON": "2021-07-01",
-            "BALANCER-ARBITRUM": "2021-09-14",
-            "BALANCER-OPTIMISM": "2022-06-23",
-            "BALANCER-AVALANCHE": "2022-04-05",
-            "BALANCER-BASE": "2023-08-09",
+            "CURVE-AVALANCHE": "2020-01-20",
+            "CURVE-OPTIMISM": "2020-01-20",
+            "BALANCER-ETHEREUM": "2026-03-01",  # Only recent data so far
+            "BALANCER-POLYGON": "2021-06-24",
+            "BALANCER-ARBITRUM": "2021-08-27",
+            "BALANCER-OPTIMISM": "2022-05-20",
+            "BALANCER-AVALANCHE": "2023-08-17",
+            "BALANCER-BASE": "2023-07-29",
             # DeFi - Lending protocols
             "AAVEV3-ETHEREUM": "2023-01-27",
-            "AAVEV3-POLYGON": "2023-01-27",
-            "AAVEV3-AVALANCHE": "2023-01-27",
-            "AAVEV3-ARBITRUM": "2023-03-16",
-            "AAVEV3-OPTIMISM": "2023-03-16",
-            "AAVEV3-BASE": "2024-02-01",
-            "AAVEV3-BSC": "2024-08-22",
-            "AAVEV3-SCROLL": "2024-10-02",
-            "AAVEV3-LINEA": "2024-11-07",
-            "AAVEV3-ZKSYNC": "2024-08-06",
-            "COMPOUNDV3-ETHEREUM": "2022-08-26",
-            "COMPOUNDV3-ARBITRUM": "2023-06-28",
-            "COMPOUNDV3-BASE": "2023-08-09",
-            "COMPOUNDV3-OPTIMISM": "2024-01-18",
-            "COMPOUNDV3-SCROLL": "2024-10-15",
+            "AAVEV3-POLYGON": "2022-03-12",
+            "AAVEV3-AVALANCHE": "2022-03-12",
+            "AAVEV3-ARBITRUM": "2022-03-12",
+            "AAVEV3-OPTIMISM": "2022-03-12",
+            "AAVEV3-BASE": "2023-08-23",
+            "AAVEV3-BSC": "2024-01-24",
+            "AAVEV3-SCROLL": "2024-02-10",
+            "AAVEV3-LINEA": "2025-02-12",
+            "AAVEV3-ZKSYNC": "2024-09-21",
+            "COMPOUNDV3-ETHEREUM": "2022-08-14",
+            "COMPOUNDV3-ARBITRUM": "2023-05-05",
+            "COMPOUNDV3-BASE": "2023-08-20",
+            "COMPOUNDV3-OPTIMISM": "2024-04-07",
+            "COMPOUNDV3-SCROLL": "2024-02-17",
             "MORPHO-ETHEREUM": "2024-01-08",
-            "MORPHO-BASE": "2024-06-26",
-            "FLUID-ETHEREUM": "2024-03-01",
+            "MORPHO-BASE": "2024-06-01",
+            "FLUID-ETHEREUM": "2024-02-27",
             # DeFi - LST/Yield protocols
             "LIDO-ETHEREUM": "2020-12-18",
             "ETHERFI-ETHEREUM": "2023-11-01",
             "ETHENA-ETHEREUM": "2024-02-19",
             # DeFi - Solana protocols
-            "DRIFT-SOLANA": "2021-11-08",
-            "ORCA-SOLANA": "2021-03-08",
-            "RAYDIUM-SOLANA": "2021-02-21",
-            "KAMINO-SOLANA": "2024-01-15",
-            "JITO-SOLANA": "2023-11-28",
+            "DRIFT-SOLANA": "2022-11-04",
+            "ORCA-SOLANA": "2023-12-29",
+            "RAYDIUM-SOLANA": "2020-01-20",
+            "KAMINO-SOLANA": "2023-01-21",
+            "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
         }
     )
