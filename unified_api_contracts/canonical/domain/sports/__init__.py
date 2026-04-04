@@ -147,6 +147,67 @@ class BookmakerInfo(BaseModel):
         return cls.model_validate(data)
 
 
+class BookmakerTier(StrEnum):
+    """ML-oriented bookmaker tier for feature engineering.
+
+    SHARP: Low-margin bookmakers that accept sharp bettors (Pinnacle, 3et, etc.).
+    EXCHANGE: Peer-to-peer betting exchanges (Betfair, Smarkets, etc.).
+    SOFT: High-margin retail bookmakers (bet365, William Hill, etc.).
+    """
+
+    SHARP = "sharp"
+    EXCHANGE = "exchange"
+    SOFT = "soft"
+
+
+# Bookmaker keys classified as sharp (low-vig, accept sharps)
+_SHARP_BOOKMAKERS: frozenset[str] = frozenset(
+    {
+        "pinnacle",
+        "pinnaclesports",
+        "3et",
+        "isn",
+        "cris",
+        "sharpbet",
+        "singbet",
+        "asianodds",
+        "sbobet",
+        "ps3838",
+    }
+)
+
+# Bookmaker keys classified as exchange
+_EXCHANGE_BOOKMAKERS: frozenset[str] = frozenset(
+    {
+        "betfair",
+        "betfair_ex_uk",
+        "betfair_ex_eu",
+        "betfair_ex_au",
+        "smarkets",
+        "matchbook",
+        "betdaq",
+        "polymarket",
+    }
+)
+
+
+def classify_bookmaker(bookmaker_key: str) -> BookmakerTier:
+    """Classify a bookmaker key into a tier for ML features.
+
+    Args:
+        bookmaker_key: Lowercase bookmaker identifier (e.g. "pinnacle", "bet365").
+
+    Returns:
+        BookmakerTier classification.
+    """
+    key = bookmaker_key.lower().replace(" ", "").replace("-", "")
+    if key in _SHARP_BOOKMAKERS:
+        return BookmakerTier.SHARP
+    if key in _EXCHANGE_BOOKMAKERS:
+        return BookmakerTier.EXCHANGE
+    return BookmakerTier.SOFT
+
+
 class OddsFormat(StrEnum):
     DECIMAL = "decimal"
     AMERICAN = "american"
