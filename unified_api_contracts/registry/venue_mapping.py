@@ -215,17 +215,17 @@ class VenueMapping:
             "FX": "2020-01-01",
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
             # Start dates = earliest manifest data
-            "UNISWAPV2-ETHEREUM": "2020-05-06",
-            "UNISWAPV3-ETHEREUM": "2026-03-01",  # Only recent data so far
+            "UNISWAPV2-ETHEREUM": "2020-05-06",  # Uniswap V2 factory deployed May 2020
+            "UNISWAPV3-ETHEREUM": "2021-05-05",  # Uniswap V3 mainnet launch
             "UNISWAPV3-ARBITRUM": "2021-06-18",
-            "UNISWAPV3-POLYGON": "2026-03-01",  # Only recent data so far
+            "UNISWAPV3-POLYGON": "2021-12-22",  # Uniswap V3 Polygon deployment
             "UNISWAPV3-OPTIMISM": "2021-11-12",
-            "UNISWAPV3-BASE": "2023-09-07",
-            "UNISWAPV4-ETHEREUM": "2026-03-01",  # Only recent data so far
-            "CURVE-ETHEREUM": "2020-01-20",
-            "CURVE-AVALANCHE": "2020-01-20",
-            "CURVE-OPTIMISM": "2020-01-20",
-            "BALANCER-ETHEREUM": "2026-03-01",  # Only recent data so far
+            "UNISWAPV3-BASE": "2023-08-09",  # Base mainnet launch
+            "UNISWAPV4-ETHEREUM": "2025-01-30",  # Uniswap V4 mainnet deployment
+            "CURVE-ETHEREUM": "2020-01-20",  # Curve genesis pool
+            "CURVE-AVALANCHE": "2021-11-10",  # Curve Avalanche deployment
+            "CURVE-OPTIMISM": "2022-01-13",  # Curve Optimism deployment
+            "BALANCER-ETHEREUM": "2020-02-28",  # Balancer V1 launch
             "BALANCER-POLYGON": "2021-06-24",
             "BALANCER-ARBITRUM": "2021-08-27",
             "BALANCER-OPTIMISM": "2022-05-20",
@@ -257,7 +257,7 @@ class VenueMapping:
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
-            "RAYDIUM-SOLANA": "2020-01-20",
+            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launched on Solana mainnet
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
