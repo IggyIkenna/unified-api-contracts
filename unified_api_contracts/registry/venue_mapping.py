@@ -220,7 +220,7 @@ class VenueMapping:
             "UNISWAPV3-ARBITRUM": "2021-06-18",
             "UNISWAPV3-POLYGON": "2021-12-22",  # Uniswap V3 Polygon deployment
             "UNISWAPV3-OPTIMISM": "2021-11-12",
-            "UNISWAPV3-BASE": "2023-08-09",  # Base mainnet launch
+            "UNISWAPV3-BASE": "2023-08-09",  # Base mainnet launch; Uni V3 pools existed from Jul 31 pre-launch
             "UNISWAPV4-ETHEREUM": "2025-01-30",  # Uniswap V4 mainnet deployment
             "CURVE-ETHEREUM": "2020-01-20",  # Curve genesis pool
             "CURVE-AVALANCHE": "2021-11-10",  # Curve Avalanche deployment
@@ -257,7 +257,7 @@ class VenueMapping:
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
-            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launched on Solana mainnet
+            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch; on-chain RPC discovery
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
