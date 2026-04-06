@@ -14,6 +14,69 @@ from __future__ import annotations
 # Default timeframes for candle processing (used by sharding and CLI)
 TIMEFRAMES: list[str] = ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
 
+# Base (native) granularity per data type — the finest meaningful timeframe
+# that can be produced from the raw source data for each data type.
+# Tick-level data (trades, book snapshots) → 15s base.
+# Pre-aggregated OHLCV → native period is the base.
+# DeFi on-chain data → depends on block time; 15m is safe default for ETH (~12s blocks).
+# Sports odds → horizon-based buckets, not standard timeframes.
+BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
+    # CeFi — tick-level from Tardis
+    "trades": "15s",
+    "book_snapshot_5": "15s",
+    "derivative_ticker": "15s",
+    "liquidations": "15s",
+    "options_chain": "15s",
+    "futures_chain": "15s",
+    # TradFi — pre-aggregated candles
+    "ohlcv_1m": "1m",
+    "ohlcv_15m": "15m",
+    "ohlcv_24h": "24h",
+    "tbbo": "15s",
+    # DeFi — on-chain sampled (ETH ~12s blocks → 15m safe default)
+    "swaps": "15s",
+    "liquidity": "15m",
+    "rate_indices": "15m",
+    "oracle_prices": "15m",
+    "utilization": "15m",
+    "yields": "1h",
+    "rewards": "24h",
+    "risk_params": "24h",
+    # Sports — horizon-based, not standard timeframes
+    "odds_snapshot": "15m",
+    "odds_movement": "15m",
+    "arbitrage_opportunity": "15m",
+    # Prediction — tick-level from CLOB
+    "prediction_trades": "15s",
+    "prediction_book_snapshot": "15s",
+    "prediction_market_metadata": "24h",
+}
+
+# Timeframe ordering in seconds (used for validation and aggregation)
+TIMEFRAME_SECONDS: dict[str, int] = {
+    "15s": 15,
+    "1m": 60,
+    "5m": 300,
+    "15m": 900,
+    "1h": 3600,
+    "4h": 14400,
+    "24h": 86400,
+}
+
+
+def get_valid_timeframes_for_data_type(data_type: str) -> list[str]:
+    """Return the list of valid output timeframes for a data type.
+
+    Only timeframes >= the base granularity are valid. Requesting 15s candles
+    from ohlcv_15m source data would produce NaN-filled garbage.
+    """
+    base = BASE_GRANULARITY_BY_DATA_TYPE.get(data_type)
+    if base is None:
+        return list(TIMEFRAMES)  # Unknown data type — allow all
+    base_seconds = TIMEFRAME_SECONDS.get(base, 0)
+    return [tf for tf in TIMEFRAMES if TIMEFRAME_SECONDS.get(tf, 0) >= base_seconds]
+
+
 # Data types per category
 DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
     "cefi": [
@@ -44,6 +107,7 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
         "risk_params",  # Protocol risk parameters (pass-through, OHLCV=NaN)
     ],
     "sports": [
+        "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
         "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
@@ -132,6 +196,7 @@ VENUES_BY_CATEGORY: dict[str, list[str]] = {
     ],
     "sports": [
         # Sports betting exchanges and bookmakers
+        "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
         "PINNACLE",
         "BETFAIR",
         "DRAFTKINGS",
@@ -216,6 +281,29 @@ FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
         "temporal": "oracle_prices",
         "economic_events": "oracle_prices",
         "targets": "oracle_prices",
+    },
+    "prediction": {
+        "technical_indicators": "prediction_trades",
+        "moving_averages": "prediction_trades",
+        "oscillators": "prediction_trades",
+        "volatility_realized": "prediction_trades",
+        "momentum": "prediction_trades",
+        "volume_analysis": "prediction_trades",
+        "vwap": "prediction_trades",
+        "candlestick_patterns": "prediction_trades",
+        "market_structure": "prediction_trades",
+        "returns": "prediction_trades",
+        "round_numbers": "prediction_trades",
+        "streaks": "prediction_trades",
+        "volume_flow": "prediction_trades",
+        "temporal": "prediction_trades",
+        "targets": "prediction_trades",
+        "supply_demand_zones": "prediction_trades",
+        "fibonacci": "prediction_trades",
+        "level_confluence": "prediction_trades",
+        "market_structure_sequence": "prediction_trades",
+        "risk_reward": "prediction_trades",
+        "wedge_quality": "prediction_trades",
     },
 }
 
