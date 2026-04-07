@@ -261,6 +261,20 @@ class VenueMapping:
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
+            # Prediction — Polymarket
+            # POLYMARKET base venue start = earliest instrument data
+            "POLYMARKET": "2025-03-13",
+            # Per-underlying shard start dates (consistent daily presence)
+            # These are used by deployment-ui for accurate completion %
+            "POLYMARKET:BTC": "2025-03-13",
+            "POLYMARKET:ETH": "2025-03-14",
+            "POLYMARKET:SOL": "2025-05-08",
+            "POLYMARKET:XRP": "2025-05-15",
+            "POLYMARKET:DOGE": "2026-03-09",
+            "POLYMARKET:HYPE": "2026-03-08",
+            "POLYMARKET:BNB": "2026-03-08",
+            "POLYMARKET:FOOTBALL": "2025-10-18",
+            "POLYMARKET:OTHER": "2025-03-13",
         }
     )
 
