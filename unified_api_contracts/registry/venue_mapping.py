@@ -257,7 +257,7 @@ class VenueMapping:
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
-            "RAYDIUM-SOLANA": "2025-06-26",  # Earliest adapter data (AMM launched 2021-02-21)
+            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch; on-chain RPC discovery
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
