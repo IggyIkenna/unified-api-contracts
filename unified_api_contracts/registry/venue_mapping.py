@@ -28,8 +28,8 @@ class VenueMapping:
         default_factory=lambda: [
             # Tier 1: Primary exchanges (highest liquidity)
             "binance",
-            "binance-futures",  # BINANCE split
-            "deribit",  # DERIBIT unified
+            "binance-futures",  # BINANCE USDT-margined (perps + dated quarterly)
+            "deribit",  # DERIBIT unified (perps + futures + options)
             "bybit",
             "bybit-spot",  # BYBIT unified
             "okex",
@@ -220,12 +220,12 @@ class VenueMapping:
             "UNISWAPV3-ARBITRUM": "2021-06-18",
             "UNISWAPV3-POLYGON": "2021-12-22",  # Uniswap V3 Polygon deployment
             "UNISWAPV3-OPTIMISM": "2021-11-12",
-            "UNISWAPV3-BASE": "2023-08-09",  # Base mainnet launch; Uni V3 pools existed from Jul 31 pre-launch
+            "UNISWAPV3-BASE": "2023-09-03",  # Earliest subgraph data (Base launched 2023-08-09)
             "UNISWAPV4-ETHEREUM": "2025-01-30",  # Uniswap V4 mainnet deployment
             "CURVE-ETHEREUM": "2020-01-20",  # Curve genesis pool
             "CURVE-AVALANCHE": "2021-11-10",  # Curve Avalanche deployment
             "CURVE-OPTIMISM": "2022-01-13",  # Curve Optimism deployment
-            "BALANCER-ETHEREUM": "2020-02-28",  # Balancer V1 launch
+            "BALANCER-ETHEREUM": "2021-04-22",  # Earliest subgraph data (V1 launched 2020-02-28)
             "BALANCER-POLYGON": "2021-06-24",
             "BALANCER-ARBITRUM": "2021-08-27",
             "BALANCER-OPTIMISM": "2022-05-20",
@@ -257,7 +257,7 @@ class VenueMapping:
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
-            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch; on-chain RPC discovery
+            "RAYDIUM-SOLANA": "2025-06-26",  # Earliest adapter data (AMM launched 2021-02-21)
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
