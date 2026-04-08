@@ -257,7 +257,7 @@ class VenueMapping:
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
-            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch; on-chain RPC discovery
+            "RAYDIUM-SOLANA": "2025-06-26",  # Earliest active pool data (REST API set)
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
@@ -275,6 +275,17 @@ class VenueMapping:
             "POLYMARKET:BNB": "2026-03-08",
             "POLYMARKET:FOOTBALL": "2025-10-18",
             "POLYMARKET:OTHER": "2025-03-13",
+        }
+    )
+
+    # Source/provider data start dates (distinct from venue launch dates)
+    # These are data aggregators or providers, not trading venues.
+    # The date is the earliest date with actual data available from the source.
+    source_data_start_dates: dict[str, str] = field(
+        default_factory=lambda: {
+            # Sports — Odds API historical data starts 2020-06-06
+            # API returns 401 Unauthorized for dates before this
+            "ODDS_API": "2020-06-06",
         }
     )
 
@@ -349,15 +360,17 @@ class VenueMapping:
 
     def get_venue_start_date(self, venue: str) -> str | None:
         """
-        Get the launch/start date for a venue.
+        Get the start date for a venue or data source.
+
+        Checks venue_start_dates first, then source_data_start_dates as fallback.
 
         Args:
-            venue: Canonical venue name (e.g., "ETHERFI-ETHEREUM", "UNISWAPV3-ETHEREUM")
+            venue: Canonical venue name or source name (e.g., "BINANCE-SPOT", "ODDS_API")
 
         Returns:
-            ISO date string (YYYY-MM-DD) or None if venue not found
+            ISO date string (YYYY-MM-DD) or None if not found
         """
-        return self.venue_start_dates.get(venue)
+        return self.venue_start_dates.get(venue) or self.source_data_start_dates.get(venue)
 
     def is_venue_available_on_date(self, venue: str, target_date: datetime | date | str) -> bool:
         """
@@ -370,7 +383,7 @@ class VenueMapping:
         Returns:
             True if venue was available on the target date, False otherwise
         """
-        start_date_str = self.venue_start_dates.get(venue)
+        start_date_str = self.venue_start_dates.get(venue) or self.source_data_start_dates.get(venue)
         if not start_date_str:
             # If no start date configured, assume always available
             return True
