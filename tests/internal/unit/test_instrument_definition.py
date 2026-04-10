@@ -146,25 +146,6 @@ class TestValidateToDatetime:
 
 
 # ---------------------------------------------------------------------------
-# validate_data_types
-# ---------------------------------------------------------------------------
-
-
-class TestValidateDataTypes:
-    def test_none_allowed(self) -> None:
-        inst = make_spot(data_types=None)
-        assert inst.data_types is None
-
-    def test_empty_string_raises(self) -> None:
-        with pytest.raises(ValueError, match="cannot be empty string"):
-            make_spot(data_types="")
-
-    def test_valid_data_types(self) -> None:
-        inst = make_spot(data_types="trades,book_snapshot_25")
-        assert inst.data_types == "trades,book_snapshot_25"
-
-
-# ---------------------------------------------------------------------------
 # validate_expiry
 # ---------------------------------------------------------------------------
 
@@ -399,7 +380,6 @@ class TestValidateRequiredFields:
             quote_asset="USDT",
             tardis_symbol="BTC-USDT",
             tardis_exchange="binance",
-            data_types="trades",
         )
         missing = inst.validate_required_fields()
         assert missing == []
@@ -411,7 +391,6 @@ class TestValidateRequiredFields:
         assert "quote_asset" in missing
         assert "tardis_symbol" in missing
         assert "tardis_exchange" in missing
-        assert "data_types" in missing
 
 
 # ---------------------------------------------------------------------------

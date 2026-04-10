@@ -46,7 +46,6 @@ class InstrumentDefinition(BaseModel):
         "quote_asset",
         "tardis_symbol",
         "tardis_exchange",
-        "data_types",
         "available_from_datetime",
     ]
 
@@ -57,7 +56,6 @@ class InstrumentDefinition(BaseModel):
     available_from_datetime: str
 
     available_to_datetime: str | None = None
-    data_types: str | None = None
     expiry: str | None = None
     option_type: str | None = None
     strike: str | None = None
@@ -120,16 +118,6 @@ class InstrumentDefinition(BaseModel):
             return None
         if not _validate_iso(s):
             raise ValueError(f"Invalid ISO datetime: {s!r}")
-        return s
-
-    @field_validator("data_types", mode="before")
-    @classmethod
-    def validate_data_types(cls, v: object) -> str | None:
-        if v is None:
-            return None
-        s = str(v).strip()
-        if s == "":
-            raise ValueError("Data types cannot be empty string; use None to omit")
         return s
 
     @field_validator("expiry", mode="before")

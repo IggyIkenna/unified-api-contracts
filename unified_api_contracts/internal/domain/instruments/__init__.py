@@ -74,12 +74,6 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
             description="Asset class: 'crypto' or 'traditional'",
         ),
         ColumnSchema(
-            name="data_types",
-            dtype="string",
-            nullable=True,
-            description="Comma-separated list of available data types",
-        ),
-        ColumnSchema(
             name="available_to_datetime",
             dtype="datetime64[ns]",
             nullable=True,
@@ -464,13 +458,6 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "required": False,
         "nullable": True,
         "description": "ISO datetime when instrument expires. Empty/None for SPOT/PERPETUAL",
-    },
-    {
-        "name": "data_types",
-        "type": "string",
-        "required": False,
-        "default": "trades,book_snapshot_5",
-        "description": "Comma-separated list of data types",
     },
     {
         "name": "base_asset",
