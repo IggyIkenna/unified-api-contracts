@@ -95,14 +95,14 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         # ARB/POLY only on hosted service (deprecated) — use api.curve.fi instead
     },
     # ── Additional DEX protocols (chain-dominant) ─────────────────
-    "pancakeswap_v3": {  # UniV3-fork schema (poolDayDatas)
-        "BSC": "78EUqzJmEVJsAKvWghn7qotf9LVGqcTQxJhT5z84ZmgJ",
-        "ETHEREUM": "9psTWtnVVQwSHUVRtCuR8985UfzotdtdZwVt8K9kJGeg",
+    "pancakeswap_v3": {  # UniV3-fork schema (poolDayDatas) — from pancakeswap/pancake-frontend
+        "BSC": "Hv1GncLY5docZoGtXjo4kwbTvxm3MAhVZqBZE4sUT9eZ",
+        "ETHEREUM": "CJYGNhb7RvnhfBDjqpRnD3oxgyhibzc7fkAMa38YV3oS",
         "ARBITRUM": "251MHFNN1rwjErXD2efWMpNS73SANZN8Ua192zw6iXve",
-        "BASE": "2NjL7L4CmQaGJSacM43ofmH6ARf6gJoBeBaJtz9eWAQ9",
-        "ZKSYNC": "BnTM866GHTEyhxzrSmqnCdDAEixc34R87SnZaxH4BChy",
+        "BASE": "5YYKGBcRkJs6tmDfB3RpHdbK2R5KBACHQebXVgbUcYQp",
+        "ZKSYNC": "3dKr3tYxTuwiRLkU9vPj3MvZeUmeuGgWURbFC72ZBpYY",
     },
-    "sushiswap_v3": {  # UniV3-fork schema (poolDayDatas)
+    "sushiswap_v3": {  # Mixed schemas: ETH/AVAX = Messari DEX, BASE = SushiSwap custom (pairDaySnapshots)
         "ETHEREUM": "2tGWMrDha4164KkFAfkU3rDCtuxGb4q1emXmFdLLzJ8x",
         "BASE": "H6SjXCnZxJhaVHw4VDuXqtzWZ2JEBDvhwA3qysnUEjSV",
         "AVALANCHE": "9WGqYsU8h1KVZeKz32663gFrbjVUNhBgmhRavMFqiSZz",
@@ -153,6 +153,582 @@ def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
     if protocol_ids is None:
         return None
     return protocol_ids.get(chain.upper())
+
+
+# ---------------------------------------------------------------------------
+# Protocol capability declarations (SSOT)
+#
+# Single source of truth for:
+#   - instrument_types: what InstrumentType each protocol produces
+#   - data_types: what MTDS data types each protocol produces
+#   - mtds_operation: which MTDS --operation collects data for this protocol
+#   - venue_prefix: canonical venue prefix (e.g. "AAVEV3")
+#   - protocol_class: classification for filtering/routing
+#   - required_tokens: protocol-native tokens that MUST be in the major assets
+#     filter (governance, reward, staking tokens that our strategies need)
+#   - chain_native_tokens: per-chain tokens auto-included when protocol is
+#     deployed on that chain (e.g. SOL for Solana, BNB for BSC)
+#
+# Consumers:
+#   - instruments-service orchestrator: builds venue list from this
+#   - MTDS handlers: validate which data types to collect per protocol
+#   - market_data_categories.py: derives VENUES_BY_CATEGORY from this
+#   - deployment-ui data-status: shows expected data coverage matrix
+# ---------------------------------------------------------------------------
+
+from ..._instrument_enums import InstrumentType as _IT  # noqa: E402, N814
+
+
+class ProtocolClass(StrEnum):
+    """Protocol classification for filtering and routing."""
+
+    LENDING = "lending"
+    DEX = "dex"
+    YIELD = "yield"
+    STAKING = "staking"
+    PERPS = "perps"
+    RESTAKING = "restaking"
+
+
+class _ProtocolCapability:
+    """Capability declaration for a single DeFi protocol."""
+
+    __slots__ = (
+        "data_types",
+        "instrument_types",
+        "mtds_operations",
+        "protocol_class",
+        "required_tokens",
+        "venue_prefix",
+    )
+
+    def __init__(
+        self,
+        venue_prefix: str,
+        protocol_class: ProtocolClass,
+        instrument_types: list[str],
+        data_types: list[str],
+        mtds_operations: list[str],
+        required_tokens: frozenset[str] | None = None,
+    ) -> None:
+        self.venue_prefix = venue_prefix
+        self.protocol_class = protocol_class
+        self.instrument_types = instrument_types
+        self.data_types = data_types
+        self.mtds_operations = mtds_operations
+        self.required_tokens = required_tokens or frozenset()
+
+
+# Instrument type shorthands
+_LENDING = [_IT.LENDING]
+_POOL = [_IT.POOL]
+_YIELD = [_IT.YIELD_BEARING]
+_STAKING = [_IT.STAKING]
+_PERPS = [_IT.PERPETUAL, _IT.SPOT_PAIR]
+_RESTAKING = [_IT.SPOT_ASSET]
+
+# Data type groups
+#
+# These describe ALL data types a protocol CAN produce — both what MTDS
+# collects today and what's available on-chain/via APIs.  "Aspirational"
+# entries are marked with inline comments; MTDS handlers for those may
+# not exist yet but the data IS available at the source.
+#
+# Key distinctions:
+#   tvl           — totalValueLockedUSD (pool/market level, from snapshots)
+#   swaps         — individual swap events (amount0, amount1, amountUSD, sender, ts)
+#   dex_pools     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
+#   oracle_prices — external price feeds (Chainlink, protocol exchange rates)
+#                   needed to compute yield on non-rebasing tokens (sUSDe, wstETH)
+#   gas_fees      — chain-level gas price data (baseFee, priorityFee, gasUsed)
+#
+_LENDING_DATA = ["rate_indices", "utilization", "liquidations", "risk_params", "tvl"]
+_DEX_DATA = ["dex_pools", "swaps", "tvl"]
+_YIELD_DATA = ["lst_rates", "oracle_prices"]
+_STAKING_DATA = ["lst_rates", "oracle_prices"]
+_PERPS_DATA = ["perp_funding"]
+
+PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
+    # ── EVM Lending ──────────────────────────────────────────────
+    "aave_v3": _ProtocolCapability(
+        venue_prefix="AAVEV3",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
+        mtds_operations=["collect-evm-defi", "collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        required_tokens=frozenset({"AAVE", "GHO"}),
+    ),
+    "spark": _ProtocolCapability(
+        venue_prefix="SPARK",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        required_tokens=frozenset({"MKR", "DAI"}),
+    ),
+    "compound_v3": _ProtocolCapability(
+        venue_prefix="COMPOUNDV3",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
+        mtds_operations=["collect-evm-defi", "collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        required_tokens=frozenset({"COMP"}),
+    ),
+    "morpho": _ProtocolCapability(
+        venue_prefix="MORPHO",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
+        mtds_operations=["collect-evm-defi", "collect-liquidations", "collect-gas-fees"],
+    ),
+    "fluid": _ProtocolCapability(
+        venue_prefix="FLUID",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
+        mtds_operations=["collect-evm-defi", "collect-liquidations", "collect-gas-fees"],
+    ),
+    # ── EVM DEX — Native schema ─────────────────────────────────
+    "uniswap_v2": _ProtocolCapability(
+        venue_prefix="UNISWAPV2",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"UNI"}),
+    ),
+    "uniswap_v3": _ProtocolCapability(
+        venue_prefix="UNISWAPV3",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"UNI"}),
+    ),
+    "uniswap_v4": _ProtocolCapability(
+        venue_prefix="UNISWAPV4",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"UNI"}),
+    ),
+    "balancer": _ProtocolCapability(
+        venue_prefix="BALANCER",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"BAL"}),
+    ),
+    "curve": _ProtocolCapability(
+        venue_prefix="CURVE",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"CRV", "CRVUSD"}),
+    ),
+    # ── EVM DEX — Forks (reuse uniswap_v3 adapter) ─────────────
+    "pancakeswap_v3": _ProtocolCapability(
+        venue_prefix="PANCAKESWAPV3",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+    ),
+    "sushiswap_v3": _ProtocolCapability(
+        venue_prefix="SUSHISWAPV3",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"SUSHI"}),
+    ),
+    "sushiswap": _ProtocolCapability(
+        venue_prefix="SUSHISWAP",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        required_tokens=frozenset({"SUSHI"}),
+    ),
+    "aerodrome_v3": _ProtocolCapability(
+        venue_prefix="AERODROMEV3",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+    ),
+    "camelot_v3": _ProtocolCapability(
+        venue_prefix="CAMELOTV3",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+    ),
+    "velodrome_v2": _ProtocolCapability(
+        venue_prefix="VELODROMEV2",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+    ),
+    "trader_joe_v2": _ProtocolCapability(
+        venue_prefix="TRADERJOEV2",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+    ),
+    "gmx": _ProtocolCapability(
+        venue_prefix="GMX",
+        protocol_class=ProtocolClass.PERPS,
+        instrument_types=_POOL,
+        data_types=[*_DEX_DATA, *_PERPS_DATA, "liquidations", "gas_fees"],
+        mtds_operations=["collect-dex-pools", "collect-perp-funding", "collect-gas-fees"],
+    ),
+    # ── EVM Yield/Staking (static adapters, no subgraph) ────────
+    "lido": _ProtocolCapability(
+        venue_prefix="LIDO",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=[*_YIELD_DATA, "rewards", "gas_fees"],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-gas-fees"],
+        required_tokens=frozenset({"LDO", "STETH", "WSTETH"}),
+    ),
+    "etherfi": _ProtocolCapability(
+        venue_prefix="ETHERFI",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=[*_YIELD_DATA, "rewards", "gas_fees"],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-gas-fees"],
+        required_tokens=frozenset({"ETHFI", "EETH", "WEETH"}),
+    ),
+    "ethena": _ProtocolCapability(
+        venue_prefix="ETHENA",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=[*_YIELD_DATA, "gas_fees"],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-gas-fees"],
+        required_tokens=frozenset({"USDE", "SUSDE"}),
+    ),
+    "eigenlayer": _ProtocolCapability(
+        venue_prefix="EIGENLAYER",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_RESTAKING,
+        data_types=["rewards", "oracle_prices", "gas_fees"],
+        mtds_operations=["collect-eigenlayer-rewards", "collect-oracle-prices", "collect-gas-fees"],
+        required_tokens=frozenset({"EIGEN", "ETHFI"}),
+    ),
+    # ── CeFi-style Perps (API-based, not on-chain) ─────────────
+    "hyperliquid": _ProtocolCapability(
+        venue_prefix="HYPERLIQUID",
+        protocol_class=ProtocolClass.PERPS,
+        instrument_types=_PERPS,
+        data_types=["perp_funding", "oracle_prices"],
+        mtds_operations=["collect-perp-funding"],
+    ),
+    "aster": _ProtocolCapability(
+        venue_prefix="ASTER",
+        protocol_class=ProtocolClass.PERPS,
+        instrument_types=_PERPS,
+        data_types=["perp_funding"],
+        mtds_operations=["collect-perp-funding"],
+    ),
+    # ── Solana DeFi ─────────────────────────────────────────────
+    "drift": _ProtocolCapability(
+        venue_prefix="DRIFT",
+        protocol_class=ProtocolClass.PERPS,
+        instrument_types=_PERPS,
+        data_types=["perp_funding", "oracle_prices", "solana_defi"],
+        mtds_operations=["collect-solana-defi", "collect-perp-funding"],
+        required_tokens=frozenset({"DRIFT"}),
+    ),
+    "kamino": _ProtocolCapability(
+        venue_prefix="KAMINO",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["solana_defi", "swaps", "tvl"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"KMNO"}),
+    ),
+    "raydium": _ProtocolCapability(
+        venue_prefix="RAYDIUM",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["solana_defi", "swaps", "tvl"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"RAY"}),
+    ),
+    "orca": _ProtocolCapability(
+        venue_prefix="ORCA",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["solana_defi", "swaps", "tvl"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"ORCA"}),
+    ),
+    "marinade": _ProtocolCapability(
+        venue_prefix="MARINADE",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_STAKING,
+        data_types=["solana_defi", "lst_rates", "oracle_prices"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"MNDE", "MSOL"}),
+    ),
+    "jito": _ProtocolCapability(
+        venue_prefix="JITO",
+        protocol_class=ProtocolClass.STAKING,
+        instrument_types=_STAKING,
+        data_types=["solana_defi", "lst_rates", "oracle_prices"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
+    ),
+}
+
+# Chain-native tokens — auto-included in major assets for any protocol on that chain.
+# These are gas tokens and wrapped variants needed for ANY pool on that chain.
+CHAIN_REQUIRED_TOKENS: dict[str, frozenset[str]] = {
+    "ETHEREUM": frozenset({"ETH", "WETH"}),
+    "ARBITRUM": frozenset({"ETH", "WETH"}),
+    "OPTIMISM": frozenset({"ETH", "WETH"}),
+    "BASE": frozenset({"ETH", "WETH"}),
+    "POLYGON": frozenset({"MATIC", "WMATIC"}),
+    "AVALANCHE": frozenset({"AVAX", "WAVAX"}),
+    "BSC": frozenset({"BNB", "WBNB"}),
+    "LINEA": frozenset({"ETH", "WETH"}),
+    "SCROLL": frozenset({"ETH", "WETH"}),
+    "ZKSYNC": frozenset({"ETH", "WETH"}),
+    "SOLANA": frozenset({"SOL", "WSOL"}),
+}
+
+# Wrapped/staked token equivalence groups — for major assets matching,
+# any token in the same group counts as a match. This means if ETH is in
+# the major assets list, pools with WETH/stETH/wstETH/cbETH/rETH/weETH
+# all pass the filter without needing every variant listed explicitly.
+TOKEN_EQUIVALENCE_GROUPS: dict[str, frozenset[str]] = {
+    "ETH": frozenset(
+        {
+            "ETH",
+            "WETH",
+            "STETH",
+            "WSTETH",
+            "CBETH",
+            "RETH",
+            "WEETH",
+            "EETH",
+            "SFRXETH",
+            "FRXETH",
+            "OETH",
+            "OSETH",
+            "SWETH",
+            "ETHX",
+            "METH",
+            "EZETH",
+            "RSETH",
+            "PUFETH",
+            "ANKRETH",
+            "WETH.E",  # Avalanche/Polygon bridged
+        }
+    ),
+    "BTC": frozenset(
+        {
+            "BTC",
+            "WBTC",
+            "TBTC",
+            "CBBTC",
+            "LBTC",
+        }
+    ),
+    "USD": frozenset(
+        {
+            "USDT",
+            "USDC",
+            "DAI",
+            "FRAX",
+            "USDE",
+            "SUSDE",
+            "GHO",
+            "CRVUSD",
+            "LUSD",
+            "PYUSD",
+            "EURC",
+            "SUSD",
+            "TUSD",
+            "USDP",
+            "USDC.E",
+            "USDT.E",  # Bridged variants
+        }
+    ),
+    "SOL": frozenset(
+        {
+            "SOL",
+            "WSOL",
+            "MSOL",
+            "STSOL",
+            "JITOSOL",
+            "BSOL",
+            "JSOL",
+        }
+    ),
+    "MATIC": frozenset({"MATIC", "WMATIC"}),
+    "AVAX": frozenset({"AVAX", "WAVAX"}),
+    "BNB": frozenset({"BNB", "WBNB"}),
+}
+
+# Reverse lookup: token → equivalence group base
+_TOKEN_TO_GROUP: dict[str, str] = {tok: group for group, tokens in TOKEN_EQUIVALENCE_GROUPS.items() for tok in tokens}
+
+
+def get_protocol_capability(protocol: str) -> _ProtocolCapability | None:
+    """Get capability declaration for a protocol."""
+    return PROTOCOL_CAPABILITIES.get(protocol)
+
+
+def get_venue_prefix(protocol: str) -> str | None:
+    """Get the canonical venue prefix for a protocol (e.g. 'aave_v3' -> 'AAVEV3')."""
+    cap = PROTOCOL_CAPABILITIES.get(protocol)
+    return cap.venue_prefix if cap else None
+
+
+def get_data_types_for_protocol(protocol: str) -> list[str]:
+    """Get the data types that MTDS should collect for a protocol."""
+    cap = PROTOCOL_CAPABILITIES.get(protocol)
+    return list(cap.data_types) if cap else []
+
+
+def get_mtds_operations_for_protocol(protocol: str) -> list[str]:
+    """Get the MTDS operations that should run for a protocol."""
+    cap = PROTOCOL_CAPABILITIES.get(protocol)
+    return list(cap.mtds_operations) if cap else []
+
+
+def get_required_tokens_for_protocol(protocol: str) -> frozenset[str]:
+    """Get protocol-native tokens that must be in the major assets filter."""
+    cap = PROTOCOL_CAPABILITIES.get(protocol)
+    return cap.required_tokens if cap else frozenset()
+
+
+def get_required_tokens_for_venue(venue: str) -> frozenset[str]:
+    """Get all required tokens for a venue (protocol + chain tokens).
+
+    Args:
+        venue: Canonical venue name (e.g. "AAVEV3-ETHEREUM", "DRIFT-SOLANA").
+
+    Returns:
+        Union of protocol-required tokens + chain-native tokens.
+    """
+    parts = venue.split("-", 1)
+    if len(parts) != 2:
+        return frozenset()
+
+    # Find protocol by venue prefix
+    prefix = parts[0]
+    chain = parts[1]
+    protocol_tokens: frozenset[str] = frozenset()
+    for cap in PROTOCOL_CAPABILITIES.values():
+        if cap.venue_prefix == prefix:
+            protocol_tokens = cap.required_tokens
+            break
+
+    chain_tokens = CHAIN_REQUIRED_TOKENS.get(chain, frozenset())
+    return protocol_tokens | chain_tokens
+
+
+def is_token_equivalent(token_a: str, token_b: str) -> bool:
+    """Check if two tokens are in the same equivalence group.
+
+    Used for major-assets filtering with tolerance for wrapped/staked variants.
+    E.g. is_token_equivalent("WETH", "stETH") -> True (both in ETH group).
+    """
+    upper_a = token_a.upper()
+    upper_b = token_b.upper()
+    if upper_a == upper_b:
+        return True
+    group_a = _TOKEN_TO_GROUP.get(upper_a)
+    group_b = _TOKEN_TO_GROUP.get(upper_b)
+    return bool(group_a is not None and group_a == group_b)
+
+
+def token_matches_major_assets(token: str, major_assets: frozenset[str]) -> bool:
+    """Check if a token passes the major assets filter with equivalence tolerance.
+
+    Returns True if:
+    1. The token itself is in major_assets, OR
+    2. Any token in the same equivalence group is in major_assets.
+
+    This means a pool with WETH passes even if only "ETH" is in the filter,
+    because WETH and ETH are in the same equivalence group.
+    """
+    upper = token.upper()
+    if upper in major_assets:
+        return True
+    group = _TOKEN_TO_GROUP.get(upper)
+    if group is None:
+        return False
+    return bool(TOKEN_EQUIVALENCE_GROUPS[group] & major_assets)
+
+
+def build_complete_major_assets() -> frozenset[str]:
+    """Build the complete major assets set including all protocol and chain tokens.
+
+    Combines:
+    1. All tokens from TOKEN_EQUIVALENCE_GROUPS (ETH/BTC/USD/SOL families)
+    2. All protocol required_tokens (governance tokens, reward tokens)
+    3. All chain native tokens
+    """
+    tokens: set[str] = set()
+
+    # All equivalence group tokens
+    for group_tokens in TOKEN_EQUIVALENCE_GROUPS.values():
+        tokens |= group_tokens
+
+    # All protocol-required tokens
+    for cap in PROTOCOL_CAPABILITIES.values():
+        tokens |= cap.required_tokens
+
+    # All chain-native tokens
+    for chain_tokens in CHAIN_REQUIRED_TOKENS.values():
+        tokens |= chain_tokens
+
+    return frozenset(tokens)
+
+
+def build_defi_venues() -> list[str]:
+    """Build the full DeFi venue list from protocol capabilities + SUBGRAPH_IDS.
+
+    This is the SSOT for the expected venue set. Generates PROTOCOL-CHAIN
+    for each protocol that has subgraph IDs, plus static venues.
+    """
+    venues: list[str] = []
+    for protocol, cap in PROTOCOL_CAPABILITIES.items():
+        chains = get_supported_chains_for_protocol(protocol)
+        if chains:
+            for chain in chains:
+                venues.append(f"{cap.venue_prefix}-{chain}")
+        elif protocol in _STATIC_VENUE_CHAINS:
+            # Protocols without subgraph IDs — static chain mapping
+            for chain in _STATIC_VENUE_CHAINS[protocol]:
+                venues.append(f"{cap.venue_prefix}-{chain}")
+    return venues
+
+
+# Static chain assignments for protocols that don't use The Graph
+_STATIC_VENUE_CHAINS: dict[str, list[str]] = {
+    "lido": ["ETHEREUM"],
+    "etherfi": ["ETHEREUM"],
+    "ethena": ["ETHEREUM"],
+    "eigenlayer": ["ETHEREUM"],
+    "hyperliquid": ["HYPERLIQUID"],
+    "aster": ["ASTER"],
+    "drift": ["SOLANA"],
+    "kamino": ["SOLANA"],
+    "raydium": ["SOLANA"],
+    "orca": ["SOLANA"],
+    "marinade": ["SOLANA"],
+    "jito": ["SOLANA"],
+}
 
 
 # ---------------------------------------------------------------------------

@@ -37,6 +37,19 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "ORCA",
         "MARINADE",
         "JITO",
+        # DEX forks (UniV3 adapter with protocol_slug)
+        "PANCAKESWAPV3",
+        "SUSHISWAPV3",
+        "AERODROMEV3",
+        "CAMELOTV3",
+        "VELODROMEV2",
+        "TRADERJOEV2",
+        "GMX",
+        "SUSHISWAP",
+        # Lending forks
+        "SPARK",
+        # Governance / restaking
+        "EIGENLAYER",
     }
 )
 

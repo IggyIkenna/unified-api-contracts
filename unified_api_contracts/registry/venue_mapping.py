@@ -194,8 +194,8 @@ class VenueMapping:
             # CEFI - Tardis exchanges (Tier 1)
             # Start dates = earliest manifest data, NOT exchange founding dates
             "BINANCE-SPOT": "2020-01-01",
-            "BINANCE-FUTURES": "2020-01-01",
-            "DERIBIT": "2020-01-01",
+            "BINANCE-FUTURES": "2019-11-17",
+            "DERIBIT": "2019-03-30",
             "BYBIT": "2020-01-01",
             "OKX-SPOT": "2020-01-01",
             "OKX-FUTURES": "2020-01-01",
@@ -208,7 +208,7 @@ class VenueMapping:
             # TradFi - Databento
             # Start dates = earliest manifest data
             "CME": "2020-01-01",
-            "CBOE": "2026-03-01",  # Only recent data so far
+            "CBOE": "2020-06-01",  # Barchart historical data available
             "NASDAQ": "2023-04-15",
             "NYSE": "2023-04-15",
             "ICE": "2020-01-01",

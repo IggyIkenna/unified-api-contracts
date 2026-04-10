@@ -45,15 +45,25 @@ DEFI_MAJOR_ASSET_SYMBOLS: frozenset[str] = frozenset({
 # fmt: on
 
 # DEX keyword detection — venues containing these are treated as DEX pools
-# where BOTH base and quote must be in the whitelist
+# where BOTH base and quote must be in the whitelist.
+# Must cover all DEX protocols in PROTOCOL_CAPABILITIES with protocol_class=DEX.
 DEX_VENUE_KEYWORDS: frozenset[str] = frozenset(
     {
+        # EVM DEXes
         "UNISWAP",
         "BALANCER",
-        "CURVE",  # EVM
+        "CURVE",
+        "PANCAKESWAP",
+        "SUSHISWAP",
+        "AERODROME",
+        "CAMELOT",
+        "VELODROME",
+        "TRADERJOE",
+        "GMX",
+        # Solana DEXes
         "ORCA",
         "RAYDIUM",
-        "KAMINO",  # Solana
+        "KAMINO",
     }
 )
 
