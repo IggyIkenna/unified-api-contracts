@@ -94,6 +94,43 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "AVALANCHE": "2Vt8WtdXNZUEeaVtzyEd1dpioJf44nvomzkd4HhubfKS",
         # ARB/POLY only on hosted service (deprecated) — use api.curve.fi instead
     },
+    # ── Additional DEX protocols (chain-dominant) ─────────────────
+    "pancakeswap_v3": {  # UniV3-fork schema (poolDayDatas)
+        "BSC": "78EUqzJmEVJsAKvWghn7qotf9LVGqcTQxJhT5z84ZmgJ",
+        "ETHEREUM": "9psTWtnVVQwSHUVRtCuR8985UfzotdtdZwVt8K9kJGeg",
+        "ARBITRUM": "251MHFNN1rwjErXD2efWMpNS73SANZN8Ua192zw6iXve",
+        "BASE": "2NjL7L4CmQaGJSacM43ofmH6ARf6gJoBeBaJtz9eWAQ9",
+        "ZKSYNC": "BnTM866GHTEyhxzrSmqnCdDAEixc34R87SnZaxH4BChy",
+    },
+    "sushiswap_v3": {  # UniV3-fork schema (poolDayDatas)
+        "ETHEREUM": "2tGWMrDha4164KkFAfkU3rDCtuxGb4q1emXmFdLLzJ8x",
+        "BASE": "H6SjXCnZxJhaVHw4VDuXqtzWZ2JEBDvhwA3qysnUEjSV",
+        "AVALANCHE": "9WGqYsU8h1KVZeKz32663gFrbjVUNhBgmhRavMFqiSZz",
+    },
+    "sushiswap": {  # Messari schema (liquidityPoolDailySnapshots) — legacy V2
+        "ARBITRUM": "9tSS5FaePZnjmnXnSKCCqKVLAqA6eGg6jA2oRojsXUbP",
+    },
+    "aerodrome_v3": {  # UniV3-style schema (poolDayDatas) — "Aerodrome Base Full"
+        "BASE": "GENunSHWLBXm59mBSgPzQ8metBEp9YDfdqwFr91Av1UM",
+    },
+    "velodrome_v2": {  # Messari schema (liquidityPoolDailySnapshots)
+        "OPTIMISM": "A4Y1A82YhSLTn998BVVELC8eWzhi992k4ZitByvssxqA",
+    },
+    "camelot_v3": {  # Algebra CL schema (poolDayDatas — UniV3-compatible)
+        "ARBITRUM": "7mPnp1UqmefcCycB8umy4uUkTkFxMoHn1Y7ncBUscePp",
+    },
+    "trader_joe_v2": {  # Messari schema (liquidityPoolDailySnapshots)
+        "AVALANCHE": "H2VGe2tYavUEosSjomHwxbvCKy3LaNaW8Kjw2KhhHs1K",
+    },
+    # ── Additional perps ──────────────────────────────────────────
+    "gmx": {  # Messari schema
+        "ARBITRUM": "DiR5cWwB3pwXXQWWdus7fDLR2mnFRQLiBFsVmHAH9VAs",
+        "AVALANCHE": "6pXgnXcL6mkXBjKX7NyHN7tCudv2JGFnXZ8wf8WbjPXv",
+    },
+    # ── Additional lending ────────────────────────────────────────
+    "spark": {  # Messari lending schema (same as Aave V3 — MakerDAO fork)
+        "ETHEREUM": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si",
+    },
 }
 
 

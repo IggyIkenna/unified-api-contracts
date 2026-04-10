@@ -27,6 +27,24 @@ DEFI_VENUE_TO_PROTOCOL: dict[str, tuple[str, str | None]] = {
     "FLUID-PLASMA": ("fluid_plasma", None),
     "AAVE-PLASMA": ("aave_plasma", None),
     "ETHENA": ("ethena", "ETHEREUM"),
+    # ── Chain-dominant DEXes ──────────────────────────────────────
+    "PANCAKESWAPV3-BSC": ("pancakeswap_v3", "BSC"),
+    "PANCAKESWAPV3-ETHEREUM": ("pancakeswap_v3", "ETHEREUM"),
+    "PANCAKESWAPV3-ARBITRUM": ("pancakeswap_v3", "ARBITRUM"),
+    "PANCAKESWAPV3-BASE": ("pancakeswap_v3", "BASE"),
+    "PANCAKESWAPV3-ZKSYNC": ("pancakeswap_v3", "ZKSYNC"),
+    "SUSHISWAPV3-ETHEREUM": ("sushiswap_v3", "ETHEREUM"),
+    "SUSHISWAPV3-BASE": ("sushiswap_v3", "BASE"),
+    "SUSHISWAPV3-AVALANCHE": ("sushiswap_v3", "AVALANCHE"),
+    "SUSHISWAP-ARBITRUM": ("sushiswap", "ARBITRUM"),
+    "AERODROMEV3-BASE": ("aerodrome_v3", "BASE"),
+    "VELODROMEV2-OPTIMISM": ("velodrome_v2", "OPTIMISM"),
+    "CAMELOTV3-ARBITRUM": ("camelot_v3", "ARBITRUM"),
+    "TRADERJOEV2-AVALANCHE": ("trader_joe_v2", "AVALANCHE"),
+    # ── Additional perps / lending ────────────────────────────────
+    "GMX-ARBITRUM": ("gmx", "ARBITRUM"),
+    "GMX-AVALANCHE": ("gmx", "AVALANCHE"),
+    "SPARK-ETHEREUM": ("spark", "ETHEREUM"),
 }
 
 # All DeFi protocols to process when no venue filter is specified.
@@ -46,4 +64,14 @@ DEFI_PROTOCOLS: list[tuple[str, str | None]] = [
     ("hyperliquid", None),
     ("aster", None),
     ("ethena", "ETHEREUM"),
+    # Chain-dominant DEXes
+    ("pancakeswap_v3", "BSC"),
+    ("sushiswap_v3", "ETHEREUM"),
+    ("aerodrome_v3", "BASE"),
+    ("velodrome_v2", "OPTIMISM"),
+    ("camelot_v3", "ARBITRUM"),
+    ("trader_joe_v2", "AVALANCHE"),
+    # Additional perps / lending
+    ("gmx", "ARBITRUM"),
+    ("spark", "ETHEREUM"),
 ]

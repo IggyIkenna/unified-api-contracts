@@ -35,6 +35,10 @@ DEFI_MAJOR_ASSET_SYMBOLS: frozenset[str] = frozenset({
     "WSOL", "MSOL", "STSOL", "JITOSOL", "BSOL", "JSOL",
     "JUP", "RAY", "ORCA", "BONK", "PYTH", "JTO", "WIF", "HNT",
     "MNDE",  # Marinade governance (LP pairs)
+    # Solana extended major assets (high liquidity on Raydium/Orca)
+    "RNDR", "W", "TENSOR", "KMNO", "DRIFT", "MOBILE", "IOT",
+    "SAMO", "FIDA", "SRM", "STEP", "ATLAS", "POLIS", "MEAN",
+    "RENDER", "POPCAT", "MEW",
     # Bridging tokens (cross-chain standards)
     "WETH.E", "USDC.E", "USDT.E",  # Avalanche/Polygon bridged variants
 })

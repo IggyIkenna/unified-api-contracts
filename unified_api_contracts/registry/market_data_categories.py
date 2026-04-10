@@ -39,7 +39,6 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "rate_indices": "15m",
     "oracle_prices": "15m",
     "utilization": "15m",
-    "yields": "1h",
     "rewards": "24h",
     "risk_params": "24h",
     # Sports — horizon-based, not standard timeframes
@@ -102,7 +101,6 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
         "rate_indices",  # Funding rates, interest rates
         "oracle_prices",  # Chainlink oracle prices
         "utilization",  # AAVE/Morpho utilization rates
-        "yields",  # LST yields (EtherFi, Lido)
         "rewards",  # Protocol reward emissions (pass-through, OHLCV=NaN)
         "risk_params",  # Protocol risk parameters (pass-through, OHLCV=NaN)
     ],
