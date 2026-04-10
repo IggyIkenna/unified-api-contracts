@@ -231,6 +231,20 @@ class VenueMapping:
             "BALANCER-OPTIMISM": "2022-05-20",
             "BALANCER-AVALANCHE": "2023-08-17",
             "BALANCER-BASE": "2023-07-29",
+            "PANCAKESWAPV3-BSC": "2023-04-03",  # PancakeSwap V3 BSC launch
+            "PANCAKESWAPV3-ETHEREUM": "2023-04-03",  # PancakeSwap V3 ETH launch
+            "PANCAKESWAPV3-ARBITRUM": "2023-08-21",
+            "PANCAKESWAPV3-BASE": "2023-09-01",
+            "PANCAKESWAPV3-ZKSYNC": "2023-08-01",
+            "CAMELOTV3-ARBITRUM": "2022-11-01",  # Camelot V3 Arbitrum launch
+            "SUSHISWAPV3-ETHEREUM": "2023-04-01",  # SushiSwap V3 ETH launch
+            "SUSHISWAPV3-BASE": "2023-09-01",  # SushiSwap V3 Base launch
+            "SUSHISWAPV3-AVALANCHE": "2023-04-01",
+            "GMX-ARBITRUM": "2021-09-06",  # GMX Arbitrum launch
+            "GMX-AVALANCHE": "2022-01-05",  # GMX Avalanche launch
+            "AERODROMEV3-BASE": "2023-08-28",  # Aerodrome Base launch
+            "VELODROMEV2-OPTIMISM": "2023-06-15",  # Velodrome V2 Optimism launch
+            "TRADERJOE-AVALANCHE": "2021-07-04",  # TraderJoe Avalanche launch
             # DeFi - Lending protocols
             "AAVEV3-ETHEREUM": "2023-01-27",
             "AAVEV3-POLYGON": "2022-03-12",
