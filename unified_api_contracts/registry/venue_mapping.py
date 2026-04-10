@@ -268,6 +268,8 @@ class VenueMapping:
             "LIDO-ETHEREUM": "2020-12-18",
             "ETHERFI-ETHEREUM": "2023-11-01",
             "ETHENA-ETHEREUM": "2024-02-19",
+            "EIGENLAYER-ETHEREUM": "2024-06-01",  # EigenLayer mainnet restaking launch
+            "SUSHISWAP-ARBITRUM": "2021-09-01",  # SushiSwap V1/V2 Arbitrum deployment
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
