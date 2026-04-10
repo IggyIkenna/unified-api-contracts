@@ -340,7 +340,7 @@ class PolymarketGammaMarket(BaseModel):
     sports_market_type: str | None = Field(None, alias="sportsMarketType")  # moneyline|spreads|totals|btts
     line: float | None = None  # Spread/total value (e.g. -1.5, 2.5)
     game_start_time: str | None = Field(None, alias="gameStartTime")  # ISO datetime of fixture kickoff
-    game_id: int | None = Field(None, alias="gameId")  # Polymarket internal game ID
+    game_id: str | int | None = Field(None, alias="gameId")  # Polymarket internal game ID (hex or int)
     group_item_title: str | None = Field(None, alias="groupItemTitle")  # Outcome label
     # Series (league/competition grouping — populated from nested events[].series[])
     series_slug: str | None = None  # e.g. "premier-league-2025" (extracted from events)

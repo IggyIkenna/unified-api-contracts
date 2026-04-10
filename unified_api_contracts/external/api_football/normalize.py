@@ -146,9 +146,9 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     status: str | None = None
     if raw.status:
         if isinstance(raw.status, dict):
-            status = str(raw.status.get("long") or raw.status.get("short") or "")
+            status = str(raw.status.get("short") or raw.status.get("long") or "")
         else:
-            status = getattr(raw.status, "long", None) or getattr(raw.status, "short", None)
+            status = getattr(raw.status, "short", None) or getattr(raw.status, "long", None)
 
     # Build human-readable fixture ID: ENG_PREMIER_LEAGUE:ARSENAL_v_CHELSEA:20260322
     # Falls back to raw API-Football numeric ID if team/league names are empty
@@ -170,6 +170,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
 
     return CanonicalFixture(
         fixture_id=canonical_fixture_id,
+        source_fixture_id=raw_fixture_id,
         home_team=home_team,
         away_team=away_team,
         league=league,

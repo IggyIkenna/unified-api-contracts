@@ -112,10 +112,13 @@ _SINGLE_ASSET_DEFI_TYPES = frozenset(
 
 
 def _infer_category(venue: str) -> str:
-    """Infer CEFI/DEFI/TRADFI from venue name."""
-    if venue in _TRADFI_VENUES:
+    """Infer CEFI/DEFI/TRADFI/SPORTS/PREDICTION from venue name."""
+    venue_upper = venue.upper()
+    if venue_upper in _TRADFI_VENUES:
         return "TRADFI"
-    prefix = venue.split("-")[0]
+    if venue_upper in _SPORTS_VENUES:
+        return "SPORTS"
+    prefix = venue_upper.split("-")[0]
     if prefix in _DEFI_VENUE_PREFIXES:
         return "DEFI"
     return "CEFI"
@@ -162,8 +165,9 @@ def validate_instrument_records(
 
 def _validate_venue(venue: str) -> str | None:
     """Validate venue name against known registries. Returns error or None."""
-    # Exact match against known non-DeFi venues
-    if venue in _ALL_KNOWN_VENUES:
+    # Exact match against known non-DeFi venues (case-insensitive)
+    venue_upper = venue.upper()
+    if venue_upper in _ALL_KNOWN_VENUES:
         return None
 
     # DeFi venues: must be PROTOCOL-CHAIN format with known prefix and chain
@@ -236,9 +240,9 @@ def _check_record(rec: InstrumentRecord) -> str | None:
     # Many venues (Bybit, Coinbase, OKX, Hyperliquid, DeFi) don't expose listing dates.
     # Rejecting on this would block the entire pipeline.
 
-    # quote_asset: REQUIRED for CeFi and TradFi (not DeFi single-asset types)
+    # quote_asset: REQUIRED for CeFi and TradFi (not DeFi single-asset types, not sports/prediction)
     is_single_asset = inst_type in _SINGLE_ASSET_DEFI_TYPES
-    if category != "DEFI" and not rec.quote_asset:
+    if category not in ("DEFI", "SPORTS") and not rec.quote_asset:
         return f"quote_asset is required for {category} (venue={rec.venue}, symbol={rec.raw_symbol})"
     if category == "DEFI" and not is_single_asset and not rec.quote_asset:
         # DeFi non-lending (pools, swaps) should have quote_asset

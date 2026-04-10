@@ -414,6 +414,7 @@ class CanonicalFixture(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     fixture_id: str
+    source_fixture_id: str | None = None
     home_team: CanonicalTeam
     away_team: CanonicalTeam
     league: CanonicalLeague

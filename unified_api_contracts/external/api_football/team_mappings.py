@@ -287,10 +287,10 @@ PRIMEIRA_LIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "PORTO": ["PORTO", "FC Porto", "Porto"],
     "SPORTING_CP": ["SPORTING CP", "SPORTING LISBON", "Sporting Lisbon", "Sporting CP"],
     "BRAGA": ["BRAGA", "SC BRAGA", "SC Braga", "Braga"],
-    "VITORIA_GUIMARAES": ["VITORIA GUIMARAES", "Vitoria de Guimaraes", "Vitoria Guimaraes"],
+    "VITORIA_GUIMARAES": ["VITORIA GUIMARAES", "Vitoria de Guimaraes", "Vitoria Guimaraes", "Guimaraes", "Vitoria SC"],
     "RIO_AVE": ["RIO AVE", "RIO AVE FC", "Rio Ave FC", "Rio Ave"],
     "GIL_VICENTE": ["GIL VICENTE", "Gil Vicente"],
-    "BOAVISTA": ["BOAVISTA", "Boavista"],
+    "BOAVISTA": ["BOAVISTA", "Boavista", "Boavista Porto", "Boavista FC"],
     "FAMALICAO": ["FAMALICAO", "FC Famalicao", "Famalicao"],
     "CASA_PIA": ["CASA PIA", "Casa Pia AC", "Casa Pia"],
     "AROUCA": ["AROUCA", "FC Arouca", "Arouca"],
@@ -298,6 +298,14 @@ PRIMEIRA_LIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "ESTORIL": ["ESTORIL", "Estoril Praia", "Estoril"],
     "ESTRELA_AMADORA": ["ESTRELA AMADORA", "Estrela da Amadora", "Estrela Amadora"],
     "ALVERCA": ["ALVERCA", "FC Alverca", "Alverca"],
+    "PACOS_FERREIRA": ["PACOS FERREIRA", "Pacos de Ferreira", "FC Pacos de Ferreira"],
+    "CS_MARITIMO": ["CS MARITIMO", "CS Maritimo", "Maritimo"],
+    "BELENENSES": ["BELENENSES", "Belenenses", "Belenenses SAD", "CF Os Belenenses"],
+    "AVES": ["AVES", "CD Aves", "Desportivo Aves"],
+    "TONDELA": ["TONDELA", "CD Tondela"],
+    "PORTIMONENSE": ["PORTIMONENSE", "Portimonense", "Portimonense SC"],
+    "SANTA_CLARA": ["SANTA CLARA", "Santa Clara", "CD Santa Clara"],
+    "VITORIA_SETUBAL": ["VITORIA SETUBAL", "Vitoria Setubal", "Vitoria FC"],
 }
 
 # ---------------------------------------------------------------------------
@@ -353,6 +361,10 @@ DANISH_SUPERLIGA_TEAM_ALIASES: dict[str, list[str]] = {
     "VEJLE": ["VEJLE", "Vejle BK"],
     "FREDERICIA": ["FREDERICIA", "FC Fredericia", "Fredericia"],
     "SONDERJYSKE": ["SONDERJYSKE", "SonderjyskE", "SønderjyskE", "Sonderjyske"],
+    "HOBRO": ["HOBRO", "Hobro", "Hobro IK"],
+    "AC_HORSENS": ["AC HORSENS", "AC Horsens"],
+    "OB_ODENSE": ["OB ODENSE", "OB Odense BK", "OB", "Odense BK", "Odense"],
+    "ESBJERG": ["ESBJERG", "Esbjerg fB", "Esbjerg"],
 }
 
 # ---------------------------------------------------------------------------
@@ -692,13 +704,15 @@ SUPER_LIG_TEAM_ALIASES: dict[str, list[str]] = {
     "FENERBAHCE": ["FENERBAHCE", "Fenerbahce SK"],
     "BESIKTAS": ["BESIKTAS", "Besiktas JK"],
     "TRABZONSPOR": ["TRABZONSPOR", "Trabzonspor"],
-    "ISTANBUL_BASAKSEHIR": ["ISTANBUL BASAKSEHIR", "Istanbul Basaksehir FK"],
+    "ISTANBUL_BASAKSEHIR": ["ISTANBUL BASAKSEHIR", "Istanbul Basaksehir FK", "Basaksehir"],
     "ANTALYASPOR": ["ANTALYASPOR", "Antalyaspor"],
     "ADANA_DEMIRSPOR": ["ADANA DEMIRSPOR", "Adana Demirspor"],
-    "KONYASPOR": ["KONYASPOR", "Konyaspor"],
+    "KONYASPOR": ["KONYASPOR", "Konyaspor", "Torku Konyaspor"],
     "SIVASSPOR": ["SIVASSPOR", "Sivasspor"],
     "ALANYASPOR": ["ALANYASPOR", "Alanyaspor"],
-    "GAZIANTEP": ["GAZIANTEP", "Gaziantep FK"],
+    "GAZIANTEP": ["GAZIANTEP", "Gaziantep FK", "Gazişehir Gaziantep"],
+    "ANKARAGUCU": ["ANKARAGUCU", "Ankaragücü", "MKE Ankaragücü", "Ankaragucu"],
+    "YENI_MALATYASPOR": ["YENI MALATYASPOR", "Yeni Malatyaspor"],
     "KAYSERISPOR": ["KAYSERISPOR", "Kayserispor"],
     "KASIMPASA": ["KASIMPASA", "Kasimpasa SK"],
     "HATAYSPOR": ["HATAYSPOR", "Hatayspor"],
@@ -732,6 +746,8 @@ ALLSVENSKAN_TEAM_ALIASES: dict[str, list[str]] = {
     "BROMMAPOJKARNA": ["BROMMAPOJKARNA", "IF Brommapojkarna"],
     "VASTERAAS": ["VASTERAAS", "Vasteras SK"],
     "SUNDSVALL": ["SUNDSVALL", "GIF Sundsvall"],
+    "OREBRO": ["OREBRO", "Orebro SK", "Örebro SK"],
+    "OSTERSUNDS": ["OSTERSUNDS", "Ostersunds FK", "Östersunds FK"],
 }
 
 # ---------------------------------------------------------------------------
@@ -776,6 +792,9 @@ K_LEAGUE_1_TEAM_ALIASES: dict[str, list[str]] = {
     "FC_SEOUL": ["FC SEOUL", "FC Seoul"],
     "JEJU_UNITED": ["JEJU UNITED", "Jeju United FC"],
     "GIMCHEON_SANGMU": ["GIMCHEON SANGMU", "Gimcheon Sangmu FC"],
+    "SEONGNAM": ["SEONGNAM", "Seongnam FC", "Seongnam Ilhwa Chunma"],
+    "SANGJU_SANGMU": ["SANGJU SANGMU", "Sangju Sangmu FC"],
+    "BUSAN_I_PARK": ["BUSAN I PARK", "Busan I Park", "Busan IPark"],
 }
 
 # ---------------------------------------------------------------------------
@@ -952,7 +971,7 @@ BUNDESLIGA_2_TEAM_ALIASES: dict[str, list[str]] = {
     "PREUSSEN_MUNSTER": ["PREUSSEN MUNSTER", "SC Preußen Münster"],
     "MAGDEBURG": ["MAGDEBURG", "1. FC Magdeburg"],
     "ULMER": ["ULMER", "SSV Ulm 1846"],
-    "REGENSBURG": ["REGENSBURG", "SSV Jahn Regensburg"],
+    "REGENSBURG": ["REGENSBURG", "SSV Jahn Regensburg", "Jahn Regensburg"],
 }
 
 # ---------------------------------------------------------------------------
@@ -995,7 +1014,7 @@ SEGUNDA_DIVISION_TEAM_ALIASES: dict[str, list[str]] = {
     "CORDOBA": ["CORDOBA", "Córdoba", "Cordoba"],
     "EIBAR": ["EIBAR", "SD Eibar"],
     "HUESCA": ["HUESCA", "SD Huesca"],
-    "RACING_SANTANDER": ["RACING SANTANDER", "Racing Santander"],
+    "RACING_SANTANDER": ["RACING SANTANDER", "Racing Santander", "Real Racing Club de Santander"],
     "ELCHE": ["ELCHE", "Elche CF"],
     "TENERIFE": ["TENERIFE", "CD Tenerife"],
     "ZARAGOZA": ["ZARAGOZA", "Real Zaragoza"],
@@ -1009,6 +1028,13 @@ SEGUNDA_DIVISION_TEAM_ALIASES: dict[str, list[str]] = {
     "DEPORTIVO_LA_CORUNA": ["DEPORTIVO LA CORUNA", "Deportivo La Coruña", "Deportivo La Coruna", "RC Deportivo"],
     "MALAGA": ["MALAGA", "Málaga", "Malaga CF", "Málaga CF"],
     "CEUTA": ["CEUTA", "AD Ceuta FC", "AD Ceuta", "Ceuta"],
+    "ALCORCON": ["ALCORCON", "Alcorcón", "AD Alcorcón", "Alcorcon"],
+    "ALMERIA": ["ALMERIA", "Almería", "UD Almería", "Almeria"],
+    "LUGO": ["LUGO", "CD Lugo"],
+    "NUMANCIA": ["NUMANCIA", "CD Numancia"],
+    "EXTREMADURA": ["EXTREMADURA", "Extremadura", "Extremadura UD"],
+    "FUENLABRADA": ["FUENLABRADA", "CF Fuenlabrada"],
+    "PONFERRADINA": ["PONFERRADINA", "SD Ponferradina"],
 }
 
 # ---------------------------------------------------------------------------
