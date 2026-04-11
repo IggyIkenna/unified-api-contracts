@@ -30,7 +30,6 @@ DEFI_VENUE_TO_PROTOCOL: dict[str, tuple[str, str | None]] = {
     # ── Chain-dominant DEXes ──────────────────────────────────────
     "PANCAKESWAPV3-BSC": ("pancakeswap_v3", "BSC"),
     "PANCAKESWAPV3-ETHEREUM": ("pancakeswap_v3", "ETHEREUM"),
-    "PANCAKESWAPV3-ARBITRUM": ("pancakeswap_v3", "ARBITRUM"),
     "PANCAKESWAPV3-BASE": ("pancakeswap_v3", "BASE"),
     "PANCAKESWAPV3-ZKSYNC": ("pancakeswap_v3", "ZKSYNC"),
     "SUSHISWAPV3-ETHEREUM": ("sushiswap_v3", "ETHEREUM"),

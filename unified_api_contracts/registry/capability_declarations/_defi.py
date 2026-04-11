@@ -98,7 +98,6 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "pancakeswap_v3": {  # UniV3-fork schema (poolDayDatas) — from pancakeswap/pancake-frontend
         "BSC": "Hv1GncLY5docZoGtXjo4kwbTvxm3MAhVZqBZE4sUT9eZ",
         "ETHEREUM": "CJYGNhb7RvnhfBDjqpRnD3oxgyhibzc7fkAMa38YV3oS",
-        "ARBITRUM": "251MHFNN1rwjErXD2efWMpNS73SANZN8Ua192zw6iXve",
         "BASE": "5YYKGBcRkJs6tmDfB3RpHdbK2R5KBACHQebXVgbUcYQp",
         "ZKSYNC": "3dKr3tYxTuwiRLkU9vPj3MvZeUmeuGgWURbFC72ZBpYY",
     },

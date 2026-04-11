@@ -233,16 +233,15 @@ class VenueMapping:
             "BALANCER-BASE": "2023-07-29",
             "PANCAKESWAPV3-BSC": "2023-04-03",  # PancakeSwap V3 BSC launch
             "PANCAKESWAPV3-ETHEREUM": "2023-04-03",  # PancakeSwap V3 ETH launch
-            "PANCAKESWAPV3-ARBITRUM": "2023-08-21",
             "PANCAKESWAPV3-BASE": "2023-09-01",
             "PANCAKESWAPV3-ZKSYNC": "2023-08-01",
-            "CAMELOTV3-ARBITRUM": "2022-11-01",  # Camelot V3 Arbitrum launch
+            "CAMELOTV3-ARBITRUM": "2023-06-14",  # Earliest pool createdAtTimestamp
             "SUSHISWAPV3-ETHEREUM": "2023-04-01",  # SushiSwap V3 ETH launch
             "SUSHISWAPV3-BASE": "2023-09-01",  # SushiSwap V3 Base launch
             "SUSHISWAPV3-AVALANCHE": "2023-04-01",
             "GMX-ARBITRUM": "2021-09-06",  # GMX Arbitrum launch
             "GMX-AVALANCHE": "2022-01-05",  # GMX Avalanche launch
-            "AERODROMEV3-BASE": "2023-08-28",  # Aerodrome Base launch
+            "AERODROMEV3-BASE": "2024-05-01",  # Earliest pool createdAtTimestamp from subgraph
             "VELODROMEV2-OPTIMISM": "2023-06-15",  # Velodrome V2 Optimism launch
             "TRADERJOE-AVALANCHE": "2021-07-04",  # TraderJoe Avalanche launch
             # DeFi - Lending protocols
@@ -268,8 +267,8 @@ class VenueMapping:
             "LIDO-ETHEREUM": "2020-12-18",
             "ETHERFI-ETHEREUM": "2023-11-01",
             "ETHENA-ETHEREUM": "2024-02-19",
-            "EIGENLAYER-ETHEREUM": "2024-06-01",  # EigenLayer mainnet restaking launch
-            "SUSHISWAP-ARBITRUM": "2021-09-01",  # SushiSwap V1/V2 Arbitrum deployment
+            "EIGENLAYER-ETHEREUM": "2024-09-17",  # EIGEN token listing date (earliest instrument)
+            "SUSHISWAP-ARBITRUM": "2023-03-30",  # Earliest pool createdAtTimestamp from subgraph
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
