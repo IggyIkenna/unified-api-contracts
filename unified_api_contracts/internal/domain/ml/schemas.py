@@ -757,3 +757,139 @@ class BackfillSpec(BaseModel):
     required_upstream_services: list[str] = Field(default_factory=list)
     warm_up_features: list[str] = Field(default_factory=list, description="Feature groups needed")
     can_start_cold: bool = Field(default=False, description="Can start without history (degraded)")
+
+
+# ---------------------------------------------------------------------------
+# Domain-agnostic ML framework schemas
+# ---------------------------------------------------------------------------
+
+
+class CalibrationMethod(StrEnum):
+    """Post-hoc calibration method for probability estimates."""
+
+    PLATT = "platt"
+    ISOTONIC = "isotonic"
+    BETA = "beta"
+    NONE = "none"
+
+
+class EvaluationMetricsConfig(BaseModel):
+    """Which metrics to compute for a target during training evaluation."""
+
+    primary: list[str] = Field(default_factory=list)
+    secondary: list[str] = Field(default_factory=list)
+
+
+class TargetSpec(BaseModel):
+    """Specification for a single training target within a model family."""
+
+    target_name: str
+    domain: str = "sports"
+    phase: str = "pregame"
+    task_type: Literal["regression", "classification", "multiclass_classification"] = "regression"
+    horizon: str = ""
+    label_formula: str = ""
+    required_inputs: list[str] = Field(default_factory=list)
+    evaluation_metrics: EvaluationMetricsConfig = Field(default_factory=EvaluationMetricsConfig)
+    target_group: str = ""
+
+
+class PromotionGate(BaseModel):
+    """Metric threshold that must be met before a model is promoted to production."""
+
+    metric_name: str
+    threshold: float
+    comparison: Literal["min", "max"] = "min"
+
+
+class AlgorithmConfig(BaseModel):
+    """Algorithm selection per task type within a model family."""
+
+    regression: list[ModelType] = Field(default_factory=list)
+    classification: list[ModelType] = Field(default_factory=list)
+
+
+class ModelFamilyConfig(BaseModel):
+    """Configuration for a model family — a group of related targets trained together."""
+
+    family_name: str
+    phase: str = "pregame"
+    purpose: str = ""
+    feature_groups_required: list[str] = Field(default_factory=list, min_length=1)
+    target_names: list[str] = Field(default_factory=list, min_length=1)
+    algorithms: AlgorithmConfig = Field(default_factory=AlgorithmConfig)
+    calibration_method: CalibrationMethod = CalibrationMethod.NONE
+    promotion_gates: list[PromotionGate] = Field(default_factory=list)
+
+
+class SplitStrategy(BaseModel):
+    """Train/validation split strategy — rolling windows or seasonal splits."""
+
+    strategy_type: str = "rolling"
+    n_periods: int = 2
+    period_unit: str = "season"
+    validation_window_size: int = 8
+    validation_window_unit: str = "week"
+    gap_days: int = 1
+
+
+class FilterConfig(BaseModel):
+    """Thresholds for the decision policy bet filter."""
+
+    min_edge_bps: float = 20.0
+    min_expected_clv_bps: float = 10.0
+    max_uncertainty_score: float = 0.55
+    min_feature_validity_ratio: float = 0.75
+
+
+class RegimeOverride(BaseModel):
+    """Adjusts filter thresholds under specific market/game regimes."""
+
+    name: str
+    applies_when: str = ""
+    min_edge_bps_add: float = 0.0
+    min_expected_clv_bps_add: float = 0.0
+    max_uncertainty_score_subtract: float = 0.0
+
+
+class RankingWeights(BaseModel):
+    """Weights for ranking candidate bets/trades in the decision layer."""
+
+    expected_value_bps: float = 0.45
+    expected_clv_bps: float = 0.30
+    uncertainty_score: float = -0.15
+    bet_quality_score: float = 0.10
+
+
+class DecisionPolicyConfig(BaseModel):
+    """Decision layer policy — filters, ranking, and regime overrides."""
+
+    mode: str = "backtest"
+    allow_bet_recommendation: bool = True
+    strict_abstain: bool = False
+    filters: FilterConfig = Field(default_factory=FilterConfig)
+    regime_overrides: list[RegimeOverride] = Field(default_factory=list)
+    abstain_rules: list[str] = Field(default_factory=list)
+    ranking_weights: RankingWeights = Field(default_factory=RankingWeights)
+    top_n_per_entity: int = 3
+    top_n_global: int = 50
+
+
+class SignalPackage(BaseModel):
+    """A scored prediction signal ready for decision policy evaluation."""
+
+    entity_id: str = ""
+    domain: str = ""
+    market_type: str = ""
+    market_side: str = ""
+    prediction_phase: str = ""
+    prediction_timestamp: datetime | None = None
+    fundamental_prob: float | None = None
+    market_implied_prob: float | None = None
+    edge_bps: float = 0.0
+    expected_clv_bps: float | None = None
+    uncertainty_score: float = 0.5
+    feature_validity_ratio: float = 1.0
+    abstain_flag: bool = False
+    reason_codes: list[str] = Field(default_factory=list)
+    signal_rank: int | None = None
