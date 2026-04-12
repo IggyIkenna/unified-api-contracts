@@ -162,8 +162,47 @@ def normalize_footystats_odds(
     )
 
 
+def normalize_footystats_predictions(raw: FootyStatsMatch, venue: str = "footystats") -> dict[str, object]:
+    """Extract predictive/proprietary fields from a FootyStatsMatch.
+
+    Returns a flat dict suitable for a DataFrame row. These fields are
+    FootyStats-proprietary pre-match predictions (potentials, xG prematch)
+    and should be written to ``entity=footystats_predictions`` separately
+    from the factual fixture data.
+    """
+    kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix > 0 else datetime.now(UTC)
+    home_name = raw.home_name or ""
+    away_name = raw.away_name or ""
+
+    date_str = kickoff_utc.strftime("%Y%m%d")
+    home_id = build_team_id(home_name)
+    away_id = build_team_id(away_name)
+    league_id = build_league_id("", str(raw.competition_id or ""))
+    fixture_id = (
+        build_fixture_id(league_id, home_id, away_id, date_str) if home_id and away_id else str(raw.match_id or "")
+    )
+
+    return {
+        "fixture_id": fixture_id,
+        "source": venue,
+        "kickoff_utc": kickoff_utc.isoformat(),
+        "home_team": home_name,
+        "away_team": away_name,
+        "btts_potential": raw.btts_potential,
+        "o25_potential": raw.o25_potential,
+        "o35_potential": raw.o35_potential,
+        "o45_potential": raw.o45_potential,
+        "xg_prematch_home": raw.xg_prematch_home,
+        "xg_prematch_away": raw.xg_prematch_away,
+        "corners_potential": raw.corners_potential,
+        "cards_potential": raw.cards_potential,
+        "avg_potential": raw.avg_potential,
+    }
+
+
 __all__ = [
     "normalize_footystats_match",
     "normalize_footystats_match_to_market",
     "normalize_footystats_odds",
+    "normalize_footystats_predictions",
 ]

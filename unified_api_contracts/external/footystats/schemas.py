@@ -288,6 +288,16 @@ class FootyStatsMatch(BaseModel):
     odds_ft_over25: float | None = None
     odds_ft_under25: float | None = None
     created_at: datetime | None = None
+    # --- Predictive potentials (FootyStats proprietary) ---
+    btts_potential: int | None = None
+    o25_potential: int | None = None
+    o35_potential: int | None = None
+    o45_potential: int | None = None
+    xg_prematch_home: float | None = None
+    xg_prematch_away: float | None = None
+    corners_potential: int | None = None
+    cards_potential: int | None = None
+    avg_potential: int | None = None
 
     @classmethod
     def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:
