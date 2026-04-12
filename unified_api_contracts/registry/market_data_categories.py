@@ -211,6 +211,50 @@ ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_CATEGORY.values(
 ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_CATEGORY.values() for v in vs})
 
 
+# --- Candle processing classification ---
+# True = MDPS should process this data type through a candle adapter.
+# False = bypass (pre-bucketed data written directly by MTDS, no OHLCV conversion needed).
+NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
+    # CeFi — all need candle processing from raw ticks
+    "trades": True,
+    "book_snapshot_5": True,
+    "derivative_ticker": True,
+    "liquidations": True,
+    "options_chain": True,
+    "futures_chain": True,
+    # TradFi — pre-aggregated but still processed (timeframe re-aggregation)
+    "ohlcv_1m": True,
+    "ohlcv_15m": True,
+    "ohlcv_24h": True,
+    "tbbo": True,
+    # DeFi — candle-sampled types need processing; pass-through types do not
+    "swaps": True,
+    "liquidity": True,
+    "rate_indices": False,
+    "oracle_prices": False,
+    "utilization": False,
+    "rewards": False,
+    "risk_params": False,
+    # Sports — candle adapters process these
+    "odds": False,  # Raw tick data, not directly processed (bucket adapter handles)
+    "odds_snapshot": True,
+    "odds_movement": True,
+    "arbitrage_opportunity": True,
+    # Prediction — candle adapters process these
+    "prediction_trades": True,
+    "prediction_book_snapshot": True,
+    "prediction_market_metadata": False,
+}
+
+
+def needs_candle_processing(data_type: str) -> bool:
+    """Return True if the data type requires MDPS candle adapter processing.
+
+    Data types not in NEEDS_CANDLE_PROCESSING default to True (process by default).
+    """
+    return NEEDS_CANDLE_PROCESSING.get(data_type, True)
+
+
 # --- Venue → Category reverse lookup ---
 
 VENUE_TO_CATEGORY: dict[str, str] = {venue: cat for cat, venues in VENUES_BY_CATEGORY.items() for venue in venues}
@@ -334,3 +378,298 @@ def validate_data_type_for_venue(venue: str, data_type: str) -> bool:
     if not valid:
         return True  # Unknown venue — don't block
     return data_type in valid
+
+
+# --- Per-venue data type capabilities with start dates ---
+# SSOT for which data types each venue can produce and when that capability started.
+# Used by MTDS for shard-level skip logic and deployment UI for multi-dimensional status.
+#
+# Structure: {venue: {data_type: start_date_YYYY_MM_DD}}
+# Default rule: if a venue is NOT in this dict, fall back to category-level
+# DATA_TYPES_BY_CATEGORY with VenueMapping.venue_start_dates as the start date.
+# Only venues with non-default data type availability need explicit entries.
+#
+# Override entries needed when:
+# - A venue's data type started later than the venue itself (e.g. Deribit options added later)
+# - A venue only supports a subset of its category's data types (e.g. CBOE has ohlcv_15m only)
+# - A data type has a different start date per venue (e.g. TradFi venues)
+
+VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
+    # ── CeFi — Tardis exchanges ──
+    # Most CeFi venues support all cefi data types from their launch date.
+    # Exceptions: only DERIBIT has options_chain/futures_chain.
+    # HYPERLIQUID/ASTER: perpetual-focused, no options/futures chain.
+    "BINANCE-SPOT": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+    },
+    "BINANCE-FUTURES": {
+        "trades": "2019-11-17",
+        "book_snapshot_5": "2019-11-17",
+        "derivative_ticker": "2019-11-17",
+        "liquidations": "2019-11-17",
+        "futures_chain": "2019-11-17",
+    },
+    "DERIBIT": {
+        "trades": "2019-03-30",
+        "book_snapshot_5": "2019-03-30",
+        "derivative_ticker": "2019-03-30",
+        "liquidations": "2019-03-30",
+        "options_chain": "2019-03-30",
+        "futures_chain": "2019-03-30",
+    },
+    "BYBIT": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+        "futures_chain": "2020-01-01",
+    },
+    "OKX": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+    },
+    "UPBIT": {
+        "trades": "2021-03-03",
+        "book_snapshot_5": "2021-03-03",
+    },
+    "COINBASE": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+    },
+    "HYPERLIQUID": {
+        "trades": "2023-11-01",
+        "book_snapshot_5": "2023-11-01",
+        "derivative_ticker": "2023-11-01",
+        "liquidations": "2023-11-01",
+    },
+    "ASTER": {
+        "trades": "2024-10-01",
+        "book_snapshot_5": "2024-10-01",
+        "derivative_ticker": "2024-10-01",
+        "liquidations": "2024-10-01",
+    },
+    # ── TradFi — Databento + external providers ──
+    # Each TradFi venue has specific data types and start dates.
+    "NASDAQ": {
+        "trades": "2023-04-15",
+        "ohlcv_1m": "2023-04-15",
+        "tbbo": "2023-04-15",
+    },
+    "NYSE": {
+        "trades": "2023-04-15",
+        "ohlcv_1m": "2023-04-15",
+        "tbbo": "2023-04-15",
+    },
+    "CME": {
+        "trades": "2020-01-01",
+        "ohlcv_1m": "2020-01-01",
+        "tbbo": "2020-01-01",
+    },
+    "ICE": {
+        "trades": "2020-01-01",
+        "ohlcv_1m": "2020-01-01",
+        "tbbo": "2020-01-01",
+    },
+    "CBOE": {
+        "ohlcv_15m": "2020-01-07",  # VIX — Barchart CSV start
+    },
+    "FX": {
+        "ohlcv_24h": "2020-01-01",  # KRW/USD daily via Yahoo Finance
+    },
+    "BARCHART": {
+        "ohlcv_15m": "2020-01-02",  # VIX 15m historical CSV (discontinued 2025-11-12)
+    },
+    "YAHOO_FINANCE": {
+        "ohlcv_15m": "2021-04-22",  # VIX 15m rolling 60-day window
+        "ohlcv_24h": "2020-01-01",  # KRW/USD daily rates
+    },
+    # ── DeFi — DEX protocols (swaps + liquidity only) ──
+    "UNISWAPV2-ETHEREUM": {"swaps": "2020-05-06", "liquidity": "2020-05-06"},
+    "UNISWAPV3-ETHEREUM": {"swaps": "2021-05-05", "liquidity": "2021-05-05"},
+    "UNISWAPV3-ARBITRUM": {"swaps": "2021-06-18", "liquidity": "2021-06-18"},
+    "UNISWAPV3-BASE": {"swaps": "2023-09-03", "liquidity": "2023-09-03"},
+    "UNISWAPV3-OPTIMISM": {"swaps": "2021-11-12", "liquidity": "2021-11-12"},
+    "UNISWAPV3-POLYGON": {"swaps": "2021-12-22", "liquidity": "2021-12-22"},
+    "UNISWAPV4-ETHEREUM": {"swaps": "2025-01-30", "liquidity": "2025-01-30"},
+    "CURVE-ETHEREUM": {"swaps": "2020-01-20", "liquidity": "2020-01-20"},
+    "CURVE-AVALANCHE": {"swaps": "2021-11-10", "liquidity": "2021-11-10"},
+    "CURVE-OPTIMISM": {"swaps": "2022-01-13", "liquidity": "2022-01-13"},
+    "BALANCER-ETHEREUM": {"swaps": "2021-04-22", "liquidity": "2021-04-22"},
+    "BALANCER-ARBITRUM": {"swaps": "2021-08-27", "liquidity": "2021-08-27"},
+    "BALANCER-AVALANCHE": {"swaps": "2023-08-17", "liquidity": "2023-08-17"},
+    "BALANCER-BASE": {"swaps": "2023-07-29", "liquidity": "2023-07-29"},
+    "BALANCER-OPTIMISM": {"swaps": "2022-05-20", "liquidity": "2022-05-20"},
+    "BALANCER-POLYGON": {"swaps": "2021-06-24", "liquidity": "2021-06-24"},
+    # ── DeFi — Lending protocols ──
+    "AAVEV3-ETHEREUM": {
+        "rate_indices": "2023-01-27",
+        "oracle_prices": "2023-01-27",
+        "utilization": "2023-01-27",
+        "rewards": "2023-01-27",
+        "risk_params": "2023-01-27",
+    },
+    "AAVEV3-ARBITRUM": {
+        "rate_indices": "2022-03-12",
+        "oracle_prices": "2022-03-12",
+        "utilization": "2022-03-12",
+        "rewards": "2022-03-12",
+        "risk_params": "2022-03-12",
+    },
+    "AAVEV3-AVALANCHE": {
+        "rate_indices": "2022-03-12",
+        "oracle_prices": "2022-03-12",
+        "utilization": "2022-03-12",
+        "rewards": "2022-03-12",
+        "risk_params": "2022-03-12",
+    },
+    "AAVEV3-BASE": {
+        "rate_indices": "2023-08-23",
+        "oracle_prices": "2023-08-23",
+        "utilization": "2023-08-23",
+        "rewards": "2023-08-23",
+        "risk_params": "2023-08-23",
+    },
+    "AAVEV3-BSC": {
+        "rate_indices": "2024-01-24",
+        "oracle_prices": "2024-01-24",
+        "utilization": "2024-01-24",
+        "rewards": "2024-01-24",
+        "risk_params": "2024-01-24",
+    },
+    "AAVEV3-LINEA": {
+        "rate_indices": "2025-02-12",
+        "oracle_prices": "2025-02-12",
+        "utilization": "2025-02-12",
+        "rewards": "2025-02-12",
+        "risk_params": "2025-02-12",
+    },
+    "AAVEV3-OPTIMISM": {
+        "rate_indices": "2022-03-12",
+        "oracle_prices": "2022-03-12",
+        "utilization": "2022-03-12",
+        "rewards": "2022-03-12",
+        "risk_params": "2022-03-12",
+    },
+    "AAVEV3-POLYGON": {
+        "rate_indices": "2022-03-12",
+        "oracle_prices": "2022-03-12",
+        "utilization": "2022-03-12",
+        "rewards": "2022-03-12",
+        "risk_params": "2022-03-12",
+    },
+    "COMPOUNDV3-ETHEREUM": {
+        "rate_indices": "2022-08-14",
+        "oracle_prices": "2022-08-14",
+        "utilization": "2022-08-14",
+    },
+    "COMPOUNDV3-ARBITRUM": {
+        "rate_indices": "2023-05-05",
+        "oracle_prices": "2023-05-05",
+        "utilization": "2023-05-05",
+    },
+    "COMPOUNDV3-BASE": {
+        "rate_indices": "2023-08-20",
+        "oracle_prices": "2023-08-20",
+        "utilization": "2023-08-20",
+    },
+    "COMPOUNDV3-OPTIMISM": {
+        "rate_indices": "2024-04-07",
+        "oracle_prices": "2024-04-07",
+        "utilization": "2024-04-07",
+    },
+    "COMPOUNDV3-POLYGON": {
+        "rate_indices": "2024-04-07",
+        "oracle_prices": "2024-04-07",
+        "utilization": "2024-04-07",
+    },
+    "MORPHO-ETHEREUM": {
+        "rate_indices": "2024-01-08",
+        "oracle_prices": "2024-01-08",
+        "utilization": "2024-01-08",
+    },
+    "MORPHO-ARBITRUM": {
+        "rate_indices": "2024-06-01",
+        "oracle_prices": "2024-06-01",
+        "utilization": "2024-06-01",
+    },
+    "MORPHO-BASE": {
+        "rate_indices": "2024-06-01",
+        "oracle_prices": "2024-06-01",
+        "utilization": "2024-06-01",
+    },
+    "MORPHO-OPTIMISM": {
+        "rate_indices": "2024-06-01",
+        "oracle_prices": "2024-06-01",
+        "utilization": "2024-06-01",
+    },
+    "MORPHO-POLYGON": {
+        "rate_indices": "2024-06-01",
+        "oracle_prices": "2024-06-01",
+        "utilization": "2024-06-01",
+    },
+    "FLUID-ETHEREUM": {
+        "rate_indices": "2024-02-27",
+        "oracle_prices": "2024-02-27",
+        "utilization": "2024-02-27",
+    },
+    # ── DeFi — LST/Yield protocols ──
+    "LIDO-ETHEREUM": {"rate_indices": "2020-12-18", "oracle_prices": "2020-12-18"},
+    "ETHERFI-ETHEREUM": {"rate_indices": "2023-11-01", "oracle_prices": "2023-11-01"},
+    "ETHENA-ETHEREUM": {"rate_indices": "2024-02-19", "oracle_prices": "2024-02-19"},
+    "JITO-SOLANA": {"rate_indices": "2021-11-01", "oracle_prices": "2021-11-01"},
+    # ── Sports ──
+    "ODDS_API": {
+        "odds_snapshot": "2024-01-01",
+        "odds_movement": "2024-01-01",
+        "arbitrage_opportunity": "2024-01-01",
+    },
+    "PINNACLE": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    "BETFAIR": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    "DRAFTKINGS": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    "FANDUEL": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    "BET365": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    # ── Prediction ──
+    "POLYMARKET": {
+        "prediction_trades": "2024-06-01",
+        "prediction_book_snapshot": "2024-06-01",
+        "prediction_market_metadata": "2024-06-01",
+    },
+    "KALSHI": {
+        "prediction_trades": "2024-06-01",
+        "prediction_book_snapshot": "2024-06-01",
+        "prediction_market_metadata": "2024-06-01",
+    },
+}
+
+
+def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
+    """Return the start date for a specific (venue, data_type) pair.
+
+    Priority:
+    1. VENUE_DATA_TYPE_CAPABILITIES[venue][data_type] — explicit per-data-type date
+    2. VenueMapping.venue_start_dates[venue] — venue-level default (lazy import)
+    3. None — unknown venue/data_type (permissive)
+    """
+    caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
+    if data_type in caps:
+        return caps[data_type]
+    # Fall back to venue start date from VenueMapping
+    from .venue_mapping import VenueMapping  # noqa: qg-inside-import
+
+    vm = VenueMapping()
+    return vm.get_venue_start_date(venue)
+
+
+def get_expected_data_types_for_venue(venue: str) -> list[str]:
+    """Return the list of data types a venue is expected to produce.
+
+    Uses VENUE_DATA_TYPE_CAPABILITIES if the venue is explicitly listed,
+    else falls back to category-level DATA_TYPES_BY_CATEGORY.
+    """
+    caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
+    if caps:
+        return sorted(caps.keys())
+    return get_valid_data_types_for_venue(venue)

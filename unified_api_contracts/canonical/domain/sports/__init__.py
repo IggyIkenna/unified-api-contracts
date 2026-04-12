@@ -47,8 +47,10 @@ from .canonical_ids import build_venue_id as build_venue_id
 from .league_classification_data import DEFAULT_CLASSIFICATION_REGISTRY as DEFAULT_CLASSIFICATION_REGISTRY
 from .league_classification_data import LEAGUE_CLASSIFICATION_DATA as LEAGUE_CLASSIFICATION_DATA
 from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
+from .league_data import get_all_prediction_league_ids as get_all_prediction_league_ids
 from .league_data import get_league as get_league
 from .league_data import get_league_by_api_football_id as get_league_by_api_football_id
+from .league_data import get_league_fixture_calendar as get_league_fixture_calendar
 from .league_data import get_leagues_by_classification as get_leagues_by_classification
 from .league_data import get_leagues_by_country as get_leagues_by_country
 from .league_data import get_leagues_for_sport as get_leagues_for_sport
@@ -457,6 +459,240 @@ class CanonicalFixture(BaseModel):
     @classmethod
     def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:
         return cls.model_validate(data)
+
+
+# ---------------------------------------------------------------------------
+# Per-entity canonical schemas — validated before every GCS write
+# ---------------------------------------------------------------------------
+
+
+class CanonicalStanding(BaseModel):
+    """League standings row — shared by API Football and SFI."""
+
+    model_config = ConfigDict(frozen=True)
+
+    league_id: str
+    season: str | None = None
+    rank: int
+    team_id: str
+    team_name: str
+    points: int
+    goals_diff: int | None = None
+    group: str | None = None
+    form: str | None = None
+    status: str | None = None
+    description: str | None = None
+    played: int | None = None
+    wins: int | None = None
+    draws: int | None = None
+    losses: int | None = None
+    goals_for: int | None = None
+    goals_against: int | None = None
+    home_played: int | None = None
+    home_wins: int | None = None
+    home_draws: int | None = None
+    home_losses: int | None = None
+    home_goals_for: int | None = None
+    home_goals_against: int | None = None
+    away_played: int | None = None
+    away_wins: int | None = None
+    away_draws: int | None = None
+    away_losses: int | None = None
+    away_goals_for: int | None = None
+    away_goals_against: int | None = None
+
+
+class CanonicalInjury(BaseModel):
+    """Player injury or suspension record."""
+
+    model_config = ConfigDict(frozen=True)
+
+    player_id: str
+    player_name: str
+    team_id: str
+    team_name: str
+    league_id: str | None = None
+    season: int | None = None
+    fixture_id: str | None = None
+    injury_type: str
+    reason: str | None = None
+
+
+class CanonicalFixtureStats(BaseModel):
+    """Per-team aggregate stats for a single fixture."""
+
+    model_config = ConfigDict(frozen=True)
+
+    fixture_id: str
+    team_id: str
+    team_name: str
+    shots_on_goal: int | None = None
+    shots_off_goal: int | None = None
+    total_shots: int | None = None
+    blocked_shots: int | None = None
+    shots_inside_box: int | None = None
+    shots_outside_box: int | None = None
+    fouls: int | None = None
+    corner_kicks: int | None = None
+    offsides: int | None = None
+    ball_possession: int | None = None
+    yellow_cards: int | None = None
+    red_cards: int | None = None
+    goalkeeper_saves: int | None = None
+    total_passes: int | None = None
+    passes_accurate: int | None = None
+    passes_pct: int | None = None
+    expected_goals: float | None = None
+
+
+class CanonicalFixtureEvent(BaseModel):
+    """Single match event — goal, card, substitution, VAR."""
+
+    model_config = ConfigDict(frozen=True)
+
+    fixture_id: str
+    elapsed_min: int
+    extra_min: int | None = None
+    team_id: str
+    team_name: str
+    player_id: str | None = None
+    player_name: str | None = None
+    assist_id: str | None = None
+    assist_name: str | None = None
+    event_type: str
+    detail: str | None = None
+    comments: str | None = None
+
+
+class CanonicalLineupEntry(BaseModel):
+    """Single lineup entry — one per player per fixture."""
+
+    model_config = ConfigDict(frozen=True)
+
+    fixture_id: str
+    team_id: str
+    team_name: str
+    formation: str | None = None
+    player_id: str
+    player_name: str
+    player_number: int | None = None
+    player_position: str | None = None
+    player_grid: str | None = None
+    is_starter: bool
+    coach_id: str | None = None
+    coach_name: str | None = None
+
+
+class CanonicalPlayerPerformance(BaseModel):
+    """Per-player stats for a single fixture."""
+
+    model_config = ConfigDict(frozen=True)
+
+    fixture_id: str
+    team_id: str
+    team_name: str
+    player_id: str
+    player_name: str
+    minutes_played: int | None = None
+    position: str | None = None
+    rating: float | None = None
+    captain: bool | None = None
+    substitute: bool | None = None
+    offsides: int | None = None
+    shots_total: int | None = None
+    shots_on: int | None = None
+    goals_total: int | None = None
+    goals_conceded: int | None = None
+    assists: int | None = None
+    saves: int | None = None
+    passes_total: int | None = None
+    passes_key: int | None = None
+    passes_accuracy: int | None = None
+    tackles_total: int | None = None
+    blocks: int | None = None
+    interceptions: int | None = None
+    duels_total: int | None = None
+    duels_won: int | None = None
+    dribbles_attempts: int | None = None
+    dribbles_success: int | None = None
+    dribbles_past: int | None = None
+    fouls_drawn: int | None = None
+    fouls_committed: int | None = None
+    yellow_cards: int | None = None
+    red_cards: int | None = None
+    penalty_won: int | None = None
+    penalty_committed: int | None = None
+    penalty_scored: int | None = None
+    penalty_missed: int | None = None
+    penalty_saved: int | None = None
+
+
+class CanonicalPrediction(BaseModel):
+    """Pre-match predictive signals — FootyStats potentials, prematch xG.
+
+    Null-rate expectations (validated at shard write time):
+      - REQUIRED (0% null): fixture_id, source, kickoff_utc, home_team, away_team,
+        btts_potential, o25_potential, o35_potential, o45_potential,
+        xg_prematch_home, xg_prematch_away
+      - SPARSE (>80% null typical): corners_potential, corners_o85/o95/o105_potential,
+        cards_potential, offsides_potential, avg_potential
+      - VARIABLE: all other potentials and PPG fields
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    fixture_id: str
+    source: str
+    kickoff_utc: str
+    home_team: str
+    away_team: str
+    # --- Core potentials (expected 0% null) ---
+    btts_potential: int | None = None
+    o25_potential: int | None = None
+    o35_potential: int | None = None
+    o45_potential: int | None = None
+    xg_prematch_home: float | None = None
+    xg_prematch_away: float | None = None
+    # --- Extended potentials (variable null rate) ---
+    btts_fhg_potential: int | None = None
+    btts_2hg_potential: int | None = None
+    o05_potential: int | None = None
+    o15_potential: int | None = None
+    u05_potential: int | None = None
+    u15_potential: int | None = None
+    u25_potential: int | None = None
+    u35_potential: int | None = None
+    u45_potential: int | None = None
+    xg_prematch_total: float | None = None
+    pre_match_home_ppg: float | None = None
+    pre_match_away_ppg: float | None = None
+    pre_match_home_overall_ppg: float | None = None
+    pre_match_away_overall_ppg: float | None = None
+    # --- Sparse potentials (>80% null typical from API) ---
+    corners_potential: int | None = None
+    corners_o85_potential: int | None = None
+    corners_o95_potential: int | None = None
+    corners_o105_potential: int | None = None
+    cards_potential: int | None = None
+    offsides_potential: int | None = None
+    avg_potential: int | None = None
+
+
+class CanonicalWeather(BaseModel):
+    """Weather observation for a venue at match time."""
+
+    model_config = ConfigDict(frozen=True)
+
+    latitude: float
+    longitude: float
+    temperature_celsius: float
+    wind_speed_ms: float | None = None
+    humidity_pct: int | None = None
+    precipitation_mm: float | None = None
+    cloud_cover_pct: int | None = None
+    condition: str | None = None
+    observation_time: str
+    date: str
 
 
 class TeamMapping(BaseModel):

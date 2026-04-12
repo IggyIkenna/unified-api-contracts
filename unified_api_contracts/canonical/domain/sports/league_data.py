@@ -16,11 +16,13 @@ share a single SSOT.
 
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 from .league_data_other import FEATURES_LEAGUES as FEATURES_LEAGUES
 from .league_data_other import NON_FOOTBALL_LEAGUES as NON_FOOTBALL_LEAGUES
 from .league_data_other import REFERENCE_LEAGUES as REFERENCE_LEAGUES
 from .league_data_prediction import PREDICTION_LEAGUES as PREDICTION_LEAGUES
-from .league_registry import LeagueDefinition
+from .league_registry import SEASON_BY_COUNTRY, LeagueDefinition
 
 # ---------------------------------------------------------------------------
 # LEAGUE_REGISTRY - single source of truth for all leagues
@@ -85,14 +87,78 @@ def get_prediction_leagues() -> list[LeagueDefinition]:
     return get_leagues_by_classification("Prediction")
 
 
+def get_all_prediction_league_ids() -> list[str]:
+    """Return canonical league_id strings for all Prediction-tier leagues.
+
+    Used by data-status to iterate leagues and show 0% for newly added ones.
+    """
+    return [league.league_id for league in get_prediction_leagues()]
+
+
+def _is_in_season(d: date, season_start: int, season_end: int) -> bool:
+    """Check if a date falls within a season defined by start/end months.
+
+    Handles wrap-around seasons (e.g. Aug-May crosses year boundary).
+    """
+    month = d.month
+    if season_start <= season_end:
+        # Calendar-year season (e.g. Feb-Nov)
+        return season_start <= month <= season_end
+    # Wrap-around season (e.g. Aug-May)
+    return month >= season_start or month <= season_end
+
+
+def get_league_fixture_calendar(
+    league_id: str,
+    start: str,
+    end: str,
+) -> list[str]:
+    """Return expected fixture dates for a league within a date range.
+
+    Uses the league's country → ``SEASON_BY_COUNTRY`` season months to
+    determine which dates fall within the active season. Off-season dates are
+    excluded. Only returns dates that are NOT in the off-season gap.
+
+    Args:
+        league_id: Canonical league identifier (e.g. ``EPL``, ``BUN``).
+        start: Start date (``YYYY-MM-DD`` inclusive).
+        end: End date (``YYYY-MM-DD`` inclusive).
+
+    Returns:
+        Sorted list of date strings (``YYYY-MM-DD``) within the league's
+        active season. Empty list if the league is not found or the entire
+        range is off-season.
+    """
+    league = get_league(league_id)
+    if league is None:
+        return []
+
+    season_months = SEASON_BY_COUNTRY.get(league.country, league.season_months)
+    season_start, season_end = season_months
+
+    start_date = date.fromisoformat(start)
+    end_date = date.fromisoformat(end)
+
+    result: list[str] = []
+    current = start_date
+    while current <= end_date:
+        if _is_in_season(current, season_start, season_end):
+            result.append(current.isoformat())
+        current += timedelta(days=1)
+
+    return result
+
+
 __all__ = [
     "FEATURES_LEAGUES",
     "LEAGUE_REGISTRY",
     "NON_FOOTBALL_LEAGUES",
     "PREDICTION_LEAGUES",
     "REFERENCE_LEAGUES",
+    "get_all_prediction_league_ids",
     "get_league",
     "get_league_by_api_football_id",
+    "get_league_fixture_calendar",
     "get_leagues_by_classification",
     "get_leagues_by_country",
     "get_leagues_for_sport",
