@@ -16,8 +16,6 @@ MAINNET_CHAIN_IDS: dict[str, int] = {
     "AVALANCHE": 43114,
     "BSC": 56,
     "LINEA": 59144,
-    "SCROLL": 534352,
-    "ZKSYNC": 324,
     "MANTLE": 5000,
     "BLAST": 81457,
     "MODE": 34443,
@@ -41,8 +39,6 @@ TESTNET_CHAIN_IDS: dict[str, int] = {
     "AVALANCHE": 43113,  # Avalanche Fuji
     "BSC": 97,  # BSC Testnet
     "LINEA": 59141,  # Linea Sepolia
-    "SCROLL": 534351,  # Scroll Sepolia
-    "ZKSYNC": 300,  # zkSync Sepolia
     "MANTLE": 5003,  # Mantle Sepolia
     "BLAST": 168587773,  # Blast Sepolia
     "MODE": 919,  # Mode Testnet
@@ -58,6 +54,23 @@ TESTNET_CHAIN_IDS: dict[str, int] = {
 
 # Fork chain IDs (Tenderly forks use mainnet chain ID but different RPC)
 FORK_CHAIN_IDS = MAINNET_CHAIN_IDS  # Same chain IDs, different RPC URL
+
+# Gas fee collection start dates per chain (earliest date with archival RPC data).
+# Used by gas fee handler to skip dates before chain genesis / EIP-1559 activation.
+# SSOT for gas fee backfill date ranges — services read these, never hardcode dates.
+GAS_FEE_CHAIN_START_DATES: dict[int, str] = {
+    1: "2020-01-01",  # Ethereum — archival nodes have data from genesis
+    10: "2021-11-12",  # Optimism — mainnet regenesis (EVM equivalence)
+    56: "2020-09-01",  # BSC — mainnet launch
+    137: "2020-06-01",  # Polygon — mainnet launch (Matic rebranded)
+    8453: "2023-08-09",  # Base — mainnet launch
+    42161: "2021-09-01",  # Arbitrum One — public mainnet
+    43114: "2020-09-22",  # Avalanche C-Chain — mainnet launch
+    59144: "2023-07-12",  # Linea — mainnet alpha launch
+}
+
+# Solana start date for gas fee collection (Alchemy archival RPC coverage)
+GAS_FEE_SOLANA_START_DATE: str = "2021-01-01"
 
 # Environment names
 CHAIN_ENVS = ("mainnet", "testnet", "fork")

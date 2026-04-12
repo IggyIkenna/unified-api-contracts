@@ -790,6 +790,7 @@ class TargetSpec(BaseModel):
     horizon: str = ""
     label_formula: str = ""
     required_inputs: list[str] = Field(default_factory=list)
+    validity_conditions: list[str] = Field(default_factory=list)
     evaluation_metrics: EvaluationMetricsConfig = Field(default_factory=EvaluationMetricsConfig)
     target_group: str = ""
 
@@ -816,8 +817,10 @@ class ModelFamilyConfig(BaseModel):
     phase: str = "pregame"
     purpose: str = ""
     feature_groups_required: list[str] = Field(default_factory=list, min_length=1)
+    feature_groups_optional: list[str] = Field(default_factory=list)
     target_names: list[str] = Field(default_factory=list, min_length=1)
     algorithms: AlgorithmConfig = Field(default_factory=AlgorithmConfig)
+    calibration: str = "none"
     calibration_method: CalibrationMethod = CalibrationMethod.NONE
     promotion_gates: list[PromotionGate] = Field(default_factory=list)
 

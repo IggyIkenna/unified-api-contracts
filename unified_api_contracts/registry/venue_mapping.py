@@ -234,10 +234,8 @@ class VenueMapping:
             "PANCAKESWAPV3-BSC": "2023-04-03",  # PancakeSwap V3 BSC launch
             "PANCAKESWAPV3-ETHEREUM": "2023-04-03",  # PancakeSwap V3 ETH launch
             "PANCAKESWAPV3-BASE": "2023-09-01",
-            "PANCAKESWAPV3-ZKSYNC": "2023-08-01",
             "CAMELOTV3-ARBITRUM": "2023-06-14",  # Earliest pool createdAtTimestamp
             "SUSHISWAPV3-ETHEREUM": "2023-04-01",  # SushiSwap V3 ETH launch
-            "SUSHISWAPV3-BASE": "2023-09-01",  # SushiSwap V3 Base launch
             "SUSHISWAPV3-AVALANCHE": "2023-04-01",
             "GMX-ARBITRUM": "2021-09-06",  # GMX Arbitrum launch
             "GMX-AVALANCHE": "2022-01-05",  # GMX Avalanche launch
@@ -252,14 +250,11 @@ class VenueMapping:
             "AAVEV3-OPTIMISM": "2022-03-12",
             "AAVEV3-BASE": "2023-08-23",
             "AAVEV3-BSC": "2024-01-24",
-            "AAVEV3-SCROLL": "2024-02-10",
             "AAVEV3-LINEA": "2025-02-12",
-            "AAVEV3-ZKSYNC": "2024-09-21",
             "COMPOUNDV3-ETHEREUM": "2022-08-14",
             "COMPOUNDV3-ARBITRUM": "2023-05-05",
             "COMPOUNDV3-BASE": "2023-08-20",
             "COMPOUNDV3-OPTIMISM": "2024-04-07",
-            "COMPOUNDV3-SCROLL": "2024-02-17",
             "MORPHO-ETHEREUM": "2024-01-08",
             "MORPHO-BASE": "2024-06-01",
             "FLUID-ETHEREUM": "2024-02-27",
@@ -272,7 +267,7 @@ class VenueMapping:
             # DeFi - Solana protocols
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
-            "RAYDIUM-SOLANA": "2025-06-26",  # Earliest active pool data (REST API set)
+            "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM V4 mainnet launch
             "KAMINO-SOLANA": "2023-01-21",
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",

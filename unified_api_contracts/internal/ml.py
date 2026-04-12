@@ -67,6 +67,31 @@ class TrainingPhase(StrEnum):
     CROSS_PIPELINE = "cross_pipeline"
 
 
+class TrainingObjective(StrEnum):
+    """Objective function strategy for training."""
+
+    STANDARD = "standard"
+    PNL_AWARE = "pnl_aware"
+    SHARPE_MAXIMIZING = "sharpe_maximizing"
+
+
+class TrainingScope(StrEnum):
+    """Scope of a training run — per-asset, cross-asset, or full universe."""
+
+    SINGLE_ASSET = "single_asset"
+    CROSS_ASSET = "cross_asset"
+    UNIVERSE = "universe"
+
+
+class CalibrationConfig(BaseModel):
+    """Probability calibration settings for classification models."""
+
+    method: str = Field(
+        default="none",
+        description="Calibration method: none, platt, isotonic, beta",
+    )
+
+
 class TrainingPeriod(BaseModel):
     start: str = Field(description="ISO date string YYYY-MM-DD")
     end: str = Field(description="ISO date string YYYY-MM-DD")
@@ -348,6 +373,24 @@ class TrainingPipelineConfig(BaseModel):
     market_hours_filter: bool = Field(
         default=False,
         description="TradFi: filter rows where market is closed",
+    )
+
+    # --- Objective & Calibration ---
+    training_objective: TrainingObjective = Field(
+        default=TrainingObjective.STANDARD,
+        description="Objective function strategy: standard, pnl_aware, sharpe_maximizing",
+    )
+    calibration_config: CalibrationConfig = Field(
+        default_factory=CalibrationConfig,
+        description="Probability calibration settings for classification models",
+    )
+    trade_cost_column: str = Field(
+        default="",
+        description="Column name in features DF containing per-row trade costs for P&L-aware objectives",
+    )
+    training_scope: TrainingScope = Field(
+        default=TrainingScope.SINGLE_ASSET,
+        description="Scope of training: single_asset, cross_asset, or universe",
     )
 
     # --- Evaluation ---
