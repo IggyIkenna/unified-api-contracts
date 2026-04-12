@@ -40,10 +40,8 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "POLYGON": "Co2URyXjnxaw8WqxKyVHdirq9Ahhm5vcTs4dMedAq211",
         "AVALANCHE": "2h9woxy8RTjHu1HJsCEnmzpPHFArU33avmUh4f71JpVn",
         "BASE": "GQFbb95cE6d8mV989mL5figjaGaKCQB3xqYrr1bRyXqF",
-        "SCROLL": "74JwenoHZb2aAYVGCCSdPWzi9mm745dyHyQQVoZ7Sbub",
         "LINEA": "Gz2kjnmRV1fQj3R8cssoZa5y9VTanhrDo4Mh7nWW1wHa",
         "BSC": "7Jk85XgkV1MQ7u56hD8rr65rfASbayJXopugWkUoBMnZ",
-        "ZKSYNC": "ENYSc8G3WvrbhWH8UZHrqPWYRcuyCaNmaTmoVp7uzabM",
     },
     "compound_v3": {  # Verified from github.com/papercliplabs/compound-v3-subgraph
         "ETHEREUM": "5nwMCSHaTqG3Kd2gHznbTXEnZ9QNWsssQfbHhDqQSQFp",
@@ -51,14 +49,13 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "BASE": "2hcXhs36pTBDVUmk5K2Zkr6N4UYGwaHuco2a6jyTsijo",
         # POLYGON removed: subgraph returns 0 markets (Compound V3 not active on Polygon)
         "OPTIMISM": "FhHNkfh5z6Z2WCEBxB6V3s8RPxnJfWZ9zAfM5bVvbvbb",
-        "SCROLL": "6aRGn6noEdin1krLfYTnLMYaCoTujL7cHekARE4Ndxng",
     },
     "morpho": {
         # Morpho adapter uses blue-api.morpho.org (NOT The Graph subgraphs).
         # IDs here are subgraph IDs from docs.morpho.org but only used to declare
         # which chains instruments-service should query. Only list chains where
         # Morpho Blue has markets with major assets (DEFI_MAJOR_ASSET_SYMBOLS).
-        # ARBITRUM/OPTIMISM/POLYGON/SCROLL: 0 major-asset markets as of 2026-03.
+        # ARBITRUM/OPTIMISM/POLYGON: 0 major-asset markets as of 2026-03.
         "ETHEREUM": "8Lz789DP5VKLXumTMTgygjU2xtuzx8AhbaacgN5PYCAs",
         "BASE": "71ZTy1veF9twER9CLMnPWeLQ7GZcwKsjmygejrgKirqs",
     },
@@ -99,7 +96,6 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
         "BSC": "Hv1GncLY5docZoGtXjo4kwbTvxm3MAhVZqBZE4sUT9eZ",
         "ETHEREUM": "CJYGNhb7RvnhfBDjqpRnD3oxgyhibzc7fkAMa38YV3oS",
         "BASE": "5YYKGBcRkJs6tmDfB3RpHdbK2R5KBACHQebXVgbUcYQp",
-        "ZKSYNC": "3dKr3tYxTuwiRLkU9vPj3MvZeUmeuGgWURbFC72ZBpYY",
     },
     "sushiswap_v3": {  # Mixed schemas: ETH/AVAX = Messari DEX, BASE = SushiSwap custom (pairDaySnapshots)
         "ETHEREUM": "2tGWMrDha4164KkFAfkU3rDCtuxGb4q1emXmFdLLzJ8x",
@@ -497,8 +493,6 @@ CHAIN_REQUIRED_TOKENS: dict[str, frozenset[str]] = {
     "AVALANCHE": frozenset({"AVAX", "WAVAX"}),
     "BSC": frozenset({"BNB", "WBNB"}),
     "LINEA": frozenset({"ETH", "WETH"}),
-    "SCROLL": frozenset({"ETH", "WETH"}),
-    "ZKSYNC": frozenset({"ETH", "WETH"}),
     "SOLANA": frozenset({"SOL", "WSOL"}),
 }
 
