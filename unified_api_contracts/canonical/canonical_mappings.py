@@ -143,6 +143,12 @@ VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "API_FOOTBALL": "api_football",
     "ODDS_API": "odds_api",
     "BETFAIR": "betfair",
+    # Sports enrichment (no instruments — reference data only)
+    "FOOTYSTATS": "footystats",
+    "SOCCER_FOOTBALL_INFO": "soccer_football_info",
+    "TRANSFERMARKT": "transfermarkt",
+    "UNDERSTAT": "understat",
+    "OPEN_METEO": "open_meteo",
 }
 
 
