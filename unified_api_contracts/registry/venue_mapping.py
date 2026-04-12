@@ -382,6 +382,23 @@ class VenueMapping:
         """
         return self.venue_start_dates.get(venue) or self.source_data_start_dates.get(venue)
 
+    def get_expected_trading_dates(self, venue: str, start_date: str, end_date: str) -> list[str]:
+        """Return expected trading dates for a venue between start and end dates.
+
+        TradFi venues (NASDAQ, NYSE, CME, ICE, CBOE, FX) trade weekdays only.
+        All other venues (crypto, DeFi, sports, prediction) trade 24/7.
+        """
+        import pandas as pd
+
+        from unified_api_contracts.registry.market_data_categories import VENUE_TO_CATEGORY
+
+        all_dates = pd.date_range(start_date, end_date, freq="D")
+        category = VENUE_TO_CATEGORY.get(venue, "")
+        if category == "tradfi":
+            # Weekdays only (Mon-Fri)
+            all_dates = all_dates[all_dates.weekday < 5]
+        return [d.strftime("%Y-%m-%d") for d in all_dates]
+
     def is_venue_available_on_date(self, venue: str, target_date: datetime | date | str) -> bool:
         """
         Check if a venue was available (launched) on a given date.
