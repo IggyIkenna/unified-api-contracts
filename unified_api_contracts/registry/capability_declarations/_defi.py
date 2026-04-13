@@ -724,6 +724,51 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
 }
 
 
+# Reverse lookup: venue_prefix → protocol slug (for parse_defi_venue)
+_PREFIX_TO_PROTOCOL: dict[str, str] = {cap.venue_prefix: slug for slug, cap in PROTOCOL_CAPABILITIES.items()}
+
+# All known chain names (from SUBGRAPH_IDS + _STATIC_VENUE_CHAINS)
+KNOWN_CHAINS: frozenset[str] = frozenset(
+    {chain for chains in SUBGRAPH_IDS.values() for chain in chains}
+    | {chain for chains in _STATIC_VENUE_CHAINS.values() for chain in chains}
+)
+
+
+def parse_defi_venue(venue_str: str) -> tuple[str, str]:
+    """Split a DeFi venue string into (protocol_slug, chain).
+
+    Parses "AAVEV3-ETHEREUM" → ("aave_v3", "ETHEREUM"),
+    "UNISWAPV3-BASE" → ("uniswap_v3", "BASE"), etc.
+
+    Uses the PROTOCOL_CAPABILITIES venue_prefix as the authority
+    for how to split the string. Falls back to splitting on the
+    last hyphen if no prefix match.
+
+    Returns:
+        (protocol_slug, chain_name) — protocol_slug matches PROTOCOL_CAPABILITIES keys.
+    """
+    # Try known prefixes (longest match first to handle UNISWAPV3 vs UNISWAPV2)
+    for prefix in sorted(_PREFIX_TO_PROTOCOL, key=len, reverse=True):
+        if venue_str.startswith(prefix + "-"):
+            chain = venue_str[len(prefix) + 1 :]
+            return _PREFIX_TO_PROTOCOL[prefix], chain
+    # Fallback: split on last hyphen
+    if "-" in venue_str:
+        idx = venue_str.rfind("-")
+        prefix_part = venue_str[:idx]
+        chain_part = venue_str[idx + 1 :]
+        # Check if chain_part is a known chain
+        if chain_part in KNOWN_CHAINS:
+            slug = _PREFIX_TO_PROTOCOL.get(prefix_part, prefix_part.lower())
+            return slug, chain_part
+    return venue_str.lower(), ""
+
+
+def get_all_defi_chains() -> list[str]:
+    """Return all chains with DeFi protocol deployments, sorted."""
+    return sorted(KNOWN_CHAINS)
+
+
 # ---------------------------------------------------------------------------
 # Chain-specific Alchemy RPC URL templates (SSOT)
 #

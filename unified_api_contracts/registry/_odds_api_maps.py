@@ -160,3 +160,50 @@ ODDS_API_REGION_MAP: dict[str, list[str]] = {
     "TAB": ["au"],
     "TABTOUCH": ["au"],
 }
+
+
+# Audited clean bookmakers — passed data quality validation against Pinnacle reference.
+# These are the bookmakers whose odds we actually fetch and trust for pricing/ML.
+# "accuracy" is % exact match vs Pinnacle ground truth (from audit).
+# "is_exchange" distinguishes exchanges (back+lay) from fixed-odds bookmakers.
+# "is_execution_venue" means we have an execution adapter wired up.
+AUDITED_BOOKMAKERS: dict[str, dict[str, str | bool | float]] = {
+    "PINNACLE": {"accuracy": 0.99, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "BETFAIR_EX": {"accuracy": 1.0, "is_exchange": True, "is_execution_venue": True, "start_date": "2025-07-31"},
+    "FANDUEL": {"accuracy": 1.0, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "CORAL": {"accuracy": 1.0, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "PADDYPOWER": {"accuracy": 1.0, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "WILLIAMHILL": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "LADBROKES": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "DRAFTKINGS": {"accuracy": 0.86, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "BETRIVERS": {"accuracy": 0.92, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "BETONLINEAG": {"accuracy": 0.97, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "CASUMO": {"accuracy": 0.96, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "VIRGINBET": {"accuracy": 0.97, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "BETVICTOR": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "UNIBET": {"accuracy": 0.66, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "SKYBET": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "BET888SPORT": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "LIVESCOREBET": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "MATCHBOOK": {"accuracy": 0.90, "is_exchange": True, "is_execution_venue": True, "start_date": "2025-07-31"},
+    "SMARKETS": {"accuracy": 0.90, "is_exchange": True, "is_execution_venue": True, "start_date": "2025-07-31"},
+    "BETFAIR_SB": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "UNIBET_UK": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+    "BET365": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
+}
+
+
+def get_audited_bookmakers() -> list[str]:
+    """Return sorted list of audited bookmaker venue names."""
+    return sorted(AUDITED_BOOKMAKERS)
+
+
+def get_execution_bookmakers() -> list[str]:
+    """Return bookmakers with execution adapters wired up."""
+    return sorted(k for k, v in AUDITED_BOOKMAKERS.items() if v.get("is_execution_venue"))
+
+
+def get_bookmaker_start_date(bookmaker: str) -> str | None:
+    """Return the start date for a bookmaker's odds data, or None if unknown."""
+    bm = AUDITED_BOOKMAKERS.get(bookmaker)
+    return str(bm["start_date"]) if bm else None
