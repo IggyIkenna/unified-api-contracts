@@ -230,15 +230,19 @@ _RESTAKING = [_IT.SPOT_ASSET]
 # not exist yet but the data IS available at the source.
 #
 # Key distinctions:
-#   tvl           — totalValueLockedUSD (pool/market level, from snapshots)
 #   swaps         — individual swap events (amount0, amount1, amountUSD, sender, ts)
 #   dex_pools     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
 #   oracle_prices — external price feeds (Chainlink, protocol exchange rates)
 #                   needed to compute yield on non-rebasing tokens (sUSDe, wstETH)
 #   gas_fees      — chain-level gas price data (baseFee, priorityFee, gasUsed)
 #
-_LENDING_DATA = ["rate_indices", "utilization", "liquidations", "risk_params", "tvl"]
-_DEX_DATA = ["dex_pools", "swaps", "tvl"]
+# Removed phantom data types (not separate data types — they are columns):
+#   tvl           — totalValueLockedUSD is a column in dex_pools, not a separate data type
+#   utilization   — utilization_rate is a column in lending rate_indices, not a separate data type
+#   evm_defi      — redundant with lending_indices (live snapshot of the same data)
+#
+_LENDING_DATA = ["lending_indices", "liquidations", "risk_params"]
+_DEX_DATA = ["dex_pools", "dex_swaps"]
 _YIELD_DATA = ["lst_rates", "oracle_prices"]
 _STAKING_DATA = ["lst_rates", "oracle_prices"]
 _PERPS_DATA = ["perp_funding"]
@@ -249,8 +253,8 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="AAVEV3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
-        mtds_operations=["collect-evm-defi", "collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
         required_tokens=frozenset({"AAVE", "GHO"}),
     ),
     "spark": _ProtocolCapability(
@@ -265,23 +269,23 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="COMPOUNDV3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
-        mtds_operations=["collect-evm-defi", "collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
         required_tokens=frozenset({"COMP"}),
     ),
     "morpho": _ProtocolCapability(
         venue_prefix="MORPHO",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
-        mtds_operations=["collect-evm-defi", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-liquidations", "collect-gas-fees"],
     ),
     "fluid": _ProtocolCapability(
         venue_prefix="FLUID",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "evm_defi", "gas_fees"],
-        mtds_operations=["collect-evm-defi", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-liquidations", "collect-gas-fees"],
     ),
     # ── EVM DEX — Native schema ─────────────────────────────────
     "uniswap_v2": _ProtocolCapability(
@@ -436,7 +440,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="DRIFT",
         protocol_class=ProtocolClass.PERPS,
         instrument_types=_PERPS,
-        data_types=["perp_funding", "oracle_prices", "solana_defi"],
+        data_types=["perp_funding", "oracle_prices"],
         mtds_operations=["collect-solana-defi", "collect-perp-funding"],
         required_tokens=frozenset({"DRIFT"}),
     ),
@@ -444,7 +448,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["solana_defi", "swaps", "tvl"],
+        data_types=["dex_pools"],
         mtds_operations=["collect-solana-defi"],
         required_tokens=frozenset({"KMNO"}),
     ),
@@ -452,7 +456,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RAYDIUM",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["solana_defi", "swaps", "tvl"],
+        data_types=["dex_pools", "dex_swaps"],
         mtds_operations=["collect-solana-defi"],
         required_tokens=frozenset({"RAY"}),
     ),
@@ -460,7 +464,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="ORCA",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["solana_defi", "swaps", "tvl"],
+        data_types=["dex_pools", "dex_swaps"],
         mtds_operations=["collect-solana-defi"],
         required_tokens=frozenset({"ORCA"}),
     ),
@@ -468,7 +472,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="MARINADE",
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
-        data_types=["solana_defi", "lst_rates", "oracle_prices"],
+        data_types=["lst_rates", "oracle_prices"],
         mtds_operations=["collect-solana-defi"],
         required_tokens=frozenset({"MNDE", "MSOL"}),
     ),
@@ -476,7 +480,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="JITO",
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
-        data_types=["solana_defi", "lst_rates", "oracle_prices"],
+        data_types=["lst_rates", "oracle_prices"],
         mtds_operations=["collect-solana-defi"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),

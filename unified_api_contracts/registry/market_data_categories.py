@@ -34,11 +34,14 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "ohlcv_24h": "24h",
     "tbbo": "15s",
     # DeFi — on-chain sampled (ETH ~12s blocks → 15m safe default)
-    "swaps": "15s",
-    "liquidity": "15m",
-    "rate_indices": "15m",
+    # Note: "liquidations" already declared in CeFi section above (same 15s granularity)
+    "dex_pools": "15m",
+    "dex_swaps": "15s",
+    "lending_indices": "15m",
+    "perp_funding": "15m",
+    "lst_rates": "15m",
     "oracle_prices": "15m",
-    "utilization": "15m",
+    "gas_fees": "15m",
     "rewards": "24h",
     "risk_params": "24h",
     # Sports — horizon-based, not standard timeframes
@@ -48,7 +51,6 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     # Prediction — tick-level from CLOB
     "prediction_trades": "15s",
     "prediction_book_snapshot": "15s",
-    "prediction_market_metadata": "24h",
 }
 
 # Timeframe ordering in seconds (used for validation and aggregation)
@@ -94,13 +96,14 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
         "tbbo",  # Top-of-book quotes
     ],
     "defi": [
-        # Candle-sampled data types (OHLCV from mid_price):
-        "swaps",  # DEX trades - requires candle sampling
-        "liquidity",  # Pool liquidity depth - OHLCV from mid_price
-        # Pass-through data types (already in sampled form from upstream):
-        "rate_indices",  # Funding rates, interest rates
-        "oracle_prices",  # Chainlink oracle prices
-        "utilization",  # AAVE/Morpho utilization rates
+        "dex_pools",  # DEX pool metrics (TVL, liquidity depth)
+        "dex_swaps",  # DEX swap events (requires candle sampling)
+        "lending_indices",  # Lending rate indices (supply/borrow APY, utilization)
+        "liquidations",  # DeFi liquidation events
+        "perp_funding",  # Perpetual funding rates (Hyperliquid, Aster, GMX)
+        "lst_rates",  # Liquid staking token exchange rates
+        "oracle_prices",  # Chainlink oracle price snapshots
+        "gas_fees",  # EVM gas fee history
         "rewards",  # Protocol reward emissions (pass-through, OHLCV=NaN)
         "risk_params",  # Protocol risk parameters (pass-through, OHLCV=NaN)
     ],
@@ -113,7 +116,6 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
     "prediction": [
         "prediction_trades",  # CLOB trade fills (price, size, side, timestamp)
         "prediction_book_snapshot",  # Order book snapshot (bids/asks)
-        "prediction_market_metadata",  # Market metadata (question, outcomes, status)
     ],
 }
 
@@ -228,11 +230,14 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "ohlcv_24h": True,
     "tbbo": True,
     # DeFi — candle-sampled types need processing; pass-through types do not
-    "swaps": True,
-    "liquidity": True,
-    "rate_indices": False,
+    "dex_pools": False,
+    "dex_swaps": True,
+    "lending_indices": False,
+    "liquidations": True,
+    "perp_funding": False,
+    "lst_rates": False,
     "oracle_prices": False,
-    "utilization": False,
+    "gas_fees": False,
     "rewards": False,
     "risk_params": False,
     # Sports — candle adapters process these
@@ -243,7 +248,6 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # Prediction — candle adapters process these
     "prediction_trades": True,
     "prediction_book_snapshot": True,
-    "prediction_market_metadata": False,
 }
 
 
@@ -306,16 +310,16 @@ FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
         "oscillators": "oracle_prices",
         "volatility_realized": "oracle_prices",
         "momentum": "oracle_prices",
-        "volume_analysis": "swaps",
-        "vwap": "swaps",
+        "volume_analysis": "dex_swaps",
+        "vwap": "dex_swaps",
         "candlestick_patterns": "oracle_prices",
         "market_structure": "oracle_prices",
         "returns": "oracle_prices",
         "round_numbers": "oracle_prices",
         "streaks": "oracle_prices",
-        "microstructure": "swaps",
-        "funding_oi": "derivative_ticker",
-        "liquidations": "derivative_ticker",
+        "microstructure": "dex_swaps",
+        "funding_oi": "perp_funding",
+        "liquidations": "liquidations",
         "temporal": "oracle_prices",
         "economic_events": "oracle_prices",
         "targets": "oracle_prices",
@@ -486,140 +490,121 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_15m": "2021-04-22",  # VIX 15m rolling 60-day window
         "ohlcv_24h": "2020-01-01",  # KRW/USD daily rates
     },
-    # ── DeFi — DEX protocols (swaps + liquidity only) ──
-    "UNISWAPV2-ETHEREUM": {"swaps": "2020-05-06", "liquidity": "2020-05-06"},
-    "UNISWAPV3-ETHEREUM": {"swaps": "2021-05-05", "liquidity": "2021-05-05"},
-    "UNISWAPV3-ARBITRUM": {"swaps": "2021-06-18", "liquidity": "2021-06-18"},
-    "UNISWAPV3-BASE": {"swaps": "2023-09-03", "liquidity": "2023-09-03"},
-    "UNISWAPV3-OPTIMISM": {"swaps": "2021-11-12", "liquidity": "2021-11-12"},
-    "UNISWAPV3-POLYGON": {"swaps": "2021-12-22", "liquidity": "2021-12-22"},
-    "UNISWAPV4-ETHEREUM": {"swaps": "2025-01-30", "liquidity": "2025-01-30"},
-    "CURVE-ETHEREUM": {"swaps": "2020-01-20", "liquidity": "2020-01-20"},
-    "CURVE-AVALANCHE": {"swaps": "2021-11-10", "liquidity": "2021-11-10"},
-    "CURVE-OPTIMISM": {"swaps": "2022-01-13", "liquidity": "2022-01-13"},
-    "BALANCER-ETHEREUM": {"swaps": "2021-04-22", "liquidity": "2021-04-22"},
-    "BALANCER-ARBITRUM": {"swaps": "2021-08-27", "liquidity": "2021-08-27"},
-    "BALANCER-AVALANCHE": {"swaps": "2023-08-17", "liquidity": "2023-08-17"},
-    "BALANCER-BASE": {"swaps": "2023-07-29", "liquidity": "2023-07-29"},
-    "BALANCER-OPTIMISM": {"swaps": "2022-05-20", "liquidity": "2022-05-20"},
-    "BALANCER-POLYGON": {"swaps": "2021-06-24", "liquidity": "2021-06-24"},
+    # ── DeFi — DEX protocols (dex_swaps + dex_pools) ──
+    "UNISWAPV2-ETHEREUM": {"dex_swaps": "2020-05-06", "dex_pools": "2020-05-06"},
+    "UNISWAPV3-ETHEREUM": {"dex_swaps": "2021-05-05", "dex_pools": "2021-05-05"},
+    "UNISWAPV3-ARBITRUM": {"dex_swaps": "2021-06-18", "dex_pools": "2021-06-18"},
+    "UNISWAPV3-BASE": {"dex_swaps": "2023-09-03", "dex_pools": "2023-09-03"},
+    "UNISWAPV3-OPTIMISM": {"dex_swaps": "2021-11-12", "dex_pools": "2021-11-12"},
+    "UNISWAPV3-POLYGON": {"dex_swaps": "2021-12-22", "dex_pools": "2021-12-22"},
+    "UNISWAPV4-ETHEREUM": {"dex_swaps": "2025-01-30", "dex_pools": "2025-01-30"},
+    "CURVE-ETHEREUM": {"dex_swaps": "2020-01-20", "dex_pools": "2020-01-20"},
+    "CURVE-AVALANCHE": {"dex_swaps": "2021-11-10", "dex_pools": "2021-11-10"},
+    "CURVE-OPTIMISM": {"dex_swaps": "2022-01-13", "dex_pools": "2022-01-13"},
+    "BALANCER-ETHEREUM": {"dex_swaps": "2021-04-22", "dex_pools": "2021-04-22"},
+    "BALANCER-ARBITRUM": {"dex_swaps": "2021-08-27", "dex_pools": "2021-08-27"},
+    "BALANCER-AVALANCHE": {"dex_swaps": "2023-08-17", "dex_pools": "2023-08-17"},
+    "BALANCER-BASE": {"dex_swaps": "2023-07-29", "dex_pools": "2023-07-29"},
+    "BALANCER-OPTIMISM": {"dex_swaps": "2022-05-20", "dex_pools": "2022-05-20"},
+    "BALANCER-POLYGON": {"dex_swaps": "2021-06-24", "dex_pools": "2021-06-24"},
     # ── DeFi — Lending protocols ──
     "AAVEV3-ETHEREUM": {
-        "rate_indices": "2023-01-27",
+        "lending_indices": "2023-01-27",
         "oracle_prices": "2023-01-27",
-        "utilization": "2023-01-27",
         "rewards": "2023-01-27",
         "risk_params": "2023-01-27",
     },
     "AAVEV3-ARBITRUM": {
-        "rate_indices": "2022-03-12",
+        "lending_indices": "2022-03-12",
         "oracle_prices": "2022-03-12",
-        "utilization": "2022-03-12",
         "rewards": "2022-03-12",
         "risk_params": "2022-03-12",
     },
     "AAVEV3-AVALANCHE": {
-        "rate_indices": "2022-03-12",
+        "lending_indices": "2022-03-12",
         "oracle_prices": "2022-03-12",
-        "utilization": "2022-03-12",
         "rewards": "2022-03-12",
         "risk_params": "2022-03-12",
     },
     "AAVEV3-BASE": {
-        "rate_indices": "2023-08-23",
+        "lending_indices": "2023-08-23",
         "oracle_prices": "2023-08-23",
-        "utilization": "2023-08-23",
         "rewards": "2023-08-23",
         "risk_params": "2023-08-23",
     },
     "AAVEV3-BSC": {
-        "rate_indices": "2024-01-24",
+        "lending_indices": "2024-01-24",
         "oracle_prices": "2024-01-24",
-        "utilization": "2024-01-24",
         "rewards": "2024-01-24",
         "risk_params": "2024-01-24",
     },
     "AAVEV3-LINEA": {
-        "rate_indices": "2025-02-12",
+        "lending_indices": "2025-02-12",
         "oracle_prices": "2025-02-12",
-        "utilization": "2025-02-12",
         "rewards": "2025-02-12",
         "risk_params": "2025-02-12",
     },
     "AAVEV3-OPTIMISM": {
-        "rate_indices": "2022-03-12",
+        "lending_indices": "2022-03-12",
         "oracle_prices": "2022-03-12",
-        "utilization": "2022-03-12",
         "rewards": "2022-03-12",
         "risk_params": "2022-03-12",
     },
     "AAVEV3-POLYGON": {
-        "rate_indices": "2022-03-12",
+        "lending_indices": "2022-03-12",
         "oracle_prices": "2022-03-12",
-        "utilization": "2022-03-12",
         "rewards": "2022-03-12",
         "risk_params": "2022-03-12",
     },
     "COMPOUNDV3-ETHEREUM": {
-        "rate_indices": "2022-08-14",
+        "lending_indices": "2022-08-14",
         "oracle_prices": "2022-08-14",
-        "utilization": "2022-08-14",
     },
     "COMPOUNDV3-ARBITRUM": {
-        "rate_indices": "2023-05-05",
+        "lending_indices": "2023-05-05",
         "oracle_prices": "2023-05-05",
-        "utilization": "2023-05-05",
     },
     "COMPOUNDV3-BASE": {
-        "rate_indices": "2023-08-20",
+        "lending_indices": "2023-08-20",
         "oracle_prices": "2023-08-20",
-        "utilization": "2023-08-20",
     },
     "COMPOUNDV3-OPTIMISM": {
-        "rate_indices": "2024-04-07",
+        "lending_indices": "2024-04-07",
         "oracle_prices": "2024-04-07",
-        "utilization": "2024-04-07",
     },
     "COMPOUNDV3-POLYGON": {
-        "rate_indices": "2024-04-07",
+        "lending_indices": "2024-04-07",
         "oracle_prices": "2024-04-07",
-        "utilization": "2024-04-07",
     },
     "MORPHO-ETHEREUM": {
-        "rate_indices": "2024-01-08",
+        "lending_indices": "2024-01-08",
         "oracle_prices": "2024-01-08",
-        "utilization": "2024-01-08",
     },
     "MORPHO-ARBITRUM": {
-        "rate_indices": "2024-06-01",
+        "lending_indices": "2024-06-01",
         "oracle_prices": "2024-06-01",
-        "utilization": "2024-06-01",
     },
     "MORPHO-BASE": {
-        "rate_indices": "2024-06-01",
+        "lending_indices": "2024-06-01",
         "oracle_prices": "2024-06-01",
-        "utilization": "2024-06-01",
     },
     "MORPHO-OPTIMISM": {
-        "rate_indices": "2024-06-01",
+        "lending_indices": "2024-06-01",
         "oracle_prices": "2024-06-01",
-        "utilization": "2024-06-01",
     },
     "MORPHO-POLYGON": {
-        "rate_indices": "2024-06-01",
+        "lending_indices": "2024-06-01",
         "oracle_prices": "2024-06-01",
-        "utilization": "2024-06-01",
     },
     "FLUID-ETHEREUM": {
-        "rate_indices": "2024-02-27",
+        "lending_indices": "2024-02-27",
         "oracle_prices": "2024-02-27",
-        "utilization": "2024-02-27",
     },
     # ── DeFi — LST/Yield protocols ──
-    "LIDO-ETHEREUM": {"rate_indices": "2020-12-18", "oracle_prices": "2020-12-18"},
-    "ETHERFI-ETHEREUM": {"rate_indices": "2023-11-01", "oracle_prices": "2023-11-01"},
-    "ETHENA-ETHEREUM": {"rate_indices": "2024-02-19", "oracle_prices": "2024-02-19"},
-    "JITO-SOLANA": {"rate_indices": "2021-11-01", "oracle_prices": "2021-11-01"},
+    "LIDO-ETHEREUM": {"lst_rates": "2020-12-18", "oracle_prices": "2020-12-18"},
+    "ETHERFI-ETHEREUM": {"lst_rates": "2023-11-01", "oracle_prices": "2023-11-01"},
+    "ETHENA-ETHEREUM": {"lst_rates": "2024-02-19", "oracle_prices": "2024-02-19"},
+    "JITO-SOLANA": {"lst_rates": "2021-11-01", "oracle_prices": "2021-11-01"},
     # ── Sports ──
     "ODDS_API": {
         "odds_snapshot": "2024-01-01",
@@ -651,6 +636,28 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
 # Prediction market metadata is NOT separate — the instruments parquet IS
 # the metadata (market question, outcomes, expiry are InstrumentRecord fields).
 VENUE_REFERENCE_DATA_CAPABILITIES: dict[str, dict[str, str]] = {}
+
+
+# TradFi tick data windows — dates where expensive tick data (tbbo, trades) is collected.
+# Outside these windows, only ohlcv_1m (pre-aggregated, cheaper) is downloaded.
+# Cost rationale: Databento tbbo/trades charges per-symbol per-day; ohlcv_1m is
+# significantly cheaper. We collect tick data only for specific training/validation
+# windows to manage Databento costs while still having representative tick-level data.
+TRADFI_TICK_DATA_WINDOWS: list[dict[str, str]] = [
+    {"start": "2023-05-01", "end": "2023-05-31"},  # Training window
+    {"start": "2024-07-01", "end": "2024-07-31"},  # Validation window
+]
+
+
+def is_in_tradfi_tick_window(date_str: str) -> bool:
+    """Check if a date falls within any TradFi tick data window.
+
+    Tick windows are date ranges where expensive tick data (tbbo, trades) is
+    collected from Databento. Outside these windows, only cheaper ohlcv_1m
+    is downloaded.
+    """
+    return any(w["start"] <= date_str <= w["end"] for w in TRADFI_TICK_DATA_WINDOWS)
+
 
 
 def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:

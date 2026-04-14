@@ -134,6 +134,7 @@ from .market_data_categories import (
     NEEDS_CANDLE_PROCESSING,
     TIMEFRAME_SECONDS,
     TIMEFRAMES,
+    TRADFI_TICK_DATA_WINDOWS,
     VENUE_DATA_TYPE_CAPABILITIES,
     VENUE_REFERENCE_DATA_CAPABILITIES,
     VENUE_TO_CATEGORY,
@@ -142,6 +143,7 @@ from .market_data_categories import (
     get_valid_data_types_for_venue,
     get_valid_timeframes_for_data_type,
     get_venue_data_type_start_date,
+    is_in_tradfi_tick_window,
     needs_candle_processing,
     resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
@@ -184,6 +186,7 @@ from .token_wrapping import (
 )
 from .tradfi_instrument_universe import (
     FX_SPOT_PAIRS,
+    MVP_CME_EXCHANGE_CODES,
     TRADFI_DATABENTO_INSTRUMENTS,
     YAHOO_INDICES,
     DatabentoInstrumentDef,
@@ -191,6 +194,7 @@ from .tradfi_instrument_universe import (
     YahooIndexDef,
     get_databento_symbols_for_dataset,
     get_databento_symbols_for_venue,
+    get_mvp_databento_symbols_for_venue,
     get_required_datasets,
 )
 from .tradfi_symbology import (
@@ -569,6 +573,7 @@ __all__ = [
     "TRADFI_FUTURES",
     "TRADFI_INSTRUMENTS",
     "TRADFI_INSTRUMENTS_CONFIG",
+    "TRADFI_TICK_DATA_WINDOWS",
     "TRADFI_TICKER_UNIVERSE",
     "TRADFI_VENUE_MAPPINGS",
     "TRANSFERMARKT",
@@ -679,6 +684,7 @@ __all__ = [
     "get_vix_15m_source",
     "get_wrapped_form",
     "get_yahoo_vix_15m_start",
+    "is_in_tradfi_tick_window",
     "is_lst",
     "is_token_equivalent",
     "is_vix_15m_gap_date",

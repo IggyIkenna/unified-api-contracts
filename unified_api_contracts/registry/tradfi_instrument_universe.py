@@ -332,3 +332,22 @@ def get_databento_symbols_for_venue(venue: str) -> list[DatabentoInstrumentDef]:
 def get_required_datasets() -> list[str]:
     """Return the unique set of Databento datasets needed for the curated universe."""
     return sorted({i.dataset for i in TRADFI_DATABENTO_INSTRUMENTS})
+
+
+# ---------------------------------------------------------------------------
+# MVP CME exchange codes — only these parent symbols are downloaded in MVP mode.
+# Full TRADFI_TICKER_UNIVERSE is kept for later expansion.
+# ES covers: ES.FUT (quarterly futures), ES.OPT (quarterly options),
+# EW.OPT (weekly), EW1-4.OPT (weekly), E1A-E5A.OPT (daily/0DTE), EOM.OPT (end-of-month)
+# ---------------------------------------------------------------------------
+MVP_CME_EXCHANGE_CODES: frozenset[str] = frozenset({
+    "ES", "EW", "EW1", "EW2", "EW4", "E1A", "E2A", "E3A", "E4A", "E5A", "EOM",
+})
+
+
+def get_mvp_databento_symbols_for_venue(venue: str) -> list[DatabentoInstrumentDef]:
+    """Return MVP-filtered instruments for a venue (ES-only for CME)."""
+    all_defs = get_databento_symbols_for_venue(venue)
+    if venue.upper() == "CME":
+        return [d for d in all_defs if d.exchange_code in MVP_CME_EXCHANGE_CODES]
+    return all_defs

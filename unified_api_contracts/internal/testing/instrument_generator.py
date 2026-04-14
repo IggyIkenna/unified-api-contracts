@@ -131,9 +131,10 @@ def _deterministic_address(rng: np.random.Generator) -> str:
 
 def _defi_data_types(itype: InstrumentType, venue: str) -> list[str]:
     """Return data_types for a DeFi instrument based on type and venue."""
+    # tvl is a column in dex_pools, not a separate data type
     if itype == InstrumentType.POOL and venue != "COMPOUND_V3_ETH":
-        return ["apy", "tvl", "liquidity"] if venue == "CURVE-ETHEREUM" else ["ohlcv", "liquidity"]
-    return ["apy", "tvl"]
+        return ["apy", "dex_pools"] if venue == "CURVE-ETHEREUM" else ["ohlcv", "dex_pools"]
+    return ["apy", "lending_indices"]
 
 
 # ---------------------------------------------------------------------------

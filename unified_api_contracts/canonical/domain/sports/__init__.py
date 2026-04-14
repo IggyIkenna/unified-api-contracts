@@ -82,6 +82,7 @@ from .odds import OddsType as OddsType
 from .odds import OutcomeType as OutcomeType
 from .odds_api_mapping import ODDS_API_KEY_TO_VENUE as ODDS_API_KEY_TO_VENUE
 from .odds_api_mapping import ODDS_API_KEY_TO_VENUE_CATEGORY as ODDS_API_KEY_TO_VENUE_CATEGORY
+from .provider_league_ids import FOOTYSTATS_HISTORICAL_SEASON_IDS as FOOTYSTATS_HISTORICAL_SEASON_IDS
 from .provider_league_ids import FOOTYSTATS_SEASON_IDS as FOOTYSTATS_SEASON_IDS
 from .provider_league_ids import SOCCER_FOOTBALL_INFO_IDS as SOCCER_FOOTBALL_INFO_IDS
 from .provider_league_ids import TRANSFERMARKT_IDS as TRANSFERMARKT_IDS
@@ -99,6 +100,8 @@ from .season_dates import is_reference_refresh_date as is_reference_refresh_date
 from .team_mapping_data import get_all_teams as get_all_teams
 from .team_mapping_data import get_team_by_af_id as get_team_by_af_id
 from .team_mapping_data import get_team_provider_ids as get_team_provider_ids
+from .team_mapping_data import resolve_footystats_team as resolve_footystats_team
+from .team_mapping_data import resolve_understat_team as resolve_understat_team
 from .team_mapping_data_bundesliga import BUNDESLIGA_TEAM_MAPPINGS as BUNDESLIGA_TEAM_MAPPINGS
 from .team_mapping_data_epl import EPL_TEAM_MAPPINGS as EPL_TEAM_MAPPINGS
 from .venue_execution import (

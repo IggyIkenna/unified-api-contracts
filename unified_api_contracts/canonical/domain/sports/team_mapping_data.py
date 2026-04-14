@@ -77,6 +77,50 @@ def get_team_by_af_id(af_team_id: int) -> dict[str, str]:
     return _af_id_index().get(af_team_id, {})
 
 
+@lru_cache(maxsize=1)
+def _us_name_index() -> dict[str, str]:
+    """Index: Understat team name (lowercased) → canonical_team_id."""
+    idx: dict[str, str] = {}
+    for row in _load_mapping():
+        us_name = row.get("us_team_name", "").strip()
+        if us_name:
+            idx[us_name.lower()] = row["canonical_team_id"]
+    return idx
+
+
+@lru_cache(maxsize=1)
+def _ft_name_index() -> dict[str, str]:
+    """Index: FootyStats team name (lowercased) → canonical_team_id."""
+    idx: dict[str, str] = {}
+    for row in _load_mapping():
+        ft_name = row.get("ft_team_name", "").strip()
+        if ft_name:
+            idx[ft_name.lower()] = row["canonical_team_id"]
+    return idx
+
+
+def resolve_understat_team(team_name: str) -> str:
+    """Resolve Understat team name to canonical team ID.
+
+    Falls back to build_team_id() if no mapping found.
+    """
+    from .canonical_ids import build_team_id
+
+    canonical = _us_name_index().get(team_name.lower().strip())
+    return canonical if canonical else build_team_id(team_name)
+
+
+def resolve_footystats_team(team_name: str) -> str:
+    """Resolve FootyStats team name to canonical team ID.
+
+    Falls back to build_team_id() if no mapping found.
+    """
+    from .canonical_ids import build_team_id
+
+    canonical = _ft_name_index().get(team_name.lower().strip())
+    return canonical if canonical else build_team_id(team_name)
+
+
 def get_all_teams() -> list[dict[str, str]]:
     """Get all team mappings."""
     return _load_mapping()

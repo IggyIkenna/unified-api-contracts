@@ -280,9 +280,9 @@ class VenueMapping:
             "POLYMARKET:ETH": "2025-03-14",
             "POLYMARKET:SOL": "2025-03-14",
             "POLYMARKET:XRP": "2025-03-31",
-            "POLYMARKET:DOGE": "2025-03-14",
-            "POLYMARKET:HYPE": "2025-05-08",
-            "POLYMARKET:BNB": "2025-10-16",
+            "POLYMARKET:DOGE": "2026-03-01",  # Intermittent before Mar 2026
+            "POLYMARKET:HYPE": "2026-03-01",  # Intermittent before Mar 2026
+            "POLYMARKET:BNB": "2026-03-01",  # Intermittent before Mar 2026
             "POLYMARKET:FOOTBALL": "2025-10-18",
             "POLYMARKET:OTHER": "2025-03-13",
             "POLYMARKET:SPX": "2025-10-15",
@@ -701,13 +701,13 @@ class DataTypeConfig:
             ],
             "OPTION": ["options_chain", "trades", "book_snapshot_5", "liquidations"],
             # DeFi instrument types
-            "POOL": ["swaps", "liquidity"],  # DEX pools (Uniswap, etc.)
-            "A_TOKEN": ["rate_indices", "oracle_prices"],  # Lending supply positions (AAVE, Morpho)
+            "POOL": ["dex_swaps", "dex_pools"],  # DEX pools (Uniswap, etc.)
+            "A_TOKEN": ["lending_indices", "oracle_prices"],  # Lending supply positions (AAVE, Morpho)
             "DEBT_TOKEN": [
-                "rate_indices",
+                "lending_indices",
                 "oracle_prices",
             ],  # Lending borrow positions (AAVE, Morpho)
-            "LST": ["oracle_prices"],  # Liquid staking tokens (Lido, EtherFi)
+            "LST": ["lst_rates", "oracle_prices"],  # Liquid staking tokens (Lido, EtherFi)
             "YIELD_BEARING": ["oracle_prices"],  # Yield-bearing tokens (Ethena sUSDe)
         }
     )
