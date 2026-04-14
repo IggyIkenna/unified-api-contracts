@@ -19,11 +19,18 @@
         "role": "service",
         "tags": ["alerting", "cross-domain", "standard"],
         "version": "0.1.0",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 87,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": [
@@ -49,7 +56,13 @@
         "coverage_pct": null,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-internal-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -70,7 +83,7 @@
         "coverage_pct": 18,
         "testing_level": "unit",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": ["unified-trading-library"],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": ["data_source", "event_bus", "cache"],
@@ -87,11 +100,17 @@
         "role": "api",
         "tags": ["cefi", "deployment", "standard"],
         "version": "0.1.1",
-        "ci_status": "FAILING",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": 71,
         "testing_level": "unit",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-events-interface",
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": ["event_bus", "cache"],
@@ -108,19 +127,32 @@
         "role": "service",
         "tags": ["cefi", "deployment", "standard"],
         "version": "0.1.1",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 81,
         "testing_level": "unit",
         "status": "active",
-        "dependencies": [
-          "unified-trading-library",
-          "deployment-api",
-          "unified-api-contracts"
-        ],
+        "dependencies": ["unified-trading-library", "deployment-api"],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
         "completion_path": "cefi",
+        "sit_level": "standard"
+      },
+      "execution-algo-library": {
+        "type": "library",
+        "tier": 2,
+        "role": "library",
+        "tags": ["cross-domain", "execution", "important"],
+        "version": "0.1.2",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 72,
+        "testing_level": "unit",
+        "status": "active",
+        "dependencies": [],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
         "sit_level": "standard"
       },
       "execution-service": {
@@ -135,8 +167,17 @@
         "status": "active",
         "dependencies": [
           "unified-trading-library",
+          "unified-defi-execution-interface",
+          "matching-engine-library",
+          "execution-algo-library",
           "unified-api-contracts",
-          "unified-market-interface"
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-domain-client",
+          "unified-events-interface",
+          "unified-internal-contracts",
+          "unified-sports-execution-interface",
+          "unified-trade-execution-interface"
         ],
         "service_declaration": {
           "mode": "live",
@@ -154,11 +195,20 @@
         "role": "service",
         "tags": ["cefi", "feature-computation", "standard"],
         "version": "0.2.1",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 72,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-feature-calculator-library",
+          "unified-features-interface",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -179,7 +229,13 @@
         "coverage_pct": 3,
         "testing_level": "unit",
         "status": "scaffolded",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -196,11 +252,18 @@
         "role": "service",
         "tags": ["cefi", "feature-computation", "standard"],
         "version": "0.1.1",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 65,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-feature-calculator-library",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -217,11 +280,19 @@
         "role": "service",
         "tags": ["cefi", "feature-computation", "standard"],
         "version": "0.2.0",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 71,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-features-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -242,7 +313,14 @@
         "coverage_pct": 57,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-cloud-interface",
+          "unified-feature-calculator-library",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -263,7 +341,15 @@
         "coverage_pct": 39,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-feature-calculator-library",
+          "unified-features-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -286,8 +372,16 @@
         "status": "scaffolded",
         "dependencies": [
           "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-feature-calculator-library",
+          "unified-feature-orchestration-library",
+          "unified-features-interface",
+          "unified-internal-contracts",
           "unified-market-interface",
-          "unified-api-contracts"
+          "unified-reference-data-interface",
+          "unified-sports-reference-interface"
         ],
         "service_declaration": {
           "mode": "batch",
@@ -309,7 +403,14 @@
         "coverage_pct": 35,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-feature-calculator-library",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -330,7 +431,7 @@
         "coverage_pct": "N/A",
         "testing_level": "none",
         "status": "active",
-        "dependencies": [],
+        "dependencies": ["unified-config-interface"],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
@@ -347,7 +448,15 @@
         "coverage_pct": 53,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-api-contracts", "unified-trading-library"],
+        "dependencies": [
+          "unified-api-contracts",
+          "unified-trading-library",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-reference-data-interface",
+          "unified-internal-contracts",
+          "unified-sports-reference-interface"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -364,14 +473,18 @@
         "role": "service",
         "tags": ["cefi", "data-ingestion", "standard"],
         "version": "0.2.0",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 39,
         "testing_level": "integration",
         "status": "active",
         "dependencies": [
           "unified-trading-library",
           "market-tick-data-service",
-          "unified-api-contracts"
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts"
         ],
         "service_declaration": {
           "mode": "live",
@@ -394,13 +507,15 @@
         "role": "service",
         "tags": ["cefi", "data-ingestion", "standard"],
         "version": "0.3.1",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 73,
         "testing_level": "integration",
         "status": "active",
         "dependencies": [
           "unified-trading-library",
           "unified-api-contracts",
+          "unified-config-interface",
+          "unified-events-interface",
           "unified-market-interface"
         ],
         "service_declaration": {
@@ -418,6 +533,23 @@
         "completion_path": "cefi",
         "sit_level": "standard"
       },
+      "matching-engine-library": {
+        "type": "library",
+        "tier": 2,
+        "role": "library",
+        "tags": ["cross-domain", "execution", "important"],
+        "version": "0.1.3",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 89,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": ["unified-internal-contracts", "unified-api-contracts"],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
       "ml-inference-service": {
         "type": "service",
         "tier": 3,
@@ -428,7 +560,14 @@
         "coverage_pct": 75,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts",
+          "unified-ml-interface"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": [
@@ -454,7 +593,16 @@
         "coverage_pct": 35,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-ml-interface",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-feature-calculator-library",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -475,7 +623,13 @@
         "coverage_pct": 46,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "batch",
           "capabilities_needed": ["data_source", "data_sink", "event_bus"],
@@ -496,7 +650,15 @@
         "coverage_pct": 77,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts",
+          "unified-position-interface"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": [
@@ -518,11 +680,18 @@
         "role": "service",
         "tags": ["cefi", "risk", "standard"],
         "version": "0.1.0",
-        "ci_status": "FAILING",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": 77,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-api-contracts", "unified-trading-library"],
+        "dependencies": [
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts",
+          "unified-trading-library"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": ["data_source", "event_bus", "cache"],
@@ -543,7 +712,15 @@
         "coverage_pct": 72,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-domain-client",
+          "unified-events-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": [
@@ -585,11 +762,18 @@
         "role": "service",
         "tags": ["execution", "standard", "tradfi"],
         "version": "0.1.0",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 50,
         "testing_level": "integration",
         "status": "scaffolded",
-        "dependencies": ["unified-trading-library", "unified-api-contracts"],
+        "dependencies": [
+          "unified-trading-library",
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts"
+        ],
         "service_declaration": {
           "mode": "live",
           "capabilities_needed": [
@@ -622,14 +806,133 @@
         "completion_path": "core",
         "sit_level": "standard"
       },
-      "unified-market-interface": {
+      "unified-cloud-interface": {
+        "type": "library",
+        "tier": 0,
+        "role": "primitive",
+        "tags": ["config", "critical", "cross-domain"],
+        "version": "0.11.6",
+        "ci_status": "FAILING",
+        "coverage_pct": 82,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": ["unified-internal-contracts"],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-config-interface": {
+        "type": "library",
+        "tier": 0,
+        "role": "primitive",
+        "tags": ["config", "critical", "cross-domain"],
+        "version": "0.1.17",
+        "ci_status": "FAILING",
+        "coverage_pct": 97,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-events-interface",
+          "unified-cloud-interface",
+          "unified-internal-contracts"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-defi-execution-interface": {
         "type": "library",
         "tier": 2,
         "role": "interface",
-        "tags": ["cross-domain", "important"],
-        "version": "0.3.2",
+        "tags": ["defi", "execution", "important"],
+        "version": "0.1.1",
         "ci_status": "LOCAL_PASS",
-        "coverage_pct": 40,
+        "coverage_pct": 88,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-internal-contracts",
+          "unified-api-contracts",
+          "unified-config-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "defi",
+        "sit_level": "standard"
+      },
+      "unified-domain-client": {
+        "type": "library",
+        "tier": 3,
+        "role": "domain-client",
+        "tags": ["config", "cross-domain", "standard"],
+        "version": "0.1.14",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 84,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-config-interface",
+          "unified-cloud-interface",
+          "unified-api-contracts",
+          "unified-internal-contracts",
+          "unified-ml-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-events-interface": {
+        "type": "library",
+        "tier": 0,
+        "role": "primitive",
+        "tags": ["critical", "cross-domain", "events"],
+        "version": "0.2.2",
+        "ci_status": "FAILING",
+        "coverage_pct": 97,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-feature-calculator-library": {
+        "type": "library",
+        "tier": 2,
+        "role": "library",
+        "tags": ["cross-domain", "feature-computation", "important"],
+        "version": "0.1.0",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 95,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-config-interface",
+          "unified-events-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-internal-contracts": {
+        "type": "library",
+        "tier": 0,
+        "role": "contracts",
+        "tags": ["contracts", "critical", "cross-domain"],
+        "version": "0.1.2",
+        "ci_status": "FAILING",
+        "coverage_pct": 99,
         "testing_level": "integration",
         "status": "active",
         "dependencies": ["unified-api-contracts", "unified-trading-library"],
@@ -639,17 +942,166 @@
         "completion_path": "core",
         "sit_level": "standard"
       },
+      "unified-market-interface": {
+        "type": "library",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "important"],
+        "version": "0.3.2",
+        "ci_status": "FAILING",
+        "coverage_pct": 40,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-api-contracts",
+          "unified-config-interface",
+          "unified-cloud-interface",
+          "unified-internal-contracts",
+          "unified-events-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-ml-interface": {
+        "type": "library",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "important", "ml-inference", "ml-training"],
+        "version": "0.1.0",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 96,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-config-interface",
+          "unified-cloud-interface",
+          "unified-internal-contracts"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-position-interface": {
+        "type": "library",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "important", "risk"],
+        "version": "0.1.0",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 90,
+        "testing_level": "integration",
+        "status": "future",
+        "dependencies": ["unified-internal-contracts", "unified-api-contracts"],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-reference-data-interface": {
+        "type": "library",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "data-ingestion", "important"],
+        "version": "0.1.0",
+        "ci_status": "FAILING",
+        "coverage_pct": 87,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-cloud-interface",
+          "unified-internal-contracts",
+          "unified-api-contracts",
+          "unified-events-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-sports-execution-interface": {
+        "type": "library",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["execution", "important", "sports"],
+        "version": "0.1.1",
+        "ci_status": "FAILING",
+        "coverage_pct": 76,
+        "testing_level": "integration",
+        "status": "scaffolded",
+        "dependencies": [
+          "unified-api-contracts",
+          "unified-internal-contracts",
+          "unified-events-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "sports",
+        "sit_level": "standard"
+      },
+      "unified-trade-execution-interface": {
+        "type": "library",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "execution", "important"],
+        "version": "0.1.1",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 89,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-api-contracts",
+          "unified-config-interface",
+          "unified-sports-execution-interface",
+          "unified-internal-contracts"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-trading-codex": {
+        "type": "infrastructure",
+        "tier": null,
+        "role": "infrastructure",
+        "tags": ["config", "cross-domain", "standard"],
+        "version": "0.1.0",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 0,
+        "testing_level": "none",
+        "status": "active",
+        "dependencies": [],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "infrastructure",
+        "sit_level": "abbreviated"
+      },
       "unified-trading-library": {
         "type": "library",
         "tier": 1,
         "role": "library",
         "tags": ["contracts", "critical", "cross-domain"],
         "version": "0.3.167",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 78,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": ["unified-api-contracts"],
+        "dependencies": [
+          "unified-cloud-interface",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-internal-contracts",
+          "unified-api-contracts"
+        ],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
@@ -673,13 +1125,72 @@
         "completion_path": "all",
         "sit_level": "abbreviated"
       },
+      "unified-features-interface": {
+        "type": "interface",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "feature-computation", "important"],
+        "version": "0.1.0",
+        "ci_status": "FAILING",
+        "coverage_pct": 80,
+        "testing_level": "unit",
+        "status": "active",
+        "dependencies": [
+          "unified-api-contracts",
+          "unified-cloud-interface",
+          "unified-events-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-feature-orchestration-library": {
+        "type": "library",
+        "tier": 2,
+        "role": "library",
+        "tags": ["cross-domain", "feature-computation", "important"],
+        "version": "0.1.0",
+        "ci_status": "LOCAL_PASS",
+        "coverage_pct": 80,
+        "testing_level": "integration",
+        "status": "active",
+        "dependencies": [
+          "unified-trading-library",
+          "unified-feature-calculator-library",
+          "unified-features-interface"
+        ],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
+      "unified-sports-reference-interface": {
+        "type": "interface",
+        "tier": 2,
+        "role": "interface",
+        "tags": ["cross-domain", "important", "sports"],
+        "version": "0.1.0",
+        "ci_status": "FAILING",
+        "coverage_pct": 80,
+        "testing_level": "unit",
+        "status": "active",
+        "dependencies": ["unified-api-contracts", "unified-events-interface"],
+        "service_declaration": null,
+        "serves_ui": null,
+        "proxies_service": null,
+        "completion_path": "core",
+        "sit_level": "standard"
+      },
       "unified-trading-api": {
         "type": "api",
         "tier": 3,
         "role": null,
         "tags": ["gateway", "trading", "api"],
         "version": "0.1.0",
-        "ci_status": "FAILING",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": null,
         "testing_level": null,
         "status": "active",
@@ -695,8 +1206,8 @@
         "tier": 3,
         "role": "ui",
         "tags": ["cross-domain", "trading", "standard"],
-        "version": "0.2.0",
-        "ci_status": "FAILING",
+        "version": "0.1.0",
+        "ci_status": "LOCAL_PASS",
         "coverage_pct": "N/A",
         "testing_level": "unit",
         "status": "active",
@@ -709,9 +1220,9 @@
       },
       "deployment-ui": {
         "type": "ui",
-        "tier": 3,
+        "tier": "T3",
         "role": "Deployment management UI",
-        "tags": ["infrastructure", "deployment"],
+        "tags": [],
         "version": "0.1.0",
         "ci_status": "BASELINE_RECORDED",
         "coverage_pct": null,
@@ -725,13 +1236,14 @@
         "sit_level": null
       }
     },
-    "total_repos": 33,
+    "total_repos": 51,
     "versions": {
       "_note": "All versions reset to 0.x.x (2026-02-28). Nothing was stable under the old CI/CD \u2014 versions >=1.0.0 were aspirational. 1.0.0 will be set by GitHub Action on first successful main merge per repo. 0.x.y preserves relative evolution (e.g. UTL 0.2.2 reflects more history than AC 0.1.0).",
       "batch-live-reconciliation-service": "0.1.0",
       "deployment-api": "0.1.1",
       "deployment-service": "0.1.1",
       "deployment-ui": "0.1.0",
+      "execution-algo-library": "0.1.2",
       "execution-service": "0.1.1",
       "features-cross-instrument-service": "0.1.1",
       "features-multi-timeframe-service": "0.1.1",
@@ -739,10 +1251,27 @@
       "ibkr-gateway-infra": "0.1.0",
       "instruments-service": "0.1.22",
       "market-tick-data-service": "0.3.1",
+      "matching-engine-library": "0.1.3",
       "pnl-attribution-service": "0.1.0",
       "system-integration-tests": "0.2.0",
       "unified-api-contracts": "0.1.20",
+      "unified-cloud-interface": "0.11.6",
+      "unified-config-interface": "0.1.17",
+      "unified-defi-execution-interface": "0.1.1",
+      "unified-domain-client": "0.1.14",
+      "unified-events-interface": "0.2.2",
+      "unified-feature-calculator-library": "0.1.0",
+      "unified-feature-orchestration-library": "0.1.0",
+      "unified-features-interface": "0.1.0",
+      "unified-internal-contracts": "0.1.2",
       "unified-market-interface": "0.3.2",
+      "unified-ml-interface": "0.1.0",
+      "unified-position-interface": "0.1.0",
+      "unified-reference-data-interface": "0.1.0",
+      "unified-sports-execution-interface": "0.1.1",
+      "unified-sports-reference-interface": "0.1.0",
+      "unified-trade-execution-interface": "0.1.1",
+      "unified-trading-codex": "0.1.0",
       "unified-trading-library": "0.3.167",
       "unified-trading-pm": "1.2.0"
     },
@@ -756,26 +1285,66 @@
         },
         {
           "level": 1,
-          "description": "Foundation \u2014 zero inter-library dependencies (Tier 0). Depends on PM + codex for CI standards.",
-          "repos": ["unified-api-contracts"]
+          "description": "Standards & codex \u2014 coding standards, architecture docs, quality gate templates. Depends on PM.",
+          "repos": ["unified-trading-codex"]
         },
         {
           "level": 2,
-          "description": "Services runtime (Tier 1)",
-          "repos": ["unified-trading-library"]
+          "description": "Foundation \u2014 zero inter-library dependencies (Tier 0). Depends on PM + codex for CI standards.",
+          "repos": [
+            "unified-api-contracts",
+            "unified-cloud-interface",
+            "unified-events-interface",
+            "unified-internal-contracts"
+          ]
         },
         {
           "level": 3,
-          "description": "Core interfaces (depends on UTL, T0) \u2014 unified-market-interface",
-          "repos": ["unified-market-interface"]
+          "description": "Services runtime (Tier 1)",
+          "repos": [
+            "unified-config-interface",
+            "unified-reference-data-interface",
+            "unified-trading-library"
+          ]
         },
         {
           "level": 4,
+          "description": "T1c + T2 libraries (reference-data, algo, feature-calculator)",
+          "repos": [
+            "matching-engine-library",
+            "execution-algo-library",
+            "unified-feature-calculator-library"
+          ]
+        },
+        {
+          "level": 5,
+          "description": "Core interfaces (depends on UTEI, UTL, T0)",
+          "repos": [
+            "unified-domain-client",
+            "unified-market-interface",
+            "unified-ml-interface",
+            "unified-position-interface",
+            "unified-trade-execution-interface",
+            "unified-features-interface",
+            "unified-sports-reference-interface"
+          ]
+        },
+        {
+          "level": 6,
+          "description": "Execution interfaces \u2014 DeFi + sports",
+          "repos": [
+            "unified-defi-execution-interface",
+            "unified-sports-execution-interface",
+            "unified-feature-orchestration-library"
+          ]
+        },
+        {
+          "level": 7,
           "description": "Foundational service (instruments only; no service-domain-data dependency)",
           "repos": ["instruments-service"]
         },
         {
-          "level": 5,
+          "level": 8,
           "description": "Services with data-flow dependencies",
           "repos": [
             "alerting-service",
@@ -798,7 +1367,7 @@
           ]
         },
         {
-          "level": 6,
+          "level": 9,
           "description": "Operational services + API gateways",
           "repos": [
             "client-reporting-api",
@@ -807,7 +1376,7 @@
           ]
         },
         {
-          "level": 7,
+          "level": 10,
           "description": "Deployment infrastructure (deployment-api, deployment-service; deploys all services)",
           "repos": [
             "batch-live-reconciliation-service",
@@ -816,12 +1385,12 @@
           ]
         },
         {
-          "level": 8,
+          "level": 11,
           "description": "UI applications",
           "repos": ["deployment-ui", "unified-trading-system-ui"]
         },
         {
-          "level": 9,
+          "level": 12,
           "description": "IaC + post-deploy validation (deploy last; references all service images)",
           "repos": ["ibkr-gateway-infra", "system-integration-tests"]
         }
@@ -830,23 +1399,23 @@
     "tier_rules": {
       "0": {
         "allowed_from": [],
-        "description": "Pure leaf \u2014 zero inter-library deps. Uses doc dependencies (PM, codex) for CI standards. Repos: unified-api-contracts (includes internal contracts as unified_api_contracts.internal). NOTE: unified-events-interface, unified-cloud-interface, unified-config-interface merged into unified-trading-library."
+        "description": "Pure leaf \u2014 zero inter-library deps. Uses doc dependencies (PM, codex) for CI standards. Repos: unified-api-contracts, unified-internal-contracts, unified-events-interface, unified-cloud-interface, execution-algo-library, matching-engine-library"
       },
       "1": {
         "allowed_from": ["0"],
-        "description": "Services runtime (library) \u2014 imports Tier 0 only. Repos: unified-trading-library (UTL)"
+        "description": "Services runtime (library) \u2014 imports Tier 0 only. Services use UTL for L2. Repos: unified-trading-library (UTL), unified-reference-data-interface, unified-config-interface (UCI)"
       },
       "2": {
         "allowed_from": ["0", "1"],
-        "description": "Domain/market interfaces \u2014 imports Tier 0+1, NOT T3. Repos: unified-market-interface"
+        "description": "Domain/market interfaces \u2014 imports Tier 0+1, NOT Tier 3. Repos: unified-market-interface, unified-trade-execution-interface, unified-ml-interface, unified-feature-calculator-library, unified-position-interface, unified-defi-execution-interface, unified-sports-execution-interface"
       },
       "3": {
         "allowed_from": ["0", "1"],
-        "description": "Domain data client \u2014 cloud storage I/O, imports Tier 0+1. Repos: . NOTE: execution-service now contains its own execution interfaces (trade, defi, sports) as subpackages. instruments-service contains reference data as subpackage. position-balance-monitor-service contains position interface as subpackage."
+        "description": "Domain data client \u2014 cloud storage I/O, imports Tier 0+1. Repos: unified-domain-client (UDC)"
       },
       "service": {
         "allowed_from": ["0", "1", "2", "3"],
-        "description": "Services \u2014 import from all library tiers. Never import from another service repo. execution-service owns execution_service.trade_execution, execution_service.defi_execution, execution_service.sports_execution. instruments-service owns instruments_service.reference_data. position-balance-monitor-service owns position_balance_monitor_service.position_interface."
+        "description": "Services \u2014 import from all library tiers. Never import from another service repo."
       },
       "api": {
         "allowed_from": ["0", "1"],
@@ -858,7 +1427,7 @@
       },
       "infrastructure": {
         "allowed_from": [],
-        "description": "Infrastructure repos \u2014 IaC (Terraform), scripts. No Python package deps. Repos: ibkr-gateway-infra. NOTE: unified-trading-codex merged into unified-trading-pm/codex/ (2026-03-27)."
+        "description": "Infrastructure repos \u2014 codex, IaC (Terraform), scripts. No Python package deps. Repos: unified-trading-codex, ibkr-gateway-infra."
       },
       "devops": {
         "allowed_from": ["0", "1"],
@@ -874,21 +1443,52 @@
       "steps": [
         {
           "step": 1,
-          "packages": ["unified-api-contracts"],
-          "reason": "Foundation package with no dependencies (Tier 0)"
+          "packages": [
+            "unified-api-contracts",
+            "unified-internal-contracts",
+            "unified-events-interface",
+            "unified-cloud-interface"
+          ],
+          "reason": "Foundation packages with no dependencies (Tier 0)"
         },
         {
           "step": 2,
-          "packages": ["unified-trading-library"],
-          "reason": "Tier 1 packages. UTL depends on T0 libs."
+          "packages": [
+            "unified-config-interface",
+            "unified-reference-data-interface",
+            "unified-trading-library"
+          ],
+          "reason": "Tier 1 packages. UCI depends on UEI. UTL depends on T0 libs."
         },
         {
           "step": 3,
-          "packages": ["unified-market-interface"],
-          "reason": "Depend on domain services"
+          "packages": [
+            "unified-domain-client",
+            "execution-algo-library",
+            "unified-feature-calculator-library"
+          ],
+          "reason": "Depend on cloud services"
         },
         {
           "step": 4,
+          "packages": [
+            "unified-market-interface",
+            "unified-ml-interface",
+            "unified-trade-execution-interface",
+            "matching-engine-library"
+          ],
+          "reason": "Depend on domain services"
+        },
+        {
+          "step": 5,
+          "packages": [
+            "unified-defi-execution-interface",
+            "unified-position-interface"
+          ],
+          "reason": "Depend on market/execution interfaces"
+        },
+        {
+          "step": 6,
           "packages": ["All services"],
           "reason": "Can be published once all libraries are available"
         }
@@ -902,10 +1502,19 @@
         "description": "Minimum set for commercial CeFi trading: crypto spot+perp (Binance, OKX, Bybit, Hyperliquid) + traditional equities (IBKR).",
         "required_libraries": [
           "unified-api-contracts (CeFi venues: Binance, OKX, Bybit, Hyperliquid, Coinbase, IBKR, Deribit, Kalshi)",
-          "unified-trading-library (includes domain_client/, ml/, feature_calculator/, cloud_interface/, config_interface/, events_interface/ \u2014 merged from UDC, UMLI, UFCL, UCI, UEI, UCfI)",
+          "unified-internal-contracts",
+          "unified-config-interface",
+          "unified-events-interface",
+          "unified-cloud-interface",
+          "unified-reference-data-interface",
+          "unified-trading-library",
+          "unified-domain-client",
           "unified-market-interface",
-          "execution-service (includes trade_execution/, algo_library/, matching_engine/ \u2014 merged from UTEI, EAL, MEL)",
-          "position-balance-monitor-service (includes position_interface/ \u2014 merged from UPI; v1.0.0 needed before live)"
+          "unified-trade-execution-interface",
+          "execution-algo-library",
+          "unified-ml-interface",
+          "unified-feature-calculator-library",
+          "unified-position-interface (v1.0.0 needed before exec-services + PBM live)"
         ],
         "required_services": [
           "instruments-service",
@@ -932,9 +1541,9 @@
         "required_uis": ["unified-trading-system-ui", "deployment-ui"],
         "not_required": [
           "features-sports-service",
-          "execution-service (includes sports_execution/)",
+          "unified-sports-execution-interface",
           "features-onchain-service (optional DeFi)",
-          "execution-service (includes defi_execution/) (optional DeFi)",
+          "unified-defi-execution-interface (optional DeFi)",
           "Legacy split UIs, standalone APIs, npm UI-kit/workspace repos, experimental services, and scratch data trees \u2014 archived under workspace-root archive/ only (see archive/README.md). Not part of the active 1 UI + consolidated API surface."
         ]
       },
@@ -943,7 +1552,7 @@
         "milestone": "Post-CeFi",
         "description": "Adds on-chain protocol support (Uniswap, Aave, Curve, Hyperliquid DEX). Requires CeFi path complete first.",
         "additional_libraries": [
-          "execution-service (includes defi_execution/)",
+          "unified-defi-execution-interface",
           "unified-api-contracts (DeFi: Uniswap v3/v4, Aave v3, Curve, TheGraph, DeFiLlama)"
         ],
         "additional_services": ["features-onchain-service"],
@@ -954,7 +1563,7 @@
         "milestone": "Post-commercialisation",
         "description": "Sports betting as a separate vertical. Does NOT require DeFi. Can be done in parallel with CeFi post-commercialisation.",
         "additional_libraries": [
-          "execution-service (includes sports_execution/) (v1.0.0 \u2014 BaseSportsAdapter, Betfair, Pinnacle)",
+          "unified-sports-execution-interface (v1.0.0 \u2014 BaseSportsAdapter, Betfair, Pinnacle)",
           "unified-api-contracts (sports: api_football, FootyStats, soccer-football-info, Betfair, Pinnacle, Open Meteo)"
         ],
         "additional_services": [
@@ -966,14 +1575,17 @@
           "execution-service (sports execution module, merged from sports-execution-service)"
         ],
         "reuses_from_cefi": [
-          "unified-trading-library (includes domain_client/, ml/, feature_calculator/)",
+          "unified-trading-library",
+          "unified-domain-client",
+          "unified-ml-interface",
+          "unified-feature-calculator-library",
           "ml-training-service",
           "ml-inference-service",
           "strategy-service (sports strategy module)",
           "pnl-attribution-service"
         ],
         "requires_cefi_path": false,
-        "note": "Sports services consolidated 2026-03-01: sports-reference-data-service merged into instruments-service, sports-odds-processing-service merged into market-data-processing-service, sports-strategy-service merged into strategy-service, sports-execution-service merged into execution-service. 2026-03-26: unified-sports-execution-interface merged into execution-service as sports_execution/. 2026-03-27: unified-sports-reference-interface merged into URDI sports/ sub-package. features-sports-service remains standalone. Can develop sports ML pipeline in parallel with CeFi."
+        "note": "Sports services consolidated 2026-03-01: sports-reference-data-service merged into instruments-service, sports-odds-processing-service merged into market-data-processing-service, sports-strategy-service merged into strategy-service, sports-execution-service merged into execution-service. features-sports-service and unified-sports-execution-interface remain standalone. Can develop sports ML pipeline in parallel with CeFi. Only needs USEI v1.0.0 for live execution."
       }
     },
     "doc_standards": {
@@ -3082,6 +3694,12 @@
         "internal_count": 0,
         "external_count": 15
       },
+      "unified-trading-codex": {
+        "internal_deps": {},
+        "external_deps": {},
+        "internal_count": 0,
+        "external_count": 0
+      },
       "unified-api-contracts": {
         "internal_deps": {},
         "external_deps": {
@@ -3092,12 +3710,8 @@
           "httpx": ["httpx>=0.28.1,<1.0.0"],
           "hypothesis": ["hypothesis>=6.0.0,<7.0.0"],
           "ib-insync": ["ib_insync>=0.9.86,<1.0.0"],
-          "numpy": ["numpy>=2.3.0,<2.4.0"],
-          "pandas": ["pandas>=2.3.0,<3.0.0"],
-          "pandas-stubs": ["pandas-stubs>=2.2.0,<3.0.0"],
           "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
           "pre-commit": ["pre-commit>=3.0,<4.0.0"],
-          "pyarrow": ["pyarrow>=23.0.0,<24.0.0"],
           "pydantic": ["pydantic>=2.12.5,<3.0.0"],
           "pytest": ["pytest>=9.0.1,<10.0.0"],
           "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
@@ -3112,36 +3726,162 @@
           "vcrpy": ["vcrpy>=8.0.0,<9.0.0"]
         },
         "internal_count": 0,
-        "external_count": 25
+        "external_count": 21
       },
-      "unified-trading-library": {
+      "unified-cloud-interface": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0"
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
-          "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
-          "bandit<2.0.0,": ["bandit<2.0.0,>=1.7.0"],
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
           "basedpyright": ["basedpyright==1.38.2"],
           "boto3": ["boto3>=1.40.70,<2.0.0"],
           "boto3-stubs": ["boto3-stubs[s3,secretsmanager]>=1.35.0,<2.0.0"],
           "botocore": ["botocore>=1.34.0,<2.0.0"],
-          "databento": ["databento>=0.32.0,<1.0.0"],
-          "fastapi<1.0.0,": ["fastapi<1.0.0,>=0.115.0"],
-          "fsspec<2026.0.0,": ["fsspec<2026.0.0,>=2025.2.0"],
           "gcsfs": ["gcsfs>=2025.5.0,<2026.0.0"],
           "google-auth": ["google-auth>=2.40.0,<3.0.0"],
           "google-cloud-bigquery": ["google-cloud-bigquery>=3.40.0,<4.0.0"],
           "google-cloud-build": ["google-cloud-build>=3.0.0,<4.0.0"],
-          "google-cloud-compute<2.0.0,": [
-            "google-cloud-compute<2.0.0,>=1.45.0"
-          ],
+          "google-cloud-compute": ["google-cloud-compute>=1.45.0,<2.0.0"],
           "google-cloud-logging": ["google-cloud-logging>=3.12.0,<4.0.0"],
           "google-cloud-pubsub": ["google-cloud-pubsub>=2.28.0,<3.0.0"],
-          "google-cloud-run<1.0.0,": ["google-cloud-run<1.0.0,>=0.15.0"],
+          "google-cloud-run": ["google-cloud-run>=0.15.0,<1.0.0"],
           "google-cloud-secret-manager": [
             "google-cloud-secret-manager>=2.25.0,<3.0.0"
           ],
           "google-cloud-storage": ["google-cloud-storage>=3.8.0,<4.0.0"],
+          "moto": ["moto[s3,secretsmanager,sqs]>=5.0.0,<6.0.0"],
+          "pandas<3.0.0,": ["pandas<3.0.0,>=2.3.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pyjwt": ["PyJWT>=2.8.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "redis": ["redis>=5.0.0,<6.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "vcrpy": ["vcrpy>=8.0.0,<9.0.0"]
+        },
+        "internal_count": 1,
+        "external_count": 28
+      },
+      "unified-events-interface": {
+        "internal_deps": {},
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 0,
+        "external_count": 11
+      },
+      "unified-internal-contracts": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-trading-library": "unified-trading-library>=1.6.0,<2.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "numpy<2.4.0,": ["numpy<2.4.0,>=2.3.0"],
+          "pandas-stubs<3.0.0,": ["pandas-stubs<3.0.0,>=2.2.0"],
+          "pandas<3.0.0,": ["pandas<3.0.0,>=2.3.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pyarrow<24.0.0,": ["pyarrow<24.0.0,>=23.0.0"],
+          "pydantic": ["pydantic>=2.12.5,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "pyyaml<7.0.0,": ["pyyaml<7.0.0,>=6.0.1"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 2,
+        "external_count": 17
+      },
+      "unified-config-interface": {
+        "internal_deps": {
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pyasn1": ["pyasn1>=0.6.3,<0.7.0"],
+          "pydantic": ["pydantic>=2.12.5,<3.0.0"],
+          "pydantic-settings": ["pydantic-settings>=2.12.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "python-dateutil": ["python-dateutil>=2.8.2,<3.0.0"],
+          "pyyaml": ["pyyaml>=6.0.1,<7.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 3,
+        "external_count": 16
+      },
+      "unified-reference-data-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
+          "aioresponses": ["aioresponses>=0.7.6,<1.0.0"],
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "ccxt": ["ccxt>=4.5.24,<5.0.0"],
+          "google-auth": ["google-auth>=2.40.0,<3.0.0"],
+          "ib-insync<1.0.0,": ["ib-insync<1.0.0,>=0.9.86"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "vcrpy": ["vcrpy>=8.0.0,<9.0.0"]
+        },
+        "internal_count": 4,
+        "external_count": 17
+      },
+      "unified-trading-library": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.11.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "bandit<2.0.0,": ["bandit<2.0.0,>=1.7.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "databento": ["databento>=0.32.0,<1.0.0"],
+          "fastapi<1.0.0,": ["fastapi<1.0.0,>=0.115.0"],
+          "fsspec<2026.0.0,": ["fsspec<2026.0.0,>=2025.2.0"],
           "httpx<1.0.0,": ["httpx<1.0.0,>=0.28.1"],
           "joblib<2.0.0,": ["joblib<2.0.0,>=1.3.0"],
           "mypy<2.0.0,": ["mypy<2.0.0,>=1.13.0"],
@@ -3164,33 +3904,126 @@
           "prometheus-client": ["prometheus-client>=0.20.0,<1.0.0"],
           "psutil<7.0.0,": ["psutil<7.0.0,>=6.0.0"],
           "pyarrow<24.0.0,": ["pyarrow<24.0.0,>=23.0.0"],
-          "pyasn1": ["pyasn1>=0.6.3,<0.7.0"],
           "pydantic-settings<3.0.0,": ["pydantic-settings<3.0.0,>=2.12.0"],
           "pydantic<3.0.0,": ["pydantic<3.0.0,>=2.12.5"],
-          "pyjwt": ["PyJWT>=2.8.0,<3.0.0"],
           "pytest-asyncio<2.0.0,": ["pytest-asyncio<2.0.0,>=0.25.0"],
           "pytest-cov<8.0.0,": ["pytest-cov<8.0.0,>=7.0.0"],
           "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
           "pytest-timeout<3.0.0,": ["pytest-timeout<3.0.0,>=2.4.0"],
           "pytest-xdist<4.0.0,": ["pytest-xdist<4.0.0,>=3.6.0"],
           "pytest<10.0.0,": ["pytest<10.0.0,>=9.0.1"],
-          "python-dateutil": ["python-dateutil>=2.8.2,<3.0.0"],
           "python-dotenv<2.0.0,": ["python-dotenv<2.0.0,>=1.0.0"],
           "pyyaml<7.0.0,": ["pyyaml<7.0.0,>=6.0.1"],
-          "redis": ["redis>=5.0.0,<6.0.0"],
           "ruff": ["ruff==0.15.0"],
-          "scikit-learn": ["scikit-learn>=1.5.0,<2.0.0"],
-          "scipy": ["scipy>=1.15.0,<2.0.0"],
           "starlette": ["starlette>=0.46.3,<1.0.0"],
           "web3": ["web3>=6.0.0,<7.0.0"]
         },
-        "internal_count": 1,
-        "external_count": 54
+        "internal_count": 5,
+        "external_count": 34
+      },
+      "matching-engine-library": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 2,
+        "external_count": 10
+      },
+      "execution-algo-library": {
+        "internal_deps": {},
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pydantic": ["pydantic>=2.12.5,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-mock": ["pytest-mock>=3.15.0,<4.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "python-dateutil": ["python-dateutil>=2.8.2,<3.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 0,
+        "external_count": 14
+      },
+      "unified-feature-calculator-library": {
+        "internal_deps": {
+          "unified-config-interface": "unified-config-interface",
+          "unified-events-interface": "unified-events-interface"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "httpx<1.0.0,": ["httpx<1.0.0,>=0.28.1"],
+          "numpy": ["numpy>=2.3.0,<2.4.0"],
+          "pandas": ["pandas>=2.3.0,<3.0.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio<2.0.0,": ["pytest-asyncio<2.0.0,>=0.25.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-mock<4.0.0,": ["pytest-mock<4.0.0,>=3.15.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "scikit-learn": ["scikit-learn>=1.5.0,<2.0.0"],
+          "scipy<2.0.0,": ["scipy<2.0.0,>=1.15.0"]
+        },
+        "internal_count": 2,
+        "external_count": 16
+      },
+      "unified-domain-client": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.3.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-ml-interface": "unified-ml-interface>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pandas": ["pandas>=2.3.0,<3.0.0"],
+          "pandas-stubs": ["pandas-stubs>=2.2.0,<3.0.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pyarrow": ["pyarrow>=23.0.0,<24.0.0"],
+          "pyright": ["pyright>=1.1.390,<2.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-mock<4.0.0,": ["pytest-mock<4.0.0,>=3.15.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "pyyaml": ["pyyaml>=6.0.1,<7.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 5,
+        "external_count": 16
       },
       "unified-market-interface": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
-          "unified-trading-library": "unified-trading-library>=0.3.0,<1.0.0"
+          "unified-api-contracts": "unified-api-contracts>=0.1.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0",
+          "unified-config-interface": "unified-config-interface>=0.3.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
           "aiohttp<4.0.0,": ["aiohttp<4.0.0,>=3.13.2"],
@@ -3223,12 +4056,221 @@
           "websockets<15.0.0,": ["websockets<15.0.0,>=14.0"],
           "yfinance<1.0.0,": ["yfinance<1.0.0,>=0.2.66"]
         },
-        "internal_count": 2,
+        "internal_count": 5,
         "external_count": 29
+      },
+      "unified-ml-interface": {
+        "internal_deps": {
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.2,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "joblib": ["joblib>=1.3.0,<2.0.0"],
+          "numpy": ["numpy>=2.3.0,<2.4.0"],
+          "pandas": ["pandas>=2.3.0,<3.0.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "psutil": ["psutil>=6.0.0,<7.0.0"],
+          "pydantic": ["pydantic>=2.12.5,<3.0.0"],
+          "pydantic-settings": ["pydantic-settings>=2.12.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "python-dateutil": ["python-dateutil>=2.8.2,<3.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "scikit-learn": ["scikit-learn>=1.5.0,<2.0.0"],
+          "scipy": ["scipy>=1.15.0,<2.0.0"]
+        },
+        "internal_count": 3,
+        "external_count": 20
+      },
+      "unified-position-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "ccxt": ["ccxt>=4.5.24,<5.0.0"],
+          "httpx": ["httpx>=0.28.1,<1.0.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pydantic": ["pydantic>=2.12.5,<3.0.0"],
+          "pyjwt": ["PyJWT>=2.9.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 2,
+        "external_count": 13
+      },
+      "unified-trade-execution-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-sports-execution-interface": "unified-sports-execution-interface>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "aiohttp<4.0.0,": ["aiohttp<4.0.0,>=3.13.2"],
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "ccxt<5.0.0,": ["ccxt<5.0.0,>=4.5.24"],
+          "httpx<1.0.0,": ["httpx<1.0.0,>=0.28.1"],
+          "ib-insync": ["ib_insync>=0.9.86,<1.0.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pydantic": ["pydantic>=2.12.5,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "python-dateutil": ["python-dateutil>=2.8.2,<3.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "vcrpy": ["vcrpy>=8.0.0,<9.0.0"]
+        },
+        "internal_count": 4,
+        "external_count": 18
+      },
+      "unified-features-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.11.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0"
+        },
+        "external_deps": {
+          "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 3,
+        "external_count": 12
+      },
+      "unified-sports-reference-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0"
+        },
+        "external_deps": {
+          "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 2,
+        "external_count": 12
+      },
+      "unified-defi-execution-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.36,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=1.0.0,<2.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.2,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "responses": ["responses>=0.24.1,<1.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "vcrpy": ["vcrpy>=8.0.0,<9.0.0"]
+        },
+        "internal_count": 3,
+        "external_count": 12
+      },
+      "unified-sports-execution-interface": {
+        "internal_deps": {
+          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
+        },
+        "external_deps": {
+          "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
+          "aioresponses": ["aioresponses>=0.7.6,<1.0.0"],
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "beautifulsoup4": ["beautifulsoup4>=4.12,<5.0"],
+          "betfairlightweight": ["betfairlightweight>=2.20,<3.0"],
+          "cryptography": ["cryptography>=44.0.0,<47.0.0"],
+          "lxml": ["lxml>=5.0,<6.0"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "playwright": ["playwright>=1.40,<2.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov<8.0.0,": ["pytest-cov<8.0.0,>=7.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "pyyaml": ["pyyaml>=6.0.1,<7.0.0"],
+          "ruff": ["ruff==0.15.0"],
+          "vcrpy": ["vcrpy>=8.0.0,<9.0.0"]
+        },
+        "internal_count": 3,
+        "external_count": 19
+      },
+      "unified-feature-orchestration-library": {
+        "internal_deps": {
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.2.0,<1.0.0",
+          "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
+          "unified-trading-library": "unified-trading-library>=0.3.0,<1.0.0"
+        },
+        "external_deps": {
+          "bandit": ["bandit>=1.7.0,<2.0.0"],
+          "basedpyright": ["basedpyright==1.38.2"],
+          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
+          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
+          "pytest": ["pytest>=9.0.1,<10.0.0"],
+          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
+          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
+          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
+          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
+          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
+          "ruff": ["ruff==0.15.0"]
+        },
+        "internal_count": 3,
+        "external_count": 11
       },
       "instruments-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.2.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-reference-data-interface": "unified-reference-data-interface>=0.1.0,<1.0.0",
+          "unified-sports-reference-interface": "unified-sports-reference-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3263,12 +4305,16 @@
           "web3": ["web3>=6.0.0,<7.0.0"],
           "yfinance": ["yfinance>=0.2.66,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 7,
         "external_count": 30
       },
       "alerting-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3295,24 +4341,30 @@
           "sse-starlette": ["sse-starlette>=1.6.1,<2.0.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 22
       },
       "execution-service": {
         "internal_deps": {
+          "execution-algo-library": "execution-algo-library>=0.1.0,<1.0.0",
+          "matching-engine-library": "matching-engine-library>=0.1.0,<1.0.0",
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
-          "unified-market-interface": "unified-market-interface>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-defi-execution-interface": "unified-defi-execution-interface>=0.1.0,<1.0.0",
+          "unified-domain-client": "unified-domain-client>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-sports-execution-interface": "unified-sports-execution-interface>=0.1.0,<1.0.0",
+          "unified-trade-execution-interface": "unified-trade-execution-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
           "aiohttp<4.0.0,": ["aiohttp<4.0.0,>=3.13.2"],
-          "aioresponses": ["aioresponses>=0.7.6,<1.0.0"],
           "alembic": ["alembic>=1.13.0,<2.0.0"],
           "asyncpg": ["asyncpg>=0.31.0,<1.0.0"],
           "bandit": ["bandit>=1.7.0,<2.0.0"],
           "basedpyright": ["basedpyright==1.38.2"],
-          "beautifulsoup4": ["beautifulsoup4>=4.12,<5.0"],
-          "betfairlightweight": ["betfairlightweight>=2.20,<3.0"],
           "binance-futures-connector": [
             "binance-futures-connector>=2.0.0,<3.0.0"
           ],
@@ -3322,7 +4374,6 @@
           "fsspec": ["fsspec>=2025.2.0,<2026.0.0"],
           "greenlet": ["greenlet>=3.0.0,<4.0.0"],
           "httpx": ["httpx>=0.28.1,<1.0.0"],
-          "lxml": ["lxml>=5.0,<6.0"],
           "mypy": ["mypy>=1.13.0,<2.0.0"],
           "nautilus-trader": ["nautilus-trader>=1.221.0,<2.0.0"],
           "numpy": ["numpy>=2.3.0,<2.4.0"],
@@ -3337,7 +4388,6 @@
           "pandas": ["pandas>=2.3.0,<3.0.0"],
           "pandas-stubs": ["pandas-stubs>=2.2.0,<3.0.0"],
           "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
-          "playwright": ["playwright>=1.40,<2.0"],
           "prometheus-client": ["prometheus-client>=0.20.0,<1.0.0"],
           "psutil": ["psutil>=6.0.0,<7.0.0"],
           "psycopg2-binary": ["psycopg2-binary>=2.9.9,<3.0.0"],
@@ -3353,7 +4403,6 @@
           "python-dotenv": ["python-dotenv>=1.0.0,<2.0.0"],
           "python-multipart": ["python-multipart>=0.0.9,<1.0.0"],
           "requests": ["requests>=2.32.5,<3.0.0"],
-          "responses": ["responses>=0.24.1,<1.0.0"],
           "rich<15.0.0,": ["rich<15.0.0,>=14.2.0"],
           "ruff": ["ruff==0.15.0"],
           "scipy<2.0.0,": ["scipy<2.0.0,>=1.15.0"],
@@ -3362,15 +4411,20 @@
           "types-requests": ["types-requests>=2.32.0,<3.0.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"],
           "uvloop": ["uvloop>=0.21.0,<1.0.0; sys_platform != 'win32'"],
-          "vcrpy": ["vcrpy>=8.0.0,<9.0.0"],
           "websockets": ["websockets>=14.0,<15.0.0"]
         },
-        "internal_count": 3,
-        "external_count": 53
+        "internal_count": 12,
+        "external_count": 46
       },
       "features-calendar-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
+          "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3401,12 +4455,16 @@
           "ruff": ["ruff==0.15.0"],
           "types-requests": ["types-requests>=2.32.0,<3.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 8,
         "external_count": 26
       },
       "features-cross-instrument-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3440,12 +4498,17 @@
           "statsmodels<1.0.0,": ["statsmodels<1.0.0,>=0.14.6"],
           "tqdm": ["tqdm>=4.66.0,<5.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 29
       },
       "features-delta-one-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.4.0,<1.0.0"
         },
         "external_deps": {
@@ -3476,12 +4539,16 @@
           "ta-lib": ["ta-lib>=0.6.8,<1.0.0"],
           "tqdm": ["tqdm>=4.66.0,<5.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 7,
         "external_count": 26
       },
       "features-multi-timeframe-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<2.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<0.2.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<0.2.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.2.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3511,12 +4578,17 @@
           "scipy<2.0.0,": ["scipy<2.0.0,>=1.15.0"],
           "tqdm": ["tqdm>=4.66.0,<5.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 25
       },
       "features-onchain-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
+          "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3546,13 +4618,21 @@
           "tqdm": ["tqdm>=4.66.0,<5.0.0"],
           "types-requests": ["types-requests>=2.32.0,<3.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 7,
         "external_count": 25
       },
       "features-sports-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
+          "unified-feature-orchestration-library": "unified-feature-orchestration-library>=0.1.0,<1.0.0",
+          "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-market-interface": "unified-market-interface>=0.1.0,<1.0.0",
+          "unified-reference-data-interface": "unified-reference-data-interface>=0.1.0,<1.0.0",
+          "unified-sports-reference-interface": "unified-sports-reference-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3572,12 +4652,16 @@
           "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
           "ruff": ["ruff==0.15.0"]
         },
-        "internal_count": 3,
+        "internal_count": 11,
         "external_count": 15
       },
       "features-volatility-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3604,13 +4688,17 @@
           "tqdm": ["tqdm>=4.66.0,<5.0.0"],
           "types-requests": ["types-requests>=2.32.0,<3.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 22
       },
       "market-data-processing-service": {
         "internal_deps": {
           "market-tick-data-service": "market-tick-data-service>=0.1.0,<1.0.0",
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3646,12 +4734,14 @@
           "ruff": ["ruff==0.15.0"],
           "types-aiobotocore-full": ["types-aiobotocore-full>=2.26.0,<3.0.0"]
         },
-        "internal_count": 3,
+        "internal_count": 7,
         "external_count": 31
       },
       "market-tick-data-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-market-interface": "unified-market-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -3682,12 +4772,16 @@
           "types-requests": ["types-requests>=2.32.0,<3.0.0"],
           "uvicorn": ["uvicorn[standard]>=0.29.0,<1.0.0"]
         },
-        "internal_count": 3,
+        "internal_count": 5,
         "external_count": 25
       },
       "ml-inference-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-ml-interface": "unified-ml-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3727,12 +4821,18 @@
           "types-requests": ["types-requests>=2.32.0,<3.0.0"],
           "uvicorn": ["uvicorn>=0.34.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 31
       },
       "ml-training-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-ml-interface": "unified-ml-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.4.0,<1.0.0"
         },
         "external_deps": {
@@ -3771,12 +4871,15 @@
           "tqdm": ["tqdm>=4.66.0,<5.0.0"],
           "uvicorn": ["uvicorn>=0.34.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 8,
         "external_count": 34
       },
       "pnl-attribution-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3801,12 +4904,17 @@
           "scipy<2.0.0,": ["scipy<2.0.0,>=1.15.0"],
           "uvicorn": ["uvicorn[standard]>=0.29.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 5,
         "external_count": 20
       },
       "strategy-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-domain-client": "unified-domain-client>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.3.0,<1.0.0"
         },
         "external_deps": {
@@ -3852,12 +4960,15 @@
           "typer": ["typer>=0.9.0,<1.0.0"],
           "types-requests": ["types-requests>=2.32.0,<3.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 7,
         "external_count": 35
       },
       "features-commodity-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.4.0,<1.0.0"
         },
         "external_deps": {
@@ -3887,12 +4998,16 @@
           "ruff": ["ruff==0.15.0"],
           "scikit-learn": ["scikit-learn>=1.5.0,<2.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 5,
         "external_count": 25
       },
       "trading-agent-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3913,12 +5028,11 @@
           "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
           "ruff": ["ruff==0.15.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 16
       },
       "client-reporting-api": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.3.0,<1.0.0"
         },
         "external_deps": {
@@ -3943,12 +5057,17 @@
           "sse-starlette": ["sse-starlette>=1.6.1,<2.0.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 1,
         "external_count": 20
       },
       "position-balance-monitor-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
+          "unified-position-interface": "unified-position-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3984,12 +5103,16 @@
           "types-requests": ["types-requests>=2.32.0,<3.0.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 7,
         "external_count": 31
       },
       "risk-and-exposure-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.2.38,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.11.39,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.3.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -4024,12 +5147,15 @@
           "ruff": ["ruff==0.15.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 6,
         "external_count": 26
       },
       "batch-live-reconciliation-service": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -4041,12 +5167,15 @@
           "pytest-xdist<4.0.0,": ["pytest-xdist<4.0.0,>=3.6.0"],
           "pytest<10.0.0,": ["pytest<10.0.0,>=9.0.1"]
         },
-        "internal_count": 2,
+        "internal_count": 5,
         "external_count": 7
       },
       "deployment-api": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -4077,13 +5206,17 @@
           "ruff": ["ruff==0.15.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"]
         },
-        "internal_count": 2,
+        "internal_count": 5,
         "external_count": 26
       },
       "deployment-service": {
         "internal_deps": {
           "deployment-api": "deployment-api>=0.1.0,<1.0.0",
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
+          "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
+          "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
+          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
+          "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -4108,7 +5241,7 @@
           "ruff": ["ruff==0.15.0"],
           "uvicorn": ["uvicorn[standard]>=0.27.0,<1.0.0"]
         },
-        "internal_count": 3,
+        "internal_count": 7,
         "external_count": 20
       },
       "deployment-ui": {
@@ -4124,7 +5257,9 @@
         "external_count": 0
       },
       "ibkr-gateway-infra": {
-        "internal_deps": {},
+        "internal_deps": {
+          "unified-config-interface": "unified-config-interface>=0.2.0,<1.0.0"
+        },
         "external_deps": {
           "bandit": ["bandit>=1.7.0,<2.0.0"],
           "basedpyright": ["basedpyright==1.38.2"],
@@ -4139,7 +5274,7 @@
           "pytest-xdist<4.0.0,": ["pytest-xdist<4.0.0,>=3.6.0"],
           "ruff": ["ruff==0.15.0"]
         },
-        "internal_count": 0,
+        "internal_count": 1,
         "external_count": 12
       },
       "system-integration-tests": {
