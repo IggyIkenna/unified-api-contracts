@@ -135,6 +135,7 @@ from .market_data_categories import (
     TIMEFRAME_SECONDS,
     TIMEFRAMES,
     VENUE_DATA_TYPE_CAPABILITIES,
+    VENUE_REFERENCE_DATA_CAPABILITIES,
     VENUE_TO_CATEGORY,
     VENUES_BY_CATEGORY,
     get_expected_data_types_for_venue,

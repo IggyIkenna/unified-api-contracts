@@ -631,44 +631,71 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "DRAFTKINGS": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     "FANDUEL": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     "BET365": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
-    # ── Prediction ──
+    # ── Prediction (market data only — metadata is reference data, see below) ──
     "POLYMARKET": {
         "prediction_trades": "2024-06-01",
         "prediction_book_snapshot": "2024-06-01",
-        "prediction_market_metadata": "2024-06-01",
     },
     "KALSHI": {
         "prediction_trades": "2024-06-01",
         "prediction_book_snapshot": "2024-06-01",
-        "prediction_market_metadata": "2024-06-01",
     },
 }
+
+# Reference data capabilities — static/structural data collected by
+# instruments-service.  Separate from market data capabilities above.
+# Market shards (BTC, ETH, SPX, etc.) are emergent from the data and
+# not declared here — only explicitly-typed reference data goes here.
+# Reference data capabilities — reserved for instruments-service reference
+# data types that are genuinely separate from the instruments themselves.
+# Prediction market metadata is NOT separate — the instruments parquet IS
+# the metadata (market question, outcomes, expiry are InstrumentRecord fields).
+VENUE_REFERENCE_DATA_CAPABILITIES: dict[str, dict[str, str]] = {}
 
 
 def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
     """Return the start date for a specific (venue, data_type) pair.
 
     Priority:
-    1. VENUE_DATA_TYPE_CAPABILITIES[venue][data_type] — explicit per-data-type date
-    2. VenueMapping.venue_start_dates[venue] — venue-level default (lazy import)
-    3. None — unknown venue/data_type (permissive)
+    1. VENUE_DATA_TYPE_CAPABILITIES[venue][data_type] — market data
+    2. VENUE_REFERENCE_DATA_CAPABILITIES[venue][data_type] — reference data
+    3. VenueMapping.venue_start_dates[venue] — venue-level default (lazy import)
+    4. None — unknown venue/data_type (permissive)
     """
     caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
     if data_type in caps:
         return caps[data_type]
+    ref_caps = VENUE_REFERENCE_DATA_CAPABILITIES.get(venue, {})
+    if data_type in ref_caps:
+        return ref_caps[data_type]
     # Fall back to venue start date from VenueMapping
     from .venue_mapping import VenueMapping  # noqa: qg-inside-import
 
     vm = VenueMapping()
+    # Check compound key first (e.g. POLYMARKET:CRUDE_OIL) for per-shard start dates
+    compound = f"{venue}:{data_type}" if data_type else venue
+    compound_start = vm.get_venue_start_date(compound)
+    if compound_start:
+        return compound_start
     return vm.get_venue_start_date(venue)
 
 
-def get_expected_data_types_for_venue(venue: str) -> list[str]:
+def get_expected_data_types_for_venue(
+    venue: str,
+    service: str = "",
+) -> list[str]:
     """Return the list of data types a venue is expected to produce.
 
-    Uses VENUE_DATA_TYPE_CAPABILITIES if the venue is explicitly listed,
-    else falls back to category-level DATA_TYPES_BY_CATEGORY.
+    The capabilities registry is split by service layer:
+    - instruments-service → VENUE_REFERENCE_DATA_CAPABILITIES (static metadata)
+    - MTDS/MDPS/features → VENUE_DATA_TYPE_CAPABILITIES (market data)
+
+    Market shards (BTC, ETH, SPX for prediction) are emergent from the index
+    and not declared in either registry — they appear automatically.
     """
+    if service == "instruments-service":
+        ref_caps = VENUE_REFERENCE_DATA_CAPABILITIES.get(venue, {})
+        return sorted(ref_caps.keys()) if ref_caps else []
     caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
     if caps:
         return sorted(caps.keys())

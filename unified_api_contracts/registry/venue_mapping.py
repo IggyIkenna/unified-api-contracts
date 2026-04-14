@@ -272,19 +272,25 @@ class VenueMapping:
             "JITO-SOLANA": "2021-11-01",
             "MARINADE-SOLANA": "2021-08-01",
             # Prediction — Polymarket
-            # POLYMARKET base venue start = earliest instrument data
-            "POLYMARKET": "2025-03-13",
-            # Per-underlying shard start dates (consistent daily presence)
-            # These are used by deployment-ui for accurate completion %
+            # POLYMARKET base venue start = first date with actual instruments
+            "POLYMARKET": "2025-03-14",
+            # Per-market start dates — verified from GCS instrument parquets.
+            # Each market's denominator starts from its actual first appearance.
             "POLYMARKET:BTC": "2025-03-13",
             "POLYMARKET:ETH": "2025-03-14",
-            "POLYMARKET:SOL": "2025-05-08",
-            "POLYMARKET:XRP": "2025-05-15",
-            "POLYMARKET:DOGE": "2026-03-09",
-            "POLYMARKET:HYPE": "2026-03-08",
-            "POLYMARKET:BNB": "2026-03-08",
+            "POLYMARKET:SOL": "2025-03-14",
+            "POLYMARKET:XRP": "2025-03-31",
+            "POLYMARKET:DOGE": "2025-03-14",
+            "POLYMARKET:HYPE": "2025-05-08",
+            "POLYMARKET:BNB": "2025-10-16",
             "POLYMARKET:FOOTBALL": "2025-10-18",
             "POLYMARKET:OTHER": "2025-03-13",
+            "POLYMARKET:SPX": "2025-10-15",
+            "POLYMARKET:DJIA": "2025-10-15",
+            "POLYMARKET:NDX": "2025-10-15",
+            "POLYMARKET:CRUDE_OIL": "2025-12-08",  # Gap Oct 27-Dec 7 (Polymarket didn't list daily)
+            "POLYMARKET:GOLD": "2025-12-09",
+            "POLYMARKET:SILVER": "2025-12-09",
         }
     )
 
@@ -382,11 +388,69 @@ class VenueMapping:
         """
         return self.venue_start_dates.get(venue) or self.source_data_start_dates.get(venue)
 
+    # Prediction market shards tied to traditional financial instruments —
+    # these only trade on weekdays (no UP_DOWN market on weekends because
+    # the underlying doesn't move).  Crypto shards trade 24/7.
+    _WEEKDAY_ONLY_PREDICTION_SHARDS: frozenset[str] = frozenset(
+        {
+            "POLYMARKET:SPX",
+            "POLYMARKET:DJIA",
+            "POLYMARKET:NDX",
+            "POLYMARKET:CRUDE_OIL",
+            "POLYMARKET:GOLD",
+            "POLYMARKET:SILVER",
+            "POLYMARKET:DAX",
+            "POLYMARKET:FTSE",
+            "POLYMARKET:NIKKEI",
+            "POLYMARKET:HANG_SENG",
+            "POLYMARKET:RUSSELL_2000",
+            # Individual stocks
+            "POLYMARKET:AAPL",
+            "POLYMARKET:TSLA",
+            "POLYMARKET:NVDA",
+            "POLYMARKET:META",
+            "POLYMARKET:MSFT",
+            "POLYMARKET:GOOGL",
+            "POLYMARKET:NFLX",
+            "POLYMARKET:PLTR",
+            "POLYMARKET:AMZN",
+            "POLYMARKET:AMD",
+        }
+    )
+
+    # US market holidays — Polymarket doesn't list UP_DOWN markets for
+    # traditional instruments on these days.
+    _US_MARKET_HOLIDAYS: frozenset[str] = frozenset(
+        {
+            # 2025
+            "2025-01-01",
+            "2025-01-20",
+            "2025-02-17",
+            "2025-05-26",
+            "2025-06-19",
+            "2025-07-04",
+            "2025-09-01",
+            "2025-11-27",
+            "2025-12-25",
+            # 2026
+            "2026-01-01",
+            "2026-01-19",
+            "2026-02-16",
+            "2026-05-25",
+            "2026-06-19",
+            "2026-07-03",
+            "2026-09-07",
+            "2026-11-26",
+            "2026-12-25",
+        }
+    )
+
     def get_expected_trading_dates(self, venue: str, start_date: str, end_date: str) -> list[str]:
         """Return expected trading dates for a venue between start and end dates.
 
-        TradFi venues (NASDAQ, NYSE, CME, ICE, CBOE, FX) trade weekdays only.
-        All other venues (crypto, DeFi, sports, prediction) trade 24/7.
+        TradFi venues and prediction shards tied to traditional markets
+        (SPX, CRUDE_OIL, GOLD, etc.) trade weekdays only.
+        Crypto venues/shards (BTC, ETH, SOL) trade 24/7 including weekends.
         """
         import pandas as pd
 
@@ -394,9 +458,12 @@ class VenueMapping:
 
         all_dates = pd.date_range(start_date, end_date, freq="D")
         category = VENUE_TO_CATEGORY.get(venue, "")
-        if category == "tradfi":
-            # Weekdays only (Mon-Fri)
+        weekday_only = category == "tradfi" or venue in self._WEEKDAY_ONLY_PREDICTION_SHARDS
+        if weekday_only:
             all_dates = all_dates[all_dates.weekday < 5]
+            # Exclude US market holidays
+            date_strs = all_dates.strftime("%Y-%m-%d")
+            return [d for d in date_strs if d not in self._US_MARKET_HOLIDAYS]
         return [d.strftime("%Y-%m-%d") for d in all_dates]
 
     def is_venue_available_on_date(self, venue: str, target_date: datetime | date | str) -> bool:

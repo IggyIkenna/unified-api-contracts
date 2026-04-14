@@ -311,8 +311,52 @@ def normalize_api_football_odds(
     return out
 
 
+def normalize_api_football_standing(raw: dict[str, object], league_id: str = "", season: str = "") -> dict[str, object]:
+    """Normalize a single API-Football standing row."""
+    return {"league_id": league_id, "season": season, **{k: v for k, v in raw.items() if isinstance(k, str)}}
+
+
+def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:
+    """Normalize a single API-Football injury row."""
+    return dict(raw) if isinstance(raw, dict) else {}
+
+
+def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str = "") -> dict[str, object]:
+    """Normalize a single API-Football fixture stats row."""
+    result = dict(raw) if isinstance(raw, dict) else {}
+    result["fixture_id"] = fixture_id
+    return result
+
+
+def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str = "") -> dict[str, object]:
+    """Normalize a single API-Football fixture event row."""
+    result = dict(raw) if isinstance(raw, dict) else {}
+    result["fixture_id"] = fixture_id
+    return result
+
+
+def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+    """Normalize a single API-Football lineup row into player-level records."""
+    result = dict(raw) if isinstance(raw, dict) else {}
+    result["fixture_id"] = fixture_id
+    return [result]
+
+
+def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+    """Normalize API-Football player statistics into per-player records."""
+    result = dict(raw) if isinstance(raw, dict) else {}
+    result["fixture_id"] = fixture_id
+    return [result]
+
+
 __all__ = [
     "normalize_api_football_fixture",
+    "normalize_api_football_fixture_event",
+    "normalize_api_football_fixture_stats",
     "normalize_api_football_fixture_to_market",
+    "normalize_api_football_injury",
+    "normalize_api_football_lineup",
     "normalize_api_football_odds",
+    "normalize_api_football_player_stats",
+    "normalize_api_football_standing",
 ]
