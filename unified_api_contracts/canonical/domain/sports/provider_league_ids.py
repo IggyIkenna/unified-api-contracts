@@ -710,3 +710,60 @@ def get_provider_league_id(canonical_league_id: str, provider: str) -> str | int
     if provider == "odds_api":
         return _CANONICAL_TO_ODDS_API_DISPLAY.get(canonical_league_id)
     return None
+
+
+# ---------------------------------------------------------------------------
+# Sports entity → league coverage mapping
+#
+# Maps each sports manifest entity name to the set of canonical league IDs
+# it covers.  ``None`` means "all leagues" — the entity is expected on every
+# date that has ANY fixture.  A specific ``frozenset`` means the entity is
+# only expected on dates where at least one of those leagues has a fixture.
+#
+# Used by instruments-service (freshness check) and deployment-api (denominator)
+# to avoid phantom "missing" data for entities that only cover a subset of
+# leagues (e.g. Understat covers 5 European leagues, not J1 or MLS).
+# ---------------------------------------------------------------------------
+
+# Derived from UNDERSTAT_NAMES keys — the 5 leagues Understat covers.
+_UNDERSTAT_LEAGUE_COVERAGE: frozenset[str] = frozenset(UNDERSTAT_NAMES.keys())
+
+SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
+    # Core entities — expected on all fixture dates
+    "FIXTURES": None,
+    "LEAGUES": None,
+    "TEAMS": None,
+    "STANDINGS": None,
+    "INJURIES": None,
+    # Per-fixture entities — expected on all fixture dates
+    "FIXTURE_STATS": None,
+    "FIXTURE_EVENTS": None,
+    "FIXTURE_LINEUPS": None,
+    "PLAYER_STATS": None,
+    # Enrichment entities — coverage varies by source
+    "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
+    "MATCHES": None,  # FootyStats: all leagues
+    "PREDICTIONS": None,  # FootyStats: all leagues
+    "TRANSFERMARKT_LEAGUES": None,  # Transfermarkt: all mapped leagues
+    "PLAYER_VALUES": None,  # Transfermarkt: all mapped leagues
+    "SFI_LEAGUES": None,  # SFI: all mapped leagues
+    "SFI_STANDINGS": None,  # SFI: all mapped leagues
+    "SFI_PROGRESSIVE_STATS": None,  # SFI: all mapped leagues
+    "WEATHER": None,  # Open Meteo: all fixtures with coordinates
+}
+
+
+def get_entity_league_coverage(entity: str) -> frozenset[str] | None:
+    """Return the set of canonical league IDs an entity covers.
+
+    Returns ``None`` if the entity covers all leagues (expected on every
+    fixture date).  Returns a ``frozenset`` of canonical league IDs if
+    the entity is only expected when those specific leagues have fixtures.
+
+    Args:
+        entity: Sports manifest entity name (e.g. "XG", "FIXTURES").
+
+    Returns:
+        League coverage set, or ``None`` for all-league entities.
+    """
+    return SPORTS_ENTITY_LEAGUE_COVERAGE.get(entity.upper())

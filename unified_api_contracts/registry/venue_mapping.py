@@ -17,6 +17,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
+import pandas as pd
+
 
 @dataclass
 class VenueMapping:
@@ -452,8 +454,6 @@ class VenueMapping:
         (SPX, CRUDE_OIL, GOLD, etc.) trade weekdays only.
         Crypto venues/shards (BTC, ETH, SOL) trade 24/7 including weekends.
         """
-        import pandas as pd
-
         from unified_api_contracts.registry.market_data_categories import VENUE_TO_CATEGORY
 
         all_dates = pd.date_range(start_date, end_date, freq="D")

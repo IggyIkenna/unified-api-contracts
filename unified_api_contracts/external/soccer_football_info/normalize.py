@@ -19,6 +19,9 @@ from unified_api_contracts.canonical.domain import (
     CanonicalVenue,
 )
 from unified_api_contracts.canonical.domain.features import FeatureMetadata
+from unified_api_contracts.canonical.domain.sports.progressive import (
+    CanonicalProgressiveStats,
+)
 
 from .schemas import (
     SFILeague,
@@ -227,10 +230,56 @@ def normalize_soccer_football_info_feature_record(
     )
 
 
+def normalize_soccer_football_info_progressive_stats(
+    raw: SFIMatchProgressiveStats,
+) -> CanonicalProgressiveStats:
+    """Convert SFIMatchProgressiveStats to CanonicalProgressiveStats.
+
+    SFI provides 30-second interval stats per team including goals,
+    possession, shots, corners, fouls, cards, dangerous attacks, and
+    dominance percentage.  The timer field is a string like "00:30",
+    "01:00" etc. — parsed to total seconds.
+    """
+    timer_seconds = _parse_timer_to_seconds(raw.timer)
+    return CanonicalProgressiveStats(
+        fixture_id=raw.match_id,
+        timer_seconds=timer_seconds,
+        team=raw.team,
+        goals=raw.goals,
+        possession_pct=float(raw.possession) if raw.possession is not None else None,
+        dangerous_attacks=raw.dangerous_attacks,
+        attacks=None,
+        shots_on_target=raw.shots_on_target,
+        shots_off_target=None,
+        corners=raw.corners,
+        fouls=raw.fouls,
+        yellow_cards=raw.yellow_cards,
+        red_cards=raw.red_cards,
+        substitutions=None,
+        dominance_pct=None,
+    )
+
+
+def _parse_timer_to_seconds(timer: str) -> int:
+    """Parse SFI timer string "MM:SS" to total seconds.
+
+    Examples: "00:30" -> 30, "45:00" -> 2700, "90:00" -> 5400.
+    Falls back to 0 on parse errors.
+    """
+    parts = timer.split(":")
+    if len(parts) == 2:
+        try:
+            return int(parts[0]) * 60 + int(parts[1])
+        except (ValueError, TypeError):
+            return 0
+    return 0
+
+
 __all__ = [
     "normalize_soccer_football_info_feature_record",
     "normalize_soccer_football_info_fixture",
     "normalize_soccer_football_info_league",
     "normalize_soccer_football_info_player",
+    "normalize_soccer_football_info_progressive_stats",
     "normalize_soccer_football_info_team",
 ]

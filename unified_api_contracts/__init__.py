@@ -496,6 +496,7 @@ from .registry import (
     TRADFI_TICKER_UNIVERSE,
     TRADFI_VENUE_MAPPINGS,
     VENUE_CATEGORY_MAP,
+    VENUE_COORDINATES,
     VENUE_TO_CATEGORY,
     VENUES_BY_CATEGORY,
     ZERO_ALPHA_VENUES,
@@ -511,6 +512,7 @@ from .registry import (
     ResponseFormat,
     SessionTimes,
     TradFiInstrumentDef,
+    VenueCoordinates,
     VenueMapping,
     get_databento_symbols_for_dataset,
     get_databento_symbols_for_venue,
@@ -518,8 +520,10 @@ from .registry import (
     get_required_datasets,
     get_session_times,
     get_valid_data_types_for_venue,
+    get_venue_coordinates,
     get_venue_data_type_start_date,
     is_trading_hours,
+    needs_candle_processing,
     resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
 )
@@ -593,6 +597,7 @@ __all__ = [
     "VALID_TIMEFRAMES",
     "VENUES_BY_CATEGORY",
     "VENUE_CATEGORY_MAP",
+    "VENUE_COORDINATES",
     "VENUE_ERROR_MAP",
     "VENUE_EXECUTION_REGISTRY",
     "VENUE_TO_CATEGORY",
@@ -954,6 +959,7 @@ __all__ = [
     "UpbitWithdrawRequest",
     "UpbitWithdrawResponse",
     "VenueCategory",
+    "VenueCoordinates",
     "VenueErrorClassification",
     "VenueExecutionProfile",
     "VenueMapping",
@@ -975,6 +981,7 @@ __all__ = [
     "get_data_sources_for_venue",
     "get_databento_symbols_for_venue",
     "get_required_secrets",
+    "get_venue_coordinates",
 ]
 
 # fmt: off

@@ -21,6 +21,7 @@ class TransfermarktPlayer(BaseModel):
     nationality: str | None = None
     market_value_eur: float | None = None
     market_value_currency: str | None = None
+    valuation_date: str | None = None
     club: str | None = None
     age: int | None = None
     contract_until: str | None = None

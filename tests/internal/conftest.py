@@ -1,14 +1,15 @@
-"""Pytest configuration for unified-internal-contracts.
+"""Pytest configuration for tests/internal/.
 
 Tier 0 library: no workspace dependencies to mock.
 Provides standard session-scoped fixtures for test isolation.
+
+NOTE: pytest_plugins is declared in the root tests/conftest.py only
+(pytest forbids it in non-root conftest files).
 """
 
 import os
 
 import pytest
-
-pytest_plugins = ["unified_api_contracts.testing.network_block_plugin"]
 
 
 @pytest.fixture(scope="session", autouse=True)

@@ -233,7 +233,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "dex_pools": False,
     "dex_swaps": True,
     "lending_indices": False,
-    "liquidations": True,
+    # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
     "lst_rates": False,
     "oracle_prices": False,
@@ -393,6 +393,31 @@ def validate_data_type_for_venue(venue: str, data_type: str) -> bool:
 # DATA_TYPES_BY_CATEGORY with VenueMapping.venue_start_dates as the start date.
 # Only venues with non-default data type availability need explicit entries.
 #
+# ── MVP Data Type Overrides ──
+# In MVP mode, we limit downloads to reduce cost and API calls.
+# Key decision: Deribit options — only download options_chain (IV/greeks, bulk 1-call)
+# not trades/book_snapshot_5/derivative_ticker/liquidations per individual option strike
+# (~12,000 API calls/day → 1 call/day). Full tick data for individual options is
+# only needed for execution quality analysis, not for strategy/ML.
+# Perpetuals still get all data types (trades, book, deriv_ticker, liquidations).
+
+MVP_VENUE_DATA_TYPES: dict[str, list[str]] = {
+    # Deribit: perpetual data types + only bulk-downloadable chain types (no per-strike tick data)
+    "DERIBIT": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations", "options_chain", "futures_chain"],
+    # For other CeFi venues, perpetuals get all data types (same as full mode)
+    # TradFi: controlled by tick_windows + MVP_CME_EXCHANGE_CODES (ES-only)
+}
+
+# Deribit MVP: which instrument types get which data types.
+# Options/futures only get chain data types (bulk download).
+# Perpetuals get all data types (per-symbol download, but only ~20 perps).
+DERIBIT_MVP_INSTRUMENT_TYPE_DATA_TYPES: dict[str, list[str]] = {
+    "perpetual": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations"],
+    "options_chain": ["options_chain"],  # Bulk only — no per-strike trades/book
+    "futures_chain": ["futures_chain"],  # Bulk only — no per-contract trades/book
+}
+
+
 # Override entries needed when:
 # - A venue's data type started later than the venue itself (e.g. Deribit options added later)
 # - A venue only supports a subset of its category's data types (e.g. CBOE has ohlcv_15m only)
@@ -657,7 +682,6 @@ def is_in_tradfi_tick_window(date_str: str) -> bool:
     is downloaded.
     """
     return any(w["start"] <= date_str <= w["end"] for w in TRADFI_TICK_DATA_WINDOWS)
-
 
 
 def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:

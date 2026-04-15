@@ -82,11 +82,15 @@ from .odds import OddsType as OddsType
 from .odds import OutcomeType as OutcomeType
 from .odds_api_mapping import ODDS_API_KEY_TO_VENUE as ODDS_API_KEY_TO_VENUE
 from .odds_api_mapping import ODDS_API_KEY_TO_VENUE_CATEGORY as ODDS_API_KEY_TO_VENUE_CATEGORY
+from .progressive import CanonicalProgressiveOdds as CanonicalProgressiveOdds
+from .progressive import CanonicalProgressiveStats as CanonicalProgressiveStats
 from .provider_league_ids import FOOTYSTATS_HISTORICAL_SEASON_IDS as FOOTYSTATS_HISTORICAL_SEASON_IDS
 from .provider_league_ids import FOOTYSTATS_SEASON_IDS as FOOTYSTATS_SEASON_IDS
 from .provider_league_ids import SOCCER_FOOTBALL_INFO_IDS as SOCCER_FOOTBALL_INFO_IDS
+from .provider_league_ids import SPORTS_ENTITY_LEAGUE_COVERAGE as SPORTS_ENTITY_LEAGUE_COVERAGE
 from .provider_league_ids import TRANSFERMARKT_IDS as TRANSFERMARKT_IDS
 from .provider_league_ids import UNDERSTAT_NAMES as UNDERSTAT_NAMES
+from .provider_league_ids import get_entity_league_coverage as get_entity_league_coverage
 from .provider_league_ids import get_provider_league_id as get_provider_league_id
 from .round_names import ROUND_NAMES as ROUND_NAMES
 from .round_names import ROUND_PREFIXES as ROUND_PREFIXES
@@ -104,6 +108,17 @@ from .team_mapping_data import resolve_footystats_team as resolve_footystats_tea
 from .team_mapping_data import resolve_understat_team as resolve_understat_team
 from .team_mapping_data_bundesliga import BUNDESLIGA_TEAM_MAPPINGS as BUNDESLIGA_TEAM_MAPPINGS
 from .team_mapping_data_epl import EPL_TEAM_MAPPINGS as EPL_TEAM_MAPPINGS
+from .transfer_windows import TransferWindowPeriod as TransferWindowPeriod
+from .transfer_windows import days_since_window_close as days_since_window_close
+from .transfer_windows import days_until_window_open as days_until_window_open
+from .transfer_windows import get_active_window as get_active_window
+from .transfer_windows import get_transfer_windows_for_year as get_transfer_windows_for_year
+from .transfer_windows import get_windows_for_league as get_windows_for_league
+from .transfer_windows import is_transfer_data_expected as is_transfer_data_expected
+from .transfer_windows import is_transfer_window_open as is_transfer_window_open
+from .transfer_windows import most_recent_window_close as most_recent_window_close
+from .transfer_windows import next_window_open as next_window_open
+from .transfer_windows import window_closed_within as window_closed_within
 from .venue_execution import (
     AccountVerificationLevel as AccountVerificationLevel,
 )

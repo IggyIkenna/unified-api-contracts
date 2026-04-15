@@ -28,6 +28,8 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 
+from .canonical_ids import build_team_id
+
 logger = logging.getLogger(__name__)
 
 _DATA_FILE = Path(__file__).parent / "data" / "team_mapping.csv"
@@ -82,9 +84,9 @@ def _us_name_index() -> dict[str, str]:
     """Index: Understat team name (lowercased) → canonical_team_id."""
     idx: dict[str, str] = {}
     for row in _load_mapping():
-        us_name = row.get("us_team_name", "").strip()
-        if us_name:
-            idx[us_name.lower()] = row["canonical_team_id"]
+        us_name = row.get("us_team_name")
+        if us_name is not None and us_name.strip():
+            idx[us_name.strip().lower()] = row["canonical_team_id"]
     return idx
 
 
@@ -93,9 +95,9 @@ def _ft_name_index() -> dict[str, str]:
     """Index: FootyStats team name (lowercased) → canonical_team_id."""
     idx: dict[str, str] = {}
     for row in _load_mapping():
-        ft_name = row.get("ft_team_name", "").strip()
-        if ft_name:
-            idx[ft_name.lower()] = row["canonical_team_id"]
+        ft_name = row.get("ft_team_name")
+        if ft_name is not None and ft_name.strip():
+            idx[ft_name.strip().lower()] = row["canonical_team_id"]
     return idx
 
 
@@ -104,8 +106,6 @@ def resolve_understat_team(team_name: str) -> str:
 
     Falls back to build_team_id() if no mapping found.
     """
-    from .canonical_ids import build_team_id
-
     canonical = _us_name_index().get(team_name.lower().strip())
     return canonical if canonical else build_team_id(team_name)
 
@@ -115,8 +115,6 @@ def resolve_footystats_team(team_name: str) -> str:
 
     Falls back to build_team_id() if no mapping found.
     """
-    from .canonical_ids import build_team_id
-
     canonical = _ft_name_index().get(team_name.lower().strip())
     return canonical if canonical else build_team_id(team_name)
 

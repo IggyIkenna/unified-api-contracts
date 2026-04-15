@@ -340,9 +340,21 @@ def get_required_datasets() -> list[str]:
 # ES covers: ES.FUT (quarterly futures), ES.OPT (quarterly options),
 # EW.OPT (weekly), EW1-4.OPT (weekly), E1A-E5A.OPT (daily/0DTE), EOM.OPT (end-of-month)
 # ---------------------------------------------------------------------------
-MVP_CME_EXCHANGE_CODES: frozenset[str] = frozenset({
-    "ES", "EW", "EW1", "EW2", "EW4", "E1A", "E2A", "E3A", "E4A", "E5A", "EOM",
-})
+MVP_CME_EXCHANGE_CODES: frozenset[str] = frozenset(
+    {
+        "ES",
+        "EW",
+        "EW1",
+        "EW2",
+        "EW4",
+        "E1A",
+        "E2A",
+        "E3A",
+        "E4A",
+        "E5A",
+        "EOM",
+    }
+)
 
 
 def get_mvp_databento_symbols_for_venue(venue: str) -> list[DatabentoInstrumentDef]:

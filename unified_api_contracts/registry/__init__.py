@@ -169,6 +169,11 @@ from .representative_sample import (
 )
 from .reward_schedules import REWARD_SCHEDULES, RewardScheduleEntry
 from .session_times import SessionTimes, get_session_times, is_trading_hours
+from .sports_venue_coordinates import (
+    VENUE_COORDINATES,
+    VenueCoordinates,
+    get_venue_coordinates,
+)
 from .token_wrapping import (
     LST_BASE_ASSET,
     PROTOCOL_TOKEN_PREFERENCE,
@@ -573,8 +578,8 @@ __all__ = [
     "TRADFI_FUTURES",
     "TRADFI_INSTRUMENTS",
     "TRADFI_INSTRUMENTS_CONFIG",
-    "TRADFI_TICK_DATA_WINDOWS",
     "TRADFI_TICKER_UNIVERSE",
+    "TRADFI_TICK_DATA_WINDOWS",
     "TRADFI_VENUE_MAPPINGS",
     "TRANSFERMARKT",
     "UNDERDOG",
@@ -591,6 +596,7 @@ __all__ = [
     "VENUE_CATEGORY_MAP",
     "VENUE_CHAIN_MAP",
     "VENUE_COLLATERAL_MATRIX",
+    "VENUE_COORDINATES",
     "VENUE_FEE_MODEL_MAP",
     "VENUE_ORDER_CAPABILITIES",
     "VENUE_PROTOCOL_TYPE",
@@ -646,6 +652,7 @@ __all__ = [
     "UnsupportedOperationError",
     "VenueCapability",
     "VenueContext",
+    "VenueCoordinates",
     "VenueFeeModel",
     "VenueMapping",
     "VenueOrderCapability",
@@ -680,6 +687,7 @@ __all__ = [
     "get_subgraph_id",
     "get_supported_chains_for_protocol",
     "get_unwrapped_form",
+    "get_venue_coordinates",
     "get_venue_prefix",
     "get_vix_15m_source",
     "get_wrapped_form",
