@@ -14,6 +14,7 @@ from unified_api_contracts.internal.domain.execution_service.execution_status im
 from unified_api_contracts.internal.domain.execution_service.multi_leg import (
     LegExecutionResult,
     LegInstruction,
+    LegRole,
     LegStatus,
     MultiLegExecutionMode,
     MultiLegExecutionResult,
@@ -68,6 +69,7 @@ __all__ = [
     "InstructionType",
     "LegExecutionResult",
     "LegInstruction",
+    "LegRole",
     "LegStatus",
     "MultiLegExecutionMode",
     "MultiLegExecutionResult",

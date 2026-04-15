@@ -4,16 +4,19 @@ from unified_api_contracts.internal.domain.strategy_service.client_config import
     ClientStrategyOverride,
 )
 from unified_api_contracts.internal.domain.strategy_service.instruction import (
-    DeFiSignal as StrategyDeFiSignal,
-)
-from unified_api_contracts.internal.domain.strategy_service.instruction import (
+    INSTRUCTION_TYPE_TO_OPERATIONS,
     FuturesRollInstruction,
     OptionsComboInstruction,
     PredictionBetInstruction,
     SportsBetInstruction,
     SportsExchangeOrderInstruction,
     StrategyInstruction,
+    StrategyInstructionType,
     TransferInstruction,
+    Urgency,
+)
+from unified_api_contracts.internal.domain.strategy_service.instruction import (
+    DeFiSignal as StrategyDeFiSignal,
 )
 from unified_api_contracts.internal.domain.strategy_service.instrument_intent import (
     ResolvedInstruments,
@@ -39,6 +42,7 @@ from unified_api_contracts.internal.domain.strategy_service.trigger_subscription
 )
 
 __all__ = [
+    "INSTRUCTION_TYPE_TO_OPERATIONS",
     "ClientStrategyOverride",
     "FuturesRollInstruction",
     "OptionsComboInstruction",
@@ -53,6 +57,7 @@ __all__ = [
     "SportsExchangeOrderInstruction",
     "StrategyDeFiSignal",
     "StrategyInstruction",
+    "StrategyInstructionType",
     "StrategyInstrumentIntent",
     "StrategyModeParams",
     "StrategyPosition",
@@ -60,4 +65,5 @@ __all__ = [
     "TriggerEvent",
     "TriggerEventType",
     "TriggerSubscription",
+    "Urgency",
 ]

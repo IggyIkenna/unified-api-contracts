@@ -21,6 +21,15 @@ class MultiLegExecutionMode(StrEnum):
     SEQUENTIAL = "SEQUENTIAL"  # Legs executed in order, one at a time
     LEADER_FOLLOWER = "LEADER_FOLLOWER"  # Leader fills first, then followers dispatch
     PARALLEL = "PARALLEL"  # All legs submitted simultaneously
+    LIQUIDITY_AWARE = "LIQUIDITY_AWARE"  # Thinner side leads, deeper side follows
+
+
+class LegRole(StrEnum):
+    """Hint from strategy about a leg's role in a multi-leg instruction."""
+
+    PRIMARY = "PRIMARY"  # Primary leg (e.g. the alpha trade)
+    HEDGE = "HEDGE"  # Hedge leg (e.g. risk-offsetting position)
+    AUTO = "AUTO"  # Determined at runtime by liquidity depth
 
 
 class LegStatus(StrEnum):
@@ -32,6 +41,8 @@ class LegStatus(StrEnum):
     FILLED = "FILLED"
     CANCELLED = "CANCELLED"
     FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
+    UNWOUND = "UNWOUND"
 
 
 class LegInstruction(BaseModel):
@@ -60,6 +71,7 @@ class LegInstruction(BaseModel):
     time_in_force: str = "IOC"
     priority: int = 0
     depends_on: list[str] = Field(default_factory=list)
+    leg_role: LegRole = LegRole.AUTO
 
 
 class MultiLegInstruction(BaseModel):
@@ -85,6 +97,10 @@ class MultiLegInstruction(BaseModel):
     timeout_seconds: int = 60
     max_partial_fill_ratio: Decimal = Field(default=Decimal("0.8"))
     created_at: datetime | None = None
+    auto_unwind_enabled: bool = True
+    max_unwind_slippage_bps: int = 50
+    max_retry_attempts: int = 3
+    retry_backoff_ms: int = 500
 
 
 class LegExecutionResult(BaseModel):
@@ -105,6 +121,8 @@ class LegExecutionResult(BaseModel):
     average_price: Decimal | None = None
     order_id: str | None = None
     error_message: str | None = None
+    compensation_order_id: str | None = None
+    retry_count: int = 0
 
 
 class MultiLegExecutionResult(BaseModel):
@@ -126,6 +144,7 @@ class MultiLegExecutionResult(BaseModel):
 __all__ = [
     "LegExecutionResult",
     "LegInstruction",
+    "LegRole",
     "LegStatus",
     "MultiLegExecutionMode",
     "MultiLegExecutionResult",
