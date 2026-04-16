@@ -74,6 +74,11 @@ from .chain_env import (
     resolve_chain_id,
     resolve_rpc_url,
 )
+from .data_availability import (
+    VENUE_DATA_AVAILABILITY,
+    ProviderDataAvailability,
+    get_provider_availability,
+)
 from .data_source_continuity import (
     BARCHART_VIX_FILE_COUNT,
     BARCHART_VIX_FIRST_DATE,
@@ -597,6 +602,7 @@ __all__ = [
     "VENUE_CHAIN_MAP",
     "VENUE_COLLATERAL_MATRIX",
     "VENUE_COORDINATES",
+    "VENUE_DATA_AVAILABILITY",
     "VENUE_FEE_MODEL_MAP",
     "VENUE_ORDER_CAPABILITIES",
     "VENUE_PROTOCOL_TYPE",
@@ -637,6 +643,7 @@ __all__ = [
     "OperationEnvDetail",
     "ProtocolClass",
     "ProviderBinding",
+    "ProviderDataAvailability",
     "ReserveParams",
     "ResponseFormat",
     "RewardScheduleEntry",
@@ -677,6 +684,7 @@ __all__ = [
     "get_primary_binding",
     "get_protocol_capability",
     "get_protocol_token",
+    "get_provider_availability",
     "get_required_tokens_for_protocol",
     "get_required_tokens_for_venue",
     "get_reserve_params",

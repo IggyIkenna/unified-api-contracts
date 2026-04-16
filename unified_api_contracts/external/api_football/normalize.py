@@ -6,6 +6,7 @@ Uses _d, _to_decimal, _ts_ms_to_datetime from normalize_utils._helpers.
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 
 from unified_api_contracts.canonical.domain import CanonicalBetMarket, CanonicalOdds
@@ -25,6 +26,49 @@ from unified_api_contracts.canonical.domain.sports import (
 from unified_api_contracts.normalize_utils._helpers import _iso, _to_decimal, _ts_ms_to_datetime
 
 from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue
+
+logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Boundary validation: required fields per entity type
+# ---------------------------------------------------------------------------
+# Fields that MUST be present for a record to be meaningful. If missing,
+# the record is skipped (shard-level failure isolation — skip, don't raise).
+
+_REQUIRED_FIELDS: dict[str, frozenset[str]] = {
+    "player_stats_team": frozenset({"team"}),
+    "player_stats_player": frozenset({"player"}),
+}
+
+
+def _extract_dict(container: dict[str, object], key: str) -> dict[str, object]:
+    """Safely extract a nested dict, returning empty dict for None/missing.
+
+    API Football nests stat categories (games, shots, goals, etc.) as sub-dicts.
+    A missing or None sub-dict is structurally valid — it means no data for
+    that category. The empty dict allows safe ``.get()`` calls downstream.
+    """
+    val = container.get(key)
+    if isinstance(val, dict):
+        return val
+    return {}
+
+
+def _extract_list(container: dict[str, object], key: str) -> list[object]:
+    """Safely extract a nested list, returning empty list for None/missing."""
+    val = container.get(key)
+    if isinstance(val, list):
+        return val
+    return []
+
+
+def _require_str(container: dict[str, object], key: str, entity_context: str) -> str | None:
+    """Extract a required string field. Returns None and logs warning if missing/empty."""
+    val = container.get(key)
+    if val is None or str(val).strip() == "":
+        logger.warning("Missing required field %r in %s — skipping record", key, entity_context)
+        return None
+    return str(val)
 
 
 def _extract_referee(raw: ApiFootballFixture) -> CanonicalReferee | None:
@@ -426,25 +470,32 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
 
     records: list[dict[str, object]] = []
     for team_block in teams:
-        team_info = team_block.get("team", {})
-        if not isinstance(team_info, dict):
+        team_info = _extract_dict(team_block, "team")
+        if not team_info:
             continue
-        team_id = str(team_info.get("id", ""))
-        team_name = str(team_info.get("name", ""))
+        team_id = _require_str(team_info, "id", "player_stats.team")
+        if team_id is None:
+            continue
+        team_name = str(team_info.get("name") or team_id)
 
-        players = team_block.get("players", [])
-        if not isinstance(players, list):
+        players = _extract_list(team_block, "players")
+        if not players:
             continue
 
         for player_block in players:
             if not isinstance(player_block, dict):
                 continue
-            player_info = player_block.get("player", {})
-            if not isinstance(player_info, dict):
+            player_info = _extract_dict(player_block, "player")
+            if not player_info:
                 continue
 
-            stats_list = player_block.get("statistics", [])
-            if not isinstance(stats_list, list) or not stats_list:
+            player_id = _require_str(player_info, "id", "player_stats.player")
+            if player_id is None:
+                continue
+            player_name = str(player_info.get("name") or player_id)
+
+            stats_list = _extract_list(player_block, "statistics")
+            if not stats_list:
                 continue
 
             # Merge all stat blocks (usually just one per player per fixture)
@@ -452,15 +503,15 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
                 "fixture_id": fixture_id,
                 "team_id": team_id,
                 "team_name": team_name,
-                "player_id": str(player_info.get("id", "")),
-                "player_name": str(player_info.get("name", "")),
+                "player_id": player_id,
+                "player_name": player_name,
             }
 
             for stat_block in stats_list:
                 if not isinstance(stat_block, dict):
                     continue
                 # Map API Football nested keys to flat CanonicalPlayerPerformance fields
-                games = stat_block.get("games", {}) or {}
+                games = _extract_dict(stat_block, "games")
                 merged["minutes_played"] = _safe_int(games.get("minutes"))
                 merged["position"] = games.get("position")
                 merged["rating"] = float(games.get("rating", 0) or 0) if games.get("rating") else None
@@ -468,44 +519,44 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
                 merged["substitute"] = games.get("substitute")
                 merged["offsides"] = _safe_int(games.get("offsides") or stat_block.get("offsides"))
 
-                shots = stat_block.get("shots", {}) or {}
+                shots = _extract_dict(stat_block, "shots")
                 merged["shots_total"] = _safe_int(shots.get("total"))
                 merged["shots_on"] = _safe_int(shots.get("on"))
 
-                goals = stat_block.get("goals", {}) or {}
+                goals = _extract_dict(stat_block, "goals")
                 merged["goals_total"] = _safe_int(goals.get("total"))
                 merged["goals_conceded"] = _safe_int(goals.get("conceded"))
                 merged["assists"] = _safe_int(goals.get("assists"))
                 merged["saves"] = _safe_int(goals.get("saves"))
 
-                passes = stat_block.get("passes", {}) or {}
+                passes = _extract_dict(stat_block, "passes")
                 merged["passes_total"] = _safe_int(passes.get("total"))
                 merged["passes_key"] = _safe_int(passes.get("key"))
                 merged["passes_accuracy"] = _safe_int(passes.get("accuracy"))
 
-                tackles = stat_block.get("tackles", {}) or {}
+                tackles = _extract_dict(stat_block, "tackles")
                 merged["tackles_total"] = _safe_int(tackles.get("total"))
                 merged["blocks"] = _safe_int(tackles.get("blocks"))
                 merged["interceptions"] = _safe_int(tackles.get("interceptions"))
 
-                duels = stat_block.get("duels", {}) or {}
+                duels = _extract_dict(stat_block, "duels")
                 merged["duels_total"] = _safe_int(duels.get("total"))
                 merged["duels_won"] = _safe_int(duels.get("won"))
 
-                dribbles = stat_block.get("dribbles", {}) or {}
+                dribbles = _extract_dict(stat_block, "dribbles")
                 merged["dribbles_attempts"] = _safe_int(dribbles.get("attempts"))
                 merged["dribbles_success"] = _safe_int(dribbles.get("success"))
                 merged["dribbles_past"] = _safe_int(dribbles.get("past"))
 
-                fouls = stat_block.get("fouls", {}) or {}
+                fouls = _extract_dict(stat_block, "fouls")
                 merged["fouls_drawn"] = _safe_int(fouls.get("drawn"))
                 merged["fouls_committed"] = _safe_int(fouls.get("committed"))
 
-                cards = stat_block.get("cards", {}) or {}
+                cards = _extract_dict(stat_block, "cards")
                 merged["yellow_cards"] = _safe_int(cards.get("yellow"))
                 merged["red_cards"] = _safe_int(cards.get("red"))
 
-                penalty = stat_block.get("penalty", {}) or {}
+                penalty = _extract_dict(stat_block, "penalty")
                 merged["penalty_won"] = _safe_int(penalty.get("won"))
                 merged["penalty_committed"] = _safe_int(penalty.get("commited"))  # API typo: "commited"
                 merged["penalty_scored"] = _safe_int(penalty.get("scored"))

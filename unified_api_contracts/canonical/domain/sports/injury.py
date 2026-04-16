@@ -144,6 +144,9 @@ class CanonicalInjury(BaseModel):
         If ``absence_type`` is not provided in the data, it is derived
         automatically from the ``reason`` field.
         """
-        if "absence_type" not in data and "reason" in data:
-            data = {**data, "absence_type": classify_absence(str(data.get("reason", "")))}
+        if "absence_type" not in data:
+            reason = data.get("reason")
+            if reason:
+                data = {**data, "absence_type": classify_absence(str(reason))}
+            # If no reason, absence_type stays at default (OTHER) — don't guess from empty string
         return cls.model_validate(data)
