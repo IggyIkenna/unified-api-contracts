@@ -143,6 +143,14 @@ class CanonicalOrder(_CanonicalBase):
     average_fill_price: Decimal | None = None
     strategy_id: str | None = None
     client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    # Shard dimensions — resolved at write time by RecordEnricher
+    strategy_name: str | None = Field(default=None, description="Display name from StrategyRegistry")
+    client_name: str | None = Field(default=None, description="Display name from ClientRegistry")
+    category: str | None = Field(default=None, description="CEFI, DEFI, TRADFI, SPORTS, PREDICTION")
+    strategy_family: str | None = Field(default=None, description="Strategy family from registry")
+    chain: str | None = Field(default=None, description="Blockchain for DeFi orders")
+    account_id: str | None = Field(default=None, description="Composite account key (client:venue:label)")
+    share_class: str | None = Field(default=None, description="Base currency denomination (USDT, ETH, BTC)")
     # Derivative-specific optional fields
     reduce_only: bool | None = None
     stop_price: Decimal | None = None
@@ -167,6 +175,14 @@ class CanonicalFill(_CanonicalBase):
     is_maker: bool | None = None
     strategy_id: str | None = None
     client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    # Shard dimensions — resolved at write time by RecordEnricher
+    strategy_name: str | None = Field(default=None, description="Display name from StrategyRegistry")
+    client_name: str | None = Field(default=None, description="Display name from ClientRegistry")
+    category: str | None = Field(default=None, description="CEFI, DEFI, TRADFI, SPORTS, PREDICTION")
+    strategy_family: str | None = Field(default=None, description="Strategy family from registry")
+    chain: str | None = Field(default=None, description="Blockchain for DeFi fills")
+    account_id: str | None = Field(default=None, description="Composite account key (client:venue:label)")
+    share_class: str | None = Field(default=None, description="Base currency denomination (USDT, ETH, BTC)")
     fee_rate: Decimal | None = None
     rebate: Decimal | None = None
     realized_pnl: Decimal | None = None

@@ -1,5 +1,8 @@
 """Execution-service internal domain contracts."""
 
+from unified_api_contracts.internal.domain.execution_service.cost_estimate import (
+    ExecutionCostEstimate,
+)
 from unified_api_contracts.internal.domain.execution_service.defi_position import (
     DeFiPosition,
     PositionPortfolio,
@@ -47,6 +50,14 @@ from unified_api_contracts.internal.domain.execution_service.types import (
 from unified_api_contracts.internal.domain.execution_service.types import (
     OrderType as ExecutionOrderType,
 )
+from unified_api_contracts.internal.domain.execution_service.unwind_preview import (
+    UnwindAction,
+    UnwindConfidence,
+    UnwindExecutionStyle,
+    UnwindPreviewRequest,
+    UnwindPreviewResponse,
+    UnwindStep,
+)
 
 __all__ = [
     "AtomicLeg",
@@ -63,6 +74,7 @@ __all__ = [
     "DeFiSwapQuoteResult",
     "DeFiSwapResult",
     "DeFiTxResult",
+    "ExecutionCostEstimate",
     "ExecutionInstruction",
     "ExecutionOrderType",
     "ExecutionResult",
@@ -80,4 +92,10 @@ __all__ = [
     "PositionType",
     "ServiceExecutionStatus",
     "SignalExecutionResult",
+    "UnwindAction",
+    "UnwindConfidence",
+    "UnwindExecutionStyle",
+    "UnwindPreviewRequest",
+    "UnwindPreviewResponse",
+    "UnwindStep",
 ]

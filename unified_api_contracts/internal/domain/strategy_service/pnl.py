@@ -131,10 +131,18 @@ class PnLAttribution:
     attribution_id: str
     timestamp: datetime
     strategy_id: str
+    client_id: str = ""  # Required — identifies which client this P&L belongs to
+
+    # Shard dimensions — resolved at write time by RecordEnricher
+    strategy_name: str = ""
+    client_name: str = ""
+    category: str = ""  # CEFI, DEFI, TRADFI, SPORTS, PREDICTION
+    strategy_family: str = ""
+    account_id: str = ""  # Composite account key (client:venue:label)
 
     # Balance-based PnL (source of truth)
-    total_equity: Decimal
-    total_pnl: Decimal  # equity_current - equity_initial
+    total_equity: Decimal = Decimal("0")
+    total_pnl: Decimal = Decimal("0")  # equity_current - equity_initial
 
     # Attribution breakdown
     trading_pnl: Decimal = Decimal("0")  # Entry/exit price differences

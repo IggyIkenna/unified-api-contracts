@@ -1,10 +1,10 @@
 {
   "summary": {
-    "alive": 621,
-    "test_only": 18,
+    "alive": 631,
+    "test_only": 21,
     "import_chain_only": 35,
-    "dead": 155,
-    "total": 829
+    "dead": 186,
+    "total": 873
   },
   "dead_types": [
     {
@@ -36,11 +36,19 @@
       "source": "UIC"
     },
     {
+      "name": "BinanceInstrumentInfo",
+      "source": "UAC"
+    },
+    {
       "name": "BinanceLiquidationOrder",
       "source": "UAC"
     },
     {
       "name": "BinanceMarkPriceUpdate",
+      "source": "UAC"
+    },
+    {
+      "name": "BinanceOptionInstrumentInfo",
       "source": "UAC"
     },
     {
@@ -57,6 +65,10 @@
     },
     {
       "name": "BookmakerRegistry",
+      "source": "UAC"
+    },
+    {
+      "name": "BybitInstrumentInfo",
       "source": "UAC"
     },
     {
@@ -102,6 +114,10 @@
     {
       "name": "CONFIG_SCHEMA",
       "source": "UAC"
+    },
+    {
+      "name": "CalibrationMethod",
+      "source": "UIC"
     },
     {
       "name": "CcxtAggTrade",
@@ -164,7 +180,15 @@
       "source": "UIC"
     },
     {
+      "name": "CoinPnLBreakdown",
+      "source": "UIC"
+    },
+    {
       "name": "CoinbaseOrderBook",
+      "source": "UAC"
+    },
+    {
+      "name": "CoinbaseProductInfo",
       "source": "UAC"
     },
     {
@@ -220,6 +244,14 @@
       "source": "UAC"
     },
     {
+      "name": "DailyBalanceSummary",
+      "source": "UIC"
+    },
+    {
+      "name": "DataProtocol",
+      "source": "UAC"
+    },
+    {
       "name": "DeFiConnectorStateDict",
       "source": "UIC"
     },
@@ -244,10 +276,6 @@
       "source": "UIC"
     },
     {
-      "name": "DeadLetterRecord",
-      "source": "UIC"
-    },
-    {
       "name": "DefiErrorCode",
       "source": "UAC"
     },
@@ -260,7 +288,15 @@
       "source": "UAC"
     },
     {
+      "name": "DeribitInstrumentInfoFull",
+      "source": "UAC"
+    },
+    {
       "name": "DeviationStatus",
+      "source": "UIC"
+    },
+    {
+      "name": "DexPoolDayRecord",
       "source": "UIC"
     },
     {
@@ -308,6 +344,10 @@
       "source": "UAC"
     },
     {
+      "name": "FeeLineType",
+      "source": "UIC"
+    },
+    {
       "name": "FileReport",
       "source": "UIC"
     },
@@ -352,6 +392,18 @@
       "source": "UIC"
     },
     {
+      "name": "Invoice",
+      "source": "UIC"
+    },
+    {
+      "name": "InvoiceHistoryEntry",
+      "source": "UIC"
+    },
+    {
+      "name": "InvoiceStatus",
+      "source": "UIC"
+    },
+    {
       "name": "KNOWN_ETFS",
       "source": "UAC"
     },
@@ -372,12 +424,28 @@
       "source": "UIC"
     },
     {
+      "name": "LendingIndexRecord",
+      "source": "UIC"
+    },
+    {
       "name": "LiquidationHeatmapResponse",
       "source": "UAC"
     },
     {
       "name": "LiquidationLevel",
       "source": "UAC"
+    },
+    {
+      "name": "LiquidationRecord",
+      "source": "UIC"
+    },
+    {
+      "name": "LiveDataEvent",
+      "source": "UAC"
+    },
+    {
+      "name": "LstRateRecord",
+      "source": "UIC"
     },
     {
       "name": "MARKET_TICK_FRESHNESS",
@@ -400,11 +468,19 @@
       "source": "UAC"
     },
     {
+      "name": "MonthlyReturn",
+      "source": "UIC"
+    },
+    {
       "name": "NAVSnapshotStatus",
       "source": "UIC"
     },
     {
       "name": "OKXFundingRate",
+      "source": "UAC"
+    },
+    {
+      "name": "OKXInstrumentInfo",
       "source": "UAC"
     },
     {
@@ -444,7 +520,15 @@
       "source": "UIC"
     },
     {
-      "name": "OperationalMode",
+      "name": "PerformanceStats",
+      "source": "UIC"
+    },
+    {
+      "name": "PerformanceSummary",
+      "source": "UIC"
+    },
+    {
+      "name": "PerpFundingRecord",
       "source": "UIC"
     },
     {
@@ -464,7 +548,19 @@
       "source": "UAC"
     },
     {
+      "name": "PortfolioAllocation",
+      "source": "UIC"
+    },
+    {
       "name": "PrimeBrokerEntity",
+      "source": "UIC"
+    },
+    {
+      "name": "ProtocolCapability",
+      "source": "UAC"
+    },
+    {
+      "name": "ProvisioningRole",
       "source": "UIC"
     },
     {
@@ -524,6 +620,14 @@
       "source": "UIC"
     },
     {
+      "name": "StrategyPositionSnapshot",
+      "source": "UIC"
+    },
+    {
+      "name": "TIER_ENTITLEMENTS",
+      "source": "UIC"
+    },
+    {
       "name": "TIMEFRAME_TO_SECONDS",
       "source": "UIC"
     },
@@ -553,6 +657,14 @@
     },
     {
       "name": "TickReplayEngine",
+      "source": "UIC"
+    },
+    {
+      "name": "TradeSide",
+      "source": "UIC"
+    },
+    {
+      "name": "TradeType",
       "source": "UIC"
     },
     {
@@ -600,6 +712,14 @@
       "source": "UAC"
     },
     {
+      "name": "VENUE_COORDINATES",
+      "source": "UAC"
+    },
+    {
+      "name": "VENUE_DATA_AVAILABILITY",
+      "source": "UAC"
+    },
+    {
       "name": "VENUE_TO_CATEGORY",
       "source": "UAC"
     },
@@ -614,6 +734,10 @@
     {
       "name": "VM_INFRASTRUCTURE_EVENTS",
       "source": "UIC"
+    },
+    {
+      "name": "VenueCoordinates",
+      "source": "UAC"
     },
     {
       "name": "WebSocketConnectionClosed",
@@ -733,13 +857,6 @@
       "name": "ODDS_API_KEY_TO_VENUE",
       "source": "UAC",
       "chain": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py"
       ]
     },
@@ -747,13 +864,6 @@
       "name": "ODDS_API_KEY_TO_VENUE_CATEGORY",
       "source": "UAC",
       "chain": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py"
       ]
     },
@@ -776,13 +886,6 @@
       "name": "OrphanDetector",
       "source": "UAC",
       "chain": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/prediction/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py"
       ]
     },
@@ -795,13 +898,6 @@
       "name": "RISK_TYPE_CATEGORIES",
       "source": "UAC",
       "chain": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py"
       ]
     },
@@ -819,13 +915,6 @@
       "name": "VENUE_ERROR_MAP",
       "source": "UAC",
       "chain": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/crosscutting/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py"
       ]
     },
@@ -833,13 +922,6 @@
       "name": "VENUE_EXECUTION_REGISTRY",
       "source": "UAC",
       "chain": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/sports/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py"
       ]
     },
@@ -871,14 +953,7 @@
       "name": "CanonicalFundingRate",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-market-interface/tests/integration/test_library_deps_integration.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/market-tick-data-service/tests/market_interface/integration/test_library_deps_integration.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py"
       ]
     },
@@ -886,22 +961,8 @@
       "name": "CanonicalInstrument",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/system-integration-tests/tests/integration/test_instrument_alignment.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/system-integration-tests/tests/smoke/test_mock_data_chain.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/reference/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py"
       ]
@@ -910,7 +971,7 @@
       "name": "DataSourceMapping",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-market-interface/tests/integration/test_library_deps_integration.py"
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/market-tick-data-service/tests/market_interface/integration/test_library_deps_integration.py"
       ]
     },
     {
@@ -924,7 +985,7 @@
       "name": "ExchangeInstrumentConfig",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-market-interface/tests/unit/test_models_and_config.py",
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/market-tick-data-service/tests/market_interface/unit/test_models_and_config.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-library/tests/config_interface/unit/test_venue_config.py"
       ]
     },
@@ -932,21 +993,7 @@
       "name": "FeeType",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/position-balance-monitor-service/tests/unit/test_fee_reconciliation_engine.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/position/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/internal-contracts/schemas/domain/matching_engine/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py"
       ]
@@ -964,7 +1011,7 @@
       "test_files": [
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/execution-service/tests/sports_execution/integration/test_library_deps_integration.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/execution-service/tests/trade_execution/integration/test_library_deps_integration.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-market-interface/tests/integration/test_library_deps_integration.py"
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/market-tick-data-service/tests/market_interface/integration/test_library_deps_integration.py"
       ]
     },
     {
@@ -979,6 +1026,13 @@
       "source": "UIC",
       "test_files": [
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/system-integration-tests/tests/integration/test_instrument_alignment.py"
+      ]
+    },
+    {
+      "name": "LegRole",
+      "source": "UIC",
+      "test_files": [
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/execution-service/tests/unit/engine/test_multi_leg_orchestrator_new.py"
       ]
     },
     {
@@ -1013,7 +1067,21 @@
       "name": "TardisExchangeDetail",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/instruments-service/tests/reference_data/unit/test_coverage_gaps_adapters.py"
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/instruments-service/tests/unit/test_coverage_gaps_adapters.py"
+      ]
+    },
+    {
+      "name": "TrainingScope",
+      "source": "UIC",
+      "test_files": [
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/ml-training-service/tests/unit/test_cross_asset_training.py"
+      ]
+    },
+    {
+      "name": "TransferLearningConfig",
+      "source": "UIC",
+      "test_files": [
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/ml-training-service/tests/unit/test_cross_asset_training.py"
       ]
     },
     {
@@ -1027,14 +1095,7 @@
       "name": "VolSurface",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/_archived-ui-reference/versa-onboarding/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/features-volatility-service/tests/unit/test_vol_surface_term_structure.py",
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui copy/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py"
       ]
     }
@@ -1050,70 +1111,70 @@
     {
       "name": "AaveBorrowParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveDepositParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveFlashLoanParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveRepayParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AaveV3ReserveData",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "AaveV3UserAccountData",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "AaveV3UserReserveData",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "AccountState",
       "source": "UIC",
-      "instantiation_count": 32,
+      "instantiation_count": 11,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "AccountVerificationLevel",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AgentEventDetails",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1127,15 +1188,15 @@
     {
       "name": "AggregatedPositionMessage",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AlertContextData",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -1148,57 +1209,57 @@
     {
       "name": "AlertMessage",
       "source": "UIC",
-      "instantiation_count": 35,
-      "annotation_count": 19,
+      "instantiation_count": 7,
+      "annotation_count": 6,
       "isinstance_count": 0
     },
     {
       "name": "AlertType",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 18,
+      "instantiation_count": 3,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
       "name": "AlternativeDataSignal",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "AlternativeDataType",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "AntiDetectionLevel",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ArbitrageMarket",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ArbitrageOpportunity",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ArbitrageStatus",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -1211,8 +1272,8 @@
     {
       "name": "AssetBalanceSummary",
       "source": "UIC",
-      "instantiation_count": 1,
-      "annotation_count": 1,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -1225,14 +1286,14 @@
     {
       "name": "AuthFailureDetails",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "AuthFailureEvent",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1260,7 +1321,7 @@
     {
       "name": "Balance",
       "source": "UIC",
-      "instantiation_count": 32,
+      "instantiation_count": 18,
       "annotation_count": 9,
       "isinstance_count": 0
     },
@@ -1274,71 +1335,71 @@
     {
       "name": "BenchmarkType",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 11,
+      "instantiation_count": 2,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
       "name": "BetCancelledEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BetExecution",
       "source": "UAC",
-      "instantiation_count": 16,
-      "annotation_count": 17,
+      "instantiation_count": 8,
+      "annotation_count": 16,
       "isinstance_count": 0
     },
     {
       "name": "BetFilledEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BetOrder",
       "source": "UAC",
-      "instantiation_count": 10,
-      "annotation_count": 19,
+      "instantiation_count": 3,
+      "annotation_count": 18,
       "isinstance_count": 0
     },
     {
       "name": "BetPlacedEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BetRejectedError",
       "source": "UAC",
-      "instantiation_count": 16,
+      "instantiation_count": 8,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BetSettledEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BetSide",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BetStatus",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 18,
+      "instantiation_count": 2,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
@@ -1372,43 +1433,29 @@
     {
       "name": "BettingSignal",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "BinanceInstrumentInfo",
-      "source": "UAC",
-      "instantiation_count": 0,
-      "annotation_count": 1,
-      "isinstance_count": 0
-    },
-    {
-      "name": "BinanceOptionInstrumentInfo",
-      "source": "UAC",
-      "instantiation_count": 0,
-      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "BinanceWithdrawRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BinanceWithdrawResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BookUpdateLevel",
       "source": "UIC",
-      "instantiation_count": 10,
-      "annotation_count": 9,
+      "instantiation_count": 3,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -1421,49 +1468,42 @@
     {
       "name": "BookmakerInfo",
       "source": "UAC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "BookmakerUnavailableError",
       "source": "UAC",
-      "instantiation_count": 19,
+      "instantiation_count": 11,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BucketMarket",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "BybitInstrumentInfo",
-      "source": "UAC",
-      "instantiation_count": 0,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "BybitWithdrawRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "BybitWithdrawResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CLVRecord",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1477,7 +1517,7 @@
     {
       "name": "CandleOutput",
       "source": "UIC",
-      "instantiation_count": 24,
+      "instantiation_count": 17,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1491,21 +1531,21 @@
     {
       "name": "CanonicalAccountState",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalAuthenticationError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalAuthorizationError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1519,7 +1559,7 @@
     {
       "name": "CanonicalBase",
       "source": "UAC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1540,35 +1580,35 @@
     {
       "name": "CanonicalBondData",
       "source": "UAC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalBookUpdate",
       "source": "UIC",
-      "instantiation_count": 10,
+      "instantiation_count": 3,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalBookmakerMarket",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalCdsSpread",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalContractExpiredError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1582,7 +1622,7 @@
     {
       "name": "CanonicalDuplicateOrderError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1596,14 +1636,14 @@
     {
       "name": "CanonicalFeatureRecord",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalFill",
       "source": "UAC",
-      "instantiation_count": 20,
+      "instantiation_count": 13,
       "annotation_count": 10,
       "isinstance_count": 0
     },
@@ -1611,83 +1651,83 @@
       "name": "CanonicalFixture",
       "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 10,
+      "annotation_count": 8,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalFixtureEvent",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalFixtureStatsDetail",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalInjury",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalInstrumentHaltedError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalInsufficientBalanceError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalInsufficientMarginError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalInternalServerError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalInvalidRequestError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalLeague",
       "source": "UAC",
-      "instantiation_count": 7,
-      "annotation_count": 9,
+      "instantiation_count": 5,
+      "annotation_count": 7,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalLendingRate",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalLineup",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1701,56 +1741,56 @@
     {
       "name": "CanonicalLiquidityPool",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalMaintenanceModeError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalMarginState",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalMarketClosedError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalNetworkError",
       "source": "UAC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalOHLCV",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalOdds",
       "source": "UAC",
-      "instantiation_count": 11,
-      "annotation_count": 53,
+      "instantiation_count": 2,
+      "annotation_count": 36,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalOptionQuote",
       "source": "UIC",
-      "instantiation_count": 10,
+      "instantiation_count": 3,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1758,27 +1798,27 @@
       "name": "CanonicalOptionsChainEntry",
       "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 8,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalOraclePrice",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalOrder",
       "source": "UAC",
-      "instantiation_count": 12,
-      "annotation_count": 10,
+      "instantiation_count": 5,
+      "annotation_count": 3,
       "isinstance_count": 1
     },
     {
       "name": "CanonicalOrderAmendment",
       "source": "UAC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1792,21 +1832,21 @@
     {
       "name": "CanonicalOrderRejectedError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalOrderRejection",
       "source": "UAC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalPlayerMatchStats",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -1820,112 +1860,112 @@
     {
       "name": "CanonicalPositionLimitExceededError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalPredictionMarket",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 9,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalPriceBoundError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalProgressiveOdds",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalProgressiveStats",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalPullRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalRateLimitError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 1
     },
     {
       "name": "CanonicalRepository",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalSchemaError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalServiceUnavailableError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalSizeLimitError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalSportsFill",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalSportsOrder",
       "source": "UIC",
-      "instantiation_count": 12,
+      "instantiation_count": 4,
       "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalSpread",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalStakingRate",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalSwap",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -1933,7 +1973,7 @@
       "name": "CanonicalTeam",
       "source": "UAC",
       "instantiation_count": 3,
-      "annotation_count": 9,
+      "annotation_count": 7,
       "isinstance_count": 0
     },
     {
@@ -1953,7 +1993,7 @@
     {
       "name": "CanonicalUnknownVenueError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 1
     },
@@ -1967,28 +2007,28 @@
     {
       "name": "CanonicalWebSocketLifecycle",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalWorkflowRun",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalYieldCurve",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CanonicalYieldCurvePoint",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2002,7 +2042,7 @@
     {
       "name": "CascadeDispatchDetails",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2016,14 +2056,14 @@
     {
       "name": "CatBoostHyperparams",
       "source": "UIC",
-      "instantiation_count": 2,
+      "instantiation_count": 3,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CategorizedErrorDetails",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2037,7 +2077,7 @@
     {
       "name": "CeFiPosition",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2051,78 +2091,71 @@
     {
       "name": "CircuitBreakerEvent",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CircuitBreakerEventMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ClientConfig",
       "source": "UIC",
-      "instantiation_count": 13,
+      "instantiation_count": 6,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "ClientRiskTolerance",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CloudProvider",
       "source": "UAC",
-      "instantiation_count": 11,
-      "annotation_count": 18,
+      "instantiation_count": 4,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
       "name": "CoachRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "CoinbaseProductInfo",
-      "source": "UAC",
-      "instantiation_count": 0,
-      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CoinbaseWithdrawRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CoinbaseWithdrawResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CollateralAsset",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ColumnSchema",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 8,
+      "instantiation_count": 9,
+      "annotation_count": 1,
       "isinstance_count": 1
     },
     {
@@ -2142,8 +2175,8 @@
     {
       "name": "CommissionModel",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -2156,91 +2189,91 @@
     {
       "name": "CommoditySignal",
       "source": "UIC",
-      "instantiation_count": 11,
-      "annotation_count": 9,
+      "instantiation_count": 4,
+      "annotation_count": 10,
       "isinstance_count": 0
     },
     {
       "name": "CompoundV3MarketInfo",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CompoundV3UserPosition",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ComputeType",
       "source": "UAC",
-      "instantiation_count": 24,
-      "annotation_count": 18,
+      "instantiation_count": 3,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "ConfigChangedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "ConfigChangedEvent",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ContractSpec",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CorrelationEntry",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CorrelationRegime",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CorrelationRegimeChange",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CredentialType",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CredentialsRegistry",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CrossAssetCorrelationMatrix",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2254,98 +2287,98 @@
     {
       "name": "CrossInstrumentFeatures",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CrossMarginNettingResult",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CrossTimeframeFeatures",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CrossValidationResult",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CrossVenueArbLeg",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "CrossVenueArbSignal",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CrossVenueLink",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CurveDepositParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CurveSwapParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CurveWithdrawParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "CustomRiskEvaluationMethod",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "CustomRiskTypeDefinition",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "DarkPoolPrintRecord",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "DataBroadcastDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2359,29 +2392,29 @@
     {
       "name": "DataIngestionCompletedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "DataIngestionDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "DataMode",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "DataSourceRoute",
       "source": "UAC",
-      "instantiation_count": 2,
-      "annotation_count": 2,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -2394,14 +2427,14 @@
     {
       "name": "DataType",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "DatabentoError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2422,14 +2455,14 @@
     {
       "name": "DeFiLPPosition",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "DeFiLendingPosition",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 2,
       "isinstance_count": 0
     },
@@ -2443,8 +2476,15 @@
     {
       "name": "DeFiStakingPosition",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "DeadLetterRecord",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
       "isinstance_count": 0
     },
     {
@@ -2464,42 +2504,42 @@
     {
       "name": "DeltaOneFeatureRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "DeploymentDetails",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "DeploymentState",
       "source": "UIC",
-      "instantiation_count": 18,
-      "annotation_count": 10,
+      "instantiation_count": 3,
+      "annotation_count": 5,
       "isinstance_count": 0
     },
     {
       "name": "DeploymentStatus",
       "source": "UIC",
-      "instantiation_count": 18,
-      "annotation_count": 18,
+      "instantiation_count": 3,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "DepositAddress",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "DepositRecord",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2515,13 +2555,6 @@
       "source": "UAC",
       "instantiation_count": 1,
       "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "DeribitInstrumentInfoFull",
-      "source": "UAC",
-      "instantiation_count": 0,
-      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -2569,7 +2602,7 @@
     {
       "name": "DerivativeTickerMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2632,14 +2665,14 @@
     {
       "name": "DurationBucket",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EODSettlementTrigger",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2653,40 +2686,47 @@
     {
       "name": "EmergencyExitPlaybook",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EmergencyExitStep",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "EmergencyExitType",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "EnhancedError",
       "source": "UIC",
-      "instantiation_count": 32,
+      "instantiation_count": 31,
       "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "EnsembleConfig",
       "source": "UIC",
-      "instantiation_count": 1,
-      "annotation_count": 2,
+      "instantiation_count": 2,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "EnsembleMember",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "Entitlement",
       "source": "UIC",
       "instantiation_count": 1,
       "annotation_count": 0,
@@ -2700,24 +2740,31 @@
       "isinstance_count": 0
     },
     {
+      "name": "EquityCurvePoint",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 2,
+      "isinstance_count": 0
+    },
+    {
       "name": "Erc20TransferCalldata",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "Erc20TransferFromCalldata",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ErrorAction",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 16,
+      "instantiation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -2730,7 +2777,7 @@
     {
       "name": "ErrorContext",
       "source": "UIC",
-      "instantiation_count": 33,
+      "instantiation_count": 32,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -2751,161 +2798,161 @@
     {
       "name": "EthSendRawTransactionRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EthSendRawTransactionResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EthSendTransactionRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EthTransactionRequest",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "EtherFiStakeResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EtherFiUnstakeResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EulerBorrowParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EulerDepositParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EulerRepayParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EulerUserPosition",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EulerVaultData",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "EventMetadata",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "EventSeverity",
       "source": "UIC",
       "instantiation_count": 0,
-      "annotation_count": 16,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "ExchangeFeeSchedule",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionAlpha",
       "source": "UAC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionInstruction",
       "source": "UAC",
-      "instantiation_count": 10,
+      "instantiation_count": 4,
       "annotation_count": 17,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionMethod",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionMode",
       "source": "UIC",
-      "instantiation_count": 20,
-      "annotation_count": 10,
+      "instantiation_count": 6,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionPreferencesConfig",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionResult",
       "source": "UAC",
-      "instantiation_count": 24,
+      "instantiation_count": 13,
       "annotation_count": 18,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionResultMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ExecutionStatus",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 10,
+      "instantiation_count": 2,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "ExpectedValue",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2913,7 +2960,7 @@
       "name": "ExposureData",
       "source": "UIC",
       "instantiation_count": 1,
-      "annotation_count": 11,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
@@ -2926,63 +2973,63 @@
     {
       "name": "ExposureSummary",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ExtendedPnLAttribution",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FactorAttributionModel",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FactorAttributionRecord",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FactorExposure",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "FactorType",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "FactorValue",
       "source": "UIC",
-      "instantiation_count": 14,
-      "annotation_count": 23,
-      "isinstance_count": 0
+      "instantiation_count": 8,
+      "annotation_count": 10,
+      "isinstance_count": 1
     },
     {
       "name": "FailedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "FailedEvent",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -2996,21 +3043,21 @@
     {
       "name": "FeatureMetadata",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 8,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "FeatureSnapshotRequest",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FeatureUpdateMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3018,83 +3065,83 @@
       "name": "FeeScheduleEntry",
       "source": "UIC",
       "instantiation_count": 0,
-      "annotation_count": 4,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "FeeStructure",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "FillEventMessage",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "FixtureEventsRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FixtureLineupsRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FixtureNotFoundError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FixturePlayerStatsRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FixtureRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FixtureStatsRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FluidBorrowParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FluidDepositParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "FluidRepayParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3108,49 +3155,63 @@
     {
       "name": "FuturesTermStructureRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "GasCostAction",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "GasCostEstimate",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "GreeksExposure",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "HWMState",
+      "source": "UIC",
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "HealthAlertMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "HourlyBalanceSnapshot",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "HttpRateLimitHeaders",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "HuberHyperparams",
       "source": "UIC",
-      "instantiation_count": 2,
+      "instantiation_count": 3,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3164,7 +3225,7 @@
     {
       "name": "HyperparameterConfig",
       "source": "UIC",
-      "instantiation_count": 19,
+      "instantiation_count": 5,
       "annotation_count": 5,
       "isinstance_count": 0
     },
@@ -3206,21 +3267,21 @@
     {
       "name": "InferenceRequest",
       "source": "UIC",
-      "instantiation_count": 20,
+      "instantiation_count": 6,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "InferenceResult",
       "source": "UIC",
-      "instantiation_count": 18,
+      "instantiation_count": 4,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "InjuryRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3234,8 +3295,8 @@
     {
       "name": "InstrumentInfo",
       "source": "UIC",
-      "instantiation_count": 12,
-      "annotation_count": 26,
+      "instantiation_count": 5,
+      "annotation_count": 19,
       "isinstance_count": 0
     },
     {
@@ -3255,15 +3316,15 @@
     {
       "name": "InstrumentMetadata",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 26,
+      "instantiation_count": 1,
+      "annotation_count": 19,
       "isinstance_count": 0
     },
     {
       "name": "InstrumentRecord",
       "source": "UIC",
-      "instantiation_count": 36,
-      "annotation_count": 41,
+      "instantiation_count": 31,
+      "annotation_count": 36,
       "isinstance_count": 0
     },
     {
@@ -3276,29 +3337,36 @@
     {
       "name": "InternalOptionsChainSnapshot",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "InternalPosition",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "InternalPubSubTopic",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "InternalTransfer",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "InvoiceLineItem",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -3318,8 +3386,8 @@
     {
       "name": "KillSwitchScope",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 3,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -3332,169 +3400,169 @@
     {
       "name": "LatencyComponent",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LeagueRecord",
-      "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LegExecutionResult",
-      "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LegInstruction",
-      "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LegStatus",
-      "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LendingEntry",
-      "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LendingRate",
-      "source": "UIC",
-      "instantiation_count": 9,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LidoRequestWithdrawalsParams",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LidoSubmitParams",
-      "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
-      "name": "LidoSubmitResponse",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LidoWstEthWrapResponse",
-      "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LifecycleEventEnvelope",
-      "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 0,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LifecycleEventType",
-      "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
-      "isinstance_count": 0
-    },
-    {
-      "name": "LightGBMHyperparams",
+      "name": "LeagueRecord",
       "source": "UIC",
       "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
+      "name": "LegExecutionResult",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 2,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LegInstruction",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 3,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LegStatus",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LendingEntry",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LendingRate",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LidoRequestWithdrawalsParams",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LidoSubmitParams",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LidoSubmitResponse",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LidoWstEthWrapResponse",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LifecycleEventEnvelope",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LifecycleEventType",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 2,
+      "isinstance_count": 0
+    },
+    {
+      "name": "LightGBMHyperparams",
+      "source": "UIC",
+      "instantiation_count": 4,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
       "name": "LimitCheckResult",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "LineupPlayer",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "LiquidationBandEntry",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "LiquidationBandPredictionSnapshot",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "LiquidationMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "LiquidityPool",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "LiveMatchState",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "LiveOddsUpdate",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "LogLevel",
       "source": "UIC",
-      "instantiation_count": 13,
+      "instantiation_count": 6,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MLConfigDict",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 16,
+      "instantiation_count": 3,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -3508,13 +3576,13 @@
       "name": "MLPrediction",
       "source": "UIC",
       "instantiation_count": 1,
-      "annotation_count": 1,
+      "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MLPredictionMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3528,29 +3596,29 @@
     {
       "name": "ManualInstruction",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MappingRule",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MarginHealthSnapshot",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MarginState",
       "source": "UIC",
-      "instantiation_count": 32,
-      "annotation_count": 17,
+      "instantiation_count": 11,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -3563,169 +3631,169 @@
     {
       "name": "MarketCategory",
       "source": "UIC",
-      "instantiation_count": 22,
+      "instantiation_count": 8,
       "annotation_count": 23,
       "isinstance_count": 1
     },
     {
       "name": "MarketClosedError",
       "source": "UAC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MarketState",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MarketStatus",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MarketTickMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MatchPeriod",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MessagingScope",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MessagingTopic",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MetaSignalRecord",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MockScenario",
       "source": "UIC",
-      "instantiation_count": 24,
+      "instantiation_count": 17,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ModelDegradationAlert",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ModelMetadata",
       "source": "UIC",
-      "instantiation_count": 20,
-      "annotation_count": 21,
+      "instantiation_count": 6,
+      "annotation_count": 7,
       "isinstance_count": 0
     },
     {
       "name": "ModelType",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 17,
+      "instantiation_count": 3,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "ModelVariantConfig",
       "source": "UIC",
-      "instantiation_count": 24,
+      "instantiation_count": 10,
       "annotation_count": 18,
       "isinstance_count": 0
     },
     {
       "name": "MorphoBorrowParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MorphoFlashLoanParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MorphoMarketParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MorphoRepayParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MorphoSupplyParams",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MorphoUserPosition",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MultiAssetMarginCalculation",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "MultiLegExecutionMode",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MultiLegExecutionResult",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "MultiLegInstruction",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -3738,84 +3806,84 @@
     {
       "name": "NetClearingInstruction",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "NetworkJitterMetric",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "NormalizedStrikeCoordinate",
       "source": "UAC",
-      "instantiation_count": 12,
+      "instantiation_count": 5,
       "annotation_count": 4,
       "isinstance_count": 0
     },
     {
       "name": "OHLCVSource",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
-      "isinstance_count": 0
-    },
-    {
-      "name": "OKXInstrumentInfo",
-      "source": "UAC",
-      "instantiation_count": 0,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "OKXWithdrawRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "OKXWithdrawResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "OddsChangedError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "OddsType",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 60,
+      "instantiation_count": 1,
+      "annotation_count": 31,
       "isinstance_count": 0
     },
     {
       "name": "OnchainFeatureRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "OperationType",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 12,
+      "instantiation_count": 1,
+      "annotation_count": 6,
+      "isinstance_count": 0
+    },
+    {
+      "name": "OperationalMode",
+      "source": "UIC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "OptionChainSnapshot",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -3829,21 +3897,21 @@
     {
       "name": "OptionsFlowRecord",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "OptionsIvRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "OraclePrice",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -3857,15 +3925,15 @@
     {
       "name": "Order",
       "source": "UIC",
-      "instantiation_count": 53,
-      "annotation_count": 62,
+      "instantiation_count": 31,
+      "annotation_count": 49,
       "isinstance_count": 7
     },
     {
       "name": "OrderData",
       "source": "UIC",
       "instantiation_count": 0,
-      "annotation_count": 11,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
@@ -3878,78 +3946,85 @@
     {
       "name": "OrderLatencyRecord",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "OrderRequestMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "OrderSide",
       "source": "UAC",
-      "instantiation_count": 13,
-      "annotation_count": 21,
+      "instantiation_count": 6,
+      "annotation_count": 14,
       "isinstance_count": 1
     },
     {
       "name": "OrderStatus",
       "source": "UAC",
-      "instantiation_count": 12,
-      "annotation_count": 12,
+      "instantiation_count": 5,
+      "annotation_count": 5,
       "isinstance_count": 0
     },
     {
       "name": "OrderType",
       "source": "UAC",
-      "instantiation_count": 13,
-      "annotation_count": 14,
+      "instantiation_count": 6,
+      "annotation_count": 7,
       "isinstance_count": 1
+    },
+    {
+      "name": "OrgType",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
+      "isinstance_count": 0
     },
     {
       "name": "OutcomeType",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "PairSpreadFeatureRecord",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "Permission",
       "source": "UIC",
-      "instantiation_count": 0,
-      "annotation_count": 2,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "PersistenceCompletedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PersistenceStartedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PhaseMode",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 16,
+      "instantiation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -3962,21 +4037,21 @@
     {
       "name": "PlayerRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PnLAttributionRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PnLBreakdown",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -3991,7 +4066,7 @@
       "name": "PnLData",
       "source": "UIC",
       "instantiation_count": 1,
-      "annotation_count": 10,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -4060,7 +4135,7 @@
     {
       "name": "PortfolioMarginAccount",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4082,35 +4157,35 @@
       "name": "PositionData",
       "source": "UIC",
       "instantiation_count": 1,
-      "annotation_count": 10,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "PositionQuantityProtocol",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "PositionSide",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 19,
+      "instantiation_count": 3,
+      "annotation_count": 5,
       "isinstance_count": 0
     },
     {
       "name": "PositionSnapshot",
       "source": "UIC",
-      "instantiation_count": 1,
-      "annotation_count": 1,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "PositionSummary",
       "source": "UIC",
-      "instantiation_count": 2,
-      "annotation_count": 1,
+      "instantiation_count": 3,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -4123,29 +4198,29 @@
     {
       "name": "PositionUpdateMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PreTradeCheckRequest",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 19,
+      "instantiation_count": 3,
+      "annotation_count": 5,
       "isinstance_count": 0
     },
     {
       "name": "PreTradeCheckResponse",
       "source": "UIC",
-      "instantiation_count": 18,
+      "instantiation_count": 4,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "PredictionMarketCategory",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 9,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -4158,91 +4233,91 @@
     {
       "name": "PredictionMarketUniverse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PredictionMarketUseCase",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PredictionSnapshot",
       "source": "UIC",
-      "instantiation_count": 10,
+      "instantiation_count": 3,
       "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "PrimeBrokerAccount",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PrimeBrokerError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PrimeBrokerFill",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PrimeBrokerMarginCall",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PrimeBrokerPosition",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PrimeBrokerProvider",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ProbabilityBucket",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ProcessedOddsOutput",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ProcessingCompletedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ProcessingStartedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4254,30 +4329,37 @@
       "isinstance_count": 0
     },
     {
+      "name": "ProviderDataAvailability",
+      "source": "UAC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
+      "isinstance_count": 0
+    },
+    {
       "name": "PubSubLifecycleEventMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "PubSubMessageEnvelope",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "QualityGateDetails",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "RateLimitResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4291,7 +4373,7 @@
     {
       "name": "RealTimePnLRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4312,42 +4394,42 @@
     {
       "name": "RefereeRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "RegimeState",
       "source": "UIC",
-      "instantiation_count": 9,
-      "annotation_count": 27,
+      "instantiation_count": 2,
+      "annotation_count": 7,
       "isinstance_count": 0
     },
     {
       "name": "RegimeStateRecord",
       "source": "UIC",
-      "instantiation_count": 9,
-      "annotation_count": 8,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ResourceMetricsSnapshot",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "RestartDetectedDetails",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "RestartDetectedEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4368,36 +4450,36 @@
     {
       "name": "RiskAggregationLevel",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "RiskAlertMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "RiskAssessment",
       "source": "UIC",
-      "instantiation_count": 1,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "RiskCategory",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "RiskData",
       "source": "UIC",
       "instantiation_count": 1,
-      "annotation_count": 10,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -4410,57 +4492,64 @@
     {
       "name": "RiskMetrics",
       "source": "UIC",
-      "instantiation_count": 19,
+      "instantiation_count": 5,
       "annotation_count": 5,
       "isinstance_count": 0
     },
     {
       "name": "RiskPnLNode",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "RiskPosition",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 9,
       "isinstance_count": 0
     },
     {
       "name": "RiskStatus",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 20,
+      "instantiation_count": 3,
+      "annotation_count": 6,
       "isinstance_count": 0
     },
     {
       "name": "RiskType",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "RoundRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "RuntimeMode",
       "source": "UIC",
-      "instantiation_count": 12,
-      "annotation_count": 18,
+      "instantiation_count": 5,
+      "annotation_count": 4,
+      "isinstance_count": 0
+    },
+    {
+      "name": "SSEChannelType",
+      "source": "UAC",
+      "instantiation_count": 0,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "SatelliteObservation",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -4473,15 +4562,15 @@
     {
       "name": "SchemaDefinition",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 9,
       "annotation_count": 6,
       "isinstance_count": 0
     },
     {
       "name": "SchemaValidationError",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -4494,57 +4583,57 @@
     {
       "name": "ScopedKillSwitchState",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ScraperError",
       "source": "UAC",
-      "instantiation_count": 22,
+      "instantiation_count": 15,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ScraperVersionMeta",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SecretAccessedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "SecretAccessedEvent",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SentimentScore",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ServiceLifecycleEventMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ServiceMode",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -4557,15 +4646,15 @@
     {
       "name": "SettlementType",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "ShardEvent",
       "source": "UIC",
-      "instantiation_count": 20,
-      "annotation_count": 6,
+      "instantiation_count": 4,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
@@ -4578,15 +4667,22 @@
     {
       "name": "SignalSource",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "SignalVectorRecord",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 2,
+      "isinstance_count": 0
+    },
+    {
+      "name": "SnapshotSource",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
       "isinstance_count": 0
     },
     {
@@ -4599,42 +4695,42 @@
     {
       "name": "SourceControlProvider",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "SpanMarginLeg",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "Sport",
       "source": "UAC",
       "instantiation_count": 0,
-      "annotation_count": 19,
+      "annotation_count": 9,
       "isinstance_count": 3
     },
     {
       "name": "SportsArbLeg",
       "source": "UAC",
-      "instantiation_count": 9,
-      "annotation_count": 9,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "SportsArbPosition",
       "source": "UAC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "SportsBetEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4648,21 +4744,21 @@
     {
       "name": "SportsBetResult",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SportsBookUpdate",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SportsError",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4676,43 +4772,43 @@
     {
       "name": "SportsFeatureVector",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SportsOddsTick",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "SportsVenueScore",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "SportsVenueSelection",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SportsbookLink",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SpreadLeg",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -4725,28 +4821,28 @@
     {
       "name": "StakingRate",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "StandingsRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "StartedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "StartedEvent",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4767,7 +4863,7 @@
     {
       "name": "StoppedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4775,27 +4871,27 @@
       "name": "StrategyDecision",
       "source": "UIC",
       "instantiation_count": 1,
-      "annotation_count": 10,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "StrategyDecisionData",
       "source": "UIC",
       "instantiation_count": 0,
-      "annotation_count": 9,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "StrategyRiskProfile",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "StrategySignalMessage",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -4816,35 +4912,42 @@
     {
       "name": "StressScenario",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 17,
+      "instantiation_count": 2,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "StressScenarioType",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 17,
+      "instantiation_count": 2,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "StressTestResult",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "SubAccount",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "SubscriptionTier",
+      "source": "UIC",
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "SwapResult",
       "source": "UIC",
-      "instantiation_count": 2,
+      "instantiation_count": 3,
       "annotation_count": 3,
       "isinstance_count": 0
     },
@@ -4872,36 +4975,36 @@
     {
       "name": "TargetType",
       "source": "UIC",
-      "instantiation_count": 17,
-      "annotation_count": 17,
+      "instantiation_count": 3,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "TeamRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "TermStructureExposure",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "TestingStage",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "TestingStageConfig",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 0,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -4914,14 +5017,14 @@
     {
       "name": "TimeInForce",
       "source": "UAC",
-      "instantiation_count": 10,
-      "annotation_count": 12,
+      "instantiation_count": 3,
+      "annotation_count": 5,
       "isinstance_count": 0
     },
     {
       "name": "Timeframe",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 2,
       "annotation_count": 34,
       "isinstance_count": 0
     },
@@ -4933,24 +5036,31 @@
       "isinstance_count": 0
     },
     {
+      "name": "TradeRecord",
+      "source": "UIC",
+      "instantiation_count": 3,
+      "annotation_count": 4,
+      "isinstance_count": 0
+    },
+    {
       "name": "TrainingJobRequest",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "TrainingJobResult",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "TrainingPeriod",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -4964,27 +5074,34 @@
       "name": "TrainingPipelineConfig",
       "source": "UIC",
       "instantiation_count": 2,
-      "annotation_count": 2,
+      "annotation_count": 4,
+      "isinstance_count": 0
+    },
+    {
+      "name": "TransferRecord",
+      "source": "UIC",
+      "instantiation_count": 4,
+      "annotation_count": 3,
       "isinstance_count": 0
     },
     {
       "name": "TriggerEvent",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 1,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "TriggerEventType",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "TriggerSubscription",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 1,
       "isinstance_count": 0
     },
@@ -4998,57 +5115,57 @@
     {
       "name": "UniswapV3PoolStateResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "UniswapV3QuoteResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "UniswapV3SwapTxReceipt",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "UpbitWithdrawRequest",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "UpbitWithdrawResponse",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "UrgencyLevel",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "UserProfile",
       "source": "UIC",
-      "instantiation_count": 2,
-      "annotation_count": 2,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "UserRole",
       "source": "UIC",
-      "instantiation_count": 4,
-      "annotation_count": 4,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -5061,35 +5178,35 @@
     {
       "name": "VMEventType",
       "source": "UIC",
-      "instantiation_count": 18,
-      "annotation_count": 20,
+      "instantiation_count": 3,
+      "annotation_count": 4,
       "isinstance_count": 0
     },
     {
       "name": "VaRMethod",
       "source": "UIC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
       "name": "VaRRequest",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "VaRResult",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "ValidationCompletedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -5103,7 +5220,7 @@
     {
       "name": "ValidationStartedDetails",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -5131,8 +5248,8 @@
     {
       "name": "VenueCategory",
       "source": "UAC",
-      "instantiation_count": 16,
-      "annotation_count": 16,
+      "instantiation_count": 2,
+      "annotation_count": 2,
       "isinstance_count": 0
     },
     {
@@ -5145,22 +5262,22 @@
     {
       "name": "VenueErrorClassification",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 56,
+      "instantiation_count": 1,
+      "annotation_count": 7,
       "isinstance_count": 0
     },
     {
       "name": "VenueExecutionProfile",
       "source": "UAC",
-      "instantiation_count": 40,
+      "instantiation_count": 5,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "VenueFreshnessSLA",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -5173,8 +5290,8 @@
     {
       "name": "VenueMapping",
       "source": "UAC",
-      "instantiation_count": 15,
-      "annotation_count": 0,
+      "instantiation_count": 19,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
@@ -5187,105 +5304,105 @@
     {
       "name": "VenuePositionBreakdownMessage",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "VenueRateLimitSpec",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "VenueRecord",
       "source": "UIC",
-      "instantiation_count": 16,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "VersionBumpDetails",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "VmQuotaShape",
       "source": "UAC",
-      "instantiation_count": 10,
-      "annotation_count": 2,
+      "instantiation_count": 2,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "VolSurfaceTermStructureRecord",
       "source": "UIC",
-      "instantiation_count": 17,
+      "instantiation_count": 3,
       "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketCloseInfo",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketConnectEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketDisconnectEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketErrorEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketEvent",
       "source": "UAC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketPingEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketPongEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketReconnectEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "WebSocketSubscribeAckEvent",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -5299,63 +5416,63 @@
     {
       "name": "WithdrawalRecord",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "XGBoostHyperparams",
       "source": "UIC",
-      "instantiation_count": 2,
+      "instantiation_count": 3,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "YieldCurveTenor",
       "source": "UIC",
-      "instantiation_count": 8,
-      "annotation_count": 8,
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
       "name": "aggregate_notional",
       "source": "UIC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "aggregate_positions",
       "source": "UIC",
-      "instantiation_count": 9,
+      "instantiation_count": 2,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "american_to_decimal",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "classify_venue_error",
       "source": "UAC",
-      "instantiation_count": 35,
+      "instantiation_count": 32,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "decimal_to_american",
       "source": "UAC",
-      "instantiation_count": 8,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
     {
       "name": "get_data_sources_for_venue",
       "source": "UAC",
-      "instantiation_count": 2,
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },
@@ -5367,9 +5484,23 @@
       "isinstance_count": 0
     },
     {
+      "name": "get_provider_availability",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
       "name": "get_required_secrets",
       "source": "UAC",
-      "instantiation_count": 10,
+      "instantiation_count": 3,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "get_venue_coordinates",
+      "source": "UAC",
+      "instantiation_count": 1,
       "annotation_count": 0,
       "isinstance_count": 0
     },

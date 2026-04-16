@@ -16,6 +16,10 @@ from typing import Literal, Self
 
 from pydantic import AwareDatetime, BaseModel, ConfigDict
 
+from unified_api_contracts.external.soccer_football_info.team_mappings import (
+    resolve_sfi_team as resolve_sfi_team,
+)
+
 from .._base import CanonicalBase
 from .arb import SportsArbLeg as SportsArbLeg
 from .arb import SportsArbPosition as SportsArbPosition
@@ -90,17 +94,24 @@ from .provider_league_ids import FOOTYSTATS_HISTORICAL_SEASON_IDS as FOOTYSTATS_
 from .provider_league_ids import FOOTYSTATS_SEASON_IDS as FOOTYSTATS_SEASON_IDS
 from .provider_league_ids import SOCCER_FOOTBALL_INFO_IDS as SOCCER_FOOTBALL_INFO_IDS
 from .provider_league_ids import SPORTS_ENTITY_LEAGUE_COVERAGE as SPORTS_ENTITY_LEAGUE_COVERAGE
+from .provider_league_ids import SPORTS_ENTITY_START_DATES as SPORTS_ENTITY_START_DATES
 from .provider_league_ids import TRANSFERMARKT_IDS as TRANSFERMARKT_IDS
 from .provider_league_ids import UNDERSTAT_NAMES as UNDERSTAT_NAMES
 from .provider_league_ids import get_entity_league_coverage as get_entity_league_coverage
 from .provider_league_ids import get_provider_league_id as get_provider_league_id
+from .provider_league_ids import get_sports_entity_start_date as get_sports_entity_start_date
 from .round_names import ROUND_NAMES as ROUND_NAMES
 from .round_names import ROUND_PREFIXES as ROUND_PREFIXES
 from .round_names import RoundMatch as RoundMatch
 from .round_names import is_known_round as is_known_round
 from .round_names import resolve_round_name as resolve_round_name
+from .season_dates import SeasonBoundary as SeasonBoundary
 from .season_dates import get_leagues_needing_refresh as get_leagues_needing_refresh
 from .season_dates import get_reference_refresh_dates as get_reference_refresh_dates
+from .season_dates import get_season_boundary as get_season_boundary
+from .season_dates import get_season_end as get_season_end
+from .season_dates import get_season_start as get_season_start
+from .season_dates import get_transfer_window_country as get_transfer_window_country
 from .season_dates import is_any_league_refresh_date as is_any_league_refresh_date
 from .season_dates import is_reference_refresh_date as is_reference_refresh_date
 from .team_mapping_data import get_all_teams as get_all_teams

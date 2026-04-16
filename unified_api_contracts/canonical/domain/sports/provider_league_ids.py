@@ -767,3 +767,52 @@ def get_entity_league_coverage(entity: str) -> frozenset[str] | None:
         League coverage set, or ``None`` for all-league entities.
     """
     return SPORTS_ENTITY_LEAGUE_COVERAGE.get(entity.upper())
+
+
+# ── Provider-specific start dates for sports entities ──
+# Before these dates, the provider did not supply data — so pre-start
+# fixture dates should NOT count as "missing" in the denominator.
+SPORTS_ENTITY_START_DATES: dict[str, str] = {
+    # SFI progressive stats / xG — Ultra xG feature launched 2024-03-15
+    "SFI_PROGRESSIVE_STATS": "2024-03-15",
+    "SFI_LEAGUES": "2024-03-15",
+    "SFI_STANDINGS": "2024-03-15",
+    # Understat xG — backfilled from 2019-01-01
+    "XG": "2019-01-01",
+    # FootyStats entities — backfilled from 2019-01-01
+    "MATCHES": "2019-01-01",
+    "PREDICTIONS": "2019-01-01",
+    # Weather — collection started 2024-01-01
+    "WEATHER": "2024-01-01",
+    # Transfermarkt entities — backfilled from 2019-01-01
+    "TRANSFERMARKT_LEAGUES": "2019-01-01",
+    "PLAYER_VALUES": "2019-01-01",
+    # API Football core entities — backfilled from 2019-01-01
+    "FIXTURES": "2019-01-01",
+    "FIXTURE_STATS": "2019-01-01",
+    "FIXTURE_EVENTS": "2019-01-01",
+    "FIXTURE_LINEUPS": "2019-01-01",
+    "PLAYER_STATS": "2019-01-01",
+    "LEAGUES": "2019-01-01",
+    "TEAMS": "2019-01-01",
+    "STANDINGS": "2019-01-01",
+    "INJURIES": "2019-01-01",
+    # Odds API — collection started 2024-07-01
+    "ODDS": "2024-07-01",
+}
+
+
+def get_sports_entity_start_date(entity: str) -> str | None:
+    """Return the earliest date a sports entity has data available.
+
+    Used by the data status denominator to exclude pre-start dates from
+    the "expected" count — prevents inflating missing data figures for
+    entities whose provider only started supplying data after a given date.
+
+    Args:
+        entity: Sports manifest entity name (e.g. "SFI_PROGRESSIVE_STATS").
+
+    Returns:
+        ISO date string, or ``None`` if no start date is registered.
+    """
+    return SPORTS_ENTITY_START_DATES.get(entity.upper())

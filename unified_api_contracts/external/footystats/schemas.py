@@ -280,23 +280,114 @@ class FootyStatsMatch(BaseModel):
     away_shots: int | None = None
     home_corners: int | None = None
     away_corners: int | None = None
+    # --- Odds: full-time result + over/under (all lines) ---
     odds_ft_1: float | None = None
     odds_ft_x: float | None = None
     odds_ft_2: float | None = None
+    odds_ft_over05: float | None = None
+    odds_ft_over15: float | None = None
+    odds_ft_over25: float | None = None
+    odds_ft_over35: float | None = None
+    odds_ft_over45: float | None = None
+    odds_ft_under05: float | None = None
+    odds_ft_under15: float | None = None
+    odds_ft_under25: float | None = None
+    odds_ft_under35: float | None = None
+    odds_ft_under45: float | None = None
+    # --- Odds: BTTS ---
     odds_btts_yes: float | None = None
     odds_btts_no: float | None = None
-    odds_ft_over25: float | None = None
-    odds_ft_under25: float | None = None
+    odds_btts_1st_half_yes: float | None = None
+    odds_btts_1st_half_no: float | None = None
+    odds_btts_2nd_half_yes: float | None = None
+    odds_btts_2nd_half_no: float | None = None
+    # --- Odds: double chance + DNB ---
+    odds_doublechance_1x: float | None = None
+    odds_doublechance_12: float | None = None
+    odds_doublechance_x2: float | None = None
+    odds_dnb_1: float | None = None
+    odds_dnb_2: float | None = None
+    # --- Odds: 1st half ---
+    odds_1st_half_result_1: float | None = None
+    odds_1st_half_result_x: float | None = None
+    odds_1st_half_result_2: float | None = None
+    odds_1st_half_over05: float | None = None
+    odds_1st_half_over15: float | None = None
+    odds_1st_half_over25: float | None = None
+    odds_1st_half_over35: float | None = None
+    odds_1st_half_under05: float | None = None
+    odds_1st_half_under15: float | None = None
+    odds_1st_half_under25: float | None = None
+    odds_1st_half_under35: float | None = None
+    # --- Odds: 2nd half ---
+    odds_2nd_half_result_1: float | None = None
+    odds_2nd_half_result_x: float | None = None
+    odds_2nd_half_result_2: float | None = None
+    odds_2nd_half_over05: float | None = None
+    odds_2nd_half_over15: float | None = None
+    odds_2nd_half_over25: float | None = None
+    odds_2nd_half_over35: float | None = None
+    odds_2nd_half_under05: float | None = None
+    odds_2nd_half_under15: float | None = None
+    odds_2nd_half_under25: float | None = None
+    odds_2nd_half_under35: float | None = None
+    # --- Odds: corners ---
+    odds_corners_1: float | None = None
+    odds_corners_2: float | None = None
+    odds_corners_x: float | None = None
+    odds_corners_over_75: float | None = None
+    odds_corners_over_85: float | None = None
+    odds_corners_over_95: float | None = None
+    odds_corners_over_105: float | None = None
+    odds_corners_over_115: float | None = None
+    odds_corners_under_75: float | None = None
+    odds_corners_under_85: float | None = None
+    odds_corners_under_95: float | None = None
+    odds_corners_under_105: float | None = None
+    odds_corners_under_115: float | None = None
+    # --- Odds: clean sheet ---
+    odds_team_a_cs_yes: float | None = None
+    odds_team_a_cs_no: float | None = None
+    odds_team_b_cs_yes: float | None = None
+    odds_team_b_cs_no: float | None = None
+    # --- Odds: specials ---
+    odds_team_to_score_first_1: float | None = None
+    odds_team_to_score_first_2: float | None = None
+    odds_team_to_score_first_x: float | None = None
+    odds_win_to_nil_1: float | None = None
+    odds_win_to_nil_2: float | None = None
     created_at: datetime | None = None
     # --- Predictive potentials (FootyStats proprietary) ---
     btts_potential: int | None = None
+    btts_fhg_potential: int | None = None
+    btts_2hg_potential: int | None = None
+    o05_potential: int | None = None
+    o15_potential: int | None = None
     o25_potential: int | None = None
     o35_potential: int | None = None
     o45_potential: int | None = None
+    u05_potential: int | None = None
+    u15_potential: int | None = None
+    u25_potential: int | None = None
+    u35_potential: int | None = None
+    u45_potential: int | None = None
+    o05HT_potential: int | None = None
+    o15HT_potential: int | None = None
+    o05_2H_potential: int | None = None
+    o15_2H_potential: int | None = None
     xg_prematch_home: float | None = None
     xg_prematch_away: float | None = None
+    xg_prematch_total: float | None = None
+    pre_match_home_ppg: float | None = None
+    pre_match_away_ppg: float | None = None
+    pre_match_team_a_overall_ppg: float | None = None
+    pre_match_team_b_overall_ppg: float | None = None
     corners_potential: int | None = None
+    corners_o85_potential: int | None = None
+    corners_o95_potential: int | None = None
+    corners_o105_potential: int | None = None
     cards_potential: int | None = None
+    offsides_potential: int | None = None
     avg_potential: int | None = None
 
     @classmethod
@@ -439,6 +530,10 @@ class FTMatchRaw(BaseModel):
     u25_potential: int | None = None
     u35_potential: int | None = None
     u45_potential: int | None = None
+    o05HT_potential: int | None = None
+    o15HT_potential: int | None = None
+    o05_2H_potential: int | None = None
+    o15_2H_potential: int | None = None
     corners_o85_potential: int | None = None
     corners_o95_potential: int | None = None
     corners_o105_potential: int | None = None
@@ -454,26 +549,89 @@ class FTMatchRaw(BaseModel):
     over35: bool | None = None
     over45: bool | None = None
 
-    # --- Odds (most important ~20 fields) ---
+    # --- Odds: full-time result + over/under (all lines) ---
     odds_ft_1: float | None = None
     odds_ft_x: float | None = None
     odds_ft_2: float | None = None
+    odds_ft_over05: float | None = None
     odds_ft_over15: float | None = None
     odds_ft_over25: float | None = None
     odds_ft_over35: float | None = None
+    odds_ft_over45: float | None = None
+    odds_ft_under05: float | None = None
     odds_ft_under15: float | None = None
     odds_ft_under25: float | None = None
     odds_ft_under35: float | None = None
+    odds_ft_under45: float | None = None
+
+    # --- Odds: BTTS ---
     odds_btts_yes: float | None = None
     odds_btts_no: float | None = None
+    odds_btts_1st_half_yes: float | None = None
+    odds_btts_1st_half_no: float | None = None
+    odds_btts_2nd_half_yes: float | None = None
+    odds_btts_2nd_half_no: float | None = None
+
+    # --- Odds: double chance + draw no bet ---
     odds_doublechance_1x: float | None = None
     odds_doublechance_12: float | None = None
     odds_doublechance_x2: float | None = None
+    odds_dnb_1: float | None = None
+    odds_dnb_2: float | None = None
+
+    # --- Odds: 1st half result + over/under ---
     odds_1st_half_result_1: float | None = None
     odds_1st_half_result_x: float | None = None
     odds_1st_half_result_2: float | None = None
-    odds_dnb_1: float | None = None
-    odds_dnb_2: float | None = None
+    odds_1st_half_over05: float | None = None
+    odds_1st_half_over15: float | None = None
+    odds_1st_half_over25: float | None = None
+    odds_1st_half_over35: float | None = None
+    odds_1st_half_under05: float | None = None
+    odds_1st_half_under15: float | None = None
+    odds_1st_half_under25: float | None = None
+    odds_1st_half_under35: float | None = None
+
+    # --- Odds: 2nd half result + over/under ---
+    odds_2nd_half_result_1: float | None = None
+    odds_2nd_half_result_x: float | None = None
+    odds_2nd_half_result_2: float | None = None
+    odds_2nd_half_over05: float | None = None
+    odds_2nd_half_over15: float | None = None
+    odds_2nd_half_over25: float | None = None
+    odds_2nd_half_over35: float | None = None
+    odds_2nd_half_under05: float | None = None
+    odds_2nd_half_under15: float | None = None
+    odds_2nd_half_under25: float | None = None
+    odds_2nd_half_under35: float | None = None
+
+    # --- Odds: corners ---
+    odds_corners_1: float | None = None
+    odds_corners_2: float | None = None
+    odds_corners_x: float | None = None
+    odds_corners_over_75: float | None = None
+    odds_corners_over_85: float | None = None
+    odds_corners_over_95: float | None = None
+    odds_corners_over_105: float | None = None
+    odds_corners_over_115: float | None = None
+    odds_corners_under_75: float | None = None
+    odds_corners_under_85: float | None = None
+    odds_corners_under_95: float | None = None
+    odds_corners_under_105: float | None = None
+    odds_corners_under_115: float | None = None
+
+    # --- Odds: clean sheet ---
+    odds_team_a_cs_yes: float | None = None
+    odds_team_a_cs_no: float | None = None
+    odds_team_b_cs_yes: float | None = None
+    odds_team_b_cs_no: float | None = None
+
+    # --- Odds: specials ---
+    odds_team_to_score_first_1: float | None = None
+    odds_team_to_score_first_2: float | None = None
+    odds_team_to_score_first_x: float | None = None
+    odds_win_to_nil_1: float | None = None
+    odds_win_to_nil_2: float | None = None
 
     # --- Attacks & dangerous attacks ---
     team_a_dangerous_attacks: int | None = None

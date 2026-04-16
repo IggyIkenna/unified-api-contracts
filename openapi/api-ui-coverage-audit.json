@@ -1,0 +1,786 @@
+{
+  "_meta": {
+    "generated_at": "2026-04-16T12:15:30.615948+00:00",
+    "workspace_root": "/Users/ikennaigboaka/Code/unified-trading-system-repos",
+    "spec_path": "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-api-contracts/openapi/unified-trading-system.openapi.json",
+    "elapsed_seconds": 0.4,
+    "target_services": ["client-reporting-api", "unified-trading-api"]
+  },
+  "summary": {
+    "api_endpoints_total": 259,
+    "ui_consumed": 128,
+    "api_not_consumed": 131,
+    "ui_no_backend": 60,
+    "gateway_mappings": 66,
+    "rewrite_rules": 21,
+    "ui_paths_scanned": 235
+  },
+  "api_not_consumed_by_ui": [
+    {
+      "path": "/client-reporting-api/alerts",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/reporting/fund-operations",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/reports",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/reports/generate",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/clients",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/clients/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/compliance/best-execution",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/compliance/dashboard",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/compliance/positions",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/compliance/trade-reporting",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/documents",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/documents/upload-url",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/documents/{document_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/documents/{document_id}/download-url",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/documents/{document_id}/send-for-signature",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/documents/{document_id}/signature-status",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/emergency/close-all/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/coin-breakdown",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/daily-equity",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/daily-summary",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/hourly-snapshots",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/tear-sheet",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/trades",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/exports/transfers",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/all",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/analytics",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/analytics/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/charts",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/charts/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboard/fees",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboard/fees/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboard/hwm/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboard/introducers",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboard/trader-payment",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboards",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboards/generate-all",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/dashboards/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/generate",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/generate-all",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/orders/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/performance/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/portal/admin",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/portal/introducer/{introducer_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/portal/trader",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/reports/{client_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/reports/{client_id}/{year}/{month}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/view/{invoice_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/{invoice_id}",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/{invoice_id}/download",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/invoices/{invoice_id}/transition",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/manual-entry/return",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/manual-entry/returns",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/manual-entry/snapshot",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/manual-entry/snapshots",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/performance/balances",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/performance/coin-breakdown",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/performance/positions",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/performance/summary",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/stream/reports",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/tax/annual-summary",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/tax/annual-summary/csv",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/trades",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/api/v1/webhooks/docusign",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/auth/login",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/auth/me",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/auth/users",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/metrics",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/performance",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/pnl",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/sports/clv",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/sports/pnl",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/sports/positions",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/sports/risk",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/client-reporting-api/sports/venue-performance",
+      "service": "client-reporting-api"
+    },
+    {
+      "path": "/unified-trading-api/alerts/{alert_id}/acknowledge",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/alerts/{alert_id}/escalate",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/alerts/{alert_id}/resolve",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/instruments",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/live-batch-delta",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/organizations",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/strategies/catalog",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/strategies/{strategy_id}/promote",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/strategies/{strategy_id}/reject",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/strategies/{strategy_id}/scale",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/analytics/timeseries",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/fixtures/{fixture_id}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/fixtures/{fixture_id}/injuries",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/fixtures/{fixture_id}/lineups",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/fixtures/{fixture_id}/odds",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/fixtures/{fixture_id}/predictions",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/fixtures/{fixture_id}/results",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/api/sports/standings/{league_id}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/audit/logs",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/catalogue",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/catalogue/domain/{domain}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/catalogue/domains",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/catalogue/search",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/chat/message",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/chat/tier",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/commodity/cot-positioning",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/commodity/factors",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/commodity/positions",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/commodity/regime-history",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/commodity/regime-state",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/config/feature-flags",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/config/system",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/config/venues",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/data-status/list-files",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/defi/lending/simulate-rate-impact",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/documents/download-url",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/documents/upload-url",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/events/calendar",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/events/news",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/events/positions",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/events/predictions",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/execution/analysis/{execution_id}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/execution/orders/{order_id}/amend",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/execution/orders/{order_id}/cancel",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/execution/sports/bets/{bet_id}/cancel",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/instruments/mock/create",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/instruments/mock/expire/{key}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/instruments/mock/{key}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/market-data/fx-rates",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/ml/grid-configs/{config_name}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/ml/models/{model_id}/promote",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/protocols",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/reporting/download/{report_id}",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/stream/reports",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/users/members",
+      "service": "unified-trading-api"
+    },
+    {
+      "path": "/unified-trading-api/version",
+      "service": "unified-trading-api"
+    }
+  ],
+  "ui_endpoints_no_backend": [
+    {
+      "path": "/api/accounts/transfer-history",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/alerts/acknowledge",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/alerts/escalate",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/alerts/resolve",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/analytics/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/analytics/strategies/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/analytics/strategy-candidates",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/analytics/strategy-handoffs",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/audit/batch-jobs",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/audit/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/client-config",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/funding-rates",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/pools",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/risk-monitor",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/staking",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/swap/quote",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/defi/treasury",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/deployment/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/execution/candidates",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/execution/handoff",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/execution/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/execution/metrics",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/futures/contracts",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/market-data/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/alerts",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/analysis/compare",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/health",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/pipeline/status",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/registry/models",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/training/queue",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/ml/training/runs",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/news/feed",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/onboarding",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/openapi.json",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/openapi.yaml",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/options/chain",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/options/positions",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/positions/reconciliation/auto-recon/history",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/positions/reconciliation/resolve",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/positions/reconciliation/summary",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/preview/unwind",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/reconciliation/drift/evaluate",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/reconciliation/drift/history",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/reconciliation/drift/portfolio-snapshot",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/reconciliation/venue-status",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/risk/venue-circuit-breakers",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/sports/arb",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/sports/bets",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/sports/bets/history",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/sports/bookmakers",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/sports/markets",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/sports/odds",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/trading/clients",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/trading/live-batch-delta",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/trading/organizations",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/trading/pnl",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/trading/timeseries",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/transfers/active",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/v1/health/readiness",
+      "target_hint": "unified-trading-api (catch-all)"
+    },
+    {
+      "path": "/api/v1/signup",
+      "target_hint": "unified-trading-api (catch-all)"
+    }
+  ]
+}

@@ -20,7 +20,7 @@ from unified_api_contracts.canonical.domain.sports import (
 )
 from unified_api_contracts.normalize_utils._helpers import _to_decimal, _ts_sec
 
-from .schemas import FootyStatsMatch, FootyStatsOdds
+from .schemas import FootyStatsMatch, FootyStatsOdds, FTMatchRaw
 
 
 def normalize_footystats_match(raw: FootyStatsMatch, venue: str = "footystats") -> CanonicalFixture:
@@ -188,15 +188,149 @@ def normalize_footystats_predictions(raw: FootyStatsMatch, venue: str = "footyst
         "kickoff_utc": kickoff_utc.isoformat(),
         "home_team": home_name,
         "away_team": away_name,
+        # Potentials (full set)
         "btts_potential": raw.btts_potential,
+        "btts_fhg_potential": raw.btts_fhg_potential,
+        "btts_2hg_potential": raw.btts_2hg_potential,
+        "o05_potential": raw.o05_potential,
+        "o15_potential": raw.o15_potential,
         "o25_potential": raw.o25_potential,
         "o35_potential": raw.o35_potential,
         "o45_potential": raw.o45_potential,
-        "xg_prematch_home": raw.xg_prematch_home,
-        "xg_prematch_away": raw.xg_prematch_away,
+        "u05_potential": raw.u05_potential,
+        "u15_potential": raw.u15_potential,
+        "u25_potential": raw.u25_potential,
+        "u35_potential": raw.u35_potential,
+        "u45_potential": raw.u45_potential,
+        "o05HT_potential": raw.o05HT_potential,
+        "o15HT_potential": raw.o15HT_potential,
+        "o05_2H_potential": raw.o05_2H_potential,
+        "o15_2H_potential": raw.o15_2H_potential,
+        "corners_o85_potential": raw.corners_o85_potential,
+        "corners_o95_potential": raw.corners_o95_potential,
+        "corners_o105_potential": raw.corners_o105_potential,
         "corners_potential": raw.corners_potential,
         "cards_potential": raw.cards_potential,
+        "offsides_potential": raw.offsides_potential,
         "avg_potential": raw.avg_potential,
+        # Pre-match xG
+        "xg_prematch_home": raw.xg_prematch_home,
+        "xg_prematch_away": raw.xg_prematch_away,
+        "xg_prematch_total": raw.xg_prematch_total,
+        # PPG
+        "pre_match_home_ppg": raw.pre_match_home_ppg,
+        "pre_match_away_ppg": raw.pre_match_away_ppg,
+        "pre_match_home_overall_ppg": raw.pre_match_team_a_overall_ppg,
+        "pre_match_away_overall_ppg": raw.pre_match_team_b_overall_ppg,
+    }
+
+
+def normalize_footystats_odds_snapshot(
+    raw: FootyStatsMatch | FTMatchRaw,
+    venue: str = "footystats",
+) -> dict[str, object]:
+    """Extract all odds fields from a FootyStats match as a flat dict.
+
+    Accepts either ``FootyStatsMatch`` or ``FTMatchRaw``. Uses ``getattr``
+    for fields that may not exist on the normalized model.
+
+    Returns a row suitable for a DataFrame written to ``entity=footystats_odds``.
+    """
+    kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix > 0 else datetime.now(UTC)
+    home_name = raw.home_name or ""
+    away_name = raw.away_name or ""
+
+    date_str = kickoff_utc.strftime("%Y%m%d")
+    home_id = build_team_id(home_name)
+    away_id = build_team_id(away_name)
+    league_id = build_league_id("", str(raw.competition_id or ""))
+    _match_id = getattr(raw, "ft_match_id", None) or getattr(raw, "match_id", "")
+    fixture_id = build_fixture_id(league_id, home_id, away_id, date_str) if home_id and away_id else str(_match_id)
+
+    return {
+        "fixture_id": fixture_id,
+        "canonical_fixture_id": fixture_id,
+        "source": venue,
+        "kickoff_utc": kickoff_utc.isoformat(),
+        "home_team": home_name,
+        "away_team": away_name,
+        # Full-time 1X2
+        "odds_ft_1": raw.odds_ft_1,
+        "odds_ft_x": raw.odds_ft_x,
+        "odds_ft_2": raw.odds_ft_2,
+        # Full-time over/under (all lines)
+        "odds_ft_over05": raw.odds_ft_over05,
+        "odds_ft_over15": raw.odds_ft_over15,
+        "odds_ft_over25": raw.odds_ft_over25,
+        "odds_ft_over35": raw.odds_ft_over35,
+        "odds_ft_over45": raw.odds_ft_over45,
+        "odds_ft_under05": raw.odds_ft_under05,
+        "odds_ft_under15": raw.odds_ft_under15,
+        "odds_ft_under25": raw.odds_ft_under25,
+        "odds_ft_under35": raw.odds_ft_under35,
+        "odds_ft_under45": raw.odds_ft_under45,
+        # BTTS
+        "odds_btts_yes": raw.odds_btts_yes,
+        "odds_btts_no": raw.odds_btts_no,
+        "odds_btts_1st_half_yes": raw.odds_btts_1st_half_yes,
+        "odds_btts_1st_half_no": raw.odds_btts_1st_half_no,
+        "odds_btts_2nd_half_yes": raw.odds_btts_2nd_half_yes,
+        "odds_btts_2nd_half_no": raw.odds_btts_2nd_half_no,
+        # Double chance + DNB
+        "odds_doublechance_1x": raw.odds_doublechance_1x,
+        "odds_doublechance_12": raw.odds_doublechance_12,
+        "odds_doublechance_x2": raw.odds_doublechance_x2,
+        "odds_dnb_1": raw.odds_dnb_1,
+        "odds_dnb_2": raw.odds_dnb_2,
+        # 1st half
+        "odds_1st_half_result_1": raw.odds_1st_half_result_1,
+        "odds_1st_half_result_x": raw.odds_1st_half_result_x,
+        "odds_1st_half_result_2": raw.odds_1st_half_result_2,
+        "odds_1st_half_over05": raw.odds_1st_half_over05,
+        "odds_1st_half_over15": raw.odds_1st_half_over15,
+        "odds_1st_half_over25": raw.odds_1st_half_over25,
+        "odds_1st_half_over35": raw.odds_1st_half_over35,
+        "odds_1st_half_under05": raw.odds_1st_half_under05,
+        "odds_1st_half_under15": raw.odds_1st_half_under15,
+        "odds_1st_half_under25": raw.odds_1st_half_under25,
+        "odds_1st_half_under35": raw.odds_1st_half_under35,
+        # 2nd half
+        "odds_2nd_half_result_1": raw.odds_2nd_half_result_1,
+        "odds_2nd_half_result_x": raw.odds_2nd_half_result_x,
+        "odds_2nd_half_result_2": raw.odds_2nd_half_result_2,
+        "odds_2nd_half_over05": raw.odds_2nd_half_over05,
+        "odds_2nd_half_over15": raw.odds_2nd_half_over15,
+        "odds_2nd_half_over25": raw.odds_2nd_half_over25,
+        "odds_2nd_half_over35": raw.odds_2nd_half_over35,
+        "odds_2nd_half_under05": raw.odds_2nd_half_under05,
+        "odds_2nd_half_under15": raw.odds_2nd_half_under15,
+        "odds_2nd_half_under25": raw.odds_2nd_half_under25,
+        "odds_2nd_half_under35": raw.odds_2nd_half_under35,
+        # Corners
+        "odds_corners_1": raw.odds_corners_1,
+        "odds_corners_2": raw.odds_corners_2,
+        "odds_corners_x": raw.odds_corners_x,
+        "odds_corners_over_75": raw.odds_corners_over_75,
+        "odds_corners_over_85": raw.odds_corners_over_85,
+        "odds_corners_over_95": raw.odds_corners_over_95,
+        "odds_corners_over_105": raw.odds_corners_over_105,
+        "odds_corners_over_115": raw.odds_corners_over_115,
+        "odds_corners_under_75": raw.odds_corners_under_75,
+        "odds_corners_under_85": raw.odds_corners_under_85,
+        "odds_corners_under_95": raw.odds_corners_under_95,
+        "odds_corners_under_105": raw.odds_corners_under_105,
+        "odds_corners_under_115": raw.odds_corners_under_115,
+        # Clean sheet
+        "odds_team_a_cs_yes": raw.odds_team_a_cs_yes,
+        "odds_team_a_cs_no": raw.odds_team_a_cs_no,
+        "odds_team_b_cs_yes": raw.odds_team_b_cs_yes,
+        "odds_team_b_cs_no": raw.odds_team_b_cs_no,
+        # Specials
+        "odds_team_to_score_first_1": raw.odds_team_to_score_first_1,
+        "odds_team_to_score_first_2": raw.odds_team_to_score_first_2,
+        "odds_team_to_score_first_x": raw.odds_team_to_score_first_x,
+        "odds_win_to_nil_1": raw.odds_win_to_nil_1,
+        "odds_win_to_nil_2": raw.odds_win_to_nil_2,
     }
 
 
@@ -204,5 +338,6 @@ __all__ = [
     "normalize_footystats_match",
     "normalize_footystats_match_to_market",
     "normalize_footystats_odds",
+    "normalize_footystats_odds_snapshot",
     "normalize_footystats_predictions",
 ]

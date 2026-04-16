@@ -1,5 +1,12 @@
-"""Risk service domain schemas — metrics, alerts, exposure, pre-trade checks, account state."""
+"""Risk service domain schemas — metrics, alerts, exposure, pre-trade checks, account state, position reconciliation."""
 
+from unified_api_contracts.internal.domain.risk_service.position_reconciliation import (
+    DriftDimension,
+    DriftSeverity,
+    PortfolioReconciliationSnapshot,
+    PositionDriftMetric,
+    ShareClassSummary,
+)
 from unified_api_contracts.internal.domain.risk_service.risk import (
     AccountState,
     AlertContextData,
@@ -48,6 +55,8 @@ __all__ = [
     "ClientRiskTolerance",
     "CustomRiskEvaluationMethod",
     "CustomRiskTypeDefinition",
+    "DriftDimension",
+    "DriftSeverity",
     "DurationBucket",
     "EODSettlementTrigger",
     "EmergencyExitPlaybook",
@@ -63,6 +72,8 @@ __all__ = [
     "MarginState",
     "MultiAssetMarginCalculation",
     "PnLBreakdown",
+    "PortfolioReconciliationSnapshot",
+    "PositionDriftMetric",
     "PositionSide",
     "PreTradeCheckRequest",
     "PreTradeCheckResponse",
@@ -72,6 +83,7 @@ __all__ = [
     "RiskPosition",
     "RiskStatus",
     "ScopedKillSwitchState",
+    "ShareClassSummary",
     "SpanMarginLeg",
     "StrategyRiskProfile",
     "TermStructureExposure",

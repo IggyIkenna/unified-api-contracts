@@ -79,7 +79,7 @@
         "role": "api",
         "tags": ["analytics", "cefi", "standard"],
         "version": "0.1.0",
-        "ci_status": "LOCAL_PASS",
+        "ci_status": "FAILING",
         "coverage_pct": 18,
         "testing_level": "unit",
         "status": "active",

@@ -74,6 +74,8 @@ class RiskMetrics(BaseModel):
     account_equity_share_class: Decimal | None = Field(
         default=None, description="Account equity in share class currency"
     )
+    account_id: str | None = Field(default=None, description="Account-level risk when specified")
+    strategy_id: str | None = Field(default=None, description="Strategy-level risk when specified")
     var_1d: Decimal | None = None
     var_5d: Decimal | None = None
     expected_shortfall: Decimal | None = None
@@ -192,6 +194,7 @@ class AccountState(BaseModel):
     timestamp: datetime
     venue: str
     account_id: str = Field(..., json_schema_extra={"pii": True})
+    client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
     positions: list[InternalPosition] = Field(default_factory=list)
     balances: dict[str, Balance] = Field(default_factory=dict)
     margin: MarginState | None = None

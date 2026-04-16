@@ -2935,7 +2935,7 @@
         "class_name": "PositionBalanceMonitorServiceConfig",
         "module": "position_balance_monitor_service.config",
         "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
-        "field_count": 123,
+        "field_count": 128,
         "fields": {
           "service_name": {
             "type": "<class 'str'>",
@@ -3370,6 +3370,31 @@
           "critical_discrepancy_value": {
             "type": "<class 'float'>",
             "default": 1000.0,
+            "required": false
+          },
+          "drift_warning_threshold_pct": {
+            "type": "<class 'decimal.Decimal'>",
+            "default": "Decimal('2.0')",
+            "required": false
+          },
+          "drift_critical_threshold_pct": {
+            "type": "<class 'decimal.Decimal'>",
+            "default": "Decimal('5.0')",
+            "required": false
+          },
+          "drift_delta_warning_threshold": {
+            "type": "<class 'decimal.Decimal'>",
+            "default": "Decimal('0.5')",
+            "required": false
+          },
+          "drift_delta_critical_threshold": {
+            "type": "<class 'decimal.Decimal'>",
+            "default": "Decimal('1.0')",
+            "required": false
+          },
+          "reconciliation_drift_interval_seconds": {
+            "type": "<class 'int'>",
+            "default": 30,
             "required": false
           },
           "auto_correct_enabled": {

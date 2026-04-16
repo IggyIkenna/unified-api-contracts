@@ -3,15 +3,15 @@ UAC / UIC Type Usage Audit Report
 ========================================================================
 
 Workspace: /Users/ikennaigboaka/Code/unified-trading-system-repos
-Elapsed:   28.2s
+Elapsed:   6.2s
 
 SUMMARY
 ----------------------------------------
-  ALIVE:              621
-  TEST_ONLY:           18
+  ALIVE:              631
+  TEST_ONLY:           21
   IMPORT_CHAIN_ONLY:   35
-  DEAD:               155
-  TOTAL:              829
+  DEAD:               186
+  TOTAL:              873
 
 
 DEAD TYPES (no external usage)
@@ -23,12 +23,15 @@ DEAD TYPES (no external usage)
   [UAC] BOOKMAKER_REGISTRY
   [UIC] BackfillSpec
   [UIC] BalanceReconciliationStatus
+  [UAC] BinanceInstrumentInfo
   [UAC] BinanceLiquidationOrder
   [UAC] BinanceMarkPriceUpdate
+  [UAC] BinanceOptionInstrumentInfo
   [UAC] BinanceOrderBook
   [UAC] BinanceTicker
   [UAC] BinanceTrade
   [UAC] BookmakerRegistry
+  [UAC] BybitInstrumentInfo
   [UAC] BybitInstrumentsResponse
   [UAC] BybitLiquidationOrder
   [UAC] BybitOrderBook
@@ -40,6 +43,7 @@ DEAD TYPES (no external usage)
   [UAC] CLOB_VENUES
   [UAC] CME_MONTH_CODES
   [UAC] CONFIG_SCHEMA
+  [UIC] CalibrationMethod
   [UAC] CcxtAggTrade
   [UAC] CcxtFundingRate
   [UAC] CcxtMarket
@@ -55,7 +59,9 @@ DEAD TYPES (no external usage)
   [UIC] ClientFeeSchedule
   [UIC] ClientPrimeBrokerLink
   [UIC] ClientStrategyOverride
+  [UIC] CoinPnLBreakdown
   [UAC] CoinbaseOrderBook
+  [UAC] CoinbaseProductInfo
   [UAC] CoinbaseProductsResponse
   [UAC] CoinbaseTicker
   [UAC] CoinbaseTrade
@@ -69,17 +75,20 @@ DEAD TYPES (no external usage)
   [UAC] DEFI_MAJOR_ASSET_SYMBOLS
   [UAC] DEX_VENUES
   [UAC] DEX_VENUE_KEYWORDS
+  [UIC] DailyBalanceSummary
+  [UAC] DataProtocol
   [UIC] DeFiConnectorStateDict
   [UIC] DeFiHealthSummary
   [UIC] DeFiPoolStateResult
   [UIC] DeFiSwapQuoteResult
   [UIC] DeFiSwapResult
   [UIC] DeFiTxResult
-  [UIC] DeadLetterRecord
   [UAC] DefiErrorCode
   [UAC] DeribitGetInstrumentResponse
   [UAC] DeribitGetInstrumentsResponse
+  [UAC] DeribitInstrumentInfoFull
   [UIC] DeviationStatus
+  [UIC] DexPoolDayRecord
   [UIC] DividendType
   [UIC] DriftOrderSide
   [UAC] ENDPOINT_REGISTRY
@@ -91,6 +100,7 @@ DEAD TYPES (no external usage)
   [UIC] FEATURES_SCHEMA
   [UIC] FEATURE_FRESHNESS
   [UAC] FX_SPOT_PAIRS
+  [UIC] FeeLineType
   [UIC] FileReport
   [UIC] GasCostRecord
   [UAC] HyperliquidFill
@@ -102,20 +112,29 @@ DEAD TYPES (no external usage)
   [UAC] INSTRUMENT_TYPE_FOLDER_MAP
   [UIC] InstrumentFaultRule
   [UIC] InstrumentStatus
+  [UIC] Invoice
+  [UIC] InvoiceHistoryEntry
+  [UIC] InvoiceStatus
   [UAC] KNOWN_ETFS
   [UAC] KalshiMarket
   [UAC] KalshiOrderBook
   [UAC] KalshiTrade
   [UIC] KaminoBorrowParams
+  [UIC] LendingIndexRecord
   [UAC] LiquidationHeatmapResponse
   [UAC] LiquidationLevel
+  [UIC] LiquidationRecord
+  [UAC] LiveDataEvent
+  [UIC] LstRateRecord
   [UIC] MARKET_TICK_FRESHNESS
   [UIC] ML_FRESHNESS
   [UAC] ManifoldMarket
   [UAC] ManifoldPrice
   [UAC] ManifoldTrade
+  [UIC] MonthlyReturn
   [UIC] NAVSnapshotStatus
   [UAC] OKXFundingRate
+  [UAC] OKXInstrumentInfo
   [UAC] OKXInstrumentsResponse
   [UAC] OKXLiquidationOrder
   [UAC] OKXMarkPrice
@@ -125,12 +144,17 @@ DEAD TYPES (no external usage)
   [UAC] OKX_SPOT
   [UAC] OPTIONAL_CONFIG_FIELDS
   [UIC] OnchainDataFreshnessConfig
-  [UIC] OperationalMode
+  [UIC] PerformanceStats
+  [UIC] PerformanceSummary
+  [UIC] PerpFundingRecord
   [UAC] PolygonDividendsResponse
   [UAC] PolygonOptionContractsResponse
   [UAC] PolygonSplitsResponse
   [UAC] PolygonTickersResponse
+  [UIC] PortfolioAllocation
   [UIC] PrimeBrokerEntity
+  [UAC] ProtocolCapability
+  [UIC] ProvisioningRole
   [UAC] QUARTERLY_MONTHS
   [UAC] REQUIRED_CONFIG_FIELDS
   [UAC] RateLimitInfo
@@ -145,6 +169,8 @@ DEAD TYPES (no external usage)
   [UIC] SignalVectorMetaFeatures
   [UIC] StrategyModeParams
   [UIC] StrategyNAV
+  [UIC] StrategyPositionSnapshot
+  [UIC] TIER_ENTITLEMENTS
   [UIC] TIMEFRAME_TO_SECONDS
   [UAC] TRADFI_DATABENTO_INSTRUMENTS
   [UAC] TRADFI_EQUITIES
@@ -153,6 +179,8 @@ DEAD TYPES (no external usage)
   [UAC] TRADFI_TICKER_UNIVERSE
   [UIC] TargetTypeParams
   [UIC] TickReplayEngine
+  [UIC] TradeSide
+  [UIC] TradeType
   [UIC] UniverseSnapshot
   [UIC] UnsubscribeRequest
   [UAC] UpbitTicker
@@ -164,10 +192,13 @@ DEAD TYPES (no external usage)
   [UAC] VALID_TIMEFRAMES
   [UAC] VENUES_BY_CATEGORY
   [UAC] VENUE_CATEGORY_MAP
+  [UAC] VENUE_COORDINATES
+  [UAC] VENUE_DATA_AVAILABILITY
   [UAC] VENUE_TO_CATEGORY
   [UAC] VENUE_TO_DATA_SOURCE
   [UAC] VENUE_TO_DATA_SOURCES
   [UIC] VM_INFRASTRUCTURE_EVENTS
+  [UAC] VenueCoordinates
   [UAC] WebSocketConnectionClosed
   [UAC] WebSocketConnectionOpened
   [UAC] ZERO_ALPHA_VENUES
@@ -177,25 +208,27 @@ TEST-ONLY TYPES (used only in test files)
   [UAC] BinanceFuturesExchangeInfo
            files: instruments-service/tests/reference_data/integration/test_library_deps_integration.py
   [UAC] CanonicalFundingRate
-           files: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py
+           files: market-tick-data-service/tests/market_interface/integration/test_library_deps_integration.py, unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py
   [UAC] CanonicalInstrument
-           files: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/__init__.py, _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/__init__.py
+           files: system-integration-tests/tests/integration/test_instrument_alignment.py, system-integration-tests/tests/smoke/test_mock_data_chain.py, unified-trading-system-ui/context/api-contracts/canonical-schemas/__init__.py, unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/reference/__init__.py
   [UAC] DataSourceMapping
-           files: unified-market-interface/tests/integration/test_library_deps_integration.py
+           files: market-tick-data-service/tests/market_interface/integration/test_library_deps_integration.py
   [UAC] DataTypeConfig
            files: unified-trading-library/tests/config_interface/unit/test_venue_config.py
   [UAC] ExchangeInstrumentConfig
-           files: unified-market-interface/tests/unit/test_models_and_config.py, unified-trading-library/tests/config_interface/unit/test_venue_config.py
+           files: market-tick-data-service/tests/market_interface/unit/test_models_and_config.py, unified-trading-library/tests/config_interface/unit/test_venue_config.py
   [UAC] FeeType
-           files: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py, _archived-ui-reference/versa-admin-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py, _archived-ui-reference/versa-audit-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/position/__init__.py
+           files: position-balance-monitor-service/tests/unit/test_fee_reconciliation_engine.py, unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py, unified-trading-system-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py
   [UIC] GridDimensions
            files: strategy-service/tests/unit/test_grid_generator.py
   [UAC] HealthPingResponse
-           files: execution-service/tests/sports_execution/integration/test_library_deps_integration.py, execution-service/tests/trade_execution/integration/test_library_deps_integration.py, unified-market-interface/tests/integration/test_library_deps_integration.py
+           files: execution-service/tests/sports_execution/integration/test_library_deps_integration.py, execution-service/tests/trade_execution/integration/test_library_deps_integration.py, market-tick-data-service/tests/market_interface/integration/test_library_deps_integration.py
   [UAC] HyperliquidPosition
            files: position-balance-monitor-service/tests/position_interface/unit/test_routing.py
   [UIC] InstrumentDefinition
            files: system-integration-tests/tests/integration/test_instrument_alignment.py
+  [UIC] LegRole
+           files: execution-service/tests/unit/engine/test_multi_leg_orchestrator_new.py
   [UAC] NegRiskArbSignal
            files: execution-service/tests/sports_execution/integration/test_library_deps_integration.py
   [UAC] NegRiskBucket
@@ -205,11 +238,15 @@ TEST-ONLY TYPES (used only in test files)
   [UIC] SeedDataWriter
            files: system-integration-tests/tests/smoke/test_mock_data_chain.py
   [UAC] TardisExchangeDetail
-           files: instruments-service/tests/reference_data/unit/test_coverage_gaps_adapters.py
+           files: instruments-service/tests/unit/test_coverage_gaps_adapters.py
+  [UIC] TrainingScope
+           files: ml-training-service/tests/unit/test_cross_asset_training.py
+  [UIC] TransferLearningConfig
+           files: ml-training-service/tests/unit/test_cross_asset_training.py
   [UAC] UpbitBalanceQueryResponse
            files: position-balance-monitor-service/tests/position_interface/integration/test_library_deps_integration.py
   [UAC] VolSurface
-           files: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py
+           files: features-volatility-service/tests/unit/test_vol_surface_term_structure.py, unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/derivatives/__init__.py
 
 IMPORT-CHAIN-ONLY TYPES (only in __init__.py re-exports)
 ----------------------------------------
@@ -234,49 +271,49 @@ IMPORT-CHAIN-ONLY TYPES (only in __init__.py re-exports)
   [UAC] MarketTrade
   [UAC] MultiLegInstrument
   [UAC] ODDS_API_KEY_TO_VENUE
-           chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py
+           chain: unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py
   [UAC] ODDS_API_KEY_TO_VENUE_CATEGORY
-           chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py
+           chain: unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py
   [UAC] OddsFormat
   [UAC] OpenInterestHistory
   [UAC] OrderBookSnapshot5
   [UAC] OrphanDetector
-           chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/prediction/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/prediction/__init__.py
+           chain: unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/prediction/__init__.py
   [UAC] PositionRisk
   [UAC] RISK_TYPE_CATEGORIES
-           chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/crosscutting/__init__.py
+           chain: unified-trading-system-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py
   [UAC] ScalingMode
   [UAC] TeamMapping
   [UAC] VENUE_ERROR_MAP
-           chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/crosscutting/__init__.py
+           chain: unified-trading-system-ui/context/api-contracts/canonical-schemas/crosscutting/__init__.py
   [UAC] VENUE_EXECUTION_REGISTRY
-           chain: _archived-ui-reference/versa-admin-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-audit-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-client-reporting/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-execution-analytics-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py, _archived-ui-reference/versa-invoicing/context/api-contracts/canonical-schemas/domain/sports/__init__.py
+           chain: unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/sports/__init__.py
   [UAC] VolSmilePoint
   [UAC] VolSurfaceSlice
   [UAC] VolTermStructure
 
 ALIVE TYPES (top 20 by instantiation count)
 ----------------------------------------
-  [UIC] Order                                              inst=53  annot=62
-  [UAC] VenueExecutionProfile                              inst=40  annot=1
-  [UIC] InstrumentRecord                                   inst=36  annot=41
-  [UAC] classify_venue_error                               inst=35  annot=0
-  [UIC] AlertMessage                                       inst=35  annot=19
-  [UIC] ErrorContext                                       inst=33  annot=1
-  [UIC] AccountState                                       inst=32  annot=0
-  [UIC] Balance                                            inst=32  annot=9
-  [UIC] EnhancedError                                      inst=32  annot=3
-  [UIC] MarginState                                        inst=32  annot=17
-  [UAC] ComputeType                                        inst=24  annot=18
-  [UAC] ExecutionResult                                    inst=24  annot=18
-  [UIC] CandleOutput                                       inst=24  annot=0
-  [UIC] MockScenario                                       inst=24  annot=1
-  [UIC] ModelVariantConfig                                 inst=24  annot=18
-  [UAC] ScraperError                                       inst=22  annot=0
-  [UIC] MarketCategory                                     inst=22  annot=23
-  [UAC] CanonicalFill                                      inst=20  annot=10
-  [UIC] ExecutionMode                                      inst=20  annot=10
-  [UIC] InferenceRequest                                   inst=20  annot=1
+  [UAC] classify_venue_error                               inst=32  annot=0
+  [UIC] ErrorContext                                       inst=32  annot=1
+  [UIC] EnhancedError                                      inst=31  annot=3
+  [UIC] InstrumentRecord                                   inst=31  annot=36
+  [UIC] Order                                              inst=31  annot=49
+  [UAC] VenueMapping                                       inst=19  annot=1
+  [UIC] Balance                                            inst=18  annot=9
+  [UIC] CandleOutput                                       inst=17  annot=0
+  [UIC] MockScenario                                       inst=17  annot=1
+  [UAC] ScraperError                                       inst=15  annot=0
+  [UAC] CanonicalFill                                      inst=13  annot=10
+  [UAC] ExecutionResult                                    inst=13  annot=18
+  [UAC] BookmakerUnavailableError                          inst=11  annot=0
+  [UIC] AccountState                                       inst=11  annot=0
+  [UIC] MarginState                                        inst=11  annot=3
+  [UAC] CanonicalAccountSnapshot                           inst=10  annot=0
+  [UIC] ModelVariantConfig                                 inst=10  annot=18
+  [UIC] ColumnSchema                                       inst=9   annot=1
+  [UIC] SchemaDefinition                                   inst=9   annot=6
+  [UAC] BetExecution                                       inst=8   annot=16
 
 ========================================================================
 END OF REPORT

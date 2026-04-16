@@ -299,11 +299,16 @@ class StrategyInstruction:
         metadata={"description": "Destination chain for BRIDGE instructions."},
     )
 
-    # Client attribution
-    client_id: str | None = field(
-        default=None,
-        metadata={"description": "Client identifier for multi-client strategies."},
-    )
+    # Client and account routing
+    client_id: str = field(default="", metadata={"description": "Client identifier for routing."})
+    account_id: str | None = field(default=None, metadata={"description": "Account key (client:venue:label)."})
+
+    # Market making — delta-proxy repricing (see codex/09-strategy/market-making-reference-price.md)
+    reference_price: Decimal | None = field(default=None, metadata={"description": "Underlying ref price."})
+    underlying_instrument_id: str | None = field(default=None, metadata={"description": "Underlying to track."})
+    delta: Decimal | None = field(default=None, metadata={"description": "Instrument delta to underlying."})
+    gamma: Decimal | None = field(default=None, metadata={"description": "Second-order delta sensitivity."})
+    delta_premium: Decimal | None = field(default=None, metadata={"description": "Options delta-premium."})
 
     # Additional metadata
     metadata: MetadataMap = field(default_factory=dict)
@@ -354,6 +359,11 @@ class StrategyInstruction:
             "source_chain": self.source_chain,
             "dest_chain": self.dest_chain,
             "client_id": self.client_id,
+            "reference_price": str(self.reference_price) if self.reference_price is not None else None,
+            "underlying_instrument_id": self.underlying_instrument_id,
+            "delta": str(self.delta) if self.delta is not None else None,
+            "gamma": str(self.gamma) if self.gamma is not None else None,
+            "delta_premium": str(self.delta_premium) if self.delta_premium is not None else None,
             "metadata": self.metadata,
         }
 

@@ -34,6 +34,16 @@ class SettlementType(StrEnum):
     FLASH_LOAN_FEE = "flash_loan_fee"
 
 
+class BatchExecutionMode(StrEnum):
+    """How batch/backtest fills should be simulated."""
+
+    BENCHMARK = "benchmark"
+    """Always fill at requested price. Zero execution alpha. Isolates strategy P&L."""
+
+    SIMULATED = "simulated"
+    """Realistic fills with commission, margin, latency. Measures execution alpha."""
+
+
 class ManualExecutionMode(StrEnum):
     """How a manual instruction should be processed by the execution service."""
 
@@ -92,4 +102,4 @@ class ManualInstruction(BaseModel):
     source_reference: str = ""
 
 
-__all__ = ["ManualExecutionMode", "ManualInstruction", "SettlementType"]
+__all__ = ["BatchExecutionMode", "ManualExecutionMode", "ManualInstruction", "SettlementType"]
