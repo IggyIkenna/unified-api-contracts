@@ -40,6 +40,10 @@ class LeagueDefinition:
             non-football or unmapped leagues.
         tier: 1 = top division, 2 = second tier, etc. 0 = cup/non-football.
         classification: ``Prediction``, ``Features``, ``Reference``, or ``Other``.
+        supports_live_stats: Whether API Football provides live in-play statistics
+            (possession, shots, corners) for this league. Tier 0 (cups/continental)
+            and Tier 1 (top national divisions) generally do. Lower tiers only get
+            live score + events (goals/cards/subs) but not detailed stats.
     """
 
     league_id: str
@@ -52,6 +56,7 @@ class LeagueDefinition:
     api_football_id: int | None
     tier: int
     classification: str
+    supports_live_stats: bool = False
 
 
 # ---------------------------------------------------------------------------

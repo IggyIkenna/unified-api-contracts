@@ -44,6 +44,8 @@ from .canonical_ids import build_referee_id as build_referee_id
 from .canonical_ids import build_season_id as build_season_id
 from .canonical_ids import build_team_id as build_team_id
 from .canonical_ids import build_venue_id as build_venue_id
+from .injury import AbsenceType as AbsenceType
+from .injury import classify_absence as classify_absence
 from .league_classification_data import DEFAULT_CLASSIFICATION_REGISTRY as DEFAULT_CLASSIFICATION_REGISTRY
 from .league_classification_data import LEAGUE_CLASSIFICATION_DATA as LEAGUE_CLASSIFICATION_DATA
 from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
@@ -538,6 +540,7 @@ class CanonicalInjury(BaseModel):
     fixture_id: str | None = None
     injury_type: str
     reason: str | None = None
+    absence_type: AbsenceType = AbsenceType.OTHER
 
 
 class CanonicalFixtureStats(BaseModel):

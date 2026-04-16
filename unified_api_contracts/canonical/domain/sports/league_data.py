@@ -87,6 +87,23 @@ def get_prediction_leagues() -> list[LeagueDefinition]:
     return get_leagues_by_classification("Prediction")
 
 
+def get_live_stats_api_football_ids() -> frozenset[int]:
+    """Return API Football league IDs that support live in-play statistics.
+
+    API Football provides live stats (possession, shots, corners, fouls) for
+    top-tier football leagues (Tier 0 cups/continental + Tier 1 national top
+    divisions). Lower tiers only get score + events (goals/cards/subs).
+
+    Used by instruments-service live poller to decide which fixtures get the
+    extra ``/fixtures/statistics`` call vs just score + events.
+    """
+    return frozenset(
+        league.api_football_id
+        for league in LEAGUE_REGISTRY.values()
+        if league.api_football_id is not None and league.sport == "FOOTBALL" and league.tier <= 1
+    )
+
+
 def get_all_prediction_league_ids() -> list[str]:
     """Return canonical league_id strings for all Prediction-tier leagues.
 
@@ -162,5 +179,6 @@ __all__ = [
     "get_leagues_by_classification",
     "get_leagues_by_country",
     "get_leagues_for_sport",
+    "get_live_stats_api_football_ids",
     "get_prediction_leagues",
 ]

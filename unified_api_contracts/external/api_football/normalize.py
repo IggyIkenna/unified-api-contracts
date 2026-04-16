@@ -342,11 +342,179 @@ def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") 
     return [result]
 
 
+def _safe_int(val: object) -> int | None:
+    """Parse a value to int, stripping percentage signs and other suffixes.
+
+    API Football returns some stats as ``"44%"`` strings. This function
+    handles: int, float, ``"44"``, ``"44%"``, ``None``.
+    """
+    if val is None:
+        return None
+    if isinstance(val, int):
+        return val
+    if isinstance(val, float):
+        return int(val)
+    s = str(val).strip().rstrip("%").strip()
+    if not s or s.lower() in ("none", "null", "-"):
+        return None
+    try:
+        return int(float(s))
+    except (ValueError, OverflowError):
+        return None
+
+
+_INT_STAT_FIELDS = frozenset(
+    {
+        "minutes_played",
+        "offsides",
+        "shots_total",
+        "shots_on",
+        "goals_total",
+        "goals_conceded",
+        "assists",
+        "saves",
+        "passes_total",
+        "passes_key",
+        "passes_accuracy",
+        "tackles_total",
+        "blocks",
+        "interceptions",
+        "duels_total",
+        "duels_won",
+        "dribbles_attempts",
+        "dribbles_success",
+        "dribbles_past",
+        "fouls_drawn",
+        "fouls_committed",
+        "yellow_cards",
+        "red_cards",
+        "penalty_won",
+        "penalty_committed",
+        "penalty_scored",
+        "penalty_missed",
+        "penalty_saved",
+    }
+)
+
+
 def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
-    """Normalize API-Football player statistics into per-player records."""
-    result = dict(raw) if isinstance(raw, dict) else {}
-    result["fixture_id"] = fixture_id
-    return [result]
+    """Normalize API-Football player statistics into per-player records.
+
+    Handles percentage strings (``"44%"`` → ``44``) and nested stat
+    structures from the API Football ``/fixtures/players`` endpoint.
+    """
+    if not isinstance(raw, dict):
+        return []
+
+    # API Football nests player stats under teams→players→statistics
+    # The raw dict may be a team-level response or a flat player record.
+    teams: list[dict[str, object]] = []
+    if "team" in raw and "players" in raw:
+        teams = [raw]
+    elif "response" in raw:
+        resp = raw["response"]
+        if isinstance(resp, list):
+            teams = [t for t in resp if isinstance(t, dict)]
+    else:
+        # Flat record — sanitise int fields and drop nested structures
+        result = {k: v for k, v in raw.items() if not isinstance(v, (dict, list))}
+        result["fixture_id"] = fixture_id
+        for field in _INT_STAT_FIELDS:
+            if field in result:
+                result[field] = _safe_int(result[field])
+        return [result]
+
+    records: list[dict[str, object]] = []
+    for team_block in teams:
+        team_info = team_block.get("team", {})
+        if not isinstance(team_info, dict):
+            continue
+        team_id = str(team_info.get("id", ""))
+        team_name = str(team_info.get("name", ""))
+
+        players = team_block.get("players", [])
+        if not isinstance(players, list):
+            continue
+
+        for player_block in players:
+            if not isinstance(player_block, dict):
+                continue
+            player_info = player_block.get("player", {})
+            if not isinstance(player_info, dict):
+                continue
+
+            stats_list = player_block.get("statistics", [])
+            if not isinstance(stats_list, list) or not stats_list:
+                continue
+
+            # Merge all stat blocks (usually just one per player per fixture)
+            merged: dict[str, object] = {
+                "fixture_id": fixture_id,
+                "team_id": team_id,
+                "team_name": team_name,
+                "player_id": str(player_info.get("id", "")),
+                "player_name": str(player_info.get("name", "")),
+            }
+
+            for stat_block in stats_list:
+                if not isinstance(stat_block, dict):
+                    continue
+                # Map API Football nested keys to flat CanonicalPlayerPerformance fields
+                games = stat_block.get("games", {}) or {}
+                merged["minutes_played"] = _safe_int(games.get("minutes"))
+                merged["position"] = games.get("position")
+                merged["rating"] = float(games.get("rating", 0) or 0) if games.get("rating") else None
+                merged["captain"] = games.get("captain")
+                merged["substitute"] = games.get("substitute")
+                merged["offsides"] = _safe_int(games.get("offsides") or stat_block.get("offsides"))
+
+                shots = stat_block.get("shots", {}) or {}
+                merged["shots_total"] = _safe_int(shots.get("total"))
+                merged["shots_on"] = _safe_int(shots.get("on"))
+
+                goals = stat_block.get("goals", {}) or {}
+                merged["goals_total"] = _safe_int(goals.get("total"))
+                merged["goals_conceded"] = _safe_int(goals.get("conceded"))
+                merged["assists"] = _safe_int(goals.get("assists"))
+                merged["saves"] = _safe_int(goals.get("saves"))
+
+                passes = stat_block.get("passes", {}) or {}
+                merged["passes_total"] = _safe_int(passes.get("total"))
+                merged["passes_key"] = _safe_int(passes.get("key"))
+                merged["passes_accuracy"] = _safe_int(passes.get("accuracy"))
+
+                tackles = stat_block.get("tackles", {}) or {}
+                merged["tackles_total"] = _safe_int(tackles.get("total"))
+                merged["blocks"] = _safe_int(tackles.get("blocks"))
+                merged["interceptions"] = _safe_int(tackles.get("interceptions"))
+
+                duels = stat_block.get("duels", {}) or {}
+                merged["duels_total"] = _safe_int(duels.get("total"))
+                merged["duels_won"] = _safe_int(duels.get("won"))
+
+                dribbles = stat_block.get("dribbles", {}) or {}
+                merged["dribbles_attempts"] = _safe_int(dribbles.get("attempts"))
+                merged["dribbles_success"] = _safe_int(dribbles.get("success"))
+                merged["dribbles_past"] = _safe_int(dribbles.get("past"))
+
+                fouls = stat_block.get("fouls", {}) or {}
+                merged["fouls_drawn"] = _safe_int(fouls.get("drawn"))
+                merged["fouls_committed"] = _safe_int(fouls.get("committed"))
+
+                cards = stat_block.get("cards", {}) or {}
+                merged["yellow_cards"] = _safe_int(cards.get("yellow"))
+                merged["red_cards"] = _safe_int(cards.get("red"))
+
+                penalty = stat_block.get("penalty", {}) or {}
+                merged["penalty_won"] = _safe_int(penalty.get("won"))
+                merged["penalty_committed"] = _safe_int(penalty.get("commited"))  # API typo: "commited"
+                merged["penalty_scored"] = _safe_int(penalty.get("scored"))
+                merged["penalty_missed"] = _safe_int(penalty.get("missed"))
+                merged["penalty_saved"] = _safe_int(penalty.get("saved"))
+
+            records.append(merged)
+
+    return records
 
 
 __all__ = [
