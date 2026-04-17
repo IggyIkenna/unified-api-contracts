@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 EXTERNAL_PACKAGES = {
     "unified_trading_library.config_interface",
     "unified_config_service",
-    "unified_trading_library.events_interface",
+    "unified_trading_library.events",
     "unified_domain_client",
     "unified_trading_library",
     "unified_market_interface",
