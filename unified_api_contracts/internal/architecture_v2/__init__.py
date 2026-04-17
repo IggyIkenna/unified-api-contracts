@@ -73,6 +73,11 @@ from unified_api_contracts.internal.architecture_v2.schemas import (
     VenueCapabilityV2,
     VenueConstraints,
 )
+from unified_api_contracts.internal.architecture_v2.venue_tokens import (
+    KNOWN_VENUE_TOKENS,
+    is_venue_token,
+    split_scope_tokens,
+)
 
 # StrategyInstructionV2 is a union — exposed as a type alias here to let
 # consumers import it from the sub-package root rather than reaching into
@@ -95,6 +100,7 @@ StrategyInstructionV2 = (
 __all__ = [
     "ARCHETYPE_TO_FAMILY",
     "COMPATIBILITY_SEED",
+    "KNOWN_VENUE_TOKENS",
     "AccountActionV2",
     "AccountInstruction",
     "AllocationDirective",
@@ -154,4 +160,6 @@ __all__ = [
     "VenueFeature",
     "VenueRoutingMode",
     "VenueType",
+    "is_venue_token",
+    "split_scope_tokens",
 ]

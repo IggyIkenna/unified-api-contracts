@@ -7,6 +7,7 @@ from unified_api_contracts.internal.alerting import AlertEvent, DefiAlert
 from unified_api_contracts.internal.architecture_v2 import (
     ARCHETYPE_TO_FAMILY,
     COMPATIBILITY_SEED,
+    KNOWN_VENUE_TOKENS,
     AccountActionV2,
     AccountInstruction,
     AllocationDirective,
@@ -64,6 +65,8 @@ from unified_api_contracts.internal.architecture_v2 import (
     VenueFeature,
     VenueRoutingMode,
     VenueType,
+    is_venue_token,
+    split_scope_tokens,
 )
 from unified_api_contracts.internal.architecture_v2 import (
     Urgency as UrgencyV2,
@@ -769,6 +772,7 @@ __all__ = [
     "EXECUTION_AUDIT",
     "FEATURES_SCHEMA",
     "FEATURE_FRESHNESS",
+    "KNOWN_VENUE_TOKENS",
     "MARKET_TICK_FRESHNESS",
     "ML_FRESHNESS",
     "STRATEGY_AUDIT",
@@ -1337,6 +1341,8 @@ __all__ = [
     "aggregate_notional",
     "aggregate_positions",
     "get_unity_child_book",
+    "is_venue_token",
+    "split_scope_tokens",
     "unity_child_books_confirmed",
     "validate_feature_columns_not_null",
     "validate_instrument_records",

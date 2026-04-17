@@ -475,6 +475,20 @@ class TrainingPipelineConfig(BaseModel):
         description="How often to re-run the pipeline: '1M', '3M', '6M', '1Y'",
     )
 
+    # --- Drift-triggered retuning (consumed by ml-inference-service DriftMonitor) ---
+    auto_retune_enabled: bool = Field(
+        default=False,
+        description="Whether drift monitor should auto-trigger retuning on accuracy degradation",
+    )
+    retune_accuracy_drop_threshold: float = Field(
+        default=0.05,
+        description="Accuracy drop (as fraction, 0.05 = 5%) that triggers auto-retune",
+    )
+    retune_window_days: int = Field(
+        default=30,
+        description="Rolling window of days over which to compute accuracy degradation",
+    )
+
     @model_validator(mode="after")
     def _validate_meta_requires_multi(self) -> TrainingPipelineConfig:
         if self.pipeline_dependencies and not self.multi_model:
@@ -604,6 +618,10 @@ class InferenceRequest(BaseModel):
     timeframe: str = "1h"
     target_type: str = "swing_high"
     model_version: str | None = None
+    explain: bool = Field(
+        default=False,
+        description="Opt-in SHAP feature-importance explanation in the response",
+    )
 
 
 class InferenceResult(BaseModel):
