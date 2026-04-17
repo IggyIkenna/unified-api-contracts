@@ -139,17 +139,6 @@ _DATA_AGGREGATOR_TOKENS: frozenset[str] = frozenset(
     }
 )
 
-# Multi-venue / meta scope markers used in strategy slot labels
-_MULTI_SCOPE_TOKENS: frozenset[str] = frozenset(
-    {
-        # e.g., YIELD_ROTATION_LENDING@aave-multichain-usdc-prod
-        "multichain",
-        # e.g., STAT_ARB_CROSS_SECTIONAL@ibkr-russell1000-daily-usd-prod
-        # "russell1000" treated as instrument scope, not venue; do NOT include here
-    }
-)
-
-
 KNOWN_VENUE_TOKENS: frozenset[str] = (
     _CEFI_TOKENS
     | _TRADFI_TOKENS
@@ -160,7 +149,6 @@ KNOWN_VENUE_TOKENS: frozenset[str] = (
     | _SPORTS_TOKENS
     | _PREDICTION_TOKENS
     | _DATA_AGGREGATOR_TOKENS
-    | _MULTI_SCOPE_TOKENS
 )
 
 
@@ -176,16 +164,23 @@ def is_venue_token(token: str) -> bool:
 def split_scope_tokens(tokens: tuple[str, ...]) -> tuple[tuple[str, ...], tuple[str, ...]]:
     """Split slot-label scope tokens into (venue_tokens, instrument_tokens).
 
-    Grammar rule: venue tokens come first (one or more), followed by instrument
-    tokens (one or more). The boundary is the first non-venue token.
+    Grammar rule: venue tokens come first (one or more), optionally followed by
+    instrument tokens. The boundary is the first non-venue token. When every
+    token in `tokens` is a venue token, `instrument_tokens` is empty — this is
+    legal for single-asset strategies where the instrument is implied by the
+    slot's share_class (e.g., CARRY_STAKED_BASIS on ETH has share_class=ETH
+    and no separate instrument token).
 
-    Example: ("lido", "aave", "hyperliquid", "eth")
-      -> venues=("lido", "aave", "hyperliquid"), instruments=("eth",)
+    Example: ("lido", "aave", "hyperliquid")
+      -> venues=("lido", "aave", "hyperliquid"), instruments=()
+         (instrument = share_class, resolved by caller)
 
     Example: ("hyperliquid", "btc") -> venues=("hyperliquid",), instruments=("btc",)
 
-    Raises ValueError if no venue token is found at the start, or if the
-    instrument-scope tail is empty.
+    Example: ("unity", "epl", "1x2")
+      -> venues=("unity",), instruments=("epl", "1x2")
+
+    Raises ValueError iff `tokens` is empty OR the first token is not a venue.
     """
     if not tokens:
         raise ValueError("cannot split empty scope tokens")
@@ -201,16 +196,7 @@ def split_scope_tokens(tokens: tuple[str, ...]) -> tuple[tuple[str, ...], tuple[
             f"scope tokens {tokens!r} start with a non-venue token — grammar requires at least one venue token first"
         )
 
-    venue_tokens = tokens[:boundary]
-    instrument_tokens = tokens[boundary:]
-
-    if not instrument_tokens:
-        raise ValueError(
-            f"scope tokens {tokens!r} have no instrument-scope tail — "
-            "grammar requires venue_scope followed by instrument_scope"
-        )
-
-    return venue_tokens, instrument_tokens
+    return tokens[:boundary], tokens[boundary:]
 
 
 __all__ = [
