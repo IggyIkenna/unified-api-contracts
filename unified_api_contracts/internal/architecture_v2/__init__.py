@@ -9,6 +9,12 @@ Split across enums.py + schemas.py to stay under the 900-line QG limit.
 
 from __future__ import annotations
 
+from unified_api_contracts.internal.architecture_v2.artifact_registry import (
+    ArtifactKind,
+    ArtifactMetadata,
+    ArtifactPublishedPayload,
+    ArtifactRef,
+)
 from unified_api_contracts.internal.architecture_v2.enums import (
     ARCHETYPE_TO_FAMILY,
     AccountActionV2,
@@ -105,6 +111,10 @@ __all__ = [
     "AccountInstruction",
     "AllocationDirective",
     "AllocatorArchetype",
+    "ArtifactKind",
+    "ArtifactMetadata",
+    "ArtifactPublishedPayload",
+    "ArtifactRef",
     "AtomicExecutionMode",
     "AtomicInstruction",
     "AtomicLeg",
