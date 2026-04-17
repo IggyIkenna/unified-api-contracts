@@ -1,5 +1,22 @@
 """Internal request/response/error schemas."""
 
+from unified_api_contracts.internal.schemas.contracts import (
+    CEFI_FUTURES_CHAIN_TRADES,
+    CEFI_OPTIONS_CHAIN_TRADES,
+    CEFI_PERPETUAL_BOOK_SNAPSHOT_5,
+    CEFI_PERPETUAL_TRADES,
+    CONTRACT_REGISTRY,
+    DEFI_DEX_POOL_DEX_POOL_SWAPS,
+    DEFI_LENDING_POSITION_LENDING_INDICES,
+    DEFI_LST_LST_RATES,
+    TRADFI_EQUITY_TRADES,
+    TRADFI_FUTURE_TRADES,
+    TRADFI_OPTIONS_CHAIN_TRADES,
+    ColumnSpec,
+    SchemaContract,
+    Violation,
+    validate_dataframe,
+)
 from unified_api_contracts.internal.schemas.errors import (
     DeadLetterRecord,
     EnhancedError,
@@ -27,8 +44,20 @@ from unified_api_contracts.internal.schemas.strategy import (
 )
 
 __all__ = [
+    "CEFI_FUTURES_CHAIN_TRADES",
+    "CEFI_OPTIONS_CHAIN_TRADES",
+    "CEFI_PERPETUAL_BOOK_SNAPSHOT_5",
+    "CEFI_PERPETUAL_TRADES",
+    "CONTRACT_REGISTRY",
+    "DEFI_DEX_POOL_DEX_POOL_SWAPS",
+    "DEFI_LENDING_POSITION_LENDING_INDICES",
+    "DEFI_LST_LST_RATES",
     "ROLE_PERMISSIONS",
     "TIER_ENTITLEMENTS",
+    "TRADFI_EQUITY_TRADES",
+    "TRADFI_FUTURE_TRADES",
+    "TRADFI_OPTIONS_CHAIN_TRADES",
+    "ColumnSpec",
     "DeadLetterRecord",
     "EnhancedError",
     "Entitlement",
@@ -39,11 +68,14 @@ __all__ = [
     "OrgType",
     "Permission",
     "ProvisioningRole",
+    "SchemaContract",
     "StartupValidationError",
     "StrategySpec",
     "StrategyType",
     "SubscriptionTier",
     "UserProfile",
     "UserRole",
+    "Violation",
     "has_role_permission",
+    "validate_dataframe",
 ]

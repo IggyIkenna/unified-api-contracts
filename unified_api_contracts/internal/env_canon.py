@@ -86,9 +86,21 @@ class EnvVars:
     STORAGE_EMULATOR_HOST = "STORAGE_EMULATOR_HOST"
     BIGQUERY_EMULATOR_HOST = "BIGQUERY_EMULATOR_HOST"
 
+    # Live service URLs (Tier 2 gateway routing — unified-trading-api → backend services)
+    LIVE_SERVICE_BASE_URL = "LIVE_SERVICE_BASE_URL"
+    LIVE_SERVICE_STRATEGY_URL = "LIVE_SERVICE_STRATEGY_URL"
+    LIVE_SERVICE_EXECUTION_URL = "LIVE_SERVICE_EXECUTION_URL"
+    LIVE_SERVICE_RISK_URL = "LIVE_SERVICE_RISK_URL"
+    LIVE_SERVICE_INSTRUMENTS_URL = "LIVE_SERVICE_INSTRUMENTS_URL"
+    LIVE_SERVICE_MARKET_DATA_URL = "LIVE_SERVICE_MARKET_DATA_URL"
+    LIVE_SERVICE_REPORTING_URL = "LIVE_SERVICE_REPORTING_URL"
+
+    # MDPS (market-data-processing-service) tuning flags
+    USE_POLARS = "USE_POLARS"  # true | false — enable Polars aggregation path
+    MDPS_TIMEFRAMES = "MDPS_TIMEFRAMES"  # comma-separated timeframes override
+
     @classmethod
-    def all_canonical(cls) -> set[str]:
-        """Return set of all canonical env var string values."""
+    def _core_canonical(cls) -> set[str]:
         return {
             cls.RUNTIME_MODE,
             cls.DATA_MODE,
@@ -100,6 +112,17 @@ class EnvVars:
             cls.WORKSPACE_ROOT,
             cls.DEPLOYMENT_ENV,
             cls.ENVIRONMENT,
+            cls.SERVICE_MODE,
+            cls.TESTNET_MODE,
+            cls.OPERATIONAL_MODE,
+            cls.TESTING_STAGE,
+            cls.CLOUD_MOCK_MODE,
+            cls.LOG_LEVEL,
+        }
+
+    @classmethod
+    def _protocol_canonical(cls) -> set[str]:
+        return {
             cls.PROTOCOL_DATA_SINK_BUCKET,
             cls.PROTOCOL_DATA_SINK_BACKEND,
             cls.PROTOCOL_DATA_SINK_TABLE_PREFIX,
@@ -111,11 +134,11 @@ class EnvVars:
             cls.PROTOCOL_ANALYTICS_PROJECT,
             cls.PROTOCOL_ANALYTICS_DATASET,
             cls.PROTOCOL_ANALYTICS_BACKEND,
-            cls.SERVICE_MODE,
-            cls.TESTNET_MODE,
-            cls.OPERATIONAL_MODE,
-            cls.TESTING_STAGE,
-            cls.CLOUD_MOCK_MODE,
+        }
+
+    @classmethod
+    def _cloud_canonical(cls) -> set[str]:
+        return {
             cls.AWS_REGION,
             cls.AWS_PROFILE,
             cls.ATHENA_OUTPUT_BUCKET,
@@ -128,5 +151,23 @@ class EnvVars:
             cls.PUBSUB_EMULATOR_HOST,
             cls.STORAGE_EMULATOR_HOST,
             cls.BIGQUERY_EMULATOR_HOST,
-            cls.LOG_LEVEL,
         }
+
+    @classmethod
+    def _service_canonical(cls) -> set[str]:
+        return {
+            cls.LIVE_SERVICE_BASE_URL,
+            cls.LIVE_SERVICE_STRATEGY_URL,
+            cls.LIVE_SERVICE_EXECUTION_URL,
+            cls.LIVE_SERVICE_RISK_URL,
+            cls.LIVE_SERVICE_INSTRUMENTS_URL,
+            cls.LIVE_SERVICE_MARKET_DATA_URL,
+            cls.LIVE_SERVICE_REPORTING_URL,
+            cls.USE_POLARS,
+            cls.MDPS_TIMEFRAMES,
+        }
+
+    @classmethod
+    def all_canonical(cls) -> set[str]:
+        """Return set of all canonical env var string values."""
+        return cls._core_canonical() | cls._protocol_canonical() | cls._cloud_canonical() | cls._service_canonical()

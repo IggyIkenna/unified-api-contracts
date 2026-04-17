@@ -1,5 +1,13 @@
 """Reference data contracts — canonical instrument definitions and enums."""
 
+from unified_api_contracts.internal.reference.availability import (
+    get_instruments_available_on,
+)
+from unified_api_contracts.internal.reference.canonical_id_builder import (
+    SUPPORTED_INSTRUMENT_TYPES,
+    UNSUPPORTED_BY_DESIGN,
+    build_instrument_id,
+)
 from unified_api_contracts.internal.reference.circuit_breaker_config import (
     CircuitBreakerConfigRegistry,
     VenueCircuitBreakerConfig,
@@ -45,6 +53,8 @@ __all__ = [
     "FEATURE_FRESHNESS",
     "MARKET_TICK_FRESHNESS",
     "ML_FRESHNESS",
+    "SUPPORTED_INSTRUMENT_TYPES",
+    "UNSUPPORTED_BY_DESIGN",
     "AssetClass",
     "CircuitBreakerConfigRegistry",
     "ClientFeeSchedule",
@@ -69,5 +79,7 @@ __all__ = [
     "StockSplitRecord",
     "UniverseSnapshot",
     "VenueCircuitBreakerConfig",
+    "build_instrument_id",
+    "get_instruments_available_on",
     "validate_instrument_records",
 ]
