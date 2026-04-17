@@ -1,4 +1,5 @@
-"""Deployment service domain schemas — deployment state, shard events, VM lifecycle."""
+"""Deployment service domain schemas — deployment state, shard events, VM lifecycle,
+client isolation, SLA tiers, runtime profiles, and chaos injection."""
 
 from unified_api_contracts.internal.domain.deployment_service.deployment import (
     VM_INFRASTRUCTURE_EVENTS,
@@ -11,10 +12,29 @@ from unified_api_contracts.internal.domain.deployment_service.deployment import 
     ShardEvent,
     VMEventType,
 )
+from unified_api_contracts.internal.domain.deployment_service.isolation import (
+    ChaosHookSpec,
+    ChaosInjectionPoint,
+    ChaosInjectionSpec,
+    ClientServiceOverride,
+    ClientSubscription,
+    IsolationPolicy,
+    KillSwitchScope,
+    RuntimeProfile,
+    RuntimeProfileSpec,
+    ServiceIsolationSpec,
+    SLATier,
+    SLATierSpec,
+)
 from unified_api_contracts.internal.modes import CloudProvider, PhaseMode, RuntimeMode
 
 __all__ = [
     "VM_INFRASTRUCTURE_EVENTS",
+    "ChaosHookSpec",
+    "ChaosInjectionPoint",
+    "ChaosInjectionSpec",
+    "ClientServiceOverride",
+    "ClientSubscription",
     "CloudProvider",
     "ComputeType",
     "DeploymentCluster",
@@ -22,8 +42,15 @@ __all__ = [
     "DeploymentState",
     "DeploymentStatus",
     "DeploymentTier",
+    "IsolationPolicy",
+    "KillSwitchScope",
     "PhaseMode",
     "RuntimeMode",
+    "RuntimeProfile",
+    "RuntimeProfileSpec",
+    "SLATier",
+    "SLATierSpec",
+    "ServiceIsolationSpec",
     "ShardEvent",
     "VMEventType",
 ]
