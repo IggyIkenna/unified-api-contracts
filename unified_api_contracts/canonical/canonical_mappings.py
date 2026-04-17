@@ -473,7 +473,7 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "soccer_football_info": "soccer-football-info-api-key",
     "transfermarkt": "transfermarkt-api-key",
     "understat": None,
-    "open_meteo": None,
+    "open_meteo": "open-meteo-api-key",
     "pinnacle": None,
     "polygon": "polygon-api-key",
     "polymarket": "polymarket-api-key",
