@@ -459,33 +459,6 @@ _BITSTAMP = SourceCapability(
     },
 )
 
-_KRAKEN = SourceCapability(
-    source="kraken",
-    domains=["market", "execution", "position", "reference"],
-    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["ticker", "orderbook", "trades", "ohlc", "ws_ticker", "ws_book", "ws_trade"],
-        "execution": ["add_order", "cancel_order", "open_orders", "closed_orders", "query_orders"],
-        "position": ["balance", "extended_balance", "trade_balance", "open_positions"],
-        "reference": ["asset_pairs", "assets", "system_status"],
-    },
-    base_urls={"mainnet": "https://api.kraken.com"},
-    operation_details={
-        "add_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
-            }
-        ),
-    },
-)
-
 _HUOBI = SourceCapability(
     source="huobi",
     domains=["market", "execution", "position", "reference"],
@@ -781,7 +754,6 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _HYPERLIQUID,
     _BITGET,
     _BITSTAMP,
-    _KRAKEN,
     _HUOBI,
     _KUCOIN,
     _MEXC,

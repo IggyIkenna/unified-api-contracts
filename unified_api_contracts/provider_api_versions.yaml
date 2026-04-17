@@ -210,12 +210,6 @@ providers:
     last_verified: "2026-03-06"
     status: green
 
-  kraken:
-    api_version: "v1"
-    spec_url: "https://docs.kraken.com/rest/"
-    last_verified: "2026-03-06"
-    status: yellow
-
   kucoin:
     api_version: "v3"
     spec_url: "https://www.kucoin.com/docs/rest/spot-trading/introduction"

@@ -606,6 +606,10 @@ class InferenceResult(BaseModel):
     probabilities: list[float] | None = None
     timeframe: str | None = None
     metadata: dict[str, object] | None = None
+    # Calibration fields (applied post-inference by ProbabilityCalibrator)
+    is_calibrated: bool = False
+    calibrated_confidence: float | None = None
+    calibration_method: str | None = None
 
 
 class TrainingJobRequest(BaseModel):

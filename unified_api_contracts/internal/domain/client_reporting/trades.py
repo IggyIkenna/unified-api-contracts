@@ -71,7 +71,14 @@ class TransferRecord(BaseModel, frozen=True):
     venue: str = Field(description="Exchange venue")
     direction: str = Field(description="'deposit' or 'withdrawal'")
     currency: str = Field(description="Asset transferred (e.g. 'USDT', 'BTC')")
-    amount: Decimal = Field(description="Transfer amount")
+    amount: Decimal = Field(description="Transfer amount in the asset currency")
+    usd_amount: Decimal = Field(
+        default=Decimal("0"),
+        description=(
+            "Transfer amount converted to USD at the time of transfer "
+            "(0 = unknown / not yet priced; e.g. BTC transfers from CCXT backfill)"
+        ),
+    )
     fee: Decimal = Field(default=Decimal("0"), description="Transfer fee")
     status: str = Field(description="Transfer status (e.g. 'ok', 'pending', 'canceled')")
     timestamp: AwareDatetime = Field(description="Transfer timestamp (UTC)")

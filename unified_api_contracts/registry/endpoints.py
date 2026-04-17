@@ -50,6 +50,9 @@ BASE_URLS: dict[str, str] = {
     "thegraph": "https://api.thegraph.com",
     "alchemy": "https://eth-mainnet.g.alchemy.com/v2",
     "mev": "https://relay.flashbots.net",
+    "defillama": "https://api.llama.fi",
+    # Macro data
+    "fred": "https://api.stlouisfed.org/fred",
     # CCXT: per-exchange; no single base URL
 }
 

@@ -368,34 +368,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
-    # --- Kraken ---
-    EndpointSpec(
-        venue="kraken",
-        endpoint_path="https://api.kraken.com/0/public/Ticker",
-        http_method="GET",
-        schema_class="KrakenTicker",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v0",
-        notes="Public ticker. No auth required.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
-    EndpointSpec(
-        venue="kraken",
-        endpoint_path="https://api.kraken.com/0/private/AddOrder",
-        http_method="POST",
-        schema_class="KrakenOrderRequest",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v0",
-        notes=(
-            "Private order submission. Auth: API-Key + API-Sign (HMAC-SHA512 nonce+payload). "
-            "Secret Manager key: kraken-api-credentials."
-        ),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
     # --- Deribit ---
     EndpointSpec(
         venue="deribit",
