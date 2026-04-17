@@ -28,7 +28,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -60,8 +59,7 @@
           "unified-trading-library",
           "unified-internal-contracts",
           "unified-cloud-interface",
-          "unified-config-interface",
-          "unified-events-interface"
+          "unified-config-interface"
         ],
         "service_declaration": {
           "mode": "batch",
@@ -105,7 +103,6 @@
         "testing_level": "unit",
         "status": "active",
         "dependencies": [
-          "unified-events-interface",
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
@@ -174,7 +171,6 @@
           "unified-cloud-interface",
           "unified-config-interface",
           "unified-domain-client",
-          "unified-events-interface",
           "unified-internal-contracts",
           "unified-sports-execution-interface",
           "unified-trade-execution-interface"
@@ -206,7 +202,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -233,7 +228,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -260,7 +254,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-feature-calculator-library",
           "unified-internal-contracts"
         ],
@@ -289,7 +282,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-features-interface",
           "unified-internal-contracts"
         ],
@@ -316,7 +308,6 @@
         "dependencies": [
           "unified-trading-library",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-cloud-interface",
           "unified-feature-calculator-library",
           "unified-internal-contracts"
@@ -345,7 +336,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-feature-calculator-library",
           "unified-features-interface",
           "unified-internal-contracts"
@@ -374,7 +364,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-feature-calculator-library",
           "unified-feature-orchestration-library",
           "unified-features-interface",
@@ -407,7 +396,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-feature-calculator-library",
           "unified-internal-contracts"
         ],
@@ -452,7 +440,6 @@
           "unified-api-contracts",
           "unified-trading-library",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-reference-data-interface",
           "unified-internal-contracts",
           "unified-sports-reference-interface"
@@ -483,7 +470,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -515,7 +501,6 @@
           "unified-trading-library",
           "unified-api-contracts",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-market-interface"
         ],
         "service_declaration": {
@@ -564,7 +549,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts",
           "unified-ml-interface"
         ],
@@ -599,7 +583,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-feature-calculator-library",
           "unified-internal-contracts"
         ],
@@ -627,7 +610,6 @@
           "unified-trading-library",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -655,7 +637,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts",
           "unified-position-interface"
         ],
@@ -688,7 +669,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts",
           "unified-trading-library"
         ],
@@ -718,7 +698,6 @@
           "unified-cloud-interface",
           "unified-config-interface",
           "unified-domain-client",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -771,7 +750,6 @@
           "unified-api-contracts",
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts"
         ],
         "service_declaration": {
@@ -834,7 +812,6 @@
         "testing_level": "integration",
         "status": "active",
         "dependencies": [
-          "unified-events-interface",
           "unified-cloud-interface",
           "unified-internal-contracts"
         ],
@@ -888,23 +865,6 @@
         "completion_path": "core",
         "sit_level": "standard"
       },
-      "unified-events-interface": {
-        "type": "library",
-        "tier": 0,
-        "role": "primitive",
-        "tags": ["critical", "cross-domain", "events"],
-        "version": "0.2.2",
-        "ci_status": "FAILING",
-        "coverage_pct": 97,
-        "testing_level": "integration",
-        "status": "active",
-        "dependencies": [],
-        "service_declaration": null,
-        "serves_ui": null,
-        "proxies_service": null,
-        "completion_path": "core",
-        "sit_level": "standard"
-      },
       "unified-feature-calculator-library": {
         "type": "library",
         "tier": 2,
@@ -915,10 +875,7 @@
         "coverage_pct": 95,
         "testing_level": "integration",
         "status": "active",
-        "dependencies": [
-          "unified-config-interface",
-          "unified-events-interface"
-        ],
+        "dependencies": ["unified-config-interface"],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
@@ -956,8 +913,7 @@
           "unified-api-contracts",
           "unified-config-interface",
           "unified-cloud-interface",
-          "unified-internal-contracts",
-          "unified-events-interface"
+          "unified-internal-contracts"
         ],
         "service_declaration": null,
         "serves_ui": null,
@@ -1016,8 +972,7 @@
         "dependencies": [
           "unified-cloud-interface",
           "unified-internal-contracts",
-          "unified-api-contracts",
-          "unified-events-interface"
+          "unified-api-contracts"
         ],
         "service_declaration": null,
         "serves_ui": null,
@@ -1035,11 +990,7 @@
         "coverage_pct": 76,
         "testing_level": "integration",
         "status": "scaffolded",
-        "dependencies": [
-          "unified-api-contracts",
-          "unified-internal-contracts",
-          "unified-events-interface"
-        ],
+        "dependencies": ["unified-api-contracts", "unified-internal-contracts"],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
@@ -1098,7 +1049,6 @@
         "dependencies": [
           "unified-cloud-interface",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-internal-contracts",
           "unified-api-contracts"
         ],
@@ -1135,11 +1085,7 @@
         "coverage_pct": 80,
         "testing_level": "unit",
         "status": "active",
-        "dependencies": [
-          "unified-api-contracts",
-          "unified-cloud-interface",
-          "unified-events-interface"
-        ],
+        "dependencies": ["unified-api-contracts", "unified-cloud-interface"],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
@@ -1177,7 +1123,7 @@
         "coverage_pct": 80,
         "testing_level": "unit",
         "status": "active",
-        "dependencies": ["unified-api-contracts", "unified-events-interface"],
+        "dependencies": ["unified-api-contracts"],
         "service_declaration": null,
         "serves_ui": null,
         "proxies_service": null,
@@ -1259,7 +1205,6 @@
       "unified-config-interface": "0.1.17",
       "unified-defi-execution-interface": "0.1.1",
       "unified-domain-client": "0.1.14",
-      "unified-events-interface": "0.2.2",
       "unified-feature-calculator-library": "0.1.0",
       "unified-feature-orchestration-library": "0.1.0",
       "unified-features-interface": "0.1.0",
@@ -1294,7 +1239,6 @@
           "repos": [
             "unified-api-contracts",
             "unified-cloud-interface",
-            "unified-events-interface",
             "unified-internal-contracts"
           ]
         },
@@ -1399,7 +1343,7 @@
     "tier_rules": {
       "0": {
         "allowed_from": [],
-        "description": "Pure leaf \u2014 zero inter-library deps. Uses doc dependencies (PM, codex) for CI standards. Repos: unified-api-contracts, unified-internal-contracts, unified-events-interface, unified-cloud-interface, execution-algo-library, matching-engine-library"
+        "description": "Pure leaf \u2014 zero inter-library deps. Uses doc dependencies (PM, codex) for CI standards. Repos: unified-api-contracts, unified-internal-contracts, unified-cloud-interface, execution-algo-library, matching-engine-library"
       },
       "1": {
         "allowed_from": ["0"],
@@ -1446,7 +1390,6 @@
           "packages": [
             "unified-api-contracts",
             "unified-internal-contracts",
-            "unified-events-interface",
             "unified-cloud-interface"
           ],
           "reason": "Foundation packages with no dependencies (Tier 0)"
@@ -1504,7 +1447,6 @@
           "unified-api-contracts (CeFi venues: Binance, OKX, Bybit, Hyperliquid, Coinbase, IBKR, Deribit, Kalshi)",
           "unified-internal-contracts",
           "unified-config-interface",
-          "unified-events-interface",
           "unified-cloud-interface",
           "unified-reference-data-interface",
           "unified-trading-library",
@@ -3767,24 +3709,6 @@
         "internal_count": 1,
         "external_count": 28
       },
-      "unified-events-interface": {
-        "internal_deps": {},
-        "external_deps": {
-          "bandit": ["bandit>=1.7.0,<2.0.0"],
-          "basedpyright": ["basedpyright==1.38.2"],
-          "pip-audit": ["pip-audit>=2.7.0,<3.0.0"],
-          "pre-commit": ["pre-commit>=3.0,<4.0.0"],
-          "pytest": ["pytest>=9.0.1,<10.0.0"],
-          "pytest-asyncio": ["pytest-asyncio>=0.25.0,<2.0.0"],
-          "pytest-cov": ["pytest-cov>=7.0.0,<8.0.0"],
-          "pytest-socket": ["pytest-socket>=0.7.0,<1.0.0"],
-          "pytest-timeout": ["pytest-timeout>=2.4.0,<3.0.0"],
-          "pytest-xdist": ["pytest-xdist>=3.6.0,<4.0.0"],
-          "ruff": ["ruff==0.15.0"]
-        },
-        "internal_count": 0,
-        "external_count": 11
-      },
       "unified-internal-contracts": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
@@ -3815,7 +3739,6 @@
       "unified-config-interface": {
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3843,7 +3766,6 @@
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3873,7 +3795,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.11.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -3964,8 +3885,7 @@
       },
       "unified-feature-calculator-library": {
         "internal_deps": {
-          "unified-config-interface": "unified-config-interface",
-          "unified-events-interface": "unified-events-interface"
+          "unified-config-interface": "unified-config-interface"
         },
         "external_deps": {
           "bandit": ["bandit>=1.7.0,<2.0.0"],
@@ -4022,7 +3942,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0",
           "unified-config-interface": "unified-config-interface>=0.3.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -4146,8 +4065,7 @@
       "unified-features-interface": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0",
-          "unified-cloud-interface": "unified-cloud-interface>=0.11.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0"
+          "unified-cloud-interface": "unified-cloud-interface>=0.11.0,<1.0.0"
         },
         "external_deps": {
           "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
@@ -4168,8 +4086,7 @@
       },
       "unified-sports-reference-interface": {
         "internal_deps": {
-          "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0"
+          "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0"
         },
         "external_deps": {
           "aiohttp": ["aiohttp>=3.13.2,<4.0.0"],
@@ -4214,7 +4131,6 @@
       "unified-sports-execution-interface": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0"
         },
         "external_deps": {
@@ -4267,7 +4183,6 @@
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.2.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.2.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.2.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-reference-data-interface": "unified-reference-data-interface>=0.1.0,<1.0.0",
           "unified-sports-reference-interface": "unified-sports-reference-interface>=0.1.0,<1.0.0",
@@ -4313,7 +4228,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -4353,7 +4267,6 @@
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
           "unified-defi-execution-interface": "unified-defi-execution-interface>=0.1.0,<1.0.0",
           "unified-domain-client": "unified-domain-client>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-sports-execution-interface": "unified-sports-execution-interface>=0.1.0,<1.0.0",
           "unified-trade-execution-interface": "unified-trade-execution-interface>=0.1.0,<1.0.0",
@@ -4421,7 +4334,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
           "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
@@ -4462,7 +4374,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -4506,7 +4417,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.4.0,<1.0.0"
@@ -4546,7 +4456,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<2.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<0.2.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<0.2.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.2.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -4585,7 +4494,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
           "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
@@ -4625,7 +4533,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
           "unified-feature-orchestration-library": "unified-feature-orchestration-library>=0.1.0,<1.0.0",
           "unified-features-interface": "unified-features-interface>=0.1.0,<1.0.0",
@@ -4659,7 +4566,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -4697,7 +4603,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -4741,7 +4646,6 @@
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-market-interface": "unified-market-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -4779,7 +4683,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-ml-interface": "unified-ml-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -4829,7 +4732,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-feature-calculator-library": "unified-feature-calculator-library>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-ml-interface": "unified-ml-interface>=0.1.0,<1.0.0",
@@ -4878,7 +4780,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -4913,7 +4814,6 @@
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
           "unified-domain-client": "unified-domain-client>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.3.0,<1.0.0"
         },
@@ -4967,7 +4867,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.4.0,<1.0.0"
         },
@@ -5006,7 +4905,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -5065,7 +4963,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-position-interface": "unified-position-interface>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -5111,7 +5008,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.2.38,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.11.39,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.3.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -5154,7 +5050,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -5174,7 +5069,6 @@
         "internal_deps": {
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
@@ -5215,7 +5109,6 @@
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-cloud-interface": "unified-cloud-interface>=0.1.0,<1.0.0",
           "unified-config-interface": "unified-config-interface>=0.1.0,<1.0.0",
-          "unified-events-interface": "unified-events-interface>=0.1.0,<1.0.0",
           "unified-internal-contracts": "unified-internal-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
         },
