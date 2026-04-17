@@ -286,6 +286,60 @@ class EnsembleConfig(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+class IncrementalTrainingConfig(BaseModel):
+    """Configuration for incremental (warm-start) training on new data.
+
+    When enabled, the pipeline reuses a previously-trained champion model and
+    adds additional boosting rounds on new samples rather than training from
+    scratch. Guarded by min_new_samples, degradation checks, and lookback windows.
+    """
+
+    enabled: bool = Field(default=False, description="Enable incremental training on new data")
+    incremental_n_estimators: int = Field(default=50, description="Additional boosting rounds for incremental update")
+    min_new_samples: int = Field(default=100, description="Minimum new samples required to trigger incremental run")
+    max_degradation_pct: float = Field(
+        default=5.0,
+        description="Max % performance degradation on validation before rolling back to champion",
+    )
+    lookback_days: int = Field(default=30, description="Lookback window for fetching new training samples")
+    validation_days: int = Field(default=7, description="Holdout window for validating the incremental model")
+
+
+class TransferLearningConfig(BaseModel):
+    """Cross-asset transfer learning settings for TrainingScope.CROSS_ASSET / UNIVERSE.
+
+    When enabled, a base model is pre-trained on aggregated data from multiple
+    assets and then fine-tuned per-asset. ``shared_feature_ratio`` controls the
+    fraction of features shared across all assets; ``include_domain_indicator``
+    adds a categorical domain column (cefi / tradfi / defi / sports).
+    """
+
+    enabled: bool = Field(
+        default=False,
+        description="Enable cross-asset transfer learning",
+    )
+    base_assets: list[str] = Field(
+        default_factory=list,
+        description="Explicit list of base-model asset IDs; empty = auto-discover",
+    )
+    min_samples_per_asset: int = Field(
+        default=500,
+        description="Minimum rows per asset required for inclusion",
+    )
+    fine_tune_iterations: int = Field(
+        default=50,
+        description="Boosting rounds used for per-asset fine-tuning",
+    )
+    shared_feature_ratio: float = Field(
+        default=0.8,
+        description="Fraction of features shared across all assets (0-1)",
+    )
+    include_domain_indicator: bool = Field(
+        default=False,
+        description="Append a one-hot domain indicator column to features",
+    )
+
+
 class TrainingPipelineConfig(BaseModel):
     """Asset-class-agnostic configuration for the uniform 5+1 phase training pipeline.
 
@@ -296,9 +350,15 @@ class TrainingPipelineConfig(BaseModel):
 
     # --- Identity ---
     pipeline_id: str = Field(description="e.g. 'sports-odds-drift', 'cefi-btc-swing'")
-    category: str = Field(description="cefi, tradfi, defi, or sports")
-    asset: str = Field(description="BTC, SPY, FOOTBALL, etc.")
-    target_type: TargetType
+    category: str = Field(
+        default="cefi",
+        description="cefi, tradfi, defi, or sports",
+    )
+    asset: str = Field(
+        default="",
+        description="BTC, SPY, FOOTBALL, etc. (empty for cross-asset / universe scopes)",
+    )
+    target_type: TargetType = TargetType.DIRECTION
 
     # --- Task type ---
     task_type: Literal["regression", "classification"] = "classification"
@@ -384,6 +444,10 @@ class TrainingPipelineConfig(BaseModel):
         default_factory=CalibrationConfig,
         description="Probability calibration settings for classification models",
     )
+    incremental_config: IncrementalTrainingConfig = Field(
+        default_factory=IncrementalTrainingConfig,
+        description="Incremental (warm-start) training settings",
+    )
     trade_cost_column: str = Field(
         default="",
         description="Column name in features DF containing per-row trade costs for P&L-aware objectives",
@@ -391,6 +455,10 @@ class TrainingPipelineConfig(BaseModel):
     training_scope: TrainingScope = Field(
         default=TrainingScope.SINGLE_ASSET,
         description="Scope of training: single_asset, cross_asset, or universe",
+    )
+    transfer_learning_config: TransferLearningConfig = Field(
+        default_factory=TransferLearningConfig,
+        description="Cross-asset transfer learning settings",
     )
 
     # --- Evaluation ---
@@ -554,6 +622,10 @@ class InferenceResult(BaseModel):
     probabilities: list[float] | None = None
     timeframe: str | None = None
     metadata: dict[str, object] | None = None
+    # Calibration fields (applied post-inference by ProbabilityCalibrator)
+    is_calibrated: bool = False
+    calibrated_confidence: float | None = None
+    calibration_method: str | None = None
 
 
 class TrainingJobRequest(BaseModel):
