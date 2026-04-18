@@ -52,14 +52,17 @@ DeFi::
 from __future__ import annotations
 
 import datetime as _dt
+from collections.abc import Sequence
 from decimal import Decimal
 from typing import Final, Literal
 
 from unified_api_contracts._instrument_enums import InstrumentType
+from unified_api_contracts.canonical.domain.derivatives import ComboStrategyType
 
 __all__ = [
     "SUPPORTED_INSTRUMENT_TYPES",
     "UNSUPPORTED_BY_DESIGN",
+    "build_combo_id",
     "build_instrument_id",
 ]
 
@@ -260,11 +263,142 @@ def _build_tradfi_cash(
 
 
 def _build_combo(venue: str, symbol: str) -> str:
-    """Build ``VENUE:COMBO:SYMBOL`` — symbol is an opaque combo identifier."""
+    """Build ``VENUE:COMBO:SYMBOL`` — symbol is an opaque combo identifier.
+
+    For structured combo IDs (butterfly/iron-condor/calendar) use
+    :func:`build_combo_id` which encodes strategy + expiries + strikes.
+    """
     if not symbol:
         msg = "COMBO requires a non-empty symbol identifying the combo"
         raise ValueError(msg)
     return f"{_venue_token(venue, None)}:{InstrumentType.COMBO.value}:{symbol.upper()}"
+
+
+# Strategies whose anchor points are **strikes** (N strike points).
+_STRIKE_ANCHORED_STRATEGIES: Final[frozenset[ComboStrategyType]] = frozenset(
+    {
+        ComboStrategyType.BUTTERFLY,
+        ComboStrategyType.CALL_BUTTERFLY,
+        ComboStrategyType.PUT_BUTTERFLY,
+        ComboStrategyType.IRON_BUTTERFLY,
+        ComboStrategyType.CONDOR,
+        ComboStrategyType.IRON_CONDOR,
+        ComboStrategyType.STRADDLE,
+        ComboStrategyType.STRANGLE,
+        ComboStrategyType.VERTICAL,
+        ComboStrategyType.BULL_CALL_SPREAD,
+        ComboStrategyType.BEAR_PUT_SPREAD,
+        ComboStrategyType.RATIO_SPREAD,
+        ComboStrategyType.RISK_REVERSAL,
+        ComboStrategyType.BOX,
+        ComboStrategyType.COLLAR,
+        ComboStrategyType.COVERED_CALL,
+        ComboStrategyType.PROTECTIVE_PUT,
+    }
+)
+
+# Strategies whose anchor points are **expiries** (N expiry dates).
+_EXPIRY_ANCHORED_STRATEGIES: Final[frozenset[ComboStrategyType]] = frozenset(
+    {
+        ComboStrategyType.CALENDAR_SPREAD,
+        ComboStrategyType.CALENDAR,
+        ComboStrategyType.DIAGONAL,
+        ComboStrategyType.SPREAD,
+        ComboStrategyType.JELLY_ROLL,
+        ComboStrategyType.EFP,
+    }
+)
+
+
+def build_combo_id(
+    venue: str,
+    underlying: str,
+    strategy: ComboStrategyType,
+    *,
+    anchor_expiry: _dt.date | None = None,
+    strikes: Sequence[Decimal] | None = None,
+    expiries: Sequence[_dt.date] | None = None,
+) -> str:
+    """Build a structured canonical COMBO id.
+
+    Format: ``VENUE:COMBO:{UNDERLYING}-{STRATEGY}-{anchor_expiry?}-{ANCHORS...}``.
+
+    Strike-anchored strategies (butterfly, iron condor, straddle, …) need
+    one ``anchor_expiry`` plus the ordered ``strikes``. Expiry-anchored
+    strategies (calendar, diagonal, jelly roll, …) need the ordered
+    ``expiries``.
+
+    Examples
+    --------
+    Butterfly::
+
+        build_combo_id(
+            "CME",
+            "SP500",
+            ComboStrategyType.BUTTERFLY,
+            anchor_expiry=date(2024, 6, 21),
+            strikes=[Decimal(5500), Decimal(5600), Decimal(5700)],
+        )
+        # → "CME:COMBO:SP500-BUTTERFLY-20240621-5500-5600-5700"
+
+    Calendar::
+
+        build_combo_id(
+            "CME",
+            "SP500",
+            ComboStrategyType.CALENDAR,
+            expiries=[date(2024, 6, 21), date(2024, 9, 20)],
+        )
+        # → "CME:COMBO:SP500-CALENDAR-20240621-20240920"
+
+    Iron condor::
+
+        build_combo_id(
+            "CME",
+            "SP500",
+            ComboStrategyType.IRON_CONDOR,
+            anchor_expiry=date(2024, 6, 21),
+            strikes=[Decimal(5400), Decimal(5500), Decimal(5600), Decimal(5700)],
+        )
+        # → "CME:COMBO:SP500-IRON_CONDOR-20240621-5400-5500-5600-5700"
+    """
+    if not underlying:
+        msg = "build_combo_id requires a non-empty underlying"
+        raise ValueError(msg)
+    if strategy is ComboStrategyType.CUSTOM:
+        msg = (
+            "build_combo_id does not accept ComboStrategyType.CUSTOM — "
+            "fall back to build_instrument_id(InstrumentType.COMBO, symbol=...) "
+            "for opaque combos."
+        )
+        raise ValueError(msg)
+
+    venue_token = _venue_token(venue, None)
+    underlying_up = underlying.strip().upper()
+    strategy_token = strategy.value.upper()
+
+    if strategy in _STRIKE_ANCHORED_STRATEGIES:
+        if anchor_expiry is None:
+            msg = f"build_combo_id: strategy={strategy.value} requires anchor_expiry"
+            raise ValueError(msg)
+        if not strikes:
+            msg = f"build_combo_id: strategy={strategy.value} requires at least one strike"
+            raise ValueError(msg)
+        strike_tokens = "-".join(_format_strike(s) for s in strikes)
+        tail = f"{anchor_expiry.strftime('%Y%m%d')}-{strike_tokens}"
+    elif strategy in _EXPIRY_ANCHORED_STRATEGIES:
+        if not expiries or len(expiries) < 2:
+            msg = f"build_combo_id: strategy={strategy.value} requires at least two expiries"
+            raise ValueError(msg)
+        tail = "-".join(e.strftime("%Y%m%d") for e in expiries)
+    else:
+        msg = (
+            f"build_combo_id: no anchor convention registered for strategy={strategy.value}. "
+            "Add it to _STRIKE_ANCHORED_STRATEGIES or _EXPIRY_ANCHORED_STRATEGIES."
+        )
+        raise ValueError(msg)
+
+    return f"{venue_token}:{InstrumentType.COMBO.value}:{underlying_up}-{strategy_token}-{tail}"
 
 
 def _build_sports_or_prediction(venue: str, itype: InstrumentType, symbol: str) -> str:

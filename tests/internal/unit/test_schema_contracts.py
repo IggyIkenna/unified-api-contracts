@@ -8,6 +8,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pandas as pd
+import pytest
 
 from unified_api_contracts.internal.schemas.contracts import (
     CEFI_FUTURES_CHAIN_TRADES,
@@ -15,15 +16,23 @@ from unified_api_contracts.internal.schemas.contracts import (
     CEFI_PERPETUAL_BOOK_SNAPSHOT_5,
     CEFI_PERPETUAL_TRADES,
     CONTRACT_REGISTRY,
+    DEFI_AAVE_V3_LENDING_INDICES,
+    DEFI_DEX_POOL_DEX_POOL_STATE,
     DEFI_DEX_POOL_DEX_POOL_SWAPS,
+    DEFI_LENDING_INDICES_MARKET_ID,
     DEFI_LENDING_POSITION_LENDING_INDICES,
     DEFI_LST_LST_RATES,
+    DEFI_POOL_DEX_POOL_SWAPS,
+    DEFI_SPOT_ASSET_GAS_FEES,
     TRADFI_EQUITY_TRADES,
     TRADFI_FUTURE_TRADES,
     TRADFI_OPTIONS_CHAIN_TRADES,
+    VENUE_CONTRACT_OVERRIDES,
     ColumnSpec,
     SchemaContract,
+    SchemaContractNotFoundError,
     Violation,
+    lookup_contract,
     validate_dataframe,
 )
 
@@ -301,3 +310,131 @@ def test_violation_model_is_frozen() -> None:
     v = Violation(kind="missing_column", column="x", message="test")
     assert v.kind == "missing_column"
     assert v.column == "x"
+
+
+# ---------------------------------------------------------------------------
+# G7 — SchemaContract.symbol_column & venue-aware lookup
+# ---------------------------------------------------------------------------
+
+
+def test_every_contract_declares_a_symbol_column() -> None:
+    """G7: every registered contract must declare ``symbol_column`` (no blank)."""
+    for key, contract in CONTRACT_REGISTRY.items():
+        assert contract.symbol_column, f"{key} missing symbol_column"
+        declared = {c.name for c in contract.columns}
+        assert contract.symbol_column in declared or contract.symbol_column in {
+            "symbol",
+            "underlying",
+        }, f"{key} symbol_column={contract.symbol_column} not in declared columns"
+
+
+def test_defi_contracts_use_correct_per_source_symbol_columns() -> None:
+    """Aave V3 must key on ``symbol`` (aToken), pools must key on ``pool_id``,
+    generic lending must key on ``market_id`` — no more guessing."""
+    assert DEFI_AAVE_V3_LENDING_INDICES.symbol_column == "symbol"
+    assert DEFI_LENDING_INDICES_MARKET_ID.symbol_column == "market_id"
+    # dex_pool_state currently keys on ``symbol`` for live-handler parity;
+    # dex_pool_swaps keys on ``pool_id`` for cross-protocol swap feeds.
+    assert DEFI_DEX_POOL_DEX_POOL_STATE.symbol_column == "symbol"
+    assert DEFI_DEX_POOL_DEX_POOL_SWAPS.symbol_column == "pool_id"
+    assert DEFI_POOL_DEX_POOL_SWAPS.symbol_column == "pool_id"
+    assert DEFI_LST_LST_RATES.symbol_column == "symbol"
+    assert DEFI_SPOT_ASSET_GAS_FEES.symbol_column == "symbol"
+
+
+def test_cefi_chain_contracts_key_on_underlying() -> None:
+    """Options / futures chains bundle per underlying, not per row symbol."""
+    assert CEFI_OPTIONS_CHAIN_TRADES.symbol_column == "underlying"
+    assert CEFI_FUTURES_CHAIN_TRADES.symbol_column == "underlying"
+    assert TRADFI_OPTIONS_CHAIN_TRADES.symbol_column == "underlying"
+
+
+def test_lookup_contract_without_venue_resolves_base_registry() -> None:
+    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type="trades")
+    assert contract is CONTRACT_REGISTRY[("cefi", "perpetual", "trades")]
+
+
+def test_lookup_contract_with_venue_prefers_override() -> None:
+    """Aave V3 override routes to the liquidity/borrow-index schema."""
+    contract = lookup_contract(
+        category="defi",
+        instrument_type="a_token",
+        data_type="lending_indices",
+        venue="AAVE_V3",
+    )
+    assert contract is DEFI_AAVE_V3_LENDING_INDICES
+
+
+def test_lookup_contract_with_unknown_venue_falls_back_to_base() -> None:
+    """Unknown venue falls back to the base (category, it, dt) registry."""
+    contract = lookup_contract(
+        category="cefi",
+        instrument_type="perpetual",
+        data_type="trades",
+        venue="NEW_VENUE_NOT_REGISTERED",
+    )
+    assert contract is CONTRACT_REGISTRY[("cefi", "perpetual", "trades")]
+
+
+def test_lookup_contract_missing_raises_with_structured_details() -> None:
+    """G3: a missing contract must raise — not warn — with routable details."""
+    with pytest.raises(SchemaContractNotFoundError) as exc_info:
+        lookup_contract(
+            category="defi",
+            instrument_type="unknown_type",
+            data_type="unknown_dt",
+            venue="UNKNOWN_VENUE",
+        )
+    details = exc_info.value.details
+    assert details["category"] == "defi"
+    assert details["instrument_type"] == "unknown_type"
+    assert details["data_type"] == "unknown_dt"
+    assert details["venue"] == "UNKNOWN_VENUE"
+
+
+def test_venue_contract_overrides_cover_aave_v3_variant() -> None:
+    """Aave V3's column vocabulary (liquidityIndex, variableBorrowIndex)
+    differs from every other lending protocol, so it's the sentinel
+    venue-override that must be present. Other protocols resolve via the
+    base registry by (category, instrument_type, data_type)."""
+    covered = {v for (_, v, _, _) in VENUE_CONTRACT_OVERRIDES}
+    assert "AAVE_V3" in covered
+
+
+def test_contract_registry_covers_expanded_defi_shards() -> None:
+    """G7 expanded coverage: every data_type the handlers write must resolve."""
+    required = {
+        ("defi", "a_token", "lending_indices"),
+        ("defi", "lending", "lending_indices"),
+        ("defi", "lending", "liquidations"),
+        ("defi", "pool", "dex_pool_state"),
+        ("defi", "pool", "dex_pool_swaps"),
+        ("defi", "dex_pool", "dex_pool_swaps"),
+        ("defi", "lst", "lst_rates"),
+        ("defi", "spot_asset", "gas_fees"),
+        ("defi", "spot_asset", "oracle_prices"),
+        ("defi", "perpetual", "perp_funding"),
+        ("defi", "staking", "eigenlayer_rewards"),
+        ("defi", "staking", "yield_snapshots"),
+    }
+    assert required.issubset(set(CONTRACT_REGISTRY.keys()))
+
+
+def test_contract_registry_covers_expanded_cefi_shards() -> None:
+    required = {
+        ("cefi", "perpetual", "derivative_ticker"),
+        ("cefi", "perpetual", "liquidations"),
+        ("cefi", "perpetual", "quotes"),
+        ("cefi", "spot_pair", "trades"),
+        ("cefi", "spot_pair", "book_snapshot_5"),
+    }
+    assert required.issubset(set(CONTRACT_REGISTRY.keys()))
+
+
+def test_contract_registry_covers_expanded_tradfi_shards() -> None:
+    required = {
+        ("tradfi", "future", "ohlcv_1m"),
+        ("tradfi", "equity", "ohlcv_1m"),
+        ("tradfi", "index", "trades"),
+    }
+    assert required.issubset(set(CONTRACT_REGISTRY.keys()))

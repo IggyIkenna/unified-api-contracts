@@ -6,6 +6,7 @@ from unified_api_contracts.internal.reference.availability import (
 from unified_api_contracts.internal.reference.canonical_id_builder import (
     SUPPORTED_INSTRUMENT_TYPES,
     UNSUPPORTED_BY_DESIGN,
+    build_combo_id,
     build_instrument_id,
 )
 from unified_api_contracts.internal.reference.circuit_breaker_config import (
@@ -46,14 +47,22 @@ from unified_api_contracts.internal.reference.instrument_definition import Instr
 from unified_api_contracts.internal.reference.instrument_key import InstrumentKey
 from unified_api_contracts.internal.reference.instrument_validation import validate_instrument_records
 from unified_api_contracts.internal.reference.onchain_freshness import OnchainDataFreshnessConfig
+from unified_api_contracts.internal.reference.ticker_registry import (
+    EXCHANGE_BY_TICKER,
+    UNDERLYING_NORMALIZATION,
+    normalize_underlying,
+    resolve_exchange,
+)
 from unified_api_contracts.internal.reference.universe_snapshot import UniverseSnapshot
 
 __all__ = [
     "ALL_FRESHNESS_CONTRACTS",
+    "EXCHANGE_BY_TICKER",
     "FEATURE_FRESHNESS",
     "MARKET_TICK_FRESHNESS",
     "ML_FRESHNESS",
     "SUPPORTED_INSTRUMENT_TYPES",
+    "UNDERLYING_NORMALIZATION",
     "UNSUPPORTED_BY_DESIGN",
     "AssetClass",
     "CircuitBreakerConfigRegistry",
@@ -79,7 +88,10 @@ __all__ = [
     "StockSplitRecord",
     "UniverseSnapshot",
     "VenueCircuitBreakerConfig",
+    "build_combo_id",
     "build_instrument_id",
     "get_instruments_available_on",
+    "normalize_underlying",
+    "resolve_exchange",
     "validate_instrument_records",
 ]

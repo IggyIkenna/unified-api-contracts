@@ -16,11 +16,14 @@ from decimal import Decimal
 
 import pytest
 
+from unified_api_contracts import ComboStrategyType
+from unified_api_contracts import build_combo_id as top_level_build_combo_id
 from unified_api_contracts import build_instrument_id as top_level_build_instrument_id
 from unified_api_contracts._instrument_enums import InstrumentType
 from unified_api_contracts.internal.reference.canonical_id_builder import (
     SUPPORTED_INSTRUMENT_TYPES,
     UNSUPPORTED_BY_DESIGN,
+    build_combo_id,
     build_instrument_id,
 )
 
@@ -378,6 +381,116 @@ class TestCoverage:
 # ---------------------------------------------------------------------------
 
 
+class TestBuildComboId:
+    def test_butterfly_three_strikes(self) -> None:
+        assert (
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.BUTTERFLY,
+                anchor_expiry=_dt.date(2024, 6, 21),
+                strikes=[Decimal(5500), Decimal(5600), Decimal(5700)],
+            )
+            == "CME:COMBO:SP500-BUTTERFLY-20240621-5500-5600-5700"
+        )
+
+    def test_iron_condor_four_strikes(self) -> None:
+        assert (
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.IRON_CONDOR,
+                anchor_expiry=_dt.date(2024, 6, 21),
+                strikes=[Decimal(5400), Decimal(5500), Decimal(5600), Decimal(5700)],
+            )
+            == "CME:COMBO:SP500-IRON_CONDOR-20240621-5400-5500-5600-5700"
+        )
+
+    def test_calendar_two_expiries(self) -> None:
+        assert (
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.CALENDAR,
+                expiries=[_dt.date(2024, 6, 21), _dt.date(2024, 9, 20)],
+            )
+            == "CME:COMBO:SP500-CALENDAR-20240621-20240920"
+        )
+
+    def test_calendar_spread_two_expiries(self) -> None:
+        assert (
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.CALENDAR_SPREAD,
+                expiries=[_dt.date(2024, 6, 21), _dt.date(2024, 9, 20)],
+            )
+            == "CME:COMBO:SP500-CALENDAR_SPREAD-20240621-20240920"
+        )
+
+    def test_straddle_single_strike(self) -> None:
+        assert (
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.STRADDLE,
+                anchor_expiry=_dt.date(2024, 6, 21),
+                strikes=[Decimal(5600)],
+            )
+            == "CME:COMBO:SP500-STRADDLE-20240621-5600"
+        )
+
+    def test_butterfly_without_expiry_raises(self) -> None:
+        with pytest.raises(ValueError, match="requires anchor_expiry"):
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.BUTTERFLY,
+                strikes=[Decimal(5500), Decimal(5600), Decimal(5700)],
+            )
+
+    def test_butterfly_without_strikes_raises(self) -> None:
+        with pytest.raises(ValueError, match="requires at least one strike"):
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.BUTTERFLY,
+                anchor_expiry=_dt.date(2024, 6, 21),
+            )
+
+    def test_calendar_single_expiry_raises(self) -> None:
+        with pytest.raises(ValueError, match="requires at least two expiries"):
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.CALENDAR,
+                expiries=[_dt.date(2024, 6, 21)],
+            )
+
+    def test_empty_underlying_raises(self) -> None:
+        with pytest.raises(ValueError, match="non-empty underlying"):
+            build_combo_id(
+                "CME",
+                "",
+                ComboStrategyType.BUTTERFLY,
+                anchor_expiry=_dt.date(2024, 6, 21),
+                strikes=[Decimal(5600)],
+            )
+
+    def test_custom_strategy_rejected(self) -> None:
+        with pytest.raises(ValueError, match=r"does not accept ComboStrategyType\.CUSTOM"):
+            build_combo_id(
+                "CME",
+                "SP500",
+                ComboStrategyType.CUSTOM,
+                anchor_expiry=_dt.date(2024, 6, 21),
+                strikes=[Decimal(5600)],
+            )
+
+
 class TestTopLevelReExport:
     def test_top_level_alias_is_same_callable(self) -> None:
         assert top_level_build_instrument_id is build_instrument_id
+
+    def test_top_level_build_combo_id_is_same_callable(self) -> None:
+        assert top_level_build_combo_id is build_combo_id
