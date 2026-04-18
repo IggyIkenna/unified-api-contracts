@@ -769,6 +769,135 @@ for _venue in ("UNISWAP_V2", "UNISWAP_V3", "UNISWAP_V4", "CURVE", "BALANCER"):
     VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_swaps")] = DEFI_UNISWAP_POOL_SWAPS_LEGACY
 
 
+# Aave V3 reserve-level datasets: oracle prices, rate indices (liquidity +
+# borrow), utilization %, and risk parameters (LTV, liquidation threshold,
+# reserve factor). All keyed per-asset symbol (USDC, WETH, …).
+DEFI_A_TOKEN_ORACLE_PRICES = SchemaContract(
+    category="defi",
+    instrument_type="a_token",
+    data_type="oracle_prices",
+    columns=[_INSTRUMENT_ID, _VENUE, _CHAIN, _TS_EVENT, ColumnSpec(name="price", dtype="float64", nullable=False)],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_A_TOKEN_RATE_INDICES = SchemaContract(
+    category="defi",
+    instrument_type="a_token",
+    data_type="rate_indices",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="liquidity_index", dtype="float64", nullable=True),
+        ColumnSpec(name="variable_borrow_index", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_A_TOKEN_RISK_PARAMS = SchemaContract(
+    category="defi",
+    instrument_type="a_token",
+    data_type="risk_params",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="ltv", dtype="float64", nullable=True),
+        ColumnSpec(name="liquidation_threshold", dtype="float64", nullable=True),
+        ColumnSpec(name="reserve_factor", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_A_TOKEN_UTILIZATION = SchemaContract(
+    category="defi",
+    instrument_type="a_token",
+    data_type="utilization",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="utilization_rate", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Morpho (generic lending) reserve datasets — same shape as a_token variants
+# but routed under instrument_type=lending per the live handler convention.
+DEFI_LENDING_RATE_INDICES = SchemaContract(
+    category="defi",
+    instrument_type="lending",
+    data_type="rate_indices",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="supply_rate", dtype="float64", nullable=True),
+        ColumnSpec(name="borrow_rate", dtype="float64", nullable=True),
+    ],
+    symbol_column="market_id",
+    required_row_count_min=1,
+)
+
+DEFI_LENDING_UTILIZATION = SchemaContract(
+    category="defi",
+    instrument_type="lending",
+    data_type="utilization",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="utilization_rate", dtype="float64", nullable=True),
+    ],
+    symbol_column="market_id",
+    required_row_count_min=1,
+)
+
+# LST (Lido, EtherFi, Ethena) oracle prices + rewards — per-token snapshots.
+DEFI_LST_ORACLE_PRICES = SchemaContract(
+    category="defi",
+    instrument_type="lst",
+    data_type="oracle_prices",
+    columns=[_INSTRUMENT_ID, _VENUE, _CHAIN, _TS_EVENT, ColumnSpec(name="price", dtype="float64", nullable=False)],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_LST_REWARDS = SchemaContract(
+    category="defi",
+    instrument_type="lst",
+    data_type="rewards",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="reward_rate", dtype="float64", nullable=True),
+        ColumnSpec(name="apy", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+CONTRACT_REGISTRY[("defi", "a_token", "oracle_prices")] = DEFI_A_TOKEN_ORACLE_PRICES
+CONTRACT_REGISTRY[("defi", "a_token", "rate_indices")] = DEFI_A_TOKEN_RATE_INDICES
+CONTRACT_REGISTRY[("defi", "a_token", "risk_params")] = DEFI_A_TOKEN_RISK_PARAMS
+CONTRACT_REGISTRY[("defi", "a_token", "utilization")] = DEFI_A_TOKEN_UTILIZATION
+CONTRACT_REGISTRY[("defi", "lending", "rate_indices")] = DEFI_LENDING_RATE_INDICES
+CONTRACT_REGISTRY[("defi", "lending", "utilization")] = DEFI_LENDING_UTILIZATION
+CONTRACT_REGISTRY[("defi", "lst", "oracle_prices")] = DEFI_LST_ORACLE_PRICES
+CONTRACT_REGISTRY[("defi", "lst", "rewards")] = DEFI_LST_REWARDS
+
+
 class SchemaContractNotFoundError(LookupError):
     """Raised when :func:`lookup_contract` cannot resolve a contract.
 
