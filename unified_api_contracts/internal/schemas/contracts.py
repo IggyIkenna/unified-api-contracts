@@ -798,12 +798,34 @@ DEFI_UNISWAP_V2_POOL_SWAPS_LEGACY = SchemaContract(
     required_row_count_min=1,
 )
 
-for _venue in ("UNISWAP_V3", "UNISWAP_V4", "CURVE", "BALANCER"):
+for _venue in ("UNISWAP_V3", "CURVE", "BALANCER"):
     VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_state")] = DEFI_UNISWAP_POOL_STATE_LEGACY
     VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_swaps")] = DEFI_UNISWAP_POOL_SWAPS_LEGACY
 
 VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V2", "pool", "dex_pool_state")] = DEFI_UNISWAP_V2_POOL_STATE_LEGACY
 VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V2", "pool", "dex_pool_swaps")] = DEFI_UNISWAP_V2_POOL_SWAPS_LEGACY
+
+# Uniswap V4 raw rows use ``pool_id`` as the pool identifier (not
+# ``pool_address`` like V3). Separate override keeps V3/V4 in sync with
+# their actual writer grammars.
+DEFI_UNISWAP_V4_POOL_STATE_LEGACY = SchemaContract(
+    category="defi",
+    instrument_type="pool",
+    data_type="dex_pool_state",
+    columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
+    symbol_column="pool_id",
+    required_row_count_min=1,
+)
+DEFI_UNISWAP_V4_POOL_SWAPS_LEGACY = SchemaContract(
+    category="defi",
+    instrument_type="pool",
+    data_type="dex_pool_swaps",
+    columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
+    symbol_column="pool_id",
+    required_row_count_min=1,
+)
+VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V4", "pool", "dex_pool_state")] = DEFI_UNISWAP_V4_POOL_STATE_LEGACY
+VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V4", "pool", "dex_pool_swaps")] = DEFI_UNISWAP_V4_POOL_SWAPS_LEGACY
 
 
 # Aave V3 reserve-level datasets: oracle prices, rate indices (liquidity +
