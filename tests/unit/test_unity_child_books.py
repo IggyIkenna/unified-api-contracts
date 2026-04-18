@@ -125,14 +125,14 @@ class TestUnityChildBookInvariantsForRouting:
 
 @pytest.mark.unit
 class TestUnityChildBookCommissionSanity:
-    def test_confirmed_commissions_in_range_or_pending(self) -> None:
-        """Confirmed books: commission_bps in [20, 300] or 0 (commercial-pending)."""
+    def test_confirmed_commissions_in_range_or_free(self) -> None:
+        """Confirmed books: commission_bps in [20, 300] or 0 (commission-free per portal)."""
         for book in unity_child_books_confirmed():
             if book.commission_bps == Decimal("0"):
-                # Broker3 / Broker4 commercial-pending sentinel
-                assert "TBD" in book.notes or "pending" in book.notes.lower(), (
+                # CROWN / SBO are commission-free per Unity pricing 2026-04-17
+                assert "commission-free" in book.notes.lower(), (
                     f"{book.child_venue_id}: commission_bps=0 on confirmed book "
-                    f"requires notes to document commercial-pending status"
+                    f"requires notes to document commission-free status"
                 )
             else:
                 assert book.commission_bps >= UNITY_MIN_CONFIRMED_COMMISSION_BPS, (

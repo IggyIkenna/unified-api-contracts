@@ -1,11 +1,13 @@
 """Unity meta-broker child book declarations.
 
-SSOT for Unity's 10 child books. 8 confirmed with commissions as of 2026-04-17;
-2 pending from https://quant-portal.olesportsresearch.com/unity.
+SSOT for Unity's 10 child books, fully populated from quant-portal.olesportsresearch.com/unity
+on 2026-04-17. All 10 books are confirmed. Commission type is COMMISSION_ON_WIN
+for every book that charges commission; CROWN and SBO are commission-free.
 
 See codex/02-venues/unity-integration.md for the full commercial + technical
 spec (single TCP connection, Java Feed Connector sidecar, 3 sports enabled,
-USD share class, $10.8k deposit, $2.6k/mo subscription).
+USD share class, $10.8k deposit, subscription USD 2,600/mo waived at
+USD 260,000/mo effective turnover).
 """
 
 from __future__ import annotations
@@ -21,28 +23,28 @@ UNITY_CHILD_BOOKS: list[UnityChildVenue] = [
     UnityChildVenue(
         child_venue_id="3ET",
         display_name="3ET",
-        commission_bps=Decimal("0"),  # 0%
-        commission_type=CommissionStructureType.FLAT,
+        commission_bps=Decimal("50"),  # 0.5%
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Commission TBD per commercial agreement; existence confirmed from quant-portal 2026-04-17",
+        notes="0.5% on winning bets per Unity pricing 2026-04-17",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="BETFAIR",
         display_name="Betfair (via Unity)",
-        commission_bps=Decimal("50"),  # 0.5%
+        commission_bps=Decimal("280"),  # 2.8%
         commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Back+lay exchange via Unity aggregated book; 0.5% on winnings",
+        notes="Back+lay exchange via Unity aggregated book; 2.8% on winnings per Unity pricing 2026-04-17",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="BROKER5",
         display_name="Broker 5",
         commission_bps=Decimal("300"),  # 3%
-        commission_type=CommissionStructureType.FLAT,
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="High commission (3.0%); only route if spread justifies",
+        notes="High commission (3.0% on winning bets); only route if spread justifies",
         confirmed=True,
     ),
     UnityChildVenue(
@@ -51,16 +53,16 @@ UNITY_CHILD_BOOKS: list[UnityChildVenue] = [
         commission_bps=Decimal("0"),  # 0%
         commission_type=CommissionStructureType.FLAT,
         supported_sports=["SOCCER", "BASKETBALL"],
-        notes="Asian market operator (marked * on portal); Asian handicap specialist. Commission TBD per commercial.",
+        notes="Commission-free per Unity pricing 2026-04-17; Asian handicap specialist (marked * on portal)",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="MATCHBOOK",
         display_name="Matchbook (via Unity)",
-        commission_bps=Decimal("0"),  # 0%
+        commission_bps=Decimal("220"),  # 2.2%
         commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Exchange via Unity; commission TBD per commercial",
+        notes="Exchange via Unity; 2.2% on winnings per Unity pricing 2026-04-17",
         confirmed=True,
     ),
     UnityChildVenue(
@@ -69,46 +71,43 @@ UNITY_CHILD_BOOKS: list[UnityChildVenue] = [
         commission_bps=Decimal("0"),  # 0%
         commission_type=CommissionStructureType.FLAT,
         supported_sports=["SOCCER", "BASKETBALL"],
-        notes=(
-            "Asian market operator (marked * on portal; SBOBet); "
-            "Asian handicap specialist. Commission TBD per commercial."
-        ),
+        notes="Commission-free per Unity pricing 2026-04-17; SBOBet — Asian handicap specialist (marked * on portal)",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="SHARPBET",
         display_name="SharpBet",
         commission_bps=Decimal("20"),  # 0.2%
-        commission_type=CommissionStructureType.FLAT,
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Cheapest child book (0.2%); preferred first",
+        notes="Cheapest commissioned book (0.2% on winnings); preferred first alongside VX",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="VX",
         display_name="VX",
         commission_bps=Decimal("20"),  # 0.2%
-        commission_type=CommissionStructureType.FLAT,
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Cheapest child book (0.2%); preferred first",
+        notes="Cheapest commissioned book (0.2% on winnings); preferred first alongside SharpBet",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="BETDEX",
         display_name="Betdex",
-        commission_bps=Decimal("0"),  # 0%
+        commission_bps=Decimal("160"),  # 1.6%
         commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Decentralized betting exchange via Unity; commission TBD per commercial",
+        notes="Decentralized betting exchange via Unity; 1.6% on winnings per Unity pricing 2026-04-17",
         confirmed=True,
     ),
     UnityChildVenue(
         child_venue_id="IBC",
         display_name="IBC (Asian)",
-        commission_bps=Decimal("150"),  # 1.5%
-        commission_type=CommissionStructureType.FLAT,
+        commission_bps=Decimal("250"),  # 2.5%
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "BASKETBALL"],
-        notes="Asian market operator (marked * on portal; IBCBet); Asian handicap specialist. 1.5% commission.",
+        notes="IBCBet — Asian handicap specialist (marked * on portal); 2.5% on winnings per Unity pricing 2026-04-17",
         confirmed=True,
     ),
 ]
@@ -124,10 +123,11 @@ UNITY_MAX_CONFIRMED_COMMISSION_BPS: Decimal = Decimal("300")
 #: enabled (soccer, tennis, basketball). Adding a new sport requires a UAC
 #: schema bump + contract with Unity.
 UNITY_SUPPORTED_SPORTS: frozenset[str] = frozenset({"SOCCER", "TENNIS", "BASKETBALL"})
-#: Commission-TBD-per-commercial-agreement sentinel. Broker 3 and Broker 4 are
-#: confirmed-existence but commission was not disclosed at time of schema landing.
-#: ``commission_bps`` set to 0 is the documented sentinel; callers must treat
-#: 0 on a confirmed book as "commercial-pending" not "free".
+#: Commission-free sentinel. Post-2026-04-17 the quant-portal pricing
+#: confirms CROWN and SBO are commission-free; ``commission_bps=0`` on a
+#: confirmed book now means "genuinely free" and routing must NOT treat
+#: these books as unroutable. Notes on such a book should start with
+#: "Commission-free" for grep/audit clarity.
 UNITY_COMMERCIAL_PENDING_COMMISSION_BPS: Decimal = Decimal("0")
 #: Sentinel prefix for stub books pending identity pull from quant-portal.
 UNITY_TBD_PREFIX: str = "TBD_BOOK_"
