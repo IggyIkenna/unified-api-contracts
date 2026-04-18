@@ -46,6 +46,13 @@ class LifecycleEventType(StrEnum):
     UPSTREAM_NOT_READY = "UPSTREAM_NOT_READY"
     SHARD_INCOMPLETE = "SHARD_INCOMPLETE"
     WRITE_FAILED = "WRITE_FAILED"
+    # Upstream fetch lifecycle (data_pipeline_completion Phase 8.3 — no double-fetch)
+    # Emitted by every external-data adapter (Tardis, Databento, ODDS_API, Polymarket,
+    # FootyStats, The Graph) wrapping a paid upstream call. Migrations and backfills
+    # consult these events to skip already-landed day partitions unless --force.
+    UPSTREAM_FETCH_STARTED = "UPSTREAM_FETCH_STARTED"
+    UPSTREAM_FETCH_COMPLETED = "UPSTREAM_FETCH_COMPLETED"
+    UPSTREAM_DOUBLE_FETCH = "UPSTREAM_DOUBLE_FETCH"
     # CI/CD pipeline lifecycle
     QG_PASSED = "QG_PASSED"
     QG_FAILED = "QG_FAILED"
@@ -54,6 +61,17 @@ class LifecycleEventType(StrEnum):
     DEPLOYMENT_COMPLETED = "DEPLOYMENT_COMPLETED"
     DEPLOYMENT_FAILED = "DEPLOYMENT_FAILED"
     DEPLOYMENT_ROLLED_BACK = "DEPLOYMENT_ROLLED_BACK"
+    # Orphan detector (data_pipeline_completion Phase 8.1 — nightly)
+    # Emitted by deployments-registry sweeper for any DEPLOYMENT_STARTED whose
+    # deployment_id has not emitted COMPLETED/FAILED within 24h.
+    DEPLOYMENT_ORPHANED = "DEPLOYMENT_ORPHANED"
+    # Debug-mode events (data_pipeline_completion Phase 8.2 — --debug flag)
+    # Verbose per-shard / per-row / per-manifest-row diagnostic events. Default
+    # off in prod to avoid flooding Pub/Sub; gated behind DEBUG_EVENTS=1 env var
+    # or --debug CLI flag.
+    DEBUG_SHARD_SCANNED = "DEBUG_SHARD_SCANNED"
+    DEBUG_ROW_CLASSIFIED = "DEBUG_ROW_CLASSIFIED"
+    DEBUG_MANIFEST_ROW = "DEBUG_MANIFEST_ROW"
     WORKFLOW_TRIGGERED = "WORKFLOW_TRIGGERED"
     VERSION_BUMPED = "VERSION_BUMPED"
     CASCADE_DISPATCHED = "CASCADE_DISPATCHED"
