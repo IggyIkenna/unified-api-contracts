@@ -421,6 +421,20 @@ TRADFI_INDEX_TRADES = SchemaContract(
     required_row_count_min=1,
 )
 
+# COMBO = calendar spread (NGH0-NGJ0), butterfly (CLZ0-CLF1-CLG1), iron
+# condor, etc. Per-underlying bundled (one file per underlying per day
+# carrying every multi-leg instruction). ``symbol`` is the Databento-style
+# leg-combo string (``ESH0-ESM0``); canonical ``instrument_id`` is built
+# upstream via MultiLegInstrument.
+TRADFI_COMBO_TRADES = SchemaContract(
+    category="tradfi",
+    instrument_type="combo",
+    data_type="trades",
+    columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 TRADFI_FUTURE_OHLCV_1M = SchemaContract(
     category="tradfi",
     instrument_type="future",
@@ -708,6 +722,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("tradfi", "equity", "trades"): TRADFI_EQUITY_TRADES,
     ("tradfi", "equity", "ohlcv_1m"): TRADFI_EQUITY_OHLCV_1M,
     ("tradfi", "index", "trades"): TRADFI_INDEX_TRADES,
+    ("tradfi", "combo", "trades"): TRADFI_COMBO_TRADES,
     # DeFi
     ("defi", "lending_position", "lending_indices"): DEFI_LENDING_POSITION_LENDING_INDICES,
     ("defi", "a_token", "lending_indices"): DEFI_AAVE_V3_LENDING_INDICES,
