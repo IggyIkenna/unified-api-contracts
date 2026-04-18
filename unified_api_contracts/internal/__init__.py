@@ -773,6 +773,12 @@ from unified_api_contracts.internal.unity_child_books import (
     unity_child_books_pending,
     validate_unity_child_book,
 )
+from unified_api_contracts.internal.unity_commercial_terms import (
+    UNITY_COMMERCIAL_TERMS,
+    SupportedCurrency,
+    UnityCommercialTerms,
+    UnityCurrencyTerms,
+)
 
 __all__ = [
     "ALL_FRESHNESS_CONTRACTS",
@@ -791,6 +797,7 @@ __all__ = [
     "TIMEFRAME_TO_SECONDS",
     "UNITY_CHILD_BOOKS",
     "UNITY_COMMERCIAL_PENDING_COMMISSION_BPS",
+    "UNITY_COMMERCIAL_TERMS",
     "UNITY_MAX_CONFIRMED_COMMISSION_BPS",
     "UNITY_MIN_CONFIRMED_COMMISSION_BPS",
     "UNITY_SUPPORTED_SPORTS",
@@ -1279,6 +1286,7 @@ __all__ = [
     "StressTestResult",
     "SubAccount",
     "SubscriptionTier",
+    "SupportedCurrency",
     "SwapInstruction",
     "SwapResult",
     "SyntheticDataGenerator",
@@ -1311,6 +1319,8 @@ __all__ = [
     "UniswapV3QuoteResponse",
     "UniswapV3SwapTxReceipt",
     "UnityChildVenue",
+    "UnityCommercialTerms",
+    "UnityCurrencyTerms",
     "UniverseSnapshot",
     "UnstakeInstruction",
     "UnsubscribeRequest",
