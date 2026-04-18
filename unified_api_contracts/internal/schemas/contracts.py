@@ -138,6 +138,23 @@ _OPTION_RIGHT = ColumnSpec(name="option_right", dtype="string", nullable=False)
 _VENUE = ColumnSpec(name="venue", dtype="string", nullable=False)
 _CHAIN = ColumnSpec(name="chain", dtype="string", nullable=False)
 
+# Public aliases for cross-module use inside this package (avoids
+# reportPrivateUsage when sibling modules like ``_legacy_venue_overrides``
+# or ``_sports_prediction_contracts`` reference these shared building
+# blocks).
+INSTRUMENT_ID_COL = _INSTRUMENT_ID
+TS_EVENT_COL = _TS_EVENT
+SYMBOL_COL = _SYMBOL
+SIDE_COL = _SIDE
+PRICE_COL = _PRICE
+SIZE_COL = _SIZE
+UNDERLYING_COL = _UNDERLYING
+STRIKE_COL = _STRIKE
+EXPIRY_DATE_COL = _EXPIRY_DATE
+OPTION_RIGHT_COL = _OPTION_RIGHT
+VENUE_COL = _VENUE
+CHAIN_COL = _CHAIN
+
 # ---------------------------------------------------------------------------
 # Built-in contracts — CeFi
 # ---------------------------------------------------------------------------
@@ -377,6 +394,14 @@ TRADFI_EQUITY_OHLCV_1M = SchemaContract(
     symbol_column="symbol",
     required_row_count_min=1,
 )
+
+# ---------------------------------------------------------------------------
+# Built-in contracts — Sports / Prediction
+# ---------------------------------------------------------------------------
+# Sports (odds) and Prediction (Polymarket CLOB) contracts are declared in
+# ``_sports_prediction_contracts`` and imported here via a side-effect import
+# to keep this module under the 900-line codex-compliance limit. Re-exports
+# below preserve ``from ...contracts import SPORTS_ODDS_TRADES`` API.
 
 # ---------------------------------------------------------------------------
 # Built-in contracts — DeFi
@@ -644,6 +669,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
     ("defi", "staking", "eigenlayer_rewards"): DEFI_STAKING_EIGENLAYER_REWARDS,
     ("defi", "staking", "yield_snapshots"): DEFI_STAKING_YIELD_SNAPSHOTS,
+    # Sports + Prediction registered via _sports_prediction_contracts side-effect import (see end of file).
 }
 
 
@@ -749,6 +775,14 @@ def lookup_contract(
     return contract
 
 
+# Side-effect import: registers Sports + Prediction contracts into
+# CONTRACT_REGISTRY. Placed after lookup_contract / registry construction so
+# its mutations land before any external consumer calls lookup_contract.
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+    PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
+    SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
+)
+
 __all__ = [
     "CEFI_FUTURES_CHAIN_TRADES",
     "CEFI_OPTIONS_CHAIN_TRADES",
@@ -773,6 +807,9 @@ __all__ = [
     "DEFI_SPOT_ASSET_ORACLE_PRICES",
     "DEFI_STAKING_EIGENLAYER_REWARDS",
     "DEFI_STAKING_YIELD_SNAPSHOTS",
+    "PREDICTION_PREDICTION_MARKET_TRADES",
+    "SPORTS_ODDS_TRADES",
+    "TRADFI_COMBO_TRADES",
     "TRADFI_EQUITY_OHLCV_1M",
     "TRADFI_EQUITY_TRADES",
     "TRADFI_FUTURE_OHLCV_1M",
