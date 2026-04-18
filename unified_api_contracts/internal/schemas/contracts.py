@@ -741,6 +741,34 @@ VENUE_CONTRACT_OVERRIDES: dict[tuple[str, str, str, str], SchemaContract] = {
 }
 
 
+# Historical/raw Uniswap (V2/V3/V4), Curve, Balancer pool rows carry the
+# pool hex address under ``pool_address`` rather than the canonical
+# ``symbol`` column the live handlers emit. These overrides let the
+# migration pipeline resolve to a contract that points to the column the
+# row actually has, without silent fallback.
+DEFI_UNISWAP_POOL_STATE_LEGACY = SchemaContract(
+    category="defi",
+    instrument_type="pool",
+    data_type="dex_pool_state",
+    columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
+    symbol_column="pool_address",
+    required_row_count_min=1,
+)
+
+DEFI_UNISWAP_POOL_SWAPS_LEGACY = SchemaContract(
+    category="defi",
+    instrument_type="pool",
+    data_type="dex_pool_swaps",
+    columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
+    symbol_column="pool_address",
+    required_row_count_min=1,
+)
+
+for _venue in ("UNISWAP_V2", "UNISWAP_V3", "UNISWAP_V4", "CURVE", "BALANCER"):
+    VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_state")] = DEFI_UNISWAP_POOL_STATE_LEGACY
+    VENUE_CONTRACT_OVERRIDES[("defi", _venue, "pool", "dex_pool_swaps")] = DEFI_UNISWAP_POOL_SWAPS_LEGACY
+
+
 class SchemaContractNotFoundError(LookupError):
     """Raised when :func:`lookup_contract` cannot resolve a contract.
 
