@@ -19,21 +19,60 @@ from unified_api_contracts.internal.architecture_v2 import (
 
 UNITY_CHILD_BOOKS: list[UnityChildVenue] = [
     UnityChildVenue(
-        child_venue_id="PINNACLE_VIA_UNITY",
-        display_name="Pinnacle (via Unity)",
-        commission_bps=Decimal("40"),  # 0.4%
+        child_venue_id="3ET",
+        display_name="3ET",
+        commission_bps=Decimal("0"),  # 0%
         commission_type=CommissionStructureType.FLAT,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Sharp book via Unity — lower limits than direct Pinnacle",
+        notes="Commission TBD per commercial agreement; existence confirmed from quant-portal 2026-04-17",
         confirmed=True,
     ),
     UnityChildVenue(
-        child_venue_id="VX",
-        display_name="VX",
-        commission_bps=Decimal("20"),  # 0.2%
+        child_venue_id="BETFAIR",
+        display_name="Betfair (via Unity)",
+        commission_bps=Decimal("50"),  # 0.5%
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
+        supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
+        notes="Back+lay exchange via Unity aggregated book; 0.5% on winnings",
+        confirmed=True,
+    ),
+    UnityChildVenue(
+        child_venue_id="BROKER5",
+        display_name="Broker 5",
+        commission_bps=Decimal("300"),  # 3%
         commission_type=CommissionStructureType.FLAT,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Cheapest child book; preferred first",
+        notes="High commission (3.0%); only route if spread justifies",
+        confirmed=True,
+    ),
+    UnityChildVenue(
+        child_venue_id="CROWN",
+        display_name="Crown (Asian)",
+        commission_bps=Decimal("0"),  # 0%
+        commission_type=CommissionStructureType.FLAT,
+        supported_sports=["SOCCER", "BASKETBALL"],
+        notes="Asian market operator (marked * on portal); Asian handicap specialist. Commission TBD per commercial.",
+        confirmed=True,
+    ),
+    UnityChildVenue(
+        child_venue_id="MATCHBOOK",
+        display_name="Matchbook (via Unity)",
+        commission_bps=Decimal("0"),  # 0%
+        commission_type=CommissionStructureType.COMMISSION_ON_WIN,
+        supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
+        notes="Exchange via Unity; commission TBD per commercial",
+        confirmed=True,
+    ),
+    UnityChildVenue(
+        child_venue_id="SBO",
+        display_name="SBO (Asian)",
+        commission_bps=Decimal("0"),  # 0%
+        commission_type=CommissionStructureType.FLAT,
+        supported_sports=["SOCCER", "BASKETBALL"],
+        notes=(
+            "Asian market operator (marked * on portal; SBOBet); "
+            "Asian handicap specialist. Commission TBD per commercial."
+        ),
         confirmed=True,
     ),
     UnityChildVenue(
@@ -42,73 +81,35 @@ UNITY_CHILD_BOOKS: list[UnityChildVenue] = [
         commission_bps=Decimal("20"),  # 0.2%
         commission_type=CommissionStructureType.FLAT,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Cheapest child book; preferred first",
+        notes="Cheapest child book (0.2%); preferred first",
         confirmed=True,
     ),
     UnityChildVenue(
-        child_venue_id="BETFAIR_VIA_UNITY",
-        display_name="Betfair (via Unity)",
-        commission_bps=Decimal("50"),  # 0.5% on winnings
+        child_venue_id="VX",
+        display_name="VX",
+        commission_bps=Decimal("20"),  # 0.2%
+        commission_type=CommissionStructureType.FLAT,
+        supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
+        notes="Cheapest child book (0.2%); preferred first",
+        confirmed=True,
+    ),
+    UnityChildVenue(
+        child_venue_id="BETDEX",
+        display_name="Betdex",
+        commission_bps=Decimal("0"),  # 0%
         commission_type=CommissionStructureType.COMMISSION_ON_WIN,
         supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="Back+lay exchange via Unity aggregated book",
+        notes="Decentralized betting exchange via Unity; commission TBD per commercial",
         confirmed=True,
     ),
     UnityChildVenue(
-        child_venue_id="BROKER3",
-        display_name="Broker 3 (confidential)",
-        commission_bps=Decimal("0"),  # TBD per commercial agreement
-        commission_type=CommissionStructureType.FLAT,
-        supported_sports=["SOCCER"],
-        notes="Commission TBD per commercial; existence confirmed",
-        confirmed=True,
-    ),
-    UnityChildVenue(
-        child_venue_id="BROKER4",
-        display_name="Broker 4 (confidential)",
-        commission_bps=Decimal("0"),  # TBD per commercial agreement
-        commission_type=CommissionStructureType.FLAT,
-        supported_sports=["SOCCER"],
-        notes="Commission TBD per commercial; existence confirmed",
-        confirmed=True,
-    ),
-    UnityChildVenue(
-        child_venue_id="BROKER5",
-        display_name="Broker 5 (confidential)",
-        commission_bps=Decimal("300"),  # 3.0% — avoid unless spread justifies
-        commission_type=CommissionStructureType.FLAT,
-        supported_sports=["SOCCER", "TENNIS", "BASKETBALL"],
-        notes="High commission; only route if spread justifies",
-        confirmed=True,
-    ),
-    UnityChildVenue(
-        child_venue_id="IBCBET",
-        display_name="IBCBet",
+        child_venue_id="IBC",
+        display_name="IBC (Asian)",
         commission_bps=Decimal("150"),  # 1.5%
         commission_type=CommissionStructureType.FLAT,
         supported_sports=["SOCCER", "BASKETBALL"],
-        notes="Mid-commission; Asian handicap specialist",
+        notes="Asian market operator (marked * on portal; IBCBet); Asian handicap specialist. 1.5% commission.",
         confirmed=True,
-    ),
-    # 2 PENDING from quant-portal.olesportsresearch.com/unity — stub entries so
-    # the registry can surface the TBD state in UI without shipping fake data.
-    UnityChildVenue(
-        child_venue_id="TBD_BOOK_9",
-        display_name="TBD — pending from quant-portal",
-        commission_bps=Decimal("0"),
-        commission_type=CommissionStructureType.FLAT,
-        supported_sports=[],
-        notes="Commission + identity pending from quant-portal.olesportsresearch.com/unity",
-        confirmed=False,
-    ),
-    UnityChildVenue(
-        child_venue_id="TBD_BOOK_10",
-        display_name="TBD — pending from quant-portal",
-        commission_bps=Decimal("0"),
-        commission_type=CommissionStructureType.FLAT,
-        supported_sports=[],
-        notes="Commission + identity pending from quant-portal.olesportsresearch.com/unity",
-        confirmed=False,
     ),
 ]
 

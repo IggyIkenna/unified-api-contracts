@@ -34,23 +34,29 @@ from unified_api_contracts.internal.architecture_v2 import CommissionStructureTy
 @pytest.mark.unit
 class TestUnityChildBookRegistry:
     def test_total_book_count_is_ten(self) -> None:
-        assert len(UNITY_CHILD_BOOKS) == 10, "Unity has 10 child books (8 confirmed + 2 pending from quant-portal)"
-
-    def test_exactly_eight_confirmed(self) -> None:
-        confirmed = unity_child_books_confirmed()
-        assert len(confirmed) == 8, (
-            "8 confirmed child books: Pinnacle, VX, SharpBet, Betfair, Broker3, Broker4, Broker5, IBCBet"
+        assert len(UNITY_CHILD_BOOKS) == 10, (
+            "Unity has 10 child books per quant-portal: 3ET, BETFAIR, BROKER5, CROWN*, "
+            "MATCHBOOK, SBO*, SHARPBET, VX, BETDEX, IBC*"
         )
+
+    def test_all_ten_confirmed(self) -> None:
+        """All 10 books are confirmed existence from quant-portal 2026-04-17.
+
+        Note: some confirmed books have commission_bps=0 (commercial-pending) —
+        that is a DIFFERENT sentinel than unconfirmed. See
+        UNITY_COMMERCIAL_PENDING_COMMISSION_BPS.
+        """
+        confirmed = unity_child_books_confirmed()
+        assert len(confirmed) == 10, "10 confirmed child books from quant-portal pull"
         for book in confirmed:
             assert book.confirmed is True
 
-    def test_exactly_two_pending(self) -> None:
+    def test_no_tbd_stub_books_present(self) -> None:
+        """Data is fully pulled; no TBD stubs should remain."""
         pending = unity_child_books_pending()
-        assert len(pending) == 2, (
-            "2 pending child books awaiting data pull from quant-portal.olesportsresearch.com/unity"
+        assert len(pending) == 0, (
+            "Unity child-book data was pulled from quant-portal on 2026-04-17; no TBD stubs should remain"
         )
-        for book in pending:
-            assert book.confirmed is False
 
     def test_confirmed_and_pending_partition_full_registry(self) -> None:
         confirmed = {b.child_venue_id for b in unity_child_books_confirmed()}
@@ -60,6 +66,7 @@ class TestUnityChildBookRegistry:
         assert confirmed | pending == all_ids
 
     def test_pending_books_reference_quant_portal(self) -> None:
+        """If any TBD book re-appears in the future, its note must point to quant-portal."""
         for book in unity_child_books_pending():
             assert "quant-portal.olesportsresearch.com/unity" in book.notes, (
                 f"{book.child_venue_id} notes must reference quant-portal URL so "
@@ -96,7 +103,9 @@ class TestUnityChildBookInvariantsForRouting:
             )
 
     def test_get_by_id_hits_known_books(self) -> None:
-        for expected in ("VX", "SHARPBET", "PINNACLE_VIA_UNITY", "BETFAIR_VIA_UNITY"):
+        # Real 10 child books per quant-portal 2026-04-17:
+        # 3ET, BETFAIR, BROKER5, CROWN, MATCHBOOK, SBO, SHARPBET, VX, BETDEX, IBC
+        for expected in ("VX", "SHARPBET", "BETFAIR", "IBC"):
             book = get_unity_child_book(expected)
             assert book is not None, f"{expected} missing from registry"
             assert book.confirmed is True
@@ -104,12 +113,14 @@ class TestUnityChildBookInvariantsForRouting:
     def test_get_by_id_returns_none_for_unknown(self) -> None:
         assert get_unity_child_book("DEFINITELY_NOT_A_BOOK") is None
 
-    def test_get_by_id_hits_tbd_stubs(self) -> None:
-        """TBD stubs must still be retrievable by id (UI surfaces them)."""
-        for tbd in ("TBD_BOOK_9", "TBD_BOOK_10"):
-            book = get_unity_child_book(tbd)
-            assert book is not None
-            assert book.confirmed is False
+    def test_get_by_id_returns_none_for_retired_placeholders(self) -> None:
+        """Placeholder ids used during Phase 13 plumbing must NOT be retrievable
+        after the 2026-04-17 data pull — they were never real Unity books."""
+        for retired in ("PINNACLE_VIA_UNITY", "BROKER3", "BROKER4", "IBCBET", "TBD_BOOK_9", "TBD_BOOK_10"):
+            assert get_unity_child_book(retired) is None, (
+                f"{retired} was a Phase-13 placeholder, not a real Unity book; "
+                "must not be retrievable after the quant-portal data pull"
+            )
 
 
 @pytest.mark.unit
