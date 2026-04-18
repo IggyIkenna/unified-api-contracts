@@ -775,13 +775,15 @@ def lookup_contract(
     return contract
 
 
-# Side-effect import: registers Sports + Prediction contracts into
-# CONTRACT_REGISTRY. Placed after lookup_contract / registry construction so
-# its mutations land before any external consumer calls lookup_contract.
+# Side-effect imports: register Sports + Prediction (Phase 1.1/1.2) and MDPS
+# processed-candle (Phase 5b.1) contracts into CONTRACT_REGISTRY. Placed
+# after lookup_contract / registry construction so mutations land before any
+# external consumer calls lookup_contract.
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
     PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
     SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
 )
+from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402, F401
 
 __all__ = [
     "CEFI_FUTURES_CHAIN_TRADES",
