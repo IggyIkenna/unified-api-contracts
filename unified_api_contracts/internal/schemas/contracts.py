@@ -47,6 +47,9 @@ CategoryLiteral = Literal[
     "sports",
     "prediction",
     "onchain",
+    # Meta-categories for manifest-only contracts (Phase 5d.1).
+    "ml_training",
+    "ml_inference",
 ]
 
 ViolationKind = Literal[
@@ -784,6 +787,10 @@ from unified_api_contracts.internal.schemas._sports_prediction_contracts import 
     SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
 )
 from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402, F401
+from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402, F401
+from unified_api_contracts.internal.schemas._ml_training_contract import (  # noqa: E402
+    ML_TRAINING_MANIFEST as ML_TRAINING_MANIFEST,
+)
 
 __all__ = [
     "CEFI_FUTURES_CHAIN_TRADES",
@@ -809,6 +816,7 @@ __all__ = [
     "DEFI_SPOT_ASSET_ORACLE_PRICES",
     "DEFI_STAKING_EIGENLAYER_REWARDS",
     "DEFI_STAKING_YIELD_SNAPSHOTS",
+    "ML_TRAINING_MANIFEST",
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_ODDS_TRADES",
     "TRADFI_COMBO_TRADES",
