@@ -48,9 +48,8 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "odds_snapshot": "15m",
     "odds_movement": "15m",
     "arbitrage_opportunity": "15m",
-    # Prediction — tick-level from CLOB
-    "prediction_trades": "15s",
-    "prediction_book_snapshot": "15s",
+    # Prediction — tick-level from CLOB (uses canonical "trades" / "book_snapshot_5",
+    # aligned with CeFi; no category-specific data_type names).
 }
 
 # Timeframe ordering in seconds (used for validation and aggregation)
@@ -114,8 +113,11 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
     ],
     "prediction": [
-        "prediction_trades",  # CLOB trade fills (price, size, side, timestamp)
-        "prediction_book_snapshot",  # Order book snapshot (bids/asks)
+        # Canonical names — aligned with CeFi. Prediction markets are CLOBs so the
+        # "trades" + "book_snapshot_5" taxonomy applies uniformly. Legacy
+        # "prediction_trades" / "prediction_book_snapshot" names retired 2026-04-19.
+        "trades",  # CLOB trade fills (price, size, side, timestamp)
+        "book_snapshot_5",  # Order book snapshot (bids/asks)
     ],
 }
 
@@ -245,9 +247,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "odds_snapshot": True,
     "odds_movement": True,
     "arbitrage_opportunity": True,
-    # Prediction — candle adapters process these
-    "prediction_trades": True,
-    "prediction_book_snapshot": True,
+    # Prediction — uses canonical "trades" / "book_snapshot_5" (same keys as CeFi).
 }
 
 
@@ -324,29 +324,9 @@ FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
         "economic_events": "oracle_prices",
         "targets": "oracle_prices",
     },
-    "prediction": {
-        "technical_indicators": "prediction_trades",
-        "moving_averages": "prediction_trades",
-        "oscillators": "prediction_trades",
-        "volatility_realized": "prediction_trades",
-        "momentum": "prediction_trades",
-        "volume_analysis": "prediction_trades",
-        "vwap": "prediction_trades",
-        "candlestick_patterns": "prediction_trades",
-        "market_structure": "prediction_trades",
-        "returns": "prediction_trades",
-        "round_numbers": "prediction_trades",
-        "streaks": "prediction_trades",
-        "volume_flow": "prediction_trades",
-        "temporal": "prediction_trades",
-        "targets": "prediction_trades",
-        "supply_demand_zones": "prediction_trades",
-        "fibonacci": "prediction_trades",
-        "level_confluence": "prediction_trades",
-        "market_structure_sequence": "prediction_trades",
-        "risk_reward": "prediction_trades",
-        "wedge_quality": "prediction_trades",
-    },
+    # "prediction": no overrides needed — prediction markets use "trades" (same as CeFi)
+    # for all delta-one feature groups, and the default FEATURE_GROUP_DATA_TYPES already
+    # maps them to "trades". Aligning with CeFi per single-source-of-truth rule.
 }
 
 
@@ -642,13 +622,16 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "FANDUEL": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     "BET365": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     # ── Prediction (market data only — metadata is reference data, see below) ──
+    # Prediction CLOBs emit canonical "trades" / "book_snapshot_5" data types (same keys
+    # as CeFi). Legacy "prediction_trades" / "prediction_book_snapshot" names retired
+    # 2026-04-19 for cross-category alignment.
     "POLYMARKET": {
-        "prediction_trades": "2024-06-01",
-        "prediction_book_snapshot": "2024-06-01",
+        "trades": "2024-06-01",
+        "book_snapshot_5": "2024-06-01",
     },
     "KALSHI": {
-        "prediction_trades": "2024-06-01",
-        "prediction_book_snapshot": "2024-06-01",
+        "trades": "2024-06-01",
+        "book_snapshot_5": "2024-06-01",
     },
 }
 
