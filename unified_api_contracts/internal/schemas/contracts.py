@@ -782,14 +782,25 @@ def lookup_contract(
 # processed-candle (Phase 5b.1) contracts into CONTRACT_REGISTRY. Placed
 # after lookup_contract / registry construction so mutations land before any
 # external consumer calls lookup_contract.
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
-    PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
-    SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
-)
-from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402, F401
-from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402, F401
+from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas._ml_training_contract import (  # noqa: E402
     ML_TRAINING_MANIFEST as ML_TRAINING_MANIFEST,
+)
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+    PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
+)
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+    SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
+)
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+    KEYWORD_TO_CATEGORY as KEYWORD_TO_CATEGORY,
+    OUTCOME_TO_MARKET_TYPE as OUTCOME_TO_MARKET_TYPE,
+    PredictionShardCategory as PredictionShardCategory,
+    PredictionShardMarketType as PredictionShardMarketType,
+    PredictionShardResolutionPeriod as PredictionShardResolutionPeriod,
+    SLUG_PREFIX_MAP as SLUG_PREFIX_MAP,
+    classify_polymarket_market as classify_polymarket_market,
 )
 
 __all__ = [
@@ -816,8 +827,14 @@ __all__ = [
     "DEFI_SPOT_ASSET_ORACLE_PRICES",
     "DEFI_STAKING_EIGENLAYER_REWARDS",
     "DEFI_STAKING_YIELD_SNAPSHOTS",
+    "KEYWORD_TO_CATEGORY",
     "ML_TRAINING_MANIFEST",
+    "OUTCOME_TO_MARKET_TYPE",
     "PREDICTION_PREDICTION_MARKET_TRADES",
+    "PredictionShardCategory",
+    "PredictionShardMarketType",
+    "PredictionShardResolutionPeriod",
+    "SLUG_PREFIX_MAP",
     "SPORTS_ODDS_TRADES",
     "TRADFI_COMBO_TRADES",
     "TRADFI_EQUITY_OHLCV_1M",
@@ -831,6 +848,7 @@ __all__ = [
     "SchemaContract",
     "SchemaContractNotFoundError",
     "Violation",
+    "classify_polymarket_market",
     "lookup_contract",
     "validate_dataframe",
 ]

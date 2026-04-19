@@ -137,8 +137,45 @@ PREDICTION_PREDICTION_MARKET_TRADES = SchemaContract(
         ColumnSpec(
             name="underlying",
             dtype="string",
-            nullable=True,
-            description="Real-world asset tag (BNB, ETH, SPX, fixture id, …).",
+            nullable=False,
+            description=(
+                "Real-world asset / subject / candidate tag (BNB, SPX, TRUMP, "
+                "KAMALA_HARRIS, OSCARS, EPL, …). Written by the canonical "
+                "classifier (``classify_polymarket_market``). Required — "
+                "promoted from nullable in the 6-dimension resharding."
+            ),
+        ),
+        ColumnSpec(
+            name="market_category",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Normalized cross-venue market category: CRYPTO_PRICE | "
+                "EQUITY_INDEX | COMMODITY | FX | MACRO | POLITICS_US | "
+                "POLITICS_INTL | SPORTS_FOOTBALL | SPORTS_OTHER | CULTURE | "
+                "TECH | WEATHER | MISC. Source of truth: "
+                "``PredictionMarketCategory`` in "
+                "``_prediction_market_taxonomy``."
+            ),
+        ),
+        ColumnSpec(
+            name="market_type",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Prediction market structure: binary | scalar | categorical | "
+                "ranked | range_bracket. SSOT: ``PredictionMarketType``."
+            ),
+        ),
+        ColumnSpec(
+            name="resolution_period",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Resolution horizon: intraday | hourly | daily | weekly | "
+                "monthly | quarterly | yearly | event. SSOT: "
+                "``PredictionResolutionPeriod``."
+            ),
         ),
     ],
     symbol_column="condition_id",

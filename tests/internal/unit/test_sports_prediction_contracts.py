@@ -142,6 +142,9 @@ def test_prediction_market_trades_has_all_required_columns() -> None:
         "condition_id",
         "asset_id",
         "underlying",
+        "market_category",
+        "market_type",
+        "resolution_period",
     }
     assert required == declared
 
@@ -152,11 +155,26 @@ def test_prediction_market_trades_outcome_index_is_int64() -> None:
     assert by_name["outcome_index"].nullable is False
 
 
-def test_prediction_market_trades_underlying_is_nullable() -> None:
-    """``underlying`` tags the real-world asset (BNB/ETH/…); nullable for
-    rows without a canonical mapping yet."""
+def test_prediction_market_trades_underlying_is_required() -> None:
+    """``underlying`` tags the real-world asset (BNB/SPX/TRUMP/EPL/…).
+
+    Promoted from nullable to required in the 6-dimension resharding —
+    the canonical classifier (``classify_polymarket_market``) always
+    produces a value (``UNKNOWN`` for MISC markets).
+    """
     by_name = {c.name: c for c in PREDICTION_PREDICTION_MARKET_TRADES.columns}
-    assert by_name["underlying"].nullable is True
+    assert by_name["underlying"].nullable is False
+
+
+def test_prediction_market_trades_new_shard_columns_required() -> None:
+    """The 6-dimension resharding adds three non-null shard columns:
+    ``market_category`` / ``market_type`` / ``resolution_period``.
+    """
+    by_name = {c.name: c for c in PREDICTION_PREDICTION_MARKET_TRADES.columns}
+    for col_name in ("market_category", "market_type", "resolution_period"):
+        assert col_name in by_name, f"missing {col_name}"
+        assert by_name[col_name].nullable is False
+        assert by_name[col_name].dtype == "string"
 
 
 def test_prediction_market_trades_validates_sample_dataframe() -> None:
@@ -180,6 +198,9 @@ def test_prediction_market_trades_validates_sample_dataframe() -> None:
             "condition_id": pd.Series(["0xabc123"], dtype="string"),
             "asset_id": pd.Series(["789"], dtype="string"),
             "underlying": pd.Series(["BNB"], dtype="string"),
+            "market_category": pd.Series(["CRYPTO_PRICE"], dtype="string"),
+            "market_type": pd.Series(["range_bracket"], dtype="string"),
+            "resolution_period": pd.Series(["monthly"], dtype="string"),
         }
     )
     violations = validate_dataframe(df, PREDICTION_PREDICTION_MARKET_TRADES)
