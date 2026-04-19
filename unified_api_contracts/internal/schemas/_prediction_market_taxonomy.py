@@ -123,6 +123,7 @@ SLUG_PREFIX_MAP: dict[str, tuple[PredictionShardCategory, str]] = {
     "solana-": (PredictionShardCategory.CRYPTO_PRICE, "SOL"),
     "sol-": (PredictionShardCategory.CRYPTO_PRICE, "SOL"),
     "xrp-": (PredictionShardCategory.CRYPTO_PRICE, "XRP"),
+    "ripple-": (PredictionShardCategory.CRYPTO_PRICE, "XRP"),
     "dogecoin-": (PredictionShardCategory.CRYPTO_PRICE, "DOGE"),
     "doge-": (PredictionShardCategory.CRYPTO_PRICE, "DOGE"),
     "bnb-": (PredictionShardCategory.CRYPTO_PRICE, "BNB"),
