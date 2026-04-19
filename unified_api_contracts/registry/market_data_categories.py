@@ -114,10 +114,15 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Prediction markets are CLOBs so the
-        # "trades" + "book_snapshot_5" taxonomy applies uniformly. Legacy
+        # "trades" + "book_snapshot_5" taxonomy would apply uniformly. Legacy
         # "prediction_trades" / "prediction_book_snapshot" names retired 2026-04-19.
+        # NOTE: book_snapshot_5 removed 2026-04-19 alongside the POLYMARKET +
+        # KALSHI venue-capability trim — we don't currently capture CLOB order
+        # book snapshots from either venue, and leaving it here phantom-
+        # inflated the MTDS PREDICTION completion_pct denominator (35k vs
+        # 5.7k observed shards). Re-add if a prediction adapter grows book
+        # snapshot collection.
         "trades",  # CLOB trade fills (price, size, side, timestamp)
-        "book_snapshot_5",  # Order book snapshot (bids/asks)
     ],
 }
 
