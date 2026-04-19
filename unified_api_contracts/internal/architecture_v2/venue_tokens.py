@@ -101,6 +101,12 @@ _DEFI_PERP_TOKENS: frozenset[str] = frozenset(
     {
         "dydx",
         "gmx",
+        # Added 2026-04-19 after operator approval (Phase 7 NEEDS_REVIEW resolution).
+        # Drift is Solana-native perps — required for SOL basis + staked-basis
+        # strategies that hedge native SOL exposure on the same chain. Forcing
+        # the hedge to an EVM perp venue (Hyperliquid) was economically worse
+        # than the native path on every per-hedge cross-chain transfer.
+        "drift",
     }
 )
 
