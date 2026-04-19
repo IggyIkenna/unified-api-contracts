@@ -58,10 +58,10 @@ from enum import StrEnum
 __all__ = [
     "KEYWORD_TO_CATEGORY",
     "OUTCOME_TO_MARKET_TYPE",
+    "SLUG_PREFIX_MAP",
     "PredictionShardCategory",
     "PredictionShardMarketType",
     "PredictionShardResolutionPeriod",
-    "SLUG_PREFIX_MAP",
     "classify_polymarket_market",
 ]
 
@@ -205,6 +205,31 @@ SLUG_PREFIX_MAP: dict[str, tuple[PredictionShardCategory, str]] = {
     "modi-": (PredictionShardCategory.POLITICS_INTL, "MODI"),
     "putin-": (PredictionShardCategory.POLITICS_INTL, "PUTIN"),
     "zelensky-": (PredictionShardCategory.POLITICS_INTL, "ZELENSKY"),
+    "duterte-": (PredictionShardCategory.POLITICS_INTL, "DUTERTE"),
+    "israel-": (PredictionShardCategory.POLITICS_INTL, "ISRAEL"),
+    "hamas-": (PredictionShardCategory.POLITICS_INTL, "ISRAEL"),
+    "ukraine-": (PredictionShardCategory.POLITICS_INTL, "UKRAINE"),
+    "russia-": (PredictionShardCategory.POLITICS_INTL, "RUSSIA"),
+    "china-": (PredictionShardCategory.POLITICS_INTL, "CHINA"),
+    "taiwan-": (PredictionShardCategory.POLITICS_INTL, "TAIWAN"),
+    "iran-": (PredictionShardCategory.POLITICS_INTL, "IRAN"),
+    "north-korea-": (PredictionShardCategory.POLITICS_INTL, "NORTH_KOREA"),
+    "venezuela-": (PredictionShardCategory.POLITICS_INTL, "VENEZUELA"),
+    "argentina-": (PredictionShardCategory.POLITICS_INTL, "ARGENTINA"),
+    "brazil-": (PredictionShardCategory.POLITICS_INTL, "BRAZIL"),
+    "mexico-": (PredictionShardCategory.POLITICS_INTL, "MEXICO"),
+    "canada-": (PredictionShardCategory.POLITICS_INTL, "CANADA"),
+    "trudeau-": (PredictionShardCategory.POLITICS_INTL, "CANADA"),
+    "milei-": (PredictionShardCategory.POLITICS_INTL, "ARGENTINA"),
+    # --- Macro / sentiment extension ---
+    "fear-greed-": (PredictionShardCategory.MACRO, "FEAR_GREED"),
+    "fear-and-greed-": (PredictionShardCategory.MACRO, "FEAR_GREED"),
+    "fear-": (PredictionShardCategory.MACRO, "FEAR_GREED"),
+    "greed-": (PredictionShardCategory.MACRO, "FEAR_GREED"),
+    "ppi-": (PredictionShardCategory.MACRO, "PPI"),
+    "pce-": (PredictionShardCategory.MACRO, "PCE"),
+    "jobless-": (PredictionShardCategory.MACRO, "UNEMPLOYMENT"),
+    "recession-": (PredictionShardCategory.MACRO, "RECESSION"),
     # --- Sports: Football (EPL, Champions League, World Cup, NFL) ---
     "epl-": (PredictionShardCategory.SPORTS_FOOTBALL, "EPL"),
     "premier-league-": (PredictionShardCategory.SPORTS_FOOTBALL, "EPL"),
@@ -247,6 +272,9 @@ SLUG_PREFIX_MAP: dict[str, tuple[PredictionShardCategory, str]] = {
     "billboard-": (PredictionShardCategory.CULTURE, "BILLBOARD"),
     "taylor-swift-": (PredictionShardCategory.CULTURE, "TAYLOR_SWIFT"),
     "eurovision-": (PredictionShardCategory.CULTURE, "EUROVISION"),
+    "kanye-": (PredictionShardCategory.CULTURE, "KANYE"),
+    "elon-": (PredictionShardCategory.TECH, "ELON_MUSK"),
+    "musk-": (PredictionShardCategory.TECH, "ELON_MUSK"),
     # --- Tech ---
     "nvda-": (PredictionShardCategory.TECH, "NVDA"),
     "nvidia-": (PredictionShardCategory.TECH, "NVDA"),
@@ -268,7 +296,10 @@ SLUG_PREFIX_MAP: dict[str, tuple[PredictionShardCategory, str]] = {
     "el-nino-": (PredictionShardCategory.WEATHER, "EL_NINO"),
     "la-nina-": (PredictionShardCategory.WEATHER, "LA_NINA"),
     "temperature-record-": (PredictionShardCategory.WEATHER, "TEMP_RECORD"),
+    "temperature-": (PredictionShardCategory.WEATHER, "TEMPERATURE"),
+    "weather-": (PredictionShardCategory.WEATHER, "WEATHER"),
     "heat-wave-": (PredictionShardCategory.WEATHER, "HEAT_WAVE"),
+    "epstein-": (PredictionShardCategory.POLITICS_US, "EPSTEIN"),
     "wildfire-": (PredictionShardCategory.WEATHER, "WILDFIRE"),
     "snowfall-": (PredictionShardCategory.WEATHER, "SNOWFALL"),
 }
@@ -316,27 +347,50 @@ OUTCOME_TO_MARKET_TYPE: dict[str, PredictionShardMarketType] = {
 
 
 # Slug tokens that indicate a scalar/range-bracket market.
-_RANGE_BRACKET_TOKENS: frozenset[str] = frozenset({
-    "up-or-down",
-    "above-or-below",
-    "greater-than",
-    "less-than",
-    "reach-",
-    "hit-",
-    "between-",
-})
+_RANGE_BRACKET_TOKENS: frozenset[str] = frozenset(
+    {
+        "up-or-down",
+        "above-or-below",
+        "greater-than",
+        "less-than",
+        "reach-",
+        "hit-",
+        "between-",
+    }
+)
 
 
 # Date-token patterns (YYYY-MM-DD, april-15, q1-2026, etc.) used for
 # resolution-period inference. Deliberately broad — classifier only uses
 # them to pick a period once the category is known.
 _WEEKLY_TOKENS: frozenset[str] = frozenset({"week", "weekly"})
-_MONTHLY_TOKENS: frozenset[str] = frozenset({
-    "jan", "feb", "mar", "apr", "may", "jun",
-    "jul", "aug", "sep", "oct", "nov", "dec",
-    "january", "february", "march", "april", "june", "july",
-    "august", "september", "october", "november", "december",
-})
+_MONTHLY_TOKENS: frozenset[str] = frozenset(
+    {
+        "jan",
+        "feb",
+        "mar",
+        "apr",
+        "may",
+        "jun",
+        "jul",
+        "aug",
+        "sep",
+        "oct",
+        "nov",
+        "dec",
+        "january",
+        "february",
+        "march",
+        "april",
+        "june",
+        "july",
+        "august",
+        "september",
+        "october",
+        "november",
+        "december",
+    }
+)
 _QUARTERLY_TOKENS: frozenset[str] = frozenset({"q1", "q2", "q3", "q4"})
 
 
@@ -364,10 +418,13 @@ def _classify_from_slug_token(
     """Return first (category, underlying) whose prefix appears as a ``-`` token.
 
     Polymarket slugs often embed the identifier mid-token
-    (``will-nvda-announce-jan-15``, ``can-trump-win-iowa``). We tokenise
-    on ``-`` and look up each token + ``-`` against the prefix map, so
+    (``will-nvda-announce-jan-15``, ``can-trump-win-iowa``,
+    ``will-the-price-of-bitcoin-be-above-90k``). We tokenise on ``-``
+    and look up each token + ``-`` against the prefix map, so
     ``nvda`` in ``will-nvda-announce-jan-15`` matches the ``nvda-``
-    prefix entry. Tokens of length ≤ 2 are skipped to avoid false hits.
+    prefix entry. Tokens of length ≤ 2 are skipped to avoid false
+    hits. Also retries each token with the trailing possessive ``s``
+    stripped so ``trumps-approval-rating`` matches ``trump-``.
     """
     for token in slug.split("-"):
         if len(token) <= 2:
@@ -376,6 +433,14 @@ def _classify_from_slug_token(
         hit = SLUG_PREFIX_MAP.get(probe)
         if hit is not None:
             return hit
+        # Possessive / plural fallback — Polymarket slugs drop the
+        # apostrophe (``trumps-approval-rating``, ``bidens-approval``).
+        if token.endswith("s") and len(token) > 3:
+            stripped = token[:-1]
+            probe2 = f"{stripped}-"
+            hit2 = SLUG_PREFIX_MAP.get(probe2)
+            if hit2 is not None:
+                return hit2
     return None
 
 
@@ -406,8 +471,15 @@ def _infer_market_type(slug: str, outcome: str) -> PredictionShardMarketType:
     if any(
         tok in slug_lower
         for tok in (
-            "winner", "who-will-win", "pick-", "nominee", "best-", "mvp",
-            "champion", "drivers-champion", "final",
+            "winner",
+            "who-will-win",
+            "pick-",
+            "nominee",
+            "best-",
+            "mvp",
+            "champion",
+            "drivers-champion",
+            "final",
         )
     ):
         return PredictionShardMarketType.CATEGORICAL
@@ -436,10 +508,7 @@ def _infer_resolution_period(
     if "daily" in tokens or "day" in tokens:
         return PredictionShardResolutionPeriod.DAILY
     # ``-2026`` / ``-2027`` year marker (Polymarket year-markets) → yearly.
-    if (
-        re.search(r"-20\d{2}\b", slug_lower)
-        or re.search(r"\b20\d{2}\b", title_lower)
-    ):
+    if re.search(r"-20\d{2}\b", slug_lower) or re.search(r"\b20\d{2}\b", title_lower):
         # But only if it's not a month-specific slug.
         if tokens & _MONTHLY_TOKENS:
             return PredictionShardResolutionPeriod.MONTHLY
@@ -472,9 +541,7 @@ def classify_polymarket_market(
     slug: str,
     event_slug: str,
     outcome: str,
-) -> tuple[
-    PredictionShardCategory, str, PredictionShardMarketType, PredictionShardResolutionPeriod
-]:
+) -> tuple[PredictionShardCategory, str, PredictionShardMarketType, PredictionShardResolutionPeriod]:
     """Classify a Polymarket market into the 4-tuple canonical taxonomy.
 
     Rule-first: slug prefix match handles ~95% of real Polymarket slugs
@@ -529,8 +596,6 @@ def classify_polymarket_market(
         category, underlying = cat_und
 
     market_type = _infer_market_type(slug_norm or event_slug_norm, outcome_norm)
-    resolution_period = _infer_resolution_period(
-        slug_norm or event_slug_norm, title_norm, category
-    )
+    resolution_period = _infer_resolution_period(slug_norm or event_slug_norm, title_norm, category)
 
     return category, underlying, market_type, resolution_period
