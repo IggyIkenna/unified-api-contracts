@@ -622,16 +622,19 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "FANDUEL": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     "BET365": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     # ── Prediction (market data only — metadata is reference data, see below) ──
-    # Prediction CLOBs emit canonical "trades" / "book_snapshot_5" data types (same keys
-    # as CeFi). Legacy "prediction_trades" / "prediction_book_snapshot" names retired
-    # 2026-04-19 for cross-category alignment.
+    # Prediction CLOBs emit canonical "trades" data type (same key as CeFi).
+    # Legacy "prediction_trades" name retired 2026-04-19 for cross-category
+    # alignment. NOTE: book_snapshot_5 removed 2026-04-19 — neither the
+    # Polymarket CLOB adapter nor the Kalshi adapter currently captures order
+    # book snapshots. Declaring them here phantom-inflated the
+    # market-tick-data-service PREDICTION completion_pct denominator
+    # (35k expected vs 5.7k actually observable shards). Re-add when + if
+    # either adapter grows a book-snapshot collection path.
     "POLYMARKET": {
         "trades": "2024-06-01",
-        "book_snapshot_5": "2024-06-01",
     },
     "KALSHI": {
         "trades": "2024-06-01",
-        "book_snapshot_5": "2024-06-01",
     },
 }
 
