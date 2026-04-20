@@ -31,6 +31,9 @@ from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactPublishedPayload,
     ArtifactRef,
 )
+from unified_api_contracts.internal.architecture_v2.client_contract import (
+    ClientContract,
+)
 from unified_api_contracts.internal.architecture_v2.compliance import (
     ComplianceEvent,
     ComplianceSink,
@@ -238,6 +241,7 @@ __all__ = [
     "ChildVenueDecl",
     "ClientAudience",
     "ClientContext",
+    "ClientContract",
     "ClientPackage",
     "CollateralRulesV2",
     "Combo",
