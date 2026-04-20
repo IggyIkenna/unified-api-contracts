@@ -50,6 +50,7 @@ from typing import Literal, cast
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from unified_api_contracts.internal.architecture_v2.archetype_capability import (
+    ArchetypeCapability,
     ArchetypeInstrumentType,
     archetypes_for_pair,
 )
@@ -480,53 +481,21 @@ class InstructionValidator:
         """
 
         errors: list[InstructionFieldError] = []
-
         ctx = instruction.instrument_venue_context
 
-        # 1. Pair must be declared SUPPORTED or PARTIAL by some archetype.
         matching = archetypes_for_pair(
             ctx.category,
             ctx.instrument_type,
             include_partial=True,
         )
-        if not matching:
-            errors.append(
-                InstructionFieldError(
-                    field="instrument_venue_context.category+instrument_type",
-                    violation=(f"no registered archetype supports ({ctx.category.value}, {ctx.instrument_type.value})"),
-                    allowed=_allowed_pairs_digest(),
-                    why=(
-                        "UAC ArchetypeCapabilityRegistry has zero SUPPORTED or PARTIAL "
-                        "cells for this pair — routing would land in a BL-* block-list "
-                        "group (see codex/09-strategy/architecture-v2/"
-                        "category-instrument-coverage.md)."
-                    ),
-                )
-            )
+        pair_error = self._validate_pair(ctx, matching)
+        if pair_error is not None:
+            errors.append(pair_error)
 
-        # 2. Venue must be in supported_venues of at least one matching archetype.
         if matching:
-            allowed_venues: set[str] = set()
-            for archetype in matching:
-                allowed_venues.update(archetype.supported_venues)
-            if ctx.venue not in allowed_venues:
-                errors.append(
-                    InstructionFieldError(
-                        field="instrument_venue_context.venue",
-                        violation=(
-                            f"venue {ctx.venue!r} not in supported_venues for any "
-                            f"archetype covering ({ctx.category.value}, "
-                            f"{ctx.instrument_type.value})"
-                        ),
-                        allowed=tuple(sorted(allowed_venues)),
-                        why=(
-                            "Venue must appear in at least one non-BLOCKED cell of a "
-                            "matching ArchetypeCapability row. Check "
-                            "archetype_capability_manifest.json for the authoritative "
-                            "venue list."
-                        ),
-                    )
-                )
+            venue_error = self._validate_venue(ctx, matching)
+            if venue_error is not None:
+                errors.append(venue_error)
 
         if errors:
             return InstructionValidationResult(
@@ -539,6 +508,55 @@ class InstructionValidator:
             ok=True,
             integration_depth=_compute_integration_depth(instruction),
             errors=(),
+        )
+
+    @staticmethod
+    def _validate_pair(
+        ctx: InstrumentVenueContext,
+        matching: Sequence[ArchetypeCapability],
+    ) -> InstructionFieldError | None:
+        """Pair must be declared SUPPORTED or PARTIAL by some archetype."""
+
+        if matching:
+            return None
+        return InstructionFieldError(
+            field="instrument_venue_context.category+instrument_type",
+            violation=(f"no registered archetype supports ({ctx.category.value}, {ctx.instrument_type.value})"),
+            allowed=_allowed_pairs_digest(),
+            why=(
+                "UAC ArchetypeCapabilityRegistry has zero SUPPORTED or PARTIAL "
+                "cells for this pair — routing would land in a BL-* block-list "
+                "group (see codex/09-strategy/architecture-v2/"
+                "category-instrument-coverage.md)."
+            ),
+        )
+
+    @staticmethod
+    def _validate_venue(
+        ctx: InstrumentVenueContext,
+        matching: Sequence[ArchetypeCapability],
+    ) -> InstructionFieldError | None:
+        """Venue must be in supported_venues of at least one matching archetype."""
+
+        allowed_venues: set[str] = set()
+        for archetype in matching:
+            allowed_venues.update(archetype.supported_venues)
+        if ctx.venue in allowed_venues:
+            return None
+        return InstructionFieldError(
+            field="instrument_venue_context.venue",
+            violation=(
+                f"venue {ctx.venue!r} not in supported_venues for any "
+                f"archetype covering ({ctx.category.value}, "
+                f"{ctx.instrument_type.value})"
+            ),
+            allowed=tuple(sorted(allowed_venues)),
+            why=(
+                "Venue must appear in at least one non-BLOCKED cell of a "
+                "matching ArchetypeCapability row. Check "
+                "archetype_capability_manifest.json for the authoritative "
+                "venue list."
+            ),
         )
 
     @staticmethod

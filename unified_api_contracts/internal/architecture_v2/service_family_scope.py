@@ -30,7 +30,6 @@ SSOT:
 from __future__ import annotations
 
 import fnmatch
-import os
 import re
 from pathlib import Path
 from typing import Literal, cast
@@ -38,6 +37,9 @@ from typing import Literal, cast
 import yaml  # pyright: ignore[reportMissingTypeStubs]
 from pydantic import BaseModel, ConfigDict
 
+from unified_api_contracts.internal.architecture_v2._workspace_root import (
+    workspace_root_env,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     ClientAudience,
     UserContext,
@@ -93,10 +95,10 @@ class ServiceFamilyScopeRule(BaseModel):
 def _find_rule_yaml() -> Path | None:
     """Resolve rule-12 YAML via env-var then ancestor walk (G1.8 pattern)."""
 
-    env_root = os.environ.get("UNIFIED_TRADING_WORKSPACE_ROOT")
-    if env_root:
+    env_root = workspace_root_env()
+    if env_root is not None:
         candidate = (
-            Path(env_root)
+            env_root
             / "unified-trading-pm"
             / "codex"
             / "14-playbooks"
@@ -131,7 +133,7 @@ def _load_rules() -> dict[str, ServiceFamilyScopeRule]:
         return {}
     raw_typed = cast(dict[str, object], raw)
     families: dict[str, ServiceFamilyScopeRule] = {}
-    families_raw = raw_typed.get("service_families", {})
+    families_raw = raw_typed.get("service_families", {})  # noqa: qg-empty-fallback — YAML may legitimately omit the key
     if not isinstance(families_raw, dict):
         return {}
     families_raw_typed = cast(dict[str, object], families_raw)

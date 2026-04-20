@@ -1,7 +1,7 @@
 """Unit tests for MDPS processed-candle SchemaContracts.
 
 Phase 5b.1 of ``data_pipeline_completion_2026_04_18``. Verifies the full
-matrix of (category × instrument_type × source_data_type × timeframe)
+matrix of (category x instrument_type x source_data_type x timeframe)
 contracts registered via ``_candle_contracts`` is discoverable through
 ``lookup_contract`` and that the pre-existing TradFi ``ohlcv_1m``
 pass-through contracts were not overwritten by the re-aggregate loop.

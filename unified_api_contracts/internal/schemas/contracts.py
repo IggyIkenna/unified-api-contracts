@@ -792,22 +792,22 @@ from unified_api_contracts.internal.schemas._ml_training_contract import (  # no
 from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     KEYWORD_TO_CATEGORY as KEYWORD_TO_CATEGORY,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     OUTCOME_TO_MARKET_TYPE as OUTCOME_TO_MARKET_TYPE,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     SLUG_PREFIX_MAP as SLUG_PREFIX_MAP,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     PredictionShardCategory as PredictionShardCategory,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     PredictionShardMarketType as PredictionShardMarketType,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     PredictionShardResolutionPeriod as PredictionShardResolutionPeriod,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     classify_polymarket_market as classify_polymarket_market,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402

@@ -10,6 +10,10 @@ archetype (category, instrument_type) support without reaching into the
 strategy-service v2 code or the UI coverage.ts.
 """
 
+from unified_api_contracts.internal.architecture_v2.allocator_access import (
+    allocator_access_control,
+    user_context_for_allocator,
+)
 from unified_api_contracts.internal.architecture_v2.archetype_capability import (
     ARCHETYPE_CAPABILITY_REGISTRY,
     ArchetypeCapability,
@@ -48,11 +52,17 @@ from unified_api_contracts.internal.architecture_v2.derivation import (
     SlotFilter,
     TileLockState,
     UserContext,
-    access_control,
     combo,
-    cost,
-    demo_universe,
     prod_restrictions,
+)
+from unified_api_contracts.internal.architecture_v2.derivation_access import (
+    access_control,
+)
+from unified_api_contracts.internal.architecture_v2.derivation_cost import (
+    cost,
+)
+from unified_api_contracts.internal.architecture_v2.derivation_demo import (
+    demo_universe,
 )
 from unified_api_contracts.internal.architecture_v2.restriction_profiles import (
     RESTRICTION_PROFILE_REGISTRY,
@@ -152,6 +162,7 @@ __all__ = [
     "UserContext",
     "access_control",
     "all_capabilities",
+    "allocator_access_control",
     "archetypes_for_pair",
     "archetypes_for_venue",
     "capability_for",
@@ -163,5 +174,6 @@ __all__ = [
     "prod_restrictions",
     "resolve_profile",
     "service_family_from_audience",
+    "user_context_for_allocator",
     "validate_mode_for_category",
 ]

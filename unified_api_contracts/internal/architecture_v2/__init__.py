@@ -9,6 +9,10 @@ Split across enums.py + schemas.py to stay under the 900-line QG limit.
 
 from __future__ import annotations
 
+from unified_api_contracts.internal.architecture_v2.allocator_access import (
+    allocator_access_control,
+    user_context_for_allocator,
+)
 from unified_api_contracts.internal.architecture_v2.archetype_capability import (
     ARCHETYPE_CAPABILITY_REGISTRY,
     ArchetypeCapability,
@@ -53,11 +57,17 @@ from unified_api_contracts.internal.architecture_v2.derivation import (
     SlotFilter,
     TileLockState,
     UserContext,
-    access_control,
     combo,
-    cost,
-    demo_universe,
     prod_restrictions,
+)
+from unified_api_contracts.internal.architecture_v2.derivation_access import (
+    access_control,
+)
+from unified_api_contracts.internal.architecture_v2.derivation_cost import (
+    cost,
+)
+from unified_api_contracts.internal.architecture_v2.derivation_demo import (
+    demo_universe,
 )
 from unified_api_contracts.internal.architecture_v2.enums import (
     ARCHETYPE_TO_FAMILY,
@@ -313,6 +323,7 @@ __all__ = [
     "VenueType",
     "access_control",
     "all_capabilities",
+    "allocator_access_control",
     "archetypes_for_pair",
     "archetypes_for_venue",
     "availability_for",
@@ -329,5 +340,6 @@ __all__ = [
     "service_family_from_audience",
     "slots_visible_to",
     "split_scope_tokens",
+    "user_context_for_allocator",
     "validate_allocation_authorised",
 ]

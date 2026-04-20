@@ -136,6 +136,7 @@ _TIMEFRAMES_INDEX: tuple[str, ...] = ("1m", "5m", "15m", "1h", "1d")
 # Data-type key naming (source → key prefix)
 # ---------------------------------------------------------------------------
 
+
 # Each source produces a distinct shape (and therefore a distinct contract).
 # The key schema is ``{prefix}_{timeframe}`` so ``data_type`` remains a single
 # string usable by the existing three-tuple registry. ``trades`` keeps the
@@ -244,11 +245,11 @@ def _register(contract: SchemaContract) -> None:
 
 
 # ---------------------------------------------------------------------------
-# CeFi candles — perpetual × (trades | book_snapshot_5 | derivative_ticker |
+# CeFi candles — perpetual x (trades | book_snapshot_5 | derivative_ticker |
 #                            liquidations)
-#                spot_pair × (trades | book_snapshot_5)
-#                options_chain × trades (bundled per-underlying)
-#                futures_chain × trades (bundled per-underlying)
+#                spot_pair x (trades | book_snapshot_5)
+#                options_chain x trades (bundled per-underlying)
+#                futures_chain x trades (bundled per-underlying)
 # ---------------------------------------------------------------------------
 
 for _tf in _TIMEFRAMES_CEFI:
@@ -295,10 +296,10 @@ for _tf in _TIMEFRAMES_OPTIONS:
 
 
 # ---------------------------------------------------------------------------
-# TradFi candles — future × (trades | ohlcv_1m native → re-aggregated higher)
-#                  equity × (trades | ohlcv_1m)
-#                  options_chain × trades (bundled per-underlying)
-#                  index × trades
+# TradFi candles — future x (trades | ohlcv_1m native → re-aggregated higher)
+#                  equity x (trades | ohlcv_1m)
+#                  options_chain x trades (bundled per-underlying)
+#                  index x trades
 # ---------------------------------------------------------------------------
 
 # ``ohlcv_1m`` for future/equity already exists in contracts.py as the
@@ -329,9 +330,9 @@ for _tf in _TIMEFRAMES_INDEX:
 
 
 # ---------------------------------------------------------------------------
-# DeFi candles — pool × (dex_pool_swaps | dex_pool_state)
-#                a_token × (lending_indices | rate_indices | oracle_prices)
-#                lst × (lst_rates | oracle_prices)
+# DeFi candles — pool x (dex_pool_swaps | dex_pool_state)
+#                a_token x (lending_indices | rate_indices | oracle_prices)
+#                lst x (lst_rates | oracle_prices)
 # ---------------------------------------------------------------------------
 
 for _tf in _TIMEFRAMES_DEFI:
@@ -414,7 +415,7 @@ for _tf in _TIMEFRAMES_OPTIONS:
 
 
 # ---------------------------------------------------------------------------
-# Sports candles — odds × trades (1m / 15m / 1h)
+# Sports candles — odds x trades (1m / 15m / 1h)
 # ---------------------------------------------------------------------------
 
 for _tf in _TIMEFRAMES_SPORTS:
@@ -431,7 +432,7 @@ for _tf in _TIMEFRAMES_SPORTS:
 
 
 # ---------------------------------------------------------------------------
-# Prediction candles — prediction_market × trades (1m / 15m / 1h)
+# Prediction candles — prediction_market x trades (1m / 15m / 1h)
 # ---------------------------------------------------------------------------
 
 for _tf in _TIMEFRAMES_PREDICTION:

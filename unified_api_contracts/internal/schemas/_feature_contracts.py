@@ -84,14 +84,14 @@ Enumeration source (as of 2026-04-18):
 
 Canonical category / instrument_type pairs per service:
 
-    features-delta-one        → applies to {cefi, tradfi} × {perpetual,
+    features-delta-one        → applies to {cefi, tradfi} x {perpetual,
                                 spot_pair, future, equity, options_chain,
                                 futures_chain, index}. Contract registered
                                 under ``cefi/perpetual`` (primary) + per-pair
                                 duplicates.
     features-volatility       → {cefi/options_chain, cefi/futures_chain,
                                 tradfi/options_chain}
-    features-onchain          → defi × {a_token, lending, lst, pool,
+    features-onchain          → defi x {a_token, lending, lst, pool,
                                 spot_asset, staking}
     features-sports           → sports/odds
     features-calendar         → cross-category; canonical home = tradfi/index
@@ -354,7 +354,7 @@ for _cat, _itype, _symcol in _VOL_TARGETS:
     for _fg in VOLATILITY_FEATURE_GROUPS:
         _register(_cat, _itype, _fg, symbol_column=_symcol)
 
-# Onchain: DeFi only — one contract per feature-group × instrument_type combo
+# Onchain: DeFi only — one contract per feature-group x instrument_type combo
 # that the feature group actually consumes.
 _ONCHAIN_AAVE_TARGETS = ("a_token", "lending")
 _ONCHAIN_LST_TARGETS = ("lst",)
@@ -384,13 +384,7 @@ _ONCHAIN_ROUTE: dict[str, tuple[str, ...]] = {
 
 for _fg, _itypes in _ONCHAIN_ROUTE.items():
     for _itype in _itypes:
-        _sym = (
-            "token"
-            if _itype in {"a_token", "lending"}
-            else "pool_id"
-            if _itype == "pool"
-            else "symbol"
-        )
+        _sym = "token" if _itype in {"a_token", "lending"} else "pool_id" if _itype == "pool" else "symbol"
         _register("defi", _itype, _fg, include_chain=True, symbol_column=_sym)
 
 # Sports — all groups key on fixture_id.
@@ -432,9 +426,7 @@ _XINST_DIRECTIONAL_TARGETS: tuple[tuple[str, str, str], ...] = (
     ("tradfi", "equity", "symbol"),
 )
 _XINST_DEFI_TARGETS: tuple[tuple[str, str, str], ...] = (("defi", "pool", "pool_id"),)
-_XINST_PRED_TARGETS: tuple[tuple[str, str, str], ...] = (
-    ("prediction", "prediction_market", "condition_id"),
-)
+_XINST_PRED_TARGETS: tuple[tuple[str, str, str], ...] = (("prediction", "prediction_market", "condition_id"),)
 
 for _cat, _itype, _symcol in _XINST_DIRECTIONAL_TARGETS:
     for _fg in CROSS_INSTRUMENT_FEATURE_GROUPS:

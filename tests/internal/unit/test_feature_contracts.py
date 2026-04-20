@@ -170,7 +170,7 @@ def test_every_feature_contract_has_core_columns() -> None:
 
 
 def test_total_feature_contract_count_reasonable() -> None:
-    """Sanity: >=300 feature contracts registered (8 services × avg 40 (category x instrument_type x feature_group))."""
+    """Sanity: >=300 feature contracts registered (8 services x avg 40 (category x instrument_type x feature_group))."""
     all_feature_groups = (
         set(DELTA_ONE_FEATURE_GROUPS)
         | set(VOLATILITY_FEATURE_GROUPS)
@@ -184,7 +184,6 @@ def test_total_feature_contract_count_reasonable() -> None:
     registered = [
         k
         for k, contract in CONTRACT_REGISTRY.items()
-        if k[2] in all_feature_groups
-        and any(c.name == "feature_group" for c in contract.columns)
+        if k[2] in all_feature_groups and any(c.name == "feature_group" for c in contract.columns)
     ]
     assert len(registered) >= 300, f"only {len(registered)} feature contracts registered"

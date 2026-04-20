@@ -35,7 +35,6 @@ SSOT:
 
 from __future__ import annotations
 
-import os
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Literal, cast
@@ -43,6 +42,9 @@ from typing import Literal, cast
 import yaml  # pyright: ignore[reportMissingTypeStubs]
 from pydantic import BaseModel, ConfigDict
 
+from unified_api_contracts.internal.architecture_v2._workspace_root import (
+    workspace_root_env,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     ClientAudience,
     DemoFlavour,
@@ -153,9 +155,9 @@ def _find_profiles_dir() -> Path | None:
     Returns ``None`` in siloed CI where PM is not checked out.
     """
 
-    env_root = os.environ.get("UNIFIED_TRADING_WORKSPACE_ROOT")
-    if env_root:
-        candidate = Path(env_root) / "unified-trading-pm" / "codex" / "14-playbooks" / "demo-ops" / "profiles"
+    env_root = workspace_root_env()
+    if env_root is not None:
+        candidate = env_root / "unified-trading-pm" / "codex" / "14-playbooks" / "demo-ops" / "profiles"
         if candidate.is_dir():
             return candidate
 
