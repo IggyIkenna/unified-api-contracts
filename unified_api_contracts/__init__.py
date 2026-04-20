@@ -578,6 +578,87 @@ from .registry import (
     resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
 )
+from .signal_broadcast import (
+    COUNTERPARTY_ENTITLEMENTS as COUNTERPARTY_ENTITLEMENTS,
+)
+from .signal_broadcast import (
+    COUNTERPARTY_REGISTRY as COUNTERPARTY_REGISTRY,
+)
+from .signal_broadcast import (
+    AckSource as AckSource,
+)
+from .signal_broadcast import (
+    Counterparty as Counterparty,
+)
+from .signal_broadcast import (
+    CounterpartyEntitlement as CounterpartyEntitlement,
+)
+from .signal_broadcast import (
+    CounterpartyEntitlementProfile as CounterpartyEntitlementProfile,
+)
+from .signal_broadcast import (
+    CounterpartyStatus as CounterpartyStatus,
+)
+from .signal_broadcast import (
+    DeliveryAttempt as DeliveryAttempt,
+)
+from .signal_broadcast import (
+    DeliveryStatus as DeliveryStatus,
+)
+from .signal_broadcast import (
+    DirectionalIntent as DirectionalIntent,
+)
+from .signal_broadcast import (
+    PayloadDepth as PayloadDepth,
+)
+from .signal_broadcast import (
+    RateLimitConfig as RateLimitConfig,
+)
+from .signal_broadcast import (
+    RestPullDeliveryConfig as RestPullDeliveryConfig,
+)
+from .signal_broadcast import (
+    SchemaDepth as SchemaDepth,
+)
+from .signal_broadcast import (
+    SignalAcknowledgement as SignalAcknowledgement,
+)
+from .signal_broadcast import (
+    SignalEmission as SignalEmission,
+)
+from .signal_broadcast import (
+    SignalPayload as SignalPayload,
+)
+from .signal_broadcast import (
+    SignalPayloadMinimal as SignalPayloadMinimal,
+)
+from .signal_broadcast import (
+    SignalPayloadRich as SignalPayloadRich,
+)
+from .signal_broadcast import (
+    SignalPayloadStandard as SignalPayloadStandard,
+)
+from .signal_broadcast import (
+    StrategySignalAcknowledged as StrategySignalAcknowledged,
+)
+from .signal_broadcast import (
+    StrategySignalEmittedExternal as StrategySignalEmittedExternal,
+)
+from .signal_broadcast import (
+    WebhookDeliveryConfig as WebhookDeliveryConfig,
+)
+from .signal_broadcast import (
+    active_counterparties as active_counterparties,
+)
+from .signal_broadcast import (
+    counterparty_for as counterparty_for,
+)
+from .signal_broadcast import (
+    entitled_slots_for as entitled_slots_for,
+)
+from .signal_broadcast import (
+    entitlements_for as entitlements_for,
+)
 from .sports import (
     BUNDESLIGA_TEAM_ALIASES as BUNDESLIGA_TEAM_ALIASES,
 )
@@ -618,6 +699,8 @@ __all__ = [
     "CONFIG_REQUIRED_FIELDS",
     "CONFIG_SCHEMA",
     "CONTRACT_REGISTRY",
+    "COUNTERPARTY_ENTITLEMENTS",
+    "COUNTERPARTY_REGISTRY",
     "DATA_SOURCE_TO_SECRET",
     "DATA_SOURCE_TO_VENUES",
     "DATA_TYPES_BY_CATEGORY",
@@ -696,6 +779,7 @@ __all__ = [
     "AaveV3UserAccountData",
     "AaveV3UserReserveData",
     "AccountVerificationLevel",
+    "AckSource",
     "AggregatedPosition",
     "AlternativeDataSignal",
     "AlternativeDataType",
@@ -842,6 +926,10 @@ __all__ = [
     "ComputeTarget",
     "ComputeType",
     "ContractSpec",
+    "Counterparty",
+    "CounterpartyEntitlement",
+    "CounterpartyEntitlementProfile",
+    "CounterpartyStatus",
     "CredentialType",
     "CrossMarginNettingResult",
     "CrossVenueArbLeg",
@@ -860,6 +948,8 @@ __all__ = [
     "DeFiStakingAggregatedMetrics",
     "DefiAlertType",
     "DefiErrorCode",
+    "DeliveryAttempt",
+    "DeliveryStatus",
     "DepositAddress",
     "DepositRecord",
     "DeribitAccountSummaryResponse",
@@ -873,6 +963,7 @@ __all__ = [
     "DeribitOrderStateResponse",
     "DeribitPositionsResponse",
     "DeribitTickerResponse",
+    "DirectionalIntent",
     "EndpointSpec",
     "Erc20TransferCalldata",
     "Erc20TransferFromCalldata",
@@ -981,6 +1072,7 @@ __all__ = [
     "OrderType",
     "OrphanDetector",
     "OutcomeType",
+    "PayloadDepth",
     "PlayerMapping",
     "PolygonDividend",
     "PolygonDividendsResponse",
@@ -1010,8 +1102,10 @@ __all__ = [
     "ProcessedOddsOutput",
     "ProtocolHealthBreakdown",
     "ProviderDataAvailability",
+    "RateLimitConfig",
     "RateLimitInfo",
     "RateLimitResponse",
+    "RestPullDeliveryConfig",
     "RiskCategory",
     "RiskGroupSummary",
     "RiskType",
@@ -1019,11 +1113,18 @@ __all__ = [
     "ScalingMode",
     "SchemaContract",
     "SchemaContractNotFoundError",
+    "SchemaDepth",
     "ScraperError",
     "ScraperVersionMeta",
     "SentimentScore",
     "SettlementEvent",
     "ShareClass",
+    "SignalAcknowledgement",
+    "SignalEmission",
+    "SignalPayload",
+    "SignalPayloadMinimal",
+    "SignalPayloadRich",
+    "SignalPayloadStandard",
     "SignalSource",
     "SourceControlProvider",
     "Sport",
@@ -1033,6 +1134,8 @@ __all__ = [
     "SportsbookLink",
     "SpreadLeg",
     "StakingProtocolBreakdown",
+    "StrategySignalAcknowledged",
+    "StrategySignalEmittedExternal",
     "SubAccount",
     "TardisExchangeDetail",
     "TardisInstrumentDetail",
@@ -1063,12 +1166,17 @@ __all__ = [
     "WebSocketConnectionClosed",
     "WebSocketConnectionOpened",
     "WebSocketEvent",
+    "WebhookDeliveryConfig",
     "WithdrawalRecord",
+    "active_counterparties",
     "american_to_decimal",
     "build_combo_id",
     "build_instrument_id",
     "classify_venue_error",
+    "counterparty_for",
     "decimal_to_american",
+    "entitled_slots_for",
+    "entitlements_for",
     "get_data_sources_for_venue",
     "get_databento_symbols_for_venue",
     "get_provider_availability",

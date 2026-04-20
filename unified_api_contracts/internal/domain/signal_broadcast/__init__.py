@@ -24,9 +24,19 @@ from unified_api_contracts.internal.domain.signal_broadcast.payload import (
     SignalPayloadRich,
     SignalPayloadStandard,
 )
+from unified_api_contracts.internal.domain.signal_broadcast.registry import (
+    COUNTERPARTY_ENTITLEMENTS,
+    COUNTERPARTY_REGISTRY,
+    active_counterparties,
+    counterparty_for,
+    entitled_slots_for,
+    entitlements_for,
+)
 from unified_api_contracts.internal.domain.signal_broadcast.schema_depth import SchemaDepth
 
 __all__ = [
+    "COUNTERPARTY_ENTITLEMENTS",
+    "COUNTERPARTY_REGISTRY",
     "Counterparty",
     "CounterpartyEntitlement",
     "SchemaDepth",
@@ -35,4 +45,8 @@ __all__ = [
     "SignalPayloadMinimal",
     "SignalPayloadRich",
     "SignalPayloadStandard",
+    "active_counterparties",
+    "counterparty_for",
+    "entitled_slots_for",
+    "entitlements_for",
 ]
