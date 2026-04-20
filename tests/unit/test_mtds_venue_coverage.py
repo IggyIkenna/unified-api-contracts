@@ -96,3 +96,55 @@ class TestMtdsVenueExpectedDataTypes:
         for v in ("POLYMARKET", "KALSHI"):
             dts = set(get_expected_data_types_for_venue(v))
             assert "trades" in dts, f"{v} missing 'trades'"
+
+
+class TestNormalizeDefiVenue:
+    """normalize_defi_venue must resolve legacy manifest names to canonical PROTOCOL-CHAIN form."""
+
+    def test_legacy_aave_v3_maps_to_canonical(self) -> None:
+        vm = VenueMapping()
+        assert vm.normalize_defi_venue("AAVE_V3") == "AAVEV3-ETHEREUM"
+
+    def test_legacy_uniswap_variants(self) -> None:
+        vm = VenueMapping()
+        assert vm.normalize_defi_venue("UNISWAP_V2") == "UNISWAPV2-ETHEREUM"
+        assert vm.normalize_defi_venue("UNISWAP_V3") == "UNISWAPV3-ETHEREUM"
+        assert vm.normalize_defi_venue("UNISWAP_V4") == "UNISWAPV4-ETHEREUM"
+
+    def test_legacy_single_token_protocols(self) -> None:
+        vm = VenueMapping()
+        for raw, expected in (
+            ("CURVE", "CURVE-ETHEREUM"),
+            ("BALANCER", "BALANCER-ETHEREUM"),
+            ("MORPHO", "MORPHO-ETHEREUM"),
+            ("FLUID", "FLUID-ETHEREUM"),
+            ("LIDO", "LIDO-ETHEREUM"),
+            ("ETHERFI", "ETHERFI-ETHEREUM"),
+            ("ETHENA", "ETHENA-ETHEREUM"),
+        ):
+            assert vm.normalize_defi_venue(raw) == expected, f"{raw} → expected {expected}"
+
+    def test_canonical_form_is_idempotent(self) -> None:
+        vm = VenueMapping()
+        for canonical in vm.all_defi_venues:
+            assert vm.normalize_defi_venue(canonical) == canonical
+
+    def test_unknown_venue_returned_unchanged(self) -> None:
+        vm = VenueMapping()
+        assert vm.normalize_defi_venue("TOTALLY_UNKNOWN_PROTOCOL") == "TOTALLY_UNKNOWN_PROTOCOL"
+        assert not vm.is_defi_venue("TOTALLY_UNKNOWN_PROTOCOL")
+
+    def test_chain_override_for_multi_chain_expansion(self) -> None:
+        vm = VenueMapping()
+        # When adapters start writing AAVE_V3 on Arbitrum, passing chain=ARBITRUM
+        # should resolve to AAVEV3-ARBITRUM (not registered yet — returned for
+        # the caller to decide whether to accept).
+        assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVEV3-ARBITRUM"
+        assert vm.normalize_defi_venue("UNISWAP_V3", chain="BASE") == "UNISWAPV3-BASE"
+
+    def test_is_defi_venue_accepts_legacy(self) -> None:
+        vm = VenueMapping()
+        assert vm.is_defi_venue("AAVE_V3")
+        assert vm.is_defi_venue("UNISWAP_V3")
+        assert vm.is_defi_venue("AAVEV3-ETHEREUM")
+        assert not vm.is_defi_venue("BINANCE-SPOT")

@@ -81,6 +81,38 @@ class VenueMapping:
         ]
     )
 
+    # Legacy → canonical DeFi venue name mapping. Manifests written before the
+    # 2026-04 canonical PROTOCOL-CHAIN migration carry the older single-token
+    # form (``AAVE_V3``, ``UNISWAP_V2``, ``CURVE``, ``ETHENA``). Consumers that
+    # read the manifest (data-status aggregator, feature services, ML) use
+    # ``normalize_defi_venue`` below to resolve either form to the canonical
+    # ``AAVEV3-ETHEREUM`` / etc. Going forward new adapters MUST write the
+    # canonical form; this map is read-only backwards-compat.
+    #
+    # SSOT: codex/02-data/mtds-data-source-coverage-matrix.md §4.
+    legacy_defi_venue_aliases: dict[str, str] = field(
+        default_factory=lambda: {
+            # DEX swap protocols
+            "UNISWAP_V2": "UNISWAPV2-ETHEREUM",
+            "UNISWAP_V3": "UNISWAPV3-ETHEREUM",
+            "UNISWAP_V4": "UNISWAPV4-ETHEREUM",
+            "UNISWAPV2": "UNISWAPV2-ETHEREUM",
+            "UNISWAPV3": "UNISWAPV3-ETHEREUM",
+            "UNISWAPV4": "UNISWAPV4-ETHEREUM",
+            "CURVE": "CURVE-ETHEREUM",
+            "BALANCER": "BALANCER-ETHEREUM",
+            # Lending
+            "AAVE_V3": "AAVEV3-ETHEREUM",
+            "AAVEV3": "AAVEV3-ETHEREUM",
+            "MORPHO": "MORPHO-ETHEREUM",
+            "FLUID": "FLUID-ETHEREUM",
+            # LST / yield
+            "LIDO": "LIDO-ETHEREUM",
+            "ETHERFI": "ETHERFI-ETHEREUM",
+            "ETHENA": "ETHENA-ETHEREUM",
+        }
+    )
+
     # CEFI on-chain CLOB venues (CLOB-style data, treated as CEFI for buckets)
     # These produce data identical to centralized exchanges:
     # trades, orderbook, funding, liquidations
@@ -364,8 +396,49 @@ class VenueMapping:
         return exchange in self.all_tardis_exchanges
 
     def is_defi_venue(self, venue: str) -> bool:
-        """Check if venue is a DeFi protocol (swaps, lending, staking)."""
-        return venue in self.all_defi_venues
+        """Check if venue is a DeFi protocol (swaps, lending, staking).
+
+        Accepts both canonical (``AAVEV3-ETHEREUM``) and legacy
+        (``AAVE_V3``) forms.
+        """
+        if venue in self.all_defi_venues:
+            return True
+        return self.legacy_defi_venue_aliases.get(venue) in self.all_defi_venues
+
+    def normalize_defi_venue(self, raw_venue: str, chain: str | None = None) -> str:
+        """Normalise a DeFi venue identifier to the canonical PROTOCOL-CHAIN form.
+
+        Manifests pre-dating the canonical-naming migration carry legacy forms
+        such as ``AAVE_V3`` / ``UNISWAP_V2`` / ``CURVE`` / ``ETHENA``. This
+        helper resolves either form to the canonical ``AAVEV3-ETHEREUM`` /
+        ``UNISWAPV2-ETHEREUM`` / etc. so data-status aggregators, feature
+        services, and ML pipelines can look up by a single key.
+
+        Args:
+            raw_venue: Venue identifier as stored in the manifest (canonical
+                or legacy).
+            chain: Optional chain name (``ETHEREUM`` etc.). Only consulted
+                when the legacy form is ambiguous across chains. Currently
+                all registered DeFi protocols are Ethereum-only so chain is
+                advisory — reserved for Arbitrum/Base/Optimism/etc. expansion.
+
+        Returns:
+            Canonical ``PROTOCOL-CHAIN`` form. Falls back to ``raw_venue``
+            unchanged if the legacy form is unrecognised (so unknown venues
+            are surfaced honestly as missing from the UAC registry instead
+            of silently remapped).
+
+        SSOT: codex/02-data/mtds-data-source-coverage-matrix.md §4.
+        """
+        if raw_venue in self.all_defi_venues:
+            return raw_venue
+        alias = self.legacy_defi_venue_aliases.get(raw_venue)
+        if alias is None:
+            return raw_venue
+        # Chain override for multi-chain expansion — swap -ETHEREUM suffix.
+        if chain and chain != "ETHEREUM" and alias.endswith("-ETHEREUM"):
+            alias = alias[: -len("ETHEREUM")] + chain
+        return alias
 
     def is_cefi_onchain_clob_venue(self, venue: str) -> bool:
         """Check if venue is an on-chain CLOB (treated as CEFI for data classification)."""
