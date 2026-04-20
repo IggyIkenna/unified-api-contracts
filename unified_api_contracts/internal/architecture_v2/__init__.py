@@ -31,6 +31,9 @@ from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactPublishedPayload,
     ArtifactRef,
 )
+from unified_api_contracts.internal.architecture_v2.capability_claims import (
+    CapabilityClaims,
+)
 from unified_api_contracts.internal.architecture_v2.client_contract import (
     ClientContract,
 )
@@ -238,6 +241,7 @@ __all__ = [
     "BorrowInstruction",
     "BridgeInstructionV2",
     "CancelInstruction",
+    "CapabilityClaims",
     "ChildVenueDecl",
     "ClientAudience",
     "ClientContext",
