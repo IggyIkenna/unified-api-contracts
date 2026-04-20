@@ -80,11 +80,13 @@ from unified_api_contracts.internal.architecture_v2 import (
     VenueFeature,
     VenueRoutingMode,
     VenueType,
+    allocator_access_control,
     availability_for,
     is_venue_token,
     maturity_rank,
     slots_visible_to,
     split_scope_tokens,
+    user_context_for_allocator,
     validate_allocation_authorised,
 )
 from unified_api_contracts.internal.architecture_v2 import (
@@ -106,6 +108,12 @@ from unified_api_contracts.internal.deployment import (
     DeploymentStatus,
     ShardEvent,
     VMEventType,
+)
+from unified_api_contracts.internal.domain.account import (
+    AccountRegistry,
+    AccountType,
+    TradingAccount,
+    WalletRole,
 )
 from unified_api_contracts.internal.domain.analytics import (
     CorrelationRegime as CorrelationRegime,
@@ -361,6 +369,14 @@ from unified_api_contracts.internal.domain.features_delta_one import (
 )
 from unified_api_contracts.internal.domain.features_sports import (
     SportsFeatureVector,
+)
+from unified_api_contracts.internal.domain.fund_administration import (
+    AllocationExecutionStatus,
+    AllocatorRedemption,
+    AllocatorSubscription,
+    FundAllocation,
+    RedemptionStatus,
+    SubscriptionStatus,
 )
 from unified_api_contracts.internal.domain.health.service_health import ServiceHealthResponse
 from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
@@ -843,7 +859,9 @@ __all__ = [
     "AaveV3UserReserveData",
     "AccountActionV2",
     "AccountInstruction",
+    "AccountRegistry",
     "AccountState",
+    "AccountType",
     "AgentEventDetails",
     "AggregatedPositionMessage",
     "AlertContextData",
@@ -851,7 +869,10 @@ __all__ = [
     "AlertMessage",
     "AlertType",
     "AllocationDirective",
+    "AllocationExecutionStatus",
     "AllocatorArchetype",
+    "AllocatorRedemption",
+    "AllocatorSubscription",
     "ArbitrageStrategyConfig",
     "ArtifactKind",
     "ArtifactMetadata",
@@ -1074,6 +1095,7 @@ __all__ = [
     "FluidBorrowParams",
     "FluidDepositParams",
     "FluidRepayParams",
+    "FundAllocation",
     "FundNAVSnapshot",
     "FuturesTermStructureRecord",
     "GasCostAction",
@@ -1241,6 +1263,7 @@ __all__ = [
     "RebalanceCostEstimate",
     "ReconciliationAction",
     "ReconciliationResolution",
+    "RedemptionStatus",
     "RefereeRecord",
     "RegimeState",
     "RegimeStateRecord",
@@ -1335,6 +1358,7 @@ __all__ = [
     "StressScenarioType",
     "StressTestResult",
     "SubAccount",
+    "SubscriptionStatus",
     "SubscriptionTier",
     "SupportedCurrency",
     "SwapInstruction",
@@ -1354,6 +1378,7 @@ __all__ = [
     "TradeRecord",
     "TradeSide",
     "TradeType",
+    "TradingAccount",
     "TrainingJobRequest",
     "TrainingJobResult",
     "TrainingPeriod",
@@ -1405,6 +1430,7 @@ __all__ = [
     "VenueType",
     "VersionBumpDetails",
     "VolSurfaceTermStructureRecord",
+    "WalletRole",
     "WebSocketConnectEvent",
     "WebSocketConnectionClosed",
     "WebSocketConnectionOpened",
@@ -1420,6 +1446,7 @@ __all__ = [
     "YieldCurveTenor",
     "aggregate_notional",
     "aggregate_positions",
+    "allocator_access_control",
     "availability_for",
     "get_unity_child_book",
     "is_venue_token",
@@ -1428,6 +1455,7 @@ __all__ = [
     "split_scope_tokens",
     "unity_child_books_confirmed",
     "unity_child_books_pending",
+    "user_context_for_allocator",
     "validate_allocation_authorised",
     "validate_feature_columns_not_null",
     "validate_instrument_records",

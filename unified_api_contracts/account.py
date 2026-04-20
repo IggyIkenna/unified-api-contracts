@@ -8,10 +8,12 @@ from unified_api_contracts.internal.domain.account import (
     AccountRegistry,
     AccountType,
     TradingAccount,
+    WalletRole,
 )
 
 __all__ = [
     "AccountRegistry",
     "AccountType",
     "TradingAccount",
+    "WalletRole",
 ]

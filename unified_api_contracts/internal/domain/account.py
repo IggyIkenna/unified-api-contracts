@@ -23,6 +23,25 @@ class AccountType(StrEnum):
     PREDICTION_MARKET = "PREDICTION_MARKET"
 
 
+class WalletRole(StrEnum):
+    """Wallet role within the IM Pooled fund-administration rail.
+
+    TREASURY → principal account; investor deposits land here and redemptions
+                settle from here; also source for capital-routing top-ups.
+    TRADING  → working-capital account used by a strategy for live execution.
+    RESERVE  → buffer bucket sized to ``TreasuryConfig.reserve_pct``; absorbs
+                overflow from TRADING sweeps and tops up TREASURY when low.
+
+    Additive field on ``TradingAccount`` with default None to preserve
+    backwards-compatibility with SMA / DART / Reg Umbrella paths that do not
+    use the treasury model.
+    """
+
+    TREASURY = "TREASURY"
+    TRADING = "TRADING"
+    RESERVE = "RESERVE"
+
+
 @dataclass(frozen=True)
 class TradingAccount:
     """Unified trading account identity.
@@ -41,6 +60,7 @@ class TradingAccount:
     chain: str | None = None  # DeFi only — ETHEREUM, ARBITRUM, etc.
     share_class: str | None = None  # Links to treasury — USDC, ETH, etc.
     is_active: bool = True
+    wallet_role: WalletRole | None = None  # IM Pooled rail only; default None
 
     @property
     def account_id(self) -> str:
