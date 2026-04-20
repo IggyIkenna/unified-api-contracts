@@ -322,6 +322,14 @@ def resolve_profile(
         complementary G1.6 ``demo_universe`` / ``prod_restrictions`` calls).
     """
 
+    # G1.13 — widen vague answers in demo envs before the overlay applies.
+    # Lazy import avoids a circular dep (tempt_logic imports from this file).
+    from unified_api_contracts.internal.architecture_v2.tempt_logic import (
+        apply_tempt_logic,
+    )
+
+    questionnaire = apply_tempt_logic(questionnaire, env)
+
     profile_yaml = _BY_PERSONA.get(persona.persona_id)
     if profile_yaml is None:
         # Unknown persona → hidden-everywhere deterministic profile (safer
