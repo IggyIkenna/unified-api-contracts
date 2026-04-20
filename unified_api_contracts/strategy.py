@@ -46,12 +46,21 @@ from unified_api_contracts.internal.architecture_v2.derivation import (
     RouteDescriptor,
     Rule08Violation,
     SlotFilter,
+    TileLockState,
     UserContext,
     access_control,
     combo,
     cost,
     demo_universe,
     prod_restrictions,
+)
+from unified_api_contracts.internal.architecture_v2.restriction_profiles import (
+    RESTRICTION_PROFILE_REGISTRY,
+    Env,
+    ProfileYaml,
+    QuestionnaireResponse,
+    known_persona_ids,
+    resolve_profile,
 )
 from unified_api_contracts.internal.domain.strategy_service.client_registry import (
     CLIENT_REGISTRY,
@@ -72,6 +81,7 @@ from unified_api_contracts.internal.domain.strategy_service.registry import (
 __all__ = [
     "ARCHETYPE_CAPABILITY_REGISTRY",
     "CLIENT_REGISTRY",
+    "RESTRICTION_PROFILE_REGISTRY",
     "STRATEGY_REGISTRY",
     "AccessDecision",
     "ArchetypeCapability",
@@ -90,6 +100,7 @@ __all__ = [
     "DemoUniverse",
     "DenialReason",
     "DimensionQuery",
+    "Env",
     "ExecutionMode",
     "IntegrationDepth",
     "InternalCostLeakageError",
@@ -99,6 +110,8 @@ __all__ = [
     "PriceQuote",
     "PricingTier",
     "ProductionRestrictions",
+    "ProfileYaml",
+    "QuestionnaireResponse",
     "QuoteLine",
     "RestrictionProfile",
     "RollMode",
@@ -109,6 +122,7 @@ __all__ = [
     "StrategyDefinition",
     "StrategyFamily",
     "StrategyRegistry",
+    "TileLockState",
     "UserContext",
     "access_control",
     "all_capabilities",
@@ -118,6 +132,8 @@ __all__ = [
     "combo",
     "cost",
     "demo_universe",
+    "known_persona_ids",
     "prod_restrictions",
+    "resolve_profile",
     "validate_mode_for_category",
 ]

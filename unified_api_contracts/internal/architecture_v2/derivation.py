@@ -39,7 +39,7 @@ SSOT: ``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md``.
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from enum import StrEnum
 from typing import Literal
 
@@ -385,11 +385,26 @@ class AccessDecision(BaseModel):
 # ---------------------------------------------------------------------------
 
 
+TileLockState = Literal["unlocked", "padlocked", "hidden"]
+"""G1.3 three-state lock enum. Mirrors UI
+``lib/visibility/tile-lock-state.ts`` TileLockState and
+``demo-ops/profiles/*.yaml`` tile-level state values."""
+
+
 class RestrictionProfile(BaseModel):
     """Stage-2 demo/prod restriction-profile shape.
 
-    Populated from Stage-2 ``demo-ops/demo-restriction-profiles.md`` once
-    that file ships. Today each formula bolts on a fixture default.
+    G1.7 extends the original stage-3c §1.4 block-level shape with a
+    tile-level ``tiles`` field keyed by ``ServiceDefinition.key`` from
+    ``unified-trading-system-ui/lib/config/services.ts``. The two layers
+    compose: ``visible_blocks``/``hidden_blocks`` still drive block-level
+    availability (pricing + demo universes); ``tiles`` drives the per-tile
+    G1.3 lock-state on the services portal.
+
+    Source of truth for ``tiles``:
+    ``unified-trading-pm/codex/14-playbooks/demo-ops/profiles/<persona>.yaml``
+    loaded by
+    :func:`unified_api_contracts.internal.architecture_v2.restriction_profiles.resolve_profile`.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -400,6 +415,10 @@ class RestrictionProfile(BaseModel):
     hidden_blocks: tuple[str, ...] = ()
     visible_routes: tuple[RouteDescriptor, ...] = ()
     slot_filter: SlotFilter = SlotFilter()
+    tiles: Mapping[str, TileLockState] = {}
+    """Per-tile lock state. Keys match ``ServiceDefinition.key``; values are
+    one of ``"unlocked"`` / ``"padlocked"`` / ``"hidden"``. Empty dict = the
+    caller did not resolve from a YAML profile (legacy / test fixtures)."""
 
 
 # ---------------------------------------------------------------------------
