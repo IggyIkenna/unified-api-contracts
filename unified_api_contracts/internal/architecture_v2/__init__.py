@@ -186,6 +186,10 @@ from unified_api_contracts.internal.architecture_v2.strategy_availability import
     slots_visible_to,
     validate_allocation_authorised,
 )
+from unified_api_contracts.internal.architecture_v2.usage_meter import (
+    MeterKind,
+    UsageMeterRow,
+)
 from unified_api_contracts.internal.architecture_v2.venue_tokens import (
     KNOWN_VENUE_TOKENS,
     is_venue_token,
@@ -276,6 +280,7 @@ __all__ = [
     "LtvAndHaircut",
     "MarginMode",
     "MarginSpec",
+    "MeterKind",
     "MevSubmissionMode",
     "NettingRule",
     "Persona",
@@ -332,6 +337,7 @@ __all__ = [
     "UnityChildVenue",
     "UnstakeInstruction",
     "Urgency",
+    "UsageMeterRow",
     "UserContext",
     "VenueCapabilityV2",
     "VenueCategoryV2",
