@@ -38,6 +38,11 @@ from ._defi import (
     resolve_solana_mint,
     token_matches_major_assets,
 )
+from ._signal_broadcast import (
+    SIGNAL_BROADCAST_CAPABILITIES,
+    SIGNAL_BROADCAST_CAPABILITY_TAGS,
+    SignalBroadcastCapability,
+)
 from ._sports import SPORTS_CAPABILITIES
 from ._tradfi import TRADFI_CAPABILITIES
 
@@ -50,6 +55,8 @@ __all__ = [
     "DEFI_CAPABILITIES",
     "PROTECTED_RPC_URLS",
     "PROTOCOL_CAPABILITIES",
+    "SIGNAL_BROADCAST_CAPABILITIES",
+    "SIGNAL_BROADCAST_CAPABILITY_TAGS",
     "SOLANA_DEFI_PROTOCOLS",
     "SOLANA_MINT_TO_SYMBOL",
     "SOLANA_RPC_TEMPLATES",
@@ -62,6 +69,7 @@ __all__ = [
     "DeFiDataSource",
     "NonEvmChain",
     "ProtocolClass",
+    "SignalBroadcastCapability",
     "build_complete_major_assets",
     "build_defi_venues",
     "get_data_types_for_protocol",
