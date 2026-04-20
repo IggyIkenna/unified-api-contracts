@@ -595,8 +595,8 @@ class ClientRiskTolerance(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-class KillSwitchScope(BaseModel):
-    """Composable kill switch scope. Combines entity (who) + dimension (what)."""
+class ScopedKillSwitchSpec(BaseModel):
+    """Composable kill switch scope spec. Combines entity (who) + dimension (what)."""
 
     entity_type: str = Field(description="company | client | account")
     entity_id: str | None = Field(default=None, description="None = all (company-wide)")
@@ -610,7 +610,7 @@ class KillSwitchScope(BaseModel):
 class ScopedKillSwitchState(BaseModel):
     """State of an active scoped kill switch."""
 
-    scope: KillSwitchScope
+    scope: ScopedKillSwitchSpec
     is_active: bool
     activated_at: datetime
     activated_by: str

@@ -1,9 +1,9 @@
 """ClientContract schema — Firestore ``/contracts/{org_id}`` document shape.
 
-Stage 3E G2 § 2. Contracts live in Firestore (Firebase project
-``central-element-323112`` for prod, ``odum-staging`` for staging) and
-drive ``cost()`` discounts, Tier A usage-metered pricing, and
-rule-08 exclusivity enforcement.
+Stage 3E G2 § 2. Contracts live in Firestore (prod + staging Firebase
+projects; IDs resolved at runtime via ``UnifiedCloudConfig``, never
+hardcoded) and drive ``cost()`` discounts, Tier A usage-metered
+pricing, and rule-08 exclusivity enforcement.
 
 UAC owns the Python schema (pydantic BaseModel); the TypeScript mirror
 in unified-trading-system-ui is generated from this file at build

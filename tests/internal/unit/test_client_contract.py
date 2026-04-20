@@ -2,8 +2,9 @@
 
 Stage 3E G2 § 2 — the schema stored under Firestore
 ``/contracts/{org_id}``. Tests pin the shape so mocks (dev cache),
-staging (Firebase ``odum-staging``), and prod (Firebase
-``central-element-323112``) can't drift.
+staging Firebase, and prod Firebase can't drift. Concrete Firebase
+project IDs are resolved at runtime via ``UnifiedCloudConfig`` (never
+hardcoded); see SSOT below.
 
 SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 2.
 """

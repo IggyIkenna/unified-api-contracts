@@ -1,16 +1,16 @@
 from datetime import UTC, datetime
 
-from unified_api_contracts.internal import KillSwitchScope, ScopedKillSwitchState
+from unified_api_contracts.internal import ScopedKillSwitchSpec, ScopedKillSwitchState
 
 
 class TestScopedKillSwitch:
     def test_company_wide_scope(self) -> None:
-        scope = KillSwitchScope(entity_type="company")
+        scope = ScopedKillSwitchSpec(entity_type="company")
         assert scope.entity_id is None
         assert scope.strategy_type is None
 
     def test_client_strategy_venue_scope(self) -> None:
-        scope = KillSwitchScope(
+        scope = ScopedKillSwitchSpec(
             entity_type="client",
             entity_id="C1",
             strategy_type="BASIS",
@@ -20,7 +20,7 @@ class TestScopedKillSwitch:
         assert scope.strategy_type == "BASIS"
 
     def test_scoped_state(self) -> None:
-        scope = KillSwitchScope(entity_type="client", entity_id="C1")
+        scope = ScopedKillSwitchSpec(entity_type="client", entity_id="C1")
         state = ScopedKillSwitchState(
             scope=scope,
             is_active=True,
