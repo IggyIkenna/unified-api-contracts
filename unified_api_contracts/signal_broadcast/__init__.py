@@ -110,6 +110,27 @@ from unified_api_contracts.signal_broadcast.events import (
 from unified_api_contracts.signal_broadcast.events import (
     StrategySignalEmittedExternal as StrategySignalEmittedExternal,
 )
+from unified_api_contracts.signal_broadcast.observability import (
+    BacktestPaperLiveEnvelope as BacktestPaperLiveEnvelope,
+)
+from unified_api_contracts.signal_broadcast.observability import (
+    BacktestPaperLiveRow as BacktestPaperLiveRow,
+)
+from unified_api_contracts.signal_broadcast.observability import (
+    DeliveryHealth as DeliveryHealth,
+)
+from unified_api_contracts.signal_broadcast.observability import (
+    DeliveryHealthEnvelope as DeliveryHealthEnvelope,
+)
+from unified_api_contracts.signal_broadcast.observability import (
+    PnlAttributionEnvelope as PnlAttributionEnvelope,
+)
+from unified_api_contracts.signal_broadcast.observability import (
+    PnlAttributionReport as PnlAttributionReport,
+)
+from unified_api_contracts.signal_broadcast.observability import (
+    PnlAttributionRow as PnlAttributionRow,
+)
 from unified_api_contracts.signal_broadcast.signal_payload import (
     DirectionalIntent as DirectionalIntent,
 )
@@ -124,14 +145,21 @@ __all__ = [
     "COUNTERPARTY_ENTITLEMENTS",
     "COUNTERPARTY_REGISTRY",
     "AckSource",
+    "BacktestPaperLiveEnvelope",
+    "BacktestPaperLiveRow",
     "Counterparty",
     "CounterpartyEntitlement",
     "CounterpartyEntitlementProfile",
     "CounterpartyStatus",
     "DeliveryAttempt",
+    "DeliveryHealth",
+    "DeliveryHealthEnvelope",
     "DeliveryStatus",
     "DirectionalIntent",
     "PayloadDepth",
+    "PnlAttributionEnvelope",
+    "PnlAttributionReport",
+    "PnlAttributionRow",
     "RateLimitConfig",
     "RestPullDeliveryConfig",
     "SchemaDepth",
