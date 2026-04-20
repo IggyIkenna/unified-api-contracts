@@ -16,6 +16,7 @@ share a single SSOT.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from datetime import date, timedelta
 
 from .league_data_other import FEATURES_LEAGUES as FEATURES_LEAGUES
@@ -166,6 +167,40 @@ def get_league_fixture_calendar(
     return result
 
 
+def get_expected_leagues_for_source(
+    source_key: str,
+    classifications: Iterable[str] | None = None,
+) -> list[LeagueDefinition]:
+    """Return leagues expected to produce data for a given source.
+
+    Canonical denominator for deployment-api data-status coverage %. For a
+    given source (``api_football``, ``footystats``, ``odds_api``,
+    ``open_meteo``, ``soccer_football_info``, ``transfermarkt``,
+    ``understat``), returns the list of leagues whose ``data_sources``
+    frozenset contains ``source_key``. Optionally restrict by league
+    classification (``Prediction`` / ``Features`` / ``Reference`` /
+    ``Other``).
+
+    SSOT: ``codex/02-data/sports-data-source-coverage-matrix.md``.
+
+    Args:
+        source_key: Data-source identifier as stored in
+            ``LeagueDefinition.data_sources`` (e.g. ``"api_football"``).
+        classifications: Optional iterable of classification strings.
+            ``None`` means all classifications.
+
+    Returns:
+        List of ``LeagueDefinition`` entries matching the filter.
+        Empty list if the source key is unknown or no leagues match.
+    """
+    allowed = {c.lower() for c in classifications} if classifications is not None else None
+    return [
+        league
+        for league in LEAGUE_REGISTRY.values()
+        if source_key in league.data_sources and (allowed is None or league.classification.lower() in allowed)
+    ]
+
+
 __all__ = [
     "FEATURES_LEAGUES",
     "LEAGUE_REGISTRY",
@@ -173,6 +208,7 @@ __all__ = [
     "PREDICTION_LEAGUES",
     "REFERENCE_LEAGUES",
     "get_all_prediction_league_ids",
+    "get_expected_leagues_for_source",
     "get_league",
     "get_league_by_api_football_id",
     "get_league_fixture_calendar",

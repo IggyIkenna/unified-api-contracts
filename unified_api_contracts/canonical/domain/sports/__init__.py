@@ -54,6 +54,7 @@ from .league_classification_data import DEFAULT_CLASSIFICATION_REGISTRY as DEFAU
 from .league_classification_data import LEAGUE_CLASSIFICATION_DATA as LEAGUE_CLASSIFICATION_DATA
 from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
 from .league_data import get_all_prediction_league_ids as get_all_prediction_league_ids
+from .league_data import get_expected_leagues_for_source as get_expected_leagues_for_source
 from .league_data import get_league as get_league
 from .league_data import get_league_by_api_football_id as get_league_by_api_football_id
 from .league_data import get_league_fixture_calendar as get_league_fixture_calendar

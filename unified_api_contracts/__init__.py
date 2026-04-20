@@ -691,6 +691,9 @@ from .sports import (
     EPL_TEAM_ALIASES as EPL_TEAM_ALIASES,
 )
 from .sports import (
+    get_expected_leagues_for_source as get_expected_leagues_for_source,
+)
+from .sports import (
     get_prediction_leagues as get_prediction_leagues,
 )
 
