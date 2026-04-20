@@ -804,7 +804,23 @@ def demo_universe(
             ),
         )
 
-    profile = _default_profile(persona, profile_registry)
+    # G1.7 runtime delegation: `resolve_profile()` hydrates the YAML-
+    # driven tile layer (per-persona padlock/hidden/unlocked map consumed
+    # by `useTileLockState`). `_default_profile()` supplies the block-
+    # level layer (visible_blocks / locked_visible_blocks / hidden_blocks
+    # drive the cell filter below). Both layers compose on the single
+    # RestrictionProfile envelope per the class docstring; neither is
+    # redundant. `_default_profile()` is the no-YAML block-level fallback
+    # — kept because rule-12 profile YAMLs carry tile state only.
+    # Imported lazily because `restriction_profiles` imports `Persona` /
+    # `RestrictionProfile` / `TileLockState` from this module.
+    from unified_api_contracts.internal.architecture_v2.restriction_profiles import (
+        resolve_profile,
+    )
+
+    block_profile = _default_profile(persona, profile_registry)
+    tile_profile = resolve_profile(persona, flavour)
+    profile = block_profile.model_copy(update={"tiles": dict(tile_profile.tiles)})
     overlaid = _flavour_overlay(profile, flavour)
 
     supported = _all_supported_combos(capability_registry)
@@ -839,10 +855,29 @@ def _default_profile(
     persona: Persona,
     registry: dict[str, RestrictionProfile] | None,
 ) -> RestrictionProfile:
-    """Look up the demo-restriction profile for ``persona``.
+    """Look up the *block-level* restriction profile for ``persona``.
 
-    Uses the injected registry when supplied, otherwise falls back to the
-    module-level commercial-path defaults above.
+    Returns the commercial-path default block scaffolding (``visible_blocks``
+    / ``locked_visible_blocks`` / ``hidden_blocks`` / ``visible_routes``) —
+    the orthogonal companion to the G1.7 YAML-driven tile layer resolved by
+    :func:`resolve_profile`.
+
+    This helper is NOT redundant with ``resolve_profile``:
+
+    * ``resolve_profile`` hydrates ``tiles`` from
+      ``demo-ops/profiles/<persona>.yaml`` and returns a profile whose
+      block-level fields are EMPTY (``visible_blocks = ()``, etc.).
+    * ``_default_profile`` returns the commercial-path block scaffolding
+      with EMPTY ``tiles``.
+
+    ``demo_universe`` merges both layers so the returned :class:`RestrictionProfile`
+    carries tile state AND block-level filtering. Deleting this helper
+    would strand the block-level layer — YAML profiles do not yet declare
+    block membership (rule-12 scope + rule-04 axes live elsewhere).
+
+    Uses the injected ``registry`` when ``persona.assigned_profile`` points
+    to a pre-constructed override (e.g. sales-assigned stage-2 profile);
+    otherwise falls back to the module-level commercial-path defaults.
     """
 
     if persona.assigned_profile is not None and registry is not None:
@@ -893,6 +928,18 @@ def prod_restrictions(
     ``sub_scopes(package)``, ``tier(package)``, the rule-04 axis, CLIENT_
     EXCLUSIVE filtering (BL-14/BL-22), and the external-visibility
     maturity threshold.
+
+    **G1.7 delegation note (runtime check):** the G1.7 plan line 431
+    specifies that delegation to :func:`resolve_profile` applies to
+    ``demo_universe()`` + ``prod_restrictions()`` "when caller provides a
+    profile ID". ``prod_restrictions`` is scoped to a paying *client*
+    (``ClientContext``) — not a demo *persona* — and derives entitlements
+    from the ``availability_registry`` + per-audience lock-state rules,
+    not from a YAML persona profile. There is no profile-ID arg on this
+    signature today, so there is nothing to delegate. If a future client-
+    scoped profile axis is added (e.g. per-client demo overlay), this
+    function should call ``resolve_profile`` at that point — see
+    ``refactor_g1_4_persona_combinatorial_expansion`` for the likely site.
     """
 
     all_cells = _all_supported_combos(capability_registry)
@@ -984,6 +1031,20 @@ def access_control(
     # Admin short-circuit: every phase, every item.
     if user.audience == "admin":
         return AccessDecision(status="allow", reason="admin audience — unrestricted")
+
+    # G1.11 pre-check (rule 12): service-family scope. Denial short-circuits
+    # before any other gate. Imported lazily to avoid module-load coupling.
+    from unified_api_contracts.internal.architecture_v2.service_family_scope import (
+        check_service_family_scope,
+    )
+
+    scope_decision = check_service_family_scope(user, route)
+    if scope_decision.status == "deny":
+        return AccessDecision(
+            status="deny",
+            reason=scope_decision.reason,
+            upgrade_hint=scope_decision.upgrade_hint,
+        )
 
     # Phase-entitlement gate first — `deny_phase` distinct from `deny`.
     allowed = _allowed_phases(user.entitlements)
