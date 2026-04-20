@@ -451,6 +451,69 @@ def test_integration_depth_zero_on_failure() -> None:
     assert result.integration_depth == 0.0
 
 
+def test_integration_depth_exactly_1_0_fully_structured() -> None:
+    """Explicit spec boundary: fully-structured instruction scores exactly 1.0.
+
+    Six axes are always 1.0 on success; order_constraints scores 1.0 when
+    ≥3 structured fields are populated; risk scores 1.0 when ≥3 anchors
+    populated. Supplying both pushes the mean to 8/8 = 1.0.
+    """
+
+    rich_constraints = OrderConstraints(
+        price_limit=Decimal("60000"),
+        max_participation_pct=Decimal("10"),
+        slippage_budget_bps=Decimal("5"),
+    )
+    rich_risk = RiskAndAllocationConstraints(
+        per_instruction_max_loss=Decimal("100"),
+        per_client_allocation_cap=Decimal("0.2"),
+        kill_switch_conditions=(KillSwitchCondition(metric="drawdown_bps", threshold=Decimal("500")),),
+    )
+    instruction = _make_instruction(constraints=rich_constraints, risk=rich_risk)
+    result = InstructionValidator().validate(instruction)
+    assert result.ok
+    assert result.integration_depth == 1.0
+
+
+def test_integration_depth_exactly_hybrid_half_on_both_variable_axes() -> None:
+    """Explicit spec boundary: hybrid instruction with both variable axes
+    at 0.5 weight yields mean (6*1.0 + 0.5 + 0.5) / 8 = 0.875.
+
+    This is the canonical "~0.5 hybrid" edge-case from the G1.2 plan:
+    order_constraints with exactly 2 structured fields scores 0.5;
+    risk with exactly 2 anchors scores 0.5.
+    """
+
+    hybrid_constraints = OrderConstraints(
+        price_limit=Decimal("60000"),
+        slippage_budget_bps=Decimal("5"),
+    )
+    hybrid_risk = RiskAndAllocationConstraints(
+        per_instruction_max_loss=Decimal("100"),
+        per_client_allocation_cap=Decimal("0.2"),
+    )
+    instruction = _make_instruction(constraints=hybrid_constraints, risk=hybrid_risk)
+    result = InstructionValidator().validate(instruction)
+    assert result.ok
+    # 6 structured axes (1.0 each) + 2 hybrid axes (0.5 each) = 7.0 / 8 = 0.875
+    assert result.integration_depth == 0.875
+
+
+def test_integration_depth_exact_minimum_on_success_floor() -> None:
+    """Explicit spec boundary: minimal-but-valid instruction scores the
+    success floor of 0.75 = 6/8. Empty order_constraints → 0.0; risk with
+    only one anchor → 0.0. The six always-structured axes set the floor.
+    """
+
+    minimal_constraints = OrderConstraints()
+    minimal_risk = RiskAndAllocationConstraints(per_instruction_max_loss=Decimal("100"))
+    instruction = _make_instruction(constraints=minimal_constraints, risk=minimal_risk)
+    result = InstructionValidator().validate(instruction)
+    assert result.ok
+    # 6 structured + 0 + 0 = 6/8 = 0.75 — the success floor.
+    assert result.integration_depth == 0.75
+
+
 # ---------------------------------------------------------------------------
 # 6. Happy-path acceptance (3+ cases across categories)
 # ---------------------------------------------------------------------------

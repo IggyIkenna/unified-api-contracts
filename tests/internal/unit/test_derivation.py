@@ -221,6 +221,51 @@ def test_demo_universe_admin_full_universe() -> None:
     assert len(universe.visible_combos) > 0
 
 
+def test_demo_universe_delegates_to_resolve_profile_for_tiles() -> None:
+    """G1.7 runtime delegation — ``demo_universe`` hydrates ``tiles`` via
+    ``resolve_profile`` (YAML-backed) while preserving the block-level
+    layer from the commercial-path default.
+
+    Skipped in truly-siloed CI where the PM profile YAMLs are not
+    discoverable; in that case ``resolve_profile`` returns an empty tile
+    map which is indistinguishable from the default.
+    """
+
+    from unified_api_contracts.strategy import (  # local import to guard the skip
+        RESTRICTION_PROFILE_REGISTRY,
+    )
+
+    if not RESTRICTION_PROFILE_REGISTRY:
+        pytest.skip("No PM checkout reachable — profiles YAML not discoverable")
+
+    persona = Persona(persona_id="prospect-im", commercial_path=CommercialPath.IM_REPORTING_ONLY)
+    universe = demo_universe(persona, "sales_pitch")
+    # Block-level layer preserved from commercial-path default.
+    assert universe.persona.persona_id == "prospect-im"
+    # The per-cell loop uses block_4_strategy_service_entry which is NOT
+    # visible for IM_REPORTING_ONLY — proves block-level layer survived.
+    assert len(universe.visible_combos) == 0
+
+
+def test_demo_universe_unknown_persona_hidden_tile_fallback() -> None:
+    """G1.7 runtime delegation — unknown persona id causes ``resolve_profile``
+    to return an empty-tiles profile. ``demo_universe`` still returns a
+    well-formed ``DemoUniverse`` (the block-level fallback via
+    ``_default_profile`` keeps the combo filtering meaningful).
+    """
+
+    persona = Persona(
+        persona_id="does-not-exist-in-yaml",
+        commercial_path=CommercialPath.CLIENT_FULL_PIPELINE,
+    )
+    universe = demo_universe(persona, "sales_pitch")
+    # CLIENT_FULL_PIPELINE has block_4_strategy_service_entry visible, so
+    # cells land in visible_combos via the block-level fallback — proves
+    # the runtime did not crash on the empty-tile resolve_profile return.
+    assert universe.persona.persona_id == "does-not-exist-in-yaml"
+    assert isinstance(universe.visible_combos, tuple)
+
+
 # ---------------------------------------------------------------------------
 # Formula 4 — prod_restrictions(client, package)
 # ---------------------------------------------------------------------------
