@@ -26,12 +26,26 @@ from unified_api_contracts.internal.domain.fund_administration._types import (
     RedemptionStatus,
     SubscriptionStatus,
 )
+from unified_api_contracts.internal.domain.fund_administration.api_requests import (
+    ApproveSubscriptionRequest,
+    ProcessRedemptionRequest,
+    RebalanceRequest,
+    RedeemRequest,
+    RejectRequest,
+    SubscribeRequest,
+)
 
 __all__ = [
     "AllocationExecutionStatus",
     "AllocatorRedemption",
     "AllocatorSubscription",
+    "ApproveSubscriptionRequest",
     "FundAllocation",
+    "ProcessRedemptionRequest",
+    "RebalanceRequest",
+    "RedeemRequest",
     "RedemptionStatus",
+    "RejectRequest",
+    "SubscribeRequest",
     "SubscriptionStatus",
 ]
