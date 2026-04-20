@@ -57,15 +57,80 @@ three environments per the dev/staging parity rule (rule 03); ``env`` only
 carries optional per-env overrides (none shipped today)."""
 
 
-class QuestionnaireResponse(BaseModel):
-    """G1.10 stub — concrete fields arrive with the questionnaire plan.
+QuestionnaireCategory = Literal["CeFi", "DeFi", "TradFi", "Sports", "Prediction"]
+"""Asset-class category picker — aligns with
+``codex/09-strategy/architecture-v2/category-instrument-coverage.md``."""
 
-    Shipped as an empty placeholder so :func:`resolve_profile` signature is
-    stable for Wave-D callers; G1.10 widens this into a real response
-    schema with commercial-path / risk-tolerance / venue-breadth selectors.
+
+QuestionnaireInstrumentType = Literal[
+    "spot",
+    "perp",
+    "dated_future",
+    "option",
+    "lending",
+    "staking",
+    "lp",
+    "event_settled",
+]
+"""Instrument-type picker — mirrors
+``ArchetypeInstrumentType`` from archetype_capability.py."""
+
+
+QuestionnaireStrategyStyle = Literal[
+    "ml_directional",
+    "rules_directional",
+    "stat_arb",
+    "arbitrage",
+    "carry",
+    "event_driven",
+    "market_making",
+    "vol_trading",
+]
+"""Strategy-style picker — mirrors ``StrategyFamilyV2`` minus the
+``stat_arb_cross_sectional`` sub-family (UX rollup for prospects)."""
+
+
+QuestionnaireServiceFamily = Literal["IM", "DART", "RegUmbrella", "combo"]
+"""Prospect-facing 4-enum. Narrower than rule 12's ``ServiceFamily``
+(which includes ``admin``, ``IM_desk``, ``DART_reporting_only``) —
+prospects never pick internal audiences. ``combo`` maps to the union
+of IM + DART + RegUmbrella via the overlay logic."""
+
+
+QuestionnaireFundStructure = Literal["SMA", "Pooled", "NA"]
+"""SMA (Separately Managed Account) vs Pooled Fund vs N/A (DART only).
+Cross-ref: ``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``."""
+
+
+class QuestionnaireResponse(BaseModel):
+    """G1.10 questionnaire response — 6 axes that feed the restriction-
+    profile overlay.
+
+    Every axis is required (no partial responses). ``venue_scope`` accepts
+    either the sentinel string ``"all"`` or an explicit list of venue
+    IDs; the sentinel is equivalent to ``all_capabilities()`` enumeration
+    for scope purposes.
+
+    SSOT for axis values:
+    - Categories + instrument types:
+      ``codex/09-strategy/architecture-v2/category-instrument-coverage.md``
+    - Service family: ``codex/14-playbooks/_ssot-rules/12-service-family-scope-rules.md``
+    - Fund structure: ``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``
+
+    The overlay logic in :func:`_apply_questionnaire_override` widens
+    tile-level padlocks for vague responses (empty categories = fall back
+    to base profile) and tightens them for narrow responses (single
+    category = hide tiles irrelevant to that category).
     """
 
-    model_config = ConfigDict(frozen=True, extra="allow")
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    categories: tuple[QuestionnaireCategory, ...]
+    instrument_types: tuple[QuestionnaireInstrumentType, ...]
+    venue_scope: tuple[str, ...] | Literal["all"] = "all"
+    strategy_style: tuple[QuestionnaireStrategyStyle, ...]
+    service_family: QuestionnaireServiceFamily
+    fund_structure: QuestionnaireFundStructure
 
 
 class ProfileYaml(BaseModel):
@@ -140,14 +205,78 @@ def _apply_questionnaire_override(
     tiles: Mapping[str, TileLockState],
     questionnaire: QuestionnaireResponse | None,
 ) -> Mapping[str, TileLockState]:
-    """G1.10 stub — no override fields declared yet; returns tiles as-is.
+    """Apply questionnaire-driven tile state overrides.
 
-    When G1.10 ships the real ``QuestionnaireResponse`` schema, this helper
-    widens padlocks on vague answers per the G1.13 tempt-logic rules.
+    Overlay semantics (G1.10 — 6-axis questionnaire):
+
+    * **service_family = "IM"**: keeps investor-relations + reports
+      unlocked; hides DART-specific tiles (trading / research / promote /
+      observe / data) beyond what the base persona allows.
+    * **service_family = "RegUmbrella"**: keeps reports + regulatory
+      facing tiles; hides research/promote/trading (client operates
+      their own stack under Odum's FCA wrapper — observing live is a
+      client-side concern).
+    * **service_family = "DART"**: keeps the full DART stack visible if
+      the base profile already allowed it; hides investor-relations
+      (IM-only surface).
+    * **service_family = "combo"**: union of IM + DART + RegUmbrella
+      overlays — no tightening. Surfaces everything the base profile
+      allows.
+    * **fund_structure = "SMA" or "Pooled"**: only meaningful for
+      IM / RegUmbrella; purely informational today (no tile narrowing).
+    * **Empty ``categories``** (vague answer): fall back to base profile
+      untouched — G1.13 tempt-logic will widen padlocks later.
+
+    The override only *tightens* — a tile that's ``unlocked`` in the base
+    profile may become ``padlocked`` or ``hidden``; a tile that's
+    ``hidden`` stays hidden regardless of questionnaire choices. (The
+    prospect hasn't paid for surfaces the base profile already gates.)
     """
 
-    _ = questionnaire
-    return dict(tiles)
+    if questionnaire is None:
+        return dict(tiles)
+
+    tiles_map: dict[str, TileLockState] = dict(tiles)
+
+    # Vague response — no categories picked — skip the overlay.
+    if not questionnaire.categories:
+        return tiles_map
+
+    def _tighten(tile_id: str, state: TileLockState) -> None:
+        current = tiles_map.get(tile_id)
+        if current is None:
+            return  # Unknown tile — leave alone
+        # Precedence: hidden > padlocked > unlocked.
+        if current == "hidden":
+            return
+        if state == "hidden":
+            tiles_map[tile_id] = "hidden"
+        elif state == "padlocked" and current == "unlocked":
+            tiles_map[tile_id] = "padlocked"
+
+    sf = questionnaire.service_family
+
+    if sf == "IM":
+        # IM picker → hide DART-operations tiles; keep reports + IR.
+        _tighten("trading", "hidden")
+        _tighten("research", "hidden")
+        _tighten("promote", "hidden")
+        _tighten("observe", "hidden")
+        _tighten("data", "padlocked")
+    elif sf == "RegUmbrella":
+        # Reg Umbrella picker → hide research/promote; padlock trading/observe
+        # (client operates their own stack under Odum's permissions).
+        _tighten("research", "hidden")
+        _tighten("promote", "hidden")
+        _tighten("trading", "padlocked")
+        _tighten("observe", "padlocked")
+        _tighten("investor-relations", "hidden")
+    elif sf == "DART":
+        # DART picker → hide IM-only investor-relations tile.
+        _tighten("investor-relations", "hidden")
+    # combo → no tightening (union semantics).
+
+    return tiles_map
 
 
 def _apply_env_override(

@@ -195,13 +195,125 @@ def test_env_override_is_a_noop_per_parity_rule(env: Env) -> None:
     assert dict(dev_profile.tiles) == dict(env_profile.tiles)
 
 
-def test_questionnaire_override_is_a_noop_until_g1_10() -> None:
-    empty = resolve_profile(_persona("prospect-dart"))
-    with_stub = resolve_profile(
-        _persona("prospect-dart"),
-        questionnaire=QuestionnaireResponse(),
+def test_questionnaire_none_is_a_noop() -> None:
+    """Passing no questionnaire leaves the base profile untouched."""
+
+    base = resolve_profile(_persona("prospect-dart"))
+    with_none = resolve_profile(_persona("prospect-dart"), questionnaire=None)
+    assert dict(base.tiles) == dict(with_none.tiles)
+
+
+def test_questionnaire_empty_categories_is_a_noop() -> None:
+    """Vague response (no categories picked) falls back to base — G1.13
+    tempt-logic will later widen padlocks for this case."""
+
+    empty_qr = QuestionnaireResponse(
+        categories=(),
+        instrument_types=(),
+        strategy_style=(),
+        service_family="DART",
+        fund_structure="NA",
     )
-    assert dict(empty.tiles) == dict(with_stub.tiles)
+    base = resolve_profile(_persona("prospect-dart"))
+    with_vague = resolve_profile(_persona("prospect-dart"), questionnaire=empty_qr)
+    assert dict(base.tiles) == dict(with_vague.tiles)
+
+
+def test_questionnaire_service_family_im_hides_dart_tiles() -> None:
+    """IM picker on a DART-base profile hides trading/research/promote/
+    observe and padlocks data — converging toward the IM reporting path."""
+
+    im_qr = QuestionnaireResponse(
+        categories=("CeFi",),
+        instrument_types=("spot",),
+        strategy_style=("ml_directional",),
+        service_family="IM",
+        fund_structure="Pooled",
+    )
+    profile = resolve_profile(_persona("prospect-dart"), questionnaire=im_qr)
+    assert profile.tiles["trading"] == "hidden"
+    assert profile.tiles["research"] == "hidden"
+    assert profile.tiles["promote"] == "hidden"  # was padlocked; tightens to hidden
+    assert profile.tiles["observe"] == "hidden"
+    assert profile.tiles["data"] in {"padlocked", "hidden"}
+
+
+def test_questionnaire_service_family_regumbrella_tightens_ops_tiles() -> None:
+    reg_qr = QuestionnaireResponse(
+        categories=("TradFi",),
+        instrument_types=("spot",),
+        strategy_style=("carry",),
+        service_family="RegUmbrella",
+        fund_structure="SMA",
+    )
+    profile = resolve_profile(_persona("prospect-dart"), questionnaire=reg_qr)
+    assert profile.tiles["research"] == "hidden"
+    assert profile.tiles["promote"] == "hidden"
+    # prospect-dart base is trading=unlocked; Reg Umbrella padlocks it
+    assert profile.tiles["trading"] in {"padlocked", "hidden"}
+    assert profile.tiles["investor-relations"] == "hidden"
+
+
+def test_questionnaire_service_family_dart_hides_investor_relations() -> None:
+    dart_qr = QuestionnaireResponse(
+        categories=("DeFi",),
+        instrument_types=("perp",),
+        strategy_style=("stat_arb",),
+        service_family="DART",
+        fund_structure="NA",
+    )
+    profile = resolve_profile(_persona("prospect-dart"), questionnaire=dart_qr)
+    assert profile.tiles["investor-relations"] == "hidden"
+    # Other DART surfaces stay unchanged
+    assert profile.tiles["trading"] == "unlocked"
+    assert profile.tiles["research"] == "unlocked"
+
+
+def test_questionnaire_service_family_combo_no_tightening() -> None:
+    """Combo service_family picks the union — no tightening applied."""
+
+    combo_qr = QuestionnaireResponse(
+        categories=("CeFi", "DeFi"),
+        instrument_types=("spot", "perp"),
+        strategy_style=("ml_directional", "stat_arb"),
+        service_family="combo",
+        fund_structure="NA",
+    )
+    base = resolve_profile(_persona("prospect-dart"))
+    with_combo = resolve_profile(_persona("prospect-dart"), questionnaire=combo_qr)
+    assert dict(base.tiles) == dict(with_combo.tiles)
+
+
+def test_questionnaire_cannot_unlock_a_hidden_tile() -> None:
+    """Overlay only tightens — a tile hidden in the base profile stays
+    hidden regardless of questionnaire choices."""
+
+    # anon.yaml has all tiles hidden; any questionnaire response must preserve that.
+    aggressive_qr = QuestionnaireResponse(
+        categories=("CeFi",),
+        instrument_types=("spot",),
+        strategy_style=("ml_directional",),
+        service_family="DART",
+        fund_structure="NA",
+    )
+    profile = resolve_profile(_persona("anon"), questionnaire=aggressive_qr)
+    assert all(state == "hidden" for state in profile.tiles.values())
+
+
+def test_questionnaire_response_rejects_extra_fields() -> None:
+    """``extra='forbid'`` — unknown axes must be rejected."""
+
+    with pytest.raises(ValidationError):
+        QuestionnaireResponse.model_validate(
+            {
+                "categories": ["CeFi"],
+                "instrument_types": ["spot"],
+                "strategy_style": ["ml_directional"],
+                "service_family": "DART",
+                "fund_structure": "NA",
+                "unknown_axis": "oops",
+            }
+        )
 
 
 # ---------------------------------------------------------------------------
