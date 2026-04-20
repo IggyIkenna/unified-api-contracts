@@ -104,12 +104,16 @@ class VenueMapping:
 
     @property
     def all_cefi_venues(self) -> list[str]:
-        """All CEFI venues (Tardis exchanges + on-chain CLOBs like Hyperliquid/Aster)"""
-        # Map Tardis exchanges to canonical venue names
-        cefi_venues = list(set(self.tardis_to_venue.values()))
-        # Add on-chain CLOB venues
-        cefi_venues.extend(self.all_cefi_onchain_clob_venues)
-        return cefi_venues
+        """All CEFI venues (Tardis exchanges + on-chain CLOBs like Hyperliquid/Aster)
+
+        Deduped — HYPERLIQUID is both a Tardis-backed feed and an on-chain
+        CLOB, so prior to 2026-04-20 the raw concat returned duplicates that
+        propagated to the data-status aggregator's expected-venue count.
+        Returns a deduplicated, sorted list so downstream consumers can
+        iterate safely.
+        """
+        merged = set(self.tardis_to_venue.values()) | set(self.all_cefi_onchain_clob_venues)
+        return sorted(merged)
 
     # Map canonical venues to Databento dataset identifiers
     venue_to_databento: dict[str, str] = field(

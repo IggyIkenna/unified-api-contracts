@@ -445,11 +445,35 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
     },
+    # Canonical suffixed variants (VenueMapping.tardis_to_venue returns
+    # these forms — OKX-SPOT/OKX-FUTURES/OKX-SWAP — to disambiguate market
+    # types). Bare "OKX" kept above for execution-context / client-config
+    # callers that don't split by market. MTDS per-venue lookups hit the
+    # suffixed form.
+    "OKX-SPOT": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+    },
+    "OKX-FUTURES": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+    },
+    "OKX-SWAP": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+    },
     "UPBIT": {
         "trades": "2021-03-03",
         "book_snapshot_5": "2021-03-03",
     },
     "COINBASE": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+    },
+    "COINBASE-SPOT": {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
     },
