@@ -53,6 +53,7 @@ from .canonical.crosscutting.errors import (
 )
 from .canonical.domain import (
     BOOKMAKER_REGISTRY,
+    get_expected_bookmakers,
     ODDS_API_KEY_TO_VENUE,
     ODDS_API_KEY_TO_VENUE_CATEGORY,
     RISK_TYPE_CATEGORIES,

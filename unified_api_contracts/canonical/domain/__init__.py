@@ -250,6 +250,7 @@ from .sports.betting import (
 from .sports.bookmaker_registry import (
     BOOKMAKER_REGISTRY,
     BookmakerRegistry,
+    get_expected_bookmakers,
 )
 from .sports.errors import (
     BetRejectedError,
@@ -282,6 +283,7 @@ from .sports.progressive import (
 
 __all__ = [
     "BOOKMAKER_REGISTRY",
+    "get_expected_bookmakers",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
     "RISK_TYPE_CATEGORIES",
