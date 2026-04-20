@@ -48,6 +48,7 @@ def cost(
     integration_depth: IntegrationDepth | None = None,
     block_scope: tuple[str, ...] = _DEFAULT_BLOCK_SCOPE,
     has_exclusivity: bool = False,
+    has_raw_data_framing: bool = False,
     caller_has_internal_read: bool = False,
     caller_audience: str = "unknown",
     org_id: str | None = None,
@@ -88,6 +89,36 @@ def cost(
         combo_cell.chain,
     )
 
+    violations: list[Rule08Violation] = []
+
+    # Rule 07 (BL-19 raw-data framing on Tier A): breaches both rules 07
+    # and 08 (rule 08 §"No raw data on any tier"). Compliance event is
+    # tagged rule_id="07" for routing; the violation lands in
+    # ``rule_08_violations`` because rule 08's "no raw data" clause is the
+    # same breach surface — keeps one violations container on the quote.
+    if has_raw_data_framing and tier == "tier_a":
+        violations.append(
+            Rule08Violation(
+                code="raw_data_framing_on_tier_a",
+                message="Raw-data framing is not permitted on any tier (rules 07 + 08).",
+            )
+        )
+        if compliance_sink is not None:
+            compliance_sink(
+                ComplianceEvent(
+                    rule_id="07",
+                    violation_code="raw_data_framing_on_tier_a",
+                    combo_id=cid,
+                    caller_audience=caller_audience,
+                    org_id=org_id,
+                    requested_tier=tier,
+                    details=(
+                        "Raw-data framing requested on Tier A (BL-19). "
+                        "Breaches rule 07 data-licensing + rule 08 no-raw-data."
+                    ),
+                )
+            )
+
     if tier == "internal" and not caller_has_internal_read:
         if compliance_sink is not None:
             compliance_sink(
@@ -103,7 +134,6 @@ def cost(
             )
         raise InternalCostLeakageError("tier='internal' requires pricing.read_internal capability (stage-3c §1.2 Ex 4)")
 
-    violations: list[Rule08Violation] = []
     if has_exclusivity and tier == "tier_a":
         violations.append(
             Rule08Violation(

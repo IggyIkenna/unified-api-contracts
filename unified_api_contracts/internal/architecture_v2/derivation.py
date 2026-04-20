@@ -179,6 +179,7 @@ class Rule08Violation(BaseModel):
         "exclusivity_on_tier_a",
         "internal_cost_leakage",
         "mixed_tier_advisory",
+        "raw_data_framing_on_tier_a",
     ]
     message: str
 

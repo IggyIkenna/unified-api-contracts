@@ -249,6 +249,44 @@ def test_cost_sink_optional_preserves_existing_callers() -> None:
     assert len(quote.rule_08_violations) == 1  # violation still collected on the quote
 
 
+def test_cost_raw_data_framing_on_tier_a_fires_rule_07_event() -> None:
+    """Stage-3E G2 § 5: raw-data framing on Tier A breaches rules 07 + 08."""
+
+    captured: list[ComplianceEvent] = []
+    quote = cost(
+        _example_combo(),
+        tier="tier_a",
+        has_raw_data_framing=True,
+        caller_audience="trading_platform_subscriber",
+        org_id="alpha-capital",
+        compliance_sink=captured.append,
+    )
+    # One violation on the quote (rule_08_violations holds the marker; rule 07 co-violates).
+    assert len(quote.rule_08_violations) == 1
+    assert quote.rule_08_violations[0].code == "raw_data_framing_on_tier_a"
+    assert len(quote.lines) == 0  # violation suppresses quote assembly
+
+    # Compliance event tagged rule_id="07" for routing.
+    assert len(captured) == 1
+    assert captured[0].rule_id == "07"
+    assert captured[0].violation_code == "raw_data_framing_on_tier_a"
+
+
+def test_cost_raw_data_framing_on_tier_b_is_allowed() -> None:
+    """Raw-data framing is only a hard-fail on Tier A — Tier B negotiates separately."""
+
+    captured: list[ComplianceEvent] = []
+    quote = cost(
+        _example_combo(),
+        tier="tier_b",
+        has_raw_data_framing=True,
+        compliance_sink=captured.append,
+    )
+    assert len(quote.rule_08_violations) == 0
+    assert len(quote.lines) > 0
+    assert captured == []
+
+
 def test_combo_id_for_mirrors_slot_label_convention() -> None:
     assert (
         combo_id_for("STAT_ARB_PAIRS_FIXED", "DEFI", "spot", "uniswap_v3", "ethereum")
