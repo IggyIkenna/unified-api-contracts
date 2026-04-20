@@ -31,6 +31,13 @@ from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactPublishedPayload,
     ArtifactRef,
 )
+from unified_api_contracts.internal.architecture_v2.compliance import (
+    ComplianceEvent,
+    ComplianceSink,
+    RuleId,
+    ViolationCode,
+    combo_id_for,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     AccessDecision,
     ClientAudience,
@@ -240,6 +247,8 @@ __all__ = [
     "CommissionTier",
     "CompatibilityEntry",
     "CompensationPolicy",
+    "ComplianceEvent",
+    "ComplianceSink",
     "CoverageStatus",
     "DemoFlavour",
     "DemoUniverse",
@@ -284,6 +293,7 @@ __all__ = [
     "RollMode",
     "RouteDescriptor",
     "Rule08Violation",
+    "RuleId",
     "ScopeAllow",
     "ScopeDecision",
     "ScopeDeny",
@@ -321,6 +331,7 @@ __all__ = [
     "VenueFeature",
     "VenueRoutingMode",
     "VenueType",
+    "ViolationCode",
     "access_control",
     "all_capabilities",
     "allocator_access_control",
@@ -330,6 +341,7 @@ __all__ = [
     "capability_for",
     "check_service_family_scope",
     "combo",
+    "combo_id_for",
     "cost",
     "demo_universe",
     "is_venue_token",

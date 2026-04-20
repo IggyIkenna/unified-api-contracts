@@ -11,6 +11,11 @@ SSOT: ``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.2.
 
 from __future__ import annotations
 
+from unified_api_contracts.internal.architecture_v2.compliance import (
+    ComplianceEvent,
+    ComplianceSink,
+    combo_id_for,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     Combo,
     IntegrationDepth,
@@ -44,6 +49,9 @@ def cost(
     block_scope: tuple[str, ...] = _DEFAULT_BLOCK_SCOPE,
     has_exclusivity: bool = False,
     caller_has_internal_read: bool = False,
+    caller_audience: str = "unknown",
+    org_id: str | None = None,
+    compliance_sink: ComplianceSink | None = None,
 ) -> PriceQuote:
     """Return the priced line items for a combo at a tier.
 
@@ -63,9 +71,36 @@ def cost(
         :class:`InternalCostLeakageError` (stage-3c §1.2 Ex 4).
       * ``tier='tier_a'`` + ``has_exclusivity=True`` populates
         ``rule_08_violations`` (stage-3c §1.2 Ex 3).
+
+    Stage-3E G2 § 5: when ``compliance_sink`` is supplied, every
+    detected violation (raised OR collected) is also forwarded as a
+    :class:`ComplianceEvent` so the caller can emit
+    ``PRICING_RULE_0[78]_VIOLATION`` via UTL → Pub/Sub
+    ``<env>-compliance-events``. ``caller_audience`` + ``org_id`` exist
+    purely to enrich the event — they do not influence pricing logic.
     """
 
+    cid = combo_id_for(
+        str(combo_cell.archetype_id),
+        str(combo_cell.category),
+        str(combo_cell.instrument_type),
+        combo_cell.venue_id,
+        combo_cell.chain,
+    )
+
     if tier == "internal" and not caller_has_internal_read:
+        if compliance_sink is not None:
+            compliance_sink(
+                ComplianceEvent(
+                    rule_id="08",
+                    violation_code="internal_cost_leakage",
+                    combo_id=cid,
+                    caller_audience=caller_audience,
+                    org_id=org_id,
+                    requested_tier=tier,
+                    details="tier='internal' requested without pricing.read_internal capability",
+                )
+            )
         raise InternalCostLeakageError("tier='internal' requires pricing.read_internal capability (stage-3c §1.2 Ex 4)")
 
     violations: list[Rule08Violation] = []
@@ -76,6 +111,18 @@ def cost(
                 message="Exclusivity premium requires Tier B (rule 08).",
             )
         )
+        if compliance_sink is not None:
+            compliance_sink(
+                ComplianceEvent(
+                    rule_id="08",
+                    violation_code="exclusivity_on_tier_a",
+                    combo_id=cid,
+                    caller_audience=caller_audience,
+                    org_id=org_id,
+                    requested_tier=tier,
+                    details="Exclusivity premium requires Tier B (rule 08).",
+                )
+            )
 
     lines: list[QuoteLine] = []
     if not violations:

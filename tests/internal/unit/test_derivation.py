@@ -17,6 +17,7 @@ from unified_api_contracts.internal.architecture_v2 import (
     ClientPackage,
     Combo,
     CommercialPath,
+    ComplianceEvent,
     DimensionQuery,
     InternalCostLeakageError,
     ItemRef,
@@ -30,6 +31,7 @@ from unified_api_contracts.internal.architecture_v2 import (
     VenueCategoryV2,
     access_control,
     combo,
+    combo_id_for,
     cost,
     demo_universe,
     prod_restrictions,
@@ -172,6 +174,87 @@ def test_cost_internal_leakage_guard() -> None:
     # But an internal caller can read
     quote = cost(_example_combo(), tier="internal", caller_has_internal_read=True)
     assert quote.tier == "internal"
+
+
+# ---------------------------------------------------------------------------
+# Stage-3E G2 § 5 — compliance_sink emits ComplianceEvents for rule-08 breaches
+# ---------------------------------------------------------------------------
+
+
+def test_cost_compliance_sink_emits_on_exclusivity_tier_a() -> None:
+    """``compliance_sink`` receives a ComplianceEvent when exclusivity is requested on Tier A."""
+
+    captured: list[ComplianceEvent] = []
+    quote = cost(
+        _example_combo(),
+        tier="tier_a",
+        has_exclusivity=True,
+        caller_audience="im_desk",
+        org_id="alpha-capital",
+        compliance_sink=captured.append,
+    )
+    assert len(quote.rule_08_violations) == 1
+    assert len(captured) == 1
+    event = captured[0]
+    assert event.rule_id == "08"
+    assert event.violation_code == "exclusivity_on_tier_a"
+    assert event.caller_audience == "im_desk"
+    assert event.org_id == "alpha-capital"
+    assert event.requested_tier == "tier_a"
+    assert "STAT_ARB_PAIRS_FIXED" in event.combo_id
+    assert "DEFI" in event.combo_id
+
+
+def test_cost_compliance_sink_emits_on_internal_leakage() -> None:
+    """``compliance_sink`` fires BEFORE the raise so leakage attempts are always audited."""
+
+    captured: list[ComplianceEvent] = []
+    with pytest.raises(InternalCostLeakageError):
+        cost(
+            _example_combo(),
+            tier="internal",
+            caller_has_internal_read=False,
+            caller_audience="trading_platform_subscriber",
+            org_id="beta-fund",
+            compliance_sink=captured.append,
+        )
+
+    assert len(captured) == 1
+    event = captured[0]
+    assert event.rule_id == "08"
+    assert event.violation_code == "internal_cost_leakage"
+    assert event.caller_audience == "trading_platform_subscriber"
+    assert event.org_id == "beta-fund"
+    assert event.requested_tier == "internal"
+
+
+def test_cost_compliance_sink_silent_on_clean_quote() -> None:
+    """Sink is not invoked when no rule is violated — clean quote = zero events."""
+
+    captured: list[ComplianceEvent] = []
+    quote = cost(
+        _example_combo(),
+        tier="tier_b",
+        integration_depth="richer_execution_constraints",
+        compliance_sink=captured.append,
+    )
+    assert len(quote.rule_08_violations) == 0
+    assert captured == []
+
+
+def test_cost_sink_optional_preserves_existing_callers() -> None:
+    """``compliance_sink`` defaults to None so every pre-G2 caller keeps working unchanged."""
+
+    quote = cost(_example_combo(), tier="tier_a", has_exclusivity=True)
+    assert len(quote.rule_08_violations) == 1  # violation still collected on the quote
+
+
+def test_combo_id_for_mirrors_slot_label_convention() -> None:
+    assert (
+        combo_id_for("STAT_ARB_PAIRS_FIXED", "DEFI", "spot", "uniswap_v3", "ethereum")
+        == "STAT_ARB_PAIRS_FIXED:DEFI:spot:uniswap_v3:ethereum"
+    )
+    assert combo_id_for("STAT_ARB_PAIRS_FIXED", "CEFI", "perp", None, None) == "STAT_ARB_PAIRS_FIXED:CEFI:perp"
 
 
 # ---------------------------------------------------------------------------
