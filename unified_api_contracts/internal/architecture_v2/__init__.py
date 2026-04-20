@@ -9,6 +9,18 @@ Split across enums.py + schemas.py to stay under the 900-line QG limit.
 
 from __future__ import annotations
 
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (
+    ARCHETYPE_CAPABILITY_REGISTRY,
+    ArchetypeCapability,
+    ArchetypeCapabilityCell,
+    ArchetypeInstrumentType,
+    CoverageStatus,
+    RollMode,
+    all_capabilities,
+    archetypes_for_pair,
+    archetypes_for_venue,
+    capability_for,
+)
 from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactKind,
     ArtifactMetadata,
@@ -122,6 +134,7 @@ StrategyInstructionV2 = (
 
 __all__ = [
     "ALLOCATION_MIN_MATURITY",
+    "ARCHETYPE_CAPABILITY_REGISTRY",
     "ARCHETYPE_TO_FAMILY",
     "COMPATIBILITY_SEED",
     "EXTERNAL_VISIBILITY_MIN_MATURITY",
@@ -131,6 +144,9 @@ __all__ = [
     "AccountInstruction",
     "AllocationDirective",
     "AllocatorArchetype",
+    "ArchetypeCapability",
+    "ArchetypeCapabilityCell",
+    "ArchetypeInstrumentType",
     "ArtifactKind",
     "ArtifactMetadata",
     "ArtifactPublishedPayload",
@@ -151,6 +167,7 @@ __all__ = [
     "CommissionTier",
     "CompatibilityEntry",
     "CompensationPolicy",
+    "CoverageStatus",
     "EdgeMethod",
     "FillSource",
     "HoldPolicy",
@@ -169,6 +186,7 @@ __all__ = [
     "RiskGateDecision",
     "RiskGateLayer",
     "RiskGateResult",
+    "RollMode",
     "ShareClass",
     "StakeInstruction",
     "StakingMethod",
@@ -198,7 +216,11 @@ __all__ = [
     "VenueFeature",
     "VenueRoutingMode",
     "VenueType",
+    "all_capabilities",
+    "archetypes_for_pair",
+    "archetypes_for_venue",
     "availability_for",
+    "capability_for",
     "is_venue_token",
     "maturity_rank",
     "slots_visible_to",
