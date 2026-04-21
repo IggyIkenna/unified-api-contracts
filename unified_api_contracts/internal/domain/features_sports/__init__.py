@@ -53,6 +53,7 @@ from ._features_xg_advanced_market import (
     XGFeaturesMixin,
 )
 from .feature_vector import SportsFeatureVector
+from .fixture_features import FixtureFeatures
 
 
 class HalfTimeFeatureRecord(BaseModel):
@@ -247,6 +248,7 @@ class SportsMLPredictionRecord(BaseModel):
 
 __all__ = [
     "AdvancedStatsFeaturesMixin",
+    "FixtureFeatures",
     "GoalTimingFeaturesMixin",
     "H2HFeaturesMixin",
     "HalfTimeFeatureRecord",

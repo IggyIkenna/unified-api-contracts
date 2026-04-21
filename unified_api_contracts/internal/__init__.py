@@ -368,6 +368,7 @@ from unified_api_contracts.internal.domain.features_delta_one import (
     validate_feature_columns_not_null,
 )
 from unified_api_contracts.internal.domain.features_sports import (
+    FixtureFeatures,
     SportsFeatureVector,
 )
 from unified_api_contracts.internal.domain.fund_administration import (
@@ -1109,6 +1110,7 @@ __all__ = [
     "FillEventMessage",
     "FillSource",
     "FixtureEventsRecord",
+    "FixtureFeatures",
     "FixtureLineupsRecord",
     "FixturePlayerStatsRecord",
     "FixtureRecord",
