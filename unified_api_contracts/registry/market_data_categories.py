@@ -634,6 +634,57 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "lending_indices": "2024-02-27",
         "oracle_prices": "2024-02-27",
     },
+    "SPARK-ETHEREUM": {
+        "lending_indices": "2024-01-01",
+        "oracle_prices": "2024-01-01",
+    },
+    # ── DeFi — Additional DEX protocols (dex_swaps + dex_pools only) ──
+    # Observed populated across sub-dim buckets 2026-04-20.
+    "SUSHISWAPV3-ETHEREUM": {"dex_swaps": "2021-11-01", "dex_pools": "2021-11-01"},
+    "SUSHISWAPV3-BASE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
+    "SUSHISWAPV3-AVALANCHE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
+    "SUSHISWAP-ARBITRUM": {"dex_swaps": "2021-08-31", "dex_pools": "2021-08-31"},
+    "PANCAKESWAPV3-ETHEREUM": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
+    "PANCAKESWAPV3-ARBITRUM": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
+    "PANCAKESWAPV3-BASE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
+    "PANCAKESWAPV3-BSC": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
+    "PANCAKESWAPV3-ZKSYNC": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
+    "CAMELOTV3-ARBITRUM": {"dex_swaps": "2023-05-01", "dex_pools": "2023-05-01"},
+    "AERODROMEV3-BASE": {"dex_swaps": "2023-08-28", "dex_pools": "2023-08-28"},
+    "VELODROMEV2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
+    "TRADER_JOEV2-AVALANCHE": {"dex_swaps": "2022-01-01", "dex_pools": "2022-01-01"},
+    # ── DeFi — Perpetual DEXes (funding + liquidations) ──
+    "GMX-ARBITRUM": {
+        "perp_funding": "2021-09-01",
+        "liquidations": "2021-09-01",
+        "oracle_prices": "2021-09-01",
+    },
+    "GMX-AVALANCHE": {
+        "perp_funding": "2021-12-31",
+        "liquidations": "2021-12-31",
+        "oracle_prices": "2021-12-31",
+    },
+    # ── DeFi — L2/Alt-chain AAVE + Compound ──
+    "AAVEV3-SCROLL": {
+        "lending_indices": "2024-07-22",
+        "oracle_prices": "2024-07-22",
+    },
+    "COMPOUNDV3-SCROLL": {
+        "lending_indices": "2024-07-22",
+        "oracle_prices": "2024-07-22",
+    },
+    "AAVEV3-ZKSYNC": {
+        "lending_indices": "2024-12-12",
+        "oracle_prices": "2024-12-12",
+    },
+    # ── DeFi — Solana ──
+    "KAMINO-SOLANA": {
+        "lending_indices": "2023-06-01",
+        "oracle_prices": "2023-06-01",
+    },
+    "MARINADE-SOLANA": {"lst_rates": "2021-08-01", "oracle_prices": "2021-08-01"},
+    "ORCA-SOLANA": {"dex_swaps": "2021-03-01", "dex_pools": "2021-03-01"},
+    "RAYDIUM-SOLANA": {"dex_swaps": "2021-02-21", "dex_pools": "2021-02-21"},
     # ── DeFi — LST/Yield protocols ──
     "LIDO-ETHEREUM": {"lst_rates": "2020-12-18", "oracle_prices": "2020-12-18"},
     "ETHERFI-ETHEREUM": {"lst_rates": "2023-11-01", "oracle_prices": "2023-11-01"},
