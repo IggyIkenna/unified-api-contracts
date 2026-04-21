@@ -87,6 +87,11 @@ from unified_api_contracts.internal.architecture_v2.service_family_scope import 
     check_service_family_scope,
     service_family_from_audience,
 )
+from unified_api_contracts.internal.architecture_v2.strategy_naming import (
+    ParsedStrategyId,
+    format_strategy_id,
+    parse_strategy_id,
+)
 from unified_api_contracts.internal.domain.strategy_service.client_registry import (
     CLIENT_REGISTRY,
     ClientDefinition,
@@ -131,6 +136,7 @@ __all__ = [
     "IntegrationDepth",
     "InternalCostLeakageError",
     "ItemRef",
+    "ParsedStrategyId",
     "Persona",
     "Phase",
     "PriceQuote",
@@ -170,7 +176,9 @@ __all__ = [
     "combo",
     "cost",
     "demo_universe",
+    "format_strategy_id",
     "known_persona_ids",
+    "parse_strategy_id",
     "prod_restrictions",
     "resolve_profile",
     "service_family_from_audience",
