@@ -8,8 +8,13 @@ from __future__ import annotations
 from enum import StrEnum
 
 
-class StrategyFamilyV2(StrEnum):
-    """8 orthogonal families — a strategy belongs to exactly one."""
+class StrategyFamily(StrEnum):
+    """8 orthogonal families — a strategy belongs to exactly one.
+
+    v1 ``StrategyFamily`` (17 values — ``BASIS_TRADE`` / ``MOMENTUM`` / …) was
+    deleted on 2026-04-21 per ``plans/active/ui_unification_v2_sanitisation_2026_04_20``
+    — this is now the only canonical name (post-v1 ``V2`` suffix drop).
+    """
 
     ML_DIRECTIONAL = "ML_DIRECTIONAL"
     RULES_DIRECTIONAL = "RULES_DIRECTIONAL"
@@ -21,8 +26,14 @@ class StrategyFamilyV2(StrEnum):
     STAT_ARB_PAIRS = "STAT_ARB_PAIRS"
 
 
-class StrategyArchetypeV2(StrEnum):
-    """18 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_)."""
+class StrategyArchetype(StrEnum):
+    """18 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
+
+    v1 ``StrategyArchetype`` (13 values — ``BASIS_TRADE`` / ``DIRECTIONAL`` / …)
+    was deleted on 2026-04-21 per
+    ``plans/active/ui_unification_v2_sanitisation_2026_04_20`` — this is now
+    the only canonical name (post-v1 ``V2`` suffix drop).
+    """
 
     ML_DIRECTIONAL_CONTINUOUS = "ML_DIRECTIONAL_CONTINUOUS"
     ML_DIRECTIONAL_EVENT_SETTLED = "ML_DIRECTIONAL_EVENT_SETTLED"
@@ -44,25 +55,25 @@ class StrategyArchetypeV2(StrEnum):
     STAT_ARB_CROSS_SECTIONAL = "STAT_ARB_CROSS_SECTIONAL"
 
 
-ARCHETYPE_TO_FAMILY: dict[StrategyArchetypeV2, StrategyFamilyV2] = {
-    StrategyArchetypeV2.ML_DIRECTIONAL_CONTINUOUS: StrategyFamilyV2.ML_DIRECTIONAL,
-    StrategyArchetypeV2.ML_DIRECTIONAL_EVENT_SETTLED: StrategyFamilyV2.ML_DIRECTIONAL,
-    StrategyArchetypeV2.RULES_DIRECTIONAL_CONTINUOUS: StrategyFamilyV2.RULES_DIRECTIONAL,
-    StrategyArchetypeV2.RULES_DIRECTIONAL_EVENT_SETTLED: StrategyFamilyV2.RULES_DIRECTIONAL,
-    StrategyArchetypeV2.CARRY_BASIS_DATED: StrategyFamilyV2.CARRY_AND_YIELD,
-    StrategyArchetypeV2.CARRY_BASIS_PERP: StrategyFamilyV2.CARRY_AND_YIELD,
-    StrategyArchetypeV2.CARRY_STAKED_BASIS: StrategyFamilyV2.CARRY_AND_YIELD,
-    StrategyArchetypeV2.CARRY_RECURSIVE_STAKED: StrategyFamilyV2.CARRY_AND_YIELD,
-    StrategyArchetypeV2.YIELD_ROTATION_LENDING: StrategyFamilyV2.CARRY_AND_YIELD,
-    StrategyArchetypeV2.YIELD_STAKING_SIMPLE: StrategyFamilyV2.CARRY_AND_YIELD,
-    StrategyArchetypeV2.ARBITRAGE_PRICE_DISPERSION: StrategyFamilyV2.ARBITRAGE_STRUCTURAL,
-    StrategyArchetypeV2.LIQUIDATION_CAPTURE: StrategyFamilyV2.ARBITRAGE_STRUCTURAL,
-    StrategyArchetypeV2.MARKET_MAKING_CONTINUOUS: StrategyFamilyV2.MARKET_MAKING,
-    StrategyArchetypeV2.MARKET_MAKING_EVENT_SETTLED: StrategyFamilyV2.MARKET_MAKING,
-    StrategyArchetypeV2.EVENT_DRIVEN: StrategyFamilyV2.EVENT_DRIVEN,
-    StrategyArchetypeV2.VOL_TRADING_OPTIONS: StrategyFamilyV2.VOL_TRADING,
-    StrategyArchetypeV2.STAT_ARB_PAIRS_FIXED: StrategyFamilyV2.STAT_ARB_PAIRS,
-    StrategyArchetypeV2.STAT_ARB_CROSS_SECTIONAL: StrategyFamilyV2.STAT_ARB_PAIRS,
+ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
+    StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS: StrategyFamily.ML_DIRECTIONAL,
+    StrategyArchetype.ML_DIRECTIONAL_EVENT_SETTLED: StrategyFamily.ML_DIRECTIONAL,
+    StrategyArchetype.RULES_DIRECTIONAL_CONTINUOUS: StrategyFamily.RULES_DIRECTIONAL,
+    StrategyArchetype.RULES_DIRECTIONAL_EVENT_SETTLED: StrategyFamily.RULES_DIRECTIONAL,
+    StrategyArchetype.CARRY_BASIS_DATED: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_BASIS_PERP: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_STAKED_BASIS: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_RECURSIVE_STAKED: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.YIELD_ROTATION_LENDING: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.YIELD_STAKING_SIMPLE: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.ARBITRAGE_PRICE_DISPERSION: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.LIQUIDATION_CAPTURE: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.MARKET_MAKING_CONTINUOUS: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.MARKET_MAKING_EVENT_SETTLED: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.EVENT_DRIVEN: StrategyFamily.EVENT_DRIVEN,
+    StrategyArchetype.VOL_TRADING_OPTIONS: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.STAT_ARB_PAIRS_FIXED: StrategyFamily.STAT_ARB_PAIRS,
+    StrategyArchetype.STAT_ARB_CROSS_SECTIONAL: StrategyFamily.STAT_ARB_PAIRS,
 }
 
 
@@ -314,8 +325,8 @@ __all__ = [
     "RiskGateLayer",
     "ShareClass",
     "StakingMethod",
-    "StrategyArchetypeV2",
-    "StrategyFamilyV2",
+    "StrategyArchetype",
+    "StrategyFamily",
     "TransferType",
     "Urgency",
     "VenueCategoryV2",

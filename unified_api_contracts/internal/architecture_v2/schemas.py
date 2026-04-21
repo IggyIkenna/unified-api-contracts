@@ -24,8 +24,8 @@ from unified_api_contracts.internal.architecture_v2.enums import (
     RiskGateDecision,
     RiskGateLayer,
     ShareClass,
-    StrategyArchetypeV2,
-    StrategyFamilyV2,
+    StrategyArchetype,
+    StrategyFamily,
     Urgency,
     VenueCategoryV2,
     VenueFeature,
@@ -144,8 +144,8 @@ class VenueCapabilityV2(BaseModel):
 
 
 class StrategyInstanceIdentity(BaseModel):
-    family: StrategyFamilyV2
-    archetype_id: StrategyArchetypeV2
+    family: StrategyFamily
+    archetype_id: StrategyArchetype
     archetype_build_version: str
     strategy_instance_id: str
     slot_version: int = 1
@@ -158,8 +158,8 @@ class StrategyInstanceIdentity(BaseModel):
 
 class StrategyInstanceDefinition(BaseModel):
     strategy_instance_id: str
-    archetype_id: StrategyArchetypeV2
-    family: StrategyFamilyV2
+    archetype_id: StrategyArchetype
+    family: StrategyFamily
     client_id: str
     capital_budget_amount: Decimal
     capital_budget_share_class: ShareClass
@@ -394,7 +394,7 @@ class RiskGateResult:
 
 
 class CompatibilityEntry(BaseModel):
-    archetype: StrategyArchetypeV2
+    archetype: StrategyArchetype
     venue_category: VenueCategoryV2
     action: InstructionActionV2
     instrument_type: str
@@ -404,56 +404,56 @@ class CompatibilityEntry(BaseModel):
 
 COMPATIBILITY_SEED: list[CompatibilityEntry] = [
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.ML_DIRECTIONAL_CONTINUOUS,
+        archetype=StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS,
         venue_category=VenueCategoryV2.CEFI,
         action=InstructionActionV2.TRADE,
         instrument_type="SPOT",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.ML_DIRECTIONAL_CONTINUOUS,
+        archetype=StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS,
         venue_category=VenueCategoryV2.CEFI,
         action=InstructionActionV2.TRADE,
         instrument_type="PERP",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.CARRY_RECURSIVE_STAKED,
+        archetype=StrategyArchetype.CARRY_RECURSIVE_STAKED,
         venue_category=VenueCategoryV2.DEFI,
         action=InstructionActionV2.ATOMIC,
         instrument_type="LEVERAGED_LENDING_LOOP",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.LIQUIDATION_CAPTURE,
+        archetype=StrategyArchetype.LIQUIDATION_CAPTURE,
         venue_category=VenueCategoryV2.DEFI,
         action=InstructionActionV2.ATOMIC,
         instrument_type="FLASH_LOAN",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.MARKET_MAKING_EVENT_SETTLED,
+        archetype=StrategyArchetype.MARKET_MAKING_EVENT_SETTLED,
         venue_category=VenueCategoryV2.SPORTS,
         action=InstructionActionV2.QUOTE,
         instrument_type="BET_BACK",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.MARKET_MAKING_EVENT_SETTLED,
+        archetype=StrategyArchetype.MARKET_MAKING_EVENT_SETTLED,
         venue_category=VenueCategoryV2.SPORTS,
         action=InstructionActionV2.QUOTE,
         instrument_type="BET_LAY",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.VOL_TRADING_OPTIONS,
+        archetype=StrategyArchetype.VOL_TRADING_OPTIONS,
         venue_category=VenueCategoryV2.CEFI,
         action=InstructionActionV2.ATOMIC,
         instrument_type="STRADDLE",
         supported=True,
     ),
     CompatibilityEntry(
-        archetype=StrategyArchetypeV2.STAT_ARB_CROSS_SECTIONAL,
+        archetype=StrategyArchetype.STAT_ARB_CROSS_SECTIONAL,
         venue_category=VenueCategoryV2.TRADFI,
         action=InstructionActionV2.ATOMIC,
         instrument_type="BASKET",

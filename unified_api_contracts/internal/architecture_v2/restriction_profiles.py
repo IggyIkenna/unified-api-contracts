@@ -88,7 +88,7 @@ QuestionnaireStrategyStyle = Literal[
     "market_making",
     "vol_trading",
 ]
-"""Strategy-style picker — mirrors ``StrategyFamilyV2`` minus the
+"""Strategy-style picker — mirrors ``StrategyFamily`` minus the
 ``stat_arb_cross_sectional`` sub-family (UX rollup for prospects)."""
 
 

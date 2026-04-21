@@ -24,7 +24,7 @@ from unified_api_contracts.internal.architecture_v2 import (
     LockState,
     Persona,
     Rule08Violation,
-    StrategyArchetypeV2,
+    StrategyArchetype,
     StrategyAvailabilityEntry,
     StrategyMaturity,
     UserContext,
@@ -46,7 +46,7 @@ def test_combo_canonical_defi_stat_arb_public() -> None:
     """Stage-3C §1.1 Ex 1 — canonical DeFi stat-arb PUBLIC slot resolves to 1 cell."""
 
     query = DimensionQuery(
-        archetype_id=StrategyArchetypeV2.STAT_ARB_PAIRS_FIXED,
+        archetype_id=StrategyArchetype.STAT_ARB_PAIRS_FIXED,
         category=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.SPOT,
         venue_id="uniswap_v3",
@@ -55,7 +55,7 @@ def test_combo_canonical_defi_stat_arb_public() -> None:
     result = combo([query])
     assert len(result) == 1
     cell = next(iter(result))
-    assert cell.archetype_id == StrategyArchetypeV2.STAT_ARB_PAIRS_FIXED
+    assert cell.archetype_id == StrategyArchetype.STAT_ARB_PAIRS_FIXED
     assert cell.category == VenueCategoryV2.DEFI
     assert cell.instrument_type == ArchetypeInstrumentType.SPOT
 
@@ -64,7 +64,7 @@ def test_combo_blocked_defi_options() -> None:
     """Stage-3C §1.1 Ex 2 — DeFi options rejected (BL-1 or mechanical reject)."""
 
     query = DimensionQuery(
-        archetype_id=StrategyArchetypeV2.VOL_TRADING_OPTIONS,
+        archetype_id=StrategyArchetype.VOL_TRADING_OPTIONS,
         category=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.OPTION,
         venue_id="uniswap_v3",
@@ -77,7 +77,7 @@ def test_combo_defi_perp_market_making_bl7() -> None:
     """Stage-3C §1.1 Ex 3 — BL-7 fires on DeFi perp market-making."""
 
     query = DimensionQuery(
-        archetype_id=StrategyArchetypeV2.MARKET_MAKING_CONTINUOUS,
+        archetype_id=StrategyArchetype.MARKET_MAKING_CONTINUOUS,
         category=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.PERP,
         venue_id="hyperliquid_dex",
@@ -91,7 +91,7 @@ def test_combo_bl10_dated_future_pending() -> None:
     """Stage-3C §1.1 Ex 4 — BL-10 fires for ``-dated-`` slot on archetype with rolling futures."""
 
     query = DimensionQuery(
-        archetype_id=StrategyArchetypeV2.ML_DIRECTIONAL_CONTINUOUS,
+        archetype_id=StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS,
         category=VenueCategoryV2.CEFI,
         instrument_type=ArchetypeInstrumentType.DATED_FUTURE,
         venue_id="deribit",
@@ -113,7 +113,7 @@ def test_combo_bl10_dated_future_pending() -> None:
 
 def _example_combo() -> Combo:
     return Combo(
-        archetype_id=StrategyArchetypeV2.STAT_ARB_PAIRS_FIXED,
+        archetype_id=StrategyArchetype.STAT_ARB_PAIRS_FIXED,
         category=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.SPOT,
     )

@@ -52,7 +52,7 @@ from unified_api_contracts.internal.architecture_v2.archetype_capability import 
     CoverageStatus,
 )
 from unified_api_contracts.internal.architecture_v2.enums import (
-    StrategyArchetypeV2,
+    StrategyArchetype,
     VenueCategoryV2,
 )
 from unified_api_contracts.internal.architecture_v2.strategy_availability import (
@@ -117,7 +117,7 @@ class Combo(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    archetype_id: StrategyArchetypeV2
+    archetype_id: StrategyArchetype
     category: VenueCategoryV2
     instrument_type: ArchetypeInstrumentType
     venue_id: str | None = None
@@ -137,7 +137,7 @@ class DimensionQuery(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    archetype_id: StrategyArchetypeV2
+    archetype_id: StrategyArchetype
     category: VenueCategoryV2
     instrument_type: ArchetypeInstrumentType
     venue_id: str | None = None
@@ -465,7 +465,7 @@ def _blocker_fires(
 
     # BL-7: DeFi perp market-making
     if (
-        capability.archetype_id == StrategyArchetypeV2.MARKET_MAKING_CONTINUOUS
+        capability.archetype_id == StrategyArchetype.MARKET_MAKING_CONTINUOUS
         and query.category == VenueCategoryV2.DEFI
         and query.instrument_type == ArchetypeInstrumentType.PERP
     ):

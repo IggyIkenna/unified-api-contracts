@@ -1,12 +1,25 @@
-"""
-Strategy Registry — SSOT for all strategy definitions.
+"""Strategy Registry (v2) — SSOT for strategy name / family / category resolution.
 
-Consumed by backend services directly (Python import) and by UI via
-the OpenAPI generation pipeline (generate_ui_reference_data.py →
-ui-reference-data.json → generated.ts).
+Backed by the v2 archetype capability matrix in
+``unified_api_contracts.internal.architecture_v2.archetype_capability``. Each
+"strategy entry" is derived from an (archetype x representative slot label)
+pair — representative slot labels are declared per cell in the manifest and
+follow the slot-label grammar ``ARCHETYPE@venue-asset-instrument-period-quote-env``.
 
-Strategy families, archetypes, allowed execution modes, and display
-names are all defined here. No other source should duplicate these.
+Consumers:
+    * ``unified_trading_library.utils.record_enricher.RecordEnricher`` — stamps
+      ``strategy_name`` / ``category`` / ``strategy_family`` on exec/pos records.
+    * ``unified_trading_api.routes.trading_analytics`` — powers
+      ``/api/trading/strategies/catalog`` (UI consumer).
+    * ``unified_trading_pm.scripts.openapi.generate_ui_reference_data`` —
+      emits ``ui-reference-data.json`` for the UI pipeline.
+
+This module also re-exports ``Category`` and ``ExecutionMode`` — narrow
+strategy-service enums that pre-date the v2 refactor and are still consumed
+by engine code (strategy-service / execution-service). The v2 canonical
+category axis is ``unified_api_contracts.internal.architecture_v2.enums.
+VenueCategoryV2`` — new code should import from there. ``Category`` is kept
+here only for the engine-side enum semantics (mode validation).
 """
 
 from __future__ import annotations
@@ -14,54 +27,37 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import StrEnum
 
-# ---------------------------------------------------------------------------
-# Enums
-# ---------------------------------------------------------------------------
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (
+    ARCHETYPE_CAPABILITY_REGISTRY,
+    ArchetypeCapability,
+    CoverageStatus,
+)
+from unified_api_contracts.internal.architecture_v2.enums import (
+    StrategyArchetype,
+    StrategyFamily,
+    VenueCategoryV2,
+)
 
-
-class StrategyFamily(StrEnum):
-    """Top-level grouping of related strategies."""
-
-    BASIS_TRADE = "BASIS_TRADE"
-    RECURSIVE_STAKED_BASIS = "RECURSIVE_STAKED_BASIS"
-    MOMENTUM = "MOMENTUM"
-    MEAN_REVERSION = "MEAN_REVERSION"
-    MARKET_MAKING = "MARKET_MAKING"
-    ARBITRAGE = "ARBITRAGE"
-    LENDING = "LENDING"
-    STAKING = "STAKING"
-    LP_PROVISION = "LP_PROVISION"
-    OPTIONS_VOL = "OPTIONS_VOL"
-    ML_DIRECTIONAL = "ML_DIRECTIONAL"
-    SPORTS_ARB = "SPORTS_ARB"
-    SPORTS_VALUE = "SPORTS_VALUE"
-    SPORTS_ML = "SPORTS_ML"
-    SPORTS_MM = "SPORTS_MM"
-    PREDICTION_ARB = "PREDICTION_ARB"
-    PREDICTION_ML = "PREDICTION_ML"
-    YIELD = "YIELD"
-
-
-class StrategyArchetype(StrEnum):
-    """Execution archetype — defines how the strategy interacts with execution."""
-
-    BASIS_TRADE = "BASIS_TRADE"
-    RECURSIVE_STAKED_BASIS = "RECURSIVE_STAKED_BASIS"
-    DIRECTIONAL = "DIRECTIONAL"
-    ML_DIRECTIONAL = "ML_DIRECTIONAL"
-    MARKET_MAKING = "MARKET_MAKING"
-    ARBITRAGE = "ARBITRAGE"
-    YIELD = "YIELD"
-    AMM_LP = "AMM_LP"
-    OPTIONS = "OPTIONS"
-    MOMENTUM = "MOMENTUM"
-    MEAN_REVERSION = "MEAN_REVERSION"
-    SPORTS_ARB = "SPORTS_ARB"
-    PREDICTION_ARB = "PREDICTION_ARB"
+__all__ = [
+    "STRATEGY_REGISTRY",
+    "Category",
+    "ExecutionMode",
+    "StrategyArchetype",
+    "StrategyDefinition",
+    "StrategyFamily",
+    "StrategyRegistry",
+    "validate_mode_for_category",
+]
 
 
 class Category(StrEnum):
-    """Asset class / domain category."""
+    """Engine-side category enum (strategy-service mode validation).
+
+    The canonical v2 category axis is ``VenueCategoryV2`` (upper-case string
+    values). ``Category`` values are kept stable for strategy-service engine
+    legacy code that maps ``Category`` → mode rules. New consumers should
+    use ``VenueCategoryV2`` (from the ``unified_api_contracts`` facade).
+    """
 
     CEFI = "CEFI"
     DEFI = "DEFI"
@@ -85,10 +81,6 @@ class ExecutionMode(StrEnum):
     EVT = "EVT"
 
 
-# ---------------------------------------------------------------------------
-# Mode enforcement rules
-# ---------------------------------------------------------------------------
-
 # Which modes are allowed per category. SCE is narrow: only CeFi/TradFi ML.
 _CATEGORY_ALLOWED_MODES: dict[Category, frozenset[ExecutionMode]] = {
     Category.DEFI: frozenset({ExecutionMode.HUF, ExecutionMode.EVT}),
@@ -107,47 +99,102 @@ def validate_mode_for_category(category: Category | str, mode: ExecutionMode | s
 
 
 # ---------------------------------------------------------------------------
-# Strategy definition
+# Strategy entry — derived from (archetype x representative slot label)
 # ---------------------------------------------------------------------------
 
 
 @dataclass(frozen=True)
 class StrategyDefinition:
-    """Single strategy definition in the registry."""
+    """Single strategy entry in the v2 registry.
+
+    Derived from ``ArchetypeCapability`` + one of its cells'
+    ``representative_slot_labels``. ``strategy_id`` is the slot label itself
+    (e.g., ``ML_DIRECTIONAL_CONTINUOUS@binance-btc-usdt-5m-usdt-prod``);
+    ``name`` is a humanised rendering.
+    """
 
     strategy_id: str
     name: str
     family: StrategyFamily
     category: Category
     archetype: StrategyArchetype
-    execution_mode: ExecutionMode
-    strategy_type: str  # Human-readable type label (e.g. "Basis Trade", "ML Directional")
-    default_timeframe: str = ""
-    version: int = 1
-    description: str = ""
-    client_id: str = ""  # Default client association (e.g. "patrick-elysium")
+    coverage_status: CoverageStatus
 
-    @property
-    def allowed_modes(self) -> frozenset[ExecutionMode]:
-        """Modes allowed for this strategy's category."""
-        return _CATEGORY_ALLOWED_MODES.get(self.category, frozenset())
+
+def _category_from_v2(v2_category: VenueCategoryV2) -> Category:
+    """Map the v2 ``VenueCategoryV2`` to the engine-side ``Category`` enum.
+
+    Both use identical upper-case string values so the translation is a 1:1
+    lookup. Kept as an explicit function so the mapping is auditable.
+    """
+    return Category(v2_category.value)
+
+
+def _humanise_slot_label(slot_label: str, archetype: StrategyArchetype) -> str:
+    """Produce a human-readable name from a slot label.
+
+    e.g., ``ML_DIRECTIONAL_CONTINUOUS@binance-btc-usdt-5m-usdt-prod`` →
+    ``"ML Directional Continuous — binance · btc-usdt · 5m"``. Best-effort
+    rendering — callers that need structured fields should parse the slot
+    label themselves.
+    """
+    if "@" not in slot_label:
+        return slot_label
+    _, body = slot_label.split("@", 1)
+    archetype_pretty = archetype.value.replace("_", " ").title()
+    return f"{archetype_pretty} — {body}"
+
+
+def _build_entries_from_capabilities(
+    capabilities: tuple[ArchetypeCapability, ...],
+) -> list[StrategyDefinition]:
+    """Flatten (archetype, cell, representative_slot_label) into entries.
+
+    A capability cell may declare 0, 1, or multiple representative slot
+    labels. Each becomes one ``StrategyDefinition``. Cells with
+    ``status == BLOCKED`` are excluded (they have no representatives).
+    """
+    entries: list[StrategyDefinition] = []
+    seen: set[str] = set()
+    for capability in capabilities:
+        family = capability.family
+        archetype = capability.archetype_id
+        for cell in capability.cells:
+            if cell.status == CoverageStatus.BLOCKED:
+                continue
+            category = _category_from_v2(cell.category)
+            for slot_label in cell.representative_slot_labels:
+                if slot_label in seen:
+                    continue
+                seen.add(slot_label)
+                entries.append(
+                    StrategyDefinition(
+                        strategy_id=slot_label,
+                        name=_humanise_slot_label(slot_label, archetype),
+                        family=family,
+                        category=category,
+                        archetype=archetype,
+                        coverage_status=cell.status,
+                    )
+                )
+    return entries
 
 
 # ---------------------------------------------------------------------------
-# Registry
+# Registry class
 # ---------------------------------------------------------------------------
 
 
 class StrategyRegistry:
-    """SSOT for all strategy definitions.
+    """SSOT for strategy lookups backed by the v2 archetype capability matrix.
 
-    Backend services import this directly. The UI receives it via the
-    OpenAPI generation pipeline (generate_ui_reference_data.py serialises
-    to JSON, UI reads from ui-reference-data.json).
+    Public methods match the pre-v2 interface (``resolve_name`` /
+    ``resolve_category`` / ``resolve_family`` / ``to_dict``) so consumers
+    migrate without signature churn.
     """
 
     def __init__(self, strategies: list[StrategyDefinition] | None = None) -> None:
-        entries = strategies or _DEFAULT_STRATEGIES
+        entries = strategies if strategies is not None else _default_entries()
         self._by_id: dict[str, StrategyDefinition] = {s.strategy_id: s for s in entries}
 
     # -- Lookups -----------------------------------------------------------
@@ -162,20 +209,33 @@ class StrategyRegistry:
         return defn.name if defn else strategy_id
 
     def resolve_family(self, strategy_id: str) -> str:
-        """Resolve strategy_id → family name. Returns empty string if not found."""
+        """Resolve strategy_id → family name. Returns empty string if not found.
+
+        Falls back to parsing the archetype prefix out of the slot label when
+        the exact ID is absent — this keeps legacy records (not in the v2
+        manifest) routable.
+        """
         defn = self._by_id.get(strategy_id)
-        return defn.family.value if defn else ""
+        if defn:
+            return defn.family.value
+        # Fallback: if the id follows the slot-label grammar (ARCHETYPE@...)
+        # look up the archetype -> family mapping.
+        if "@" in strategy_id:
+            archetype_token = strategy_id.split("@", 1)[0]
+            try:
+                archetype = StrategyArchetype(archetype_token)
+            except ValueError:
+                return ""
+            for capability in ARCHETYPE_CAPABILITY_REGISTRY:
+                if capability.archetype_id is archetype:
+                    return capability.family.value
+        return ""
 
     def resolve_category(self, strategy_id: str) -> str:
-        """Resolve strategy_id → category. Falls back to parsing ID prefix."""
+        """Resolve strategy_id → category. Empty string if unknown."""
         defn = self._by_id.get(strategy_id)
         if defn:
             return defn.category.value
-        # Fallback: parse from strategy_id prefix
-        parts = strategy_id.split("_", 1)
-        prefix = parts[0].upper() if parts else ""
-        if prefix in {c.value for c in Category}:
-            return prefix
         return ""
 
     # -- Filtering ---------------------------------------------------------
@@ -195,15 +255,6 @@ class StrategyRegistry:
         a = StrategyArchetype(archetype) if isinstance(archetype, str) else archetype
         return [s for s in self._by_id.values() if s.archetype == a]
 
-    # -- Validation --------------------------------------------------------
-
-    def validate_mode(self, strategy_id: str, mode: str) -> bool:
-        """Check if a mode is valid for a registered strategy."""
-        defn = self._by_id.get(strategy_id)
-        if not defn:
-            return True  # Unknown strategy — don't block
-        return ExecutionMode(mode) in defn.allowed_modes
-
     # -- Iteration ---------------------------------------------------------
 
     def all(self) -> list[StrategyDefinition]:
@@ -212,7 +263,7 @@ class StrategyRegistry:
 
     @property
     def families(self) -> dict[str, list[StrategyDefinition]]:
-        """Strategies grouped by family."""
+        """Strategies grouped by family value."""
         result: dict[str, list[StrategyDefinition]] = {}
         for s in self._by_id.values():
             result.setdefault(s.family.value, []).append(s)
@@ -224,7 +275,13 @@ class StrategyRegistry:
     # -- Serialisation (for OpenAPI pipeline) ------------------------------
 
     def to_dict(self) -> dict[str, object]:
-        """Serialise for JSON export (used by generate_ui_reference_data.py)."""
+        """Serialise for JSON export (used by ``generate_ui_reference_data.py``).
+
+        v2 shape. Consumers that depended on v1-only fields (``execution_mode``,
+        ``strategy_type``, ``default_timeframe``, ``version``, ``description``,
+        ``client_id``) must migrate — those fields are gone. The ``coverage_status``
+        field is new.
+        """
         return {
             "strategies": [
                 {
@@ -233,609 +290,26 @@ class StrategyRegistry:
                     "family": s.family.value,
                     "category": s.category.value,
                     "archetype": s.archetype.value,
-                    "execution_mode": s.execution_mode.value,
-                    "strategy_type": s.strategy_type,
-                    "default_timeframe": s.default_timeframe,
-                    "version": s.version,
-                    "description": s.description,
-                    "client_id": s.client_id,
+                    "coverage_status": s.coverage_status.value,
                 }
                 for s in self._by_id.values()
             ],
             "families": {fam: [s.strategy_id for s in strats] for fam, strats in self.families.items()},
             "categories": [c.value for c in Category],
             "archetypes": [a.value for a in StrategyArchetype],
-            "execution_modes": [m.value for m in ExecutionMode],
+            "coverage_statuses": [st.value for st in CoverageStatus],
         }
 
 
 # ---------------------------------------------------------------------------
-# Default strategy catalogue (migrated from UI strategy-registry.ts)
-# ---------------------------------------------------------------------------
-
-_s = StrategyDefinition  # short alias for readability
-
-_DEFAULT_STRATEGIES: list[StrategyDefinition] = [
-    # ── DeFi ──────────────────────────────────────────────────────────────
-    _s(
-        "DEFI_ETH_BASIS_HUF_1H",
-        "ETH Basis Trade",
-        StrategyFamily.BASIS_TRADE,
-        Category.DEFI,
-        StrategyArchetype.BASIS_TRADE,
-        ExecutionMode.HUF,
-        "Basis Trade",
-        "1H",
-    ),
-    _s(
-        "DEFI_ETH_REC_STAKE_HUF_1H",
-        "ETH Recursive Staked Basis",
-        StrategyFamily.RECURSIVE_STAKED_BASIS,
-        Category.DEFI,
-        StrategyArchetype.RECURSIVE_STAKED_BASIS,
-        ExecutionMode.EVT,
-        "Leveraged Basis",
-        "1H",
-    ),
-    _s(
-        "DEFI_UNI_LP_HUF_1H",
-        "Uniswap V3 LP (ETH-USDT)",
-        StrategyFamily.LP_PROVISION,
-        Category.DEFI,
-        StrategyArchetype.AMM_LP,
-        ExecutionMode.EVT,
-        "LP Provision",
-        "1H",
-    ),
-    _s(
-        "DEFI_AAVE_LEND_HUF_1D",
-        "AAVE Lending (USDT)",
-        StrategyFamily.LENDING,
-        Category.DEFI,
-        StrategyArchetype.YIELD,
-        ExecutionMode.EVT,
-        "Lending",
-        "1D",
-    ),
-    _s(
-        "DEFI_MORPHO_LEND_HUF_1D",
-        "Morpho Lending",
-        StrategyFamily.LENDING,
-        Category.DEFI,
-        StrategyArchetype.YIELD,
-        ExecutionMode.EVT,
-        "Lending",
-        "1D",
-    ),
-    _s(
-        "DEFI_WBTC_BASIS_HUF_4H",
-        "WBTC Basis Trade",
-        StrategyFamily.BASIS_TRADE,
-        Category.DEFI,
-        StrategyArchetype.BASIS_TRADE,
-        ExecutionMode.HUF,
-        "Basis Trade",
-        "4H",
-    ),
-    _s(
-        "DEFI_STETH_STAKED_BASIS_HUF_1D",
-        "stETH Staked Basis",
-        StrategyFamily.BASIS_TRADE,
-        Category.DEFI,
-        StrategyArchetype.BASIS_TRADE,
-        ExecutionMode.EVT,
-        "Staked Basis",
-        "1D",
-    ),
-    _s(
-        "DEFI_ETH_RECURSIVE_STAKED_HUF_BLOCK",
-        "ETH Recursive Staked (Acme)",
-        StrategyFamily.RECURSIVE_STAKED_BASIS,
-        Category.DEFI,
-        StrategyArchetype.RECURSIVE_STAKED_BASIS,
-        ExecutionMode.EVT,
-        "Recursive Staked Basis",
-        "BLOCK",
-    ),
-    _s(
-        "DEFI_USDC_AAVE_LEND_HUF_1H",
-        "USDC Aave Lending",
-        StrategyFamily.LENDING,
-        Category.DEFI,
-        StrategyArchetype.YIELD,
-        ExecutionMode.EVT,
-        "Lending",
-        "1H",
-    ),
-    _s(
-        "DEFI_ARB_AMM_LP_HUF_4H",
-        "ARB AMM LP",
-        StrategyFamily.LP_PROVISION,
-        Category.DEFI,
-        StrategyArchetype.AMM_LP,
-        ExecutionMode.HUF,
-        "AMM LP",
-        "4H",
-    ),
-    _s(
-        "DEFI_MATIC_AMM_LP_HUF_2H",
-        "MATIC AMM LP",
-        StrategyFamily.LP_PROVISION,
-        Category.DEFI,
-        StrategyArchetype.AMM_LP,
-        ExecutionMode.HUF,
-        "AMM LP",
-        "2H",
-    ),
-    _s(
-        "DEFI_DAI_AAVE_LEND_HUF_8H",
-        "DAI Aave Lending",
-        StrategyFamily.LENDING,
-        Category.DEFI,
-        StrategyArchetype.YIELD,
-        ExecutionMode.EVT,
-        "Lending",
-        "8H",
-    ),
-    _s(
-        "DEFI_ETH_STAKED_BASIS_HUF_1H",
-        "ETH Staked Basis (weETH + Short Perp)",
-        StrategyFamily.BASIS_TRADE,
-        Category.DEFI,
-        StrategyArchetype.BASIS_TRADE,
-        ExecutionMode.HUF,
-        "Staked Basis",
-        "1H",
-    ),
-    _s(
-        "DEFI_AAVE_SUPPLY_USDC_HUF_1H",
-        "Aave V3 USDC Supply",
-        StrategyFamily.LENDING,
-        Category.DEFI,
-        StrategyArchetype.YIELD,
-        ExecutionMode.HUF,
-        "Lending",
-        "1H",
-    ),
-    # Client-specific DeFi
-    _s(
-        "ELYSIUM_AAVE_LENDING",
-        "AAVE Lending",
-        StrategyFamily.LENDING,
-        Category.DEFI,
-        StrategyArchetype.YIELD,
-        ExecutionMode.HUF,
-        "Yield Lending",
-        "",
-        1,
-        "",
-        "patrick-elysium",
-    ),
-    _s(
-        "ELYSIUM_BASIS_TRADE",
-        "Multi-Venue Basis Trade",
-        StrategyFamily.BASIS_TRADE,
-        Category.DEFI,
-        StrategyArchetype.BASIS_TRADE,
-        ExecutionMode.HUF,
-        "Basis Trade",
-        "",
-        1,
-        "",
-        "patrick-elysium",
-    ),
-    _s(
-        "ELYSIUM_RECURSIVE_STAKED_BASIS",
-        "Recursive Staked Basis (Hedged)",
-        StrategyFamily.RECURSIVE_STAKED_BASIS,
-        Category.DEFI,
-        StrategyArchetype.RECURSIVE_STAKED_BASIS,
-        ExecutionMode.HUF,
-        "Recursive Yield",
-        "",
-        1,
-        "",
-        "patrick-elysium",
-    ),
-    # ── CeFi ──────────────────────────────────────────────────────────────
-    _s(
-        "CEFI_BTC_MM_EVT_TICK",
-        "BTC Market Making (Binance)",
-        StrategyFamily.MARKET_MAKING,
-        Category.CEFI,
-        StrategyArchetype.MARKET_MAKING,
-        ExecutionMode.EVT,
-        "Market Making",
-        "TICK",
-    ),
-    _s(
-        "CEFI_ETH_OPT_MM_EVT_TICK",
-        "ETH Options MM (Deribit)",
-        StrategyFamily.OPTIONS_VOL,
-        Category.CEFI,
-        StrategyArchetype.OPTIONS,
-        ExecutionMode.EVT,
-        "Options MM",
-        "TICK",
-    ),
-    _s(
-        "CEFI_BTC_BASIS_SCE_1H",
-        "BTC Basis (Binance-HL)",
-        StrategyFamily.BASIS_TRADE,
-        Category.CEFI,
-        StrategyArchetype.BASIS_TRADE,
-        ExecutionMode.SCE,
-        "Basis Trade",
-        "1H",
-    ),
-    _s(
-        "CEFI_BTC_ML_DIR_HUF_4H",
-        "ML Directional BTC",
-        StrategyFamily.ML_DIRECTIONAL,
-        Category.CEFI,
-        StrategyArchetype.ML_DIRECTIONAL,
-        ExecutionMode.HUF,
-        "ML Directional",
-        "4H",
-    ),
-    _s(
-        "CEFI_ETH_MOM_HUF_4H",
-        "ETH Momentum",
-        StrategyFamily.MOMENTUM,
-        Category.CEFI,
-        StrategyArchetype.MOMENTUM,
-        ExecutionMode.HUF,
-        "Momentum",
-        "4H",
-    ),
-    _s(
-        "CEFI_SOL_MOM_HUF_4H",
-        "SOL Momentum",
-        StrategyFamily.MOMENTUM,
-        Category.CEFI,
-        StrategyArchetype.MOMENTUM,
-        ExecutionMode.HUF,
-        "Momentum",
-        "4H",
-    ),
-    _s(
-        "CEFI_MULTI_ARB_SCE_TICK",
-        "Multi-Venue Arbitrage",
-        StrategyFamily.ARBITRAGE,
-        Category.CEFI,
-        StrategyArchetype.ARBITRAGE,
-        ExecutionMode.SCE,
-        "Arbitrage",
-        "TICK",
-    ),
-    _s(
-        "CEFI_AVAX_MOMENTUM_HUF_1H",
-        "AVAX Momentum",
-        StrategyFamily.MOMENTUM,
-        Category.CEFI,
-        StrategyArchetype.MOMENTUM,
-        ExecutionMode.HUF,
-        "Momentum",
-        "1H",
-    ),
-    _s(
-        "CEFI_ETH_MEAN_REV_SCE_4H",
-        "ETH Mean Reversion",
-        StrategyFamily.MEAN_REVERSION,
-        Category.CEFI,
-        StrategyArchetype.MEAN_REVERSION,
-        ExecutionMode.SCE,
-        "Mean Reversion",
-        "4H",
-    ),
-    _s(
-        "CEFI_DOGE_MM_HUF_30S",
-        "DOGE Market Making",
-        StrategyFamily.MARKET_MAKING,
-        Category.CEFI,
-        StrategyArchetype.MARKET_MAKING,
-        ExecutionMode.HUF,
-        "Market Making",
-        "30S",
-    ),
-    _s(
-        "CEFI_LINK_MOMENTUM_SCE_2H",
-        "LINK Momentum",
-        StrategyFamily.MOMENTUM,
-        Category.CEFI,
-        StrategyArchetype.MOMENTUM,
-        ExecutionMode.SCE,
-        "Momentum",
-        "2H",
-    ),
-    _s(
-        "CEFI_ARB_MEAN_REV_HUF_15M",
-        "ARB Mean Reversion",
-        StrategyFamily.MEAN_REVERSION,
-        Category.CEFI,
-        StrategyArchetype.MEAN_REVERSION,
-        ExecutionMode.HUF,
-        "Mean Reversion",
-        "15M",
-    ),
-    _s(
-        "CEFI_XRP_MM_HUF_1M",
-        "XRP Market Making",
-        StrategyFamily.MARKET_MAKING,
-        Category.CEFI,
-        StrategyArchetype.MARKET_MAKING,
-        ExecutionMode.HUF,
-        "Market Making",
-        "1M",
-    ),
-    _s(
-        "CEFI_MATIC_MOMENTUM_SCE_2H",
-        "MATIC Momentum",
-        StrategyFamily.MOMENTUM,
-        Category.CEFI,
-        StrategyArchetype.MOMENTUM,
-        ExecutionMode.SCE,
-        "Momentum",
-        "2H",
-    ),
-    _s(
-        "CEFI_SUI_MOMENTUM_HUF_1H",
-        "SUI Momentum",
-        StrategyFamily.MOMENTUM,
-        Category.CEFI,
-        StrategyArchetype.MOMENTUM,
-        ExecutionMode.HUF,
-        "Momentum",
-        "1H",
-    ),
-    # ── TradFi ────────────────────────────────────────────────────────────
-    _s(
-        "TRADFI_SPY_MOM_HUF_1D",
-        "SPY ML Directional",
-        StrategyFamily.ML_DIRECTIONAL,
-        Category.TRADFI,
-        StrategyArchetype.DIRECTIONAL,
-        ExecutionMode.HUF,
-        "ML Directional",
-        "1D",
-    ),
-    _s(
-        "TRADFI_BOND_MEAN_REV_HUF_1D",
-        "Bond Mean Reversion",
-        StrategyFamily.MEAN_REVERSION,
-        Category.TRADFI,
-        StrategyArchetype.MEAN_REVERSION,
-        ExecutionMode.HUF,
-        "Mean Reversion",
-        "1D",
-    ),
-    _s(
-        "TRADFI_ES_ML_DIR_SCE_30M",
-        "ES ML Directional",
-        StrategyFamily.ML_DIRECTIONAL,
-        Category.TRADFI,
-        StrategyArchetype.ML_DIRECTIONAL,
-        ExecutionMode.SCE,
-        "ML Directional",
-        "30M",
-    ),
-    _s(
-        "TRADFI_SPY_OPTIONS_ML_EVT_1D",
-        "SPY Options ML",
-        StrategyFamily.OPTIONS_VOL,
-        Category.TRADFI,
-        StrategyArchetype.OPTIONS,
-        ExecutionMode.EVT,
-        "Options ML",
-        "1D",
-    ),
-    _s(
-        "TRADFI_CL_ML_DIR_SCE_1H",
-        "Crude Oil ML Directional",
-        StrategyFamily.ML_DIRECTIONAL,
-        Category.TRADFI,
-        StrategyArchetype.ML_DIRECTIONAL,
-        ExecutionMode.SCE,
-        "ML Directional",
-        "1H",
-    ),
-    _s(
-        "TRADFI_GC_MM_OPTIONS_EVT_TICK",
-        "Gold Options MM",
-        StrategyFamily.OPTIONS_VOL,
-        Category.TRADFI,
-        StrategyArchetype.OPTIONS,
-        ExecutionMode.EVT,
-        "Options MM",
-        "TICK",
-    ),
-    _s(
-        "TRADFI_ZN_OPTIONS_ML_SCE_4H",
-        "Treasury Options ML",
-        StrategyFamily.OPTIONS_VOL,
-        Category.TRADFI,
-        StrategyArchetype.OPTIONS,
-        ExecutionMode.SCE,
-        "Options ML",
-        "4H",
-    ),
-    _s(
-        "TRADFI_SI_ML_DIR_SCE_2H",
-        "Silver ML Directional",
-        StrategyFamily.ML_DIRECTIONAL,
-        Category.TRADFI,
-        StrategyArchetype.ML_DIRECTIONAL,
-        ExecutionMode.SCE,
-        "ML Directional",
-        "2H",
-    ),
-    _s(
-        "TRADFI_QQQ_MM_OPTIONS_EVT_5M",
-        "QQQ Options MM",
-        StrategyFamily.OPTIONS_VOL,
-        Category.TRADFI,
-        StrategyArchetype.OPTIONS,
-        ExecutionMode.EVT,
-        "Options MM",
-        "5M",
-    ),
-    _s(
-        "TRADFI_EURUSD_ML_DIR_SCE_1H",
-        "EUR/USD ML Directional",
-        StrategyFamily.ML_DIRECTIONAL,
-        Category.TRADFI,
-        StrategyArchetype.ML_DIRECTIONAL,
-        ExecutionMode.SCE,
-        "ML Directional",
-        "1H",
-    ),
-    _s(
-        "TRADFI_HG_OPTIONS_ML_SCE_1D",
-        "Copper Options ML",
-        StrategyFamily.OPTIONS_VOL,
-        Category.TRADFI,
-        StrategyArchetype.OPTIONS,
-        ExecutionMode.SCE,
-        "Options ML",
-        "1D",
-    ),
-    # ── Sports ────────────────────────────────────────────────────────────
-    _s(
-        "SPORTS_NFL_ARB_SCE_GAME",
-        "Football Cross-Book Arb",
-        StrategyFamily.SPORTS_ARB,
-        Category.SPORTS,
-        StrategyArchetype.SPORTS_ARB,
-        ExecutionMode.EVT,
-        "Arbitrage",
-        "GAME",
-    ),
-    _s(
-        "SPORTS_NBA_ML_HUF_GAME",
-        "NBA Halftime ML",
-        StrategyFamily.SPORTS_ML,
-        Category.SPORTS,
-        StrategyArchetype.DIRECTIONAL,
-        ExecutionMode.HUF,
-        "Sports ML",
-        "GAME",
-    ),
-    _s(
-        "SPORTS_EPL_ARB_EVT_MATCH",
-        "EPL Cross-Book Arb",
-        StrategyFamily.SPORTS_ARB,
-        Category.SPORTS,
-        StrategyArchetype.SPORTS_ARB,
-        ExecutionMode.EVT,
-        "Arbitrage",
-        "MATCH",
-    ),
-    _s(
-        "SPORTS_NFL_VALUE_BET_EVT_GAME",
-        "NFL Value Betting",
-        StrategyFamily.SPORTS_VALUE,
-        Category.SPORTS,
-        StrategyArchetype.SPORTS_ARB,
-        ExecutionMode.EVT,
-        "Value Betting",
-        "GAME",
-    ),
-    _s(
-        "SPORTS_LALIGA_ML_EVT_MATCH",
-        "La Liga ML Sports",
-        StrategyFamily.SPORTS_ML,
-        Category.SPORTS,
-        StrategyArchetype.SPORTS_ARB,
-        ExecutionMode.EVT,
-        "Sports ML",
-        "MATCH",
-    ),
-    _s(
-        "SPORTS_NBA_MM_EVT_QUARTER",
-        "NBA Market Making",
-        StrategyFamily.SPORTS_MM,
-        Category.SPORTS,
-        StrategyArchetype.MARKET_MAKING,
-        ExecutionMode.EVT,
-        "Sports MM",
-        "QUARTER",
-    ),
-    _s(
-        "SPORTS_MLB_VALUE_BET_EVT_GAME",
-        "MLB Value Betting",
-        StrategyFamily.SPORTS_VALUE,
-        Category.SPORTS,
-        StrategyArchetype.SPORTS_ARB,
-        ExecutionMode.EVT,
-        "Value Betting",
-        "GAME",
-    ),
-    _s(
-        "SPORTS_SERIE_A_ARB_EVT_MATCH",
-        "Serie A Arbitrage",
-        StrategyFamily.SPORTS_ARB,
-        Category.SPORTS,
-        StrategyArchetype.SPORTS_ARB,
-        ExecutionMode.EVT,
-        "Arbitrage",
-        "MATCH",
-    ),
-    _s(
-        "SPORTS_BETFAIR_MM_EVT_TICK",
-        "Betfair EPL Market Making",
-        StrategyFamily.SPORTS_MM,
-        Category.SPORTS,
-        StrategyArchetype.MARKET_MAKING,
-        ExecutionMode.EVT,
-        "Sports MM",
-        "TICK",
-    ),
-    # ── Prediction ────────────────────────────────────────────────────────
-    _s(
-        "PRED_POLY_ARB_SCE_1M",
-        "Prediction Market Arb",
-        StrategyFamily.PREDICTION_ARB,
-        Category.PREDICTION,
-        StrategyArchetype.PREDICTION_ARB,
-        ExecutionMode.EVT,
-        "Arbitrage",
-        "1M",
-    ),
-    _s(
-        "PRED_BTC_CEFI_ARB_SCE_5M",
-        "BTC Prediction-CeFi Arb",
-        StrategyFamily.PREDICTION_ARB,
-        Category.PREDICTION,
-        StrategyArchetype.PREDICTION_ARB,
-        ExecutionMode.EVT,
-        "Arbitrage",
-        "5M",
-    ),
-    _s(
-        "PREDICTION_POLY_ML_DIR_EVT_4H",
-        "Prediction ML Directional",
-        StrategyFamily.PREDICTION_ML,
-        Category.PREDICTION,
-        StrategyArchetype.PREDICTION_ARB,
-        ExecutionMode.EVT,
-        "ML Directional",
-        "4H",
-    ),
-    _s(
-        "PREDICTION_POLY_ARB_EVT_1H",
-        "Prediction Cross-Platform Arb",
-        StrategyFamily.PREDICTION_ARB,
-        Category.PREDICTION,
-        StrategyArchetype.PREDICTION_ARB,
-        ExecutionMode.EVT,
-        "Arbitrage",
-        "1H",
-    ),
-]
-
-# ---------------------------------------------------------------------------
 # Module-level singleton
 # ---------------------------------------------------------------------------
+
+
+def _default_entries() -> list[StrategyDefinition]:
+    """Default entries — derived once at module import from the v2 manifest."""
+    return _build_entries_from_capabilities(ARCHETYPE_CAPABILITY_REGISTRY)
+
 
 STRATEGY_REGISTRY = StrategyRegistry()
 """Module-level singleton — import this for lookups."""

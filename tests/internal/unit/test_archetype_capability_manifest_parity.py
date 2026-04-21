@@ -1,7 +1,7 @@
 """Archetype capability registry parity + structural invariants.
 
 G1.8 — guarantees the committed manifest JSON is a deterministic
-round-trip of the live registry, every ``StrategyArchetypeV2`` enum
+round-trip of the live registry, every ``StrategyArchetype`` enum
 member is represented, the family mapping matches
 ``ARCHETYPE_TO_FAMILY``, and the codex narrative markdown
 (``category-instrument-coverage.md``) contains a matching section for
@@ -27,8 +27,8 @@ from unified_api_contracts.internal.architecture_v2.archetype_capability import 
 )
 from unified_api_contracts.internal.architecture_v2.enums import (
     ARCHETYPE_TO_FAMILY,
-    StrategyArchetypeV2,
-    StrategyFamilyV2,
+    StrategyArchetype,
+    StrategyFamily,
     VenueCategoryV2,
 )
 
@@ -63,7 +63,7 @@ def test_registry_has_eighteen_archetypes() -> None:
 
 def test_every_strategy_archetype_v2_member_is_represented() -> None:
     registered = {entry.archetype_id for entry in ARCHETYPE_CAPABILITY_REGISTRY}
-    expected = set(StrategyArchetypeV2)
+    expected = set(StrategyArchetype)
     assert registered == expected, f"missing: {expected - registered}; extra: {registered - expected}"
 
 
@@ -76,7 +76,7 @@ def test_family_assignment_matches_uac_canonical_mapping() -> None:
 
 
 def test_capability_for_returns_none_for_unknown_lookup_via_filter() -> None:
-    for member in StrategyArchetypeV2:
+    for member in StrategyArchetype:
         assert capability_for(member) is not None
 
 
@@ -86,9 +86,9 @@ def test_cefi_perp_query_returns_expected_archetypes() -> None:
     result = archetypes_for_pair(VenueCategoryV2.CEFI, ArchetypeInstrumentType.PERP)
     result_ids = {entry.archetype_id for entry in result}
     # Must contain the three "obvious" archetypes — regression guard.
-    assert StrategyArchetypeV2.CARRY_BASIS_PERP in result_ids
-    assert StrategyArchetypeV2.MARKET_MAKING_CONTINUOUS in result_ids
-    assert StrategyArchetypeV2.ML_DIRECTIONAL_CONTINUOUS in result_ids
+    assert StrategyArchetype.CARRY_BASIS_PERP in result_ids
+    assert StrategyArchetype.MARKET_MAKING_CONTINUOUS in result_ids
+    assert StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS in result_ids
 
 
 def test_archetypes_for_pair_excludes_partial_when_requested() -> None:
@@ -135,12 +135,12 @@ def test_archetypes_for_venue_handles_known_venue() -> None:
 
 
 def test_event_driven_archetype_and_family_resolve_distinctly() -> None:
-    # StrategyArchetypeV2.EVENT_DRIVEN shares its token with the family
-    # StrategyFamilyV2.EVENT_DRIVEN — guard against accidental collapse.
-    entry = capability_for(StrategyArchetypeV2.EVENT_DRIVEN)
+    # StrategyArchetype.EVENT_DRIVEN shares its token with the family
+    # StrategyFamily.EVENT_DRIVEN — guard against accidental collapse.
+    entry = capability_for(StrategyArchetype.EVENT_DRIVEN)
     assert entry is not None
-    assert entry.archetype_id is StrategyArchetypeV2.EVENT_DRIVEN
-    assert entry.family is StrategyFamilyV2.EVENT_DRIVEN
+    assert entry.archetype_id is StrategyArchetype.EVENT_DRIVEN
+    assert entry.family is StrategyFamily.EVENT_DRIVEN
     assert entry.archetype_id.value == entry.family.value == "EVENT_DRIVEN"
 
 
@@ -173,14 +173,14 @@ def test_every_supported_cell_has_at_least_one_venue() -> None:
 _ARCHETYPE_HEADER_RE = re.compile(r"^###\s+\d+\.\s+`([A-Z_]+)`", re.MULTILINE)
 _FAMILY_HEADER_RE = re.compile(r"^##\s+Family\s+\d+:\s+(.+?)\s*$", re.MULTILINE)
 _FAMILY_NAME_TO_ENUM = {
-    "ML Directional": StrategyFamilyV2.ML_DIRECTIONAL,
-    "Rules Directional": StrategyFamilyV2.RULES_DIRECTIONAL,
-    "Carry & Yield": StrategyFamilyV2.CARRY_AND_YIELD,
-    "Arbitrage / Structural": StrategyFamilyV2.ARBITRAGE_STRUCTURAL,
-    "Market Making": StrategyFamilyV2.MARKET_MAKING,
-    "Event-Driven": StrategyFamilyV2.EVENT_DRIVEN,
-    "Vol Trading": StrategyFamilyV2.VOL_TRADING,
-    "Stat Arb / Pairs": StrategyFamilyV2.STAT_ARB_PAIRS,
+    "ML Directional": StrategyFamily.ML_DIRECTIONAL,
+    "Rules Directional": StrategyFamily.RULES_DIRECTIONAL,
+    "Carry & Yield": StrategyFamily.CARRY_AND_YIELD,
+    "Arbitrage / Structural": StrategyFamily.ARBITRAGE_STRUCTURAL,
+    "Market Making": StrategyFamily.MARKET_MAKING,
+    "Event-Driven": StrategyFamily.EVENT_DRIVEN,
+    "Vol Trading": StrategyFamily.VOL_TRADING,
+    "Stat Arb / Pairs": StrategyFamily.STAT_ARB_PAIRS,
 }
 
 
@@ -242,8 +242,8 @@ def test_codex_markdown_archetype_appears_under_correct_family_section() -> None
         re.MULTILINE,
     )
 
-    current_family: StrategyFamilyV2 | None = None
-    codex_family_by_archetype: dict[str, StrategyFamilyV2] = {}
+    current_family: StrategyFamily | None = None
+    codex_family_by_archetype: dict[str, StrategyFamily] = {}
     for match in family_pattern.finditer(text):
         family_name, archetype_id = match.group(1), match.group(2)
         if family_name is not None:

@@ -30,8 +30,8 @@ from typing import Final
 from pydantic import BaseModel, ConfigDict
 
 from unified_api_contracts.internal.architecture_v2.enums import (
-    StrategyArchetypeV2,
-    StrategyFamilyV2,
+    StrategyArchetype,
+    StrategyFamily,
     VenueCategoryV2,
 )
 
@@ -104,8 +104,8 @@ class ArchetypeCapability(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    archetype_id: StrategyArchetypeV2
-    family: StrategyFamilyV2
+    archetype_id: StrategyArchetype
+    family: StrategyFamily
     uses_rolling_futures: bool
     cells: tuple[ArchetypeCapabilityCell, ...]
 
@@ -147,7 +147,7 @@ def _load_registry() -> tuple[ArchetypeCapability, ...]:
 ARCHETYPE_CAPABILITY_REGISTRY: Final[tuple[ArchetypeCapability, ...]] = _load_registry()
 
 
-def capability_for(archetype_id: StrategyArchetypeV2) -> ArchetypeCapability | None:
+def capability_for(archetype_id: StrategyArchetype) -> ArchetypeCapability | None:
     """Return the capability row for ``archetype_id`` or ``None`` if absent."""
 
     for entry in ARCHETYPE_CAPABILITY_REGISTRY:
@@ -189,7 +189,7 @@ def archetypes_for_venue(venue_id: str) -> tuple[ArchetypeCapability, ...]:
     return tuple(entry for entry in ARCHETYPE_CAPABILITY_REGISTRY if venue_id in entry.supported_venues)
 
 
-def iter_cells() -> Iterator[tuple[StrategyArchetypeV2, ArchetypeCapabilityCell]]:
+def iter_cells() -> Iterator[tuple[StrategyArchetype, ArchetypeCapabilityCell]]:
     """Flat iterator over every (archetype, cell) pair. Used by serialisers."""
 
     for entry in ARCHETYPE_CAPABILITY_REGISTRY:
