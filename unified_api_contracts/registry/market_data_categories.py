@@ -559,6 +559,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
 
 # Merge the DEFI multi-chain block (extracted to defi_venue_capabilities.py
 # to keep this file under the 900-line QG ceiling).
+from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402
+    seed_for_venue_and_data_type,
+)
 from unified_api_contracts.registry.defi_venue_capabilities import (  # noqa: E402
     DEFI_VENUE_DATA_TYPE_CAPABILITIES,
 )
@@ -820,12 +823,18 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
     """MVP seed table — used when ``instruments_provider`` is None.
 
     Scope intentionally narrow: the 21 MVP base assets on SPOT dts, the
-    top-10 perps on PERPETUAL / derivative_ticker dts, and BTC / ETH on
-    options_chain / futures_chain. DEFI dts fall back to an empty tuple
-    (follow-up WAVE 8G seeds DeFi top-20 pools + top-10 Aave reserves).
+    top-10 perps on PERPETUAL / derivative_ticker dts, BTC / ETH on
+    options_chain / futures_chain, top-20 Uniswap V3 pools / top-10 Aave
+    reserves / LST tokens on DEFI dts, and top-10 Polymarket conditionIds
+    on PREDICTION dts (Wave 8G — see
+    ``registry.defi_prediction_instrument_seeds``).
     """
-    # CEFI spot_pair path
+    # CEFI spot_pair path for `trades` + `book_snapshot_5`. PREDICTION
+    # venues also write canonical `trades` (since 2026-04-19
+    # `prediction_trades` rename) so they branch off first.
     if data_type in ("trades", "book_snapshot_5"):
+        if venue in ("POLYMARKET", "KALSHI"):
+            return seed_for_venue_and_data_type(venue, data_type)
         venue_caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
         # Venues that declare both SPOT + PERPETUAL (BINANCE-FUTURES / BYBIT
         # / DERIBIT) still write `trades` for each — expand both universes.
@@ -849,8 +858,8 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
     if data_type in ("options_chain", "futures_chain"):
         return _OPTION_FUTURE_MVP_SEED_UNDERLYINGS
 
-    # DEFI + PREDICTION per-instrument dts — MVP seed is empty until WAVE 8G
-    # lands the top-20 pools / top-10 reserves / top-10 PREDICTION markets
-    # seed tables. Returning `()` keeps the aggregator denominator at the
-    # previous Tier-2 level (no regression) until the real provider is wired.
-    return ()
+    # DEFI per-instrument dts (dex_pools / dex_swaps / lending_indices /
+    # oracle_prices / lst_rates / rewards / risk_params) + PREDICTION
+    # legacy `prediction_trades` / `prediction_book_snapshot` /
+    # `prediction_market_metadata` — delegated to the Wave 8G seed module.
+    return seed_for_venue_and_data_type(venue, data_type)

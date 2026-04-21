@@ -312,11 +312,15 @@ class TestGetExpectedInstrumentsForVenueMvpSeed:
     def test_unknown_venue_returns_empty(self) -> None:
         assert get_expected_instruments_for_venue("FAKEVENUE-X", "trades") == []
 
-    def test_defi_dt_returns_empty_mvp_seed(self) -> None:
-        # WAVE 8G will seed DeFi top-N pools. MVP returns empty and the
-        # aggregator degrades to Tier-2.
-        assert get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_swaps") == []
-        assert get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices") == []
+    def test_defi_dt_returns_seeded_mvp(self) -> None:
+        # Wave 8G populated the DeFi seeds — top-20 UNI V3 ETH pools,
+        # top-10 Aave ETH reserves.
+        swaps = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_swaps")
+        assert len(swaps) == 20
+        # canonical lowercase pool addresses
+        for pool in swaps:
+            assert pool.startswith("0x") and pool.lower() == pool
+        assert len(get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices")) == 10
 
 
 class TestGetExpectedInstrumentsForVenueInjectedProvider:
@@ -385,3 +389,99 @@ class TestGetExpectedInstrumentsForVenueInjectedProvider:
             "BNB-USDT",
             "XRP-USDT",
         ]
+
+
+# ---------------------------------------------------------------------------
+# Wave 8G — DEFI + PREDICTION MVP seed tables
+# ---------------------------------------------------------------------------
+# SSOT: unified-trading-pm/codex/02-data/mtds-data-source-coverage-matrix.md § 8
+# Registry: unified_api_contracts.registry.defi_prediction_instrument_seeds
+
+from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402
+    DEFI_MVP_SEED_INSTRUMENTS,
+    PREDICTION_MVP_SEED_INSTRUMENTS,
+    seed_for_venue_and_data_type,
+)
+
+
+class TestWave8GDefiSeeds:
+    """Wave 8G DEFI seed — top-N pools / reserves / LST tokens."""
+
+    def test_uniswapv3_ethereum_dex_pools_top20(self) -> None:
+        result = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_pools")
+        assert len(result) == 20
+        # First 5 must match the observed 2026-04-14 TVL order.
+        assert result[0] == "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"  # USDC/WETH 0.05%
+        assert result[1] == "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8"  # USDC/WETH 0.3%
+        # All entries are lowercase 42-char ETH addresses.
+        for pool in result:
+            assert pool.startswith("0x") and len(pool) == 42
+            assert pool.lower() == pool
+
+    def test_uniswapv3_ethereum_dex_swaps_same_pool_set(self) -> None:
+        pools = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_pools")
+        swaps = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_swaps")
+        assert pools == swaps, "dex_pools and dex_swaps share the pool universe"
+
+    def test_aavev3_ethereum_lending_indices_top10_reserves(self) -> None:
+        result = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices")
+        assert len(result) == 10
+        # Canonical liquid reserves must be present.
+        for sym in ("USDC", "USDT", "DAI", "WETH", "WBTC", "AAVE", "LINK"):
+            assert sym in result, f"{sym} missing from Aave top-10 seed"
+
+    def test_aavev3_ethereum_dts_share_reserve_universe(self) -> None:
+        li = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices")
+        op = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "oracle_prices")
+        rw = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "rewards")
+        rp = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "risk_params")
+        assert li == op == rw == rp
+
+    def test_lst_rates_per_protocol_seed(self) -> None:
+        # Each LST protocol emits its own token set (rebase + wrapped).
+        assert get_expected_instruments_for_venue("LIDO-ETHEREUM", "lst_rates") == ["stETH", "wstETH"]
+        assert get_expected_instruments_for_venue("ETHERFI-ETHEREUM", "lst_rates") == ["eETH", "weETH"]
+        assert get_expected_instruments_for_venue("ETHENA-ETHEREUM", "lst_rates") == ["USDe", "sUSDe"]
+
+    def test_defi_venue_level_dt_still_empty(self) -> None:
+        # `perp_funding` + `liquidations` + `gas_fees` stay venue-level
+        # even on DEFI venues — must not trigger the seed path.
+        assert get_expected_instruments_for_venue("GMX-ARBITRUM", "perp_funding") == []
+        assert get_expected_instruments_for_venue("GMX-ARBITRUM", "liquidations") == []
+
+
+class TestWave8GPredictionSeeds:
+    """Wave 8G PREDICTION seed — top-N conditionIds."""
+
+    def test_polymarket_trades_top10_condition_ids(self) -> None:
+        result = get_expected_instruments_for_venue("POLYMARKET", "trades")
+        assert len(result) == 10
+        # 0x-prefixed 66-char (0x + 64 hex) conditionId hashes.
+        for cid in result:
+            assert cid.startswith("0x") and len(cid) == 66
+
+    def test_kalshi_trades_empty_until_adapter_lands(self) -> None:
+        # No live KALSHI bucket observed on 2026-04-20; seed is intentionally
+        # empty (honest-coverage "attempted_failed" / "empty_confirmed").
+        assert get_expected_instruments_for_venue("KALSHI", "trades") == []
+
+    def test_polymarket_cap_truncates(self) -> None:
+        result = get_expected_instruments_for_venue("POLYMARKET", "trades", cap=3)
+        assert len(result) == 3
+
+
+class TestWave8GSeedHelper:
+    """Direct tests on the ``seed_for_venue_and_data_type`` helper."""
+
+    def test_defi_map_entries(self) -> None:
+        assert ("UNISWAPV3-ETHEREUM", "dex_pools") in DEFI_MVP_SEED_INSTRUMENTS
+        assert ("AAVEV3-ETHEREUM", "lending_indices") in DEFI_MVP_SEED_INSTRUMENTS
+        assert ("LIDO-ETHEREUM", "lst_rates") in DEFI_MVP_SEED_INSTRUMENTS
+
+    def test_prediction_map_entries(self) -> None:
+        assert ("POLYMARKET", "trades") in PREDICTION_MVP_SEED_INSTRUMENTS
+        assert ("KALSHI", "trades") in PREDICTION_MVP_SEED_INSTRUMENTS
+
+    def test_unknown_venue_dt_returns_empty_tuple(self) -> None:
+        assert seed_for_venue_and_data_type("FAKE-CHAIN", "dex_pools") == ()
+        assert seed_for_venue_and_data_type("UNISWAPV3-ETHEREUM", "unknown_dt") == ()
