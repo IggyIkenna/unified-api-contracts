@@ -1213,6 +1213,7 @@ __all__ = [
     "entitlements_for",
     "get_data_sources_for_venue",
     "get_databento_symbols_for_venue",
+    "get_expected_bookmakers",
     "get_expected_data_types_for_venue",
     "get_provider_availability",
     "get_required_secrets",
