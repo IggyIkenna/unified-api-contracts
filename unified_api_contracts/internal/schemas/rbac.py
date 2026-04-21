@@ -92,10 +92,6 @@ class Entitlement(StrEnum):
     ML_FULL = "ml-full"
     STRATEGY_FULL = "strategy-full"
     STRATEGY_FAMILIES = "strategy-families"
-    DEFI_TRADING = "defi-trading"
-    SPORTS_TRADING = "sports-trading"
-    PREDICTIONS_TRADING = "predictions-trading"
-    OPTIONS_TRADING = "options-trading"
     REPORTING = "reporting"
     INVESTOR_RELATIONS = "investor-relations"
 
