@@ -77,6 +77,12 @@ class VenueMapping:
     # the canonical ``PROTOCOL-CHAIN`` key used here.
     all_defi_venues: list[str] = field(
         default_factory=lambda: [
+            # Naming convention: protocol versioning is collapsed (AAVEV3, not
+            # AAVE_V3; COMPOUNDV3, not COMPOUND_V3; PANCAKESWAPV3) to match
+            # the existing ``VENUE_DATA_TYPE_CAPABILITIES`` keys. The raw
+            # manifest values with underscores (``AAVE_V3``, ``COMPOUND_V3``,
+            # ``PANCAKESWAP_V3``) are resolved to these canonical names via
+            # ``normalize_defi_venue``.
             # ── Ethereum ──
             "UNISWAPV2-ETHEREUM",
             "UNISWAPV3-ETHEREUM",
@@ -84,7 +90,7 @@ class VenueMapping:
             "CURVE-ETHEREUM",
             "BALANCER-ETHEREUM",
             "AAVEV3-ETHEREUM",
-            "COMPOUND_V3-ETHEREUM",
+            "COMPOUNDV3-ETHEREUM",
             "MORPHO-ETHEREUM",
             "FLUID-ETHEREUM",
             "SPARK-ETHEREUM",
@@ -96,7 +102,7 @@ class VenueMapping:
             # ── Arbitrum ──
             "UNISWAPV3-ARBITRUM",
             "AAVEV3-ARBITRUM",
-            "COMPOUND_V3-ARBITRUM",
+            "COMPOUNDV3-ARBITRUM",
             "BALANCER-ARBITRUM",
             "SUSHISWAP-ARBITRUM",
             "PANCAKESWAPV3-ARBITRUM",
@@ -105,7 +111,7 @@ class VenueMapping:
             # ── Base ──
             "UNISWAPV3-BASE",
             "AAVEV3-BASE",
-            "COMPOUND_V3-BASE",
+            "COMPOUNDV3-BASE",
             "BALANCER-BASE",
             "MORPHO-BASE",
             "SUSHISWAPV3-BASE",
@@ -114,7 +120,7 @@ class VenueMapping:
             # ── Optimism ──
             "UNISWAPV3-OPTIMISM",
             "AAVEV3-OPTIMISM",
-            "COMPOUND_V3-OPTIMISM",
+            "COMPOUNDV3-OPTIMISM",
             "BALANCER-OPTIMISM",
             "CURVE-OPTIMISM",
             "VELODROMEV2-OPTIMISM",
@@ -122,6 +128,7 @@ class VenueMapping:
             "UNISWAPV3-POLYGON",
             "AAVEV3-POLYGON",
             "BALANCER-POLYGON",
+            "COMPOUNDV3-POLYGON",
             # ── Avalanche ──
             "AAVEV3-AVALANCHE",
             "BALANCER-AVALANCHE",
@@ -135,7 +142,7 @@ class VenueMapping:
             # ── Linea / Scroll / zkSync ──
             "AAVEV3-LINEA",
             "AAVEV3-SCROLL",
-            "COMPOUND_V3-SCROLL",
+            "COMPOUNDV3-SCROLL",
             "AAVEV3-ZKSYNC",
             "PANCAKESWAPV3-ZKSYNC",
             # ── Solana ──
@@ -185,8 +192,8 @@ class VenueMapping:
             # Lending
             "AAVE_V3": "AAVEV3-ETHEREUM",
             "AAVEV3": "AAVEV3-ETHEREUM",
-            "COMPOUND_V3": "COMPOUND_V3-ETHEREUM",
-            "COMPOUNDV3": "COMPOUND_V3-ETHEREUM",
+            "COMPOUND_V3": "COMPOUNDV3-ETHEREUM",
+            "COMPOUNDV3": "COMPOUNDV3-ETHEREUM",
             "MORPHO": "MORPHO-ETHEREUM",
             "FLUID": "FLUID-ETHEREUM",
             "SPARK": "SPARK-ETHEREUM",

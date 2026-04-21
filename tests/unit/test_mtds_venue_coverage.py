@@ -248,4 +248,4 @@ class TestMultiChainDefiExpansion:
         # Chain override flips the canonical suffix
         assert vm.normalize_defi_venue("AAVE_V3", chain="POLYGON") == "AAVEV3-POLYGON"
         assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVEV3-ARBITRUM"
-        assert vm.normalize_defi_venue("COMPOUND_V3", chain="SCROLL") == "COMPOUND_V3-SCROLL"
+        assert vm.normalize_defi_venue("COMPOUND_V3", chain="SCROLL") == "COMPOUNDV3-SCROLL"
