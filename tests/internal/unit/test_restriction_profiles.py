@@ -363,3 +363,116 @@ def test_returned_profile_keeps_extra_forbid() -> None:
     assert isinstance(profile, RestrictionProfile)
     with pytest.raises(ValidationError):
         profile.foo = "bar"  # pyright: ignore[reportAttributeAccessIssue]
+
+
+# ---------------------------------------------------------------------------
+# Reg-Umbrella axes (2026-04-21 — plan
+# `reg_umbrella_questionnaire_and_onboarding_docs_2026_04_21`)
+# ---------------------------------------------------------------------------
+
+
+def test_questionnaire_accepts_reg_umbrella_fields_populated() -> None:
+    """All 7 new Reg-Umbrella axes accept their declared types."""
+
+    qr = QuestionnaireResponse(
+        categories=("TradFi",),
+        instrument_types=("spot",),
+        strategy_style=("carry",),
+        service_family="RegUmbrella",
+        fund_structure="SMA",
+        licence_region="EU_and_UK",
+        targets_3mo="Onboard 2 client orgs; £5M AUM",
+        targets_1yr="£25M AUM; 3 live strategies",
+        targets_2yr="£100M AUM; regulatory audit passed",
+        own_mlro=False,
+        entity_jurisdiction="GB",
+        supported_currencies=("GBP", "EUR", "USD"),
+    )
+    assert qr.licence_region == "EU_and_UK"
+    assert qr.targets_3mo and "AUM" in qr.targets_3mo
+    assert qr.own_mlro is False
+    assert qr.entity_jurisdiction == "GB"
+    assert qr.supported_currencies == ("GBP", "EUR", "USD")
+
+
+def test_questionnaire_accepts_reg_umbrella_fields_omitted() -> None:
+    """Payloads authored before 2026-04-21 (no Reg-Umbrella axes) must
+    continue to validate — every new field defaults to ``None`` / ``()``.
+    This is the backwards-compat contract for all downstream consumers
+    (tempt_logic, resolve-persona, admin playback)."""
+
+    qr = QuestionnaireResponse(
+        categories=("CeFi",),
+        instrument_types=("spot",),
+        strategy_style=("ml_directional",),
+        service_family="DART",
+        fund_structure="NA",
+    )
+    assert qr.licence_region is None
+    assert qr.targets_3mo is None
+    assert qr.targets_1yr is None
+    assert qr.targets_2yr is None
+    assert qr.own_mlro is None
+    assert qr.entity_jurisdiction is None
+    assert qr.supported_currencies == ()
+
+
+def test_questionnaire_overlay_unchanged_when_reg_umbrella_populated() -> None:
+    """Regression guard — the tile-lock overlay behaviour must not change
+    when Reg-Umbrella axes are present. Overlay logic reads the 6 base
+    axes only; the new axes surface in admin UI, not persona resolution."""
+
+    base_qr = QuestionnaireResponse(
+        categories=("TradFi",),
+        instrument_types=("spot",),
+        strategy_style=("carry",),
+        service_family="RegUmbrella",
+        fund_structure="SMA",
+    )
+    enriched_qr = QuestionnaireResponse(
+        categories=("TradFi",),
+        instrument_types=("spot",),
+        strategy_style=("carry",),
+        service_family="RegUmbrella",
+        fund_structure="SMA",
+        licence_region="EU_or_UK",
+        targets_3mo="Stand up £10M SMA",
+        targets_1yr="Add two more SMAs",
+        targets_2yr="Pooled fund launch",
+        own_mlro=True,
+        entity_jurisdiction="Gibraltar",
+        supported_currencies=("GBP", "USD"),
+    )
+    base_profile = resolve_profile(_persona("prospect-dart"), questionnaire=base_qr)
+    enriched_profile = resolve_profile(_persona("prospect-dart"), questionnaire=enriched_qr)
+    assert dict(base_profile.tiles) == dict(enriched_profile.tiles)
+
+
+def test_questionnaire_rejects_unknown_licence_region() -> None:
+    """Closed enum — Pydantic must reject licence_region outside the
+    declared literal set."""
+
+    with pytest.raises(ValidationError):
+        QuestionnaireResponse(
+            categories=("TradFi",),
+            instrument_types=("spot",),
+            strategy_style=("carry",),
+            service_family="RegUmbrella",
+            fund_structure="SMA",
+            licence_region="APAC",  # pyright: ignore[reportArgumentType] — deliberately invalid
+        )
+
+
+def test_questionnaire_rejects_unknown_top_level_field() -> None:
+    """``extra='forbid'`` still holds — unknown fields raise
+    ValidationError even after the Reg-Umbrella extension."""
+
+    with pytest.raises(ValidationError):
+        QuestionnaireResponse(
+            categories=("TradFi",),
+            instrument_types=("spot",),
+            strategy_style=("carry",),
+            service_family="RegUmbrella",
+            fund_structure="SMA",
+            totally_unknown_axis="nope",  # pyright: ignore[reportCallIssue] — deliberately invalid
+        )

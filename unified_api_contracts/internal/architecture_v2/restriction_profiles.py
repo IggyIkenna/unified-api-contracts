@@ -104,35 +104,83 @@ QuestionnaireFundStructure = Literal["SMA", "Pooled", "NA"]
 Cross-ref: ``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``."""
 
 
-class QuestionnaireResponse(BaseModel):
-    """G1.10 questionnaire response — 6 axes that feed the restriction-
-    profile overlay.
+QuestionnaireLicenceRegion = Literal["EU_only", "UK_only", "EU_or_UK", "EU_and_UK", "other"]
+"""Regulatory-licence jurisdiction preference for prospects picking the
+Reg-Umbrella service family. "other" is a free-text escape hatch
+captured in ``entity_jurisdiction`` alongside."""
 
-    Every axis is required (no partial responses). ``venue_scope`` accepts
-    either the sentinel string ``"all"`` or an explicit list of venue
+
+class QuestionnaireResponse(BaseModel):
+    """G1.10 questionnaire response — 6 base axes + 7 optional Reg-Umbrella
+    axes that feed the restriction-profile overlay and populate the admin
+    organisation detail view.
+
+    The 6 base axes are always required (no partial responses). ``venue_scope``
+    accepts either the sentinel string ``"all"`` or an explicit list of venue
     IDs; the sentinel is equivalent to ``all_capabilities()`` enumeration
     for scope purposes.
+
+    The 7 Reg-Umbrella axes are optional — they are only collected in the UI
+    when ``service_family`` is ``"RegUmbrella"`` or ``"combo"``. Responses
+    authored before their introduction (2026-04-21) default to ``None`` /
+    empty tuple and must continue to validate.
 
     SSOT for axis values:
     - Categories + instrument types:
       ``codex/09-strategy/architecture-v2/category-instrument-coverage.md``
     - Service family: ``codex/14-playbooks/_ssot-rules/12-service-family-scope-rules.md``
     - Fund structure: ``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``
+    - Reg-Umbrella plan: ``plans/active/reg_umbrella_questionnaire_and_onboarding_docs_2026_04_21.plan.md``
 
     The overlay logic in :func:`_apply_questionnaire_override` widens
     tile-level padlocks for vague responses (empty categories = fall back
     to base profile) and tightens them for narrow responses (single
-    category = hide tiles irrelevant to that category).
+    category = hide tiles irrelevant to that category). The Reg-Umbrella
+    axes are read by admin UI only; they do not participate in persona
+    resolution or tile-lock overlay today.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    # ── Base 6 axes (required) ────────────────────────────────────────────
     categories: tuple[QuestionnaireCategory, ...]
     instrument_types: tuple[QuestionnaireInstrumentType, ...]
     venue_scope: tuple[str, ...] | Literal["all"] = "all"
     strategy_style: tuple[QuestionnaireStrategyStyle, ...]
     service_family: QuestionnaireServiceFamily
     fund_structure: QuestionnaireFundStructure
+
+    # ── Reg-Umbrella axes (optional; only collected when service_family
+    #    ∈ {RegUmbrella, combo}) ──────────────────────────────────────────
+    licence_region: QuestionnaireLicenceRegion | None = None
+    """Regulatory licence jurisdiction the prospect wants (or is flexible
+    on). ``None`` = not asked / not applicable."""
+
+    targets_3mo: str | None = None
+    """Free-text business target for the first 3 months post-launch
+    (AUM / revenue / headcount / milestone). ``None`` = not provided."""
+
+    targets_1yr: str | None = None
+    """Free-text business target for end-of-year-1. ``None`` = not
+    provided."""
+
+    targets_2yr: str | None = None
+    """Free-text business target for end-of-year-2. ``None`` = not
+    provided."""
+
+    own_mlro: bool | None = None
+    """Does the firm supply its own MLRO (Money Laundering Reporting
+    Officer)? ``True`` = own MLRO; ``False`` = consume Odum's;
+    ``None`` = not yet decided / not asked."""
+
+    entity_jurisdiction: str | None = None
+    """Operating entity's country / jurisdiction. ISO-2 country code
+    preferred but free-text accepted for EEA sub-regions or dependent
+    territories. ``None`` = not provided."""
+
+    supported_currencies: tuple[str, ...] = ()
+    """ISO 4217 currency codes (e.g. ``("USD", "EUR", "GBP")``) the
+    prospect expects to operate in. Empty tuple = not specified."""
 
 
 class ProfileYaml(BaseModel):
