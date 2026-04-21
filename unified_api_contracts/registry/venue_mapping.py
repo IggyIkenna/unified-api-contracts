@@ -62,22 +62,87 @@ class VenueMapping:
 
     # DeFi venues — canonical PROTOCOL-CHAIN format (matches URDI CANONICAL_VENUE_TO_ADAPTER)
     # Note: HYPERLIQUID and ASTER moved to all_cefi_onchain_clob_venues
+    #
+    # Multi-chain expansion added 2026-04-20 Phase 7 — enumerated from live
+    # observations across the DEFI sub-dim buckets
+    # (``market-data-tick-{gas-fees,lending-indices,dex-{swaps,pools},
+    # oracle-prices,lst-rates,liquidations,evm-defi,solana-defi,perp-funding}-
+    # central-element-323112``). Without these entries the deployment-api
+    # data-status aggregator's honest-coverage math would miss every non-
+    # Ethereum venue. SSOT: ``codex/02-data/mtds-data-source-coverage-
+    # matrix.md`` §4.
+    #
+    # Adapters MUST write ``venue=<PROTOCOL>`` + ``chain=<CHAIN>`` (split
+    # form). ``normalize_defi_venue(raw, chain=...)`` resolves the split to
+    # the canonical ``PROTOCOL-CHAIN`` key used here.
     all_defi_venues: list[str] = field(
         default_factory=lambda: [
-            # Ethereum DEX protocols (swaps)
+            # ── Ethereum ──
             "UNISWAPV2-ETHEREUM",
             "UNISWAPV3-ETHEREUM",
             "UNISWAPV4-ETHEREUM",
             "CURVE-ETHEREUM",
             "BALANCER-ETHEREUM",
-            # Lending protocols
             "AAVEV3-ETHEREUM",
+            "COMPOUND_V3-ETHEREUM",
             "MORPHO-ETHEREUM",
             "FLUID-ETHEREUM",
-            # LST/Yield protocols
+            "SPARK-ETHEREUM",
             "LIDO-ETHEREUM",
             "ETHERFI-ETHEREUM",
             "ETHENA-ETHEREUM",
+            "SUSHISWAPV3-ETHEREUM",
+            "PANCAKESWAPV3-ETHEREUM",
+            # ── Arbitrum ──
+            "UNISWAPV3-ARBITRUM",
+            "AAVEV3-ARBITRUM",
+            "COMPOUND_V3-ARBITRUM",
+            "BALANCER-ARBITRUM",
+            "SUSHISWAP-ARBITRUM",
+            "PANCAKESWAPV3-ARBITRUM",
+            "CAMELOTV3-ARBITRUM",
+            "GMX-ARBITRUM",
+            # ── Base ──
+            "UNISWAPV3-BASE",
+            "AAVEV3-BASE",
+            "COMPOUND_V3-BASE",
+            "BALANCER-BASE",
+            "MORPHO-BASE",
+            "SUSHISWAPV3-BASE",
+            "PANCAKESWAPV3-BASE",
+            "AERODROMEV3-BASE",
+            # ── Optimism ──
+            "UNISWAPV3-OPTIMISM",
+            "AAVEV3-OPTIMISM",
+            "COMPOUND_V3-OPTIMISM",
+            "BALANCER-OPTIMISM",
+            "CURVE-OPTIMISM",
+            "VELODROMEV2-OPTIMISM",
+            # ── Polygon ──
+            "UNISWAPV3-POLYGON",
+            "AAVEV3-POLYGON",
+            "BALANCER-POLYGON",
+            # ── Avalanche ──
+            "AAVEV3-AVALANCHE",
+            "BALANCER-AVALANCHE",
+            "CURVE-AVALANCHE",
+            "GMX-AVALANCHE",
+            "SUSHISWAPV3-AVALANCHE",
+            "TRADER_JOEV2-AVALANCHE",
+            # ── BSC ──
+            "AAVEV3-BSC",
+            "PANCAKESWAPV3-BSC",
+            # ── Linea / Scroll / zkSync ──
+            "AAVEV3-LINEA",
+            "AAVEV3-SCROLL",
+            "COMPOUND_V3-SCROLL",
+            "AAVEV3-ZKSYNC",
+            "PANCAKESWAPV3-ZKSYNC",
+            # ── Solana ──
+            "KAMINO-SOLANA",
+            "MARINADE-SOLANA",
+            "ORCA-SOLANA",
+            "RAYDIUM-SOLANA",
         ]
     )
 
@@ -92,6 +157,9 @@ class VenueMapping:
     # SSOT: codex/02-data/mtds-data-source-coverage-matrix.md §4.
     legacy_defi_venue_aliases: dict[str, str] = field(
         default_factory=lambda: {
+            # Chain-less legacy names default to ETHEREUM canonical. Callers
+            # that pass the chain kwarg via ``normalize_defi_venue(raw, chain)``
+            # get the non-Ethereum canonical (``AAVEV3-ARBITRUM`` etc).
             # DEX swap protocols
             "UNISWAP_V2": "UNISWAPV2-ETHEREUM",
             "UNISWAP_V3": "UNISWAPV3-ETHEREUM",
@@ -101,15 +169,38 @@ class VenueMapping:
             "UNISWAPV4": "UNISWAPV4-ETHEREUM",
             "CURVE": "CURVE-ETHEREUM",
             "BALANCER": "BALANCER-ETHEREUM",
+            "SUSHISWAP": "SUSHISWAP-ETHEREUM",
+            "SUSHISWAP_V3": "SUSHISWAPV3-ETHEREUM",
+            "SUSHISWAPV3": "SUSHISWAPV3-ETHEREUM",
+            "PANCAKESWAP_V3": "PANCAKESWAPV3-ETHEREUM",
+            "PANCAKESWAPV3": "PANCAKESWAPV3-ETHEREUM",
+            "CAMELOT_V3": "CAMELOTV3-ARBITRUM",
+            "CAMELOTV3": "CAMELOTV3-ARBITRUM",
+            "AERODROME_V3": "AERODROMEV3-BASE",
+            "AERODROMEV3": "AERODROMEV3-BASE",
+            "VELODROME_V2": "VELODROMEV2-OPTIMISM",
+            "VELODROMEV2": "VELODROMEV2-OPTIMISM",
+            "TRADER_JOE_V2": "TRADER_JOEV2-AVALANCHE",
+            "TRADER_JOEV2": "TRADER_JOEV2-AVALANCHE",
             # Lending
             "AAVE_V3": "AAVEV3-ETHEREUM",
             "AAVEV3": "AAVEV3-ETHEREUM",
+            "COMPOUND_V3": "COMPOUND_V3-ETHEREUM",
+            "COMPOUNDV3": "COMPOUND_V3-ETHEREUM",
             "MORPHO": "MORPHO-ETHEREUM",
             "FLUID": "FLUID-ETHEREUM",
+            "SPARK": "SPARK-ETHEREUM",
+            # Perpetual DEXes
+            "GMX": "GMX-ARBITRUM",
             # LST / yield
             "LIDO": "LIDO-ETHEREUM",
             "ETHERFI": "ETHERFI-ETHEREUM",
             "ETHENA": "ETHENA-ETHEREUM",
+            # Solana
+            "KAMINO": "KAMINO-SOLANA",
+            "MARINADE": "MARINADE-SOLANA",
+            "ORCA": "ORCA-SOLANA",
+            "RAYDIUM": "RAYDIUM-SOLANA",
         }
     )
 

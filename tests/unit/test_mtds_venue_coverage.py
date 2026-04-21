@@ -148,3 +148,104 @@ class TestNormalizeDefiVenue:
         assert vm.is_defi_venue("UNISWAP_V3")
         assert vm.is_defi_venue("AAVEV3-ETHEREUM")
         assert not vm.is_defi_venue("BINANCE-SPOT")
+
+
+class TestMultiChainDefiExpansion:
+    """Phase 7 — observed (protocol, chain) combos across DEFI sub-dim buckets.
+
+    Multi-chain venues (AAVE_V3 on Polygon/Arbitrum/Base/Avalanche/BSC/Linea/Scroll/zkSync,
+    Compound V3 on Arbitrum/Base/Optimism/Scroll, Uniswap V3 on Arbitrum/Base/Optimism/Polygon,
+    etc.) were phantom-gaps in the pre-2026-04-20 registry. Every observed non-Ethereum
+    (protocol, chain) combo now has a canonical ``PROTOCOL-CHAIN`` entry in
+    ``all_defi_venues`` + a ``normalize_defi_venue(raw, chain=...)`` aliases entry.
+    """
+
+    def test_registry_size_matches_observed_scope(self) -> None:
+        vm = VenueMapping()
+        assert len(vm.all_defi_venues) >= 50, (
+            f"expected >=50 canonical (protocol, chain) combos, got {len(vm.all_defi_venues)}"
+        )
+
+    def test_every_observed_combo_resolves(self) -> None:
+        """Every (protocol, chain) pair seen in the live DEFI buckets resolves to a registered venue."""
+        observed: list[tuple[str, str]] = [
+            # AAVE V3 wide chain coverage
+            ("AAVE_V3", "ETHEREUM"),
+            ("AAVE_V3", "POLYGON"),
+            ("AAVE_V3", "ARBITRUM"),
+            ("AAVE_V3", "BASE"),
+            ("AAVE_V3", "OPTIMISM"),
+            ("AAVE_V3", "AVALANCHE"),
+            ("AAVE_V3", "BSC"),
+            ("AAVE_V3", "LINEA"),
+            ("AAVE_V3", "SCROLL"),
+            ("AAVE_V3", "ZKSYNC"),
+            # Compound V3
+            ("COMPOUND_V3", "ETHEREUM"),
+            ("COMPOUND_V3", "ARBITRUM"),
+            ("COMPOUND_V3", "BASE"),
+            ("COMPOUND_V3", "OPTIMISM"),
+            ("COMPOUND_V3", "SCROLL"),
+            # Uniswap V3
+            ("UNISWAP_V3", "ETHEREUM"),
+            ("UNISWAP_V3", "ARBITRUM"),
+            ("UNISWAP_V3", "BASE"),
+            ("UNISWAP_V3", "OPTIMISM"),
+            ("UNISWAP_V3", "POLYGON"),
+            # Balancer
+            ("BALANCER", "ETHEREUM"),
+            ("BALANCER", "POLYGON"),
+            ("BALANCER", "ARBITRUM"),
+            ("BALANCER", "OPTIMISM"),
+            ("BALANCER", "AVALANCHE"),
+            ("BALANCER", "BASE"),
+            # Curve
+            ("CURVE", "ETHEREUM"),
+            ("CURVE", "AVALANCHE"),
+            ("CURVE", "OPTIMISM"),
+            # DEX (chain-exclusive)
+            ("AERODROME_V3", "BASE"),
+            ("CAMELOT_V3", "ARBITRUM"),
+            ("VELODROME_V2", "OPTIMISM"),
+            ("TRADER_JOE_V2", "AVALANCHE"),
+            # PancakeSwap V3
+            ("PANCAKESWAP_V3", "ETHEREUM"),
+            ("PANCAKESWAP_V3", "ARBITRUM"),
+            ("PANCAKESWAP_V3", "BASE"),
+            ("PANCAKESWAP_V3", "BSC"),
+            ("PANCAKESWAP_V3", "ZKSYNC"),
+            # SushiSwap V3
+            ("SUSHISWAP_V3", "ETHEREUM"),
+            ("SUSHISWAP_V3", "AVALANCHE"),
+            ("SUSHISWAP_V3", "BASE"),
+            # GMX
+            ("GMX", "ARBITRUM"),
+            ("GMX", "AVALANCHE"),
+            # Solana
+            ("KAMINO", "SOLANA"),
+            ("MARINADE", "SOLANA"),
+            ("ORCA", "SOLANA"),
+            ("RAYDIUM", "SOLANA"),
+            # Spark, Morpho expansion
+            ("SPARK", "ETHEREUM"),
+            ("MORPHO", "ETHEREUM"),
+            ("MORPHO", "BASE"),
+            ("FLUID", "ETHEREUM"),
+        ]
+        vm = VenueMapping()
+        missing: list[tuple[str, str, str]] = []
+        for protocol, chain in observed:
+            canonical = vm.normalize_defi_venue(protocol, chain=chain)
+            if canonical not in vm.all_defi_venues:
+                missing.append((protocol, chain, canonical))
+        assert not missing, (
+            "Observed (protocol, chain) combos did not resolve to a registered canonical "
+            f"venue — add these to all_defi_venues: {missing}"
+        )
+
+    def test_non_ethereum_chain_override(self) -> None:
+        vm = VenueMapping()
+        # Chain override flips the canonical suffix
+        assert vm.normalize_defi_venue("AAVE_V3", chain="POLYGON") == "AAVEV3-POLYGON"
+        assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVEV3-ARBITRUM"
+        assert vm.normalize_defi_venue("COMPOUND_V3", chain="SCROLL") == "COMPOUND_V3-SCROLL"
