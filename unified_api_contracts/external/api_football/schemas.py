@@ -153,7 +153,8 @@ class ApiFootballFixture(BaseModel):
     periods: ApiFootballPeriods | None = None
     league: ApiFootballLeague | None = None
     teams: dict[str, ApiFootballTeamWithWinner] | None = None
-    goals: dict[str, int] | None = None
+    # Unplayed fixtures (status NS) return {"home": null, "away": null} — must accept None.
+    goals: ApiFootballScore | None = None
     score: ApiFootballScoreFull | dict[str, object] | None = None
 
 

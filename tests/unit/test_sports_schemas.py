@@ -47,6 +47,19 @@ def test_api_football_fixture_minimal() -> None:
     assert obj.date is not None
 
 
+def test_api_football_fixture_goals_null_before_kickoff() -> None:
+    """Unplayed fixtures (NS) return null home/away goals — must parse without validation errors."""
+    obj = ApiFootballFixture.model_validate(
+        {
+            "id": 1,
+            "goals": {"home": None, "away": None},
+        }
+    )
+    assert obj.goals is not None
+    assert obj.goals.home is None
+    assert obj.goals.away is None
+
+
 def test_api_football_team_minimal() -> None:
     """ApiFootballTeam parses minimal payload."""
     obj = ApiFootballTeam.model_validate({"id": 1, "name": "Team A"})

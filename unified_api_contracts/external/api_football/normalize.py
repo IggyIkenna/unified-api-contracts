@@ -172,8 +172,17 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
             altitude=None,
         )
 
-    home_goals = raw.goals.get("home") if raw.goals and isinstance(raw.goals, dict) else None
-    away_goals = raw.goals.get("away") if raw.goals and isinstance(raw.goals, dict) else None
+    home_goals: int | None = None
+    away_goals: int | None = None
+    if raw.goals:
+        if isinstance(raw.goals, dict):
+            _h = raw.goals.get("home")
+            _a = raw.goals.get("away")
+        else:
+            _h = raw.goals.home
+            _a = raw.goals.away
+        home_goals = int(_h) if _h is not None and isinstance(_h, (int, float)) else None
+        away_goals = int(_a) if _a is not None and isinstance(_a, (int, float)) else None
     home_ht_int: int | None = None
     away_ht_int: int | None = None
     if raw.score and isinstance(raw.score, dict):
