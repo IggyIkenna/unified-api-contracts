@@ -31,5 +31,9 @@ SIZE_EXTRA_EXCLUDES=(
 )
 # requests CVE-2026-25645: no fix version available yet
 PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645"
+# UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
+# sources; the default 300s budget is too tight. 600s accommodates the combined surface
+# without masking runaway regressions (a 60% overrun would still trip).
+MAX_DURATION=600
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
