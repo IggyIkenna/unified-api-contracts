@@ -14,7 +14,6 @@ from .crosscutting.errors import CanonicalError, CanonicalRateLimitError
 from .domain import (
     BOOKMAKER_REGISTRY,
     AccountVerificationLevel,
-    get_expected_bookmakers,
     AlternativeDataSignal,
     AlternativeDataType,
     AntiDetectionLevel,
@@ -103,6 +102,7 @@ from .domain import (
     WebSocketConnectionClosed,
     WebSocketConnectionOpened,
     WebSocketEvent,
+    get_expected_bookmakers,
 )
 from .domain.execution import (
     CanonicalAccountState,
@@ -121,7 +121,6 @@ from .domain.sports.odds_canonical import american_to_decimal, decimal_to_americ
 
 __all__ = [
     "BOOKMAKER_REGISTRY",
-    "get_expected_bookmakers",
     "AccountVerificationLevel",
     "AlternativeDataSignal",
     "AlternativeDataType",
@@ -226,4 +225,5 @@ __all__ = [
     "WebSocketEvent",
     "american_to_decimal",
     "decimal_to_american",
+    "get_expected_bookmakers",
 ]

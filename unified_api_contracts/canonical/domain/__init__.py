@@ -283,7 +283,6 @@ from .sports.progressive import (
 
 __all__ = [
     "BOOKMAKER_REGISTRY",
-    "get_expected_bookmakers",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
     "RISK_TYPE_CATEGORIES",
@@ -499,4 +498,5 @@ __all__ = [
     "WebSocketConnectionOpened",
     "WebSocketEvent",
     "WithdrawalRecord",
+    "get_expected_bookmakers",
 ]

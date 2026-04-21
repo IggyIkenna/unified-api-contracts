@@ -19,6 +19,11 @@ from datetime import date, datetime
 
 import pandas as pd
 
+from unified_api_contracts.registry.defi_venues import (
+    ALL_DEFI_VENUES,
+    LEGACY_DEFI_VENUE_ALIASES,
+)
+
 
 @dataclass
 class VenueMapping:
@@ -60,156 +65,17 @@ class VenueMapping:
         ]
     )
 
-    # DeFi venues — canonical PROTOCOL-CHAIN format (matches URDI CANONICAL_VENUE_TO_ADAPTER)
-    # Note: HYPERLIQUID and ASTER moved to all_cefi_onchain_clob_venues
-    #
-    # Multi-chain expansion added 2026-04-20 Phase 7 — enumerated from live
-    # observations across the DEFI sub-dim buckets
-    # (``market-data-tick-{gas-fees,lending-indices,dex-{swaps,pools},
-    # oracle-prices,lst-rates,liquidations,evm-defi,solana-defi,perp-funding}-
-    # central-element-323112``). Without these entries the deployment-api
-    # data-status aggregator's honest-coverage math would miss every non-
-    # Ethereum venue. SSOT: ``codex/02-data/mtds-data-source-coverage-
-    # matrix.md`` §4.
-    #
-    # Adapters MUST write ``venue=<PROTOCOL>`` + ``chain=<CHAIN>`` (split
-    # form). ``normalize_defi_venue(raw, chain=...)`` resolves the split to
-    # the canonical ``PROTOCOL-CHAIN`` key used here.
-    all_defi_venues: list[str] = field(
-        default_factory=lambda: [
-            # Naming convention: protocol versioning is collapsed (AAVEV3, not
-            # AAVE_V3; COMPOUNDV3, not COMPOUND_V3; PANCAKESWAPV3) to match
-            # the existing ``VENUE_DATA_TYPE_CAPABILITIES`` keys. The raw
-            # manifest values with underscores (``AAVE_V3``, ``COMPOUND_V3``,
-            # ``PANCAKESWAP_V3``) are resolved to these canonical names via
-            # ``normalize_defi_venue``.
-            # ── Ethereum ──
-            "UNISWAPV2-ETHEREUM",
-            "UNISWAPV3-ETHEREUM",
-            "UNISWAPV4-ETHEREUM",
-            "CURVE-ETHEREUM",
-            "BALANCER-ETHEREUM",
-            "AAVEV3-ETHEREUM",
-            "COMPOUNDV3-ETHEREUM",
-            "MORPHO-ETHEREUM",
-            "FLUID-ETHEREUM",
-            "SPARK-ETHEREUM",
-            "LIDO-ETHEREUM",
-            "ETHERFI-ETHEREUM",
-            "ETHENA-ETHEREUM",
-            "SUSHISWAPV3-ETHEREUM",
-            "PANCAKESWAPV3-ETHEREUM",
-            # ── Arbitrum ──
-            "UNISWAPV3-ARBITRUM",
-            "AAVEV3-ARBITRUM",
-            "COMPOUNDV3-ARBITRUM",
-            "BALANCER-ARBITRUM",
-            "SUSHISWAP-ARBITRUM",
-            "PANCAKESWAPV3-ARBITRUM",
-            "CAMELOTV3-ARBITRUM",
-            "GMX-ARBITRUM",
-            # ── Base ──
-            "UNISWAPV3-BASE",
-            "AAVEV3-BASE",
-            "COMPOUNDV3-BASE",
-            "BALANCER-BASE",
-            "MORPHO-BASE",
-            "SUSHISWAPV3-BASE",
-            "PANCAKESWAPV3-BASE",
-            "AERODROMEV3-BASE",
-            # ── Optimism ──
-            "UNISWAPV3-OPTIMISM",
-            "AAVEV3-OPTIMISM",
-            "COMPOUNDV3-OPTIMISM",
-            "BALANCER-OPTIMISM",
-            "CURVE-OPTIMISM",
-            "VELODROMEV2-OPTIMISM",
-            # ── Polygon ──
-            "UNISWAPV3-POLYGON",
-            "AAVEV3-POLYGON",
-            "BALANCER-POLYGON",
-            "COMPOUNDV3-POLYGON",
-            # ── Avalanche ──
-            "AAVEV3-AVALANCHE",
-            "BALANCER-AVALANCHE",
-            "CURVE-AVALANCHE",
-            "GMX-AVALANCHE",
-            "SUSHISWAPV3-AVALANCHE",
-            "TRADER_JOEV2-AVALANCHE",
-            # ── BSC ──
-            "AAVEV3-BSC",
-            "PANCAKESWAPV3-BSC",
-            # ── Linea / Scroll / zkSync ──
-            "AAVEV3-LINEA",
-            "AAVEV3-SCROLL",
-            "COMPOUNDV3-SCROLL",
-            "AAVEV3-ZKSYNC",
-            "PANCAKESWAPV3-ZKSYNC",
-            # ── Solana ──
-            "KAMINO-SOLANA",
-            "MARINADE-SOLANA",
-            "ORCA-SOLANA",
-            "RAYDIUM-SOLANA",
-        ]
-    )
+    # DeFi venues — canonical PROTOCOL-CHAIN format (matches URDI
+    # CANONICAL_VENUE_TO_ADAPTER). Data moved to ``defi_venues.py`` to keep
+    # this file under the 900-line QG cap — see ALL_DEFI_VENUES +
+    # LEGACY_DEFI_VENUE_ALIASES there. Note: HYPERLIQUID and ASTER live in
+    # all_cefi_onchain_clob_venues.
+    all_defi_venues: list[str] = field(default_factory=lambda: list(ALL_DEFI_VENUES))
 
-    # Legacy → canonical DeFi venue name mapping. Manifests written before the
-    # 2026-04 canonical PROTOCOL-CHAIN migration carry the older single-token
-    # form (``AAVE_V3``, ``UNISWAP_V2``, ``CURVE``, ``ETHENA``). Consumers that
-    # read the manifest (data-status aggregator, feature services, ML) use
-    # ``normalize_defi_venue`` below to resolve either form to the canonical
-    # ``AAVEV3-ETHEREUM`` / etc. Going forward new adapters MUST write the
-    # canonical form; this map is read-only backwards-compat.
-    #
-    # SSOT: codex/02-data/mtds-data-source-coverage-matrix.md §4.
-    legacy_defi_venue_aliases: dict[str, str] = field(
-        default_factory=lambda: {
-            # Chain-less legacy names default to ETHEREUM canonical. Callers
-            # that pass the chain kwarg via ``normalize_defi_venue(raw, chain)``
-            # get the non-Ethereum canonical (``AAVEV3-ARBITRUM`` etc).
-            # DEX swap protocols
-            "UNISWAP_V2": "UNISWAPV2-ETHEREUM",
-            "UNISWAP_V3": "UNISWAPV3-ETHEREUM",
-            "UNISWAP_V4": "UNISWAPV4-ETHEREUM",
-            "UNISWAPV2": "UNISWAPV2-ETHEREUM",
-            "UNISWAPV3": "UNISWAPV3-ETHEREUM",
-            "UNISWAPV4": "UNISWAPV4-ETHEREUM",
-            "CURVE": "CURVE-ETHEREUM",
-            "BALANCER": "BALANCER-ETHEREUM",
-            "SUSHISWAP": "SUSHISWAP-ETHEREUM",
-            "SUSHISWAP_V3": "SUSHISWAPV3-ETHEREUM",
-            "SUSHISWAPV3": "SUSHISWAPV3-ETHEREUM",
-            "PANCAKESWAP_V3": "PANCAKESWAPV3-ETHEREUM",
-            "PANCAKESWAPV3": "PANCAKESWAPV3-ETHEREUM",
-            "CAMELOT_V3": "CAMELOTV3-ARBITRUM",
-            "CAMELOTV3": "CAMELOTV3-ARBITRUM",
-            "AERODROME_V3": "AERODROMEV3-BASE",
-            "AERODROMEV3": "AERODROMEV3-BASE",
-            "VELODROME_V2": "VELODROMEV2-OPTIMISM",
-            "VELODROMEV2": "VELODROMEV2-OPTIMISM",
-            "TRADER_JOE_V2": "TRADER_JOEV2-AVALANCHE",
-            "TRADER_JOEV2": "TRADER_JOEV2-AVALANCHE",
-            # Lending
-            "AAVE_V3": "AAVEV3-ETHEREUM",
-            "AAVEV3": "AAVEV3-ETHEREUM",
-            "COMPOUND_V3": "COMPOUNDV3-ETHEREUM",
-            "COMPOUNDV3": "COMPOUNDV3-ETHEREUM",
-            "MORPHO": "MORPHO-ETHEREUM",
-            "FLUID": "FLUID-ETHEREUM",
-            "SPARK": "SPARK-ETHEREUM",
-            # Perpetual DEXes
-            "GMX": "GMX-ARBITRUM",
-            # LST / yield
-            "LIDO": "LIDO-ETHEREUM",
-            "ETHERFI": "ETHERFI-ETHEREUM",
-            "ETHENA": "ETHENA-ETHEREUM",
-            # Solana
-            "KAMINO": "KAMINO-SOLANA",
-            "MARINADE": "MARINADE-SOLANA",
-            "ORCA": "ORCA-SOLANA",
-            "RAYDIUM": "RAYDIUM-SOLANA",
-        }
-    )
+    # Legacy → canonical DeFi venue name mapping. Data moved to
+    # ``defi_venues.LEGACY_DEFI_VENUE_ALIASES``. SSOT:
+    # codex/02-data/mtds-data-source-coverage-matrix.md §4.
+    legacy_defi_venue_aliases: dict[str, str] = field(default_factory=lambda: dict(LEGACY_DEFI_VENUE_ALIASES))
 
     # CEFI on-chain CLOB venues (CLOB-style data, treated as CEFI for buckets)
     # These produce data identical to centralized exchanges:
