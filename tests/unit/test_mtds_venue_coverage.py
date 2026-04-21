@@ -249,3 +249,139 @@ class TestMultiChainDefiExpansion:
         assert vm.normalize_defi_venue("AAVE_V3", chain="POLYGON") == "AAVEV3-POLYGON"
         assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVEV3-ARBITRUM"
         assert vm.normalize_defi_venue("COMPOUND_V3", chain="SCROLL") == "COMPOUNDV3-SCROLL"
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 — per-instrument Tier-3 sentinel denominator tests
+# ---------------------------------------------------------------------------
+# SSOT: unified-trading-pm/plans/active/mtds_per_instrument_sentinels_2026_04_21.plan.md
+# Registry: unified_api_contracts.registry.market_data_categories
+# Accessor: get_expected_instruments_for_venue(venue, data_type, *, as_of_date, instruments_provider, cap)
+
+
+from unified_api_contracts import (  # noqa: E402
+    get_expected_instruments_for_venue,
+    is_per_instrument_shard_data_type,
+)
+
+
+class TestIsPerInstrumentShardDataType:
+    """Canonical frozenset of per-instrument shard data_types."""
+
+    def test_cefi_per_instrument_dts(self) -> None:
+        for dt in ("trades", "book_snapshot_5", "derivative_ticker", "options_chain", "futures_chain"):
+            assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
+
+    def test_venue_level_dts(self) -> None:
+        for dt in ("liquidations", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "gas_fees", "perp_funding", "odds"):
+            assert not is_per_instrument_shard_data_type(dt), f"{dt} should be venue-level"
+
+    def test_defi_per_instrument_dts(self) -> None:
+        for dt in ("dex_swaps", "dex_pools", "lending_indices", "oracle_prices", "lst_rates", "rewards", "risk_params"):
+            assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
+
+    def test_prediction_per_instrument_dts(self) -> None:
+        for dt in ("prediction_trades", "prediction_book_snapshot", "prediction_market_metadata"):
+            assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
+
+
+class TestGetExpectedInstrumentsForVenueMvpSeed:
+    """Default MVP seed path (no instruments_provider injected)."""
+
+    def test_binance_spot_trades_uses_spot_mvp_seed(self) -> None:
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades")
+        assert result, "BINANCE-SPOT trades must seed non-empty"
+        assert "BTC-USDT" in result and "ETH-USDT" in result
+        assert len(result) == 21, f"SPOT MVP seed should hold 21 assets, got {len(result)}"
+
+    def test_binance_futures_derivative_ticker_uses_perp_seed(self) -> None:
+        result = get_expected_instruments_for_venue("BINANCE-FUTURES", "derivative_ticker")
+        assert result, "BINANCE-FUTURES derivative_ticker must seed non-empty"
+        assert "BTC-PERP" in result and "ETH-PERP" in result
+
+    def test_deribit_options_chain_uses_underlyings(self) -> None:
+        result = get_expected_instruments_for_venue("DERIBIT", "options_chain")
+        assert result == ["BTC", "ETH"]
+
+    def test_venue_level_dt_returns_empty(self) -> None:
+        # `liquidations` is venue-level → caller should fall back to Tier-2
+        assert get_expected_instruments_for_venue("BINANCE-FUTURES", "liquidations") == []
+        assert get_expected_instruments_for_venue("CME", "ohlcv_1m") == []
+        assert get_expected_instruments_for_venue("CME", "tbbo") == []
+
+    def test_unknown_venue_returns_empty(self) -> None:
+        assert get_expected_instruments_for_venue("FAKEVENUE-X", "trades") == []
+
+    def test_defi_dt_returns_empty_mvp_seed(self) -> None:
+        # WAVE 8G will seed DeFi top-N pools. MVP returns empty and the
+        # aggregator degrades to Tier-2.
+        assert get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_swaps") == []
+        assert get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices") == []
+
+
+class TestGetExpectedInstrumentsForVenueInjectedProvider:
+    """Runtime provider injection path — used by MTDS orchestrator."""
+
+    def test_provider_overrides_seed(self) -> None:
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return ["CUSTOM-1", "CUSTOM-2", "CUSTOM-3"]
+
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades", instruments_provider=provider)
+        assert result == ["CUSTOM-1", "CUSTOM-2", "CUSTOM-3"]
+
+    def test_cap_trims_provider_result(self) -> None:
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return [f"INST-{i}" for i in range(200)]
+
+        result = get_expected_instruments_for_venue(
+            "BINANCE-FUTURES", "derivative_ticker", instruments_provider=provider, cap=50
+        )
+        assert len(result) == 50
+        assert result[0] == "INST-0"
+        assert result[-1] == "INST-49"
+
+    def test_cap_of_zero_returns_empty(self) -> None:
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return ["A", "B", "C"]
+
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades", instruments_provider=provider, cap=0)
+        assert result == []
+
+    def test_cap_larger_than_list_returns_full_list(self) -> None:
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return ["A", "B"]
+
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades", instruments_provider=provider, cap=500)
+        assert result == ["A", "B"]
+
+    def test_provider_returning_none_degrades_gracefully(self) -> None:
+        def provider(_venue: str, _data_type: str) -> list[str] | None:
+            return None
+
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades", instruments_provider=provider)
+        assert result == []
+
+    def test_venue_level_dt_still_empty_even_with_provider(self) -> None:
+        # Provider must not be consulted for venue-level dts — returning a
+        # non-empty list here should still be ignored.
+        def provider(_venue: str, _data_type: str) -> list[str]:
+            return ["SHOULD-NOT-APPEAR"]
+
+        result = get_expected_instruments_for_venue("BINANCE-FUTURES", "liquidations", instruments_provider=provider)
+        assert result == []
+
+    def test_mvp_seed_respects_default_cap_of_none(self) -> None:
+        # No cap → full SPOT MVP list
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades")
+        assert len(result) == 21
+
+    def test_mvp_seed_honours_cap(self) -> None:
+        result = get_expected_instruments_for_venue("BINANCE-SPOT", "trades", cap=5)
+        assert len(result) == 5
+        assert result == [
+            "BTC-USDT",
+            "ETH-USDT",
+            "SOL-USDT",
+            "BNB-USDT",
+            "XRP-USDT",
+        ]

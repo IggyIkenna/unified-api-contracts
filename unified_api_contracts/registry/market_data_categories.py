@@ -11,6 +11,8 @@ Centralized here as the system SSOT per UAC registry pattern.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+
 # Default timeframes for candle processing (used by sharding and CLI)
 TIMEFRAMES: list[str] = ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
 
@@ -797,3 +799,212 @@ def get_expected_data_types_for_venue(
     if caps:
         return sorted(caps.keys())
     return get_valid_data_types_for_venue(venue)
+
+
+# ---------------------------------------------------------------------------
+# Phase 8 — per-instrument Tier-3 sentinel denominator helpers
+# ---------------------------------------------------------------------------
+# SSOT: unified-trading-pm/codex/02-data/mtds-data-source-coverage-matrix.md
+# §§ 2, 4 and 8 (Phase 8 stretch goal — instrument-level expected).
+#
+# Per-instrument shard data_types: the adapter writes one GCS parquet per
+# instrument per day. Honest-coverage denominator must therefore be
+# (venue x data_type x instrument x date), not (venue x data_type x date).
+#
+# Venue-level shard data_types (`liquidations`, `ohlcv_*`, `tbbo`, `gas_fees`,
+# `perp_funding`, `odds`) remain per-venue x per-date and are served by
+# `get_expected_data_types_for_venue` + the Tier-2 sentinel path. Callers
+# branch on `bool(get_expected_instruments_for_venue(...))` -- truthy == Tier-3
+# fan-out, falsy == Tier-2 fan-out.
+
+_PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
+    {
+        # CEFI per-instrument shards
+        "trades",
+        "book_snapshot_5",
+        "derivative_ticker",
+        "options_chain",
+        "futures_chain",
+        # DEFI per-pool / per-market / per-asset shards
+        "dex_swaps",
+        "dex_pools",
+        "lending_indices",
+        "oracle_prices",
+        "lst_rates",
+        "rewards",
+        "risk_params",
+        # PREDICTION per-conditionId shards
+        "prediction_trades",
+        "prediction_book_snapshot",
+        "prediction_market_metadata",
+    }
+)
+
+# MVP seed instrument tables — used when no runtime `instruments_provider` is
+# injected. These caps keep the Phase 8 denominator from blowing up against
+# the full ~200-perp BINANCE-FUTURES tape during initial rollout. Operators
+# dial into Expanded / Full tiers via the `--per-instrument-sentinel-cap`
+# CLI flag once the MVP-tier rollout stabilises.
+#
+# Scope: the 21 MVP base assets (crypto majors) on SPOT_PAIR venues, and the
+# top-10 perp contracts on PERPETUAL venues. Derivative venues (OPTION /
+# FUTURE) seed with the two dominant underlyings BTC / ETH — expiry
+# expansion happens at adapter write-time, not in the sentinel denominator.
+_SPOT_MVP_SEED_INSTRUMENTS: tuple[str, ...] = (
+    "BTC-USDT",
+    "ETH-USDT",
+    "SOL-USDT",
+    "BNB-USDT",
+    "XRP-USDT",
+    "ADA-USDT",
+    "AVAX-USDT",
+    "DOT-USDT",
+    "MATIC-USDT",
+    "LINK-USDT",
+    "LTC-USDT",
+    "TRX-USDT",
+    "NEAR-USDT",
+    "ATOM-USDT",
+    "FIL-USDT",
+    "APT-USDT",
+    "ARB-USDT",
+    "OP-USDT",
+    "SUI-USDT",
+    "INJ-USDT",
+    "TIA-USDT",
+)
+
+_PERP_MVP_SEED_INSTRUMENTS: tuple[str, ...] = (
+    "BTC-PERP",
+    "ETH-PERP",
+    "SOL-PERP",
+    "BNB-PERP",
+    "XRP-PERP",
+    "ADA-PERP",
+    "AVAX-PERP",
+    "DOGE-PERP",
+    "MATIC-PERP",
+    "ARB-PERP",
+)
+
+# Derivatives (options / futures) underlyings for MVP seed — expiry series
+# expansion happens inside the adapter, not in the denominator.
+_OPTION_FUTURE_MVP_SEED_UNDERLYINGS: tuple[str, ...] = (
+    "BTC",
+    "ETH",
+)
+
+
+def is_per_instrument_shard_data_type(data_type: str) -> bool:
+    """Return True iff ``data_type`` writes one GCS shard per instrument per day.
+
+    Per-instrument dt require per-(venue, dt, instrument, date) denominators
+    in the honest-coverage aggregator (Phase 8). Venue-level dt keep the
+    Phase 6d per-(venue, dt, date) denominator.
+    """
+    return data_type in _PER_INSTRUMENT_SHARD_DATA_TYPES
+
+
+def get_expected_instruments_for_venue(
+    venue: str,
+    data_type: str,
+    *,
+    as_of_date: str | None = None,
+    instruments_provider: Callable[[str, str], list[str] | None] | None = None,
+    cap: int | None = None,
+) -> list[str]:
+    """Return the per-instrument shard denominator for ``(venue, data_type)``.
+
+    Phase 8 of the MTDS honest-coverage rollout. Callers (MTDS orchestrator,
+    deployment-api aggregator) use this to fan out Tier-3 sentinels and to
+    size the honest-coverage denominator at ``len(instruments) * len(dates)``
+    per per-instrument data_type.
+
+    Parameters
+    ----------
+    venue:
+        Canonical MTDS venue key (``BINANCE-SPOT``, ``DERIBIT``,
+        ``AAVEV3-ETHEREUM`` …) as used by ``VenueMapping``.
+    data_type:
+        Canonical MTDS data_type (``trades``, ``book_snapshot_5``,
+        ``dex_swaps`` …).
+    as_of_date:
+        ISO date (YYYY-MM-DD). Reserved for future use — today both MVP
+        seed tables and injected providers are date-agnostic, but this
+        signature keeps the door open for instrument universes that churn
+        (delisting tracking, expiry rolls).
+    instruments_provider:
+        Optional callable ``(venue, data_type) -> list[str]`` returning the
+        live instrument list from a runtime source (typically the
+        instruments-service parquet snapshot already in memory in the
+        MTDS orchestrator). When ``None``, UAC falls back to the MVP seed
+        tables below — this keeps UAC free of runtime GCS reads and makes
+        the function pure for unit tests.
+    cap:
+        Optional hard ceiling on the returned list size. The MTDS
+        orchestrator passes ``cap=_DEFAULT_PER_INSTRUMENT_SENTINEL_CAP``
+        (MVP tier = 50) to keep manifest row counts bounded.
+
+    Returns
+    -------
+    list[str]
+        Canonical instrument_ids (possibly capped). **Empty list** when
+        ``data_type`` is a venue-level (not per-instrument) shard, when the
+        venue is unknown, or when the seed tables have no entry. Callers
+        branch on truthiness: truthy → Tier-3 per-instrument fan-out;
+        falsy → Tier-2 per-(venue, data_type) fan-out.
+    """
+    del as_of_date  # reserved for future churn-tracking; not yet used
+    if data_type not in _PER_INSTRUMENT_SHARD_DATA_TYPES:
+        return []
+
+    resolved: list[str]
+    if instruments_provider is not None:
+        raw = instruments_provider(venue, data_type)
+        resolved = [] if raw is None else [str(i) for i in raw]
+    else:
+        resolved = list(_default_seed_instruments_for(venue, data_type))
+
+    if cap is not None and cap >= 0:
+        resolved = resolved[:cap]
+    return resolved
+
+
+def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]:
+    """MVP seed table — used when ``instruments_provider`` is None.
+
+    Scope intentionally narrow: the 21 MVP base assets on SPOT dts, the
+    top-10 perps on PERPETUAL / derivative_ticker dts, and BTC / ETH on
+    options_chain / futures_chain. DEFI dts fall back to an empty tuple
+    (follow-up WAVE 8G seeds DeFi top-20 pools + top-10 Aave reserves).
+    """
+    # CEFI spot_pair path
+    if data_type in ("trades", "book_snapshot_5"):
+        venue_caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
+        # Venues that declare both SPOT + PERPETUAL (BINANCE-FUTURES / BYBIT
+        # / DERIBIT) still write `trades` for each — expand both universes.
+        if venue.endswith("-SPOT") or venue in ("COINBASE-SPOT", "UPBIT", "BINANCE-SPOT"):
+            return _SPOT_MVP_SEED_INSTRUMENTS
+        if venue in ("BINANCE-FUTURES", "BYBIT", "OKX-SWAP", "HYPERLIQUID", "ASTER"):
+            return _PERP_MVP_SEED_INSTRUMENTS
+        if venue == "DERIBIT":
+            # DERIBIT writes SPOT + PERP + OPTION; on the `trades` /
+            # `book_snapshot_5` axis we seed with perps.
+            return _PERP_MVP_SEED_INSTRUMENTS
+        # Unknown venue — fall back to empty (caller degrades to Tier-2).
+        if not venue_caps:
+            return ()
+        # Default: treat as spot.
+        return _SPOT_MVP_SEED_INSTRUMENTS
+
+    if data_type == "derivative_ticker":
+        return _PERP_MVP_SEED_INSTRUMENTS
+
+    if data_type in ("options_chain", "futures_chain"):
+        return _OPTION_FUTURE_MVP_SEED_UNDERLYINGS
+
+    # DEFI + PREDICTION per-instrument dts — MVP seed is empty until WAVE 8G
+    # lands the top-20 pools / top-10 reserves / top-10 PREDICTION markets
+    # seed tables. Returning `()` keeps the aggregator denominator at the
+    # previous Tier-2 level (no regression) until the real provider is wired.
+    return ()

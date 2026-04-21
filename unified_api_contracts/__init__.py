@@ -53,7 +53,6 @@ from .canonical.crosscutting.errors import (
 )
 from .canonical.domain import (
     BOOKMAKER_REGISTRY,
-    get_expected_bookmakers,
     ODDS_API_KEY_TO_VENUE,
     ODDS_API_KEY_TO_VENUE_CATEGORY,
     RISK_TYPE_CATEGORIES,
@@ -268,6 +267,7 @@ from .canonical.domain import (
     WebSocketConnectionOpened,
     WebSocketEvent,
     WithdrawalRecord,
+    get_expected_bookmakers,
 )
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
@@ -584,12 +584,14 @@ from .registry import (
     get_databento_symbols_for_dataset,
     get_databento_symbols_for_venue,
     get_expected_data_types_for_venue,
+    get_expected_instruments_for_venue,
     get_provider_availability,
     get_required_datasets,
     get_session_times,
     get_valid_data_types_for_venue,
     get_venue_coordinates,
     get_venue_data_type_start_date,
+    is_per_instrument_shard_data_type,
     is_trading_hours,
     needs_candle_processing,
     resolve_data_type_for_feature_group,
@@ -1215,10 +1217,12 @@ __all__ = [
     "get_databento_symbols_for_venue",
     "get_expected_bookmakers",
     "get_expected_data_types_for_venue",
+    "get_expected_instruments_for_venue",
     "get_provider_availability",
     "get_required_secrets",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
+    "is_per_instrument_shard_data_type",
     "lookup_contract",
     "normalize_underlying",
     "resolve_exchange",
