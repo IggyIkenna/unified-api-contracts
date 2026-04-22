@@ -454,9 +454,11 @@ from .external.upbit.schemas import (
 from .internal.domain.client_reporting import FundNAVSnapshot
 from .internal.domain.fund_administration import (
     AllocationExecutionStatus,
+    AllocatorCashAccountView,
     AllocatorRedemption,
     AllocatorSubscription,
     ApproveSubscriptionRequest,
+    CashAccountMovement,
     FundAllocation,
     FundTransferContext,
     ProcessRedemptionRequest,
@@ -805,6 +807,7 @@ __all__ = [
     "AckSource",
     "AggregatedPosition",
     "AllocationExecutionStatus",
+    "AllocatorCashAccountView",
     "AllocatorRedemption",
     "AllocatorSubscription",
     "AlternativeDataSignal",
@@ -926,6 +929,7 @@ __all__ = [
     "CanonicalWebSocketLifecycle",
     "CanonicalWorkflowRun",
     "CanonicalYieldCurvePoint",
+    "CashAccountMovement",
     "CcxtAggTrade",
     "CcxtFundingRate",
     "CcxtMarket",

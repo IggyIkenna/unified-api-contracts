@@ -20,8 +20,10 @@ own venue accounts and do not touch this rail. See
 
 from unified_api_contracts.internal.domain.fund_administration._types import (
     AllocationExecutionStatus,
+    AllocatorCashAccountView,
     AllocatorRedemption,
     AllocatorSubscription,
+    CashAccountMovement,
     FundAllocation,
     RedemptionStatus,
     SubscriptionStatus,
@@ -40,9 +42,11 @@ from unified_api_contracts.internal.domain.fund_administration.transfer_context 
 
 __all__ = [
     "AllocationExecutionStatus",
+    "AllocatorCashAccountView",
     "AllocatorRedemption",
     "AllocatorSubscription",
     "ApproveSubscriptionRequest",
+    "CashAccountMovement",
     "FundAllocation",
     "FundTransferContext",
     "ProcessRedemptionRequest",

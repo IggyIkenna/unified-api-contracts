@@ -19,6 +19,9 @@ from unified_api_contracts.internal.domain.fund_administration import (
     AllocationExecutionStatus as AllocationExecutionStatus,
 )
 from unified_api_contracts.internal.domain.fund_administration import (
+    AllocatorCashAccountView as AllocatorCashAccountView,
+)
+from unified_api_contracts.internal.domain.fund_administration import (
     AllocatorRedemption as AllocatorRedemption,
 )
 from unified_api_contracts.internal.domain.fund_administration import (
@@ -26,6 +29,9 @@ from unified_api_contracts.internal.domain.fund_administration import (
 )
 from unified_api_contracts.internal.domain.fund_administration import (
     ApproveSubscriptionRequest as ApproveSubscriptionRequest,
+)
+from unified_api_contracts.internal.domain.fund_administration import (
+    CashAccountMovement as CashAccountMovement,
 )
 from unified_api_contracts.internal.domain.fund_administration import (
     FundAllocation as FundAllocation,
@@ -54,9 +60,11 @@ from unified_api_contracts.internal.domain.fund_administration import (
 
 __all__ = [
     "AllocationExecutionStatus",
+    "AllocatorCashAccountView",
     "AllocatorRedemption",
     "AllocatorSubscription",
     "ApproveSubscriptionRequest",
+    "CashAccountMovement",
     "FundAllocation",
     "ProcessRedemptionRequest",
     "RebalanceRequest",

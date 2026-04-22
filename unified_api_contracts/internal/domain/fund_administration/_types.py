@@ -169,3 +169,61 @@ class FundAllocation(BaseModel, frozen=True):
         default=None,
         description="UTC timestamp at which execution_status moved to COMPLETED",
     )
+
+
+class CashAccountMovement(BaseModel, frozen=True):
+    """A single row in the allocator's cash-account ledger.
+
+    Flattens a subscription or redemption lifecycle event into a chronological
+    ledger row. Consumed by `client-reporting-api` to build the allocator-facing
+    cash-account view and by the platform UI history page. Signed `amount_usd`:
+    positive for subscriptions (cash into the fund from the allocator's
+    perspective) and negative for redemptions.
+    """
+
+    reference_id: str = Field(
+        description="Subscription or redemption id this movement represents",
+    )
+    movement_type: str = Field(
+        description="'SUBSCRIPTION' or 'REDEMPTION' — which lifecycle emitted this row",
+    )
+    status: str = Field(
+        description="String form of SubscriptionStatus / RedemptionStatus at movement time",
+    )
+    amount_usd: Decimal = Field(
+        description="Signed USD — positive for SUBSCRIPTION, negative for REDEMPTION",
+    )
+    timestamp: AwareDatetime = Field(
+        description="UTC timestamp of the underlying lifecycle event (requested / settled)",
+    )
+
+
+class AllocatorCashAccountView(BaseModel, frozen=True):
+    """Derived reporting projection of an allocator's cash position in one share class.
+
+    Built by `client-reporting-api` from the allocator's subscription + redemption
+    history (sourced from `fund-administration-service`). Current-balance is
+    settled-only (pending flows never move cash). YTD aggregates include only
+    SETTLED movements. Consumed by the platform UI history page and by allocator
+    REST callers.
+    """
+
+    client_id: str = Field(description="Allocator identifier — matches AuthContext.org_id")
+    share_class: str = Field(description="Share-class key within the fund")
+    current_balance_usd: Decimal = Field(
+        description="Net settled-movement balance in USD for this client + share class",
+    )
+    subscriptions_ytd_usd: Decimal = Field(
+        description="Year-to-date settled subscription total in USD",
+    )
+    redemptions_ytd_usd: Decimal = Field(
+        description="Year-to-date settled redemption total in USD (positive magnitude)",
+    )
+    last_settlement_timestamp: AwareDatetime | None = Field(
+        default=None,
+        description="Latest settled-movement timestamp across subscriptions + redemptions",
+    )
+    movements: tuple[CashAccountMovement, ...] = Field(
+        default=(),
+        description="Chronologically sorted ledger — oldest first",
+    )
