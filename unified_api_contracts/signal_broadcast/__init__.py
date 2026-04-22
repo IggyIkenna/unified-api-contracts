@@ -35,6 +35,17 @@ SSOT plan:
 
 from __future__ import annotations
 
+# --- New surface (Phase 2a v2 per task spec) ------------------------
+# NOTE: Counterparty comes from the legacy internal.domain path during the
+# migration window — strategy-service router.py / emitter.py / audit.py still
+# reference the legacy ``schema_depth`` + ``active`` fields on the type. The
+# v2 Counterparty (with ``rate_limit_ref`` + ``CounterpartyStatus``) is reached
+# as ``CounterpartyV2`` below. Once strategy-service migrates to the v2 shape
+# the v1 class is deleted and this alias flips back.
+from unified_api_contracts.internal.domain.signal_broadcast.counterparty import (
+    Counterparty as Counterparty,
+)
+
 # --- Legacy surface (Phase 2a v1 — retained for strategy-service) ----
 from unified_api_contracts.internal.domain.signal_broadcast.emission import (
     SignalAcknowledgement as SignalAcknowledgement,
@@ -71,17 +82,6 @@ from unified_api_contracts.internal.domain.signal_broadcast.registry import (
 )
 from unified_api_contracts.internal.domain.signal_broadcast.schema_depth import (
     SchemaDepth as SchemaDepth,
-)
-
-# --- New surface (Phase 2a v2 per task spec) ------------------------
-# NOTE: Counterparty comes from the legacy internal.domain path during the
-# migration window — strategy-service router.py / emitter.py / audit.py still
-# reference the legacy ``schema_depth`` + ``active`` fields on the type. The
-# v2 Counterparty (with ``rate_limit_ref`` + ``CounterpartyStatus``) is reached
-# as ``CounterpartyV2`` below. Once strategy-service migrates to the v2 shape
-# the v1 class is deleted and this alias flips back.
-from unified_api_contracts.internal.domain.signal_broadcast.counterparty import (
-    Counterparty as Counterparty,
 )
 from unified_api_contracts.signal_broadcast.counterparty import (
     Counterparty as CounterpartyV2,
@@ -160,6 +160,7 @@ __all__ = [
     "CounterpartyEntitlement",
     "CounterpartyEntitlementProfile",
     "CounterpartyStatus",
+    "CounterpartyV2",
     "DeliveryAttempt",
     "DeliveryHealth",
     "DeliveryHealthEnvelope",
