@@ -44,6 +44,13 @@ class LeagueDefinition:
             (possession, shots, corners) for this league. Tier 0 (cups/continental)
             and Tier 1 (top national divisions) generally do. Lower tiers only get
             live score + events (goals/cards/subs) but not detailed stats.
+        expected_team_count_per_season: Optional mapping of ``season_year ->
+            expected_team_count`` used by reference-data adapters (Transfermarkt,
+            API-Football) to drift-check the size of a fetched team roster vs the
+            league's known size for that season. ``None`` means the league-level
+            override is absent; lookups fall back to the module-level seed dict
+            in ``league_data.LEAGUE_EXPECTED_TEAM_COUNTS`` (see
+            ``get_expected_team_count_for_league``).
     """
 
     league_id: str
@@ -57,6 +64,7 @@ class LeagueDefinition:
     tier: int
     classification: str
     supports_live_stats: bool = False
+    expected_team_count_per_season: dict[int, int] | None = None
 
 
 # ---------------------------------------------------------------------------
