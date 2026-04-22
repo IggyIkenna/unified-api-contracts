@@ -34,6 +34,9 @@ from unified_api_contracts.internal.domain.fund_administration.api_requests impo
     RejectRequest,
     SubscribeRequest,
 )
+from unified_api_contracts.internal.domain.fund_administration.transfer_context import (
+    FundTransferContext,
+)
 
 __all__ = [
     "AllocationExecutionStatus",
@@ -41,6 +44,7 @@ __all__ = [
     "AllocatorSubscription",
     "ApproveSubscriptionRequest",
     "FundAllocation",
+    "FundTransferContext",
     "ProcessRedemptionRequest",
     "RebalanceRequest",
     "RedeemRequest",
