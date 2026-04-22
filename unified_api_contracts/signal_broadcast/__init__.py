@@ -35,17 +35,6 @@ SSOT plan:
 
 from __future__ import annotations
 
-# --- New surface (Phase 2a v2 per task spec) ------------------------
-# NOTE: Counterparty comes from the legacy internal.domain path during the
-# migration window — strategy-service router.py / emitter.py / audit.py still
-# reference the legacy ``schema_depth`` + ``active`` fields on the type. The
-# v2 Counterparty (with ``rate_limit_ref`` + ``CounterpartyStatus``) is reached
-# as ``CounterpartyV2`` below. Once strategy-service migrates to the v2 shape
-# the v1 class is deleted and this alias flips back.
-from unified_api_contracts.internal.domain.signal_broadcast.counterparty import (
-    Counterparty as Counterparty,
-)
-
 # --- Legacy surface (Phase 2a v1 — retained for strategy-service) ----
 from unified_api_contracts.internal.domain.signal_broadcast.emission import (
     SignalAcknowledgement as SignalAcknowledgement,
@@ -63,10 +52,16 @@ from unified_api_contracts.internal.domain.signal_broadcast.payload import (
     SignalPayloadStandard as SignalPayloadStandard,
 )
 from unified_api_contracts.internal.domain.signal_broadcast.registry import (
+    COUNTERPARTY_ENTITLEMENT_PROFILES as COUNTERPARTY_ENTITLEMENT_PROFILES,
+)
+from unified_api_contracts.internal.domain.signal_broadcast.registry import (
     COUNTERPARTY_ENTITLEMENTS as COUNTERPARTY_ENTITLEMENTS,
 )
 from unified_api_contracts.internal.domain.signal_broadcast.registry import (
     COUNTERPARTY_REGISTRY as COUNTERPARTY_REGISTRY,
+)
+from unified_api_contracts.internal.domain.signal_broadcast.registry import (
+    RATE_LIMIT_CONFIGS as RATE_LIMIT_CONFIGS,
 )
 from unified_api_contracts.internal.domain.signal_broadcast.registry import (
     active_counterparties as active_counterparties,
@@ -78,13 +73,24 @@ from unified_api_contracts.internal.domain.signal_broadcast.registry import (
     entitled_slots_for as entitled_slots_for,
 )
 from unified_api_contracts.internal.domain.signal_broadcast.registry import (
+    entitlement_profile_for as entitlement_profile_for,
+)
+from unified_api_contracts.internal.domain.signal_broadcast.registry import (
     entitlements_for as entitlements_for,
+)
+from unified_api_contracts.internal.domain.signal_broadcast.registry import (
+    rate_limit_config_for as rate_limit_config_for,
 )
 from unified_api_contracts.internal.domain.signal_broadcast.schema_depth import (
     SchemaDepth as SchemaDepth,
 )
+
+# --- v2 submodule imports MUST come first so that ``internal.domain.signal_broadcast.registry``
+#     can resolve ``unified_api_contracts.signal_broadcast.counterparty`` etc. without
+#     a circular-import partially-initialised ImportError. Registry seed below depends
+#     on these classes being registered on the facade package namespace.
 from unified_api_contracts.signal_broadcast.counterparty import (
-    Counterparty as CounterpartyV2,
+    Counterparty as Counterparty,
 )
 from unified_api_contracts.signal_broadcast.counterparty import (
     CounterpartyStatus as CounterpartyStatus,
@@ -152,7 +158,9 @@ from unified_api_contracts.signal_broadcast.signal_payload import (
 
 __all__ = [
     "COUNTERPARTY_ENTITLEMENTS",
+    "COUNTERPARTY_ENTITLEMENT_PROFILES",
     "COUNTERPARTY_REGISTRY",
+    "RATE_LIMIT_CONFIGS",
     "AckSource",
     "BacktestPaperLiveEnvelope",
     "BacktestPaperLiveRow",
@@ -160,7 +168,6 @@ __all__ = [
     "CounterpartyEntitlement",
     "CounterpartyEntitlementProfile",
     "CounterpartyStatus",
-    "CounterpartyV2",
     "DeliveryAttempt",
     "DeliveryHealth",
     "DeliveryHealthEnvelope",
@@ -185,5 +192,7 @@ __all__ = [
     "active_counterparties",
     "counterparty_for",
     "entitled_slots_for",
+    "entitlement_profile_for",
     "entitlements_for",
+    "rate_limit_config_for",
 ]
