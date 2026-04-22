@@ -1,0 +1,4014 @@
+{
+  "EMIRATES_STADIUM": {
+    "latitude": 51.5549,
+    "longitude": -0.1084
+  },
+  "VILLA_PARK": {
+    "latitude": 52.5092,
+    "longitude": -1.8847
+  },
+  "VITALITY_STADIUM": {
+    "latitude": 50.7352,
+    "longitude": -1.8384
+  },
+  "AMEX_STADIUM": {
+    "latitude": 50.8616,
+    "longitude": -0.0837
+  },
+  "AMERICAN_EXPRESS_COMMUNITY_STADIUM": {
+    "latitude": 50.8616,
+    "longitude": -0.0837
+  },
+  "TURF_MOOR": {
+    "latitude": 53.789,
+    "longitude": -2.2302
+  },
+  "STAMFORD_BRIDGE": {
+    "latitude": 51.4817,
+    "longitude": -0.191
+  },
+  "SELHURST_PARK": {
+    "latitude": 51.3983,
+    "longitude": -0.0855
+  },
+  "GOODISON_PARK": {
+    "latitude": 53.4388,
+    "longitude": -2.9664
+  },
+  "CRAVEN_COTTAGE": {
+    "latitude": 51.4749,
+    "longitude": -0.2217
+  },
+  "ELLAND_ROAD": {
+    "latitude": 53.7778,
+    "longitude": -1.5722
+  },
+  "KING_POWER_STADIUM": {
+    "latitude": 52.6204,
+    "longitude": -1.1422
+  },
+  "ANFIELD": {
+    "latitude": 53.4308,
+    "longitude": -2.9608
+  },
+  "ETIHAD_STADIUM": {
+    "latitude": 53.4831,
+    "longitude": -2.2004
+  },
+  "OLD_TRAFFORD": {
+    "latitude": 53.4631,
+    "longitude": -2.2913
+  },
+  "ST_JAMES_PARK": {
+    "latitude": 54.9756,
+    "longitude": -1.6217
+  },
+  "ST_JAMES__PARK": {
+    "latitude": 54.9756,
+    "longitude": -1.6217
+  },
+  "CARROW_ROAD": {
+    "latitude": 52.6222,
+    "longitude": 1.3094
+  },
+  "ST_MARYS_STADIUM": {
+    "latitude": 50.9058,
+    "longitude": -1.391
+  },
+  "ST_MARY_S_STADIUM": {
+    "latitude": 50.9058,
+    "longitude": -1.391
+  },
+  "TOTTENHAM_HOTSPUR_STADIUM": {
+    "latitude": 51.6042,
+    "longitude": -0.0662
+  },
+  "VICARAGE_ROAD": {
+    "latitude": 51.6498,
+    "longitude": -0.4014
+  },
+  "LONDON_STADIUM": {
+    "latitude": 51.5387,
+    "longitude": -0.0166
+  },
+  "MOLINEUX_STADIUM": {
+    "latitude": 52.5903,
+    "longitude": -2.1306
+  },
+  "GTECH_COMMUNITY_STADIUM": {
+    "latitude": 51.4907,
+    "longitude": -0.2887
+  },
+  "PORTMAN_ROAD": {
+    "latitude": 52.0545,
+    "longitude": 1.1448
+  },
+  "CITY_GROUND": {
+    "latitude": 52.94,
+    "longitude": -1.1325
+  },
+  "KENILWORTH_ROAD": {
+    "latitude": 51.8842,
+    "longitude": -0.4317
+  },
+  "KC_STADIUM": {
+    "latitude": 53.7463,
+    "longitude": -0.3681
+  },
+  "BRAMALL_LANE": {
+    "latitude": 53.3703,
+    "longitude": -1.471
+  },
+  "CAMP_NOU": {
+    "latitude": 41.3809,
+    "longitude": 2.1228
+  },
+  "SPOTIFY_CAMP_NOU": {
+    "latitude": 41.3809,
+    "longitude": 2.1228
+  },
+  "ESTADI_OLIMPIC_LLUIS_COMPANYS": {
+    "latitude": 41.3649,
+    "longitude": 2.1556
+  },
+  "SANTIAGO_BERNABEU": {
+    "latitude": 40.4531,
+    "longitude": -3.6883
+  },
+  "ESTADIO_SANTIAGO_BERNABEU": {
+    "latitude": 40.4531,
+    "longitude": -3.6883
+  },
+  "CIVITAS_METROPOLITANO": {
+    "latitude": 40.4361,
+    "longitude": -3.5994
+  },
+  "ESTADIO_METROPOLITANO": {
+    "latitude": 40.4361,
+    "longitude": -3.5994
+  },
+  "WANDA_METROPOLITANO": {
+    "latitude": 40.4361,
+    "longitude": -3.5994
+  },
+  "ESTADIO_DE_MESTALLA": {
+    "latitude": 39.4745,
+    "longitude": -0.3583
+  },
+  "MESTALLA": {
+    "latitude": 39.4745,
+    "longitude": -0.3583
+  },
+  "SAN_MAMES": {
+    "latitude": 43.2641,
+    "longitude": -2.9494
+  },
+  "ESTADIO_SAN_MAMES": {
+    "latitude": 43.2641,
+    "longitude": -2.9494
+  },
+  "ESTADIO_BENITO_VILLAMARIN": {
+    "latitude": 37.3564,
+    "longitude": -5.9817
+  },
+  "BENITO_VILLAMARIN": {
+    "latitude": 37.3564,
+    "longitude": -5.9817
+  },
+  "REALE_ARENA": {
+    "latitude": 43.3013,
+    "longitude": -1.9736
+  },
+  "ANOETA": {
+    "latitude": 43.3013,
+    "longitude": -1.9736
+  },
+  "ESTADIO_DE_LA_CERAMICA": {
+    "latitude": 39.9444,
+    "longitude": -0.1036
+  },
+  "LA_CERAMICA": {
+    "latitude": 39.9444,
+    "longitude": -0.1036
+  },
+  "RAMON_SANCHEZ_PIZJUAN": {
+    "latitude": 37.3841,
+    "longitude": -5.9706
+  },
+  "RCDE_STADIUM": {
+    "latitude": 41.3478,
+    "longitude": 2.0756
+  },
+  "ESTADIO_COLISEUM_ALFONSO_PEREZ": {
+    "latitude": 40.3258,
+    "longitude": -3.7147
+  },
+  "MONTILIVI": {
+    "latitude": 41.9617,
+    "longitude": 2.8286
+  },
+  "ESTADIO_DE_MONTILIVI": {
+    "latitude": 41.9617,
+    "longitude": 2.8286
+  },
+  "ESTADIO_RAMON_DE_CARRANZA": {
+    "latitude": 36.5008,
+    "longitude": -6.27
+  },
+  "NUEVO_MIRANDILLA": {
+    "latitude": 36.5008,
+    "longitude": -6.27
+  },
+  "BALAIDOS": {
+    "latitude": 42.2117,
+    "longitude": -8.7392
+  },
+  "ABANCA_BALAIDOS": {
+    "latitude": 42.2117,
+    "longitude": -8.7392
+  },
+  "MENDIZORROZA": {
+    "latitude": 42.8372,
+    "longitude": -2.6878
+  },
+  "ESTADIO_DE_MENDIZORROZA": {
+    "latitude": 42.8372,
+    "longitude": -2.6878
+  },
+  "SON_MOIX": {
+    "latitude": 39.59,
+    "longitude": 2.63
+  },
+  "ESTADIO_SON_MOIX": {
+    "latitude": 39.59,
+    "longitude": 2.63
+  },
+  "EL_SADAR": {
+    "latitude": 42.7964,
+    "longitude": -1.6367
+  },
+  "ESTADIO_EL_SADAR": {
+    "latitude": 42.7964,
+    "longitude": -1.6367
+  },
+  "ESTADIO_MUNICIPAL_DE_BUTARQUE": {
+    "latitude": 40.3244,
+    "longitude": -3.7617
+  },
+  "ESTADIO_DE_VALLECAS": {
+    "latitude": 40.3917,
+    "longitude": -3.6589
+  },
+  "ALLIANZ_ARENA": {
+    "latitude": 48.2188,
+    "longitude": 11.6247
+  },
+  "SIGNAL_IDUNA_PARK": {
+    "latitude": 51.4926,
+    "longitude": 7.4518
+  },
+  "WESTFALENSTADION": {
+    "latitude": 51.4926,
+    "longitude": 7.4518
+  },
+  "VELTINS_ARENA": {
+    "latitude": 51.5536,
+    "longitude": 7.0678
+  },
+  "ARENA_AUFSCHALKE": {
+    "latitude": 51.5536,
+    "longitude": 7.0678
+  },
+  "RED_BULL_ARENA": {
+    "latitude": 51.3458,
+    "longitude": 12.3481
+  },
+  "MERCEDES_BENZ_ARENA": {
+    "latitude": 48.7922,
+    "longitude": 9.2319
+  },
+  "MHP_ARENA": {
+    "latitude": 48.7922,
+    "longitude": 9.2319
+  },
+  "VOLKSWAGEN_ARENA": {
+    "latitude": 52.4319,
+    "longitude": 10.8039
+  },
+  "BORUSSIA_PARK": {
+    "latitude": 51.1747,
+    "longitude": 6.3856
+  },
+  "COMMERZBANK_ARENA": {
+    "latitude": 50.0686,
+    "longitude": 8.6456
+  },
+  "DEUTSCHE_BANK_PARK": {
+    "latitude": 50.0686,
+    "longitude": 8.6456
+  },
+  "OLYMPIASTADION_BERLIN": {
+    "latitude": 52.5147,
+    "longitude": 13.2394
+  },
+  "OLYMPIASTADION": {
+    "latitude": 52.5147,
+    "longitude": 13.2394
+  },
+  "BAYARENA": {
+    "latitude": 51.0383,
+    "longitude": 7.0022
+  },
+  "BAY_ARENA": {
+    "latitude": 51.0383,
+    "longitude": 7.0022
+  },
+  "OPEL_ARENA": {
+    "latitude": 49.9844,
+    "longitude": 8.2244
+  },
+  "MEWA_ARENA": {
+    "latitude": 49.9844,
+    "longitude": 8.2244
+  },
+  "RHEINENERGIESTADION": {
+    "latitude": 50.9336,
+    "longitude": 6.875
+  },
+  "RHEIN_ENERGIE_STADION": {
+    "latitude": 50.9336,
+    "longitude": 6.875
+  },
+  "WWK_ARENA": {
+    "latitude": 48.3233,
+    "longitude": 10.8861
+  },
+  "SCHWARZWALD_STADION": {
+    "latitude": 47.9892,
+    "longitude": 7.8536
+  },
+  "EUROPA_PARK_STADION": {
+    "latitude": 47.9892,
+    "longitude": 7.8536
+  },
+  "PREZERO_ARENA": {
+    "latitude": 49.2381,
+    "longitude": 8.8878
+  },
+  "WIRSOL_RHEIN_NECKAR_ARENA": {
+    "latitude": 49.2381,
+    "longitude": 8.8878
+  },
+  "VONOVIA_RUHRSTADION": {
+    "latitude": 51.49,
+    "longitude": 7.2186
+  },
+  "STADION_AN_DER_ALTEN_FORSTEREI": {
+    "latitude": 52.4572,
+    "longitude": 13.5678
+  },
+  "AN_DER_ALTEN_FORSTEREI": {
+    "latitude": 52.4572,
+    "longitude": 13.5678
+  },
+  "WESERSTADION": {
+    "latitude": 53.0664,
+    "longitude": 8.8378
+  },
+  "WOHNINVEST_WESERSTADION": {
+    "latitude": 53.0664,
+    "longitude": 8.8378
+  },
+  "VOLKSPARKSTADION": {
+    "latitude": 53.5872,
+    "longitude": 9.8986
+  },
+  "SCHUCO_ARENA": {
+    "latitude": 52.0319,
+    "longitude": 8.5167
+  },
+  "BENTELER_ARENA": {
+    "latitude": 51.7142,
+    "longitude": 8.7406
+  },
+  "STADIO_GIUSEPPE_MEAZZA": {
+    "latitude": 45.4781,
+    "longitude": 9.124
+  },
+  "SAN_SIRO": {
+    "latitude": 45.4781,
+    "longitude": 9.124
+  },
+  "ALLIANZ_STADIUM": {
+    "latitude": 45.1097,
+    "longitude": 7.6411
+  },
+  "STADIO_OLIMPICO": {
+    "latitude": 41.934,
+    "longitude": 12.4547
+  },
+  "STADIO_DIEGO_ARMANDO_MARADONA": {
+    "latitude": 40.8279,
+    "longitude": 14.1931
+  },
+  "STADIO_SAN_PAOLO": {
+    "latitude": 40.8279,
+    "longitude": 14.1931
+  },
+  "GEWISS_STADIUM": {
+    "latitude": 45.7089,
+    "longitude": 9.6808
+  },
+  "STADIO_ATLETI_AZZURRI_D_ITALIA": {
+    "latitude": 45.7089,
+    "longitude": 9.6808
+  },
+  "MAPEI_STADIUM": {
+    "latitude": 44.7144,
+    "longitude": 10.6494
+  },
+  "STADIO_CITTA_DEL_TRICOLORE": {
+    "latitude": 44.7144,
+    "longitude": 10.6494
+  },
+  "STADIO_ARTEMIO_FRANCHI": {
+    "latitude": 43.7808,
+    "longitude": 11.2822
+  },
+  "STADIO_RENATO_DALL_ARA": {
+    "latitude": 44.4922,
+    "longitude": 11.3097
+  },
+  "STADIO_LUIGI_FERRARIS": {
+    "latitude": 44.4164,
+    "longitude": 8.9525
+  },
+  "STADIO_MARC_ANTONIO_BENTEGODI": {
+    "latitude": 45.4353,
+    "longitude": 10.9686
+  },
+  "STADIO_FRIULI": {
+    "latitude": 46.0814,
+    "longitude": 13.1997
+  },
+  "DACIA_ARENA": {
+    "latitude": 46.0814,
+    "longitude": 13.1997
+  },
+  "UNIPOL_DOMUS": {
+    "latitude": 39.2,
+    "longitude": 9.1378
+  },
+  "SARDEGNA_ARENA": {
+    "latitude": 39.2,
+    "longitude": 9.1378
+  },
+  "U_POWER_STADIUM": {
+    "latitude": 45.5836,
+    "longitude": 9.2772
+  },
+  "STADIO_BRIANTEO": {
+    "latitude": 45.5836,
+    "longitude": 9.2772
+  },
+  "STADIO_VIA_DEL_MARE": {
+    "latitude": 40.3569,
+    "longitude": 18.1828
+  },
+  "STADIO_ARECHI": {
+    "latitude": 40.6594,
+    "longitude": 14.7975
+  },
+  "STADIO_GRANDE_TORINO": {
+    "latitude": 45.0419,
+    "longitude": 7.6497
+  },
+  "STADIO_OLIMPICO_GRANDE_TORINO": {
+    "latitude": 45.0419,
+    "longitude": 7.6497
+  },
+  "STADIO_ENNIO_TARDINI": {
+    "latitude": 44.7956,
+    "longitude": 10.3381
+  },
+  "STADIO_PIER_LUIGI_PENZO": {
+    "latitude": 45.425,
+    "longitude": 12.3631
+  },
+  "STADIO_CARLO_CASTELLANI": {
+    "latitude": 43.7261,
+    "longitude": 10.9494
+  },
+  "STADIO_CIRO_VIGORITO": {
+    "latitude": 41.1175,
+    "longitude": 14.7836
+  },
+  "STADIO_ALBERTO_PICCO": {
+    "latitude": 44.1044,
+    "longitude": 9.8319
+  },
+  "PARC_DES_PRINCES": {
+    "latitude": 48.8414,
+    "longitude": 2.253
+  },
+  "GROUPAMA_STADIUM": {
+    "latitude": 45.7653,
+    "longitude": 4.9822
+  },
+  "PARC_OLYMPIQUE_LYONNAIS": {
+    "latitude": 45.7653,
+    "longitude": 4.9822
+  },
+  "STADE_VELODROME": {
+    "latitude": 43.2697,
+    "longitude": 5.3956
+  },
+  "ORANGE_VELODROME": {
+    "latitude": 43.2697,
+    "longitude": 5.3956
+  },
+  "STADE_PIERRE_MAUROY": {
+    "latitude": 50.6119,
+    "longitude": 3.1303
+  },
+  "DECATHLON_ARENA": {
+    "latitude": 50.6119,
+    "longitude": 3.1303
+  },
+  "ALLIANZ_RIVIERA": {
+    "latitude": 43.705,
+    "longitude": 7.1925
+  },
+  "ROAZHON_PARK": {
+    "latitude": 48.1075,
+    "longitude": -1.7128
+  },
+  "STADE_DE_LA_BEAUJOIRE": {
+    "latitude": 47.2558,
+    "longitude": -1.5247
+  },
+  "BEAUJOIRE__LOUIS_FONTENEAU": {
+    "latitude": 47.2558,
+    "longitude": -1.5247
+  },
+  "STADE_BOLLAERT_DELELIS": {
+    "latitude": 50.4328,
+    "longitude": 2.8153
+  },
+  "STADE_FELIX_BOLLAERT": {
+    "latitude": 50.4328,
+    "longitude": 2.8153
+  },
+  "STADE_DE_LA_MOSSON": {
+    "latitude": 43.6222,
+    "longitude": 3.8119
+  },
+  "STADE_LOUIS_II": {
+    "latitude": 43.7275,
+    "longitude": 7.4153
+  },
+  "STADE_AUGUSTE_DELAUNE": {
+    "latitude": 49.2469,
+    "longitude": 3.9931
+  },
+  "STADE_AUGUSTE_DELAUNE_II": {
+    "latitude": 49.2469,
+    "longitude": 3.9931
+  },
+  "MATMUT_ATLANTIQUE": {
+    "latitude": 44.8975,
+    "longitude": -0.5614
+  },
+  "STADE_GEOFFROY_GUICHARD": {
+    "latitude": 45.4608,
+    "longitude": 4.3903
+  },
+  "STADE_RAYMOND_KOPA": {
+    "latitude": 47.4603,
+    "longitude": -0.5317
+  },
+  "STADE_DE_LA_MEINAU": {
+    "latitude": 48.56,
+    "longitude": 7.755
+  },
+  "STADE_ABBE_DESCHAMPS": {
+    "latitude": 47.7886,
+    "longitude": 3.5772
+  },
+  "STADE_FRANCIS_LE_BLE": {
+    "latitude": 48.4033,
+    "longitude": -4.4622
+  },
+  "STADE_GABRIEL_MONTPIED": {
+    "latitude": 45.8158,
+    "longitude": 3.1267
+  },
+  "STADE_OCEANE": {
+    "latitude": 49.5353,
+    "longitude": 0.1064
+  },
+  "STADE_DU_MOUSTOIR": {
+    "latitude": 47.75,
+    "longitude": -3.3667
+  },
+  "STADE_DE_LA_LICORNE": {
+    "latitude": 49.9,
+    "longitude": 2.2833
+  },
+  "ABE_LENSTRA_STADION": {
+    "latitude": 52.9587,
+    "longitude": 5.9362
+  },
+  "ADAMS_PARK": {
+    "latitude": 51.6304,
+    "longitude": -0.8003
+  },
+  "AESSEAL_NEW_YORK_STADIUM": {
+    "latitude": 53.4268,
+    "longitude": -1.3627
+  },
+  "AFAS_STADION": {
+    "latitude": 52.6128,
+    "longitude": 4.7421
+  },
+  "AGGBOROUGH_STADIUM": {
+    "latitude": 52.3805,
+    "longitude": -2.2427
+  },
+  "AKER_STADION": {
+    "latitude": 62.7334,
+    "longitude": 7.1481
+  },
+  "AKTEPE_STADIUM": {
+    "latitude": 39.9992,
+    "longitude": 32.8807
+  },
+  "ALLIANZ_PARQUE": {
+    "latitude": -23.5275,
+    "longitude": -46.6785
+  },
+  "ALSANCAK_MUSTAFA_DENIZLI_STAD": {
+    "latitude": 38.4373,
+    "longitude": 27.1508
+  },
+  "AMERICAN_EXPRESS_STADIUM": {
+    "latitude": 50.8615,
+    "longitude": -0.0837
+  },
+  "ARCELORMITTAL_PARK": {
+    "latitude": 50.2891,
+    "longitude": 19.1695
+  },
+  "ARENA_COND": {
+    "latitude": -27.1041,
+    "longitude": -52.607
+  },
+  "ARENA_LUBLIN": {
+    "latitude": 51.2323,
+    "longitude": 22.5574
+  },
+  "ARENA_PANTANAL": {
+    "latitude": -15.6041,
+    "longitude": -56.1223
+  },
+  "AYKUR_DIDI_STADYUMU": {
+    "latitude": 41.042,
+    "longitude": 40.5726
+  },
+  "BASAKSEHIR_FATIH_TERIM_STADIUM": {
+    "latitude": 41.1228,
+    "longitude": 28.8094
+  },
+  "BBBANK_WILDPARK": {
+    "latitude": 49.02,
+    "longitude": 8.413
+  },
+  "BEHRN_ARENA": {
+    "latitude": 59.2663,
+    "longitude": 15.2234
+  },
+  "BENFICA_CAMPUS": {
+    "latitude": 38.6408,
+    "longitude": -9.0907
+  },
+  "BG_GRUP_4_EYLL_STADYUMU": {
+    "latitude": 39.7309,
+    "longitude": 36.9825
+  },
+  "BLOOMFIELD_ROAD": {
+    "latitude": 53.8051,
+    "longitude": -3.0361
+  },
+  "BLUNDELL_PARK": {
+    "latitude": 53.5702,
+    "longitude": -0.0465
+  },
+  "BOB_LUCAS_STADIUM": {
+    "latitude": 50.6204,
+    "longitude": -2.4857
+  },
+  "BORS_ARENA": {
+    "latitude": 57.7344,
+    "longitude": 12.9348
+  },
+  "BREMER_BRCKE": {
+    "latitude": 52.2808,
+    "longitude": 8.0713
+  },
+  "BRNDBY_STADION": {
+    "latitude": 55.6499,
+    "longitude": 12.4172
+  },
+  "BROADFIELD_STADIUM": {
+    "latitude": 51.0996,
+    "longitude": -0.1947
+  },
+  "BRUNTON_PARK": {
+    "latitude": 54.8956,
+    "longitude": -2.9136
+  },
+  "BRYNE_STADION": {
+    "latitude": 58.7302,
+    "longitude": 5.6502
+  },
+  "CAIXA_FUTEBOL_CAMPUS": {
+    "latitude": 38.6408,
+    "longitude": -9.0907
+  },
+  "CAMPOS_DE_SPORT_DE_EL_SARDINERO": {
+    "latitude": 43.4767,
+    "longitude": -3.7916
+  },
+  "CAPELLI_SPORT_STADION": {
+    "latitude": 55.4682,
+    "longitude": 12.1783
+  },
+  "CARDIFF_CITY_STADIUM": {
+    "latitude": 51.4728,
+    "longitude": -3.203
+  },
+  "CEGEKA_ARENA": {
+    "latitude": 51.005,
+    "longitude": 5.5342
+  },
+  "CENTENARY_STADIUM": {
+    "latitude": 35.8966,
+    "longitude": 14.4154
+  },
+  "CENTRAL_STADIUM": {
+    "latitude": 43.2384,
+    "longitude": 76.9242
+  },
+  "CLEDARA_ABBEY_STADIUM": {
+    "latitude": 52.212,
+    "longitude": 0.1542
+  },
+  "COLOR_LINE_STADION": {
+    "latitude": 62.4697,
+    "longitude": 6.1886
+  },
+  "COMPLETELYSUZUKI_STADIUM": {
+    "latitude": 51.9062,
+    "longitude": -2.0602
+  },
+  "CORENDON_AIRLINES_PARK": {
+    "latitude": 36.8882,
+    "longitude": 30.6684
+  },
+  "CROWN_OIL_ARENA": {
+    "latitude": 53.6208,
+    "longitude": -2.1799
+  },
+  "DAIO_WASABI_STAYEN_STADIUM": {
+    "latitude": 50.8135,
+    "longitude": 5.1661
+  },
+  "DECATHLON_ARENA_STADE_PIERREMAUROY": {
+    "latitude": 50.6119,
+    "longitude": 3.1305
+  },
+  "DEVA_STADIUM": {
+    "latitude": 53.1892,
+    "longitude": -2.9235
+  },
+  "DE_ADELAARSHORST": {
+    "latitude": 52.2604,
+    "longitude": 6.1727
+  },
+  "DE_GROLSCH_VESTE": {
+    "latitude": 52.2364,
+    "longitude": 6.8378
+  },
+  "DE_LEUNEN": {
+    "latitude": 51.1743,
+    "longitude": 4.9723
+  },
+  "DE_OUDE_MEERDIJK": {
+    "latitude": 52.7747,
+    "longitude": 6.9457
+  },
+  "DIYARBAKIR_STADIUM": {
+    "latitude": 37.9431,
+    "longitude": 40.1205
+  },
+  "DONAUSTADION": {
+    "latitude": 48.4045,
+    "longitude": 10.0094
+  },
+  "ECOPOWER_STADIUM": {
+    "latitude": 53.5098,
+    "longitude": -1.1138
+  },
+  "EDGELEY_PARK": {
+    "latitude": 53.3996,
+    "longitude": -2.1665
+  },
+  "EDMOND_MACHTENSSTADION": {
+    "latitude": 50.8551,
+    "longitude": 4.3105
+  },
+  "EINTRACHTSTADION": {
+    "latitude": 52.2901,
+    "longitude": 10.5215
+  },
+  "ELEDA_STADION": {
+    "latitude": 55.5837,
+    "longitude": 12.9877
+  },
+  "ESTADIO_15_DE_ABRIL": {
+    "latitude": -31.6319,
+    "longitude": -60.7157
+  },
+  "ESTADIO_ABANCABALADOS": {
+    "latitude": 42.2118,
+    "longitude": -8.7397
+  },
+  "ESTADIO_ADELMAR_DA_COSTA_CARVALHO": {
+    "latitude": -8.063,
+    "longitude": -34.9036
+  },
+  "ESTADIO_CIUDAD_DE_LANS_NSTOR_DAZ_PREZ": {
+    "latitude": -34.7176,
+    "longitude": -58.3838
+  },
+  "ESTADIO_CIUDAD_DE_LOS_DEPORTES": {
+    "latitude": 19.3834,
+    "longitude": -99.1783
+  },
+  "ESTADIO_CIUDAD_DE_VALENCIA": {
+    "latitude": 39.4946,
+    "longitude": -0.3639
+  },
+  "ESTADIO_CIUDAD_DE_VICENTE_LPEZ": {
+    "latitude": -34.5403,
+    "longitude": -58.4817
+  },
+  "ESTADIO_DE_LA_CERMICA": {
+    "latitude": 39.9442,
+    "longitude": -0.1034
+  },
+  "ESTADIO_EL_ALCORAZ": {
+    "latitude": 42.1318,
+    "longitude": -0.4241
+  },
+  "ESTADIO_EL_SARDINERO": {
+    "latitude": 43.4763,
+    "longitude": -3.794
+  },
+  "ESTADIO_JALISCO": {
+    "latitude": 20.7048,
+    "longitude": -103.3277
+  },
+  "ESTADIO_JOS_AMALFITANI": {
+    "latitude": -34.6353,
+    "longitude": -58.5207
+  },
+  "ESTADIO_JOS_DELLAGIOVANNA": {
+    "latitude": -34.4493,
+    "longitude": -58.5423
+  },
+  "ESTADIO_JUAN_PASQUALE": {
+    "latitude": -34.5412,
+    "longitude": -58.4619
+  },
+  "ESTADIO_LA_ROSALEDA": {
+    "latitude": 36.735,
+    "longitude": -4.4265
+  },
+  "ESTADIO_MANUEL_MARTNEZ_VALERO": {
+    "latitude": 38.267,
+    "longitude": -0.6633
+  },
+  "ESTADIO_MARCOLINO_DE_CASTRO": {
+    "latitude": 40.9266,
+    "longitude": -8.5459
+  },
+  "ESTADIO_MORELOS": {
+    "latitude": 19.7187,
+    "longitude": -101.2336
+  },
+  "ESTADIO_MUNICIPAL_25_DE_ABRIL": {
+    "latitude": 41.2118,
+    "longitude": -8.2772
+  },
+  "ESTADIO_MUNICIPAL_ALFONSO_MURUBE": {
+    "latitude": 35.8856,
+    "longitude": -5.328
+  },
+  "ESTADIO_MUNICIPAL_DE_ANDUVA": {
+    "latitude": 42.6808,
+    "longitude": -2.9354
+  },
+  "ESTADIO_MUNICIPAL_DE_CHAVES": {
+    "latitude": 41.7506,
+    "longitude": -7.465
+  },
+  "ESTADIO_MUNICIPAL_DE_EL_PLANTO": {
+    "latitude": 42.3444,
+    "longitude": -3.6809
+  },
+  "ESTADIO_MUNICIPAL_DE_FAMALICAO": {
+    "latitude": 41.4013,
+    "longitude": -8.5224
+  },
+  "ESTADIO_MUNICIPAL_DE_LA_PINTANA": {
+    "latitude": -33.5866,
+    "longitude": -70.6362
+  },
+  "ESTADIO_MUNICIPAL_DE_PASARN": {
+    "latitude": 42.4386,
+    "longitude": -8.6414
+  },
+  "ESTADIO_NORBERTO_TITO_TOMAGHELLO": {
+    "latitude": -34.8218,
+    "longitude": -58.2865
+  },
+  "ESTADIO_NUEVO_ARCNGEL": {
+    "latitude": 37.8721,
+    "longitude": -4.7635
+  },
+  "ESTADIO_NUEVO_LOS_CRMENES": {
+    "latitude": 37.1529,
+    "longitude": -3.5959
+  },
+  "ESTADIO_NUEVO_MIRANDILLA": {
+    "latitude": 36.5026,
+    "longitude": -6.273
+  },
+  "ESTADIO_OLMPICO_BENITO_JUREZ": {
+    "latitude": 31.7531,
+    "longitude": -106.4678
+  },
+  "ESTADIO_PRESIDENTE_JUAN_DOMINGO_PERN": {
+    "latitude": -34.6676,
+    "longitude": -58.3685
+  },
+  "ESTADIO_RAMN_SNCHEZ_PIZJUN": {
+    "latitude": 37.3841,
+    "longitude": -5.9706
+  },
+  "ESTADIO_SANTA_CRUZ": {
+    "latitude": -21.2024,
+    "longitude": -47.7901
+  },
+  "ESTADIO_SANTIAGO_BERNABU": {
+    "latitude": 40.4531,
+    "longitude": -3.6884
+  },
+  "ESTADIO_VICTORIA": {
+    "latitude": 21.8807,
+    "longitude": -102.2755
+  },
+  "ESTADI_MALLORCA_SON_MOIX": {
+    "latitude": 39.5899,
+    "longitude": 2.6301
+  },
+  "ESTADI_OLMPIC_LLUS_COMPANYS": {
+    "latitude": 41.3647,
+    "longitude": 2.1556
+  },
+  "ESTDIO_ANTNIO_COIMBRA_DA_MOTA": {
+    "latitude": 38.7159,
+    "longitude": -9.4064
+  },
+  "ESTDIO_BRINCO_DE_OURO_DA_PRINCESA": {
+    "latitude": -22.9096,
+    "longitude": -47.0434
+  },
+  "ESTDIO_DE_SO_LIS": {
+    "latitude": 37.0229,
+    "longitude": -7.9283
+  },
+  "ESTDIO_DE_SO_MIGUEL": {
+    "latitude": 37.764,
+    "longitude": -25.6228
+  },
+  "ESTDIO_DOM_AFONSO_HENRIQUES": {
+    "latitude": 41.4458,
+    "longitude": -8.301
+  },
+  "ESTDIO_DO_BESSA_SCULO_XXI": {
+    "latitude": 41.1622,
+    "longitude": -8.6426
+  },
+  "ESTDIO_DO_MAR": {
+    "latitude": 41.1843,
+    "longitude": -8.6662
+  },
+  "ESTDIO_DO_MARTIMO": {
+    "latitude": 32.6456,
+    "longitude": -16.9284
+  },
+  "ESTDIO_DO_SPORT_LISBOA_E_BENFICA": {
+    "latitude": 38.7527,
+    "longitude": -9.1847
+  },
+  "ESTDIO_DR_JORGE_ISMAEL_DE_BIASI": {
+    "latitude": -21.4668,
+    "longitude": -49.2321
+  },
+  "ESTDIO_DR_MACHADO_DE_MATOS": {
+    "latitude": 41.3559,
+    "longitude": -8.1908
+  },
+  "ESTDIO_JOO_CARDOSO": {
+    "latitude": 40.512,
+    "longitude": -8.0828
+  },
+  "ESTDIO_JOS_GOMES": {
+    "latitude": 38.7522,
+    "longitude": -9.228
+  },
+  "ESTDIO_JOS_PINHEIRO_BORDA": {
+    "latitude": -30.0655,
+    "longitude": -51.2349
+  },
+  "ESTDIO_LUS_FILIPE_MENEZES": {
+    "latitude": 41.0659,
+    "longitude": -8.517
+  },
+  "ESTDIO_MUNICIPAL_DE_AROUCA": {
+    "latitude": 40.9323,
+    "longitude": -8.2504
+  },
+  "ESTDIO_MUNICIPAL_DE_BRAGA": {
+    "latitude": 41.5625,
+    "longitude": -8.4299
+  },
+  "ESTDIO_MUNICIPAL_DE_MAFRA": {
+    "latitude": 38.9408,
+    "longitude": -9.3416
+  },
+  "ESTDIO_MUNICIPAL_DE_PORTIMO": {
+    "latitude": 37.1357,
+    "longitude": -8.5398
+  },
+  "ESTDIO_URBANO_CALDEIRA": {
+    "latitude": -23.9511,
+    "longitude": -46.339
+  },
+  "EWOOD_PARK": {
+    "latitude": 53.7285,
+    "longitude": -2.4892
+  },
+  "FORTUNA_SITTARD_STADION": {
+    "latitude": 50.9923,
+    "longitude": 5.8433
+  },
+  "FRATTON_PARK": {
+    "latitude": 50.7963,
+    "longitude": -1.0639
+  },
+  "FREETHIEL_STADION": {
+    "latitude": 51.2141,
+    "longitude": 4.2439
+  },
+  "GAMLA_ULLEVI": {
+    "latitude": 57.7063,
+    "longitude": 11.9801
+  },
+  "GAUGHAN_GROUP_STADIUM": {
+    "latitude": 51.5601,
+    "longitude": -0.0126
+  },
+  "GAVLEVALLEN": {
+    "latitude": 60.692,
+    "longitude": 17.1346
+  },
+  "GJEMSELUND_STADION": {
+    "latitude": 60.1952,
+    "longitude": 11.9875
+  },
+  "GOFFERTSTADION": {
+    "latitude": 51.8225,
+    "longitude": 5.8372
+  },
+  "GRSEL_AKSEL_STADYUMU": {
+    "latitude": 38.3968,
+    "longitude": 27.0764
+  },
+  "HAYES_LANE": {
+    "latitude": 51.3843,
+    "longitude": 0.0172
+  },
+  "HOME_DELUXE_ARENA": {
+    "latitude": 51.7309,
+    "longitude": 8.711
+  },
+  "HOME_PARK": {
+    "latitude": 50.3881,
+    "longitude": -4.1509
+  },
+  "HORNCHURCH_STADIUM": {
+    "latitude": 51.5566,
+    "longitude": 0.2383
+  },
+  "IBROX_STADIUM": {
+    "latitude": 55.8532,
+    "longitude": -4.3093
+  },
+  "INTILITY_ARENA": {
+    "latitude": 59.9179,
+    "longitude": 10.8066
+  },
+  "JAKEMANS_COMMUNITY_STADIUM": {
+    "latitude": 52.9562,
+    "longitude": -0.0287
+  },
+  "JAN_BREYDELSTADION": {
+    "latitude": 51.1933,
+    "longitude": 3.1806
+  },
+  "JOHAN_CRUIJFF_ARENA": {
+    "latitude": 52.3144,
+    "longitude": 4.9428
+  },
+  "JYSK_PARK": {
+    "latitude": 56.1842,
+    "longitude": 9.5752
+  },
+  "KAZM_KARABEKIR_STADYUMU": {
+    "latitude": 39.9112,
+    "longitude": 41.2381
+  },
+  "KEYS_PARK": {
+    "latitude": 52.6978,
+    "longitude": -1.989
+  },
+  "KFUM_ARENA": {
+    "latitude": 59.8896,
+    "longitude": 10.7831
+  },
+  "KONING_WILLEM_II_STADION": {
+    "latitude": 51.5427,
+    "longitude": 5.0668
+  },
+  "KONYA_BUYUKSEHIR_BELEDIYE_STADIUM": {
+    "latitude": 37.9461,
+    "longitude": 32.4881
+  },
+  "KPAVOGSVLLUR": {
+    "latitude": 64.1042,
+    "longitude": -21.8966
+  },
+  "KYBUNPARK": {
+    "latitude": 47.4083,
+    "longitude": 9.3056
+  },
+  "LAMEX_STADIUM": {
+    "latitude": 51.8896,
+    "longitude": -0.1937
+  },
+  "LEAG_ENERGIE_STADION": {
+    "latitude": 51.7516,
+    "longitude": 14.3456
+  },
+  "LERKENDAL_STADION": {
+    "latitude": 63.4123,
+    "longitude": 10.4045
+  },
+  "LIDL_ARENA": {
+    "latitude": 47.4586,
+    "longitude": 9.037
+  },
+  "LINCOLN_ROAD": {
+    "latitude": 52.586,
+    "longitude": -0.2463
+  },
+  "LNER_STADIUM": {
+    "latitude": 53.2183,
+    "longitude": -0.5409
+  },
+  "LNK_SPORTA_PARKS": {
+    "latitude": 56.908,
+    "longitude": 24.1544
+  },
+  "LOFTUS_ROAD": {
+    "latitude": 51.542,
+    "longitude": 0.0769
+  },
+  "LOTTO_PARK": {
+    "latitude": 50.834,
+    "longitude": 4.2979
+  },
+  "MACPARK_STADION": {
+    "latitude": 52.5169,
+    "longitude": 6.1209
+  },
+  "MANDEMAKERS_STADION": {
+    "latitude": 51.6866,
+    "longitude": 5.0888
+  },
+  "MAPEI_STADIUM_CITT_DEL_TRICOLORE": {
+    "latitude": 44.7145,
+    "longitude": 10.6497
+  },
+  "MATRADE_LOFTUS_ROAD": {
+    "latitude": 51.5094,
+    "longitude": -0.2321
+  },
+  "MAXMORLOCKSTADION": {
+    "latitude": 49.4263,
+    "longitude": 11.1257
+  },
+  "MCH_ARENA": {
+    "latitude": 56.1168,
+    "longitude": 8.9518
+  },
+  "MEADOW_LANE": {
+    "latitude": 52.9187,
+    "longitude": -1.2262
+  },
+  "MEDA_KONYA_BYKEHIR_STADYUMU": {
+    "latitude": 37.9461,
+    "longitude": 32.4881
+  },
+  "MELLS_STADION": {
+    "latitude": 59.4208,
+    "longitude": 10.6709
+  },
+  "MERCKSTADION_AM_BOLLENFALLTOR": {
+    "latitude": 49.8577,
+    "longitude": 8.6724
+  },
+  "MERKUR_SPIELARENA": {
+    "latitude": 51.2616,
+    "longitude": 6.7332
+  },
+  "MERSIN_STADYUMU": {
+    "latitude": 36.819,
+    "longitude": 34.5418
+  },
+  "MHPARENA": {
+    "latitude": 48.7922,
+    "longitude": 9.2321
+  },
+  "MORNFLAKE_STADIUM": {
+    "latitude": 53.0874,
+    "longitude": -2.4357
+  },
+  "MOSS_LANE": {
+    "latitude": 53.3834,
+    "longitude": -2.3352
+  },
+  "MRV_ARENA": {
+    "latitude": -19.93,
+    "longitude": -44.0139
+  },
+  "MSCORES_STADION": {
+    "latitude": 51.8024,
+    "longitude": 4.69
+  },
+  "NAMMO_STADION": {
+    "latitude": 60.7219,
+    "longitude": 10.5992
+  },
+  "NATIONAL_ARENA_TOSHE_PROESKI": {
+    "latitude": 42.0057,
+    "longitude": 21.4256
+  },
+  "OAKWELL": {
+    "latitude": 53.5522,
+    "longitude": -1.4722
+  },
+  "ONE_CALL_STADIUM": {
+    "latitude": 53.1381,
+    "longitude": -1.2009
+  },
+  "ORANGE_VLODROME": {
+    "latitude": 43.2698,
+    "longitude": 5.3959
+  },
+  "ORUM_EHIR_STADYUMU": {
+    "latitude": 40.5346,
+    "longitude": 34.9227
+  },
+  "PARKEN": {
+    "latitude": 55.7027,
+    "longitude": 12.5723
+  },
+  "PHILIPS_STADION": {
+    "latitude": 51.4417,
+    "longitude": 5.4674
+  },
+  "PIRELLI_STADIUM": {
+    "latitude": 52.8219,
+    "longitude": -1.6269
+  },
+  "PLANET_GROUP_ARENA": {
+    "latitude": 51.0161,
+    "longitude": 3.7325
+  },
+  "PODGORICA_CITY_STADIUM": {
+    "latitude": 42.4448,
+    "longitude": 19.2643
+  },
+  "POUNDLAND_BESCOT_STADIUM": {
+    "latitude": 52.5655,
+    "longitude": -1.9905
+  },
+  "PRENTON_PARK": {
+    "latitude": 53.3694,
+    "longitude": -3.0254
+  },
+  "PREUSSENSTADION": {
+    "latitude": 51.9297,
+    "longitude": 7.6248
+  },
+  "PRIDE_PARK_STADIUM": {
+    "latitude": 52.9149,
+    "longitude": -1.4473
+  },
+  "RAMS_PARK": {
+    "latitude": 41.1034,
+    "longitude": 28.991
+  },
+  "RAT_VERLEGH_STADION": {
+    "latitude": 51.5948,
+    "longitude": 4.7503
+  },
+  "RECEP_TAYYIP_ERDOAN_STADYUMU": {
+    "latitude": 41.0328,
+    "longitude": 28.9724
+  },
+  "RHEINPARK_STADION": {
+    "latitude": 47.138,
+    "longitude": 9.511
+  },
+  "RIGHT_TO_DREAM_PARK": {
+    "latitude": 55.8162,
+    "longitude": 12.353
+  },
+  "RIVERSIDE_STADIUM": {
+    "latitude": 54.5783,
+    "longitude": -1.2169
+  },
+  "RIYADH_AIR_METROPOLITANO": {
+    "latitude": 40.4361,
+    "longitude": -3.5997
+  },
+  "RJANS_VALL": {
+    "latitude": 56.6849,
+    "longitude": 12.868
+  },
+  "RODNEY_PARADE": {
+    "latitude": 51.589,
+    "longitude": -2.9887
+  },
+  "ROMSSA_ARENA": {
+    "latitude": 69.6489,
+    "longitude": 18.9343
+  },
+  "ROOTS_HALL": {
+    "latitude": 51.549,
+    "longitude": 0.7015
+  },
+  "RSEN_STADION": {
+    "latitude": 59.9627,
+    "longitude": 11.0636
+  },
+  "SANE_ARENA": {
+    "latitude": 60.4698,
+    "longitude": 5.3147
+  },
+  "SCHCOARENA": {
+    "latitude": 52.032,
+    "longitude": 8.5168
+  },
+  "SILVERLAKE_STADIUM": {
+    "latitude": 50.9525,
+    "longitude": -1.3719
+  },
+  "SMH_GROUP_STADIUM": {
+    "latitude": 53.2536,
+    "longitude": -1.4258
+  },
+  "SPORTCLUB_ARENA": {
+    "latitude": 51.8835,
+    "longitude": 8.5134
+  },
+  "SPORTPARK_MIDDELMORS": {
+    "latitude": 52.2008,
+    "longitude": 4.4426
+  },
+  "SPORTPARK_RONHOF_THOMAS_SOMMER": {
+    "latitude": 49.4871,
+    "longitude": 10.9989
+  },
+  "SPOTLAND_STADIUM": {
+    "latitude": 53.6208,
+    "longitude": -2.1799
+  },
+  "STADE_AUGUSTEBONAL": {
+    "latitude": 47.5124,
+    "longitude": 6.8112
+  },
+  "STADE_BOLLAERTDELELIS": {
+    "latitude": 50.4328,
+    "longitude": 2.815
+  },
+  "STADE_DE_GENVE": {
+    "latitude": 46.1778,
+    "longitude": 6.1274
+  },
+  "STADE_DE_LAUBE": {
+    "latitude": 48.3075,
+    "longitude": 4.0985
+  },
+  "STADE_DE_LA_COLOMBIRE": {
+    "latitude": 48.1782,
+    "longitude": 6.4657
+  },
+  "STADE_DE_ROCOURT": {
+    "latitude": 50.6601,
+    "longitude": 5.5518
+  },
+  "STADE_FRANCISLE_BL": {
+    "latitude": 48.403,
+    "longitude": -4.4614
+  },
+  "STADE_FRED_AUBERT": {
+    "latitude": 48.5091,
+    "longitude": -2.7441
+  },
+  "STADE_JEAN_BOUIN": {
+    "latitude": 48.8433,
+    "longitude": 2.253
+  },
+  "STADE_JOSEPH_MARIN": {
+    "latitude": 50.8179,
+    "longitude": 4.3295
+  },
+  "STADE_MARCELMICHELIN": {
+    "latitude": 45.7894,
+    "longitude": 3.106
+  },
+  "STADE_MICHELMORETTI": {
+    "latitude": 41.9308,
+    "longitude": 8.7768
+  },
+  "STADE_MUNICIPAL_DE_DIFFERDANGE": {
+    "latitude": 49.5133,
+    "longitude": 5.8898
+  },
+  "STADE_OCANE": {
+    "latitude": 49.4988,
+    "longitude": 0.1695
+  },
+  "STADE_PIERRE_DE_COUBERTIN": {
+    "latitude": 43.553,
+    "longitude": 6.965
+  },
+  "STADE_PIERRE_RAJON": {
+    "latitude": 45.5896,
+    "longitude": 5.2877
+  },
+  "STADE_REN_GAILLARD": {
+    "latitude": 46.3169,
+    "longitude": -0.4896
+  },
+  "STADE_ROBERT_DIOCHON": {
+    "latitude": 49.4111,
+    "longitude": 1.0706
+  },
+  "STADION_AN_DER_ALTEN_FRSTEREI": {
+    "latitude": 52.457,
+    "longitude": 13.5681
+  },
+  "STADION_AN_DER_HAFENSTRASSE": {
+    "latitude": 51.4869,
+    "longitude": 6.9766
+  },
+  "STADION_CRACOVII_IM_JZEFA_PISUDSKIEGO": {
+    "latitude": 50.0579,
+    "longitude": 19.9205
+  },
+  "STADION_GALGENWAARD": {
+    "latitude": 52.0784,
+    "longitude": 5.1459
+  },
+  "STADION_IM_ERNESTA_POHLA": {
+    "latitude": 50.2963,
+    "longitude": 18.7683
+  },
+  "STADION_LETZIGRUND": {
+    "latitude": 47.3828,
+    "longitude": 8.5037
+  },
+  "STADION_LUDWIGSPARK": {
+    "latitude": 49.2466,
+    "longitude": 6.9816
+  },
+  "STADION_MIEJSKI_WIDZEWA_D": {
+    "latitude": 51.7651,
+    "longitude": 19.5117
+  },
+  "STADION_POD_BIJELIM_BRIJEGOM": {
+    "latitude": 43.3452,
+    "longitude": 17.7951
+  },
+  "STADION_WANKDORF": {
+    "latitude": 46.9631,
+    "longitude": 7.4649
+  },
+  "STADIO_ADRIATICO_GIOVANNI_CORNACCHIA": {
+    "latitude": 42.4553,
+    "longitude": 14.2297
+  },
+  "STADIO_ALBERTO_BRAGLIA": {
+    "latitude": 44.6534,
+    "longitude": 10.9231
+  },
+  "STADIO_CARLO_CASTELLANI_COMPUTER_GROSS_ARENA": {
+    "latitude": 43.7265,
+    "longitude": 10.9547
+  },
+  "STADIO_COMUNALE_LUIGI_FERRARIS": {
+    "latitude": 44.4165,
+    "longitude": 8.9525
+  },
+  "STADIO_DEI_MARMI": {
+    "latitude": 44.0653,
+    "longitude": 10.0766
+  },
+  "STADIO_ETTORE_GIARDINIERO_VIA_DEL_MARE": {
+    "latitude": 40.3651,
+    "longitude": 18.2089
+  },
+  "STADIO_GIOVANNI_ZINI": {
+    "latitude": 45.14,
+    "longitude": 10.035
+  },
+  "STADIO_GIUSEPPE_SINIGAGLIA": {
+    "latitude": 45.8138,
+    "longitude": 9.0723
+  },
+  "STADIO_MARCANTONIO_BENTEGODI": {
+    "latitude": 45.4353,
+    "longitude": 10.9674
+  },
+  "STADIO_MARIO_RIGAMONTI": {
+    "latitude": 45.5707,
+    "longitude": 10.237
+  },
+  "STADIO_OLIMPICO_DI_TORINO": {
+    "latitude": 45.0417,
+    "longitude": 7.6492
+  },
+  "STADIO_RENATO_DALLARA": {
+    "latitude": 44.4923,
+    "longitude": 11.3108
+  },
+  "STADIO_RENZO_BARBERA": {
+    "latitude": 38.1528,
+    "longitude": 13.342
+  },
+  "STADIO_RIGAMONTI_CEPPI": {
+    "latitude": 45.8578,
+    "longitude": 9.3989
+  },
+  "STADIUM_DE_TOULOUSE": {
+    "latitude": 43.5832,
+    "longitude": 1.4341
+  },
+  "STADIUM_OF_LIGHT": {
+    "latitude": 54.9144,
+    "longitude": -1.3883
+  },
+  "STDTISCHES_STADION_AN_DER_GRNWALDER_STRAE": {
+    "latitude": 48.111,
+    "longitude": 11.5744
+  },
+  "STER_HUS_ARENA": {
+    "latitude": 58.8615,
+    "longitude": 5.7225
+  },
+  "STRAWBERRY_ARENA": {
+    "latitude": 59.3725,
+    "longitude": 18.0017
+  },
+  "STUDENTERNAS_IP": {
+    "latitude": 59.8487,
+    "longitude": 17.6463
+  },
+  "SWANSEACOM_STADIUM": {
+    "latitude": 51.6428,
+    "longitude": -3.9347
+  },
+  "TADIN_TEHELN_POLE": {
+    "latitude": 48.1635,
+    "longitude": 17.1368
+  },
+  "TELE2_ARENA": {
+    "latitude": 59.291,
+    "longitude": 18.0845
+  },
+  "THE_BRICK_COMMUNITY_STADIUM": {
+    "latitude": 53.5477,
+    "longitude": -2.654
+  },
+  "THE_CAMPING_WORLD_COMMUNITY_STADIUM": {
+    "latitude": 51.0468,
+    "longitude": -0.3406
+  },
+  "THE_CITY_GROUND": {
+    "latitude": 52.9399,
+    "longitude": -1.1329
+  },
+  "THE_DEN": {
+    "latitude": 51.486,
+    "longitude": -0.0509
+  },
+  "THE_HAWTHORNS": {
+    "latitude": 52.5092,
+    "longitude": -1.9637
+  },
+  "THE_HIVE_STADIUM": {
+    "latitude": 51.6026,
+    "longitude": -0.2917
+  },
+  "THE_KASSAM_STADIUM": {
+    "latitude": 51.7164,
+    "longitude": -1.2058
+  },
+  "THE_LAITHWAITE_COMMUNITY_STADIUM": {
+    "latitude": 51.3063,
+    "longitude": -0.5589
+  },
+  "THE_VALLEY": {
+    "latitude": 51.4864,
+    "longitude": 0.0362
+  },
+  "THE_WALKS": {
+    "latitude": 52.7506,
+    "longitude": 0.4058
+  },
+  "TOFIQ_BAHRAMOV_STADIUM": {
+    "latitude": 40.3976,
+    "longitude": 49.8524
+  },
+  "TOUGHSHEET_COMMUNITY_STADIUM": {
+    "latitude": 53.5805,
+    "longitude": -2.5357
+  },
+  "TUPRAS_STADIUM": {
+    "latitude": 41.0395,
+    "longitude": 28.9943
+  },
+  "ULSAN_MUNSU_FOOTBALL_STADIUM": {
+    "latitude": 35.5353,
+    "longitude": 129.2595
+  },
+  "VOITHARENA": {
+    "latitude": 48.6685,
+    "longitude": 10.1393
+  },
+  "WHAM_STADIUM": {
+    "latitude": 53.7654,
+    "longitude": -2.371
+  },
+  "YENI_ADANA_STADYUMU": {
+    "latitude": 37.0635,
+    "longitude": 35.375
+  },
+  "YORK_COMMUNITY_STADIUM": {
+    "latitude": 53.9843,
+    "longitude": -1.0527
+  },
+  "YUSUF_ZIYA_NI_STADYUMU": {
+    "latitude": 41.1726,
+    "longitude": 29.0503
+  },
+  "3ARENA": {
+    "latitude": 59.291,
+    "longitude": 18.0845
+  },
+  "711_STADION": {
+    "latitude": 52.4552,
+    "longitude": 4.6349
+  },
+  "AALBORG_PORTLAND_PARK": {
+    "latitude": 57.052,
+    "longitude": 9.8986
+  },
+  "ABBEY_STADIUM": {
+    "latitude": 52.212,
+    "longitude": 0.1542
+  },
+  "AFAS_TRAININGSCOMPLEX": {
+    "latitude": 52.4731,
+    "longitude": 4.8472
+  },
+  "AJINOMOTO_STADIUM": {
+    "latitude": 35.6642,
+    "longitude": 139.5271
+  },
+  "ALBERT_BARTLETT_STADIUM": {
+    "latitude": 55.8603,
+    "longitude": -3.9601
+  },
+  "ALLIANZ_FIELD": {
+    "latitude": 44.9531,
+    "longitude": -93.1647
+  },
+  "ALLIANZ_STADION": {
+    "latitude": 48.198,
+    "longitude": 16.2652
+  },
+  "ALPHAMEGA_STADIUM": {
+    "latitude": 34.6923,
+    "longitude": 32.9391
+  },
+  "AL_LANG_STADIUM": {
+    "latitude": 27.7684,
+    "longitude": -82.6331
+  },
+  "ANSAN_WA_STADIUM": {
+    "latitude": 37.3194,
+    "longitude": 126.8186
+  },
+  "ANYANG_STADIUM": {
+    "latitude": 37.4053,
+    "longitude": 126.9464
+  },
+  "ARMCO_ARENA": {
+    "latitude": 52.413,
+    "longitude": -1.7769
+  },
+  "A_LE_COQ_ARENA": {
+    "latitude": 59.4208,
+    "longitude": 24.7323
+  },
+  "BAAKEHIR_FATIH_TERIM_STADYUMU": {
+    "latitude": 41.1228,
+    "longitude": 28.8094
+  },
+  "BANC_OF_CALIFORNIA_STADIUM": {
+    "latitude": 34.1613,
+    "longitude": -118.1677
+  },
+  "BANDRMA_17_EYLL_STAD": {
+    "latitude": 40.3382,
+    "longitude": 27.9841
+  },
+  "BANK_OF_AMERICA_STADIUM": {
+    "latitude": 35.2258,
+    "longitude": -80.8528
+  },
+  "BANK_RESPUBLIKA_ARENA": {
+    "latitude": 40.4862,
+    "longitude": 49.7664
+  },
+  "BERFORMANCE_ARENA": {
+    "latitude": 47.696,
+    "longitude": 8.6345
+  },
+  "BESCOT_STADIUM": {
+    "latitude": 52.5655,
+    "longitude": -1.9905
+  },
+  "BEST_DENKI_STADIUM": {
+    "latitude": 33.5859,
+    "longitude": 130.4608
+  },
+  "BET365_STADIUM": {
+    "latitude": 53.0006,
+    "longitude": -2.1213
+  },
+  "BLUENERGY_STADIUM": {
+    "latitude": 46.0814,
+    "longitude": 13.1997
+  },
+  "BLUENERGY_STADIUM_STADIO_FRIULI": {
+    "latitude": 46.0814,
+    "longitude": 13.1997
+  },
+  "BLUE_WATER_ARENA": {
+    "latitude": 55.4819,
+    "longitude": 8.4384
+  },
+  "BOGDANKA_ARENA": {
+    "latitude": 51.3016,
+    "longitude": 22.876
+  },
+  "BOLSHAYA_SPORTIVNAYA_ARENA": {
+    "latitude": 46.8399,
+    "longitude": 29.6328
+  },
+  "BOLU_ATATRK_STADYUMU": {
+    "latitude": 40.7362,
+    "longitude": 31.6075
+  },
+  "BOSUILSTADION": {
+    "latitude": 51.2326,
+    "longitude": 4.4718
+  },
+  "BRITAARENA": {
+    "latitude": 50.0713,
+    "longitude": 8.2566
+  },
+  "BUKO_STADION": {
+    "latitude": 52.4552,
+    "longitude": 4.6349
+  },
+  "COVEBO_STADION_DE_KOEL": {
+    "latitude": 51.3519,
+    "longitude": 6.18
+  },
+  "DAKNAMSTADION": {
+    "latitude": 51.1166,
+    "longitude": 3.9874
+  },
+  "DAKOTA_ARENA": {
+    "latitude": 50.9842,
+    "longitude": 3.527
+  },
+  "DAMSON_PARK": {
+    "latitude": 52.413,
+    "longitude": -1.7769
+  },
+  "DEEPDALE": {
+    "latitude": 53.7722,
+    "longitude": -2.6886
+  },
+  "DENKA_BIG_SWAN_STADIUM": {
+    "latitude": 37.8826,
+    "longitude": 139.0592
+  },
+  "DEVKARENA": {
+    "latitude": 42.4667,
+    "longitude": 1.4967
+  },
+  "DE_HERDGANG": {
+    "latitude": 51.4602,
+    "longitude": 5.4369
+  },
+  "DE_KUIP": {
+    "latitude": 51.8939,
+    "longitude": 4.5232
+  },
+  "DGB_DAEGU_BANK_PARK": {
+    "latitude": 35.8813,
+    "longitude": 128.588
+  },
+  "DICKS_SPORTING_GOODS_PARK": {
+    "latitude": 39.8059,
+    "longitude": -104.8919
+  },
+  "DIGNITY_HEALTH_SPORTS_PARK": {
+    "latitude": 33.8623,
+    "longitude": -118.2629
+  },
+  "DIMOTIKO_STADIO_AGION_ANARGYRON": {
+    "latitude": 11.5237,
+    "longitude": 42.8379
+  },
+  "DIMOTIKO_STADIO_KRYAS_VRYSIS": {
+    "latitude": 37.5767,
+    "longitude": 22.566
+  },
+  "DIMOTIKO_STADIO_TRKALON": {
+    "latitude": 39.5561,
+    "longitude": 21.7679
+  },
+  "DOMNARVSVALLEN": {
+    "latitude": 60.4947,
+    "longitude": 15.4338
+  },
+  "DOOSAN_ARNA": {
+    "latitude": 49.75,
+    "longitude": 13.3851
+  },
+  "DS_ARENA": {
+    "latitude": 56.6372,
+    "longitude": 9.794
+  },
+  "EARTHQUAKES_STADIUM": {
+    "latitude": 37.3513,
+    "longitude": -121.9247
+  },
+  "EASTER_ROAD_STADIUM": {
+    "latitude": 55.9617,
+    "longitude": -3.1652
+  },
+  "EDION_PEACE_WING_HIROSHIMA": {
+    "latitude": 34.4015,
+    "longitude": 132.4546
+  },
+  "EDION_PEACE_WING_HIROSHIMA_STADIUM": {
+    "latitude": 34.4015,
+    "longitude": 132.4546
+  },
+  "EGAO_KENKO_STADIUM": {
+    "latitude": 32.8369,
+    "longitude": 130.8001
+  },
+  "EILENRIEDESTADION": {
+    "latitude": 52.3766,
+    "longitude": 9.7727
+  },
+  "EKEVALLA_IP_ESLV_APLAN": {
+    "latitude": 55.845,
+    "longitude": 13.3262
+  },
+  "EKIMAE_REAL_ESTATE_STADIUM": {
+    "latitude": 33.3717,
+    "longitude": 130.5202
+  },
+  "ELINDUS_ARENA": {
+    "latitude": 50.8831,
+    "longitude": 3.4291
+  },
+  "ESTADIO_COLISEUM": {
+    "latitude": 40.3257,
+    "longitude": -3.7149
+  },
+  "ESTADIO_CORONA": {
+    "latitude": 25.6288,
+    "longitude": -103.38
+  },
+  "ESTADIO_CORREGIDORA": {
+    "latitude": 20.5776,
+    "longitude": -100.3663
+  },
+  "ESTADIO_CUAUHTMOC": {
+    "latitude": 19.078,
+    "longitude": -98.1644
+  },
+  "ESTADIO_DIEGO_ARMANDO_MARADONA": {
+    "latitude": -34.6061,
+    "longitude": -58.4727
+  },
+  "ESTADIO_DON_LEN_KOLBOVSKI": {
+    "latitude": -34.6024,
+    "longitude": -58.3687
+  },
+  "ESTADIO_DR_JORGE_ISMAEL_DE_BIASI": {
+    "latitude": -21.4668,
+    "longitude": -49.2321
+  },
+  "ESTADIO_EL_ENCANTO": {
+    "latitude": 23.2771,
+    "longitude": -106.3832
+  },
+  "ESTADIO_EL_TENIENTE": {
+    "latitude": -34.1778,
+    "longitude": -70.7375
+  },
+  "ESTADIO_ESTER_ROA": {
+    "latitude": -36.8153,
+    "longitude": -73.0237
+  },
+  "ESTADIO_FELICIANO_GAMBARTE": {
+    "latitude": -32.9202,
+    "longitude": -68.8392
+  },
+  "ESTADIO_FISCAL_DE_TALCA": {
+    "latitude": -35.42,
+    "longitude": -71.6728
+  },
+  "ESTADIO_GENERALSIMO_JOS_MARA_MORELOS_Y_PAVN": {
+    "latitude": 19.6546,
+    "longitude": -101.2624
+  },
+  "ESTADIO_GIGANTE_DE_ARROYITO": {
+    "latitude": -32.914,
+    "longitude": -60.6745
+  },
+  "ESTADIO_MUNICIPAL_CARTAGONOVA": {
+    "latitude": 37.6097,
+    "longitude": -0.996
+  },
+  "ESTADIO_MUNICIPAL_CASTALIA": {
+    "latitude": 39.9961,
+    "longitude": -0.0386
+  },
+  "ESTADIO_MUNICIPAL_DE_A_MALATA": {
+    "latitude": 43.4912,
+    "longitude": -8.2394
+  },
+  "ESTADIO_MUNICIPAL_DE_CASTALIA": {
+    "latitude": 39.9961,
+    "longitude": -0.0386
+  },
+  "ESTADIO_MUNICIPAL_DE_IPURUA": {
+    "latitude": 43.1817,
+    "longitude": -2.4759
+  },
+  "ESTADIO_MUNICIPAL_DE_LA_CISTERNA": {
+    "latitude": -33.429,
+    "longitude": -70.6709
+  },
+  "ESTADIO_MUNICIPAL_DE_LO_BARNECHEA": {
+    "latitude": -33.3542,
+    "longitude": -70.4982
+  },
+  "ESTADIO_MUNICIPAL_DE_MONTILIVI": {
+    "latitude": 41.9612,
+    "longitude": 2.829
+  },
+  "ESTADIO_MUNICIPAL_DE_SAN_FELIPE": {
+    "latitude": -32.7469,
+    "longitude": -70.7301
+  },
+  "ESTADIO_MUNICIPAL_DE_SAN_JOAQUN": {
+    "latitude": 10.0009,
+    "longitude": -84.1488
+  },
+  "ESTADIO_MUNICIPAL_EL_ALTO": {
+    "latitude": -38.7397,
+    "longitude": -72.9485
+  },
+  "ESTADIO_MUNICIPAL_EL_MOLINN": {
+    "latitude": 43.5355,
+    "longitude": -5.6379
+  },
+  "ESTADIO_MUNICIPAL_EL_MOLINNENRIQUE_CASTRO_QUINI": {
+    "latitude": 43.5355,
+    "longitude": -5.6379
+  },
+  "ESTADIO_MUNICIPAL_JOAQUN_MUOZ_GARCA": {
+    "latitude": -34.6393,
+    "longitude": -71.3685
+  },
+  "ESTADIO_MUNICIPAL_JOS_ZORRILLA": {
+    "latitude": 41.6446,
+    "longitude": -4.7613
+  },
+  "ESTADIO_MUNICIPAL_NICOLS_CHAHUN_NAZAR": {
+    "latitude": -32.7843,
+    "longitude": -71.1994
+  },
+  "ESTADIO_MUNICIPAL_NUEVO_PEPICO_AMAT": {
+    "latitude": 38.4741,
+    "longitude": -0.7975
+  },
+  "ESTADIO_MUNICIPAL_REINO_DE_LEN": {
+    "latitude": 42.5876,
+    "longitude": -5.577
+  },
+  "ESTADIO_MUNICIPAL_ROLANDO_CORTS_DUBO": {
+    "latitude": -23.1002,
+    "longitude": -70.4483
+  },
+  "ESTADIO_MUNICIPAL_RUBN_MARCOS_PERALTA": {
+    "latitude": -40.5833,
+    "longitude": -73.1315
+  },
+  "ESTADIO_NACIONAL_JULIO_MARTNEZ_PRDANOS": {
+    "latitude": -33.4644,
+    "longitude": -70.6106
+  },
+  "ESTADIO_NEMESIO_DIEZ": {
+    "latitude": 19.2871,
+    "longitude": -99.6666
+  },
+  "ESTADIO_NUEVO_CARLOS_TARTIERE": {
+    "latitude": 43.3597,
+    "longitude": -5.8613
+  },
+  "ESTADIO_NUEVO_FRANCISCO_URBANO": {
+    "latitude": -34.662,
+    "longitude": -58.6318
+  },
+  "ESTADIO_NUEVO_MONUMENTAL": {
+    "latitude": -31.2508,
+    "longitude": -61.4814
+  },
+  "ESTADIO_OLIMPICO_NILTON_SANTOS": {
+    "latitude": -22.8932,
+    "longitude": -43.2936
+  },
+  "ESTADIO_OLMPICO_UNIVERSITARIO": {
+    "latitude": 19.3317,
+    "longitude": -99.1923
+  },
+  "ESTADIO_OMAR_HIGINIO_SPERDUTTI": {
+    "latitude": -32.9832,
+    "longitude": -68.7934
+  },
+  "ESTADIO_OSVALDO_BALETTO": {
+    "latitude": -34.6439,
+    "longitude": -58.3529
+  },
+  "ESTADIO_PEDRO_BIDEGAIN": {
+    "latitude": -34.6521,
+    "longitude": -58.4401
+  },
+  "ESTADIO_PRESBTERO_BARTOLOM_GRELLA": {
+    "latitude": -31.733,
+    "longitude": -60.5299
+  },
+  "ESTADIO_PRESIDENTE_PERON": {
+    "latitude": -31.3837,
+    "longitude": -64.1804
+  },
+  "ESTADIO_REGIONAL_DE_ANTOFAGASTA": {
+    "latitude": -23.6702,
+    "longitude": -70.4046
+  },
+  "ESTADIO_SANTA_LAURAUNIVERSIDAD_SEK": {
+    "latitude": -33.4043,
+    "longitude": -70.6585
+  },
+  "ESTADIO_SANTO_DOMINGO": {
+    "latitude": 40.3389,
+    "longitude": -3.8405
+  },
+  "ESTADIO_SAUSALITO": {
+    "latitude": -33.0144,
+    "longitude": -71.5341
+  },
+  "ESTADIO_SERGIO_LEN_CHVEZ": {
+    "latitude": 20.6845,
+    "longitude": -101.3564
+  },
+  "ESTADIO_SERRA_DOURADA": {
+    "latitude": -16.6991,
+    "longitude": -49.2332
+  },
+  "ESTADIO_SKYFI_CASTALIA": {
+    "latitude": 39.9961,
+    "longitude": -0.0386
+  },
+  "EV_CHARGER_POINTS_STADIUM": {
+    "latitude": 51.9062,
+    "longitude": -2.0602
+  },
+  "EXTRA_ARENA": {
+    "latitude": 63.4283,
+    "longitude": 10.5251
+  },
+  "FALKIRK_STADIUM": {
+    "latitude": 56.0054,
+    "longitude": -3.7526
+  },
+  "FINNVEDSVALLEN": {
+    "latitude": 57.1959,
+    "longitude": 14.0427
+  },
+  "FIR_PARK": {
+    "latitude": 55.7804,
+    "longitude": -3.9803
+  },
+  "FOSSHAUGANE_CAMPUS": {
+    "latitude": 61.232,
+    "longitude": 7.0857
+  },
+  "FRANS_HEESEN_STADION": {
+    "latitude": 51.755,
+    "longitude": 5.5279
+  },
+  "FREETHIELSTADION": {
+    "latitude": 51.2126,
+    "longitude": 4.2578
+  },
+  "FRITZWALTERSTADION": {
+    "latitude": 49.4346,
+    "longitude": 7.7766
+  },
+  "FRITZ_WALTER_STADION": {
+    "latitude": 49.4346,
+    "longitude": 7.7766
+  },
+  "FUJIEDA_CITY_GENERAL_SPORTS_PARK": {
+    "latitude": 34.8674,
+    "longitude": 138.2577
+  },
+  "FUJIEDA_SOCCER_STADIUM": {
+    "latitude": 34.8674,
+    "longitude": 138.2577
+  },
+  "GAIN_PARK_STADIUM": {
+    "latitude": 36.5147,
+    "longitude": 30.0599
+  },
+  "GAN_PARK_STADYUMU": {
+    "latitude": 43.023,
+    "longitude": 44.6944
+  },
+  "GATESHEAD_INTERNATIONAL_STADIUM": {
+    "latitude": 54.9609,
+    "longitude": -1.5798
+  },
+  "GAZIANTEP_STADYUMU": {
+    "latitude": 37.0628,
+    "longitude": 37.3793
+  },
+  "GELREDOME": {
+    "latitude": 51.9627,
+    "longitude": 5.8928
+  },
+  "GEODIS_PARK": {
+    "latitude": 36.13,
+    "longitude": -86.7659
+  },
+  "GILLETTE_STADIUM": {
+    "latitude": 42.0909,
+    "longitude": -71.2642
+  },
+  "GIMCHEON_STADIUM": {
+    "latitude": 36.1396,
+    "longitude": 128.0865
+  },
+  "GIMPO_SALTER_SOCCER_FIELD": {
+    "latitude": 37.6176,
+    "longitude": 126.7196
+  },
+  "GIPEDO_DIMOTIKO_MOSCHATO": {
+    "latitude": 37.9552,
+    "longitude": 23.6803
+  },
+  "GIPEDO_FELNIS": {
+    "latitude": 41.0986,
+    "longitude": 24.9224
+  },
+  "GIPEDO_KRANIDIS": {
+    "latitude": 37.3805,
+    "longitude": 23.1601
+  },
+  "GIPEDO_NAXOS": {
+    "latitude": 37.8241,
+    "longitude": 15.2694
+  },
+  "GLOBAL_ENERGY_STADIUM": {
+    "latitude": 57.5958,
+    "longitude": -4.4191
+  },
+  "GRADSKI_STADION": {
+    "latitude": 43.143,
+    "longitude": 24.7248
+  },
+  "GREY_BETON_BODRUM_STADYUMU": {
+    "latitude": 37.0344,
+    "longitude": 27.4307
+  },
+  "GROSVENOR_VALE": {
+    "latitude": 51.587,
+    "longitude": -0.4427
+  },
+  "GULDFGELN_ARENA": {
+    "latitude": 56.6913,
+    "longitude": 16.314
+  },
+  "GWANGJU_FOOTBALL_STADIUM": {
+    "latitude": 35.1338,
+    "longitude": 126.875
+  },
+  "GWANGYANG_FOOTBALL_STADIUM": {
+    "latitude": 34.9331,
+    "longitude": 127.7274
+  },
+  "GWANGYANG_STADIUM": {
+    "latitude": 34.9331,
+    "longitude": 127.7274
+  },
+  "HADERSLEV_FOOTBALL_STADIUM": {
+    "latitude": 55.2501,
+    "longitude": 9.4998
+  },
+  "HALADS_STADION": {
+    "latitude": 47.2291,
+    "longitude": 16.6188
+  },
+  "HAMMARBY_IP": {
+    "latitude": 59.3064,
+    "longitude": 18.085
+  },
+  "HAMPDEN_PARK": {
+    "latitude": 55.826,
+    "longitude": -4.2519
+  },
+  "HAUGESUND_SPAREBANK_ARENA": {
+    "latitude": 59.4682,
+    "longitude": 5.0828
+  },
+  "HAWAIIANS_STADIUM_IWAKI": {
+    "latitude": 37.0453,
+    "longitude": 140.8915
+  },
+  "HEART_HEALTH_PARK": {
+    "latitude": 38.5914,
+    "longitude": -121.438
+  },
+  "HEIDEWALDSTADION": {
+    "latitude": 51.8918,
+    "longitude": 8.3881
+  },
+  "HIGHBURY_STADIUM": {
+    "latitude": 53.9164,
+    "longitude": -3.0247
+  },
+  "HIGH_ROAD": {
+    "latitude": 51.2999,
+    "longitude": -0.167
+  },
+  "HILLSBOROUGH": {
+    "latitude": 53.4114,
+    "longitude": -1.5006
+  },
+  "HITACHI_ENERGY_ARENA": {
+    "latitude": 59.6275,
+    "longitude": 16.5307
+  },
+  "HOLSTEINSTADION": {
+    "latitude": 54.3492,
+    "longitude": 10.1238
+  },
+  "HOME_OF_THE_SET_FARE_ARENA": {
+    "latitude": 55.886,
+    "longitude": -3.522
+  },
+  "HUISH_PARK": {
+    "latitude": 50.9502,
+    "longitude": -2.6741
+  },
+  "HUISH_PARK_STADIUM": {
+    "latitude": 50.9502,
+    "longitude": -2.6741
+  },
+  "HVIDOVRE_STADIUM": {
+    "latitude": 55.6318,
+    "longitude": 12.4829
+  },
+  "HWASEONG_STADIUM": {
+    "latitude": 37.1373,
+    "longitude": 126.9247
+  },
+  "LKER_STADYUMU_FENERBAHE_KR_SARACOLU_SPOR_KOMPLEKSI": {
+    "latitude": 40.9876,
+    "longitude": 29.037
+  },
+  "LUDWIGSPARKSTADION": {
+    "latitude": 49.2466,
+    "longitude": 6.9816
+  },
+  "LUMEN_FIELD": {
+    "latitude": 47.5953,
+    "longitude": -122.3316
+  },
+  "LYNGBY_STADION": {
+    "latitude": 55.7813,
+    "longitude": 12.5057
+  },
+  "MACHIDA_GION_STADIUM": {
+    "latitude": 35.5925,
+    "longitude": 139.4389
+  },
+  "MANISA_19_MAYS_STADYUMU": {
+    "latitude": 38.8574,
+    "longitude": 28.0566
+  },
+  "MARIENLYST_STADION": {
+    "latitude": 59.7344,
+    "longitude": 10.2016
+  },
+  "MARSHAL_JOZEF_PILSUDSKI_STADIUM": {
+    "latitude": 50.0677,
+    "longitude": 19.9915
+  },
+  "MAZUMA_MOBILE_STADIUM": {
+    "latitude": 54.0615,
+    "longitude": -2.8673
+  },
+  "MCDIARMID_PARK": {
+    "latitude": 56.4099,
+    "longitude": -3.4769
+  },
+  "MEADOW_PARK": {
+    "latitude": 51.662,
+    "longitude": -0.2724
+  },
+  "MEMORIAL_STADIUM": {
+    "latitude": 51.8528,
+    "longitude": -2.2554
+  },
+  "MERCEDESBENZ_STADIUM": {
+    "latitude": 33.7554,
+    "longitude": -84.4008
+  },
+  "MERKUR_ARENA": {
+    "latitude": 47.0464,
+    "longitude": 15.454
+  },
+  "METROPOLITANO_STADIUM": {
+    "latitude": 40.4361,
+    "longitude": -3.5997
+  },
+  "MICHAEL_A_CARROLL_STADIUM": {
+    "latitude": 39.771,
+    "longitude": -86.179
+  },
+  "MIEJSKI_STADION_PIKARSKI_RAKW_W_CZSTOCHOWIE": {
+    "latitude": 50.8212,
+    "longitude": 19.1126
+  },
+  "MILLERNTORSTADION": {
+    "latitude": 53.5546,
+    "longitude": 9.9678
+  },
+  "MILL_FARM_STADIUM": {
+    "latitude": 53.7974,
+    "longitude": -2.8897
+  },
+  "MILL_LANE": {
+    "latitude": 54.24,
+    "longitude": -0.7805
+  },
+  "MNHK_SPRING_MITSUZAWA_FOOTBALL_STADIUM": {
+    "latitude": 35.51,
+    "longitude": 139.6064
+  },
+  "MONJASA_PARK": {
+    "latitude": 55.5785,
+    "longitude": 9.7292
+  },
+  "MSTSK_STADION_VTKOVICE_ARNA": {
+    "latitude": 49.7889,
+    "longitude": 18.2362
+  },
+  "NACK5_STADIUM_OMIYA": {
+    "latitude": 35.9162,
+    "longitude": 139.6335
+  },
+  "NATURE_ENERGY_PARK": {
+    "latitude": 55.3977,
+    "longitude": 10.3502
+  },
+  "ND_SOFT_STADIUM_YAMAGATA": {
+    "latitude": 38.3356,
+    "longitude": 140.3774
+  },
+  "NEUER_TIVOLI": {
+    "latitude": 50.7955,
+    "longitude": 6.0943
+  },
+  "NEW_DOUGLAS_PARK": {
+    "latitude": 55.7822,
+    "longitude": -4.0579
+  },
+  "NHK_SPRING_MITSUZAWA_FOOTBALL_STADIUM": {
+    "latitude": 35.469,
+    "longitude": 139.6037
+  },
+  "NISSAN_STADIUM": {
+    "latitude": 35.51,
+    "longitude": 139.6064
+  },
+  "NOEVIR_STADIUM": {
+    "latitude": 34.6567,
+    "longitude": 135.1698
+  },
+  "NOEVIR_STADIUM_KOBE": {
+    "latitude": 34.6567,
+    "longitude": 135.1698
+  },
+  "OFELIA_ROSENZUAIG": {
+    "latitude": -34.6024,
+    "longitude": -58.3687
+  },
+  "OLYMPIAKO_STADIO_SPYROS_LOUIS": {
+    "latitude": 34.7343,
+    "longitude": -86.974
+  },
+  "ONEOK_FIELD": {
+    "latitude": 36.1604,
+    "longitude": -95.988
+  },
+  "OPAPDIMOTIKO_GIPEDO_KOMOTINIS": {
+    "latitude": 41.1217,
+    "longitude": 25.3852
+  },
+  "OPAP_ARENA": {
+    "latitude": 38.0372,
+    "longitude": 23.7409
+  },
+  "OROGEL_STADIUMDINO_MANUZZI": {
+    "latitude": 44.1404,
+    "longitude": 12.2619
+  },
+  "OSTERBRO_STADIUM": {
+    "latitude": 55.7041,
+    "longitude": 12.5749
+  },
+  "PAMPELOPONNISIAKO_STADIO": {
+    "latitude": 38.2091,
+    "longitude": 21.7645
+  },
+  "PAPARA_PARK": {
+    "latitude": 40.9987,
+    "longitude": 39.6454
+  },
+  "PARKEN_STADIUM": {
+    "latitude": 55.7027,
+    "longitude": 12.5723
+  },
+  "PARKSTAD_LIMBURG_STADION": {
+    "latitude": 50.857,
+    "longitude": 6.0058
+  },
+  "PARQUE_DESPORTIVO_COMENDADOR_JOAQUIM_DE_ALMEIDA_FREITAS": {
+    "latitude": 41.3815,
+    "longitude": -8.3362
+  },
+  "PASKBERGSVALLEN": {
+    "latitude": 57.0977,
+    "longitude": 12.2652
+  },
+  "PEACE_STADIUM": {
+    "latitude": 32.7591,
+    "longitude": 129.8642
+  },
+  "PENDIK_STADYUMU": {
+    "latitude": 40.9876,
+    "longitude": 29.037
+  },
+  "PIONEER_STADIUM": {
+    "latitude": 37.6572,
+    "longitude": -122.0608
+  },
+  "PITTODRIE_STADIUM": {
+    "latitude": 57.1587,
+    "longitude": -2.0884
+  },
+  "PLATINUMCARS_ARENA": {
+    "latitude": 58.5844,
+    "longitude": 16.1721
+  },
+  "PSV_CAMPUS_DE_HERDGANG": {
+    "latitude": 51.4393,
+    "longitude": 5.4786
+  },
+  "RIO_GRANDE_CREDIT_UNION_FIELD_AT_ISOTOPES_PARK": {
+    "latitude": 35.0841,
+    "longitude": -106.651
+  },
+  "RIO_TINTO_STADIUM": {
+    "latitude": 40.583,
+    "longitude": -111.8933
+  },
+  "RUDOLFHARBIGSTADION": {
+    "latitude": 51.0408,
+    "longitude": 13.748
+  },
+  "RUGBY_PARK": {
+    "latitude": 55.6041,
+    "longitude": -4.5094
+  },
+  "SAITAMA_STADIUM_2002": {
+    "latitude": 35.9031,
+    "longitude": 139.7168
+  },
+  "SAMSUN_19_MAYIS_STADYUMU": {
+    "latitude": 41.228,
+    "longitude": 36.4586
+  },
+  "SANDYGATE_ROAD": {
+    "latitude": 53.3778,
+    "longitude": -1.5268
+  },
+  "SANGA_STADIUM_BY_KYOCERA": {
+    "latitude": 35.017,
+    "longitude": 135.5849
+  },
+  "SANKYO_FRONTIER_KASHIWA_STADIUM": {
+    "latitude": 35.8485,
+    "longitude": 139.9751
+  },
+  "SAN_MAMS_BARRIA": {
+    "latitude": 43.2642,
+    "longitude": -2.9494
+  },
+  "SAPPORO_ATSUBETSU_STADIUM": {
+    "latitude": 43.0188,
+    "longitude": 141.4642
+  },
+  "SAPPORO_DOME": {
+    "latitude": 43.0166,
+    "longitude": 141.4114
+  },
+  "SARPSBORG_STADION": {
+    "latitude": 59.2863,
+    "longitude": 11.0977
+  },
+  "SDERMALMS_IP": {
+    "latitude": 58.3784,
+    "longitude": 13.8404
+  },
+  "SELECT_CAR_LEASING_STADIUM": {
+    "latitude": 51.4535,
+    "longitude": -1.0319
+  },
+  "SHELL_ENERGY_STADIUM": {
+    "latitude": 29.752,
+    "longitude": -95.3523
+  },
+  "SHIRANAMI_STADIUM": {
+    "latitude": 31.5216,
+    "longitude": 130.5474
+  },
+  "SILTA_YAP_PENDIK_STADYUMU": {
+    "latitude": 40.9876,
+    "longitude": 29.037
+  },
+  "SIXFIELDS_STADIUM": {
+    "latitude": 52.9623,
+    "longitude": -1.1332
+  },
+  "SKAGERAK_ARENA": {
+    "latitude": 59.2116,
+    "longitude": 9.59
+  },
+  "SNAPDRAGON_STADIUM": {
+    "latitude": 32.7842,
+    "longitude": -117.1224
+  },
+  "SOEVEREINSTADION": {
+    "latitude": 51.2396,
+    "longitude": 5.3073
+  },
+  "SOEVEREIN_STADION": {
+    "latitude": 51.2396,
+    "longitude": 5.3073
+  },
+  "SOLDIER_FIELD": {
+    "latitude": 41.8623,
+    "longitude": -87.6176
+  },
+  "SOMERSET_PARK": {
+    "latitude": 55.4697,
+    "longitude": -4.62
+  },
+  "SOYU_STADIUM": {
+    "latitude": 39.7215,
+    "longitude": 140.0958
+  },
+  "SPAREBANKEN_SR_ARENA": {
+    "latitude": 58.1537,
+    "longitude": 8.0303
+  },
+  "SPARTASTADION_HET_KASTEEL": {
+    "latitude": 51.8939,
+    "longitude": 4.5232
+  },
+  "SPARTA_STADION_HET_KASTEEL": {
+    "latitude": 51.8939,
+    "longitude": 4.5232
+  },
+  "SPOINT_INAAT_MRANIYESPOR_STADYUMU": {
+    "latitude": 40.9876,
+    "longitude": 29.037
+  },
+  "SPORTCOMPLEX_DE_TOEKOMST": {
+    "latitude": 52.2947,
+    "longitude": 4.9165
+  },
+  "SPORTCOMPLEX_ZOUDENBALCH": {
+    "latitude": 52.0779,
+    "longitude": 5.2334
+  },
+  "SPORTPARK_DE_TOEKOMST": {
+    "latitude": 52.3219,
+    "longitude": 4.9259
+  },
+  "SPORTPLATZ_HINTERLEISIBACH": {
+    "latitude": 47.0941,
+    "longitude": 8.3473
+  },
+  "SPORTPLATZ_MOOS": {
+    "latitude": 47.3357,
+    "longitude": 8.4637
+  },
+  "SPORTS_ILLUSTRATED_STADIUM": {
+    "latitude": 40.7369,
+    "longitude": -74.1503
+  },
+  "STADE_ANTOINE_DE_SAINTEXUPRY": {
+    "latitude": 43.4162,
+    "longitude": 5.2145
+  },
+  "STADE_ARMAND_CESARI": {
+    "latitude": 42.6515,
+    "longitude": 9.4427
+  },
+  "STADE_AUGUSTEDELAUNE": {
+    "latitude": 49.2471,
+    "longitude": 4.0248
+  },
+  "STADE_CHARLTY": {
+    "latitude": 48.8181,
+    "longitude": 2.3461
+  },
+  "STADE_COMMUNAL_COURGENAY": {
+    "latitude": 48.2864,
+    "longitude": 3.549
+  },
+  "STADE_COMMUNAL_DU_TIVOLI": {
+    "latitude": 50.4774,
+    "longitude": 4.2032
+  },
+  "STADE_DES_ALPES": {
+    "latitude": 45.1874,
+    "longitude": 5.7402
+  },
+  "STADE_DE_LABB_DESCHAMPS": {
+    "latitude": 47.7961,
+    "longitude": 3.5706
+  },
+  "STADE_DE_LATTRE_DE_TASSIGNY": {
+    "latitude": 43.2938,
+    "longitude": 5.5624
+  },
+  "STADE_DE_LA_BEAUJOIRE_LOUIS_FONTENEAU": {
+    "latitude": 47.256,
+    "longitude": -1.5248
+  },
+  "STADE_DE_LA_LIBRATION": {
+    "latitude": 50.7236,
+    "longitude": 1.6195
+  },
+  "STADE_DE_LA_MOSSONMONDIAL_98": {
+    "latitude": 43.6496,
+    "longitude": 3.9293
+  },
+  "STADE_DE_LA_TUILIERE": {
+    "latitude": 46.5436,
+    "longitude": 6.622
+  },
+  "STADE_DE_LA_TUILIRE": {
+    "latitude": 46.5436,
+    "longitude": 6.622
+  },
+  "STADE_DE_PARIS": {
+    "latitude": 48.9061,
+    "longitude": 2.3412
+  },
+  "STADE_DE_ROUDOUROU": {
+    "latitude": 48.566,
+    "longitude": -3.1645
+  },
+  "STADE_DE_TOURBILLON": {
+    "latitude": 46.2334,
+    "longitude": 7.376
+  },
+  "STADE_DU_HAINAUT": {
+    "latitude": 50.3484,
+    "longitude": 3.5317
+  },
+  "STADE_DU_MOUSTOIR_YVES_ALLAINMAT": {
+    "latitude": 47.7488,
+    "longitude": -3.3695
+  },
+  "STADE_DU_PAYS_DE_CHARLEROI": {
+    "latitude": 50.4146,
+    "longitude": 4.4537
+  },
+  "STADE_DU_ROUDOUROU": {
+    "latitude": 48.566,
+    "longitude": -3.1645
+  },
+  "STADE_FRANCIS_LE_BASSER": {
+    "latitude": 48.0822,
+    "longitude": -0.7548
+  },
+  "STADE_GASTONGRARD": {
+    "latitude": 47.3243,
+    "longitude": 5.0683
+  },
+  "STADE_GASTON_PETIT": {
+    "latitude": 46.802,
+    "longitude": 1.7215
+  },
+  "STADE_GUY_PIRIOU": {
+    "latitude": 47.8892,
+    "longitude": -3.9136
+  },
+  "STADE_JACQUES_PONTREMY": {
+    "latitude": 16.3317,
+    "longitude": -61.3476
+  },
+  "STADE_JEAN_LEVEILLE": {
+    "latitude": 46.8411,
+    "longitude": -1.8793
+  },
+  "STADE_LEBON": {
+    "latitude": 45.641,
+    "longitude": 0.1777
+  },
+  "STADE_LOUISII": {
+    "latitude": 43.7276,
+    "longitude": 7.4155
+  },
+  "STADE_MARCELPICOT": {
+    "latitude": 48.6958,
+    "longitude": 6.2104
+  },
+  "STADE_MARCELTRIBUT": {
+    "latitude": 51.0353,
+    "longitude": 2.3898
+  },
+  "STADE_MARCEL_PICOT": {
+    "latitude": 48.6958,
+    "longitude": 6.2104
+  },
+  "STADE_MARIEMARVINGT": {
+    "latitude": 47.9592,
+    "longitude": 0.2231
+  },
+  "STADE_MASSABIELLE": {
+    "latitude": 46.8714,
+    "longitude": -1.0151
+  },
+  "STADE_MUNICIPAL_GEORGES_LEFVRE": {
+    "latitude": 48.9123,
+    "longitude": 2.081
+  },
+  "STADE_OLYMPIQUE_DE_LA_PONTAISE": {
+    "latitude": 46.5332,
+    "longitude": 6.6243
+  },
+  "STADE_PAUL_ROBBE": {
+    "latitude": 46.9025,
+    "longitude": 6.3433
+  },
+  "STADE_PIERREMAUROY": {
+    "latitude": 50.6119,
+    "longitude": 3.1305
+  },
+  "STADE_PIERRE_BLOUEN": {
+    "latitude": 47.0551,
+    "longitude": -0.8705
+  },
+  "STADE_RAYMONDKOPA": {
+    "latitude": 47.4606,
+    "longitude": -0.5307
+  },
+  "STADE_RENE_FENOUILLERE": {
+    "latitude": 48.6808,
+    "longitude": -1.3594
+  },
+  "STADE_REN_FENOUILLRE": {
+    "latitude": 48.6808,
+    "longitude": -1.3594
+  },
+  "STADE_ROBERT_URBAIN": {
+    "latitude": 50.4236,
+    "longitude": 3.8028
+  },
+  "STADE_SAINTSYMPHORIEN": {
+    "latitude": 49.1096,
+    "longitude": 6.1596
+  },
+  "STADE_SAPUTO": {
+    "latitude": 45.5631,
+    "longitude": -73.5526
+  },
+  "STADIONUL_DR_CONSTANTIN_RDULESCU": {
+    "latitude": 46.7797,
+    "longitude": 23.5778
+  },
+  "STADION_AN_DER_HAFENSTRAE": {
+    "latitude": 51.4869,
+    "longitude": 6.9766
+  },
+  "STADION_BIJELI_BRIJEG": {
+    "latitude": 43.3452,
+    "longitude": 17.7951
+  },
+  "STADION_BRGGLIFELD": {
+    "latitude": 47.3916,
+    "longitude": 8.028
+  },
+  "STADION_DE_VLIERT": {
+    "latitude": 51.7017,
+    "longitude": 5.3298
+  },
+  "STADION_DR_MACHADO_DE_MATOS": {
+    "latitude": 41.3649,
+    "longitude": -8.1989
+  },
+  "STADION_FEIJENOORD": {
+    "latitude": 51.8939,
+    "longitude": 4.5232
+  },
+  "STADION_IM_ORA_BIAEGO": {
+    "latitude": 51.2036,
+    "longitude": 16.1699
+  },
+  "STADION_KRAJ_BISTRICE": {
+    "latitude": 42.7739,
+    "longitude": 18.9488
+  },
+  "STADION_LSKI": {
+    "latitude": 50.2882,
+    "longitude": 18.9735
+  },
+  "STADION_MIEJSKI": {
+    "latitude": 50.8602,
+    "longitude": 20.6262
+  },
+  "STADION_MIEJSKI_IM_GRZEGORZA_LATO": {
+    "latitude": 50.2986,
+    "longitude": 21.4359
+  },
+  "STADION_MIEJSKI_IM_HENRYKA_REYMANA": {
+    "latitude": 50.0636,
+    "longitude": 19.9117
+  },
+  "STADION_MIEJSKI_IM_SEBASTIANA_KARPINIUKA": {
+    "latitude": 54.1761,
+    "longitude": 15.5621
+  },
+  "STADION_MIEJSKI_LEGII_WARSZAWA_IM_MARSZAKA_JZEFA_PISUDSKIEGO": {
+    "latitude": 52.2205,
+    "longitude": 21.0407
+  },
+  "STADION_MIEJSKI_LKS_LODZ": {
+    "latitude": 51.7651,
+    "longitude": 19.5117
+  },
+  "STADION_POLJUD": {
+    "latitude": 43.5195,
+    "longitude": 16.4319
+  },
+  "STADION_POLONII": {
+    "latitude": 52.2399,
+    "longitude": 21.0453
+  },
+  "STADION_POLONII_IM_GENERAA_KAZIMIERZA_SOSNKOWSKIEGO": {
+    "latitude": 52.2399,
+    "longitude": 21.0453
+  },
+  "STADION_RESPECT_ENERGY": {
+    "latitude": 52.2263,
+    "longitude": 16.3628
+  },
+  "STADION_ROTE_ERDE": {
+    "latitude": 51.4929,
+    "longitude": 7.4541
+  },
+  "STADION_SCHTZENWIESE": {
+    "latitude": 47.5008,
+    "longitude": 8.7181
+  },
+  "STADION_SPORTOWY_BRUKBET_TERMALICA": {
+    "latitude": 50.1536,
+    "longitude": 20.848
+  },
+  "STADION_ZAGBIA_LUBIN": {
+    "latitude": 51.3974,
+    "longitude": 16.2051
+  },
+  "STADIO_BENITO_STIRPE": {
+    "latitude": 41.634,
+    "longitude": 13.3218
+  },
+  "STADIO_COMUNALE": {
+    "latitude": 46.1978,
+    "longitude": 9.022
+  },
+  "STADIO_COMUNALE_ROMEO_MENTI": {
+    "latitude": 40.7063,
+    "longitude": 14.4943
+  },
+  "STADIO_COMUNALE_SAN_NICOLA": {
+    "latitude": 9.5032,
+    "longitude": 49.0903
+  },
+  "STADIO_DI_CORNAREDO": {
+    "latitude": 46.0038,
+    "longitude": 8.9512
+  },
+  "STADIO_GEORGIOS_KARAISKKI": {
+    "latitude": 37.9465,
+    "longitude": 23.6644
+  },
+  "STADIO_MARCO_DRUSO": {
+    "latitude": 46.4929,
+    "longitude": 11.3151
+  },
+  "STADIO_PARTENIOADRIANO_LOMBARDI": {
+    "latitude": 40.927,
+    "longitude": 14.7926
+  },
+  "STADIO_PIER_CESARE_TOMBOLATO": {
+    "latitude": -8.8274,
+    "longitude": 13.2559
+  },
+  "STADIO_SAN_NICOLA": {
+    "latitude": 41.0847,
+    "longitude": 16.8401
+  },
+  "STADIO_SAN_VITOLUIGI_MARULLA": {
+    "latitude": 39.1613,
+    "longitude": 16.0689
+  },
+  "STADIO_STAVROS_MAVROTHALASSITIS": {
+    "latitude": 37.9872,
+    "longitude": 23.676
+  },
+  "STADIUMI_FADIL_VOKRRI": {
+    "latitude": 42.6629,
+    "longitude": 21.1571
+  },
+  "STADIUM_MK": {
+    "latitude": 52.0096,
+    "longitude": -0.7335
+  },
+  "STARKS_PARK": {
+    "latitude": 56.0998,
+    "longitude": -3.1684
+  },
+  "STEELYARD_STADIUM": {
+    "latitude": 35.9976,
+    "longitude": 129.3845
+  },
+  "STOCKHORN_ARENA": {
+    "latitude": 46.7446,
+    "longitude": 7.6066
+  },
+  "STRANDVALLEN": {
+    "latitude": 56.0122,
+    "longitude": 14.7172
+  },
+  "ST_ANDREWS_KNIGHTHEAD_PARK": {
+    "latitude": 52.4797,
+    "longitude": -1.915
+  },
+  "ST_JAKOBPARK": {
+    "latitude": 47.5416,
+    "longitude": 7.6201
+  },
+  "SUBARU_PARK": {
+    "latitude": 39.8329,
+    "longitude": -75.3785
+  },
+  "SUNGUI_ARENA_PARK": {
+    "latitude": 37.4351,
+    "longitude": 126.6908
+  },
+  "SUWON_WORLD_CUP_STADIUM": {
+    "latitude": 37.2864,
+    "longitude": 127.0368
+  },
+  "SWISSPORARENA": {
+    "latitude": 47.0329,
+    "longitude": 8.3051
+  },
+  "TALLAGHT_STADIUM": {
+    "latitude": 53.2834,
+    "longitude": -6.3738
+  },
+  "TANCHEON_SPORTS_COMPLEX": {
+    "latitude": 37.4101,
+    "longitude": 127.1212
+  },
+  "TARCZYSKI_ARENA": {
+    "latitude": 51.1412,
+    "longitude": 16.9438
+  },
+  "TERRAIN_WALTER_FELDER": {
+    "latitude": 48.63,
+    "longitude": 2.3609
+  },
+  "THE_BBSP_STADIUM_RUGBY_PARK": {
+    "latitude": 55.6041,
+    "longitude": -4.5094
+  },
+  "THE_BOLT_NEW_LAWN": {
+    "latitude": 51.699,
+    "longitude": -2.2379
+  },
+  "THE_CHERRY_RED_RECORDS_STADIUM": {
+    "latitude": 51.4051,
+    "longitude": -0.282
+  },
+  "THE_COVENTRY_BUILDING_SOCIETY_ARENA": {
+    "latitude": 52.4482,
+    "longitude": -1.497
+  },
+  "THE_CROUD_MEADOW": {
+    "latitude": 52.6865,
+    "longitude": -2.7486
+  },
+  "THE_JAKEMANS_COMMUNITY_STADIUM": {
+    "latitude": 52.9562,
+    "longitude": -0.0287
+  },
+  "THE_J_DAVIDSON_STADIUM": {
+    "latitude": 53.385,
+    "longitude": -2.3519
+  },
+  "THE_MKM_STADIUM": {
+    "latitude": 53.7462,
+    "longitude": -0.3678
+  },
+  "THE_NEST": {
+    "latitude": 50.945,
+    "longitude": 3.1244
+  },
+  "THE_NEW_LAWN": {
+    "latitude": 51.699,
+    "longitude": -2.2378
+  },
+  "THE_NIGEL_EADY_COUNTY_GROUND": {
+    "latitude": 51.5539,
+    "longitude": -1.7776
+  },
+  "THE_PENINSULA_STADIUM": {
+    "latitude": 53.4693,
+    "longitude": -2.3752
+  },
+  "THE_PRESTIGE_GROUP_STADIUM": {
+    "latitude": 54.7506,
+    "longitude": -1.4289
+  },
+  "THE_SCOT_FOAM_STADIUM_AT_DENS_PARK": {
+    "latitude": 56.4606,
+    "longitude": -2.9702
+  },
+  "THE_SHAY_STADIUM": {
+    "latitude": 53.7162,
+    "longitude": -1.8599
+  },
+  "THE_SKUNA_STADIUM": {
+    "latitude": 53.5235,
+    "longitude": -2.4847
+  },
+  "THE_SMISA_STADIUM": {
+    "latitude": 55.8456,
+    "longitude": -4.424
+  },
+  "THE_SPORTS_GROUND": {
+    "latitude": 52.4599,
+    "longitude": -2.116
+  },
+  "THE_WHAM_STADIUM": {
+    "latitude": 53.7654,
+    "longitude": -2.371
+  },
+  "TOYAMA_STADIUM": {
+    "latitude": 36.7577,
+    "longitude": 137.2353
+  },
+  "TOYOTA_STADIUM": {
+    "latitude": 35.0846,
+    "longitude": 137.1709
+  },
+  "TPRA_STADYUMU": {
+    "latitude": 41.0395,
+    "longitude": 28.9943
+  },
+  "TQL_STADIUM": {
+    "latitude": 39.1112,
+    "longitude": -84.5222
+  },
+  "TRINITY_HEALTH_STADIUM": {
+    "latitude": 41.7539,
+    "longitude": -72.6611
+  },
+  "TSC_ARENA": {
+    "latitude": 45.8156,
+    "longitude": 19.6274
+  },
+  "TYNECASTLE_PARK": {
+    "latitude": 55.939,
+    "longitude": -3.2323
+  },
+  "UD_ALMERA_STADIUM": {
+    "latitude": 36.8401,
+    "longitude": -2.4355
+  },
+  "UNIVERSITY_OF_BRADFORD_STADIUM": {
+    "latitude": 53.8043,
+    "longitude": -1.7594
+  },
+  "UPOWER_STADIUM": {
+    "latitude": 45.5831,
+    "longitude": 9.3079
+  },
+  "URSAPHARMARENA_AN_DER_KAISERLINDE": {
+    "latitude": 49.3145,
+    "longitude": 7.137
+  },
+  "VALE_PARK": {
+    "latitude": 53.0006,
+    "longitude": -2.1213
+  },
+  "VAZGEN_SARGSYAN_ANVAN_HANRAPETAKAN_MARZADASHT": {
+    "latitude": 40.172,
+    "longitude": 44.5255
+  },
+  "VBS_COMMUNITY_STADIUM": {
+    "latitude": 51.1968,
+    "longitude": -0.6229
+  },
+  "VEJLE_STADION": {
+    "latitude": 55.7137,
+    "longitude": 9.5562
+  },
+  "VICTORIA_PARK": {
+    "latitude": 54.6891,
+    "longitude": -1.2127
+  },
+  "VNGAVALLEN": {
+    "latitude": 55.3852,
+    "longitude": 13.1609
+  },
+  "WALDSTADION_KAISERLINDE": {
+    "latitude": 49.3145,
+    "longitude": 7.137
+  },
+  "WEIDNER_FIELD": {
+    "latitude": 38.8263,
+    "longitude": -104.8284
+  },
+  "WILLYSACHSSTADION": {
+    "latitude": 50.0541,
+    "longitude": 10.196
+  },
+  "WIRMACHENDRUCK_ARENA": {
+    "latitude": 48.9807,
+    "longitude": 9.393
+  },
+  "WYRE_STADIUM_AT_FIRHILL": {
+    "latitude": 55.8532,
+    "longitude": -4.3093
+  },
+  "YAMAHA_STADIUM": {
+    "latitude": 34.7251,
+    "longitude": 137.8751
+  },
+  "YANKEE_STADIUM": {
+    "latitude": 40.8296,
+    "longitude": -73.9265
+  },
+  "YANMAR_STADION": {
+    "latitude": 52.3944,
+    "longitude": 5.2405
+  },
+  "YENI_MALATYA_STADYUMU": {
+    "latitude": 38.3374,
+    "longitude": 38.4461
+  },
+  "YENI_SAKARYA_ATATRK_STADYUMU": {
+    "latitude": 40.7804,
+    "longitude": 30.4323
+  },
+  "YISHUNSIN_STADIUM": {
+    "latitude": 36.7715,
+    "longitude": 127.0217
+  },
+  "YLDZ_ENTEGRE_KOCAELI_STADYUMU": {
+    "latitude": 40.7751,
+    "longitude": 30.017
+  },
+  "YODOKO_SAKURA_STADIUM": {
+    "latitude": 34.6154,
+    "longitude": 135.5165
+  },
+  "YORK_ROAD_STADIUM": {
+    "latitude": 51.4641,
+    "longitude": -0.6515
+  },
+  "ZLX_STADIUM": {
+    "latitude": 43.2517,
+    "longitude": -79.8316
+  },
+  "ZUBIETA_REAL_SOCIEDAD": {
+    "latitude": 43.3224,
+    "longitude": -1.9839
+  },
+  "ACHTER_DE_KAZERNE": {
+    "latitude": 51.0281,
+    "longitude": 4.4803
+  },
+  "ALEXANDRA_STADIUM": {
+    "latitude": 53.0874,
+    "longitude": -2.4357
+  },
+  "AMERICA_FIRST_FIELD": {
+    "latitude": 40.583,
+    "longitude": -111.8933
+  },
+  "ARENA_BRB_MAN_GARRINCHA": {
+    "latitude": -15.7837,
+    "longitude": -47.899
+  },
+  "ARENA_DO_GRMIO": {
+    "latitude": -29.974,
+    "longitude": -51.1951
+  },
+  "ARENA_FONTE_NOVA": {
+    "latitude": -12.9788,
+    "longitude": -38.5036
+  },
+  "ARENA_GARIBALDI_STADIO_ROMEO_ANCONETANI": {
+    "latitude": -6.2617,
+    "longitude": 106.6296
+  },
+  "ARENA_MRV": {
+    "latitude": -19.93,
+    "longitude": -44.0139
+  },
+  "ASHTON_GATE_STADIUM": {
+    "latitude": 51.4399,
+    "longitude": -2.6203
+  },
+  "ASITO_STADION": {
+    "latitude": 52.3388,
+    "longitude": 6.6508
+  },
+  "ASITO_STADIUM": {
+    "latitude": 52.3388,
+    "longitude": 6.6508
+  },
+  "ASPMYRA_STADION": {
+    "latitude": 67.2766,
+    "longitude": 14.3844
+  },
+  "ATATRK_OLIMPIYAT_STAD": {
+    "latitude": 41.0745,
+    "longitude": 28.7657
+  },
+  "AUDI_FIELD": {
+    "latitude": 38.8683,
+    "longitude": -77.0126
+  },
+  "BINGOAL_STADION": {
+    "latitude": 52.0627,
+    "longitude": 4.3829
+  },
+  "BORUSSIAPARK": {
+    "latitude": 51.1746,
+    "longitude": 6.3854
+  },
+  "BOUNDARY_PARK": {
+    "latitude": 53.5552,
+    "longitude": -2.1283
+  },
+  "BRANN_STADION": {
+    "latitude": 60.3668,
+    "longitude": 5.3574
+  },
+  "BRAVIDA_ARENA": {
+    "latitude": 57.7076,
+    "longitude": 11.9697
+  },
+  "BRIANTEO": {
+    "latitude": 45.5831,
+    "longitude": 9.3079
+  },
+  "BRISBANE_ROAD": {
+    "latitude": 51.5601,
+    "longitude": -0.0126
+  },
+  "BRISKEBY_ARENA": {
+    "latitude": 53.0652,
+    "longitude": 48.4183
+  },
+  "CALFORTH_CONSTRUCTION_ARENA_AT_TANNADICE_PARK": {
+    "latitude": 56.4606,
+    "longitude": -2.9702
+  },
+  "CAMPO_DE_FUTBOL_DE_VALLECAS": {
+    "latitude": 40.3918,
+    "longitude": -3.6587
+  },
+  "CARLBENZ_STADION": {
+    "latitude": 49.4794,
+    "longitude": 8.5025
+  },
+  "CITYPARK": {
+    "latitude": 38.6313,
+    "longitude": -90.2103
+  },
+  "ESTADIO_DE_GRAN_CANARIA": {
+    "latitude": 28.1002,
+    "longitude": -15.4567
+  },
+  "ESTADIO_DE_LA_CARTUJA": {
+    "latitude": 37.4172,
+    "longitude": -6.0046
+  },
+  "ESTADIO_DE_LA_ROMAREDA": {
+    "latitude": 41.6398,
+    "longitude": -0.9041
+  },
+  "ESTADIO_NICO_MADRE_DE_CIUDADES": {
+    "latitude": -38.9513,
+    "longitude": -68.0652
+  },
+  "ESTADIO_UNICO_MADRE_DE_CIUDADES": {
+    "latitude": -27.6431,
+    "longitude": -63.5409
+  },
+  "ESTADIO_UNIVERSITARIO": {
+    "latitude": 25.7226,
+    "longitude": -100.312
+  },
+  "ESTADIO_URBANO_CALDEIRA": {
+    "latitude": -23.9511,
+    "longitude": -46.339
+  },
+  "ESTADIO_ZORROS_DEL_DESIERTO": {
+    "latitude": -22.4605,
+    "longitude": -68.9206
+  },
+  "ESTDIO_ALFREDO_JACONI": {
+    "latitude": -29.1623,
+    "longitude": -51.1765
+  },
+  "ESTDIO_CIDADE_DE_BARCELOS": {
+    "latitude": 41.5511,
+    "longitude": -8.6231
+  },
+  "ESTDIO_CLUBE_DESPORTIVO_DAS_AVES": {
+    "latitude": 41.3574,
+    "longitude": -8.4063
+  },
+  "ESTDIO_DA_LUZ": {
+    "latitude": 38.7527,
+    "longitude": -9.1847
+  },
+  "ESTDIO_DA_MADEIRA": {
+    "latitude": 32.7518,
+    "longitude": -16.9817
+  },
+  "ESTDIO_DO_DRAGO": {
+    "latitude": 41.1618,
+    "longitude": -8.5837
+  },
+  "ESTDIO_DO_MARACAN": {
+    "latitude": -22.9122,
+    "longitude": -43.2312
+  },
+  "ESTDIO_DO_RIO_AVE_FUTEBOL_CLUBE": {
+    "latitude": 41.3627,
+    "longitude": -8.7401
+  },
+  "ESTDIO_DO_VIZELA": {
+    "latitude": 41.3728,
+    "longitude": -8.3133
+  },
+  "ESTDIO_GOVERNADOR_MAGALHES_PINTO": {
+    "latitude": -19.8659,
+    "longitude": -43.971
+  },
+  "ESTDIO_GOVERNADOR_PLCIDO_ADERALDO_CASTELO": {
+    "latitude": -3.8135,
+    "longitude": -38.5222
+  },
+  "ESTDIO_HERIBERTO_HLSE": {
+    "latitude": -28.6843,
+    "longitude": -49.3677
+  },
+  "ESTDIO_JOS_ALVALADE": {
+    "latitude": 38.7612,
+    "longitude": -9.1608
+  },
+  "ESTDIO_MUNICIPAL_DE_RIO_MAIOR": {
+    "latitude": 39.3365,
+    "longitude": -8.9364
+  },
+  "ESTDIO_NABI_ABI_CHEDID": {
+    "latitude": -22.9654,
+    "longitude": -46.5369
+  },
+  "ESTDIO_NILTON_SANTOS": {
+    "latitude": -22.8932,
+    "longitude": -43.2936
+  },
+  "ESTDIO_SO_JANURIO": {
+    "latitude": -22.8908,
+    "longitude": -43.2283
+  },
+  "EUROBORG": {
+    "latitude": 53.2062,
+    "longitude": 6.5915
+  },
+  "EUROPAPARK_STADION": {
+    "latitude": 48.0214,
+    "longitude": 7.8298
+  },
+  "EXBUD_ARENA": {
+    "latitude": 50.8615,
+    "longitude": 20.6247
+  },
+  "EXERCISE_STADIUM": {
+    "latitude": 53.9921,
+    "longitude": -1.5391
+  },
+  "FC_ALVERCA_SPORTS_COMPLEX": {
+    "latitude": 38.8979,
+    "longitude": -9.0352
+  },
+  "FREDRIKSTAD_STADION": {
+    "latitude": 59.2131,
+    "longitude": 10.9281
+  },
+  "GANGNEUNG_STADIUM": {
+    "latitude": 37.7736,
+    "longitude": 128.8976
+  },
+  "GP_STADION_AM_HARDTWALD": {
+    "latitude": 49.3321,
+    "longitude": 8.6477
+  },
+  "GRIMSTA_IP": {
+    "latitude": 59.3618,
+    "longitude": 17.8524
+  },
+  "GULDENSPORENSTADION": {
+    "latitude": 50.8303,
+    "longitude": 3.2491
+  },
+  "HAUGESUND_STADION": {
+    "latitude": 59.4131,
+    "longitude": 5.2795
+  },
+  "HEINZVONHEIDENARENA": {
+    "latitude": 52.36,
+    "longitude": 9.731
+  },
+  "HEINZ_VON_HEIDENARENA": {
+    "latitude": 52.36,
+    "longitude": 9.731
+  },
+  "HET_KUIPJE": {
+    "latitude": 51.0867,
+    "longitude": 4.9169
+  },
+  "HILL_DICKINSON_STADIUM": {
+    "latitude": 53.425,
+    "longitude": -3.0027
+  },
+  "HOLKER_STREET": {
+    "latitude": 54.1174,
+    "longitude": -3.2259
+  },
+  "IAI_STADIUM_NIHONDAIRA": {
+    "latitude": 34.9847,
+    "longitude": 138.4813
+  },
+  "INTERCO_STADIUM": {
+    "latitude": 28.5411,
+    "longitude": -81.3891
+  },
+  "JAHNSTADION_REGENSBURG": {
+    "latitude": 48.9909,
+    "longitude": 12.1074
+  },
+  "JAPAN_NATIONAL_STADIUM": {
+    "latitude": 35.6645,
+    "longitude": 139.5242
+  },
+  "JEJU_WORLD_CUP_STADIUM": {
+    "latitude": 33.2463,
+    "longitude": 126.5091
+  },
+  "JEONJU_WORLD_CUP_STADIUM": {
+    "latitude": 35.8678,
+    "longitude": 127.0646
+  },
+  "JOBSERVE_COMMUNITY_STADIUM": {
+    "latitude": 51.9234,
+    "longitude": 0.8976
+  },
+  "JOHN_SMIT": {
+    "latitude": 53.6543,
+    "longitude": -1.7683
+  },
+  "JOHN_SMITHS_STADIUM": {
+    "latitude": 53.6543,
+    "longitude": -1.7683
+  },
+  "JOSE_AMALFITANI": {
+    "latitude": -34.6353,
+    "longitude": -58.5207
+  },
+  "JOTUN_ARENA": {
+    "latitude": 59.1372,
+    "longitude": 10.1795
+  },
+  "KADIR_HAS_STADIUM": {
+    "latitude": 38.7219,
+    "longitude": 35.4873
+  },
+  "KALYON_STADYUMU": {
+    "latitude": 37.1244,
+    "longitude": 37.3823
+  },
+  "KASHIMA_SOCCER_STADIUM": {
+    "latitude": 35.9923,
+    "longitude": 140.6363
+  },
+  "KASSAM_STADIUM": {
+    "latitude": 51.7165,
+    "longitude": -1.2077
+  },
+  "KAWASAKI_TODOROKI_STADIUM": {
+    "latitude": 35.5858,
+    "longitude": 139.6527
+  },
+  "KGHM_ZAGLEBIE_ARENA": {
+    "latitude": 51.4139,
+    "longitude": 16.1982
+  },
+  "KING_POWER_AT_DEN_DREEF_STADION": {
+    "latitude": 50.8684,
+    "longitude": 4.6943
+  },
+  "KRAS_STADION": {
+    "latitude": 52.4944,
+    "longitude": 5.0663
+  },
+  "KRBYK_HOLDING_STADYUMU": {
+    "latitude": 43.023,
+    "longitude": 44.6944
+  },
+  "KRISTIANSUND_STADION": {
+    "latitude": 63.1258,
+    "longitude": 7.719
+  },
+  "LA_ROMAREDA": {
+    "latitude": 41.6365,
+    "longitude": -0.9018
+  },
+  "LEMON_GAS_STADIUM": {
+    "latitude": 35.3437,
+    "longitude": 139.3411
+  },
+  "LEMON_GAS_STADIUM_HIRATSUKA": {
+    "latitude": 35.3437,
+    "longitude": 139.3411
+  },
+  "LETZIGRUND_STADION": {
+    "latitude": 47.3828,
+    "longitude": 8.5037
+  },
+  "LIGGA_ARENA": {
+    "latitude": -25.4483,
+    "longitude": -49.2769
+  },
+  "LOWERCOM_FIELD": {
+    "latitude": 39.9684,
+    "longitude": -83.0167
+  },
+  "LUDWIGSPARK_STADION": {
+    "latitude": 50.0541,
+    "longitude": 10.196
+  },
+  "LYSE_ARENA": {
+    "latitude": 58.9146,
+    "longitude": 5.731
+  },
+  "MERCARI_STADIUM": {
+    "latitude": 35.992,
+    "longitude": 140.6404
+  },
+  "MERCKSTADION_AM_BLLENFALLTOR": {
+    "latitude": 49.8577,
+    "longitude": 8.6724
+  },
+  "MIEJSKI_STADION_PIKARSKI_RAKW": {
+    "latitude": 50.8212,
+    "longitude": 19.1126
+  },
+  "MKM_STADIUM": {
+    "latitude": 53.7462,
+    "longitude": -0.3678
+  },
+  "MOKDONG_STADIUM": {
+    "latitude": 37.5683,
+    "longitude": 126.8972
+  },
+  "MORUMBIS": {
+    "latitude": -23.6001,
+    "longitude": -46.7201
+  },
+  "MOTOR_LUBLIN_ARENA": {
+    "latitude": 51.2323,
+    "longitude": 22.5574
+  },
+  "NEO_QUIMICA_ARENA": {
+    "latitude": -23.5453,
+    "longitude": -46.4743
+  },
+  "NEO_QUMICA_ARENA": {
+    "latitude": -23.5453,
+    "longitude": -46.4743
+  },
+  "NEW_TIVOLI": {
+    "latitude": 50.7955,
+    "longitude": 6.0943
+  },
+  "NORDMRE_STADION": {
+    "latitude": 63.1249,
+    "longitude": 7.7183
+  },
+  "NOU_ESTADI_CASTALIA": {
+    "latitude": 39.986,
+    "longitude": -0.0377
+  },
+  "NYE_FREDRIKSTAD_STADION": {
+    "latitude": 59.2131,
+    "longitude": 10.9281
+  },
+  "OLYMPISCH_STADION": {
+    "latitude": 51.1851,
+    "longitude": 4.382
+  },
+  "OSTSEESTADION": {
+    "latitude": 54.085,
+    "longitude": 12.0951
+  },
+  "PANASONIC_STADIUM_SUITA": {
+    "latitude": 34.8026,
+    "longitude": 135.5381
+  },
+  "PARC_DES_SPORTS": {
+    "latitude": 45.9169,
+    "longitude": 6.1192
+  },
+  "PAYPAL_PARK": {
+    "latitude": 37.3513,
+    "longitude": -121.9247
+  },
+  "PENINSULA_STADIUM": {
+    "latitude": 53.4693,
+    "longitude": -2.3752
+  },
+  "POHANG_STEEL_YARD": {
+    "latitude": 35.9976,
+    "longitude": 129.3845
+  },
+  "POLSAT_PLUS_ARENA_GDASK": {
+    "latitude": 54.3899,
+    "longitude": 18.6404
+  },
+  "POWER_HORSE_STADIUM": {
+    "latitude": 36.8401,
+    "longitude": -2.4355
+  },
+  "PREUENSTADION": {
+    "latitude": 52.6821,
+    "longitude": -7.826
+  },
+  "PRIDE_PARK": {
+    "latitude": 52.9165,
+    "longitude": -1.4626
+  },
+  "PRIESTFIELD_STADIUM": {
+    "latitude": 51.383,
+    "longitude": 0.5513
+  },
+  "PROVIDENCE_PARK": {
+    "latitude": 45.5215,
+    "longitude": -122.6918
+  },
+  "PRO_VENTILATION_ARENA": {
+    "latitude": 55.6318,
+    "longitude": 12.4829
+  },
+  "Q2_STADIUM": {
+    "latitude": 30.2838,
+    "longitude": -97.7326
+  },
+  "RACECOURSE_GROUND": {
+    "latitude": 53.0518,
+    "longitude": -3.0037
+  },
+  "RHG_ENERTRK_ENERJI_STADYUMU": {
+    "latitude": 38.7372,
+    "longitude": 35.4225
+  },
+  "SAITAMA_STADIUM": {
+    "latitude": 35.9031,
+    "longitude": 139.7176
+  },
+  "SAMSUN_YENI_19_MAYS_STADYUMU": {
+    "latitude": 41.228,
+    "longitude": 36.4586
+  },
+  "SAN_MAMS": {
+    "latitude": 43.2642,
+    "longitude": -2.9494
+  },
+  "SEATGEEK_STADIUM": {
+    "latitude": 41.7648,
+    "longitude": -87.8062
+  },
+  "SEOUL_WORLD_CUP_STADIUM": {
+    "latitude": 37.5683,
+    "longitude": 126.8972
+  },
+  "SO_LEGAL_STADIUM": {
+    "latitude": 54.0977,
+    "longitude": -3.2568
+  },
+  "SPORTPARK_HHENBERG": {
+    "latitude": 50.9451,
+    "longitude": 7.0305
+  },
+  "SPORTPARK_HOHENBERG": {
+    "latitude": 50.9451,
+    "longitude": 7.0305
+  },
+  "SRBANK_ARENA": {
+    "latitude": 58.9695,
+    "longitude": 5.7285
+  },
+  "STADE_CRDIT_AGRICOLE_DE_LA_LICORNE": {
+    "latitude": 49.8942,
+    "longitude": 2.2957
+  },
+  "STADE_GABRIELMONTPIED": {
+    "latitude": 45.8159,
+    "longitude": 3.1215
+  },
+  "STADE_GEOFFROYGUICHARD": {
+    "latitude": 45.4608,
+    "longitude": 4.3901
+  },
+  "STADE_JEAN_LAVILLE": {
+    "latitude": 46.595,
+    "longitude": 4.0562
+  },
+  "STADE_MARCEL_TRIBUT": {
+    "latitude": 51.0353,
+    "longitude": 2.3898
+  },
+  "STADE_MAURICE_DUFRASNE": {
+    "latitude": 50.6099,
+    "longitude": 5.5435
+  },
+  "STADE_MICHEL_DORNANO": {
+    "latitude": 49.1795,
+    "longitude": -0.397
+  },
+  "STADE_MUNICIPAL": {
+    "latitude": 46.7786,
+    "longitude": 6.6409
+  },
+  "STADE_NOUSTE_CAMP": {
+    "latitude": 43.3076,
+    "longitude": -0.3252
+  },
+  "STADE_PAULLIGNON": {
+    "latitude": 44.3516,
+    "longitude": 2.5638
+  },
+  "STADE_PAUL_LIGNON": {
+    "latitude": 44.3516,
+    "longitude": 2.5638
+  },
+  "STADION_GKS_KATOWICE": {
+    "latitude": 50.2882,
+    "longitude": 18.9735
+  },
+  "STADION_IM_KAZIMIERZA_GORSKIEGO": {
+    "latitude": 52.562,
+    "longitude": 19.6842
+  },
+  "STADION_MIEJSKI_IM_FLORIANA_KRYGIERA": {
+    "latitude": 53.4365,
+    "longitude": 14.5185
+  },
+  "STADION_MIEJSKI_W_MIELCU": {
+    "latitude": 50.2802,
+    "longitude": 21.4631
+  },
+  "STADION_RADOMIAKA": {
+    "latitude": 51.4167,
+    "longitude": 21.1607
+  },
+  "STADION_WOJSKA_POLSKIEGO_W_WARSZAWIE": {
+    "latitude": 52.2205,
+    "longitude": 21.0407
+  },
+  "STADION_WOUDESTEIN": {
+    "latitude": 51.917,
+    "longitude": 4.5204
+  },
+  "STADIO_CINO_E_LILLO_DEL_DUCA": {
+    "latitude": 42.861,
+    "longitude": 13.5938
+  },
+  "STADIO_DANILO_MARTELLI": {
+    "latitude": 45.1463,
+    "longitude": 10.7941
+  },
+  "STADIO_EUGANEO": {
+    "latitude": 45.4324,
+    "longitude": 11.8583
+  },
+  "STADIO_LEONARDO_GARILLI": {
+    "latitude": 45.0296,
+    "longitude": 9.6901
+  },
+  "STADIO_NICOLA_CERAVOLO": {
+    "latitude": 38.9197,
+    "longitude": 16.5878
+  },
+  "STADIO_PIERLUIGI_PENZO": {
+    "latitude": 39.3729,
+    "longitude": -74.4409
+  },
+  "STADIO_ROMEO_MENTI": {
+    "latitude": 40.7063,
+    "longitude": 14.4943
+  },
+  "STK_CAE_RAS": {
+    "latitude": 53.0518,
+    "longitude": -3.0037
+  },
+  "STUTTGART_ARENA": {
+    "latitude": 48.7922,
+    "longitude": 9.2321
+  },
+  "SUWON_SPORTS_COMPLEX": {
+    "latitude": 37.2984,
+    "longitude": 127.01
+  },
+  "SYDBANK_PARK": {
+    "latitude": 55.2613,
+    "longitude": 9.4877
+  },
+  "TANNADICE_PARK": {
+    "latitude": 56.4746,
+    "longitude": -2.969
+  },
+  "THE_BROADFIELD_STADIUM": {
+    "latitude": 51.1001,
+    "longitude": -0.1965
+  },
+  "THE_HOME_OF_THE_SET_FARE_ARENA": {
+    "latitude": 55.886,
+    "longitude": -3.522
+  },
+  "TIVOLI": {
+    "latitude": 50.7931,
+    "longitude": 6.0964
+  },
+  "UD_ALMERIA_STADIUM": {
+    "latitude": 36.8401,
+    "longitude": -2.4355
+  },
+  "UHLSPORT_PARK": {
+    "latitude": 48.0738,
+    "longitude": 11.6158
+  },
+  "ULSAN_COMPLEX_STADIUM": {
+    "latitude": 35.5353,
+    "longitude": 129.2595
+  },
+  "UVANCE_TODOROKI_STADIUM_BY_FUJITSU": {
+    "latitude": 35.5325,
+    "longitude": 139.7108
+  },
+  "VALLEY_PARADE": {
+    "latitude": 53.8043,
+    "longitude": -1.7594
+  },
+  "VELTINSARENA": {
+    "latitude": 51.5546,
+    "longitude": 7.0676
+  },
+  "VIA_DEL_MARE": {
+    "latitude": 40.3566,
+    "longitude": 18.1842
+  },
+  "WESTON_HOMES_STADIUM": {
+    "latitude": 52.5645,
+    "longitude": -0.2401
+  },
+  "WHADDON_ROAD": {
+    "latitude": 51.9062,
+    "longitude": -2.0602
+  },
+  "ZONDACRYPTO_ARENA": {
+    "latitude": 50.8212,
+    "longitude": 19.1126
+  }
+}

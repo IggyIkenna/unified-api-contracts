@@ -87,11 +87,23 @@ nosetests.xml
 data/
 logs/
 *.log
+# Exempt runtime-critical data shipped inside the package — these are loaded at
+# import time (registry/sports_venue_coordinates.py + canonical/domain/sports/
+# team_mapping_data.py). Bug 9 (2026-04-22): the blanket `data/` rule dropped
+# these from clean-checkout tarballs, crashing every sports VM at import. The
+# files are public reference data (venue lat/lon, team-name aliases) — safe to
+# version-control.
+!unified_api_contracts/registry/data/
+!unified_api_contracts/registry/data/**
+!unified_api_contracts/canonical/domain/sports/data/
+!unified_api_contracts/canonical/domain/sports/data/**
 
 # --- Common data / document file types (generated or local, not for git) ---
 # Uncomment or add !tests/fixtures/*.csv if the repo commits CSV fixtures
 *.csv
 *.xlsx
+# Re-exempt the sports team mapping shadowed by both `data/` and `*.csv`.
+!unified_api_contracts/canonical/domain/sports/data/team_mapping.csv
 *.xls
 *.xlsm
 *.ppt
