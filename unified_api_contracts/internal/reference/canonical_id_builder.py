@@ -200,12 +200,27 @@ def _build_future(
     itype: InstrumentType,
     symbol: str,
     expiry_date: _dt.date | None,
+    quote_asset: str = "",
+    margin_type: str = "",
 ) -> str:
-    """Build ``VENUE:FUTURE:SYMBOL-YYYYMMDD`` for dated futures."""
+    """Build ``VENUE:FUTURE:SYMBOL-YYYYMMDD`` for dated futures.
+
+    v6: when ``quote_asset`` and ``margin_type`` are both non-empty (e.g.
+    ``"USD"`` + ``"inverse"``), they are injected between the underlying and
+    the expiry to disambiguate inverse/linear shards:
+    ``DERIBIT:FUTURE:BTC-USD-inverse-20261226``.
+    Legacy callers omit these kwargs and get the unchanged format.
+    """
     if expiry_date is None:
         msg = f"{itype.value} requires expiry_date"
         raise ValueError(msg)
-    return f"{_venue_token(venue, None)}:{itype.value}:{symbol.upper()}-{expiry_date.strftime('%Y%m%d')}"
+    sym_up = symbol.upper()
+    if quote_asset and margin_type:
+        return (
+            f"{_venue_token(venue, None)}:{itype.value}:"
+            f"{sym_up}-{quote_asset.upper()}-{margin_type.lower()}-{expiry_date.strftime('%Y%m%d')}"
+        )
+    return f"{_venue_token(venue, None)}:{itype.value}:{sym_up}-{expiry_date.strftime('%Y%m%d')}"
 
 
 def _build_option(
@@ -214,8 +229,16 @@ def _build_option(
     expiry_date: _dt.date | None,
     strike: Decimal | None,
     option_right: Literal["C", "P"] | None,
+    quote_asset: str = "",
+    margin_type: str = "",
 ) -> str:
-    """Build ``VENUE:OPTION:SYMBOL-YYYYMMDD-STRIKE-[C|P]``."""
+    """Build ``VENUE:OPTION:SYMBOL-YYYYMMDD-STRIKE-[C|P]``.
+
+    v6: when ``quote_asset`` and ``margin_type`` are both non-empty, they are
+    injected between the underlying and the expiry to disambiguate:
+    ``DERIBIT:OPTION:BTC-USD-inverse-20261226-65000-C``.
+    Legacy callers omit these kwargs and get the unchanged format.
+    """
     if expiry_date is None or strike is None or option_right is None:
         msg = (
             "OPTION requires expiry_date, strike, and option_right "
@@ -226,9 +249,16 @@ def _build_option(
         msg = f"option_right must be 'C' or 'P', got {option_right!r}"
         raise ValueError(msg)
     strike_str = _format_strike(strike)
+    sym_up = symbol.upper()
+    if quote_asset and margin_type:
+        return (
+            f"{_venue_token(venue, None)}:{InstrumentType.OPTION.value}:"
+            f"{sym_up}-{quote_asset.upper()}-{margin_type.lower()}"
+            f"-{expiry_date.strftime('%Y%m%d')}-{strike_str}-{option_right}"
+        )
     return (
         f"{_venue_token(venue, None)}:{InstrumentType.OPTION.value}:"
-        f"{symbol.upper()}-{expiry_date.strftime('%Y%m%d')}-{strike_str}-{option_right}"
+        f"{sym_up}-{expiry_date.strftime('%Y%m%d')}-{strike_str}-{option_right}"
     )
 
 
@@ -432,6 +462,8 @@ def build_instrument_id(
     option_right: Literal["C", "P"] | None = None,
     underlying: str | None = None,
     chain: str | None = None,
+    quote_asset: str = "",
+    margin_type: str = "",
 ) -> str:
     """Build a canonical instrument ID for any supported InstrumentType.
 
@@ -467,6 +499,16 @@ def build_instrument_id(
     chain:
         Required for DeFi types when the protocol is deployed on multiple
         chains (appended as ``VENUE-CHAIN``).
+    quote_asset:
+        v6 settlement dimension — e.g. ``"USD"``, ``"USDT"``, ``"USDC"``.
+        When non-empty (and ``margin_type`` is also non-empty) for OPTION or
+        FUTURE, it is embedded in the canonical ID between the underlying and
+        the expiry so inverse and linear shards on the same underlying produce
+        distinct IDs. Legacy callers that omit this kwarg get the unchanged
+        pre-v6 format.
+    margin_type:
+        v6 settlement dimension — ``"inverse"`` or ``"linear"``. Only
+        meaningful (and emitted) when ``quote_asset`` is also non-empty.
 
     Raises
     ------
@@ -494,10 +536,10 @@ def build_instrument_id(
 
     # Dated CeFi/TradFi derivatives
     if instrument_type is InstrumentType.FUTURE:
-        return _build_future(venue, instrument_type, symbol, expiry_date)
+        return _build_future(venue, instrument_type, symbol, expiry_date, quote_asset, margin_type)
 
     if instrument_type is InstrumentType.OPTION:
-        return _build_option(venue, symbol, expiry_date, strike, option_right)
+        return _build_option(venue, symbol, expiry_date, strike, option_right, quote_asset, margin_type)
 
     # DeFi
     if instrument_type in _DEFI_TYPES:

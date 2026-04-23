@@ -348,6 +348,122 @@ class TestVenueNormalisation:
 
 
 # ---------------------------------------------------------------------------
+# v6 settlement-dimension disambiguation (quote_asset + margin_type kwargs)
+# ---------------------------------------------------------------------------
+
+
+class TestV6SettlementDimensions:
+    """Phase 2c — quote_asset + margin_type embed in OPTION / FUTURE canonical IDs."""
+
+    def test_option_inverse_deribit(self) -> None:
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC",
+            expiry_date=_dt.date(2026, 12, 26),
+            strike=Decimal("100000"),
+            option_right="C",
+            quote_asset="USD",
+            margin_type="inverse",
+        )
+        assert result == "DERIBIT:OPTION:BTC-USD-inverse-20261226-100000-C"
+
+    def test_option_linear_deribit(self) -> None:
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC",
+            expiry_date=_dt.date(2026, 12, 26),
+            strike=Decimal("100000"),
+            option_right="C",
+            quote_asset="USDC",
+            margin_type="linear",
+        )
+        assert result == "DERIBIT:OPTION:BTC-USDC-linear-20261226-100000-C"
+
+    def test_future_inverse(self) -> None:
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.FUTURE,
+            "BTC",
+            expiry_date=_dt.date(2026, 12, 26),
+            quote_asset="USD",
+            margin_type="inverse",
+        )
+        assert result == "DERIBIT:FUTURE:BTC-USD-inverse-20261226"
+
+    def test_future_linear(self) -> None:
+        result = build_instrument_id(
+            "binance_futures",
+            InstrumentType.FUTURE,
+            "BTC",
+            expiry_date=_dt.date(2026, 6, 26),
+            quote_asset="USDT",
+            margin_type="linear",
+        )
+        assert result == "BINANCE_FUTURES:FUTURE:BTC-USDT-linear-20260626"
+
+    def test_option_no_settlement_dims_unchanged(self) -> None:
+        # Legacy callers omitting the new kwargs get the pre-v6 format.
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC",
+            expiry_date=_dt.date(2026, 3, 28),
+            strike=Decimal("65000"),
+            option_right="C",
+        )
+        assert result == "DERIBIT:OPTION:BTC-20260328-65000-C"
+
+    def test_future_no_settlement_dims_unchanged(self) -> None:
+        result = build_instrument_id(
+            "cme",
+            InstrumentType.FUTURE,
+            "ES",
+            expiry_date=_dt.date(2026, 6, 20),
+        )
+        assert result == "CME:FUTURE:ES-20260620"
+
+    def test_only_quote_without_margin_uses_legacy_format(self) -> None:
+        # Both must be non-empty for the v6 segment to appear.
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC",
+            expiry_date=_dt.date(2026, 3, 28),
+            strike=Decimal("65000"),
+            option_right="C",
+            quote_asset="USD",
+        )
+        assert result == "DERIBIT:OPTION:BTC-20260328-65000-C"
+
+    def test_only_margin_without_quote_uses_legacy_format(self) -> None:
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.OPTION,
+            "BTC",
+            expiry_date=_dt.date(2026, 3, 28),
+            strike=Decimal("65000"),
+            option_right="C",
+            margin_type="inverse",
+        )
+        assert result == "DERIBIT:OPTION:BTC-20260328-65000-C"
+
+    def test_option_put_with_settlement_dims(self) -> None:
+        result = build_instrument_id(
+            "deribit",
+            InstrumentType.OPTION,
+            "ETH",
+            expiry_date=_dt.date(2026, 6, 26),
+            strike=Decimal("3000"),
+            option_right="P",
+            quote_asset="USD",
+            margin_type="inverse",
+        )
+        assert result == "DERIBIT:OPTION:ETH-USD-inverse-20260626-3000-P"
+
+
+# ---------------------------------------------------------------------------
 # Coverage — every enum variant is either supported or explicitly opted out.
 # ---------------------------------------------------------------------------
 
