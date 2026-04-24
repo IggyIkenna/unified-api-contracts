@@ -46,6 +46,7 @@ class DataType(StrEnum):
     GAS_FEES = "gas_fees"
     OPTIONS_CHAIN = "options_chain"
     FUTURES_CHAIN = "futures_chain"
+    COMBO_CHAIN = "combo_chain"
     SPORTS_ARBITRAGE = "sports_arbitrage"
     SPORTS_ODDS_SNAPSHOT = "sports_odds_snapshot"
     SPORTS_ODDS_MOVEMENT = "sports_odds_movement"

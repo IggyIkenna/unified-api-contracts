@@ -20,6 +20,7 @@ GCP_PROJECT_ID_EXCLUDE_GLOBS=(
     "!**/registry/defi_prediction_instrument_seeds.py"
 )
 # __init__.py: re-export facades (large by design); defi errors: comprehensive catalog; synthetic/generators: data-heavy
+# contracts.py: canonical SchemaContract registry across CeFi/TradFi/DeFi/Sports/Prediction (side-effect re-exports)
 SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/__init__.py"
     "./unified_api_contracts/internal/__init__.py"
@@ -28,9 +29,11 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/internal/testing/instrument_generator.py"
     "./unified_api_contracts/external/api_football/team_mappings.py"
     "./unified_api_contracts/internal/domain/ml/schemas.py"
+    "./unified_api_contracts/internal/schemas/contracts.py"
 )
 # requests CVE-2026-25645: no fix version available yet
-PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645"
+# pip CVE-2026-3219: pip tool itself (not a runtime dep), affects editable installs only
+PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645 --ignore-vuln CVE-2026-3219"
 # UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
 # without masking runaway regressions (a 60% overrun would still trip).

@@ -34,7 +34,9 @@ from pydantic import BaseModel, ConfigDict, Field
 DtypeLiteral = Literal[
     "string",
     "int64",
+    "int32",
     "float64",
+    "float32",
     "bool",
     "datetime64[ns, UTC]",
     "decimal",
@@ -62,13 +64,28 @@ ViolationKind = Literal[
 
 
 class ColumnSpec(BaseModel):
-    """Declarative spec for a single dataframe column."""
+    """Declarative spec for a single dataframe column.
+
+    ``required`` and ``provided_by_venues`` let us model schemas where a column
+    is optional overall (not every venue publishes it) without losing the
+    ability to hard-enforce its presence for the venues that do.
+
+    - ``required=False`` → column may be absent entirely on any venue.
+    - ``required=True`` (default) + ``provided_by_venues=None`` (default) →
+      column must be present for every venue writing this schema.
+    - ``required=True`` + ``provided_by_venues=frozenset({...})`` → column is
+      required only when the writing venue is in that set; absent is OK
+      otherwise (e.g. Deribit publishes ``mark_iv`` on ``options_chain`` but
+      IBKR does not).
+    """
 
     model_config = ConfigDict(frozen=True)
 
     name: str
     dtype: DtypeLiteral
     nullable: bool = False
+    required: bool = True
+    provided_by_venues: frozenset[str] | None = None
     description: str | None = None
 
 
@@ -299,6 +316,11 @@ CEFI_FUTURES_CHAIN_TRADES = SchemaContract(
     required_row_count_min=1,
 )
 
+# Snapshot contracts (options_chain / futures_chain / combo_chain / tbbo /
+# ohlcv_24h) live in ``_snapshot_contracts`` — imported below via a
+# side-effect import to keep this module under the 900-line codex-compliance
+# limit.
+
 # ---------------------------------------------------------------------------
 # Built-in contracts — TradFi
 # ---------------------------------------------------------------------------
@@ -397,6 +419,9 @@ TRADFI_EQUITY_OHLCV_1M = SchemaContract(
     symbol_column="symbol",
     required_row_count_min=1,
 )
+
+# TradFi options_chain / futures_chain snapshot contracts live in
+# ``_snapshot_contracts`` alongside their CeFi counterparts.
 
 # ---------------------------------------------------------------------------
 # Built-in contracts — Sports / Prediction
@@ -650,6 +675,8 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("cefi", "spot_pair", "book_snapshot_5"): CEFI_SPOT_PAIR_BOOK_SNAPSHOT_5,
     ("cefi", "options_chain", "trades"): CEFI_OPTIONS_CHAIN_TRADES,
     ("cefi", "futures_chain", "trades"): CEFI_FUTURES_CHAIN_TRADES,
+    # Chain / BBO / rolling-candle snapshot contracts registered via
+    # _snapshot_contracts side-effect import (see end of file).
     # TradFi
     ("tradfi", "future", "trades"): TRADFI_FUTURE_TRADES,
     ("tradfi", "future", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
@@ -658,6 +685,8 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("tradfi", "equity", "ohlcv_1m"): TRADFI_EQUITY_OHLCV_1M,
     ("tradfi", "index", "trades"): TRADFI_INDEX_TRADES,
     ("tradfi", "combo", "trades"): TRADFI_COMBO_TRADES,
+    # TradFi options_chain / futures_chain snapshot registered via
+    # _snapshot_contracts side-effect import (see end of file).
     # DeFi
     ("defi", "lending_position", "lending_indices"): DEFI_LENDING_POSITION_LENDING_INDICES,
     ("defi", "a_token", "lending_indices"): DEFI_AAVE_V3_LENDING_INDICES,
@@ -681,6 +710,17 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
 # data_type)``. Aave V3 and Compound V3 both emit ``lending_indices`` but with
 # different column vocabularies — the override lets migration + read paths
 # resolve the precise schema by venue without guessing.
+#
+# **Composite venue convention for DeFi**: DeFi override keys MUST use the
+# composite venue format ``<PROTOCOL>-<CHAIN>`` (e.g. ``AAVE_V3-ETHEREUM``,
+# ``MORPHO-ETHEREUM``, ``UNISWAP_V3-ARBITRUM``). This matches the
+# instruments-service availability-manifest naming convention where a single
+# logical deployment is identified by protocol+chain (Aave V3 on Ethereum is a
+# distinct venue from Aave V3 on Polygon). For CeFi / TradFi, ``venue`` is a
+# single identifier (``DERIBIT``, ``BINANCE-SPOT``, ``CME``) — no chain suffix.
+# Legacy DeFi entries below predate this convention and use the bare protocol
+# name; they are kept for back-compat and will converge to the composite form
+# as the migration lands.
 VENUE_CONTRACT_OVERRIDES: dict[tuple[str, str, str, str], SchemaContract] = {
     # Aave V3 is the only lending protocol whose column vocabulary
     # meaningfully differs from the base contracts, so it's the primary
@@ -784,6 +824,7 @@ from unified_api_contracts.internal.schemas import _candle_contracts as _candle_
 from unified_api_contracts.internal.schemas import _defi_v2_contracts as _defi_v2_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _legacy_venue_overrides as _legacy_venue_overrides  # noqa: E402
+from unified_api_contracts.internal.schemas import _snapshot_contracts as _snapshot_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
     DEFI_LENDING_FLASH_LOAN_EVENTS as DEFI_LENDING_FLASH_LOAN_EVENTS,
 )
@@ -792,6 +833,12 @@ from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa:
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
     DEFI_LENDING_POSITION_DATA as DEFI_LENDING_POSITION_DATA,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_POOL_DEX_POOLS as DEFI_POOL_DEX_POOLS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_POOL_DEX_SWAPS as DEFI_POOL_DEX_SWAPS,
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
     DEFI_SPOT_ASSET_BRIDGE_EVENTS as DEFI_SPOT_ASSET_BRIDGE_EVENTS,
@@ -832,22 +879,71 @@ from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
 from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
     classify_polymarket_market as classify_polymarket_market,
 )
+from unified_api_contracts.internal.schemas._row_validation import (  # noqa: E402
+    RowSchemaValidationError as RowSchemaValidationError,
+)
+from unified_api_contracts.internal.schemas._row_validation import (  # noqa: E402
+    validate_row_df as validate_row_df,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_COMBO_CHAIN_SNAPSHOT as CEFI_COMBO_CHAIN_SNAPSHOT,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_FUTURES_CHAIN_SNAPSHOT as CEFI_FUTURES_CHAIN_SNAPSHOT,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_OPTIONS_CHAIN_SNAPSHOT as CEFI_OPTIONS_CHAIN_SNAPSHOT,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_PERPETUAL_OHLCV_24H as CEFI_PERPETUAL_OHLCV_24H,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_PERPETUAL_TBBO as CEFI_PERPETUAL_TBBO,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_SPOT_PAIR_OHLCV_24H as CEFI_SPOT_PAIR_OHLCV_24H,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    CEFI_SPOT_PAIR_TBBO as CEFI_SPOT_PAIR_TBBO,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    TRADFI_FUTURES_CHAIN_SNAPSHOT as TRADFI_FUTURES_CHAIN_SNAPSHOT,
+)
+from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+    TRADFI_OPTIONS_CHAIN_SNAPSHOT as TRADFI_OPTIONS_CHAIN_SNAPSHOT,
+)
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
     PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
+)
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+    SPORTS_ODDS_ARBITRAGE as SPORTS_ODDS_ARBITRAGE,
+)
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+    SPORTS_ODDS_MOVEMENT as SPORTS_ODDS_MOVEMENT,
+)
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+    SPORTS_ODDS_SNAPSHOT as SPORTS_ODDS_SNAPSHOT,
 )
 from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
     SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
 )
 
 __all__ = [
+    "CEFI_COMBO_CHAIN_SNAPSHOT",
+    "CEFI_FUTURES_CHAIN_SNAPSHOT",
     "CEFI_FUTURES_CHAIN_TRADES",
+    "CEFI_OPTIONS_CHAIN_SNAPSHOT",
     "CEFI_OPTIONS_CHAIN_TRADES",
     "CEFI_PERPETUAL_BOOK_SNAPSHOT_5",
     "CEFI_PERPETUAL_DERIVATIVE_TICKER",
     "CEFI_PERPETUAL_LIQUIDATIONS",
+    "CEFI_PERPETUAL_OHLCV_24H",
     "CEFI_PERPETUAL_QUOTES",
+    "CEFI_PERPETUAL_TBBO",
     "CEFI_PERPETUAL_TRADES",
     "CEFI_SPOT_PAIR_BOOK_SNAPSHOT_5",
+    "CEFI_SPOT_PAIR_OHLCV_24H",
+    "CEFI_SPOT_PAIR_TBBO",
     "CEFI_SPOT_PAIR_TRADES",
     "CONTRACT_REGISTRY",
     "DEFI_AAVE_V3_LENDING_INDICES",
@@ -861,7 +957,9 @@ __all__ = [
     "DEFI_LENDING_POSITION_LENDING_INDICES",
     "DEFI_LST_LST_RATES",
     "DEFI_PERPETUAL_PERP_FUNDING",
+    "DEFI_POOL_DEX_POOLS",
     "DEFI_POOL_DEX_POOL_SWAPS",
+    "DEFI_POOL_DEX_SWAPS",
     "DEFI_SPOT_ASSET_BRIDGE_EVENTS",
     "DEFI_SPOT_ASSET_GAS_FEES",
     "DEFI_SPOT_ASSET_GOVERNANCE_EVENTS",
@@ -876,23 +974,30 @@ __all__ = [
     "OUTCOME_TO_MARKET_TYPE",
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SLUG_PREFIX_MAP",
+    "SPORTS_ODDS_ARBITRAGE",
+    "SPORTS_ODDS_MOVEMENT",
+    "SPORTS_ODDS_SNAPSHOT",
     "SPORTS_ODDS_TRADES",
     "TRADFI_COMBO_TRADES",
     "TRADFI_EQUITY_OHLCV_1M",
     "TRADFI_EQUITY_TRADES",
+    "TRADFI_FUTURES_CHAIN_SNAPSHOT",
     "TRADFI_FUTURE_OHLCV_1M",
     "TRADFI_FUTURE_TRADES",
     "TRADFI_INDEX_TRADES",
+    "TRADFI_OPTIONS_CHAIN_SNAPSHOT",
     "TRADFI_OPTIONS_CHAIN_TRADES",
     "VENUE_CONTRACT_OVERRIDES",
     "ColumnSpec",
     "PredictionShardCategory",
     "PredictionShardMarketType",
     "PredictionShardResolutionPeriod",
+    "RowSchemaValidationError",
     "SchemaContract",
     "SchemaContractNotFoundError",
     "Violation",
     "classify_polymarket_market",
     "lookup_contract",
     "validate_dataframe",
+    "validate_row_df",
 ]

@@ -521,11 +521,13 @@ from .internal.schemas.contracts import (
     TRADFI_OPTIONS_CHAIN_TRADES,
     VENUE_CONTRACT_OVERRIDES,
     ColumnSpec,
+    RowSchemaValidationError,
     SchemaContract,
     SchemaContractNotFoundError,
     Violation,
     lookup_contract,
     validate_dataframe,
+    validate_row_df,
 )
 from .normalize_utils import american_to_decimal, decimal_to_american
 from .registry import (
@@ -1166,6 +1168,7 @@ __all__ = [
     "RiskCategory",
     "RiskGroupSummary",
     "RiskType",
+    "RowSchemaValidationError",
     "SatelliteObservation",
     "ScalingMode",
     "SchemaContract",
@@ -1251,6 +1254,7 @@ __all__ = [
     "normalize_underlying",
     "resolve_exchange",
     "validate_dataframe",
+    "validate_row_df",
 ]
 
 # fmt: off

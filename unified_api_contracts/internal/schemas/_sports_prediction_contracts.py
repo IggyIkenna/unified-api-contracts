@@ -184,14 +184,124 @@ PREDICTION_PREDICTION_MARKET_TRADES = SchemaContract(
 
 
 # ---------------------------------------------------------------------------
+# Sports — odds snapshot / movement / arbitrage (DataType enum coverage)
+# ---------------------------------------------------------------------------
+# ``sports_odds_snapshot`` / ``sports_odds_movement`` / ``sports_arbitrage``
+# live under the canonical ``sports`` category + ``odds`` instrument_type.
+# Snapshot = point-in-time odds across venues. Movement = deltas between
+# snapshots. Arbitrage = cross-venue mispricings. Venue-specific columns
+# (``traded_volume`` on Betfair, ``max_bet`` on Pinnacle) carry
+# ``provided_by_venues``.
+
+_SNAPSHOT_VENUES = frozenset({"BETFAIR", "MATCHBOOK", "ODDS_API", "PINNACLE_AS_LINE"})
+
+SPORTS_ODDS_SNAPSHOT = SchemaContract(
+    category="sports",
+    instrument_type="odds",
+    data_type="sports_odds_snapshot",
+    columns=[
+        INSTRUMENT_ID_COL,
+        VENUE_COL,
+        TS_EVENT_COL,
+        ColumnSpec(name="league_id", dtype="string", nullable=False),
+        ColumnSpec(name="fixture_id", dtype="string", nullable=False),
+        ColumnSpec(name="market_type", dtype="string", nullable=False),
+        ColumnSpec(name="outcome", dtype="string", nullable=False),
+        ColumnSpec(name="odds_decimal", dtype="float64", nullable=False),
+        ColumnSpec(
+            name="bookmaker",
+            dtype="string",
+            nullable=True,
+            description="Provider-side bookmaker label (e.g. pinnacle, draftkings).",
+        ),
+        # Betfair exchange publishes traded volume per outcome; other books do not.
+        ColumnSpec(
+            name="traded_volume",
+            dtype="float64",
+            nullable=True,
+            required=False,
+            provided_by_venues=frozenset({"BETFAIR"}),
+        ),
+        # Pinnacle publishes max stake per market; other venues do not.
+        ColumnSpec(
+            name="max_bet",
+            dtype="float64",
+            nullable=True,
+            required=False,
+            provided_by_venues=frozenset({"PINNACLE_AS_LINE"}),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+SPORTS_ODDS_MOVEMENT = SchemaContract(
+    category="sports",
+    instrument_type="odds",
+    data_type="sports_odds_movement",
+    columns=[
+        INSTRUMENT_ID_COL,
+        VENUE_COL,
+        TS_EVENT_COL,
+        ColumnSpec(name="league_id", dtype="string", nullable=False),
+        ColumnSpec(name="fixture_id", dtype="string", nullable=False),
+        ColumnSpec(name="market_type", dtype="string", nullable=False),
+        ColumnSpec(name="outcome", dtype="string", nullable=False),
+        ColumnSpec(name="odds_before", dtype="float64", nullable=False),
+        ColumnSpec(name="odds_after", dtype="float64", nullable=False),
+        ColumnSpec(name="odds_delta", dtype="float64", nullable=False),
+        ColumnSpec(name="ts_before", dtype="datetime64[ns, UTC]", nullable=False),
+        ColumnSpec(name="bookmaker", dtype="string", nullable=True),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+# Cross-venue arbitrage opportunities — ``venue`` and ``instrument_id`` carry
+# a composite ``<LEG_A_VENUE>_VS_<LEG_B_VENUE>`` label. Not venue-scoped.
+SPORTS_ODDS_ARBITRAGE = SchemaContract(
+    category="sports",
+    instrument_type="odds",
+    data_type="sports_arbitrage",
+    columns=[
+        INSTRUMENT_ID_COL,
+        TS_EVENT_COL,
+        ColumnSpec(name="league_id", dtype="string", nullable=False),
+        ColumnSpec(name="fixture_id", dtype="string", nullable=False),
+        ColumnSpec(name="market_type", dtype="string", nullable=False),
+        ColumnSpec(name="leg_a_venue", dtype="string", nullable=False),
+        ColumnSpec(name="leg_b_venue", dtype="string", nullable=False),
+        ColumnSpec(name="leg_a_outcome", dtype="string", nullable=False),
+        ColumnSpec(name="leg_b_outcome", dtype="string", nullable=False),
+        ColumnSpec(name="leg_a_odds", dtype="float64", nullable=False),
+        ColumnSpec(name="leg_b_odds", dtype="float64", nullable=False),
+        ColumnSpec(
+            name="arbitrage_margin_bps",
+            dtype="float64",
+            nullable=False,
+            description="Positive margin in basis points when the 1/a + 1/b book < 1.",
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+
+# ---------------------------------------------------------------------------
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
+CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAPSHOT
+CONTRACT_REGISTRY[("sports", "odds", "sports_odds_movement")] = SPORTS_ODDS_MOVEMENT
+CONTRACT_REGISTRY[("sports", "odds", "sports_arbitrage")] = SPORTS_ODDS_ARBITRAGE
 
 
 __all__ = [
     "PREDICTION_PREDICTION_MARKET_TRADES",
+    "SPORTS_ODDS_ARBITRAGE",
+    "SPORTS_ODDS_MOVEMENT",
+    "SPORTS_ODDS_SNAPSHOT",
     "SPORTS_ODDS_TRADES",
 ]
