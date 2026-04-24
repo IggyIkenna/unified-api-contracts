@@ -1,0 +1,716 @@
+"""SPORTS SchemaContracts — Families A (API-Football reference), C (Transfermarkt), D (SFI).
+
+Family B (API-Football match-fact) lives in ``_sports_match_contracts``.
+Family E (derived / other providers) lives in ``_sports_derived_contracts``.
+Shared ColumnSpec helpers are in ``_sports_shared``.
+
+This split keeps each module under the codex 900-line limit. All three
+modules register into ``CONTRACT_REGISTRY`` as side-effects on import; the
+parent ``contracts.py`` pulls them in at the bottom of that file. SSOT plan:
+``plans/active/sports_uac_schema_contracts_registration_2026_04_24.plan.md``.
+
+Column-name conventions (shared with Families B / E):
+
+- API-Football parquets key IDs with the ``af_`` prefix (``af_fixture_id``,
+  ``af_league_id``, ``af_home_id``, ``af_away_id``, ``af_winner_id``,
+  ``af_home_name``, ``af_away_name``) to avoid collision with downstream
+  canonical IDs.
+- Nested API-Football structures (STANDINGS' ``team`` / ``all`` / ``home`` /
+  ``away``) land in parquet as ``struct<...>`` columns. UAC's
+  ``DtypeLiteral`` does not yet include ``struct``; we declare these as
+  ``string`` and note the nested shape in the column description.
+"""
+
+from __future__ import annotations
+
+from unified_api_contracts.internal.schemas._sports_shared import DATA_AVAILABLE_AT as _DATA_AVAILABLE_AT
+from unified_api_contracts.internal.schemas.contracts import (
+    CONTRACT_REGISTRY,
+    ColumnSpec,
+    SchemaContract,
+)
+
+# ============================================================================
+# Family A — API-Football REFERENCE
+# ============================================================================
+
+
+SPORTS_LEAGUES = SchemaContract(
+    category="sports",
+    instrument_type="reference",
+    data_type="leagues",
+    columns=[
+        ColumnSpec(
+            name="league_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Canonical league identifier (UAC ``LeagueDefinition.league_id``, "
+                "e.g. 'EPL', 'BUNDESLIGA', 'LA_LIGA'). Stable across providers; "
+                "maps via ``get_provider_league_id()`` to each provider's native code."
+            ),
+        ),
+        ColumnSpec(
+            name="name",
+            dtype="string",
+            nullable=False,
+            description="Human-readable league name (e.g. 'Premier League').",
+        ),
+        ColumnSpec(
+            name="country",
+            dtype="string",
+            nullable=True,
+            description="ISO country name of league jurisdiction (e.g. 'England').",
+        ),
+        ColumnSpec(
+            name="league_type",
+            dtype="string",
+            nullable=True,
+            description=(
+                "League classification: 'domestic_top_flight', 'domestic_second', "
+                "'international_club', 'international_country'. Sparse today."
+            ),
+        ),
+        ColumnSpec(
+            name="logo_url",
+            dtype="string",
+            nullable=True,
+            description="HTTPS URL to league logo PNG; provider-hosted, used by UIs.",
+        ),
+    ],
+    symbol_column="league_id",
+    required_row_count_min=1,
+)
+
+
+SPORTS_TEAMS = SchemaContract(
+    category="sports",
+    instrument_type="reference",
+    data_type="teams",
+    columns=[
+        ColumnSpec(
+            name="team_id",
+            dtype="int64",
+            nullable=False,
+            description="API-Football numeric team ID — canonical row identifier.",
+        ),
+        ColumnSpec(
+            name="team_name",
+            dtype="string",
+            nullable=False,
+            description="Official team name as published by API-Football.",
+        ),
+        ColumnSpec(
+            name="team_code",
+            dtype="string",
+            nullable=True,
+            description="Short 3-letter team code (e.g. 'MUN') when available.",
+        ),
+        ColumnSpec(
+            name="team_country",
+            dtype="string",
+            nullable=True,
+            description="Club nationality (country registered) — distinct from venue country for internationals.",
+        ),
+        ColumnSpec(
+            name="team_founded",
+            dtype="float64",
+            nullable=True,
+            description="Year the club was founded; float because some rows are null and pandas promotes to float64.",
+        ),
+        ColumnSpec(
+            name="team_national",
+            dtype="bool",
+            nullable=False,
+            description="True for national teams, False for clubs.",
+        ),
+        ColumnSpec(
+            name="team_logo",
+            dtype="string",
+            nullable=True,
+            description="HTTPS URL to team crest PNG (provider-hosted).",
+        ),
+        ColumnSpec(
+            name="venue_id",
+            dtype="float64",
+            nullable=True,
+            description="API-Football home venue ID; float to allow nulls for teams without a venue.",
+        ),
+        ColumnSpec(
+            name="venue_name",
+            dtype="string",
+            nullable=True,
+            description="Home venue name (stadium).",
+        ),
+        ColumnSpec(
+            name="venue_address",
+            dtype="string",
+            nullable=True,
+            description="Street address of the home venue.",
+        ),
+        ColumnSpec(
+            name="venue_city",
+            dtype="string",
+            nullable=True,
+            description="City of the home venue.",
+        ),
+        ColumnSpec(
+            name="venue_capacity",
+            dtype="float64",
+            nullable=True,
+            description="Stated seating capacity of the home venue; float for null tolerance.",
+        ),
+        ColumnSpec(
+            name="venue_surface",
+            dtype="string",
+            nullable=True,
+            description="Pitch surface type: 'grass' | 'artificial' | 'hybrid'.",
+        ),
+        ColumnSpec(
+            name="venue_image",
+            dtype="string",
+            nullable=True,
+            description="HTTPS URL to a venue photograph (provider-hosted).",
+        ),
+        ColumnSpec(
+            name="season",
+            dtype="int64",
+            nullable=False,
+            description="Season year (e.g. 2024 for 2024-25 season) — added by orchestrator for provenance.",
+        ),
+        ColumnSpec(
+            name="af_league_id",
+            dtype="int64",
+            nullable=False,
+            description="API-Football numeric league ID this team row was fetched under.",
+        ),
+        ColumnSpec(
+            name="data_available_at",
+            dtype="string",
+            nullable=True,
+            description=(
+                "Fetch timestamp; stored as string in TEAMS reference parquet "
+                "(differs from fact tables where dtype is datetime64[ns, UTC])."
+            ),
+        ),
+    ],
+    symbol_column="team_id",
+    required_row_count_min=1,
+)
+
+
+SPORTS_VENUES = SchemaContract(
+    category="sports",
+    instrument_type="reference",
+    data_type="venues",
+    columns=[
+        ColumnSpec(
+            name="id",
+            dtype="int64",
+            nullable=False,
+            description="Internal venue PK — may duplicate venue_id for some writes.",
+        ),
+        ColumnSpec(
+            name="venue_id",
+            dtype="int64",
+            nullable=False,
+            description="API-Football numeric venue ID — canonical row identifier.",
+        ),
+        ColumnSpec(
+            name="name",
+            dtype="string",
+            nullable=False,
+            description="Official venue name (e.g. 'Old Trafford').",
+        ),
+        ColumnSpec(
+            name="address",
+            dtype="string",
+            nullable=True,
+            description="Street address of the venue.",
+        ),
+        ColumnSpec(
+            name="city",
+            dtype="string",
+            nullable=True,
+            description="City the venue is in.",
+        ),
+        ColumnSpec(
+            name="country",
+            dtype="string",
+            nullable=True,
+            description="Country of the venue.",
+        ),
+        ColumnSpec(
+            name="capacity",
+            dtype="int64",
+            nullable=True,
+            description="Stated seating capacity.",
+        ),
+        ColumnSpec(
+            name="surface",
+            dtype="string",
+            nullable=True,
+            description="Pitch surface: 'grass' | 'artificial' | 'hybrid'.",
+        ),
+        ColumnSpec(
+            name="image",
+            dtype="string",
+            nullable=True,
+            description="HTTPS URL to a venue photograph.",
+        ),
+        ColumnSpec(
+            name="latitude",
+            dtype="float64",
+            nullable=True,
+            description="Venue latitude (WGS84 decimal degrees) — used by OpenMeteo weather lookups.",
+        ),
+        ColumnSpec(
+            name="longitude",
+            dtype="float64",
+            nullable=True,
+            description="Venue longitude (WGS84 decimal degrees) — used by OpenMeteo weather lookups.",
+        ),
+        ColumnSpec(
+            name="altitude",
+            dtype="float64",
+            nullable=True,
+            description="Venue altitude in metres above sea level — influences ball flight / atmospheric features.",
+        ),
+        ColumnSpec(
+            name="data_available_at",
+            dtype="string",
+            nullable=True,
+            description="Fetch timestamp; stored as string in the static VENUES reference parquet.",
+        ),
+    ],
+    symbol_column="venue_id",
+    required_row_count_min=1,
+)
+
+
+SPORTS_STANDINGS = SchemaContract(
+    category="sports",
+    instrument_type="league",
+    data_type="standings",
+    columns=[
+        ColumnSpec(
+            name="rank",
+            dtype="int64",
+            nullable=False,
+            description="Team's league-table position (1 = top).",
+        ),
+        ColumnSpec(
+            name="team",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Nested API-Football team struct serialised as string on disk: "
+                "``{id, logo, name}``. Flatten-to-columns is a follow-up "
+                "(UAC DtypeLiteral lacks a struct type today)."
+            ),
+        ),
+        ColumnSpec(
+            name="points",
+            dtype="int64",
+            nullable=False,
+            description="Total league points accumulated so far in the season.",
+        ),
+        ColumnSpec(
+            name="goalsDiff",
+            dtype="int64",
+            nullable=False,
+            description="Goal difference (goals-for minus goals-against). Camelcase matches API-Football.",
+        ),
+        ColumnSpec(
+            name="group",
+            dtype="string",
+            nullable=True,
+            description="Group name for group-stage competitions (UCL, WC); null for round-robin leagues.",
+        ),
+        ColumnSpec(
+            name="form",
+            dtype="string",
+            nullable=True,
+            description="Recent-form streak string, e.g. 'WWDLW' — most-recent-first, 5 matches.",
+        ),
+        ColumnSpec(
+            name="status",
+            dtype="string",
+            nullable=True,
+            description="Standings status: 'same' | 'up' | 'down' — movement vs last snapshot.",
+        ),
+        ColumnSpec(
+            name="description",
+            dtype="string",
+            nullable=True,
+            description="Qualification / relegation annotation (e.g. 'Promotion - Champions League (Group Stage)').",
+        ),
+        ColumnSpec(
+            name="all",
+            dtype="string",
+            nullable=True,
+            description=(
+                "Nested struct serialised as string: played/win/draw/lose/goals over all matches. "
+                "Flatten-to-columns is a follow-up."
+            ),
+        ),
+        ColumnSpec(
+            name="home",
+            dtype="string",
+            nullable=True,
+            description="Nested struct serialised as string: played/win/draw/lose/goals at home.",
+        ),
+        ColumnSpec(
+            name="away",
+            dtype="string",
+            nullable=True,
+            description="Nested struct serialised as string: played/win/draw/lose/goals away.",
+        ),
+        ColumnSpec(
+            name="update",
+            dtype="string",
+            nullable=True,
+            description="API-Football's own update timestamp (ISO string) — distinct from data_available_at.",
+        ),
+        ColumnSpec(
+            name="league_id",
+            dtype="int64",
+            nullable=False,
+            description="API-Football numeric league ID — partition / join key.",
+        ),
+        _DATA_AVAILABLE_AT,
+    ],
+    symbol_column="team",
+    required_row_count_min=1,
+)
+
+
+# ============================================================================
+# Family C — Transfermarkt
+# ============================================================================
+
+
+SPORTS_TRANSFERMARKT_LEAGUES = SchemaContract(
+    category="sports",
+    instrument_type="reference",
+    data_type="transfermarkt_leagues",
+    columns=[
+        ColumnSpec(
+            name="league_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Transfermarkt league code (e.g. 'GB1' for EPL, 'ES1' for La Liga) — "
+                "distinct from UAC canonical ``league_id`` and from ``af_league_id``. "
+                "Join via ``get_provider_league_id()`` mapping."
+            ),
+        ),
+        ColumnSpec(
+            name="name", dtype="string", nullable=False, description="League name as Transfermarkt publishes it."
+        ),
+        ColumnSpec(name="country", dtype="string", nullable=True, description="Country of the league."),
+        ColumnSpec(
+            name="league_type", dtype="string", nullable=True, description="League tier descriptor from Transfermarkt."
+        ),
+        ColumnSpec(name="logo_url", dtype="string", nullable=True, description="Transfermarkt-hosted league logo URL."),
+    ],
+    symbol_column="league_id",
+    required_row_count_min=1,
+)
+
+
+SPORTS_PLAYER_VALUES = SchemaContract(
+    category="sports",
+    instrument_type="player",
+    data_type="values",
+    columns=[
+        ColumnSpec(
+            name="team_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Transfermarkt team/club ID (e.g. 't123'). Row identifier — one row per "
+                "(team_id, season, fetch_day). FSS uses this for team-level squad valuation aggregates."
+            ),
+        ),
+        ColumnSpec(name="name", dtype="string", nullable=False, description="Team name from Transfermarkt squad page."),
+        ColumnSpec(
+            name="squad_size",
+            dtype="string",
+            nullable=True,
+            description=(
+                "Total players in squad on the fetch date, coerced to string (adapter output "
+                "is dict-casted to str). Parse at read-time if a numeric value is needed."
+            ),
+        ),
+        ColumnSpec(
+            name="player_count",
+            dtype="string",
+            nullable=True,
+            description=(
+                "Count of players with market valuations (subset of ``squad_size``). "
+                "Ratio gives valuation coverage %. String for the same reason as ``squad_size``."
+            ),
+        ),
+        ColumnSpec(
+            name="league_id",
+            dtype="string",
+            nullable=False,
+            description="Transfermarkt league code — which league this team was fetched under.",
+        ),
+        ColumnSpec(
+            name="canonical_league",
+            dtype="string",
+            nullable=True,
+            description=(
+                "UAC canonical ``league_id`` resolved via ``get_provider_league_id()``; "
+                "null when the mapping wasn't present for the team's league_id."
+            ),
+        ),
+        ColumnSpec(
+            name="season",
+            dtype="int64",
+            nullable=False,
+            description=(
+                "Season year (e.g. 2024 for 2024-25 season). Added post-hoc by the orchestrator "
+                "at write time for partitioning under ``season=YYYY`` when backfilling."
+            ),
+        ),
+    ],
+    symbol_column="team_id",
+    required_row_count_min=1,
+)
+
+
+# ============================================================================
+# Family D — SFI (SoccerFootball Insights)
+# ============================================================================
+
+
+SPORTS_SFI_LEAGUES = SchemaContract(
+    category="sports",
+    instrument_type="reference",
+    data_type="sfi_leagues",
+    columns=[
+        ColumnSpec(
+            name="league_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "SFI league UUID/slug — distinct from UAC canonical and AF/Transfermarkt codes. "
+                "Join via ``get_provider_league_id()`` mapping stored in "
+                "``sports_reference/mappings/sfi_league_mapping.parquet``."
+            ),
+        ),
+        ColumnSpec(name="name", dtype="string", nullable=False, description="SFI-published league name."),
+        ColumnSpec(
+            name="country", dtype="string", nullable=False, description="Country of the league (required by SFI)."
+        ),
+        ColumnSpec(name="league_type", dtype="string", nullable=True, description="SFI's competition-type label."),
+        ColumnSpec(name="logo_url", dtype="string", nullable=True, description="SFI-hosted league logo URL."),
+    ],
+    symbol_column="league_id",
+    required_row_count_min=1,
+)
+
+
+SPORTS_SFI_PROGRESSIVE_STATS = SchemaContract(
+    category="sports",
+    instrument_type="match",
+    data_type="sfi_progressive_stats",
+    columns=[
+        ColumnSpec(
+            name="fixture_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "SFI fixture ID (not API-Football's). One row per progressive snapshot; "
+                "use ``(fixture_id, timer_seconds)`` as composite join key."
+            ),
+        ),
+        ColumnSpec(
+            name="timer_seconds",
+            dtype="int64",
+            nullable=True,
+            description="Seconds elapsed from match start to this snapshot; monotone across a fixture's rows.",
+        ),
+        ColumnSpec(
+            name="team",
+            dtype="string",
+            nullable=True,
+            description="'home' | 'away' — which team this team-side stat row pertains to.",
+        ),
+        ColumnSpec(name="goals", dtype="int64", nullable=True, description="Goals scored up to this timer snapshot."),
+        ColumnSpec(
+            name="possession_pct",
+            dtype="float64",
+            nullable=True,
+            description="Ball possession % (0-100) at snapshot time.",
+        ),
+        ColumnSpec(
+            name="dangerous_attacks",
+            dtype="int64",
+            nullable=True,
+            description="SFI 'dangerous attack' count — proprietary definition, roughly attacks entering box.",
+        ),
+        ColumnSpec(
+            name="attacks",
+            dtype="int64",
+            nullable=True,
+            description="Total attacks count (superset of dangerous_attacks).",
+        ),
+        ColumnSpec(
+            name="shots_on_target", dtype="int64", nullable=True, description="Shots on target at snapshot time."
+        ),
+        ColumnSpec(
+            name="shots_off_target", dtype="int64", nullable=True, description="Shots off target at snapshot time."
+        ),
+        ColumnSpec(name="corners", dtype="int64", nullable=True, description="Corner kicks taken."),
+        ColumnSpec(name="fouls", dtype="int64", nullable=True, description="Fouls committed."),
+        ColumnSpec(name="yellow_cards", dtype="int64", nullable=True, description="Yellow cards received."),
+        ColumnSpec(name="red_cards", dtype="int64", nullable=True, description="Red cards received."),
+        ColumnSpec(name="substitutions", dtype="int64", nullable=True, description="Substitutions made."),
+        ColumnSpec(
+            name="dominance_pct",
+            dtype="float64",
+            nullable=True,
+            description="SFI dominance index (0-100): composite of attacks/possession/location.",
+        ),
+        ColumnSpec(
+            name="xg_home", dtype="float64", nullable=True, description="Accumulated expected goals for home team."
+        ),
+        ColumnSpec(
+            name="xg_away", dtype="float64", nullable=True, description="Accumulated expected goals for away team."
+        ),
+        ColumnSpec(
+            name="dominance_index_home",
+            dtype="float64",
+            nullable=True,
+            description="Dominance index for home side at this snapshot.",
+        ),
+        ColumnSpec(
+            name="dominance_index_away",
+            dtype="float64",
+            nullable=True,
+            description="Dominance index for away side at this snapshot.",
+        ),
+        ColumnSpec(
+            name="dominance_avg_home",
+            dtype="float64",
+            nullable=True,
+            description="Rolling mean of home dominance across the match-to-date.",
+        ),
+        ColumnSpec(
+            name="dominance_avg_away",
+            dtype="float64",
+            nullable=True,
+            description="Rolling mean of away dominance across the match-to-date.",
+        ),
+        ColumnSpec(
+            name="attacks_normal", dtype="int64", nullable=True, description="Home-side normal (non-dangerous) attacks."
+        ),
+        ColumnSpec(name="attacks_dangerous", dtype="int64", nullable=True, description="Home-side dangerous attacks."),
+        ColumnSpec(name="attacks_normal_away", dtype="int64", nullable=True, description="Away-side normal attacks."),
+        ColumnSpec(
+            name="attacks_dangerous_away", dtype="int64", nullable=True, description="Away-side dangerous attacks."
+        ),
+        ColumnSpec(
+            name="shoots_total",
+            dtype="int64",
+            nullable=True,
+            description="Alias/typo variant of total shots; provider spelling preserved.",
+        ),
+        ColumnSpec(
+            name="shoots_on_target", dtype="int64", nullable=True, description="Alias variant of shots_on_target."
+        ),
+        ColumnSpec(
+            name="shoots_off_target", dtype="int64", nullable=True, description="Alias variant of shots_off_target."
+        ),
+        ColumnSpec(
+            name="odds_1x2_home",
+            dtype="float64",
+            nullable=True,
+            description="SFI 1X2 odds for home win at snapshot time.",
+        ),
+        ColumnSpec(name="odds_1x2_draw", dtype="float64", nullable=True, description="SFI 1X2 odds for draw."),
+        ColumnSpec(name="odds_1x2_away", dtype="float64", nullable=True, description="SFI 1X2 odds for away win."),
+        ColumnSpec(
+            name="odds_ou_over",
+            dtype="float64",
+            nullable=True,
+            description="Over/Under odds for total goals — over side.",
+        ),
+        ColumnSpec(name="odds_ou_under", dtype="float64", nullable=True, description="Over/Under odds — under side."),
+        ColumnSpec(
+            name="odds_ou_line", dtype="float64", nullable=True, description="O/U line (total-goals threshold)."
+        ),
+        ColumnSpec(name="odds_ah_home", dtype="float64", nullable=True, description="Asian handicap odds — home side."),
+        ColumnSpec(name="odds_ah_away", dtype="float64", nullable=True, description="Asian handicap odds — away side."),
+        ColumnSpec(
+            name="odds_ah_line", dtype="float64", nullable=True, description="Asian handicap line (goal-spread)."
+        ),
+        ColumnSpec(
+            name="odds_asian_corner_over",
+            dtype="float64",
+            nullable=True,
+            description="Asian corners market — over side.",
+        ),
+        ColumnSpec(
+            name="odds_asian_corner_under",
+            dtype="float64",
+            nullable=True,
+            description="Asian corners market — under side.",
+        ),
+        ColumnSpec(
+            name="odds_asian_corner_line", dtype="float64", nullable=True, description="Asian corners line threshold."
+        ),
+        ColumnSpec(
+            name="ht_start_timer",
+            dtype="int64",
+            nullable=True,
+            description="Halftime-start timer_seconds — stamped on snapshots taken during/after HT.",
+        ),
+        ColumnSpec(name="ht_end_timer", dtype="int64", nullable=True, description="Halftime-end timer_seconds."),
+        ColumnSpec(
+            name="data_available_at",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description=(
+                "UTC timestamp when this snapshot was captured — computed post-hoc from "
+                "``kickoff + timer_seconds``. Nullable because pre-match snapshots "
+                "(timer_seconds=0) may not have a stable kickoff reference."
+            ),
+        ),
+    ],
+    symbol_column="fixture_id",
+    required_row_count_min=0,
+)
+
+
+# ============================================================================
+# Registry side-effects (Families A, C, D only)
+# ============================================================================
+
+# Family A
+CONTRACT_REGISTRY[("sports", "reference", "leagues")] = SPORTS_LEAGUES
+CONTRACT_REGISTRY[("sports", "reference", "teams")] = SPORTS_TEAMS
+CONTRACT_REGISTRY[("sports", "reference", "venues")] = SPORTS_VENUES
+CONTRACT_REGISTRY[("sports", "league", "standings")] = SPORTS_STANDINGS
+# Family C
+CONTRACT_REGISTRY[("sports", "reference", "transfermarkt_leagues")] = SPORTS_TRANSFERMARKT_LEAGUES
+CONTRACT_REGISTRY[("sports", "player", "values")] = SPORTS_PLAYER_VALUES
+# Family D
+CONTRACT_REGISTRY[("sports", "reference", "sfi_leagues")] = SPORTS_SFI_LEAGUES
+CONTRACT_REGISTRY[("sports", "match", "sfi_progressive_stats")] = SPORTS_SFI_PROGRESSIVE_STATS
+
+
+__all__ = [
+    "SPORTS_LEAGUES",
+    "SPORTS_PLAYER_VALUES",
+    "SPORTS_SFI_LEAGUES",
+    "SPORTS_SFI_PROGRESSIVE_STATS",
+    "SPORTS_STANDINGS",
+    "SPORTS_TEAMS",
+    "SPORTS_TRANSFERMARKT_LEAGUES",
+    "SPORTS_VENUES",
+]

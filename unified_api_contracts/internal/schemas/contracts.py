@@ -825,6 +825,16 @@ from unified_api_contracts.internal.schemas import _defi_v2_contracts as _defi_v
 from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _legacy_venue_overrides as _legacy_venue_overrides  # noqa: E402
 from unified_api_contracts.internal.schemas import _snapshot_contracts as _snapshot_contracts  # noqa: E402
+
+# _sports_contracts / _sports_match_contracts / _sports_derived_contracts
+# together register 19 additional SPORTS SchemaContracts via module-level
+# CONTRACT_REGISTRY side-effects (every live SPORTS data_type except ODDS,
+# which lives in _sports_prediction_contracts). Split into 3 files to stay
+# under the codex 900-line limit. SSOT plan:
+# sports_uac_schema_contracts_registration_2026_04_24.plan.md.
+from unified_api_contracts.internal.schemas import _sports_contracts as _sports_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas import _sports_derived_contracts as _sports_derived_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas import _sports_match_contracts as _sports_match_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
     DEFI_LENDING_FLASH_LOAN_EVENTS as DEFI_LENDING_FLASH_LOAN_EVENTS,
 )
