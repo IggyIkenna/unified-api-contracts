@@ -218,6 +218,8 @@ _DERIBIT = SourceCapability(
     },
 )
 
+# OPTIONS: not supported — venue does not offer listed options contracts
+# FUTURE: not supported — Hyperliquid only offers perpetual futures (no fixed-expiry contracts)
 _HYPERLIQUID = SourceCapability(
     source="hyperliquid",
     domains=["market", "execution", "position"],
@@ -636,6 +638,8 @@ _TARDIS = SourceCapability(
     },
 )
 
+# OPTIONS: not supported — venue does not offer listed options contracts
+# FUTURE: not supported — Aster only offers perpetual futures (CLOB model, no fixed-expiry contracts)
 _ASTER = SourceCapability(
     source="aster",
     domains=["market", "execution", "position", "reference"],
