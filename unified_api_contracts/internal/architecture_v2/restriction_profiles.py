@@ -247,14 +247,23 @@ class QuestionnaireResponse(BaseModel):
 class ProfileYaml(BaseModel):
     """Parsed YAML shape — enforces the schema the PM validator already
     checks, so Pydantic validation here is a belt-and-braces sanity layer.
+
+    ``extra="ignore"``: profile YAMLs under
+    ``unified-trading-pm/codex/14-playbooks/demo-ops/profiles/`` carry
+    demo-runtime metadata (display_name, email, password, role, org,
+    entitlements, questionnaire_response, plan_toggle, notes,
+    walkthrough_hints) that is consumed by the demo-mode seeder but is
+    NOT part of the restriction-profile model. Ignoring unknown keys
+    keeps this loader focused on its scope without rejecting otherwise
+    valid YAMLs.
     """
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    model_config = ConfigDict(frozen=True, extra="ignore")
 
     persona_id: str
     base_audience: ClientAudience
     description: str = ""
-    tiles: Mapping[str, TileLockState]
+    tiles: Mapping[str, TileLockState] = {}
     flavour_overrides: Mapping[str, Mapping[str, TileLockState]] = {}
 
 

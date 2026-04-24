@@ -386,10 +386,15 @@ class AccessDecision(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-TileLockState = Literal["unlocked", "padlocked", "hidden"]
-"""G1.3 three-state lock enum. Mirrors UI
+TileLockState = Literal["unlocked", "padlocked", "hidden", "locked-redirect"]
+"""G1.3 four-state lock enum. Mirrors UI
 ``lib/visibility/tile-lock-state.ts`` TileLockState and
-``demo-ops/profiles/*.yaml`` tile-level state values."""
+``demo-ops/profiles/*.yaml`` tile-level state values.
+
+``locked-redirect`` — entitlement-gated tile; click is intercepted by
+the UI and redirected to a ``/services/<tier>/locked?from=<tile>``
+explainer page (used for strategy-full-only research/promote sub-routes
+on DART Signals-In personas)."""
 
 
 class RestrictionProfile(BaseModel):
