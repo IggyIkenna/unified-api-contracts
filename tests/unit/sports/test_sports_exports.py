@@ -35,7 +35,7 @@ class TestSportsExports:
     def test_import_bookmaker_registry(self) -> None:
         from unified_api_contracts import BookmakerRegistry
 
-        assert len(BookmakerRegistry) == 81
+        assert len(BookmakerRegistry) == 78
 
     def test_import_odds_type(self) -> None:
         from unified_api_contracts import OddsType

@@ -37,7 +37,6 @@ from ..external.nautilus.normalize import normalize_nautilus_instrument
 from ..external.odds_api.normalize import normalize_odds_api_market
 from ..external.odds_engine.normalize import normalize_odds_engine_market
 from ..external.okx.normalize import normalize_okx_market
-from ..external.predictit.normalize import normalize_predictit_market
 from ..external.tardis.normalize import normalize_tardis_instrument
 from ..external.upbit.normalize import normalize_upbit_market
 
@@ -92,7 +91,6 @@ __all__ = [
     "normalize_odds_api_market",
     "normalize_odds_engine_market",
     "normalize_okx_market",
-    "normalize_predictit_market",
     "normalize_tardis_instrument",
     "normalize_upbit_market",
 ]

@@ -16,7 +16,7 @@ def test_betting_sports_venues_non_empty() -> None:
 
 def test_exchange_venues_present() -> None:
     """All sports exchange venues must be in the manifest."""
-    for key in ("betfair", "smarkets", "matchbook", "betdaq"):
+    for key in ("betfair", "matchbook"):
         assert key in BETTING_SPORTS_VENUES, f"Exchange venue {key} missing"
 
 
@@ -56,7 +56,7 @@ def test_scraper_venues_present() -> None:
 
 def test_aggregator_venues_present() -> None:
     """Odds aggregator venues must be in the manifest."""
-    for key in ("odds_api", "opticodds", "oddsjam", "sharpapi", "odds_engine", "metabet"):
+    for key in ("odds_api", "opticodds", "sharpapi", "odds_engine", "metabet"):
         assert key in BETTING_SPORTS_VENUES, f"Aggregator venue {key} missing"
 
 
@@ -101,7 +101,7 @@ def test_scraper_venues_have_no_rest() -> None:
 
 def test_api_venues_have_rest() -> None:
     """API-based venues should have has_rest=True."""
-    api_keys = ["betfair", "pinnacle", "polymarket", "kalshi", "odds_api", "smarkets"]
+    api_keys = ["betfair", "pinnacle", "polymarket", "kalshi", "odds_api"]
     for key in api_keys:
         contract = BETTING_SPORTS_VENUES[key]
         assert contract["has_rest"] is True, f"API venue {key} should have has_rest=True"

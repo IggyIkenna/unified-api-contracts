@@ -46,7 +46,6 @@ from unified_api_contracts.normalize_utils.errors._normalize_a import (
 )
 from unified_api_contracts.normalize_utils.errors._normalize_b import (
     normalize_api_football_error,
-    normalize_betdaq_error,
     normalize_cloud_sdks_error,
     normalize_defillama_error,
     normalize_footystats_error,
@@ -63,7 +62,6 @@ from unified_api_contracts.normalize_utils.errors._normalize_b import (
     normalize_prime_broker_error,
     normalize_regulatory_error,
     normalize_sharpapi_error,
-    normalize_smarkets_error,
     normalize_sports_error,
     normalize_thegraph_error,
     normalize_transfermarkt_error,
@@ -99,7 +97,6 @@ __all__ = [
     "normalize_alchemy_error",
     "normalize_api_football_error",
     "normalize_aster_error",
-    "normalize_betdaq_error",
     "normalize_betfair_error",
     "normalize_binance_error",
     "normalize_bitget_error",
@@ -134,7 +131,6 @@ __all__ = [
     "normalize_prime_broker_error",
     "normalize_regulatory_error",
     "normalize_sharpapi_error",
-    "normalize_smarkets_error",
     "normalize_sports_error",
     "normalize_tardis_error",
     "normalize_thegraph_error",

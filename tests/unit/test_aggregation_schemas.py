@@ -414,7 +414,7 @@ def test_sports_arb_position_round_trip() -> None:
         commission_amount=Decimal("5"),
     )
     leg_lay = SportsArbLeg(
-        venue="smarkets",
+        venue="matchbook",
         side="LAY",
         stake=Decimal("95"),
         odds=Decimal("2.0"),
@@ -444,7 +444,7 @@ def test_sports_arb_position_round_trip() -> None:
     assert restored.net_pnl_after_commission == arb.net_pnl_after_commission
     assert len(restored.legs) == 2
     assert restored.legs[0].venue == "betfair"
-    assert restored.legs[1].venue == "smarkets"
+    assert restored.legs[1].venue == "matchbook"
 
 
 def test_sports_arb_position_decimal_fields() -> None:

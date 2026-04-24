@@ -115,9 +115,7 @@ _SPORTS_TOKENS: frozenset[str] = frozenset(
     {
         "unity",
         "betfair",
-        "smarkets",
         "matchbook",
-        "betdaq",
     }
 )
 

@@ -6,10 +6,6 @@ from datetime import UTC, datetime
 
 from ..canonical.domain import CanonicalBetMarket, CanonicalBetOrder
 from ..canonical.domain.sports.betting import BetOrder, BetSide
-from ..external.betdaq.normalize import (
-    normalize_betdaq_market,
-    normalize_betdaq_order,
-)
 from ..external.betfair.normalize import (
     normalize_betfair_market,
     normalize_betfair_odds,
@@ -31,10 +27,6 @@ from ..external.odds_api.normalize import normalize_odds_api_fixture
 from ..external.onexbet.normalize import normalize_onexbet_market
 from ..external.pinnacle.normalize import normalize_pinnacle_event
 from ..external.polymarket.normalize import normalize_polymarket_market
-from ..external.smarkets.normalize import (
-    normalize_smarkets_market,
-    normalize_smarkets_order,
-)
 from ..registry.venue_constants import SPORTS_EXCHANGE_VENUES
 
 # ---------------------------------------------------------------------------
@@ -101,8 +93,6 @@ def normalize_sports_market(raw: BetfairSourceMarket, venue: str = "betfair") ->
 
 
 __all__ = [
-    "normalize_betdaq_market",
-    "normalize_betdaq_order",
     "normalize_betfair_market",
     "normalize_betfair_odds",
     "normalize_betfair_order",
@@ -115,8 +105,6 @@ __all__ = [
     "normalize_onexbet_market",
     "normalize_pinnacle_event",
     "normalize_polymarket_market",
-    "normalize_smarkets_market",
-    "normalize_smarkets_order",
     "normalize_sports_market",
     "normalize_sports_order",
 ]

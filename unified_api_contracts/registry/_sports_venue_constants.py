@@ -9,7 +9,6 @@ from .venue_constants import (
     API_FOOTBALL,
     BET365,
     BET888SPORT,
-    BETDAQ,
     BETFAIR,
     BETMGM,
     BETOPENLY,
@@ -25,7 +24,6 @@ from .venue_constants import (
     NOVIG,
     ODDS_API,
     ODDS_ENGINE,
-    ODDSJAM,
     ONEXBET,
     OPEN_METEO,
     OPTICODDS,
@@ -36,7 +34,6 @@ from .venue_constants import (
     SBOBET,
     SHARPAPI,
     SKYBET,
-    SMARKETS,
     SOCCER_FOOTBALL_INFO,
     SPORTS_BOOKMAKER_API_VENUES,
     SPORTS_BOOKMAKER_WEB_VENUES,
@@ -82,9 +79,7 @@ SPORTS_VENUE_TYPE_MAP.update(dict.fromkeys(SPORTS_DATA_VENUES, SportsVenueType.D
 
 SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     BETFAIR: SportsAuthMethod.SESSION_TOKEN,
-    SMARKETS: SportsAuthMethod.API_KEY,
     MATCHBOOK: SportsAuthMethod.API_KEY,
-    BETDAQ: SportsAuthMethod.API_KEY,
     POLYMARKET: SportsAuthMethod.WALLET_SIGNATURE,
     KALSHI: SportsAuthMethod.API_KEY,
     NOVIG: SportsAuthMethod.API_KEY,
@@ -94,7 +89,6 @@ SPORTS_AUTH_MAP: dict[str, SportsAuthMethod] = {
     ONEXBET: SportsAuthMethod.API_KEY,
     ODDS_API: SportsAuthMethod.API_KEY,
     OPTICODDS: SportsAuthMethod.API_KEY,
-    ODDSJAM: SportsAuthMethod.API_KEY,
     API_FOOTBALL: SportsAuthMethod.API_KEY,
 }
 SPORTS_AUTH_MAP.update(dict.fromkeys(SPORTS_BOOKMAKER_WEB_VENUES, SportsAuthMethod.LOGIN_CREDENTIALS))
@@ -117,9 +111,7 @@ class SportsAggregatorType(StrEnum):
 
 
 VENUE_AGGREGATOR_TYPE: dict[str, SportsAggregatorType] = {
-    **dict.fromkeys(
-        {ODDS_API, OPTICODDS, ODDSJAM, SHARPAPI, METABET, ODDS_ENGINE}, SportsAggregatorType.ODDS_AGGREGATOR
-    ),
+    **dict.fromkeys({ODDS_API, OPTICODDS, SHARPAPI, METABET, ODDS_ENGINE}, SportsAggregatorType.ODDS_AGGREGATOR),
     **dict.fromkeys(
         SPORTS_EXCHANGE_VENUES | SPORTS_BOOKMAKER_API_VENUES | SPORTS_PREDICTION_MARKET_VENUES,
         SportsAggregatorType.DIRECT_EXECUTION,

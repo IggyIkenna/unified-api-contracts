@@ -1,10 +1,8 @@
-"""Tests for normalizers added to close the 5 schema audit gaps.
+"""Tests for normalizers added to close the schema audit gaps.
 
 Gaps resolved:
-  betdaq    → Order        (BetdaqOrder)
   matchbook → Error        (MatchbookErrorResponse)
   onexbet   → ReferenceData (OneXBetMarket)
-  smarkets  → Order        (SmarketsOrderResponse)
   sports    → ReferenceData (BetfairMarket from sports/sources/betfair)
 """
 
@@ -20,30 +18,6 @@ from unified_api_contracts.canonical.crosscutting.errors import (
 
 
 class TestSchemaGapNormalizers:
-    def test_normalize_betdaq_order_accepted(self) -> None:
-        from unified_api_contracts.canonical.domain import CanonicalBetOrder
-        from unified_api_contracts.external.betdaq.schemas import BetdaqOrder
-        from unified_api_contracts.normalize_utils.sports import (
-            normalize_betdaq_order,
-        )
-
-        order = BetdaqOrder(Id=12345, Result=0)
-        result = normalize_betdaq_order(order)
-        assert isinstance(result, CanonicalBetOrder)
-        assert result.order_id == "12345"
-        assert result.status == "accepted"
-        assert result.venue == "betdaq"
-
-    def test_normalize_betdaq_order_rejected(self) -> None:
-        from unified_api_contracts.external.betdaq.schemas import BetdaqOrder
-        from unified_api_contracts.normalize_utils.sports import (
-            normalize_betdaq_order,
-        )
-
-        order = BetdaqOrder(Id=99, Result=-1)
-        result = normalize_betdaq_order(order)
-        assert result.status == "rejected"
-
     def test_normalize_matchbook_error_known_codes(self) -> None:
         from unified_api_contracts.normalize_utils.errors import (
             normalize_matchbook_error,
@@ -72,22 +46,6 @@ class TestSchemaGapNormalizers:
         assert result.market_id == "1x2"
         assert result.market_name == "1x2"
         assert result.venue == "onexbet"
-
-    def test_normalize_smarkets_order(self) -> None:
-        from unified_api_contracts.canonical.domain import CanonicalBetOrder
-        from unified_api_contracts.external.smarkets.schemas import (
-            SmarketsOrderResponse,
-        )
-        from unified_api_contracts.normalize_utils.sports import (
-            normalize_smarkets_order,
-        )
-
-        order = SmarketsOrderResponse(id="ord_abc123")
-        result = normalize_smarkets_order(order)
-        assert isinstance(result, CanonicalBetOrder)
-        assert result.order_id == "ord_abc123"
-        assert result.status == "submitted"
-        assert result.venue == "smarkets"
 
     def test_normalize_sports_market(self) -> None:
         from datetime import UTC, datetime

@@ -46,6 +46,16 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "gas_fees": "15m",
     "rewards": "24h",
     "risk_params": "24h",
+    # New DeFi data types (Phase 1 — defi_data_types_completeness_2026_04_24)
+    "liquidation_events": "15m",
+    "flash_loan_events": "15m",
+    "staking_yields": "24h",
+    "token_transfers": "15m",
+    "bridge_events": "15m",
+    "position_data": "24h",
+    "mev_events": "15m",
+    "governance_events": "24h",
+    "eigenlayer_rewards": "24h",
     # Sports — horizon-based, not standard timeframes
     "odds_snapshot": "15m",
     "odds_movement": "15m",
@@ -107,6 +117,16 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
         "gas_fees",  # EVM gas fee history
         "rewards",  # Protocol reward emissions (pass-through, OHLCV=NaN)
         "risk_params",  # Protocol risk parameters (pass-through, OHLCV=NaN)
+        # ── New data types (Phase 1 — defi_data_types_completeness_2026_04_24) ──
+        "liquidation_events",  # Liquidation call events (Aave V3, Morpho)
+        "flash_loan_events",  # Flash loan events (Aave V3)
+        "staking_yields",  # Staking APY snapshots (Lido, EigenLayer)
+        "token_transfers",  # ERC-20 transfer events for top DeFi tokens
+        "bridge_events",  # Cross-chain bridge transfer events
+        "position_data",  # User positions (Aave V3 top borrowers, Uniswap V3 LP)
+        "mev_events",  # MEV-Boost relay builder/relay stats
+        "governance_events",  # DAO proposal + vote events
+        "eigenlayer_rewards",  # EigenLayer restaking reward distributions
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
@@ -249,6 +269,16 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "gas_fees": False,
     "rewards": False,
     "risk_params": False,
+    # New DeFi data types — all pass-through (event/snapshot data, not OHLCV)
+    "liquidation_events": False,
+    "flash_loan_events": False,
+    "staking_yields": False,
+    "token_transfers": False,
+    "bridge_events": False,
+    "position_data": False,
+    "mev_events": False,
+    "governance_events": False,
+    "eigenlayer_rewards": False,
     # Sports — candle adapters process these
     "odds": False,  # Raw tick data, not directly processed (bucket adapter handles)
     "odds_snapshot": True,

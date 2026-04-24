@@ -1,7 +1,7 @@
 """Canonical error schemas and venue error classification maps."""
 
 from ._canonical import *  # noqa: F403
-from ._canonical import ErrorAction
+from ._canonical import ErrorAction, UnsupportedCapabilityError
 from ._types import (
     DATABENTO_ERROR_MAP,
     DatabentoError,
@@ -55,6 +55,7 @@ __all__ = [
     "DefiErrorCode",
     "ErrorAction",
     "RateLimitResponse",
+    "UnsupportedCapabilityError",
     "VenueErrorClassification",
     "WebSocketCloseInfo",
     "classify_venue_error",

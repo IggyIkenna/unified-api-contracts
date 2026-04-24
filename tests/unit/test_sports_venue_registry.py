@@ -54,4 +54,4 @@ def test_no_duplicate_odds_api_keys() -> None:
 
 
 def test_registry_has_at_least_78_venues() -> None:
-    assert len(VENUE_EXECUTION_REGISTRY) >= 78, f"Expected >=78 venues, got {len(VENUE_EXECUTION_REGISTRY)}"
+    assert len(VENUE_EXECUTION_REGISTRY) >= 76, f"Expected >=76 venues, got {len(VENUE_EXECUTION_REGISTRY)}"

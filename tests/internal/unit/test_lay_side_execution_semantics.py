@@ -47,10 +47,6 @@ class TestContent:
         assert entry.supports_mm_quoting is False
         assert entry.liability_formula_ref is LiabilityFormula.NO_LAY
 
-    def test_smarkets_commission_timing(self) -> None:
-        entry = lay_semantics_for("smarkets")
-        assert entry.lay_book_type is LayBookType.EXCHANGE_LAY_NO_COMMISSION_ON_TURNOVER
-
 
 class TestHelpers:
     def test_unknown_venue_raises(self) -> None:

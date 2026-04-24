@@ -673,6 +673,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "staking", "eigenlayer_rewards"): DEFI_STAKING_EIGENLAYER_REWARDS,
     ("defi", "staking", "yield_snapshots"): DEFI_STAKING_YIELD_SNAPSHOTS,
     # Sports + Prediction registered via _sports_prediction_contracts side-effect import (see end of file).
+    # DeFi phase-2 contracts registered via _defi_v2_contracts side-effect import (see end of file).
 }
 
 
@@ -778,14 +779,35 @@ def lookup_contract(
     return contract
 
 
-# Side-effect imports: register Sports + Prediction (Phase 1.1/1.2), MDPS
-# processed-candle (Phase 5b.1), and legacy Uniswap V2/V3/V4/Curve/Balancer
-# + Aave V3 venue overrides into CONTRACT_REGISTRY / VENUE_CONTRACT_OVERRIDES.
-# Placed after lookup_contract / registry construction so mutations land
-# before any external consumer calls lookup_contract.
+# Side-effect imports — must appear after CONTRACT_REGISTRY construction.
 from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas import _defi_v2_contracts as _defi_v2_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _legacy_venue_overrides as _legacy_venue_overrides  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_LENDING_FLASH_LOAN_EVENTS as DEFI_LENDING_FLASH_LOAN_EVENTS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_LENDING_LIQUIDATION_EVENTS as DEFI_LENDING_LIQUIDATION_EVENTS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_LENDING_POSITION_DATA as DEFI_LENDING_POSITION_DATA,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_SPOT_ASSET_BRIDGE_EVENTS as DEFI_SPOT_ASSET_BRIDGE_EVENTS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_SPOT_ASSET_GOVERNANCE_EVENTS as DEFI_SPOT_ASSET_GOVERNANCE_EVENTS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_SPOT_ASSET_MEV_EVENTS as DEFI_SPOT_ASSET_MEV_EVENTS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_SPOT_ASSET_TOKEN_TRANSFERS as DEFI_SPOT_ASSET_TOKEN_TRANSFERS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_STAKING_STAKING_YIELDS as DEFI_STAKING_STAKING_YIELDS,
+)
 from unified_api_contracts.internal.schemas._ml_training_contract import (  # noqa: E402
     ML_TRAINING_MANIFEST as ML_TRAINING_MANIFEST,
 )
@@ -831,15 +853,23 @@ __all__ = [
     "DEFI_AAVE_V3_LENDING_INDICES",
     "DEFI_DEX_POOL_DEX_POOL_STATE",
     "DEFI_DEX_POOL_DEX_POOL_SWAPS",
+    "DEFI_LENDING_FLASH_LOAN_EVENTS",
     "DEFI_LENDING_INDICES_MARKET_ID",
     "DEFI_LENDING_LIQUIDATIONS",
+    "DEFI_LENDING_LIQUIDATION_EVENTS",
+    "DEFI_LENDING_POSITION_DATA",
     "DEFI_LENDING_POSITION_LENDING_INDICES",
     "DEFI_LST_LST_RATES",
     "DEFI_PERPETUAL_PERP_FUNDING",
     "DEFI_POOL_DEX_POOL_SWAPS",
+    "DEFI_SPOT_ASSET_BRIDGE_EVENTS",
     "DEFI_SPOT_ASSET_GAS_FEES",
+    "DEFI_SPOT_ASSET_GOVERNANCE_EVENTS",
+    "DEFI_SPOT_ASSET_MEV_EVENTS",
     "DEFI_SPOT_ASSET_ORACLE_PRICES",
+    "DEFI_SPOT_ASSET_TOKEN_TRANSFERS",
     "DEFI_STAKING_EIGENLAYER_REWARDS",
+    "DEFI_STAKING_STAKING_YIELDS",
     "DEFI_STAKING_YIELD_SNAPSHOTS",
     "KEYWORD_TO_CATEGORY",
     "ML_TRAINING_MANIFEST",

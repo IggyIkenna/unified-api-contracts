@@ -105,7 +105,7 @@ class TestLiveOddsUpdate:
         assert update.source_tier == "opticodds"
 
     def test_source_tiers(self) -> None:
-        for tier in ("odds_api", "opticodds", "oddsjam", "scraper", "exchange"):
+        for tier in ("odds_api", "opticodds", "scraper", "exchange"):
             update = LiveOddsUpdate(
                 fixture_id="af:1",
                 bookmaker_key="test",

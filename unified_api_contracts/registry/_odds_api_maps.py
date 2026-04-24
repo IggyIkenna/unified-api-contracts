@@ -9,7 +9,6 @@ from __future__ import annotations
 
 ODDS_API_KEY_MAP: dict[str, list[str]] = {
     "BETFAIR": ["betfair_ex_uk", "betfair_ex_eu", "betfair_ex_au"],
-    "SMARKETS": ["smarkets"],
     "MATCHBOOK": ["matchbook"],
     "POLYMARKET": ["polymarket"],
     "KALSHI": ["kalshi"],
@@ -86,7 +85,6 @@ ODDS_API_KEY_MAP: dict[str, list[str]] = {
 
 ODDS_API_REGION_MAP: dict[str, list[str]] = {
     "BETFAIR": ["uk", "eu", "au"],
-    "SMARKETS": ["uk"],
     "MATCHBOOK": ["uk", "eu"],
     "POLYMARKET": ["us_ex"],
     "KALSHI": ["us_ex"],
@@ -186,7 +184,6 @@ AUDITED_BOOKMAKERS: dict[str, dict[str, str | bool | float]] = {
     "BET888SPORT": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
     "LIVESCOREBET": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
     "MATCHBOOK": {"accuracy": 0.90, "is_exchange": True, "is_execution_venue": True, "start_date": "2025-07-31"},
-    "SMARKETS": {"accuracy": 0.90, "is_exchange": True, "is_execution_venue": True, "start_date": "2025-07-31"},
     "BETFAIR_SB": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
     "UNIBET_UK": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},
     "BET365": {"accuracy": 0.95, "is_exchange": False, "is_execution_venue": False, "start_date": "2025-07-31"},

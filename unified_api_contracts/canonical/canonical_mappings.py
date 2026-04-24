@@ -468,7 +468,6 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "api_football": "api-football-api-key",
     "odds_api": "odds-api-key",
     "footystats": "footystats-api-key",
-    "oddsjam": "oddsjam-api-key",
     "opticodds": "opticodds-api-key",
     "soccer_football_info": "soccer-football-info-api-key",
     "transfermarkt": "transfermarkt-api-key",

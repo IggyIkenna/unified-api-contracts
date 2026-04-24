@@ -1,4 +1,4 @@
-"""Verify OpticOdds and OddsJam source schemas: construction, from_raw(), immutability."""
+"""Verify OpticOdds source schemas: construction, from_raw(), immutability."""
 
 from __future__ import annotations
 
@@ -8,11 +8,6 @@ from decimal import Decimal
 import pytest
 from pydantic import ValidationError
 
-from unified_api_contracts.external.oddsjam.schemas import (
-    OddsJamGame,
-    OddsJamMarket,
-    OddsJamOdds,
-)
 from unified_api_contracts.external.opticodds.schemas import (
     OpticOddsFixture,
     OpticOddsMarket,
@@ -114,90 +109,6 @@ class TestOpticOddsSchemas:
 
 
 @pytest.mark.unit
-class TestOddsJamSchemas:
-    def test_odds_construct(self) -> None:
-        o = OddsJamOdds(
-            sportsbook="bet365",
-            odds=Decimal("2.10"),
-            is_main=True,
-            last_updated=NOW,
-        )
-        assert o.sportsbook == "bet365"
-        assert o.odds == Decimal("2.10")
-
-    def test_odds_optional_fields(self) -> None:
-        o = OddsJamOdds(sportsbook="pinnacle", odds=Decimal("1.95"))
-        assert o.is_main is True
-        assert o.last_updated is None
-
-    def test_market_construct(self) -> None:
-        odds = OddsJamOdds(sportsbook="bet365", odds=Decimal("2.10"))
-        m = OddsJamMarket(
-            market_name="moneyline",
-            bet_name="home",
-            odds_list=[odds],
-        )
-        assert m.market_name == "moneyline"
-        assert m.line is None
-
-    def test_market_with_line(self) -> None:
-        m = OddsJamMarket(
-            market_name="total",
-            bet_name="over",
-            line=Decimal("2.5"),
-            odds_list=[],
-        )
-        assert m.line == Decimal("2.5")
-
-    def test_game_construct(self) -> None:
-        game = OddsJamGame(
-            game_id="g1",
-            sport="soccer",
-            league="EPL",
-            home_team="Man City",
-            away_team="Arsenal",
-            start_date=NOW,
-            is_live=False,
-            markets=[],
-        )
-        assert game.sport == "soccer"
-        assert game.is_live is False
-
-    def test_game_frozen(self) -> None:
-        game = OddsJamGame(
-            game_id="g1",
-            sport="soccer",
-            league="EPL",
-            home_team="A",
-            away_team="B",
-            start_date=NOW,
-            markets=[],
-        )
-        with pytest.raises(ValidationError):
-            game.is_live = True  # type: ignore[misc]
-
-    def test_odds_from_raw(self) -> None:
-        o = OddsJamOdds.from_raw({"sportsbook": "pinnacle", "odds": 1.95})
-        assert o.odds == Decimal("1.95")
-
-    def test_game_round_trip(self) -> None:
-        odds = OddsJamOdds(sportsbook="bet365", odds=Decimal("2.10"))
-        market = OddsJamMarket(market_name="moneyline", bet_name="home", odds_list=[odds])
-        game = OddsJamGame(
-            game_id="g1",
-            sport="soccer",
-            league="EPL",
-            home_team="A",
-            away_team="B",
-            start_date=NOW,
-            markets=[market],
-        )
-        data = game.model_dump()
-        g2 = OddsJamGame.model_validate(data)
-        assert g2.markets[0].odds_list[0].sportsbook == "bet365"
-
-
-@pytest.mark.unit
 class TestStreamingSourceExports:
     def test_import_opticodds(self) -> None:
         from unified_api_contracts.external.opticodds import (
@@ -207,12 +118,3 @@ class TestStreamingSourceExports:
         )
 
         assert all([OpticOddsFixture, OpticOddsMarket, OpticOddsSportsbook])
-
-    def test_import_oddsjam(self) -> None:
-        from unified_api_contracts.external.oddsjam import (
-            OddsJamGame,
-            OddsJamMarket,
-            OddsJamOdds,
-        )
-
-        assert all([OddsJamGame, OddsJamMarket, OddsJamOdds])

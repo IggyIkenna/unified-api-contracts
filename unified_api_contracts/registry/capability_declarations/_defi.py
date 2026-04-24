@@ -442,6 +442,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         required_tokens=frozenset({"EIGEN", "ETHFI"}),
     ),
     # ── CeFi-style Perps (API-based, not on-chain) ─────────────
+    # OPTIONS: not supported — venue does not offer listed options contracts
     "hyperliquid": _ProtocolCapability(
         venue_prefix="HYPERLIQUID",
         protocol_class=ProtocolClass.PERPS,
@@ -449,6 +450,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=["perp_funding", "oracle_prices"],
         mtds_operations=["collect-perp-funding"],
     ),
+    # OPTIONS: not supported — venue does not offer listed options contracts
     "aster": _ProtocolCapability(
         venue_prefix="ASTER",
         protocol_class=ProtocolClass.PERPS,

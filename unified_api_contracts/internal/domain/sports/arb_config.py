@@ -157,8 +157,6 @@ EXCHANGE_VENUES: frozenset[str] = frozenset(
         "betfair_ex_eu",
         "betfair_ex_au",
         "matchbook",
-        "smarkets",
-        "betdaq",
     }
 )
 
@@ -168,8 +166,6 @@ EXCHANGE_COMMISSION_RATES: dict[str, float] = {
     "betfair_ex_eu": 0.02,
     "betfair_ex_au": 0.02,
     "matchbook": 0.015,  # 1.5%
-    "smarkets": 0.02,
-    "betdaq": 0.02,
 }
 
 # Bookmaker operator groups — same company, different regional skins.

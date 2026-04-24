@@ -373,8 +373,8 @@ class TestClassifyVenueError:
         assert core_codes <= aave_v3_codes
         assert core_codes <= aave_plasma_codes
 
-    def test_all_18_venues_in_venue_error_map(self):
-        """All 18 venues from the error code audit exist in VENUE_ERROR_MAP."""
+    def test_all_16_venues_in_venue_error_map(self):
+        """All 16 venues from the error code audit exist in VENUE_ERROR_MAP."""
         from unified_api_contracts.canonical.crosscutting.errors import VENUE_ERROR_MAP
 
         expected_venues = [
@@ -382,13 +382,11 @@ class TestClassifyVenueError:
             "pinnacle",
             "odds_api",
             "odds_engine",
-            "oddsjam",
             "opticodds",
             "sharpapi",
             "matchbook",
             "metabet",
             "manifold",
-            "predictit",
             "polygon",
             "transfermarkt",
             "footystats",
@@ -405,18 +403,16 @@ class TestClassifyVenueError:
                 assert required_code in codes, f"Venue {venue} missing code {required_code}"
 
     def test_new_venues_429_returns_retry(self):
-        """All 10 newly added venues: 429 maps to RETRY."""
+        """All 8 newly added venues: 429 maps to RETRY."""
         from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
 
         new_venues = [
             "odds_engine",
-            "oddsjam",
             "opticodds",
             "sharpapi",
             "matchbook",
             "metabet",
             "manifold",
-            "predictit",
             "polygon",
             "fear_greed",
         ]
@@ -426,18 +422,16 @@ class TestClassifyVenueError:
             assert result.action == ErrorAction.RETRY, f"{venue}: 429 should be RETRY"
 
     def test_new_venues_400_returns_fail(self):
-        """All 10 newly added venues: 400 maps to FAIL."""
+        """All 8 newly added venues: 400 maps to FAIL."""
         from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
 
         new_venues = [
             "odds_engine",
-            "oddsjam",
             "opticodds",
             "sharpapi",
             "matchbook",
             "metabet",
             "manifold",
-            "predictit",
             "polygon",
             "fear_greed",
         ]

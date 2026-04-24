@@ -108,16 +108,6 @@ LAY_SIDE_EXECUTION_SEMANTICS: Final[tuple[LaySideExecutionSemantics, ...]] = (
         notes="Betfair Exchange — canonical full-lay venue. Commission on winnings.",
     ),
     LaySideExecutionSemantics(
-        venue_id="smarkets",
-        lay_book_type=LayBookType.EXCHANGE_LAY_NO_COMMISSION_ON_TURNOVER,
-        supports_mm_quoting=True,
-        liability_formula_ref=LiabilityFormula.BETFAIR_STANDARD,
-        commission_basis="winnings",
-        min_quote_refresh_ms=250,
-        in_play_policy="soft_lock",
-        notes="Smarkets — commission on net winnings only, not on turnover.",
-    ),
-    LaySideExecutionSemantics(
         venue_id="matchbook",
         lay_book_type=LayBookType.FULL_LAY,
         supports_mm_quoting=True,

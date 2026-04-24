@@ -17,7 +17,11 @@ from __future__ import annotations
 DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # ── DeFi — DEX protocols (dex_swaps + dex_pools) ──
     "UNISWAPV2-ETHEREUM": {"dex_swaps": "2020-05-06", "dex_pools": "2020-05-06"},
-    "UNISWAPV3-ETHEREUM": {"dex_swaps": "2021-05-05", "dex_pools": "2021-05-05"},
+    "UNISWAPV3-ETHEREUM": {
+        "dex_swaps": "2021-05-05",
+        "dex_pools": "2021-05-05",
+        "position_data": "2021-05-05",  # LP position data (top 1000 by liquidity)
+    },
     "UNISWAPV3-ARBITRUM": {"dex_swaps": "2021-06-18", "dex_pools": "2021-06-18"},
     "UNISWAPV3-BASE": {"dex_swaps": "2023-09-03", "dex_pools": "2023-09-03"},
     "UNISWAPV3-OPTIMISM": {"dex_swaps": "2021-11-12", "dex_pools": "2021-11-12"},
@@ -38,12 +42,18 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "oracle_prices": "2023-01-27",
         "rewards": "2023-01-27",
         "risk_params": "2023-01-27",
+        "liquidation_events": "2023-01-27",  # LiquidationCall events via subgraph
+        "flash_loan_events": "2023-01-27",  # FlashLoan events via subgraph
+        "position_data": "2023-01-27",  # Top-500 user positions by supplied_usd
     },
     "AAVEV3-ARBITRUM": {
         "lending_indices": "2022-03-12",
         "oracle_prices": "2022-03-12",
         "rewards": "2022-03-12",
         "risk_params": "2022-03-12",
+        "liquidation_events": "2022-03-12",
+        "flash_loan_events": "2022-03-12",
+        "position_data": "2022-03-12",
     },
     "AAVEV3-AVALANCHE": {
         "lending_indices": "2022-03-12",
@@ -80,6 +90,9 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "oracle_prices": "2022-03-12",
         "rewards": "2022-03-12",
         "risk_params": "2022-03-12",
+        "liquidation_events": "2022-03-12",
+        "flash_loan_events": "2022-03-12",
+        "position_data": "2022-03-12",
     },
     "AAVEV3-SCROLL": {"lending_indices": "2024-07-22", "oracle_prices": "2024-07-22"},
     "AAVEV3-ZKSYNC": {"lending_indices": "2024-12-12", "oracle_prices": "2024-12-12"},
@@ -89,7 +102,11 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "COMPOUNDV3-OPTIMISM": {"lending_indices": "2024-04-07", "oracle_prices": "2024-04-07"},
     "COMPOUNDV3-POLYGON": {"lending_indices": "2024-04-07", "oracle_prices": "2024-04-07"},
     "COMPOUNDV3-SCROLL": {"lending_indices": "2024-07-22", "oracle_prices": "2024-07-22"},
-    "MORPHO-ETHEREUM": {"lending_indices": "2024-01-08", "oracle_prices": "2024-01-08"},
+    "MORPHO-ETHEREUM": {
+        "lending_indices": "2024-01-08",
+        "oracle_prices": "2024-01-08",
+        "liquidation_events": "2024-01-08",  # LiquidationCall events via subgraph
+    },
     "MORPHO-ARBITRUM": {"lending_indices": "2024-06-01", "oracle_prices": "2024-06-01"},
     "MORPHO-BASE": {"lending_indices": "2024-06-01", "oracle_prices": "2024-06-01"},
     "MORPHO-OPTIMISM": {"lending_indices": "2024-06-01", "oracle_prices": "2024-06-01"},
@@ -119,10 +136,43 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "ORCA-SOLANA": {"dex_swaps": "2021-03-01", "dex_pools": "2021-03-01"},
     "RAYDIUM-SOLANA": {"dex_swaps": "2021-02-21", "dex_pools": "2021-02-21"},
     # ── DeFi — LST/Yield protocols ──
-    "LIDO-ETHEREUM": {"lst_rates": "2020-12-18", "oracle_prices": "2020-12-18"},
-    "ETHERFI-ETHEREUM": {"lst_rates": "2023-11-01", "oracle_prices": "2023-11-01"},
+    "LIDO-ETHEREUM": {
+        "lst_rates": "2020-12-18",
+        "oracle_prices": "2020-12-18",
+        "staking_yields": "2020-12-18",  # stETH APY daily rate
+    },
+    "ETHERFI-ETHEREUM": {
+        "lst_rates": "2023-11-01",
+        "oracle_prices": "2023-11-01",
+        "staking_yields": "2023-11-01",  # weETH APY
+    },
     "ETHENA-ETHEREUM": {"lst_rates": "2024-02-19", "oracle_prices": "2024-02-19"},
     "JITO-SOLANA": {"lst_rates": "2021-11-01", "oracle_prices": "2021-11-01"},
+    # ── DeFi — EigenLayer (restaking rewards + staking yields) ──
+    "EIGENLAYER-ETHEREUM": {
+        "eigenlayer_rewards": "2024-08-06",  # RewardsClaimed events
+        "staking_yields": "2024-08-06",  # Restaking APY per operator
+    },
+    # ── DeFi — Gas fees (chain-level, via ALCHEMY synthetic venue) ──
+    # The gas_fee_handler uses venue="ALCHEMY" (chain-level, not per-protocol).
+    # These entries enable data-status completeness metrics for gas fee coverage.
+    "ALCHEMY-ETHEREUM": {"gas_fees": "2020-01-01"},
+    "ALCHEMY-ARBITRUM": {"gas_fees": "2021-05-28"},
+    "ALCHEMY-POLYGON": {"gas_fees": "2020-05-30"},
+    "ALCHEMY-OPTIMISM": {"gas_fees": "2021-11-11"},
+    "ALCHEMY-BASE": {"gas_fees": "2023-06-15"},
+    # ── DeFi — Token transfers (top 20 DeFi tokens, cross-chain) ──
+    # token_transfers adapter uses ALCHEMY RPC; synthetic venue per token x chain.
+    "ALCHEMY-ONCHAIN": {"token_transfers": "2020-01-01"},
+    # ── DeFi — Bridge events ──
+    "ACROSS-ETHEREUM": {"bridge_events": "2021-11-08"},
+    "STARGATE-ETHEREUM": {"bridge_events": "2022-03-17"},
+    # ── DeFi — Governance events (Compound, Aave, Uniswap DAO) ──
+    "COMPOUND-ETHEREUM": {"governance_events": "2020-02-26"},
+    "AAVE-ETHEREUM": {"governance_events": "2020-07-27"},
+    "UNISWAP-ETHEREUM": {"governance_events": "2020-09-17"},
+    # ── DeFi — MEV events (MEV-Boost relay stats) ──
+    "FLASHBOTS-ETHEREUM": {"mev_events": "2021-01-01"},
 }
 
 

@@ -51,9 +51,7 @@ ETHENA = "ETHENA"
 
 # Sports Betting Exchanges — two-sided markets with API access
 BETFAIR = "BETFAIR"
-SMARKETS = "SMARKETS"
 MATCHBOOK = "MATCHBOOK"
-BETDAQ = "BETDAQ"
 
 # Prediction Markets — crypto/blockchain-based prediction exchanges
 POLYMARKET = "POLYMARKET"
@@ -157,10 +155,9 @@ SHARPAPI = "SHARPAPI"
 ODDS_ENGINE = "ODDS_ENGINE"
 METABET = "METABET"
 OPTICODDS = "OPTICODDS"
-ODDSJAM = "ODDSJAM"
 
 # Sports Venue Sub-Sets — grouped by execution semantics
-SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, SMARKETS, MATCHBOOK, BETDAQ}
+SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK}
 
 SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
 
@@ -251,7 +248,6 @@ SPORTS_DATA_VENUES: set[str] = {
     ODDS_ENGINE,
     METABET,
     OPTICODDS,
-    ODDSJAM,
 }
 
 SPORTS_BET_PLACEMENT_VENUES: set[str] = (

@@ -49,6 +49,15 @@ class DataType(StrEnum):
     SPORTS_ARBITRAGE = "sports_arbitrage"
     SPORTS_ODDS_SNAPSHOT = "sports_odds_snapshot"
     SPORTS_ODDS_MOVEMENT = "sports_odds_movement"
+    LIQUIDATION_EVENTS = "liquidation_events"
+    FLASH_LOAN_EVENTS = "flash_loan_events"
+    STAKING_YIELDS = "staking_yields"
+    TOKEN_TRANSFERS = "token_transfers"
+    BRIDGE_EVENTS = "bridge_events"
+    POSITION_DATA = "position_data"
+    MEV_EVENTS = "mev_events"
+    GOVERNANCE_EVENTS = "governance_events"
+    EIGENLAYER_REWARDS = "eigenlayer_rewards"
 
 
 __all__ = ["DataType", "MarketState"]

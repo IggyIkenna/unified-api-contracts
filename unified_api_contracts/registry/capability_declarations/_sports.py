@@ -43,32 +43,6 @@ _BETFAIR = SourceCapability(
     },
 )
 
-_BETDAQ = SourceCapability(
-    source="betdaq",
-    domains=["market", "execution", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=False,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["list_markets", "get_prices", "streaming"],
-        "execution": ["place_orders", "cancel_orders", "settle_orders"],
-        "reference": ["list_sports", "list_events"],
-    },
-    base_urls={"mainnet": "https://api.betdaq.com"},
-    operation_details={
-        "place_orders": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            }
-        ),
-    },
-)
-
 _PINNACLE = SourceCapability(
     source="pinnacle",
     domains=["market", "reference"],
@@ -215,25 +189,6 @@ _ODDS_ENGINE = SourceCapability(
     operation_details={},
 )
 
-_ODDSJAM = SourceCapability(
-    source="oddsjam",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["odds", "game_lines", "player_props", "arb_opportunities"],
-        "reference": ["sports", "leagues", "books"],
-    },
-    base_urls={"mainnet": "https://api.oddsjam.com"},
-    operation_details={},
-)
-
 _OPTICODDS = SourceCapability(
     source="opticodds",
     domains=["market", "reference"],
@@ -279,32 +234,6 @@ _MATCHBOOK = SourceCapability(
     },
 )
 
-_SMARKETS = SourceCapability(
-    source="smarkets",
-    domains=["market", "execution", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=False,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["events", "markets", "quotes", "streaming"],
-        "execution": ["create_order", "cancel_order", "open_orders"],
-        "reference": ["sports", "competitions"],
-    },
-    base_urls={"mainnet": "https://api.smarkets.com"},
-    operation_details={
-        "create_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            }
-        ),
-    },
-)
-
 _MANIFOLD = SourceCapability(
     source="manifold",
     domains=["market", "execution", "reference"],
@@ -329,25 +258,6 @@ _MANIFOLD = SourceCapability(
             }
         ),
     },
-)
-
-_PREDICTIT = SourceCapability(
-    source="predictit",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["none"],
-    auth_environments={},
-    operations={
-        "market": ["markets", "market_contracts", "price_history"],
-        "reference": ["all_markets"],
-    },
-    base_urls={"mainnet": "https://www.predictit.org/api"},
-    operation_details={},
 )
 
 _ONEXBET = SourceCapability(
@@ -511,18 +421,14 @@ _SHARPAPI = SourceCapability(
 SPORTS_CAPABILITIES: list[SourceCapability] = [
     # Sports / prediction markets
     _BETFAIR,
-    _BETDAQ,
     _PINNACLE,
     _KALSHI,
     _POLYMARKET,
     _ODDS_API,
     _ODDS_ENGINE,
-    _ODDSJAM,
     _OPTICODDS,
     _MATCHBOOK,
-    _SMARKETS,
     _MANIFOLD,
-    _PREDICTIT,
     _ONEXBET,
     _METABET,
     # Sports reference data

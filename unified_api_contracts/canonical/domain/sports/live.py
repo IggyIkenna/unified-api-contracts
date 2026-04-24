@@ -47,7 +47,7 @@ class LiveOddsUpdate(BaseModel):
     is_in_play: bool
     match_minute: int | None = None
     odds: CanonicalOdds
-    source_tier: str  # "odds_api", "opticodds", "oddsjam", "scraper", "exchange"
+    source_tier: str  # "odds_api", "opticodds", "scraper", "exchange"
 
     @classmethod
     def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:

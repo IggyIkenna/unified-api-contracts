@@ -282,26 +282,6 @@ class TestErrorNormalizersProviders:
         assert isinstance(normalize_nautilus_error("VENUE_NOT_AVAILABLE"), CanonicalServiceUnavailableError)
         assert isinstance(normalize_nautilus_error("UNKNOWN"), CanonicalError)
 
-    def test_betdaq_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_betdaq_error,
-        )
-
-        assert isinstance(normalize_betdaq_error("1001"), CanonicalRateLimitError)
-        assert isinstance(normalize_betdaq_error("40"), CanonicalInsufficientBalanceError)
-        assert isinstance(normalize_betdaq_error(503), CanonicalServiceUnavailableError)
-        assert isinstance(normalize_betdaq_error("NOCODE"), CanonicalError)
-
-    def test_smarkets_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_smarkets_error,
-        )
-
-        assert isinstance(normalize_smarkets_error("too_many_requests"), CanonicalRateLimitError)
-        assert isinstance(normalize_smarkets_error("unauthorized"), CanonicalAuthenticationError)
-        assert isinstance(normalize_smarkets_error(500), CanonicalInternalServerError)
-        assert isinstance(normalize_smarkets_error("NOCODE"), CanonicalError)
-
     def test_pinnacle_known_and_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_pinnacle_error,

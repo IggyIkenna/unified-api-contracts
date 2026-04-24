@@ -15,7 +15,7 @@ from unified_api_contracts.canonical.domain.sports.bookmaker import (
 @pytest.mark.unit
 class TestBookmakerRegistry:
     def test_registry_has_20_entries(self) -> None:
-        assert len(BOOKMAKER_REGISTRY) == 81
+        assert len(BOOKMAKER_REGISTRY) == 78
 
     def test_registry_alias(self) -> None:
         assert BookmakerRegistry is BOOKMAKER_REGISTRY
@@ -30,8 +30,8 @@ class TestBookmakerRegistry:
 
     def test_exchanges_count(self) -> None:
         exchanges = [k for k, v in BOOKMAKER_REGISTRY.items() if v.category == BookmakerCategory.EXCHANGE]
-        assert len(exchanges) == 9
-        assert {"betfair", "smarkets", "matchbook", "betdaq", "polymarket", "kalshi"}.issubset(set(exchanges))
+        assert len(exchanges) == 7
+        assert {"betfair", "matchbook", "polymarket", "kalshi"}.issubset(set(exchanges))
 
     def test_bookmaker_api_count(self) -> None:
         apis = [k for k, v in BOOKMAKER_REGISTRY.items() if v.category == BookmakerCategory.BOOKMAKER_API]

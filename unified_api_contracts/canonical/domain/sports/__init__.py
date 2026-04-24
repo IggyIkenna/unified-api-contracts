@@ -223,9 +223,7 @@ _EXCHANGE_BOOKMAKERS: frozenset[str] = frozenset(
         "betfair_ex_uk",
         "betfair_ex_eu",
         "betfair_ex_au",
-        "smarkets",
         "matchbook",
-        "betdaq",
         "polymarket",
     }
 )

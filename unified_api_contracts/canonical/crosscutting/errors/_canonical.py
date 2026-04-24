@@ -289,6 +289,30 @@ class CanonicalUnknownVenueError(CanonicalError):
         self.endpoint = endpoint
 
 
+class UnsupportedCapabilityError(Exception):
+    """Raised when a venue adapter is asked to perform a capability it does not support.
+
+    Examples:
+    - Requesting OPTIONS data from a venue that only offers SPOT / PERP.
+    - Calling a WebSocket method on a REST-only adapter.
+
+    Usage::
+
+        raise UnsupportedCapabilityError(venue="hyperliquid", capability="OPTIONS")
+    """
+
+    def __init__(
+        self,
+        venue: str,
+        capability: str,
+        message: str = "",
+    ) -> None:
+        self.venue = venue
+        self.capability = capability
+        self.message = message or f"Venue '{venue}' does not support capability '{capability}'"
+        super().__init__(self.message)
+
+
 __all__ = [
     "CanonicalAuthenticationError",
     "CanonicalAuthorizationError",
@@ -313,5 +337,6 @@ __all__ = [
     "CanonicalUnknownVenueError",
     "ErrorAction",
     "RateLimitInfo",
+    "UnsupportedCapabilityError",
     "VenueErrorClassification",
 ]

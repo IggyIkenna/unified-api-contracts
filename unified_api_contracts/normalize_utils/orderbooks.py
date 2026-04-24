@@ -24,7 +24,6 @@ from ..external.hyperliquid.normalize import normalize_hyperliquid_orderbook
 from ..external.kalshi.normalize import normalize_kalshi_orderbook
 from ..external.okx.normalize import normalize_okx_orderbook
 from ..external.polymarket.normalize import normalize_polymarket_orderbook
-from ..external.smarkets.normalize import normalize_smarkets_orderbook
 from ..external.tardis.normalize import normalize_tardis_orderbook
 from ..external.upbit.normalize import normalize_upbit_orderbook
 
@@ -45,7 +44,6 @@ __all__ = [
     "normalize_kalshi_orderbook",
     "normalize_okx_orderbook",
     "normalize_polymarket_orderbook",
-    "normalize_smarkets_orderbook",
     "normalize_tardis_orderbook",
     "normalize_upbit_orderbook",
 ]

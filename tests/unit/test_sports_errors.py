@@ -38,11 +38,11 @@ def test_bet_rejected_error() -> None:
     err = BetRejectedError(
         order_id="ord-1",
         reason="price moved",
-        bookmaker_key="smarkets",
+        bookmaker_key="matchbook",
     )
     assert err.order_id == "ord-1"
     assert err.reason == "price moved"
-    assert err.bookmaker_key == "smarkets"
+    assert err.bookmaker_key == "matchbook"
     assert "ord-1" in str(err)
     assert isinstance(err, SportsError)
 

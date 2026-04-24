@@ -79,7 +79,6 @@ from .errors import (
     normalize_alchemy_error,
     normalize_api_football_error,
     normalize_aster_error,
-    normalize_betdaq_error,
     normalize_betfair_error,
     normalize_binance_error,
     normalize_bitget_error,
@@ -114,7 +113,6 @@ from .errors import (
     normalize_prime_broker_error,
     normalize_regulatory_error,
     normalize_sharpapi_error,
-    normalize_smarkets_error,
     normalize_sports_error,
     normalize_tardis_error,
     normalize_thegraph_error,
@@ -157,7 +155,6 @@ from .instruments import (
     normalize_odds_api_market,
     normalize_odds_engine_market,
     normalize_okx_market,
-    normalize_predictit_market,
     normalize_tardis_instrument,
     normalize_upbit_market,
 )
@@ -245,7 +242,6 @@ from .orderbooks import (
     normalize_kalshi_orderbook,
     normalize_okx_orderbook,
     normalize_polymarket_orderbook,
-    normalize_smarkets_orderbook,
     normalize_tardis_orderbook,
     normalize_upbit_orderbook,
 )
@@ -351,8 +347,6 @@ from .versifi import (
 # The _utils import triggers normalize_utils.__init__ again (circular).
 # Lazy import defers sports loading until first access.
 _SPORTS_NAMES = [
-    "normalize_betdaq_market",
-    "normalize_betdaq_order",
     "normalize_betfair_market",
     "normalize_betfair_odds",
     "normalize_betfair_order",
@@ -365,8 +359,6 @@ _SPORTS_NAMES = [
     "normalize_onexbet_market",
     "normalize_pinnacle_event",
     "normalize_polymarket_market",
-    "normalize_smarkets_market",
-    "normalize_smarkets_order",
     "normalize_sports_market",
     "normalize_sports_order",
 ]
@@ -412,9 +404,6 @@ __all__ = [
     "normalize_aster_ws_close",
     "normalize_aster_ws_subscription",
     "normalize_barchart_ohlcv",
-    "normalize_betdaq_error",
-    "normalize_betdaq_market",
-    "normalize_betdaq_order",
     "normalize_betfair_error",
     "normalize_betfair_market",
     # Market state normalizers (phase6-market-state)
@@ -646,17 +635,12 @@ __all__ = [
     "normalize_polymarket_order",
     "normalize_polymarket_orderbook",
     "normalize_polymarket_trade",
-    "normalize_predictit_market",
     "normalize_prime_broker_error",
     "normalize_prime_broker_fill",
     "normalize_regulatory_error",
     "normalize_regulatory_trade_report",
     "normalize_sharpapi_error",
     "normalize_side",
-    "normalize_smarkets_error",
-    "normalize_smarkets_market",
-    "normalize_smarkets_order",
-    "normalize_smarkets_orderbook",
     "normalize_sports_error",
     "normalize_sports_market",
     "normalize_sports_order",

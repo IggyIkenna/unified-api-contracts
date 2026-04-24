@@ -93,7 +93,7 @@ _BASE_VENUES_BY_CATEGORY: dict[VenueCategoryV2, tuple[str, ...]] = {
     VenueCategoryV2.CEFI: ("okx", "binance", "bybit"),
     VenueCategoryV2.DEFI: ("aave_v3", "uniswap_v3", "lido"),
     VenueCategoryV2.TRADFI: ("cme", "ibkr", "ice"),
-    VenueCategoryV2.SPORTS: ("betfair_direct", "smarkets_direct", "matchbook_direct"),
+    VenueCategoryV2.SPORTS: ("betfair_direct", "matchbook_direct"),
     VenueCategoryV2.PREDICTION: ("polymarket",),
 }
 

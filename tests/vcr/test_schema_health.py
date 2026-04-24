@@ -202,17 +202,6 @@ class TestHyperliquidSchemaHealth(_BaseSchemaHealthTest):
             self._assert_cassette_non_empty(c)
 
 
-class TestSmarketsSchemaHealth(_BaseSchemaHealthTest):
-    provider = "smarkets"
-
-    def test_cassettes_non_empty(self) -> None:
-        cassettes = self._get_cassettes()
-        if not cassettes:
-            pytest.skip(f"No cassettes for {self.provider}")
-        for c in cassettes:
-            self._assert_cassette_non_empty(c)
-
-
 class TestMatchbookSchemaHealth(_BaseSchemaHealthTest):
     provider = "matchbook"
 

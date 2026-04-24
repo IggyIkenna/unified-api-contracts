@@ -224,11 +224,10 @@ class TestVenueAggregatorTypeMapping:
     def test_odds_aggregators_mapped(self) -> None:
         from unified_api_contracts.registry.venue_constants import (
             ODDS_API,
-            ODDSJAM,
             OPTICODDS,
         )
 
-        for venue in (ODDS_API, ODDSJAM, OPTICODDS):
+        for venue in (ODDS_API, OPTICODDS):
             assert venue in VENUE_AGGREGATOR_TYPE, f"Venue {venue} missing from VENUE_AGGREGATOR_TYPE"
             assert VENUE_AGGREGATOR_TYPE[venue] == SportsAggregatorType.ODDS_AGGREGATOR
 

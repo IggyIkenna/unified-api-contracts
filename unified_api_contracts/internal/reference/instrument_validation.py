@@ -80,9 +80,7 @@ _CEFI_VENUES = frozenset(
 _SPORTS_VENUES = frozenset(
     {
         "BETFAIR",
-        "SMARKETS",
         "MATCHBOOK",
-        "BETDAQ",
         "POLYMARKET",
         "KALSHI",
         "API_FOOTBALL",
