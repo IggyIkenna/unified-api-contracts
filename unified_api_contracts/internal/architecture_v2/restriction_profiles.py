@@ -110,6 +110,31 @@ Reg-Umbrella service family. "other" is a free-text escape hatch
 captured in ``entity_jurisdiction`` alongside."""
 
 
+# ── Strategy-preference axes (2026-04-24) ────────────────────────────────────
+
+QuestionnaireMarketNeutrality = Literal["neutral", "directional", "both"]
+"""Market exposure preference. ``neutral`` = delta-hedged strategies only
+(carry, arb, stat_arb, market_making); ``directional`` = trend/event/ML
+signal strategies; ``both`` = no preference. ``None`` = not asked."""
+
+QuestionnaireShareClassPreference = Literal["btc_neutral", "eth_neutral", "usd_only", "any"]
+"""Base currency / hedging preference for strategy P&L.
+``usd_only`` = stablecoins (USDT, USDC, USD, GBP, EUR);
+``btc_neutral`` = P&L denominated in BTC;
+``eth_neutral`` = P&L denominated in ETH;
+``any`` = no preference. ``None`` = not asked."""
+
+QuestionnaireRiskProfile = Literal["low", "medium", "high"]
+"""Risk appetite. ``low`` = capital preservation, prefer SUPPORTED-status
+strategies only; ``medium`` = balanced; ``high`` = growth-focused, include
+PARTIAL-status strategies. ``None`` = not asked."""
+
+QuestionnaireLeveragePreference = Literal["none", "low", "medium", "any"]
+"""Leverage tolerance. ``none`` = 1x only (spot or delta-neutral perp);
+``low`` = 2-3x; ``medium`` = ~5x; ``any`` = unconstrained.
+``none`` implies excluding options instrument type. ``None`` = not asked."""
+
+
 class QuestionnaireResponse(BaseModel):
     """G1.10 questionnaire response — 6 base axes + 7 optional Reg-Umbrella
     axes that feed the restriction-profile overlay and populate the admin
@@ -181,6 +206,30 @@ class QuestionnaireResponse(BaseModel):
     supported_currencies: tuple[str, ...] = ()
     """ISO 4217 currency codes (e.g. ``("USD", "EUR", "GBP")``) the
     prospect expects to operate in. Empty tuple = not specified."""
+
+    # ── Strategy-preference axes (optional; 2026-04-24) ──────────────────────
+    # These are collected in the UI for all service families and feed the
+    # ``seedFiltersFromQuestionnaire`` function in the UI (catalogue-filter
+    # seeding). They do not participate in tile-lock overlay today — they are
+    # informational for admin review and drive FOMO tab pre-filtering only.
+    market_neutral: QuestionnaireMarketNeutrality | None = None
+    """Market exposure preference — ``neutral`` / ``directional`` / ``both``.
+    ``None`` = not asked / no preference."""
+
+    share_class_preference: QuestionnaireShareClassPreference | None = None
+    """Base currency / hedging preference. ``None`` = not asked / any."""
+
+    risk_profile: QuestionnaireRiskProfile | None = None
+    """Risk appetite. Drives coverage-status filter in ``seedFiltersFromQuestionnaire``.
+    ``None`` = not asked / no minimum."""
+
+    target_sharpe_min: float | None = None
+    """Minimum acceptable Sharpe ratio (annualised). ``None`` = no minimum.
+    Informational for admin view; used as annotation in FOMO tearsheet ranking."""
+
+    leverage_preference: QuestionnaireLeveragePreference | None = None
+    """Leverage tolerance. ``none`` implies excluding options instrument type
+    from FOMO filter. ``None`` = not asked / unconstrained."""
 
 
 class ProfileYaml(BaseModel):
