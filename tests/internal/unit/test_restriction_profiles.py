@@ -212,7 +212,7 @@ def test_questionnaire_empty_categories_is_a_noop() -> None:
         instrument_types=(),
         strategy_style=(),
         service_family="DART",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
     base = resolve_profile(_persona("prospect-dart"))
     with_vague = resolve_profile(_persona("prospect-dart"), questionnaire=empty_qr)
@@ -228,7 +228,7 @@ def test_questionnaire_service_family_im_hides_dart_tiles() -> None:
         instrument_types=("spot",),
         strategy_style=("ml_directional",),
         service_family="IM",
-        fund_structure="Pooled",
+        fund_structure=("Pooled",),
     )
     profile = resolve_profile(_persona("prospect-dart"), questionnaire=im_qr)
     assert profile.tiles["trading"] == "hidden"
@@ -244,7 +244,7 @@ def test_questionnaire_service_family_regumbrella_tightens_ops_tiles() -> None:
         instrument_types=("spot",),
         strategy_style=("carry",),
         service_family="RegUmbrella",
-        fund_structure="SMA",
+        fund_structure=("SMA",),
     )
     profile = resolve_profile(_persona("prospect-dart"), questionnaire=reg_qr)
     assert profile.tiles["research"] == "hidden"
@@ -260,7 +260,7 @@ def test_questionnaire_service_family_dart_hides_investor_relations() -> None:
         instrument_types=("perp",),
         strategy_style=("stat_arb",),
         service_family="DART",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
     profile = resolve_profile(_persona("prospect-dart"), questionnaire=dart_qr)
     assert profile.tiles["investor-relations"] == "hidden"
@@ -277,7 +277,7 @@ def test_questionnaire_service_family_combo_no_tightening() -> None:
         instrument_types=("spot", "perp"),
         strategy_style=("ml_directional", "stat_arb"),
         service_family="combo",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
     base = resolve_profile(_persona("prospect-dart"))
     with_combo = resolve_profile(_persona("prospect-dart"), questionnaire=combo_qr)
@@ -294,7 +294,7 @@ def test_questionnaire_cannot_unlock_a_hidden_tile() -> None:
         instrument_types=("spot",),
         strategy_style=("ml_directional",),
         service_family="DART",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
     profile = resolve_profile(_persona("anon"), questionnaire=aggressive_qr)
     assert all(state == "hidden" for state in profile.tiles.values())
@@ -310,7 +310,7 @@ def test_questionnaire_response_rejects_extra_fields() -> None:
                 "instrument_types": ["spot"],
                 "strategy_style": ["ml_directional"],
                 "service_family": "DART",
-                "fund_structure": "NA",
+                "fund_structure": ["NA"],
                 "unknown_axis": "oops",
             }
         )
@@ -379,7 +379,7 @@ def test_questionnaire_accepts_reg_umbrella_fields_populated() -> None:
         instrument_types=("spot",),
         strategy_style=("carry",),
         service_family="RegUmbrella",
-        fund_structure="SMA",
+        fund_structure=("SMA",),
         licence_region="EU_and_UK",
         targets_3mo="Onboard 2 client orgs; £5M AUM",
         targets_1yr="£25M AUM; 3 live strategies",
@@ -406,7 +406,7 @@ def test_questionnaire_accepts_reg_umbrella_fields_omitted() -> None:
         instrument_types=("spot",),
         strategy_style=("ml_directional",),
         service_family="DART",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
     assert qr.licence_region is None
     assert qr.targets_3mo is None
@@ -427,14 +427,14 @@ def test_questionnaire_overlay_unchanged_when_reg_umbrella_populated() -> None:
         instrument_types=("spot",),
         strategy_style=("carry",),
         service_family="RegUmbrella",
-        fund_structure="SMA",
+        fund_structure=("SMA",),
     )
     enriched_qr = QuestionnaireResponse(
         categories=("TradFi",),
         instrument_types=("spot",),
         strategy_style=("carry",),
         service_family="RegUmbrella",
-        fund_structure="SMA",
+        fund_structure=("SMA",),
         licence_region="EU_or_UK",
         targets_3mo="Stand up £10M SMA",
         targets_1yr="Add two more SMAs",
@@ -458,7 +458,7 @@ def test_questionnaire_rejects_unknown_licence_region() -> None:
             instrument_types=("spot",),
             strategy_style=("carry",),
             service_family="RegUmbrella",
-            fund_structure="SMA",
+            fund_structure=("SMA",),
             licence_region="APAC",  # pyright: ignore[reportArgumentType] — deliberately invalid
         )
 
@@ -473,6 +473,6 @@ def test_questionnaire_rejects_unknown_top_level_field() -> None:
             instrument_types=("spot",),
             strategy_style=("carry",),
             service_family="RegUmbrella",
-            fund_structure="SMA",
+            fund_structure=("SMA",),
             totally_unknown_axis="nope",  # pyright: ignore[reportCallIssue] — deliberately invalid
         )

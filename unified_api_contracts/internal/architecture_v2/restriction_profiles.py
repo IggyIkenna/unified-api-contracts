@@ -99,9 +99,19 @@ prospects never pick internal audiences. ``combo`` maps to the union
 of IM + DART + RegUmbrella via the overlay logic."""
 
 
-QuestionnaireFundStructure = Literal["SMA", "Pooled", "NA"]
-"""SMA (Separately Managed Account) vs Pooled Fund vs N/A (DART only).
-Cross-ref: ``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``."""
+QuestionnaireFundStructure = Literal["SMA", "Pooled", "prop", "NA"]
+"""Structure axis for prospects — multi-select tuple.
+
+* ``SMA`` — Separately Managed Account (one client, one mandate).
+* ``Pooled`` — Pooled fund / multi-investor vehicle.
+* ``prop`` — Proprietary capital only; no external investors. A valid
+  standalone picture for DART-Signals-In / DART-Full prospects who trade
+  their own book under Odum's execution stack.
+* ``NA`` — Not applicable / DART-only with no fund vehicle declared yet.
+
+Multi-select: a prospect running a pooled fund alongside a prop book
+would pick ``("Pooled", "prop")``. Cross-ref:
+``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``."""
 
 
 QuestionnaireLicenceRegion = Literal["EU_only", "UK_only", "EU_or_UK", "EU_and_UK", "other"]
@@ -173,7 +183,7 @@ class QuestionnaireResponse(BaseModel):
     venue_scope: tuple[str, ...] | Literal["all"] = "all"
     strategy_style: tuple[QuestionnaireStrategyStyle, ...]
     service_family: QuestionnaireServiceFamily
-    fund_structure: QuestionnaireFundStructure
+    fund_structure: tuple[QuestionnaireFundStructure, ...]
 
     # ── Reg-Umbrella axes (optional; only collected when service_family
     #    ∈ {RegUmbrella, combo}) ──────────────────────────────────────────
@@ -216,8 +226,10 @@ class QuestionnaireResponse(BaseModel):
     """Market exposure preference — ``neutral`` / ``directional`` / ``both``.
     ``None`` = not asked / no preference."""
 
-    share_class_preference: QuestionnaireShareClassPreference | None = None
-    """Base currency / hedging preference. ``None`` = not asked / any."""
+    share_class_preferences: tuple[QuestionnaireShareClassPreference, ...] = ()
+    """Base currency / hedging preferences — multi-select tuple. Prospects
+    can accept more than one share class (e.g. both ``usd_only`` and
+    ``btc_neutral``). Empty tuple = not asked / any."""
 
     risk_profile: QuestionnaireRiskProfile | None = None
     """Risk appetite. Drives coverage-status filter in ``seedFiltersFromQuestionnaire``.
@@ -321,8 +333,10 @@ def _apply_questionnaire_override(
     * **service_family = "combo"**: union of IM + DART + RegUmbrella
       overlays — no tightening. Surfaces everything the base profile
       allows.
-    * **fund_structure = "SMA" or "Pooled"**: only meaningful for
+    * **"SMA" or "Pooled" in fund_structure**: only meaningful for
       IM / RegUmbrella; purely informational today (no tile narrowing).
+      ``"prop"`` is likewise informational and indicates a proprietary-only
+      book (common for DART-Signals-In prospects).
     * **Empty ``categories``** (vague answer): fall back to base profile
       untouched — G1.13 tempt-logic will widen padlocks later.
 

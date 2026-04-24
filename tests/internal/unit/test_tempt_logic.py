@@ -35,7 +35,7 @@ def _tight_qr() -> QuestionnaireResponse:
         venue_scope=("binance",),
         strategy_style=("ml_directional",),
         service_family="DART",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
 
 
@@ -46,7 +46,7 @@ def _vague_qr() -> QuestionnaireResponse:
         venue_scope="all",
         strategy_style=(),
         service_family="DART",
-        fund_structure="NA",
+        fund_structure=("NA",),
     )
 
 
@@ -159,8 +159,8 @@ def test_service_family_never_widens(service_family: str) -> None:
     assert out.service_family == service_family
 
 
-@pytest.mark.parametrize("fund_structure", ["SMA", "Pooled", "NA"])
-def test_fund_structure_never_widens(fund_structure: str) -> None:
+@pytest.mark.parametrize("fund_structure", [("SMA",), ("Pooled",), ("prop",), ("NA",), ("SMA", "prop")])
+def test_fund_structure_never_widens(fund_structure: tuple[str, ...]) -> None:
     qr = _vague_qr().model_copy(update={"fund_structure": fund_structure})
     out = apply_tempt_logic(qr, "dev")
     assert out is not None
