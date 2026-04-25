@@ -101,7 +101,7 @@ def normalize_polygon_ticker(
         instrument_type=InstrumentType.SPOT_PAIR,
         symbol=symbol,
         timestamp=ts,
-        asset_class=raw.market,
+        asset_group=raw.market,
         exchange_raw_symbol=raw.ticker,
     )
 

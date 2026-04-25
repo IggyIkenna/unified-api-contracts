@@ -131,7 +131,7 @@ class EmirTradeReport(BaseModel):
     reporting_timestamp: datetime
     event_type: str = Field(description="NEWT/MODI/EROR/VALU/MARU/CORR/TERM")
     product_classification: EmirProductClassification
-    asset_class: str | None = None
+    asset_group: str | None = None
     underlying_isin: str | None = None
     notional_amount: Decimal | None = None
     notional_currency: str | None = None

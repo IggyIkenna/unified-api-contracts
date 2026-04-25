@@ -28,7 +28,7 @@ class TestDataFreshnessContractModel:
     def test_valid_contract_instantiation(self) -> None:
         c = DataFreshnessContract(
             source="test_source",
-            asset_class="crypto_cefi",
+            asset_group="crypto_cefi",
             max_age_seconds=10,
             warn_age_seconds=5,
             expected_cadence_seconds=1,
@@ -40,13 +40,13 @@ class TestDataFreshnessContractModel:
         assert c.expected_cadence_seconds == 1
         assert c.criticality == "critical"
 
-    def test_invalid_asset_class_raises(self) -> None:
+    def test_invalid_asset_group_raises(self) -> None:
         from pydantic import ValidationError
 
         with pytest.raises(ValidationError):
             DataFreshnessContract(
                 source="x",
-                asset_class="unknown_class",  # type: ignore[arg-type]
+                asset_group="unknown_class",  # type: ignore[arg-type]
                 max_age_seconds=10,
                 warn_age_seconds=5,
                 expected_cadence_seconds=1,
@@ -59,7 +59,7 @@ class TestDataFreshnessContractModel:
         with pytest.raises(ValidationError):
             DataFreshnessContract(
                 source="x",
-                asset_class="crypto_cefi",
+                asset_group="crypto_cefi",
                 max_age_seconds=10,
                 warn_age_seconds=5,
                 expected_cadence_seconds=1,
@@ -72,7 +72,7 @@ class TestDataFreshnessContractModel:
         with pytest.raises(ValidationError):
             DataFreshnessContract(
                 source="x",
-                asset_class="crypto_cefi",
+                asset_group="crypto_cefi",
                 max_age_seconds=0,
                 warn_age_seconds=5,
                 expected_cadence_seconds=1,
@@ -85,15 +85,15 @@ class TestDataFreshnessContractModel:
         with pytest.raises(ValidationError):
             DataFreshnessContract(
                 source="x",
-                asset_class="crypto_cefi",
+                asset_group="crypto_cefi",
                 max_age_seconds=10,
                 warn_age_seconds=0,
                 expected_cadence_seconds=1,
                 criticality="critical",
             )
 
-    def test_all_asset_classes_valid(self) -> None:
-        asset_classes = [
+    def test_all_asset_groupes_valid(self) -> None:
+        asset_groupes = [
             "crypto_cefi",
             "crypto_defi",
             "tradfi",
@@ -102,22 +102,22 @@ class TestDataFreshnessContractModel:
             "feature",
             "ml",
         ]
-        for ac in asset_classes:
+        for ac in asset_groupes:
             c = DataFreshnessContract(
                 source="test",
-                asset_class=ac,  # type: ignore[arg-type]
+                asset_group=ac,  # type: ignore[arg-type]
                 max_age_seconds=60,
                 warn_age_seconds=30,
                 expected_cadence_seconds=10,
                 criticality="informational",
             )
-            assert c.asset_class == ac
+            assert c.asset_group == ac
 
     def test_all_criticality_levels_valid(self) -> None:
         for crit in ("critical", "important", "informational"):
             c = DataFreshnessContract(
                 source="test",
-                asset_class="feature",
+                asset_group="feature",
                 max_age_seconds=60,
                 warn_age_seconds=30,
                 expected_cadence_seconds=10,
@@ -131,7 +131,7 @@ class TestDataFreshnessContractModel:
 # ---------------------------------------------------------------------------
 
 _EXPECTED_MARKET_VENUES = [
-    # (key, asset_class, max_age, warn_age, cadence, criticality)
+    # (key, asset_group, max_age, warn_age, cadence, criticality)
     ("binance", "crypto_cefi", 5, 2, 1, "critical"),
     ("bybit", "crypto_cefi", 5, 2, 1, "critical"),
     ("okx", "crypto_cefi", 5, 2, 1, "critical"),
@@ -158,12 +158,12 @@ _EXPECTED_MARKET_VENUES = [
 
 
 @pytest.mark.parametrize(
-    "key,asset_class,max_age,warn_age,cadence,criticality",
+    "key,asset_group,max_age,warn_age,cadence,criticality",
     _EXPECTED_MARKET_VENUES,
 )
 def test_market_tick_freshness_entry(
     key: str,
-    asset_class: str,
+    asset_group: str,
     max_age: int,
     warn_age: int,
     cadence: int,
@@ -172,7 +172,7 @@ def test_market_tick_freshness_entry(
     assert key in MARKET_TICK_FRESHNESS, f"Missing venue: {key}"
     c = MARKET_TICK_FRESHNESS[key]
     assert c.source == key
-    assert c.asset_class == asset_class
+    assert c.asset_group == asset_group
     assert c.max_age_seconds == max_age
     assert c.warn_age_seconds == warn_age
     assert c.expected_cadence_seconds == cadence
@@ -200,12 +200,12 @@ _EXPECTED_FEATURE_SERVICES = [
 
 
 @pytest.mark.parametrize(
-    "key,asset_class,max_age,warn_age,cadence,criticality",
+    "key,asset_group,max_age,warn_age,cadence,criticality",
     _EXPECTED_FEATURE_SERVICES,
 )
 def test_feature_freshness_entry(
     key: str,
-    asset_class: str,
+    asset_group: str,
     max_age: int,
     warn_age: int,
     cadence: int,
@@ -214,7 +214,7 @@ def test_feature_freshness_entry(
     assert key in FEATURE_FRESHNESS, f"Missing feature service: {key}"
     c = FEATURE_FRESHNESS[key]
     assert c.source == key
-    assert c.asset_class == asset_class
+    assert c.asset_group == asset_group
     assert c.max_age_seconds == max_age
     assert c.warn_age_seconds == warn_age
     assert c.expected_cadence_seconds == cadence
@@ -236,12 +236,12 @@ _EXPECTED_ML_ENTRIES = [
 
 
 @pytest.mark.parametrize(
-    "key,asset_class,max_age,warn_age,cadence,criticality",
+    "key,asset_group,max_age,warn_age,cadence,criticality",
     _EXPECTED_ML_ENTRIES,
 )
 def test_ml_freshness_entry(
     key: str,
-    asset_class: str,
+    asset_group: str,
     max_age: int,
     warn_age: int,
     cadence: int,
@@ -250,7 +250,7 @@ def test_ml_freshness_entry(
     assert key in ML_FRESHNESS, f"Missing ML entry: {key}"
     c = ML_FRESHNESS[key]
     assert c.source == key
-    assert c.asset_class == asset_class
+    assert c.asset_group == asset_group
     assert c.max_age_seconds == max_age
     assert c.warn_age_seconds == warn_age
     assert c.expected_cadence_seconds == cadence

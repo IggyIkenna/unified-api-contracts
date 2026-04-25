@@ -34,7 +34,7 @@ class TestNautilusSchemas:
         inst = mock_instrument()
         assert inst.instrument_id == "BTCUSDT-PERP.BINANCE"
         assert inst.venue == "BINANCE"
-        assert inst.asset_class == "CRYPTO"
+        assert inst.asset_group == "CRYPTO"
 
     def test_fill_schema(self) -> None:
         """Fill schema validates and serializes."""

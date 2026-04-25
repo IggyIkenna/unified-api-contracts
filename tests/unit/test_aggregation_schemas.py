@@ -64,7 +64,7 @@ def _make_aggregated_position(**overrides: object) -> AggregatedPosition:
 def test_aggregated_position_round_trip() -> None:
     """AggregatedPosition serializes and deserializes without data loss."""
     pos = _make_aggregated_position(
-        asset_class="crypto",
+        asset_group="crypto",
         instrument_type="PERPETUAL",
         strategy_id="trend-v1",
         underlying="BTC",
@@ -79,7 +79,7 @@ def test_aggregated_position_round_trip() -> None:
     assert restored.weighted_avg_entry_price == pos.weighted_avg_entry_price
     assert restored.total_unrealized_pnl == pos.total_unrealized_pnl
     assert restored.mark_price == pos.mark_price
-    assert restored.asset_class == pos.asset_class
+    assert restored.asset_group == pos.asset_group
     assert restored.strategy_id == pos.strategy_id
 
 
@@ -235,7 +235,7 @@ def test_portfolio_pnl_attribution_round_trip() -> None:
         fx_pnl=Decimal("-2"),
         residual_pnl=Decimal("1"),
         total_pnl=Decimal("145"),
-        by_asset_class={"crypto": Decimal("145")},
+        by_asset_group={"crypto": Decimal("145")},
         by_strategy={"trend-v1": Decimal("145")},
         timestamp=_TS,
     )
@@ -270,7 +270,7 @@ def test_risk_group_summary_round_trip() -> None:
     rgs = RiskGroupSummary(
         risk_group_id="btc-perp",
         underlying="BTC",
-        asset_class="crypto",
+        asset_group="crypto",
         net_delta=Decimal("2.5"),
         net_gamma=Decimal("0.1"),
         gross_exposure=Decimal("125000"),
@@ -293,7 +293,7 @@ def test_risk_group_extra_forbidden() -> None:
         RiskGroupSummary(  # type: ignore[call-arg]
             risk_group_id="x",
             underlying="BTC",
-            asset_class="crypto",
+            asset_group="crypto",
             extra_key="bad",
         )
 

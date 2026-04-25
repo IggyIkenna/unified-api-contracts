@@ -48,7 +48,7 @@ class DatabentoInstrumentDef:
     dataset: str
     stype_in: str
     base_asset: str
-    asset_class: str = "commodity"
+    asset_group: str = "commodity"
     exchange_code: str | None = None
     underlying: str | None = None
 
@@ -221,7 +221,7 @@ class YahooIndexDef:
     venue: str
     base_asset: str
     yahoo_ticker: str
-    asset_class: str = "equity"
+    asset_group: str = "equity"
 
 
 YAHOO_INDICES: list[YahooIndexDef] = [

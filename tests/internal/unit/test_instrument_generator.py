@@ -342,11 +342,11 @@ class TestIceFutures:
         for inst in zn:
             assert inst.tick_size == 0.015625  # 1/64
 
-    def test_ice_asset_class(self, gen: InstrumentGenerator) -> None:
+    def test_ice_asset_group(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_tradfi(REF_DATE)
         ice = [i for i in instruments if i.venue == "ICE"]
         for inst in ice:
-            assert inst.asset_class == "tradfi_futures"
+            assert inst.asset_group == "tradfi_futures"
 
     def test_ice_available_from_before_expiry(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_tradfi(REF_DATE)
@@ -510,7 +510,7 @@ class TestSports:
         nba = [i for i in instruments if "DAL-MEM" in i.symbol]
         assert len(nba) == 1
         assert nba[0].symbol == "NBA-DAL-MEM-SPREAD-5.5"
-        assert nba[0].asset_class == "prediction"
+        assert nba[0].asset_group == "prediction"
         assert nba[0].available_to_datetime is not None
 
     def test_polymarket_nfl_market(self, gen: InstrumentGenerator) -> None:
@@ -519,7 +519,7 @@ class TestSports:
         nfl = [i for i in instruments if "ATL-CAR" in i.symbol]
         assert len(nfl) == 1
         assert nfl[0].symbol == "NFL-ATL-CAR-SPREAD-3.5"
-        assert nfl[0].asset_class == "prediction"
+        assert nfl[0].asset_group == "prediction"
 
     def test_count(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_sports(REF_DATE)

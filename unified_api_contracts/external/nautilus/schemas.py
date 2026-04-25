@@ -66,7 +66,7 @@ class Instrument(BaseModel):
     instrument_id: str = Field(..., description="Unique instrument ID (SYMBOL.VENUE)")
     symbol: str = Field(..., description="Ticker symbol")
     venue: str = Field(..., description="Trading venue")
-    asset_class: str = Field(default="CRYPTO", description="CRYPTO, EQUITY, FX, FUTURES, etc.")
+    asset_group: str = Field(default="CRYPTO", description="CRYPTO, EQUITY, FX, FUTURES, etc.")
     tick_size: Decimal = Field(..., gt=0, description="Minimum price increment")
     lot_size: Decimal = Field(..., gt=0, description="Minimum quantity increment")
     price_precision: int = Field(default=8, ge=0, description="Price decimal precision")
