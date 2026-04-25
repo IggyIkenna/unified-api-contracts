@@ -12,6 +12,36 @@ Contracts registered:
 - FIXTURE_LINEUPS — per-fixture team formations
 - PLAYER_STATS — per-fixture per-player stats
 - INJURIES — daily injury report (nested structs serialised as string)
+
+## Provider semantics — API-Football
+
+API-Football is a JSON HTTP API; every endpoint returns nested objects
+(player + team + fixture + league + statistics arrays). The instruments-service
+adapter currently performs **minimal flattening** at write-time: only the
+top-level identifier columns + ``data_available_at`` make it onto disk for
+``fixture_events``, ``fixture_stats``, and ``fixture_lineups``. The nested
+arrays of stat-name/stat-value tuples (FIXTURE_STATS), event-time/player
+tuples (FIXTURE_EVENTS), and player-grid coordinates (FIXTURE_LINEUPS) are
+**dropped** today; this is a known limitation, not a contract gap.
+``PLAYER_STATS`` is the exception — it ships fully flattened with all
+~38 player-level metrics.
+
+For ``INJURIES``, the adapter writes the API response as four ``struct<>``
+columns (``player`` / ``team`` / ``fixture`` / ``league``). UAC's
+``DtypeLiteral`` does not yet include ``struct``; the contract declares
+these as ``"string"`` with a description of the nested shape. Flattening
+is a follow-up plan — once flattened, the column count will jump from
+5 → ~12 (player.id, player.name, player.photo, player.reason, player.type,
+team.id, team.name, fixture.id, league.id, league.season, …).
+
+Status enumeration on FIXTURES (``status_short``):
+- Pre-match: ``TBD`` (date confirmed, time TBC), ``NS`` (not started)
+- In-play: ``1H`` (first half), ``HT`` (halftime), ``2H`` (second half),
+  ``ET`` (extra time), ``BT`` (break time), ``P`` (penalty shootout),
+  ``SUSP`` (suspended), ``INT`` (interrupted), ``LIVE`` (generic live)
+- Post-match: ``FT`` (full time), ``AET`` (after extra time), ``PEN``
+  (after penalties), ``PST`` (postponed), ``CANC`` (cancelled), ``ABD``
+  (abandoned), ``AWD`` (awarded by federation), ``WO`` (walkover)
 """
 
 from __future__ import annotations
@@ -235,30 +265,47 @@ SPORTS_FIXTURE_EVENTS = SchemaContract(
             name="type",
             dtype="string",
             nullable=False,
-            description="Event category: 'Goal' | 'Card' | 'subst' | 'Var'. API-Football top-level ``type``.",
+            description=(
+                "Event category from API-Football: 'Goal' | 'Card' | 'subst' "
+                "| 'Var'. Combined with ``detail`` (sub-type) gives full event "
+                "classification. Pre-match rows always absent."
+            ),
         ),
         ColumnSpec(
             name="detail",
             dtype="string",
             nullable=True,
             description=(
-                "Event sub-type (e.g. 'Normal Goal', 'Penalty', 'Yellow Card', "
-                "'Substitution 1'). Pairs with ``type`` for full event classification."
+                "Event sub-type. For Goals: 'Normal Goal' | 'Own Goal' | "
+                "'Penalty' | 'Missed Penalty'. For Cards: 'Yellow Card' | "
+                "'Red Card' | 'Second Yellow card'. For substitutions: "
+                "'Substitution 1' | 'Substitution 2' | … (numbered per team). "
+                "For VAR: 'Goal Disallowed - Foul', 'Penalty awarded', etc."
             ),
         ),
         ColumnSpec(
             name="comments",
             dtype="string",
             nullable=True,
-            description="Free-text VAR / referee commentary; null for routine events.",
+            description=(
+                "Free-text VAR / referee commentary as published by "
+                "API-Football. Null for routine events. Useful for narrative "
+                "data products; not for filter / aggregation use."
+            ),
         ),
         ColumnSpec(
             name="fixture_id",
             dtype="string",
             nullable=False,
             description=(
-                "Stringified ``af_fixture_id`` — note: FIXTURE_EVENTS uses the legacy "
-                "``fixture_id`` column name (not ``af_fixture_id``). Join key back to FIXTURES."
+                "Stringified ``af_fixture_id``. **Note**: this entity keeps "
+                "the unprefixed ``fixture_id`` column name on disk (not "
+                "``af_fixture_id`` like the master FIXTURES parquet — schema "
+                "drift caught + papered over by the drilldown reader's "
+                "schema-adaptive ``_probe_fid_column`` helper). Join key "
+                "back to FIXTURES. Adapter does NOT flatten event-time "
+                "(``time.elapsed`` minute), player_id, or team_id today — "
+                "see module docstring on minimal flattening."
             ),
         ),
         _DATA_AVAILABLE_AT,
@@ -277,16 +324,24 @@ SPORTS_FIXTURE_STATS = SchemaContract(
             name="fixture_id",
             dtype="string",
             nullable=False,
-            description="Stringified ``af_fixture_id`` — join key back to FIXTURES.",
+            description=(
+                "Stringified ``af_fixture_id`` — join key back to FIXTURES. "
+                "One row per (fixture, team) when fully flattened (currently "
+                "the adapter writes one row per fixture and drops the nested "
+                "team-stats array — see module docstring on minimal flattening)."
+            ),
         ),
         _DATA_AVAILABLE_AT,
     ],
     symbol_column="fixture_id",
     required_row_count_min=0,
-    # Note: current FIXTURE_STATS adapter output is minimal (only fixture_id +
-    # data_available_at). Team-level statistics (possession, shots, etc.) are
-    # not currently flattened into columns. Schema reflects current on-disk
-    # reality; broader stat columns are a follow-up plan.
+    # Adapter currently writes only fixture_id + data_available_at. The
+    # API-Football payload contains a per-team statistics array
+    # (possession_pct, shots_total, shots_on_target, shots_off_target,
+    # corners, fouls, yellow/red cards, offsides, ball_possession,
+    # passes_total, passes_accuracy, expected_goals — ~16 fields x 2 teams)
+    # which is dropped during ingest. Flattening to (fixture_id, team_id, …)
+    # is a follow-up plan tracked separately.
 )
 
 
@@ -299,13 +354,24 @@ SPORTS_FIXTURE_LINEUPS = SchemaContract(
             name="formation",
             dtype="string",
             nullable=True,
-            description="Team formation string (e.g. '4-3-3', '3-5-2'); null pre-match until lineup published.",
+            description=(
+                "Team formation string (e.g. '4-3-3', '3-5-2', '4-2-3-1'). "
+                "Null pre-match until the team sheet is published (~1 hour "
+                "before kickoff for major leagues, later for lower tiers). "
+                "API-Football also publishes the canonical XI + bench arrays "
+                "and grid-coordinate positions, but the adapter currently "
+                "drops these — see module docstring on minimal flattening."
+            ),
         ),
         ColumnSpec(
             name="fixture_id",
             dtype="string",
             nullable=False,
-            description="Stringified ``af_fixture_id`` — join key.",
+            description=(
+                "Stringified ``af_fixture_id`` — join key. One row per "
+                "(fixture, team) when fully flattened; today the adapter "
+                "writes one row per (fixture, team) with only formation."
+            ),
         ),
         _DATA_AVAILABLE_AT,
     ],
@@ -424,30 +490,50 @@ SPORTS_INJURIES = SchemaContract(
             dtype="string",
             nullable=False,
             description=(
-                "Nested player struct serialised as string on disk: "
-                "``{id, name, photo, reason, type}``. Flatten-to-columns is a follow-up."
+                "Nested API-Football player struct serialised as PyArrow ``struct<>`` "
+                "on disk: ``{id: int64, name: string, photo: string, reason: string, "
+                "type: string}``. ``reason`` is free-text (e.g. 'Hamstring Injury', "
+                "'Suspended', 'COVID-19'). ``type`` is one of 'Missing Fixture' | "
+                "'Questionable'. Read via pyarrow's struct accessors or unnest at "
+                "the consumer side. Flatten-to-columns follow-up will produce "
+                "``player_id`` / ``player_name`` / ``injury_reason`` / "
+                "``injury_type`` separate columns."
             ),
         ),
         ColumnSpec(
             name="team",
             dtype="string",
             nullable=False,
-            description="Nested team struct serialised as string: ``{id, logo, name}``.",
+            description=(
+                "Nested team struct serialised as PyArrow ``struct<>``: "
+                "``{id: int64, logo: string, name: string}``. ``id`` joins back "
+                "to TEAMS via ``team_id``. ``logo`` is provider-hosted PNG URL."
+            ),
         ),
         ColumnSpec(
             name="fixture",
             dtype="string",
             nullable=True,
             description=(
-                "Nested fixture struct serialised as string: ``{date, id, timestamp, timezone}``. "
-                "May be null for injuries not tied to a specific fixture."
+                "Nested fixture struct: ``{date: string, id: int64, "
+                "timestamp: int64, timezone: string}``. ``id`` joins back to "
+                "FIXTURES via ``af_fixture_id``. Null when the injury report "
+                "is published as a generic player-status update not tied to a "
+                "specific upcoming match (rare — most rows reference the next "
+                "league fixture)."
             ),
         ),
         ColumnSpec(
             name="league",
             dtype="string",
             nullable=False,
-            description="Nested league struct serialised as string: ``{country, flag, id, logo, name, season}``.",
+            description=(
+                "Nested league struct: ``{country: string, flag: string, "
+                "id: int64, logo: string, name: string, season: int64}``. "
+                "``id`` is API-Football's numeric league ID (joins to "
+                "``af_league_id`` everywhere else). ``flag`` is country-flag "
+                "PNG URL, ``logo`` is league-crest PNG URL."
+            ),
         ),
         _DATA_AVAILABLE_AT,
     ],

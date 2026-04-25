@@ -11,6 +11,67 @@ Contracts registered:
 - WEATHER — OpenMeteo per-venue per-day forecast + actual (72 cols)
 - FIXTURE_FEATURES — features-sports-service derivative (denormalised
   Transfermarkt + standings + weather joined to a fixture)
+
+## Provider semantics
+
+### FootyStats (MATCHES + PREDICTIONS)
+
+FootyStats is a paid feed of historical + upcoming football match data + a
+proprietary set of pre-match prediction markets. Match coverage is broader
+than API-Football for tier-2/3 leagues but **narrower** for in-match
+statistics (most stats columns ship as null even when the match has
+finished). The MATCHES contract preserves the full FootyStats column set
+for parity with their JSON, but consumers should treat the in-match stats
+columns (``home_shots_on_target``, ``home_passes_total``,
+``home_yellow_cards``, etc.) as opportunistic — they're populated for
+top-flight European leagues but very sparse otherwise.
+
+The PREDICTIONS ``*_potential`` columns are FootyStats's proprietary
+**probability score** for each market, on a 0-100 integer or float scale.
+Despite the name, ``btts_potential = 65`` means "65% probability that BTTS
+hits", **not** an over-round-adjusted fair odds value. Their model blends
+season-to-date PPG, recent form, xG, and head-to-head history. When using
+these as features upstream, consumers should normalise to [0, 1] and
+treat them as one model output among several, not as ground-truth implied
+probability.
+
+### Understat (XG)
+
+Understat publishes only **expected-goals** + raw goal data per fixture.
+The XG contract preserves the full pipeline shape (which is structurally
+similar to MATCHES because both go through the same provider-agnostic
+fixture builder), but the ONLY columns Understat originally produces are
+``home_xg``, ``away_xg``, ``home_goals``, ``away_goals``, ``kickoff_utc``,
+``home_team_*``, ``away_team_*``, ``league_*``. All the in-match statistics
+columns (``home_shots_on_target``, ``home_passes_total``, etc.) ship as
+null — they exist only so MATCHES + XG share the same column set for
+unified downstream readers. **Don't read non-xG columns from XG; use
+MATCHES or FIXTURES instead.**
+
+### OpenMeteo (WEATHER)
+
+OpenMeteo is a free weather API offering historical reanalysis (``actual_*``
+columns), best-pre-match forecast (``forecast_t0_*`` columns, captured at
+kickoff hour), and an earlier 24h-ahead forecast snapshot
+(``forecast_t24h_*`` columns) for backtesting forecast-accuracy. The
+adapter samples three timesteps per fixture: kickoff hour, kickoff+1h,
+kickoff+2h. WMO weather codes (0-99) follow the canonical
+``https://www.nodc.noaa.gov/archive/arc0021/0002199/1.1/data/0-data/HTML/WMO-CODE/WMO4677.HTM``
+spec — common values: 0=clear, 1-3=mainly clear / partly cloudy, 45=fog,
+51-67=drizzle/rain by intensity, 71-77=snow, 95-99=thunderstorm.
+
+### features-sports-service (FIXTURE_FEATURES)
+
+FIXTURE_FEATURES is a **derived** product, not raw provider output. The
+features-sports-service Cloud Run job joins (a) the FIXTURES master
+parquet, (b) the most-recent Transfermarkt PLAYER_VALUES squad valuations
+(at as-of-date), (c) pre-match STANDINGS (D-1 league position + points),
+and (d) WEATHER at kickoff hour. ``weather_source`` records which weather
+variant was used (``actual`` for backfill, ``forecast_t0`` / ``t24h`` for
+forward fixtures). NULLs propagate strictly — if any join misses, the
+output column for that join is null rather than a fallback (the
+``*_partition_used`` columns record which provenance partition was
+selected so consumers can audit).
 """
 
 from __future__ import annotations
@@ -96,7 +157,12 @@ SPORTS_MATCHES = SchemaContract(
         _stringy("away_passes_accuracy", "Away pass accuracy % (often null)."),
         _stringy(
             "canonical_fixture_id",
-            "Canonical fixture ID resolved via mapping to API-Football — join key across providers.",
+            "Canonical fixture ID — stringified ``af_fixture_id`` resolved via "
+            "the fixture-mapping parquet. PRIMARY join key when stitching "
+            "FootyStats / Understat / API-Football fixtures together. May be "
+            "null when the mapping hasn't matched (logged as a drift anomaly "
+            "upstream); fall back to ``(home_team_team_id, away_team_team_id, "
+            "kickoff_utc)`` 3-tuple for fuzzy joins.",
         ),
         _DATA_AVAILABLE_AT,
     ],
@@ -115,12 +181,25 @@ SPORTS_PREDICTIONS = SchemaContract(
         _stringy("kickoff_utc", "ISO UTC kickoff; string-typed."),
         _stringy("home_team", "Home team name."),
         _stringy("away_team", "Away team name."),
-        _i64("btts_potential", "Both-teams-to-score market 'potential' % (0-100 integer)."),
-        _f64("o25_potential", "Over-2.5-goals market potential (0-100)."),
-        _f64("o35_potential", "Over-3.5-goals market potential."),
-        _i64("o45_potential", "Over-4.5-goals market potential."),
-        _f64("xg_prematch_home", "Pre-match home expected goals."),
-        _f64("xg_prematch_away", "Pre-match away expected goals."),
+        _i64(
+            "btts_potential",
+            "Both-teams-to-score probability score (0-100). FootyStats model "
+            "output, NOT fair-odds implied probability — see module docstring "
+            "on PREDICTIONS semantics. ``btts=65`` means ~65% chance both teams score.",
+        ),
+        _f64("o25_potential", "Over-2.5-goals probability score (0-100). Same scale as ``btts_potential``."),
+        _f64("o35_potential", "Over-3.5-goals probability score (0-100)."),
+        _i64("o45_potential", "Over-4.5-goals probability score (0-100)."),
+        _f64(
+            "xg_prematch_home",
+            "Pre-match expected goals — home side, FootyStats model. "
+            "Compare with Understat XG ``home_xg`` (post-match observed) for "
+            "model-vs-actual deltas; can also be used as a vol prior.",
+        ),
+        _f64(
+            "xg_prematch_away",
+            "Pre-match expected goals — away side. Same scale as ``xg_prematch_home``.",
+        ),
         _i64("btts_fhg_potential", "BTTS first-half-goal potential."),
         _i64("btts_2hg_potential", "BTTS second-half-goal potential."),
         _i64("o05_potential", "Over-0.5 goals potential."),
@@ -151,7 +230,13 @@ SPORTS_PREDICTIONS = SchemaContract(
                 "Timestamp when the adapter actually fetched the prediction (precedes data_available_at when batched)."
             ),
         ),
-        _stringy("canonical_fixture_id", "Canonical fixture ID resolved via mapping — join key across providers."),
+        _stringy(
+            "canonical_fixture_id",
+            "Canonical fixture ID — stringified ``af_fixture_id`` resolved via "
+            "the fixture-mapping parquet. PRIMARY join key for stitching "
+            "PREDICTIONS to FIXTURES + ODDS + MATCHES. See identical column "
+            "on MATCHES for the full semantics.",
+        ),
     ],
     symbol_column="fixture_id",
     required_row_count_min=0,
