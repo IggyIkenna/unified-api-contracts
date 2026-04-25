@@ -1052,21 +1052,23 @@ GCS_OBJECT_PATH = "catalogue/envelope.md"
 
 
 def _upload_to_gcs(content: str, target: str) -> None:
-    """Upload the rendered envelope to GCS, overwriting any prior version.
-
-    target is "{bucket}/{object_path}". ADC is the auth default.
-    """
-    from google.cloud import storage  # local import — script also runs without GCS
+    """Upload to GCS. content_type derived from object_path extension."""
+    from google.cloud import storage
 
     bucket_name, _, object_path = target.partition("/")
     if not object_path:
-        print(f"Bad GCS target: {target!r} (expected '<bucket>/<path>')", file=sys.stderr)
+        print(f"Bad GCS target: {target!r}", file=sys.stderr)
         sys.exit(2)
+
+    if object_path.endswith(".json"):
+        content_type = "application/json; charset=utf-8"
+    else:
+        content_type = "text/markdown; charset=utf-8"
 
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blob = bucket.blob(object_path)
-    blob.upload_from_string(content, content_type="text/markdown; charset=utf-8")
+    blob.upload_from_string(content, content_type=content_type)
 
     https_url = f"https://console.cloud.google.com/storage/browser/_details/{bucket_name}/{object_path}"
     print(f"Uploaded {len(content):,} bytes to gs://{bucket_name}/{object_path}", file=sys.stderr)
@@ -1076,22 +1078,207 @@ def _upload_to_gcs(content: str, target: str) -> None:
 _upload_target: str | None = None
 
 
+# ---------------------------------------------------------------------------
+# Structured JSON build (parallel to markdown rendering in main())
+# ---------------------------------------------------------------------------
+
+GCS_OBJECT_PATH_JSON = "catalogue/envelope.json"
+
+
+def build_envelope_json() -> dict:
+    """Build the structured JSON envelope, parallel to the markdown render.
+
+    Schema:
+      {
+        "schema_version": "0.1.0",
+        "categories": {
+          "CEFI": {
+             "instances_count": int,
+             "bespoke_count": int,
+             "families": {
+                "VOL_TRADING": {
+                   "archetypes": {
+                      "VOL_0DTE_GAMMA_SCALPING": {
+                         "tenors": [...],
+                         "timeframes": [...],
+                         "venue_combo_policy": "single_venue|cross_venue_pairs|same_venue_basis",
+                         "bespoke_capable": bool,
+                         "cells": [
+                            {"instrument_type": "option", "status": "SUPPORTED",
+                             "venue_count": 5, "venue_combos": 5, "tf_count": 1,
+                             "instances": 5, "venues": [...]}
+                         ]
+                      }
+                   }
+                }
+             }
+          }
+        },
+        "totals": {"instances": int, "bespoke_archetype_rows": int}
+      }
+    """
+    with _MANIFEST_PATH.open("r", encoding="utf-8") as fh:
+        manifest = json.load(fh)
+
+    archetypes_by_family: dict[str, list[dict]] = defaultdict(list)
+    _REPLACED = {
+        "VOL_TRADING_OPTIONS",
+        "MARKET_MAKING",
+        "MARKET_MAKING_CONTINUOUS",
+        "MARKET_MAKING_EVENT_SETTLED",
+    }
+    for entry in manifest["archetypes"]:
+        if entry["archetype_id"] in _REPLACED:
+            continue
+        archetypes_by_family[entry["family"]].append(entry)
+    for entry in _VOL_SPLIT:
+        archetypes_by_family[entry["family"]].append(entry)
+    for entry in _MM_SPLIT:
+        archetypes_by_family[entry["family"]].append(entry)
+    for entry in _MEV_SPLIT:
+        archetypes_by_family[entry["family"]].append(entry)
+    for entry in _CROSS_DOMAIN_SPLIT:
+        archetypes_by_family[entry["family"]].append(entry)
+
+    portfolio_entries: list[dict] = []
+    for arch_id, count, note in _PORTFOLIO_ARCHETYPES:
+        portfolio_entries.append(
+            {
+                "archetype_id": arch_id,
+                "family": "PORTFOLIO",
+                "cells": [
+                    {
+                        "category": "CROSS_CATEGORY",
+                        "instrument_type": "sleeve_mix",
+                        "status": "SUPPORTED",
+                        "venue_ids": [f"canonical-{i+1}" for i in range(count)],
+                        "note": note,
+                    }
+                ],
+            }
+        )
+    archetypes_by_family["PORTFOLIO"] = portfolio_entries
+
+    _CATEGORY_ORDER = ["CEFI", "DEFI", "TRADFI", "SPORTS", "PREDICTION", "CROSS_CATEGORY"]
+    out: dict = {
+        "schema_version": "0.1.0",
+        "categories": {},
+        "totals": {"instances": 0, "bespoke_archetype_rows": 0},
+    }
+
+    grand_instances = 0
+    grand_bespoke = 0
+
+    for category in _CATEGORY_ORDER:
+        cat_payload: dict = {"instances_count": 0, "bespoke_count": 0, "families": {}}
+        cat_instances = 0
+        cat_bespoke = 0
+
+        for family, entries in archetypes_by_family.items():
+            fam_payload: dict[str, dict] = {}
+            for entry in entries:
+                archetype_id = entry["archetype_id"]
+                cells_in_cat: list[dict] = []
+                arch_instances = 0
+
+                for cell in entry["cells"]:
+                    if cell.get("status") not in ("SUPPORTED", "PARTIAL"):
+                        continue
+                    cell_cat = cell["category"]
+                    if cell_cat != category:
+                        continue
+                    if not _category_allowed(archetype_id, cell_cat):
+                        continue
+                    instrument = cell["instrument_type"]
+                    venues = list(cell.get("venue_ids", []))
+                    count, combos, tf_count, expanded = _cell_instances(
+                        archetype_id, cell_cat, instrument, venues
+                    )
+                    if count == 0:
+                        continue
+                    cells_in_cat.append({
+                        "instrument_type": instrument,
+                        "status": cell["status"],
+                        "venue_count": len(expanded),
+                        "venue_combos": combos,
+                        "tf_count": tf_count,
+                        "instances": count,
+                        "venues": expanded,
+                        "note": cell.get("note"),
+                    })
+                    arch_instances += count
+
+                if not cells_in_cat:
+                    continue
+                bespoke = archetype_id in _BESPOKE_CAPABLE
+                if bespoke:
+                    cat_bespoke += 1
+                    grand_bespoke += 1
+                fam_payload[archetype_id] = {
+                    "tenors": _TENOR_BUCKETS_BY_ARCHETYPE.get(archetype_id),
+                    "timeframes": _timeframes_for(archetype_id),
+                    "venue_combo_policy": (
+                        "cross_venue_pairs"
+                        if archetype_id in _CROSS_VENUE_ARCHETYPES
+                        else "same_venue_basis"
+                        if archetype_id in _SAME_VENUE_BASIS
+                        else "single_venue"
+                    ),
+                    "bespoke_capable": bespoke,
+                    "instances_total": arch_instances,
+                    "cells": cells_in_cat,
+                }
+                cat_instances += arch_instances
+
+            if fam_payload:
+                cat_payload["families"][family] = {"archetypes": fam_payload}
+
+        if cat_instances > 0 or cat_bespoke > 0:
+            cat_payload["instances_count"] = cat_instances
+            cat_payload["bespoke_count"] = cat_bespoke
+            out["categories"][category] = cat_payload
+            grand_instances += cat_instances
+
+    out["totals"]["instances"] = grand_instances
+    out["totals"]["bespoke_archetype_rows"] = grand_bespoke
+    return out
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--upload",
         action="store_true",
-        help=f"Upload to gs://{GCS_BUCKET}/{GCS_OBJECT_PATH} instead of printing.",
+        help=(
+            f"Upload BOTH markdown to gs://{GCS_BUCKET}/{GCS_OBJECT_PATH} and "
+            f"JSON to gs://{GCS_BUCKET}/{GCS_OBJECT_PATH_JSON}."
+        ),
+    )
+    parser.add_argument(
+        "--format",
+        choices=["md", "json"],
+        default="md",
+        help="Output format when not uploading. md (default) or json.",
     )
     parser.add_argument(
         "--gcs-target",
         type=str,
         default=None,
-        help="Override GCS target as '<bucket>/<path>'. Implies --upload.",
+        help="Override GCS markdown target as '<bucket>/<path>'. Implies --upload.",
     )
     args = parser.parse_args()
+
     if args.gcs_target:
         _upload_target = args.gcs_target
     elif args.upload:
         _upload_target = f"{GCS_BUCKET}/{GCS_OBJECT_PATH}"
-    main()
+
+    if args.format == "json" and not args.upload:
+        # JSON-only stdout mode (no upload)
+        print(json.dumps(build_envelope_json(), indent=2, sort_keys=True))
+    else:
+        main()
+        # Also upload JSON when --upload is set
+        if args.upload:
+            json_payload = json.dumps(build_envelope_json(), indent=2, sort_keys=True)
+            _upload_to_gcs(json_payload, f"{GCS_BUCKET}/{GCS_OBJECT_PATH_JSON}")
