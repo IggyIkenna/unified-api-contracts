@@ -9,11 +9,12 @@ from enum import StrEnum
 
 
 class StrategyFamily(StrEnum):
-    """8 orthogonal families — a strategy belongs to exactly one.
+    """9 orthogonal families — a strategy belongs to exactly one.
 
     v1 ``StrategyFamily`` (17 values — ``BASIS_TRADE`` / ``MOMENTUM`` / …) was
-    deleted on 2026-04-21 per ``plans/active/ui_unification_v2_sanitisation_2026_04_20``
-    — this is now the only canonical name (post-v1 ``V2`` suffix drop).
+    deleted on 2026-04-21 per ``plans/active/ui_unification_v2_sanitisation_2026_04_20``.
+    PORTFOLIO added 2026-04-25 (cross-category sleeves) per Phase 9 of
+    ``plans/active/dart_ui_strategy_filtering_and_onboarding_2026_04_24.plan.md``.
     """
 
     ML_DIRECTIONAL = "ML_DIRECTIONAL"
@@ -24,15 +25,33 @@ class StrategyFamily(StrEnum):
     EVENT_DRIVEN = "EVENT_DRIVEN"
     VOL_TRADING = "VOL_TRADING"
     STAT_ARB_PAIRS = "STAT_ARB_PAIRS"
+    PORTFOLIO = "PORTFOLIO"
 
 
 class StrategyArchetype(StrEnum):
-    """18 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
+    """46 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
 
-    v1 ``StrategyArchetype`` (13 values — ``BASIS_TRADE`` / ``DIRECTIONAL`` / …)
-    was deleted on 2026-04-21 per
-    ``plans/active/ui_unification_v2_sanitisation_2026_04_20`` — this is now
-    the only canonical name (post-v1 ``V2`` suffix drop).
+    v1 ``StrategyArchetype`` was deleted on 2026-04-21 per
+    ``plans/active/ui_unification_v2_sanitisation_2026_04_20``.
+
+    Phase 9 expansion 2026-04-25 — VOL family expanded from 1 to 18 archetypes
+    (RV/IV arb, spread structures, carry, covered calls, protective put,
+    straddle, synthetic delta, MM, ML lean, 0DTE gamma scalping, 0DTE pin
+    risk, term-structure arb / slope, dispersion, variance swap, LEAPS
+    convexity, cross-asset spread, ratio spread). MM family expanded from 2
+    to 9 (passive spread / inventory skew / ML lean / queue microstructure
+    on CEFI; concentrated / pool / vault DeFi LP). PORTFOLIO family added
+    (4 cross-category archetypes). MEV archetypes added under
+    ARBITRAGE_STRUCTURAL (sandwich / JIT liquidity / backrun /
+    liquidation bundle). Cross-domain event arb + prediction MM added.
+
+    Legacy values (`VOL_TRADING_OPTIONS`, `MARKET_MAKING_CONTINUOUS`,
+    `MARKET_MAKING_EVENT_SETTLED`) retained for back-compat with existing
+    Firestore + GCS records; new strategies use the granular variants.
+
+    Capability cells (per-archetype venue/category claims) are currently in
+    ``unified-api-contracts/scripts/enumerate_envelope.py``; manifest
+    incorporation is a follow-up.
     """
 
     ML_DIRECTIONAL_CONTINUOUS = "ML_DIRECTIONAL_CONTINUOUS"
@@ -47,12 +66,55 @@ class StrategyArchetype(StrEnum):
     YIELD_STAKING_SIMPLE = "YIELD_STAKING_SIMPLE"
     ARBITRAGE_PRICE_DISPERSION = "ARBITRAGE_PRICE_DISPERSION"
     LIQUIDATION_CAPTURE = "LIQUIDATION_CAPTURE"
-    MARKET_MAKING_CONTINUOUS = "MARKET_MAKING_CONTINUOUS"
-    MARKET_MAKING_EVENT_SETTLED = "MARKET_MAKING_EVENT_SETTLED"
+    # MEV (DeFi-only structural arb under ARBITRAGE_STRUCTURAL family)
+    ARBITRAGE_MEV_SANDWICH = "ARBITRAGE_MEV_SANDWICH"
+    ARBITRAGE_MEV_JIT_LIQUIDITY = "ARBITRAGE_MEV_JIT_LIQUIDITY"
+    ARBITRAGE_MEV_BACKRUN = "ARBITRAGE_MEV_BACKRUN"
+    ARBITRAGE_MEV_LIQUIDATION_BUNDLE = "ARBITRAGE_MEV_LIQUIDATION_BUNDLE"
+    # Cross-domain event arb (PREDICTION × SPORTS, primary_category=CROSS_CATEGORY)
+    ARBITRAGE_CROSS_DOMAIN_EVENT = "ARBITRAGE_CROSS_DOMAIN_EVENT"
+    # Market making
+    MARKET_MAKING_CONTINUOUS = "MARKET_MAKING_CONTINUOUS"  # legacy
+    MARKET_MAKING_EVENT_SETTLED = "MARKET_MAKING_EVENT_SETTLED"  # legacy
+    MARKET_MAKING_PASSIVE_SPREAD = "MARKET_MAKING_PASSIVE_SPREAD"
+    MARKET_MAKING_INVENTORY_SKEW = "MARKET_MAKING_INVENTORY_SKEW"
+    MARKET_MAKING_ML_LEAN = "MARKET_MAKING_ML_LEAN"
+    MARKET_MAKING_QUEUE_MICROSTRUCTURE = "MARKET_MAKING_QUEUE_MICROSTRUCTURE"
+    MARKET_MAKING_PREDICTION = "MARKET_MAKING_PREDICTION"
+    # DeFi LP variants under MARKET_MAKING family
+    DEFI_LP_CONCENTRATED = "DEFI_LP_CONCENTRATED"
+    DEFI_LP_POOL = "DEFI_LP_POOL"
+    DEFI_LP_VAULT = "DEFI_LP_VAULT"
+    # Event-driven
     EVENT_DRIVEN = "EVENT_DRIVEN"
-    VOL_TRADING_OPTIONS = "VOL_TRADING_OPTIONS"
+    # VOL family — 18 archetypes (was 1)
+    VOL_TRADING_OPTIONS = "VOL_TRADING_OPTIONS"  # legacy
+    VOL_ARB_RV_IV = "VOL_ARB_RV_IV"
+    VOL_SPREAD_STRUCTURES = "VOL_SPREAD_STRUCTURES"
+    VOL_CARRY = "VOL_CARRY"
+    VOL_OVERLAY_COVERED_CALLS = "VOL_OVERLAY_COVERED_CALLS"
+    VOL_OVERLAY_PROTECTIVE_PUT = "VOL_OVERLAY_PROTECTIVE_PUT"
+    VOL_STRADDLE = "VOL_STRADDLE"
+    VOL_SYNTHETIC_DELTA = "VOL_SYNTHETIC_DELTA"
+    VOL_MARKET_MAKING = "VOL_MARKET_MAKING"
+    VOL_ML_LEAN = "VOL_ML_LEAN"
+    VOL_0DTE_GAMMA_SCALPING = "VOL_0DTE_GAMMA_SCALPING"
+    VOL_0DTE_PIN_RISK = "VOL_0DTE_PIN_RISK"
+    VOL_TERM_STRUCTURE_ARB = "VOL_TERM_STRUCTURE_ARB"
+    VOL_TERM_STRUCTURE_SLOPE = "VOL_TERM_STRUCTURE_SLOPE"
+    VOL_DISPERSION = "VOL_DISPERSION"
+    VOL_VARIANCE_SWAP = "VOL_VARIANCE_SWAP"
+    VOL_LEAPS_CONVEXITY = "VOL_LEAPS_CONVEXITY"
+    VOL_CROSS_ASSET_SPREAD = "VOL_CROSS_ASSET_SPREAD"
+    VOL_RATIO_SPREAD = "VOL_RATIO_SPREAD"
+    # Stat-arb
     STAT_ARB_PAIRS_FIXED = "STAT_ARB_PAIRS_FIXED"
     STAT_ARB_CROSS_SECTIONAL = "STAT_ARB_CROSS_SECTIONAL"
+    # Portfolio (cross-category)
+    PORTFOLIO_MULTI_STRATEGY = "PORTFOLIO_MULTI_STRATEGY"
+    PORTFOLIO_RISK_PARITY = "PORTFOLIO_RISK_PARITY"
+    PORTFOLIO_FACTOR_ALLOCATION = "PORTFOLIO_FACTOR_ALLOCATION"
+    PORTFOLIO_TACTICAL_OVERLAY = "PORTFOLIO_TACTICAL_OVERLAY"
 
 
 ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
@@ -68,12 +130,47 @@ ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
     StrategyArchetype.YIELD_STAKING_SIMPLE: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.ARBITRAGE_PRICE_DISPERSION: StrategyFamily.ARBITRAGE_STRUCTURAL,
     StrategyArchetype.LIQUIDATION_CAPTURE: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.ARBITRAGE_MEV_SANDWICH: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.ARBITRAGE_MEV_JIT_LIQUIDITY: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.ARBITRAGE_MEV_BACKRUN: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.ARBITRAGE_MEV_LIQUIDATION_BUNDLE: StrategyFamily.ARBITRAGE_STRUCTURAL,
+    StrategyArchetype.ARBITRAGE_CROSS_DOMAIN_EVENT: StrategyFamily.ARBITRAGE_STRUCTURAL,
     StrategyArchetype.MARKET_MAKING_CONTINUOUS: StrategyFamily.MARKET_MAKING,
     StrategyArchetype.MARKET_MAKING_EVENT_SETTLED: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.MARKET_MAKING_PASSIVE_SPREAD: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.MARKET_MAKING_INVENTORY_SKEW: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.MARKET_MAKING_ML_LEAN: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.MARKET_MAKING_QUEUE_MICROSTRUCTURE: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.MARKET_MAKING_PREDICTION: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.DEFI_LP_CONCENTRATED: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.DEFI_LP_POOL: StrategyFamily.MARKET_MAKING,
+    StrategyArchetype.DEFI_LP_VAULT: StrategyFamily.MARKET_MAKING,
     StrategyArchetype.EVENT_DRIVEN: StrategyFamily.EVENT_DRIVEN,
     StrategyArchetype.VOL_TRADING_OPTIONS: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_ARB_RV_IV: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_SPREAD_STRUCTURES: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_CARRY: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_OVERLAY_COVERED_CALLS: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_OVERLAY_PROTECTIVE_PUT: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_STRADDLE: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_SYNTHETIC_DELTA: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_MARKET_MAKING: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_ML_LEAN: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_0DTE_GAMMA_SCALPING: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_0DTE_PIN_RISK: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_TERM_STRUCTURE_ARB: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_TERM_STRUCTURE_SLOPE: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_DISPERSION: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_VARIANCE_SWAP: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_LEAPS_CONVEXITY: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_CROSS_ASSET_SPREAD: StrategyFamily.VOL_TRADING,
+    StrategyArchetype.VOL_RATIO_SPREAD: StrategyFamily.VOL_TRADING,
     StrategyArchetype.STAT_ARB_PAIRS_FIXED: StrategyFamily.STAT_ARB_PAIRS,
     StrategyArchetype.STAT_ARB_CROSS_SECTIONAL: StrategyFamily.STAT_ARB_PAIRS,
+    StrategyArchetype.PORTFOLIO_MULTI_STRATEGY: StrategyFamily.PORTFOLIO,
+    StrategyArchetype.PORTFOLIO_RISK_PARITY: StrategyFamily.PORTFOLIO,
+    StrategyArchetype.PORTFOLIO_FACTOR_ALLOCATION: StrategyFamily.PORTFOLIO,
+    StrategyArchetype.PORTFOLIO_TACTICAL_OVERLAY: StrategyFamily.PORTFOLIO,
 }
 
 
@@ -208,13 +305,19 @@ class VenueType(StrEnum):
 
 
 class VenueCategoryV2(StrEnum):
-    """Derived category label. Uppercase values to match slot-label grammar."""
+    """Derived category label. Uppercase values to match slot-label grammar.
+
+    `CROSS_CATEGORY` added 2026-04-25 — primary category for portfolio
+    archetypes (cross-category sleeves) and `ARBITRAGE_CROSS_DOMAIN_EVENT`
+    (same real-world event listed in PREDICTION + SPORTS).
+    """
 
     CEFI = "CEFI"
     DEFI = "DEFI"
     SPORTS = "SPORTS"
     TRADFI = "TRADFI"
     PREDICTION = "PREDICTION"
+    CROSS_CATEGORY = "CROSS_CATEGORY"
 
 
 class MarginMode(StrEnum):
