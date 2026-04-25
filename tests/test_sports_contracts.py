@@ -59,7 +59,7 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     ("sports", "match", "injuries", SPORTS_INJURIES, 5),
     # Family C — Transfermarkt
     ("sports", "reference", "transfermarkt_leagues", SPORTS_TRANSFERMARKT_LEAGUES, 5),
-    ("sports", "player", "values", SPORTS_PLAYER_VALUES, 7),
+    ("sports", "player", "player_values", SPORTS_PLAYER_VALUES, 7),
     # Family D — SFI
     ("sports", "reference", "sfi_leagues", SPORTS_SFI_LEAGUES, 5),
     ("sports", "match", "sfi_progressive_stats", SPORTS_SFI_PROGRESSIVE_STATS, 43),

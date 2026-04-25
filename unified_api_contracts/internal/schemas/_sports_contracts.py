@@ -422,7 +422,7 @@ SPORTS_TRANSFERMARKT_LEAGUES = SchemaContract(
 SPORTS_PLAYER_VALUES = SchemaContract(
     category="sports",
     instrument_type="player",
-    data_type="values",
+    data_type="player_values",
     columns=[
         ColumnSpec(
             name="team_id",
@@ -698,7 +698,7 @@ CONTRACT_REGISTRY[("sports", "reference", "venues")] = SPORTS_VENUES
 CONTRACT_REGISTRY[("sports", "league", "standings")] = SPORTS_STANDINGS
 # Family C
 CONTRACT_REGISTRY[("sports", "reference", "transfermarkt_leagues")] = SPORTS_TRANSFERMARKT_LEAGUES
-CONTRACT_REGISTRY[("sports", "player", "values")] = SPORTS_PLAYER_VALUES
+CONTRACT_REGISTRY[("sports", "player", "player_values")] = SPORTS_PLAYER_VALUES
 # Family D
 CONTRACT_REGISTRY[("sports", "reference", "sfi_leagues")] = SPORTS_SFI_LEAGUES
 CONTRACT_REGISTRY[("sports", "match", "sfi_progressive_stats")] = SPORTS_SFI_PROGRESSIVE_STATS
