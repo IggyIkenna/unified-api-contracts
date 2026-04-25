@@ -142,7 +142,7 @@ def test_prediction_market_trades_has_all_required_columns() -> None:
         "condition_id",
         "asset_id",
         "underlying",
-        "market_category",
+        "asset_group",
         "market_type",
         "resolution_period",
     }
@@ -168,10 +168,10 @@ def test_prediction_market_trades_underlying_is_required() -> None:
 
 def test_prediction_market_trades_new_shard_columns_required() -> None:
     """The 6-dimension resharding adds three non-null shard columns:
-    ``market_category`` / ``market_type`` / ``resolution_period``.
+    ``asset_group`` / ``market_type`` / ``resolution_period``.
     """
     by_name = {c.name: c for c in PREDICTION_PREDICTION_MARKET_TRADES.columns}
-    for col_name in ("market_category", "market_type", "resolution_period"):
+    for col_name in ("asset_group", "market_type", "resolution_period"):
         assert col_name in by_name, f"missing {col_name}"
         assert by_name[col_name].nullable is False
         assert by_name[col_name].dtype == "string"
@@ -198,7 +198,7 @@ def test_prediction_market_trades_validates_sample_dataframe() -> None:
             "condition_id": pd.Series(["0xabc123"], dtype="string"),
             "asset_id": pd.Series(["789"], dtype="string"),
             "underlying": pd.Series(["BNB"], dtype="string"),
-            "market_category": pd.Series(["CRYPTO_PRICE"], dtype="string"),
+            "asset_group": pd.Series(["CRYPTO_PRICE"], dtype="string"),
             "market_type": pd.Series(["range_bracket"], dtype="string"),
             "resolution_period": pd.Series(["monthly"], dtype="string"),
         }
@@ -224,3 +224,86 @@ def test_new_contracts_declared_symbol_columns_are_present_in_schema() -> None:
     for contract in (SPORTS_ODDS_TRADES, PREDICTION_PREDICTION_MARKET_TRADES):
         names = {c.name for c in contract.columns}
         assert contract.symbol_column in names
+
+
+# ---------------------------------------------------------------------------
+# PREDICTION market — Gap 1 of cross-category audit (2026-04-25):
+#   book_snapshot + market_metadata + fills contracts.
+# ---------------------------------------------------------------------------
+
+
+def test_prediction_book_snapshot_registered() -> None:
+    from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
+        PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT,
+    )
+
+    key = ("prediction", "prediction_market", "book_snapshot")
+    assert key in CONTRACT_REGISTRY
+    assert CONTRACT_REGISTRY[key] is PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
+    resolved = lookup_contract(category="prediction", instrument_type="prediction_market", data_type="book_snapshot")
+    assert resolved is PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
+    # condition_id is the canonical identifier (matches trades contract).
+    assert resolved.symbol_column == "condition_id"
+    names = {c.name for c in resolved.columns}
+    # bids + asks ladder are JSON-serialised (not flattened) per docstring.
+    assert "bids" in names and "asks" in names
+    # asset_id is mandatory — outcome-token-scoped book.
+    asset_col = next(c for c in resolved.columns if c.name == "asset_id")
+    assert asset_col.nullable is False
+
+
+def test_prediction_market_metadata_registered() -> None:
+    from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
+        PREDICTION_PREDICTION_MARKET_METADATA,
+    )
+
+    key = ("prediction", "prediction_market", "market_metadata")
+    assert key in CONTRACT_REGISTRY
+    resolved = lookup_contract(category="prediction", instrument_type="prediction_market", data_type="market_metadata")
+    assert resolved is PREDICTION_PREDICTION_MARKET_METADATA
+    assert resolved.symbol_column == "condition_id"
+    names = {c.name for c in resolved.columns}
+    # Gamma API core fields.
+    assert {"question", "active", "closed", "tokens"} <= names
+    # active / closed are non-nullable booleans.
+    active_col = next(c for c in resolved.columns if c.name == "active")
+    assert active_col.dtype == "bool" and active_col.nullable is False
+
+
+def test_prediction_market_fills_registered() -> None:
+    from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
+        PREDICTION_PREDICTION_MARKET_FILLS,
+    )
+
+    key = ("prediction", "prediction_market", "fills")
+    assert key in CONTRACT_REGISTRY
+    resolved = lookup_contract(category="prediction", instrument_type="prediction_market", data_type="fills")
+    assert resolved is PREDICTION_PREDICTION_MARKET_FILLS
+    assert resolved.symbol_column == "condition_id"
+    names = {c.name for c in resolved.columns}
+    # Fill identity + linkage to parent order.
+    assert {"fill_id", "order_id", "condition_id", "asset_id"} <= names
+    # fee/maker/taker are nullable (legacy fills + redacted addresses).
+    for nullable_col in ("fee", "maker", "taker"):
+        spec = next(c for c in resolved.columns if c.name == nullable_col)
+        assert spec.nullable is True, f"{nullable_col} must be nullable"
+
+
+def test_all_three_new_prediction_contracts_use_condition_id() -> None:
+    """All three new contracts pivot on condition_id for cross-endpoint joins.
+
+    This is the institutional invariant: book / metadata / fills / trades must
+    all join on the same canonical key (Polymarket's on-chain market id) so
+    cross-API stitching works without column mapping.
+    """
+    keys = [
+        ("prediction", "prediction_market", "book_snapshot"),
+        ("prediction", "prediction_market", "market_metadata"),
+        ("prediction", "prediction_market", "fills"),
+        ("prediction", "prediction_market", "trades"),  # incumbent
+    ]
+    for key in keys:
+        contract = CONTRACT_REGISTRY[key]
+        assert contract.symbol_column == "condition_id", (
+            f"{key} must pivot on condition_id (got {contract.symbol_column!r})"
+        )

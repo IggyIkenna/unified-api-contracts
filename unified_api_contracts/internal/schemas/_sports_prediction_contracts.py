@@ -146,7 +146,7 @@ PREDICTION_PREDICTION_MARKET_TRADES = SchemaContract(
             ),
         ),
         ColumnSpec(
-            name="market_category",
+            name="asset_group",
             dtype="string",
             nullable=False,
             description=(
@@ -288,17 +288,282 @@ SPORTS_ODDS_ARBITRAGE = SchemaContract(
 
 
 # ---------------------------------------------------------------------------
+# PREDICTION — additional contracts (Gap 1 of cross-category audit, 2026-04-25).
+#
+# Polymarket has three production APIs surfaced by the MTDS PolymarketAdapter:
+# - **Gamma API** (gamma-api.polymarket.com): market metadata + tag taxonomy.
+#   Source for ``market_metadata`` contract.
+# - **CLOB API** (clob.polymarket.com): orderbook + trades + orders.
+#   Source for ``book_snapshot``; ``trades`` already registered above.
+# - **Data API** (data-api.polymarket.com): historical fills + position
+#   snapshots. Source for ``fills`` contract.
+#
+# Column lists drawn from PolymarketAdapter writer source + Polymarket public
+# docs (https://docs.polymarket.com/developers/CLOB | gamma-markets-api |
+# data-api). All three contracts use ``condition_id`` as the canonical row
+# identifier (matches PREDICTION_PREDICTION_MARKET_TRADES) — the on-chain
+# market id is the only identifier guaranteed stable across endpoints.
+# ---------------------------------------------------------------------------
+
+
+PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT = SchemaContract(
+    category="prediction",
+    instrument_type="prediction_market",
+    data_type="book_snapshot",
+    columns=[
+        INSTRUMENT_ID_COL,
+        TS_EVENT_COL,
+        ColumnSpec(
+            name="condition_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Polymarket on-chain market id (0x-prefixed bytes32). One condition "
+                "produces N outcome tokens (binary=2, scalar=2, categorical=N>2)."
+            ),
+        ),
+        ColumnSpec(
+            name="asset_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "ERC-1155 outcome-token id within the condition. Each condition has "
+                "one asset_id per outcome (binary YES + NO). The L2 book is "
+                "asset-id-scoped: bids/asks are quoted per outcome, not per market."
+            ),
+        ),
+        ColumnSpec(
+            name="bids",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Top-N bid levels serialised as JSON array of [price, size] pairs. "
+                "Polymarket CLOB returns up to 50 levels per side; we serialise "
+                "rather than flatten to keep the schema rectangular across markets "
+                "with varying depth."
+            ),
+        ),
+        ColumnSpec(
+            name="asks",
+            dtype="string",
+            nullable=False,
+            description="Top-N ask levels as JSON array of [price, size] pairs.",
+        ),
+        ColumnSpec(
+            name="venue",
+            dtype="string",
+            nullable=False,
+            description="POLYMARKET (or KALSHI for the Kalshi adapter on the same shape).",
+        ),
+        ColumnSpec(
+            name="chain",
+            dtype="string",
+            nullable=False,
+            description="Settlement chain — POLYGON for Polymarket, ETHEREUM for Kalshi.",
+        ),
+        ColumnSpec(
+            name="market_category",
+            dtype="string",
+            nullable=False,
+            description=(
+                "UAC market taxonomy: CRYPTO_PRICE, EQUITY_INDEX, COMMODITY, "
+                "POLITICS_US, SPORTS_*, EVENT, etc. SSOT: ``PredictionMarketCategory``."
+            ),
+        ),
+    ],
+    symbol_column="condition_id",
+    required_row_count_min=0,
+)
+
+
+PREDICTION_PREDICTION_MARKET_METADATA = SchemaContract(
+    category="prediction",
+    instrument_type="prediction_market",
+    data_type="market_metadata",
+    columns=[
+        INSTRUMENT_ID_COL,
+        ColumnSpec(
+            name="condition_id",
+            dtype="string",
+            nullable=False,
+            description="On-chain market id — primary key for the row.",
+        ),
+        ColumnSpec(
+            name="question",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Free-text market question as published by Polymarket Gamma API. "
+                "Example: 'Will Bitcoin reach $150,000 by end of 2026?'"
+            ),
+        ),
+        ColumnSpec(
+            name="market_slug",
+            dtype="string",
+            nullable=True,
+            description="URL-safe slug of the question; used in market URLs.",
+        ),
+        ColumnSpec(
+            name="event_slug",
+            dtype="string",
+            nullable=True,
+            description=(
+                "Parent event slug — events group multiple related markets "
+                "(e.g. an election event carries markets per candidate)."
+            ),
+        ),
+        ColumnSpec(
+            name="end_date_iso",
+            dtype="string",
+            nullable=True,
+            description=("Expected resolution date (ISO 8601 string). Null when the market has open-ended resolution."),
+        ),
+        ColumnSpec(
+            name="active",
+            dtype="bool",
+            nullable=False,
+            description="True while the market accepts trades; False once paused or resolved.",
+        ),
+        ColumnSpec(
+            name="closed",
+            dtype="bool",
+            nullable=False,
+            description="True once resolution is finalised on-chain.",
+        ),
+        ColumnSpec(
+            name="volume",
+            dtype="float64",
+            nullable=True,
+            description="Total USDC traded across all outcomes (lifetime).",
+        ),
+        ColumnSpec(
+            name="liquidity",
+            dtype="float64",
+            nullable=True,
+            description="Aggregate USDC liquidity quoted across the orderbook (instantaneous).",
+        ),
+        ColumnSpec(
+            name="tokens",
+            dtype="string",
+            nullable=False,
+            description=(
+                "JSON array of outcome tokens: [{token_id, outcome, price, winner}]. "
+                "Length = number of outcomes (2 for binary/scalar, N for categorical)."
+            ),
+        ),
+        TS_EVENT_COL,
+    ],
+    symbol_column="condition_id",
+    required_row_count_min=0,
+)
+
+
+PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
+    category="prediction",
+    instrument_type="prediction_market",
+    data_type="fills",
+    columns=[
+        INSTRUMENT_ID_COL,
+        TS_EVENT_COL,
+        ColumnSpec(
+            name="fill_id",
+            dtype="string",
+            nullable=False,
+            description="Unique fill identifier from Polymarket Data API. Primary key.",
+        ),
+        ColumnSpec(
+            name="order_id",
+            dtype="string",
+            nullable=False,
+            description=(
+                "Parent order this fill matched against. Multiple fills can stem "
+                "from one order (partial fills against multiple counterparties)."
+            ),
+        ),
+        ColumnSpec(
+            name="condition_id",
+            dtype="string",
+            nullable=False,
+            description="On-chain market id — join key back to trades / book_snapshot.",
+        ),
+        ColumnSpec(
+            name="asset_id",
+            dtype="string",
+            nullable=False,
+            description="ERC-1155 outcome-token id (which side of the binary/categorical was filled).",
+        ),
+        ColumnSpec(
+            name="price",
+            dtype="float64",
+            nullable=False,
+            description="Fill price in USDC per outcome share (0.0-1.0 for binary).",
+        ),
+        ColumnSpec(
+            name="size",
+            dtype="float64",
+            nullable=False,
+            description="Fill size in outcome shares (1 share = $1 if outcome wins).",
+        ),
+        ColumnSpec(
+            name="side",
+            dtype="string",
+            nullable=False,
+            description="BUY | SELL — taker direction relative to the outcome token.",
+        ),
+        ColumnSpec(
+            name="fee",
+            dtype="float64",
+            nullable=True,
+            description="Polymarket fee charged on this fill (USDC). Null on legacy fills.",
+        ),
+        ColumnSpec(
+            name="maker",
+            dtype="string",
+            nullable=True,
+            description="Maker wallet address (0x-prefixed). Null when the API redacts it.",
+        ),
+        ColumnSpec(
+            name="taker",
+            dtype="string",
+            nullable=True,
+            description="Taker wallet address. Null when redacted.",
+        ),
+        ColumnSpec(
+            name="venue",
+            dtype="string",
+            nullable=False,
+            description="POLYMARKET | KALSHI.",
+        ),
+        ColumnSpec(
+            name="chain",
+            dtype="string",
+            nullable=False,
+            description="Settlement chain.",
+        ),
+    ],
+    symbol_column="condition_id",
+    required_row_count_min=0,
+)
+
+
+# ---------------------------------------------------------------------------
 # Registry side-effects
 # ---------------------------------------------------------------------------
 
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
+CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
+CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA
+CONTRACT_REGISTRY[("prediction", "prediction_market", "fills")] = PREDICTION_PREDICTION_MARKET_FILLS
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAPSHOT
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_movement")] = SPORTS_ODDS_MOVEMENT
 CONTRACT_REGISTRY[("sports", "odds", "sports_arbitrage")] = SPORTS_ODDS_ARBITRAGE
 
 
 __all__ = [
+    "PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT",
+    "PREDICTION_PREDICTION_MARKET_FILLS",
+    "PREDICTION_PREDICTION_MARKET_METADATA",
     "PREDICTION_PREDICTION_MARKET_TRADES",
     "SPORTS_ODDS_ARBITRAGE",
     "SPORTS_ODDS_MOVEMENT",
