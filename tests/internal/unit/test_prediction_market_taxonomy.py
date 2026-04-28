@@ -408,6 +408,6 @@ def test_contract_has_new_shard_columns() -> None:
     )
 
     by_name = {c.name: c for c in PREDICTION_PREDICTION_MARKET_TRADES.columns}
-    for col_name in ("market_category", "market_type", "resolution_period", "underlying"):
+    for col_name in ("asset_group", "market_type", "resolution_period", "underlying"):
         assert col_name in by_name, f"missing {col_name} column"
         assert by_name[col_name].nullable is False, f"{col_name} must be required"

@@ -69,7 +69,6 @@ unified_api_contracts/
 │   ├── coinbase/
 │   ├── okx/
 │   ├── bybit/
-│   ├── kraken/
 │   ├── ...
 │   ├── databento/             # TradFi / data providers
 │   ├── tardis/

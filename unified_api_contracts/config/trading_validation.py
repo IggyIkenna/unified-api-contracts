@@ -7,7 +7,7 @@ REQUIRED_CONFIG_FIELDS: list[str] = [
     "config_id",
     "strategy_id",
     "config_version",
-    "category",
+    "asset_group",
     "asset",
     "strategy_base",
     "execution_mode",
@@ -27,7 +27,7 @@ OPTIONAL_CONFIG_FIELDS: list[str] = [
     "strategy",
 ]
 
-VALID_CATEGORIES: list[str] = ["cefi", "tradfi", "defi"]
+VALID_ASSET_GROUPS: list[str] = ["cefi", "tradfi", "defi"]
 VALID_MODES: list[str] = ["SCE", "HUF"]
 VALID_TIMEFRAMES: list[str] = ["1M", "5M", "15M", "30M", "1H", "4H", "8H", "24H"]
 VALID_INSTRUCTION_TYPES: list[str] = [
@@ -141,7 +141,7 @@ CONFIG_SCHEMA: dict[str, object] = {
         "strategy_id": {"type": "string"},
         "config_version": {"type": "string", "pattern": r"^V\d+$"},
         "strategy_base": {"type": "string"},
-        "category": {"type": "string", "enum": VALID_CATEGORIES},
+        "asset_group": {"type": "string", "enum": VALID_ASSET_GROUPS},
         "asset": {"type": "string"},
         "execution_mode": {"type": "string", "enum": VALID_MODES},
         "timeframe": {"type": "string", "enum": VALID_TIMEFRAMES},

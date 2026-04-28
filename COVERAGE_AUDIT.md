@@ -177,17 +177,17 @@ volume: Decimal
 SSOT: `unified_api_contracts/unified_api_contracts_external/<venue>/mocks/`
 Tests: `tests/vcr/`
 
-| Status         | Count | Venues                                                                                                                                                                                              |
-| -------------- | ----- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| DONE           | 18    | alchemy(partial), barchart, betdaq, betfair, binance, bybit, defillama, fear_greed, fred, hyperliquid, matchbook, okx, open_meteo, polymarket, smarkets, tardis, upbit, yahoo_finance               |
-| CASSETTE-ONLY  | 1     | alchemy (cassette recorded, test_alchemy_vcr.py missing)                                                                                                                                            |
-| SKIP-GUARD     | 3     | tardis-hist (TARDIS_API_KEY), databento (DATABENTO_API_KEY), betfair-live (BETFAIR_APP_KEY)                                                                                                         |
-| TODO-PUBLIC    | 20    | coingecko, kraken, deribit, kucoin, gateio, mexc, huobi, bitstamp, bitfinex, bitget, dydx, ecb, ofr, manifold, predictit, transfermarkt, understat, soccer_football_info, thegraph, coinbase-public |
-| TODO-NEED-KEY  | 13    | api_football, arkham, aster, databento, footystats, glassnode, kalshi, metabet, mev, odds_api, openbb, pinnacle, sharpapi, tardis-hist, github                                                      |
-| TODO-NEED-AUTH | 5     | betfair-live, coinbase-private, deribit-private, ibkr, instadapp                                                                                                                                    |
-| TODO-INTERNAL  | 13    | fix, nautilus, prime_broker, regulatory, sentiment, odds_engine, cloud_sdks, sports, macro, onchain, venue_manifest, defi, ccxt                                                                     |
+| Status         | Count | Venues                                                                                                                                                                                      |
+| -------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DONE           | 18    | alchemy(partial), barchart, betdaq, betfair, binance, bybit, defillama, fear_greed, fred, hyperliquid, matchbook, okx, open_meteo, polymarket, smarkets, tardis, upbit, yahoo_finance       |
+| CASSETTE-ONLY  | 1     | alchemy (cassette recorded, test_alchemy_vcr.py missing)                                                                                                                                    |
+| SKIP-GUARD     | 3     | tardis-hist (TARDIS_API_KEY), databento (DATABENTO_API_KEY), betfair-live (BETFAIR_APP_KEY)                                                                                                 |
+| TODO-PUBLIC    | 19    | coingecko, deribit, kucoin, gateio, mexc, huobi, bitstamp, bitfinex, bitget, dydx, ecb, ofr, manifold, predictit, transfermarkt, understat, soccer_football_info, thegraph, coinbase-public |
+| TODO-NEED-KEY  | 13    | api_football, arkham, aster, databento, footystats, glassnode, kalshi, metabet, mev, odds_api, openbb, pinnacle, sharpapi, tardis-hist, github                                              |
+| TODO-NEED-AUTH | 5     | betfair-live, coinbase-private, deribit-private, ibkr, instadapp                                                                                                                            |
+| TODO-INTERNAL  | 13    | fix, nautilus, prime_broker, regulatory, sentiment, odds_engine, cloud_sdks, sports, macro, onchain, venue_manifest, defi, ccxt                                                             |
 
 **Current cassette coverage: 19/57 non-internal venues = 33%**
 **Target for A grade: >= 80% = 46+ venues**
 
-To reach A grade: record all 20 TODO-PUBLIC venues (curl + yaml) then 3 SKIP-GUARD venues once keys available.
+To reach A grade: record all 19 TODO-PUBLIC venues (curl + yaml) then 3 SKIP-GUARD venues once keys available.

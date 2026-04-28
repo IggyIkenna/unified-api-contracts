@@ -113,7 +113,7 @@ class CanonicalInstrument(CanonicalBase):
     post_market_close_utc: str | None = None
     timezone: str | None = None
     session_date_tag: str | None = None
-    market_category: str | None = None
+    asset_group: str | None = None
 
 
 InstrumentWarehouseRow = CanonicalInstrument

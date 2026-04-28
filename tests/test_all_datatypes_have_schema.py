@@ -53,7 +53,7 @@ def test_every_datatype_has_at_least_one_schema_contract() -> None:
 def _simple_contract() -> SchemaContract:
     """Small CeFi-shaped contract used across validate_row_df tests."""
     return SchemaContract(
-        category="cefi",
+        asset_group="cefi",
         instrument_type="perpetual",
         data_type="trades",
         columns=[
@@ -142,7 +142,7 @@ def test_validate_row_df_dtype_mismatch() -> None:
 def test_validate_row_df_venue_scoped_required_column_absent_for_other_venue() -> None:
     """``provided_by_venues`` narrows the required-set: absent is OK off-venue."""
     contract = SchemaContract(
-        category="cefi",
+        asset_group="cefi",
         instrument_type="options_chain",
         data_type="options_chain",
         columns=[

@@ -26,7 +26,7 @@ OPTIONS_IV_SCHEMA = SchemaDefinition(
     name="options_iv",
     version="1.0",
     description="Implied volatility features from options chains",
-    dimension_keys=["feature_group", "category"],
+    dimension_keys=["feature_group", "asset_group"],
     columns=[
         # Core fields
         ColumnSchema(name="timestamp", dtype="int64", nullable=False, description="Timestamp in microseconds"),
@@ -116,7 +116,7 @@ FUTURES_TERM_STRUCTURE_SCHEMA = SchemaDefinition(
     name="futures_term_structure",
     version="1.0",
     description="Futures term structure features",
-    dimension_keys=["feature_group", "category"],
+    dimension_keys=["feature_group", "asset_group"],
     columns=[
         # Core fields
         ColumnSchema(name="timestamp", dtype="int64", nullable=False, description="Timestamp in microseconds"),

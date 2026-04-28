@@ -8,7 +8,7 @@ follow the slot-label grammar ``ARCHETYPE@venue-asset-instrument-period-quote-en
 
 Consumers:
     * ``unified_trading_library.utils.record_enricher.RecordEnricher`` — stamps
-      ``strategy_name`` / ``category`` / ``strategy_family`` on exec/pos records.
+      ``strategy_name`` / ``asset_group`` / ``strategy_family`` on exec/pos records.
     * ``unified_trading_api.routes.trading_analytics`` — powers
       ``/api/trading/strategies/catalog`` (UI consumer).
     * ``unified_trading_pm.scripts.openapi.generate_ui_reference_data`` —
@@ -116,7 +116,7 @@ class StrategyDefinition:
     strategy_id: str
     name: str
     family: StrategyFamily
-    category: Category
+    asset_group: Category
     archetype: StrategyArchetype
     coverage_status: CoverageStatus
 
@@ -162,7 +162,7 @@ def _build_entries_from_capabilities(
         for cell in capability.cells:
             if cell.status == CoverageStatus.BLOCKED:
                 continue
-            category = _category_from_v2(cell.category)
+            asset_group = _category_from_v2(cell.asset_group)
             for slot_label in cell.representative_slot_labels:
                 if slot_label in seen:
                     continue
@@ -172,7 +172,7 @@ def _build_entries_from_capabilities(
                         strategy_id=slot_label,
                         name=_humanise_slot_label(slot_label, archetype),
                         family=family,
-                        category=category,
+                        asset_group=asset_group,
                         archetype=archetype,
                         coverage_status=cell.status,
                     )
@@ -188,9 +188,8 @@ def _build_entries_from_capabilities(
 class StrategyRegistry:
     """SSOT for strategy lookups backed by the v2 archetype capability matrix.
 
-    Public methods match the pre-v2 interface (``resolve_name`` /
-    ``resolve_category`` / ``resolve_family`` / ``to_dict``) so consumers
-    migrate without signature churn.
+    Public methods: ``resolve_name`` / ``resolve_asset_group`` /
+    ``resolve_family`` / ``to_dict``.
     """
 
     def __init__(self, strategies: list[StrategyDefinition] | None = None) -> None:
@@ -231,11 +230,11 @@ class StrategyRegistry:
                     return capability.family.value
         return ""
 
-    def resolve_category(self, strategy_id: str) -> str:
-        """Resolve strategy_id → category. Empty string if unknown."""
+    def resolve_asset_group(self, strategy_id: str) -> str:
+        """Resolve strategy_id → asset group (``Category`` value). Empty if unknown."""
         defn = self._by_id.get(strategy_id)
         if defn:
-            return defn.category.value
+            return defn.asset_group.value
         return ""
 
     # -- Filtering ---------------------------------------------------------
@@ -245,10 +244,10 @@ class StrategyRegistry:
         f = StrategyFamily(family) if isinstance(family, str) else family
         return [s for s in self._by_id.values() if s.family == f]
 
-    def get_by_category(self, category: Category | str) -> list[StrategyDefinition]:
-        """Get all strategies in a category."""
-        c = Category(category) if isinstance(category, str) else category
-        return [s for s in self._by_id.values() if s.category == c]
+    def get_by_asset_group(self, asset_group: Category | str) -> list[StrategyDefinition]:
+        """Get all strategies in an asset group."""
+        c = Category(asset_group) if isinstance(asset_group, str) else asset_group
+        return [s for s in self._by_id.values() if s.asset_group == c]
 
     def get_by_archetype(self, archetype: StrategyArchetype | str) -> list[StrategyDefinition]:
         """Get all strategies with a given archetype."""
@@ -288,14 +287,14 @@ class StrategyRegistry:
                     "strategy_id": s.strategy_id,
                     "name": s.name,
                     "family": s.family.value,
-                    "category": s.category.value,
+                    "asset_group": s.asset_group.value,
                     "archetype": s.archetype.value,
                     "coverage_status": s.coverage_status.value,
                 }
                 for s in self._by_id.values()
             ],
             "families": {fam: [s.strategy_id for s in strats] for fam, strats in self.families.items()},
-            "categories": [c.value for c in Category],
+            "asset_groups": [c.value for c in Category],
             "archetypes": [a.value for a in StrategyArchetype],
             "coverage_statuses": [st.value for st in CoverageStatus],
         }

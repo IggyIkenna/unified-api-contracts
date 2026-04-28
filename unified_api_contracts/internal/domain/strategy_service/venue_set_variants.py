@@ -86,10 +86,10 @@ class VenueSetVariant:
 # ---------------------------------------------------------------------------
 
 
-# Canonical "first three" venues per category. Used as the ``base`` variant's
-# venue subset when the archetype supports venues in that category. Ordering
+# Canonical "first three" venues per asset group. Used as the ``base`` variant's
+# venue subset when the archetype supports venues in that asset group. Ordering
 # reflects liquidity / usage rank, not alphabetical.
-_BASE_VENUES_BY_CATEGORY: dict[VenueCategoryV2, tuple[str, ...]] = {
+_BASE_VENUES_BY_ASSET_GROUP: dict[VenueCategoryV2, tuple[str, ...]] = {
     VenueCategoryV2.CEFI: ("okx", "binance", "bybit"),
     VenueCategoryV2.DEFI: ("aave_v3", "uniswap_v3", "lido"),
     VenueCategoryV2.TRADFI: ("cme", "ibkr", "ice"),
@@ -103,31 +103,31 @@ def _archetype_slug(archetype: StrategyArchetype) -> str:
     return archetype.value.lower()
 
 
-def _category_slug(category: VenueCategoryV2) -> str:
-    return category.value.lower()
+def _asset_group_slug(asset_group: VenueCategoryV2) -> str:
+    return asset_group.value.lower()
 
 
-def _venues_and_instruments_by_category(
+def _venues_and_instruments_by_asset_group(
     capability: ArchetypeCapability,
 ) -> tuple[dict[VenueCategoryV2, set[str]], dict[VenueCategoryV2, set[ArchetypeInstrumentType]]]:
-    """Group supported venues / instrument types per category for one archetype."""
+    """Group supported venues / instrument types per asset group for one archetype."""
     venues_by_cat: dict[VenueCategoryV2, set[str]] = defaultdict(set)
     instr_by_cat: dict[VenueCategoryV2, set[ArchetypeInstrumentType]] = defaultdict(set)
     for cell in capability.cells:
         if cell.status is CoverageStatus.BLOCKED:
             continue
-        venues_by_cat[cell.category].update(cell.venue_ids)
-        instr_by_cat[cell.category].add(cell.instrument_type)
+        venues_by_cat[cell.asset_group].update(cell.venue_ids)
+        instr_by_cat[cell.asset_group].add(cell.instrument_type)
     return venues_by_cat, instr_by_cat
 
 
-def _base_subset(category: VenueCategoryV2, supported_venues: set[str]) -> tuple[str, ...]:
-    """Pick the canonical ``base`` venues for a category, preserving rank order.
+def _base_subset(asset_group: VenueCategoryV2, supported_venues: set[str]) -> tuple[str, ...]:
+    """Pick the canonical ``base`` venues for an asset group, preserving rank order.
 
     Falls back to the top 3 supported venues (alphabetical) if none of the
     canonical picks are supported for this archetype.
     """
-    preferred = [v for v in _BASE_VENUES_BY_CATEGORY.get(category, ()) if v in supported_venues]
+    preferred = [v for v in _BASE_VENUES_BY_ASSET_GROUP.get(asset_group, ()) if v in supported_venues]
     if preferred:
         return tuple(preferred)
     return tuple(sorted(supported_venues)[:3])
@@ -137,7 +137,7 @@ def _build_variants_for_archetype(capability: ArchetypeCapability) -> list[Venue
     """Derive base/premium/multicat/full variants from an archetype's capability row."""
     archetype = capability.archetype_id
     slug = _archetype_slug(archetype)
-    venues_by_cat, instr_by_cat = _venues_and_instruments_by_category(capability)
+    venues_by_cat, instr_by_cat = _venues_and_instruments_by_asset_group(capability)
     if not venues_by_cat:
         return []
 
@@ -159,7 +159,7 @@ def _build_variants_for_archetype(capability: ArchetypeCapability) -> list[Venue
     base_venues = _base_subset(primary, venues_by_cat[primary])
     variants.append(
         VenueSetVariant(
-            id=f"{slug}_base_{_category_slug(primary)}",
+            id=f"{slug}_base_{_asset_group_slug(primary)}",
             archetype=archetype,
             venues=base_venues,
             instrument_types=_sorted_instr((primary,)),
@@ -173,7 +173,7 @@ def _build_variants_for_archetype(capability: ArchetypeCapability) -> list[Venue
     if primary_venues_sorted != base_venues:
         variants.append(
             VenueSetVariant(
-                id=f"{slug}_premium_{_category_slug(primary)}",
+                id=f"{slug}_premium_{_asset_group_slug(primary)}",
                 archetype=archetype,
                 venues=primary_venues_sorted,
                 instrument_types=_sorted_instr((primary,)),
@@ -188,7 +188,7 @@ def _build_variants_for_archetype(capability: ArchetypeCapability) -> list[Venue
         merged = tuple(sorted(venues_by_cat[primary] | venues_by_cat[secondary]))
         variants.append(
             VenueSetVariant(
-                id=f"{slug}_multicat_{_category_slug(primary)}_{_category_slug(secondary)}",
+                id=f"{slug}_multicat_{_asset_group_slug(primary)}_{_asset_group_slug(secondary)}",
                 archetype=archetype,
                 venues=merged,
                 instrument_types=_sorted_instr((primary, secondary)),

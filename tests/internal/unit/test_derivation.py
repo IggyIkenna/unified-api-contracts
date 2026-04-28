@@ -47,7 +47,7 @@ def test_combo_canonical_defi_stat_arb_public() -> None:
 
     query = DimensionQuery(
         archetype_id=StrategyArchetype.STAT_ARB_PAIRS_FIXED,
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.SPOT,
         venue_id="uniswap_v3",
         chain="ethereum",
@@ -56,7 +56,7 @@ def test_combo_canonical_defi_stat_arb_public() -> None:
     assert len(result) == 1
     cell = next(iter(result))
     assert cell.archetype_id == StrategyArchetype.STAT_ARB_PAIRS_FIXED
-    assert cell.category == VenueCategoryV2.DEFI
+    assert cell.asset_group == VenueCategoryV2.DEFI
     assert cell.instrument_type == ArchetypeInstrumentType.SPOT
 
 
@@ -65,7 +65,7 @@ def test_combo_blocked_defi_options() -> None:
 
     query = DimensionQuery(
         archetype_id=StrategyArchetype.VOL_TRADING_OPTIONS,
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.OPTION,
         venue_id="uniswap_v3",
     )
@@ -78,7 +78,7 @@ def test_combo_defi_perp_market_making_bl7() -> None:
 
     query = DimensionQuery(
         archetype_id=StrategyArchetype.MARKET_MAKING_CONTINUOUS,
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.PERP,
         venue_id="hyperliquid_dex",
         chain="hyperliquid",
@@ -92,7 +92,7 @@ def test_combo_bl10_dated_future_pending() -> None:
 
     query = DimensionQuery(
         archetype_id=StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS,
-        category=VenueCategoryV2.CEFI,
+        asset_group=VenueCategoryV2.CEFI,
         instrument_type=ArchetypeInstrumentType.DATED_FUTURE,
         venue_id="deribit",
         slot_label="ML_DIRECTIONAL_CONTINUOUS@deribit-eth-dated-prod",
@@ -114,7 +114,7 @@ def test_combo_bl10_dated_future_pending() -> None:
 def _example_combo() -> Combo:
     return Combo(
         archetype_id=StrategyArchetype.STAT_ARB_PAIRS_FIXED,
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.SPOT,
     )
 

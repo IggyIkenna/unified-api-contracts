@@ -68,7 +68,7 @@ def test_tradfi_factory_skipped_1m_timeframe() -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
 def test_cefi_perpetual_trades_candles(tf: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "symbol"
     names = {c.name for c in contract.columns}
     # OHLCV core + timeframe + anchors
@@ -77,7 +77,7 @@ def test_cefi_perpetual_trades_candles(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
 def test_cefi_perpetual_book5_candles(tf: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=MDPS_KEY_BOOK5(tf))
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_BOOK5(tf))
     names = {c.name for c in contract.columns}
     assert {
         "spread_bps_mean",
@@ -90,14 +90,14 @@ def test_cefi_perpetual_book5_candles(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
 def test_cefi_perpetual_deriv_candles(tf: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=MDPS_KEY_DERIV(tf))
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_DERIV(tf))
     names = {c.name for c in contract.columns}
     assert {"funding_rate_mean", "mark_price_mean", "index_price_mean"}.issubset(names)
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
 def test_cefi_perpetual_liq_aggregates(tf: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=MDPS_KEY_LIQ(tf))
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_LIQ(tf))
     names = {c.name for c in contract.columns}
     # Liquidation aggregates are NOT OHLCV — just count + notional.
     assert "liquidation_count" in names
@@ -107,21 +107,21 @@ def test_cefi_perpetual_liq_aggregates(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
 def test_cefi_spot_pair_candles(tf: str) -> None:
-    trades = lookup_contract(category="cefi", instrument_type="spot_pair", data_type=MDPS_KEY_TRADES(tf))
-    book5 = lookup_contract(category="cefi", instrument_type="spot_pair", data_type=MDPS_KEY_BOOK5(tf))
+    trades = lookup_contract(asset_group="cefi", instrument_type="spot_pair", data_type=MDPS_KEY_TRADES(tf))
+    book5 = lookup_contract(asset_group="cefi", instrument_type="spot_pair", data_type=MDPS_KEY_BOOK5(tf))
     assert trades.symbol_column == "symbol"
     assert book5.symbol_column == "symbol"
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_cefi_options_chain_candles_key_on_underlying(tf: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="cefi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "underlying"
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_cefi_futures_chain_candles_key_on_underlying(tf: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="futures_chain", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="cefi", instrument_type="futures_chain", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "underlying"
 
 
@@ -132,25 +132,25 @@ def test_cefi_futures_chain_candles_key_on_underlying(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED)
 def test_tradfi_future_higher_timeframes(tf: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="future", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="tradfi", instrument_type="future", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "symbol"
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED)
 def test_tradfi_equity_higher_timeframes(tf: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="equity", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="tradfi", instrument_type="equity", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "symbol"
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_tradfi_options_chain_candles(tf: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="tradfi", instrument_type="options_chain", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "underlying"
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_INDEX)
 def test_tradfi_index_candles(tf: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="index", data_type=MDPS_KEY_TRADES(tf))
+    contract = lookup_contract(asset_group="tradfi", instrument_type="index", data_type=MDPS_KEY_TRADES(tf))
     assert contract.symbol_column == "symbol"
 
 
@@ -161,7 +161,7 @@ def test_tradfi_index_candles(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_DEFI)
 def test_defi_pool_swap_candles_include_chain(tf: str) -> None:
-    contract = lookup_contract(category="defi", instrument_type="pool", data_type=MDPS_KEY_SWAPS(tf))
+    contract = lookup_contract(asset_group="defi", instrument_type="pool", data_type=MDPS_KEY_SWAPS(tf))
     names = {c.name for c in contract.columns}
     assert "chain" in names
     assert "swap_count" in names
@@ -171,7 +171,7 @@ def test_defi_pool_swap_candles_include_chain(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_DEFI)
 def test_defi_pool_state_candles_include_chain(tf: str) -> None:
-    contract = lookup_contract(category="defi", instrument_type="pool", data_type=MDPS_KEY_POOL_STATE(tf))
+    contract = lookup_contract(asset_group="defi", instrument_type="pool", data_type=MDPS_KEY_POOL_STATE(tf))
     names = {c.name for c in contract.columns}
     assert "chain" in names
     assert contract.symbol_column == "symbol"
@@ -180,7 +180,7 @@ def test_defi_pool_state_candles_include_chain(tf: str) -> None:
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_defi_a_token_candles_include_chain_and_key_on_token(tf: str) -> None:
     for key_fn in (MDPS_KEY_LENDING, MDPS_KEY_RATE, MDPS_KEY_ORACLE):
-        contract = lookup_contract(category="defi", instrument_type="a_token", data_type=key_fn(tf))
+        contract = lookup_contract(asset_group="defi", instrument_type="a_token", data_type=key_fn(tf))
         names = {c.name for c in contract.columns}
         assert "chain" in names
         assert contract.symbol_column == "token"
@@ -189,7 +189,7 @@ def test_defi_a_token_candles_include_chain_and_key_on_token(tf: str) -> None:
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_OPTIONS)
 def test_defi_lst_candles_include_chain(tf: str) -> None:
     for key_fn in (MDPS_KEY_LST, MDPS_KEY_ORACLE):
-        contract = lookup_contract(category="defi", instrument_type="lst", data_type=key_fn(tf))
+        contract = lookup_contract(asset_group="defi", instrument_type="lst", data_type=key_fn(tf))
         names = {c.name for c in contract.columns}
         assert "chain" in names
         assert contract.symbol_column == "symbol"
@@ -202,7 +202,7 @@ def test_defi_lst_candles_include_chain(tf: str) -> None:
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
 def test_sports_odds_candles(tf: str) -> None:
-    contract = lookup_contract(category="sports", instrument_type="odds", data_type=MDPS_KEY_ODDS(tf))
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type=MDPS_KEY_ODDS(tf))
     assert contract.symbol_column == "fixture_id"
     names = {c.name for c in contract.columns}
     assert "quote_count" in names
@@ -212,7 +212,7 @@ def test_sports_odds_candles(tf: str) -> None:
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_PREDICTION)
 def test_prediction_market_candles(tf: str) -> None:
     contract = lookup_contract(
-        category="prediction",
+        asset_group="prediction",
         instrument_type="prediction_market",
         data_type=MDPS_KEY_PRED(tf),
     )

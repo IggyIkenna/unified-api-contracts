@@ -36,7 +36,7 @@ _CHAIN = CHAIN_COL
 # Aave V3 / Morpho — LiquidationCall events via subgraph.
 # Per-row symbol = collateral asset (e.g. WETH, USDC).
 DEFI_LENDING_LIQUIDATION_EVENTS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="liquidation_events",
     columns=[
@@ -58,7 +58,7 @@ DEFI_LENDING_LIQUIDATION_EVENTS = SchemaContract(
 # Aave V3 — FlashLoan events via subgraph.
 # Per-row symbol = flash loan asset (e.g. WETH, USDC).
 DEFI_LENDING_FLASH_LOAN_EVENTS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="flash_loan_events",
     columns=[
@@ -79,7 +79,7 @@ DEFI_LENDING_FLASH_LOAN_EVENTS = SchemaContract(
 # Lido / EigenLayer — staking APY snapshots.
 # Per-row symbol = token (e.g. stETH, EIGEN).
 DEFI_STAKING_STAKING_YIELDS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="staking",
     data_type="staking_yields",
     columns=[
@@ -94,10 +94,45 @@ DEFI_STAKING_STAKING_YIELDS = SchemaContract(
     required_row_count_min=1,
 )
 
+# Aave V3 variable-debt token rows (e.g. variableDebtUSDC) — borrow rate snapshot.
+# ``InstrumentType`` path uses lower-case ``debt_token`` in partition + registry keys.
+DEFI_DEBT_TOKEN_LENDING_INDICES = SchemaContract(
+    asset_group="defi",
+    instrument_type="debt_token",
+    data_type="lending_indices",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="variable_borrow_rate", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Ethena sUSDe / similar — ``InstrumentType.YIELD_BEARING`` + data_type ``yield_snapshots``.
+# Mirrors :data:`DEFI_STAKING_YIELD_SNAPSHOTS` in ``contracts``; staking uses a
+# different ``instrument_type`` string in the registry.
+DEFI_YIELD_BEARING_YIELD_SNAPSHOTS = SchemaContract(
+    asset_group="defi",
+    instrument_type="yield_bearing",
+    data_type="yield_snapshots",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="apy", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 # ERC-20 transfer events for top DeFi tokens.
 # Per-row symbol = token ticker (e.g. WETH, USDC).
 DEFI_SPOT_ASSET_TOKEN_TRANSFERS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="spot_asset",
     data_type="token_transfers",
     columns=[
@@ -118,7 +153,7 @@ DEFI_SPOT_ASSET_TOKEN_TRANSFERS = SchemaContract(
 # Cross-chain bridge transfer events (Across, Stargate, etc.).
 # Per-row symbol = token being bridged (e.g. USDC).
 DEFI_SPOT_ASSET_BRIDGE_EVENTS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="spot_asset",
     data_type="bridge_events",
     columns=[
@@ -140,7 +175,7 @@ DEFI_SPOT_ASSET_BRIDGE_EVENTS = SchemaContract(
 # Aave V3 / Uniswap V3 — user position snapshots.
 # Per-row symbol = collateral/LP token (e.g. WETH).
 DEFI_LENDING_POSITION_DATA = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="position_data",
     columns=[
@@ -160,7 +195,7 @@ DEFI_LENDING_POSITION_DATA = SchemaContract(
 # MEV-Boost relay builder/relay stats.
 # Per-row symbol = relay name (e.g. FLASHBOTS).
 DEFI_SPOT_ASSET_MEV_EVENTS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="spot_asset",
     data_type="mev_events",
     columns=[
@@ -180,7 +215,7 @@ DEFI_SPOT_ASSET_MEV_EVENTS = SchemaContract(
 # DAO proposal + vote events (Compound, Aave, Uniswap).
 # Per-row symbol = protocol name (e.g. COMPOUND).
 DEFI_SPOT_ASSET_GOVERNANCE_EVENTS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="spot_asset",
     data_type="governance_events",
     columns=[
@@ -224,7 +259,7 @@ _UNIV3_VENUES: frozenset[str] = frozenset(
 )
 
 DEFI_POOL_DEX_POOLS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pools",
     columns=[
@@ -257,7 +292,7 @@ DEFI_POOL_DEX_POOLS = SchemaContract(
 )
 
 DEFI_POOL_DEX_SWAPS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_swaps",
     columns=[
@@ -317,5 +352,7 @@ CONTRACT_REGISTRY.update(
         ("defi", "spot_asset", "governance_events"): DEFI_SPOT_ASSET_GOVERNANCE_EVENTS,
         ("defi", "pool", "dex_pools"): DEFI_POOL_DEX_POOLS,
         ("defi", "pool", "dex_swaps"): DEFI_POOL_DEX_SWAPS,
+        ("defi", "debt_token", "lending_indices"): DEFI_DEBT_TOKEN_LENDING_INDICES,
+        ("defi", "yield_bearing", "yield_snapshots"): DEFI_YIELD_BEARING_YIELD_SNAPSHOTS,
     }
 )

@@ -78,11 +78,11 @@ class RollMode(StrEnum):
 
 
 class ArchetypeCapabilityCell(BaseModel):
-    """One (archetype, category, instrument_type) cell."""
+    """One (archetype, asset_group, instrument_type) cell."""
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    category: VenueCategoryV2
+    asset_group: VenueCategoryV2
     instrument_type: ArchetypeInstrumentType
     status: CoverageStatus
     venue_ids: tuple[str, ...]
@@ -94,7 +94,7 @@ class ArchetypeCapabilityCell(BaseModel):
 
 
 class ArchetypeCapability(BaseModel):
-    """Per-archetype capability row — all its (category, instrument) cells.
+    """Per-archetype capability row — all its (asset_group, instrument) cells.
 
     Consumers use the derived frozensets (``supported_pairs`` /
     ``partial_pairs`` / ``blocked_pairs`` / ``supported_venues``) for O(1)
@@ -111,15 +111,15 @@ class ArchetypeCapability(BaseModel):
 
     @property
     def supported_pairs(self) -> frozenset[tuple[VenueCategoryV2, ArchetypeInstrumentType]]:
-        return frozenset((c.category, c.instrument_type) for c in self.cells if c.status == CoverageStatus.SUPPORTED)
+        return frozenset((c.asset_group, c.instrument_type) for c in self.cells if c.status == CoverageStatus.SUPPORTED)
 
     @property
     def partial_pairs(self) -> frozenset[tuple[VenueCategoryV2, ArchetypeInstrumentType]]:
-        return frozenset((c.category, c.instrument_type) for c in self.cells if c.status == CoverageStatus.PARTIAL)
+        return frozenset((c.asset_group, c.instrument_type) for c in self.cells if c.status == CoverageStatus.PARTIAL)
 
     @property
     def blocked_pairs(self) -> frozenset[tuple[VenueCategoryV2, ArchetypeInstrumentType]]:
-        return frozenset((c.category, c.instrument_type) for c in self.cells if c.status == CoverageStatus.BLOCKED)
+        return frozenset((c.asset_group, c.instrument_type) for c in self.cells if c.status == CoverageStatus.BLOCKED)
 
     @property
     def supported_venues(self) -> frozenset[str]:
@@ -163,19 +163,19 @@ def all_capabilities() -> tuple[ArchetypeCapability, ...]:
 
 
 def archetypes_for_pair(
-    category: VenueCategoryV2,
+    asset_group: VenueCategoryV2,
     instrument_type: ArchetypeInstrumentType,
     *,
     include_partial: bool = True,
 ) -> tuple[ArchetypeCapability, ...]:
-    """Return archetypes that support the ``(category, instrument_type)`` pair.
+    """Return archetypes that support the ``(asset_group, instrument_type)`` pair.
 
     ``include_partial=True`` (default) includes PARTIAL cells alongside
     SUPPORTED — callers validating whether an instruction can be routed
     generally want both. Pass ``False`` to restrict to SUPPORTED only.
     """
 
-    pair = (category, instrument_type)
+    pair = (asset_group, instrument_type)
     out: list[ArchetypeCapability] = []
     for entry in ARCHETYPE_CAPABILITY_REGISTRY:
         if pair in entry.supported_pairs or (include_partial and pair in entry.partial_pairs):

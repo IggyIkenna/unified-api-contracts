@@ -118,7 +118,7 @@ class Combo(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     archetype_id: StrategyArchetype
-    category: VenueCategoryV2
+    asset_group: VenueCategoryV2
     instrument_type: ArchetypeInstrumentType
     venue_id: str | None = None
     chain: str | None = None
@@ -138,7 +138,7 @@ class DimensionQuery(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     archetype_id: StrategyArchetype
-    category: VenueCategoryV2
+    asset_group: VenueCategoryV2
     instrument_type: ArchetypeInstrumentType
     venue_id: str | None = None
     chain: str | None = None
@@ -466,18 +466,18 @@ def _blocker_fires(
         if entry.lock_state == LockState.RETIRED:
             return ("BL-15", "RETIRED lock_state — no new allocation")
 
-    pair = (query.category, query.instrument_type)
+    pair = (query.asset_group, query.instrument_type)
 
     # BL-7: DeFi perp market-making
     if (
         capability.archetype_id == StrategyArchetype.MARKET_MAKING_CONTINUOUS
-        and query.category == VenueCategoryV2.DEFI
+        and query.asset_group == VenueCategoryV2.DEFI
         and query.instrument_type == ArchetypeInstrumentType.PERP
     ):
         return ("BL-7", "DeFi perp market-making — venue latency > tick generator")
 
     # BL-1: DeFi options
-    if query.category == VenueCategoryV2.DEFI and query.instrument_type == ArchetypeInstrumentType.OPTION:
+    if query.asset_group == VenueCategoryV2.DEFI and query.instrument_type == ArchetypeInstrumentType.OPTION:
         return ("BL-1", "DeFi options — vol surface fidelity not yet wired")
 
     # BL-10: dated-future rolls — slot_label carries the convention
@@ -496,7 +496,7 @@ def _blocker_fires(
     if pair in capability.blocked_pairs:
         return (
             "BL-MECH",
-            f"mechanically unsupported: {query.category.value} x {query.instrument_type.value}",
+            f"mechanically unsupported: {query.asset_group.value} x {query.instrument_type.value}",
         )
 
     _ = today  # referenced to keep signature stable; used by full suite
@@ -524,7 +524,7 @@ def combo(
         }
 
     ``valid_cartesian`` is satisfied when the archetype capability cell
-    for ``(category, instrument_type)`` exists and its status is
+    for ``(asset_group, instrument_type)`` exists and its status is
     SUPPORTED or PARTIAL. ``blocked`` runs BL-1..BL-22 predicates via
     :func:`_blocker_fires`.
 
@@ -541,7 +541,7 @@ def combo(
         if capability is None:
             continue  # archetype absent from registry — rejected silently
 
-        pair = (query.category, query.instrument_type)
+        pair = (query.asset_group, query.instrument_type)
         # valid_cartesian: SUPPORTED or PARTIAL status
         if pair not in capability.supported_pairs and pair not in capability.partial_pairs:
             continue  # mechanical reject — no BL required
@@ -562,7 +562,7 @@ def combo(
         result.add(
             Combo(
                 archetype_id=query.archetype_id,
-                category=query.category,
+                asset_group=query.asset_group,
                 instrument_type=query.instrument_type,
                 venue_id=query.venue_id,
                 chain=query.chain,
@@ -594,7 +594,7 @@ def combo(
 def _all_supported_combos(
     capability_registry: Iterable[ArchetypeCapability],
 ) -> tuple[Combo, ...]:
-    """Enumerate every SUPPORTED (archetype, category, instrument_type) cell."""
+    """Enumerate every SUPPORTED (archetype, asset_group, instrument_type) cell."""
 
     out: list[Combo] = []
     for capability in capability_registry:
@@ -603,7 +603,7 @@ def _all_supported_combos(
                 out.append(
                     Combo(
                         archetype_id=capability.archetype_id,
-                        category=cell.category,
+                        asset_group=cell.asset_group,
                         instrument_type=cell.instrument_type,
                     )
                 )
@@ -651,7 +651,9 @@ def prod_restrictions(
     entitled: list[Combo] = []
 
     for cell in all_cells:
-        slot_label = cell.slot_label or f"{cell.archetype_id.value}@{cell.category.value}-{cell.instrument_type.value}"
+        ag = cell.asset_group.value
+        it = cell.instrument_type.value
+        slot_label = cell.slot_label or f"{cell.archetype_id.value}@{ag}-{it}"
         entry = availability_for(slot_label, registry=availability_registry)
 
         # BL-15: retired

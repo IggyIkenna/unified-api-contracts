@@ -54,7 +54,7 @@ class ComplianceSink(Protocol):
 
 def combo_id_for(
     archetype_id: str,
-    category: str,
+    asset_group: str,
     instrument_type: str,
     venue_id: str | None,
     chain: str | None,
@@ -65,7 +65,7 @@ def combo_id_for(
     downstream BigQuery joins line up without re-derivation.
     """
 
-    parts: list[str] = [archetype_id, category, instrument_type]
+    parts: list[str] = [archetype_id, asset_group, instrument_type]
     if venue_id:
         parts.append(venue_id)
     if chain:

@@ -370,12 +370,12 @@ class TestUICDomainInstrumentsSchemaRoundTrip(unittest.TestCase):
 
     def test_instruments_schema_nullable_override_cefi(self) -> None:
         """tardis_exchange is NOT nullable for CEFI dimension."""
-        is_nullable = INSTRUMENTS_SCHEMA.is_nullable("tardis_exchange", {"category": "CEFI"})
+        is_nullable = INSTRUMENTS_SCHEMA.is_nullable("tardis_exchange", {"asset_group": "CEFI"})
         self.assertFalse(is_nullable, "tardis_exchange must be required for CEFI")
 
     def test_instruments_schema_nullable_override_tradfi(self) -> None:
         """databento_symbol is NOT nullable for TRADFI dimension."""
-        is_nullable = INSTRUMENTS_SCHEMA.is_nullable("databento_symbol", {"category": "TRADFI"})
+        is_nullable = INSTRUMENTS_SCHEMA.is_nullable("databento_symbol", {"asset_group": "TRADFI"})
         self.assertFalse(is_nullable, "databento_symbol must be required for TRADFI")
 
     def test_instruments_schema_required_columns_include_timestamp(self) -> None:

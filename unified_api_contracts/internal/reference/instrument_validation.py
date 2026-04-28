@@ -1,6 +1,6 @@
 """Runtime schema validation for InstrumentRecord.
 
-Enforces required-field rules per instrument_type and category.
+Enforces required-field rules per instrument_type and asset group (cefi/defi/…).
 Called by orchestrator before writing to GCS — rejects records
 that would produce bad data for downstream consumers.
 """
@@ -16,7 +16,7 @@ from unified_api_contracts.registry.chain_env import MAINNET_CHAIN_IDS
 
 logger = logging.getLogger(__name__)
 
-# Category is derived from venue patterns
+# Asset group (CEFI/DEFI/…) is derived from venue patterns
 _DEFI_VENUE_PREFIXES = frozenset(
     {
         "AAVEV3",
@@ -88,7 +88,7 @@ _SPORTS_VENUES = frozenset(
     }
 )
 
-# All known venue names (union of all categories)
+# All known venue names (union of all asset groups)
 _ALL_KNOWN_VENUES: frozenset[str] = _TRADFI_VENUES | _CEFI_VENUES | _SPORTS_VENUES
 
 # EVM chains — addresses are 0x + 40 hex chars
@@ -122,7 +122,7 @@ _SINGLE_ASSET_DEFI_TYPES = frozenset(
 )
 
 
-def _infer_category(venue: str) -> str:
+def _infer_asset_group(venue: str) -> str:
     """Infer CEFI/DEFI/TRADFI/SPORTS/PREDICTION from venue name."""
     venue_upper = venue.upper()
     if venue_upper in _TRADFI_VENUES:
@@ -138,7 +138,7 @@ def _infer_category(venue: str) -> str:
 def validate_instrument_records(
     records: list[InstrumentRecord],
 ) -> tuple[list[InstrumentRecord], list[tuple[InstrumentRecord, str]]]:
-    """Validate instrument records against per-type/category rules.
+    """Validate instrument records against per-type and asset-group rules.
 
     Returns (valid_records, rejected_records_with_reason).
 
@@ -235,11 +235,11 @@ def _check_record(rec: InstrumentRecord) -> str | None:
     if venue_err:
         return venue_err
 
-    category = _infer_category(rec.venue)
+    asset_group = _infer_asset_group(rec.venue)
     inst_type = str(rec.instrument_type)
 
     # --- DeFi address validation ---
-    if category == "DEFI":
+    if asset_group == "DEFI":
         parts = rec.venue.split("-", 1)
         if len(parts) == 2:
             protocol, chain = parts[0], parts[1]
@@ -253,9 +253,9 @@ def _check_record(rec: InstrumentRecord) -> str | None:
 
     # quote_asset: REQUIRED for CeFi and TradFi (not DeFi single-asset types, not sports/prediction)
     is_single_asset = inst_type in _SINGLE_ASSET_DEFI_TYPES
-    if category not in ("DEFI", "SPORTS") and not rec.quote_asset:
-        return f"quote_asset is required for {category} (venue={rec.venue}, symbol={rec.raw_symbol})"
-    if category == "DEFI" and not is_single_asset and not rec.quote_asset:
+    if asset_group not in ("DEFI", "SPORTS") and not rec.quote_asset:
+        return f"quote_asset is required for {asset_group} (venue={rec.venue}, symbol={rec.raw_symbol})"
+    if asset_group == "DEFI" and not is_single_asset and not rec.quote_asset:
         # DeFi non-lending (pools, swaps) should have quote_asset
         return f"quote_asset is required for DeFi non-lending (venue={rec.venue}, type={inst_type})"
 
@@ -271,11 +271,11 @@ def _check_record(rec: InstrumentRecord) -> str | None:
             return f"option_type is required for options (venue={rec.venue}, symbol={rec.raw_symbol})"
 
     # underlying: REQUIRED for CeFi/TradFi derivatives (not spot/index/combo, not DeFi)
-    if category != "DEFI" and inst_type in (InstrumentType.FUTURE, InstrumentType.OPTION) and not rec.underlying:
-        return f"underlying is required for {category} derivatives (venue={rec.venue}, symbol={rec.raw_symbol})"
+    if asset_group != "DEFI" and inst_type in (InstrumentType.FUTURE, InstrumentType.OPTION) and not rec.underlying:
+        return f"underlying is required for {asset_group} derivatives (venue={rec.venue}, symbol={rec.raw_symbol})"
 
     # TradFi session metadata: timezone and holiday_calendar REQUIRED for all TradFi
-    if category == "TRADFI":
+    if asset_group == "TRADFI":
         if not rec.timezone:
             return f"timezone required for TradFi (venue={rec.venue}, symbol={rec.raw_symbol})"
         if not rec.holiday_calendar:
@@ -294,7 +294,7 @@ def _check_record(rec: InstrumentRecord) -> str | None:
     # Every CeFi/TradFi adapter sets a value — None means a bug in the adapter.
     # Exceptions: INDEX (non-tradeable pricing), COMBO (tick derived from legs),
     # and all DeFi instruments (AMM pools, lending, staking — no order book tick).
-    is_tick_exempt = category == "DEFI" or inst_type in (
+    is_tick_exempt = asset_group == "DEFI" or inst_type in (
         InstrumentType.INDEX.value,
         InstrumentType.COMBO.value,
     )

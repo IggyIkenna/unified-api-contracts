@@ -296,3 +296,25 @@ class TestManualInstruction:
         )
         assert mi.price == Decimal("65000")
         assert mi.reason == "risk_reduction"
+
+    def test_manual_instruction_asset_group_json_key(self) -> None:
+        from unified_api_contracts.internal.execution import ManualInstruction
+
+        ts = datetime.now(UTC)
+        data = {
+            "instruction_id": "instr-003",
+            "submitted_by": "trader@example.com",
+            "venue": "binance",
+            "account_id": "a1",
+            "instrument_key": "BINANCE:SPOT:BTCUSDT",
+            "side": "BUY",
+            "order_type": "MARKET",
+            "quantity": "0.1",
+            "submitted_at": ts,
+            "asset_group": "cefi",
+        }
+        mi = ManualInstruction.model_validate(data)
+        assert mi.asset_group == "cefi"
+        dumped = mi.model_dump(mode="json")
+        assert dumped["asset_group"] == "cefi"
+        assert "category" not in dumped

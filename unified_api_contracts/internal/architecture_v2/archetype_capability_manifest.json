@@ -9,7 +9,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
@@ -22,7 +22,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
@@ -36,7 +36,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["deribit"],
@@ -49,7 +49,7 @@
           "notes": "Settlement-aware reconciliation not batch-tested on Deribit dated."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["deribit", "okx"],
@@ -62,7 +62,7 @@
           "notes": "Expression axis supports atm_call / 25d_call / synthetic; multi-leg option router pending."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["uniswap_v3", "balancer"],
@@ -75,7 +75,7 @@
           "notes": "Pricing-fidelity flag missing (UAC gap #8) \u2014 thin pools not tick-stream-reliable."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
@@ -88,7 +88,7 @@
           "notes": ""
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "dated_future",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -99,7 +99,7 @@
           "notes": "No DeFi dated-future venue."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "option",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -110,7 +110,7 @@
           "notes": "No supported DeFi options venue (Lyra / Dopex archived)."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr"],
@@ -123,7 +123,7 @@
           "notes": "IBKR FIX adapter symbol universe declaration incomplete."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["cme", "ice"],
@@ -137,7 +137,7 @@
           "notes": "Adapter batch-tested only for ES / NQ / CL; roll service required (BL-10)."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["cboe"],
@@ -157,7 +157,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
           "venue_ids": [
@@ -179,7 +179,7 @@
           "notes": "Value-betting (edge_method=VALUE_PROB_VS_IMPLIED) is a config axis on this archetype, not a separate archetype. See codex value-betting-archetype-decision.md."
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
           "venue_ids": ["polymarket"],
@@ -192,7 +192,7 @@
           "notes": ""
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "BLOCKED",
           "venue_ids": ["kalshi"],
@@ -210,7 +210,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
@@ -223,7 +223,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
@@ -237,7 +237,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["deribit"],
@@ -248,7 +248,7 @@
           "notes": "Settlement-aware rule harness not batch-tested."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -259,7 +259,7 @@
           "notes": "Directional options via rules is non-standard; use VOL_TRADING_OPTIONS or ML with expression=atm_call."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["uniswap_v3"],
@@ -270,7 +270,7 @@
           "notes": "Same pricing-fidelity concern as ML DeFi spot."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["gmx_v2", "drift", "hyperliquid"],
@@ -283,7 +283,7 @@
           "notes": "No codex instance examples yet."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr"],
@@ -296,7 +296,7 @@
           "notes": "IBKR FIX adapter declaration gap."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["cme", "ice"],
@@ -309,7 +309,7 @@
           "notes": "Adapter coverage partial; roll service required (BL-10)."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -327,7 +327,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["unity", "betfair_direct", "smarkets_direct"],
@@ -341,7 +341,7 @@
           "notes": "Engine code complete; docs + example instances minor gap."
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["polymarket"],
@@ -361,7 +361,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "coinbase", "deribit"],
@@ -375,7 +375,7 @@
           "notes": "Spot + dated combo. Default rolls with front; expiry-targeted uses -fixed-."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["deribit"],
@@ -388,7 +388,7 @@
           "notes": "Put-call parity synthetic expression; no worked instance yet."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "dated_future",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -399,7 +399,7 @@
           "notes": "No DeFi dated-future venue."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["ibkr", "cme", "ice"],
@@ -420,7 +420,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
@@ -434,7 +434,7 @@
           "notes": "Single-venue netted (most capital-efficient) or cross-venue LEADER_HEDGE."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["uniswap_v3", "hyperliquid", "gmx_v2", "drift", "lido"],
@@ -455,7 +455,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "SUPPORTED",
           "venue_ids": [
@@ -486,7 +486,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "SUPPORTED",
           "venue_ids": [
@@ -514,7 +514,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "lending",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -525,7 +525,7 @@
           "notes": "CeFi lending out-of-scope: withdrawal lockups + counterparty risk (BL-3)."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "lending",
           "status": "SUPPORTED",
           "venue_ids": ["aave_v3", "compound_v3", "euler", "morpho", "kamino"],
@@ -547,7 +547,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "SUPPORTED",
           "venue_ids": ["lido", "rocketpool", "etherfi", "jito", "marinade"],
@@ -568,7 +568,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
@@ -581,7 +581,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
@@ -595,7 +595,7 @@
           "notes": "UAC lacks funding_arb flag distinct from price-arb (gap #2)."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["deribit", "okx"],
@@ -608,7 +608,7 @@
           "notes": "vol_arb not a separate capability; multi-leg vol-arb algo pending."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
           "venue_ids": ["uniswap_v3", "balancer", "curve", "sushiswap"],
@@ -621,7 +621,7 @@
           "notes": ""
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
@@ -634,7 +634,7 @@
           "notes": ""
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "lp",
           "status": "PARTIAL",
           "venue_ids": ["uniswap_v3"],
@@ -647,7 +647,7 @@
           "notes": "Flash-loan receiver per-chain registry missing from UAC (gap #3)."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "option",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -658,7 +658,7 @@
           "notes": "No supported DeFi options venue."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr", "cme"],
@@ -669,7 +669,7 @@
           "notes": "IBKR smart-router absorbs most intra-TradFi spot arb."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["cme", "ice"],
@@ -683,7 +683,7 @@
           "notes": "Cross-product routing policy not declared in UAC (gap #10)."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["cboe"],
@@ -696,7 +696,7 @@
           "notes": "Same-surface no-arb (butterfly / calendar / parity) on CBOE via IBKR."
         },
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
           "venue_ids": ["unity", "betfair_direct", "smarkets_direct"],
@@ -710,7 +710,7 @@
           "notes": "Unity single-wallet makes cross-book arb near-atomic."
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
           "venue_ids": ["polymarket", "unity", "betfair_direct"],
@@ -730,7 +730,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["hyperliquid"],
@@ -743,7 +743,7 @@
           "notes": "Hyperliquid liquidation feed; edge limited to bid-ladder placement near liq price."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "lending",
           "status": "SUPPORTED",
           "venue_ids": ["aave_v3", "kamino"],
@@ -758,7 +758,7 @@
           "notes": "Flash-loan receiver contract required per-chain. Aave V3 + Kamino primary."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["gmx_v2"],
@@ -778,7 +778,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
@@ -791,7 +791,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
@@ -804,7 +804,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["deribit", "okx"],
@@ -817,7 +817,7 @@
           "notes": "Needs MultiLegOrderCapability (UAC gap #7)."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "lp",
           "status": "SUPPORTED",
           "venue_ids": [
@@ -839,7 +839,7 @@
           "notes": "Active LP (Uniswap V3/V4, Orca, Raydium) + Passive LP (Curve, Balancer, Uniswap V2)."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -850,7 +850,7 @@
           "notes": "DeFi perp MM not exposed as third-party role."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "option",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -861,7 +861,7 @@
           "notes": "No supported DeFi options venue."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr"],
@@ -872,7 +872,7 @@
           "notes": "IBKR MM designation required; regulatory overhead."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["cme"],
@@ -883,7 +883,7 @@
           "notes": "Formal MM designation out-of-scope for initial rollout."
         },
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["betfair_direct", "unity"],
@@ -903,7 +903,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
           "venue_ids": ["betfair_direct"],
@@ -917,7 +917,7 @@
           "notes": "Primary \u2014 lay-native."
         },
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["smarkets_direct", "matchbook_direct", "betdaq_direct"],
@@ -930,7 +930,7 @@
           "notes": "Lay semantics differ per venue; capability flag gap per-venue."
         },
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "BLOCKED",
           "venue_ids": ["unity"],
@@ -941,7 +941,7 @@
           "notes": "Unity Feed Connector is place-only, not quoting."
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["polymarket"],
@@ -954,7 +954,7 @@
           "notes": "Polymarket CLOB MM supported in theory but quoting UX differs (no 'lay')."
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "BLOCKED",
           "venue_ids": ["kalshi"],
@@ -972,7 +972,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["binance", "okx"],
@@ -985,7 +985,7 @@
           "notes": "External event calendar not declared in UAC (gap #5)."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["binance", "hyperliquid", "bybit"],
@@ -998,7 +998,7 @@
           "notes": "Same calendar gap."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["deribit"],
@@ -1011,7 +1011,7 @@
           "notes": "Event-straddle expression policy not declared."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["uniswap_v3"],
@@ -1024,7 +1024,7 @@
           "notes": "Token unlock calendar source gap."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["hyperliquid", "gmx_v2"],
@@ -1035,7 +1035,7 @@
           "notes": "Governance-vote reactive path; adapter ready."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "lending",
           "status": "PARTIAL",
           "venue_ids": ["aave_v3"],
@@ -1048,7 +1048,7 @@
           "notes": "Protocol-governance calendar gap."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "PARTIAL",
           "venue_ids": ["lido"],
@@ -1059,7 +1059,7 @@
           "notes": "Slashing feed integration incomplete."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr"],
@@ -1072,7 +1072,7 @@
           "notes": "Earnings calendar source gap."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["cme"],
@@ -1085,7 +1085,7 @@
           "notes": "Event-type \u2192 instrument mapping not declared in execution_policy."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["cboe"],
@@ -1096,7 +1096,7 @@
           "notes": "Same as CeFi option."
         },
         {
-          "category": "SPORTS",
+          "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["unity"],
@@ -1109,7 +1109,7 @@
           "notes": "News-feed + lineup timing model not declared."
         },
         {
-          "category": "PREDICTION",
+          "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
           "venue_ids": ["polymarket"],
@@ -1129,7 +1129,7 @@
       "uses_rolling_futures": false,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "SUPPORTED",
           "venue_ids": ["deribit", "okx"],
@@ -1143,7 +1143,7 @@
           "notes": "Full Deribit surface support; multi-leg ATOMIC supported."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "option",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -1154,7 +1154,7 @@
           "notes": "No supported DeFi options venue (Lyra / Dopex archived)."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
           "venue_ids": ["cboe"],
@@ -1174,7 +1174,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit"],
@@ -1187,7 +1187,7 @@
           "notes": ""
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
           "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
@@ -1200,7 +1200,7 @@
           "notes": ""
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["uniswap_v3"],
@@ -1213,7 +1213,7 @@
           "notes": "Price-feed liquidity concerns on thinner pairs."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
@@ -1226,7 +1226,7 @@
           "notes": ""
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr"],
@@ -1241,7 +1241,7 @@
           "notes": "Pair pre-declaration config path fine; no batch-tested instances. Treasury ETFs (TLT/IEF/SHY) are spot equities on IBKR \u2014 bond is not a separate instrument_type (see codex tradfi-bond-instrument-type-decision.md)."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
           "venue_ids": ["cme", "ice"],
@@ -1262,7 +1262,7 @@
       "uses_rolling_futures": true,
       "cells": [
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["binance"],
@@ -1275,7 +1275,7 @@
           "notes": "Basket execution via sequential TRADE; batch-order path not tested."
         },
         {
-          "category": "CEFI",
+          "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["hyperliquid", "bybit"],
@@ -1288,7 +1288,7 @@
           "notes": ""
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "BLOCKED",
           "venue_ids": [],
@@ -1299,7 +1299,7 @@
           "notes": "Multi-token atomic basket trade on DeFi is gas-prohibitive; needs specialised router."
         },
         {
-          "category": "DEFI",
+          "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
           "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
@@ -1312,7 +1312,7 @@
           "notes": ""
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
           "venue_ids": ["ibkr"],
@@ -1326,7 +1326,7 @@
           "notes": "Batch-order capability not declared for IBKR; basket of 50\u2013500 legs."
         },
         {
-          "category": "TRADFI",
+          "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "BLOCKED",
           "venue_ids": [],

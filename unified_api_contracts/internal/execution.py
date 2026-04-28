@@ -15,7 +15,7 @@ from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class SettlementType(StrEnum):
@@ -77,10 +77,12 @@ class ManualInstruction(BaseModel):
         client_id: Org hierarchy — client identifier.
         strategy_id: Org hierarchy — strategy identifier.
         portfolio_id: Org hierarchy — portfolio/book identifier.
-        category: Instrument category (e.g. "cefi", "defi", "sports", "prediction").
+        asset_group: Instrument asset group (e.g. "cefi", "defi", "sports", "prediction").
         counterparty: OTC counterparty identifier.
         source_reference: External trade ID (exchange reference, broker confirmation).
     """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     instruction_id: str
     submitted_by: str
@@ -97,7 +99,10 @@ class ManualInstruction(BaseModel):
     client_id: str = ""
     strategy_id: str = ""
     portfolio_id: str = ""
-    category: str = ""
+    asset_group: str = Field(
+        default="",
+        description="Instrument asset group (cefi, defi, sports, prediction).",
+    )
     counterparty: str = ""
     source_reference: str = ""
 

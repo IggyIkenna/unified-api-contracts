@@ -208,7 +208,7 @@ def test_valid_dataframes_for_every_contract_return_no_violations() -> None:
     for contract, df in VALID_CASES:
         violations = validate_dataframe(df, contract)
         assert violations == [], (
-            f"expected no violations for ({contract.category},"
+            f"expected no violations for ({contract.asset_group},"
             f" {contract.instrument_type}, {contract.data_type}), "
             f"got {violations}"
         )
@@ -252,7 +252,7 @@ def test_low_row_count_reports_row_count_too_low() -> None:
 
 def test_null_rate_cap_exceeded_reports_null_rate_exceeded() -> None:
     contract = SchemaContract(
-        category="cefi",
+        asset_group="cefi",
         instrument_type="perpetual",
         data_type="trades",
         columns=[
@@ -277,7 +277,7 @@ def test_null_rate_cap_exceeded_reports_null_rate_exceeded() -> None:
 def test_contract_registry_lookup_cefi_perpetual_trades() -> None:
     contract = CONTRACT_REGISTRY[("cefi", "perpetual", "trades")]
     assert contract is CEFI_PERPETUAL_TRADES
-    assert contract.category == "cefi"
+    assert contract.asset_group == "cefi"
     assert contract.instrument_type == "perpetual"
     assert contract.data_type == "trades"
 
@@ -300,6 +300,9 @@ def test_contract_registry_covers_all_required_triples() -> None:
 
 def test_every_contract_requires_instrument_id_non_nullable_string() -> None:
     for contract in CONTRACT_REGISTRY.values():
+        if contract.asset_group == "sports":
+            # Sports reference/match shards key on league_id, fixture_id, etc.
+            continue
         id_specs = [c for c in contract.columns if c.name == "instrument_id"]
         assert len(id_specs) == 1, f"{contract.data_type} missing instrument_id spec"
         assert id_specs[0].dtype == "string"
@@ -325,6 +328,12 @@ def test_every_contract_declares_a_symbol_column() -> None:
         assert contract.symbol_column in declared or contract.symbol_column in {
             "symbol",
             "underlying",
+            "pool_id",
+            "market_id",
+            "token",
+            "fixture_id",
+            "condition_id",
+            "instrument_key",
         }, f"{key} symbol_column={contract.symbol_column} not in declared columns"
 
 
@@ -350,14 +359,14 @@ def test_cefi_chain_contracts_key_on_underlying() -> None:
 
 
 def test_lookup_contract_without_venue_resolves_base_registry() -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type="trades")
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type="trades")
     assert contract is CONTRACT_REGISTRY[("cefi", "perpetual", "trades")]
 
 
 def test_lookup_contract_with_venue_prefers_override() -> None:
     """Aave V3 override routes to the liquidity/borrow-index schema."""
     contract = lookup_contract(
-        category="defi",
+        asset_group="defi",
         instrument_type="a_token",
         data_type="lending_indices",
         venue="AAVE_V3",
@@ -368,7 +377,7 @@ def test_lookup_contract_with_venue_prefers_override() -> None:
 def test_lookup_contract_with_unknown_venue_falls_back_to_base() -> None:
     """Unknown venue falls back to the base (category, it, dt) registry."""
     contract = lookup_contract(
-        category="cefi",
+        asset_group="cefi",
         instrument_type="perpetual",
         data_type="trades",
         venue="NEW_VENUE_NOT_REGISTERED",
@@ -380,13 +389,13 @@ def test_lookup_contract_missing_raises_with_structured_details() -> None:
     """G3: a missing contract must raise — not warn — with routable details."""
     with pytest.raises(SchemaContractNotFoundError) as exc_info:
         lookup_contract(
-            category="defi",
+            asset_group="defi",
             instrument_type="unknown_type",
             data_type="unknown_dt",
             venue="UNKNOWN_VENUE",
         )
     details = exc_info.value.details
-    assert details["category"] == "defi"
+    assert details["asset_group"] == "defi"
     assert details["instrument_type"] == "unknown_type"
     assert details["data_type"] == "unknown_dt"
     assert details["venue"] == "UNKNOWN_VENUE"

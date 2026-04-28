@@ -10,7 +10,7 @@ Consumer repos import from here:
     )
 
 The ``InstructionValidator`` enforces stage-3b's 8-required-field contract
-plus the G1.8 ``ArchetypeCapability`` (category, instrument_type, venue)
+plus the G1.8 ``ArchetypeCapability`` (asset_group, instrument_type, venue)
 compatibility matrix. execution-service runs it as a pre-handler middleware
 on every incoming instruction; the Rule-10 ``integration_depth`` score it
 emits feeds the G1.6 pricing formula.

@@ -231,7 +231,7 @@ def _build(
     columns.append(_TIMEFRAME_COL)
     columns.extend(extra_cols)
     return SchemaContract(
-        category=category,  # type: ignore[arg-type]
+        asset_group=category,  # type: ignore[arg-type]
         instrument_type=instrument_type,
         data_type=data_type,
         columns=columns,
@@ -241,7 +241,7 @@ def _build(
 
 
 def _register(contract: SchemaContract) -> None:
-    CONTRACT_REGISTRY[(contract.category, contract.instrument_type, contract.data_type)] = contract
+    CONTRACT_REGISTRY[(contract.asset_group, contract.instrument_type, contract.data_type)] = contract
 
 
 # ---------------------------------------------------------------------------

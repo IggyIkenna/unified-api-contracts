@@ -88,7 +88,7 @@ class TestInstructionConstraints:
 class TestMarketDataCategories:
     def test_data_types_present(self, reference_data: dict) -> None:
         entries = reference_data["market_data_categories"]["entries"]
-        assert len(entries["data_types_by_category"]) > 0
+        assert len(entries["data_types_by_asset_group"]) > 0
 
     def test_timeframes_present(self, reference_data: dict) -> None:
         entries = reference_data["market_data_categories"]["entries"]
@@ -96,7 +96,7 @@ class TestMarketDataCategories:
 
     def test_venues_present(self, reference_data: dict) -> None:
         entries = reference_data["market_data_categories"]["entries"]
-        assert len(entries["venues_by_category"]) > 0
+        assert len(entries["venues_by_asset_group"]) > 0
 
 
 class TestVenueRateLimits:

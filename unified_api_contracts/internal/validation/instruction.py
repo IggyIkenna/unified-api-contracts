@@ -117,20 +117,23 @@ class LifecycleSemantic(StrEnum):
 
 
 class InstrumentVenueContext(BaseModel):
-    """§2.1 — unambiguous (instrument, venue, category, instrument_type)."""
+    """§2.1 — unambiguous (instrument, venue, asset_group, instrument_type).
 
-    model_config = ConfigDict(frozen=True, extra="forbid")
+    ``asset_group`` is the :class:`VenueCategoryV2` value (cefi / defi / tradfi / …).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid", populate_by_name=True)
 
     instrument_id: str
     venue: str
-    category: VenueCategoryV2
+    asset_group: VenueCategoryV2
     instrument_type: ArchetypeInstrumentType
     chain: str | None = None
 
     @model_validator(mode="after")
     def _chain_required_for_defi(self) -> InstrumentVenueContext:
-        if self.category == VenueCategoryV2.DEFI and not self.chain:
-            raise ValueError("chain required when category == DEFI")
+        if self.asset_group == VenueCategoryV2.DEFI and not self.chain:
+            raise ValueError("chain required when asset_group == DEFI")
         return self
 
 
@@ -327,7 +330,7 @@ class InstructionValidationResult(BaseModel):
     Two discriminated states:
 
     * ``ok=True`` — instruction is stage-3b-compliant + the
-      (category, instrument_type, venue) tuple is declared SUPPORTED
+      (asset_group, instrument_type, venue) tuple is declared SUPPORTED
       or PARTIAL by at least one ``ArchetypeCapability``.
       ``integration_depth`` ∈ [0, 1] is the Rule-10 pricing signal.
     * ``ok=False`` — one or more ``InstructionFieldError`` rows. The
@@ -469,7 +472,7 @@ class InstructionValidator:
         well-shaped :class:`ClientInstruction` and focuses on
         cross-field business rules:
 
-        1. Is the (category, instrument_type) pair declared SUPPORTED
+        1. Is the (asset_group, instrument_type) pair declared SUPPORTED
            or PARTIAL by any registered archetype?
         2. Is the chosen venue in any matching archetype's
            ``supported_venues``?
@@ -484,7 +487,7 @@ class InstructionValidator:
         ctx = instruction.instrument_venue_context
 
         matching = archetypes_for_pair(
-            ctx.category,
+            ctx.asset_group,
             ctx.instrument_type,
             include_partial=True,
         )
@@ -520,8 +523,8 @@ class InstructionValidator:
         if matching:
             return None
         return InstructionFieldError(
-            field="instrument_venue_context.category+instrument_type",
-            violation=(f"no registered archetype supports ({ctx.category.value}, {ctx.instrument_type.value})"),
+            field="instrument_venue_context.asset_group+instrument_type",
+            violation=(f"no registered archetype supports ({ctx.asset_group.value}, {ctx.instrument_type.value})"),
             allowed=_allowed_pairs_digest(),
             why=(
                 "UAC ArchetypeCapabilityRegistry has zero SUPPORTED or PARTIAL "
@@ -547,7 +550,7 @@ class InstructionValidator:
             field="instrument_venue_context.venue",
             violation=(
                 f"venue {ctx.venue!r} not in supported_venues for any "
-                f"archetype covering ({ctx.category.value}, "
+                f"archetype covering ({ctx.asset_group.value}, "
                 f"{ctx.instrument_type.value})"
             ),
             allowed=tuple(sorted(allowed_venues)),
@@ -597,7 +600,7 @@ class InstructionValidator:
 
 
 def _allowed_pairs_digest() -> tuple[str, ...]:
-    """Deterministic flat list of (category, instrument_type) pair names.
+    """Deterministic flat list of (asset_group, instrument_type) pair names.
 
     Used in error copy so clients see a concrete allowed-value hint
     without pulling the full manifest in. Non-exhaustive on purpose —

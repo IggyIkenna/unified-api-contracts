@@ -89,8 +89,8 @@ def get_valid_timeframes_for_data_type(data_type: str) -> list[str]:
     return [tf for tf in TIMEFRAMES if TIMEFRAME_SECONDS.get(tf, 0) >= base_seconds]
 
 
-# Data types per category
-DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
+# Data types per asset group
+DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     "cefi": [
         "trades",
         "book_snapshot_5",
@@ -148,8 +148,8 @@ DATA_TYPES_BY_CATEGORY: dict[str, list[str]] = {
     ],
 }
 
-# Venues per category
-VENUES_BY_CATEGORY: dict[str, list[str]] = {
+# Venues per asset group
+VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
     "cefi": [
         # Centralized exchanges (Tardis API)
         "BINANCE-SPOT",
@@ -235,11 +235,11 @@ VENUES_BY_CATEGORY: dict[str, list[str]] = {
     ],
 }
 
-# All supported data types (union of all categories)
-ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_CATEGORY.values() for dt in dts})
+# All supported data types (union of all asset groups)
+ALL_DATA_TYPES: list[str] = sorted({dt for dts in DATA_TYPES_BY_ASSET_GROUP.values() for dt in dts})
 
-# All supported venues (union of all categories)
-ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_CATEGORY.values() for v in vs})
+# All supported venues (union of all asset groups)
+ALL_VENUES: list[str] = sorted({v for vs in VENUES_BY_ASSET_GROUP.values() for v in vs})
 
 
 # --- Candle processing classification ---
@@ -296,9 +296,9 @@ def needs_candle_processing(data_type: str) -> bool:
     return NEEDS_CANDLE_PROCESSING.get(data_type, True)
 
 
-# --- Venue → Category reverse lookup ---
+# --- Venue → asset group reverse lookup ---
 
-VENUE_TO_CATEGORY: dict[str, str] = {venue: cat for cat, venues in VENUES_BY_CATEGORY.items() for venue in venues}
+VENUE_TO_ASSET_GROUP: dict[str, str] = {venue: ag for ag, venues in VENUES_BY_ASSET_GROUP.items() for venue in venues}
 
 
 # --- Feature-group → data_type mappings (SSOT for all feature services) ---
@@ -336,7 +336,7 @@ FEATURE_GROUP_DATA_TYPES: dict[str, str] = {
     "wedge_quality": "trades",
 }
 
-# Category-specific overrides (applied on top of FEATURE_GROUP_DATA_TYPES)
+# Asset-group-specific overrides (applied on top of FEATURE_GROUP_DATA_TYPES)
 FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
     "tradfi": {
         "microstructure": "tbbo",  # Top of Book for TradFi equities
@@ -367,32 +367,32 @@ FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
 }
 
 
-def resolve_data_type_for_feature_group(feature_group: str, category: str) -> str:
-    """Resolve the correct data type for a feature group in a given category.
+def resolve_data_type_for_feature_group(feature_group: str, asset_group: str) -> str:
+    """Resolve the correct data type for a feature group in a given asset group.
 
-    Uses FEATURE_GROUP_DATA_TYPES as base, with per-category overrides.
+    Uses FEATURE_GROUP_DATA_TYPES as base, with per-asset-group overrides.
     This is the SSOT — services should not hardcode data type mappings.
     """
-    cat_lower = category.lower()
-    overrides = FEATURE_GROUP_DATA_TYPE_OVERRIDES.get(cat_lower, {})
+    ag_lower = asset_group.lower()
+    overrides = FEATURE_GROUP_DATA_TYPE_OVERRIDES.get(ag_lower, {})
     if feature_group in overrides:
         return overrides[feature_group]
     return FEATURE_GROUP_DATA_TYPES.get(feature_group, "trades")
 
 
 def get_valid_data_types_for_venue(venue: str) -> list[str]:
-    """Return the valid data types for a venue based on its category.
+    """Return the valid data types for a venue based on its asset group.
 
-    Looks up the venue's category, then returns the data types for that category.
+    Looks up the venue's asset group, then returns the data types for that group.
     """
-    cat = VENUE_TO_CATEGORY.get(venue, "")
-    return DATA_TYPES_BY_CATEGORY.get(cat, [])
+    ag = VENUE_TO_ASSET_GROUP.get(venue, "")
+    return DATA_TYPES_BY_ASSET_GROUP.get(ag, [])
 
 
 def validate_data_type_for_venue(venue: str, data_type: str) -> bool:
     """Check if a data type is valid for a venue.
 
-    Returns True if the data type is in the venue's category's allowed data types.
+    Returns True if the data type is in the venue's asset group's allowed data types.
     Returns True for unknown venues (permissive — validation is advisory).
     """
     valid = get_valid_data_types_for_venue(venue)
@@ -406,8 +406,8 @@ def validate_data_type_for_venue(venue: str, data_type: str) -> bool:
 # Used by MTDS for shard-level skip logic and deployment UI for multi-dimensional status.
 #
 # Structure: {venue: {data_type: start_date_YYYY_MM_DD}}
-# Default rule: if a venue is NOT in this dict, fall back to category-level
-# DATA_TYPES_BY_CATEGORY with VenueMapping.venue_start_dates as the start date.
+# Default rule: if a venue is NOT in this dict, fall back to asset-group-level
+# DATA_TYPES_BY_ASSET_GROUP with VenueMapping.venue_start_dates as the start date.
 # Only venues with non-default data type availability need explicit entries.
 #
 # ── MVP Data Type Overrides ──

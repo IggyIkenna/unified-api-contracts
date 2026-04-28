@@ -166,6 +166,7 @@ class TestHumanReadableUnderlyingG9:
 _HANDLER_CONTRACT_KEYS: list[tuple[str | None, str, str]] = [
     # Lending indices
     ("AAVE_V3", "a_token", "lending_indices"),
+    ("AAVE_V3", "debt_token", "lending_indices"),
     ("COMPOUND_V3", "a_token", "lending_indices"),
     ("MORPHO", "lending", "lending_indices"),
     ("SPARK", "lending", "lending_indices"),
@@ -192,6 +193,7 @@ _HANDLER_CONTRACT_KEYS: list[tuple[str | None, str, str]] = [
     (None, "perpetual", "perp_funding"),
     ("EIGENLAYER", "staking", "eigenlayer_rewards"),
     (None, "staking", "yield_snapshots"),
+    ("ETHENA", "yield_bearing", "yield_snapshots"),
 ]
 
 
@@ -207,13 +209,13 @@ class TestDefiContractRegistryCoverageG9:
         self, venue: str | None, instrument_type: str, data_type: str
     ) -> None:
         contract = lookup_contract(
-            category="defi",
+            asset_group="defi",
             instrument_type=instrument_type,
             data_type=data_type,
             venue=venue,
         )
         assert contract is not None
-        assert contract.category == "defi"
+        assert contract.asset_group == "defi"
         assert contract.instrument_type == instrument_type
         assert contract.data_type == data_type
         # symbol_column is what migrate_defi_canonical reads from each row —
@@ -223,7 +225,7 @@ class TestDefiContractRegistryCoverageG9:
     def test_unknown_handler_key_raises_not_silent_miss(self) -> None:
         with pytest.raises(SchemaContractNotFoundError) as exc_info:
             lookup_contract(
-                category="defi",
+                asset_group="defi",
                 instrument_type="pool",
                 data_type="this_data_type_does_not_exist_xyz",
             )

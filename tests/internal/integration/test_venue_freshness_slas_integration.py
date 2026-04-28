@@ -15,10 +15,10 @@ class TestDomainReExports:
             get_slas_by_category,
         )
 
-        assert len(VENUE_FRESHNESS_SLAS) == 32
+        assert len(VENUE_FRESHNESS_SLAS) == 31
         assert VenueCategory.CEFI.value == "cefi"
         assert isinstance(get_sla_for_venue("binance"), VenueFreshnessSLA)
-        assert len(get_slas_by_category(VenueCategory.DEFI)) == 14
+        assert len(get_slas_by_category(VenueCategory.DEFI)) == 13
 
     def test_import_from_data_quality(self) -> None:
         from unified_api_contracts.internal.domain.data_quality import (

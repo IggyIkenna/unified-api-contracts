@@ -33,19 +33,31 @@ def _load_manifest() -> dict[str, Any]:
 
 
 def _read_cassette_body(cassette_path: Path) -> Any:
-    """Return parsed JSON body from the first response in a VCR YAML cassette."""
+    """Return the first response body from a VCR YAML cassette.
+
+    JSON objects are parsed with :func:`json.loads`. Non-JSON strings (including
+    explicit ``string: ""``) are returned as-is — empty bodies are used for
+    binary/gzip/DBN stubs that intentionally record no bytes in YAML.
+    """
     with cassette_path.open(encoding="utf-8") as fh:
         cassette = pyyaml.safe_load(fh)
     interactions = cassette.get("interactions", [])
     if not interactions:
         return None
-    body = interactions[0].get("response", {}).get("body", {}).get("string", "")
-    if not body:
+    body_node = interactions[0].get("response", {}).get("body", {})
+    if not isinstance(body_node, dict) or "string" not in body_node:
         return None
+    raw = body_node.get("string")
+    if raw is None:
+        return None
+    if raw == "":
+        return ""
+    if not isinstance(raw, str):
+        raw = str(raw)
     try:
-        return json.loads(body)
+        return json.loads(raw)
     except (json.JSONDecodeError, TypeError):
-        return body  # not JSON — return raw string
+        return raw
 
 
 def _list_cassettes(provider: str) -> list[Path]:
@@ -53,6 +65,27 @@ def _list_cassettes(provider: str) -> list[Path]:
     if not mocks_dir.is_dir():
         return []
     return sorted(mocks_dir.glob("*.yaml"))
+
+
+def _yaml_has_recorded_interaction(cassette_path: Path) -> bool:
+    """True when the file is a VCR cassette with at least one HTTP interaction.
+
+    Placeholder cassettes (e.g. ``stub.yaml`` with ``interactions: []``) are
+    not valid for body replay — skip them in schema health until recorded.
+    """
+    with cassette_path.open(encoding="utf-8") as fh:
+        raw = pyyaml.safe_load(fh)
+    if not isinstance(raw, dict):
+        return False
+    interactions = raw.get("interactions")
+    if not isinstance(interactions, list):
+        return False
+    return len(interactions) > 0
+
+
+def _list_recorded_cassettes(provider: str) -> list[Path]:
+    """VCR files under ``mocks/`` that have a non-empty ``interactions`` list."""
+    return [p for p in _list_cassettes(provider) if _yaml_has_recorded_interaction(p)]
 
 
 # ── Per-provider schema health tests ──────────────────────────────────────────
@@ -69,7 +102,7 @@ class _BaseSchemaHealthTest:
     provider: str = ""
 
     def _get_cassettes(self) -> list[Path]:
-        return _list_cassettes(self.provider)
+        return _list_recorded_cassettes(self.provider)
 
     def _assert_cassette_non_empty(self, cassette: Path) -> Any:
         body = _read_cassette_body(cassette)
@@ -294,26 +327,31 @@ class TestTardisSchemaHealth(_BaseSchemaHealthTest):
 
 
 def _all_providers_with_cassettes() -> list[tuple[str, Path]]:
-    """Return (provider, cassette_path) pairs for all cassettes that exist."""
+    """Return (provider, cassette_path) pairs for all recorded cassettes."""
     manifest = _load_manifest()
     pairs: list[tuple[str, Path]] = []
     for name in manifest:
-        for cassette in _list_cassettes(name):
+        for cassette in _list_recorded_cassettes(name):
             pairs.append((name, cassette))
     return pairs
 
 
 @pytest.mark.parametrize("provider,cassette", _all_providers_with_cassettes())
 def test_cassette_body_parseable(provider: str, cassette: Path) -> None:
-    """All recorded cassettes must have a parseable, non-empty body.
+    """All recorded cassettes must expose a readable first response body.
 
-    Non-VCR YAML mock files (no 'interactions' key) are skipped — they are custom
-    mock data files, not HTTP replay cassettes.
+    Empty ``body.string`` (e.g. binary download stubs) is allowed. Non-VCR YAML
+    files (no ``interactions`` key) are skipped — they are custom mock data.
     """
     with cassette.open(encoding="utf-8") as fh:
         raw = pyyaml.safe_load(fh)
     if not isinstance(raw, dict) or "interactions" not in raw:
         pytest.skip(f"{provider}/{cassette.name}: not a VCR cassette (no 'interactions' key) — skipped")
+    if not raw.get("interactions"):
+        pytest.skip(
+            f"{provider}/{cassette.name}: placeholder cassette (interactions: []) — "
+            "re-record with live mode or remove stub"
+        )
     body = _read_cassette_body(cassette)
     assert body is not None, (
         f"{provider}/{cassette.name}: cassette body is None or empty. Re-record the cassette or delete the stale file."

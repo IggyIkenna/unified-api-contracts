@@ -32,7 +32,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 # migration pipeline resolve to a contract that points to the column the
 # row actually has, without silent fallback.
 DEFI_UNISWAP_POOL_STATE_LEGACY = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_state",
     columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
@@ -41,7 +41,7 @@ DEFI_UNISWAP_POOL_STATE_LEGACY = SchemaContract(
 )
 
 DEFI_UNISWAP_POOL_SWAPS_LEGACY = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_swaps",
     columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
@@ -52,7 +52,7 @@ DEFI_UNISWAP_POOL_SWAPS_LEGACY = SchemaContract(
 # Uniswap V3/V4/Curve/Balancer legacy rows carry the pool hex under
 # ``pool_address``. Uniswap V2 uses the older ``pair_address`` naming.
 DEFI_UNISWAP_V2_POOL_STATE_LEGACY = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_state",
     columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
@@ -60,7 +60,7 @@ DEFI_UNISWAP_V2_POOL_STATE_LEGACY = SchemaContract(
     required_row_count_min=1,
 )
 DEFI_UNISWAP_V2_POOL_SWAPS_LEGACY = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_swaps",
     columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
@@ -79,7 +79,7 @@ VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V2", "pool", "dex_pool_swaps")] = DEF
 # ``pool_address`` like V3). Separate override keeps V3/V4 in sync with
 # their actual writer grammars.
 DEFI_UNISWAP_V4_POOL_STATE_LEGACY = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_state",
     columns=list(DEFI_DEX_POOL_DEX_POOL_STATE.columns),
@@ -87,7 +87,7 @@ DEFI_UNISWAP_V4_POOL_STATE_LEGACY = SchemaContract(
     required_row_count_min=1,
 )
 DEFI_UNISWAP_V4_POOL_SWAPS_LEGACY = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_swaps",
     columns=list(DEFI_POOL_DEX_POOL_SWAPS.columns),
@@ -102,7 +102,7 @@ VENUE_CONTRACT_OVERRIDES[("defi", "UNISWAP_V4", "pool", "dex_pool_swaps")] = DEF
 # borrow), utilization %, and risk parameters (LTV, liquidation threshold,
 # reserve factor). All keyed per-asset symbol (USDC, WETH, …).
 DEFI_A_TOKEN_ORACLE_PRICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="a_token",
     data_type="oracle_prices",
     columns=[
@@ -117,7 +117,7 @@ DEFI_A_TOKEN_ORACLE_PRICES = SchemaContract(
 )
 
 DEFI_A_TOKEN_RATE_INDICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="a_token",
     data_type="rate_indices",
     columns=[
@@ -133,7 +133,7 @@ DEFI_A_TOKEN_RATE_INDICES = SchemaContract(
 )
 
 DEFI_A_TOKEN_RISK_PARAMS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="a_token",
     data_type="risk_params",
     columns=[
@@ -150,7 +150,7 @@ DEFI_A_TOKEN_RISK_PARAMS = SchemaContract(
 )
 
 DEFI_A_TOKEN_UTILIZATION = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="a_token",
     data_type="utilization",
     columns=[
@@ -167,7 +167,7 @@ DEFI_A_TOKEN_UTILIZATION = SchemaContract(
 # Morpho (generic lending) reserve datasets — same shape as a_token variants
 # but routed under instrument_type=lending per the live handler convention.
 DEFI_LENDING_RATE_INDICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="rate_indices",
     columns=[
@@ -183,7 +183,7 @@ DEFI_LENDING_RATE_INDICES = SchemaContract(
 )
 
 DEFI_LENDING_UTILIZATION = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="utilization",
     columns=[
@@ -203,7 +203,7 @@ DEFI_LENDING_UTILIZATION = SchemaContract(
 # ``instrument_key``. Keep ``token`` as the canonical default; add a
 # venue override for ETHENA.
 DEFI_LST_ORACLE_PRICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lst",
     data_type="oracle_prices",
     columns=[
@@ -218,7 +218,7 @@ DEFI_LST_ORACLE_PRICES = SchemaContract(
 )
 
 DEFI_LST_ORACLE_PRICES_ETHENA = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lst",
     data_type="oracle_prices",
     columns=list(DEFI_LST_ORACLE_PRICES.columns),
@@ -227,7 +227,7 @@ DEFI_LST_ORACLE_PRICES_ETHENA = SchemaContract(
 )
 
 DEFI_LST_REWARDS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lst",
     data_type="rewards",
     columns=[

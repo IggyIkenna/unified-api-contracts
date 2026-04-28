@@ -32,7 +32,7 @@ def test_sports_odds_trades_registered_in_contract_registry() -> None:
 
 
 def test_sports_odds_trades_lookup_returns_contract() -> None:
-    contract = lookup_contract(category="sports", instrument_type="odds", data_type="trades")
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type="trades")
     assert contract is SPORTS_ODDS_TRADES
 
 
@@ -115,7 +115,7 @@ def test_prediction_market_trades_registered_in_contract_registry() -> None:
 
 def test_prediction_market_trades_lookup_returns_contract() -> None:
     contract = lookup_contract(
-        category="prediction",
+        asset_group="prediction",
         instrument_type="prediction_market",
         data_type="trades",
     )
@@ -240,7 +240,7 @@ def test_prediction_book_snapshot_registered() -> None:
     key = ("prediction", "prediction_market", "book_snapshot")
     assert key in CONTRACT_REGISTRY
     assert CONTRACT_REGISTRY[key] is PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
-    resolved = lookup_contract(category="prediction", instrument_type="prediction_market", data_type="book_snapshot")
+    resolved = lookup_contract(asset_group="prediction", instrument_type="prediction_market", data_type="book_snapshot")
     assert resolved is PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
     # condition_id is the canonical identifier (matches trades contract).
     assert resolved.symbol_column == "condition_id"
@@ -259,7 +259,11 @@ def test_prediction_market_metadata_registered() -> None:
 
     key = ("prediction", "prediction_market", "market_metadata")
     assert key in CONTRACT_REGISTRY
-    resolved = lookup_contract(category="prediction", instrument_type="prediction_market", data_type="market_metadata")
+    resolved = lookup_contract(
+        asset_group="prediction",
+        instrument_type="prediction_market",
+        data_type="market_metadata",
+    )
     assert resolved is PREDICTION_PREDICTION_MARKET_METADATA
     assert resolved.symbol_column == "condition_id"
     names = {c.name for c in resolved.columns}
@@ -277,7 +281,7 @@ def test_prediction_market_fills_registered() -> None:
 
     key = ("prediction", "prediction_market", "fills")
     assert key in CONTRACT_REGISTRY
-    resolved = lookup_contract(category="prediction", instrument_type="prediction_market", data_type="fills")
+    resolved = lookup_contract(asset_group="prediction", instrument_type="prediction_market", data_type="fills")
     assert resolved is PREDICTION_PREDICTION_MARKET_FILLS
     assert resolved.symbol_column == "condition_id"
     names = {c.name for c in resolved.columns}

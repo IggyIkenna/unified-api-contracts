@@ -410,7 +410,6 @@ class TestSymbolNormalizationParity:
             ("okx", "BTC-USDT-SWAP", "BTC-USDT-PERP"),
             ("deribit", "BTC-PERPETUAL", "BTC-PERP"),
             ("hyperliquid", "BTC", "BTC-USDC-PERP"),
-            ("kraken", "XXBTZUSD", "BTC-USD"),
             ("dydx", "BTC-USD", "BTC-USD-PERP"),
             ("coinbase", "BTC-USD", "BTC-USD"),
         ],

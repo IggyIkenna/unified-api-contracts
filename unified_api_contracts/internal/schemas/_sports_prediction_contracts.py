@@ -49,7 +49,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 # ---------------------------------------------------------------------------
 
 SPORTS_ODDS_TRADES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="odds",
     data_type="trades",
     columns=[
@@ -99,7 +99,7 @@ SPORTS_ODDS_TRADES = SchemaContract(
 # ---------------------------------------------------------------------------
 
 PREDICTION_PREDICTION_MARKET_TRADES = SchemaContract(
-    category="prediction",
+    asset_group="prediction",
     instrument_type="prediction_market",
     data_type="trades",
     columns=[
@@ -196,7 +196,7 @@ PREDICTION_PREDICTION_MARKET_TRADES = SchemaContract(
 _SNAPSHOT_VENUES = frozenset({"BETFAIR", "MATCHBOOK", "ODDS_API", "PINNACLE_AS_LINE"})
 
 SPORTS_ODDS_SNAPSHOT = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="odds",
     data_type="sports_odds_snapshot",
     columns=[
@@ -236,7 +236,7 @@ SPORTS_ODDS_SNAPSHOT = SchemaContract(
 )
 
 SPORTS_ODDS_MOVEMENT = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="odds",
     data_type="sports_odds_movement",
     columns=[
@@ -260,7 +260,7 @@ SPORTS_ODDS_MOVEMENT = SchemaContract(
 # Cross-venue arbitrage opportunities — ``venue`` and ``instrument_id`` carry
 # a composite ``<LEG_A_VENUE>_VS_<LEG_B_VENUE>`` label. Not venue-scoped.
 SPORTS_ODDS_ARBITRAGE = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="odds",
     data_type="sports_arbitrage",
     columns=[
@@ -307,7 +307,7 @@ SPORTS_ODDS_ARBITRAGE = SchemaContract(
 
 
 PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT = SchemaContract(
-    category="prediction",
+    asset_group="prediction",
     instrument_type="prediction_market",
     data_type="book_snapshot",
     columns=[
@@ -377,7 +377,7 @@ PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT = SchemaContract(
 
 
 PREDICTION_PREDICTION_MARKET_METADATA = SchemaContract(
-    category="prediction",
+    asset_group="prediction",
     instrument_type="prediction_market",
     data_type="market_metadata",
     columns=[
@@ -459,7 +459,7 @@ PREDICTION_PREDICTION_MARKET_METADATA = SchemaContract(
 
 
 PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
-    category="prediction",
+    asset_group="prediction",
     instrument_type="prediction_market",
     data_type="fills",
     columns=[

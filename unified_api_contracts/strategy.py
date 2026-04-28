@@ -107,6 +107,18 @@ from unified_api_contracts.internal.domain.strategy_service.registry import (
     StrategyRegistry,
     validate_mode_for_category,
 )
+from unified_api_contracts.internal.domain.strategy_service.subscription import (
+    ExclusiveLockViolation,
+    StrategyInstanceSubscription,
+    SubscriptionType,
+)
+from unified_api_contracts.internal.domain.strategy_service.versions import (
+    ApprovalRecord,
+    ConfigDiff,
+    StrategyVersion,
+    VersionStatus,
+    minimum_approval_maturity,
+)
 
 __all__ = [
     "ARCHETYPE_CAPABILITY_REGISTRY",
@@ -115,6 +127,7 @@ __all__ = [
     "SERVICE_FAMILY_SCOPE_RULES",
     "STRATEGY_REGISTRY",
     "AccessDecision",
+    "ApprovalRecord",
     "ArchetypeCapability",
     "ArchetypeCapabilityCell",
     "ArchetypeInstrumentType",
@@ -126,12 +139,14 @@ __all__ = [
     "ClientRegistry",
     "Combo",
     "CommercialPath",
+    "ConfigDiff",
     "CoverageStatus",
     "DemoFlavour",
     "DemoUniverse",
     "DenialReason",
     "DimensionQuery",
     "Env",
+    "ExclusiveLockViolation",
     "ExecutionMode",
     "IntegrationDepth",
     "InternalCostLeakageError",
@@ -163,9 +178,13 @@ __all__ = [
     "StrategyArchetype",
     "StrategyDefinition",
     "StrategyFamily",
+    "StrategyInstanceSubscription",
     "StrategyRegistry",
+    "StrategyVersion",
+    "SubscriptionType",
     "TileLockState",
     "UserContext",
+    "VersionStatus",
     "access_control",
     "all_capabilities",
     "allocator_access_control",
@@ -178,6 +197,7 @@ __all__ = [
     "demo_universe",
     "format_strategy_id",
     "known_persona_ids",
+    "minimum_approval_maturity",
     "parse_strategy_id",
     "prod_restrictions",
     "resolve_profile",

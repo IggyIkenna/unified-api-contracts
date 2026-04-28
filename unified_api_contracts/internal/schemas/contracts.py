@@ -1,4 +1,4 @@
-"""Declarative per-(category, instrument_type, data_type) dataframe schema contracts.
+"""Declarative per-(asset_group, instrument_type, data_type) dataframe schema contracts.
 
 Phase 1.3 of data_canonicalisation_mvp_2026_04_17, expanded under gates G3+G7
 (zero silent drops + typed SchemaContract lookup on every read/migration).
@@ -12,11 +12,11 @@ must use to extract the per-row instrument symbol. Row-count floors can be
 enforced as a basic sanity gate.
 
 Downstream services look up the canonical contract from
-:data:`CONTRACT_REGISTRY` using the ``(category, instrument_type, data_type)``
+:data:`CONTRACT_REGISTRY` using the ``(asset_group, instrument_type, data_type)``
 tuple. For venue/protocol-specific schemas (e.g. Aave V3's
 ``liquidity_index``/``variable_borrow_index`` vs Compound V3's ``supply_rate``)
 use :func:`lookup_contract` which consults :data:`VENUE_CONTRACT_OVERRIDES`
-first and falls back to the base registry. New (category, instrument_type,
+first and falls back to the base registry. New (asset_group, instrument_type,
 data_type) triples are added by appending to the module-level contract
 constants and the registry below — this module is the single source of truth.
 """
@@ -42,14 +42,14 @@ DtypeLiteral = Literal[
     "decimal",
 ]
 
-CategoryLiteral = Literal[
+AssetGroupLiteral = Literal[
     "cefi",
     "tradfi",
     "defi",
     "sports",
     "prediction",
     "onchain",
-    # Meta-categories for manifest-only contracts (Phase 5d.1).
+    # Meta-dimensions for manifest-only contracts (Phase 5d.1).
     "ml_training",
     "ml_inference",
 ]
@@ -90,7 +90,7 @@ class ColumnSpec(BaseModel):
 
 
 class SchemaContract(BaseModel):
-    """Declarative contract for a per-(category, instrument_type, data_type) dataframe.
+    """Declarative contract for a per-(asset_group, instrument_type, data_type) dataframe.
 
     The ``symbol_column`` field names the column that per-row migration /
     read pipelines must consult to extract the instrument symbol for partition
@@ -102,7 +102,7 @@ class SchemaContract(BaseModel):
 
     model_config = ConfigDict(frozen=True)
 
-    category: CategoryLiteral
+    asset_group: AssetGroupLiteral
     instrument_type: str
     data_type: str
     columns: list[ColumnSpec]
@@ -180,7 +180,7 @@ CHAIN_COL = _CHAIN
 # ---------------------------------------------------------------------------
 
 CEFI_PERPETUAL_TRADES = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="trades",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE, _SIZE, _SIDE],
@@ -189,7 +189,7 @@ CEFI_PERPETUAL_TRADES = SchemaContract(
 )
 
 CEFI_PERPETUAL_BOOK_SNAPSHOT_5 = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="book_snapshot_5",
     columns=[
@@ -214,7 +214,7 @@ CEFI_PERPETUAL_BOOK_SNAPSHOT_5 = SchemaContract(
 )
 
 CEFI_PERPETUAL_DERIVATIVE_TICKER = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="derivative_ticker",
     columns=[
@@ -231,7 +231,7 @@ CEFI_PERPETUAL_DERIVATIVE_TICKER = SchemaContract(
 )
 
 CEFI_PERPETUAL_LIQUIDATIONS = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="liquidations",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE, _SIZE, _SIDE],
@@ -240,7 +240,7 @@ CEFI_PERPETUAL_LIQUIDATIONS = SchemaContract(
 )
 
 CEFI_PERPETUAL_QUOTES = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="quotes",
     columns=[
@@ -257,7 +257,7 @@ CEFI_PERPETUAL_QUOTES = SchemaContract(
 )
 
 CEFI_SPOT_PAIR_TRADES = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="spot_pair",
     data_type="trades",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE, _SIZE, _SIDE],
@@ -266,7 +266,7 @@ CEFI_SPOT_PAIR_TRADES = SchemaContract(
 )
 
 CEFI_SPOT_PAIR_BOOK_SNAPSHOT_5 = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="spot_pair",
     data_type="book_snapshot_5",
     columns=[
@@ -281,7 +281,7 @@ CEFI_SPOT_PAIR_BOOK_SNAPSHOT_5 = SchemaContract(
 )
 
 CEFI_OPTIONS_CHAIN_TRADES = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="options_chain",
     data_type="trades",
     columns=[
@@ -300,7 +300,7 @@ CEFI_OPTIONS_CHAIN_TRADES = SchemaContract(
 )
 
 CEFI_FUTURES_CHAIN_TRADES = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="futures_chain",
     data_type="trades",
     columns=[
@@ -326,7 +326,7 @@ CEFI_FUTURES_CHAIN_TRADES = SchemaContract(
 # ---------------------------------------------------------------------------
 
 TRADFI_FUTURE_TRADES = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="future",
     data_type="trades",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE, _SIZE],
@@ -335,7 +335,7 @@ TRADFI_FUTURE_TRADES = SchemaContract(
 )
 
 TRADFI_OPTIONS_CHAIN_TRADES = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="options_chain",
     data_type="trades",
     columns=[
@@ -353,7 +353,7 @@ TRADFI_OPTIONS_CHAIN_TRADES = SchemaContract(
 )
 
 TRADFI_EQUITY_TRADES = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="equity",
     data_type="trades",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE, _SIZE],
@@ -362,7 +362,7 @@ TRADFI_EQUITY_TRADES = SchemaContract(
 )
 
 TRADFI_INDEX_TRADES = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="index",
     data_type="trades",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE],
@@ -376,7 +376,7 @@ TRADFI_INDEX_TRADES = SchemaContract(
 # leg-combo string (``ESH0-ESM0``); canonical ``instrument_id`` is built
 # upstream via MultiLegInstrument.
 TRADFI_COMBO_TRADES = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="combo",
     data_type="trades",
     columns=[_INSTRUMENT_ID, _SYMBOL, _TS_EVENT, _PRICE],
@@ -385,7 +385,7 @@ TRADFI_COMBO_TRADES = SchemaContract(
 )
 
 TRADFI_FUTURE_OHLCV_1M = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="future",
     data_type="ohlcv_1m",
     columns=[
@@ -403,7 +403,7 @@ TRADFI_FUTURE_OHLCV_1M = SchemaContract(
 )
 
 TRADFI_EQUITY_OHLCV_1M = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="equity",
     data_type="ohlcv_1m",
     columns=[
@@ -437,7 +437,7 @@ TRADFI_EQUITY_OHLCV_1M = SchemaContract(
 
 # lending_position lending_indices — generic shape (supply_index + borrow_index).
 DEFI_LENDING_POSITION_LENDING_INDICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending_position",
     data_type="lending_indices",
     columns=[
@@ -455,7 +455,7 @@ DEFI_LENDING_POSITION_LENDING_INDICES = SchemaContract(
 # Aave V3 emits liquidityIndex/variableBorrowIndex naming; canonicalise via the
 # protocol-specific contract below. ``symbol`` is the aToken symbol (aUSDC).
 DEFI_AAVE_V3_LENDING_INDICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="a_token",
     data_type="lending_indices",
     columns=[
@@ -473,7 +473,7 @@ DEFI_AAVE_V3_LENDING_INDICES = SchemaContract(
 # Generic lending (Compound V3, Morpho, Spark, Fluid, Instadapp) — row-level
 # column is the asset/market identifier.
 DEFI_LENDING_INDICES_MARKET_ID = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="lending_indices",
     columns=[
@@ -489,7 +489,7 @@ DEFI_LENDING_INDICES_MARKET_ID = SchemaContract(
 )
 
 DEFI_LENDING_LIQUIDATIONS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lending",
     data_type="liquidations",
     columns=[
@@ -512,7 +512,7 @@ DEFI_LENDING_LIQUIDATIONS = SchemaContract(
 # Uniswap V2/V3/V4, Curve, Balancer — pool-scoped rows use ``pool_id`` as the
 # canonical row symbol. ``dex_pool_state`` carries liquidity/price snapshots.
 DEFI_DEX_POOL_DEX_POOL_STATE = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_state",
     columns=[
@@ -533,7 +533,7 @@ DEFI_DEX_POOL_DEX_POOL_STATE = SchemaContract(
 )
 
 DEFI_DEX_POOL_DEX_POOL_SWAPS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="dex_pool",
     data_type="dex_pool_swaps",
     columns=[
@@ -552,7 +552,7 @@ DEFI_DEX_POOL_DEX_POOL_SWAPS = SchemaContract(
 # Pool-variant swap dataset (instrument_type=pool used by the evm_defi handler
 # and dex_pools_handler for historical swaps snapshots).
 DEFI_POOL_DEX_POOL_SWAPS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="pool",
     data_type="dex_pool_swaps",
     columns=[
@@ -570,7 +570,7 @@ DEFI_POOL_DEX_POOL_SWAPS = SchemaContract(
 
 # Lido / EtherFi / Ethena LST: per-row ``symbol`` is the LST token ticker.
 DEFI_LST_LST_RATES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="lst",
     data_type="lst_rates",
     columns=[
@@ -585,7 +585,7 @@ DEFI_LST_LST_RATES = SchemaContract(
 )
 
 DEFI_SPOT_ASSET_GAS_FEES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="spot_asset",
     data_type="gas_fees",
     columns=[
@@ -601,7 +601,7 @@ DEFI_SPOT_ASSET_GAS_FEES = SchemaContract(
 )
 
 DEFI_SPOT_ASSET_ORACLE_PRICES = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="spot_asset",
     data_type="oracle_prices",
     columns=[
@@ -616,7 +616,7 @@ DEFI_SPOT_ASSET_ORACLE_PRICES = SchemaContract(
 )
 
 DEFI_PERPETUAL_PERP_FUNDING = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="perpetual",
     data_type="perp_funding",
     columns=[
@@ -631,7 +631,7 @@ DEFI_PERPETUAL_PERP_FUNDING = SchemaContract(
 )
 
 DEFI_STAKING_EIGENLAYER_REWARDS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="staking",
     data_type="eigenlayer_rewards",
     columns=[
@@ -646,7 +646,7 @@ DEFI_STAKING_EIGENLAYER_REWARDS = SchemaContract(
 )
 
 DEFI_STAKING_YIELD_SNAPSHOTS = SchemaContract(
-    category="defi",
+    asset_group="defi",
     instrument_type="staking",
     data_type="yield_snapshots",
     columns=[
@@ -706,7 +706,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
 }
 
 
-# Venue/protocol-specific overrides. Keyed by ``(category, venue, instrument_type,
+# Venue/protocol-specific overrides. Keyed by ``(asset_group, venue, instrument_type,
 # data_type)``. Aave V3 and Compound V3 both emit ``lending_indices`` but with
 # different column vocabularies — the override lets migration + read paths
 # resolve the precise schema by venue without guessing.
@@ -753,17 +753,17 @@ class SchemaContractNotFoundError(LookupError):
     def __init__(
         self,
         *,
-        category: str,
+        asset_group: str,
         instrument_type: str,
         data_type: str,
         venue: str | None,
     ) -> None:
-        self.category = category
+        self.asset_group = asset_group
         self.instrument_type = instrument_type
         self.data_type = data_type
         self.venue = venue
         msg = (
-            f"No SchemaContract registered for category={category!r} "
+            f"No SchemaContract registered for asset_group={asset_group!r} "
             f"instrument_type={instrument_type!r} data_type={data_type!r} "
             f"venue={venue!r}. Add a contract to "
             f"unified_api_contracts.internal.schemas.contracts.CONTRACT_REGISTRY "
@@ -776,7 +776,7 @@ class SchemaContractNotFoundError(LookupError):
     def details(self) -> dict[str, str]:
         """Structured fields suitable for ``log_event(details=...)``."""
         return {
-            "category": self.category,
+            "asset_group": self.asset_group,
             "instrument_type": self.instrument_type,
             "data_type": self.data_type,
             "venue": self.venue or "",
@@ -785,7 +785,7 @@ class SchemaContractNotFoundError(LookupError):
 
 def lookup_contract(
     *,
-    category: str,
+    asset_group: str,
     instrument_type: str,
     data_type: str,
     venue: str | None = None,
@@ -793,9 +793,9 @@ def lookup_contract(
     """Return the canonical :class:`SchemaContract` for a shard key.
 
     Resolution order:
-        1. ``VENUE_CONTRACT_OVERRIDES[(category, venue.upper(), instrument_type, data_type)]``
+        1. ``VENUE_CONTRACT_OVERRIDES[(asset_group, venue.upper(), instrument_type, data_type)]``
            — only consulted when ``venue`` is supplied.
-        2. ``CONTRACT_REGISTRY[(category, instrument_type, data_type)]``.
+        2. ``CONTRACT_REGISTRY[(asset_group, instrument_type, data_type)]``.
 
     Raises:
         SchemaContractNotFoundError: If neither lookup resolves. Callers are
@@ -803,15 +803,15 @@ def lookup_contract(
             equivalent) and re-raise; G3 forbids silent fallback.
     """
     if venue is not None:
-        key_v = (category, venue.upper(), instrument_type, data_type)
+        key_v = (asset_group, venue.upper(), instrument_type, data_type)
         contract = VENUE_CONTRACT_OVERRIDES.get(key_v)
         if contract is not None:
             return contract
-    key = (category, instrument_type, data_type)
+    key = (asset_group, instrument_type, data_type)
     contract = CONTRACT_REGISTRY.get(key)
     if contract is None:
         raise SchemaContractNotFoundError(
-            category=category,
+            asset_group=asset_group,
             instrument_type=instrument_type,
             data_type=data_type,
             venue=venue,
@@ -835,6 +835,9 @@ from unified_api_contracts.internal.schemas import _snapshot_contracts as _snaps
 from unified_api_contracts.internal.schemas import _sports_contracts as _sports_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _sports_derived_contracts as _sports_derived_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _sports_match_contracts as _sports_match_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_DEBT_TOKEN_LENDING_INDICES as DEFI_DEBT_TOKEN_LENDING_INDICES,
+)
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
     DEFI_LENDING_FLASH_LOAN_EVENTS as DEFI_LENDING_FLASH_LOAN_EVENTS,
 )
@@ -864,6 +867,9 @@ from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa:
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
     DEFI_STAKING_STAKING_YIELDS as DEFI_STAKING_STAKING_YIELDS,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+    DEFI_YIELD_BEARING_YIELD_SNAPSHOTS as DEFI_YIELD_BEARING_YIELD_SNAPSHOTS,
 )
 from unified_api_contracts.internal.schemas._ml_training_contract import (  # noqa: E402
     ML_TRAINING_MANIFEST as ML_TRAINING_MANIFEST,
@@ -957,6 +963,7 @@ __all__ = [
     "CEFI_SPOT_PAIR_TRADES",
     "CONTRACT_REGISTRY",
     "DEFI_AAVE_V3_LENDING_INDICES",
+    "DEFI_DEBT_TOKEN_LENDING_INDICES",
     "DEFI_DEX_POOL_DEX_POOL_STATE",
     "DEFI_DEX_POOL_DEX_POOL_SWAPS",
     "DEFI_LENDING_FLASH_LOAN_EVENTS",
@@ -979,6 +986,7 @@ __all__ = [
     "DEFI_STAKING_EIGENLAYER_REWARDS",
     "DEFI_STAKING_STAKING_YIELDS",
     "DEFI_STAKING_YIELD_SNAPSHOTS",
+    "DEFI_YIELD_BEARING_YIELD_SNAPSHOTS",
     "KEYWORD_TO_CATEGORY",
     "ML_TRAINING_MANIFEST",
     "OUTCOME_TO_MARKET_TYPE",

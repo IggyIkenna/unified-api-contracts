@@ -110,9 +110,9 @@ class TestUICExecutionSchemas:
         mi = ManualInstruction(
             instruction_id="instr-uic-003",
             submitted_by="system",
-            venue="kraken",
+            venue="coinbase",
             account_id="acct-789",
-            instrument_key="KRAKEN:SPOT:ETHUSD",
+            instrument_key="COINBASE:SPOT:ETHUSD",
             side="BUY",
             order_type="MARKET",
             quantity=Decimal("2.5"),

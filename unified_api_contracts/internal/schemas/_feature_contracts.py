@@ -162,7 +162,7 @@ def _register(
     symbol_column: str = "symbol",
 ) -> SchemaContract:
     contract = SchemaContract(
-        category=category,  # type: ignore[arg-type]
+        asset_group=category,  # type: ignore[arg-type]
         instrument_type=instrument_type,
         data_type=feature_group,
         columns=_core_columns(include_chain=include_chain),

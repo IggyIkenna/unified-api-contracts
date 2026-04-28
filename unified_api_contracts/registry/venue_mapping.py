@@ -495,11 +495,11 @@ class VenueMapping:
         (SPX, CRUDE_OIL, GOLD, etc.) trade weekdays only.
         Crypto venues/shards (BTC, ETH, SOL) trade 24/7 including weekends.
         """
-        from unified_api_contracts.registry.market_data_categories import VENUE_TO_CATEGORY
+        from unified_api_contracts.registry.market_data_categories import VENUE_TO_ASSET_GROUP
 
         all_dates = pd.date_range(start_date, end_date, freq="D")
-        category = VENUE_TO_CATEGORY.get(venue, "")
-        weekday_only = category == "tradfi" or venue in self._WEEKDAY_ONLY_PREDICTION_SHARDS
+        asset_group = VENUE_TO_ASSET_GROUP.get(venue, "")
+        weekday_only = asset_group == "tradfi" or venue in self._WEEKDAY_ONLY_PREDICTION_SHARDS
         if weekday_only:
             all_dates = all_dates[all_dates.weekday < 5]
             # Exclude US market holidays

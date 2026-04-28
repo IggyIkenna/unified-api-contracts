@@ -47,26 +47,26 @@ def _has_core(contract_cols: list[str]) -> bool:
 
 @pytest.mark.parametrize("fg", DELTA_ONE_FEATURE_GROUPS)
 def test_delta_one_registered_for_cefi_perpetual(fg: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=fg)
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=fg)
     assert contract.symbol_column == "symbol"
     assert _has_core([c.name for c in contract.columns])
 
 
 @pytest.mark.parametrize("fg", DELTA_ONE_FEATURE_GROUPS)
 def test_delta_one_registered_for_tradfi_future(fg: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="future", data_type=fg)
+    contract = lookup_contract(asset_group="tradfi", instrument_type="future", data_type=fg)
     assert contract.symbol_column == "symbol"
 
 
 @pytest.mark.parametrize("fg", VOLATILITY_FEATURE_GROUPS)
 def test_volatility_registered_for_cefi_options(fg: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="options_chain", data_type=fg)
+    contract = lookup_contract(asset_group="cefi", instrument_type="options_chain", data_type=fg)
     assert contract.symbol_column == "underlying"
 
 
 @pytest.mark.parametrize("fg", VOLATILITY_FEATURE_GROUPS)
 def test_volatility_registered_for_tradfi_options(fg: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="options_chain", data_type=fg)
+    contract = lookup_contract(asset_group="tradfi", instrument_type="options_chain", data_type=fg)
     assert contract.symbol_column == "underlying"
 
 
@@ -81,49 +81,49 @@ def test_volatility_registered_for_tradfi_options(fg: str) -> None:
     ],
 )
 def test_onchain_aave_registered_for_a_token(fg: str) -> None:
-    contract = lookup_contract(category="defi", instrument_type="a_token", data_type=fg)
+    contract = lookup_contract(asset_group="defi", instrument_type="a_token", data_type=fg)
     assert contract.symbol_column == "token"
     assert "chain" in {c.name for c in contract.columns}
 
 
 def test_onchain_lst_staking_yields_registered_for_lst() -> None:
-    contract = lookup_contract(category="defi", instrument_type="lst", data_type="lst_staking_yields")
+    contract = lookup_contract(asset_group="defi", instrument_type="lst", data_type="lst_staking_yields")
     assert "chain" in {c.name for c in contract.columns}
 
 
 def test_onchain_fear_greed_registered_for_spot_asset() -> None:
-    contract = lookup_contract(category="defi", instrument_type="spot_asset", data_type="fear_greed")
+    contract = lookup_contract(asset_group="defi", instrument_type="spot_asset", data_type="fear_greed")
     assert contract.symbol_column == "symbol"
 
 
 @pytest.mark.parametrize("fg", SPORTS_FEATURE_GROUPS)
 def test_sports_registered(fg: str) -> None:
-    contract = lookup_contract(category="sports", instrument_type="odds", data_type=fg)
+    contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type=fg)
     assert contract.symbol_column == "fixture_id"
     assert _has_core([c.name for c in contract.columns])
 
 
 @pytest.mark.parametrize("fg", CALENDAR_FEATURE_GROUPS)
 def test_calendar_registered_for_tradfi_index(fg: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="index", data_type=fg)
+    contract = lookup_contract(asset_group="tradfi", instrument_type="index", data_type=fg)
     assert contract.symbol_column == "symbol"
 
 
 @pytest.mark.parametrize("fg", MULTI_TIMEFRAME_FEATURE_GROUPS)
 def test_multi_timeframe_registered_for_cefi_perpetual(fg: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=fg)
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=fg)
     assert _has_core([c.name for c in contract.columns])
 
 
 @pytest.mark.parametrize("fg", CROSS_INSTRUMENT_FEATURE_GROUPS)
 def test_cross_instrument_registered_for_cefi_perpetual(fg: str) -> None:
-    contract = lookup_contract(category="cefi", instrument_type="perpetual", data_type=fg)
+    contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=fg)
     assert _has_core([c.name for c in contract.columns])
 
 
 def test_cross_instrument_polymarket_scoped_to_prediction() -> None:
     contract = lookup_contract(
-        category="prediction",
+        asset_group="prediction",
         instrument_type="prediction_market",
         data_type="polymarket_crowd_sentiment",
     )
@@ -133,7 +133,7 @@ def test_cross_instrument_polymarket_scoped_to_prediction() -> None:
 
 @pytest.mark.parametrize("fg", COMMODITY_FEATURE_GROUPS)
 def test_commodity_registered_for_tradfi_future(fg: str) -> None:
-    contract = lookup_contract(category="tradfi", instrument_type="future", data_type=fg)
+    contract = lookup_contract(asset_group="tradfi", instrument_type="future", data_type=fg)
     assert contract.symbol_column == "symbol"
 
 

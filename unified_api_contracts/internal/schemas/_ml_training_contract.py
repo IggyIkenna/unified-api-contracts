@@ -4,23 +4,23 @@ Plan: ``data_pipeline_completion_2026_04_18`` §Phase 5d.1. Registers the
 canonical training-manifest SchemaContract so every ml-training-service run
 writes one row per experiment with the v4 shard dimensions populated
 (``model_family``, ``training_period``, ``strategy_id``, ``experiment_id``,
-plus the upstream data ``category``). Rows land at:
+plus the upstream data ``asset_group``). Rows land at:
 
-    gs://ml-models-{category}-*/manifests/training/by_date/day={YYYY-MM-DD}/
+    gs://ml-models-{asset_group}-*/manifests/training/by_date/day={YYYY-MM-DD}/
         model_family={family}/training_period={span}/experiment_id={uuid}/
         manifest.parquet
 
 The 3-tuple registry key is ``(ml_training, manifest, training_run)`` — we
-introduced the ``ml_training`` category literal for meta-contracts that
-aren't themselves market-data shards. The ``category`` **column** on each
-row records the upstream data category (cefi / tradfi / defi / sports /
+introduced the ``ml_training`` asset_group literal for meta-contracts that
+aren't themselves market-data shards. The ``asset_group`` **column** on each
+row records the upstream data plane (cefi / tradfi / defi / sports /
 prediction) so the training manifest UI can filter by business domain.
 
 Per-row columns:
 
     instrument_id       — canonical model artifact id
                           (e.g. ``ML_TRAINING:<family>:<exp_id>``)
-    category            — upstream data category (cefi / tradfi / …)
+    asset_group         — upstream data plane (cefi / tradfi / …)
     model_family        — e.g. xgboost_classifier_v2, lightgbm_regressor
     training_period     — ISO date span (e.g. 2020-01-01..2024-12-31)
     experiment_id       — UUID of this run
@@ -52,16 +52,16 @@ from unified_api_contracts.internal.schemas.contracts import (
 )
 
 ML_TRAINING_MANIFEST = SchemaContract(
-    category="ml_training",
+    asset_group="ml_training",
     instrument_type="manifest",
     data_type="training_run",
     columns=[
         INSTRUMENT_ID_COL,
         ColumnSpec(
-            name="category",
+            name="asset_group",
             dtype="string",
             nullable=False,
-            description="Upstream data category (cefi/tradfi/defi/sports/prediction).",
+            description="Upstream data plane (cefi/tradfi/defi/sports/prediction).",
         ),
         ColumnSpec(
             name="model_family",

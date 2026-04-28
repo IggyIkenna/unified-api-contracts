@@ -35,8 +35,8 @@ class ProviderDataAvailability:
     """Describes when a data provider makes data available for a target UTC date.
 
     Attributes:
-        venue_name: Canonical venue / provider name (matches VENUE_TO_CATEGORY keys).
-        category: Domain category — ``cefi``, ``tradfi``, ``defi``, ``sports``,
+        venue_name: Canonical venue / provider name (matches VENUE_TO_ASSET_GROUP keys where applicable).
+        asset_group: Venue / data plane bucket — ``cefi``, ``tradfi``, ``defi``, ``sports``,
             ``prediction``, ``altdata``.
         availability_lag_hours: Minimum hours after UTC midnight before the
             *previous* day's data is expected.  ``0.0`` means real-time / no lag.
@@ -50,7 +50,7 @@ class ProviderDataAvailability:
     """
 
     venue_name: str
-    category: str
+    asset_group: str
     availability_lag_hours: float
     available_after_utc_hour: int | None = None
     is_t_plus_one: bool = False
@@ -69,7 +69,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── CeFi tick data (via Tardis) ──────────────────────────────────
     "TARDIS": ProviderDataAvailability(
         venue_name="TARDIS",
-        category="cefi",
+        asset_group="cefi",
         availability_lag_hours=6.0,
         available_after_utc_hour=6,
         is_t_plus_one=True,
@@ -78,7 +78,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── TradFi tick data (via Databento) ─────────────────────────────
     "DATABENTO": ProviderDataAvailability(
         venue_name="DATABENTO",
-        category="tradfi",
+        asset_group="tradfi",
         availability_lag_hours=0.0,
         available_after_utc_hour=0,
         is_t_plus_one=True,
@@ -86,7 +86,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "BARCHART": ProviderDataAvailability(
         venue_name="BARCHART",
-        category="tradfi",
+        asset_group="tradfi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -94,7 +94,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "YAHOO_FINANCE": ProviderDataAvailability(
         venue_name="YAHOO_FINANCE",
-        category="tradfi",
+        asset_group="tradfi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -103,7 +103,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── Sports reference data ────────────────────────────────────────
     "API_FOOTBALL": ProviderDataAvailability(
         venue_name="API_FOOTBALL",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -111,7 +111,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "ODDS_API": ProviderDataAvailability(
         venue_name="ODDS_API",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -119,7 +119,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "FOOTYSTATS": ProviderDataAvailability(
         venue_name="FOOTYSTATS",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -127,7 +127,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "SOCCER_FOOTBALL_INFO": ProviderDataAvailability(
         venue_name="SOCCER_FOOTBALL_INFO",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -135,7 +135,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "TRANSFERMARKT": ProviderDataAvailability(
         venue_name="TRANSFERMARKT",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=12.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -143,7 +143,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "UNDERSTAT": ProviderDataAvailability(
         venue_name="UNDERSTAT",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=24.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -151,7 +151,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "OPEN_METEO": ProviderDataAvailability(
         venue_name="OPEN_METEO",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -159,7 +159,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "BETFAIR": ProviderDataAvailability(
         venue_name="BETFAIR",
-        category="sports",
+        asset_group="sports",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -168,7 +168,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── Prediction markets ───────────────────────────────────────────
     "POLYMARKET": ProviderDataAvailability(
         venue_name="POLYMARKET",
-        category="prediction",
+        asset_group="prediction",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -176,7 +176,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "KALSHI": ProviderDataAvailability(
         venue_name="KALSHI",
-        category="prediction",
+        asset_group="prediction",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -185,7 +185,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── DeFi protocols (all on-chain / The Graph — immediate) ────────
     "AAVE_V3": ProviderDataAvailability(
         venue_name="AAVE_V3",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -193,7 +193,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "COMPOUND_V3": ProviderDataAvailability(
         venue_name="COMPOUND_V3",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -201,7 +201,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "MORPHO": ProviderDataAvailability(
         venue_name="MORPHO",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -209,7 +209,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "UNISWAP_V2": ProviderDataAvailability(
         venue_name="UNISWAP_V2",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -217,7 +217,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "UNISWAP_V3": ProviderDataAvailability(
         venue_name="UNISWAP_V3",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -225,7 +225,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "UNISWAP_V4": ProviderDataAvailability(
         venue_name="UNISWAP_V4",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -233,7 +233,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "CURVE": ProviderDataAvailability(
         venue_name="CURVE",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -241,7 +241,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "BALANCER": ProviderDataAvailability(
         venue_name="BALANCER",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -249,7 +249,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "LIDO": ProviderDataAvailability(
         venue_name="LIDO",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -257,7 +257,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "ETHENA": ProviderDataAvailability(
         venue_name="ETHENA",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -265,7 +265,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "ETHERFI": ProviderDataAvailability(
         venue_name="ETHERFI",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -273,7 +273,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "FLUID_PLASMA": ProviderDataAvailability(
         venue_name="FLUID_PLASMA",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -281,7 +281,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "AERODROME": ProviderDataAvailability(
         venue_name="AERODROME",
-        category="defi",
+        asset_group="defi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -290,7 +290,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── CeFi CLOBs (real-time) ───────────────────────────────────────
     "HYPERLIQUID": ProviderDataAvailability(
         venue_name="HYPERLIQUID",
-        category="cefi",
+        asset_group="cefi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -298,7 +298,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "ASTER": ProviderDataAvailability(
         venue_name="ASTER",
-        category="cefi",
+        asset_group="cefi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -307,7 +307,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── Alt data / on-chain analytics ────────────────────────────────
     "ALCHEMY": ProviderDataAvailability(
         venue_name="ALCHEMY",
-        category="altdata",
+        asset_group="altdata",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -315,7 +315,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "THEGRAPH": ProviderDataAvailability(
         venue_name="THEGRAPH",
-        category="altdata",
+        asset_group="altdata",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -324,7 +324,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     # ── TradFi reference data ────────────────────────────────────────
     "FRED": ProviderDataAvailability(
         venue_name="FRED",
-        category="tradfi",
+        asset_group="tradfi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,
@@ -332,7 +332,7 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
     ),
     "POLYGON": ProviderDataAvailability(
         venue_name="POLYGON",
-        category="tradfi",
+        asset_group="tradfi",
         availability_lag_hours=0.0,
         available_after_utc_hour=None,
         is_t_plus_one=False,

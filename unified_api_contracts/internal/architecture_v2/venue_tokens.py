@@ -9,8 +9,8 @@ strategy instance can span spot+perp+options on the same venue.
 Callers (strategy-service slot_label parser, etc.) use `is_venue_token()` to
 split `scope_tokens` into venue-scope vs instrument-scope at parse time.
 
-Kraken, LSE, TSX are deliberately excluded — they are not in the Unified
-Trading System.
+LSE, TSX are deliberately excluded — they are not in the Unified Trading
+System.
 """
 
 from __future__ import annotations

@@ -124,9 +124,9 @@ class TestInstrumentsDomain:
         from unified_api_contracts.internal.domain.instruments import INSTRUMENTS_SCHEMA
 
         # databento_symbol: nullable=True but TRADFI override = False
-        result = INSTRUMENTS_SCHEMA.is_nullable("databento_symbol", {"category": "TRADFI"})
+        result = INSTRUMENTS_SCHEMA.is_nullable("databento_symbol", {"asset_group": "TRADFI"})
         assert result is False
-        result2 = INSTRUMENTS_SCHEMA.is_nullable("databento_symbol", {"category": "CEFI"})
+        result2 = INSTRUMENTS_SCHEMA.is_nullable("databento_symbol", {"asset_group": "CEFI"})
         assert result2 is True
 
     def test_all_exports(self) -> None:

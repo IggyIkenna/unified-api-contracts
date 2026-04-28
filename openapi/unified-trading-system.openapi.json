@@ -1473,50 +1473,6 @@
         ]
       }
     },
-    "/deployment-api/api/config/venues/{category}": {
-      "get": {
-        "tags": ["deployment-api", "Configuration"],
-        "summary": "Get Venues By Category",
-        "description": "Get venues for a specific category.\n\nArgs:\n    category: Category name (CEFI, TRADFI, DEFI)\n\nReturns:\n    List of venues and their data types for the category.",
-        "operationId": "get_venues_by_category_api_config_venues__category__get",
-        "security": [
-          {
-            "APIKeyHeader": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "category",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "title": "Category"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Response",
-            "content": {
-              "application/json": {
-                "schema": {}
-              }
-            }
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/HTTPValidationError"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/deployment-api/api/config/expected-start-dates": {
       "get": {
         "tags": ["deployment-api", "Configuration"],
@@ -27022,6 +26978,50 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/deployment-api/api/config/venues/{asset_group}": {
+      "get": {
+        "tags": ["deployment-api", "Configuration"],
+        "summary": "Get Venues By Asset Group",
+        "description": "Get venues for a specific category.\n\nArgs:\n    category: Category name (CEFI, TRADFI, DEFI)\n\nReturns:\n    List of venues and their data types for the category.",
+        "operationId": "get_venues_by_asset_group_api_config_venues__asset_group__get",
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "asset_group",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Asset Group"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
               }
             }
           }

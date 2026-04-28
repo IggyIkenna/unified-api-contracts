@@ -21,7 +21,7 @@ def test_ml_training_manifest_registered() -> None:
 
 def test_ml_training_manifest_lookup_works() -> None:
     contract = lookup_contract(
-        category="ml_training",
+        asset_group="ml_training",
         instrument_type="manifest",
         data_type="training_run",
     )
@@ -36,7 +36,7 @@ def test_ml_training_manifest_has_v4_shard_columns() -> None:
     """v4 manifest shard dims — model_family, training_period, experiment_id —
     MUST be non-nullable columns on every training manifest row."""
     by_name = {c.name: c for c in ML_TRAINING_MANIFEST.columns}
-    for name in ("model_family", "training_period", "experiment_id", "category", "status"):
+    for name in ("model_family", "training_period", "experiment_id", "asset_group", "status"):
         assert name in by_name
         assert by_name[name].nullable is False
 
@@ -63,7 +63,7 @@ def test_ml_training_manifest_validates_sample_row() -> None:
     df = pd.DataFrame(
         {
             "instrument_id": pd.Series(["ML_TRAINING:XGBOOST_CLASSIFIER_V2:exp-abc"], dtype="string"),
-            "category": pd.Series(["cefi"], dtype="string"),
+            "asset_group": pd.Series(["cefi"], dtype="string"),
             "model_family": pd.Series(["xgboost_classifier_v2"], dtype="string"),
             "training_period": pd.Series(["2020-01-01..2024-12-31"], dtype="string"),
             "experiment_id": pd.Series(["exp-abc"], dtype="string"),

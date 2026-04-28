@@ -8,7 +8,7 @@ INSTRUMENTS_SCHEMA = SchemaDefinition(
     name="instruments",
     version="1.0",
     description="Instrument definitions for all categories (CEFI, TRADFI, DEFI)",
-    dimension_keys=["category"],
+    dimension_keys=["asset_group"],
     columns=[
         ColumnSchema(
             name="instrument_key",

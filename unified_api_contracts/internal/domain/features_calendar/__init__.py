@@ -27,7 +27,7 @@ TIME_FEATURES_SCHEMA = SchemaDefinition(
     name="time_features",
     version="1.0",
     description="Time-based features: sessions, cyclical encoding, binary indicators",
-    dimension_keys=["category"],
+    dimension_keys=["asset_group"],
     columns=[
         ColumnSchema(
             name="timestamp",
@@ -78,7 +78,7 @@ ECONOMIC_EVENTS_SCHEMA = SchemaDefinition(
     name="economic_events",
     version="1.0",
     description="Deterministic economic event dates (FOMC, NFP, CPI, GDP, etc.)",
-    dimension_keys=["category"],
+    dimension_keys=["asset_group"],
     columns=[
         ColumnSchema(
             name="timestamp",

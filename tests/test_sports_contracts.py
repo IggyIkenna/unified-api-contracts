@@ -4,7 +4,7 @@
 Covers the contract gap closed by
 ``plans/active/sports_uac_schema_contracts_registration_2026_04_24.plan.md``.
 Every sports data_type written to GCS must be resolvable via
-``lookup_contract(category, instrument_type, data_type)``.
+``lookup_contract(asset_group, instrument_type, data_type)``.
 """
 
 from __future__ import annotations
@@ -43,7 +43,7 @@ from unified_api_contracts.internal.schemas.contracts import (
     lookup_contract,
 )
 
-# (category, instrument_type, data_type, expected_contract, min_col_count).
+# (asset_group, instrument_type, data_type, expected_contract, min_col_count).
 SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     # Family A — API-Football reference
     ("sports", "reference", "leagues", SPORTS_LEAGUES, 5),
@@ -73,35 +73,35 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
 
 
 @pytest.mark.parametrize(
-    ("category", "instrument_type", "data_type", "expected", "min_cols"),
+    ("asset_group", "instrument_type", "data_type", "expected", "min_cols"),
     SPORTS_CONTRACT_CASES,
     ids=[f"{c[0]}/{c[1]}/{c[2]}" for c in SPORTS_CONTRACT_CASES],
 )
 def test_sports_contract_registered(
-    category: str,
+    asset_group: str,
     instrument_type: str,
     data_type: str,
     expected: SchemaContract,
     min_cols: int,
 ) -> None:
     """Every sports contract is registered and resolvable via lookup_contract."""
-    key = (category, instrument_type, data_type)
+    key = (asset_group, instrument_type, data_type)
     assert key in CONTRACT_REGISTRY, f"missing from CONTRACT_REGISTRY: {key}"
-    resolved = lookup_contract(category=category, instrument_type=instrument_type, data_type=data_type)
+    resolved = lookup_contract(asset_group=asset_group, instrument_type=instrument_type, data_type=data_type)
     assert resolved is expected, f"CONTRACT_REGISTRY[{key}] is not the same object as the module-level constant"
-    assert resolved.category == category
+    assert resolved.asset_group == asset_group
     assert resolved.instrument_type == instrument_type
     assert resolved.data_type == data_type
     assert len(resolved.columns) >= min_cols, f"{key} has {len(resolved.columns)} cols, expected >= {min_cols}"
 
 
 @pytest.mark.parametrize(
-    ("category", "instrument_type", "data_type", "expected", "_min_cols"),
+    ("asset_group", "instrument_type", "data_type", "expected", "_min_cols"),
     SPORTS_CONTRACT_CASES,
     ids=[f"{c[0]}/{c[1]}/{c[2]}" for c in SPORTS_CONTRACT_CASES],
 )
 def test_sports_contract_symbol_column_is_declared(
-    category: str,
+    asset_group: str,
     instrument_type: str,
     data_type: str,
     expected: SchemaContract,
@@ -109,25 +109,26 @@ def test_sports_contract_symbol_column_is_declared(
 ) -> None:
     """symbol_column must be an actual column in the contract."""
     column_names = {c.name for c in expected.columns}
-    assert expected.symbol_column, f"{category}/{instrument_type}/{data_type} missing symbol_column"
+    assert expected.symbol_column, f"{asset_group}/{instrument_type}/{data_type} missing symbol_column"
     assert expected.symbol_column in column_names, (
         f"symbol_column={expected.symbol_column!r} not found in columns {sorted(column_names)[:5]}..."
     )
 
 
 @pytest.mark.parametrize(
-    ("category", "instrument_type", "data_type", "expected", "_min_cols"),
+    ("asset_group", "instrument_type", "data_type", "expected", "_min_cols"),
     SPORTS_CONTRACT_CASES,
     ids=[f"{c[0]}/{c[1]}/{c[2]}" for c in SPORTS_CONTRACT_CASES],
 )
 def test_sports_contract_columns_are_valid_column_specs(
-    category: str,
+    asset_group: str,
     instrument_type: str,
     data_type: str,
     expected: SchemaContract,
     _min_cols: int,
 ) -> None:
     """Every column is a ColumnSpec with a non-empty name and dtype."""
+    assert asset_group, "parametrised sport shard asset_group"
     for col in expected.columns:
         assert isinstance(col, ColumnSpec), f"{data_type}: non-ColumnSpec column {col!r}"
         assert col.name, f"{data_type}: empty column name"

@@ -19,12 +19,12 @@ Design notes
           available_from_datetime.date() <= D <= available_to_datetime.date()
       with None bounds skipped per the rules above. Boundary dates are
       INCLUSIVE on both ends.
-- Filter args (``category``, ``venue``, ``instrument_type``, ``chain``) are
+- Filter args (``asset_group``, ``venue``, ``instrument_type``, ``chain``) are
   AND-combined. ``None`` = wildcard. Matching is case-insensitive.
 - ``InstrumentRecord`` currently carries ``venue`` and ``instrument_type``
-  but NOT ``category`` or ``chain`` as first-class fields (see
+  but NOT ``asset_group`` or ``chain`` as first-class fields (see
   ``internal/reference/instrument.py``). Phase 1.5 of the canonicalisation
-  plan will populate ``category`` / ``chain``. Until then, records that
+  plan will populate ``asset_group`` / ``chain``. Until then, records that
   don't expose those attributes are treated as wildcard matches for those
   filters (i.e. they match only when the caller passes ``None``). This is
   implemented via ``getattr(record, field, None)`` with an explicit sentinel
@@ -52,7 +52,7 @@ def _norm(value: str | None) -> str | None:
 def _record_field_str(record: InstrumentRecord, attr: str) -> str | None:
     """Extract a string attribute from a record, lowercased. None if missing/empty.
 
-    Used for ``category`` / ``chain`` which may not yet be present on
+    Used for ``asset_group`` / ``chain`` which may not yet be present on
     ``InstrumentRecord`` (see module docstring). When the attribute is
     absent we treat the record as having no declared value for that axis.
     """
@@ -89,7 +89,7 @@ def _is_in_window(record: InstrumentRecord, ref_date: _dt.date) -> bool:
 def get_instruments_available_on(
     ref_date: _dt.date,
     catalogue: Iterable[InstrumentRecord],
-    category: str | None = None,
+    asset_group: str | None = None,
     venue: str | None = None,
     instrument_type: str | None = None,
     chain: str | None = None,
@@ -104,8 +104,8 @@ def get_instruments_available_on(
     catalogue:
         Iterable of ``InstrumentRecord`` (loaded by the caller — UAC does not
         fetch from GCS).
-    category:
-        Optional category filter (e.g. ``"cefi"``, ``"defi"``, ``"tradfi"``,
+    asset_group:
+        Optional asset group filter (e.g. ``"cefi"``, ``"defi"``, ``"tradfi"``,
         ``"sports"``, ``"prediction"``). Case-insensitive. ``None`` = wildcard.
     venue:
         Optional venue filter (e.g. ``"BINANCE_FUTURES"``). Case-insensitive.
@@ -123,7 +123,7 @@ def get_instruments_available_on(
         Records that satisfy all active filters AND the availability window
         on ``ref_date``. Preserves input ordering.
     """
-    cat_f = _norm(category)
+    cat_f = _norm(asset_group)
     venue_f = _norm(venue)
     itype_f = _norm(instrument_type)
     chain_f = _norm(chain)
@@ -137,7 +137,7 @@ def get_instruments_available_on(
         if itype_f is not None and _instrument_type_str(record) != itype_f:
             continue
         if cat_f is not None:
-            rec_cat = _record_field_str(record, "category")
+            rec_cat = _record_field_str(record, "asset_group")
             if rec_cat != cat_f:
                 continue
         if chain_f is not None:

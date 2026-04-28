@@ -95,7 +95,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 )
 
 SPORTS_MATCHES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="matches",
     columns=[
@@ -172,7 +172,7 @@ SPORTS_MATCHES = SchemaContract(
 
 
 SPORTS_PREDICTIONS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="predictions",
     columns=[
@@ -244,7 +244,7 @@ SPORTS_PREDICTIONS = SchemaContract(
 
 
 SPORTS_XG = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="xg",
     columns=[
@@ -312,7 +312,7 @@ SPORTS_XG = SchemaContract(
 
 
 SPORTS_WEATHER = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="weather",
     columns=[
@@ -401,7 +401,7 @@ SPORTS_WEATHER = SchemaContract(
 
 
 SPORTS_FIXTURE_FEATURES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="feature",
     data_type="fixture_features",
     columns=[

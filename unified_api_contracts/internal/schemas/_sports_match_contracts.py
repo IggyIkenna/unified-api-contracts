@@ -59,7 +59,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 
 
 SPORTS_FIXTURES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="fixtures",
     columns=[
@@ -257,7 +257,7 @@ SPORTS_FIXTURES = SchemaContract(
 
 
 SPORTS_FIXTURE_EVENTS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="fixture_events",
     columns=[
@@ -316,7 +316,7 @@ SPORTS_FIXTURE_EVENTS = SchemaContract(
 
 
 SPORTS_FIXTURE_STATS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="fixture_stats",
     columns=[
@@ -346,7 +346,7 @@ SPORTS_FIXTURE_STATS = SchemaContract(
 
 
 SPORTS_FIXTURE_LINEUPS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="fixture_lineups",
     columns=[
@@ -381,7 +381,7 @@ SPORTS_FIXTURE_LINEUPS = SchemaContract(
 
 
 SPORTS_PLAYER_STATS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="player_stats",
     columns=[
@@ -481,7 +481,7 @@ SPORTS_PLAYER_STATS = SchemaContract(
 
 
 SPORTS_INJURIES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="injuries",
     columns=[

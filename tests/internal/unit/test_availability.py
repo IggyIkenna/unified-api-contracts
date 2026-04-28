@@ -283,14 +283,14 @@ class TestCombinedFilters:
         out = get_instruments_available_on(_dt.date(2025, 5, 15), catalogue, venue="OKX")
         assert out == []
 
-    def test_category_filter_matches_none_until_field_populated(self) -> None:
-        """InstrumentRecord has no `category` field yet (populated in Phase 1.5).
+    def test_asset_group_filter_matches_none_until_field_populated(self) -> None:
+        """InstrumentRecord has no `asset_group` field yet (populated in Phase 1.5).
 
-        Until then, passing a category filter should return nothing because
-        no record can report a matching category.
+        Until then, passing an asset_group filter should return nothing because
+        no record can report a matching asset group.
         """
         catalogue = self._mixed_catalogue()
-        out = get_instruments_available_on(_dt.date(2025, 5, 15), catalogue, category="cefi")
+        out = get_instruments_available_on(_dt.date(2025, 5, 15), catalogue, asset_group="cefi")
         assert out == []
 
     def test_chain_filter_matches_none_until_field_populated(self) -> None:
@@ -389,7 +389,7 @@ class TestEmptyCatalogue:
         out = get_instruments_available_on(
             _dt.date(2025, 1, 1),
             [],
-            category="cefi",
+            asset_group="cefi",
             venue="BINANCE",
             instrument_type="PERPETUAL",
             chain="ethereum",

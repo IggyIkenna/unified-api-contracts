@@ -4,7 +4,7 @@ Coverage targets (≥ 30 cases):
 * Every one of the 8 required fields rejected when omitted / malformed
   (8 cases, Pydantic-layer).
 * Each BL-1..BL-10 block-list group surfaces as a
-  ``category+instrument_type`` rejection with a readable ``why`` (10
+  ``asset_group+instrument_type`` rejection with a readable ``why`` (10
   cases).
 * Venue not in archetype's ``supported_venues`` (3 cases across
   CeFi / DeFi / Sports).
@@ -55,7 +55,7 @@ def _ctx_cefi_perp_binance() -> InstrumentVenueContext:
     return InstrumentVenueContext(
         instrument_id="BTCUSDT",
         venue="binance",
-        category=VenueCategoryV2.CEFI,
+        asset_group=VenueCategoryV2.CEFI,
         instrument_type=ArchetypeInstrumentType.PERP,
     )
 
@@ -140,7 +140,7 @@ def _base_payload() -> dict[str, object]:
         "instrument_venue_context": {
             "instrument_id": "BTCUSDT",
             "venue": "binance",
-            "category": "CEFI",
+            "asset_group": "CEFI",
             "instrument_type": "perp",
         },
         "intended_action": "BUY",
@@ -154,6 +154,17 @@ def _base_payload() -> dict[str, object]:
         "lifecycle_replace_cancel": {"semantic": "NEW"},
         "risk_and_allocation_constraints": {"per_instruction_max_loss": "100"},
     }
+
+
+def test_instrument_venue_context_accepts_legacy_category_json_key() -> None:
+    """``category`` in JSON still maps to ``asset_group`` (wire compat)."""
+    payload = _base_payload()
+    ivc = payload["instrument_venue_context"]
+    assert isinstance(ivc, dict)
+    del ivc["asset_group"]
+    ivc["asset_group"] = "CEFI"
+    instr = ClientInstruction.model_validate(payload)
+    assert instr.instrument_venue_context.asset_group is VenueCategoryV2.CEFI
 
 
 @pytest.mark.parametrize(
@@ -188,7 +199,7 @@ def test_missing_required_field_rejected(missing_field: str) -> None:
 
 
 BLOCK_LIST_CASES: list[tuple[str, VenueCategoryV2, ArchetypeInstrumentType, str]] = [
-    # (ref, category, instrument_type, representative_venue)
+    # (ref, asset_group, instrument_type, representative_venue)
     ("BL-1", VenueCategoryV2.DEFI, ArchetypeInstrumentType.OPTION, "uniswap_v3"),
     ("BL-2", VenueCategoryV2.DEFI, ArchetypeInstrumentType.DATED_FUTURE, "uniswap_v3"),
     ("BL-3", VenueCategoryV2.CEFI, ArchetypeInstrumentType.LENDING, "binance"),
@@ -203,13 +214,13 @@ BLOCK_LIST_CASES: list[tuple[str, VenueCategoryV2, ArchetypeInstrumentType, str]
 
 
 @pytest.mark.parametrize(
-    "ref,category,instrument_type,venue",
+    "ref,asset_group,instrument_type,venue",
     BLOCK_LIST_CASES,
     ids=[case[0] for case in BLOCK_LIST_CASES],
 )
 def test_block_list_group_rejection(
     ref: str,
-    category: VenueCategoryV2,
+    asset_group: VenueCategoryV2,
     instrument_type: ArchetypeInstrumentType,
     venue: str,
 ) -> None:
@@ -224,9 +235,9 @@ def test_block_list_group_rejection(
     ctx = InstrumentVenueContext(
         instrument_id="SOMETHING",
         venue=venue,
-        category=category,
+        asset_group=asset_group,
         instrument_type=instrument_type,
-        chain="eth" if category == VenueCategoryV2.DEFI else None,
+        chain="eth" if asset_group == VenueCategoryV2.DEFI else None,
     )
     instruction = _make_instruction(ctx=ctx)
 
@@ -235,11 +246,11 @@ def test_block_list_group_rejection(
 
     assert not result.ok, f"{ref}: expected rejection, got ok"
     assert result.integration_depth == 0.0
-    assert any("category+instrument_type" in err.field for err in result.errors), (
-        f"{ref}: expected category+instrument_type error, got {[e.field for e in result.errors]}"
+    assert any("asset_group+instrument_type" in err.field for err in result.errors), (
+        f"{ref}: expected asset_group+instrument_type error, got {[e.field for e in result.errors]}"
     )
-    first = next(err for err in result.errors if "category+instrument_type" in err.field)
-    assert category.value in first.violation
+    first = next(err for err in result.errors if "asset_group+instrument_type" in err.field)
+    assert asset_group.value in first.violation
     assert instrument_type.value in first.violation
     assert "UAC ArchetypeCapabilityRegistry" in first.why
 
@@ -254,7 +265,7 @@ def test_venue_mismatch_cefi_perp() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="BTCUSDT",
         venue="nonexistent_exchange_xyz",
-        category=VenueCategoryV2.CEFI,
+        asset_group=VenueCategoryV2.CEFI,
         instrument_type=ArchetypeInstrumentType.PERP,
     )
     instruction = _make_instruction(ctx=ctx)
@@ -268,7 +279,7 @@ def test_venue_mismatch_defi_spot() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="WETH",
         venue="made_up_dex_xyz",
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.SPOT,
         chain="eth",
     )
@@ -284,7 +295,7 @@ def test_venue_mismatch_sports_event_settled() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="EV-42",
         venue="mystery_sportsbook",
-        category=VenueCategoryV2.SPORTS,
+        asset_group=VenueCategoryV2.SPORTS,
         instrument_type=ArchetypeInstrumentType.EVENT_SETTLED,
     )
     instruction = _make_instruction(ctx=ctx)
@@ -304,7 +315,7 @@ def test_defi_without_chain_rejected() -> None:
         InstrumentVenueContext(
             instrument_id="WETH",
             venue="uniswap_v3",
-            category=VenueCategoryV2.DEFI,
+            asset_group=VenueCategoryV2.DEFI,
             instrument_type=ArchetypeInstrumentType.SPOT,
             chain=None,
         )
@@ -441,7 +452,7 @@ def test_integration_depth_zero_on_failure() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="X",
         venue="uniswap_v3",
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.OPTION,  # BL-1
         chain="eth",
     )
@@ -531,7 +542,7 @@ def test_happy_path_defi_spot_uniswap() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="WETH",
         venue="uniswap_v3",
-        category=VenueCategoryV2.DEFI,
+        asset_group=VenueCategoryV2.DEFI,
         instrument_type=ArchetypeInstrumentType.SPOT,
         chain="eth",
     )
@@ -544,7 +555,7 @@ def test_happy_path_sports_event_settled_betfair() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="EV-42",
         venue="betfair_direct",
-        category=VenueCategoryV2.SPORTS,
+        asset_group=VenueCategoryV2.SPORTS,
         instrument_type=ArchetypeInstrumentType.EVENT_SETTLED,
     )
     instruction = _make_instruction(ctx=ctx, action=InstructionAction.BACK)
@@ -556,7 +567,7 @@ def test_happy_path_tradfi_dated_future_cme() -> None:
     ctx = InstrumentVenueContext(
         instrument_id="ES-Z6",
         venue="cme",
-        category=VenueCategoryV2.TRADFI,
+        asset_group=VenueCategoryV2.TRADFI,
         instrument_type=ArchetypeInstrumentType.DATED_FUTURE,
     )
     instruction = _make_instruction(ctx=ctx)

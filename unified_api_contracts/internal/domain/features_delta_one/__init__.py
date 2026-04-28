@@ -33,7 +33,7 @@ FEATURES_SCHEMA = SchemaDefinition(
     name="features_delta_one",
     version="1.0",
     description="Delta-one features for all feature groups (technical, volume, etc.)",
-    dimension_keys=["feature_group", "category"],
+    dimension_keys=["feature_group", "asset_group"],
     columns=[
         # ==========================================================================
         # REQUIRED CORE FIELDS (always NOT NULL for all feature groups)

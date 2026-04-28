@@ -188,7 +188,7 @@ def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
 # Consumers:
 #   - instruments-service orchestrator: builds venue list from this
 #   - MTDS handlers: validate which data types to collect per protocol
-#   - market_data_categories.py: derives VENUES_BY_CATEGORY from this
+#   - market_data_categories.py: derives VENUES_BY_ASSET_GROUP from this
 #   - deployment-ui data-status: shows expected data coverage matrix
 # ---------------------------------------------------------------------------
 

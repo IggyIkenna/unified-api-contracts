@@ -4,7 +4,7 @@ SSOT for the 6-dimension canonical sharding of prediction-market tick
 data across venues (Polymarket today; Kalshi + Betfair + PredictIt in
 the future):
 
-    day / category=prediction / venue / chain / market_category /
+    day / category=prediction / venue / chain / asset_group /
     underlying / market_type / resolution_period / data_type=trades /
     {condition_id}.parquet
 

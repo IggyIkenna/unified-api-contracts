@@ -53,7 +53,7 @@ _OPTION_RIGHT = OPTION_RIGHT_COL
 # ``provided_by_venues``.
 
 CEFI_OPTIONS_CHAIN_SNAPSHOT = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="options_chain",
     data_type="options_chain",
     columns=[
@@ -120,7 +120,7 @@ CEFI_OPTIONS_CHAIN_SNAPSHOT = SchemaContract(
 )
 
 CEFI_FUTURES_CHAIN_SNAPSHOT = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="futures_chain",
     data_type="futures_chain",
     columns=[
@@ -144,7 +144,7 @@ CEFI_FUTURES_CHAIN_SNAPSHOT = SchemaContract(
 
 # Deribit combo instruments (calendar spreads, iron condors, butterflies).
 CEFI_COMBO_CHAIN_SNAPSHOT = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="combo_chain",
     data_type="combo_chain",
     columns=[
@@ -172,7 +172,7 @@ CEFI_COMBO_CHAIN_SNAPSHOT = SchemaContract(
 )
 
 TRADFI_OPTIONS_CHAIN_SNAPSHOT = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="options_chain",
     data_type="options_chain",
     columns=[
@@ -196,7 +196,7 @@ TRADFI_OPTIONS_CHAIN_SNAPSHOT = SchemaContract(
 )
 
 TRADFI_FUTURES_CHAIN_SNAPSHOT = SchemaContract(
-    category="tradfi",
+    asset_group="tradfi",
     instrument_type="futures_chain",
     data_type="futures_chain",
     columns=[
@@ -222,7 +222,7 @@ TRADFI_FUTURES_CHAIN_SNAPSHOT = SchemaContract(
 # ---------------------------------------------------------------------------
 
 CEFI_PERPETUAL_TBBO = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="tbbo",
     columns=[
@@ -239,7 +239,7 @@ CEFI_PERPETUAL_TBBO = SchemaContract(
 )
 
 CEFI_SPOT_PAIR_TBBO = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="spot_pair",
     data_type="tbbo",
     columns=[
@@ -260,7 +260,7 @@ CEFI_SPOT_PAIR_TBBO = SchemaContract(
 # ---------------------------------------------------------------------------
 
 CEFI_PERPETUAL_OHLCV_24H = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="perpetual",
     data_type="ohlcv_24h",
     columns=[
@@ -278,7 +278,7 @@ CEFI_PERPETUAL_OHLCV_24H = SchemaContract(
 )
 
 CEFI_SPOT_PAIR_OHLCV_24H = SchemaContract(
-    category="cefi",
+    asset_group="cefi",
     instrument_type="spot_pair",
     data_type="ohlcv_24h",
     columns=[

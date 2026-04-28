@@ -354,7 +354,7 @@ class TestSchemaDefinition:
                     applies_to={"DEFI"},
                 ),
             ],
-            dimension_keys=["category", "venue"],
+            dimension_keys=["asset_group", "venue"],
         )
 
     def test_get_column_existing(self) -> None:
@@ -372,26 +372,26 @@ class TestSchemaDefinition:
     def test_is_nullable_unknown_column_returns_true(self) -> None:
         schema = self._make_schema()
         # Unknown column defaults to nullable=True
-        assert schema.is_nullable("ghost", {"category": "CEFI"}) is True
+        assert schema.is_nullable("ghost", {"asset_group": "CEFI"}) is True
 
     def test_is_nullable_no_overrides(self) -> None:
         schema = self._make_schema()
         # ts is non-nullable by default, no overrides
-        assert schema.is_nullable("ts", {"category": "CEFI"}) is False
+        assert schema.is_nullable("ts", {"asset_group": "CEFI"}) is False
 
     def test_is_nullable_dimension_override_single(self) -> None:
         schema = self._make_schema()
         # optional_cefi: nullable=True but override CEFI=False
-        assert schema.is_nullable("optional_cefi", {"category": "CEFI"}) is False
-        assert schema.is_nullable("optional_cefi", {"category": "DEFI"}) is True
+        assert schema.is_nullable("optional_cefi", {"asset_group": "CEFI"}) is False
+        assert schema.is_nullable("optional_cefi", {"asset_group": "DEFI"}) is True
 
     def test_is_nullable_compound_key_override(self) -> None:
         schema = self._make_schema()
         # compound_col: nullable=True, override "CEFI:BINANCE-FUTURES"=False
-        result = schema.is_nullable("compound_col", {"category": "CEFI", "venue": "BINANCE-FUTURES"})
+        result = schema.is_nullable("compound_col", {"asset_group": "CEFI", "venue": "BINANCE-FUTURES"})
         assert result is False
         # With DEFI, compound key doesn't match, falls back to nullable=True
-        result2 = schema.is_nullable("compound_col", {"category": "DEFI"})
+        result2 = schema.is_nullable("compound_col", {"asset_group": "DEFI"})
         assert result2 is True
 
     def test_is_nullable_empty_dimensions(self) -> None:
@@ -416,17 +416,17 @@ class TestSchemaDefinition:
                     nullable_overrides={"CEFI": False},
                 ),
             ],
-            dimension_keys=["category", "venue"],
+            dimension_keys=["asset_group", "venue"],
         )
         # compound key = "CEFI:BINANCE" — not in nullable_overrides
         # for loop: category → "CEFI" → found in overrides → returns False (line 117)
-        result = schema.is_nullable("col_a", {"category": "CEFI", "venue": "BINANCE"})
+        result = schema.is_nullable("col_a", {"asset_group": "CEFI", "venue": "BINANCE"})
         assert result is False
 
     def test_get_applicable_columns_no_applies_to(self) -> None:
         schema = self._make_schema()
         # All columns with applies_to=None + those matching dimensions
-        cols = schema.get_applicable_columns({"category": "CEFI"})
+        cols = schema.get_applicable_columns({"asset_group": "CEFI"})
         names = [c.name for c in cols]
         # ts, optional_cefi, compound_col have applies_to=None
         assert "ts" in names
@@ -435,21 +435,21 @@ class TestSchemaDefinition:
     def test_get_applicable_columns_with_applies_to(self) -> None:
         schema = self._make_schema()
         # defi_only applies to {"DEFI"} — should appear when category=DEFI
-        cols_defi = schema.get_applicable_columns({"category": "DEFI"})
+        cols_defi = schema.get_applicable_columns({"asset_group": "DEFI"})
         assert any(c.name == "defi_only" for c in cols_defi)
         # Should NOT appear when category=CEFI
-        cols_cefi = schema.get_applicable_columns({"category": "CEFI"})
+        cols_cefi = schema.get_applicable_columns({"asset_group": "CEFI"})
         assert not any(c.name == "defi_only" for c in cols_cefi)
 
     def test_get_required_columns(self) -> None:
         schema = self._make_schema()
-        required = schema.get_required_columns({"category": "CEFI"})
+        required = schema.get_required_columns({"asset_group": "CEFI"})
         assert "ts" in required
         assert "optional_cefi" in required  # override: CEFI → not nullable
 
     def test_get_nullable_columns(self) -> None:
         schema = self._make_schema()
-        nullable = schema.get_nullable_columns({"category": "DEFI"})
+        nullable = schema.get_nullable_columns({"asset_group": "DEFI"})
         assert "optional_cefi" in nullable
 
     def test_get_column_dtypes(self) -> None:
@@ -512,17 +512,17 @@ class TestSchemaValidationError:
             error_type="missing",
             message="bar missing",
             count=5,
-            dimensions={"category": "CEFI"},
+            dimensions={"asset_group": "CEFI"},
         )
         assert err.count == 5
-        assert err.dimensions["category"] == "CEFI"
+        assert err.dimensions["asset_group"] == "CEFI"
 
 
 class TestSchemaValidationResult:
     def test_initial_state(self) -> None:
         from unified_api_contracts.internal.schema_definition import SchemaValidationResult
 
-        result = SchemaValidationResult(valid=True, schema_name="test", dimensions={"category": "CEFI"})
+        result = SchemaValidationResult(valid=True, schema_name="test", dimensions={"asset_group": "CEFI"})
         assert result.valid is True
         assert result.errors == []
         assert result.warnings == []
@@ -531,7 +531,7 @@ class TestSchemaValidationResult:
     def test_add_error_sets_invalid(self) -> None:
         from unified_api_contracts.internal.schema_definition import SchemaValidationResult
 
-        result = SchemaValidationResult(valid=True, schema_name="s", dimensions={"category": "X"})
+        result = SchemaValidationResult(valid=True, schema_name="s", dimensions={"asset_group": "X"})
         result.add_error("col1", "null", "col1 has null", count=3)
         assert result.valid is False
         assert len(result.errors) == 1

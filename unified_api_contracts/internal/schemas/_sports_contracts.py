@@ -36,7 +36,7 @@ from unified_api_contracts.internal.schemas.contracts import (
 
 
 SPORTS_LEAGUES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="reference",
     data_type="leagues",
     columns=[
@@ -84,7 +84,7 @@ SPORTS_LEAGUES = SchemaContract(
 
 
 SPORTS_TEAMS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="reference",
     data_type="teams",
     columns=[
@@ -200,7 +200,7 @@ SPORTS_TEAMS = SchemaContract(
 
 
 SPORTS_VENUES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="reference",
     data_type="venues",
     columns=[
@@ -289,7 +289,7 @@ SPORTS_VENUES = SchemaContract(
 
 
 SPORTS_STANDINGS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="league",
     data_type="standings",
     columns=[
@@ -391,7 +391,7 @@ SPORTS_STANDINGS = SchemaContract(
 
 
 SPORTS_TRANSFERMARKT_LEAGUES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="reference",
     data_type="transfermarkt_leagues",
     columns=[
@@ -420,7 +420,7 @@ SPORTS_TRANSFERMARKT_LEAGUES = SchemaContract(
 
 
 SPORTS_PLAYER_VALUES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="player",
     data_type="player_values",
     columns=[
@@ -488,7 +488,7 @@ SPORTS_PLAYER_VALUES = SchemaContract(
 
 
 SPORTS_SFI_LEAGUES = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="reference",
     data_type="sfi_leagues",
     columns=[
@@ -515,7 +515,7 @@ SPORTS_SFI_LEAGUES = SchemaContract(
 
 
 SPORTS_SFI_PROGRESSIVE_STATS = SchemaContract(
-    category="sports",
+    asset_group="sports",
     instrument_type="match",
     data_type="sfi_progressive_stats",
     columns=[

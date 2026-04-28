@@ -24,10 +24,10 @@ Example::
                 nullable_overrides={"CEFI": False},
             ),
         ],
-        dimension_keys=["category", "venue"],
+        dimension_keys=["asset_group", "venue"],
     )
 
-    is_nullable = schema.is_nullable("tardis_exchange", {"category": "CEFI"})  # False
+    is_nullable = schema.is_nullable("tardis_exchange", {"asset_group": "CEFI"})  # False
 """
 
 from __future__ import annotations

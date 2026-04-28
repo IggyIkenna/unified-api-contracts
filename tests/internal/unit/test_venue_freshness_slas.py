@@ -69,7 +69,7 @@ class TestVenueFreshnessSLARegistry:
 
     def test_total_venue_count(self) -> None:
         """Registry should cover all 32 UMI VENUE_REGISTRY venues."""
-        assert len(VENUE_FRESHNESS_SLAS) == 32
+        assert len(VENUE_FRESHNESS_SLAS) == 31
 
     def test_all_sla_values_positive(self) -> None:
         for venue, sla in VENUE_FRESHNESS_SLAS.items():
@@ -150,7 +150,7 @@ class TestGetSLAsByCategory:
 
     def test_defi_count(self) -> None:
         defi = get_slas_by_category(VenueCategory.DEFI)
-        assert len(defi) == 14
+        assert len(defi) == 13
 
     def test_onchain_perps_count(self) -> None:
         onchain = get_slas_by_category(VenueCategory.ONCHAIN_PERPS)

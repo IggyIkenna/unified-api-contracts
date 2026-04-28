@@ -73,10 +73,10 @@ def test_usage_row_carries_dims() -> None:
     row = _minimal_row(
         meter_kind="execution_fill",
         source_service="execution-service",
-        dims={"venue": "binance", "category": "CEFI", "instrument_type": "spot"},
+        dims={"venue": "binance", "asset_group": "CEFI", "instrument_type": "spot"},
     )
     assert row.dims["venue"] == "binance"
-    assert row.dims["category"] == "CEFI"
+    assert row.dims["asset_group"] == "CEFI"
 
 
 def test_usage_row_is_frozen() -> None:

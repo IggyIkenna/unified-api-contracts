@@ -83,7 +83,7 @@ def cost(
 
     cid = combo_id_for(
         str(combo_cell.archetype_id),
-        str(combo_cell.category),
+        str(combo_cell.asset_group),
         str(combo_cell.instrument_type),
         combo_cell.venue_id,
         combo_cell.chain,
