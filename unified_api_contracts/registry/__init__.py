@@ -122,6 +122,13 @@ from .endpoint_registry import (
     ResponseFormat,
 )
 from .endpoints import BASE_URLS, ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
+from .expected_coverage import (
+    EXPECTED_COVERAGE_BY_ASSET_GROUP,
+    get_expected_data_types_for_venue_in_scope,
+    get_expected_pairs,
+    get_expected_venues_in_scope,
+    is_expected,
+)
 from .instruction_constraints import (
     INSTRUCTION_CONSTRAINTS,
     ConstraintOrderType,
@@ -161,6 +168,11 @@ from .max_underlying_moves import (
     compute_max_leverage_from_outright_move,
     compute_max_leverage_from_spread_move,
     get_max_move,
+)
+from .processed_data_dependencies import (
+    PROCESSED_REQUIRES_RAW,
+    get_raw_source_data_types,
+    is_processed_data_type,
 )
 from .representative_sample import (
     CEFI_BASE_ASSETS,
@@ -474,6 +486,7 @@ __all__ = [
     "ETHERFI",
     "EVERYGAME",
     "EXCHANGE_CODE_TO_NAME",
+    "EXPECTED_COVERAGE_BY_ASSET_GROUP",
     "FANATICS",
     "FANDUEL",
     "FLIFF",
@@ -532,6 +545,7 @@ __all__ = [
     "POINTSBET",
     "POLYMARKET",
     "PRIZEPICKS",
+    "PROCESSED_REQUIRES_RAW",
     "PROPHETX",
     "PROTECTED_RPC_URLS",
     "PROTOCOL_CAPABILITIES",

@@ -34,7 +34,7 @@ from unified_api_contracts.registry import (
     CEFI_BASE_ASSETS,
     CHAIN_RPC_TEMPLATES,
     CME_MONTH_CODES,
-    DATA_TYPES_BY_CATEGORY,
+    DATA_TYPES_BY_ASSET_GROUP,
     DEFI_INSTRUMENTS,
     DEFI_LENDING_ASSETS,
     DEFI_POOL_PAIRS,
@@ -48,7 +48,7 @@ from unified_api_contracts.registry import (
     TIMEFRAMES,
     TRADFI_EQUITIES,
     TRADFI_FUTURES,
-    VENUES_BY_CATEGORY,
+    VENUES_BY_ASSET_GROUP,
 )
 from unified_api_contracts.registry.venue_rate_limits import VENUE_RATE_LIMITS
 
@@ -214,8 +214,10 @@ def generate() -> dict[str, Any]:
             "registry_name": "market_data_categories",
             "version": version,
             "entries": {
-                "data_types_by_category": {k: sorted(v) for k, v in sorted(DATA_TYPES_BY_CATEGORY.items())},
-                "venues_by_category": {k: sorted(v) for k, v in sorted(VENUES_BY_CATEGORY.items())},
+                "data_types_by_asset_group": {
+                    k: sorted(v) for k, v in sorted(DATA_TYPES_BY_ASSET_GROUP.items())
+                },
+                "venues_by_asset_group": {k: sorted(v) for k, v in sorted(VENUES_BY_ASSET_GROUP.items())},
                 "timeframes": TIMEFRAMES,
             },
         },
@@ -267,9 +269,9 @@ def generate() -> dict[str, Any]:
         "data_pipeline_config": {
             "registry_name": "data_pipeline_config",
             "version": version,
-            "description": "Data types, timeframes, and venues by category for pipeline configuration",
+            "description": "Data types, timeframes, and venues by asset_group for pipeline configuration",
             "entries": {
-                "categories": sorted(DATA_TYPES_BY_CATEGORY.keys()),
+                "asset_groups": sorted(DATA_TYPES_BY_ASSET_GROUP.keys()),
                 "timeframes": TIMEFRAMES,
             },
         },
