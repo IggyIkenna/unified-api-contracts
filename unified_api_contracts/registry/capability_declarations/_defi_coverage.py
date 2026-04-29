@@ -14,9 +14,6 @@ EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
     {
         "TRADERJOEV2-AVALANCHE",  # subgraph returns 0 instruments as of 2026-04-29
         "UNISWAPV3-POLYGON",  # subgraph returns 0 instruments as of 2026-04-29 (migration finding)
-        # Spark uses its own schema (no `reserves` field) — aave_v3 adapter
-        # is incompatible. Needs a dedicated spark adapter to backfill.
-        "SPARK-ETHEREUM",
         "GMX-AVALANCHE",  # 0 historical parquets / minimal subgraph data (1 instrument) as of 2026-04-29
     }
 )
@@ -27,6 +24,11 @@ EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
 DEFI_INSTRUMENTS_NOT_YET_COLLECTED: frozenset[str] = frozenset(
     {
         "VELODROMEV2-OPTIMISM",  # subgraph: 881 instruments; bucket: 0 parquets as of 2026-04-29
+        # Spark adapter shipped 2026-04-29 (separate from aave_v3); subgraph
+        # returns 17 markets but instruments-service has never written
+        # historical parquets for this venue — until first scheduled run lands
+        # on bucket, data-status should NOT flag historical days as missing.
+        "SPARK-ETHEREUM",
     }
 )
 
