@@ -22,6 +22,7 @@ from unified_api_contracts.canonical.gcs_paths import AssetGroup as AssetGroup
 from unified_api_contracts.canonical.gcs_paths import BucketKind as BucketKind
 from unified_api_contracts.canonical.gcs_paths import bucket_name as bucket_name
 from unified_api_contracts.canonical.gcs_paths import bucket_template as bucket_template
+from unified_api_contracts.canonical.gcs_paths import generic_bucket_template as generic_bucket_template
 from unified_api_contracts.canonical.gcs_paths import sports_bucket_name as sports_bucket_name
 from unified_api_contracts.canonical.gcs_paths import strategy_store_bucket as strategy_store_bucket
 from unified_api_contracts.canonical.partition_paths import (
@@ -56,6 +57,7 @@ __all__ = [
     "build_prediction_partition_path",
     "build_tradfi_partition_path",
     "candidate_parquet_paths",
+    "generic_bucket_template",
     "sports_bucket_name",
     "strategy_store_bucket",
 ]

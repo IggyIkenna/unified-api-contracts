@@ -14,6 +14,7 @@ from unified_api_contracts.gcs_paths import (
     BucketKind,
     bucket_name,
     bucket_template,
+    generic_bucket_template,
     sports_bucket_name,
     strategy_store_bucket,
 )
@@ -78,6 +79,16 @@ def test_sports_facade_parity() -> None:
 def test_strategy_store_bucket() -> None:
     """Catalogue artefacts always live in the cefi-suffixed strategy-store bucket."""
     assert strategy_store_bucket(PID) == f"strategy-store-cefi-{PID}"
+
+
+def test_generic_bucket_template_keeps_both_placeholders() -> None:
+    """``generic_bucket_template`` keeps BOTH placeholders for lazy-resolve frameworks."""
+    assert generic_bucket_template(kind=BucketKind.INSTRUMENTS) == "instruments-store-{asset_group_lower}-{project_id}"
+    assert generic_bucket_template(kind=BucketKind.MARKET_DATA) == "market-data-tick-{asset_group_lower}-{project_id}"
+    assert (
+        generic_bucket_template(kind=BucketKind.MARKET_DATA, test_mode=True)
+        == "market-data-tick-{asset_group_lower}-test-{project_id}"
+    )
 
 
 def test_bucket_template_keeps_project_id_placeholder() -> None:

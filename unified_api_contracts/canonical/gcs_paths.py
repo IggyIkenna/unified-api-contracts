@@ -144,6 +144,44 @@ def strategy_store_bucket(project_id: str) -> str:
     return STRATEGY_STORE_BUCKET_TEMPLATE.format(project_id=project_id)
 
 
+# ---------------------------------------------------------------------------
+# Generic-shape templates (asset_group as a placeholder)
+# ---------------------------------------------------------------------------
+# Some consumers — notably MDPS ``BaseDependencyChecker`` — store template
+# strings with BOTH ``{asset_group_lower}`` and ``{project_id}`` placeholders
+# and resolve them at lookup time. These helpers expose those generic shapes
+# so the wire format stays in this module rather than getting duplicated in
+# the consumer.
+
+_GENERIC_TEMPLATES_BY_KIND: dict[BucketKind, str] = {
+    BucketKind.INSTRUMENTS: "instruments-store-{asset_group_lower}-{project_id}",
+    BucketKind.MARKET_DATA: "market-data-tick-{asset_group_lower}-{project_id}",
+}
+
+
+def generic_bucket_template(
+    *,
+    kind: BucketKind | str = BucketKind.INSTRUMENTS,
+    test_mode: bool = False,
+) -> str:
+    """Return a template with BOTH ``{asset_group_lower}`` AND ``{project_id}``
+    placeholders.
+
+    Used by lazy-resolve frameworks (e.g. MDPS ``BaseDependencyChecker``) that
+    receive the asset_group at runtime and format the template once per call.
+    For asset-group-specific templates use :func:`bucket_template`; for
+    immediate resolution use :func:`bucket_name`.
+    """
+    bk = BucketKind(kind) if not isinstance(kind, BucketKind) else kind
+    template = _GENERIC_TEMPLATES_BY_KIND.get(bk)
+    if template is None:
+        msg = f"unknown bucket kind: {kind!r}"
+        raise ValueError(msg)
+    if test_mode:
+        template = template.replace("-{project_id}", "-test-{project_id}")
+    return template
+
+
 # Sports parity import — sports has had its own facade since the phantom-row
 # audit. New code should prefer ``bucket_name(AssetGroup.SPORTS, project_id)``,
 # but importing ``sports_bucket_name`` from this module is the equivalent.
@@ -160,6 +198,7 @@ __all__ = [
     "BucketKind",
     "bucket_name",
     "bucket_template",
+    "generic_bucket_template",
     "sports_bucket_name",
     "strategy_store_bucket",
 ]
