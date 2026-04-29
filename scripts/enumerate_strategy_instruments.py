@@ -47,16 +47,22 @@ from enumerate_envelope import (  # noqa: E402  (path setup precedes import)
     _MANIFEST_PATH,
 )
 
-GCS_BUCKET = "strategy-store-cefi-central-element-323112"
+from unified_api_contracts.gcs_paths import AssetGroup, bucket_name, strategy_store_bucket
+
+_PROJECT_ID = "central-element-323112"
+
+GCS_BUCKET = strategy_store_bucket(_PROJECT_ID)
 GCS_OBJECT_PATH = "catalogue/strategy_instruments.json"
 
-_CATEGORY_TO_INSTRUMENT_BUCKET = {
-    "CEFI": "instruments-store-cefi-central-element-323112",
-    "DEFI": "instruments-store-defi-central-element-323112",
-    "SPORTS": "instruments-store-sports-central-element-323112",
-    "PREDICTION": "instruments-store-prediction-central-element-323112",
-    # TRADFI: no dedicated bucket today — instruments declared in UAC universe registry
-    "TRADFI": None,
+# Per-category instrument-store bucket. CROSS_CATEGORY has no dedicated bucket
+# (it's a virtual asset_group spanning others); TRADFI's universe is in the
+# UAC registry rather than a parquet, so bucket_name() returns None for it.
+_CATEGORY_TO_INSTRUMENT_BUCKET: dict[str, str | None] = {
+    "CEFI": bucket_name(AssetGroup.CEFI, _PROJECT_ID),
+    "DEFI": bucket_name(AssetGroup.DEFI, _PROJECT_ID),
+    "SPORTS": bucket_name(AssetGroup.SPORTS, _PROJECT_ID),
+    "PREDICTION": bucket_name(AssetGroup.PREDICTION, _PROJECT_ID),
+    "TRADFI": bucket_name(AssetGroup.TRADFI, _PROJECT_ID),
     "CROSS_CATEGORY": None,
 }
 
