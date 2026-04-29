@@ -240,30 +240,46 @@ def build_tradfi_partition_path(
 # market category (``binary`` / ``categorical`` / ``scalar``).
 
 
+def _sanitize_symbol(symbol: str) -> str:
+    """Match MTDS ``orchestrator._sanitize_symbol``: replace ``/`` with ``_``
+    so condition_ids with slashes (rare) don't escape into directory names."""
+    return symbol.replace("/", "_") if symbol else "_unknown_"
+
+
 def build_prediction_partition_path(
     *,
     venue: str,
     condition_id: str,
-    instrument_type: InstrumentType,
+    instrument_type: InstrumentType | str = "prediction_market",
     data_type: str,
     day: _dt.date,
-    file_name: str,
 ) -> str:
     """Build the canonical Prediction partition path (without bucket or
     ``raw_tick_data/by_date/`` prefix — the writer prepends those).
 
-    Wire format:
+    Wire format (verified 2026-04-29 against MTDS orchestrator
+    ``PartitionedTickWriter`` lines 640-650 and adapters
+    ``prediction/polymarket_adapter.py`` line 532-541 +
+    ``prediction/kalshi_adapter.py`` line 256-261):
 
     ``day={YYYY-MM-DD}/asset_group=prediction/venue={V}/
-    instrument_type={IT}/condition_id={CID}/data_type={DT}/{file_name}``
+    instrument_type={IT}/data_type={DT}/{condition_id}.parquet``
 
-    Used by Polymarket / Kalshi / Manifold prediction-market adapters.
+    The ``condition_id`` is used as the per-instrument FILENAME (matching
+    the per-instrument-symbol writer pattern), NOT a partition segment.
+    All Polymarket/Kalshi/Manifold markets share
+    ``instrument_type=prediction_market``; per-market disambiguation
+    happens via the ``condition_id`` filename.
 
-    VERIFY: As of 2026-04-29 the prediction adapters in MTDS construct
-    paths inline rather than via a shared helper. This canonical shape is
-    derived from the cross-asset pattern (CeFi/TradFi) plus the
-    ``condition_id`` axis that polymarket/kalshi pivot on. Audit the
-    actual wire format before using as a phantom-detection oracle.
+    Args:
+        venue: ``POLYMARKET`` / ``KALSHI`` / ``MANIFOLD``.
+        condition_id: Per-market identifier (Polymarket
+            ``conditionId`` / Kalshi event_ticker / Manifold market_id).
+            Used as the parquet file stem.
+        instrument_type: Defaults to ``"prediction_market"`` matching
+            production. Override only if a future variant emerges.
+        data_type: ``trades`` / ``book_snapshot`` / ``market_metadata``.
+        day: Partition day.
     """
     if not condition_id:
         msg = "condition_id must be a non-empty string"
@@ -271,17 +287,14 @@ def build_prediction_partition_path(
     if not data_type:
         msg = "data_type must be a non-empty string"
         raise ValueError(msg)
-    if not file_name:
-        msg = "file_name must be a non-empty string"
-        raise ValueError(msg)
 
     v = _normalize_venue_upper(venue)
-    it = instrument_type.value.lower()
+    it = instrument_type.value.lower() if isinstance(instrument_type, InstrumentType) else instrument_type.lower()
     day_str = day.strftime("%Y-%m-%d")
+    sanitized = _sanitize_symbol(condition_id)
     return (
         f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=prediction/venue={v}/"
-        f"instrument_type={it}/condition_id={condition_id}/"
-        f"data_type={data_type}/{file_name}"
+        f"instrument_type={it}/data_type={data_type}/{sanitized}.parquet"
     )
 
 
@@ -367,14 +380,19 @@ def candidate_parquet_paths(
         ]
 
     if ag == AssetGroup.PREDICTION:
+        # Prediction has no `file_name` — condition_id IS the filename.
+        instrument_type_raw = kwargs.get("instrument_type", "prediction_market")
+        if isinstance(instrument_type_raw, InstrumentType):
+            instrument_type_arg: InstrumentType | str = instrument_type_raw
+        else:
+            instrument_type_arg = str(instrument_type_raw)
         return [
             build_prediction_partition_path(
                 venue=str(kwargs["venue"]),
                 condition_id=str(kwargs["condition_id"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+                instrument_type=instrument_type_arg,
                 data_type=data_type,
                 day=day,
-                file_name=str(kwargs["file_name"]),
             )
         ]
 

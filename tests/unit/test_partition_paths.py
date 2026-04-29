@@ -160,19 +160,41 @@ def test_tradfi_partition_path_canonical() -> None:
 
 
 def test_prediction_partition_path_canonical() -> None:
+    """Verified 2026-04-29 against MTDS orchestrator + polymarket_adapter."""
     cid = "0x1234abcd"
     path = build_prediction_partition_path(
         venue="polymarket",
         condition_id=cid,
-        instrument_type=InstrumentType.PREDICTION_MARKET,
         data_type="trades",
         day=DAY,
-        file_name="trades.parquet",
     )
+    # condition_id is the FILENAME, not a partition segment.
     assert path == (
         f"day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
-        f"instrument_type=prediction_market/condition_id={cid}/data_type=trades/trades.parquet"
+        f"instrument_type=prediction_market/data_type=trades/{cid}.parquet"
     )
+
+
+def test_prediction_default_instrument_type() -> None:
+    """Default instrument_type is prediction_market — matches production."""
+    path = build_prediction_partition_path(
+        venue="kalshi",
+        condition_id="EVENT-2026-Q4",
+        data_type="trades",
+        day=DAY,
+    )
+    assert "/instrument_type=prediction_market/" in path
+
+
+def test_prediction_sanitizes_slash_in_condition_id() -> None:
+    """`/` in condition_id replaced with `_` to keep filename flat."""
+    path = build_prediction_partition_path(
+        venue="polymarket",
+        condition_id="market/with/slashes",
+        data_type="trades",
+        day=DAY,
+    )
+    assert path.endswith("/market_with_slashes.parquet")
 
 
 def test_prediction_rejects_empty_condition_id() -> None:
@@ -180,10 +202,8 @@ def test_prediction_rejects_empty_condition_id() -> None:
         build_prediction_partition_path(
             venue="polymarket",
             condition_id="",
-            instrument_type=InstrumentType.PREDICTION_MARKET,
             data_type="trades",
             day=DAY,
-            file_name="trades.parquet",
         )
 
 
@@ -235,3 +255,19 @@ def test_dispatcher_string_asset_group_accepted() -> None:
     )
     assert len(paths) == 1
     assert "asset_group=cefi" in paths[0]
+
+
+def test_dispatcher_routes_prediction() -> None:
+    """Prediction dispatcher uses condition_id as filename, no file_name kwarg."""
+    paths = candidate_parquet_paths(
+        AssetGroup.PREDICTION,
+        "trades",
+        DAY,
+        venue="POLYMARKET",
+        condition_id="0xabc123",
+    )
+    assert len(paths) == 1
+    assert paths[0] == (
+        "day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
+        "instrument_type=prediction_market/data_type=trades/0xabc123.parquet"
+    )
