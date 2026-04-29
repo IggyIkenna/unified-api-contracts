@@ -24,14 +24,38 @@ from unified_api_contracts.canonical.gcs_paths import bucket_name as bucket_name
 from unified_api_contracts.canonical.gcs_paths import bucket_template as bucket_template
 from unified_api_contracts.canonical.gcs_paths import sports_bucket_name as sports_bucket_name
 from unified_api_contracts.canonical.gcs_paths import strategy_store_bucket as strategy_store_bucket
+from unified_api_contracts.canonical.partition_paths import (
+    ASSET_GROUP_HIVE_KEY as ASSET_GROUP_HIVE_KEY,
+)
+from unified_api_contracts.canonical.partition_paths import (
+    build_cefi_partition_path as build_cefi_partition_path,
+)
+from unified_api_contracts.canonical.partition_paths import (
+    build_defi_partition_path as build_defi_partition_path,
+)
+from unified_api_contracts.canonical.partition_paths import (
+    build_prediction_partition_path as build_prediction_partition_path,
+)
+from unified_api_contracts.canonical.partition_paths import (
+    build_tradfi_partition_path as build_tradfi_partition_path,
+)
+from unified_api_contracts.canonical.partition_paths import (
+    candidate_parquet_paths as candidate_parquet_paths,
+)
 
 __all__ = [
+    "ASSET_GROUP_HIVE_KEY",
     "BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND",
     "STRATEGY_STORE_BUCKET_TEMPLATE",
     "AssetGroup",
     "BucketKind",
     "bucket_name",
     "bucket_template",
+    "build_cefi_partition_path",
+    "build_defi_partition_path",
+    "build_prediction_partition_path",
+    "build_tradfi_partition_path",
+    "candidate_parquet_paths",
     "sports_bucket_name",
     "strategy_store_bucket",
 ]
