@@ -601,39 +601,15 @@ TOKEN_EQUIVALENCE_GROUPS: dict[str, frozenset[str]] = {
 _TOKEN_TO_GROUP: dict[str, str] = {tok: group for group, tokens in TOKEN_EQUIVALENCE_GROUPS.items() for tok in tokens}
 
 
-# LST / LRT mainnet genesis (first day a rate query at noon-UTC can succeed).
-# Used by lst-rates collectors to short-circuit pre-genesis dates instead of
-# burning eth_calls that revert. Dates are token-launch dates on Ethereum mainnet
-# (or Solana for SOL-family LSTs) sourced from project docs / Etherscan
-# `getContractCreation`.
-LST_TOKEN_GENESIS: dict[str, str] = {
-    # ETH-family — Ethereum mainnet
-    "stETH": "2020-12-19",  # Lido genesis
-    "wstETH": "2022-02-19",  # wstETH wrapper
-    "rETH": "2021-11-08",  # Rocket Pool atlas
-    "cbETH": "2022-08-26",  # Coinbase Wrapped Staked ETH
-    "sUSDe": "2024-01-22",  # Ethena staked USDe
-    "sDAI": "2023-08-07",  # MakerDAO sDAI / DSR vault
-    "mETH": "2023-10-06",  # Mantle LSP launch
-    "swETH": "2023-04-17",  # Swell mainnet
-    "ETHx": "2023-07-10",  # Stader ETHx mainnet
-    "osETH": "2023-11-28",  # StakeWise V3 launch
-    "ankrETH": "2020-12-30",  # Ankr Eth2 staking (legacy aETHc renamed ankrETH)
-    "weETH": "2024-01-29",  # EtherFi weETH wrapper
-    "pufETH": "2024-01-31",  # Puffer Vault V2 (start of PUFFER coverage in our backfill)
-    # SOL-family — Solana mainnet
-    "mSOL": "2021-08-02",  # Marinade Finance launch
-    "jitoSOL": "2022-11-01",  # Jito stake pool launch
-}
-
-
-def get_lst_token_genesis(token: str) -> str | None:
-    """Return the YYYY-MM-DD genesis date for an LST token, or None if unknown.
-
-    Use this to skip pre-genesis dates in lst-rates collectors instead of
-    issuing eth_calls that will revert.
-    """
-    return LST_TOKEN_GENESIS.get(token)
+# LST / LRT genesis dates + venue->token mapping live in ``_defi_lst`` (extracted
+# to keep this file under the 900-line cap). Re-exported here so callers can
+# still ``from unified_api_contracts.registry import LST_TOKEN_GENESIS`` etc.
+from ._defi_lst import (  # noqa: E402  — co-located re-export
+    LST_TOKEN_GENESIS,
+    LST_VENUE_TO_TOKENS,
+    get_lst_token_genesis,
+    get_lst_venue_genesis,
+)
 
 
 def get_protocol_capability(protocol: str) -> _ProtocolCapability | None:
@@ -845,6 +821,7 @@ __all__ = [
     "DEFI_CAPABILITIES",
     "KNOWN_CHAINS",
     "LST_TOKEN_GENESIS",
+    "LST_VENUE_TO_TOKENS",
     "PROTECTED_RPC_URLS",
     "PROTOCOL_CAPABILITIES",
     "SOLANA_DEFI_PROTOCOLS",
@@ -864,6 +841,7 @@ __all__ = [
     "get_all_defi_chains",
     "get_data_types_for_protocol",
     "get_lst_token_genesis",
+    "get_lst_venue_genesis",
     "get_mtds_operations_for_protocol",
     "get_native_gas_token",
     "get_protocol_capability",
