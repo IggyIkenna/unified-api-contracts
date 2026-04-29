@@ -87,6 +87,55 @@ def test_cefi_partition_path_canonical() -> None:
     )
 
 
+def test_cefi_v6_chain_bundle_layout() -> None:
+    """v6 CHAIN bundle: instrument_type=options_chain + all v6 axes populated."""
+    path = build_cefi_partition_path(
+        venue="deribit",
+        instrument_type="options_chain",
+        data_type="trades",
+        day=DAY,
+        file_name="ignored.parquet",
+        underlying="btc",
+        quote_asset="usdc",
+        margin_type="USDC",
+    )
+    assert path == (
+        "day=2026-04-17/asset_group=cefi/venue=DERIBIT/instrument_type=options_chain/data_type=trades/"
+        "underlying=BTC/quote=USDC/margin=usdc/ticks.parquet"
+    )
+
+
+def test_cefi_v6_falls_back_to_v5_for_single_symbol() -> None:
+    """instrument_type=perpetual is per-symbol, not CHAIN — v6 axes ignored."""
+    path = build_cefi_partition_path(
+        venue="binance",
+        instrument_type=InstrumentType.PERPETUAL,
+        data_type="trades",
+        day=DAY,
+        file_name="BTC-USDT.parquet",
+        underlying="BTC",
+        quote_asset="USDT",
+        margin_type="USDT",
+    )
+    assert "underlying=" not in path
+    assert path.endswith("/data_type=trades/BTC-USDT.parquet")
+
+
+def test_cefi_v6_chain_without_all_axes_falls_back_to_v5() -> None:
+    """CHAIN instrument_type but missing margin_type → v5 layout."""
+    path = build_cefi_partition_path(
+        venue="deribit",
+        instrument_type="options_chain",
+        data_type="trades",
+        day=DAY,
+        file_name="BTC.parquet",
+        underlying="BTC",
+        quote_asset="USDC",
+    )
+    assert "underlying=" not in path
+    assert path.endswith("/data_type=trades/BTC.parquet")
+
+
 # ---------------------------------------------------------------------------
 # TradFi
 # ---------------------------------------------------------------------------

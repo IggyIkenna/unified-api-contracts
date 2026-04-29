@@ -118,33 +118,47 @@ def build_defi_partition_path(
 # axis (vs DeFi). instrument_type covers ``spot`` / ``perpetual`` / ``future``
 # / ``option`` / ``index``.
 
+# instrument_types that bundle an entire chain into a single file per
+# underlying per day. Mirrors MTDS
+# ``cefi/tardis_shared.py::CHAIN_INSTRUMENT_TYPES``.
+CEFI_CHAIN_INSTRUMENT_TYPES: frozenset[str] = frozenset({"options_chain", "futures_chain"})
+
 
 def build_cefi_partition_path(
     *,
     venue: str,
-    instrument_type: InstrumentType,
+    instrument_type: InstrumentType | str,
     data_type: str,
     day: _dt.date,
     file_name: str,
+    underlying: str = "",
+    quote_asset: str = "",
+    margin_type: str = "",
 ) -> str:
     """Build the canonical CeFi partition path (without bucket or
     ``raw_tick_data/by_date/`` prefix — the writer prepends those).
 
-    Wire format (matches MTDS
-    ``cefi/tardis_shared.py::build_partition_path`` v5 layout):
+    v5 (legacy) layout — single-symbol shards or callers leaving
+    underlying / quote_asset / margin_type empty:
 
     ``day={YYYY-MM-DD}/asset_group=cefi/venue={V}/
     instrument_type={IT}/data_type={DT}/{file_name}``
 
-    Used by all centralised crypto venues (Binance / Deribit / OKX / Bybit /
-    Hyperliquid / Coinbase / Kraken / Bitfinex / ...) writing
-    book / trade / ticker / funding / liquidation / OI shards.
+    v6 layout (2026-04-23) — only when ``instrument_type`` is a CHAIN bundle
+    (``options_chain`` / ``futures_chain``) AND all three of
+    ``underlying`` / ``quote_asset`` / ``margin_type`` are populated:
 
-    Note: MTDS has a v6 extension for CHAIN bundles that adds
-    ``underlying={U}/quote={Q}/margin={M}/`` segments before ``data_type``.
-    That extension is not surfaced in this SSOT yet — single-symbol and
-    legacy v5 callers produce the layout above. Captured as P0.3
-    follow-up.
+    ``day=.../instrument_type={IT}/data_type={DT}/
+    underlying={U}/quote={Q}/margin={M}/ticks.parquet``
+
+    For per-symbol (non-chain) shards, v6 does NOT add extra path segments —
+    the instrument_id itself already disambiguates
+    (``BTC-PERPETUAL.parquet`` vs ``BTC_USDC-PERPETUAL.parquet``).
+
+    Mirrors MTDS ``cefi/tardis_shared.py::build_partition_path``. Accepts
+    either ``InstrumentType`` enum members or raw lowercase strings (the
+    chain-bundle tokens ``options_chain`` / ``futures_chain`` aren't in the
+    canonical enum so callers pass them as strings).
     """
     if not data_type:
         msg = "data_type must be a non-empty string"
@@ -154,9 +168,19 @@ def build_cefi_partition_path(
         raise ValueError(msg)
 
     v = _normalize_venue_upper(venue)
-    it = instrument_type.value.lower()
+    it = instrument_type.value.lower() if isinstance(instrument_type, InstrumentType) else instrument_type.lower()
     day_str = day.strftime("%Y-%m-%d")
-    return f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=cefi/venue={v}/instrument_type={it}/data_type={data_type}/{file_name}"
+    base = f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=cefi/venue={v}/instrument_type={it}/data_type={data_type}"
+
+    # v6 layout only for CHAIN bundles with all three axes populated.
+    is_chain = it in CEFI_CHAIN_INSTRUMENT_TYPES
+    if is_chain and underlying and quote_asset and margin_type:
+        return (
+            f"{base}/underlying={underlying.upper()}/quote={quote_asset.upper()}/"
+            f"margin={margin_type.lower()}/ticks.parquet"
+        )
+
+    return f"{base}/{file_name}"
 
 
 # ---------------------------------------------------------------------------
@@ -375,6 +399,7 @@ def _coerce_instrument_type(value: object) -> InstrumentType:
 
 __all__ = [
     "ASSET_GROUP_HIVE_KEY",
+    "CEFI_CHAIN_INSTRUMENT_TYPES",
     "build_cefi_partition_path",
     "build_defi_partition_path",
     "build_prediction_partition_path",
