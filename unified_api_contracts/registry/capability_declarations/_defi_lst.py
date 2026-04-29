@@ -29,7 +29,10 @@ LST_TOKEN_GENESIS: dict[str, str] = {
     "osETH": "2023-11-28",  # StakeWise V3 launch
     "ankrETH": "2020-12-30",  # Ankr Eth2 staking (legacy aETHc renamed ankrETH)
     "weETH": "2024-01-29",  # EtherFi weETH wrapper
-    "pufETH": "2024-01-31",  # Puffer Vault V2 (start of PUFFER coverage)
+    # Puffer Vault V2 deployed 2024-01-31 but had zero shares at noon UTC that
+    # day -> convertToAssets(1e18) returned empty bytes; first non-empty read
+    # is 2024-02-01 (rate = 1.00000000).
+    "pufETH": "2024-02-01",
     # SOL-family — Solana mainnet
     "mSOL": "2021-08-02",  # Marinade Finance launch
     "jitoSOL": "2022-11-01",  # Jito stake pool launch
