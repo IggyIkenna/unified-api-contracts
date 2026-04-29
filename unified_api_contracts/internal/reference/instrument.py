@@ -136,3 +136,48 @@ class InstrumentRecord(BaseModel):
     timezone: str | None = Field(
         default=None, description="Exchange timezone (e.g. America/New_York, America/Chicago, UTC)"
     )
+
+    # --- DeFi metadata (DEX pools, lending markets, vaults; None for CeFi/TradFi) ---
+    # Aligned 1:1 with INSTRUMENTS_PARQUET_SCHEMA. Several columns already
+    # existed in the parquet schema (pool_address, pool_fee_tier,
+    # base_asset_contract_address, quote_asset_contract_address) but were
+    # not surfaced on this pydantic model — adapters had to populate them
+    # via dict pass-through and they got dropped on serialisation. Lifting
+    # them onto the model + adding genuinely-new fields lets MTDS DeFi
+    # handlers (dex_pools, dex_swaps, lending_indices, liquidations)
+    # consume them instead of re-querying The Graph each cycle.
+    # Plan: instruments_service_metadata_refactor_2026_04_29.
+    pool_address: str | None = Field(
+        default=None,
+        description="DEX pool / lending reserve / vault / market contract address",
+    )
+    pool_fee_tier: int | None = Field(
+        default=None,
+        description="DEX pool fee in basis points (Uniswap V3 feeTier / 100, Balancer pool fee, etc.)",
+    )
+    base_asset_contract_address: str | None = Field(
+        default=None,
+        description="ERC-20 contract address for base_asset (DEX token0 / lending underlying)",
+    )
+    quote_asset_contract_address: str | None = Field(
+        default=None,
+        description="ERC-20 contract address for quote_asset (DEX token1; None for single-asset markets)",
+    )
+    base_asset_decimals: int | None = Field(default=None, description="Decimals for base_asset (ERC-20)")
+    base_asset_symbol_onchain: str | None = Field(
+        default=None, description="On-chain ERC-20 symbol for base_asset (may differ from canonical base_asset)"
+    )
+    quote_asset_decimals: int | None = Field(default=None, description="Decimals for quote_asset (ERC-20)")
+    quote_asset_symbol_onchain: str | None = Field(default=None, description="On-chain ERC-20 symbol for quote_asset")
+    atoken_address: str | None = Field(
+        default=None,
+        description="Aave aToken address (interest-bearing supply receipt)",
+    )
+    debt_token_address: str | None = Field(
+        default=None,
+        description="Aave variable-debt token address",
+    )
+    rate_method_selector: str | None = Field(
+        default=None,
+        description="On-chain method selector for rate queries (LST contracts); optional parity field",
+    )
