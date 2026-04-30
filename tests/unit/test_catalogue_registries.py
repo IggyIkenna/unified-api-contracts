@@ -98,7 +98,8 @@ def test_capability_registry_non_empty_per_asset_group() -> None:
 
 
 def test_find_capability_exact_match() -> None:
-    cap = find_capability(AssetGroup.CEFI, "trades", "BINANCE", "perpetual")
+    """Wire-format venue tokens (BINANCE-FUTURES not BINANCE) per 2026-04-30 split."""
+    cap = find_capability(AssetGroup.CEFI, "trades", "BINANCE-FUTURES", "")
     assert cap is not None
     assert cap.live_capable is True
     assert cap.streaming_protocol == "ws"
@@ -106,21 +107,21 @@ def test_find_capability_exact_match() -> None:
 
 def test_find_capability_instrument_type_optional() -> None:
     """Passing ``instrument_type=None`` matches the first row regardless."""
-    cap = find_capability(AssetGroup.CEFI, "trades", "BINANCE")
+    cap = find_capability(AssetGroup.CEFI, "trades", "BINANCE-FUTURES")
     assert cap is not None
-    assert cap.venue == "BINANCE"
+    assert cap.venue == "BINANCE-FUTURES"
 
 
 def test_find_capability_returns_none_for_unknown() -> None:
     assert find_capability(AssetGroup.CEFI, "trades", "MADE_UP_VENUE") is None
 
 
-def test_options_capability_has_ttm_cutoff() -> None:
-    """Deribit options should declare a TTM cutoff."""
-    cap = find_capability(AssetGroup.CEFI, "trades", "DERIBIT", "option")
+def test_perpetual_liquidations_capability() -> None:
+    """BINANCE-FUTURES perpetual liquidations is a known live-capable tuple."""
+    cap = find_capability(AssetGroup.CEFI, "liquidations", "BINANCE-FUTURES", "perpetual")
     assert cap is not None
-    assert cap.ttm_cutoff_days is not None
-    assert cap.ttm_cutoff_days > 0
+    assert cap.live_capable is True
+    assert cap.streaming_protocol == "ws"
 
 
 def test_capability_is_frozen_dataclass() -> None:

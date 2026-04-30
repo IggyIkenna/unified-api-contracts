@@ -572,6 +572,20 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         ttm_cutoff_days=365,
         sources=("market_tick_data_service/market_interface/adapters/tradfi/databento_opra_converter.py",),
     ),
+    # Yahoo Finance ETF daily OHLCV — backfilled by launch-tradfi-etf-backfill-vm.sh
+    # (deployment-service commit 890ce29, 2026-04-30). 30-symbol institutional
+    # universe: SPY/IVV/VOO, QQQ, IWM, DIA, GLD/SLV, USO, TLT/IEF/SHY, HYG/LQD,
+    # EEM/EFA, 10 sector SPDRs, IBIT/FBTC/ARKB, ETHA/FETH.
+    DataTypeCapability(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_1d",
+        venue="YAHOO_FINANCE",
+        instrument_type="etf",
+        live_capable=False,
+        batch_capable=True,
+        notes="Daily OHLCV via free-tier yfinance — sweet spot for institutional ETF coverage",
+        sources=("market_tick_data_service/market_interface/adapters/tradfi/yahoo_finance_adapter.py",),
+    ),
     # =====================================================================
     # Prediction
     # =====================================================================
