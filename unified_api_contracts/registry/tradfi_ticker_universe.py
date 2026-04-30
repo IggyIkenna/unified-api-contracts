@@ -329,11 +329,16 @@ ETF_TICKERS: list[str] = [
     "ARKW",
     "ARKF",
     "ARKQ",
+    # BTC spot ETFs
     "IBIT",
     "FBTC",
     "ARKB",
     "GBTC",
     "BITO",
+    # ETH spot ETFs (US listings post-2024-07-23)
+    "ETHA",
+    "FETH",
+    "ETHE",
     "VIG",
     "VXUS",
     "AGG",

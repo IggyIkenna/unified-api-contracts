@@ -135,6 +135,37 @@ _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("ETH.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "crypto", "ETH"),
 ]
 
+# Crypto spot ETFs — US-listed BTC + ETH spot ETFs.
+#
+# Venue is normalised to "ARCA" matching the existing EXCHANGE_BY_TICKER
+# convention in ticker_registry.py (where IBIT/FBTC/GBTC/BITO are all
+# listed under ARCA even though some technically trade on NASDAQ
+# (IBIT/ETHA) or BATS (FBTC/ARKB/FETH)). Databento DBEQ.BASIC is the
+# consolidated SIP feed and returns trades + quotes regardless of
+# listing exchange, so the venue label is for partition routing only.
+#
+# stype_in="raw_symbol" is the equity convention (one ticker per fetch,
+# no parent symbology).
+#
+# Backfill listing dates:
+#   IBIT, FBTC: 2024-01-11 (US BTC spot ETF launch)
+#   ARKB:       2024-01-11
+#   GBTC:       2024-01-11 (uplisted from OTC; existed pre-conversion)
+#   BITO:       2021-10-19 (futures-based, not pure spot but listed)
+#   ETHA, FETH: 2024-07-23 (US ETH spot ETF launch)
+#   ETHE:       2024-07-23 (uplisted from OTC; existed pre-conversion)
+_BTC_SPOT_ETFS: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("IBIT", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "IBIT", "BTC"),
+    DatabentoInstrumentDef("FBTC", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "FBTC", "BTC"),
+    DatabentoInstrumentDef("GBTC", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "GBTC", "BTC"),
+]
+
+_ETH_SPOT_ETFS: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("ETHA", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
+    DatabentoInstrumentDef("FETH", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "FETH", "ETH"),
+    DatabentoInstrumentDef("ETHE", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "ETHE", "ETH"),
+]
+
 # CME ES options — full E-mini S&P 500 options surface.
 # Databento parent symbology: [ROOT].OPT fetches all strikes/expiries for that product.
 #
@@ -199,6 +230,8 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CME_ES_OPTIONS,
     *_ICE_FUTURES,
     *_CBOE_INSTRUMENTS,
+    *_BTC_SPOT_ETFS,
+    *_ETH_SPOT_ETFS,
 ]
 
 # ---------------------------------------------------------------------------
