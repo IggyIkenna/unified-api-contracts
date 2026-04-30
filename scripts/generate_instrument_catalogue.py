@@ -183,6 +183,22 @@ def _aggregate_tuple(
                 latest_captured = str(latest_value)
 
     coverage_start_date = coverage_start(capability.asset_group, capability.venue)
+    # Denominator floor: if the manifest's earliest captured day is later
+    # than the registry's coverage_start, use the manifest date instead.
+    # This prevents inflated denominators for venues where the adapter
+    # started capturing recently even though the venue itself is older
+    # (e.g. DERIBIT options 2025-07-18 captured even though Deribit launched
+    # 2016, or POLYMARKET trades 2024-10-XX even though venue launched 2020).
+    if "date" in df.columns and len(df) > 0:
+        try:
+            earliest_in_manifest = df["date"].min()
+            if pd.notna(earliest_in_manifest):
+                earliest_str = str(earliest_in_manifest)
+                earliest_date = datetime.strptime(earliest_str, "%Y-%m-%d").date()
+                if coverage_start_date is None or earliest_date > coverage_start_date:
+                    coverage_start_date = earliest_date
+        except (ValueError, TypeError):
+            pass
     expected = _expected_day_count(coverage_start_date, today)
 
     return _build_entry(

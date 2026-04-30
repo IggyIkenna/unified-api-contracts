@@ -86,9 +86,11 @@ def test_full_coverage_for_known_tuple_marks_batch_ready() -> None:
     assert binance_perp["latest_captured_day"] == today.isoformat()
     # is_recent → live_ready (capability says live=True)
     assert binance_perp["live_ready"] is True
-    # coverage_pct will be tiny since expected_days spans Binance launch
-    # (2017-08-17) to today (~9y). batch_ready requires ≥0.9 — will be False.
-    assert binance_perp["coverage_pct"] < 0.05
+    # Denominator-floor: registry coverage_start (2017-08-17) is older than
+    # the manifest's earliest captured day (today - 6), so denominator clips
+    # to the manifest date — 7 captured / 7 expected = 100%.
+    assert binance_perp["coverage_pct"] == 1.0
+    assert binance_perp["batch_ready"] is True
 
 
 # ---------------------------------------------------------------------------

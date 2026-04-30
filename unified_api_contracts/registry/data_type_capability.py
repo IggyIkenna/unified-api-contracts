@@ -340,55 +340,115 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # =====================================================================
     # DeFi
     # =====================================================================
+    # Wire-format SSOT verified 2026-04-30. DeFi adapters today write to
+    # the manifest with EMPTY data_type — the data-type axis in market
+    # data is currently unused on the DeFi side. Capabilities are
+    # therefore keyed by venue alone (one row per protocol). Aspirational
+    # data_types (lending_indices / dex_pool_swaps / dex_pool_state /
+    # lst_rates / yield_snapshots) are deferred until the DeFi adapters
+    # start writing them — captured as a follow-up.
     DataTypeCapability(
         asset_group=AssetGroup.DEFI,
-        data_type="lending_indices",
+        data_type="",
         venue="AAVE_V3",
-        instrument_type="a_token",
+        instrument_type="",
         live_capable=False,
         batch_capable=True,
         requires_credentials=True,
-        notes="On-chain block-by-block indexing; live = follow head",
         sources=("market_tick_data_service/market_interface/adapters/defi/aave/",),
     ),
     DataTypeCapability(
         asset_group=AssetGroup.DEFI,
-        data_type="dex_pool_swaps",
+        data_type="",
         venue="UNISWAP_V3",
-        instrument_type="pool",
+        instrument_type="",
         live_capable=False,
         batch_capable=True,
         requires_credentials=True,
         liquidity_cutoff_usd=1_000_000.0,
-        notes="Pool TVL filter — sub-1M pools dropped from canonical capture",
         sources=("market_tick_data_service/market_interface/adapters/defi/uniswap_v3_adapter.py",),
     ),
     DataTypeCapability(
         asset_group=AssetGroup.DEFI,
-        data_type="dex_pool_state",
-        venue="UNISWAP_V3",
-        instrument_type="pool",
+        data_type="",
+        venue="UNISWAP_V2",
+        instrument_type="",
         live_capable=False,
         batch_capable=True,
         requires_credentials=True,
     ),
     DataTypeCapability(
         asset_group=AssetGroup.DEFI,
-        data_type="lst_rates",
+        data_type="",
+        venue="CURVE",
+        instrument_type="",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.DEFI,
+        data_type="",
+        venue="BALANCER",
+        instrument_type="",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.DEFI,
+        data_type="",
+        venue="COMPOUND_V3",
+        instrument_type="",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.DEFI,
+        data_type="",
         venue="LIDO",
-        instrument_type="lst",
+        instrument_type="",
         live_capable=False,
         batch_capable=True,
         requires_credentials=True,
     ),
     DataTypeCapability(
         asset_group=AssetGroup.DEFI,
-        data_type="yield_snapshots",
+        data_type="",
         venue="ETHENA",
-        instrument_type="yield_bearing",
+        instrument_type="",
         live_capable=False,
         batch_capable=True,
         requires_credentials=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.DEFI,
+        data_type="",
+        venue="MORPHO",
+        instrument_type="",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.DEFI,
+        data_type="",
+        venue="EIGENLAYER",
+        instrument_type="",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.DEFI,
+        data_type="rewards",
+        venue="EIGENLAYER",
+        instrument_type="staking",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+        notes="Eigenlayer restaking rewards stream — only DeFi tuple with a non-empty data_type today",
     ),
     # =====================================================================
     # TradFi
@@ -515,6 +575,14 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # =====================================================================
     # Prediction
     # =====================================================================
+    # Wire-format SSOT verified 2026-04-30 against
+    # gs://market-data-tick-prediction-central-element-323112/_index/availability_index.parquet:
+    # POLYMARKET writes data_type=trades (with instrument_type=prediction_market)
+    # AND data_type=prediction_trades (with per-underlying instrument_type
+    # tokens BTC/ETH/XRP/SOL/SPX/DJIA/NDX/SILVER/GOLD/CRUDE_OIL/...).
+    # KALSHI excluded — no US account on the test environment yet.
+    # POLYMARKET book_snapshot / market_metadata excluded — adapters do
+    # not yet write those data_types to the manifest.
     DataTypeCapability(
         asset_group=AssetGroup.PREDICTION,
         data_type="trades",
@@ -527,31 +595,104 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     ),
     DataTypeCapability(
         asset_group=AssetGroup.PREDICTION,
-        data_type="book_snapshot",
+        data_type="prediction_trades",
         venue="POLYMARKET",
-        instrument_type="prediction_market",
+        instrument_type="BTC",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        notes="Per-underlying prediction trades — one capability per underlying token",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="ETH",
         live_capable=True,
         batch_capable=True,
         streaming_protocol="ws",
     ),
     DataTypeCapability(
         asset_group=AssetGroup.PREDICTION,
-        data_type="trades",
-        venue="KALSHI",
-        instrument_type="prediction_market",
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="SOL",
         live_capable=True,
         batch_capable=True,
         streaming_protocol="ws",
-        requires_credentials=True,
     ),
     DataTypeCapability(
         asset_group=AssetGroup.PREDICTION,
-        data_type="market_metadata",
+        data_type="prediction_trades",
         venue="POLYMARKET",
-        instrument_type="prediction_market",
-        live_capable=False,
+        instrument_type="XRP",
+        live_capable=True,
         batch_capable=True,
-        notes="Market list refreshed via REST poll",
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="SPX",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="DJIA",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="NDX",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="GOLD",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="SILVER",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="CRUDE_OIL",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        venue="POLYMARKET",
+        instrument_type="OTHER",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        notes="Long-tail / uncategorised prediction-trades bucket",
     ),
     # =====================================================================
     # Sports
