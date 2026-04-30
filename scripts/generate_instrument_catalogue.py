@@ -153,15 +153,22 @@ def _aggregate_tuple(
     # (venue, data_type, instrument_type) tuple has many rows per day
     # (one per instrument_id / symbol / chain etc.) — counting rows
     # would inflate captured beyond expected_days and break the ratio.
+    #
+    # Pre-v5 fallback: when a manifest doesn't have a capture_status
+    # column, treat every row as captured. After concat'ing pre-v5 +
+    # v5 manifests we may get a frame where capture_status is NaN for
+    # some rows — those rows behave as pre-v5 (treat-as-captured) so
+    # we don't lose visibility on adapters that haven't migrated yet
+    # (e.g. DeFi market-data BALANCER / COMPOUND_V3 today).
     if "capture_status" in df.columns and "date" in df.columns:
-        captured_dates = df.loc[df["capture_status"] == "captured", "date"]
-        empty_dates = df.loc[df["capture_status"] == "empty_confirmed", "date"]
-        failed_dates = df.loc[df["capture_status"] == "attempted_failed", "date"]
+        cs = df["capture_status"]
+        captured_dates = df.loc[(cs == "captured") | cs.isna(), "date"]
+        empty_dates = df.loc[cs == "empty_confirmed", "date"]
+        failed_dates = df.loc[cs == "attempted_failed", "date"]
         captured = int(captured_dates.nunique())
         empty = int(empty_dates.nunique())
         failed = int(failed_dates.nunique())
     elif "date" in df.columns:
-        # Pre-v5 manifest — treat every row's date as captured.
         captured = int(df["date"].nunique())
         empty = 0
         failed = 0
@@ -172,11 +179,11 @@ def _aggregate_tuple(
 
     latest_captured: str | None = None
     if "date" in df.columns and captured > 0:
-        captured_rows = (
-            df[df["capture_status"] == "captured"]
-            if "capture_status" in df.columns
-            else df
-        )
+        if "capture_status" in df.columns:
+            cs = df["capture_status"]
+            captured_rows = df[(cs == "captured") | cs.isna()]
+        else:
+            captured_rows = df
         if not captured_rows.empty:
             latest_value = captured_rows["date"].max()
             if pd.notna(latest_value):

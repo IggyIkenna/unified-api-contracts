@@ -718,13 +718,33 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
         data_type="ODDS",
+        venue="",
+        instrument_type="",
+        live_capable=False,
+        batch_capable=True,
+        requires_credentials=True,
+        notes=(
+            "Bulk ODDS captures (105K+ rows in prod) write to the manifest "
+            "with empty venue — the source axis (footystats_odds, "
+            "mdps_odds_horizon_bucket) is recorded inside the parquet path, "
+            "not as the manifest venue token. SSOT: "
+            "unified_api_contracts.sports.SOURCE_COVERAGE_START."
+        ),
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.SPORTS,
+        data_type="ODDS",
         venue="ODDS_API",
         instrument_type="",
         live_capable=False,
         batch_capable=True,
         requires_credentials=True,
         retention_days=730,
-        notes="Odds-API historical depth limited by tier",
+        notes=(
+            "Explicit ODDS_API venue tag (~17K rows in prod). The bulk of "
+            "ODDS data is at empty venue — see the empty-venue capability "
+            "above."
+        ),
     ),
     DataTypeCapability(
         asset_group=AssetGroup.SPORTS,
