@@ -128,14 +128,26 @@ def _aggregate_tuple(
         # rows for ``BINANCE``, ``BINANCE-FUTURES``, ``BINANCE-SPOT``, etc.
         # The instrument_type axis below still disambiguates per row, so the
         # alias does not double-count.
-        df = df[df["venue"].astype(str).str.startswith(capability.venue)]
+        # Empty-venue special case: registry says ``venue=""`` (e.g. sports
+        # rows captured per-source rather than per-venue) — match only rows
+        # where the manifest venue is empty/NaN, not every row.
+        venue_col = df["venue"].astype(str)
+        if capability.venue == "":
+            df = df[(venue_col == "") | (venue_col == "nan")]
+        else:
+            df = df[venue_col.str.startswith(capability.venue)]
     if "data_type" in df.columns and capability.data_type:
         df = df[df["data_type"] == capability.data_type]
     if (
         capability.instrument_type is not None
         and "instrument_type" in df.columns
     ):
-        df = df[df["instrument_type"] == capability.instrument_type]
+        # Empty-string instrument_type matches both empty and NaN.
+        if capability.instrument_type == "":
+            it_col = df["instrument_type"].astype(str)
+            df = df[(it_col == "") | (it_col == "nan")]
+        else:
+            df = df[df["instrument_type"] == capability.instrument_type]
 
     if "capture_status" in df.columns:
         captured = int((df["capture_status"] == "captured").sum())
