@@ -134,6 +134,13 @@ from unified_api_contracts.internal.architecture_v2.fund_business_unit import (
     funds_for_business_unit,
     reserving_business_unit_for,
 )
+from unified_api_contracts.internal.architecture_v2.leveraged_legs import (
+    CashSweepPolicy,
+    LegDrift,
+    LegPortfolioState,
+    LegSizingStrategy,
+    LeveragedLeg,
+)
 from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability import (
     MULTI_LEG_ORDER_CAPABILITY_REGISTRY,
     ListedComboType,
@@ -285,6 +292,7 @@ __all__ = [
     "BusinessUnit",
     "CancelInstruction",
     "CapabilityClaims",
+    "CashSweepPolicy",
     "ChildVenueDecl",
     "ClientAudience",
     "ClientContext",
@@ -320,7 +328,11 @@ __all__ = [
     "InternalCostLeakageError",
     "ItemRef",
     "KillSwitchReason",
+    "LegDrift",
+    "LegPortfolioState",
+    "LegSizingStrategy",
     "LendInstruction",
+    "LeveragedLeg",
     "ListedComboType",
     "LockState",
     "LtvAndHaircut",
