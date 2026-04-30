@@ -432,7 +432,15 @@ class ManifestLoader:
 
 
 class GCSManifestLoader:
-    """Calls UTL ``read_availability_index`` per (asset_group, kind) bucket."""
+    """Reads the consolidated availability_index parquet per (asset_group, kind) bucket.
+
+    Reads the consolidated parquet directly via gcsfs/pandas rather than going
+    through UTL's ``read_availability_index``. Reason: when the consolidated
+    blob is stale (>120s), UTL falls back to merging all per-VM shards live —
+    that's a 1-2 minute operation per bucket because the cefi market-data
+    bucket has ~1032 per-VM shards. The catalogue is regenerated nightly, so
+    a few minutes of staleness on the consolidated blob is acceptable.
+    """
 
     def __init__(self, project_id: str) -> None:
         self.project_id = project_id
@@ -440,12 +448,13 @@ class GCSManifestLoader:
     def __call__(
         self, asset_group: AssetGroup, kind: BucketKind
     ) -> pd.DataFrame:
-        from unified_trading_library import read_availability_index  # type: ignore[attr-defined]
-
         bucket = bucket_name(asset_group, self.project_id, kind=kind)
         if bucket is None:
             return pd.DataFrame()
-        return read_availability_index(bucket)
+        try:
+            return pd.read_parquet(f"gs://{bucket}/_index/availability_index.parquet")
+        except FileNotFoundError:
+            return pd.DataFrame()
 
 
 class StaticManifestLoader:
