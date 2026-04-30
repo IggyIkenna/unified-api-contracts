@@ -170,6 +170,11 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "CME",
         "ICE",
         "CBOE",
+        # NYSE Arca + Cboe BZX — listing exchanges for crypto spot ETFs
+        # routed via dedicated Databento datasets (ARCX.PILLAR, BATS.PITCH).
+        # See registry/tradfi_instrument_universe.py:_BTC_SPOT_ETFS / _ETH_SPOT_ETFS.
+        "ARCA",
+        "BATS",
         # External data providers
         "FX",  # FX rates (KRW/USD via Yahoo Finance data provider)
         "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)

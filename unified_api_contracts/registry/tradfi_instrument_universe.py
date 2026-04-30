@@ -137,33 +137,35 @@ _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
 
 # Crypto spot ETFs — US-listed BTC + ETH spot ETFs.
 #
-# Venue is normalised to "ARCA" matching the existing EXCHANGE_BY_TICKER
-# convention in ticker_registry.py (where IBIT/FBTC/GBTC/BITO are all
-# listed under ARCA even though some technically trade on NASDAQ
-# (IBIT/ETHA) or BATS (FBTC/ARKB/FETH)). Databento DBEQ.BASIC is the
-# consolidated SIP feed and returns trades + quotes regardless of
-# listing exchange, so the venue label is for partition routing only.
+# Each ETF is declared with its REAL listing exchange and the matching
+# Databento dataset. DBEQ.BASIC (consolidated SIP) returned 0 records
+# for these tickers in the 2026-04-30 backfill — the dataset coverage
+# is too thin for crypto ETFs. Direct ITCH/PILLAR/PITCH feeds work.
+#
+# Listing → dataset:
+#   IBIT, ETHA            : NASDAQ → XNAS.ITCH (Nasdaq TotalView)
+#   GBTC, BITO, ETHE      : ARCA   → ARCX.PILLAR (NYSE Arca PILLAR)
+#   FBTC, ARKB, FETH      : BATS   → BATS.PITCH (Cboe BZX PITCH)
 #
 # stype_in="raw_symbol" is the equity convention (one ticker per fetch,
 # no parent symbology).
 #
 # Backfill listing dates:
-#   IBIT, FBTC: 2024-01-11 (US BTC spot ETF launch)
-#   ARKB:       2024-01-11
-#   GBTC:       2024-01-11 (uplisted from OTC; existed pre-conversion)
-#   BITO:       2021-10-19 (futures-based, not pure spot but listed)
-#   ETHA, FETH: 2024-07-23 (US ETH spot ETF launch)
-#   ETHE:       2024-07-23 (uplisted from OTC; existed pre-conversion)
+#   IBIT, FBTC, ARKB, GBTC : 2024-01-11 (US BTC spot ETF launch; GBTC
+#                            uplisted from OTC same date)
+#   BITO                   : 2021-10-19 (futures-based)
+#   ETHA, FETH, ETHE       : 2024-07-23 (US ETH spot ETF launch; ETHE
+#                            uplisted from OTC same date)
 _BTC_SPOT_ETFS: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("IBIT", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "IBIT", "BTC"),
-    DatabentoInstrumentDef("FBTC", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "FBTC", "BTC"),
-    DatabentoInstrumentDef("GBTC", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "GBTC", "BTC"),
+    DatabentoInstrumentDef("IBIT", "NASDAQ", "ETF", "XNAS.ITCH", "raw_symbol", "BTC", "crypto", "IBIT", "BTC"),
+    DatabentoInstrumentDef("FBTC", "BATS", "ETF", "BATS.PITCH", "raw_symbol", "BTC", "crypto", "FBTC", "BTC"),
+    DatabentoInstrumentDef("GBTC", "ARCA", "ETF", "ARCX.PILLAR", "raw_symbol", "BTC", "crypto", "GBTC", "BTC"),
 ]
 
 _ETH_SPOT_ETFS: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("ETHA", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
-    DatabentoInstrumentDef("FETH", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "FETH", "ETH"),
-    DatabentoInstrumentDef("ETHE", "ARCA", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "ETHE", "ETH"),
+    DatabentoInstrumentDef("ETHA", "NASDAQ", "ETF", "XNAS.ITCH", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
+    DatabentoInstrumentDef("FETH", "BATS", "ETF", "BATS.PITCH", "raw_symbol", "ETH", "crypto", "FETH", "ETH"),
+    DatabentoInstrumentDef("ETHE", "ARCA", "ETF", "ARCX.PILLAR", "raw_symbol", "ETH", "crypto", "ETHE", "ETH"),
 ]
 
 # CME ES options — full E-mini S&P 500 options surface.
