@@ -149,12 +149,23 @@ def _aggregate_tuple(
         else:
             df = df[df["instrument_type"] == capability.instrument_type]
 
-    if "capture_status" in df.columns:
-        captured = int((df["capture_status"] == "captured").sum())
-        empty = int((df["capture_status"] == "empty_confirmed").sum())
-        failed = int((df["capture_status"] == "attempted_failed").sum())
+    # Coverage is measured in UNIQUE DAYS, not rows. A single
+    # (venue, data_type, instrument_type) tuple has many rows per day
+    # (one per instrument_id / symbol / chain etc.) — counting rows
+    # would inflate captured beyond expected_days and break the ratio.
+    if "capture_status" in df.columns and "date" in df.columns:
+        captured_dates = df.loc[df["capture_status"] == "captured", "date"]
+        empty_dates = df.loc[df["capture_status"] == "empty_confirmed", "date"]
+        failed_dates = df.loc[df["capture_status"] == "attempted_failed", "date"]
+        captured = int(captured_dates.nunique())
+        empty = int(empty_dates.nunique())
+        failed = int(failed_dates.nunique())
+    elif "date" in df.columns:
+        # Pre-v5 manifest — treat every row's date as captured.
+        captured = int(df["date"].nunique())
+        empty = 0
+        failed = 0
     else:
-        # Pre-v5 manifest — treat every row as captured.
         captured = int(len(df))
         empty = 0
         failed = 0

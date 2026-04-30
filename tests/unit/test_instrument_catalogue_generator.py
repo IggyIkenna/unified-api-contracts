@@ -58,8 +58,8 @@ def test_full_coverage_for_known_tuple_marks_batch_ready() -> None:
     rows = [
         _manifest_row(
             day=(today - timedelta(days=i)).isoformat(),
-            venue="BINANCE",
-            data_type="trades",
+            venue="BINANCE-FUTURES",
+            data_type="derivative_ticker",
             instrument_type="perpetual",
             capture_status="captured",
         )
@@ -77,7 +77,9 @@ def test_full_coverage_for_known_tuple_marks_batch_ready() -> None:
     binance_perp = next(
         e
         for e in entries
-        if e["venue"] == "BINANCE" and e["data_type"] == "trades" and e.get("instrument_type") == "perpetual"
+        if e["venue"] == "BINANCE-FUTURES"
+        and e["data_type"] == "derivative_ticker"
+        and e.get("instrument_type") == "perpetual"
     )
 
     assert binance_perp["captured_days"] == 7
@@ -102,30 +104,28 @@ def test_partial_coverage_with_mixed_status() -> None:
             day="2026-04-25",
             venue="DERIBIT",
             data_type="trades",
-            instrument_type="option",
+            instrument_type=None,
             capture_status="captured",
         ),
         _manifest_row(
             day="2026-04-26",
             venue="DERIBIT",
             data_type="trades",
-            instrument_type="option",
+            instrument_type=None,
             capture_status="empty_confirmed",
         ),
         _manifest_row(
             day="2026-04-27",
             venue="DERIBIT",
             data_type="trades",
-            instrument_type="option",
+            instrument_type=None,
             capture_status="attempted_failed",
         ),
     ]
     loader = StaticManifestLoader({AssetGroup.CEFI: pd.DataFrame(rows)})
     entries, _ = build_catalogue(loader, today=today)
     deribit = next(
-        e
-        for e in entries
-        if e["venue"] == "DERIBIT" and e["data_type"] == "trades" and e.get("instrument_type") == "option"
+        e for e in entries if e["venue"] == "DERIBIT" and e["data_type"] == "trades" and e.get("instrument_type") == ""
     )
 
     assert deribit["captured_days"] == 1
@@ -149,7 +149,7 @@ def test_all_attempted_failed_zero_coverage() -> None:
             day=(today - timedelta(days=i)).isoformat(),
             venue="HYPERLIQUID",
             data_type="trades",
-            instrument_type="perpetual",
+            instrument_type=None,
             capture_status="attempted_failed",
         )
         for i in range(0, 5)
@@ -159,7 +159,7 @@ def test_all_attempted_failed_zero_coverage() -> None:
     hyperliquid = next(
         e
         for e in entries
-        if e["venue"] == "HYPERLIQUID" and e["data_type"] == "trades" and e.get("instrument_type") == "perpetual"
+        if e["venue"] == "HYPERLIQUID" and e["data_type"] == "trades" and e.get("instrument_type") == ""
     )
 
     assert hyperliquid["captured_days"] == 0
@@ -198,7 +198,7 @@ def test_cefi_trades_entry_includes_schema() -> None:
     today = date(2026, 4, 29)
     loader = StaticManifestLoader({})
     entries, _ = build_catalogue(loader, today=today)
-    binance_perp = next(e for e in entries if e["venue"] == "BINANCE" and e["data_type"] == "trades")
+    binance_perp = next(e for e in entries if e["venue"] == "BINANCE-FUTURES" and e["data_type"] == "trades")
     schema = binance_perp.get("schema", [])
     assert len(schema) > 0
     names = {col["name"] for col in schema}
@@ -220,7 +220,7 @@ def test_shard_dynamics_independent_of_manifest() -> None:
                 [
                     _manifest_row(
                         day="2026-04-29",
-                        venue="BINANCE",
+                        venue="BINANCE-FUTURES",
                         data_type="trades",
                         instrument_type="perpetual",
                         capture_status="captured",
@@ -247,7 +247,7 @@ def test_markdown_groups_by_asset_group_and_emits_emojis() -> None:
     rows = [
         _manifest_row(
             day=(today - timedelta(days=i)).isoformat(),
-            venue="BINANCE",
+            venue="BINANCE-FUTURES",
             data_type="trades",
             instrument_type="perpetual",
             capture_status="captured",
