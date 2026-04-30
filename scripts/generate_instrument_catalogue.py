@@ -124,7 +124,11 @@ def _aggregate_tuple(
 
     df = manifest_df
     if "venue" in df.columns:
-        df = df[df["venue"] == capability.venue]
+        # Venue-prefix alias: a registry token of ``BINANCE`` matches manifest
+        # rows for ``BINANCE``, ``BINANCE-FUTURES``, ``BINANCE-SPOT``, etc.
+        # The instrument_type axis below still disambiguates per row, so the
+        # alias does not double-count.
+        df = df[df["venue"].astype(str).str.startswith(capability.venue)]
     if "data_type" in df.columns and capability.data_type:
         df = df[df["data_type"] == capability.data_type]
     if (
@@ -264,6 +268,12 @@ def build_catalogue(
 
     ``manifest_loader`` is a callable ``(asset_group, kind) -> DataFrame``.
     Tests inject a fake; production injects a UTL-backed loader.
+
+    Per asset_group we load BOTH the instruments-store manifest and the
+    market-data-tick manifest, concatenate them, and filter per tuple. Tick
+    data types (trades / funding_rate / liquidations) live in market-data-tick;
+    sports FIXTURES / ODDS live in instruments-store; the merged frame
+    surfaces both.
     """
     today_date = today or date.today()
     entries: list[TupleEntry] = []
@@ -272,7 +282,10 @@ def build_catalogue(
     for capability in DATA_TYPE_CAPABILITY_REGISTRY:
         ag = capability.asset_group
         if ag not in cached_manifests:
-            cached_manifests[ag] = manifest_loader(ag, BucketKind.INSTRUMENTS)
+            instruments_df = manifest_loader(ag, BucketKind.INSTRUMENTS)
+            market_data_df = manifest_loader(ag, BucketKind.MARKET_DATA)
+            frames = [df for df in (instruments_df, market_data_df) if not df.empty]
+            cached_manifests[ag] = pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
         manifest_df = cached_manifests[ag]
         entries.append(_aggregate_tuple(manifest_df, capability, today_date))
 
