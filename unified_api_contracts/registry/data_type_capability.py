@@ -572,23 +572,37 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         ttm_cutoff_days=365,
         sources=("market_tick_data_service/market_interface/adapters/tradfi/databento_opra_converter.py",),
     ),
-    # Yahoo Finance ETF daily OHLCV — backfilled by launch-tradfi-etf-backfill-vm.sh
-    # (deployment-service commit 890ce29, 2026-04-30). 30-symbol institutional
-    # universe: SPY/IVV/VOO, QQQ, IWM, DIA, GLD/SLV, USO, TLT/IEF/SHY, HYG/LQD,
-    # EEM/EFA, 10 sector SPDRs, IBIT/FBTC/ARKB, ETHA/FETH.
+    # ETF daily OHLCV (NYSE / NASDAQ / ARCA) — capability stubs.
+    #
+    # ARCHITECTURAL NOTE (2026-04-30 correction): venue and data source
+    # are distinct axes. SPY's venue is NYSE Arca; QQQ's is NASDAQ. yfinance
+    # is a DATA SOURCE we fetch from, not a venue. The legacy
+    # ``YAHOO_FINANCE`` venue token in some other registries (expected_coverage,
+    # data_availability) is a stop-gap that conflates the two — new code
+    # should avoid it.
+    #
+    # These capability rows will render ⚪ in the catalogue until either
+    # (a) the Databento equity adapter ships (currently NotImplementedError
+    # per its own docstring) — writes ETF ohlcv_24h to venue=NYSE/NASDAQ, or
+    # (b) the Yahoo adapter is taught to classify symbol → venue and write
+    # under the correct exchange token.
     DataTypeCapability(
         asset_group=AssetGroup.TRADFI,
         data_type="ohlcv_24h",
-        venue="YAHOO_FINANCE",
+        venue="NYSE",
         instrument_type="etf",
         live_capable=False,
         batch_capable=True,
-        notes=(
-            "Daily 24-hour OHLCV via free-tier yfinance — sweet spot for "
-            "institutional ETF coverage. data_type='ohlcv_24h' matches the "
-            "MTDS vocabulary (NOT 'ohlcv_1d')."
-        ),
-        sources=("market_tick_data_service/market_interface/adapters/tradfi/yahoo_finance_adapter.py",),
+        notes="SPY / IVV / VOO / IWM / DIA / GLD / SLV / USO / TLT / IEF / SHY / HYG / LQD / EEM / EFA / sector SPDRs",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_24h",
+        venue="NASDAQ",
+        instrument_type="etf",
+        live_capable=False,
+        batch_capable=True,
+        notes="QQQ / IBIT / FBTC / ARKB / ETHA / FETH",
     ),
     # =====================================================================
     # Prediction
