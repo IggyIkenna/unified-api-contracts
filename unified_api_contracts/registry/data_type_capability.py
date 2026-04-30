@@ -578,12 +578,16 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # EEM/EFA, 10 sector SPDRs, IBIT/FBTC/ARKB, ETHA/FETH.
     DataTypeCapability(
         asset_group=AssetGroup.TRADFI,
-        data_type="ohlcv_1d",
+        data_type="ohlcv_24h",
         venue="YAHOO_FINANCE",
         instrument_type="etf",
         live_capable=False,
         batch_capable=True,
-        notes="Daily OHLCV via free-tier yfinance — sweet spot for institutional ETF coverage",
+        notes=(
+            "Daily 24-hour OHLCV via free-tier yfinance — sweet spot for "
+            "institutional ETF coverage. data_type='ohlcv_24h' matches the "
+            "MTDS vocabulary (NOT 'ohlcv_1d')."
+        ),
         sources=("market_tick_data_service/market_interface/adapters/tradfi/yahoo_finance_adapter.py",),
     ),
     # =====================================================================
