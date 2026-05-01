@@ -492,6 +492,7 @@ from unified_api_contracts.internal.domain.sports.risk import (
 )
 from unified_api_contracts.internal.domain.strategy_service import (
     ClientStrategyOverride,
+    RewardAttributionRow,
     StrategyModeParams,
 )
 from unified_api_contracts.internal.domain.strategy_service.domain_events import (
@@ -1382,6 +1383,7 @@ __all__ = [
     "ResourceMetricsSnapshot",
     "RestartDetectedDetails",
     "RestartDetectedEvent",
+    "RewardAttributionRow",
     "RewardPnLLayer",
     "RewardPosition",
     "RewardTokenEconomics",
