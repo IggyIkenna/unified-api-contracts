@@ -154,6 +154,13 @@ class StrategyInstanceIdentity(BaseModel):
     client_id: str
     share_class: ShareClass
     env: Literal["prod", "paper", "canary", "dev"] = "prod"
+    holding_wallet: str | None = None
+    """Mirrors ``StrategyInstanceDefinition.holding_wallet`` — the
+    wallet address that holds the strategy's on-chain positions.
+    Surfaced on the identity (not just the definition) so the engine
+    can look it up at tick time without a definition round-trip. The
+    runner copies this from the definition when constructing the
+    identity in V2EngineOrchestrator.register_instance."""
 
 
 class StrategyInstanceDefinition(BaseModel):
@@ -171,6 +178,16 @@ class StrategyInstanceDefinition(BaseModel):
     retired_reason: str | None = None
     slot_version: int = 1
     notes: str = ""
+    holding_wallet: str | None = None
+    """The wallet/account address that holds the strategy's positions on
+    chain (or sub-account id for CEX strategies). Restaking-aware
+    archetypes use this to claim per-strategy seasonal rewards from the
+    daily ``lst_seasonal_rewards`` parquet — the
+    ``ParquetDustLoader`` filters parquet rows where ``recipient_address
+    == holding_wallet``. None for asset_groups that don't need wallet-
+    attributed reward streams (CEX-only, sports, prediction). Plumbed
+    through ``StrategyInstanceIdentity`` -> ``BaseArchetypeEngineV2``
+    -> Phase6Driver dust loader."""
 
 
 # ---------------------------------------------------------------------------
