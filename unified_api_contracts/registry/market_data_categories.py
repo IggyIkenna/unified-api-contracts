@@ -159,6 +159,12 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "DERIBIT",
         "UPBIT",
         "COINBASE",
+        # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
+        "BITFINEX-SPOT",
+        "BITGET-SPOT",
+        "BITGET-FUTURES",
+        "KRAKEN-SPOT",
+        "KRAKEN-FUTURES",
         # On-chain CLOBs (reclassified from DEFI - CLOB-style data like CeFi)
         "HYPERLIQUID",
         "ASTER",
