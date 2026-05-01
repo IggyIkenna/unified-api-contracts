@@ -604,6 +604,14 @@ _TOKEN_TO_GROUP: dict[str, str] = {tok: group for group, tokens in TOKEN_EQUIVAL
 # LST / LRT genesis dates + venue->token mapping live in ``_defi_lst`` (extracted
 # to keep this file under the 900-line cap). Re-exported here so callers can
 # still ``from unified_api_contracts.registry import LST_TOKEN_GENESIS`` etc.
+# Empty / deprecated DeFi venue metadata lives in ``_defi_coverage`` (co-located
+# re-export). Used by data-status to suppress missing-coverage flags for venues
+# whose subgraph is retired or whose parquets haven't been collected yet.
+from ._defi_coverage import (  # noqa: E402  — co-located re-export
+    DEFI_INSTRUMENTS_NOT_YET_COLLECTED,
+    EMPTY_OR_DEPRECATED_DEFI_VENUES,
+    venue_has_no_expected_defi_coverage,
+)
 from ._defi_lst import (  # noqa: E402  — co-located re-export
     LST_TOKEN_GENESIS,
     LST_VENUE_TO_TOKENS,
@@ -819,6 +827,8 @@ __all__ = [
     "CHAIN_REQUIRED_TOKENS",
     "CHAIN_RPC_TEMPLATES",
     "DEFI_CAPABILITIES",
+    "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
+    "EMPTY_OR_DEPRECATED_DEFI_VENUES",
     "KNOWN_CHAINS",
     "LST_TOKEN_GENESIS",
     "LST_VENUE_TO_TOKENS",
@@ -858,4 +868,5 @@ __all__ = [
     "parse_defi_venue",
     "resolve_solana_mint",
     "token_matches_major_assets",
+    "venue_has_no_expected_defi_coverage",
 ]

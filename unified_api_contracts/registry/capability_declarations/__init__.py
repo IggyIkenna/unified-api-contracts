@@ -9,6 +9,8 @@ from ._defi import (
     CHAIN_REQUIRED_TOKENS,
     CHAIN_RPC_TEMPLATES,
     DEFI_CAPABILITIES,
+    DEFI_INSTRUMENTS_NOT_YET_COLLECTED,
+    EMPTY_OR_DEPRECATED_DEFI_VENUES,
     LST_TOKEN_GENESIS,
     LST_VENUE_TO_TOKENS,
     PROTECTED_RPC_URLS,
@@ -41,6 +43,7 @@ from ._defi import (
     is_token_equivalent,
     resolve_solana_mint,
     token_matches_major_assets,
+    venue_has_no_expected_defi_coverage,
 )
 from ._signal_broadcast import (
     SIGNAL_BROADCAST_CAPABILITIES,
@@ -57,6 +60,8 @@ __all__ = [
     "CHAIN_REQUIRED_TOKENS",
     "CHAIN_RPC_TEMPLATES",
     "DEFI_CAPABILITIES",
+    "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
+    "EMPTY_OR_DEPRECATED_DEFI_VENUES",
     "LST_TOKEN_GENESIS",
     "LST_VENUE_TO_TOKENS",
     "PROTECTED_RPC_URLS",
@@ -94,4 +99,5 @@ __all__ = [
     "is_token_equivalent",
     "resolve_solana_mint",
     "token_matches_major_assets",
+    "venue_has_no_expected_defi_coverage",
 ]

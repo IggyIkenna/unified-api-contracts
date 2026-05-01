@@ -48,6 +48,132 @@ _API_FOOTBALL_ID_TO_LEAGUE: dict[int, str] = {
 
 
 # ---------------------------------------------------------------------------
+# Per-source data coverage start dates
+# ---------------------------------------------------------------------------
+# The data-status reader's expected denominator is "league plays per UAC
+# fixture calendar", but a source can't deliver data for a date before the
+# source itself launched / our capture pipeline hooked it up. Without this
+# clip, dates pre-source-start show as ``missing`` shards forever, which is
+# wrong: the source NEVER had data for those days, by design.
+#
+# Each entry is the earliest date for which the source produces SOME parquet
+# for SOME league. Days before the start date are excluded from
+# ``expected_dates_for_league`` for sources that read this registry.
+#
+# SSOT for data-status coverage clipping. Update when adding a new provider
+# or when an existing provider extends backfill (e.g. footystats Pro tier
+# unlocks earlier history).
+SOURCE_COVERAGE_START: dict[str, date] = {
+    "api_football": date(2018, 1, 1),
+    "footystats": date(2019, 1, 1),
+    "understat": date(2015, 1, 16),
+    "transfermarkt": date(2019, 1, 1),
+    "soccer_football_info": date(2019, 1, 1),
+    "open_meteo": date(2019, 3, 2),
+    # odds-api raw ticks → MDPS bucketed odds (consumed by FSS odds_features).
+    # odds-api itself provides historical from 2020-06; our MTDS+MDPS hooked
+    # in at 2020-06-06 per market-data-tick-sports/processed/by_date probe.
+    "odds_api": date(2020, 6, 6),
+    "mdps_odds_horizon_bucket": date(2020, 6, 6),
+}
+
+
+# Per-(source, data_type) override when a specific entity from a source has
+# a later coverage start than the source-wide value. Probed live 2026-04-30:
+# SFI's source-wide coverage is 2019-01-01 (leagues, day-list endpoint), but
+# /matches/view/progressive/ returns empty for every match before 2020-01-01,
+# so SFI_PROGRESSIVE_STATS gets its own later floor here.
+DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
+    ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
+}
+
+
+# Date-range gaps that we KNOW are missing and should NOT count as "missing"
+# in the data-status denominator. Format: list of (start, end) inclusive
+# `YYYY-MM-DD` tuples per (source, data_type).
+#
+# Add to this registry as we discover gaps live (e.g. provider outages,
+# leagues paused). Sparse-but-not-empty windows (like SFI_PROGRESSIVE_STATS
+# 2020-2021, where some matches return data and most don't) are NOT a good
+# fit — those still count as expected, just under-captured.
+KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
+
+
+def get_source_coverage_start(
+    source_key: str,
+    data_type: str | None = None,
+) -> date | None:
+    """Return the earliest date this source has data for (UAC SSOT).
+
+    When ``data_type`` is supplied AND a per-(source, data_type) override
+    exists in ``DATA_TYPE_COVERAGE_START``, returns that — otherwise falls
+    back to the source-wide value. Returns ``None`` for unknown sources —
+    caller should treat as no clip.
+
+    Used by deployment-api ``_sports_expected_dates_for_league`` to drop
+    pre-launch dates from the expected denominator so the data-status UI
+    doesn't paint them as missing.
+    """
+    if data_type is not None:
+        override = DATA_TYPE_COVERAGE_START.get((source_key, data_type))
+        if override is not None:
+            return override
+    return SOURCE_COVERAGE_START.get(source_key)
+
+
+def get_known_coverage_gaps(
+    source_key: str,
+    data_type: str,
+) -> list[tuple[str, str]]:
+    """Return list of (start, end) ISO-date gap windows that should be
+    excluded from the expected denominator for this (source, data_type)."""
+    return KNOWN_COVERAGE_GAPS.get((source_key, data_type), [])
+
+
+def is_in_known_gap(
+    source_key: str,
+    data_type: str,
+    iso_date: str,
+) -> bool:
+    """True if the given ``YYYY-MM-DD`` date falls inside a registered
+    known-gap window for this (source, data_type)."""
+    return any(start <= iso_date <= end for start, end in KNOWN_COVERAGE_GAPS.get((source_key, data_type), []))
+
+
+def clip_dates_to_source_coverage(
+    source_key: str,
+    start: str,
+    end: str,
+    data_type: str | None = None,
+) -> tuple[str, str]:
+    """Clip a date range so it doesn't extend before the source's launch.
+
+    Both inputs/outputs are ``YYYY-MM-DD`` strings. If the source is unknown
+    the input range is returned unchanged.
+
+    When ``data_type`` is supplied, applies the per-(source, data_type)
+    override from ``DATA_TYPE_COVERAGE_START`` if one exists — otherwise
+    falls back to the source-wide ``SOURCE_COVERAGE_START``.
+
+    Empty-range signal: when the entire query window is BEFORE the source's
+    coverage start, returns ``(end, "")`` where ``start > end`` — callers
+    should detect ``end == ""`` (or ``start > end``) as "no expected dates".
+    Returning a single-day window inside the pre-source range would be wrong
+    because the source had no data on that day either.
+    """
+    coverage_start = get_source_coverage_start(source_key, data_type)
+    if coverage_start is None:
+        return start, end
+    coverage_iso = coverage_start.isoformat()
+    if start >= coverage_iso:
+        return start, end
+    if end < coverage_iso:
+        # Entire range pre-source → signal empty via inverted bounds.
+        return coverage_iso, ""
+    return coverage_iso, end
+
+
+# ---------------------------------------------------------------------------
 # Query helpers
 # ---------------------------------------------------------------------------
 
@@ -294,15 +420,20 @@ def get_expected_leagues_for_source(
 
 
 __all__ = [
+    "DATA_TYPE_COVERAGE_START",
     "FEATURES_LEAGUES",
+    "KNOWN_COVERAGE_GAPS",
     "LEAGUE_EXPECTED_TEAM_COUNTS",
     "LEAGUE_REGISTRY",
     "NON_FOOTBALL_LEAGUES",
     "PREDICTION_LEAGUES",
     "REFERENCE_LEAGUES",
+    "SOURCE_COVERAGE_START",
+    "clip_dates_to_source_coverage",
     "get_all_prediction_league_ids",
     "get_expected_leagues_for_source",
     "get_expected_team_count_for_league",
+    "get_known_coverage_gaps",
     "get_league",
     "get_league_by_api_football_id",
     "get_league_fixture_calendar",
@@ -311,4 +442,6 @@ __all__ = [
     "get_leagues_for_sport",
     "get_live_stats_api_football_ids",
     "get_prediction_leagues",
+    "get_source_coverage_start",
+    "is_in_known_gap",
 ]

@@ -19,7 +19,7 @@ from unified_api_contracts.gcs_paths import (
     strategy_store_bucket,
 )
 
-PID = "central-element-323112"
+PID = "test-project"
 
 
 @pytest.mark.parametrize(

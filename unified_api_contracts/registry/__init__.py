@@ -30,6 +30,8 @@ from .capability_declarations import (
     BITCOIN_RPC_TEMPLATES,
     CHAIN_REQUIRED_TOKENS,
     CHAIN_RPC_TEMPLATES,
+    DEFI_INSTRUMENTS_NOT_YET_COLLECTED,
+    EMPTY_OR_DEPRECATED_DEFI_VENUES,
     LST_TOKEN_GENESIS,
     LST_VENUE_TO_TOKENS,
     PROTECTED_RPC_URLS,
@@ -62,6 +64,7 @@ from .capability_declarations import (
     is_token_equivalent,
     resolve_solana_mint,
     token_matches_major_assets,
+    venue_has_no_expected_defi_coverage,
 )
 from .cefi_instrument_universe import (
     CEFI_ACCEPTED_QUOTE_ASSETS,
@@ -473,6 +476,7 @@ __all__ = [
     "DATABENTO_VALID_PARENT_SYMBOLS",
     "DATA_TYPES_BY_ASSET_GROUP",
     "DEFI_INSTRUMENTS",
+    "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
     "DEFI_LENDING_ASSETS",
     "DEFI_POOL_PAIRS",
     "DEFI_PROTOCOLS",
@@ -483,6 +487,7 @@ __all__ = [
     "DEX_VENUE_KEYWORDS",
     "DRAFTKINGS",
     "DRAFTKINGS_PICK6",
+    "EMPTY_OR_DEPRECATED_DEFI_VENUES",
     "ENDPOINT_REGISTRY",
     "ENDPOINT_SCHEMA_MAP",
     "ESPNBET",
@@ -738,4 +743,5 @@ __all__ = [
     "validate_mode_env_auth",
     "validate_operation",
     "venue_accepts_collateral",
+    "venue_has_no_expected_defi_coverage",
 ]

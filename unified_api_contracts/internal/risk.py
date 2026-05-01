@@ -643,3 +643,178 @@ class MarginHealthSnapshot(BaseModel):
     )
     client_id: str | None = None
     account_id: str | None = None
+
+
+# ---------------------------------------------------------------------------
+# Margin model registry (P2.1a — workspace audit 2026-05-01)
+# ---------------------------------------------------------------------------
+
+
+class MarginModel(StrEnum):
+    """Canonical margin/liquidation model identifier per venue or protocol.
+
+    The UTL ``margin_and_liquidation`` engine dispatches on this enum; UAC
+    ``LiquidationParams`` table is keyed by this enum. Single SSOT for
+    "what's the margin model for X?" queries across services.
+
+    EXPOSURE_CAP is the soft analog used by sports/prediction venues — there's
+    no hard liquidation, just position-size caps enforced by the bookmaker
+    or the exchange contract.
+    """
+
+    AAVE_V3 = "AAVE_V3"
+    COMPOUND_V3 = "COMPOUND_V3"
+    MORPHO_BLUE = "MORPHO_BLUE"
+    BINANCE_CROSS = "BINANCE_CROSS"
+    BINANCE_ISOLATED = "BINANCE_ISOLATED"
+    BYBIT = "BYBIT"
+    OKX = "OKX"
+    DYDX_V4 = "DYDX_V4"
+    HYPERLIQUID = "HYPERLIQUID"
+    FUTURES_SPAN = "FUTURES_SPAN"
+    EXPOSURE_CAP = "EXPOSURE_CAP"
+
+
+class LiquidationParams(BaseModel):
+    """Per-margin-model threshold tuple — single SSOT for HF/LTV cutoffs.
+
+    Reconciles the previously-conflicting Aave HF thresholds: risk-and-exposure
+    (1.5/1.3/1.1), alerting (1.2), strategy (1.2 default). After P2.1 ships,
+    every service consumes this table; no service inlines threshold numbers.
+
+    Semantics:
+    - ``health_factor_warning``: emit MarginEvent severity=warning at or below.
+    - ``health_factor_critical``: emit severity=critical; strategy pauses.
+    - ``health_factor_severe``: deleverage executor takes auto-action.
+    - ``health_factor_liquidation``: protocol liquidation imminent (HF < 1.0
+      typically).
+    - ``ltv_max_borrow``: hard cap for new borrowing (consumed by pre-trade).
+    - ``mmr_warning_pct`` / ``mmr_critical_pct``: CeFi margin-ratio analogs.
+    """
+
+    margin_model: MarginModel
+    health_factor_warning: Decimal | None = None
+    health_factor_critical: Decimal | None = None
+    health_factor_severe: Decimal | None = None
+    health_factor_liquidation: Decimal | None = None
+    ltv_max_borrow: Decimal | None = None
+    mmr_warning_pct: Decimal | None = Field(default=None, description="CeFi: margin_usage_pct above this -> warning")
+    mmr_critical_pct: Decimal | None = Field(default=None, description="CeFi: margin_usage_pct above this -> critical")
+    description: str = ""
+
+
+LIQUIDATION_PARAMS_REGISTRY: dict[MarginModel, LiquidationParams] = {
+    # ── DeFi: HF-based ──────────────────────────────────────────────────
+    MarginModel.AAVE_V3: LiquidationParams(
+        margin_model=MarginModel.AAVE_V3,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.825"),
+        description=(
+            "Reconciled from prior 1.5/1.3/1.1 (risk) and 1.2 (alerting/strategy) — "
+            "tighter warning at 1.30 catches drift earlier; severe at 1.05 gives "
+            "the deleverage executor headroom before 1.00 liq trigger."
+        ),
+    ),
+    MarginModel.COMPOUND_V3: LiquidationParams(
+        margin_model=MarginModel.COMPOUND_V3,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.85"),
+        description="Mirrors Aave V3 thresholds; per-asset overrides via collateral factor.",
+    ),
+    MarginModel.MORPHO_BLUE: LiquidationParams(
+        margin_model=MarginModel.MORPHO_BLUE,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.86"),
+        description="Per-market lltv set at deployment; defaults track Aave shape.",
+    ),
+    # ── CeFi: MMR-based ─────────────────────────────────────────────────
+    MarginModel.BINANCE_CROSS: LiquidationParams(
+        margin_model=MarginModel.BINANCE_CROSS,
+        mmr_warning_pct=Decimal("70"),
+        mmr_critical_pct=Decimal("85"),
+        description="Cross margin: warn at 70% used, critical at 85%. Tier-aware MMR via cefi_margin_tiers.",
+    ),
+    MarginModel.BINANCE_ISOLATED: LiquidationParams(
+        margin_model=MarginModel.BINANCE_ISOLATED,
+        mmr_warning_pct=Decimal("70"),
+        mmr_critical_pct=Decimal("85"),
+        description="Isolated margin: per-position loss capped at posted margin.",
+    ),
+    MarginModel.BYBIT: LiquidationParams(
+        margin_model=MarginModel.BYBIT,
+        mmr_warning_pct=Decimal("70"),
+        mmr_critical_pct=Decimal("85"),
+        description="Bybit unified margin; tier-aware MMR via cefi_margin_tiers.",
+    ),
+    MarginModel.OKX: LiquidationParams(
+        margin_model=MarginModel.OKX,
+        mmr_warning_pct=Decimal("70"),
+        mmr_critical_pct=Decimal("85"),
+        description="OKX tiered margin; tier-aware MMR via cefi_margin_tiers.",
+    ),
+    MarginModel.DYDX_V4: LiquidationParams(
+        margin_model=MarginModel.DYDX_V4,
+        mmr_warning_pct=Decimal("70"),
+        mmr_critical_pct=Decimal("85"),
+        description="dYdX v4 perpetual margin; isolated by default.",
+    ),
+    MarginModel.HYPERLIQUID: LiquidationParams(
+        margin_model=MarginModel.HYPERLIQUID,
+        mmr_warning_pct=Decimal("70"),
+        mmr_critical_pct=Decimal("85"),
+        description="Hyperliquid cross margin with auto-deleverage on insolvency.",
+    ),
+    # ── TradFi: SPAN-based ──────────────────────────────────────────────
+    MarginModel.FUTURES_SPAN: LiquidationParams(
+        margin_model=MarginModel.FUTURES_SPAN,
+        mmr_warning_pct=Decimal("75"),
+        mmr_critical_pct=Decimal("90"),
+        description="SPAN-style scenario margin; venue computes IM/MM via portfolio risk array.",
+    ),
+    # ── Sports / prediction: soft caps ──────────────────────────────────
+    MarginModel.EXPOSURE_CAP: LiquidationParams(
+        margin_model=MarginModel.EXPOSURE_CAP,
+        description=(
+            "No hard liquidation. Bookmaker / exchange contract enforces "
+            "position-size caps; risk-service tracks exposure but no margin call."
+        ),
+    ),
+}
+
+
+def get_liquidation_params(margin_model: MarginModel) -> LiquidationParams:
+    """Lookup helper. Always succeeds — every margin model has a row."""
+    return LIQUIDATION_PARAMS_REGISTRY[margin_model]
+
+
+class HealthFactor(BaseModel):
+    """Standalone health-factor snapshot for a single account/protocol pair.
+
+    Distinct from the ``health_factor: Decimal | None`` field on ``RiskMetrics``
+    and ``MarginHealthSnapshot`` — this is a rich type that bundles the value
+    with its computed status against the registered thresholds. Used as the
+    return type from UTL's ``LiquidationMonitor.assess()``.
+    """
+
+    margin_model: MarginModel
+    value: Decimal
+    status: RiskStatus
+    severity_breach: str = Field(
+        default="none",
+        description="none | warning | critical | severe | liquidation",
+    )
+    timestamp: datetime
+    client_id: str | None = Field(default=None, json_schema_extra={"pii": True})
+    account_id: str | None = None
+    venue: str | None = None
+    distance_to_warning_pct: Decimal | None = None
+    distance_to_liquidation_pct: Decimal | None = None

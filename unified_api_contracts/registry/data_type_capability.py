@@ -53,17 +53,13 @@ class DataTypeCapability:
 # dataclass — never mutate at import time.
 
 DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
-    # =====================================================================
-    # CeFi
-    # =====================================================================
-    # Wire-format SSOT verified 2026-04-30 against
-    # gs://market-data-tick-cefi-central-element-323112/_index/availability_index.parquet:
-    #   - Venue tokens are exchange-product-specific: BINANCE-SPOT vs
-    #     BINANCE-FUTURES vs OKX-FUTURES / OKX-SPOT / OKX-SWAP. BYBIT /
-    #     DERIBIT / HYPERLIQUID / UPBIT keep a single token per venue.
-    #   - data_type vocabulary (top-volume): trades, book_snapshot_5
-    #     (NOT book_snapshot), derivative_ticker, futures_chain,
-    #     liquidations.
+    # ── CeFi ─────────────────────────────────────────────────────────────
+    # Wire-format SSOT verified 2026-04-30 against the per-asset-group
+    # availability_index.parquet. CeFi venue tokens are exchange-product-specific
+    # (BINANCE-SPOT vs BINANCE-FUTURES; OKX-FUTURES/SPOT/SWAP; BYBIT/DERIBIT/
+    # HYPERLIQUID/UPBIT keep a single token). Top-volume data_types: trades,
+    # book_snapshot_5 (NOT book_snapshot), derivative_ticker, futures_chain,
+    # liquidations.
     #   - instrument_type is empty for spot venues + most derivative_ticker
     #     rows; perpetual for liquidations + funding-bearing rows on
     #     BINANCE-FUTURES / BYBIT / OKX-SWAP.
@@ -451,13 +447,10 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         notes="Eigenlayer restaking rewards stream — only DeFi tuple with a non-empty data_type today",
     ),
     # =====================================================================
-    # TradFi
-    # =====================================================================
-    # Wire-format SSOT verified 2026-04-30 against
-    # gs://market-data-tick-tradfi-central-element-323112/_index/availability_index.parquet:
-    # venues = CME, ICE, CBOE, NYSE, NASDAQ, FX. data_types = ohlcv_1m,
-    # ohlcv_24h, ohlcv_15m, trades, tbbo, options_chain. instrument_types =
-    # future / equity / spot_pair / options_chain / combo (or empty).
+    # ── TradFi (verified 2026-04-30 against availability_index.parquet) ─
+    # venues=CME/ICE/CBOE/NYSE/NASDAQ/FX; data_types=ohlcv_{1m,24h,15m},
+    # trades, tbbo, options_chain; instrument_types=future/equity/spot_pair/
+    # options_chain/combo (or empty).
     DataTypeCapability(
         asset_group=AssetGroup.TRADFI,
         data_type="ohlcv_1m",
@@ -604,17 +597,12 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         batch_capable=True,
         notes="QQQ / IBIT / FBTC / ARKB / ETHA / FETH",
     ),
-    # =====================================================================
-    # Prediction
-    # =====================================================================
-    # Wire-format SSOT verified 2026-04-30 against
-    # gs://market-data-tick-prediction-central-element-323112/_index/availability_index.parquet:
-    # POLYMARKET writes data_type=trades (with instrument_type=prediction_market)
-    # AND data_type=prediction_trades (with per-underlying instrument_type
-    # tokens BTC/ETH/XRP/SOL/SPX/DJIA/NDX/SILVER/GOLD/CRUDE_OIL/...).
-    # KALSHI excluded — no US account on the test environment yet.
-    # POLYMARKET book_snapshot / market_metadata excluded — adapters do
-    # not yet write those data_types to the manifest.
+    # ── Prediction (verified 2026-04-30 against availability_index.parquet) ─
+    # POLYMARKET writes data_type=trades (instrument_type=prediction_market) AND
+    # data_type=prediction_trades (per-underlying instrument_type tokens BTC/ETH/
+    # XRP/SOL/SPX/DJIA/NDX/SILVER/GOLD/CRUDE_OIL/...). KALSHI excluded — no US
+    # account yet. POLYMARKET book_snapshot / market_metadata excluded — adapters
+    # do not yet write those data_types to the manifest.
     DataTypeCapability(
         asset_group=AssetGroup.PREDICTION,
         data_type="trades",

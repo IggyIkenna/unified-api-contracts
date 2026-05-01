@@ -336,7 +336,8 @@ def candidate_parquet_paths(
             candidate_parquet_paths as sports_candidates,
         )
 
-        league_id = str(kwargs.get("league_id", "") or "")
+        _league_id_raw = kwargs.get("league_id")
+        league_id = str(_league_id_raw) if _league_id_raw is not None else ""
         include_legacy_archive = bool(kwargs.get("include_legacy_archive", False))
         return sports_candidates(
             data_type=data_type,

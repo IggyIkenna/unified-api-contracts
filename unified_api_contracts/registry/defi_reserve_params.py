@@ -289,3 +289,117 @@ def _extract_asset_symbol(inst_id: str) -> str:
             return parts[-1] if parts else upper
 
     return upper
+
+
+# ---------------------------------------------------------------------------
+# Compound V3 reserve parameters (P2.1a — workspace audit 2026-05-01)
+# ---------------------------------------------------------------------------
+# Source: Compound governance, on-chain ``getCollateralFactor`` /
+# ``getLiquidationFactor``. Compound V3 uses per-asset collateral factors
+# (max LTV) and liquidation factors (liquidation threshold) similar to Aave.
+# Per-market: each Compound deployment has one base asset (USDC or ETH) and
+# many collateral assets. Below is the USDC market on Ethereum.
+COMPOUND_V3_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
+    # Compound V3 USDC market — base asset is USDC; collaterals listed below
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.83"),
+        liquidation_threshold=Decimal("0.90"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "CBETH": ReserveParams(
+        max_ltv=Decimal("0.78"),
+        liquidation_threshold=Decimal("0.83"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "LINK": ReserveParams(
+        max_ltv=Decimal("0.74"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "UNI": ReserveParams(
+        max_ltv=Decimal("0.65"),
+        liquidation_threshold=Decimal("0.71"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.10"),
+    ),
+}
+
+
+# ---------------------------------------------------------------------------
+# Morpho Blue reserve parameters (P2.1a — workspace audit 2026-05-01)
+# ---------------------------------------------------------------------------
+# Source: Morpho governance + per-market ``MarketParams`` (immutable on creation).
+# Morpho Blue is permissionless: each market is isolated (one collateral, one
+# loan asset, one oracle, one IRM, one LLTV). The values below cover the
+# canonical curated MetaMorpho vaults' underlying markets — most-traded
+# collateral assets vs USDC/USDT/DAI base. ``max_ltv`` here is the LLTV
+# (liquidation loan-to-value) since Morpho Blue uses a single threshold.
+MORPHO_BLUE_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
+    # Format: (collateral asset symbol) -> typical curated-vault params
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.86"),
+        liquidation_threshold=Decimal("0.86"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.86"),
+        liquidation_threshold=Decimal("0.86"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.86"),
+        liquidation_threshold=Decimal("0.86"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "WEETH": ReserveParams(
+        max_ltv=Decimal("0.86"),
+        liquidation_threshold=Decimal("0.86"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "USDE": ReserveParams(
+        max_ltv=Decimal("0.86"),
+        liquidation_threshold=Decimal("0.86"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "RETH": ReserveParams(
+        max_ltv=Decimal("0.86"),
+        liquidation_threshold=Decimal("0.86"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+}
+
+
+def get_compound_reserve_params(asset: str) -> ReserveParams | None:
+    """Compound V3 ETH-mainnet reserve params lookup."""
+    return COMPOUND_V3_ETHEREUM_RESERVES.get(asset.upper())
+
+
+def get_morpho_reserve_params(asset: str) -> ReserveParams | None:
+    """Morpho Blue ETH-mainnet curated-vault reserve params lookup.
+
+    Morpho is per-market; this returns typical params for the canonical
+    curated vault on the asset. Per-market overrides should be queried
+    directly via ``MarketParams`` on chain when stricter accuracy is needed.
+    """
+    return MORPHO_BLUE_ETHEREUM_RESERVES.get(asset.upper())
