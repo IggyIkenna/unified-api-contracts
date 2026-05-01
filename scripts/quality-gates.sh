@@ -38,6 +38,12 @@ SIZE_EXTRA_EXCLUDES=(
     # already extracted to defi_venues.py to defer this; further extraction
     # would split the SSOT registry across 4+ files for marginal payoff.
     "./unified_api_contracts/registry/market_data_categories.py"
+    # restaking_rewards.py: 12 LSTRewardStream entries × multi-line registry
+    # rows + RewardTokenEconomics dict for ETHFI/EIGEN/PUFFER/ANKR/SD/KARAK/
+    # CARROT/KING/MILES/ARPA/JTO/MNDE economics, plus ConvertDustInstruction
+    # + DustToken + DustConversionResult schemas. Splitting would scatter
+    # the per-protocol context that makes this single SSOT readable.
+    "./unified_api_contracts/internal/architecture_v2/restaking_rewards.py"
 )
 # requests CVE-2026-25645: no fix version available yet
 # pip CVE-2026-3219: pip tool itself (not a runtime dep), affects editable installs only

@@ -262,6 +262,14 @@ class InstructionActionV2(StrEnum):
     ATOMIC = "ATOMIC"
     CANCEL = "CANCEL"
     CONVERT_DUST = "CONVERT_DUST"
+    # DeFi LP archetype actions (defi_pipeline_extension Phase 4 → e2e closeout)
+    # Routed via NonfungiblePositionManager (Uniswap V3 / clones) for
+    # CONCENTRATED LPs, or pool-deposit/withdraw for POOL / VAULT LPs.
+    # The DEFI_LP_CONCENTRATED engine emits LP_MINT / LP_BURN; the
+    # orchestrator dispatches them to UniswapConnector.mint_position()
+    # / burn_position().
+    LP_MINT = "LP_MINT"
+    LP_BURN = "LP_BURN"
 
 
 class AccountActionV2(StrEnum):
