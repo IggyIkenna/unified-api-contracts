@@ -161,6 +161,36 @@ class LegPortfolioState(BaseModel):
     only on first allocation or after full close."""
 
 
+class LegSnapshot(BaseModel):
+    """Per-leg state observed from PBM at one tick.
+
+    The controller's input. PBM publishes one of these per leg in the
+    portfolio. ``equity`` is the leg-local notional at risk:
+
+      - futures / perps : margin posted
+      - spot + borrow   : collateral net of debt
+      - sports          : stake size
+
+    ``position_units`` is signed (positive = LONG, negative = SHORT) in
+    instrument units; ``mark_price`` is the live price used for
+    actual-leverage calculation (``actual_leverage = |position_units * mark_price| / equity``).
+
+    SSOT for the PBM → controller observation contract. PBM emits one snapshot
+    per leg in a strategy's declared ``LegPortfolioState`` each tick; the
+    controller maps ``leg_id -> LegSnapshot`` and passes that into
+    ``compute_drift(state, snapshots)``.
+    """
+
+    leg_id: str = Field(description="Stable identifier matching LeveragedLeg.leg_id")
+    position_units: Decimal = Field(description="Signed instrument units. Positive = LONG, negative = SHORT.")
+    equity: Decimal = Field(
+        description=(
+            "Leg-local notional at risk: margin (futures), collateral net of debt (spot+borrow), or stake (sports)."
+        )
+    )
+    mark_price: Decimal = Field(description="Live price used to compute actual_leverage and target_position_units.")
+
+
 class LegDrift(BaseModel):
     """Computed per-leg drift between current state and target.
 
@@ -198,5 +228,6 @@ __all__ = [
     "LegDrift",
     "LegPortfolioState",
     "LegSizingStrategy",
+    "LegSnapshot",
     "LeveragedLeg",
 ]

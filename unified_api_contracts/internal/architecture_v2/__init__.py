@@ -139,6 +139,7 @@ from unified_api_contracts.internal.architecture_v2.leveraged_legs import (
     LegDrift,
     LegPortfolioState,
     LegSizingStrategy,
+    LegSnapshot,
     LeveragedLeg,
 )
 from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability import (
@@ -351,6 +352,7 @@ __all__ = [
     "LegDrift",
     "LegPortfolioState",
     "LegSizingStrategy",
+    "LegSnapshot",
     "LendInstruction",
     "LeveragedLeg",
     "ListedComboType",
