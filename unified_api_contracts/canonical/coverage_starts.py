@@ -89,6 +89,28 @@ TRADFI_SOURCE_COVERAGE_START: dict[str, date] = {
     "CME": date(2010, 1, 1),  # TODO verify
 }
 
+# Per-ticker listing-date overrides for tradfi instruments whose source-wide
+# venue coverage (NYSE/NASDAQ/ARCA → Databento equities ~2003) is much earlier
+# than the instrument's actual listing. Without these, data-status checks
+# would flag pre-listing weekdays as `missing` since they're inside the venue's
+# coverage window. Only the ETFs we currently backfill are listed — extend as
+# new tickers are added to the universe. Futures roll forward continuously
+# so they don't need per-ticker overrides; the venue-level CME / DATABENTO
+# clip suffices.
+TRADFI_TICKER_COVERAGE_START: dict[str, date] = {
+    # US BTC spot ETFs — launched 2024-01-11 (SEC-approval cohort).
+    "IBIT": date(2024, 1, 11),
+    "FBTC": date(2024, 1, 11),
+    "ARKB": date(2024, 1, 11),
+    "GBTC": date(2024, 1, 11),  # uplisted from OTC same day
+    # US ETH spot ETFs — launched 2024-07-23.
+    "ETHA": date(2024, 7, 23),
+    "FETH": date(2024, 7, 23),
+    "ETHE": date(2024, 7, 23),  # uplisted from OTC same day
+    # Older crypto ETFs (futures-based + OTC, predate 2024 cohort).
+    "BITO": date(2021, 10, 19),
+}
+
 
 # ---------------------------------------------------------------------------
 # Prediction
@@ -128,6 +150,7 @@ _REGISTRY_BY_ASSET_GROUP: dict[AssetGroup, dict[str, date]] = {
 def coverage_start(
     asset_group: AssetGroup | str,
     source_key: str,
+    ticker: str | None = None,
 ) -> date | None:
     """Return the earliest date a source has data for, or ``None`` if unknown.
 
@@ -139,8 +162,18 @@ def coverage_start(
         source_key: Venue/source token. Casing follows the per-asset-group
             dict convention (CeFi/DeFi/TradFi/Prediction = uppercase venue;
             sports = lowercase source name).
+        ticker: Optional per-instrument override. For TradFi ETFs whose
+            listing date is materially later than the source-wide venue
+            coverage (e.g. IBIT listed 2024-01-11 but NASDAQ data goes
+            back to 2003), pass the ticker symbol to apply the per-ticker
+            clip. Falls back to the source-wide value if the ticker has
+            no override.
     """
     ag = AssetGroup(asset_group) if not isinstance(asset_group, AssetGroup) else asset_group
+    if ag == AssetGroup.TRADFI and ticker:
+        ticker_clip = TRADFI_TICKER_COVERAGE_START.get(ticker.upper())
+        if ticker_clip is not None:
+            return ticker_clip
     registry = _REGISTRY_BY_ASSET_GROUP.get(ag)
     if registry is None:
         return None
@@ -153,5 +186,6 @@ __all__ = [
     "PREDICTION_SOURCE_COVERAGE_START",
     "SPORTS_SOURCE_COVERAGE_START",
     "TRADFI_SOURCE_COVERAGE_START",
+    "TRADFI_TICKER_COVERAGE_START",
     "coverage_start",
 ]
