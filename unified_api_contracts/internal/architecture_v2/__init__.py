@@ -165,7 +165,10 @@ from unified_api_contracts.internal.architecture_v2.restaking_rewards import (
     LSTRewardStream,
     LstSeasonalRewardRow,
     RewardPnLLayer,
+    RewardStreamRegistry,
     RewardTokenEconomics,
+    TokenAddressMetadata,
+    TokenStreamMetadata,
 )
 from unified_api_contracts.internal.architecture_v2.restriction_profiles import (
     RESTRICTION_PROFILE_REGISTRY,
@@ -388,6 +391,7 @@ __all__ = [
     "RegionalRestrictions",
     "RestrictionProfile",
     "RewardPnLLayer",
+    "RewardStreamRegistry",
     "RewardTokenEconomics",
     "RiskGateDecision",
     "RiskGateLayer",
@@ -422,6 +426,8 @@ __all__ = [
     "StrategyRetiredError",
     "SwapInstruction",
     "TileLockState",
+    "TokenAddressMetadata",
+    "TokenStreamMetadata",
     "TradeInstruction",
     "TransferInstructionV2",
     "TransferType",

@@ -33,6 +33,7 @@ REWARD_REALISATION_SLIPPAGE factor capturing the dust-conversion cost.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
@@ -725,6 +726,160 @@ REWARD_TOKEN_ECONOMICS: dict[str, RewardTokenEconomics] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Joined lookup helper — eliminates the per-token "unknown" + CARRY_BASE
+# fallbacks that consumers fall back to when they only have the token symbol
+# in hand.
+#
+# Both LST_REWARD_STREAMS and REWARD_TOKEN_ECONOMICS are needed to resolve
+# (token_symbol) -> (layer, issuer, distributor_kind) for the dust-router's
+# RewardAttributionRow construction, and (token_address) -> (issuer,
+# lst_symbol, decimals) for the chain-event scanners' Transfer-event
+# projection. Pre-resolver, both consumers hardcoded fallbacks; this
+# class joins the two registries once and exposes total lookups.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class TokenStreamMetadata:
+    """Joined view returned by ``RewardStreamRegistry.lookup_by_token_symbol``."""
+
+    token_symbol: str
+    token_address: str
+    chain: str
+    decimals: int
+    is_pre_tge_points: bool
+    layer: RewardPnLLayer
+    issuer: str
+    lst_symbol: str
+    distributor_address: str | None
+    distributor_chain: str | None
+    distributor_kind: Literal["merkle", "direct_transfer", "claim_function", "exchange_rate"]
+
+
+@dataclass(frozen=True)
+class TokenAddressMetadata:
+    """Joined view returned by ``RewardStreamRegistry.lookup_by_token_address`` —
+    subset the chain-event scanners need."""
+
+    token_symbol: str
+    issuer: str
+    lst_symbol: str
+    decimals: int
+
+
+class RewardStreamRegistry:
+    """Joined lookup over ``LST_REWARD_STREAMS`` + ``REWARD_TOKEN_ECONOMICS``.
+
+    Build with ``RewardStreamRegistry.default()`` to use the as-shipped UAC
+    registries; build with ``RewardStreamRegistry.from_streams(...)`` to
+    inject test fixtures. All lookups are total — they never raise on
+    missing keys, they return ``None`` so callers can decide on the
+    sentinel value (preserves shard-level isolation).
+    """
+
+    def __init__(
+        self,
+        streams_by_lst: dict[str, list[LSTRewardStream]],
+        token_economics: dict[str, RewardTokenEconomics],
+    ) -> None:
+        self._streams_by_lst = streams_by_lst
+        self._token_economics = token_economics
+        self._by_token_symbol: dict[str, TokenStreamMetadata] = {}
+        self._by_token_address: dict[str, TokenAddressMetadata] = {}
+        self._build_indexes()
+
+    @classmethod
+    def default(cls) -> RewardStreamRegistry:
+        return cls(
+            streams_by_lst=LST_REWARD_STREAMS,
+            token_economics=REWARD_TOKEN_ECONOMICS,
+        )
+
+    @classmethod
+    def from_streams(
+        cls,
+        streams_by_lst: dict[str, list[LSTRewardStream]],
+        token_economics: dict[str, RewardTokenEconomics] | None = None,
+    ) -> RewardStreamRegistry:
+        return cls(
+            streams_by_lst=streams_by_lst,
+            token_economics=token_economics if token_economics is not None else {},
+        )
+
+    def _build_indexes(self) -> None:
+        """Walk both registries once; resolve duplicates deterministically.
+
+        When one token appears in multiple streams (e.g. EIGEN comes from
+        EigenLayer for both weETH and ankrETH), prefer the first stream
+        whose layer is non-CARRY_BASE — base streams have no distributor
+        (they accrue in exchange_rate). Lexicographic lst_symbol order
+        gives stable resolution across runs.
+        """
+        best_stream: dict[str, tuple[str, LSTRewardStream]] = {}
+        for lst_symbol in sorted(self._streams_by_lst.keys()):
+            for stream in self._streams_by_lst[lst_symbol]:
+                token = stream.reward_token_symbol
+                if stream.layer is RewardPnLLayer.CARRY_BASE:
+                    if token not in best_stream:
+                        best_stream[token] = (lst_symbol, stream)
+                    continue
+                existing = best_stream.get(token)
+                if existing is None or existing[1].layer is RewardPnLLayer.CARRY_BASE:
+                    best_stream[token] = (lst_symbol, stream)
+
+        for token_symbol, (lst_symbol, stream) in best_stream.items():
+            econ = self._token_economics.get(token_symbol)
+            if econ is None:
+                token_address = ""
+                chain = stream.distributor_chain or ""
+                decimals = 18
+                is_pre_tge_points = False
+            else:
+                token_address = econ.token_address
+                chain = econ.chain
+                decimals = econ.decimals
+                is_pre_tge_points = econ.is_pre_tge_points
+
+            joined = TokenStreamMetadata(
+                token_symbol=token_symbol,
+                token_address=token_address,
+                chain=chain,
+                decimals=decimals,
+                is_pre_tge_points=is_pre_tge_points,
+                layer=stream.layer,
+                issuer=stream.issuer,
+                lst_symbol=lst_symbol,
+                distributor_address=stream.distributor_address,
+                distributor_chain=stream.distributor_chain,
+                distributor_kind=stream.distributor_kind,
+            )
+            self._by_token_symbol[token_symbol] = joined
+            if token_address:
+                self._by_token_address[token_address.lower()] = TokenAddressMetadata(
+                    token_symbol=token_symbol,
+                    issuer=stream.issuer,
+                    lst_symbol=lst_symbol,
+                    decimals=decimals,
+                )
+
+    def lookup_by_token_symbol(self, token_symbol: str) -> TokenStreamMetadata | None:
+        """Joined view by token symbol — used by dust-router runner for RAR rows."""
+        return self._by_token_symbol.get(token_symbol)
+
+    def lookup_by_token_address(self, token_address: str) -> TokenAddressMetadata | None:
+        """Joined view by token address — used by chain-event scanners."""
+        return self._by_token_address.get(token_address.lower())
+
+    @property
+    def all_token_symbols(self) -> tuple[str, ...]:
+        return tuple(sorted(self._by_token_symbol.keys()))
+
+    @property
+    def all_token_addresses(self) -> tuple[str, ...]:
+        return tuple(sorted(self._by_token_address.keys()))
+
+
 __all__ = [
     "LST_REWARD_STREAMS",
     "REWARD_TOKEN_ECONOMICS",
@@ -737,5 +892,8 @@ __all__ = [
     "LSTRewardStream",
     "LstSeasonalRewardRow",
     "RewardPnLLayer",
+    "RewardStreamRegistry",
     "RewardTokenEconomics",
+    "TokenAddressMetadata",
+    "TokenStreamMetadata",
 ]
