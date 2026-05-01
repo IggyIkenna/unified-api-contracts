@@ -71,6 +71,9 @@ from .cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
 )
+from .cefi_margin_tiers import (
+    maintenance_margin_for,
+)
 from .chain_env import (
     BLOCK_EXPLORER_URLS,
     CHAIN_ENVS,
