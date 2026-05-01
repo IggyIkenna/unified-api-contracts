@@ -596,6 +596,12 @@ from unified_api_contracts.internal.features import (
     PairSpreadFeatureRecord,
     VolSurfaceTermStructureRecord,
 )
+from unified_api_contracts.internal.instrument_volatility import (
+    INSTRUMENT_VOLATILITY_REGISTRY,
+    MaxUnderlyingMove,
+    VolatilitySource,
+    derive_max_safe_leverage,
+)
 from unified_api_contracts.internal.inter_service_events import (
     BalanceSnapshot,
     DeleverageActionSubmitted,
@@ -902,6 +908,7 @@ __all__ = [
     "EXTERNAL_VISIBILITY_MIN_MATURITY",
     "FEATURES_SCHEMA",
     "FEATURE_FRESHNESS",
+    "INSTRUMENT_VOLATILITY_REGISTRY",
     "KNOWN_VENUE_TOKENS",
     "LIQUIDATION_PARAMS_REGISTRY",
     "LST_REWARD_STREAMS",
@@ -1277,6 +1284,7 @@ __all__ = [
     "MarketCategory",
     "MarketState",
     "MarketTickMessage",
+    "MaxUnderlyingMove",
     "MessagingScope",
     "MessagingTopic",
     "MetaSignalRecord",
@@ -1544,6 +1552,7 @@ __all__ = [
     "VenueType",
     "VersionBumpDetails",
     "VolSurfaceTermStructureRecord",
+    "VolatilitySource",
     "WalletRole",
     "WebSocketConnectEvent",
     "WebSocketConnectionClosed",
@@ -1565,6 +1574,7 @@ __all__ = [
     "availability_for",
     "consumers_for_topic",
     "counterparty_for",
+    "derive_max_safe_leverage",
     "entitled_slots_for",
     "entitlements_for",
     "get_liquidation_params",
