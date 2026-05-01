@@ -162,6 +162,7 @@ from unified_api_contracts.internal.architecture_v2.restaking_rewards import (
     DustConversionResult,
     DustToken,
     LSTRewardStream,
+    LstSeasonalRewardRow,
     RewardPnLLayer,
     RewardTokenEconomics,
 )
@@ -357,6 +358,7 @@ __all__ = [
     "LeveragedLeg",
     "ListedComboType",
     "LockState",
+    "LstSeasonalRewardRow",
     "LtvAndHaircut",
     "MarginMode",
     "MarginSpec",

@@ -33,6 +33,7 @@ REWARD_REALISATION_SLIPPAGE factor capturing the dust-conversion cost.
 
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 from typing import Literal
@@ -350,6 +351,72 @@ class DeferredTokenLeg(BaseModel):
     reason: Literal["slippage_cap_exceeded", "no_market", "below_dust_threshold", "venue_offline"]
 
 
+class LstSeasonalRewardRow(BaseModel):
+    """One row of the ``lst_seasonal_rewards`` features-onchain parquet.
+
+    Output of the features-onchain ``lst_seasonal_rewards`` collector which
+    scans Transfer events with ``from`` matching a registered distributor in
+    ``LST_REWARD_STREAMS``. Each row represents one realised reward
+    distribution: a token transfer from a distributor to a wallet that
+    holds the corresponding LST.
+
+    Pure transform contract — same row shape in batch (replay historical
+    Transfer events from MTDS / GCS) and live (subscribe to RPC event filter
+    and stream) modes per the workspace Batch=Live invariant.
+
+    Downstream consumers:
+      - strategy-service: archetypes holding restaking-eligible LSTs
+        consume these rows as ``lst_seasonal_rewards_<token>_amount``
+        features and emit ``ConvertDustInstruction`` once-per-epoch.
+      - pnl-attribution-service: tags rows with the source ``RewardPnLLayer``
+        for the CARRY decomposition.
+    """
+
+    block_number: int
+    block_timestamp_utc: datetime
+    tx_hash: str
+    chain: str
+    """Chain the distribution happened on (ETHEREUM / BASE / ARBITRUM /
+    SOLANA / etc.)."""
+
+    lst_symbol: str
+    """Which LST this stream feeds (weETH / pufETH / ETHx / etc.)."""
+
+    issuer: str
+    """Issuer label from the matching ``LSTRewardStream`` (ether.fi /
+    puffer / ankr / stader / karak / eigenlayer / jito / marinade)."""
+
+    layer: RewardPnLLayer
+    """Source layer for PnL attribution. CARRY_AVS_CONTINUOUS or
+    CARRY_ISSUER_SEASONAL — CARRY_BASE doesn't emit Transfer events."""
+
+    reward_token_symbol: str
+    """Token paid (ETHFI / EIGEN / PUFFER / ANKR / SD / KARAK / KING / etc.)."""
+
+    reward_token_address: str
+    """ERC20 contract address of the reward token."""
+
+    distributor_address: str
+    """The ``from`` address of the Transfer event — the registered
+    distributor contract from ``LSTRewardStream.distributor_address``."""
+
+    distributor_kind: Literal["merkle", "direct_transfer", "claim_function", "exchange_rate"]
+    """How rewards were paid out — propagated from the matching stream."""
+
+    recipient_address: str
+    """The ``to`` address of the Transfer event — the wallet that received
+    the rewards. Strategy-service joins on this to attribute rewards to
+    the right strategy_instance_id (one wallet per strategy instance)."""
+
+    amount_raw: Decimal
+    """Raw ERC20 ``value`` field from the Transfer event (uint256, in the
+    token's native decimal units)."""
+
+    amount_decimal: Decimal
+    """Decimals-adjusted amount: ``amount_raw / 10**reward_token_decimals``.
+    Used directly by ``DustToken.amount`` when emitting ``ConvertDustInstruction``."""
+
+
 # ---------------------------------------------------------------------------
 # Per-LST reward stream registry — the v0 mapping. Calibration of
 # expected_share_pct comes from historical data; this is the structural
@@ -602,6 +669,7 @@ __all__ = [
     "DustConversionResult",
     "DustToken",
     "LSTRewardStream",
+    "LstSeasonalRewardRow",
     "RewardPnLLayer",
     "RewardTokenEconomics",
 ]
