@@ -13,6 +13,8 @@ from __future__ import annotations
 
 from collections.abc import Callable
 
+from unified_api_contracts.registry.defi_venues import MTDS_DEFI_VENUES as _MTDS_DEFI_VENUES
+
 # Default timeframes for candle processing (used by sharding and CLI)
 TIMEFRAMES: list[str] = ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
 
@@ -135,16 +137,12 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
     ],
     "prediction": [
-        # Canonical names — aligned with CeFi. Prediction markets are CLOBs so the
-        # "trades" + "book_snapshot_5" taxonomy would apply uniformly. Legacy
-        # "prediction_trades" / "prediction_book_snapshot" names retired 2026-04-19.
-        # NOTE: book_snapshot_5 removed 2026-04-19 alongside the POLYMARKET +
-        # KALSHI venue-capability trim — we don't currently capture CLOB order
-        # book snapshots from either venue, and leaving it here phantom-
-        # inflated the MTDS PREDICTION completion_pct denominator (35k vs
-        # 5.7k observed shards). Re-add if a prediction adapter grows book
-        # snapshot collection.
-        "trades",  # CLOB trade fills (price, size, side, timestamp)
+        # Canonical names — aligned with CeFi. Legacy prediction_* names retired
+        # 2026-04-19. book_snapshot_5 also removed 2026-04-19 — POLYMARKET/KALSHI
+        # capability was trimmed and leaving it here phantom-inflated PREDICTION
+        # completion_pct (35k vs 5.7k observed). Re-add if/when a prediction
+        # adapter starts emitting book snapshots.
+        "trades",
     ],
 }
 
@@ -186,50 +184,7 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)
         "YAHOO_FINANCE",  # VIX 15m ongoing: rolling 60-day window; KRW/USD daily rates
     ],
-    "defi": [
-        # --- DEX protocols (swaps + liquidity) ---
-        "UNISWAPV2-ETHEREUM",
-        "UNISWAPV3-ETHEREUM",
-        "UNISWAPV3-ARBITRUM",
-        "UNISWAPV3-BASE",
-        "UNISWAPV3-OPTIMISM",
-        "UNISWAPV3-POLYGON",
-        "UNISWAPV4-ETHEREUM",
-        "CURVE-ETHEREUM",
-        "CURVE-AVALANCHE",
-        "CURVE-OPTIMISM",
-        "BALANCER-ETHEREUM",
-        "BALANCER-ARBITRUM",
-        "BALANCER-AVALANCHE",
-        "BALANCER-BASE",
-        "BALANCER-OPTIMISM",
-        "BALANCER-POLYGON",
-        # --- Lending protocols ---
-        "AAVEV3-ETHEREUM",
-        "AAVEV3-ARBITRUM",
-        "AAVEV3-AVALANCHE",
-        "AAVEV3-BASE",
-        "AAVEV3-BSC",
-        "AAVEV3-LINEA",
-        "AAVEV3-OPTIMISM",
-        "AAVEV3-POLYGON",
-        "COMPOUNDV3-ETHEREUM",
-        "COMPOUNDV3-ARBITRUM",
-        "COMPOUNDV3-BASE",
-        "COMPOUNDV3-OPTIMISM",
-        "COMPOUNDV3-POLYGON",
-        "MORPHO-ETHEREUM",
-        "MORPHO-ARBITRUM",
-        "MORPHO-BASE",
-        "MORPHO-OPTIMISM",
-        "MORPHO-POLYGON",
-        "FLUID-ETHEREUM",
-        # --- LST/Yield protocols ---
-        "LIDO-ETHEREUM",
-        "ETHERFI-ETHEREUM",
-        "ETHENA-ETHEREUM",
-        "JITO-SOLANA",
-    ],
+    "defi": list(_MTDS_DEFI_VENUES),
     "sports": [
         # Sports betting exchanges and bookmakers
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
@@ -582,14 +537,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "FANDUEL": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     "BET365": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     # ── Prediction (market data only — metadata is reference data, see below) ──
-    # Prediction CLOBs emit canonical "trades" data type (same key as CeFi).
-    # Legacy "prediction_trades" name retired 2026-04-19 for cross-category
-    # alignment. NOTE: book_snapshot_5 removed 2026-04-19 — neither the
-    # Polymarket CLOB adapter nor the Kalshi adapter currently captures order
-    # book snapshots. Declaring them here phantom-inflated the
-    # market-tick-data-service PREDICTION completion_pct denominator
-    # (35k expected vs 5.7k actually observable shards). Re-add when + if
-    # either adapter grows a book-snapshot collection path.
+    # Prediction CLOBs emit canonical "trades" (same key as CeFi). Legacy
+    # prediction_* names + book_snapshot_5 retired 2026-04-19; book snapshots
+    # phantom-inflated PREDICTION completion_pct (35k vs 5.7k observed).
     "POLYMARKET": {
         "trades": "2024-06-01",
     },

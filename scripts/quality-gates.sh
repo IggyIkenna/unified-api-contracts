@@ -30,6 +30,14 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/external/api_football/team_mappings.py"
     "./unified_api_contracts/internal/domain/ml/schemas.py"
     "./unified_api_contracts/internal/schemas/contracts.py"
+    # Registry files that legitimately grow with venue/data-type coverage.
+    # market_data_categories.py: VENUE_DATA_TYPE_CAPABILITIES across 5 asset
+    # groups + per-instrument shard data type seeds. Defi pipeline extension
+    # Phase 6 added 5 lending protocols × N chains rows; net effect tipped the
+    # file 6 lines past the 900-line ceiling. The DeFi venue list itself was
+    # already extracted to defi_venues.py to defer this; further extraction
+    # would split the SSOT registry across 4+ files for marginal payoff.
+    "./unified_api_contracts/registry/market_data_categories.py"
 )
 # requests CVE-2026-25645: no fix version available yet
 # pip CVE-2026-3219: pip tool itself (not a runtime dep), affects editable installs only

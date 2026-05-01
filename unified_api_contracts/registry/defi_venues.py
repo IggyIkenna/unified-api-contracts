@@ -154,4 +154,63 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
 }
 
 
-__all__ = ["ALL_DEFI_VENUES", "LEGACY_DEFI_VENUE_ALIASES"]
+# Curated subset of DeFi venues that MTDS actively backfills. Used as
+# ``VENUES_BY_ASSET_GROUP['defi']`` in ``market_data_categories.py``.
+# Extracted here to keep that module under the 900-line QG ceiling as the
+# DeFi multi-chain coverage grows.
+MTDS_DEFI_VENUES: list[str] = [
+    # --- DEX protocols (swaps + liquidity) ---
+    "UNISWAPV2-ETHEREUM",
+    "UNISWAPV3-ETHEREUM",
+    "UNISWAPV3-ARBITRUM",
+    "UNISWAPV3-BASE",
+    "UNISWAPV3-OPTIMISM",
+    "UNISWAPV3-POLYGON",
+    "UNISWAPV4-ETHEREUM",
+    "CURVE-ETHEREUM",
+    "CURVE-AVALANCHE",
+    "CURVE-OPTIMISM",
+    "BALANCER-ETHEREUM",
+    "BALANCER-ARBITRUM",
+    "BALANCER-AVALANCHE",
+    "BALANCER-BASE",
+    "BALANCER-OPTIMISM",
+    "BALANCER-POLYGON",
+    # --- Lending protocols ---
+    "AAVEV3-ETHEREUM",
+    "AAVEV3-ARBITRUM",
+    "AAVEV3-AVALANCHE",
+    "AAVEV3-BASE",
+    "AAVEV3-BSC",
+    "AAVEV3-LINEA",
+    "AAVEV3-OPTIMISM",
+    "AAVEV3-POLYGON",
+    "COMPOUNDV3-ETHEREUM",
+    "COMPOUNDV3-ARBITRUM",
+    "COMPOUNDV3-BASE",
+    "COMPOUNDV3-OPTIMISM",
+    "COMPOUNDV3-POLYGON",
+    "MORPHO-ETHEREUM",
+    "MORPHO-ARBITRUM",
+    "MORPHO-BASE",
+    "MORPHO-OPTIMISM",
+    "MORPHO-POLYGON",
+    "FLUID-ETHEREUM",
+    "FLUID-ARBITRUM",
+    "EULER_V2-ETHEREUM",
+    "EULER_V2-ARBITRUM",
+    "RADIANT-ETHEREUM",
+    "RADIANT-ARBITRUM",
+    "RADIANT-BSC",
+    "VENUS-BSC",
+    "VENUS-ETHEREUM",
+    "BENQI-AVALANCHE",
+    # --- LST/Yield protocols ---
+    "LIDO-ETHEREUM",
+    "ETHERFI-ETHEREUM",
+    "ETHENA-ETHEREUM",
+    "JITO-SOLANA",
+]
+
+
+__all__ = ["ALL_DEFI_VENUES", "LEGACY_DEFI_VENUE_ALIASES", "MTDS_DEFI_VENUES"]

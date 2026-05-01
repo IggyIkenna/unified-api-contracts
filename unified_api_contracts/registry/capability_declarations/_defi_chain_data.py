@@ -38,6 +38,17 @@ CHAIN_RPC_TEMPLATES: dict[int, str] = {
     81457: "https://blast-mainnet.g.alchemy.com/v2/{api_key}",
     534352: "https://scroll-mainnet.g.alchemy.com/v2/{api_key}",
     7777777: "https://zora-mainnet.g.alchemy.com/v2/{api_key}",
+    # ── Tier 4: Alt-L1 / non-Alchemy chains (public RPC; api_key is no-op) ────
+    # Defi pipeline extension Phase 6.1: backfill chains the analysis silently
+    # treated as unsupported. Public RPCs work for read-only / instruments-
+    # service ingest; for production execution-service calls, switch to a
+    # dedicated provider (QuickNode, Infura) via Secret Manager.
+    250: "https://rpc.ftm.tools",  # FANTOM
+    1088: "https://andromeda.metis.io/?owner=1088",  # METIS
+    1284: "https://rpc.api.moonbeam.network",  # MOONBEAM
+    5000: "https://rpc.mantle.xyz",  # MANTLE
+    42220: "https://forno.celo.org",  # CELO
+    1313161554: "https://mainnet.aurora.dev",  # AURORA
     # ── Testnets (EVM) — same key, different endpoints ───────────
     11155111: "https://eth-sepolia.g.alchemy.com/v2/{api_key}",  # ETH Sepolia
     11155420: "https://opt-sepolia.g.alchemy.com/v2/{api_key}",  # OP Sepolia
@@ -108,6 +119,14 @@ CHAIN_NATIVE_GAS_TOKEN: dict[int, str] = {
     534352: "ETH",
     7777777: "ETH",
     11155111: "ETH",
+    # Tier 4 (Phase 6.1 extension)
+    100: "XDAI",  # GNOSIS — was already in RPC table
+    250: "FTM",  # FANTOM
+    1088: "METIS",  # METIS
+    1284: "GLMR",  # MOONBEAM
+    5000: "MNT",  # MANTLE
+    42220: "CELO",  # CELO
+    1313161554: "ETH",  # AURORA — Ethereum-compatible
 }
 
 # ---------------------------------------------------------------------------

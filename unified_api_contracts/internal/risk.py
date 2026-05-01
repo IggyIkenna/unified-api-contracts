@@ -673,6 +673,11 @@ class MarginModel(StrEnum):
     AAVE_V3 = "AAVE_V3"
     COMPOUND_V3 = "COMPOUND_V3"
     MORPHO_BLUE = "MORPHO_BLUE"
+    FLUID = "FLUID"
+    EULER_V2 = "EULER_V2"
+    RADIANT = "RADIANT"
+    VENUS = "VENUS"
+    BENQI = "BENQI"
     BINANCE_CROSS = "BINANCE_CROSS"
     BINANCE_ISOLATED = "BINANCE_ISOLATED"
     BYBIT = "BYBIT"
@@ -743,6 +748,52 @@ LIQUIDATION_PARAMS_REGISTRY: dict[MarginModel, LiquidationParams] = {
         health_factor_liquidation=Decimal("1.00"),
         ltv_max_borrow=Decimal("0.86"),
         description="Per-market lltv set at deployment; defaults track Aave shape.",
+    ),
+    # Defi pipeline extension Phase 6.2 — additional lending protocols
+    MarginModel.FLUID: LiquidationParams(
+        margin_model=MarginModel.FLUID,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.85"),
+        description="Fluid (formerly Instadapp Lite); HF semantics mirror Aave.",
+    ),
+    MarginModel.EULER_V2: LiquidationParams(
+        margin_model=MarginModel.EULER_V2,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.83"),
+        description="Euler V2 EVK vaults; per-vault LTV set at deployment, conservative default.",
+    ),
+    MarginModel.RADIANT: LiquidationParams(
+        margin_model=MarginModel.RADIANT,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.80"),
+        description="Radiant Capital cross-chain lending; HF semantics mirror Aave V3.",
+    ),
+    MarginModel.VENUS: LiquidationParams(
+        margin_model=MarginModel.VENUS,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.80"),
+        description="Venus Protocol (BSC); Compound-fork HF semantics.",
+    ),
+    MarginModel.BENQI: LiquidationParams(
+        margin_model=MarginModel.BENQI,
+        health_factor_warning=Decimal("1.30"),
+        health_factor_critical=Decimal("1.15"),
+        health_factor_severe=Decimal("1.05"),
+        health_factor_liquidation=Decimal("1.00"),
+        ltv_max_borrow=Decimal("0.80"),
+        description="Benqi (Avalanche); Compound-fork HF semantics.",
     ),
     # ── CeFi: MMR-based ─────────────────────────────────────────────────
     MarginModel.BINANCE_CROSS: LiquidationParams(
