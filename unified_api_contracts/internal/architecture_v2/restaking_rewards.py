@@ -40,6 +40,13 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from unified_api_contracts.internal.architecture_v2.enums import (
+    InstructionActionV2,
+)
+from unified_api_contracts.internal.architecture_v2.schemas import (
+    StrategyInstructionEnvelope,
+)
+
 
 class RewardPnLLayer(StrEnum):
     """The 3-layer decomposition for restaking-eligible LST rewards.
@@ -206,9 +213,17 @@ class LSTRewardStream(BaseModel):
     )
 
 
-class ConvertDustInstruction(BaseModel):
+class ConvertDustInstruction(StrategyInstructionEnvelope):
     """Generic dust-conversion instruction — any strategy issues one of
     these to realise a basket of reward tokens into a target denomination.
+
+    Now extends ``StrategyInstructionEnvelope`` (the v2 envelope base shared
+    with TradeInstruction / SwapInstruction / etc.) so the orchestrator's
+    emit list is uniformly typed and downstream routing on
+    ``action == InstructionActionV2.CONVERT_DUST`` works the same way as
+    every other instruction kind. The strategy_instance_id is recovered
+    from ``self.identity.strategy_instance_id`` (was a redundant top-level
+    field in the v0 BaseModel form).
 
     Replaces hardcoded liquidity haircuts with actual route simulation:
     the dust-conversion router (execution-service algo_library) routes
@@ -237,8 +252,7 @@ class ConvertDustInstruction(BaseModel):
       - GAS: on-chain gas (DEX) or transfer fee (CEX withdrawal)
     """
 
-    instruction_id: str
-    strategy_instance_id: str
+    action: Literal[InstructionActionV2.CONVERT_DUST] = InstructionActionV2.CONVERT_DUST
     target_denomination: Literal["ETH", "SOL", "USDC", "USDT", "DAI"]
     """ETH for ETH-side restaking realisation, SOL for Solana,
     USDC/USDT/DAI for fund NAV-level realisation."""
@@ -387,13 +401,10 @@ class DustRouterResult(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    instructions: list[object] = Field(default_factory=list)
-    """``ConvertDustInstruction`` (or ``StrategyInstructionEnvelope`` once a
-    later UAC iteration unifies the two) — typed as ``object`` for v0 so
-    consumers can return the bare ``ConvertDustInstruction`` without a
-    wrapping envelope. The orchestrator just extends its emit list with
-    whatever's here. Empty when no tokens were converted (all held or
-    deferred)."""
+    instructions: list[StrategyInstructionEnvelope] = Field(default_factory=list)
+    """``ConvertDustInstruction`` envelopes (now a ``StrategyInstructionEnvelope``
+    subclass with ``action=CONVERT_DUST``) the orchestrator forwards to the
+    execution path. Empty when no tokens were converted (all held or deferred)."""
 
     realised_target_amount: Decimal = Decimal("0")
     leg_id_hint: str | None = None

@@ -261,6 +261,7 @@ class InstructionActionV2(StrEnum):
     BRIDGE = "BRIDGE"
     ATOMIC = "ATOMIC"
     CANCEL = "CANCEL"
+    CONVERT_DUST = "CONVERT_DUST"
 
 
 class AccountActionV2(StrEnum):
