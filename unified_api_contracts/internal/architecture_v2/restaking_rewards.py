@@ -38,7 +38,7 @@ from decimal import Decimal
 from enum import StrEnum
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class RewardPnLLayer(StrEnum):
@@ -349,6 +349,60 @@ class DeferredTokenLeg(BaseModel):
     token_symbol: str
     amount: Decimal
     reason: Literal["slippage_cap_exceeded", "no_market", "below_dust_threshold", "venue_offline"]
+
+
+class DustRouterResult(BaseModel):
+    """Output of one runner-side ``DustRouterAdapter.maybe_realise`` invocation.
+
+    Cross-repo contract type — strategy-service ``V2EngineOrchestrator``
+    calls into the runner-injected adapter, the adapter routes the
+    basket via ``execution_service.algo_library.dust_conversion_router.convert_dust``,
+    builds per-token ``RewardAttributionRow`` rows + wraps the
+    ``ConvertDustInstruction`` in a ``StrategyInstructionEnvelope``, and
+    returns this aggregate.
+
+    Lives in UAC (not in the consumer or producer service) because both
+    sides need to refer to it: strategy-service's
+    ``DustRouterAdapter`` Protocol declares this as the return type, and
+    execution-service's concrete ``DustRouterRunner`` constructs it.
+
+    Fields:
+      instructions: zero or more ``StrategyInstructionEnvelope`` wrapping
+        ``ConvertDustInstruction`` legs the orchestrator forwards to the
+        execution path. Empty when no tokens were converted (all held or
+        deferred).
+      realised_target_amount: total target-denomination amount realised
+        across all converted tokens (excludes held + deferred). Forwarded
+        to ``LeveragedLegController.compute_drift(reward_inflow_target=...)``
+        on the next leg-controller fire so the LST leg's equity bumps
+        before cash-sweep preserves target_net_delta.
+      leg_id_hint: which ``LegPortfolioState.legs[*].leg_id`` should
+        receive the equity bump. ``None`` for strategies without
+        leg-controller wiring.
+      reward_attribution_rows: per-token detail rows for
+        pnl-attribution-service. One row per converted token tagged with
+        the matching ``RewardPnLLayer`` from
+        ``LST_REWARD_STREAMS``.
+    """
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    instructions: list[object] = Field(default_factory=list)
+    """``ConvertDustInstruction`` (or ``StrategyInstructionEnvelope`` once a
+    later UAC iteration unifies the two) — typed as ``object`` for v0 so
+    consumers can return the bare ``ConvertDustInstruction`` without a
+    wrapping envelope. The orchestrator just extends its emit list with
+    whatever's here. Empty when no tokens were converted (all held or
+    deferred)."""
+
+    realised_target_amount: Decimal = Decimal("0")
+    leg_id_hint: str | None = None
+    reward_attribution_rows: list[object] = Field(default_factory=list)
+    """``RewardAttributionRow`` objects — typed as ``object`` to avoid the
+    circular import with ``internal.domain.strategy_service.pnl`` (that
+    module already imports ``RewardPnLLayer`` from this package).
+    Consumers (pnl-attribution-service ``attribute_reward_realisation_from_rows``)
+    cast at the import boundary."""
 
 
 class LstSeasonalRewardRow(BaseModel):
@@ -667,6 +721,7 @@ __all__ = [
     "ConvertedTokenLeg",
     "DeferredTokenLeg",
     "DustConversionResult",
+    "DustRouterResult",
     "DustToken",
     "LSTRewardStream",
     "LstSeasonalRewardRow",
