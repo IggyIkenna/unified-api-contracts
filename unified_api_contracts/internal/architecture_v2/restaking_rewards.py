@@ -808,14 +808,14 @@ class RewardStreamRegistry:
         )
 
     def _build_indexes(self) -> None:
-        """Walk both registries once; resolve duplicates deterministically.
+        """Walk both registries once and populate the joined indexes."""
+        best_stream = self._select_best_stream_per_token()
+        for token_symbol, (lst_symbol, stream) in best_stream.items():
+            self._register_token(token_symbol=token_symbol, lst_symbol=lst_symbol, stream=stream)
 
-        When one token appears in multiple streams (e.g. EIGEN comes from
-        EigenLayer for both weETH and ankrETH), prefer the first stream
-        whose layer is non-CARRY_BASE — base streams have no distributor
-        (they accrue in exchange_rate). Lexicographic lst_symbol order
-        gives stable resolution across runs.
-        """
+    def _select_best_stream_per_token(self) -> dict[str, tuple[str, LSTRewardStream]]:
+        """Resolve duplicates: prefer non-CARRY_BASE; ties go to lexicographic
+        lst_symbol. Base streams have no distributor (exchange_rate)."""
         best_stream: dict[str, tuple[str, LSTRewardStream]] = {}
         for lst_symbol in sorted(self._streams_by_lst.keys()):
             for stream in self._streams_by_lst[lst_symbol]:
@@ -827,41 +827,47 @@ class RewardStreamRegistry:
                 existing = best_stream.get(token)
                 if existing is None or existing[1].layer is RewardPnLLayer.CARRY_BASE:
                     best_stream[token] = (lst_symbol, stream)
+        return best_stream
 
-        for token_symbol, (lst_symbol, stream) in best_stream.items():
-            econ = self._token_economics.get(token_symbol)
-            if econ is None:
-                token_address = ""
-                chain = stream.distributor_chain or ""
-                decimals = 18
-                is_pre_tge_points = False
-            else:
-                token_address = econ.token_address
-                chain = econ.chain
-                decimals = econ.decimals
-                is_pre_tge_points = econ.is_pre_tge_points
-
-            joined = TokenStreamMetadata(
+    def _register_token(
+        self,
+        *,
+        token_symbol: str,
+        lst_symbol: str,
+        stream: LSTRewardStream,
+    ) -> None:
+        """Project one (token, lst, stream) tuple into the two indexes."""
+        econ = self._token_economics.get(token_symbol)
+        if econ is None:
+            token_address = ""
+            chain = stream.distributor_chain or ""
+            decimals = 18
+            is_pre_tge_points = False
+        else:
+            token_address = econ.token_address
+            chain = econ.chain
+            decimals = econ.decimals
+            is_pre_tge_points = econ.is_pre_tge_points
+        self._by_token_symbol[token_symbol] = TokenStreamMetadata(
+            token_symbol=token_symbol,
+            token_address=token_address,
+            chain=chain,
+            decimals=decimals,
+            is_pre_tge_points=is_pre_tge_points,
+            layer=stream.layer,
+            issuer=stream.issuer,
+            lst_symbol=lst_symbol,
+            distributor_address=stream.distributor_address,
+            distributor_chain=stream.distributor_chain,
+            distributor_kind=stream.distributor_kind,
+        )
+        if token_address:
+            self._by_token_address[token_address.lower()] = TokenAddressMetadata(
                 token_symbol=token_symbol,
-                token_address=token_address,
-                chain=chain,
-                decimals=decimals,
-                is_pre_tge_points=is_pre_tge_points,
-                layer=stream.layer,
                 issuer=stream.issuer,
                 lst_symbol=lst_symbol,
-                distributor_address=stream.distributor_address,
-                distributor_chain=stream.distributor_chain,
-                distributor_kind=stream.distributor_kind,
+                decimals=decimals,
             )
-            self._by_token_symbol[token_symbol] = joined
-            if token_address:
-                self._by_token_address[token_address.lower()] = TokenAddressMetadata(
-                    token_symbol=token_symbol,
-                    issuer=stream.issuer,
-                    lst_symbol=lst_symbol,
-                    decimals=decimals,
-                )
 
     def lookup_by_token_symbol(self, token_symbol: str) -> TokenStreamMetadata | None:
         """Joined view by token symbol — used by dust-router runner for RAR rows."""
