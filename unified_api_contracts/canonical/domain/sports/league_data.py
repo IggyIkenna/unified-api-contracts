@@ -83,8 +83,22 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 # SFI's source-wide coverage is 2019-01-01 (leagues, day-list endpoint), but
 # /matches/view/progressive/ returns empty for every match before 2020-01-01,
 # so SFI_PROGRESSIVE_STATS gets its own later floor here.
+#
+# api_football per-fixture endpoints (events/lineups/statistics/players) all
+# nominally have data going back to 2017-10 per live probes (2026-05-01),
+# but our backfill never captured 2018-2020 dates due to pre-flight skips
+# that mark dates as "done" once any league has a row. Re-fetching is
+# expensive (paid API quota) and operationally we only need data ≥ 2020-06
+# to match the odds_api downstream cutoff — strategies built on these
+# features can't trade on dates without odds anyway. So we declare
+# 2020-06-06 as the effective coverage start (matches odds_api) and stop
+# counting pre-cutoff dates as missing.
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
     ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
+    ("api_football", "FIXTURE_EVENTS"): date(2020, 6, 6),
+    ("api_football", "FIXTURE_LINEUPS"): date(2020, 6, 6),
+    ("api_football", "FIXTURE_STATS"): date(2020, 6, 6),
+    ("api_football", "PLAYER_STATS"): date(2020, 6, 6),
 }
 
 
