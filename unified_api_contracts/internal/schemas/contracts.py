@@ -823,6 +823,16 @@ def lookup_contract(
 from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _defi_v2_contracts as _defi_v2_contracts  # noqa: E402
 from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402
+
+# Instrument-catalogue contract — derives a single SchemaContract from
+# INSTRUMENTS_PARQUET_SCHEMA (instruments-service write SSOT) and registers it
+# under (asset_group, "instrument_catalogue", "instrument_catalogue") for each
+# of cefi/tradfi/defi/prediction/sports. Required so deployment-api's View
+# Schema endpoint can resolve schemas for the legacy v4 manifest rows that
+# carry empty instrument_type and data_type axes.
+from unified_api_contracts.internal.schemas import (  # noqa: E402
+    _instrument_catalogue_contract as _instrument_catalogue_contract,
+)
 from unified_api_contracts.internal.schemas import _legacy_venue_overrides as _legacy_venue_overrides  # noqa: E402
 from unified_api_contracts.internal.schemas import _snapshot_contracts as _snapshot_contracts  # noqa: E402
 
