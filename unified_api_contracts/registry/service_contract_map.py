@@ -40,6 +40,12 @@ class ServiceContract:
     """Module path prefixes this service must never import (enforced by static
     test ``test_import_boundaries.py``)."""
 
+    forbidden_exceptions: frozenset[str] = field(default_factory=frozenset)
+    """Specific module paths that match a ``forbidden_imports`` prefix but are
+    architecturally permitted. Each entry should carry a comment explaining why
+    (typically: "target/this should move to UAC eventually"). Use sparingly —
+    every entry is technical debt."""
+
 
 # Domain event type names — see
 # :mod:`unified_api_contracts.internal.inter_service_events` for the schemas
@@ -283,6 +289,15 @@ SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
                 "position_balance_monitor_service.storage",
                 "risk_and_exposure_service.engine.orchestrator",
                 "pnl_attribution_service.core",
+            }
+        ),
+        forbidden_exceptions=frozenset(
+            {
+                # Target universe catalog is shared reference data that
+                # execution-service legitimately consults to build the rebalance
+                # recommender's universe. Should move to UAC `registry/` long-
+                # term — tracked in deprecation_ledger.yaml.
+                "strategy_service.engine.strategies.v2.target_universe.catalog",
             }
         ),
     ),
