@@ -49,12 +49,12 @@ class VenueMapping:
             # Tier 3: Additional CeFi exchanges
             "huobi",  # Huobi/HTX - spot
             "huobi-dm",  # Huobi/HTX - derivatives (futures/swaps)
-            # 2026-05-01: extend universe per cefi_venue_universe_expansion plan
-            "bitfinex",  # Bitfinex spot + margin
-            "bitget",  # Bitget spot
-            "bitget-futures",  # Bitget USDT-M perpetuals
-            "kraken",  # Kraken spot
-            "kraken-futures",  # Kraken Futures (formerly Crypto Facilities — perp + dated)
+            # 2026-05-01 Tier-3: cryptofacilities = Kraken Futures (legacy id).
+            "bitfinex",
+            "bitget",
+            "bitget-futures",
+            "kraken",
+            "cryptofacilities",
         ]
     )
 
@@ -172,7 +172,7 @@ class VenueMapping:
             "bitget": "BITGET-SPOT",
             "bitget-futures": "BITGET-FUTURES",
             "kraken": "KRAKEN-SPOT",
-            "kraken-futures": "KRAKEN-FUTURES",
+            "cryptofacilities": "KRAKEN-FUTURES",
         }
     )
 
@@ -216,10 +216,10 @@ class VenueMapping:
             "OKX-SWAP": "2020-01-01",
             "UPBIT": "2021-03-03",
             "COINBASE-SPOT": "2020-01-01",
-            # CEFI - Tardis Tier-3 (added 2026-05-01)
-            "BITFINEX-SPOT": "2020-01-01",  # Tardis archive starts 2020 across most majors
-            "BITGET-SPOT": "2021-01-01",  # Bitget Tardis coverage starts ~2021
-            "BITGET-FUTURES": "2021-01-01",
+            # CEFI Tardis Tier-3 (2026-05-01) — verified vs Tardis availableSince.
+            "BITFINEX-SPOT": "2020-01-01",
+            "BITGET-SPOT": "2024-11-08",
+            "BITGET-FUTURES": "2024-11-08",
             "KRAKEN-SPOT": "2020-01-01",
             "KRAKEN-FUTURES": "2020-01-01",
             # CEFI - On-chain CLOBs
