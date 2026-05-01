@@ -24,6 +24,14 @@ class AlertType(StrEnum):
     LIQUIDATION_RISK = "LIQUIDATION_RISK"
     DRAWDOWN_LIMIT = "DRAWDOWN_LIMIT"
     CONCENTRATION_LIMIT = "CONCENTRATION_LIMIT"
+    LEVERAGE_BREACH = "LEVERAGE_BREACH"
+    """Per-leg actual_leverage drifted from target_leverage by more than the
+    configured alert tightness multiplier on the leg's ``rebalance_trigger_bps``.
+    Independent of the LeveragedLegController auto-rebalance — operator-visible
+    safety overlay raised after the controller's chance to act has passed.
+    Emitted by risk-and-exposure-service. SSOT for the LegPortfolioState risk
+    overlay declared in
+    ``unified-trading-pm/plans/active/leveraged_leg_controller_2026_05_01.plan.md``."""
 
 
 class PositionSide(StrEnum):
