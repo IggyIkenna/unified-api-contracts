@@ -48,6 +48,7 @@ from unified_api_contracts.internal.domain.strategy_service.lifecycle import (
 from unified_api_contracts.internal.domain.strategy_service.pnl import (
     PnLAttribution,
     PnLSummary,
+    RewardAttributionRow,
     SettlementDelta,
     SettlementType,
 )
@@ -104,6 +105,7 @@ __all__ = [
     "PricingTier",
     "ProductRouting",
     "ResolvedInstruments",
+    "RewardAttributionRow",
     "SettlementDelta",
     "SettlementType",
     "SportsBetInstruction",

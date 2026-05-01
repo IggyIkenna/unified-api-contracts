@@ -148,7 +148,23 @@ class PnLAttribution:
     trading_pnl: Decimal = Decimal("0")  # Entry/exit price differences
     funding_pnl: Decimal = Decimal("0")  # Funding rate settlements (8h intervals)
     basis_spread_pnl: Decimal = Decimal("0")  # Spot-perp spread changes
-    staking_yield_pnl: Decimal = Decimal("0")  # LST yield accrual (weETH/ETH rate)
+    staking_yield_pnl: Decimal = Decimal("0")  # CARRY_BASE — LST exchange_rate appreciation
+    avs_continuous_yield_pnl: Decimal = Decimal("0")
+    """CARRY_AVS_CONTINUOUS — EigenLayer / Karak / Symbiotic / Solayer per-token
+    rewards realised in target denomination via the dust-conversion router.
+    Sourced from eigenlayer_rewards parquet aggregated through ConvertDustInstruction.
+    Per-token breakdown lives in `reward_attribution_rows` for granular reporting."""
+    issuer_seasonal_yield_pnl: Decimal = Decimal("0")
+    """CARRY_ISSUER_SEASONAL — LST-issuer episodic distributions (Ether.fi
+    quarterly Seasons via Merkle distributor; Puffer/Ankr/Stader/Karak;
+    Solana JTO/MNDE). Sourced from lst_seasonal_rewards parquet aggregated
+    through ConvertDustInstruction. Per-distributor breakdown in
+    reward_attribution_rows."""
+    reward_realisation_slippage_pnl: Decimal = Decimal("0")
+    """REWARD_REALISATION_SLIPPAGE — measured cost of converting reward dust
+    tokens into target denomination via dust-conversion router. Negative when
+    realised < mark; never a hardcoded haircut. Per-token breakdown in
+    reward_attribution_rows."""
     lending_yield_pnl: Decimal = Decimal("0")  # aToken interest (liquidity_index growth)
     borrow_cost_pnl: Decimal = Decimal("0")  # debtToken interest (borrow_index growth)
     transaction_costs: Decimal = Decimal("0")  # Trading fees + gas
@@ -169,6 +185,14 @@ class PnLAttribution:
     # Settlement events in this period
     settlements: list[SettlementDelta] = field(default_factory=list)
 
+    # Per-(holding, layer, token) reward attribution detail. One row per
+    # realised reward stream — populated when a strategy realises restaking
+    # rewards via ConvertDustInstruction. Aggregates to the layer-level
+    # bucket fields (avs_continuous_yield_pnl + issuer_seasonal_yield_pnl
+    # + reward_realisation_slippage_pnl). See
+    # codex/09-strategy/cross-cutting/restaking-reward-economics.md.
+    reward_attribution_rows: list["RewardAttributionRow"] = field(default_factory=list)
+
     metadata: dict[str, str | int | float | bool | None] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -185,6 +209,9 @@ class PnLAttribution:
             + self.funding_pnl
             + self.basis_spread_pnl
             + self.staking_yield_pnl
+            + self.avs_continuous_yield_pnl
+            + self.issuer_seasonal_yield_pnl
+            + self.reward_realisation_slippage_pnl
             + self.lending_yield_pnl
             + self.borrow_cost_pnl
             + self.transaction_costs
@@ -425,3 +452,98 @@ class PnLSummary:
             "metadata": self.metadata,
         }
         return result
+
+
+@dataclass
+class RewardAttributionRow:
+    """One row of restaking-reward PnL attribution detail.
+
+    Per the 3-layer reward economics
+    (codex/09-strategy/cross-cutting/restaking-reward-economics.md), each
+    realised reward stream produces one row tagged with the source layer
+    (CARRY_BASE / CARRY_AVS_CONTINUOUS / CARRY_ISSUER_SEASONAL) plus paired
+    REWARD_REALISATION_SLIPPAGE rows for the dust-conversion cost.
+
+    Aggregates to the layer-level bucket fields on PnLAttribution
+    (avs_continuous_yield_pnl + issuer_seasonal_yield_pnl +
+    reward_realisation_slippage_pnl). Per-row detail enables operator-side
+    investigation of which (LST, issuer, token) is contributing carry, and
+    which is bleeding via realisation slippage.
+    """
+
+    timestamp: datetime
+    strategy_id: str
+    client_id: str
+    lst_symbol: str
+    """The LST holding that produced this reward (e.g. 'weETH', 'pufETH',
+    'jitoSOL'). Empty string for non-LST reward sources (market-making
+    rebates, liquidity-mining emissions)."""
+    layer: str
+    """One of: 'CARRY_BASE' / 'CARRY_AVS_CONTINUOUS' / 'CARRY_ISSUER_SEASONAL'
+    / 'REWARD_REALISATION_SLIPPAGE'. Maps to RewardPnLLayer enum from
+    unified_api_contracts.internal.architecture_v2.restaking_rewards."""
+    reward_token_symbol: str
+    """Native reward token symbol (EIGEN, ETHFI, PUFFER, ANKR, SD, KARAK,
+    JTO, MNDE, etc.). For CARRY_BASE this is the LST's quote asset (ETH /
+    SOL / USDe). For REWARD_REALISATION_SLIPPAGE this is the source token
+    that was converted."""
+
+    # Native amount + target-denomination valuation
+    amount_native: Decimal = Decimal("0")
+    """Raw token amount received (decimal-adjusted, not uint256)."""
+    amount_target_at_receipt: Decimal = Decimal("0")
+    """Mid-price target-denomination value at receipt time. Benchmark for
+    REWARD_REALISATION_SLIPPAGE. For CARRY_BASE this == amount_target_realised
+    (no conversion needed). For points (is_pre_tge_points) this is 0."""
+    amount_target_realised: Decimal = Decimal("0")
+    """Actual target-denomination amount realised after dust-conversion
+    routing. amount_target_realised - amount_target_at_receipt drives the
+    paired REWARD_REALISATION_SLIPPAGE row's value (negative for slippage,
+    zero for native pass-through)."""
+
+    target_denomination: str = "ETH"
+    """ETH / SOL / USDC / USDT / DAI."""
+
+    # Source provenance
+    issuer: str = ""
+    """Issuer label: 'ether.fi' / 'puffer' / 'ankr' / 'stader' / 'eigenlayer'
+    / 'karak' / 'jito' / 'marinade'. Empty for non-restaking rewards."""
+    distributor_address: str = ""
+    """On-chain distributor contract address (Merkle / direct transfer
+    sender / claim() contract). Empty for CARRY_BASE."""
+    distributor_kind: str = ""
+    """'merkle' / 'direct_transfer' / 'claim_function' / 'exchange_rate'."""
+
+    # Conversion route (REWARD_REALISATION_SLIPPAGE rows only)
+    route_taken: list[str] = field(default_factory=list)
+    """Hop list from dust-conversion router (e.g. ['BINANCE:EIGEN-USDC',
+    'BRIDGE:USDC-ETH']). Empty for non-realisation rows."""
+    route_fees_target: Decimal = Decimal("0")
+    """Cumulative venue fees in target denomination across the route."""
+
+    # Status flags
+    points_pending: bool = False
+    """True for pre-TGE points (KING / MILES / KARAK pre-TGE / CARROT) that
+    accrued but have no realisable market. Row carries
+    amount_target_realised=0; reprices on TGE."""
+    held: bool = False
+    """True if the strategy elected to hold this token rather than realise
+    (vesting cliffs — EIGEN 4yr). Row carries amount_target_realised=0
+    until the realisation epoch lands."""
+
+    # PnL contribution (signed; negative for slippage rows)
+    pnl_value: Decimal = Decimal("0")
+    """The factor's contribution to total PnL in target denomination. For
+    CARRY_BASE / CARRY_AVS_CONTINUOUS / CARRY_ISSUER_SEASONAL this equals
+    amount_target_realised (positive). For REWARD_REALISATION_SLIPPAGE this
+    is amount_target_realised - amount_target_at_receipt (negative)."""
+
+    metadata: dict[str, str | int | float | bool | None] = field(default_factory=dict)
+
+
+__all__ = [
+    "PnLAttribution",
+    "PnLSummary",
+    "RewardAttributionRow",
+    "SettlementDelta",
+]
