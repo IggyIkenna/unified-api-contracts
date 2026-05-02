@@ -220,6 +220,36 @@ _ICE_FUTURES: list[DatabentoInstrumentDef] = [
 _CBOE_INSTRUMENTS: list[DatabentoInstrumentDef] = []
 
 # ---------------------------------------------------------------------------
+# CME Event Contracts — binary YES/NO settlement on macro/financial underliers.
+# ---------------------------------------------------------------------------
+# Same shape as Polymarket / Kalshi / Opinion binary markets ("Will S&P close
+# above X today?" / "Will BTC be > $Y by date?") but cleared via CME ClearPort
+# and routed retail via DraftKings Predictions / Robinhood Event Contracts.
+# Databento classifies them as OPTIONS (parent symbology with `.OPT` suffix).
+# Coverage on Databento: 2025-09-28 onward (verified 2026-05-01 by walking
+# symbology.resolve back from current date — first contracts surfaced
+# 2025-09-28). Pre-2025-09-28 history is not available via Databento even
+# though CME launched the product in 2022.
+#
+# Roots verified live via Databento symbology.resolve (2026-05-01):
+#   ECES = E-mini S&P 500    | ECNQ = E-mini Nasdaq 100
+#   ECRTY = E-mini Russell   | ECYM = E-mini Dow
+#   ECGC = Gold              | ECCL = Crude WTI
+#   ECNG = Natural gas       | EC6E = Euro FX
+#   ECBTC = Bitcoin (the killer leg vs Polymarket BTC binaries)
+_CME_EVENT_CONTRACTS: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("ECES.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SP500", "equity", "ECES"),
+    DatabentoInstrumentDef("ECNQ.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "NASDAQ100", "equity", "ECNQ"),
+    DatabentoInstrumentDef("ECRTY.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "RUSSELL2000", "equity", "ECRTY"),
+    DatabentoInstrumentDef("ECYM.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "DOW", "equity", "ECYM"),
+    DatabentoInstrumentDef("ECGC.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "GOLD", "commodity", "ECGC"),
+    DatabentoInstrumentDef("ECCL.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "CRUDE", "commodity", "ECCL"),
+    DatabentoInstrumentDef("ECNG.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "NATGAS", "commodity", "ECNG"),
+    DatabentoInstrumentDef("EC6E.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "EUR", "fx", "EC6E"),
+    DatabentoInstrumentDef("ECBTC.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "BTC", "crypto", "ECBTC"),
+]
+
+# ---------------------------------------------------------------------------
 # Aggregate: all Databento instruments
 # ---------------------------------------------------------------------------
 TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
@@ -230,6 +260,7 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CME_FX_FUTURES,
     *_CME_CRYPTO_FUTURES,
     *_CME_ES_OPTIONS,
+    *_CME_EVENT_CONTRACTS,
     *_ICE_FUTURES,
     *_CBOE_INSTRUMENTS,
     *_BTC_SPOT_ETFS,

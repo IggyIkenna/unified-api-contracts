@@ -32,12 +32,12 @@ class TestAllCefiVenuesDeduplicated:
     def test_expected_set_size(self) -> None:
         vm = VenueMapping()
         # Tier-1/2 Tardis (BINANCE-SPOT/FUTURES, DERIBIT, BYBIT, OKX-SPOT/FUTURES/SWAP,
-        # COINBASE-SPOT, UPBIT) + Tier-3 added 2026-05-01 (BITFINEX-SPOT, BITGET-SPOT,
-        # BITGET-FUTURES, KRAKEN-SPOT, KRAKEN-FUTURES via cryptofacilities) + on-chain
-        # CLOB venues (HYPERLIQUID, ASTER). HYPERLIQUID is both Tardis-backed and a
-        # CLOB so it dedupes once. Total = 16.
-        assert len(vm.all_cefi_venues) == 16, (
-            f"expected 16 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
+        # COINBASE-SPOT, UPBIT) + Tier-3 (2026-05-01: BITFINEX-SPOT/FUTURES, BITGET-SPOT,
+        # BITGET-FUTURES, KRAKEN-SPOT, KRAKEN-FUTURES) + on-chain CLOBs (HYPERLIQUID,
+        # ASTER, PACIFICA-SOLANA, EXTENDED-STARKNET, LIGHTER-ZKSYNC). HYPERLIQUID is in
+        # both Tardis-backed and CLOB sets so dedupes once. Total = 20.
+        assert len(vm.all_cefi_venues) == 20, (
+            f"expected 20 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
         )
 
     def test_includes_all_suffixed_variants(self) -> None:

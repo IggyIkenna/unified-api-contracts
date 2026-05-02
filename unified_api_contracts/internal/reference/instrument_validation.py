@@ -13,6 +13,7 @@ from collections import defaultdict
 
 from unified_api_contracts.internal.reference.instrument import InstrumentRecord, InstrumentType
 from unified_api_contracts.registry.chain_env import MAINNET_CHAIN_IDS
+from unified_api_contracts.registry.market_data_categories import VENUES_BY_ASSET_GROUP
 
 logger = logging.getLogger(__name__)
 
@@ -53,39 +54,20 @@ _DEFI_VENUE_PREFIXES = frozenset(
     }
 )
 
-_TRADFI_VENUES = frozenset({"CME", "NASDAQ", "NYSE", "CBOE", "ICE", "FX"})
-
-# CeFi venues (Tardis canonical + on-chain CLOBs)
-_CEFI_VENUES = frozenset(
-    {
-        "BINANCE-SPOT",
-        "BINANCE-FUTURES",
-        "DERIBIT",
-        "BYBIT",
-        "OKX",
-        "OKX-SPOT",
-        "OKX-SWAP",
-        "OKX-FUTURES",
-        "COINBASE-SPOT",
-        "UPBIT",
-        "BITSTAMP-SPOT",
-        "HUOBI-SPOT",
-        "HUOBI-FUTURES",
-        "HYPERLIQUID",
-        "ASTER",
-    }
+# Sourced from the SSOT (registry/market_data_categories.py:VENUES_BY_ASSET_GROUP)
+# so adding a venue there is the only edit needed. CeFi covers Tardis canonical
+# venues + on-chain CLOBs; tradfi covers Databento + external providers; sports
+# covers bookmakers + odds aggregators; prediction covers binary CLOBs. Extra
+# legacy aliases (OKX without suffix, BITSTAMP-SPOT, HUOBI-* under earlier
+# names, MATCHBOOK / API_FOOTBALL) are still accepted for back-compat.
+_CEFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["cefi"]) | frozenset(
+    {"OKX", "BITSTAMP-SPOT", "HUOBI-SPOT", "HUOBI-FUTURES"}
 )
-
-# Sports / prediction market venues
-_SPORTS_VENUES = frozenset(
-    {
-        "BETFAIR",
-        "MATCHBOOK",
-        "POLYMARKET",
-        "KALSHI",
-        "API_FOOTBALL",
-        "ODDS_API",
-    }
+_TRADFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["tradfi"])
+_SPORTS_VENUES: frozenset[str] = (
+    frozenset(VENUES_BY_ASSET_GROUP["sports"])
+    | frozenset(VENUES_BY_ASSET_GROUP["prediction"])
+    | frozenset({"MATCHBOOK", "API_FOOTBALL"})
 )
 
 # All known venue names (union of all asset groups)

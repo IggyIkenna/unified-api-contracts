@@ -1,14 +1,7 @@
-"""
-Centralized Venue and Data Type Configuration
+"""Centralized venue and data type configuration — SSOT for venue identity.
 
-Provides canonical venue mappings, data type configurations, and exchange settings
-used across all services in the unified trading system.
-
-This is the SSOT for venue identity concepts. Previously duplicated in:
-- unified-config-interface/unified_trading_library.config_interface/venue_config.py
-- unified-market-interface/unified_market_interface/models/venue_config.py
-
-Moved to unified-api-contracts (T0) because venue identity is a contracts-level
+Previously duplicated across config-interface and market-interface; consolidated
+into unified-api-contracts (T0) because venue identity is a contracts-level
 concept, not a config concept.
 """
 
@@ -51,6 +44,7 @@ class VenueMapping:
             "huobi-dm",  # Huobi/HTX - derivatives (futures/swaps)
             # 2026-05-01 Tier-3: cryptofacilities = Kraken Futures (legacy id).
             "bitfinex",
+            "bitfinex-derivatives",
             "bitget",
             "bitget-futures",
             "kraken",
@@ -83,14 +77,11 @@ class VenueMapping:
     # codex/02-data/mtds-data-source-coverage-matrix.md §4.
     legacy_defi_venue_aliases: dict[str, str] = field(default_factory=lambda: dict(LEGACY_DEFI_VENUE_ALIASES))
 
-    # CEFI on-chain CLOB venues (CLOB-style data, treated as CEFI for buckets)
-    # These produce data identical to centralized exchanges:
-    # trades, orderbook, funding, liquidations
+    # On-chain CLOB venues (treated as CEFI for buckets — CLOB-style data
+    # like a centralized exchange). Add new DEX perps to BOTH this list AND
+    # VENUES_BY_ASSET_GROUP['cefi'] in market_data_categories.py.
     all_cefi_onchain_clob_venues: list[str] = field(
-        default_factory=lambda: [
-            "HYPERLIQUID",  # Hyperliquid perpetual futures (HyperEVM L1)
-            "ASTER",  # Aster perpetual futures exchange
-        ]
+        default_factory=lambda: ["HYPERLIQUID", "ASTER", "PACIFICA-SOLANA", "EXTENDED-STARKNET", "LIGHTER-ZKSYNC"]
     )
 
     # All exchanges (computed from above - no duplication)
@@ -106,13 +97,9 @@ class VenueMapping:
 
     @property
     def all_cefi_venues(self) -> list[str]:
-        """All CEFI venues (Tardis exchanges + on-chain CLOBs like Hyperliquid/Aster)
-
-        Deduped — HYPERLIQUID is both a Tardis-backed feed and an on-chain
-        CLOB, so prior to 2026-04-20 the raw concat returned duplicates that
-        propagated to the data-status aggregator's expected-venue count.
-        Returns a deduplicated, sorted list so downstream consumers can
-        iterate safely.
+        """All CEFI venues (Tardis + on-chain CLOBs), deduped — HYPERLIQUID
+        is in both sets and would otherwise inflate the data-status expected
+        denominator (incident 2026-04-20).
         """
         merged = set(self.tardis_to_venue.values()) | set(self.all_cefi_onchain_clob_venues)
         return sorted(merged)
@@ -169,6 +156,7 @@ class VenueMapping:
             "hyperliquid": "HYPERLIQUID",
             # Tier 3 — 2026-05-01 extension
             "bitfinex": "BITFINEX-SPOT",
+            "bitfinex-derivatives": "BITFINEX-FUTURES",
             "bitget": "BITGET-SPOT",
             "bitget-futures": "BITGET-FUTURES",
             "kraken": "KRAKEN-SPOT",
@@ -183,8 +171,11 @@ class VenueMapping:
             "CBOE": "barchart",  # VIX via Barchart
             "FX": "yahoo_finance",  # KRW/USD via Yahoo Finance
             # DeFi venues with direct API integration
-            "HYPERLIQUID": "hyperliquid_api",  # Hyperliquid REST/WebSocket API + S3 archive
-            "ASTER": "aster_api",  # Aster REST API
+            "HYPERLIQUID": "hyperliquid_api",
+            "ASTER": "aster_api",
+            "PACIFICA-SOLANA": "pacifica_api",
+            "EXTENDED-STARKNET": "extended_api",
+            "LIGHTER-ZKSYNC": "lighter_api",
             # DeFi venues — canonical PROTOCOL-CHAIN format
             "UNISWAPV2-ETHEREUM": "the_graph",
             "UNISWAPV3-ETHEREUM": "the_graph",
@@ -218,6 +209,7 @@ class VenueMapping:
             "COINBASE-SPOT": "2020-01-01",
             # CEFI Tardis Tier-3 (2026-05-01) — verified vs Tardis availableSince.
             "BITFINEX-SPOT": "2020-01-01",
+            "BITFINEX-FUTURES": "2020-01-01",
             "BITGET-SPOT": "2024-11-08",
             "BITGET-FUTURES": "2024-11-08",
             "KRAKEN-SPOT": "2020-01-01",
@@ -225,6 +217,9 @@ class VenueMapping:
             # CEFI - On-chain CLOBs
             "HYPERLIQUID": "2023-11-01",
             "ASTER": "2024-10-01",
+            "PACIFICA-SOLANA": "2025-06-01",
+            "EXTENDED-STARKNET": "2024-10-01",
+            "LIGHTER-ZKSYNC": "2024-08-01",
             # TradFi - Databento
             # Start dates = earliest manifest data
             "CME": "2020-01-01",
@@ -824,8 +819,11 @@ class ExchangeInstrumentConfig:
             "UPBIT": ["SPOT_PAIR"],  # Spot only (Korean exchange for kimchi premium)
             "COINBASE": ["SPOT_PAIR"],  # Spot only (for coinbase premium)
             # CeFi - On-chain CLOBs
-            "HYPERLIQUID": ["PERPETUAL"],  # Perpetuals only (NO liquidations endpoint)
-            "ASTER": ["PERPETUAL"],  # Perpetuals only (NO liquidations - endpoint disabled)
+            "HYPERLIQUID": ["PERPETUAL"],
+            "ASTER": ["PERPETUAL"],
+            "PACIFICA-SOLANA": ["PERPETUAL"],
+            "EXTENDED-STARKNET": ["PERPETUAL"],
+            "LIGHTER-ZKSYNC": ["PERPETUAL"],
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
             "UNISWAPV2-ETHEREUM": ["POOL"],
             "UNISWAPV3-ETHEREUM": ["POOL"],

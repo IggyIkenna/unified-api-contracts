@@ -159,6 +159,7 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "COINBASE",
         # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
         "BITFINEX-SPOT",
+        "BITFINEX-FUTURES",
         "BITGET-SPOT",
         "BITGET-FUTURES",
         "KRAKEN-SPOT",
@@ -166,6 +167,10 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # On-chain CLOBs (reclassified from DEFI - CLOB-style data like CeFi)
         "HYPERLIQUID",
         "ASTER",
+        # 2026-05-01 DEX perp expansion (cefi_venue_universe_expansion plan)
+        "PACIFICA-SOLANA",
+        "EXTENDED-STARKNET",
+        "LIGHTER-ZKSYNC",
     ],
     "tradfi": [
         # Databento venues
