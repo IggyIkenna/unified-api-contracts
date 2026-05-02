@@ -7,13 +7,27 @@ remaining 4 asset groups (CeFi, DeFi, TradFi, Prediction) — each writes to
 its dedicated ``market-data-tick-{ag}-{pid}`` bucket but with different
 partition keys per data shape.
 
-Wire-format SSOT (matches deployed MTDS adapters as of 2026-04-29):
+Wire-format SSOT (matches deployed MTDS adapters as of 2026-05-02):
 
-DeFi: ``day={D}/asset_group=defi/venue={V}/chain={C}/instrument_type={IT}/data_type={DT}/{file}``
-  Migrated 2026-04-29 from
-  ``market-tick-data-service/.../adapters/defi/canonical_write.py::build_defi_partition_path``.
+All 4 asset groups share the ``raw_tick_data/by_date/`` bucket-relative root
+prefix. Concrete patterns:
 
-CeFi / TradFi / Prediction: see per-function docstrings.
+DeFi: ``raw_tick_data/by_date/day={D}/asset_group=defi/venue={V}/chain={C}/
+       instrument_type={IT}/data_type={DT}/{file}``
+CeFi: ``raw_tick_data/by_date/day={D}/asset_group=cefi/venue={V}/
+       instrument_type={IT}/data_type={DT}/{file}``
+TradFi: ``raw_tick_data/by_date/day={D}/asset_group=tradfi/venue={V}/
+         instrument_type={IT}/data_type={DT}/{file}``
+Prediction: ``raw_tick_data/by_date/day={D}/asset_group=prediction/
+             venue={V}/instrument_type={IT}/data_type={DT}/{condition_id}.parquet``
+
+Pre-2026-05-02, the ``raw_tick_data/by_date/`` prefix was added by callers
+(MTDS ``PartitionedTickWriter`` did the prepend; DeFi handlers via
+``write_defi_rows`` did NOT — that gap put EigenLayer rewards / DEX swaps /
+liquidations / etc. at bucket root ``day=*/...`` and produced 100% phantom
+rates in the manifest audit). This module is now the single source of truth
+for the FULL bucket-relative path including the prefix; callers must NOT
+prepend further.
 
 Use the unified dispatcher :func:`candidate_parquet_paths` for code that
 spans asset_groups; use the per-asset-group ``build_*_partition_path``
@@ -31,6 +45,11 @@ from unified_api_contracts.canonical.gcs_paths import AssetGroup
 # Legacy on-disk objects use ``category=`` — readers that need both should try
 # canonical first then fall back, but new writes use this key.
 ASSET_GROUP_HIVE_KEY = "asset_group"
+
+# Bucket-relative root prefix shared by all market-tick parquets across every
+# asset_group. Includes the trailing ``/``. SSOT — never duplicate this string
+# in writer code or readers; import it from here.
+RAW_TICK_DATA_PREFIX = "raw_tick_data/by_date/"
 
 
 # ---------------------------------------------------------------------------
@@ -61,13 +80,13 @@ def build_defi_partition_path(
     day: _dt.date,
     file_name: str,
 ) -> str:
-    """Build the canonical DeFi partition path (without bucket prefix).
+    """Build the canonical DeFi partition path (full bucket-relative path).
 
-    Wire format (mirrors hive-partitioning conventions used by MTDS reader +
-    PartitionedTickWriter):
+    Wire format (returns the full path including the
+    ``raw_tick_data/by_date/`` prefix — callers MUST NOT prepend further):
 
-    ``day={YYYY-MM-DD}/asset_group=defi/venue={V}/chain={C}/
-    instrument_type={IT}/data_type={DT}/{file_name}``
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=defi/venue={V}/
+    chain={C}/instrument_type={IT}/data_type={DT}/{file_name}``
 
     Where ``venue`` is the protocol only (e.g. ``AAVE_V3``, ``UNISWAP_V3``,
     ``LIDO``) — never the legacy ``PROTOCOL-CHAIN`` overload — and
@@ -83,7 +102,7 @@ def build_defi_partition_path(
         ...     day=_dt.date(2026, 4, 17),
         ...     file_name="aUSDC.parquet",
         ... )
-        'day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/aUSDC.parquet'
+        'raw_tick_data/by_date/day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/aUSDC.parquet'
     """
     if not data_type:
         msg = "data_type must be a non-empty string"
@@ -101,7 +120,7 @@ def build_defi_partition_path(
     it = instrument_type.value.lower()
     day_str = day.strftime("%Y-%m-%d")
     return (
-        f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=defi/"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=defi/"
         f"venue={v}/chain={c}/"
         f"instrument_type={it}/data_type={data_type}/"
         f"{file_name}"
@@ -135,20 +154,22 @@ def build_cefi_partition_path(
     quote_asset: str = "",
     margin_type: str = "",
 ) -> str:
-    """Build the canonical CeFi partition path (without bucket or
-    ``raw_tick_data/by_date/`` prefix — the writer prepends those).
+    """Build the canonical CeFi partition path (full bucket-relative path).
+
+    Returns the full path including the ``raw_tick_data/by_date/`` prefix —
+    callers MUST NOT prepend further.
 
     v5 (legacy) layout — single-symbol shards or callers leaving
     underlying / quote_asset / margin_type empty:
 
-    ``day={YYYY-MM-DD}/asset_group=cefi/venue={V}/
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=cefi/venue={V}/
     instrument_type={IT}/data_type={DT}/{file_name}``
 
     v6 layout (2026-04-23) — only when ``instrument_type`` is a CHAIN bundle
     (``options_chain`` / ``futures_chain``) AND all three of
     ``underlying`` / ``quote_asset`` / ``margin_type`` are populated:
 
-    ``day=.../instrument_type={IT}/data_type={DT}/
+    ``raw_tick_data/by_date/day=.../instrument_type={IT}/data_type={DT}/
     underlying={U}/quote={Q}/margin={M}/ticks.parquet``
 
     For per-symbol (non-chain) shards, v6 does NOT add extra path segments —
@@ -170,7 +191,10 @@ def build_cefi_partition_path(
     v = _normalize_venue_upper(venue)
     it = instrument_type.value.lower() if isinstance(instrument_type, InstrumentType) else instrument_type.lower()
     day_str = day.strftime("%Y-%m-%d")
-    base = f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=cefi/venue={v}/instrument_type={it}/data_type={data_type}"
+    base = (
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=cefi/"
+        f"venue={v}/instrument_type={it}/data_type={data_type}"
+    )
 
     # v6 layout only for CHAIN bundles with all three axes populated.
     is_chain = it in CEFI_CHAIN_INSTRUMENT_TYPES
@@ -202,13 +226,15 @@ def build_tradfi_partition_path(
     day: _dt.date,
     file_name: str,
 ) -> str:
-    """Build the canonical TradFi partition path (without bucket or
-    ``raw_tick_data/by_date/`` prefix — the writer prepends those).
+    """Build the canonical TradFi partition path (full bucket-relative path).
+
+    Returns the full path including the ``raw_tick_data/by_date/`` prefix —
+    callers MUST NOT prepend further.
 
     Wire format (matches MTDS
     ``tradfi/tradfi_shared.py::build_partition_path``):
 
-    ``day={YYYY-MM-DD}/asset_group=tradfi/venue={V}/
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=tradfi/venue={V}/
     instrument_type={IT}/data_type={DT}/{file_name}``
 
     Used by FRED (rates curve via DGS series), OPRA (options chains via
@@ -226,7 +252,8 @@ def build_tradfi_partition_path(
     it = instrument_type.value.lower()
     day_str = day.strftime("%Y-%m-%d")
     return (
-        f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=tradfi/venue={v}/instrument_type={it}/data_type={data_type}/{file_name}"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=tradfi/"
+        f"venue={v}/instrument_type={it}/data_type={data_type}/{file_name}"
     )
 
 
@@ -254,16 +281,18 @@ def build_prediction_partition_path(
     data_type: str,
     day: _dt.date,
 ) -> str:
-    """Build the canonical Prediction partition path (without bucket or
-    ``raw_tick_data/by_date/`` prefix — the writer prepends those).
+    """Build the canonical Prediction partition path (full bucket-relative path).
+
+    Returns the full path including the ``raw_tick_data/by_date/`` prefix —
+    callers MUST NOT prepend further.
 
     Wire format (verified 2026-04-29 against MTDS orchestrator
     ``PartitionedTickWriter`` lines 640-650 and adapters
     ``prediction/polymarket_adapter.py`` line 532-541 +
     ``prediction/kalshi_adapter.py`` line 256-261):
 
-    ``day={YYYY-MM-DD}/asset_group=prediction/venue={V}/
-    instrument_type={IT}/data_type={DT}/{condition_id}.parquet``
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=prediction/
+    venue={V}/instrument_type={IT}/data_type={DT}/{condition_id}.parquet``
 
     The ``condition_id`` is used as the per-instrument FILENAME (matching
     the per-instrument-symbol writer pattern), NOT a partition segment.
@@ -293,8 +322,8 @@ def build_prediction_partition_path(
     day_str = day.strftime("%Y-%m-%d")
     sanitized = _sanitize_symbol(condition_id)
     return (
-        f"day={day_str}/{ASSET_GROUP_HIVE_KEY}=prediction/venue={v}/"
-        f"instrument_type={it}/data_type={data_type}/{sanitized}.parquet"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=prediction/"
+        f"venue={v}/instrument_type={it}/data_type={data_type}/{sanitized}.parquet"
     )
 
 
@@ -419,6 +448,7 @@ def _coerce_instrument_type(value: object) -> InstrumentType:
 __all__ = [
     "ASSET_GROUP_HIVE_KEY",
     "CEFI_CHAIN_INSTRUMENT_TYPES",
+    "RAW_TICK_DATA_PREFIX",
     "build_cefi_partition_path",
     "build_defi_partition_path",
     "build_prediction_partition_path",

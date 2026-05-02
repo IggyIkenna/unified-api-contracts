@@ -39,7 +39,7 @@ def test_defi_partition_path_canonical() -> None:
         file_name="aUSDC.parquet",
     )
     assert path == (
-        "day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/"
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/"
         "instrument_type=a_token/data_type=lending_indices/aUSDC.parquet"
     )
 
@@ -83,7 +83,8 @@ def test_cefi_partition_path_canonical() -> None:
         file_name="BTC-USDT.parquet",
     )
     assert path == (
-        "day=2026-04-17/asset_group=cefi/venue=BINANCE/instrument_type=perpetual/data_type=trades/BTC-USDT.parquet"
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=cefi/venue=BINANCE/"
+        "instrument_type=perpetual/data_type=trades/BTC-USDT.parquet"
     )
 
 
@@ -100,7 +101,8 @@ def test_cefi_v6_chain_bundle_layout() -> None:
         margin_type="USDC",
     )
     assert path == (
-        "day=2026-04-17/asset_group=cefi/venue=DERIBIT/instrument_type=options_chain/data_type=trades/"
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=cefi/venue=DERIBIT/"
+        "instrument_type=options_chain/data_type=trades/"
         "underlying=BTC/quote=USDC/margin=usdc/ticks.parquet"
     )
 
@@ -150,7 +152,8 @@ def test_tradfi_partition_path_canonical() -> None:
         file_name="DGS10.parquet",
     )
     assert path == (
-        "day=2026-04-17/asset_group=tradfi/venue=FRED/instrument_type=bond/data_type=series_dgs10/DGS10.parquet"
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=tradfi/venue=FRED/"
+        "instrument_type=bond/data_type=series_dgs10/DGS10.parquet"
     )
 
 
@@ -170,7 +173,7 @@ def test_prediction_partition_path_canonical() -> None:
     )
     # condition_id is the FILENAME, not a partition segment.
     assert path == (
-        f"day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
+        f"raw_tick_data/by_date/day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
         f"instrument_type=prediction_market/data_type=trades/{cid}.parquet"
     )
 
@@ -224,7 +227,7 @@ def test_dispatcher_routes_defi() -> None:
     )
     assert len(paths) == 1
     assert paths[0] == (
-        "day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/"
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/"
         "instrument_type=a_token/data_type=lending_indices/aUSDC.parquet"
     )
 
@@ -268,6 +271,6 @@ def test_dispatcher_routes_prediction() -> None:
     )
     assert len(paths) == 1
     assert paths[0] == (
-        "day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
+        "raw_tick_data/by_date/day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
         "instrument_type=prediction_market/data_type=trades/0xabc123.parquet"
     )
