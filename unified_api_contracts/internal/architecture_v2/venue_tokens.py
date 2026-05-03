@@ -84,7 +84,11 @@ _DEFI_LENDING_TOKENS: frozenset[str] = frozenset(
     }
 )
 
-# DeFi staking protocols
+# DeFi staking + yield-bearing-vault protocols. Includes ERC-4626 vault
+# venues (Yearn, MakerDAO sDAI, Frax sFRAX) alongside the LST issuers
+# (Lido, RocketPool, etc.) since slot labels use the same scope grammar
+# for staked-yield primitives — the parser doesn't care whether the
+# token is rebasing or share-price-tracked.
 _DEFI_STAKING_TOKENS: frozenset[str] = frozenset(
     {
         "lido",
@@ -93,6 +97,12 @@ _DEFI_STAKING_TOKENS: frozenset[str] = frozenset(
         "marinade",
         "etherfi",
         "ethena",
+        # ERC-4626 vault venues — DEFI_LP_VAULT seed slot family. Added
+        # 2026-05-03 with defi_pipeline_extension_followups Phase 3.
+        "yearn",
+        "yearnv3",
+        "maker",
+        "frax",
     }
 )
 
