@@ -6,7 +6,45 @@ All public symbols are re-exported by _defi.py so the external API is unchanged.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from enum import StrEnum
+
+# ---------------------------------------------------------------------------
+# ChainConfig — typed per-chain operational settings (SSOT)
+#
+# Lifted out of the bare ``CHAIN_RPC_TEMPLATES`` dict 2026-05-03 (defi
+# pipeline extension follow-ups Phase 5) so downstream services can reach
+# for ``reorg_depth`` / ``avg_block_time_s`` / ``native_gas_token``
+# without re-implementing per-chain heuristics. ``CHAIN_RPC_TEMPLATES``
+# is kept as a derived view of ``CHAIN_CONFIGS[].rpc_url_template`` for
+# back-compat — every existing caller keeps working unchanged.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ChainConfig:
+    """Per-chain operational settings for backfill / live / execution.
+
+    Attributes:
+        rpc_url_template: Provider URL with ``{api_key}`` placeholder.
+            Public RPCs (Tier-4 chains) leave the placeholder unrendered;
+            ``str.format(api_key="")`` is a no-op for them.
+        reorg_depth: Conservative confirmations-to-finality. L1s use deep
+            (≥30) values; high-finality L2s + sequencer-only chains use
+            shallower (1-30) values. The execution-service +
+            instruments-service reference these to gate event ingestion.
+        avg_block_time_s: Mean block-time, used by data-status to compute
+            expected per-day block ranges + by execution-service to
+            estimate inclusion latency.
+        native_gas_token: ETH/BNB/MATIC/AVAX/etc — symbol of the asset
+            paid as gas. Sourced from CHAIN_NATIVE_GAS_TOKEN.
+    """
+
+    rpc_url_template: str
+    reorg_depth: int
+    avg_block_time_s: float
+    native_gas_token: str
+
 
 # ---------------------------------------------------------------------------
 # Chain-specific Alchemy RPC URL templates (SSOT)
@@ -15,52 +53,242 @@ from enum import StrEnum
 # injecting it into UDEI connector config.  Interfaces never touch these
 # directly — they receive a pre-resolved ``rpc_url`` from the service layer.
 # ---------------------------------------------------------------------------
-CHAIN_RPC_TEMPLATES: dict[int, str] = {
+# Per-chain typed config — SSOT. ``CHAIN_RPC_TEMPLATES`` below is a derived
+# ``dict[int, str]`` view kept for back-compat.
+CHAIN_CONFIGS: dict[int, ChainConfig] = {
     # ── Tier 1: Core ETH + L2s (strategy-critical) ───────────────
-    1: "https://eth-mainnet.g.alchemy.com/v2/{api_key}",
-    10: "https://opt-mainnet.g.alchemy.com/v2/{api_key}",
-    8453: "https://base-mainnet.g.alchemy.com/v2/{api_key}",
-    42161: "https://arb-mainnet.g.alchemy.com/v2/{api_key}",
+    1: ChainConfig(
+        rpc_url_template="https://eth-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=64,
+        avg_block_time_s=12.0,
+        native_gas_token="ETH",
+    ),
+    10: ChainConfig(
+        rpc_url_template="https://opt-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    8453: ChainConfig(
+        rpc_url_template="https://base-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    42161: ChainConfig(
+        rpc_url_template="https://arb-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=0.25,
+        native_gas_token="ETH",
+    ),
     # ── Tier 2: Major non-ETH EVM chains ─────────────────────────
-    56: "https://bnb-mainnet.g.alchemy.com/v2/{api_key}",
-    137: "https://polygon-mainnet.g.alchemy.com/v2/{api_key}",
-    43114: "https://avax-mainnet.g.alchemy.com/v2/{api_key}",
-    100: "https://gnosis-mainnet.g.alchemy.com/v2/{api_key}",
+    56: ChainConfig(
+        rpc_url_template="https://bnb-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=3.0,
+        native_gas_token="BNB",
+    ),
+    137: ChainConfig(
+        rpc_url_template="https://polygon-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=128,
+        avg_block_time_s=2.0,
+        native_gas_token="MATIC",
+    ),
+    43114: ChainConfig(
+        rpc_url_template="https://avax-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="AVAX",
+    ),
+    100: ChainConfig(
+        rpc_url_template="https://gnosis-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=5.0,
+        native_gas_token="XDAI",
+    ),
     # ── Tier 3: ETH-native L2s + zkEVMs ──────────────────────────
-    130: "https://unichain-mainnet.g.alchemy.com/v2/{api_key}",
-    324: "https://zksync-mainnet.g.alchemy.com/v2/{api_key}",
-    480: "https://worldchain-mainnet.g.alchemy.com/v2/{api_key}",
-    1101: "https://polygonzkevm-mainnet.g.alchemy.com/v2/{api_key}",
-    2741: "https://abstract-mainnet.g.alchemy.com/v2/{api_key}",
-    34443: "https://mode-mainnet.g.alchemy.com/v2/{api_key}",
-    57073: "https://ink-mainnet.g.alchemy.com/v2/{api_key}",
-    59144: "https://linea-mainnet.g.alchemy.com/v2/{api_key}",
-    81457: "https://blast-mainnet.g.alchemy.com/v2/{api_key}",
-    534352: "https://scroll-mainnet.g.alchemy.com/v2/{api_key}",
-    7777777: "https://zora-mainnet.g.alchemy.com/v2/{api_key}",
+    130: ChainConfig(
+        rpc_url_template="https://unichain-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="ETH",
+    ),
+    324: ChainConfig(
+        rpc_url_template="https://zksync-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="ETH",
+    ),
+    480: ChainConfig(
+        rpc_url_template="https://worldchain-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    1101: ChainConfig(
+        rpc_url_template="https://polygonzkevm-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=5.0,
+        native_gas_token="ETH",
+    ),
+    2741: ChainConfig(
+        rpc_url_template="https://abstract-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="ETH",
+    ),
+    34443: ChainConfig(
+        rpc_url_template="https://mode-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    57073: ChainConfig(
+        rpc_url_template="https://ink-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="ETH",
+    ),
+    59144: ChainConfig(
+        rpc_url_template="https://linea-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=12.0,
+        native_gas_token="ETH",
+    ),
+    81457: ChainConfig(
+        rpc_url_template="https://blast-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    534352: ChainConfig(
+        rpc_url_template="https://scroll-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=3.0,
+        native_gas_token="ETH",
+    ),
+    7777777: ChainConfig(
+        rpc_url_template="https://zora-mainnet.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
     # ── Tier 4: Alt-L1 / non-Alchemy chains (public RPC; api_key is no-op) ────
-    # Defi pipeline extension Phase 6.1: backfill chains the analysis silently
+    # DeFi pipeline extension Phase 6.1: backfill chains the analysis silently
     # treated as unsupported. Public RPCs work for read-only / instruments-
     # service ingest; for production execution-service calls, switch to a
     # dedicated provider (QuickNode, Infura) via Secret Manager.
-    250: "https://rpc.ftm.tools",  # FANTOM
-    1088: "https://andromeda.metis.io/?owner=1088",  # METIS
-    1284: "https://rpc.api.moonbeam.network",  # MOONBEAM
-    5000: "https://rpc.mantle.xyz",  # MANTLE
-    42220: "https://forno.celo.org",  # CELO
-    1313161554: "https://mainnet.aurora.dev",  # AURORA
+    250: ChainConfig(
+        rpc_url_template="https://rpc.ftm.tools",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="FTM",
+    ),
+    1088: ChainConfig(
+        rpc_url_template="https://andromeda.metis.io/?owner=1088",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="METIS",
+    ),
+    1284: ChainConfig(
+        rpc_url_template="https://rpc.api.moonbeam.network",
+        reorg_depth=30,
+        avg_block_time_s=12.0,
+        native_gas_token="GLMR",
+    ),
+    5000: ChainConfig(
+        rpc_url_template="https://rpc.mantle.xyz",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="MNT",
+    ),
+    42220: ChainConfig(
+        rpc_url_template="https://forno.celo.org",
+        reorg_depth=30,
+        avg_block_time_s=5.0,
+        native_gas_token="CELO",
+    ),
+    1313161554: ChainConfig(
+        rpc_url_template="https://mainnet.aurora.dev",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="ETH",
+    ),
     # ── Testnets (EVM) — same key, different endpoints ───────────
-    11155111: "https://eth-sepolia.g.alchemy.com/v2/{api_key}",  # ETH Sepolia
-    11155420: "https://opt-sepolia.g.alchemy.com/v2/{api_key}",  # OP Sepolia
-    84532: "https://base-sepolia.g.alchemy.com/v2/{api_key}",  # Base Sepolia
-    421614: "https://arb-sepolia.g.alchemy.com/v2/{api_key}",  # Arbitrum Sepolia
-    80002: "https://polygon-amoy.g.alchemy.com/v2/{api_key}",  # Polygon Amoy
-    43113: "https://avax-fuji.g.alchemy.com/v2/{api_key}",  # Avalanche Fuji
-    300: "https://zksync-sepolia.g.alchemy.com/v2/{api_key}",  # zkSync Sepolia
-    168587773: "https://blast-sepolia.g.alchemy.com/v2/{api_key}",  # Blast Sepolia
-    534351: "https://scroll-sepolia.g.alchemy.com/v2/{api_key}",  # Scroll Sepolia
-    59141: "https://linea-sepolia.g.alchemy.com/v2/{api_key}",  # Linea Sepolia
+    11155111: ChainConfig(
+        rpc_url_template="https://eth-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=12.0,
+        native_gas_token="ETH",
+    ),
+    11155420: ChainConfig(
+        rpc_url_template="https://opt-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    84532: ChainConfig(
+        rpc_url_template="https://base-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    421614: ChainConfig(
+        rpc_url_template="https://arb-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=0.25,
+        native_gas_token="ETH",
+    ),
+    80002: ChainConfig(
+        rpc_url_template="https://polygon-amoy.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="MATIC",
+    ),
+    43113: ChainConfig(
+        rpc_url_template="https://avax-fuji.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="AVAX",
+    ),
+    300: ChainConfig(
+        rpc_url_template="https://zksync-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=1.0,
+        native_gas_token="ETH",
+    ),
+    168587773: ChainConfig(
+        rpc_url_template="https://blast-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=2.0,
+        native_gas_token="ETH",
+    ),
+    534351: ChainConfig(
+        rpc_url_template="https://scroll-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=3.0,
+        native_gas_token="ETH",
+    ),
+    59141: ChainConfig(
+        rpc_url_template="https://linea-sepolia.g.alchemy.com/v2/{api_key}",
+        reorg_depth=30,
+        avg_block_time_s=12.0,
+        native_gas_token="ETH",
+    ),
 }
+
+
+# Back-compat view: ``dict[int, str]`` mapping chain_id → rpc_url_template.
+# Existing callers keep working; new callers should pull
+# ``CHAIN_CONFIGS[chain_id]`` directly to access reorg_depth /
+# avg_block_time_s / native_gas_token.
+CHAIN_RPC_TEMPLATES: dict[int, str] = {chain_id: cfg.rpc_url_template for chain_id, cfg in CHAIN_CONFIGS.items()}
+
+
+def get_chain_config(chain_id: int) -> ChainConfig | None:
+    """Return the typed ChainConfig for a given chain_id, or None."""
+    return CHAIN_CONFIGS.get(chain_id)
+
 
 # ---------------------------------------------------------------------------
 # Solana RPC templates — same pattern as EVM, keyed by network name.
