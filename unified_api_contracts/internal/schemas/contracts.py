@@ -660,6 +660,25 @@ DEFI_STAKING_YIELD_SNAPSHOTS = SchemaContract(
     required_row_count_min=1,
 )
 
+# ERC-4626 vault share-price snapshots — produced by the MTDS
+# vault_share_price_handler. ``symbol`` is the vault ticker (yvUSDC, sUSDe,
+# sFRAX, ...). ``share_price`` is the result of
+# ``convertToAssets(10**underlying_decimals)`` divided by 10**underlying_decimals.
+DEFI_YIELD_BEARING_VAULT_SHARE_PRICE = SchemaContract(
+    asset_group="defi",
+    instrument_type="yield_bearing",
+    data_type="vault_share_price",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="share_price", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 # ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
@@ -701,6 +720,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
     ("defi", "staking", "eigenlayer_rewards"): DEFI_STAKING_EIGENLAYER_REWARDS,
     ("defi", "staking", "yield_snapshots"): DEFI_STAKING_YIELD_SNAPSHOTS,
+    ("defi", "yield_bearing", "vault_share_price"): DEFI_YIELD_BEARING_VAULT_SHARE_PRICE,
     # Sports + Prediction registered via _sports_prediction_contracts side-effect import (see end of file).
     # DeFi phase-2 contracts registered via _defi_v2_contracts side-effect import (see end of file).
 }
