@@ -58,6 +58,7 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "mev_events": "15m",
     "governance_events": "24h",
     "eigenlayer_rewards": "24h",
+    "vault_share_price": "1h",  # ERC-4626 share-price tick: per-block read; 1h sampling enough for APY drift
     # Sports — horizon-based, not standard timeframes
     "odds_snapshot": "15m",
     "odds_movement": "15m",
@@ -129,6 +130,10 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "mev_events",  # MEV-Boost relay builder/relay stats
         "governance_events",  # DAO proposal + vote events
         "eigenlayer_rewards",  # EigenLayer restaking reward distributions
+        # DeFi pipeline extension follow-ups (2026-05-03):
+        # ERC-4626 vault totalAssets/totalSupply snapshots (top-40 vaults
+        # across Yearn V3 / Morpho / Aave Vaults / Sommelier / MetaMorpho).
+        "vault_share_price",
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
@@ -250,6 +255,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "mev_events": False,
     "governance_events": False,
     "eigenlayer_rewards": False,
+    "vault_share_price": False,  # ERC-4626 share-price tick — pass-through, no candle adapter
     # Sports — candle adapters process these
     "odds": False,  # Raw tick data, not directly processed (bucket adapter handles)
     "odds_snapshot": True,
