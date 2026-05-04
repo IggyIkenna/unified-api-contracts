@@ -113,6 +113,75 @@ DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
 KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 
 
+# Sports manifest data_type → source-key mapping (SSOT).
+#
+# The manifest stores rows keyed by ``data_type`` (e.g. ``MATCHES``, ``XG``,
+# ``PREDICTIONS``) but the coverage windows above are keyed by
+# ``source_key`` (e.g. ``footystats``, ``understat``).  This mapping is the
+# bridge — used by the manifest-purge tooling and the orchestrator's
+# pre-flight to decide whether a (date, data_type) shard is even possible.
+#
+# Mirrors the orchestrator's ``_enrichment_entity_venues`` list at
+# ``instruments-service/instruments_service/engine/orchestrator.py:1113``
+# but UAC-side so other repos can import it without a circular dep.
+SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
+    # FootyStats — primary stats / odds aggregator
+    "MATCHES": "footystats",
+    "PREDICTIONS": "footystats",
+    "ODDS": "footystats",
+    "STANDINGS": "footystats",
+    "TEAMS": "footystats",
+    # Understat — xG model
+    "XG": "understat",
+    # API-Football — per-fixture detail
+    "FIXTURES": "api_football",
+    "INJURIES": "api_football",
+    "FIXTURE_STATS": "api_football",
+    "FIXTURE_EVENTS": "api_football",
+    "FIXTURE_LINEUPS": "api_football",
+    "PLAYER_STATS": "api_football",
+    # Transfermarkt — player values
+    "TRANSFERMARKT_LEAGUES": "transfermarkt",
+    "TRANSFERMARKT_VALUES": "transfermarkt",
+    "PLAYER_VALUES": "transfermarkt",
+    # SoccerFootball.info — second-tier league standings
+    "SFI_LEAGUES": "soccer_football_info",
+    "SFI_STANDINGS": "soccer_football_info",
+    "SFI_PROGRESSIVE_STATS": "soccer_football_info",
+    # OpenMeteo — historical weather
+    "WEATHER": "open_meteo",
+    # MDPS odds horizon bucket — derived from odds-api
+    "ODDS_HORIZON_BUCKET": "mdps_odds_horizon_bucket",
+}
+
+
+def get_source_for_data_type(data_type: str) -> str | None:
+    """Return the source-key for a sports manifest ``data_type``, or
+    ``None`` if unknown (caller should treat as no-clip)."""
+    return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
+
+
+def is_pre_launch_date(data_type: str, iso_date: str) -> bool:
+    """True if ``iso_date`` is before the source/data_type's coverage start.
+
+    Used to identify illegitimate manifest rows that claim
+    ``capture_status=captured`` for dates the source never covered.  A
+    pre-launch row should not exist — the writer skipped the
+    ``clip_dates_to_source_coverage`` clip and recorded a sentinel for
+    a date the source had no data on.
+
+    Returns ``False`` if the data_type is unknown or has no coverage
+    window — defensively means "we can't prove it's pre-launch".
+    """
+    source = SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
+    if source is None:
+        return False
+    coverage_start = get_source_coverage_start(source, data_type)
+    if coverage_start is None:
+        return False
+    return iso_date < coverage_start.isoformat()
+
+
 def get_source_coverage_start(
     source_key: str,
     data_type: str | None = None,

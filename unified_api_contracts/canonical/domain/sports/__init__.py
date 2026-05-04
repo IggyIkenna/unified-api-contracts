@@ -64,6 +64,7 @@ from .league_data import KNOWN_COVERAGE_GAPS as KNOWN_COVERAGE_GAPS
 from .league_data import LEAGUE_EXPECTED_TEAM_COUNTS as LEAGUE_EXPECTED_TEAM_COUNTS
 from .league_data import LEAGUE_REGISTRY as LEAGUE_REGISTRY
 from .league_data import SOURCE_COVERAGE_START as SOURCE_COVERAGE_START
+from .league_data import SPORTS_DATA_TYPE_TO_SOURCE as SPORTS_DATA_TYPE_TO_SOURCE
 from .league_data import clip_dates_to_source_coverage as clip_dates_to_source_coverage
 from .league_data import get_all_prediction_league_ids as get_all_prediction_league_ids
 from .league_data import get_expected_leagues_for_source as get_expected_leagues_for_source
@@ -77,7 +78,9 @@ from .league_data import get_leagues_by_country as get_leagues_by_country
 from .league_data import get_leagues_for_sport as get_leagues_for_sport
 from .league_data import get_prediction_leagues as get_prediction_leagues
 from .league_data import get_source_coverage_start as get_source_coverage_start
+from .league_data import get_source_for_data_type as get_source_for_data_type
 from .league_data import is_in_known_gap as is_in_known_gap
+from .league_data import is_pre_launch_date as is_pre_launch_date
 from .league_registry import COUNTRY_MAP as COUNTRY_MAP
 from .league_registry import FEAT_NO_FOOTYSTATS as FEAT_NO_FOOTYSTATS
 from .league_registry import FEAT_STANDARD as FEAT_STANDARD
