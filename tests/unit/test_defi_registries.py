@@ -317,6 +317,36 @@ class TestVenueCollateral:
         accepted = get_accepted_collateral("BINANCE")
         assert set(accepted) == {"USDT", "BTC", "ETH"}
 
+    def test_accepted_perp_collateral_filters_to_perp_kinds(self) -> None:
+        from unified_api_contracts.registry import accepted_perp_collateral
+
+        assert accepted_perp_collateral("HYPERLIQUID") == ["USDC"]
+        assert set(accepted_perp_collateral("BINANCE")) == {"USDT", "BTC", "ETH"}
+
+    def test_accepted_perp_collateral_excludes_lending(self) -> None:
+        from unified_api_contracts.registry import accepted_perp_collateral
+
+        assert accepted_perp_collateral("AAVEV3-ETHEREUM") == []
+
+    def test_accepted_perp_collateral_excludes_staking(self) -> None:
+        from unified_api_contracts.registry import accepted_perp_collateral
+
+        assert accepted_perp_collateral("LIDO") == []
+        assert accepted_perp_collateral("ETHERFI") == []
+
+    def test_accepted_perp_collateral_unknown_venue(self) -> None:
+        from unified_api_contracts.registry import accepted_perp_collateral
+
+        assert accepted_perp_collateral("DOES_NOT_EXIST") == []
+
+    def test_venue_kind_field_populated_on_every_row(self) -> None:
+        from unified_api_contracts.registry.venue_collateral import VENUE_COLLATERAL_MATRIX
+
+        for entry in VENUE_COLLATERAL_MATRIX:
+            assert entry.venue_kind in {"PERP_CEX", "PERP_DEX", "LENDING", "STAKING"}, (
+                f"row {entry.venue}/{entry.token} has invalid venue_kind={entry.venue_kind!r}"
+            )
+
 
 # ---------------------------------------------------------------------------
 # Reward Schedules
