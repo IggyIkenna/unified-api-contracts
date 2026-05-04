@@ -176,6 +176,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "PACIFICA-SOLANA",
         "EXTENDED-STARKNET",
         "LIGHTER-ZKSYNC",
+        # 2026-05-04 perp DEX expansion (carry_staked_basis_structure_axis
+        # plan, Phase 1a-followup): GMX-V2 on Arbitrum, DRIFT on Solana —
+        # capture funding via MTDS perp_funding_handler. Classified under
+        # cefi asset_group because their data shape is CLOB-style (not
+        # the AMM dex_pools shape that defines defi).
+        "GMX",
+        "DRIFT",
     ],
     "tradfi": [
         # Databento venues
@@ -486,17 +493,23 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
     },
+    # HYPERLIQUID — verified 2026-05-04 against the actual S3 archive layout.
+    # Tardis added Hyperliquid 2024-10-29 but our adapter does not wire the
+    # Tardis trades fetch path (returns []), so trades start = S3 archive start
+    # 2025-03-22. liquidations is out of scope (Hyperliquid does not publish a
+    # liquidations feed — no S3 prefix, no Tardis channel).
     "HYPERLIQUID": {
-        "trades": "2023-11-01",
-        "book_snapshot_5": "2023-11-01",
-        "derivative_ticker": "2023-11-01",
-        "liquidations": "2023-11-01",
+        "trades": "2025-03-22",  # S3 hl-mainnet-node-data/node_fills
+        "book_snapshot_5": "2023-04-15",  # S3 hyperliquid-archive/market_data/
+        "derivative_ticker": "2023-05-20",  # S3 hyperliquid-archive/asset_ctxs/
     },
+    # ASTER — only derivative_ticker (fundingRate REST) and trades (aggTrades
+    # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Both available
+    # since Aster launch (2024-10-01). book_snapshot_5 + liquidations both out
+    # of scope (no wired fetch path).
     "ASTER": {
         "trades": "2024-10-01",
-        "book_snapshot_5": "2024-10-01",
         "derivative_ticker": "2024-10-01",
-        "liquidations": "2024-10-01",
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).

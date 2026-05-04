@@ -68,12 +68,38 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # Lido / Etherfi staking venues — included so callers can discover the
     # staking principal asset (ETH) without needing a separate registry.
     # ``accepted=True`` for the native asset only; the staking contract is
-    # not a perp-margining venue. ROCKETPOOL / JITO / MARINADE / DRIFT
-    # rows are deferred until those venues are registered in
-    # ``venue_constants.py`` — see plan
-    # ``carry_staked_basis_structure_axis_2026_05_04`` Phase 1a-followup.
+    # not a perp-margining venue.
     CollateralAcceptance("LIDO", "ETH", True, Decimal("0"), "STAKE", "Native staking", "STAKING"),
     CollateralAcceptance("ETHERFI", "ETH", True, Decimal("0"), "STAKE", "Native staking", "STAKING"),
+    # Tardis-captured CeFi perp venues — funding data lives in
+    # ``gs://market-data-tick-cefi-{pid}/raw_tick_data/.../derivative_ticker/``
+    # per ``VENUES_BY_ASSET_GROUP['cefi']``. All take USDT as primary
+    # linear-perp margin (5 bps haircut applied to coin-margined where used).
+    CollateralAcceptance("BINANCE-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear-USDT perp margin", "PERP_CEX"),
+    CollateralAcceptance("BINANCE-FUTURES", "BTC", True, Decimal("0.05"), "CROSS", "Coin-margined", "PERP_CEX"),
+    CollateralAcceptance("BINANCE-FUTURES", "ETH", True, Decimal("0.05"), "CROSS", "Coin-margined", "PERP_CEX"),
+    CollateralAcceptance("BYBIT-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
+    CollateralAcceptance("BYBIT-FUTURES", "BTC", True, Decimal("0.05"), "CROSS", "Coin-margined", "PERP_CEX"),
+    CollateralAcceptance("OKX-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
+    CollateralAcceptance("OKX-FUTURES", "BTC", True, Decimal("0.05"), "CROSS", "Coin-margined", "PERP_CEX"),
+    CollateralAcceptance("OKX-FUTURES", "ETH", True, Decimal("0.05"), "CROSS", "Coin-margined", "PERP_CEX"),
+    CollateralAcceptance("KRAKEN-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
+    CollateralAcceptance(
+        "KRAKEN-FUTURES", "USDC", True, Decimal("0.01"), "CROSS", "Linear (slight haircut)", "PERP_CEX"
+    ),
+    CollateralAcceptance("BITFINEX-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
+    CollateralAcceptance("BITGET-FUTURES", "USDT", True, Decimal("0"), "CROSS", "Linear", "PERP_CEX"),
+    # Onchain perp DEXes — GMX (Arbitrum), DRIFT (Solana). GMX-V2 has its
+    # own per-market collateral set; entries here describe the typical
+    # cross-margin acceptance. funding_rate captured in
+    # ``gs://perp-funding-{pid}/perp_funding/{venue_lc}/``.
+    CollateralAcceptance("GMX", "USDC", True, Decimal("0"), "CROSS", "GMX-V2 USDC margin", "PERP_DEX"),
+    CollateralAcceptance("GMX", "ETH", True, Decimal("0.05"), "CROSS", "ETH-margined per-market", "PERP_DEX"),
+    CollateralAcceptance("GMX", "WBTC", True, Decimal("0.05"), "CROSS", "BTC-margined per-market", "PERP_DEX"),
+    CollateralAcceptance("DRIFT", "USDC", True, Decimal("0"), "CROSS", "Primary margin", "PERP_DEX"),
+    CollateralAcceptance("DRIFT", "SOL", True, Decimal("0.05"), "CROSS", "5% haircut", "PERP_DEX"),
+    CollateralAcceptance("DRIFT", "mSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Marinade LST", "PERP_DEX"),
+    CollateralAcceptance("DRIFT", "JitoSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Jito LST", "PERP_DEX"),
 ]
 
 
