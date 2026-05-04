@@ -183,6 +183,14 @@ class AllocatorArchetype(StrEnum):
     MIN_CVAR = "MIN_CVAR"
     REGIME_AWARE = "REGIME_AWARE"
     MANUAL = "MANUAL"
+    # 3-stage hierarchical (coin -> venue) ranking by realised funding rate,
+    # with a configurable ``min_funding_apy_bps`` threshold (default 250 = 2.5%).
+    # Stage 1: filter coins by avg funding across eligible venues > threshold.
+    # Stage 2: weight surviving coins by avg funding.
+    # Stage 3: weight venues per coin by per-venue funding > threshold.
+    # Below threshold = strategy stops (lend instead). See plan
+    # ``carry_staked_basis_structure_axis_2026_05_04`` Phase 4c.
+    CARRY_FUNDING_RANK = "CARRY_FUNDING_RANK"
 
 
 class HoldPolicy(StrEnum):
