@@ -61,7 +61,16 @@ _DEFI_VENUE_PREFIXES = frozenset(
 # legacy aliases (OKX without suffix, BITSTAMP-SPOT, HUOBI-* under earlier
 # names, MATCHBOOK / API_FOOTBALL) are still accepted for back-compat.
 _CEFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["cefi"]) | frozenset(
-    {"OKX", "BITSTAMP-SPOT", "HUOBI-SPOT", "HUOBI-FUTURES"}
+    {
+        "OKX",
+        "OKX-SPOT",
+        "OKX-FUTURES",
+        "OKX-SWAP",
+        "COINBASE-SPOT",
+        "BITSTAMP-SPOT",
+        "HUOBI-SPOT",
+        "HUOBI-FUTURES",
+    }
 )
 _TRADFI_VENUES: frozenset[str] = frozenset(VENUES_BY_ASSET_GROUP["tradfi"])
 _SPORTS_VENUES: frozenset[str] = (
