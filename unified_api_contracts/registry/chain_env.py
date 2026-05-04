@@ -67,6 +67,13 @@ GAS_FEE_CHAIN_START_DATES: dict[int, str] = {
     42161: "2021-09-01",  # Arbitrum One — public mainnet
     43114: "2020-09-22",  # Avalanche C-Chain — mainnet launch
     59144: "2023-07-12",  # Linea — mainnet alpha launch
+    # ── Tier-4 alt-L1s (defi_pipeline_extension_followups Phase 5 expansion) ──
+    250: "2019-12-27",  # Fantom Opera — mainnet launch
+    1088: "2021-11-19",  # Metis Andromeda — mainnet launch
+    1284: "2022-01-11",  # Moonbeam — mainnet launch
+    5000: "2023-07-14",  # Mantle — mainnet launch
+    42220: "2020-04-22",  # Celo — mainnet launch
+    1313161554: "2021-05-18",  # Aurora — mainnet launch
 }
 
 # Solana start date for gas fee collection (Alchemy archival RPC coverage)
