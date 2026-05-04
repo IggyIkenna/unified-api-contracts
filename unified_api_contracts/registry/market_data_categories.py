@@ -498,6 +498,38 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2024-10-01",
         "liquidations": "2024-10-01",
     },
+    # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
+    # +liquidations. None carry chain bundles (perps are individual syms).
+    "BITFINEX-SPOT": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+    },
+    "BITFINEX-FUTURES": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+    },
+    "BITGET-SPOT": {
+        "trades": "2024-11-08",
+        "book_snapshot_5": "2024-11-08",
+    },
+    "BITGET-FUTURES": {
+        "trades": "2024-11-08",
+        "book_snapshot_5": "2024-11-08",
+        "derivative_ticker": "2024-11-08",
+        "liquidations": "2024-11-08",
+    },
+    "KRAKEN-SPOT": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+    },
+    "KRAKEN-FUTURES": {
+        "trades": "2020-01-01",
+        "book_snapshot_5": "2020-01-01",
+        "derivative_ticker": "2020-01-01",
+        "liquidations": "2020-01-01",
+    },
     # ── TradFi — Databento + external providers ──
     # Each TradFi venue has specific data types and start dates.
     "NASDAQ": {
