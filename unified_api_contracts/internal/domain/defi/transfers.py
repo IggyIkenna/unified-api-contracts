@@ -79,6 +79,13 @@ class TransferConfirmation(BaseModel):
     discrepancy_wei: Decimal
     confirmations: int
     timestamp: datetime
+    # Whether the transfer's block has cleared the chain's reorg-depth
+    # threshold (CHAIN_CONFIGS[chain_id].reorg_depth). Distinct from
+    # ``confirmed`` (= "we found the matching transfer"); ``is_finalized``
+    # answers "is the inclusion safe to treat as canonical now". Defaults
+    # to False so consumers that don't populate it from the helper can't
+    # accidentally treat unfinalised transfers as canonical.
+    is_finalized: bool = False
 
 
 class AlchemyTransferRecord(BaseModel):
