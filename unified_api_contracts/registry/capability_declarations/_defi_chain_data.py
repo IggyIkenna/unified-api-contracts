@@ -179,18 +179,32 @@ CHAIN_CONFIGS: dict[int, ChainConfig] = {
     # service ingest; for production execution-service calls, switch to a
     # dedicated provider (QuickNode, Infura) via Secret Manager.
     250: ChainConfig(
-        rpc_url_template="https://rpc.ftm.tools",
+        # 2026-05-04: switched from rpc.ftm.tools (returns 401 Unauthorized
+        # without an API key) to the official Fantom Foundation RPC
+        # which exposes eth_feeHistory on a free public endpoint.
+        rpc_url_template="https://rpcapi.fantom.network",
         reorg_depth=30,
         avg_block_time_s=1.0,
         native_gas_token="FTM",
     ),
     1088: ChainConfig(
+        # METIS: all public RPCs reject eth_feeHistory with -32601 method-
+        # not-found (probed andromeda.metis.io, metis-rpc.publicnode.com,
+        # metis.api.onfinality.io 2026-05-04). The instruments-service
+        # path uses different RPCs that work; gas-fee collection requires
+        # a paid endpoint (excluded from DEFAULT_GAS_FEE_CHAINS until then).
         rpc_url_template="https://andromeda.metis.io/?owner=1088",
         reorg_depth=30,
         avg_block_time_s=2.0,
         native_gas_token="METIS",
     ),
     1284: ChainConfig(
+        # MOONBEAM: all public RPCs return -32603 "Block range out of
+        # bounds" on eth_feeHistory, even at tip (probed
+        # rpc.api.moonbeam.network, moonbeam.publicnode.com,
+        # moonbeam.api.onfinality.io 2026-05-04). instruments-service
+        # paths work via the same URL. Gas-fee collection requires a
+        # paid endpoint (excluded from DEFAULT_GAS_FEE_CHAINS).
         rpc_url_template="https://rpc.api.moonbeam.network",
         reorg_depth=30,
         avg_block_time_s=12.0,
