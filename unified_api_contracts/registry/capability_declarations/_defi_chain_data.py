@@ -290,6 +290,48 @@ def get_chain_config(chain_id: int) -> ChainConfig | None:
     return CHAIN_CONFIGS.get(chain_id)
 
 
+def is_block_finalized(chain_id: int, confirmations: int) -> bool:
+    """Return True iff ``confirmations`` clears the chain's reorg depth.
+
+    Consumers (event ingestion, transfer confirmation, flash-loan receipt
+    polling) call this to decide whether a block is safe to treat as
+    canonical. Falls open (returns True) for chains not in CHAIN_CONFIGS
+    so the predicate is conservative against missing configs.
+
+    Example:
+        confirmations = web3.eth.block_number - tx_receipt.block_number
+        if is_block_finalized(chain_id=1, confirmations=confirmations):
+            mark_canonical(tx)
+    """
+    cfg = CHAIN_CONFIGS.get(chain_id)
+    if cfg is None:
+        return True
+    return confirmations >= cfg.reorg_depth
+
+
+def time_budget_to_block_offset(chain_id: int, seconds: float) -> int:
+    """Convert a wall-clock time budget into a block-count offset for a chain.
+
+    Used by execution-service MEV protection (max_block_number =
+    current_block + offset) and by manifest-pre-flight to size
+    expected-block windows. Returns 1 minimum (never zero — even a 0.25s
+    Arbitrum chain advances at least one block in any meaningful budget).
+
+    Falls open with a 12s assumption (Ethereum-equivalent) for chains
+    not in CHAIN_CONFIGS.
+
+    Example:
+        # Block range that covers 90 seconds of wall time.
+        offset = time_budget_to_block_offset(chain_id=42161, seconds=90.0)
+        # → 360 (Arbitrum at 0.25s/block)
+    """
+    cfg = CHAIN_CONFIGS.get(chain_id)
+    avg_s = cfg.avg_block_time_s if cfg is not None else 12.0
+    if avg_s <= 0:
+        return 1
+    return max(1, int(seconds / avg_s))
+
+
 # ---------------------------------------------------------------------------
 # Solana RPC templates — same pattern as EVM, keyed by network name.
 # Uses the same alchemy-api-key from Secret Manager (one key covers all chains).

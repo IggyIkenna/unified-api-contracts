@@ -26,7 +26,9 @@ from ._defi_chain_data import (
     get_solana_rpc_url,
     get_solana_token_address,
     get_weth_address,
+    is_block_finalized,
     resolve_solana_mint,
+    time_budget_to_block_offset,
 )
 from ._defi_source_capabilities import DEFI_CAPABILITIES
 
@@ -870,9 +872,11 @@ __all__ = [
     "get_supported_chains_for_protocol",
     "get_venue_prefix",
     "get_weth_address",
+    "is_block_finalized",
     "is_token_equivalent",
     "parse_defi_venue",
     "resolve_solana_mint",
+    "time_budget_to_block_offset",
     "token_matches_major_assets",
     "venue_has_no_expected_defi_coverage",
 ]

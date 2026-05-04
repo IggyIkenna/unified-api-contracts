@@ -43,8 +43,10 @@ from ._defi import (
     get_subgraph_id,
     get_supported_chains_for_protocol,
     get_venue_prefix,
+    is_block_finalized,
     is_token_equivalent,
     resolve_solana_mint,
+    time_budget_to_block_offset,
     token_matches_major_assets,
     venue_has_no_expected_defi_coverage,
 )
@@ -102,8 +104,10 @@ __all__ = [
     "get_subgraph_id",
     "get_supported_chains_for_protocol",
     "get_venue_prefix",
+    "is_block_finalized",
     "is_token_equivalent",
     "resolve_solana_mint",
+    "time_budget_to_block_offset",
     "token_matches_major_assets",
     "venue_has_no_expected_defi_coverage",
 ]
