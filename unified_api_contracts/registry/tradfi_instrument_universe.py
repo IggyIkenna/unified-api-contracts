@@ -133,6 +133,14 @@ _CME_FX_FUTURES: list[DatabentoInstrumentDef] = [
 _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("BTC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BTC", "crypto", "BTC"),
     DatabentoInstrumentDef("ETH.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "crypto", "ETH"),
+    # Micro CME crypto futures — added 2026-05-05 alongside MES so strategies
+    # can size the date-futures-arb-vs-Deribit archetype at sub-portfolio
+    # capital without integer-contract rounding error against the full-size
+    # BTC.FUT (5 BTC ≈ $500k) / ETH.FUT (50 ETH ≈ $200k). Micros are 1/10
+    # notional and share the same monthly expiry calendar + GLBX.MDP3
+    # parent symbology.
+    DatabentoInstrumentDef("MBT.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BTC", "crypto", "MBT"),
+    DatabentoInstrumentDef("MET.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "crypto", "MET"),
     # Micro E-mini S&P 500 futures — MVP added 2026-05-05 after 0% capture
     # diagnosis (UAC had no MES def, so the adapter never fetched it even
     # though Databento parent symbology returns ~3,500 rows/day for MES.FUT).
