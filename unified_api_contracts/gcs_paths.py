@@ -29,6 +29,9 @@ from unified_api_contracts.canonical.partition_paths import (
     ASSET_GROUP_HIVE_KEY as ASSET_GROUP_HIVE_KEY,
 )
 from unified_api_contracts.canonical.partition_paths import (
+    CEFI_CHAIN_INSTRUMENT_TYPES as CEFI_CHAIN_INSTRUMENT_TYPES,
+)
+from unified_api_contracts.canonical.partition_paths import (
     RAW_TICK_DATA_PREFIX as RAW_TICK_DATA_PREFIX,
 )
 from unified_api_contracts.canonical.partition_paths import (
@@ -50,6 +53,7 @@ from unified_api_contracts.canonical.partition_paths import (
 __all__ = [
     "ASSET_GROUP_HIVE_KEY",
     "BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND",
+    "CEFI_CHAIN_INSTRUMENT_TYPES",
     "RAW_TICK_DATA_PREFIX",
     "STRATEGY_STORE_BUCKET_TEMPLATE",
     "AssetGroup",
