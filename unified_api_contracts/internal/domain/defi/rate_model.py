@@ -11,8 +11,112 @@ Reference: https://docs.aave.com/risk/liquidity-risk/borrow-interest-rate
 """
 
 from decimal import Decimal
+from typing import TypedDict
 
 from pydantic import BaseModel
+
+
+class AaveV3RateModelDefaults(TypedDict):
+    """Per-asset Aave V3 interest rate model parameters.
+
+    Sourced from Aave V3 governance config on Ethereum mainnet (snapshot —
+    governance can change these via vote, captured at the canonical
+    ``ReserveInterestRateStrategy`` contract per reserve). For
+    historically-correct values use the per-tick fields captured by the
+    MTDS lending_indices_handler from The Graph subgraph (which writes
+    ``optimal_utilization``, ``slope1``, ``slope2``, ``base_rate``,
+    ``reserve_factor`` columns alongside the rate indices).
+    """
+
+    optimal_utilization: Decimal
+    slope1: Decimal
+    slope2: Decimal
+    base_rate: Decimal
+    reserve_factor: Decimal
+
+
+# Per-asset Aave V3 rate model defaults (Ethereum mainnet, governance current
+# as of 2026-05-05). Single source of truth — features-onchain rate-impact
+# simulator and MTDS instruments-discovery fallbacks both import from here.
+#
+# To historically refine: use captured per-tick values from the MTDS
+# lending_indices_handler (post the schema-drift fix that adds
+# ``optimal_utilization`` / ``slope1`` / ``slope2`` / ``base_rate`` /
+# ``reserve_factor`` to the parquet). When a captured value exists for a
+# (timestamp, reserve) pair, prefer it over this default snapshot.
+AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET: dict[str, AaveV3RateModelDefaults] = {
+    "USDC": {
+        "optimal_utilization": Decimal("0.90"),
+        "slope1": Decimal("0.04"),
+        "slope2": Decimal("0.60"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.10"),
+    },
+    "USDT": {
+        "optimal_utilization": Decimal("0.90"),
+        "slope1": Decimal("0.04"),
+        "slope2": Decimal("0.60"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.10"),
+    },
+    "DAI": {
+        "optimal_utilization": Decimal("0.90"),
+        "slope1": Decimal("0.04"),
+        "slope2": Decimal("0.75"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.10"),
+    },
+    "ETH": {
+        "optimal_utilization": Decimal("0.80"),
+        "slope1": Decimal("0.038"),
+        "slope2": Decimal("0.80"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.15"),
+    },
+    "WETH": {
+        "optimal_utilization": Decimal("0.80"),
+        "slope1": Decimal("0.038"),
+        "slope2": Decimal("0.80"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.15"),
+    },
+    "wstETH": {
+        "optimal_utilization": Decimal("0.80"),
+        "slope1": Decimal("0.038"),
+        "slope2": Decimal("0.80"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.10"),
+    },
+    "weETH": {
+        "optimal_utilization": Decimal("0.80"),
+        "slope1": Decimal("0.038"),
+        "slope2": Decimal("0.80"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.10"),
+    },
+}
+
+# Default fallback for any asset not in the table above.
+AAVE_V3_RATE_MODEL_DEFAULT_FALLBACK: AaveV3RateModelDefaults = {
+    "optimal_utilization": Decimal("0.80"),
+    "slope1": Decimal("0.04"),
+    "slope2": Decimal("0.75"),
+    "base_rate": Decimal("0.00"),
+    "reserve_factor": Decimal("0.10"),
+}
+
+
+def get_aave_v3_rate_model_defaults(symbol: str) -> AaveV3RateModelDefaults:
+    """Return per-asset Aave V3 rate model defaults, falling back to a
+    conservative shape when the symbol isn't in the curated table.
+
+    Symbol normalisation: upper-cased, chain suffix stripped (``USDC-USDT``
+    splits at the dash and uses the first token). Matches the legacy
+    behaviour of features-onchain ``aave_rate_impact_calculator`` so this
+    function is a drop-in replacement.
+    """
+    normalised = symbol.upper().split("-")[0].strip()
+    return AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET.get(normalised, AAVE_V3_RATE_MODEL_DEFAULT_FALLBACK)
 
 
 class AavePoolParams(BaseModel):

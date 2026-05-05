@@ -65,11 +65,15 @@ from unified_api_contracts.internal.domain.defi.protocol_sdks import (
     UniswapV3SwapTxReceipt,
 )
 from unified_api_contracts.internal.domain.defi.rate_model import (
+    AAVE_V3_RATE_MODEL_DEFAULT_FALLBACK,
+    AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET,
     AavePoolParams,
+    AaveV3RateModelDefaults,
     RateImpactResult,
     compute_borrow_rate,
     compute_supply_rate,
     compute_utilization,
+    get_aave_v3_rate_model_defaults,
     simulate_rate_impact,
 )
 from unified_api_contracts.internal.domain.defi.solana import (
@@ -121,11 +125,14 @@ from unified_api_contracts.internal.domain.features_onchain.protocol_params impo
 )
 
 __all__ = [
+    "AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET",
+    "AAVE_V3_RATE_MODEL_DEFAULT_FALLBACK",
     "AaveBorrowParams",
     "AaveDepositParams",
     "AaveFlashLoanParams",
     "AavePoolParams",
     "AaveRepayParams",
+    "AaveV3RateModelDefaults",
     "AaveV3ReserveData",
     "AaveV3UserAccountData",
     "AaveV3UserReserveData",
@@ -214,6 +221,7 @@ __all__ = [
     "compute_borrow_rate",
     "compute_supply_rate",
     "compute_utilization",
+    "get_aave_v3_rate_model_defaults",
     "simulate_rate_impact",
     "wallet_config_gcs_path",
 ]
