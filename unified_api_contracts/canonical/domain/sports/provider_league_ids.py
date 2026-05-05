@@ -744,9 +744,9 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
     "MATCHES": None,  # FootyStats: all leagues
     "PREDICTIONS": None,  # FootyStats: all leagues
-    "TRANSFERMARKT_LEAGUES": None,  # Transfermarkt: all mapped leagues
+    # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider catalog
+    # mappings live in UAC (TRANSFERMARKT_IDS / SOCCER_FOOTBALL_INFO_IDS).
     "PLAYER_VALUES": None,  # Transfermarkt: all mapped leagues
-    "SFI_LEAGUES": None,  # SFI: all mapped leagues
     "SFI_PROGRESSIVE_STATS": None,  # SFI: all mapped leagues
     "WEATHER": None,  # Open Meteo: all fixtures with coordinates
 }
@@ -772,9 +772,9 @@ def get_entity_league_coverage(entity: str) -> frozenset[str] | None:
 # Before these dates, the provider did not supply data — so pre-start
 # fixture dates should NOT count as "missing" in the denominator.
 SPORTS_ENTITY_START_DATES: dict[str, str] = {
-    # SFI progressive stats / xG — Ultra xG feature launched 2024-03-15
+    # SFI progressive stats — Ultra xG feature launched 2024-03-15.
+    # SFI_LEAGUES retired 2026-05-05 (catalog mapping in UAC, not captured data).
     "SFI_PROGRESSIVE_STATS": "2024-03-15",
-    "SFI_LEAGUES": "2024-03-15",
     # Understat xG — backfilled from 2019-01-01
     "XG": "2019-01-01",
     # FootyStats entities — backfilled from 2019-01-01
@@ -782,8 +782,8 @@ SPORTS_ENTITY_START_DATES: dict[str, str] = {
     "PREDICTIONS": "2019-01-01",
     # Weather — collection started 2024-01-01
     "WEATHER": "2024-01-01",
-    # Transfermarkt entities — backfilled from 2019-01-01
-    "TRANSFERMARKT_LEAGUES": "2019-01-01",
+    # Transfermarkt entities — backfilled from 2019-01-01.
+    # TRANSFERMARKT_LEAGUES retired 2026-05-05 (same reason as SFI_LEAGUES).
     "PLAYER_VALUES": "2019-01-01",
     # API Football core entities — backfilled from 2019-01-01
     "FIXTURES": "2019-01-01",

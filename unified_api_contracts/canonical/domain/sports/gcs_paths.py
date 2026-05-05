@@ -50,11 +50,13 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     "PREDICTIONS": "footystats_predictions",
     # understat
     "XG": "understat_xg",
-    # transfermarkt
-    "TRANSFERMARKT_LEAGUES": "transfermarkt_leagues",
+    # transfermarkt — TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static
+    # provider-catalog mapping, belongs in UAC TRANSFERMARKT_IDS not as
+    # captured GCS data; orchestrator still calls adapter.get_leagues() at
+    # runtime for prediction-tier filtering).
     "PLAYER_VALUES": "transfermarkt_teams",
-    # soccer-football-info
-    "SFI_LEAGUES": "sfi_leagues",
+    # soccer-football-info — SFI_LEAGUES retired 2026-05-05 same reason
+    # (mapping in UAC SOCCER_FOOTBALL_INFO_IDS; runtime fetch only).
     "SFI_PROGRESSIVE_STATS": "progressive_stats",
     # open-meteo
     "WEATHER": "weather",
@@ -94,8 +96,8 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     "ODDS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "PREDICTIONS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "PLAYER_VALUES": SportsPathLayout.PER_DAY_PER_LEAGUE,
-    "TRANSFERMARKT_LEAGUES": SportsPathLayout.PER_DAY_PER_LEAGUE,
-    "SFI_LEAGUES": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider
+    # catalog mappings live in UAC, not as captured GCS data.
     "SFI_PROGRESSIVE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     # Bare path (single file per day — XG/WEATHER often un-partitioned)
     "XG": SportsPathLayout.PER_DAY_BARE,

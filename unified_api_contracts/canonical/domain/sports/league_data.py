@@ -95,12 +95,8 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 # counting pre-cutoff dates as missing.
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
     ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
-    # SFI_LEAGUES is a static league-list endpoint that only became live when
-    # the SFI provider started serving us (2024-03-15 per
-    # SPORTS_ENTITY_START_DATES). Pre-launch dates are not "missing", they
-    # pre-date the source. Mirroring SPORTS_ENTITY_START_DATES["SFI_LEAGUES"]
-    # in the data-status clip dict so the API's expected denominator is honest.
-    ("soccer_football_info", "SFI_LEAGUES"): date(2024, 3, 15),
+    # SFI_LEAGUES retired 2026-05-05 — was a static provider-catalog mapping,
+    # now lives in UAC SOCCER_FOOTBALL_INFO_IDS rather than as captured GCS data.
     ("api_football", "FIXTURE_EVENTS"): date(2020, 6, 6),
     ("api_football", "FIXTURE_LINEUPS"): date(2020, 6, 6),
     ("api_football", "FIXTURE_STATS"): date(2020, 6, 6),
@@ -146,14 +142,14 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     "FIXTURE_EVENTS": "api_football",
     "FIXTURE_LINEUPS": "api_football",
     "PLAYER_STATS": "api_football",
-    # Transfermarkt — player values
-    "TRANSFERMARKT_LEAGUES": "transfermarkt",
+    # Transfermarkt — player values.
+    # TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static catalog mapping;
+    # lives in UAC TRANSFERMARKT_IDS as provider-id config rather than captured data).
     "TRANSFERMARKT_VALUES": "transfermarkt",
     "PLAYER_VALUES": "transfermarkt",
-    # SoccerFootball.info — second-tier league standings
-    # Note: SFI_STANDINGS retired 2026-05-05 — orchestrator confirmed SFI has
-    # no standings endpoint (instruments-service uses API Football for standings).
-    "SFI_LEAGUES": "soccer_football_info",
+    # SoccerFootball.info.
+    # SFI_LEAGUES retired 2026-05-05 (same reason — UAC SOCCER_FOOTBALL_INFO_IDS).
+    # SFI_STANDINGS retired 2026-05-05 — SFI has no standings endpoint.
     "SFI_PROGRESSIVE_STATS": "soccer_football_info",
     # OpenMeteo — historical weather
     "WEATHER": "open_meteo",
