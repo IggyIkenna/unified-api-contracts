@@ -643,6 +643,58 @@ def is_in_tradfi_tick_window(date_str: str) -> bool:
     return any(w["start"] <= date_str <= w["end"] for w in TRADFI_TICK_DATA_WINDOWS)
 
 
+# Per-(venue, data_type) coverage-window registry — the more granular
+# successor to the global ``TRADFI_TICK_DATA_WINDOWS``. When a key is
+# present, the data-status reconciler restricts the expected-dates
+# denominator to dates inside the windows. Use for cost-tier'd data
+# types where we deliberately collect only specific reference months
+# (e.g. CME futures L2 microstructure for execution-tuning).
+#
+# **Why per-(venue, data_type), not global:**
+# Different venues have different cost / use-case profiles. CME tbbo
+# is the heavy "execution-microstructure" capture for the date-futures
+# arb archetype (May 2023 + Jun 2024 reference months only). Future
+# entries can scope mbp_10 to the same window, or scope CBOE / NYSE
+# tick captures to different bands without polluting the global config.
+#
+# Keys are ``(venue, data_type)``; values are inclusive [start, end]
+# date-string tuples. ALL data not listed here is expected on every
+# trading day from the venue's start_date (the default behaviour).
+VENUE_DATA_TYPE_COVERAGE_WINDOWS: dict[tuple[str, str], list[tuple[str, str]]] = {
+    # CME futures L2 microstructure (BTC date-futures-arb reference months)
+    ("CME", "tbbo"): [
+        ("2023-05-01", "2023-05-31"),
+        ("2024-06-01", "2024-06-30"),
+    ],
+    # CME futures 10-deep book — adapter doesn't support yet (deferred), but
+    # declaring the expected window here makes the intent explicit and avoids
+    # a year-round denominator if/when the adapter ships.
+    ("CME", "mbp_10"): [
+        ("2023-05-01", "2023-05-31"),
+        ("2024-06-01", "2024-06-30"),
+    ],
+}
+
+
+def get_coverage_windows(venue: str, data_type: str) -> list[tuple[str, str]]:
+    """Return the per-(venue, data_type) coverage-window list, or [] if unset.
+
+    Used by deployment-api ``_mtds_expected_dates_for_venue_dt`` to clip
+    the expected-dates denominator. Empty list = no clipping (default —
+    expect every trading day from venue start_date).
+    """
+    return VENUE_DATA_TYPE_COVERAGE_WINDOWS.get((venue, data_type), [])
+
+
+def is_in_coverage_window(venue: str, data_type: str, date_str: str) -> bool:
+    """True if ``date_str`` (YYYY-MM-DD) is inside any registered coverage
+    window for (venue, data_type). Returns False if no windows registered
+    (caller should treat as "no clip" — i.e. date is in scope by default).
+    """
+    windows = VENUE_DATA_TYPE_COVERAGE_WINDOWS.get((venue, data_type), [])
+    return any(start <= date_str <= end for start, end in windows)
+
+
 def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
     """Return the start date for a specific (venue, data_type) pair.
 
