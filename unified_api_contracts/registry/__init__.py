@@ -420,6 +420,11 @@ from .venue_context import (
     resolve_venue_context,
 )
 from .venue_mapping import DataTypeConfig, ExchangeInstrumentConfig, VenueMapping
+from .venue_trading_calendar import (
+    clip_dates_to_trading_days,
+    get_us_market_holidays,
+    is_non_trading_day,
+)
 
 __all__ = [
     "AAVE_PLASMA",
@@ -702,6 +707,7 @@ __all__ = [
     "bootstrap_capabilities",
     "build_complete_major_assets",
     "build_defi_venues",
+    "clip_dates_to_trading_days",
     "compose_validation",
     "compute_health_factor",
     "compute_max_leverage_from_outright_move",
@@ -734,6 +740,7 @@ __all__ = [
     "get_subgraph_id",
     "get_supported_chains_for_protocol",
     "get_unwrapped_form",
+    "get_us_market_holidays",
     "get_venue_coordinates",
     "get_venue_prefix",
     "get_vix_15m_source",
@@ -742,6 +749,7 @@ __all__ = [
     "is_block_finalized",
     "is_in_tradfi_tick_window",
     "is_lst",
+    "is_non_trading_day",
     "is_token_equivalent",
     "is_vix_15m_gap_date",
     "lst_adjusted_value",

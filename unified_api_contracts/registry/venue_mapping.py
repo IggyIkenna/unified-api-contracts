@@ -16,6 +16,10 @@ from unified_api_contracts.registry.defi_venues import (
     ALL_DEFI_VENUES,
     LEGACY_DEFI_VENUE_ALIASES,
 )
+from unified_api_contracts.registry.venue_trading_calendar import (
+    US_MARKET_HOLIDAYS,
+    WEEKDAY_ONLY_PREDICTION_SHARDS,
+)
 
 
 @dataclass
@@ -446,62 +450,17 @@ class VenueMapping:
         """
         return self.venue_start_dates.get(venue) or self.source_data_start_dates.get(venue)
 
-    # Prediction market shards tied to traditional financial instruments —
-    # these only trade on weekdays (no UP_DOWN market on weekends because
-    # the underlying doesn't move).  Crypto shards trade 24/7.
-    _WEEKDAY_ONLY_PREDICTION_SHARDS: frozenset[str] = frozenset(
-        {
-            "POLYMARKET:SPX",
-            "POLYMARKET:DJIA",
-            "POLYMARKET:NDX",
-            "POLYMARKET:CRUDE_OIL",
-            "POLYMARKET:GOLD",
-            "POLYMARKET:SILVER",
-            "POLYMARKET:DAX",
-            "POLYMARKET:FTSE",
-            "POLYMARKET:NIKKEI",
-            "POLYMARKET:HANG_SENG",
-            "POLYMARKET:RUSSELL_2000",
-            # Individual stocks
-            "POLYMARKET:AAPL",
-            "POLYMARKET:TSLA",
-            "POLYMARKET:NVDA",
-            "POLYMARKET:META",
-            "POLYMARKET:MSFT",
-            "POLYMARKET:GOOGL",
-            "POLYMARKET:NFLX",
-            "POLYMARKET:PLTR",
-            "POLYMARKET:AMZN",
-            "POLYMARKET:AMD",
-        }
-    )
+    # Prediction-market shards tied to traditional financial instruments —
+    # SSOT data lives in ``venue_trading_calendar.WEEKDAY_ONLY_PREDICTION_SHARDS``.
+    _WEEKDAY_ONLY_PREDICTION_SHARDS: frozenset[str] = field(default_factory=lambda: WEEKDAY_ONLY_PREDICTION_SHARDS)
 
-    # US market holidays — Polymarket doesn't list UP_DOWN markets for
-    # traditional instruments on these days.
-    _US_MARKET_HOLIDAYS: frozenset[str] = frozenset(
-        {
-            # 2025
-            "2025-01-01",
-            "2025-01-20",
-            "2025-02-17",
-            "2025-05-26",
-            "2025-06-19",
-            "2025-07-04",
-            "2025-09-01",
-            "2025-11-27",
-            "2025-12-25",
-            # 2026
-            "2026-01-01",
-            "2026-01-19",
-            "2026-02-16",
-            "2026-05-25",
-            "2026-06-19",
-            "2026-07-03",
-            "2026-09-07",
-            "2026-11-26",
-            "2026-12-25",
-        }
-    )
+    # US market holidays — TradFi venues (NYSE/NASDAQ/CBOE-Index) and
+    # Polymarket UP_DOWN markets on traditional instruments don't list /
+    # don't trade on these days. SSOT data lives in
+    # ``venue_trading_calendar.py`` (also re-exposed via
+    # :func:`is_non_trading_day` and :func:`clip_dates_to_trading_days`
+    # for the orchestrator pre-skip + data-status denominator).
+    _US_MARKET_HOLIDAYS: frozenset[str] = field(default_factory=lambda: US_MARKET_HOLIDAYS)
 
     def get_expected_trading_dates(self, venue: str, start_date: str, end_date: str) -> list[str]:
         """Return expected trading dates for a venue between start and end dates.
