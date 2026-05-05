@@ -191,6 +191,25 @@ class AllocatorArchetype(StrEnum):
     # Below threshold = strategy stops (lend instead). See plan
     # ``carry_staked_basis_structure_axis_2026_05_04`` Phase 4c.
     CARRY_FUNDING_RANK = "CARRY_FUNDING_RANK"
+    # Per-archetype rank allocators (Phase 8 of plan
+    # ``carry_staked_basis_structure_axis_2026_05_04``). Each subclass shares
+    # the ``BaseRankAllocator`` shape (universe filter -> ranking metric ->
+    # threshold gate -> top-N) but ranks by an archetype-specific metric:
+    #   YIELD_STAKING_SIMPLE_RANK    : staking_apy_total (base + EIGEN + seasonal - dust)
+    #   CARRY_BASIS_PERP_RANK        : funding_apy (CarryFundingRank shape, MVP-coin universe)
+    #   CARRY_STAKED_BASIS_RANK      : staking_apy_total + funding_apy, LST-margin-eligible only
+    #   CARRY_RECURSIVE_STAKED_RANK  : leverage * (staking_apy_total - borrow_apy)
+    #   CARRY_BASIS_DATED_RANK       : dated future basis APY, expiry-matched
+    #   YIELD_ROTATION_LENDING_RANK  : lending_apy (supply-side, net of util cap)
+    #   ARBITRAGE_PRICE_DISPERSION_RANK : signed funding spread (perp-mode) OR price
+    #                                    differential (dated-mode) per ``mode`` config
+    YIELD_STAKING_SIMPLE_RANK = "YIELD_STAKING_SIMPLE_RANK"
+    CARRY_BASIS_PERP_RANK = "CARRY_BASIS_PERP_RANK"
+    CARRY_STAKED_BASIS_RANK = "CARRY_STAKED_BASIS_RANK"
+    CARRY_RECURSIVE_STAKED_RANK = "CARRY_RECURSIVE_STAKED_RANK"
+    CARRY_BASIS_DATED_RANK = "CARRY_BASIS_DATED_RANK"
+    YIELD_ROTATION_LENDING_RANK = "YIELD_ROTATION_LENDING_RANK"
+    ARBITRAGE_PRICE_DISPERSION_RANK = "ARBITRAGE_PRICE_DISPERSION_RANK"
 
 
 class HoldPolicy(StrEnum):
