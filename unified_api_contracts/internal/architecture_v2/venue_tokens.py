@@ -32,6 +32,13 @@ _CEFI_TOKENS: frozenset[str] = frozenset(
         "mexc",
         "upbit",
         "aster",
+        # 2026-05-04 Phase 4d/e: CARRY_STAKED_BASIS + CARRY_BASIS_PERP
+        # universe expansion to all Tardis-captured CeFi perp venues.
+        # ``kraken`` / ``bitfinex`` are the slot-label tokens; the venue
+        # registry uses the suffixed forms ``KRAKEN-FUTURES`` /
+        # ``BITFINEX-FUTURES`` for collateral-matrix lookups.
+        "kraken",
+        "bitfinex",
     }
 )
 
