@@ -145,8 +145,9 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     "TRANSFERMARKT_VALUES": "transfermarkt",
     "PLAYER_VALUES": "transfermarkt",
     # SoccerFootball.info — second-tier league standings
+    # Note: SFI_STANDINGS retired 2026-05-05 — orchestrator confirmed SFI has
+    # no standings endpoint (instruments-service uses API Football for standings).
     "SFI_LEAGUES": "soccer_football_info",
-    "SFI_STANDINGS": "soccer_football_info",
     "SFI_PROGRESSIVE_STATS": "soccer_football_info",
     # OpenMeteo — historical weather
     "WEATHER": "open_meteo",

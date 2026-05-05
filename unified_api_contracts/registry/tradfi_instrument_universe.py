@@ -156,16 +156,17 @@ _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
 #   BITO                   : 2021-10-19 (futures-based)
 #   ETHA, FETH, ETHE       : 2024-07-23 (US ETH spot ETF launch; ETHE
 #                            uplisted from OTC same date)
+# MVP scope (2026-05-05): only the most-liquid BlackRock spot ETFs on NASDAQ
+# (IBIT, ETHA). FBTC/ARKB (BATS), GBTC/ETHE/BITO (NYSE Arca) dropped — the
+# date-futures arb archetype needs CME futures + Deribit futures (same expiry
+# day), and CME futures + the BlackRock NASDAQ ETF cover spot exposure.
+# Re-add the BATS/ARCA-listed ETFs only if a new strategy archetype needs them.
 _BTC_SPOT_ETFS: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("IBIT", "NASDAQ", "ETF", "XNAS.ITCH", "raw_symbol", "BTC", "crypto", "IBIT", "BTC"),
-    DatabentoInstrumentDef("FBTC", "BATS", "ETF", "BATS.PITCH", "raw_symbol", "BTC", "crypto", "FBTC", "BTC"),
-    DatabentoInstrumentDef("GBTC", "ARCA", "ETF", "ARCX.PILLAR", "raw_symbol", "BTC", "crypto", "GBTC", "BTC"),
 ]
 
 _ETH_SPOT_ETFS: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("ETHA", "NASDAQ", "ETF", "XNAS.ITCH", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
-    DatabentoInstrumentDef("FETH", "BATS", "ETF", "BATS.PITCH", "raw_symbol", "ETH", "crypto", "FETH", "ETH"),
-    DatabentoInstrumentDef("ETHE", "ARCA", "ETF", "ARCX.PILLAR", "raw_symbol", "ETH", "crypto", "ETHE", "ETH"),
 ]
 
 # CME ES options — full E-mini S&P 500 options surface.

@@ -56,7 +56,6 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     # soccer-football-info
     "SFI_LEAGUES": "sfi_leagues",
     "SFI_PROGRESSIVE_STATS": "progressive_stats",
-    "SFI_STANDINGS": "sfi_standings",
     # open-meteo
     "WEATHER": "weather",
 }
@@ -98,7 +97,6 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     "TRANSFERMARKT_LEAGUES": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "SFI_LEAGUES": SportsPathLayout.PER_DAY_PER_LEAGUE,
     "SFI_PROGRESSIVE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
-    "SFI_STANDINGS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     # Bare path (single file per day — XG/WEATHER often un-partitioned)
     "XG": SportsPathLayout.PER_DAY_BARE,
     "WEATHER": SportsPathLayout.PER_DAY_BARE,

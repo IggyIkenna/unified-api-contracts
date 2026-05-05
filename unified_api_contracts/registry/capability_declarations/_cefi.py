@@ -652,12 +652,15 @@ _ASTER = SourceCapability(
     auth_scope=["api_key"],
     auth_environments={"test": "testnet_key", "prod": "prod_key"},
     operations={
+        # NOTE: liquidations removed from scope 2026-05-04 — Aster's
+        # /fapi/v1/forceOrders endpoint returns maintenance error and our
+        # _fetch_aster_rest dispatcher does not wire it. Re-add when (if) we
+        # ship a working adapter path.
         "market": [
             "ticker",
             "orderbook",
             "trades",
             "ohlcv",
-            "liquidations",
             "derivative_ticker",
             "ws_ticker",
             "ws_depth",

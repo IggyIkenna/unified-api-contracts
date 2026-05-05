@@ -214,8 +214,10 @@ class VenueMapping:
             "BITGET-FUTURES": "2024-11-08",
             "KRAKEN-SPOT": "2020-01-01",
             "KRAKEN-FUTURES": "2020-01-01",
-            # CEFI - On-chain CLOBs
-            "HYPERLIQUID": "2023-11-01",
+            # CEFI on-chain CLOBs. HYPERLIQUID earliest = book_snapshot_5 S3
+            # archive 2023-04-15; see VENUE_DATA_TYPE_CAPABILITIES for per-
+            # data-type starts (trades only from 2025-03-22, no liquidations).
+            "HYPERLIQUID": "2023-04-15",
             "ASTER": "2024-10-01",
             "PACIFICA-SOLANA": "2025-06-01",
             "EXTENDED-STARKNET": "2024-10-01",

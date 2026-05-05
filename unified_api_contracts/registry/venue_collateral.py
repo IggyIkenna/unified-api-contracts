@@ -100,6 +100,69 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("DRIFT", "SOL", True, Decimal("0.05"), "CROSS", "5% haircut", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "mSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Marinade LST", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "JitoSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Jito LST", "PERP_DEX"),
+    # ----- ETH LST acceptance gaps (explicit `accepted=False` so the catalog ----
+    # generator's `accepted_perp_collateral(venue)` short-circuits cleanly and
+    # the absence is documented, not silently absent. Positive rows wait on
+    # Phase 7a operator audit (see plan
+    # ``carry_staked_basis_structure_axis_2026_05_04`` Phase 7a).
+    # 2026-05-05: NO production ETH-perp venue accepts an ETH LST as direct
+    # cross-margin today — Aave / Spark / Morpho take wstETH + weETH for
+    # *lending* but those are LENDING-kind venues (covered above for
+    # AAVEV3-ETHEREUM). When Aevo / Lyra-V2 / dYdX / Hyperliquid ship
+    # LST-margin support, flip the row to ``accepted=True`` with a haircut
+    # citation in ``notes``.
+    CollateralAcceptance("HYPERLIQUID", "stETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("HYPERLIQUID", "wstETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("HYPERLIQUID", "rETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("HYPERLIQUID", "cbETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("HYPERLIQUID", "eETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("DERIBIT", "stETH", False, None, "", "Not accepted (BTC/ETH/USDC PM only)", "PERP_CEX"),
+    CollateralAcceptance("DERIBIT", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("DERIBIT", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("DERIBIT", "rETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BINANCE", "stETH", False, None, "", "Not accepted as futures margin", "PERP_CEX"),
+    CollateralAcceptance("BINANCE", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BINANCE", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BINANCE", "rETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BYBIT", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BYBIT", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BYBIT", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("OKX", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("OKX", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("OKX", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "stETH", False, None, "", "Not accepted (USDC/USDT-only)", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance(
+        "GMX", "stETH", False, None, "", "Not accepted (per-market collateral set excludes LSTs)", "PERP_DEX"
+    ),
+    CollateralAcceptance("GMX", "wstETH", False, None, "", "Not accepted", "PERP_DEX"),
+    CollateralAcceptance("GMX", "weETH", False, None, "", "Not accepted", "PERP_DEX"),
+    CollateralAcceptance("GMX", "rETH", False, None, "", "Not accepted", "PERP_DEX"),
+    # Tardis-captured futures venues: same gap (linear-USDT or coin-margined
+    # only; no LST acceptance).
+    CollateralAcceptance("BINANCE-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BINANCE-FUTURES", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BINANCE-FUTURES", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BYBIT-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BYBIT-FUTURES", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("OKX-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("OKX-FUTURES", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("KRAKEN-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("KRAKEN-FUTURES", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BITFINEX-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BITGET-FUTURES", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
+    # ----- SOL LST acceptance (DRIFT positive rows above; non-DRIFT venues -----
+    # don't accept Solana LSTs as cross-margin today). Ethereum-side venues
+    # don't carry SOL LSTs at all — no row needed.
+    CollateralAcceptance("HYPERLIQUID", "JitoSOL", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("HYPERLIQUID", "mSOL", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
+    CollateralAcceptance("BINANCE", "JitoSOL", False, None, "", "Not accepted as futures margin", "PERP_CEX"),
+    CollateralAcceptance("BINANCE", "mSOL", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("BYBIT", "JitoSOL", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("OKX", "JitoSOL", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "JitoSOL", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance("ASTER", "mSOL", False, None, "", "Not accepted", "PERP_CEX"),
 ]
 
 
