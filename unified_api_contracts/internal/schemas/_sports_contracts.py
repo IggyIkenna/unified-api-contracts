@@ -390,33 +390,9 @@ SPORTS_STANDINGS = SchemaContract(
 # ============================================================================
 
 
-SPORTS_TRANSFERMARKT_LEAGUES = SchemaContract(
-    asset_group="sports",
-    instrument_type="reference",
-    data_type="transfermarkt_leagues",
-    columns=[
-        ColumnSpec(
-            name="league_id",
-            dtype="string",
-            nullable=False,
-            description=(
-                "Transfermarkt league code (e.g. 'GB1' for EPL, 'ES1' for La Liga) — "
-                "distinct from UAC canonical ``league_id`` and from ``af_league_id``. "
-                "Join via ``get_provider_league_id()`` mapping."
-            ),
-        ),
-        ColumnSpec(
-            name="name", dtype="string", nullable=False, description="League name as Transfermarkt publishes it."
-        ),
-        ColumnSpec(name="country", dtype="string", nullable=True, description="Country of the league."),
-        ColumnSpec(
-            name="league_type", dtype="string", nullable=True, description="League tier descriptor from Transfermarkt."
-        ),
-        ColumnSpec(name="logo_url", dtype="string", nullable=True, description="Transfermarkt-hosted league logo URL."),
-    ],
-    symbol_column="league_id",
-    required_row_count_min=1,
-)
+# SPORTS_TRANSFERMARKT_LEAGUES retired 2026-05-05 — was a static provider-
+# catalog mapping; now lives in UAC TRANSFERMARKT_IDS as versioned config
+# rather than as a captured GCS data type.
 
 
 SPORTS_PLAYER_VALUES = SchemaContract(
@@ -487,31 +463,8 @@ SPORTS_PLAYER_VALUES = SchemaContract(
 # ============================================================================
 
 
-SPORTS_SFI_LEAGUES = SchemaContract(
-    asset_group="sports",
-    instrument_type="reference",
-    data_type="sfi_leagues",
-    columns=[
-        ColumnSpec(
-            name="league_id",
-            dtype="string",
-            nullable=False,
-            description=(
-                "SFI league UUID/slug — distinct from UAC canonical and AF/Transfermarkt codes. "
-                "Join via ``get_provider_league_id()`` mapping stored in "
-                "``sports_reference/mappings/sfi_league_mapping.parquet``."
-            ),
-        ),
-        ColumnSpec(name="name", dtype="string", nullable=False, description="SFI-published league name."),
-        ColumnSpec(
-            name="country", dtype="string", nullable=False, description="Country of the league (required by SFI)."
-        ),
-        ColumnSpec(name="league_type", dtype="string", nullable=True, description="SFI's competition-type label."),
-        ColumnSpec(name="logo_url", dtype="string", nullable=True, description="SFI-hosted league logo URL."),
-    ],
-    symbol_column="league_id",
-    required_row_count_min=1,
-)
+# SPORTS_SFI_LEAGUES retired 2026-05-05 — was a static provider-catalog
+# mapping; now lives in UAC SOCCER_FOOTBALL_INFO_IDS as versioned config.
 
 
 SPORTS_SFI_PROGRESSIVE_STATS = SchemaContract(
@@ -696,21 +649,17 @@ CONTRACT_REGISTRY[("sports", "reference", "leagues")] = SPORTS_LEAGUES
 CONTRACT_REGISTRY[("sports", "reference", "teams")] = SPORTS_TEAMS
 CONTRACT_REGISTRY[("sports", "reference", "venues")] = SPORTS_VENUES
 CONTRACT_REGISTRY[("sports", "league", "standings")] = SPORTS_STANDINGS
-# Family C
-CONTRACT_REGISTRY[("sports", "reference", "transfermarkt_leagues")] = SPORTS_TRANSFERMARKT_LEAGUES
+# Family C — TRANSFERMARKT_LEAGUES retired 2026-05-05 (catalog mapping in UAC).
 CONTRACT_REGISTRY[("sports", "player", "player_values")] = SPORTS_PLAYER_VALUES
-# Family D
-CONTRACT_REGISTRY[("sports", "reference", "sfi_leagues")] = SPORTS_SFI_LEAGUES
+# Family D — SFI_LEAGUES retired 2026-05-05 (same reason).
 CONTRACT_REGISTRY[("sports", "match", "sfi_progressive_stats")] = SPORTS_SFI_PROGRESSIVE_STATS
 
 
 __all__ = [
     "SPORTS_LEAGUES",
     "SPORTS_PLAYER_VALUES",
-    "SPORTS_SFI_LEAGUES",
     "SPORTS_SFI_PROGRESSIVE_STATS",
     "SPORTS_STANDINGS",
     "SPORTS_TEAMS",
-    "SPORTS_TRANSFERMARKT_LEAGUES",
     "SPORTS_VENUES",
 ]

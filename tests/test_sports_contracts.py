@@ -14,11 +14,9 @@ import pytest
 from unified_api_contracts.internal.schemas._sports_contracts import (
     SPORTS_LEAGUES,
     SPORTS_PLAYER_VALUES,
-    SPORTS_SFI_LEAGUES,
     SPORTS_SFI_PROGRESSIVE_STATS,
     SPORTS_STANDINGS,
     SPORTS_TEAMS,
-    SPORTS_TRANSFERMARKT_LEAGUES,
     SPORTS_VENUES,
 )
 from unified_api_contracts.internal.schemas._sports_derived_contracts import (
@@ -57,11 +55,9 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     ("sports", "match", "fixture_lineups", SPORTS_FIXTURE_LINEUPS, 3),
     ("sports", "match", "player_stats", SPORTS_PLAYER_STATS, 38),
     ("sports", "match", "injuries", SPORTS_INJURIES, 5),
-    # Family C — Transfermarkt
-    ("sports", "reference", "transfermarkt_leagues", SPORTS_TRANSFERMARKT_LEAGUES, 5),
+    # Family C — Transfermarkt (TRANSFERMARKT_LEAGUES retired 2026-05-05; mapping in UAC).
     ("sports", "player", "player_values", SPORTS_PLAYER_VALUES, 7),
-    # Family D — SFI
-    ("sports", "reference", "sfi_leagues", SPORTS_SFI_LEAGUES, 5),
+    # Family D — SFI (SFI_LEAGUES retired 2026-05-05; mapping in UAC).
     ("sports", "match", "sfi_progressive_stats", SPORTS_SFI_PROGRESSIVE_STATS, 43),
     # Family E — Other / derived
     ("sports", "match", "matches", SPORTS_MATCHES, 58),
@@ -135,14 +131,15 @@ def test_sports_contract_columns_are_valid_column_specs(
         assert col.dtype, f"{data_type}: empty dtype on column {col.name}"
 
 
-def test_exactly_19_new_sports_contracts_registered() -> None:
-    """Guard against accidental drift — the plan ships exactly 19 new sports contracts.
-
-    If a follow-up plan adds more, bump this count deliberately.
+def test_sports_contract_count_matches_registered() -> None:
+    """Guard against accidental drift — every (asset_group, instrument_type,
+    data_type) listed here must be present in the global registry, and the
+    count should be deliberate. Originally 19 contracts; 17 after retiring
+    TRANSFERMARKT_LEAGUES + SFI_LEAGUES on 2026-05-05 (provider-catalog
+    mappings moved to UAC config rather than captured GCS data types).
     """
     keys_added_by_this_plan = {(c[0], c[1], c[2]) for c in SPORTS_CONTRACT_CASES}
-    assert len(keys_added_by_this_plan) == 19
-    # All 19 must actually be present in the global registry.
+    assert len(keys_added_by_this_plan) == 17
     for key in keys_added_by_this_plan:
         assert key in CONTRACT_REGISTRY, f"{key} expected in CONTRACT_REGISTRY"
 
