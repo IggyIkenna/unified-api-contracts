@@ -95,6 +95,12 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 # counting pre-cutoff dates as missing.
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
     ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
+    # SFI_LEAGUES is a static league-list endpoint that only became live when
+    # the SFI provider started serving us (2024-03-15 per
+    # SPORTS_ENTITY_START_DATES). Pre-launch dates are not "missing", they
+    # pre-date the source. Mirroring SPORTS_ENTITY_START_DATES["SFI_LEAGUES"]
+    # in the data-status clip dict so the API's expected denominator is honest.
+    ("soccer_football_info", "SFI_LEAGUES"): date(2024, 3, 15),
     ("api_football", "FIXTURE_EVENTS"): date(2020, 6, 6),
     ("api_football", "FIXTURE_LINEUPS"): date(2020, 6, 6),
     ("api_football", "FIXTURE_STATS"): date(2020, 6, 6),
