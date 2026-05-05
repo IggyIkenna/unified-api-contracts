@@ -133,6 +133,11 @@ _CME_FX_FUTURES: list[DatabentoInstrumentDef] = [
 _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("BTC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "BTC", "crypto", "BTC"),
     DatabentoInstrumentDef("ETH.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "ETH", "crypto", "ETH"),
+    # Micro E-mini S&P 500 futures — MVP added 2026-05-05 after 0% capture
+    # diagnosis (UAC had no MES def, so the adapter never fetched it even
+    # though Databento parent symbology returns ~3,500 rows/day for MES.FUT).
+    # Same dataset/stype as the parent ES contract.
+    DatabentoInstrumentDef("MES.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SP500", "equity", "MES"),
 ]
 
 # Crypto spot ETFs — US-listed BTC + ETH spot ETFs.
