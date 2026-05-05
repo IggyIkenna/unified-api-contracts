@@ -878,11 +878,31 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
         if venue in ("POLYMARKET", "KALSHI"):
             return seed_for_venue_and_data_type(venue, data_type)
         venue_caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
-        # Venues that declare both SPOT + PERPETUAL (BINANCE-FUTURES / BYBIT
-        # / DERIBIT) still write `trades` for each — expand both universes.
+        # If the venue's capability table doesn't declare this data_type at
+        # all, the venue isn't wired to publish it — empty seed so the
+        # Tier-3 sentinel doesn't fan out an expectation that can never be
+        # satisfied. ASTER is the canonical case (no book_snapshot_5 per
+        # VENUE_DATA_TYPE_CAPABILITIES, only trades + derivative_ticker).
+        if venue_caps and data_type not in venue_caps:
+            return ()
+        # Spot-only venues. Names ending in -SPOT plus the historical bare
+        # COINBASE-SPOT / UPBIT / BINANCE-SPOT entries that predate the
+        # suffix convention. These trade SPOT pairs only.
         if venue.endswith("-SPOT") or venue in ("COINBASE-SPOT", "UPBIT", "BINANCE-SPOT"):
             return _SPOT_MVP_SEED_INSTRUMENTS
-        if venue in ("BINANCE-FUTURES", "BYBIT", "OKX-SWAP", "HYPERLIQUID", "ASTER"):
+        # Perp-only / perp-dominant venues. Anything ending -FUTURES on
+        # Tardis is actually a perp/derivative venue (Bitfinex / Bitget /
+        # Kraken) — the suffix is the Tardis exchange-name historical
+        # accident. OKX-FUTURES is dated futures but the MVP universe seeds
+        # with perps (the linear ones live under OKX-SWAP, the dated ones
+        # under OKX-FUTURES; both write trades for the MVP perp basket).
+        if venue.endswith("-FUTURES") or venue in (
+            "BINANCE-FUTURES",
+            "BYBIT",
+            "OKX-SWAP",
+            "HYPERLIQUID",
+            "ASTER",
+        ):
             return _PERP_MVP_SEED_INSTRUMENTS
         if venue == "DERIBIT":
             # DERIBIT writes SPOT + PERP + OPTION; on the `trades` /
@@ -895,6 +915,20 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
         return _SPOT_MVP_SEED_INSTRUMENTS
 
     if data_type == "derivative_ticker":
+        # derivative_ticker only makes sense on derivative venues. Spot-only
+        # venues (BINANCE-SPOT / OKX-SPOT / COINBASE-SPOT / UPBIT /
+        # KRAKEN-SPOT / BITFINEX-SPOT / BITGET-SPOT) have no derivatives, so
+        # no expected instruments — return empty so the Tier-3 sentinel
+        # doesn't fan out a per-perp expectation onto a venue that can't
+        # publish derivative_ticker.
+        if venue.endswith("-SPOT") or venue in ("COINBASE-SPOT", "UPBIT", "BINANCE-SPOT"):
+            return ()
+        # Unknown venue with no declared capability — empty (degrade to
+        # Tier-2 or skip). VENUE_DATA_TYPE_CAPABILITIES is the SSOT for
+        # whether the venue is wired for this data_type at all.
+        venue_caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
+        if data_type not in venue_caps:
+            return ()
         return _PERP_MVP_SEED_INSTRUMENTS
 
     if data_type in ("options_chain", "futures_chain"):

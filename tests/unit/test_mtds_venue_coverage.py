@@ -487,3 +487,76 @@ class TestWave8GSeedHelper:
     def test_unknown_venue_dt_returns_empty_tuple(self) -> None:
         assert seed_for_venue_and_data_type("FAKE-CHAIN", "dex_pools") == ()
         assert seed_for_venue_and_data_type("UNISWAPV3-ETHEREUM", "unknown_dt") == ()
+
+
+class TestSeedDispatcherVenueClassification:
+    """Phase 2 CeFi gap audit (2026-05-05) — confirm the seed dispatcher
+    respects venue-vs-data_type compatibility and never returns expectations
+    for combinations a venue physically can't serve.
+    """
+
+    def test_perp_only_venues_seed_perps_on_trades(self) -> None:
+        """All -FUTURES venues are perp-dominant on Tardis (Bitfinex /
+        Bitget / Kraken-derivatives publish perps under the -FUTURES
+        suffix). Pre-fix they fell through to the SPOT branch and
+        returned BTC-USDT seeds — the Tier-3 sentinel then expected
+        spot pairs on a perp venue and every shard was a false miss.
+        """
+        for venue in ("OKX-FUTURES", "BITFINEX-FUTURES", "BITGET-FUTURES", "KRAKEN-FUTURES"):
+            ids = get_expected_instruments_for_venue(venue, "trades")
+            assert ids, f"{venue} trades must seed non-empty"
+            assert "BTC-PERP" in ids, f"{venue} trades expected BTC-PERP, got {ids[:3]}"
+            assert "BTC-USDT" not in ids, f"{venue} should not emit spot seeds"
+
+    def test_spot_venues_have_empty_derivative_ticker_seed(self) -> None:
+        """Spot-only venues never publish derivative_ticker. Pre-fix the
+        dispatcher returned PERP seeds unconditionally, causing the
+        Tier-3 sentinel to expect (e.g.) BTC-PERP rows on BINANCE-SPOT —
+        rows that can never exist. Empty seed → sentinel skips Tier-3
+        and degrades to Tier-2, which is correct.
+        """
+        for venue in (
+            "BINANCE-SPOT",
+            "OKX-SPOT",
+            "COINBASE-SPOT",
+            "UPBIT",
+            "BITFINEX-SPOT",
+            "BITGET-SPOT",
+            "KRAKEN-SPOT",
+        ):
+            assert get_expected_instruments_for_venue(venue, "derivative_ticker") == [], (
+                f"{venue} is spot-only; derivative_ticker must seed empty"
+            )
+
+    def test_spot_venues_keep_trades_book_seeds(self) -> None:
+        """Sanity guard — the derivative_ticker fix must not regress the
+        trades / book_snapshot_5 paths for spot venues."""
+        for venue in ("BINANCE-SPOT", "COINBASE-SPOT", "UPBIT", "BITGET-SPOT"):
+            assert get_expected_instruments_for_venue(venue, "trades"), f"{venue} trades regressed"
+            assert get_expected_instruments_for_venue(venue, "book_snapshot_5"), f"{venue} book_snapshot_5 regressed"
+
+    def test_aster_book_snapshot_5_is_empty(self) -> None:
+        """ASTER's adapter only wires trades + derivative_ticker (no
+        book_snapshot_5 / liquidations). Pre-fix the dispatcher emitted
+        book_snapshot_5 perps for ASTER and the Tier-3 sentinel created
+        14 false-miss rows per day. Capability table is the SSOT — if
+        the data_type isn't declared, the seed must be empty.
+        """
+        # capability-declared data_types remain seeded
+        assert get_expected_instruments_for_venue("ASTER", "trades")
+        assert get_expected_instruments_for_venue("ASTER", "derivative_ticker")
+        # not in ASTER's VENUE_DATA_TYPE_CAPABILITIES → empty
+        assert get_expected_instruments_for_venue("ASTER", "book_snapshot_5") == []
+        assert get_expected_instruments_for_venue("ASTER", "liquidations") == []
+
+    def test_capability_gate_does_not_break_known_venues(self) -> None:
+        """Regression guard: BINANCE-FUTURES / BYBIT / DERIBIT / OKX-SWAP
+        / HYPERLIQUID all declare trades + book_snapshot_5 + derivative_
+        ticker in VENUE_DATA_TYPE_CAPABILITIES, so all three should
+        continue to seed perps post-fix.
+        """
+        for venue in ("BINANCE-FUTURES", "BYBIT", "DERIBIT", "OKX-SWAP", "HYPERLIQUID"):
+            for dt in ("trades", "book_snapshot_5", "derivative_ticker"):
+                ids = get_expected_instruments_for_venue(venue, dt)
+                assert ids, f"{venue} {dt} regressed to empty"
+                assert "BTC-PERP" in ids, f"{venue} {dt} dropped BTC-PERP"
