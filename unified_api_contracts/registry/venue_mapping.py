@@ -450,6 +450,56 @@ class VenueMapping:
         """
         return self.venue_start_dates.get(venue) or self.source_data_start_dates.get(venue)
 
+    # Sparse override: venues whose instrument-discovery API has NARROWER
+    # historical coverage than the market-data archive earliest date in
+    # ``venue_start_dates``. Most venues do NOT need an entry — their
+    # discovery API can return instrument-list snapshots from
+    # ``venue_start_dates[venue]`` onwards. Add a venue here only when
+    # instruments-service can prove (by live probe) that the discovery
+    # endpoint returns empty / errors for dates before some later cutoff.
+    #
+    # Reference incident 2026-05-05: HYPERLIQUID. Market-data S3 archive
+    # starts 2023-04-15; instrument-discovery API returns nothing for dates
+    # before 2023-11-01 (no historical instrument-listing snapshots exposed
+    # for the April-October 2023 window). Without this override, the
+    # instruments-service orchestrator marked 200 (venue, date) shards as
+    # ``attempted_failed`` because the venue was "expected to be available"
+    # per market-data start but the discovery call legitimately had no data.
+    venue_instrument_discovery_overrides: dict[str, str] = field(
+        default_factory=lambda: {
+            "HYPERLIQUID": "2023-11-01",
+        }
+    )
+
+    def get_instrument_discovery_start(self, venue: str) -> str | None:
+        """Return earliest date instruments-service can produce honest discovery snapshots.
+
+        SSOT for the instruments-service expected-window lower bound. For most
+        venues this equals ``get_venue_start_date(venue)`` — the market-data
+        archive earliest date. Override here (via
+        ``venue_instrument_discovery_overrides``) when the discovery API has
+        narrower historical coverage than the market-data archive — e.g.
+        HYPERLIQUID where the API returns nothing for instrument-listing
+        snapshots before 2023-11-01 even though market-data S3 archive starts
+        2023-04-15.
+
+        instruments-service orchestrator MUST consult this (not
+        ``venue_start_dates`` directly) when deciding whether a (venue, date)
+        shard is expected to produce instrument records — otherwise the gap
+        between market-data start and discovery start renders as
+        ``attempted_failed`` phantoms (200 dates for HYPERLIQUID pre-fix).
+
+        Args:
+            venue: Canonical venue name (e.g., "HYPERLIQUID", "BINANCE-SPOT").
+
+        Returns:
+            ISO date string (YYYY-MM-DD) or None if the venue is unknown.
+        """
+        override = self.venue_instrument_discovery_overrides.get(venue)
+        if override is not None:
+            return override
+        return self.get_venue_start_date(venue)
+
     # Prediction-market shards tied to traditional financial instruments —
     # SSOT data lives in ``venue_trading_calendar.WEEKDAY_ONLY_PREDICTION_SHARDS``.
     _WEEKDAY_ONLY_PREDICTION_SHARDS: frozenset[str] = field(default_factory=lambda: WEEKDAY_ONLY_PREDICTION_SHARDS)
