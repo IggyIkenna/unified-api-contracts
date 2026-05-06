@@ -96,7 +96,10 @@ ALL_DEFI_VENUES: list[str] = [
     "AAVEV3-SCROLL",
     "COMPOUNDV3-SCROLL",
     "AAVEV3-ZKSYNC",
-    "PANCAKESWAPV3-ZKSYNC",
+    # PANCAKESWAPV3-ZKSYNC dropped 2026-05-06 — low-quality + low-volume data,
+    # never produced useful captures. The 446 manifest rows that existed were
+    # purged via `migrate_defi_legacy_venue_chain.py`. Do NOT re-add without
+    # validating data quality + non-trivial liquidity on the chain.
     # ── Solana ──
     "KAMINO-SOLANA",
     "MARINADE-SOLANA",

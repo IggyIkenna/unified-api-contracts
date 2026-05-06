@@ -122,7 +122,6 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "PANCAKESWAPV3-ARBITRUM": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
     "PANCAKESWAPV3-BASE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
     "PANCAKESWAPV3-BSC": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
-    "PANCAKESWAPV3-ZKSYNC": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
     "CAMELOTV3-ARBITRUM": {"dex_swaps": "2023-05-01", "dex_pools": "2023-05-01"},
     "AERODROMEV3-BASE": {"dex_swaps": "2023-08-28", "dex_pools": "2023-08-28"},
     "VELODROMEV2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
