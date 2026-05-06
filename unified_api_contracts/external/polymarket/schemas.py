@@ -315,6 +315,16 @@ class PolymarketGammaMarket(BaseModel):
     # Market type
     market_type: str | None = Field(None, alias="marketType")  # binary, categorical, scalar
     # Dates
+    # `created_at` and `closed_time` are present in the raw Gamma API JSON
+    # (verified in cassette `gamma_events_cassette.json:59,61`) but were
+    # silently dropped by `extra="ignore"` until 2026-05-06. Added per the
+    # predictions_canonical_question_group_polymarket_migration_2026_05_06
+    # plan amendment β (Phase 0 audit lifecycle finding):
+    #   * `created_at` → `market_created_at` lifecycle field (predictions plan).
+    #   * `closed_time` → event-level `resolution_time` proxy (preferred over
+    #     `end_date_iso` which is the SCHEDULED end date, not actual).
+    created_at: str | None = Field(None, alias="createdAt")
+    closed_time: str | None = Field(None, alias="closedTime")
     start_date: str | None = Field(None, alias="startDate")
     end_date_iso: str | None = Field(None, alias="endDateIso")
     # Status

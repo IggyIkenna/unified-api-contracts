@@ -411,3 +411,159 @@ def test_contract_has_new_shard_columns() -> None:
     for col_name in ("asset_group", "market_type", "resolution_period", "underlying"):
         assert col_name in by_name, f"missing {col_name} column"
         assert by_name[col_name].nullable is False, f"{col_name} must be required"
+
+
+# ---------------------------------------------------------------------------
+# Edge-case regression tests — surfaced by Phase 0 classifier audit 2026-05-06
+# (see predictions_canonical_question_group_polymarket_migration_2026_05_06
+# plan §Phase 0 audit findings — existing UAC classifier §Section E).
+#
+# The instruments-service-side question-text classifier had two known
+# false-positive classes that motivated commits b336834 + d7bd17f:
+#  * "abnb" (Airbnb ticker) → `bnb` substring hit → false BNB
+#  * "solar" → `sol` substring hit → false SOL
+#  * "archBitcoin" → `bitcoin` substring → still legit BTC (long-form safe)
+#
+# The UAC slug-prefix classifier here does NOT use bare substring matching,
+# so the Airbnb/solar false-positives don't reproduce on the slug path —
+# these tests lock that in as regression coverage. The first three tests
+# assert MISC fallback; the last three document genuine false-positives in
+# the current SLUG_PREFIX_MAP that should be cleaned up by a follow-up
+# false-positive guard plan (not in scope for this commit).
+# ---------------------------------------------------------------------------
+
+
+def test_classifier_airbnb_does_not_false_positive_to_bnb() -> None:
+    """Airbnb slug must NOT classify as CRYPTO_PRICE/BNB.
+
+    Regression for the instruments-service-side b336834 fix carried over to
+    UAC. The slug-based classifier here is structurally safe (slug delimiter
+    is "-", so `airbnb-` doesn't match `bnb-` prefix) — this test locks
+    that in.
+    """
+    category, underlying, _, _ = classify_polymarket_market(
+        title="Airbnb (ABNB) Up or Down on October 16?",
+        slug="airbnb-up-or-down-oct-16",
+        event_slug="",
+        outcome="Yes",
+    )
+    assert category is PredictionShardCategory.MISC
+    assert underlying == "UNKNOWN"
+
+
+def test_classifier_solar_does_not_false_positive_to_sol() -> None:
+    """Solar slug must NOT classify as CRYPTO_PRICE/SOL.
+
+    Same regression class as the Airbnb test — the slug-based classifier is
+    structurally safe (slug `solar-` doesn't match `sol-` prefix).
+    """
+    category, underlying, _, _ = classify_polymarket_market(
+        title="Solar panel adoption above 50% by 2026?",
+        slug="solar-panel-adoption-2026",
+        event_slug="",
+        outcome="Yes",
+    )
+    assert category is PredictionShardCategory.MISC
+    assert underlying == "UNKNOWN"
+
+
+def test_classifier_archbitcoin_keyword_match_via_title() -> None:
+    """archBitcoin / archEthereum / archXRP markets use long-form keywords
+    in the title and should classify correctly via the title-keyword fallback.
+
+    Slug starts with `archbitcoin-` which doesn't match any prefix; token
+    scan of `archbitcoin` (length ≥ 3) doesn't hit either. The keyword
+    fallback runs against the title which contains the long-form `bitcoin`,
+    so it should return CRYPTO_PRICE/BTC.
+    """
+    category, underlying, _, _ = classify_polymarket_market(
+        title="Will archBitcoin price exceed $100k?",
+        slug="archbitcoin-price-above-100k",
+        event_slug="",
+        outcome="Yes",
+    )
+    # Long-form keyword "bitcoin" in title triggers CRYPTO_PRICE/BTC via
+    # KEYWORD_TO_CATEGORY substring match. This is the intended behaviour
+    # per d7bd17f (long forms are safe; short tickers need word boundary).
+    assert category is PredictionShardCategory.CRYPTO_PRICE
+    assert underlying == "BTC"
+
+
+def test_classifier_bnb_up_down_may_resolves_to_monthly() -> None:
+    """`bnb-up-or-down-may-15` should resolve to MONTHLY resolution_period.
+
+    `may` IS in `_MONTHLY_TOKENS` (3-letter abbreviation set, line 374 of
+    `_prediction_market_taxonomy.py`). With no year marker (`-2025`/`-2026`)
+    in the slug, the year-marker branch at line 511-523 is skipped and we
+    fall through to the bare `tokens & _MONTHLY_TOKENS` check at line 533,
+    which returns MONTHLY.
+    """
+    category, underlying, _, resolution_period = classify_polymarket_market(
+        title="BNB Up or Down on May 15?",
+        slug="bnb-up-or-down-may-15",
+        event_slug="",
+        outcome="Up",
+    )
+    assert category is PredictionShardCategory.CRYPTO_PRICE
+    assert underlying == "BNB"
+    assert resolution_period is PredictionShardResolutionPeriod.MONTHLY
+
+
+@pytest.mark.xfail(
+    reason=(
+        "KNOWN FALSE-POSITIVE: `house-` prefix in SLUG_PREFIX_MAP catches "
+        "`house-price-above-500k` (real-estate prediction market) and "
+        "misclassifies it as POLITICS_US/US_HOUSE. Cleanup deferred to a "
+        "future false-positive-guard plan."
+    ),
+    strict=True,
+)
+def test_classifier_house_price_should_not_match_us_house() -> None:
+    """`house-price-*` slugs are real-estate, not US House of Representatives."""
+    category, _, _, _ = classify_polymarket_market(
+        title="House price above $500k?",
+        slug="house-price-above-500k",
+        event_slug="",
+        outcome="Yes",
+    )
+    assert category is PredictionShardCategory.MISC
+
+
+@pytest.mark.xfail(
+    reason=(
+        "KNOWN FALSE-POSITIVE: `fed-` prefix in SLUG_PREFIX_MAP catches "
+        "`fed-ex-delivery-2026` (FedEx package delivery) and misclassifies "
+        "it as MACRO/FED_FUNDS. Cleanup deferred to a future false-positive-"
+        "guard plan (could require word-boundary on `fed-` or override map)."
+    ),
+    strict=True,
+)
+def test_classifier_fed_ex_should_not_match_fed_funds() -> None:
+    """`fed-ex-*` slugs are FedEx, not Fed Funds."""
+    category, _, _, _ = classify_polymarket_market(
+        title="FedEx delivery above 5M packages by 2026?",
+        slug="fed-ex-delivery-2026",
+        event_slug="",
+        outcome="Yes",
+    )
+    assert category is PredictionShardCategory.MISC
+
+
+@pytest.mark.xfail(
+    reason=(
+        "KNOWN FALSE-POSITIVE: `fear-` prefix in SLUG_PREFIX_MAP catches "
+        "`fear-factor-reboot` (TV show) and misclassifies it as "
+        "MACRO/FEAR_GREED. Cleanup deferred to a future false-positive-"
+        "guard plan (could require `fear-and-greed-` or `fear-greed-` only)."
+    ),
+    strict=True,
+)
+def test_classifier_fear_factor_should_not_match_fear_greed() -> None:
+    """`fear-factor-*` slugs are TV-show, not Fear & Greed Index."""
+    category, _, _, _ = classify_polymarket_market(
+        title="Will Fear Factor reboot in 2026?",
+        slug="fear-factor-reboot",
+        event_slug="",
+        outcome="Yes",
+    )
+    assert category is PredictionShardCategory.MISC
