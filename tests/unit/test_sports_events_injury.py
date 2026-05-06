@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
 from pydantic import ValidationError
 
@@ -40,9 +42,11 @@ class TestCanonicalFixtureEvent:
         assert event.extra_time is None
         assert event.detail is None
         assert event.comments is None
+        assert event.event_time is None
 
     def test_valid_construction_all_fields(self) -> None:
         """Construct with every field populated."""
+        event_ts = datetime(2024, 11, 23, 16, 23, 17, tzinfo=UTC)
         event = CanonicalFixtureEvent(
             fixture_id="100",
             team_id="200",
@@ -53,12 +57,29 @@ class TestCanonicalFixtureEvent:
             event_type="goal",
             detail="Normal Goal",
             comments="Assisted by T. Alexander-Arnold",
+            event_time=event_ts,
         )
         assert event.player_id == "300"
         assert event.player_name == "M. Salah"
         assert event.extra_time == 3
         assert event.detail == "Normal Goal"
         assert event.comments == "Assisted by T. Alexander-Arnold"
+        assert event.event_time == event_ts
+
+    def test_event_time_carries_through_from_raw(self) -> None:
+        """The new ``event_time`` field round-trips via from_raw — adapters
+        emitting the absolute UTC instant of the in-game event keep their
+        per-row stamp through canonical normalisation. Phase 2.D bump."""
+        event_ts = datetime(2024, 11, 23, 16, 30, 0, tzinfo=UTC)
+        raw: dict[str, str | int | float | bool | None | datetime] = {
+            "fixture_id": "100",
+            "team_id": "200",
+            "minute": 35,
+            "event_type": "card",
+            "event_time": event_ts,
+        }
+        event = CanonicalFixtureEvent.model_validate(raw)
+        assert event.event_time == event_ts
 
     def test_from_raw_roundtrip(self) -> None:
         """from_raw should produce the same model as direct construction."""
