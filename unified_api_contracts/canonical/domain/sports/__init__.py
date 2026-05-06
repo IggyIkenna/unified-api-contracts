@@ -48,6 +48,10 @@ from .canonical_ids import build_referee_id as build_referee_id
 from .canonical_ids import build_season_id as build_season_id
 from .canonical_ids import build_team_id as build_team_id
 from .canonical_ids import build_venue_id as build_venue_id
+from .feature_upstream import FEATURE_UPSTREAM_REQUIREMENTS as FEATURE_UPSTREAM_REQUIREMENTS
+from .feature_upstream import UpstreamReq as UpstreamReq
+from .feature_upstream import in_coverage as in_coverage
+from .feature_upstream import in_coverage_dt as in_coverage_dt
 from .gcs_paths import SPORTS_BUCKET_TEMPLATE as SPORTS_BUCKET_TEMPLATE
 from .gcs_paths import SPORTS_DATA_TYPE_LAYOUT as SPORTS_DATA_TYPE_LAYOUT
 from .gcs_paths import SPORTS_DATA_TYPE_TO_FOLDER as SPORTS_DATA_TYPE_TO_FOLDER
