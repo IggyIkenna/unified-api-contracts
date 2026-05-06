@@ -118,9 +118,26 @@ TRADFI_TICKER_COVERAGE_START: dict[str, date] = {
 # Prediction venues = market venues. Coverage start = venue inception.
 
 PREDICTION_SOURCE_COVERAGE_START: dict[str, date] = {
-    "POLYMARKET": date(2020, 6, 12),
+    # Polymarket: CLOB (central-limit order book) launched 2022-11-21, which is
+    # the canonical "tradeable history" cutoff. The platform itself launched
+    # 2020-06-12 on Matic with AMM-style markets, but pre-CLOB data has no
+    # order-book trading history that can be backtested. The pre-CLOB window
+    # is captured in PREDICTION_KNOWN_COVERAGE_GAPS so data-status drops
+    # those days from the denominator instead of flagging them missing.
+    "POLYMARKET": date(2022, 11, 21),
     "KALSHI": date(2021, 7, 19),
     "MANIFOLD": date(2022, 1, 1),
+}
+
+
+# Known provider-side gaps within the source-coverage window. data-status drops
+# these from the denominator (don't count as missing) and the orchestrator
+# pre-skips them so VMs don't waste rate-limit on known-empty windows.
+# Keys: (source_token_uppercase, "*" for all data_types or specific data_type)
+# Values: list of (start_date, end_date) inclusive ranges.
+PREDICTION_KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[date, date]]] = {
+    # Polymarket pre-CLOB AMM era — markets existed but no order-book trades.
+    ("POLYMARKET", "*"): [(date(2020, 6, 12), date(2022, 11, 20))],
 }
 
 

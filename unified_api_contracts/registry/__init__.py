@@ -422,7 +422,8 @@ from .venue_context import (
     requires_operation_validation,
     resolve_venue_context,
 )
-from .venue_mapping import DataTypeConfig, ExchangeInstrumentConfig, VenueMapping
+from .venue_instrument_config import ExchangeInstrumentConfig
+from .venue_mapping import DataTypeConfig, VenueMapping
 from .venue_trading_calendar import (
     clip_dates_to_trading_days,
     get_us_market_holidays,

@@ -96,8 +96,8 @@ class TestPlayerValuesSSOT:
             "PLAYER_VALUES",
             "2024-08-01",
             league_id="BUNDESLIGA",
-            project_id="central-element-323112",
+            project_id="test-project",
             season="2024",
         )
-        assert uris[0].startswith("gs://instruments-store-sports-central-element-323112/")
+        assert uris[0].startswith("gs://instruments-store-sports-test-project/")
         assert "season=2024" in uris[0]
