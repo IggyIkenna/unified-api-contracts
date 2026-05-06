@@ -270,6 +270,12 @@ from .canonical.domain import (
     WithdrawalRecord,
     get_expected_bookmakers,
 )
+from .canonical.partition_paths import (
+    build_cefi_partition_path,
+    build_defi_partition_path,
+    build_prediction_partition_path,
+    build_tradfi_partition_path,
+)
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
     CONFIG_SCHEMA,
@@ -1246,8 +1252,12 @@ __all__ = [
     "WithdrawalRecord",
     "active_counterparties",
     "american_to_decimal",
+    "build_cefi_partition_path",
     "build_combo_id",
+    "build_defi_partition_path",
     "build_instrument_id",
+    "build_prediction_partition_path",
+    "build_tradfi_partition_path",
     "classify_venue_error",
     "counterparty_for",
     "decimal_to_american",
