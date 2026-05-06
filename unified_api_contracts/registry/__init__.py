@@ -242,6 +242,8 @@ from .tradfi_instrument_universe import (
 from .tradfi_symbology import (
     DATABENTO_VALID_OPTIONS_SYMBOLS,
     DATABENTO_VALID_PARENT_SYMBOLS,
+    ES_OPTIONS_CLUSTERS,
+    ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER,
     EXCHANGE_CODE_TO_NAME,
     KNOWN_ETFS,
     SPACE_TO_DOT_SYMBOLS,
@@ -253,6 +255,7 @@ from .tradfi_symbology import (
     VIX_INSTRUMENT,
     ProviderBinding,
     TradFiInstrumentDef,
+    extract_es_options_cluster,
     get_bindings_for_symbol,
     get_primary_binding,
 )
@@ -511,6 +514,8 @@ __all__ = [
     "ENDPOINT_REGISTRY",
     "ENDPOINT_SCHEMA_MAP",
     "ESPNBET",
+    "ES_OPTIONS_CLUSTERS",
+    "ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER",
     "ETHENA",
     "ETHERFI",
     "EVERYGAME",
@@ -717,6 +722,7 @@ __all__ = [
     "compute_health_factor",
     "compute_max_leverage_from_outright_move",
     "compute_max_leverage_from_spread_move",
+    "extract_es_options_cluster",
     "get_accepted_collateral",
     "get_balance_tracking_form",
     "get_bindings_for_symbol",
