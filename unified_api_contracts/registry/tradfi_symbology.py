@@ -14,6 +14,7 @@ Centralized here as the system SSOT per UAC registry pattern.
 
 from __future__ import annotations
 
+import re
 from typing import Literal
 
 from pydantic import BaseModel
@@ -519,3 +520,74 @@ VIX_INDEX_INSTRUMENT: dict[str, str | None] = next(
 
 # Named constant for the VIX instrument identity (typed)
 VIX_INSTRUMENT: TradFiInstrumentDef = next(inst for inst in TRADFI_INSTRUMENTS if inst.symbol == "VIX-USD")
+
+
+# ---------------------------------------------------------------------------
+# CME options-chain cluster taxonomy
+# ---------------------------------------------------------------------------
+# 11-cluster taxonomy for ES options bundles fetched via Databento parent
+# symbology. Used by ``ManifestWriter.record_captured(expected_root_clusters,
+# cluster_extractor)`` to validate that a per-day options-chain parquet
+# bundle actually contains rows from EVERY active sub-root, not just the
+# quarterly ES root. Reference incident **TradFi MVP 2026-05-06** (closeout
+# memory ``project_tradfi_mvp_closeout_2026_05_06.md``): 18 ES.OPT dates
+# passed presence-only manifest validation as ``captured`` despite being
+# fetched with single-parent ``ES.OPT`` only (~1,218 quarterly contracts)
+# instead of all 11 parent symbols (~2,483 contracts of all expirations).
+
+ES_OPTIONS_CLUSTERS: dict[str, str] = {
+    "ES": "quarterly (3rd Fri Mar/Jun/Sep/Dec — IMM)",
+    "EW": "weekly Friday (non-quarterly)",
+    "EW1": "weekly Monday",
+    "EW2": "weekly Wednesday",
+    "EW4": "weekly Tuesday",
+    "E1A": "daily Monday (0DTE)",
+    "E2A": "daily Tuesday",
+    "E3A": "daily Wednesday",
+    "E4A": "daily Thursday",
+    "E5A": "daily Friday",
+    "EOM": "end-of-month",
+}
+
+# Default per-cluster minimum row count for ohlcv_1m bundles. ~3 expiries
+# active x ~10 strikes per expiry x ~390 minutes (RTH) = ~11,700 rows in a
+# liquid cluster — even sparsely-traded clusters typically clear 100 rows.
+# Tunable per-shard by callers (e.g. weeklies on illiquid weeks may need
+# lower minimums; instruments-service per-day active list is the SSOT for
+# the actual expected denominator).
+ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER: int = 100
+
+# Regex matches CME futures/options symbols of form ``<root><month-letter><year-digits>``
+# where root is 1-4 alphanumerics (e.g. ``ES``, ``EW``, ``EW1``, ``E1A``,
+# ``E5A``, ``EOM``), month-letter is one of ``FGHJKMNQUVXZ``, and year-digits
+# are 1-2 digits. Anchored to the start of the symbol so that both
+# space-separated forms (``E1AN4 C5090``) and dash-separated forms
+# (``ES-2024-09-20-C-5800``) are handled. Returns the root prefix (no month/year).
+_ES_CLUSTER_PATTERN: re.Pattern[str] = re.compile(
+    r"^(?P<root>[A-Z][A-Z0-9]{0,3}?)([FGHJKMNQUVXZ])(\d{1,2})(?=\b|\s|-|$)"
+)
+
+
+def extract_es_options_cluster(symbol: str) -> str:
+    """Extract the cluster root from a CME options symbol.
+
+    Examples:
+        ``E1AN4 C5090`` → ``E1A``
+        ``ESM4 P5800`` → ``ES``
+        ``EW2J4 C5400`` → ``EW2``
+        ``EOMG5 C5100`` → ``EOM``
+
+    Returns the leading root prefix (1-4 chars, all uppercase A-Z plus
+    digits). Inputs that don't match the CME outright option format
+    (e.g. ``UD:1V: VT 2888228`` synthetic combo spreads) return the
+    leading whitespace-delimited token unchanged so callers can still
+    bucket them — they should already be routed to a separate
+    ``instrument_type=combo`` partition before this function is called.
+
+    SSOT for the cluster taxonomy: :data:`ES_OPTIONS_CLUSTERS`.
+    """
+    head = symbol.split()[0] if symbol else ""
+    match = _ES_CLUSTER_PATTERN.match(head)
+    if match:
+        return match.group("root")
+    return head
