@@ -384,6 +384,11 @@ _MONTHLY_TOKENS: frozenset[str] = frozenset(
         "february",
         "march",
         "april",
+        # 2026-05-06 bug fix (predictions plan Phase 1A): "may" was missing
+        # from the full-name set even though the 3-letter form was present.
+        # Resolution-period inference for "may-15" slugs was already working
+        # via the abbreviated set; the full-name addition fixes the rare case
+        # of a slug like "btc-up-or-down-may-2026" using the long form.
         "june",
         "july",
         "august",
@@ -443,19 +448,19 @@ def _compute_classifier_stability_hash() -> str:
     # SLUG_PREFIX_MAP — sorted by key for deterministic hashing
     for prefix in sorted(SLUG_PREFIX_MAP):
         cat, und = SLUG_PREFIX_MAP[prefix]
-        hasher.update(f"{prefix}|{cat.value}|{und}".encode("utf-8"))
+        hasher.update(f"{prefix}|{cat.value}|{und}".encode())
         hasher.update(b"\x00")
 
     hasher.update(b"---KEYWORD_TO_CATEGORY---\x00")
     for keyword in sorted(KEYWORD_TO_CATEGORY):
         cat, und = KEYWORD_TO_CATEGORY[keyword]
-        hasher.update(f"{keyword}|{cat.value}|{und}".encode("utf-8"))
+        hasher.update(f"{keyword}|{cat.value}|{und}".encode())
         hasher.update(b"\x00")
 
     hasher.update(b"---OUTCOME_TO_MARKET_TYPE---\x00")
     for outcome in sorted(OUTCOME_TO_MARKET_TYPE):
         mt = OUTCOME_TO_MARKET_TYPE[outcome]
-        hasher.update(f"{outcome}|{mt.value}".encode("utf-8"))
+        hasher.update(f"{outcome}|{mt.value}".encode())
         hasher.update(b"\x00")
 
     for tokens_label, tokens_set in (
@@ -464,7 +469,7 @@ def _compute_classifier_stability_hash() -> str:
         ("_MONTHLY_TOKENS", _MONTHLY_TOKENS),
         ("_QUARTERLY_TOKENS", _QUARTERLY_TOKENS),
     ):
-        hasher.update(f"---{tokens_label}---".encode("utf-8"))
+        hasher.update(f"---{tokens_label}---".encode())
         hasher.update(b"\x00")
         for tok in sorted(tokens_set):
             hasher.update(tok.encode("utf-8"))

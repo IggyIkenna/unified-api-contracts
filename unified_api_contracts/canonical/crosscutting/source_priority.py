@@ -39,7 +39,6 @@ from __future__ import annotations
 
 from typing import Final
 
-
 SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # ---- Sports ---------------------------------------------------------
     # Fixture lifecycle data — api_football is primary, footystats is the
@@ -101,6 +100,13 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("prediction", "trades"): ["polymarket_clob"],
     ("prediction", "book_snapshot"): ["polymarket_clob"],
     ("prediction", "prediction_canonical_question_group"): ["polymarket_clob"],
+    # MARKET_LIFECYCLE source — instruments-service reads from Polymarket
+    # gamma API ``/markets/{conditionId}`` for created/resolution/settlement
+    # timestamps. Phase 1B writes top entry only; Kalshi metadata source is
+    # a deferred follow-up plan slot. Predictions plan
+    # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+    # Phase 1A.
+    ("prediction", "MARKET_LIFECYCLE"): ["polymarket_gamma_api"],
     # ---- Reference (asset-group-agnostic) -------------------------------
     ("reference", "instruments"): ["instruments_service"],
     ("reference", "venue_trading_calendar"): ["instruments_service"],

@@ -22,7 +22,6 @@ from __future__ import annotations
 
 from typing import Final, Literal
 
-
 AvailabilitySemantic = Literal[
     "fetch_completed_at",
     "kickoff_minus_60min",
@@ -111,15 +110,20 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("prediction", "trades"): "tick_timestamp",
     ("prediction", "book_snapshot"): "tick_timestamp",
     ("prediction", "prediction_canonical_question_group"): "tick_timestamp",
+    # MARKET_LIFECYCLE rows are written by instruments-service per
+    # market_id (Polymarket conditionId / Kalshi ticker) and stamp the
+    # available_at as ``market_created_at`` — we couldn't have known
+    # about the market before it was listed. Predictions plan
+    # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+    # Phase 1A.
+    ("prediction", "MARKET_LIFECYCLE"): "market_created_at",
     # ---- Reference data (asset-group-agnostic) --------------------------
     ("reference", "instruments"): "fetch_completed_at",
     ("reference", "venue_trading_calendar"): "fetch_completed_at",
 }
 
 
-def get_availability_semantic(
-    asset_group: str, data_type: str
-) -> AvailabilitySemantic:
+def get_availability_semantic(asset_group: str, data_type: str) -> AvailabilitySemantic:
     """Return the ``available_at`` stamping semantic for a shard.
 
     Args:

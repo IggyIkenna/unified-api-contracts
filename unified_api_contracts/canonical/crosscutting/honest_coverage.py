@@ -264,13 +264,45 @@ real consumer.
 # ---------------------------------------------------------------------------
 
 
-PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {}
-"""Per-canonical_question_group expected market_id sets (empty placeholder).
+PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
+    # Cadenced range-bracket markets — count is min ticks per market_id
+    # required for the bundle to count as ``captured``. HOURLY markets
+    # tick fast through their 1-hour life (~1000 events typical);
+    # DAILY markets tick over 24h (~10000 events typical). Lower bounds
+    # are intentionally conservative — adapters that fall short flip
+    # the bundle to ``attempted_failed[ClusterCoverageError]`` instead
+    # of silently passing.
+    #
+    # Cluster keys are market_ids; the cluster_extractor lambda is
+    # ``lambda row: row["market_id"]``. Per-day expected market_id set
+    # is derived at runtime from the lifecycle table
+    # (via ``unified_api_contracts.canonical.domain.predictions.lifecycle.expected_market_ids_for_canonical_group``);
+    # the registry carries the per-market min row count only.
+    "BTC_UP_DOWN_HOURLY": {"_per_market_min_rows": 100},
+    "BTC_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
+    "ETH_UP_DOWN_HOURLY": {"_per_market_min_rows": 100},
+    "ETH_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
+    "SPX_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
+    "FED_RATE_DECISION_PER_FOMC": {"_per_market_min_rows": 100},
+    "CPI_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
+    "ELECTION_PRESIDENT_2028": {"_per_market_min_rows": 100},
+    "OSCARS_BEST_PICTURE": {"_per_market_min_rows": 50},
+    # OTHER intentionally absent — markets that classify into OTHER
+    # bypass the cluster gate (no expected market_id set), but the
+    # manifest still records the capture for audit purposes.
+}
+"""Per-canonical_question_group expected market_id sets.
 
-Populated by ``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
-Phase 1A. Slot reserved here so the UTL writer guard fires consistently for
-the ``prediction_canonical_question_group`` data_type. Workspace
-"Temporary state must have a named successor plan" rule satisfied.
+Keyed by canonical_question_group name (string form of
+:class:`unified_api_contracts.canonical.domain.predictions.canonical_groups.CanonicalQuestionGroup`).
+Each group's inner dict carries a ``_per_market_min_rows`` floor — the
+cluster gate at ``ManifestWriter.record_captured`` derives the per-day
+expected market_id set from the lifecycle table at runtime and applies
+this min-rows floor per market_id.
+
+Populated by predictions plan
+``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+Phase 1A.
 """
 
 
