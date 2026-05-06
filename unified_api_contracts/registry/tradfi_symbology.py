@@ -15,6 +15,7 @@ Centralized here as the system SSOT per UAC registry pattern.
 from __future__ import annotations
 
 import re
+from datetime import date as date_type
 from typing import Literal
 
 from pydantic import BaseModel
@@ -566,6 +567,67 @@ ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER: int = 100
 _ES_CLUSTER_PATTERN: re.Pattern[str] = re.compile(
     r"^(?P<root>[A-Z][A-Z0-9]{0,3}?)([FGHJKMNQUVXZ])(\d{1,2})(?=\b|\s|-|$)"
 )
+
+
+# Weekly-Friday and weekly-Monday/Tuesday/Wednesday roots that quote every
+# US trading day. ``ES`` is the quarterly root and is always active on
+# weekdays. Daily-expiry roots (``E1A``..``E5A``) and ``EOM`` are NOT
+# included here — pure-calendar can't tell whether the listed-but-not-traded
+# next-expiry contract has rows on the bundle's date. The
+# instruments-service per-day snapshot is the SSOT for those (see
+# ``get_active_es_options_clusters_for_date_from_snapshot`` in
+# ``instruments-service``); this calendar fallback only enforces that the
+# 5-cluster always-on baseline is present so partial-parent bundles like
+# the TradFi MVP 2026-05-06 incident (single ``ES`` parent shipped instead
+# of all 11) fail loud.
+_ES_OPTIONS_WEEKDAY_ALWAYS_ON: tuple[str, ...] = ("ES", "EW", "EW1", "EW2", "EW4")
+
+
+def get_active_es_options_clusters_for_date(
+    target_date: date_type,
+    *,
+    min_rows_per_cluster: int = ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER,
+) -> dict[str, int]:
+    """Pure-calendar fallback for the active ES.OPT cluster set on ``target_date``.
+
+    Returns ``{cluster_root: min_rows}`` — the minimum row count expected
+    per cluster on the shard's date. Designed for use as
+    ``ManifestWriter.record_captured(expected_root_clusters=...)`` when the
+    instruments-service per-day snapshot is unavailable.
+
+    Calendar rules:
+
+    * **Weekdays (Mon-Fri)**: ``ES`` + ``EW`` + ``EW1`` + ``EW2`` + ``EW4``
+      are always active. Quarterly + the four weekly roots quote every US
+      trading day.
+    * **Weekends**: empty dict — no US options trading.
+
+    Daily-expiry roots (``E1A`` Monday, ``E2A`` Tuesday, ``E3A`` Wednesday,
+    ``E4A`` Thursday, ``E5A`` Friday) and ``EOM`` are intentionally NOT
+    enforced by this fallback. The pure calendar can't tell whether the
+    next-expiry contract listed-but-not-yet-traded has ohlcv rows on
+    ``target_date`` — that requires the instruments-service per-day
+    snapshot. Use the snapshot helper as primary; fall back to this only
+    when the snapshot is unavailable.
+
+    The 5-cluster baseline is enough to catch the TradFi MVP 2026-05-06
+    partial-bundle incident (single ``ES`` parent shipped instead of all
+    11 clusters): the writer would observe ``ES`` only, miss
+    ``EW``/``EW1``/``EW2``/``EW4``, and route to ``record_failed`` with
+    :class:`ClusterCoverageError`.
+
+    Args:
+        target_date: The trading date the bundle covers.
+        min_rows_per_cluster: Minimum row count per cluster. Defaults to
+            :data:`ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER`.
+
+    Returns:
+        ``{cluster: min_rows}`` for each calendar-active cluster. Empty
+        dict on weekends.
+    """
+    if target_date.weekday() >= 5:
+        return {}
+    return {cluster: int(min_rows_per_cluster) for cluster in _ES_OPTIONS_WEEKDAY_ALWAYS_ON}
 
 
 def extract_es_options_cluster(symbol: str) -> str:

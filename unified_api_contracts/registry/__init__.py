@@ -256,6 +256,7 @@ from .tradfi_symbology import (
     ProviderBinding,
     TradFiInstrumentDef,
     extract_es_options_cluster,
+    get_active_es_options_clusters_for_date,
     get_bindings_for_symbol,
     get_primary_binding,
 )
@@ -724,6 +725,7 @@ __all__ = [
     "compute_max_leverage_from_spread_move",
     "extract_es_options_cluster",
     "get_accepted_collateral",
+    "get_active_es_options_clusters_for_date",
     "get_balance_tracking_form",
     "get_bindings_for_symbol",
     "get_block_explorer_url",
