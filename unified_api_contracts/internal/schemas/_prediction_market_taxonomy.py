@@ -52,6 +52,7 @@ downstream strategies operate on venue-agnostic shards.
 
 from __future__ import annotations
 
+import hashlib
 import re
 from enum import StrEnum
 
@@ -396,6 +397,83 @@ _QUARTERLY_TOKENS: frozenset[str] = frozenset({"q1", "q2", "q3", "q4"})
 
 
 _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
+
+
+# ---------------------------------------------------------------------------
+# Classifier stability hash
+# ---------------------------------------------------------------------------
+# Bumped manually whenever the classifier's behaviour changes in a way that
+# can re-classify existing markets. Manifest rows record the hash that was
+# active when the row was written so a reclassification pass can be triggered
+# only for rows whose stored hash differs from the current
+# ``CLASSIFIER_STABILITY_HASH`` — see
+# `unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md`
+# Phase 0 audit-7 (classifier stability hash design).
+#
+# Increment ``CLASSIFIER_VERSION`` in tandem with any rule-table edit.
+# ``CLASSIFIER_STABILITY_HASH`` is computed at module load from the canonical
+# byte representation of the version + every rule table the classifier reads,
+# so adding a new entry to ``SLUG_PREFIX_MAP`` (or any other table) flips the
+# hash automatically — no manual sync required.
+
+CLASSIFIER_VERSION = "2026-05-06.1"
+
+
+def _compute_classifier_stability_hash() -> str:
+    """Compute SHA-256 of the classifier's rule-tables + version constant.
+
+    Hash inputs (in deterministic order):
+      1. ``CLASSIFIER_VERSION``
+      2. ``SLUG_PREFIX_MAP`` — sorted ``(slug_prefix, category, underlying)`` tuples
+      3. ``KEYWORD_TO_CATEGORY`` — sorted ``(keyword, category, underlying)`` tuples
+      4. ``OUTCOME_TO_MARKET_TYPE`` — sorted ``(outcome, market_type)`` tuples
+      5. ``_RANGE_BRACKET_TOKENS`` — sorted token list
+      6. ``_WEEKLY_TOKENS`` — sorted token list
+      7. ``_MONTHLY_TOKENS`` — sorted token list
+      8. ``_QUARTERLY_TOKENS`` — sorted token list
+
+    Returns the first 16 hex characters of the SHA-256 digest (64-bit prefix
+    is sufficient for collision detection across this small input space and
+    keeps manifest rows compact). Manifest readers compare prefix-only.
+    """
+    hasher = hashlib.sha256()
+    hasher.update(CLASSIFIER_VERSION.encode("utf-8"))
+    hasher.update(b"\x00")
+
+    # SLUG_PREFIX_MAP — sorted by key for deterministic hashing
+    for prefix in sorted(SLUG_PREFIX_MAP):
+        cat, und = SLUG_PREFIX_MAP[prefix]
+        hasher.update(f"{prefix}|{cat.value}|{und}".encode("utf-8"))
+        hasher.update(b"\x00")
+
+    hasher.update(b"---KEYWORD_TO_CATEGORY---\x00")
+    for keyword in sorted(KEYWORD_TO_CATEGORY):
+        cat, und = KEYWORD_TO_CATEGORY[keyword]
+        hasher.update(f"{keyword}|{cat.value}|{und}".encode("utf-8"))
+        hasher.update(b"\x00")
+
+    hasher.update(b"---OUTCOME_TO_MARKET_TYPE---\x00")
+    for outcome in sorted(OUTCOME_TO_MARKET_TYPE):
+        mt = OUTCOME_TO_MARKET_TYPE[outcome]
+        hasher.update(f"{outcome}|{mt.value}".encode("utf-8"))
+        hasher.update(b"\x00")
+
+    for tokens_label, tokens_set in (
+        ("_RANGE_BRACKET_TOKENS", _RANGE_BRACKET_TOKENS),
+        ("_WEEKLY_TOKENS", _WEEKLY_TOKENS),
+        ("_MONTHLY_TOKENS", _MONTHLY_TOKENS),
+        ("_QUARTERLY_TOKENS", _QUARTERLY_TOKENS),
+    ):
+        hasher.update(f"---{tokens_label}---".encode("utf-8"))
+        hasher.update(b"\x00")
+        for tok in sorted(tokens_set):
+            hasher.update(tok.encode("utf-8"))
+            hasher.update(b"\x00")
+
+    return hasher.hexdigest()[:16]
+
+
+CLASSIFIER_STABILITY_HASH: str = _compute_classifier_stability_hash()
 
 
 # ---------------------------------------------------------------------------

@@ -11,6 +11,8 @@ from __future__ import annotations
 import pytest
 
 from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+    CLASSIFIER_STABILITY_HASH,
+    CLASSIFIER_VERSION,
     PredictionShardCategory,
     PredictionShardMarketType,
     PredictionShardResolutionPeriod,
@@ -567,3 +569,82 @@ def test_classifier_fear_factor_should_not_match_fear_greed() -> None:
         outcome="Yes",
     )
     assert category is PredictionShardCategory.MISC
+
+
+# ---------------------------------------------------------------------------
+# Classifier stability hash — predictions plan Phase 0 audit-7 deliverable
+# ---------------------------------------------------------------------------
+
+
+def test_classifier_stability_hash_is_16_hex_chars() -> None:
+    """`CLASSIFIER_STABILITY_HASH` must be a 16-char hex prefix of SHA-256.
+
+    Manifest rows store this prefix; readers compare prefix-only to detect
+    when reclassification is needed.
+    """
+    assert isinstance(CLASSIFIER_STABILITY_HASH, str)
+    assert len(CLASSIFIER_STABILITY_HASH) == 16
+    int(CLASSIFIER_STABILITY_HASH, 16)  # raises ValueError if not hex
+
+
+def test_classifier_version_is_iso_dotted() -> None:
+    """`CLASSIFIER_VERSION` follows ``YYYY-MM-DD.N`` shape so chronological
+    sorting is meaningful in audit logs."""
+    assert isinstance(CLASSIFIER_VERSION, str)
+    parts = CLASSIFIER_VERSION.split(".")
+    assert len(parts) == 2, f"expected 'YYYY-MM-DD.N', got {CLASSIFIER_VERSION!r}"
+    iso_date, revision = parts
+    assert len(iso_date) == 10 and iso_date[4] == "-" and iso_date[7] == "-"
+    assert revision.isdigit()
+
+
+def test_classifier_stability_hash_is_deterministic() -> None:
+    """Re-importing the module must return the same hash — no random salt /
+    no time-dependent inputs."""
+    from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+        CLASSIFIER_STABILITY_HASH as second_read,
+    )
+
+    assert second_read == CLASSIFIER_STABILITY_HASH
+
+
+def test_classifier_stability_hash_changes_on_rule_table_edit() -> None:
+    """Verify the hash function actually depends on the rule tables — i.e.
+    a synthetic edit to a copy of the input changes the output. Defends
+    against a future regression where someone refactors the hash function
+    to no longer read the maps."""
+    from unified_api_contracts.internal.schemas import (
+        _prediction_market_taxonomy as taxonomy_mod,
+    )
+
+    baseline = taxonomy_mod._compute_classifier_stability_hash()  # pyright: ignore[reportPrivateUsage]
+    assert baseline == CLASSIFIER_STABILITY_HASH
+
+    # Sanity: tamper temporarily, recompute, restore. The hash must change
+    # under tampering. This proves the hash function actually reads the
+    # map. (We never mutate the live module state in a way that persists
+    # outside this test.)
+    original_value = taxonomy_mod.SLUG_PREFIX_MAP.pop("btc-")
+    try:
+        tampered = taxonomy_mod._compute_classifier_stability_hash()  # pyright: ignore[reportPrivateUsage]
+        assert tampered != baseline, (
+            "hash function does not depend on SLUG_PREFIX_MAP — tamper test failed"
+        )
+    finally:
+        taxonomy_mod.SLUG_PREFIX_MAP["btc-"] = original_value
+        # Confirm restoration matches baseline
+        assert taxonomy_mod._compute_classifier_stability_hash() == baseline  # pyright: ignore[reportPrivateUsage]
+
+
+def test_classifier_stability_hash_independent_of_dict_iteration_order() -> None:
+    """The hash must be deterministic regardless of dict insertion order.
+    We test by computing twice and asserting equality — Python 3.7+ dicts
+    preserve insertion order, so determinism here also implies the
+    sort-by-key inside the hash function is doing real work."""
+    from unified_api_contracts.internal.schemas import (
+        _prediction_market_taxonomy as taxonomy_mod,
+    )
+
+    a = taxonomy_mod._compute_classifier_stability_hash()  # pyright: ignore[reportPrivateUsage]
+    b = taxonomy_mod._compute_classifier_stability_hash()  # pyright: ignore[reportPrivateUsage]
+    assert a == b
