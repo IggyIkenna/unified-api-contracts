@@ -1,11 +1,9 @@
-<!-- POST_PLAN_BANNER_2026_05_06 -->
-
-> **POST-PLAN REALITY (2026-05-06)** — read [`../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md`](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md) BEFORE making code or doc changes informed by this doc. This doc is partially stale: may not reflect new UAC SSOTs being added in writegate Phase 1B + predictions Phase 1A: BUNDLED_DATA_TYPES, DATA_TYPE_TO_CLUSTER_REGISTRY, SOURCE_PRIORITY, AVAILABILITY_AT_SEMANTICS, CanonicalQuestionGroup enum + classifier, MarketLifecycle, MATCH_END_TIME_DETECTORS, OPTIONS_CLUSTERS (lifted from instruments-service), FUTURES_CLUSTERS, SPORTS_FIXTURE_CLUSTERS, PREDICTION_GROUPS. The post-plan-reality doc lists the 10 cross-cutting principles codified in workspace `CLAUDE.md` (live=batch, no double SSOT, three-category empty-output decision A/B/C, cluster validation mandatory at record_captured, per-row write-time `available_at`, prediction lifecycle timing, temporary state must have named successor, per-VM shard isolation, etc.) plus the active plans where the canonical post-plan reality is being implemented. If this doc and the active plans disagree, the plans win. If you find a contradiction the plans don't address, flag to user — don't decide unilaterally.
-
 # Batch-Live Symmetry Contract
 
-**SSOT:** `docs/UAC_FULL_GAP_ANALYSIS_AND_BATCH_LIVE_SYMMETRY.md` §2
-**Date:** 2026-03-05
+**SSOT:** `docs/UAC_FULL_GAP_ANALYSIS_AND_BATCH_LIVE_SYMMETRY.md` §2 + workspace CLAUDE.md `§ Live = batch — same data, same fields, same timing semantics, different sources OK` (codified 2026-05-06).
+**Date:** 2026-03-05; updated 2026-05-06 with post-plan additions.
+
+**Cross-references**: [`unified-trading-pm/codex/05-infrastructure/deployment-clusters-live-vs-batch.md`](../../unified-trading-pm/codex/05-infrastructure/deployment-clusters-live-vs-batch.md) (taxonomy of live cluster vs batch cluster), [`unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md`](../../unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md) (manifest semantics), [`unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md`](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md).
 
 ---
 
@@ -14,6 +12,30 @@
 > **If two raw records represent the same logical event, their normalized canonical output MUST be equal for all shared fields.**
 
 Normalizers are **pure functions**. No `if mode == "batch"` or `if source == "live"` branching is allowed inside any `normalize/*.py` file. Aggregation, routing, and fan-out are the caller's responsibility.
+
+**Codified workspace rule (2026-05-06)**: Live and batch are operational modes of the SAME pipeline. They produce identical schemas + identical `data_types` + identical fields. The ONLY thing that legitimately differs is which SOURCE serves a given `(asset_group, data_type)`. Banned anti-patterns:
+
+- Separate live-only data_types like `LINEUPS_PRE_MATCH` vs `LINEUPS_POST_MATCH` (different temporal envelopes for the same logical event).
+- Distinct field sets between live + batch parquets.
+- Deriving `available_at` at read-time from the live-batch mode flag.
+
+Per workspace CLAUDE.md `§ Live = batch`: historical writes MUST be timestamped with the `available_at` we'd actually have in live mode (the `unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_PRIORITY` top entry's emission time, NOT the canonical historical archive's slower archive time).
+
+---
+
+## SSOT registries that drive symmetry (post-2026-05-06)
+
+These UAC registries enforce the live=batch contract at runtime — consumed by every data-pipeline service:
+
+| Registry                                                                         | Purpose                                                                                                                                                                                                    |
+| -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `canonical/crosscutting/source_priority.SOURCE_PRIORITY`                         | `(asset_group, data_type) → list[source_key]` — top-entry per pair drives `available_at` stamping latency. Same priority list applies whether the deployment cluster is live or batch.                     |
+| `canonical/crosscutting/availability_semantics.AVAILABILITY_AT_SEMANTICS`        | `(asset_group, data_type)` → semantic enum — drives UTL `availability_stamping.stamp_available_at_*` per row. Same semantic per row in live + batch.                                                       |
+| `canonical/crosscutting/honest_coverage.BUNDLED_DATA_TYPES` + cluster registries | Cluster validation MANDATORY at `ManifestWriter.record_captured` for bundled data*types (options_chain / futures_chain / prediction_canonical_question_group / ODDS*\*). Same enforcement in live + batch. |
+| `canonical/domain/predictions/{canonical_groups,classifiers,lifecycle}`          | Predictions canonical_question_group + lifecycle. Same shape in live + batch.                                                                                                                              |
+| `canonical/domain/sports/MATCH_END_TIME_DETECTORS`                               | Detection cascade for sports `match_end_time`. Same cascade in live + batch.                                                                                                                               |
+
+**Multi-source merge** (Plan D, deferred): when multiple sources serve the same `(asset_group, data_type)`, `SOURCE_PRIORITY` ranks them; per-field provenance tracking via `field_to_source` audit columns; tie-breakers (timestamp-availability > coverage > info-richness > merge-different-fields per user direction 2026-05-06).
 
 ---
 

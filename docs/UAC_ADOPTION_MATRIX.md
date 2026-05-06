@@ -1,8 +1,12 @@
-<!-- POST_PLAN_BANNER_2026_05_06 -->
-
-> **POST-PLAN REALITY (2026-05-06)** — read [`../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md`](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md) BEFORE making code or doc changes informed by this doc. This doc is partially stale: may not reflect new UAC SSOTs being added in writegate Phase 1B + predictions Phase 1A: BUNDLED_DATA_TYPES, DATA_TYPE_TO_CLUSTER_REGISTRY, SOURCE_PRIORITY, AVAILABILITY_AT_SEMANTICS, CanonicalQuestionGroup enum + classifier, MarketLifecycle, MATCH_END_TIME_DETECTORS, OPTIONS_CLUSTERS (lifted from instruments-service), FUTURES_CLUSTERS, SPORTS_FIXTURE_CLUSTERS, PREDICTION_GROUPS. The post-plan-reality doc lists the 10 cross-cutting principles codified in workspace `CLAUDE.md` (live=batch, no double SSOT, three-category empty-output decision A/B/C, cluster validation mandatory at record_captured, per-row write-time `available_at`, prediction lifecycle timing, temporary state must have named successor, per-VM shard isolation, etc.) plus the active plans where the canonical post-plan reality is being implemented. If this doc and the active plans disagree, the plans win. If you find a contradiction the plans don't address, flag to user — don't decide unilaterally.
-
 # UAC Adoption Matrix
+
+<!-- POST_PLAN_SECTION_2026_05_06 -->
+
+## Post-2026-05-06 additions
+
+**Post-2026-05-06 additions** — new UAC SSOTs adopted by every data-pipeline service: `BUNDLED_DATA_TYPES` + cluster registries (consumed by UTL `record_captured`); `SOURCE_PRIORITY` (consumed by UTL `availability_stamping`); `AVAILABILITY_AT_SEMANTICS` (consumed by UTL + adapters); `CanonicalQuestionGroup` + `MarketLifecycle` (consumed by instruments-service + MTDS). QG STEP 5.64 statically checks `record_captured` callsites.
+
+**Workspace SSOTs**: [POST_PLAN_REALITY](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md) (10 cross-cutting principles + active plans), [availability-manifest-and-data-status](../../unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md), [deployment-clusters-live-vs-batch](../../unified-trading-pm/codex/05-infrastructure/deployment-clusters-live-vs-batch.md), [shard-level-failure-isolation](../../unified-trading-pm/codex/04-architecture/shard-level-failure-isolation.md), [error-handling](../../unified-trading-pm/codex/06-coding-standards/error-handling.md), [validation-patterns](../../unified-trading-pm/codex/06-coding-standards/validation-patterns.md).
 
 Generated: 2026-03-14
 
