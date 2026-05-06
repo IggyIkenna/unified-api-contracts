@@ -309,12 +309,35 @@ CROSS_INSTRUMENT_FEATURE_GROUPS: tuple[str, ...] = (
     "dxy_momentum",
     "cointegration",
     "composite_sr",
+    "paired_price_dispersion",
     "polymarket_crowd_sentiment",
     "polymarket_trade_flow",
     "polymarket_whale_activity",
     "polymarket_market_microstructure",
     "polymarket_cross_market",
     "polymarket_temporal_patterns",
+)
+# `paired_price_dispersion` (Phase 9) has a DIFFERENT shard atom than the
+# rest of the cross-instrument family. The other groups are
+# (asset_group, instrument_type, instrument_id, day) — per-instrument.
+# `paired_price_dispersion` is
+# (asset_group, left_venue, left_root, right_venue, right_root, day) —
+# per-pair, computed from two simultaneously-aligned legs. The standard
+# `_register(...)` per-instrument loop is intentionally skipped for this
+# group; the calculator consumes pre-aligned `(left_close, right_close,
+# expiry, days_to_expiry)` columns and emits `spread_bps`,
+# `annualised_apy_bps`. The leg-resolver + raw_tick_data fetch lives
+# upstream of the calculator (catalog spec param parser → MTDS read).
+_PAIRED_PRICE_DISPERSION_REQUIRED_COLUMNS: tuple[str, ...] = (
+    "timestamp",
+    "left_venue",
+    "left_root",
+    "right_venue",
+    "right_root",
+    "left_close",
+    "right_close",
+    "expiry",
+    "days_to_expiry",
 )
 
 COMMODITY_FEATURE_GROUPS: tuple[str, ...] = (
@@ -432,6 +455,12 @@ for _cat, _itype, _symcol in _XINST_DIRECTIONAL_TARGETS:
     for _fg in CROSS_INSTRUMENT_FEATURE_GROUPS:
         # Polymarket-* feature groups aggregate Polymarket trades into
         # directional-instrument-level features — register them here too.
+        # `paired_price_dispersion` is per-pair not per-instrument — skip
+        # the per-instrument registration; its shard atom is registered
+        # separately downstream (deployment-api `data_status_axis_matrix`
+        # SSOT picks up the per-pair shape).
+        if _fg == "paired_price_dispersion":
+            continue
         _register(_cat, _itype, _fg, symbol_column=_symcol)
 
 for _cat, _itype, _symcol in _XINST_DEFI_TARGETS:
@@ -474,4 +503,5 @@ __all__ = [
     "ONCHAIN_FEATURE_GROUPS",
     "SPORTS_FEATURE_GROUPS",
     "VOLATILITY_FEATURE_GROUPS",
+    "_PAIRED_PRICE_DISPERSION_REQUIRED_COLUMNS",
 ]
