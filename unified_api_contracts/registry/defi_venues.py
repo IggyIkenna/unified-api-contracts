@@ -51,6 +51,23 @@ ALL_DEFI_VENUES: list[str] = [
     "YEARNV3-ETHEREUM",
     "FRAX-ETHEREUM",
     "MAKER-ETHEREUM",
+    # ── LST / staking-yield protocols on Ethereum (added 2026-05-07 per
+    #    DEFI-panel audit — these were live in the lst-rates bucket but
+    #    not declared, causing duplicate "no chevron" rendering in the
+    #    deployment-ui DEFI panel). All are actively backfilled by MTDS
+    #    via the lst-rates sub-bucket.
+    "ANKR-ETHEREUM",
+    "ROCKETPOOL-ETHEREUM",
+    "STADER-ETHEREUM",
+    "STAKEWISE-ETHEREUM",
+    "SWELL-ETHEREUM",
+    "PUFFER-ETHEREUM",
+    "MANTLE-ETHEREUM",
+    # ── Gas-fee oracle (operates as a DeFi-context gas price source via
+    #    the gas-fees sub-bucket; declared so the data-status panel
+    #    renders it as an expected DeFi venue).
+    "ALCHEMY-ETHEREUM",
+    "EIGENLAYER-ETHEREUM",
     # ── Arbitrum ──
     "UNISWAPV3-ARBITRUM",
     "AAVEV3-ARBITRUM",
@@ -105,6 +122,13 @@ ALL_DEFI_VENUES: list[str] = [
     "MARINADE-SOLANA",
     "ORCA-SOLANA",
     "RAYDIUM-SOLANA",
+    # Solana LST/staking-yield (added 2026-05-07 — MTDS backfilled; data-
+    # status was treating them as un-declared). JITO already in
+    # MTDS_DEFI_VENUES below; this adds it to the full DeFi registry too.
+    "JITO-SOLANA",
+    "MARGINFI-SOLANA",
+    "SOLEND-SOLANA",
+    "DRIFT-SOLANA",
 ]
 
 
@@ -165,6 +189,136 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "MARINADE": "MARINADE-SOLANA",
     "ORCA": "ORCA-SOLANA",
     "RAYDIUM": "RAYDIUM-SOLANA",
+    "JITO": "JITO-SOLANA",
+    "MARGINFI": "MARGINFI-SOLANA",
+    "SOLEND": "SOLEND-SOLANA",
+    "DRIFT": "DRIFT-SOLANA",
+    # LST / staking-yield protocols on Ethereum (added 2026-05-07 — DEFI
+    # panel audit). Bare-name aliases needed because the manifest carries
+    # them as ``venue=ANKR chain=ETHEREUM`` etc.; the
+    # ``VenueMapping.normalize_defi_venue`` lookup only matches
+    # ``raw_venue in all_defi_venues`` for fully-canonical strings, so
+    # bare names need an explicit alias to resolve.
+    "ANKR": "ANKR-ETHEREUM",
+    "ROCKETPOOL": "ROCKETPOOL-ETHEREUM",
+    "STADER": "STADER-ETHEREUM",
+    "STAKEWISE": "STAKEWISE-ETHEREUM",
+    "SWELL": "SWELL-ETHEREUM",
+    "PUFFER": "PUFFER-ETHEREUM",
+    "MANTLE": "MANTLE-ETHEREUM",
+    # Gas-fee + restaking oracles
+    "ALCHEMY": "ALCHEMY-ETHEREUM",
+    "EIGENLAYER": "EIGENLAYER-ETHEREUM",
+}
+
+
+# ---------------------------------------------------------------------------
+# DeFi venue phase — distinguishes actively-backfilled venues ("live") from
+# UAC-declared roadmap entries ("pipeline"). The deployment-ui DEFI panel
+# uses this to render only "live" venues in the live-coverage section AND
+# surface "pipeline" venues in a separate roadmap section so operators see
+# what's queued without polluting the active honest-coverage view. Added
+# 2026-05-07 per DEFI panel audit.
+#
+# - "live": MTDS backfill is shipping data; manifest has rows; UI shows
+#   in the main DEFI panel with chevron + dates.
+# - "pipeline": UAC declares the venue (chain expansion roadmap, not yet
+#   plumbed in MTDS); manifest has zero rows; UI shows in a "roadmap"
+#   section so the operator can see what's coming.
+#
+# Every entry in ``ALL_DEFI_VENUES`` must appear here. The
+# ``DEFI_VENUE_PHASE`` test (test_defi_venue_phase_coverage) asserts the
+# 1:1 invariant.
+# ---------------------------------------------------------------------------
+
+
+DEFI_VENUE_PHASE: dict[str, str] = {
+    # ── Live (Ethereum DEX / lending) ──
+    "UNISWAPV2-ETHEREUM": "live",
+    "UNISWAPV3-ETHEREUM": "live",
+    "UNISWAPV4-ETHEREUM": "live",
+    "CURVE-ETHEREUM": "live",
+    "BALANCER-ETHEREUM": "live",
+    "AAVEV3-ETHEREUM": "live",
+    "COMPOUNDV3-ETHEREUM": "live",
+    "MORPHO-ETHEREUM": "live",
+    "FLUID-ETHEREUM": "live",
+    "SPARK-ETHEREUM": "live",
+    "SUSHISWAPV3-ETHEREUM": "live",
+    "PANCAKESWAPV3-ETHEREUM": "live",
+    "MORPHOVAULTS-ETHEREUM": "live",
+    "YEARNV3-ETHEREUM": "live",
+    "FRAX-ETHEREUM": "live",
+    "MAKER-ETHEREUM": "live",
+    # ── Live (Ethereum LST / staking-yield) ──
+    "LIDO-ETHEREUM": "live",
+    "ETHERFI-ETHEREUM": "live",
+    "ETHENA-ETHEREUM": "live",
+    "ANKR-ETHEREUM": "live",
+    "ROCKETPOOL-ETHEREUM": "live",
+    "STADER-ETHEREUM": "live",
+    "STAKEWISE-ETHEREUM": "live",
+    "SWELL-ETHEREUM": "live",
+    "PUFFER-ETHEREUM": "live",
+    "MANTLE-ETHEREUM": "live",
+    # ── Live (Ethereum gas / restaking oracles) ──
+    "ALCHEMY-ETHEREUM": "live",
+    "EIGENLAYER-ETHEREUM": "live",
+    # ── Pipeline (Arbitrum) — UAC-declared, MTDS backfill not yet shipping ──
+    "UNISWAPV3-ARBITRUM": "pipeline",
+    "AAVEV3-ARBITRUM": "pipeline",
+    "COMPOUNDV3-ARBITRUM": "pipeline",
+    "BALANCER-ARBITRUM": "pipeline",
+    "SUSHISWAP-ARBITRUM": "pipeline",
+    "PANCAKESWAPV3-ARBITRUM": "pipeline",
+    "CAMELOTV3-ARBITRUM": "pipeline",
+    "GMX-ARBITRUM": "pipeline",
+    # ── Pipeline (Base) ──
+    "UNISWAPV3-BASE": "pipeline",
+    "AAVEV3-BASE": "pipeline",
+    "COMPOUNDV3-BASE": "pipeline",
+    "BALANCER-BASE": "pipeline",
+    "MORPHO-BASE": "pipeline",
+    "SUSHISWAPV3-BASE": "pipeline",
+    "PANCAKESWAPV3-BASE": "pipeline",
+    "AERODROMEV3-BASE": "pipeline",
+    # ── Pipeline (Optimism) ──
+    "UNISWAPV3-OPTIMISM": "pipeline",
+    "AAVEV3-OPTIMISM": "pipeline",
+    "COMPOUNDV3-OPTIMISM": "pipeline",
+    "BALANCER-OPTIMISM": "pipeline",
+    "CURVE-OPTIMISM": "pipeline",
+    "VELODROMEV2-OPTIMISM": "pipeline",
+    # ── Pipeline (Polygon) ──
+    "UNISWAPV3-POLYGON": "pipeline",
+    "AAVEV3-POLYGON": "pipeline",
+    "BALANCER-POLYGON": "pipeline",
+    "COMPOUNDV3-POLYGON": "pipeline",
+    # ── Pipeline (Avalanche) ──
+    "AAVEV3-AVALANCHE": "pipeline",
+    "BALANCER-AVALANCHE": "pipeline",
+    "CURVE-AVALANCHE": "pipeline",
+    "GMX-AVALANCHE": "pipeline",
+    "SUSHISWAPV3-AVALANCHE": "pipeline",
+    "TRADER_JOEV2-AVALANCHE": "pipeline",
+    # ── Pipeline (BSC) ──
+    "AAVEV3-BSC": "pipeline",
+    "PANCAKESWAPV3-BSC": "pipeline",
+    # ── Pipeline (Linea / Scroll / zkSync) ──
+    "AAVEV3-LINEA": "pipeline",
+    "AAVEV3-SCROLL": "pipeline",
+    "COMPOUNDV3-SCROLL": "pipeline",
+    "AAVEV3-ZKSYNC": "pipeline",
+    # ── Live (Solana — JITO, MARINADE, ORCA, RAYDIUM, KAMINO actively
+    #    backfilled per memory.project_carry_tracer_session_2026_05_06) ──
+    "KAMINO-SOLANA": "live",
+    "MARINADE-SOLANA": "live",
+    "ORCA-SOLANA": "live",
+    "RAYDIUM-SOLANA": "live",
+    "JITO-SOLANA": "live",
+    "MARGINFI-SOLANA": "live",
+    "SOLEND-SOLANA": "live",
+    "DRIFT-SOLANA": "live",
 }
 
 
@@ -227,4 +381,9 @@ MTDS_DEFI_VENUES: list[str] = [
 ]
 
 
-__all__ = ["ALL_DEFI_VENUES", "LEGACY_DEFI_VENUE_ALIASES", "MTDS_DEFI_VENUES"]
+__all__ = [
+    "ALL_DEFI_VENUES",
+    "DEFI_VENUE_PHASE",
+    "LEGACY_DEFI_VENUE_ALIASES",
+    "MTDS_DEFI_VENUES",
+]
