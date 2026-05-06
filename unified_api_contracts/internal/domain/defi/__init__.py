@@ -16,6 +16,11 @@ from unified_api_contracts.internal.domain.defi.gas_cost import (
     GasTokenBalanceImpact,
     InstructionGasCost,
 )
+from unified_api_contracts.internal.domain.defi.lst import (
+    LST_TOKEN_TO_PROTOCOL_ASSET,
+    protocol_asset_for_token,
+    tokens_for_protocol_asset,
+)
 from unified_api_contracts.internal.domain.defi.parquet_records import (
     DexPoolDayRecord,
     LendingIndexRecord,
@@ -127,6 +132,7 @@ from unified_api_contracts.internal.domain.features_onchain.protocol_params impo
 __all__ = [
     "AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET",
     "AAVE_V3_RATE_MODEL_DEFAULT_FALLBACK",
+    "LST_TOKEN_TO_PROTOCOL_ASSET",
     "AaveBorrowParams",
     "AaveDepositParams",
     "AaveFlashLoanParams",
@@ -222,6 +228,8 @@ __all__ = [
     "compute_supply_rate",
     "compute_utilization",
     "get_aave_v3_rate_model_defaults",
+    "protocol_asset_for_token",
     "simulate_rate_impact",
+    "tokens_for_protocol_asset",
     "wallet_config_gcs_path",
 ]
