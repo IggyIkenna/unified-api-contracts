@@ -1,0 +1,142 @@
+"""Sanity tests for ``PROTOCOL_LAUNCH_DATES`` — the per-(chain, protocol)
+mainnet launch SSOT used by the data-status panel for pre-protocol-launch
+date clipping.
+
+Mirrors ``test_chain_genesis_dates.py`` but at the (chain, protocol)
+shard-axis granularity per the codex shard-key matrix for DeFi:
+``(asset_group=defi, chain, venue/protocol, data_type, instrument, day)``.
+"""
+
+from __future__ import annotations
+
+import re
+from datetime import date
+
+import pytest
+
+from unified_api_contracts.registry.chain_env import (
+    _PROTOCOL_LAUNCH_PENDING_INVESTIGATION,
+    CHAIN_GENESIS_DATES,
+    PROTOCOL_LAUNCH_DATES,
+    get_chain_genesis_date,
+    get_protocol_launch_date,
+)
+from unified_api_contracts.registry.defi_venues import ALL_DEFI_VENUES
+
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _split_canonical_venue(canonical: str) -> tuple[str, str] | None:
+    """``"AAVEV3-ARBITRUM"`` → ``("ARBITRUM", "AAVEV3")``.
+
+    Returns ``None`` for venues that don't follow the ``PROTOCOL-CHAIN``
+    convention (currently none, but the helper future-proofs the test).
+    """
+    if "-" not in canonical:
+        return None
+    protocol, chain = canonical.rsplit("-", 1)
+    return chain, protocol
+
+
+def test_protocol_launch_dates_iso_format() -> None:
+    """Every value is a parseable ISO YYYY-MM-DD."""
+    for (chain, protocol), iso in PROTOCOL_LAUNCH_DATES.items():
+        assert _ISO_DATE_RE.match(iso), f"({chain},{protocol}): {iso!r} not ISO YYYY-MM-DD"
+        date.fromisoformat(iso)  # raises if invalid
+
+
+def test_protocol_launch_dates_keys_are_uppercase() -> None:
+    """Both halves of every key match the canonical UPPER form used in
+    ``CHAIN_GENESIS_DATES``, ``ALL_DEFI_VENUES``, and the manifest."""
+    for chain, protocol in PROTOCOL_LAUNCH_DATES:
+        assert chain == chain.upper(), f"chain {chain!r} should be UPPER"
+        assert protocol == protocol.upper(), f"protocol {protocol!r} should be UPPER"
+
+
+def test_protocol_launch_dates_chain_known_to_genesis_ssot() -> None:
+    """Every chain referenced by ``PROTOCOL_LAUNCH_DATES`` must also be
+    declared in ``CHAIN_GENESIS_DATES`` — otherwise the
+    ``max(chain_genesis, protocol_launch)`` composition silently drops
+    one of the clips."""
+    for chain, _protocol in PROTOCOL_LAUNCH_DATES:
+        assert chain in CHAIN_GENESIS_DATES, f"chain {chain!r} in PROTOCOL_LAUNCH_DATES but not in CHAIN_GENESIS_DATES"
+
+
+def test_protocol_launch_after_chain_genesis() -> None:
+    """A protocol cannot have launched on a chain before the chain
+    itself existed. Catches typo-class data-entry errors."""
+    for (chain, protocol), launch_iso in PROTOCOL_LAUNCH_DATES.items():
+        chain_genesis_iso = CHAIN_GENESIS_DATES[chain]
+        launch = date.fromisoformat(launch_iso)
+        chain_genesis = date.fromisoformat(chain_genesis_iso)
+        assert launch >= chain_genesis, (
+            f"({chain},{protocol}) launch {launch_iso} predates chain genesis {chain_genesis_iso}"
+        )
+
+
+def test_every_defi_venue_declared_or_pending() -> None:
+    """Every canonical ``PROTOCOL-CHAIN`` entry in ``ALL_DEFI_VENUES``
+    must either have a launch date in ``PROTOCOL_LAUNCH_DATES`` OR be
+    on the ``_PROTOCOL_LAUNCH_PENDING_INVESTIGATION`` skip list. Adding
+    a new DeFi venue without doing one of those two is a CI failure —
+    silent NaN clipping was the ARBITRUM 32/54 bug we are fixing."""
+    declared = set(PROTOCOL_LAUNCH_DATES.keys())
+    pending = _PROTOCOL_LAUNCH_PENDING_INVESTIGATION
+    missing: list[tuple[str, str]] = []
+    for venue in ALL_DEFI_VENUES:
+        split = _split_canonical_venue(venue)
+        if split is None:
+            continue
+        if split in declared or split in pending:
+            continue
+        missing.append(split)
+    assert not missing, (
+        f"DeFi (chain, protocol) pairs missing from PROTOCOL_LAUNCH_DATES: "
+        f"{sorted(missing)}. Either research + declare the launch date OR "
+        "add to _PROTOCOL_LAUNCH_PENDING_INVESTIGATION."
+    )
+
+
+def test_pending_investigation_disjoint_from_declared() -> None:
+    """A pair is either declared with a date OR pending — not both.
+    Catches stale skip-list entries left behind after research lands."""
+    overlap = set(PROTOCOL_LAUNCH_DATES.keys()) & _PROTOCOL_LAUNCH_PENDING_INVESTIGATION
+    assert not overlap, (
+        f"({sorted(overlap)}) appear in both PROTOCOL_LAUNCH_DATES and "
+        "_PROTOCOL_LAUNCH_PENDING_INVESTIGATION — remove the latter once "
+        "the former lands."
+    )
+
+
+@pytest.mark.parametrize(
+    ("chain", "protocol", "expected"),
+    [
+        ("ETHEREUM", "AAVEV3", "2022-03-14"),
+        ("ethereum", "aavev3", "2022-03-14"),  # case-insensitive
+        ("ARBITRUM", "AAVEV3", "2022-03-16"),
+        ("BASE", "AAVEV3", "2023-08-09"),
+        ("ETHEREUM", "UNISWAPV3", "2021-05-04"),
+        ("SOLANA", "JITO", "2022-08-15"),
+    ],
+)
+def test_get_protocol_launch_date_known(chain: str, protocol: str, expected: str) -> None:
+    assert get_protocol_launch_date(chain, protocol) == expected
+
+
+def test_get_protocol_launch_date_unknown_returns_none() -> None:
+    assert get_protocol_launch_date("UNKNOWN_CHAIN", "AAVEV3") is None
+    assert get_protocol_launch_date("ETHEREUM", "UNKNOWN_PROTOCOL") is None
+    assert get_protocol_launch_date("", "AAVEV3") is None
+    assert get_protocol_launch_date("ETHEREUM", "") is None
+
+
+def test_compose_with_chain_genesis_takes_max() -> None:
+    """The documented composition ``max(chain_genesis, protocol_launch)``
+    is the contract callers depend on. Verify with a concrete pair where
+    the protocol launch postdates chain genesis (AAVEV3-ARBITRUM)."""
+    chain_genesis = get_chain_genesis_date("ARBITRUM")
+    protocol_launch = get_protocol_launch_date("ARBITRUM", "AAVEV3")
+    assert chain_genesis == "2021-08-31"
+    assert protocol_launch == "2022-03-16"
+    # max of the two iso strings is the protocol launch (later)
+    assert max(chain_genesis, protocol_launch) == "2022-03-16"

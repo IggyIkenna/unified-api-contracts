@@ -123,6 +123,141 @@ def get_chain_genesis_date(chain_name: str) -> str | None:
     return CHAIN_GENESIS_DATES.get(chain_name.upper()) if chain_name else None
 
 
+# Per-(chain, protocol) launch dates for DeFi protocols. Mirrors the role
+# ``CHAIN_GENESIS_DATES`` plays for chains: clips pre-protocol-launch days
+# from the data-status panel's expected denominator. Without this clip,
+# AAVEV3-ARBITRUM's "expected dates" stretch back to ARBITRUM genesis
+# (2021-08-31) even though Aave V3 didn't deploy on Arbitrum until
+# 2022-03-16, inflating the leaf-shard denominator by ~6 months of
+# always-empty days.
+#
+# Callers compose this with ``CHAIN_GENESIS_DATES`` via
+# ``max(chain_genesis, protocol_launch)`` to get the effective earliest
+# date a (chain, protocol) shard could exist.
+#
+# Date sources are public mainnet announcements / The Graph subgraph
+# deploy timestamps / DefiLlama protocol-launch metadata. Pairs whose
+# launch date is not yet researched live in
+# ``_PROTOCOL_LAUNCH_PENDING_INVESTIGATION`` and the sanity test allows
+# their absence; new entries to ``ALL_DEFI_VENUES`` not present in
+# either set fail the test loudly.
+PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
+    # ── Aave V3 (per-chain mainnet deploy dates) ──
+    ("ETHEREUM", "AAVEV3"): "2022-03-14",
+    ("ARBITRUM", "AAVEV3"): "2022-03-16",
+    ("OPTIMISM", "AAVEV3"): "2022-08-04",
+    ("POLYGON", "AAVEV3"): "2022-03-16",
+    ("AVALANCHE", "AAVEV3"): "2022-03-16",
+    ("BASE", "AAVEV3"): "2023-08-09",  # chain genesis, deployed day-zero
+    ("BSC", "AAVEV3"): "2023-04-06",
+    ("LINEA", "AAVEV3"): "2024-09-26",
+    ("SCROLL", "AAVEV3"): "2024-04-29",
+    ("ZKSYNC", "AAVEV3"): "2024-04-09",
+    # ── Compound V3 (Comet) ──
+    ("ETHEREUM", "COMPOUNDV3"): "2022-08-25",
+    ("ARBITRUM", "COMPOUNDV3"): "2023-04-13",
+    ("BASE", "COMPOUNDV3"): "2023-08-26",
+    ("OPTIMISM", "COMPOUNDV3"): "2024-02-15",
+    ("POLYGON", "COMPOUNDV3"): "2023-02-14",
+    ("SCROLL", "COMPOUNDV3"): "2024-04-22",
+    # ── Uniswap (V2 / V3 / V4) ──
+    ("ETHEREUM", "UNISWAPV2"): "2020-05-04",
+    ("ETHEREUM", "UNISWAPV3"): "2021-05-04",
+    ("ARBITRUM", "UNISWAPV3"): "2021-08-31",  # chain genesis, deployed day-zero
+    ("OPTIMISM", "UNISWAPV3"): "2021-12-16",  # chain genesis, deployed day-zero
+    ("POLYGON", "UNISWAPV3"): "2021-12-21",
+    ("BASE", "UNISWAPV3"): "2023-08-09",  # chain genesis, deployed day-zero
+    ("ETHEREUM", "UNISWAPV4"): "2025-01-31",
+    # ── Curve / Balancer / SushiSwap ──
+    ("ETHEREUM", "CURVE"): "2020-01-19",
+    ("ETHEREUM", "BALANCER"): "2020-03-31",
+    ("ETHEREUM", "SUSHISWAPV3"): "2023-04-04",
+    # ── Liquid Staking / yield protocols (Ethereum) ──
+    ("ETHEREUM", "LIDO"): "2020-12-19",
+    ("ETHEREUM", "ROCKETPOOL"): "2021-11-08",
+    ("ETHEREUM", "ETHERFI"): "2023-04-25",
+    ("ETHEREUM", "ETHENA"): "2024-02-19",
+    ("ETHEREUM", "MAKER"): "2017-12-19",
+    ("ETHEREUM", "FRAX"): "2020-12-21",
+    # ── Solana ──
+    ("SOLANA", "JITO"): "2022-08-15",
+    ("SOLANA", "MARINADE"): "2021-08-02",
+    ("SOLANA", "RAYDIUM"): "2021-02-21",
+    ("SOLANA", "ORCA"): "2021-02-09",
+    ("SOLANA", "KAMINO"): "2022-08-23",
+    ("SOLANA", "DRIFT"): "2021-11-18",
+    # ── Perp DEXes / aggregators ──
+    ("ARBITRUM", "GMX"): "2021-09-01",
+    ("AVALANCHE", "GMX"): "2022-01-05",
+}
+
+# (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch
+# date has not yet been researched. The sanity test allows their
+# absence from ``PROTOCOL_LAUNCH_DATES``; callers without an entry
+# fall back to ``CHAIN_GENESIS_DATES`` (over-clipping toward chain
+# genesis is fine — under-clipping inflates the missing-shards
+# denominator). Add a launch date and remove the pair from this set
+# to tighten the clip.
+_PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("ETHEREUM", "MORPHO"),
+        ("ETHEREUM", "FLUID"),
+        ("ETHEREUM", "SPARK"),
+        ("ETHEREUM", "MORPHOVAULTS"),
+        ("ETHEREUM", "YEARNV3"),
+        ("ETHEREUM", "ANKR"),
+        ("ETHEREUM", "STADER"),
+        ("ETHEREUM", "STAKEWISE"),
+        ("ETHEREUM", "SWELL"),
+        ("ETHEREUM", "PUFFER"),
+        ("ETHEREUM", "MANTLE"),
+        ("ETHEREUM", "ALCHEMY"),
+        ("ETHEREUM", "EIGENLAYER"),
+        ("ETHEREUM", "PANCAKESWAPV3"),
+        ("ARBITRUM", "BALANCER"),
+        ("ARBITRUM", "SUSHISWAP"),
+        ("ARBITRUM", "PANCAKESWAPV3"),
+        ("ARBITRUM", "CAMELOTV3"),
+        ("BASE", "BALANCER"),
+        ("BASE", "MORPHO"),
+        ("BASE", "SUSHISWAPV3"),
+        ("BASE", "PANCAKESWAPV3"),
+        ("BASE", "AERODROMEV3"),
+        ("OPTIMISM", "BALANCER"),
+        ("OPTIMISM", "CURVE"),
+        ("OPTIMISM", "VELODROMEV2"),
+        ("POLYGON", "BALANCER"),
+        ("AVALANCHE", "BALANCER"),
+        ("AVALANCHE", "CURVE"),
+        ("AVALANCHE", "SUSHISWAPV3"),
+        ("AVALANCHE", "TRADER_JOEV2"),
+        ("BSC", "PANCAKESWAPV3"),
+        ("SOLANA", "MARGINFI"),
+        ("SOLANA", "SOLEND"),
+    }
+)
+
+
+def get_protocol_launch_date(chain: str, protocol: str) -> str | None:
+    """Return the (chain, protocol) mainnet launch date or ``None``.
+
+    Case-insensitive on both args. Used by the data-status panel's
+    expected-universe builder to clip pre-protocol-launch days from
+    the leaf-shard denominator. Callers should compose with
+    ``get_chain_genesis_date(chain)`` via:
+
+        effective = max(get_chain_genesis_date(chain) or "",
+                        get_protocol_launch_date(chain, protocol) or "")
+
+    so the result respects whichever clip is tighter (pre-1.0 the
+    chain genesis is a safe fallback when a protocol pair is not yet
+    declared).
+    """
+    if not chain or not protocol:
+        return None
+    return PROTOCOL_LAUNCH_DATES.get((chain.upper(), protocol.upper()))
+
+
 # Environment names
 CHAIN_ENVS = ("mainnet", "testnet", "fork")
 
