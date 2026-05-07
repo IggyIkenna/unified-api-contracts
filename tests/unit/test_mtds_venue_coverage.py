@@ -215,7 +215,10 @@ class TestMultiChainDefiExpansion:
             ("PANCAKESWAP_V3", "ARBITRUM"),
             ("PANCAKESWAP_V3", "BASE"),
             ("PANCAKESWAP_V3", "BSC"),
-            ("PANCAKESWAP_V3", "ZKSYNC"),
+            # PANCAKESWAPV3-ZKSYNC dropped 2026-05-06 (UAC@7cb9068) — low-quality +
+            # low-volume data; 446 manifest rows purged. Do NOT re-add without
+            # data-quality + liquidity validation. SSOT comment in
+            # `unified_api_contracts/registry/defi_venues.py:116`.
             # SushiSwap V3
             ("SUSHISWAP_V3", "ETHEREUM"),
             ("SUSHISWAP_V3", "AVALANCHE"),

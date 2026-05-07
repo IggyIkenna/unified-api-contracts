@@ -85,6 +85,20 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "gas_fees"): ["onchain_rpc"],
     ("defi", "lst_yields"): ["onchain_subgraph"],
     ("defi", "vault_state"): ["onchain_subgraph"],
+    # Phase 1A feature_dag seed gap closeout (2026-05-07): 5 on-chain DeFi
+    # data_types declared in AVAILABILITY_AT_SEMANTICS but missing from
+    # SOURCE_PRIORITY. Top-entry-only seeds per the Phase 1B convention
+    # documented in this module's docstring; multi-source merge (e.g. The
+    # Graph for AaveV3 + morpho_blue_api for Morpho on lending_indices)
+    # is deferred to ``multi_source_priority_merge_2026_*<TBD>.plan.md``.
+    # `risk_params` reads protocol configurator state at the contract level
+    # (Aave LendingPoolConfigurator, Morpho IRM params) → ``onchain_rpc``;
+    # the other four are event-stream / index reads → ``onchain_subgraph``.
+    ("defi", "lending_indices"): ["onchain_subgraph"],
+    ("defi", "risk_params"): ["onchain_rpc"],
+    ("defi", "rewards"): ["onchain_subgraph"],
+    ("defi", "flash_loan_events"): ["onchain_subgraph"],
+    ("defi", "eigenlayer_rewards"): ["onchain_subgraph"],
     # ---- TradFi ---------------------------------------------------------
     # Databento for CME/NQ/options/futures; Yahoo for VIX 15m rolling
     # window; Barchart for VIX 15m historical preload (handled at the
