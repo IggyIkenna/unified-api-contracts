@@ -10,7 +10,6 @@ from unified_api_contracts.canonical.crosscutting.availability_semantics import 
     has_availability_semantic,
 )
 
-
 # ---------------------------------------------------------------------------
 # Sports semantics
 # ---------------------------------------------------------------------------

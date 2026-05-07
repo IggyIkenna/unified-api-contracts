@@ -627,9 +627,7 @@ def test_classifier_stability_hash_changes_on_rule_table_edit() -> None:
     original_value = taxonomy_mod.SLUG_PREFIX_MAP.pop("btc-")
     try:
         tampered = taxonomy_mod._compute_classifier_stability_hash()  # pyright: ignore[reportPrivateUsage]
-        assert tampered != baseline, (
-            "hash function does not depend on SLUG_PREFIX_MAP — tamper test failed"
-        )
+        assert tampered != baseline, "hash function does not depend on SLUG_PREFIX_MAP — tamper test failed"
     finally:
         taxonomy_mod.SLUG_PREFIX_MAP["btc-"] = original_value
         # Confirm restoration matches baseline

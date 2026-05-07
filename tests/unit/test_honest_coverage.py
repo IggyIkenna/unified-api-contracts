@@ -20,7 +20,6 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     parse_futures_expiry,
 )
 
-
 # ---------------------------------------------------------------------------
 # BUNDLED_DATA_TYPES
 # ---------------------------------------------------------------------------
@@ -149,10 +148,7 @@ def test_futures_expiry_bucket_respects_custom_window() -> None:
     # ESM6 expires 19 Jun 2026; as_of 1 Apr 2026 → 79 days.
     # default 60d window → back; 90d window → front.
     assert futures_expiry_bucket("ESM6", as_of=date(2026, 4, 1)) == "back"
-    assert (
-        futures_expiry_bucket("ESM6", as_of=date(2026, 4, 1), front_window_days=90)
-        == "front"
-    )
+    assert futures_expiry_bucket("ESM6", as_of=date(2026, 4, 1), front_window_days=90) == "front"
 
 
 # ---------------------------------------------------------------------------
@@ -165,7 +161,7 @@ def test_futures_chain_buckets_is_frozenset() -> None:
 
 
 def test_futures_chain_buckets_contains_three_canonical_buckets() -> None:
-    assert FUTURES_CHAIN_BUCKETS == frozenset({"front", "back", "spread"})
+    assert frozenset({"front", "back", "spread"}) == FUTURES_CHAIN_BUCKETS
 
 
 @pytest.mark.parametrize(
@@ -178,7 +174,5 @@ def test_futures_chain_buckets_contains_three_canonical_buckets() -> None:
         ("ESH5-ESM5", date(2026, 1, 1), "spread"),
     ],
 )
-def test_futures_expiry_bucket_parametric(
-    symbol: str, as_of: date, expected: str
-) -> None:
+def test_futures_expiry_bucket_parametric(symbol: str, as_of: date, expected: str) -> None:
     assert futures_expiry_bucket(symbol, as_of=as_of) == expected

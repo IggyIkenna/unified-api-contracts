@@ -14,7 +14,6 @@ from unified_api_contracts.canonical.crosscutting.source_priority import (
     has_source_priority,
 )
 
-
 # ---------------------------------------------------------------------------
 # Sports primary sources
 # ---------------------------------------------------------------------------
@@ -149,10 +148,7 @@ def test_every_availability_semantic_pair_has_source_priority() -> None:
     for key in AVAILABILITY_AT_SEMANTICS:
         if key not in SOURCE_PRIORITY:
             missing.append(key)
-    assert not missing, (
-        f"{len(missing)} pairs have availability semantic but no source priority: "
-        f"{missing[:10]}"
-    )
+    assert not missing, f"{len(missing)} pairs have availability semantic but no source priority: {missing[:10]}"
 
 
 def test_every_source_priority_pair_has_availability_semantic() -> None:
@@ -161,7 +157,4 @@ def test_every_source_priority_pair_has_availability_semantic() -> None:
     for key in SOURCE_PRIORITY:
         if key not in AVAILABILITY_AT_SEMANTICS:
             missing.append(key)
-    assert not missing, (
-        f"{len(missing)} pairs have source priority but no availability semantic: "
-        f"{missing[:10]}"
-    )
+    assert not missing, f"{len(missing)} pairs have source priority but no availability semantic: {missing[:10]}"
