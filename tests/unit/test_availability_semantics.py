@@ -93,8 +93,7 @@ def test_defi_phase_1a_seed_gap_data_types_use_tick_timestamp() -> None:
         "eigenlayer_rewards",
     ):
         assert get_availability_semantic("defi", data_type) == "tick_timestamp", (
-            f"defi/{data_type} expected tick_timestamp; "
-            f"got {get_availability_semantic('defi', data_type)}"
+            f"defi/{data_type} expected tick_timestamp; got {get_availability_semantic('defi', data_type)}"
         )
         assert has_availability_semantic("defi", data_type)
 

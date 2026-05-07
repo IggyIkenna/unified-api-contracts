@@ -124,11 +124,16 @@ from unified_api_contracts.internal.connectivity import (
 )
 from unified_api_contracts.internal.deployment import (
     VM_INFRASTRUCTURE_EVENTS,
+    BackfillLaunchRequest,
+    BackfillLaunchResult,
+    BackfillLaunchTaskKind,
     ComputeType,
     DeploymentState,
     DeploymentStatus,
     ShardEvent,
+    VMEventListResult,
     VMEventType,
+    VMLifecycleEvent,
 )
 from unified_api_contracts.internal.domain.account import (
     AccountRegistry,
@@ -974,6 +979,9 @@ __all__ = [
     "AuthFailureDetails",
     "AuthFailureEvent",
     "AutoReconcileReason",
+    "BackfillLaunchRequest",
+    "BackfillLaunchResult",
+    "BackfillLaunchTaskKind",
     "BackfillSpec",
     "BacktestExperimentConfig",
     "BacktestFixedConfig",
@@ -1544,7 +1552,9 @@ __all__ = [
     "UrgencyV2",
     "UserProfile",
     "UserRole",
+    "VMEventListResult",
     "VMEventType",
+    "VMLifecycleEvent",
     "VaRMethod",
     "VaRRequest",
     "VaRResult",
