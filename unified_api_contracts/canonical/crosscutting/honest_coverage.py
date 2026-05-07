@@ -399,6 +399,84 @@ Phase 1A.
 """
 
 
+class EmptyFromLiveInstrumentError(ValueError):
+    """Raised when an adapter tries to ``record_empty(reason=SOURCE_RETURNED_ZERO)`` for a
+    ``(venue, instrument_id, day)`` tuple that the instruments-service catalog says was ALIVE on the day.
+
+    Operator directive 2026-05-07 (writegate Phase 3.D.5): when MTDS / MDPS / features-* attempts an
+    instrument and the source returns nothing, but the catalog confirms the instrument was listed +
+    not-yet-delisted on that day, the writer MUST classify this as a real failure (``attempted_failed``)
+    rather than a legitimate empty (``empty_confirmed``). Silent fallback to ``empty_confirmed`` was the
+    root cause of the 2026-05-07 RED ALERT incident (5 CeFi VMs writing 96-100% empty rows for
+    bitfinex / bitget / kraken — all blank ``error_reason``, all for instruments the catalog confirmed
+    alive).
+
+    Adapters / callers see this exception and should re-route the write to
+    ``record_failed(EmptyFromLiveInstrumentError(...))`` carrying enough context for the operator to
+    diagnose: which instrument, which day, what the source returned (HTTP status / row count / response
+    sample). The orchestrator's retry-attempted_failed-by-default logic then re-attempts on next VM run.
+
+    Args:
+        venue: The venue the catalog says was alive.
+        instrument_id: The specific instrument the catalog says was listed.
+        day: ISO YYYY-MM-DD the catalog says the instrument was tradeable on.
+        source_evidence: Optional structured detail (HTTP code, raw row count, response sample) for
+            operator diagnosis.
+
+    Reference: writegate plan
+    ``writegate_honest_coverage_endtoend_2026_05_06.plan.md`` Phase 3.D.5 Wave 2.
+    """
+
+    def __init__(
+        self,
+        venue: str,
+        instrument_id: str,
+        day: str,
+        source_evidence: str | None = None,
+    ) -> None:
+        self.venue = venue
+        self.instrument_id = instrument_id
+        self.day = day
+        self.source_evidence = source_evidence
+        suffix = f" — source evidence: {source_evidence}" if source_evidence else ""
+        super().__init__(
+            f"record_empty(reason=SOURCE_RETURNED_ZERO) rejected: instruments-service catalog says "
+            f"{instrument_id!r} was ALIVE on {venue}/{day}. Use record_failed("
+            f"EmptyFromLiveInstrumentError(...)) instead — this is a real fetch failure, not honest "
+            f"absence.{suffix}"
+        )
+
+
+class LegacyBlankErrorReasonError(ValueError):
+    """Raised by ``ManifestWriter.record_empty(reason="")`` to surface the silent-fallback bug pattern.
+
+    Pre-2026-05-07 some adapter paths could call ``record_empty()`` with an empty ``reason``, producing
+    manifest rows with ``capture_status=empty_confirmed`` AND blank ``error_reason``. This violated the
+    Phase 2.E taxonomy contract (every empty_confirmed row must carry a typed reason) AND silently
+    masked real fetch failures (e.g. the 2026-05-07 RED ALERT: 5 CeFi VMs at 96-100% empty with all blank
+    reasons).
+
+    Wave 2 of writegate Phase 3.D.5 strengthens ``record_empty`` to raise this loudly when ``reason`` is
+    empty — adapters MUST always pass a typed reason from the closed set, OR call ``record_failed`` if
+    the absence is unexpected. The migration script
+    ``reconcile_blank_error_reason_rows.py`` fixes the historical blank-reason rows by reclassifying
+    them: catalog-says-alive cases get flipped to ``attempted_failed`` with this exception's repr;
+    catalog-says-not-alive cases get a proper ``EXPECTED_*`` reason.
+    """
+
+    def __init__(self, callsite_hint: str = "") -> None:
+        suffix = f" [{callsite_hint}]" if callsite_hint else ""
+        super().__init__(
+            "record_empty() called with blank reason. Pass a typed reason from EMPTY_CONFIRMED_REASONS "
+            "(EXPECTED_HOLIDAY / EXPECTED_WEEKEND / EXPECTED_PRE_VENUE_LAUNCH / "
+            "EXPECTED_PRE_GENESIS_CHAIN / EXPECTED_PRE_SOURCE_COVERAGE_START / "
+            "EXPECTED_INSTRUMENT_NOT_LISTED / EXPECTED_INSTRUMENT_DELISTED / "
+            "EXPECTED_PARTIAL_HALF_DAY / EXPECTED_PAUSED_LEAGUE / EXPECTED_DEPRECATED_DATA_TYPE / "
+            "EXPECTED_REFDATA_CADENCE_CHANGE / SOURCE_RETURNED_ZERO), or use record_failed if the "
+            "absence is unexpected." + suffix
+        )
+
+
 __all__ = [
     "BUNDLED_DATA_TYPES",
     "DATA_TYPE_TO_CLUSTER_REGISTRY",
@@ -410,6 +488,8 @@ __all__ = [
     "PREDICTION_GROUPS",
     "SPORTS_FIXTURE_CLUSTERS",
     "EmptyConfirmedReason",
+    "EmptyFromLiveInstrumentError",
+    "LegacyBlankErrorReasonError",
     "extract_es_options_cluster",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
