@@ -443,6 +443,7 @@ from .venue_trading_calendar import (
     clip_dates_to_trading_days,
     get_us_market_holidays,
     is_non_trading_day,
+    non_trading_day_reason,
 )
 
 __all__ = [
@@ -784,6 +785,7 @@ __all__ = [
     "is_in_tradfi_tick_window",
     "is_lst",
     "is_non_trading_day",
+    "non_trading_day_reason",
     "is_shard_axis",
     "is_token_equivalent",
     "is_vix_15m_gap_date",

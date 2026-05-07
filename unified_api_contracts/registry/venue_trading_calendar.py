@@ -167,3 +167,26 @@ def is_non_trading_day(venue: str, iso_date: str) -> bool:
     if weekday >= 5:
         return True
     return iso_date in US_MARKET_HOLIDAYS
+
+
+def non_trading_day_reason(venue: str, iso_date: str) -> str | None:
+    """Return the EXPECTED_* reason for a non-trading day, or None if trading.
+
+    Discriminates ``EXPECTED_WEEKEND`` (Sat/Sun for closed-on-weekends venues)
+    from ``EXPECTED_HOLIDAY`` (US-market-holiday weekday). Returns None for
+    venues that are NOT calendar-bound (24/7 crypto / DeFi / prediction
+    crypto shards) and for trading days on calendar-bound venues.
+
+    Used by orchestrator pre-skip sites (MTDS / instruments-service) to feed
+    ``ManifestWriter.record_expected_empty(reason=...)`` per writegate Phase
+    2.E.2 so the manifest carries an EXPECTED_* row per (shard_key, day) in
+    the expected universe instead of a bare empty_confirmed.
+    """
+    if not _venue_excludes_weekends_holidays(venue):
+        return None
+    weekday = pd.Timestamp(iso_date).weekday()
+    if weekday >= 5:
+        return "EXPECTED_WEEKEND"
+    if iso_date in US_MARKET_HOLIDAYS:
+        return "EXPECTED_HOLIDAY"
+    return None
