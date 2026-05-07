@@ -153,6 +153,10 @@ from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability i
 from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability import (
     VenueNotRegisteredError as MultiLegVenueNotRegisteredError,
 )
+from unified_api_contracts.internal.architecture_v2.paired_dispersion_catalog import (
+    PAIRED_DISPERSION_CATALOG,
+    PairedDispersionCatalogRow,
+)
 from unified_api_contracts.internal.architecture_v2.restaking_rewards import (
     LST_REWARD_STREAMS,
     REWARD_TOKEN_ECONOMICS,
@@ -285,6 +289,7 @@ __all__ = [
     "KNOWN_VENUE_TOKENS",
     "LST_REWARD_STREAMS",
     "MULTI_LEG_ORDER_CAPABILITY_REGISTRY",
+    "PAIRED_DISPERSION_CATALOG",
     "RESTRICTION_PROFILE_REGISTRY",
     "REWARD_TOKEN_ECONOMICS",
     "SERVICE_FAMILY_SCOPE_RULES",
@@ -372,6 +377,7 @@ __all__ = [
     "MultiLegOrderCapability",
     "MultiLegVenueNotRegisteredError",
     "NettingRule",
+    "PairedDispersionCatalogRow",
     "Persona",
     "Phase",
     "PriceQuote",
