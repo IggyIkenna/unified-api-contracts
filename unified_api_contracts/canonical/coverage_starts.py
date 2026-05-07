@@ -47,6 +47,12 @@ CEFI_SOURCE_COVERAGE_START: dict[str, date] = {
     "BINANCE": date(2017, 8, 17),
     "BYBIT": date(2018, 11, 21),
     "HYPERLIQUID": date(2023, 6, 29),
+    # Bitget native USDT-M perp launched 2019-07-10 but Tardis only carries
+    # bitget-futures from 2024-11-08. `availableSince` probe confirmed
+    # 2026-05-07 against `https://api.tardis.dev/v1/exchanges/bitget-futures`
+    # (910 perpetuals, all gated by exchange-wide 2024-11-08T00:00:00Z floor).
+    # Pre-cutoff dates → EXPECTED_PRE_SOURCE_COVERAGE_START.
+    "BITGET": date(2024, 11, 8),
     # Tardis multi-venue feed — earliest cross-venue tick coverage.
     "TARDIS": date(2017, 6, 1),  # TODO verify
 }
