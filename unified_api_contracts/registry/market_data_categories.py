@@ -101,6 +101,14 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "liquidations",
         "options_chain",  # Deribit options - LOCF sampled to candles
         "futures_chain",  # Deribit/CME futures - LOCF sampled to candles
+        # 2026-05-07: ohlcv_1m for DEX venues (Lighter /candles + Pacifica /kline).
+        # Lighter zkSync per-trade /recentTrades is hard-capped at last ~100 trades
+        # with no cursor, so /candles OHLCV bars are the only historical-capable
+        # path; same shape applies to Pacifica /kline. Tardis CeFi venues do not
+        # expose OHLCV bars — their adapters return empty for ohlcv_1m, which the
+        # manifest records as empty_confirmed (honest absence per workspace
+        # "honest absence vs fake placeholders" rule).
+        "ohlcv_1m",
     ],
     "tradfi": [
         "trades",
