@@ -79,11 +79,17 @@ class InputReq:
 
 FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     # ---- features-onchain (defi) ----------------------------------------
-    # Two of the 12 calculators have AVAILABILITY_AT_SEMANTICS coverage today;
-    # the other 10 are blocked behind the defi data_type vocabulary alignment
-    # follow-up (lending_indices / risk_params / rewards / flash_loan_events
-    # / eigenlayer_rewards need entries in availability_semantics). Once that
-    # ships, lift the remaining 10 here in the same Phase 1A.2 commit.
+    # Phase 1A.2 follow-up shipped 2026-05-07: 8 of the 10 deferred onchain
+    # feature_groups now lifted in here, after the
+    # ``AVAILABILITY_AT_SEMANTICS`` defi vocabulary gap closed (UAC@2f40c9d
+    # registered lending_indices / risk_params / rewards / flash_loan_events
+    # / eigenlayer_rewards as ``tick_timestamp``). Mapping derived from
+    # ``features_onchain_service.schemas.feature_builder_registry._metadata``
+    # SSOT: each calculator's ``sources`` list points at the source API,
+    # which writes into the corresponding raw DeFi data_type bucket the
+    # calculator reads on the next pipeline stage. The remaining 2 are
+    # genuine external API live-reads that bypass the manifest entirely
+    # (see Temporary states section in the feature_dag plan).
     "lst_staking_yields": [
         InputReq(
             asset_group="defi",
@@ -100,6 +106,100 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
             source="defillama_api",
         ),
     ],
+    "aave_lending_rates": [
+        InputReq(
+            asset_group="defi",
+            data_type="lending_indices",
+            available_at_rule="tick_timestamp",
+            source="aave_v3_subgraph",
+        ),
+    ],
+    "aave_utilization": [
+        InputReq(
+            asset_group="defi",
+            data_type="lending_indices",
+            available_at_rule="tick_timestamp",
+            source="aave_v3_subgraph",
+        ),
+    ],
+    "aave_risk_params": [
+        InputReq(
+            asset_group="defi",
+            data_type="risk_params",
+            available_at_rule="tick_timestamp",
+            source="aave_v3_rpc",
+        ),
+    ],
+    "eigen_rewards": [
+        InputReq(
+            asset_group="defi",
+            data_type="eigenlayer_rewards",
+            available_at_rule="tick_timestamp",
+            source="eigenlayer_api",
+        ),
+    ],
+    "protocol_rewards": [
+        InputReq(
+            asset_group="defi",
+            data_type="rewards",
+            available_at_rule="tick_timestamp",
+            source=None,  # multi-source per protocol_apis aggregator
+        ),
+    ],
+    "flash_loan_availability": [
+        InputReq(
+            asset_group="defi",
+            data_type="flash_loan_events",
+            available_at_rule="tick_timestamp",
+            source="morpho_subgraph",
+        ),
+    ],
+    "aave_rate_impact": [
+        # Phase 1 calculator — depends on aave_lending_rates + aave_utilization
+        # outputs, which both consume lending_indices upstream. Lookahead-bias
+        # enforcement walks the dependency graph; declaring the leaf data_type
+        # here is sufficient.
+        InputReq(
+            asset_group="defi",
+            data_type="lending_indices",
+            available_at_rule="tick_timestamp",
+            source="aave_v3_subgraph",
+        ),
+    ],
+    "onchain_regime": [
+        # Phase 2 calculator — depends on aave_utilization + defillama_tvl +
+        # aave_lending_rates outputs. Leaf data_types: lending_indices (for
+        # the two aave_* deps) + liquidity (for defillama_tvl).
+        InputReq(
+            asset_group="defi",
+            data_type="lending_indices",
+            available_at_rule="tick_timestamp",
+            source="aave_v3_subgraph",
+        ),
+        InputReq(
+            asset_group="defi",
+            data_type="liquidity",
+            available_at_rule="tick_timestamp",
+            source="defillama_api",
+        ),
+    ],
+    # NOT lifted (and intentionally so):
+    #   * fear_greed — live HTTP fetch from Alternative.me sentiment API; no
+    #     registered DeFi raw data_type. The calculator is a pass-through over
+    #     an external sentiment endpoint (alternative.me/api/v2/), which
+    #     never lands in a manifest. ``stamp_available_at`` would still apply
+    #     when the calculator persists its output, but there's no upstream
+    #     ``(asset_group, data_type)`` to enforce LookaheadBias against.
+    #   * macro_sentiment — live HTTP fetches from CoinGecko + DefiLlama
+    #     APIs; same situation. The DefiLlama leg COULD point at
+    #     ``(defi, liquidity)`` but the CoinGecko macro feeds (BTC dominance,
+    #     total market cap) have no registered data_type at all. Defer until
+    #     either we register ``crypto_sentiment`` / ``macro_metrics`` as
+    #     defi data_types OR move these calculators behind a captured-tick
+    #     adapter that writes into a registered data_type.
+    # Successor: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md``
+    # § "Temporary states + their canonical follow-up plans" — bullet
+    # "External-sentiment-API live-read pass-throughs".
     # ---- features-delta-one (cefi / tradfi candle-derived) --------------
     # Price-based feature groups all read ohlcv_1m. We use ohlcv_1m as the
     # canonical base data_type (other timeframes derive from it via

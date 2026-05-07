@@ -159,6 +159,58 @@ def test_has_required_inputs_true_for_seeded_groups() -> None:
     assert has_required_inputs("technical_indicators") is True
 
 
+def test_phase_1a_2_lift_8_onchain_feature_groups_seeded() -> None:
+    """Phase 1A.2 follow-up shipped 2026-05-07 — 8 of the 10 deferred onchain
+    feature_groups now in FEATURE_REQUIRED_INPUTS after the
+    AVAILABILITY_AT_SEMANTICS defi vocabulary gap closed (UAC@2f40c9d).
+
+    Plan: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md``
+    § "Temporary states" — Half 2 of the AVAILABILITY_AT_SEMANTICS defi
+    vocabulary gap.
+    """
+    expected_lifted = {
+        "aave_lending_rates": ("defi", "lending_indices"),
+        "aave_utilization": ("defi", "lending_indices"),
+        "aave_risk_params": ("defi", "risk_params"),
+        "eigen_rewards": ("defi", "eigenlayer_rewards"),
+        "protocol_rewards": ("defi", "rewards"),
+        "flash_loan_availability": ("defi", "flash_loan_events"),
+        "aave_rate_impact": ("defi", "lending_indices"),
+        # onchain_regime checked separately — has TWO inputs.
+    }
+    for fg, (asset_group, data_type) in expected_lifted.items():
+        assert has_required_inputs(fg), f"{fg} missing from FEATURE_REQUIRED_INPUTS"
+        inputs = get_required_inputs(fg)
+        assert len(inputs) == 1, f"{fg} expected 1 input, got {len(inputs)}: {inputs}"
+        assert inputs[0].asset_group == asset_group, f"{fg} asset_group mismatch"
+        assert inputs[0].data_type == data_type, f"{fg} data_type mismatch"
+        assert inputs[0].available_at_rule == "tick_timestamp", (
+            f"{fg} expected tick_timestamp, got {inputs[0].available_at_rule}"
+        )
+
+
+def test_onchain_regime_has_two_inputs() -> None:
+    """``onchain_regime`` is a Phase 2 derived calculator depending on two
+    leaf data_types: lending_indices (via aave_*) + liquidity (via
+    defillama_tvl)."""
+    inputs = get_required_inputs("onchain_regime")
+    assert len(inputs) == 2
+    pairs = {(i.asset_group, i.data_type) for i in inputs}
+    assert pairs == {("defi", "lending_indices"), ("defi", "liquidity")}
+    assert all(i.available_at_rule == "tick_timestamp" for i in inputs)
+
+
+def test_fear_greed_and_macro_sentiment_intentionally_not_seeded() -> None:
+    """fear_greed + macro_sentiment do live HTTP fetches from external
+    sentiment APIs (Alternative.me, CoinGecko) — no registered DeFi raw
+    data_type to enforce LookaheadBias against. Intentionally absent from
+    FEATURE_REQUIRED_INPUTS; documented in the inline comment + the
+    feature_dag plan's Temporary states section.
+    """
+    assert not has_required_inputs("fear_greed")
+    assert not has_required_inputs("macro_sentiment")
+
+
 def test_list_feature_groups_returns_sorted() -> None:
     """``list_feature_groups()`` is deterministic and sorted."""
     groups = list_feature_groups()
