@@ -50,7 +50,7 @@ jobs:
 
     steps:
       - name: Checkout unified-api-contracts
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
