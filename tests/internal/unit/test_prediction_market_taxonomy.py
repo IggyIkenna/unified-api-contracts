@@ -602,7 +602,7 @@ def test_classifier_stability_hash_is_deterministic() -> None:
     """Re-importing the module must return the same hash — no random salt /
     no time-dependent inputs."""
     from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
-        CLASSIFIER_STABILITY_HASH as second_read,
+        CLASSIFIER_STABILITY_HASH as second_read,  # noqa: N811
     )
 
     assert second_read == CLASSIFIER_STABILITY_HASH
