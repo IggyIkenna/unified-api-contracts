@@ -79,6 +79,50 @@ GAS_FEE_CHAIN_START_DATES: dict[int, str] = {
 # Solana start date for gas fee collection (Alchemy archival RPC coverage)
 GAS_FEE_SOLANA_START_DATE: str = "2021-01-01"
 
+# Chain genesis dates per chain (mainnet launch). SSOT for the data-status
+# panel's per-chain pre-launch clipping — DEFI dates earlier than a chain's
+# genesis can never have data so they're dropped from the missing/expected
+# denominator (otherwise the panel renders thousands of "missing" dates
+# stretching back to ETHEREUM's 2015 genesis for chains that launched in
+# 2021-2023). Distinct from ``GAS_FEE_CHAIN_START_DATES``: that's the date
+# Alchemy archival RPC coverage starts (which can lag chain genesis by
+# months), this is the chain's mainnet launch (the absolute earliest any
+# data can exist on-chain).
+CHAIN_GENESIS_DATES: dict[str, str] = {
+    "ETHEREUM": "2015-07-30",  # Frontier mainnet
+    "ARBITRUM": "2021-08-31",  # Arbitrum One public mainnet
+    "BASE": "2023-08-09",  # Base mainnet
+    "OPTIMISM": "2021-12-16",  # OP mainnet (post-regenesis)
+    "POLYGON": "2020-05-30",  # Matic mainnet (rebranded to Polygon)
+    "AVALANCHE": "2020-09-22",  # C-Chain launch
+    "BSC": "2020-08-29",  # Binance Smart Chain (rebranded to BNB Chain)
+    "LINEA": "2023-07-11",  # Linea mainnet alpha
+    "SCROLL": "2023-10-17",  # Scroll mainnet
+    "ZKSYNC": "2023-03-24",  # zkSync Era mainnet
+    "CELO": "2020-04-22",  # Celo mainnet
+    "AURORA": "2021-05-12",  # Aurora mainnet
+    "FANTOM": "2019-12-28",  # Fantom Opera mainnet
+    "MANTLE": "2023-07-14",  # Mantle mainnet
+    "GNOSIS": "2018-10-08",  # xDai chain (rebranded to Gnosis)
+    "METIS": "2021-11-19",  # Metis Andromeda mainnet
+    "MOONBEAM": "2022-01-11",  # Moonbeam mainnet
+    "BLAST": "2024-02-29",  # Blast mainnet
+    "MODE": "2024-01-12",  # Mode mainnet
+    "SOLANA": "2020-03-16",  # Solana mainnet beta
+    "BITCOIN": "2009-01-03",  # Bitcoin genesis
+}
+
+
+def get_chain_genesis_date(chain_name: str) -> str | None:
+    """Return the chain's mainnet genesis date (ISO YYYY-MM-DD) or None.
+
+    Case-insensitive on ``chain_name``. Returns ``None`` for unknown
+    chains so callers can fall back to a category-wide start date when
+    the chain isn't yet declared in the SSOT.
+    """
+    return CHAIN_GENESIS_DATES.get(chain_name.upper()) if chain_name else None
+
+
 # Environment names
 CHAIN_ENVS = ("mainnet", "testnet", "fork")
 
