@@ -46,6 +46,15 @@ class LifecycleEventType(StrEnum):
     UPSTREAM_NOT_READY = "UPSTREAM_NOT_READY"
     SHARD_INCOMPLETE = "SHARD_INCOMPLETE"
     WRITE_FAILED = "WRITE_FAILED"
+    # Preflight short-circuit visibility — emitted EVERY time a service's
+    # preflight guard / freshness check / skip-date guard short-circuits
+    # before processing. Without this, silent skips look identical to
+    # silent successes from the event stream alone (reference incident
+    # 2026-05-07: features-onchain VM emitted STARTED → VALIDATION_*
+    # → STOPPED in 9s with no PROCESSING events; took manual diagnosis
+    # to determine whether skip-if-exists, dep-check-fail, or
+    # date-out-of-range fired). Reason is a closed StrEnum (PreflightSkipReason).
+    PREFLIGHT_SKIPPED = "PREFLIGHT_SKIPPED"
     # Upstream fetch lifecycle (data_pipeline_completion Phase 8.3 — no double-fetch)
     # Emitted by every external-data adapter (Tardis, Databento, ODDS_API, Polymarket,
     # FootyStats, The Graph) wrapping a paid upstream call. Migrations and backfills
@@ -219,6 +228,71 @@ class ShardIncompleteDetails(BaseModel):
     missing: list[str] = Field(default_factory=list, description="List of missing venue/shard names")
 
 
+class PreflightSkipReason(StrEnum):
+    """Closed taxonomy of reasons a service's preflight short-circuits.
+
+    Every silent skip site (early-exit before processing emits its first
+    work event) MUST emit PREFLIGHT_SKIPPED with a reason from this
+    enum. New reasons must be added here, NOT free-form strings.
+
+    Reference incident 2026-05-07: features-onchain-defi-backfill VM
+    emitted STARTED -> VALIDATION_COMPLETED -> STOPPED in 9 seconds
+    with no PROCESSING events; operator could not tell from the event
+    stream alone whether (a) skip-if-exists fired (manifest already
+    has captured rows), (b) dependency check raised
+    DependencyError(fail_on_missing=True), or (c) date was before
+    asset_group's earliest valid date. PREFLIGHT_SKIPPED with a
+    structured reason resolves each case unambiguously.
+    """
+
+    # Manifest already has fresh captured rows for the (date,
+    # feature_group) — orchestrator's check_shard_freshness fired.
+    # Not an error; expected when re-running a backfill without --force.
+    SHARD_ALREADY_FRESH = "SHARD_ALREADY_FRESH"
+    # Requested date is before the asset_group's earliest valid date
+    # (e.g. defi pre-genesis chain, sports pre-source-coverage-start).
+    # Always honest absence; preflight skips without raising.
+    DATE_BEFORE_EARLIEST_VALID = "DATE_BEFORE_EARLIEST_VALID"
+    # Required upstream service hasn't written its data yet AND
+    # fail_on_missing_deps=True. Service short-circuits with
+    # DependencyError; downstream stops the pipeline. Emit BEFORE the
+    # raise so the silent-skip is visible in the event stream.
+    DEPENDENCIES_MISSING_FAIL_FAST = "DEPENDENCIES_MISSING_FAIL_FAST"
+    # Required upstream is missing but fail_on_missing_deps=False.
+    # Service continues processing with degraded inputs; this skip
+    # event is the warning that downstream features may be NaN-heavy.
+    DEPENDENCIES_MISSING_CONTINUE = "DEPENDENCIES_MISSING_CONTINUE"
+    # Calendar pre-skip (weekend, holiday, half-day, paused-league,
+    # known-coverage-gap). Manifest gets record_expected_empty per the
+    # reason taxonomy; preflight emits this for visibility.
+    CALENDAR_NON_TRADING_DAY = "CALENDAR_NON_TRADING_DAY"
+    # Per-VM concurrency: another VM is already processing this shard
+    # (per-VM shard isolation lock). Skip without retry.
+    CONCURRENT_VM_OWNS_SHARD = "CONCURRENT_VM_OWNS_SHARD"
+
+
+class PreflightSkippedDetails(BaseModel):
+    """Metadata payload for PREFLIGHT_SKIPPED events.
+
+    Every preflight short-circuit MUST emit this structured payload so
+    operators can distinguish skip vs failure vs "all good" from the
+    event stream alone.
+    """
+
+    reason: PreflightSkipReason
+    service: str = Field(description="Service whose preflight short-circuited")
+    asset_group: str | None = None
+    feature_group: str | None = None
+    date: str | None = Field(default=None, description="Affected date (YYYY-MM-DD)")
+    shard: str | None = Field(default=None, description="Affected shard identifier")
+    message: str = Field(default="", description="Human-readable detail")
+    # Optional structured context for fail-fast cases — e.g. list of
+    # missing upstream services, the earliest-valid date that caused
+    # DATE_BEFORE_EARLIEST_VALID, etc.
+    missing_dependencies: list[str] = Field(default_factory=list)
+    earliest_valid_date: str | None = None
+
+
 class ConfigChangedDetails(BaseModel):
     config_file: str | None = None
     changed_by: str | None = None
@@ -365,6 +439,13 @@ class StartedEvent(BaseModel):
     service: str
     timestamp: datetime
     details: StartedDetails = Field(default_factory=StartedDetails)
+
+
+class PreflightSkippedEvent(BaseModel):
+    event: Literal[LifecycleEventType.PREFLIGHT_SKIPPED] = LifecycleEventType.PREFLIGHT_SKIPPED
+    service: str
+    timestamp: datetime
+    details: PreflightSkippedDetails
 
 
 class FailedEvent(BaseModel):
