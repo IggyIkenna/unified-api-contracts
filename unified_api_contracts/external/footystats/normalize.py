@@ -140,7 +140,28 @@ def normalize_footystats_odds(
     event_name: str = "",
     venue: str = "footystats",
 ) -> CanonicalOdds:
-    """Convert FootyStatsOdds to CanonicalOdds."""
+    """Convert ``FootyStatsOdds`` to ``CanonicalOdds``.
+
+    **What this is**: real published bookmaker odds for a match-market-selection.
+    FootyStats aggregates published prices from named bookmakers and exposes them as
+    decimal odds — these are MARKET DATA (what the book offered).
+
+    **NOT to be confused with** ``normalize_footystats_predictions`` (below) which
+    extracts FootyStats-PROPRIETARY pre-match forecasts (potentials, xG prematch,
+    PPG) — those are MODEL OUTPUT, not market odds, even though their values look
+    odds-like (probabilities, decimal coefficients). Per C.3 audit 2026-05-07
+    (`session_2026_05_07_data_status_audit_findings.plan.md`): the deployment-ui
+    data-status panel renders both data_types side-by-side; the disambiguation
+    is critical so consumers know whether they're reading book quotes
+    (this fn → ``data_type=ODDS``) or FootyStats's own forecasts
+    (``normalize_footystats_predictions`` → ``data_type=PREDICTIONS``).
+
+    Sister fn ``normalize_footystats_odds_snapshot`` (below) is the pre-match-
+    snapshot variant captured by ``get_fixture_odds_snapshot()``; same source,
+    flat-row shape covering 68 markets, written to ``entity=footystats_odds``
+    in instruments-service. ``data_available_at = kickoff - 72h`` (FootyStats
+    publishes opening odds ~3 days before kickoff).
+    """
     match_id = str(raw.match_id or "")
     dec = _to_decimal(raw.odds_value)
     if dec is None or dec <= 0:
@@ -163,12 +184,35 @@ def normalize_footystats_odds(
 
 
 def normalize_footystats_predictions(raw: FootyStatsMatch, venue: str = "footystats") -> dict[str, object]:
-    """Extract predictive/proprietary fields from a FootyStatsMatch.
+    """Extract FootyStats PROPRIETARY pre-match forecast fields.
 
     Returns a flat dict suitable for a DataFrame row. These fields are
-    FootyStats-proprietary pre-match predictions (potentials, xG prematch)
-    and should be written to ``entity=footystats_predictions`` separately
-    from the factual fixture data.
+    FootyStats's own MODEL OUTPUT — NOT bookmaker odds. They represent
+    FootyStats's forecast of match outcomes:
+
+    - **Potentials** (``btts_potential``, ``o05_potential`` … ``o45_potential``,
+      ``corners_potential``, ``cards_potential``, ``offsides_potential``,
+      ``avg_potential``): FootyStats's proprietary likelihood scores
+      (NOT bookmaker odds). Higher = more likely per FootyStats's model.
+    - **Pre-match xG** (``xg_prematch_home``/``away``/``total``):
+      FootyStats's pre-game expected-goals model.
+    - **PPG** (``pre_match_home_ppg``/``away_ppg``/``home_overall_ppg``/
+      ``away_overall_ppg``): FootyStats's points-per-game projections.
+
+    **NOT to be confused with** ``normalize_footystats_odds``
+    (above) and ``normalize_footystats_odds_snapshot`` (below) which return
+    REAL BOOKMAKER ODDS aggregated by FootyStats from named books. Per C.3
+    audit 2026-05-07 (`session_2026_05_07_data_status_audit_findings.plan.md`):
+    the deployment-ui data-status panel renders both data_types side-by-side;
+    the disambiguation is critical so consumers know whether they're reading
+    FootyStats's own forecasts (this fn → ``data_type=PREDICTIONS``,
+    ``entity=footystats_predictions``) or book quotes (the odds normalizers
+    → ``data_type=ODDS``, ``entity=footystats_odds``).
+
+    Both data_types share the same source (FootyStats) and similar
+    `data_available_at` (kickoff - 72h, since FootyStats publishes both
+    opening odds and prematch predictions on the same ~3-day-out cadence)
+    but they ARE NOT the same data and SHOULD NOT be merged in features.
     """
     kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix > 0 else datetime.now(UTC)
     home_name = raw.home_name or ""
@@ -230,6 +274,14 @@ def normalize_footystats_odds_snapshot(
     venue: str = "footystats",
 ) -> dict[str, object]:
     """Extract all odds fields from a FootyStats match as a flat dict.
+
+    See ``normalize_footystats_odds`` docstring for the bookmaker-odds vs
+    FootyStats-predictions distinction (per C.3 audit 2026-05-07): this
+    fn returns REAL book quotes (same class of data as ``normalize_footystats_odds``),
+    just in flat-row dict shape across 68 markets for the pre-match snapshot
+    used by ``data_type=ODDS`` / ``entity=footystats_odds`` in
+    instruments-service. NOT FootyStats's proprietary forecasts (those live
+    in ``normalize_footystats_predictions`` / ``data_type=PREDICTIONS``).
 
     Accepts either ``FootyStatsMatch`` or ``FTMatchRaw``. Uses ``getattr``
     for fields that may not exist on the normalized model.
