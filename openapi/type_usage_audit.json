@@ -1578,6 +1578,20 @@
       "isinstance_count": 0
     },
     {
+      "name": "CanonicalBetMarket",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "CanonicalBetOrder",
+      "source": "UAC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
       "name": "CanonicalBondData",
       "source": "UAC",
       "instantiation_count": 2,
@@ -3577,6 +3591,20 @@
       "source": "UIC",
       "instantiation_count": 1,
       "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "MLModelScorecard",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 0,
+      "isinstance_count": 0
+    },
+    {
+      "name": "MLPrediction",
+      "source": "UIC",
+      "instantiation_count": 1,
+      "annotation_count": 1,
       "isinstance_count": 0
     },
     {
