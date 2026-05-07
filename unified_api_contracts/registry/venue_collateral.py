@@ -105,12 +105,28 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # the absence is documented, not silently absent. Positive rows wait on
     # Phase 7a operator audit (see plan
     # ``carry_staked_basis_structure_axis_2026_05_04`` Phase 7a).
-    # 2026-05-05: NO production ETH-perp venue accepts an ETH LST as direct
-    # cross-margin today — Aave / Spark / Morpho take wstETH + weETH for
-    # *lending* but those are LENDING-kind venues (covered above for
-    # AAVEV3-ETHEREUM). When Aevo / Lyra-V2 / dYdX / Hyperliquid ship
-    # LST-margin support, flip the row to ``accepted=True`` with a haircut
-    # citation in ``notes``.
+    #
+    # STALENESS_FLAG_2026_05_07 — the prior 2026-05-05 comment claimed "NO
+    # production ETH-perp venue accepts an ETH LST as direct cross-margin
+    # today". This is OUT OF DATE. Live venue re-verification 2026-05-07
+    # (web docs, not yet API-probed) found:
+    #   - DERIBIT stETH IS accepted at 7.5% haircut, X:PM/X:SM, offsets
+    #     ETH-perp directly (effective 2026-01-13). Source:
+    #     https://insights.deribit.com/exchange-updates/portfolio-margin-improvements-for-steth-and-cross-collateral-haircuts/
+    #   - BYBIT stETH + METH UTA collateral since 2024-02; USDe since
+    #     2024-12-19. Per Bybit margin-spec page.
+    #   - OKX wstETH on multi-currency-margin / portfolio-margin
+    #     discount-rate list. Per OKX cross-margin docs.
+    # The DATA below is preserved as-is pending Stream A live-API probe in
+    # plan ``defi_archetypes_canonicalisation_and_venue_matrix_2026_05_07``.
+    # DO NOT trust ``accepted=False`` for {DERIBIT, BYBIT, OKX} x {stETH,
+    # wstETH, METH, USDe} until that probe lands and the rows below flip.
+    # Hyperliquid (L1) + Binance (Multi-Assets Mode currently
+    # BTC/ETH/BNB/XRP/ADA/DOT/SOL/USDC/USDT only) + Aster (USDT/USDF/asBNB)
+    # + GMX (per-market sets exclude LSTs) remain genuine ``accepted=False``.
+    #
+    # When Aevo / Lyra-V2 / dYdX / Hyperliquid ship LST-margin support, flip
+    # the row to ``accepted=True`` with a haircut citation in ``notes``.
     CollateralAcceptance("HYPERLIQUID", "stETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
     CollateralAcceptance("HYPERLIQUID", "wstETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
     CollateralAcceptance("HYPERLIQUID", "rETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
