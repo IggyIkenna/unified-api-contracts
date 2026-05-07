@@ -136,13 +136,15 @@ def _build_availability() -> dict:
 
 
 def _upload_to_gcs(content: str, target: str) -> None:
-    from google.cloud import storage
+    from unified_cloud_interface import upload_to_storage
 
     bucket_name, _, object_path = target.partition("/")
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(object_path)
-    blob.upload_from_string(content, content_type="application/json; charset=utf-8")
+    upload_to_storage(
+        bucket=bucket_name,
+        path=object_path,
+        data=content.encode("utf-8"),
+        content_type="application/json; charset=utf-8",
+    )
     https_url = (
         f"https://console.cloud.google.com/storage/browser/_details/"
         f"{bucket_name}/{object_path}"

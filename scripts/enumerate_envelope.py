@@ -1053,7 +1053,7 @@ GCS_OBJECT_PATH = "catalogue/envelope.md"
 
 def _upload_to_gcs(content: str, target: str) -> None:
     """Upload to GCS. content_type derived from object_path extension."""
-    from google.cloud import storage
+    from unified_cloud_interface import upload_to_storage
 
     bucket_name, _, object_path = target.partition("/")
     if not object_path:
@@ -1065,10 +1065,12 @@ def _upload_to_gcs(content: str, target: str) -> None:
     else:
         content_type = "text/markdown; charset=utf-8"
 
-    client = storage.Client()
-    bucket = client.bucket(bucket_name)
-    blob = bucket.blob(object_path)
-    blob.upload_from_string(content, content_type=content_type)
+    upload_to_storage(
+        bucket=bucket_name,
+        path=object_path,
+        data=content.encode("utf-8"),
+        content_type=content_type,
+    )
 
     https_url = f"https://console.cloud.google.com/storage/browser/_details/{bucket_name}/{object_path}"
     print(f"Uploaded {len(content):,} bytes to gs://{bucket_name}/{object_path}", file=sys.stderr)
