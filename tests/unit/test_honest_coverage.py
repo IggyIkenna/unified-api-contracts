@@ -13,8 +13,10 @@ import pytest
 
 from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     BUNDLED_DATA_TYPES,
+    EMPTY_CONFIRMED_REASONS,
     ES_OPTIONS_CLUSTERS,
     FUTURES_CHAIN_BUCKETS,
+    EmptyConfirmedReason,
     extract_es_options_cluster,
     futures_expiry_bucket,
     parse_futures_expiry,
@@ -176,3 +178,37 @@ def test_futures_chain_buckets_contains_three_canonical_buckets() -> None:
 )
 def test_futures_expiry_bucket_parametric(symbol: str, as_of: date, expected: str) -> None:
     assert futures_expiry_bucket(symbol, as_of=as_of) == expected
+
+
+# ---------------------------------------------------------------------------
+# EmptyConfirmedReason — refdata cadence migration values (added 2026-05-07
+# under manifest_migration_master § Audit findings → C.1 + C.11)
+# ---------------------------------------------------------------------------
+
+
+def test_expected_deprecated_data_type_in_taxonomy() -> None:
+    """C.1 LEAGUES kill (and any future data_type retirement) flips manifest rows
+    via ``record_empty(reason=EXPECTED_DEPRECATED_DATA_TYPE)``. UTL ManifestWriter
+    validates the reason against ``EMPTY_CONFIRMED_REASONS`` — the new value must
+    be in the closed set or migration scripts hit ``UnknownEmptyConfirmedReasonError``.
+    """
+    assert EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value == "EXPECTED_DEPRECATED_DATA_TYPE"
+    assert "EXPECTED_DEPRECATED_DATA_TYPE" in EMPTY_CONFIRMED_REASONS
+
+
+def test_expected_refdata_cadence_change_in_taxonomy() -> None:
+    """C.11 TEAMS per-(team, season) migration flips legacy daily shards via
+    ``record_empty(reason=EXPECTED_REFDATA_CADENCE_CHANGE)``. Same UTL validation
+    contract as above; the new value must be in the closed set."""
+    assert EmptyConfirmedReason.EXPECTED_REFDATA_CADENCE_CHANGE.value == "EXPECTED_REFDATA_CADENCE_CHANGE"
+    assert "EXPECTED_REFDATA_CADENCE_CHANGE" in EMPTY_CONFIRMED_REASONS
+
+
+def test_refdata_cadence_reasons_have_expected_prefix() -> None:
+    """Both new reasons start with ``EXPECTED_`` so ``record_expected_empty`` accepts
+    them (it rejects bare ``SOURCE_RETURNED_ZERO``-class reasons because those are
+    write-time honest-absence, not calendar-pre-skip / refdata-deprecation)."""
+    from unified_api_contracts.canonical.crosscutting.honest_coverage import EXPECTED_EMPTY_REASON_PREFIX
+
+    assert EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)
+    assert EmptyConfirmedReason.EXPECTED_REFDATA_CADENCE_CHANGE.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)

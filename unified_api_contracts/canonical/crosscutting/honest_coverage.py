@@ -103,6 +103,20 @@ class EmptyConfirmedReason(StrEnum):
     EXPECTED_PARTIAL_HALF_DAY = "EXPECTED_PARTIAL_HALF_DAY"
     """Calendar half-session (Thanksgiving Friday, Christmas Eve early close on US equities)."""
 
+    EXPECTED_DEPRECATED_DATA_TYPE = "EXPECTED_DEPRECATED_DATA_TYPE"
+    """Refdata-cadence migration: data_type was retired (e.g. LEAGUES daily-dump killed 2026-05-07 because UAC
+    ``LeagueDefinition`` + ``provider_league_ids`` already canonicalise the per-season league mappings via code commits,
+    making the daily-cadence GCS dump pure waste). Existing manifest rows for retired data_types get flipped to
+    ``empty_confirmed`` with this reason rather than left as `captured` (which would mislead consumers into reading
+    deleted parquets) or `attempted_failed` (which would force orchestrator backfill VMs to keep retrying a deleted
+    write path). Plan: ``manifest_migration_master_2026_05_07.plan.md`` § Audit findings 2026-05-07 → C.1."""
+
+    EXPECTED_REFDATA_CADENCE_CHANGE = "EXPECTED_REFDATA_CADENCE_CHANGE"
+    """Refdata-cadence migration: data_type's shard cadence was changed (e.g. TEAMS migrated from per-day to
+    per-(team, season) — pre-migration daily shards become honest absence under the new cadence). Distinct from
+    `EXPECTED_DEPRECATED_DATA_TYPE` (data_type still exists, just at a different cadence). Plan:
+    ``manifest_migration_master_2026_05_07.plan.md`` § Audit findings 2026-05-07 → C.11."""
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
