@@ -95,6 +95,20 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("defi", "gas_fees"): "tick_timestamp",
     ("defi", "lst_yields"): "tick_timestamp",
     ("defi", "vault_state"): "tick_timestamp",
+    # Phase 1A feature_dag seed gap (closed 2026-05-07): 5 on-chain DeFi
+    # data_types that features-onchain consumes but were missing
+    # availability_at semantics — blocked 10 of 12 onchain feature_groups
+    # from completing the DAG seed. All 5 are per-event on-chain reads
+    # where the row's own timestamp IS the available_at, matching every
+    # other DeFi entry's ``tick_timestamp`` semantic. Per
+    # ``unified_api_contracts.registry.market_data_categories``
+    # ``DEFI_DATA_TYPES`` registry these are the canonical data_type
+    # strings; any drift between this registry and that one is a bug.
+    ("defi", "lending_indices"): "tick_timestamp",
+    ("defi", "risk_params"): "tick_timestamp",
+    ("defi", "rewards"): "tick_timestamp",
+    ("defi", "flash_loan_events"): "tick_timestamp",
+    ("defi", "eigenlayer_rewards"): "tick_timestamp",
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",

@@ -75,6 +75,31 @@ def test_market_data_asset_groups_use_tick_timestamp() -> None:
         assert get_availability_semantic(asset_group, data_type) == "tick_timestamp"
 
 
+def test_defi_phase_1a_seed_gap_data_types_use_tick_timestamp() -> None:
+    """The 5 DeFi data_types added 2026-05-07 to close the feature_dag seed gap.
+
+    Per the Phase 1A audit (parallel-agent pass over 87 unchecked todos),
+    10 of 12 onchain feature_groups were blocked from completing the DAG
+    seed because these 5 data_types — declared in
+    ``unified_api_contracts.registry.market_data_categories.DEFI_DATA_TYPES``
+    and consumed by features-onchain calculators — were missing from the
+    availability_semantics registry. All 5 are per-event on-chain reads
+    where the row's own timestamp IS the available_at.
+    """
+    for data_type in (
+        "lending_indices",
+        "risk_params",
+        "rewards",
+        "flash_loan_events",
+        "eigenlayer_rewards",
+    ):
+        assert get_availability_semantic("defi", data_type) == "tick_timestamp", (
+            f"defi/{data_type} expected tick_timestamp; "
+            f"got {get_availability_semantic('defi', data_type)}"
+        )
+        assert has_availability_semantic("defi", data_type)
+
+
 # ---------------------------------------------------------------------------
 # Reference data
 # ---------------------------------------------------------------------------
