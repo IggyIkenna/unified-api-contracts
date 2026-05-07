@@ -107,7 +107,43 @@ class EmptyConfirmedReason(StrEnum):
     """Instrument's ``delisted_at`` is on or before the day."""
 
     EXPECTED_PARTIAL_HALF_DAY = "EXPECTED_PARTIAL_HALF_DAY"
-    """Calendar half-session (Thanksgiving Friday, Christmas Eve early close on US equities)."""
+    """Calendar half-session (Thanksgiving Friday, Christmas Eve early close on US equities). SSOT (NEW Wave 3.X):
+    ``unified_api_contracts.registry.half_day_sessions.HALF_DAY_SESSIONS`` — populated per CME / NYSE / NASDAQ /
+    CBOE published half-day calendar."""
+
+    EXPECTED_OUTSIDE_TRADING_HOURS = "EXPECTED_OUTSIDE_TRADING_HOURS"
+    """Intra-day shard (e.g. ``ohlcv_15m`` / ``book_snapshot_5`` / ``trades`` rolled up to a sub-day window) falls
+    OUTSIDE the venue's published trading hours for that day. Distinct from EXPECTED_HOLIDAY / EXPECTED_WEEKEND
+    (which are whole-day non-trading) and EXPECTED_PARTIAL_HALF_DAY (which is a shorter-than-usual session that's
+    still partly open). SSOT (NEW Wave 3.X):
+    ``unified_api_contracts.registry.venue_session_hours.VENUE_SESSION_HOURS`` — per-(venue, weekday) open/close
+    timestamp ranges. Operator msg 9 audit dimension #13."""
+
+    EXPECTED_OUTSIDE_TRANSFER_WINDOW = "EXPECTED_OUTSIDE_TRANSFER_WINDOW"
+    """Sports ``transfer_records`` data_type: shard date is outside the country's published transfer registration
+    windows. Transfer activity is concentrated in the summer (Jul-Aug) + winter (Jan) windows per FIFA + national-
+    FA rules; outside those windows transfermarkt has nothing to report. SSOT:
+    ``unified_api_contracts.canonical.domain.sports.transfer_windows.TRANSFER_WINDOWS`` (already populated for
+    20+ countries; classifier wiring is the gap). Operator msg 9 audit dimension #5."""
+
+    EXPECTED_PRE_SEASON = "EXPECTED_PRE_SEASON"
+    """Sports per-(league, season): shard date precedes the league season's published kick-off date. Footystats
+    league_id changes at season boundaries; api_football fixture catalogs only populate after the season's
+    schedule is announced. Distinct from EXPECTED_PRE_SOURCE_COVERAGE_START (which is per-source archive start,
+    not per-league-season). SSOT (NEW Wave 3.X): extension to
+    ``unified_api_contracts.sports.provider_league_ids.FOOTYSTATS_SEASON_IDS`` adding season_start dates.
+    Operator msg 9 audit dimension #6."""
+
+    EXPECTED_POST_SEASON = "EXPECTED_POST_SEASON"
+    """Sports per-(league, season): shard date is after the season's documented final fixture. Pair of
+    EXPECTED_PRE_SEASON. Same SSOT extension. Operator msg 9 audit dimension #6."""
+
+    EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE = "EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE"
+    """Sports per-(source, league): the source legitimately doesn't cover this league/season pair. Reference
+    case: Understat covers EPL / La Liga / Serie A / Bundesliga / Ligue 1 only — for any other league the
+    Understat shard is honest-empty by design, not a fetch failure. SSOT (NEW Wave 3.X):
+    ``unified_api_contracts.canonical.domain.sports.understat_coverage.UNDERSTAT_COVERED_LEAGUES``. Operator
+    msg 9 audit dimension #7."""
 
     EXPECTED_DEPRECATED_DATA_TYPE = "EXPECTED_DEPRECATED_DATA_TYPE"
     """Refdata-cadence migration: data_type was retired (e.g. LEAGUES daily-dump killed 2026-05-07 because UAC
