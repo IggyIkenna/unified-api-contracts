@@ -73,21 +73,34 @@ SHARD_AXIS_MATRIX: Final[dict[tuple[str, str], tuple[str, ...]]] = {
     # bundle root for options_chain / futures_chain; DEFI adds chain;
     # sports per-(data_type, league_id) — fixture_id is display-only;
     # prediction bundles per canonical_question_group.
+    #
+    # Axis ORDER matches the codex per-asset-group shard-key matrix in
+    # CLAUDE.md so the deployment-UI drilldown follows the natural
+    # operator navigation:
+    #   CeFi / TradFi: venue → data_type → instrument_type → instrument_id → day
+    #   DeFi:          venue → chain → data_type → instrument_id → day
+    #   Sports:        data_type → league_id → day
+    #   Prediction:    venue → canonical_question_group → data_type → day
+    # (Plan: data_status_drilldown_shard_atom_alignment_2026_05_07 § Phase 6
+    # operator finding 2026-05-07 evening — drilldown depth must match the
+    # codex shard atom.)
     ("market-tick-data-service", CEFI): (
         "venue",
-        "instrument_id",
         "data_type",
+        "instrument_type",
+        "instrument_id",
     ),
     ("market-tick-data-service", TRADFI): (
         "venue",
-        "instrument_id",
         "data_type",
+        "instrument_type",
+        "instrument_id",
     ),
     ("market-tick-data-service", DEFI): (
         "venue",
         "chain",
-        "instrument_id",
         "data_type",
+        "instrument_id",
     ),
     ("market-tick-data-service", SPORTS): ("data_type", "league_id"),
     ("market-tick-data-service", PREDICTION): (
@@ -99,19 +112,21 @@ SHARD_AXIS_MATRIX: Final[dict[tuple[str, str], tuple[str, ...]]] = {
     # output downstream).
     ("market-data-processing-service", CEFI): (
         "venue",
-        "instrument_id",
         "data_type",
+        "instrument_type",
+        "instrument_id",
     ),
     ("market-data-processing-service", TRADFI): (
         "venue",
-        "instrument_id",
         "data_type",
+        "instrument_type",
+        "instrument_id",
     ),
     ("market-data-processing-service", DEFI): (
         "venue",
         "chain",
-        "instrument_id",
         "data_type",
+        "instrument_id",
     ),
     ("market-data-processing-service", SPORTS): ("data_type", "league_id"),
     ("market-data-processing-service", PREDICTION): (
@@ -281,13 +296,21 @@ DISPLAY_AXES: Final[dict[tuple[str, str], tuple[str, ...]]] = {
     ("instruments-service", DEFI): ("instrument_type", "data_type"),
     ("instruments-service", SPORTS): ("source",),
     ("instruments-service", PREDICTION): ("data_type",),
-    ("market-tick-data-service", CEFI): ("instrument_type",),
-    ("market-tick-data-service", TRADFI): ("instrument_type",),
+    # MTDS / MDPS CeFi+TradFi: ``instrument_type`` is now a shard axis
+    # (codex shard-key matrix in CLAUDE.md — drilldown
+    # ``venue → data_type → instrument_type → instrument_id → day``);
+    # promoted from DISPLAY → SHARD per Phase 6 operator finding
+    # 2026-05-07. DeFi: ``instrument_type`` (POOL/LENDING/LST) is
+    # redundant with ``data_type`` for navigation purposes — kept as
+    # display-only so DeFi drilldown stays
+    # ``venue → chain → data_type → instrument_id → day``.
+    ("market-tick-data-service", CEFI): (),
+    ("market-tick-data-service", TRADFI): (),
     ("market-tick-data-service", DEFI): ("instrument_type",),
     ("market-tick-data-service", SPORTS): ("source", "fixture_id"),
     ("market-tick-data-service", PREDICTION): (),
-    ("market-data-processing-service", CEFI): ("instrument_type",),
-    ("market-data-processing-service", TRADFI): ("instrument_type",),
+    ("market-data-processing-service", CEFI): (),
+    ("market-data-processing-service", TRADFI): (),
     ("market-data-processing-service", DEFI): ("instrument_type",),
     ("market-data-processing-service", SPORTS): ("source", "fixture_id"),
     ("market-data-processing-service", PREDICTION): (),
