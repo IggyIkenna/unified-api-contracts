@@ -89,6 +89,29 @@ class ColumnSpec(BaseModel):
     description: str | None = None
 
 
+CadenceLiteral = Literal["singleton", "per_season", "per_day"]
+"""Refdata cadence — how often a data_type's shard atom changes (C.11 audit
+2026-05-07, manifest_migration_master_2026_05_07.plan.md § Audit findings).
+
+* ``"singleton"`` — one shard per (asset_group, data_type) total. Source
+  data effectively never changes (e.g. VENUES geo coordinates). Manifest
+  expected denominator = 1, regardless of date range.
+* ``"per_season"`` — one shard per (entity, season) tuple. Source data
+  changes per-season at most (e.g. TEAMS rosters refresh at season start;
+  league registries refresh per FootyStats season). Manifest expected
+  denominator = (entities x active_seasons), NOT (entities x days).
+* ``"per_day"`` — one shard per (entity, day) tuple. Source data is
+  genuinely time-series with daily resolution (CeFi ohlcv_*, sports
+  FIXTURES). Manifest expected denominator = (entities x days).
+
+Default is ``"per_day"`` for back-compat — existing contracts that don't
+declare cadence keep their per-day shard atom. New refdata contracts MUST
+declare cadence explicitly. Data-status panel reads this field to compute
+cadence-aware expected denominators (instead of the default
+entities x days everything).
+"""
+
+
 class SchemaContract(BaseModel):
     """Declarative contract for a per-(asset_group, instrument_type, data_type) dataframe.
 
@@ -98,6 +121,16 @@ class SchemaContract(BaseModel):
     ``"symbol"`` for back-compat with the ten original Phase-1.3 contracts;
     every new contract declares it explicitly so guessing (symbol → token →
     pool_id → asset) is eliminated at the root.
+
+    The ``cadence`` field (added 2026-05-07 under the C.11 refdata-cadence
+    audit) names the shard atom's renewal frequency: ``"singleton"`` |
+    ``"per_season"`` | ``"per_day"``. Used by the data-status panel to
+    compute expected denominators correctly — without it, refdata that
+    only changes per-season (TEAMS, STANDINGS) gets denominator-inflated
+    across every date in the window and renders thousands of phantom-
+    missing days. Default ``"per_day"`` preserves back-compat for the
+    existing per-day-cadence contracts (CeFi ohlcv_*, sports FIXTURES,
+    etc.); new refdata contracts MUST declare cadence explicitly.
     """
 
     model_config = ConfigDict(frozen=True)
@@ -109,6 +142,7 @@ class SchemaContract(BaseModel):
     symbol_column: str = "symbol"
     required_row_count_min: int = 0
     null_rate_max: dict[str, float] = Field(default_factory=dict)
+    cadence: CadenceLiteral = "per_day"
 
 
 class Violation(BaseModel):

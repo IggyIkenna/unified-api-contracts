@@ -158,3 +158,53 @@ def test_sports_fixtures_uses_af_fixture_id_as_symbol_column() -> None:
     assert "af_league_id" in names
     assert "af_home_id" in names
     assert "af_away_id" in names
+
+
+# ---------------------------------------------------------------------------
+# Cadence field — refdata cadence SSOT (C.11 audit 2026-05-07).
+# Drives the data-status panel's expected-denominator computation per
+# (asset_group, data_type) shard. Refdata that only changes per-season
+# (TEAMS) or essentially never (VENUES) MUST declare cadence so the panel
+# doesn't denominator-inflate them across every date in the window.
+# ---------------------------------------------------------------------------
+
+
+def test_sports_teams_cadence_is_per_season() -> None:
+    """C.11 audit: TEAMS rosters change per-season at most (transfer windows are
+    bounded events, not daily drift). Daily-cadence shards inflated the manifest
+    universe by ~830x for no signal. Marked ``cadence='per_season'`` so the
+    data-status panel computes denominator = (leagues x active_seasons), not
+    (leagues x days)."""
+    assert SPORTS_TEAMS.cadence == "per_season"
+
+
+def test_sports_venues_cadence_is_singleton() -> None:
+    """C.11 audit: VENUES is the OpenMeteo geo-enrichment overlay (lat/lon/altitude
+    per venue) — values change essentially never. Currently writes 1/1 shard;
+    cadence='singleton' documents the intent so the data-status panel expects
+    exactly 1 shard regardless of date range."""
+    assert SPORTS_VENUES.cadence == "singleton"
+
+
+def test_sports_fixtures_cadence_default_is_per_day() -> None:
+    """Back-compat: contracts that don't declare cadence default to ``per_day``.
+    SPORTS_FIXTURES is genuine time-series data (one shard per fixture date) —
+    per_day is correct."""
+    assert SPORTS_FIXTURES.cadence == "per_day"
+
+
+def test_cadence_field_default_preserves_back_compat() -> None:
+    """Adding the cadence field to SchemaContract MUST default to ``per_day`` so
+    every existing contract that doesn't declare cadence keeps its current
+    shard atom. The dozens of existing contracts (CeFi ohlcv_*, sports
+    FIXTURES, defi swap_state, etc.) are all per-day-cadence by construction."""
+    from unified_api_contracts.internal.schemas.contracts import SchemaContract
+
+    minimal = SchemaContract(
+        asset_group="cefi",
+        instrument_type="reference",
+        data_type="dummy_for_test",
+        columns=[ColumnSpec(name="x", dtype="int64", nullable=False)],
+        symbol_column="x",
+    )
+    assert minimal.cadence == "per_day"

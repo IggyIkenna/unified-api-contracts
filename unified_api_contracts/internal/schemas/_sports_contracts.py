@@ -196,6 +196,14 @@ SPORTS_TEAMS = SchemaContract(
     ],
     symbol_column="team_id",
     required_row_count_min=1,
+    # C.11 audit 2026-05-07: TEAMS rosters change per-season at most (transfer windows
+    # are bounded events, not daily drift). Daily-cadence shards inflated the manifest
+    # universe by ~830x for no signal. Per-season cadence: shard atom is
+    # (asset_group=sports, source=api_football, data_type=teams, league_id, season,
+    # fetch_day_when_changed) — orchestrator only emits on payload-fingerprint change
+    # (Unit 2 of the C.11 migration). Data-status panel reads cadence to compute
+    # per-season denominator (leagues x active_seasons).
+    cadence="per_season",
 )
 
 
@@ -285,6 +293,12 @@ SPORTS_VENUES = SchemaContract(
     ],
     symbol_column="venue_id",
     required_row_count_min=1,
+    # C.11 audit 2026-05-07: VENUES is the OpenMeteo geo-enrichment overlay
+    # (lat/lon/altitude per venue) — values change essentially never (a venue's
+    # location is fixed). Currently writes 1/1 shard (correct). cadence=singleton
+    # documents the intent; data-status panel expects exactly 1 shard regardless
+    # of date range.
+    cadence="singleton",
 )
 
 
