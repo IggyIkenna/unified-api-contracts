@@ -94,6 +94,12 @@ class EmptyConfirmedReason(StrEnum):
     EXPECTED_PRE_GENESIS_CHAIN = "EXPECTED_PRE_GENESIS_CHAIN"
     """DeFi: date precedes the chain's genesis block (Solana 2020-03-16, Arbitrum 2021-08-31, etc.)."""
 
+    EXPECTED_PRE_VENUE_LAUNCH = "EXPECTED_PRE_VENUE_LAUNCH"
+    """CeFi/Prediction: date precedes the venue's public launch date (Hyperliquid 2023-06, Aster 2024-09, Polymarket
+    2020-09, Kalshi 2021-07, etc.). SSOT: ``unified_api_contracts.registry.venue_launch_dates``. Sister of
+    ``EXPECTED_PRE_GENESIS_CHAIN`` (DeFi chains) and ``EXPECTED_PRE_SOURCE_COVERAGE_START`` (sports/databento source
+    archives) — all three express "no data possible because the venue/chain/source did not exist yet"."""
+
     EXPECTED_INSTRUMENT_NOT_LISTED = "EXPECTED_INSTRUMENT_NOT_LISTED"
     """Instrument's ``listed_at`` (or weekly options' ``listing_window``) is after the day."""
 
