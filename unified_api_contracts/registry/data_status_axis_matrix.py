@@ -161,12 +161,18 @@ SHARD_AXIS_MATRIX: Final[dict[tuple[str, str], tuple[str, ...]]] = {
         "instrument_id",
     ),
     # features-onchain: DEFI only; per-(venue, chain, feature_group,
-    # protocol_id, timeframe).
+    # instrument_id, timeframe). Per the codex DeFi shard atom
+    # ``(asset_group, chain, venue/protocol, data_type,
+    # instrument_id_or_protocol_id, day)`` the per-instrument / per-protocol
+    # slot is the canonical ``instrument_id`` manifest column —
+    # ``protocol_id`` does NOT exist in ``_ROW_KEY_COLUMNS`` (UTL
+    # ``manifest_writer.py``), so the prior ``protocol_id`` axis silently
+    # filtered to nothing at drill-down time.
     ("features-onchain-service", DEFI): (
         "venue",
         "chain",
         "feature_group",
-        "protocol_id",
+        "instrument_id",
         "timeframe",
     ),
     # features-sports: SPORTS only; upstream-source-keyed feature_group +
