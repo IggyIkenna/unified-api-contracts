@@ -47,7 +47,8 @@ SIZE_EXTRA_EXCLUDES=(
 )
 # requests CVE-2026-25645: no fix version available yet
 # pip CVE-2026-3219: pip tool itself (not a runtime dep), affects editable installs only
-PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645 --ignore-vuln CVE-2026-3219"
+# pip CVE-2026-6357: pip tool itself (26.0.1 → 26.1), not a runtime dep — same as CVE-2026-3219
+PIP_AUDIT_EXTRA_ARGS="--ignore-vuln CVE-2026-25645 --ignore-vuln CVE-2026-3219 --ignore-vuln CVE-2026-6357"
 # UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
 # without masking runaway regressions (a 60% overrun would still trip).

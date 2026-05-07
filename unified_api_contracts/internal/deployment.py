@@ -357,7 +357,7 @@ class VMLifecycleEvent(BaseModel):
     """One parsed JSONL row from the events bucket.
 
     Mirrors the schema documented in `codex/03-observability/lifecycle-events.md` and
-    confirmed via live probe of `gs://central-element-323112-events/...` 2026-05-07.
+    confirmed via live probe of `gs://<events-bucket>/...` 2026-05-07.
     """
 
     event: str = Field(..., description="Event type (e.g. STARTED, STOPPED, INSTRUMENT_PROCESSED).")

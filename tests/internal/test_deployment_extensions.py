@@ -20,7 +20,7 @@ from unified_api_contracts.internal import (
 
 # ────────────────────────────────────────────────────────────────────────────
 # Real-world JSONL fixture captured 2026-05-07 from
-# gs://central-element-323112-events/events/instruments-service/2026-05-07/
+# gs://<events-bucket>/events/instruments-service/2026-05-07/
 #   af-backfill-20260507-002914/hour=00/1778113506490157_372.jsonl
 # Truncated `details.message` for readability — the parse logic is the same.
 # ────────────────────────────────────────────────────────────────────────────
@@ -194,13 +194,13 @@ class TestBackfillLaunchResult:
             vm_name="cefi-binance-spot-2024-light-20260507-150000",
             vm_name_prefix="cefi-binance-",
             zone="asia-northeast1-c",
-            project_id="central-element-323112",
+            project_id="test-project",
             launched_at=datetime(2026, 5, 7, 15, 0, 0, tzinfo=UTC),
             correlation_id="48583baf-0c72-4147-9049-966151100123",
             launcher_script="launch-cefi-sharded-backfill.sh",
             dry_run=False,
             events_uri=(
-                "gs://central-element-323112-events/events/market-tick-data-service/"
+                "gs://test-project-events/events/market-tick-data-service/"
                 "2026-05-07/cefi-binance-spot-2024-light-20260507-150000/"
             ),
             argv=["bash", "/path/to/launch-cefi-sharded-backfill.sh"],
