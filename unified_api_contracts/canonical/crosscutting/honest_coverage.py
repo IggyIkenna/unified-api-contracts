@@ -42,6 +42,7 @@ from __future__ import annotations
 
 import datetime as _dt
 import re
+from enum import StrEnum
 from typing import Final
 
 from unified_api_contracts.registry import (
@@ -50,6 +51,78 @@ from unified_api_contracts.registry import (
     extract_es_options_cluster,
     get_active_es_options_clusters_for_date,
 )
+
+# ---------------------------------------------------------------------------
+# EMPTY_CONFIRMED_REASONS — closed-set taxonomy for ``capture_status="empty_confirmed"``.
+#
+# Operator direction 2026-05-07: every ``empty_confirmed`` manifest row carries
+# one of these reason codes so downstream consumers (ML training NaN-fill,
+# rolling-window feature denominator adjustment, execution skip-or-trade
+# decision) can classify absence without re-querying calendars / coverage
+# tables. Adding a new code = adding it here AND to
+# ``codex/02-data/honest-absence-downstream-handling.md`` § "Reason taxonomy"
+# AND to the per-service consumer-class audit table.
+# ---------------------------------------------------------------------------
+
+
+class EmptyConfirmedReason(StrEnum):
+    """Closed-set taxonomy for ``capture_status="empty_confirmed"`` rows.
+
+    See ``codex/02-data/honest-absence-downstream-handling.md`` for the
+    write-side decision tree (calendar lookup / coverage_start / paused-league
+    / source-returned-zero) and the per-service consumer-class audit that
+    spells out NaN-fill vs skip vs propagate per (consumer, reason) pair.
+
+    Members are string-valued so ``record_empty(reason=EmptyConfirmedReason.EXPECTED_HOLIDAY)``
+    serialises straight to the ``error_reason`` parquet column without any
+    enum-to-str gymnastics. Bare-string callers (``reason="EXPECTED_HOLIDAY"``)
+    are validated via membership lookup at the writer boundary.
+    """
+
+    EXPECTED_HOLIDAY = "EXPECTED_HOLIDAY"
+    """Calendar-pre-skip: venue trading calendar marks the date as a holiday."""
+
+    EXPECTED_WEEKEND = "EXPECTED_WEEKEND"
+    """Calendar-pre-skip: weekend day on a Monday-Friday venue (NYSE, CBOE, CME ETH)."""
+
+    EXPECTED_PAUSED_LEAGUE = "EXPECTED_PAUSED_LEAGUE"
+    """Sports: league is in a documented pause window (off-season, suspended due to crisis)."""
+
+    EXPECTED_PRE_SOURCE_COVERAGE_START = "EXPECTED_PRE_SOURCE_COVERAGE_START"
+    """Date precedes the source's ``SOURCE_COVERAGE_START`` (per UAC sports / databento registries)."""
+
+    EXPECTED_PRE_GENESIS_CHAIN = "EXPECTED_PRE_GENESIS_CHAIN"
+    """DeFi: date precedes the chain's genesis block (Solana 2020-03-16, Arbitrum 2021-08-31, etc.)."""
+
+    EXPECTED_INSTRUMENT_NOT_LISTED = "EXPECTED_INSTRUMENT_NOT_LISTED"
+    """Instrument's ``listed_at`` (or weekly options' ``listing_window``) is after the day."""
+
+    EXPECTED_INSTRUMENT_DELISTED = "EXPECTED_INSTRUMENT_DELISTED"
+    """Instrument's ``delisted_at`` is on or before the day."""
+
+    EXPECTED_PARTIAL_HALF_DAY = "EXPECTED_PARTIAL_HALF_DAY"
+    """Calendar half-session (Thanksgiving Friday, Christmas Eve early close on US equities)."""
+
+    SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
+    """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
+
+
+EMPTY_CONFIRMED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in EmptyConfirmedReason)
+"""String-membership view of :class:`EmptyConfirmedReason` for fast O(1) validation.
+
+UTL ``ManifestWriter.record_empty(reason=...)`` validates the kwarg against
+this set; unknown reasons raise ``UnknownEmptyConfirmedReasonError``. Use
+:class:`EmptyConfirmedReason` members in new code; the bare-string set is for
+the validation hot path only.
+"""
+
+
+EXPECTED_EMPTY_REASON_PREFIX: Final[str] = "EXPECTED_"
+"""Reason-prefix marker used by ``record_expected_empty`` to distinguish
+calendar-pre-skip writes (``EXPECTED_*``) from honest source-returned-zero
+writes (``SOURCE_RETURNED_ZERO``). The helper rejects non-prefixed reasons so
+calendar callsites can't accidentally emit ``SOURCE_RETURNED_ZERO``.
+"""
 
 # ---------------------------------------------------------------------------
 # Bundled data_types — referenced by the ManifestWriter cluster-validation guard.
@@ -309,11 +382,14 @@ Phase 1A.
 __all__ = [
     "BUNDLED_DATA_TYPES",
     "DATA_TYPE_TO_CLUSTER_REGISTRY",
+    "EMPTY_CONFIRMED_REASONS",
     "ES_OPTIONS_CLUSTERS",
     "ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER",
+    "EXPECTED_EMPTY_REASON_PREFIX",
     "FUTURES_CHAIN_BUCKETS",
     "PREDICTION_GROUPS",
     "SPORTS_FIXTURE_CLUSTERS",
+    "EmptyConfirmedReason",
     "extract_es_options_cluster",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
