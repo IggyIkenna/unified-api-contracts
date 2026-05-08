@@ -337,6 +337,16 @@ _PLAN_REQUIRED_CODES: tuple[AlertCode, ...] = (
     AlertCode.POSITION_DRIFT,
 )
 
+# ML lifecycle codes added 2026-05-08 (cefi_ml_may_23_2026.epic Tab 5 Item 6).
+_ML_LIFECYCLE_CODES: tuple[AlertCode, ...] = (
+    AlertCode.ML_SIGNAL_STALENESS,
+    AlertCode.ML_MODEL_DRIFT_DETECTED,
+    AlertCode.ML_PNL_DEVIATION,
+    AlertCode.ML_INFERENCE_LATENCY_BREACH,
+    AlertCode.ML_MODEL_VERSION_MISMATCH,
+    AlertCode.KILL_SWITCH_ML_MODEL_FAILURE,
+)
+
 
 def test_plan_required_codes_present_in_enum() -> None:
     """Plan Phase 1 §"Add `AlertCode` StrEnum" enumerated 15 codes that MUST
@@ -374,3 +384,88 @@ def test_alert_threshold_construction_with_overrides() -> None:
     )
     assert t.for_archetype("archetype_a") == Decimal("50")
     assert t.for_archetype("archetype_b") == Decimal("100")
+
+
+# ---------------------------------------------------------------------------
+# ML lifecycle codes (2026-05-08, cefi_ml_may_23_2026.epic Tab 5 Item 6)
+# ---------------------------------------------------------------------------
+
+
+def test_ml_lifecycle_codes_present_in_enum() -> None:
+    """6 ML lifecycle codes added 2026-05-08 must be in the closed AlertCode set."""
+    for code in _ML_LIFECYCLE_CODES:
+        assert code in AlertCode
+
+
+def test_ml_lifecycle_codes_have_routing_rule() -> None:
+    """Every ML lifecycle code must have at least one matching AlertRule in
+    LIVE_ALERT_RULES — either an explicit rule or a wildcard match (e.g.
+    KILL_SWITCH_ML_MODEL_FAILURE matches the existing KILL_SWITCH_* rule)."""
+    for code in _ML_LIFECYCLE_CODES:
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.pattern)]
+        assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
+
+
+def test_ml_thresholds_present_in_registry() -> None:
+    """Every ML threshold key referenced by an ML AlertRule must exist in
+    ALERT_THRESHOLDS with explicit ThresholdUnit. Resolves the bps-vs-PSI-vs-ms
+    ambiguity that would otherwise lurk across model-monitoring code."""
+    expected_ml_keys = {
+        "ml_signal_staleness_minutes": ThresholdUnit.MINUTES,
+        "ml_model_drift_psi": ThresholdUnit.PSI,
+        "ml_pnl_deviation_bps": ThresholdUnit.BPS_OF_ONE,
+        "ml_inference_latency_p99_ms": ThresholdUnit.MILLISECONDS,
+        "ml_model_version_mismatch_minutes": ThresholdUnit.MINUTES,
+    }
+    for key, expected_unit in expected_ml_keys.items():
+        assert key in ALERT_THRESHOLDS, f"ALERT_THRESHOLDS missing {key!r} for ML lifecycle"
+        assert ALERT_THRESHOLDS[key].unit is expected_unit, (
+            f"ALERT_THRESHOLDS[{key!r}].unit={ALERT_THRESHOLDS[key].unit} != expected {expected_unit}"
+        )
+
+
+def test_ml_kill_switch_rule_carries_kill_switch_flag() -> None:
+    """KILL_SWITCH_ML_MODEL_FAILURE rule must opt into triggers_kill_switch=True
+    so the kill-switch publisher hook (alerting Phase 2 follow-up) emits the
+    KillSwitchEvent on fire — required for archetype halt without operator
+    intervention."""
+    matched = [r for r in LIVE_ALERT_RULES if r.code is AlertCode.KILL_SWITCH_ML_MODEL_FAILURE]
+    assert matched, "Expected at least one explicit AlertRule for KILL_SWITCH_ML_MODEL_FAILURE"
+    for rule in matched:
+        assert rule.triggers_kill_switch is True, (
+            f"AlertRule(code=KILL_SWITCH_ML_MODEL_FAILURE) must have triggers_kill_switch=True;"
+            f" got {rule.triggers_kill_switch}"
+        )
+
+
+def test_ml_critical_rules_include_pagerduty() -> None:
+    """Every CRITICAL-severity ML rule must page on-call. ML_MODEL_VERSION_MISMATCH
+    + KILL_SWITCH_ML_MODEL_FAILURE both qualify; ML_PNL_DEVIATION is HIGH not
+    CRITICAL but should still page (PagerDuty P2)."""
+    critical_ml_codes = {AlertCode.ML_MODEL_VERSION_MISMATCH, AlertCode.KILL_SWITCH_ML_MODEL_FAILURE}
+    for rule in LIVE_ALERT_RULES:
+        if rule.code in critical_ml_codes:
+            assert rule.severity is AlertSeverity.CRITICAL, (
+                f"AlertRule(code={rule.code}) expected CRITICAL severity; got {rule.severity}"
+            )
+            assert AlertChannel.PAGERDUTY in rule.channels, (
+                f"AlertRule(code={rule.code}, severity=CRITICAL) is missing PagerDuty channel"
+            )
+
+
+def test_ml_psi_threshold_unit_is_explicit() -> None:
+    """PSI is a distinct unit from RATIO — distributional drift, not a
+    multiplicative factor. ml_model_drift_psi MUST carry ThresholdUnit.PSI so
+    consumers don't accidentally compare a PSI value against a ratio threshold."""
+    threshold = ALERT_THRESHOLDS["ml_model_drift_psi"]
+    assert threshold.unit is ThresholdUnit.PSI
+    # Industry rule-of-thumb: 0.10 < PSI < 0.25 = moderate drift; default 0.20.
+    assert threshold.default_value == Decimal("0.20")
+
+
+def test_ml_inference_latency_threshold_unit_is_milliseconds() -> None:
+    """Inference SLO is naturally in milliseconds, NOT minutes. Wrong unit
+    here would make a 500min p99 SLO (8 hours) the ratchet — silent disaster."""
+    threshold = ALERT_THRESHOLDS["ml_inference_latency_p99_ms"]
+    assert threshold.unit is ThresholdUnit.MILLISECONDS
+    assert threshold.default_value == Decimal("500")

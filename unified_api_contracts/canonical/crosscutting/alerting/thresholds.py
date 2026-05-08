@@ -52,6 +52,14 @@ class ThresholdUnit(StrEnum):
     COUNT_PER_MINUTE = "count_per_minute"
     """Rolling rate (10 = ten events per minute)."""
 
+    MILLISECONDS = "milliseconds"
+    """Duration in milliseconds (500 = 500 ms inference SLO)."""
+
+    PSI = "psi"
+    """Population Stability Index — distributional drift metric. PSI < 0.10
+    = no drift; 0.10-0.25 = moderate drift; >= 0.25 = significant drift.
+    Industry-standard ML monitoring metric."""
+
 
 @dataclass(frozen=True, slots=True)
 class AlertThreshold:
@@ -212,6 +220,75 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " CROSS_CLOUD_EGRESS_DETECTED."
         ),
         description="Per-request cross-cloud egress bytes that flag a locality bug.",
+    ),
+    # ── ML lifecycle (2026-05-08, cefi_ml_may_23_2026.epic Tab 5 Item 6) ────
+    "ml_signal_staleness_minutes": AlertThreshold(
+        key="ml_signal_staleness_minutes",
+        unit=ThresholdUnit.MINUTES,
+        default_value=Decimal("5"),
+        source_doc=(
+            "Default ML signal freshness window. CeFi ML archetypes typically"
+            " refresh on 1-min or 5-min bar boundaries; 5min default catches"
+            " genuine stalls without false-positive on bar-close jitter."
+            " Per-archetype overrides expected once Phase 7 quietness baseline"
+            " runs against live ml-inference-service emission."
+        ),
+        description="Maximum age of last ML signal emission before staleness alert fires.",
+    ),
+    "ml_model_drift_psi": AlertThreshold(
+        key="ml_model_drift_psi",
+        unit=ThresholdUnit.PSI,
+        default_value=Decimal("0.20"),
+        source_doc=(
+            "Population Stability Index threshold for output-distribution"
+            " drift vs training baseline. Industry rule-of-thumb: PSI<0.10 no"
+            " drift, 0.10-0.25 moderate, ≥0.25 significant. 0.20 is a"
+            " conservative mid-band that flags before drift fully invalidates"
+            " the model. ml-training-service emits on rolling-window compare"
+            " against the training distribution snapshot stored alongside the"
+            " model artefact."
+        ),
+        description="PSI threshold for ML output distribution drift vs training baseline.",
+    ),
+    "ml_pnl_deviation_bps": AlertThreshold(
+        key="ml_pnl_deviation_bps",
+        unit=ThresholdUnit.BPS_OF_ONE,
+        default_value=Decimal("200"),
+        source_doc=(
+            "2.00% deviation between live strategy P&L and expected P&L (from"
+            " batch backtest baseline) over a rolling 24h window. Above this,"
+            " either the model is wrong or execution is degraded; either case"
+            " warrants pager + investigation before drawdown compounds. Phase"
+            " 7 quietness baseline tunes per-archetype."
+        ),
+        description="Strategy P&L deviation from expected baseline in bps over 24h.",
+    ),
+    "ml_inference_latency_p99_ms": AlertThreshold(
+        key="ml_inference_latency_p99_ms",
+        unit=ThresholdUnit.MILLISECONDS,
+        default_value=Decimal("500"),
+        source_doc=(
+            "Default inference SLO p99 = 500ms. CeFi ML archetypes operate on"
+            " 1-min bar cadence so 500ms p99 leaves ample headroom; sub-100ms"
+            " HFT archetypes (not shipped pre-May-23) would override this"
+            " threshold per-archetype. ml-inference-service emits per-bar"
+            " inference latency; rolling-window p99 compared to threshold."
+        ),
+        description="Inference p99 latency SLO in milliseconds.",
+    ),
+    "ml_model_version_mismatch_minutes": AlertThreshold(
+        key="ml_model_version_mismatch_minutes",
+        unit=ThresholdUnit.MINUTES,
+        default_value=Decimal("0"),
+        source_doc=(
+            "Zero-tolerance: any version mismatch fires immediately. Strategy"
+            " executing against an unexpected model version means trades land"
+            " on an unapproved artefact (rollback race / promotion mis-fire /"
+            " hot-reload bug). Operator must investigate before next trade."
+            " Threshold value is the grace window in minutes — 0 means alert"
+            " on first observation."
+        ),
+        description="Grace window in minutes before ML model-version mismatch fires (0 = immediate).",
     ),
 }
 """Threshold registry. New rules must add an entry here AND reference the key

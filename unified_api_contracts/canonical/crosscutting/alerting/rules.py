@@ -355,6 +355,66 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " above per-request budget. Audit 2026-05-07 dual-cloud-active policy."
         ),
     ),
+    # ── ML lifecycle (2026-05-08, cefi_ml_may_23_2026.epic Tab 5 Item 6) ────
+    # CRITICAL — model-version mismatch is zero-tolerance: any trade against
+    # an unapproved artefact is a regulatory + risk problem.
+    AlertRule(
+        code=AlertCode.ML_MODEL_VERSION_MISMATCH,
+        pattern="ML_MODEL_VERSION_MISMATCH",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("ml_model_version_mismatch"),
+        threshold_key="ml_model_version_mismatch_minutes",
+        description=(
+            "Strategy executing against unexpected model version — page on-call"
+            " immediately; halt archetype until artefact / promotion path resolved."
+        ),
+    ),
+    # CRITICAL — kill-switch family extension: ML model server unreachable /
+    # repeated inference failures. NOTE: paired Sub-A work
+    # (`alerting_kill_switch_publish_hook` Phase 1) is mid-flight adding
+    # `kill_switch_scope: KillSwitchScope` field to AlertRule + validator
+    # that requires it on KILL_SWITCH_* codes. When that lands, this rule
+    # MUST be updated to `kill_switch_scope=KillSwitchScope.ARCHETYPE` —
+    # halt only the affected ML archetype, other archetypes keep trading.
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_ML_MODEL_FAILURE,
+        pattern="KILL_SWITCH_ML_MODEL_FAILURE",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("kill_switch_ml_model_failure"),
+        triggers_kill_switch=True,
+        description=(
+            "ML model server unreachable / repeated inference failures — halt"
+            " the affected archetype until model recovers or operator overrides."
+        ),
+    ),
+    # HIGH — model-output drift vs training baseline (PSI ≥ threshold).
+    AlertRule(
+        code=AlertCode.ML_MODEL_DRIFT_DETECTED,
+        pattern="ML_MODEL_DRIFT_DETECTED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("ml_model_drift_detected"),
+        threshold_key="ml_model_drift_psi",
+        description=(
+            "ML output distribution drift vs training baseline (PSI threshold)."
+            " Page — model may be stale or feature inputs may have shifted regime."
+        ),
+    ),
+    # HIGH — strategy P&L deviation from expected baseline.
+    AlertRule(
+        code=AlertCode.ML_PNL_DEVIATION,
+        pattern="ML_PNL_DEVIATION",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("ml_pnl_deviation"),
+        threshold_key="ml_pnl_deviation_bps",
+        description=(
+            "Live strategy P&L deviates from expected baseline beyond bps"
+            " threshold over 24h — model wrong or execution degraded; investigate."
+        ),
+    ),
     # ── T3 WARN — Telegram only ─────────────────────────────────────────────
     AlertRule(
         code=AlertCode.CIRCUIT_BREAKER_DEGRADED,
@@ -484,6 +544,31 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         runbook_doc=_runbook("position_drift"),
         threshold_key="position_drift_bps",
         description="Position drift from target exceeds rebalance threshold.",
+    ),
+    # ── ML lifecycle WARN tier (2026-05-08) ─────────────────────────────────
+    AlertRule(
+        code=AlertCode.ML_SIGNAL_STALENESS,
+        pattern="ML_SIGNAL_STALENESS",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM, AlertChannel.SLACK),
+        runbook_doc=_runbook("ml_signal_staleness"),
+        threshold_key="ml_signal_staleness_minutes",
+        description=(
+            "ML signal stale beyond freshness window — investigate before escalating"
+            " to ML_MODEL_VERSION_MISMATCH or KILL_SWITCH_ML_MODEL_FAILURE."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.ML_INFERENCE_LATENCY_BREACH,
+        pattern="ML_INFERENCE_LATENCY_BREACH",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.SLACK,),
+        runbook_doc=_runbook("ml_inference_latency_breach"),
+        threshold_key="ml_inference_latency_p99_ms",
+        description=(
+            "Inference p99 latency SLO breached — model server slower than expected;"
+            " investigate before staleness escalation."
+        ),
     ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(

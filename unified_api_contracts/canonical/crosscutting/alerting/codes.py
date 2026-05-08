@@ -32,6 +32,11 @@ class AlertCode(StrEnum):
     KILL_SWITCH_DEFI_LIQUIDATION_RISK = "KILL_SWITCH_DEFI_LIQUIDATION_RISK"
     KILL_SWITCH_PORTFOLIO_DRAWDOWN = "KILL_SWITCH_PORTFOLIO_DRAWDOWN"
     KILL_SWITCH_VENUE_DISCONNECT = "KILL_SWITCH_VENUE_DISCONNECT"
+    KILL_SWITCH_ML_MODEL_FAILURE = "KILL_SWITCH_ML_MODEL_FAILURE"
+    """Kill-switch — model server unreachable / repeated inference failures /
+    unrecoverable model-version mismatch. Halts the affected archetype until
+    model server recovers or operator overrides. Added 2026-05-08 for
+    `cefi_ml_may_23_2026.epic` ML kill-switch coverage."""
 
     # ── Circuit-breaker lifecycle
     CIRCUIT_BREAKER_OPEN = "CIRCUIT_BREAKER_OPEN"
@@ -90,6 +95,31 @@ class AlertCode(StrEnum):
     # active policy means a UI in one cloud reading data from the other is a
     # bug; alerting catches it).
     CROSS_CLOUD_EGRESS_DETECTED = "CROSS_CLOUD_EGRESS_DETECTED"
+
+    # ── ML lifecycle (2026-05-08, cefi_ml_may_23_2026.epic Tab 5 Item 6) ────
+    # Live-ML signal staleness / drift / P&L deviation / inference latency /
+    # model-version mismatch. Producers: ml-inference-service (signal +
+    # latency + version); strategy-service (P&L deviation per archetype);
+    # ml-training-service (drift via PSI vs training-baseline distributions).
+    ML_SIGNAL_STALENESS = "ML_SIGNAL_STALENESS"
+    """ML signal hasn't refreshed within the freshness window. Default 5min
+    per `ml_signal_staleness_minutes`; per-archetype overrides allowed."""
+    ML_MODEL_DRIFT_DETECTED = "ML_MODEL_DRIFT_DETECTED"
+    """Model output distribution drifts from training baseline (Population
+    Stability Index ≥ threshold). Page-worthy — model may be stale or
+    feature inputs may have shifted regime."""
+    ML_PNL_DEVIATION = "ML_PNL_DEVIATION"
+    """Live strategy P&L deviates from expected by more than the bps
+    threshold. Either model is wrong or execution is degraded; in either
+    case, page on-call to investigate before drawdown compounds."""
+    ML_INFERENCE_LATENCY_BREACH = "ML_INFERENCE_LATENCY_BREACH"
+    """Inference SLO breached (p99 > threshold ms). WARN-level — model
+    server still serving but slower than expected; investigate before it
+    escalates to staleness."""
+    ML_MODEL_VERSION_MISMATCH = "ML_MODEL_VERSION_MISMATCH"
+    """Strategy executing against unexpected model version (artefact
+    rollback / promotion race / hot-reload mis-fire). CRITICAL — every
+    trade until resolved is on a model the operator did not approve."""
 
 
 ALERT_CODES: Final[frozenset[str]] = frozenset(member.value for member in AlertCode)
