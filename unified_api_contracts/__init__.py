@@ -307,6 +307,9 @@ from .canonical.domain import (
     resolve_environment_from_env,
     resolve_environment_from_hostname,
 )
+from .canonical.domain.features import (
+    get_required_inputs,
+)
 from .canonical.partition_paths import (
     build_cefi_partition_path,
     build_defi_partition_path,
@@ -326,6 +329,32 @@ from .config.trading_validation import (
     VALID_MODES,
     VALID_TIMEFRAMES,
 )
+
+# isort: off
+# These crosscutting / features imports must load AFTER ``.canonical.domain``
+# so ``BetStatus`` is already in the top-level UAC namespace when the
+# honest_coverage → registry → capability_declarations → _signal_broadcast
+# → internal/__init__.py → execution_service/sports.py chain triggers
+# ``from unified_api_contracts import BetStatus``. Pre-existing circular
+# import — see ``canonical.crosscutting.alerting`` comment block above.
+from .canonical.crosscutting.honest_coverage import (
+    BUNDLED_DATA_TYPES,
+    DATA_TYPE_TO_CLUSTER_REGISTRY,
+    EMPTY_CONFIRMED_REASONS,
+    EXPECTED_EMPTY_REASON_PREFIX,
+    EmptyConfirmedReason,
+    LegacyBlankErrorReasonError,
+)
+from .canonical.crosscutting.service_emission_policy import (
+    EmissionLifecycleEvent,
+    ServiceEmissionPolicy,
+    get_emission_policy,
+    is_emission_policy_declared,
+    policy_is_alert,
+    policy_is_publish_row,
+)
+
+# isort: on
 from .external.aster.schemas import AsterExchangeInfo
 from .external.betfair import (
     BetfairCurrentOrderSummary,
@@ -773,6 +802,8 @@ __all__ = [
     "ALERT_THRESHOLDS",
     "ALL_VENUES",
     "BOOKMAKER_REGISTRY",
+    # Honest-coverage taxonomy — UTL ManifestWriter consumers
+    "BUNDLED_DATA_TYPES",
     "CEFI_ACCEPTED_QUOTE_ASSETS",
     "CEFI_BASE_ASSETS",
     "CEFI_BASE_ASSET_UNIVERSE",
@@ -796,6 +827,7 @@ __all__ = [
     "DATA_SOURCE_TO_SECRET",
     "DATA_SOURCE_TO_VENUES",
     "DATA_TYPES_BY_ASSET_GROUP",
+    "DATA_TYPE_TO_CLUSTER_REGISTRY",
     "DEFI_AAVE_V3_LENDING_INDICES",
     "DEFI_DEX_POOL_DEX_POOL_STATE",
     "DEFI_DEX_POOL_DEX_POOL_SWAPS",
@@ -824,15 +856,16 @@ __all__ = [
     "DEFI_STAKING_YIELD_SNAPSHOTS",
     "DEX_VENUES",
     "DEX_VENUE_KEYWORDS",
+    "EMPTY_CONFIRMED_REASONS",
     "ENDPOINT_REGISTRY",
     "EXCHANGE_BY_TICKER",
     "EXPECTED_COVERAGE_BY_ASSET_GROUP",
+    "EXPECTED_EMPTY_REASON_PREFIX",
     "FX_SPOT_PAIRS",
     "INSTRUMENT_SCHEMA",
     "INSTRUMENT_TYPES_BY_VENUE",
     "INSTRUMENT_TYPE_FOLDER_MAP",
     "KNOWN_ETFS",
-    "KillSwitchScope",
     "LIVE_ALERT_RULES",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
@@ -1080,6 +1113,9 @@ __all__ = [
     "DeribitPositionsResponse",
     "DeribitTickerResponse",
     "DirectionalIntent",
+    # Service emission policy — UTL emission_publisher consumers
+    "EmissionLifecycleEvent",
+    "EmptyConfirmedReason",
     "EndpointSpec",
     "EnvironmentTier",
     "Erc20TransferCalldata",
@@ -1135,8 +1171,10 @@ __all__ = [
     "KalshiMarket",
     "KalshiOrderBook",
     "KalshiTrade",
+    "KillSwitchScope",
     "LPProtocolBreakdown",
     "LatencyComponent",
+    "LegacyBlankErrorReasonError",
     "LidoRequestWithdrawalsParams",
     "LidoSubmitParams",
     "LidoSubmitResponse",
@@ -1246,6 +1284,7 @@ __all__ = [
     "ScraperError",
     "ScraperVersionMeta",
     "SentimentScore",
+    "ServiceEmissionPolicy",
     "SettlementEvent",
     "ShareClass",
     "SignalAcknowledgement",
@@ -1323,19 +1362,25 @@ __all__ = [
     "entitlements_for",
     "get_data_sources_for_venue",
     "get_databento_symbols_for_venue",
+    "get_emission_policy",
     "get_expected_bookmakers",
     "get_expected_data_types_for_venue",
     "get_expected_instruments_for_venue",
     "get_provider_availability",
+    # Features DAG — UTL point_in_time + features-* consumers
+    "get_required_inputs",
     "get_required_secrets",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
     "is_batch",
+    "is_emission_policy_declared",
     "is_live",
     "is_per_instrument_shard_data_type",
     "lookup_contract",
     "normalize_underlying",
     "pipeline_mode_for_source",
+    "policy_is_alert",
+    "policy_is_publish_row",
     "resolve_environment_from_env",
     "resolve_environment_from_hostname",
     "resolve_exchange",

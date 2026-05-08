@@ -7,7 +7,14 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts import AlertCode
+# Import AlertCode from its definition module rather than the top-level
+# UAC facade — when this module loads as part of UAC __init__'s transitive
+# chain (canonical_mappings → canonical/__init__.py → crosscutting/...
+# → instruments_preflight_dag → internal/events → internal/alerting/...),
+# the top-level facade hasn't yet bound AlertCode (line 26 in __init__.py
+# imports alerting AFTER this chain triggers). Direct module import is
+# circular-safe.
+from unified_api_contracts.canonical.crosscutting.alerting.codes import AlertCode
 from unified_api_contracts.internal.alerting.alerts import DefiAlert
 
 
