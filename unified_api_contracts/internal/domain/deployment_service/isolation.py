@@ -26,6 +26,16 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
+# KillSwitchScope moved to canonical/crosscutting/alerting/codes.py 2026-05-08
+# so canonical AlertRule can carry it as a typed field without a circular
+# import. Re-exported here for backward compat — every existing
+# `unified_api_contracts.internal.KillSwitchScope` consumer keeps working.
+from unified_api_contracts.canonical.crosscutting.alerting.codes import (
+    KillSwitchScope,
+)
+
+__all_canonical_reexports__ = ["KillSwitchScope"]
+
 
 class IsolationPolicy(StrEnum):
     """Per-service isolation choice.
@@ -83,25 +93,6 @@ class ChaosInjectionPoint(StrEnum):
     CONFIG_FLIP = "config_flip"
     KILL_SWITCH_FIRE = "kill_switch_fire"
     COMPONENT_FAILURE = "component_failure"
-
-
-class KillSwitchScope(StrEnum):
-    """Scope at which a kill-switch fires.
-
-    GLOBAL: halt the entire platform (human operator only).
-    CLIENT: halt all activity for one client.
-    VENUE: halt all orders to one venue.
-    STRATEGY: halt one strategy_id.
-    ARCHETYPE: halt all strategies of one archetype.
-    INSTRUMENT: halt one symbol.
-    """
-
-    GLOBAL = "global"
-    CLIENT = "client"
-    VENUE = "venue"
-    STRATEGY = "strategy"
-    ARCHETYPE = "archetype"
-    INSTRUMENT = "instrument"
 
 
 class ServiceIsolationSpec(BaseModel):

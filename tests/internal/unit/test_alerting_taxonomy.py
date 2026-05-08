@@ -31,6 +31,7 @@ from unified_api_contracts.alerting import (
     AlertRule,
     AlertSeverity,
     AlertThreshold,
+    KillSwitchScope,
     ThresholdUnit,
     UnknownAlertCodeError,
     UnknownThresholdKeyError,
@@ -511,19 +512,58 @@ def test_every_alert_rule_runbook_doc_path_format() -> None:
         )
 
 
-def test_kill_switch_wildcard_rule_runbook_anchors_at_liquidation_risk() -> None:
-    """The `KILL_SWITCH_*` wildcard rule pattern matches all 3 KILL_SWITCH
-    codes. Its runbook_doc anchors at kill_switch_defi_liquidation_risk.md
-    (the highest-impact variant); the runbook itself cross-references the
-    sibling kill_switch_portfolio_drawdown.md +
-    kill_switch_venue_disconnect.md so operators reach the right one."""
-    matching_rules = [r for r in LIVE_ALERT_RULES if r.pattern == "KILL_SWITCH_*"]
-    assert len(matching_rules) == 1, f"Expected exactly one KILL_SWITCH_* wildcard rule; found {len(matching_rules)}."
-    rule = matching_rules[0]
-    assert rule.runbook_doc.endswith("kill_switch_defi_liquidation_risk.md"), (
-        f"KILL_SWITCH_* wildcard rule.runbook_doc={rule.runbook_doc!r}"
-        " expected to anchor at kill_switch_defi_liquidation_risk.md."
-    )
+def test_kill_switch_family_split_into_atomic_per_code_rules() -> None:
+    """The KILL_SWITCH_* family is split into atomic per-code rules
+    (2026-05-08 split — wildcard rule cannot carry per-event kill_switch_scope).
+    Each KILL_SWITCH_* code has its own dedicated rule with the matching
+    runbook_doc + per-event kill_switch_scope (GLOBAL / VENUE / ARCHETYPE)."""
+    expected_per_code_rules = {
+        AlertCode.KILL_SWITCH_DEFI_LIQUIDATION_RISK: ("kill_switch_defi_liquidation_risk", KillSwitchScope.GLOBAL),
+        AlertCode.KILL_SWITCH_PORTFOLIO_DRAWDOWN: ("kill_switch_portfolio_drawdown", KillSwitchScope.GLOBAL),
+        AlertCode.KILL_SWITCH_VENUE_DISCONNECT: ("kill_switch_venue_disconnect", KillSwitchScope.VENUE),
+        AlertCode.KILL_SWITCH_ML_MODEL_FAILURE: ("kill_switch_ml_model_failure", KillSwitchScope.ARCHETYPE),
+    }
+    for code, (expected_slug, expected_scope) in expected_per_code_rules.items():
+        matching = [r for r in LIVE_ALERT_RULES if r.code == code]
+        assert len(matching) == 1, f"Expected exactly one rule for {code.value!r}; found {len(matching)}."
+        rule = matching[0]
+        assert rule.runbook_doc.endswith(f"{expected_slug}.md"), (
+            f"{code.value!r}.runbook_doc={rule.runbook_doc!r} expected to end with {expected_slug}.md."
+        )
+        assert rule.kill_switch_scope == expected_scope, (
+            f"{code.value!r}.kill_switch_scope={rule.kill_switch_scope!r} expected {expected_scope!r}."
+        )
+        assert rule.triggers_kill_switch is True, (
+            f"{code.value!r}.triggers_kill_switch={rule.triggers_kill_switch!r} expected True."
+        )
+
+
+def test_kill_switch_scope_required_for_kill_switch_codes() -> None:
+    """KILL_SWITCH_* AlertCode members MUST have kill_switch_scope set;
+    construction with kill_switch_scope=None for a KILL_SWITCH_* code raises."""
+    with pytest.raises(ValidationError, match="kill_switch_scope is REQUIRED"):
+        AlertRule(
+            code=AlertCode.KILL_SWITCH_DEFI_LIQUIDATION_RISK,
+            pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
+            severity=AlertSeverity.CRITICAL,
+            channels=(AlertChannel.PAGERDUTY,),
+            runbook_doc="unified-trading-pm/codex/14-playbooks/alerting/kill_switch_defi_liquidation_risk.md",
+            triggers_kill_switch=True,
+            kill_switch_scope=None,
+        )
+
+
+def test_kill_switch_scope_must_be_none_for_non_kill_switch_codes() -> None:
+    """Non-KILL_SWITCH_* AlertCode members MUST have kill_switch_scope=None."""
+    with pytest.raises(ValidationError, match="kill_switch_scope MUST be None"):
+        AlertRule(
+            code=AlertCode.CIRCUIT_BREAKER_OPEN,
+            pattern="CIRCUIT_BREAKER_OPEN",
+            severity=AlertSeverity.CRITICAL,
+            channels=(AlertChannel.PAGERDUTY,),
+            runbook_doc="unified-trading-pm/codex/14-playbooks/alerting/circuit_breaker_open.md",
+            kill_switch_scope=KillSwitchScope.GLOBAL,
+        )
 
 
 def test_phase6_required_runbook_slugs_present_in_live_alert_rules() -> None:
@@ -548,22 +588,11 @@ def test_phase6_required_runbook_slugs_present_in_live_alert_rules() -> None:
     }
     referenced_slugs: set[str] = set()
     for rule in LIVE_ALERT_RULES:
-        # Strip the `unified-trading-pm/codex/14-playbooks/alerting/` prefix
-        # and the `.md` suffix. Path validated by the format test above.
         slug = rule.runbook_doc.rsplit("/", 1)[-1].removesuffix(".md")
         referenced_slugs.add(slug)
     missing = plan_required_slugs - referenced_slugs
-    # KILL_SWITCH_PORTFOLIO_DRAWDOWN + KILL_SWITCH_VENUE_DISCONNECT are
-    # routed via the `KILL_SWITCH_*` wildcard rule whose runbook_doc anchors
-    # at kill_switch_defi_liquidation_risk.md. The two sibling slugs are
-    # cross-referenced from the anchor runbook + reachable via the README
-    # index, so this test allows their absence from the runbook_doc set.
-    expected_missing_due_to_wildcard = {
-        "kill_switch_portfolio_drawdown",
-        "kill_switch_venue_disconnect",
-    }
-    assert missing <= expected_missing_due_to_wildcard, (
-        f"Phase 6 plan-required runbook slugs missing from LIVE_ALERT_RULES"
-        f" runbook_doc set (excluding kill-switch siblings reached via the"
-        f" wildcard anchor): {sorted(missing - expected_missing_due_to_wildcard)}"
+    # 2026-05-08: KILL_SWITCH_* wildcard rule split into atomic per-code rules
+    # so each kill-switch slug now has its own AlertRule.runbook_doc.
+    assert not missing, (
+        f"Phase 6 plan-required runbook slugs missing from LIVE_ALERT_RULES runbook_doc set: {sorted(missing)}"
     )

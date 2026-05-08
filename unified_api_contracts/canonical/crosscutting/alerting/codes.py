@@ -166,3 +166,29 @@ class AlertChannel(StrEnum):
     SLACK = "slack"
     EMAIL = "email"
     LOG_ONLY = "log_only"
+
+
+class KillSwitchScope(StrEnum):
+    """Scope at which a kill-switch fires.
+
+    Canonical layer SSOT (was at ``internal/domain/deployment_service/isolation.py``;
+    moved here 2026-05-08 so canonical AlertRule can carry a per-rule
+    ``kill_switch_scope`` field without a circular import). The internal-layer
+    location now imports + re-exports for backward compat — every existing
+    consumer of ``unified_api_contracts.internal.KillSwitchScope`` keeps
+    working.
+
+    - ``GLOBAL`` — halt the entire platform (human operator only).
+    - ``CLIENT`` — halt all activity for one client.
+    - ``VENUE`` — halt all orders to one venue.
+    - ``STRATEGY`` — halt one strategy_id.
+    - ``ARCHETYPE`` — halt all strategies of one archetype.
+    - ``INSTRUMENT`` — halt one symbol.
+    """
+
+    GLOBAL = "global"
+    CLIENT = "client"
+    VENUE = "venue"
+    STRATEGY = "strategy"
+    ARCHETYPE = "archetype"
+    INSTRUMENT = "instrument"

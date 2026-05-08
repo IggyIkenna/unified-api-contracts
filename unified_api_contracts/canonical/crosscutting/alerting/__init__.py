@@ -21,6 +21,7 @@ from .codes import (
     AlertChannel,
     AlertCode,
     AlertSeverity,
+    KillSwitchScope,
 )
 from .rules import (
     LIVE_ALERT_RULES,
@@ -43,6 +44,7 @@ __all__ = [
     "AlertRule",
     "AlertSeverity",
     "AlertThreshold",
+    "KillSwitchScope",
     "ThresholdUnit",
     "UnknownAlertCodeError",
     "UnknownThresholdKeyError",

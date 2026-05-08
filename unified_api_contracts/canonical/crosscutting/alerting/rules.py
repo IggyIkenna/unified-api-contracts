@@ -20,7 +20,7 @@ from typing import Final
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from .codes import ALERT_CODES, AlertChannel, AlertCode, AlertSeverity
+from .codes import ALERT_CODES, AlertChannel, AlertCode, AlertSeverity, KillSwitchScope
 from .thresholds import ALERT_THRESHOLDS
 
 
@@ -78,6 +78,13 @@ class AlertRule(BaseModel):
     """If True, alerting-service publishes a ``KillSwitchEvent`` when this
     rule fires. Reserved for the ``KILL_SWITCH_*`` family."""
 
+    kill_switch_scope: KillSwitchScope | None = Field(default=None)
+    """Scope of the kill-switch action: ``GLOBAL`` halts every venue/archetype,
+    ``VENUE`` halts only the named venue's adapters, ``ARCHETYPE`` halts only
+    the named strategy archetype, ``STRATEGY`` halts a single strategy ID.
+    REQUIRED for KILL_SWITCH_* codes; MUST be ``None`` for non-kill-switch
+    codes. Validated below."""
+
     description: str = Field(default="")
     """One-line operator-facing description; rendered alongside the badge
     in DART. Keep concise."""
@@ -130,6 +137,23 @@ class AlertRule(BaseModel):
             )
         return self
 
+    @model_validator(mode="after")
+    def _validate_kill_switch_scope_matches_code_family(self) -> AlertRule:
+        is_kill_switch = self.code.value.startswith("KILL_SWITCH_")
+        if is_kill_switch and self.kill_switch_scope is None:
+            raise ValueError(
+                "AlertRule.kill_switch_scope is REQUIRED for KILL_SWITCH_* "
+                f"AlertCode members; got code={self.code.value!r} with "
+                f"kill_switch_scope=None. Choose one of {[s.value for s in KillSwitchScope]!r}."
+            )
+        if not is_kill_switch and self.kill_switch_scope is not None:
+            raise ValueError(
+                "AlertRule.kill_switch_scope MUST be None for non-KILL_SWITCH_* "
+                f"AlertCode members; got code={self.code.value!r} with "
+                f"kill_switch_scope={self.kill_switch_scope!r}."
+            )
+        return self
+
     def to_routing_dict(self) -> dict[str, object]:
         """Render to the legacy routing-rule shape consumed by alerting-service.
 
@@ -163,26 +187,51 @@ def _runbook(slug: str) -> str:
 
 LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T1 CRITICAL — page now, kill-switch-fire family ─────────────────────
-    # Single wildcard rule preserves byte-equivalence with the legacy
-    # `KILL_SWITCH_*` routing entry. The ``code`` field anchors at the
-    # liquidation-risk variant for runbook + threshold deep-link; the
-    # AlertCode enum still enumerates all three KILL_SWITCH_* codes for
-    # type-safe emitter use.
+    # Atomic per-code rules so ``kill_switch_scope`` can carry the per-event
+    # halt scope (GLOBAL / VENUE / ARCHETYPE). The legacy single-wildcard
+    # ``KILL_SWITCH_*`` rule was split 2026-05-08 because one rule cannot
+    # carry three different scopes. Routing equivalence is preserved.
     AlertRule(
         code=AlertCode.KILL_SWITCH_DEFI_LIQUIDATION_RISK,
-        pattern="KILL_SWITCH_*",
+        pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("kill_switch_defi_liquidation_risk"),
         threshold_key="defi_health_factor_critical",
         triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.GLOBAL,
         description=(
-            "Kill-switch family — DEFI_LIQUIDATION_RISK / PORTFOLIO_DRAWDOWN /"
-            " VENUE_DISCONNECT all halt downstream subscribers + page on-call."
-            " Wildcard pattern matches all 3 KILL_SWITCH_* codes; runbook_doc"
-            " anchors at the liquidation-risk variant which cross-references"
-            " sibling kill_switch_portfolio_drawdown.md +"
-            " kill_switch_venue_disconnect.md."
+            "DeFi position approaching liquidation (Aave HF below buffer) —"
+            " halt all venues + page on-call. GLOBAL scope: every adapter"
+            " stops new orders until operator clears."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_PORTFOLIO_DRAWDOWN,
+        pattern="KILL_SWITCH_PORTFOLIO_DRAWDOWN",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("kill_switch_portfolio_drawdown"),
+        triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.GLOBAL,
+        description=(
+            "Portfolio drawdown breached threshold — halt all venues +"
+            " page on-call. GLOBAL scope: every adapter stops new orders"
+            " until operator reviews positions."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_VENUE_DISCONNECT,
+        pattern="KILL_SWITCH_VENUE_DISCONNECT",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("kill_switch_venue_disconnect"),
+        triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.VENUE,
+        description=(
+            "Venue connectivity lost — halt the affected venue's adapters"
+            " until reconnect. VENUE scope: other venues continue trading."
+            " Payload includes ``details['venue']`` for scope key."
         ),
     ),
     # ── T1 CRITICAL — circuit + multi-leg ───────────────────────────────────
@@ -375,12 +424,9 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         ),
     ),
     # CRITICAL — kill-switch family extension: ML model server unreachable /
-    # repeated inference failures. NOTE: paired Sub-A work
-    # (`alerting_kill_switch_publish_hook` Phase 1) is mid-flight adding
-    # `kill_switch_scope: KillSwitchScope` field to AlertRule + validator
-    # that requires it on KILL_SWITCH_* codes. When that lands, this rule
-    # MUST be updated to `kill_switch_scope=KillSwitchScope.ARCHETYPE` —
-    # halt only the affected ML archetype, other archetypes keep trading.
+    # repeated inference failures. ARCHETYPE scope: halt only the affected
+    # ML archetype, other archetypes keep trading. Payload includes
+    # ``details['archetype']`` for scope key.
     AlertRule(
         code=AlertCode.KILL_SWITCH_ML_MODEL_FAILURE,
         pattern="KILL_SWITCH_ML_MODEL_FAILURE",
@@ -388,6 +434,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("kill_switch_ml_model_failure"),
         triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.ARCHETYPE,
         description=(
             "ML model server unreachable / repeated inference failures — halt"
             " the affected archetype until model recovers or operator overrides."
