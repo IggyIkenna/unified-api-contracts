@@ -128,7 +128,7 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # market_id (Polymarket conditionId / Kalshi ticker) and stamp the
     # available_at as ``market_created_at`` — we couldn't have known
     # about the market before it was listed. Predictions plan
-    # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+    # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.md``
     # Phase 1A.
     ("prediction", "MARKET_LIFECYCLE"): "market_created_at",
     # ---- Reference data (asset-group-agnostic) --------------------------

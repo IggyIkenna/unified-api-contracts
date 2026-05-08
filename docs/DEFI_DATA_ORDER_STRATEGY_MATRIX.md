@@ -1,6 +1,6 @@
 <!-- POST_PLAN_BANNER_2026_05_06_FINAL -->
 
-> **Post-2026-05-06** — read [`../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md`](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md) before code/doc changes informed by this doc. The post-plan-reality doc summarizes the 10 cross-cutting principles codified in workspace `CLAUDE.md` (live=batch, no double SSOT, three-category empty-output decision A/B/C, cluster validation MANDATORY at `record_captured`, `available_at` per-row write-time, prediction lifecycle, temporary state must have named successor, per-VM shard isolation, multi-axis shard-vs-display distinction) plus the active plans (`writegate_honest_coverage_endtoend_2026_05_06.plan.md`, `predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md`, `data_status_multi_axis_shard_propagation_2026_05_06.plan.md`). If this doc disagrees with the active plans, the plans win. Flag conflicts to user — don't decide unilaterally.
+> **Post-2026-05-06** — read [`../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md`](../../unified-trading-pm/codex/POST_PLAN_REALITY_2026_05_06.md) before code/doc changes informed by this doc. The post-plan-reality doc summarizes the 10 cross-cutting principles codified in workspace `CLAUDE.md` (live=batch, no double SSOT, three-category empty-output decision A/B/C, cluster validation MANDATORY at `record_captured`, `available_at` per-row write-time, prediction lifecycle, temporary state must have named successor, per-VM shard isolation, multi-axis shard-vs-display distinction) plus the active plans (`writegate_honest_coverage_endtoend_2026_05_06.plan`, `predictions_canonical_question_group_polymarket_migration_2026_05_06.plan`, `data_status_multi_axis_shard_propagation_2026_05_06.plan`). If this doc disagrees with the active plans, the plans win. Flag conflicts to user — don't decide unilaterally.
 
 # DeFi Data & Order Strategy Matrix
 
@@ -8,7 +8,7 @@
 
 Aligned with: [CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md), [VENUE_DATA_TYPES.md](VENUE_DATA_TYPES.md), [TRANSPORT_AND_ENDPOINTS.md](TRANSPORT_AND_ENDPOINTS.md)
 
-Plan reference: `unified-trading-pm/plans/active/defi_dev_testnet_data_rollout_2026_03_13.plan.md`
+Plan reference: `unified-trading-pm/plans/active/defi_dev_testnet_data_rollout_2026_03_13.plan`
 
 ---
 
@@ -109,8 +109,8 @@ Both `unified-defi-execution-interface` (orders) and `unified-position-interface
 
 ## References
 
-- `unified-trading-pm/plans/active/defi_dev_testnet_data_rollout_2026_03_13.plan.md` — master plan
-- `unified-trading-pm/plans/active/ai/api_keys_and_auth.plan.md` — SM secret tracking per venue
+- `unified-trading-pm/plans/active/defi_dev_testnet_data_rollout_2026_03_13.plan` — master plan
+- `unified-trading-pm/plans/active/ai/api_keys_and_auth.plan` — SM secret tracking per venue
 - [CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md) — CeFi/TradFi/Sports venue comparison
 - [VENUE_DATA_TYPES.md](VENUE_DATA_TYPES.md) — per-venue data type availability
 - [MOCKS_AND_VCR.md](MOCKS_AND_VCR.md) — VCR cassette recording protocol

@@ -12,7 +12,7 @@ the route handler hydrates the canonical model from these fields.
 
 SSOT:
   - ``codex/14-playbooks/shared-core/fund-administration-and-custody.md``
-  - ``plans/active/fund_administration_service_and_pooled_subscription_redemption_2026_04_20.plan.md``
+  - ``plans/active/fund_administration_service_and_pooled_subscription_redemption_2026_04_20.md``
 """
 
 from __future__ import annotations

@@ -28,7 +28,7 @@ Three stacked layers — net architecture:
   parquets) — "What % of the upstream window made it into THIS published
   row + which inner shards are gaps?"
 
-Plan: ``writegate_honest_coverage_endtoend_2026_05_06.plan.md`` § Phase 3.D.5
+Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` § Phase 3.D.5
 Wave 4. UTL companion: :mod:`unified_trading_library.emission_publisher`.
 
 Wave-4 scope — slice (a) only (the schema floor): enum + seed dict + helper.

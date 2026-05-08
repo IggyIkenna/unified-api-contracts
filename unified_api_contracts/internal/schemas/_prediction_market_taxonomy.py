@@ -412,7 +412,7 @@ _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
 # active when the row was written so a reclassification pass can be triggered
 # only for rows whose stored hash differs from the current
 # ``CLASSIFIER_STABILITY_HASH`` — see
-# `unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md`
+# `unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.md`
 # Phase 0 audit-7 (classifier stability hash design).
 #
 # Increment ``CLASSIFIER_VERSION`` in tandem with any rule-table edit.

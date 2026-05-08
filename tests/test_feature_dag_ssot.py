@@ -1,6 +1,6 @@
 """Unit tests for the feature-DAG UAC SSOT (Phase 1A).
 
-Plan: ``unified-trading-pm/plans/active/feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md``.
+Plan: ``unified-trading-pm/plans/active/feature_dag_uac_ssot_and_features_coverage_2026_05_06.md``.
 
 Asserts the three Phase 1A invariants from the plan:
 
@@ -164,7 +164,7 @@ def test_phase_1a_2_lift_8_onchain_feature_groups_seeded() -> None:
     feature_groups now in FEATURE_REQUIRED_INPUTS after the
     AVAILABILITY_AT_SEMANTICS defi vocabulary gap closed (UAC@2f40c9d).
 
-    Plan: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md``
+    Plan: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.md``
     § "Temporary states" — Half 2 of the AVAILABILITY_AT_SEMANTICS defi
     vocabulary gap.
     """

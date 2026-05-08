@@ -31,7 +31,7 @@ class AlertType(StrEnum):
     safety overlay raised after the controller's chance to act has passed.
     Emitted by risk-and-exposure-service. SSOT for the LegPortfolioState risk
     overlay declared in
-    ``unified-trading-pm/plans/active/leveraged_leg_controller_2026_05_01.plan.md``."""
+    ``unified-trading-pm/plans/active/leveraged_leg_controller_2026_05_01.md``."""
 
 
 class PositionSide(StrEnum):

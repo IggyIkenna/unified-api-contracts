@@ -15,7 +15,7 @@ VenueKind = Literal["PERP_CEX", "PERP_DEX", "LENDING", "STAKING"]
 
 Used by callers like ``CARRY_STAKED_BASIS`` to filter to perp-margining venues
 when deciding the leg sequence — see
-``unified-trading-pm/plans/active/carry_staked_basis_structure_axis_2026_05_04.plan.md``.
+``unified-trading-pm/plans/active/carry_staked_basis_structure_axis_2026_05_04.md``.
 """
 
 _PERP_VENUE_KINDS: Final[frozenset[str]] = frozenset({"PERP_CEX", "PERP_DEX"})

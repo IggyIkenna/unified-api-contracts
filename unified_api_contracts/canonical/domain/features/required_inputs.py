@@ -75,7 +75,7 @@ class InputReq:
 # in ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` (denominator coverage), but the
 # lookahead-bias check skips groups absent here. See
 # ``## Temporary states + their canonical follow-up plans`` in
-# ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md``.
+# ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.md``.
 
 FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     # ---- features-onchain (defi) ----------------------------------------
@@ -197,7 +197,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     #     either we register ``crypto_sentiment`` / ``macro_metrics`` as
     #     defi data_types OR move these calculators behind a captured-tick
     #     adapter that writes into a registered data_type.
-    # Successor: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md``
+    # Successor: ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.md``
     # § "Temporary states + their canonical follow-up plans" — bullet
     # "External-sentiment-API live-read pass-throughs".
     # ---- features-delta-one (cefi / tradfi candle-derived) --------------

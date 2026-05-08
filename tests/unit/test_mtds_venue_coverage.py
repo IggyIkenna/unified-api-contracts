@@ -259,7 +259,7 @@ class TestMultiChainDefiExpansion:
 # ---------------------------------------------------------------------------
 # Phase 8 — per-instrument Tier-3 sentinel denominator tests
 # ---------------------------------------------------------------------------
-# SSOT: unified-trading-pm/plans/active/mtds_per_instrument_sentinels_2026_04_21.plan.md
+# SSOT: unified-trading-pm/plans/active/mtds_per_instrument_sentinels_2026_04_21.md
 # Registry: unified_api_contracts.registry.market_data_categories
 # Accessor: get_expected_instruments_for_venue(venue, data_type, *, as_of_date, instruments_provider, cap)
 

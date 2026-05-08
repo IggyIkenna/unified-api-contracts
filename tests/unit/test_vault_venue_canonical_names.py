@@ -1,6 +1,6 @@
 """Lock the canonical names + legacy aliases for vault / yield-bearing DeFi
 venues — MORPHOVAULTS, YEARNV3, FRAX, MAKER (added 2026-05-06 as part of
-Phase 1.5a-1 of plans/active/market_tick_data_to_100pct_2026_05_05.plan.md).
+Phase 1.5a-1 of plans/active/market_tick_data_to_100pct_2026_05_05.plan).
 
 Pre-2026-05-06 MTDS ``vault_share_price_handler`` emitted manifest rows with
 underscore protocol forms (``MORPHO_VAULTS``, ``YEARN_V3``) that did not match

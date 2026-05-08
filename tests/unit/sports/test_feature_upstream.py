@@ -1,6 +1,6 @@
 """Unit tests for FEATURE_UPSTREAM_REQUIREMENTS + in_coverage helper.
 
-Plan: features_sports_honest_coverage_2026_05_05.plan.md, Phase 1.D.
+Plan: features_sports_honest_coverage_2026_05_05.md, Phase 1.D.
 """
 
 from __future__ import annotations

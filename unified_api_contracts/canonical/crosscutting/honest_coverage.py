@@ -151,13 +151,13 @@ class EmptyConfirmedReason(StrEnum):
     making the daily-cadence GCS dump pure waste). Existing manifest rows for retired data_types get flipped to
     ``empty_confirmed`` with this reason rather than left as `captured` (which would mislead consumers into reading
     deleted parquets) or `attempted_failed` (which would force orchestrator backfill VMs to keep retrying a deleted
-    write path). Plan: ``manifest_migration_master_2026_05_07.plan.md`` § Audit findings 2026-05-07 → C.1."""
+    write path). Plan: ``manifest_migration_master_2026_05_07.plan`` § Audit findings 2026-05-07 → C.1."""
 
     EXPECTED_REFDATA_CADENCE_CHANGE = "EXPECTED_REFDATA_CADENCE_CHANGE"
     """Refdata-cadence migration: data_type's shard cadence was changed (e.g. TEAMS migrated from per-day to
     per-(team, season) — pre-migration daily shards become honest absence under the new cadence). Distinct from
     `EXPECTED_DEPRECATED_DATA_TYPE` (data_type still exists, just at a different cadence). Plan:
-    ``manifest_migration_master_2026_05_07.plan.md`` § Audit findings 2026-05-07 → C.11."""
+    ``manifest_migration_master_2026_05_07.plan`` § Audit findings 2026-05-07 → C.11."""
 
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
@@ -430,7 +430,7 @@ expected market_id set from the lifecycle table at runtime and applies
 this min-rows floor per market_id.
 
 Populated by predictions plan
-``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan``
 Phase 1A.
 """
 
@@ -460,7 +460,7 @@ class EmptyFromLiveInstrumentError(ValueError):
             operator diagnosis.
 
     Reference: writegate plan
-    ``writegate_honest_coverage_endtoend_2026_05_06.plan.md`` Phase 3.D.5 Wave 2.
+    ``writegate_honest_coverage_endtoend_2026_05_06.plan`` Phase 3.D.5 Wave 2.
     """
 
     def __init__(

@@ -68,5 +68,5 @@ The package is organized into six top-level directories plus root facade files:
 - **Manifest semantics SSOT**: [`unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md`](../../unified-trading-pm/codex/02-data/availability-manifest-and-data-status.md)
 - **Live = batch contract** (UAC-specific implications): [BATCH_LIVE_SYMMETRY.md](BATCH_LIVE_SYMMETRY.md)
 - **Schema governance** (UAC-specific placement + ownership rules): [SCHEMA_GOVERNANCE.md](SCHEMA_GOVERNANCE.md)
-- **Active plans**: [`writegate_honest_coverage_endtoend_2026_05_06.plan.md`](../../unified-trading-pm/plans/active/writegate_honest_coverage_endtoend_2026_05_06.plan.md), [`predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md`](../../unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md)
+- **Active plans**: [`writegate_honest_coverage_endtoend_2026_05_06.md`](../../unified-trading-pm/plans/active/writegate_honest_coverage_endtoend_2026_05_06.md), [`predictions_canonical_question_group_polymarket_migration_2026_05_06.md`](../../unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.md)
 - **README structure**: [README Structure](../README.md#structure), [docs/INDEX.md](INDEX.md), [docs/CROSS_VENUE_MATRIX.md](CROSS_VENUE_MATRIX.md).

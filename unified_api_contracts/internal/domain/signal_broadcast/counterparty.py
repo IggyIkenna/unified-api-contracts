@@ -1,7 +1,7 @@
 """Counterparty domain entity for signal-broadcast (signal-leasing).
 
 A :class:`Counterparty` is a new domain entity per D9 of
-``signal_leasing_broadcast_architecture_2026_04_20.plan.md`` — distinct
+``signal_leasing_broadcast_architecture_2026_04_20.md`` — distinct
 from ``ClientDefinition`` / ``ClientRegistry`` (which describe Odum's
 paying Investment-Management clients or SaaS subscribers).
 Counterparties consume emitted strategy signals via the signal-leasing

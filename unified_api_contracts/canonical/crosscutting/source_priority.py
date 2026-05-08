@@ -16,7 +16,7 @@ same timing semantics, different sources OK`` rule:
 Phase 1B seed: this module ships with **single-source seeds**
 (top-of-list only). Multi-source merge logic and per-tier-tier-tier
 priority tie-breakers are deferred to a follow-up plan
-(``multi_source_priority_merge_2026_*<TBD>.plan.md``) — flagged as a
+(``multi_source_priority_merge_2026_*<TBD>.md``) — flagged as a
 documented temporary state per the workspace
 ``Temporary state must have a named successor plan`` rule.
 
@@ -90,7 +90,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # SOURCE_PRIORITY. Top-entry-only seeds per the Phase 1B convention
     # documented in this module's docstring; multi-source merge (e.g. The
     # Graph for AaveV3 + morpho_blue_api for Morpho on lending_indices)
-    # is deferred to ``multi_source_priority_merge_2026_*<TBD>.plan.md``.
+    # is deferred to ``multi_source_priority_merge_2026_*<TBD>.md``.
     # `risk_params` reads protocol configurator state at the contract level
     # (Aave LendingPoolConfigurator, Morpho IRM params) → ``onchain_rpc``;
     # the other four are event-stream / index reads → ``onchain_subgraph``.
@@ -118,7 +118,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # gamma API ``/markets/{conditionId}`` for created/resolution/settlement
     # timestamps. Phase 1B writes top entry only; Kalshi metadata source is
     # a deferred follow-up plan slot. Predictions plan
-    # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+    # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.md``
     # Phase 1A.
     ("prediction", "MARKET_LIFECYCLE"): ["polymarket_gamma_api"],
     # ---- Reference (asset-group-agnostic) -------------------------------

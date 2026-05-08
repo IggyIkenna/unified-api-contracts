@@ -165,7 +165,7 @@ class QuestionnaireResponse(BaseModel):
       ``codex/09-strategy/architecture-v2/category-instrument-coverage.md``
     - Service family: ``codex/14-playbooks/_ssot-rules/12-service-family-scope-rules.md``
     - Fund structure: ``codex/14-playbooks/cross-cutting/sma-vs-pooled.md``
-    - Reg-Umbrella plan: ``plans/active/reg_umbrella_questionnaire_and_onboarding_docs_2026_04_21.plan.md``
+    - Reg-Umbrella plan: ``plans/active/reg_umbrella_questionnaire_and_onboarding_docs_2026_04_21.plan``
 
     The overlay logic in :func:`_apply_questionnaire_override` widens
     tile-level padlocks for vague responses (empty categories = fall back

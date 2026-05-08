@@ -35,7 +35,7 @@ import + allocator-time; services just call the helpers):
   synthesised two-leg roll.
 
 Gates **G2.5** (Execution Algo Catalogue refactor). See
-``plans/active/refactor_g2_5_execution_algo_catalogue_refactor_2026_04_20.plan.md``.
+``plans/active/refactor_g2_5_execution_algo_catalogue_refactor_2026_04_20.md``.
 """
 
 from __future__ import annotations
@@ -321,7 +321,7 @@ _validate_registry_invariants()
 # module that imports this registry / helper.
 #
 # Integration is tracked in
-# ``plans/active/refactor_g2_5_execution_algo_catalogue_refactor_2026_04_20.plan.md``.
+# ``plans/active/refactor_g2_5_execution_algo_catalogue_refactor_2026_04_20.md``.
 # G2.9 ships the UAC declaration + registry; G2.5 wires the call-sites.
 CONSUMER_CALL_SITES: Final[tuple[str, ...]] = (
     "execution-service/execution_service/algo_library/base_algorithm.py",

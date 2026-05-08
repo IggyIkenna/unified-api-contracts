@@ -30,7 +30,7 @@ re-exported here (``SchemaDepth``, ``SignalEmission``,
 resolving while Phase 3 consumers migrate to the new surface.
 
 SSOT plan:
-``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.plan.md``.
+``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.md``.
 """
 
 from __future__ import annotations

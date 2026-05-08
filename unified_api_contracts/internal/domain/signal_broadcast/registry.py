@@ -23,7 +23,7 @@ September 2026 go-live. Real endpoint URLs + Secret Manager references
 are injected at deploy time by ``deployment-service`` (never checked
 in).
 
-SSOT: ``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.plan.md``.
+SSOT: ``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.md``.
 """
 
 from __future__ import annotations

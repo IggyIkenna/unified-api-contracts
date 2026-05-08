@@ -12,7 +12,7 @@ helper ``minimum_approval_maturity()`` is the SSOT — never re-hardcode this
 constant in consumer code.
 
 SSOT:
-    plans/active/dart_exclusive_subscription_research_fork_2026_04_21.plan.md
+    plans/active/dart_exclusive_subscription_research_fork_2026_04_21.md
     codex/14-playbooks/shared-core/strategy-version-governance.md
 """
 

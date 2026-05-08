@@ -1,7 +1,7 @@
 """``CanonicalQuestionGroup`` enum + per-group metadata SSOT.
 
 Predictions plan
-``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+``predictions_canonical_question_group_polymarket_migration_2026_05_06.md``
 Phase 1A.
 
 Recurring canonical groups (``BTC_UP_DOWN_HOURLY``, ``BTC_UP_DOWN_DAILY``,

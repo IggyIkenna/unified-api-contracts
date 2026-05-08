@@ -8,7 +8,7 @@ attribution + higher lease price.
 
 Mirrors the schema-depth dimension of rule-10 block-5 of the
 signal-leasing commercial model. SSOT:
-``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.plan.md``.
+``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.md``.
 """
 
 from __future__ import annotations

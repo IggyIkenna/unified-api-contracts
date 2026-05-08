@@ -1,6 +1,6 @@
 """Tests for LST_TOKEN_TO_PROTOCOL_ASSET and helpers.
 
-Phase 9 plan ``carry_tracer_phase_9_catalog_paired_dispersion_2026_05_06.plan.md``
+Phase 9 plan ``carry_tracer_phase_9_catalog_paired_dispersion_2026_05_06.md``
 Phase 1.A — UAC SSOT lifted from tracer-local table.
 """
 

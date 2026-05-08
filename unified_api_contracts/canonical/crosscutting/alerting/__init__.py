@@ -11,7 +11,7 @@ on top of routing to the paging channels.
 
 Cross-references:
 - `unified-trading-pm/codex/14-playbooks/alerting/alert-code-taxonomy.md`
-- `unified-trading-pm/plans/active/alerting_service_live_rules_2026_05_07.plan.md`
+- `unified-trading-pm/plans/active/alerting_service_live_rules_2026_05_07.md`
 """
 
 from __future__ import annotations

@@ -1,6 +1,6 @@
 """Per-(service, asset_group) shard + display axis SSOT.
 
-Data-status plan ``data_status_multi_axis_shard_propagation_2026_05_06.plan.md``
+Data-status plan ``data_status_multi_axis_shard_propagation_2026_05_06.md``
 Phase 0.
 
 The data-status panel has historically slid one breakdown per asset_group

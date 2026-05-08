@@ -11,7 +11,7 @@ Three subscription types coexist on a single ``StrategyInstance``:
     coexists with both of the above. Never forks.
 
 SSOT:
-    plans/active/dart_exclusive_subscription_research_fork_2026_04_21.plan.md
+    plans/active/dart_exclusive_subscription_research_fork_2026_04_21.md
     codex/09-strategy/architecture-v2/dart-exclusive-research-fork.md
 """
 

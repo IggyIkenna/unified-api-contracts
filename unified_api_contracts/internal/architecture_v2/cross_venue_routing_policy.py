@@ -35,7 +35,7 @@ module bottom):
   (archetype, venues) tuple with no matching policy entry.
 
 Gates **G2.5** (Execution Algo Catalogue refactor) —
-``plans/active/refactor_g2_5_execution_algo_catalogue_refactor_2026_04_20.plan.md``.
+``plans/active/refactor_g2_5_execution_algo_catalogue_refactor_2026_04_20.md``.
 """
 
 from __future__ import annotations

@@ -20,7 +20,7 @@ The ``in_coverage`` helper here returns True iff the (source, data_type,
 league, date) is *expected* to have data — i.e. case 2 or 3 territory.
 False = case 1 (NaN-by-design is fine).
 
-Plan: features_sports_honest_coverage_2026_05_05.plan.md
+Plan: features_sports_honest_coverage_2026_05_05.md
 """
 
 from __future__ import annotations

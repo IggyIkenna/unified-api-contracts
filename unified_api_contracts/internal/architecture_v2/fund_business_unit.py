@@ -31,7 +31,7 @@ and must not surface POD anywhere in public UI strings.
 
 SSOT:
 
-* Plan: ``plans/active/refactor_g2_8_fund_business_unit_registry_2026_04_20.plan.md``
+* Plan: ``plans/active/refactor_g2_8_fund_business_unit_registry_2026_04_20.md``
 * Custody memo:
   ``memory/project_custody_model_per_path_2026_04_20.md``
 * Codex:

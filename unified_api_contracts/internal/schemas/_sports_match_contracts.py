@@ -2,7 +2,7 @@
 
 Extracted from ``_sports_contracts.py`` to keep each module under the
 codex 900-line limit. See SSOT plan:
-``plans/active/sports_uac_schema_contracts_registration_2026_04_24.plan.md``.
+``plans/active/sports_uac_schema_contracts_registration_2026_04_24.md``.
 
 Contracts registered:
 

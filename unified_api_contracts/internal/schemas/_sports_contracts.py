@@ -7,7 +7,7 @@ Shared ColumnSpec helpers are in ``_sports_shared``.
 This split keeps each module under the codex 900-line limit. All three
 modules register into ``CONTRACT_REGISTRY`` as side-effects on import; the
 parent ``contracts.py`` pulls them in at the bottom of that file. SSOT plan:
-``plans/active/sports_uac_schema_contracts_registration_2026_04_24.plan.md``.
+``plans/active/sports_uac_schema_contracts_registration_2026_04_24.plan``.
 
 Column-name conventions (shared with Families B / E):
 

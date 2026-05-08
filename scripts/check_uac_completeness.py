@@ -76,7 +76,7 @@ SCAN_FILES: list[str] = [
 # NOTE: The 68 specialty classes (analytics, CEX withdrawals, latency, prediction-market-arb,
 # protocol-sdk-action, rate-limit, eth-transfer, ws-internal) were promoted to __all__ in
 # 2026-03-10 as part of the UAC cross-service adoption plan. They are no longer exempt.
-# Service wiring tracked in: unified-trading-pm/plans/active/uac-exempt-class-adoption.plan.md
+# Service wiring tracked in: unified-trading-pm/plans/active/uac-exempt-class-adoption.md
 EXEMPT_MISSING: frozenset[str] = frozenset(
     [
         # internal-base: private base classes used by the schema hierarchy

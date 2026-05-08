@@ -11,5 +11,5 @@ See ``unified_api_contracts.predictions`` for the public facade. Submodules:
   per-market activity windows and per-day cluster expectations.
 
 Reference plan:
-``unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``.
+``unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.md``.
 """

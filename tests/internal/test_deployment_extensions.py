@@ -1,6 +1,6 @@
 """Tests for the work-stream-A internal deployment types.
 
-Plan: unified-trading-pm/plans/active/deployment_api_work_stream_a_2026_05_07.plan.md
+Plan: unified-trading-pm/plans/active/deployment_api_work_stream_a_2026_05_07.md
 """
 
 from __future__ import annotations

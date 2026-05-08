@@ -10,7 +10,7 @@ aligned with the field names + types below (field renames in either
 surface are breaking changes and require a coordinated PR).
 
 Plan SSOT:
-    unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.plan.md
+    unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.md
     § Phase 10 — strategy-service observability read endpoints (follow-up 2026-04-20)
 """
 

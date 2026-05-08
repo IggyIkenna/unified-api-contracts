@@ -163,33 +163,23 @@ def _runbook(slug: str) -> str:
 
 LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T1 CRITICAL — page now, kill-switch-fire family ─────────────────────
+    # Single wildcard rule preserves byte-equivalence with the legacy
+    # `KILL_SWITCH_*` routing entry. The ``code`` field anchors at the
+    # liquidation-risk variant for runbook + threshold deep-link; the
+    # AlertCode enum still enumerates all three KILL_SWITCH_* codes for
+    # type-safe emitter use.
     AlertRule(
         code=AlertCode.KILL_SWITCH_DEFI_LIQUIDATION_RISK,
-        pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
+        pattern="KILL_SWITCH_*",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
-        runbook_doc=_runbook("kill_switch_defi_liquidation_risk"),
+        runbook_doc=_runbook("kill_switch"),
         threshold_key="defi_health_factor_critical",
         triggers_kill_switch=True,
-        description="DeFi position health-factor breach — auto-fire kill switch + page on-call.",
-    ),
-    AlertRule(
-        code=AlertCode.KILL_SWITCH_PORTFOLIO_DRAWDOWN,
-        pattern="KILL_SWITCH_PORTFOLIO_DRAWDOWN",
-        severity=AlertSeverity.CRITICAL,
-        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
-        runbook_doc=_runbook("kill_switch_portfolio_drawdown"),
-        triggers_kill_switch=True,
-        description="Portfolio drawdown threshold tripped — halt + page.",
-    ),
-    AlertRule(
-        code=AlertCode.KILL_SWITCH_VENUE_DISCONNECT,
-        pattern="KILL_SWITCH_VENUE_DISCONNECT",
-        severity=AlertSeverity.CRITICAL,
-        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
-        runbook_doc=_runbook("kill_switch_venue_disconnect"),
-        triggers_kill_switch=True,
-        description="Venue feed/order-channel lost — halt venue + page.",
+        description=(
+            "Kill-switch family — DEFI_LIQUIDATION_RISK / PORTFOLIO_DRAWDOWN /"
+            " VENUE_DISCONNECT all halt downstream subscribers + page on-call."
+        ),
     ),
     # ── T1 CRITICAL — circuit + multi-leg ───────────────────────────────────
     AlertRule(
@@ -319,11 +309,10 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         description="Position drift detected — could be WARNING or CRITICAL severity.",
     ),
     AlertRule(
-        # Pattern uses single-char `?` + `*` so legacy `RECON_DEGRADED_PARTIAL`
-        # / `RECON_DEGRADED_FULL` event names match while the bare atomic
-        # `RECON_DEGRADED` code also matches via the union wildcard.
+        # Pattern preserves legacy `RECON_DEGRADED_*` byte-equivalence; the
+        # bare atomic `RECON_DEGRADED` code anchors the rule + runbook.
         code=AlertCode.RECON_DEGRADED,
-        pattern="RECON_DEGRADED*",
+        pattern="RECON_DEGRADED_*",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("recon_degraded"),

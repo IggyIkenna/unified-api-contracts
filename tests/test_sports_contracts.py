@@ -2,7 +2,7 @@
 ``unified_api_contracts.internal.schemas._sports_contracts``.
 
 Covers the contract gap closed by
-``plans/active/sports_uac_schema_contracts_registration_2026_04_24.plan.md``.
+``plans/active/sports_uac_schema_contracts_registration_2026_04_24.md``.
 Every sports data_type written to GCS must be resolvable via
 ``lookup_contract(asset_group, instrument_type, data_type)``.
 """

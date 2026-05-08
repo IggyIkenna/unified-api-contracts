@@ -150,7 +150,7 @@ def normalize_footystats_odds(
     extracts FootyStats-PROPRIETARY pre-match forecasts (potentials, xG prematch,
     PPG) — those are MODEL OUTPUT, not market odds, even though their values look
     odds-like (probabilities, decimal coefficients). Per C.3 audit 2026-05-07
-    (`session_2026_05_07_data_status_audit_findings.plan.md`): the deployment-ui
+    (`session_2026_05_07_data_status_audit_findings.md`): the deployment-ui
     data-status panel renders both data_types side-by-side; the disambiguation
     is critical so consumers know whether they're reading book quotes
     (this fn → ``data_type=ODDS``) or FootyStats's own forecasts
@@ -202,7 +202,7 @@ def normalize_footystats_predictions(raw: FootyStatsMatch, venue: str = "footyst
     **NOT to be confused with** ``normalize_footystats_odds``
     (above) and ``normalize_footystats_odds_snapshot`` (below) which return
     REAL BOOKMAKER ODDS aggregated by FootyStats from named books. Per C.3
-    audit 2026-05-07 (`session_2026_05_07_data_status_audit_findings.plan.md`):
+    audit 2026-05-07 (`session_2026_05_07_data_status_audit_findings.md`):
     the deployment-ui data-status panel renders both data_types side-by-side;
     the disambiguation is critical so consumers know whether they're reading
     FootyStats's own forecasts (this fn → ``data_type=PREDICTIONS``,

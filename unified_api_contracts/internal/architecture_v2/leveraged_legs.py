@@ -9,7 +9,7 @@ Replaces hand-rolled `_build_legs` + bespoke rebalance loops scattered across
 strategy-service archetype engines, position-balance-monitor sports_arb_engine,
 and execution-service tracers — each was solving the same shape of problem
 with strategy-specific code. See
-``unified-trading-pm/plans/active/leveraged_leg_controller_2026_05_01.plan.md``.
+``unified-trading-pm/plans/active/leveraged_leg_controller_2026_05_01.md``.
 
 The wire-format primitive here is consumed by:
   - ``execution_service.algo_library.leveraged_leg_controller`` — drift +

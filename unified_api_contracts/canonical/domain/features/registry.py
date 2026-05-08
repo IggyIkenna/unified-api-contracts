@@ -12,7 +12,7 @@ Mirrors the SSOT pattern of ``unified_api_contracts.sports.SOURCE_COVERAGE_START
 status uses to clip the expected-dates window before counting captured / empty /
 missing.
 
-Reference: feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md Phase 1A.
+Reference: feature_dag_uac_ssot_and_features_coverage_2026_05_06.md Phase 1A.
 """
 
 from __future__ import annotations

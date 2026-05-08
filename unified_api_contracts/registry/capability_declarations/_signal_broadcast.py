@@ -7,7 +7,7 @@ emitted-signal pipeline. The declaration records the supported schema
 depths, the max counterparty count per environment, and the rate-limit
 bounds enforced at the emitter.
 
-SSOT: ``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.plan.md``.
+SSOT: ``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.md``.
 """
 
 from __future__ import annotations

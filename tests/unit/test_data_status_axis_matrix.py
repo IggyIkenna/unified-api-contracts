@@ -1,7 +1,7 @@
 """Cross-registry consistency tests for data_status_axis_matrix.py.
 
 Data-status plan
-``data_status_multi_axis_shard_propagation_2026_05_06.plan.md`` Phase 0.
+``data_status_multi_axis_shard_propagation_2026_05_06.md`` Phase 0.
 """
 
 from __future__ import annotations

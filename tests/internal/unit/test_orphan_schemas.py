@@ -1,6 +1,6 @@
 """Unit tests for orphan UIC schemas — instantiate each to verify they work.
 
-Per orphan-contracts-utilization.plan.md Phase 1: Add unit tests for all UIC schemas.
+Per orphan-contracts-utilization.md Phase 1: Add unit tests for all UIC schemas.
 Orphans: InferenceRequest (has test), InferenceResult, DeltaOneFeatureRecord,
 FeatureSnapshotRequest, OptionsIvRecord, FuturesTermStructureRecord,
 CircuitBreakerEventMessage, HealthAlertMessage.

@@ -6,7 +6,7 @@ emitted strategy signals via signal-leasing and pay per-slot subscription
 fees; they do NOT have portfolio allocations or any capital routed
 through Odum's infra.
 
-SSOT: ``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.plan.md``.
+SSOT: ``unified-trading-pm/plans/active/signal_leasing_broadcast_architecture_2026_04_20.md``.
 """
 
 from __future__ import annotations

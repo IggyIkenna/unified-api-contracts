@@ -20,7 +20,7 @@ class CanonicalFixtureEvent(BaseModel):
     write-time stamp is canonical — readers MUST NOT re-derive
     ``available_at`` from ``minute`` at read time.
 
-    Plan reference: writegate_honest_coverage_endtoend_2026_05_06.plan.md
+    Plan reference: writegate_honest_coverage_endtoend_2026_05_06.md
     Phase 2.D — net schema bump after amendments B/C/D dropped 3 others.
     """
 

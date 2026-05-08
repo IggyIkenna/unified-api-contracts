@@ -15,7 +15,7 @@ to translate between LST surface forms speaks through this module:
   picks it up.
 
 Schema-drift sentinel (Phase 9 plan
-``carry_tracer_phase_9_catalog_paired_dispersion_2026_05_06.plan.md``):
+``carry_tracer_phase_9_catalog_paired_dispersion_2026_05_06.plan``):
 features-onchain calculator must emit BOTH ``token`` and the canonical
 ``protocol`` / ``asset`` columns. Once that ships, the tracer-local adapter
 shim is deleted (Phase 3.E).

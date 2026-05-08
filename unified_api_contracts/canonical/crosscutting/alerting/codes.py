@@ -63,6 +63,10 @@ class AlertCode(StrEnum):
     PORTFOLIO_REBALANCE_TRIGGERED = "PORTFOLIO_REBALANCE_TRIGGERED"
     BALANCE_DRIFT = "BALANCE_DRIFT"
     RECON_DEGRADED = "RECON_DEGRADED"
+    RECON_DEGRADED_CLOSE = "RECON_DEGRADED_CLOSE"
+    """Reconciliation degraded — closing positions without verified state.
+    Mirrors the UTL ``RECON_DEGRADED_CLOSE`` lifecycle event emitted by
+    position-balance-monitor + risk-and-exposure-service."""
 
     # ── Order / execution health
     ORDER_REJECTION_SPIKE = "ORDER_REJECTION_SPIKE"

@@ -24,7 +24,7 @@ Re-exports:
   (per-day expected market_id derivation).
 
 Reference plan:
-``unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``.
+``unified-trading-pm/plans/active/predictions_canonical_question_group_polymarket_migration_2026_05_06.plan``.
 """
 
 from __future__ import annotations

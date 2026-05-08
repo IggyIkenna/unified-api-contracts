@@ -14,7 +14,7 @@ class StrategyFamily(StrEnum):
     v1 ``StrategyFamily`` (17 values — ``BASIS_TRADE`` / ``MOMENTUM`` / …) was
     deleted on 2026-04-21 per ``plans/active/ui_unification_v2_sanitisation_2026_04_20``.
     PORTFOLIO added 2026-04-25 (cross-category sleeves) per Phase 9 of
-    ``plans/active/dart_ui_strategy_filtering_and_onboarding_2026_04_24.plan.md``.
+    ``plans/active/dart_ui_strategy_filtering_and_onboarding_2026_04_24.md``.
     """
 
     ML_DIRECTIONAL = "ML_DIRECTIONAL"

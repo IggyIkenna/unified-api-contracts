@@ -1,7 +1,7 @@
 """Unit tests for the predictions canonical-question-group SSOT.
 
 Predictions plan
-``predictions_canonical_question_group_polymarket_migration_2026_05_06.plan.md``
+``predictions_canonical_question_group_polymarket_migration_2026_05_06.md``
 Phase 1A.
 """
 

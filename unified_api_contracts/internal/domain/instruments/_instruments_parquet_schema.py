@@ -10,7 +10,7 @@ model in ``unified_api_contracts.internal.reference.instrument``.
 
 Plan extending the schema with DeFi metadata fields (contract_address,
 token_a/b_*, fee_bps, atoken_address, debt_token_address): plans/active/
-``instruments_service_metadata_refactor_2026_04_29.plan.md``.
+``instruments_service_metadata_refactor_2026_04_29.plan``.
 """
 
 from __future__ import annotations

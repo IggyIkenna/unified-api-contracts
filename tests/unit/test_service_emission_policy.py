@@ -4,7 +4,7 @@ Covers the Wave 4 schema floor — :class:`ServiceEmissionPolicy`,
 :data:`SERVICE_OUTPUT_POLICIES` seed, lifecycle event names, and the
 default-fail-loud resolution semantics.
 
-Plan: ``writegate_honest_coverage_endtoend_2026_05_06.plan.md`` § Phase 3.D.5
+Plan: ``writegate_honest_coverage_endtoend_2026_05_06.plan`` § Phase 3.D.5
 Wave 4 (slice a — schema floor only; per-service rollout deferred).
 """
 

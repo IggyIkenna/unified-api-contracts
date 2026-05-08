@@ -10,7 +10,7 @@ top-level re-export (``from unified_api_contracts import X``).
 
 See:
   - ``codex/14-playbooks/shared-core/treasury-and-subaccount-model.md``
-  - ``plans/active/fund_administration_service_and_pooled_subscription_redemption_2026_04_20.plan.md``
+  - ``plans/active/fund_administration_service_and_pooled_subscription_redemption_2026_04_20.md``
 """
 
 from __future__ import annotations
