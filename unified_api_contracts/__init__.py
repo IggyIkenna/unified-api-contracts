@@ -17,19 +17,7 @@ from .canonical.canonical_mappings import (
     get_data_sources_for_venue,
     get_required_secrets,
 )
-from .canonical.crosscutting.alerting import (
-    ALERT_CODES,
-    ALERT_THRESHOLDS,
-    LIVE_ALERT_RULES,
-    AlertChannel,
-    AlertCode,
-    AlertRule,
-    AlertSeverity,
-    AlertThreshold,
-    ThresholdUnit,
-    UnknownAlertCodeError,
-    UnknownThresholdKeyError,
-)
+
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
     VENUE_ERROR_MAP,
@@ -292,6 +280,25 @@ from .canonical.domain import (
     get_expected_bookmakers,
     resolve_environment_from_env,
     resolve_environment_from_hostname,
+)
+
+# ``canonical.crosscutting.alerting`` transitively triggers
+# ``unified_api_contracts.internal`` via ``rules.py`` (KillSwitchScope) +
+# downstream chain. ``internal/...`` imports back from this top-level
+# facade (BetStatus, CanonicalFill, DefiAlertType, ...). Order matters:
+# canonical_mappings → errors → domain → alerting (loads internal/).
+from .canonical.crosscutting.alerting import (  # noqa: E402
+    ALERT_CODES,
+    ALERT_THRESHOLDS,
+    LIVE_ALERT_RULES,
+    AlertChannel,
+    AlertCode,
+    AlertRule,
+    AlertSeverity,
+    AlertThreshold,
+    ThresholdUnit,
+    UnknownAlertCodeError,
+    UnknownThresholdKeyError,
 )
 from .canonical.partition_paths import (
     build_cefi_partition_path,
