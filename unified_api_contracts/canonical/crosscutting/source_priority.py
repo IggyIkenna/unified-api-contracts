@@ -33,11 +33,53 @@ The :data:`SOURCE_PRIORITY` registry below records the *single
 authoritative source* for each pair today. When a second source becomes
 available for the same pair, the writer-side merge logic must land
 before the dict gets a multi-entry list (otherwise live=batch breaks).
+
+Phase 1C (2026-05-08) — ``pipeline_mode`` per-source mapping
+============================================================
+
+Per ``gcs_migration_bundle_pipeline_mode_2026_05_08`` Phase 1C, each row
+selected via :func:`read_with_source_priority` returns ``(source,
+pipeline_mode)`` so downstream consumers know which on-disk
+``pipeline_mode=`` partition serves the row, enabling the batch-vs-live
+reconciliation gate in
+``live_pipeline_mtds_mdps_features_2026_05_08`` Phase 12.
+
+**Design choice — Option B (chosen over Option A).** ``pipeline_mode``
+is a property of the *source string itself*, not of the
+``(asset_group, data_type, source)`` triple — every source has
+exactly one batch ``PipelineMode`` value via the closed-set round-trip
+already enforced in
+:mod:`unified_api_contracts.canonical.crosscutting.pipeline_mode`. So
+rather than restructuring :data:`SOURCE_PRIORITY`'s value type from
+``list[str]`` to ``list[SourcePriorityEntry]`` (Option A), we keep the
+existing shape and look up the ``PipelineMode`` for each source via the
+existing :func:`pipeline_mode_for_source` helper. This:
+
+* Avoids breaking every existing consumer of ``list[str]`` semantics.
+* Composes with the existing closed-set test
+  (``tests/unit/test_pipeline_mode.py``) which already asserts every
+  source string in ``SOURCE_PRIORITY`` round-trips to a
+  ``PipelineMode``.
+* Keeps the SSOT surface narrow — adding new sources = one entry in
+  ``SOURCE_PRIORITY`` + one ``PipelineMode`` member, not two coupled
+  mutations of the same triple.
+
+The :func:`read_with_source_priority` reader returned tuple is
+``(source, pipeline_mode)`` and the live-priority-over-batch behaviour
+is enforced by callers stratifying rows by ``pipeline_mode`` first
+(live wins if a live row exists for the same
+``(asset_group, venue, day)``); the SSOT lookup itself returns the
+single primary batch source.
 """
 
 from __future__ import annotations
 
 from typing import Final
+
+from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
+    PipelineMode,
+    pipeline_mode_for_source,
+)
 
 SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # ---- Sports ---------------------------------------------------------
@@ -170,9 +212,54 @@ def has_source_priority(asset_group: str, data_type: str) -> bool:
     return (asset_group, data_type) in SOURCE_PRIORITY
 
 
+def read_with_source_priority(
+    asset_group: str,
+    data_type: str,
+) -> tuple[str, PipelineMode]:
+    """Return ``(primary_source, pipeline_mode)`` for an ``(asset_group, data_type)``.
+
+    The pipeline-mode-aware companion to :func:`get_primary_source`. Per Phase 1C
+    of ``gcs_migration_bundle_pipeline_mode_2026_05_08``, every read of the
+    primary source is paired with the source's batch :class:`PipelineMode` so
+    callers can:
+
+    * Tag rows with the on-disk ``pipeline_mode=`` hive partition value
+      (matches the partition the migration bundle writes).
+    * Stratify batch-vs-live reconciliation in
+      ``live_pipeline_mtds_mdps_features_2026_05_08`` Phase 12 — live rows
+      (``pipeline_mode=PipelineMode.LIVE_WEBSOCKET``) win over batch rows
+      with the same row-key.
+
+    Args:
+        asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / ``prediction``
+            / ``sports`` / ``reference``.
+        data_type: Canonical data_type string.
+
+    Returns:
+        Tuple of ``(primary_source_string, pipeline_mode)``. ``pipeline_mode``
+        is always a batch value (e.g. :attr:`PipelineMode.BATCH_TARDIS`); the
+        live mode :attr:`PipelineMode.LIVE_WEBSOCKET` is set by the streaming
+        writer at write-time, not derived from this registry.
+
+    Raises:
+        KeyError: If the ``(asset_group, data_type)`` pair is not registered
+            in :data:`SOURCE_PRIORITY` (delegated from
+            :func:`get_primary_source`).
+        ValueError: If the primary source string has no corresponding
+            :class:`PipelineMode` value — closed-set round-trip violation.
+            Existing test
+            ``tests/unit/test_pipeline_mode.py::test_every_source_priority_source_has_pipeline_mode``
+            prevents this from firing in CI.
+    """
+    primary_source = get_primary_source(asset_group, data_type)
+    pipeline_mode = pipeline_mode_for_source(primary_source)
+    return primary_source, pipeline_mode
+
+
 __all__ = [
     "SOURCE_PRIORITY",
     "get_primary_source",
     "get_source_priority",
     "has_source_priority",
+    "read_with_source_priority",
 ]

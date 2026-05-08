@@ -23,3 +23,4 @@ from .risk_taxonomy import RiskCategory as RiskCategory
 from .risk_taxonomy import RiskType as RiskType
 from .share_class import SHARE_CLASS_BASE_ASSETS as SHARE_CLASS_BASE_ASSETS
 from .share_class import ShareClass as ShareClass
+from .source_priority import read_with_source_priority as read_with_source_priority
