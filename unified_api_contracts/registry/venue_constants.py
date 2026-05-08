@@ -355,7 +355,7 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     ASTER: {"PERPETUAL"},
     NASDAQ: {"EQUITY", "ETF", "INDEX"},
     NYSE: {"EQUITY", "ETF", "INDEX"},
-    CME: {"FUTURE", "OPTION", "INDEX", "BOND"},
+    CME: {"FUTURE", "OPTION", "INDEX", "BOND", "EVENT_CONTRACT"},
     CBOT: {"FUTURE", "OPTION", "BOND"},
     NYMEX: {"FUTURE", "OPTION", "COMMODITY"},
     COMEX: {"FUTURE", "OPTION", "COMMODITY"},
@@ -408,6 +408,7 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PREDICTION_MARKET": "prediction_markets",
     "PROP": "props",
     "COMBO": "combos",
+    "EVENT_CONTRACT": "event_contracts",
 }
 
 
