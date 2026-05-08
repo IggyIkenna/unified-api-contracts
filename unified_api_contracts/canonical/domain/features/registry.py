@@ -318,9 +318,9 @@ def _build_feature_group_to_family() -> dict[str, FeatureFamily]:
     programming error.
 
     Services declared in ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` but absent
-    from ``_SERVICE_TO_FAMILY`` raise ``KeyError`` loudly at import time —
-    that's the correct failure mode (a new service repo without a registered
-    family would silently lose feature_family stamping).
+    in ``_SERVICE_TO_FAMILY`` raise ``KeyError`` loudly at module load time
+    — that's the correct failure mode (a new service repo without a
+    registered family would silently lose feature_family stamping).
     """
     result: dict[str, FeatureFamily] = {}
     for service, groups in EXPECTED_FEATURE_GROUPS_BY_SERVICE.items():

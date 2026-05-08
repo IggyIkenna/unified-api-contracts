@@ -364,7 +364,9 @@ class InstrumentsLiveTriggerFailedDetails(BaseModel):
     attempt_number: int = Field(default=1, description="1-based attempt index inside the same fire")
     consecutive_failures: int | None = Field(
         default=None,
-        description="Cumulative consecutive failures for this trigger_name; populated by the alerting rule, not the emitter",
+        description=(
+            "Cumulative consecutive failures for this trigger_name; populated by the alerting rule, not the emitter"
+        ),
     )
     correlation_id: str | None = None
 
@@ -403,9 +405,7 @@ class InstrumentsLiveSchemaDriftDetails(BaseModel):
     trigger_name: str
     source: str = Field(description="Source whose response shape drifted")
     entity_type: str = Field(description="e.g. fixtures, ohlcv_15m, market_lifecycle")
-    expected_columns: list[str] = Field(
-        description="Columns the UAC contract declares for this entity_type"
-    )
+    expected_columns: list[str] = Field(description="Columns the UAC contract declares for this entity_type")
     observed_columns: list[str] = Field(description="Columns actually emitted by the adapter")
     missing_columns: list[str] = Field(default_factory=list)
     extra_columns: list[str] = Field(default_factory=list)
@@ -430,7 +430,7 @@ class InstrumentsLiveT1AuditDiscrepancyDetails(BaseModel):
         default_factory=list,
         description="Sample of row-key tuples (stringified) that differ between live and batch",
     )
-    tolerance_pct: float = Field(description="Per-asset-group divergence tolerance (0.0–1.0)")
+    tolerance_pct: float = Field(description="Per-asset-group divergence tolerance (0.0-1.0)")
     observed_divergence_pct: float
     correlation_id: str | None = None
 
@@ -450,9 +450,7 @@ class MissingDependency(BaseModel):
     entity_type: str = Field(
         description="UAC entity_type that's missing or stale (e.g. fixtures, instrument-catalog, lineups)"
     )
-    expected_max_age_seconds: int = Field(
-        description="Max staleness tolerance per the preflight DAG SSOT (Phase A.9)"
-    )
+    expected_max_age_seconds: int = Field(description="Max staleness tolerance per the preflight DAG SSOT (Phase A.9)")
     actual_age_seconds: int | None = Field(
         default=None,
         description="Observed age at probe time; None if the entity is missing entirely (no row in manifest)",
@@ -477,7 +475,12 @@ class InstrumentsLivePreflightFailedDetails(BaseModel):
     asset_group: str
     trigger_name: str
     missing_dependencies: list[MissingDependency] = Field(
-        description="One entry per upstream entity that failed preflight; each names which entity, expected vs actual age, and last-seen timestamp. Must be non-empty: the event fires BECAUSE deps are missing — an empty list would be a contract violation."
+        description=(
+            "One entry per upstream entity that failed preflight; each names "
+            "which entity, expected vs actual age, and last-seen timestamp. "
+            "Must be non-empty: the event fires BECAUSE deps are missing — "
+            "an empty list would be a contract violation."
+        )
     )
     correlation_id: str | None = None
 
@@ -726,9 +729,7 @@ class InstrumentsLiveSourceDegradedEvent(BaseModel):
 
 
 class InstrumentsLiveSchemaDriftEvent(BaseModel):
-    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_SCHEMA_DRIFT] = (
-        LifecycleEventType.INSTRUMENTS_LIVE_SCHEMA_DRIFT
-    )
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_SCHEMA_DRIFT] = LifecycleEventType.INSTRUMENTS_LIVE_SCHEMA_DRIFT
     service: str
     timestamp: datetime
     details: InstrumentsLiveSchemaDriftDetails

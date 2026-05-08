@@ -359,12 +359,26 @@ class TestVenueCollateral:
         assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.10")
 
     def test_no_eth_perp_venue_accepts_eth_lst_today(self) -> None:
-        """As of 2026-05-05 no production ETH-perp venue accepts ETH LSTs as
-        direct cross-margin. The matrix must encode this explicitly so the
-        catalog generator's `accepted_perp_collateral(...)` filter
-        short-circuits cleanly. When Aevo / Lyra-V2 / dYdX / Hyperliquid
-        ship LST-margin support, flip the relevant row to True with a
-        haircut citation in `notes` and update this test."""
+        """As of 2026-05-08 the production ETH-perp venues that accept an
+        ETH LST as direct cross-margin are: BYBIT (stETH + wstETH; UTA
+        collateral since 2024-02), OKX (wstETH; multi-currency-margin
+        discount-rate list, Stream A flip 2026-05-08), and DERIBIT
+        (stETH; portfolio-margin). Every other (venue, lst) combo in the
+        ETH-perp set still rejects. The matrix must encode this
+        explicitly so the catalog generator's `accepted_perp_collateral(...)`
+        filter short-circuits cleanly. When Aevo / Lyra-V2 / dYdX /
+        Hyperliquid ship LST-margin support, flip the relevant row to
+        True with a haircut citation in `notes` and add the (venue, lst)
+        pair to ``known_exceptions`` below."""
+        # (venue, lst) pairs already flipped to accepted=True in the registry.
+        # Documented in venue_collateral.py with citation. Adding a new pair here
+        # requires the same note + a haircut value in the registry row.
+        known_exceptions: set[tuple[str, str]] = {
+            ("BYBIT", "stETH"),
+            ("BYBIT", "wstETH"),
+            ("OKX", "wstETH"),
+            ("DERIBIT", "stETH"),
+        }
         for venue in (
             "HYPERLIQUID",
             "BINANCE",
@@ -381,6 +395,8 @@ class TestVenueCollateral:
             "BITGET-FUTURES",
         ):
             for lst in ("stETH", "wstETH", "weETH", "rETH"):
+                if (venue, lst) in known_exceptions:
+                    continue
                 accepted = venue_accepts_collateral(venue, lst)
                 assert accepted is False, (
                     f"unexpected: {venue} now accepts {lst} — update the firm rule "

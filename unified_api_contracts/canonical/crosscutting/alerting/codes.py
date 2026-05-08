@@ -174,9 +174,8 @@ class KillSwitchScope(StrEnum):
     Canonical layer SSOT (was at ``internal/domain/deployment_service/isolation.py``;
     moved here 2026-05-08 so canonical AlertRule can carry a per-rule
     ``kill_switch_scope`` field without a circular import). The internal-layer
-    location now imports + re-exports for backward compat — every existing
-    consumer of ``unified_api_contracts.internal.KillSwitchScope`` keeps
-    working.
+    location now imports the canonical symbol so prior call sites
+    (``unified_api_contracts.internal.KillSwitchScope``) keep resolving.
 
     - ``GLOBAL`` — halt the entire platform (human operator only).
     - ``CLIENT`` — halt all activity for one client.

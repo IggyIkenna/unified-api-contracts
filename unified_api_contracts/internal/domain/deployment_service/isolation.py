@@ -28,8 +28,8 @@ from pydantic import BaseModel, Field
 
 # KillSwitchScope moved to canonical/crosscutting/alerting/codes.py 2026-05-08
 # so canonical AlertRule can carry it as a typed field without a circular
-# import. Re-exported here for backward compat — every existing
-# `unified_api_contracts.internal.KillSwitchScope` consumer keeps working.
+# import. Imported here from canonical so prior call sites
+# (``unified_api_contracts.internal.KillSwitchScope``) still resolve.
 from unified_api_contracts.canonical.crosscutting.alerting.codes import (
     KillSwitchScope,
 )
