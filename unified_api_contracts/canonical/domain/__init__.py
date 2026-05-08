@@ -18,6 +18,9 @@ from ..crosscutting.analytics import (
 from ..crosscutting.analytics import (
     SentimentScore as SentimentScore,
 )
+from ..crosscutting.cloud_target import (
+    CloudTarget,
+)
 from ..crosscutting.connectivity import (
     CanonicalWebSocketLifecycle,
     HealthPingResponse,
@@ -25,10 +28,23 @@ from ..crosscutting.connectivity import (
     WebSocketConnectionOpened,
     WebSocketEvent,
 )
+from ..crosscutting.environment_tier import (
+    EnvironmentTier,
+    resolve_environment_from_env,
+    resolve_environment_from_hostname,
+)
 from ..crosscutting.latency import (
     LatencyComponent,
     NetworkJitterMetric,
     OrderLatencyRecord,
+)
+from ..crosscutting.lifecycle_class import (
+    LifecycleClass,
+    VmPrefixSpec,
+    classify_cloud_run_service,
+    classify_experiment_run,
+    classify_scheduled_job,
+    classify_vm_name,
 )
 from ..crosscutting.rate_limits import (
     HttpRateLimitHeaders,
@@ -369,6 +385,7 @@ __all__ = [
     "CanonicalWorkflowRun",
     "CanonicalYieldCurvePoint",
     "CloudProvider",
+    "CloudTarget",
     "CoinbaseWithdrawRequest",
     "CoinbaseWithdrawResponse",
     "CollateralAsset",
@@ -386,6 +403,7 @@ __all__ = [
     "DeFiStakingAggregatedMetrics",
     "DepositAddress",
     "DepositRecord",
+    "EnvironmentTier",
     "Erc20TransferCalldata",
     "Erc20TransferFromCalldata",
     "EthSendRawTransactionRequest",
@@ -413,6 +431,7 @@ __all__ = [
     "InternalTransfer",
     "LPProtocolBreakdown",
     "LatencyComponent",
+    "LifecycleClass",
     "LineupPlayer",
     "LiveMatchState",
     "LiveOddsUpdate",
@@ -489,6 +508,7 @@ __all__ = [
     "VenueExecutionProfile",
     "VenuePositionBreakdown",
     "VenueRateLimitSpec",
+    "VmPrefixSpec",
     "VmQuotaShape",
     "VolSmilePoint",
     "VolSurface",
@@ -498,5 +518,11 @@ __all__ = [
     "WebSocketConnectionOpened",
     "WebSocketEvent",
     "WithdrawalRecord",
+    "classify_cloud_run_service",
+    "classify_experiment_run",
+    "classify_scheduled_job",
+    "classify_vm_name",
     "get_expected_bookmakers",
+    "resolve_environment_from_env",
+    "resolve_environment_from_hostname",
 ]

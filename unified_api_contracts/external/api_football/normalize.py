@@ -370,29 +370,238 @@ def normalize_api_football_standing(raw: dict[str, object], league_id: str = "",
 
 
 def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:
-    """Normalize a single API-Football injury row."""
-    return dict(raw) if isinstance(raw, dict) else {}
+    """Flatten a single API-Football ``/injuries`` row into a flat dict.
+
+    The raw shape has 4 nested struct columns (``player`` / ``team`` /
+    ``fixture`` / ``league``). We surface every useful field at the top
+    level so downstream readers don't need pyarrow struct accessors.
+
+    Returns a single dict (one injury report = one row).
+    """
+    if not isinstance(raw, dict):
+        return {}
+    player = _extract_dict(raw, "player")
+    team = _extract_dict(raw, "team")
+    fixture = _extract_dict(raw, "fixture")
+    league = _extract_dict(raw, "league")
+    out: dict[str, object] = {
+        "player_id": _safe_int(player.get("id")),
+        "player_name": player.get("name"),
+        "player_photo": player.get("photo"),
+        "player_type": player.get("type"),
+        "player_reason": player.get("reason"),
+        "team_id": _safe_int(team.get("id")),
+        "team_name": team.get("name"),
+        "fixture_id": _safe_int(fixture.get("id")),
+        "league_id": _safe_int(league.get("id")),
+        "league_season": _safe_int(league.get("season")),
+    }
+    return out
 
 
-def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str = "") -> dict[str, object]:
-    """Normalize a single API-Football fixture stats row."""
-    result = dict(raw) if isinstance(raw, dict) else {}
-    result["fixture_id"] = fixture_id
-    return result
+def _safe_pct(val: object) -> int | None:
+    """Parse a percentage value to int 0..100.
+
+    Handles ``"44%"``, ``"44"``, ``44``, ``44.0``, ``None``. Returns
+    ``None`` when the value is missing / unparseable / sentinel.
+    """
+    return _safe_int(val)
 
 
-def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str = "") -> dict[str, object]:
-    """Normalize a single API-Football fixture event row."""
-    result = dict(raw) if isinstance(raw, dict) else {}
-    result["fixture_id"] = fixture_id
-    return result
+def _safe_float(val: object) -> float | None:
+    """Parse a numeric value to float, accepting strings + percent suffix."""
+    if val is None:
+        return None
+    if isinstance(val, (int, float)):
+        return float(val)
+    s = str(val).strip().rstrip("%").strip()
+    if not s or s.lower() in ("none", "null", "-"):
+        return None
+    try:
+        return float(s)
+    except (ValueError, OverflowError):
+        return None
+
+
+# Closed-set mapping of API-Football statistic ``type`` strings to the flat
+# column name we expose on the parquet. Values to the right are the
+# canonical column names in SPORTS_FIXTURE_STATS. Each is paired with a
+# parser — _safe_int for counts, _safe_pct for percentages, _safe_float
+# for xG / goals_prevented.
+_FIXTURE_STAT_TYPE_MAP: dict[str, tuple[str, str]] = {
+    "Shots on Goal": ("shots_on_target", "int"),
+    "Shots off Goal": ("shots_off_target", "int"),
+    "Total Shots": ("shots_total", "int"),
+    "Blocked Shots": ("shots_blocked", "int"),
+    "Shots insidebox": ("shots_inside_box", "int"),
+    "Shots outsidebox": ("shots_outside_box", "int"),
+    "Fouls": ("fouls", "int"),
+    "Corner Kicks": ("corners", "int"),
+    "Offsides": ("offsides", "int"),
+    "Ball Possession": ("ball_possession_pct", "pct"),
+    "Yellow Cards": ("yellow_cards", "int"),
+    "Red Cards": ("red_cards", "int"),
+    "Goalkeeper Saves": ("goalkeeper_saves", "int"),
+    "Total passes": ("passes_total", "int"),
+    "Passes accurate": ("passes_accurate", "int"),
+    "Passes %": ("passes_pct", "pct"),
+    "expected_goals": ("expected_goals", "float"),
+    "goals_prevented": ("goals_prevented", "float"),
+}
+
+
+def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+    """Flatten a single API-Football ``/fixtures/statistics`` team-stats row.
+
+    Each call covers ONE team's stat block — the API returns a list of
+    {team, statistics: [{type, value}, ...]} rows, two per fixture (home,
+    away). Caller chains the results across the list.
+
+    Returns a list of length 1 (one row per team) with explicit columns
+    per the closed `_FIXTURE_STAT_TYPE_MAP`. ``team_id`` is stamped from
+    the nested team struct; ``is_home`` is left to the caller (we cannot
+    determine home/away without the fixture context).
+
+    Returns ``[]`` if the row shape is malformed.
+    """
+    if not isinstance(raw, dict):
+        return []
+
+    team = _extract_dict(raw, "team")
+    stats_list = _extract_list(raw, "statistics")
+
+    row: dict[str, object] = {
+        "fixture_id": fixture_id,
+        "team_id": _safe_int(team.get("id")),
+        "team_name": team.get("name"),
+        "is_home": None,  # Caller stamps based on (raw.team.id == fixture.teams.home.id).
+    }
+
+    # Pre-populate every known stat column with None so the parquet has
+    # a stable schema even when a stat type is absent for a fixture.
+    for _typ, (col_name, _kind) in _FIXTURE_STAT_TYPE_MAP.items():
+        if col_name not in row:
+            row[col_name] = None
+
+    for stat in stats_list:
+        if not isinstance(stat, dict):
+            continue
+        stat_type = stat.get("type")
+        stat_value = stat.get("value")
+        if not isinstance(stat_type, str):
+            continue
+        mapping = _FIXTURE_STAT_TYPE_MAP.get(stat_type)
+        if mapping is None:
+            # Unknown stat type — skip silently. New types added by the
+            # provider get picked up the next time we extend the map.
+            continue
+        col_name, kind = mapping
+        if kind == "int":
+            row[col_name] = _safe_int(stat_value)
+        elif kind == "pct":
+            row[col_name] = _safe_pct(stat_value)
+        else:  # "float"
+            row[col_name] = _safe_float(stat_value)
+
+    return [row]
+
+
+def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+    """Flatten one API-Football ``/fixtures/events`` row into one event row.
+
+    Each call covers a single event (goal / card / sub / VAR) with nested
+    ``time``, ``team``, ``player``, ``assist`` structs. We surface every
+    useful field at the top level.
+
+    Returns a list of length 1 (one event = one row); returns ``[]`` for
+    malformed input. List-shape preserves caller symmetry with
+    ``normalize_api_football_fixture_stats`` and
+    ``normalize_api_football_lineup`` so the orchestrator can use a
+    uniform ``chain.from_iterable`` regardless of normalizer.
+    """
+    if not isinstance(raw, dict):
+        return []
+
+    time_block = _extract_dict(raw, "time")
+    team = _extract_dict(raw, "team")
+    player = _extract_dict(raw, "player")
+    assist = _extract_dict(raw, "assist")
+
+    row: dict[str, object] = {
+        "fixture_id": fixture_id,
+        "time_elapsed": _safe_int(time_block.get("elapsed")),
+        "time_extra": _safe_int(time_block.get("extra")),
+        "team_id": _safe_int(team.get("id")),
+        "team_name": team.get("name"),
+        "player_id": _safe_int(player.get("id")),
+        "player_name": player.get("name"),
+        "assist_id": _safe_int(assist.get("id")) if assist else None,
+        "assist_name": assist.get("name") if assist else None,
+        "event_type": raw.get("type"),
+        "event_detail": raw.get("detail"),
+        "comments": raw.get("comments"),
+    }
+    return [row]
 
 
 def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
-    """Normalize a single API-Football lineup row into player-level records."""
-    result = dict(raw) if isinstance(raw, dict) else {}
-    result["fixture_id"] = fixture_id
-    return [result]
+    """Flatten one API-Football ``/fixtures/lineups`` team block into rows.
+
+    Each call covers ONE team's lineup with nested ``startXI`` (11 starters),
+    ``substitutes`` (~7 bench players), ``coach``, and ``formation``. We
+    explode to one row per (team, player) — coach NOT emitted as a row by
+    default (would mix grain). ``is_starter`` distinguishes starters from
+    subs.
+
+    Returns a list of length ~18 (11 starters + 7 subs); returns ``[]``
+    for malformed input.
+    """
+    if not isinstance(raw, dict):
+        return []
+
+    team = _extract_dict(raw, "team")
+    coach = _extract_dict(raw, "coach")
+    formation = raw.get("formation")
+    start_xi = _extract_list(raw, "startXI")
+    substitutes = _extract_list(raw, "substitutes")
+
+    team_id = _safe_int(team.get("id"))
+    team_name = team.get("name")
+    coach_id = _safe_int(coach.get("id")) if coach else None
+    coach_name = coach.get("name") if coach else None
+
+    rows: list[dict[str, object]] = []
+
+    def _emit(entry: object, is_starter: bool) -> None:
+        # API-Football wraps each player block as {"player": {id, name, number, pos, grid}}.
+        if not isinstance(entry, dict):
+            return
+        player = _extract_dict(entry, "player")
+        if not player:
+            return
+        rows.append(
+            {
+                "fixture_id": fixture_id,
+                "team_id": team_id,
+                "team_name": team_name,
+                "formation": formation,
+                "coach_id": coach_id,
+                "coach_name": coach_name,
+                "player_id": _safe_int(player.get("id")),
+                "player_name": player.get("name"),
+                "player_number": _safe_int(player.get("number")),
+                "player_pos": player.get("pos"),
+                "player_grid": player.get("grid"),
+                "is_starter": is_starter,
+            }
+        )
+
+    for entry in start_xi:
+        _emit(entry, is_starter=True)
+    for entry in substitutes:
+        _emit(entry, is_starter=False)
+
+    return rows
 
 
 def _safe_int(val: object) -> int | None:

@@ -59,9 +59,55 @@ def _d_opt(value: float | int | str | Decimal | None) -> Decimal | None:
     return Decimal(str(value))
 
 
-def _instrument_class_to_type(ic: str | None) -> InstrumentType:
+# CME event-contract root prefixes — symbols starting with these are binary YES/NO
+# outcome contracts (cross-venue arb leg with Polymarket canonical_question_groups).
+# SSOT for the root list: registry.tradfi_instrument_universe._CME_EVENT_CONTRACTS.
+# Kept inline here to avoid a circular import (registry/ → canonical/ → external/ →
+# back to registry/). When the registry list grows beyond the 9 canonical roots,
+# the loader will need to keep this tuple in sync (covered by the
+# tradfi_master_2026_05_07 plan + cme_polymarket_arb_2026_05_08 plan Phase 4).
+_CME_EVENT_CONTRACT_ROOTS: tuple[str, ...] = (
+    "ECES",
+    "ECNQ",
+    "ECRTY",
+    "ECYM",
+    "ECGC",
+    "ECCL",
+    "ECNG",
+    "EC6E",
+    "ECBTC",
+)
+
+
+def _is_cme_event_contract_symbol(raw_symbol: str | None) -> bool:
+    """True iff raw_symbol looks like a CME event-contract symbol (e.g. ``ECBTC.OPT``).
+
+    Match shape: ``<root>.OPT`` or ``<root>-<...>`` where root ∈ ``_CME_EVENT_CONTRACT_ROOTS``.
+    Used by ``_instrument_class_to_type`` to map Databento ``BAG`` instrument_class
+    (or legacy ``OPT``) for these roots to ``InstrumentType.EVENT_CONTRACT`` rather
+    than ``InstrumentType.OPTION``.
+    """
+    if not raw_symbol:
+        return False
+    head = raw_symbol.split(".", 1)[0].split("-", 1)[0].upper()
+    return head in _CME_EVENT_CONTRACT_ROOTS
+
+
+def _instrument_class_to_type(ic: str | None, raw_symbol: str | None = None) -> InstrumentType:
+    """Map Databento ``instrument_class`` (single-char or ``BAG``) to canonical InstrumentType.
+
+    When ``raw_symbol`` matches a CME event-contract root prefix AND
+    ``instrument_class`` is ``BAG`` (Databento's spread/bag classification — current
+    encoding for event contracts) OR ``O`` (legacy event-contract encoding before
+    Databento's symbology refresh), returns ``InstrumentType.EVENT_CONTRACT``
+    instead of the default option/spot mapping.
+    """
     if not ic:
         return InstrumentType.SPOT_PAIR
+    upper = ic.upper()
+    # Event-contract override: BAG (current Databento encoding) or O (legacy) on EC* roots.
+    if upper in {"BAG", "O"} and _is_cme_event_contract_symbol(raw_symbol):
+        return InstrumentType.EVENT_CONTRACT
     m = {
         "F": InstrumentType.FUTURE,
         "O": InstrumentType.OPTION,
@@ -71,8 +117,9 @@ def _instrument_class_to_type(ic: str | None) -> InstrumentType:
         "N": InstrumentType.ETF,
         "X": InstrumentType.INDEX,
         "C": InstrumentType.COMMODITY,
+        "BAG": InstrumentType.COMBO,  # generic spread/bag without event-contract root → COMBO
     }
-    return m.get(ic.upper(), InstrumentType.SPOT_PAIR)
+    return m.get(upper, InstrumentType.SPOT_PAIR)
 
 
 def _mbp10_levels(
@@ -283,7 +330,7 @@ def normalize_databento_ohlcv_bar(
 def normalize_databento_definition(raw: DatabentoDefinition, venue: str = "databento") -> CanonicalInstrument:
     """Convert DatabentoDefinition to CanonicalInstrument."""
     ts = datetime.fromtimestamp(raw.ts_recv / 1e9, tz=UTC)
-    itype = _instrument_class_to_type(raw.instrument_class)
+    itype = _instrument_class_to_type(raw.instrument_class, raw.raw_symbol)
     symbol = raw.raw_symbol
     instrument_key = f"{venue}:{itype.value}:{symbol}"
     expiry = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC) if raw.expiration else None
@@ -307,7 +354,7 @@ def normalize_databento_definition(raw: DatabentoDefinition, venue: str = "datab
 def normalize_databento_symbol(raw: DatabentoSymbol, venue: str = "databento") -> CanonicalInstrument:
     """Convert DatabentoSymbol to CanonicalInstrument (minimal)."""
     ts = datetime.now(UTC)
-    itype = _instrument_class_to_type(raw.instrument_class)
+    itype = _instrument_class_to_type(raw.instrument_class, raw.raw_symbol)
     symbol = raw.raw_symbol
     instrument_key = f"{venue}:{itype.value}:{symbol}"
     return CanonicalInstrument(

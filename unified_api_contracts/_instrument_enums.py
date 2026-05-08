@@ -49,6 +49,9 @@ class InstrumentType(StrEnum):
     INDEX = "INDEX"
     BOND = "BOND"
     CDS = "CDS"
+    # Binary YES/NO settlement (CME ECES/ECBTC/etc.); cross-venue arb leg with
+    # Polymarket canonical_question_groups. See cme_polymarket_arb_2026_05_08 plan.
+    EVENT_CONTRACT = "EVENT_CONTRACT"
     # Multi-leg (combos, spreads, strategies)
     COMBO = "COMBO"
     # Sports / Prediction Markets

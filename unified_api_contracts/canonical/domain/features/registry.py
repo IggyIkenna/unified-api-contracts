@@ -12,12 +12,17 @@ Mirrors the SSOT pattern of ``unified_api_contracts.sports.SOURCE_COVERAGE_START
 status uses to clip the expected-dates window before counting captured / empty /
 missing.
 
-Reference: feature_dag_uac_ssot_and_features_coverage_2026_05_06.md Phase 1A.
+References:
+- ``feature_dag_uac_ssot_and_features_coverage_2026_05_06.plan.md`` Phase 1A —
+  ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` + ``FEATURE_COVERAGE_START``.
+- ``features_repo_consolidation_2026_05_08.plan.md`` Phase 1A — the
+  ``FeatureFamily`` enum + ``FEATURE_GROUP_TO_FAMILY`` registry below.
 """
 
 from __future__ import annotations
 
 from datetime import date
+from enum import StrEnum
 from typing import Final
 
 # ---------------------------------------------------------------------------
@@ -240,10 +245,142 @@ def list_services() -> list[str]:
     return sorted(EXPECTED_FEATURE_GROUPS_BY_SERVICE)
 
 
+# ---------------------------------------------------------------------------
+# FeatureFamily — closed-set enum of feature-service "families" (Phase 1A of
+# ``features_repo_consolidation_2026_05_08``).
+# ---------------------------------------------------------------------------
+#
+# The features-repo consolidation introduces ``feature_family`` as an additive
+# sibling-or-prefix axis of ``feature_group`` in the v5 manifest schema. Every
+# feature_group produced by a ``features-{family}-service`` calculator is
+# tagged with its owning family at write time so the manifest can be sliced /
+# rolled-up by family in deployment-UI without grepping the calculator name.
+#
+# This enum is the closed set — adding a new feature family is a deliberate
+# UAC change, not a string-typo waiting to happen. The 8 values mirror the 8
+# ``features-{family}-service`` repos enumerated in the consolidation plan.
+#
+# Plan: ``features_repo_consolidation_2026_05_08.plan.md`` Phase 1A.
+
+
+class FeatureFamily(StrEnum):
+    """Closed set of feature-service families.
+
+    Each value corresponds to one ``features-{family}-service`` repo. The
+    string value is the canonical lower_snake form used as the manifest
+    column value and as the family key in ``FEATURE_GROUP_TO_FAMILY``.
+    """
+
+    CALENDAR = "calendar"
+    COMMODITY = "commodity"
+    CROSS_INSTRUMENT = "cross_instrument"
+    DELTA_ONE = "delta_one"
+    MULTI_TIMEFRAME = "multi_timeframe"
+    ONCHAIN = "onchain"
+    SPORTS = "sports"
+    VOLATILITY = "volatility"
+
+
+class FeatureGroupFamilyCollisionError(ValueError):
+    """Raised when ``_build_feature_group_to_family`` finds the same
+    ``feature_group`` declared by two services that map to different
+    ``FeatureFamily`` values.
+
+    This is a hard programming error — the plan's invariant is that every
+    feature_group maps to exactly ONE feature_family. If a legitimate use
+    case for cross-family feature_groups emerges, the plan + this enforcement
+    must change deliberately, not by silently picking one side.
+    """
+
+
+# Service-name → FeatureFamily mapping. Mechanical: every
+# ``features-{family}-service`` maps to the matching ``FeatureFamily`` value.
+# Kept as a private constant — callers should reach for ``FEATURE_GROUP_TO_FAMILY``
+# / ``get_feature_family`` instead of this dict directly.
+_SERVICE_TO_FAMILY: Final[dict[str, FeatureFamily]] = {
+    "features-calendar-service": FeatureFamily.CALENDAR,
+    "features-commodity-service": FeatureFamily.COMMODITY,
+    "features-cross-instrument-service": FeatureFamily.CROSS_INSTRUMENT,
+    "features-delta-one-service": FeatureFamily.DELTA_ONE,
+    "features-multi-timeframe-service": FeatureFamily.MULTI_TIMEFRAME,
+    "features-onchain-service": FeatureFamily.ONCHAIN,
+    "features-sports-service": FeatureFamily.SPORTS,
+    "features-volatility-service": FeatureFamily.VOLATILITY,
+}
+
+
+def _build_feature_group_to_family() -> dict[str, FeatureFamily]:
+    """Invert ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` into a
+    ``feature_group -> FeatureFamily`` lookup at module-load time.
+
+    Raises ``FeatureGroupFamilyCollisionError`` if the same feature_group is
+    declared by two services that map to different families — a hard
+    programming error.
+
+    Services declared in ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` but absent
+    from ``_SERVICE_TO_FAMILY`` raise ``KeyError`` loudly at import time —
+    that's the correct failure mode (a new service repo without a registered
+    family would silently lose feature_family stamping).
+    """
+    result: dict[str, FeatureFamily] = {}
+    for service, groups in EXPECTED_FEATURE_GROUPS_BY_SERVICE.items():
+        family = _SERVICE_TO_FAMILY[service]
+        for group in groups:
+            existing = result.get(group)
+            if existing is not None and existing != family:
+                raise FeatureGroupFamilyCollisionError(
+                    f"feature_group {group!r} is declared by two services "
+                    f"that map to different feature_family values: "
+                    f"{existing.value!r} vs {family.value!r}. The plan's "
+                    "invariant is one-family-per-feature_group; resolve by "
+                    "renaming the duplicate or revising _SERVICE_TO_FAMILY."
+                )
+            result[group] = family
+    return result
+
+
+FEATURE_GROUP_TO_FAMILY: Final[dict[str, FeatureFamily]] = _build_feature_group_to_family()
+"""``feature_group -> FeatureFamily`` lookup.
+
+Built once at module-load by inverting ``EXPECTED_FEATURE_GROUPS_BY_SERVICE``
+through ``_SERVICE_TO_FAMILY``. ``ManifestWriter`` callers use
+``get_feature_family(feature_group)`` to look up the family before stamping
+the manifest column.
+
+Plan: ``features_repo_consolidation_2026_05_08.plan.md`` Phase 1A.
+"""
+
+
+def get_feature_family(feature_group: str) -> FeatureFamily | None:
+    """Return the ``FeatureFamily`` for ``feature_group``, or ``None`` if
+    the feature_group is not registered in ``EXPECTED_FEATURE_GROUPS_BY_SERVICE``.
+
+    Returning ``None`` (rather than raising) lets non-features writers
+    (MTDS / MDPS) reach this helper without forcing a try/except — they
+    simply don't stamp ``feature_family`` on their rows. Features-CLI
+    writers should treat ``None`` as a contract violation and fail loudly.
+    """
+    return FEATURE_GROUP_TO_FAMILY.get(feature_group)
+
+
+def is_known_feature_family(family: str) -> bool:
+    """True iff ``family`` matches a member of :class:`FeatureFamily`.
+
+    Useful for validating manifest-row values read back from disk before
+    they're returned through the deployment-api ``feature_family=`` filter.
+    """
+    return family in {member.value for member in FeatureFamily}
+
+
 __all__ = [
     "EXPECTED_FEATURE_GROUPS_BY_SERVICE",
     "FEATURE_COVERAGE_START",
+    "FEATURE_GROUP_TO_FAMILY",
+    "FeatureFamily",
+    "FeatureGroupFamilyCollisionError",
     "get_feature_coverage_start",
+    "get_feature_family",
+    "is_known_feature_family",
     "is_known_feature_group",
     "list_services",
 ]

@@ -120,6 +120,52 @@ class TestDabentoNormalizer:
         assert _instrument_class_to_type("f") == InstrumentType.FUTURE
         assert _instrument_class_to_type("e") == InstrumentType.EQUITY
 
+    def test_cme_event_contract_bag_maps_to_event_contract(self) -> None:
+        """CME event-contract roots (ECES/ECBTC/etc.) with BAG instrument_class
+        map to ``InstrumentType.EVENT_CONTRACT`` per the cme_polymarket_arb plan."""
+        from unified_api_contracts.external.databento.normalize import (
+            _instrument_class_to_type,
+        )
+
+        # BAG (current Databento encoding) → EVENT_CONTRACT for EC* roots.
+        assert _instrument_class_to_type("BAG", "ECES.OPT") == InstrumentType.EVENT_CONTRACT
+        assert _instrument_class_to_type("BAG", "ECBTC.OPT") == InstrumentType.EVENT_CONTRACT
+        assert _instrument_class_to_type("BAG", "ECNQ-20260509") == InstrumentType.EVENT_CONTRACT
+        # Legacy "O" encoding for EC* roots also flips to EVENT_CONTRACT (covers
+        # mid-migration symbology where the registry still labels them OPTION).
+        assert _instrument_class_to_type("O", "ECRTY.OPT") == InstrumentType.EVENT_CONTRACT
+
+    def test_regular_option_still_classifies_as_option(self) -> None:
+        """Vanilla CME options (ES.OPT etc.) keep ``InstrumentType.OPTION`` —
+        the EVENT_CONTRACT override is gated on the EC* root prefix."""
+        from unified_api_contracts.external.databento.normalize import (
+            _instrument_class_to_type,
+        )
+
+        assert _instrument_class_to_type("O", "ES.OPT") == InstrumentType.OPTION
+        assert _instrument_class_to_type("O", "SPX.OPT") == InstrumentType.OPTION
+        assert _instrument_class_to_type("O", None) == InstrumentType.OPTION
+
+    def test_regular_future_still_classifies_as_future(self) -> None:
+        """Vanilla CME futures (ES.FUT etc.) keep ``InstrumentType.FUTURE`` —
+        the EVENT_CONTRACT override does not affect F instrument_class."""
+        from unified_api_contracts.external.databento.normalize import (
+            _instrument_class_to_type,
+        )
+
+        assert _instrument_class_to_type("F", "ES.FUT") == InstrumentType.FUTURE
+        assert _instrument_class_to_type("F", "ECBTC.FUT") == InstrumentType.FUTURE  # EC* root + F → still FUTURE
+        assert _instrument_class_to_type("F", None) == InstrumentType.FUTURE
+
+    def test_bag_without_event_contract_root_maps_to_combo(self) -> None:
+        """BAG instrument_class for non-EC* symbols maps to COMBO (generic spread/bag)."""
+        from unified_api_contracts.external.databento.normalize import (
+            _instrument_class_to_type,
+        )
+
+        assert _instrument_class_to_type("BAG", "ES.SPREAD") == InstrumentType.COMBO
+        assert _instrument_class_to_type("BAG", None) == InstrumentType.COMBO
+
 
 class TestIbkrNormalizer:
     """IBKR _ibkr_instrument_type maps all IBKR sec types correctly."""
