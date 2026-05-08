@@ -101,6 +101,36 @@ class LifecycleEventType(StrEnum):
     AGENT_INVESTIGATION_COMPLETED = "AGENT_INVESTIGATION_COMPLETED"
     AGENT_FIX_APPLIED = "AGENT_FIX_APPLIED"
     AGENT_FIX_FAILED = "AGENT_FIX_FAILED"
+    # Instruments-live trigger lifecycle (instruments_live_master_2026_05_08
+    # Phase A.5 — codifying the typed event surface for Cloud Scheduler /
+    # Cloud Run instruments-live triggers across cefi / defi / tradfi /
+    # sports / prediction). Per Phase A.4 alerting taxonomy:
+    #   TRIGGER_FIRED        — every successful fire (operator visibility +
+    #                          missed-fire watchdog input)
+    #   TRIGGER_FAILED       — single-trigger fail; alerting threshold N
+    #                          consecutive (default 3)
+    #   SOURCE_DEGRADED      — primary source returns degraded data; alert
+    #                          immediately + auto-switch to secondary
+    #   SCHEMA_DRIFT         — adapter output schema diverges from canonical;
+    #                          alert immediately + circuit-break (do not write)
+    #   T1_AUDIT_DISCREPANCY — T+1 audit detects live≠batch beyond tolerance;
+    #                          alert + page on-call
+    #   PREFLIGHT_FAILED     — preflight chain check (instruments_live_master
+    #                          Phase A.10 helper) detected missing or stale
+    #                          upstream entity BEFORE the source call; high-
+    #                          value early-warning surface (instant alert,
+    #                          single instance, no consecutive threshold).
+    #   UPSTREAM_STALE       — independent upstream-staleness monitor (Phase
+    #                          A.11) detects an upstream is older than its
+    #                          declared threshold BEFORE downstream fires;
+    #                          early-warning, single instance.
+    INSTRUMENTS_LIVE_TRIGGER_FIRED = "INSTRUMENTS_LIVE_TRIGGER_FIRED"
+    INSTRUMENTS_LIVE_TRIGGER_FAILED = "INSTRUMENTS_LIVE_TRIGGER_FAILED"
+    INSTRUMENTS_LIVE_SOURCE_DEGRADED = "INSTRUMENTS_LIVE_SOURCE_DEGRADED"
+    INSTRUMENTS_LIVE_SCHEMA_DRIFT = "INSTRUMENTS_LIVE_SCHEMA_DRIFT"
+    INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY = "INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY"
+    INSTRUMENTS_LIVE_PREFLIGHT_FAILED = "INSTRUMENTS_LIVE_PREFLIGHT_FAILED"
+    INSTRUMENTS_LIVE_UPSTREAM_STALE = "INSTRUMENTS_LIVE_UPSTREAM_STALE"
 
 
 # Backward-compat alias — LogLevel is the canonical severity enum (modes.py).
@@ -293,6 +323,193 @@ class PreflightSkippedDetails(BaseModel):
     earliest_valid_date: str | None = None
 
 
+# ---------------------------------------------------------------------------
+# Instruments-live trigger metadata payloads (Phase A.5 of
+# instruments_live_master_2026_05_08). These payloads carry the metadata
+# required by the Phase H.1 alerting rules (alerting_service_live_rules)
+# to format Telegram / PagerDuty messages with operator-actionable detail —
+# specifically `missing_dependencies` payloads name the exact upstream that
+# is blocking, so the operator can act in seconds rather than diagnosing
+# from logs. See `codex/04-architecture/alerting-batch-live.md` § Instruments-
+# live failure rules (added Phase A.4) for the per-rule routing table.
+# ---------------------------------------------------------------------------
+
+
+class InstrumentsLiveTriggerFiredDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_TRIGGER_FIRED — every successful trigger
+    fire emits this so the deployment-UI Scheduled Jobs tab + the missed-fire
+    watchdog have a continuous heartbeat record of when each Cloud Scheduler
+    / Cloud Run cron last actually ran.
+    """
+
+    asset_group: str = Field(description="cefi | defi | tradfi | sports | prediction")
+    trigger_name: str = Field(description="UAC trigger taxonomy entry, e.g. sports.fixtures.daily_repoll")
+    scheduled_fire_at: datetime = Field(description="Cloud Scheduler's intended fire time")
+    actual_fire_at: datetime = Field(description="Time the orchestrator entrypoint actually started")
+    correlation_id: str | None = None
+
+
+class InstrumentsLiveTriggerFailedDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_TRIGGER_FAILED — a single trigger
+    invocation completed in failure. Phase H.1 alerting rule (a) escalates
+    to Telegram after N consecutive failures of the same trigger_name
+    (default 3); the per-trigger circuit-breaker (Phase H.2) flips the
+    Cloud Scheduler entry to ``paused`` after the same threshold.
+    """
+
+    asset_group: str
+    trigger_name: str
+    error_type: str = Field(description="Python exception class name, e.g. SourceTimeoutError")
+    error_message: str = Field(description="Single-line summary of the failure")
+    attempt_number: int = Field(default=1, description="1-based attempt index inside the same fire")
+    consecutive_failures: int | None = Field(
+        default=None,
+        description="Cumulative consecutive failures for this trigger_name; populated by the alerting rule, not the emitter",
+    )
+    correlation_id: str | None = None
+
+
+class InstrumentsLiveSourceDegradedDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_SOURCE_DEGRADED — primary source for
+    the trigger returned degraded data (HTTP 5xx, partial payload, schema-
+    valid but suspicious row count, rate-limit exhaustion). Phase H.1 rule
+    (b) alerts immediately + the orchestrator auto-switches to the
+    secondary source declared in UAC ``SOURCE_PRIORITY``.
+    """
+
+    asset_group: str
+    trigger_name: str
+    primary_source: str = Field(description="Source that degraded, e.g. polygon")
+    secondary_source: str | None = Field(
+        default=None, description="Fall-back source per UAC SOURCE_PRIORITY; None if no fall-back exists"
+    )
+    degradation_reason: str = Field(
+        description="Closed taxonomy: HTTP_5XX | RATE_LIMIT | PARTIAL_PAYLOAD | SCHEMA_VALID_BUT_SUSPICIOUS | TIMEOUT"
+    )
+    switched_at: datetime | None = Field(
+        default=None, description="When the orchestrator switched to the secondary source"
+    )
+    correlation_id: str | None = None
+
+
+class InstrumentsLiveSchemaDriftDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_SCHEMA_DRIFT — the adapter's output
+    DataFrame schema diverges from the UAC contract for this trigger's
+    output entity-type. Phase H.1 rule (c) alerts immediately + the
+    write-gate refuses the parquet write (no garbage-on-garbage downstream).
+    """
+
+    asset_group: str
+    trigger_name: str
+    source: str = Field(description="Source whose response shape drifted")
+    entity_type: str = Field(description="e.g. fixtures, ohlcv_15m, market_lifecycle")
+    expected_columns: list[str] = Field(
+        description="Columns the UAC contract declares for this entity_type"
+    )
+    observed_columns: list[str] = Field(description="Columns actually emitted by the adapter")
+    missing_columns: list[str] = Field(default_factory=list)
+    extra_columns: list[str] = Field(default_factory=list)
+    correlation_id: str | None = None
+
+
+class InstrumentsLiveT1AuditDiscrepancyDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY — the T+1
+    retrospective audit (Phase I) detected that live-mode writes for
+    ``(asset_group, entity_type, audit_date)`` diverge from what a fresh
+    batch run would have produced beyond the per-asset-group tolerance.
+    Phase H.1 rule (d) alerts AND pages on-call (single-iteration miss is
+    not end-of-world per operator direction; consecutive-day miss is).
+    """
+
+    asset_group: str
+    entity_type: str
+    audit_date: str = Field(description="ISO YYYY-MM-DD — the day under audit")
+    live_row_count: int
+    batch_row_count: int
+    mismatch_keys: list[str] = Field(
+        default_factory=list,
+        description="Sample of row-key tuples (stringified) that differ between live and batch",
+    )
+    tolerance_pct: float = Field(description="Per-asset-group divergence tolerance (0.0–1.0)")
+    observed_divergence_pct: float
+    correlation_id: str | None = None
+
+
+class MissingDependency(BaseModel):
+    """Per-dependency entry in PREFLIGHT_FAILED / UPSTREAM_STALE payloads.
+
+    Names the specific upstream entity that's blocking the downstream
+    trigger so the alerting Telegram message body can format
+    operator-actionable detail (e.g. ``"sports.weather_cascade [-3h] for
+    fixture 1234567 BLOCKED — fixture upstream last seen 36h ago,
+    threshold 24h"``). Per CLAUDE.md "Honest absence vs fake placeholders"
+    rule, every preflight short-circuit must surface the missing-dep set
+    in structured form, not just a free-text reason.
+    """
+
+    entity_type: str = Field(
+        description="UAC entity_type that's missing or stale (e.g. fixtures, instrument-catalog, lineups)"
+    )
+    expected_max_age_seconds: int = Field(
+        description="Max staleness tolerance per the preflight DAG SSOT (Phase A.9)"
+    )
+    actual_age_seconds: int | None = Field(
+        default=None,
+        description="Observed age at probe time; None if the entity is missing entirely (no row in manifest)",
+    )
+    last_seen_at: datetime | None = Field(
+        default=None,
+        description="Most recent ``attempted_at`` for the entity in the upstream manifest; None if never captured",
+    )
+
+
+class InstrumentsLivePreflightFailedDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_PREFLIGHT_FAILED — a downstream trigger
+    detected upstream entities that are missing or stale (per the Phase A.9
+    preflight DAG SSOT) BEFORE making the source call. Phase H.1 rule (f)
+    alerts IMMEDIATELY (single instance, no consecutive threshold) — this
+    is the high-value early-warning surface that turns a "live pipeline
+    degraded but nobody noticed for 4 hours" silent failure into a
+    sub-minute Telegram alert with the missing-dep detail in the message
+    body.
+    """
+
+    asset_group: str
+    trigger_name: str
+    missing_dependencies: list[MissingDependency] = Field(
+        description="One entry per upstream entity that failed preflight; each names which entity, expected vs actual age, and last-seen timestamp. Must be non-empty: the event fires BECAUSE deps are missing — an empty list would be a contract violation."
+    )
+    correlation_id: str | None = None
+
+
+class InstrumentsLiveUpstreamStaleDetails(BaseModel):
+    """Metadata for INSTRUMENTS_LIVE_UPSTREAM_STALE — the independent
+    upstream-staleness monitor (Phase A.11) detected an upstream is older
+    than its declared staleness threshold BEFORE any downstream trigger
+    has fired. Phase H.1 rule (g) alerts IMMEDIATELY — earlier than the
+    PREFLIGHT_FAILED path, because the staleness monitor runs on its own
+    Cloud Scheduler cron (every 5min per asset_group) regardless of
+    whether a downstream trigger is due to fire.
+    """
+
+    asset_group: str
+    upstream_entity_type: str = Field(
+        description="UAC entity_type of the stale upstream (e.g. instrument-catalog, fixtures)"
+    )
+    last_captured_at: datetime | None = Field(
+        default=None, description="Most recent successful ``attempted_at`` in the upstream manifest"
+    )
+    staleness_threshold_seconds: int = Field(
+        description="Per-(asset_group, entity_type) threshold from the preflight DAG SSOT"
+    )
+    actual_age_seconds: int = Field(description="Observed age at the monitor's probe time")
+    downstream_triggers_blocked: list[str] = Field(
+        default_factory=list,
+        description="Downstream trigger_names that would fail preflight if they fired now (declared in the DAG SSOT)",
+    )
+    correlation_id: str | None = None
+
+
 class ConfigChangedDetails(BaseModel):
     config_file: str | None = None
     changed_by: str | None = None
@@ -474,6 +691,74 @@ class SecretAccessedEvent(BaseModel):
     service: str
     timestamp: datetime
     details: SecretAccessedDetails
+
+
+# ---------------------------------------------------------------------------
+# Instruments-live trigger typed convenience wrappers (Phase A.5)
+# ---------------------------------------------------------------------------
+
+
+class InstrumentsLiveTriggerFiredEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_TRIGGER_FIRED] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_TRIGGER_FIRED
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLiveTriggerFiredDetails
+
+
+class InstrumentsLiveTriggerFailedEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_TRIGGER_FAILED] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_TRIGGER_FAILED
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLiveTriggerFailedDetails
+
+
+class InstrumentsLiveSourceDegradedEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_SOURCE_DEGRADED] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_SOURCE_DEGRADED
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLiveSourceDegradedDetails
+
+
+class InstrumentsLiveSchemaDriftEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_SCHEMA_DRIFT] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_SCHEMA_DRIFT
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLiveSchemaDriftDetails
+
+
+class InstrumentsLiveT1AuditDiscrepancyEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLiveT1AuditDiscrepancyDetails
+
+
+class InstrumentsLivePreflightFailedEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_PREFLIGHT_FAILED] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_PREFLIGHT_FAILED
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLivePreflightFailedDetails
+
+
+class InstrumentsLiveUpstreamStaleEvent(BaseModel):
+    event: Literal[LifecycleEventType.INSTRUMENTS_LIVE_UPSTREAM_STALE] = (
+        LifecycleEventType.INSTRUMENTS_LIVE_UPSTREAM_STALE
+    )
+    service: str
+    timestamp: datetime
+    details: InstrumentsLiveUpstreamStaleDetails
 
 
 # ---------------------------------------------------------------------------
