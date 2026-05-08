@@ -173,12 +173,16 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         pattern="KILL_SWITCH_*",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
-        runbook_doc=_runbook("kill_switch"),
+        runbook_doc=_runbook("kill_switch_defi_liquidation_risk"),
         threshold_key="defi_health_factor_critical",
         triggers_kill_switch=True,
         description=(
             "Kill-switch family — DEFI_LIQUIDATION_RISK / PORTFOLIO_DRAWDOWN /"
             " VENUE_DISCONNECT all halt downstream subscribers + page on-call."
+            " Wildcard pattern matches all 3 KILL_SWITCH_* codes; runbook_doc"
+            " anchors at the liquidation-risk variant which cross-references"
+            " sibling kill_switch_portfolio_drawdown.md +"
+            " kill_switch_venue_disconnect.md."
         ),
     ),
     # ── T1 CRITICAL — circuit + multi-leg ───────────────────────────────────

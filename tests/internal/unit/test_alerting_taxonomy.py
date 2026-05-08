@@ -16,6 +16,7 @@ Phase 1 of `alerting_service_live_rules_2026_05_07`. Enforces:
 from __future__ import annotations
 
 import fnmatch
+import re
 from decimal import Decimal
 
 import pytest
@@ -469,3 +470,100 @@ def test_ml_inference_latency_threshold_unit_is_milliseconds() -> None:
     threshold = ALERT_THRESHOLDS["ml_inference_latency_p99_ms"]
     assert threshold.unit is ThresholdUnit.MILLISECONDS
     assert threshold.default_value == Decimal("500")
+
+
+# ---------------------------------------------------------------------------
+# Phase 6 of alerting_service_live_rules_2026_05_07 — `runbook_doc` field
+# wiring tests. Each `AlertRule.runbook_doc` should resolve to a stable path
+# under `unified-trading-pm/codex/14-playbooks/alerting/<filename>.md`.
+#
+# Cross-repo file existence at unit-test time isn't feasible (UAC test runs
+# don't have the PM repo on path), so we verify path FORMAT only — the
+# structure check catches the most common foot-gun (typo in slug, wrong
+# directory, missing `.md` extension).
+# ---------------------------------------------------------------------------
+
+
+_RUNBOOK_PATH_PATTERN: re.Pattern[str] = re.compile(r"^unified-trading-pm/codex/14-playbooks/alerting/[a-z0-9_]+\.md$")
+
+
+def test_every_alert_rule_runbook_doc_is_non_empty() -> None:
+    """Every rule MUST point at SOME runbook — empty string is a code smell
+    that means a future operator has nothing to read on the alert."""
+    for rule in LIVE_ALERT_RULES:
+        assert rule.runbook_doc, (
+            f"AlertRule(code={rule.code}, pattern={rule.pattern!r}) has empty"
+            " runbook_doc; populate per Phase 6 of"
+            " alerting_service_live_rules_2026_05_07.md."
+        )
+
+
+def test_every_alert_rule_runbook_doc_path_format() -> None:
+    """All runbook_doc paths conform to the canonical shape:
+    `unified-trading-pm/codex/14-playbooks/alerting/<slug>.md` with a
+    lowercase-slug filename. Catches typos / wrong-extension / wrong-dir."""
+    for rule in LIVE_ALERT_RULES:
+        assert _RUNBOOK_PATH_PATTERN.fullmatch(rule.runbook_doc), (
+            f"AlertRule(code={rule.code}).runbook_doc={rule.runbook_doc!r} does"
+            " not match canonical format"
+            f" {_RUNBOOK_PATH_PATTERN.pattern!r}; expected"
+            " unified-trading-pm/codex/14-playbooks/alerting/<slug>.md."
+        )
+
+
+def test_kill_switch_wildcard_rule_runbook_anchors_at_liquidation_risk() -> None:
+    """The `KILL_SWITCH_*` wildcard rule pattern matches all 3 KILL_SWITCH
+    codes. Its runbook_doc anchors at kill_switch_defi_liquidation_risk.md
+    (the highest-impact variant); the runbook itself cross-references the
+    sibling kill_switch_portfolio_drawdown.md +
+    kill_switch_venue_disconnect.md so operators reach the right one."""
+    matching_rules = [r for r in LIVE_ALERT_RULES if r.pattern == "KILL_SWITCH_*"]
+    assert len(matching_rules) == 1, f"Expected exactly one KILL_SWITCH_* wildcard rule; found {len(matching_rules)}."
+    rule = matching_rules[0]
+    assert rule.runbook_doc.endswith("kill_switch_defi_liquidation_risk.md"), (
+        f"KILL_SWITCH_* wildcard rule.runbook_doc={rule.runbook_doc!r}"
+        " expected to anchor at kill_switch_defi_liquidation_risk.md."
+    )
+
+
+def test_phase6_required_runbook_slugs_present_in_live_alert_rules() -> None:
+    """The Phase 6 plan-required 15 per-AlertCode runbooks each correspond to
+    at least one rule whose runbook_doc points at the matching slug."""
+    plan_required_slugs = {
+        "kill_switch_defi_liquidation_risk",
+        "kill_switch_portfolio_drawdown",
+        "kill_switch_venue_disconnect",
+        "circuit_breaker_open",
+        "defi_health_factor_critical",
+        "defi_weeth_depeg",
+        "defi_aave_utilization_spike",
+        "defi_funding_rate_flip",
+        "defi_feature_stale",
+        "preflight_failed",
+        "service_degraded",
+        "balance_drift",
+        "order_rejection_spike",
+        "margin_threshold_breach",
+        "position_drift",
+    }
+    referenced_slugs: set[str] = set()
+    for rule in LIVE_ALERT_RULES:
+        # Strip the `unified-trading-pm/codex/14-playbooks/alerting/` prefix
+        # and the `.md` suffix. Path validated by the format test above.
+        slug = rule.runbook_doc.rsplit("/", 1)[-1].removesuffix(".md")
+        referenced_slugs.add(slug)
+    missing = plan_required_slugs - referenced_slugs
+    # KILL_SWITCH_PORTFOLIO_DRAWDOWN + KILL_SWITCH_VENUE_DISCONNECT are
+    # routed via the `KILL_SWITCH_*` wildcard rule whose runbook_doc anchors
+    # at kill_switch_defi_liquidation_risk.md. The two sibling slugs are
+    # cross-referenced from the anchor runbook + reachable via the README
+    # index, so this test allows their absence from the runbook_doc set.
+    expected_missing_due_to_wildcard = {
+        "kill_switch_portfolio_drawdown",
+        "kill_switch_venue_disconnect",
+    }
+    assert missing <= expected_missing_due_to_wildcard, (
+        f"Phase 6 plan-required runbook slugs missing from LIVE_ALERT_RULES"
+        f" runbook_doc set (excluding kill-switch siblings reached via the"
+        f" wildcard anchor): {sorted(missing - expected_missing_due_to_wildcard)}"
+    )
