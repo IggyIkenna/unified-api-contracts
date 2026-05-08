@@ -1,0 +1,123 @@
+"""Pipeline-mode SSOT — closed-set values describing how a row was produced.
+
+Every parquet row written by MTDS / MDPS / features-service / instruments-service
+is tagged with a ``pipeline_mode`` value. The value identifies the source-and-mode
+that produced it (batch source vs live websocket). The ``pipeline_mode`` column is
+a manifest dimension (extends the v5 row primary-key) and a hive partition segment
+on disk (sits LEFT of ``asset_group=`` for partition-pruning efficiency, since
+batch-vs-live reconciliation queries pivot on pipeline_mode first).
+
+Per the workspace CLAUDE.md ``Live = batch — same data, same fields, same timing
+semantics, different sources OK`` rule:
+
+* Batch and live produce IDENTICAL parquet schemas.
+* The ONLY thing that legitimately differs is which SOURCE serves a given
+  ``(asset_group, data_type)``.
+* Historical writes get the live-pipeline ``available_at`` they'd actually have
+  in live mode (the SOURCE_PRIORITY top entry's emission time).
+
+So ``pipeline_mode`` is the on-disk + manifest-row tag that records WHICH source
+served each row, allowing batch-vs-live reconciliation queries (live-pipeline
+plan Phase 12) to pivot cleanly.
+
+Closed-set rule: every batch ``PipelineMode`` value MUST correspond to an entry
+in :data:`~unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_PRIORITY`,
+and every source string in ``SOURCE_PRIORITY`` MUST have a matching ``PipelineMode``
+value. The :func:`assert_pipeline_mode_source_priority_round_trip` helper enforces
+this and is wired into the UAC unit-test suite.
+
+Plans:
+
+* ``gcs_migration_bundle_pipeline_mode_2026_05_08`` Phase 1A — owns this enum +
+  the manifest schema column extension.
+* ``live_pipeline_mtds_mdps_features_2026_05_08`` Phase 1 — consumes this enum
+  on the streaming ``CandleBoundaryCrossedEvent`` / ``CandleComputedEvent``
+  payloads.
+"""
+
+from __future__ import annotations
+
+from enum import StrEnum
+from typing import Final
+
+
+class PipelineMode(StrEnum):
+    """Closed-set source-and-mode tag for every persisted row.
+
+    Batch values mirror :data:`~unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_PRIORITY`
+    source strings (one batch enum per source). The single live value
+    :attr:`LIVE_WEBSOCKET` covers all websocket-streaming paths — per-venue
+    WS-vs-poll fallback is an operational concern, not a manifest dimension.
+    """
+
+    BATCH_API_FOOTBALL = "batch_api_football"
+    BATCH_DATABENTO = "batch_databento"
+    BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"
+    BATCH_ODDS_API = "batch_odds_api"
+    BATCH_ONCHAIN_RPC = "batch_onchain_rpc"
+    BATCH_ONCHAIN_SUBGRAPH = "batch_onchain_subgraph"
+    BATCH_OPEN_METEO = "batch_open_meteo"
+    BATCH_POLYMARKET_CLOB = "batch_polymarket_clob"
+    BATCH_POLYMARKET_GAMMA_API = "batch_polymarket_gamma_api"
+    BATCH_SOCCER_FOOTBALL_INFO = "batch_soccer_football_info"
+    BATCH_TARDIS = "batch_tardis"
+    BATCH_TRANSFERMARKT = "batch_transfermarkt"
+    BATCH_UNDERSTAT = "batch_understat"
+
+    LIVE_WEBSOCKET = "live_websocket"
+
+
+_BATCH_PREFIX: Final[str] = "batch_"
+
+
+def is_batch(mode: PipelineMode) -> bool:
+    """True if ``mode`` is a batch-source value."""
+
+    return mode.value.startswith(_BATCH_PREFIX)
+
+
+def is_live(mode: PipelineMode) -> bool:
+    """True if ``mode`` is the live-websocket value."""
+
+    return mode is PipelineMode.LIVE_WEBSOCKET
+
+
+def source_string_for(mode: PipelineMode) -> str | None:
+    """Return the SOURCE_PRIORITY source string this batch mode maps to.
+
+    Returns ``None`` for :attr:`PipelineMode.LIVE_WEBSOCKET` since live mode
+    is not represented in ``SOURCE_PRIORITY`` — live emission is a runtime
+    concern, not a per-source archival concern.
+    """
+
+    if not is_batch(mode):
+        return None
+    return mode.value.removeprefix(_BATCH_PREFIX)
+
+
+def pipeline_mode_for_source(source: str) -> PipelineMode:
+    """Return the batch :class:`PipelineMode` matching a SOURCE_PRIORITY source string.
+
+    Raises :class:`ValueError` if the source has no corresponding batch mode —
+    the closed-set round-trip rule is bidirectional, so an unknown source means
+    either the source string is misspelled or a new ``PipelineMode`` value is
+    needed.
+    """
+
+    target = f"{_BATCH_PREFIX}{source}"
+    for mode in PipelineMode:
+        if mode.value == target:
+            return mode
+    raise ValueError(
+        f"No PipelineMode for source {source!r}; "
+        "add a BATCH_<SOURCE> value to PipelineMode (closed-set round-trip required)."
+    )
+
+
+__all__ = [
+    "PipelineMode",
+    "is_batch",
+    "is_live",
+    "pipeline_mode_for_source",
+    "source_string_for",
+]

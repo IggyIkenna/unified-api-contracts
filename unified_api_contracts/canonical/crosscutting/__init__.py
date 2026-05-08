@@ -13,6 +13,11 @@ from .lifecycle_class import classify_cloud_run_service as classify_cloud_run_se
 from .lifecycle_class import classify_experiment_run as classify_experiment_run
 from .lifecycle_class import classify_scheduled_job as classify_scheduled_job
 from .lifecycle_class import classify_vm_name as classify_vm_name
+from .pipeline_mode import PipelineMode as PipelineMode
+from .pipeline_mode import is_batch as is_batch
+from .pipeline_mode import is_live as is_live
+from .pipeline_mode import pipeline_mode_for_source as pipeline_mode_for_source
+from .pipeline_mode import source_string_for as source_string_for
 from .risk_taxonomy import RISK_TYPE_CATEGORIES as RISK_TYPE_CATEGORIES
 from .risk_taxonomy import RiskCategory as RiskCategory
 from .risk_taxonomy import RiskType as RiskType
