@@ -476,7 +476,7 @@ def test_ml_inference_latency_threshold_unit_is_milliseconds() -> None:
 # ---------------------------------------------------------------------------
 # Phase 6 of alerting_service_live_rules_2026_05_07 — `runbook_doc` field
 # wiring tests. Each `AlertRule.runbook_doc` should resolve to a stable path
-# under `unified-trading-pm/codex/14-playbooks/alerting/<filename>.md`.
+# under `unified-trading-pm/codex/15-runbooks/alerting/<filename>.md`.
 #
 # Cross-repo file existence at unit-test time isn't feasible (UAC test runs
 # don't have the PM repo on path), so we verify path FORMAT only — the
@@ -485,7 +485,7 @@ def test_ml_inference_latency_threshold_unit_is_milliseconds() -> None:
 # ---------------------------------------------------------------------------
 
 
-_RUNBOOK_PATH_PATTERN: re.Pattern[str] = re.compile(r"^unified-trading-pm/codex/14-playbooks/alerting/[a-z0-9_]+\.md$")
+_RUNBOOK_PATH_PATTERN: re.Pattern[str] = re.compile(r"^unified-trading-pm/codex/15-runbooks/alerting/[a-z0-9_]+\.md$")
 
 
 def test_every_alert_rule_runbook_doc_is_non_empty() -> None:
@@ -501,14 +501,14 @@ def test_every_alert_rule_runbook_doc_is_non_empty() -> None:
 
 def test_every_alert_rule_runbook_doc_path_format() -> None:
     """All runbook_doc paths conform to the canonical shape:
-    `unified-trading-pm/codex/14-playbooks/alerting/<slug>.md` with a
+    `unified-trading-pm/codex/15-runbooks/alerting/<slug>.md` with a
     lowercase-slug filename. Catches typos / wrong-extension / wrong-dir."""
     for rule in LIVE_ALERT_RULES:
         assert _RUNBOOK_PATH_PATTERN.fullmatch(rule.runbook_doc), (
             f"AlertRule(code={rule.code}).runbook_doc={rule.runbook_doc!r} does"
             " not match canonical format"
             f" {_RUNBOOK_PATH_PATTERN.pattern!r}; expected"
-            " unified-trading-pm/codex/14-playbooks/alerting/<slug>.md."
+            " unified-trading-pm/codex/15-runbooks/alerting/<slug>.md."
         )
 
 
@@ -547,7 +547,7 @@ def test_kill_switch_scope_required_for_kill_switch_codes() -> None:
             pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
             severity=AlertSeverity.CRITICAL,
             channels=(AlertChannel.PAGERDUTY,),
-            runbook_doc="unified-trading-pm/codex/14-playbooks/alerting/kill_switch_defi_liquidation_risk.md",
+            runbook_doc="unified-trading-pm/codex/15-runbooks/alerting/kill_switch_defi_liquidation_risk.md",
             triggers_kill_switch=True,
             kill_switch_scope=None,
         )
@@ -561,7 +561,7 @@ def test_kill_switch_scope_must_be_none_for_non_kill_switch_codes() -> None:
             pattern="CIRCUIT_BREAKER_OPEN",
             severity=AlertSeverity.CRITICAL,
             channels=(AlertChannel.PAGERDUTY,),
-            runbook_doc="unified-trading-pm/codex/14-playbooks/alerting/circuit_breaker_open.md",
+            runbook_doc="unified-trading-pm/codex/15-runbooks/alerting/circuit_breaker_open.md",
             kill_switch_scope=KillSwitchScope.GLOBAL,
         )
 

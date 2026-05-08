@@ -178,7 +178,7 @@ class AlertRule(BaseModel):
 # ---------------------------------------------------------------------------
 
 
-_RUNBOOK_BASE: Final[str] = "unified-trading-pm/codex/14-playbooks/alerting"
+_RUNBOOK_BASE: Final[str] = "unified-trading-pm/codex/15-runbooks/alerting"
 
 
 def _runbook(slug: str) -> str:

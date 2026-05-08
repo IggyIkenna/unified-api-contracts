@@ -23,7 +23,7 @@ class AlertCode(StrEnum):
 
     Adding a new code requires (1) appending here, (2) adding an `AlertRule`
     in `live_rules.LIVE_ALERT_RULES`, (3) writing the operator playbook entry
-    under `unified-trading-pm/codex/14-playbooks/alerting/`, and (4) including
+    under `unified-trading-pm/codex/15-runbooks/alerting/`, and (4) including
     the code in the next quarterly rehearsal scope. The closed-set sanity
     test in `tests/internal/unit/test_alerting_taxonomy.py` enforces (1) ↔ (2).
     """
