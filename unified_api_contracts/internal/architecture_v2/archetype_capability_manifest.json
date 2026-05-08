@@ -467,16 +467,25 @@
             "kamino",
             "hyperliquid",
             "gmx_v2",
-            "drift"
+            "drift",
+            "binance",
+            "bybit",
+            "deribit",
+            "okx"
           ],
           "signal_variants": ["staking_yield", "funding_rate", "rate_spread"],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
             "CARRY_STAKED_BASIS@lido-aave-hyperliquid-eth-prod",
-            "CARRY_STAKED_BASIS@jito-kamino-drift-sol-usdc-prod"
+            "CARRY_STAKED_BASIS@jito-kamino-drift-sol-usdc-prod",
+            "CARRY_STAKED_BASIS@lido-aave-binance-eth-usdt-prod",
+            "CARRY_STAKED_BASIS@lido-aave-bybit-eth-usdt-prod",
+            "CARRY_STAKED_BASIS@lido-aave-deribit-eth-usdt-prod",
+            "CARRY_STAKED_BASIS@lido-aave-okx-eth-usdt-prod",
+            "CARRY_STAKED_BASIS@jito-kamino-bybit-sol-usdt-prod"
           ],
-          "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + Drift)."
+          "notes": "3-leg ATOMIC (stake + lending + perp). Ethereum (Lido/RocketPool + Aave + HL/GMX) and Solana (Jito/Marinade + Kamino + Drift). CeFi-perp hedge legs (Binance/Bybit/Deribit/OKX) added 2026-05-08 for May-23 cutover (master_to_live_defi_2026_05_23 §1 — 6-venue hedge universe). Aster pending venue onboarding — track in defi_master."
         }
       ]
     },

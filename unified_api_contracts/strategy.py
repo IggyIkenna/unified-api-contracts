@@ -26,6 +26,13 @@ from unified_api_contracts.internal.architecture_v2.archetype_capability import 
     archetypes_for_venue,
     capability_for,
 )
+from unified_api_contracts.internal.architecture_v2.archetype_config import (
+    ARCHETYPE_CONFIG_SEED,
+    ArchetypeConfig,
+    archetype_kill_switch_thresholds,
+    get_archetype_config,
+    is_archetype_config_declared,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     AccessDecision,
     ClientAudience,
@@ -122,6 +129,7 @@ from unified_api_contracts.internal.domain.strategy_service.versions import (
 
 __all__ = [
     "ARCHETYPE_CAPABILITY_REGISTRY",
+    "ARCHETYPE_CONFIG_SEED",
     "CLIENT_REGISTRY",
     "RESTRICTION_PROFILE_REGISTRY",
     "SERVICE_FAMILY_SCOPE_RULES",
@@ -130,6 +138,7 @@ __all__ = [
     "ApprovalRecord",
     "ArchetypeCapability",
     "ArchetypeCapabilityCell",
+    "ArchetypeConfig",
     "ArchetypeInstrumentType",
     "Category",
     "ClientAudience",
@@ -188,6 +197,7 @@ __all__ = [
     "access_control",
     "all_capabilities",
     "allocator_access_control",
+    "archetype_kill_switch_thresholds",
     "archetypes_for_pair",
     "archetypes_for_venue",
     "capability_for",
@@ -196,6 +206,8 @@ __all__ = [
     "cost",
     "demo_universe",
     "format_strategy_id",
+    "get_archetype_config",
+    "is_archetype_config_declared",
     "known_persona_ids",
     "minimum_approval_maturity",
     "parse_strategy_id",

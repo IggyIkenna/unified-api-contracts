@@ -29,21 +29,22 @@ class StrategyFamily(StrEnum):
 
 
 class StrategyArchetype(StrEnum):
-    """46 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
+    """53 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
 
     v1 ``StrategyArchetype`` was deleted on 2026-04-21 per
     ``plans/active/ui_unification_v2_sanitisation_2026_04_20``.
 
-    Phase 9 expansion 2026-04-25 — VOL family expanded from 1 to 18 archetypes
-    (RV/IV arb, spread structures, carry, covered calls, protective put,
-    straddle, synthetic delta, MM, ML lean, 0DTE gamma scalping, 0DTE pin
-    risk, term-structure arb / slope, dispersion, variance swap, LEAPS
-    convexity, cross-asset spread, ratio spread). MM family expanded from 2
-    to 9 (passive spread / inventory skew / ML lean / queue microstructure
-    on CEFI; concentrated / pool / vault DeFi LP). PORTFOLIO family added
-    (4 cross-category archetypes). MEV archetypes added under
+    Phase 9 expansion 2026-04-25 — VOL family expanded from 1 to 19 archetypes
+    (legacy VOL_TRADING_OPTIONS retained + RV/IV arb, spread structures, carry,
+    covered calls, protective put, straddle, synthetic delta, MM, ML lean,
+    0DTE gamma scalping, 0DTE pin risk, term-structure arb / slope,
+    dispersion, variance swap, LEAPS convexity, cross-asset spread, ratio
+    spread). MM family expanded from 2 to 10 (passive spread / inventory skew /
+    ML lean / queue microstructure / prediction MM on CEFI; concentrated /
+    pool / vault DeFi LP). PORTFOLIO family added as the 9th orthogonal
+    family (4 cross-category archetypes). MEV archetypes added under
     ARBITRAGE_STRUCTURAL (sandwich / JIT liquidity / backrun /
-    liquidation bundle). Cross-domain event arb + prediction MM added.
+    liquidation bundle). Cross-domain event arb added.
 
     Legacy values (`VOL_TRADING_OPTIONS`, `MARKET_MAKING_CONTINUOUS`,
     `MARKET_MAKING_EVENT_SETTLED`) retained for back-compat with existing
