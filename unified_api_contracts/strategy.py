@@ -33,6 +33,15 @@ from unified_api_contracts.internal.architecture_v2.archetype_config import (
     get_archetype_config,
     is_archetype_config_declared,
 )
+from unified_api_contracts.internal.architecture_v2.capital_allocation import (
+    CAPITAL_ALLOCATION_SEED,
+    AllocationViolationError,
+    CapitalAllocation,
+    get_capital_allocation,
+    is_allocation_declared,
+    is_within_allocation,
+    validate_allocation_respect,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     AccessDecision,
     ClientAudience,
@@ -130,16 +139,19 @@ from unified_api_contracts.internal.domain.strategy_service.versions import (
 __all__ = [
     "ARCHETYPE_CAPABILITY_REGISTRY",
     "ARCHETYPE_CONFIG_SEED",
+    "CAPITAL_ALLOCATION_SEED",
     "CLIENT_REGISTRY",
     "RESTRICTION_PROFILE_REGISTRY",
     "SERVICE_FAMILY_SCOPE_RULES",
     "STRATEGY_REGISTRY",
     "AccessDecision",
+    "AllocationViolationError",
     "ApprovalRecord",
     "ArchetypeCapability",
     "ArchetypeCapabilityCell",
     "ArchetypeConfig",
     "ArchetypeInstrumentType",
+    "CapitalAllocation",
     "Category",
     "ClientAudience",
     "ClientContext",
@@ -207,7 +219,10 @@ __all__ = [
     "demo_universe",
     "format_strategy_id",
     "get_archetype_config",
+    "get_capital_allocation",
+    "is_allocation_declared",
     "is_archetype_config_declared",
+    "is_within_allocation",
     "known_persona_ids",
     "minimum_approval_maturity",
     "parse_strategy_id",
@@ -215,5 +230,6 @@ __all__ = [
     "resolve_profile",
     "service_family_from_audience",
     "user_context_for_allocator",
+    "validate_allocation_respect",
     "validate_mode_for_category",
 ]

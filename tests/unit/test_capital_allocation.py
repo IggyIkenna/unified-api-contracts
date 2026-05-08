@@ -1,10 +1,17 @@
-"""Unit tests for the client + capital allocation SSOT.
+"""Unit tests for the capital allocation SSOT.
 
-Covers cross_cutting deliverable #3 — :class:`Client`, :class:`VenueAccount`,
-:class:`CapitalAllocation`, the seed dictionaries, the lookup helpers, and the
-fail-loud validators.
+Covers cross_cutting deliverable #3 — :class:`CapitalAllocation`,
+:data:`CAPITAL_ALLOCATION_SEED`, the lookup helpers, and the fail-loud
+validators.
 
-Plan:
+Migrated 2026-05-08 from ``tests/unit/test_client_model.py`` per the Option A
+recipe in
+``unified-trading-pm/plans/active/issues/cross_cutting_strategy_catalogue_already_shipped_2026_05_08.md``.
+The ``Client`` + ``VenueAccount`` test cases were deleted because the
+parallel-SSOT classes they covered were reverted (the canonical client SSOTs
+are :class:`ClientDefinition` + :class:`TradingAccount`).
+
+Plan-of-record:
 ``unified-trading-pm/plans/active/cross_cutting_may_23_deliverables_2026_05_08.md``
 deliverable #3.
 """
@@ -15,98 +22,16 @@ import dataclasses
 
 import pytest
 
-from unified_api_contracts.canonical.domain.client.model import (
+from unified_api_contracts.internal.architecture_v2.capital_allocation import (
     CAPITAL_ALLOCATION_SEED,
-    CLIENTS_SEED,
     AllocationViolationError,
     CapitalAllocation,
-    Client,
-    VenueAccount,
     get_capital_allocation,
-    get_client,
     is_allocation_declared,
     is_within_allocation,
     validate_allocation_respect,
 )
-
-# ---------------------------------------------------------------------------
-# VenueAccount — frozen + hashable
-# ---------------------------------------------------------------------------
-
-
-def test_venue_account_is_frozen() -> None:
-    account = VenueAccount(venue="binance", account_id="a-binance-main")
-    with pytest.raises(dataclasses.FrozenInstanceError):
-        account.account_id = "tampered"  # type: ignore[misc]
-
-
-def test_venue_account_is_hashable_and_set_member() -> None:
-    """Frozen dataclasses are hashable; verify set membership works so
-    callers can de-dup account collections."""
-    main = VenueAccount(venue="binance", account_id="a-binance-main")
-    sub = VenueAccount(
-        venue="binance",
-        account_id="a-binance-sub",
-        is_subaccount=True,
-        parent_account_id="a-binance-main",
-    )
-    accounts = {main, sub, main}  # duplicate main collapses
-    assert len(accounts) == 2
-    assert main in accounts
-    assert sub in accounts
-
-
-def test_venue_account_subaccount_defaults() -> None:
-    """is_subaccount defaults to False and parent_account_id defaults to None."""
-    account = VenueAccount(venue="okx", account_id="a-okx-main")
-    assert account.is_subaccount is False
-    assert account.parent_account_id is None
-
-
-# ---------------------------------------------------------------------------
-# Client — frozen + accounts_for_venue helper
-# ---------------------------------------------------------------------------
-
-
-def test_client_constructed_with_multiple_accounts() -> None:
-    main = VenueAccount(venue="binance", account_id="x-binance-main")
-    sub = VenueAccount(
-        venue="binance",
-        account_id="x-binance-sub-a",
-        is_subaccount=True,
-        parent_account_id="x-binance-main",
-    )
-    bybit = VenueAccount(venue="bybit", account_id="x-bybit-main")
-    client = Client(client_id="x", display_name="X", accounts=(main, sub, bybit))
-    assert client.client_id == "x"
-    assert len(client.accounts) == 3
-
-
-def test_accounts_for_venue_returns_main_and_subaccounts() -> None:
-    """accounts_for_venue must include sub-accounts so caller code that walks
-    a venue's accounts (for credential fetch / position rollup) sees the
-    full subset."""
-    main = VenueAccount(venue="binance", account_id="x-binance-main")
-    sub = VenueAccount(
-        venue="binance",
-        account_id="x-binance-sub-a",
-        is_subaccount=True,
-        parent_account_id="x-binance-main",
-    )
-    bybit = VenueAccount(venue="bybit", account_id="x-bybit-main")
-    client = Client(client_id="x", display_name="X", accounts=(main, sub, bybit))
-    binance_accounts = client.accounts_for_venue("binance")
-    assert binance_accounts == (main, sub)
-    bybit_accounts = client.accounts_for_venue("bybit")
-    assert bybit_accounts == (bybit,)
-    assert client.accounts_for_venue("unknown") == ()
-
-
-def test_client_default_accounts_empty_tuple() -> None:
-    """Empty accounts tuple is the legitimate freshly-onboarded shape."""
-    client = Client(client_id="fresh", display_name="Fresh")
-    assert client.accounts == ()
-
+from unified_api_contracts.internal.architecture_v2.enums import StrategyArchetype
 
 # ---------------------------------------------------------------------------
 # CapitalAllocation — __post_init__ bounds validation
@@ -118,7 +43,7 @@ def test_capital_allocation_rejects_non_positive_capital(bad_capital: float) -> 
     with pytest.raises(ValueError, match="initial_capital_usd"):
         CapitalAllocation(
             client_id="x",
-            archetype="carry_staked_basis",
+            archetype=StrategyArchetype.CARRY_STAKED_BASIS,
             venue="aave_v3_arbitrum",
             initial_capital_usd=bad_capital,
         )
@@ -129,7 +54,7 @@ def test_capital_allocation_rejects_out_of_bounds_position_pct(bad_pct: float) -
     with pytest.raises(ValueError, match="max_position_pct"):
         CapitalAllocation(
             client_id="x",
-            archetype="carry_staked_basis",
+            archetype=StrategyArchetype.CARRY_STAKED_BASIS,
             venue="aave_v3_arbitrum",
             initial_capital_usd=10_000.0,
             max_position_pct=bad_pct,
@@ -141,7 +66,7 @@ def test_capital_allocation_rejects_out_of_bounds_drawdown_pct(bad_pct: float) -
     with pytest.raises(ValueError, match="max_drawdown_pct"):
         CapitalAllocation(
             client_id="x",
-            archetype="carry_staked_basis",
+            archetype=StrategyArchetype.CARRY_STAKED_BASIS,
             venue="aave_v3_arbitrum",
             initial_capital_usd=10_000.0,
             max_drawdown_pct=bad_pct,
@@ -153,7 +78,7 @@ def test_capital_allocation_accepts_boundary_values() -> None:
     is allowed for capital."""
     allocation = CapitalAllocation(
         client_id="x",
-        archetype="carry_staked_basis",
+        archetype=StrategyArchetype.CARRY_STAKED_BASIS,
         venue="aave_v3_arbitrum",
         initial_capital_usd=0.01,
         max_position_pct=1.0,
@@ -166,7 +91,7 @@ def test_capital_allocation_accepts_boundary_values() -> None:
 def test_capital_allocation_is_frozen_and_hashable() -> None:
     allocation = CapitalAllocation(
         client_id="x",
-        archetype="carry_staked_basis",
+        archetype=StrategyArchetype.CARRY_STAKED_BASIS,
         venue="aave_v3_arbitrum",
         initial_capital_usd=10_000.0,
     )
@@ -176,27 +101,43 @@ def test_capital_allocation_is_frozen_and_hashable() -> None:
     _ = {allocation}
 
 
+def test_capital_allocation_archetype_is_strategy_archetype_enum() -> None:
+    """archetype field must be a StrategyArchetype enum member, not a raw string.
+
+    Tightening the placeholder ``ArchetypeRef = str`` to the canonical UAC
+    enum was the central goal of the Option A migration. Verify it sticks.
+    """
+    allocation = CapitalAllocation(
+        client_id="x",
+        archetype=StrategyArchetype.CARRY_STAKED_BASIS,
+        venue="aave_v3_arbitrum",
+        initial_capital_usd=10_000.0,
+    )
+    assert isinstance(allocation.archetype, StrategyArchetype)
+    assert allocation.archetype == StrategyArchetype.CARRY_STAKED_BASIS
+
+
 # ---------------------------------------------------------------------------
 # get_capital_allocation + is_allocation_declared lookup behaviour
 # ---------------------------------------------------------------------------
 
 
 def test_get_capital_allocation_returns_seed_entry() -> None:
-    allocation = get_capital_allocation("ikenna", "carry_staked_basis", "aave_v3_arbitrum")
+    allocation = get_capital_allocation("ikenna", StrategyArchetype.CARRY_STAKED_BASIS, "aave_v3_arbitrum")
     assert allocation.client_id == "ikenna"
-    assert allocation.archetype == "carry_staked_basis"
+    assert allocation.archetype == StrategyArchetype.CARRY_STAKED_BASIS
     assert allocation.venue == "aave_v3_arbitrum"
     assert allocation.initial_capital_usd > 0
 
 
 def test_get_capital_allocation_raises_for_unknown_triple() -> None:
     with pytest.raises(KeyError, match="No CapitalAllocation declared"):
-        get_capital_allocation("nonexistent", "carry_staked_basis", "aave_v3_arbitrum")
+        get_capital_allocation("nonexistent", StrategyArchetype.CARRY_STAKED_BASIS, "aave_v3_arbitrum")
 
 
 def test_is_allocation_declared_membership() -> None:
-    assert is_allocation_declared("ikenna", "carry_staked_basis", "aave_v3_arbitrum") is True
-    assert is_allocation_declared("nonexistent", "carry_staked_basis", "aave_v3_arbitrum") is False
+    assert is_allocation_declared("ikenna", StrategyArchetype.CARRY_STAKED_BASIS, "aave_v3_arbitrum") is True
+    assert is_allocation_declared("nonexistent", StrategyArchetype.CARRY_STAKED_BASIS, "aave_v3_arbitrum") is False
 
 
 # ---------------------------------------------------------------------------
@@ -207,7 +148,7 @@ def test_is_allocation_declared_membership() -> None:
 def _sample_allocation() -> CapitalAllocation:
     return CapitalAllocation(
         client_id="x",
-        archetype="carry_staked_basis",
+        archetype=StrategyArchetype.CARRY_STAKED_BASIS,
         venue="aave_v3_arbitrum",
         initial_capital_usd=100_000.0,
         max_position_pct=0.5,
@@ -264,13 +205,13 @@ def test_capital_allocation_seed_non_empty() -> None:
 def test_capital_allocation_seed_covers_carry_archetype_family() -> None:
     """At least one carry archetype must be seeded — this is the May-23 lead."""
     archetypes = {key[1] for key in CAPITAL_ALLOCATION_SEED}
-    assert any("carry" in archetype for archetype in archetypes), f"No carry archetype in seed: {archetypes}"
+    assert any("CARRY" in archetype.value for archetype in archetypes), f"No carry archetype in seed: {archetypes}"
 
 
 def test_capital_allocation_seed_covers_ml_directional_archetype_family() -> None:
     """At least one ml_directional archetype seeded — CeFi-ML is in May-23 scope."""
     archetypes = {key[1] for key in CAPITAL_ALLOCATION_SEED}
-    assert any("ml_directional" in archetype for archetype in archetypes), (
+    assert any("ML_DIRECTIONAL" in archetype.value for archetype in archetypes), (
         f"No ml_directional archetype in seed: {archetypes}"
     )
 
@@ -285,24 +226,9 @@ def test_capital_allocation_seed_keys_match_internal_fields() -> None:
         assert allocation.venue == key_venue
 
 
-def test_clients_seed_non_empty() -> None:
-    assert len(CLIENTS_SEED) > 0
-
-
-def test_clients_seed_at_least_one_client_has_four_or_more_venue_accounts() -> None:
-    """Live CeFi (Bybit / Deribit / Binance / OKX) means any onboarded client
-    in the May-23 cutover slice carries ≥4 venue accounts."""
-    assert any(len(client.accounts) >= 4 for client in CLIENTS_SEED), (
-        f"No client has >=4 venue accounts in seed: {[(c.client_id, len(c.accounts)) for c in CLIENTS_SEED]}"
-    )
-
-
-def test_get_client_returns_seed_entry() -> None:
-    client = get_client("ikenna")
-    assert client.client_id == "ikenna"
-    assert client.display_name
-
-
-def test_get_client_raises_for_unknown_client() -> None:
-    with pytest.raises(KeyError, match="Unknown client_id"):
-        get_client("nonexistent")
+def test_capital_allocation_seed_keys_use_strategy_archetype_enum() -> None:
+    """Tightening of the seed-key archetype axis from raw strings to the
+    canonical :class:`StrategyArchetype` enum is part of Option A. Verify."""
+    for key in CAPITAL_ALLOCATION_SEED:
+        _, key_archetype, _ = key
+        assert isinstance(key_archetype, StrategyArchetype)
