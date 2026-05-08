@@ -111,8 +111,10 @@ def test_pending_investigation_disjoint_from_declared() -> None:
 @pytest.mark.parametrize(
     ("chain", "protocol", "expected"),
     [
-        ("ETHEREUM", "AAVEV3", "2022-03-14"),
-        ("ethereum", "aavev3", "2022-03-14"),  # case-insensitive
+        ("ETHEREUM", "AAVEV3", "2023-01-27"),  # AAVE V3 ETH mainnet — first
+        # subgraph event 2023-01-27 08:00:11 UTC, verified 2026-05-08 via
+        # gateway.thegraph.com Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g.
+        ("ethereum", "aavev3", "2023-01-27"),  # case-insensitive
         ("ARBITRUM", "AAVEV3", "2022-03-16"),
         ("BASE", "AAVEV3", "2023-08-09"),
         ("ETHEREUM", "UNISWAPV3", "2021-05-04"),

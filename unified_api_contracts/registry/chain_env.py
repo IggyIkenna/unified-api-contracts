@@ -143,7 +143,18 @@ def get_chain_genesis_date(chain_name: str) -> str | None:
 # either set fail the test loudly.
 PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # ── Aave V3 (per-chain mainnet deploy dates) ──
-    ("ETHEREUM", "AAVEV3"): "2022-03-14",
+    # ETHEREUM deployed Jan 27 2023 (much later than the Mar 2022 multi-L2
+    # rollout) — verified 2026-05-08 via AAVE V3 ETH subgraph
+    # ``Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g``: earliest
+    # ``reserveParamsHistoryItems`` event is 2023-01-27 08:00:11 UTC
+    # (WETH reserve); 2022-03-14, 2022-12-08, 2023-01-26 all return 0
+    # rows. Pre-fix entry was 2022-03-14 (mis-aligned with the L2 cohort)
+    # which caused 11 months of pre-deployment dates to be backfill-attempted
+    # and recorded as ``empty_confirmed[SOURCE_RETURNED_ZERO]``, framed as
+    # "Bug 1 silent zero" in
+    # ``plans/active/issues/lending_indices_handler_bugs_2026_05_07.md``
+    # — actually a UAC SSOT misdiagnosis, not a code bug.
+    ("ETHEREUM", "AAVEV3"): "2023-01-27",
     ("ARBITRUM", "AAVEV3"): "2022-03-16",
     ("OPTIMISM", "AAVEV3"): "2022-08-04",
     ("POLYGON", "AAVEV3"): "2022-03-16",
