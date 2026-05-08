@@ -36,6 +36,15 @@ LST_TOKEN_GENESIS: dict[str, str] = {
     # SOL-family — Solana mainnet
     "mSOL": "2021-08-02",  # Marinade Finance launch
     "jitoSOL": "2022-11-01",  # Jito stake pool launch
+    # BlazeStake (SolBlaze) bSOL — conservative floor 2022-11-24 from the
+    # documented "Custom Liquid Staking" feature rollout (the protocol must
+    # have existed by then). Exact mint creation date for bSO13r4Tki...HP3piy1
+    # to be probed via Solana RPC ``getSignaturesForAddress`` in a follow-up;
+    # over-clipping toward this date means the lst-rates collector skips a
+    # few weeks of legitimate pre-2022-11-24 reads — under-clipping would
+    # inflate the missing-shards denominator (the worse direction).
+    # Filed by Tab 14 audit as missing from UAC SSOT 2026-05-08.
+    "bSOL": "2022-11-24",
 }
 
 
@@ -58,6 +67,7 @@ LST_VENUE_TO_TOKENS: dict[str, tuple[str, ...]] = {
     "PUFFER": ("pufETH",),
     "MARINADE": ("mSOL",),
     "JITO": ("jitoSOL",),
+    "BLAZESTAKE": ("bSOL",),
 }
 
 

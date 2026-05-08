@@ -156,28 +156,73 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # — actually a UAC SSOT misdiagnosis, not a code bug.
     ("ETHEREUM", "AAVEV3"): "2023-01-27",
     ("ARBITRUM", "AAVEV3"): "2022-03-16",
-    ("OPTIMISM", "AAVEV3"): "2022-08-04",
-    ("POLYGON", "AAVEV3"): "2022-03-16",
-    ("AVALANCHE", "AAVEV3"): "2022-03-16",
-    ("BASE", "AAVEV3"): "2023-08-09",  # chain genesis, deployed day-zero
-    ("BSC", "AAVEV3"): "2023-04-06",
-    ("LINEA", "AAVEV3"): "2024-09-26",
+    # OPTIMISM AAVE V3 actually deployed 2022-03-15 (subgraph indexes
+    # ``reserveParamsHistoryItems`` from 2022-03-15 21:48:18 UTC) — not
+    # 2022-08-04 as the pre-2026-05-08 entry claimed. Tab 14 audit
+    # 2026-05-08 found 142 days of legitimate post-deploy OPT data
+    # was being silently clipped as ``EXPECTED_PRE_GENESIS_CHAIN`` because
+    # the 2022-08-04 floor pre-skipped the 2022-03-15 → 2022-08-03 window.
+    # See plans/archive/issues/defi_fork1_prep_audit_2026_05_08.md.
+    ("OPTIMISM", "AAVEV3"): "2022-03-15",
+    # POLYGON earliest event 2022-03-12 (Tab 14 audit 2026-05-08); pre-fix
+    # entry 2022-03-16 was 4 days late.
+    ("POLYGON", "AAVEV3"): "2022-03-12",
+    # AVALANCHE earliest event 2022-03-12 (Tab 14 audit 2026-05-08);
+    # pre-fix entry 2022-03-16 was 4 days late.
+    ("AVALANCHE", "AAVEV3"): "2022-03-12",
+    # BASE earliest event 2023-08-22 (Tab 14 audit 2026-05-08); pre-fix
+    # 2023-08-09 (BASE chain genesis) was 13 days early — caused 13d of
+    # ``SOURCE_RETURNED_ZERO`` rows that should have been
+    # ``EXPECTED_PRE_PROTOCOL_LAUNCH``.
+    ("BASE", "AAVEV3"): "2023-08-22",
+    # BSC earliest event 2024-01-23 (Tab 14 audit 2026-05-08); pre-fix
+    # 2023-04-06 was 293 days early — caused ~293d of ``SOURCE_RETURNED_ZERO``
+    # false-empty rows.
+    ("BSC", "AAVEV3"): "2024-01-23",
+    # LINEA earliest event 2025-02-11 (Tab 14 audit 2026-05-08); pre-fix
+    # 2024-09-26 was 138 days early — caused ~138d of false-empty rows.
+    ("LINEA", "AAVEV3"): "2025-02-11",
     ("SCROLL", "AAVEV3"): "2024-04-29",
     ("ZKSYNC", "AAVEV3"): "2024-04-09",
     # ── Compound V3 (Comet) ──
-    ("ETHEREUM", "COMPOUNDV3"): "2022-08-25",
-    ("ARBITRUM", "COMPOUNDV3"): "2023-04-13",
-    ("BASE", "COMPOUNDV3"): "2023-08-26",
-    ("OPTIMISM", "COMPOUNDV3"): "2024-02-15",
-    ("POLYGON", "COMPOUNDV3"): "2023-02-14",
+    # ETHEREUM earliest ``dailyMarketAccountings`` event 2022-08-13 04:18:30
+    # UTC (Tab 14 audit 2026-05-08); pre-fix 2022-08-25 was 12 days late —
+    # caused 12d of legitimate post-deploy ETH Compound V3 data to be
+    # silently clipped as pre-launch.
+    ("ETHEREUM", "COMPOUNDV3"): "2022-08-13",
+    # ARBITRUM earliest event 2023-05-04 22:00:26 UTC (Tab 14 audit
+    # 2026-05-08); pre-fix 2023-04-13 was 21 days early — caused 21d of
+    # ``SOURCE_RETURNED_ZERO`` false-empty rows.
+    ("ARBITRUM", "COMPOUNDV3"): "2023-05-04",
+    # BASE earliest event 2023-08-04 23:29:21 UTC (subgraph indexes
+    # pre-mainnet-open BASE blocks); pre-fix 2023-08-26 was 22 days late —
+    # caused 22d of legitimate post-deploy BASE data to be silently clipped.
+    ("BASE", "COMPOUNDV3"): "2023-08-04",
+    # OPTIMISM earliest event 2024-04-06 17:09:21 UTC (Tab 14 audit
+    # 2026-05-08); pre-fix 2024-02-15 was 51 days early — caused 51d of
+    # false-empty rows.
+    ("OPTIMISM", "COMPOUNDV3"): "2024-04-06",
+    # POLYGON entry removed 2026-05-08 — Tab 14 audit confirmed
+    # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (subgraph returned
+    # 0 markets, Compound V3 not active on Polygon). The lingering UAC entry
+    # was inflating the data-status denominator with always-empty days.
     ("SCROLL", "COMPOUNDV3"): "2024-04-22",
     # ── Uniswap (V2 / V3 / V4) ──
     ("ETHEREUM", "UNISWAPV2"): "2020-05-04",
     ("ETHEREUM", "UNISWAPV3"): "2021-05-04",
-    ("ARBITRUM", "UNISWAPV3"): "2021-08-31",  # chain genesis, deployed day-zero
-    ("OPTIMISM", "UNISWAPV3"): "2021-12-16",  # chain genesis, deployed day-zero
+    # ARBITRUM earliest ``poolDayDatas`` event 2021-06-01 (subgraph
+    # indexes pre-mainnet-open Arbitrum blocks); pre-fix 2021-08-31
+    # (chain genesis) was 91 days late — caused 91d of legitimate
+    # pre-public-launch indexed data to be silently clipped. Tab 14
+    # audit 2026-05-08.
+    ("ARBITRUM", "UNISWAPV3"): "2021-06-01",
+    # OPTIMISM earliest event 2021-11-11 (subgraph indexes pre-mainnet-open
+    # Optimism blocks); pre-fix 2021-12-16 (OP chain-genesis) was 35d late.
+    ("OPTIMISM", "UNISWAPV3"): "2021-11-11",
     ("POLYGON", "UNISWAPV3"): "2021-12-21",
-    ("BASE", "UNISWAPV3"): "2023-08-09",  # chain genesis, deployed day-zero
+    # BASE earliest event 2023-07-31 (subgraph indexes pre-mainnet-open
+    # BASE blocks); pre-fix 2023-08-09 (BASE chain genesis) was 9d late.
+    ("BASE", "UNISWAPV3"): "2023-07-31",
     ("ETHEREUM", "UNISWAPV4"): "2025-01-31",
     # ── Curve / Balancer / SushiSwap ──
     ("ETHEREUM", "CURVE"): "2020-01-19",
@@ -190,6 +235,13 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("ETHEREUM", "ETHENA"): "2024-02-19",
     ("ETHEREUM", "MAKER"): "2017-12-19",
     ("ETHEREUM", "FRAX"): "2020-12-21",
+    # Spark earliest Messari ``marketDailySnapshots`` event 2023-03-07
+    # 04:31:11 UTC (Tab 14 audit 2026-05-08). Local
+    # ``LENDING_PROTOCOL_DEPLOY_DATES`` fallback in instruments-service
+    # had 2023-05-09, over-clipping 63 days of legitimate Spark data;
+    # adding the UAC SSOT entry tightens the floor to subgraph reality.
+    # See plans/archive/issues/defi_fork1_prep_audit_2026_05_08.md.
+    ("ETHEREUM", "SPARK"): "2023-03-07",
     # ── Solana ──
     ("SOLANA", "JITO"): "2022-08-15",
     ("SOLANA", "MARINADE"): "2021-08-02",
@@ -213,7 +265,8 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
     {
         ("ETHEREUM", "MORPHO"),
         ("ETHEREUM", "FLUID"),
-        ("ETHEREUM", "SPARK"),
+        # SPARK / ETHEREUM moved to ``PROTOCOL_LAUNCH_DATES`` 2026-05-08
+        # (Tab 14 audit verified 2023-03-07 earliest subgraph event).
         ("ETHEREUM", "MORPHOVAULTS"),
         ("ETHEREUM", "YEARNV3"),
         ("ETHEREUM", "ANKR"),
@@ -243,6 +296,12 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
         ("AVALANCHE", "SUSHISWAPV3"),
         ("AVALANCHE", "TRADER_JOEV2"),
         ("BSC", "PANCAKESWAPV3"),
+        # POLYGON / COMPOUNDV3 — UAC ``ALL_DEFI_VENUES`` declares it but
+        # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (Compound V3
+        # is not active on Polygon — subgraph returned 0 markets). Removed
+        # from ``PROTOCOL_LAUNCH_DATES`` 2026-05-08 (Tab 14 audit) to stop
+        # inflating the data-status denominator with always-empty days.
+        ("POLYGON", "COMPOUNDV3"),
         ("SOLANA", "MARGINFI"),
         ("SOLANA", "SOLEND"),
     }

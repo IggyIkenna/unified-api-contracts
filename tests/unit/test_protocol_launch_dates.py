@@ -62,10 +62,33 @@ def test_protocol_launch_dates_chain_known_to_genesis_ssot() -> None:
         assert chain in CHAIN_GENESIS_DATES, f"chain {chain!r} in PROTOCOL_LAUNCH_DATES but not in CHAIN_GENESIS_DATES"
 
 
+# Subgraphs for some (chain, protocol) pairs index PRE-public-mainnet-launch
+# blocks (testnet/devnet phase blocks the chain rolled into mainnet at
+# regenesis). For those pairs ``earliest_subgraph_event < chain_genesis``
+# is correct on-disk reality — the right SSOT for ``PROTOCOL_LAUNCH_DATES``
+# is "earliest day a subgraph query returns rows" (per Tab 14 fork1 audit
+# 2026-05-08), so this test allow-lists the known cases. Adding a new pair
+# here requires inline subgraph-probe citation in ``PROTOCOL_LAUNCH_DATES``.
+_PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST: frozenset[tuple[str, str]] = frozenset(
+    {
+        ("ARBITRUM", "UNISWAPV3"),  # subgraph indexes 2021-06-01; ARB public mainnet 2021-08-31
+        ("OPTIMISM", "UNISWAPV3"),  # subgraph indexes 2021-11-11; OP regenesis mainnet 2021-12-16
+        ("BASE", "UNISWAPV3"),  # subgraph indexes 2023-07-31; BASE public mainnet 2023-08-09
+        ("BASE", "COMPOUNDV3"),  # subgraph indexes 2023-08-04; BASE public mainnet 2023-08-09
+    }
+)
+
+
 def test_protocol_launch_after_chain_genesis() -> None:
-    """A protocol cannot have launched on a chain before the chain
-    itself existed. Catches typo-class data-entry errors."""
+    """A protocol's earliest subgraph event must not predate chain
+    genesis EXCEPT for documented cases where the subgraph indexes
+    pre-public-launch blocks (see ``_PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST``).
+    Catches typo-class data-entry errors while permitting the legitimate
+    "subgraph indexes pre-mainnet" shape Tab 14's 2026-05-08 audit
+    documented across UNISWAPV3 ARB/OPT/BASE + COMPOUNDV3 BASE."""
     for (chain, protocol), launch_iso in PROTOCOL_LAUNCH_DATES.items():
+        if (chain, protocol) in _PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST:
+            continue
         chain_genesis_iso = CHAIN_GENESIS_DATES[chain]
         launch = date.fromisoformat(launch_iso)
         chain_genesis = date.fromisoformat(chain_genesis_iso)
@@ -116,7 +139,12 @@ def test_pending_investigation_disjoint_from_declared() -> None:
         # gateway.thegraph.com Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g.
         ("ethereum", "aavev3", "2023-01-27"),  # case-insensitive
         ("ARBITRUM", "AAVEV3", "2022-03-16"),
-        ("BASE", "AAVEV3", "2023-08-09"),
+        ("BASE", "AAVEV3", "2023-08-22"),  # Tab 14 audit 2026-05-08
+        ("OPTIMISM", "AAVEV3", "2022-03-15"),  # Tab 14 audit 2026-05-08
+        ("BSC", "AAVEV3", "2024-01-23"),  # Tab 14 audit 2026-05-08
+        ("ETHEREUM", "COMPOUNDV3", "2022-08-13"),  # Tab 14 audit 2026-05-08
+        ("ARBITRUM", "UNISWAPV3", "2021-06-01"),  # Tab 14 audit; pre-mainnet-open indexed
+        ("ETHEREUM", "SPARK", "2023-03-07"),  # Tab 14 audit; added 2026-05-08
         ("ETHEREUM", "UNISWAPV3", "2021-05-04"),
         ("SOLANA", "JITO", "2022-08-15"),
     ],
