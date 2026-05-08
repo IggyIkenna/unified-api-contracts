@@ -132,19 +132,58 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("HYPERLIQUID", "rETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
     CollateralAcceptance("HYPERLIQUID", "cbETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
     CollateralAcceptance("HYPERLIQUID", "eETH", False, None, "", "Not accepted (USDC-only)", "PERP_CEX"),
-    CollateralAcceptance("DERIBIT", "stETH", False, None, "", "Not accepted (BTC/ETH/USDC PM only)", "PERP_CEX"),
-    CollateralAcceptance("DERIBIT", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    # DERIBIT — stETH accepted at 7.5% haircut on Portfolio Margin (X:PM/X:SM),
+    # offsets ETH-perp directly. Effective 2026-01-13 per Deribit insights post
+    # ``portfolio-margin-improvements-for-steth-and-cross-collateral-haircuts``.
+    # Stream A flip 2026-05-08 (was ``accepted=False`` — stale 2026-05-05 entry).
+    # See unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md.
+    CollateralAcceptance(
+        "DERIBIT",
+        "stETH",
+        True,
+        Decimal("0.075"),
+        "PORTFOLIO",
+        "PM/SM only; offsets ETH-perp",
+        "PERP_CEX",
+    ),
+    CollateralAcceptance("DERIBIT", "wstETH", False, None, "", "Not accepted (only stETH on PM)", "PERP_CEX"),
     CollateralAcceptance("DERIBIT", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("DERIBIT", "rETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("BINANCE", "stETH", False, None, "", "Not accepted as futures margin", "PERP_CEX"),
     CollateralAcceptance("BINANCE", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("BINANCE", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("BINANCE", "rETH", False, None, "", "Not accepted", "PERP_CEX"),
-    CollateralAcceptance("BYBIT", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
-    CollateralAcceptance("BYBIT", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    # BYBIT — stETH + METH on UTA collateral (Unified Trading Account) since
+    # 2024-02 per Bybit margin-spec page; USDe added 2024-12-19. Conservative
+    # 10% haircut placeholder pending live-API probe; documented haircut ranges
+    # vary by collateral tier (5-12%). Stream A flip 2026-05-08.
+    # See unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md.
+    CollateralAcceptance(
+        "BYBIT", "stETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral since 2024-02", "PERP_CEX"
+    ),
+    CollateralAcceptance("BYBIT", "wstETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral", "PERP_CEX"),
     CollateralAcceptance("BYBIT", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
-    CollateralAcceptance("OKX", "stETH", False, None, "", "Not accepted", "PERP_CEX"),
-    CollateralAcceptance("OKX", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance(
+        "BYBIT", "USDe", True, Decimal("0.05"), "PORTFOLIO", "UTA collateral since 2024-12-19", "PERP_CEX"
+    ),
+    CollateralAcceptance(
+        "BYBIT", "sUSDe", True, Decimal("0.07"), "PORTFOLIO", "UTA collateral; sUSDe staked", "PERP_CEX"
+    ),
+    # OKX — wstETH on multi-currency-margin / portfolio-margin discount-rate
+    # list (per OKX cross-margin docs). Stream A flip 2026-05-08. stETH not
+    # explicitly listed on discount-rate page; conservative ``False`` until
+    # live-API probe confirms.
+    # See unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md.
+    CollateralAcceptance("OKX", "stETH", False, None, "", "Not on discount-rate list", "PERP_CEX"),
+    CollateralAcceptance(
+        "OKX",
+        "wstETH",
+        True,
+        Decimal("0.10"),
+        "PORTFOLIO",
+        "Multi-currency-margin discount-rate list",
+        "PERP_CEX",
+    ),
     CollateralAcceptance("OKX", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("ASTER", "stETH", False, None, "", "Not accepted (USDC/USDT-only)", "PERP_CEX"),
     CollateralAcceptance("ASTER", "wstETH", False, None, "", "Not accepted", "PERP_CEX"),
