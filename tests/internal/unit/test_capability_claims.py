@@ -4,7 +4,7 @@ Stage 3E G2 § 4. Canonical shape of the Odum-controlled claims on
 every Firebase Auth user. Tests pin the shape so the Cloud Function
 writer and Python + TS readers can't drift.
 
-SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 4.
+SSOT: codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 4.
 """
 
 from __future__ import annotations

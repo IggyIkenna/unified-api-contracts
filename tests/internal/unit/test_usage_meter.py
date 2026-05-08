@@ -4,7 +4,7 @@ Stage 3E G2 § 3. Every metered unit of work lands as one row in
 GCS ``odum-<env>-usage-metering/``. Schema stays pinned so dev,
 staging, and prod writers + BigQuery aggregators stay in lockstep.
 
-SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 3.
+SSOT: codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 3.
 """
 
 from __future__ import annotations

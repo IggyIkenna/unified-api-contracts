@@ -3,7 +3,7 @@
 Covers every worked example in the stage-3c spec. Fixtures mirror the
 §1.x Ex N examples verbatim; docstrings cite the spec line.
 
-SSOT: ``unified-trading-pm/codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md``.
+SSOT: ``unified-trading-pm/codex/16-strategy-playbooks/infra-spec/stage-3c-derivation-engine.md``.
 """
 
 from __future__ import annotations

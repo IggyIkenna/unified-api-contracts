@@ -8,7 +8,7 @@ to UTL ``log_event(PRICING_RULE_0[78]_VIOLATION, ...)`` lives in the
 caller (strategy-service / pricing-engine / admin tools).
 
 SSOT:
-    codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 5
+    codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 5
     codex/14-playbooks/_ssot-rules/07-data-licensing-boundaries.md
     codex/14-playbooks/_ssot-rules/08-pricing-principles.md
 """

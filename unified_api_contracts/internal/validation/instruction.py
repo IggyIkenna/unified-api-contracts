@@ -31,7 +31,7 @@ collisions with:
 Consumers import via the public facade ``unified_api_contracts.instruction``.
 
 SSOT:
-- ``codex/14-playbooks/infra-spec/stage-3b-instruction-schema-contract.md``
+- ``codex/16-strategy-playbooks/infra-spec/stage-3b-instruction-schema-contract.md``
   §2 (the 8 required fields + nested validation rules).
 - ``codex/14-playbooks/_ssot-rules/10-strategy-instruction-schema-principles.md``
   (rule 10 — schema depth as pricing dimension).

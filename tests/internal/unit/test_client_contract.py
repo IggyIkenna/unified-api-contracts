@@ -6,7 +6,7 @@ staging Firebase, and prod Firebase can't drift. Concrete Firebase
 project IDs are resolved at runtime via ``UnifiedCloudConfig`` (never
 hardcoded); see SSOT below.
 
-SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 2.
+SSOT: codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 2.
 """
 
 from __future__ import annotations

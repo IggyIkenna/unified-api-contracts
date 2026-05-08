@@ -2,7 +2,7 @@
 
 G1.6 of ``stage-3e-refactor-plan`` / ``uac-registry-gaps.md`` gap #11. Ships
 the five derivation formulas specified in
-``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.1-§1.5 as
+``codex/16-strategy-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.1-§1.5 as
 pure, side-effect-free functions that consume the G1.8 archetype capability
 registry plus the Phase-10.5 strategy-availability registry.
 
@@ -34,7 +34,7 @@ non-strategy services) from pulling strategy-service as a dep.
 + ``access_control.py`` once the single-file surface stabilises. Tracked
 as a follow-up in the G1.6 plan.
 
-SSOT: ``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md``.
+SSOT: ``codex/16-strategy-playbooks/infra-spec/stage-3c-derivation-engine.md``.
 """
 
 from __future__ import annotations

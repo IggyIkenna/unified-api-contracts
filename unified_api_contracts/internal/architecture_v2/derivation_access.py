@@ -7,7 +7,7 @@ Public API stable — callers still import ``access_control`` via the
 ``unified_api_contracts.strategy`` facade or
 ``unified_api_contracts.internal.architecture_v2``.
 
-SSOT: ``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.5.
+SSOT: ``codex/16-strategy-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.5.
 """
 
 from __future__ import annotations

@@ -6,7 +6,7 @@ constants), so it moves out here. Public API stable — callers still
 import ``cost`` via the ``unified_api_contracts.strategy`` facade
 OR ``unified_api_contracts.internal.architecture_v2``.
 
-SSOT: ``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.2.
+SSOT: ``codex/16-strategy-playbooks/infra-spec/stage-3c-derivation-engine.md`` §1.2.
 """
 
 from __future__ import annotations

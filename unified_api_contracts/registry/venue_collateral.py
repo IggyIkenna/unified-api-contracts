@@ -136,7 +136,7 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # offsets ETH-perp directly. Effective 2026-01-13 per Deribit insights post
     # ``portfolio-margin-improvements-for-steth-and-cross-collateral-haircuts``.
     # Stream A flip 2026-05-08 (was ``accepted=False`` — stale 2026-05-05 entry).
-    # See unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md.
+    # See unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md.
     CollateralAcceptance(
         "DERIBIT",
         "stETH",
@@ -157,7 +157,7 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # 2024-02 per Bybit margin-spec page; USDe added 2024-12-19. Conservative
     # 10% haircut placeholder pending live-API probe; documented haircut ranges
     # vary by collateral tier (5-12%). Stream A flip 2026-05-08.
-    # See unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md.
+    # See unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md.
     CollateralAcceptance(
         "BYBIT", "stETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral since 2024-02", "PERP_CEX"
     ),
@@ -173,7 +173,7 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # list (per OKX cross-margin docs). Stream A flip 2026-05-08. stETH not
     # explicitly listed on discount-rate page; conservative ``False`` until
     # live-API probe confirms.
-    # See unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md.
+    # See unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md.
     CollateralAcceptance("OKX", "stETH", False, None, "", "Not on discount-rate list", "PERP_CEX"),
     CollateralAcceptance(
         "OKX",

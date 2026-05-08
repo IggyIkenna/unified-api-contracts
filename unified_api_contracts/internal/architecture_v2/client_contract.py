@@ -10,7 +10,7 @@ in unified-trading-system-ui is generated from this file at build
 time, identical to the pattern used for restriction profiles
 (Stage 3E G1.7) and archetype capability (G1.8).
 
-SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 2.
+SSOT: codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 2.
 """
 
 from __future__ import annotations

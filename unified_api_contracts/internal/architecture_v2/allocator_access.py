@@ -32,7 +32,7 @@ still raises fail-loud in the allocator before the legacy
 ``validate_allocation_authorised`` runs, preserving the two-layer
 defence model.
 
-SSOT: ``codex/14-playbooks/infra-spec/stage-3c-derivation-engine.md``
+SSOT: ``codex/16-strategy-playbooks/infra-spec/stage-3c-derivation-engine.md``
 §1.5 (the item-visibility sub-section).
 """
 

@@ -13,7 +13,7 @@ Coverage targets (≥ 30 cases):
 * Happy-path acceptance (≥ 3 cases).
 
 SSOT:
-- ``codex/14-playbooks/infra-spec/stage-3b-instruction-schema-contract.md`` §2
+- ``codex/16-strategy-playbooks/infra-spec/stage-3b-instruction-schema-contract.md`` §2
 - ``codex/09-strategy/architecture-v2/category-instrument-coverage.md``
   (BL-1..BL-10).
 """

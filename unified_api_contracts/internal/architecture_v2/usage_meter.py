@@ -6,7 +6,7 @@ pull, signal emission, strategy-run minute, etc.). Rows land in
 aggregated nightly into BigQuery ``<env>_usage.daily_usage`` for
 month-end invoicing.
 
-SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 3.
+SSOT: codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 3.
 """
 
 from __future__ import annotations

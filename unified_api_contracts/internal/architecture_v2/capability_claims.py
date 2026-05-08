@@ -10,7 +10,7 @@ Claims are propagated in the ID token and read by:
 3. UAC ``cost()`` via the ``caller_has_internal_read`` + audience
    kwargs — callers translate claims → cost() args.
 
-SSOT: codex/14-playbooks/infra-spec/stage-3e-g2-env-split.md § 4.
+SSOT: codex/16-strategy-playbooks/infra-spec/stage-3e-g2-env-split.md § 4.
 """
 
 from __future__ import annotations

@@ -1,7 +1,7 @@
 """Unit tests for ``unified_api_contracts.registry.venue_collateral`` matrix.
 
 Covers Stream A 2026-05-08 LST acceptance flips for DERIBIT / BYBIT / OKX.
-Source evidence: ``unified-trading-pm/codex/14-playbooks/defi/venue-collateral-2026-05-07.md``.
+Source evidence: ``unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md``.
 """
 
 from __future__ import annotations
