@@ -20,7 +20,7 @@ jobs:
   # Notify unified-trading-system-ui to regenerate OpenAPI TypeScript types
   notify-ui-openapi-sync:
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/staging')
-    needs: quality-gates
+    needs: call-quality-gates
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch to unified-trading-system-ui
