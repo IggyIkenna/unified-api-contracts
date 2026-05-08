@@ -8,6 +8,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
+from unified_api_contracts import AlertCode
+
 
 class RiskStatus(StrEnum):
     OK = "OK"
@@ -114,6 +116,16 @@ class AlertMessage(BaseModel):
     recommended_action: str | None = None
     context: AlertContextData | None = None
     severity: str = "WARNING"
+    code: AlertCode | None = Field(
+        default=None,
+        description=(
+            "Closed-set alert code (UAC top-level facade `AlertCode`). Optional during the producer-migration "
+            "window started 2026-05-08 (Phase 3 of alerting_service_live_rules_2026_05_07.md, operator decision "
+            "Option A). Producers SHOULD stamp this on every emit; legacy `alert_type` (AlertType) coexists "
+            "for backwards compat and will be deprecated post-cutover. Alerting-service rule-matching prefers "
+            "`code` when present and falls back to `alert_type` when absent."
+        ),
+    )
 
 
 class LimitCheckResult(BaseModel):
