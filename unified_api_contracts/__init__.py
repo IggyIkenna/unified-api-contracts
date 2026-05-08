@@ -18,6 +18,24 @@ from .canonical.canonical_mappings import (
     get_required_secrets,
 )
 
+# ``canonical.crosscutting.alerting`` transitively triggers
+# ``unified_api_contracts.internal`` via ``rules.py`` (KillSwitchScope) +
+# downstream chain. ``internal/...`` imports back from this top-level
+# facade (BetStatus, CanonicalFill, DefiAlertType, ...). Order matters:
+# canonical_mappings → errors → domain → alerting (loads internal/).
+from .canonical.crosscutting.alerting import (
+    ALERT_CODES,
+    ALERT_THRESHOLDS,
+    LIVE_ALERT_RULES,
+    AlertChannel,
+    AlertCode,
+    AlertRule,
+    AlertSeverity,
+    AlertThreshold,
+    ThresholdUnit,
+    UnknownAlertCodeError,
+    UnknownThresholdKeyError,
+)
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
     VENUE_ERROR_MAP,
@@ -52,6 +70,13 @@ from .canonical.crosscutting.errors import (
     VenueErrorClassification,
     WebSocketCloseInfo,
     classify_venue_error,
+)
+from .canonical.crosscutting.pipeline_mode import (
+    PipelineMode,
+    is_batch,
+    is_live,
+    pipeline_mode_for_source,
+    source_string_for,
 )
 from .canonical.domain import (
     BOOKMAKER_REGISTRY,
@@ -280,25 +305,6 @@ from .canonical.domain import (
     get_expected_bookmakers,
     resolve_environment_from_env,
     resolve_environment_from_hostname,
-)
-
-# ``canonical.crosscutting.alerting`` transitively triggers
-# ``unified_api_contracts.internal`` via ``rules.py`` (KillSwitchScope) +
-# downstream chain. ``internal/...`` imports back from this top-level
-# facade (BetStatus, CanonicalFill, DefiAlertType, ...). Order matters:
-# canonical_mappings → errors → domain → alerting (loads internal/).
-from .canonical.crosscutting.alerting import (  # noqa: E402
-    ALERT_CODES,
-    ALERT_THRESHOLDS,
-    LIVE_ALERT_RULES,
-    AlertChannel,
-    AlertCode,
-    AlertRule,
-    AlertSeverity,
-    AlertThreshold,
-    ThresholdUnit,
-    UnknownAlertCodeError,
-    UnknownThresholdKeyError,
 )
 from .canonical.partition_paths import (
     build_cefi_partition_path,
@@ -1187,6 +1193,7 @@ __all__ = [
     "OrphanDetector",
     "OutcomeType",
     "PayloadDepth",
+    "PipelineMode",
     "PlayerMapping",
     "PolygonDividend",
     "PolygonDividendsResponse",
@@ -1321,12 +1328,16 @@ __all__ = [
     "get_required_secrets",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
+    "is_batch",
+    "is_live",
     "is_per_instrument_shard_data_type",
     "lookup_contract",
     "normalize_underlying",
+    "pipeline_mode_for_source",
     "resolve_environment_from_env",
     "resolve_environment_from_hostname",
     "resolve_exchange",
+    "source_string_for",
     "validate_dataframe",
     "validate_row_df",
 ]
