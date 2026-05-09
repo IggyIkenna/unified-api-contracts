@@ -34,4 +34,12 @@ from .risk_taxonomy import RiskCategory as RiskCategory
 from .risk_taxonomy import RiskType as RiskType
 from .share_class import SHARE_CLASS_BASE_ASSETS as SHARE_CLASS_BASE_ASSETS
 from .share_class import ShareClass as ShareClass
+from .source_priority import EMISSION_LATENCY_MS_BY_SOURCE as EMISSION_LATENCY_MS_BY_SOURCE
+from .source_priority import SOURCE_PRIORITY as SOURCE_PRIORITY
+from .source_priority import assert_emission_latency_round_trip as assert_emission_latency_round_trip
+from .source_priority import emission_latency_ms_for_source as emission_latency_ms_for_source
+from .source_priority import get_primary_source as get_primary_source
+from .source_priority import get_primary_source_with_latency as get_primary_source_with_latency
+from .source_priority import get_source_priority as get_source_priority
+from .source_priority import has_source_priority as has_source_priority
 from .source_priority import read_with_source_priority as read_with_source_priority

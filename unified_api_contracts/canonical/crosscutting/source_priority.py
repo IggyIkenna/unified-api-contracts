@@ -212,6 +212,153 @@ def has_source_priority(asset_group: str, data_type: str) -> bool:
     return (asset_group, data_type) in SOURCE_PRIORITY
 
 
+EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
+    # Tick-level live sources — sub-second tick-to-pipeline arrival.
+    "tardis": 50,  # multi-venue WS aggregator
+    "databento": 10,  # CME direct feed, microsecond-grade infra
+    "polymarket_clob": 200,  # HTTPS CLOB polling
+    "onchain_rpc": 200,  # direct RPC, block-time bounded
+    # Subgraph / indexer — block-confirmation latency dominates.
+    "onchain_subgraph": 60_000,  # 1 min: block confirmation + Graph indexing
+    # Sports REST APIs — emission cadence ≈ 1-5s.
+    "api_football": 1_000,
+    "odds_api": 5_000,
+    # Post-match / batch-only — cadence is hours-to-day.
+    "understat": 7_200_000,  # 2h post-match xG
+    "soccer_football_info": 3_600_000,  # 1h SFI freeze cadence
+    "open_meteo": 3_600_000,  # 1h forecast issue
+    "transfermarkt": 86_400_000,  # 24h market values
+    # Metadata / lifecycle reads — minute-cadence.
+    "polymarket_gamma_api": 60_000,
+    "instruments_service": 60_000,
+}
+"""Per-source emission latency (ms) — live-pipeline tick-to-pipeline arrival.
+
+Used by the live=batch ``available_at`` formula:
+``available_at = tick_event_time + emission_latency_ms_for_source(primary_source)``.
+
+The values represent the wall-clock delta between when an event happens at the
+source and when our live pipeline would actually have the row in-process. Per
+the workspace ``Live = batch — same data, same fields, same timing semantics``
+rule, batch writes MUST stamp ``available_at`` with this delta added so historical
+features see the same arrival horizon they would in live mode.
+
+**Phase 1B seed values are CONSERVATIVE estimates** — empirical calibration via
+per-source tick-arrival sampling is deferred to follow-up plan
+``source_emission_latency_calibration_2026_*<TBD>.md`` (named-successor per the
+workspace ``Temporary state must have a named successor plan`` rule). Sources
+whose primary is in batch-archive shape (e.g. ``tardis`` for CeFi ticks) carry
+the LIVE-equivalent latency, NOT the archive-fetch latency — the archive read
+happens at backfill time, but the stamped ``available_at`` reflects when a live
+pipeline would have the row.
+
+**Closed-set round-trip rule (mirrors :data:`PipelineMode`):** every source
+string appearing in :data:`SOURCE_PRIORITY` MUST have an entry here. The
+:func:`assert_emission_latency_round_trip` helper enforces this and is wired
+into the UAC unit-test suite.
+
+Plans:
+
+* ``cefi_master_2026_05_07`` Q1 — F2-v2 prerequisite for CeFi adapter
+  ``available_at`` stamping.
+* ``predictions_master_2026_05_07`` Q2 — Polymarket / Kalshi bundled-row
+  ``available_at`` stamping.
+"""
+
+
+def emission_latency_ms_for_source(source: str) -> int:
+    """Return the live-emission latency (ms) for ``source``.
+
+    Args:
+        source: A source string from :data:`SOURCE_PRIORITY` (e.g. ``"tardis"``,
+            ``"databento"``, ``"api_football"``).
+
+    Returns:
+        Latency in milliseconds — wall-clock delta from event-at-source to
+        row-in-pipeline.
+
+    Raises:
+        KeyError: If the source is not registered in
+            :data:`EMISSION_LATENCY_MS_BY_SOURCE`. Failing loud is intentional —
+            silent fallback would mask schema-drift bugs in the closed-set
+            round-trip with :data:`SOURCE_PRIORITY`.
+    """
+    if source not in EMISSION_LATENCY_MS_BY_SOURCE:
+        msg = (
+            f"No emission latency registered for source={source!r}. "
+            f"Add an entry to EMISSION_LATENCY_MS_BY_SOURCE before use. "
+            f"Every source in SOURCE_PRIORITY must have a latency entry "
+            f"(closed-set round-trip rule)."
+        )
+        raise KeyError(msg)
+    return EMISSION_LATENCY_MS_BY_SOURCE[source]
+
+
+def get_primary_source_with_latency(
+    asset_group: str,
+    data_type: str,
+) -> tuple[str, int]:
+    """Return ``(primary_source, emission_latency_ms)`` for an ``(asset_group, data_type)``.
+
+    The latency-aware companion to :func:`get_primary_source`. Stamping helpers
+    use this to compute ``available_at = tick_event_time + latency_ms`` per the
+    live=batch invariant.
+
+    Args:
+        asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / ``prediction``
+            / ``sports`` / ``reference``.
+        data_type: Canonical data_type string.
+
+    Returns:
+        Tuple of ``(primary_source_string, emission_latency_ms)``.
+
+    Raises:
+        KeyError: If the ``(asset_group, data_type)`` pair is not registered
+            (delegated from :func:`get_primary_source`) OR if the primary source
+            has no latency entry (delegated from
+            :func:`emission_latency_ms_for_source`). Both raise paths are
+            prevented in CI by :func:`assert_emission_latency_round_trip`.
+    """
+    primary_source = get_primary_source(asset_group, data_type)
+    latency_ms = emission_latency_ms_for_source(primary_source)
+    return primary_source, latency_ms
+
+
+def assert_emission_latency_round_trip() -> None:
+    """Closed-set round-trip: every SOURCE_PRIORITY source has a latency entry.
+
+    Mirrors :func:`pipeline_mode.assert_pipeline_mode_source_priority_round_trip`.
+    Wired into the UAC unit-test suite via
+    ``tests/unit/test_source_priority.py::test_emission_latency_round_trip``.
+
+    Raises:
+        AssertionError: If any source in :data:`SOURCE_PRIORITY` is missing from
+            :data:`EMISSION_LATENCY_MS_BY_SOURCE`, or if any latency entry refers
+            to a source not used in :data:`SOURCE_PRIORITY`.
+    """
+    sources_in_priority: set[str] = set()
+    for source_list in SOURCE_PRIORITY.values():
+        sources_in_priority.update(source_list)
+    sources_in_latency: set[str] = set(EMISSION_LATENCY_MS_BY_SOURCE.keys())
+
+    missing_latency = sources_in_priority - sources_in_latency
+    if missing_latency:
+        msg = (
+            f"Sources in SOURCE_PRIORITY without emission latency entries: "
+            f"{sorted(missing_latency)}. Add to EMISSION_LATENCY_MS_BY_SOURCE."
+        )
+        raise AssertionError(msg)
+
+    orphan_latency = sources_in_latency - sources_in_priority
+    if orphan_latency:
+        msg = (
+            f"Sources in EMISSION_LATENCY_MS_BY_SOURCE not used in SOURCE_PRIORITY: "
+            f"{sorted(orphan_latency)}. Remove orphan latency entries or wire the "
+            f"source into SOURCE_PRIORITY."
+        )
+        raise AssertionError(msg)
+
+
 def read_with_source_priority(
     asset_group: str,
     data_type: str,
@@ -257,8 +404,12 @@ def read_with_source_priority(
 
 
 __all__ = [
+    "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",
+    "assert_emission_latency_round_trip",
+    "emission_latency_ms_for_source",
     "get_primary_source",
+    "get_primary_source_with_latency",
     "get_source_priority",
     "has_source_priority",
     "read_with_source_priority",

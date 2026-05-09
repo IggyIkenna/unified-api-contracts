@@ -8,8 +8,12 @@ from unified_api_contracts.canonical.crosscutting.availability_semantics import 
     AVAILABILITY_AT_SEMANTICS,
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
+    EMISSION_LATENCY_MS_BY_SOURCE,
     SOURCE_PRIORITY,
+    assert_emission_latency_round_trip,
+    emission_latency_ms_for_source,
     get_primary_source,
+    get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
 )
@@ -158,3 +162,56 @@ def test_every_source_priority_pair_has_availability_semantic() -> None:
         if key not in AVAILABILITY_AT_SEMANTICS:
             missing.append(key)
     assert not missing, f"{len(missing)} pairs have source priority but no availability semantic: {missing[:10]}"
+
+
+# ---------------------------------------------------------------------------
+# Emission-latency registry — F2-v2 prerequisite for available_at stamping
+# ---------------------------------------------------------------------------
+
+
+def test_emission_latency_round_trip() -> None:
+    """Closed-set: every source in SOURCE_PRIORITY has a latency entry, and vice versa."""
+    assert_emission_latency_round_trip()
+
+
+def test_emission_latency_ms_for_known_source() -> None:
+    assert emission_latency_ms_for_source("tardis") == 50
+    assert emission_latency_ms_for_source("databento") == 10
+    assert emission_latency_ms_for_source("api_football") == 1_000
+
+
+def test_emission_latency_ms_for_unknown_source_raises() -> None:
+    with pytest.raises(KeyError, match="No emission latency registered"):
+        emission_latency_ms_for_source("nonexistent_source")
+
+
+def test_emission_latency_values_are_positive_int_under_one_day() -> None:
+    """Sanity bounds: latencies are non-negative ints under 24h (86_400_000ms)."""
+    one_day_ms = 86_400_000
+    for source, latency in EMISSION_LATENCY_MS_BY_SOURCE.items():
+        assert isinstance(latency, int), f"{source} latency is not an int: {type(latency)}"
+        assert latency >= 0, f"{source} latency is negative: {latency}"
+        assert latency <= one_day_ms, f"{source} latency exceeds 24h: {latency}"
+
+
+def test_get_primary_source_with_latency_for_cefi_trades() -> None:
+    source, latency_ms = get_primary_source_with_latency("cefi", "trades")
+    assert source == "tardis"
+    assert latency_ms == 50
+
+
+def test_get_primary_source_with_latency_for_sports_fixtures() -> None:
+    source, latency_ms = get_primary_source_with_latency("sports", "FIXTURES")
+    assert source == "api_football"
+    assert latency_ms == 1_000
+
+
+def test_get_primary_source_with_latency_for_prediction_trades() -> None:
+    source, latency_ms = get_primary_source_with_latency("prediction", "trades")
+    assert source == "polymarket_clob"
+    assert latency_ms == 200
+
+
+def test_get_primary_source_with_latency_unknown_pair_raises() -> None:
+    with pytest.raises(KeyError, match="No source priority registered"):
+        get_primary_source_with_latency("nonexistent_asset_group", "nonexistent_data_type")
