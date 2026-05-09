@@ -99,6 +99,10 @@ class EnvVars:
     USE_POLARS = "USE_POLARS"  # true | false — enable Polars aggregation path
     MDPS_TIMEFRAMES = "MDPS_TIMEFRAMES"  # comma-separated timeframes override
 
+    # Adapter cursor-resumption tokens (set per-VM at backfill chunk launch)
+    POLYMARKET_START_CURSOR = "POLYMARKET_START_CURSOR"  # base64 offset; first scan position
+    POLYMARKET_END_CURSOR = "POLYMARKET_END_CURSOR"  # base64 offset; early-exit bound
+
     @classmethod
     def _core_canonical(cls) -> set[str]:
         return {
@@ -165,6 +169,8 @@ class EnvVars:
             cls.LIVE_SERVICE_REPORTING_URL,
             cls.USE_POLARS,
             cls.MDPS_TIMEFRAMES,
+            cls.POLYMARKET_START_CURSOR,
+            cls.POLYMARKET_END_CURSOR,
         }
 
     @classmethod
