@@ -131,6 +131,41 @@ class LifecycleEventType(StrEnum):
     INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY = "INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY"
     INSTRUMENTS_LIVE_PREFLIGHT_FAILED = "INSTRUMENTS_LIVE_PREFLIGHT_FAILED"
     INSTRUMENTS_LIVE_UPSTREAM_STALE = "INSTRUMENTS_LIVE_UPSTREAM_STALE"
+    # Live-mode connectivity-gap event family (mdps_streaming_and_backpressure
+    # 2026-05-07 Phase 1, "Migrated issue 2026-05-08 — Live data recovery
+    # self-detect"). Live WebSocket connectivity loss has no upstream
+    # detection/signal/recovery today; gap windows silently lost; downstream
+    # can't distinguish "venue quiet" from "MTDS disconnected"; manifests have
+    # no LIVE_CONNECTIVITY_GAP rows; auto-backfill unimplemented. Violates
+    # Live=Batch principle (batch has 4-state capture taxonomy; live has none
+    # for outages). MTDS LiveConnectivityWatchdog wraps each per-venue WS
+    # adapter, tracks heartbeats per (venue, data_type), and emits this
+    # 3-event family on state transitions:
+    #
+    #   CONNECTIVITY_GAP_DETECTED  — heartbeat staleness exceeds per-venue
+    #                                threshold (UAC VENUE_HEARTBEAT_INTERVAL).
+    #                                Carries gap_start, last_received_at,
+    #                                classification (WS_DISCONNECT |
+    #                                STALE_HEARTBEAT | API_TIMEOUT | UNKNOWN).
+    #                                Alerting tier-up via alerting-service
+    #                                live rules.
+    #   CONNECTIVITY_RECOVERED     — heartbeat resumes after gap. Carries
+    #                                gap_end, gap_duration_seconds,
+    #                                last_received_at. Triggers auto-backfill
+    #                                of the gap window via SOURCE_PRIORITY
+    #                                fallback REST source.
+    #   CONNECTIVITY_GAP_BACKFILLED — auto-backfill completed for the gap
+    #                                window; rows recorded via record_captured
+    #                                so manifest reflects honest 4-state
+    #                                coverage. Carries rows_backfilled,
+    #                                backfill_completed_at.
+    #
+    # Cross-plan banner: complementary to TICK_STALENESS (MDPS, downstream-
+    # detected) — this event family is the upstream-detected counterpart.
+    # Operator decision 2026-05-08: keep both.
+    CONNECTIVITY_GAP_DETECTED = "CONNECTIVITY_GAP_DETECTED"
+    CONNECTIVITY_RECOVERED = "CONNECTIVITY_RECOVERED"
+    CONNECTIVITY_GAP_BACKFILLED = "CONNECTIVITY_GAP_BACKFILLED"
 
 
 # Backward-compat alias — LogLevel is the canonical severity enum (modes.py).
@@ -760,6 +795,91 @@ class InstrumentsLiveUpstreamStaleEvent(BaseModel):
     service: str
     timestamp: datetime
     details: InstrumentsLiveUpstreamStaleDetails
+
+
+# ---------------------------------------------------------------------------
+# Live-mode connectivity-gap event family (mdps_streaming_and_backpressure
+# 2026-05-07 Phase 1 — "Migrated issue 2026-05-08 — Live data recovery
+# self-detect"). MTDS LiveConnectivityWatchdog emits these on state
+# transitions per (venue, data_type) heartbeat tracking.
+# ---------------------------------------------------------------------------
+
+
+class ConnectivityGapDetectedDetails(BaseModel):
+    """Metadata for CONNECTIVITY_GAP_DETECTED.
+
+    Emitted by MTDS LiveConnectivityWatchdog when (venue, data_type)
+    heartbeat staleness exceeds the per-venue threshold (UAC
+    VENUE_HEARTBEAT_INTERVAL — empirical 99th percentile per venue).
+    """
+
+    venue: str
+    data_type: str
+    gap_start: datetime
+    last_received_at: datetime
+    # Closed-set classification of the gap source. WS_DISCONNECT = explicit
+    # WebSocket close; STALE_HEARTBEAT = no message for > threshold;
+    # API_TIMEOUT = REST fallback timed out; UNKNOWN = other.
+    classification: Literal["WS_DISCONNECT", "STALE_HEARTBEAT", "API_TIMEOUT", "UNKNOWN"]
+    # Optional context: how many messages received during the gap window
+    # (typically 0 — set to a non-zero value if the gap was a heartbeat-rate
+    # drop rather than a complete blackout).
+    message_count_during_gap: int = 0
+
+
+class ConnectivityRecoveredDetails(BaseModel):
+    """Metadata for CONNECTIVITY_RECOVERED.
+
+    Emitted by MTDS LiveConnectivityWatchdog when a (venue, data_type) pair
+    that was previously in GAP state receives a heartbeat. Triggers
+    auto-backfill of the gap window via SOURCE_PRIORITY fallback REST source.
+    """
+
+    venue: str
+    data_type: str
+    gap_start: datetime
+    gap_end: datetime
+    gap_duration_seconds: float
+    last_received_at: datetime
+
+
+class ConnectivityGapBackfilledDetails(BaseModel):
+    """Metadata for CONNECTIVITY_GAP_BACKFILLED.
+
+    Emitted by MTDS auto-backfill loop after the gap window is filled via
+    REST batch fetch. Per CLAUDE.md "Manifest concurrency principle":
+    read-once + per-date freshness check + write-time CAS. Each filled row
+    is recorded via ManifestWriter.record_captured so the manifest reflects
+    honest 4-state coverage.
+    """
+
+    venue: str
+    data_type: str
+    gap_start: datetime
+    gap_end: datetime
+    backfill_completed_at: datetime
+    rows_backfilled: int
+
+
+class ConnectivityGapDetectedEvent(BaseModel):
+    event: Literal[LifecycleEventType.CONNECTIVITY_GAP_DETECTED] = LifecycleEventType.CONNECTIVITY_GAP_DETECTED
+    service: str
+    timestamp: datetime
+    details: ConnectivityGapDetectedDetails
+
+
+class ConnectivityRecoveredEvent(BaseModel):
+    event: Literal[LifecycleEventType.CONNECTIVITY_RECOVERED] = LifecycleEventType.CONNECTIVITY_RECOVERED
+    service: str
+    timestamp: datetime
+    details: ConnectivityRecoveredDetails
+
+
+class ConnectivityGapBackfilledEvent(BaseModel):
+    event: Literal[LifecycleEventType.CONNECTIVITY_GAP_BACKFILLED] = LifecycleEventType.CONNECTIVITY_GAP_BACKFILLED
+    service: str
+    timestamp: datetime
+    details: ConnectivityGapBackfilledDetails
 
 
 # ---------------------------------------------------------------------------
