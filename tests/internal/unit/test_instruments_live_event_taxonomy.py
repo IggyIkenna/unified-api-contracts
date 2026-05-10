@@ -38,7 +38,6 @@ from unified_api_contracts.internal.events import (
     MissingDependency,
 )
 
-
 # ═══════════════════════════════════════════════════════════════════════════
 # Enum-member existence + closed-set membership
 # ═══════════════════════════════════════════════════════════════════════════

@@ -61,9 +61,7 @@ MAY_23_STRETCH_ARCHETYPES: tuple[StrategyArchetype, ...] = (
 
 # Hedge-perp universe per master plan §1 + Risk Register. Aster excluded —
 # pending venue onboarding (see notes on CARRY_STAKED_BASIS cell).
-MAY_23_HEDGE_PERP_VENUES: frozenset[str] = frozenset(
-    {"bybit", "deribit", "binance", "okx", "hyperliquid"}
-)
+MAY_23_HEDGE_PERP_VENUES: frozenset[str] = frozenset({"bybit", "deribit", "binance", "okx", "hyperliquid"})
 
 
 # ---------------------------------------------------------------------------
@@ -92,8 +90,7 @@ def test_archetype_has_at_least_one_non_blocked_cell(archetype: StrategyArchetyp
     assert capability is not None
     non_blocked = [c for c in capability.cells if c.status != CoverageStatus.BLOCKED]
     assert len(non_blocked) >= 1, (
-        f"{archetype.value} has zero non-BLOCKED cells — "
-        "every May-23 archetype must have at least one routable cell."
+        f"{archetype.value} has zero non-BLOCKED cells — every May-23 archetype must have at least one routable cell."
     )
 
 
@@ -111,8 +108,7 @@ def test_live_archetype_has_at_least_one_supported_cell(
     assert capability is not None
     supported = [c for c in capability.cells if c.status == CoverageStatus.SUPPORTED]
     assert len(supported) >= 1, (
-        f"{archetype.value} has zero SUPPORTED cells — "
-        "lead May-23 archetypes need at least one SUPPORTED cell."
+        f"{archetype.value} has zero SUPPORTED cells — lead May-23 archetypes need at least one SUPPORTED cell."
     )
 
 
@@ -212,9 +208,7 @@ def test_leveraged_funding_arb_declares_cefi_perp_universe() -> None:
     cefi_perp_cells = [
         c
         for c in capability.cells
-        if c.asset_group.value == "CEFI"
-        and c.instrument_type.value == "perp"
-        and c.status != CoverageStatus.BLOCKED
+        if c.asset_group.value == "CEFI" and c.instrument_type.value == "perp" and c.status != CoverageStatus.BLOCKED
     ]
     assert cefi_perp_cells, (
         "ARBITRAGE_PRICE_DISPERSION has no CEFI/perp cell — "
@@ -243,18 +237,14 @@ def test_carry_basis_perp_declares_full_cefi_hedge_universe() -> None:
     cefi_perp_cells = [
         c
         for c in capability.cells
-        if c.asset_group.value == "CEFI"
-        and c.instrument_type.value == "perp"
-        and c.status != CoverageStatus.BLOCKED
+        if c.asset_group.value == "CEFI" and c.instrument_type.value == "perp" and c.status != CoverageStatus.BLOCKED
     ]
     assert cefi_perp_cells, "CARRY_BASIS_PERP has no CEFI/perp cell."
     declared_venues: set[str] = set()
     for cell in cefi_perp_cells:
         declared_venues.update(cell.venue_ids)
     missing = MAY_23_HEDGE_PERP_VENUES - declared_venues
-    assert not missing, (
-        f"CARRY_BASIS_PERP CEFI/perp missing venues: {sorted(missing)}."
-    )
+    assert not missing, f"CARRY_BASIS_PERP CEFI/perp missing venues: {sorted(missing)}."
 
 
 # ---------------------------------------------------------------------------
@@ -285,9 +275,7 @@ def test_ml_directional_continuous_declares_cefi_ml_venues(instrument: str) -> N
         declared_venues.update(cell.venue_ids)
     required = {"binance", "okx", "bybit"}
     missing = required - declared_venues
-    assert not missing, (
-        f"ML_DIRECTIONAL_CONTINUOUS CEFI/{instrument} missing venues: {sorted(missing)}."
-    )
+    assert not missing, f"ML_DIRECTIONAL_CONTINUOUS CEFI/{instrument} missing venues: {sorted(missing)}."
 
 
 # ---------------------------------------------------------------------------
@@ -315,8 +303,7 @@ def test_carry_staked_basis_declares_lst_and_lending_legs(required_venue: str) -
             continue
         declared_venues.update(cell.venue_ids)
     assert required_venue in declared_venues, (
-        f"CARRY_STAKED_BASIS missing required leg venue: {required_venue}. "
-        f"Declared: {sorted(declared_venues)}"
+        f"CARRY_STAKED_BASIS missing required leg venue: {required_venue}. Declared: {sorted(declared_venues)}"
     )
 
 

@@ -345,6 +345,12 @@ from .canonical.crosscutting.honest_coverage import (
     EmptyConfirmedReason,
     LegacyBlankErrorReasonError,
 )
+from .canonical.crosscutting.instruments_preflight_dag import (
+    PreflightFailed,
+    PreflightOK,
+    PreflightResult,
+    validate_preflight_for_trigger,
+)
 from .canonical.crosscutting.service_emission_policy import (
     EmissionLifecycleEvent,
     ServiceEmissionPolicy,
@@ -353,6 +359,7 @@ from .canonical.crosscutting.service_emission_policy import (
     policy_is_alert,
     policy_is_publish_row,
 )
+from .canonical.gcs_paths import AssetGroup
 
 # isort: on
 from .external.aster.schemas import AsterExchangeInfo
@@ -691,6 +698,7 @@ from .registry import (
     is_trading_hours,
     maintenance_margin_for,
     needs_candle_processing,
+    non_trading_day_reason,
     resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
 )
@@ -802,7 +810,6 @@ __all__ = [
     "ALERT_THRESHOLDS",
     "ALL_VENUES",
     "BOOKMAKER_REGISTRY",
-    # Honest-coverage taxonomy — UTL ManifestWriter consumers
     "BUNDLED_DATA_TYPES",
     "CEFI_ACCEPTED_QUOTE_ASSETS",
     "CEFI_BASE_ASSETS",
@@ -935,6 +942,8 @@ __all__ = [
     "ArbitrageOpportunity",
     "ArbitrageStatus",
     "AssetClass",
+    # Honest-coverage taxonomy — UTL ManifestWriter consumers
+    "AssetGroup",
     "AsterExchangeInfo",
     "BenchmarkType",
     "BetExecution",
@@ -1253,6 +1262,9 @@ __all__ = [
     "PredictionMarketCategory",
     "PredictionMarketMapper",
     "PredictionMarketUniverse",
+    "PreflightFailed",
+    "PreflightOK",
+    "PreflightResult",
     "PrimeBrokerAccount",
     "PrimeBrokerError",
     "PrimeBrokerFill",
@@ -1386,6 +1398,7 @@ __all__ = [
     "resolve_exchange",
     "source_string_for",
     "validate_dataframe",
+    "validate_preflight_for_trigger",
     "validate_row_df",
 ]
 
