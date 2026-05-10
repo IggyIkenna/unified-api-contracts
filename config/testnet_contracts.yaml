@@ -1,14 +1,27 @@
-# Testnet Contract Registry — known testnet contract addresses for DeFi protocols.
+# Contract Registry — known contract addresses for DeFi protocols (mainnet + testnets).
 #
 # Format: chain_id -> protocol -> contract_name -> address
-# Used by TestnetContractRegistry (unified-config-interface) to auto-detect
-# testnet environments and route DeFi connectors accordingly.
+# Loaded by TestnetContractRegistry (unified_trading_library.config_interface.testnet_contracts)
+# and consumed by execution-service DeFi connectors to resolve contract addresses per chain.
+#
+# Note: file name retained as `testnet_contracts.yaml` for backwards compatibility, but the
+# registry covers both mainnet (chain_id=1) and testnets. The `KNOWN_TESTNET_CHAIN_IDS`
+# constant in the loader still gates "is this a testnet" checks; mainnet entries here are
+# resolved by chain_id only and are NOT classified as testnet.
 #
 # Sources:
+#   Aave V3 mainnet:        https://docs.aave.com/developers/deployed-contracts/v3-mainnet
 #   Aave V3 Sepolia/Holesky: https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
-#   Uniswap V3 Sepolia: https://docs.uniswap.org/contracts/v3/reference/deployments
-#   EigenLayer Holesky: https://github.com/Layr-Labs/eigenlayer-contracts/blob/dev/README.md
-#   Lido Holesky: https://docs.lido.fi/deployed-contracts/holesky/
+#   Uniswap V3 Sepolia:      https://docs.uniswap.org/contracts/v3/reference/deployments
+#   EigenLayer Holesky:      https://github.com/Layr-Labs/eigenlayer-contracts/blob/dev/README.md
+#   Lido Holesky:            https://docs.lido.fi/deployed-contracts/holesky/
+
+# Ethereum mainnet (chain_id: 1)
+1:
+  aave_v3:
+    pool: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
+    pool_addresses_provider: "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e"
+    flash_loan_receiver: "0x42c005e2Bc545a49B50Fee3E76B8558348CAAb4c"
 
 # Sepolia (chain_id: 11155111)
 11155111:
