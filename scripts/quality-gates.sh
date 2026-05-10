@@ -24,6 +24,7 @@ GCP_PROJECT_ID_EXCLUDE_GLOBS=(
 SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/__init__.py"
     "./unified_api_contracts/internal/__init__.py"
+    "./unified_api_contracts/internal/events.py"
     "./unified_api_contracts/canonical/crosscutting/errors/defi.py"
     "./unified_api_contracts/internal/testing/synthetic.py"
     "./unified_api_contracts/internal/testing/instrument_generator.py"
