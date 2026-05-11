@@ -77,14 +77,14 @@ def test_lifecycle_events_frozenset_is_immutable() -> None:
 def test_seed_contains_mdps_ohlcv_current_strict_fail() -> None:
     """Operator-msg-10 framing — current 1m bar is real-time; partial = wrong."""
     assert (
-        SERVICE_OUTPUT_POLICIES[("market-data-pipeline-service", "ohlcv_1m:current")]
+        SERVICE_OUTPUT_POLICIES[("market-data-processing-service", "ohlcv_1m:current")]
         is ServiceEmissionPolicy.STRICT_FAIL
     )
 
 
 def test_seed_contains_mdps_ohlcv_24h_partial_ok() -> None:
     """Operator-msg-10 framing — 24h high/low denominator stable across inner gaps."""
-    assert SERVICE_OUTPUT_POLICIES[("market-data-pipeline-service", "ohlcv_24h")] is ServiceEmissionPolicy.PARTIAL_OK
+    assert SERVICE_OUTPUT_POLICIES[("market-data-processing-service", "ohlcv_24h")] is ServiceEmissionPolicy.PARTIAL_OK
 
 
 def test_seed_contains_features_volatility_high_low_partial_ok() -> None:
@@ -153,7 +153,7 @@ def test_all_seed_keys_are_two_tuples_of_strings() -> None:
 
 
 def test_get_emission_policy_returns_seeded_value() -> None:
-    assert get_emission_policy("market-data-pipeline-service", "ohlcv_24h") is ServiceEmissionPolicy.PARTIAL_OK
+    assert get_emission_policy("market-data-processing-service", "ohlcv_24h") is ServiceEmissionPolicy.PARTIAL_OK
 
 
 def test_get_emission_policy_defaults_to_strict_fail() -> None:
@@ -163,9 +163,11 @@ def test_get_emission_policy_defaults_to_strict_fail() -> None:
 
 def test_get_emission_policy_distinguishes_current_vs_historical_slice() -> None:
     """The ``"<data_type>:<slice>"`` shape lets the same data_type carry different policies."""
-    assert get_emission_policy("market-data-pipeline-service", "ohlcv_1m:current") is ServiceEmissionPolicy.STRICT_FAIL
     assert (
-        get_emission_policy("market-data-pipeline-service", "ohlcv_1m:historical") is ServiceEmissionPolicy.PARTIAL_OK
+        get_emission_policy("market-data-processing-service", "ohlcv_1m:current") is ServiceEmissionPolicy.STRICT_FAIL
+    )
+    assert (
+        get_emission_policy("market-data-processing-service", "ohlcv_1m:historical") is ServiceEmissionPolicy.PARTIAL_OK
     )
 
 
@@ -175,7 +177,7 @@ def test_get_emission_policy_distinguishes_current_vs_historical_slice() -> None
 
 
 def test_is_emission_policy_declared_seeded_pair_true() -> None:
-    assert is_emission_policy_declared("market-data-pipeline-service", "ohlcv_24h") is True
+    assert is_emission_policy_declared("market-data-processing-service", "ohlcv_24h") is True
 
 
 def test_is_emission_policy_declared_unseeded_pair_false() -> None:

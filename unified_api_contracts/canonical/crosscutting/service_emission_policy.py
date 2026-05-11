@@ -160,12 +160,12 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # MDPS — candle outputs at multiple cadences. Current bars are real-time;
     # partial = wrong. Historical re-emission tolerates inner gaps via
     # completeness_fraction.
-    ("market-data-pipeline-service", "ohlcv_1m:current"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("market-data-pipeline-service", "ohlcv_1m:historical"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("market-data-pipeline-service", "ohlcv_1h:current"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("market-data-pipeline-service", "ohlcv_1h:historical"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("market-data-pipeline-service", "ohlcv_24h"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("market-data-pipeline-service", "book_snapshot_5"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("market-data-processing-service", "ohlcv_1m:current"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("market-data-processing-service", "ohlcv_1m:historical"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("market-data-processing-service", "ohlcv_1h:current"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("market-data-processing-service", "ohlcv_1h:historical"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("market-data-processing-service", "ohlcv_24h"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("market-data-processing-service", "book_snapshot_5"): ServiceEmissionPolicy.STRICT_FAIL,
     # features-volatility — operator-flagged 24h-high-low example as PARTIAL_OK; rolling
     # vols are NaN_FILL because the ML consumer NaN-fills natively.
     ("features-volatility-service", "high_low_24h"): ServiceEmissionPolicy.PARTIAL_OK,
@@ -213,7 +213,7 @@ def get_emission_policy(service: str, output_data_type: str) -> ServiceEmissionP
     """Resolve the emission policy for ``(service, output_data_type)``.
 
     Args:
-        service: Canonical service name (e.g. ``"market-data-pipeline-service"``).
+        service: Canonical service name (e.g. ``"market-data-processing-service"``).
             Must match the ``service_name`` passed to
             :func:`unified_trading_library.events.setup_events`.
         output_data_type: The data_type the service publishes. Use the
