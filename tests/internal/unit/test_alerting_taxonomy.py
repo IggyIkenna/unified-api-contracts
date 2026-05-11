@@ -489,6 +489,104 @@ def test_ml_inference_latency_threshold_unit_is_milliseconds() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Tick-staleness + connectivity-gap event taxonomy (2026-05-11)
+# alerting_service_live_rules_2026_05_07 § "Tick-staleness + connectivity-gap"
+# ---------------------------------------------------------------------------
+
+_STALENESS_CONNECTIVITY_CODES: tuple[AlertCode, ...] = (
+    AlertCode.TICK_STALENESS,
+    AlertCode.CONNECTIVITY_GAP_DETECTED,
+    AlertCode.CONNECTIVITY_RECOVERED,
+    AlertCode.CONNECTIVITY_GAP_BACKFILLED,
+)
+
+
+def test_staleness_connectivity_codes_present_in_enum() -> None:
+    """4 staleness/connectivity codes added 2026-05-11 must be in the closed
+    AlertCode set (downstream MDPS + upstream MTDS complementary signals)."""
+    for code in _STALENESS_CONNECTIVITY_CODES:
+        assert code in AlertCode
+
+
+def test_staleness_connectivity_codes_have_routing_rule() -> None:
+    """Every staleness/connectivity code must have at least one matching
+    AlertRule in LIVE_ALERT_RULES."""
+    for code in _STALENESS_CONNECTIVITY_CODES:
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.event_pattern)]
+        assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
+
+
+def test_alert_code_closed_set_grew_to_at_least_56() -> None:
+    """Closed-set growth ratchet: 39 pre-2026-05-07 + 6 ML lifecycle
+    (2026-05-08) + 6 risk-rule + recovery (2026-05-10) + 4 staleness/
+    connectivity (2026-05-11) = at-least 55 codes. Track upward."""
+    assert len(list(AlertCode)) >= 55, (
+        f"AlertCode closed set has only {len(list(AlertCode))} members;"
+        " expected at-least 55 after the 2026-05-11 staleness/connectivity additions."
+    )
+
+
+def test_no_pre_existing_shadowing_of_staleness_connectivity_codes() -> None:
+    """The 4 staleness/connectivity codes must be UNIQUE within the closed
+    set — no pre-existing AlertCode member happens to share their string
+    value via a different name. Catches refactor regressions where a code is
+    renamed but the old string sneaks back in."""
+    values = [member.value for member in AlertCode]
+    for code in _STALENESS_CONNECTIVITY_CODES:
+        assert values.count(code.value) == 1, (
+            f"AlertCode.{code.name} value={code.value!r} appears"
+            f" {values.count(code.value)} times — shadowing regression."
+        )
+
+
+def test_tick_staleness_threshold_unit_is_seconds() -> None:
+    """tick_staleness_seconds threshold MUST carry ThresholdUnit.SECONDS so
+    consumers don't accidentally compare a 300s value against a minute-based
+    threshold and emit a silent 5h alert window."""
+    threshold = ALERT_THRESHOLDS["tick_staleness_seconds"]
+    assert threshold.unit is ThresholdUnit.SECONDS
+    assert threshold.default_value == Decimal("300")
+
+
+def test_tick_staleness_alerts_route_to_correct_channels() -> None:
+    """TICK_STALENESS + CONNECTIVITY_GAP_DETECTED are HIGH severity (page
+    on-call via PagerDuty + Telegram). CONNECTIVITY_RECOVERED +
+    CONNECTIVITY_GAP_BACKFILLED are INFO (Telegram-only, recovery events)."""
+    expected_routing = {
+        AlertCode.TICK_STALENESS: (
+            AlertSeverity.HIGH,
+            {AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM},
+        ),
+        AlertCode.CONNECTIVITY_GAP_DETECTED: (
+            AlertSeverity.HIGH,
+            {AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM},
+        ),
+        AlertCode.CONNECTIVITY_RECOVERED: (
+            AlertSeverity.INFO,
+            {AlertChannel.TELEGRAM},
+        ),
+        AlertCode.CONNECTIVITY_GAP_BACKFILLED: (
+            AlertSeverity.INFO,
+            {AlertChannel.TELEGRAM},
+        ),
+    }
+    for code, (expected_severity, expected_channels) in expected_routing.items():
+        matched = [r for r in LIVE_ALERT_RULES if r.code is code]
+        assert len(matched) == 1, (
+            f"Expected exactly one rule for {code.value!r}; found {len(matched)}."
+        )
+        rule = matched[0]
+        assert rule.severity is expected_severity, (
+            f"AlertRule(code={code.value!r}).severity={rule.severity!r} expected"
+            f" {expected_severity!r}."
+        )
+        assert set(rule.channels) == expected_channels, (
+            f"AlertRule(code={code.value!r}).channels={set(rule.channels)!r}"
+            f" expected {expected_channels!r}."
+        )
+
+
+# ---------------------------------------------------------------------------
 # Phase 6 of alerting_service_live_rules_2026_05_07 — `runbook_doc` field
 # wiring tests. Each `AlertRule.runbook_doc` should resolve to a stable path
 # under `unified-trading-pm/codex/15-runbooks/alerting/<filename>.md`.

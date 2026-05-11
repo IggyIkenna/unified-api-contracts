@@ -698,6 +698,69 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " Audit log carries unkilled_by_operator_id + original arm provenance."
         ),
     ),
+    # ── Tick-staleness + connectivity-gap event taxonomy (2026-05-11) ──────
+    # alerting_service_live_rules_2026_05_07 § "Tick-staleness +
+    # connectivity-gap event taxonomy" — complementary signals from MDPS
+    # (downstream-detected) + MTDS (upstream-detected). The 30s coalesce
+    # window in ``alerting-service/notifiers/router.py`` merges concurrent
+    # TICK_STALENESS + CONNECTIVITY_GAP_DETECTED fires for the same
+    # (venue, instrument, time-window) into ONE operator alert. Recovery
+    # events (CONNECTIVITY_RECOVERED / CONNECTIVITY_GAP_BACKFILLED) close
+    # the loop on previously-fired gap alerts. Payload contracts documented
+    # in AlertCode docstrings (codes.py).
+    AlertRule(
+        code=AlertCode.TICK_STALENESS,
+        event_pattern="TICK_STALENESS",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("tick_staleness"),
+        threshold_key="tick_staleness_seconds",
+        description=(
+            "MDPS downstream-detected tick staleness — last tick for"
+            " (venue, instrument) older than tick_staleness_seconds (default"
+            " 300s = 5min). PagerDuty P2 when actual_seconds > 5min."
+            " Coalesced with concurrent CONNECTIVITY_GAP_DETECTED on the"
+            " same (venue, instrument) within 30s at the router."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.CONNECTIVITY_GAP_DETECTED,
+        event_pattern="CONNECTIVITY_GAP_DETECTED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("connectivity_gap_detected"),
+        description=(
+            "MTDS upstream-detected connectivity gap — websocket dropped /"
+            " heartbeat staleness threshold crossed per-venue. PagerDuty P2."
+            " Coalesced with concurrent TICK_STALENESS on the same"
+            " (venue, instrument) within 30s at the router."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.CONNECTIVITY_RECOVERED,
+        event_pattern="CONNECTIVITY_RECOVERED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("connectivity_recovered"),
+        description=(
+            "MTDS upstream connectivity restored — closes the loop on a"
+            " previously-fired CONNECTIVITY_GAP_DETECTED. Telegram-only"
+            " (no page); operators rely on this to clear gap-alert state."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.CONNECTIVITY_GAP_BACKFILLED,
+        event_pattern="CONNECTIVITY_GAP_BACKFILLED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("connectivity_gap_backfilled"),
+        description=(
+            "MTDS replay/backfill closed the gap window with historical"
+            " data (secondary source). Distinct from CONNECTIVITY_RECOVERED"
+            " because gap is fully closed (no missing data) vs reconnected"
+            " forward. Payload includes replayed_ticks_count."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

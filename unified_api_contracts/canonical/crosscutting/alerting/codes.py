@@ -183,6 +183,49 @@ class AlertCode(StrEnum):
     operator sign-off required because cancelled / fully-unwound positions
     don't have a natural auto-restore semantic."""
 
+    # ── Tick-staleness + connectivity-gap event taxonomy (2026-05-11 —
+    # alerting_service_live_rules_2026_05_07 § "Tick-staleness +
+    # connectivity-gap event taxonomy"). Complementary signals:
+    # downstream-detected staleness (MDPS) vs upstream-detected gap (MTDS).
+    # Recovery + backfill events round out the lifecycle so operators see
+    # the full picture rather than orphan "fired-but-never-cleared" alerts.
+    # The 30s coalesce window keyed on (venue, instrument) in
+    # ``alerting-service/notifiers/router.py`` merges concurrent
+    # TICK_STALENESS + CONNECTIVITY_GAP_DETECTED fires for the same
+    # (venue, instrument, time-window) into ONE operator-visible alert.
+    TICK_STALENESS = "TICK_STALENESS"
+    """MDPS downstream-detected staleness — last tick for the (venue,
+    instrument) is older than the configured ``tick_staleness_seconds``
+    threshold (default 300s). Payload includes ``venue``, ``instrument``,
+    ``baseline_seconds`` (expected inter-tick gap from baseline), ``actual_seconds``
+    (observed gap), ``last_received_at`` (ISO timestamp). Severity HIGH —
+    operator visibility, paged at PagerDuty P2 when ``actual_seconds`` > 5min.
+    Emitter: MDPS write-gate consultation against per-venue baseline."""
+    CONNECTIVITY_GAP_DETECTED = "CONNECTIVITY_GAP_DETECTED"
+    """MTDS upstream-detected connectivity gap — websocket subscription
+    dropped + reconnect in progress, or heartbeat-staleness threshold
+    crossed per-venue (per ``venue_thresholds.py``). Payload includes
+    ``venue``, ``instrument``, ``gap_window_start`` (ISO timestamp of last
+    successful heartbeat), ``last_received_at``. Severity HIGH —
+    operator visibility, paged at PagerDuty P2. Emitter:
+    MTDS ``LiveConnectivityWatchdog``."""
+    CONNECTIVITY_RECOVERED = "CONNECTIVITY_RECOVERED"
+    """MTDS upstream connectivity restored — websocket reconnected +
+    heartbeats resumed. Payload includes ``venue``, ``instrument``,
+    ``gap_window_start`` (carry-forward from the original
+    ``CONNECTIVITY_GAP_DETECTED`` event), ``recovered_at`` (ISO timestamp).
+    Severity INFO — recovery event, Telegram-only (no page). Operators
+    rely on this to close the loop on a previously-fired gap alert."""
+    CONNECTIVITY_GAP_BACKFILLED = "CONNECTIVITY_GAP_BACKFILLED"
+    """MTDS replay/backfill closed the connectivity gap with historical
+    data — the gap window was retrofilled from a secondary source (REST
+    poll / archive replay). Payload includes ``venue``, ``instrument``,
+    ``gap_window_start``, ``recovered_at``, ``replayed_ticks_count`` (number
+    of historical ticks loaded). Severity INFO — recovery event,
+    Telegram-only (no page). Distinct from ``CONNECTIVITY_RECOVERED``
+    because the gap is now *fully* closed (no missing data), not just
+    reconnected forward."""
+
 
 ALERT_CODES: Final[frozenset[str]] = frozenset(member.value for member in AlertCode)
 """String-membership view of :class:`AlertCode` for fast O(1) validation.
