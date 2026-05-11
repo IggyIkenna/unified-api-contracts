@@ -149,7 +149,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("tradfi", "trades"): ["databento"],
     ("tradfi", "tbbo"): ["databento"],
     ("tradfi", "ohlcv_1m"): ["databento"],
-    ("tradfi", "ohlcv_15m"): ["databento"],  # VIX uses Yahoo; orchestrator routes by date
+    ("tradfi", "ohlcv_15m"): ["databento", "yahoo"],  # databento primary; yahoo for VIX 15m rolling 60d fallback (see MTDS umi_tick_provider._fetch_yahoo_vix_15m route — orchestrator routes by date AND venue==CBOE)
     ("tradfi", "options_chain"): ["databento"],
     ("tradfi", "futures_chain"): ["databento"],
     # ---- Prediction -----------------------------------------------------
@@ -223,6 +223,8 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # Sports REST APIs — emission cadence ≈ 1-5s.
     "api_football": 1_000,
     "odds_api": 5_000,
+    # Equity / index intraday — free-tier delayed feeds (VIX 15m fallback route).
+    "yahoo": 900_000,  # 15 min: Yahoo Finance free-tier intraday delay for CBOE-sourced indices like ^VIX
     # Post-match / batch-only — cadence is hours-to-day.
     "understat": 7_200_000,  # 2h post-match xG
     "soccer_football_info": 3_600_000,  # 1h SFI freeze cadence
