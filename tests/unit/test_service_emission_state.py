@@ -150,7 +150,7 @@ def test_published_degraded_consumes_with_completeness_flag() -> None:
     """PUBLISHED_DEGRADED rows carry a metric — consumers branch on completeness_fraction.
 
     The state value itself is the marker; the writer also writes the
-    ``completeness_fraction`` + ``expected_window_completeness_pct``
+    ``completeness_fraction`` + ``expected_window_completeness_fraction``
     sibling columns so consumers can NaN-fill / adjust-denominator / propagate
     per-leg per the per-service consumer-class audit.
     """

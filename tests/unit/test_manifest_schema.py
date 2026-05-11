@@ -7,7 +7,7 @@ NEW v8 columns + version constant + back-compat defaults.
 from __future__ import annotations
 
 from unified_api_contracts.canonical.crosscutting.manifest_schema import (
-    EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN,
+    EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN,
     LAST_EMISSION_DECISION_AT_COLUMN,
     MANIFEST_SCHEMA_VERSION_V8,
     READER_FALLBACK_WINDOW_DAYS,
@@ -28,7 +28,7 @@ def test_v8_new_columns_pins_exactly_three() -> None:
     assert set(V8_NEW_COLUMNS) == {
         SERVICE_EMISSION_STATE_COLUMN,
         LAST_EMISSION_DECISION_AT_COLUMN,
-        EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN,
+        EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN,
     }
 
 
@@ -36,7 +36,11 @@ def test_v8_column_names_match_canonical_strings() -> None:
     """Column-name SSOT — parquet headers + kwargs MUST use these strings."""
     assert SERVICE_EMISSION_STATE_COLUMN == "service_emission_state"
     assert LAST_EMISSION_DECISION_AT_COLUMN == "last_emission_decision_at"
-    assert EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN == "expected_window_completeness_pct"
+    assert EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN == "expected_window_completeness_fraction"
+    # Naming history: original `_pct` shipped UAC@174f401 (slot 6 Phase 1.C); operator-renamed
+    # to `_fraction` per plans/active/issues/expected_window_completeness_pct_range_drift_2026_05_11.md
+    # option (a). Value range is [0.0, 1.0] (fraction); the original `_pct` suffix implied
+    # 0-100 percentage, contradicting the value range.
 
 
 def test_v8_column_ordering_stable() -> None:
@@ -44,7 +48,7 @@ def test_v8_column_ordering_stable() -> None:
     assert V8_NEW_COLUMNS == (
         "service_emission_state",
         "last_emission_decision_at",
-        "expected_window_completeness_pct",
+        "expected_window_completeness_fraction",
     )
 
 
@@ -53,7 +57,7 @@ def test_v8_column_defaults_all_none() -> None:
     assert V8_COLUMN_DEFAULTS == {
         "service_emission_state": None,
         "last_emission_decision_at": None,
-        "expected_window_completeness_pct": None,
+        "expected_window_completeness_fraction": None,
     }
     assert set(V8_COLUMN_DEFAULTS.keys()) == set(V8_NEW_COLUMNS)
 

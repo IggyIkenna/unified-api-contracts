@@ -29,7 +29,7 @@ v8 schema-bump (this module):
 * **service_emission_state** (``str | None`` — value drawn from
   :class:`~unified_api_contracts.canonical.crosscutting.service_emission_state.ServiceEmissionStateEnum`).
 * **last_emission_decision_at** (``str | None`` — ISO-8601 milliseconds UTC).
-* **expected_window_completeness_pct** (``float | None``, range ``[0.0, 1.0]``).
+* **expected_window_completeness_fraction** (``float | None``, range ``[0.0, 1.0]``).
 
 All three NULLABLE for v7 row back-compat. UTL writer hot path may stamp
 defaults of ``None`` for pre-v8 callsites during the migration window; once
@@ -107,7 +107,7 @@ already canonicalises timestamps as ISO strings. UTC suffix
 ``Z`` mandatory; the UTL writer rejects naive / local-tz timestamps."""
 
 
-EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN: Final[str] = "expected_window_completeness_pct"
+EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN: Final[str] = "expected_window_completeness_fraction"
 """Manifest column name for the v8 expected-window completeness fraction.
 
 Value type: ``float | None`` in the closed interval ``[0.0, 1.0]``. Sibling
@@ -115,8 +115,17 @@ to UTL ``publish_with_policy`` 's ``completeness_fraction`` argument — the
 manifest column records the operator-declared expected fraction so
 downstream readers can detect a row that's degraded BELOW its expected
 floor (e.g. an ``ohlcv_24h`` row whose policy is ``PARTIAL_OK`` with
-expected_window_completeness_pct=0.95 but actual completeness 0.80 →
+``expected_window_completeness_fraction=0.95`` but actual completeness 0.80 →
 escalate).
+
+**Naming history (2026-05-11)**: originally shipped as
+``expected_window_completeness_pct`` at UAC@``174f401`` (slot 6 Phase 1.C);
+operator-renamed to ``_fraction`` at UAC@<this commit> per
+[`plans/active/issues/expected_window_completeness_pct_range_drift_2026_05_11.md`](../../../../unified-trading-pm/plans/active/issues/expected_window_completeness_pct_range_drift_2026_05_11.md)
+option (a) — the `_pct` suffix implied percentage (0-100) but the value
+range is 0-1 fraction (matches UTL ``completeness_fraction`` arg + the
+in-band parquet column). Rename window was free because zero on-disk writes
+had shipped before the rename landed. Frozen 2026-05-11 → 2026-05-23.
 
 UTL writer rejects out-of-range values with the same fail-loud pattern as
 :class:`unified_trading_library.emission_publisher.InvalidCompletenessFractionError`."""
@@ -125,7 +134,7 @@ UTL writer rejects out-of-range values with the same fail-loud pattern as
 V8_NEW_COLUMNS: Final[tuple[str, str, str]] = (
     SERVICE_EMISSION_STATE_COLUMN,
     LAST_EMISSION_DECISION_AT_COLUMN,
-    EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN,
+    EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN,
 )
 """Closed tuple of v8 new column names — what the Phase 7 bundled walk
 backfills onto every v7 row + what the workspace consumer sweep (Phase 4)
@@ -149,7 +158,7 @@ construction (``manifest_migrations/v7_to_v8.py`` per Phase 2.D)."""
 V8_COLUMN_DEFAULTS: Final[dict[str, None]] = {
     SERVICE_EMISSION_STATE_COLUMN: None,
     LAST_EMISSION_DECISION_AT_COLUMN: None,
-    EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN: None,
+    EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN: None,
 }
 """Read-side defaults for v7 rows missing the v8 columns.
 
@@ -170,7 +179,7 @@ row that survives is a phantom-audit finding.
 
 
 __all__ = [
-    "EXPECTED_WINDOW_COMPLETENESS_PCT_COLUMN",
+    "EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN",
     "LAST_EMISSION_DECISION_AT_COLUMN",
     "MANIFEST_SCHEMA_VERSION_V8",
     "READER_FALLBACK_WINDOW_DAYS",

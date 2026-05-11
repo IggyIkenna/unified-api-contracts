@@ -74,7 +74,7 @@ class ServiceEmissionStateEnum(StrEnum):
     (``PARTIAL_OK`` or ``NAN_FILL``).
 
     Row carries ``completeness_fraction`` < 1.0 and
-    ``expected_window_completeness_pct`` columns. Downstream branches its
+    ``expected_window_completeness_fraction`` columns. Downstream branches its
     own NaN-fill / denominator-adjustment / propagate-per-leg policy per the
     per-service consumer-class audit at ``codex/02-data/honest-absence-downstream-handling.md``
     § "Per-service consumer-class audit"."""
