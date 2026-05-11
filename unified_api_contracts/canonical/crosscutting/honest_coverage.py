@@ -198,6 +198,119 @@ writes (``SOURCE_RETURNED_ZERO``). The helper rejects non-prefixed reasons so
 calendar callsites can't accidentally emit ``SOURCE_RETURNED_ZERO``.
 """
 
+
+# ---------------------------------------------------------------------------
+# RecordFailedReason — closed-set taxonomy for ``capture_status="attempted_failed"``.
+# ---------------------------------------------------------------------------
+#
+# Sister enum to :class:`EmptyConfirmedReason`. ``record_failed`` historically
+# accepted a freeform ``error: str`` value (typically the output of
+# ``classify_venue_error()`` or a ``ValueError`` repr); this taxonomy
+# codifies the closed set of operationally-actionable failure categories so
+# downstream consumers can branch on the reason without string-matching.
+#
+# Adding a new member = adding it here AND to
+# ``codex/02-data/honest-absence-downstream-handling.md`` § "Reason taxonomy"
+# AND extending the per-service consumer-class audit table (alerting tier-up
+# routing per category; ML NaN-fill vs skip-strict per category).
+#
+# Migration: ``record_failed(error=...)`` callsites continue accepting bare
+# strings during the transition. The structured-reason kwarg lands incrementally
+# behind ``hard_schema_enforcement_2026_05_08.md`` Phase 2 (per-row failure
+# routing refactor). The closed-set membership check goes live at write
+# boundary in the same phase. Adapters that already emit
+# ``classify_venue_error()`` strings continue to work — those resolve to
+# ``CLASSIFIED_VENUE_ERROR`` here.
+# ---------------------------------------------------------------------------
+
+
+class RecordFailedReason(StrEnum):
+    """Closed-set taxonomy for ``capture_status="attempted_failed"`` rows.
+
+    See :class:`EmptyConfirmedReason` for the sister taxonomy covering
+    ``empty_confirmed`` rows. The two enums are mutually exclusive — a shard
+    is either an honest empty (calendar-pre-skip / source-returned-zero) or
+    an attempted failure (schema violation / upstream bug / classified venue
+    error). ``record_captured`` writes are neither.
+
+    Migration shape: ``record_failed(error: str, ...)`` keeps the freeform
+    string API today; this enum is the canonical taxonomy adapters should
+    pass `.value` into. Phase 2 of `hard_schema_enforcement_2026_05_08.md`
+    refactors the signature to require enum membership at write time.
+
+    Per the `Four-category empty-output decision` rule (CLAUDE.md): all
+    `record_failed` paths route through this enum's members; freeform
+    strings deprecate post-Phase-2 cutover.
+    """
+
+    SCHEMA_VALIDATION_FAILED = "SCHEMA_VALIDATION_FAILED"
+    """Pydantic / TypedDict / dataclass validation rejected the row (hard-
+    required field missing or mistyped). Per
+    ``hard_schema_enforcement_2026_05_08.md`` Phase 2, instruments-service
+    orchestrator + MTDS adapter per-row try/except routes the offending row
+    here with ``error_detail={field, expected_type, observed_value}`` so
+    downstream tooling (alerting / dashboards) can branch on the field name."""
+
+    UPSTREAM_TIMESTAMP_BIAS = "UPSTREAM_TIMESTAMP_BIAS"
+    """Source returned ticks; ALL fall outside the requested day after
+    ``interval_idx`` filter. UPSTREAM BUG — partition mislabeled at MTDS
+    write-time, source replay covered wrong window, OR clock-skew. Matched
+    to the existing ``UpstreamTimestampBiasError`` exception type."""
+
+    MALFORMED_TICK_FIELD = "MALFORMED_TICK_FIELD"
+    """Rows in window but downstream calc dropped all rows due to NaN /
+    malformed source fields. Data-quality bug worth diagnosing. Matched to
+    the existing ``MalformedTickFieldError`` exception type."""
+
+    UPSTREAM_SUBGRAPH_ZERO = "UPSTREAM_SUBGRAPH_ZERO"
+    """DeFi subgraph returned zero rows on a date the instruments-service
+    catalog reports as alive. Per `Honest absence vs fake placeholders`
+    asset-group rule: cefi / defi / tradfi cannot legitimately
+    ``empty_confirmed`` at instrument-day grain when catalog says alive —
+    must flip to ``attempted_failed``. Matched to the
+    ``UpstreamSubgraphZeroError`` exception type (recursive-borrow Phase 1
+    Bug 1 fix)."""
+
+    CLUSTER_COVERAGE_VIOLATION = "CLUSTER_COVERAGE_VIOLATION"
+    """Bundled shard's `record_captured` validation found fewer clusters
+    than declared in `expected_root_clusters`. Examples: ES.OPT 11-cluster
+    options-chain shipping with 8 clusters; prediction
+    canonical_question_group bundle missing market_ids. Matched to the
+    `ClusterCoverageError` exception type."""
+
+    MALFORMED_ROW_KEY = "MALFORMED_ROW_KEY"
+    """`ManifestWriter.record_captured` rejected the row_key shape for
+    failing the per-asset-group shard-atom invariant (e.g. per-instrument
+    shard missing `instrument_id`; bundled shard missing `chain` /
+    `options_chain` / `canonical_question_group`). Phase 4 of
+    `hard_schema_enforcement_2026_05_08.md`."""
+
+    CLASSIFIED_VENUE_ERROR = "CLASSIFIED_VENUE_ERROR"
+    """Catch-all for adapter errors classified via UAC `classify_venue_error()`
+    (rate-limit / 5xx / connection-refused / timeout / circuit-tripped).
+    Distinct from the structured taxonomy values above — those are
+    workspace-side bugs; CLASSIFIED_VENUE_ERROR is venue-side transient or
+    operational error that should typically retry. Existing
+    ``record_failed(error=classify_venue_error(exc))`` callsites resolve here
+    during the migration period."""
+
+    UNCLASSIFIED_ADAPTER_ERROR = "UNCLASSIFIED_ADAPTER_ERROR"
+    """Catch-all for adapter exceptions that did NOT pass through
+    `classify_venue_error()` before reaching `record_failed`. Used as a
+    transition-period bucket; Phase 2 of hard_schema_enforcement forces
+    every callsite to either route via classify_venue_error OR pick a
+    structured taxonomy member from this enum. Reviewer flag: any
+    `record_failed` callsite producing this reason in production is a bug
+    in the calling adapter."""
+
+
+RECORD_FAILED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in RecordFailedReason)
+"""String-membership view of :class:`RecordFailedReason` for fast O(1)
+validation. ``ManifestWriter.record_failed`` Phase 2 refactor validates the
+structured-reason kwarg against this set; freeform strings stay accepted
+during the migration period (the legacy ``error: str`` arg).
+"""
+
 # ---------------------------------------------------------------------------
 # Bundled data_types — referenced by the ManifestWriter cluster-validation guard.
 # ---------------------------------------------------------------------------
