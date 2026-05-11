@@ -278,6 +278,70 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("BSC", "RADIANT"): "2022-09-21",  # Radiant V2 BSC expansion
     ("SOLANA", "JUPITER"): "2021-10-13",  # Jupiter aggregator launch
     ("SOLANA", "JITORESTAKING"): "2024-08-01",  # Jito Restaking mainnet
+    # ── PROTOCOL_LAUNCH_DATES catalogue Phase 1B research (slot 5 2026-05-12
+    #    5-sub-agent fan-out — Ethereum lending/vault + LST/restaking + Balancer
+    #    rollouts + DEX/AMM rollouts + Beefy/Yearn/Idle multi-chain). 45 new
+    #    pairs sourced from official protocol blogs, Etherscan/Snowtrace/Polygonscan
+    #    contract-creation timestamps, DefiLlama protocol-launch metadata, +
+    #    CoinDesk / TheDefiant coverage. Confidence tier flagged per pair:
+    #    high = primary-source verified day-of; medium = announcement-anchored;
+    #    low = relative-age estimate. Conservative principle applied (date is
+    #    ≤ first verifiable on-chain event). SolBlaze on Solana kept in pending
+    #    (medium-low confidence; pool-creation-tx audit deferred).
+    # ── Ethereum lending/vault + restaking (Sub-agent A) ──
+    ("ETHEREUM", "MORPHO"): "2023-12-28",  # Morpho Blue contract 0xBBBB...EEFFCb deployed via Etherscan internal-tx block 18883124; high
+    ("ETHEREUM", "FLUID"): "2024-02-15",  # Fluid Liquidity proxy 0x52aa899454998be5b000ad077a46bbe360f4e497 ~2024-02-17 per Etherscan relative-age; conservative -2d; medium
+    ("ETHEREUM", "MORPHOVAULTS"): "2024-01-04",  # MetaMorpho factory 0xA9c3D3a366466Fa809d1Ae982Fb2c46E5fC41101 ~2024-01-04 per Etherscan; first Steakhouse USDC vault Jan 2024; medium
+    ("ETHEREUM", "YEARNV3"): "2024-03-20",  # Yearn V3 mainnet launch per Yearn / Binance Square + Token Terminal; high
+    ("ETHEREUM", "ANKR"): "2020-12-01",  # ankrETH ERC20 0xe95a203b1a91a908f9b9ce46459d101078c2c3cb verified 2020-10-09; Ankr docs Dec 2020 first-LST month; conservative; medium
+    ("ETHEREUM", "STADER"): "2023-07-10",  # Stader ETHx mainnet public launch per Stader blog (launch incentives Jul 10 - Aug 9); high
+    ("ETHEREUM", "STAKEWISE"): "2023-11-28",  # StakeWise V3 + osETH ERC20 launch per StakeWise Medium (osETH = V3-era token; V2 deprecated 2025-06-01); high
+    ("ETHEREUM", "EIGENLAYER"): "2023-06-14",  # EigenLayer Stage 1 mainnet (LST deposits, $17M cap) per EigenLayer blog + TheBlock/Coinacademy coverage; high
+    # ── LST + restaking + PancakeSwap ETH (Sub-agent B) ──
+    ("ETHEREUM", "SWELL"): "2023-04-25",  # swETH mainnet "Seawolf unleashed" per Swell post; high
+    ("ETHEREUM", "PUFFER"): "2024-05-09",  # Puffer mainnet "pufETH deposits live" per Puffer Medium; high
+    ("ETHEREUM", "MANTLE"): "2023-12-04",  # Mantle mETH LSP Permissionless Mode launch per CoinDesk + Mantle Docs; high
+    ("ETHEREUM", "ALCHEMY"): "2021-02-27",  # Alchemix alUSD mainnet + ALCX token launch (alETH followed Jun 2021); high
+    ("ETHEREUM", "PANCAKESWAPV3"): "2023-04-01",  # PancakeSwap V3 Factory 0x0BFb...91865 deployed 2023-04-01 00:20 UTC per Etherscan; public announce 2023-04-03; high
+    # ── Solana lending/LST (Sub-agent B) ── SolBlaze deferred (low confidence)
+    ("SOLANA", "MARGINFI"): "2023-02-23",  # mrgnlend lending protocol launch on Solana mainnet (Squads + multiple sources); high
+    ("SOLANA", "SOLEND"): "2021-08-13",  # Solend mainnet launch announcement (Smart Liquidity 2021-08-13); high
+    # ── Balancer multi-chain rollout (Sub-agent C) ──
+    ("ARBITRUM", "BALANCER"): "2021-08-31",  # Arbitrum One mainnet day; Balancer joined per Fernando Martinelli Medium + Coindesk; high
+    ("BASE", "BALANCER"): "2023-08-09",  # Balancer Base announced Aug 1 2023 per Avalanche blog (bundled w/ Avalanche launch); CLAMPED to BASE chain genesis 2023-08-09 (no on-chain events possible pre-genesis); medium
+    ("OPTIMISM", "BALANCER"): "2022-06-01",  # Balancer Optimism launch June 2 2022 per Balancer Labs Medium "Balancer is Now on Optimism!"; conservative -1d; high
+    ("POLYGON", "BALANCER"): "2021-07-01",  # Balancer Polygon launch per Polygon Technology blog (incentives began June 28); high
+    ("AVALANCHE", "BALANCER"): "2023-08-01",  # Balancer Avalanche deploy per Avax.network blog "Balancer Deploys on Avalanche"; high
+    # ── PancakeSwap V3 multi-chain rollout (Sub-agent C) ──
+    ("ARBITRUM", "PANCAKESWAPV3"): "2023-08-09",  # PancakeSwap V3 Arbitrum deploy Aug 10 per Coindesk + BSC News + DL News; conservative -1d; high
+    ("BASE", "PANCAKESWAPV3"): "2023-08-30",  # PancakeSwap V3 Base launch Aug 31 per PancakeSwap blog + Galxe "Traverse"; conservative -1d; medium
+    ("BSC", "PANCAKESWAPV3"): "2023-04-03",  # PancakeSwap V3 BNB Chain Apr 3 per CoinCarp + BSC News "Chef's Special" + Crypto Times; high
+    # ── SushiSwap multi-chain (Sub-agent C + D) ──
+    ("ARBITRUM", "SUSHISWAP"): "2021-08-31",  # Arbitrum One full public mainnet (Sushi among earliest); high
+    ("AVALANCHE", "SUSHISWAPV3"): "2023-05-04",  # SushiSwap V3 13-chain rollout per CoinDesk 2023-05-04; high
+    ("BASE", "SUSHISWAPV3"): "2023-08-09",  # SushiSwap on Base announced Aug 4 2023; CLAMPED to BASE chain genesis 2023-08-09 (sub-agent D flagged); medium
+    # ── DEX/AMM multi-chain rollouts (Sub-agent D) ──
+    ("ARBITRUM", "CAMELOTV3"): "2023-04-08",  # Camelot V2 (Algebra concentrated-liq) stage-1 launch; V3 codebase same Algebra fork per CoinDesk + Camelot docs; medium
+    ("OPTIMISM", "VELODROMEV2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
+    ("OPTIMISM", "CURVE"): "2022-01-18",  # Curve Optimism deployment announcement tweet (TheDefiant, TheBlock); high
+    ("AVALANCHE", "CURVE"): "2021-08-18",  # Curve Avalanche deployment via Avalanche Rush program (TheDefiant + Avalanche Medium); high
+    ("AVALANCHE", "TRADER_JOEV2"): "2022-11-17",  # Trader Joe Liquidity Book V2 live per TokenInsight + TheDefiant; high
+    ("BASE", "AERODROMEV3"): "2024-04-22",  # Aerodrome Slipstream (concentrated-liq V3) launch per Aerodrome official X + CCN; high
+    ("BASE", "MORPHO"): "2024-06-18",  # Morpho Blue on Base — first L2 deployment per Paul Frambot X + Morpho blog + CryptoTimes; high
+    # ── Beefy multi-chain (Sub-agent E) ──
+    ("ETHEREUM", "BEEFY"): "2021-12-01",  # Beefy multichain expansion era; Convex ETH vaults active late-2021 (Coinbase: BEEFY ERC20 created 2021-06-22); BIP-71 ETH migration Sept 2023; low (conservative)
+    ("ARBITRUM", "BEEFY"): "2021-09-20",  # Beefy Learn Medium "Beefy Finance deploys on Arbitrum"; high
+    ("BASE", "BEEFY"): "2023-08-15",  # Coinbase Base mainnet GA 2023-08-09; Beefy x Lido Base article 2023-11-08 + DefiLlama TVL ~2023-08; medium (conservative pre-Lido article)
+    ("POLYGON", "BEEFY"): "2021-05-20",  # Beefy Polygon partnership Medium 2021-05-26 + Iron Finance vaults live 2021-06-03; conservative pre-partnership; high
+    ("BSC", "BEEFY"): "2020-10-08",  # Official Beefy founding launch on BSC; first BNB Chain yield optimizer; high
+    ("AVALANCHE", "BEEFY"): "2021-03-15",  # TokenPost "Yield optimizer Beefy Finance now is launched on Avalanche" 2021-03-16; high
+    # ── Yearn V3 + Idle + Karak + Renzo on L2s (Sub-agent E) ──
+    ("ARBITRUM", "YEARNV3"): "2023-11-15",  # Yearn V3 v3.0.0 cross-chain deploy per Yearn docs; Polygon first focus Nov 2023; ETH mainnet GA Mar 2024; low (conservative pre-GA)
+    ("OPTIMISM", "YEARNV3"): "2023-11-15",  # Yearn V3 v3.0.0 deployed cross-chain incl. Optimism per Yearn docs Nov 2023; low
+    ("ARBITRUM", "IDLE"): "2024-12-01",  # Idle Medium "Credit Vaults are coming to Arbitrum" 2024-12-04; conservative pre-announce; medium
+    ("POLYGON", "IDLE"): "2021-11-11",  # Idle Medium "Idle is officially live on Polygon!" (Smart Liquidity repost 2021-11-11); high
+    ("ARBITRUM", "KARAK"): "2024-04-08",  # Karak private mainnet 2024-04-08; public 2024-04-09; Arbitrum included multi-chain day-1 per DLNews; high
+    ("ARBITRUM", "RENZO"): "2024-02-29",  # Renzo + Connext native restaking on Arbitrum launch per official X (tweet 1763237166459527250) + Metaverse Post; high
 }
 
 # (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch
@@ -289,63 +353,23 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
 # to tighten the clip.
 _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
     {
-        ("ETHEREUM", "MORPHO"),
-        ("ETHEREUM", "FLUID"),
         # SPARK / ETHEREUM moved to ``PROTOCOL_LAUNCH_DATES`` 2026-05-08
         # (Tab 14 audit verified 2023-03-07 earliest subgraph event).
-        ("ETHEREUM", "MORPHOVAULTS"),
-        ("ETHEREUM", "YEARNV3"),
-        ("ETHEREUM", "ANKR"),
-        ("ETHEREUM", "STADER"),
-        ("ETHEREUM", "STAKEWISE"),
-        ("ETHEREUM", "SWELL"),
-        ("ETHEREUM", "PUFFER"),
-        ("ETHEREUM", "MANTLE"),
-        ("ETHEREUM", "ALCHEMY"),
-        ("ETHEREUM", "EIGENLAYER"),
-        ("ETHEREUM", "PANCAKESWAPV3"),
-        ("ARBITRUM", "BALANCER"),
-        ("ARBITRUM", "SUSHISWAP"),
-        ("ARBITRUM", "PANCAKESWAPV3"),
-        ("ARBITRUM", "CAMELOTV3"),
-        ("BASE", "BALANCER"),
-        ("BASE", "MORPHO"),
-        ("BASE", "SUSHISWAPV3"),
-        ("BASE", "PANCAKESWAPV3"),
-        ("BASE", "AERODROMEV3"),
-        ("OPTIMISM", "BALANCER"),
-        ("OPTIMISM", "CURVE"),
-        ("OPTIMISM", "VELODROMEV2"),
-        ("POLYGON", "BALANCER"),
-        ("AVALANCHE", "BALANCER"),
-        ("AVALANCHE", "CURVE"),
-        ("AVALANCHE", "SUSHISWAPV3"),
-        ("AVALANCHE", "TRADER_JOEV2"),
-        ("BSC", "PANCAKESWAPV3"),
+        # ── Catalogue Phase 1B research (slot 5 2026-05-12 5-sub-agent fan-out)
+        # moved 45 pairs to ``PROTOCOL_LAUNCH_DATES``. The remaining pending
+        # entries are below + (SOLANA, SOLBLAZE) flagged for follow-up.
         # POLYGON / COMPOUNDV3 — UAC ``ALL_DEFI_VENUES`` declares it but
         # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (Compound V3
         # is not active on Polygon — subgraph returned 0 markets). Removed
         # from ``PROTOCOL_LAUNCH_DATES`` 2026-05-08 (Tab 14 audit) to stop
         # inflating the data-status denominator with always-empty days.
         ("POLYGON", "COMPOUNDV3"),
-        ("SOLANA", "MARGINFI"),
-        ("SOLANA", "SOLEND"),
-        # Catalogue Phase 1A new pairs (slot 5 2026-05-11) with launch
-        # dates not yet confidently researched — fall back to chain genesis
-        # in the meantime; catalogue Phase 3 owner refines via Tab 14-style
-        # subgraph probe and moves to ``PROTOCOL_LAUNCH_DATES``.
-        ("ETHEREUM", "BEEFY"),
-        ("ARBITRUM", "BEEFY"),
-        ("BASE", "BEEFY"),
-        ("POLYGON", "BEEFY"),
-        ("BSC", "BEEFY"),
-        ("AVALANCHE", "BEEFY"),
-        ("ARBITRUM", "YEARNV3"),
-        ("OPTIMISM", "YEARNV3"),
-        ("ARBITRUM", "IDLE"),
-        ("POLYGON", "IDLE"),
-        ("ARBITRUM", "KARAK"),
-        ("ARBITRUM", "RENZO"),
+        # (SOLANA, SOLBLAZE) — slot 5 2026-05-12 Sub-agent B research returned
+        # only medium-low confidence (date 2022-10-15 anchored to Solanacompass
+        # stake-pool Epoch 345 + Nov 2022 X promo; no primary-source pool-
+        # creation-tx audit done). Operator follow-up via Solscan stake-pool
+        # creation tx for pool address `stk9ApL5HeVAwPLr3TLhDXdZS8ptVu7zp6ov8HFDuMi`
+        # before tightening the floor.
         ("SOLANA", "SOLBLAZE"),
     }
 )
