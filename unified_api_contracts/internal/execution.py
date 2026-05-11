@@ -232,6 +232,33 @@ class WalletSpendingPreCheckResult(BaseModel):
     denial_reason: str = ""
 
 
+class ManualInstructionPrecheckResponse(BaseModel):
+    """Dry-run validation response for `POST /manual/instruction/precheck`.
+
+    Returned to the DART UI BEFORE the operator clicks Submit, so the wallet-tier
+    + capital-allocation + venue-eligibility decisions are surfaced visually
+    without spending quote-asset capital. Identical inputs to `/manual/instruction`
+    but `execution_mode=ManualExecutionMode.RECORD_ONLY` semantics — no order is
+    routed, no fill is recorded.
+
+    `routing_target` echoes the venue the EXECUTE flow would dispatch to (for
+    DeFi this includes the chain+protocol resolution from `venue` → connector);
+    operator-visible field that lets the operator double-check the dispatch path
+    before committing.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    instruction_id: str
+    checked_at: datetime
+    accepted: bool
+    rejection_reason: str = ""
+    wallet_spending_check: WalletSpendingPreCheckResult | None = None
+    capital_allocation_remaining_usd: Decimal | None = None
+    routing_target: str = ""
+    estimated_amount_usd: Decimal | None = None
+
+
 class ManualInstructionAuditLog(BaseModel):
     """Persistence shape for every operator-initiated action (manual trade + ML control).
 
@@ -283,6 +310,7 @@ __all__ = [
     "ManualExecutionMode",
     "ManualInstruction",
     "ManualInstructionAuditLog",
+    "ManualInstructionPrecheckResponse",
     "ManualMLTrainingAction",
     "MLTrainingControlRequest",
     "MLTrainingControlResponse",

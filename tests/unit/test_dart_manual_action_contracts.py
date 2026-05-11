@@ -18,6 +18,7 @@ from unified_api_contracts.internal.execution import (
     ManualExecutionMode,
     ManualInstruction,
     ManualInstructionAuditLog,
+    ManualInstructionPrecheckResponse,
     ManualMLTrainingAction,
     MLTrainingControlRequest,
     MLTrainingControlResponse,
@@ -292,6 +293,50 @@ def test_audit_log_non_defi_trade_omits_wallet_spending_check() -> None:
     )
     assert audit_row.wallet_id == ""
     assert audit_row.wallet_spending_check is None
+
+
+def test_manual_instruction_precheck_response_accepted() -> None:
+    """Precheck response on an accepted dry-run echoes wallet check + routing target."""
+    spending_check = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-1",
+        checked_at=_now(),
+        passed=True,
+        kill_switch_armed=False,
+        amount_usd=Decimal("50000"),
+        per_tx_check=True,
+        per_hour_check=True,
+        per_day_check=True,
+        per_protocol_check=True,
+    )
+    response = ManualInstructionPrecheckResponse(
+        instruction_id="inst-defi-100",
+        checked_at=_now(),
+        accepted=True,
+        wallet_spending_check=spending_check,
+        capital_allocation_remaining_usd=Decimal("250000"),
+        routing_target="ethereum:aave_v3",
+        estimated_amount_usd=Decimal("50000"),
+    )
+    assert response.accepted is True
+    assert response.rejection_reason == ""
+    assert response.wallet_spending_check is not None
+    assert response.routing_target == "ethereum:aave_v3"
+
+
+def test_manual_instruction_precheck_response_rejected_capital_allocation() -> None:
+    """Precheck rejected on capital allocation exhaustion populates rejection_reason."""
+    response = ManualInstructionPrecheckResponse(
+        instruction_id="inst-cefi-3",
+        checked_at=_now(),
+        accepted=False,
+        rejection_reason="capital_allocation_exhausted",
+        capital_allocation_remaining_usd=Decimal("0"),
+        routing_target="binance",
+        estimated_amount_usd=Decimal("100000"),
+    )
+    assert response.accepted is False
+    assert response.rejection_reason == "capital_allocation_exhausted"
+    assert response.capital_allocation_remaining_usd == Decimal("0")
 
 
 def test_audit_log_request_response_correlation() -> None:
