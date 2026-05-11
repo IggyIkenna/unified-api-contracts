@@ -25,7 +25,7 @@ from .thresholds import ALERT_THRESHOLDS
 
 
 class UnknownAlertCodeError(ValueError):
-    """Raised when an :class:`AlertRule` pattern matches no :class:`AlertCode`."""
+    """Raised when an :class:`AlertRule.event_pattern` matches no :class:`AlertCode`."""
 
 
 class UnknownThresholdKeyError(ValueError):
@@ -33,12 +33,12 @@ class UnknownThresholdKeyError(ValueError):
 
 
 class AlertRule(BaseModel):
-    """A single routing rule — pattern → severity + channels (+ optional kill-switch).
+    """A single routing rule — event_pattern → severity + channels (+ optional kill-switch).
 
-    The ``pattern`` is fnmatch-style (e.g. ``"KILL_SWITCH_*"``) and is matched
+    The ``event_pattern`` is fnmatch-style (e.g. ``"KILL_SWITCH_*"``) and is matched
     against incoming event names. At least one :class:`AlertCode` member must
     match the pattern, otherwise the rule is dead and a stale risk —
-    :meth:`_validate_pattern_matches_codes` catches this at construction.
+    :meth:`_validate_event_pattern_matches_codes` catches this at construction.
 
     ``triggers_kill_switch`` is the kill-switch axis orthogonal to severity:
     a rule with ``triggers_kill_switch=True`` causes
@@ -53,7 +53,7 @@ class AlertRule(BaseModel):
     """Canonical AlertCode this rule represents. Anchors operator playbook
     deep-link, threshold lookup, and rehearsal scope."""
 
-    pattern: str
+    event_pattern: str
     """fnmatch pattern matched against incoming event names. Must match
     `code.value` (exact-match rules) OR a wildcard family containing `code`."""
 
@@ -89,11 +89,11 @@ class AlertRule(BaseModel):
     """One-line operator-facing description; rendered alongside the badge
     in DART. Keep concise."""
 
-    @field_validator("pattern")
+    @field_validator("event_pattern")
     @classmethod
-    def _pattern_non_empty(cls, value: str) -> str:
+    def _event_pattern_non_empty(cls, value: str) -> str:
         if not value:
-            raise ValueError("AlertRule.pattern must be a non-empty fnmatch pattern")
+            raise ValueError("AlertRule.event_pattern must be a non-empty fnmatch pattern")
         return value
 
     @field_validator("channels")
@@ -116,14 +116,14 @@ class AlertRule(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def _validate_pattern_matches_codes(self) -> AlertRule:
-        if self.pattern == "*":
+    def _validate_event_pattern_matches_codes(self) -> AlertRule:
+        if self.event_pattern == "*":
             # Catch-all is allowed and intentional — matches every code.
             return self
-        matched = [c for c in ALERT_CODES if fnmatch.fnmatchcase(c, self.pattern)]
+        matched = [c for c in ALERT_CODES if fnmatch.fnmatchcase(c, self.event_pattern)]
         if not matched:
             raise UnknownAlertCodeError(
-                f"AlertRule.pattern={self.pattern!r} matches no AlertCode member (closed set: {sorted(ALERT_CODES)})"
+                f"AlertRule.event_pattern={self.event_pattern!r} matches no AlertCode member (closed set: {sorted(ALERT_CODES)})"
             )
         return self
 
@@ -163,7 +163,7 @@ class AlertRule(BaseModel):
         byte-equivalent output, single SSOT.
         """
         return {
-            "event_pattern": self.pattern,
+            "event_pattern": self.event_pattern,
             "channels": [ch.value for ch in self.channels if ch is not AlertChannel.LOG_ONLY],
             "severity_filter": self.severity.to_legacy_filter(),
         }
@@ -193,7 +193,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # carry three different scopes. Routing equivalence is preserved.
     AlertRule(
         code=AlertCode.KILL_SWITCH_DEFI_LIQUIDATION_RISK,
-        pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
+        event_pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("kill_switch_defi_liquidation_risk"),
@@ -208,7 +208,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.KILL_SWITCH_PORTFOLIO_DRAWDOWN,
-        pattern="KILL_SWITCH_PORTFOLIO_DRAWDOWN",
+        event_pattern="KILL_SWITCH_PORTFOLIO_DRAWDOWN",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("kill_switch_portfolio_drawdown"),
@@ -222,7 +222,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.KILL_SWITCH_VENUE_DISCONNECT,
-        pattern="KILL_SWITCH_VENUE_DISCONNECT",
+        event_pattern="KILL_SWITCH_VENUE_DISCONNECT",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("kill_switch_venue_disconnect"),
@@ -237,7 +237,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T1 CRITICAL — circuit + multi-leg ───────────────────────────────────
     AlertRule(
         code=AlertCode.CIRCUIT_BREAKER_OPEN,
-        pattern="CIRCUIT_BREAKER_OPEN",
+        event_pattern="CIRCUIT_BREAKER_OPEN",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("circuit_breaker_open"),
@@ -245,7 +245,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.UNHEDGED_POSITION_ALERT,
-        pattern="UNHEDGED_POSITION_ALERT",
+        event_pattern="UNHEDGED_POSITION_ALERT",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("unhedged_position_alert"),
@@ -253,7 +253,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.MULTI_LEG_COMPENSATION_FAILED,
-        pattern="MULTI_LEG_COMPENSATION_FAILED",
+        event_pattern="MULTI_LEG_COMPENSATION_FAILED",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("multi_leg_compensation_failed"),
@@ -261,7 +261,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DUAL_FAILURE_DETECTED,
-        pattern="DUAL_FAILURE_DETECTED",
+        event_pattern="DUAL_FAILURE_DETECTED",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("dual_failure_detected"),
@@ -269,7 +269,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.ORDER_RECOVERY_FAILED,
-        pattern="ORDER_RECOVERY_FAILED",
+        event_pattern="ORDER_RECOVERY_FAILED",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("order_recovery_failed"),
@@ -277,7 +277,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.SERVICE_ERROR_CRITICAL,
-        pattern="SERVICE_ERROR_CRITICAL",
+        event_pattern="SERVICE_ERROR_CRITICAL",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("service_error_critical"),
@@ -286,7 +286,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T1 CRITICAL — DeFi P0 ──────────────────────────────────────────────
     AlertRule(
         code=AlertCode.DEFI_HEALTH_FACTOR_CRITICAL,
-        pattern="DEFI_HEALTH_FACTOR_CRITICAL",
+        event_pattern="DEFI_HEALTH_FACTOR_CRITICAL",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("defi_health_factor_critical"),
@@ -295,7 +295,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_WEETH_DEPEG,
-        pattern="DEFI_WEETH_DEPEG",
+        event_pattern="DEFI_WEETH_DEPEG",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("defi_weeth_depeg"),
@@ -304,7 +304,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_POSITION_LIQUIDATED,
-        pattern="DEFI_POSITION_LIQUIDATED",
+        event_pattern="DEFI_POSITION_LIQUIDATED",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("defi_position_liquidated"),
@@ -312,7 +312,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_RATE_DEVIATION,
-        pattern="DEFI_RATE_DEVIATION",
+        event_pattern="DEFI_RATE_DEVIATION",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("defi_rate_deviation"),
@@ -321,7 +321,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T1 CRITICAL — margin ────────────────────────────────────────────────
     AlertRule(
         code=AlertCode.MARGIN_LIQUIDATION,
-        pattern="MARGIN_LIQUIDATION",
+        event_pattern="MARGIN_LIQUIDATION",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("margin_liquidation"),
@@ -329,7 +329,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.MARGIN_CRITICAL,
-        pattern="MARGIN_CRITICAL",
+        event_pattern="MARGIN_CRITICAL",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("margin_critical"),
@@ -338,7 +338,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T2 HIGH — Telegram + PagerDuty P2 ───────────────────────────────────
     AlertRule(
         code=AlertCode.CIRCUIT_BREAKER_BACKOFF_ESCALATING,
-        pattern="CIRCUIT_BREAKER_BACKOFF_*",
+        event_pattern="CIRCUIT_BREAKER_BACKOFF_*",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("circuit_breaker_backoff"),
@@ -346,7 +346,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.ORDER_ORPHANED,
-        pattern="ORDER_ORPHANED",
+        event_pattern="ORDER_ORPHANED",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("order_orphaned"),
@@ -354,7 +354,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.POSITION_DRIFT_DETECTED,
-        pattern="POSITION_DRIFT_DETECTED",
+        event_pattern="POSITION_DRIFT_DETECTED",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("position_drift"),
@@ -365,7 +365,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         # Pattern preserves legacy `RECON_DEGRADED_*` byte-equivalence; the
         # bare atomic `RECON_DEGRADED` code anchors the rule + runbook.
         code=AlertCode.RECON_DEGRADED,
-        pattern="RECON_DEGRADED_*",
+        event_pattern="RECON_DEGRADED_*",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("recon_degraded"),
@@ -373,7 +373,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.POSITION_CRITICAL_DISCREPANCY,
-        pattern="POSITION_CRITICAL_DISCREPANCY",
+        event_pattern="POSITION_CRITICAL_DISCREPANCY",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("position_critical_discrepancy"),
@@ -381,7 +381,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.MARGIN_WARNING,
-        pattern="MARGIN_WARNING",
+        event_pattern="MARGIN_WARNING",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("margin_warning"),
@@ -389,7 +389,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.MARGIN_THRESHOLD_BREACH,
-        pattern="MARGIN_THRESHOLD_BREACH",
+        event_pattern="MARGIN_THRESHOLD_BREACH",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("margin_threshold_breach"),
@@ -398,7 +398,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.CROSS_CLOUD_EGRESS_DETECTED,
-        pattern="CROSS_CLOUD_EGRESS_DETECTED",
+        event_pattern="CROSS_CLOUD_EGRESS_DETECTED",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("cross_cloud_egress_detected"),
@@ -413,7 +413,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # an unapproved artefact is a regulatory + risk problem.
     AlertRule(
         code=AlertCode.ML_MODEL_VERSION_MISMATCH,
-        pattern="ML_MODEL_VERSION_MISMATCH",
+        event_pattern="ML_MODEL_VERSION_MISMATCH",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("ml_model_version_mismatch"),
@@ -429,7 +429,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ``details['archetype']`` for scope key.
     AlertRule(
         code=AlertCode.KILL_SWITCH_ML_MODEL_FAILURE,
-        pattern="KILL_SWITCH_ML_MODEL_FAILURE",
+        event_pattern="KILL_SWITCH_ML_MODEL_FAILURE",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("kill_switch_ml_model_failure"),
@@ -443,7 +443,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # HIGH — model-output drift vs training baseline (PSI ≥ threshold).
     AlertRule(
         code=AlertCode.ML_MODEL_DRIFT_DETECTED,
-        pattern="ML_MODEL_DRIFT_DETECTED",
+        event_pattern="ML_MODEL_DRIFT_DETECTED",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("ml_model_drift_detected"),
@@ -456,7 +456,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # HIGH — strategy P&L deviation from expected baseline.
     AlertRule(
         code=AlertCode.ML_PNL_DEVIATION,
-        pattern="ML_PNL_DEVIATION",
+        event_pattern="ML_PNL_DEVIATION",
         severity=AlertSeverity.HIGH,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         runbook_doc=_runbook("ml_pnl_deviation"),
@@ -469,7 +469,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T3 WARN — Telegram only ─────────────────────────────────────────────
     AlertRule(
         code=AlertCode.CIRCUIT_BREAKER_DEGRADED,
-        pattern="CIRCUIT_BREAKER_DEGRADED",
+        event_pattern="CIRCUIT_BREAKER_DEGRADED",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("circuit_breaker_degraded"),
@@ -477,7 +477,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.CIRCUIT_BREAKER_CLOSED,
-        pattern="CIRCUIT_BREAKER_CLOSED",
+        event_pattern="CIRCUIT_BREAKER_CLOSED",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("circuit_breaker_closed"),
@@ -485,7 +485,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.SERVICE_ERROR,
-        pattern="SERVICE_ERROR",
+        event_pattern="SERVICE_ERROR",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("service_error"),
@@ -493,7 +493,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.PREFLIGHT_FAILED,
-        pattern="PREFLIGHT_FAILED",
+        event_pattern="PREFLIGHT_FAILED",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("preflight_failed"),
@@ -501,7 +501,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,
-        pattern="SERVICE_DEGRADED",
+        event_pattern="SERVICE_DEGRADED",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("service_degraded"),
@@ -509,7 +509,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.POSITION_CORRECTION_DISPATCHED,
-        pattern="POSITION_CORRECTION_*",
+        event_pattern="POSITION_CORRECTION_*",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("position_correction"),
@@ -517,7 +517,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.PORTFOLIO_REBALANCE_TRIGGERED,
-        pattern="PORTFOLIO_REBALANCE_*",
+        event_pattern="PORTFOLIO_REBALANCE_*",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("portfolio_rebalance"),
@@ -525,7 +525,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.ORDER_RECOVERY_INITIATED,
-        pattern="ORDER_RECOVERY_*",
+        event_pattern="ORDER_RECOVERY_*",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("order_recovery"),
@@ -533,7 +533,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_AAVE_UTILIZATION_SPIKE,
-        pattern="DEFI_AAVE_UTILIZATION_SPIKE",
+        event_pattern="DEFI_AAVE_UTILIZATION_SPIKE",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("defi_aave_utilization_spike"),
@@ -545,7 +545,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_FUNDING_RATE_FLIP,
-        pattern="DEFI_FUNDING_RATE_FLIP",
+        event_pattern="DEFI_FUNDING_RATE_FLIP",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("defi_funding_rate_flip"),
@@ -554,7 +554,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_FEATURE_STALE,
-        pattern="DEFI_FEATURE_STALE",
+        event_pattern="DEFI_FEATURE_STALE",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("defi_feature_stale"),
@@ -563,7 +563,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.DEFI_TX_SIMULATION_FAILED,
-        pattern="DEFI_TX_SIMULATION_FAILED",
+        event_pattern="DEFI_TX_SIMULATION_FAILED",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("defi_tx_simulation_failed"),
@@ -571,7 +571,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.BALANCE_DRIFT,
-        pattern="BALANCE_DRIFT",
+        event_pattern="BALANCE_DRIFT",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("balance_drift"),
@@ -580,7 +580,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.ORDER_REJECTION_SPIKE,
-        pattern="ORDER_REJECTION_SPIKE",
+        event_pattern="ORDER_REJECTION_SPIKE",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("order_rejection_spike"),
@@ -589,7 +589,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.POSITION_DRIFT,
-        pattern="POSITION_DRIFT",
+        event_pattern="POSITION_DRIFT",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("position_drift"),
@@ -599,7 +599,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── ML lifecycle WARN tier (2026-05-08) ─────────────────────────────────
     AlertRule(
         code=AlertCode.ML_SIGNAL_STALENESS,
-        pattern="ML_SIGNAL_STALENESS",
+        event_pattern="ML_SIGNAL_STALENESS",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.TELEGRAM, AlertChannel.SLACK),
         runbook_doc=_runbook("ml_signal_staleness"),
@@ -611,7 +611,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     ),
     AlertRule(
         code=AlertCode.ML_INFERENCE_LATENCY_BREACH,
-        pattern="ML_INFERENCE_LATENCY_BREACH",
+        event_pattern="ML_INFERENCE_LATENCY_BREACH",
         severity=AlertSeverity.WARN,
         channels=(AlertChannel.SLACK,),
         runbook_doc=_runbook("ml_inference_latency_breach"),
@@ -624,7 +624,7 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.
-        pattern="*",
+        event_pattern="*",
         severity=AlertSeverity.INFO,
         channels=(AlertChannel.TELEGRAM,),
         runbook_doc=_runbook("service_degraded"),

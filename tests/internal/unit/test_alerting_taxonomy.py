@@ -3,9 +3,9 @@
 Phase 1 of `alerting_service_live_rules_2026_05_07`. Enforces:
 
 1. Every `AlertRule.threshold_key` is in `ALERT_THRESHOLDS`.
-2. Every `AlertRule.pattern` matches at least one `AlertCode` member.
+2. Every `AlertRule.event_pattern` matches at least one `AlertCode` member.
 3. The catch-all `*` rule is last (otherwise specific rules never match).
-4. No duplicate (`pattern`, `severity`) tuples — drift between Phase 1 and
+4. No duplicate (`event_pattern`, `severity`) tuples — drift between Phase 1 and
    the legacy `_default_routing_rules` factory.
 5. KILL_SWITCH_* rules carry `triggers_kill_switch=True`.
 6. `to_routing_dict()` produces the legacy shape consumed by
@@ -127,7 +127,7 @@ def test_alert_rule_rejects_unknown_threshold_key() -> None:
     with pytest.raises(ValidationError, match="ALERT_THRESHOLDS"):
         _ = AlertRule(
             code=AlertCode.SERVICE_DEGRADED,
-            pattern="SERVICE_DEGRADED",
+            event_pattern="SERVICE_DEGRADED",
             severity=AlertSeverity.WARN,
             channels=(AlertChannel.TELEGRAM,),
             threshold_key="nonexistent_threshold_key",
@@ -138,7 +138,7 @@ def test_alert_rule_rejects_pattern_matching_no_code() -> None:
     with pytest.raises(ValidationError, match="matches no AlertCode"):
         _ = AlertRule(
             code=AlertCode.SERVICE_DEGRADED,
-            pattern="UNKNOWN_PATTERN_THAT_MATCHES_NO_CODE_*",
+            event_pattern="UNKNOWN_PATTERN_THAT_MATCHES_NO_CODE_*",
             severity=AlertSeverity.WARN,
             channels=(AlertChannel.TELEGRAM,),
         )
@@ -148,7 +148,7 @@ def test_alert_rule_rejects_kill_switch_flag_on_non_kill_switch_code() -> None:
     with pytest.raises(ValidationError, match="triggers_kill_switch"):
         _ = AlertRule(
             code=AlertCode.SERVICE_DEGRADED,
-            pattern="SERVICE_DEGRADED",
+            event_pattern="SERVICE_DEGRADED",
             severity=AlertSeverity.WARN,
             channels=(AlertChannel.TELEGRAM,),
             triggers_kill_switch=True,
@@ -166,10 +166,11 @@ def test_unknown_alert_code_error_is_value_error_subclass() -> None:
 def test_alert_rule_accepts_kill_switch_flag_on_kill_switch_code() -> None:
     rule = AlertRule(
         code=AlertCode.KILL_SWITCH_VENUE_DISCONNECT,
-        pattern="KILL_SWITCH_VENUE_DISCONNECT",
+        event_pattern="KILL_SWITCH_VENUE_DISCONNECT",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
         triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.VENUE,
     )
     assert rule.triggers_kill_switch is True
 
@@ -178,7 +179,7 @@ def test_alert_rule_rejects_empty_channels() -> None:
     with pytest.raises(ValidationError, match="channels"):
         _ = AlertRule(
             code=AlertCode.SERVICE_DEGRADED,
-            pattern="SERVICE_DEGRADED",
+            event_pattern="SERVICE_DEGRADED",
             severity=AlertSeverity.WARN,
             channels=(),
         )
@@ -188,7 +189,7 @@ def test_alert_rule_rejects_empty_pattern() -> None:
     with pytest.raises(ValidationError):
         _ = AlertRule(
             code=AlertCode.SERVICE_DEGRADED,
-            pattern="",
+            event_pattern="",
             severity=AlertSeverity.WARN,
             channels=(AlertChannel.TELEGRAM,),
         )
@@ -200,7 +201,7 @@ def test_alert_rule_to_routing_dict_legacy_shape() -> None:
     enforces byte-equivalence with the legacy shape."""
     rule = AlertRule(
         code=AlertCode.DEFI_HEALTH_FACTOR_CRITICAL,
-        pattern="DEFI_HEALTH_FACTOR_CRITICAL",
+        event_pattern="DEFI_HEALTH_FACTOR_CRITICAL",
         severity=AlertSeverity.CRITICAL,
         channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
     )
@@ -215,7 +216,7 @@ def test_alert_rule_to_routing_dict_legacy_shape() -> None:
 def test_alert_rule_to_routing_dict_omits_log_only_channel() -> None:
     rule = AlertRule(
         code=AlertCode.SERVICE_DEGRADED,
-        pattern="SERVICE_DEGRADED",
+        event_pattern="SERVICE_DEGRADED",
         severity=AlertSeverity.INFO,
         channels=(AlertChannel.LOG_ONLY, AlertChannel.TELEGRAM),
     )
@@ -249,16 +250,18 @@ def test_live_alert_rules_patterns_match_at_least_one_code() -> None:
     """Plan Phase 1 sanity test — every pattern matches at least one
     AlertCode (the catch-all `*` is the only acceptable exception)."""
     for rule in LIVE_ALERT_RULES:
-        if rule.pattern == "*":
+        if rule.event_pattern == "*":
             continue
-        matched = [c for c in ALERT_CODES if fnmatch.fnmatchcase(c, rule.pattern)]
-        assert matched, f"AlertRule.pattern={rule.pattern!r} matches no AlertCode — rule is dead and would never fire"
+        matched = [c for c in ALERT_CODES if fnmatch.fnmatchcase(c, rule.event_pattern)]
+        assert matched, (
+            f"AlertRule.event_pattern={rule.event_pattern!r} matches no AlertCode — rule is dead and would never fire"
+        )
 
 
 def test_live_alert_rules_catch_all_is_last() -> None:
     """Plan Phase 1 sanity test — catch-all `*` MUST be last so specific
     rules win during fnmatch dispatch."""
-    catch_all_indexes = [i for i, r in enumerate(LIVE_ALERT_RULES) if r.pattern == "*"]
+    catch_all_indexes = [i for i, r in enumerate(LIVE_ALERT_RULES) if r.event_pattern == "*"]
     assert catch_all_indexes, "LIVE_ALERT_RULES must contain a catch-all `*` rule"
     assert catch_all_indexes == [len(LIVE_ALERT_RULES) - 1], (
         "catch-all `*` rule must be the last entry; otherwise specific rules after it never match"
@@ -272,8 +275,8 @@ def test_live_alert_rules_no_duplicate_pattern_severity_pairs() -> None:
     both at WARN/Telegram) are distinguished by pattern."""
     seen: set[tuple[str, AlertSeverity]] = set()
     for rule in LIVE_ALERT_RULES:
-        key = (rule.pattern, rule.severity)
-        assert key not in seen, f"LIVE_ALERT_RULES has duplicate (pattern, severity)={key!r}"
+        key = (rule.event_pattern, rule.severity)
+        assert key not in seen, f"LIVE_ALERT_RULES has duplicate (event_pattern, severity)={key!r}"
         seen.add(key)
 
 
@@ -361,7 +364,7 @@ def test_plan_required_codes_have_a_routing_rule() -> None:
     """Every required code must have at least one matching rule in
     LIVE_ALERT_RULES (matched either exactly or via wildcard)."""
     for code in _PLAN_REQUIRED_CODES:
-        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.pattern)]
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.event_pattern)]
         assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
 
 
@@ -404,7 +407,7 @@ def test_ml_lifecycle_codes_have_routing_rule() -> None:
     LIVE_ALERT_RULES — either an explicit rule or a wildcard match (e.g.
     KILL_SWITCH_ML_MODEL_FAILURE matches the existing KILL_SWITCH_* rule)."""
     for code in _ML_LIFECYCLE_CODES:
-        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.pattern)]
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.event_pattern)]
         assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
 
 
@@ -493,7 +496,7 @@ def test_every_alert_rule_runbook_doc_is_non_empty() -> None:
     that means a future operator has nothing to read on the alert."""
     for rule in LIVE_ALERT_RULES:
         assert rule.runbook_doc, (
-            f"AlertRule(code={rule.code}, pattern={rule.pattern!r}) has empty"
+            f"AlertRule(code={rule.code}, event_pattern={rule.event_pattern!r}) has empty"
             " runbook_doc; populate per Phase 6 of"
             " alerting_service_live_rules_2026_05_07.md."
         )
@@ -544,7 +547,7 @@ def test_kill_switch_scope_required_for_kill_switch_codes() -> None:
     with pytest.raises(ValidationError, match="kill_switch_scope is REQUIRED"):
         AlertRule(
             code=AlertCode.KILL_SWITCH_DEFI_LIQUIDATION_RISK,
-            pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
+            event_pattern="KILL_SWITCH_DEFI_LIQUIDATION_RISK",
             severity=AlertSeverity.CRITICAL,
             channels=(AlertChannel.PAGERDUTY,),
             runbook_doc="unified-trading-pm/codex/15-runbooks/alerting/kill_switch_defi_liquidation_risk.md",
@@ -558,7 +561,7 @@ def test_kill_switch_scope_must_be_none_for_non_kill_switch_codes() -> None:
     with pytest.raises(ValidationError, match="kill_switch_scope MUST be None"):
         AlertRule(
             code=AlertCode.CIRCUIT_BREAKER_OPEN,
-            pattern="CIRCUIT_BREAKER_OPEN",
+            event_pattern="CIRCUIT_BREAKER_OPEN",
             severity=AlertSeverity.CRITICAL,
             channels=(AlertChannel.PAGERDUTY,),
             runbook_doc="unified-trading-pm/codex/15-runbooks/alerting/circuit_breaker_open.md",
