@@ -139,6 +139,14 @@ class ManualInstruction(BaseModel):
     )
     counterparty: str = ""
     source_reference: str = ""
+    wallet_id: str = Field(
+        default="",
+        description=(
+            "DeFi wallet identifier per WalletProvisioningConfig.wallet_id "
+            "(empty for CeFi/sports/prediction trades). Provenance for audit-log rollup "
+            "+ pre-trade wallet-tier kill-switch + SpendingCaps validation."
+        ),
+    )
 
 
 class MLTrainingControlRequest(BaseModel):
@@ -181,6 +189,49 @@ class MLTrainingControlResponse(BaseModel):
     detail: str = ""
 
 
+class WalletSpendingPreCheckResult(BaseModel):
+    """Outcome of pre-trade wallet-tier kill-switch + SpendingCaps validation.
+
+    Computed at the `/manual/instruction` API boundary BEFORE forwarding to the
+    executor when `manual_instruction.wallet_id` is non-empty. Persisted into
+    `ManualInstructionAuditLog.wallet_spending_check` so pnl-attribution +
+    batch-live-reconciliation + alerting can reconstruct the pre-trade envelope
+    state for any manual action.
+
+    The validation algorithm (implemented in execution-service runtime, NOT in
+    UAC) loads the operator-target `WalletProvisioningConfig` and:
+
+    1. If `kill_switch_id` is armed → `kill_switch_armed=True`, `passed=False`.
+    2. Else, compute `amount_usd` from `manual_instruction.quantity × price` (or
+       reference price for market orders) and run:
+       - `SpendingCaps.is_within_per_tx(amount_usd)` → populate `per_tx_check`.
+       - Look up rolling 1h spend from position-balance-monitor →
+         `per_hour_check`.
+       - Look up rolling 24h spend → `per_day_check`.
+       - If `manual_instruction.venue` matches a `per_protocol_usd` key →
+         `per_protocol_check`.
+    3. Aggregate: `passed = (kill_switch_armed is False) and all 4 checks True`.
+    4. Populate `denial_reason` with the failed-check name if `passed is False`.
+
+    Empty result (`wallet_id == ""` on the source instruction) means "non-DeFi
+    trade, wallet checks skipped" — the field stays None in the audit row.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    wallet_id: str
+    checked_at: datetime
+    passed: bool
+    kill_switch_armed: bool
+    kill_switch_id: str = ""
+    amount_usd: Decimal | None = None
+    per_tx_check: bool | None = None
+    per_hour_check: bool | None = None
+    per_day_check: bool | None = None
+    per_protocol_check: bool | None = None
+    denial_reason: str = ""
+
+
 class ManualInstructionAuditLog(BaseModel):
     """Persistence shape for every operator-initiated action (manual trade + ML control).
 
@@ -194,6 +245,11 @@ class ManualInstructionAuditLog(BaseModel):
     `MANUAL_TRADE` → `manual_instruction` populated; `ml_training_*` fields None.
     `ML_TRAINING_CONTROL` → `ml_training_request` (and optionally response) populated;
     `manual_instruction` None.
+
+    `wallet_spending_check` is populated for DeFi manual trades (wallet_id non-empty
+    on the source instruction); None otherwise. The `wallet_id` top-level field
+    mirrors `manual_instruction.wallet_id` to support indexed audit-log queries by
+    wallet without joining through the embedded instruction body.
 
     Persisted by execution-service / ml-training-service at the API boundary
     BEFORE forwarding to downstream consumers (EXECUTE flow) or directly
@@ -210,11 +266,13 @@ class ManualInstructionAuditLog(BaseModel):
     strategy_id: str = ""
     client_id: str = ""
     portfolio_id: str = ""
+    wallet_id: str = ""
     manual_instruction: ManualInstruction | None = None
     ml_training_request: MLTrainingControlRequest | None = None
     ml_training_response: MLTrainingControlResponse | None = None
     pre_trade_check_passed: bool | None = None
     pre_trade_check_detail: str = ""
+    wallet_spending_check: WalletSpendingPreCheckResult | None = None
     routed_to_venue: str = ""
     fill_reference: str = ""
 
@@ -229,4 +287,5 @@ __all__ = [
     "MLTrainingControlRequest",
     "MLTrainingControlResponse",
     "SettlementType",
+    "WalletSpendingPreCheckResult",
 ]

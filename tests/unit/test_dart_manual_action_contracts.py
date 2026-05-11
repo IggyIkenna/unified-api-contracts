@@ -21,6 +21,7 @@ from unified_api_contracts.internal.execution import (
     ManualMLTrainingAction,
     MLTrainingControlRequest,
     MLTrainingControlResponse,
+    WalletSpendingPreCheckResult,
 )
 
 
@@ -150,6 +151,147 @@ def test_audit_log_ml_training_category() -> None:
     assert audit_row.ml_training_request.action == ManualMLTrainingAction.RETRAIN
     assert audit_row.ml_training_response is not None
     assert audit_row.ml_training_response.status == "accepted"
+
+
+def test_manual_instruction_carries_wallet_id() -> None:
+    """ManualInstruction.wallet_id provides provenance for DeFi audit-log rollups."""
+    instruction = ManualInstruction(
+        instruction_id="inst-defi-1",
+        submitted_by="operator@anthropic.com",
+        venue="aave_v3",
+        account_id="vault-7",
+        instrument_key="ethereum:lending:USDC",
+        side="BUY",
+        order_type="LEND",
+        quantity=Decimal("50000"),
+        submitted_at=_now(),
+        execution_mode=ManualExecutionMode.EXECUTE,
+        client_id="client-A",
+        strategy_id="LST_LEV.carry_staked_basis.aave-v3-USDC-1d-USDC-prod",
+        asset_group="defi",
+        wallet_id="hot-trading-eth-1",
+    )
+    assert instruction.wallet_id == "hot-trading-eth-1"
+    # Non-DeFi default stays empty.
+    cefi = ManualInstruction(
+        instruction_id="inst-cefi-1",
+        submitted_by="operator@anthropic.com",
+        venue="binance",
+        account_id="acct-1",
+        instrument_key="binance:spot:BTC-USDT",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.1"),
+        submitted_at=_now(),
+    )
+    assert cefi.wallet_id == ""
+
+
+def test_wallet_spending_precheck_result_passed_path() -> None:
+    """WalletSpendingPreCheckResult on a clean pre-trade check (all caps within)."""
+    result = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-1",
+        checked_at=_now(),
+        passed=True,
+        kill_switch_armed=False,
+        kill_switch_id="KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
+        amount_usd=Decimal("50000"),
+        per_tx_check=True,
+        per_hour_check=True,
+        per_day_check=True,
+        per_protocol_check=True,
+    )
+    assert result.passed is True
+    assert result.kill_switch_armed is False
+    assert result.denial_reason == ""
+
+
+def test_wallet_spending_precheck_result_kill_switch_armed() -> None:
+    """Kill-switch armed short-circuits the check; denial_reason populated."""
+    result = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-1",
+        checked_at=_now(),
+        passed=False,
+        kill_switch_armed=True,
+        kill_switch_id="KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
+        denial_reason="kill_switch_armed",
+    )
+    assert result.passed is False
+    assert result.kill_switch_armed is True
+    assert result.denial_reason == "kill_switch_armed"
+
+
+def test_audit_log_defi_trade_carries_wallet_spending_check() -> None:
+    """Audit row for a DeFi manual trade populates wallet_id + wallet_spending_check."""
+    instruction = ManualInstruction(
+        instruction_id="inst-defi-100",
+        submitted_by="operator@anthropic.com",
+        venue="aave_v3",
+        account_id="vault-7",
+        instrument_key="ethereum:lending:USDC",
+        side="BUY",
+        order_type="LEND",
+        quantity=Decimal("50000"),
+        submitted_at=_now(),
+        execution_mode=ManualExecutionMode.EXECUTE,
+        asset_group="defi",
+        wallet_id="hot-trading-eth-1",
+    )
+    spending_check = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-1",
+        checked_at=_now(),
+        passed=True,
+        kill_switch_armed=False,
+        amount_usd=Decimal("50000"),
+        per_tx_check=True,
+        per_hour_check=True,
+        per_day_check=True,
+        per_protocol_check=True,
+    )
+    audit_row = ManualInstructionAuditLog(
+        audit_id="aud-defi-100",
+        action_category=ManualAuditCategory.MANUAL_TRADE,
+        persisted_at=_now(),
+        submitted_by="operator@anthropic.com",
+        asset_group="defi",
+        wallet_id=instruction.wallet_id,
+        manual_instruction=instruction,
+        wallet_spending_check=spending_check,
+        pre_trade_check_passed=True,
+        routed_to_venue="aave_v3",
+    )
+    assert audit_row.wallet_id == "hot-trading-eth-1"
+    assert audit_row.wallet_spending_check is not None
+    assert audit_row.wallet_spending_check.passed is True
+    assert audit_row.wallet_spending_check.wallet_id == audit_row.wallet_id
+
+
+def test_audit_log_non_defi_trade_omits_wallet_spending_check() -> None:
+    """Audit row for a CeFi manual trade leaves wallet_spending_check None."""
+    instruction = ManualInstruction(
+        instruction_id="inst-cefi-2",
+        submitted_by="operator@anthropic.com",
+        venue="binance",
+        account_id="acct-1",
+        instrument_key="binance:spot:BTC-USDT",
+        side="BUY",
+        order_type="MARKET",
+        quantity=Decimal("0.1"),
+        submitted_at=_now(),
+        asset_group="cefi",
+    )
+    audit_row = ManualInstructionAuditLog(
+        audit_id="aud-cefi-2",
+        action_category=ManualAuditCategory.MANUAL_TRADE,
+        persisted_at=_now(),
+        submitted_by="operator@anthropic.com",
+        asset_group="cefi",
+        manual_instruction=instruction,
+        pre_trade_check_passed=True,
+        routed_to_venue="binance",
+    )
+    assert audit_row.wallet_id == ""
+    assert audit_row.wallet_spending_check is None
 
 
 def test_audit_log_request_response_correlation() -> None:
