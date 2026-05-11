@@ -347,6 +347,10 @@ class MevSubmissionMode(StrEnum):
     MEV_BLOCKER = "MEV_BLOCKER"
     MANIFOLD = "MANIFOLD"
     CUSTOM_PRIVATE_RPC = "CUSTOM_PRIVATE_RPC"
+    # Solana — Jito bundle submission via block-engine RPC. Private mempool,
+    # 2-block max delay (Solana slot ~400ms). Resolved via UCI/Secret Manager
+    # at dispatch time. See defi_catalogue_chain_primitives_2026_05_10.md Phase 1D.
+    JITO_BUNDLE = "JITO_BUNDLE"
 
 
 class VenueType(StrEnum):
