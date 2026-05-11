@@ -252,6 +252,10 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # ── Perp DEXes / aggregators ──
     ("ARBITRUM", "GMX"): "2021-09-01",
     ("AVALANCHE", "GMX"): "2022-01-05",
+    # ASTER perp DEX on BNB Chain — operator decision 2026-05-11 (defi_master Q1 #4 approved).
+    # Conservative date: Aster DEX launched on BSC ~Q3 2024 per public news; first on-chain event
+    # verifiable via BscScan. Eliminates ~759 false-flagged missing rows from defi_988 audit.
+    ("BSC", "ASTER"): "2024-09-01",
 }
 
 # (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch
