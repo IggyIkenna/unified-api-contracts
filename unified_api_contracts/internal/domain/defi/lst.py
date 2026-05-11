@@ -51,6 +51,12 @@ LST_TOKEN_TO_PROTOCOL_ASSET: dict[str, tuple[str, str]] = {
     "jitoSOL": ("JITO", "SOL"),
     "mSOL": ("MARINADE", "SOL"),
     "bSOL": ("BLAZESTAKE", "SOL"),
+    # Restaking LRTs (added 2026-05-12 per defi_catalogue_chain_primitives_2026_05_10.md
+    # Phase 1G + 1A. Symbiotic/Karak vault tokens NOT in this mapping — those protocols
+    # issue per-vault shares rather than a single canonical LRT, so they live in the
+    # instruments-service LST_REFERENCE_DATA registry only.)
+    "ezETH": ("RENZO", "ETH"),
+    "rsETH": ("KELPDAO", "ETH"),
 }
 
 

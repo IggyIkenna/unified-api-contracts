@@ -16,9 +16,11 @@ from unified_api_contracts.internal.domain.defi import (
 class TestLstTokenToProtocolAsset:
     """Coverage of the canonical LST mapping."""
 
-    def test_table_has_all_16_canonical_lsts(self) -> None:
-        """Every LST resolved by the carry tracer (2026-05-06) must be present."""
+    def test_table_has_all_canonical_lsts(self) -> None:
+        """Every LST/LRT resolved by the carry tracer (2026-05-06) + restaking
+        LRTs added 2026-05-12 per defi_catalogue Phase 1A must be present."""
         expected = {
+            # ETH LSTs (carry-tracer baseline 2026-05-06)
             "stETH",
             "wstETH",
             "rETH",
@@ -30,11 +32,16 @@ class TestLstTokenToProtocolAsset:
             "ETHx",
             "osETH",
             "pufETH",
+            # Yield-bearing stablecoins
             "sUSDe",
             "sDAI",
+            # Solana LSTs
             "jitoSOL",
             "mSOL",
             "bSOL",
+            # Restaking LRTs (defi_catalogue Phase 1G + 1A; added 2026-05-12)
+            "ezETH",
+            "rsETH",
         }
         assert set(LST_TOKEN_TO_PROTOCOL_ASSET) == expected
 
