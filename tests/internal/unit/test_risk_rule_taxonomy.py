@@ -39,7 +39,6 @@ from unified_api_contracts.risk import (
     RiskRuleScope,
 )
 
-
 # ---------------------------------------------------------------------------
 # Closed-set sanity — RiskRuleId
 # ---------------------------------------------------------------------------
@@ -366,9 +365,7 @@ def test_new_alert_codes_resolve() -> None:
 def test_consequence_alert_code_strings_resolve_to_alert_code_members() -> None:
     """CONSEQUENCE_ALERT_CODES values are valid AlertCode .value strings."""
     for consequence, code_str in CONSEQUENCE_ALERT_CODES.items():
-        assert code_str in ALERT_CODES, (
-            f"{consequence}: {code_str} not in AlertCode closed-set"
-        )
+        assert code_str in ALERT_CODES, f"{consequence}: {code_str} not in AlertCode closed-set"
 
 
 def test_alert_code_set_grew_by_at_least_six() -> None:

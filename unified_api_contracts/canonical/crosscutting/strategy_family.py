@@ -170,8 +170,7 @@ STRATEGY_FAMILY_REGISTRY: Final[dict[StrategyFamilyId, StrategyFamily]] = {
         family_id=StrategyFamilyId.BASIS_CARRY_FAMILY,
         members=frozenset({StrategyArchetype.CARRY_BASIS_DATED}),
         description=(
-            "Dated-futures basis carry. Shared risk cluster: roll-forward "
-            "slippage, term-structure inversion."
+            "Dated-futures basis carry. Shared risk cluster: roll-forward slippage, term-structure inversion."
         ),
     ),
     StrategyFamilyId.OPTIONS_VOL_FAMILY: StrategyFamily(
@@ -196,8 +195,7 @@ STRATEGY_FAMILY_REGISTRY: Final[dict[StrategyFamilyId, StrategyFamily]] = {
         family_id=StrategyFamilyId.SPORTS_MM_FAMILY,
         members=frozenset({StrategyArchetype.MARKET_MAKING_EVENT_SETTLED}),
         description=(
-            "Sports market-making. Shared risk cluster: late line-move adverse "
-            "selection, sport-specific regime shifts."
+            "Sports market-making. Shared risk cluster: late line-move adverse selection, sport-specific regime shifts."
         ),
     ),
     StrategyFamilyId.PREDICTION_MM_FAMILY: StrategyFamily(
@@ -217,8 +215,7 @@ STRATEGY_FAMILY_REGISTRY: Final[dict[StrategyFamilyId, StrategyFamily]] = {
             }
         ),
         description=(
-            "Statistical-pairs arbitrage. Shared risk cluster: cointegration "
-            "breakdown, cross-asset volatility shock."
+            "Statistical-pairs arbitrage. Shared risk cluster: cointegration breakdown, cross-asset volatility shock."
         ),
     ),
 }

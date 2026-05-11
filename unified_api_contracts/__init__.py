@@ -47,13 +47,6 @@ from .canonical.crosscutting.circuit_breaker import (
     BreakerTrigger,
     CircuitBreakerId,
 )
-from .canonical.crosscutting.kill_switch import (
-    KillSwitchArmedEvent,
-    KillSwitchArmRequest,
-    KillSwitchDisarmEvent,
-    KillSwitchId,
-    KillSwitchProvenance,
-)
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
     VENUE_ERROR_MAP,
@@ -88,6 +81,13 @@ from .canonical.crosscutting.errors import (
     VenueErrorClassification,
     WebSocketCloseInfo,
     classify_venue_error,
+)
+from .canonical.crosscutting.kill_switch import (
+    KillSwitchArmedEvent,
+    KillSwitchArmRequest,
+    KillSwitchDisarmEvent,
+    KillSwitchId,
+    KillSwitchProvenance,
 )
 from .canonical.crosscutting.pipeline_mode import (
     PipelineMode,

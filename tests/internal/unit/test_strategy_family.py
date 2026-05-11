@@ -35,7 +35,6 @@ from unified_api_contracts.risk import (
     family_for_archetype,
 )
 
-
 # ---------------------------------------------------------------------------
 # Closed-set sanity
 # ---------------------------------------------------------------------------
@@ -54,9 +53,7 @@ def test_strategy_family_id_all_uppercase_snake() -> None:
     for fid in StrategyFamilyId:
         assert fid.value.isupper(), f"{fid.value} must be UPPER_SNAKE_CASE"
         assert " " not in fid.value
-        assert fid.value.endswith("_FAMILY"), (
-            f"{fid.value} must end with _FAMILY for grep-ability"
-        )
+        assert fid.value.endswith("_FAMILY"), f"{fid.value} must end with _FAMILY for grep-ability"
 
 
 # ---------------------------------------------------------------------------
@@ -89,9 +86,7 @@ def test_registry_no_overlapping_membership() -> None:
     seen: dict[StrategyArchetype, StrategyFamilyId] = {}
     for fid, fam in STRATEGY_FAMILY_REGISTRY.items():
         for archetype in fam.members:
-            assert archetype not in seen, (
-                f"{archetype} appears in {seen[archetype]} AND {fid}"
-            )
+            assert archetype not in seen, f"{archetype} appears in {seen[archetype]} AND {fid}"
             seen[archetype] = fid
 
 
@@ -150,17 +145,11 @@ def test_strategy_family_rejects_unknown_family_id() -> None:
 
 
 def test_family_for_archetype_cutover_lead() -> None:
-    assert (
-        family_for_archetype(StrategyArchetype.CARRY_STAKED_BASIS)
-        is StrategyFamilyId.LST_LEVERAGE_FAMILY
-    )
+    assert family_for_archetype(StrategyArchetype.CARRY_STAKED_BASIS) is StrategyFamilyId.LST_LEVERAGE_FAMILY
 
 
 def test_family_for_archetype_cutover_pair() -> None:
-    assert (
-        family_for_archetype(StrategyArchetype.ARBITRAGE_PRICE_DISPERSION)
-        is StrategyFamilyId.FUNDING_ARB_FAMILY
-    )
+    assert family_for_archetype(StrategyArchetype.ARBITRAGE_PRICE_DISPERSION) is StrategyFamilyId.FUNDING_ARB_FAMILY
 
 
 def test_family_for_archetype_unmapped_returns_none() -> None:
@@ -184,9 +173,7 @@ def test_strategy_family_id_orthogonal_to_mechanism_axis() -> None:
     """
     risk_axis = {m.value for m in StrategyFamilyId}
     mechanism_axis = {m.value for m in MechanismStrategyFamily}
-    assert risk_axis.isdisjoint(mechanism_axis), (
-        f"Name collision: {risk_axis & mechanism_axis}"
-    )
+    assert risk_axis.isdisjoint(mechanism_axis), f"Name collision: {risk_axis & mechanism_axis}"
 
 
 def test_facade_exports_strategy_family_symbols() -> None:

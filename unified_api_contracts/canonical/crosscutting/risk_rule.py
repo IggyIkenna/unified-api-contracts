@@ -42,7 +42,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 from enum import StrEnum
-from typing import Annotated, Final, Literal, Union
+from typing import Annotated, Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -261,7 +261,7 @@ class MaxConcentrationTrigger(_TriggerBase):
 
 
 class MaxCorrelationTrigger(_TriggerBase):
-    """Cross-position correlation cap. Units: Pearson ρ on rolling returns."""
+    """Cross-position correlation cap. Units: Pearson rho on rolling returns."""
 
     trigger_type: Literal["max_correlation"] = "max_correlation"
     cap_rho: Decimal
@@ -325,21 +325,21 @@ class MaxDailyLossTrigger(_TriggerBase):
 
 
 RiskRuleTrigger = Annotated[
-    Union[
-        MaxPositionSizeTrigger,
-        MaxDrawdownTrigger,
-        MaxLeverageTrigger,
-        MaxConcentrationTrigger,
-        MaxCorrelationTrigger,
-        SlippageBudgetTrigger,
-        FundingCostCeilingTrigger,
-        GasBudgetTrigger,
-        CapitalAtRiskCeilingTrigger,
-        MaxOITrigger,
-        MaxGrossExposureTrigger,
-        MaxNetExposureTrigger,
-        MaxDailyLossTrigger,
-    ],
+    (
+        MaxPositionSizeTrigger
+        | MaxDrawdownTrigger
+        | MaxLeverageTrigger
+        | MaxConcentrationTrigger
+        | MaxCorrelationTrigger
+        | SlippageBudgetTrigger
+        | FundingCostCeilingTrigger
+        | GasBudgetTrigger
+        | CapitalAtRiskCeilingTrigger
+        | MaxOITrigger
+        | MaxGrossExposureTrigger
+        | MaxNetExposureTrigger
+        | MaxDailyLossTrigger
+    ),
     Field(discriminator="trigger_type"),
 ]
 """Discriminated union of typed trigger conditions.
@@ -534,6 +534,7 @@ through ``AlertCode``.
 __all__ = [
     "CONSEQUENCE_ALERT_CODES",
     "CONSEQUENCE_EVENTS_EMITTED",
+    "RISK_RULE_IDS",
     "CapitalAtRiskCeilingTrigger",
     "FundingCostCeilingTrigger",
     "GasBudgetTrigger",
@@ -546,7 +547,6 @@ __all__ = [
     "MaxNetExposureTrigger",
     "MaxOITrigger",
     "MaxPositionSizeTrigger",
-    "RISK_RULE_IDS",
     "RiskRule",
     "RiskRuleConsequence",
     "RiskRuleId",
