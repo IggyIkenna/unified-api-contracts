@@ -19,7 +19,7 @@ InstrumentType`` still works everywhere.
 from datetime import datetime
 from decimal import Decimal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 # Re-export enums from cycle-free SSOT module.
 from unified_api_contracts._instrument_enums import (
@@ -37,6 +37,34 @@ from unified_api_contracts._instrument_enums import (
 from unified_api_contracts._instrument_enums import (
     OptionType as OptionType,
 )
+
+
+# Closed-set instrument-type buckets used by InstrumentRecord's
+# per-asset-group model_validator (hard_schema_enforcement_2026_05_08
+# Phase 1, slot 5 2026-05-11). Module-level rather than class-level so
+# Pydantic v2 doesn't treat them as ``ModelPrivateAttr`` descriptors.
+CEFI_PAIR_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset(
+    {InstrumentType.SPOT_PAIR, InstrumentType.PERPETUAL}
+)
+"""CeFi spot/perp instrument types. Workspace rule: base_asset + quote_asset
+must be non-empty (trading pair identity). Enforced by InstrumentRecord
+model_validator."""
+
+DEFI_ONCHAIN_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset(
+    {
+        InstrumentType.POOL,
+        InstrumentType.LENDING,
+        InstrumentType.LST,
+        InstrumentType.YIELD_BEARING,
+        InstrumentType.A_TOKEN,
+        InstrumentType.DEBT_TOKEN,
+        InstrumentType.STAKING,
+        InstrumentType.SPOT_ASSET,
+    }
+)
+"""DeFi on-chain instrument types. Workspace rule: at least one on-chain
+identifier (pool_address OR base_asset_contract_address) must be non-empty.
+Enforced by InstrumentRecord model_validator."""
 
 
 class InstrumentLeg(BaseModel):
@@ -181,3 +209,100 @@ class InstrumentRecord(BaseModel):
         default=None,
         description="On-chain method selector for rate queries (LST contracts); optional parity field",
     )
+
+    # ─────────────────────────────────────────────────────────────────
+    # Per-asset-group hard-required field enforcement
+    # (hard_schema_enforcement_2026_05_08 Phase 1 — slot 5 RE-TASK 2026-05-11)
+    # ─────────────────────────────────────────────────────────────────
+    # Pydantic model_validator(mode="after") enforces the per-asset-group
+    # contract that workspace rules require but the schema doesn't yet
+    # type-enforce. Per CLAUDE.md "Honest absence vs fake placeholders" +
+    # "Shard-granularity SSOT" — adapters writing empty/null on required
+    # fields produces silent data corruption downstream (1440-NaN-bar
+    # incident 2026-05-05 was the canonical failure mode).
+    #
+    # Three asset-group rules enforced as of 2026-05-11 (CeFi half +
+    # DeFi half ship now; TradFi futures-expiry + Sports fixture_id flips
+    # are blocked on `tradfi_master_2026_05_07` Q1+Q2 + sports adapter
+    # capture audit per the per-asset-group schema-flip roadmap in
+    # `hard_schema_enforcement_2026_05_08.md`):
+    #
+    # 1. CeFi spot/perp (SPOT_PAIR / PERPETUAL): base_asset + quote_asset
+    #    must be non-empty. These are the trading pair identity; empty
+    #    means the adapter silently wrote a header-only row.
+    # 2. DeFi on-chain (POOL / LENDING / LST / YIELD_BEARING / A_TOKEN /
+    #    DEBT_TOKEN / STAKING / SPOT_ASSET): pool_address OR
+    #    base_asset_contract_address must be non-empty. At least one
+    #    on-chain identifier is required to reach the protocol.
+    # 3. EVENT_CONTRACT (CME × Polymarket cross-venue arb per
+    #    cme_polymarket_arb_2026_05_08): expiry must be non-null
+    #    (resolution_date is the shard-atom dimension).
+    #
+    # Violations raise ValueError; downstream MTDS / instruments-service
+    # adapters' per-row try/except routes them to
+    # `record_failed(reason=RecordFailedReason.SCHEMA_VALIDATION_FAILED)`
+    # (RecordFailedReason taxonomy shipped UAC@cb70b3a per slot 5
+    # earlier today). Per-row routing wires in Phase 2 of
+    # hard_schema_enforcement_2026_05_08; this commit ships the
+    # type-system half (Phase 1).
+
+    @model_validator(mode="after")
+    def _enforce_per_asset_group_required_fields(self) -> "InstrumentRecord":
+        """Per-asset-group hard-required field validator.
+
+        Raises ``ValueError`` if a workspace-rule-required field is empty/null
+        for the row's ``instrument_type``. Adapters catch the ValueError at
+        the per-row try/except and route to
+        ``record_failed(reason=RecordFailedReason.SCHEMA_VALIDATION_FAILED,
+        ...)`` per the writegate Phase 2 + hard_schema_enforcement Phase 2
+        contract.
+
+        Closed-set rules (slot 5 2026-05-11):
+
+        * CeFi spot/perp → base_asset + quote_asset non-empty.
+        * DeFi on-chain → pool_address OR base_asset_contract_address non-empty.
+        * EVENT_CONTRACT → expiry non-null (resolution_date axis).
+
+        TradFi futures + sports per-fixture flips deferred behind
+        tradfi_master Q1+Q2 + sports adapter audit per the
+        hard_schema_enforcement plan body roadmap.
+        """
+        # CeFi spot/perp rule
+        if self.instrument_type in CEFI_PAIR_INSTRUMENT_TYPES:
+            if not self.base_asset:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={self.instrument_type.value}) "
+                    f"requires non-empty base_asset; got {self.base_asset!r}. "
+                    f"Workspace rule: CeFi spot/perp must have a trading pair identity. "
+                    f"Per hard_schema_enforcement_2026_05_08 Phase 1."
+                )
+            if not self.quote_asset:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={self.instrument_type.value}) "
+                    f"requires non-empty quote_asset; got {self.quote_asset!r}. "
+                    f"Workspace rule: CeFi spot/perp must have a trading pair identity. "
+                    f"Per hard_schema_enforcement_2026_05_08 Phase 1."
+                )
+        # DeFi on-chain rule
+        elif self.instrument_type in DEFI_ONCHAIN_INSTRUMENT_TYPES:
+            has_pool = bool(self.pool_address)
+            has_base_addr = bool(self.base_asset_contract_address)
+            if not (has_pool or has_base_addr):
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={self.instrument_type.value}) "
+                    f"requires at least one on-chain identifier: pool_address or "
+                    f"base_asset_contract_address. Got pool_address={self.pool_address!r}, "
+                    f"base_asset_contract_address={self.base_asset_contract_address!r}. "
+                    f"Workspace rule: DeFi on-chain instruments must be reachable. "
+                    f"Per hard_schema_enforcement_2026_05_08 Phase 1."
+                )
+        # EVENT_CONTRACT rule (CME × Polymarket cross-venue arb)
+        elif self.instrument_type == InstrumentType.EVENT_CONTRACT:
+            if self.expiry is None:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={InstrumentType.EVENT_CONTRACT.value}) "
+                    f"requires non-null expiry (resolution_date axis). "
+                    f"Workspace rule: event contracts shard by (root, resolution_date) per "
+                    f"cme_polymarket_arb_2026_05_08 Phase 3+4."
+                )
+        return self
