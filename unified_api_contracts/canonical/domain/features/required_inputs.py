@@ -326,6 +326,87 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
         InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
         InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
     ],
+    # ---- features-cross-instrument (CeFi/TradFi multi-asset + Prediction) -
+    # Phase 4 expansion 2026-05-11 (`ikenna-available-at-tab`). Mapping
+    # derived from features-cross-instrument's BuilderEntry registry
+    # ``sources`` declarations, normalised to UAC canonical data_type names.
+    # All upstream pairs verified against ``AVAILABILITY_AT_SEMANTICS``;
+    # ``validate_required_inputs()`` is the runtime gate.
+    "regime_detection": [
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    "cross_venue_spreads": [
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    "realized_implied_vol": [
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="cefi", data_type="options_chain", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    "cross_asset_correlation": [
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    "cross_instrument_dynamics": [
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    "cme_gap": [
+        # CME Globex tradfi-only — captures the weekend / overnight gap on
+        # CME crypto futures markets.
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    "book_depth_bands": [
+        InputReq(asset_group="cefi", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+    ],
+    "liquidity_walls": [
+        InputReq(asset_group="cefi", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+    ],
+    "liquidation_clusters": [
+        InputReq(asset_group="cefi", data_type="liquidations", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="cefi", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+    ],
+    "liquidation_band_prediction": [
+        InputReq(asset_group="cefi", data_type="funding_rate", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    "flow_interaction": [
+        InputReq(asset_group="cefi", data_type="trades", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="cefi", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+    ],
+    "cointegration": [
+        InputReq(asset_group="cefi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+    ],
+    # ---- features-cross-instrument — Polymarket prediction-market reads -
+    # All 6 Polymarket-derived feature_groups consume the canonical
+    # ``(prediction, trades)`` shard (Polymarket CLOB tick capture).
+    "polymarket_crowd_sentiment": [
+        InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
+    ],
+    "polymarket_trade_flow": [
+        InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
+    ],
+    "polymarket_whale_activity": [
+        InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
+    ],
+    "polymarket_market_microstructure": [
+        InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="prediction", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+    ],
+    "polymarket_cross_market": [
+        InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
+    ],
+    "polymarket_temporal_patterns": [
+        InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
+    ],
+    # ---- Phase 1 (depends on walls + clusters; leaf data_types only) ----
+    "composite_sr": [
+        InputReq(asset_group="cefi", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="cefi", data_type="liquidations", available_at_rule="tick_timestamp"),
+    ],
 }
 """Registry — feature_group -> list of upstream input requirements.
 

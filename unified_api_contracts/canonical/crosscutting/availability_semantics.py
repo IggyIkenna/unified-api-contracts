@@ -109,6 +109,28 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("defi", "rewards"): "tick_timestamp",
     ("defi", "flash_loan_events"): "tick_timestamp",
     ("defi", "eigenlayer_rewards"): "tick_timestamp",
+    # Phase 5 audit 2026-05-11 (`ikenna-available-at-tab`) — every defi
+    # data_type that an MTDS handler calls ``record_captured(...)`` on must
+    # have a semantic entry, else stamping at write-time raises KeyError.
+    # All 14 below are per-row on-chain event reads where the row's own
+    # timestamp IS the available_at — same semantic as every other defi
+    # entry above. Coverage probe: MTDS handler grep across
+    # ``market_tick_data_service/cli/handlers/*.py`` for literal
+    # ``record_captured(`` callsites with ``data_type=<literal>``.
+    ("defi", "dex_pools"): "tick_timestamp",
+    ("defi", "vault_share_price"): "tick_timestamp",
+    ("defi", "solana_defi"): "tick_timestamp",
+    ("defi", "oracle_prices"): "tick_timestamp",
+    ("defi", "governance_events"): "tick_timestamp",
+    ("defi", "perp_funding"): "tick_timestamp",
+    ("defi", "staking_yields"): "tick_timestamp",
+    ("defi", "bridge_events"): "tick_timestamp",
+    ("defi", "position_data"): "tick_timestamp",
+    ("defi", "token_transfers"): "tick_timestamp",
+    ("defi", "liquidation_events"): "tick_timestamp",
+    ("defi", "liquidations"): "tick_timestamp",
+    ("defi", "mev_events"): "tick_timestamp",
+    ("defi", "lst_rates"): "tick_timestamp",
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",
