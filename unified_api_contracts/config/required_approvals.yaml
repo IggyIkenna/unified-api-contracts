@@ -1,0 +1,240 @@
+# Required per-protocol ERC-20 approvals per (archetype, chain, protocol, asset).
+#
+# Plan: api_keys_wallets_accounts_readiness_2026_05_10.md Phase 4.B (per-protocol
+# approvals SSOT + automation).
+#
+# Reader: execution-service/scripts/vm/launch-defi-approval-presigner-vm.sh
+# (Phase 4.B sub-deliverable) pre-signs every (chain, protocol, asset) approval
+# this YAML enumerates, scoped to the May-23 cutover archetypes:
+# carry_staked_basis + ARBITRAGE_PRICE_DISPERSION.
+#
+# Per CLAUDE.md security-grade default: ceiling = per_session_cap_usd (safer)
+# over MAX_UINT256 (gas-cheaper). Operator must ratify ceiling overrides for
+# any (archetype, chain, protocol, asset) row in this file.
+#
+# Cap units = USD-equivalent at approval time. Multiply by ERC-20 decimals at
+# execution. For native assets (ETH, MATIC, SOL) the protocol uses wrapped
+# variant (WETH, WMATIC, WSOL) — declared explicitly here.
+
+version: 1
+created: 2026-05-12
+owner: ikenna-keys-wallets-tab (slot 4)
+schema_ref: dict[archetype_id, dict[chain, dict[protocol, list[ApprovalSpec]]]]
+
+archetypes:
+  carry_staked_basis:
+    ETHEREUM:
+      LIDO:
+        - asset: WETH
+          ceiling_usd: "500000"
+          spender_contract: "lido_steth"
+          purpose: "Submit ETH → stETH wrap"
+        - asset: STETH
+          ceiling_usd: "500000"
+          spender_contract: "lido_wsteth_wrapper"
+          purpose: "Wrap stETH → wstETH for cross-protocol use"
+      ETHERFI:
+        - asset: WETH
+          ceiling_usd: "300000"
+          spender_contract: "etherfi_liquid_pool"
+          purpose: "Deposit ETH → eETH"
+        - asset: EETH
+          ceiling_usd: "300000"
+          spender_contract: "etherfi_weeth_wrapper"
+          purpose: "Wrap eETH → weETH"
+      AAVE_V3:
+        - asset: WSTETH
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool"
+          purpose: "Supply wstETH as collateral"
+        - asset: WEETH
+          ceiling_usd: "300000"
+          spender_contract: "aave_v3_pool"
+          purpose: "Supply weETH as collateral"
+        - asset: USDC
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool"
+          purpose: "Borrow USDC against LST collateral"
+      UNISWAP_V3:
+        - asset: WSTETH
+          ceiling_usd: "200000"
+          spender_contract: "uniswap_v3_swap_router02"
+          purpose: "Rebalance wstETH ↔ ETH"
+        - asset: USDC
+          ceiling_usd: "200000"
+          spender_contract: "uniswap_v3_swap_router02"
+          purpose: "Rebalance USDC ↔ ETH"
+    ARBITRUM:
+      AAVE_V3:
+        - asset: WSTETH
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool_arbitrum"
+          purpose: "Supply wstETH on Arbitrum L2"
+        - asset: USDC
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool_arbitrum"
+          purpose: "Borrow USDC"
+      UNISWAP_V3:
+        - asset: WSTETH
+          ceiling_usd: "200000"
+          spender_contract: "uniswap_v3_swap_router02_arbitrum"
+          purpose: "Rebalance wstETH"
+      GMX:
+        - asset: USDC
+          ceiling_usd: "250000"
+          spender_contract: "gmx_router"
+          purpose: "GMX hedge leg margin"
+    BASE:
+      AAVE_V3:
+        - asset: WEETH
+          ceiling_usd: "300000"
+          spender_contract: "aave_v3_pool_base"
+          purpose: "Supply weETH on Base"
+        - asset: USDC
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool_base"
+          purpose: "Borrow USDC"
+      MORPHO:
+        - asset: WEETH
+          ceiling_usd: "300000"
+          spender_contract: "morpho_blue_base"
+          purpose: "Morpho weETH market"
+      UNISWAP_V3:
+        - asset: USDC
+          ceiling_usd: "200000"
+          spender_contract: "uniswap_v3_swap_router02_base"
+          purpose: "Rebalance USDC ↔ ETH on Base"
+    POLYGON:
+      AAVE_V3:
+        - asset: WMATIC
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool_polygon"
+          purpose: "Supply wMATIC"
+        - asset: USDC
+          ceiling_usd: "500000"
+          spender_contract: "aave_v3_pool_polygon"
+          purpose: "Borrow USDC"
+      UNISWAP_V3:
+        - asset: USDC
+          ceiling_usd: "200000"
+          spender_contract: "uniswap_v3_swap_router02_polygon"
+          purpose: "Rebalance USDC ↔ MATIC"
+    SOLANA:
+      JITO:
+        - asset: SOL
+          ceiling_usd: "500000"
+          spender_contract: "jito_sol_pool"
+          purpose: "Stake SOL → jitoSOL"
+        - asset: JITOSOL
+          ceiling_usd: "500000"
+          spender_contract: "kamino_lending"
+          purpose: "Use jitoSOL as collateral in Kamino"
+      MARINADE:
+        - asset: SOL
+          ceiling_usd: "300000"
+          spender_contract: "marinade_sol_pool"
+          purpose: "Stake SOL → mSOL"
+      RAYDIUM:
+        - asset: JITOSOL
+          ceiling_usd: "200000"
+          spender_contract: "raydium_amm_v4"
+          purpose: "Rebalance jitoSOL ↔ SOL"
+      ORCA:
+        - asset: JITOSOL
+          ceiling_usd: "200000"
+          spender_contract: "orca_whirlpool"
+          purpose: "Rebalance jitoSOL via Orca"
+
+  ARBITRAGE_PRICE_DISPERSION:
+    ETHEREUM:
+      UNISWAP_V3:
+        - asset: WETH
+          ceiling_usd: "250000"
+          spender_contract: "uniswap_v3_swap_router02"
+          purpose: "Cross-venue WETH arbitrage"
+        - asset: USDC
+          ceiling_usd: "250000"
+          spender_contract: "uniswap_v3_swap_router02"
+          purpose: "Cross-venue USDC arbitrage"
+        - asset: USDT
+          ceiling_usd: "250000"
+          spender_contract: "uniswap_v3_swap_router02"
+          purpose: "Cross-venue USDT arbitrage"
+      CURVE:
+        - asset: USDC
+          ceiling_usd: "150000"
+          spender_contract: "curve_3pool"
+          purpose: "Stable triangular arbitrage via 3pool"
+        - asset: USDT
+          ceiling_usd: "150000"
+          spender_contract: "curve_3pool"
+          purpose: "Stable triangular arbitrage"
+      BALANCER:
+        - asset: WETH
+          ceiling_usd: "100000"
+          spender_contract: "balancer_vault"
+          purpose: "Balancer-side leg"
+    ARBITRUM:
+      UNISWAP_V3:
+        - asset: WETH
+          ceiling_usd: "250000"
+          spender_contract: "uniswap_v3_swap_router02_arbitrum"
+          purpose: "L2 arbitrage"
+      CAMELOT:
+        - asset: WETH
+          ceiling_usd: "100000"
+          spender_contract: "camelot_router"
+          purpose: "Camelot DEX leg"
+      GMX:
+        - asset: USDC
+          ceiling_usd: "150000"
+          spender_contract: "gmx_router"
+          purpose: "GMX perp leg margin"
+    BASE:
+      UNISWAP_V3:
+        - asset: WETH
+          ceiling_usd: "250000"
+          spender_contract: "uniswap_v3_swap_router02_base"
+          purpose: "Base DEX arbitrage"
+      AERODROME:
+        - asset: WETH
+          ceiling_usd: "100000"
+          spender_contract: "aerodrome_router"
+          purpose: "Aerodrome DEX leg"
+    POLYGON:
+      UNISWAP_V3:
+        - asset: WMATIC
+          ceiling_usd: "250000"
+          spender_contract: "uniswap_v3_swap_router02_polygon"
+          purpose: "Polygon DEX arbitrage"
+      QUICKSWAP:
+        - asset: WMATIC
+          ceiling_usd: "100000"
+          spender_contract: "quickswap_router"
+          purpose: "Quickswap DEX leg"
+      BALANCER:
+        - asset: WMATIC
+          ceiling_usd: "100000"
+          spender_contract: "balancer_vault_polygon"
+          purpose: "Balancer Polygon"
+    SOLANA:
+      RAYDIUM:
+        - asset: SOL
+          ceiling_usd: "200000"
+          spender_contract: "raydium_amm_v4"
+          purpose: "Raydium DEX leg"
+      ORCA:
+        - asset: SOL
+          ceiling_usd: "200000"
+          spender_contract: "orca_whirlpool"
+          purpose: "Orca DEX leg"
+      JUPITER:
+        - asset: SOL
+          ceiling_usd: "250000"
+          spender_contract: "jupiter_v6_aggregator"
+          purpose: "Jupiter aggregator routes"
+      DRIFT:
+        - asset: USDC
+          ceiling_usd: "150000"
+          spender_contract: "drift_v2_program"
+          purpose: "Drift perp leg margin"
