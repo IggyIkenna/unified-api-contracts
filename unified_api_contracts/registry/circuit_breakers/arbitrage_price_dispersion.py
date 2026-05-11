@@ -151,8 +151,7 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
         cooldown_seconds=3600,
         alerting_severity=AlertSeverity.HIGH,
         description=(
-            "Realised PnL >= 3 sigma vs backtest expectation → halve position; "
-            "auto-recover after 1h within tolerance."
+            "Realised PnL >= 3 sigma vs backtest expectation → halve position; auto-recover after 1h within tolerance."
         ),
     ),
     BreakerConfig(

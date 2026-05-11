@@ -123,7 +123,8 @@ class AlertRule(BaseModel):
         matched = [c for c in ALERT_CODES if fnmatch.fnmatchcase(c, self.event_pattern)]
         if not matched:
             raise UnknownAlertCodeError(
-                f"AlertRule.event_pattern={self.event_pattern!r} matches no AlertCode member (closed set: {sorted(ALERT_CODES)})"
+                f"AlertRule.event_pattern={self.event_pattern!r} matches no AlertCode member "
+                f"(closed set: {sorted(ALERT_CODES)})"
             )
         return self
 
@@ -619,6 +620,82 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         description=(
             "Inference p99 latency SLO breached — model server slower than expected;"
             " investigate before staleness escalation."
+        ),
+    ),
+    # ── Risk-rule pre-flight decisions (2026-05-11, risk_simulations plan Phase 1.E) ──
+    # Per § 7 SSOT reconciliation seam: BLOCK is HIGH (route to alerting, not page);
+    # SCALE_DOWN is WARN; MONITOR + TEST_ONLY are INFO. RiskRuleConsequence cross-product
+    # table in risk_simulations_limits_alerting_2026_05_10.md lines 50-58.
+    AlertRule(
+        code=AlertCode.RISK_RULE_BLOCKED,
+        event_pattern="RISK_RULE_BLOCKED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("risk_rule_blocked"),
+        description=(
+            "Pre-flight risk rule BLOCKED an order — order never reached venue."
+            " Operator reviews the rule fire + decides whether to override."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.RISK_RULE_SCALED_DOWN,
+        event_pattern="RISK_RULE_SCALED_DOWN",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("risk_rule_scaled_down"),
+        description=(
+            "Pre-flight risk rule SCALED DOWN an order — order proceeded at reduced"
+            " size. Logged for post-trade review; no operator action required."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.RISK_RULE_MONITOR_FIRED,
+        event_pattern="RISK_RULE_MONITOR_FIRED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.LOG_ONLY,),
+        runbook_doc=_runbook("risk_rule_monitor_fired"),
+        description=(
+            "Advisory risk rule fired (MONITOR consequence) — instruction passed"
+            " through unmodified. Recorded for analytics; no operator action."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.RISK_RULE_TEST_ONLY_ROUTED,
+        event_pattern="RISK_RULE_TEST_ONLY_ROUTED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.LOG_ONLY,),
+        runbook_doc=_runbook("risk_rule_test_only_routed"),
+        description=(
+            "Risk rule routed instruction to the matching engine (TEST_ONLY"
+            " consequence) instead of live venue. Logged for backtest analysis."
+        ),
+    ),
+    # ── Kill-switch recovery events (2026-05-11, Q8 ratification) ───────────
+    # Distinct alert events per Policy B (larger-set-wins). Code starts with
+    # KILL_SWITCH_ so kill_switch_scope is required by validator; GLOBAL chosen
+    # as default since recovery scope follows the original arm-event scope.
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_AUTO_RECOVERED,
+        event_pattern="KILL_SWITCH_AUTO_RECOVERED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("kill_switch_auto_recovered"),
+        kill_switch_scope=KillSwitchScope.GLOBAL,
+        description=(
+            "Circuit breaker auto-recovered after cooldown — guard predicate green"
+            " for N consecutive readings; positions/orders resumed automatically."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_MANUAL_UNKILLED,
+        event_pattern="KILL_SWITCH_MANUAL_UNKILLED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("kill_switch_manual_unkilled"),
+        kill_switch_scope=KillSwitchScope.GLOBAL,
+        description=(
+            "Operator manually disarmed a kill switch via deployment-UI or CLI."
+            " Audit log carries unkilled_by_operator_id + original arm provenance."
         ),
     ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────

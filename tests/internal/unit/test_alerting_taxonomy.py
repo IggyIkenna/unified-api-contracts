@@ -281,13 +281,25 @@ def test_live_alert_rules_no_duplicate_pattern_severity_pairs() -> None:
 
 
 def test_kill_switch_rules_trigger_kill_switch_flag() -> None:
-    """Every KILL_SWITCH_* AlertCode rule MUST have triggers_kill_switch=True
-    so the kill_switch_bus_subscriber publishes the event downstream."""
+    """Every KILL_SWITCH_* ARMING AlertCode rule MUST have triggers_kill_switch=True
+    so the kill_switch_bus_subscriber publishes the event downstream. RECOVERY
+    events (KILL_SWITCH_AUTO_RECOVERED / KILL_SWITCH_MANUAL_UNKILLED — Q8
+    ratification 2026-05-10) report PAST kill-switch state changes and MUST NOT
+    re-arm; they keep triggers_kill_switch=False."""
+    _RECOVERY_CODES: set[str] = {
+        "KILL_SWITCH_AUTO_RECOVERED",
+        "KILL_SWITCH_MANUAL_UNKILLED",
+    }
     for rule in LIVE_ALERT_RULES:
-        if rule.code.value.startswith("KILL_SWITCH_"):
+        if rule.code.value.startswith("KILL_SWITCH_") and rule.code.value not in _RECOVERY_CODES:
             assert rule.triggers_kill_switch is True, (
-                f"AlertRule(code={rule.code}) is in the KILL_SWITCH_ family but "
+                f"AlertRule(code={rule.code}) is in the KILL_SWITCH_ arming family but "
                 "triggers_kill_switch=False — execution-service won't halt on fire"
+            )
+        elif rule.code.value in _RECOVERY_CODES:
+            assert rule.triggers_kill_switch is False, (
+                f"AlertRule(code={rule.code}) is a kill-switch RECOVERY event but "
+                "triggers_kill_switch=True — would re-arm the kill switch on recovery"
             )
 
 
