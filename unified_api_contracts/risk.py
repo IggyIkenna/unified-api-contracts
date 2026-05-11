@@ -92,4 +92,29 @@ __all__ = [
     "StrategyFamily",
     "StrategyFamilyId",
     "family_for_archetype",
+    # Phase 2 — per-axis registry aggregator (shipped Round 2 sub-agents D/E/F)
+    "ACCOUNT_RULES",
+    "ALL_RULES",
+    "ARCHETYPE_RULES",
+    "ASSET_GROUP_RULES",
+    "CLIENT_RULES",
+    "GLOBAL_RULES",
+    "STRATEGY_FAMILY_RULES",
+    "VENUE_RULES",
+    "get_rules_for",
+    "iter_applicable_rules",
 ]
+
+# Re-export the per-axis registry aggregator at the risk facade.
+from .registry.risk_rules import (
+    ACCOUNT_RULES,
+    ALL_RULES,
+    ARCHETYPE_RULES,
+    ASSET_GROUP_RULES,
+    CLIENT_RULES,
+    GLOBAL_RULES,
+    STRATEGY_FAMILY_RULES,
+    VENUE_RULES,
+    get_rules_for,
+    iter_applicable_rules,
+)
