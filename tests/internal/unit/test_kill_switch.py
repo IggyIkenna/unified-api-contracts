@@ -1,6 +1,7 @@
 """Closed-set sanity tests for the UAC kill-switch event taxonomy.
 
-Phase 1.F of [`disaster_recovery_circuit_breakers_2026_05_10.md`](../../../../../unified-trading-pm/plans/active/disaster_recovery_circuit_breakers_2026_05_10.md).
+Phase 1.F of ``disaster_recovery_circuit_breakers_2026_05_10.md``
+(``unified-trading-pm/plans/active/``).
 
 Verifies:
 

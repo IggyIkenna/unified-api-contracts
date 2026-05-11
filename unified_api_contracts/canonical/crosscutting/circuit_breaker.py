@@ -1,12 +1,13 @@
 """Circuit-breaker taxonomy — closed-set workspace SSOT.
 
-Phase 1.A of [`disaster_recovery_circuit_breakers_2026_05_10.md`](../../../../unified-trading-pm/plans/active/disaster_recovery_circuit_breakers_2026_05_10.md).
-Defines the canonical breaker taxonomy that the risk-and-exposure-service,
-execution-service, and alerting-service all consume.
+Phase 1.A of ``disaster_recovery_circuit_breakers_2026_05_10.md``
+(``unified-trading-pm/plans/active/``). Defines the canonical breaker
+taxonomy that the risk-and-exposure-service, execution-service, and
+alerting-service all consume.
 
 Five orthogonal axes per breaker:
 
-1. :class:`CircuitBreakerId` — closed-set identifier (per-archetype × per-trigger).
+1. :class:`CircuitBreakerId` — closed-set identifier (per-archetype x per-trigger).
 2. :class:`BreakerScope` — applicability blast radius
    (per-venue / per-archetype / per-account / per-asset_group / global).
 3. :class:`BreakerTrigger` — typed condition the breaker watches
@@ -35,10 +36,11 @@ The seam:
 - :class:`BreakerAction` is a Layer-3 execution-side response distinct from
   :class:`unified_api_contracts.errors.ErrorAction` (Layer-4 post-venue-error
   classification per
-  [`codex/04-architecture/autonomous-recovery-matrix.md`](../../../../unified-trading-pm/codex/04-architecture/autonomous-recovery-matrix.md)).
-- :class:`BreakerScope` composes with :class:`unified_api_contracts.alerting.KillSwitchScope`
-  (per [`codex/04-architecture/kill-switch-circuit-breaker.md`](../../../../unified-trading-pm/codex/04-architecture/kill-switch-circuit-breaker.md))
-  — breaker firing at ``PER_VENUE`` may engage a :class:`KillSwitchId` at
+  ``codex/04-architecture/autonomous-recovery-matrix.md``).
+- :class:`BreakerScope` composes with
+  :class:`unified_api_contracts.alerting.KillSwitchScope`
+  (per ``codex/04-architecture/kill-switch-circuit-breaker.md``) —
+  breaker firing at ``PER_VENUE`` may engage a :class:`KillSwitchId` at
   ``KillSwitchScope.VENUE``.
 - :class:`BreakerRecoveryMode` orthogonal to the kill-switch 4-set strategy
   behaviours (``STOP_NEW_ONLY`` / ``FAST_UNWIND`` / ``SLOW_UNWIND`` /
@@ -54,8 +56,7 @@ Adding a new breaker
 3. If the trigger maps to an alert, append the corresponding :class:`AlertCode`
    in ``alerting/codes.py`` (Sub-B's scope).
 4. Update the codex doc list per
-   [`disaster_recovery_circuit_breakers_2026_05_10.md`](../../../../unified-trading-pm/plans/active/disaster_recovery_circuit_breakers_2026_05_10.md)
-   Phase 8.
+   ``disaster_recovery_circuit_breakers_2026_05_10.md`` Phase 8.
 """
 
 from __future__ import annotations

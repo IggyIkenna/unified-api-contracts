@@ -1,7 +1,8 @@
 """Kill-switch event taxonomy — closed-set workspace SSOT.
 
-Phase 1.C-D of [`disaster_recovery_circuit_breakers_2026_05_10.md`](../../../../unified-trading-pm/plans/active/disaster_recovery_circuit_breakers_2026_05_10.md).
-Defines the canonical event vocabulary for the
+Phase 1.C-D of ``disaster_recovery_circuit_breakers_2026_05_10.md``
+(``unified-trading-pm/plans/active/``). Defines the canonical event
+vocabulary for the
 :class:`unified_trading_library.kill_switch.KillSwitchBus` arm/disarm cycle.
 
 Five orthogonal axes per kill-switch event:

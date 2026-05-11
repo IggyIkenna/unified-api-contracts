@@ -150,7 +150,10 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
         action=BreakerAction.SCALE_DOWN,
         cooldown_seconds=3600,
         alerting_severity=AlertSeverity.HIGH,
-        description="Realised PnL >= 3 sigma vs backtest expectation → halve position; auto-recover after 1h within tolerance.",
+        description=(
+            "Realised PnL >= 3 sigma vs backtest expectation → halve position; "
+            "auto-recover after 1h within tolerance."
+        ),
     ),
     BreakerConfig(
         breaker_id=CircuitBreakerId.HEDGE_GAP_NOTIONAL_USD,
