@@ -121,6 +121,68 @@ class AlertCode(StrEnum):
     rollback / promotion race / hot-reload mis-fire). CRITICAL — every
     trade until resolved is on a model the operator did not approve."""
 
+    # ── Risk-rule taxonomy (2026-05-10, risk_simulations_limits_alerting Phase
+    # 1.E + cross-plan audit Q6 Policy B "larger-set-wins"). Each
+    # ``RiskRuleConsequence`` value gets a dedicated AlertCode so the alerting
+    # routing layer can apply per-consequence severity + per-consequence
+    # channels (e.g. BLOCK pages; SCALE_DOWN dashboards; MONITOR + TEST_ONLY
+    # log-only). The corresponding LIVE_ALERT_RULES entries are seeded by the
+    # master coordinator after Sub-A's ``event_pattern`` rename lands
+    # (UAC@0b61aec). Producers: risk-and-exposure-service ``rule_evaluator``.
+    # SSOT seam: ``plans/active/risk_simulations_limits_alerting_2026_05_10.md``
+    # § "§ 7 SSOT reconciliation seam (Framing 1)" cross-product table.
+    RISK_RULE_BLOCKED = "RISK_RULE_BLOCKED"
+    """A risk rule fired with ``RiskRuleConsequence.BLOCK`` — instruction
+    rejected pre-flight before reaching the venue. Severity per
+    ``RiskRule.alerting_severity`` (typically HIGH or CRITICAL). Distinct from
+    generic ``PREFLIGHT_FAILED`` which fires for pre-flight checks NOT routed
+    through the rule engine (e.g. instrument-not-listed, kill-switch already
+    engaged). When N consecutive BLOCKs on the same ``(venue, asset_group)``
+    accumulate, the breaker may escalate per
+    ``RISK_TO_BREAKER_ESCALATION_MAP`` — that emits
+    ``CIRCUIT_BREAKER_DEGRADED`` / ``CIRCUIT_BREAKER_OPEN`` separately."""
+    RISK_RULE_SCALED_DOWN = "RISK_RULE_SCALED_DOWN"
+    """A risk rule fired with ``RiskRuleConsequence.SCALE_DOWN`` — instruction
+    accepted with a size-adjustment multiplier (e.g. position-size cap halves
+    the order). Severity typically WARN. Does NOT trigger kill-switch or
+    circuit-breaker — instruction proceeds at reduced size, downstream P&L
+    reflects the scaled fill."""
+    RISK_RULE_MONITOR_FIRED = "RISK_RULE_MONITOR_FIRED"
+    """A risk rule fired with ``RiskRuleConsequence.MONITOR`` — instruction
+    accepted unchanged; rule fire is advisory (dashboard signal / log entry).
+    Severity typically INFO or WARN. Never triggers kill-switch or
+    circuit-breaker. Used for tripwire rules where the team wants visibility
+    before tightening to BLOCK / SCALE_DOWN."""
+    RISK_RULE_TEST_ONLY_ROUTED = "RISK_RULE_TEST_ONLY_ROUTED"
+    """A risk rule fired with ``RiskRuleConsequence.TEST_ONLY`` — instruction
+    diverted to the matching engine instead of the live venue (no live fills
+    produced). Severity INFO. Used for shadow-mode rules where strategy +
+    execution exercise the full path but no capital is at risk. Distinct from
+    venue-side circuit-breaker route (which is post-error)."""
+
+    # ── Kill-switch recovery (2026-05-10, risk_simulations_limits_alerting
+    # Phase 1.F + DR plan Phase 1.A). Distinct events per Policy B (the
+    # kill-switch supports BOTH manual-unkill AND auto-cooldown recovery
+    # modes per ``BREAKER_RECOVERY_DEFAULTS`` per-action defaults). Distinct
+    # codes so dashboards can show "auto-recovered vs operator-unkilled"
+    # separately, and so operator-attention auditing distinguishes the two.
+    # Producers: execution-service breaker / risk-and-exposure-service
+    # kill-switch on transition out of armed state.
+    KILL_SWITCH_AUTO_RECOVERED = "KILL_SWITCH_AUTO_RECOVERED"
+    """Kill-switch transitioned from armed to inactive via the auto-cooldown
+    path (metric cleared + ``cooldown_seconds`` elapsed). Severity INFO.
+    Fires once per recovery transition. The ``BREAKER_RECOVERY_DEFAULTS``
+    dict in ``unified_api_contracts.canonical.crosscutting.circuit_breaker``
+    declares which ``BreakerAction`` values auto-recover (default:
+    ``BLOCK_NEW`` + ``SCALE_DOWN``)."""
+    KILL_SWITCH_MANUAL_UNKILLED = "KILL_SWITCH_MANUAL_UNKILLED"
+    """Kill-switch transitioned from armed to inactive via operator manual
+    unkill (DART unkill button + reason text). Severity INFO. Fires once per
+    recovery transition. Default for ``BreakerAction.CANCEL_OPEN`` +
+    ``BreakerAction.KILL_ALL`` per ``BREAKER_RECOVERY_DEFAULTS`` —
+    operator sign-off required because cancelled / fully-unwound positions
+    don't have a natural auto-restore semantic."""
+
 
 ALERT_CODES: Final[frozenset[str]] = frozenset(member.value for member in AlertCode)
 """String-membership view of :class:`AlertCode` for fast O(1) validation.

@@ -1,0 +1,556 @@
+"""Risk-rule taxonomy SSOT — closed-set rule-id, scope, consequence, trigger conditions.
+
+This module is the workspace SSOT for **pre-flight risk-rule decisions** evaluated
+at Layer 2 of the 4-layer risk-gates model (see
+``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md``). It introduces
+``RiskRuleConsequence`` as a NEW pre-flight rule-decision abstraction — distinct
+from + composing with the 5 canonical workspace risk SSOTs (risk-gates layers,
+8-event lifecycle, kill-switch trigger set, circuit-breaker action set, strategy
+kill-switch behaviour set).
+
+§ 7 SSOT reconciliation
+=======================
+
+Per ``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` § "§ 7 SSOT
+reconciliation seam (Framing 1)" — picked by operator 2026-05-10. The seam
+diagram + cross-product table in that plan body is the canonical reconciliation
+between ``RiskRuleConsequence`` and the 5 canonical SSOTs:
+
+* **Risk-gates 4 layers** — ``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md``.
+  ``RiskRuleConsequence`` evaluates at Layer 2 (risk-and-exposure-service
+  pre-flight); ``ErrorAction`` taxonomy classifies Layer 4 (venue-side) errors.
+  They don't overlap.
+* **8-event lifecycle SSOT** — every fire emits ``RiskRuleFiredEvent`` plus
+  the corresponding instruction-lifecycle event (BLOCK → ``INSTRUCTION_REJECTED_RISK``;
+  others → ``INSTRUCTION_ACCEPTED_PREFLIGHT`` with annotations).
+* **Kill-switch trigger set** — ``codex/04-architecture/kill-switch-circuit-breaker.md``.
+  ``RiskRule.kill_switch_scope()`` maps ``RiskRuleScope`` →
+  ``KillSwitchScope`` for the orthogonal axis (rule applicability vs kill-switch
+  blast radius).
+* **Circuit-breaker action set** — ``plans/active/alerting_service_live_rules_2026_05_07.md``.
+  Aggregated BLOCK rate ≥ threshold triggers circuit-breaker state transitions
+  (CLOSED → DEGRADED → OPEN); SCALE_DOWN / MONITOR / TEST_ONLY do not.
+* **Strategy kill-switch behaviour 4-set** — ``STOP_NEW_ONLY`` / ``FAST_UNWIND``
+  / ``SLOW_UNWIND`` / ``DELTA_HEDGE`` — engaged downstream when a BLOCK rule's
+  ``triggers_kill_switch`` evaluates true.
+
+Reviewers reject Phase 1+ contributors that bypass this seam (e.g. inlining
+risk-rule logic in execution-service instead of routing through Layer 2).
+"""
+
+from __future__ import annotations
+
+from decimal import Decimal
+from enum import StrEnum
+from typing import Annotated, Final, Literal, Union
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from .alerting import AlertSeverity
+from .alerting.codes import KillSwitchScope
+
+
+class RiskRuleId(StrEnum):
+    """Closed-set rule identifiers for the per-axis risk-rule registry.
+
+    § 7 SSOT reconciliation
+    -----------------------
+
+    Each rule-id maps 1:1 to a ``RiskRule`` instance in the per-axis registry
+    (``registry/risk_rules/{archetype,venue,account,client,asset_group,global}.py``
+    seeded in Phase 2 of ``risk_simulations_limits_alerting_2026_05_10``). The
+    closed-set discipline mirrors ``AlertCode`` /
+    ``EmptyConfirmedReason`` / ``LifecycleEventType`` — emitting a rule-id
+    outside the enum is a programming error caught at type-check time.
+
+    Composes with the 5 canonical SSOTs per the seam diagram in
+    ``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` § "§ 7
+    SSOT reconciliation seam (Framing 1)":
+
+    * ``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md`` — Layer
+      2 evaluation point.
+    * 8-event lifecycle SSOT — fire emits ``RiskRuleFiredEvent``.
+    * ``codex/04-architecture/kill-switch-circuit-breaker.md`` — kill-switch
+      scope mapping via ``RiskRule.kill_switch_scope()``.
+    * ``plans/active/alerting_service_live_rules_2026_05_07.md`` — alerting
+      routing via ``RiskRule.alerting_severity`` + AlertCodes
+      ``RISK_RULE_BLOCKED`` / ``RISK_RULE_SCALED_DOWN`` /
+      ``RISK_RULE_MONITOR_FIRED`` / ``RISK_RULE_TEST_ONLY_ROUTED``.
+    * Strategy kill-switch behaviour 4-set — engaged when BLOCK rule's
+      ``triggers_kill_switch`` is true.
+
+    Closed members below seed the Phase 2 registry. Phase 2.A-F sub-agents
+    extend this enum with additional archetype-specific / venue-specific
+    rule-ids — every new member MUST also seed a ``RiskRule`` in the
+    appropriate per-axis registry.
+    """
+
+    # ── Position-sizing axis (per-archetype + per-venue) ────────────────────
+    MAX_POSITION_SIZE_PER_ARCHETYPE = "MAX_POSITION_SIZE_PER_ARCHETYPE"
+    MAX_POSITION_SIZE_PER_VENUE = "MAX_POSITION_SIZE_PER_VENUE"
+    MAX_POSITION_SIZE_PER_INSTRUMENT = "MAX_POSITION_SIZE_PER_INSTRUMENT"
+    MAX_OI_PER_VENUE = "MAX_OI_PER_VENUE"
+
+    # ── Drawdown axis (per-archetype + per-account + per-client) ────────────
+    MAX_DRAWDOWN_PER_ARCHETYPE = "MAX_DRAWDOWN_PER_ARCHETYPE"
+    MAX_DRAWDOWN_PER_ACCOUNT = "MAX_DRAWDOWN_PER_ACCOUNT"
+    MAX_DRAWDOWN_PER_CLIENT = "MAX_DRAWDOWN_PER_CLIENT"
+    MAX_DAILY_LOSS_PER_ACCOUNT = "MAX_DAILY_LOSS_PER_ACCOUNT"
+
+    # ── Leverage + concentration axis ───────────────────────────────────────
+    MAX_LEVERAGE_PER_ARCHETYPE = "MAX_LEVERAGE_PER_ARCHETYPE"
+    MAX_LEVERAGE_PER_ACCOUNT = "MAX_LEVERAGE_PER_ACCOUNT"
+    MAX_CONCENTRATION_PER_INSTRUMENT = "MAX_CONCENTRATION_PER_INSTRUMENT"
+    MAX_CONCENTRATION_PER_ASSET_GROUP = "MAX_CONCENTRATION_PER_ASSET_GROUP"
+
+    # ── Cost-budget axis ────────────────────────────────────────────────────
+    SLIPPAGE_BUDGET_PER_ARCHETYPE = "SLIPPAGE_BUDGET_PER_ARCHETYPE"
+    FUNDING_COST_CEILING_PER_ARCHETYPE = "FUNDING_COST_CEILING_PER_ARCHETYPE"
+    GAS_BUDGET_PER_ARCHETYPE = "GAS_BUDGET_PER_ARCHETYPE"
+
+    # ── Cross-instrument / cross-venue axis ─────────────────────────────────
+    MAX_CORRELATION_PER_ARCHETYPE = "MAX_CORRELATION_PER_ARCHETYPE"
+    MAX_GROSS_EXPOSURE_PER_ACCOUNT = "MAX_GROSS_EXPOSURE_PER_ACCOUNT"
+    MAX_NET_EXPOSURE_PER_ACCOUNT = "MAX_NET_EXPOSURE_PER_ACCOUNT"
+    CAPITAL_AT_RISK_CEILING_PER_ARCHETYPE = "CAPITAL_AT_RISK_CEILING_PER_ARCHETYPE"
+
+    # ── Global kill-conditions axis ─────────────────────────────────────────
+    GLOBAL_PORTFOLIO_DRAWDOWN_HALT = "GLOBAL_PORTFOLIO_DRAWDOWN_HALT"
+    GLOBAL_DATA_STALENESS_HALT = "GLOBAL_DATA_STALENESS_HALT"
+
+
+RISK_RULE_IDS: Final[frozenset[str]] = frozenset(m.value for m in RiskRuleId)
+"""String-membership view of :class:`RiskRuleId` for fast O(1) validation.
+
+Mirrors ``ALERT_CODES``. Use enum members in new code; this set is for the
+validation hot path only.
+"""
+
+
+class RiskRuleScope(StrEnum):
+    """Scope axis — which dimension the rule applies along.
+
+    § 7 SSOT reconciliation
+    -----------------------
+
+    ``RiskRuleScope`` is **orthogonal to ``KillSwitchScope``** per the seam
+    diagram cross-product table in
+    ``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` § "§ 7 SSOT
+    reconciliation seam":
+
+    * ``RiskRuleScope`` = the rule-applicability axis (which entities the rule
+      should evaluate against).
+    * ``KillSwitchScope`` (per
+      ``codex/04-architecture/kill-switch-circuit-breaker.md``) = the
+      kill-switch-blast-radius axis (when armed, what gets halted).
+
+    ``RiskRule.kill_switch_scope()`` (Phase 1.C) maps Scope → KillSwitchScope
+    when the rule's BLOCK consequence is paired with
+    ``triggers_kill_switch=True``:
+
+    * ``PER_VENUE`` → ``KillSwitchScope.VENUE``
+    * ``PER_ARCHETYPE`` → ``KillSwitchScope.ARCHETYPE``
+    * ``PER_CLIENT`` → ``KillSwitchScope.CLIENT``
+    * ``GLOBAL`` → ``KillSwitchScope.GLOBAL``
+    * ``PER_ACCOUNT`` / ``PER_ASSET_GROUP`` → ``None`` (not directly
+      kill-switch-applicable; affects portfolio aggregates instead).
+    """
+
+    PER_ARCHETYPE = "PER_ARCHETYPE"
+    PER_VENUE = "PER_VENUE"
+    PER_ACCOUNT = "PER_ACCOUNT"
+    PER_ASSET_GROUP = "PER_ASSET_GROUP"
+    PER_CLIENT = "PER_CLIENT"
+    GLOBAL = "GLOBAL"
+
+
+class RiskRuleConsequence(StrEnum):
+    """Pre-flight rule decision — closed set of 4 actions a fired rule can take.
+
+    § 7 SSOT reconciliation
+    -----------------------
+
+    ``RiskRuleConsequence`` is a NEW abstraction at a NEW layer — **per-rule
+    per-instruction pre-flight decision** evaluated at Layer 2 of the 4-layer
+    risk-gates model
+    (``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md``). It
+    does NOT replace any existing canonical SSOT; it COMPOSES with all 5 per
+    the cross-product table in
+    ``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` § "§ 7 SSOT
+    reconciliation seam":
+
+    * **BLOCK**: emits ``INSTRUCTION_REJECTED_RISK`` + ``RiskRuleFiredEvent``
+      (HIGH/CRITICAL) + AlertCode ``RISK_RULE_BLOCKED``. May trigger
+      kill-switch when paired with ``triggers_kill_switch=True``. Aggregated
+      BLOCK rate ≥ threshold may transition the venue circuit-breaker per
+      ``alerting_service_live_rules`` cascade.
+    * **SCALE_DOWN**: emits ``INSTRUCTION_ACCEPTED_PREFLIGHT`` (size_adjusted)
+      + ``RESIZED_EXECUTION`` at Layer 3 + ``RiskRuleFiredEvent`` (WARN) +
+      AlertCode ``RISK_RULE_SCALED_DOWN``. Does NOT trigger kill-switch or
+      breaker.
+    * **MONITOR**: emits ``INSTRUCTION_ACCEPTED_PREFLIGHT`` + advisory
+      ``RiskRuleFiredEvent`` (INFO/WARN) + AlertCode
+      ``RISK_RULE_MONITOR_FIRED``. Passthrough; no instruction modification.
+    * **TEST_ONLY**: tags instruction ``mode=TEST`` → Layer 3 routes to the
+      matching engine instead of live venue. Emits
+      ``INSTRUCTION_ACCEPTED_PREFLIGHT`` (mode=TEST) +
+      ``RiskRuleFiredEvent`` (INFO) + AlertCode
+      ``RISK_RULE_TEST_ONLY_ROUTED``.
+
+    Orthogonal to ``ErrorAction`` (RETRY / RECONNECT / SKIP / FAIL per
+    ``codex/04-architecture/autonomous-recovery-matrix.md``) — that's the
+    Layer 4 post-venue-error classification. Layer 2 may BLOCK (instruction
+    never reaches venue → no ErrorAction); Layer 2 may approve (any
+    non-BLOCK) → Layer 4 may then classify a venue rejection.
+    """
+
+    BLOCK = "BLOCK"
+    SCALE_DOWN = "SCALE_DOWN"
+    MONITOR = "MONITOR"
+    TEST_ONLY = "TEST_ONLY"
+
+
+# ---------------------------------------------------------------------------
+# Trigger conditions — typed closed-union (discriminated by ``trigger_type``).
+# ---------------------------------------------------------------------------
+
+
+class _TriggerBase(BaseModel):
+    """Shared trigger-condition base.
+
+    § 7 SSOT reconciliation
+    -----------------------
+
+    Trigger conditions are evaluated by ``risk/rule_evaluator.py`` (UTL Phase
+    3.A) against a runtime ``context`` containing the proposed instruction +
+    current position-balance state. The closed-union discriminator
+    ``trigger_type`` makes Pydantic + basedpyright route to the correct
+    sub-model. Adding a new trigger type means appending to this union AND
+    teaching the evaluator. No string-typed runtime branching.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+
+class MaxPositionSizeTrigger(_TriggerBase):
+    """Position-size cap. Units: USD-notional."""
+
+    trigger_type: Literal["max_position_size"] = "max_position_size"
+    cap_usd: Decimal
+
+
+class MaxDrawdownTrigger(_TriggerBase):
+    """Drawdown cap. Units: bps from peak NAV."""
+
+    trigger_type: Literal["max_drawdown"] = "max_drawdown"
+    cap_bps: int
+
+
+class MaxLeverageTrigger(_TriggerBase):
+    """Leverage cap. Units: dimensionless (gross-notional / equity)."""
+
+    trigger_type: Literal["max_leverage"] = "max_leverage"
+    cap_ratio: Decimal
+
+
+class MaxConcentrationTrigger(_TriggerBase):
+    """Concentration cap. Units: % of total portfolio NAV."""
+
+    trigger_type: Literal["max_concentration"] = "max_concentration"
+    cap_pct: Decimal
+
+
+class MaxCorrelationTrigger(_TriggerBase):
+    """Cross-position correlation cap. Units: Pearson ρ on rolling returns."""
+
+    trigger_type: Literal["max_correlation"] = "max_correlation"
+    cap_rho: Decimal
+    window_days: int
+
+
+class SlippageBudgetTrigger(_TriggerBase):
+    """Slippage budget. Units: bps over benchmark-arrival mid."""
+
+    trigger_type: Literal["slippage_budget_exceeded"] = "slippage_budget_exceeded"
+    budget_bps: int
+
+
+class FundingCostCeilingTrigger(_TriggerBase):
+    """Funding-cost annualised ceiling. Units: bps APR."""
+
+    trigger_type: Literal["funding_cost_ceiling"] = "funding_cost_ceiling"
+    ceiling_bps_apr: int
+
+
+class GasBudgetTrigger(_TriggerBase):
+    """Per-instruction gas budget. Units: USD-equivalent at current ETH/SOL price."""
+
+    trigger_type: Literal["gas_budget_exceeded"] = "gas_budget_exceeded"
+    budget_usd: Decimal
+
+
+class CapitalAtRiskCeilingTrigger(_TriggerBase):
+    """Capital-at-risk ceiling. Units: USD-notional at 95% VaR / equivalent."""
+
+    trigger_type: Literal["capital_at_risk_ceiling"] = "capital_at_risk_ceiling"
+    ceiling_usd: Decimal
+
+
+class MaxOITrigger(_TriggerBase):
+    """Per-venue per-instrument open-interest cap. Units: USD-notional."""
+
+    trigger_type: Literal["max_oi"] = "max_oi"
+    cap_usd: Decimal
+
+
+class MaxGrossExposureTrigger(_TriggerBase):
+    """Account-level gross exposure cap. Units: USD-notional."""
+
+    trigger_type: Literal["max_gross_exposure"] = "max_gross_exposure"
+    cap_usd: Decimal
+
+
+class MaxNetExposureTrigger(_TriggerBase):
+    """Account-level net exposure cap. Units: USD-notional."""
+
+    trigger_type: Literal["max_net_exposure"] = "max_net_exposure"
+    cap_usd: Decimal
+
+
+class MaxDailyLossTrigger(_TriggerBase):
+    """Per-account daily loss cap. Units: USD."""
+
+    trigger_type: Literal["max_daily_loss"] = "max_daily_loss"
+    cap_usd: Decimal
+
+
+RiskRuleTrigger = Annotated[
+    Union[
+        MaxPositionSizeTrigger,
+        MaxDrawdownTrigger,
+        MaxLeverageTrigger,
+        MaxConcentrationTrigger,
+        MaxCorrelationTrigger,
+        SlippageBudgetTrigger,
+        FundingCostCeilingTrigger,
+        GasBudgetTrigger,
+        CapitalAtRiskCeilingTrigger,
+        MaxOITrigger,
+        MaxGrossExposureTrigger,
+        MaxNetExposureTrigger,
+        MaxDailyLossTrigger,
+    ],
+    Field(discriminator="trigger_type"),
+]
+"""Discriminated union of typed trigger conditions.
+
+§ 7 SSOT reconciliation
+-----------------------
+
+Closed union — every condition the pre-flight rule engine can evaluate is
+listed here. The evaluator in UTL ``risk/rule_evaluator.py`` (Phase 3.A)
+dispatches on ``trigger.trigger_type``. Adding new trigger types means
+appending to this union + teaching the evaluator. Composes with Phase 2's
+per-axis registry — each registry entry sets ``trigger=<concrete subclass>``
+with axis-appropriate fields.
+
+Closed for now; archetype-specific extensions (e.g. ``StakingDepegTrigger``
+for ``carry_staked_basis``) land in the closed-enum extension table of
+this module as Phase 2 ships, NOT in a wildcard ``Any`` field.
+"""
+
+
+# ---------------------------------------------------------------------------
+# RiskRule — the per-rule contract.
+# ---------------------------------------------------------------------------
+
+
+class RiskRule(BaseModel):
+    """Single risk-rule contract — one row in the per-axis registry.
+
+    § 7 SSOT reconciliation
+    -----------------------
+
+    ``RiskRule`` is the fundamental contract every per-axis registry entry
+    instantiates. Composes with all 5 canonical SSOTs per the seam diagram in
+    ``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` § "§ 7
+    SSOT reconciliation seam (Framing 1)":
+
+    * **Risk-gates Layer 2** — evaluated by
+      ``risk/rule_evaluator.py`` (UTL Phase 3.A) against runtime context.
+    * **8-event lifecycle SSOT** — every fire emits ``RiskRuleFiredEvent``
+      with this rule's ``rule_id`` + ``alerting_severity``.
+    * **Kill-switch trigger set** — ``kill_switch_scope()`` maps ``scope`` →
+      ``KillSwitchScope``; downstream kill-switch fires when consequence is
+      ``BLOCK`` + caller declares ``triggers_kill_switch=True``.
+    * **Circuit-breaker action set** — aggregated BLOCK rate ≥ threshold may
+      transition the breaker per
+      ``RISK_TO_BREAKER_ESCALATION_MAP`` (declared separately in
+      ``circuit_breaker.py`` by Sub-C; see plan body
+      ``risk_simulations_limits_alerting`` Phase 7.E).
+    * **Strategy kill-switch behaviour 4-set** — Layer 3 strategy engine
+      consumes the BLOCK + kill-switch-engaged combination + dispatches
+      ``STOP_NEW_ONLY`` / ``FAST_UNWIND`` / ``SLOW_UNWIND`` / ``DELTA_HEDGE``
+      per per-archetype config.
+
+    The ``applies_to`` field is a free-form string keyed by ``scope``:
+
+    * ``PER_ARCHETYPE`` → ``StrategyArchetype.value`` (e.g.
+      ``"CARRY_STAKED_BASIS"``).
+    * ``PER_VENUE`` → venue short-name (e.g. ``"bybit"`` / ``"deribit"``).
+    * ``PER_ACCOUNT`` → account-id string (e.g. ``"paper-1"`` / ``"live-1"``).
+    * ``PER_ASSET_GROUP`` → ``"cefi"`` / ``"defi"`` / ``"tradfi"`` /
+      ``"sports"`` / ``"prediction"``.
+    * ``PER_CLIENT`` → client-id string.
+    * ``GLOBAL`` → ``"*"`` (sentinel).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    rule_id: RiskRuleId
+    """Closed-set rule identifier — keys the per-axis registry."""
+
+    scope: RiskRuleScope
+    """Applicability axis — drives ``kill_switch_scope()`` mapping."""
+
+    applies_to: str
+    """Free-form string keyed by ``scope`` — see class docstring for the
+    per-scope key shape. Empty string is rejected by Pydantic."""
+
+    trigger: RiskRuleTrigger
+    """Typed trigger condition — closed-union discriminated by
+    ``trigger_type``. Evaluator dispatches on this field."""
+
+    consequence: RiskRuleConsequence
+    """Pre-flight rule decision — closed set of 4 actions
+    (BLOCK / SCALE_DOWN / MONITOR / TEST_ONLY)."""
+
+    alerting_severity: AlertSeverity
+    """Severity to stamp on the emitted ``RiskRuleFiredEvent`` — drives
+    paging behaviour per ``alerting_service_live_rules``. CRITICAL +
+    HIGH typically pair with BLOCK; WARN with SCALE_DOWN; INFO with
+    MONITOR + TEST_ONLY."""
+
+    description: str
+    """Operator-facing rule description. Rendered in the deployment-UI Risk
+    tab (Phase 6 of risk plan)."""
+
+    triggers_kill_switch: bool = False
+    """Whether a BLOCK consequence engages the kill-switch via
+    ``kill_switch_scope()``. Only meaningful when ``consequence == BLOCK``.
+    SCALE_DOWN / MONITOR / TEST_ONLY ignore this field per the seam diagram
+    orthogonality declarations."""
+
+    def kill_switch_scope(self) -> KillSwitchScope | None:
+        """Map ``self.scope`` → ``KillSwitchScope`` per the seam diagram.
+
+        § 7 SSOT reconciliation
+        -----------------------
+
+        Composes with the kill-switch SSOT
+        (``codex/04-architecture/kill-switch-circuit-breaker.md``). Returns
+        ``None`` for scopes that aren't directly kill-switch-applicable
+        (``PER_ACCOUNT`` + ``PER_ASSET_GROUP`` affect portfolio aggregates,
+        not blast-radius halts). Callers MUST only use the return value when
+        ``self.consequence == RiskRuleConsequence.BLOCK`` AND
+        ``self.triggers_kill_switch`` is True — otherwise the orthogonality
+        declaration says the kill-switch does not fire even when scope is
+        mappable.
+        """
+        if self.scope is RiskRuleScope.PER_VENUE:
+            return KillSwitchScope.VENUE
+        if self.scope is RiskRuleScope.PER_ARCHETYPE:
+            return KillSwitchScope.ARCHETYPE
+        if self.scope is RiskRuleScope.PER_CLIENT:
+            return KillSwitchScope.CLIENT
+        if self.scope is RiskRuleScope.GLOBAL:
+            return KillSwitchScope.GLOBAL
+        # PER_ACCOUNT + PER_ASSET_GROUP — not directly kill-switch-applicable
+        # per the seam diagram cross-product table.
+        return None
+
+
+# ---------------------------------------------------------------------------
+# Seam-diagram conformance — declarative cross-product for tests.
+# ---------------------------------------------------------------------------
+
+CONSEQUENCE_EVENTS_EMITTED: Final[dict[RiskRuleConsequence, tuple[str, ...]]] = {
+    RiskRuleConsequence.BLOCK: (
+        "INSTRUCTION_REJECTED_RISK",
+        "RiskRuleFiredEvent",
+    ),
+    RiskRuleConsequence.SCALE_DOWN: (
+        "INSTRUCTION_ACCEPTED_PREFLIGHT",
+        "RESIZED_EXECUTION",
+        "RiskRuleFiredEvent",
+    ),
+    RiskRuleConsequence.MONITOR: (
+        "INSTRUCTION_ACCEPTED_PREFLIGHT",
+        "RiskRuleFiredEvent",
+    ),
+    RiskRuleConsequence.TEST_ONLY: (
+        "INSTRUCTION_ACCEPTED_PREFLIGHT",
+        "ORDER_SUBMITTED",
+        "RiskRuleFiredEvent",
+    ),
+}
+"""Declarative cross-product from the § 7 seam diagram.
+
+§ 7 SSOT reconciliation
+-----------------------
+
+Constant SSOT of "which lifecycle events fire per ``RiskRuleConsequence``"
+per the cross-product table in
+``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` § "§ 7 SSOT
+reconciliation seam". Phase 1.D unit tests assert this matches the seam
+diagram; downstream service emitters cite this dict at runtime to verify
+their own emission shape.
+
+Each ``ORDER_SUBMITTED`` for ``TEST_ONLY`` targets the matching engine, not
+the live venue — Layer 3 routing semantics per the seam diagram.
+"""
+
+
+CONSEQUENCE_ALERT_CODES: Final[dict[RiskRuleConsequence, str]] = {
+    RiskRuleConsequence.BLOCK: "RISK_RULE_BLOCKED",
+    RiskRuleConsequence.SCALE_DOWN: "RISK_RULE_SCALED_DOWN",
+    RiskRuleConsequence.MONITOR: "RISK_RULE_MONITOR_FIRED",
+    RiskRuleConsequence.TEST_ONLY: "RISK_RULE_TEST_ONLY_ROUTED",
+}
+"""Per-consequence AlertCode mapping per the § 7 seam diagram.
+
+§ 7 SSOT reconciliation
+-----------------------
+
+The 4 AlertCodes were added to ``AlertCode`` closed-set in Phase 1.E
+(2026-05-10 risk plan + Q6 Policy B "larger-set-wins" ratification). The
+strings here MUST match ``AlertCode.<MEMBER>.value``; the unit test in
+``tests/internal/unit/test_risk_rule_taxonomy.py`` asserts the keys cover
+the full ``RiskRuleConsequence`` closed set and that every value resolves
+through ``AlertCode``.
+"""
+
+
+__all__ = [
+    "CONSEQUENCE_ALERT_CODES",
+    "CONSEQUENCE_EVENTS_EMITTED",
+    "CapitalAtRiskCeilingTrigger",
+    "FundingCostCeilingTrigger",
+    "GasBudgetTrigger",
+    "MaxConcentrationTrigger",
+    "MaxCorrelationTrigger",
+    "MaxDailyLossTrigger",
+    "MaxDrawdownTrigger",
+    "MaxGrossExposureTrigger",
+    "MaxLeverageTrigger",
+    "MaxNetExposureTrigger",
+    "MaxOITrigger",
+    "MaxPositionSizeTrigger",
+    "RISK_RULE_IDS",
+    "RiskRule",
+    "RiskRuleConsequence",
+    "RiskRuleId",
+    "RiskRuleScope",
+    "RiskRuleTrigger",
+    "SlippageBudgetTrigger",
+]
