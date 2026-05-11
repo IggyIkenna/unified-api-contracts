@@ -159,6 +159,24 @@ class EmptyConfirmedReason(StrEnum):
     `EXPECTED_DEPRECATED_DATA_TYPE` (data_type still exists, just at a different cadence). Plan:
     ``manifest_migration_master_2026_05_07.plan`` § Audit findings 2026-05-07 → C.11."""
 
+    EXPECTED_KNOWN_SOURCE_GAP = "EXPECTED_KNOWN_SOURCE_GAP"
+    """Documented mid-history source gap that doesn't fit the venue-launch / source-coverage-start /
+    pre-genesis closed-set primitives. Distinct from ``EXPECTED_PRE_SOURCE_COVERAGE_START`` (which is
+    "before the source's archive started") and ``EXPECTED_INSTRUMENT_NOT_LISTED`` (which is "the specific
+    instrument didn't exist yet"): this is the "the source briefly stopped covering the data_type mid-history"
+    semantic.
+
+    Reference uses (operator-approved 2026-05-11):
+    * **VIX 15m gap** (``2025-11-13`` to ``today - 60d``) - the rolling Yahoo Finance window cannot reach back
+      to those dates and the Barchart historical preload stopped at ``2025-11-12``. Per CLAUDE.md
+      "VIX 15m source layering" rule the gap is honest absence (denominator clip), not a coverage hole.
+    * **Sports ``KNOWN_COVERAGE_GAPS``** — per UAC ``unified_api_contracts.sports.KNOWN_COVERAGE_GAPS``
+      ranges where a sports source had a documented multi-day outage / paused windows that don't fit
+      the league-paused / pre-source-launch categories.
+
+    Plan: ``manifest_schema_final_gate_2026_05_09.md`` Phase 1 — operator-approved 2026-05-11 in the
+    ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` § TL;DR point 2 routing decision."""
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
@@ -508,7 +526,8 @@ class LegacyBlankErrorReasonError(ValueError):
             "EXPECTED_PRE_GENESIS_CHAIN / EXPECTED_PRE_SOURCE_COVERAGE_START / "
             "EXPECTED_INSTRUMENT_NOT_LISTED / EXPECTED_INSTRUMENT_DELISTED / "
             "EXPECTED_PARTIAL_HALF_DAY / EXPECTED_PAUSED_LEAGUE / EXPECTED_DEPRECATED_DATA_TYPE / "
-            "EXPECTED_REFDATA_CADENCE_CHANGE / SOURCE_RETURNED_ZERO), or use record_failed if the "
+            "EXPECTED_REFDATA_CADENCE_CHANGE / EXPECTED_KNOWN_SOURCE_GAP / "
+            "SOURCE_RETURNED_ZERO), or use record_failed if the "
             "absence is unexpected." + suffix
         )
 

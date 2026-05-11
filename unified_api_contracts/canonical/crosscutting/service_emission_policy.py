@@ -42,6 +42,10 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final
 
+from unified_api_contracts.canonical.crosscutting.service_emission_state import (
+    ServiceEmissionStateEnum,
+)
+
 
 class ServiceEmissionPolicy(StrEnum):
     """Closed-set policy for what a service publishes when upstream input is incomplete.
@@ -259,6 +263,75 @@ def policy_is_alert(policy: ServiceEmissionPolicy) -> bool:
     return policy is ServiceEmissionPolicy.BLOCK_CRITICAL
 
 
+# ---------------------------------------------------------------------------
+# next_state — Phase 1.B of manifest_schema_final_gate plan.
+#
+# Resolves a (policy, event) pair to the manifest-row column value
+# (ServiceEmissionStateEnum). Pure function, no I/O. UTL
+# ``emission_publisher.publish_with_policy`` consumes this when filling the
+# v8 ``service_emission_state`` manifest column.
+#
+# The mapping derives the manifest state from the lifecycle event:
+#
+#   * EmissionLifecycleEvent.PUBLISHED_OK       → ServiceEmissionStateEnum.PUBLISHED_OK
+#   * EmissionLifecycleEvent.PUBLISHED_DEGRADED → ServiceEmissionStateEnum.PUBLISHED_DEGRADED
+#   * EmissionLifecycleEvent.STALE_DATA         → ServiceEmissionStateEnum.STALE_DATA_HEARTBEAT_ONLY
+#   * EmissionLifecycleEvent.BLOCKED            → ServiceEmissionStateEnum.BLOCKED
+#
+# The ``policy`` argument is currently advisory — state derives from the
+# event alone under the slice-b spec — but stays in the signature so future
+# policy-specific state nuances (e.g. a fifth policy that publishes a row
+# under DEGRADED conditions with a slimmer schema) can extend the resolver
+# without breaking callers.
+# ---------------------------------------------------------------------------
+
+
+_EVENT_TO_STATE: Final[dict[EmissionLifecycleEvent, ServiceEmissionStateEnum]] = {
+    EmissionLifecycleEvent.PUBLISHED_OK: ServiceEmissionStateEnum.PUBLISHED_OK,
+    EmissionLifecycleEvent.PUBLISHED_DEGRADED: ServiceEmissionStateEnum.PUBLISHED_DEGRADED,
+    EmissionLifecycleEvent.STALE_DATA: ServiceEmissionStateEnum.STALE_DATA_HEARTBEAT_ONLY,
+    EmissionLifecycleEvent.BLOCKED: ServiceEmissionStateEnum.BLOCKED,
+}
+
+
+def next_state(
+    *,
+    policy: ServiceEmissionPolicy,
+    event: EmissionLifecycleEvent,
+) -> ServiceEmissionStateEnum:
+    """Resolve a publish-boundary ``(policy, event)`` to the manifest-row state.
+
+    Pure function. UTL ``emission_publisher.publish_with_policy`` calls this
+    after emitting the lifecycle event so the v8 manifest write carries the
+    structured state column. Downstream consumers reading the manifest can
+    then reason about absence semantics from the column alone — no
+    event-stream replay needed.
+
+    The :class:`EmissionLifecycleEvent` taxonomy maps 1:1 to
+    :class:`ServiceEmissionStateEnum` except for ``STALE_DATA`` →
+    ``STALE_DATA_HEARTBEAT_ONLY`` (the manifest column name elaborates
+    "heartbeat only" so downstream readers know the service is up). All four
+    combinations are covered.
+
+    Args:
+        policy: The resolved policy from :func:`get_emission_policy`. Echoed
+            into the signature for caller-side documentation + forward-compat
+            with future policy-specific state nuances. Currently advisory —
+            state derives from ``event`` alone.
+        event: The lifecycle event the publish boundary just emitted (one of
+            the 4 :class:`EmissionLifecycleEvent` members).
+
+    Returns:
+        The resolved :class:`ServiceEmissionStateEnum` value to write into
+        the v8 ``service_emission_state`` manifest column.
+
+    Reference: ``manifest_schema_final_gate_2026_05_09.md`` Phase 1.B.
+    """
+    # Mark as referenced — caller-side documentation contract.
+    _ = policy
+    return _EVENT_TO_STATE[event]
+
+
 __all__ = [
     "EMISSION_LIFECYCLE_EVENTS",
     "SERVICE_OUTPUT_POLICIES",
@@ -266,6 +339,7 @@ __all__ = [
     "ServiceEmissionPolicy",
     "get_emission_policy",
     "is_emission_policy_declared",
+    "next_state",
     "policy_is_alert",
     "policy_is_publish_row",
 ]

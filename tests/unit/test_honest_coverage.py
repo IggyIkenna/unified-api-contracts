@@ -212,3 +212,19 @@ def test_refdata_cadence_reasons_have_expected_prefix() -> None:
 
     assert EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)
     assert EmptyConfirmedReason.EXPECTED_REFDATA_CADENCE_CHANGE.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)
+
+
+def test_expected_known_source_gap_value_present() -> None:
+    """Added 2026-05-11 (operator-approved per wave3x_track_d_findings_2026_05_11.md § TL;DR 2).
+
+    Reference uses: VIX 15m mid-history gap (currently written as NaN-OHLC placeholder, see
+    ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` P0-2) + sports
+    ``KNOWN_COVERAGE_GAPS`` ranges. Distinct from ``EXPECTED_PRE_SOURCE_COVERAGE_START`` /
+    ``EXPECTED_INSTRUMENT_NOT_LISTED`` — those are pre-launch absence; this is mid-history
+    accepted gap.
+    """
+    from unified_api_contracts.canonical.crosscutting.honest_coverage import EXPECTED_EMPTY_REASON_PREFIX
+
+    assert EmptyConfirmedReason.EXPECTED_KNOWN_SOURCE_GAP.value == "EXPECTED_KNOWN_SOURCE_GAP"
+    assert "EXPECTED_KNOWN_SOURCE_GAP" in EMPTY_CONFIRMED_REASONS
+    assert EmptyConfirmedReason.EXPECTED_KNOWN_SOURCE_GAP.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)

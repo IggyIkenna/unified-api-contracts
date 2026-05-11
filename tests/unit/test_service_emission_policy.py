@@ -19,8 +19,12 @@ from unified_api_contracts.canonical.crosscutting.service_emission_policy import
     ServiceEmissionPolicy,
     get_emission_policy,
     is_emission_policy_declared,
+    next_state,
     policy_is_alert,
     policy_is_publish_row,
+)
+from unified_api_contracts.canonical.crosscutting.service_emission_state import (
+    ServiceEmissionStateEnum,
 )
 
 # ---------------------------------------------------------------------------
@@ -213,3 +217,105 @@ def test_policy_is_publish_row(policy: ServiceEmissionPolicy, expected: bool) ->
 )
 def test_policy_is_alert(policy: ServiceEmissionPolicy, expected: bool) -> None:
     assert policy_is_alert(policy) is expected
+
+
+# ---------------------------------------------------------------------------
+# next_state resolver (Phase 1.B of manifest_schema_final_gate plan)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("event", "expected_state"),
+    [
+        (EmissionLifecycleEvent.PUBLISHED_OK, ServiceEmissionStateEnum.PUBLISHED_OK),
+        (EmissionLifecycleEvent.PUBLISHED_DEGRADED, ServiceEmissionStateEnum.PUBLISHED_DEGRADED),
+        (EmissionLifecycleEvent.STALE_DATA, ServiceEmissionStateEnum.STALE_DATA_HEARTBEAT_ONLY),
+        (EmissionLifecycleEvent.BLOCKED, ServiceEmissionStateEnum.BLOCKED),
+    ],
+)
+def test_next_state_maps_every_event(
+    event: EmissionLifecycleEvent,
+    expected_state: ServiceEmissionStateEnum,
+) -> None:
+    """Every :class:`EmissionLifecycleEvent` resolves to a manifest state under all policies."""
+    for policy in ServiceEmissionPolicy:
+        assert next_state(policy=policy, event=event) is expected_state, (
+            f"policy={policy} event={event} should resolve to {expected_state}"
+        )
+
+
+def test_next_state_strict_fail_full_window_publishes_ok() -> None:
+    """``STRICT_FAIL`` + ``completeness == 1.0`` → ``PUBLISHED_OK`` event → ``PUBLISHED_OK`` state."""
+    state = next_state(
+        policy=ServiceEmissionPolicy.STRICT_FAIL,
+        event=EmissionLifecycleEvent.PUBLISHED_OK,
+    )
+    assert state is ServiceEmissionStateEnum.PUBLISHED_OK
+
+
+def test_next_state_strict_fail_with_gap_stales() -> None:
+    """Per ``publish_with_policy``: ``STRICT_FAIL`` + gap → ``STALE_DATA`` event → STALE_DATA_HEARTBEAT_ONLY state."""
+    state = next_state(
+        policy=ServiceEmissionPolicy.STRICT_FAIL,
+        event=EmissionLifecycleEvent.STALE_DATA,
+    )
+    assert state is ServiceEmissionStateEnum.STALE_DATA_HEARTBEAT_ONLY
+
+
+def test_next_state_block_critical_with_gap_blocks() -> None:
+    """Per ``publish_with_policy``: ``BLOCK_CRITICAL`` + gap → ``BLOCKED`` event → BLOCKED state."""
+    state = next_state(
+        policy=ServiceEmissionPolicy.BLOCK_CRITICAL,
+        event=EmissionLifecycleEvent.BLOCKED,
+    )
+    assert state is ServiceEmissionStateEnum.BLOCKED
+
+
+def test_next_state_partial_ok_with_gap_publishes_degraded() -> None:
+    """Per ``publish_with_policy``: ``PARTIAL_OK`` + gap → ``PUBLISHED_DEGRADED`` event → PUBLISHED_DEGRADED state."""
+    state = next_state(
+        policy=ServiceEmissionPolicy.PARTIAL_OK,
+        event=EmissionLifecycleEvent.PUBLISHED_DEGRADED,
+    )
+    assert state is ServiceEmissionStateEnum.PUBLISHED_DEGRADED
+
+
+def test_next_state_nan_fill_with_gap_publishes_degraded() -> None:
+    """Per ``publish_with_policy``: ``NAN_FILL`` + gap → ``PUBLISHED_DEGRADED`` event → PUBLISHED_DEGRADED state."""
+    state = next_state(
+        policy=ServiceEmissionPolicy.NAN_FILL,
+        event=EmissionLifecycleEvent.PUBLISHED_DEGRADED,
+    )
+    assert state is ServiceEmissionStateEnum.PUBLISHED_DEGRADED
+
+
+def test_next_state_kwargs_only() -> None:
+    """Signature is keyword-only — protects against positional-arg drift."""
+    with pytest.raises(TypeError):
+        next_state(ServiceEmissionPolicy.STRICT_FAIL, EmissionLifecycleEvent.PUBLISHED_OK)  # pyright: ignore[reportCallIssue]
+
+
+def test_next_state_returns_strenum_value() -> None:
+    """Result is a :class:`ServiceEmissionStateEnum` member, not a bare string.
+
+    Writers can then use ``.value`` to serialise; type checkers see the enum
+    on the boundary.
+    """
+    state = next_state(
+        policy=ServiceEmissionPolicy.STRICT_FAIL,
+        event=EmissionLifecycleEvent.PUBLISHED_OK,
+    )
+    assert isinstance(state, ServiceEmissionStateEnum)
+    assert state.value == "PUBLISHED_OK"
+
+
+def test_next_state_pure_function() -> None:
+    """No mutation, no I/O — deterministic across repeated invocations."""
+    for _ in range(3):
+        assert (
+            next_state(
+                policy=ServiceEmissionPolicy.BLOCK_CRITICAL,
+                event=EmissionLifecycleEvent.BLOCKED,
+            )
+            is ServiceEmissionStateEnum.BLOCKED
+        )
