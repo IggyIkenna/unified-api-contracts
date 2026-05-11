@@ -118,6 +118,17 @@ class RiskRuleId(StrEnum):
     GLOBAL_PORTFOLIO_DRAWDOWN_HALT = "GLOBAL_PORTFOLIO_DRAWDOWN_HALT"
     GLOBAL_DATA_STALENESS_HALT = "GLOBAL_DATA_STALENESS_HALT"
 
+    # ── Strategy-family aggregate axis (Phase 2.H) ──────────────────────────
+    # § 7 SSOT reconciliation — strategy-family rules aggregate per-archetype
+    # state into per-family caps. See
+    # ``registry/risk_rules/strategy_family.py`` for the seed registry.
+    FAMILY_GROSS_EXPOSURE_CAP = "FAMILY_GROSS_EXPOSURE_CAP"
+    FAMILY_NET_EXPOSURE_CAP = "FAMILY_NET_EXPOSURE_CAP"
+    FAMILY_DRAWDOWN_CAP = "FAMILY_DRAWDOWN_CAP"
+    FAMILY_CAPITAL_AT_RISK_CEILING = "FAMILY_CAPITAL_AT_RISK_CEILING"
+    FAMILY_CONCENTRATION_PER_VENUE = "FAMILY_CONCENTRATION_PER_VENUE"
+    FAMILY_CORRELATION_WITH_OTHER_FAMILY = "FAMILY_CORRELATION_WITH_OTHER_FAMILY"
+
 
 RISK_RULE_IDS: Final[frozenset[str]] = frozenset(m.value for m in RiskRuleId)
 """String-membership view of :class:`RiskRuleId` for fast O(1) validation.
@@ -152,8 +163,10 @@ class RiskRuleScope(StrEnum):
     * ``PER_ARCHETYPE`` → ``KillSwitchScope.ARCHETYPE``
     * ``PER_CLIENT`` → ``KillSwitchScope.CLIENT``
     * ``GLOBAL`` → ``KillSwitchScope.GLOBAL``
-    * ``PER_ACCOUNT`` / ``PER_ASSET_GROUP`` → ``None`` (not directly
-      kill-switch-applicable; affects portfolio aggregates instead).
+    * ``PER_ACCOUNT`` / ``PER_ASSET_GROUP`` / ``PER_STRATEGY_FAMILY`` →
+      ``None`` (not directly kill-switch-applicable; affect portfolio
+      aggregates instead — family-aggregate caps escalate via the
+      circuit-breaker BLOCK-rate path, not the kill-switch).
     """
 
     PER_ARCHETYPE = "PER_ARCHETYPE"
@@ -161,6 +174,7 @@ class RiskRuleScope(StrEnum):
     PER_ACCOUNT = "PER_ACCOUNT"
     PER_ASSET_GROUP = "PER_ASSET_GROUP"
     PER_CLIENT = "PER_CLIENT"
+    PER_STRATEGY_FAMILY = "PER_STRATEGY_FAMILY"
     GLOBAL = "GLOBAL"
 
 
@@ -402,6 +416,9 @@ class RiskRule(BaseModel):
     * ``PER_ASSET_GROUP`` → ``"cefi"`` / ``"defi"`` / ``"tradfi"`` /
       ``"sports"`` / ``"prediction"``.
     * ``PER_CLIENT`` → client-id string.
+    * ``PER_STRATEGY_FAMILY`` → ``StrategyFamilyId.value`` (e.g.
+      ``"LST_LEVERAGE_FAMILY"`` / ``"FUNDING_ARB_FAMILY"``) per
+      ``canonical/crosscutting/strategy_family.py``.
     * ``GLOBAL`` → ``"*"`` (sentinel).
     """
 
@@ -465,8 +482,11 @@ class RiskRule(BaseModel):
             return KillSwitchScope.CLIENT
         if self.scope is RiskRuleScope.GLOBAL:
             return KillSwitchScope.GLOBAL
-        # PER_ACCOUNT + PER_ASSET_GROUP — not directly kill-switch-applicable
-        # per the seam diagram cross-product table.
+        # PER_ACCOUNT + PER_ASSET_GROUP + PER_STRATEGY_FAMILY — not directly
+        # kill-switch-applicable per the seam diagram cross-product table.
+        # Family-aggregate rules escalate via the circuit-breaker BLOCK-rate
+        # path (aggregate BLOCK rate ≥ threshold → breaker transition) rather
+        # than the kill-switch's per-blast-radius halt mechanism.
         return None
 
 

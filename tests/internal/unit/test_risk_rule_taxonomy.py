@@ -72,6 +72,7 @@ def test_risk_rule_scope_closed_set() -> None:
         "PER_ACCOUNT",
         "PER_ASSET_GROUP",
         "PER_CLIENT",
+        "PER_STRATEGY_FAMILY",
         "GLOBAL",
     }
     assert {m.value for m in RiskRuleScope} == expected
