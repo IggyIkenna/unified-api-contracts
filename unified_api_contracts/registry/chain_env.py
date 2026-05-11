@@ -256,6 +256,28 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # Conservative date: Aster DEX launched on BSC ~Q3 2024 per public news; first on-chain event
     # verifiable via BscScan. Eliminates ~759 false-flagged missing rows from defi_988 audit.
     ("BSC", "ASTER"): "2024-09-01",
+    # ── Catalogue Phase 1A new launch dates (slot 5 2026-05-11 per
+    #    defi_catalogue_chain_primitives_2026_05_10.md Phase 1A). Dates
+    #    sourced from public mainnet announcements + DefiLlama protocol-
+    #    launch metadata. Subgraph-truth refinement deferred to catalogue
+    #    Phase 3 owner (Tab 14-style audit per the prior 2026-05-08 pass
+    #    that tightened Aave/Compound dates). Less-confident pairs (Beefy
+    #    multi-chain rollouts, Yearn-V3 L2 rollouts, etc.) sit in
+    #    ``_PROTOCOL_LAUNCH_PENDING_INVESTIGATION`` until subgraph probes
+    #    land — they fall back to ``CHAIN_GENESIS_DATES`` (safe over-clip)
+    #    in the meantime.
+    ("ETHEREUM", "CONVEX"): "2021-05-17",  # Convex Finance public launch
+    ("ETHEREUM", "PENDLE"): "2021-06-15",  # Pendle V1 mainnet
+    ("ETHEREUM", "IDLE"): "2019-08-13",  # Idle Finance launch
+    ("ETHEREUM", "SYMBIOTIC"): "2024-06-11",  # Symbiotic mainnet launch
+    ("ETHEREUM", "KARAK"): "2024-04-08",  # Karak Network mainnet
+    ("ETHEREUM", "RENZO"): "2024-04-29",  # Renzo Protocol (ezETH) mainnet
+    ("ETHEREUM", "KELPDAO"): "2023-11-09",  # KelpDAO (rsETH) mainnet
+    ("ARBITRUM", "PENDLE"): "2024-01-26",  # Pendle V2 Arbitrum expansion
+    ("ARBITRUM", "RADIANT"): "2022-07-25",  # Radiant Capital V1 Arbitrum launch
+    ("BSC", "RADIANT"): "2022-09-21",  # Radiant V2 BSC expansion
+    ("SOLANA", "JUPITER"): "2021-10-13",  # Jupiter aggregator launch
+    ("SOLANA", "JITORESTAKING"): "2024-08-01",  # Jito Restaking mainnet
 }
 
 # (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch
@@ -308,6 +330,23 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
         ("POLYGON", "COMPOUNDV3"),
         ("SOLANA", "MARGINFI"),
         ("SOLANA", "SOLEND"),
+        # Catalogue Phase 1A new pairs (slot 5 2026-05-11) with launch
+        # dates not yet confidently researched — fall back to chain genesis
+        # in the meantime; catalogue Phase 3 owner refines via Tab 14-style
+        # subgraph probe and moves to ``PROTOCOL_LAUNCH_DATES``.
+        ("ETHEREUM", "BEEFY"),
+        ("ARBITRUM", "BEEFY"),
+        ("BASE", "BEEFY"),
+        ("POLYGON", "BEEFY"),
+        ("BSC", "BEEFY"),
+        ("AVALANCHE", "BEEFY"),
+        ("ARBITRUM", "YEARNV3"),
+        ("OPTIMISM", "YEARNV3"),
+        ("ARBITRUM", "IDLE"),
+        ("POLYGON", "IDLE"),
+        ("ARBITRUM", "KARAK"),
+        ("ARBITRUM", "RENZO"),
+        ("SOLANA", "SOLBLAZE"),
     }
 )
 

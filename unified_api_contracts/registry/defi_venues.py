@@ -68,6 +68,18 @@ ALL_DEFI_VENUES: list[str] = [
     #    renders it as an expected DeFi venue).
     "ALCHEMY-ETHEREUM",
     "EIGENLAYER-ETHEREUM",
+    # ── Catalogue Phase 1A new Ethereum entries (slot 5 2026-05-11 per
+    #    defi_catalogue_chain_primitives_2026_05_10.md Phase 1A). Vaults +
+    #    restaking primitives; all "pipeline" phase until catalogue Phase
+    #    2-3 ships instruments adapters + MTDS adapters.
+    "CONVEX-ETHEREUM",
+    "BEEFY-ETHEREUM",
+    "PENDLE-ETHEREUM",
+    "IDLE-ETHEREUM",
+    "SYMBIOTIC-ETHEREUM",
+    "KARAK-ETHEREUM",
+    "RENZO-ETHEREUM",
+    "KELPDAO-ETHEREUM",
     # ── Arbitrum ──
     "UNISWAPV3-ARBITRUM",
     "AAVEV3-ARBITRUM",
@@ -77,6 +89,14 @@ ALL_DEFI_VENUES: list[str] = [
     "PANCAKESWAPV3-ARBITRUM",
     "CAMELOTV3-ARBITRUM",
     "GMX-ARBITRUM",
+    # ── Catalogue Phase 1A new Arbitrum entries (slot 5 2026-05-11) ──
+    "YEARNV3-ARBITRUM",
+    "BEEFY-ARBITRUM",
+    "PENDLE-ARBITRUM",
+    "IDLE-ARBITRUM",
+    "RADIANT-ARBITRUM",
+    "KARAK-ARBITRUM",
+    "RENZO-ARBITRUM",
     # ── Base ──
     "UNISWAPV3-BASE",
     "AAVEV3-BASE",
@@ -86,6 +106,8 @@ ALL_DEFI_VENUES: list[str] = [
     "SUSHISWAPV3-BASE",
     "PANCAKESWAPV3-BASE",
     "AERODROMEV3-BASE",
+    # ── Catalogue Phase 1A new Base entries (slot 5 2026-05-11) ──
+    "BEEFY-BASE",
     # ── Optimism ──
     "UNISWAPV3-OPTIMISM",
     "AAVEV3-OPTIMISM",
@@ -93,11 +115,16 @@ ALL_DEFI_VENUES: list[str] = [
     "BALANCER-OPTIMISM",
     "CURVE-OPTIMISM",
     "VELODROMEV2-OPTIMISM",
+    # ── Catalogue Phase 1A new Optimism entries (slot 5 2026-05-11) ──
+    "YEARNV3-OPTIMISM",
     # ── Polygon ──
     "UNISWAPV3-POLYGON",
     "AAVEV3-POLYGON",
     "BALANCER-POLYGON",
     "COMPOUNDV3-POLYGON",
+    # ── Catalogue Phase 1A new Polygon entries (slot 5 2026-05-11) ──
+    "BEEFY-POLYGON",
+    "IDLE-POLYGON",
     # ── Avalanche ──
     "AAVEV3-AVALANCHE",
     "BALANCER-AVALANCHE",
@@ -105,9 +132,14 @@ ALL_DEFI_VENUES: list[str] = [
     "GMX-AVALANCHE",
     "SUSHISWAPV3-AVALANCHE",
     "TRADER_JOEV2-AVALANCHE",
+    # ── Catalogue Phase 1A new Avalanche entries (slot 5 2026-05-11) ──
+    "BEEFY-AVALANCHE",
     # ── BSC ──
     "AAVEV3-BSC",
     "PANCAKESWAPV3-BSC",
+    # ── Catalogue Phase 1A new BSC entries (slot 5 2026-05-11) ──
+    "BEEFY-BSC",
+    "RADIANT-BSC",
     # ── Linea / Scroll / zkSync ──
     "AAVEV3-LINEA",
     "AAVEV3-SCROLL",
@@ -129,6 +161,13 @@ ALL_DEFI_VENUES: list[str] = [
     "MARGINFI-SOLANA",
     "SOLEND-SOLANA",
     "DRIFT-SOLANA",
+    # ── Catalogue Phase 1A new Solana entries (slot 5 2026-05-11). JUPITER
+    #    aggregator is read-only (route registry, no MTDS tick stream);
+    #    SOLBLAZE = bSOL liquid-staking; JITORESTAKING = distinct from
+    #    JITO-SOLANA (LST/MEV) — covers Jito's restaking-vault product. ──
+    "JUPITER-SOLANA",
+    "SOLBLAZE-SOLANA",
+    "JITORESTAKING-SOLANA",
 ]
 
 
@@ -209,6 +248,26 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     # Gas-fee + restaking oracles
     "ALCHEMY": "ALCHEMY-ETHEREUM",
     "EIGENLAYER": "EIGENLAYER-ETHEREUM",
+    # Catalogue Phase 1A new aliases (slot 5 2026-05-11). Bare-name defaults
+    # chosen by primary chain: CONVEX (Ethereum-only), BEEFY (multi-chain,
+    # defaults to Ethereum), PENDLE (defaults to Ethereum), IDLE (defaults
+    # to Ethereum), JUPITER (Solana-only), SOLBLAZE (Solana-only), SYMBIOTIC
+    # (Ethereum-only), KARAK (defaults to Ethereum), RENZO (defaults to
+    # Ethereum), KELPDAO (Ethereum-only), JITORESTAKING (Solana-only),
+    # RADIANT (defaults to Arbitrum where it has highest TVL).
+    "CONVEX": "CONVEX-ETHEREUM",
+    "BEEFY": "BEEFY-ETHEREUM",
+    "PENDLE": "PENDLE-ETHEREUM",
+    "IDLE": "IDLE-ETHEREUM",
+    "JUPITER": "JUPITER-SOLANA",
+    "SOLBLAZE": "SOLBLAZE-SOLANA",
+    "SYMBIOTIC": "SYMBIOTIC-ETHEREUM",
+    "KARAK": "KARAK-ETHEREUM",
+    "RENZO": "RENZO-ETHEREUM",
+    "KELPDAO": "KELPDAO-ETHEREUM",
+    "JITORESTAKING": "JITORESTAKING-SOLANA",
+    "JITO_RESTAKING": "JITORESTAKING-SOLANA",
+    "RADIANT": "RADIANT-ARBITRUM",
 }
 
 
@@ -264,6 +323,16 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # ── Live (Ethereum gas / restaking oracles) ──
     "ALCHEMY-ETHEREUM": "live",
     "EIGENLAYER-ETHEREUM": "live",
+    # ── Pipeline (Ethereum catalogue Phase 1A vault + restaking primitives,
+    #    slot 5 2026-05-11) ──
+    "CONVEX-ETHEREUM": "pipeline",
+    "BEEFY-ETHEREUM": "pipeline",
+    "PENDLE-ETHEREUM": "pipeline",
+    "IDLE-ETHEREUM": "pipeline",
+    "SYMBIOTIC-ETHEREUM": "pipeline",
+    "KARAK-ETHEREUM": "pipeline",
+    "RENZO-ETHEREUM": "pipeline",
+    "KELPDAO-ETHEREUM": "pipeline",
     # ── Pipeline (Arbitrum) — UAC-declared, MTDS backfill not yet shipping ──
     "UNISWAPV3-ARBITRUM": "pipeline",
     "AAVEV3-ARBITRUM": "pipeline",
@@ -273,6 +342,14 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "PANCAKESWAPV3-ARBITRUM": "pipeline",
     "CAMELOTV3-ARBITRUM": "pipeline",
     "GMX-ARBITRUM": "pipeline",
+    # ── Pipeline (Arbitrum catalogue Phase 1A, slot 5 2026-05-11) ──
+    "YEARNV3-ARBITRUM": "pipeline",
+    "BEEFY-ARBITRUM": "pipeline",
+    "PENDLE-ARBITRUM": "pipeline",
+    "IDLE-ARBITRUM": "pipeline",
+    "RADIANT-ARBITRUM": "pipeline",
+    "KARAK-ARBITRUM": "pipeline",
+    "RENZO-ARBITRUM": "pipeline",
     # ── Pipeline (Base) ──
     "UNISWAPV3-BASE": "pipeline",
     "AAVEV3-BASE": "pipeline",
@@ -282,6 +359,8 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "SUSHISWAPV3-BASE": "pipeline",
     "PANCAKESWAPV3-BASE": "pipeline",
     "AERODROMEV3-BASE": "pipeline",
+    # ── Pipeline (Base catalogue Phase 1A, slot 5 2026-05-11) ──
+    "BEEFY-BASE": "pipeline",
     # ── Pipeline (Optimism) ──
     "UNISWAPV3-OPTIMISM": "pipeline",
     "AAVEV3-OPTIMISM": "pipeline",
@@ -289,11 +368,16 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "BALANCER-OPTIMISM": "pipeline",
     "CURVE-OPTIMISM": "pipeline",
     "VELODROMEV2-OPTIMISM": "pipeline",
+    # ── Pipeline (Optimism catalogue Phase 1A, slot 5 2026-05-11) ──
+    "YEARNV3-OPTIMISM": "pipeline",
     # ── Pipeline (Polygon) ──
     "UNISWAPV3-POLYGON": "pipeline",
     "AAVEV3-POLYGON": "pipeline",
     "BALANCER-POLYGON": "pipeline",
     "COMPOUNDV3-POLYGON": "pipeline",
+    # ── Pipeline (Polygon catalogue Phase 1A, slot 5 2026-05-11) ──
+    "BEEFY-POLYGON": "pipeline",
+    "IDLE-POLYGON": "pipeline",
     # ── Pipeline (Avalanche) ──
     "AAVEV3-AVALANCHE": "pipeline",
     "BALANCER-AVALANCHE": "pipeline",
@@ -301,9 +385,14 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "GMX-AVALANCHE": "pipeline",
     "SUSHISWAPV3-AVALANCHE": "pipeline",
     "TRADER_JOEV2-AVALANCHE": "pipeline",
+    # ── Pipeline (Avalanche catalogue Phase 1A, slot 5 2026-05-11) ──
+    "BEEFY-AVALANCHE": "pipeline",
     # ── Pipeline (BSC) ──
     "AAVEV3-BSC": "pipeline",
     "PANCAKESWAPV3-BSC": "pipeline",
+    # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
+    "BEEFY-BSC": "pipeline",
+    "RADIANT-BSC": "pipeline",
     # ── Pipeline (Linea / Scroll / zkSync) ──
     "AAVEV3-LINEA": "pipeline",
     "AAVEV3-SCROLL": "pipeline",
@@ -319,6 +408,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "MARGINFI-SOLANA": "live",
     "SOLEND-SOLANA": "live",
     "DRIFT-SOLANA": "live",
+    # ── Pipeline (Solana catalogue Phase 1A, slot 5 2026-05-11) ──
+    "JUPITER-SOLANA": "pipeline",
+    "SOLBLAZE-SOLANA": "pipeline",
+    "JITORESTAKING-SOLANA": "pipeline",
 }
 
 
