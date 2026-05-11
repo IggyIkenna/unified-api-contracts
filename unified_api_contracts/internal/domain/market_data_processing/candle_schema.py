@@ -40,6 +40,18 @@ class DataType(StrEnum):
     DEX_POOLS = "dex_pools"
     DEX_SWAPS = "dex_swaps"
     LENDING_INDICES = "lending_indices"
+    # Per-protocol lending-rate breakouts (folded in from
+    # plans/active/defi_recursive_borrow_archetypes_2026_05_10.md Phase 1
+    # via plans/active/defi_catalogue_chain_primitives_2026_05_10.md
+    # Phase 1-LENDING per Q11 ratification 2026-05-10). LENDING_INDICES
+    # remains the coarse-grain aggregate; per-protocol adapters
+    # (Aave V3 / Compound V3 / Spark / Morpho) classify into the granular
+    # variants when the subgraph response carries the underlying field.
+    SUPPLY_APY = "supply_apy"
+    BORROW_APY = "borrow_apy"
+    UTILISATION = "utilisation"
+    LIQUIDATION_THRESHOLD = "liquidation_threshold"
+    EMODE_PARAMS = "emode_params"
     PERP_FUNDING = "perp_funding"
     LST_RATES = "lst_rates"
     ORACLE_PRICES = "oracle_prices"

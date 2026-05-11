@@ -63,6 +63,18 @@ class StrategyArchetype(StrEnum):
     CARRY_BASIS_PERP = "CARRY_BASIS_PERP"
     CARRY_STAKED_BASIS = "CARRY_STAKED_BASIS"
     CARRY_RECURSIVE_STAKED = "CARRY_RECURSIVE_STAKED"
+    # Recursive-borrow variants (Family 1 + Family 2 per
+    # plans/active/defi_recursive_borrow_archetypes_2026_05_10.md AD-1
+    # flip 2026-05-10 cross-plan audit Q10 ratification). Both variants
+    # are config siblings of CARRY_RECURSIVE_STAKED — pure-lending-side
+    # recursion (LENDING_ONLY) vs lending-recursion + matched-perp-short
+    # hedge (PERP_HEDGED, USDC-margined perp leg per AD-2). Owner of the
+    # full 8 -> 11 enum expansion = defi_archetypes_canonicalisation
+    # Stream C extension; this commit ships 2 of 3 (11th TBD via Stream C
+    # codex sweep per C-enum.1). ARCHETYPE_CONFIG_SEED rows + downstream
+    # consumer wiring deferred to Stream C C-enum.2 / C-enum.3.
+    CARRY_RECURSIVE_BORROW_LENDING_ONLY = "CARRY_RECURSIVE_BORROW_LENDING_ONLY"
+    CARRY_RECURSIVE_BORROW_PERP_HEDGED = "CARRY_RECURSIVE_BORROW_PERP_HEDGED"
     YIELD_ROTATION_LENDING = "YIELD_ROTATION_LENDING"
     YIELD_STAKING_SIMPLE = "YIELD_STAKING_SIMPLE"
     ARBITRAGE_PRICE_DISPERSION = "ARBITRAGE_PRICE_DISPERSION"
@@ -127,6 +139,8 @@ ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
     StrategyArchetype.CARRY_BASIS_PERP: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_STAKED_BASIS: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_RECURSIVE_STAKED: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_RECURSIVE_BORROW_LENDING_ONLY: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.YIELD_ROTATION_LENDING: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.YIELD_STAKING_SIMPLE: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.ARBITRAGE_PRICE_DISPERSION: StrategyFamily.ARBITRAGE_STRUCTURAL,
