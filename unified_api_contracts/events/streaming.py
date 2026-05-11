@@ -257,6 +257,110 @@ class CandleComputedEvent(BaseModel):
     vm_name: str
 
 
+class FeaturesComputedEvent(BaseModel):
+    """Published by features-service when a feature_group emits for a shard window.
+
+    Stream-name convention: ``streaming.{asset_group}.features_computed``.
+
+    Per ``live_pipeline_mtds_mdps_features_2026_05_08`` Phase 5.1.d, the
+    asset-scoped features flavor publishes this event on every successful
+    feature compute so cross-cutting features (Phase 6) can fan-in via
+    :class:`~unified_trading_library.watermark.WatermarkAlignmentFanin`. The
+    payload mirrors :class:`CandleComputedEvent` for downstream symmetry —
+    same ``available_at`` / ``emission_policy`` / ``emission_outcome`` /
+    ``data_freshness`` semantics — but adds the ``feature_group`` +
+    ``feature_family`` axes so a cross-instrument feature can subscribe to
+    the relevant upstream feature streams without re-walking the v5 shard
+    matrix.
+
+    Schema identical between batch (``pipeline_mode=batch_*``) and live
+    (``pipeline_mode=live_websocket``) per CLAUDE.md "Live = batch" rule —
+    only the trigger source differs. Banned: a parallel
+    ``BatchFeaturesComputedEvent`` shape.
+
+    Invariants:
+
+    * ``period_end - period_start == parse_timeframe(timeframe)`` — exact;
+      mirrors :class:`CandleComputedEvent` to keep watermark alignment
+      simple (consumers don't need per-event timeframe arithmetic).
+    * ``data_freshness`` is one of ``"FRESH"`` / ``"STALE"`` /
+      ``"ZERO_ACTIVITY_BAR"`` — propagation rule: derived feature inherits
+      the worst freshness of its upstream inputs (catalog-alive +
+      market-hours + zero source ticks → ``ZERO_ACTIVITY_BAR``;
+      WS-disconnect mid-window → ``STALE``).
+    * ``emission_outcome`` propagates per Phase 6.2 watermark fan-in rule:
+      one ``PUBLISHED_DEGRADED`` upstream → output ``PUBLISHED_DEGRADED``;
+      one critical upstream missing > grace → output ``STALE_DATA``.
+    * ``available_at`` is the UTL ``record_captured`` stamp — when the
+      feature_group's parquet finalised on disk. NEVER derived at
+      read-time per CLAUDE.md ``available_at`` rule.
+    * Shard-key fields (``venue`` / ``chain`` / ``instrument_id`` /
+      ``data_type`` / etc.) are populated when the feature is bound to a
+      single shard (delta_one / volatility / multi_timeframe families) and
+      may be ``None`` for cross-instrument families that aggregate across
+      shards (the feature_group itself carries the aggregation contract).
+    * ``feature_family`` mirrors the consolidated features-service family
+      taxonomy (``onchain`` / ``sports`` / ``commodity`` / ``delta_one`` /
+      ``volatility`` / ``multi_timeframe`` / ``calendar`` /
+      ``cross_instrument``) per ``features_repo_consolidation_2026_05_08``
+      Phase 5 family registry.
+    """
+
+    event_type: Literal["FEATURES_COMPUTED"] = "FEATURES_COMPUTED"
+    asset_group: AssetGroup
+    feature_family: str = Field(
+        ...,
+        description=(
+            "Consolidated features-service family token (closed set per "
+            "features_repo_consolidation Phase 5 family registry): "
+            "'onchain' / 'sports' / 'commodity' / 'delta_one' / "
+            "'volatility' / 'multi_timeframe' / 'calendar' / 'cross_instrument'."
+        ),
+    )
+    feature_group: str = Field(
+        ...,
+        description=(
+            "UAC feature_group key per the required_inputs DAG SSOT. "
+            "Resolves to a single parquet shard per (timeframe, "
+            "shard_key, available_at) tuple."
+        ),
+    )
+    venue: str | None = None
+    chain: str | None = None
+    instrument_id: str | None = None
+    data_type: DataType | None = None
+    instrument_type: str | None = None
+    league_id: str | None = None
+    timeframe: str = Field(
+        ...,
+        description=("Closed-set timeframe token: one of '15s' / '1m' / '5m' / '15m' / '1h' / '1d'."),
+    )
+    period_start: datetime = Field(
+        ...,
+        description="UTC, aligned to the timeframe boundary.",
+    )
+    period_end: datetime = Field(
+        ...,
+        description="UTC, aligned (period_start + timeframe).",
+    )
+    row_count: int = Field(
+        ...,
+        ge=0,
+        description="Rows in the emitted features parquet for this shard window.",
+    )
+    available_at: datetime = Field(
+        ...,
+        description=("When features-service finalised the parquet (= window_close + compute latency)."),
+    )
+    data_freshness: Literal["FRESH", "STALE", "ZERO_ACTIVITY_BAR"] = "FRESH"
+    emission_policy: ServiceEmissionPolicy = ServiceEmissionPolicy.STRICT_FAIL
+    emission_outcome: EmissionOutcome = "PUBLISHED_OK"
+    policy_decision_reason: str | None = None
+    pipeline_mode: PipelineMode = PipelineMode.LIVE_WEBSOCKET
+    correlation_id: str
+    vm_name: str
+
+
 class InstrumentCacheRefreshTriggerEvent(BaseModel):
     """Published by instruments-service after every successful catalog refresh.
 
@@ -310,6 +414,7 @@ __all__ = [
     "CandleBoundaryCrossedEvent",
     "CandleComputedEvent",
     "EmissionOutcome",
+    "FeaturesComputedEvent",
     "InstrumentCacheRefreshTriggerEvent",
     "parse_timeframe",
 ]

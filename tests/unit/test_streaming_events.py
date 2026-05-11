@@ -17,6 +17,7 @@ from unified_api_contracts.canonical.gcs_paths import AssetGroup
 from unified_api_contracts.events.streaming import (
     CandleBoundaryCrossedEvent,
     CandleComputedEvent,
+    FeaturesComputedEvent,
     InstrumentCacheRefreshTriggerEvent,
     parse_timeframe,
 )
@@ -69,6 +70,35 @@ def _computed_event(
     )
 
 
+def _features_computed_event(
+    *,
+    feature_family: str = "delta_one",
+    feature_group: str = "delta_one.spot_mom_15s",
+    data_freshness: str = "FRESH",
+    emission_policy: ServiceEmissionPolicy = ServiceEmissionPolicy.STRICT_FAIL,
+    emission_outcome: str = "PUBLISHED_OK",
+) -> FeaturesComputedEvent:
+    period_end = _UTC_PERIOD_START + parse_timeframe("1m")
+    return FeaturesComputedEvent(
+        asset_group=AssetGroup.CEFI,
+        feature_family=feature_family,
+        feature_group=feature_group,
+        venue="binance",
+        instrument_id="BTC-USDT",
+        data_type=DataType.OHLCV_1M,
+        timeframe="1m",
+        period_start=_UTC_PERIOD_START,
+        period_end=period_end,
+        row_count=1,
+        available_at=period_end + timedelta(seconds=3),
+        data_freshness=data_freshness,  # type: ignore[arg-type]
+        emission_policy=emission_policy,
+        emission_outcome=emission_outcome,  # type: ignore[arg-type]
+        correlation_id="corr-123",
+        vm_name="features-cefi-20260508-120000",
+    )
+
+
 def _instrument_cache_event() -> InstrumentCacheRefreshTriggerEvent:
     return InstrumentCacheRefreshTriggerEvent(
         asset_group=AssetGroup.DEFI,
@@ -108,6 +138,45 @@ def test_instrument_cache_refresh_trigger_round_trip() -> None:
     restored = InstrumentCacheRefreshTriggerEvent.model_validate_json(payload)
     assert restored == original
     assert restored.event_type == "INSTRUMENT_CACHE_REFRESH_TRIGGER"
+
+
+def test_features_computed_round_trip() -> None:
+    original = _features_computed_event()
+    payload = original.model_dump_json()
+    restored = FeaturesComputedEvent.model_validate_json(payload)
+    assert restored == original
+    assert restored.event_type == "FEATURES_COMPUTED"
+
+
+def test_features_computed_cross_instrument_no_shard_fields() -> None:
+    """Cross-instrument family may omit per-shard fields (venue / chain / ...)."""
+    period_end = _UTC_PERIOD_START + parse_timeframe("1m")
+    event = FeaturesComputedEvent(
+        asset_group=AssetGroup.CEFI,
+        feature_family="cross_instrument",
+        feature_group="cross_instrument.perp_funding_vs_spot_basis",
+        timeframe="1m",
+        period_start=_UTC_PERIOD_START,
+        period_end=period_end,
+        row_count=4,
+        available_at=period_end + timedelta(seconds=3),
+        correlation_id="corr-xc",
+        vm_name="features-xc-20260508-120000",
+    )
+    assert event.venue is None
+    assert event.instrument_id is None
+    assert event.data_type is None
+    assert event.feature_family == "cross_instrument"
+
+
+def test_features_computed_degraded_propagation_outcome() -> None:
+    """``emission_outcome=PUBLISHED_DEGRADED`` carries downstream per Phase 6.2 fan-in rule."""
+    degraded = _features_computed_event(
+        data_freshness="STALE",
+        emission_outcome="PUBLISHED_DEGRADED",
+    )
+    assert degraded.emission_outcome == "PUBLISHED_DEGRADED"
+    assert degraded.data_freshness == "STALE"
 
 
 # ---------------------------------------------------------------------------

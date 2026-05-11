@@ -15,6 +15,7 @@ from unified_api_contracts.events.streaming import (
     CandleBoundaryCrossedEvent,
     CandleComputedEvent,
     EmissionOutcome,
+    FeaturesComputedEvent,
     InstrumentCacheRefreshTriggerEvent,
 )
 
@@ -22,5 +23,6 @@ __all__ = [
     "CandleBoundaryCrossedEvent",
     "CandleComputedEvent",
     "EmissionOutcome",
+    "FeaturesComputedEvent",
     "InstrumentCacheRefreshTriggerEvent",
 ]
