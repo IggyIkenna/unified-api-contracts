@@ -284,6 +284,7 @@ class WalletProvisioningConfig:
                 "KILL_PER_ARCHETYPE_",
                 "KILL_PER_VENUE_",
                 "KILL_PER_ASSET_GROUP_",
+                "KILL_PER_WALLET",
             )
             if not self.kill_switch_id.startswith(valid_prefixes):
                 raise WalletProvisioningError(

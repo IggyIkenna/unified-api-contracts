@@ -69,6 +69,10 @@ class KillSwitchId(StrEnum):
     - ``KILL_PER_ASSET_GROUP_*`` (no equivalent enum on
       :class:`KillSwitchScope` — at runtime, the consumer maps to GLOBAL
       filtered by asset_group)
+    - ``KILL_PER_WALLET`` → ``KillSwitchScope.WALLET`` (runtime-targeted via
+      :class:`KillSwitchArmRequest.target_wallet_id` — no enum-per-wallet
+      explosion). Added 2026-05-12 per
+      ``api_keys_wallets_accounts_readiness_2026_05_10.md`` Phase 5.
     """
 
     KILL_ALL_LIVE = "KILL_ALL_LIVE"
@@ -90,6 +94,18 @@ class KillSwitchId(StrEnum):
     # Per-asset-group halts (cutover-relevant)
     KILL_PER_ASSET_GROUP_CEFI = "KILL_PER_ASSET_GROUP_CEFI"
     KILL_PER_ASSET_GROUP_DEFI = "KILL_PER_ASSET_GROUP_DEFI"
+
+    # Per-wallet halt (sentinel — runtime-targeted via target_wallet_id)
+    KILL_PER_WALLET = "KILL_PER_WALLET"
+    """Freeze a single wallet by its ``wallet_id``. Runtime target carried on
+    :class:`KillSwitchArmRequest.target_wallet_id` — no enum-per-wallet
+    explosion. Per-wallet kill is the FINEST-grain switch (below per-venue +
+    per-archetype) — engages only the named wallet's signing surface, leaving
+    sibling wallets of the same archetype unaffected. Composes with
+    :class:`unified_api_contracts.defi.WalletProvisioningConfig.kill_switch_id`
+    (set to ``"KILL_PER_WALLET"`` for wallet-level freezes; broader prefixes
+    for archetype/venue/asset-group/global freezes that cascade through this
+    wallet)."""
 
 
 class KillSwitchProvenance(StrEnum):
@@ -153,6 +169,13 @@ class KillSwitchArmRequest(BaseModel):
     in :class:`KillSwitchArmedEvent` — these may differ slightly if the bus
     queues the request."""
 
+    target_wallet_id: str = ""
+    """Wallet ID for ``switch_id=KILL_PER_WALLET`` runtime targeting. Empty
+    for every other switch_id (broader scopes target archetype / venue /
+    asset_group / all via the switch_id alone). Required when
+    ``switch_id == KILL_PER_WALLET``; rejected otherwise. Per
+    ``api_keys_wallets_accounts_readiness_2026_05_10.md`` Phase 5."""
+
     metadata: dict[str, str] = Field(default_factory=dict)
     """Free-form structured fields for downstream consumers
     (e.g. ``breaker_serial``, ``threshold_observed``, ``correlation_id``)."""
@@ -182,6 +205,11 @@ class KillSwitchArmedEvent(BaseModel):
     provenance: KillSwitchProvenance
     armed_at: datetime
     requested_by: str
+    target_wallet_id: str = ""
+    """Wallet ID for ``switch_id=KILL_PER_WALLET`` events; empty otherwise.
+    Subscribers reading this event for routing decisions MUST consume both
+    ``switch_id`` AND ``target_wallet_id`` when the former is
+    ``KILL_PER_WALLET``."""
     metadata: dict[str, str] = Field(default_factory=dict)
 
 
@@ -206,6 +234,8 @@ class KillSwitchDisarmEvent(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     switch_id: KillSwitchId
+    target_wallet_id: str = ""
+    """Wallet ID for ``switch_id=KILL_PER_WALLET`` events; empty otherwise."""
     disarmed_at: datetime
     disarmed_by: str
     """Operator ID for manual disarms; the literal ``"AUTO_COOLDOWN"`` for

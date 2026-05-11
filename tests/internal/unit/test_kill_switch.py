@@ -75,6 +75,16 @@ def test_kill_switch_id_no_duplicate_values() -> None:
     assert len(values) == len(set(values))
 
 
+def test_kill_switch_id_includes_kill_per_wallet_sentinel() -> None:
+    """KILL_PER_WALLET is the runtime-targeted wallet-tier sentinel.
+
+    Added 2026-05-12 per api_keys_wallets_accounts_readiness_2026_05_10.md
+    Phase 5. Wallet ID is carried on KillSwitchArmRequest.target_wallet_id
+    at runtime — no enum-per-wallet explosion.
+    """
+    assert KillSwitchId.KILL_PER_WALLET.value == "KILL_PER_WALLET"
+
+
 def test_kill_switch_provenance_closed_four_set() -> None:
     assert {m.value for m in KillSwitchProvenance} == {
         "OPERATOR_MANUAL",
@@ -104,6 +114,33 @@ def test_kill_switch_arm_request_round_trip() -> None:
     dump = req.model_dump()
     restored = KillSwitchArmRequest.model_validate(dump)
     assert restored == req
+
+
+def test_kill_switch_arm_request_per_wallet_round_trip() -> None:
+    """KILL_PER_WALLET request carries target_wallet_id at runtime."""
+    req = KillSwitchArmRequest(
+        switch_id=KillSwitchId.KILL_PER_WALLET,
+        provenance=KillSwitchProvenance.OPERATOR_MANUAL,
+        requested_by="operator-ikenna",
+        arm_timestamp=_ts(),
+        target_wallet_id="defi-eth-hot-aave-v1",
+        metadata={"correlation_id": "wallet-freeze-001"},
+    )
+    dump = req.model_dump()
+    restored = KillSwitchArmRequest.model_validate(dump)
+    assert restored == req
+    assert restored.target_wallet_id == "defi-eth-hot-aave-v1"
+
+
+def test_kill_switch_arm_request_default_target_wallet_id_empty() -> None:
+    """Non-wallet kill-switches default target_wallet_id to empty string."""
+    req = KillSwitchArmRequest(
+        switch_id=KillSwitchId.KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS,
+        provenance=KillSwitchProvenance.OPERATOR_MANUAL,
+        requested_by="operator-ikenna",
+        arm_timestamp=_ts(),
+    )
+    assert req.target_wallet_id == ""
 
 
 def test_kill_switch_armed_event_round_trip() -> None:

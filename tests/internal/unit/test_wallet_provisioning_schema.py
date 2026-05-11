@@ -255,10 +255,11 @@ def test_kill_switch_id_must_use_known_prefix() -> None:
         "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
         "KILL_PER_VENUE_BYBIT",
         "KILL_PER_ASSET_GROUP_DEFI",
+        "KILL_PER_WALLET",  # added 2026-05-12 per Phase 5 wallet-tier kill-switch
     ],
 )
 def test_kill_switch_id_accepts_known_prefixes(kill_switch_id: str) -> None:
-    """All four KillSwitchId prefix families are accepted."""
+    """All five KillSwitchId prefix families are accepted."""
     cfg = WalletProvisioningConfig(
         wallet_id="trading-killswitch-ok",
         chain="ETHEREUM",
