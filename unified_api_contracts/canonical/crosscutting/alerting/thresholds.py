@@ -49,6 +49,11 @@ class ThresholdUnit(StrEnum):
     MINUTES = "minutes"
     """Duration in minutes (15 = 15 min staleness window)."""
 
+    SECONDS = "seconds"
+    """Duration in seconds (300 = 5 min tick-staleness window). Use when
+    the natural unit is sub-minute (tick-level staleness windows on
+    high-frequency venues where 60s granularity is too coarse)."""
+
     COUNT_PER_MINUTE = "count_per_minute"
     """Rolling rate (10 = ten events per minute)."""
 
@@ -275,6 +280,26 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " inference latency; rolling-window p99 compared to threshold."
         ),
         description="Inference p99 latency SLO in milliseconds.",
+    ),
+    # ── Tick-staleness threshold (2026-05-11 — alerting plan § Tick-staleness +
+    # connectivity-gap event taxonomy). MDPS write-gate consults the (venue,
+    # instrument) baseline; if observed inter-tick gap exceeds this threshold
+    # the TICK_STALENESS event fires. 300s (5min) is the conservative default;
+    # high-frequency CeFi venues may override per-venue once Phase 7 baseline
+    # tuning lands.
+    "tick_staleness_seconds": AlertThreshold(
+        key="tick_staleness_seconds",
+        unit=ThresholdUnit.SECONDS,
+        default_value=Decimal("300"),
+        source_doc=(
+            "Conservative default for MDPS-detected tick staleness across cefi /"
+            " defi / tradfi / sports / prediction. 300s (5min) catches genuine"
+            " staleness without false-positive on routine low-liquidity windows."
+            " Per-venue overrides expected once Phase 7 quietness baseline runs"
+            " against live MDPS emission. Reference: alerting_service_live_rules"
+            "_2026_05_07.md § Tick-staleness + connectivity-gap event taxonomy."
+        ),
+        description="Maximum age in seconds of last tick before MDPS emits TICK_STALENESS.",
     ),
     "ml_model_version_mismatch_minutes": AlertThreshold(
         key="ml_model_version_mismatch_minutes",
