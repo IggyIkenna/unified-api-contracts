@@ -54,6 +54,40 @@ class ManualExecutionMode(StrEnum):
     """Skip venue execution, record fill directly (OTC, missed trades, simulation)."""
 
 
+class ManualMLTrainingAction(StrEnum):
+    """Operator-initiated lifecycle actions on an ML archetype training run.
+
+    Separate axis from `OperationType` because these are training-control
+    operations, not trade operations. Consumed by the DART manual ML training
+    trigger surface (`cross_cutting_may_23_deliverables` deliverable #4 BUILD 3)
+    which posts to `ml-training-service` `POST /training/{archetype}/{action}`.
+    """
+
+    PAUSE = "pause"
+    """Suspend the in-flight training loop without losing checkpoint state."""
+
+    RESUME = "resume"
+    """Resume a paused training run from its last checkpoint."""
+
+    RETRAIN = "retrain"
+    """Force a fresh training run; discards any in-flight loop for the archetype."""
+
+
+class ManualAuditCategory(StrEnum):
+    """Which child schema populated a `ManualInstructionAuditLog` row.
+
+    Closed set so the audit-log surface stays type-safe; downstream consumers
+    (pnl-attribution / batch-live-reconciliation / alerting) dispatch on this
+    rather than null-checking each child field.
+    """
+
+    MANUAL_TRADE = "manual_trade"
+    """`manual_instruction` field populated; ml_training_* fields None."""
+
+    ML_TRAINING_CONTROL = "ml_training_control"
+    """`ml_training_request` (and optionally response) populated; manual_instruction None."""
+
+
 class ManualInstruction(BaseModel):
     """An operator-submitted manual execution instruction for audit and routing.
 
@@ -107,4 +141,92 @@ class ManualInstruction(BaseModel):
     source_reference: str = ""
 
 
-__all__ = ["BatchExecutionMode", "ManualExecutionMode", "ManualInstruction", "SettlementType"]
+class MLTrainingControlRequest(BaseModel):
+    """Operator-submitted ML training lifecycle control instruction.
+
+    Posted from the DART `MlTrainingControlPanel` UI to
+    `ml-training-service` `POST /training/{archetype}/{action}`. Persisted
+    to the same audit log as `ManualInstruction` so all operator-initiated
+    actions (manual trade + manual training trigger) share one timeline.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    request_id: str
+    submitted_by: str
+    archetype: str
+    action: ManualMLTrainingAction
+    submitted_at: datetime
+    reason: str = Field(default="manual_training_action")
+    strategy_id: str = ""
+    client_id: str = ""
+
+
+class MLTrainingControlResponse(BaseModel):
+    """Response from `ml-training-service` after applying a training control action.
+
+    Echoes the originating request_id for audit-log correlation. `status` is a
+    closed set of outcome states (e.g. `accepted` / `rejected` / `applied` /
+    `no_op`); `effective_at` is the wall-clock time the training-service applied
+    the action (may differ from request submitted_at by API latency + queueing).
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    request_id: str
+    archetype: str
+    action: ManualMLTrainingAction
+    status: str
+    effective_at: datetime
+    detail: str = ""
+
+
+class ManualInstructionAuditLog(BaseModel):
+    """Persistence shape for every operator-initiated action (manual trade + ML control).
+
+    Single audit-log surface for both `ManualInstruction` submissions and
+    `MLTrainingControlRequest` submissions. Consumed by:
+    - `pnl-attribution-service` — rolls up manual fills by strategy_id alongside automated fills.
+    - `batch-live-reconciliation-service` — isolates execution alpha by comparing manual vs simulated fills.
+    - `alerting-service` — emits strategy_id per fired alert when manual action triggers a threshold.
+
+    Dispatched via `action_category` (closed `ManualAuditCategory` set):
+    `MANUAL_TRADE` → `manual_instruction` populated; `ml_training_*` fields None.
+    `ML_TRAINING_CONTROL` → `ml_training_request` (and optionally response) populated;
+    `manual_instruction` None.
+
+    Persisted by execution-service / ml-training-service at the API boundary
+    BEFORE forwarding to downstream consumers (EXECUTE flow) or directly
+    after recording the fill (RECORD_ONLY flow).
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    audit_id: str
+    action_category: ManualAuditCategory
+    persisted_at: datetime
+    submitted_by: str
+    asset_group: str = ""
+    strategy_id: str = ""
+    client_id: str = ""
+    portfolio_id: str = ""
+    manual_instruction: ManualInstruction | None = None
+    ml_training_request: MLTrainingControlRequest | None = None
+    ml_training_response: MLTrainingControlResponse | None = None
+    pre_trade_check_passed: bool | None = None
+    pre_trade_check_detail: str = ""
+    routed_to_venue: str = ""
+    fill_reference: str = ""
+
+
+__all__ = [
+    "BatchExecutionMode",
+    "ManualAuditCategory",
+    "ManualExecutionMode",
+    "ManualInstruction",
+    "ManualInstructionAuditLog",
+    "ManualMLTrainingAction",
+    "MLTrainingControlRequest",
+    "MLTrainingControlResponse",
+    "SettlementType",
+]
