@@ -88,6 +88,18 @@ GAS_FEE_SOLANA_START_DATE: str = "2021-01-01"
 # Alchemy archival RPC coverage starts (which can lag chain genesis by
 # months), this is the chain's mainnet launch (the absolute earliest any
 # data can exist on-chain).
+#
+# Naming conventions (locked here per defi_catalogue Phase 1C verification 2026-05-12):
+# - Each chain has ONE canonical key. Rebrands keep the legacy key (no alias keys —
+#   that would duplicate the entry + invite drift).
+#   - BSC = "Binance Smart Chain" (legacy) / "BNB Chain" (2022 rebrand). Same chain
+#     ID 56, same contracts. Callers that receive "BNB_CHAIN" / "BNB" / "BNBCHAIN"
+#     must normalise to "BSC" at entry (do not add alias keys here).
+#   - POLYGON = "Matic" (legacy) / "Polygon PoS" (rebrand). Same chain ID 137.
+# - Polygon zkEVM is a DISTINCT chain from Polygon PoS (chain ID 1101, different
+#   contracts, different bridge). It is currently NOT in defi_catalogue Phase 1A
+#   scope; add as "POLYGON_ZKEVM": "2023-03-27" only when a protocol on that chain
+#   enters Phase 1A.
 CHAIN_GENESIS_DATES: dict[str, str] = {
     "ETHEREUM": "2015-07-30",  # Frontier mainnet
     "ARBITRUM": "2021-08-31",  # Arbitrum One public mainnet
@@ -95,7 +107,7 @@ CHAIN_GENESIS_DATES: dict[str, str] = {
     "OPTIMISM": "2021-12-16",  # OP mainnet (post-regenesis)
     "POLYGON": "2020-05-30",  # Matic mainnet (rebranded to Polygon)
     "AVALANCHE": "2020-09-22",  # C-Chain launch
-    "BSC": "2020-08-29",  # Binance Smart Chain (rebranded to BNB Chain)
+    "BSC": "2020-08-29",  # Binance Smart Chain (rebranded to BNB Chain 2022; same chain ID 56)
     "LINEA": "2023-07-11",  # Linea mainnet alpha
     "SCROLL": "2023-10-17",  # Scroll mainnet
     "ZKSYNC": "2023-03-24",  # zkSync Era mainnet
