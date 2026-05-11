@@ -18,7 +18,7 @@ For live mode, check ``is_reference_refresh_date()`` on each batch run.
 from __future__ import annotations
 
 from datetime import date, timedelta
-from typing import NamedTuple
+from typing import Literal, NamedTuple
 
 from .league_data import LEAGUE_REGISTRY
 from .league_registry import LeagueDefinition
@@ -110,6 +110,91 @@ def get_season_boundary(league_id: str, season_year: int) -> SeasonBoundary:
         start_date=get_season_start(league_id, season_year),
         end_date=get_season_end(league_id, season_year),
     )
+
+
+# ---------------------------------------------------------------------------
+# FootyStats per-league season bounds
+#
+# FootyStats refreshes its per-league season IDs every season
+# (``FOOTYSTATS_SEASON_IDS`` in provider_league_ids.py), but the season
+# *boundary dates* are source-agnostic — a 2025-26 EPL season runs Aug 2025 →
+# May 2026 whether you read it from FootyStats, api_football or understat.  So
+# the FootyStats season-bounds view is derived from the existing
+# :func:`get_season_boundary` (which reads ``LeagueDefinition.season_months``)
+# rather than carrying duplicate per-(league, season) date pairs (per the
+# workspace "no double SSOT" rule — the league registry's ``season_months`` is
+# the single source).  These helpers exist so the sports per-source classifier
+# can flip a FootyStats ``empty_confirmed`` shard whose day falls before/after
+# the league's season window to the typed ``EXPECTED_PRE_SEASON`` /
+# ``EXPECTED_POST_SEASON`` reason instead of the catch-all ``SOURCE_RETURNED_ZERO``
+# (the SOURCE_COVERAGE_START clip in UAC ``sports`` handles the
+# before-FootyStats-coverage-started case separately).
+# ---------------------------------------------------------------------------
+
+
+def get_footystats_season_bounds(league_id: str, season_year: int) -> tuple[date, date]:
+    """Return ``(season_start, season_end)`` for ``league_id``'s ``season_year`` season.
+
+    Thin wrapper over :func:`get_season_boundary` — same data, tuple shape for
+    callers that just want the bounds.  ``season_year`` is the year the season
+    STARTS (2025 for the 2025-26 EPL season; equal to the calendar year for
+    calendar-year leagues like Allsvenskan / J.League).
+    """
+    boundary = get_season_boundary(league_id, season_year)
+    return (boundary.start_date, boundary.end_date)
+
+
+def is_within_footystats_season(league_id: str, season_year: int, day: date) -> bool:
+    """Whether ``day`` falls inside ``league_id``'s ``season_year`` season window.
+
+    ``season_year`` is the year the season STARTS.  Inclusive of both bounds.
+    """
+    start, end = get_footystats_season_bounds(league_id, season_year)
+    return start <= day <= end
+
+
+def footystats_season_status_for_day(
+    league_id: str,
+    day: date,
+) -> Literal["EXPECTED_PRE_SEASON", "EXPECTED_POST_SEASON"] | None:
+    """Classify ``day`` relative to ``league_id``'s season windows.
+
+    Checks the season boundaries for the three candidate season-years that could
+    plausibly contain ``day`` (``day.year - 1`` / ``day.year`` / ``day.year + 1``)
+    — this handles both cross-year leagues (Aug→May) and calendar-year leagues
+    (Jan→Dec) without the caller needing to know which kind it is.
+
+    Returns:
+      - ``None`` if ``day`` is inside any of those season windows (in-season —
+        FootyStats data is genuinely expected, so a zero-row shard is a real
+        absence, not a season-gap).
+      - ``"EXPECTED_PRE_SEASON"`` if ``day`` is in the off-season gap and is
+        closer to the *upcoming* season's start than to the *just-ended* season's
+        end (or there is no just-ended season among the candidates).
+      - ``"EXPECTED_POST_SEASON"`` otherwise (off-season gap, closer to the
+        season that just ended).
+
+    The returned strings are exactly the values of
+    ``unified_api_contracts.canonical.crosscutting.honest_coverage.EmptyConfirmedReason.EXPECTED_PRE_SEASON``
+    / ``.EXPECTED_POST_SEASON`` — returned as bare strings here to keep this
+    module dependency-free of ``crosscutting`` (the classifier validates against
+    ``EMPTY_CONFIRMED_REASONS``).
+    """
+    candidate_years = (day.year - 1, day.year, day.year + 1)
+    bounds = [get_season_boundary(league_id, sy) for sy in candidate_years]
+    for b in bounds:
+        if b.start_date <= day <= b.end_date:
+            return None  # in-season
+    # Off-season gap: decide pre vs post by which season window is nearer.
+    later_starts = [b.start_date for b in bounds if b.start_date > day]
+    earlier_ends = [b.end_date for b in bounds if b.end_date < day]
+    if not earlier_ends:
+        return "EXPECTED_PRE_SEASON"
+    if not later_starts:
+        return "EXPECTED_POST_SEASON"
+    dist_to_next = min(later_starts) - day
+    dist_from_prev = day - max(earlier_ends)
+    return "EXPECTED_PRE_SEASON" if dist_to_next <= dist_from_prev else "EXPECTED_POST_SEASON"
 
 
 def get_reference_refresh_dates(league_id: str, year: int) -> list[date]:

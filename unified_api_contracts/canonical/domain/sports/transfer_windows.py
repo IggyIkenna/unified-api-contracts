@@ -462,6 +462,33 @@ def is_transfer_window_open(canonical_league_id: str, d: date) -> bool:
     return any(w.contains(d) for w in _get_candidate_windows(country, d))
 
 
+def is_within_transfer_window(country_code: str, day: date) -> bool:
+    """Whether ``day`` falls inside any transfer registration window for ``country_code``.
+
+    Country-code-keyed sibling of :func:`is_transfer_window_open` (which is keyed by
+    canonical league_id). Both read the SAME SSOT — :data:`_COUNTRY_DEFAULTS` +
+    :data:`_YEAR_OVERRIDES` via :func:`_resolve_specs` — so this introduces NO
+    duplicate calendar dict (per the workspace "no double SSOT in data-saving
+    methodology" rule). Unknown ``country_code`` falls through to the generic
+    European dual-window pattern, exactly as :func:`_resolve_specs` does.
+
+    Consumers:
+      - ``unified_trading_library.legacy_reason_classifier._classify_sports`` — a
+        transfermarkt ``empty_confirmed`` shard whose day is outside the window for
+        the league's country gets ``EXPECTED_OUTSIDE_TRANSFER_WINDOW`` instead of the
+        catch-all ``SOURCE_RETURNED_ZERO``.
+      - instruments-service — optional skip of ``transfer_records`` fetch outside windows.
+
+    Args:
+        country_code: ISO 3166-1 alpha-3 (``"ENG"`` / ``"ESP"`` / ``"USA"`` / ``"JPN"`` / …).
+        day: The calendar day to test.
+
+    Returns:
+        True if a transfer window is open for that country on ``day``, else False.
+    """
+    return any(w.contains(day) for w in _get_candidate_windows(country_code, day))
+
+
 def get_active_window(
     canonical_league_id: str,
     d: date,
