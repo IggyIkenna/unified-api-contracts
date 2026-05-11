@@ -37,6 +37,14 @@ from .canonical.crosscutting.alerting import (
     UnknownAlertCodeError,
     UnknownThresholdKeyError,
 )
+from .canonical.crosscutting.bar_boundary import (
+    BAR_TIMEFRAME_SECONDS,
+    BAR_TIMEFRAMES,
+    BarBoundaryViolationError,
+    BarTimeframe,
+    assert_bar_boundary_contract,
+    bar_window_for_close,
+)
 from .canonical.crosscutting.circuit_breaker import (
     BREAKER_RECOVERY_DEFAULTS,
     BreakerAction,
@@ -841,6 +849,8 @@ __all__ = [
     "ALERT_CODES",
     "ALERT_THRESHOLDS",
     "ALL_VENUES",
+    "BAR_TIMEFRAMES",
+    "BAR_TIMEFRAME_SECONDS",
     "BOOKMAKER_REGISTRY",
     "BREAKER_RECOVERY_DEFAULTS",
     "BUNDLED_DATA_TYPES",
@@ -986,6 +996,8 @@ __all__ = [
     # Honest-coverage taxonomy — UTL ManifestWriter consumers
     "AssetGroup",
     "AsterExchangeInfo",
+    "BarBoundaryViolationError",
+    "BarTimeframe",
     "BenchmarkType",
     "BetExecution",
     "BetOrder",
@@ -1412,6 +1424,8 @@ __all__ = [
     "WithdrawalRecord",
     "active_counterparties",
     "american_to_decimal",
+    "assert_bar_boundary_contract",
+    "bar_window_for_close",
     "build_cefi_partition_path",
     "build_combo_id",
     "build_defi_partition_path",
