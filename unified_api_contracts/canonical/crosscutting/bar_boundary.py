@@ -32,11 +32,21 @@ satisfies a 4-clause contract:
    timeframe``; the bar contains every tick with ``t_open <= tick_ts <
    t_close``. A tick at the boundary itself belongs to the NEXT bar.
 
-4. **``available_at == t_close``.** A bar could not have been observed live
-   before ``t_close`` (the moment the bar closed and the aggregate could be
-   computed). Stamping any earlier timestamp would leak future ticks into
-   features built on prior bars; stamping ``wall_clock_now`` at replay time
-   makes the row replay-non-idempotent. Both are banned by the rule above.
+4. **``available_at >= t_close`` AND canonical form
+   ``available_at == t_close + emission_latency_ms_for_source(primary_source)``**
+   (amended 2026-05-11 per the MDPS canonical_writer off-by-one audit). A bar
+   could not have been observed live before ``t_close`` (the moment the bar
+   closed and the aggregate could be computed). Stamping any earlier timestamp
+   would leak future ticks into features built on prior bars
+   (``available_at < t_close`` is BANNED). Per the workspace CLAUDE.md
+   "Live = batch" rule, the canonical form adds the per-source emission
+   latency on top of ``t_close`` to reflect the actual live-pipeline-arrival
+   time (UAC ``EMISSION_LATENCY_MS_BY_SOURCE`` is the SSOT — tardis = 50ms,
+   databento = 10ms, polymarket_clob = 200ms, onchain_subgraph = 60s, etc.).
+   Stamping ``wall_clock_now`` at replay time is BANNED (replay-non-idempotent).
+   Stamping ``t_close + tf + latency`` (the pre-2026-05-11 MDPS overshoot
+   bug) is BANNED — that's one full timeframe later than the live pipeline
+   would actually have the row.
 
 Idempotency
 -----------
@@ -51,10 +61,15 @@ here).
 
 Worked examples
 ---------------
-Last tick at ``2026-04-29T14:23:47.123Z`` with timeframe ``15m``:
+Last tick at ``2026-04-29T14:23:47.123Z`` with timeframe ``15m`` from tardis
+(50ms emission latency):
 * ``t_close = 2026-04-29T14:30:00Z`` (the next 15-minute boundary).
 * ``t_open  = 2026-04-29T14:15:00Z`` (= ``t_close - 15m``).
-* ``available_at = t_close = 2026-04-29T14:30:00Z``.
+* ``available_at = t_close + 50ms = 2026-04-29T14:30:00.050Z`` (canonical
+  live-pipeline-arrival form per the Live=batch rule).
+* ``available_at = t_close = 2026-04-29T14:30:00Z`` is the degenerate
+  no-latency form — valid (``>= t_close``) but does not match the live
+  pipeline; only synthetic / unit-test fixtures should use this form.
 
 Last tick exactly on a boundary, ``2026-04-29T14:15:00Z``, timeframe ``15m``:
 * ``t_close = 2026-04-29T14:30:00Z`` (the boundary AFTER the tick; the tick
@@ -243,12 +258,29 @@ def assert_bar_boundary_contract(
             f"one timeframe."
         )
         raise BarBoundaryViolationError(msg)
-    if available_at != t_close:
+    if available_at < t_close:
         msg = (
-            f"bar_boundary_contract: available_at={available_at!r} != "
+            f"bar_boundary_contract: available_at={available_at!r} < "
             f"t_close={t_close!r} (clause 4). Bars become observable at "
-            f"close, never earlier (would leak), never at wall-clock-now "
-            f"(would be replay-non-idempotent)."
+            f"close (canonical Live=batch form = t_close + emission_latency), "
+            f"never earlier — would leak future ticks into prior bars."
+        )
+        raise BarBoundaryViolationError(msg)
+    # Hard upper bound: more than 1 day past t_close is per-definition a bug
+    # (catches the pre-2026-05-11 `t_close + tf + latency` overshoot for
+    # 1d candles + the stamping-with-wall-clock-now replay-non-idempotent
+    # antipattern). Real emission latencies cap at 24h (transfermarkt's
+    # daily market-values refresh); anything beyond is a stamping bug.
+    if (available_at - t_close) > timedelta(days=1, hours=1):
+        msg = (
+            f"bar_boundary_contract: available_at={available_at!r} is more "
+            f"than 25h past t_close={t_close!r} (clause 4 hard upper bound). "
+            f"Either the per-row emission_latency is wrong, OR the stamping "
+            f"helper is treating timestamp as t_open when the aggregator "
+            f"emits t_close (pre-2026-05-11 MDPS overshoot bug — see "
+            f"plans/active/issues/mdps_canonical_writer_off_by_one_tf_2026_05_11.md). "
+            f"Real per-source latencies in UAC EMISSION_LATENCY_MS_BY_SOURCE "
+            f"cap at 24h (transfermarkt)."
         )
         raise BarBoundaryViolationError(msg)
 

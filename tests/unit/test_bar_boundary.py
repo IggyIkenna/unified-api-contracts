@@ -118,27 +118,74 @@ def test_window_width_must_match_timeframe() -> None:
 
 
 # ---------------------------------------------------------------------------
-# available_at == t_close (clause 4).
+# available_at >= t_close (clause 4 — amended 2026-05-11 per the MDPS audit).
+#
+# The canonical Live=batch form is `t_close + emission_latency_ms_for_source`,
+# i.e. `available_at >= t_close` with the per-source latency added on top.
+# Earlier-than-close is BANNED (leak); 25h+ past close is BANNED (catches the
+# pre-2026-05-11 MDPS `t_close + tf + latency` overshoot for 1d candles).
 # ---------------------------------------------------------------------------
 
 
-def test_available_at_must_equal_t_close() -> None:
+def test_available_at_below_t_close_raises() -> None:
+    """available_at < t_close = leak — banned."""
     t_close = _utc(2026, 4, 29, 14, 30)
     t_open = t_close - timedelta(minutes=15)
-    # available_at < t_close → would leak future ticks
-    with pytest.raises(BarBoundaryViolationError, match="available_at="):
+    with pytest.raises(BarBoundaryViolationError, match=r"available_at=.*< t_close"):
         assert_bar_boundary_contract(
             t_open=t_open,
             t_close=t_close,
             available_at=t_close - timedelta(seconds=1),
             timeframe="15m",
         )
-    # available_at > t_close → replay-non-idempotent
-    with pytest.raises(BarBoundaryViolationError, match="available_at="):
+
+
+def test_available_at_equal_to_t_close_passes_degenerate_no_latency() -> None:
+    """available_at == t_close: degenerate no-latency form (valid)."""
+    t_close = _utc(2026, 4, 29, 14, 30)
+    t_open = t_close - timedelta(minutes=15)
+    # Should not raise — t_close + 0ms latency is the synthetic / unit-test form.
+    assert_bar_boundary_contract(
+        t_open=t_open,
+        t_close=t_close,
+        available_at=t_close,
+        timeframe="15m",
+    )
+
+
+def test_available_at_plus_typical_emission_latency_passes() -> None:
+    """available_at = t_close + emission_latency (the canonical Live=batch form)."""
+    t_close = _utc(2026, 4, 29, 14, 30)
+    t_open = t_close - timedelta(minutes=15)
+    # Per UAC EMISSION_LATENCY_MS_BY_SOURCE: tardis=50ms, databento=10ms,
+    # onchain_subgraph=60s, transfermarkt=24h. All within the [t_close, t_close+25h)
+    # canonical window.
+    for latency in (
+        timedelta(milliseconds=10),  # databento
+        timedelta(milliseconds=50),  # tardis
+        timedelta(milliseconds=200),  # polymarket_clob
+        timedelta(seconds=60),  # onchain_subgraph
+        timedelta(hours=2),  # understat post-match
+        timedelta(hours=24),  # transfermarkt
+    ):
         assert_bar_boundary_contract(
             t_open=t_open,
             t_close=t_close,
-            available_at=t_close + timedelta(seconds=1),
+            available_at=t_close + latency,
+            timeframe="15m",
+        )
+
+
+def test_available_at_25h_past_t_close_raises_overshoot_guard() -> None:
+    """available_at >25h past t_close — catches the pre-2026-05-11 overshoot bug."""
+    t_close = _utc(2026, 4, 29, 14, 30)
+    t_open = t_close - timedelta(minutes=15)
+    # 25h + 1s past t_close — exceeds the 24h transfermarkt cap.
+    with pytest.raises(BarBoundaryViolationError, match=r"more than 25h past t_close"):
+        assert_bar_boundary_contract(
+            t_open=t_open,
+            t_close=t_close,
+            available_at=t_close + timedelta(hours=25, seconds=1),
             timeframe="15m",
         )
 
