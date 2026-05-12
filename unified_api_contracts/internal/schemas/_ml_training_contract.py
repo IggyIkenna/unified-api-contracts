@@ -4,7 +4,13 @@ Plan: ``data_pipeline_completion_2026_04_18`` §Phase 5d.1. Registers the
 canonical training-manifest SchemaContract so every ml-training-service run
 writes one row per experiment with the v4 shard dimensions populated
 (``model_family``, ``training_period``, ``strategy_id``, ``experiment_id``,
-plus the upstream data ``asset_group``). Rows land at:
+plus the upstream data ``asset_group``). Rows land under the
+``ml-models-store`` bucket family (resolved via canonical Bucket-name SSOT (b+)
+``unified_trading_library.cloud_interface.bucket_naming.resolve_bucket_name(
+cloud="gcp", kind="ml-models-store")``) at the following path shape (the
+``{asset_group}`` infix below is illustrative of the historical per-AG bucket
+layout; current SSOT routes all asset_groups through the flat
+``ml-models-store`` kind):  # CORRECT-LOCAL
 
     gs://ml-models-{asset_group}-*/manifests/training/by_date/day={YYYY-MM-DD}/
         model_family={family}/training_period={span}/experiment_id={uuid}/
