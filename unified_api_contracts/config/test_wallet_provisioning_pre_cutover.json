@@ -109,7 +109,18 @@
     }
   ],
   "_pending_solana_wallets": {
-    "note": "Solana devnet test wallet requires operator-led setup per codex/05-infrastructure/pre-cutover-test-wallets-runbook.md § 3. Once operator provides Solana keypair JSON, slot 4 agent wraps via staging CMK + provisions test-sol-devnet-pk-wrapped + adds wallet entries here.",
-    "missing": ["test-sol-devnet", "test-sol-mainnet-small-amount"]
+    "canonical_path": "Trust Wallet Solana wallet (same BIP-39 seed as EVM Trust Wallet → different Ed25519 keypair). Per operator 2026-05-12 direction *'can we use trust wallet for solana too?'* — yes, via separate-keypair export from the same seed.",
+    "operator_action_required": "Open Trust Wallet → switch to Solana wallet view → reveal Solana private key (base58-encoded; different from the EVM 0x-hex PK) → hand to slot 4 agent for envelope-encrypt + Secret Manager provisioning per codex/05-infrastructure/pre-cutover-test-wallets-runbook.md § 3.1",
+    "target_secrets": {
+      "address_public": "defi-wallet-solana",
+      "private_key_raw": "defi-wallet-solana-private-key",
+      "private_key_wrapped": "defi-wallet-solana-private-key-wrapped (envelope-encrypted via wallets-staging/trading-defi-master-v1 CMK, same pattern as defi-wallet-private-key-wrapped)"
+    },
+    "missing_wallet_entries": ["test-sol-mainnet-trust", "test-sol-devnet-trust"],
+    "rpc_credentials_status": {
+      "devnet_rpc": "Public https://api.devnet.solana.com — no auth required",
+      "mainnet_rpc_production_grade": "🟡 NOT YET in Secret Manager (Helius / QuickNode / Triton — operator-action P1 if production-rate needed)",
+      "pyth_hermes": "Public HTTPS endpoint — no auth required"
+    }
   }
 }
