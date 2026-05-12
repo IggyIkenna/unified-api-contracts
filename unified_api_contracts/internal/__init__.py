@@ -432,7 +432,19 @@ from unified_api_contracts.internal.domain.matching_engine import (
     MatchResult as MatchResult,
 )
 from unified_api_contracts.internal.domain.matching_engine import (
+    FillResult as FillResult,
+)
+from unified_api_contracts.internal.domain.matching_engine import (
     OrderRecord as OrderRecord,
+)
+from unified_api_contracts.internal.domain.matching_engine import (
+    OrderSide as OrderSide,
+)
+from unified_api_contracts.internal.domain.matching_engine import (
+    PoolShape as PoolShape,
+)
+from unified_api_contracts.internal.domain.matching_engine import (
+    SwapQuote as SwapQuote,
 )
 from unified_api_contracts.internal.domain.matching_engine import (
     SwapResult,
@@ -1193,6 +1205,7 @@ __all__ = [
     "FileReport",
     "FillEvent",
     "FillEventMessage",
+    "FillResult",
     "FillSource",
     "FixtureEventsRecord",
     "FixtureFeatures",
@@ -1340,6 +1353,7 @@ __all__ = [
     "OrderData",
     "OrderEvent",
     "OrderRequestMessage",
+    "OrderSide",
     "OrderSubmitted",
     "OrderType",
     "OrgType",
@@ -1359,6 +1373,7 @@ __all__ = [
     "PnLData",
     "PnLPoint",
     "PnLReconciliationSnapshot",
+    "PoolShape",
     "PoissonGLMHyperparams",
     "PortfolioAllocation",
     "PortfolioMarginAccount",
@@ -1505,6 +1520,7 @@ __all__ = [
     "SubscriptionTier",
     "SupportedCurrency",
     "SwapInstruction",
+    "SwapQuote",
     "SwapResult",
     "SyntheticDataGenerator",
     "TargetType",
