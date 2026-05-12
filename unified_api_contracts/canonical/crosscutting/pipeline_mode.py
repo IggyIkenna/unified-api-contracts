@@ -51,7 +51,11 @@ class PipelineMode(StrEnum):
     """
 
     BATCH_API_FOOTBALL = "batch_api_football"
+    BATCH_BARCHART = "batch_barchart"
+    BATCH_CHAINLINK = "batch_chainlink"
     BATCH_DATABENTO = "batch_databento"
+    BATCH_FOOTYSTATS = "batch_footystats"
+    BATCH_HYPERLIQUID_REST = "batch_hyperliquid_rest"
     BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"
     BATCH_ODDS_API = "batch_odds_api"
     BATCH_ONCHAIN_RPC = "batch_onchain_rpc"
@@ -59,10 +63,12 @@ class PipelineMode(StrEnum):
     BATCH_OPEN_METEO = "batch_open_meteo"
     BATCH_POLYMARKET_CLOB = "batch_polymarket_clob"
     BATCH_POLYMARKET_GAMMA_API = "batch_polymarket_gamma_api"
+    BATCH_PYTH_HERMES = "batch_pyth_hermes"
     BATCH_SOCCER_FOOTBALL_INFO = "batch_soccer_football_info"
     BATCH_TARDIS = "batch_tardis"
     BATCH_TRANSFERMARKT = "batch_transfermarkt"
     BATCH_UNDERSTAT = "batch_understat"
+    BATCH_YAHOO = "batch_yahoo"
 
     LIVE_WEBSOCKET = "live_websocket"
 

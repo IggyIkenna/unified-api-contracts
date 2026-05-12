@@ -86,7 +86,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # Fixture lifecycle data — api_football is primary, footystats is the
     # multi-source merge candidate (deferred). Soccer-football-info handles
     # the SFI_PROGRESSIVE_STATS slice.
-    ("sports", "FIXTURES"): ["api_football"],
+    ("sports", "FIXTURES"): [
+        "api_football",
+        "footystats",
+    ],  # footystats is the deferred multi-source merge candidate (see module docstring Phase 1B)
     ("sports", "FIXTURE_LINEUPS"): ["api_football"],
     ("sports", "FIXTURE_EVENTS"): ["api_football"],
     ("sports", "FIXTURE_STATS"): ["api_football"],
@@ -141,6 +144,33 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "rewards"): ["onchain_subgraph"],
     ("defi", "flash_loan_events"): ["onchain_subgraph"],
     ("defi", "eigenlayer_rewards"): ["onchain_subgraph"],
+    # Phase 4.MTDS / Phase 5 availability-semantic gap closeout (2026-05-12):
+    # 14 DeFi data_types present in AVAILABILITY_AT_SEMANTICS (Ikenna Phase 5
+    # audit 2026-05-11) but missing from SOURCE_PRIORITY. Source assignments
+    # derived from MTDS handler survey in
+    # ``scratch_codefreeze_phase4_mtds_fanout_2026_05_12.md`` per-source
+    # mapping table. Subgraph = EVM The Graph / Messari indexer; RPC = direct
+    # node call or signed transaction event; hyperliquid_rest = Hyperliquid
+    # REST API for Solana-based perp + DEX legs.
+    ("defi", "bridge_events"): ["onchain_rpc"],
+    ("defi", "dex_pools"): ["onchain_subgraph"],
+    ("defi", "governance_events"): ["onchain_subgraph"],
+    ("defi", "liquidation_events"): ["onchain_rpc"],
+    ("defi", "liquidations"): ["onchain_subgraph"],
+    ("defi", "lst_rates"): ["onchain_subgraph"],
+    ("defi", "mev_events"): ["onchain_rpc"],
+    # oracle_prices dispatches Pyth Hermes (Solana feeds) as primary and
+    # Chainlink (EVM aggregator rounds) as secondary; per-row pipeline_mode
+    # is resolved at callsite by the MTDS oracle_prices_handler resolver.
+    ("defi", "oracle_prices"): ["pyth_hermes", "chainlink"],
+    # perp_funding + solana_defi are Hyperliquid REST legs; the HL REST API
+    # is the primary (and currently only) source for both data_types.
+    ("defi", "perp_funding"): ["hyperliquid_rest"],
+    ("defi", "position_data"): ["onchain_rpc"],
+    ("defi", "solana_defi"): ["hyperliquid_rest"],
+    ("defi", "staking_yields"): ["onchain_subgraph"],
+    ("defi", "token_transfers"): ["onchain_rpc"],
+    ("defi", "vault_share_price"): ["onchain_subgraph"],
     # ---- TradFi ---------------------------------------------------------
     # Databento for CME/NQ/options/futures; Yahoo for VIX 15m rolling
     # window; Barchart for VIX 15m historical preload (handled at the
@@ -149,7 +179,8 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("tradfi", "trades"): ["databento"],
     ("tradfi", "tbbo"): ["databento"],
     ("tradfi", "ohlcv_1m"): ["databento"],
-    ("tradfi", "ohlcv_15m"): ["databento", "yahoo"],  # databento primary; yahoo for VIX 15m rolling 60d fallback (see MTDS umi_tick_provider._fetch_yahoo_vix_15m route — orchestrator routes by date AND venue==CBOE)
+    # databento primary; yahoo: VIX 15m rolling 60d fallback; barchart: VIX 15m historical preload 2020-2025.
+    ("tradfi", "ohlcv_15m"): ["databento", "yahoo", "barchart"],
     ("tradfi", "options_chain"): ["databento"],
     ("tradfi", "futures_chain"): ["databento"],
     # ---- Prediction -----------------------------------------------------
@@ -233,6 +264,14 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # Metadata / lifecycle reads — minute-cadence.
     "polymarket_gamma_api": 60_000,
     "instruments_service": 60_000,
+    # DeFi REST APIs — Hyperliquid + oracle aggregators.
+    "hyperliquid_rest": 1_000,  # 1s: HL REST API polling cadence
+    "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
+    "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
+    # Sports batch-data provider (deferred multi-source merge candidate).
+    "footystats": 3_600_000,  # 1h: Footystats batch publication cadence
+    # Historical preload archive — daily publication delay.
+    "barchart": 86_400_000,  # 24h: Barchart VIX 15m historical preload (2020-2025)
 }
 """Per-source emission latency (ms) — live-pipeline tick-to-pipeline arrival.
 
