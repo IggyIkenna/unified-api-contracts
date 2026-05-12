@@ -1,0 +1,115 @@
+{
+  "_meta": {
+    "purpose": "Pre-cutover (now → 2026-06-01 POD cred handover) test wallet provisioning. Real wallet entries pointing at operator's existing Secret Manager test PK (defi-wallet-private-key, wrapped via staging CMK on 2026-05-12).",
+    "schema_ref": "unified_api_contracts.internal.domain.defi.WalletProvisioningConfig",
+    "created": "2026-05-12",
+    "owner": "ikenna-keys-wallets-tab (slot 4)",
+    "plan": "plans/active/api_keys_wallets_accounts_readiness_2026_05_10.md Phase 4.D.3",
+    "destination_gcs_path": "wallet-config/testnet/wallet_provisioning.json",
+    "signing_surface_routing": "CLOUD_KMS_ENCRYPTED (envelope-encrypted via wallets-staging CMK) for all 4 EVM testnets — operator existing Metamask/Trust wallets pre-wrapped 2026-05-12",
+    "pod_scope_note": "Pre-cutover test setup ONLY. POD-managed Copper + CEFFU custody activates 2026-06-01 per codex/14-customer-journeys/pod-elysium-client-onboarding.md.",
+    "operator_existing_wallets": {
+      "ethereum_metamask_address": "0x0056801778F9A5dE5C8a5225B676859b797fA88B",
+      "_metamask_pk_NOT_in_secret_manager_note": "defi-wallet-metamask = address only; the PK in defi-wallet-private-key corresponds to Trust Wallet not MetaMask (verified 2026-05-12 via web3.py from_key)",
+      "ethereum_trust_address": "0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f",
+      "ethereum_pk_secret": "defi-wallet-private-key",
+      "ethereum_pk_wrapped_secret": "defi-wallet-private-key-wrapped (envelope-encrypted via wallets-staging/trading-defi-master-v1 CMK, round-trip verified 2026-05-12)"
+    }
+  },
+  "wallets": [
+    {
+      "wallet_id": "test-eth-sepolia-trust",
+      "chain": "SEPOLIA",
+      "kind": "HOT_TRADING",
+      "signing_surface": "CLOUD_KMS_ENCRYPTED",
+      "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-staging/cryptoKeys/trading-defi-master-v1",
+      "private_key_secret_ref": "defi-wallet-private-key-wrapped",
+      "address": "0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f",
+      "allowed_protocols": ["AAVE_V3", "UNISWAP_V3", "LIDO"],
+      "spending_caps": {
+        "per_tx_usd": "100",
+        "per_hour_usd": "500",
+        "per_day_usd": "1000"
+      },
+      "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
+      "archetype_id": "test_carry_staked_basis",
+      "label": "Sepolia test wallet (Trust Wallet PK wrapped via staging CMK (PK corresponds to defi-wallet-trust, NOT defi-wallet-metamask — verified by web3.py round-trip)) — operator existing PK"
+    },
+    {
+      "wallet_id": "test-arb-sepolia-trust",
+      "chain": "ARBITRUM",
+      "kind": "HOT_TRADING",
+      "signing_surface": "CLOUD_KMS_ENCRYPTED",
+      "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-staging/cryptoKeys/trading-defi-master-v1",
+      "private_key_secret_ref": "defi-wallet-private-key-wrapped",
+      "address": "0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f",
+      "allowed_protocols": ["AAVE_V3", "UNISWAP_V3", "GMX"],
+      "spending_caps": {
+        "per_tx_usd": "100",
+        "per_hour_usd": "500",
+        "per_day_usd": "1000"
+      },
+      "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
+      "archetype_id": "test_carry_staked_basis",
+      "label": "Arbitrum Sepolia test wallet (same PK as Sepolia; same address across EVM chains)"
+    },
+    {
+      "wallet_id": "test-base-sepolia-trust",
+      "chain": "BASE",
+      "kind": "HOT_TRADING",
+      "signing_surface": "CLOUD_KMS_ENCRYPTED",
+      "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-staging/cryptoKeys/trading-defi-master-v1",
+      "private_key_secret_ref": "defi-wallet-private-key-wrapped",
+      "address": "0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f",
+      "allowed_protocols": ["AAVE_V3", "UNISWAP_V3", "MORPHO"],
+      "spending_caps": {
+        "per_tx_usd": "100",
+        "per_hour_usd": "500",
+        "per_day_usd": "1000"
+      },
+      "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
+      "archetype_id": "test_carry_staked_basis",
+      "label": "Base Sepolia test wallet (same EVM PK)"
+    },
+    {
+      "wallet_id": "test-poly-amoy-trust",
+      "chain": "POLYGON",
+      "kind": "HOT_TRADING",
+      "signing_surface": "CLOUD_KMS_ENCRYPTED",
+      "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-staging/cryptoKeys/trading-defi-master-v1",
+      "private_key_secret_ref": "defi-wallet-private-key-wrapped",
+      "address": "0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f",
+      "allowed_protocols": ["AAVE_V3", "UNISWAP_V3"],
+      "spending_caps": {
+        "per_tx_usd": "100",
+        "per_hour_usd": "500",
+        "per_day_usd": "1000"
+      },
+      "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
+      "archetype_id": "test_carry_staked_basis",
+      "label": "Polygon Amoy test wallet (same EVM PK)"
+    },
+    {
+      "wallet_id": "test-holesky-trust",
+      "chain": "HOLESKY",
+      "kind": "HOT_TRADING",
+      "signing_surface": "CLOUD_KMS_ENCRYPTED",
+      "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-staging/cryptoKeys/trading-defi-master-v1",
+      "private_key_secret_ref": "defi-wallet-private-key-wrapped",
+      "address": "0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f",
+      "allowed_protocols": ["LIDO", "ETHERFI", "AAVE_V3"],
+      "spending_caps": {
+        "per_tx_usd": "100",
+        "per_hour_usd": "500",
+        "per_day_usd": "1000"
+      },
+      "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
+      "archetype_id": "test_carry_staked_basis",
+      "label": "Holesky test wallet (Lido + EigenLayer testnet; same EVM PK)"
+    }
+  ],
+  "_pending_solana_wallets": {
+    "note": "Solana devnet test wallet requires operator-led setup per codex/05-infrastructure/pre-cutover-test-wallets-runbook.md § 3. Once operator provides Solana keypair JSON, slot 4 agent wraps via staging CMK + provisions test-sol-devnet-pk-wrapped + adds wallet entries here.",
+    "missing": ["test-sol-devnet", "test-sol-mainnet-small-amount"]
+  }
+}
