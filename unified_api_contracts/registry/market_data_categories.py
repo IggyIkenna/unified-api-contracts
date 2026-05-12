@@ -213,13 +213,19 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "defi": list(_MTDS_DEFI_VENUES),
     "sports": [
-        # Sports betting exchanges and bookmakers
+        # Sports betting exchanges and bookmakers active in the May-23 universe.
+        # DEFERRED-INDEFINITELY 2026-05-12 per operator: scraper bookmakers
+        # (BET365, DRAFTKINGS, FANDUEL, WILLIAMHILL, LADBROKES, CORAL, PADDYPOWER,
+        # SKYBET, BETWAY, BETVICTOR, BOYLESPORTS, BWIN, BET888SPORT, UNIBET,
+        # BETFRED, SBOBET) are out of the active venue universe; their venue
+        # constants + capability flags + execution adapter stubs remain in the
+        # codebase as future-work scaffolding but they do NOT participate in MTDS
+        # market-data ingestion or in `VENUES_BY_ASSET_GROUP["sports"]`. See
+        # `unified-trading-pm/plans/epics/sports_master_2026_05_07.md` §
+        # "Scrapers DEFERRED-INDEFINITELY 2026-05-12 per operator".
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
         "PINNACLE",
         "BETFAIR",
-        "DRAFTKINGS",
-        "FANDUEL",
-        "BET365",
     ],
     "prediction": [
         # Prediction markets (binary / multi-outcome)
@@ -599,9 +605,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     },
     "PINNACLE": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
     "BETFAIR": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
-    "DRAFTKINGS": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
-    "FANDUEL": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
-    "BET365": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    # DRAFTKINGS / FANDUEL / BET365 + the 14 UK/EU scraper bookmakers are
+    # DEFERRED-INDEFINITELY 2026-05-12 per operator (see VENUES_BY_ASSET_GROUP
+    # comment above + sports_master plan).
     # ── Prediction (market data only — metadata is reference data, see below) ──
     # Prediction CLOBs emit canonical "trades" (same key as CeFi). Legacy
     # prediction_* names + book_snapshot_5 retired 2026-04-19; book snapshots
