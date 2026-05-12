@@ -149,3 +149,68 @@ def test_pipeline_mode_is_exposed_from_crosscutting_namespace() -> None:
     )
 
     assert CrosscuttingPipelineMode is PipelineMode
+
+
+# ---------------------------------------------------------------------------
+# Phase 4.MTDS operator-approved Q2=(A) 2026-05-12 enum extension
+# Per-member round-trip tests for the 6 new batch sources added at PM@52d289c
+# (UAC enum + SOURCE_PRIORITY) — pinning each (enum value, source string)
+# pair so accidental rename of either side fails CI loudly. Composes with
+# `test_every_batch_pipeline_mode_maps_to_source_priority_source` above (which
+# enforces existence) by adding per-member name-string fidelity.
+# ---------------------------------------------------------------------------
+
+
+def test_batch_yahoo_round_trip() -> None:
+    """VIX 15m rolling 60d fallback route — Yahoo Finance free-tier intraday."""
+    assert PipelineMode.BATCH_YAHOO.value == "batch_yahoo"
+    assert pipeline_mode_for_source("yahoo") is PipelineMode.BATCH_YAHOO
+    assert source_string_for(PipelineMode.BATCH_YAHOO) == "yahoo"
+
+
+def test_batch_barchart_round_trip() -> None:
+    """VIX 15m historical preload 2020-01-02 → 2025-11-12 per CLAUDE.md."""
+    assert PipelineMode.BATCH_BARCHART.value == "batch_barchart"
+    assert pipeline_mode_for_source("barchart") is PipelineMode.BATCH_BARCHART
+    assert source_string_for(PipelineMode.BATCH_BARCHART) == "barchart"
+
+
+def test_batch_footystats_round_trip() -> None:
+    """Sports multi-source merge candidate — 1h cadence fallback to api_football."""
+    assert PipelineMode.BATCH_FOOTYSTATS.value == "batch_footystats"
+    assert pipeline_mode_for_source("footystats") is PipelineMode.BATCH_FOOTYSTATS
+    assert source_string_for(PipelineMode.BATCH_FOOTYSTATS) == "footystats"
+
+
+def test_batch_hyperliquid_rest_round_trip() -> None:
+    """DEX-perp REST poll for cefi/funding_rate + defi/perp_funding venues."""
+    assert PipelineMode.BATCH_HYPERLIQUID_REST.value == "batch_hyperliquid_rest"
+    assert pipeline_mode_for_source("hyperliquid_rest") is PipelineMode.BATCH_HYPERLIQUID_REST
+    assert source_string_for(PipelineMode.BATCH_HYPERLIQUID_REST) == "hyperliquid_rest"
+
+
+def test_batch_pyth_hermes_round_trip() -> None:
+    """Solana on-chain price feeds via Hermes endpoint (Pyth-unbanned 2026-05-06)."""
+    assert PipelineMode.BATCH_PYTH_HERMES.value == "batch_pyth_hermes"
+    assert pipeline_mode_for_source("pyth_hermes") is PipelineMode.BATCH_PYTH_HERMES
+    assert source_string_for(PipelineMode.BATCH_PYTH_HERMES) == "pyth_hermes"
+
+
+def test_batch_chainlink_round_trip() -> None:
+    """EVM on-chain oracle prices via Chainlink aggregator rounds."""
+    assert PipelineMode.BATCH_CHAINLINK.value == "batch_chainlink"
+    assert pipeline_mode_for_source("chainlink") is PipelineMode.BATCH_CHAINLINK
+    assert source_string_for(PipelineMode.BATCH_CHAINLINK) == "chainlink"
+
+
+def test_six_new_enum_members_present_in_pipeline_mode() -> None:
+    """Phase 4.MTDS Q2=(A) extension landed all 6 new members atomically."""
+    new_members = {
+        PipelineMode.BATCH_YAHOO,
+        PipelineMode.BATCH_BARCHART,
+        PipelineMode.BATCH_FOOTYSTATS,
+        PipelineMode.BATCH_HYPERLIQUID_REST,
+        PipelineMode.BATCH_PYTH_HERMES,
+        PipelineMode.BATCH_CHAINLINK,
+    }
+    assert new_members.issubset(set(PipelineMode))
