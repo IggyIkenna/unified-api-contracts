@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date, datetime, time
 from decimal import Decimal
 from enum import StrEnum
@@ -889,3 +890,97 @@ class HealthFactor(BaseModel):
     venue: str | None = None
     distance_to_warning_pct: Decimal | None = None
     distance_to_liquidation_pct: Decimal | None = None
+
+
+# ---------------------------------------------------------------------------
+# Factor x layer dual-axis P&L attribution schema
+# SSOT: codex/09-strategy/architecture-v2/cross-cutting/pnl-attribution.md
+# Hard Rule #4 + § PnLAttribution Schema + § Decomposition Invariants
+# ---------------------------------------------------------------------------
+
+
+class PnLFactor(StrEnum):
+    """Canonical 16-factor economic-driver axis.
+
+    Closed set — adding a new factor requires a formal PR amending this enum
+    + extending the factor-definitions table + per-archetype relevance matrix
+    in the codex SSOT (pnl-attribution.md § Canonical Attribution Factors).
+    """
+
+    DELTA = "DELTA"
+    FUNDING = "FUNDING"
+    BASIS = "BASIS"
+    CARRY = "CARRY"
+    CARRY_BASE = "CARRY_BASE"
+    CARRY_AVS_CONTINUOUS = "CARRY_AVS_CONTINUOUS"
+    CARRY_ISSUER_SEASONAL = "CARRY_ISSUER_SEASONAL"
+    REWARD_REALISATION_SLIPPAGE = "REWARD_REALISATION_SLIPPAGE"
+    GREEKS = "GREEKS"
+    FEES = "FEES"
+    SLIPPAGE = "SLIPPAGE"
+    SETTLEMENT = "SETTLEMENT"
+    LIQUIDATION = "LIQUIDATION"
+    REBATE = "REBATE"
+    FX = "FX"
+    RESIDUAL = "RESIDUAL"
+
+
+class PnLLayer(StrEnum):
+    """System-layer axis — which part of the pipeline contributed this P&L.
+
+    STRATEGY_ALPHA and EXECUTION_ALPHA are derived sum-by-layer VIEWS,
+    NOT enum members.  Aggregators expose them as computed fields on rollups;
+    storage stays factor x layer rows using this enum.
+    """
+
+    STRATEGY = "STRATEGY"
+    """Benchmark-mode matching-engine fills (always-fill at requested price)."""
+    EXECUTION = "EXECUTION"
+    """Residual: live_or_simulated_fill_pnl - benchmark_fill_pnl."""
+
+
+@dataclass(frozen=True)
+class PnLAttributionRow:
+    """Single per-(factor, layer) attribution row.
+
+    Immutable.  Every row is stored as-is; rollup views are computed on read.
+    Per codex § PnLAttribution Schema.
+    """
+
+    strategy_id: str
+    client_id: str
+    instrument_id: str
+    timestamp: datetime
+    period: str
+    """Granularity tag: 'fill' | 'funding_8h' | 'daily' | 'settlement'."""
+    factor: PnLFactor
+    layer: PnLLayer
+    amount: Decimal
+    """Signed P&L attributable to (factor, layer) for this row."""
+    archetype_id: str | None = None
+    fill_id: str | None = None
+    venue: str | None = None
+    benchmark_price: Decimal | None = None
+
+
+class PnLAttribution(BaseModel):
+    """Aggregated rollup view over a (strategy, client, period) bucket.
+
+    strategy_alpha_total and execution_alpha_total are DERIVED — never stored.
+    Per codex § PnLAttribution Schema.
+    """
+
+    strategy_id: str
+    client_id: str
+    instrument_id: str
+    timestamp: datetime
+    period: str
+    factors: dict[str, Decimal] = Field(default_factory=dict)
+    """PnLFactor.value → sum across both layers."""
+    factors_by_layer: dict[str, Decimal] = Field(default_factory=dict)
+    """'FACTOR:LAYER' → P&L amount (serialisable form of (PnLFactor, PnLLayer) key)."""
+    total_pnl: Decimal = Decimal("0")
+    strategy_alpha_total: Decimal = Decimal("0")
+    """Derived: sum where layer=STRATEGY."""
+    execution_alpha_total: Decimal = Decimal("0")
+    """Derived: sum where layer=EXECUTION."""
