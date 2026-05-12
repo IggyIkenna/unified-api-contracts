@@ -280,6 +280,21 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-multi-timeframe-service", "tf_structure_context"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "tf_vol_compression"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "tf_confluence_signals"): ServiceEmissionPolicy.STRICT_FAIL,
+    #
+    # features-calendar-service — 2 entries (Phase 6.5 extension, 2026-05-12).
+    # Calendar features are venue-agnostic and deterministically derived from
+    # time (time_features) or economic-calendar sources (economic_events).
+    #
+    # time_features: purely time-derived cyclic encodings + session flags
+    # (day-of-week, month, hour, session overlap, etc.). No upstream source
+    # that can be "partially missing" — the generator either runs fully or fails.
+    # ML consumers NaN-fill natively. → NAN_FILL.
+    #
+    # economic_events: sourced from economic calendar (FRED / hardcoded events).
+    # Legitimate gaps on holidays/weekends/pre-source-coverage days are expected.
+    # Partial upstream source coverage is normal. → PARTIAL_OK.
+    ("features-calendar-service", "time_features"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-calendar-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
 }
 """Per-(service, output_data_type) emission policy seed.
 
