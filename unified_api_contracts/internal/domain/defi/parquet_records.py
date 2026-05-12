@@ -13,7 +13,24 @@ from datetime import datetime
 
 @dataclass(frozen=True, slots=True)
 class LendingIndexRecord:
-    """One row in a lending-indices parquet file."""
+    """One row in a lending-indices parquet file.
+
+    Phase 1B extension (``defi_simulation_realism_2026_05_10`` +
+    ``plans/active/issues/aave_irm_slope_capture_dropped_2026_05_12.md``):
+    captures per-block IRM-strategy params (``optimal_utilization_rate``,
+    ``variable_rate_slope1``, ``variable_rate_slope2``,
+    ``base_variable_borrow_rate``, ``reserve_factor``) sourced from the Aave
+    V3 ``ReserveInterestRateStrategy`` contract (or Compound V3 equivalent).
+    These are governance-mutable + historically-changing — the MTDS adapter
+    captures them per-block from The Graph subgraph so the matching engine's
+    ``LendingRateImpactCalculator`` (Phase 3A) uses actual historical slopes
+    instead of the static ``AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET`` snapshot.
+
+    Optional[float] for backwards compat — older parquets written before the
+    Phase 1B fix (mtds@``4b38a9b``) have these as ``None``. Backfill VM run
+    (Step 3 of the issue doc) populates them from the subgraph's historical
+    block-pinned queries.
+    """
 
     timestamp: datetime
     timestamp_unix: int
@@ -27,6 +44,12 @@ class LendingIndexRecord:
     utilization_rate: float
     total_supply: float  # totalATokenSupply (Aave) or totalDepositBalanceUSD (Compound)
     total_debt: float  # totalCurrentVariableDebt (Aave) or totalBorrowBalanceUSD (Compound)
+    # Phase 1B IRM strategy params (governance-mutable; per-block historical truth):
+    optimal_utilization_rate: float | None = None
+    variable_rate_slope1: float | None = None
+    variable_rate_slope2: float | None = None
+    base_variable_borrow_rate: float | None = None
+    reserve_factor: float | None = None
 
 
 @dataclass(frozen=True, slots=True)
