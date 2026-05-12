@@ -1,9 +1,15 @@
-"""Aave V3 Interest Rate Model — pure math for rate impact simulation.
+"""Aave V3 + Compound V3 Interest Rate Models — pure math for rate impact simulation.
 
 Implements the Aave V3 variable interest rate model exactly as specified in the
 Aave V3 protocol docs. Given pool parameters (slopes, optimal utilization,
 reserve factor) and a proposed trade (supply or borrow), computes the resulting
 utilization shift and new supply/borrow APYs.
+
+Phase 1B (``defi_simulation_realism_2026_05_10``) adds a generalised
+``LendingMarketState`` model with a ``protocol_irm_shape`` discriminator so
+the matching engine's rate-impact calculator dispatches by protocol family.
+Compound V3 uses a different (single-kink) IRM shape than Aave's
+piecewise-linear kinked-slope; Spark + Radiant inherit Aave's shape.
 
 All computations use Decimal for precision — no floats.
 
@@ -11,9 +17,35 @@ Reference: https://docs.aave.com/risk/liquidity-risk/borrow-interest-rate
 """
 
 from decimal import Decimal
+from enum import StrEnum
 from typing import TypedDict
 
 from pydantic import BaseModel
+
+
+class ProtocolIRMShape(StrEnum):
+    """Discriminator for per-protocol interest-rate-model shape dispatch.
+
+    Distinct shapes drive distinct ``compute_borrow_rate`` formulas:
+
+    - ``AAVE_KINKED`` — Aave V3, Spark, Radiant. Piecewise linear with a kink
+      at ``optimal_utilization``: below kink uses ``slope1`` only; above kink
+      adds ``slope2`` scaled by ``(U - U_opt) / (1 - U_opt)``.
+    - ``COMPOUND_V3`` — Comet single-asset borrow model. Different shape: base
+      rate + linear ``below_kink_slope`` to the kink; then jumps to a different
+      linear ``above_kink_slope * (U - kink)`` beyond it. Critical: the matcher
+      MUST dispatch by ``protocol_irm_shape`` — applying Aave math to Compound
+      pools silently corrupts post-trade rate predictions.
+    - ``MORPHO_ADAPTIVE`` — Morpho-Blue adaptive curve (FUTURE; not yet wired).
+
+    SSOT: ``codex/04-architecture/amm-slippage-simulation.md`` § "Per-protocol
+    IRM parameter capture". Declared by ``defi_simulation_realism_2026_05_10``
+    Phase 1B.
+    """
+
+    AAVE_KINKED = "AAVE_KINKED"
+    COMPOUND_V3 = "COMPOUND_V3"
+    MORPHO_ADAPTIVE = "MORPHO_ADAPTIVE"
 
 
 class AaveV3RateModelDefaults(TypedDict):
@@ -140,6 +172,79 @@ class AavePoolParams(BaseModel):
     total_borrow_usd: Decimal  # total borrowed in USD
 
 
+class LendingMarketState(BaseModel):
+    """Generalised per-protocol lending market state with IRM-shape discriminator.
+
+    Phase 1B (``defi_simulation_realism_2026_05_10``). Superset of ``AavePoolParams``
+    with a ``protocol_irm_shape`` field so the matching engine's rate-impact
+    calculator dispatches to the right IRM math (Aave V3 / Spark / Radiant share
+    ``AAVE_KINKED``; Compound V3 has its own shape).
+
+    Consumed by:
+
+    - matching-engine ``LendingRateImpactCalculator`` (execution-service Phase 3A)
+      for backtest + live pre-trade post-trade-rate estimation.
+    - features-onchain rate-impact analytics (``aave_rate_impact_calculator``
+      is the historical Aave-only consumer; that consumer reads
+      ``LendingMarketState`` and adapts via ``protocol_irm_shape == AAVE_KINKED``).
+    - risk-and-exposure-service forward-impact projection for archetype
+      capital-allocation gates.
+
+    Compound V3 specific fields (``compound_kink``, ``compound_below_kink_slope``,
+    ``compound_above_kink_slope``) carry the Comet IRM parameters that the
+    Aave-shape fields don't represent. Both sets are populated by the MTDS
+    ``lending_indices`` adapter at capture time; the matcher reads the
+    discriminator-relevant subset only.
+    """
+
+    pool_symbol: str
+    chain: str  # "ethereum" / "arbitrum" / "optimism" / "polygon" / "base" / "avalanche" / "gnosis" / "bsc"
+    protocol: str  # "AAVE_V3" / "COMPOUND_V3" / "SPARK" / "RADIANT" / "MORPHO"
+    protocol_irm_shape: ProtocolIRMShape
+
+    # Pool liquidity state (always populated, native units):
+    total_supply: Decimal
+    total_borrow: Decimal
+    reserve_factor: Decimal
+
+    # Aave-shape IRM parameters (populated when protocol_irm_shape == AAVE_KINKED):
+    optimal_utilization_rate: Decimal = Decimal("0")
+    irm_base: Decimal = Decimal("0")
+    irm_slope1: Decimal = Decimal("0")
+    irm_slope2: Decimal = Decimal("0")
+
+    # Compound V3-shape IRM parameters (populated when protocol_irm_shape == COMPOUND_V3):
+    compound_kink: Decimal = Decimal("0")
+    compound_base_rate: Decimal = Decimal("0")
+    compound_below_kink_slope: Decimal = Decimal("0")
+    compound_above_kink_slope: Decimal = Decimal("0")
+
+    # Aave-only on-chain index snapshots (used for live state reconciliation):
+    liquidity_index: Decimal = Decimal("1")
+    variable_borrow_index: Decimal = Decimal("1")
+
+    @classmethod
+    def from_aave_pool_params(cls, params: AavePoolParams, chain: str = "ethereum") -> "LendingMarketState":
+        """Backwards-compat builder — promote a legacy ``AavePoolParams`` into the
+        generalised ``LendingMarketState`` shape with ``protocol_irm_shape``
+        set to ``AAVE_KINKED``. Consumers can incrementally migrate to the new
+        model without breaking existing call sites.
+        """
+        return cls(
+            pool_symbol=params.pool_symbol,
+            chain=chain,
+            protocol="AAVE_V3",
+            protocol_irm_shape=ProtocolIRMShape.AAVE_KINKED,
+            total_supply=params.total_supply_usd,
+            total_borrow=params.total_borrow_usd,
+            reserve_factor=params.reserve_factor,
+            optimal_utilization_rate=params.optimal_utilization,
+            irm_base=params.base_rate,
+            irm_slope1=params.slope1,
+            irm_slope2=params.slope2,
+        )
+
+
 class RateImpactResult(BaseModel):
     """Result of simulating a lending/borrowing trade's impact on pool rates."""
 
@@ -210,6 +315,87 @@ def compute_supply_rate(
     Suppliers earn the borrow rate weighted by utilization, minus the protocol cut.
     """
     return borrow_rate * utilization * (Decimal("1") - reserve_factor)
+
+
+def compute_borrow_rate_compound_v3(
+    utilization: Decimal,
+    kink: Decimal,
+    base_rate: Decimal,
+    below_kink_slope: Decimal,
+    above_kink_slope: Decimal,
+) -> Decimal:
+    """Compute the variable borrow rate using Compound V3 (Comet) interest rate model.
+
+    DIFFERENT shape from Aave V3's piecewise-linear kinked-slope. Compound V3
+    uses a base rate + separate below-kink and above-kink slopes:
+
+        if U <= kink:
+            R_borrow = base_rate + below_kink_slope * U
+        else:
+            R_borrow = base_rate + below_kink_slope * kink + above_kink_slope * (U - kink)
+
+    Used by ``LendingMarketState`` when ``protocol_irm_shape == COMPOUND_V3``.
+    Reference: Compound V3 (Comet) Solidity implementation —
+    `Comet.getBorrowRate(utilization)`.
+    """
+    if utilization <= kink:
+        return base_rate + below_kink_slope * utilization
+    return base_rate + below_kink_slope * kink + above_kink_slope * (utilization - kink)
+
+
+def compute_borrow_rate_for_state(state: "LendingMarketState", utilization: Decimal) -> Decimal:
+    """Protocol-dispatched borrow rate — selects the right IRM formula by ``protocol_irm_shape``.
+
+    Phase 1B helper used by the matching engine's ``post_trade_rate`` calculator
+    (execution-service Phase 3A) + the features-onchain Aave-rate-impact-calculator
+    consumer. Dispatching here keeps callers ignorant of per-protocol IRM math.
+    """
+    if state.protocol_irm_shape == ProtocolIRMShape.AAVE_KINKED:
+        return compute_borrow_rate(
+            utilization=utilization,
+            slope1=state.irm_slope1,
+            slope2=state.irm_slope2,
+            optimal_utilization=state.optimal_utilization_rate,
+            base_rate=state.irm_base,
+        )
+    if state.protocol_irm_shape == ProtocolIRMShape.COMPOUND_V3:
+        return compute_borrow_rate_compound_v3(
+            utilization=utilization,
+            kink=state.compound_kink,
+            base_rate=state.compound_base_rate,
+            below_kink_slope=state.compound_below_kink_slope,
+            above_kink_slope=state.compound_above_kink_slope,
+        )
+    # MORPHO_ADAPTIVE not yet implemented — return base_rate as a conservative
+    # placeholder until the Morpho-Blue adaptive-curve helper lands.
+    return state.irm_base
+
+
+def post_trade_rate(
+    state: "LendingMarketState",
+    supply_delta: Decimal,
+    borrow_delta: Decimal,
+) -> tuple[Decimal, Decimal]:
+    """Compute post-trade (supply_apy, borrow_apy) for the given state mutation.
+
+    Phase 1B + 3A canonical entry point. Dispatches by ``state.protocol_irm_shape``
+    via ``compute_borrow_rate_for_state``. Mirrors the codex section
+    ``amm-slippage-simulation.md`` § "Per-protocol IRM parameter capture".
+
+    Args:
+        state: current lending market state (pre-trade).
+        supply_delta: change to ``total_supply`` (positive for supply, negative for withdraw).
+        borrow_delta: change to ``total_borrow`` (positive for borrow, negative for repay).
+
+    Returns:
+        ``(supply_apy, borrow_apy)`` — post-trade rates implied by the new utilization.
+    """
+    new_total_supply = state.total_supply + supply_delta
+    new_total_borrow = state.total_borrow + borrow_delta
+    new_utilization = compute_utilization(new_total_supply, new_total_borrow)
+    borrow_apy = compute_borrow_rate_for_state(state, new_utilization)
+    supply_apy = compute_supply_rate(new_utilization, borrow_apy, state.reserve_factor)
+    return supply_apy, borrow_apy
 
 
 def simulate_rate_impact(
