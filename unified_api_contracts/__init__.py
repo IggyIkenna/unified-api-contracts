@@ -397,6 +397,14 @@ from .config.trading_validation import (
 # Importing the per-asset_group registry seeds populates SCENARIO_REGISTRY at module load.
 from .registry import scenarios as _scenarios_registry
 
+# Phase 5.A — per-archetype regression matrix derived from SCENARIO_REGISTRY at module load.
+from .registry.scenario_archetype_matrix import (
+    CUTOVER_ARCHETYPES,
+    MATRIX as SCENARIO_ARCHETYPE_MATRIX,
+    matrix_cell_count,
+    scenarios_for_archetype,
+)
+
 # Importing the per-asset_group generator seeds populates SYNTHETIC_GENERATOR_REGISTRY at module load.
 from .registry import generators as _generators_registry
 
@@ -919,6 +927,7 @@ __all__ = [
     "CONTRACT_REGISTRY",
     "COUNTERPARTY_ENTITLEMENTS",
     "COUNTERPARTY_REGISTRY",
+    "CUTOVER_ARCHETYPES",
     "DATA_SOURCE_TO_SECRET",
     "DATA_SOURCE_TO_VENUES",
     "DATA_TYPES_BY_ASSET_GROUP",
@@ -975,6 +984,7 @@ __all__ = [
     "READER_FALLBACK_WINDOW_DAYS",
     "REQUIRED_CONFIG_FIELDS",
     "RISK_TYPE_CATEGORIES",
+    "SCENARIO_ARCHETYPE_MATRIX",
     "SCENARIO_REGISTRY",
     "SERVICE_EMISSION_STATES",
     "SERVICE_EMISSION_STATE_COLUMN",
@@ -1536,6 +1546,7 @@ __all__ = [
     "is_live",
     "is_per_instrument_shard_data_type",
     "lookup_contract",
+    "matrix_cell_count",
     "next_state",
     "normalize_underlying",
     "pipeline_mode_for_source",
@@ -1546,6 +1557,7 @@ __all__ = [
     "resolve_environment_from_env",
     "resolve_environment_from_hostname",
     "resolve_exchange",
+    "scenarios_for_archetype",
     "source_string_for",
     "validate_dataframe",
     "validate_preflight_for_trigger",
