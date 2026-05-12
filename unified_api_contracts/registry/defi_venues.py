@@ -434,6 +434,25 @@ DEFI_VENUE_PHASE: dict[str, str] = {
 }
 
 
+# Venues that appear in ALL_DEFI_VENUES / DEFI_VENUE_DATA_TYPE_CAPABILITIES for
+# DeFi *protocol-level* coverage tracking but whose market-data AXIS is "cefi"
+# because their data shape is CLOB-style (perpetual DEX funding/liquidations —
+# captured via the MTDS perp_funding_handler, same pipeline as CeFi perps).
+#
+# Consumers iterating ALL_DEFI_VENUES or DEFI_VENUE_DATA_TYPE_CAPABILITIES for
+# asset_group routing MUST consult this dict:
+#   if DEFI_VENUE_AXIS_OVERRIDES.get(venue) == "cefi": route to cefi pipeline
+#
+# SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1C.
+DEFI_VENUE_AXIS_OVERRIDES: dict[str, str] = {
+    # GMX perpetual DEX — Arbitrum + Avalanche deployments
+    "GMX-ARBITRUM": "cefi",
+    "GMX-AVALANCHE": "cefi",
+    # DRIFT perpetual DEX — Solana (CLOB order-book, not AMM)
+    "DRIFT-SOLANA": "cefi",
+}
+
+
 # Curated subset of DeFi venues that MTDS actively backfills. Used as
 # ``VENUES_BY_ASSET_GROUP['defi']`` in ``market_data_categories.py``.
 # Extracted here to keep that module under the 900-line QG ceiling as the
@@ -495,6 +514,7 @@ MTDS_DEFI_VENUES: list[str] = [
 
 __all__ = [
     "ALL_DEFI_VENUES",
+    "DEFI_VENUE_AXIS_OVERRIDES",
     "DEFI_VENUE_PHASE",
     "LEGACY_DEFI_VENUE_ALIASES",
     "MTDS_DEFI_VENUES",

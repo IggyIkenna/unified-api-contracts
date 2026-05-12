@@ -130,6 +130,8 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "VELODROMEV2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
     "TRADER_JOEV2-AVALANCHE": {"dex_swaps": "2022-01-01", "dex_pools": "2022-01-01"},
     # ── DeFi — Perpetual DEXes (funding + liquidations) ──
+    # axis_override = "cefi" — CLOB-style perp funding captured via MTDS
+    # perp_funding_handler. See DEFI_VENUE_AXIS_OVERRIDES in defi_venues.py.
     "GMX-ARBITRUM": {"perp_funding": "2021-09-01", "liquidations": "2021-09-01", "oracle_prices": "2021-09-01"},
     "GMX-AVALANCHE": {"perp_funding": "2021-12-31", "liquidations": "2021-12-31", "oracle_prices": "2021-12-31"},
     # ── DeFi — Solana ──
