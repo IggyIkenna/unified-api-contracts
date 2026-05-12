@@ -4,8 +4,14 @@ These are per-asset protocol parameters from Aave V3 governance.
 Used by risk-and-exposure-service to compute HF and LTV mathematically
 from positions, without querying the protocol.
 
-Values from: https://app.aave.com/reserve-overview/ (Ethereum mainnet)
-Last updated: 2026-03-29
+Values from: https://app.aave.com/reserve-overview/ (Ethereum mainnet + multi-chain
+markets), https://app.spark.fi/markets, https://app.radiant.capital.
+Last updated: 2026-05-15
+
+Per-chain Aave V3 markets sourced from
+``https://app.aave.com/reserve-overview/?marketName=proto_<chain>_v3``. Spark is an
+Aave V3 fork on Ethereum (same dataclass shape). Radiant is an Aave V2 fork
+deployed on Arbitrum + BSC + other chains (same dataclass shape).
 
 Format: asset → {max_ltv, liquidation_threshold, liquidation_bonus, reserve_factor}
 - max_ltv: Maximum loan-to-value ratio for borrowing (e.g., 0.80 = can borrow 80% of collateral value)
@@ -172,20 +178,525 @@ def get_emode_params(collateral_asset: str, debt_asset: str) -> EModeCategory | 
     return None
 
 
+# ---------------------------------------------------------------------------
+# Aave V3 multi-chain reserve parameters (P1B — 2026-05-15)
+# ---------------------------------------------------------------------------
+# Source: Aave governance UI, proto_<chain>_v3 markets, verified against
+# on-chain getConfiguration(). Parameters are governance-set + may evolve;
+# refresh on every quarterly Aave governance review.
+
+# Aave V3 Arbitrum reserves — proto_arbitrum_v3
+AAVE_V3_ARBITRUM_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDCE": ReserveParams(  # USDC.e — bridged USDC
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "DAI": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.83"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.73"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.063"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.785"),
+        liquidation_threshold=Decimal("0.81"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WEETH": ReserveParams(
+        max_ltv=Decimal("0.725"),
+        liquidation_threshold=Decimal("0.775"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "RETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.77"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# Aave V3 Optimism reserves — proto_optimism_v3
+AAVE_V3_OPTIMISM_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "DAI": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.83"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.785"),
+        liquidation_threshold=Decimal("0.81"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "RETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.77"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# Aave V3 Base reserves — proto_base_v3
+AAVE_V3_BASE_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDBC": ReserveParams(  # USDbC — bridged USDC on Base
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.83"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "CBETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.77"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.77"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# Aave V3 Avalanche reserves — proto_avalanche_v3
+AAVE_V3_AVALANCHE_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "DAI": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WAVAX": ReserveParams(
+        max_ltv=Decimal("0.65"),
+        liquidation_threshold=Decimal("0.70"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WETHE": ReserveParams(  # WETH.e — bridged WETH on Avalanche
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.825"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# Aave V3 Polygon reserves — proto_polygon_v3
+AAVE_V3_POLYGON_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "DAI": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.825"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WMATIC": ReserveParams(
+        max_ltv=Decimal("0.65"),
+        liquidation_threshold=Decimal("0.70"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "MATICX": ReserveParams(
+        max_ltv=Decimal("0.40"),
+        liquidation_threshold=Decimal("0.50"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.20"),
+    ),
+}
+
+
+# Aave V3 BSC reserves — proto_bnb_v3 (launched 2024-01-23, small reserve set)
+AAVE_V3_BSC_RESERVES: dict[str, ReserveParams] = {
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WBNB": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "ETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.825"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "FDUSD": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+}
+
+
+# Aave V3 Linea reserves — proto_linea_v3 (launched 2025-02-11, small reserve set)
+AAVE_V3_LINEA_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.78"),
+        liquidation_threshold=Decimal("0.81"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.77"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# Aave V3 Scroll reserves — proto_scroll_v3
+AAVE_V3_SCROLL_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.78"),
+        liquidation_threshold=Decimal("0.81"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.77"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# Aave V3 zkSync Era reserves — proto_zksync_v3
+AAVE_V3_ZKSYNC_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.72"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.72"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# ---------------------------------------------------------------------------
+# Spark Ethereum reserves (Aave V3 fork — same dataclass)
+# ---------------------------------------------------------------------------
+# Source: https://app.spark.fi/markets (Spark governance dashboard)
+# Spark uses Aave V3 codebase but is operated by the Sky / MakerDAO ecosystem;
+# parameters are Spark-governance-set and tend to be tighter for DAI / sDAI.
+SPARK_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.74"),
+        liquidation_threshold=Decimal("0.76"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.74"),
+        liquidation_threshold=Decimal("0.76"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "DAI": ReserveParams(
+        max_ltv=Decimal("0.74"),
+        liquidation_threshold=Decimal("0.76"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.825"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.785"),
+        liquidation_threshold=Decimal("0.81"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WEETH": ReserveParams(
+        max_ltv=Decimal("0.725"),
+        liquidation_threshold=Decimal("0.775"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+}
+
+
+# ---------------------------------------------------------------------------
+# Radiant reserves (Aave V2 fork — same dataclass) on Arbitrum + BSC
+# ---------------------------------------------------------------------------
+# Source: https://app.radiant.capital (Radiant governance dashboard).
+# Radiant is a cross-chain money market forked from Aave V2 with RDNT
+# emissions. Per-market deployments share governance schema.
+RADIANT_ARBITRUM_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "DAI": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+}
+
+
+RADIANT_BSC_RESERVES: dict[str, ReserveParams] = {
+    "USDC": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "USDT": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.75"),
+        liquidation_threshold=Decimal("0.80"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WBNB": ReserveParams(
+        max_ltv=Decimal("0.65"),
+        liquidation_threshold=Decimal("0.70"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "WBTC": ReserveParams(  # BTCB on BSC, exposed as WBTC here for symbol consistency
+        max_ltv=Decimal("0.70"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+}
+
+
+# ---------------------------------------------------------------------------
+# Chain dispatch — Aave V3 multi-chain lookup table
+# ---------------------------------------------------------------------------
+# Keyed by uppercase chain name. ETHEREUM remains the default for legacy
+# callers that did not pass an explicit chain.
+_AAVE_V3_CHAIN_DISPATCH: dict[str, dict[str, ReserveParams]] = {
+    "ETHEREUM": AAVE_V3_ETHEREUM_RESERVES,
+    "ARBITRUM": AAVE_V3_ARBITRUM_RESERVES,
+    "OPTIMISM": AAVE_V3_OPTIMISM_RESERVES,
+    "BASE": AAVE_V3_BASE_RESERVES,
+    "AVALANCHE": AAVE_V3_AVALANCHE_RESERVES,
+    "POLYGON": AAVE_V3_POLYGON_RESERVES,
+    "BSC": AAVE_V3_BSC_RESERVES,
+    "LINEA": AAVE_V3_LINEA_RESERVES,
+    "SCROLL": AAVE_V3_SCROLL_RESERVES,
+    "ZKSYNC": AAVE_V3_ZKSYNC_RESERVES,
+}
+
+
+_RADIANT_CHAIN_DISPATCH: dict[str, dict[str, ReserveParams]] = {
+    "ARBITRUM": RADIANT_ARBITRUM_RESERVES,
+    "BSC": RADIANT_BSC_RESERVES,
+}
+
+
 def get_reserve_params(asset: str, chain: str = "ETHEREUM") -> ReserveParams | None:
-    """Look up reserve parameters for an asset.
+    """Look up Aave V3 reserve parameters for an asset on a given chain.
+
+    Default chain is ETHEREUM (backwards-compatible with pre-P1B callers).
+    Pass an explicit chain string (e.g. "ARBITRUM", "OPTIMISM", "BASE")
+    to look up multi-chain markets. Spark + Radiant use separate helpers.
 
     Args:
         asset: Asset symbol (e.g., "USDC", "WETH") or instrument_id containing the asset.
-        chain: Chain name (currently only ETHEREUM supported).
+        chain: Chain name (ETHEREUM / ARBITRUM / OPTIMISM / BASE / AVALANCHE /
+            POLYGON / BSC / LINEA / SCROLL / ZKSYNC).
 
     Returns:
-        ReserveParams or None if asset not found.
+        ReserveParams or None if asset not found on the chain.
     """
-    # Direct match
+    chain_dict = _AAVE_V3_CHAIN_DISPATCH.get(chain.upper())
+    if chain_dict is None:
+        return None
+
     upper = asset.upper()
-    if upper in AAVE_V3_ETHEREUM_RESERVES:
-        return AAVE_V3_ETHEREUM_RESERVES[upper]
+    if upper in chain_dict:
+        return chain_dict[upper]
 
     # Extract asset from A_TOKEN/DEBT_TOKEN instrument_id
     # Format: AAVEV3-ETHEREUM:A_TOKEN:AUSDC → USDC
@@ -199,10 +710,43 @@ def get_reserve_params(asset: str, chain: str = "ETHEREUM") -> ReserveParams | N
             # DEBT_TOKEN: DEBTUSDC → USDC
             if token_name.startswith("DEBT"):
                 token_name = token_name[4:]
-            if token_name in AAVE_V3_ETHEREUM_RESERVES:
-                return AAVE_V3_ETHEREUM_RESERVES[token_name]
+            if token_name in chain_dict:
+                return chain_dict[token_name]
 
     return None
+
+
+def get_aave_reserve_params(asset: str, chain: str) -> ReserveParams | None:
+    """Explicit-chain Aave V3 reserve params lookup.
+
+    Mirrors :func:`get_reserve_params` but requires the caller to pass an
+    explicit chain, leaving no room for the legacy ETHEREUM default.
+    """
+    return get_reserve_params(asset, chain=chain)
+
+
+def get_spark_reserve_params(asset: str) -> ReserveParams | None:
+    """Spark Ethereum reserve params lookup (Aave V3 fork).
+
+    Spark is only deployed on Ethereum mainnet; chain argument intentionally
+    absent. Callers needing other Spark deployments must pass the explicit
+    dict (none additional exist as of 2026-05-15).
+    """
+    return SPARK_ETHEREUM_RESERVES.get(asset.upper())
+
+
+def get_radiant_reserve_params(asset: str, chain: str) -> ReserveParams | None:
+    """Radiant cross-chain money market reserve params lookup.
+
+    Args:
+        asset: Asset symbol (e.g., "USDC", "WETH").
+        chain: Chain name ("ARBITRUM" / "BSC"). Other Radiant deployments
+            return None.
+    """
+    chain_dict = _RADIANT_CHAIN_DISPATCH.get(chain.upper())
+    if chain_dict is None:
+        return None
+    return chain_dict.get(asset.upper())
 
 
 def compute_health_factor(
