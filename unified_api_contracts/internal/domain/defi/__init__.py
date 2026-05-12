@@ -3,6 +3,7 @@
 from unified_api_contracts.internal.domain.defi.backtest_fidelity_schemas import (
     AggregateSignal,
     BacktestFidelityReport,
+    LegKind,
     OperatorSignOffStatus,
     PerLegAttribution,
     PerPoolShapeReconciliation,
@@ -225,6 +226,7 @@ __all__ = [
     "KaminoBorrowParams",
     "KaminoDepositParams",
     "KaminoReserve",
+    "LegKind",
     "LendingIndexRecord",
     "LendingMarketState",
     "LendingRate",

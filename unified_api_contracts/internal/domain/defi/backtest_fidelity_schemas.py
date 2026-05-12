@@ -23,12 +23,30 @@ from __future__ import annotations
 from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
 # ----------------------------------------------------------------------------
 # Phase 8A/8B — Backtest fidelity report (per-archetype 1-year replay)
 # ----------------------------------------------------------------------------
+
+
+LegKind = Literal[
+    "amm_swap",
+    "perp_position",
+    "lending_supply",
+    "lending_borrow",
+    "stake",
+    "restake",
+]
+"""Closed set of archetype-leg kinds — pydantic enforces at construction.
+
+Spans the simulation primitives consumed across Phase 2-7: AMM swap fills
+(per-PoolShape matchers), perp positions (CeFi/DeFi perp venues), lending
+supply/borrow legs (Phase 3 rate-impact), and stake/restake yield legs
+(Phase 5 yield-stream simulators).
+"""
 
 
 class PerLegAttribution(BaseModel):
@@ -43,7 +61,7 @@ class PerLegAttribution(BaseModel):
     """
 
     leg_id: str  # archetype-specific leg identifier (e.g. "stake_long", "perp_short", "lending_borrow")
-    leg_kind: str  # closed-set: "amm_swap" / "perp_position" / "lending_supply" / "lending_borrow" / "stake" / "restake"  # noqa: E501
+    leg_kind: LegKind
     old_pnl_usdc: Decimal  # leg P&L under old (pre-2026-05-10) matching engine
     new_pnl_usdc: Decimal  # leg P&L under new (post Phase 2-7) matching engine
     delta_bps: Decimal  # signed bps delta vs old_pnl absolute value (negative = new is lower / more conservative)
