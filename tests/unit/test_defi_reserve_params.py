@@ -47,12 +47,8 @@ _AAVE_V3_CHAIN_DICTS_MIN_COUNT: list[tuple[str, dict[str, object], int]] = [
 ]
 
 
-@pytest.mark.parametrize(
-    ("chain_name", "chain_dict", "min_count"), _AAVE_V3_CHAIN_DICTS_MIN_COUNT
-)
-def test_aave_v3_chain_dict_has_min_reserves(
-    chain_name: str, chain_dict: dict[str, object], min_count: int
-) -> None:
+@pytest.mark.parametrize(("chain_name", "chain_dict", "min_count"), _AAVE_V3_CHAIN_DICTS_MIN_COUNT)
+def test_aave_v3_chain_dict_has_min_reserves(chain_name: str, chain_dict: dict[str, object], min_count: int) -> None:
     """Each per-chain Aave V3 reserve dict must carry at least the documented floor."""
     assert len(chain_dict) >= min_count, (
         f"AAVE_V3_{chain_name}_RESERVES has {len(chain_dict)} reserves, expected >= {min_count}"
