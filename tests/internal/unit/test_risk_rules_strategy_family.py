@@ -25,7 +25,6 @@ from decimal import Decimal
 import pytest
 
 from unified_api_contracts.canonical.crosscutting.risk_rule import (
-    RiskRule,
     RiskRuleConsequence,
     RiskRuleId,
     RiskRuleScope,
@@ -38,7 +37,6 @@ from unified_api_contracts.registry.risk_rules.strategy_family import (
     STRATEGY_FAMILY_RULES,
     get_rules_for_family,
 )
-
 
 # ---------------------------------------------------------------------------
 # Coverage invariants — every StrategyFamilyId has at least one rule.
@@ -229,11 +227,7 @@ def test_lst_family_has_correlation_with_other_family_rule() -> None:
     surveilled.
     """
     rules = RULES_BY_FAMILY[StrategyFamilyId.LST_LEVERAGE_FAMILY]
-    correlation_rules = [
-        r
-        for r in rules
-        if r.rule_id is RiskRuleId.FAMILY_CORRELATION_WITH_OTHER_FAMILY
-    ]
+    correlation_rules = [r for r in rules if r.rule_id is RiskRuleId.FAMILY_CORRELATION_WITH_OTHER_FAMILY]
     assert len(correlation_rules) == 1
     rule = correlation_rules[0]
     assert rule.consequence is RiskRuleConsequence.MONITOR
@@ -242,11 +236,7 @@ def test_lst_family_has_correlation_with_other_family_rule() -> None:
 def test_funding_arb_family_has_correlation_with_other_family_rule() -> None:
     """FUNDING_ARB_FAMILY mirrors the LST correlation surveillance rule."""
     rules = RULES_BY_FAMILY[StrategyFamilyId.FUNDING_ARB_FAMILY]
-    correlation_rules = [
-        r
-        for r in rules
-        if r.rule_id is RiskRuleId.FAMILY_CORRELATION_WITH_OTHER_FAMILY
-    ]
+    correlation_rules = [r for r in rules if r.rule_id is RiskRuleId.FAMILY_CORRELATION_WITH_OTHER_FAMILY]
     assert len(correlation_rules) == 1
 
 
@@ -258,7 +248,7 @@ def test_funding_arb_family_has_correlation_with_other_family_rule() -> None:
 def test_rule_models_are_frozen() -> None:
     """``RiskRule`` instances are immutable per Pydantic frozen ConfigDict."""
     rule = STRATEGY_FAMILY_RULES[0]
-    with pytest.raises(Exception):  # noqa: B017,PT011 — covers ValidationError + AttributeError
+    with pytest.raises(Exception):  # noqa: B017 — covers ValidationError + AttributeError
         rule.applies_to = "tampered"  # pyright: ignore[reportAttributeAccessIssue]
 
 
@@ -345,11 +335,7 @@ def test_lst_and_funding_arb_gross_caps_differ() -> None:
 
     def _gross_cap(family_id: StrategyFamilyId) -> Decimal:
         rules = RULES_BY_FAMILY[family_id]
-        gross_rules = [
-            r
-            for r in rules
-            if r.rule_id is RiskRuleId.FAMILY_GROSS_EXPOSURE_CAP
-        ]
+        gross_rules = [r for r in rules if r.rule_id is RiskRuleId.FAMILY_GROSS_EXPOSURE_CAP]
         assert len(gross_rules) == 1
         trigger = gross_rules[0].trigger
         assert isinstance(trigger, MaxGrossExposureTrigger)
@@ -367,6 +353,4 @@ def test_no_duplicate_rule_id_within_family() -> None:
         # Forward-compat families have a single placeholder, so the
         # uniqueness check holds trivially. Cutover families have 6 distinct
         # rule_ids.
-        assert len(rule_ids) == len(set(rule_ids)), (
-            f"{family_id.value} has duplicate rule_ids"
-        )
+        assert len(rule_ids) == len(set(rule_ids)), f"{family_id.value} has duplicate rule_ids"

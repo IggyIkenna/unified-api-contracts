@@ -57,9 +57,7 @@ _CUTOVER_VENUES: frozenset[str] = frozenset(
     }
 )
 
-_CUTOVER_ACCOUNTS: frozenset[str] = frozenset(
-    {"paper_default", "live_cutover_2026_05_23"}
-)
+_CUTOVER_ACCOUNTS: frozenset[str] = frozenset({"paper_default", "live_cutover_2026_05_23"})
 
 _CUTOVER_CLIENTS: frozenset[str] = frozenset({"cutover_demo_client_2026_05_23"})
 
@@ -143,9 +141,7 @@ def test_every_global_rule_has_global_scope() -> None:
 def test_venue_applies_to_in_cutover_set() -> None:
     """Every PER_VENUE rule's applies_to is a known cutover venue (lowercase)."""
     for rule in VENUE_RULES:
-        assert rule.applies_to in _CUTOVER_VENUES, (
-            f"venue rule applies_to={rule.applies_to!r} not in cutover venue set"
-        )
+        assert rule.applies_to in _CUTOVER_VENUES, f"venue rule applies_to={rule.applies_to!r} not in cutover venue set"
         assert rule.applies_to == rule.applies_to.lower(), (
             f"venue applies_to should be lowercase, got {rule.applies_to!r}"
         )
@@ -177,9 +173,7 @@ def test_asset_group_applies_to_in_cutover_set() -> None:
 def test_global_applies_to_is_sentinel() -> None:
     """GLOBAL rules use the '*' sentinel per RiskRule docstring."""
     for rule in GLOBAL_RULES:
-        assert rule.applies_to == "*", (
-            f"global rule applies_to should be '*' sentinel, got {rule.applies_to!r}"
-        )
+        assert rule.applies_to == "*", f"global rule applies_to should be '*' sentinel, got {rule.applies_to!r}"
 
 
 # ---------------------------------------------------------------------------
@@ -219,15 +213,11 @@ def test_global_rules_kill_switch_scope_is_global() -> None:
 # ---------------------------------------------------------------------------
 
 # BLOCK typically pairs with HIGH or CRITICAL.
-_BLOCK_VALID_SEVERITIES: frozenset[AlertSeverity] = frozenset(
-    {AlertSeverity.HIGH, AlertSeverity.CRITICAL}
-)
+_BLOCK_VALID_SEVERITIES: frozenset[AlertSeverity] = frozenset({AlertSeverity.HIGH, AlertSeverity.CRITICAL})
 # SCALE_DOWN typically pairs with WARN; MONITOR pairs with WARN or INFO;
 # TEST_ONLY pairs with INFO.
 _SCALE_DOWN_VALID_SEVERITIES: frozenset[AlertSeverity] = frozenset({AlertSeverity.WARN})
-_MONITOR_VALID_SEVERITIES: frozenset[AlertSeverity] = frozenset(
-    {AlertSeverity.INFO, AlertSeverity.WARN}
-)
+_MONITOR_VALID_SEVERITIES: frozenset[AlertSeverity] = frozenset({AlertSeverity.INFO, AlertSeverity.WARN})
 _TEST_ONLY_VALID_SEVERITIES: frozenset[AlertSeverity] = frozenset({AlertSeverity.INFO})
 
 
@@ -264,9 +254,7 @@ def _check_severity_consequence_consistency(rule: RiskRule) -> None:
         ("global", GLOBAL_RULES),
     ],
 )
-def test_consequence_severity_consistent(
-    axis_name: str, rules: tuple[RiskRule, ...]
-) -> None:
+def test_consequence_severity_consistent(axis_name: str, rules: tuple[RiskRule, ...]) -> None:
     """Per-axis sweep: every rule's consequence + severity match the seam mapping."""
     assert rules, f"{axis_name} registry must be non-empty"
     for rule in rules:
@@ -284,9 +272,7 @@ def test_every_cutover_venue_has_min_3_rules() -> None:
     for rule in VENUE_RULES:
         counts[rule.applies_to] = counts.get(rule.applies_to, 0) + 1
     for venue in _CUTOVER_VENUES:
-        assert counts.get(venue, 0) >= 3, (
-            f"cutover venue {venue!r} has only {counts.get(venue, 0)} rules (expected ≥3)"
-        )
+        assert counts.get(venue, 0) >= 3, f"cutover venue {venue!r} has only {counts.get(venue, 0)} rules (expected ≥3)"
 
 
 def test_every_cutover_account_has_min_4_rules() -> None:
@@ -306,9 +292,7 @@ def test_every_cutover_asset_group_has_min_3_rules() -> None:
     for rule in ASSET_GROUP_RULES:
         counts[rule.applies_to] = counts.get(rule.applies_to, 0) + 1
     for ag in _CUTOVER_ASSET_GROUPS:
-        assert counts.get(ag, 0) >= 3, (
-            f"cutover asset_group {ag!r} has only {counts.get(ag, 0)} rules (expected ≥3)"
-        )
+        assert counts.get(ag, 0) >= 3, f"cutover asset_group {ag!r} has only {counts.get(ag, 0)} rules (expected ≥3)"
 
 
 # ---------------------------------------------------------------------------
@@ -319,22 +303,14 @@ def test_every_cutover_asset_group_has_min_3_rules() -> None:
 def test_defi_asset_group_has_gas_budget_rule() -> None:
     """Phase 2.E spec: DeFi asset_group must include a gas-budget rule (DeFi only)."""
     defi_rules = [rule for rule in ASSET_GROUP_RULES if rule.applies_to == "defi"]
-    gas_rules = [
-        rule
-        for rule in defi_rules
-        if rule.trigger.trigger_type == "gas_budget_exceeded"
-    ]
+    gas_rules = [rule for rule in defi_rules if rule.trigger.trigger_type == "gas_budget_exceeded"]
     assert gas_rules, "DeFi asset_group registry must contain a gas-budget rule"
 
 
 def test_cefi_asset_group_has_no_gas_budget_rule() -> None:
     """CeFi venues don't have on-chain gas; gas-budget rule is DeFi-only per Phase 2.E spec."""
     cefi_rules = [rule for rule in ASSET_GROUP_RULES if rule.applies_to == "cefi"]
-    gas_rules = [
-        rule
-        for rule in cefi_rules
-        if rule.trigger.trigger_type == "gas_budget_exceeded"
-    ]
+    gas_rules = [rule for rule in cefi_rules if rule.trigger.trigger_type == "gas_budget_exceeded"]
     assert not gas_rules, "CeFi asset_group must NOT contain a gas-budget rule"
 
 
@@ -346,9 +322,7 @@ def test_cefi_asset_group_has_no_gas_budget_rule() -> None:
 def test_every_global_rule_triggers_kill_switch() -> None:
     """Workspace-wide kill-condition rules MUST set triggers_kill_switch=True."""
     for rule in GLOBAL_RULES:
-        assert rule.triggers_kill_switch, (
-            f"global rule {rule.rule_id} must trigger kill-switch"
-        )
+        assert rule.triggers_kill_switch, f"global rule {rule.rule_id} must trigger kill-switch"
 
 
 def test_every_global_rule_fires_critical() -> None:
@@ -364,14 +338,6 @@ def test_every_global_rule_fires_critical() -> None:
 
 def test_total_rule_count_across_other_axes() -> None:
     """Total of Phase 2.B-F rule count meets ≥36 aggregate seed expectation."""
-    total = (
-        len(VENUE_RULES)
-        + len(ACCOUNT_RULES)
-        + len(CLIENT_RULES)
-        + len(ASSET_GROUP_RULES)
-        + len(GLOBAL_RULES)
-    )
+    total = len(VENUE_RULES) + len(ACCOUNT_RULES) + len(CLIENT_RULES) + len(ASSET_GROUP_RULES) + len(GLOBAL_RULES)
     # 15 venue + 8 account + 4 client + 6 asset_group + 3 global = 36
-    assert total >= 36, (
-        f"aggregate Phase 2.B-F rule count = {total}, expected ≥36"
-    )
+    assert total >= 36, f"aggregate Phase 2.B-F rule count = {total}, expected ≥36"

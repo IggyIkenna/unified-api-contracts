@@ -572,17 +572,13 @@ def test_tick_staleness_alerts_route_to_correct_channels() -> None:
     }
     for code, (expected_severity, expected_channels) in expected_routing.items():
         matched = [r for r in LIVE_ALERT_RULES if r.code is code]
-        assert len(matched) == 1, (
-            f"Expected exactly one rule for {code.value!r}; found {len(matched)}."
-        )
+        assert len(matched) == 1, f"Expected exactly one rule for {code.value!r}; found {len(matched)}."
         rule = matched[0]
         assert rule.severity is expected_severity, (
-            f"AlertRule(code={code.value!r}).severity={rule.severity!r} expected"
-            f" {expected_severity!r}."
+            f"AlertRule(code={code.value!r}).severity={rule.severity!r} expected {expected_severity!r}."
         )
         assert set(rule.channels) == expected_channels, (
-            f"AlertRule(code={code.value!r}).channels={set(rule.channels)!r}"
-            f" expected {expected_channels!r}."
+            f"AlertRule(code={code.value!r}).channels={set(rule.channels)!r} expected {expected_channels!r}."
         )
 
 

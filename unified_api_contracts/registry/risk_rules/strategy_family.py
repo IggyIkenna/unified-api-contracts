@@ -145,9 +145,7 @@ _LST_LEVERAGE_FAMILY_RULES: tuple[RiskRule, ...] = (
         rule_id=RiskRuleId.FAMILY_CORRELATION_WITH_OTHER_FAMILY,
         scope=RiskRuleScope.PER_STRATEGY_FAMILY,
         applies_to=StrategyFamilyId.LST_LEVERAGE_FAMILY.value,
-        trigger=MaxCorrelationTrigger(
-            cap_rho=Decimal("0.80"), window_days=30
-        ),
+        trigger=MaxCorrelationTrigger(cap_rho=Decimal("0.80"), window_days=30),
         consequence=RiskRuleConsequence.MONITOR,
         alerting_severity=AlertSeverity.WARN,
         description=(
@@ -236,9 +234,7 @@ _FUNDING_ARB_FAMILY_RULES: tuple[RiskRule, ...] = (
         rule_id=RiskRuleId.FAMILY_CORRELATION_WITH_OTHER_FAMILY,
         scope=RiskRuleScope.PER_STRATEGY_FAMILY,
         applies_to=StrategyFamilyId.FUNDING_ARB_FAMILY.value,
-        trigger=MaxCorrelationTrigger(
-            cap_rho=Decimal("0.80"), window_days=30
-        ),
+        trigger=MaxCorrelationTrigger(cap_rho=Decimal("0.80"), window_days=30),
         consequence=RiskRuleConsequence.MONITOR,
         alerting_severity=AlertSeverity.WARN,
         description=(

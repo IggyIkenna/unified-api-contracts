@@ -45,10 +45,7 @@ from unified_api_contracts.canonical.crosscutting.risk_rule import (
 )
 from unified_api_contracts.registry.risk_rules.archetype import ARCHETYPE_RULES
 
-
-_CUTOVER_ARCHETYPES: Final[frozenset[str]] = frozenset(
-    {"CARRY_STAKED_BASIS", "ARBITRAGE_PRICE_DISPERSION"}
-)
+_CUTOVER_ARCHETYPES: Final[frozenset[str]] = frozenset({"CARRY_STAKED_BASIS", "ARBITRAGE_PRICE_DISPERSION"})
 
 
 _KNOWN_TRIGGER_TYPES: Final[frozenset[str]] = frozenset(
@@ -93,8 +90,7 @@ def test_archetype_rules_min_count(archetype: str) -> None:
 def test_archetype_rules_total_minimum() -> None:
     """Sanity: ≥20 total rules across both cutover archetypes."""
     assert len(ARCHETYPE_RULES) >= 20, (
-        f"ARCHETYPE_RULES has {len(ARCHETYPE_RULES)} rules; "
-        "≥20 required (≥10 per archetype × 2 archetypes)."
+        f"ARCHETYPE_RULES has {len(ARCHETYPE_RULES)} rules; ≥20 required (≥10 per archetype × 2 archetypes)."
     )
 
 
@@ -107,8 +103,7 @@ def test_every_rule_scope_is_per_archetype() -> None:
     """All rules in this registry are scoped per-archetype."""
     for rule in ARCHETYPE_RULES:
         assert rule.scope is RiskRuleScope.PER_ARCHETYPE, (
-            f"Rule {rule.rule_id} has scope={rule.scope}; "
-            "expected PER_ARCHETYPE for archetype.py registry."
+            f"Rule {rule.rule_id} has scope={rule.scope}; expected PER_ARCHETYPE for archetype.py registry."
         )
 
 
@@ -116,8 +111,7 @@ def test_every_applies_to_is_cutover_archetype() -> None:
     """Every applies_to is a cutover-archetype key."""
     for rule in ARCHETYPE_RULES:
         assert rule.applies_to in _CUTOVER_ARCHETYPES, (
-            f"Rule {rule.rule_id} applies_to={rule.applies_to!r}; "
-            f"expected one of {sorted(_CUTOVER_ARCHETYPES)!r}."
+            f"Rule {rule.rule_id} applies_to={rule.applies_to!r}; expected one of {sorted(_CUTOVER_ARCHETYPES)!r}."
         )
 
 
@@ -176,13 +170,9 @@ def test_consequence_severity_mapping_matches_seam_diagram() -> None:
     * TEST_ONLY → INFO.
     """
     allowed: dict[RiskRuleConsequence, frozenset[AlertSeverity]] = {
-        RiskRuleConsequence.BLOCK: frozenset(
-            {AlertSeverity.HIGH, AlertSeverity.CRITICAL}
-        ),
+        RiskRuleConsequence.BLOCK: frozenset({AlertSeverity.HIGH, AlertSeverity.CRITICAL}),
         RiskRuleConsequence.SCALE_DOWN: frozenset({AlertSeverity.WARN}),
-        RiskRuleConsequence.MONITOR: frozenset(
-            {AlertSeverity.INFO, AlertSeverity.WARN}
-        ),
+        RiskRuleConsequence.MONITOR: frozenset({AlertSeverity.INFO, AlertSeverity.WARN}),
         RiskRuleConsequence.TEST_ONLY: frozenset({AlertSeverity.INFO}),
     }
     for rule in ARCHETYPE_RULES:
@@ -251,10 +241,7 @@ def test_no_duplicate_rules_with_same_trigger_payload() -> None:
         if key in seen:
             duplicates.append(key)
         seen.add(key)
-    assert not duplicates, (
-        f"Duplicate (rule_id, applies_to, trigger) entries in "
-        f"ARCHETYPE_RULES: {duplicates!r}."
-    )
+    assert not duplicates, f"Duplicate (rule_id, applies_to, trigger) entries in ARCHETYPE_RULES: {duplicates!r}."
 
 
 # ---------------------------------------------------------------------------
@@ -287,16 +274,11 @@ def test_no_duplicate_rules_with_same_trigger_payload() -> None:
         ("ARBITRAGE_PRICE_DISPERSION", "max_daily_loss"),
     ],
 )
-def test_axis_coverage_per_archetype(
-    archetype: str, required_trigger_type: str
-) -> None:
+def test_axis_coverage_per_archetype(archetype: str, required_trigger_type: str) -> None:
     """Every required axis from § Scope item 2 has at least one rule per
     archetype."""
     matching = [
-        r
-        for r in ARCHETYPE_RULES
-        if r.applies_to == archetype
-        and r.trigger.trigger_type == required_trigger_type
+        r for r in ARCHETYPE_RULES if r.applies_to == archetype and r.trigger.trigger_type == required_trigger_type
     ]
     assert len(matching) >= 1, (
         f"Archetype {archetype!r} has 0 rules with trigger_type="
@@ -327,6 +309,4 @@ def test_every_rule_is_riskrule_instance() -> None:
     """Sanity: tuple members are all ``RiskRule`` instances (Pydantic
     discriminated-union sometimes resolves surprisingly)."""
     for rule in ARCHETYPE_RULES:
-        assert isinstance(rule, RiskRule), (
-            f"ARCHETYPE_RULES member is not a RiskRule: {type(rule).__name__}."
-        )
+        assert isinstance(rule, RiskRule), f"ARCHETYPE_RULES member is not a RiskRule: {type(rule).__name__}."

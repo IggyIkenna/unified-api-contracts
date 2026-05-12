@@ -105,8 +105,7 @@ _CARRY_STAKED_BASIS_RULES: Final[tuple[RiskRule, ...]] = (
         consequence=RiskRuleConsequence.BLOCK,
         alerting_severity=AlertSeverity.CRITICAL,
         description=(
-            "Archetype-level drawdown ceiling of 8% from peak NAV. BLOCK + "
-            "kill-switch arms FAST_UNWIND on the LST leg."
+            "Archetype-level drawdown ceiling of 8% from peak NAV. BLOCK + kill-switch arms FAST_UNWIND on the LST leg."
         ),
         triggers_kill_switch=True,
     ),
@@ -420,9 +419,7 @@ _ARBITRAGE_PRICE_DISPERSION_RULES: Final[tuple[RiskRule, ...]] = (
 )
 
 
-ARCHETYPE_RULES: Final[tuple[RiskRule, ...]] = (
-    _CARRY_STAKED_BASIS_RULES + _ARBITRAGE_PRICE_DISPERSION_RULES
-)
+ARCHETYPE_RULES: Final[tuple[RiskRule, ...]] = _CARRY_STAKED_BASIS_RULES + _ARBITRAGE_PRICE_DISPERSION_RULES
 """Per-archetype risk-rule registry — flat tuple of all rules across the 2
 cutover archetypes.
 
