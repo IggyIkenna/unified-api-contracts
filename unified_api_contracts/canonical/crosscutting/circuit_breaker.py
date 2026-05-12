@@ -61,13 +61,14 @@ Adding a new breaker
 
 from __future__ import annotations
 
+from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
-from typing import Final
+from typing import Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from .alerting.codes import AlertSeverity
+from .alerting.codes import AlertCode, AlertSeverity
 from .alerting.thresholds import ThresholdUnit
 
 
@@ -414,3 +415,55 @@ class BreakerRecoveryRule(BaseModel):
     """If set, breaker auto-disarms after this many seconds regardless of
     guard state. ``None`` = breaker stays armed indefinitely (manual disarm
     only) — typical for ``MANUAL_UNKILL`` mode."""
+
+
+class BreakerFiredEvent(BaseModel):
+    """Emitted when a circuit breaker arms (``state="armed"``) or disarms
+    (``state="disarmed"``).
+
+    Mirrors :class:`unified_api_contracts.canonical.crosscutting.risk_rule.RiskRuleFiredEvent`.
+    Frozen + extra=forbid.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    breaker_id: CircuitBreakerId
+    scope: BreakerScope
+    applies_to: str
+    """Archetype name, venue slug, or ``"*"`` for global scope."""
+    action: BreakerAction
+    recovery_mode: BreakerRecoveryMode
+    cooldown_seconds: int | None
+    alerting_severity: AlertSeverity
+    alert_code: AlertCode
+    fired_at: datetime
+    state: Literal["armed", "disarmed"]
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+def breaker_fired_event(
+    config: BreakerConfig,
+    *,
+    fired_at: datetime,
+    alert_code: AlertCode,
+    state: Literal["armed", "disarmed"],
+    metadata: dict[str, str] | None = None,
+) -> BreakerFiredEvent:
+    """Convenience constructor that hydrates :class:`BreakerFiredEvent` from a
+    :class:`BreakerConfig`.
+    """
+    recovery_mode = config.recovery_mode
+    assert recovery_mode is not None  # model_validator always fills this field
+    return BreakerFiredEvent(
+        breaker_id=config.breaker_id,
+        scope=config.scope,
+        applies_to=config.applies_to,
+        action=config.action,
+        recovery_mode=recovery_mode,
+        cooldown_seconds=config.cooldown_seconds,
+        alerting_severity=config.alerting_severity,
+        alert_code=alert_code,
+        fired_at=fired_at,
+        state=state,
+        metadata=metadata or {},
+    )

@@ -49,11 +49,13 @@ from .canonical.crosscutting.circuit_breaker import (
     BREAKER_RECOVERY_DEFAULTS,
     BreakerAction,
     BreakerConfig,
+    BreakerFiredEvent,
     BreakerRecoveryMode,
     BreakerRecoveryRule,
     BreakerScope,
     BreakerTrigger,
     CircuitBreakerId,
+    breaker_fired_event,
 )
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
@@ -394,19 +396,21 @@ from .config.trading_validation import (
     VALID_TIMEFRAMES,
 )
 
+# Importing the per-asset_group generator seeds populates SYNTHETIC_GENERATOR_REGISTRY at module load.
+from .registry import generators as _generators_registry
+
 # Importing the per-asset_group registry seeds populates SCENARIO_REGISTRY at module load.
 from .registry import scenarios as _scenarios_registry
 
 # Phase 5.A — per-archetype regression matrix derived from SCENARIO_REGISTRY at module load.
 from .registry.scenario_archetype_matrix import (
     CUTOVER_ARCHETYPES,
-    MATRIX as SCENARIO_ARCHETYPE_MATRIX,
     matrix_cell_count,
     scenarios_for_archetype,
 )
-
-# Importing the per-asset_group generator seeds populates SYNTHETIC_GENERATOR_REGISTRY at module load.
-from .registry import generators as _generators_registry
+from .registry.scenario_archetype_matrix import (
+    MATRIX as SCENARIO_ARCHETYPE_MATRIX,
+)
 
 # isort: off
 # These crosscutting / features imports must load AFTER ``.canonical.domain``
@@ -1084,6 +1088,7 @@ __all__ = [
     "BookmakerUnavailableError",
     "BreakerAction",
     "BreakerConfig",
+    "BreakerFiredEvent",
     "BreakerRecoveryMode",
     "BreakerRecoveryRule",
     "BreakerScope",
@@ -1512,6 +1517,7 @@ __all__ = [
     "american_to_decimal",
     "assert_bar_boundary_contract",
     "bar_window_for_close",
+    "breaker_fired_event",
     "build_cefi_partition_path",
     "build_combo_id",
     "build_defi_partition_path",
