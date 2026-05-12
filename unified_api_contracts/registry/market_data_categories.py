@@ -156,6 +156,13 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # completion_pct (35k vs 5.7k observed). Re-add if/when a prediction
         # adapter starts emitting book snapshots.
         "trades",
+        # Non-instrument-day-grain data_types — cluster-grain (question_group) and
+        # market_id-grain (MARKET_LIFECYCLE). Downstream completion_pct aggregators
+        # MUST NOT mix these with instrument-day-grain types when computing coverage
+        # denominators; segregate by grain before summing. See predictions_master plan
+        # PR-3/PR-4 and catalogue_audit_prediction_2026_05_12.md findings PR-3/PR-4.
+        "prediction_canonical_question_group",  # cluster-grain (CanonicalQuestionGroup)
+        "MARKET_LIFECYCLE",  # market_id-grain (lifecycle timestamps per market)
     ],
 }
 

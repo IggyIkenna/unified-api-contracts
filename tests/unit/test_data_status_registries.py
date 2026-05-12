@@ -116,6 +116,15 @@ class TestExpectedCoverageByAssetGroup:
                 f"{venue} should not declare arbitrage_opportunity (it's processed)"
             )
 
+    def test_prediction_data_types_includes_non_instrument_day_grain_types(self) -> None:
+        """PR-3/PR-4: prediction set must include the cluster-grain and market-grain types."""
+        dts = DATA_TYPES_BY_ASSET_GROUP["prediction"]
+        assert "trades" in dts
+        assert "prediction_canonical_question_group" in dts, (
+            "cluster-grain type missing from DATA_TYPES_BY_ASSET_GROUP[prediction]"
+        )
+        assert "MARKET_LIFECYCLE" in dts, "market_id-grain type missing from DATA_TYPES_BY_ASSET_GROUP[prediction]"
+
     def test_is_expected_in_scope_returns_true(self) -> None:
         assert is_expected("tradfi", "CME", "trades")
         assert is_expected("cefi", "BINANCE-FUTURES", "derivative_ticker")
