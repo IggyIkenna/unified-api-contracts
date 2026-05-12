@@ -269,69 +269,17 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
 # ---------------------------------------------------------------------------
 
 FEATURE_FRESHNESS: dict[str, DataFreshnessContract] = {
-    "features-delta-one-service": DataFreshnessContract(
-        source="features-delta-one-service",
-        asset_class="feature",
-        max_age_seconds=120,
-        warn_age_seconds=60,
-        expected_cadence_seconds=60,
-        criticality="critical",
-    ),
-    "features-volatility-service": DataFreshnessContract(
-        source="features-volatility-service",
+    # Consolidated from features-{family}-service repos. Uses delta-one
+    # (primary active family) values as the canonical contract. Per-family
+    # freshness differentiation is handled at the feature_family manifest
+    # column level in monitoring, not here.
+    "features-service": DataFreshnessContract(
+        source="features-service",
         asset_class="feature",
         max_age_seconds=300,
         warn_age_seconds=150,
         expected_cadence_seconds=60,
         criticality="critical",
-    ),
-    "features-onchain-service": DataFreshnessContract(
-        source="features-onchain-service",
-        asset_class="feature",
-        max_age_seconds=600,
-        warn_age_seconds=300,
-        expected_cadence_seconds=300,
-        criticality="important",
-    ),
-    "features-calendar-service": DataFreshnessContract(
-        source="features-calendar-service",
-        asset_class="feature",
-        max_age_seconds=86400,
-        warn_age_seconds=43200,
-        expected_cadence_seconds=3600,
-        criticality="informational",
-    ),
-    "features-commodity-service": DataFreshnessContract(
-        source="features-commodity-service",
-        asset_class="feature",
-        max_age_seconds=3600,
-        warn_age_seconds=1800,
-        expected_cadence_seconds=3600,
-        criticality="informational",
-    ),
-    "features-cross-instrument-service": DataFreshnessContract(
-        source="features-cross-instrument-service",
-        asset_class="feature",
-        max_age_seconds=300,
-        warn_age_seconds=150,
-        expected_cadence_seconds=60,
-        criticality="important",
-    ),
-    "features-multi-timeframe-service": DataFreshnessContract(
-        source="features-multi-timeframe-service",
-        asset_class="feature",
-        max_age_seconds=300,
-        warn_age_seconds=150,
-        expected_cadence_seconds=60,
-        criticality="critical",
-    ),
-    "features-sports-service": DataFreshnessContract(
-        source="features-sports-service",
-        asset_class="feature",
-        max_age_seconds=300,
-        warn_age_seconds=60,
-        expected_cadence_seconds=60,
-        criticality="important",
     ),
 }
 

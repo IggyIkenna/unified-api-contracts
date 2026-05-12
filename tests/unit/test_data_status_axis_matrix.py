@@ -92,11 +92,7 @@ def test_data_pipeline_defi_entries_have_chain_in_shard() -> None:
         "instruments-service",
         "market-tick-data-service",
         "market-data-processing-service",
-        "features-delta-one-service",
-        "features-volatility-service",
-        "features-onchain-service",
-        "features-cross-instrument-service",
-        "features-multi-timeframe-service",
+        "features-service",
     }
     for (service, asset_group), shard in SHARD_AXIS_MATRIX.items():
         if asset_group != DEFI or service not in data_pipeline_services:
@@ -112,7 +108,7 @@ def test_prediction_entries_have_canonical_question_group_in_shard() -> None:
         "instruments-service",
         "market-tick-data-service",
         "market-data-processing-service",
-        "features-cross-instrument-service",
+        "features-service",
     }
     for (service, asset_group), shard in SHARD_AXIS_MATRIX.items():
         if asset_group != PREDICTION or service not in pricing_services:
@@ -155,7 +151,7 @@ def test_shared_pseudo_group_only_for_cross_asset_services() -> None:
     expected_shared_services = {
         "ml-training-service",
         "ml-inference-service",
-        "features-calendar-service",
+        "features-service",
     }
     actual_shared_services = {service for (service, asset_group) in SHARD_AXIS_MATRIX if asset_group == SHARED}
     assert actual_shared_services == expected_shared_services, (
@@ -163,21 +159,15 @@ def test_shared_pseudo_group_only_for_cross_asset_services() -> None:
     )
 
 
-def test_features_onchain_only_covers_defi() -> None:
-    """features-onchain is DEFI-only; no other asset_group should have
-    a SHARD entry under that service."""
-    onchain_groups = {
-        asset_group for (service, asset_group) in SHARD_AXIS_MATRIX if service == "features-onchain-service"
-    }
-    assert onchain_groups == {DEFI}, f"features-onchain coverage drift: {onchain_groups}"
+def test_features_service_covers_expected_asset_groups() -> None:
+    """Consolidated features-service covers exactly the expected asset_groups.
 
-
-def test_features_sports_only_covers_sports() -> None:
-    """features-sports is SPORTS-only."""
-    sports_groups = {
-        asset_group for (service, asset_group) in SHARD_AXIS_MATRIX if service == "features-sports-service"
-    }
-    assert sports_groups == {SPORTS}, f"features-sports coverage drift: {sports_groups}"
+    After features-{family}-service consolidation, features-service is the
+    single service for all feature families across all asset_groups.
+    """
+    expected = {CEFI, TRADFI, DEFI, SPORTS, SHARED, PREDICTION}
+    actual = {asset_group for (service, asset_group) in SHARD_AXIS_MATRIX if service == "features-service"}
+    assert actual == expected, f"features-service shard coverage drift: {actual} vs {expected}"
 
 
 def test_get_shard_axes_returns_tuple() -> None:

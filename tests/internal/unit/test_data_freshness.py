@@ -188,14 +188,8 @@ def test_market_tick_freshness_count() -> None:
 # ---------------------------------------------------------------------------
 
 _EXPECTED_FEATURE_SERVICES = [
-    ("features-delta-one-service", "feature", 120, 60, 60, "critical"),
-    ("features-volatility-service", "feature", 300, 150, 60, "critical"),
-    ("features-onchain-service", "feature", 600, 300, 300, "important"),
-    ("features-calendar-service", "feature", 86400, 43200, 3600, "informational"),
-    ("features-commodity-service", "feature", 3600, 1800, 3600, "informational"),
-    ("features-cross-instrument-service", "feature", 300, 150, 60, "important"),
-    ("features-multi-timeframe-service", "feature", 300, 150, 60, "critical"),
-    ("features-sports-service", "feature", 300, 60, 60, "important"),
+    # Consolidated from 8 features-{family}-service entries; one canonical contract.
+    ("features-service", "feature", 300, 150, 60, "critical"),
 ]
 
 
@@ -222,7 +216,7 @@ def test_feature_freshness_entry(
 
 
 def test_feature_freshness_count() -> None:
-    assert len(FEATURE_FRESHNESS) == 8
+    assert len(FEATURE_FRESHNESS) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -282,7 +276,7 @@ def test_all_freshness_contracts_no_duplicates() -> None:
 
 
 def test_all_freshness_contracts_contains_known_sources() -> None:
-    for key in ("binance", "features-delta-one-service", "ml-inference-api"):
+    for key in ("binance", "features-service", "ml-inference-api"):
         assert key in ALL_FRESHNESS_CONTRACTS
 
 

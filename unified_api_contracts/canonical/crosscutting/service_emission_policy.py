@@ -143,7 +143,7 @@ fail-loud pattern as :data:`unified_api_contracts.canonical.crosscutting.honest_
 #
 # Conventions:
 # * ``service`` is the canonical service name as it appears in ``setup_events(service_name=...)``
-#   (e.g. ``"market-tick-data-service"``, ``"features-volatility-service"``,
+#   (e.g. ``"market-tick-data-service"``, ``"features-service"``,
 #   ``"strategy-service"``, ``"execution-service"``).
 # * ``output_data_type`` is the data_type the SERVICE PUBLISHES — distinct from
 #   any input data_type the service reads. ``ohlcv_1m`` is consumed by MDPS as
@@ -168,13 +168,13 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("market-data-processing-service", "book_snapshot_5"): ServiceEmissionPolicy.STRICT_FAIL,
     # features-volatility — operator-flagged 24h-high-low example as PARTIAL_OK; rolling
     # vols are NaN_FILL because the ML consumer NaN-fills natively.
-    ("features-volatility-service", "high_low_24h"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-volatility-service", "vol_30d"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-volatility-service", "realised_vol_intraday"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "high_low_24h"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "vol_30d"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "realised_vol_intraday"): ServiceEmissionPolicy.PARTIAL_OK,
     # features-cross-instrument — paired-spec compute is leak-risk-sensitive: both legs
     # MUST be current. Partial = lookahead-bias trap.
-    ("features-cross-instrument-service", "paired_spec"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "pairwise_correlation"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "paired_spec"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "pairwise_correlation"): ServiceEmissionPolicy.NAN_FILL,
     # ml-training — training a model on incomplete data is the worst-case silent corruption.
     # block_critical forces operator review.
     ("ml-training-service", "model_version"): ServiceEmissionPolicy.BLOCK_CRITICAL,
@@ -205,30 +205,30 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # Real-time current-state + trading-decision inputs → STRICT_FAIL.
     # Authoritative risk/position truth → BLOCK_CRITICAL.
     # Rolling-window aggregates → PARTIAL_OK.
-    ("features-onchain-service", "lending_rates"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-onchain-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-onchain-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-onchain-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-onchain-service", "flash_loan_availability"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-onchain-service", "rate_impact"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-onchain-service", "risk_params"): ServiceEmissionPolicy.BLOCK_CRITICAL,
-    ("features-onchain-service", "health_factor"): ServiceEmissionPolicy.BLOCK_CRITICAL,
-    ("features-onchain-service", "macro_sentiment"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-onchain-service", "rewards"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-onchain-service", "liquidation_events"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "lending_rates"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "flash_loan_availability"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "rate_impact"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "risk_params"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    ("features-service", "health_factor"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    ("features-service", "macro_sentiment"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "rewards"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "liquidation_events"): ServiceEmissionPolicy.PARTIAL_OK,
     #
     # features-sports-service — 7 entries.
     # Three canonical data_types (FIXTURE_FEATURES / ODDS_FEATURES / DERIVED_FEATURES)
     # split current/historical per slice convention = 6; plus live PubSub
     # subset = 7. Tree-based ML consumer → NaN-fill native (1-10% tolerance).
     # In-play HT-odds = STRICT_FAIL (live pricing input).
-    ("features-sports-service", "fixture_features:current"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-sports-service", "fixture_features:historical"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-sports-service", "odds_features:current"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-sports-service", "odds_features:historical"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-sports-service", "derived_features:current"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-sports-service", "derived_features:historical"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-sports-service", "live_feature_subset"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "fixture_features:current"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "fixture_features:historical"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "odds_features:current"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "odds_features:historical"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "derived_features:current"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "derived_features:historical"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "live_feature_subset"): ServiceEmissionPolicy.STRICT_FAIL,
     #
     # features-cross-instrument-service — 21 entries.
     # Source: CALCULATOR_REGISTRY in features_service/cross_instrument/engine/orchestrator.py
@@ -236,50 +236,50 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # Cross-venue / paired-leg / orderbook-snapshot signals → STRICT_FAIL
     # (partial leg = lookahead-bias trap, paired_spec precedent).
     # Rolling-window aggregates → PARTIAL_OK.
-    ("features-cross-instrument-service", "regime_detection"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "cross_asset_correlation"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "cross_instrument_dynamics"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "realized_implied_vol"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "cointegration"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "cme_gap"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-cross-instrument-service", "cross_venue_spreads"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "book_depth_bands"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "liquidity_walls"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "liquidation_clusters"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "liquidation_band_prediction"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "flow_interaction"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "composite_sr"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "dxy_momentum"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "paired_price_dispersion"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "polymarket_crowd_sentiment"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "polymarket_trade_flow"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "polymarket_whale_activity"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "polymarket_market_microstructure"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-cross-instrument-service", "polymarket_cross_market"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-cross-instrument-service", "polymarket_temporal_patterns"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "regime_detection"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "cross_asset_correlation"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "cross_instrument_dynamics"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "realized_implied_vol"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "cointegration"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "cme_gap"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "cross_venue_spreads"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "book_depth_bands"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "liquidity_walls"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "liquidation_clusters"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "liquidation_band_prediction"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "flow_interaction"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "composite_sr"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "dxy_momentum"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "paired_price_dispersion"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "polymarket_crowd_sentiment"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "polymarket_trade_flow"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "polymarket_whale_activity"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "polymarket_market_microstructure"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "polymarket_cross_market"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "polymarket_temporal_patterns"): ServiceEmissionPolicy.NAN_FILL,
     #
     # features-delta-one-service — 9 entries (P0 anchors; ~24 ohlcv-derived
     # feature_groups share NAN_FILL — Phase-2 helper expansion deferred).
     # Default for ML-consumer feature_groups → NAN_FILL (LightGBM NaN-fill native,
     # operator-msg-10 vol_30d anchor). STRICT_FAIL for cross-venue/cross-leg pairings
     # + execution-sensitive signals + supervised labels.
-    ("features-delta-one-service", "technical_indicators"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-delta-one-service", "microstructure"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-delta-one-service", "funding_oi"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-delta-one-service", "futures_basis"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-delta-one-service", "volatility_realized"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-delta-one-service", "volume_flow"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-delta-one-service", "liquidations"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-delta-one-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
-    ("features-delta-one-service", "targets"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "technical_indicators"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "microstructure"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "funding_oi"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "futures_basis"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "volatility_realized"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-service", "volume_flow"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "liquidations"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-service", "targets"): ServiceEmissionPolicy.STRICT_FAIL,
     #
     # features-multi-timeframe-service — 4 entries.
     # Cross-TF alignment is load-bearing — ANY stale leg corrupts the alignment
     # column with lookahead bias (paired_spec precedent). All STRICT_FAIL.
-    ("features-multi-timeframe-service", "tf_momentum_alignment"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-multi-timeframe-service", "tf_structure_context"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-multi-timeframe-service", "tf_vol_compression"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-multi-timeframe-service", "tf_confluence_signals"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "tf_momentum_alignment"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "tf_structure_context"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "tf_vol_compression"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-service", "tf_confluence_signals"): ServiceEmissionPolicy.STRICT_FAIL,
     #
     # features-calendar-service — 2 entries (Phase 6.5 extension, 2026-05-12).
     # Calendar features are venue-agnostic and deterministically derived from

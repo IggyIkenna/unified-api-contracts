@@ -226,8 +226,8 @@ def test_list_services_returns_sorted_known() -> None:
 
 def test_is_known_feature_group_round_trip() -> None:
     """is_known_feature_group(service, fg) is True iff fg is registered."""
-    assert is_known_feature_group("features-onchain-service", "lst_staking_yields") is True
-    assert is_known_feature_group("features-onchain-service", "definitely-not-real") is False
+    assert is_known_feature_group("features-service", "lst_staking_yields") is True
+    assert is_known_feature_group("features-service", "definitely-not-real") is False
     assert is_known_feature_group("definitely-not-a-service", "lst_staking_yields") is False
 
 

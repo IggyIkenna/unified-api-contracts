@@ -30,10 +30,11 @@ from typing import Final
 # ---------------------------------------------------------------------------
 #
 # Source-of-truth for "service S is expected to produce these feature_groups".
-# Sourced from each service's ``app/calculators/`` / ``calculators/`` directory
-# listing as of 2026-05-07. data-status uses this as the denominator: every
-# feature_group listed here is expected to have manifest rows; absence is
-# coverage hole, not "not declared."
+# All features calculators run under the consolidated ``features-service`` after
+# per-family repo consolidation (plan: ``features_repo_consolidation_2026_05_08``).
+# Previously each family (onchain, delta_one, sports, volatility,
+# cross_instrument, ...) had its own repo and service name; all are now
+# ``features-service``.
 #
 # Feature groups are listed in the same string form they appear as in the
 # service's ``feature_builder_registry.py`` ``BuilderEntry.group_name`` —
@@ -41,7 +42,8 @@ from typing import Final
 # column. Drift here = data-status double-counts or under-counts.
 
 EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
-    "features-onchain-service": [
+    "features-service": [
+        # ---- Onchain --------------------------------------------------------
         # Phase 0 — base calculators (no inter-calculator deps)
         "aave_lending_rates",
         "aave_utilization",
@@ -57,8 +59,7 @@ EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
         "aave_rate_impact",
         # Phase 2 — regime aggregator
         "onchain_regime",
-    ],
-    "features-delta-one-service": [
+        # ---- Delta-one -------------------------------------------------------
         # Phase 0 — Price-based (no inter-calculator deps)
         "technical_indicators",
         "moving_averages",
@@ -100,8 +101,7 @@ EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
         "wedge_quality",
         # Phase 1 — Cross-calculator confluence
         "confluence",
-    ],
-    "features-sports-service": [
+        # ---- Sports ----------------------------------------------------------
         # Sports calculators directory listing 2026-05-07. The
         # ``features-sports-service`` BuilderEntry vocabulary uses
         # ``required_inputs: list[str]`` of reference-entity names rather
@@ -146,20 +146,9 @@ EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
         "venue_context",
         "weather",
         "xg_decomposition",
-    ],
-    "features-volatility-service": [
-        # Stub today; populate as volatility calculators land. Volatility
-        # service produces IV-surface + realised-vol features for options
-        # / perp basis trades — the ``features-volatility-service``
-        # ``BuilderRegistry`` is currently a placeholder per audit
-        # 2026-05-07.
-    ],
-    "features-cross-instrument-service": [
-        # Cross-instrument feature service ships paired_price_dispersion
-        # + cross-asset / index-vs-constituent features. The 20+
-        # calculators in the dir today don't yet use a BuilderRegistry —
-        # populate this list as they're rationalised under the same
-        # vocabulary as features-delta-one.
+        # ---- Volatility — stub (populate as IV-surface / realised-vol calculators land)
+        # ---- Cross-instrument — stub (populate as calculators rationalised under BuilderRegistry)
+        # ---- Calendar, Commodity, Multi-timeframe — stubs
     ],
 }
 """service -> ordered list of feature_groups the service is expected to produce.
@@ -201,17 +190,17 @@ FEATURE_COVERAGE_START: Final[dict[tuple[str, str], date]] = {
     #
     # Aave V3 mainnet launch (March 2022). All Aave-derived feature
     # groups can't have data before this.
-    ("features-onchain-service", "aave_lending_rates"): date(2022, 3, 16),
-    ("features-onchain-service", "aave_utilization"): date(2022, 3, 16),
-    ("features-onchain-service", "aave_risk_params"): date(2022, 3, 16),
-    ("features-onchain-service", "aave_rate_impact"): date(2022, 3, 16),
+    ("features-service", "aave_lending_rates"): date(2022, 3, 16),
+    ("features-service", "aave_utilization"): date(2022, 3, 16),
+    ("features-service", "aave_risk_params"): date(2022, 3, 16),
+    ("features-service", "aave_rate_impact"): date(2022, 3, 16),
     # Lido stETH launched Dec 2020; Etherfi mid-2023. The MIN of upstream
     # source starts wins for the multi-source aggregate.
-    ("features-onchain-service", "lst_staking_yields"): date(2020, 12, 18),
+    ("features-service", "lst_staking_yields"): date(2020, 12, 18),
     # EigenLayer mainnet launch (June 2023).
-    ("features-onchain-service", "eigen_rewards"): date(2023, 6, 14),
+    ("features-service", "eigen_rewards"): date(2023, 6, 14),
     # Morpho v1 launch (June 2022).
-    ("features-onchain-service", "flash_loan_availability"): date(2022, 6, 1),
+    ("features-service", "flash_loan_availability"): date(2022, 6, 1),
     # Add deltas / sports / volatility entries as upstream coverage
     # windows are formalised — until then the default (epoch) means
     # data-status doesn't pre-clip, which renders genuine pre-coverage
@@ -282,9 +271,8 @@ class FeatureFamily(StrEnum):
 
 
 class FeatureGroupFamilyCollisionError(ValueError):
-    """Raised when ``_build_feature_group_to_family`` finds the same
-    ``feature_group`` declared by two services that map to different
-    ``FeatureFamily`` values.
+    """Raised when the same ``feature_group`` is assigned to two different
+    ``FeatureFamily`` values in ``_GROUP_FAMILY_MAP``.
 
     This is a hard programming error — the plan's invariant is that every
     feature_group maps to exactly ONE feature_family. If a legitimate use
@@ -293,57 +281,118 @@ class FeatureGroupFamilyCollisionError(ValueError):
     """
 
 
-# Service-name → FeatureFamily mapping. Mechanical: every
-# ``features-{family}-service`` maps to the matching ``FeatureFamily`` value.
-# Kept as a private constant — callers should reach for ``FEATURE_GROUP_TO_FAMILY``
-# / ``get_feature_family`` instead of this dict directly.
-_SERVICE_TO_FAMILY: Final[dict[str, FeatureFamily]] = {
-    "features-calendar-service": FeatureFamily.CALENDAR,
-    "features-commodity-service": FeatureFamily.COMMODITY,
-    "features-cross-instrument-service": FeatureFamily.CROSS_INSTRUMENT,
-    "features-delta-one-service": FeatureFamily.DELTA_ONE,
-    "features-multi-timeframe-service": FeatureFamily.MULTI_TIMEFRAME,
-    "features-onchain-service": FeatureFamily.ONCHAIN,
-    "features-sports-service": FeatureFamily.SPORTS,
-    "features-volatility-service": FeatureFamily.VOLATILITY,
+# ---------------------------------------------------------------------------
+# _GROUP_FAMILY_MAP — explicit feature_group → FeatureFamily assignment.
+# ---------------------------------------------------------------------------
+#
+# After ``features-{family}-service`` consolidation to ``features-service``,
+# family membership can no longer be derived from service name. Each group is
+# explicitly tagged here by its originating feature domain.
+#
+# When adding a new feature_group to ``EXPECTED_FEATURE_GROUPS_BY_SERVICE``,
+# also add its FeatureFamily here in the same PR so manifest stamping stays
+# honest.
+#
+# Plan: ``features_repo_consolidation_2026_05_08.plan.md`` Phase 1A.
+
+_GROUP_FAMILY_MAP: Final[dict[str, FeatureFamily]] = {
+    # --- Onchain (features-onchain-service origin) ---
+    "aave_lending_rates": FeatureFamily.ONCHAIN,
+    "aave_utilization": FeatureFamily.ONCHAIN,
+    "aave_risk_params": FeatureFamily.ONCHAIN,
+    "defillama_tvl": FeatureFamily.ONCHAIN,
+    "fear_greed": FeatureFamily.ONCHAIN,
+    "lst_staking_yields": FeatureFamily.ONCHAIN,
+    "macro_sentiment": FeatureFamily.ONCHAIN,
+    "eigen_rewards": FeatureFamily.ONCHAIN,
+    "protocol_rewards": FeatureFamily.ONCHAIN,
+    "flash_loan_availability": FeatureFamily.ONCHAIN,
+    "aave_rate_impact": FeatureFamily.ONCHAIN,
+    "onchain_regime": FeatureFamily.ONCHAIN,
+    # --- Delta-one (features-delta-one-service origin) ---
+    "technical_indicators": FeatureFamily.DELTA_ONE,
+    "moving_averages": FeatureFamily.DELTA_ONE,
+    "oscillators": FeatureFamily.DELTA_ONE,
+    "volatility_realized": FeatureFamily.DELTA_ONE,
+    "momentum": FeatureFamily.DELTA_ONE,
+    "volume_analysis": FeatureFamily.DELTA_ONE,
+    "vwap": FeatureFamily.DELTA_ONE,
+    "candlestick_patterns": FeatureFamily.DELTA_ONE,
+    "market_structure": FeatureFamily.DELTA_ONE,
+    "returns": FeatureFamily.DELTA_ONE,
+    "round_numbers": FeatureFamily.DELTA_ONE,
+    "streaks": FeatureFamily.DELTA_ONE,
+    "targets": FeatureFamily.DELTA_ONE,
+    "swing_outcome_targets": FeatureFamily.DELTA_ONE,
+    "microstructure": FeatureFamily.DELTA_ONE,
+    "funding_oi": FeatureFamily.DELTA_ONE,
+    "liquidations": FeatureFamily.DELTA_ONE,
+    "futures_basis": FeatureFamily.DELTA_ONE,
+    "volume_flow": FeatureFamily.DELTA_ONE,
+    "temporal": FeatureFamily.DELTA_ONE,
+    "economic_events": FeatureFamily.DELTA_ONE,
+    "supply_demand_zones": FeatureFamily.DELTA_ONE,
+    "fibonacci": FeatureFamily.DELTA_ONE,
+    "level_confluence": FeatureFamily.DELTA_ONE,
+    "market_structure_sequence": FeatureFamily.DELTA_ONE,
+    "sr_memory": FeatureFamily.DELTA_ONE,
+    "signal_confirmation": FeatureFamily.DELTA_ONE,
+    "statistical_anomaly": FeatureFamily.DELTA_ONE,
+    "order_flow_inference": FeatureFamily.DELTA_ONE,
+    "return_kurtosis": FeatureFamily.DELTA_ONE,
+    "polynomial_trendlines": FeatureFamily.DELTA_ONE,
+    "risk_reward": FeatureFamily.DELTA_ONE,
+    "wedge_quality": FeatureFamily.DELTA_ONE,
+    "confluence": FeatureFamily.DELTA_ONE,
+    # --- Sports (features-sports-service origin) ---
+    "advanced_stats": FeatureFamily.SPORTS,
+    "bench_sub": FeatureFamily.SPORTS,
+    "bucketed_features": FeatureFamily.SPORTS,
+    "elo": FeatureFamily.SPORTS,
+    "european_fatigue": FeatureFamily.SPORTS,
+    "footystats_predictions": FeatureFamily.SPORTS,
+    "formation": FeatureFamily.SPORTS,
+    "goal_timing": FeatureFamily.SPORTS,
+    "h2h": FeatureFamily.SPORTS,
+    "halftime": FeatureFamily.SPORTS,
+    "ht_features": FeatureFamily.SPORTS,
+    "injury_impact": FeatureFamily.SPORTS,
+    "league": FeatureFamily.SPORTS,
+    "manager": FeatureFamily.SPORTS,
+    "meta_features": FeatureFamily.SPORTS,
+    "ml_predictions": FeatureFamily.SPORTS,
+    "multisource_xg": FeatureFamily.SPORTS,
+    "odds": FeatureFamily.SPORTS,
+    "player_lineup": FeatureFamily.SPORTS,
+    "poisson_xg": FeatureFamily.SPORTS,
+    "promoted_team": FeatureFamily.SPORTS,
+    "referee_features": FeatureFamily.SPORTS,
+    "relative_context": FeatureFamily.SPORTS,
+    "replacement_model": FeatureFamily.SPORTS,
+    "season_context": FeatureFamily.SPORTS,
+    "sfi_progressive": FeatureFamily.SPORTS,
+    "squad_value": FeatureFamily.SPORTS,
+    "steam_detector": FeatureFamily.SPORTS,
+    "team_derived": FeatureFamily.SPORTS,
+    "team_form": FeatureFamily.SPORTS,
+    "team_goals": FeatureFamily.SPORTS,
+    "team_xg": FeatureFamily.SPORTS,
+    "transfer_window": FeatureFamily.SPORTS,
+    "travel": FeatureFamily.SPORTS,
+    "venue_context": FeatureFamily.SPORTS,
+    "weather": FeatureFamily.SPORTS,
+    "xg_decomposition": FeatureFamily.SPORTS,
+    # Volatility, Cross-instrument, Calendar, Commodity, Multi-timeframe:
+    # no groups yet — add entries here when calculators land under their family.
 }
 
 
-def _build_feature_group_to_family() -> dict[str, FeatureFamily]:
-    """Invert ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` into a
-    ``feature_group -> FeatureFamily`` lookup at module-load time.
-
-    Raises ``FeatureGroupFamilyCollisionError`` if the same feature_group is
-    declared by two services that map to different families — a hard
-    programming error.
-
-    Services declared in ``EXPECTED_FEATURE_GROUPS_BY_SERVICE`` but absent
-    in ``_SERVICE_TO_FAMILY`` raise ``KeyError`` loudly at module load time
-    — that's the correct failure mode (a new service repo without a
-    registered family would silently lose feature_family stamping).
-    """
-    result: dict[str, FeatureFamily] = {}
-    for service, groups in EXPECTED_FEATURE_GROUPS_BY_SERVICE.items():
-        family = _SERVICE_TO_FAMILY[service]
-        for group in groups:
-            existing = result.get(group)
-            if existing is not None and existing != family:
-                raise FeatureGroupFamilyCollisionError(
-                    f"feature_group {group!r} is declared by two services "
-                    f"that map to different feature_family values: "
-                    f"{existing.value!r} vs {family.value!r}. The plan's "
-                    "invariant is one-family-per-feature_group; resolve by "
-                    "renaming the duplicate or revising _SERVICE_TO_FAMILY."
-                )
-            result[group] = family
-    return result
-
-
-FEATURE_GROUP_TO_FAMILY: Final[dict[str, FeatureFamily]] = _build_feature_group_to_family()
+FEATURE_GROUP_TO_FAMILY: Final[dict[str, FeatureFamily]] = _GROUP_FAMILY_MAP
 """``feature_group -> FeatureFamily`` lookup.
 
-Built once at module-load by inverting ``EXPECTED_FEATURE_GROUPS_BY_SERVICE``
-through ``_SERVICE_TO_FAMILY``. ``ManifestWriter`` callers use
+Built from ``_GROUP_FAMILY_MAP`` — an explicit per-group declaration that
+replaced the earlier per-service derivation after ``features-{family}-service``
+consolidated to ``features-service``. ``ManifestWriter`` callers use
 ``get_feature_family(feature_group)`` to look up the family before stamping
 the manifest column.
 
