@@ -176,6 +176,37 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         # Tighter breach gate — stop accumulating size before liquidation.
         kill_switch_position_breach_pct=0.03,
     ),
+    # Family 1 — pure-lending recursive arb (no perp leg). Per
+    # defi_recursive_borrow_archetypes_2026_05_10.md Family 1 design 2026-05-12.
+    # No perp hedge → hedge_ratio=None; single-asset delta exposure equals base capital.
+    StrategyArchetype.CARRY_RECURSIVE_BORROW_LENDING_ONLY: ArchetypeConfig(
+        collateral_currency="USDC",
+        hedge_ratio=None,
+        # Smaller cap than CARRY_RECURSIVE_STAKED — Family 1 hasn't been live-tested.
+        position_cap_usd=15_000.0,
+        # Drawdown gate tighter than CARRY_RECURSIVE_STAKED — pure-lending recursion has
+        # no perp-hedge dampener on adverse moves; LST/ETH peg risk is the dominant tail.
+        kill_switch_drawdown_pct=0.04,
+        # Breach gate tighter than CARRY_RECURSIVE_STAKED — protect against position-size
+        # creep when HF buffer is the load-bearing safety mechanism.
+        kill_switch_position_breach_pct=0.025,
+    ),
+    # Family 2 — Family 1 + USDC-margined perp short for delta neutrality. Per
+    # defi_recursive_borrow_archetypes_2026_05_10.md Family 2 design 2026-05-12.
+    # Perp leg neutralises ETH-correlated delta → hedge_ratio=1.0 (matches base).
+    StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED: ArchetypeConfig(
+        collateral_currency="ETH",
+        hedge_ratio=1.0,
+        # Slightly larger cap than Family 1 — perp hedge reduces directional tail risk.
+        # Still smaller than CARRY_RECURSIVE_STAKED — Family 2 adds funding-flip + cross-
+        # venue delta-drift risk surfaces not present in canonical staked-basis carry.
+        position_cap_usd=20_000.0,
+        # Drawdown gate slightly looser than Family 1 (perp dampens spot moves) but
+        # tighter than CARRY_RECURSIVE_STAKED (additional funding-sign-flip tail).
+        kill_switch_drawdown_pct=0.045,
+        # Breach gate matches Family 1 — same HF-buffer-driven safety mechanism.
+        kill_switch_position_breach_pct=0.03,
+    ),
     StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS: ArchetypeConfig(
         collateral_currency="USDT",
         # Single-leg directional — no hedge.
