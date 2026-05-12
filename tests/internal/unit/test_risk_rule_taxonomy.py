@@ -405,3 +405,103 @@ def test_facade_exports_risk_rule_symbols() -> None:
     assert hasattr(risk_facade, "RiskRuleConsequence")
     assert hasattr(risk_facade, "CONSEQUENCE_EVENTS_EMITTED")
     assert hasattr(risk_facade, "CONSEQUENCE_ALERT_CODES")
+    assert hasattr(risk_facade, "RiskRuleFiredEvent")
+    assert hasattr(risk_facade, "risk_rule_fired_event")
+
+
+# ---------------------------------------------------------------------------
+# RiskRuleFiredEvent — 8-event-lifecycle entry for the risk-rule layer
+# ---------------------------------------------------------------------------
+
+
+def _scaled_down_rule() -> RiskRule:
+    return RiskRule(
+        rule_id=RiskRuleId.MAX_DRAWDOWN_PER_ARCHETYPE,
+        scope=RiskRuleScope.PER_ARCHETYPE,
+        applies_to="CARRY_STAKED_BASIS",
+        trigger=MaxDrawdownTrigger(cap_bps=500),
+        consequence=RiskRuleConsequence.SCALE_DOWN,
+        alerting_severity=AlertSeverity.WARN,
+        description="Per-archetype drawdown — scale down at 500 bps.",
+    )
+
+
+def test_risk_rule_fired_event_block_carries_kill_switch() -> None:
+    from datetime import UTC, datetime
+
+    from unified_api_contracts.risk import RiskRuleFiredEvent, risk_rule_fired_event
+
+    rule = _sample_rule()  # BLOCK + triggers_kill_switch=True, PER_ARCHETYPE
+    fired_at = datetime(2026, 5, 12, 9, 30, tzinfo=UTC)
+    event = risk_rule_fired_event(rule, fired_at=fired_at, instruction_id="ord-1")
+
+    assert isinstance(event, RiskRuleFiredEvent)
+    assert event.rule_id is rule.rule_id
+    assert event.scope is RiskRuleScope.PER_ARCHETYPE
+    assert event.applies_to == "CARRY_STAKED_BASIS"
+    assert event.consequence is RiskRuleConsequence.BLOCK
+    assert event.alerting_severity is AlertSeverity.HIGH
+    assert event.alert_code is AlertCode(CONSEQUENCE_ALERT_CODES[RiskRuleConsequence.BLOCK])
+    assert event.fired_at == fired_at
+    assert event.instruction_id == "ord-1"
+    assert event.triggers_kill_switch is True
+    assert event.kill_switch_scope is KillSwitchScope.ARCHETYPE
+
+
+def test_risk_rule_fired_event_scale_down_no_kill_switch() -> None:
+    from datetime import UTC, datetime
+
+    from unified_api_contracts.risk import risk_rule_fired_event
+
+    rule = _scaled_down_rule()
+    event = risk_rule_fired_event(
+        rule,
+        fired_at=datetime(2026, 5, 12, tzinfo=UTC),
+        trigger_detail={"observed": "600", "threshold": "500", "units": "bps"},
+    )
+    assert event.consequence is RiskRuleConsequence.SCALE_DOWN
+    assert event.alert_code is AlertCode(CONSEQUENCE_ALERT_CODES[RiskRuleConsequence.SCALE_DOWN])
+    assert event.triggers_kill_switch is False
+    assert event.kill_switch_scope is None
+    assert event.trigger_detail == {"observed": "600", "threshold": "500", "units": "bps"}
+
+
+def test_risk_rule_fired_event_alert_codes_cover_all_consequences() -> None:
+    from datetime import UTC, datetime
+
+    from unified_api_contracts.risk import risk_rule_fired_event
+
+    fired_at = datetime(2026, 5, 12, tzinfo=UTC)
+    for consequence in RiskRuleConsequence:
+        rule = RiskRule(
+            rule_id=RiskRuleId.MAX_LEVERAGE_PER_ARCHETYPE,
+            scope=RiskRuleScope.PER_ARCHETYPE,
+            applies_to="CARRY_STAKED_BASIS",
+            trigger=MaxLeverageTrigger(cap_ratio=Decimal("3")),
+            consequence=consequence,
+            alerting_severity=AlertSeverity.INFO,
+            description="Per-archetype leverage cap.",
+        )
+        event = risk_rule_fired_event(rule, fired_at=fired_at)
+        assert event.alert_code is AlertCode(CONSEQUENCE_ALERT_CODES[consequence])
+
+
+def test_risk_rule_fired_event_frozen_and_extra_forbid() -> None:
+    from datetime import UTC, datetime
+
+    from unified_api_contracts.risk import RiskRuleFiredEvent, risk_rule_fired_event
+
+    event = risk_rule_fired_event(_sample_rule(), fired_at=datetime(2026, 5, 12, tzinfo=UTC))
+    with pytest.raises(ValidationError):
+        event.consequence = RiskRuleConsequence.MONITOR  # type: ignore[misc]
+    with pytest.raises(ValidationError):
+        RiskRuleFiredEvent(  # type: ignore[call-arg]
+            rule_id=RiskRuleId.MAX_LEVERAGE_PER_ARCHETYPE,
+            scope=RiskRuleScope.GLOBAL,
+            applies_to="*",
+            consequence=RiskRuleConsequence.BLOCK,
+            alerting_severity=AlertSeverity.CRITICAL,
+            alert_code=AlertCode(CONSEQUENCE_ALERT_CODES[RiskRuleConsequence.BLOCK]),
+            fired_at=datetime(2026, 5, 12, tzinfo=UTC),
+            nonsense_field="x",
+        )

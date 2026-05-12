@@ -52,10 +52,12 @@ from .canonical.crosscutting.risk_rule import (
     MaxPositionSizeTrigger,
     RiskRule,
     RiskRuleConsequence,
+    RiskRuleFiredEvent,
     RiskRuleId,
     RiskRuleScope,
     RiskRuleTrigger,
     SlippageBudgetTrigger,
+    risk_rule_fired_event,
 )
 from .canonical.crosscutting.strategy_family import (
     STRATEGY_FAMILY_IDS,
@@ -66,11 +68,20 @@ from .canonical.crosscutting.strategy_family import (
 )
 
 __all__ = [
+    # Phase 2 — per-axis registry aggregator (shipped Round 2 sub-agents D/E/F)
+    "ACCOUNT_RULES",
+    "ALL_RULES",
+    "ARCHETYPE_RULES",
+    "ASSET_GROUP_RULES",
+    "CLIENT_RULES",
     "CONSEQUENCE_ALERT_CODES",
     "CONSEQUENCE_EVENTS_EMITTED",
+    "GLOBAL_RULES",
     "RISK_RULE_IDS",
     "STRATEGY_FAMILY_IDS",
     "STRATEGY_FAMILY_REGISTRY",
+    "STRATEGY_FAMILY_RULES",
+    "VENUE_RULES",
     "CapitalAtRiskCeilingTrigger",
     "FundingCostCeilingTrigger",
     "GasBudgetTrigger",
@@ -85,6 +96,7 @@ __all__ = [
     "MaxPositionSizeTrigger",
     "RiskRule",
     "RiskRuleConsequence",
+    "RiskRuleFiredEvent",
     "RiskRuleId",
     "RiskRuleScope",
     "RiskRuleTrigger",
@@ -92,17 +104,9 @@ __all__ = [
     "StrategyFamily",
     "StrategyFamilyId",
     "family_for_archetype",
-    # Phase 2 — per-axis registry aggregator (shipped Round 2 sub-agents D/E/F)
-    "ACCOUNT_RULES",
-    "ALL_RULES",
-    "ARCHETYPE_RULES",
-    "ASSET_GROUP_RULES",
-    "CLIENT_RULES",
-    "GLOBAL_RULES",
-    "STRATEGY_FAMILY_RULES",
-    "VENUE_RULES",
     "get_rules_for",
     "iter_applicable_rules",
+    "risk_rule_fired_event",
 ]
 
 # Re-export the per-axis registry aggregator at the risk facade.
