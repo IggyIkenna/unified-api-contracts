@@ -130,6 +130,8 @@ from .defi_major_assets import (
 )
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
 from .defi_reserve_params import (
+    AAVE_V3_ARBITRUM_EMODE_CATEGORIES,
+    AAVE_V3_BASE_EMODE_CATEGORIES,
     AAVE_V3_EMODE_CATEGORIES,
     AAVE_V3_ETHEREUM_RESERVES,
     EModeCategory,
@@ -138,6 +140,12 @@ from .defi_reserve_params import (
     get_emode_category,
     get_emode_params,
     get_reserve_params,
+)
+from .dex_router_addresses import (
+    UNISWAP_SWAP_ROUTER_BY_CHAIN,
+    UNISWAP_V3_FACTORY_BY_CHAIN,
+    get_uniswap_swap_router,
+    get_uniswap_v3_factory,
 )
 from .endpoint_registry import (
     ENDPOINT_REGISTRY,
@@ -449,6 +457,8 @@ from .venue_trading_calendar import (
 __all__ = [
     "AAVE_PLASMA",
     "AAVE_V3",
+    "AAVE_V3_ARBITRUM_EMODE_CATEGORIES",
+    "AAVE_V3_BASE_EMODE_CATEGORIES",
     "AAVE_V3_EMODE_CATEGORIES",
     "AAVE_V3_ETH",
     "AAVE_V3_ETHEREUM_RESERVES",
@@ -656,6 +666,8 @@ __all__ = [
     "UNISWAPV2_ETH",
     "UNISWAPV3_ETH",
     "UNISWAPV4_ETH",
+    "UNISWAP_SWAP_ROUTER_BY_CHAIN",
+    "UNISWAP_V3_FACTORY_BY_CHAIN",
     "UPBIT",
     "VENUES_BY_ASSET_GROUP",
     "VENUE_AGGREGATOR_TYPE",
@@ -773,6 +785,8 @@ __all__ = [
     "get_solana_token_address",
     "get_subgraph_id",
     "get_supported_chains_for_protocol",
+    "get_uniswap_swap_router",
+    "get_uniswap_v3_factory",
     "get_unwrapped_form",
     "get_us_market_holidays",
     "get_venue_coordinates",
