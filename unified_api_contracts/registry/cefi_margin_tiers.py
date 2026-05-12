@@ -10,12 +10,23 @@ CeFi venues use a tiered margin schedule: position notional in USD determines
 which tier applies. Higher tier = higher MMR (maintenance margin requirement)
 and lower max leverage. These values track venue documentation and are
 periodically revalidated against venue API ``getLeverageBracket`` endpoints.
-Last revalidated: 2026-05-01.
+Last revalidated: 2026-05-15.
+
+Note: Per ``VENUES_BY_ASSET_GROUP['cefi']`` (FLAG 1 RESOLVED 2026-05-10),
+on-chain perpetual venues (Hyperliquid, Aster) are classified under
+``cefi`` because they expose order-book perp markets identical in shape to
+CeFi venues — even though settlement is on-chain. Therefore this file is the
+canonical perp margin SSOT for both CEX and on-chain perp venues; there is
+NO separate ``perp_margin_tiers.py``.
 
 Sources:
 - Binance: https://www.binance.com/en/futures/trading-rules/perpetual/leverage-margin
 - Bybit: https://www.bybit.com/en/help-center/article/Risk-Limit
 - OKX: https://www.okx.com/help-center/usdt-margined-perpetual-swaps-tiered-rates
+- Deribit: https://www.deribit.com/kb/leverage-and-margin-perpetuals
+- Hyperliquid: https://hyperliquid.gitbook.io/hyperliquid-docs/onboarding/how-to-trade-perpetuals
+- Aster: on-chain ``getLeverageBracket(market)`` per market; conservative defaults
+  pending live read.
 
 The values are conservative defaults — risk-and-exposure-service may override
 per-client based on the venue's actual returned tier in real-time queries.
@@ -156,6 +167,95 @@ _OKX_ETH = VenueMarginSchedule(
 )
 
 
+# ── Deribit perpetuals ──────────────────────────────────────────────────────
+# Source: https://www.deribit.com/kb/leverage-and-margin-perpetuals
+# Deribit uses portfolio margin with 50x max leverage on BTC/ETH PERP.
+# Last revalidated: 2026-05-15.
+
+_DERIBIT_BTC = VenueMarginSchedule(
+    venue="deribit",
+    asset="BTC",
+    tiers=(
+        _tier(1, "500000", 50, "0.02", "0.01"),
+        _tier(2, "1000000", 33, "0.03", "0.015"),
+        _tier(3, "5000000", 20, "0.05", "0.025"),
+        _tier(4, "10000000", 10, "0.10", "0.05"),
+        _tier(5, "50000000", 5, "0.20", "0.10"),
+    ),
+)
+
+_DERIBIT_ETH = VenueMarginSchedule(
+    venue="deribit",
+    asset="ETH",
+    tiers=(
+        _tier(1, "500000", 50, "0.02", "0.01"),
+        _tier(2, "1000000", 33, "0.03", "0.015"),
+        _tier(3, "5000000", 20, "0.05", "0.025"),
+        _tier(4, "10000000", 10, "0.10", "0.05"),
+        _tier(5, "50000000", 5, "0.20", "0.10"),
+    ),
+)
+
+
+# ── Hyperliquid perpetuals (on-chain order book) ────────────────────────────
+# Source: https://hyperliquid.gitbook.io/hyperliquid-docs/onboarding/how-to-trade-perpetuals
+# Hyperliquid uses cross-margin with up to 50x max leverage on BTC/ETH PERP.
+# Classified under VENUES_BY_ASSET_GROUP['cefi'] (FLAG 1 RESOLVED 2026-05-10).
+# Last revalidated: 2026-05-15.
+
+_HYPERLIQUID_BTC = VenueMarginSchedule(
+    venue="hyperliquid",
+    asset="BTC",
+    tiers=(
+        _tier(1, "1000000", 50, "0.02", "0.01"),
+        _tier(2, "5000000", 20, "0.05", "0.025"),
+        _tier(3, "20000000", 10, "0.10", "0.05"),
+        _tier(4, "50000000", 5, "0.20", "0.10"),
+    ),
+)
+
+_HYPERLIQUID_ETH = VenueMarginSchedule(
+    venue="hyperliquid",
+    asset="ETH",
+    tiers=(
+        _tier(1, "1000000", 50, "0.02", "0.01"),
+        _tier(2, "5000000", 20, "0.05", "0.025"),
+        _tier(3, "20000000", 10, "0.10", "0.05"),
+        _tier(4, "50000000", 5, "0.20", "0.10"),
+    ),
+)
+
+
+# ── Aster perpetuals (on-chain order book) ──────────────────────────────────
+# Source: on-chain ``getLeverageBracket(market)`` per market.
+# Aster is a newer perp DEX; conservative per-tier ceilings reflect smaller
+# liquidity vs Hyperliquid. Values pending live on-chain read.
+# Classified under VENUES_BY_ASSET_GROUP['cefi'] (FLAG 1 RESOLVED 2026-05-10).
+# Last revalidated: 2026-05-15.
+
+_ASTER_BTC = VenueMarginSchedule(
+    venue="aster",
+    asset="BTC",
+    tiers=(
+        _tier(1, "100000", 50, "0.02", "0.01"),
+        _tier(2, "500000", 20, "0.05", "0.025"),
+        _tier(3, "1000000", 10, "0.10", "0.05"),
+        _tier(4, "5000000", 5, "0.20", "0.10"),
+    ),
+)
+
+_ASTER_ETH = VenueMarginSchedule(
+    venue="aster",
+    asset="ETH",
+    tiers=(
+        _tier(1, "100000", 50, "0.02", "0.01"),
+        _tier(2, "500000", 20, "0.05", "0.025"),
+        _tier(3, "1000000", 10, "0.10", "0.05"),
+        _tier(4, "5000000", 5, "0.20", "0.10"),
+    ),
+)
+
+
 # ── Master registry ─────────────────────────────────────────────────────────
 
 CEFI_MARGIN_TIERS: Final[dict[tuple[str, str], VenueMarginSchedule]] = {
@@ -165,6 +265,12 @@ CEFI_MARGIN_TIERS: Final[dict[tuple[str, str], VenueMarginSchedule]] = {
     ("bybit", "ETH"): _BYBIT_ETH,
     ("okx", "BTC"): _OKX_BTC,
     ("okx", "ETH"): _OKX_ETH,
+    ("deribit", "BTC"): _DERIBIT_BTC,
+    ("deribit", "ETH"): _DERIBIT_ETH,
+    ("hyperliquid", "BTC"): _HYPERLIQUID_BTC,
+    ("hyperliquid", "ETH"): _HYPERLIQUID_ETH,
+    ("aster", "BTC"): _ASTER_BTC,
+    ("aster", "ETH"): _ASTER_ETH,
 }
 
 
