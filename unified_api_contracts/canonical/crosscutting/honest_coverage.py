@@ -177,6 +177,28 @@ class EmptyConfirmedReason(StrEnum):
     Plan: ``manifest_schema_final_gate_2026_05_09.md`` Phase 1 — operator-approved 2026-05-11 in the
     ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` § TL;DR point 2 routing decision."""
 
+    EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
+    """Instrument exists in the instruments-service catalog but is not included in the downstream
+    service's subscription_list / MVP-scope configuration. The service explicitly skips it rather
+    than treating the absence as a pipeline failure.
+
+    Used by: features batch handlers (delta_one, calendar, onchain, volatility, sports, commodity)
+    and ml-training / ml-inference when an instrument is in the catalog but not in
+    ``FEATURES_MVP_INSTRUMENTS`` / ``ML_SCOPE_INSTRUMENTS`` respectively.
+
+    Plan: ``expected_unattempted_propagation_chain_2026_05_12.md`` Phase 3.0 / Phase 4."""
+
+    EXPECTED_UPSTREAM_EMPTY = "EXPECTED_UPSTREAM_EMPTY"
+    """Downstream service skipped this shard because the upstream service's manifest has
+    ``capture_status`` in (``empty_confirmed``, ``expected_unattempted``).  The downstream
+    service propagates the honest absence signal rather than attempting to process missing data.
+
+    Used by: MTDS (skips shard when instruments-service manifest is empty/unattempted),
+    MDPS (skips shard when MTDS manifest shows empty/unattempted), feature services (when MDPS
+    manifest shows empty/unattempted).
+
+    Plan: ``expected_unattempted_propagation_chain_2026_05_12.md`` Phases 1-4."""
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
