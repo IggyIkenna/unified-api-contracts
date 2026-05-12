@@ -122,12 +122,19 @@ AAVE_V3_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
         liquidation_bonus=Decimal("0.075"),
         reserve_factor=Decimal("0.20"),
     ),
+    # Restaking LST (added 2026-05-12 per defi_recursive_borrow Family 1 design)
+    "RETH": ReserveParams(
+        max_ltv=Decimal("0.745"),
+        liquidation_threshold=Decimal("0.79"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
 }
 
 
 # ── E-Mode Categories (Aave V3 Ethereum) ──────────────────────────────────
 # Source: Aave governance, on-chain getEModeCategoryData()
-# Category 1: ETH-correlated — weETH, wstETH, cbETH, WETH all in same bucket
+# Category 1: ETH-correlated — weETH, wstETH, cbETH, rETH, WETH all in same bucket
 # Category 2: Stablecoins — USDC, USDT, DAI
 AAVE_V3_EMODE_CATEGORIES: list[EModeCategory] = [
     EModeCategory(
@@ -136,7 +143,7 @@ AAVE_V3_EMODE_CATEGORIES: list[EModeCategory] = [
         max_ltv=Decimal("0.93"),
         liquidation_threshold=Decimal("0.95"),
         liquidation_bonus=Decimal("0.01"),
-        assets=frozenset({"WETH", "WEETH", "WSTETH", "CBETH"}),
+        assets=frozenset({"WETH", "WEETH", "WSTETH", "CBETH", "RETH"}),
     ),
     EModeCategory(
         category_id=2,
@@ -148,31 +155,116 @@ AAVE_V3_EMODE_CATEGORIES: list[EModeCategory] = [
     ),
 ]
 
-# Lookup: asset → E-Mode category
-_ASSET_EMODE_MAP: dict[str, EModeCategory] = {}
+# Aave V3 Arbitrum E-Mode categories (added 2026-05-12)
+# Differs from Ethereum: NO CBETH on Arbitrum; STABLECOIN E-Mode caps tighter (0.93 vs 0.97)
+# Source: training-knowledge — values low-medium confidence; verify on app.aave.com
+AAVE_V3_ARBITRUM_EMODE_CATEGORIES: list[EModeCategory] = [
+    EModeCategory(
+        category_id=1,
+        label="ETH_CORRELATED",
+        max_ltv=Decimal("0.93"),
+        liquidation_threshold=Decimal("0.95"),
+        liquidation_bonus=Decimal("0.01"),
+        assets=frozenset({"WETH", "WEETH", "WSTETH", "RETH"}),
+    ),
+    EModeCategory(
+        category_id=2,
+        label="STABLECOIN",
+        max_ltv=Decimal("0.93"),
+        liquidation_threshold=Decimal("0.95"),
+        liquidation_bonus=Decimal("0.01"),
+        assets=frozenset({"USDC", "USDT", "DAI"}),
+    ),
+]
+
+# Aave V3 Base E-Mode categories (added 2026-05-12)
+# Base distinctives: CBETH in ETH-correlated; only USDC + USDBC in STABLECOIN
+# Source: training-knowledge — values low-confidence; verify on app.aave.com
+AAVE_V3_BASE_EMODE_CATEGORIES: list[EModeCategory] = [
+    EModeCategory(
+        category_id=1,
+        label="ETH_CORRELATED",
+        max_ltv=Decimal("0.93"),
+        liquidation_threshold=Decimal("0.95"),
+        liquidation_bonus=Decimal("0.01"),
+        assets=frozenset({"WETH", "WSTETH", "CBETH", "WEETH"}),
+    ),
+    EModeCategory(
+        category_id=2,
+        label="STABLECOIN",
+        max_ltv=Decimal("0.93"),
+        liquidation_threshold=Decimal("0.95"),
+        liquidation_bonus=Decimal("0.01"),
+        assets=frozenset({"USDC", "USDBC"}),
+    ),
+]
+
+# Chain-aware E-Mode dispatch (added 2026-05-12 per defi_recursive_borrow Family 1 design)
+# Mirrors _AAVE_V3_CHAIN_DISPATCH (line ~658 — added by Harsh 2026-05-12 Phase 1B) for reserves.
+_CHAIN_ASSET_EMODE_MAP: dict[str, dict[str, EModeCategory]] = {
+    "ETHEREUM": {},
+    "ARBITRUM": {},
+    "BASE": {},
+}
 for _cat in AAVE_V3_EMODE_CATEGORIES:
     for _asset in _cat.assets:
-        _ASSET_EMODE_MAP[_asset] = _cat
+        _CHAIN_ASSET_EMODE_MAP["ETHEREUM"][_asset] = _cat
+for _cat in AAVE_V3_ARBITRUM_EMODE_CATEGORIES:
+    for _asset in _cat.assets:
+        _CHAIN_ASSET_EMODE_MAP["ARBITRUM"][_asset] = _cat
+for _cat in AAVE_V3_BASE_EMODE_CATEGORIES:
+    for _asset in _cat.assets:
+        _CHAIN_ASSET_EMODE_MAP["BASE"][_asset] = _cat
+
+# Legacy single-chain map — alias for Ethereum; preserved for backwards compat
+_ASSET_EMODE_MAP: dict[str, EModeCategory] = _CHAIN_ASSET_EMODE_MAP["ETHEREUM"]
 
 
-def get_emode_category(asset: str) -> EModeCategory | None:
-    """Get the E-Mode category for an asset, or None if not in any E-Mode category."""
-    return _ASSET_EMODE_MAP.get(asset.upper())
+def get_emode_category(asset: str, chain: str = "ETHEREUM") -> EModeCategory | None:
+    """Get the E-Mode category for an asset on a given chain.
+
+    Chain-aware as of 2026-05-12: prior single-chain signature defaulted to Ethereum;
+    chain dispatch added per defi_recursive_borrow_archetypes_2026_05_10.md Family 1
+    design.
+
+    Args:
+        asset: Asset symbol (e.g., "WETH", "WSTETH").
+        chain: Chain name (default ETHEREUM; supports ARBITRUM, BASE).
+
+    Returns:
+        EModeCategory or None if asset not in any E-Mode category on that chain.
+    """
+    chain_map = _CHAIN_ASSET_EMODE_MAP.get(chain.upper())
+    if chain_map is None:
+        return None
+    return chain_map.get(asset.upper())
 
 
-def get_emode_params(collateral_asset: str, debt_asset: str) -> EModeCategory | None:
-    """Get E-Mode parameters when collateral and debt are in the same category.
+def get_emode_params(
+    collateral_asset: str, debt_asset: str, chain: str = "ETHEREUM"
+) -> EModeCategory | None:
+    """Get E-Mode parameters when collateral and debt are in the same category on a given chain.
 
-    Returns the EModeCategory if both assets share an E-Mode category (enabling
-    higher LTV/liquidation thresholds), or None if they're in different categories
-    or neither is in an E-Mode category.
+    Chain-aware as of 2026-05-12.
+
+    Args:
+        collateral_asset: Collateral asset symbol.
+        debt_asset: Debt asset symbol.
+        chain: Chain name (default ETHEREUM; supports ARBITRUM, BASE).
+
+    Returns:
+        EModeCategory if both assets share an E-Mode category on `chain`; None otherwise.
 
     Example:
-        get_emode_params("WEETH", "WETH") → ETH_CORRELATED (93% LTV, 95% liq)
+        get_emode_params("WEETH", "WETH") → ETH_CORRELATED (93% LTV, 95% liq) on Ethereum
         get_emode_params("WEETH", "USDC") → None (different categories)
+        get_emode_params("WSTETH", "WETH", chain="ARBITRUM") → ETH_CORRELATED Arbitrum
     """
-    collateral_cat = _ASSET_EMODE_MAP.get(collateral_asset.upper())
-    debt_cat = _ASSET_EMODE_MAP.get(debt_asset.upper())
+    chain_map = _CHAIN_ASSET_EMODE_MAP.get(chain.upper())
+    if chain_map is None:
+        return None
+    collateral_cat = chain_map.get(collateral_asset.upper())
+    debt_cat = chain_map.get(debt_asset.upper())
     if collateral_cat is not None and collateral_cat is debt_cat:
         return collateral_cat
     return None
