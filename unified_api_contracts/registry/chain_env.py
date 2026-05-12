@@ -25,6 +25,10 @@ MAINNET_CHAIN_IDS: dict[str, int] = {
     "AURORA": 1313161554,
     "METIS": 1088,
     "MOONBEAM": 1284,
+    # Phase 1F-extend (cross_asset_group_catalogue_audit): SCROLL + ZKSYNC in CHAIN_GENESIS_DATES
+    # but were missing from MAINNET_CHAIN_IDS; added to enforce MAINNET ⊇ GENESIS_DATES invariant.
+    "SCROLL": 534352,
+    "ZKSYNC": 324,
     "SOLANA": 0,  # Not EVM -- handled separately
     "BITCOIN": 0,  # Not EVM -- handled separately
 }
@@ -48,6 +52,8 @@ TESTNET_CHAIN_IDS: dict[str, int] = {
     "AURORA": 1313161555,  # Aurora Testnet
     "METIS": 599,  # Metis Goerli
     "MOONBEAM": 1287,  # Moonbase Alpha
+    "SCROLL": 534351,  # Scroll Sepolia
+    "ZKSYNC": 300,  # zkSync Sepolia
     "SOLANA": 0,  # Devnet -- handled separately
     "BITCOIN": 0,  # Testnet -- handled separately
 }
@@ -74,6 +80,14 @@ GAS_FEE_CHAIN_START_DATES: dict[int, str] = {
     5000: "2023-07-14",  # Mantle — mainnet launch
     42220: "2020-04-22",  # Celo — mainnet launch
     1313161554: "2021-05-18",  # Aurora — mainnet launch
+    # ── Phase 1F-extend (cross_asset_group_catalogue_audit) — enforce GAS_FEE ⊆ MAINNET set ──
+    # BLAST/MODE/GNOSIS were in MAINNET_CHAIN_IDS but missing from this dict (DF-7).
+    # SCROLL/ZKSYNC added here in the same commit as their MAINNET_CHAIN_IDS additions.
+    81457: "2024-02-29",  # Blast — mainnet launch (Alchemy archival coverage = genesis)
+    34443: "2024-01-12",  # Mode — mainnet launch
+    100: "2021-01-01",  # Gnosis (xDai rebranded) — conservative Alchemy archival floor
+    534352: "2023-10-17",  # Scroll — mainnet launch
+    324: "2023-03-24",  # zkSync Era — mainnet launch
 }
 
 # Solana start date for gas fee collection (Alchemy archival RPC coverage)
