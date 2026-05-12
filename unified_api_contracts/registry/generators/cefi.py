@@ -1,4 +1,5 @@
-"""CeFi synthetic-generator seeds — :class:`SyntheticGeneratorSpec` instances for the ``leveraged_funding_arb`` / ``ARBITRAGE_PRICE_DISPERSION`` cutover archetype.
+"""CeFi synthetic-generator seeds — :class:`SyntheticGeneratorSpec` instances for the
+``leveraged_funding_arb`` / ``ARBITRAGE_PRICE_DISPERSION`` cutover archetype.
 
 Phase 1.B of ``mock_data_pipeline_benchmarking_2026_05_10.md``. Six
 generators covering the CeFi data_types the cutover hedge + arb legs read:
@@ -42,7 +43,11 @@ CEFI_TRADES_SPEC = SyntheticGeneratorSpec(
     asset_group="cefi",
     data_type="trades",
     schema_version="trades.v3",
-    default_row_count_per_day=1_800_000,  # ~100k trades/day/cell * 18 cells (axis-1 estimate)
+    # Calibrated 2026-05-12 from real GCS sample: BITGET-FUTURES 2026-05-07 measured 3,475,449 rows
+    # for BTC/ETH/SOL-USDT perps alone (1 of 6 cutover venues). Extrapolated ~18M for 6 venues x 3
+    # instruments. Sample URI is BITGET-FUTURES proxy (cutover venues bybit/binance/okx not yet in backfill).
+    real_backfill_sample_uri="gs://market-data-tick-cefi-central-element-323112/raw_tick_data/by_date/day=2026-05-07/asset_group=cefi/venue=BITGET-FUTURES/instrument_type=perpetual/data_type=trades/BTCUSDT.parquet",
+    default_row_count_per_day=18_000_000,  # 3 instruments x ~1M avg/venue x 6 venues (prev 1.8M was 10x too low)
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_CEFI_TICK_PARTITION,
     archetypes_consuming=frozenset({"ARBITRAGE_PRICE_DISPERSION", "leveraged_funding_arb"}),
@@ -56,6 +61,7 @@ CEFI_OHLCV_1M_SPEC = SyntheticGeneratorSpec(
     asset_group="cefi",
     data_type="ohlcv_1m",
     schema_version="ohlcv.v2",
+    # ESTIMATE — MDPS-computed bars; no raw ohlcv_1m in raw_tick backfill as of 2026-05-12.
     default_row_count_per_day=25_920,  # 1440 bars/day * 18 cells
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_CEFI_TICK_PARTITION,
@@ -70,6 +76,7 @@ CEFI_OHLCV_15M_SPEC = SyntheticGeneratorSpec(
     asset_group="cefi",
     data_type="ohlcv_15m",
     schema_version="ohlcv.v2",
+    # ESTIMATE — MDPS-computed bars; no raw ohlcv_15m in raw_tick backfill as of 2026-05-12.
     default_row_count_per_day=1_728,  # 96 bars/day * 18 cells
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_CEFI_TICK_PARTITION,
@@ -84,6 +91,7 @@ CEFI_FUNDING_RATE_SPEC = SyntheticGeneratorSpec(
     asset_group="cefi",
     data_type="funding_rate",
     schema_version="funding_rate.v2",
+    # ESTIMATE — funding_rate not in raw_tick GCS backfill as of 2026-05-12 (only trades + book_snapshot_5 live).
     default_row_count_per_day=432,  # up to 24 settlements/day (hourly venues) * 18 cells
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_CEFI_DERIV_PARTITION,
@@ -98,6 +106,7 @@ CEFI_OPEN_INTEREST_SPEC = SyntheticGeneratorSpec(
     asset_group="cefi",
     data_type="open_interest",
     schema_version="open_interest.v1",
+    # ESTIMATE — open_interest not present in raw_tick GCS backfill as of 2026-05-12.
     default_row_count_per_day=25_920,  # 1440 1-min OI snapshots/day * 18 cells
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_CEFI_DERIV_PARTITION,
@@ -112,6 +121,7 @@ CEFI_LIQUIDATIONS_SPEC = SyntheticGeneratorSpec(
     asset_group="cefi",
     data_type="liquidations",
     schema_version="liquidations.v1",
+    # ESTIMATE — liquidations not present in raw_tick GCS backfill as of 2026-05-12.
     default_row_count_per_day=90_000,  # ~5k events/day/cell on a volatile day * 18 cells
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_CEFI_DERIV_PARTITION,

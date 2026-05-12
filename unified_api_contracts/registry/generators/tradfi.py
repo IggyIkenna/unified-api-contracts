@@ -39,13 +39,15 @@ TRADFI_OHLCV_1M_SPEC = SyntheticGeneratorSpec(
     asset_group="tradfi",
     data_type="ohlcv_1m",
     schema_version="ohlcv.v2",
+    # ESTIMATE — TradFi GCS backfill (2026-05-12) contains only CBOE/index/ohlcv_15m/VIX (23 rows on
+    # 2026-05-05). No ohlcv_1m for ES/NQ/ZN/GC/DXY archetype instruments in the raw_tick bucket.
     # ~390 RTH minutes/day (equities) up to ~1380 (futures near-24h) per cell; model 1380 * 5 cells.
     default_row_count_per_day=6_900,
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_TRADFI_PARTITION,
     archetypes_consuming=frozenset({"carry_staked_basis", "leveraged_funding_arb"}),
     pipeline_stages_touching=("mtds_read", "mdps_compute", "features", "strategy"),
-    description="1-minute TradFi OHLCV bars (index futures + rates + FX proxy); cross-asset hedge-overlay regime input.",
+    description="1-minute TradFi OHLCV bars (index futures + rates + FX proxy); cross-asset hedge-overlay input.",
 )
 
 TRADFI_OHLCV_1D_SPEC = SyntheticGeneratorSpec(
@@ -54,6 +56,7 @@ TRADFI_OHLCV_1D_SPEC = SyntheticGeneratorSpec(
     asset_group="tradfi",
     data_type="ohlcv_1d",
     schema_version="ohlcv.v2",
+    # ESTIMATE — deterministic (1 bar/day/cell); no ohlcv_1d in raw_tick GCS as of 2026-05-12.
     default_row_count_per_day=5,  # 1 bar/day * 5 cells
     default_shard_key_axes=("venue", "instrument"),
     default_partition_template=_TRADFI_PARTITION,

@@ -1,4 +1,5 @@
-"""DeFi synthetic-generator seeds — :class:`SyntheticGeneratorSpec` instances for the ``carry_staked_basis`` cutover archetype (lead).
+"""DeFi synthetic-generator seeds — :class:`SyntheticGeneratorSpec` instances for the
+``carry_staked_basis`` cutover archetype (lead).
 
 Phase 1.B of ``mock_data_pipeline_benchmarking_2026_05_10.md``. Five
 generators covering the on-chain data_types ``carry_staked_basis`` reads:
@@ -36,7 +37,7 @@ from ...canonical.crosscutting.synthetic_generator import (
 CUTOVER_DEFI_EVM_CHAINS: Final[tuple[str, ...]] = ("ethereum", "arbitrum", "optimism", "base")
 CUTOVER_DEFI_CHAINS: Final[tuple[str, ...]] = (*CUTOVER_DEFI_EVM_CHAINS, "solana")
 
-# LST assets — Solana (jitoSOL/mSOL/bSOL via Marinade/Jito/BlazeStake) + EVM (wstETH/rETH/cbETH via Lido/Rocket/Coinbase).
+# LST assets — Solana (jitoSOL/mSOL/bSOL via Marinade/Jito/BlazeStake) + EVM (wstETH/rETH/cbETH via Lido/Rocket/CB).
 CUTOVER_LST_PROTOCOLS: Final[tuple[str, ...]] = (
     "marinade",
     "jito",
@@ -81,6 +82,7 @@ DEFI_GAS_SPEC = SyntheticGeneratorSpec(
     asset_group="defi",
     data_type="gas",
     schema_version="gas.v2",
+    # ESTIMATE — no gas data_type in raw_tick GCS as of 2026-05-12 (DeFi bucket contains vault_share_price only).
     # ETH ~7.2k + ARB ~350k + OP ~43.2k + BASE ~43.2k + SOL ~216k = ~660k blocks/day total.
     default_row_count_per_day=660_000,
     default_shard_key_axes=("chain",),
@@ -96,7 +98,11 @@ DEFI_LST_RATES_SPEC = SyntheticGeneratorSpec(
     asset_group="defi",
     data_type="lst_rates",
     schema_version="lst_rates.v1",
-    # ~1 snapshot/epoch on Solana (~2-day epoch -> sub-daily) + per-block-ish on EVM; model ~96 (15-min) snapshots/day/cell.
+    # ESTIMATE — no lst_rates data_type in raw_tick GCS as of 2026-05-12. DeFi bucket contains
+    # vault_share_price (ETHENA/FRAX/MAKER/MORPHOVAULTS/YEARNV3, 1 row/instrument/day) which is adjacent
+    # but not the same data_type. Calibrate when on-chain indexer ships LST rate snapshots.
+    # ~1 snapshot/epoch on Solana (~2-day epoch → sub-daily) + per-block-ish on EVM;
+    # model ~96 (15-min) snapshots/day/cell.
     default_row_count_per_day=576,  # 96 * 6 LST protocol cells
     default_shard_key_axes=("chain", "protocol"),
     default_partition_template=_CHAIN_PROTOCOL_PARTITION,
@@ -111,7 +117,9 @@ DEFI_LENDING_INDICES_SPEC = SyntheticGeneratorSpec(
     asset_group="defi",
     data_type="lending_indices",
     schema_version="lending_indices.v2",
-    # Per-reserve supply/borrow index ~hourly snapshots; ~24/day/cell, ~5 reserves * 2 protocols * 5 chains -> model 24 * 50 cells.
+    # ESTIMATE — no lending_indices data_type in raw_tick GCS as of 2026-05-12.
+    # Per-reserve supply/borrow index ~hourly snapshots; ~24/day/cell,
+    # ~5 reserves x 2 protocols x 5 chains → model 24 x 50 cells.
     default_row_count_per_day=1_200,
     default_shard_key_axes=("chain", "protocol"),
     default_partition_template=_CHAIN_PROTOCOL_PARTITION,
@@ -126,13 +134,15 @@ DEFI_DEX_POOL_STATE_SPEC = SyntheticGeneratorSpec(
     asset_group="defi",
     data_type="dex_pool_state",
     schema_version="dex_pool_state.v1",
-    # Per-pool reserves/sqrtPrice/tick/liquidity snapshot ~per block on the pool's chain; model ~1440 (1-min) snapshots/day/cell.
+    # ESTIMATE — no dex_pool_state data_type in raw_tick GCS as of 2026-05-12.
+    # Per-pool reserves/sqrtPrice/tick/liquidity snapshot ~per block on the pool's chain;
+    # model ~1440 (1-min) snapshots/day/cell.
     default_row_count_per_day=5_760,  # 1440 * 4 pool cells
     default_shard_key_axes=("chain", "pool"),
     default_partition_template=_CHAIN_POOL_PARTITION,
     archetypes_consuming=frozenset({"carry_staked_basis"}),
     pipeline_stages_touching=("mtds_read", "features", "strategy", "matching_engine"),
-    description="Uniswap-V3 + Curve-V2 pool-state snapshots (reserves, sqrtPriceX96, tick, liquidity); hedge-swap slippage input.",
+    description="Uniswap-V3 + Curve-V2 pool-state snapshots (reserves, sqrtPriceX96, tick, liquidity); slippage input.",
 )
 
 DEFI_ORACLE_FEEDS_SPEC = SyntheticGeneratorSpec(
@@ -141,13 +151,15 @@ DEFI_ORACLE_FEEDS_SPEC = SyntheticGeneratorSpec(
     asset_group="defi",
     data_type="oracle_feeds",
     schema_version="oracle_feeds.v1",
-    # Pyth Hermes ~per slot (~400ms) on Solana; Chainlink aggregator rounds ~heartbeat (1h) + deviation; model ~1440 (1-min) rows/day/cell.
+    # ESTIMATE — no oracle_feeds data_type in raw_tick GCS as of 2026-05-12.
+    # Pyth Hermes ~per slot (~400ms) on Solana; Chainlink ~heartbeat (1h) + deviation;
+    # model ~1440 (1-min) rows/day/cell.
     default_row_count_per_day=7_200,  # 1440 * 5 oracle-feed cells
     default_shard_key_axes=("chain", "oracle_feed"),
     default_partition_template=_CHAIN_ORACLE_PARTITION,
     archetypes_consuming=frozenset({"carry_staked_basis"}),
     pipeline_stages_touching=("mtds_read", "features", "strategy"),
-    description="Pyth Hermes batches + Chainlink aggregator rounds; the mark-price oracle input for carry_staked_basis.",
+    description="Pyth Hermes batches + Chainlink aggregator rounds; mark-price oracle input for carry_staked_basis.",
 )
 
 SPECS: Final[tuple[SyntheticGeneratorSpec, ...]] = (
