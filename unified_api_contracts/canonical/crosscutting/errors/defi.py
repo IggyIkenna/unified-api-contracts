@@ -26,9 +26,12 @@ class DefiAlertType(StrEnum):
 class DefiErrorCode:
     """Known DeFi error codes for structured error classification.
 
-    These codes are used by UDEI connectors (aave.py, etc.) to classify
-    on-chain revert reasons into structured error codes. Execution-service
-    routes on the code prefix (FAIL/RETRY/SKIP) via classify_venue_error().
+    These codes are used by execution-service DeFi connectors (e.g.
+    ``protocols/aave.py``) to classify on-chain revert reasons into structured
+    error codes. Execution-service routes on the code prefix (FAIL/RETRY/SKIP)
+    via ``classify_venue_error()``. (Docstring corrected 2026-05-12 per slot 8
+    execution audit EX-6 — the prior "UDEI connectors" reference predated the
+    UDEI → execution-service merge.)
 
     Each constant aligns with the aave_v3 venue error classifications in
     VENUE_ERRORS_DEFI below.
