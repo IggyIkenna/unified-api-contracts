@@ -54,6 +54,23 @@ class AlertCode(StrEnum):
     DEFI_RATE_DEVIATION = "DEFI_RATE_DEVIATION"
     DEFI_TX_SIMULATION_FAILED = "DEFI_TX_SIMULATION_FAILED"
 
+    # ── DeFi Family 1/2 recursive-borrow archetype (added 2026-05-12 per Phase 8 design)
+    DEFI_LIQUIDATION_IMMINENT = "DEFI_LIQUIDATION_IMMINENT"
+    """HF < 1.05 (configurable per archetype); kill-switch fires immediate flash-close.
+    Distinct from DEFI_POSITION_LIQUIDATED which is post-liquidation telemetry."""
+    DEFI_CROSS_VENUE_DELTA_DRIFT = "DEFI_CROSS_VENUE_DELTA_DRIFT"
+    """PerpHedgeSizer band breach > 5% of E_actual sustained > 60s without rebalance
+    landing. Auto-rebalance + alert per Family 2 design."""
+    DEFI_PERP_VENUE_OUTAGE = "DEFI_PERP_VENUE_OUTAGE"
+    """3+ consecutive HL_RATE_LIMITED / bridge-halt / WS-disconnect over 60s window.
+    Failover decision tree per Family 2 PERP_VENUE_OUTAGE handling."""
+    DEFI_ORACLE_STALE_PAUSE = "DEFI_ORACLE_STALE_PAUSE"
+    """Chainlink heartbeat > 24h on a price feed in active recursive loop. New opens
+    paused; existing positions evaluated against widened HF threshold (+0.10 buffer)."""
+    DEFI_RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED = "DEFI_RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED"
+    """Persistent driver halts mid-loop after exceeding gas_budget_eth. Kill-switch
+    fires partial-state recovery per Phase 8 mid-loop recovery wiring."""
+
     # ── Margin ladder (PBM-canonical, thresholds from UAC LIQUIDATION_PARAMS_REGISTRY)
     MARGIN_LIQUIDATION = "MARGIN_LIQUIDATION"
     MARGIN_CRITICAL = "MARGIN_CRITICAL"

@@ -29,7 +29,7 @@ with the 5 canonical SSOTs:
   ``KillSwitchScope.ARCHETYPE`` for every rule in this module (the rules are
   ``scope=PER_ARCHETYPE``); downstream kill-switch fires when consequence is
   ``BLOCK`` + ``triggers_kill_switch=True``.
-* **Circuit-breaker action set** — aggregated BLOCK rate ≥ threshold across
+* **Circuit-breaker action set** — aggregated BLOCK rate >= threshold across
   archetype instructions may transition the venue circuit-breaker per the
   ``RISK_TO_BREAKER_ESCALATION_MAP`` (declared separately in
   ``circuit_breaker.py``).
@@ -48,7 +48,7 @@ Consequence → severity mapping (per the seam diagram):
 
 Coverage discipline (per Phase 2.A done-definition + plan Scope item 2):
 
-* Each cutover archetype gets ≥10 rules across the axes — position size,
+* Each cutover archetype gets >=10 rules across the axes — position size,
   drawdown, leverage, concentration, correlation, slippage budget, funding
   cost ceiling (ARBITRAGE_PRICE_DISPERSION-specific), gas budget
   (CARRY_STAKED_BASIS-specific since it's on-chain), capital-at-risk
@@ -78,7 +78,6 @@ from ...canonical.crosscutting.risk_rule import (
     RiskRuleScope,
     SlippageBudgetTrigger,
 )
-
 
 # ---------------------------------------------------------------------------
 # CARRY_STAKED_BASIS — LST-yield carry archetype (Solana on-chain).
@@ -446,6 +445,33 @@ Each rule's ``scope`` is ``PER_ARCHETYPE`` and ``applies_to`` is one of:
 """
 
 
+# Per-archetype concentration multiplier (added 2026-05-12 per defi_recursive_borrow
+# Phase 8 design). Higher multipliers penalise concentration in (chain x asset x
+# protocol). Risk-and-exposure-service computes
+# ``max_position_usd_per_archetype = base_cap_usd / multiplier`` — recursive variants
+# get HALF the headroom of simple variants on the same (chain x asset x protocol)
+# tuple. Wires into existing ``_HYPERLIQUID_RULES`` proposal-time veto.
+ARCHETYPE_CONCENTRATION_MULTIPLIER: Final[dict[str, Decimal]] = {
+    "CARRY_STAKED_BASIS": Decimal("1.0"),
+    "CARRY_BASIS_PERP": Decimal("1.0"),
+    "CARRY_BASIS_DATED": Decimal("1.0"),
+    "ARBITRAGE_PRICE_DISPERSION": Decimal("1.0"),
+    "ML_DIRECTIONAL_CONTINUOUS": Decimal("1.0"),
+    # Recursive-borrow archetypes (Family 0/1/2) — 1.5x penalises concentration
+    # because liquidation-cascade risk in same (chain x asset x protocol) compounds.
+    "CARRY_RECURSIVE_STAKED": Decimal("1.5"),
+    "CARRY_RECURSIVE_BORROW_LENDING_ONLY": Decimal("1.5"),
+    "CARRY_RECURSIVE_BORROW_PERP_HEDGED": Decimal("1.5"),
+}
+
+
+def get_archetype_concentration_multiplier(archetype: str) -> Decimal:
+    """Return concentration-cap multiplier for archetype (default 1.0 if unknown)."""
+    return ARCHETYPE_CONCENTRATION_MULTIPLIER.get(archetype, Decimal("1.0"))
+
+
 __all__ = [
+    "ARCHETYPE_CONCENTRATION_MULTIPLIER",
     "ARCHETYPE_RULES",
+    "get_archetype_concentration_multiplier",
 ]

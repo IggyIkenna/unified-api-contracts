@@ -319,6 +319,48 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         runbook_doc=_runbook("defi_rate_deviation"),
         description="Oracle/DEX rate divergence — page; possible MEV / oracle stale.",
     ),
+    # ── T1 CRITICAL — DeFi Family 1/2 recursive-borrow archetype (added 2026-05-12)
+    AlertRule(
+        code=AlertCode.DEFI_LIQUIDATION_IMMINENT,
+        event_pattern="DEFI_LIQUIDATION_IMMINENT",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("defi_liquidation_imminent"),
+        threshold_key="defi_health_factor_critical",
+        description="HF < 1.05 (pre-liquidation). LiquidationProximityCircuit fires immediate flash-close.",
+    ),
+    AlertRule(
+        code=AlertCode.DEFI_PERP_VENUE_OUTAGE,
+        event_pattern="DEFI_PERP_VENUE_OUTAGE",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("defi_perp_venue_outage"),
+        description="HL bridge halt / Bybit rate-limit / WS-disconnect sustained > 60s; failover decision tree.",
+    ),
+    AlertRule(
+        code=AlertCode.DEFI_ORACLE_STALE_PAUSE,
+        event_pattern="DEFI_ORACLE_STALE_PAUSE",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("defi_oracle_stale_pause"),
+        description="Chainlink heartbeat > 24h on active feed; pause new opens; widen HF threshold +0.10.",
+    ),
+    AlertRule(
+        code=AlertCode.DEFI_RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED,
+        event_pattern="DEFI_RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("defi_recursive_loop_gas_budget_exceeded"),
+        description="Persistent driver halted mid-loop; partial-state recovery + mid-loop unwind.",
+    ),
+    AlertRule(
+        code=AlertCode.DEFI_CROSS_VENUE_DELTA_DRIFT,
+        event_pattern="DEFI_CROSS_VENUE_DELTA_DRIFT",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("defi_cross_venue_delta_drift"),
+        description="PerpHedgeSizer band breach > 5% of E_actual; auto-rebalance + alert.",
+    ),
     # ── T1 CRITICAL — margin ────────────────────────────────────────────────
     AlertRule(
         code=AlertCode.MARGIN_LIQUIDATION,

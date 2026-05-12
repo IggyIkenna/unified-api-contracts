@@ -48,6 +48,42 @@ class DefiErrorCode:
     BORROW_CAP_EXCEEDED = "BORROW_CAP_EXCEEDED"
     SUPPLY_CAP_EXCEEDED = "SUPPLY_CAP_EXCEEDED"
 
+    # Recursive-loop orchestrator codes (added 2026-05-12 per Phase 5 design;
+    # routes via FAIL/RETRY/SKIP-prefix dispatcher)
+    RECURSIVE_LOOP_ABORTED_HF = "RECURSIVE_LOOP_ABORTED_HF"
+    """Pre-iter HF gate triggered; SKIP — caller reports partial result."""
+    RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED = "RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED"
+    """Gas-budget gate triggered mid-loop; SKIP — caller reports partial result."""
+    RECURSIVE_LOOP_SLIPPAGE_REVERT = "RECURSIVE_LOOP_SLIPPAGE_REVERT"
+    """Cross-asset swap exceeded slippage_tolerance; RETRY once with widened slippage."""
+    RECURSIVE_LOOP_FLASH_RECEIVER_NOT_FOUND = "RECURSIVE_LOOP_FLASH_RECEIVER_NOT_FOUND"
+    """UAC flash_loan_receiver_for(...) returned None; FAIL — config bug, no retry."""
+    RECURSIVE_LOOP_FLASH_REPAYMENT_INSUFFICIENT = "RECURSIVE_LOOP_FLASH_REPAYMENT_INSUFFICIENT"
+    """Receiver's InsufficientRepaymentBalance revert; FAIL — alpha decay or oracle drift."""
+    RECURSIVE_LOOP_FLASH_ACTION_FAILED = "RECURSIVE_LOOP_FLASH_ACTION_FAILED"
+    """Receiver's ActionFailed(idx, ret) revert; FAIL — idx-encoded for forensic."""
+    RECURSIVE_LOOP_PARTIAL_OPEN_NO_UNWIND_FUNDS = "RECURSIVE_LOOP_PARTIAL_OPEN_NO_UNWIND_FUNDS"
+    """Persistent driver aborted mid-loop; residue cannot self-unwind (HF too tight);
+    FAIL — routes to alerting LIQUIDATION_IMMINENT per Phase 8."""
+
+    # Hyperliquid LIVE perp connector codes (added 2026-05-12 per Phase 6 design)
+    HL_INSUFFICIENT_MARGIN = "HL_INSUFFICIENT_MARGIN"
+    """HL place_order rejected for insufficient USDC margin; FAIL — caller decides."""
+    HL_REDUCE_ONLY_VIOLATION = "HL_REDUCE_ONLY_VIOLATION"
+    """reduce_only=True on a size-increasing order; FAIL — caller-side bug."""
+    HL_INVALID_TIF = "HL_INVALID_TIF"
+    """TimeInForce mismatch (HL accepts Alo / Ioc / Gtc only); FAIL."""
+    HL_RATE_LIMITED = "HL_RATE_LIMITED"
+    """429 or 1-req/s breach; RETRY with exponential backoff (1s base)."""
+    HL_NONCE_TOO_LOW = "HL_NONCE_TOO_LOW"
+    """EIP-712 nonce race; RETRY after re-reading latest nonce from /info."""
+    HL_SIGNATURE_INVALID = "HL_SIGNATURE_INVALID"
+    """Wallet config / chainId drift; FAIL — do NOT retry; alert operator."""
+    HL_POSITION_CLOSED = "HL_POSITION_CLOSED"
+    """Auto-liquidation race; SKIP — cancel/modify against ghost position."""
+    HL_FILL_CONFIRMATION_MISSED = "HL_FILL_CONFIRMATION_MISSED"
+    """WS fill arrived > timeout; RETRY — re-query /info userFills before declaring lost."""
+
 
 VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
     "balancer": [
