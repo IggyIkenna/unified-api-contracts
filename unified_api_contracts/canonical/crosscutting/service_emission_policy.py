@@ -295,6 +295,34 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # Partial upstream source coverage is normal. → PARTIAL_OK.
     ("features-calendar-service", "time_features"): ServiceEmissionPolicy.NAN_FILL,
     ("features-calendar-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
+    #
+    # features-commodity-service — 6 entries (Phase 6.5 extension, 2026-05-12).
+    # Source: FACTOR_REGISTRY in features_service/commodity/engine/factors/__init__.py
+    # (6 distinct factor_groups).
+    #
+    # storage_alpha / crude_storage_alpha: StorageDeviationFactor — OHLCV-derived
+    # rolling storage deviation signals. Tree-based ML consumer NaN-fills natively;
+    # short gaps on holidays/weekends acceptable. → NAN_FILL.
+    #
+    # price_momentum: PriceMomentumFactor — OHLCV-derived rolling price momentum.
+    # Same ML-consumer NaN-fill tolerance as vol_30d anchor (operator-msg-10). → NAN_FILL.
+    #
+    # weather_delta: DegreeDayFactor — weather/seasonal degree-day signal.
+    # Sourced from NOAA/weather APIs; legitimate gaps on weekends + data-release
+    # cadence gaps are expected. Rolling-window aggregate. → PARTIAL_OK.
+    #
+    # cot_positioning: ManagedMoneyFactor — CFTC Commitment of Traders weekly data.
+    # Weekly release cadence means most daily requests hit a gap. Expected source
+    # gap is normal; downstream fills with last-known. → PARTIAL_OK.
+    #
+    # rig_count: RigCountFactor — Baker Hughes weekly rig count release.
+    # Same weekly-cadence reasoning as cot_positioning. → PARTIAL_OK.
+    ("features-commodity-service", "storage_alpha"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-commodity-service", "crude_storage_alpha"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-commodity-service", "price_momentum"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-commodity-service", "weather_delta"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-commodity-service", "cot_positioning"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-commodity-service", "rig_count"): ServiceEmissionPolicy.PARTIAL_OK,
 }
 """Per-(service, output_data_type) emission policy seed.
 
