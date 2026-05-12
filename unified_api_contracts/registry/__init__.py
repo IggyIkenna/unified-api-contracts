@@ -141,6 +141,7 @@ from .defi_reserve_params import (
     get_emode_params,
     get_reserve_params,
 )
+from .defi_venues import to_canonical_venue
 from .dex_router_addresses import (
     UNISWAP_SWAP_ROUTER_BY_CHAIN,
     UNISWAP_V3_FACTORY_BY_CHAIN,
@@ -814,6 +815,7 @@ __all__ = [
     "resolve_solana_mint",
     "resolve_venue_context",
     "time_budget_to_block_offset",
+    "to_canonical_venue",
     "token_matches_major_assets",
     "validate_instruction",
     "validate_mode_env_auth",

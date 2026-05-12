@@ -37,7 +37,7 @@ DEFI_VENUE_TO_PROTOCOL: dict[str, tuple[str, str | None]] = {
     "AERODROMEV3-BASE": ("aerodrome_v3", "BASE"),
     "VELODROMEV2-OPTIMISM": ("velodrome_v2", "OPTIMISM"),
     "CAMELOTV3-ARBITRUM": ("camelot_v3", "ARBITRUM"),
-    "TRADERJOEV2-AVALANCHE": ("trader_joe_v2", "AVALANCHE"),
+    "TRADER_JOEV2-AVALANCHE": ("trader_joe_v2", "AVALANCHE"),
     # ── Additional perps / lending ────────────────────────────────
     "GMX-ARBITRUM": ("gmx", "ARBITRUM"),
     "GMX-AVALANCHE": ("gmx", "AVALANCHE"),

@@ -263,10 +263,10 @@ from .sports.betting import (
     BetSide,
     CommissionModel,
 )
+from .sports.bookmaker_accessors import get_expected_bookmakers
 from .sports.bookmaker_registry import (
     BOOKMAKER_REGISTRY,
     BookmakerRegistry,
-    get_expected_bookmakers,
 )
 from .sports.errors import (
     BetRejectedError,

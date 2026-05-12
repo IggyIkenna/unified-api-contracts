@@ -268,7 +268,26 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "JITORESTAKING": "JITORESTAKING-SOLANA",
     "JITO_RESTAKING": "JITORESTAKING-SOLANA",
     "RADIANT": "RADIANT-ARBITRUM",
+    # Phase 1D case-folding drift fixes (cross_asset_group_catalogue_audit DF-4/DF-17)
+    "BLAZESTAKE": "SOLBLAZE-SOLANA",  # DF-4: _defi_lst.py uses BLAZESTAKE; canonical is SOLBLAZE
+    "BLAZESTAKE-SOLANA": "SOLBLAZE-SOLANA",  # DF-4: full-form variant
+    "TRADERJOEV2-AVALANCHE": "TRADER_JOEV2-AVALANCHE",  # DF-17: protocol registry had no-underscore form
 }
+
+
+def to_canonical_venue(venue_id: str) -> str:
+    """Return the canonical uppercase venue ID, resolving known DeFi legacy aliases.
+
+    For CeFi and sports venues this is equivalent to ``venue_id.upper()``.
+    For DeFi venues it also resolves legacy bare-name and underscore forms
+    (e.g. ``aavev3`` → ``AAVEV3-ETHEREUM``, ``TRADERJOEV2-AVALANCHE`` →
+    ``TRADER_JOEV2-AVALANCHE``) via ``LEGACY_DEFI_VENUE_ALIASES``.
+
+    Cross-asset-group SSOT for venue-id normalisation.
+    SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1D.
+    """
+    upper = venue_id.upper()
+    return LEGACY_DEFI_VENUE_ALIASES.get(upper, upper)
 
 
 # ---------------------------------------------------------------------------
@@ -479,4 +498,5 @@ __all__ = [
     "DEFI_VENUE_PHASE",
     "LEGACY_DEFI_VENUE_ALIASES",
     "MTDS_DEFI_VENUES",
+    "to_canonical_venue",
 ]
