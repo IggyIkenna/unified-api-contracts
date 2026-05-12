@@ -143,6 +143,16 @@ class CircuitBreakerId(StrEnum):
     CLOCK_SKEW_MS = "CLOCK_SKEW_MS"
     """Local clock vs venue ts skew >= threshold ms (timestamp-mismatch correctness risk)."""
 
+    # ── Stablecoin depeg ladder (D.1 — risk plan Phase D) ─────────────────────
+    STABLECOIN_DEPEG_WARNING = "STABLECOIN_DEPEG_WARNING"
+    """Stablecoin peg deviation ≥ 100bps (standard) / 50bps (synthetic: USDE/CRVUSD/FRAX) — BLOCK_NEW."""
+    STABLECOIN_DEPEG_SMALL = "STABLECOIN_DEPEG_SMALL"
+    """Stablecoin peg deviation ≥ 300bps (standard) / 150bps (synthetic) — SCALE_DOWN."""
+    STABLECOIN_DEPEG_MODERATE = "STABLECOIN_DEPEG_MODERATE"
+    """Stablecoin peg deviation ≥ 500bps (standard) / 250bps (synthetic) — CANCEL_OPEN."""
+    STABLECOIN_DEPEG_CATASTROPHIC = "STABLECOIN_DEPEG_CATASTROPHIC"
+    """Stablecoin peg deviation ≥ 1000bps (standard) / 500bps (synthetic) — KILL_ALL + MANUAL_UNKILL."""
+
 
 class BreakerScope(StrEnum):
     """Blast-radius scope for a breaker.
@@ -165,6 +175,8 @@ class BreakerScope(StrEnum):
     PER_ARCHETYPE = "PER_ARCHETYPE"
     PER_ACCOUNT = "PER_ACCOUNT"
     PER_ASSET_GROUP = "PER_ASSET_GROUP"
+    PER_STABLE = "PER_STABLE"
+    """Per-stablecoin scope — ``applies_to`` is the stable symbol (e.g. ``"USDC"``)."""
     GLOBAL = "GLOBAL"
 
 
