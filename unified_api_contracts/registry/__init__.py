@@ -141,6 +141,7 @@ from .defi_reserve_params import (
     get_emode_params,
     get_reserve_params,
 )
+from .defi_venues import to_canonical_venue
 from .dex_router_addresses import (
     UNISWAP_SWAP_ROUTER_BY_CHAIN,
     UNISWAP_V3_FACTORY_BY_CHAIN,
@@ -446,7 +447,7 @@ from .venue_context import (
     resolve_venue_context,
 )
 from .venue_instrument_config import ExchangeInstrumentConfig
-from .venue_mapping import DataTypeConfig, VenueMapping
+from .venue_mapping import DataTypeConfig, LST_MARGIN_VENUES, VenueMapping
 from .venue_trading_calendar import (
     clip_dates_to_trading_days,
     get_us_market_holidays,
@@ -571,6 +572,7 @@ __all__ = [
     "LIVESCOREBET",
     "LOWVIG",
     "LST_BASE_ASSET",
+    "LST_MARGIN_VENUES",
     "LST_TOKEN_GENESIS",
     "LST_VENUE_TO_TOKENS",
     "MAINNET_CHAIN_IDS",
@@ -814,6 +816,7 @@ __all__ = [
     "resolve_solana_mint",
     "resolve_venue_context",
     "time_budget_to_block_offset",
+    "to_canonical_venue",
     "token_matches_major_assets",
     "validate_instruction",
     "validate_mode_env_auth",

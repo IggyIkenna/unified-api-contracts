@@ -263,10 +263,10 @@ from .sports.betting import (
     BetSide,
     CommissionModel,
 )
+from .sports.bookmaker_accessors import get_expected_bookmakers
 from .sports.bookmaker_registry import (
     BOOKMAKER_REGISTRY,
     BookmakerRegistry,
-    get_expected_bookmakers,
 )
 from .sports.errors import (
     BetRejectedError,
@@ -279,6 +279,15 @@ from .sports.errors import (
 )
 from .sports.events import CanonicalFixtureEvent
 from .sports.fixture_stats import CanonicalFixtureStatsDetail
+from .sports.fixture_status import (
+    AF_COMPLETED_CODES,
+    AF_STATUS_SHORT_MAP,
+    COMPLETED_STATUSES,
+    IN_PROGRESS_STATUSES,
+    MatchStatus,
+    PRE_MATCH_STATUSES,
+    TERMINAL_STATUSES,
+)
 from .sports.injury import CanonicalInjury
 from .sports.lineup import (
     CanonicalLineup,
@@ -298,11 +307,17 @@ from .sports.progressive import (
 )
 
 __all__ = [
+    "AF_COMPLETED_CODES",
+    "AF_STATUS_SHORT_MAP",
     "BOOKMAKER_REGISTRY",
+    "COMPLETED_STATUSES",
+    "IN_PROGRESS_STATUSES",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
+    "PRE_MATCH_STATUSES",
     "RISK_TYPE_CATEGORIES",
     "SHARE_CLASS_BASE_ASSETS",
+    "TERMINAL_STATUSES",
     "VENUE_EXECUTION_REGISTRY",
     "AccountVerificationLevel",
     "AggregatedPosition",
@@ -442,6 +457,7 @@ __all__ = [
     "MarketState",
     "MarketStatus",
     "MarketTrade",
+    "MatchStatus",
     "MatchPeriod",
     "MultiLegInstrument",
     "NetClearingInstruction",

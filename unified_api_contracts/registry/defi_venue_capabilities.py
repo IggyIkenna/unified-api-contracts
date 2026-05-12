@@ -113,6 +113,9 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "MORPHO-POLYGON": {"lending_indices": "2024-06-01", "oracle_prices": "2024-06-01"},
     "FLUID-ETHEREUM": {"lending_indices": "2024-02-27", "oracle_prices": "2024-02-27"},
     "SPARK-ETHEREUM": {"lending_indices": "2024-01-01", "oracle_prices": "2024-01-01"},
+    # cross_asset Phase 1B(b) — Radiant UAC back-fill (was orphan adapter, now declared)
+    "RADIANT-ARBITRUM": {"lending_indices": "2022-07-25", "oracle_prices": "2022-07-25"},
+    "RADIANT-BSC": {"lending_indices": "2022-09-21", "oracle_prices": "2022-09-21"},
     # ── DeFi — Additional DEX protocols (dex_swaps + dex_pools only) ──
     "SUSHISWAPV3-ETHEREUM": {"dex_swaps": "2021-11-01", "dex_pools": "2021-11-01"},
     "SUSHISWAPV3-BASE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
@@ -127,6 +130,8 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "VELODROMEV2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
     "TRADER_JOEV2-AVALANCHE": {"dex_swaps": "2022-01-01", "dex_pools": "2022-01-01"},
     # ── DeFi — Perpetual DEXes (funding + liquidations) ──
+    # axis_override = "cefi" — CLOB-style perp funding captured via MTDS
+    # perp_funding_handler. See DEFI_VENUE_AXIS_OVERRIDES in defi_venues.py.
     "GMX-ARBITRUM": {"perp_funding": "2021-09-01", "liquidations": "2021-09-01", "oracle_prices": "2021-09-01"},
     "GMX-AVALANCHE": {"perp_funding": "2021-12-31", "liquidations": "2021-12-31", "oracle_prices": "2021-12-31"},
     # ── DeFi — Solana ──

@@ -53,6 +53,9 @@ class VenueMapping:
             "bitget-futures",
             "kraken",
             "cryptofacilities",
+            # 2026-05-12: Lighter (zkSync L2) — Tardis coverage from 2026-04-17.
+            # Pre-2026-04-17 falls through to REST /candles in MTDS adapter.
+            "lighter-zksync",
         ]
     )
 
@@ -85,7 +88,14 @@ class VenueMapping:
     # like a centralized exchange). Add new DEX perps to BOTH this list AND
     # VENUES_BY_ASSET_GROUP['cefi'] in market_data_categories.py.
     all_cefi_onchain_clob_venues: list[str] = field(
-        default_factory=lambda: ["HYPERLIQUID", "ASTER", "PACIFICA-SOLANA", "EXTENDED-STARKNET", "LIGHTER-ZKSYNC"]
+        default_factory=lambda: [
+            "HYPERLIQUID",
+            "ASTER",
+            "PACIFICA-SOLANA",
+            "EXTENDED-STARKNET",
+            "LIGHTER-ZKSYNC",
+            "DRIFT",  # Drift Protocol (Solana) — S3 archive + Data API adapter
+        ]
     )
 
     # All exchanges (computed from above - no duplication)
@@ -165,6 +175,9 @@ class VenueMapping:
             "bitget-futures": "BITGET-FUTURES",
             "kraken": "KRAKEN-SPOT",
             "cryptofacilities": "KRAKEN-FUTURES",
+            # 2026-05-12 — Lighter (Tardis coverage from 2026-04-17).
+            # MTDS routes pre-2026-04-17 dates to REST /candles; post to Tardis.
+            "lighter-zksync": "LIGHTER-ZKSYNC",
         }
     )
 
@@ -179,7 +192,8 @@ class VenueMapping:
             "ASTER": "aster_api",
             "PACIFICA-SOLANA": "pacifica_api",
             "EXTENDED-STARKNET": "extended_api",
-            "LIGHTER-ZKSYNC": "lighter_api",
+            "LIGHTER-ZKSYNC": "lighter_api",  # pre-2026-04-17; post routes to Tardis
+            "DRIFT": "drift_api",  # S3 archive (2022-2025) + Data API (2025-present)
             # DeFi venues — canonical PROTOCOL-CHAIN format
             "UNISWAPV2-ETHEREUM": "the_graph",
             "UNISWAPV3-ETHEREUM": "the_graph",
@@ -213,11 +227,14 @@ class VenueMapping:
             "COINBASE-SPOT": "2020-01-01",
             # CEFI Tardis Tier-3 (2026-05-01) — verified vs Tardis availableSince.
             "BITFINEX-SPOT": "2020-01-01",
-            "BITFINEX-FUTURES": "2020-01-01",
+            # Tardis bitfinex-derivatives available from 2019-12-01; symbols
+            # reliable from 2020-05-27 (pre-filter emits EXPECTED_PRE_SOURCE_COVERAGE_START).
+            "BITFINEX-FUTURES": "2019-12-01",
             "BITGET-SPOT": "2024-11-08",
             "BITGET-FUTURES": "2024-11-08",
             "KRAKEN-SPOT": "2020-01-01",
-            "KRAKEN-FUTURES": "2020-01-01",
+            # Tardis cryptofacilities (Kraken Futures) available from 2019-03-30.
+            "KRAKEN-FUTURES": "2019-03-30",
             # CEFI on-chain CLOBs. HYPERLIQUID earliest = book_snapshot_5 S3
             # archive 2023-04-15; see VENUE_DATA_TYPE_CAPABILITIES for per-
             # data-type starts (trades only from 2025-03-22, no liquidations).
@@ -286,6 +303,9 @@ class VenueMapping:
             "EIGENLAYER-ETHEREUM": "2024-09-17",  # EIGEN token listing date (earliest instrument)
             "SUSHISWAP-ARBITRUM": "2023-03-30",  # Earliest pool createdAtTimestamp from subgraph
             # DeFi - Solana protocols
+            # DRIFT canonical venue string (market_data_categories.py uses "DRIFT" not "DRIFT-SOLANA").
+            # S3 archive data: 2022-01-01. DRIFT-SOLANA kept as an alias start date.
+            "DRIFT": "2022-01-01",
             "DRIFT-SOLANA": "2022-11-04",
             "ORCA-SOLANA": "2023-12-29",
             "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM V4 mainnet launch
@@ -694,6 +714,12 @@ class VenueMapping:
             ("HUOBI-SPOT", "SPOT_PAIR"): "huobi",
             ("HUOBI-FUTURES", "PERPETUAL"): "huobi-dm",
             ("HUOBI-FUTURES", "FUTURE"): "huobi-dm",
+            # DEX perps with Tardis routing (2026-05-12)
+            ("LIGHTER-ZKSYNC", "PERPETUAL"): "lighter-zksync",
+            ("KRAKEN-FUTURES", "PERPETUAL"): "cryptofacilities",
+            ("KRAKEN-FUTURES", "FUTURE"): "cryptofacilities",
+            ("BITFINEX-FUTURES", "PERPETUAL"): "bitfinex-derivatives",
+            ("BITFINEX-FUTURES", "FUTURE"): "bitfinex-derivatives",
         }
     )
 
@@ -818,3 +844,17 @@ class DataTypeConfig:
 # ExchangeInstrumentConfig moved to venue_instrument_config.py 2026-05-06 to
 # keep venue_mapping.py under the 900-line ceiling. Re-exported via
 # registry/__init__.py and the top-level package for consumer-import parity.
+
+
+# ---------------------------------------------------------------------------
+# LST margin collateral — venues that accept liquid staking tokens as margin
+# 2026-05-12 (dex_perp_and_venue_data_expansion plan, Phase 1)
+# ---------------------------------------------------------------------------
+# Confirmed: Bybit UTA (stETH), Deribit (stETH, 7.5% haircut), Drift (JitoSOL + mSOL).
+# OKX, Binance: pending live API verification (stETH status unconfirmed).
+# Reference: codex/09-strategy/architecture-v2/archetypes/carry-staked-basis.md
+LST_MARGIN_VENUES: dict[str, list[str]] = {
+    "BYBIT": ["stETH"],
+    "DERIBIT": ["stETH"],
+    "DRIFT": ["JitoSOL", "mSOL"],
+}
