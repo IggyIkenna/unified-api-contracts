@@ -518,6 +518,12 @@ class CanonicalFixture(BaseModel):
     away_passes_total: int | None = None
     home_passes_accuracy: int | None = None
     away_passes_accuracy: int | None = None
+    match_end_time: datetime | None = None
+    """UTC timestamp when the match ended (derived from SFI max timer_seconds or freeze-detect)."""
+    announced_at: datetime | None = None
+    """UTC timestamp when this fixture became publicly known (API Football: kickoff_utc - 7 days)."""
+    report_time: datetime | None = None
+    """UTC timestamp when full post-match stats are expected (match_end_time + source p95 lag)."""
 
     @classmethod
     def from_raw(cls, data: dict[str, str | int | float | bool | None]) -> Self:

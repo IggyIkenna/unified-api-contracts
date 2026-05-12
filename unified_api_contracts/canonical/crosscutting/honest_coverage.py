@@ -199,6 +199,17 @@ class EmptyConfirmedReason(StrEnum):
 
     Plan: ``expected_unattempted_propagation_chain_2026_05_12.md`` Phases 1-4."""
 
+    EXPECTED_FIXTURE_POSTPONED = "EXPECTED_FIXTURE_POSTPONED"
+    """Sports fixture status PST (postponed): fixture postponed before kickoff with no rescheduled date yet
+    (or rescheduled date outside the current pipeline window). Source: API Football ``status.short == "PST"``.
+    Instruments-service emits this at the fixture-day grain so downstream features don't treat absence as a
+    fetch failure."""
+
+    EXPECTED_FIXTURE_CANCELLED = "EXPECTED_FIXTURE_CANCELLED"
+    """Sports fixture status CANC (cancelled): the fixture was cancelled outright (no reschedule). Source: API Football
+    ``status.short == "CANC"``. Instruments-service emits this so consumers can distinguish cancelled fixtures from
+    data-fetch failures. Pair with ``EXPECTED_FIXTURE_POSTPONED``."""
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 

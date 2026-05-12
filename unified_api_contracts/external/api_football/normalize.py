@@ -7,7 +7,7 @@ Uses _d, _to_decimal, _ts_ms_to_datetime from normalize_utils._helpers.
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from unified_api_contracts.canonical.domain import CanonicalBetMarket, CanonicalOdds
 from unified_api_contracts.canonical.domain.sports import (
@@ -262,6 +262,7 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
         away_passes_total=None,
         home_passes_accuracy=None,
         away_passes_accuracy=None,
+        announced_at=kickoff_utc - timedelta(days=7),
     )
 
 
