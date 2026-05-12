@@ -2408,7 +2408,7 @@ _CROSS_PROVIDER_ALIASES: dict[str, str] = {
     # MLS
     "Saint Louis City SC": "ST_LOUIS_CITY",
     # API-Football Turkish variants (diacritics differ from OddsPapi)
-    "Kasımpaşa": "KASIMPASA",  # noqa: RUF001 - Turkish dotless-i is intentional
+    "Kasımpaşa": "KASIMPASA",
     "Gençlerbirliği S.K.": "GENCLERBIRLIGI",
     "Başakşehir": "ISTANBUL_BASAKSEHIR",
     "Eyüpspor": "EYUPSPOR",

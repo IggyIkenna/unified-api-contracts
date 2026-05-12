@@ -395,7 +395,7 @@ def get_instruments_schema() -> SchemaDefinition:
 # (extracted to keep this file under the 900-line cap). Re-exported here so
 # callers continue to use ``from unified_api_contracts.internal.domain.instruments
 # import INSTRUMENTS_PARQUET_SCHEMA``.
-from ._instruments_parquet_schema import INSTRUMENTS_PARQUET_SCHEMA  # noqa: E402  co-located re-export
+from ._instruments_parquet_schema import INSTRUMENTS_PARQUET_SCHEMA
 
 SCHEMA_METADATA: dict[str, str | list[str]] = {
     "version": "1.0",

@@ -16,15 +16,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
 import yaml
 
-
-YAML_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "config"
-    / "testnet_contracts.yaml"
-)
+YAML_PATH = Path(__file__).resolve().parents[3] / "config" / "testnet_contracts.yaml"
 
 
 def _load() -> dict[int, dict[str, dict[str, str]]]:
@@ -108,9 +102,7 @@ def test_all_testnet_chains_have_flash_loan_receiver() -> None:
     for chain_id in evm_testnets:
         assert chain_id in data, f"missing chain {chain_id}"
         assert "aave_v3" in data[chain_id], f"missing aave_v3 on {chain_id}"
-        assert "flash_loan_receiver" in data[chain_id]["aave_v3"], (
-            f"missing flash_loan_receiver on chain {chain_id}"
-        )
+        assert "flash_loan_receiver" in data[chain_id]["aave_v3"], f"missing flash_loan_receiver on chain {chain_id}"
         flr = data[chain_id]["aave_v3"]["flash_loan_receiver"]
         assert flr.startswith("0x"), f"flash_loan_receiver on chain {chain_id} not 0x-prefixed"
         assert len(flr) == 42, f"flash_loan_receiver on chain {chain_id} not 20-byte EVM addr"
@@ -126,9 +118,7 @@ def test_evm_addresses_are_well_formed() -> None:
         for protocol, contracts in data[chain_id].items():
             for name, value in contracts.items():
                 if isinstance(value, str) and value.startswith("0x"):
-                    assert len(value) == 42, (
-                        f"chain={chain_id} protocol={protocol} {name}={value!r} not 42 chars"
-                    )
+                    assert len(value) == 42, f"chain={chain_id} protocol={protocol} {name}={value!r} not 42 chars"
 
 
 def test_six_chains_covered_for_may23_cutover() -> None:

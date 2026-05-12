@@ -36,7 +36,7 @@ class SubscriptionType(StrEnum):
     SIGNALS_IN = "signals_in"
 
 
-class ExclusiveLockViolation(Exception):  # noqa: N818 — domain name; "Violation" is intentional in DART spec
+class ExclusiveLockViolation(Exception):
     """Raised when a DART_EXCLUSIVE create would collide with an existing holder.
 
     Carries enough context for HTTP layers to convert into a 409 with a

@@ -216,6 +216,9 @@ from unified_api_contracts.internal.domain.defi import (
     AaveV3ReserveData,
     AaveV3UserAccountData,
     AaveV3UserReserveData,
+    AggregateSignal,
+    AVSRewardComponent,
+    BacktestFidelityReport,
     CompoundV3MarketInfo,
     CompoundV3UserPosition,
     CurveSwapParams,
@@ -240,9 +243,6 @@ from unified_api_contracts.internal.domain.defi import (
     FluidBorrowParams,
     FluidDepositParams,
     FluidRepayParams,
-    AVSRewardComponent,
-    AggregateSignal,
-    BacktestFidelityReport,
     GasCostAction,
     GasCostEstimate,
     GasCostRecord,
@@ -252,16 +252,6 @@ from unified_api_contracts.internal.domain.defi import (
     LegKind,
     LendingMarketState,
     LendingRate,
-    OperatorSignOffStatus,
-    PerLegAttribution,
-    PerPoolShapeReconciliation,
-    ProtocolIRMShape,
-    SignOffReport,
-    SlashingEvent,
-    SlashingReason,
-    StakingYieldDecomposition,
-    TenderlyReconciliationReport,
-    compute_aggregate_signal,
     LidoRequestWithdrawalsParams,
     LidoSubmitParams,
     LidoSubmitResponse,
@@ -273,11 +263,21 @@ from unified_api_contracts.internal.domain.defi import (
     MorphoRepayParams,
     MorphoSupplyParams,
     MorphoUserPosition,
+    OperatorSignOffStatus,
     OraclePrice,
+    PerLegAttribution,
+    PerPoolShapeReconciliation,
+    ProtocolIRMShape,
+    SignOffReport,
+    SlashingEvent,
+    SlashingReason,
     StakingRate,
+    StakingYieldDecomposition,
+    TenderlyReconciliationReport,
     UniswapV3PoolStateResponse,
     UniswapV3QuoteResponse,
     UniswapV3SwapTxReceipt,
+    compute_aggregate_signal,
 )
 from unified_api_contracts.internal.domain.defi import (
     CurveDepositParams as CurveDepositParams,
@@ -444,13 +444,13 @@ from unified_api_contracts.internal.domain.matching_engine import (
     FeeResult as FeeResult,
 )
 from unified_api_contracts.internal.domain.matching_engine import (
+    FillResult as FillResult,
+)
+from unified_api_contracts.internal.domain.matching_engine import (
     MatchingFeeType as MatchingFeeType,
 )
 from unified_api_contracts.internal.domain.matching_engine import (
     MatchResult as MatchResult,
-)
-from unified_api_contracts.internal.domain.matching_engine import (
-    FillResult as FillResult,
 )
 from unified_api_contracts.internal.domain.matching_engine import (
     OrderRecord as OrderRecord,

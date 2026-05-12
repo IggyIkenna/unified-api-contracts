@@ -451,7 +451,7 @@ def normalize_bybit_ws_subscription(
 # Rate Limits
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.rate_limits import extract_bybit_rate_limit  # noqa: E402
+from ...normalize_utils.rate_limits import extract_bybit_rate_limit
 
 __all__ = [
     "extract_bybit_rate_limit",

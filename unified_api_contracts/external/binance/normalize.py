@@ -496,7 +496,7 @@ def normalize_binance_ws_subscription(
 # ---------------------------------------------------------------------------
 
 
-from ...normalize_utils.rate_limits import extract_binance_rate_limit  # noqa: E402
+from ...normalize_utils.rate_limits import extract_binance_rate_limit
 
 __all__ = [
     "extract_binance_rate_limit",

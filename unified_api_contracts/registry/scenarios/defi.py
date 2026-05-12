@@ -110,13 +110,9 @@ DEFI_LIQUIDITY_DRAIN_LENDING_POOL = ScenarioOverlay(
             expected_within_seconds=120,
         ),
     ),
-    description=(
-        "Aave/Morpho utilization spikes to 99% on (pool, asset); "
-        "borrow tx rejected with BorrowCapExceeded."
-    ),
+    description=("Aave/Morpho utilization spikes to 99% on (pool, asset); borrow tx rejected with BorrowCapExceeded."),
     real_world_referent=(
-        "Aave 2023-11 BUSD utilization to CRV cascade; "
-        "Morpho 2024-03 governance pause; Aave V3 2024-Q4 ETH borrow cap."
+        "Aave 2023-11 BUSD utilization to CRV cascade; Morpho 2024-03 governance pause; Aave V3 2024-Q4 ETH borrow cap."
     ),
     composes_with=frozenset({"defi_oracle_deviation_30sigma", "defi_stablecoin_depeg"}),
 )
@@ -240,8 +236,7 @@ DEFI_MEMPOOL_CONGESTION_INCLUSION_DELAY = ScenarioOverlay(
     ),
     description="Mempool congestion to inclusion latency spike to MEV sandwich risk + cancel-tx race.",
     real_world_referent=(
-        "Ethereum 2023-Q4 sandwich-bot domination; "
-        "Arbitrum 2024-Q1 sequencer outage with mempool backlog."
+        "Ethereum 2023-Q4 sandwich-bot domination; Arbitrum 2024-Q1 sequencer outage with mempool backlog."
     ),
     composes_with=frozenset({"defi_gas_surge_50x"}),
 )
@@ -283,8 +278,7 @@ DEFI_STABLECOIN_DEPEG = ScenarioOverlay(
         "unstable; deleverage USDC borrow leg structurally unfavorable."
     ),
     real_world_referent=(
-        "USDC 2023-03-11 ($0.87 SVB); UST 2022-05-09 ($0.00 death spiral); "
-        "PYUSD 2024-07; USDE 2024-Q4 Ethena unwind."
+        "USDC 2023-03-11 ($0.87 SVB); UST 2022-05-09 ($0.00 death spiral); PYUSD 2024-07; USDE 2024-Q4 Ethena unwind."
     ),
     composes_with=frozenset({"defi_liquidity_drain_lending_pool", "defi_oracle_deviation_30sigma"}),
 )

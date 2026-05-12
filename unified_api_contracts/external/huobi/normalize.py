@@ -160,7 +160,7 @@ def normalize_huobi_fill(raw: HuobiFill, venue: str = "huobi") -> CanonicalFill:
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_a import normalize_huobi_error  # noqa: E402
+from ...normalize_utils.errors._normalize_a import normalize_huobi_error
 
 __all__ = [
     "normalize_huobi_error",

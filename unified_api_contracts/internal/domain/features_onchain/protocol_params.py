@@ -16,9 +16,9 @@ class AaveBorrowParams(BaseModel):
 
     asset: str = Field(..., description="Token to borrow")
     amount: str = Field(..., description="Amount (wei string)")
-    interestRateMode: Literal[1, 2] = Field(2, description="1=stable, 2=variable")  # noqa: N815
-    referralCode: int | None = Field(0, description="Referral code")  # noqa: N815
-    onBehalfOf: str | None = Field(None, description="Debt recipient")  # noqa: N815
+    interestRateMode: Literal[1, 2] = Field(2, description="1=stable, 2=variable")
+    referralCode: int | None = Field(0, description="Referral code")
+    onBehalfOf: str | None = Field(None, description="Debt recipient")
 
 
 class CurveDepositParams(BaseModel):

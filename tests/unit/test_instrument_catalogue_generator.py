@@ -15,13 +15,13 @@ import pytest
 _SCRIPTS_DIR = Path(__file__).resolve().parents[2] / "scripts"
 sys.path.insert(0, str(_SCRIPTS_DIR))
 
-from generate_instrument_catalogue import (  # noqa: E402  (path-setup precedes import)
+from generate_instrument_catalogue import (
     StaticManifestLoader,
     build_catalogue,
     render_markdown,
 )
 
-from unified_api_contracts.canonical.gcs_paths import AssetGroup  # noqa: E402
+from unified_api_contracts.canonical.gcs_paths import AssetGroup
 
 
 def _manifest_row(

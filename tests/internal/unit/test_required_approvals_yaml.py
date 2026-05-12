@@ -24,13 +24,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-
-YAML_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "unified_api_contracts"
-    / "config"
-    / "required_approvals.yaml"
-)
+YAML_PATH = Path(__file__).resolve().parents[3] / "unified_api_contracts" / "config" / "required_approvals.yaml"
 
 CUTOVER_ARCHETYPES = {"carry_staked_basis", "ARBITRAGE_PRICE_DISPERSION"}
 CUTOVER_CHAINS = {"ETHEREUM", "ARBITRUM", "BASE", "POLYGON", "SOLANA"}
@@ -67,9 +61,7 @@ def test_each_cutover_archetype_covers_five_chains(archetype: str) -> None:
     """Every cutover archetype covers all 5 chains."""
     archetypes = _load()["archetypes"]
     chains = set(archetypes[archetype].keys())
-    assert CUTOVER_CHAINS.issubset(chains), (
-        f"{archetype}: missing chains {CUTOVER_CHAINS - chains}"
-    )
+    assert CUTOVER_CHAINS.issubset(chains), f"{archetype}: missing chains {CUTOVER_CHAINS - chains}"
 
 
 def test_every_approval_row_has_required_fields() -> None:
@@ -94,9 +86,7 @@ def test_every_ceiling_is_positive_decimal() -> None:
             for protocol, rows in by_protocol.items():
                 for row in rows:
                     ceiling = Decimal(row["ceiling_usd"])
-                    assert ceiling > Decimal("0"), (
-                        f"{archetype}.{chain}.{protocol}.{row['asset']}: ceiling must be > 0"
-                    )
+                    assert ceiling > Decimal("0"), f"{archetype}.{chain}.{protocol}.{row['asset']}: ceiling must be > 0"
 
 
 def test_no_max_uint256_ceilings() -> None:
@@ -123,9 +113,7 @@ def test_no_duplicate_asset_per_protocol() -> None:
         for chain, by_protocol in by_chain.items():
             for protocol, rows in by_protocol.items():
                 assets = [r["asset"] for r in rows]
-                assert len(assets) == len(set(assets)), (
-                    f"{archetype}.{chain}.{protocol}: duplicate assets {assets}"
-                )
+                assert len(assets) == len(set(assets)), f"{archetype}.{chain}.{protocol}: duplicate assets {assets}"
 
 
 def test_carry_staked_basis_covers_lst_protocols() -> None:

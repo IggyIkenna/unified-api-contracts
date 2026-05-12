@@ -44,7 +44,7 @@ from .schemas import (
 
 _parse_decimal = _d
 
-_now_utc = lambda: datetime.now(UTC)  # noqa: E731
+_now_utc = lambda: datetime.now(UTC)
 
 
 def _ms_to_utc(ts_ms: object | None) -> datetime | None:
@@ -371,7 +371,7 @@ def normalize_aster_ws_close(
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_a import normalize_aster_error  # noqa: E402
+from ...normalize_utils.errors._normalize_a import normalize_aster_error
 
 __all__ = [
     "normalize_aster_derivative_ticker",

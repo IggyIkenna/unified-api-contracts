@@ -164,7 +164,9 @@ def test_params_rejects_chain_layout_without_chains() -> None:
             row_count_per_day=1_000,
             schema_version="gas.v2",
             shard_layout=SyntheticShardLayout(
-                shard_key_axes=("chain",), shards_per_day=1, partition_template="chain={chain}/dt={dt}",
+                shard_key_axes=("chain",),
+                shards_per_day=1,
+                partition_template="chain={chain}/dt={dt}",
             ),
             output_uri="gs://x/y",
             chains=(),
@@ -348,8 +350,10 @@ def test_every_spec_has_nonempty_pipeline_stages_and_archetypes(spec: SyntheticG
     assert len(spec.pipeline_stages_touching) >= 1
     assert len(spec.archetypes_consuming) >= 1
     assert spec.default_row_count_per_day > 0
-    assert all(a in {"mtds_read", "mdps_compute", "features", "ml_inference", "strategy", "matching_engine"}
-               for a in spec.pipeline_stages_touching)
+    assert all(
+        a in {"mtds_read", "mdps_compute", "features", "ml_inference", "strategy", "matching_engine"}
+        for a in spec.pipeline_stages_touching
+    )
 
 
 @pytest.mark.parametrize("spec", ALL_GENERATORS, ids=lambda s: s.generator_id.value)

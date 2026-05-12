@@ -480,7 +480,7 @@ def normalize_okx_ws_subscription(
 # Rate Limits
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.rate_limits import extract_okx_rate_limit  # noqa: E402
+from ...normalize_utils.rate_limits import extract_okx_rate_limit
 
 __all__ = [
     "extract_okx_rate_limit",

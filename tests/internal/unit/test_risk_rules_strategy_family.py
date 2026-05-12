@@ -248,7 +248,7 @@ def test_funding_arb_family_has_correlation_with_other_family_rule() -> None:
 def test_rule_models_are_frozen() -> None:
     """``RiskRule`` instances are immutable per Pydantic frozen ConfigDict."""
     rule = STRATEGY_FAMILY_RULES[0]
-    with pytest.raises(Exception):  # noqa: B017 — covers ValidationError + AttributeError
+    with pytest.raises(Exception):
         rule.applies_to = "tampered"  # pyright: ignore[reportAttributeAccessIssue]
 
 

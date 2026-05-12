@@ -13,7 +13,7 @@ import pytest
 _repo_root = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(_repo_root / "scripts"))
 
-from generate_ui_reference_data import generate  # noqa: E402
+from generate_ui_reference_data import generate
 
 
 @pytest.fixture(scope="module")

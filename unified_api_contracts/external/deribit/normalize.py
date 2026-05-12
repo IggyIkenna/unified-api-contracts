@@ -395,7 +395,7 @@ def normalize_deribit_ws_heartbeat(
 # Rate Limits
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.rate_limits import extract_deribit_rate_limit, extract_deribit_ws_rate_limit  # noqa: E402
+from ...normalize_utils.rate_limits import extract_deribit_rate_limit, extract_deribit_ws_rate_limit
 
 __all__ = [
     "extract_deribit_rate_limit",

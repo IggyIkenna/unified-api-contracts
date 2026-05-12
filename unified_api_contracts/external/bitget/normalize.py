@@ -186,7 +186,7 @@ def normalize_bitget_fee(
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_a import normalize_bitget_error  # noqa: E402
+from ...normalize_utils.errors._normalize_a import normalize_bitget_error
 
 __all__ = [
     "normalize_bitget_error",

@@ -240,9 +240,7 @@ def get_emode_category(asset: str, chain: str = "ETHEREUM") -> EModeCategory | N
     return chain_map.get(asset.upper())
 
 
-def get_emode_params(
-    collateral_asset: str, debt_asset: str, chain: str = "ETHEREUM"
-) -> EModeCategory | None:
+def get_emode_params(collateral_asset: str, debt_asset: str, chain: str = "ETHEREUM") -> EModeCategory | None:
     """Get E-Mode parameters when collateral and debt are in the same category on a given chain.
 
     Chain-aware as of 2026-05-12.

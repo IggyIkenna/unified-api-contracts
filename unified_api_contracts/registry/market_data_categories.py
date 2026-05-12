@@ -622,10 +622,10 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
 
 # Merge the DEFI multi-chain block (extracted to defi_venue_capabilities.py
 # to keep this file under the 900-line QG ceiling).
-from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402
+from unified_api_contracts.registry.defi_prediction_instrument_seeds import (
     seed_for_venue_and_data_type,
 )
-from unified_api_contracts.registry.defi_venue_capabilities import (  # noqa: E402
+from unified_api_contracts.registry.defi_venue_capabilities import (
     DEFI_VENUE_DATA_TYPE_CAPABILITIES,
 )
 

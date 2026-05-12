@@ -43,7 +43,7 @@ class PolygonAggregate(BaseModel):
 
     o: float | None = None  # open
     h: float | None = None  # high
-    l: float | None = None  # low  # noqa: E741
+    l: float | None = None  # low
     c: float | None = None  # close
     v: float | None = None  # volume
     vw: float | None = None  # vwap

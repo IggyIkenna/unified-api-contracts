@@ -20,7 +20,6 @@ from unified_api_contracts.internal.domain.defi import (
     WalletProvisioningError,
 )
 
-
 # ---------------------------------------------------------------------------
 # SigningSurface — closed-set enum membership
 # ---------------------------------------------------------------------------

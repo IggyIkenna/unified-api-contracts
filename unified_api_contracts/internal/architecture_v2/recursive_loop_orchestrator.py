@@ -104,9 +104,7 @@ class RecursiveLoopRequest(BaseModel):
         ),
     )
     start_amount: Decimal = Field(..., gt=0, description="Base capital, human-readable units.")
-    share_class_coin: str = Field(
-        ..., description="'ETH' | 'WSTETH' | 'BTC' | 'WBTC' | 'SOL' | 'USDC'."
-    )
+    share_class_coin: str = Field(..., description="'ETH' | 'WSTETH' | 'BTC' | 'WBTC' | 'SOL' | 'USDC'.")
     n_loops: int = Field(..., ge=1, le=15, description="Recursion depth.")
     ltv_per_loop: Decimal = Field(
         ...,
@@ -180,9 +178,7 @@ class RecursiveLoopResult(BaseModel):
     success: bool
     mode: OpeningMode
     direction: Literal["OPEN", "UNWIND"]
-    tx_receipts_count: int = Field(
-        ..., description="N for persistent; 1 for flash. Receipts in event stream."
-    )
+    tx_receipts_count: int = Field(..., description="N for persistent; 1 for flash. Receipts in event stream.")
     final_position: AavePositionState
     realised_supply_apy: Decimal
     realised_borrow_apy: Decimal

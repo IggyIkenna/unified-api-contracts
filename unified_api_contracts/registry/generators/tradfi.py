@@ -29,7 +29,9 @@ from ...canonical.crosscutting.synthetic_generator import (
 CUTOVER_TRADFI_INSTRUMENTS: Final[tuple[str, ...]] = ("ES", "NQ", "ZN", "GC", "DXY")
 CUTOVER_TRADFI_SOURCES: Final[tuple[str, ...]] = ("databento",)
 
-_TRADFI_PARTITION: Final = "asset_group={asset_group}/data_type={data_type}/venue={venue}/instrument={instrument}/dt={dt}"
+_TRADFI_PARTITION: Final = (
+    "asset_group={asset_group}/data_type={data_type}/venue={venue}/instrument={instrument}/dt={dt}"
+)
 
 TRADFI_OHLCV_1M_SPEC = SyntheticGeneratorSpec(
     generator_id=SyntheticGeneratorId.TRADFI_OHLCV_1M,

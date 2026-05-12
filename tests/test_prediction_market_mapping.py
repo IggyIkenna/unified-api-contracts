@@ -342,5 +342,5 @@ class TestModelFrozen:
         )
         import pytest
 
-        with pytest.raises(Exception):  # noqa: B017 — ValidationError subclass
+        with pytest.raises(Exception):
             result.category = PredictionMarketCategory.SPORTS  # type: ignore[misc]

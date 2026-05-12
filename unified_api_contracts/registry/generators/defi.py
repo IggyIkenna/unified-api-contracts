@@ -37,7 +37,14 @@ CUTOVER_DEFI_EVM_CHAINS: Final[tuple[str, ...]] = ("ethereum", "arbitrum", "opti
 CUTOVER_DEFI_CHAINS: Final[tuple[str, ...]] = (*CUTOVER_DEFI_EVM_CHAINS, "solana")
 
 # LST assets — Solana (jitoSOL/mSOL/bSOL via Marinade/Jito/BlazeStake) + EVM (wstETH/rETH/cbETH via Lido/Rocket/Coinbase).
-CUTOVER_LST_PROTOCOLS: Final[tuple[str, ...]] = ("marinade", "jito", "blazestake", "lido", "rocket_pool", "coinbase_cbeth")
+CUTOVER_LST_PROTOCOLS: Final[tuple[str, ...]] = (
+    "marinade",
+    "jito",
+    "blazestake",
+    "lido",
+    "rocket_pool",
+    "coinbase_cbeth",
+)
 
 # Lending protocols for the recursive-staked / yield-rotation legs.
 CUTOVER_LENDING_PROTOCOLS: Final[tuple[str, ...]] = ("aave_v3", "morpho")
@@ -60,9 +67,13 @@ CUTOVER_ORACLE_FEEDS: Final[tuple[str, ...]] = (
 )
 
 _CHAIN_PARTITION: Final = "asset_group={asset_group}/data_type={data_type}/chain={chain}/dt={dt}"
-_CHAIN_PROTOCOL_PARTITION: Final = "asset_group={asset_group}/data_type={data_type}/chain={chain}/protocol={protocol}/dt={dt}"
+_CHAIN_PROTOCOL_PARTITION: Final = (
+    "asset_group={asset_group}/data_type={data_type}/chain={chain}/protocol={protocol}/dt={dt}"
+)
 _CHAIN_POOL_PARTITION: Final = "asset_group={asset_group}/data_type={data_type}/chain={chain}/pool={pool}/dt={dt}"
-_CHAIN_ORACLE_PARTITION: Final = "asset_group={asset_group}/data_type={data_type}/chain={chain}/oracle_feed={oracle_feed}/dt={dt}"
+_CHAIN_ORACLE_PARTITION: Final = (
+    "asset_group={asset_group}/data_type={data_type}/chain={chain}/oracle_feed={oracle_feed}/dt={dt}"
+)
 
 DEFI_GAS_SPEC = SyntheticGeneratorSpec(
     generator_id=SyntheticGeneratorId.DEFI_GAS,

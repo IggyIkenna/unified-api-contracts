@@ -38,14 +38,11 @@ from unified_api_contracts._instrument_enums import (
     OptionType as OptionType,
 )
 
-
 # Closed-set instrument-type buckets used by InstrumentRecord's
 # per-asset-group model_validator (hard_schema_enforcement_2026_05_08
 # Phase 1, slot 5 2026-05-11). Module-level rather than class-level so
 # Pydantic v2 doesn't treat them as ``ModelPrivateAttr`` descriptors.
-CEFI_PAIR_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset(
-    {InstrumentType.SPOT_PAIR, InstrumentType.PERPETUAL}
-)
+CEFI_PAIR_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset({InstrumentType.SPOT_PAIR, InstrumentType.PERPETUAL})
 """CeFi spot/perp instrument types. Workspace rule: base_asset + quote_asset
 must be non-empty (trading pair identity). Enforced by InstrumentRecord
 model_validator."""

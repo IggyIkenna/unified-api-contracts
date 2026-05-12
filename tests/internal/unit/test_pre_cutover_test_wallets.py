@@ -16,15 +16,12 @@ import json
 from decimal import Decimal
 from pathlib import Path
 
-import pytest
-
 from unified_api_contracts.internal.domain.defi import (
     SigningSurface,
     SpendingCaps,
     WalletKind,
     WalletProvisioningConfig,
 )
-
 
 CONFIG_PATH = (
     Path(__file__).resolve().parents[3]
@@ -48,9 +45,7 @@ def _load_wallets() -> list[WalletProvisioningConfig]:
             per_tx_usd=_decimal_or_none(caps_raw.get("per_tx_usd")),
             per_hour_usd=_decimal_or_none(caps_raw.get("per_hour_usd")),
             per_day_usd=_decimal_or_none(caps_raw.get("per_day_usd")),
-            per_protocol_usd={
-                k: Decimal(v) for k, v in caps_raw.get("per_protocol_usd", {}).items()
-            },
+            per_protocol_usd={k: Decimal(v) for k, v in caps_raw.get("per_protocol_usd", {}).items()},
         )
         wallets.append(
             WalletProvisioningConfig(

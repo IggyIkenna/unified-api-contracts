@@ -83,8 +83,7 @@ class HedgeSizerConfig(BaseModel):
     auto_topup_threshold: Decimal = Field(
         Decimal("1.5"),
         description=(
-            "Target ratio post-top-up. Top-up amount = "
-            "(auto_topup_threshold x initial_margin) - available_margin."
+            "Target ratio post-top-up. Top-up amount = (auto_topup_threshold x initial_margin) - available_margin."
         ),
     )
     rebalance_band_pct: Decimal = Field(
@@ -141,9 +140,7 @@ class MarginTopupInstruction(BaseModel):
     )
     pending_until_ts: int | None = Field(
         None,
-        description=(
-            "For withdrawals only: 5-min dispute window on Hyperliquid. None for deposits."
-        ),
+        description=("For withdrawals only: 5-min dispute window on Hyperliquid. None for deposits."),
     )
     correlation_id: str
 

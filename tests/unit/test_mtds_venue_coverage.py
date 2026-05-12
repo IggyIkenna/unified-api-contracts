@@ -264,7 +264,7 @@ class TestMultiChainDefiExpansion:
 # Accessor: get_expected_instruments_for_venue(venue, data_type, *, as_of_date, instruments_provider, cap)
 
 
-from unified_api_contracts import (  # noqa: E402
+from unified_api_contracts import (
     get_expected_instruments_for_venue,
     is_per_instrument_shard_data_type,
 )
@@ -402,7 +402,7 @@ class TestGetExpectedInstrumentsForVenueInjectedProvider:
 # SSOT: unified-trading-pm/codex/02-data/mtds-data-source-coverage-matrix.md § 8
 # Registry: unified_api_contracts.registry.defi_prediction_instrument_seeds
 
-from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402
+from unified_api_contracts.registry.defi_prediction_instrument_seeds import (
     DEFI_MVP_SEED_INSTRUMENTS,
     PREDICTION_MVP_SEED_INSTRUMENTS,
     seed_for_venue_and_data_type,

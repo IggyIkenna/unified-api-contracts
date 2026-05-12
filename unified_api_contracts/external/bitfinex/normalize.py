@@ -168,7 +168,7 @@ def normalize_bitfinex_fill(raw: BitfinexFill, venue: str = "bitfinex") -> Canon
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_b import normalize_bitfinex_error  # noqa: E402
+from ...normalize_utils.errors._normalize_b import normalize_bitfinex_error
 
 __all__ = [
     "normalize_bitfinex_error",

@@ -412,7 +412,10 @@ class SyntheticGeneratorSpec(BaseModel):
     ) -> SyntheticParams:
         """Build a :class:`SyntheticParams` from this spec's defaults."""
         cardinality = self._fanout_cardinality(
-            venues=venues, instruments=instruments, chains=chains, protocols=protocols,
+            venues=venues,
+            instruments=instruments,
+            chains=chains,
+            protocols=protocols,
         )
         return SyntheticParams(
             generator_id=self.generator_id,

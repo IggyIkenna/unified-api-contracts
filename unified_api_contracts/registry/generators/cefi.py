@@ -29,7 +29,9 @@ CUTOVER_CEFI_VENUES: Final[tuple[str, ...]] = ("bybit", "deribit", "binance", "o
 # Representative cutover instrument set (the arb/hedge legs trade these).
 CUTOVER_CEFI_INSTRUMENTS: Final[tuple[str, ...]] = ("BTCUSDT", "ETHUSDT", "SOLUSDT")
 
-_CEFI_TICK_PARTITION: Final = "asset_group={asset_group}/data_type={data_type}/venue={venue}/instrument={instrument}/dt={dt}"
+_CEFI_TICK_PARTITION: Final = (
+    "asset_group={asset_group}/data_type={data_type}/venue={venue}/instrument={instrument}/dt={dt}"
+)
 _CEFI_DERIV_PARTITION: Final = _CEFI_TICK_PARTITION
 
 # n_shards default = len(venues) * len(instruments) = 6 * 3 = 18 cells.
@@ -133,8 +135,8 @@ for _spec in SPECS:
 __all__ = [
     "CEFI_FUNDING_RATE_SPEC",
     "CEFI_LIQUIDATIONS_SPEC",
-    "CEFI_OHLCV_15M_SPEC",
     "CEFI_OHLCV_1M_SPEC",
+    "CEFI_OHLCV_15M_SPEC",
     "CEFI_OPEN_INTEREST_SPEC",
     "CEFI_TRADES_SPEC",
     "CUTOVER_CEFI_INSTRUMENTS",

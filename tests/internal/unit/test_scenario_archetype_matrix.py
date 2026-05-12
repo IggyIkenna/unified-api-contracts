@@ -41,9 +41,7 @@ def test_matrix_cell_count_over_delivers_vs_compressed_target() -> None:
 def test_every_matrix_scenario_resolves_to_registry() -> None:
     for archetype, scenario_ids in MATRIX.items():
         for sid in scenario_ids:
-            assert sid in SCENARIO_REGISTRY, (
-                f"matrix declares {archetype} -> {sid} but it's not in SCENARIO_REGISTRY"
-            )
+            assert sid in SCENARIO_REGISTRY, f"matrix declares {archetype} -> {sid} but it's not in SCENARIO_REGISTRY"
 
 
 def test_apd_matrix_includes_funding_arb_critical_scenarios() -> None:

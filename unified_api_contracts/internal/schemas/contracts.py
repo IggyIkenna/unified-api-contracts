@@ -161,7 +161,7 @@ class Violation(BaseModel):
 # callers keep using ``from ...schemas.contracts import validate_dataframe``.
 # ---------------------------------------------------------------------------
 
-from unified_api_contracts.internal.schemas._validation import (  # noqa: E402 — after type defs
+from unified_api_contracts.internal.schemas._validation import (
     validate_dataframe as validate_dataframe,
 )
 
@@ -874,9 +874,9 @@ def lookup_contract(
 
 
 # Side-effect imports — must appear after CONTRACT_REGISTRY construction.
-from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts  # noqa: E402
-from unified_api_contracts.internal.schemas import _defi_v2_contracts as _defi_v2_contracts  # noqa: E402
-from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas import _candle_contracts as _candle_contracts
+from unified_api_contracts.internal.schemas import _defi_v2_contracts as _defi_v2_contracts
+from unified_api_contracts.internal.schemas import _feature_contracts as _feature_contracts
 
 # Instrument-catalogue contract — derives a single SchemaContract from
 # INSTRUMENTS_PARQUET_SCHEMA (instruments-service write SSOT) and registers it
@@ -884,11 +884,11 @@ from unified_api_contracts.internal.schemas import _feature_contracts as _featur
 # of cefi/tradfi/defi/prediction/sports. Required so deployment-api's View
 # Schema endpoint can resolve schemas for the legacy v4 manifest rows that
 # carry empty instrument_type and data_type axes.
-from unified_api_contracts.internal.schemas import (  # noqa: E402
+from unified_api_contracts.internal.schemas import (
     _instrument_catalogue_contract as _instrument_catalogue_contract,
 )
-from unified_api_contracts.internal.schemas import _legacy_venue_overrides as _legacy_venue_overrides  # noqa: E402
-from unified_api_contracts.internal.schemas import _snapshot_contracts as _snapshot_contracts  # noqa: E402
+from unified_api_contracts.internal.schemas import _legacy_venue_overrides as _legacy_venue_overrides
+from unified_api_contracts.internal.schemas import _snapshot_contracts as _snapshot_contracts
 
 # _sports_contracts / _sports_match_contracts / _sports_derived_contracts
 # together register 19 additional SPORTS SchemaContracts via module-level
@@ -896,115 +896,115 @@ from unified_api_contracts.internal.schemas import _snapshot_contracts as _snaps
 # which lives in _sports_prediction_contracts). Split into 3 files to stay
 # under the codex 900-line limit. SSOT plan:
 # sports_uac_schema_contracts_registration_2026_04_24.md.
-from unified_api_contracts.internal.schemas import _sports_contracts as _sports_contracts  # noqa: E402
-from unified_api_contracts.internal.schemas import _sports_derived_contracts as _sports_derived_contracts  # noqa: E402
-from unified_api_contracts.internal.schemas import _sports_match_contracts as _sports_match_contracts  # noqa: E402
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas import _sports_contracts as _sports_contracts
+from unified_api_contracts.internal.schemas import _sports_derived_contracts as _sports_derived_contracts
+from unified_api_contracts.internal.schemas import _sports_match_contracts as _sports_match_contracts
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_DEBT_TOKEN_LENDING_INDICES as DEFI_DEBT_TOKEN_LENDING_INDICES,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_LENDING_FLASH_LOAN_EVENTS as DEFI_LENDING_FLASH_LOAN_EVENTS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_LENDING_LIQUIDATION_EVENTS as DEFI_LENDING_LIQUIDATION_EVENTS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_LENDING_POSITION_DATA as DEFI_LENDING_POSITION_DATA,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_POOL_DEX_POOLS as DEFI_POOL_DEX_POOLS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_POOL_DEX_SWAPS as DEFI_POOL_DEX_SWAPS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_SPOT_ASSET_BRIDGE_EVENTS as DEFI_SPOT_ASSET_BRIDGE_EVENTS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_SPOT_ASSET_GOVERNANCE_EVENTS as DEFI_SPOT_ASSET_GOVERNANCE_EVENTS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_SPOT_ASSET_MEV_EVENTS as DEFI_SPOT_ASSET_MEV_EVENTS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_SPOT_ASSET_TOKEN_TRANSFERS as DEFI_SPOT_ASSET_TOKEN_TRANSFERS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_STAKING_STAKING_YIELDS as DEFI_STAKING_STAKING_YIELDS,
 )
-from unified_api_contracts.internal.schemas._defi_v2_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_YIELD_BEARING_YIELD_SNAPSHOTS as DEFI_YIELD_BEARING_YIELD_SNAPSHOTS,
 )
-from unified_api_contracts.internal.schemas._ml_training_contract import (  # noqa: E402
+from unified_api_contracts.internal.schemas._ml_training_contract import (
     ML_TRAINING_MANIFEST as ML_TRAINING_MANIFEST,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     KEYWORD_TO_CATEGORY as KEYWORD_TO_CATEGORY,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     OUTCOME_TO_MARKET_TYPE as OUTCOME_TO_MARKET_TYPE,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     SLUG_PREFIX_MAP as SLUG_PREFIX_MAP,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     PredictionShardCategory as PredictionShardCategory,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     PredictionShardMarketType as PredictionShardMarketType,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     PredictionShardResolutionPeriod as PredictionShardResolutionPeriod,
 )
-from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (  # noqa: E402
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     classify_polymarket_market as classify_polymarket_market,
 )
-from unified_api_contracts.internal.schemas._row_validation import (  # noqa: E402
+from unified_api_contracts.internal.schemas._row_validation import (
     RowSchemaValidationError as RowSchemaValidationError,
 )
-from unified_api_contracts.internal.schemas._row_validation import (  # noqa: E402
+from unified_api_contracts.internal.schemas._row_validation import (
     validate_row_df as validate_row_df,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_COMBO_CHAIN_SNAPSHOT as CEFI_COMBO_CHAIN_SNAPSHOT,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_FUTURES_CHAIN_SNAPSHOT as CEFI_FUTURES_CHAIN_SNAPSHOT,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_OPTIONS_CHAIN_SNAPSHOT as CEFI_OPTIONS_CHAIN_SNAPSHOT,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_PERPETUAL_OHLCV_24H as CEFI_PERPETUAL_OHLCV_24H,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_PERPETUAL_TBBO as CEFI_PERPETUAL_TBBO,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_SPOT_PAIR_OHLCV_24H as CEFI_SPOT_PAIR_OHLCV_24H,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     CEFI_SPOT_PAIR_TBBO as CEFI_SPOT_PAIR_TBBO,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     TRADFI_FUTURES_CHAIN_SNAPSHOT as TRADFI_FUTURES_CHAIN_SNAPSHOT,
 )
-from unified_api_contracts.internal.schemas._snapshot_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._snapshot_contracts import (
     TRADFI_OPTIONS_CHAIN_SNAPSHOT as TRADFI_OPTIONS_CHAIN_SNAPSHOT,
 )
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     PREDICTION_PREDICTION_MARKET_TRADES as PREDICTION_PREDICTION_MARKET_TRADES,
 )
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_ARBITRAGE as SPORTS_ODDS_ARBITRAGE,
 )
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_MOVEMENT as SPORTS_ODDS_MOVEMENT,
 )
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_SNAPSHOT as SPORTS_ODDS_SNAPSHOT,
 )
-from unified_api_contracts.internal.schemas._sports_prediction_contracts import (  # noqa: E402
+from unified_api_contracts.internal.schemas._sports_prediction_contracts import (
     SPORTS_ODDS_TRADES as SPORTS_ODDS_TRADES,
 )
 

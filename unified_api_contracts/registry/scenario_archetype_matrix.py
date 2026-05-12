@@ -98,8 +98,7 @@ def scenarios_for_archetype(archetype: str) -> frozenset[str]:
     """
     if archetype not in CUTOVER_ARCHETYPES:
         raise ValueError(
-            f"unknown archetype {archetype!r}; "
-            f"matrix declares {sorted(CUTOVER_ARCHETYPES)}",
+            f"unknown archetype {archetype!r}; matrix declares {sorted(CUTOVER_ARCHETYPES)}",
         )
     return MATRIX[archetype]
 

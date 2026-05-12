@@ -299,7 +299,7 @@ def normalize_hyperliquid_ws_subscription(
 # Rate Limits
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.rate_limits import extract_hyperliquid_rate_limit  # noqa: E402
+from ...normalize_utils.rate_limits import extract_hyperliquid_rate_limit
 
 __all__ = [
     "extract_hyperliquid_rate_limit",

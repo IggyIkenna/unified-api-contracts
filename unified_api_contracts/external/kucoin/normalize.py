@@ -159,7 +159,7 @@ def normalize_kucoin_fill(raw: KucoinFill, venue: str = "kucoin") -> CanonicalFi
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_a import normalize_kucoin_error  # noqa: E402
+from ...normalize_utils.errors._normalize_a import normalize_kucoin_error
 
 __all__ = [
     "normalize_kucoin_error",

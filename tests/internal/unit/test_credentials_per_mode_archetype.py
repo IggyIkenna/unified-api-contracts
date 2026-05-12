@@ -10,18 +10,9 @@ from pathlib import Path
 import pytest
 import yaml
 
-
-PER_MODE_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "unified_api_contracts"
-    / "config"
-    / "credentials_per_mode.yaml"
-)
+PER_MODE_PATH = Path(__file__).resolve().parents[3] / "unified_api_contracts" / "config" / "credentials_per_mode.yaml"
 PER_ARCHETYPE_PATH = (
-    Path(__file__).resolve().parents[3]
-    / "unified_api_contracts"
-    / "config"
-    / "credentials_per_archetype.yaml"
+    Path(__file__).resolve().parents[3] / "unified_api_contracts" / "config" / "credentials_per_archetype.yaml"
 )
 
 
@@ -74,9 +65,7 @@ def test_live_mode_marks_post_cutover_only_creds() -> None:
     assert copper_keys, "Copper creds missing from live mode"
     assert fireblocks_keys, "Fireblocks creds missing from live mode"
     for c in copper_keys + fireblocks_keys:
-        assert c.get("post_cutover_only") is True, (
-            f"{c['id']} must be marked post_cutover_only=True"
-        )
+        assert c.get("post_cutover_only") is True, f"{c['id']} must be marked post_cutover_only=True"
 
 
 def test_paper_mode_does_not_require_production_custody() -> None:
@@ -174,18 +163,14 @@ def test_every_archetype_declares_telegram() -> None:
     data = _load(PER_ARCHETYPE_PATH)
     for archetype, bundle in data["archetypes"].items():
         creds = bundle["required_credentials"]
-        assert "telegram-bot-token-prod" in creds, (
-            f"{archetype}: missing telegram-bot-token-prod"
-        )
+        assert "telegram-bot-token-prod" in creds, f"{archetype}: missing telegram-bot-token-prod"
 
 
 def test_every_archetype_declares_gcp_sa() -> None:
     """Every archetype requires gcp_service_account."""
     data = _load(PER_ARCHETYPE_PATH)
     for archetype, bundle in data["archetypes"].items():
-        assert "gcp_service_account" in bundle["required_credentials"], (
-            f"{archetype}: missing gcp_service_account"
-        )
+        assert "gcp_service_account" in bundle["required_credentials"], f"{archetype}: missing gcp_service_account"
 
 
 def test_archetype_credential_match_template_wallet_ids() -> None:
@@ -193,7 +178,12 @@ def test_archetype_credential_match_template_wallet_ids() -> None:
     import json
     from pathlib import Path as _P
 
-    template = _P(__file__).resolve().parents[3] / "unified_api_contracts" / "config" / "cutover_wallet_provisioning_mainnet_template.json"
+    template = (
+        _P(__file__).resolve().parents[3]
+        / "unified_api_contracts"
+        / "config"
+        / "cutover_wallet_provisioning_mainnet_template.json"
+    )
     with template.open() as f:
         wallet_template = json.load(f)
     template_wallet_ids = {w["wallet_id"] for w in wallet_template["wallets"]}

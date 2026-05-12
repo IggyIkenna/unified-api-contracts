@@ -318,7 +318,7 @@ def normalize_coinbase_ws_subscription(
 # Rate Limits
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.rate_limits import extract_coinbase_rate_limit  # noqa: E402
+from ...normalize_utils.rate_limits import extract_coinbase_rate_limit
 
 __all__ = [
     "extract_coinbase_rate_limit",

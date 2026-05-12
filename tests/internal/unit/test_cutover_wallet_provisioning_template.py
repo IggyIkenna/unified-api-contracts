@@ -33,7 +33,6 @@ from unified_api_contracts.internal.domain.defi import (
     WalletProvisioningConfig,
 )
 
-
 TEMPLATE_PATH = (
     Path(__file__).resolve().parents[3]
     / "unified_api_contracts"
@@ -57,9 +56,7 @@ def _load_wallets() -> list[WalletProvisioningConfig]:
             per_tx_usd=_decimal_or_none(caps_raw.get("per_tx_usd")),
             per_hour_usd=_decimal_or_none(caps_raw.get("per_hour_usd")),
             per_day_usd=_decimal_or_none(caps_raw.get("per_day_usd")),
-            per_protocol_usd={
-                k: Decimal(v) for k, v in caps_raw.get("per_protocol_usd", {}).items()
-            },
+            per_protocol_usd={k: Decimal(v) for k, v in caps_raw.get("per_protocol_usd", {}).items()},
         )
         wallets.append(
             WalletProvisioningConfig(
@@ -116,9 +113,7 @@ def test_chain_coverage_five_chains() -> None:
     wallets = _load_wallets()
     hot_trading_chains = {w.chain for w in wallets if w.kind == WalletKind.HOT_TRADING}
     expected = {"ETHEREUM", "ARBITRUM", "BASE", "POLYGON", "SOLANA"}
-    assert expected.issubset(hot_trading_chains), (
-        f"Missing chain coverage: {expected - hot_trading_chains}"
-    )
+    assert expected.issubset(hot_trading_chains), f"Missing chain coverage: {expected - hot_trading_chains}"
 
 
 def test_gas_reserve_per_chain() -> None:

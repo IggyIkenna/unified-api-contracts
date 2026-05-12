@@ -392,7 +392,7 @@ def normalize_ibkr_ws_close(
 # Error
 # ---------------------------------------------------------------------------
 
-from collections.abc import Callable  # noqa: E402
+from collections.abc import Callable
 
 IBKR_MAP: dict[str, Callable[..., CanonicalError]] = {
     "100": CanonicalServiceUnavailableError,

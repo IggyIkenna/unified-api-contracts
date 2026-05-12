@@ -179,7 +179,7 @@ def normalize_bitstamp_fill(raw: BitstampFill, symbol: str = "", venue: str = "b
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_b import normalize_bitstamp_error  # noqa: E402
+from ...normalize_utils.errors._normalize_b import normalize_bitstamp_error
 
 __all__ = [
     "normalize_bitstamp_error",
