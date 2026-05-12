@@ -128,6 +128,21 @@ from .canonical.crosscutting.scenario_overlay import (
     StaleHold,
     register_scenario,
 )
+from .canonical.crosscutting.synthetic_generator import (
+    SYNTHETIC_GENERATOR_REGISTRY,
+    SyntheticDataDomain,
+    SyntheticGeneratorId,
+    SyntheticGeneratorSpec,
+    SyntheticOutputManifest,
+    SyntheticParams,
+    SyntheticRealismAxis,
+    SyntheticRunManifest,
+    SyntheticShardLayout,
+    SyntheticShardManifest,
+    generators_for_archetype,
+    get_generator_spec,
+    register_generator,
+)
 from .canonical.domain import (
     BOOKMAKER_REGISTRY,
     ODDS_API_KEY_TO_VENUE,
@@ -381,6 +396,9 @@ from .config.trading_validation import (
 
 # Importing the per-asset_group registry seeds populates SCENARIO_REGISTRY at module load.
 from .registry import scenarios as _scenarios_registry
+
+# Importing the per-asset_group generator seeds populates SYNTHETIC_GENERATOR_REGISTRY at module load.
+from .registry import generators as _generators_registry
 
 # isort: off
 # These crosscutting / features imports must load AFTER ``.canonical.domain``
@@ -962,6 +980,7 @@ __all__ = [
     "SERVICE_EMISSION_STATE_COLUMN",
     "SHARE_CLASS_BASE_ASSETS",
     "SPORTS_VENUES",
+    "SYNTHETIC_GENERATOR_REGISTRY",
     "TIMEFRAMES",
     "TRADFI_DATABENTO_INSTRUMENTS",
     "TRADFI_EQUITIES",
@@ -1434,6 +1453,15 @@ __all__ = [
     "SubAccount",
     "SubscribeRequest",
     "SubscriptionStatus",
+    "SyntheticDataDomain",
+    "SyntheticGeneratorId",
+    "SyntheticGeneratorSpec",
+    "SyntheticOutputManifest",
+    "SyntheticParams",
+    "SyntheticRealismAxis",
+    "SyntheticRunManifest",
+    "SyntheticShardLayout",
+    "SyntheticShardManifest",
     "TardisExchangeDetail",
     "TardisInstrumentDetail",
     "TeamMapping",
@@ -1494,7 +1522,9 @@ __all__ = [
     "get_emission_policy",
     "get_expected_bookmakers",
     "get_expected_data_types_for_venue",
+    "generators_for_archetype",
     "get_expected_instruments_for_venue",
+    "get_generator_spec",
     "get_provider_availability",
     # Features DAG — UTL point_in_time + features-* consumers
     "get_required_inputs",
@@ -1511,6 +1541,7 @@ __all__ = [
     "pipeline_mode_for_source",
     "policy_is_alert",
     "policy_is_publish_row",
+    "register_generator",
     "register_scenario",
     "resolve_environment_from_env",
     "resolve_environment_from_hostname",
