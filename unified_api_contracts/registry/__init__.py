@@ -447,7 +447,7 @@ from .venue_context import (
     resolve_venue_context,
 )
 from .venue_instrument_config import ExchangeInstrumentConfig
-from .venue_mapping import DataTypeConfig, VenueMapping
+from .venue_mapping import DataTypeConfig, LST_MARGIN_VENUES, VenueMapping
 from .venue_trading_calendar import (
     clip_dates_to_trading_days,
     get_us_market_holidays,
@@ -572,6 +572,7 @@ __all__ = [
     "LIVESCOREBET",
     "LOWVIG",
     "LST_BASE_ASSET",
+    "LST_MARGIN_VENUES",
     "LST_TOKEN_GENESIS",
     "LST_VENUE_TO_TOKENS",
     "MAINNET_CHAIN_IDS",
