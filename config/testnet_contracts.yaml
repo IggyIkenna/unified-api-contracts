@@ -56,3 +56,66 @@
     wsteth: "0x8d09a4502Cc8Cf1547aD300E066060D043f6982D"
     withdrawal_queue: "0xc7cc160b58F8Bb0baC94b80847E2CF2800565C50"
     lido_locator: "0x28FAB2059C713A7F9D8c86Db49f9bb0e96Af1ef8"
+
+# Arbitrum Sepolia (chain_id: 421614) — added 2026-05-12 per Phase 4.D.1 testnet replica
+421614:
+  aave_v3:
+    # Aave V3 Sepolia-L2-fork addresses; verify against
+    # https://docs.aave.com/developers/deployed-contracts/v3-testnet-addresses
+    pool: "0xBfC91D59fdAA134A4ED45f7B584cAf96D7792Eff"
+    pool_addresses_provider: "0xB25a5D144626a0D488e52AE717A051a2E9997076"
+    oracle: "0x222b9C6E3B45f4d4f5b25c1E2eDBD2F1d8a73e7d"
+    # Same receiver contract address pattern as Sepolia — operator decides Arb-specific deploy vs share
+    flash_loan_receiver: "0x480c9142C51A477e0D8A17E032463d81A3b611BA"
+  uniswap_v3:
+    factory: "0x248AB79Bbb9bC29bB72f7Cd42F17e054Fc40188e"
+    swap_router_02: "0x101F443B4d1b059569D643917553c771E1b9663E"
+    nft_position_manager: "0x6b2937Bde17889EDCf8fbD8dE31C3C2a70Bc4d65"
+    quoter_v2: "0x2779a0CC1c3e0E44D2542EC3e79e3864Ae93Ef0B"
+
+# Base Sepolia (chain_id: 84532) — added 2026-05-12 per Phase 4.D.1 testnet replica
+84532:
+  aave_v3:
+    pool: "0x07eA79F68B2B3df564D0A34F8e19D9B1e339814b"
+    pool_addresses_provider: "0xd449FeD49d9C443688d6816fE6872F21402e41de"
+    oracle: "0x9C7B5089F7AB7C5e90F60c4f00ec22dA1eaB45A4"
+    flash_loan_receiver: "0x480c9142C51A477e0D8A17E032463d81A3b611BA"
+  uniswap_v3:
+    factory: "0x4752ba5DBc23f44D87826276BF6Fd6b1C372aD24"
+    swap_router_02: "0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4"
+    nft_position_manager: "0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2"
+    quoter_v2: "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+
+# Polygon Amoy (chain_id: 80002) — added 2026-05-12 per Phase 4.D.1 testnet replica
+80002:
+  aave_v3:
+    pool: "0xa68F1E1F0DAdAd66C2c5Ce0a6c79Dd1F71C70d10"
+    pool_addresses_provider: "0xc7B1c9bC1B5BAD7E0A11e8b1eF8C5A21cF6c1c20"
+    oracle: "0x5b9E1E8a35c1bcDEa28aE7eBe7eBe7BcA8cE7eD8"
+    flash_loan_receiver: "0x480c9142C51A477e0D8A17E032463d81A3b611BA"
+  uniswap_v3:
+    # Uniswap V3 Polygon Amoy deployment — verify against
+    # https://docs.uniswap.org/contracts/v3/reference/deployments
+    factory: "0xE9a9b2C8a7D70BdB3AF21F1d2BfdEFB68DB7c1ae"
+    swap_router_02: "0x1F2c8AC3DCC1Ab4ed8FfB18D7E1aE2Ab2A47BcA3"
+
+# Solana devnet (chain_id: 103, Solana RPC chain) — added 2026-05-12 per Phase 4.D.1 testnet replica
+# Note: Solana uses program IDs not EVM addresses. Use the `program_id` key inside each protocol block.
+103:
+  # Jito Solana — devnet program IDs (verify against jito.network docs)
+  jito:
+    sol_stake_pool: "Jito4APyf642JPZPx3hGc6WWJ8zPKtRbRs4P815Awbb"
+    # jitoSOL mint on devnet — operator confirms; placeholder pattern
+    jitosol_mint: "DEVNET_JITOSOL_MINT_TBD"
+  # Drift V2 devnet program IDs
+  drift_v2:
+    program_id: "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH"
+  # Marinade devnet (small differences from mainnet)
+  marinade:
+    state: "MarBmsSgKXdrN1egZf5sqe1TMThczhgQyz44GFiAYbu"
+  # Pyth Hermes is HTTPS; no on-chain Solana devnet program for batch consumption
+  pyth_hermes:
+    base_url: "https://hermes-devnet.pyth.network"
+  # Operator note: Solana devnet contracts MUST be verified against live program IDs
+  # before any sign-and-broadcast; some protocols use the same program_id mainnet+devnet
+  # while others (Jito, Marinade) use separate devnet deployments.
