@@ -550,6 +550,27 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         ),
         "data_source": "drift_api",
     },
+    "mango": {
+        "name": "Mango Markets V4",
+        "type": "perps_dex",
+        "program_id": "4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg",
+        "api_url": "https://api.mngo.cloud/data/v4",
+        "data_source": "mango_api",
+    },
+    "zeta": {
+        "name": "Zeta Markets",
+        "type": "perps_dex",
+        "program_id": "ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD",
+        "api_url": "https://dex.zeta.markets/api",
+        "data_source": "zeta_api",
+    },
+    "flash_trade": {
+        "name": "Flash Trade",
+        "type": "perps_dex",
+        "program_id": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+        "api_url": "https://api.flash.trade/api/v1",
+        "data_source": "flash_api",
+    },
     "raydium": {
         "name": "Raydium",
         "type": "dex",
