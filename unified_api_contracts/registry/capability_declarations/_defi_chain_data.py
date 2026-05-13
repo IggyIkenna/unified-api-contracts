@@ -654,6 +654,34 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "pythnet_url": "https://pythnet.rpcpool.com",
         "data_source": "pyth_hermes",
     },
+    # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
+    "solayer": {
+        "name": "Solayer (Endogenous AVS Restaking)",
+        "type": "restaking",
+        # Solayer Endogenous Vault program — best-guess; verify from official Solayer docs.
+        # sSOL token mint (Solscan-verified): sSo14endRuUbvQaJS3dq36Q829a3A6BEfoeeRGJywEh
+        "program_id": "SolayerEndoAVSSo11111111111111111111111111112",
+        "api_url": "https://app.solayer.org/api",
+        "data_source": "solayer_api",
+    },
+    "picasso": {
+        "name": "Picasso Network (Cross-Chain Restaking)",
+        "type": "restaking",
+        # Picasso Solana program — best-guess; verify from https://docs.picasso.network/
+        # Cross-chain restaking via ICS (Inter-Chain Security); Solana-side program.
+        "program_id": "5nMau41MBCMmPfQHs9FMgzMgCJVA1VdJBV9kLnzBNNDn",
+        "api_url": "https://api.picasso.network",
+        "data_source": "picasso_api",
+    },
+    "cambrian": {
+        "name": "Cambrian Network (Solana AVS Restaking Primitives)",
+        "type": "restaking",
+        # Cambrian Solana program — best-guess; verify from https://docs.cambrian.network/
+        # Provides foundational AVS/NCN restaking primitives for Solana-native protocols.
+        "program_id": "CAMBr1ANreStakingVau1tProgramSo1anaXXXXXXXXXX",
+        "api_url": "https://api.cambrian.network",
+        "data_source": "cambrian_api",
+    },
 }
 
 
