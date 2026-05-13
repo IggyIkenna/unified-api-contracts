@@ -103,6 +103,110 @@ EXPECTED_PRE_VENUE_LAUNCH rows in the default window.
 
 
 # ---------------------------------------------------------------------------
+# DeFi venue launch dates — when the protocol-chain combination became
+# publicly active on-chain. Distinct from ``CHAIN_GENESIS_DATES`` (which only
+# tells us the chain existed). A protocol-chain row in the manifest needs
+# BOTH chain genesis AND protocol launch to be live on that date.
+#
+# Codified 2026-05-13 (slot 3) after `_classify_defi` was found to only check
+# chain genesis (Ethereum 2015-07-30) but not protocol launch (Aave V3
+# 2022-03-16). Result: 604,951 defi rows wrongly flipped from
+# ``empty_confirmed/EXPECTED_INSTRUMENT_NOT_LISTED`` to
+# ``attempted_failed/LegacyBlankErrorReasonError`` because the wrapper had no
+# way to detect pre-protocol-launch dates. See issue doc
+# ``plans/active/issues/defi_legacy_blank_reclassification_2026_05_13.md``.
+#
+# Keys are the ``protocol-chain`` venue string used in the defi manifest's
+# ``venue`` column (e.g. ``"AAVEV3-ETHEREUM"``). Bare protocol names (e.g.
+# ``"MAKER"``, ``"YEARNV3"``) are protocols that span all chains via a single
+# manifest row — those use just the protocol name without chain suffix.
+#
+# Per the conservative-prefer-later principle (see CeFi block above):
+# undercounting EXPECTED_PRE_VENUE_LAUNCH rows is safer than overcounting.
+# If unsure, pick a slightly LATER date.
+# ---------------------------------------------------------------------------
+
+DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
+    # Aave V3 — March 16 2022 multi-chain launch (ETH/POLY/AVAX/ARB/OPT).
+    # BSC/LINEA/ZKSYNC/SCROLL came later per official deployment timelines.
+    "AAVEV3-ETHEREUM": "2022-03-16",
+    "AAVEV3-POLYGON": "2022-03-16",
+    "AAVEV3-AVALANCHE": "2022-03-16",
+    "AAVEV3-ARBITRUM": "2022-03-16",
+    "AAVEV3-OPTIMISM": "2022-03-16",
+    "AAVEV3-BSC": "2023-04-06",
+    "AAVEV3-LINEA": "2024-09-26",
+    "AAVEV3-ZKSYNC": "2024-04-09",
+    "AAVEV3-SCROLL": "2024-04-29",
+    # Compound V3 ("Comet") — Aug 26 2022 on Ethereum; multi-chain later.
+    "COMPOUNDV3-ETHEREUM": "2022-08-26",
+    "COMPOUNDV3-POLYGON": "2023-02-15",
+    "COMPOUNDV3-ARBITRUM": "2023-04-14",
+    "COMPOUNDV3-BASE": "2023-08-11",
+    "COMPOUNDV3-OPTIMISM": "2024-02-16",
+    "COMPOUNDV3-SCROLL": "2024-04-23",
+    # Uniswap V2 (May 2020), V3 (May 2021 ETH, Dec 2021 Polygon), V4 (Jan 2025).
+    "UNISWAPV2-ETHEREUM": "2020-05-05",
+    "UNISWAPV3-ETHEREUM": "2021-05-05",
+    "UNISWAPV3-POLYGON": "2021-12-22",
+    "UNISWAPV4-ETHEREUM": "2025-01-31",
+    # SushiSwap V3 — April 2023.
+    "SUSHISWAPV3-ETHEREUM": "2023-04-04",
+    # Curve — Jan 2020 launch (CRV token mainnet later, but pools live earlier).
+    "CURVE-ETHEREUM": "2020-01-19",
+    # Balancer V2 — March 2020 (V1 earlier but V2 is the active reference).
+    "BALANCER-ETHEREUM": "2020-03-31",
+    # Lido stETH — Dec 19 2020 ETH mainnet.
+    "LIDO-ETHEREUM": "2020-12-19",
+    # Frax stablecoin — Dec 21 2020.
+    "FRAX-ETHEREUM": "2020-12-21",
+    "FRAX": "2020-12-21",  # bare-protocol variant
+    # Rocket Pool Atlas — Nov 9 2021 (rETH liquid staking).
+    "ROCKETPOOL-ETHEREUM": "2021-11-09",
+    # Ethena USDe — Feb 20 2024 mainnet launch.
+    "ETHENA-ETHEREUM": "2024-02-20",
+    "ETHENA": "2024-02-20",  # bare-protocol variant
+    # ether.fi liquid restaking — April 26 2023 mainnet.
+    "ETHERFI-ETHEREUM": "2023-04-26",
+    # Solana DeFi protocols
+    "KAMINO-SOLANA": "2022-08-24",  # Kamino Aug 2022
+    "JITO-SOLANA": "2022-08-16",  # Jito MEV+staking Aug 2022
+    "MARINADE-SOLANA": "2021-08-02",  # Marinade mSOL launch
+    "DRIFT-SOLANA": "2021-11-08",  # Drift V1 mainnet
+    "RAYDIUM-SOLANA": "2021-02-21",  # Raydium AMM launch
+    "ORCA-SOLANA": "2021-02-09",  # Orca AMM launch
+    # GMX — Sept 2021 Arbitrum, Jan 2022 Avalanche.
+    "GMX-ARBITRUM": "2021-09-01",
+    "GMX-AVALANCHE": "2022-01-06",
+    # Yearn V3 — March 13 2024 launch (V2 earlier but V3 is referenced here).
+    "YEARNV3": "2024-03-13",
+    # Morpho Vaults (MetaMorpho) — Jan 4 2024 launch.
+    "MORPHOVAULTS": "2024-01-04",
+    # Pre-2018 venues kept for completeness (no EXPECTED_PRE_VENUE_LAUNCH rows
+    # within the default [2018-01-01, today] window):
+    "MAKER": "2017-12-19",  # MakerDAO single-collateral DAI launch
+}
+"""DeFi venue (``PROTOCOL-CHAIN`` or bare ``PROTOCOL``) → public-launch date.
+
+Sister registry to ``CEFI_VENUE_LAUNCH_DATES``. The protocol-chain combo is
+the relevant launch date because a protocol may deploy to a new chain years
+after its original launch (e.g. Aave V3 launched 2022-03 on ETH/POLY/AVAX/
+ARB/OPT but didn't reach BSC until 2023-04 or Linea until 2024-09).
+
+Used by ``_classify_defi`` in
+``unified_trading_library.legacy_reason_classifier`` to detect pre-protocol-
+launch dates that should be classified as ``EXPECTED_PRE_VENUE_LAUNCH``
+rather than falling through to ``SOURCE_RETURNED_ZERO`` (which then flips to
+``attempted_failed`` for cefi/defi/tradfi per the per-asset-group empty rules).
+
+Conservative principle: prefer LATER dates when uncertain. A later date
+emits fewer EXPECTED_PRE_VENUE_LAUNCH rows; the cost is "a few pre-launch
+days look like real data gaps" vs "real data dates marked as pre-launch"
+(correctness bug).
+"""
+
+
+# ---------------------------------------------------------------------------
 # Combined lookup — keyed by ``(asset_group, venue)`` so a single helper
 # call can resolve the launch date regardless of which asset_group's
 # dict the venue lives in.
@@ -111,6 +215,7 @@ EXPECTED_PRE_VENUE_LAUNCH rows in the default window.
 _ALL_VENUE_LAUNCH_DATES: Final[dict[tuple[str, str], str]] = {
     **{("cefi", venue): date for venue, date in CEFI_VENUE_LAUNCH_DATES.items()},
     **{("prediction", venue): date for venue, date in PREDICTION_VENUE_LAUNCH_DATES.items()},
+    **{("defi", venue): date for venue, date in DEFI_VENUE_LAUNCH_DATES.items()},
 }
 
 
@@ -127,6 +232,7 @@ def get_venue_launch_date(asset_group: str, venue: str) -> str | None:
 
 __all__ = (
     "CEFI_VENUE_LAUNCH_DATES",
+    "DEFI_VENUE_LAUNCH_DATES",
     "PREDICTION_VENUE_LAUNCH_DATES",
     "get_venue_launch_date",
 )
