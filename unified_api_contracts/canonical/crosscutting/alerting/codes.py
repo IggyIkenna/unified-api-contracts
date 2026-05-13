@@ -243,6 +243,57 @@ class AlertCode(StrEnum):
     because the gap is now *fully* closed (no missing data), not just
     reconnected forward."""
 
+    # ── Phase 1.E extensions — venue / lending / market-data / gas / oracle kill-switch ─
+    VENUE_HALTED = "VENUE_HALTED"
+    """Venue has entered a maintenance halt or full trading suspension —
+    all instrument pairs halted. Distinct from ``VENUE_CIRCUIT_BREAKER_OPEN``
+    (execution-side breaker) and ``CONNECTIVITY_GAP_DETECTED`` (network-level).
+    Payload: ``venue``, ``halt_reason``, ``resumed_at`` (if known).
+    Severity HIGH — PagerDuty P2; operator must reroute open hedges."""
+    LENDING_POOL_PAUSED = "LENDING_POOL_PAUSED"
+    """Aave / lending protocol pool paused by guardian or governance action —
+    new borrows and repayments blocked until unpaused. Carry-strategy borrows
+    cannot be resized. Severity HIGH — PagerDuty P2.
+    Payload: ``protocol``, ``pool``, ``paused_at``."""
+    LENDING_BORROW_CAP_REACHED = "LENDING_BORROW_CAP_REACHED"
+    """Aave / lending pool borrow cap reached — no new borrows possible but
+    repayments and liquidations still active. Carry strategy cannot add leverage.
+    Severity WARN — Telegram only (pool may clear within one block).
+    Payload: ``protocol``, ``pool``, ``current_borrow_usd``, ``cap_usd``."""
+    LENDING_UTILIZATION_HIGH = "LENDING_UTILIZATION_HIGH"
+    """Lending pool utilization above threshold bps — carry-strategy borrow
+    cost inflects at Aave's interest-rate kink (95.00%). Complements
+    ``CIRCUIT_BREAKER_OPEN`` with an earlier soft warning.
+    Severity WARN. Threshold key: ``lending_utilization_high_bps``.
+    Payload: ``protocol``, ``pool``, ``utilization_bps``."""
+    MARKET_DATA_STALE = "MARKET_DATA_STALE"
+    """Generic market-data staleness — broader than ``TICK_STALENESS``
+    (MDPS write-gate downstream-detected). ``MARKET_DATA_STALE`` fires at the
+    consuming-service layer (features-onchain, strategy) when any input feed
+    has not updated within the allowed window.
+    Severity HIGH. Threshold key: ``market_data_stale_seconds``.
+    Payload: ``service``, ``feed_id``, ``last_updated_at``, ``stale_seconds``."""
+    GAS_PRICE_SPIKE = "GAS_PRICE_SPIKE"
+    """L1 / L2 gas price spiked above threshold gwei — on-chain tx cost
+    renders execution economically infeasible for the current archetype.
+    Severity WARN (single spike) — escalates to HIGH if sustained.
+    Threshold key: ``gas_price_spike_gwei``.
+    Payload: ``chain``, ``gas_gwei``, ``threshold_gwei``."""
+    GAS_BUDGET_EXCEEDED = "GAS_BUDGET_EXCEEDED"
+    """Per-archetype / per-wallet cumulative gas spend exceeded the session
+    or daily budget in ETH. Blocks new on-chain transactions until operator
+    extends budget or rotates wallet.
+    Severity HIGH — PagerDuty P2. Threshold key: ``gas_budget_exceeded_eth``.
+    Payload: ``archetype``, ``wallet``, ``spent_eth``, ``budget_eth``."""
+    KILL_SWITCH_ORACLE_DIVERGENCE = "KILL_SWITCH_ORACLE_DIVERGENCE"
+    """Oracle price divergence exceeds kill-switch threshold — covers both
+    price-deviation (``ORACLE_DEVIATION_BPS`` breaker) AND data-staleness
+    (``ORACLE_STALENESS_SECONDS`` breaker). Either condition qualifies because
+    a stale or divergent price oracle makes strategy execution unsafe.
+    Triggers GLOBAL kill-switch. Severity CRITICAL — PagerDuty P1.
+    Payload: ``oracle_source``, ``instrument``, ``deviation_bps`` or
+    ``stale_seconds``, ``threshold``."""
+
 
 ALERT_CODES: Final[frozenset[str]] = frozenset(member.value for member in AlertCode)
 """String-membership view of :class:`AlertCode` for fast O(1) validation.

@@ -705,3 +705,116 @@ def test_phase6_required_runbook_slugs_present_in_live_alert_rules() -> None:
     assert not missing, (
         f"Phase 6 plan-required runbook slugs missing from LIVE_ALERT_RULES runbook_doc set: {sorted(missing)}"
     )
+
+
+# ---------------------------------------------------------------------------
+# Phase 1.E extensions — venue / lending / market-data / gas / oracle (2026-05-13)
+# ---------------------------------------------------------------------------
+
+_PHASE_1E_CODES: tuple[AlertCode, ...] = (
+    AlertCode.VENUE_HALTED,
+    AlertCode.LENDING_POOL_PAUSED,
+    AlertCode.LENDING_BORROW_CAP_REACHED,
+    AlertCode.LENDING_UTILIZATION_HIGH,
+    AlertCode.MARKET_DATA_STALE,
+    AlertCode.GAS_PRICE_SPIKE,
+    AlertCode.GAS_BUDGET_EXCEEDED,
+    AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE,
+)
+
+
+def test_phase_1e_codes_present_in_enum() -> None:
+    """8 Phase 1.E codes must be in the closed AlertCode set."""
+    for code in _PHASE_1E_CODES:
+        assert code in AlertCode, f"AlertCode.{code.name} missing from enum"
+
+
+def test_phase_1e_codes_have_routing_rule() -> None:
+    """Every Phase 1.E code must have at least one matching AlertRule in LIVE_ALERT_RULES."""
+    for code in _PHASE_1E_CODES:
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.event_pattern)]
+        assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
+
+
+def test_phase_1e_codes_no_shadowing() -> None:
+    """Phase 1.E code string values must be unique in the closed set."""
+    values = [member.value for member in AlertCode]
+    for code in _PHASE_1E_CODES:
+        assert values.count(code.value) == 1, (
+            f"AlertCode.{code.name} value={code.value!r} appears"
+            f" {values.count(code.value)} times — shadowing regression."
+        )
+
+
+def test_alert_code_closed_set_grew_to_at_least_64() -> None:
+    """Closed-set growth ratchet: prior 61 + 8 Phase 1.E (2026-05-13) = at-least 64."""
+    assert len(list(AlertCode)) >= 64, (
+        f"AlertCode closed set has only {len(list(AlertCode))} members;"
+        " expected at-least 64 after Phase 1.E additions (2026-05-13)."
+    )
+
+
+def test_kill_switch_oracle_divergence_triggers_kill_switch() -> None:
+    """KILL_SWITCH_ORACLE_DIVERGENCE must carry triggers_kill_switch=True and
+    kill_switch_scope=GLOBAL — a frozen/diverged oracle must halt globally."""
+    rules = [r for r in LIVE_ALERT_RULES if r.code is AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE]
+    assert len(rules) == 1, "Expected exactly one rule for KILL_SWITCH_ORACLE_DIVERGENCE"
+    rule = rules[0]
+    assert rule.triggers_kill_switch is True
+    assert rule.kill_switch_scope is KillSwitchScope.GLOBAL
+    assert rule.severity is AlertSeverity.CRITICAL
+    assert AlertChannel.PAGERDUTY in rule.channels
+
+
+def test_phase_1e_threshold_keys_present_in_registry() -> None:
+    """Phase 1.E threshold-gated codes must reference keys present in ALERT_THRESHOLDS."""
+    expected_threshold_keys = {
+        "LENDING_UTILIZATION_HIGH": "lending_utilization_high_bps",
+        "MARKET_DATA_STALE": "market_data_stale_seconds",
+        "GAS_PRICE_SPIKE": "gas_price_spike_gwei",
+        "GAS_BUDGET_EXCEEDED": "gas_budget_exceeded_eth",
+    }
+    for code_name, expected_key in expected_threshold_keys.items():
+        assert expected_key in ALERT_THRESHOLDS, f"Missing threshold key: {expected_key}"
+        rules = [r for r in LIVE_ALERT_RULES if r.code.value == code_name]
+        assert rules, f"No rule for {code_name}"
+        assert rules[0].threshold_key == expected_key, (
+            f"{code_name}: expected threshold_key={expected_key!r},"
+            f" got {rules[0].threshold_key!r}"
+        )
+
+
+def test_phase_1e_oracle_staleness_threshold_is_seconds() -> None:
+    """oracle_staleness_seconds threshold MUST carry ThresholdUnit.SECONDS."""
+    threshold = ALERT_THRESHOLDS["oracle_staleness_seconds"]
+    assert threshold.unit is ThresholdUnit.SECONDS
+    assert threshold.default_value == Decimal("120")
+
+
+def test_phase_1e_lending_utilization_threshold_unit_is_bps() -> None:
+    """lending_utilization_high_bps must be BPS_OF_ONE with value < defi_aave_utilization_spike_bps."""
+    threshold = ALERT_THRESHOLDS["lending_utilization_high_bps"]
+    assert threshold.unit is ThresholdUnit.BPS_OF_ONE
+    spike_threshold = ALERT_THRESHOLDS["defi_aave_utilization_spike_bps"]
+    assert threshold.default_value < spike_threshold.default_value, (
+        "lending_utilization_high_bps should fire before defi_aave_utilization_spike_bps kink"
+    )
+
+
+def test_phase_1e_venue_halted_severity_is_high() -> None:
+    """VENUE_HALTED should be HIGH severity + page PagerDuty."""
+    rules = [r for r in LIVE_ALERT_RULES if r.code is AlertCode.VENUE_HALTED]
+    assert len(rules) == 1
+    rule = rules[0]
+    assert rule.severity is AlertSeverity.HIGH
+    assert AlertChannel.PAGERDUTY in rule.channels
+
+
+def test_phase_1e_lending_borrow_cap_is_warn_only() -> None:
+    """LENDING_BORROW_CAP_REACHED is a transient condition — WARN/Telegram-only,
+    no page (pool may clear within a block)."""
+    rules = [r for r in LIVE_ALERT_RULES if r.code is AlertCode.LENDING_BORROW_CAP_REACHED]
+    assert len(rules) == 1
+    rule = rules[0]
+    assert rule.severity is AlertSeverity.WARN
+    assert AlertChannel.PAGERDUTY not in rule.channels

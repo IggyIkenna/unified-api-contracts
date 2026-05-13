@@ -143,6 +143,19 @@ class CircuitBreakerId(StrEnum):
     CLOCK_SKEW_MS = "CLOCK_SKEW_MS"
     """Local clock vs venue ts skew >= threshold ms (timestamp-mismatch correctness risk)."""
 
+    # ── Cross-archetype shared: oracle staleness + lending pool unavailability ─
+    ORACLE_STALENESS_SECONDS = "ORACLE_STALENESS_SECONDS"
+    """Oracle data feed has not updated for >= threshold seconds.
+    Distinct from ``ORACLE_DEVIATION_BPS`` (price divergence) — this breaker
+    guards against a *frozen* oracle, not a *wrong* oracle price.
+    Applies to both carry_staked_basis (Chainlink/Pyth LST price feeds) and
+    arbitrage_price_dispersion (cross-venue reference prices)."""
+    LENDING_POOL_UNAVAILABLE_SECONDS = "LENDING_POOL_UNAVAILABLE_SECONDS"
+    """Aave / lending pool has been paused OR borrow-cap-locked for >= threshold
+    seconds. Covers two sub-modes: ``PAUSED`` (guardian action; repayments still
+    live) and ``BORROW_CAP_REACHED`` (pool full; new borrows blocked). Both
+    sub-modes prevent carry_staked_basis from resizing leverage."""
+
     # ── Stablecoin depeg ladder (D.1 — risk plan Phase D) ─────────────────────
     STABLECOIN_DEPEG_WARNING = "STABLECOIN_DEPEG_WARNING"
     """Stablecoin peg deviation ≥ 100bps (standard) / 50bps (synthetic: USDE/CRVUSD/FRAX) — BLOCK_NEW."""

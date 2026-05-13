@@ -184,6 +184,24 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
         alerting_severity=AlertSeverity.WARN,
         description="Local vs venue ts skew >= 500ms → pause new orders until NTP resync.",
     ),
+    # ── Phase 1.E addition — RPC outage seed for ARBITRAGE_PRICE_DISPERSION ──
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.RPC_OUTAGE_SECONDS,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="ARBITRAGE_PRICE_DISPERSION",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.RPC_OUTAGE_SECONDS,
+            threshold_value=Decimal("60"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=120,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Chain RPC unreachable >= 60s — cross-venue price data unavailable;"
+            " ARBITRAGE_PRICE_DISPERSION cannot safely execute on-chain legs."
+        ),
+    ),
 )
 
 RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
@@ -245,6 +263,12 @@ RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
         breaker_id=CircuitBreakerId.CLOCK_SKEW_MS,
         guard_description="Local clock skew < 100ms after NTP resync.",
         retry_policy="linear",
+        auto_disarm_after_seconds=120,
+    ),
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.RPC_OUTAGE_SECONDS,
+        guard_description="RPC endpoint returns 200 for >= 5 consecutive health checks.",
+        retry_policy="exponential",
         auto_disarm_after_seconds=120,
     ),
 )

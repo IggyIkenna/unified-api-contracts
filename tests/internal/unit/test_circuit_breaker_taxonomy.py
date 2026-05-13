@@ -434,3 +434,63 @@ def test_facade_exports_breaker_taxonomy() -> None:
     assert uac.BreakerConfig is BreakerConfig
     assert uac.BreakerRecoveryRule is BreakerRecoveryRule
     assert uac.BREAKER_RECOVERY_DEFAULTS is BREAKER_RECOVERY_DEFAULTS
+
+
+# ---------------------------------------------------------------------------
+# Phase 1.E extensions — ORACLE_STALENESS_SECONDS + LENDING_POOL_UNAVAILABLE_SECONDS
+# + RPC_OUTAGE_SECONDS APD seed (2026-05-13)
+# ---------------------------------------------------------------------------
+
+
+def test_phase_1e_new_circuit_breaker_ids_present() -> None:
+    """ORACLE_STALENESS_SECONDS and LENDING_POOL_UNAVAILABLE_SECONDS must be
+    present in the CircuitBreakerId enum as of Phase 1.E (2026-05-13)."""
+    assert hasattr(CircuitBreakerId, "ORACLE_STALENESS_SECONDS")
+    assert hasattr(CircuitBreakerId, "LENDING_POOL_UNAVAILABLE_SECONDS")
+    assert CircuitBreakerId.ORACLE_STALENESS_SECONDS.value == "ORACLE_STALENESS_SECONDS"
+    assert CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS.value == "LENDING_POOL_UNAVAILABLE_SECONDS"
+
+
+def test_oracle_staleness_distinct_from_oracle_deviation() -> None:
+    """ORACLE_STALENESS_SECONDS (frozen feed) and ORACLE_DEVIATION_BPS (wrong price)
+    must be different enum members — conflating them would mask the difference
+    between a stale oracle and a diverging oracle."""
+    assert CircuitBreakerId.ORACLE_STALENESS_SECONDS != CircuitBreakerId.ORACLE_DEVIATION_BPS
+    assert CircuitBreakerId.ORACLE_STALENESS_SECONDS.value != CircuitBreakerId.ORACLE_DEVIATION_BPS.value
+
+
+def test_carry_staked_basis_has_oracle_staleness_breaker() -> None:
+    """CARRY_STAKED_BASIS registry must include ORACLE_STALENESS_SECONDS config."""
+    configs = PER_ARCHETYPE_BREAKERS["CARRY_STAKED_BASIS"]
+    ids = {c.breaker_id for c in configs}
+    assert CircuitBreakerId.ORACLE_STALENESS_SECONDS in ids, (
+        "CARRY_STAKED_BASIS missing ORACLE_STALENESS_SECONDS breaker (Phase 1.E)"
+    )
+
+
+def test_carry_staked_basis_has_lending_pool_unavailable_breaker() -> None:
+    """CARRY_STAKED_BASIS registry must include LENDING_POOL_UNAVAILABLE_SECONDS config."""
+    configs = PER_ARCHETYPE_BREAKERS["CARRY_STAKED_BASIS"]
+    ids = {c.breaker_id for c in configs}
+    assert CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS in ids, (
+        "CARRY_STAKED_BASIS missing LENDING_POOL_UNAVAILABLE_SECONDS breaker (Phase 1.E)"
+    )
+
+
+def test_arbitrage_price_dispersion_has_rpc_outage_breaker() -> None:
+    """ARBITRAGE_PRICE_DISPERSION registry must include RPC_OUTAGE_SECONDS config
+    (Phase 1.E — disambiguate per-archetype applies_to seed)."""
+    configs = PER_ARCHETYPE_BREAKERS["ARBITRAGE_PRICE_DISPERSION"]
+    ids = {c.breaker_id for c in configs}
+    assert CircuitBreakerId.RPC_OUTAGE_SECONDS in ids, (
+        "ARBITRAGE_PRICE_DISPERSION missing RPC_OUTAGE_SECONDS breaker (Phase 1.E)"
+    )
+
+
+def test_oracle_staleness_breaker_severity_is_critical() -> None:
+    """ORACLE_STALENESS_SECONDS for CARRY_STAKED_BASIS must be CRITICAL
+    (frozen oracle = unsafe to trade)."""
+    configs = PER_ARCHETYPE_BREAKERS["CARRY_STAKED_BASIS"]
+    staleness_configs = [c for c in configs if c.breaker_id == CircuitBreakerId.ORACLE_STALENESS_SECONDS]
+    assert staleness_configs, "ORACLE_STALENESS_SECONDS config not found in CARRY_STAKED_BASIS"
+    assert staleness_configs[0].alerting_severity == AlertSeverity.CRITICAL

@@ -315,6 +315,95 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         ),
         description="Grace window in minutes before ML model-version mismatch fires (0 = immediate).",
     ),
+    # ── Phase 1.E extensions (2026-05-13 alerting_service_live_rules slot 7) ──
+    "gas_price_spike_gwei": AlertThreshold(
+        key="gas_price_spike_gwei",
+        unit=ThresholdUnit.COUNT_PER_MINUTE,  # gwei is a count unit; no explicit GWEI unit exists
+        default_value=Decimal("200"),
+        source_doc=(
+            "200 gwei matches GAS_PRICE_SURGE_GWEI circuit-breaker threshold in"
+            " carry_staked_basis registry (Phase 1.A). At 200 gwei Ethereum L1 a"
+            " typical Aave V3 repay tx costs ~$20-40 in gas — above the carry"
+            " yield at normal position sizes. L2 gas is far lower; this threshold"
+            " applies only to mainnet-native operations. Phase 7 quietness baseline"
+            " will tune per-chain if L2s are added. Alert plan Phase 1.E (2026-05-13)."
+        ),
+        description="L1/L2 gas price in gwei above which on-chain tx cost renders execution uneconomic.",
+    ),
+    "gas_budget_exceeded_eth": AlertThreshold(
+        key="gas_budget_exceeded_eth",
+        unit=ThresholdUnit.USD,  # using USD unit as closest available — actual value is ETH
+        default_value=Decimal("1"),
+        source_doc=(
+            "1 ETH per-wallet daily gas budget. Conservative starting point for"
+            " May-23 testnet operations; operator confirms post-live-testnet."
+            " Measured in ETH (stored as Decimal here; consuming code interprets"
+            " the unit as ETH native). Phase 7 quietness baseline tunes"
+            " per-archetype and per-wallet once Phase 4 wallet provisioning lands."
+            " Alert plan Phase 1.E (2026-05-13)."
+        ),
+        description="Cumulative gas spent in ETH per wallet per session/day above which budget alert fires.",
+    ),
+    "lending_utilization_high_bps": AlertThreshold(
+        key="lending_utilization_high_bps",
+        unit=ThresholdUnit.BPS_OF_ONE,
+        default_value=Decimal("9000"),
+        source_doc=(
+            "9000 bps_of_one = 90.00% pool utilization. Fires 5pp before the"
+            " Aave V3 interest-rate kink (95.00%; gated by"
+            " defi_aave_utilization_spike_bps = 9500). LENDING_UTILIZATION_HIGH"
+            " is a soft early-warning; defi_aave_utilization_spike_bps gates the"
+            " CIRCUIT_BREAKER_OPEN escalation. Alert plan Phase 1.E (2026-05-13)."
+        ),
+        description="Lending pool utilization in bps at which the early-warning LENDING_UTILIZATION_HIGH alert fires.",
+        per_archetype_overrides={
+            "leveraged_funding_arb": Decimal("8500"),
+        },
+    ),
+    "oracle_staleness_seconds": AlertThreshold(
+        key="oracle_staleness_seconds",
+        unit=ThresholdUnit.SECONDS,
+        default_value=Decimal("120"),
+        source_doc=(
+            "Chainlink heartbeat on mainnet WETH/USD is 3600s (1h) with a 0.5%"
+            " deviation threshold. Pyth on Solana publishes sub-second. 120s"
+            " (2min) is conservative enough to avoid false-positives on Chainlink"
+            " normal-range updates while catching genuine staleness on Pyth/Solana."
+            " ORACLE_STALENESS_SECONDS breaker in carry_staked_basis uses same"
+            " value; per-chain overrides expected once Phase 7 baseline lands."
+            " Alert plan Phase 1.E (2026-05-13)."
+        ),
+        description="Maximum seconds since oracle last published before KILL_SWITCH_ORACLE_DIVERGENCE fires.",
+    ),
+    "lending_pool_unavailable_seconds": AlertThreshold(
+        key="lending_pool_unavailable_seconds",
+        unit=ThresholdUnit.SECONDS,
+        default_value=Decimal("300"),
+        source_doc=(
+            "Aave V3 guardian pause is typically resolved within minutes; 300s"
+            " (5min) balances false-positive avoidance against carry-strategy"
+            " leverage-resize timeliness. Borrow-cap-reached events are often"
+            " block-by-block transient; same window avoids alert storms on"
+            " high-utilization periods. LENDING_POOL_UNAVAILABLE_SECONDS"
+            " circuit-breaker in carry_staked_basis uses same threshold."
+            " Alert plan Phase 1.E (2026-05-13)."
+        ),
+        description="Seconds a lending pool has been paused or borrow-cap-locked before breaker fires.",
+    ),
+    "market_data_stale_seconds": AlertThreshold(
+        key="market_data_stale_seconds",
+        unit=ThresholdUnit.SECONDS,
+        default_value=Decimal("300"),
+        source_doc=(
+            "300s (5min) matches tick_staleness_seconds (MDPS layer). MARKET_DATA_STALE"
+            " fires at the consuming-service layer (features-onchain, strategy) when"
+            " any upstream feed has not updated within this window. 5min is the same"
+            " conservative default as MDPS tick-staleness; per-service overrides"
+            " expected once Phase 7 quietness baseline runs against live pipeline."
+            " Alert plan Phase 1.E (2026-05-13)."
+        ),
+        description="Maximum age in seconds of any market-data feed before MARKET_DATA_STALE fires.",
+    ),
 }
 """Threshold registry. New rules must add an entry here AND reference the key
 from ``AlertRule.threshold_key`` so the closed-set sanity test catches drift.

@@ -803,6 +803,106 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " forward. Payload includes replayed_ticks_count."
         ),
     ),
+    # ── Phase 1.E — venue / lending / market-data / gas / oracle kill-switch ─
+    AlertRule(
+        code=AlertCode.VENUE_HALTED,
+        event_pattern="VENUE_HALTED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("venue_halted"),
+        description=(
+            "Venue entered a maintenance halt or full trading suspension."
+            " Operator must reroute open hedges. Distinct from"
+            " VENUE_CIRCUIT_BREAKER_OPEN (execution-side) and"
+            " CONNECTIVITY_GAP_DETECTED (network-level)."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.LENDING_POOL_PAUSED,
+        event_pattern="LENDING_POOL_PAUSED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("lending_pool_paused"),
+        description=(
+            "Aave / lending pool paused by guardian or governance — new borrows"
+            " and repayments blocked. Carry strategy cannot resize leverage."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.LENDING_BORROW_CAP_REACHED,
+        event_pattern="LENDING_BORROW_CAP_REACHED",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("lending_borrow_cap_reached"),
+        description=(
+            "Lending pool borrow cap reached — no new borrows possible."
+            " Repayments and liquidations still active. Pool may clear in one block."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.LENDING_UTILIZATION_HIGH,
+        event_pattern="LENDING_UTILIZATION_HIGH",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("lending_utilization_high"),
+        threshold_key="lending_utilization_high_bps",
+        description=(
+            "Lending pool utilization above threshold — early-warning before"
+            " interest-rate kink at 95.00%. Complements CIRCUIT_BREAKER_OPEN."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.MARKET_DATA_STALE,
+        event_pattern="MARKET_DATA_STALE",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("market_data_stale"),
+        threshold_key="market_data_stale_seconds",
+        description=(
+            "Market-data feed stale at consuming-service layer. Broader than"
+            " TICK_STALENESS (MDPS-specific); covers features-onchain / strategy"
+            " detecting any stale upstream feed."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.GAS_PRICE_SPIKE,
+        event_pattern="GAS_PRICE_SPIKE",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("gas_price_spike"),
+        threshold_key="gas_price_spike_gwei",
+        description=(
+            "L1/L2 gas price spiked above threshold gwei — on-chain tx cost"
+            " renders execution uneconomic. Strategy blocks new on-chain orders"
+            " until gas falls below recovery level."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.GAS_BUDGET_EXCEEDED,
+        event_pattern="GAS_BUDGET_EXCEEDED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("gas_budget_exceeded"),
+        threshold_key="gas_budget_exceeded_eth",
+        description=(
+            "Cumulative gas spend exceeded session/daily budget — new on-chain"
+            " txs blocked until operator extends budget or rotates wallet."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE,
+        event_pattern="KILL_SWITCH_ORACLE_DIVERGENCE",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("kill_switch_oracle_divergence"),
+        triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.GLOBAL,
+        description=(
+            "Oracle price divergence or staleness exceeds kill-switch threshold."
+            " Either ORACLE_DEVIATION_BPS or ORACLE_STALENESS_SECONDS breach"
+            " qualifies. Triggers GLOBAL kill-switch — full halt."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

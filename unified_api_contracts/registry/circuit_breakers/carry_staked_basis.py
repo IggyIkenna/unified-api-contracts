@@ -219,6 +219,41 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
         alerting_severity=AlertSeverity.HIGH,
         description="Batch-vs-live P&L divergence >= 50bps — auto-scale-down + recover when within 5bps.",
     ),
+    # ── Phase 1.E additions — oracle staleness + lending pool unavailability ──
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="CARRY_STAKED_BASIS",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
+            threshold_value=Decimal("120"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=300,
+        alerting_severity=AlertSeverity.CRITICAL,
+        description=(
+            "Chainlink/Pyth oracle has not published for >= 120s — frozen feed."
+            " BLOCK_NEW + fires KILL_SWITCH_ORACLE_DIVERGENCE → GLOBAL halt."
+        ),
+    ),
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="CARRY_STAKED_BASIS",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+            threshold_value=Decimal("300"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=600,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Aave pool paused or borrow-cap-locked >= 300s — carry leverage"
+            " cannot be resized. BLOCK_NEW until pool accepts borrows again."
+        ),
+    ),
     *_depeg_configs(),
 )
 
@@ -282,6 +317,18 @@ RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
         guard_description="Batch-vs-live recon within 5bps for 30min.",
         retry_policy="linear",
         auto_disarm_after_seconds=1800,
+    ),
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
+        guard_description="Oracle publishes fresh price for >= 5 consecutive heartbeat intervals.",
+        retry_policy="exponential",
+        auto_disarm_after_seconds=300,
+    ),
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+        guard_description="Lending pool accepts a borrow quote (non-reverted health check) for 3 consecutive probes.",
+        retry_policy="exponential",
+        auto_disarm_after_seconds=600,
     ),
     BreakerRecoveryRule(
         breaker_id=CircuitBreakerId.STABLECOIN_DEPEG_WARNING,
