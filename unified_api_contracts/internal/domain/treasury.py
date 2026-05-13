@@ -196,3 +196,45 @@ class CustodyPingResult:
         if self.is_reachable:
             return f"{self.source.value}: {self.balance_usd or self.balance_native} USD/native, {self.latency_ms}ms"
         return f"{self.source.value}: UNREACHABLE ({self.error_message})"
+
+
+@dataclass(frozen=True)
+class WithdrawalApprovalRule:
+    """Approval rule for a withdrawal from a specific TreasurySource.
+
+    Per ``wallet_treasury_client_flow_2026_05_10.md`` Phase 5.C.
+
+    Defines how many approvals are required and who may approve.
+    The rule applies to withdrawals above ``threshold_amount_usd``
+    (exclusive); amounts at or below require a single operator.
+
+    Fields:
+        treasury_source: Which custody source this rule governs.
+        amount_bucket: Human label ('SMALL' / 'MEDIUM' / 'LARGE') — informational only.
+        threshold_amount_usd: Amount above which quorum is required.
+            Amounts <= threshold require only 1 approver.
+        required_approvers: Number of approvals N needed (N-of-M quorum).
+        approver_pool: Set of operator IDs eligible to approve (pool size M >= required_approvers).
+    """
+
+    treasury_source: TreasurySource
+    amount_bucket: str
+    threshold_amount_usd: Decimal
+    required_approvers: int
+    approver_pool: frozenset[str]
+
+    def __post_init__(self) -> None:
+        if self.required_approvers < 1:
+            raise ValueError(f"required_approvers must be >= 1, got {self.required_approvers}")
+        if len(self.approver_pool) < self.required_approvers:
+            raise ValueError(
+                f"approver_pool size {len(self.approver_pool)} < required_approvers {self.required_approvers}"
+            )
+        if self.threshold_amount_usd < Decimal("0"):
+            raise ValueError(f"threshold_amount_usd must be >= 0, got {self.threshold_amount_usd}")
+
+    def approvers_required_for(self, amount_usd: Decimal) -> int:
+        """Return number of approvals required for a given withdrawal amount."""
+        if amount_usd <= self.threshold_amount_usd:
+            return 1
+        return self.required_approvers

@@ -95,6 +95,26 @@ class KillSwitchId(StrEnum):
     KILL_PER_ASSET_GROUP_CEFI = "KILL_PER_ASSET_GROUP_CEFI"
     KILL_PER_ASSET_GROUP_DEFI = "KILL_PER_ASSET_GROUP_DEFI"
 
+    # Per-treasury-source halts — wired to WithdrawalReconciler emergency threshold
+    # (wallet_treasury_client_flow_2026_05_10.md Phase 5.E)
+    KILL_PER_TREASURY_COPPER = "KILL_PER_TREASURY_COPPER"
+    """Halt all Copper withdrawals. Armed by WithdrawalReconciler on balance drift > emergency threshold."""
+
+    KILL_PER_TREASURY_CEFFU = "KILL_PER_TREASURY_CEFFU"
+    """Halt all CEFFU withdrawals. Armed by WithdrawalReconciler on balance drift > emergency threshold."""
+
+    KILL_PER_TREASURY_DEFI_HOT_WALLET = "KILL_PER_TREASURY_DEFI_HOT_WALLET"
+    """Halt all DeFi hot wallet withdrawals. Armed by WithdrawalReconciler on balance drift > emergency threshold."""
+
+    KILL_PER_TREASURY_SUB_ACCOUNT_HYPERLIQUID = "KILL_PER_TREASURY_SUB_ACCOUNT_HYPERLIQUID"
+    """Halt Hyperliquid sub-account withdrawals."""
+
+    KILL_PER_TREASURY_SUB_ACCOUNT_DRIFT = "KILL_PER_TREASURY_SUB_ACCOUNT_DRIFT"
+    """Halt DRIFT sub-account withdrawals."""
+
+    KILL_PER_TREASURY_SUB_ACCOUNT_DYDX = "KILL_PER_TREASURY_SUB_ACCOUNT_DYDX"
+    """Halt dYdX sub-account withdrawals."""
+
     # Per-wallet halt (sentinel — runtime-targeted via target_wallet_id)
     KILL_PER_WALLET = "KILL_PER_WALLET"
     """Freeze a single wallet by its ``wallet_id``. Runtime target carried on
