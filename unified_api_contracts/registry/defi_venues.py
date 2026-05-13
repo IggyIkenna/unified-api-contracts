@@ -434,23 +434,27 @@ DEFI_VENUE_PHASE: dict[str, str] = {
 }
 
 
-# Venues that appear in ALL_DEFI_VENUES / DEFI_VENUE_DATA_TYPE_CAPABILITIES for
-# DeFi *protocol-level* coverage tracking but whose market-data AXIS is "cefi"
-# because their data shape is CLOB-style (perpetual DEX funding/liquidations —
-# captured via the MTDS perp_funding_handler, same pipeline as CeFi perps).
+# On-chain perpetual DEX venues that are DeFi by settlement (wallet-signed
+# transactions, on-chain custody) but eligible as hedge leg candidates for
+# cross-venue funding arbitrage and basis trades alongside CeFi perp venues.
+# Strategy archetypes MUST NOT assume perp_venues ⊆ cefi — include this list
+# when building hedge leg candidate universes.
 #
-# Consumers iterating ALL_DEFI_VENUES or DEFI_VENUE_DATA_TYPE_CAPABILITIES for
-# asset_group routing MUST consult this dict:
-#   if DEFI_VENUE_AXIS_OVERRIDES.get(venue) == "cefi": route to cefi pipeline
-#
-# SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1C.
-DEFI_VENUE_AXIS_OVERRIDES: dict[str, str] = {
-    # GMX perpetual DEX — Arbitrum + Avalanche deployments
-    "GMX-ARBITRUM": "cefi",
-    "GMX-AVALANCHE": "cefi",
-    # DRIFT perpetual DEX — Solana (CLOB order-book, not AMM)
-    "DRIFT-SOLANA": "cefi",
-}
+# SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1C
+# (revised 2026-05-13 per operator — GMX/DRIFT are DeFi-only; prior cefi-axis
+# routing via DEFI_VENUE_AXIS_OVERRIDES was incorrect).
+DEFI_PERP_VENUES: list[str] = [
+    # GMX perpetual DEX — Arbitrum + Avalanche (on-chain, wallet-signed settlement)
+    "GMX-ARBITRUM",
+    "GMX-AVALANCHE",
+    # DRIFT perpetual DEX — Solana CLOB (on-chain settlement, not off-chain like CeFi)
+    "DRIFT-SOLANA",
+]
+
+# Formerly routed GMX/DRIFT to the cefi axis (CLOB-style data shape reasoning).
+# Emptied 2026-05-13: operator revised — GMX/DRIFT are DeFi-only; see
+# DEFI_PERP_VENUES above. Preserved for future venue axis-override semantics.
+DEFI_VENUE_AXIS_OVERRIDES: dict[str, str] = {}
 
 
 # Curated subset of DeFi venues that MTDS actively backfills. Used as

@@ -191,13 +191,6 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "PACIFICA-SOLANA",
         "EXTENDED-STARKNET",
         "LIGHTER-ZKSYNC",
-        # 2026-05-04 perp DEX expansion (carry_staked_basis_structure_axis
-        # plan, Phase 1a-followup): GMX-V2 on Arbitrum, DRIFT on Solana —
-        # capture funding via MTDS perp_funding_handler. Classified under
-        # cefi asset_group because their data shape is CLOB-style (not
-        # the AMM dex_pools shape that defines defi).
-        "GMX",
-        "DRIFT",
     ],
     "tradfi": [
         # Databento venues
@@ -622,10 +615,10 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
 
 # Merge the DEFI multi-chain block (extracted to defi_venue_capabilities.py
 # to keep this file under the 900-line QG ceiling).
-from unified_api_contracts.registry.defi_prediction_instrument_seeds import (
+from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402
     seed_for_venue_and_data_type,
 )
-from unified_api_contracts.registry.defi_venue_capabilities import (
+from unified_api_contracts.registry.defi_venue_capabilities import (  # noqa: E402
     DEFI_VENUE_DATA_TYPE_CAPABILITIES,
 )
 
@@ -732,7 +725,7 @@ def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
     if data_type in ref_caps:
         return ref_caps[data_type]
     # Fall back to venue start date from VenueMapping
-    from .venue_mapping import VenueMapping  # noqa: qg-inside-import
+    from .venue_mapping import VenueMapping
 
     vm = VenueMapping()
     # Check compound key first (e.g. POLYMARKET:CRUDE_OIL) for per-shard start dates
