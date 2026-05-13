@@ -101,8 +101,12 @@ class ManualInstruction(BaseModel):
         venue: Target venue slug (e.g. "binance", "deribit", or counterparty for OTC).
         account_id: Account identifier at the venue.
         instrument_key: Canonical instrument key (VENUE:TYPE:SYMBOL).
-        side: "BUY" or "SELL".
-        order_type: Execution algorithm or order type (e.g. "MARKET", "TWAP").
+        side: Trade direction. CeFi/DeFi: "BUY" or "SELL". Sports: "HOME"/"AWAY"/"DRAW".
+            Prediction: "YES"/"NO". Validated at the endpoint per asset_group.
+        order_type: Execution algorithm (e.g. "MARKET", "TWAP", "VWAP"). Always the HOW.
+        operation_type: Operation verb — the WHAT. Empty for CeFi (implicit from side).
+            DeFi: OperationType value (e.g. "SWAP", "STAKE", "LEND"). Sports/prediction:
+            "PLACE_BET". Populated from ManualInstructionRequest.instruction_type.
         quantity: Order quantity in base asset units.
         price: Limit price; None for market orders.
         reason: Human-readable reason for the manual trade (audit log).
@@ -125,6 +129,7 @@ class ManualInstruction(BaseModel):
     instrument_key: str
     side: str
     order_type: str
+    operation_type: str = ""
     quantity: Decimal
     submitted_at: datetime
     price: Decimal | None = None
@@ -202,7 +207,7 @@ class WalletSpendingPreCheckResult(BaseModel):
     UAC) loads the operator-target `WalletProvisioningConfig` and:
 
     1. If `kill_switch_id` is armed → `kill_switch_armed=True`, `passed=False`.
-    2. Else, compute `amount_usd` from `manual_instruction.quantity × price` (or
+    2. Else, compute `amount_usd` from `manual_instruction.quantity x price` (or
        reference price for market orders) and run:
        - `SpendingCaps.is_within_per_tx(amount_usd)` → populate `per_tx_check`.
        - Look up rolling 1h spend from position-balance-monitor →
