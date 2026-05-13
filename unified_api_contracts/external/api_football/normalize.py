@@ -366,8 +366,60 @@ def normalize_api_football_odds(
 
 
 def normalize_api_football_standing(raw: dict[str, object], league_id: str = "", season: str = "") -> dict[str, object]:
-    """Normalize a single API-Football standing row."""
-    return {"league_id": league_id, "season": season, **{k: v for k, v in raw.items() if isinstance(k, str)}}
+    """Flatten a single API-Football standing row to a flat dict.
+
+    Raw API-Football payload has nested team / all / home / away structs.
+    PyArrow flattens these inconsistently or silently drops the nested array,
+    so we surface every useful field at the top level (same pattern as
+    ``normalize_api_football_injury``).
+
+    See ``codex/02-data/match-end-time-cascade.md`` neighbouring docs for the
+    motivation: nested-struct columns are a wide spot for silent data loss.
+    """
+    if not isinstance(raw, dict):
+        return {"league_id": league_id, "season": season}
+
+    team = _extract_dict(raw, "team")
+    all_stats = _extract_dict(raw, "all")
+    home_stats = _extract_dict(raw, "home")
+    away_stats = _extract_dict(raw, "away")
+    all_goals = _extract_dict(all_stats, "goals")
+    home_goals = _extract_dict(home_stats, "goals")
+    away_goals = _extract_dict(away_stats, "goals")
+
+    return {
+        "rank": _safe_int(raw.get("rank")),
+        "team_id": _safe_int(team.get("id")),
+        "team_name": team.get("name"),
+        "team_logo": team.get("logo"),
+        "points": _safe_int(raw.get("points")),
+        "goals_diff": _safe_int(raw.get("goalsDiff")),
+        "group": raw.get("group"),
+        "form": raw.get("form"),
+        "status": raw.get("status"),
+        "description": raw.get("description"),
+        "all_played": _safe_int(all_stats.get("played")),
+        "all_win": _safe_int(all_stats.get("win")),
+        "all_draw": _safe_int(all_stats.get("draw")),
+        "all_lose": _safe_int(all_stats.get("lose")),
+        "all_goals_for": _safe_int(all_goals.get("for")),
+        "all_goals_against": _safe_int(all_goals.get("against")),
+        "home_played": _safe_int(home_stats.get("played")),
+        "home_win": _safe_int(home_stats.get("win")),
+        "home_draw": _safe_int(home_stats.get("draw")),
+        "home_lose": _safe_int(home_stats.get("lose")),
+        "home_goals_for": _safe_int(home_goals.get("for")),
+        "home_goals_against": _safe_int(home_goals.get("against")),
+        "away_played": _safe_int(away_stats.get("played")),
+        "away_win": _safe_int(away_stats.get("win")),
+        "away_draw": _safe_int(away_stats.get("draw")),
+        "away_lose": _safe_int(away_stats.get("lose")),
+        "away_goals_for": _safe_int(away_goals.get("for")),
+        "away_goals_against": _safe_int(away_goals.get("against")),
+        "update": raw.get("update"),
+        "league_id": league_id,
+        "season": season,
+    }
 
 
 def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:

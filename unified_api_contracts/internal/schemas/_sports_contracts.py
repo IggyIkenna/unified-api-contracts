@@ -313,15 +313,24 @@ SPORTS_STANDINGS = SchemaContract(
             nullable=False,
             description="Team's league-table position (1 = top).",
         ),
+        # Team flat columns (was nested ``team`` struct pre-flatten 2026-05-13).
         ColumnSpec(
-            name="team",
+            name="team_id",
+            dtype="int64",
+            nullable=False,
+            description="API-Football numeric team ID — row + join key.",
+        ),
+        ColumnSpec(
+            name="team_name",
             dtype="string",
             nullable=False,
-            description=(
-                "Nested API-Football team struct serialised as string on disk: "
-                "``{id, logo, name}``. Flatten-to-columns is a follow-up "
-                "(UAC DtypeLiteral lacks a struct type today)."
-            ),
+            description="Team display name from API-Football.",
+        ),
+        ColumnSpec(
+            name="team_logo",
+            dtype="string",
+            nullable=True,
+            description="HTTPS URL to team crest PNG (provider-hosted).",
         ),
         ColumnSpec(
             name="points",
@@ -330,10 +339,10 @@ SPORTS_STANDINGS = SchemaContract(
             description="Total league points accumulated so far in the season.",
         ),
         ColumnSpec(
-            name="goalsDiff",
+            name="goals_diff",
             dtype="int64",
             nullable=False,
-            description="Goal difference (goals-for minus goals-against). Camelcase matches API-Football.",
+            description="Goal difference (goals-for minus goals-against). Renamed from camelcase goalsDiff 2026-05-13.",
         ),
         ColumnSpec(
             name="group",
@@ -359,27 +368,27 @@ SPORTS_STANDINGS = SchemaContract(
             nullable=True,
             description="Qualification / relegation annotation (e.g. 'Promotion - Champions League (Group Stage)').",
         ),
-        ColumnSpec(
-            name="all",
-            dtype="string",
-            nullable=True,
-            description=(
-                "Nested struct serialised as string: played/win/draw/lose/goals over all matches. "
-                "Flatten-to-columns is a follow-up."
-            ),
-        ),
-        ColumnSpec(
-            name="home",
-            dtype="string",
-            nullable=True,
-            description="Nested struct serialised as string: played/win/draw/lose/goals at home.",
-        ),
-        ColumnSpec(
-            name="away",
-            dtype="string",
-            nullable=True,
-            description="Nested struct serialised as string: played/win/draw/lose/goals away.",
-        ),
+        # ``all`` flat columns — overall stats across home + away (was nested struct pre-flatten 2026-05-13).
+        ColumnSpec(name="all_played", dtype="int64", nullable=True, description="Total matches played (home + away)."),
+        ColumnSpec(name="all_win", dtype="int64", nullable=True, description="Total wins."),
+        ColumnSpec(name="all_draw", dtype="int64", nullable=True, description="Total draws."),
+        ColumnSpec(name="all_lose", dtype="int64", nullable=True, description="Total losses."),
+        ColumnSpec(name="all_goals_for", dtype="int64", nullable=True, description="Total goals scored."),
+        ColumnSpec(name="all_goals_against", dtype="int64", nullable=True, description="Total goals conceded."),
+        # Home flat columns (was nested struct pre-flatten 2026-05-13).
+        ColumnSpec(name="home_played", dtype="int64", nullable=True, description="Home matches played."),
+        ColumnSpec(name="home_win", dtype="int64", nullable=True, description="Home wins."),
+        ColumnSpec(name="home_draw", dtype="int64", nullable=True, description="Home draws."),
+        ColumnSpec(name="home_lose", dtype="int64", nullable=True, description="Home losses."),
+        ColumnSpec(name="home_goals_for", dtype="int64", nullable=True, description="Goals scored at home."),
+        ColumnSpec(name="home_goals_against", dtype="int64", nullable=True, description="Goals conceded at home."),
+        # Away flat columns (was nested struct pre-flatten 2026-05-13).
+        ColumnSpec(name="away_played", dtype="int64", nullable=True, description="Away matches played."),
+        ColumnSpec(name="away_win", dtype="int64", nullable=True, description="Away wins."),
+        ColumnSpec(name="away_draw", dtype="int64", nullable=True, description="Away draws."),
+        ColumnSpec(name="away_lose", dtype="int64", nullable=True, description="Away losses."),
+        ColumnSpec(name="away_goals_for", dtype="int64", nullable=True, description="Goals scored away."),
+        ColumnSpec(name="away_goals_against", dtype="int64", nullable=True, description="Goals conceded away."),
         ColumnSpec(
             name="update",
             dtype="string",
@@ -392,9 +401,15 @@ SPORTS_STANDINGS = SchemaContract(
             nullable=False,
             description="API-Football numeric league ID — partition / join key.",
         ),
+        ColumnSpec(
+            name="season",
+            dtype="int64",
+            nullable=True,
+            description="Season year (e.g. 2024 for 2024-25 season). Added 2026-05-13 — orchestrator stamps at write.",
+        ),
         _DATA_AVAILABLE_AT,
     ],
-    symbol_column="team",
+    symbol_column="team_id",
     required_row_count_min=1,
 )
 
