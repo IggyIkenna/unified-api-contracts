@@ -415,60 +415,79 @@ SPORTS_PLAYER_VALUES = SchemaContract(
     data_type="player_values",
     columns=[
         ColumnSpec(
-            name="team_id",
+            name="player_id",
             dtype="string",
             nullable=False,
             description=(
-                "Transfermarkt team/club ID (e.g. 't123'). Row identifier — one row per "
-                "(team_id, season, fetch_day). FSS uses this for team-level squad valuation aggregates."
-            ),
-        ),
-        ColumnSpec(name="name", dtype="string", nullable=False, description="Team name from Transfermarkt squad page."),
-        ColumnSpec(
-            name="squad_size",
-            dtype="string",
-            nullable=True,
-            description=(
-                "Total players in squad on the fetch date, coerced to string (adapter output "
-                "is dict-casted to str). Parse at read-time if a numeric value is needed."
+                "Transfermarkt player ID (e.g. 'p123456'). Row identifier — one row per "
+                "(player_id, team_id, season, fetch_day)."
             ),
         ),
         ColumnSpec(
-            name="player_count",
+            name="player_name",
             dtype="string",
             nullable=True,
+            description="Player full name as published by Transfermarkt.",
+        ),
+        ColumnSpec(
+            name="position",
+            dtype="string",
+            nullable=True,
+            description="Player position on field (e.g. 'CB', 'CM', 'ST'). Transfermarkt position codes.",
+        ),
+        ColumnSpec(
+            name="age",
+            dtype="int64",
+            nullable=True,
+            description="Player age in years at valuation snapshot date.",
+        ),
+        ColumnSpec(
+            name="market_value_eur",
+            dtype="float64",
+            nullable=True,
             description=(
-                "Count of players with market valuations (subset of ``squad_size``). "
-                "Ratio gives valuation coverage %. String for the same reason as ``squad_size``."
+                "Estimated market value in EUR — Transfermarkt weekly valuation. Primary signal for squad analysis."
             ),
+        ),
+        ColumnSpec(
+            name="contract_until",
+            dtype="string",
+            nullable=True,
+            description="Contract expiry date as string (e.g. '2027-06-30'). Null if contract unknown/indefinite.",
+        ),
+        ColumnSpec(
+            name="current_club_id",
+            dtype="string",
+            nullable=False,
+            description="Transfermarkt club ID where player is employed (same as team_id for this snapshot).",
+        ),
+        ColumnSpec(
+            name="nationality_iso",
+            dtype="string",
+            nullable=True,
+            description="ISO 3166-1 country code or Transfermarkt nationality string.",
+        ),
+        ColumnSpec(
+            name="team_id",
+            dtype="string",
+            nullable=False,
+            description="Transfermarkt team/club ID — foreign key for team-level aggregation.",
         ),
         ColumnSpec(
             name="league_id",
             dtype="string",
             nullable=False,
-            description="Transfermarkt league code — which league this team was fetched under.",
-        ),
-        ColumnSpec(
-            name="canonical_league",
-            dtype="string",
-            nullable=True,
-            description=(
-                "UAC canonical ``league_id`` resolved via ``get_provider_league_id()``; "
-                "null when the mapping wasn't present for the team's league_id."
-            ),
+            description="Canonical league_id (UAC) for this team at valuation time.",
         ),
         ColumnSpec(
             name="season",
             dtype="int64",
             nullable=False,
-            description=(
-                "Season year (e.g. 2024 for 2024-25 season). Added post-hoc by the orchestrator "
-                "at write time for partitioning under ``season=YYYY`` when backfilling."
-            ),
+            description="Season year (e.g. 2024 for 2024-25 season). Added post-hoc by orchestrator at write time.",
         ),
     ],
-    symbol_column="team_id",
-    required_row_count_min=1,
+    symbol_column="player_id",
+    required_row_count_min=0,
 )
 
 
