@@ -131,6 +131,17 @@ SPORTS_FIXTURES = SchemaContract(
             description="Minutes elapsed in live match (0-90 regulation, 90-120 ET); null pre-match and post-match.",
         ),
         ColumnSpec(
+            name="match_end_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description=(
+                "UTC timestamp when match concluded — computed at write-time via "
+                "resolve_match_end_time() cascade (api_football native → SFI freeze → "
+                "footystats/understat post-match → kickoff+120min fallback). Null pre-match "
+                "and during live. SSOT: codex/02-data/match-end-time-cascade.md."
+            ),
+        ),
+        ColumnSpec(
             name="af_league_id",
             dtype="int64",
             nullable=False,

@@ -49,7 +49,8 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     ("sports", "reference", "venues", SPORTS_VENUES, 13),
     ("sports", "league", "standings", SPORTS_STANDINGS, 14),
     # Family B — API-Football fact
-    ("sports", "match", "fixtures", SPORTS_FIXTURES, 32),
+    # FIXTURES: 32 → 33 per C.6 Step 1 match_end_time column (UAC@2026-05-13).
+    ("sports", "match", "fixtures", SPORTS_FIXTURES, 33),
     ("sports", "match", "fixture_events", SPORTS_FIXTURE_EVENTS, 5),
     ("sports", "match", "fixture_stats", SPORTS_FIXTURE_STATS, 2),
     ("sports", "match", "fixture_lineups", SPORTS_FIXTURE_LINEUPS, 3),
