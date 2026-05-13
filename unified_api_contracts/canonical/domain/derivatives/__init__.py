@@ -6,6 +6,8 @@ from enum import StrEnum
 from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 
 from .._base import CanonicalBase
+from .futures import CanonicalFuturesContract as CanonicalFuturesContract
+from .futures import FuturesContractLifecyclePhase as FuturesContractLifecyclePhase
 
 
 class CanonicalLiquidation(CanonicalBase):
