@@ -77,7 +77,15 @@ class CanonicalDerivativeTicker(CanonicalBase):
 
 
 class CanonicalOptionsChainEntry(CanonicalBase):
-    """Normalised options chain entry — strike, greeks, bid/ask."""
+    """Normalised options chain entry — strike, greeks, bid/ask.
+
+    `expiration` is hard-required per tradfi_master Q2 (UAC@2026-05-13 Phase 1B
+    flip from nullable -> required). Callers MUST derive expiry from the
+    instrument symbol or upstream payload; helpers like
+    `unified_api_contracts.normalize_utils.options._parse_deribit_option_expiry()`
+    exist for symbol-based derivation. Historical-row backfill is handled by
+    one-shot migration script per the plan.
+    """
 
     timestamp: AwareDatetime
     venue: str
@@ -85,7 +93,12 @@ class CanonicalOptionsChainEntry(CanonicalBase):
     underlying: str
     strike: Decimal
     option_type: str = Field(description="call or put")
-    expiration: AwareDatetime | None = None
+    expiration: AwareDatetime = Field(
+        description=(
+            "Option contract expiration timestamp (UTC). Hard-required per tradfi_master Q2. "
+            "Derive from instrument symbol or upstream payload; never None for new writes."
+        )
+    )
     bid_price: Decimal | None = None
     ask_price: Decimal | None = None
     bid_size: Decimal | None = None
