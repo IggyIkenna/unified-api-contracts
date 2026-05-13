@@ -228,6 +228,24 @@ class EmptyConfirmedReason(StrEnum):
     Plan: ``sports_classifier_sfi_footystats_fixture_pin_2026_05_13.md`` +
     ``sports_classifier_weather_no_fixture_2026_05_13.md`` (slot 4 ownership 2026-05-13)."""
 
+    LEGACY_MIGRATION_MISSING_EXPIRY = "LEGACY_MIGRATION_MISSING_EXPIRY"
+    """Tradfi futures/options row from a pre-2026-05-13 historical capture that lacks a
+    populated ``expiration`` / ``expiry_date`` field, AND cannot be back-filled from
+    Databento metadata at migration time (instrument symbol unresolvable to a chain).
+
+    Used by the one-shot manifest migration script per
+    ``plans/active/tradfi_canonical_futures_contract_hard_required_fields_2026_05_13.md``
+    Phase 3 when walking legacy ``options_chain`` / ``futures_contract`` manifest rows.
+    The migration script attempts a Databento RDC (reference-data) lookup first;
+    on miss, flips the row to ``empty_confirmed`` with this reason rather than
+    silent re-fetching or write-anyway-with-None (the schema flip in UAC@dd407ae
+    rejects None expiration at the pydantic boundary).
+
+    Distinct from ``EXPECTED_INSTRUMENT_NOT_LISTED`` (instrument never existed at
+    the date) and ``EXPECTED_INSTRUMENT_DELISTED`` (instrument removed AFTER the date):
+    this is "data was captured but the historical write-path didn't populate expiration."
+    """
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 

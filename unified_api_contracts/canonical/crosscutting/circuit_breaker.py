@@ -170,12 +170,16 @@ class CircuitBreakerId(StrEnum):
     # 4 breakers surfaced from simulation_scenarios_topology_price_shocks_2026_05_09
     # Day-1 run: per-chain RPC outage disambiguation, oracle staleness, lending
     # pool unavailability, and ARBITRAGE_PRICE_DISPERSION applies_to seed.
-    ORACLE_STALENESS_SECONDS = "ORACLE_STALENESS_SECONDS"
-    """Chainlink heartbeat exceeded threshold seconds without a price update.
-    Distinct from ``ORACLE_DEVIATION_BPS`` (price accuracy) — this fires on
-    feed *age* not on deviation magnitude. Fires at heartbeat > threshold
-    (Chainlink ETH/USD heartbeat = 3600s; threshold default = heartbeat + 15min
-    grace = 4500s). Added 2026-05-13 per simulation_scenarios Day-1 follow-up."""
+    #
+    # NOTE 2026-05-13 (slot 5): ORACLE_STALENESS_SECONDS was duplicated here
+    # in commit adcfcf5 — already defined at line 147 above with the same
+    # semantic. Duplicate removed to unblock workspace-wide UAC imports
+    # (StrEnum raises TypeError on duplicate names). The original definition
+    # already covers Chainlink heartbeat semantics ("Chainlink/Pyth LST price
+    # feeds and cross-venue reference prices"); the 2026-05-13 docstring
+    # extension (Chainlink ETH/USD heartbeat = 3600s; threshold default =
+    # heartbeat + 15min grace = 4500s) belongs in the breaker registry's
+    # threshold defaults rather than the enum docstring.
 
     RPC_OUTAGE_SECONDS_ETHEREUM = "RPC_OUTAGE_SECONDS_ETHEREUM"
     """Ethereum chain RPC endpoint unreachable for >= threshold seconds.
@@ -190,12 +194,10 @@ class CircuitBreakerId(StrEnum):
     default = 30s (same as Ethereum for operational simplicity; per-archetype
     override can tighten). Added 2026-05-13 per simulation_scenarios Day-1."""
 
-    LENDING_POOL_UNAVAILABLE_SECONDS = "LENDING_POOL_UNAVAILABLE_SECONDS"
-    """Aave/Morpho lending market unavailable (RPC-unreachable OR on-chain
-    ``isPaused() == True``) for >= threshold seconds. Merges both the
-    infrastructure outage and governance-pause cases at the breaker layer —
-    the operator sees a unified circuit-breaker arm regardless of cause.
-    Threshold default = 60s. Added 2026-05-13 per simulation_scenarios Day-1."""
+    # NOTE 2026-05-13 (slot 5): LENDING_POOL_UNAVAILABLE_SECONDS was duplicated
+    # here in commit adcfcf5 — already defined at line 153 above with the same
+    # semantic ("Aave / lending pool paused OR borrow-cap-locked"). Duplicate
+    # removed to unblock workspace-wide UAC imports.
 
 
 class BreakerScope(StrEnum):
