@@ -40,7 +40,7 @@ class MatchStatus(StrEnum):
     INTERRUPTED = "interrupted"
 
     @classmethod
-    def from_af_short(cls, code: str | None) -> "MatchStatus":
+    def from_af_short(cls, code: str | None) -> MatchStatus:
         """Map an API-Football ``status.short`` code to canonical MatchStatus.
 
         Falls back to ``SCHEDULED`` for unknown / empty codes so callers never
@@ -83,19 +83,13 @@ AF_STATUS_SHORT_MAP: dict[str, MatchStatus] = {
 # Convenience grouping sets — use these instead of ad-hoc frozensets in callers
 # ---------------------------------------------------------------------------
 
-COMPLETED_STATUSES: frozenset[MatchStatus] = frozenset(
-    {MatchStatus.FINISHED}
-)
+COMPLETED_STATUSES: frozenset[MatchStatus] = frozenset({MatchStatus.FINISHED})
 """Fixtures where all regulation + extra-time + penalty play is over."""
 
-IN_PROGRESS_STATUSES: frozenset[MatchStatus] = frozenset(
-    {MatchStatus.LIVE, MatchStatus.HALFTIME}
-)
+IN_PROGRESS_STATUSES: frozenset[MatchStatus] = frozenset({MatchStatus.LIVE, MatchStatus.HALFTIME})
 """Fixtures currently being played (including halftime break)."""
 
-PRE_MATCH_STATUSES: frozenset[MatchStatus] = frozenset(
-    {MatchStatus.SCHEDULED}
-)
+PRE_MATCH_STATUSES: frozenset[MatchStatus] = frozenset({MatchStatus.SCHEDULED})
 """Fixtures not yet kicked off."""
 
 TERMINAL_STATUSES: frozenset[MatchStatus] = frozenset(

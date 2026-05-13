@@ -84,10 +84,7 @@ def get_canonical_inventory(asset_group: str) -> AssetGroupInventory:
     """
     ag = asset_group.lower()
     if ag not in KNOWN_ASSET_GROUPS:
-        raise KeyError(
-            f"Unknown asset_group {asset_group!r}. "
-            f"Known: {sorted(KNOWN_ASSET_GROUPS)}"
-        )
+        raise KeyError(f"Unknown asset_group {asset_group!r}. Known: {sorted(KNOWN_ASSET_GROUPS)}")
     return AssetGroupInventory(
         asset_group=ag,
         venues=tuple(VENUES_BY_ASSET_GROUP.get(ag, [])),

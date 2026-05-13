@@ -21,7 +21,11 @@
         "per_tx_usd": "50000",
         "per_hour_usd": "250000",
         "per_day_usd": "1000000",
-        "per_protocol_usd": {"LIDO": "500000", "ETHERFI": "300000", "AAVE_V3": "500000"}
+        "per_protocol_usd": {
+          "LIDO": "500000",
+          "ETHERFI": "300000",
+          "AAVE_V3": "500000"
+        }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
       "archetype_id": "carry_staked_basis",
@@ -40,7 +44,7 @@
         "per_tx_usd": "50000",
         "per_hour_usd": "250000",
         "per_day_usd": "1000000",
-        "per_protocol_usd": {"AAVE_V3": "500000", "GMX": "250000"}
+        "per_protocol_usd": { "AAVE_V3": "500000", "GMX": "250000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
       "archetype_id": "carry_staked_basis",
@@ -59,7 +63,7 @@
         "per_tx_usd": "50000",
         "per_hour_usd": "250000",
         "per_day_usd": "1000000",
-        "per_protocol_usd": {"AAVE_V3": "500000", "MORPHO": "300000"}
+        "per_protocol_usd": { "AAVE_V3": "500000", "MORPHO": "300000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
       "archetype_id": "carry_staked_basis",
@@ -78,7 +82,7 @@
         "per_tx_usd": "50000",
         "per_hour_usd": "250000",
         "per_day_usd": "1000000",
-        "per_protocol_usd": {"AAVE_V3": "500000"}
+        "per_protocol_usd": { "AAVE_V3": "500000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
       "archetype_id": "carry_staked_basis",
@@ -97,7 +101,7 @@
         "per_tx_usd": "50000",
         "per_hour_usd": "250000",
         "per_day_usd": "1000000",
-        "per_protocol_usd": {"JITO": "500000", "MARINADE": "300000"}
+        "per_protocol_usd": { "JITO": "500000", "MARINADE": "300000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
       "archetype_id": "carry_staked_basis",
@@ -116,7 +120,7 @@
         "per_tx_usd": "25000",
         "per_hour_usd": "150000",
         "per_day_usd": "500000",
-        "per_protocol_usd": {"UNISWAP_V3": "250000", "CURVE": "150000"}
+        "per_protocol_usd": { "UNISWAP_V3": "250000", "CURVE": "150000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION",
       "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
@@ -135,7 +139,7 @@
         "per_tx_usd": "25000",
         "per_hour_usd": "150000",
         "per_day_usd": "500000",
-        "per_protocol_usd": {"UNISWAP_V3": "250000", "GMX": "150000"}
+        "per_protocol_usd": { "UNISWAP_V3": "250000", "GMX": "150000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION",
       "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
@@ -154,7 +158,7 @@
         "per_tx_usd": "25000",
         "per_hour_usd": "150000",
         "per_day_usd": "500000",
-        "per_protocol_usd": {"UNISWAP_V3": "250000", "AERODROME": "100000"}
+        "per_protocol_usd": { "UNISWAP_V3": "250000", "AERODROME": "100000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION",
       "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
@@ -173,7 +177,7 @@
         "per_tx_usd": "25000",
         "per_hour_usd": "150000",
         "per_day_usd": "500000",
-        "per_protocol_usd": {"UNISWAP_V3": "250000"}
+        "per_protocol_usd": { "UNISWAP_V3": "250000" }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION",
       "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
@@ -192,7 +196,11 @@
         "per_tx_usd": "25000",
         "per_hour_usd": "150000",
         "per_day_usd": "500000",
-        "per_protocol_usd": {"RAYDIUM": "200000", "ORCA": "200000", "JUPITER": "250000"}
+        "per_protocol_usd": {
+          "RAYDIUM": "200000",
+          "ORCA": "200000",
+          "JUPITER": "250000"
+        }
       },
       "kill_switch_id": "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION",
       "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
@@ -224,7 +232,11 @@
       "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-prod/cryptoKeys/trading-defi-master-v1",
       "private_key_secret_ref": "gas-reserve-arb-v1-wrapped",
       "allowed_protocols": [],
-      "spending_caps": {"per_tx_usd": "200", "per_hour_usd": "1000", "per_day_usd": "5000"},
+      "spending_caps": {
+        "per_tx_usd": "200",
+        "per_hour_usd": "1000",
+        "per_day_usd": "5000"
+      },
       "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
       "address": "0x_OPERATOR_FILL_AFTER_KEYGEN",
       "label": "Arbitrum native ETH gas reserve"
@@ -237,7 +249,11 @@
       "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-prod/cryptoKeys/trading-defi-master-v1",
       "private_key_secret_ref": "gas-reserve-base-v1-wrapped",
       "allowed_protocols": [],
-      "spending_caps": {"per_tx_usd": "200", "per_hour_usd": "1000", "per_day_usd": "5000"},
+      "spending_caps": {
+        "per_tx_usd": "200",
+        "per_hour_usd": "1000",
+        "per_day_usd": "5000"
+      },
       "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
       "address": "0x_OPERATOR_FILL_AFTER_KEYGEN",
       "label": "Base native ETH gas reserve"
@@ -250,7 +266,11 @@
       "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-prod/cryptoKeys/trading-defi-master-v1",
       "private_key_secret_ref": "gas-reserve-poly-v1-wrapped",
       "allowed_protocols": [],
-      "spending_caps": {"per_tx_usd": "500", "per_hour_usd": "2500", "per_day_usd": "10000"},
+      "spending_caps": {
+        "per_tx_usd": "500",
+        "per_hour_usd": "2500",
+        "per_day_usd": "10000"
+      },
       "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
       "address": "0x_OPERATOR_FILL_AFTER_KEYGEN",
       "label": "Polygon native MATIC gas reserve"
@@ -263,7 +283,11 @@
       "kms_key_uri": "projects/central-element-323112/locations/asia-northeast1/keyRings/wallets-prod/cryptoKeys/trading-defi-master-v1",
       "private_key_secret_ref": "gas-reserve-sol-v1-wrapped",
       "allowed_protocols": [],
-      "spending_caps": {"per_tx_usd": "100", "per_hour_usd": "500", "per_day_usd": "2500"},
+      "spending_caps": {
+        "per_tx_usd": "100",
+        "per_hour_usd": "500",
+        "per_day_usd": "2500"
+      },
       "kill_switch_id": "KILL_PER_ASSET_GROUP_DEFI",
       "address": "OPERATOR_FILL_AFTER_KEYGEN_BASE58",
       "label": "Solana native SOL gas reserve"

@@ -117,40 +117,75 @@ TRADFI_ETFS: dict[str, ETFMetadata] = {
     # Listing date = 2024-01-11 (SEC approval + first trading day for BTC spot ETFs).
     # GBTC converted from trust to ETF on the same date.
     "IBIT": ETFMetadata(
-        "IBIT", CATEGORY_CRYPTO_SPOT, "BTC",
-        listing_date=date(2024, 1, 11), issuer="iShares", crypto_underlying="BTC",
+        "IBIT",
+        CATEGORY_CRYPTO_SPOT,
+        "BTC",
+        listing_date=date(2024, 1, 11),
+        issuer="iShares",
+        crypto_underlying="BTC",
     ),
     "FBTC": ETFMetadata(
-        "FBTC", CATEGORY_CRYPTO_SPOT, "BTC",
-        listing_date=date(2024, 1, 11), issuer="Fidelity", crypto_underlying="BTC",
+        "FBTC",
+        CATEGORY_CRYPTO_SPOT,
+        "BTC",
+        listing_date=date(2024, 1, 11),
+        issuer="Fidelity",
+        crypto_underlying="BTC",
     ),
     "ARKB": ETFMetadata(
-        "ARKB", CATEGORY_CRYPTO_SPOT, "BTC",
-        listing_date=date(2024, 1, 11), issuer="ARK/21Shares", crypto_underlying="BTC",
+        "ARKB",
+        CATEGORY_CRYPTO_SPOT,
+        "BTC",
+        listing_date=date(2024, 1, 11),
+        issuer="ARK/21Shares",
+        crypto_underlying="BTC",
     ),
     "GBTC": ETFMetadata(
-        "GBTC", CATEGORY_CRYPTO_SPOT, "BTC",
-        listing_date=date(2024, 1, 11), issuer="Grayscale", crypto_underlying="BTC",
+        "GBTC",
+        CATEGORY_CRYPTO_SPOT,
+        "BTC",
+        listing_date=date(2024, 1, 11),
+        issuer="Grayscale",
+        crypto_underlying="BTC",
     ),
     # ── Crypto spot ETFs (ETH) ─────────────────────────────────────────────
     # Listing date = 2024-07-23 (SEC approval for ETH spot ETFs).
     # NOT in KNOWN_ETFS (legacy classifier set predates ETH ETF approval).
     "ETHA": ETFMetadata(
-        "ETHA", CATEGORY_CRYPTO_SPOT, "ETH",
-        listing_date=date(2024, 7, 23), issuer="iShares", in_known_etfs=False, crypto_underlying="ETH",
+        "ETHA",
+        CATEGORY_CRYPTO_SPOT,
+        "ETH",
+        listing_date=date(2024, 7, 23),
+        issuer="iShares",
+        in_known_etfs=False,
+        crypto_underlying="ETH",
     ),
     "FETH": ETFMetadata(
-        "FETH", CATEGORY_CRYPTO_SPOT, "ETH",
-        listing_date=date(2024, 7, 23), issuer="Fidelity", in_known_etfs=False, crypto_underlying="ETH",
+        "FETH",
+        CATEGORY_CRYPTO_SPOT,
+        "ETH",
+        listing_date=date(2024, 7, 23),
+        issuer="Fidelity",
+        in_known_etfs=False,
+        crypto_underlying="ETH",
     ),
     "ETHE": ETFMetadata(
-        "ETHE", CATEGORY_CRYPTO_SPOT, "ETH",
-        listing_date=date(2024, 7, 23), issuer="Grayscale", in_known_etfs=False, crypto_underlying="ETH",
+        "ETHE",
+        CATEGORY_CRYPTO_SPOT,
+        "ETH",
+        listing_date=date(2024, 7, 23),
+        issuer="Grayscale",
+        in_known_etfs=False,
+        crypto_underlying="ETH",
     ),
     # ── Crypto futures ETF ─────────────────────────────────────────────────
     "BITO": ETFMetadata(
-        "BITO", CATEGORY_CRYPTO_FUTURES, "BTC_FUTURES",
-        listing_date=date(2021, 10, 19), issuer="ProShares", crypto_underlying="BTC",
+        "BITO",
+        CATEGORY_CRYPTO_FUTURES,
+        "BTC_FUTURES",
+        listing_date=date(2021, 10, 19),
+        issuer="ProShares",
+        crypto_underlying="BTC",
     ),
 }
 
@@ -161,28 +196,17 @@ TRADFI_ETFS: dict[str, ETFMetadata] = {
 
 ALL_ETF_TICKERS: frozenset[str] = frozenset(TRADFI_ETFS)
 
-KNOWN_ETFS_TICKERS: frozenset[str] = frozenset(
-    t for t, m in TRADFI_ETFS.items() if m.in_known_etfs
-)
+KNOWN_ETFS_TICKERS: frozenset[str] = frozenset(t for t, m in TRADFI_ETFS.items() if m.in_known_etfs)
 
 CRYPTO_ETF_TICKERS: frozenset[str] = frozenset(
-    t for t, m in TRADFI_ETFS.items()
-    if m.category in (CATEGORY_CRYPTO_SPOT, CATEGORY_CRYPTO_FUTURES)
+    t for t, m in TRADFI_ETFS.items() if m.category in (CATEGORY_CRYPTO_SPOT, CATEGORY_CRYPTO_FUTURES)
 )
 
-BTC_ETF_TICKERS: frozenset[str] = frozenset(
-    t for t, m in TRADFI_ETFS.items() if m.crypto_underlying == "BTC"
-)
+BTC_ETF_TICKERS: frozenset[str] = frozenset(t for t, m in TRADFI_ETFS.items() if m.crypto_underlying == "BTC")
 
-ETH_ETF_TICKERS: frozenset[str] = frozenset(
-    t for t, m in TRADFI_ETFS.items() if m.crypto_underlying == "ETH"
-)
+ETH_ETF_TICKERS: frozenset[str] = frozenset(t for t, m in TRADFI_ETFS.items() if m.crypto_underlying == "ETH")
 
-ETF_LISTING_DATES: dict[str, date] = {
-    t: m.listing_date
-    for t, m in TRADFI_ETFS.items()
-    if m.listing_date is not None
-}
+ETF_LISTING_DATES: dict[str, date] = {t: m.listing_date for t, m in TRADFI_ETFS.items() if m.listing_date is not None}
 
 
 # ---------------------------------------------------------------------------
@@ -210,7 +234,8 @@ def get_etf_listing_date(ticker: str) -> date | None:
 def get_crypto_etfs(underlying: str | None = None) -> list[str]:
     """Return crypto ETF tickers, optionally filtered by underlying ("BTC" or "ETH")."""
     return [
-        t for t, m in TRADFI_ETFS.items()
+        t
+        for t, m in TRADFI_ETFS.items()
         if m.category in (CATEGORY_CRYPTO_SPOT, CATEGORY_CRYPTO_FUTURES)
         and (underlying is None or m.crypto_underlying == underlying)
     ]

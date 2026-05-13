@@ -79,36 +79,73 @@ DATASET_CBOE_CFE = "XCBF.PITCH"
 TRADFI_ROOTS: dict[str, RootMetadata] = {
     # ── CME Index Futures ──────────────────────────────────────────────────
     "ES": RootMetadata(
-        "ES", CATEGORY_INDEX_FUTURES, "SP500", "CME", DATASET_CME, "equity",
-        has_options=True, micro_root="MES", in_supported_underlyings=True,
+        "ES",
+        CATEGORY_INDEX_FUTURES,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        has_options=True,
+        micro_root="MES",
+        in_supported_underlyings=True,
     ),
     "NQ": RootMetadata(
-        "NQ", CATEGORY_INDEX_FUTURES, "NASDAQ100", "CME", DATASET_CME, "equity",
-        has_options=True, in_supported_underlyings=True,
+        "NQ",
+        CATEGORY_INDEX_FUTURES,
+        "NASDAQ100",
+        "CME",
+        DATASET_CME,
+        "equity",
+        has_options=True,
+        in_supported_underlyings=True,
     ),
     "RTY": RootMetadata("RTY", CATEGORY_INDEX_FUTURES, "RUSSELL2000", "CME", DATASET_CME, "equity"),
     "YM": RootMetadata("YM", CATEGORY_INDEX_FUTURES, "DOW", "CME", DATASET_CME, "equity"),
     "NKD": RootMetadata("NKD", CATEGORY_INDEX_FUTURES, "NIKKEI225", "CME", DATASET_CME, "equity"),
     # Micro E-mini S&P 500 (1/10 notional; same monthly expiry + dataset)
     "MES": RootMetadata(
-        "MES", CATEGORY_INDEX_FUTURES, "SP500", "CME", DATASET_CME, "equity",
-        parent_root="ES", listing_date=date(2019, 5, 6),
+        "MES",
+        CATEGORY_INDEX_FUTURES,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        parent_root="ES",
+        listing_date=date(2019, 5, 6),
     ),
     # ── CME Energy Futures ─────────────────────────────────────────────────
     "CL": RootMetadata(
-        "CL", CATEGORY_ENERGY_FUTURES, "CRUDE", "CME", DATASET_CME, "commodity",
-        has_options=True, in_supported_underlyings=True,
+        "CL",
+        CATEGORY_ENERGY_FUTURES,
+        "CRUDE",
+        "CME",
+        DATASET_CME,
+        "commodity",
+        has_options=True,
+        in_supported_underlyings=True,
     ),
     "NG": RootMetadata(
-        "NG", CATEGORY_ENERGY_FUTURES, "NATGAS", "CME", DATASET_CME, "commodity",
-        has_options=True, in_supported_underlyings=True,
+        "NG",
+        CATEGORY_ENERGY_FUTURES,
+        "NATGAS",
+        "CME",
+        DATASET_CME,
+        "commodity",
+        has_options=True,
+        in_supported_underlyings=True,
     ),
     "HO": RootMetadata("HO", CATEGORY_ENERGY_FUTURES, "HEATING_OIL", "CME", DATASET_CME, "commodity"),
     "RB": RootMetadata("RB", CATEGORY_ENERGY_FUTURES, "GASOLINE", "CME", DATASET_CME, "commodity"),
     # ── CME Metals Futures ─────────────────────────────────────────────────
     "GC": RootMetadata(
-        "GC", CATEGORY_METALS_FUTURES, "GOLD", "CME", DATASET_CME, "commodity",
-        has_options=True, in_supported_underlyings=True,
+        "GC",
+        CATEGORY_METALS_FUTURES,
+        "GOLD",
+        "CME",
+        DATASET_CME,
+        "commodity",
+        has_options=True,
+        in_supported_underlyings=True,
     ),
     "SI": RootMetadata("SI", CATEGORY_METALS_FUTURES, "SILVER", "CME", DATASET_CME, "commodity"),
     "HG": RootMetadata("HG", CATEGORY_METALS_FUTURES, "COPPER", "CME", DATASET_CME, "commodity"),
@@ -149,21 +186,45 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
     "XAU": RootMetadata("XAU", CATEGORY_SECTOR_FUTURES, "UTILITIES_SECTOR", "CME", DATASET_CME, "equity"),
     # ── CME Crypto Futures ─────────────────────────────────────────────────
     "BTC": RootMetadata(
-        "BTC", CATEGORY_CRYPTO_FUTURES, "BTC", "CME", DATASET_CME, "crypto",
-        micro_root="MBT", listing_date=date(2017, 12, 18),
+        "BTC",
+        CATEGORY_CRYPTO_FUTURES,
+        "BTC",
+        "CME",
+        DATASET_CME,
+        "crypto",
+        micro_root="MBT",
+        listing_date=date(2017, 12, 18),
     ),
     "ETH": RootMetadata(
-        "ETH", CATEGORY_CRYPTO_FUTURES, "ETH", "CME", DATASET_CME, "crypto",
-        micro_root="MET", listing_date=date(2021, 2, 8),
+        "ETH",
+        CATEGORY_CRYPTO_FUTURES,
+        "ETH",
+        "CME",
+        DATASET_CME,
+        "crypto",
+        micro_root="MET",
+        listing_date=date(2021, 2, 8),
     ),
     # Micro CME crypto futures (1/10 notional; same monthly expiry calendar)
     "MBT": RootMetadata(
-        "MBT", CATEGORY_CRYPTO_FUTURES, "BTC", "CME", DATASET_CME, "crypto",
-        parent_root="BTC", listing_date=date(2021, 5, 3),
+        "MBT",
+        CATEGORY_CRYPTO_FUTURES,
+        "BTC",
+        "CME",
+        DATASET_CME,
+        "crypto",
+        parent_root="BTC",
+        listing_date=date(2021, 5, 3),
     ),
     "MET": RootMetadata(
-        "MET", CATEGORY_CRYPTO_FUTURES, "ETH", "CME", DATASET_CME, "crypto",
-        parent_root="ETH", listing_date=date(2021, 10, 4),
+        "MET",
+        CATEGORY_CRYPTO_FUTURES,
+        "ETH",
+        "CME",
+        DATASET_CME,
+        "crypto",
+        parent_root="ETH",
+        listing_date=date(2021, 10, 4),
     ),
     # ── ICE Futures Europe ─────────────────────────────────────────────────
     "BRN": RootMetadata("BRN", CATEGORY_ICE_FUTURES, "BRENT", "ICE", DATASET_ICE_EUROPE, "commodity"),
@@ -178,89 +239,199 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
     # raw_symbol stype_in (explicit contract codes like VXH6); parent symbology
     # not available. Front-month symbols must be generated from target date.
     "VX": RootMetadata(
-        "VX", CATEGORY_VOLATILITY_FUTURES, "VIX", "CFE", DATASET_CBOE_CFE, "equity",
+        "VX",
+        CATEGORY_VOLATILITY_FUTURES,
+        "VIX",
+        "CFE",
+        DATASET_CBOE_CFE,
+        "equity",
     ),
     # VIX spot index — calculated by CBOE, sourced via yahoo_finance (not Databento).
     "VIX": RootMetadata("VIX", CATEGORY_VOLATILITY_INDEX, "VIX", "CBOE", None, "equity"),
     # ── CME ES Options Sub-Series ──────────────────────────────────────────
     # ES quarterly options (3rd Friday of Mar/Jun/Sep/Dec)
     "EW": RootMetadata(
-        "EW", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="weekly_friday",
+        "EW",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="weekly_friday",
     ),
     "EW1": RootMetadata(
-        "EW1", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="weekly_monday",
+        "EW1",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="weekly_monday",
     ),
     "EW2": RootMetadata(
-        "EW2", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="weekly_wednesday",
+        "EW2",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="weekly_wednesday",
     ),
     "EW4": RootMetadata(
-        "EW4", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="weekly_tuesday",
+        "EW4",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="weekly_tuesday",
     ),
     "E1A": RootMetadata(
-        "E1A", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="daily_monday_0dte",
+        "E1A",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="daily_monday_0dte",
     ),
     "E2A": RootMetadata(
-        "E2A", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="daily_tuesday_0dte",
+        "E2A",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="daily_tuesday_0dte",
     ),
     "E3A": RootMetadata(
-        "E3A", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="daily_wednesday_0dte",
+        "E3A",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="daily_wednesday_0dte",
     ),
     "E4A": RootMetadata(
-        "E4A", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="daily_thursday_0dte",
+        "E4A",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="daily_thursday_0dte",
     ),
     "E5A": RootMetadata(
-        "E5A", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="daily_friday_0dte",
+        "E5A",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="daily_friday_0dte",
     ),
     "EOM": RootMetadata(
-        "EOM", CATEGORY_OPTIONS_CLUSTER, "SP500", "CME", DATASET_CME, "equity",
-        options_parent="ES", expiry_series="end_of_month",
+        "EOM",
+        CATEGORY_OPTIONS_CLUSTER,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
+        options_parent="ES",
+        expiry_series="end_of_month",
     ),
     # ── CME Event Contracts ────────────────────────────────────────────────
     # Binary YES/NO settlement; classified as OPTIONS by Databento (parent stype).
     # Databento coverage starts 2025-09-28.
     "ECES": RootMetadata(
-        "ECES", CATEGORY_EVENT_CONTRACT, "SP500", "CME", DATASET_CME, "equity",
+        "ECES",
+        CATEGORY_EVENT_CONTRACT,
+        "SP500",
+        "CME",
+        DATASET_CME,
+        "equity",
         listing_date=date(2025, 9, 28),
     ),
     "ECNQ": RootMetadata(
-        "ECNQ", CATEGORY_EVENT_CONTRACT, "NASDAQ100", "CME", DATASET_CME, "equity",
+        "ECNQ",
+        CATEGORY_EVENT_CONTRACT,
+        "NASDAQ100",
+        "CME",
+        DATASET_CME,
+        "equity",
         listing_date=date(2025, 9, 28),
     ),
     "ECRTY": RootMetadata(
-        "ECRTY", CATEGORY_EVENT_CONTRACT, "RUSSELL2000", "CME", DATASET_CME, "equity",
+        "ECRTY",
+        CATEGORY_EVENT_CONTRACT,
+        "RUSSELL2000",
+        "CME",
+        DATASET_CME,
+        "equity",
         listing_date=date(2025, 9, 28),
     ),
     "ECYM": RootMetadata(
-        "ECYM", CATEGORY_EVENT_CONTRACT, "DOW", "CME", DATASET_CME, "equity",
+        "ECYM",
+        CATEGORY_EVENT_CONTRACT,
+        "DOW",
+        "CME",
+        DATASET_CME,
+        "equity",
         listing_date=date(2025, 9, 28),
     ),
     "ECGC": RootMetadata(
-        "ECGC", CATEGORY_EVENT_CONTRACT, "GOLD", "CME", DATASET_CME, "commodity",
+        "ECGC",
+        CATEGORY_EVENT_CONTRACT,
+        "GOLD",
+        "CME",
+        DATASET_CME,
+        "commodity",
         listing_date=date(2025, 9, 28),
     ),
     "ECCL": RootMetadata(
-        "ECCL", CATEGORY_EVENT_CONTRACT, "CRUDE", "CME", DATASET_CME, "commodity",
+        "ECCL",
+        CATEGORY_EVENT_CONTRACT,
+        "CRUDE",
+        "CME",
+        DATASET_CME,
+        "commodity",
         listing_date=date(2025, 9, 28),
     ),
     "ECNG": RootMetadata(
-        "ECNG", CATEGORY_EVENT_CONTRACT, "NATGAS", "CME", DATASET_CME, "commodity",
+        "ECNG",
+        CATEGORY_EVENT_CONTRACT,
+        "NATGAS",
+        "CME",
+        DATASET_CME,
+        "commodity",
         listing_date=date(2025, 9, 28),
     ),
     "EC6E": RootMetadata(
-        "EC6E", CATEGORY_EVENT_CONTRACT, "EUR", "CME", DATASET_CME, "fx",
+        "EC6E",
+        CATEGORY_EVENT_CONTRACT,
+        "EUR",
+        "CME",
+        DATASET_CME,
+        "fx",
         listing_date=date(2025, 9, 28),
     ),
     "ECBTC": RootMetadata(
-        "ECBTC", CATEGORY_EVENT_CONTRACT, "BTC", "CME", DATASET_CME, "crypto",
+        "ECBTC",
+        CATEGORY_EVENT_CONTRACT,
+        "BTC",
+        "CME",
+        DATASET_CME,
+        "crypto",
         listing_date=date(2025, 9, 28),
     ),
 }
@@ -272,35 +443,24 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
 
 ALL_ROOT_SYMBOLS: frozenset[str] = frozenset(TRADFI_ROOTS)
 
-CME_ROOTS: frozenset[str] = frozenset(
-    r for r, m in TRADFI_ROOTS.items() if m.exchange == "CME"
-)
+CME_ROOTS: frozenset[str] = frozenset(r for r, m in TRADFI_ROOTS.items() if m.exchange == "CME")
 
-ICE_ROOTS: frozenset[str] = frozenset(
-    r for r, m in TRADFI_ROOTS.items() if m.exchange == "ICE"
-)
+ICE_ROOTS: frozenset[str] = frozenset(r for r, m in TRADFI_ROOTS.items() if m.exchange == "ICE")
 
-OPTIONS_ENABLED_ROOTS: frozenset[str] = frozenset(
-    r for r, m in TRADFI_ROOTS.items() if m.has_options
-)
+OPTIONS_ENABLED_ROOTS: frozenset[str] = frozenset(r for r, m in TRADFI_ROOTS.items() if m.has_options)
 
 # Roots currently supported by the Databento CME options converter
 # (SUPPORTED_UNDERLYINGS in databento_cme_converter.py).
-SUPPORTED_CONVERTER_ROOTS: frozenset[str] = frozenset(
-    r for r, m in TRADFI_ROOTS.items() if m.in_supported_underlyings
-)
+SUPPORTED_CONVERTER_ROOTS: frozenset[str] = frozenset(r for r, m in TRADFI_ROOTS.items() if m.in_supported_underlyings)
 
 CRYPTO_FUTURE_ROOTS: frozenset[str] = frozenset(
     r for r, m in TRADFI_ROOTS.items() if m.category == CATEGORY_CRYPTO_FUTURES
 )
 
-MICRO_ROOTS: frozenset[str] = frozenset(
-    r for r, m in TRADFI_ROOTS.items() if m.parent_root is not None
-)
+MICRO_ROOTS: frozenset[str] = frozenset(r for r, m in TRADFI_ROOTS.items() if m.parent_root is not None)
 
 ES_OPTIONS_CLUSTER_ROOTS: frozenset[str] = frozenset(
-    r for r, m in TRADFI_ROOTS.items()
-    if m.category == CATEGORY_OPTIONS_CLUSTER and m.options_parent == "ES"
+    r for r, m in TRADFI_ROOTS.items() if m.category == CATEGORY_OPTIONS_CLUSTER and m.options_parent == "ES"
 )
 
 EVENT_CONTRACT_ROOTS: frozenset[str] = frozenset(

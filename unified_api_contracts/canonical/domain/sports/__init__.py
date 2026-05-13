@@ -52,6 +52,13 @@ from .feature_upstream import FEATURE_UPSTREAM_REQUIREMENTS as FEATURE_UPSTREAM_
 from .feature_upstream import UpstreamReq as UpstreamReq
 from .feature_upstream import in_coverage as in_coverage
 from .feature_upstream import in_coverage_dt as in_coverage_dt
+from .fixture_status import AF_COMPLETED_CODES as AF_COMPLETED_CODES
+from .fixture_status import AF_STATUS_SHORT_MAP as AF_STATUS_SHORT_MAP
+from .fixture_status import COMPLETED_STATUSES as COMPLETED_STATUSES
+from .fixture_status import IN_PROGRESS_STATUSES as IN_PROGRESS_STATUSES
+from .fixture_status import PRE_MATCH_STATUSES as PRE_MATCH_STATUSES
+from .fixture_status import TERMINAL_STATUSES as TERMINAL_STATUSES
+from .fixture_status import MatchStatus as MatchStatus
 from .gcs_paths import SPORTS_BUCKET_TEMPLATE as SPORTS_BUCKET_TEMPLATE
 from .gcs_paths import SPORTS_DATA_TYPE_LAYOUT as SPORTS_DATA_TYPE_LAYOUT
 from .gcs_paths import SPORTS_DATA_TYPE_TO_FOLDER as SPORTS_DATA_TYPE_TO_FOLDER
@@ -100,13 +107,6 @@ from .league_registry import LeagueClassificationType as LeagueClassificationTyp
 from .league_registry import LeagueDefinition as LeagueDefinition
 from .live import LiveMatchState as LiveMatchState
 from .live import LiveOddsUpdate as LiveOddsUpdate
-from .fixture_status import AF_COMPLETED_CODES as AF_COMPLETED_CODES
-from .fixture_status import AF_STATUS_SHORT_MAP as AF_STATUS_SHORT_MAP
-from .fixture_status import COMPLETED_STATUSES as COMPLETED_STATUSES
-from .fixture_status import IN_PROGRESS_STATUSES as IN_PROGRESS_STATUSES
-from .fixture_status import TERMINAL_STATUSES as TERMINAL_STATUSES
-from .fixture_status import MatchStatus as MatchStatus
-from .fixture_status import PRE_MATCH_STATUSES as PRE_MATCH_STATUSES
 from .live import MatchPeriod as MatchPeriod
 from .live import ScraperVersionMeta as ScraperVersionMeta
 from .mapping_resolver import clear_mapping_cache as clear_mapping_cache

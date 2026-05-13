@@ -639,6 +639,25 @@ SPORTS_SFI_PROGRESSIVE_STATS = SchemaContract(
         ),
         ColumnSpec(name="ht_end_timer", dtype="int64", nullable=True, description="Halftime-end timer_seconds."),
         ColumnSpec(
+            name="ft_timer",
+            dtype="int64",
+            nullable=True,
+            description=(
+                "Final-time timer_seconds — the raw timer value from the last live snapshot "
+                "before match freeze. Used to detect match completion via freeze-detection patterns."
+            ),
+        ),
+        ColumnSpec(
+            name="match_end_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description=(
+                "Detected match end timestamp — the UTC time of the last snapshot where "
+                "timer_seconds advanced. Freezing of timer_seconds is the canonical match-end signal. "
+                "Computed post-hoc from kickoff + ft_timer."
+            ),
+        ),
+        ColumnSpec(
             name="data_available_at",
             dtype="datetime64[ns, UTC]",
             nullable=True,

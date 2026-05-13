@@ -284,9 +284,9 @@ from .sports.fixture_status import (
     AF_STATUS_SHORT_MAP,
     COMPLETED_STATUSES,
     IN_PROGRESS_STATUSES,
-    MatchStatus,
     PRE_MATCH_STATUSES,
     TERMINAL_STATUSES,
+    MatchStatus,
 )
 from .sports.injury import CanonicalInjury
 from .sports.lineup import (
@@ -457,8 +457,8 @@ __all__ = [
     "MarketState",
     "MarketStatus",
     "MarketTrade",
-    "MatchStatus",
     "MatchPeriod",
+    "MatchStatus",
     "MultiLegInstrument",
     "NetClearingInstruction",
     "NetworkJitterMetric",
