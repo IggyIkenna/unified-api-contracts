@@ -6,6 +6,7 @@ from unified_api_contracts.canonical.domain.sports.fixture_status import (
     AF_COMPLETED_CODES,
     AF_STATUS_SHORT_MAP,
     COMPLETED_STATUSES,
+    FS_STATUS_MAP,
     IN_PROGRESS_STATUSES,
     PRE_MATCH_STATUSES,
     TERMINAL_STATUSES,
@@ -111,3 +112,108 @@ def test_grouping_sets_partition_finished_in_progress_pre_match():
 def test_terminal_disjoint_from_completed():
     """TERMINAL fixtures didn't finish in regulation — disjoint from COMPLETED."""
     assert TERMINAL_STATUSES.isdisjoint(COMPLETED_STATUSES)
+
+
+# ---------------------------------------------------------------------------
+# FootyStats helper
+# ---------------------------------------------------------------------------
+
+
+def test_fs_status_map_covers_documented_codes():
+    """FS_STATUS_MAP covers FootyStats's documented status strings + spelling variants."""
+    documented = {
+        "scheduled",
+        "live",
+        "complete",
+        "finished",
+        "cancelled",
+        "canceled",
+        "postponed",
+        "suspended",
+        "abandoned",
+    }
+    assert set(FS_STATUS_MAP.keys()) == documented
+
+
+def test_from_footystats_status_happy_path():
+    """Each FootyStats status string maps to expected MatchStatus."""
+    assert MatchStatus.from_footystats_status("scheduled") == MatchStatus.SCHEDULED
+    assert MatchStatus.from_footystats_status("live") == MatchStatus.LIVE
+    assert MatchStatus.from_footystats_status("complete") == MatchStatus.FINISHED
+    assert MatchStatus.from_footystats_status("cancelled") == MatchStatus.CANCELLED
+    assert MatchStatus.from_footystats_status("postponed") == MatchStatus.POSTPONED
+
+
+def test_from_footystats_status_case_and_whitespace_insensitive():
+    """Strips whitespace + lowercases the input."""
+    assert MatchStatus.from_footystats_status("  LIVE  ") == MatchStatus.LIVE
+    assert MatchStatus.from_footystats_status("Complete") == MatchStatus.FINISHED
+
+
+def test_from_footystats_status_handles_unknown_with_fallback():
+    """Unknown / empty / None → SCHEDULED fallback (matches from_af_short pattern)."""
+    assert MatchStatus.from_footystats_status("unknown") == MatchStatus.SCHEDULED
+    assert MatchStatus.from_footystats_status("") == MatchStatus.SCHEDULED
+    assert MatchStatus.from_footystats_status(None) == MatchStatus.SCHEDULED
+
+
+def test_from_footystats_status_american_canceled():
+    """American spelling 'canceled' (one L) maps the same as British 'cancelled'."""
+    assert MatchStatus.from_footystats_status("canceled") == MatchStatus.CANCELLED
+
+
+# ---------------------------------------------------------------------------
+# SFI state-derivation helper
+# ---------------------------------------------------------------------------
+
+
+def test_from_sfi_state_no_row_yet():
+    """timer_seconds=None → SCHEDULED (fixture not yet started in SFI feed)."""
+    assert MatchStatus.from_sfi_state(timer_seconds=None) == MatchStatus.SCHEDULED
+
+
+def test_from_sfi_state_frozen_signals_finished():
+    """frozen=True → FINISHED regardless of timer_seconds value."""
+    assert MatchStatus.from_sfi_state(timer_seconds=5400, frozen=True) == MatchStatus.FINISHED
+
+
+def test_from_sfi_state_within_halftime_window():
+    """timer_seconds within [ht_start, ht_end] → HALFTIME."""
+    assert (
+        MatchStatus.from_sfi_state(
+            timer_seconds=2710,  # ~45:10
+            ht_start_timer=2700,
+            ht_end_timer=3600,
+        )
+        == MatchStatus.HALFTIME
+    )
+
+
+def test_from_sfi_state_outside_halftime_window_is_live():
+    """timer_seconds outside HT bounds (but not frozen) → LIVE."""
+    assert (
+        MatchStatus.from_sfi_state(
+            timer_seconds=1800,  # 30:00 — first half
+            ht_start_timer=2700,
+            ht_end_timer=3600,
+        )
+        == MatchStatus.LIVE
+    )
+
+
+def test_from_sfi_state_no_halftime_metadata_defaults_to_live():
+    """Without HT bounds + not frozen + timer present → LIVE."""
+    assert MatchStatus.from_sfi_state(timer_seconds=1800) == MatchStatus.LIVE
+
+
+def test_from_sfi_state_frozen_beats_halftime_check():
+    """frozen=True wins even if timer happens to be within HT window."""
+    assert (
+        MatchStatus.from_sfi_state(
+            timer_seconds=2800,
+            ht_start_timer=2700,
+            ht_end_timer=3600,
+            frozen=True,
+        )
+        == MatchStatus.FINISHED
+    )
