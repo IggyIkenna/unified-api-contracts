@@ -168,6 +168,11 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
     # ── ICE Futures Europe ─────────────────────────────────────────────────
     "BRN": RootMetadata("BRN", CATEGORY_ICE_FUTURES, "BRENT", "ICE", DATASET_ICE_EUROPE, "commodity"),
     "G": RootMetadata("G", CATEGORY_ICE_FUTURES, "GASOIL", "ICE", DATASET_ICE_EUROPE, "commodity"),
+    # T = WTI Crude Oil Futures on ICE Europe (separate from CME's CL light-sweet
+    # crude). Same dataset/stype pattern as BRN/G — IFEU.IMPACT parent symbology.
+    # Legacy presence: tradfi_symbology.py TRADFI_INSTRUMENTS+TRADFI_DATA_BINDINGS;
+    # NOT in tradfi_instrument_universe.py (omission, not ambiguity).
+    "T": RootMetadata("T", CATEGORY_ICE_FUTURES, "WTI", "ICE", DATASET_ICE_EUROPE, "commodity"),
     # ── CBOE / CFE Volatility ──────────────────────────────────────────────
     # VX: VIX futures on CBOE Futures Exchange (CFE). XCBF.PITCH supports only
     # raw_symbol stype_in (explicit contract codes like VXH6); parent symbology
