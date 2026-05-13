@@ -253,6 +253,8 @@ class AlertCode(StrEnum):
     reconnected forward."""
 
     # ── Phase 1.E extensions — venue / lending / market-data / gas / oracle kill-switch ─
+    # Upstream additions (21 commits on live-defi-rollout) + simulation_scenarios
+    # Day-1 follow-up gaps (#1-#8, 2026-05-13). Merged 2026-05-13.
     VENUE_HALTED = "VENUE_HALTED"
     """Venue has entered a maintenance halt or full trading suspension —
     all instrument pairs halted. Distinct from ``VENUE_CIRCUIT_BREAKER_OPEN``
@@ -264,6 +266,20 @@ class AlertCode(StrEnum):
     new borrows and repayments blocked until unpaused. Carry-strategy borrows
     cannot be resized. Severity HIGH — PagerDuty P2.
     Payload: ``protocol``, ``pool``, ``paused_at``."""
+    LENDING_POOL_UNAVAILABLE = "LENDING_POOL_UNAVAILABLE"
+    """Chain RPC outage or network partition makes the lending venue unreachable
+    for >= threshold seconds. Distinct from ``LENDING_POOL_PAUSED`` (which is
+    an on-chain governance state) — this is an infrastructure availability issue.
+    Payload: ``protocol``, ``chain``, ``rpc_url``, ``outage_seconds``.
+    Severity CRITICAL — triggers per-lending-venue circuit-breaker.
+    Added 2026-05-13 per simulation_scenarios Day-1 follow-up gap #3."""
+    LENDING_RATE_SPIKE = "LENDING_RATE_SPIKE"
+    """Borrow rate deviates >= 5 sigma from rolling mean (configurable per pool). Signals
+    a sudden demand surge, governance parameter change, or liquidation cascade
+    inflating borrow cost. Payload: ``protocol``, ``pool``, ``asset``,
+    ``current_rate_bps``, ``rolling_mean_bps``, ``sigma_deviation``.
+    Severity HIGH -- block new borrows; evaluate existing position viability.
+    Added 2026-05-13 per simulation_scenarios Day-1 follow-up gap #4."""
     LENDING_BORROW_CAP_REACHED = "LENDING_BORROW_CAP_REACHED"
     """Aave / lending pool borrow cap reached — no new borrows possible but
     repayments and liquidations still active. Carry strategy cannot add leverage.
@@ -282,6 +298,21 @@ class AlertCode(StrEnum):
     has not updated within the allowed window.
     Severity HIGH. Threshold key: ``market_data_stale_seconds``.
     Payload: ``service``, ``feed_id``, ``last_updated_at``, ``stale_seconds``."""
+    GAS_SURGE_50X = "GAS_SURGE_50X"
+    """EVM gas price has reached >= 50x the rolling baseline (configurable).
+    At 50x baseline the carry/recursive-borrow economics go deeply negative;
+    all on-chain tx submission MUST be paused until gas normalises. Payload:
+    ``chain``, ``current_gas_gwei``, ``baseline_gas_gwei``, ``surge_multiple``.
+    Severity CRITICAL -- KILL_ALL on-chain positions; trigger circuit-breaker.
+    Added 2026-05-13 per simulation_scenarios Day-1 follow-up gap #6."""
+    GAS_MEMPOOL_CONGESTION = "GAS_MEMPOOL_CONGESTION"
+    """Gas mempool congestion: submitted txs are queuing/nonce-delaying beyond
+    acceptable latency. Distinct from ``GAS_SURGE_50X`` (absolute price level) —
+    this fires when confirmation latency p99 exceeds threshold even at moderate
+    gas prices (nonce queue backlog, EIP-4844 blob competition, etc.). Payload:
+    ``chain``, ``pending_tx_count``, ``estimated_confirmation_delay_seconds``.
+    Severity HIGH — throttle new tx submission; monitor queue drain.
+    Added 2026-05-13 per simulation_scenarios Day-1 follow-up gap #7."""
     GAS_PRICE_SPIKE = "GAS_PRICE_SPIKE"
     """L1 / L2 gas price spiked above threshold gwei — on-chain tx cost
     renders execution economically infeasible for the current archetype.

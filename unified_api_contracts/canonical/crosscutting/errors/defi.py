@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from ._canonical import CanonicalError
 from ._types import ErrorAction, VenueErrorClassification, ve
 
 
@@ -86,6 +87,80 @@ class DefiErrorCode:
     """Auto-liquidation race; SKIP — cancel/modify against ghost position."""
     HL_FILL_CONFIRMATION_MISSED = "HL_FILL_CONFIRMATION_MISSED"
     """WS fill arrived > timeout; RETRY — re-query /info userFills before declaring lost."""
+
+    # Oracle error codes (added 2026-05-13 per writegate Phase 2.A +
+    # simulation_scenarios Day-1 gap #3/#8)
+    ORACLE_STALE = "ORACLE_STALE"
+    """Chainlink/Pyth feed heartbeat exceeded threshold; SKIP — caller records honest absence."""
+    ORACLE_DEVIATION_EXCEEDED = "ORACLE_DEVIATION_EXCEEDED"
+    """Multi-source oracle prices diverge >= sigma threshold; FAIL — triggers KILL_SWITCH_ORACLE_DIVERGENCE."""
+
+
+class OracleStaleError(CanonicalError):
+    """Oracle price feed heartbeat exceeded threshold — feed age too old for safe execution.
+
+    Emitted by execution-service and features-onchain when a Chainlink/Pyth feed
+    age exceeds the configured heartbeat threshold. Routes to the
+    ORACLE_STALENESS_SECONDS circuit-breaker trip. Action=SKIP so the caller
+    records honest absence rather than using a stale price.
+
+    Added 2026-05-13 per writegate Phase 2.A + simulation_scenarios Day-1 gap #3/#8.
+    """
+
+    def __init__(
+        self,
+        feed: str,
+        chain: str,
+        feed_age_seconds: int,
+        threshold_seconds: int,
+        venue: str | None = None,
+    ) -> None:
+        super().__init__(
+            code=DefiErrorCode.ORACLE_STALE,
+            message=(f"Oracle feed {feed} on {chain} is stale: {feed_age_seconds}s > {threshold_seconds}s threshold"),
+            action=ErrorAction.SKIP,
+            venue=venue,
+        )
+        self.feed = feed
+        self.chain = chain
+        self.feed_age_seconds = feed_age_seconds
+        self.threshold_seconds = threshold_seconds
+
+
+class OracleDeviationError(CanonicalError):
+    """Oracle price deviation exceeds sigma threshold across multiple sources.
+
+    Emitted when Chainlink / Pyth / on-chain TWAP prices diverge by >= sigma
+    threshold (default 30 sigma per ``oracle_divergence_sigma`` AlertThreshold).
+    Triggers KILL_SWITCH_ORACLE_DIVERGENCE alert. Action=FAIL -- position delta
+    is undefined when oracle sources disagree at this scale.
+
+    Added 2026-05-13 per writegate Phase 2.A + simulation_scenarios Day-1 gap #8.
+    """
+
+    def __init__(
+        self,
+        asset: str,
+        chain: str,
+        primary_price: float,
+        secondary_price: float,
+        sigma_deviation: float,
+        venue: str | None = None,
+    ) -> None:
+        super().__init__(
+            code=DefiErrorCode.ORACLE_DEVIATION_EXCEEDED,
+            message=(
+                f"Oracle price deviation {sigma_deviation:.1f} sigma for {asset} on {chain}: "
+                f"primary={primary_price}, secondary={secondary_price}"
+            ),
+            action=ErrorAction.FAIL,
+            venue=venue,
+        )
+        self.asset = asset
+        self.chain = chain
+        self.primary_price = primary_price
+        self.secondary_price = secondary_price
+        self.sigma_deviation = sigma_deviation
 
 
 VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {

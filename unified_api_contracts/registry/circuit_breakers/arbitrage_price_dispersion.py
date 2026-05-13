@@ -31,6 +31,82 @@ from ...canonical.crosscutting.circuit_breaker import (
 )
 
 BREAKERS: Final[tuple[BreakerConfig, ...]] = (
+    # ── DR Phase 1.A+4 extensions (2026-05-13) — simulation_scenarios Day-1 ──
+    # 4 new breakers for ARBITRAGE_PRICE_DISPERSION: oracle staleness, per-chain
+    # RPC outage (Ethereum + Solana), and lending pool unavailability.
+    # The arbitrage_price_dispersion archetype uses both ETH and SOL chain RPCs
+    # (hedge legs on Hyperliquid/DRIFT both require chain connectivity) and
+    # interacts with lending pools for margin/collateral.
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="ARBITRAGE_PRICE_DISPERSION",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
+            threshold_value=Decimal("4500"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=300,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Chainlink heartbeat > 4500s (1h heartbeat + 15min grace) on active"
+            " price feed — oracle price is stale. Block new signal entry; evaluate"
+            " existing positions against widened spread. AUTO_COOLDOWN on feed refresh."
+        ),
+    ),
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.RPC_OUTAGE_SECONDS_ETHEREUM,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="ARBITRAGE_PRICE_DISPERSION",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.RPC_OUTAGE_SECONDS_ETHEREUM,
+            threshold_value=Decimal("30"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=120,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Ethereum RPC unreachable >= 30s — block new ETH on-chain ops;"
+            " hedge legs on CeFi perps can continue. AUTO_COOLDOWN on reconnect."
+        ),
+    ),
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.RPC_OUTAGE_SECONDS_SOLANA,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="ARBITRAGE_PRICE_DISPERSION",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.RPC_OUTAGE_SECONDS_SOLANA,
+            threshold_value=Decimal("30"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=120,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Solana RPC unreachable >= 30s — block new SOL on-chain ops (DRIFT/JitoSOL);"
+            " other chain legs unaffected. AUTO_COOLDOWN on reconnect."
+        ),
+    ),
+    BreakerConfig(
+        breaker_id=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+        scope=BreakerScope.PER_ARCHETYPE,
+        applies_to="ARBITRAGE_PRICE_DISPERSION",
+        trigger=BreakerTrigger(
+            trigger_type=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+            threshold_value=Decimal("60"),
+            threshold_unit=ThresholdUnit.SECONDS,
+        ),
+        action=BreakerAction.BLOCK_NEW,
+        cooldown_seconds=300,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Aave/Morpho lending pool unavailable (RPC-outage or governance pause) >= 60s."
+            " Block new borrows/collateral ops for this archetype. AUTO_COOLDOWN when"
+            " pool is confirmed reachable and unpaused."
+        ),
+    ),
     BreakerConfig(
         breaker_id=CircuitBreakerId.FUNDING_RATE_FLIP_BPS,
         scope=BreakerScope.PER_ARCHETYPE,
@@ -205,6 +281,31 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
 )
 
 RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
+    # ── DR Phase 1.A+4 extensions recovery rules (2026-05-13) ─────────────────
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.ORACLE_STALENESS_SECONDS,
+        guard_description="Chainlink heartbeat within SLA (latest answer timestamp < threshold) for 5min.",
+        retry_policy="linear",
+        auto_disarm_after_seconds=300,
+    ),
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.RPC_OUTAGE_SECONDS_ETHEREUM,
+        guard_description="Ethereum RPC eth_blockNumber responds within 2s for 3 consecutive checks.",
+        retry_policy="exponential",
+        auto_disarm_after_seconds=120,
+    ),
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.RPC_OUTAGE_SECONDS_SOLANA,
+        guard_description="Solana RPC getSlot responds within 2s for 3 consecutive checks.",
+        retry_policy="exponential",
+        auto_disarm_after_seconds=120,
+    ),
+    BreakerRecoveryRule(
+        breaker_id=CircuitBreakerId.LENDING_POOL_UNAVAILABLE_SECONDS,
+        guard_description="Lending pool RPC reachable and isPaused() == False for 5min.",
+        retry_policy="linear",
+        auto_disarm_after_seconds=300,
+    ),
     BreakerRecoveryRule(
         breaker_id=CircuitBreakerId.FUNDING_RATE_FLIP_BPS,
         guard_description="Funding rate within 20bps of pre-flip level for full funding window.",

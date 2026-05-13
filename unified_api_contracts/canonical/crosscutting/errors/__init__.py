@@ -12,7 +12,7 @@ from ._types import (
 )
 from .altdata import VENUE_ERRORS_ALTDATA
 from .cefi import VENUE_ERRORS_CEFI
-from .defi import VENUE_ERRORS_DEFI, DefiAlertType, DefiErrorCode
+from .defi import VENUE_ERRORS_DEFI, DefiAlertType, DefiErrorCode, OracleDeviationError, OracleStaleError
 from .infra import INFRA_ERRORS
 from .onchain_perps import VENUE_ERRORS_ONCHAIN_PERPS
 from .sports import VENUE_ERRORS_SPORTS
@@ -54,6 +54,8 @@ __all__ = [
     "DefiAlertType",
     "DefiErrorCode",
     "ErrorAction",
+    "OracleDeviationError",
+    "OracleStaleError",
     "RateLimitResponse",
     "UnsupportedCapabilityError",
     "VenueErrorClassification",

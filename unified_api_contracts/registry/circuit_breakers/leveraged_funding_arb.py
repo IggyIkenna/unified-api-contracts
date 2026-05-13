@@ -23,6 +23,7 @@ from ...canonical.crosscutting.alerting.thresholds import ThresholdUnit
 from ...canonical.crosscutting.circuit_breaker import (
     BreakerAction,
     BreakerConfig,
+    BreakerRecoveryMode,
     BreakerRecoveryRule,
     BreakerScope,
     BreakerTrigger,
@@ -34,12 +35,24 @@ from ...canonical.crosscutting.circuit_breaker import (
 _STANDARD_STABLES: Final[tuple[str, ...]] = ("USDC", "USDT", "DAI", "GHO", "SUSDE")
 _SYNTHETIC_STABLES: Final[tuple[str, ...]] = ("USDE", "CRVUSD", "FRAX")
 
-# (breaker_id, base_bps, action, severity, cooldown_seconds)
-_DEPEG_TIERS: Final[tuple[tuple[CircuitBreakerId, int, BreakerAction, AlertSeverity, int | None], ...]] = (
-    (CircuitBreakerId.STABLECOIN_DEPEG_WARNING, 100, BreakerAction.BLOCK_NEW, AlertSeverity.WARN, 600),
-    (CircuitBreakerId.STABLECOIN_DEPEG_SMALL, 300, BreakerAction.SCALE_DOWN, AlertSeverity.HIGH, 900),
-    (CircuitBreakerId.STABLECOIN_DEPEG_MODERATE, 500, BreakerAction.CANCEL_OPEN, AlertSeverity.HIGH, 1800),
-    (CircuitBreakerId.STABLECOIN_DEPEG_CATASTROPHIC, 1000, BreakerAction.KILL_ALL, AlertSeverity.CRITICAL, None),
+# (breaker_id, base_bps, action, severity, cooldown_seconds, recovery_mode_override)
+# STABLECOIN_DEPEG_MODERATE uses CANCEL_OPEN with explicit AUTO_COOLDOWN override —
+# CANCEL_OPEN defaults to MANUAL_UNKILL per BREAKER_RECOVERY_DEFAULTS but 500bps
+# depeg is an intermediate severity that auto-recovers after 30min (per DR plan D.1).
+_DEPEG_TIERS: Final[
+    tuple[tuple[CircuitBreakerId, int, BreakerAction, AlertSeverity, int | None, BreakerRecoveryMode | None], ...]
+] = (
+    (CircuitBreakerId.STABLECOIN_DEPEG_WARNING, 100, BreakerAction.BLOCK_NEW, AlertSeverity.WARN, 600, None),
+    (CircuitBreakerId.STABLECOIN_DEPEG_SMALL, 300, BreakerAction.SCALE_DOWN, AlertSeverity.HIGH, 900, None),
+    (
+        CircuitBreakerId.STABLECOIN_DEPEG_MODERATE,
+        500,
+        BreakerAction.CANCEL_OPEN,
+        AlertSeverity.HIGH,
+        1800,
+        BreakerRecoveryMode.AUTO_COOLDOWN,
+    ),
+    (CircuitBreakerId.STABLECOIN_DEPEG_CATASTROPHIC, 1000, BreakerAction.KILL_ALL, AlertSeverity.CRITICAL, None, None),
 )
 
 
@@ -49,7 +62,7 @@ def _depeg_configs() -> tuple[BreakerConfig, ...]:
         is_synthetic = stable in _SYNTHETIC_STABLES
         multiplier = Decimal("0.5") if is_synthetic else Decimal("1")
         suffix = " (synthetic half-threshold)" if is_synthetic else ""
-        for breaker_id, base_bps, action, severity, cooldown in _DEPEG_TIERS:
+        for breaker_id, base_bps, action, severity, cooldown, recovery_override in _DEPEG_TIERS:
             effective_bps = int(Decimal(str(base_bps)) * multiplier)
             configs.append(
                 BreakerConfig(
@@ -63,6 +76,7 @@ def _depeg_configs() -> tuple[BreakerConfig, ...]:
                     ),
                     action=action,
                     cooldown_seconds=cooldown,
+                    recovery_mode=recovery_override,
                     alerting_severity=severity,
                     description=f"{stable} peg deviation >= {effective_bps}bps{suffix}.",
                 )

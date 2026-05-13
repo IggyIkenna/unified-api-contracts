@@ -804,6 +804,50 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         ),
     ),
     # ── Phase 1.E — venue / lending / market-data / gas / oracle kill-switch ─
+    # Combined upstream + stash additions (2026-05-13):
+    # Upstream: VENUE_HALTED, LENDING_POOL_PAUSED, LENDING_BORROW_CAP_REACHED,
+    #   LENDING_UTILIZATION_HIGH, MARKET_DATA_STALE, GAS_PRICE_SPIKE,
+    #   GAS_BUDGET_EXCEEDED, KILL_SWITCH_ORACLE_DIVERGENCE
+    # Stash: adds LENDING_POOL_UNAVAILABLE, GAS_SURGE_50X, LENDING_RATE_SPIKE,
+    #   GAS_MEMPOOL_CONGESTION — all codes present in codes.py closed set.
+    AlertRule(
+        code=AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE,
+        event_pattern="KILL_SWITCH_ORACLE_DIVERGENCE",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("kill_switch_oracle_divergence"),
+        threshold_key="oracle_divergence_sigma",
+        triggers_kill_switch=True,
+        kill_switch_scope=KillSwitchScope.GLOBAL,
+        description=(
+            "Oracle price divergence >= 30 sigma from rolling mean (Chainlink / Pyth / TWAP)."
+            " Position delta undefined at this level — GLOBAL halt until oracle recovers."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.LENDING_POOL_UNAVAILABLE,
+        event_pattern="LENDING_POOL_UNAVAILABLE",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("lending_pool_unavailable"),
+        threshold_key="lending_pool_outage_seconds",
+        description=(
+            "Chain RPC outage / network partition making lending venue unreachable"
+            " for >= threshold seconds. Block all lending-venue operations."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.GAS_SURGE_50X,
+        event_pattern="GAS_SURGE_50X",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("gas_surge_50x"),
+        threshold_key="gas_surge_multiple",
+        description=(
+            "EVM gas price >= 50x rolling baseline — on-chain economics inverted."
+            " Pause all tx submission; circuit-breaker KILL_ALL on-chain positions."
+        ),
+    ),
     AlertRule(
         code=AlertCode.VENUE_HALTED,
         event_pattern="VENUE_HALTED",
@@ -852,6 +896,18 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         ),
     ),
     AlertRule(
+        code=AlertCode.LENDING_RATE_SPIKE,
+        event_pattern="LENDING_RATE_SPIKE",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("lending_rate_spike"),
+        threshold_key="lending_rate_spike_sigma",
+        description=(
+            "Borrow rate >= 5 sigma from rolling mean — sudden demand surge or governance"
+            " param change. Block new borrows; evaluate existing position viability."
+        ),
+    ),
+    AlertRule(
         code=AlertCode.MARKET_DATA_STALE,
         event_pattern="MARKET_DATA_STALE",
         severity=AlertSeverity.HIGH,
@@ -890,17 +946,15 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         ),
     ),
     AlertRule(
-        code=AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE,
-        event_pattern="KILL_SWITCH_ORACLE_DIVERGENCE",
-        severity=AlertSeverity.CRITICAL,
-        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
-        runbook_doc=_runbook("kill_switch_oracle_divergence"),
-        triggers_kill_switch=True,
-        kill_switch_scope=KillSwitchScope.GLOBAL,
+        code=AlertCode.GAS_MEMPOOL_CONGESTION,
+        event_pattern="GAS_MEMPOOL_CONGESTION",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("gas_mempool_congestion"),
+        threshold_key="gas_mempool_confirmation_delay_seconds",
         description=(
-            "Oracle price divergence or staleness exceeds kill-switch threshold."
-            " Either ORACLE_DEVIATION_BPS or ORACLE_STALENESS_SECONDS breach"
-            " qualifies. Triggers GLOBAL kill-switch — full halt."
+            "Tx confirmation latency p99 exceeds threshold (nonce queue backlog,"
+            " blob competition). Throttle new tx submission; monitor queue drain."
         ),
     ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────

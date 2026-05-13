@@ -166,6 +166,37 @@ class CircuitBreakerId(StrEnum):
     STABLECOIN_DEPEG_CATASTROPHIC = "STABLECOIN_DEPEG_CATASTROPHIC"
     """Stablecoin peg deviation ≥ 1000bps (standard) / 500bps (synthetic) — KILL_ALL + MANUAL_UNKILL."""
 
+    # ── DR Phase 1.A+4 extensions — simulation_scenarios Day-1 follow-up (2026-05-13) ──
+    # 4 breakers surfaced from simulation_scenarios_topology_price_shocks_2026_05_09
+    # Day-1 run: per-chain RPC outage disambiguation, oracle staleness, lending
+    # pool unavailability, and ARBITRAGE_PRICE_DISPERSION applies_to seed.
+    ORACLE_STALENESS_SECONDS = "ORACLE_STALENESS_SECONDS"
+    """Chainlink heartbeat exceeded threshold seconds without a price update.
+    Distinct from ``ORACLE_DEVIATION_BPS`` (price accuracy) — this fires on
+    feed *age* not on deviation magnitude. Fires at heartbeat > threshold
+    (Chainlink ETH/USD heartbeat = 3600s; threshold default = heartbeat + 15min
+    grace = 4500s). Added 2026-05-13 per simulation_scenarios Day-1 follow-up."""
+
+    RPC_OUTAGE_SECONDS_ETHEREUM = "RPC_OUTAGE_SECONDS_ETHEREUM"
+    """Ethereum chain RPC endpoint unreachable for >= threshold seconds.
+    Disambiguates from the generic ``RPC_OUTAGE_SECONDS`` (used by
+    ``CARRY_STAKED_BASIS`` cross-chain) — per-chain breakers allow
+    chain-specific thresholds and recovery semantics. ETHEREUM = 30s threshold
+    (fast finality expectations on L1). Added 2026-05-13."""
+
+    RPC_OUTAGE_SECONDS_SOLANA = "RPC_OUTAGE_SECONDS_SOLANA"
+    """Solana chain RPC endpoint unreachable for >= threshold seconds.
+    Solana slot time ≈ 400ms; 30s outage = ~75 missed slots. Threshold
+    default = 30s (same as Ethereum for operational simplicity; per-archetype
+    override can tighten). Added 2026-05-13 per simulation_scenarios Day-1."""
+
+    LENDING_POOL_UNAVAILABLE_SECONDS = "LENDING_POOL_UNAVAILABLE_SECONDS"
+    """Aave/Morpho lending market unavailable (RPC-unreachable OR on-chain
+    ``isPaused() == True``) for >= threshold seconds. Merges both the
+    infrastructure outage and governance-pause cases at the breaker layer —
+    the operator sees a unified circuit-breaker arm regardless of cause.
+    Threshold default = 60s. Added 2026-05-13 per simulation_scenarios Day-1."""
+
 
 class BreakerScope(StrEnum):
     """Blast-radius scope for a breaker.
