@@ -98,4 +98,10 @@ TERMINAL_STATUSES: frozenset[MatchStatus] = frozenset(
 """Fixtures that will not (or may not) produce a result today."""
 
 # Raw API-Football codes that map to COMPLETED (used in existing status_short comparisons).
-AF_COMPLETED_CODES: frozenset[str] = frozenset({"FT", "AET", "PEN"})
+# Includes regulation-end (FT), extra-time (AET), penalties (PEN), and the two
+# awarded-result codes (AWD = technical walkover, WO = walkover) — both produce
+# a final result row even though no play occurred. Reference: instruments-service
+# scripts/audit_fixtures_via_api_football.py:94 source comment "AWD=tech-walkover,
+# WO=walkover". Mirrors the AF_STATUS_SHORT_MAP entries that resolve to
+# MatchStatus.FINISHED.
+AF_COMPLETED_CODES: frozenset[str] = frozenset({"FT", "AET", "PEN", "AWD", "WO"})
