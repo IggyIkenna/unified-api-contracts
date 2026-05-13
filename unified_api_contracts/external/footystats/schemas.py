@@ -280,6 +280,23 @@ class FootyStatsMatch(BaseModel):
     away_shots: int | None = None
     home_corners: int | None = None
     away_corners: int | None = None
+    # --- Halftime goals (team_a/team_b naming convention) ---
+    home_goals_halftime: int | None = None
+    away_goals_halftime: int | None = None
+    # --- Shots on target (team_a/team_b naming convention) ---
+    home_shots_on_target: int | None = None
+    away_shots_on_target: int | None = None
+    # --- Cards (team_a/team_b naming convention) ---
+    home_yellow_cards: int | None = None
+    away_yellow_cards: int | None = None
+    home_red_cards: int | None = None
+    away_red_cards: int | None = None
+    # --- Fouls (team_a/team_b naming convention) ---
+    home_fouls: int | None = None
+    away_fouls: int | None = None
+    # --- Offsides (team_a/team_b naming convention) ---
+    home_offsides: int | None = None
+    away_offsides: int | None = None
     # --- Odds: full-time result + over/under (all lines) ---
     odds_ft_1: float | None = None
     odds_ft_x: float | None = None
