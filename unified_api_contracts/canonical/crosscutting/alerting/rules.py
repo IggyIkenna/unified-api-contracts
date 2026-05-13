@@ -957,6 +957,29 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " blob competition). Throttle new tx submission; monitor queue drain."
         ),
     ),
+    # ── Stablecoin depeg surveillance (2026-05-13, Phase D.5 + D.7) ──────────
+    AlertRule(
+        code=AlertCode.STABLECOIN_ISSUER_PAUSED,
+        event_pattern="STABLECOIN_ISSUER_PAUSED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("stablecoin_issuer_paused"),
+        description=(
+            "Stablecoin issuer (Circle / Tether / MakerDAO) paused issuance/redemption."
+            " Operator must evaluate depeg-ladder escalation. NOT auto-action."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.GOVERNANCE_INCIDENT_DETECTED,
+        event_pattern="GOVERNANCE_INCIDENT_DETECTED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("governance_incident_detected"),
+        description=(
+            "Governance forum (Snapshot / Tally) posted a proposal tagged with depeg-risk keywords."
+            " Operator-page only — NOT auto-action. Investigate before escalating."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

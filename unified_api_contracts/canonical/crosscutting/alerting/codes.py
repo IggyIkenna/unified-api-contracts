@@ -334,6 +334,23 @@ class AlertCode(StrEnum):
     Payload: ``oracle_source``, ``instrument``, ``deviation_bps`` or
     ``stale_seconds``, ``threshold``."""
 
+    # ── Stablecoin depeg surveillance (2026-05-13, risk_simulations Phase D.5 + D.7)
+    # Produced by: alerting-service stablecoin subscribers (D.5 issuer-pause,
+    # D.7 governance-forum watcher). Consumed by: depeg ladder (D.1 / D.2) to
+    # evaluate whether to escalate to KILL_ALL circuit-breaker action.
+    # SSOT: plans/active/risk_simulations_limits_alerting_2026_05_10.md § D.5/D.7.
+    STABLECOIN_ISSUER_PAUSED = "STABLECOIN_ISSUER_PAUSED"
+    """Stablecoin issuer (Circle / Tether / MakerDAO) signalled a pause or halt
+    of issuance/redemption activity. Payload: ``stable``, ``issuer``,
+    ``paused_at``, ``source_url``, ``reason``. Severity HIGH — elevated risk
+    that stable will depeg without on/off-ramp. Operator must evaluate whether
+    to trigger KILL_ALL via depeg ladder."""
+    GOVERNANCE_INCIDENT_DETECTED = "GOVERNANCE_INCIDENT_DETECTED"
+    """A governance forum (Snapshot / Tally) posted a proposal tagged with
+    depeg-risk keywords (``incident``, ``freeze``, ``<stable-name>``,
+    ``aave``, ``spark``). Operator-page only — NOT auto-action. Payload:
+    ``forum``, ``proposal_id``, ``title``, ``tags``, ``posted_at``, ``url``."""
+
 
 ALERT_CODES: Final[frozenset[str]] = frozenset(member.value for member in AlertCode)
 """String-membership view of :class:`AlertCode` for fast O(1) validation.

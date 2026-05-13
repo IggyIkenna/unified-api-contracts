@@ -984,3 +984,60 @@ class PnLAttribution(BaseModel):
     """Derived: sum where layer=STRATEGY."""
     execution_alpha_total: Decimal = Decimal("0")
     """Derived: sum where layer=EXECUTION."""
+
+
+# ---------------------------------------------------------------------------
+# Stablecoin aggregate exposure (D.2 — depeg ladder support)
+# SSOT: plans/active/risk_simulations_limits_alerting_2026_05_10.md Phase D.2
+# ---------------------------------------------------------------------------
+
+
+class VenueExposureBreakdown(BaseModel):
+    """Per-venue/chain/protocol breakdown of stablecoin exposure."""
+
+    venue_or_chain: str
+    """e.g. 'BINANCE', 'ETHEREUM', 'AAVE_V3', 'UNISWAP_V3_POOL:0x...'"""
+    gross_long_usd: Decimal = Decimal("0")
+    gross_short_usd: Decimal = Decimal("0")
+    net_usd: Decimal = Decimal("0")
+    position_count: int = 0
+
+
+class StablecoinExposure(BaseModel):
+    """Aggregated stablecoin exposure across all venues, chains, protocols, wallets.
+
+    Output of ``StablecoinAggregateExposureCalculator``
+    (``features_service.cross_instrument.app.calculators.stablecoin_aggregate_exposure``).
+
+    Used by the depeg ladder (D.1 ``_depeg_configs()``) to compute impact
+    magnitude at the KILL_ALL trigger. ``delta_1bps`` measures total P&L
+    sensitivity to a 1 basis-point peg move against the stable.
+
+    :param stable: Stablecoin symbol, e.g. ``'USDC'``.
+    :param gross_long_usd: Total long notional in USD (absolute value).
+    :param gross_short_usd: Total short notional in USD (absolute value).
+    :param net_usd: ``gross_long_usd - gross_short_usd`` (signed; positive = net long).
+    :param delta_1bps: Sensitivity to a 1 bps peg move (USD). Positive = long position
+        loses value as peg falls; negative = short benefits from depeg.
+    :param as_of: Timestamp of the underlying positions used for the calculation.
+    :param sources_breakdown: Per-venue/chain breakdown for operator drilldown.
+    """
+
+    stable: str
+    gross_long_usd: Decimal = Decimal("0")
+    gross_short_usd: Decimal = Decimal("0")
+    net_usd: Decimal = Decimal("0")
+    delta_1bps: Decimal = Decimal("0")
+    """USD P&L impact of a 1-bps ($0.0001) peg deviation. net_usd / 10000."""
+    as_of: datetime
+    sources_breakdown: list[VenueExposureBreakdown] = Field(default_factory=list)
+
+    @property
+    def is_net_long(self) -> bool:
+        """True if net position is long the stablecoin."""
+        return self.net_usd > Decimal("0")
+
+    @property
+    def gross_total_usd(self) -> Decimal:
+        """Sum of gross long + gross short (total two-sided exposure)."""
+        return self.gross_long_usd + self.gross_short_usd
