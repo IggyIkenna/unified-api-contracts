@@ -624,6 +624,36 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "program_id": "So1endDq2YkqhipRh3WViPa8hFb54GdNFfmLqErtPqNo",
         "data_source": "defillama",
     },
+    # ── Plan C: Solana AMM coverage expansion (2026-05-13) ──────────────
+    "meteora": {
+        "name": "Meteora Dynamic Liquidity",
+        "type": "amm_dex",
+        "program_id": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+        "api_url": "https://app.meteora.ag/api",
+        "data_source": "meteora_api",
+    },
+    "phoenix": {
+        "name": "Phoenix CLOB DEX",
+        "type": "clob_dex",
+        "program_id": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
+        "api_url": "https://api.phoenix.trade",
+        "data_source": "phoenix_api",
+    },
+    "lifinity": {
+        "name": "Lifinity Protocol",
+        "type": "amm_dex",
+        "program_id": "LFNTYraetVioAPnGJht4yNg2aUZFXR776cMeN9VMjXp",
+        "api_url": "https://api.lifinity.io",
+        "data_source": "lifinity_api",
+    },
+    "pyth": {
+        "name": "Pyth Network Oracle",
+        "type": "oracle",
+        "program_id": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+        "api_url": "https://hermes.pyth.network/v2",
+        "pythnet_url": "https://pythnet.rpcpool.com",
+        "data_source": "pyth_hermes",
+    },
 }
 
 
