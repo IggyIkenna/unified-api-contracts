@@ -56,9 +56,11 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     ("sports", "match", "player_stats", SPORTS_PLAYER_STATS, 38),
     ("sports", "match", "injuries", SPORTS_INJURIES, 5),
     # Family C — Transfermarkt (TRANSFERMARKT_LEAGUES retired 2026-05-05; mapping in UAC).
-    ("sports", "player", "player_values", SPORTS_PLAYER_VALUES, 7),
+    # PLAYER_VALUES: 7 → 11 per C.4 per-player flatten (UAC@3b29f7e 2026-05-13).
+    ("sports", "player", "player_values", SPORTS_PLAYER_VALUES, 11),
     # Family D — SFI (SFI_LEAGUES retired 2026-05-05; mapping in UAC).
-    ("sports", "match", "sfi_progressive_stats", SPORTS_SFI_PROGRESSIVE_STATS, 43),
+    # SFI_PROGRESSIVE_STATS: 43 → 45 per C.6 Step 2 ft_timer + match_end_time (UAC@1848647 2026-05-13).
+    ("sports", "match", "sfi_progressive_stats", SPORTS_SFI_PROGRESSIVE_STATS, 45),
     # Family E — Other / derived
     ("sports", "match", "matches", SPORTS_MATCHES, 58),
     ("sports", "match", "predictions", SPORTS_PREDICTIONS, 35),
