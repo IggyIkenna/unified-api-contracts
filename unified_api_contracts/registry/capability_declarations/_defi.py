@@ -400,7 +400,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "trader_joe_v2": _ProtocolCapability(
-        venue_prefix="TRADERJOEV2",
+        venue_prefix="TRADER_JOEV2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],

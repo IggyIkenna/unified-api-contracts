@@ -12,7 +12,7 @@ from __future__ import annotations
 
 EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
     {
-        "TRADERJOEV2-AVALANCHE",  # subgraph returns 0 instruments as of 2026-04-29
+        "TRADER_JOEV2-AVALANCHE",  # subgraph returns 0 instruments as of 2026-04-29 (DF-17 producer-side migration 2026-05-13)
         "UNISWAPV3-POLYGON",  # subgraph returns 0 instruments as of 2026-04-29 (migration finding)
         "GMX-AVALANCHE",  # 0 historical parquets / minimal subgraph data (1 instrument) as of 2026-04-29
     }
