@@ -200,6 +200,15 @@ class AlertCode(StrEnum):
     operator sign-off required because cancelled / fully-unwound positions
     don't have a natural auto-restore semantic."""
 
+    # ── DR drill staleness (disaster_recovery_circuit_breakers_2026_05_10.md Phase 6.B)
+    CHAOS_DRILL_FAILED = "CHAOS_DRILL_FAILED"
+    """Nightly chaos-drill failed or is >24h stale — no passing ``DrillReport``
+    written to the events bucket within the staleness window. Severity HIGH.
+    Producer: ``e2e-testing/scripts/defi/run_chaos_drill.py`` (``disaster-drill-cron-*``
+    VM). Fires when ``overall_pass=False`` OR ``check_drill_staleness()`` returns
+    ``True`` (>24h since last passing drill). Operator action: check drill VM logs +
+    inspect ``gs://{pid}-events/dr_drill_reports/`` for last passing report."""
+
     # ── Tick-staleness + connectivity-gap event taxonomy (2026-05-11 —
     # alerting_service_live_rules_2026_05_07 § "Tick-staleness +
     # connectivity-gap event taxonomy"). Complementary signals:
