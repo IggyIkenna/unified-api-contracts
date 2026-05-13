@@ -210,6 +210,24 @@ class EmptyConfirmedReason(StrEnum):
     ``status.short == "CANC"``. Instruments-service emits this so consumers can distinguish cancelled fixtures from
     data-fetch failures. Pair with ``EXPECTED_FIXTURE_POSTPONED``."""
 
+    EXPECTED_NO_FIXTURE = "EXPECTED_NO_FIXTURE"
+    """No fixture scheduled for this ``(league_id, day)`` per the canonical api_football fixtures manifest.
+
+    Fixture-pinned sources (e.g. ``soccer_football_info`` SFI_PROGRESSIVE_STATS,
+    ``footystats`` MATCHES/ODDS/PREDICTIONS, ``open_meteo`` WEATHER) cannot emit data without a
+    fixture. Without a scheduled fixture for the (league, day), an empty row is the EXPECTED state,
+    not a fetch failure.
+
+    Used by:
+    - UTL ``legacy_reason_classifier._classify_sports`` for legacy manifest rows missing per-source
+      fixture-pin classification (returns this reason when ``is_fixture_scheduled(league_id, day)``
+      is False for SFI/footystats/open_meteo sources).
+    - instruments-service WEATHER + SFI + footystats write-paths (preventatively skip fetch when no
+      fixture exists; `record_empty(reason=EXPECTED_NO_FIXTURE)` so future runs don't retry).
+
+    Plan: ``sports_classifier_sfi_footystats_fixture_pin_2026_05_13.md`` +
+    ``sports_classifier_weather_no_fixture_2026_05_13.md`` (slot 4 ownership 2026-05-13)."""
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
