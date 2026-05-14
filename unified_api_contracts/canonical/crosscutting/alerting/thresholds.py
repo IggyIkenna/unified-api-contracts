@@ -476,3 +476,41 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
 """Threshold registry. New rules must add an entry here AND reference the key
 from ``AlertRule.threshold_key`` so the closed-set sanity test catches drift.
 """
+
+# ---------------------------------------------------------------------------
+# Reconciliation green-band thresholds — batch-vs-live recon gate.
+# ---------------------------------------------------------------------------
+
+RECON_GREEN_THRESHOLDS: Final[dict[str, dict[str, Decimal]]] = {
+    "carry_staked_basis": {
+        "bps_delta_max": Decimal("50"),
+        "drawdown_pct": Decimal("2.0"),
+        "fill_rate_min": Decimal("0.95"),
+    },
+    "leveraged_funding_arb": {
+        "bps_delta_max": Decimal("75"),
+        "drawdown_pct": Decimal("3.0"),
+        "fill_rate_min": Decimal("0.92"),
+    },
+}
+"""Per-archetype reconciliation green-band.
+
+Keys per archetype:
+
+- ``bps_delta_max`` — maximum allowable P&L delta between batch-simulated fills
+  and live fills, in basis points of notional. Breaching this fires
+  ``RECON_BATCH_LIVE_DELTA_BREACH`` and blocks cutover sign-off.
+  Values set at 95th-percentile backtest spread plus 2× slippage margin
+  (carry_staked_basis: 50 bps; leveraged_funding_arb: 75 bps — tighter
+  LST_AS_MARGIN venues vs wider USDC-margin multi-venue spread).
+- ``drawdown_pct`` — maximum acceptable intraday drawdown as % of starting NAV
+  for a "green" recon run. Values anchored to 2-year backtest 95p drawdown +
+  2× margin per batch_live_symmetry_2026_05_10.md Phase 4.
+- ``fill_rate_min`` — minimum fraction of intended fills that must execute for
+  the recon run to pass. carry_staked_basis: 0.95 (LST venues; less cancel
+  risk); leveraged_funding_arb: 0.92 (multi-venue; wider path variance).
+
+These defaults are **operator-calibrated post-2-yr-backtest** starting points.
+Phase 7 quietness-baseline tuning (batch_live_symmetry_2026_05_10.md Phase 7)
+will tighten them once live-pipeline fill distribution is observed.
+"""
