@@ -322,16 +322,16 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "ETHEREUM",
         "FLUID",
-    ): "2024-02-15",  # Fluid Liquidity proxy 0x52aa899454998be5b000ad077a46bbe360f4e497 ~2024-02-17 per Etherscan relative-age; conservative -2d; medium
+    ): "2024-02-15",  # Fluid proxy 0x52aa...4e497 ~2024-02-17 per Etherscan; conservative -2d; medium
     (
         "ETHEREUM",
         "MORPHOVAULTS",
-    ): "2024-01-04",  # MetaMorpho factory 0xA9c3D3a366466Fa809d1Ae982Fb2c46E5fC41101 ~2024-01-04 per Etherscan; first Steakhouse USDC vault Jan 2024; medium
+    ): "2024-01-04",  # MetaMorpho factory 0xA9c3...c41101 ~2024-01-04; first Steakhouse USDC vault Jan 2024; medium
     ("ETHEREUM", "YEARNV3"): "2024-03-20",  # Yearn V3 mainnet launch per Yearn / Binance Square + Token Terminal; high
     (
         "ETHEREUM",
         "ANKR",
-    ): "2020-12-01",  # ankrETH ERC20 0xe95a203b1a91a908f9b9ce46459d101078c2c3cb verified 2020-10-09; Ankr docs Dec 2020 first-LST month; conservative; medium
+    ): "2020-12-01",  # ankrETH ERC20 0xe95a...2c3cb verified 2020-10-09; Ankr docs Dec 2020 first-LST; medium
     (
         "ETHEREUM",
         "STADER",
@@ -339,11 +339,11 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "ETHEREUM",
         "STAKEWISE",
-    ): "2023-11-28",  # StakeWise V3 + osETH ERC20 launch per StakeWise Medium (osETH = V3-era token; V2 deprecated 2025-06-01); high
+    ): "2023-11-28",  # StakeWise V3 + osETH launch per StakeWise Medium (V3-era token; V2 deprecated 2025-06-01); high
     (
         "ETHEREUM",
         "EIGENLAYER",
-    ): "2023-06-14",  # EigenLayer Stage 1 mainnet (LST deposits, $17M cap) per EigenLayer blog + TheBlock/Coinacademy coverage; high
+    ): "2023-06-14",  # EigenLayer Stage 1 mainnet (LST deposits, $17M cap) per EigenLayer blog + TheBlock; high
     # ── LST + restaking + PancakeSwap ETH (Sub-agent B) ──
     ("ETHEREUM", "SWELL"): "2023-04-25",  # swETH mainnet "Seawolf unleashed" per Swell post; high
     ("ETHEREUM", "PUFFER"): "2024-05-09",  # Puffer mainnet "pufETH deposits live" per Puffer Medium; high
@@ -352,7 +352,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "ETHEREUM",
         "PANCAKESWAPV3",
-    ): "2023-04-01",  # PancakeSwap V3 Factory 0x0BFb...91865 deployed 2023-04-01 00:20 UTC per Etherscan; public announce 2023-04-03; high
+    ): "2023-04-01",  # PancakeSwap V3 Factory deployed 2023-04-01 per Etherscan; public announce 2023-04-03; high
     # ── Solana lending/LST (Sub-agent B) ── SolBlaze deferred (low confidence)
     (
         "SOLANA",
@@ -367,11 +367,11 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "BASE",
         "BALANCER",
-    ): "2023-08-09",  # Balancer Base announced Aug 1 2023 per Avalanche blog (bundled w/ Avalanche launch); CLAMPED to BASE chain genesis 2023-08-09 (no on-chain events possible pre-genesis); medium
+    ): "2023-08-09",  # Balancer Base: CLAMPED to genesis 2023-08-09 (announced Aug 1; pre-genesis impossible); medium
     (
         "OPTIMISM",
         "BALANCER",
-    ): "2022-06-01",  # Balancer Optimism launch June 2 2022 per Balancer Labs Medium "Balancer is Now on Optimism!"; conservative -1d; high
+    ): "2022-06-01",  # Balancer Optimism launch June 2 2022 per Balancer Labs Medium; conservative -1d; high
     (
         "POLYGON",
         "BALANCER",
@@ -388,7 +388,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "BASE",
         "PANCAKESWAPV3",
-    ): "2023-08-30",  # PancakeSwap V3 Base launch Aug 31 per PancakeSwap blog + Galxe "Traverse"; conservative -1d; medium
+    ): "2023-08-30",  # PancakeSwap V3 Base Aug 31 per PancakeSwap blog + Galxe Traverse; conservative -1d; medium
     (
         "BSC",
         "PANCAKESWAPV3",
@@ -399,12 +399,12 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "BASE",
         "SUSHISWAPV3",
-    ): "2023-08-09",  # SushiSwap on Base announced Aug 4 2023; CLAMPED to BASE chain genesis 2023-08-09 (sub-agent D flagged); medium
+    ): "2023-08-09",  # SushiSwap on Base: CLAMPED to genesis 2023-08-09 (Aug 4 announced; D flagged); medium
     # ── DEX/AMM multi-chain rollouts (Sub-agent D) ──
     (
         "ARBITRUM",
         "CAMELOTV3",
-    ): "2023-04-08",  # Camelot V2 (Algebra concentrated-liq) stage-1 launch; V3 codebase same Algebra fork per CoinDesk + Camelot docs; medium
+    ): "2023-04-08",  # Camelot V2 (Algebra conc-liq) stage-1; V3 same Algebra fork per CoinDesk + Camelot docs; medium
     ("OPTIMISM", "VELODROMEV2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
     ("OPTIMISM", "CURVE"): "2022-01-18",  # Curve Optimism deployment announcement tweet (TheDefiant, TheBlock); high
     (
@@ -427,16 +427,16 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "ETHEREUM",
         "BEEFY",
-    ): "2021-12-01",  # Beefy multichain expansion era; Convex ETH vaults active late-2021 (Coinbase: BEEFY ERC20 created 2021-06-22); BIP-71 ETH migration Sept 2023; low (conservative)
+    ): "2021-12-01",  # Beefy multichain; Convex ETH vaults late-2021 (ERC20 2021-06-22); BIP-71 ETH Sept 2023; low
     ("ARBITRUM", "BEEFY"): "2021-09-20",  # Beefy Learn Medium "Beefy Finance deploys on Arbitrum"; high
     (
         "BASE",
         "BEEFY",
-    ): "2023-08-15",  # Coinbase Base mainnet GA 2023-08-09; Beefy x Lido Base article 2023-11-08 + DefiLlama TVL ~2023-08; medium (conservative pre-Lido article)
+    ): "2023-08-15",  # Base GA 2023-08-09; Beefy x Lido 2023-11-08 + DefiLlama ~2023-08; medium (conservative)
     (
         "POLYGON",
         "BEEFY",
-    ): "2021-05-20",  # Beefy Polygon partnership Medium 2021-05-26 + Iron Finance vaults live 2021-06-03; conservative pre-partnership; high
+    ): "2021-05-20",  # Beefy Polygon partnership Medium 2021-05-26 + Iron Finance vaults 2021-06-03; conservative; high
     ("BSC", "BEEFY"): "2020-10-08",  # Official Beefy founding launch on BSC; first BNB Chain yield optimizer; high
     (
         "AVALANCHE",
@@ -446,7 +446,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "ARBITRUM",
         "YEARNV3",
-    ): "2023-11-15",  # Yearn V3 v3.0.0 cross-chain deploy per Yearn docs; Polygon first focus Nov 2023; ETH mainnet GA Mar 2024; low (conservative pre-GA)
+    ): "2023-11-15",  # Yearn V3 cross-chain per Yearn docs; Polygon Nov 2023; ETH GA Mar 2024; low (conservative)
     (
         "OPTIMISM",
         "YEARNV3",
@@ -462,11 +462,11 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     (
         "ARBITRUM",
         "KARAK",
-    ): "2024-04-08",  # Karak private mainnet 2024-04-08; public 2024-04-09; Arbitrum included multi-chain day-1 per DLNews; high
+    ): "2024-04-08",  # Karak private mainnet 2024-04-08; public 2024-04-09; Arbitrum multi-chain day-1 per DLNews; high
     (
         "ARBITRUM",
         "RENZO",
-    ): "2024-02-29",  # Renzo + Connext native restaking on Arbitrum launch per official X (tweet 1763237166459527250) + Metaverse Post; high
+    ): "2024-02-29",  # Renzo + Connext native restaking on Arbitrum per official X (1763237166459527250); high
 }
 
 # (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch

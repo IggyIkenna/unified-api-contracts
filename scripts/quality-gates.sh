@@ -16,6 +16,9 @@ BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py" "**/mapping_resolver.py")
 # data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants;
 # defi_prediction_instrument_seeds.py docstring cites live GCS bucket names as provenance for Wave 8G seeds.
 GCP_PROJECT_ID_EXCLUDE_GLOBS=(
+    "!**/data_source_continuity.py"
+    "!**/defi_prediction_instrument_seeds.py"
+)
 # UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
 # without masking runaway regressions (a 60% overrun would still trip).

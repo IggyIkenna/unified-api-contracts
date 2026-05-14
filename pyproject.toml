@@ -117,6 +117,8 @@ max-complexity = 7
 "unified_api_contracts/options.py" = ["F403", "F405"]
 "unified_api_contracts/prediction.py" = ["F403", "F405"]
 # Internal contracts (merged from unified-internal-contracts)
+# contracts.py imports sub-modules AFTER CONTRACT_REGISTRY construction (circular-import workaround)
+"unified_api_contracts/internal/schemas/contracts.py" = ["E402"]
 "unified_api_contracts/internal/testing/seed_*.py" = ["C901", "E501", "B007", "RUF002", "B905"]
 "unified_api_contracts/internal/testing/seed_validator.py" = ["C901", "E501"]
 "unified_api_contracts/internal/domain/cefi_accounts/schemas.py" = ["N815"]
@@ -141,9 +143,31 @@ max-complexity = 7
 "unified_api_contracts/registry/**/*.py" = ["C901"]
 "unified_api_contracts/internal/architecture_v2/**/*.py" = ["C901"]
 "unified_api_contracts/canonical/crosscutting/**/*.py" = ["C901"]
-"unified_api_contracts/external/**/normalize.py" = ["C901"]
+# E402 in normalize.py: TYPE_CHECKING / lazy imports after module-level registry setup
+"unified_api_contracts/external/**/normalize.py" = ["C901", "E402", "E731"]
 "unified_api_contracts/canonical/domain/sports/gcs_paths.py" = ["C901"]
 "unified_api_contracts/canonical/domain/sports/mapping_resolver.py" = ["C901"]
+# F403 in crosscutting facades — intentional wildcard re-exports for domain surface
+"unified_api_contracts/canonical/crosscutting/__init__.py" = ["F403", "F405"]
+"unified_api_contracts/canonical/crosscutting/errors/__init__.py" = ["F403", "F405"]
+# RUF001/RUF002 — intentional Unicode math symbols (×, ℤ) in API/domain strings+docstrings
+"unified_api_contracts/canonical/crosscutting/alerting/thresholds.py" = ["C901", "RUF001"]
+"unified_api_contracts/canonical/crosscutting/bar_boundary.py" = ["RUF002"]
+"unified_api_contracts/external/api_football/team_mappings.py" = ["RUF001"]
+# wallet_config: × in string (on-chain gas estimate note); SIM102 nested-if is intentional guard
+"unified_api_contracts/internal/domain/defi/wallet_config.py" = ["RUF001", "SIM102"]
+# instrument.py: × in comments (e.g. "2x") — intentional math notation
+"unified_api_contracts/internal/reference/instrument.py" = ["RUF003"]
+# polygon schemas: `l` is liquidity (external API field alias)
+"unified_api_contracts/external/polygon/schemas.py" = ["E741"]
+# internal __init__ re-exports signals: F401 (redundant alias), RUF022 (__all__ domain-grouped)
+"unified_api_contracts/internal/__init__.py" = ["F401", "RUF022"]
+# E402 in instruments domain __init__ — contract registration after base class
+"unified_api_contracts/internal/domain/instruments/__init__.py" = ["E402", "F401"]
+# N815: protocol_params mirrors on-chain ABI camelCase field names
+"unified_api_contracts/internal/domain/features_onchain/protocol_params.py" = ["N815"]
+# N818: ExclusiveLockViolation is domain concept (advisory lock), not Python exception hierarchy
+"unified_api_contracts/internal/domain/strategy_service/subscription.py" = ["N818"]
 
 [tool.ruff.format]
 quote-style = "double"
