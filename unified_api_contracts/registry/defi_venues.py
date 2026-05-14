@@ -513,6 +513,13 @@ MTDS_DEFI_VENUES: list[str] = [
     "ETHERFI-ETHEREUM",
     "ETHENA-ETHEREUM",
     "JITO-SOLANA",
+    # --- DeFi perp DEXes (EVM + Solana) ---
+    # GMX: operator revised 2026-05-13 — DeFi-only (not CeFi axis).
+    "GMX-ARBITRUM",
+    "GMX-AVALANCHE",
+    # Drift V1 S3 archive data starts 2022-01-01; Data API (2025-present).
+    # Operator revised 2026-05-13: DeFi-only (not CeFi axis).
+    "DRIFT-SOLANA",
 ]
 
 

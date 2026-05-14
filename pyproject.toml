@@ -168,6 +168,16 @@ max-complexity = 7
 "unified_api_contracts/internal/domain/features_onchain/protocol_params.py" = ["N815"]
 # N818: ExclusiveLockViolation is domain concept (advisory lock), not Python exception hierarchy
 "unified_api_contracts/internal/domain/strategy_service/subscription.py" = ["N818"]
+# Test-file suppressions — pre-existing patterns intentional in test context:
+# N806/N811/N814: naming convention violations (test setup uses UPPER_CASE vars/aliases)
+# RUF001-003: Unicode × in docstrings/comments (intentional math notation)
+# RUF043: regex metacharacters in pytest match= (intentional raw patterns)
+# RUF059: unused unpacked variable in multi-assign test patterns
+# B017: blind except Exception (acceptable in assertion-style tests)
+# C408: dict() call (minor style; not worth refactoring test fixtures)
+# E402: imports after conditional or fixture setup (common test pattern)
+"tests/**/*.py" = ["N806", "N811", "N814", "RUF001", "RUF002", "RUF003", "RUF043", "RUF059", "B017", "C408", "E402"]
+"tests/*.py" = ["N806", "N811", "N814", "RUF001", "RUF002", "RUF003", "RUF043", "RUF059", "B017", "C408", "E402"]
 
 [tool.ruff.format]
 quote-style = "double"

@@ -510,18 +510,25 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # Tardis trades fetch path (returns []), so trades start = S3 archive start
     # 2025-03-22. liquidations is out of scope (Hyperliquid does not publish a
     # liquidations feed — no S3 prefix, no Tardis channel).
+    # perp_funding: collected by perp_funding_handler via POST /info fundingHistory
+    # (declared in _defi.py _ProtocolCapability data_types=["perp_funding"]);
+    # start date aligned with derivative_ticker S3 archive start.
     "HYPERLIQUID": {
         "trades": "2025-03-22",  # S3 hl-mainnet-node-data/node_fills
         "book_snapshot_5": "2023-04-15",  # S3 hyperliquid-archive/market_data/
         "derivative_ticker": "2023-05-20",  # S3 hyperliquid-archive/asset_ctxs/
+        "perp_funding": "2023-05-20",  # perp_funding_handler REST /info fundingHistory
     },
     # ASTER — only derivative_ticker (fundingRate REST) and trades (aggTrades
     # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Both available
     # since Aster launch (2024-10-01). book_snapshot_5 + liquidations both out
     # of scope (no wired fetch path).
+    # perp_funding: collected by perp_funding_handler (declared in _defi.py
+    # _ProtocolCapability data_types=["perp_funding"]); start = Aster launch.
     "ASTER": {
         "trades": "2024-10-01",
         "derivative_ticker": "2024-10-01",
+        "perp_funding": "2024-10-01",  # perp_funding_handler REST Aster API
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).

@@ -94,7 +94,8 @@ class VenueMapping:
             "PACIFICA-SOLANA",
             "EXTENDED-STARKNET",
             "LIGHTER-ZKSYNC",
-            "DRIFT",  # Drift Protocol (Solana) — S3 archive + Data API adapter
+            # DRIFT removed 2026-05-14: operator revised 2026-05-13 — GMX/DRIFT are
+            # DeFi-only (on-chain settlement). DRIFT-SOLANA lives in MTDS_DEFI_VENUES.
         ]
     )
 
