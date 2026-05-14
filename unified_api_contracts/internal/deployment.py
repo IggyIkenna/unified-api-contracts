@@ -69,6 +69,11 @@ class VMEventType(StrEnum):
     LIVE_HEALTH_CHECK_FAILED = "LIVE_HEALTH_CHECK_FAILED"
     LIVE_ROLLBACK_EXECUTED = "LIVE_ROLLBACK_EXECUTED"
 
+    # Tarball deploy audit events (Phase 1 audit log wire-in)
+    TARBALL_DEPLOY_ATTEMPTED = "TARBALL_DEPLOY_ATTEMPTED"
+    TARBALL_DEPLOY_BLOCKED = "TARBALL_DEPLOY_BLOCKED"
+    TARBALL_DEPLOY_OVERRIDE = "TARBALL_DEPLOY_OVERRIDE"
+
 
 #: VM infrastructure event types — subset used for the /vm-events endpoint filter
 VM_INFRASTRUCTURE_EVENTS: frozenset[VMEventType] = frozenset(
