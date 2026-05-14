@@ -150,7 +150,7 @@ class DefiWalletKeyMaterial:
     public_key: str = ""
     """Optional: public key for validation. Mostly informational; Solana optional."""
 
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     """Wallet creation / import timestamp."""
 
     last_rotated_at: datetime | None = None
