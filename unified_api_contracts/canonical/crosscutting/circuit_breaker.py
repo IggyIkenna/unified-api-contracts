@@ -166,6 +166,39 @@ class CircuitBreakerId(StrEnum):
     STABLECOIN_DEPEG_CATASTROPHIC = "STABLECOIN_DEPEG_CATASTROPHIC"
     """Stablecoin peg deviation ≥ 1000bps (standard) / 500bps (synthetic) — KILL_ALL + MANUAL_UNKILL."""
 
+    # ── DR Phase 1.A+4 extensions — simulation_scenarios Day-1 follow-up (2026-05-13) ──
+    # 4 breakers surfaced from simulation_scenarios_topology_price_shocks_2026_05_09
+    # Day-1 run: per-chain RPC outage disambiguation, oracle staleness, lending
+    # pool unavailability, and ARBITRAGE_PRICE_DISPERSION applies_to seed.
+    #
+    # NOTE 2026-05-13 (slot 5): ORACLE_STALENESS_SECONDS was duplicated here
+    # in commit adcfcf5 — already defined at line 147 above with the same
+    # semantic. Duplicate removed to unblock workspace-wide UAC imports
+    # (StrEnum raises TypeError on duplicate names). The original definition
+    # already covers Chainlink heartbeat semantics ("Chainlink/Pyth LST price
+    # feeds and cross-venue reference prices"); the 2026-05-13 docstring
+    # extension (Chainlink ETH/USD heartbeat = 3600s; threshold default =
+    # heartbeat + 15min grace = 4500s) belongs in the breaker registry's
+    # threshold defaults rather than the enum docstring.
+
+    RPC_OUTAGE_SECONDS_ETHEREUM = "RPC_OUTAGE_SECONDS_ETHEREUM"
+    """Ethereum chain RPC endpoint unreachable for >= threshold seconds.
+    Disambiguates from the generic ``RPC_OUTAGE_SECONDS`` (used by
+    ``CARRY_STAKED_BASIS`` cross-chain) — per-chain breakers allow
+    chain-specific thresholds and recovery semantics. ETHEREUM = 30s threshold
+    (fast finality expectations on L1). Added 2026-05-13."""
+
+    RPC_OUTAGE_SECONDS_SOLANA = "RPC_OUTAGE_SECONDS_SOLANA"
+    """Solana chain RPC endpoint unreachable for >= threshold seconds.
+    Solana slot time ≈ 400ms; 30s outage = ~75 missed slots. Threshold
+    default = 30s (same as Ethereum for operational simplicity; per-archetype
+    override can tighten). Added 2026-05-13 per simulation_scenarios Day-1."""
+
+    # NOTE 2026-05-13 (slot 5): LENDING_POOL_UNAVAILABLE_SECONDS was duplicated
+    # here in commit adcfcf5 — already defined at line 153 above with the same
+    # semantic ("Aave / lending pool paused OR borrow-cap-locked"). Duplicate
+    # removed to unblock workspace-wide UAC imports.
+
 
 class BreakerScope(StrEnum):
     """Blast-radius scope for a breaker.

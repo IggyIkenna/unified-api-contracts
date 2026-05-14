@@ -36,6 +36,7 @@ from unified_api_contracts.alerting import (
     UnknownAlertCodeError,
     UnknownThresholdKeyError,
 )
+from unified_api_contracts.canonical.crosscutting.errors import ErrorAction, OracleDeviationError, OracleStaleError
 
 # ---------------------------------------------------------------------------
 # Closed-set sanity
@@ -526,6 +527,70 @@ def test_alert_code_closed_set_grew_to_at_least_56() -> None:
     )
 
 
+# ---------------------------------------------------------------------------
+# simulation_scenarios Day-1 follow-up gap codes (2026-05-13)
+# alerting_service_live_rules_2026_05_07.md Phase 1.E
+# ---------------------------------------------------------------------------
+
+_SIMULATION_DAY1_CODES: tuple[AlertCode, ...] = (
+    AlertCode.VENUE_HALTED,
+    AlertCode.LENDING_POOL_PAUSED,
+    AlertCode.LENDING_POOL_UNAVAILABLE,
+    AlertCode.LENDING_RATE_SPIKE,
+    AlertCode.MARKET_DATA_STALE,
+    AlertCode.GAS_SURGE_50X,
+    AlertCode.GAS_MEMPOOL_CONGESTION,
+    AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE,
+)
+
+
+def test_simulation_day1_codes_present_in_enum() -> None:
+    """8 simulation_scenarios Day-1 gap codes added 2026-05-13 must be in the
+    closed AlertCode set (alerting Phase 1.E of alerting_service_live_rules_2026_05_07)."""
+    for code in _SIMULATION_DAY1_CODES:
+        assert code in AlertCode, f"AlertCode.{code.name} missing from closed set"
+
+
+def test_simulation_day1_codes_have_routing_rule() -> None:
+    """Every simulation_scenarios Day-1 code must have at least one matching
+    AlertRule in LIVE_ALERT_RULES (exact or wildcard)."""
+    for code in _SIMULATION_DAY1_CODES:
+        matches = [r for r in LIVE_ALERT_RULES if fnmatch.fnmatchcase(code.value, r.event_pattern)]
+        assert matches, f"AlertCode.{code.name} has no matching AlertRule in LIVE_ALERT_RULES"
+
+
+def test_kill_switch_oracle_divergence_carries_kill_switch_flag() -> None:
+    """KILL_SWITCH_ORACLE_DIVERGENCE must trigger kill-switch with GLOBAL scope."""
+    matched = [r for r in LIVE_ALERT_RULES if r.code is AlertCode.KILL_SWITCH_ORACLE_DIVERGENCE]
+    assert matched, "Expected at least one explicit AlertRule for KILL_SWITCH_ORACLE_DIVERGENCE"
+    for rule in matched:
+        assert rule.triggers_kill_switch is True, (
+            f"AlertRule(code=KILL_SWITCH_ORACLE_DIVERGENCE) must have triggers_kill_switch=True; "
+            f"got {rule.triggers_kill_switch}"
+        )
+        assert rule.kill_switch_scope == KillSwitchScope.GLOBAL, (
+            f"KILL_SWITCH_ORACLE_DIVERGENCE.kill_switch_scope={rule.kill_switch_scope!r} expected GLOBAL"
+        )
+
+
+def test_simulation_day1_thresholds_present() -> None:
+    """Thresholds for the numeric simulation_scenarios Day-1 codes must be
+    in ALERT_THRESHOLDS with correct ThresholdUnit (bps-vs-% ambiguity rule)."""
+    expected_threshold_units = {
+        "lending_rate_spike_sigma": ThresholdUnit.RATIO,
+        "market_data_stale_seconds": ThresholdUnit.SECONDS,
+        "gas_surge_multiple": ThresholdUnit.RATIO,
+        "gas_mempool_confirmation_delay_seconds": ThresholdUnit.SECONDS,
+        "lending_pool_outage_seconds": ThresholdUnit.SECONDS,
+        "oracle_divergence_sigma": ThresholdUnit.RATIO,
+    }
+    for key, expected_unit in expected_threshold_units.items():
+        assert key in ALERT_THRESHOLDS, f"ALERT_THRESHOLDS missing {key!r} for simulation Day-1"
+        assert ALERT_THRESHOLDS[key].unit is expected_unit, (
+            f"ALERT_THRESHOLDS[{key!r}].unit={ALERT_THRESHOLDS[key].unit} != expected {expected_unit}"
+        )
+
+
 def test_no_pre_existing_shadowing_of_staleness_connectivity_codes() -> None:
     """The 4 staleness/connectivity codes must be UNIQUE within the closed
     set — no pre-existing AlertCode member happens to share their string
@@ -747,7 +812,7 @@ def test_phase_1e_codes_no_shadowing() -> None:
 
 
 def test_alert_code_closed_set_grew_to_at_least_64() -> None:
-    """Closed-set growth ratchet: prior 61 + 8 Phase 1.E (2026-05-13) = at-least 64."""
+    """Closed-set growth ratchet: prior 55 + 12 Phase 1.E combined upstream+stash (2026-05-13) = at-least 64."""
     assert len(list(AlertCode)) >= 64, (
         f"AlertCode closed set has only {len(list(AlertCode))} members;"
         " expected at-least 64 after Phase 1.E additions (2026-05-13)."
@@ -779,8 +844,7 @@ def test_phase_1e_threshold_keys_present_in_registry() -> None:
         rules = [r for r in LIVE_ALERT_RULES if r.code.value == code_name]
         assert rules, f"No rule for {code_name}"
         assert rules[0].threshold_key == expected_key, (
-            f"{code_name}: expected threshold_key={expected_key!r},"
-            f" got {rules[0].threshold_key!r}"
+            f"{code_name}: expected threshold_key={expected_key!r}, got {rules[0].threshold_key!r}"
         )
 
 
@@ -818,3 +882,74 @@ def test_phase_1e_lending_borrow_cap_is_warn_only() -> None:
     rule = rules[0]
     assert rule.severity is AlertSeverity.WARN
     assert AlertChannel.PAGERDUTY not in rule.channels
+
+
+# ---------------------------------------------------------------------------
+# OracleStaleError + OracleDeviationError — writegate Phase 2.A error taxonomy
+# (2026-05-13, simulation_scenarios Day-1 gap #3/#8)
+# ---------------------------------------------------------------------------
+
+
+def test_oracle_stale_error_instantiation() -> None:
+    """OracleStaleError maps to SKIP action (caller records honest absence)."""
+    err = OracleStaleError(
+        feed="ETH/USD",
+        chain="ethereum",
+        feed_age_seconds=4600,
+        threshold_seconds=4500,
+    )
+    assert err.code == "ORACLE_STALE"
+    assert err.action is ErrorAction.SKIP
+    assert err.feed == "ETH/USD"
+    assert err.chain == "ethereum"
+    assert err.feed_age_seconds == 4600
+    assert err.threshold_seconds == 4500
+    assert "4600s > 4500s" in err.message
+
+
+def test_oracle_deviation_error_instantiation() -> None:
+    """OracleDeviationError maps to FAIL action (position delta undefined)."""
+    err = OracleDeviationError(
+        asset="ETH",
+        chain="ethereum",
+        primary_price=3000.0,
+        secondary_price=2900.0,
+        sigma_deviation=35.2,
+    )
+    assert err.code == "ORACLE_DEVIATION_EXCEEDED"
+    assert err.action is ErrorAction.FAIL
+    assert err.asset == "ETH"
+    assert err.sigma_deviation == 35.2
+    assert "35.2 sigma" in err.message
+
+
+def test_oracle_stale_error_is_canonical_error_subclass() -> None:
+    """OracleStaleError must be a CanonicalError subclass for unified dispatch."""
+    from unified_api_contracts.canonical.crosscutting.errors import CanonicalError
+
+    assert issubclass(OracleStaleError, CanonicalError)
+    assert issubclass(OracleDeviationError, CanonicalError)
+
+
+def test_oracle_stale_error_with_venue() -> None:
+    """venue kwarg threads through to CanonicalError.venue field."""
+    err = OracleStaleError(
+        feed="SOL/USD",
+        chain="solana",
+        feed_age_seconds=100,
+        threshold_seconds=60,
+        venue="pyth",
+    )
+    assert err.venue == "pyth"
+
+
+def test_oracle_deviation_error_with_venue() -> None:
+    err = OracleDeviationError(
+        asset="SOL",
+        chain="solana",
+        primary_price=150.0,
+        secondary_price=148.0,
+        sigma_deviation=31.0,
+        venue="chainlink",
+    )
+    assert err.venue == "chainlink"

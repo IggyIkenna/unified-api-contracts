@@ -116,7 +116,10 @@
       "private_key_raw": "defi-wallet-solana-private-key",
       "private_key_wrapped": "defi-wallet-solana-private-key-wrapped (envelope-encrypted via wallets-staging/trading-defi-master-v1 CMK, same pattern as defi-wallet-private-key-wrapped)"
     },
-    "missing_wallet_entries": ["test-sol-mainnet-trust", "test-sol-devnet-trust"],
+    "missing_wallet_entries": [
+      "test-sol-mainnet-trust",
+      "test-sol-devnet-trust"
+    ],
     "rpc_credentials_status": {
       "devnet_rpc": "Public https://api.devnet.solana.com — no auth required",
       "mainnet_rpc_production_grade": "🟡 NOT YET in Secret Manager (Helius / QuickNode / Triton — operator-action P1 if production-rate needed)",

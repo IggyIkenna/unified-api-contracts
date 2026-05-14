@@ -40,7 +40,7 @@ def test_artifact_metadata_ref_and_as_ref() -> None:
         family="crypto-onchain-ethereum",
         version=4,
         content_hash="abcdef0123456789",
-        created_by="features-onchain-service",
+        created_by="features-service",
         dependencies=[],
     )
     assert meta.ref == "crypto-onchain-ethereum@v4"

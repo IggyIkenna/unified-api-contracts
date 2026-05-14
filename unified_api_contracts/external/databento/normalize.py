@@ -380,7 +380,12 @@ def normalize_databento_option_quote(
     """Convert DatabentoOptionQuote (OPRA) to CanonicalOptionsChainEntry."""
     ts = datetime.fromtimestamp(raw.ts_event / 1e9, tz=UTC)
     opt_type = "call" if (raw.option_type or "C").upper() == "C" else "put"
-    exp = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC) if raw.expiration else None
+    if not raw.expiration:
+        raise ValueError(
+            f"Databento option payload missing expiration for instrument {raw.instrument_id} "
+            f"(symbol={symbol}). Options contracts MUST have expiration."
+        )
+    exp = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC)
     return CanonicalOptionsChainEntry(
         timestamp=ts,
         venue=venue,
@@ -408,7 +413,12 @@ def normalize_databento_cme_option_quote(
     """Convert DatabentoCMEOptionQuote (CME) to CanonicalOptionsChainEntry."""
     ts = datetime.fromtimestamp(raw.ts_event / 1e9, tz=UTC)
     opt_type = "call" if (raw.option_type or "C").upper() == "C" else "put"
-    exp = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC) if raw.expiration else None
+    if not raw.expiration:
+        raise ValueError(
+            f"Databento option payload missing expiration for instrument {raw.instrument_id} "
+            f"(symbol={symbol}). Options contracts MUST have expiration."
+        )
+    exp = datetime.fromtimestamp(raw.expiration / 1e9, tz=UTC)
     return CanonicalOptionsChainEntry(
         timestamp=ts,
         venue=venue,

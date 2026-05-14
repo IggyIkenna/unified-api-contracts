@@ -89,20 +89,17 @@ def test_seed_contains_mdps_ohlcv_24h_partial_ok() -> None:
 
 def test_seed_contains_features_volatility_high_low_partial_ok() -> None:
     """Operator-flagged example: 24h high/low publishes with completeness_fraction."""
-    assert SERVICE_OUTPUT_POLICIES[("features-volatility-service", "high_low_24h")] is ServiceEmissionPolicy.PARTIAL_OK
+    assert SERVICE_OUTPUT_POLICIES[("features-service", "high_low_24h")] is ServiceEmissionPolicy.PARTIAL_OK
 
 
 def test_seed_contains_features_volatility_vol_30d_nan_fill() -> None:
     """ML downstream NaN-fills natively — rolling vol gets NaN_FILL not STRICT_FAIL."""
-    assert SERVICE_OUTPUT_POLICIES[("features-volatility-service", "vol_30d")] is ServiceEmissionPolicy.NAN_FILL
+    assert SERVICE_OUTPUT_POLICIES[("features-service", "vol_30d")] is ServiceEmissionPolicy.NAN_FILL
 
 
 def test_seed_contains_features_cross_instrument_paired_spec_strict_fail() -> None:
     """Two-leg pair must have both legs current; partial = leak risk."""
-    assert (
-        SERVICE_OUTPUT_POLICIES[("features-cross-instrument-service", "paired_spec")]
-        is ServiceEmissionPolicy.STRICT_FAIL
-    )
+    assert SERVICE_OUTPUT_POLICIES[("features-service", "paired_spec")] is ServiceEmissionPolicy.STRICT_FAIL
 
 
 def test_seed_contains_ml_training_model_version_block_critical() -> None:

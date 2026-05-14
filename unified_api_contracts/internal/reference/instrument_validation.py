@@ -44,7 +44,7 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "AERODROMEV3",
         "CAMELOTV3",
         "VELODROMEV2",
-        "TRADERJOEV2",
+        "TRADER_JOEV2",
         "GMX",
         "SUSHISWAP",
         # Lending forks

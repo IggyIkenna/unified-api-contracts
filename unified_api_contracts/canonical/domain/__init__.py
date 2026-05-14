@@ -63,6 +63,7 @@ from ._base import CanonicalBase
 from .derivatives import (
     CanonicalDerivativeTicker,
     CanonicalFundingRate,
+    CanonicalFuturesContract,
     CanonicalLiquidation,
     CanonicalLiquidationCluster,
     CanonicalOptionsChainEntry,
@@ -70,6 +71,7 @@ from .derivatives import (
     ComboQuote,
     ComboStrategyType,
     FundingRateHistory,
+    FuturesContractLifecyclePhase,
     InsuranceFundState,
     LongShortRatio,
     MultiLegInstrument,
@@ -284,9 +286,9 @@ from .sports.fixture_status import (
     AF_STATUS_SHORT_MAP,
     COMPLETED_STATUSES,
     IN_PROGRESS_STATUSES,
-    MatchStatus,
     PRE_MATCH_STATUSES,
     TERMINAL_STATUSES,
+    MatchStatus,
 )
 from .sports.injury import CanonicalInjury
 from .sports.lineup import (
@@ -365,6 +367,7 @@ __all__ = [
     "CanonicalFixtureEvent",
     "CanonicalFixtureStatsDetail",
     "CanonicalFundingRate",
+    "CanonicalFuturesContract",
     "CanonicalInjury",
     "CanonicalInstrument",
     "CanonicalLeague",
@@ -437,6 +440,7 @@ __all__ = [
     "FixtureMapping",
     "FixtureNotFoundError",
     "FundingRateHistory",
+    "FuturesContractLifecyclePhase",
     "HealthPingResponse",
     "HttpRateLimitHeaders",
     "InstructionType",
@@ -457,8 +461,8 @@ __all__ = [
     "MarketState",
     "MarketStatus",
     "MarketTrade",
-    "MatchStatus",
     "MatchPeriod",
+    "MatchStatus",
     "MultiLegInstrument",
     "NetClearingInstruction",
     "NetworkJitterMetric",

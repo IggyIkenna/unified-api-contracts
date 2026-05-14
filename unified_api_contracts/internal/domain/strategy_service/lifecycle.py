@@ -6,6 +6,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import StrEnum
 
+from unified_api_contracts.internal.execution import BatchExecutionMode
+from unified_api_contracts.internal.modes import OperationalMode, RuntimeMode
+
 
 class StrategyLifecycleStage(StrEnum):
     """Legacy lifecycle stages (pre-maturity-model). Retained for runtime consumers."""
@@ -113,6 +116,19 @@ def is_valid_maturity_transition(
     if to_phase is StrategyMaturityPhase.RETIRED:
         return True
     return maturity_phase_rank(to_phase) > maturity_phase_rank(from_phase)
+
+
+def runtime_mode_for_phase(
+    phase: StrategyMaturityPhase,
+) -> tuple[RuntimeMode, BatchExecutionMode, OperationalMode]:
+    """Return the canonical (RuntimeMode, BatchExecutionMode, OperationalMode) triple for a maturity phase.
+
+    Design stub — wire-in deferred post-cutover (batch_live_symmetry_2026_05_10 Tab 2 J1).
+    Signature locked here; full dispatch table ships in a follow-up plan phase.
+    """
+    raise NotImplementedError(
+        f"runtime_mode_for_phase not yet wired — phase={phase!r} (batch_live_symmetry Tab 2 J1 follow-up)"
+    )
 
 
 class ProductRouting(StrEnum):

@@ -134,111 +134,40 @@ SHARD_AXIS_MATRIX: Final[dict[tuple[str, str], tuple[str, ...]]] = {
         "canonical_question_group",
         "data_type",
     ),
-    # features-delta-one: per-(venue, feature_group, timeframe,
-    # instrument_id); DEFI adds chain.
-    ("features-delta-one-service", CEFI): (
+    # features-service (consolidated from features-{family}-service repos).
+    # Uses delta-one shard granularity as canonical — the most comprehensive
+    # shape across active families. CEFI/TRADFI shard on
+    # (venue, feature_group, timeframe, instrument_id); DEFI adds chain;
+    # SPORTS = (feature_group, league_id); SHARED = (feature_group, timeframe);
+    # PREDICTION = (venue, canonical_question_group, feature_group, timeframe).
+    # Onchain DEFI and volatility share the delta-one DEFI shape.
+    ("features-service", CEFI): (
         "venue",
         "feature_group",
         "timeframe",
         "instrument_id",
     ),
-    ("features-delta-one-service", TRADFI): (
+    ("features-service", TRADFI): (
         "venue",
         "feature_group",
         "timeframe",
         "instrument_id",
     ),
-    ("features-delta-one-service", DEFI): (
+    ("features-service", DEFI): (
         "venue",
         "chain",
         "feature_group",
         "timeframe",
         "instrument_id",
     ),
-    # features-volatility: same shape as delta-one.
-    ("features-volatility-service", CEFI): (
-        "venue",
-        "feature_group",
-        "timeframe",
-        "instrument_id",
-    ),
-    ("features-volatility-service", TRADFI): (
-        "venue",
-        "feature_group",
-        "timeframe",
-        "instrument_id",
-    ),
-    ("features-volatility-service", DEFI): (
-        "venue",
-        "chain",
-        "feature_group",
-        "timeframe",
-        "instrument_id",
-    ),
-    # features-onchain: DEFI only; per-(venue, chain, feature_group,
-    # instrument_id, timeframe). Per the codex DeFi shard atom
-    # ``(asset_group, chain, venue/protocol, data_type,
-    # instrument_id_or_protocol_id, day)`` the per-instrument / per-protocol
-    # slot is the canonical ``instrument_id`` manifest column —
-    # ``protocol_id`` does NOT exist in ``_ROW_KEY_COLUMNS`` (UTL
-    # ``manifest_writer.py``), so the prior ``protocol_id`` axis silently
-    # filtered to nothing at drill-down time.
-    ("features-onchain-service", DEFI): (
-        "venue",
-        "chain",
-        "feature_group",
-        "instrument_id",
-        "timeframe",
-    ),
-    # features-sports: SPORTS only; upstream-source-keyed feature_group +
-    # league_id.
-    ("features-sports-service", SPORTS): ("feature_group", "league_id"),
-    # features-calendar: cross-asset; source-keyed feature_group +
-    # timeframe.
-    ("features-calendar-service", SHARED): ("feature_group", "timeframe"),
-    # features-cross-instrument: per asset_group; DEFI adds chain;
-    # PREDICTION keys on canonical_question_group instead of instrument.
-    ("features-cross-instrument-service", CEFI): (
-        "venue",
-        "feature_group",
-        "timeframe",
-    ),
-    ("features-cross-instrument-service", TRADFI): (
-        "venue",
-        "feature_group",
-        "timeframe",
-    ),
-    ("features-cross-instrument-service", DEFI): (
-        "venue",
-        "chain",
-        "feature_group",
-        "timeframe",
-    ),
-    ("features-cross-instrument-service", PREDICTION): (
+    ("features-service", SPORTS): ("feature_group", "league_id"),
+    ("features-service", SHARED): ("feature_group", "timeframe"),
+    ("features-service", PREDICTION): (
         "venue",
         "canonical_question_group",
         "feature_group",
         "timeframe",
     ),
-    # features-multi-timeframe: per asset_group; DEFI adds chain.
-    ("features-multi-timeframe-service", CEFI): (
-        "venue",
-        "timeframe",
-        "feature_group",
-    ),
-    ("features-multi-timeframe-service", TRADFI): (
-        "venue",
-        "timeframe",
-        "feature_group",
-    ),
-    ("features-multi-timeframe-service", DEFI): (
-        "venue",
-        "chain",
-        "timeframe",
-        "feature_group",
-    ),
-    # features-commodity: TRADFI only.
-    ("features-commodity-service", TRADFI): ("venue", "feature_group"),
     # ml-training: experiment-based; cross-asset; job_id required for
     # multi-experiment tracking.
     ("ml-training-service", SHARED): (
@@ -314,23 +243,12 @@ DISPLAY_AXES: Final[dict[tuple[str, str], tuple[str, ...]]] = {
     ("market-data-processing-service", DEFI): ("instrument_type",),
     ("market-data-processing-service", SPORTS): ("source", "fixture_id"),
     ("market-data-processing-service", PREDICTION): (),
-    ("features-delta-one-service", CEFI): ("instrument_type",),
-    ("features-delta-one-service", TRADFI): ("instrument_type",),
-    ("features-delta-one-service", DEFI): ("instrument_type",),
-    ("features-volatility-service", CEFI): ("instrument_type",),
-    ("features-volatility-service", TRADFI): ("instrument_type",),
-    ("features-volatility-service", DEFI): ("instrument_type",),
-    ("features-onchain-service", DEFI): (),
-    ("features-sports-service", SPORTS): ("source", "data_type"),
-    ("features-calendar-service", SHARED): (),
-    ("features-cross-instrument-service", CEFI): ("instrument_type",),
-    ("features-cross-instrument-service", TRADFI): ("instrument_type",),
-    ("features-cross-instrument-service", DEFI): ("instrument_type",),
-    ("features-cross-instrument-service", PREDICTION): (),
-    ("features-multi-timeframe-service", CEFI): ("instrument_type",),
-    ("features-multi-timeframe-service", TRADFI): ("instrument_type",),
-    ("features-multi-timeframe-service", DEFI): ("instrument_type",),
-    ("features-commodity-service", TRADFI): ("instrument_type",),
+    ("features-service", CEFI): ("instrument_type",),
+    ("features-service", TRADFI): ("instrument_type",),
+    ("features-service", DEFI): ("instrument_type",),
+    ("features-service", SPORTS): ("source", "data_type"),
+    ("features-service", SHARED): (),
+    ("features-service", PREDICTION): (),
     ("ml-training-service", SHARED): ("client_id", "asset_group"),
     ("ml-inference-service", SHARED): ("client_id", "asset_group"),
     ("strategy-service", CEFI): ("archetype", "client_id"),
@@ -371,23 +289,12 @@ PRIMARY_AXIS: Final[dict[tuple[str, str], str]] = {
     ("market-data-processing-service", DEFI): "venue",
     ("market-data-processing-service", SPORTS): "data_type",
     ("market-data-processing-service", PREDICTION): "venue",
-    ("features-delta-one-service", CEFI): "venue",
-    ("features-delta-one-service", TRADFI): "venue",
-    ("features-delta-one-service", DEFI): "venue",
-    ("features-volatility-service", CEFI): "venue",
-    ("features-volatility-service", TRADFI): "venue",
-    ("features-volatility-service", DEFI): "venue",
-    ("features-onchain-service", DEFI): "venue",
-    ("features-sports-service", SPORTS): "feature_group",
-    ("features-calendar-service", SHARED): "feature_group",
-    ("features-cross-instrument-service", CEFI): "venue",
-    ("features-cross-instrument-service", TRADFI): "venue",
-    ("features-cross-instrument-service", DEFI): "venue",
-    ("features-cross-instrument-service", PREDICTION): "venue",
-    ("features-multi-timeframe-service", CEFI): "venue",
-    ("features-multi-timeframe-service", TRADFI): "venue",
-    ("features-multi-timeframe-service", DEFI): "venue",
-    ("features-commodity-service", TRADFI): "venue",
+    ("features-service", CEFI): "venue",
+    ("features-service", TRADFI): "venue",
+    ("features-service", DEFI): "venue",
+    ("features-service", SPORTS): "feature_group",
+    ("features-service", SHARED): "feature_group",
+    ("features-service", PREDICTION): "venue",
     # Experiment-based services — primary axis = the experiment unit
     # that operators look at first.
     ("ml-training-service", SHARED): "model_family",

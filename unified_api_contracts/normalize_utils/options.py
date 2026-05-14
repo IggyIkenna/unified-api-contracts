@@ -23,6 +23,66 @@ from ..external.yahoo_finance.normalize import (
     normalize_yahoo_option,
 )
 
+# Deribit option expiry settlement convention: 08:00 UTC on expiry day.
+_DERIBIT_EXPIRY_HOUR_UTC = 8
+
+_DERIBIT_MONTH_MAP = {
+    "JAN": 1,
+    "FEB": 2,
+    "MAR": 3,
+    "APR": 4,
+    "MAY": 5,
+    "JUN": 6,
+    "JUL": 7,
+    "AUG": 8,
+    "SEP": 9,
+    "OCT": 10,
+    "NOV": 11,
+    "DEC": 12,
+}
+
+
+def _parse_deribit_option_expiry(instrument_name: str) -> datetime:
+    """Parse Deribit option instrument expiry from the symbol.
+
+    Deribit option symbols use the format ``<asset>-<DDMMMYY>-<strike>-<type>``
+    where ``<type>`` is ``C`` (call) or ``P`` (put) and ``<DDMMMYY>`` is
+    e.g. ``28JUN24``. Settlement convention is 08:00 UTC on the expiry day.
+
+    Args:
+        instrument_name: Deribit option symbol (e.g. "BTC-28JUN24-70000-C").
+
+    Returns:
+        Timezone-aware datetime at 08:00 UTC on the expiry day.
+
+    Raises:
+        ValueError: If the symbol does not have a parseable expiry segment.
+    """
+    parts = instrument_name.split("-")
+    if len(parts) < 4:
+        raise ValueError(
+            f"Cannot parse Deribit option expiry: instrument_name {instrument_name!r} "
+            f"has {len(parts)} segments, expected 4+ (e.g. 'BTC-28JUN24-70000-C')"
+        )
+    expiry_str = parts[1]  # e.g. "28JUN24"
+    if len(expiry_str) < 6:
+        raise ValueError(
+            f"Cannot parse Deribit option expiry: segment {expiry_str!r} too short (expected DDMMMYY like '28JUN24')"
+        )
+    day_str = expiry_str[:-5]  # leading digits (1 or 2)
+    month_str = expiry_str[-5:-2]  # 3-letter month
+    year_str = expiry_str[-2:]  # 2-digit year
+    month = _DERIBIT_MONTH_MAP.get(month_str.upper())
+    if month is None:
+        raise ValueError(f"Unknown Deribit month code {month_str!r} in {instrument_name!r}")
+    try:
+        day = int(day_str)
+        year = 2000 + int(year_str)  # Deribit options run 2020-2099 era
+    except ValueError as e:
+        raise ValueError(f"Cannot parse Deribit expiry day/year from {expiry_str!r}: {e}") from e
+    return datetime(year, month, day, _DERIBIT_EXPIRY_HOUR_UTC, 0, 0, tzinfo=UTC)
+
+
 # ---------------------------------------------------------------------------
 # Deribit — option-specific normalizers not yet in external/deribit/normalize.py
 # ---------------------------------------------------------------------------
@@ -43,7 +103,11 @@ def normalize_deribit_option_ticker(
     (parseable from instrument_name: e.g. BTC-29MAR24-50000-C).
     """
     ts = datetime.fromtimestamp(raw.timestamp / 1000.0, tz=UTC) if raw.timestamp is not None else datetime.now(tz=UTC)
-    exp = datetime.fromtimestamp(expiration_ms / 1000.0, tz=UTC) if expiration_ms is not None else None
+    # Prefer caller-supplied expiration_ms; fall back to parsing from instrument_name.
+    if expiration_ms is not None:
+        exp = datetime.fromtimestamp(expiration_ms / 1000.0, tz=UTC)
+    else:
+        exp = _parse_deribit_option_expiry(raw.instrument_name)
     return CanonicalOptionsChainEntry(
         timestamp=ts,
         venue=venue,
@@ -84,6 +148,7 @@ def normalize_deribit_mark_price_option(
         with contextlib.suppress(ValueError, IndexError):
             strike = Decimal(parts[-2])
     iv = float(raw.iv) if raw.iv is not None else None
+    expiration = _parse_deribit_option_expiry(instrument_name)
     return CanonicalOptionsChainEntry(
         timestamp=ts,
         venue=venue,
@@ -91,7 +156,7 @@ def normalize_deribit_mark_price_option(
         underlying=parts[0] if parts else instrument_name,
         strike=strike,
         option_type=opt_type,
-        expiration=None,
+        expiration=expiration,
         bid_price=None,
         ask_price=None,
         bid_size=None,

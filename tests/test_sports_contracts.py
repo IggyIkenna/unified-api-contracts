@@ -47,18 +47,22 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     ("sports", "reference", "leagues", SPORTS_LEAGUES, 5),
     ("sports", "reference", "teams", SPORTS_TEAMS, 17),
     ("sports", "reference", "venues", SPORTS_VENUES, 13),
-    ("sports", "league", "standings", SPORTS_STANDINGS, 14),
+    # STANDINGS: 14 → 32 per C.7 Follow-up #1 flatten (UAC@2026-05-13).
+    ("sports", "league", "standings", SPORTS_STANDINGS, 32),
     # Family B — API-Football fact
-    ("sports", "match", "fixtures", SPORTS_FIXTURES, 32),
+    # FIXTURES: 32 → 33 per C.6 Step 1 match_end_time column (UAC@2026-05-13).
+    ("sports", "match", "fixtures", SPORTS_FIXTURES, 33),
     ("sports", "match", "fixture_events", SPORTS_FIXTURE_EVENTS, 5),
     ("sports", "match", "fixture_stats", SPORTS_FIXTURE_STATS, 2),
     ("sports", "match", "fixture_lineups", SPORTS_FIXTURE_LINEUPS, 3),
     ("sports", "match", "player_stats", SPORTS_PLAYER_STATS, 38),
     ("sports", "match", "injuries", SPORTS_INJURIES, 5),
     # Family C — Transfermarkt (TRANSFERMARKT_LEAGUES retired 2026-05-05; mapping in UAC).
-    ("sports", "player", "player_values", SPORTS_PLAYER_VALUES, 7),
+    # PLAYER_VALUES: 7 → 11 per C.4 per-player flatten (UAC@3b29f7e 2026-05-13).
+    ("sports", "player", "player_values", SPORTS_PLAYER_VALUES, 11),
     # Family D — SFI (SFI_LEAGUES retired 2026-05-05; mapping in UAC).
-    ("sports", "match", "sfi_progressive_stats", SPORTS_SFI_PROGRESSIVE_STATS, 43),
+    # SFI_PROGRESSIVE_STATS: 43 → 45 per C.6 Step 2 ft_timer + match_end_time (UAC@1848647 2026-05-13).
+    ("sports", "match", "sfi_progressive_stats", SPORTS_SFI_PROGRESSIVE_STATS, 45),
     # Family E — Other / derived
     ("sports", "match", "matches", SPORTS_MATCHES, 58),
     ("sports", "match", "predictions", SPORTS_PREDICTIONS, 35),

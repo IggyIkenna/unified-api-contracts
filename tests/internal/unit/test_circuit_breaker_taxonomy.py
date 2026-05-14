@@ -64,6 +64,7 @@ def test_breaker_scope_closed_set() -> None:
         "PER_ARCHETYPE",
         "PER_ACCOUNT",
         "PER_ASSET_GROUP",
+        "PER_STABLE",
         "GLOBAL",
     }
 
@@ -118,6 +119,49 @@ def test_circuit_breaker_id_has_arbitrage_price_dispersion_breakers() -> None:
     }
     enum_values = {m.value for m in CircuitBreakerId}
     assert expected_arb.issubset(enum_values)
+
+
+# ---------------------------------------------------------------------------
+# simulation_scenarios Day-1 + DR plan Phase 1.A+4 — 4 new CircuitBreakerIds
+# ---------------------------------------------------------------------------
+
+
+def test_circuit_breaker_id_has_simulation_day1_breakers() -> None:
+    """4 simulation_scenarios Day-1 / DR plan Phase 1.A+4 breakers (2026-05-13)
+    must be in the CircuitBreakerId closed set."""
+    expected_sim_day1 = {
+        "ORACLE_STALENESS_SECONDS",
+        "RPC_OUTAGE_SECONDS_ETHEREUM",
+        "RPC_OUTAGE_SECONDS_SOLANA",
+        "LENDING_POOL_UNAVAILABLE_SECONDS",
+    }
+    enum_values = {m.value for m in CircuitBreakerId}
+    assert expected_sim_day1.issubset(enum_values), (
+        f"Missing simulation Day-1 CircuitBreakerIds: {expected_sim_day1 - enum_values}"
+    )
+
+
+def test_arbitrage_price_dispersion_has_simulation_day1_breakers_wired() -> None:
+    """The 4 simulation_scenarios Day-1 breakers must be wired into
+    ARBITRAGE_PRICE_DISPERSION per DR plan Phase 1.A+4."""
+    from unified_api_contracts.registry.circuit_breakers import (
+        PER_ARCHETYPE_BREAKERS,
+        PER_ARCHETYPE_RECOVERY_RULES,
+    )
+
+    configs = PER_ARCHETYPE_BREAKERS["ARBITRAGE_PRICE_DISPERSION"]
+    rules = PER_ARCHETYPE_RECOVERY_RULES["ARBITRAGE_PRICE_DISPERSION"]
+    config_ids = {c.breaker_id.value for c in configs}
+    rule_ids = {r.breaker_id.value for r in rules}
+    expected_new = {
+        "ORACLE_STALENESS_SECONDS",
+        "RPC_OUTAGE_SECONDS_ETHEREUM",
+        "RPC_OUTAGE_SECONDS_SOLANA",
+        "LENDING_POOL_UNAVAILABLE_SECONDS",
+    }
+    for bid in expected_new:
+        assert bid in config_ids, f"{bid} missing from ARBITRAGE_PRICE_DISPERSION BREAKERS"
+        assert bid in rule_ids, f"{bid} missing from ARBITRAGE_PRICE_DISPERSION RECOVERY_RULES"
 
 
 # ---------------------------------------------------------------------------

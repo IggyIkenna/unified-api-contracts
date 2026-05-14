@@ -315,7 +315,25 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         ),
         description="Grace window in minutes before ML model-version mismatch fires (0 = immediate).",
     ),
-    # ── Phase 1.E extensions (2026-05-13 alerting_service_live_rules slot 7) ──
+    # ── Phase 1.E extensions — combined upstream + stash (2026-05-13) ──
+    # Upstream: gas_price_spike_gwei, gas_budget_exceeded_eth, lending_utilization_high_bps,
+    #   oracle_staleness_seconds, lending_pool_unavailable_seconds
+    # Stash: lending_rate_spike_sigma, gas_surge_multiple, gas_mempool_confirmation_delay_seconds,
+    #   lending_pool_outage_seconds, oracle_divergence_sigma
+    # market_data_stale_seconds: keeping both source_doc variants merged.
+    "lending_rate_spike_sigma": AlertThreshold(
+        key="lending_rate_spike_sigma",
+        unit=ThresholdUnit.RATIO,
+        default_value=Decimal("5.0"),
+        source_doc=(
+            "5 sigma deviation from rolling mean borrow rate. Industry standard for"
+            " statistical anomaly detection on lending protocol rates. Rolling"
+            " window = 24h (configurable per-pool). Fires LENDING_RATE_SPIKE."
+            " Reference: simulation_scenarios_topology_price_shocks_2026_05_09.md"
+            " Day-1 follow-up gap #4."
+        ),
+        description="Sigma threshold for borrow-rate deviation from rolling mean.",
+    ),
     "gas_price_spike_gwei": AlertThreshold(
         key="gas_price_spike_gwei",
         unit=ThresholdUnit.COUNT_PER_MINUTE,  # gwei is a count unit; no explicit GWEI unit exists
@@ -344,6 +362,31 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         ),
         description="Cumulative gas spent in ETH per wallet per session/day above which budget alert fires.",
     ),
+    "gas_surge_multiple": AlertThreshold(
+        key="gas_surge_multiple",
+        unit=ThresholdUnit.RATIO,
+        default_value=Decimal("50.0"),
+        source_doc=(
+            "50x baseline gas price renders carry/recursive-borrow deeply negative."
+            " EVM gas cost at 50x baseline typically >$500/tx on Ethereum mainnet"
+            " (2026 gas floor). At this level on-chain economics invert; all"
+            " tx submission must pause. Fires GAS_SURGE_50X. Reference:"
+            " simulation_scenarios Day-1 follow-up gap #6."
+        ),
+        description="Gas surge multiple above rolling baseline that triggers GAS_SURGE_50X.",
+    ),
+    "gas_mempool_confirmation_delay_seconds": AlertThreshold(
+        key="gas_mempool_confirmation_delay_seconds",
+        unit=ThresholdUnit.SECONDS,
+        default_value=Decimal("120"),
+        source_doc=(
+            "120s (2min) confirmation delay p99 for normal EVM operations."
+            " Beyond this threshold nonce queue backlog is considered disruptive"
+            " to real-time strategy execution. Fires GAS_MEMPOOL_CONGESTION."
+            " Reference: simulation_scenarios Day-1 follow-up gap #7."
+        ),
+        description="P99 confirmation latency threshold in seconds before GAS_MEMPOOL_CONGESTION fires.",
+    ),
     "lending_utilization_high_bps": AlertThreshold(
         key="lending_utilization_high_bps",
         unit=ThresholdUnit.BPS_OF_ONE,
@@ -359,6 +402,18 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         per_archetype_overrides={
             "leveraged_funding_arb": Decimal("8500"),
         },
+    ),
+    "lending_pool_outage_seconds": AlertThreshold(
+        key="lending_pool_outage_seconds",
+        unit=ThresholdUnit.SECONDS,
+        default_value=Decimal("60"),
+        source_doc=(
+            "60s RPC outage is sufficient to miss a liquidation-proximity check;"
+            " trigger circuit-breaker after 60s sustained unreachability."
+            " Fires LENDING_POOL_UNAVAILABLE. Reference: simulation_scenarios"
+            " Day-1 follow-up gap #3."
+        ),
+        description="Seconds of RPC unavailability before LENDING_POOL_UNAVAILABLE fires.",
     ),
     "oracle_staleness_seconds": AlertThreshold(
         key="oracle_staleness_seconds",
@@ -390,6 +445,19 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         ),
         description="Seconds a lending pool has been paused or borrow-cap-locked before breaker fires.",
     ),
+    "oracle_divergence_sigma": AlertThreshold(
+        key="oracle_divergence_sigma",
+        unit=ThresholdUnit.RATIO,
+        default_value=Decimal("30.0"),
+        source_doc=(
+            "30 sigma oracle price divergence across Chainlink / Pyth / on-chain TWAP."
+            " At 30 sigma the position delta is undefined; position valuation cannot"
+            " be trusted. Fires KILL_SWITCH_ORACLE_DIVERGENCE. Industry-standard"
+            " circuit-breaker level used by Aave/Compound oracle guardians."
+            " Reference: simulation_scenarios Day-1 follow-up gap #8."
+        ),
+        description="Oracle price divergence sigma threshold that fires the oracle kill-switch.",
+    ),
     "market_data_stale_seconds": AlertThreshold(
         key="market_data_stale_seconds",
         unit=ThresholdUnit.SECONDS,
@@ -407,4 +475,42 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
 }
 """Threshold registry. New rules must add an entry here AND reference the key
 from ``AlertRule.threshold_key`` so the closed-set sanity test catches drift.
+"""
+
+# ---------------------------------------------------------------------------
+# Reconciliation green-band thresholds — batch-vs-live recon gate.
+# ---------------------------------------------------------------------------
+
+RECON_GREEN_THRESHOLDS: Final[dict[str, dict[str, Decimal]]] = {
+    "carry_staked_basis": {
+        "bps_delta_max": Decimal("50"),
+        "drawdown_pct": Decimal("2.0"),
+        "fill_rate_min": Decimal("0.95"),
+    },
+    "leveraged_funding_arb": {
+        "bps_delta_max": Decimal("75"),
+        "drawdown_pct": Decimal("3.0"),
+        "fill_rate_min": Decimal("0.92"),
+    },
+}
+"""Per-archetype reconciliation green-band.
+
+Keys per archetype:
+
+- ``bps_delta_max`` — maximum allowable P&L delta between batch-simulated fills
+  and live fills, in basis points of notional. Breaching this fires
+  ``RECON_BATCH_LIVE_DELTA_BREACH`` and blocks cutover sign-off.
+  Values set at 95th-percentile backtest spread plus 2× slippage margin
+  (carry_staked_basis: 50 bps; leveraged_funding_arb: 75 bps — tighter
+  LST_AS_MARGIN venues vs wider USDC-margin multi-venue spread).
+- ``drawdown_pct`` — maximum acceptable intraday drawdown as % of starting NAV
+  for a "green" recon run. Values anchored to 2-year backtest 95p drawdown +
+  2× margin per batch_live_symmetry_2026_05_10.md Phase 4.
+- ``fill_rate_min`` — minimum fraction of intended fills that must execute for
+  the recon run to pass. carry_staked_basis: 0.95 (LST venues; less cancel
+  risk); leveraged_funding_arb: 0.92 (multi-venue; wider path variance).
+
+These defaults are **operator-calibrated post-2-yr-backtest** starting points.
+Phase 7 quietness-baseline tuning (batch_live_symmetry_2026_05_10.md Phase 7)
+will tighten them once live-pipeline fill distribution is observed.
 """

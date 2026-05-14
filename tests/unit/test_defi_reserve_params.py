@@ -27,6 +27,7 @@ from unified_api_contracts.registry.defi_reserve_params import (
     RADIANT_ARBITRUM_RESERVES,
     RADIANT_BSC_RESERVES,
     SPARK_ETHEREUM_RESERVES,
+    UnknownChainError,
     get_aave_reserve_params,
     get_radiant_reserve_params,
     get_reserve_params,
@@ -84,9 +85,10 @@ def test_get_reserve_params_arbitrum_usdc() -> None:
     assert arb_usdc is AAVE_V3_ARBITRUM_RESERVES["USDC"]
 
 
-def test_get_reserve_params_unknown_chain_returns_none() -> None:
-    """Unknown chain name returns None rather than raising."""
-    assert get_reserve_params(asset="USDC", chain="GNOSIS") is None
+def test_get_reserve_params_unknown_chain_raises() -> None:
+    """Unknown chain name raises UnknownChainError (not silently returns None)."""
+    with pytest.raises(UnknownChainError, match="GNOSIS"):
+        get_reserve_params(asset="USDC", chain="GNOSIS")
 
 
 def test_get_aave_reserve_params_explicit_chain() -> None:

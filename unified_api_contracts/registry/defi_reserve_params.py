@@ -33,6 +33,19 @@ from dataclasses import dataclass
 from decimal import Decimal
 
 
+class UnknownChainError(ValueError):
+    """Raised when a chain name is not present in the reserve-params registry.
+
+    This is a hard error — callers that pass an unknown chain string almost
+    certainly have a misconfiguration bug.  Returning None silently would mask
+    routing errors for multi-chain strategies (see P0 bug in
+    defi_recursive_borrow_archetypes_2026_05_10.md § "P0 silent correctness bug").
+
+    Supported chains: ETHEREUM / ARBITRUM / OPTIMISM / BASE / AVALANCHE /
+    POLYGON / BSC / LINEA / SCROLL / ZKSYNC.
+    """
+
+
 @dataclass(frozen=True)
 class ReserveParams:
     """Aave V3 reserve configuration for a single asset."""
@@ -233,10 +246,14 @@ def get_emode_category(asset: str, chain: str = "ETHEREUM") -> EModeCategory | N
 
     Returns:
         EModeCategory or None if asset not in any E-Mode category on that chain.
+
+    Raises:
+        UnknownChainError: If chain is not in the E-Mode registry.
     """
-    chain_map = _CHAIN_ASSET_EMODE_MAP.get(chain.upper())
-    if chain_map is None:
-        return None
+    chain_upper = chain.upper()
+    if chain_upper not in _CHAIN_ASSET_EMODE_MAP:
+        raise UnknownChainError(f"Chain {chain!r} not in E-Mode registry. Supported: {sorted(_CHAIN_ASSET_EMODE_MAP)}")
+    chain_map = _CHAIN_ASSET_EMODE_MAP[chain_upper]
     return chain_map.get(asset.upper())
 
 
@@ -253,14 +270,18 @@ def get_emode_params(collateral_asset: str, debt_asset: str, chain: str = "ETHER
     Returns:
         EModeCategory if both assets share an E-Mode category on `chain`; None otherwise.
 
+    Raises:
+        UnknownChainError: If chain is not in the E-Mode registry.
+
     Example:
         get_emode_params("WEETH", "WETH") → ETH_CORRELATED (93% LTV, 95% liq) on Ethereum
         get_emode_params("WEETH", "USDC") → None (different categories)
         get_emode_params("WSTETH", "WETH", chain="ARBITRUM") → ETH_CORRELATED Arbitrum
     """
-    chain_map = _CHAIN_ASSET_EMODE_MAP.get(chain.upper())
-    if chain_map is None:
-        return None
+    chain_upper = chain.upper()
+    if chain_upper not in _CHAIN_ASSET_EMODE_MAP:
+        raise UnknownChainError(f"Chain {chain!r} not in E-Mode registry. Supported: {sorted(_CHAIN_ASSET_EMODE_MAP)}")
+    chain_map = _CHAIN_ASSET_EMODE_MAP[chain_upper]
     collateral_cat = chain_map.get(collateral_asset.upper())
     debt_cat = chain_map.get(debt_asset.upper())
     if collateral_cat is not None and collateral_cat is debt_cat:
@@ -330,6 +351,22 @@ AAVE_V3_ARBITRUM_RESERVES: dict[str, ReserveParams] = {
         liquidation_threshold=Decimal("0.77"),
         liquidation_bonus=Decimal("0.075"),
         reserve_factor=Decimal("0.15"),
+    ),
+    # Arbitrum-native governance token
+    # Source: training-knowledge — values low-medium confidence; verify on app.aave.com Arbitrum V3
+    "ARB": ReserveParams(
+        max_ltv=Decimal("0.60"),
+        liquidation_threshold=Decimal("0.65"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    # Cross-chain oracle / DeFi infra
+    # Source: training-knowledge — values low-medium confidence; verify on app.aave.com Arbitrum V3
+    "LINK": ReserveParams(
+        max_ltv=Decimal("0.68"),
+        liquidation_threshold=Decimal("0.73"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.20"),
     ),
 }
 
@@ -412,6 +449,23 @@ AAVE_V3_BASE_RESERVES: dict[str, ReserveParams] = {
         liquidation_threshold=Decimal("0.77"),
         liquidation_bonus=Decimal("0.075"),
         reserve_factor=Decimal("0.15"),
+        # WSTETH on Base comes via Lido canonical bridge — bridge_risk=True
+    ),
+    # weETH on Base comes via native ether.fi bridge — bridge_risk=True
+    # Source: training-knowledge — values low-confidence; verify on app.aave.com Base V3
+    "WEETH": ReserveParams(
+        max_ltv=Decimal("0.725"),
+        liquidation_threshold=Decimal("0.775"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.15"),
+    ),
+    # cbBTC — Coinbase Wrapped Bitcoin, Base-native
+    # Source: training-knowledge — values low-confidence; verify on app.aave.com Base V3
+    "CBBTC": ReserveParams(
+        max_ltv=Decimal("0.73"),
+        liquidation_threshold=Decimal("0.78"),
+        liquidation_bonus=Decimal("0.063"),
+        reserve_factor=Decimal("0.20"),
     ),
 }
 
@@ -779,10 +833,16 @@ def get_reserve_params(asset: str, chain: str = "ETHEREUM") -> ReserveParams | N
 
     Returns:
         ReserveParams or None if asset not found on the chain.
+
+    Raises:
+        UnknownChainError: If chain is not in the Aave V3 registry.
     """
-    chain_dict = _AAVE_V3_CHAIN_DISPATCH.get(chain.upper())
-    if chain_dict is None:
-        return None
+    chain_upper = chain.upper()
+    if chain_upper not in _AAVE_V3_CHAIN_DISPATCH:
+        raise UnknownChainError(
+            f"Chain {chain!r} not in Aave V3 reserve registry. Supported: {sorted(_AAVE_V3_CHAIN_DISPATCH)}"
+        )
+    chain_dict = _AAVE_V3_CHAIN_DISPATCH[chain_upper]
 
     upper = asset.upper()
     if upper in chain_dict:
@@ -1024,9 +1084,163 @@ MORPHO_BLUE_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
 }
 
 
-def get_compound_reserve_params(asset: str) -> ReserveParams | None:
-    """Compound V3 ETH-mainnet reserve params lookup."""
-    return COMPOUND_V3_ETHEREUM_RESERVES.get(asset.upper())
+# ---------------------------------------------------------------------------
+# Compound V3 per-chain, per-market reserve parameters
+# ---------------------------------------------------------------------------
+# Compound V3 is structured as per-market deployments: each deployment has a
+# single base asset (USDC or ETH) and many collateral assets. Markets are
+# chain-and-base-asset scoped, e.g. ARBITRUM / USDC.E vs ARBITRUM / USDC.
+#
+# Dispatch: _COMPOUND_CHAIN_MARKET_RESERVES[chain][market][asset] → ReserveParams
+#
+# Source: Compound governance, on-chain ``getCollateralFactor``
+#         Values are training-knowledge + low-medium confidence for non-Ethereum;
+#         verify at https://app.compound.finance before live routing.
+
+# Compound V3 Arbitrum — USDC.e market
+COMPOUND_V3_ARBITRUM_USDCE_RESERVES: dict[str, ReserveParams] = {
+    # Source: training-knowledge — values low-medium confidence; verify at app.compound.finance
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.83"),
+        liquidation_threshold=Decimal("0.90"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "ARB": ReserveParams(
+        max_ltv=Decimal("0.60"),
+        liquidation_threshold=Decimal("0.70"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "GMX": ReserveParams(
+        max_ltv=Decimal("0.55"),
+        liquidation_threshold=Decimal("0.65"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.10"),
+    ),
+}
+
+# Compound V3 Arbitrum — USDC market (native USDC, distinct from USDC.e)
+COMPOUND_V3_ARBITRUM_USDC_RESERVES: dict[str, ReserveParams] = {
+    # Source: training-knowledge — values low-medium confidence; verify at app.compound.finance
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.83"),
+        liquidation_threshold=Decimal("0.90"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WBTC": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "ARB": ReserveParams(
+        max_ltv=Decimal("0.60"),
+        liquidation_threshold=Decimal("0.70"),
+        liquidation_bonus=Decimal("0.10"),
+        reserve_factor=Decimal("0.10"),
+    ),
+}
+
+# Compound V3 Base — USDC market
+COMPOUND_V3_BASE_USDC_RESERVES: dict[str, ReserveParams] = {
+    # Source: training-knowledge — values low-medium confidence; verify at app.compound.finance
+    "WETH": ReserveParams(
+        max_ltv=Decimal("0.83"),
+        liquidation_threshold=Decimal("0.90"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "CBETH": ReserveParams(
+        max_ltv=Decimal("0.78"),
+        liquidation_threshold=Decimal("0.83"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "WSTETH": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.05"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "CBBTC": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.85"),
+        liquidation_bonus=Decimal("0.07"),
+        reserve_factor=Decimal("0.10"),
+    ),
+}
+
+
+# Compound V3 chain → market → asset dispatch
+# Market key convention: "USDC", "USDC.E", "ETH" (base asset symbol, uppercase)
+_COMPOUND_CHAIN_MARKET_RESERVES: dict[str, dict[str, dict[str, ReserveParams]]] = {
+    "ETHEREUM": {
+        "USDC": COMPOUND_V3_ETHEREUM_RESERVES,
+    },
+    "ARBITRUM": {
+        "USDC.E": COMPOUND_V3_ARBITRUM_USDCE_RESERVES,
+        "USDC": COMPOUND_V3_ARBITRUM_USDC_RESERVES,
+    },
+    "BASE": {
+        "USDC": COMPOUND_V3_BASE_USDC_RESERVES,
+    },
+}
+
+
+def get_compound_reserve_params(
+    asset: str,
+    chain: str = "ETHEREUM",
+    market: str = "USDC",
+) -> ReserveParams | None:
+    """Compound V3 reserve params lookup — per-chain and per-market.
+
+    Compound V3 is per-market AND per-chain: each deployment has a single
+    base asset (e.g. USDC or ETH) and many collateral assets.  Pass both
+    ``chain`` and ``market`` for multi-chain routing.
+
+    Args:
+        asset: Collateral asset symbol (e.g., "WETH", "WBTC").
+        chain: Chain name (ETHEREUM / ARBITRUM / BASE).  Defaults to ETHEREUM
+            for backwards compatibility with legacy single-chain callers.
+        market: Base-asset market key (e.g., "USDC", "USDC.E", "ETH").
+            Defaults to "USDC" (most common Compound V3 market).
+
+    Returns:
+        ReserveParams or None if asset not found in that chain x market.
+
+    Raises:
+        UnknownChainError: If chain is not in the Compound V3 registry.
+    """
+    chain_upper = chain.upper()
+    if chain_upper not in _COMPOUND_CHAIN_MARKET_RESERVES:
+        raise UnknownChainError(
+            f"Chain {chain!r} not in Compound V3 registry. Supported: {sorted(_COMPOUND_CHAIN_MARKET_RESERVES)}"
+        )
+    market_map = _COMPOUND_CHAIN_MARKET_RESERVES[chain_upper]
+    asset_map = market_map.get(market.upper())
+    if asset_map is None:
+        return None
+    return asset_map.get(asset.upper())
 
 
 def get_morpho_reserve_params(asset: str) -> ReserveParams | None:

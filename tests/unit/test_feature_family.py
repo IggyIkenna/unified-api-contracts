@@ -92,26 +92,26 @@ def test_feature_group_to_family_values_are_feature_family_members() -> None:
 
 
 def test_feature_group_to_family_matches_owning_service() -> None:
-    """Each feature_group's family must match the family implied by the
-    service that declares it (mechanical service-name → family mapping)."""
-    service_to_family_value = {
-        "features-calendar-service": "calendar",
-        "features-commodity-service": "commodity",
-        "features-cross-instrument-service": "cross_instrument",
-        "features-delta-one-service": "delta_one",
-        "features-multi-timeframe-service": "multi_timeframe",
-        "features-onchain-service": "onchain",
-        "features-sports-service": "sports",
-        "features-volatility-service": "volatility",
-    }
-    for service, groups in EXPECTED_FEATURE_GROUPS_BY_SERVICE.items():
-        expected_value = service_to_family_value[service]
-        for group in groups:
-            actual = FEATURE_GROUP_TO_FAMILY[group]
-            assert actual.value == expected_value, (
-                f"feature_group {group!r} declared by {service!r} should map to "
-                f"FeatureFamily({expected_value!r}) but maps to {actual.value!r}"
-            )
+    """Every feature_group declared in EXPECTED_FEATURE_GROUPS_BY_SERVICE has
+    an explicit FeatureFamily assignment in FEATURE_GROUP_TO_FAMILY.
+
+    After features-{family}-service consolidation to features-service, the
+    family can no longer be derived from service name — it is explicitly
+    declared in _GROUP_FAMILY_MAP. This test verifies no group is left
+    untagged (orphaned) after the consolidation.
+    """
+    all_declared: set[str] = set()
+    for groups in EXPECTED_FEATURE_GROUPS_BY_SERVICE.values():
+        all_declared.update(groups)
+    for group in all_declared:
+        family = FEATURE_GROUP_TO_FAMILY.get(group)
+        assert family is not None, (
+            f"feature_group {group!r} is declared in EXPECTED_FEATURE_GROUPS_BY_SERVICE "
+            "but has no FeatureFamily assignment in FEATURE_GROUP_TO_FAMILY"
+        )
+        assert isinstance(family, FeatureFamily), (
+            f"FEATURE_GROUP_TO_FAMILY[{group!r}] = {family!r} is not a FeatureFamily member"
+        )
 
 
 def test_get_feature_family_round_trip() -> None:

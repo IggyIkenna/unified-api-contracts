@@ -4055,7 +4055,7 @@
         "SUSHISWAP-ARBITRUM": ["sushiswap", "ARBITRUM"],
         "SUSHISWAPV3-AVALANCHE": ["sushiswap_v3", "AVALANCHE"],
         "SUSHISWAPV3-ETHEREUM": ["sushiswap_v3", "ETHEREUM"],
-        "TRADERJOEV2-AVALANCHE": ["trader_joe_v2", "AVALANCHE"],
+        "TRADER_JOEV2-AVALANCHE": ["trader_joe_v2", "AVALANCHE"],
         "UNISWAPV2-ETHEREUM": ["uniswap_v2", "ETHEREUM"],
         "UNISWAPV3-ETHEREUM": ["uniswap_v3", "ETHEREUM"],
         "UNISWAPV4-ETHEREUM": ["uniswap_v4", "ETHEREUM"],

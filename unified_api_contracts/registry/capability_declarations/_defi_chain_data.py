@@ -550,6 +550,27 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         ),
         "data_source": "drift_api",
     },
+    "mango": {
+        "name": "Mango Markets V4",
+        "type": "perps_dex",
+        "program_id": "4MangoMjqJ2firMokCjjGgoK8d4MXcrgL7XJaL3w6fVg",
+        "api_url": "https://api.mngo.cloud/data/v4",
+        "data_source": "mango_api",
+    },
+    "zeta": {
+        "name": "Zeta Markets",
+        "type": "perps_dex",
+        "program_id": "ZETAxsqBRek56DhiGXrn75yj2NHU3aYUnxvHXpkf3aD",
+        "api_url": "https://dex.zeta.markets/api",
+        "data_source": "zeta_api",
+    },
+    "flash_trade": {
+        "name": "Flash Trade",
+        "type": "perps_dex",
+        "program_id": "FLASH6Lo6h3iasJKWDs2F8TkW2UKf3s15C8PMGuVfgBn",
+        "api_url": "https://api.flash.trade/api/v1",
+        "data_source": "flash_api",
+    },
     "raydium": {
         "name": "Raydium",
         "type": "dex",
@@ -602,6 +623,64 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "type": "lending",
         "program_id": "So1endDq2YkqhipRh3WViPa8hFb54GdNFfmLqErtPqNo",
         "data_source": "defillama",
+    },
+    # ── Plan C: Solana AMM coverage expansion (2026-05-13) ──────────────
+    "meteora": {
+        "name": "Meteora Dynamic Liquidity",
+        "type": "amm_dex",
+        "program_id": "LBUZKhRxPF3XUpBCjp4YzTKgLccjZhTSDM9YuVaPwxo",
+        "api_url": "https://app.meteora.ag/api",
+        "data_source": "meteora_api",
+    },
+    "phoenix": {
+        "name": "Phoenix CLOB DEX",
+        "type": "clob_dex",
+        "program_id": "PhoeNiXZ8ByJGLkxNfZRnkUfjvmuYqLR89jjFHGqdXY",
+        "api_url": "https://api.phoenix.trade",
+        "data_source": "phoenix_api",
+    },
+    "lifinity": {
+        "name": "Lifinity Protocol",
+        "type": "amm_dex",
+        "program_id": "LFNTYraetVioAPnGJht4yNg2aUZFXR776cMeN9VMjXp",
+        "api_url": "https://api.lifinity.io",
+        "data_source": "lifinity_api",
+    },
+    "pyth": {
+        "name": "Pyth Network Oracle",
+        "type": "oracle",
+        "program_id": "rec5EKMGg6MxZYaMdyBfgwp4d5rB9T1VQH5pJv5LtFJ",
+        "api_url": "https://hermes.pyth.network/v2",
+        "pythnet_url": "https://pythnet.rpcpool.com",
+        "data_source": "pyth_hermes",
+    },
+    # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
+    "solayer": {
+        "name": "Solayer (Endogenous AVS Restaking)",
+        "type": "restaking",
+        # Solayer Endogenous Vault program — best-guess; verify from official Solayer docs.
+        # sSOL token mint (Solscan-verified): sSo14endRuUbvQaJS3dq36Q829a3A6BEfoeeRGJywEh
+        "program_id": "SolayerEndoAVSSo11111111111111111111111111112",
+        "api_url": "https://app.solayer.org/api",
+        "data_source": "solayer_api",
+    },
+    "picasso": {
+        "name": "Picasso Network (Cross-Chain Restaking)",
+        "type": "restaking",
+        # Picasso Solana program — best-guess; verify from https://docs.picasso.network/
+        # Cross-chain restaking via ICS (Inter-Chain Security); Solana-side program.
+        "program_id": "5nMau41MBCMmPfQHs9FMgzMgCJVA1VdJBV9kLnzBNNDn",
+        "api_url": "https://api.picasso.network",
+        "data_source": "picasso_api",
+    },
+    "cambrian": {
+        "name": "Cambrian Network (Solana AVS Restaking Primitives)",
+        "type": "restaking",
+        # Cambrian Solana program — best-guess; verify from https://docs.cambrian.network/
+        # Provides foundational AVS/NCN restaking primitives for Solana-native protocols.
+        "program_id": "CAMBr1ANreStakingVau1tProgramSo1anaXXXXXXXXXX",
+        "api_url": "https://api.cambrian.network",
+        "data_source": "cambrian_api",
     },
 }
 

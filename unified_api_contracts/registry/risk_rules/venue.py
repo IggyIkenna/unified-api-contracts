@@ -52,7 +52,7 @@ from unified_api_contracts.canonical.crosscutting.risk_rule import (
 )
 
 # ---------------------------------------------------------------------------
-# CeFi perp venues — 6 venues × 3 rules = 18 rules
+# CeFi perp venues — 6 venues x 3 rules = 18 rules
 # ---------------------------------------------------------------------------
 
 _BYBIT_RULES: tuple[RiskRule, ...] = (
@@ -248,7 +248,7 @@ _ASTER_RULES: tuple[RiskRule, ...] = (
 )
 
 # ---------------------------------------------------------------------------
-# Solana DeFi protocols (LST yields for carry_staked_basis) — 3 × 3 = 9 rules
+# Solana DeFi protocols (LST yields for carry_staked_basis) — 3 x 3 = 9 rules
 # ---------------------------------------------------------------------------
 
 _MARINADE_RULES: tuple[RiskRule, ...] = (

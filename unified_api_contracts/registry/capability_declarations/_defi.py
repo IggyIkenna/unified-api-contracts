@@ -197,7 +197,7 @@ def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
 #   - deployment-ui data-status: shows expected data coverage matrix
 # ---------------------------------------------------------------------------
 
-from ..._instrument_enums import InstrumentType as _IT
+from ..._instrument_enums import InstrumentType as _IT  # noqa: E402, N814
 
 
 class ProtocolClass(StrEnum):
@@ -400,7 +400,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "trader_joe_v2": _ProtocolCapability(
-        venue_prefix="TRADERJOEV2",
+        venue_prefix="TRADER_JOEV2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -512,6 +512,32 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-solana-defi"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),
+    # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
+    # Second-layer staking: stake LSTs into restaking vaults to earn AVS operator rewards
+    # on top of base staking yield. Critical for carry_staked_basis archetype carry computation.
+    "solayer": _ProtocolCapability(
+        venue_prefix="SOLAYER",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_YIELD,
+        data_types=["restaking_rewards", "lst_rates"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"SSOL"}),
+    ),
+    "picasso": _ProtocolCapability(
+        venue_prefix="PICASSO",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_YIELD,
+        data_types=["restaking_rewards", "cross_chain_restaking_routes"],
+        mtds_operations=["collect-solana-defi"],
+        required_tokens=frozenset({"PICA"}),
+    ),
+    "cambrian": _ProtocolCapability(
+        venue_prefix="CAMBRIAN",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_YIELD,
+        data_types=["restaking_rewards", "restaking_operator_set"],
+        mtds_operations=["collect-solana-defi"],
+    ),
 }
 
 # Chain-native tokens — auto-included in major assets for any protocol on that chain.
@@ -612,12 +638,12 @@ _TOKEN_TO_GROUP: dict[str, str] = {tok: group for group, tokens in TOKEN_EQUIVAL
 # Empty / deprecated DeFi venue metadata lives in ``_defi_coverage`` (co-located
 # re-export). Used by data-status to suppress missing-coverage flags for venues
 # whose subgraph is retired or whose parquets haven't been collected yet.
-from ._defi_coverage import (
+from ._defi_coverage import (  # noqa: E402
     DEFI_INSTRUMENTS_NOT_YET_COLLECTED,
     EMPTY_OR_DEPRECATED_DEFI_VENUES,
     venue_has_no_expected_defi_coverage,
 )
-from ._defi_lst import (
+from ._defi_lst import (  # noqa: E402
     LST_TOKEN_GENESIS,
     LST_VENUE_TO_TOKENS,
     get_lst_token_genesis,
@@ -772,6 +798,10 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "orca": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
+    # Plan E: Solana restaking rewards coverage (2026-05-13)
+    "solayer": ["SOLANA"],
+    "picasso": ["SOLANA"],
+    "cambrian": ["SOLANA"],
 }
 
 
