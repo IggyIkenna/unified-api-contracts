@@ -128,6 +128,22 @@ max-complexity = 7
 "unified_api_contracts/canonical/options.py" = ["F403", "F405"]
 "unified_api_contracts/canonical/odds.py" = ["F403", "F405"]
 "unified_api_contracts/canonical/spread.py" = ["F403", "F405"]
+# C901 complexity carveout for UAC registry/declarative paths
+# (codified 2026-05-13 per codex/05-infrastructure/deployment-and-qg-strategy.md
+# § "QG complexity (C901) policy — UAC carveout").
+# UAC is registry/declarative, NOT algorithmic. KNOWN_VENUE_TOKENS,
+# STRATEGY_FAMILY_REGISTRY, paired_dispersion_catalog, capability_declarations/*,
+# ARCHETYPE_CONFIG_SEED, VENUE_DATA_TYPE_CAPABILITIES, per-venue order-status
+# dispatchers, sports path-template dispatch — all enumerate closed sets.
+# Lowering complexity = artificial extraction that fragments registry view +
+# harms grep-ability. Phase 8 surface coverage targets (100% on validation +
+# registry consumers) is the real correctness gate, not C901.
+"unified_api_contracts/registry/**/*.py" = ["C901"]
+"unified_api_contracts/internal/architecture_v2/**/*.py" = ["C901"]
+"unified_api_contracts/canonical/crosscutting/**/*.py" = ["C901"]
+"unified_api_contracts/external/**/normalize.py" = ["C901"]
+"unified_api_contracts/canonical/domain/sports/gcs_paths.py" = ["C901"]
+"unified_api_contracts/canonical/domain/sports/mapping_resolver.py" = ["C901"]
 
 [tool.ruff.format]
 quote-style = "double"
