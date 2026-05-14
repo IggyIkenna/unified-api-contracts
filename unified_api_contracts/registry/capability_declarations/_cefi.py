@@ -748,6 +748,105 @@ _NAUTILUS = SourceCapability(
 
 
 # ---------------------------------------------------------------------------
+# Kraken — direct REST + WebSocket (BLOCKED-CREDENTIALS scaffold 2026-05-14)
+# ---------------------------------------------------------------------------
+# BLOCKED-CREDENTIALS: Requires Kraken Pro API key (read-only scope for May-23 SLA).
+# See: ikenna_orchestrator/pings/slot_11.md — CREDENTIAL APPROVAL REQUEST filed.
+# CCXT fallback (kraken) exists but is insufficient: rate-limit handling +
+# ticker normalization gaps (Kraken uses XBT not BTC; USDT pairs suffixed differently).
+# This capability entry supports the direct REST+WS adapter in execution-service.
+# Note: Kraken futures are offered via the "cryptofacilities" CCXT id (see venue_mapping.py).
+_KRAKEN = SourceCapability(
+    source="kraken",
+    domains=["market", "execution", "position", "reference"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,  # Kraken does not offer a public testnet for REST/WS
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": ["ticker", "orderbook", "trades", "ohlc", "ws_ticker", "ws_book", "ws_trade"],
+        "execution": ["add_order", "cancel_order", "query_orders", "open_orders"],
+        "position": ["balance", "trade_balance", "open_positions"],
+        "reference": ["asset_pairs", "assets", "server_time", "system_status"],
+    },
+    base_urls={
+        "mainnet": "https://api.kraken.com",
+        "ws_public": "wss://ws.kraken.com",
+        "ws_private": "wss://ws-auth.kraken.com",
+    },
+    margin_model={},
+    operation_details={
+        "add_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+            }
+        ),
+        "ticker": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+            }
+        ),
+        "balance": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+            }
+        ),
+    },
+)
+
+# Kraken Futures (via cryptofacilities CCXT id / Kraken Futures REST API)
+# BLOCKED-CREDENTIALS: same credential request as _KRAKEN above.
+_KRAKEN_FUTURES = SourceCapability(
+    source="kraken-futures",
+    domains=["market", "execution", "position", "reference"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=True,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"test": "testnet_key", "prod": "prod_key"},
+    operations={
+        "market": ["ticker", "orderbook", "trades", "ohlc", "funding_rate", "ws_ticker", "ws_book"],
+        "execution": ["place_order", "cancel_order", "open_orders", "fill_history"],
+        "position": ["account", "open_positions", "notifications"],
+        "reference": ["instruments", "fee_schedules"],
+    },
+    base_urls={
+        "mainnet": "https://futures.kraken.com",
+        "testnet": "https://demo-futures.kraken.com",
+    },
+    margin_model={"mainnet": "cross"},
+    operation_details={
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="hmac_sha512", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+                "testnet": OperationEnvDetail(signing_scheme="hmac_sha512", required_credential="api_key"),
+            }
+        ),
+    },
+)
+
+
+# ---------------------------------------------------------------------------
 # Ordered list -- CeFi
 # ---------------------------------------------------------------------------
 
@@ -765,6 +864,9 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _KUCOIN,
     _MEXC,
     _UPBIT,
+    # Kraken (BLOCKED-CREDENTIALS scaffold 2026-05-14 — see slot_11.md ping)
+    _KRAKEN,
+    _KRAKEN_FUTURES,
     # CeFi aggregators / connectors
     _CCXT,
     _TARDIS,
