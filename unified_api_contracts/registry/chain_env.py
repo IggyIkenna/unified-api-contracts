@@ -359,6 +359,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
         "MARGINFI",
     ): "2023-02-23",  # mrgnlend lending protocol launch on Solana mainnet (Squads + multiple sources); high
     ("SOLANA", "SOLEND"): "2021-08-13",  # Solend mainnet launch announcement (Smart Liquidity 2021-08-13); high
+    ("SOLANA", "SANCTUM"): "2023-06-01",  # Sanctum v1 mainnet LST marketplace launch (conservative floor); medium
     # ── Balancer multi-chain rollout (Sub-agent C) ──
     (
         "ARBITRUM",
