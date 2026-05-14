@@ -133,6 +133,9 @@ from .provider_league_ids import does_understat_cover as does_understat_cover
 from .provider_league_ids import get_entity_league_coverage as get_entity_league_coverage
 from .provider_league_ids import get_provider_league_id as get_provider_league_id
 from .provider_league_ids import get_sports_entity_start_date as get_sports_entity_start_date
+from .refdata_cadence import (
+    TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS as TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS,
+)
 from .round_names import ROUND_NAMES as ROUND_NAMES
 from .round_names import ROUND_PREFIXES as ROUND_PREFIXES
 from .round_names import RoundMatch as RoundMatch
