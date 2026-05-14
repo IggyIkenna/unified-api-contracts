@@ -258,11 +258,38 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-service", "polymarket_cross_market"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "polymarket_temporal_patterns"): ServiceEmissionPolicy.NAN_FILL,
     #
-    # features-delta-one-service — 9 entries (P0 anchors; ~24 ohlcv-derived
-    # feature_groups share NAN_FILL — Phase-2 helper expansion deferred).
-    # Default for ML-consumer feature_groups → NAN_FILL (LightGBM NaN-fill native,
-    # operator-msg-10 vol_30d anchor). STRICT_FAIL for cross-venue/cross-leg pairings
-    # + execution-sensitive signals + supervised labels.
+    # features-delta-one-service — 21 entries (all FEATURE_GROUPS from parser.py).
+    # NOTE: legacy orphaned entries under ("features-service", ...) below are superseded
+    # by these correct-key entries. Default for ML-consumer feature_groups → NAN_FILL
+    # (LightGBM NaN-fill native, operator-msg-10 vol_30d anchor). STRICT_FAIL for
+    # cross-venue/cross-leg pairings + execution-sensitive signals + ML training targets.
+    # (Phase 6.5 P2 fix 2026-05-14: added correct "features-delta-one-service" key +
+    # 12 ohlcv-derived NAN_FILL groups that were previously unregistered → STRICT_FAIL
+    # fallback; key mismatch for prior 9 entries also fixed here.)
+    ("features-delta-one-service", "technical_indicators"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "moving_averages"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "oscillators"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "volatility_realized"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "momentum"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "volume_analysis"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "vwap"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "candlestick_patterns"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "market_structure"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "returns"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "round_numbers"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "streaks"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "temporal"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-delta-one-service", "microstructure"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-delta-one-service", "funding_oi"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-delta-one-service", "futures_basis"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-delta-one-service", "volume_flow"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-delta-one-service", "liquidations"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-delta-one-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-delta-one-service", "targets"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-delta-one-service", "swing_outcome_targets"): ServiceEmissionPolicy.STRICT_FAIL,
+    # Legacy entries (key "features-service" does NOT match handler _SERVICE_NAME
+    # "features-delta-one-service"; these are orphaned but preserved to avoid
+    # breaking any future consumers that may use the consolidated service name).
     ("features-service", "technical_indicators"): ServiceEmissionPolicy.NAN_FILL,
     ("features-service", "microstructure"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "funding_oi"): ServiceEmissionPolicy.STRICT_FAIL,
