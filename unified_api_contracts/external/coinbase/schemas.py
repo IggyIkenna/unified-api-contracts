@@ -343,3 +343,40 @@ class CoinbaseFill(BaseModel):
     liquidity: str | None = None  # maker, taker
     side: str | None = None
     info: dict[str, object] | None = None
+
+
+# --- cbETH LST APR / Supply Rate (carry_staked_basis DeFi cell) ---
+# BLOCKED-CREDENTIALS: Requires Coinbase Institutional / Advanced Trade API key.
+# See ikenna_orchestrator/pings/slot_11.md for credential approval request.
+# Endpoint: GET /api/v2/assets/cbETH
+# Ref: https://docs.cdp.coinbase.com/advanced-trade/docs/rest-api-asset-info
+
+
+class CbEthAprResponse(BaseModel):
+    """Coinbase cbETH asset info response (GET /api/v2/assets/cbETH).
+
+    Used by MTDS ``CoinbaseCbEthAdapter`` to resolve:
+    - ``exchange_rate``: cbETH/ETH exchange rate (grows as staking rewards accrue)
+    - ``apy``: annualised percentage yield as reported by Coinbase
+    - ``total_supply``: total cbETH minted (for supply/redemption tracking)
+
+    BLOCKED-CREDENTIALS status: adapter scaffold ships but integration path
+    requires Coinbase Advanced Trade API key + secret. Unit tests mock this schema.
+
+    UAC cross-reference:
+      ``registry/capability_declarations/_defi_lst.py`` → COINBASE: (cbETH,)
+      ``internal/domain/defi/lst.py`` → cbETH → (COINBASE, ETH)
+    """
+
+    exchange_rate: str | None = None  # cbETH/ETH rate, e.g. "1.06234"
+    apy: str | None = None  # annualised yield as string, e.g. "3.52"
+    total_supply: str | None = None  # total cbETH minted
+    token_address: str | None = None  # Ethereum mainnet contract address
+    chain: str | None = None  # "ethereum"
+    timestamp: str | None = None  # ISO8601 response timestamp
+
+
+class CbEthAssetData(BaseModel):
+    """Outer wrapper for Coinbase asset info API response (``data`` key)."""
+
+    data: CbEthAprResponse | None = None
