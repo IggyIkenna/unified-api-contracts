@@ -300,9 +300,21 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-service", "targets"): ServiceEmissionPolicy.STRICT_FAIL,
     #
-    # features-multi-timeframe-service — 4 entries.
+    # features-multi-timeframe-service — 6 entries (Phase 6.5 P2 fix 2026-05-14: added
+    # correct "features-multi-timeframe-service" key entries for all seeded groups including
+    # tf_risk_reward + wedge_confluence which were confirmed cross-TF STRICT_FAIL;
+    # intraday_regime + micro_regime remain unseeded pending operator classification,
+    # tracked in plans/active/issues/mtf_intraday_micro_regime_policy_2026_05_14.md).
     # Cross-TF alignment is load-bearing — ANY stale leg corrupts the alignment
     # column with lookahead bias (paired_spec precedent). All STRICT_FAIL.
+    ("features-multi-timeframe-service", "tf_momentum_alignment"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-multi-timeframe-service", "tf_structure_context"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-multi-timeframe-service", "tf_vol_compression"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-multi-timeframe-service", "tf_confluence_signals"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-multi-timeframe-service", "tf_risk_reward"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-multi-timeframe-service", "wedge_confluence"): ServiceEmissionPolicy.STRICT_FAIL,
+    # Legacy entries (key "features-service" does NOT match handler _SERVICE_NAME
+    # "features-multi-timeframe-service"; orphaned but preserved as catch-all).
     ("features-service", "tf_momentum_alignment"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "tf_structure_context"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "tf_vol_compression"): ServiceEmissionPolicy.STRICT_FAIL,
