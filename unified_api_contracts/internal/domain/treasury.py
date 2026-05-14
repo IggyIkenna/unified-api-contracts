@@ -12,8 +12,10 @@ Credentials are NEVER inlined — always referenced by credential-registry id pe
 
 from __future__ import annotations
 
+import hashlib
+import hmac as _hmac_module
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
 
@@ -336,7 +338,7 @@ class TreasuryNAVByClient:
     """Client's proportional share of total_nav_usd."""
 
     attribution_pct: Decimal
-    """Fraction of total fund NAV attributed to this client (0–100)."""
+    """Fraction of total fund NAV attributed to this client (0-100)."""
 
     per_source: list[TreasurySourceBalance]
     """Per-source balances scaled by attribution_pct."""
@@ -379,7 +381,7 @@ class TreasurySourceAttribution:
     """Client's effective allocation share for this source (0-100)."""
 
     client_nav_usd: Decimal
-    """Client's attributed NAV = source_total_nav_usd × (client_allocation_pct / 100)."""
+    """Client's attributed NAV = source_total_nav_usd x (client_allocation_pct / 100)."""
 
     source_reachable: bool = True
     """True if the custody endpoint was reachable at rollup time."""
@@ -489,3 +491,189 @@ class ClientSubscriptionList:
             (s.allocation_pct for s in self.subscriptions if s.is_active),
             start=Decimal("0"),
         )
+
+
+# ---------------------------------------------------------------------------
+# Withdrawal approval chain (Phase 1: HMAC-SHA256 / Cloud-KMS)
+# Per ``wallet_treasury_post_cutover_custody_signing_2026_06_01.md`` Phase 1.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class WithdrawalApprovalSignature:
+    """HMAC-SHA256 signed withdrawal approval from a single approver.
+
+    Phase 1 (Cloud-KMS path, May-23 cutover): the HMAC secret key is an
+    ephemeral 32-byte key stored in Secret Manager under
+    ``withdrawal-hmac-secret``, fetched once per service boot via
+    ``execution_service.custody.withdrawal_signing.get_hmac_key()``.
+
+    Phase 2 (Copper/Fireblocks post-cutover): ``hmac_signature`` is replaced
+    by the MPC custody provider's signature; ``kms_key_ref`` holds the
+    Copper vault ID instead of a KMS CMK URI.
+
+    The ``signature_input()`` canonical string is the tamper-evident payload:
+    any field change invalidates the HMAC, which ``verify()`` detects.
+    """
+
+    withdrawal_id: str
+    """UUID or opaque ID generated at withdrawal-request time."""
+
+    approver_id: str
+    """Operator ID from the approver pool (e.g. 'operator:ikenna')."""
+
+    amount_usd: Decimal
+    """Withdrawal amount in USD (must match the pending withdrawal record)."""
+
+    treasury_source: TreasurySource
+    """Which custody source the withdrawal comes from."""
+
+    hmac_signature: str
+    """Hex-encoded HMAC-SHA256 over ``signature_input()`` using the shared key."""
+
+    signed_at: datetime
+    """UTC timestamp at which the approver signed (used in canonical input)."""
+
+    kms_key_ref: str = ""
+    """Secret Manager / KMS key ref used to derive the HMAC secret.
+    Empty string means the secret was supplied out-of-band (e.g. test fixture).
+    Production value: ``'withdrawal-hmac-secret'`` (GCP/AWS Secret Manager id)."""
+
+    def signature_input(self) -> str:
+        """Return the canonical input string for HMAC computation.
+
+        Format: ``{withdrawal_id}:{approver_id}:{amount_usd}:{source}:{signed_at_iso}``
+        All fields are required — changing any field invalidates the signature.
+        ``signed_at`` uses ``.isoformat()`` (microsecond precision UTC).
+        """
+        return (
+            f"{self.withdrawal_id}:{self.approver_id}:{self.amount_usd}"
+            f":{self.treasury_source.value}:{self.signed_at.isoformat()}"
+        )
+
+    def verify(self, secret_key: bytes) -> bool:
+        """Return True if the HMAC signature is valid for the given secret.
+
+        Uses ``hmac.compare_digest`` to prevent timing side-channels.
+        """
+        expected = _hmac_module.new(
+            secret_key,
+            self.signature_input().encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        return _hmac_module.compare_digest(expected, self.hmac_signature)
+
+    @classmethod
+    def create(
+        cls,
+        withdrawal_id: str,
+        approver_id: str,
+        amount_usd: Decimal,
+        treasury_source: TreasurySource,
+        secret_key: bytes,
+        kms_key_ref: str = "",
+    ) -> WithdrawalApprovalSignature:
+        """Create a new HMAC-signed approval at UTC now."""
+        signed_at = datetime.now(UTC)
+        sig_input = f"{withdrawal_id}:{approver_id}:{amount_usd}:{treasury_source.value}:{signed_at.isoformat()}"
+        signature = _hmac_module.new(
+            secret_key,
+            sig_input.encode("utf-8"),
+            hashlib.sha256,
+        ).hexdigest()
+        return cls(
+            withdrawal_id=withdrawal_id,
+            approver_id=approver_id,
+            amount_usd=amount_usd,
+            treasury_source=treasury_source,
+            hmac_signature=signature,
+            signed_at=signed_at,
+            kms_key_ref=kms_key_ref,
+        )
+
+
+@dataclass
+class WithdrawalApprovalChain:
+    """2-of-N multisig approval chain for a pending withdrawal.
+
+    Accumulates ``WithdrawalApprovalSignature`` objects until the quorum
+    defined by ``WithdrawalApprovalRule.required_approvers`` is reached.
+    Once quorum is reached the chain is locked (``quorum_reached=True``)
+    and subsequent ``add_approval`` calls raise ``ValueError``.
+
+    Usage:
+        chain = WithdrawalApprovalChain.new(withdrawal_id, amount_usd, source, rules)
+        chain.add_approval(sig_from_ikenna)
+        chain.add_approval(sig_from_harsh)  # quorum reached if required=2
+        assert chain.quorum_reached
+    """
+
+    withdrawal_id: str
+    amount_usd: Decimal
+    treasury_source: TreasurySource
+    required_approvers: int
+    approver_pool: frozenset[str]
+    requested_at: datetime
+    approvals: list[WithdrawalApprovalSignature] = field(default_factory=list)
+    quorum_reached: bool = False
+    quorum_reached_at: datetime | None = None
+
+    def __post_init__(self) -> None:
+        if self.required_approvers < 1:
+            raise ValueError(f"required_approvers must be >= 1, got {self.required_approvers}")
+        if len(self.approver_pool) < self.required_approvers:
+            raise ValueError(
+                f"approver_pool size {len(self.approver_pool)} < required_approvers {self.required_approvers}"
+            )
+
+    @classmethod
+    def new(
+        cls,
+        withdrawal_id: str,
+        amount_usd: Decimal,
+        treasury_source: TreasurySource,
+        required_approvers: int,
+        approver_pool: frozenset[str],
+    ) -> WithdrawalApprovalChain:
+        """Create a new empty approval chain."""
+        return cls(
+            withdrawal_id=withdrawal_id,
+            amount_usd=amount_usd,
+            treasury_source=treasury_source,
+            required_approvers=required_approvers,
+            approver_pool=approver_pool,
+            requested_at=datetime.now(UTC),
+        )
+
+    def add_approval(self, sig: WithdrawalApprovalSignature) -> None:
+        """Add a signed approval to the chain.
+
+        Raises:
+            ValueError: if quorum already reached, approver not in pool,
+                approver already approved, or withdrawal_id mismatch.
+        """
+        if self.quorum_reached:
+            raise ValueError(f"WithdrawalApprovalChain {self.withdrawal_id!r}: quorum already reached")
+        if sig.withdrawal_id != self.withdrawal_id:
+            raise ValueError(
+                f"Approval withdrawal_id {sig.withdrawal_id!r} != chain withdrawal_id {self.withdrawal_id!r}"
+            )
+        if sig.approver_id not in self.approver_pool:
+            raise ValueError(f"Approver {sig.approver_id!r} not in pool for {self.withdrawal_id!r}")
+        existing_approvers = {a.approver_id for a in self.approvals}
+        if sig.approver_id in existing_approvers:
+            raise ValueError(f"Approver {sig.approver_id!r} already approved {self.withdrawal_id!r}")
+        self.approvals.append(sig)
+        if len(self.approvals) >= self.required_approvers:
+            self.quorum_reached = True
+            self.quorum_reached_at = datetime.now(UTC)
+
+    @property
+    def approver_count(self) -> int:
+        """Number of distinct approvals collected so far."""
+        return len(self.approvals)
+
+    @property
+    def approvers_remaining(self) -> int:
+        """Number of additional approvals needed to reach quorum."""
+        return max(0, self.required_approvers - len(self.approvals))
