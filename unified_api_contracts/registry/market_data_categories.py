@@ -11,7 +11,10 @@ Centralized here as the system SSOT per UAC registry pattern.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
+from datetime import date as _date
+from datetime import timedelta as _timedelta
 
 from unified_api_contracts.registry.defi_venues import MTDS_DEFI_VENUES as _MTDS_DEFI_VENUES
 
@@ -655,6 +658,92 @@ def is_in_tradfi_tick_window(date_str: str) -> bool:
     is downloaded.
     """
     return any(w["start"] <= date_str <= w["end"] for w in TRADFI_TICK_DATA_WINDOWS)
+
+
+# ---------------------------------------------------------------------------
+# Phase 4.3 — TradFi futures per-contract staleness gate
+# ---------------------------------------------------------------------------
+# CME/ICE futures symbols follow the pattern: ROOT + MONTH_CODE + YEAR_DIGITS
+# e.g. ESH26, CLZ6, GCM26, 6EZ26, BRN.H26, CL.F27
+# This regex matches the canonical raw_symbol format from Databento.
+_FUTURES_SYMBOL_RE = re.compile(
+    r"^(?P<root>[A-Z0-9]{1,5})"  # root: 1-5 alphanumeric chars
+    r"\.?"  # optional dot separator (BRN.H26, CL.F27)
+    r"(?P<month>[FGHJKMNQUVXZ])"  # CME month code
+    r"(?P<year>\d{1,2})$",  # 1-2 digit year suffix
+)
+
+# CME month-code → month number (mirrors instruments-service futures_factory.py)
+_FUTURES_MONTH_CODE: dict[str, int] = {
+    "F": 1,
+    "G": 2,
+    "H": 3,
+    "J": 4,
+    "K": 5,
+    "M": 6,
+    "N": 7,
+    "Q": 8,
+    "U": 9,
+    "V": 10,
+    "X": 11,
+    "Z": 12,
+}
+
+
+def is_tradfi_futures_instrument_active(instrument_id: str, as_of_date_str: str) -> bool:
+    """Return True if a TradFi futures instrument is expected to be active on a given date.
+
+    Parses the CME/ICE futures symbol format (e.g. ESH26, CLZ6, BRN.H26) to derive
+    the contract month and year, then checks whether the contract's expiry month is
+    on or after the as_of_date.
+
+    Conservative contract-expiry estimate: a contract is considered expired once
+    ``as_of_date`` is strictly past the LAST DAY of the contract month.  In practice
+    most CME contracts expire mid-month, so this is a conservative (inclusive) gate —
+    it may include a few extra trading days inside the delivery month but never
+    drops a contract that is still tradeable.  The full-precision expiry gate requires
+    CanonicalFuturesContract.expiry_date from the IS GCS parquet (Phase 4.3
+    precision upgrade — out of scope for the UAC pure-function tier).
+
+    Parameters
+    ----------
+    instrument_id:
+        Raw CME/ICE futures symbol (e.g. ``ESH26``, ``CLZ6``, ``BRN.H26``).
+    as_of_date_str:
+        ISO date string (``YYYY-MM-DD``).
+
+    Returns
+    -------
+    bool
+        ``True``  — contract is active (expiry month >= as_of_date month).
+        ``True``  — symbol cannot be parsed (fail-open: don't suppress unknowns).
+        ``False`` — contract is past its expiry month (expiry month < as_of_date month).
+
+    Plan: tradfi_canonical_futures_contract_hard_required_fields_2026_05_13.md
+    Phase 4.3 — mtds-tradfi-staleness per-contract gate.
+    """
+    m = _FUTURES_SYMBOL_RE.match(instrument_id.upper())
+    if m is None:
+        # Symbol doesn't match CME format — fail-open (don't suppress).
+        return True
+    year_suffix = int(m.group("year"))
+    # Expand 2-digit year: 00-49 → 2000-2049, 50-99 → 1950-1999 (2030-safe).
+    contract_year = (2000 + year_suffix) if year_suffix < 50 else (1900 + year_suffix)
+    month_code = m.group("month")
+    contract_month = _FUTURES_MONTH_CODE.get(month_code)
+    if contract_month is None:
+        return True  # Unknown month code — fail-open.
+    try:
+        as_of = _date.fromisoformat(as_of_date_str)
+    except ValueError:
+        return True  # Unparseable date — fail-open.
+    # Contract is active if the as_of_date is not past the last day of contract month.
+    # last day of contract month = first day of next month - 1 day
+    if contract_month == 12:
+        last_day = _date(contract_year + 1, 1, 1) - _timedelta(days=1)
+    else:
+        last_day = _date(contract_year, contract_month + 1, 1) - _timedelta(days=1)
+    return as_of <= last_day
 
 
 # Per-(venue, data_type) coverage-window registry — the more granular
