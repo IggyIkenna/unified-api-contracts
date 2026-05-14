@@ -210,6 +210,42 @@ class EmptyConfirmedReason(StrEnum):
     ``status.short == "CANC"``. Instruments-service emits this so consumers can distinguish cancelled fixtures from
     data-fetch failures. Pair with ``EXPECTED_FIXTURE_POSTPONED``."""
 
+    EXPECTED_NO_FIXTURE = "EXPECTED_NO_FIXTURE"
+    """No fixture scheduled for this ``(league_id, day)`` per the canonical api_football fixtures manifest.
+
+    Fixture-pinned sources (e.g. ``soccer_football_info`` SFI_PROGRESSIVE_STATS,
+    ``footystats`` MATCHES/ODDS/PREDICTIONS, ``open_meteo`` WEATHER) cannot emit data without a
+    fixture. Without a scheduled fixture for the (league, day), an empty row is the EXPECTED state,
+    not a fetch failure.
+
+    Used by:
+    - UTL ``legacy_reason_classifier._classify_sports`` for legacy manifest rows missing per-source
+      fixture-pin classification (returns this reason when ``is_fixture_scheduled(league_id, day)``
+      is False for SFI/footystats/open_meteo sources).
+    - instruments-service WEATHER + SFI + footystats write-paths (preventatively skip fetch when no
+      fixture exists; `record_empty(reason=EXPECTED_NO_FIXTURE)` so future runs don't retry).
+
+    Plan: ``sports_classifier_sfi_footystats_fixture_pin_2026_05_13.md`` +
+    ``sports_classifier_weather_no_fixture_2026_05_13.md`` (slot 4 ownership 2026-05-13)."""
+
+    LEGACY_MIGRATION_MISSING_EXPIRY = "LEGACY_MIGRATION_MISSING_EXPIRY"
+    """Tradfi futures/options row from a pre-2026-05-13 historical capture that lacks a
+    populated ``expiration`` / ``expiry_date`` field, AND cannot be back-filled from
+    Databento metadata at migration time (instrument symbol unresolvable to a chain).
+
+    Used by the one-shot manifest migration script per
+    ``plans/active/tradfi_canonical_futures_contract_hard_required_fields_2026_05_13.md``
+    Phase 3 when walking legacy ``options_chain`` / ``futures_contract`` manifest rows.
+    The migration script attempts a Databento RDC (reference-data) lookup first;
+    on miss, flips the row to ``empty_confirmed`` with this reason rather than
+    silent re-fetching or write-anyway-with-None (the schema flip in UAC@dd407ae
+    rejects None expiration at the pydantic boundary).
+
+    Distinct from ``EXPECTED_INSTRUMENT_NOT_LISTED`` (instrument never existed at
+    the date) and ``EXPECTED_INSTRUMENT_DELISTED`` (instrument removed AFTER the date):
+    this is "data was captured but the historical write-path didn't populate expiration."
+    """
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
