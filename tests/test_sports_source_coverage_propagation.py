@@ -9,7 +9,7 @@ Plan: data_status_comprehensive_test_coverage_2026_05_07.md § C sports-half.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date
 
 import pytest
 
@@ -59,7 +59,9 @@ class TestClipDatesToSourceCoverage:
         # soccer_football_info source-wide: 2019-01-01
         # SFI_PROGRESSIVE_STATS override: 2020-01-01
         start, end = clip_dates_to_source_coverage(
-            "soccer_football_info", "2019-06-01", "2020-06-01",
+            "soccer_football_info",
+            "2019-06-01",
+            "2020-06-01",
             data_type="SFI_PROGRESSIVE_STATS",
         )
         assert start == "2020-01-01"
@@ -70,7 +72,9 @@ class TestClipDatesToSourceCoverage:
         """data_type with no override uses the source-wide coverage start."""
         # soccer_football_info: 2019-01-01 (no override for MATCHES)
         start, end = clip_dates_to_source_coverage(
-            "soccer_football_info", "2018-01-01", "2019-06-01",
+            "soccer_football_info",
+            "2018-01-01",
+            "2019-06-01",
             data_type="MATCHES",
         )
         assert start == "2019-01-01"
@@ -80,7 +84,9 @@ class TestClipDatesToSourceCoverage:
     def test_api_football_fixture_events_override(self) -> None:
         """api_football FIXTURE_EVENTS override is 2020-06-06 (later than source-wide 2018-01-01)."""
         start, end = clip_dates_to_source_coverage(
-            "api_football", "2019-01-01", "2021-01-01",
+            "api_football",
+            "2019-01-01",
+            "2021-01-01",
             data_type="FIXTURE_EVENTS",
         )
         assert start == "2020-06-06"
@@ -90,7 +96,9 @@ class TestClipDatesToSourceCoverage:
     def test_api_football_fixture_lineups_override(self) -> None:
         """api_football FIXTURE_LINEUPS override is 2020-06-06."""
         start, end = clip_dates_to_source_coverage(
-            "api_football", "2019-01-01", "2021-01-01",
+            "api_football",
+            "2019-01-01",
+            "2021-01-01",
             data_type="FIXTURE_LINEUPS",
         )
         assert start == "2020-06-06"
@@ -100,7 +108,9 @@ class TestClipDatesToSourceCoverage:
     def test_api_football_fixture_stats_override(self) -> None:
         """api_football FIXTURE_STATS override is 2020-06-06."""
         start, end = clip_dates_to_source_coverage(
-            "api_football", "2019-01-01", "2021-01-01",
+            "api_football",
+            "2019-01-01",
+            "2021-01-01",
             data_type="FIXTURE_STATS",
         )
         assert start == "2020-06-06"
@@ -109,7 +119,9 @@ class TestClipDatesToSourceCoverage:
     def test_api_football_player_stats_override(self) -> None:
         """api_football PLAYER_STATS override is 2020-06-06."""
         start, end = clip_dates_to_source_coverage(
-            "api_football", "2019-01-01", "2021-01-01",
+            "api_football",
+            "2019-01-01",
+            "2021-01-01",
             data_type="PLAYER_STATS",
         )
         assert start == "2020-06-06"
@@ -118,7 +130,9 @@ class TestClipDatesToSourceCoverage:
     def test_api_football_no_override_uses_source_wide(self) -> None:
         """api_football without data_type override uses source-wide 2018-01-01."""
         start, end = clip_dates_to_source_coverage(
-            "api_football", "2017-01-01", "2018-06-01",
+            "api_football",
+            "2017-01-01",
+            "2018-06-01",
         )
         assert start == "2018-01-01"
         assert end == "2018-06-01"
@@ -126,9 +140,7 @@ class TestClipDatesToSourceCoverage:
     @pytest.mark.unit
     def test_range_starting_exactly_at_coverage_is_not_clipped(self) -> None:
         """Range starting exactly at coverage start → no clip needed."""
-        start, end = clip_dates_to_source_coverage(
-            "footystats", "2019-01-01", "2019-12-31"
-        )
+        start, end = clip_dates_to_source_coverage("footystats", "2019-01-01", "2019-12-31")
         assert start == "2019-01-01"
         assert end == "2019-12-31"
 
@@ -180,8 +192,7 @@ class TestSourceCoverageStartCompleteness:
         today = date.today()
         for source, coverage_date in SOURCE_COVERAGE_START.items():
             assert min_date <= coverage_date <= today, (
-                f"{source!r} has unreasonable coverage start {coverage_date} "
-                f"(must be in [{min_date}, {today}])"
+                f"{source!r} has unreasonable coverage start {coverage_date} (must be in [{min_date}, {today}])"
             )
 
     @pytest.mark.unit
