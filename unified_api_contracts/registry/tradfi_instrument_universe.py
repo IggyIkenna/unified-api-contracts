@@ -107,7 +107,6 @@ _CME_COMMODITY_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("RB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GASOLINE", "commodity", "RB"),
     DatabentoInstrumentDef("SI.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SILVER", "commodity", "SI"),
     DatabentoInstrumentDef("HG.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COPPER", "commodity", "HG"),
-    DatabentoInstrumentDef("CT.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COTTON", "commodity", "CT"),
     DatabentoInstrumentDef("ZS.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEANS", "commodity", "ZS"),
     DatabentoInstrumentDef("ZC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CORN", "commodity", "ZC"),
     DatabentoInstrumentDef("ZW.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "WHEAT", "commodity", "ZW"),
@@ -218,11 +217,26 @@ _CME_ES_OPTIONS: list[DatabentoInstrumentDef] = [
 ]
 
 # ---------------------------------------------------------------------------
-# ICE futures
+# ICE futures — Europe (IFEU.IMPACT)
 # ---------------------------------------------------------------------------
 _ICE_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("BRN.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "BRENT", "commodity", "BRN"),
     DatabentoInstrumentDef("G.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "GASOIL", "commodity", "G"),
+]
+
+# ---------------------------------------------------------------------------
+# ICE futures — US Softs (IFUS.IMPACT)
+# CT was previously (incorrectly) listed under _CME_COMMODITY_FUTURES with
+# GLBX.MDP3. Cotton No. 2 has traded exclusively on ICE Futures US since ICE
+# acquired NYBOT in 2007; CME/GLBX.MDP3 does not carry it.
+# ---------------------------------------------------------------------------
+_ICE_US_FUTURES: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("CT.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "COTTON", "commodity", "CT"),
+    DatabentoInstrumentDef("CC.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "COCOA", "commodity", "CC"),
+    DatabentoInstrumentDef("KC.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "COFFEE", "commodity", "KC"),
+    DatabentoInstrumentDef("SB.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "SUGAR", "commodity", "SB"),
+    DatabentoInstrumentDef("OJ.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "OJ", "commodity", "OJ"),
+    DatabentoInstrumentDef("DX.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "DOLLARINDEX", "fx", "DX"),
 ]
 
 # ---------------------------------------------------------------------------
@@ -276,6 +290,7 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CME_ES_OPTIONS,
     *_CME_EVENT_CONTRACTS,
     *_ICE_FUTURES,
+    *_ICE_US_FUTURES,
     *_CBOE_INSTRUMENTS,
     *_BTC_SPOT_ETFS,
     *_ETH_SPOT_ETFS,
@@ -354,9 +369,15 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "HE": "LEANHOGS",
     # VIX
     "VX": "VIX",
-    # ICE energy
+    # ICE energy (Europe)
     "BRN": "BRENT",
     "G": "GASOIL",
+    # ICE US softs
+    "CC": "COCOA",
+    "KC": "COFFEE",
+    "SB": "SUGAR",
+    "OJ": "OJ",
+    "DX": "DOLLARINDEX",
     # Crypto
     "BTC": "BTC",
     "ETH": "ETH",

@@ -234,6 +234,17 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
     # Legacy presence: tradfi_symbology.py TRADFI_INSTRUMENTS+TRADFI_DATA_BINDINGS;
     # NOT in tradfi_instrument_universe.py (omission, not ambiguity).
     "T": RootMetadata("T", CATEGORY_ICE_FUTURES, "WTI", "ICE", DATASET_ICE_EUROPE, "commodity"),
+    # ── ICE Futures US (Softs) ────────────────────────────────────────────────
+    # All 6 trade on ICE Futures US (IFUS.IMPACT). Disambiguation: CT is ICE, NOT
+    # CME — tradfi_instrument_universe.py had a data-entry error (CME/GLBX.MDP3).
+    # DX (US Dollar Index) is classified as fx despite trading as a futures contract
+    # because its underlying is a currency basket, not a commodity.
+    "CT": RootMetadata("CT", CATEGORY_ICE_FUTURES, "COTTON", "ICE", DATASET_ICE_US, "commodity"),
+    "CC": RootMetadata("CC", CATEGORY_ICE_FUTURES, "COCOA", "ICE", DATASET_ICE_US, "commodity"),
+    "KC": RootMetadata("KC", CATEGORY_ICE_FUTURES, "COFFEE", "ICE", DATASET_ICE_US, "commodity"),
+    "SB": RootMetadata("SB", CATEGORY_ICE_FUTURES, "SUGAR", "ICE", DATASET_ICE_US, "commodity"),
+    "OJ": RootMetadata("OJ", CATEGORY_ICE_FUTURES, "OJ", "ICE", DATASET_ICE_US, "commodity"),
+    "DX": RootMetadata("DX", CATEGORY_ICE_FUTURES, "DOLLARINDEX", "ICE", DATASET_ICE_US, "fx"),
     # ── CBOE / CFE Volatility ──────────────────────────────────────────────
     # VX: VIX futures on CBOE Futures Exchange (CFE). XCBF.PITCH supports only
     # raw_symbol stype_in (explicit contract codes like VXH6); parent symbology
