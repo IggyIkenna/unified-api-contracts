@@ -159,6 +159,9 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "liquidations"): ["onchain_subgraph"],
     ("defi", "lst_rates"): ["onchain_subgraph"],
     ("defi", "mev_events"): ["onchain_rpc"],
+    # native_staking_rates: Solana RPC (getInflationRate/getEpochInfo) is primary;
+    # helius_rpc for per-validator APY breakdown (requires Helius API key).
+    ("defi", "native_staking_rates"): ["solana_rpc", "helius_rpc"],
     # oracle_prices dispatches Pyth Hermes (Solana feeds) as primary and
     # Chainlink (EVM aggregator rounds) as secondary; per-row pipeline_mode
     # is resolved at callsite by the MTDS oracle_prices_handler resolver.
@@ -268,6 +271,9 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "hyperliquid_rest": 1_000,  # 1s: HL REST API polling cadence
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
+    # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
+    "solana_rpc": 60_000,  # 1 min: Solana RPC getInflationRate/getEpochInfo polling
+    "helius_rpc": 60_000,  # 1 min: Helius APY aggregation endpoint polling
     # Sports batch-data provider (deferred multi-source merge candidate).
     "footystats": 3_600_000,  # 1h: Footystats batch publication cadence
     # Historical preload archive — daily publication delay.

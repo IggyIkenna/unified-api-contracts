@@ -71,6 +71,7 @@ class DataType(StrEnum):
     MEV_EVENTS = "mev_events"
     GOVERNANCE_EVENTS = "governance_events"
     EIGENLAYER_REWARDS = "eigenlayer_rewards"
+    NATIVE_STAKING_RATES = "native_staking_rates"
 
 
 __all__ = ["DataType", "MarketState"]
