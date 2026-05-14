@@ -844,8 +844,7 @@ def test_phase_1e_threshold_keys_present_in_registry() -> None:
         rules = [r for r in LIVE_ALERT_RULES if r.code.value == code_name]
         assert rules, f"No rule for {code_name}"
         assert rules[0].threshold_key == expected_key, (
-            f"{code_name}: expected threshold_key={expected_key!r},"
-            f" got {rules[0].threshold_key!r}"
+            f"{code_name}: expected threshold_key={expected_key!r}, got {rules[0].threshold_key!r}"
         )
 
 

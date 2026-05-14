@@ -25,10 +25,10 @@ from typing import Final
 from unified_api_contracts.internal.execution import BatchExecutionMode
 
 __all__ = [
-    "BatchExecutionMode",
+    "BATCH_FILL_ALGO_TYPES",
     "BENCHMARK_FILL_ALGO_TYPE",
     "NORMAL_ALGO_TYPE",
-    "BATCH_FILL_ALGO_TYPES",
+    "BatchExecutionMode",
 ]
 
 # ---------------------------------------------------------------------------
@@ -51,9 +51,7 @@ When ``exec_algo_type`` equals this value (or is absent), node_builder uses regu
 Nautilus market orders with no exec-algorithm override.
 """
 
-BATCH_FILL_ALGO_TYPES: Final[frozenset[str]] = frozenset(
-    {BENCHMARK_FILL_ALGO_TYPE, NORMAL_ALGO_TYPE}
-)
+BATCH_FILL_ALGO_TYPES: Final[frozenset[str]] = frozenset({BENCHMARK_FILL_ALGO_TYPE, NORMAL_ALGO_TYPE})
 """Set of algo-type strings that bypass the Nautilus exec-algorithm registry.
 
 Usage in node_builder::
