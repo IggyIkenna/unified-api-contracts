@@ -136,6 +136,7 @@ from .provider_league_ids import get_sports_entity_start_date as get_sports_enti
 from .refdata_cadence import (
     TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS as TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS,
 )
+from .refdata_cadence import is_player_values_update_day as is_player_values_update_day
 from .round_names import ROUND_NAMES as ROUND_NAMES
 from .round_names import ROUND_PREFIXES as ROUND_PREFIXES
 from .round_names import RoundMatch as RoundMatch

@@ -24,6 +24,7 @@ reads ``TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS`` to decide per-day.
 
 from __future__ import annotations
 
+from datetime import date
 from typing import Final
 
 TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS: Final[frozenset[int]] = frozenset({1, 2})
@@ -38,4 +39,14 @@ If empirical sampling shows a different dominant weekday, update this frozenset
 and redeploy — no structural change needed.
 """
 
-__all__ = ["TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS"]
+
+def is_player_values_update_day(day: date) -> bool:
+    """Return True iff *day* falls on a known Transfermarkt PLAYER_VALUES update weekday.
+
+    Non-update days produce expected-empty PLAYER_VALUES manifests.  Callers
+    should emit ``EXPECTED_REFDATA_CADENCE_CHANGE`` when this returns False.
+    """
+    return day.weekday() in TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS
+
+
+__all__ = ["TRANSFERMARKT_PLAYER_VALUES_UPDATE_WEEKDAYS", "is_player_values_update_day"]
