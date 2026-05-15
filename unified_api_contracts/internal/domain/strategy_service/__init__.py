@@ -1,5 +1,11 @@
 """Strategy service domain schemas — cross-service data contracts."""
 
+from unified_api_contracts.internal.domain.strategy_service.candidate_manifest import (
+    GroupBMetrics,
+    MinimalCandidateManifest,
+    ModelRef,
+    make_manifest_id,
+)
 from unified_api_contracts.internal.domain.strategy_service.catalogue import (
     STRATEGY_INSTANCE_CATALOGUE,
     StrategyInstance,
@@ -95,6 +101,9 @@ __all__ = [
     "ClientStrategyOverride",
     "ExecutionMode",
     "FuturesRollInstruction",
+    "GroupBMetrics",
+    "MinimalCandidateManifest",
+    "ModelRef",
     "OptionsComboInstruction",
     "PaperTradeComparison",
     "PhaseTransition",
@@ -136,6 +145,7 @@ __all__ = [
     "get_venue_set_variant",
     "get_venue_set_variants",
     "is_valid_maturity_transition",
+    "make_manifest_id",
     "maturity_phase_rank",
     "validate_mode_for_category",
 ]
