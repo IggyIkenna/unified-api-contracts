@@ -205,7 +205,10 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # Real-time current-state + trading-decision inputs → STRICT_FAIL.
     # Authoritative risk/position truth → BLOCK_CRITICAL.
     # Rolling-window aggregates → PARTIAL_OK.
-    ("features-service", "lending_rates"): ServiceEmissionPolicy.STRICT_FAIL,
+    # lending_rates: PARTIAL_OK — lending protocol data is inherently partial;
+    # different markets populate different APY fields. write_gate nan_threshold=0.95
+    # enforces quality; strategy tracer does its own None-guard on missing values.
+    ("features-service", "lending_rates"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
