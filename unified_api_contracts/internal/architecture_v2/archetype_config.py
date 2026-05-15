@@ -88,6 +88,11 @@ class ArchetypeConfig:
             would breach :attr:`position_cap_usd` by this margin. Range
             ``(0, 1.0]``. Tighter for leveraged strategies (smaller breach
             tolerance = earlier kill before liquidation cascade).
+        perp_venue: For paired archetypes whose hedge leg is a CeFi perp
+            (e.g. ``CARRY_RECURSIVE_BORROW_PERP_HEDGED``), the canonical
+            venue name where the perp short executes. Must be a member of
+            :func:`unified_api_contracts.registry.get_perp_venues` if
+            specified. ``None`` for archetypes without a perp leg.
     """
 
     collateral_currency: str | None = None
@@ -95,6 +100,7 @@ class ArchetypeConfig:
     position_cap_usd: float | None = None
     kill_switch_drawdown_pct: float | None = None
     kill_switch_position_breach_pct: float | None = None
+    perp_venue: str | None = None
 
     def __post_init__(self) -> None:
         if self.position_cap_usd is not None and self.position_cap_usd <= 0:
@@ -114,6 +120,15 @@ class ArchetypeConfig:
             raise ValueError(
                 f"hedge_ratio must be >= 0 if specified (negative inverts direction); got {self.hedge_ratio}",
             )
+        if self.perp_venue is not None:
+            from unified_api_contracts.registry import get_perp_venues
+
+            valid_perp_venues = get_perp_venues()
+            if self.perp_venue not in valid_perp_venues:
+                raise ValueError(
+                    f"perp_venue {self.perp_venue!r} not in get_perp_venues(); "
+                    f"valid: {sorted(valid_perp_venues)}",
+                )
 
 
 # ---------------------------------------------------------------------------
@@ -206,6 +221,10 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         kill_switch_drawdown_pct=0.045,
         # Breach gate matches Family 1 — same HF-buffer-driven safety mechanism.
         kill_switch_position_breach_pct=0.03,
+        # May-23 default perp hedge venue. Bybit alternative available via cell-id
+        # override per defi_recursive_borrow_archetypes_2026_05_10.md variant-naming
+        # decision (single archetype + perp_venue config field, no per-venue tarballs).
+        perp_venue="HYPERLIQUID",
     ),
     StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS: ArchetypeConfig(
         collateral_currency="USDT",

@@ -210,3 +210,40 @@ def test_archetype_kill_switch_thresholds_recursive_tightened() -> None:
 def test_archetype_kill_switch_thresholds_unseeded_raises() -> None:
     with pytest.raises(KeyError):
         archetype_kill_switch_thresholds(StrategyArchetype.MARKET_MAKING_PASSIVE_SPREAD)
+
+
+# ---------------------------------------------------------------------------
+# perp_venue config field — defi_recursive_borrow Phase 6 variant-naming P0
+# ---------------------------------------------------------------------------
+
+
+def test_archetype_config_default_perp_venue_is_none() -> None:
+    cfg = ArchetypeConfig()
+    assert cfg.perp_venue is None
+
+
+def test_archetype_config_perp_venue_valid_accepted() -> None:
+    cfg = ArchetypeConfig(perp_venue="HYPERLIQUID")
+    assert cfg.perp_venue == "HYPERLIQUID"
+
+
+def test_archetype_config_perp_venue_bybit_futures_accepted() -> None:
+    cfg = ArchetypeConfig(perp_venue="BYBIT-FUTURES")
+    assert cfg.perp_venue == "BYBIT-FUTURES"
+
+
+def test_archetype_config_perp_venue_invalid_rejected() -> None:
+    with pytest.raises(ValueError, match="not in get_perp_venues"):
+        ArchetypeConfig(perp_venue="NOT_A_VENUE")
+
+
+def test_archetype_config_perp_venue_spot_only_rejected() -> None:
+    """Spot-only venues are not perp-trade-capable."""
+    with pytest.raises(ValueError, match="not in get_perp_venues"):
+        ArchetypeConfig(perp_venue="BINANCE-SPOT")
+
+
+def test_seed_carry_recursive_borrow_perp_hedged_has_hyperliquid() -> None:
+    """Per defi_recursive_borrow variant-naming P0 — single archetype + perp_venue config."""
+    cfg = ARCHETYPE_CONFIG_SEED[StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED]
+    assert cfg.perp_venue == "HYPERLIQUID"
