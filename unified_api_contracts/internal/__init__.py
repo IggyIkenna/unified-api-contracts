@@ -628,6 +628,7 @@ from unified_api_contracts.internal.execution import (
     ManualInstruction,
     ManualInstructionAuditLog,
     ManualInstructionPrecheckResponse,
+    PositionHealthSnapshot,
     SettlementType,
     WalletSpendingPreCheckResult,
 )
@@ -1448,6 +1449,7 @@ __all__ = [
     "PositionData",
     "PositionQuantityProtocol",
     "PositionSide",
+    "PositionHealthSnapshot",
     "PositionSnapshot",
     "PositionSnapshotEvent",
     "PositionSummary",

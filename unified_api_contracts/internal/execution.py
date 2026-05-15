@@ -194,6 +194,42 @@ class MLTrainingControlResponse(BaseModel):
     detail: str = ""
 
 
+class PositionHealthSnapshot(BaseModel):
+    """Current position-health state for a single wallet, as queried by PBM
+    ``GET /positions/health?wallet_id=X``.
+
+    Consumed by execution-service ``run_wallet_preflight_checks`` Layer-4
+    (position-health gate) to compute ``projected_ltv`` / ``projected_margin_ratio``
+    before forwarding a manual or automated instruction.
+
+    All four numeric fields are optional because a wallet may have only a lending
+    leg (no perp), only a perp leg (no lending), or be freshly provisioned with no
+    open positions yet.
+    """
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    wallet_id: str
+    snapshot_at: datetime
+
+    ltv: Decimal | None = None
+    """Current loan-to-value ratio ``debt / collateral`` in ``[0, 1]``.
+    Populated for Aave / Compound lending positions. ``None`` for non-lending
+    wallets."""
+
+    margin_ratio: Decimal | None = None
+    """Current margin ratio for perp positions (maintenance margin / account value).
+    Populated for CeFi perp-hedged legs. ``None`` for lending-only wallets."""
+
+    liquidation_threshold: Decimal | None = None
+    """Protocol-defined LTV at which the lending position is liquidated
+    (e.g. Aave WETH collateral ETH mainnet = 0.825). ``None`` if no lending leg."""
+
+    maintenance_margin: Decimal | None = None
+    """Minimum margin ratio floor before venue liquidation for perp positions.
+    ``None`` if no perp leg."""
+
+
 class WalletSpendingPreCheckResult(BaseModel):
     """Outcome of pre-trade wallet-tier kill-switch + SpendingCaps validation.
 
@@ -345,6 +381,7 @@ __all__ = [
     "ManualInstructionAuditLog",
     "ManualInstructionPrecheckResponse",
     "ManualMLTrainingAction",
+    "PositionHealthSnapshot",
     "SettlementType",
     "WalletSpendingPreCheckResult",
 ]
