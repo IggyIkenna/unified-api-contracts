@@ -33,6 +33,12 @@ LST_TOKEN_GENESIS: dict[str, str] = {
     # day -> convertToAssets(1e18) returned empty bytes; first non-empty read
     # is 2024-02-01 (rate = 1.00000000).
     "pufETH": "2024-02-01",
+    # Renzo ezETH (Liquid Restaking Token, EigenLayer via RestakeManager).
+    # Rate = RestakeManager.calculateTVLs()[2] / ezETH.totalSupply() — requires
+    # a two-contract multi-call; not supported by MTDS single-call _query_rate.
+    # Exchange-rate collection is deferred until a multi-call path is wired;
+    # this entry ensures coverage tracking clips pre-launch dates correctly.
+    "ezETH": "2024-01-24",
     # SOL-family — Solana mainnet
     "mSOL": "2021-08-02",  # Marinade Finance launch
     "jitoSOL": "2022-11-01",  # Jito stake pool launch
@@ -45,6 +51,11 @@ LST_TOKEN_GENESIS: dict[str, str] = {
     # inflate the missing-shards denominator (the worse direction).
     # Filed by Tab 14 audit as missing from UAC SSOT 2026-05-08.
     "bSOL": "2022-11-24",
+    # Sanctum Infinity (INF) — Solana LST aggregator pool launched ~2024-01-25.
+    # Uses standard SPL stake-pool layout (same Tier-1 decoder as jitoSOL/bSOL).
+    # Exact stake-pool account address requires on-chain verification against
+    # INF mint 5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm before enabling.
+    "sanctumSOL": "2024-01-25",
 }
 
 
@@ -65,9 +76,11 @@ LST_VENUE_TO_TOKENS: dict[str, tuple[str, ...]] = {
     "ANKR": ("ankrETH",),
     "ETHERFI": ("weETH",),
     "PUFFER": ("pufETH",),
+    "RENZO": ("ezETH",),
     "MARINADE": ("mSOL",),
     "JITO": ("jitoSOL",),
     "BLAZESTAKE": ("bSOL",),
+    "SANCTUM": ("sanctumSOL",),
 }
 
 
