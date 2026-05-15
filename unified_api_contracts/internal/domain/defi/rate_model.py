@@ -77,24 +77,31 @@ class AaveV3RateModelDefaults(TypedDict):
 # ``reserve_factor`` to the parquet). When a captured value exists for a
 # (timestamp, reserve) pair, prefer it over this default snapshot.
 AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET: dict[str, AaveV3RateModelDefaults] = {
+    # USDC — verified from DefaultReserveInterestRateStrategyV2.getInterestRateData(USDC)
+    # at Ethereum mainnet block 23364831 via _fetch_irm_params_live in Phase 3C harness.
+    # V2 ABI returns (optimalUsageRatio, baseVariableBorrowRate, variableRateSlope1, variableRateSlope2)
+    # all as uint256 in RAY (1e27 = 100%). reserve_factor from configuration.data bits 64-79 in bps.
     "USDC": {
-        "optimal_utilization": Decimal("0.90"),
-        "slope1": Decimal("0.04"),
-        "slope2": Decimal("0.60"),
+        "optimal_utilization": Decimal("0.92"),
+        "slope1": Decimal("0.065"),
+        "slope2": Decimal("0.20"),
         "base_rate": Decimal("0.00"),
         "reserve_factor": Decimal("0.10"),
     },
+    # USDT — V2 strategy per-asset params (same singleton contract as USDC).
+    # slope2=0.14 per Phase 3C v4 investigation (per-asset cache confirmed distinct from USDC).
     "USDT": {
-        "optimal_utilization": Decimal("0.90"),
-        "slope1": Decimal("0.04"),
-        "slope2": Decimal("0.60"),
+        "optimal_utilization": Decimal("0.92"),
+        "slope1": Decimal("0.065"),
+        "slope2": Decimal("0.14"),
         "base_rate": Decimal("0.00"),
         "reserve_factor": Decimal("0.10"),
     },
+    # DAI — V2 or V1 strategy; slope2=0.35 per Phase 3C v4 investigation (cache pollution fixed).
     "DAI": {
-        "optimal_utilization": Decimal("0.90"),
-        "slope1": Decimal("0.04"),
-        "slope2": Decimal("0.75"),
+        "optimal_utilization": Decimal("0.92"),
+        "slope1": Decimal("0.055"),
+        "slope2": Decimal("0.35"),
         "base_rate": Decimal("0.00"),
         "reserve_factor": Decimal("0.10"),
     },
@@ -112,19 +119,33 @@ AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET: dict[str, AaveV3RateModelDefaults] = {
         "base_rate": Decimal("0.00"),
         "reserve_factor": Decimal("0.15"),
     },
-    "wstETH": {
-        "optimal_utilization": Decimal("0.80"),
-        "slope1": Decimal("0.038"),
-        "slope2": Decimal("0.80"),
+    "WBTC": {
+        "optimal_utilization": Decimal("0.45"),
+        "slope1": Decimal("0.04"),
+        "slope2": Decimal("3.00"),
         "base_rate": Decimal("0.00"),
-        "reserve_factor": Decimal("0.10"),
+        "reserve_factor": Decimal("0.20"),
+    },
+    "wstETH": {
+        "optimal_utilization": Decimal("0.45"),
+        "slope1": Decimal("0.07"),
+        "slope2": Decimal("3.00"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.15"),
     },
     "weETH": {
-        "optimal_utilization": Decimal("0.80"),
-        "slope1": Decimal("0.038"),
-        "slope2": Decimal("0.80"),
+        "optimal_utilization": Decimal("0.35"),
+        "slope1": Decimal("0.07"),
+        "slope2": Decimal("3.00"),
         "base_rate": Decimal("0.00"),
-        "reserve_factor": Decimal("0.10"),
+        "reserve_factor": Decimal("0.15"),
+    },
+    "rETH": {
+        "optimal_utilization": Decimal("0.45"),
+        "slope1": Decimal("0.07"),
+        "slope2": Decimal("3.00"),
+        "base_rate": Decimal("0.00"),
+        "reserve_factor": Decimal("0.15"),
     },
 }
 

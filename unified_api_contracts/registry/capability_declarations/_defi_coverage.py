@@ -29,6 +29,14 @@ DEFI_INSTRUMENTS_NOT_YET_COLLECTED: frozenset[str] = frozenset(
         # historical parquets for this venue — until first scheduled run lands
         # on bucket, data-status should NOT flag historical days as missing.
         "SPARK-ETHEREUM",
+        # SANCTUM: instruments-service adapter not yet created (Phase 2 of
+        # solana_lst_native_staking_adapters_2026_05_14.md). Remove when
+        # Phase 2 ships + first backfill completes.
+        "SANCTUM-SOLANA",
+        # SOLBLAZE: execution-service connector exists but instruments-service
+        # reference data adapter + MTDS wiring not yet done (Phase 3 of plan).
+        # Remove when Phase 3 ships + first backfill completes.
+        "SOLBLAZE-SOLANA",
     }
 )
 

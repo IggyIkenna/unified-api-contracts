@@ -694,6 +694,31 @@ DEFI_STAKING_YIELD_SNAPSHOTS = SchemaContract(
     required_row_count_min=1,
 )
 
+# Solana native-staking per-epoch APR data. Produced by the MTDS
+# native_staking_handler. ``symbol`` is "SOL" (network-aggregate row) or a
+# validator moniker. ``validator_vote_account`` is the base58 vote pubkey
+# (nullable for network-aggregate rows). Sources: Solana RPC getInflationRate +
+# getEpochInfo; Helius APY endpoint for per-validator breakdown.
+DEFI_STAKING_NATIVE_STAKING_RATES = SchemaContract(
+    asset_group="defi",
+    instrument_type="staking",
+    data_type="native_staking_rates",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="epoch", dtype="int64", nullable=False),
+        ColumnSpec(name="validator_vote_account", dtype="string", nullable=True),
+        ColumnSpec(name="commission_pct", dtype="float64", nullable=True),
+        ColumnSpec(name="base_apy", dtype="float64", nullable=False),
+        ColumnSpec(name="mev_apy", dtype="float64", nullable=True),
+        ColumnSpec(name="total_apy", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
 # ERC-4626 vault share-price snapshots — produced by the MTDS
 # vault_share_price_handler. ``symbol`` is the vault ticker (yvUSDC, sUSDe,
 # sFRAX, ...). ``share_price`` is the result of
@@ -754,6 +779,7 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
     ("defi", "staking", "eigenlayer_rewards"): DEFI_STAKING_EIGENLAYER_REWARDS,
     ("defi", "staking", "yield_snapshots"): DEFI_STAKING_YIELD_SNAPSHOTS,
+    ("defi", "staking", "native_staking_rates"): DEFI_STAKING_NATIVE_STAKING_RATES,
     ("defi", "yield_bearing", "vault_share_price"): DEFI_YIELD_BEARING_VAULT_SHARE_PRICE,
     # Sports + Prediction registered via _sports_prediction_contracts side-effect import (see end of file).
     # DeFi phase-2 contracts registered via _defi_v2_contracts side-effect import (see end of file).
@@ -1048,6 +1074,7 @@ __all__ = [
     "DEFI_SPOT_ASSET_ORACLE_PRICES",
     "DEFI_SPOT_ASSET_TOKEN_TRANSFERS",
     "DEFI_STAKING_EIGENLAYER_REWARDS",
+    "DEFI_STAKING_NATIVE_STAKING_RATES",
     "DEFI_STAKING_STAKING_YIELDS",
     "DEFI_STAKING_YIELD_SNAPSHOTS",
     "DEFI_YIELD_BEARING_YIELD_SNAPSHOTS",
