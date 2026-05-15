@@ -492,6 +492,18 @@ VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_BOOKMAKER_WEB} for v in SP
 VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_DFS} for v in SPORTS_DFS_VENUES})
 VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_DATA} for v in SPORTS_DATA_VENUES})
 
+
+def get_perp_venues() -> frozenset[str]:
+    """Return the canonical set of venues with PERP_TRADE capability.
+
+    Filters ``VENUE_CAPABILITIES`` by ``VenueCapability.PERP_TRADE``. Used by
+    strategy-service / execution-service / risk-and-exposure-service to validate
+    ``perp_venue`` config fields (e.g. ``CARRY_RECURSIVE_BORROW_PERP_HEDGED``)
+    without introducing a per-archetype ``PerpVenue`` StrEnum.
+    """
+    return frozenset(venue for venue, caps in VENUE_CAPABILITIES.items() if VenueCapability.PERP_TRADE in caps)
+
+
 # ---------------------------------------------------------------------------
 # Venue Order-Type Sub-Capabilities
 # ---------------------------------------------------------------------------

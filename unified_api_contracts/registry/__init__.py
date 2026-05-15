@@ -452,6 +452,7 @@ from .venue_constants import (
     VenueCapability,
     VenueFeeModel,
     VenueOrderCapability,
+    get_perp_venues,
 )
 from .venue_context import (
     VenueContext,
@@ -795,6 +796,7 @@ __all__ = [
     "get_max_move",
     "get_morpho_reserve_params",
     "get_mtds_operations_for_protocol",
+    "get_perp_venues",
     "get_primary_axis",
     "get_primary_binding",
     "get_protocol_capability",
