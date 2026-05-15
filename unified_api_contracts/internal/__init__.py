@@ -532,8 +532,12 @@ from unified_api_contracts.internal.domain.sports.risk import (
 )
 from unified_api_contracts.internal.domain.strategy_service import (
     ClientStrategyOverride,
+    GroupBMetrics,
+    MinimalCandidateManifest,
+    ModelRef,
     RewardAttributionRow,
     StrategyModeParams,
+    make_manifest_id,
 )
 from unified_api_contracts.internal.domain.strategy_service.domain_events import (
     ExposureSnapshot,
@@ -1110,6 +1114,10 @@ __all__ = [
     "ClientRiskTolerance",
     "ClientServiceOverride",
     "ClientStrategyOverride",
+    "GroupBMetrics",
+    "MinimalCandidateManifest",
+    "ModelRef",
+    "make_manifest_id",
     "ClientSubscription",
     "CloudProvider",
     "CoachRecord",
