@@ -131,6 +131,25 @@ class SpendingCaps:
     Protocol key matches UAC ``transfer_types.VENUE_WALLET_CAPABILITIES`` venue
     name. Missing protocol = inherit per_tx/per_hour/per_day caps."""
 
+    # --- Proportional caps (R-18: ``effective_cap`` returns tighter of absolute + proportional) ---
+
+    per_tx_pct_of_balance: Decimal | None = None
+    """Proportional per-tx cap as fraction of current balance (e.g. ``Decimal("0.05")`` = 5%).
+    When both ``per_tx_usd`` and ``per_tx_pct_of_balance`` are set,
+    :meth:`effective_cap` returns the tighter (min) of the two."""
+
+    per_hour_pct_of_balance: Decimal | None = None
+    """Proportional rolling-1h cap as fraction of current balance.
+    Same min-semantics as ``per_tx_pct_of_balance``."""
+
+    per_day_pct_of_balance: Decimal | None = None
+    """Proportional rolling-24h cap as fraction of current balance.
+    Same min-semantics as ``per_tx_pct_of_balance``."""
+
+    per_protocol_pct_of_balance: dict[str, Decimal] = field(default_factory=dict)
+    """Per-protocol proportional cap (e.g. ``{"AAVE_V3": Decimal("0.10")}`` = 10% of balance).
+    Takes the min with ``per_protocol_usd[protocol]`` if both are present."""
+
     def is_within_per_tx(self, amount_usd: Decimal) -> bool:
         """Returns True if amount is within per-tx cap (or no cap set)."""
         return self.per_tx_usd is None or amount_usd <= self.per_tx_usd
@@ -138,6 +157,49 @@ class SpendingCaps:
     def per_protocol_limit(self, protocol: str) -> Decimal | None:
         """Returns the per-protocol cap, or None if not specified."""
         return self.per_protocol_usd.get(protocol)
+
+    def effective_cap(self, period: str, current_balance: Decimal) -> Decimal | None:
+        """Compute the binding cap for ``period`` given ``current_balance``.
+
+        Returns ``min(per_period_usd, pct_of_balance * current_balance)``, or
+        ``None`` if neither cap is configured for this period.
+
+        Args:
+            period: One of ``"per_tx"``, ``"per_hour"``, ``"per_day"``.
+            current_balance: Current wallet USD-equivalent balance at check time.
+
+        Returns:
+            Binding cap in USD, or ``None`` when this period is uncapped.
+
+        Example::
+
+            caps = SpendingCaps(per_day_usd=Decimal("100000"),
+                                per_day_pct_of_balance=Decimal("0.05"))
+            caps.effective_cap("per_day", Decimal("50000"))  # → Decimal("2500")
+        """
+        abs_cap: Decimal | None
+        pct: Decimal | None
+        if period == "per_tx":
+            abs_cap = self.per_tx_usd
+            pct = self.per_tx_pct_of_balance
+        elif period == "per_hour":
+            abs_cap = self.per_hour_usd
+            pct = self.per_hour_pct_of_balance
+        elif period == "per_day":
+            abs_cap = self.per_day_usd
+            pct = self.per_day_pct_of_balance
+        else:
+            return None
+
+        proportional: Decimal | None = pct * current_balance if pct is not None else None
+
+        if abs_cap is None and proportional is None:
+            return None
+        if abs_cap is None:
+            return proportional
+        if proportional is None:
+            return abs_cap
+        return min(abs_cap, proportional)
 
 
 @dataclass(frozen=True)

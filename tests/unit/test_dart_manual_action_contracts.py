@@ -367,3 +367,75 @@ def test_audit_log_request_response_correlation() -> None:
     assert audit_row.ml_training_request is not None
     assert audit_row.ml_training_response is not None
     assert audit_row.ml_training_request.request_id == audit_row.ml_training_response.request_id
+
+
+# ---------------------------------------------------------------------------
+# R-17 — Layer-4 position-health fields on WalletSpendingPreCheckResult
+# ---------------------------------------------------------------------------
+
+
+def test_position_health_check_lending_path_passes() -> None:
+    """Lending Layer-4: projected LTV within safety margin → position_health_check True."""
+    result = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-1",
+        checked_at=_now(),
+        passed=True,
+        kill_switch_armed=False,
+        amount_usd=Decimal("50000"),
+        per_tx_check=True,
+        per_hour_check=True,
+        per_day_check=True,
+        per_protocol_check=True,
+        position_health_check=True,
+        projected_ltv=Decimal("0.72"),
+        projected_margin_ratio=None,
+        position_health_denial_reason="",
+    )
+    assert result.passed is True
+    assert result.position_health_check is True
+    assert result.projected_ltv == Decimal("0.72")
+    assert result.projected_margin_ratio is None
+    assert result.position_health_denial_reason == ""
+
+
+def test_position_health_check_perp_path_denied() -> None:
+    """Perp Layer-4: projected margin ratio below safety floor → position_health_check False, passed False."""
+    result = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-1",
+        checked_at=_now(),
+        passed=False,
+        kill_switch_armed=False,
+        amount_usd=Decimal("200000"),
+        per_tx_check=True,
+        per_hour_check=True,
+        per_day_check=True,
+        per_protocol_check=True,
+        position_health_check=False,
+        projected_ltv=None,
+        projected_margin_ratio=Decimal("0.08"),
+        position_health_denial_reason="projected_margin_ratio=0.08 below margin_safety_factor floor 0.15",
+    )
+    assert result.passed is False
+    assert result.position_health_check is False
+    assert result.projected_margin_ratio == Decimal("0.08")
+    assert "projected_margin_ratio" in result.position_health_denial_reason
+    assert result.denial_reason == ""  # spending-cap denial_reason distinct from position-health
+
+
+def test_position_health_check_none_when_no_open_positions() -> None:
+    """No open positions → position_health_check stays None (first-entry into a new pool)."""
+    result = WalletSpendingPreCheckResult(
+        wallet_id="hot-trading-eth-new",
+        checked_at=_now(),
+        passed=True,
+        kill_switch_armed=False,
+        amount_usd=Decimal("10000"),
+        per_tx_check=True,
+        per_hour_check=True,
+        per_day_check=True,
+        per_protocol_check=None,
+        position_health_check=None,
+    )
+    assert result.position_health_check is None
+    assert result.projected_ltv is None
+    assert result.projected_margin_ratio is None

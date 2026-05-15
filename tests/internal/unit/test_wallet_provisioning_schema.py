@@ -92,6 +92,51 @@ def test_spending_caps_per_protocol_lookup() -> None:
     assert caps.per_protocol_limit("MORPHO") is None  # not in map → fall through to per_tx/per_hour/per_day
 
 
+# R-18 — effective_cap proportional tests
+
+
+def test_effective_cap_proportional_tighter_than_absolute() -> None:
+    """5% of $50k balance = $2.5k tighter than $100k absolute cap."""
+    caps = SpendingCaps(
+        per_day_usd=Decimal("100000"),
+        per_day_pct_of_balance=Decimal("0.05"),
+    )
+    assert caps.effective_cap("per_day", Decimal("50000")) == Decimal("2500")
+
+
+def test_effective_cap_absolute_tighter_than_proportional() -> None:
+    """$10k absolute tighter than 50% of $50k = $25k proportional."""
+    caps = SpendingCaps(
+        per_tx_usd=Decimal("10000"),
+        per_tx_pct_of_balance=Decimal("0.50"),
+    )
+    assert caps.effective_cap("per_tx", Decimal("50000")) == Decimal("10000")
+
+
+def test_effective_cap_only_absolute_set() -> None:
+    """Only absolute cap → returns absolute (no proportional)."""
+    caps = SpendingCaps(per_hour_usd=Decimal("20000"))
+    assert caps.effective_cap("per_hour", Decimal("1000000")) == Decimal("20000")
+
+
+def test_effective_cap_only_proportional_set() -> None:
+    """Only proportional cap → returns pct × balance."""
+    caps = SpendingCaps(per_tx_pct_of_balance=Decimal("0.02"))
+    assert caps.effective_cap("per_tx", Decimal("300000")) == Decimal("6000")
+
+
+def test_effective_cap_neither_set_returns_none() -> None:
+    """No cap configured for period → None (uncapped)."""
+    caps = SpendingCaps()
+    assert caps.effective_cap("per_day", Decimal("100000")) is None
+
+
+def test_effective_cap_unknown_period_returns_none() -> None:
+    """Unknown period string → None (safe default)."""
+    caps = SpendingCaps(per_tx_usd=Decimal("5000"))
+    assert caps.effective_cap("per_week", Decimal("50000")) is None
+
+
 # ---------------------------------------------------------------------------
 # WalletProvisioningConfig — validation rules
 # ---------------------------------------------------------------------------

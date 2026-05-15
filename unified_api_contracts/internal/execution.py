@@ -215,8 +215,13 @@ class WalletSpendingPreCheckResult(BaseModel):
        - Look up rolling 24h spend → `per_day_check`.
        - If `manual_instruction.venue` matches a `per_protocol_usd` key →
          `per_protocol_check`.
-    3. Aggregate: `passed = (kill_switch_armed is False) and all 4 checks True`.
-    4. Populate `denial_reason` with the failed-check name if `passed is False`.
+    3. Layer-4 position-health (R-17): query PBM ``/positions/health?wallet_id=X``
+       (5s TTL cache); compute projected LTV (lending) or projected margin ratio
+       (perp) after this trade. Populate ``position_health_check``,
+       ``projected_ltv``, ``projected_margin_ratio``, ``position_health_denial_reason``.
+    4. Aggregate: ``passed = (kill_switch_armed is False) and all 5 checks True``
+       (4 spending-cap checks + 1 position-health check).
+    5. Populate `denial_reason` with the failed-check name if `passed is False`.
 
     Empty result (`wallet_id == ""` on the source instruction) means "non-DeFi
     trade, wallet checks skipped" — the field stays None in the audit row.
@@ -235,6 +240,27 @@ class WalletSpendingPreCheckResult(BaseModel):
     per_day_check: bool | None = None
     per_protocol_check: bool | None = None
     denial_reason: str = ""
+
+    # --- Layer-4 position-health (R-17) ---
+
+    position_health_check: bool | None = None
+    """Layer-4 position-health gate result (lending LTV + perp margin-ratio check).
+    ``None`` when no open positions exist for this wallet at check time (e.g.
+    first entry before any borrow). ``True`` = projected values within safety
+    margins. ``False`` = trade would tip LTV above ``ltv_safety_margin`` or
+    margin ratio below ``margin_safety_factor`` floor."""
+
+    projected_ltv: Decimal | None = None
+    """Projected loan-to-value ratio after this trade (lending leg only).
+    Range ``[0, 1]``; ``None`` for non-lending operations (e.g. perp hedges)."""
+
+    projected_margin_ratio: Decimal | None = None
+    """Projected margin ratio after this trade (perp leg only).
+    ``None`` for non-perp operations (e.g. lending deposits)."""
+
+    position_health_denial_reason: str = ""
+    """Human-readable denial reason when ``position_health_check is False``.
+    E.g. ``"projected_ltv=0.87 exceeds ltv_safety_margin=0.85"``."""
 
 
 class ManualInstructionPrecheckResponse(BaseModel):
