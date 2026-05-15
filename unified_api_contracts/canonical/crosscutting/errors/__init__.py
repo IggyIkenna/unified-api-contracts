@@ -18,15 +18,30 @@ from .onchain_perps import VENUE_ERRORS_ONCHAIN_PERPS
 from .sports import VENUE_ERRORS_SPORTS
 from .tradfi import VENUE_ERRORS_TRADFI
 
-VENUE_ERROR_MAP: dict[str, list[VenueErrorClassification]] = {
-    **VENUE_ERRORS_CEFI,
-    **VENUE_ERRORS_ALTDATA,
-    **VENUE_ERRORS_DEFI,
-    **VENUE_ERRORS_SPORTS,
-    **VENUE_ERRORS_TRADFI,
-    **VENUE_ERRORS_ONCHAIN_PERPS,
-    **INFRA_ERRORS,
-}
+
+def _merge_venue_error_maps(
+    *maps: dict[str, list[VenueErrorClassification]],
+) -> dict[str, list[VenueErrorClassification]]:
+    """Merge venue error maps, combining lists for duplicate venue keys."""
+    result: dict[str, list[VenueErrorClassification]] = {}
+    for m in maps:
+        for venue, codes in m.items():
+            if venue in result:
+                result[venue] = result[venue] + codes
+            else:
+                result[venue] = list(codes)
+    return result
+
+
+VENUE_ERROR_MAP: dict[str, list[VenueErrorClassification]] = _merge_venue_error_maps(
+    VENUE_ERRORS_CEFI,
+    VENUE_ERRORS_ALTDATA,
+    VENUE_ERRORS_DEFI,
+    VENUE_ERRORS_SPORTS,
+    VENUE_ERRORS_TRADFI,
+    VENUE_ERRORS_ONCHAIN_PERPS,
+    INFRA_ERRORS,
+)
 
 
 def classify_venue_error(venue: str, error_code: str) -> VenueErrorClassification | None:

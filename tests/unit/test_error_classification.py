@@ -331,6 +331,93 @@ class TestCcxtClassify:
         assert CcxtErrorPayload.classify(code="InvalidOrder") == ErrorAction.FAIL
 
 
+class TestHyperliquidDefiCodesClassify:
+    """Test classify_venue_error() for all 8 HL DeFi error codes (Phase 6 — added 2026-05-12)."""
+
+    def test_hl_insufficient_margin_fails(self):
+        """HL_INSUFFICIENT_MARGIN → FAIL (caller decides on position sizing)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_INSUFFICIENT_MARGIN")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL
+
+    def test_hl_reduce_only_violation_fails(self):
+        """HL_REDUCE_ONLY_VIOLATION → FAIL (caller-side bug)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_REDUCE_ONLY_VIOLATION")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL
+
+    def test_hl_invalid_tif_fails(self):
+        """HL_INVALID_TIF → FAIL (TIF mismatch — Alo/Ioc/Gtc only)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_INVALID_TIF")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL
+
+    def test_hl_rate_limited_retries(self):
+        """HL_RATE_LIMITED → RETRY (exponential backoff 1s base)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_RATE_LIMITED")
+        assert result is not None
+        assert result.action == ErrorAction.RETRY
+
+    def test_hl_nonce_too_low_retries(self):
+        """HL_NONCE_TOO_LOW → RETRY (re-read nonce from /info)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_NONCE_TOO_LOW")
+        assert result is not None
+        assert result.action == ErrorAction.RETRY
+
+    def test_hl_signature_invalid_fails(self):
+        """HL_SIGNATURE_INVALID → FAIL (wallet/chainId drift — do NOT retry)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_SIGNATURE_INVALID")
+        assert result is not None
+        assert result.action == ErrorAction.FAIL
+
+    def test_hl_position_closed_skips(self):
+        """HL_POSITION_CLOSED → SKIP (auto-liquidation race — ghost position)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_POSITION_CLOSED")
+        assert result is not None
+        assert result.action == ErrorAction.SKIP
+
+    def test_hl_fill_confirmation_missed_retries(self):
+        """HL_FILL_CONFIRMATION_MISSED → RETRY (re-query /info userFills)."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+
+        result = classify_venue_error("hyperliquid", "HL_FILL_CONFIRMATION_MISSED")
+        assert result is not None
+        assert result.action == ErrorAction.RETRY
+
+    def test_all_8_hl_codes_are_registered(self):
+        """All 8 Phase 6 HL DeFi codes resolve non-None via classify_venue_error."""
+        from unified_api_contracts.canonical.crosscutting.errors import classify_venue_error
+        from unified_api_contracts.canonical.crosscutting.errors.defi import DefiErrorCode
+
+        hl_codes = [
+            DefiErrorCode.HL_INSUFFICIENT_MARGIN,
+            DefiErrorCode.HL_REDUCE_ONLY_VIOLATION,
+            DefiErrorCode.HL_INVALID_TIF,
+            DefiErrorCode.HL_RATE_LIMITED,
+            DefiErrorCode.HL_NONCE_TOO_LOW,
+            DefiErrorCode.HL_SIGNATURE_INVALID,
+            DefiErrorCode.HL_POSITION_CLOSED,
+            DefiErrorCode.HL_FILL_CONFIRMATION_MISSED,
+        ]
+        for code in hl_codes:
+            result = classify_venue_error("hyperliquid", code)
+            assert result is not None, f"classify_venue_error('hyperliquid', {code!r}) returned None"
+
+
 class TestClassifyVenueError:
     """Test classify_venue_error() for VENUE_ERROR_MAP completeness."""
 
