@@ -225,13 +225,13 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # split current/historical per slice convention = 6; plus live PubSub
     # subset = 7. Tree-based ML consumer → NaN-fill native (1-10% tolerance).
     # In-play HT-odds = STRICT_FAIL (live pricing input).
-    ("features-service", "fixture_features:current"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-service", "fixture_features:historical"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-service", "odds_features:current"): ServiceEmissionPolicy.STRICT_FAIL,
-    ("features-service", "odds_features:historical"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-service", "derived_features:current"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-service", "derived_features:historical"): ServiceEmissionPolicy.NAN_FILL,
-    ("features-service", "live_feature_subset"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-sports-service", "fixture_features:current"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-sports-service", "fixture_features:historical"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-sports-service", "odds_features:current"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-sports-service", "odds_features:historical"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-sports-service", "derived_features:current"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-sports-service", "derived_features:historical"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-sports-service", "live_feature_subset"): ServiceEmissionPolicy.STRICT_FAIL,
     #
     # features-cross-instrument-service — 21 entries.
     # Source: CALCULATOR_REGISTRY in features_service/cross_instrument/engine/orchestrator.py
