@@ -295,7 +295,8 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # "features-onchain-service" key entries; prior seeds used "features-service" key which
     # did not match handler _SERVICE_NAME → all groups fell back to STRICT_FAIL including
     # BLOCK_CRITICAL groups risk_params + health_factor that require P0 alert).
-    ("features-onchain-service", "lending_rates"): ServiceEmissionPolicy.STRICT_FAIL,
+    # lending_rates: PARTIAL_OK (aligned with features-service entry update in a84e012).
+    ("features-onchain-service", "lending_rates"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-onchain-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-onchain-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-onchain-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
