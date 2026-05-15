@@ -723,6 +723,8 @@ from unified_api_contracts.internal.modes import (
     CloudProvider,
     DataMode,
     EnvironmentMode,
+    ExecutionTarget,
+    ExecutionTrigger,
     LogLevel,
     MockScenario,
     OperationalMode,
@@ -731,6 +733,7 @@ from unified_api_contracts.internal.modes import (
     TestingStage,
     TestingStageConfig,
     TestnetMode,
+    decompose,
 )
 from unified_api_contracts.internal.position_protocol import (
     CrossAssetPortfolioAggregator,
@@ -1150,6 +1153,7 @@ __all__ = [
     "DataIngestionDetails",
     "DataMode",
     "DataStalenessError",
+    "decompose",
     "DataType",
     "DeFiConnectorStateDict",
     "DeFiHealthSummary",
@@ -1200,6 +1204,8 @@ __all__ = [
     "EnvVars",
     "EnvironmentMode",
     "EquityCurvePoint",
+    "ExecutionTarget",
+    "ExecutionTrigger",
     "Erc20TransferCalldata",
     "Erc20TransferFromCalldata",
     "ErrorCategory",

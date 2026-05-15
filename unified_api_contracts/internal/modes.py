@@ -148,8 +148,42 @@ class MockScenario(StrEnum):
     HIGH_LATENCY = "high_latency"
 
 
+class ExecutionTarget(StrEnum):
+    """Where execution orders are sent — independent of OperationalMode.
+
+    Replaces the execution-target dimension of TestingStage (see decompose()).
+
+    MAINNET:    Real mainnet (EVM L1/L2, real DEX/CEX, real capital).
+    TESTNET:    Exchange testnet endpoint (Deribit testnet, Binance testnet, Solana devnet).
+    FORK:       Tenderly fork or local Hardhat/Anvil — deterministic EVM replay.
+    SIMULATION: Matching-engine simulation only — no external execution API.
+    """
+
+    MAINNET = "mainnet"
+    TESTNET = "testnet"
+    FORK = "fork"
+    SIMULATION = "simulation"
+
+
+class ExecutionTrigger(StrEnum):
+    """Who/what generates the instruction — independent of OperationalMode.
+
+    Replaces the trigger dimension of TestingStage (see decompose()).
+
+    AUTOMATED:       Strategy-service generates instructions autonomously.
+    MANUAL_OPERATOR: Operator enters instruction via DART / trading API.
+    """
+
+    AUTOMATED = "automated"
+    MANUAL_OPERATOR = "manual_operator"
+
+
 class TestingStage(StrEnum):
     """Strategy testing progression stages.
+
+    DEPRECATED — use OperationalMode + ExecutionTarget + ExecutionTrigger.
+    Kept for backward-compat with existing 6 consumer call-sites.
+    Collapsed mapping via decompose().
 
     Strategies must pass through stages sequentially:
     MOCK -> HISTORICAL -> LIVE_MOCK -> LIVE_TESTNET -> STAGING -> LIVE_REAL
@@ -196,10 +230,31 @@ class OperationalMode(StrEnum):
     PAPER = "paper"
 
 
+def decompose(
+    stage: TestingStage,
+) -> tuple[OperationalMode, ExecutionTarget, ExecutionTrigger]:
+    """Decompose a (deprecated) TestingStage into canonical 3-tuple.
+
+    Use this when migrating consumers off TestingStage to the finer-grained enums.
+    Returns (OperationalMode, ExecutionTarget, ExecutionTrigger).
+    """
+    _map: dict[TestingStage, tuple[OperationalMode, ExecutionTarget, ExecutionTrigger]] = {
+        TestingStage.MOCK: (OperationalMode.BACKTEST, ExecutionTarget.SIMULATION, ExecutionTrigger.AUTOMATED),
+        TestingStage.HISTORICAL: (OperationalMode.BACKTEST, ExecutionTarget.SIMULATION, ExecutionTrigger.AUTOMATED),
+        TestingStage.LIVE_MOCK: (OperationalMode.PAPER, ExecutionTarget.SIMULATION, ExecutionTrigger.AUTOMATED),
+        TestingStage.LIVE_TESTNET: (OperationalMode.PAPER, ExecutionTarget.TESTNET, ExecutionTrigger.AUTOMATED),
+        TestingStage.STAGING: (OperationalMode.PAPER, ExecutionTarget.FORK, ExecutionTrigger.AUTOMATED),
+        TestingStage.LIVE_REAL: (OperationalMode.LIVE, ExecutionTarget.MAINNET, ExecutionTrigger.AUTOMATED),
+    }
+    return _map[stage]
+
+
 __all__ = [
     "CloudProvider",
     "DataMode",
     "EnvironmentMode",
+    "ExecutionTarget",
+    "ExecutionTrigger",
     "LogLevel",
     "MockScenario",
     "OperationalMode",
@@ -208,4 +263,5 @@ __all__ = [
     "TestingStage",
     "TestingStageConfig",
     "TestnetMode",
+    "decompose",
 ]
