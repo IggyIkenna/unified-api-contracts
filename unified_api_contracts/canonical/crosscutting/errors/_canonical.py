@@ -20,25 +20,26 @@ class RateLimitInfo:
 
 
 class CanonicalError(Exception):
-    """Canonical error (grouped from venue-specific errors)."""
+    """Canonical error base for venue-specific errors."""
 
     def __init__(
         self,
-        code: str,
-        message: str,
-        action: ErrorAction,
+        code: str = "",
+        message: str = "",
+        action: ErrorAction = ErrorAction.FAIL,
         venue: str | None = None,
-        retry_safe: bool = False,
+        error_code: str | None = None,
         reconnect: bool = False,
+        retry_safe: bool | None = None,
     ) -> None:
         super().__init__(message)
         self.code = code
         self.message = message
         self.action = action
         self.venue = venue
-        self.retry_safe = retry_safe
+        self.error_code = error_code
         self.reconnect = reconnect
-        self.error_code = code
+        self.retry_safe: bool = retry_safe if retry_safe is not None else (action == ErrorAction.RETRY)
 
 
 class CanonicalRateLimitError(CanonicalError):
