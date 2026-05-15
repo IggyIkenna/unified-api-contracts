@@ -1,0 +1,227 @@
+# Venue account-level limits SSOT
+# Phase 2.D of api_keys_wallets_accounts_readiness_2026_05_10.md
+#
+# IMPORTANT — this file has two tiers of values:
+#   (1) PUBLIC: sourced from venue API docs / public fee schedules (filled here)
+#   (2) PROBE_REQUIRED: account-tier-specific; operator must run per-venue REST probe
+#       (GET /account/info or equivalent) to populate.
+#
+# Operator probe commands per venue are in the notes fields below.
+# Consumer: execution-service pre-flight risk checks + VenueAdapterBase rate-limit token bucket (Phase 2.E).
+#
+# Schema version: 1.0.0
+# Last updated: 2026-05-15 by slot-6 (Ikenna)
+
+schema_version: "1.0.0"
+
+# Instruments in scope for May-23: BTC-PERP, ETH-PERP, SOL-PERP (CeFi hedge leg)
+# See carry_staked_basis archetype docs.
+instruments_in_scope:
+  - "BTC-PERP"
+  - "ETH-PERP"
+  - "SOL-PERP"
+  - "BTC/USDT"
+  - "ETH/USDT"
+
+venues:
+
+  # ────────────────────────────────────────────────────────
+  # binance — CeFi spot + perp futures
+  # API docs: https://developers.binance.com/docs/derivatives/usds-margined-futures/trade/rest-api
+  # ────────────────────────────────────────────────────────
+  binance:
+    operator_probe_cmd: "curl -H 'X-MBX-APIKEY: $BINANCE_TRADE_API_KEY' https://fapi.binance.com/fapi/v1/account"
+    rate_limits:
+      # Public: 2400 weight/min across all endpoints; order endpoints cost 1 weight
+      orders_per_minute: 300   # Conservative; actual limit = account-tier-dependent
+      requests_per_minute: 2400
+      weight_per_order: 1
+    fee_tiers:
+      # Public: regular user tier — PROBE_REQUIRED for actual account tier
+      taker_bps: 4   # 0.04% — VIP 0 baseline
+      maker_bps: 2   # 0.02% — VIP 0 baseline
+      # PROBE_REQUIRED: actual tier from GET /fapi/v1/account → "feeTier" field
+      tier_probe_required: true
+    max_order_size:
+      # PROBE_REQUIRED: GET /fapi/v1/exchangeInfo → filters[].MARKET_LOT_SIZE.maxQty per symbol
+      # Public defaults (USDT-margined perpetuals):
+      BTC-PERP-USDT: {max_qty: 1000.0, max_notional_usd: null, probe_required: true}
+      ETH-PERP-USDT: {max_qty: 10000.0, max_notional_usd: null, probe_required: true}
+      SOL-PERP-USDT: {max_qty: 1000000.0, max_notional_usd: null, probe_required: true}
+    max_leverage:
+      # Public: up to 125x for BTC, 100x for ETH, 50x for SOL on USDT-margined
+      # PROBE_REQUIRED: actual bracket from GET /fapi/v1/leverageBracket
+      BTC-PERP: {max: 125, default_live: 5, probe_required: true}
+      ETH-PERP: {max: 100, default_live: 5, probe_required: true}
+      SOL-PERP: {max: 50, default_live: 5, probe_required: true}
+    market_maker: false   # PROBE_REQUIRED: MM programs require separate application
+    position_mode: one_way  # Default — hedge mode must be explicitly enabled
+
+  # ────────────────────────────────────────────────────────
+  # bybit — CeFi spot + perp futures
+  # API docs: https://bybit-exchange.github.io/docs/v5/rate-limit
+  # ────────────────────────────────────────────────────────
+  bybit:
+    operator_probe_cmd: "curl -H 'X-BAPI-API-KEY: $BYBIT_TRADE_API_KEY' https://api.bybit.com/v5/account/info"
+    rate_limits:
+      # Public: 120 requests/s for order endpoints per UID
+      orders_per_second: 10   # Conservative
+      requests_per_second: 120
+    fee_tiers:
+      # Public: VIP 0 baseline
+      taker_bps: 6   # 0.06% — Linear perpetuals
+      maker_bps: 1   # 0.01%
+      tier_probe_required: true
+    max_order_size:
+      # PROBE_REQUIRED: GET /v5/market/instruments-info → lotSizeFilter.maxOrderQty per symbol
+      BTC-PERP-USDT: {max_qty: 100.0, max_notional_usd: null, probe_required: true}
+      ETH-PERP-USDT: {max_qty: 2000.0, max_notional_usd: null, probe_required: true}
+      SOL-PERP-USDT: {max_qty: 500000.0, max_notional_usd: null, probe_required: true}
+    max_leverage:
+      BTC-PERP: {max: 100, default_live: 5, probe_required: true}
+      ETH-PERP: {max: 100, default_live: 5, probe_required: true}
+      SOL-PERP: {max: 100, default_live: 5, probe_required: true}
+    market_maker: false
+    position_mode: one_way
+
+  # ────────────────────────────────────────────────────────
+  # okx — CeFi spot + perp swap
+  # API docs: https://www.okx.com/docs-v5/en/#trading-account-rest-api-get-account-configuration
+  # ────────────────────────────────────────────────────────
+  okx:
+    operator_probe_cmd: "curl -H 'OK-ACCESS-KEY: $OKX_TRADE_API_KEY' -H 'OK-ACCESS-PASSPHRASE: $OKX_TRADE_PASSPHRASE' https://www.okx.com/api/v5/account/config"
+    rate_limits:
+      # Public: 60 requests/s for private endpoints (varies by endpoint)
+      orders_per_second: 20   # POST /trade/order: 60/s for batch; conservative single
+      requests_per_second: 60
+    fee_tiers:
+      taker_bps: 5   # 0.05% — Level 1 baseline
+      maker_bps: 2   # 0.02%
+      tier_probe_required: true
+    max_order_size:
+      # PROBE_REQUIRED: GET /api/v5/public/instruments → maxLmtSz per symbol
+      BTC-PERP-USDT: {max_qty: 100.0, max_notional_usd: null, probe_required: true}
+      ETH-PERP-USDT: {max_qty: 10000.0, max_notional_usd: null, probe_required: true}
+      SOL-PERP-USDT: {max_qty: 1000000.0, max_notional_usd: null, probe_required: true}
+    max_leverage:
+      BTC-PERP: {max: 125, default_live: 5, probe_required: true}
+      ETH-PERP: {max: 100, default_live: 5, probe_required: true}
+      SOL-PERP: {max: 75, default_live: 5, probe_required: true}
+    market_maker: false
+    position_mode: long_short  # OKX uses separate long/short positions
+
+  # ────────────────────────────────────────────────────────
+  # deribit — Options + perpetuals (ETH + BTC focus)
+  # API docs: https://docs.deribit.com/#private-get_account_summary
+  # ────────────────────────────────────────────────────────
+  deribit:
+    operator_probe_cmd: "curl -d '{\"id\":1,\"method\":\"private/get_account_summary\",\"params\":{\"currency\":\"BTC\"}}' -H 'Authorization: Bearer $DERIBIT_TRADE_API_KEY' https://www.deribit.com/api/v2/private/get_account_summary"
+    rate_limits:
+      # Public: 20 non-matching-engine requests/s; 5 matching-engine/s per account
+      orders_per_second: 5
+      requests_per_second: 20
+    fee_tiers:
+      # Options maker: 0.03%, taker: 0.03% (0bps maker for futures)
+      futures_taker_bps: 5   # 0.05% — BTC perpetual baseline
+      futures_maker_bps: 0   # 0bps — maker rebate model
+      options_taker_bps: 3   # 0.03%
+      options_maker_bps: 3   # 0.03%
+      tier_probe_required: true
+    max_order_size:
+      # PROBE_REQUIRED: GET /api/v2/public/get_instruments → contract_size + max_qty
+      BTC-PERP: {max_qty_btc: 100.0, probe_required: true}   # ~$7M at $70k BTC
+      ETH-PERP: {max_qty_eth: 5000.0, probe_required: true}
+    max_leverage:
+      # Deribit uses margin model not leverage — ~10x effective for BTC/ETH perpetuals
+      BTC-PERP: {max_effective: 10, default_live: 3, probe_required: true}
+      ETH-PERP: {max_effective: 10, default_live: 3, probe_required: true}
+    market_maker: false   # MM program exists but requires separate application
+    instruments_primary: [BTC-PERP, ETH-PERP, options]
+
+  # ────────────────────────────────────────────────────────
+  # hyperliquid — Decentralized perp CLOB (on-chain, but CeFi-like API)
+  # API docs: https://hyperliquid.gitbook.io/hyperliquid-docs/for-developers/api
+  # ────────────────────────────────────────────────────────
+  hyperliquid:
+    operator_probe_cmd: "curl -d '{\"type\":\"clearinghouseState\",\"user\":\"$HL_WALLET_ADDRESS\"}' https://api.hyperliquid.xyz/info"
+    rate_limits:
+      # Public: 1200 requests/min for info; 100 requests/min for order endpoints
+      orders_per_minute: 100
+      requests_per_minute: 1200
+    fee_tiers:
+      # Public: standard taker 0.045%, maker 0.01% (rebate); decreasing with volume
+      taker_bps: 4.5  # 0.045%
+      maker_bps: -1   # Maker rebate: -0.01%
+      tier_probe_required: true
+    max_order_size:
+      # PROBE_REQUIRED: GET /info with type=meta → universe[].szDecimals + maxLeverage
+      BTC-PERP: {max_notional_usd: 20000000, probe_required: true}  # $20M public limit
+      ETH-PERP: {max_notional_usd: 20000000, probe_required: true}
+      SOL-PERP: {max_notional_usd: 5000000, probe_required: true}
+    max_leverage:
+      # Public: up to 50x for BTC, 50x for ETH, 20x for SOL
+      BTC-PERP: {max: 50, default_live: 5, probe_required: false}  # Public data sufficient
+      ETH-PERP: {max: 50, default_live: 5, probe_required: false}
+      SOL-PERP: {max: 20, default_live: 5, probe_required: false}
+    market_maker: false
+    custody_model: onchain_wallet  # Uses EVM wallet — different from CEX key model
+    wallet_required: true   # Requires wallet address (not API key) for auth
+
+  # ────────────────────────────────────────────────────────
+  # aster — CeFi perp CLOB (Asia-focused)
+  # API docs: operator-access required
+  # ────────────────────────────────────────────────────────
+  aster:
+    operator_probe_cmd: "# PROBE_REQUIRED — Aster API docs not public; operator to probe via authenticated endpoint"
+    rate_limits:
+      orders_per_second: 10   # PROBE_REQUIRED
+      requests_per_second: 50  # PROBE_REQUIRED
+    fee_tiers:
+      taker_bps: null  # PROBE_REQUIRED
+      maker_bps: null  # PROBE_REQUIRED
+      tier_probe_required: true
+    max_order_size:
+      BTC-PERP: {max_qty: null, max_notional_usd: null, probe_required: true}
+      ETH-PERP: {max_qty: null, max_notional_usd: null, probe_required: true}
+    max_leverage:
+      BTC-PERP: {max: null, default_live: 5, probe_required: true}
+      ETH-PERP: {max: null, default_live: 5, probe_required: true}
+    market_maker: false
+    credentials_status: BLOCKED-CREDENTIALS  # Pending per Phase 8.D audit
+
+  # ────────────────────────────────────────────────────────
+  # kraken — CeFi spot + futures
+  # API docs: https://docs.kraken.com/rest/#tag/Account-Data/operation/getTradeVolume
+  # ────────────────────────────────────────────────────────
+  kraken:
+    operator_probe_cmd: "curl -d 'nonce=...&pair=XBTUSD' -H 'API-Key: $KRAKEN_TRADE_API_KEY' -H 'API-Sign: ...' https://api.kraken.com/0/private/TradeVolume"
+    rate_limits:
+      # Public: 15 counter per 3s (tier-dependent); orders consume 0 counter (separate matching engine limit)
+      orders_per_minute: 60    # Matching engine: 60 orders/min for starter; PROBE_REQUIRED
+      requests_per_minute: 300  # Conservative
+    fee_tiers:
+      # 30d volume tiers; PROBE_REQUIRED for actual volume bracket
+      taker_bps: 26  # 0.26% — <$10k/30d volume
+      maker_bps: 16  # 0.16%
+      tier_probe_required: true
+    max_order_size:
+      # PROBE_REQUIRED: GET /0/public/AssetPairs → lot precision + ordermin/ordermax
+      BTC-USDT: {min_qty: 0.0001, probe_required: true}
+      ETH-USDT: {min_qty: 0.001, probe_required: true}
+    max_leverage:
+      # Spot: no leverage; margin: up to 5x for BTC spot with Flex Margin
+      BTC-USD: {max: 5, default_live: 1}
+      ETH-USD: {max: 5, default_live: 1}
+    market_maker: false
+    note: "Kraken futures are separate API (kraken-futures venue); credentials incoming per Phase 8.D"
+
+# ────────────────────────────────────────────────────────
+# PROBE STATUS SUMMARY
+# ────────────────────────────────────────────────────────
+# Run before cutover (May-23):
+#   for venue in binance bybit okx deribit hyperliquid aster kraken; do
+#     echo "=== $venue ==="; bash deployment-service/scripts/audit/venue-account-probe.sh "$venue"; done
+#
+# All PROBE_REQUIRED fields MUST be populated before live order flow begins.
+# hyperliquid: max_leverage is public — probe not needed.
+# aster: all fields PROBE_REQUIRED — unblock on credential delivery.
