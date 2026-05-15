@@ -371,4 +371,29 @@ orthogonality declaration.
 """
 
 
-__all__ = ["VENUE_RULES"]
+def get_max_position_size_usd_for_venue(venue: str) -> Decimal | None:
+    """Return the ``MAX_POSITION_SIZE_PER_INSTRUMENT`` USD cap for a venue.
+
+    Filters :data:`VENUE_RULES` by ``applies_to == venue.lower()`` and
+    ``rule_id == MAX_POSITION_SIZE_PER_INSTRUMENT``. Returns ``None`` when no
+    such rule is declared for the venue (caller must decide fail-open vs
+    fail-closed — for PerpHedgeSizer per-instrument-cap pre-trade checks, the
+    safe default is to BLOCK on missing rule per CLAUDE.md "honest absence
+    vs fake placeholders" principle applied to risk parameters).
+
+    Used by ``execution-service/.../perp_hedge_sizer.py`` to validate sized
+    rebalance instructions against per-venue / per-instrument caps before
+    publishing (per defi_recursive_borrow_archetypes_2026_05_10.md Phase 7 P0).
+    """
+    needle = venue.lower()
+    for rule in VENUE_RULES:
+        if rule.applies_to != needle:
+            continue
+        if rule.rule_id != RiskRuleId.MAX_POSITION_SIZE_PER_INSTRUMENT:
+            continue
+        if isinstance(rule.trigger, MaxPositionSizeTrigger):
+            return rule.trigger.cap_usd
+    return None
+
+
+__all__ = ["VENUE_RULES", "get_max_position_size_usd_for_venue"]

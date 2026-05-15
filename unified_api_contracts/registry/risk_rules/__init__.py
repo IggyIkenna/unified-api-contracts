@@ -39,7 +39,7 @@ from .asset_group import ASSET_GROUP_RULES
 from .client import CLIENT_RULES
 from .global_rules import GLOBAL_RULES
 from .strategy_family import STRATEGY_FAMILY_RULES
-from .venue import VENUE_RULES
+from .venue import VENUE_RULES, get_max_position_size_usd_for_venue
 
 ALL_RULES: tuple[RiskRule, ...] = (
     *ARCHETYPE_RULES,
@@ -129,6 +129,7 @@ __all__ = [
     "GLOBAL_RULES",
     "STRATEGY_FAMILY_RULES",
     "VENUE_RULES",
+    "get_max_position_size_usd_for_venue",
     "get_rules_for",
     "iter_applicable_rules",
 ]

@@ -104,6 +104,7 @@ __all__ = [
     "StrategyFamily",
     "StrategyFamilyId",
     "family_for_archetype",
+    "get_max_position_size_usd_for_venue",
     "get_rules_for",
     "iter_applicable_rules",
     "risk_rule_fired_event",
@@ -119,6 +120,7 @@ from .registry.risk_rules import (
     GLOBAL_RULES,
     STRATEGY_FAMILY_RULES,
     VENUE_RULES,
+    get_max_position_size_usd_for_venue,
     get_rules_for,
     iter_applicable_rules,
 )
