@@ -261,3 +261,89 @@ class TestStrategyInstructionTypedFields:
         assert restored.protocol is None
         assert restored.chain is None
         assert restored.client_id is None
+
+
+# ── StrategyInstruction.mode field (pvl-p17d) ─────────────────────────────
+
+
+class TestStrategyInstructionModeField:
+    """Tests for the mode: OperationalMode field on StrategyInstruction."""
+
+    def _make_instruction(self, **overrides: object) -> StrategyInstruction:
+
+        defaults: dict[str, object] = {
+            "instruction_id": "test_mode_001",
+            "strategy_id": "MODE_STRAT",
+            "timestamp": datetime(2026, 5, 15, tzinfo=UTC),
+            "operation": OperationType.SWAP,
+            "instrument_id": "UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
+            "from_venue": "UNISWAPV3-ETHEREUM",
+            "to_venue": "WALLET_ETH",
+            "token_in": "WETH",
+            "amount": Decimal("1.0"),
+        }
+        defaults.update(overrides)
+        return StrategyInstruction(**defaults)  # pyright: ignore[reportArgumentType]
+
+    def test_default_mode_is_live(self) -> None:
+        from unified_api_contracts.internal.modes import OperationalMode
+
+        instr = self._make_instruction()
+        assert instr.mode == OperationalMode.LIVE
+
+    def test_paper_mode_set(self) -> None:
+        from unified_api_contracts.internal.modes import OperationalMode
+
+        instr = self._make_instruction(mode=OperationalMode.PAPER)
+        assert instr.mode == OperationalMode.PAPER
+
+    def test_mode_serialized_in_to_dict(self) -> None:
+        from unified_api_contracts.internal.modes import OperationalMode
+
+        instr = self._make_instruction(mode=OperationalMode.PAPER)
+        d = instr.to_dict()
+        assert d["mode"] == "paper"
+
+    def test_mode_deserialized_in_from_dict(self) -> None:
+        from unified_api_contracts.internal.modes import OperationalMode
+
+        d: dict[str, object] = {
+            "instruction_id": "test_mode_002",
+            "strategy_id": "MODE_STRAT",
+            "timestamp": "2026-05-15T00:00:00",
+            "operation": "SWAP",
+            "instrument_id": "X",
+            "from_venue": "A",
+            "to_venue": "B",
+            "token_in": "WETH",
+            "amount": "1.0",
+            "mode": "paper",
+        }
+        restored = StrategyInstruction.from_dict(d)
+        assert restored.mode == OperationalMode.PAPER
+
+    def test_mode_defaults_to_live_when_missing_from_dict(self) -> None:
+        from unified_api_contracts.internal.modes import OperationalMode
+
+        d: dict[str, object] = {
+            "instruction_id": "test_mode_003",
+            "strategy_id": "MODE_STRAT",
+            "timestamp": "2026-05-15T00:00:00",
+            "operation": "SWAP",
+            "instrument_id": "X",
+            "from_venue": "A",
+            "to_venue": "B",
+            "token_in": "WETH",
+            "amount": "1.0",
+        }
+        restored = StrategyInstruction.from_dict(d)
+        assert restored.mode == OperationalMode.LIVE
+
+    def test_mode_round_trip(self) -> None:
+        from unified_api_contracts.internal.modes import OperationalMode
+
+        for mode in (OperationalMode.LIVE, OperationalMode.PAPER, OperationalMode.BACKTEST, OperationalMode.MANUAL):
+            instr = self._make_instruction(mode=mode)
+            d = instr.to_dict()
+            restored = StrategyInstruction.from_dict(d)
+            assert restored.mode == mode

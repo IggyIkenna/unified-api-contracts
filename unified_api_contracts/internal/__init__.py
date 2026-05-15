@@ -735,6 +735,10 @@ from unified_api_contracts.internal.modes import (
     TestnetMode,
     decompose,
 )
+from unified_api_contracts.internal.paper_execution_targets import (
+    PAPER_EXECUTION_TARGETS,
+    get_paper_target,
+)
 from unified_api_contracts.internal.position_protocol import (
     CrossAssetPortfolioAggregator,
     PositionQuantityProtocol,
@@ -1416,6 +1420,7 @@ __all__ = [
     "OrderSubmitted",
     "OrderType",
     "OrgType",
+    "PAPER_EXECUTION_TARGETS",
     "PairSpreadFeatureRecord",
     "PerformanceStats",
     "PerformanceSummary",
@@ -1688,6 +1693,7 @@ __all__ = [
     "entitled_slots_for",
     "entitlements_for",
     "get_liquidation_params",
+    "get_paper_target",
     "get_topic_spec",
     "get_unity_child_book",
     "is_venue_token",

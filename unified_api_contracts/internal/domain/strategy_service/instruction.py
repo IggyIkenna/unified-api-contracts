@@ -30,6 +30,7 @@ from unified_api_contracts.internal.domain.execution_service.types import (
     OperationType,
     OrderType,
 )
+from unified_api_contracts.internal.modes import OperationalMode
 
 MetadataValue = str | int | float | bool | None
 MetadataMap = dict[str, MetadataValue]
@@ -306,6 +307,12 @@ class StrategyInstruction:
     client_id: str = field(default="", metadata={"description": "Client identifier for routing."})
     account_id: str | None = field(default=None, metadata={"description": "Account key (client:venue:label)."})
 
+    # Operational mode — determines execution pathway (live/paper/backtest/manual)
+    mode: OperationalMode = field(
+        default=OperationalMode.LIVE,
+        metadata={"description": "Operational mode for this instruction. PAPER = simulated execution only."},
+    )
+
     # Market making — delta-proxy repricing (see codex/09-strategy/market-making-reference-price.md)
     reference_price: Decimal | None = field(default=None, metadata={"description": "Underlying ref price."})
     underlying_instrument_id: str | None = field(default=None, metadata={"description": "Underlying to track."})
@@ -362,6 +369,7 @@ class StrategyInstruction:
             "source_chain": self.source_chain,
             "dest_chain": self.dest_chain,
             "client_id": self.client_id,
+            "mode": self.mode.value,
             "reference_price": str(self.reference_price) if self.reference_price is not None else None,
             "underlying_instrument_id": self.underlying_instrument_id,
             "delta": str(self.delta) if self.delta is not None else None,
@@ -471,6 +479,9 @@ class StrategyInstruction:
             source_chain=cast("str | None", data.get("source_chain")),
             dest_chain=cast("str | None", data.get("dest_chain")),
             client_id=cast("str | None", data.get("client_id")),
+            mode=OperationalMode(data["mode"])
+            if "mode" in data and isinstance(data["mode"], str)
+            else OperationalMode.LIVE,
             metadata=_metadata_or_empty(cast("MetadataMap | None", data.get("metadata"))),
         )
 
