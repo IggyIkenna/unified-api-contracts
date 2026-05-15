@@ -290,6 +290,48 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-delta-one-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-delta-one-service", "targets"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-delta-one-service", "swing_outcome_targets"): ServiceEmissionPolicy.STRICT_FAIL,
+    #
+    # features-onchain-service — 11 entries (Phase 6.5 P2 fix 2026-05-15: added correct
+    # "features-onchain-service" key entries; prior seeds used "features-service" key which
+    # did not match handler _SERVICE_NAME → all groups fell back to STRICT_FAIL including
+    # BLOCK_CRITICAL groups risk_params + health_factor that require P0 alert).
+    ("features-onchain-service", "lending_rates"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "lst_yields"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "onchain_perps"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "utilization"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "flash_loan_availability"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "rate_impact"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-onchain-service", "risk_params"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    ("features-onchain-service", "health_factor"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    ("features-onchain-service", "macro_sentiment"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-onchain-service", "rewards"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-onchain-service", "liquidation_events"): ServiceEmissionPolicy.PARTIAL_OK,
+    #
+    # features-cross-instrument-service — 21 entries (Phase 6.5 P2 fix 2026-05-15: added
+    # correct "features-cross-instrument-service" key; prior "features-service" key did not
+    # match handler _SERVICE_NAME → all groups fell back to STRICT_FAIL suppressing valid
+    # NAN_FILL / PARTIAL_OK group writes).
+    ("features-cross-instrument-service", "regime_detection"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "cross_asset_correlation"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "cross_instrument_dynamics"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "realized_implied_vol"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "cointegration"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "cme_gap"): ServiceEmissionPolicy.PARTIAL_OK,
+    ("features-cross-instrument-service", "cross_venue_spreads"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "book_depth_bands"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "liquidity_walls"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "liquidation_clusters"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "liquidation_band_prediction"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "flow_interaction"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "composite_sr"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "dxy_momentum"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "paired_price_dispersion"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "polymarket_crowd_sentiment"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "polymarket_trade_flow"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "polymarket_whale_activity"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "polymarket_market_microstructure"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-cross-instrument-service", "polymarket_cross_market"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("features-cross-instrument-service", "polymarket_temporal_patterns"): ServiceEmissionPolicy.NAN_FILL,
     # Legacy entries (key "features-service" does NOT match handler _SERVICE_NAME
     # "features-delta-one-service"; these are orphaned but preserved to avoid
     # breaking any future consumers that may use the consolidated service name).
