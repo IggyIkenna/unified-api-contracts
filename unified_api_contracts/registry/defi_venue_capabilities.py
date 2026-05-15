@@ -179,6 +179,38 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "UNISWAP-ETHEREUM": {"governance_events": "2020-09-17"},
     # ── DeFi — MEV events (MEV-Boost relay stats) ──
     "FLASHBOTS-ETHEREUM": {"mev_events": "2021-01-01"},
+    # ── DeFi — Yield vaults (Phase 1A) ──
+    # staking_yields = vault APY time-series (daily rate)
+    "YEARNV3-ETHEREUM": {"staking_yields": "2024-03-20"},
+    "YEARNV3-ARBITRUM": {"staking_yields": "2023-11-15"},
+    "YEARNV3-OPTIMISM": {"staking_yields": "2023-11-15"},
+    "CONVEX-ETHEREUM": {"staking_yields": "2021-05-17"},
+    "BEEFY-ETHEREUM": {"staking_yields": "2021-12-01"},
+    "BEEFY-ARBITRUM": {"staking_yields": "2021-09-20"},
+    "BEEFY-BASE": {"staking_yields": "2023-08-15"},
+    "BEEFY-POLYGON": {"staking_yields": "2021-05-20"},
+    "BEEFY-BSC": {"staking_yields": "2020-10-08"},
+    "BEEFY-AVALANCHE": {"staking_yields": "2021-03-15"},
+    "PENDLE-ETHEREUM": {"staking_yields": "2021-06-15", "oracle_prices": "2021-06-15"},
+    "PENDLE-ARBITRUM": {"staking_yields": "2024-01-26", "oracle_prices": "2024-01-26"},
+    "IDLE-ETHEREUM": {"staking_yields": "2019-08-13"},
+    "IDLE-ARBITRUM": {"staking_yields": "2024-12-01"},
+    "IDLE-POLYGON": {"staking_yields": "2021-11-11"},
+    # ── DeFi — Additional LSTs (Phase 1A) ──
+    "ROCKETPOOL-ETHEREUM": {"lst_rates": "2021-11-08", "oracle_prices": "2021-11-08"},
+    "SOLBLAZE-SOLANA": {"lst_rates": "2022-10-15", "oracle_prices": "2022-10-15"},
+    # ── DeFi — Restaking / LRTs (Phase 1A) ──
+    # staking_yields = restaking APY; oracle_prices = LRT token price (via Chainlink/Pyth)
+    "SYMBIOTIC-ETHEREUM": {"staking_yields": "2024-06-11", "oracle_prices": "2024-06-11"},
+    "KARAK-ETHEREUM": {"staking_yields": "2024-04-08", "oracle_prices": "2024-04-08"},
+    "KARAK-ARBITRUM": {"staking_yields": "2024-04-08", "oracle_prices": "2024-04-08"},
+    "RENZO-ETHEREUM": {"staking_yields": "2024-04-29", "oracle_prices": "2024-04-29"},
+    "RENZO-ARBITRUM": {"staking_yields": "2024-02-29", "oracle_prices": "2024-02-29"},
+    "KELPDAO-ETHEREUM": {"staking_yields": "2023-11-09", "oracle_prices": "2023-11-09"},
+    "PUFFER-ETHEREUM": {"staking_yields": "2024-05-09", "oracle_prices": "2024-05-09"},
+    "JITORESTAKING-SOLANA": {"staking_yields": "2024-08-01"},
+    # ── DeFi — Solana DEX aggregator (Phase 1A) ──
+    "JUPITER-SOLANA": {"dex_swaps": "2021-10-13"},
 }
 
 
