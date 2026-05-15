@@ -100,6 +100,13 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("DRIFT", "SOL", True, Decimal("0.05"), "CROSS", "5% haircut", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "mSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Marinade LST", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "JitoSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Jito LST", "PERP_DEX"),
+    # Pacifica-Solana — USDC-settled linear perp DEX (Solana). settle_asset=USDC confirmed in
+    # instruments-service adapter (pacifica.py). No LST cross-margin support documented as of
+    # 2026-05-15 (live probe + docs review). Explicit negatives per audit spec.
+    CollateralAcceptance(
+        "PACIFICA-SOLANA", "USDC", True, Decimal("0"), "CROSS", "Primary margin; USDC-settled linear perp", "PERP_DEX"
+    ),
+    CollateralAcceptance("PACIFICA-SOLANA", "SOL", False, None, "", "Not accepted; USDC-only margin model", "PERP_DEX"),
     # ----- ETH LST acceptance gaps (explicit `accepted=False` so the catalog ----
     # generator's `accepted_perp_collateral(venue)` short-circuits cleanly and
     # the absence is documented, not silently absent. Positive rows wait on
@@ -218,6 +225,12 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("OKX", "JitoSOL", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("ASTER", "JitoSOL", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("ASTER", "mSOL", False, None, "", "Not accepted", "PERP_CEX"),
+    CollateralAcceptance(
+        "PACIFICA-SOLANA", "JitoSOL", False, None, "", "Not accepted; USDC-only margin model", "PERP_DEX"
+    ),
+    CollateralAcceptance(
+        "PACIFICA-SOLANA", "mSOL", False, None, "", "Not accepted; USDC-only margin model", "PERP_DEX"
+    ),
 ]
 
 
