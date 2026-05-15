@@ -3,6 +3,7 @@
 from .base import (
     CANONICAL_EXECUTION_ALPHA_VERSION,
     CANONICAL_EXECUTION_INSTRUCTION_VERSION,
+    CANONICAL_EXECUTION_REJECTION_VERSION,
     CANONICAL_EXECUTION_RESULT_VERSION,
     CANONICAL_FILL_VERSION,
     CANONICAL_ORDER_VERSION,
@@ -11,6 +12,8 @@ from .base import (
     CanonicalOrder,
     ExecutionAlpha,
     ExecutionInstruction,
+    ExecutionRejectionCode,
+    ExecutionRejectionEvent,
     ExecutionResult,
     ExecutionStatus,
     OperationType,
@@ -29,6 +32,7 @@ from .trade import (
 __all__ = [
     "CANONICAL_EXECUTION_ALPHA_VERSION",
     "CANONICAL_EXECUTION_INSTRUCTION_VERSION",
+    "CANONICAL_EXECUTION_REJECTION_VERSION",
     "CANONICAL_EXECUTION_RESULT_VERSION",
     "CANONICAL_FILL_VERSION",
     "CANONICAL_ORDER_VERSION",
@@ -41,6 +45,8 @@ __all__ = [
     "CanonicalOrderRejection",
     "ExecutionAlpha",
     "ExecutionInstruction",
+    "ExecutionRejectionCode",
+    "ExecutionRejectionEvent",
     "ExecutionResult",
     "ExecutionStatus",
     "OperationType",

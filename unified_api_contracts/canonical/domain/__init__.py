@@ -104,7 +104,7 @@ from .execution import (
     OrderType,
     TimeInForce,
 )
-from .execution.base import ExecutionAlpha
+from .execution.base import ExecutionAlpha, ExecutionRejectionCode, ExecutionRejectionEvent
 from .execution.prime_broker import (
     CollateralAsset,
     CrossMarginNettingResult,
@@ -432,6 +432,8 @@ __all__ = [
     "ExecutionAlpha",
     "ExecutionInstruction",
     "ExecutionMethod",
+    "ExecutionRejectionCode",
+    "ExecutionRejectionEvent",
     "ExecutionResult",
     "ExecutionStatus",
     "ExpectedValue",

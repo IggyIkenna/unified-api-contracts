@@ -249,6 +249,49 @@ class ExecutionResult(_CanonicalBase):
 CANONICAL_EXECUTION_ALPHA_VERSION = "1.0.0"
 
 
+class ExecutionRejectionCode(StrEnum):
+    """Closed-set rejection codes for system-level execution rejections.
+
+    Strategy-service routes on these codes for retry-or-alert decisions:
+    - RETRY: RATE_LIMITED, VENUE_DOWN
+    - ALERT + HOLD: INSUFFICIENT_LIQUIDITY, SLIPPAGE_EXCEEDED
+    - ALERT + STOP: KILL_SWITCH_ARMED
+
+    Distinct from CanonicalOrderRejection (venue-level, string reason);
+    ExecutionRejectionCode is issued by execution-service / matching engine
+    BEFORE the order is sent to the venue, or when the venue rejects with a
+    semantically mappable code.
+    """
+
+    INSUFFICIENT_LIQUIDITY = "INSUFFICIENT_LIQUIDITY"
+    RATE_LIMITED = "RATE_LIMITED"
+    KILL_SWITCH_ARMED = "KILL_SWITCH_ARMED"
+    VENUE_DOWN = "VENUE_DOWN"
+    SLIPPAGE_EXCEEDED = "SLIPPAGE_EXCEEDED"
+
+
+CANONICAL_EXECUTION_REJECTION_VERSION = "1.0.0"
+
+
+class ExecutionRejectionEvent(_CanonicalBase):
+    """System-level execution rejection — emitted by execution-service or matching engine.
+
+    Consumers:
+    - strategy-service: routes on rejection_code (retry / alert / stop)
+    - alerting-service: fires alert rule on KILL_SWITCH_ARMED or repeated VENUE_DOWN
+    """
+
+    strategy_id: str
+    instruction_id: str
+    venue: str
+    instrument_id: str
+    rejection_code: ExecutionRejectionCode
+    detail: str
+    retry_after_ms: int | None = None
+    timestamp: AwareDatetime
+    schema_version: str = CANONICAL_EXECUTION_REJECTION_VERSION
+
+
 class ExecutionAlpha(_CanonicalBase):
     """Execution quality metrics returned for every execution.
 
