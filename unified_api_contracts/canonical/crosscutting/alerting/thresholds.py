@@ -65,6 +65,10 @@ class ThresholdUnit(StrEnum):
     = no drift; 0.10-0.25 = moderate drift; >= 0.25 = significant drift.
     Industry-standard ML monitoring metric."""
 
+    DAYS = "days"
+    """Duration in days (2 = 2-day staleness window). Use when the natural
+    unit is day-granularity (e.g. daily cron staleness checks)."""
+
 
 @dataclass(frozen=True, slots=True)
 class AlertThreshold:
@@ -471,6 +475,20 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Alert plan Phase 1.E (2026-05-13)."
         ),
         description="Maximum age in seconds of any market-data feed before MARKET_DATA_STALE fires.",
+    ),
+    "qg_snapshot_stale_days": AlertThreshold(
+        key="qg_snapshot_stale_days",
+        unit=ThresholdUnit.DAYS,
+        default_value=Decimal("2"),
+        source_doc=(
+            "2 consecutive days without a QG snapshot parquet in GCS means the"
+            " qg-snapshot cron VM has missed at least one full cycle (scheduled"
+            " daily 06:00 UTC). 2-day window avoids single transient failures"
+            " (e.g. VM startup race on the first day) while catching sustained"
+            " outages before the deploy-ready tracking surface goes stale."
+            " B-018 Phase 4.A monitoring (2026-05-15)."
+        ),
+        description="Consecutive days without a GCS QG snapshot before QG_SNAPSHOT_STALE fires.",
     ),
 }
 """Threshold registry. New rules must add an entry here AND reference the key

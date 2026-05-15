@@ -980,6 +980,20 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " Operator-page only — NOT auto-action. Investigate before escalating."
         ),
     ),
+    # ── QG / infra staleness (2026-05-15, B-018 Phase 4.A monitoring) ────────
+    AlertRule(
+        code=AlertCode.QG_SNAPSHOT_STALE,
+        event_pattern="QG_SNAPSHOT_STALE",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("qg_snapshot_stale"),
+        threshold_key="qg_snapshot_stale_days",
+        description=(
+            "Daily QG snapshot not written to GCS for 2+ consecutive days —"
+            " qg-snapshot cron VM likely failed. Investigate"
+            " deployment-service/scripts/vm/launch-qg-snapshot-vm.sh."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

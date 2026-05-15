@@ -351,6 +351,17 @@ class AlertCode(StrEnum):
     ``aave``, ``spark``). Operator-page only — NOT auto-action. Payload:
     ``forum``, ``proposal_id``, ``title``, ``tags``, ``posted_at``, ``url``."""
 
+    # ── QG / infra staleness (2026-05-15, B-018 Phase 4.A monitoring) ────────
+    QG_SNAPSHOT_STALE = "QG_SNAPSHOT_STALE"
+    """Daily QG snapshot not written to GCS for N consecutive days (default 2).
+    Producer: ``unified-trading-pm/scripts/quality_gates/check_snapshot_staleness.py``
+    (qg-snapshot-* VM). Fires when no parquet exists at the expected GCS path
+    for ``qg_snapshot_stale_days`` consecutive days, indicating the snapshot
+    cron VM has failed. Severity HIGH — operator should investigate the VM logs
+    at ``deployment-service/scripts/vm/launch-qg-snapshot-vm.sh``.
+    Payload: ``stale_days`` (int), ``last_snapshot_date`` (ISO-8601 or None),
+    ``bucket_path`` (str), ``checked_dates`` (list[str])."""
+
 
 ALERT_CODES: Final[frozenset[str]] = frozenset(member.value for member in AlertCode)
 """String-membership view of :class:`AlertCode` for fast O(1) validation.
