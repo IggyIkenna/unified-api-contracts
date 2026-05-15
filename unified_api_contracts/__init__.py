@@ -455,6 +455,11 @@ from .canonical.crosscutting.service_emission_policy import (
     policy_is_alert,
     policy_is_publish_row,
 )
+from .canonical.crosscutting.market_session import (
+    MarketSession,
+    SessionPhase,
+    classify_session,
+)
 from .canonical.crosscutting.service_emission_state import (
     SERVICE_EMISSION_STATES,
     ManifestRowBlockedError,
@@ -1344,6 +1349,7 @@ __all__ = [
     "MappingRule",
     "MarginType",
     "MarketClosedError",
+    "MarketSession",
     "MarketState",
     "MarketStatus",
     "MarketTrade",
@@ -1453,6 +1459,7 @@ __all__ = [
     "SentimentScore",
     "ServiceEmissionPolicy",
     "ServiceEmissionStateEnum",
+    "SessionPhase",
     "SettlementEvent",
     "ShareClass",
     "SignalAcknowledgement",
@@ -1535,6 +1542,7 @@ __all__ = [
     "classify_cloud_run_service",
     "classify_experiment_run",
     "classify_scheduled_job",
+    "classify_session",
     "classify_venue_error",
     "classify_vm_name",
     "counterparty_for",

@@ -5,6 +5,7 @@ from enum import StrEnum
 
 from pydantic import AwareDatetime, Field
 
+from ...crosscutting.market_session import MarketSession, SessionPhase
 from .._base import CanonicalBase
 
 
@@ -123,6 +124,8 @@ class CanonicalOhlcvBar(CanonicalBase):
     quote_volume: Decimal | None = None
     count: int | None = None
     vwap: Decimal | None = None
+    session: MarketSession | None = None
+    phase: SessionPhase | None = None
 
 
 class CanonicalMarketStateEvent(CanonicalBase):
