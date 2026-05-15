@@ -10,8 +10,9 @@ from __future__ import annotations
 import logging
 import re
 from collections import defaultdict
+from datetime import date
 
-from unified_api_contracts.internal.reference.instrument import InstrumentRecord, InstrumentType
+from unified_api_contracts.internal.reference.instrument import InstrumentRecord, InstrumentStatus, InstrumentType
 from unified_api_contracts.registry.chain_env import MAINNET_CHAIN_IDS
 from unified_api_contracts.registry.market_data_categories import VENUES_BY_ASSET_GROUP
 
@@ -128,6 +129,7 @@ def _infer_asset_group(venue: str) -> str:
 
 def validate_instrument_records(
     records: list[InstrumentRecord],
+    as_of_date: date | None = None,
 ) -> tuple[list[InstrumentRecord], list[tuple[InstrumentRecord, str]]]:
     """Validate instrument records against per-type and asset-group rules.
 
@@ -148,7 +150,7 @@ def validate_instrument_records(
     rejected: list[tuple[InstrumentRecord, str]] = []
 
     for rec in records:
-        reason = _check_record(rec)
+        reason = _check_record(rec, as_of_date)
         if reason:
             rejected.append((rec, reason))
         else:
@@ -219,7 +221,7 @@ def _validate_defi_raw_symbol(rec: InstrumentRecord, protocol: str, chain: str) 
     return None
 
 
-def _check_record(rec: InstrumentRecord) -> str | None:
+def _check_record(rec: InstrumentRecord, as_of_date: date | None = None) -> str | None:
     """Return rejection reason or None if valid."""
     # --- Venue validation ---
     venue_err = _validate_venue(rec.venue)
@@ -253,6 +255,15 @@ def _check_record(rec: InstrumentRecord) -> str | None:
     # expiry: REQUIRED for futures and options
     if inst_type in (InstrumentType.FUTURE, InstrumentType.OPTION) and rec.expiry is None:
         return f"expiry is required for {inst_type} (venue={rec.venue}, symbol={rec.raw_symbol})"
+
+    # expiry guard: reject instruments already expired as of the processing date
+    if rec.status == InstrumentStatus.EXPIRED:
+        return f"instrument is EXPIRED (venue={rec.venue}, symbol={rec.raw_symbol})"
+    if as_of_date is not None and rec.expiry is not None and rec.expiry.date() < as_of_date:
+        return (
+            f"instrument expired before as_of_date: expiry={rec.expiry.date()} "
+            f"as_of={as_of_date} (venue={rec.venue}, symbol={rec.raw_symbol})"
+        )
 
     # strike + option_type: REQUIRED for options
     if inst_type == InstrumentType.OPTION:
