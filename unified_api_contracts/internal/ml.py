@@ -12,10 +12,11 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-# MLModelScorecard, MLPrediction, BackfillSpec — SSOT: domain/ml/schemas.py
+# MLModelScorecard, MLPrediction, BackfillSpec, ModelArtifactRegistry — SSOT: domain/ml/schemas.py
 from unified_api_contracts.internal.domain.ml.schemas import BackfillSpec as BackfillSpec
 from unified_api_contracts.internal.domain.ml.schemas import MLModelScorecard as MLModelScorecard
 from unified_api_contracts.internal.domain.ml.schemas import MLPrediction as MLPrediction
+from unified_api_contracts.internal.domain.ml.schemas import ModelArtifactRegistry as ModelArtifactRegistry
 
 
 class TargetType(StrEnum):

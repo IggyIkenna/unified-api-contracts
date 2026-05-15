@@ -764,6 +764,28 @@ class MLPrediction(BaseModel):
     features_used: int = 0
 
 
+class ModelArtifactRegistry(BaseModel):
+    """Canonical registry record for every deployed model artifact.
+
+    ml-inference-service MUST read from this registry at startup and on the
+    hot-reload cadence to resolve the active artifact GCS URI. Direct GCS path
+    lookup without the registry is banned.
+
+    SSOT: codex/04-architecture/ml-lifecycle.md
+    """
+
+    model_id: str
+    model_family: str  # e.g. "ml_directional", "carry_and_yield"
+    asset_group: str  # cefi/defi/tradfi/sports/prediction
+    version: str  # semver string e.g. "1.0.0"
+    gcs_uri: str  # full GCS path to model artifact
+    trained_at: datetime
+    is_active: bool = True  # False = soft-deleted/superseded
+    archetype: str | None = None  # strategy archetype this model was trained for
+    paper_snapshot_version: str | None = None  # filled at paper-run-start to freeze the artifact version
+    live_hot_reload_cadence_days: int = 7  # default weekly, configurable per archetype
+
+
 class BackfillSpec(BaseModel):
     """Per-service lookback requirements for transitioning from batch to live.
 

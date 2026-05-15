@@ -433,6 +433,29 @@ class BenchmarkFillMode(StrEnum):
     FUNDING_SNAPSHOT = "FUNDING_SNAPSHOT"
 
 
+BENCHMARK_FILL_MODE_BY_ACTION: dict[InstructionActionV2, BenchmarkFillMode] = {
+    InstructionActionV2.TRADE: BenchmarkFillMode.ARRIVAL_MID,
+    InstructionActionV2.SWAP: BenchmarkFillMode.POOL_MID_AT_BLOCK,
+    InstructionActionV2.LEND: BenchmarkFillMode.FUNDING_SNAPSHOT,
+    InstructionActionV2.BORROW: BenchmarkFillMode.FUNDING_SNAPSHOT,
+    InstructionActionV2.STAKE: BenchmarkFillMode.FUNDING_SNAPSHOT,
+    InstructionActionV2.UNSTAKE: BenchmarkFillMode.FUNDING_SNAPSHOT,
+    InstructionActionV2.QUOTE: BenchmarkFillMode.PASSIVE_BBO,
+    InstructionActionV2.TRANSFER: BenchmarkFillMode.ARRIVAL_MID,
+    InstructionActionV2.BRIDGE: BenchmarkFillMode.POOL_MID_AT_BLOCK,
+    InstructionActionV2.ATOMIC: BenchmarkFillMode.ARRIVAL_MID,
+    InstructionActionV2.CANCEL: BenchmarkFillMode.PASSIVE_BBO,
+    InstructionActionV2.CONVERT_DUST: BenchmarkFillMode.POOL_MID_AT_BLOCK,
+    InstructionActionV2.LP_MINT: BenchmarkFillMode.POOL_MID_AT_BLOCK,
+    InstructionActionV2.LP_BURN: BenchmarkFillMode.POOL_MID_AT_BLOCK,
+}
+"""Per-action BenchmarkFillMode — canonical SSOT (closes GAP-16, topology_qgroup_gap_closure_2026_05_09).
+
+Every InstructionActionV2 must have an entry. Matching engine reads this at BATCH mode
+always-fill to determine the reference price for simulated fills.
+"""
+
+
 class BacktestGroup(StrEnum):
     A_ML_TRAINING = "A_ML_TRAINING"
     B_STRATEGY = "B_STRATEGY"
@@ -465,6 +488,7 @@ class TransferType(StrEnum):
 
 __all__ = [
     "ARCHETYPE_TO_FAMILY",
+    "BENCHMARK_FILL_MODE_BY_ACTION",
     "AccountActionV2",
     "AllocatorArchetype",
     "AtomicExecutionMode",

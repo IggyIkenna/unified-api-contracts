@@ -96,6 +96,7 @@ from unified_api_contracts.internal.architecture_v2.derivation_demo import (
 )
 from unified_api_contracts.internal.architecture_v2.enums import (
     ARCHETYPE_TO_FAMILY,
+    BENCHMARK_FILL_MODE_BY_ACTION,
     AccountActionV2,
     AllocatorArchetype,
     AtomicExecutionMode,
@@ -282,6 +283,7 @@ __all__ = [
     "ALLOCATION_MIN_MATURITY",
     "ARCHETYPE_CAPABILITY_REGISTRY",
     "ARCHETYPE_TO_FAMILY",
+    "BENCHMARK_FILL_MODE_BY_ACTION",
     "COMPATIBILITY_SEED",
     "CROSS_VENUE_ROUTING_POLICIES",
     "EXTERNAL_VISIBILITY_MIN_MATURITY",
