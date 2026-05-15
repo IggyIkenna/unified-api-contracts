@@ -162,6 +162,12 @@ class StrategyInstanceIdentity(BaseModel):
     runner copies this from the definition when constructing the
     identity in V2EngineOrchestrator.register_instance."""
 
+    wallet_id: str = ""
+    """Operational wallet identifier matching ``WalletProvisioningConfig.wallet_id``
+    (e.g. ``csb-eth-hot-lido-v1``). Empty for non-DeFi strategies.
+    Used by strategy-service ``WalletPreflightRegistry`` to gate emissions against
+    spending caps before handing off to execution-service (Phase 4.C.F)."""
+
 
 class StrategyInstanceDefinition(BaseModel):
     strategy_instance_id: str
@@ -188,6 +194,11 @@ class StrategyInstanceDefinition(BaseModel):
     attributed reward streams (CEX-only, sports, prediction). Plumbed
     through ``StrategyInstanceIdentity`` -> ``BaseArchetypeEngineV2``
     -> Phase6Driver dust loader."""
+
+    wallet_id: str = ""
+    """Operational wallet identifier matching ``WalletProvisioningConfig.wallet_id``
+    (e.g. ``csb-eth-hot-lido-v1``). Empty for non-DeFi strategies.
+    Propagated to ``StrategyInstanceIdentity`` at registration time."""
 
 
 # ---------------------------------------------------------------------------
