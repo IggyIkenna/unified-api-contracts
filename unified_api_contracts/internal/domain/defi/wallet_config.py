@@ -537,6 +537,9 @@ class WalletMappingConfig:
         return sorted(ids)
 
 
+# Schema versioning — bump when WalletProvisioningConfig or SpendingCaps fields change
+CANONICAL_WALLET_PROVISIONING_VERSION = "1.0.0"
+
 # GCS config path template
 WALLET_CONFIG_GCS_PATH = "wallet-config/{chain_env}/wallet_mapping.json"
 

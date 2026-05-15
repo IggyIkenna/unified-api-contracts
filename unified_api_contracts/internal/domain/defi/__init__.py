@@ -136,6 +136,7 @@ from unified_api_contracts.internal.domain.defi.transfers import (
     TransferType,
 )
 from unified_api_contracts.internal.domain.defi.wallet_config import (
+    CANONICAL_WALLET_PROVISIONING_VERSION,
     ChainWalletMapping,
     ShareClassWalletMapping,
     SigningSurface,
@@ -162,6 +163,7 @@ from unified_api_contracts.internal.domain.features_onchain.protocol_params impo
 __all__ = [
     "AAVE_V3_RATE_MODEL_DEFAULTS_BY_ASSET",
     "AAVE_V3_RATE_MODEL_DEFAULT_FALLBACK",
+    "CANONICAL_WALLET_PROVISIONING_VERSION",
     "LST_TOKEN_TO_PROTOCOL_ASSET",
     "AVSRewardComponent",
     "AaveBorrowParams",

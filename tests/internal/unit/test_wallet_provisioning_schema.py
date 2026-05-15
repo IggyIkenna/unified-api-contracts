@@ -8,11 +8,15 @@ Phase 3 (wallet provisioning schema) + cross-tab handshake to slot 5
 
 from __future__ import annotations
 
+import dataclasses
+import json
+import re
 from decimal import Decimal
 
 import pytest
 
 from unified_api_contracts.internal.domain.defi import (
+    CANONICAL_WALLET_PROVISIONING_VERSION,
     SigningSurface,
     SpendingCaps,
     WalletKind,
@@ -397,3 +401,61 @@ def test_spending_caps_is_frozen() -> None:
     caps = SpendingCaps(per_tx_usd=Decimal("100"))
     with pytest.raises((AttributeError, Exception)):
         caps.per_tx_usd = Decimal("200")  # type: ignore[misc]
+
+
+# ---------------------------------------------------------------------------
+# Round-trip serialization + schema versioning
+# ---------------------------------------------------------------------------
+
+
+def test_schema_version_constant_exists_and_is_semver() -> None:
+    """CANONICAL_WALLET_PROVISIONING_VERSION must exist and follow X.Y.Z format."""
+    assert re.match(r"^\d+\.\d+\.\d+$", CANONICAL_WALLET_PROVISIONING_VERSION) is not None
+
+
+def test_signing_surface_all_values_round_trip_via_string() -> None:
+    """Each SigningSurface value serialises to a string and deserialises back to the same enum member."""
+    for surface in SigningSurface:
+        serialised = surface.value
+        assert isinstance(serialised, str)
+        assert SigningSurface(serialised) == surface
+
+
+def test_signing_surface_value_is_json_native() -> None:
+    """SigningSurface.value is a plain str — JSON-serialisable without a custom encoder."""
+    for surface in SigningSurface:
+        encoded = json.dumps(surface.value)
+        decoded = json.loads(encoded)
+        assert SigningSurface(decoded) == surface
+
+
+def test_wallet_provisioning_config_field_reconstruction() -> None:
+    """Fields extracted from a frozen WalletProvisioningConfig reconstruct an equal instance."""
+    original = WalletProvisioningConfig(
+        wallet_id="hot-trading-eth-v1",
+        chain="ETHEREUM",
+        kind=WalletKind.HOT_TRADING,
+        signing_surface=SigningSurface.CLOUD_KMS_ENCRYPTED,
+        kms_key_uri="projects/pid/locations/us/keyRings/wallets/cryptoKeys/k1",
+        archetype_id="carry_staked_basis",
+        allowed_protocols=frozenset({"AAVE_V3", "UNISWAP_V3"}),
+        allowed_destinations=frozenset(),
+        spending_caps=SpendingCaps(per_tx_usd=Decimal("50000")),
+        label="carry archetype hot wallet",
+    )
+    reconstructed = WalletProvisioningConfig(
+        **{f.name: getattr(original, f.name) for f in dataclasses.fields(original)}
+    )
+    assert reconstructed == original
+
+
+def test_spending_caps_decimal_precision_preserved() -> None:
+    """Decimal fields on SpendingCaps retain full precision after field access and reconstruction."""
+    caps = SpendingCaps(
+        per_tx_usd=Decimal("99999.999999999999"),
+        per_day_usd=Decimal("0.000000000000001"),
+    )
+    assert caps.per_tx_usd == Decimal("99999.999999999999")
+    assert caps.per_day_usd == Decimal("0.000000000000001")
+    reconstructed = SpendingCaps(**{f.name: getattr(caps, f.name) for f in dataclasses.fields(caps)})
+    assert reconstructed == caps
