@@ -142,6 +142,38 @@ AAVE_V3_ETHEREUM_RESERVES: dict[str, ReserveParams] = {
         liquidation_bonus=Decimal("0.075"),
         reserve_factor=Decimal("0.15"),
     ),
+    # Yield-bearing stablecoins — top recursive-borrow cell candidates (P1 addition 2026-05-15)
+    # Source: app.aave.com Ethereum market — low-confidence, verify before mainnet use
+    "SUSDE": ReserveParams(
+        max_ltv=Decimal("0.72"),
+        liquidation_threshold=Decimal("0.75"),
+        liquidation_bonus=Decimal("0.075"),
+        reserve_factor=Decimal("0.20"),
+    ),
+    "GHO": ReserveParams(
+        max_ltv=Decimal("0.00"),  # GHO is borrow-only on Aave V3 ETH; no collateral
+        liquidation_threshold=Decimal("0.00"),
+        liquidation_bonus=Decimal("0.00"),
+        reserve_factor=Decimal("0.00"),
+    ),
+    "SDAI": ReserveParams(
+        max_ltv=Decimal("0.80"),
+        liquidation_threshold=Decimal("0.82"),
+        liquidation_bonus=Decimal("0.045"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "FRAX": ReserveParams(
+        max_ltv=Decimal("0.00"),  # frozen on Aave V3 ETH as of 2026-05-15
+        liquidation_threshold=Decimal("0.00"),
+        liquidation_bonus=Decimal("0.00"),
+        reserve_factor=Decimal("0.10"),
+    ),
+    "LUSD": ReserveParams(
+        max_ltv=Decimal("0.00"),  # collateral-disabled on Aave V3 ETH
+        liquidation_threshold=Decimal("0.00"),
+        liquidation_bonus=Decimal("0.00"),
+        reserve_factor=Decimal("0.10"),
+    ),
 }
 
 
