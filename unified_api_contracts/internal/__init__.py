@@ -623,9 +623,13 @@ from unified_api_contracts.internal.events import (
     VersionBumpDetails,
 )
 from unified_api_contracts.internal.execution import (
+    ManualAuditCategory,
     ManualExecutionMode,
     ManualInstruction,
+    ManualInstructionAuditLog,
+    ManualInstructionPrecheckResponse,
     SettlementType,
+    WalletSpendingPreCheckResult,
 )
 from unified_api_contracts.internal.features import (
     CrossInstrumentFeatures,
@@ -1346,8 +1350,11 @@ __all__ = [
     "MLModelScorecard",
     "MLPrediction",
     "MLPredictionMessage",
+    "ManualAuditCategory",
     "ManualExecutionMode",
     "ManualInstruction",
+    "ManualInstructionAuditLog",
+    "ManualInstructionPrecheckResponse",
     "MarginEvent",
     "MarginEventSeverity",
     "MarginHealthSnapshot",
@@ -1650,6 +1657,7 @@ __all__ = [
     "VolSurfaceTermStructureRecord",
     "VolatilitySource",
     "WalletRole",
+    "WalletSpendingPreCheckResult",
     "WebSocketConnectEvent",
     "WebSocketConnectionClosed",
     "WebSocketConnectionOpened",
