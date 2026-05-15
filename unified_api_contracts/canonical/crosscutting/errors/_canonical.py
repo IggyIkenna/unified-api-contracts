@@ -19,8 +19,8 @@ class RateLimitInfo:
     venue: str | None = None
 
 
-class CanonicalError:
-    """Canonical error (grouped from venue-specific errors). Phase 1 placeholder."""
+class CanonicalError(Exception):
+    """Canonical error (grouped from venue-specific errors)."""
 
     def __init__(
         self,
@@ -28,11 +28,17 @@ class CanonicalError:
         message: str,
         action: ErrorAction,
         venue: str | None = None,
+        retry_safe: bool = False,
+        reconnect: bool = False,
     ) -> None:
+        super().__init__(message)
         self.code = code
         self.message = message
         self.action = action
         self.venue = venue
+        self.retry_safe = retry_safe
+        self.reconnect = reconnect
+        self.error_code = code
 
 
 class CanonicalRateLimitError(CanonicalError):
@@ -44,6 +50,8 @@ class CanonicalRateLimitError(CanonicalError):
             message=message,
             action=ErrorAction.RETRY,
             venue=venue,
+            retry_safe=True,
+            reconnect=False,
         )
 
 
@@ -80,6 +88,8 @@ class CanonicalInternalServerError(CanonicalError):
             message=message,
             action=ErrorAction.RETRY,
             venue=venue,
+            retry_safe=True,
+            reconnect=False,
         )
 
 
@@ -92,6 +102,8 @@ class CanonicalServiceUnavailableError(CanonicalError):
             message=message,
             action=ErrorAction.RETRY,
             venue=venue,
+            retry_safe=True,
+            reconnect=True,
         )
 
 
@@ -104,6 +116,8 @@ class CanonicalNetworkError(CanonicalError):
             message=message,
             action=ErrorAction.RETRY,
             venue=venue,
+            retry_safe=True,
+            reconnect=True,
         )
 
 
@@ -248,6 +262,8 @@ class CanonicalMaintenanceModeError(CanonicalError):
             message=message,
             action=ErrorAction.RECONNECT,
             venue=venue,
+            retry_safe=True,
+            reconnect=True,
         )
 
 
