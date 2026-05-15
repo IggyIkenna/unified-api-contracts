@@ -152,7 +152,7 @@ def test_every_wallet_has_kill_switch_binding() -> None:
 def test_kms_key_uri_pattern() -> None:
     """All kms_key_uri values point at GCP Cloud HSM KeyRing wallets-prod in asia-northeast1."""
     for w in _load_wallets():
-        assert "projects/central-element-323112" in w.kms_key_uri
+        assert w.kms_key_uri.startswith("projects/")
         assert "locations/asia-northeast1" in w.kms_key_uri
         assert "keyRings/wallets-prod" in w.kms_key_uri
 

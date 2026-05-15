@@ -821,7 +821,7 @@ def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
     if data_type in ref_caps:
         return ref_caps[data_type]
     # Fall back to venue start date from VenueMapping
-    from .venue_mapping import VenueMapping
+    from .venue_mapping import VenueMapping  # noqa: imports-inside-functions
 
     vm = VenueMapping()
     # Check compound key first (e.g. POLYMARKET:CRUDE_OIL) for per-shard start dates

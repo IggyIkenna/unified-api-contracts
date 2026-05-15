@@ -19,6 +19,9 @@ from enum import StrEnum
 from typing import Literal, cast
 from uuid import uuid4
 
+from unified_api_contracts.canonical.domain.derivatives.futures import (
+    FuturesContractLifecyclePhase,
+)
 from unified_api_contracts.internal.domain.execution_service.multi_leg import (
     LegRole,
 )
@@ -807,6 +810,7 @@ class FuturesRollInstruction:
     near_contract_id: str
     far_contract_id: str
     roll_spread: Decimal | None = None
+    lifecycle_phase: FuturesContractLifecyclePhase | None = None
 
     @staticmethod
     def create(
@@ -819,6 +823,7 @@ class FuturesRollInstruction:
         amount: Decimal,
         direction: "Literal['LONG', 'SHORT', 'FLAT']",
         roll_spread: Decimal | None = None,
+        lifecycle_phase: FuturesContractLifecyclePhase | None = None,
         metadata: MetadataMap | None = None,
     ) -> "FuturesRollInstruction":
         instr = StrategyInstruction(
@@ -839,6 +844,7 @@ class FuturesRollInstruction:
             near_contract_id=near_contract_id,
             far_contract_id=far_contract_id,
             roll_spread=roll_spread,
+            lifecycle_phase=lifecycle_phase,
         )
 
 

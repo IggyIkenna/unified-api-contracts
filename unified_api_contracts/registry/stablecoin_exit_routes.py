@@ -15,7 +15,7 @@ Usage::
     # Cheapest routes for a $500k USDC exit
     routes = get_emergency_exit_routes("USDC", Decimal("500000"))
     for r in routes:
-        print(r.route_id, r.venue, r.priority_rank)
+        pass  # r.route_id, r.venue, r.priority_rank → cheapest routes ordered by cost
 
 SSOT: ``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` Phase D.6.
 """

@@ -124,7 +124,7 @@ def _cefi_params(**overrides: object) -> SyntheticParams:
             shards_per_day=2,
             partition_template="venue={venue}/instrument={instrument}/dt={dt}",
         ),
-        output_uri="gs://central-element-323112-benchmark-synthetic/cefi/trades",
+        output_uri="gs://test-project-benchmark-synthetic/cefi/trades",
         venues=("bybit",),
         instruments=("BTCUSDT",),
     )

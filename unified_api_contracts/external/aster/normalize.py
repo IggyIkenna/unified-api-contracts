@@ -44,7 +44,9 @@ from .schemas import (
 
 _parse_decimal = _d
 
-_now_utc = lambda: datetime.now(UTC)
+
+def _now_utc() -> datetime:
+    return datetime.now(UTC)
 
 
 def _ms_to_utc(ts_ms: object | None) -> datetime | None:

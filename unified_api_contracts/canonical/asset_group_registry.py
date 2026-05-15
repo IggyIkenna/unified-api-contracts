@@ -14,9 +14,9 @@ Usage::
         get_canonical_inventory,
     )
     inv = get_canonical_inventory("cefi")
-    print(inv.venues)           # ("BINANCE-SPOT", "BINANCE-FUTURES", ...)
-    print(inv.data_types)       # ("book_snapshot_5", "futures_chain", ...)
-    print(inv.source_coverage_start)  # {"BINANCE-SPOT": date(2017, 8, 17), ...}
+    # inv.venues           → ("BINANCE-SPOT", "BINANCE-FUTURES", ...)
+    # inv.data_types       → ("book_snapshot_5", "futures_chain", ...)
+    # inv.source_coverage_start → {"BINANCE-SPOT": date(2017, 8, 17), ...}
 
 SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 5C.
 """

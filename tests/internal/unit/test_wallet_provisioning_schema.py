@@ -105,8 +105,7 @@ def _valid_kms_wallet() -> WalletProvisioningConfig:
         kind=WalletKind.HOT_TRADING,
         signing_surface=SigningSurface.CLOUD_KMS_ENCRYPTED,
         kms_key_uri=(
-            "projects/central-element-323112/locations/asia-northeast1/"
-            "keyRings/wallets-prod/cryptoKeys/trading-aave-eth-v1"
+            "projects/test-project/locations/asia-northeast1/keyRings/wallets-prod/cryptoKeys/trading-aave-eth-v1"
         ),
         allowed_protocols=frozenset({"AAVE_V3", "UNISWAP_V3"}),
         spending_caps=SpendingCaps(

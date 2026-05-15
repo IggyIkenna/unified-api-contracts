@@ -121,6 +121,8 @@ max-complexity = 7
 "unified_api_contracts/internal/schemas/contracts.py" = ["E402"]
 "unified_api_contracts/internal/testing/seed_*.py" = ["C901", "E501", "B007", "RUF002", "B905"]
 "unified_api_contracts/internal/testing/seed_validator.py" = ["C901", "E501"]
+# chain_env.py carries long provenance comment annotations for each chain entry; E501 is expected.
+"unified_api_contracts/registry/chain_env.py" = ["E501"]
 "unified_api_contracts/internal/domain/cefi_accounts/schemas.py" = ["N815"]
 "unified_api_contracts/internal/domain/defi/eth_transfers.py" = ["N815"]
 "unified_api_contracts/internal/domain/defi/protocol_sdks.py" = ["N815"]
