@@ -145,7 +145,7 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     # Transfermarkt — player values.
     # TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static catalog mapping;
     # lives in UAC TRANSFERMARKT_IDS as provider-id config rather than captured data).
-    "TRANSFERMARKT_VALUES": "transfermarkt",
+    # TRANSFERMARKT_VALUES retired 2026-05-15 (stale alias — PLAYER_VALUES is canonical).
     "PLAYER_VALUES": "transfermarkt",
     # SoccerFootball.info.
     # SFI_LEAGUES retired 2026-05-05 (same reason — UAC SOCCER_FOOTBALL_INFO_IDS).
