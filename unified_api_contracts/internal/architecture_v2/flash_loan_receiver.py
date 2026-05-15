@@ -33,7 +33,7 @@ from __future__ import annotations
 import re
 from collections.abc import Iterable
 from enum import StrEnum
-from typing import Final
+from typing import Final, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -67,6 +67,10 @@ class FlashLoanReceiverDeployment(BaseModel):
     ``deployment_commit_sha`` is the deployment-service repo commit SHA
     that produced the deployed bytecode — makes every row
     git-bisectable back to its Solidity source.
+
+    ``receiver_kind`` distinguishes the passthrough receiver (simple
+    repay-approve pattern) from the action-encoder recursive-leverage
+    receiver (``RecursiveLeverageReceiver.sol``).
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -77,6 +81,13 @@ class FlashLoanReceiverDeployment(BaseModel):
     """
 
     protocol: FlashLoanProtocol
+    receiver_kind: Literal["passthrough", "recursive_leverage"] = "passthrough"
+    """Receiver contract kind:
+    - ``passthrough``: simple repay-approve (FlashLoanReceiver.sol).
+    - ``recursive_leverage``: action-encoder pattern (RecursiveLeverageReceiver.sol);
+      used by RecursiveLoopOrchestrator Phase 4/5.
+    """
+
     receiver_address: str
     """Checksum address (EVM) or base58 program ID (Solana)."""
 
@@ -159,6 +170,44 @@ FLASH_LOAN_RECEIVER_REGISTRY: Final[tuple[FlashLoanReceiverDeployment, ...]] = (
         supported_tokens=("USDC", "WETH", "ARB"),
         notes="Arbitrum Uniswap V3 single-pool flash-swap receiver.",
     ),
+    # --- RecursiveLeverageReceiver.sol (action-encoder pattern, Phase 4) ---
+    # Addresses are placeholder pending Sepolia deploy + mainnet deploy via
+    # deployment-service/scripts/deploy-recursive-leverage-receiver.sh.
+    FlashLoanReceiverDeployment(
+        chain="SEPOLIA",
+        protocol=FlashLoanProtocol.AAVE_V3,
+        receiver_kind="recursive_leverage",
+        receiver_address="0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+        deployment_commit_sha="phase4-pending",
+        deployed_at_utc="2026-05-15T00:00:00Z",
+        supported_tokens=("WETH", "WSTETH", "WEETH", "CBETH"),
+        notes="Sepolia testnet RecursiveLeverageReceiver. Aave V3 pool "
+        "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951. "
+        "Placeholder address — replace after `deploy-recursive-leverage-receiver.sh --chain sepolia`.",
+    ),
+    FlashLoanReceiverDeployment(
+        chain="ETHEREUM",
+        protocol=FlashLoanProtocol.AAVE_V3,
+        receiver_kind="recursive_leverage",
+        receiver_address="0xDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+        deployment_commit_sha="phase4-pending",
+        deployed_at_utc="2026-05-15T00:00:00Z",
+        supported_tokens=("WETH", "WSTETH", "WEETH", "CBETH"),
+        notes="Ethereum mainnet RecursiveLeverageReceiver. Aave V3 pool "
+        "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2. "
+        "Placeholder address — replace after `deploy-recursive-leverage-receiver.sh --chain ethereum`.",
+    ),
+    FlashLoanReceiverDeployment(
+        chain="BASE",
+        protocol=FlashLoanProtocol.AAVE_V3,
+        receiver_kind="recursive_leverage",
+        receiver_address="0xEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+        deployment_commit_sha="phase4-pending",
+        deployed_at_utc="2026-05-15T00:00:00Z",
+        supported_tokens=("WETH", "WSTETH", "CBETH"),
+        notes="Base mainnet RecursiveLeverageReceiver. Aave V3 pool via PoolAddressesProvider. "
+        "Placeholder address — replace after `deploy-recursive-leverage-receiver.sh --chain base`.",
+    ),
 )
 
 
@@ -170,18 +219,22 @@ def flash_loan_receiver_for(
     chain: str,
     protocol: FlashLoanProtocol,
     *,
+    kind: Literal["passthrough", "recursive_leverage"] = "passthrough",
     registry: Iterable[FlashLoanReceiverDeployment] = FLASH_LOAN_RECEIVER_REGISTRY,
 ) -> FlashLoanReceiverDeployment:
-    """Resolve a deployed receiver by (chain, protocol).
+    """Resolve a deployed receiver by (chain, protocol, kind).
+
+    ``kind`` defaults to ``"passthrough"`` for backwards-compatibility —
+    callers of ``RecursiveLoopOrchestrator`` must pass ``kind="recursive_leverage"``.
 
     Fail-loud: raises on miss (no silent fallback per CLAUDE.md).
     """
 
     for entry in registry:
-        if entry.chain == chain and entry.protocol == protocol:
+        if entry.chain == chain and entry.protocol == protocol and entry.receiver_kind == kind:
             return entry
     raise FlashLoanReceiverNotFoundError(
-        f"no FlashLoanReceiver deployed for chain={chain!r}, protocol={protocol.value!r}",
+        f"no FlashLoanReceiver deployed for chain={chain!r}, protocol={protocol.value!r}, kind={kind!r}",
     )
 
 
@@ -205,22 +258,32 @@ def receivers_supporting_token(
     return tuple(entry for entry in registry if token in entry.supported_tokens)
 
 
+def receivers_by_kind(
+    kind: Literal["passthrough", "recursive_leverage"],
+    *,
+    registry: Iterable[FlashLoanReceiverDeployment] = FLASH_LOAN_RECEIVER_REGISTRY,
+) -> tuple[FlashLoanReceiverDeployment, ...]:
+    """All receivers of a specific ``receiver_kind`` across all chains/protocols."""
+
+    return tuple(entry for entry in registry if entry.receiver_kind == kind)
+
+
 def _validate_registry_invariants(
     registry: Iterable[FlashLoanReceiverDeployment] = FLASH_LOAN_RECEIVER_REGISTRY,
 ) -> None:
     """Invariants:
 
-    * (chain, protocol) pair unique.
+    * (chain, protocol, receiver_kind) triple unique.
     * ``receiver_address`` matches EVM-checksum or Solana-base58 shape.
     * ``supported_tokens`` non-empty.
     """
 
-    seen: set[tuple[str, FlashLoanProtocol]] = set()
+    seen: set[tuple[str, FlashLoanProtocol, str]] = set()
     for entry in registry:
-        key = (entry.chain, entry.protocol)
+        key = (entry.chain, entry.protocol, entry.receiver_kind)
         if key in seen:
             raise ValueError(
-                f"duplicate (chain, protocol) in FLASH_LOAN_RECEIVER_REGISTRY: {key!r}",
+                f"duplicate (chain, protocol, receiver_kind) in FLASH_LOAN_RECEIVER_REGISTRY: {key!r}",
             )
         seen.add(key)
         if not _is_valid_address(entry.receiver_address):
@@ -250,6 +313,7 @@ __all__ = [
     "FlashLoanReceiverDeployment",
     "FlashLoanReceiverNotFoundError",
     "flash_loan_receiver_for",
+    "receivers_by_kind",
     "receivers_for_chain",
     "receivers_supporting_token",
 ]
