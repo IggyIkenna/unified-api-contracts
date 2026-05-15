@@ -177,13 +177,18 @@ FLASH_LOAN_RECEIVER_REGISTRY: Final[tuple[FlashLoanReceiverDeployment, ...]] = (
         chain="SEPOLIA",
         protocol=FlashLoanProtocol.AAVE_V3,
         receiver_kind="recursive_leverage",
-        receiver_address="0xCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
-        deployment_commit_sha="phase4-pending",
-        deployed_at_utc="2026-05-15T00:00:00Z",
+        receiver_address="0x668BC0C59F434D7cE2498416E7eF9095b840c7cF",
+        deployment_commit_sha="602feaf",
+        deployed_at_utc="2026-05-15T19:55:12Z",
         supported_tokens=("WETH", "WSTETH", "WEETH", "CBETH"),
         notes="Sepolia testnet RecursiveLeverageReceiver. Aave V3 pool "
-        "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951. "
-        "Placeholder address — replace after `deploy-recursive-leverage-receiver.sh --chain sepolia`.",
+        "0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951; SwapRouter02 "
+        "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45; WETH9 "
+        "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14. "
+        "Deploy tx 0x5c299e9f3e64c5179d81b8e26a695ab4f12392064f416ee22df205b0492aeab6 "
+        "(gas_used=1508218). Etherscan: "
+        "https://sepolia.etherscan.io/address/0x668BC0C59F434D7cE2498416E7eF9095b840c7cF. "
+        "Secret: recursive-leverage-receiver-sepolia (central-element-323112).",
     ),
     FlashLoanReceiverDeployment(
         chain="ETHEREUM",
