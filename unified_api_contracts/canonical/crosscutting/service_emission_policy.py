@@ -300,19 +300,24 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-service", "economic_events"): ServiceEmissionPolicy.PARTIAL_OK,
     ("features-service", "targets"): ServiceEmissionPolicy.STRICT_FAIL,
     #
-    # features-multi-timeframe-service — 6 entries (Phase 6.5 P2 fix 2026-05-14: added
-    # correct "features-multi-timeframe-service" key entries for all seeded groups including
-    # tf_risk_reward + wedge_confluence which were confirmed cross-TF STRICT_FAIL;
-    # intraday_regime + micro_regime remain unseeded pending operator classification,
-    # tracked in plans/active/issues/mtf_intraday_micro_regime_policy_2026_05_14.md).
-    # Cross-TF alignment is load-bearing — ANY stale leg corrupts the alignment
-    # column with lookahead bias (paired_spec precedent). All STRICT_FAIL.
+    # features-multi-timeframe-service — 8 entries (Phase 6.5 P2 fix 2026-05-14: added
+    # correct "features-multi-timeframe-service" key entries for all seeded groups;
+    # intraday_regime + micro_regime seeded NAN_FILL 2026-05-15 per slot-9→5 reassignment
+    # operator decision; issue mtf_intraday_micro_regime_policy_2026_05_14.md closed).
+    # Cross-TF alignment groups: STRICT_FAIL (any stale leg = lookahead-bias trap).
+    # Single-TF regime labels: NAN_FILL (partial day still yields computable labels).
     ("features-multi-timeframe-service", "tf_momentum_alignment"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "tf_structure_context"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "tf_vol_compression"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "tf_confluence_signals"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "tf_risk_reward"): ServiceEmissionPolicy.STRICT_FAIL,
     ("features-multi-timeframe-service", "wedge_confluence"): ServiceEmissionPolicy.STRICT_FAIL,
+    # intraday_regime + micro_regime: single-TF (1h / 1m OHLCV-derived regime labels).
+    # NOT cross-TF — no paired-spec lookahead-bias risk. Partial OHLCV day still yields
+    # computable regime labels. ML consumer NaN-fills natively. → NAN_FILL (Option A,
+    # operator-acked via slot-9→5 reassignment 2026-05-14).
+    ("features-multi-timeframe-service", "intraday_regime"): ServiceEmissionPolicy.NAN_FILL,
+    ("features-multi-timeframe-service", "micro_regime"): ServiceEmissionPolicy.NAN_FILL,
     # Legacy entries (key "features-service" does NOT match handler _SERVICE_NAME
     # "features-multi-timeframe-service"; orphaned but preserved as catch-all).
     ("features-service", "tf_momentum_alignment"): ServiceEmissionPolicy.STRICT_FAIL,

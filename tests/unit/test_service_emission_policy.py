@@ -129,6 +129,21 @@ def test_seed_contains_instruments_catalog_snapshot_partial_ok() -> None:
     assert SERVICE_OUTPUT_POLICIES[("instruments-service", "catalog_snapshot")] is ServiceEmissionPolicy.PARTIAL_OK
 
 
+def test_seed_contains_mtf_intraday_regime_nan_fill() -> None:
+    """Single-TF 1h regime labels: partial day still yields computable output → NAN_FILL."""
+    assert (
+        SERVICE_OUTPUT_POLICIES[("features-multi-timeframe-service", "intraday_regime")]
+        is ServiceEmissionPolicy.NAN_FILL
+    )
+
+
+def test_seed_contains_mtf_micro_regime_nan_fill() -> None:
+    """Single-TF 1m regime labels: partial day still yields computable output → NAN_FILL."""
+    assert (
+        SERVICE_OUTPUT_POLICIES[("features-multi-timeframe-service", "micro_regime")] is ServiceEmissionPolicy.NAN_FILL
+    )
+
+
 def test_all_seed_values_are_valid_policies() -> None:
     """No stray strings — every value must be a real :class:`ServiceEmissionPolicy`."""
     for policy in SERVICE_OUTPUT_POLICIES.values():
