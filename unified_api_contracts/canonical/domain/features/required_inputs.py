@@ -407,6 +407,45 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
         InputReq(asset_group="cefi", data_type="book_snapshot", available_at_rule="tick_timestamp"),
         InputReq(asset_group="cefi", data_type="liquidations", available_at_rule="tick_timestamp"),
     ],
+    # ---- features-volatility (tradfi options + futures chains) -----------
+    # Reads bundled options_chain / futures_chain shards for the TradFi
+    # archetype universe (CME ES.OPT clusters, CBOE VIX, NASDAQ ETF options
+    # post-cutover). Cross-listed for cefi where Deribit/Tardis supply
+    # parallel coverage (per `tradfi_master_2026_05_07` § feature_groups).
+    "options_iv": [
+        InputReq(asset_group="cefi", data_type="options_chain", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    "futures_term_structure": [
+        InputReq(asset_group="cefi", data_type="futures_chain", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="futures_chain", available_at_rule="tick_timestamp"),
+    ],
+    "gamma_exposure": [
+        InputReq(asset_group="cefi", data_type="options_chain", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    "variance_risk_premium": [
+        InputReq(asset_group="cefi", data_type="options_chain", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    "second_order_greeks": [
+        InputReq(asset_group="cefi", data_type="options_chain", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    "tradfi_vol_surface": [
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    "vol_surface_term_structure": [
+        InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),
+    ],
+    # CBOE VIX 15m + 1m OHLCV — the VIX-specific feature calculator
+    # (features-service@b3814675 — vix_calculator.py) consumes ohlcv at
+    # multiple timeframes. VIX 15m has its own data_type per CLAUDE.md
+    # "VIX 15m" rule (Barchart preload + Yahoo rolling 60d + honest gap).
+    "vix_features": [
+        InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="tradfi", data_type="ohlcv_15m", available_at_rule="tick_timestamp"),
+    ],
 }
 """Registry — feature_group -> list of upstream input requirements.
 
