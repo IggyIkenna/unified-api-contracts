@@ -101,6 +101,14 @@ from .canonical.crosscutting.kill_switch import (
     KillSwitchId,
     KillSwitchProvenance,
 )
+from .canonical.crosscutting.source_priority import (
+    emission_latency_ms_for_source,
+    get_primary_source,
+    get_primary_source_with_latency,
+    get_source_priority,
+    has_source_priority,
+    read_with_source_priority,
+)
 from .canonical.crosscutting.pipeline_mode import (
     PipelineMode,
     is_batch,
@@ -387,6 +395,12 @@ from .canonical.partition_paths import (
     build_defi_partition_path,
     build_prediction_partition_path,
     build_tradfi_partition_path,
+)
+from .canonical.crosscutting.strategy_family import (
+    STRATEGY_FAMILY_REGISTRY,
+    StrategyFamily,
+    StrategyFamilyId,
+    family_for_archetype,
 )
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
@@ -1005,6 +1019,7 @@ __all__ = [
     "SERVICE_EMISSION_STATE_COLUMN",
     "SHARE_CLASS_BASE_ASSETS",
     "SPORTS_VENUES",
+    "STRATEGY_FAMILY_REGISTRY",
     "SYNTHETIC_GENERATOR_REGISTRY",
     "TIMEFRAMES",
     "TRADFI_DATABENTO_INSTRUMENTS",
@@ -1482,6 +1497,8 @@ __all__ = [
     "SpreadLeg",
     "StakingProtocolBreakdown",
     "StaleHold",
+    "StrategyFamily",
+    "StrategyFamilyId",
     "StrategySignalAcknowledged",
     "StrategySignalEmittedExternal",
     "SubAccount",
@@ -1551,8 +1568,10 @@ __all__ = [
     "classify_vm_name",
     "counterparty_for",
     "decimal_to_american",
+    "emission_latency_ms_for_source",
     "entitled_slots_for",
     "entitlements_for",
+    "family_for_archetype",
     "generators_for_archetype",
     "get_data_sources_for_venue",
     "get_databento_symbols_for_venue",
@@ -1561,12 +1580,16 @@ __all__ = [
     "get_expected_data_types_for_venue",
     "get_expected_instruments_for_venue",
     "get_generator_spec",
+    "get_primary_source",
+    "get_primary_source_with_latency",
     "get_provider_availability",
     # Features DAG — UTL point_in_time + features-* consumers
     "get_required_inputs",
     "get_required_secrets",
+    "get_source_priority",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
+    "has_source_priority",
     "is_batch",
     "is_emission_policy_declared",
     "is_live",
@@ -1578,6 +1601,7 @@ __all__ = [
     "pipeline_mode_for_source",
     "policy_is_alert",
     "policy_is_publish_row",
+    "read_with_source_priority",
     "register_generator",
     "register_scenario",
     "resolve_environment_from_env",
