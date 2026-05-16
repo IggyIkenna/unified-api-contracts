@@ -74,6 +74,11 @@ class LstRateRecord:
     Stores the on-chain oracle exchange rate (NOT APY).
     APY = annualised growth in the rate.
     For P&L attribution: pnl = position_size * (rate_t1 - rate_t0).
+
+    Rebasing flag: stETH rebases daily (token balance increases automatically);
+    wstETH/cbETH/rETH/jitoSOL/mSOL are non-rebasing (exchange rate grows but
+    balance stays constant). Consumers need this to distinguish position-balance
+    delta sources: rebasing tokens accrue via balance, non-rebasing via rate.
     """
 
     timestamp: str  # YYYY-MM-DD
@@ -83,6 +88,8 @@ class LstRateRecord:
     block_number: int
     method: str  # contract method name
     contract: str  # contract address
+    is_rebasing: bool = False  # stETH=True, wstETH/cbETH/rETH/jitoSOL/mSOL=False
+    rebase_rate: float | None = None  # daily rebase multiplier (Lido oracle); None for non-rebasing
 
 
 @dataclass(frozen=True, slots=True)
