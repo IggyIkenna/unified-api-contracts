@@ -663,7 +663,14 @@ TRADFI_TICK_DATA_WINDOWS: list[dict[str, str]] = []
 # successor plan reads this list to restore TRADFI_TICK_DATA_WINDOWS above).
 # Kept here (not in the post-cutover plan file) so a single grep -r finds the
 # canonical historical scope.
-_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS: list[dict[str, str]] = [
+# Renamed 2026-05-17 from `_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS` (the
+# original naming conflicted with the dict-shape per-(venue, data_type)
+# deferred constant added below — same name, incompatible shapes). The
+# list-shape constant here mirrors TRADFI_TICK_DATA_WINDOWS; the dict-shape
+# `_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS` below mirrors
+# VENUE_DATA_TYPE_COVERAGE_WINDOWS. Plan reference:
+# `plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md` Phase 1.
+_DEFERRED_TRADFI_TICK_DATA_WINDOWS: list[dict[str, str]] = [
     {"start": "2023-05-01", "end": "2023-05-31"},  # was: Training window
     {"start": "2024-07-01", "end": "2024-07-31"},  # was: Validation window
 ]
@@ -782,15 +789,23 @@ def is_tradfi_futures_instrument_active(instrument_id: str, as_of_date_str: str)
 # Keys are ``(venue, data_type)``; values are inclusive [start, end]
 # date-string tuples. ALL data not listed here is expected on every
 # trading day from the venue's start_date (the default behaviour).
-VENUE_DATA_TYPE_COVERAGE_WINDOWS: dict[tuple[str, str], list[tuple[str, str]]] = {
+# Currently empty per OHLCV-only MVP scope (`tradfi_ohlcv_only_mvp_backfill_2026_05_15.md`
+# Phase 1, 2026-05-15 operator direction). CME tbbo + CME mbp_10 windows moved to
+# `_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS` below for post-cutover restoration.
+VENUE_DATA_TYPE_COVERAGE_WINDOWS: dict[tuple[str, str], list[tuple[str, str]]] = {}
+
+
+# Frozen reference of pre-2026-05-15 per-(venue, data_type) coverage windows.
+# Restored by post-cutover successor plan
+# `tradfi_l1_l2_l3_tick_data_post_cutover_2026_06_01.md` (filed Phase 9 of the
+# OHLCV-only MVP plan). Mirrors the dict shape of VENUE_DATA_TYPE_COVERAGE_WINDOWS.
+_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS: dict[tuple[str, str], list[tuple[str, str]]] = {
     # CME futures L2 microstructure (BTC date-futures-arb reference months)
     ("CME", "tbbo"): [
         ("2023-05-01", "2023-05-31"),
         ("2024-06-01", "2024-06-30"),
     ],
-    # CME futures 10-deep book — adapter doesn't support yet (deferred), but
-    # declaring the expected window here makes the intent explicit and avoids
-    # a year-round denominator if/when the adapter ships.
+    # CME futures 10-deep book — adapter deferred to post-cutover scope.
     ("CME", "mbp_10"): [
         ("2023-05-01", "2023-05-31"),
         ("2024-06-01", "2024-06-30"),
