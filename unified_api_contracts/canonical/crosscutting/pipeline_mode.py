@@ -67,6 +67,7 @@ class PipelineMode(StrEnum):
     BATCH_PYTH_HERMES = "batch_pyth_hermes"
     BATCH_SOCCER_FOOTBALL_INFO = "batch_soccer_football_info"
     BATCH_SOLANA_RPC = "batch_solana_rpc"
+    BATCH_STRATEGY_SERVICE = "batch_strategy_service"
     BATCH_TARDIS = "batch_tardis"
     BATCH_TRANSFERMARKT = "batch_transfermarkt"
     BATCH_UNDERSTAT = "batch_understat"

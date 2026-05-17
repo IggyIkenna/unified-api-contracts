@@ -132,6 +132,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("defi", "mev_events"): "tick_timestamp",
     ("defi", "lst_rates"): "tick_timestamp",
     ("defi", "native_staking_rates"): "tick_timestamp",
+    # hedge_ratio_snapshot — emitted by strategy-service at each rebalance
+    # event (not a market-data tick); available_at = write-time per
+    # ``fetch_completed_at`` semantic.  Phase 0 decision from
+    # ``hedge_ratio_snapshot_persistence_2026_05_13``.
+    ("defi", "hedge_ratio_snapshot"): "fetch_completed_at",
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",

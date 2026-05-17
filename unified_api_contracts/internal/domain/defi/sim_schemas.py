@@ -181,3 +181,33 @@ class HedgeRatioSnapshot(BaseModel):
     last_adjustment_at: datetime | None = None  # null for initial entry
     rebalance_triggered: bool = False
     captured_at: datetime
+
+
+class HedgeRatioSnapshotRecord(HedgeRatioSnapshot):
+    """On-disk parquet shape for ``hedge_ratio_snapshot`` data_type.
+
+    Extends :class:`HedgeRatioSnapshot` with the three standard parquet
+    columns required by the manifest + availability-at SSOT:
+
+    * ``partition_dt`` — date partition (``YYYY-MM-DD`` string; equals
+      ``captured_at.date()`` at write time — drives GCS hive path
+      ``dt={partition_dt}``).
+    * ``available_at`` — per-row write-time stamp per the workspace
+      ``fetch_completed_at`` semantic registered in
+      ``availability_semantics.AVAILABILITY_AT_SEMANTICS``
+      ``("defi", "hedge_ratio_snapshot")``.
+    * ``correlation_id`` — propagated from the trade context for cross-service
+      audit joins.
+
+    Phase 0 design decision (hedge_ratio_snapshot_persistence_2026_05_13):
+    * Bucket kind: ``strategy-store`` / ``defi`` asset_group (reuses existing
+      bucket; no new bucket needed — cardinality / retention are identical).
+    * Writer pattern: inline (Pattern A) for both batch + live; rebalance
+      events are infrequent (~25 bps drift threshold) so I/O latency is not
+      a concern and Pattern A is simpler with identical code path per
+      batch=live SSOT.
+    """
+
+    partition_dt: str  # YYYY-MM-DD — hive partition key
+    available_at: datetime  # write-time stamp (fetch_completed_at semantic)
+    correlation_id: str | None = None  # trade-context correlation for audit joins

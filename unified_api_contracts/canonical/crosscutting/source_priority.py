@@ -174,6 +174,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "staking_yields"): ["onchain_subgraph"],
     ("defi", "token_transfers"): ["onchain_rpc"],
     ("defi", "vault_share_price"): ["onchain_subgraph"],
+    # hedge_ratio_snapshot — emitted by strategy-service (not an external
+    # market-data vendor); source tag is ``strategy_service``.
+    # hedge_ratio_snapshot_persistence_2026_05_13 Phase 1.
+    ("defi", "hedge_ratio_snapshot"): ["strategy_service"],
     # ---- TradFi ---------------------------------------------------------
     # Databento for CME/NQ/options/futures; Yahoo for VIX 15m rolling
     # window; Barchart for VIX 15m historical preload (handled at the
@@ -267,6 +271,10 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # Metadata / lifecycle reads — minute-cadence.
     "polymarket_gamma_api": 60_000,
     "instruments_service": 60_000,
+    # strategy-service hedge-ratio snapshots — emitted inline at rebalance time;
+    # latency = 0ms relative to the event that triggered it (the rebalance
+    # decision is the event; available_at = captured_at = write time).
+    "strategy_service": 0,
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid_rest": 1_000,  # 1s: HL REST API polling cadence
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
