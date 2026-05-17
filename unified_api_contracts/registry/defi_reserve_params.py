@@ -1280,6 +1280,70 @@ def get_morpho_reserve_params(asset: str) -> ReserveParams | None:
 
     Morpho is per-market; this returns typical params for the canonical
     curated vault on the asset. Per-market overrides should be queried
-    directly via ``MarketParams`` on chain when stricter accuracy is needed.
+    via :func:`get_morpho_market_lltv` when stricter accuracy is needed.
     """
     return MORPHO_BLUE_ETHEREUM_RESERVES.get(asset.upper())
+
+
+# ---------------------------------------------------------------------------
+# Morpho Blue per-market LLTV overrides
+# ---------------------------------------------------------------------------
+# Each Morpho Blue market is immutable on creation: (collateral, loan_asset,
+# oracle, IRM, LLTV) tuple.  The LLTV varies by curator — the canonical
+# Steakhouse / Gauntlet / MEV Capital curated vaults use different LLTVs for
+# the same collateral depending on the oracle used.
+#
+# Key: (collateral_upper, loan_asset_upper)
+# Value: highest LLTV available across curated vault deployments (conservative
+#        for HF calculation — use actual on-chain LLTV for production).
+#
+# Source: Morpho governance + MetaMorpho vault catalogues, 2026-05-15.
+# Low-medium confidence; verify via morpho.org/markets before live trading.
+_MORPHO_MARKET_LLTV: dict[tuple[str, str], Decimal] = {
+    # wstETH / WETH — canonical Steakhouse 94.5% vault (highest-LLTV Family 1 cell)
+    ("WSTETH", "WETH"): Decimal("0.945"),
+    # weETH / WETH — ether.fi re-staking vault (ETH_CORRELATED, slightly lower)
+    ("WEETH", "WETH"): Decimal("0.860"),
+    # rETH / WETH — Rocket Pool vault
+    ("RETH", "WETH"): Decimal("0.860"),
+    # cbETH / WETH — Coinbase staked ETH
+    ("CBETH", "WETH"): Decimal("0.860"),
+    # sUSDe / USDC — Ethena staked USDe; highest cash APR Family 1 cell
+    ("SUSDE", "USDC"): Decimal("0.860"),
+    # sUSDe / USDT — alternative stable debt
+    ("SUSDE", "USDT"): Decimal("0.860"),
+    # USDe / USDC — unstaked Ethena USDe
+    ("USDE", "USDC"): Decimal("0.860"),
+    # WBTC / USDC — BTC-collateralised stablecoin borrow
+    ("WBTC", "USDC"): Decimal("0.860"),
+    # WBTC / USDT
+    ("WBTC", "USDT"): Decimal("0.860"),
+    # WETH / USDC — ETH-collateralised stablecoin borrow
+    ("WETH", "USDC"): Decimal("0.860"),
+    # WETH / USDT
+    ("WETH", "USDT"): Decimal("0.860"),
+}
+
+
+def get_morpho_market_lltv(collateral: str, loan_asset: str) -> Decimal | None:
+    """Return the highest LLTV for a Morpho Blue market by (collateral, loan_asset).
+
+    Morpho Blue markets are immutable: LLTV is set at creation and cannot change.
+    This table covers canonical curated vault deployments (Steakhouse / Gauntlet /
+    MEV Capital) that are eligible as Family 1 recursive-borrow cells.
+
+    Args:
+        collateral: Collateral asset symbol (e.g., "WSTETH", "WEETH").
+        loan_asset: Loan/debt asset symbol (e.g., "WETH", "USDC").
+
+    Returns:
+        Decimal LLTV if the market is in the curated-vault registry; None if unknown.
+        Callers should fall back to ``get_morpho_reserve_params(collateral).max_ltv``
+        for the conservative uniform=0.86 estimate when None is returned.
+
+    Example:
+        get_morpho_market_lltv("WSTETH", "WETH") → Decimal("0.945")
+        get_morpho_market_lltv("SUSDE", "USDC") → Decimal("0.860")
+        get_morpho_market_lltv("UNKNOWN", "WETH") → None
+    """
+    return _MORPHO_MARKET_LLTV.get((collateral.upper(), loan_asset.upper()))
