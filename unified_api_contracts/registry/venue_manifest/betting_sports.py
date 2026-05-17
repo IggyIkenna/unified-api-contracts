@@ -451,6 +451,15 @@ BETTING_SPORTS_VENUES: dict[str, VenueContract] = {
         "error_schema_classes": [],
         "example_schema_map": {},
     },
+    "smarkets": {
+        "has_rest": True,
+        "has_websocket": True,
+        "has_fix": False,
+        "config_secret_field": "smarkets_secret_name",
+        "response_schema_classes": [],
+        "error_schema_classes": [],
+        "example_schema_map": {},
+    },
     # Odds Aggregator APIs (streaming market data, Tier 2 adapters)
     "opticodds": {
         "has_rest": True,
