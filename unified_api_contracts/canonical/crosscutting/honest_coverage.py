@@ -145,6 +145,24 @@ class EmptyConfirmedReason(StrEnum):
     ``unified_api_contracts.canonical.domain.sports.understat_coverage.UNDERSTAT_COVERED_LEAGUES``. Operator
     msg 9 audit dimension #7."""
 
+    EXPECTED_OUT_OF_COVERAGE_WINDOW = "EXPECTED_OUT_OF_COVERAGE_WINDOW"
+    """Data_type still valid + restorable post-cutover, but currently OUT of the
+    operator-acked MVP coverage scope. Distinct from
+    ``EXPECTED_DEPRECATED_DATA_TYPE`` (permanent retirement) — this is a scope
+    SHRINK that may reverse. Canonical case: TradFi ``trades`` / ``tbbo`` (L1/L2
+    tick data) moved to post-cutover per operator direction 2026-05-15. Existing
+    captured parquets remain on GCS (audit trail preserved); the manifest row
+    flip says "we collected this previously but the current operational scope
+    no longer expects it". SSOT:
+    ``unified_api_contracts.registry.market_data_categories.TRADFI_TICK_DATA_WINDOWS``
+    (empty list = OHLCV-only mode) +
+    ``_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS`` (restoration source for the
+    post-cutover successor plan). Plan:
+    ``plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md``. Added
+    2026-05-17 (slot-1-main) when Phase 5 phantom-reconcile needed the typed
+    reason; prior `EXPECTED_DEPRECATED_DATA_TYPE` would have falsified the
+    permanent-retirement semantic for these row sets."""
+
     EXPECTED_DEPRECATED_DATA_TYPE = "EXPECTED_DEPRECATED_DATA_TYPE"
     """Refdata-cadence migration: data_type was retired (e.g. LEAGUES daily-dump killed 2026-05-07 because UAC
     ``LeagueDefinition`` + ``provider_league_ids`` already canonicalise the per-season league mappings via code commits,
