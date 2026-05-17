@@ -220,6 +220,22 @@ VENUE_ERRORS_TRADFI: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.RETRY,
             desc="Internal server error",
         ),
+        ve(
+            "databento",
+            "402",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Payment Required — PAYG credit exhausted / billing failure (DO NOT retry)",
+        ),
+        ve(
+            "databento",
+            "DATABENTO_PAYMENT_REQUIRED",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Payment Required from error message (insufficient credit / quota exceeded)",
+        ),
     ],
     "barchart": [
         ve(
