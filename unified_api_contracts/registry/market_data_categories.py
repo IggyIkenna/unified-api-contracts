@@ -564,27 +564,28 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
     },
-    # ── TradFi — Databento + external providers ──
-    # Each TradFi venue has specific data types and start dates.
+    # ── TradFi — Databento (OHLCV-only MVP per operator direction 2026-05-15) ──
+    # Operator: "lets [do] ohlcv 1m for all the tradfi mvp instruments only please …
+    # no need for l1-l3 yet … i want the full period for tradfi thats available …
+    # since 2019 1st jan at least". SSOT:
+    # plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md Phase 2.
+    # `trades` + `tbbo` (L1 + L2 tick data) are MOVED to post-cutover scope
+    # (`_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS` below preserves the prior
+    # date floors for the successor plan). Only `ohlcv_1m` (cheap pre-aggregated
+    # bars) stays in MVP. Start dates backdated to 2019-01-01 per operator's
+    # full-period ask (NASDAQ/NYSE only have Databento equity data from
+    # 2023-04-15 — keep that floor since Databento's coverage starts there).
     "NASDAQ": {
-        "trades": "2023-04-15",
         "ohlcv_1m": "2023-04-15",
-        "tbbo": "2023-04-15",
     },
     "NYSE": {
-        "trades": "2023-04-15",
         "ohlcv_1m": "2023-04-15",
-        "tbbo": "2023-04-15",
     },
     "CME": {
-        "trades": "2020-01-01",
-        "ohlcv_1m": "2020-01-01",
-        "tbbo": "2020-01-01",
+        "ohlcv_1m": "2019-01-01",
     },
     "ICE": {
-        "trades": "2020-01-01",
-        "ohlcv_1m": "2020-01-01",
-        "tbbo": "2020-01-01",
+        "ohlcv_1m": "2019-01-01",
     },
     "CBOE": {
         "ohlcv_15m": "2020-01-07",  # VIX — Barchart CSV start
@@ -648,14 +649,23 @@ VENUE_DATA_TYPE_CAPABILITIES.update(DEFI_VENUE_DATA_TYPE_CAPABILITIES)
 VENUE_REFERENCE_DATA_CAPABILITIES: dict[str, dict[str, str]] = {}
 
 
-# TradFi tick data windows — dates where expensive tick data (tbbo, trades) is collected.
-# Outside these windows, only ohlcv_1m (pre-aggregated, cheaper) is downloaded.
-# Cost rationale: Databento tbbo/trades charges per-symbol per-day; ohlcv_1m is
-# significantly cheaper. We collect tick data only for specific training/validation
-# windows to manage Databento costs while still having representative tick-level data.
-TRADFI_TICK_DATA_WINDOWS: list[dict[str, str]] = [
-    {"start": "2023-05-01", "end": "2023-05-31"},  # Training window
-    {"start": "2024-07-01", "end": "2024-07-31"},  # Validation window
+# TradFi tick data windows — OHLCV-only MVP per operator direction 2026-05-15.
+# Per `plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md` Phase 1:
+# tbbo + trades scope moved to post-cutover; only ohlcv_1m collected in MVP.
+# `is_in_tradfi_tick_window` below returns False for ALL dates when the windows
+# list is empty (`any([]) == False` is the intentional short-circuit), suppressing
+# every tbbo/trades fetch attempt in MTDS orchestrator.py:3014.
+# Restoration: post-cutover, populate from `_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS`
+# below. Successor plan: `tradfi_l1_l2_l3_tick_data_post_cutover_2026_06_01.md`.
+TRADFI_TICK_DATA_WINDOWS: list[dict[str, str]] = []
+
+# Preserved windows for the post-cutover restoration plan (do not delete; the
+# successor plan reads this list to restore TRADFI_TICK_DATA_WINDOWS above).
+# Kept here (not in the post-cutover plan file) so a single grep -r finds the
+# canonical historical scope.
+_DEFERRED_VENUE_DATA_TYPE_COVERAGE_WINDOWS: list[dict[str, str]] = [
+    {"start": "2023-05-01", "end": "2023-05-31"},  # was: Training window
+    {"start": "2024-07-01", "end": "2024-07-31"},  # was: Validation window
 ]
 
 
