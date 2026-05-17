@@ -41,8 +41,9 @@ Cross-references:
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Final
+from typing import Final, Literal
 
+from unified_api_contracts.canonical.crosscutting.defi import LendingProtocol
 from unified_api_contracts.internal.architecture_v2.enums import StrategyArchetype
 
 
@@ -101,6 +102,13 @@ class ArchetypeConfig:
     kill_switch_drawdown_pct: float | None = None
     kill_switch_position_breach_pct: float | None = None
     perp_venue: str | None = None
+    perp_leg_enabled: bool | None = None
+    target_net_delta: float | None = None
+    recursion_depth_max: int | None = None
+    safety_buffer_ltv: float | None = None
+    opening_mode: Literal["persistent", "flash"] | None = None
+    usdc_margin_buffer_min: float | None = None
+    lending_protocol: LendingProtocol | None = None
 
     def __post_init__(self) -> None:
         if self.position_cap_usd is not None and self.position_cap_usd <= 0:
@@ -126,9 +134,20 @@ class ArchetypeConfig:
             valid_perp_venues = get_perp_venues()
             if self.perp_venue not in valid_perp_venues:
                 raise ValueError(
-                    f"perp_venue {self.perp_venue!r} not in get_perp_venues(); "
-                    f"valid: {sorted(valid_perp_venues)}",
+                    f"perp_venue {self.perp_venue!r} not in get_perp_venues(); valid: {sorted(valid_perp_venues)}",
                 )
+        if self.recursion_depth_max is not None and self.recursion_depth_max < 1:
+            raise ValueError(
+                f"recursion_depth_max must be >= 1 if specified; got {self.recursion_depth_max}",
+            )
+        if self.safety_buffer_ltv is not None and not (0 < self.safety_buffer_ltv < 1.0):
+            raise ValueError(
+                f"safety_buffer_ltv must be in (0, 1.0) if specified; got {self.safety_buffer_ltv}",
+            )
+        if self.usdc_margin_buffer_min is not None and self.usdc_margin_buffer_min < 0:
+            raise ValueError(
+                f"usdc_margin_buffer_min must be >= 0 if specified; got {self.usdc_margin_buffer_min}",
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -205,6 +224,13 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         # Breach gate tighter than CARRY_RECURSIVE_STAKED — protect against position-size
         # creep when HF buffer is the load-bearing safety mechanism.
         kill_switch_position_breach_pct=0.025,
+        perp_leg_enabled=False,
+        target_net_delta=0.0,
+        recursion_depth_max=5,
+        safety_buffer_ltv=0.05,
+        opening_mode="persistent",
+        usdc_margin_buffer_min=None,
+        lending_protocol=LendingProtocol.AAVE_V3,
     ),
     # Family 2 — Family 1 + USDC-margined perp short for delta neutrality. Per
     # defi_recursive_borrow_archetypes_2026_05_10.md Family 2 design 2026-05-12.
@@ -225,6 +251,13 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         # override per defi_recursive_borrow_archetypes_2026_05_10.md variant-naming
         # decision (single archetype + perp_venue config field, no per-venue tarballs).
         perp_venue="HYPERLIQUID",
+        perp_leg_enabled=True,
+        target_net_delta=0.0,
+        recursion_depth_max=5,
+        safety_buffer_ltv=0.05,
+        opening_mode="persistent",
+        usdc_margin_buffer_min=500.0,
+        lending_protocol=LendingProtocol.AAVE_V3,
     ),
     StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS: ArchetypeConfig(
         collateral_currency="USDT",

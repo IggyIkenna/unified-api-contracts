@@ -11,6 +11,7 @@ from .bar_boundary import BarTimeframe as BarTimeframe
 from .bar_boundary import assert_bar_boundary_contract as assert_bar_boundary_contract
 from .bar_boundary import bar_window_for_close as bar_window_for_close
 from .cloud_target import CloudTarget as CloudTarget
+from .defi import LendingProtocol as LendingProtocol
 from .deployment import ManifestShaDriftError as ManifestShaDriftError
 from .environment_tier import EnvironmentTier as EnvironmentTier
 from .environment_tier import resolve_environment_from_env as resolve_environment_from_env
