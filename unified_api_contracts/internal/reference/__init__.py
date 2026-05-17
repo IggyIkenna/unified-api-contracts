@@ -27,6 +27,9 @@ from unified_api_contracts.internal.reference.data_freshness import (
     DataFreshnessContract,
     DataStalenessError,
 )
+from unified_api_contracts.internal.reference.economic_calendar import (
+    MacroResultRecord,
+)
 from unified_api_contracts.internal.reference.fee_schedule import (
     ClientFeeSchedule,
     ClientPrimeBrokerLink,
@@ -81,6 +84,7 @@ __all__ = [
     "InstrumentRecord",
     "InstrumentStatus",
     "InstrumentType",
+    "MacroResultRecord",
     "MarginType",
     "OnchainDataFreshnessConfig",
     "OptionType",
