@@ -9,7 +9,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts import AlertCode
+from unified_api_contracts.canonical.crosscutting.alerting.codes import AlertCode
 
 
 class RiskStatus(StrEnum):

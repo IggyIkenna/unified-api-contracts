@@ -26,7 +26,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
-from unified_api_contracts import CanonicalFill, CanonicalOrder
+from unified_api_contracts.canonical.domain.execution.base import CanonicalFill, CanonicalOrder
 
 
 class CanonicalSportsOrder(CanonicalOrder):

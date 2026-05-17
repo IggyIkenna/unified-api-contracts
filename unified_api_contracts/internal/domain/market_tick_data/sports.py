@@ -22,7 +22,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, computed_field
 
-from unified_api_contracts import (
+from unified_api_contracts.canonical.domain.sports.odds import (
     MarketStatus,
     OddsType,
     OutcomeType,

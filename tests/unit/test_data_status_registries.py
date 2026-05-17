@@ -98,13 +98,15 @@ class TestExpectedCoverageByAssetGroup:
             "prediction",
         }
 
-    def test_tradfi_excludes_us_equities_by_design(self) -> None:
-        """NASDAQ + NYSE are capable but operator-omitted — render as out-of-scope."""
+    def test_tradfi_us_equity_venues_ohlcv_only(self) -> None:
+        """NASDAQ + NYSE added 2026-05-17 (OHLCV-only MVP) — ohlcv_1m, no trades/tbbo.
+        BARCHART remains operator-omitted (cost-prohibitive per-symbol tick).
+        """
         tradfi = EXPECTED_COVERAGE_BY_ASSET_GROUP["tradfi"]
-        assert "NASDAQ" not in tradfi
-        assert "NYSE" not in tradfi
+        assert tradfi["NASDAQ"] == ["ohlcv_1m"]
+        assert tradfi["NYSE"] == ["ohlcv_1m"]
         assert "BARCHART" not in tradfi
-        # And in-scope venues are present.
+        # Futures venues unchanged.
         assert tradfi["CME"] == ["trades", "ohlcv_1m", "tbbo"]
         assert tradfi["ICE"] == ["trades", "ohlcv_1m", "tbbo"]
         assert tradfi["CBOE"] == ["ohlcv_15m"]
@@ -150,16 +152,16 @@ class TestExpectedCoverageByAssetGroup:
     def test_get_expected_data_types_for_venue_in_scope(self) -> None:
         cme = get_expected_data_types_for_venue_in_scope("tradfi", "CME")
         assert sorted(cme) == sorted(["trades", "ohlcv_1m", "tbbo"])
-        # Out of scope venue → empty.
-        assert get_expected_data_types_for_venue_in_scope("tradfi", "NASDAQ") == []
+        # NASDAQ is now in scope (ohlcv_1m only — OHLCV-only MVP 2026-05-17).
+        assert get_expected_data_types_for_venue_in_scope("tradfi", "NASDAQ") == ["ohlcv_1m"]
 
     def test_get_expected_venues_in_scope(self) -> None:
         venues = get_expected_venues_in_scope("tradfi")
         assert "CME" in venues
         assert "ICE" in venues
         assert "CBOE" in venues
-        assert "NASDAQ" not in venues
-        assert "NYSE" not in venues
+        assert "NASDAQ" in venues
+        assert "NYSE" in venues
 
     def test_get_expected_pairs_flattens_correctly(self) -> None:
         pairs = get_expected_pairs("prediction")

@@ -14,7 +14,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, computed_field
 
-from unified_api_contracts import BetStatus
+from unified_api_contracts.canonical.domain.sports.betting import BetStatus
 
 # Schema version for UIC execution-service sports domain contracts.
 # UIC re-uses UAC types (BetStatus) but owns its own versioning here.

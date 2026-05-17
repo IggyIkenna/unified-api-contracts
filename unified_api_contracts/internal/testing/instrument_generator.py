@@ -36,7 +36,8 @@ from decimal import Decimal
 
 import numpy as np
 
-from unified_api_contracts import CanonicalInstrument, InstrumentType, OptionType
+from unified_api_contracts._instrument_enums import InstrumentType, OptionType
+from unified_api_contracts.canonical.domain.reference import CanonicalInstrument
 from unified_api_contracts.registry.representative_sample import (
     CEFI_FUTURES_SPECS,
     CEFI_PERPETUAL_SPECS,

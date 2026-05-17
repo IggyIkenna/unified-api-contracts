@@ -101,14 +101,6 @@ from .canonical.crosscutting.kill_switch import (
     KillSwitchId,
     KillSwitchProvenance,
 )
-from .canonical.crosscutting.source_priority import (
-    emission_latency_ms_for_source,
-    get_primary_source,
-    get_primary_source_with_latency,
-    get_source_priority,
-    has_source_priority,
-    read_with_source_priority,
-)
 from .canonical.crosscutting.pipeline_mode import (
     PipelineMode,
     is_batch,
@@ -139,6 +131,20 @@ from .canonical.crosscutting.scenario_overlay import (
     ScenarioReport,
     StaleHold,
     register_scenario,
+)
+from .canonical.crosscutting.source_priority import (
+    emission_latency_ms_for_source,
+    get_primary_source,
+    get_primary_source_with_latency,
+    get_source_priority,
+    has_source_priority,
+    read_with_source_priority,
+)
+from .canonical.crosscutting.strategy_family import (
+    STRATEGY_FAMILY_REGISTRY,
+    StrategyFamily,
+    StrategyFamilyId,
+    family_for_archetype,
 )
 from .canonical.crosscutting.synthetic_generator import (
     SYNTHETIC_GENERATOR_REGISTRY,
@@ -395,12 +401,6 @@ from .canonical.partition_paths import (
     build_defi_partition_path,
     build_prediction_partition_path,
     build_tradfi_partition_path,
-)
-from .canonical.crosscutting.strategy_family import (
-    STRATEGY_FAMILY_REGISTRY,
-    StrategyFamily,
-    StrategyFamilyId,
-    family_for_archetype,
 )
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,

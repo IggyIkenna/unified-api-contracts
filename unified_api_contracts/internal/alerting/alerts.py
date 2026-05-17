@@ -4,7 +4,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from unified_api_contracts import AlertCode, DefiAlertType
+from unified_api_contracts.canonical.crosscutting.alerting.codes import AlertCode
+from unified_api_contracts.canonical.crosscutting.errors.defi import DefiAlertType
 
 
 class DefiAlert(BaseModel):
