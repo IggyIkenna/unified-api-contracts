@@ -38,6 +38,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
+    permissions:
+      contents: write # needed for stefanzweifel/git-auto-commit-action to push SVG updates
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
