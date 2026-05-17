@@ -92,6 +92,14 @@ _TRADFI: dict[str, list[str]] = {
     "CME": ["trades", "ohlcv_1m", "tbbo"],
     "ICE": ["trades", "ohlcv_1m", "tbbo"],
     "CBOE": ["ohlcv_15m"],
+    # NASDAQ + NYSE equity venues added 2026-05-17 per OHLCV-only MVP scope
+    # (operator direction 2026-05-15 — see
+    # plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md). Phase 7
+    # backfill captured 33,672 NASDAQ + 122,494 NYSE ohlcv_1m rows from
+    # 2023-04-15+ via Databento XNAS.ITCH + XNYS.PILLAR. Before this entry
+    # the venues were silently out_of_scope in the data-status denominator.
+    "NASDAQ": ["ohlcv_1m"],
+    "NYSE": ["ohlcv_1m"],
     "FX": ["ohlcv_24h"],
     "YAHOO_FINANCE": ["ohlcv_15m", "ohlcv_24h"],
 }
