@@ -440,6 +440,17 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
         description="Within initial-margin-call buffer — pre-emptive notify.",
     ),
     AlertRule(
+        code=AlertCode.MARGIN_INFO,
+        event_pattern="MARGIN_INFO",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.LOG_ONLY,),
+        runbook_doc=_runbook("margin_info"),
+        description=(
+            "Informational margin event from PBM canonical ladder — position within"
+            " safe band; metric being tracked. Log-only, no page."
+        ),
+    ),
+    AlertRule(
         code=AlertCode.CROSS_CLOUD_EGRESS_DETECTED,
         event_pattern="CROSS_CLOUD_EGRESS_DETECTED",
         severity=AlertSeverity.HIGH,
@@ -918,6 +929,45 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             "Market-data feed stale at consuming-service layer. Broader than"
             " TICK_STALENESS (MDPS-specific); covers features-onchain / strategy"
             " detecting any stale upstream feed."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.FEED_UNHEALTHY,
+        event_pattern="FEED_UNHEALTHY",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("feed_unhealthy"),
+        description=(
+            "Data feed health degraded — feed returning errors, stale responses,"
+            " or unreachable. Criticality-tiered routing handled by"
+            " alerting-service data_freshness_rules.py (critical: PD+Slack;"
+            " important: Slack; informational: log only)."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.DATA_STALE,
+        event_pattern="DATA_STALE",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("data_stale"),
+        threshold_key="market_data_stale_seconds",
+        description=(
+            "Alerting-service data-staleness check failed — feed age exceeds SLA."
+            " Criticality-tiered: critical/important → Slack; informational → log only."
+            " Distinct from MARKET_DATA_STALE (consuming-service) and"
+            " TICK_STALENESS (MDPS write-gate)."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.DATA_GAP_DETECTED,
+        event_pattern="DATA_GAP_DETECTED",
+        severity=AlertSeverity.WARN,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("data_gap_detected"),
+        description=(
+            "Significant gap in a data feed — age > 2x expected cadence."
+            " Distinct from CONNECTIVITY_GAP_DETECTED (MTDS upstream WS drop)."
+            " Fires from alerting-service scheduled freshness check."
         ),
     ),
     AlertRule(

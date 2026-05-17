@@ -76,6 +76,9 @@ class AlertCode(StrEnum):
     MARGIN_CRITICAL = "MARGIN_CRITICAL"
     MARGIN_WARNING = "MARGIN_WARNING"
     MARGIN_THRESHOLD_BREACH = "MARGIN_THRESHOLD_BREACH"
+    MARGIN_INFO = "MARGIN_INFO"
+    """Informational margin event from PBM canonical ladder — position within safe band
+    but metric is being tracked. Severity INFO; log-only, no page."""
 
     # ── Position / reconciliation
     POSITION_DRIFT = "POSITION_DRIFT"
@@ -291,6 +294,23 @@ class AlertCode(StrEnum):
     ``CIRCUIT_BREAKER_OPEN`` with an earlier soft warning.
     Severity WARN. Threshold key: ``lending_utilization_high_bps``.
     Payload: ``protocol``, ``pool``, ``utilization_bps``."""
+    # ── Data freshness / feed health (alerting-service data_freshness_rules.py) ──
+    FEED_UNHEALTHY = "FEED_UNHEALTHY"
+    """Data feed health degraded — feed is returning errors, stale responses,
+    or has become unreachable. Criticality-tiered: critical → PagerDuty + Slack;
+    important → Slack; informational → log only. Producer: alerting-service
+    data_freshness_rules.py."""
+    DATA_STALE = "DATA_STALE"
+    """Alerting-service layer data-staleness check failed — a feed's age exceeds
+    the configured SLA. Distinct from ``MARKET_DATA_STALE`` (consuming-service
+    layer) and ``TICK_STALENESS`` (MDPS write-gate). Criticality-tiered routing:
+    critical / important → Slack; informational → log only."""
+    DATA_GAP_DETECTED = "DATA_GAP_DETECTED"
+    """Significant gap detected in a data feed — observed age > 2x expected
+    cadence. Distinct from ``CONNECTIVITY_GAP_DETECTED`` (MTDS upstream WS drop).
+    Fires when the alerting-service's scheduled freshness check finds missing data
+    rather than a connectivity event. Severity WARN — Slack only."""
+
     MARKET_DATA_STALE = "MARKET_DATA_STALE"
     """Generic market-data staleness — broader than ``TICK_STALENESS``
     (MDPS write-gate downstream-detected). ``MARKET_DATA_STALE`` fires at the
