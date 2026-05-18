@@ -243,7 +243,7 @@ def test_archetype_config_perp_venue_spot_only_rejected() -> None:
         ArchetypeConfig(perp_venue="BINANCE-SPOT")
 
 
-def test_seed_carry_recursive_borrow_perp_hedged_has_hyperliquid() -> None:
+def test_seed_carry_basis_perp_inv_has_hyperliquid() -> None:
     """Per defi_recursive_borrow variant-naming P0 — single archetype + perp_venue config."""
-    cfg = ARCHETYPE_CONFIG_SEED[StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED]
+    cfg = ARCHETYPE_CONFIG_SEED[StrategyArchetype.CARRY_BASIS_PERP_INV]
     assert cfg.perp_venue == "HYPERLIQUID"

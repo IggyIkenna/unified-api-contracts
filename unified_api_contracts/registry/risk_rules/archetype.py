@@ -450,15 +450,17 @@ Each rule's ``scope`` is ``PER_ARCHETYPE`` and ``applies_to`` is one of:
 # tuple. Wires into existing ``_HYPERLIQUID_RULES`` proposal-time veto.
 ARCHETYPE_CONCENTRATION_MULTIPLIER: Final[dict[str, Decimal]] = {
     "CARRY_STAKED_BASIS": Decimal("1.0"),
+    "CARRY_STAKED_BASIS_DATED": Decimal("1.0"),
     "CARRY_BASIS_PERP": Decimal("1.0"),
     "CARRY_BASIS_DATED": Decimal("1.0"),
+    "CARRY_BASIS_DATED_INV": Decimal("1.0"),
     "ARBITRAGE_PRICE_DISPERSION": Decimal("1.0"),
     "ML_DIRECTIONAL_CONTINUOUS": Decimal("1.0"),
     # Recursive-borrow archetypes (Family 0/1/2) — 1.5x penalises concentration
     # because liquidation-cascade risk in same (chain x asset x protocol) compounds.
     "CARRY_RECURSIVE_STAKED": Decimal("1.5"),
     "CARRY_RECURSIVE_BORROW_LENDING_ONLY": Decimal("1.5"),
-    "CARRY_RECURSIVE_BORROW_PERP_HEDGED": Decimal("1.5"),
+    "CARRY_BASIS_PERP_INV": Decimal("1.5"),
 }
 
 

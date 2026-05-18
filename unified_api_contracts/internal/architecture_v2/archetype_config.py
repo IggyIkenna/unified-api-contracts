@@ -90,7 +90,7 @@ class ArchetypeConfig:
             ``(0, 1.0]``. Tighter for leveraged strategies (smaller breach
             tolerance = earlier kill before liquidation cascade).
         perp_venue: For paired archetypes whose hedge leg is a CeFi perp
-            (e.g. ``CARRY_RECURSIVE_BORROW_PERP_HEDGED``), the canonical
+            (e.g. ``CARRY_BASIS_PERP_INV``), the canonical
             venue name where the perp short executes. Must be a member of
             :func:`unified_api_contracts.registry.get_perp_venues` if
             specified. ``None`` for archetypes without a perp leg.
@@ -117,7 +117,7 @@ class ArchetypeConfig:
     may be ``"BYBIT"`` as an alternative to ``"HYPERLIQUID"``.  ``None``
     means no ratio cap (unlimited Bybit relative to HL).
 
-    Policy: ``0.50`` for ``CARRY_RECURSIVE_BORROW_PERP_HEDGED`` first 30 days
+    Policy: ``0.50`` for ``CARRY_BASIS_PERP_INV`` first 30 days
     post-cutover. Source:
     ``plans/active/defi_recursive_borrow_archetypes_2026_05_10.md``
     § "Bybit counterparty cap policy".  Review after soak.
@@ -221,6 +221,27 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         kill_switch_drawdown_pct=0.10,
         kill_switch_position_breach_pct=0.05,
     ),
+    # CARRY_BASIS_DATED_INV: inverse of CARRY_BASIS_DATED (short basis, long spot).
+    # Same cap + gates as CARRY_BASIS_DATED — same structural edge, inverted direction.
+    # Added 2026-05-18 per strategy_archetype_taxonomy_2026_05_12.md §V-1.
+    StrategyArchetype.CARRY_BASIS_DATED_INV: ArchetypeConfig(
+        collateral_currency="USDT",
+        hedge_ratio=1.0,
+        position_cap_usd=25_000.0,
+        kill_switch_drawdown_pct=0.10,
+        kill_switch_position_breach_pct=0.05,
+    ),
+    # CARRY_STAKED_BASIS_DATED: dated-contract variant of CARRY_STAKED_BASIS.
+    # ETH collateral (stETH margin), shorter cap than perp variant — dated roll adds
+    # liquidity + expiry risk that perpetuals don't have.
+    # Added 2026-05-18 per strategy_archetype_taxonomy_2026_05_12.md §V-1.
+    StrategyArchetype.CARRY_STAKED_BASIS_DATED: ArchetypeConfig(
+        collateral_currency="ETH",
+        hedge_ratio=1.0,
+        position_cap_usd=40_000.0,
+        kill_switch_drawdown_pct=0.10,
+        kill_switch_position_breach_pct=0.05,
+    ),
     StrategyArchetype.CARRY_RECURSIVE_STAKED: ArchetypeConfig(
         collateral_currency="ETH",
         hedge_ratio=1.0,
@@ -253,10 +274,11 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         usdc_margin_buffer_min=None,
         lending_protocol=LendingProtocol.AAVE_V3,
     ),
+    # CARRY_BASIS_PERP_INV (renamed from CARRY_RECURSIVE_BORROW_PERP_HEDGED 2026-05-12)
     # Family 2 — Family 1 + USDC-margined perp short for delta neutrality. Per
     # defi_recursive_borrow_archetypes_2026_05_10.md Family 2 design 2026-05-12.
     # Perp leg neutralises ETH-correlated delta → hedge_ratio=1.0 (matches base).
-    StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED: ArchetypeConfig(
+    StrategyArchetype.CARRY_BASIS_PERP_INV: ArchetypeConfig(
         collateral_currency="ETH",
         hedge_ratio=1.0,
         # Slightly larger cap than Family 1 — perp hedge reduces directional tail risk.

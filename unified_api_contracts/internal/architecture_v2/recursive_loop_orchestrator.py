@@ -3,7 +3,7 @@
 Consumed by ``execution-service.defi_execution.orchestrators.recursive_loop_orchestrator``
 to open / unwind recursive supply-borrow positions atomically (flash mode) or iteratively
 (persistent mode). Both Family 1 (``CARRY_RECURSIVE_BORROW_LENDING_ONLY``) and Family 2
-(``CARRY_RECURSIVE_BORROW_PERP_HEDGED``) consume these schemas; Family 2 attaches an
+(``CARRY_BASIS_PERP_INV``) consume these schemas; Family 2 attaches an
 optional ``perp_leg_config`` per the delta-hedge topology.
 
 Plan:

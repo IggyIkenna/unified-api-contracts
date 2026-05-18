@@ -31,6 +31,10 @@ MAINNET_CHAIN_IDS: dict[str, int] = {
     "ZKSYNC": 324,
     "SOLANA": 0,  # Not EVM -- handled separately
     "BITCOIN": 0,  # Not EVM -- handled separately
+    # STARKNET + HYPERLIQUID_L1 were in CHAIN_GENESIS_DATES but missing from MAINNET_CHAIN_IDS;
+    # added to enforce MAINNET ⊇ GENESIS_DATES invariant (DF-7, STEP 5.72).
+    "STARKNET": 0,  # Not EVM -- StarkNet native chain
+    "HYPERLIQUID_L1": 0,  # Not EVM -- Hyperliquid L1 native chain
 }
 
 # Testnet chain IDs

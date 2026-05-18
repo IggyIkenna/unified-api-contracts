@@ -79,13 +79,13 @@ def test_family1_risk_knobs_unchanged(family1_config: ArchetypeConfig) -> None:
 
 
 # ---------------------------------------------------------------------------
-# Family 2 — CARRY_RECURSIVE_BORROW_PERP_HEDGED
+# Family 2 — CARRY_BASIS_PERP_INV (renamed from CARRY_RECURSIVE_BORROW_PERP_HEDGED)
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture()
 def family2_config() -> ArchetypeConfig:
-    return get_archetype_config(StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED)
+    return get_archetype_config(StrategyArchetype.CARRY_BASIS_PERP_INV)
 
 
 def test_family2_perp_leg_enabled(family2_config: ArchetypeConfig) -> None:

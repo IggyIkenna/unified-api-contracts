@@ -64,21 +64,22 @@ class StrategyArchetype(StrEnum):
     RULES_DIRECTIONAL_CONTINUOUS = "RULES_DIRECTIONAL_CONTINUOUS"
     RULES_DIRECTIONAL_EVENT_SETTLED = "RULES_DIRECTIONAL_EVENT_SETTLED"
     CARRY_BASIS_DATED = "CARRY_BASIS_DATED"
+    CARRY_BASIS_DATED_INV = "CARRY_BASIS_DATED_INV"
     CARRY_BASIS_PERP = "CARRY_BASIS_PERP"
+    # CARRY_BASIS_PERP_INV: inverse of CARRY_BASIS_PERP — strategy is short the basis
+    # (lend USDC-margined perp, hold spot). Renamed from CARRY_RECURSIVE_BORROW_PERP_HEDGED
+    # per operator decision 2026-05-12 (strategy_archetype_taxonomy_2026_05_12.md §rename).
+    CARRY_BASIS_PERP_INV = "CARRY_BASIS_PERP_INV"
     CARRY_STAKED_BASIS = "CARRY_STAKED_BASIS"
+    CARRY_STAKED_BASIS_DATED = "CARRY_STAKED_BASIS_DATED"
     CARRY_RECURSIVE_STAKED = "CARRY_RECURSIVE_STAKED"
-    # Recursive-borrow variants (Family 1 + Family 2 per
+    # Recursive-borrow variant (Family 1 per
     # plans/active/defi_recursive_borrow_archetypes_2026_05_10.md AD-1
-    # flip 2026-05-10 cross-plan audit Q10 ratification). Both variants
-    # are config siblings of CARRY_RECURSIVE_STAKED — pure-lending-side
-    # recursion (LENDING_ONLY) vs lending-recursion + matched-perp-short
-    # hedge (PERP_HEDGED, USDC-margined perp leg per AD-2). Owner of the
-    # full 8 -> 11 enum expansion = defi_archetypes_canonicalisation
-    # Stream C extension; this commit ships 2 of 3 (11th TBD via Stream C
-    # codex sweep per C-enum.1). ARCHETYPE_CONFIG_SEED rows + downstream
-    # consumer wiring deferred to Stream C C-enum.2 / C-enum.3.
+    # flip 2026-05-10 cross-plan audit Q10 ratification). Config sibling
+    # of CARRY_RECURSIVE_STAKED — pure-lending-side recursion (LENDING_ONLY).
+    # Family 2 (lending loop + matched-perp-short hedge) is now CARRY_BASIS_PERP_INV
+    # (renamed from CARRY_RECURSIVE_BORROW_PERP_HEDGED 2026-05-12).
     CARRY_RECURSIVE_BORROW_LENDING_ONLY = "CARRY_RECURSIVE_BORROW_LENDING_ONLY"
-    CARRY_RECURSIVE_BORROW_PERP_HEDGED = "CARRY_RECURSIVE_BORROW_PERP_HEDGED"
     YIELD_ROTATION_LENDING = "YIELD_ROTATION_LENDING"
     YIELD_STAKING_SIMPLE = "YIELD_STAKING_SIMPLE"
     ARBITRAGE_PRICE_DISPERSION = "ARBITRAGE_PRICE_DISPERSION"
@@ -142,11 +143,13 @@ ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
     StrategyArchetype.RULES_DIRECTIONAL_CONTINUOUS: StrategyFamily.RULES_DIRECTIONAL,
     StrategyArchetype.RULES_DIRECTIONAL_EVENT_SETTLED: StrategyFamily.RULES_DIRECTIONAL,
     StrategyArchetype.CARRY_BASIS_DATED: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_BASIS_DATED_INV: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_BASIS_PERP: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_BASIS_PERP_INV: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_STAKED_BASIS: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_STAKED_BASIS_DATED: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_RECURSIVE_STAKED: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_RECURSIVE_BORROW_LENDING_ONLY: StrategyFamily.CARRY_AND_YIELD,
-    StrategyArchetype.CARRY_RECURSIVE_BORROW_PERP_HEDGED: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.YIELD_ROTATION_LENDING: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.YIELD_STAKING_SIMPLE: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.ARBITRAGE_PRICE_DISPERSION: StrategyFamily.ARBITRAGE_STRUCTURAL,

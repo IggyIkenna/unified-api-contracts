@@ -353,7 +353,7 @@ class CounterpartyRatioCapTrigger(_TriggerBase):
     Caps notional on ``secondary_venue`` as a fraction of the live notional on
     ``reference_venue``. Evaluated at Layer 2 against runtime position-balance
     state. Designed for the Bybit-vs-Hyperliquid 30-day post-cutover
-    constraint in ``CARRY_RECURSIVE_BORROW_PERP_HEDGED``:
+    constraint in ``CARRY_BASIS_PERP_INV``:
 
     ``bybit_notional <= cap_ratio_of_reference * hyperliquid_notional``
 
