@@ -130,6 +130,14 @@ class RiskRuleId(StrEnum):
     FAMILY_CONCENTRATION_PER_VENUE = "FAMILY_CONCENTRATION_PER_VENUE"
     FAMILY_CORRELATION_WITH_OTHER_FAMILY = "FAMILY_CORRELATION_WITH_OTHER_FAMILY"
 
+    # ── Counterparty ratio axis (cross-venue safety constraint) ─────────────
+    # § 7 SSOT reconciliation — Bybit notional must not exceed a fraction of
+    # the Hyperliquid leg for the first 30 days post-cutover, per
+    # ``plans/active/defi_recursive_borrow_archetypes_2026_05_10.md``
+    # "Bybit counterparty cap policy". Evaluated at Layer 2 against the live
+    # HL notional read from position-balance state.
+    COUNTERPARTY_RATIO_CAP = "COUNTERPARTY_RATIO_CAP"
+
 
 RISK_RULE_IDS: Final[frozenset[str]] = frozenset(m.value for m in RiskRuleId)
 """String-membership view of :class:`RiskRuleId` for fast O(1) validation.
@@ -339,6 +347,34 @@ class MaxDailyLossTrigger(_TriggerBase):
     cap_usd: Decimal
 
 
+class CounterpartyRatioCapTrigger(_TriggerBase):
+    """Cross-venue counterparty ratio cap.
+
+    Caps notional on ``secondary_venue`` as a fraction of the live notional on
+    ``reference_venue``. Evaluated at Layer 2 against runtime position-balance
+    state. Designed for the Bybit-vs-Hyperliquid 30-day post-cutover
+    constraint in ``CARRY_RECURSIVE_BORROW_PERP_HEDGED``:
+
+    ``bybit_notional <= cap_ratio_of_reference * hyperliquid_notional``
+
+    Consequence must be ``BLOCK`` (not ``SCALE_DOWN``) — the ratio is a hard
+    counterparty credit-risk constraint, not a sizing preference.
+
+    Attributes:
+        reference_venue: The reference-leg venue whose live notional sets the
+            denominator (e.g. ``"HYPERLIQUID"``).
+        cap_ratio_of_reference: Maximum permitted fraction of reference-venue
+            notional (e.g. ``0.50`` = 50%).  Range ``(0, 1.0]``.
+        secondary_venue: The venue whose proposed notional is checked against
+            the cap (e.g. ``"BYBIT"``).
+    """
+
+    trigger_type: Literal["counterparty_ratio_cap"] = "counterparty_ratio_cap"
+    reference_venue: str
+    cap_ratio_of_reference: Decimal
+    secondary_venue: str
+
+
 RiskRuleTrigger = Annotated[
     (
         MaxPositionSizeTrigger
@@ -354,6 +390,7 @@ RiskRuleTrigger = Annotated[
         | MaxGrossExposureTrigger
         | MaxNetExposureTrigger
         | MaxDailyLossTrigger
+        | CounterpartyRatioCapTrigger
     ),
     Field(discriminator="trigger_type"),
 ]

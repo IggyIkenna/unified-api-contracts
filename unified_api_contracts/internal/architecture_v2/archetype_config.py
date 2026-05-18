@@ -109,6 +109,22 @@ class ArchetypeConfig:
     opening_mode: Literal["persistent", "flash"] | None = None
     usdc_margin_buffer_min: float | None = None
     lending_protocol: LendingProtocol | None = None
+    bybit_notional_cap_pct_of_hl: float | None = None
+    """Bybit 30-day post-cutover counterparty cap.
+
+    When set, Bybit notional must not exceed this fraction of the live
+    Hyperliquid notional. Only relevant for archetypes where ``perp_venue``
+    may be ``"BYBIT"`` as an alternative to ``"HYPERLIQUID"``.  ``None``
+    means no ratio cap (unlimited Bybit relative to HL).
+
+    Policy: ``0.50`` for ``CARRY_RECURSIVE_BORROW_PERP_HEDGED`` first 30 days
+    post-cutover. Source:
+    ``plans/active/defi_recursive_borrow_archetypes_2026_05_10.md``
+    § "Bybit counterparty cap policy".  Review after soak.
+
+    Range: ``(0, 1.0]`` if specified. ``> 1.0`` would mean Bybit can exceed
+    HL, defeating the purpose of the constraint — that's a ValueError at init.
+    """
 
     def __post_init__(self) -> None:
         if self.position_cap_usd is not None and self.position_cap_usd <= 0:
@@ -147,6 +163,11 @@ class ArchetypeConfig:
         if self.usdc_margin_buffer_min is not None and self.usdc_margin_buffer_min < 0:
             raise ValueError(
                 f"usdc_margin_buffer_min must be >= 0 if specified; got {self.usdc_margin_buffer_min}",
+            )
+        if self.bybit_notional_cap_pct_of_hl is not None and not (0 < self.bybit_notional_cap_pct_of_hl <= 1.0):
+            raise ValueError(
+                "bybit_notional_cap_pct_of_hl must be in (0, 1.0] if specified; "
+                f"got {self.bybit_notional_cap_pct_of_hl}",
             )
 
 
@@ -258,6 +279,12 @@ ARCHETYPE_CONFIG_SEED: Final[dict[StrategyArchetype, ArchetypeConfig]] = {
         opening_mode="persistent",
         usdc_margin_buffer_min=500.0,
         lending_protocol=LendingProtocol.AAVE_V3,
+        # 30-day post-cutover Bybit counterparty cap: cap Bybit notional at ≤ 50%
+        # of Hyperliquid leg. Enforced at Layer 2 via COUNTERPARTY_RATIO_CAP rule
+        # in risk_rules/venue.py (_BYBIT_RULES). Source:
+        # defi_recursive_borrow_archetypes_2026_05_10.md § "Bybit counterparty
+        # cap policy". Review and clear this field after 30-day soak.
+        bybit_notional_cap_pct_of_hl=0.50,
     ),
     StrategyArchetype.ML_DIRECTIONAL_CONTINUOUS: ArchetypeConfig(
         collateral_currency="USDT",

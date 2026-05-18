@@ -42,6 +42,7 @@ from decimal import Decimal
 
 from unified_api_contracts.canonical.crosscutting.alerting import AlertSeverity
 from unified_api_contracts.canonical.crosscutting.risk_rule import (
+    CounterpartyRatioCapTrigger,
     MaxConcentrationTrigger,
     MaxOITrigger,
     MaxPositionSizeTrigger,
@@ -84,6 +85,32 @@ _BYBIT_RULES: tuple[RiskRule, ...] = (
         consequence=RiskRuleConsequence.SCALE_DOWN,
         alerting_severity=AlertSeverity.WARN,
         description="Bybit max cross-instrument USD-notional total exposure on venue.",
+    ),
+    # Post-cutover 30-day counterparty-cap: Bybit notional must not exceed 50%
+    # of Hyperliquid notional. Ensures single-counterparty credit risk stays
+    # bounded while Bybit is being soak-tested. Source:
+    # plans/active/defi_recursive_borrow_archetypes_2026_05_10.md § "Bybit
+    # counterparty cap policy". Consequence = BLOCK (hard constraint, not sizing
+    # preference). triggers_kill_switch=False — this is a per-instruction gate,
+    # NOT a portfolio-halt condition (mitigated by rejecting the specific order).
+    RiskRule(
+        rule_id=RiskRuleId.COUNTERPARTY_RATIO_CAP,
+        scope=RiskRuleScope.PER_VENUE,
+        applies_to="bybit",
+        trigger=CounterpartyRatioCapTrigger(
+            reference_venue="HYPERLIQUID",
+            cap_ratio_of_reference=Decimal("0.50"),
+            secondary_venue="BYBIT",
+        ),
+        consequence=RiskRuleConsequence.BLOCK,
+        alerting_severity=AlertSeverity.HIGH,
+        description=(
+            "Bybit 30-day post-cutover counterparty cap: Bybit notional "
+            "≤ 50% of live Hyperliquid notional. Hard BLOCK — not a sizing "
+            "preference. Review after 30-day soak per "
+            "defi_recursive_borrow_archetypes_2026_05_10.md."
+        ),
+        triggers_kill_switch=False,
     ),
 )
 
