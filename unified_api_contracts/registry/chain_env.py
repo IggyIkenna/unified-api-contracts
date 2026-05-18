@@ -136,6 +136,8 @@ CHAIN_GENESIS_DATES: dict[str, str] = {
     "MODE": "2024-01-12",  # Mode mainnet
     "SOLANA": "2020-03-16",  # Solana mainnet beta
     "BITCOIN": "2009-01-03",  # Bitcoin genesis
+    "STARKNET": "2021-11-08",  # Starknet Alpha mainnet
+    "HYPERLIQUID_L1": "2023-11-14",  # Hyperliquid L1 mainnet
 }
 
 

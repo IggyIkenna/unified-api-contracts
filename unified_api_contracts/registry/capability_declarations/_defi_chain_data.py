@@ -714,6 +714,29 @@ BITCOIN_RPC_TEMPLATES: dict[str, str] = {
     "mempool": "https://mempool.space/api",
 }
 
+# ---------------------------------------------------------------------------
+# Hyperliquid L1 RPC templates
+# Native CLOB-on-chain perp venue; bridges to/from Arbitrum via native bridge.
+# Uses Hyperliquid's own API endpoints — no Alchemy key required.
+# ---------------------------------------------------------------------------
+HYPERLIQUID_RPC_TEMPLATES: dict[str, str] = {
+    "mainnet": "https://api.hyperliquid.xyz",
+    "testnet": "https://api.hyperliquid-testnet.xyz",
+}
+
+# ---------------------------------------------------------------------------
+# Starknet RPC templates
+# ZK-rollup L2 on Ethereum; bridges via StarkGate (~8h withdrawal delay).
+# Uses alchemy-api-key from Secret Manager (Alchemy supports Starknet).
+# ---------------------------------------------------------------------------
+STARKNET_RPC_TEMPLATES: dict[str, str] = {
+    "alchemy": "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_7/{api_key}",
+    "infura_compatible": "https://starknet-mainnet.infura.io/v3/{api_key}",
+    "public": "https://free-rpc.nethermind.io/mainnet-juno",
+    "testnet_alchemy": "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/{api_key}",
+    "testnet_public": "https://free-rpc.nethermind.io/sepolia-juno",
+}
+
 # Wrapped BTC tokens on EVM chains (already in WBTC_ADDRESSES / CBBTC_ADDRESSES above)
 # tBTC is another wrapped BTC option on Ethereum
 TBTC_ADDRESSES: dict[int, str] = {
