@@ -26,7 +26,7 @@ import math
 import sys
 from datetime import date
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 import yaml
 
@@ -74,7 +74,7 @@ class ProviderHealth(NamedTuple):
 
 def _read_yaml() -> dict[str, object]:
     with _YAML_PATH.open(encoding="utf-8") as fh:
-        return yaml.safe_load(fh)  # type: ignore[return-value]
+        return cast("dict[str, object]", yaml.safe_load(fh))
 
 
 def _import_schema_version(provider_name: str) -> str:
@@ -132,11 +132,11 @@ def _compute_status(
 def load_providers() -> list[ProviderHealth]:
     """Read YAML and compute ProviderHealth records for all providers."""
     data = _read_yaml()
-    providers_raw: dict[str, object] = data.get("providers", {})  # type: ignore[assignment]
+    providers_raw = cast("dict[str, object]", data.get("providers", {}))
 
     results: list[ProviderHealth] = []
     for name, info in providers_raw.items():
-        info_dict: dict[str, str] = info  # type: ignore[assignment]
+        info_dict = cast("dict[str, str]", info)
         yaml_ver: str = str(info_dict.get("api_version", "v1"))
         last_verified: str = str(info_dict.get("last_verified", "2000-01-01"))
         yaml_status: str = str(info_dict.get("status", "yellow"))
