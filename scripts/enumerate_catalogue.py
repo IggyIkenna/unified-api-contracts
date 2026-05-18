@@ -19,7 +19,7 @@ from pathlib import Path
 # Ensure UAC package is importable when run from repo root
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from unified_api_contracts.internal.domain.strategy_service.registry import STRATEGY_REGISTRY  # noqa: E402
+from unified_api_contracts.internal.domain.strategy_service.registry import STRATEGY_REGISTRY  # noqa: E402  # placed after conditional setup to avoid circular import at load time
 
 
 def run() -> None:

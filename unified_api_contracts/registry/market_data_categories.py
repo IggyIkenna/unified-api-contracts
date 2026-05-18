@@ -628,10 +628,10 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
 
 # Merge the DEFI multi-chain block (extracted to defi_venue_capabilities.py
 # to keep this file under the 900-line QG ceiling).
-from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402
+from unified_api_contracts.registry.defi_prediction_instrument_seeds import (  # noqa: E402  # placed after conditional setup to avoid circular import at load time
     seed_for_venue_and_data_type,
 )
-from unified_api_contracts.registry.defi_venue_capabilities import (  # noqa: E402
+from unified_api_contracts.registry.defi_venue_capabilities import (  # noqa: E402  # placed after conditional setup to avoid circular import at load time
     DEFI_VENUE_DATA_TYPE_CAPABILITIES,
 )
 
@@ -848,7 +848,7 @@ def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
     if data_type in ref_caps:
         return ref_caps[data_type]
     # Fall back to venue start date from VenueMapping
-    from .venue_mapping import VenueMapping  # noqa: qg-inside-import
+    from .venue_mapping import VenueMapping  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
 
     vm = VenueMapping()
     # Check compound key first (e.g. POLYMARKET:CRUDE_OIL) for per-shard start dates

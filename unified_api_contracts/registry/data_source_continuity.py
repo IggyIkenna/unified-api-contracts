@@ -204,7 +204,7 @@ def get_source_for_instrument(
     "GAP_NO_SOURCE" for known gaps, or None if no temporal resolver is
     registered (caller should fall back to VENUE_TO_DATA_SOURCE).
     """
-    from collections.abc import Callable  # noqa: qg-inside-import
+    from collections.abc import Callable  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
 
     resolver = _SOURCE_RESOLVERS.get((instrument_key, data_type))
     if resolver is None:

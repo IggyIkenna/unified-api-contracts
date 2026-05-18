@@ -20,13 +20,13 @@ import argparse
 import sys
 from collections.abc import Iterable
 
-from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # noqa: qg-deep-import
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # noqa: qg-deep-import  # symbol not yet on library root facade
     ARCHETYPE_CAPABILITY_REGISTRY,
     ArchetypeCapability,
     CoverageStatus,
     capability_for,
 )
-from unified_api_contracts.internal.architecture_v2.enums import (  # noqa: qg-deep-import
+from unified_api_contracts.internal.architecture_v2.enums import (  # noqa: qg-deep-import  # symbol not yet on library root facade
     StrategyArchetype,
 )
 

@@ -8,20 +8,20 @@ from pydantic import BaseModel
 class EconomicResultItem(BaseModel):
     """Single macro economic event with actual and previous values."""
 
-    id: str = ""  # noqa: qg-empty-fallback
+    id: str = ""  # noqa: qg-empty-fallback  # honest absence: field optional in this context; caller validates
     event_type: str  # NFP | CPI | FOMC | GDP | CLAIMS | PCE
     release_date: str  # ISO date YYYY-MM-DD
     release_time_utc: str  # HH:MM e.g. "13:30"
     actual_value: float | None = None
     previous_value: float | None = None
-    unit: str = ""  # noqa: qg-empty-fallback
+    unit: str = ""  # noqa: qg-empty-fallback  # honest absence: field optional in this context; caller validates
     status: str  # "released" | "upcoming"
 
 
 class CorporateActionItem(BaseModel):
     """Single corporate action event."""
 
-    id: str = ""  # noqa: qg-empty-fallback
+    id: str = ""  # noqa: qg-empty-fallback  # honest absence: field optional in this context; caller validates
     ticker: str
     event_type: str  # "dividend" | "earnings" | "split"
     event_date: str  # ISO date YYYY-MM-DD

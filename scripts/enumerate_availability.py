@@ -21,7 +21,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from enumerate_envelope import (  # noqa: E402
+from enumerate_envelope import (  # noqa: E402  # placed after conditional setup to avoid circular import at load time
     _ARCHETYPE_ALLOWED_CATEGORIES,
     _BESPOKE_CAPABLE,
     _CROSS_DOMAIN_SPLIT,

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from unified_api_contracts.internal.architecture_v2.enums import StrategyArchetype
 from unified_api_contracts.internal.domain.strategy_service.lifecycle import (
@@ -81,7 +81,7 @@ class MinimalCandidateManifest:
     reason: str
 
     manifest_id: str = field(default_factory=make_manifest_id)
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     version_id: str | None = None
 
@@ -171,7 +171,7 @@ class MinimalCandidateManifest:
             ]
 
         created_at_raw = data.get("created_at")
-        created_at: datetime = created_at_raw if isinstance(created_at_raw, datetime) else datetime.now(timezone.utc)
+        created_at: datetime = created_at_raw if isinstance(created_at_raw, datetime) else datetime.now(UTC)
 
         config_raw = data.get("config_json")
         config_json: dict[str, object] = config_raw if isinstance(config_raw, dict) else {}
