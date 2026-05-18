@@ -99,6 +99,7 @@ from unified_api_contracts.internal.domain.defi.rate_model import (
 )
 from unified_api_contracts.internal.domain.defi.sim_schemas import (
     AVSRewardComponent,
+    DecisionOutcome,
     GovernanceProposal,
     GovernanceProposalStatus,
     HedgeRatioSnapshot,
@@ -191,6 +192,7 @@ __all__ = [
     "CurveSwapParams",
     "CurveWithdrawParams",
     "CustodianWalletConfig",
+    "DecisionOutcome",
     "DexPoolDayRecord",
     "DriftMarketInfo",
     "DriftMarketType",

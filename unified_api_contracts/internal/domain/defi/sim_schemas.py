@@ -218,6 +218,21 @@ class HedgeRatioSnapshotRecord(HedgeRatioSnapshot):
 # ----------------------------------------------------------------------------
 
 
+class DecisionOutcome(StrEnum):
+    """Closed-set of carry engine tick outcomes (why did we act or not act).
+
+    Every on_tick call emits exactly one of these.  Distinguishes the
+    "5 consecutive ticks with fills=0" audit problem observed on B-015.
+    """
+
+    REBALANCED = "REBALANCED"
+    HOLD_CARRY_UNFAVORABLE = "HOLD_CARRY_UNFAVORABLE"
+    HOLD_WITHIN_DRIFT_BAND = "HOLD_WITHIN_DRIFT_BAND"
+    HOLD_FEATURE_STALE = "HOLD_FEATURE_STALE"
+    HOLD_POSITION_OPTIMAL = "HOLD_POSITION_OPTIMAL"
+    HOLD_RATE_LIMIT = "HOLD_RATE_LIMIT"
+
+
 class StrategyDecisionContext(BaseModel):
     """Pre-decision input snapshot emitted on EVERY engine tick.
 
@@ -239,9 +254,7 @@ class StrategyDecisionContext(BaseModel):
     computed_net_apr_bps: Decimal
     peg_drift_observed_bps: Decimal
     peg_drift_threshold_bps: Decimal
-    # OPEN | HOLD_CARRY_UNFAVORABLE | HOLD_WITHIN_DRIFT | HOLD_FEATURE_STALE
-    # | HOLD_POSITION_OPTIMAL | CLOSE_BASIS_INVERTED | REBALANCE
-    decision_outcome: str
+    decision_outcome: DecisionOutcome
     decision_reason_detail: str | None = None
     position_state_long_units: Decimal = Decimal("0")
     position_state_short_units: Decimal = Decimal("0")
