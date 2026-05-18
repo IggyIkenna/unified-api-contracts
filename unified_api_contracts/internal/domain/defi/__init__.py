@@ -106,6 +106,8 @@ from unified_api_contracts.internal.domain.defi.sim_schemas import (
     SlashingEvent,
     SlashingReason,
     StakingYieldDecomposition,
+    StrategyDecisionContext,
+    StrategyDecisionContextRecord,
 )
 from unified_api_contracts.internal.domain.defi.solana import (
     DriftMarketInfo,
@@ -267,6 +269,8 @@ __all__ = [
     "SpendingCaps",
     "StakingRate",
     "StakingYieldDecomposition",
+    "StrategyDecisionContext",
+    "StrategyDecisionContextRecord",
     "TenderlyReconciliationReport",
     "TradingWalletConfig",
     "TransferConfirmation",

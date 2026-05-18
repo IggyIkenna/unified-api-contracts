@@ -178,6 +178,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # market-data vendor); source tag is ``strategy_service``.
     # hedge_ratio_snapshot_persistence_2026_05_13 Phase 1.
     ("defi", "hedge_ratio_snapshot"): ["strategy_service"],
+    # strategy_decision_context — emitted by strategy-service on every tick
+    # (pre-decision inputs for audit trail); same source as hedge_ratio_snapshot.
+    # hedge_ratio_snapshot_persistence_2026_05_13 Phase 5.
+    ("defi", "strategy_decision_context"): ["strategy_service"],
     # ---- TradFi ---------------------------------------------------------
     # Databento for CME/NQ/options/futures; Yahoo for VIX 15m rolling
     # window; Barchart for VIX 15m historical preload (handled at the

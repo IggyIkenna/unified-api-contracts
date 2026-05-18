@@ -137,6 +137,10 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ``fetch_completed_at`` semantic.  Phase 0 decision from
     # ``hedge_ratio_snapshot_persistence_2026_05_13``.
     ("defi", "hedge_ratio_snapshot"): "fetch_completed_at",
+    # strategy_decision_context — emitted by strategy-service on EVERY tick
+    # (not just rebalances); available_at = write-time per ``fetch_completed_at``
+    # semantic.  Phase 5 decision from ``hedge_ratio_snapshot_persistence_2026_05_13``.
+    ("defi", "strategy_decision_context"): "fetch_completed_at",
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",

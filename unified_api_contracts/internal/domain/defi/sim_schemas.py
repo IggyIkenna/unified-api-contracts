@@ -211,3 +211,58 @@ class HedgeRatioSnapshotRecord(HedgeRatioSnapshot):
     partition_dt: str  # YYYY-MM-DD — hive partition key
     available_at: datetime  # write-time stamp (fetch_completed_at semantic)
     correlation_id: str | None = None  # trade-context correlation for audit joins
+
+
+# ----------------------------------------------------------------------------
+# Phase 5 — Strategy decision context (every tick, pre-decision inputs)
+# ----------------------------------------------------------------------------
+
+
+class StrategyDecisionContext(BaseModel):
+    """Pre-decision input snapshot emitted on EVERY engine tick.
+
+    Phase 5 schema. Produced by CarryStakedBasisEngine.on_tick before
+    the rebalance gate — captures the APY/funding inputs and decision reason
+    so non-rebalance ticks are auditable (distinguishes carry-unfavorable from
+    config-bug from feature-stale).
+
+    SSOT: ``hedge_ratio_snapshot_persistence_2026_05_13.md`` Phase 5.
+    """
+
+    archetype: str  # carry_staked_basis / leveraged_funding_arb
+    instrument_long: str
+    instrument_short: str
+    stake_apy_bps: Decimal
+    borrow_apy_bps: Decimal
+    perp_funding_apy_bps: Decimal
+    usdc_idle_apy_bps: Decimal
+    computed_net_apr_bps: Decimal
+    peg_drift_observed_bps: Decimal
+    peg_drift_threshold_bps: Decimal
+    # OPEN | HOLD_CARRY_UNFAVORABLE | HOLD_WITHIN_DRIFT | HOLD_FEATURE_STALE
+    # | HOLD_POSITION_OPTIMAL | CLOSE_BASIS_INVERTED | REBALANCE
+    decision_outcome: str
+    decision_reason_detail: str | None = None
+    position_state_long_units: Decimal = Decimal("0")
+    position_state_short_units: Decimal = Decimal("0")
+    captured_at: datetime
+
+
+class StrategyDecisionContextRecord(StrategyDecisionContext):
+    """On-disk parquet shape for ``strategy_decision_context`` data_type.
+
+    Extends :class:`StrategyDecisionContext` with standard parquet columns
+    (partition_dt / available_at / correlation_id). Mirrors
+    :class:`HedgeRatioSnapshotRecord` pattern.
+
+    Phase 5 design decision (hedge_ratio_snapshot_persistence_2026_05_13):
+    * Bucket kind: ``strategy-store`` / ``defi`` asset_group.
+    * Writer pattern: inline (Pattern A) on EVERY tick — 1-hour cadence
+      makes per-row I/O cost acceptable.
+    * Availability semantic: ``fetch_completed_at`` (write-time stamp; mirrors
+      hedge_ratio_snapshot per AVAILABILITY_AT_SEMANTICS registry).
+    """
+
+    partition_dt: str  # YYYY-MM-DD — hive partition key
+    available_at: datetime  # write-time stamp (fetch_completed_at semantic)
+    correlation_id: str | None = None  # trade-context correlation for audit joins
