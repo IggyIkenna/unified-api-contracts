@@ -506,6 +506,18 @@ class ScenarioOverlay(BaseModel):
             )
         return v
 
+    @classmethod
+    def model_validate_yaml(cls, yaml_content: str) -> ScenarioOverlay:
+        """Parse a YAML string into a ScenarioOverlay.
+
+        Phase 6.C facade used by the backtest CLI ``--scenario-overlay-yaml`` path.
+        Importable as ``unified_api_contracts.scenario_overlay.ScenarioOverlay.model_validate_yaml``.
+        """
+        import yaml
+
+        data = yaml.safe_load(yaml_content)
+        return cls.model_validate(data)
+
 
 # ---------------------------------------------------------------------------
 # Run-time report types (Phase 1.E from full-scope plan; ships pre-cutover for matrix harness)

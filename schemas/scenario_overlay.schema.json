@@ -1,0 +1,974 @@
+{
+  "$defs": {
+    "AlertCode": {
+      "description": "Closed set of alert codes the alerting-service may route.\n\nAdding a new code requires (1) appending here, (2) adding an `AlertRule`\nin `live_rules.LIVE_ALERT_RULES`, (3) writing the operator playbook entry\nunder `unified-trading-pm/codex/15-runbooks/alerting/`, and (4) including\nthe code in the next quarterly rehearsal scope. The closed-set sanity\ntest in `tests/internal/unit/test_alerting_taxonomy.py` enforces (1) \u2194 (2).",
+      "enum": [
+        "KILL_SWITCH_DEFI_LIQUIDATION_RISK",
+        "KILL_SWITCH_PORTFOLIO_DRAWDOWN",
+        "KILL_SWITCH_VENUE_DISCONNECT",
+        "KILL_SWITCH_ML_MODEL_FAILURE",
+        "CIRCUIT_BREAKER_OPEN",
+        "CIRCUIT_BREAKER_DEGRADED",
+        "CIRCUIT_BREAKER_CLOSED",
+        "CIRCUIT_BREAKER_BACKOFF_ESCALATING",
+        "DEFI_HEALTH_FACTOR_CRITICAL",
+        "DEFI_WEETH_DEPEG",
+        "DEFI_AAVE_UTILIZATION_SPIKE",
+        "DEFI_FUNDING_RATE_FLIP",
+        "DEFI_FEATURE_STALE",
+        "DEFI_POSITION_LIQUIDATED",
+        "DEFI_RATE_DEVIATION",
+        "DEFI_TX_SIMULATION_FAILED",
+        "DEFI_LIQUIDATION_IMMINENT",
+        "DEFI_CROSS_VENUE_DELTA_DRIFT",
+        "DEFI_PERP_VENUE_OUTAGE",
+        "DEFI_ORACLE_STALE_PAUSE",
+        "DEFI_RECURSIVE_LOOP_GAS_BUDGET_EXCEEDED",
+        "MARGIN_LIQUIDATION",
+        "MARGIN_CRITICAL",
+        "MARGIN_WARNING",
+        "MARGIN_THRESHOLD_BREACH",
+        "MARGIN_INFO",
+        "POSITION_DRIFT",
+        "POSITION_DRIFT_DETECTED",
+        "POSITION_CRITICAL_DISCREPANCY",
+        "POSITION_CORRECTION_DISPATCHED",
+        "PORTFOLIO_REBALANCE_TRIGGERED",
+        "BALANCE_DRIFT",
+        "RECON_DEGRADED",
+        "RECON_DEGRADED_CLOSE",
+        "ORDER_REJECTION_SPIKE",
+        "ORDER_ORPHANED",
+        "ORDER_RECOVERY_INITIATED",
+        "ORDER_RECOVERY_COMPLETED",
+        "ORDER_RECOVERY_FAILED",
+        "UNHEDGED_POSITION_ALERT",
+        "MULTI_LEG_COMPENSATION_FAILED",
+        "DUAL_FAILURE_DETECTED",
+        "SERVICE_ERROR",
+        "SERVICE_ERROR_CRITICAL",
+        "SERVICE_DEGRADED",
+        "PREFLIGHT_FAILED",
+        "CROSS_CLOUD_EGRESS_DETECTED",
+        "ML_SIGNAL_STALENESS",
+        "ML_MODEL_DRIFT_DETECTED",
+        "ML_PNL_DEVIATION",
+        "ML_INFERENCE_LATENCY_BREACH",
+        "ML_MODEL_VERSION_MISMATCH",
+        "RISK_RULE_BLOCKED",
+        "RISK_RULE_SCALED_DOWN",
+        "RISK_RULE_MONITOR_FIRED",
+        "RISK_RULE_TEST_ONLY_ROUTED",
+        "KILL_SWITCH_AUTO_RECOVERED",
+        "KILL_SWITCH_MANUAL_UNKILLED",
+        "CHAOS_DRILL_FAILED",
+        "TICK_STALENESS",
+        "CONNECTIVITY_GAP_DETECTED",
+        "CONNECTIVITY_RECOVERED",
+        "CONNECTIVITY_GAP_BACKFILLED",
+        "VENUE_HALTED",
+        "LENDING_POOL_PAUSED",
+        "LENDING_POOL_UNAVAILABLE",
+        "LENDING_RATE_SPIKE",
+        "LENDING_BORROW_CAP_REACHED",
+        "LENDING_UTILIZATION_HIGH",
+        "FEED_UNHEALTHY",
+        "DATA_STALE",
+        "DATA_GAP_DETECTED",
+        "MARKET_DATA_STALE",
+        "GAS_SURGE_50X",
+        "GAS_MEMPOOL_CONGESTION",
+        "GAS_PRICE_SPIKE",
+        "GAS_BUDGET_EXCEEDED",
+        "KILL_SWITCH_ORACLE_DIVERGENCE",
+        "STABLECOIN_ISSUER_PAUSED",
+        "GOVERNANCE_INCIDENT_DETECTED",
+        "QG_SNAPSHOT_STALE"
+      ],
+      "title": "AlertCode",
+      "type": "string"
+    },
+    "BookSpoof": {
+      "additionalProperties": false,
+      "description": "Inject synthetic book imbalance / liquidity withdrawal.",
+      "properties": {
+        "mutation_type": {
+          "const": "BookSpoof",
+          "default": "BookSpoof",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "book_depth_scale": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "maximum": 1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Book Depth Scale"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "integer"
+        },
+        "imbalance_target": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": -1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Imbalance Target"
+        }
+      },
+      "required": ["book_depth_scale", "duration_seconds"],
+      "title": "BookSpoof",
+      "type": "object"
+    },
+    "BreakerAction": {
+      "description": "Execution-side response when a breaker trigger fires.\n\nClosed set of four. Severity escalates left-to-right:\n\n- ``BLOCK_NEW`` \u2014 least restrictive. New orders refused; in-flight kept.\n- ``CANCEL_OPEN`` \u2014 open orders cancelled; existing positions held.\n- ``SCALE_DOWN`` \u2014 proportional unwind (e.g. halve position).\n- ``KILL_ALL`` \u2014 full unwind / delta-neutral exit per\n  :class:`unified_api_contracts.internal.KillSwitchReason`.\n\n\u00a7 7 SSOT reconciliation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nDistinct from :class:`unified_api_contracts.errors.ErrorAction`\n(``RETRY`` / ``RECONNECT`` / ``SKIP`` / ``FAIL`` \u2014 Layer-4 venue-rejection\nclassification per ``codex/04-architecture/autonomous-recovery-matrix.md``).\nDistinct from :class:`unified_api_contracts.alerting.AlertChannel`\nrouting \u2014 actions are execution-side; channels are notification-side.\n\nComposes with the 3-set circuit-breaker action vocabulary in\n``alerting_service_live_rules_2026_05_07.md`` (``stop_new_signals`` /\n``force_exit_only`` / ``halt_strategy``): BLOCK_NEW maps to\n``stop_new_signals`` (DEGRADED); CANCEL_OPEN + SCALE_DOWN map to\n``force_exit_only``; KILL_ALL maps to ``halt_strategy`` (OPEN cascade).",
+      "enum": ["BLOCK_NEW", "CANCEL_OPEN", "SCALE_DOWN", "KILL_ALL"],
+      "title": "BreakerAction",
+      "type": "string"
+    },
+    "CircuitBreakerId": {
+      "description": "Closed-set breaker identifiers \u2014 per-trigger, archetype-agnostic.\n\nThe same identifier may register at multiple :class:`BreakerScope` values\nacross archetypes (e.g. ``ORACLE_DEVIATION_BPS`` fires both for\n``CARRY_STAKED_BASIS`` and ``ARBITRAGE_PRICE_DISPERSION``); per-archetype\nthreshold tuning lives in the registry seeds, not here.\n\n\u00a7 7 SSOT reconciliation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nComposes with:\n\n- ``codex/04-architecture/kill-switch-circuit-breaker.md`` \u2014 canonical\n  breaker taxonomy + 5-set kill-switch trigger mapping.\n- The 8-event lifecycle SSOT \u2014 ``BREAKER_ARMED`` / ``BREAKER_DISARMED``\n  events are emitted on every transition (per\n  ``codex/04-architecture/autonomous-recovery-matrix.md``).\n- :class:`unified_api_contracts.alerting.AlertCode` \u2014\n  ``CIRCUIT_BREAKER_OPEN`` / ``CIRCUIT_BREAKER_DEGRADED`` /\n  ``CIRCUIT_BREAKER_CLOSED`` mirror breaker transitions; new per-breaker\n  alert codes (if needed) are added in the alerting codes module.\n- ``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md`` \u2014\n  Layer-2 risk rule consequences feed into Layer-3 breakers via the\n  ``BREAKER_ESCALATION_REQUESTED`` event seam.",
+      "enum": [
+        "ORACLE_DEVIATION_BPS",
+        "RPC_OUTAGE_SECONDS",
+        "GAS_PRICE_SURGE_GWEI",
+        "POSITION_LIMIT_EXCEEDED",
+        "DRAWDOWN_DAILY_BPS",
+        "LIQUIDATION_CASCADE_RISK",
+        "VENUE_OUTAGE_SECONDS",
+        "CUSTODY_DISCONNECT_SECONDS",
+        "MANIFEST_PHANTOM_RATE_BPS",
+        "BATCH_LIVE_DIVERGENCE_BPS",
+        "FUNDING_RATE_FLIP_BPS",
+        "BASIS_INVERSION_BPS",
+        "SPREAD_BLOWOUT_BPS",
+        "CROSS_VENUE_DIVERGENCE_BPS",
+        "INVENTORY_IMBALANCE_RATIO",
+        "FILL_LATENCY_BREACH_MS",
+        "REJECT_RATE_BPS",
+        "PNL_VARIANCE_SIGMA",
+        "HEDGE_GAP_NOTIONAL_USD",
+        "CLOCK_SKEW_MS",
+        "ORACLE_STALENESS_SECONDS",
+        "LENDING_POOL_UNAVAILABLE_SECONDS",
+        "STABLECOIN_DEPEG_WARNING",
+        "STABLECOIN_DEPEG_SMALL",
+        "STABLECOIN_DEPEG_MODERATE",
+        "STABLECOIN_DEPEG_CATASTROPHIC",
+        "RPC_OUTAGE_SECONDS_ETHEREUM",
+        "RPC_OUTAGE_SECONDS_SOLANA"
+      ],
+      "title": "CircuitBreakerId",
+      "type": "string"
+    },
+    "DropRows": {
+      "additionalProperties": false,
+      "description": "Drop rows entirely from raw-tick or feature output.",
+      "properties": {
+        "mutation_type": {
+          "const": "DropRows",
+          "default": "DropRows",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "drop_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Drop Rate"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "integer"
+        }
+      },
+      "required": ["drop_rate", "duration_seconds"],
+      "title": "DropRows",
+      "type": "object"
+    },
+    "EventDrop": {
+      "additionalProperties": false,
+      "description": "Drop named events from the event stream.",
+      "properties": {
+        "mutation_type": {
+          "const": "EventDrop",
+          "default": "EventDrop",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "event_types": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Event Types",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "integer"
+        }
+      },
+      "required": ["event_types", "duration_seconds"],
+      "title": "EventDrop",
+      "type": "object"
+    },
+    "EventDuplicate": {
+      "additionalProperties": false,
+      "description": "Duplicate a synthetic event payload onto the stream.",
+      "properties": {
+        "mutation_type": {
+          "const": "EventDuplicate",
+          "default": "EventDuplicate",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        },
+        "payload_template": {
+          "title": "Payload Template",
+          "type": "string"
+        }
+      },
+      "required": ["event_type", "payload_template"],
+      "title": "EventDuplicate",
+      "type": "object"
+    },
+    "GasSurge": {
+      "additionalProperties": false,
+      "description": "Spike gas / priority-fee on a chain.",
+      "properties": {
+        "mutation_type": {
+          "const": "GasSurge",
+          "default": "GasSurge",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "surge_multiplier": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Surge Multiplier"
+        },
+        "baseline_gwei": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Baseline Gwei"
+        },
+        "surge_duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Surge Duration Seconds",
+          "type": "integer"
+        },
+        "recovery_curve": {
+          "default": "linear",
+          "enum": ["step", "linear", "exponential_decay"],
+          "title": "Recovery Curve",
+          "type": "string"
+        }
+      },
+      "required": [
+        "surge_multiplier",
+        "baseline_gwei",
+        "surge_duration_seconds"
+      ],
+      "title": "GasSurge",
+      "type": "object"
+    },
+    "KillSwitchId": {
+      "description": "Closed-set identifier for kill-switch arming targets.\n\nGranularity matches the cutover-archetype work-split: full-platform\nhalt, per-archetype halt, per-venue halt, per-asset_group halt.\nReviewers MUST update the cutover plan if a new kill-switch is added\nhere without a matching entry in the master plan's Group F item 20 row.\n\n\u00a7 7 SSOT reconciliation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nComposes with :class:`unified_api_contracts.alerting.KillSwitchScope` \u2014\neach :class:`KillSwitchId` maps to a scope via its semantic prefix:\n\n- ``KILL_ALL_LIVE`` \u2192 ``KillSwitchScope.GLOBAL``\n- ``KILL_PER_ARCHETYPE_*`` \u2192 ``KillSwitchScope.ARCHETYPE``\n- ``KILL_PER_VENUE_*`` \u2192 ``KillSwitchScope.VENUE``\n- ``KILL_PER_ASSET_GROUP_*`` (no equivalent enum on\n  :class:`KillSwitchScope` \u2014 at runtime, the consumer maps to GLOBAL\n  filtered by asset_group)\n- ``KILL_PER_WALLET`` \u2192 ``KillSwitchScope.WALLET`` (runtime-targeted via\n  :class:`KillSwitchArmRequest.target_wallet_id` \u2014 no enum-per-wallet\n  explosion). Added 2026-05-12 per\n  ``api_keys_wallets_accounts_readiness_2026_05_10.md`` Phase 5.",
+      "enum": [
+        "KILL_ALL_LIVE",
+        "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS",
+        "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION",
+        "KILL_PER_VENUE_BYBIT",
+        "KILL_PER_VENUE_DERIBIT",
+        "KILL_PER_VENUE_BINANCE",
+        "KILL_PER_VENUE_OKX",
+        "KILL_PER_VENUE_HYPERLIQUID",
+        "KILL_PER_VENUE_ASTER",
+        "KILL_PER_ASSET_GROUP_CEFI",
+        "KILL_PER_ASSET_GROUP_DEFI",
+        "KILL_PER_TREASURY_COPPER",
+        "KILL_PER_TREASURY_CEFFU",
+        "KILL_PER_TREASURY_DEFI_HOT_WALLET",
+        "KILL_PER_TREASURY_SUB_ACCOUNT_HYPERLIQUID",
+        "KILL_PER_TREASURY_SUB_ACCOUNT_DRIFT",
+        "KILL_PER_TREASURY_SUB_ACCOUNT_DYDX",
+        "KILL_PER_WALLET"
+      ],
+      "title": "KillSwitchId",
+      "type": "string"
+    },
+    "LatencyInject": {
+      "additionalProperties": false,
+      "description": "Add fixed/variable latency on a pipeline edge.",
+      "properties": {
+        "mutation_type": {
+          "const": "LatencyInject",
+          "default": "LatencyInject",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "added_latency_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Added Latency Seconds"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "integer"
+        },
+        "recovery_curve": {
+          "default": "step",
+          "enum": ["step", "linear", "exponential_decay"],
+          "title": "Recovery Curve",
+          "type": "string"
+        }
+      },
+      "required": ["added_latency_seconds", "duration_seconds"],
+      "title": "LatencyInject",
+      "type": "object"
+    },
+    "ManifestPhantom": {
+      "additionalProperties": false,
+      "description": "Inject a synthetic manifest row at a target (asset_group, venue, data_type, day, ...).",
+      "properties": {
+        "mutation_type": {
+          "const": "ManifestPhantom",
+          "default": "ManifestPhantom",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "target_capture_status": {
+          "enum": [
+            "captured",
+            "empty_confirmed",
+            "attempted_failed",
+            "expected_unattempted"
+          ],
+          "title": "Target Capture Status",
+          "type": "string"
+        },
+        "target_value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Value"
+        }
+      },
+      "required": ["target_capture_status"],
+      "title": "ManifestPhantom",
+      "type": "object"
+    },
+    "OracleDeviate": {
+      "additionalProperties": false,
+      "description": "Wild-print or sustained-deviation oracle mutation. Distinct from StaleHold.",
+      "properties": {
+        "mutation_type": {
+          "const": "OracleDeviate",
+          "default": "OracleDeviate",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "deviation_sigma": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Deviation Sigma"
+        },
+        "deviation_duration_heartbeats": {
+          "exclusiveMinimum": 0,
+          "title": "Deviation Duration Heartbeats",
+          "type": "integer"
+        },
+        "oracle_id": {
+          "title": "Oracle Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "deviation_sigma",
+        "deviation_duration_heartbeats",
+        "oracle_id"
+      ],
+      "title": "OracleDeviate",
+      "type": "object"
+    },
+    "OutcomeCategory": {
+      "description": "Closed-set assertion category \u2014 what the scenario expects to observe.\n\n9 members covering the cross-product of `RiskRuleConsequence` x\n`CircuitBreakerId` x `KillSwitchId` x `AlertCode` plus P&L bounds +\nreconciliation hooks. Per the handshake doc fragment 11 \u00a7 \"Outcome\nassertion \u2192 expected-state cross-product.\"",
+      "enum": [
+        "STRATEGY_HALTED",
+        "STRATEGY_SCALED_DOWN",
+        "RISK_BREAKER_TRIPPED",
+        "ORDER_REJECTED",
+        "ORDER_CANCELLED_ON_STALE",
+        "KILL_SWITCH_ARMED",
+        "ALERT_FIRED",
+        "PNL_BOUNDED_BY",
+        "RECONCILIATION_FLAGGED"
+      ],
+      "title": "OutcomeCategory",
+      "type": "string"
+    },
+    "PriceShift": {
+      "additionalProperties": false,
+      "description": "Shift a price-like value by a target delta. Funding-rate / mid-price / peg-price all use this.",
+      "properties": {
+        "mutation_type": {
+          "const": "PriceShift",
+          "default": "PriceShift",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "target_value_bps": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Target Value Bps"
+        },
+        "baseline_bps": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseline Bps"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "integer"
+        },
+        "recovery_curve": {
+          "default": "step",
+          "enum": ["step", "linear", "exponential_decay", "ramp"],
+          "title": "Recovery Curve",
+          "type": "string"
+        }
+      },
+      "required": ["target_value_bps", "duration_seconds"],
+      "title": "PriceShift",
+      "type": "object"
+    },
+    "RejectFills": {
+      "additionalProperties": false,
+      "description": "Force matching-engine to reject fills with a typed reason.",
+      "properties": {
+        "mutation_type": {
+          "const": "RejectFills",
+          "default": "RejectFills",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "reject_rate": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Reject Rate"
+        },
+        "duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Seconds",
+          "type": "integer"
+        },
+        "reject_reason": {
+          "title": "Reject Reason",
+          "type": "string"
+        }
+      },
+      "required": ["reject_rate", "duration_seconds", "reject_reason"],
+      "title": "RejectFills",
+      "type": "object"
+    },
+    "RiskRuleConsequence": {
+      "description": "Pre-flight rule decision \u2014 closed set of 4 actions a fired rule can take.\n\n\u00a7 7 SSOT reconciliation\n-----------------------\n\n``RiskRuleConsequence`` is a NEW abstraction at a NEW layer \u2014 **per-rule\nper-instruction pre-flight decision** evaluated at Layer 2 of the 4-layer\nrisk-gates model\n(``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md``). It\ndoes NOT replace any existing canonical SSOT; it COMPOSES with all 5 per\nthe cross-product table in\n``plans/active/risk_simulations_limits_alerting_2026_05_10.md`` \u00a7 \"\u00a7 7 SSOT\nreconciliation seam\":\n\n* **BLOCK**: emits ``INSTRUCTION_REJECTED_RISK`` + ``RiskRuleFiredEvent``\n  (HIGH/CRITICAL) + AlertCode ``RISK_RULE_BLOCKED``. May trigger\n  kill-switch when paired with ``triggers_kill_switch=True``. Aggregated\n  BLOCK rate \u2265 threshold may transition the venue circuit-breaker per\n  ``alerting_service_live_rules`` cascade.\n* **SCALE_DOWN**: emits ``INSTRUCTION_ACCEPTED_PREFLIGHT`` (size_adjusted)\n  + ``RESIZED_EXECUTION`` at Layer 3 + ``RiskRuleFiredEvent`` (WARN) +\n  AlertCode ``RISK_RULE_SCALED_DOWN``. Does NOT trigger kill-switch or\n  breaker.\n* **MONITOR**: emits ``INSTRUCTION_ACCEPTED_PREFLIGHT`` + advisory\n  ``RiskRuleFiredEvent`` (INFO/WARN) + AlertCode\n  ``RISK_RULE_MONITOR_FIRED``. Passthrough; no instruction modification.\n* **TEST_ONLY**: tags instruction ``mode=TEST`` \u2192 Layer 3 routes to the\n  matching engine instead of live venue. Emits\n  ``INSTRUCTION_ACCEPTED_PREFLIGHT`` (mode=TEST) +\n  ``RiskRuleFiredEvent`` (INFO) + AlertCode\n  ``RISK_RULE_TEST_ONLY_ROUTED``.\n\nOrthogonal to ``ErrorAction`` (RETRY / RECONNECT / SKIP / FAIL per\n``codex/04-architecture/autonomous-recovery-matrix.md``) \u2014 that's the\nLayer 4 post-venue-error classification. Layer 2 may BLOCK (instruction\nnever reaches venue \u2192 no ErrorAction); Layer 2 may approve (any\nnon-BLOCK) \u2192 Layer 4 may then classify a venue rejection.",
+      "enum": ["BLOCK", "SCALE_DOWN", "MONITOR", "TEST_ONLY"],
+      "title": "RiskRuleConsequence",
+      "type": "string"
+    },
+    "ScenarioApplicabilityFilter": {
+      "additionalProperties": false,
+      "description": "Per-scenario filter narrowing which (venue, data_type, instrument, day, archetype) cells the overlay applies to.\n\nSparse \u2014 every field is optional; an empty filter matches everything in\nthe scenario's declared `asset_groups`. Operator-runtime override:\nmatrix-runner can layer additional filters atop the registry default.\n\n\u00a7 7 SSOT reconciliation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nComposes with :class:`unified_api_contracts.canonical.crosscutting.risk_rule.RiskRuleScope` \u2014\na filter at ``per_venue`` granularity tests rules at\n:attr:`RiskRuleScope.PER_VENUE`.",
+      "properties": {
+        "venues": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Venues"
+        },
+        "chains": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Chains"
+        },
+        "instruments": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Instruments"
+        },
+        "data_types": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Data Types"
+        },
+        "archetypes": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Archetypes"
+        },
+        "protocols": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Protocols"
+        }
+      },
+      "title": "ScenarioApplicabilityFilter",
+      "type": "object"
+    },
+    "ScenarioCategory": {
+      "description": "High-level scenario taxonomy.\n\nClosed-set 7. A scenario may declare ONE primary category; secondary\ncategories are captured in the per-scenario design fragment but not\nsurfaced on the :class:`ScenarioOverlay` Pydantic instance (one-of-N\nkeeps consumer dispatchers narrow).\n\n\u00a7 7 SSOT reconciliation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nOrthogonal to :class:`EmptyConfirmedReason` (manifest-side honest-absence\nvocabulary). Where both apply, the scenario emits both:\n`ScenarioCategory.TOPOLOGY_GAP` + manifest `record_empty(reason=...)`\nwith the appropriate reason. Categories DO NOT shadow reasons.",
+      "enum": [
+        "TOPOLOGY_GAP",
+        "STALENESS",
+        "PRICE_SHOCK",
+        "VENUE_OUTAGE",
+        "DATA_CORRUPTION",
+        "CROSS_ASSET",
+        "OPERATIONAL"
+      ],
+      "title": "ScenarioCategory",
+      "type": "string"
+    },
+    "ScenarioOutcomeAssertion": {
+      "additionalProperties": false,
+      "description": "Per-cell expected outcome \u2014 the 6-tuple-per-cell contract per handshake doc.\n\nEach archetype's expected outcome is a list of these (one per assertion\nthe scenario expects). The `ScenarioOutcomeChecker` (UTL Phase 2.B)\niterates these + emits a `ScenarioOutcomeResult` per assertion.\n\n\u00a7 7 SSOT reconciliation\n~~~~~~~~~~~~~~~~~~~~~~~\n\nCarries optional :class:`RiskRuleConsequence` + :class:`CircuitBreakerId`\n+ :class:`BreakerAction` + :class:`KillSwitchId` + :class:`AlertCode`\nreferences \u2014 the 5 canonical SSOTs the assertion checks against. Per\nhandshake doc fragment 11 \u00a7 \"Per-axis registry handshake\" + \u00a7 \"Outcome\nassertion \u2192 expected-state cross-product.\"",
+      "properties": {
+        "archetype": {
+          "title": "Archetype",
+          "type": "string"
+        },
+        "category": {
+          "$ref": "#/$defs/OutcomeCategory"
+        },
+        "consequence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RiskRuleConsequence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "breaker_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CircuitBreakerId"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "breaker_action": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/BreakerAction"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "kill_switch_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/KillSwitchId"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "alert_codes": {
+          "items": {
+            "$ref": "#/$defs/AlertCode"
+          },
+          "title": "Alert Codes",
+          "type": "array",
+          "uniqueItems": true
+        },
+        "pnl_lower_bound_bps": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pnl Lower Bound Bps"
+        },
+        "pnl_upper_bound_bps": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pnl Upper Bound Bps"
+        },
+        "reconciler_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reconciler Id"
+        },
+        "expected_within_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Expected Within Seconds",
+          "type": "integer"
+        }
+      },
+      "required": ["archetype", "category", "expected_within_seconds"],
+      "title": "ScenarioOutcomeAssertion",
+      "type": "object"
+    },
+    "ScenarioOverlayLayer": {
+      "description": "Pipeline-tap injection point for the mutation.\n\nClosed-set 6. A scenario may declare ONE primary layer; multi-layer\nmutations decompose into N scenarios composing via :attr:`ScenarioOverlay.composes_with`.\n\nReuse-prod-codepath principle: every layer here corresponds to a real\nboundary in the unified pipeline (MTDS \u2192 MDPS \u2192 features-* \u2192 strategy \u2192\nexecution \u2192 matching engine; manifest writer + event stream are\ncross-cutting). No standalone backtest engine.",
+      "enum": ["RAW_TICK", "FEATURE", "SIGNAL", "ORDER", "EVENT", "MANIFEST"],
+      "title": "ScenarioOverlayLayer",
+      "type": "string"
+    },
+    "StaleHold": {
+      "additionalProperties": false,
+      "description": "Freeze last value emitted \u2014 emulates feed staleness past heartbeat.",
+      "properties": {
+        "mutation_type": {
+          "const": "StaleHold",
+          "default": "StaleHold",
+          "title": "Mutation Type",
+          "type": "string"
+        },
+        "stale_duration_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Stale Duration Seconds",
+          "type": "integer"
+        },
+        "heartbeat_count": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heartbeat Count"
+        }
+      },
+      "required": ["stale_duration_seconds"],
+      "title": "StaleHold",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Unified Trading System \u2014 ScenarioOverlay YAML/JSON schema. Phase 6.C of simulation_scenarios_topology_price_shocks_2026_05_09.md. Import: from unified_api_contracts.scenario_overlay import ScenarioOverlay",
+  "properties": {
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "category": {
+      "$ref": "#/$defs/ScenarioCategory"
+    },
+    "layer": {
+      "$ref": "#/$defs/ScenarioOverlayLayer"
+    },
+    "asset_groups": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Asset Groups",
+      "type": "array",
+      "uniqueItems": true
+    },
+    "applies_to": {
+      "$ref": "#/$defs/ScenarioApplicabilityFilter"
+    },
+    "mutation_spec": {
+      "discriminator": {
+        "mapping": {
+          "BookSpoof": "#/$defs/BookSpoof",
+          "DropRows": "#/$defs/DropRows",
+          "EventDrop": "#/$defs/EventDrop",
+          "EventDuplicate": "#/$defs/EventDuplicate",
+          "GasSurge": "#/$defs/GasSurge",
+          "LatencyInject": "#/$defs/LatencyInject",
+          "ManifestPhantom": "#/$defs/ManifestPhantom",
+          "OracleDeviate": "#/$defs/OracleDeviate",
+          "PriceShift": "#/$defs/PriceShift",
+          "RejectFills": "#/$defs/RejectFills",
+          "StaleHold": "#/$defs/StaleHold"
+        },
+        "propertyName": "mutation_type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/PriceShift"
+        },
+        {
+          "$ref": "#/$defs/StaleHold"
+        },
+        {
+          "$ref": "#/$defs/LatencyInject"
+        },
+        {
+          "$ref": "#/$defs/BookSpoof"
+        },
+        {
+          "$ref": "#/$defs/RejectFills"
+        },
+        {
+          "$ref": "#/$defs/OracleDeviate"
+        },
+        {
+          "$ref": "#/$defs/GasSurge"
+        },
+        {
+          "$ref": "#/$defs/DropRows"
+        },
+        {
+          "$ref": "#/$defs/EventDrop"
+        },
+        {
+          "$ref": "#/$defs/EventDuplicate"
+        },
+        {
+          "$ref": "#/$defs/ManifestPhantom"
+        }
+      ],
+      "title": "Mutation Spec"
+    },
+    "expected_outcomes": {
+      "items": {
+        "$ref": "#/$defs/ScenarioOutcomeAssertion"
+      },
+      "title": "Expected Outcomes",
+      "type": "array"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "real_world_referent": {
+      "default": "",
+      "title": "Real World Referent",
+      "type": "string"
+    },
+    "composes_with": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Composes With",
+      "type": "array",
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "scenario_id",
+    "category",
+    "layer",
+    "asset_groups",
+    "mutation_spec",
+    "expected_outcomes"
+  ],
+  "title": "ScenarioOverlay",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
