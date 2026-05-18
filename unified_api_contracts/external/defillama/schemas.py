@@ -36,6 +36,18 @@ class DefiLlamaProtocol(BaseModel):
     tvlPrevDay: float | None = None
     tvlPrevWeek: float | None = None
     tvlPrevMonth: float | None = None
+    # Additional fields observed in API responses
+    gecko_id: str | None = None
+    cmcId: str | None = None
+    twitter: str | None = None
+    listedAt: int | None = None
+    mcap: float | None = None
+    methodology: str | None = None
+    module: str | None = None
+    misrepresentedTokens: bool | None = None
+    chainTvls: dict[str, float] | None = None
+    tokenBreakdowns: dict[str, object] | None = None
+    tvlCodePath: str | None = None
 
 
 class DefiLlamaChainTvl(BaseModel):
@@ -97,9 +109,22 @@ class DefiLlamaYieldPool(BaseModel):
     volumeUsd1d: float | None = None
     volumeUsd7d: float | None = None
     pool: str | None = None
+    poolMeta: str | None = None
     exposure: str | None = None  # single/multi
     underlyingTokens: list[str] | None = None
     rewardTokens: list[str] | None = None
+    # Additional fields observed in API responses
+    stablecoin: bool | None = None
+    ilRisk: str | None = None
+    predictions: dict[str, object] | None = None
+    outlier: bool | None = None
+    mu: float | None = None
+    sigma: float | None = None
+    count: int | None = None
+    apyPct1D: float | None = None
+    apyPct7D: float | None = None
+    apyPct30D: float | None = None
+    apyBaseInception: float | None = None
 
 
 class DefiLlamaBridge(BaseModel):

@@ -82,9 +82,13 @@ class TestHyperliquidCassettesConsolidated:
     def test_meta_and_asset_ctxs_cassette_loadable(self) -> None:
         """meta_and_asset_ctxs.yaml loads and contains expected universe data."""
         body = load_cassette("hyperliquid", "meta_and_asset_ctxs.yaml")
-        assert isinstance(body, dict)
-        assert "universe" in body
-        universe = body["universe"]
+        # Hyperliquid metaAndAssetCtxs returns [meta, assetCtxs] — a 2-element list
+        assert isinstance(body, list)
+        assert len(body) == 2
+        meta = body[0]
+        assert isinstance(meta, dict)
+        assert "universe" in meta
+        universe = meta["universe"]
         assert isinstance(universe, list)
         assert len(universe) >= 2
         btc = universe[0]

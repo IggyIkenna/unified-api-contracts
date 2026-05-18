@@ -44,13 +44,16 @@ class PolymarketToken(BaseModel):
     token_id: str | None = Field(None, alias="tokenId")
     outcome: str | None = None
     price: float | None = None
+    winner: bool | None = None  # set after market resolution
 
 
 class PolymarketMarket(BaseModel):
-    """Polymarket prediction market."""
+    """Polymarket prediction market (CLOB API response shape)."""
 
     condition_id: str | None = Field(None, alias="conditionId")
+    question_id: str | None = None  # CLOB returns snake_case
     question: str | None = None
+    description: str | None = None
     end_date_iso: str | None = Field(None, alias="endDateIso")
     market_slug: str | None = Field(None, alias="marketSlug")
     tokens: list[PolymarketToken] | None = None
@@ -58,6 +61,9 @@ class PolymarketMarket(BaseModel):
     liquidity: float | None = None
     active: bool | None = None
     closed: bool | None = None
+    fpmm: str | None = None  # Fixed Price Market Maker address
+    game_start_time: str | None = None
+    seconds_delay: int | None = None
 
 
 class PolymarketOrderBook(BaseModel):
