@@ -142,7 +142,7 @@ def _emit(path: Path, writer: object) -> None:
     """Open ``path``, call writer(file_handle), close. Path's parent is auto-created."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as fh:
-        writer(fh)  # type: ignore[operator]
+        writer(fh)  # type: ignore[operator]  # writer typed as object; runtime value is always a callable writer
 
 
 def main(argv: list[str] | None = None) -> int:

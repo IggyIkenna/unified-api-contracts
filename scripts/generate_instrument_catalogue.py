@@ -545,7 +545,7 @@ def main() -> None:
         return
 
     from unified_api_contracts.canonical.gcs_paths import strategy_store_bucket
-    from unified_cloud_interface.gcs import upload_blob  # type: ignore[import-untyped]
+    from unified_cloud_interface.gcs import upload_blob  # type: ignore[import-untyped]  # unified_cloud_interface has no py.typed marker
 
     target_bucket = strategy_store_bucket(args.project_id)
     for path in (catalogue_path, shard_path, md_path):

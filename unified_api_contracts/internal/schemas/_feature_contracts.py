@@ -162,7 +162,7 @@ def _register(
     symbol_column: str = "symbol",
 ) -> SchemaContract:
     contract = SchemaContract(
-        asset_group=category,  # type: ignore[arg-type]
+        asset_group=category,  # type: ignore[arg-type]  # category is a legacy str alias for AssetGroup; runtime coercion is handled
         instrument_type=instrument_type,
         data_type=feature_group,
         columns=_core_columns(include_chain=include_chain),

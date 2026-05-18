@@ -210,7 +210,7 @@ def get_source_for_instrument(
     if resolver is None:
         return None
     assert callable(resolver)
-    typed_resolver: Callable[[date], str] = resolver  # type: ignore[assignment]
+    typed_resolver: Callable[[date], str] = resolver  # type: ignore[assignment]  # resolver is a union of callable shapes; all conform at runtime
     return typed_resolver(query_date)
 
 

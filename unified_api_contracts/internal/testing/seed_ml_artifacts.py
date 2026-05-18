@@ -113,9 +113,9 @@ def _sigmoid(x: float) -> float:
 
 def generate_logistic_model(strategy: dict[str, object], rng: np.random.Generator) -> dict[str, object]:
     """Generate a lightweight logistic regression artifact (JSON-serializable)."""
-    features: list[str] = list(strategy["features"])  # type: ignore[arg-type]
+    features: list[str] = list(strategy["features"])  # type: ignore[arg-type]  # strategy is a dict[str, Any]; values coerced at runtime
     n_features = len(features)
-    n_classes = int(strategy["n_classes"])  # type: ignore[arg-type]
+    n_classes = int(strategy["n_classes"])  # type: ignore[arg-type]  # strategy is a dict[str, Any]; values coerced at runtime
     name = str(strategy["name"])
 
     # Random but bounded weights — small values so inference is stable

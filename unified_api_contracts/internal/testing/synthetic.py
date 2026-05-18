@@ -148,7 +148,7 @@ class SyntheticDataGenerator:
             )
         }
         correlations_raw = spec.get("correlations") or {}
-        self._correlations: dict[str, float] = {str(k): float(v) for k, v in correlations_raw.items()}  # type: ignore[arg-type]
+        self._correlations: dict[str, float] = {str(k): float(v) for k, v in correlations_raw.items()}  # type: ignore[arg-type]  # correlations_raw from untyped dict; keys/values coerced
 
     # ------------------------------------------------------------------
     # Fault injection helpers
@@ -630,8 +630,8 @@ class SyntheticDataGenerator:
             interval="1m",
         )
         vol_mult = self._scenario.volume_multiplier if self._scenario is not None else 1.0
-        timestamps: list[datetime] = list(prices_1m["timestamps"])  # type: ignore[arg-type]
-        close_prices: list[float] = [float(p) for p in prices_1m["close"]]  # type: ignore[union-attr]
+        timestamps: list[datetime] = list(prices_1m["timestamps"])  # type: ignore[arg-type]  # prices_1m is a dict[str, Any]; values coerced at runtime
+        close_prices: list[float] = [float(p) for p in prices_1m["close"]]  # type: ignore[union-attr]  # prices_1m["close"] is a Series or list at runtime
         rows: list[dict[str, object]] = []
         for bar_ts, bar_price in zip(timestamps, close_prices, strict=False):
             self._append_bar_ticks(rows, bar_ts, bar_price, venue, symbol, trades_per_minute, vol_mult)
@@ -715,7 +715,7 @@ class SyntheticDataGenerator:
         end: date,
     ) -> pd.DataFrame:
         """Convert GBM price path to OHLCV bars."""
-        timestamps: list[datetime] = list(path["timestamps"])  # type: ignore[arg-type]
+        timestamps: list[datetime] = list(path["timestamps"])  # type: ignore[arg-type]  # path is a dict[str, Any]; values coerced at runtime
         prices: np.ndarray = np.asarray(path["prices"])
         n = len(timestamps)
         interval_minutes = INTERVAL_MINUTES.get(interval, 1)

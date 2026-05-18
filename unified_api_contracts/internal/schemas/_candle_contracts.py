@@ -231,7 +231,7 @@ def _build(
     columns.append(_TIMEFRAME_COL)
     columns.extend(extra_cols)
     return SchemaContract(
-        asset_group=category,  # type: ignore[arg-type]
+        asset_group=category,  # type: ignore[arg-type]  # category is a legacy str alias for AssetGroup; runtime coercion is handled
         instrument_type=instrument_type,
         data_type=data_type,
         columns=columns,
