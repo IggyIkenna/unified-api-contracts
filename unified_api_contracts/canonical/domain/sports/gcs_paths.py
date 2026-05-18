@@ -240,7 +240,7 @@ def candidate_parquet_uris(
     """Same as ``candidate_parquet_paths`` but returns full ``gs://`` URIs."""
     bucket = sports_bucket_name(project_id)
     return [
-        f"gs://{bucket}/{p}"
+        f"gs://{bucket}/{p}"  # noqa: gs-uri — URI composer, bucket already resolved via sports_bucket_name()
         for p in candidate_parquet_paths(
             data_type,
             day,

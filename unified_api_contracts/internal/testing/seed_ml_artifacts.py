@@ -252,7 +252,7 @@ def run(output_dir: Path, version: str, project: str | None, dry_run: bool) -> i
 
     # GCS hint
     if project:
-        gcs_path = f"gs://{project}-models/v{version}/"
+        gcs_path = f"gs://{project}-models/v{version}/"  # noqa: gs-uri — test seed utility; ml-models bucket kind pending Phase 2.6 L3 delegate
         if dry_run:
             log.info("[DRY RUN] Would upload: gsutil -m cp -r %s %s", version_dir, gcs_path)
         else:
