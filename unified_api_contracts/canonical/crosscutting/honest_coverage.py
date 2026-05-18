@@ -390,6 +390,16 @@ class RecordFailedReason(StrEnum):
     `record_failed` callsite producing this reason in production is a bug
     in the calling adapter."""
 
+    UPSTREAM_LIVE_GAP = "UPSTREAM_LIVE_GAP"
+    """Upstream live-data source (MTDS) emitted ``CONNECTIVITY_GAP_DETECTED``
+    for this (venue, data_type) during the processing window. The downstream
+    processor (MDPS) detected an ``attempted_failed`` row in the MTDS
+    availability manifest with a connectivity-gap classification and propagates
+    the gap upstream to avoid silent zero/partial candle output. Downstream
+    consumers SHOULD skip or alert rather than retry — the gap will be filled
+    when MTDS auto-backfills the window on ``CONNECTIVITY_RECOVERED``.
+    SSOT: ``plans/active/mdps_streaming_and_backpressure_2026_05_07.md`` § item 524."""
+
 
 RECORD_FAILED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in RecordFailedReason)
 """String-membership view of :class:`RecordFailedReason` for fast O(1)
