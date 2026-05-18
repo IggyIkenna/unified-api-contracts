@@ -33,7 +33,6 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/canonical/crosscutting/alerting/rules.py"
     "./unified_api_contracts/canonical/crosscutting/errors/defi.py"
     "./unified_api_contracts/internal/__init__.py"
-    "./unified_api_contracts/internal/events.py"
     "./unified_api_contracts/internal/schemas/contracts.py"
     "./unified_api_contracts/internal/architecture_v2/restaking_rewards.py"
     "./unified_api_contracts/internal/risk.py"
@@ -47,8 +46,8 @@ SIZE_EXTRA_EXCLUDES=(
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
 # without masking runaway regressions (a 60% overrun would still trip).
 MAX_DURATION=600
-# 5 pre-existing size violations in large generated/registry files not caused by Slot 2 changes.
-# See plans/active/issues/uac_qg_preexisting_size_violations_2026_05_14.md for remediation plan.
+# Pre-existing size violations in large generated/registry files (events.py remediated 2026-05-18).
+# See plans/active/issues/uac_qg_preexisting_size_violations_2026_05_14.md for remaining items.
 CODEX_MAX_VIOLATIONS=5
 export CODEX_MAX_VIOLATIONS
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"

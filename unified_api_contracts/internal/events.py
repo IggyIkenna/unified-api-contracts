@@ -295,11 +295,9 @@ class ShardIncompleteDetails(BaseModel):
 
 class PreflightSkipReason(StrEnum):
     """Closed taxonomy of reasons a service's preflight short-circuits.
-
     Every silent skip site (early-exit before processing emits its first
     work event) MUST emit PREFLIGHT_SKIPPED with a reason from this
     enum. New reasons must be added here, NOT free-form strings.
-
     Reference incident 2026-05-07: features-onchain-defi-backfill VM
     emitted STARTED -> VALIDATION_COMPLETED -> STOPPED in 9 seconds
     with no PROCESSING events; operator could not tell from the event
