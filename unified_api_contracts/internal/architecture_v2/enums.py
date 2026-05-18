@@ -46,9 +46,13 @@ class StrategyArchetype(StrEnum):
     ARBITRAGE_STRUCTURAL (sandwich / JIT liquidity / backrun /
     liquidation bundle). Cross-domain event arb added.
 
-    Legacy values (`VOL_TRADING_OPTIONS`, `MARKET_MAKING_CONTINUOUS`,
-    `MARKET_MAKING_EVENT_SETTLED`) retained for back-compat with existing
-    Firestore + GCS records; new strategies use the granular variants.
+    Legacy values (`VOL_TRADING_OPTIONS`, `MARKET_MAKING_CONTINUOUS`) retained
+    for back-compat with existing Firestore + GCS records; new strategies use the
+    granular variants. ``MARKET_MAKING_EVENT_SETTLED`` is NOT legacy — it is the
+    canonical archetype for the ``SPORTS_MM_FAMILY`` (see ``strategy_family.py``).
+    ``MARKET_MAKING_CONTINUOUS`` covers CeFi continuous-quoting strategies and
+    also acts as the back-compat value for old records before the granular MM
+    variants (passive-spread / inventory-skew / ML-lean / queue-micro) landed.
 
     Capability cells (per-archetype venue/category claims) are currently in
     ``unified-api-contracts/scripts/enumerate_envelope.py``; manifest
@@ -87,8 +91,10 @@ class StrategyArchetype(StrEnum):
     # Cross-domain event arb (PREDICTION x SPORTS, primary_category=CROSS_CATEGORY)
     ARBITRAGE_CROSS_DOMAIN_EVENT = "ARBITRAGE_CROSS_DOMAIN_EVENT"
     # Market making
-    MARKET_MAKING_CONTINUOUS = "MARKET_MAKING_CONTINUOUS"  # legacy
-    MARKET_MAKING_EVENT_SETTLED = "MARKET_MAKING_EVENT_SETTLED"  # legacy
+    MARKET_MAKING_CONTINUOUS = (
+        "MARKET_MAKING_CONTINUOUS"  # legacy — back-compat for old records; new CeFi MM uses granular variants
+    )
+    MARKET_MAKING_EVENT_SETTLED = "MARKET_MAKING_EVENT_SETTLED"
     MARKET_MAKING_PASSIVE_SPREAD = "MARKET_MAKING_PASSIVE_SPREAD"
     MARKET_MAKING_INVENTORY_SKEW = "MARKET_MAKING_INVENTORY_SKEW"
     MARKET_MAKING_ML_LEAN = "MARKET_MAKING_ML_LEAN"
