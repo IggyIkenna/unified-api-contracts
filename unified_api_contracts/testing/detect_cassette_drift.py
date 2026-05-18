@@ -211,7 +211,7 @@ def run_drift_detection(
     }
     output_json.write_text(json.dumps(report, indent=2))
     logger.info("Report written to %s", output_json)
-    logger.info(summary)
+    logger.info("%s", summary)
     return drift_detected
 
 

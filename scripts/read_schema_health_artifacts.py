@@ -124,9 +124,9 @@ def _regenerate_svg(merged_report_path: Path) -> int:
     result = subprocess.run(cmd, capture_output=True, text=True)
 
     if result.stdout:
-        logger.info(result.stdout.rstrip())
+        logger.info("%s", result.stdout.rstrip())
     if result.stderr:
-        logger.warning(result.stderr.rstrip())
+        logger.warning("%s", result.stderr.rstrip())
 
     return result.returncode
 

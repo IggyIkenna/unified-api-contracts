@@ -143,7 +143,7 @@ def main() -> int:
         status = "PASS" if total_mismatches == 0 else "FAIL"
         logger.info(f"\n{status}: {total_mismatches} mismatch(es) found")
     else:
-        logger.info(total_mismatches)
+        logger.info("%s", total_mismatches)
     return total_mismatches
 
 

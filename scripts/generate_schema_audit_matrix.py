@@ -401,7 +401,7 @@ def main() -> None:
     if args.count_red:
         # Red-provider count is tracked by VCR cassette tests (tests/vcr/test_schema_health.py).
         # This matrix script performs static analysis only; no live failures to count.
-        logger.info(0)
+        logger.info("%s", 0)
         return
 
     repo_root = Path(__file__).resolve().parents[1]
