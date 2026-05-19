@@ -283,6 +283,9 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # latency = 0ms relative to the event that triggered it (the rebalance
     # decision is the event; available_at = captured_at = write time).
     "strategy_service": 0,
+    # features-onchain-service — feature snapshots emitted inline at calculation
+    # time; latency = 0ms relative to the observation trigger.
+    "features_onchain_service": 0,
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid_rest": 1_000,  # 1s: HL REST API polling cadence
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint

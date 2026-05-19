@@ -54,6 +54,7 @@ class PipelineMode(StrEnum):
     BATCH_BARCHART = "batch_barchart"
     BATCH_CHAINLINK = "batch_chainlink"
     BATCH_DATABENTO = "batch_databento"
+    BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
     BATCH_HYPERLIQUID_REST = "batch_hyperliquid_rest"
     BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"
