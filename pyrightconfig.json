@@ -1,9 +1,19 @@
 {
   "pythonVersion": "3.13",
   "typeCheckingMode": "strict",
-  "include": ["unified_api_contracts"],
+  "include": [
+    "unified_api_contracts"
+  ],
   "reportAny": "error",
   "venvPath": ".",
   "venv": ".venv",
-  "exclude": ["tests", "unified_api_contracts/testing"]
+  "exclude": [
+    "tests",
+    "unified_api_contracts/testing",
+    "node_modules",
+    "dist",
+    "build",
+    ".venv*",
+    "**/__pycache__"
+  ]
 }
