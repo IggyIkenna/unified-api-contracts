@@ -57,6 +57,7 @@ from .canonical.crosscutting.circuit_breaker import (
     CircuitBreakerId,
     breaker_fired_event,
 )
+from .canonical.crosscutting.defi import ChainKind
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
     VENUE_ERROR_MAP,
@@ -1218,6 +1219,7 @@ __all__ = [
     "CcxtOrderBook",
     "CcxtTicker",
     "CcxtTrade",
+    "ChainKind",
     "CircuitBreakerId",
     "CloudProvider",
     "CloudTarget",
