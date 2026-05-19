@@ -43,7 +43,7 @@ from __future__ import annotations
 import datetime as _dt
 import re
 from enum import StrEnum
-from typing import Final
+from typing import Final, NamedTuple
 
 from unified_api_contracts.registry import (
     ES_OPTIONS_CLUSTERS,
@@ -264,6 +264,19 @@ class EmptyConfirmedReason(StrEnum):
     this is "data was captured but the historical write-path didn't populate expiration."
     """
 
+    EXPECTED_NO_FUNDING_RATE_TICKS = "EXPECTED_NO_FUNDING_RATE_TICKS"
+    """Perp funding rate adapter: MTDS derivative_ticker parquet for this (venue, symbol, day) had zero
+    non-null funding_rate rows. Distinct from SOURCE_RETURNED_ZERO (which is a raw fetch that returned
+    200+empty at the HTTP layer). This fires when the parquet exists but the funding_rate column is
+    all-null for the filtered (venue, symbol) slice. Downstream: NaN-fill with previous day's value
+    (rolling window); do not treat as a pipeline failure.
+
+    Used by:
+    - features_service.cefi.calculators.perp_funding_rates (CeFi Binance ETH-PERP adapter)
+    - features_service.onchain.calculators.perp_funding_rates_defi (DeFi Hyperliquid ETH-PERP adapter)
+
+    Plan: plans/active/phase5_features_streaming_carry_staked_basis_mvp_2026_05_19.md Phase A."""
+
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
@@ -445,6 +458,132 @@ validation. ``ManifestWriter.record_failed`` Phase 2 refactor validates the
 structured-reason kwarg against this set; freeform strings stay accepted
 during the migration period (the legacy ``error: str`` arg).
 """
+
+
+# ---------------------------------------------------------------------------
+# Honest-coverage formula — SSOT for "what fraction of expected slots have we
+# answered honestly?". Every numerator/denominator computation in the workspace
+# MUST flow through :func:`compute_honest_coverage` so that deployment-api,
+# deployment-ui, service data-status endpoints, and CI ratchet all agree.
+#
+# Plan: ``honest_coverage_formula_consolidation_2026_05_19.md``.
+# Codified after the 2026-05-19 audit found three plans
+# (writegate-endtoend, expected-unattempted-propagation, data-status-drilldown)
+# each carried a partial formula with implicit numerator semantics.
+# ---------------------------------------------------------------------------
+
+
+class CaptureStatusCounts(NamedTuple):
+    """Per-(asset_group, data_type, ...) capture_status row counts.
+
+    Five fields, not four — the manifest's ``expected_unattempted`` state splits
+    into two semantically-different sub-states for the honest-coverage formula:
+
+    * ``expected_unattempted_known_empty`` — Tier-3 sentinel pre-resolved this
+      slot to an ``EXPECTED_*`` reason (calendar pre-skip, pre-genesis, pre-listing).
+      No fetch will ever land data here, so the slot IS honestly answered.
+      Counts toward NUMERATOR.
+
+    * ``expected_unattempted_pending_fetch`` — Tier-3 sentinel says "we expect
+      data exists here but no adapter has run yet". This is a GAP. Counts in
+      DENOMINATOR only — backfills must run to convert these into ``captured``,
+      ``empty_confirmed`` (with ``SOURCE_RETURNED_ZERO``), or ``attempted_failed``.
+
+    Producers (manifest reconcilers, data-status service, deployment-api):
+    materialise these counts by grouping manifest rows on
+    ``(capture_status, error_reason)``. The split rule is:
+
+        if capture_status == "expected_unattempted":
+            if error_reason.startswith("EXPECTED_"):
+                bucket = "known_empty"
+            else:
+                bucket = "pending_fetch"
+
+    Construct positionally or by name; all fields default to 0 for ergonomic
+    partial counts (e.g. a freshly-bootstrapped asset_group may have only
+    ``expected_unattempted_pending_fetch`` non-zero).
+    """
+
+    captured: int = 0
+    empty_confirmed: int = 0
+    attempted_failed: int = 0
+    expected_unattempted_known_empty: int = 0
+    expected_unattempted_pending_fetch: int = 0
+
+
+def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
+    """Canonical honest-coverage ratio. Every caller in the workspace uses this.
+
+    Formula (post-2026-05-19 consolidation):
+
+        numerator   = captured + empty_confirmed + expected_unattempted_known_empty
+        denominator = numerator + attempted_failed + expected_unattempted_pending_fetch
+        coverage    = numerator / denominator     (returns 1.0 if denominator==0)
+
+    Semantics in plain English: a slot is **honestly answered** if we have any
+    truthful answer for it — data landed, or we confirmed it's empty, or the
+    Tier-3 sentinel resolved it as known-empty-no-fetch-needed
+    (``EXPECTED_HOLIDAY`` / ``EXPECTED_PRE_VENUE_LAUNCH`` / etc.). A slot is a
+    **gap** if we tried and failed (``attempted_failed``) or if the sentinel
+    says "expected to exist but we never tried" (non-``EXPECTED_*``
+    ``expected_unattempted`` rows).
+
+    Why ``known_empty`` is in the numerator: the writegate Phase 6.x plan
+    states "production-grade >99% means real >99% — denominator clipped to
+    legitimately-coverable shards". Equivalent rewording: rows that CAN'T
+    have data (pre-genesis dates, holidays, delisted instruments) are not a
+    gap, they're an honest answer. Excluding them from the numerator AND
+    denominator (clipping) and including them in both (numerator-credit)
+    produce the same ratio — we choose numerator-credit so the breakdown
+    in the deployment-ui drilldown shows the count.
+
+    SSOTs this function consolidates:
+
+    * ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 1B + 6.x
+    * ``expected_unattempted_propagation_chain_2026_05_12.md`` Phase 2.A
+      (the EXPECTED_/non-EXPECTED_ split for ``expected_unattempted`` rows)
+    * ``data_status_drilldown_shard_atom_alignment_2026_05_07.md`` Phase 1
+      endpoint (line 170-171: "numerator = manifest rows with
+      ``capture_status=captured``" — superseded by this function)
+
+    Callers:
+
+    * ``deployment-api/deployment_api/services/data_status_service.py`` —
+      per-(asset_group, data_type) panel rollup
+    * ``deployment-api/deployment_api/services/data_status_drilldown_service.py``
+      — per-shard drilldown
+    * ``instruments-service`` + ``market-tick-data-service`` —
+      ``/api/data-status`` endpoints + ``--operation=status`` CLI
+    * ``deployment-ui`` — coverage % displayed in data-status panel (one
+      formula, no client-side recomputation)
+    * ``unified-trading-pm/scripts/qg/honest-coverage-ratchet.sh`` —
+      CI gate (when shipped, writegate Phase 6.x follow-up)
+
+    Edge case — empty manifest: returns 1.0 (treat "no expected slots" as
+    fully covered). Reconcilers MUST seed expected_unattempted_pending_fetch
+    rows before computing coverage; otherwise a brand-new asset_group reports
+    a misleading 100%.
+    """
+    numerator = counts.captured + counts.empty_confirmed + counts.expected_unattempted_known_empty
+    denominator = numerator + counts.attempted_failed + counts.expected_unattempted_pending_fetch
+    if denominator == 0:
+        return 1.0
+    return numerator / denominator
+
+
+HONEST_COVERAGE_GAP_FIELDS: Final[tuple[str, ...]] = (
+    "attempted_failed",
+    "expected_unattempted_pending_fetch",
+)
+"""The two ``CaptureStatusCounts`` fields that represent unanswered slots.
+
+Use this when you need to enumerate "what's left to do" in a data-status
+panel or backfill orchestrator without re-deriving the gap definition.
+Backfill CLIs MUST retry rows in these two states when ``--force`` is OFF;
+all other states (``captured`` / ``empty_confirmed`` /
+``expected_unattempted_known_empty``) are skipped.
+"""
+
 
 # ---------------------------------------------------------------------------
 # Bundled data_types — referenced by the ManifestWriter cluster-validation guard.
