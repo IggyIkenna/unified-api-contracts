@@ -1,0 +1,121 @@
+"""Tests for per-venue perp funding cadence + annualisation math."""
+
+from __future__ import annotations
+
+from decimal import Decimal
+
+import pytest
+
+from unified_api_contracts.registry.perp_funding_cadence import (
+    FUNDING_CADENCE_SECONDS,
+    SECONDS_PER_YEAR,
+    annualise_funding_rate_bps,
+    fundings_per_year,
+    is_supported_venue,
+)
+
+
+class TestCadenceRegistry:
+    def test_all_major_perp_venues_present(self) -> None:
+        # The MVP MUST cover at minimum the carry_staked_basis target venues
+        # — adding/removing here is a deliberate scope change, not a casual
+        # edit, so this test pins the contract.
+        required = {
+            "binance",
+            "bybit",
+            "okx",
+            "deribit",
+            "hyperliquid",
+            "aster",
+            "kraken",
+        }
+        missing = required - FUNDING_CADENCE_SECONDS.keys()
+        assert not missing, f"Missing perp venues in cadence registry: {missing}"
+
+    def test_cadences_in_seconds_not_zero(self) -> None:
+        for venue, cadence in FUNDING_CADENCE_SECONDS.items():
+            assert cadence > 0, f"{venue} cadence must be positive, got {cadence}"
+            # Sanity: nothing slower than 24h (anything that slow isn't a perp)
+            assert cadence <= 24 * 3600, f"{venue} cadence {cadence}s exceeds 24h"
+
+    def test_seconds_per_year_constant(self) -> None:
+        assert SECONDS_PER_YEAR == 365 * 24 * 3600
+
+
+class TestFundingsPerYear:
+    def test_binance_eight_hour(self) -> None:
+        # 8h cadence → 3 fundings/day × 365 = 1095/year
+        assert fundings_per_year("binance") == Decimal("1095")
+
+    def test_hyperliquid_one_hour(self) -> None:
+        # 1h cadence → 24/day × 365 = 8760/year
+        assert fundings_per_year("hyperliquid") == Decimal("8760")
+
+    def test_kraken_four_hour(self) -> None:
+        # 4h cadence → 6/day × 365 = 2190/year
+        assert fundings_per_year("kraken") == Decimal("2190")
+
+    def test_drift_five_minute(self) -> None:
+        # 5min cadence → 12/hour × 24 × 365 = 105120/year
+        assert fundings_per_year("drift") == Decimal("105120")
+
+    def test_case_insensitive_lookup(self) -> None:
+        assert fundings_per_year("BINANCE") == fundings_per_year("binance")
+        assert fundings_per_year("Hyperliquid") == fundings_per_year("hyperliquid")
+
+    def test_unknown_venue_raises(self) -> None:
+        with pytest.raises(KeyError):
+            fundings_per_year("ftx-rip")
+
+
+class TestAnnualisation:
+    """Strategy-relevant cases. Output is APY in basis points."""
+
+    def test_binance_one_basis_point_per_cycle(self) -> None:
+        # 0.0001 raw rate (= 1bp per 8h cycle = 0.01%)
+        # Annualised: 0.0001 × 1095 × 10000 = 1095 bps APY = 10.95%
+        # This is a typical mid-range ETH-PERP funding.
+        result = annualise_funding_rate_bps(Decimal("0.0001"), "binance")
+        assert result == Decimal("1095.0000"), f"got {result}"
+
+    def test_hyperliquid_one_basis_point_per_cycle(self) -> None:
+        # Same 0.0001 raw rate on Hyperliquid (1h cadence, 8× more accruals)
+        # 0.0001 × 8760 × 10000 = 8760 bps APY = 87.6%
+        # Hourly cadence venues see ~8× the same raw rate's annualised APY
+        # vs an 8h venue — drives the carry advantage of CeFi-vs-DeFi perps.
+        result = annualise_funding_rate_bps(Decimal("0.0001"), "hyperliquid")
+        assert result == Decimal("8760.0000")
+
+    def test_negative_funding_short_side_receives(self) -> None:
+        # When funding < 0, longs PAY shorts. Annualised stays negative.
+        # -0.00005 × 1095 × 10000 = -547.5 bps APY = -5.475%
+        result = annualise_funding_rate_bps(Decimal("-0.00005"), "binance")
+        assert result == Decimal("-547.50000")
+        assert result < 0
+
+    def test_zero_funding(self) -> None:
+        assert annualise_funding_rate_bps(Decimal("0"), "binance") == Decimal("0")
+        assert annualise_funding_rate_bps(Decimal("0"), "hyperliquid") == Decimal("0")
+
+    def test_carry_staked_basis_realistic_inputs(self) -> None:
+        # Strategy sees something like 11% APY funding on ETH-PERP Binance.
+        # Reverse derivation:
+        #   11% APY = 1100 bps
+        #   rate × 1095 fundings_per_year × 10000 = 1100
+        #   rate = 1100 / (1095 × 10000) = 0.00010046...
+        # Forward verification: 0.0001005 × 1095 × 10000 = 1100.475 bps ≈ 11.00% APY
+        result = annualise_funding_rate_bps(Decimal("0.0001005"), "binance")
+        assert Decimal("1100") < result < Decimal("1101")
+
+
+class TestIsSupportedVenue:
+    @pytest.mark.parametrize(
+        "venue",
+        ["binance", "BYBIT", "Okx", "deribit", "hyperliquid"],
+    )
+    def test_known_venues(self, venue: str) -> None:
+        assert is_supported_venue(venue)
+
+    @pytest.mark.parametrize("venue", ["", "ftx", "mango-perps"])
+    def test_unknown_venues(self, venue: str) -> None:
+        assert not is_supported_venue(venue)
