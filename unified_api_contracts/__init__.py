@@ -102,6 +102,12 @@ from .canonical.crosscutting.kill_switch import (
     KillSwitchId,
     KillSwitchProvenance,
 )
+from .canonical.crosscutting.live_cluster_registry import (
+    LIVE_CLUSTER_REGISTRY,
+    LiveClusterDeploymentKind,
+    LiveClusterSpec,
+    get_clusters_for_env,
+)
 from .canonical.crosscutting.pipeline_mode import (
     PipelineMode,
     is_batch,
@@ -1014,6 +1020,7 @@ __all__ = [
     "KNOWN_ETFS",
     "LAST_EMISSION_DECISION_AT_COLUMN",
     "LIVE_ALERT_RULES",
+    "LIVE_CLUSTER_REGISTRY",
     "MANIFEST_SCHEMA_VERSION_V8",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
@@ -1369,6 +1376,8 @@ __all__ = [
     "LineupPlayer",
     "LiquidationHeatmapResponse",
     "LiquidationLevel",
+    "LiveClusterDeploymentKind",
+    "LiveClusterSpec",
     "LiveMatchState",
     "LiveOddsUpdate",
     "LongShortRatio",
@@ -1589,6 +1598,7 @@ __all__ = [
     "entitlements_for",
     "family_for_archetype",
     "generators_for_archetype",
+    "get_clusters_for_env",
     "get_data_sources_for_venue",
     "get_databento_symbols_for_venue",
     "get_emission_policy",

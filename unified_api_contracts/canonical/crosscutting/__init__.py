@@ -38,6 +38,10 @@ from .lifecycle_class import classify_cloud_run_service as classify_cloud_run_se
 from .lifecycle_class import classify_experiment_run as classify_experiment_run
 from .lifecycle_class import classify_scheduled_job as classify_scheduled_job
 from .lifecycle_class import classify_vm_name as classify_vm_name
+from .live_cluster_registry import LIVE_CLUSTER_REGISTRY as LIVE_CLUSTER_REGISTRY
+from .live_cluster_registry import LiveClusterDeploymentKind as LiveClusterDeploymentKind
+from .live_cluster_registry import LiveClusterSpec as LiveClusterSpec
+from .live_cluster_registry import get_clusters_for_env as get_clusters_for_env
 from .pipeline_mode import PipelineMode as PipelineMode
 from .pipeline_mode import is_batch as is_batch
 from .pipeline_mode import is_live as is_live

@@ -21,7 +21,7 @@ GCP_PROJECT_ID_EXCLUDE_GLOBS=(
     "**/defi_prediction_instrument_seeds.py"
     "**/generators/cefi.py"
 )
-# UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
+# UAC's suite now covers 228-instance catalogue x cassette parity across 80+ external
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
 # without masking runaway regressions (a 60% overrun would still trip).
 MAX_DURATION=600
