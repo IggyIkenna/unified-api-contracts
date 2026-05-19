@@ -21,6 +21,9 @@ from .environment_tier import resolve_environment_from_hostname as resolve_envir
 from .errors import *
 from .errors import VENUE_ERROR_MAP as VENUE_ERROR_MAP
 from .errors import ErrorAction as ErrorAction
+from .experiment_registry import ExperimentKind as ExperimentKind
+from .experiment_registry import ExperimentRunSpec as ExperimentRunSpec
+from .experiment_registry import ExperimentStatus as ExperimentStatus
 from .instruments_preflight_dag import INSTRUMENTS_PREFLIGHT_REQUIREMENTS as INSTRUMENTS_PREFLIGHT_REQUIREMENTS
 from .instruments_preflight_dag import TRIGGER_TO_DOWNSTREAM_ENTITY as TRIGGER_TO_DOWNSTREAM_ENTITY
 from .instruments_preflight_dag import ManifestReader as ManifestReader

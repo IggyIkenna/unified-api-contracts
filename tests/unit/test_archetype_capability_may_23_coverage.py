@@ -314,9 +314,9 @@ def test_carry_staked_basis_declares_lst_and_lending_legs(required_venue: str) -
 # ---------------------------------------------------------------------------
 
 
-def test_capability_registry_loaded_with_18_archetypes() -> None:
-    """Manifest declares 18 archetypes — adding to MAY_23 must not regress."""
-    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 18
+def test_capability_registry_loaded_with_22_archetypes() -> None:
+    """Manifest declares 22 archetypes — adding to MAY_23 must not regress."""
+    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 22
 
 
 def test_strategy_registry_non_empty() -> None:

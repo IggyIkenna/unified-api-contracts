@@ -95,6 +95,11 @@ from .canonical.crosscutting.errors import (
     WebSocketCloseInfo,
     classify_venue_error,
 )
+from .canonical.crosscutting.experiment_registry import (
+    ExperimentKind,
+    ExperimentRunSpec,
+    ExperimentStatus,
+)
 from .canonical.crosscutting.kill_switch import (
     KillSwitchArmedEvent,
     KillSwitchArmRequest,
@@ -1325,6 +1330,9 @@ __all__ = [
     "ExecutionResult",
     "ExecutionStatus",
     "ExpectedValue",
+    "ExperimentKind",
+    "ExperimentRunSpec",
+    "ExperimentStatus",
     "FeatureMetadata",
     "FeeStructure",
     "FeeType",
