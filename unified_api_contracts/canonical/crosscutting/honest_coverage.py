@@ -267,6 +267,33 @@ class EmptyConfirmedReason(StrEnum):
     SOURCE_RETURNED_ZERO = "SOURCE_RETURNED_ZERO"
     """We expected data, the source returned 200+empty. Distinct from EXPECTED_* — this is data-side honest absence."""
 
+    NO_INPUT_AVAILABLE = "NO_INPUT_AVAILABLE"
+    """Downstream feature or model computation skipped because an upstream input had
+    ``attempted_failed`` status in the availability manifest. Distinct from
+    ``EXPECTED_UPSTREAM_EMPTY`` (which propagates ``empty_confirmed`` / ``expected_unattempted``
+    from upstream) — this reason fires when upstream data was ATTEMPTED but FAILED, making
+    any downstream derived output unreliable.
+
+    Used by: rolling-window calcs (features-volatility, features-cross-instrument,
+    features-onchain), same-day single-sample calcs, strategy allocator skip.
+
+    Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 2.E.3."""
+
+    LEG_ABSENT_LEFT = "LEG_ABSENT_LEFT"
+    """Cross-instrument paired calc: the LEFT leg had ``empty_confirmed`` status in the
+    manifest for this date. The paired output cannot be computed without both legs present.
+    Emitted by: features-cross-instrument ``PairedPriceDispersionCalculator`` and other
+    paired / cross-leg calculators when the left leg is absent but the right is present.
+    Pair with ``LEG_ABSENT_RIGHT``.
+
+    Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 2.E.3."""
+
+    LEG_ABSENT_RIGHT = "LEG_ABSENT_RIGHT"
+    """Cross-instrument paired calc: the RIGHT leg had ``empty_confirmed`` status in the
+    manifest for this date. Pair of ``LEG_ABSENT_LEFT``.
+
+    Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 2.E.3."""
+
 
 EMPTY_CONFIRMED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in EmptyConfirmedReason)
 """String-membership view of :class:`EmptyConfirmedReason` for fast O(1) validation.
@@ -399,6 +426,17 @@ class RecordFailedReason(StrEnum):
     consumers SHOULD skip or alert rather than retry — the gap will be filled
     when MTDS auto-backfills the window on ``CONNECTIVITY_RECOVERED``.
     SSOT: ``plans/active/mdps_streaming_and_backpressure_2026_05_07.md`` § item 524."""
+
+    UPSTREAM_LEG_FAILED = "UPSTREAM_LEG_FAILED"
+    """Cross-instrument paired calc: one or both legs had ``attempted_failed`` status in the
+    availability manifest for this date. The pairing cannot proceed — the failure propagates
+    as ``attempted_failed`` (not ``empty_confirmed``) because the data was attempted but corrupt
+    or unavailable, not simply absent due to a calendar gap.
+
+    Emitted by: features-cross-instrument paired / cross-leg calculators when either leg has
+    ``attempted_failed`` in the upstream manifest.
+
+    Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 2.E.3."""
 
 
 RECORD_FAILED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in RecordFailedReason)
