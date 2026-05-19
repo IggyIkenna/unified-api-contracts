@@ -147,6 +147,7 @@ def candidate_parquet_paths(
     *,
     season: str | None = None,
     include_legacy_archive: bool = False,
+    pipeline_mode: str | None = None,
 ) -> list[str]:
     """Return ordered list of candidate GCS paths (without bucket prefix) for
     a SPORTS shard.
@@ -173,6 +174,11 @@ def candidate_parquet_paths(
         include_legacy_archive: If True, also include
             ``sports_reference_v1_archive/...`` paths (pre-2026-04-28
             schema migration). Default False.
+        pipeline_mode: When provided, the pipeline_mode-aware canonical path
+            ``sports_reference/by_date/day={D}/pipeline_mode={mode}/entity=...``
+            is prepended as the first probe (Phase 5.3 migration fallback
+            chain). Default ``None`` skips the canonical level (back-compat).
+            Ignored for ``FLAT`` layout (no date partition).
 
     Returns:
         List of GCS paths (relative to bucket). Empty if data_type unknown.
@@ -188,37 +194,48 @@ def candidate_parquet_paths(
         return paths
 
     base = f"{SPORTS_BY_DATE_PREFIX}day={day}/entity={folder}"
+    pm_base = (
+        f"{SPORTS_BY_DATE_PREFIX}day={day}/pipeline_mode={pipeline_mode}/entity={folder}" if pipeline_mode else None
+    )
 
     if layout == SportsPathLayout.PER_DAY_PER_SEASON:
-        # Per-(date, season) bulk file. League filter happens intra-file
-        # on the ``canonical_league`` column.
+        try:
+            year = int(day[:4])
+        except (ValueError, TypeError):
+            year = 0
+        year_window = (str(year - 1), str(year), str(year + 1))
+
+        # Level 1: pipeline_mode-aware canonical paths (migrated data)
+        if pm_base:
+            if season:
+                paths.append(f"{pm_base}/season={season}/{folder}.parquet")
+            else:
+                for s in year_window:
+                    paths.append(f"{pm_base}/season={s}/{folder}.parquet")
+            paths.append(f"{pm_base}/{folder}.parquet")
+
+        # Level 2+: existing paths (pre-migration or legacy)
         if season:
             paths.append(f"{base}/season={season}/{folder}.parquet")
         else:
-            # Probe a 3-year window around the day's year — covers transfer-
-            # window overlap when old + new season values legitimately
-            # co-exist for the same day (e.g. 2023-08-01 may carry both
-            # season=2022 final-window updates AND season=2023 pre-season).
-            try:
-                year = int(day[:4])
-            except (ValueError, TypeError):
-                year = 0
-            for s in (str(year - 1), str(year), str(year + 1)):
+            for s in year_window:
                 paths.append(f"{base}/season={s}/{folder}.parquet")
-        # Bare fallback for any historical writes that omitted the season
-        # subpartition (orchestrator omits ``season=`` when ``season`` arg
-        # is None — captured here so the bare path doesn't silently miss).
         paths.append(f"{base}/{folder}.parquet")
         if include_legacy_archive:
             archive_base = f"sports_reference_v1_archive/by_date/day={day}/entity={folder}"
             paths.append(f"{archive_base}/{folder}.parquet")
         return paths
 
+    # PER_DAY_PER_LEAGUE or PER_DAY_BARE
+    # Level 1: pipeline_mode-aware canonical paths (migrated data)
+    if pm_base:
+        if layout == SportsPathLayout.PER_DAY_PER_LEAGUE and league_id:
+            paths.append(f"{pm_base}/league={league_id}/{folder}.parquet")
+        paths.append(f"{pm_base}/{folder}.parquet")
+
+    # Level 2+: existing paths (pre-migration or legacy)
     if layout == SportsPathLayout.PER_DAY_PER_LEAGUE and league_id:
-        # Per-league subpartition (modern layout) — try first.
         paths.append(f"{base}/league={league_id}/{folder}.parquet")
-    # Bare path — fallback for legacy / single-file-per-day entities,
-    # OR when league_id is empty.
     paths.append(f"{base}/{folder}.parquet")
     if include_legacy_archive:
         archive_base = f"sports_reference_v1_archive/by_date/day={day}/entity={folder}"
@@ -236,6 +253,7 @@ def candidate_parquet_uris(
     project_id: str,
     season: str | None = None,
     include_legacy_archive: bool = False,
+    pipeline_mode: str | None = None,
 ) -> list[str]:
     """Same as ``candidate_parquet_paths`` but returns full ``gs://`` URIs."""
     bucket = sports_bucket_name(project_id)
@@ -247,6 +265,7 @@ def candidate_parquet_uris(
             league_id,
             season=season,
             include_legacy_archive=include_legacy_archive,
+            pipeline_mode=pipeline_mode,
         )
     ]
 

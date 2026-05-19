@@ -101,3 +101,67 @@ class TestPlayerValuesSSOT:
         )
         assert uris[0].startswith("gs://instruments-store-sports-test-project/")
         assert "season=2024" in uris[0]
+
+
+class TestSportsPipelineModeFallbackChain:
+    """pipeline_mode kwarg on candidate_parquet_paths (Phase 5.3 fallback chain)."""
+
+    def test_fixtures_pipeline_mode_prepends_canonical_path(self) -> None:
+        """PER_DAY_PER_LEAGUE: pipeline_mode paths precede existing paths."""
+        paths = candidate_parquet_paths("FIXTURES", "2024-01-15", "BUNDESLIGA", pipeline_mode="batch_api_football")
+        assert any("pipeline_mode=batch_api_football" in p for p in paths)
+        # pipeline_mode paths come first
+        assert "pipeline_mode=batch_api_football" in paths[0]
+        # Existing paths follow (no pipeline_mode)
+        assert any("pipeline_mode=" not in p for p in paths)
+        existing = [p for p in paths if "pipeline_mode=" not in p]
+        assert any("league=BUNDESLIGA" in p for p in existing)
+
+    def test_fixtures_no_pipeline_mode_unchanged(self) -> None:
+        """Without pipeline_mode, output matches pre-Phase-5 behaviour."""
+        paths_with = candidate_parquet_paths("FIXTURES", "2024-01-15", "BUNDESLIGA")
+        paths_without = candidate_parquet_paths("FIXTURES", "2024-01-15", "BUNDESLIGA", pipeline_mode=None)
+        assert paths_with == paths_without
+        assert all("pipeline_mode=" not in p for p in paths_with)
+
+    def test_odds_pipeline_mode_bare_path_included(self) -> None:
+        """Without league_id, pipeline_mode bare path is still included."""
+        paths = candidate_parquet_paths("ODDS", "2024-01-15", pipeline_mode="batch_footystats")
+        pm_paths = [p for p in paths if "pipeline_mode=batch_footystats" in p]
+        assert pm_paths, "pipeline_mode paths missing"
+        assert any("league=" not in p for p in pm_paths)
+
+    def test_player_values_pipeline_mode_season_window(self) -> None:
+        """PER_DAY_PER_SEASON: pipeline_mode paths cover the season window."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01", pipeline_mode="batch_transfermarkt")
+        pm_paths = [p for p in paths if "pipeline_mode=batch_transfermarkt" in p]
+        assert len(pm_paths) >= 3, "expected 3-year window + bare for pipeline_mode"
+        assert any("season=2024" in p for p in pm_paths)
+
+    def test_xg_pipeline_mode_bare_layout(self) -> None:
+        """PER_DAY_BARE: single pipeline_mode path prepended."""
+        paths = candidate_parquet_paths("XG", "2024-01-15", pipeline_mode="batch_understat")
+        assert paths[0] == (
+            "sports_reference/by_date/day=2024-01-15/pipeline_mode=batch_understat/"
+            "entity=understat_xg/understat_xg.parquet"
+        )
+        assert paths[1] == "sports_reference/by_date/day=2024-01-15/entity=understat_xg/understat_xg.parquet"
+
+    def test_venues_flat_layout_ignores_pipeline_mode(self) -> None:
+        """FLAT layout has no date partition — pipeline_mode is inapplicable."""
+        paths_with = candidate_parquet_paths("VENUES", "2024-01-15", pipeline_mode="batch_api_football")
+        paths_without = candidate_parquet_paths("VENUES", "2024-01-15")
+        assert paths_with == paths_without
+        assert all("pipeline_mode=" not in p for p in paths_with)
+
+    def test_uri_helper_propagates_pipeline_mode(self) -> None:
+        from unified_api_contracts.sports import candidate_parquet_uris
+
+        uris = candidate_parquet_uris(
+            "FIXTURES",
+            "2024-01-15",
+            "BUNDESLIGA",
+            project_id="test-project",
+            pipeline_mode="batch_api_football",
+        )
+        assert any("pipeline_mode=batch_api_football" in u for u in uris)

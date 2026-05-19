@@ -274,3 +274,108 @@ def test_dispatcher_routes_prediction() -> None:
         "raw_tick_data/by_date/day=2026-04-17/asset_group=prediction/venue=POLYMARKET/"
         "instrument_type=prediction_market/data_type=trades/0xabc123.parquet"
     )
+
+
+# ---------------------------------------------------------------------------
+# pipeline_mode fallback chain (Phase 5.3)
+# ---------------------------------------------------------------------------
+
+
+def test_defi_pipeline_mode_prepends_canonical_path() -> None:
+    """With pipeline_mode, canonical path (with segment) is first, bare path second."""
+    paths = candidate_parquet_paths(
+        AssetGroup.DEFI,
+        "lending_indices",
+        DAY,
+        pipeline_mode="batch_onchain_rpc",
+        venue="AAVE_V3",
+        chain="ETHEREUM",
+        instrument_type=InstrumentType.A_TOKEN,
+        file_name="aUSDC.parquet",
+    )
+    assert len(paths) == 2
+    assert "pipeline_mode=batch_onchain_rpc" in paths[0]
+    assert "pipeline_mode=" not in paths[1]
+    assert paths[0].startswith("raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_onchain_rpc/asset_group=defi/")
+    assert paths[1].startswith("raw_tick_data/by_date/day=2026-04-17/asset_group=defi/")
+
+
+def test_defi_no_pipeline_mode_returns_single_path() -> None:
+    """Without pipeline_mode, single canonical path returned (back-compat)."""
+    paths = candidate_parquet_paths(
+        AssetGroup.DEFI,
+        "lending_indices",
+        DAY,
+        venue="AAVE_V3",
+        chain="ETHEREUM",
+        instrument_type=InstrumentType.A_TOKEN,
+        file_name="aUSDC.parquet",
+    )
+    assert len(paths) == 1
+    assert "pipeline_mode=" not in paths[0]
+
+
+def test_cefi_pipeline_mode_prepends_canonical_path() -> None:
+    paths = candidate_parquet_paths(
+        AssetGroup.CEFI,
+        "trades",
+        DAY,
+        pipeline_mode="batch_tardis",
+        venue="BINANCE",
+        instrument_type=InstrumentType.PERPETUAL,
+        file_name="BTC-USDT-PERP.parquet",
+    )
+    assert len(paths) == 2
+    assert paths[0].startswith("raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_tardis/asset_group=cefi/")
+    assert paths[1].startswith("raw_tick_data/by_date/day=2026-04-17/asset_group=cefi/")
+
+
+def test_tradfi_pipeline_mode_prepends_canonical_path() -> None:
+    paths = candidate_parquet_paths(
+        AssetGroup.TRADFI,
+        "trades",
+        DAY,
+        pipeline_mode="batch_databento",
+        venue="CME",
+        instrument_type=InstrumentType.FUTURE,
+        file_name="ES.parquet",
+    )
+    assert len(paths) == 2
+    assert "pipeline_mode=batch_databento" in paths[0]
+    assert "pipeline_mode=" not in paths[1]
+
+
+def test_prediction_pipeline_mode_prepends_canonical_path() -> None:
+    paths = candidate_parquet_paths(
+        AssetGroup.PREDICTION,
+        "trades",
+        DAY,
+        pipeline_mode="batch_polymarket_clob",
+        venue="POLYMARKET",
+        condition_id="0xabc",
+    )
+    assert len(paths) == 2
+    assert "pipeline_mode=batch_polymarket_clob" in paths[0]
+    assert "pipeline_mode=" not in paths[1]
+
+
+def test_pipeline_mode_path_preserves_all_segments() -> None:
+    """pipeline_mode insertion keeps all other segments intact."""
+    paths = candidate_parquet_paths(
+        AssetGroup.DEFI,
+        "lending_indices",
+        DAY,
+        pipeline_mode="live_websocket",
+        venue="LIDO",
+        chain="ETHEREUM",
+        instrument_type=InstrumentType.A_TOKEN,
+        file_name="stETH.parquet",
+    )
+    pm_path = paths[0]
+    bare_path = paths[1]
+    # Both end with identical suffix after the day segment
+    suffix = (
+        "asset_group=defi/venue=LIDO/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/stETH.parquet"
+    )
+    assert pm_path.endswith(suffix)
+    assert bare_path.endswith(suffix)

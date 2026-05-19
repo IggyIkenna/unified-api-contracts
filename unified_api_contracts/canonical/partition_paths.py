@@ -336,14 +336,26 @@ def candidate_parquet_paths(
     asset_group: AssetGroup | str,
     data_type: str,
     day: _dt.date,
+    *,
+    pipeline_mode: str | None = None,
     **kwargs: object,
 ) -> list[str]:
     """Return ordered list of candidate partition paths for any asset_group.
+
+    When ``pipeline_mode`` is provided, the pipeline_mode-aware canonical path
+    ``raw_tick_data/by_date/day={D}/pipeline_mode={mode}/asset_group={ag}/...``
+    is prepended as the first probe; the existing path without the segment
+    follows as a fallback (Phase 5.3 migration fallback chain). Default
+    ``None`` returns only the existing paths (back-compat).
 
     Args:
         asset_group: Asset group enum or lowercase string token.
         data_type: Data type token (asset-group-specific vocabulary).
         day: Partition day.
+        pipeline_mode: When provided, prepend the pipeline_mode-aware
+            canonical path as the first probe. See
+            :mod:`unified_api_contracts.canonical.domain.sports.gcs_paths`
+            for the Sports flavour.
         **kwargs: Asset-group-specific path components.
             - DeFi: ``venue``, ``chain``, ``instrument_type``, ``file_name``.
             - CeFi / TradFi: ``venue``, ``instrument_type``, ``file_name``.
@@ -373,58 +385,69 @@ def candidate_parquet_paths(
             day=day.strftime("%Y-%m-%d") if isinstance(day, _dt.date) else str(day),
             league_id=league_id,
             include_legacy_archive=include_legacy_archive,
+            pipeline_mode=pipeline_mode,
         )
 
+    day_str = day.strftime("%Y-%m-%d")
+
+    def _prepend_pipeline_mode(path: str) -> str:
+        """Insert ``pipeline_mode={mode}/`` after ``day={D}/`` in a canonical path."""
+        marker = f"day={day_str}/{ASSET_GROUP_HIVE_KEY}="
+        return path.replace(marker, f"day={day_str}/pipeline_mode={pipeline_mode}/{ASSET_GROUP_HIVE_KEY}=", 1)
+
     if ag == AssetGroup.DEFI:
-        return [
-            build_defi_partition_path(
-                venue=str(kwargs["venue"]),
-                chain=str(kwargs["chain"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-                data_type=data_type,
-                day=day,
-                file_name=str(kwargs["file_name"]),
-            )
-        ]
+        base = build_defi_partition_path(
+            venue=str(kwargs["venue"]),
+            chain=str(kwargs["chain"]),
+            instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+            data_type=data_type,
+            day=day,
+            file_name=str(kwargs["file_name"]),
+        )
+        if pipeline_mode:
+            return [_prepend_pipeline_mode(base), base]
+        return [base]
 
     if ag == AssetGroup.CEFI:
-        return [
-            build_cefi_partition_path(
-                venue=str(kwargs["venue"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-                data_type=data_type,
-                day=day,
-                file_name=str(kwargs["file_name"]),
-            )
-        ]
+        base = build_cefi_partition_path(
+            venue=str(kwargs["venue"]),
+            instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+            data_type=data_type,
+            day=day,
+            file_name=str(kwargs["file_name"]),
+        )
+        if pipeline_mode:
+            return [_prepend_pipeline_mode(base), base]
+        return [base]
 
     if ag == AssetGroup.TRADFI:
-        return [
-            build_tradfi_partition_path(
-                venue=str(kwargs["venue"]),
-                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-                data_type=data_type,
-                day=day,
-                file_name=str(kwargs["file_name"]),
-            )
-        ]
+        base = build_tradfi_partition_path(
+            venue=str(kwargs["venue"]),
+            instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+            data_type=data_type,
+            day=day,
+            file_name=str(kwargs["file_name"]),
+        )
+        if pipeline_mode:
+            return [_prepend_pipeline_mode(base), base]
+        return [base]
 
     if ag == AssetGroup.PREDICTION:
-        # Prediction has no `file_name` — condition_id IS the filename.
         instrument_type_raw = kwargs.get("instrument_type", "prediction_market")
         if isinstance(instrument_type_raw, InstrumentType):
             instrument_type_arg: InstrumentType | str = instrument_type_raw
         else:
             instrument_type_arg = str(instrument_type_raw)
-        return [
-            build_prediction_partition_path(
-                venue=str(kwargs["venue"]),
-                condition_id=str(kwargs["condition_id"]),
-                instrument_type=instrument_type_arg,
-                data_type=data_type,
-                day=day,
-            )
-        ]
+        base = build_prediction_partition_path(
+            venue=str(kwargs["venue"]),
+            condition_id=str(kwargs["condition_id"]),
+            instrument_type=instrument_type_arg,
+            data_type=data_type,
+            day=day,
+        )
+        if pipeline_mode:
+            return [_prepend_pipeline_mode(base), base]
+        return [base]
 
     msg = f"unsupported asset_group: {ag!r}"
     raise ValueError(msg)
