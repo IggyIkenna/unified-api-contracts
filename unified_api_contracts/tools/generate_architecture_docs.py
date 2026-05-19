@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from collections.abc import Callable
 from pathlib import Path
 from typing import TextIO
 
@@ -138,11 +139,11 @@ def _write_index(out: TextIO) -> None:
     )
 
 
-def _emit(path: Path, writer: object) -> None:
+def _emit(path: Path, writer: Callable[[TextIO], None]) -> None:
     """Open ``path``, call writer(file_handle), close. Path's parent is auto-created."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as fh:
-        writer(fh)  # type: ignore[operator]  # writer typed as object; runtime value is always a callable writer
+        writer(fh)
 
 
 def main(argv: list[str] | None = None) -> int:

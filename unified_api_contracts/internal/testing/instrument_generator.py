@@ -174,7 +174,7 @@ class InstrumentGenerator:
         # Ensure timestamp
         if "timestamp" not in kwargs:
             kwargs["timestamp"] = datetime.now(UTC)
-        inst = CanonicalInstrument(**kwargs)  # type: ignore[arg-type]  # kwargs built from dict; all required fields present at runtime
+        inst = CanonicalInstrument.model_validate(kwargs)
         self._adhoc.append(inst)
         return inst
 
@@ -539,7 +539,7 @@ class InstrumentGenerator:
             inst_kwargs["underlying"] = str(spec["staked_underlying"])
         inst_kwargs["data_types"] = _defi_data_types(itype, venue)
 
-        return CanonicalInstrument(**inst_kwargs)  # type: ignore[arg-type]  # inst_kwargs built from dict; all required fields present at runtime
+        return CanonicalInstrument.model_validate(inst_kwargs)
 
     # -- Sports -------------------------------------------------------------
 
@@ -585,7 +585,7 @@ class InstrumentGenerator:
                 inst_kwargs["venue_type"] = spec.get("venue_type")
                 inst_kwargs["data_types"] = ["odds"]
 
-            instruments.append(CanonicalInstrument(**inst_kwargs))  # type: ignore[arg-type]  # inst_kwargs built from dict; all required fields present at runtime
+            instruments.append(CanonicalInstrument.model_validate(inst_kwargs))
 
         return instruments
 

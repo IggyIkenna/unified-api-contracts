@@ -111,12 +111,15 @@ Do NOT import this module directly; use
 
 from __future__ import annotations
 
+from typing import cast
+
 from unified_api_contracts.internal.schemas.contracts import (
     CHAIN_COL,
     CONTRACT_REGISTRY,
     INSTRUMENT_ID_COL,
     TS_EVENT_COL,
     VENUE_COL,
+    AssetGroupLiteral,
     ColumnSpec,
     SchemaContract,
 )
@@ -162,7 +165,7 @@ def _register(
     symbol_column: str = "symbol",
 ) -> SchemaContract:
     contract = SchemaContract(
-        asset_group=category,  # type: ignore[arg-type]  # category is a legacy str alias for AssetGroup; runtime coercion is handled
+        asset_group=cast(AssetGroupLiteral, category),
         instrument_type=instrument_type,
         data_type=feature_group,
         columns=_core_columns(include_chain=include_chain),

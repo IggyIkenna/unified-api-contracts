@@ -22,6 +22,7 @@ import math
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 
@@ -113,9 +114,9 @@ def _sigmoid(x: float) -> float:
 
 def generate_logistic_model(strategy: dict[str, object], rng: np.random.Generator) -> dict[str, object]:
     """Generate a lightweight logistic regression artifact (JSON-serializable)."""
-    features: list[str] = list(strategy["features"])  # type: ignore[arg-type]  # strategy is a dict[str, Any]; values coerced at runtime
+    features = cast("list[str]", strategy["features"])
     n_features = len(features)
-    n_classes = int(strategy["n_classes"])  # type: ignore[arg-type]  # strategy is a dict[str, Any]; values coerced at runtime
+    n_classes = int(cast("int | str", strategy["n_classes"]))
     name = str(strategy["name"])
 
     # Random but bounded weights — small values so inference is stable

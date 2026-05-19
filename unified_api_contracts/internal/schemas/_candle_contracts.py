@@ -54,6 +54,8 @@ Registry mutations at module-import time — imported as a side-effect from
 
 from __future__ import annotations
 
+from typing import cast
+
 from unified_api_contracts.internal.schemas.contracts import (
     CHAIN_COL,
     CONTRACT_REGISTRY,
@@ -62,6 +64,7 @@ from unified_api_contracts.internal.schemas.contracts import (
     TS_EVENT_COL,
     UNDERLYING_COL,
     VENUE_COL,
+    AssetGroupLiteral,
     ColumnSpec,
     SchemaContract,
 )
@@ -231,7 +234,7 @@ def _build(
     columns.append(_TIMEFRAME_COL)
     columns.extend(extra_cols)
     return SchemaContract(
-        asset_group=category,  # type: ignore[arg-type]  # category is a legacy str alias for AssetGroup; runtime coercion is handled
+        asset_group=cast(AssetGroupLiteral, category),
         instrument_type=instrument_type,
         data_type=data_type,
         columns=columns,

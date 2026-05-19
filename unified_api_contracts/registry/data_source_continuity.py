@@ -41,7 +41,7 @@ and unrecoverable — the data simply does not exist at 15m granularity.
 from __future__ import annotations
 
 from datetime import date
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 
 class SourceWindow(NamedTuple):
@@ -204,13 +204,15 @@ def get_source_for_instrument(
     "GAP_NO_SOURCE" for known gaps, or None if no temporal resolver is
     registered (caller should fall back to VENUE_TO_DATA_SOURCE).
     """
-    from collections.abc import Callable  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
+    from collections.abc import (
+        Callable,  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
+    )
 
     resolver = _SOURCE_RESOLVERS.get((instrument_key, data_type))
     if resolver is None:
         return None
     assert callable(resolver)
-    typed_resolver: Callable[[date], str] = resolver  # type: ignore[assignment]  # resolver is a union of callable shapes; all conform at runtime
+    typed_resolver = cast(Callable[[date], str], resolver)
     return typed_resolver(query_date)
 
 

@@ -21,7 +21,7 @@ import inspect
 import logging
 import re
 from collections.abc import Callable
-from typing import TypeVar
+from typing import TypeVar, cast
 
 from pydantic import BaseModel
 
@@ -170,7 +170,7 @@ def requires_operation_validation(
                     )
                 return await fn(*args, **kwargs)
 
-            return async_wrapper  # type: ignore[return-value]  # decorator preserves call signature but type checker cannot infer generic wrapper return type
+            return cast(_F, async_wrapper)
 
         @functools.wraps(fn)
         def sync_wrapper(*args: object, **kwargs: object) -> object:
@@ -188,7 +188,7 @@ def requires_operation_validation(
                 )
             return fn(*args, **kwargs)
 
-        return sync_wrapper  # type: ignore[return-value]  # decorator preserves call signature but type checker cannot infer generic wrapper return type
+        return cast(_F, sync_wrapper)
 
     return decorator
 
