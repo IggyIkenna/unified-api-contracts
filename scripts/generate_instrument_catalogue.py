@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import tempfile
 from dataclasses import asdict
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -504,7 +505,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("/tmp/instrument-catalogue"),
+        default=Path(tempfile.gettempdir()) / "instrument-catalogue",
         help="Local output directory (Bandit B108: caller-controlled, not a hardcoded /tmp)",
     )
     parser.add_argument(
