@@ -1,6 +1,6 @@
 """Unit tests for treasury contracts."""
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import pytest
@@ -290,7 +290,7 @@ class TestDefiWalletKeyMaterial:
 
     def test_defi_wallet_key_rotation(self) -> None:
         """Test key rotation timestamp tracking."""
-        created = datetime.utcnow()
+        created = datetime.now(timezone.utc)
         rotated = created + timedelta(days=30)
         wallet = DefiWalletKeyMaterial(
             wallet_address="0xaddr",
@@ -335,7 +335,7 @@ class TestCustodyPingResult:
             is_reachable=True,
             balance_native=Decimal("50000"),
             balance_usd=Decimal("50000"),
-            as_of_timestamp=datetime.utcnow(),
+            as_of_timestamp=datetime.now(timezone.utc),
             latency_ms=42,
         )
         assert result.is_reachable
