@@ -1044,6 +1044,19 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " deployment-service/scripts/vm/launch-qg-snapshot-vm.sh."
         ),
     ),
+    # ── Batch-vs-live recon drift (batch_live_symmetry_2026_05_10 Tab 6) ────
+    AlertRule(
+        code=AlertCode.BATCH_VS_LIVE_RECON_DRIFTED,
+        event_pattern="BATCH_VS_LIVE_RECON_DRIFTED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("batch_vs_live_recon_drifted"),
+        description=(
+            "T+1 batch-vs-live execution PnL delta exceeded RECON_GREEN_THRESHOLDS bps_delta_max."
+            " Inspect stage3 execution recon report in the GCS recon bucket for the flagged date."
+            " Emitter: batch-live-reconciliation-service post stage3."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

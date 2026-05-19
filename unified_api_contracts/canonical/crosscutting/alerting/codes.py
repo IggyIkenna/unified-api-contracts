@@ -371,6 +371,16 @@ class AlertCode(StrEnum):
     ``aave``, ``spark``). Operator-page only — NOT auto-action. Payload:
     ``forum``, ``proposal_id``, ``title``, ``tags``, ``posted_at``, ``url``."""
 
+    # ── Batch-vs-live recon drift (batch_live_symmetry_2026_05_10 Tab 6) ────
+    BATCH_VS_LIVE_RECON_DRIFTED = "BATCH_VS_LIVE_RECON_DRIFTED"
+    """T+1 batch-vs-live reconciliation: execution PnL delta exceeded the
+    archetype ``bps_delta_max`` threshold from ``RECON_GREEN_THRESHOLDS``.
+    Indicates matching-engine simulation diverging from real fills beyond the
+    calibrated green-band. Severity HIGH — Telegram + PagerDuty. Operator
+    action: inspect ``stage3_execution_recon`` report in the GCS recon bucket
+    and compare batch vs live fill events for the flagged date. Emitter:
+    batch-live-reconciliation-service orchestrator (post stage3)."""
+
     # ── QG / infra staleness (2026-05-15, B-018 Phase 4.A monitoring) ────────
     QG_SNAPSHOT_STALE = "QG_SNAPSHOT_STALE"
     """Daily QG snapshot not written to GCS for N consecutive days (default 2).
