@@ -254,15 +254,16 @@ class InstrumentRecord(BaseModel):
         ...)`` per the writegate Phase 2 + hard_schema_enforcement Phase 2
         contract.
 
-        Closed-set rules (slot 5 2026-05-11):
+        Closed-set rules:
 
-        * CeFi spot/perp → base_asset + quote_asset non-empty.
-        * DeFi on-chain → pool_address OR base_asset_contract_address non-empty.
-        * EVENT_CONTRACT → expiry non-null (resolution_date axis).
+        * CeFi spot/perp → base_asset + quote_asset non-empty (slot 5 2026-05-11).
+        * DeFi on-chain → pool_address OR base_asset_contract_address non-empty (slot 5 2026-05-11).
+        * EVENT_CONTRACT → expiry non-null (resolution_date axis; slot 5 2026-05-11).
+        * FUTURE → expiry non-null (tradfi_master Q1 gate passed 2026-05-13; slot 8 2026-05-19).
+        * OPTION → expiry non-null (tradfi_master Q2 gate passed 2026-05-13; slot 8 2026-05-19).
 
-        TradFi futures + sports per-fixture flips deferred behind
-        tradfi_master Q1+Q2 + sports adapter audit per the
-        hard_schema_enforcement plan body roadmap.
+        Sports per-fixture (fixture_id) deferred behind sports_master Phase 3 C.7
+        per hard_schema_enforcement plan body roadmap.
         """
         # CeFi spot/perp rule
         if self.instrument_type in CEFI_PAIR_INSTRUMENT_TYPES:
@@ -301,5 +302,23 @@ class InstrumentRecord(BaseModel):
                     f"requires non-null expiry (resolution_date axis). "
                     f"Workspace rule: event contracts shard by (root, resolution_date) per "
                     f"cme_polymarket_arb_2026_05_08 Phase 3+4."
+                )
+        # TradFi FUTURE rule — tradfi_master Q1 gate passed 2026-05-13
+        elif self.instrument_type == InstrumentType.FUTURE:
+            if self.expiry is None:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={InstrumentType.FUTURE.value}) "
+                    f"requires non-null expiry (contract expiry datetime). "
+                    f"Workspace rule: futures instruments shard by expiry for contract roll detection. "
+                    f"Per hard_schema_enforcement_2026_05_08 Phase 1 (tradfi_master Q1 gate passed 2026-05-13)."
+                )
+        # TradFi OPTION rule — tradfi_master Q2 gate passed 2026-05-13
+        elif self.instrument_type == InstrumentType.OPTION:
+            if self.expiry is None:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={InstrumentType.OPTION.value}) "
+                    f"requires non-null expiry (option expiration datetime). "
+                    f"Workspace rule: option instruments shard by (root, expiry, strike) per "
+                    f"hard_schema_enforcement_2026_05_08 Phase 1 (tradfi_master Q2 gate passed 2026-05-13)."
                 )
         return self
