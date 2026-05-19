@@ -218,11 +218,13 @@ class InstrumentRecord(BaseModel):
     # fields produces silent data corruption downstream (1440-NaN-bar
     # incident 2026-05-05 was the canonical failure mode).
     #
-    # Three asset-group rules enforced as of 2026-05-11 (CeFi half +
-    # DeFi half ship now; TradFi futures-expiry + Sports fixture_id flips
-    # are blocked on `tradfi_master_2026_05_07` Q1+Q2 + sports adapter
-    # capture audit per the per-asset-group schema-flip roadmap in
-    # `hard_schema_enforcement_2026_05_08.md`):
+    # Five asset-group rules enforced as of 2026-05-19 (all asset groups
+    # complete per hard_schema_enforcement_2026_05_08 Phase 1):
+    # Sports fixture_id enforcement is complete at the domain-schema level —
+    # `canonical/domain/sports/{fixture_stats,lineup,events,injury,player_stats}.py`
+    # all declare `fixture_id: str` (Pydantic required non-nullable; no default).
+    # No InstrumentRecord rule needed: sports instruments use `instrument_key`
+    # to encode fixture identity. See Phase 1 roadmap item 5 in the plan.
     #
     # 1. CeFi spot/perp (SPOT_PAIR / PERPETUAL): base_asset + quote_asset
     #    must be non-empty. These are the trading pair identity; empty
@@ -254,16 +256,17 @@ class InstrumentRecord(BaseModel):
         ...)`` per the writegate Phase 2 + hard_schema_enforcement Phase 2
         contract.
 
-        Closed-set rules:
+        Closed-set rules (all complete as of 2026-05-19):
 
         * CeFi spot/perp → base_asset + quote_asset non-empty (slot 5 2026-05-11).
         * DeFi on-chain → pool_address OR base_asset_contract_address non-empty (slot 5 2026-05-11).
         * EVENT_CONTRACT → expiry non-null (resolution_date axis; slot 5 2026-05-11).
         * FUTURE → expiry non-null (tradfi_master Q1 gate passed 2026-05-13; slot 8 2026-05-19).
         * OPTION → expiry non-null (tradfi_master Q2 gate passed 2026-05-13; slot 8 2026-05-19).
-
-        Sports per-fixture (fixture_id) deferred behind sports_master Phase 3 C.7
-        per hard_schema_enforcement plan body roadmap.
+        * Sports fixture_id: complete at domain-schema level — sports per-fixture schemas
+          (fixture_stats, lineup, events, injury, player_stats) declare ``fixture_id: str``
+          (Pydantic required non-nullable). No InstrumentRecord rule needed: sports instruments
+          encode fixture identity in ``instrument_key``. (slot 4 2026-05-19)
         """
         # CeFi spot/perp rule
         if self.instrument_type in CEFI_PAIR_INSTRUMENT_TYPES:
