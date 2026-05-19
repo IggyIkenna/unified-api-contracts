@@ -3,11 +3,14 @@
 Covers:
 - CeFi SPOT_PAIR / PERPETUAL: base_asset + quote_asset non-empty
 - DeFi on-chain types: pool_address OR base_asset_contract_address non-empty
+- DeFi on-chain: base_asset_decimals non-null for all DEFI_ONCHAIN types (Phase A)
+- DeFi POOL: quote_asset_decimals non-null (Phase A)
 - EVENT_CONTRACT: expiry non-null
 - FUTURE: expiry non-null (tradfi_master Q1 gate 2026-05-13)
 - OPTION: expiry non-null (tradfi_master Q2 gate 2026-05-13)
 
-Per hard_schema_enforcement_2026_05_08 Phase 1.
+Per hard_schema_enforcement_2026_05_08 Phase 1 +
+hard_schema_phase1_field_flip_migration_2026_05_19 Phase A.
 """
 
 from __future__ import annotations
@@ -99,6 +102,8 @@ class TestDeFiOnchainRules:
             venue="UNISWAPV3-ETHEREUM",
             instrument_type=InstrumentType.POOL,
             pool_address=_DUMMY_ADDR,
+            base_asset_decimals=18,
+            quote_asset_decimals=6,
         )
         assert rec.pool_address == _DUMMY_ADDR
 
@@ -108,8 +113,121 @@ class TestDeFiOnchainRules:
             venue="AAVEV3-ETHEREUM",
             instrument_type=InstrumentType.LENDING,
             base_asset_contract_address=_DUMMY_ADDR,
+            base_asset_decimals=6,
         )
         assert rec.base_asset_contract_address == _DUMMY_ADDR
+
+
+# ---------------------------------------------------------------------------
+# DeFi decimals rules (Phase A — hard_schema_phase1_field_flip_migration_2026_05_19)
+# ---------------------------------------------------------------------------
+
+
+class TestDeFiDecimalsRules:
+    """Rule 6: base_asset_decimals non-null for all DEFI_ONCHAIN types.
+    Rule 7: quote_asset_decimals non-null for POOL type only.
+    """
+
+    def test_pool_without_base_decimals_fails(self) -> None:
+        with pytest.raises(ValueError, match="base_asset_decimals"):
+            InstrumentRecord(
+                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAPV3-ETHEREUM",
+                instrument_type=InstrumentType.POOL,
+                pool_address=_DUMMY_ADDR,
+                base_asset_decimals=None,
+                quote_asset_decimals=6,
+            )
+
+    def test_lending_without_base_decimals_fails(self) -> None:
+        with pytest.raises(ValueError, match="base_asset_decimals"):
+            InstrumentRecord(
+                instrument_key="AAVEV3-ETHEREUM:LENDING:USDC",
+                venue="AAVEV3-ETHEREUM",
+                instrument_type=InstrumentType.LENDING,
+                base_asset_contract_address=_DUMMY_ADDR,
+                base_asset_decimals=None,
+            )
+
+    def test_lst_without_base_decimals_fails(self) -> None:
+        with pytest.raises(ValueError, match="base_asset_decimals"):
+            InstrumentRecord(
+                instrument_key="LIDO-ETHEREUM:LST:STETH",
+                venue="LIDO-ETHEREUM",
+                instrument_type=InstrumentType.LST,
+                base_asset_contract_address=_DUMMY_ADDR,
+                base_asset_decimals=None,
+            )
+
+    def test_pool_without_quote_decimals_fails(self) -> None:
+        with pytest.raises(ValueError, match="quote_asset_decimals"):
+            InstrumentRecord(
+                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAPV3-ETHEREUM",
+                instrument_type=InstrumentType.POOL,
+                pool_address=_DUMMY_ADDR,
+                base_asset_decimals=18,
+                quote_asset_decimals=None,
+            )
+
+    def test_pool_with_both_decimals_passes(self) -> None:
+        rec = InstrumentRecord(
+            instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
+            venue="UNISWAPV3-ETHEREUM",
+            instrument_type=InstrumentType.POOL,
+            pool_address=_DUMMY_ADDR,
+            base_asset_decimals=18,
+            quote_asset_decimals=6,
+        )
+        assert rec.base_asset_decimals == 18
+        assert rec.quote_asset_decimals == 6
+
+    def test_lending_without_quote_decimals_passes(self) -> None:
+        """LENDING is single-asset — quote_asset_decimals legitimately None."""
+        rec = InstrumentRecord(
+            instrument_key="AAVEV3-ETHEREUM:LENDING:USDC",
+            venue="AAVEV3-ETHEREUM",
+            instrument_type=InstrumentType.LENDING,
+            base_asset_contract_address=_DUMMY_ADDR,
+            base_asset_decimals=6,
+            quote_asset_decimals=None,
+        )
+        assert rec.base_asset_decimals == 6
+        assert rec.quote_asset_decimals is None
+
+    def test_staking_without_quote_decimals_passes(self) -> None:
+        """STAKING is single-asset — quote_asset_decimals legitimately None."""
+        rec = InstrumentRecord(
+            instrument_key="LIDO-ETHEREUM:STAKING:ETH",
+            venue="LIDO-ETHEREUM",
+            instrument_type=InstrumentType.STAKING,
+            base_asset_contract_address=_DUMMY_ADDR,
+            base_asset_decimals=18,
+            quote_asset_decimals=None,
+        )
+        assert rec.base_asset_decimals == 18
+
+    def test_spot_asset_without_quote_decimals_passes(self) -> None:
+        """SPOT_ASSET is single-asset — quote_asset_decimals legitimately None."""
+        rec = InstrumentRecord(
+            instrument_key="SOLANA:SPOT_ASSET:SOL",
+            venue="SOLANA",
+            instrument_type=InstrumentType.SPOT_ASSET,
+            base_asset_contract_address=_DUMMY_ADDR,
+            base_asset_decimals=9,
+            quote_asset_decimals=None,
+        )
+        assert rec.base_asset_decimals == 9
+
+    def test_error_message_cites_phase_a_plan(self) -> None:
+        with pytest.raises(ValueError, match="hard_schema_phase1_field_flip_migration_2026_05_19"):
+            InstrumentRecord(
+                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAPV3-ETHEREUM",
+                instrument_type=InstrumentType.POOL,
+                pool_address=_DUMMY_ADDR,
+                base_asset_decimals=None,
+            )
 
 
 # ---------------------------------------------------------------------------

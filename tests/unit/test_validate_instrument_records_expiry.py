@@ -38,6 +38,7 @@ def _defi_lending_record(**overrides: object) -> InstrumentRecord:
         "venue": "AAVEV3-ETHEREUM",
         "instrument_type": InstrumentType.LENDING,
         "pool_address": _DUMMY_EVM_ADDR,
+        "base_asset_decimals": 6,  # USDC — required by Phase A decimals rule
     }
     kwargs.update(overrides)
     return InstrumentRecord(**kwargs)  # type: ignore[arg-type]

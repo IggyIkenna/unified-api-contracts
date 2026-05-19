@@ -260,6 +260,8 @@ class InstrumentRecord(BaseModel):
 
         * CeFi spot/perp → base_asset + quote_asset non-empty (slot 5 2026-05-11).
         * DeFi on-chain → pool_address OR base_asset_contract_address non-empty (slot 5 2026-05-11).
+        * DeFi on-chain → base_asset_decimals non-null for all DEFI_ONCHAIN types (slot 4 2026-05-19).
+        * DeFi POOL → quote_asset_decimals non-null (two-asset; slot 4 2026-05-19).
         * EVENT_CONTRACT → expiry non-null (resolution_date axis; slot 5 2026-05-11).
         * FUTURE → expiry non-null (tradfi_master Q1 gate passed 2026-05-13; slot 8 2026-05-19).
         * OPTION → expiry non-null (tradfi_master Q2 gate passed 2026-05-13; slot 8 2026-05-19).
@@ -296,6 +298,25 @@ class InstrumentRecord(BaseModel):
                     f"base_asset_contract_address={self.base_asset_contract_address!r}. "
                     f"Workspace rule: DeFi on-chain instruments must be reachable. "
                     f"Per hard_schema_enforcement_2026_05_08 Phase 1."
+                )
+            # Rule 6: base_asset_decimals required for all DeFi on-chain types
+            if self.base_asset_decimals is None:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={self.instrument_type.value}) "
+                    f"requires non-null base_asset_decimals. "
+                    f"Workspace rule: DeFi on-chain price normalisation requires primary token "
+                    f"decimals (18 for most ERC-20s, 6 for USDC, 8 for WBTC). "
+                    f"Null decimals = silent price normalisation bug. "
+                    f"Per hard_schema_phase1_field_flip_migration_2026_05_19 Phase A."
+                )
+            # Rule 7: quote_asset_decimals required for POOL only (two-asset types)
+            if self.instrument_type == InstrumentType.POOL and self.quote_asset_decimals is None:
+                raise ValueError(
+                    f"InstrumentRecord(instrument_type={InstrumentType.POOL.value}) "
+                    f"requires non-null quote_asset_decimals (two-asset pool: token0 + token1). "
+                    f"Workspace rule: POOL instruments require both token decimals for price "
+                    f"computation. Single-asset DeFi types (LENDING/LST/etc.) may omit. "
+                    f"Per hard_schema_phase1_field_flip_migration_2026_05_19 Phase A."
                 )
         # EVENT_CONTRACT rule (CME × Polymarket cross-venue arb)
         elif self.instrument_type == InstrumentType.EVENT_CONTRACT:
