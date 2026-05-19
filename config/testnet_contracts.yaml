@@ -22,6 +22,36 @@
     pool: "0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2"
     pool_addresses_provider: "0x2f39d218133AFaB8F2B819B1066c7E434Ad94E9e"
     flash_loan_receiver: "0x42c005e2Bc545a49B50Fee3E76B8558348CAAb4c"
+  cctp:
+    # CCTP v1 — https://developers.circle.com/stablecoins/docs/evm-smart-contracts
+    token_messenger: "0xBd3fa81B58Ba92a82136038B25aDec7066af3155"
+    message_transmitter: "0x0a992d191DEeC32aFe36203Ad87D7d289a738F81"
+    usdc: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+    domain_id: 0
+
+# Arbitrum mainnet (chain_id: 42161) — CCTP only (Aave contracts live in the testnet section)
+42161:
+  cctp:
+    token_messenger: "0x19330d10D9Cc8751218eaf51E8885D058642E08A"
+    message_transmitter: "0xC30362313FBBA5cf9163F0bb16a0e01f01A896ca"
+    usdc: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831"
+    domain_id: 3
+
+# Base mainnet (chain_id: 8453) — CCTP only
+8453:
+  cctp:
+    token_messenger: "0x1682Ae6375C4E4A97e4B583BC394c861A46D8962"
+    message_transmitter: "0xAD09780d193884d503182aD4588450C416D6F9D4"
+    usdc: "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
+    domain_id: 6
+
+# Polygon PoS mainnet (chain_id: 137) — CCTP only
+137:
+  cctp:
+    token_messenger: "0x9daF8c91AEFAE50b9c0E69629D3f6Ca40cA3B3FE"
+    message_transmitter: "0xF3be9355363857F3e001be68856A2f96b4C39Ba9"
+    usdc: "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"
+    domain_id: 7
 
 # Sepolia (chain_id: 11155111)
 11155111:
@@ -36,6 +66,12 @@
     swap_router: "0x3bFA4769FB09eefC5a80d6E87c3B9C650f7Ae48E"
     nft_position_manager: "0x1238536071E1c677A632429e3655c799b22cDA52"
     quoter_v2: "0xEd1f6473345F45b75F8179591dd5bA1888781034"
+  cctp:
+    # CCTP v1 testnet — https://developers.circle.com/stablecoins/docs/evm-smart-contracts
+    token_messenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+    message_transmitter: "0x7865fAfC2db2093669d92c0197e5d6f4D14BF07B"
+    usdc: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
+    domain_id: 0
 
 # Holesky (chain_id: 17000)
 17000:
@@ -72,6 +108,11 @@
     swap_router_02: "0x101F443B4d1b059569D643917553c771E1b9663E"
     nft_position_manager: "0x6b2937Bde17889EDCf8fbD8dE31C3C2a70Bc4d65"
     quoter_v2: "0x2779a0CC1c3e0E44D2542EC3e79e3864Ae93Ef0B"
+  cctp:
+    token_messenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+    message_transmitter: "0xaCF1ceeF35caAc005e15888dDb8A3515C41B4872"
+    usdc: "0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d"
+    domain_id: 3
 
 # Base Sepolia (chain_id: 84532) — added 2026-05-12 per Phase 4.D.1 testnet replica
 84532:
@@ -85,6 +126,11 @@
     swap_router_02: "0x94cC0AaC535CCDB3C01d6787D6413C739ae12bc4"
     nft_position_manager: "0x27F971cb582BF9E50F397e4d29a5C7A34f11faA2"
     quoter_v2: "0xC5290058841028F1614F3A6F0F5816cAd0df5E27"
+  cctp:
+    token_messenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+    message_transmitter: "0x7865fAfC2db2093669d92c0197e5d6f4D14BF07B"
+    usdc: "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+    domain_id: 6
 
 # Polygon Amoy (chain_id: 80002) — added 2026-05-12 per Phase 4.D.1 testnet replica
 80002:
@@ -98,6 +144,11 @@
     # https://docs.uniswap.org/contracts/v3/reference/deployments
     factory: "0xE9a9b2C8a7D70BdB3AF21F1d2BfdEFB68DB7c1ae"
     swap_router_02: "0x1F2c8AC3DCC1Ab4ed8FfB18D7E1aE2Ab2A47BcA3"
+  cctp:
+    token_messenger: "0x9f3B8679c73C2Fef8b59B4f3444d4e156fb70AA5"
+    message_transmitter: "0x7865fAfC2db2093669d92c0197e5d6f4D14BF07B"
+    usdc: "0x41e94eb019c0762f9bfcf9fb1e58725bfb0e7582"
+    domain_id: 7
 
 # Solana devnet (chain_id: 103, Solana RPC chain) — added 2026-05-12 per Phase 4.D.1 testnet replica
 # Note: Solana uses program IDs not EVM addresses. Use the `program_id` key inside each protocol block.

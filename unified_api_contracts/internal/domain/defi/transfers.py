@@ -40,6 +40,7 @@ class BridgeProtocol(StrEnum):
     LAYERZERO = "LAYERZERO"
     SOCKET = "SOCKET"
     LIFI = "LIFI"
+    CCTP = "CCTP"
 
 
 class TransferRecord(BaseModel):

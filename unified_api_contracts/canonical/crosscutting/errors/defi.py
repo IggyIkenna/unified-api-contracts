@@ -95,6 +95,18 @@ class DefiErrorCode:
     ORACLE_DEVIATION_EXCEEDED = "ORACLE_DEVIATION_EXCEEDED"
     """Multi-source oracle prices diverge >= sigma threshold; FAIL — triggers KILL_SWITCH_ORACLE_DIVERGENCE."""
 
+    # CCTP bridge error codes (added 2026-05-19 per api_keys Phase 4.C)
+    CCTP_BURN_FAILED = "CCTP_BURN_FAILED"
+    """depositForBurn tx reverted on source chain; FAIL — check USDC balance + allowance."""
+    CCTP_ATTESTATION_TIMEOUT = "CCTP_ATTESTATION_TIMEOUT"
+    """Circle Iris API did not return attestation within timeout; RETRY after backoff."""
+    CCTP_RECEIVE_FAILED = "CCTP_RECEIVE_FAILED"
+    """receiveMessage tx reverted on dest chain; FAIL — may indicate message already consumed."""
+    CCTP_UNSUPPORTED_CHAIN = "CCTP_UNSUPPORTED_CHAIN"
+    """Source or destination chain_id is not in CCTP_CONTRACTS; FAIL — config bug."""
+    CCTP_NON_USDC_TOKEN = "CCTP_NON_USDC_TOKEN"
+    """CCTP only bridges USDC; caller passed a different token; FAIL."""
+
 
 class OracleStaleError(CanonicalError):
     """Oracle price feed heartbeat exceeded threshold — feed age too old for safe execution.
@@ -1360,6 +1372,48 @@ VENUE_ERRORS_DEFI: dict[str, list[VenueErrorClassification]] = {
             reconnect=False,
             action=ErrorAction.RETRY,
             desc="RPC internal error — retry",
+        ),
+    ],
+    "cctp": [
+        ve(
+            "cctp",
+            DefiErrorCode.CCTP_BURN_FAILED,
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="depositForBurn reverted — check USDC balance and allowance",
+        ),
+        ve(
+            "cctp",
+            DefiErrorCode.CCTP_ATTESTATION_TIMEOUT,
+            retry=True,
+            reconnect=False,
+            action=ErrorAction.RETRY,
+            desc="Circle Iris attestation not ready — retry after backoff",
+        ),
+        ve(
+            "cctp",
+            DefiErrorCode.CCTP_RECEIVE_FAILED,
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="receiveMessage reverted — message may already be consumed",
+        ),
+        ve(
+            "cctp",
+            DefiErrorCode.CCTP_UNSUPPORTED_CHAIN,
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="Chain not in CCTP contract registry — config bug",
+        ),
+        ve(
+            "cctp",
+            DefiErrorCode.CCTP_NON_USDC_TOKEN,
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc="CCTP only bridges USDC — caller passed unsupported token",
         ),
     ],
 }
