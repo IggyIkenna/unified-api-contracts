@@ -246,7 +246,7 @@ class EmptyConfirmedReason(StrEnum):
     Plan: ``sports_classifier_sfi_footystats_fixture_pin_2026_05_13.md`` +
     ``sports_classifier_weather_no_fixture_2026_05_13.md`` (slot 4 ownership 2026-05-13)."""
 
-    LEGACY_MIGRATION_MISSING_EXPIRY = "LEGACY_MIGRATION_MISSING_EXPIRY"
+    EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY = "EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY"
     """Tradfi futures/options row from a pre-2026-05-13 historical capture that lacks a
     populated ``expiration`` / ``expiry_date`` field, AND cannot be back-filled from
     Databento metadata at migration time (instrument symbol unresolvable to a chain).
