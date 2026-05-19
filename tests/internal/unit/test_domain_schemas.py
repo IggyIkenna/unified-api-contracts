@@ -318,3 +318,93 @@ class TestManualInstruction:
         dumped = mi.model_dump(mode="json")
         assert dumped["asset_group"] == "cefi"
         assert "category" not in dumped
+
+
+class TestFeatureObservationSchema:
+    """Tests for FeatureObservationRecord roundtrip (Phase 1 — features_tick_observation_audit)."""
+
+    def test_feature_observation_record_roundtrip(self) -> None:
+        from datetime import UTC, datetime
+        from decimal import Decimal
+
+        from unified_api_contracts.internal import FeatureObservation, FeatureObservationRecord
+
+        tick_ts = datetime(2026, 5, 19, 12, 0, 0, tzinfo=UTC)
+        available_at = datetime(2026, 5, 19, 12, 0, 1, tzinfo=UTC)
+
+        obs = FeatureObservation(
+            archetype="carry_staked_basis",
+            chain="ethereum",
+            asset="stETH",
+            tick_ts=tick_ts,
+            stake_apy_bps=Decimal("412"),
+            borrow_apy_bps=Decimal("120"),
+            perp_funding_apy_bps=Decimal("85"),
+            net_apr_computed_bps=Decimal("207"),
+            mtds_parquet_path="gs://bucket/lst_rates/dt=2026-05-19/part.parquet",
+            mtds_row_id="row-001",
+            staleness_seconds=15.0,
+            fallback_fired=False,
+        )
+        record = FeatureObservationRecord(
+            **obs.model_dump(),
+            partition_dt="2026-05-19",
+            available_at=available_at,
+            correlation_id="corr-abc-123",
+        )
+
+        dumped = record.model_dump()
+        restored = FeatureObservationRecord.model_validate(dumped)
+
+        assert restored.archetype == "carry_staked_basis"
+        assert restored.chain == "ethereum"
+        assert restored.asset == "stETH"
+        assert restored.stake_apy_bps == Decimal("412")
+        assert restored.net_apr_computed_bps == Decimal("207")
+        assert restored.partition_dt == "2026-05-19"
+        assert restored.correlation_id == "corr-abc-123"
+        assert restored.fallback_fired is False
+        assert restored.available_at == available_at
+
+    def test_feature_observation_record_correlation_id_none(self) -> None:
+        from datetime import UTC, datetime
+
+        from unified_api_contracts.internal import FeatureObservation, FeatureObservationRecord
+
+        obs = FeatureObservation(
+            archetype="carry_staked_basis",
+            chain="solana",
+            asset="jitoSOL",
+            tick_ts=datetime(2026, 5, 19, 0, 0, 0, tzinfo=UTC),
+        )
+        record = FeatureObservationRecord(
+            **obs.model_dump(),
+            partition_dt="2026-05-19",
+            available_at=datetime(2026, 5, 19, 0, 0, 1, tzinfo=UTC),
+            correlation_id=None,
+        )
+        assert record.correlation_id is None
+        dumped = record.model_dump()
+        restored = FeatureObservationRecord.model_validate(dumped)
+        assert restored.correlation_id is None
+
+    def test_feature_observation_defaults(self) -> None:
+        from datetime import UTC, datetime
+
+        from unified_api_contracts.internal import FeatureObservation
+
+        obs = FeatureObservation(
+            archetype="carry_staked_basis",
+            chain="arbitrum",
+            asset="rETH",
+            tick_ts=datetime(2026, 5, 19, 6, 0, 0, tzinfo=UTC),
+        )
+        assert obs.stake_apy_bps is None
+        assert obs.borrow_apy_bps is None
+        assert obs.perp_funding_apy_bps is None
+        assert obs.net_apr_computed_bps is None
+        assert obs.mtds_parquet_path is None
+        assert obs.mtds_row_id is None
+        assert obs.staleness_seconds is None
+        assert obs.fallback_fired is False
+        assert obs.fallback_reason is None
