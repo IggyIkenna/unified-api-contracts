@@ -29,6 +29,7 @@ from .schemas import (
     UnderstatMatchTeam,
     UnderstatPlayer,
     UnderstatShot,
+    UnderstatShotSource,
     UnderstatTeam,
     USMatchRaw,
     USPlayerRaw,
@@ -258,11 +259,71 @@ def normalize_understat_fixture(
     )
 
 
+def normalize_understat_shot(
+    raw: UnderstatShot | UnderstatShotSource,
+    venue: str = "understat",
+) -> dict[str, object]:
+    """Convert UnderstatShot/UnderstatShotSource to flat dict with all shot fields.
+
+    Captures full per-shot context (18 fields) replacing the old
+    normalize_understat_feature_record which dropped ~14 fields per shot.
+    Fields: shot_id, match_id, fixture_id, player_id, player_name, minute,
+    result, xg, x, y, situation, shot_type, home_or_away, last_action,
+    home_goals, away_goals, period, source.
+    """
+    if isinstance(raw, UnderstatShotSource):
+        return {
+            "shot_id": raw.shot_id,
+            "match_id": None,
+            "fixture_id": raw.fixture_id,
+            "player_id": raw.player_id,
+            "player_name": raw.player_name,
+            "minute": raw.minute,
+            "result": raw.result,
+            "xg": float(raw.xg),
+            "x": float(raw.x),
+            "y": float(raw.y),
+            "situation": raw.situation,
+            "shot_type": raw.shot_type,
+            "home_or_away": raw.home_away,
+            "last_action": raw.last_action,
+            "home_goals": raw.home_goals,
+            "away_goals": raw.away_goals,
+            "period": None,
+            "source": venue,
+        }
+    # UnderstatShot
+    return {
+        "shot_id": raw.id,
+        "match_id": raw.match_id,
+        "fixture_id": None,
+        "player_id": raw.player_id,
+        "player_name": raw.player,
+        "minute": raw.minute,
+        "result": raw.result,
+        "xg": float(raw.xg) if raw.xg is not None else None,
+        "x": float(raw.x) if raw.x is not None else None,
+        "y": float(raw.y) if raw.y is not None else None,
+        "situation": raw.situation,
+        "shot_type": raw.shot_type,
+        "home_or_away": raw.h_a,
+        "last_action": raw.last_action,
+        "home_goals": None,
+        "away_goals": None,
+        "period": raw.period,
+        "source": venue,
+    }
+
+
 def normalize_understat_feature_record(
     raw: UnderstatShot,
     venue: str = "understat",
 ) -> CanonicalFeatureRecord:
-    """Convert UnderstatShot (xG per shot) to CanonicalFeatureRecord."""
+    """Convert UnderstatShot (xG per shot) to CanonicalFeatureRecord.
+
+    Use normalize_understat_shot for full per-shot column capture (18 fields).
+    This function exists for callers that need the CanonicalFeatureRecord shape.
+    """
     now = datetime.now(UTC).isoformat()
     xg = float(raw.xg) if raw.xg is not None else 0.0
     return CanonicalFeatureRecord(
@@ -283,5 +344,6 @@ __all__ = [
     "normalize_understat_fixture",
     "normalize_understat_league",
     "normalize_understat_player",
+    "normalize_understat_shot",
     "normalize_understat_team",
 ]
