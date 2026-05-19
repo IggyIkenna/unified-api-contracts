@@ -14,9 +14,10 @@ Centralized here as the system SSOT per UAC registry pattern.
 
 from __future__ import annotations
 
+import datetime as _dt
 import re
 from datetime import date as date_type
-from typing import Literal
+from typing import Final, Literal
 
 from pydantic import BaseModel
 
@@ -653,3 +654,71 @@ def extract_es_options_cluster(symbol: str) -> str:
     if match:
         return match.group("root")
     return head
+
+
+# ---------------------------------------------------------------------------
+# Futures expiry-bucket derivation
+# ---------------------------------------------------------------------------
+
+# CME month codes → calendar month number (also used in instruments-service and MTDS).
+_FUTURES_MONTH_CODE: Final[dict[str, int]] = {
+    "F": 1,
+    "G": 2,
+    "H": 3,
+    "J": 4,
+    "K": 5,
+    "M": 6,
+    "N": 7,
+    "Q": 8,
+    "U": 9,
+    "V": 10,
+    "X": 11,
+    "Z": 12,
+}
+
+# Matches a single dated futures symbol: ROOT(1-5 alphanum) + MONTH(CME letter) + YEAR(1-2 digits).
+# Handles both short (``ESM6``) and long (``ESM26``) year encodings.
+_SINGLE_FUT_RE: Final[re.Pattern[str]] = re.compile(r"^([A-Z0-9]{1,5})([FGHJKMNQUVXZ])(\d{1,2})$")
+
+# Contracts expiring within this many days of ``today`` are classified as ``front``.
+_FRONT_MONTH_DAYS: Final[int] = 90
+
+
+def derive_expiry_bucket(symbol: str, today: date_type) -> Literal["front", "back", "spread", "butterfly"]:
+    """Classify a futures symbol into one of four expiry buckets.
+
+    Returns:
+        ``spread``    — 2-leg calendar spread (e.g. ``ESM6-ESU6``)
+        ``butterfly`` — 3+ leg spread (e.g. ``ESH6-ESM6-ESU6``)
+        ``front``     — single contract expiring within 90 days of *today*
+        ``back``      — single contract expiring 90+ days from *today*
+
+    Unrecognised single-leg symbols (no CME month letter) default to ``front``
+    so callers receive a non-null bucket and can apply a conservative gate.
+    """
+    legs = symbol.split("-")
+    if len(legs) >= 3:
+        return "butterfly"
+    if len(legs) == 2:
+        return "spread"
+
+    # Single contract — parse month + year.
+    m = _SINGLE_FUT_RE.match(symbol)
+    if not m:
+        return "front"
+    month = _FUTURES_MONTH_CODE.get(m.group(2), 1)
+    year_suffix = int(m.group(3)) % 10  # normalize: both "6" and "26" → 6
+
+    # Sliding-window year expansion: pick the nearest year >= today.year - 1
+    # whose last digit matches year_suffix (handles 1- and 2-digit codes).
+    decade_base = today.year - (today.year % 10) + year_suffix
+    year = decade_base if decade_base >= today.year - 1 else decade_base + 10
+
+    # Conservative expiry estimate: last day of the contract month.
+    if month == 12:
+        expiry = date_type(year + 1, 1, 1) - _dt.timedelta(days=1)
+    else:
+        expiry = date_type(year, month + 1, 1) - _dt.timedelta(days=1)
+
+    days_remaining = (expiry - today).days
+    return "front" if days_remaining < _FRONT_MONTH_DAYS else "back"

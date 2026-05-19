@@ -4,9 +4,12 @@ from __future__ import annotations
 
 from datetime import date
 
+import pytest
+
 from unified_api_contracts.registry import (
     ES_OPTIONS_CLUSTERS,
     ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER,
+    derive_expiry_bucket,
     extract_es_options_cluster,
     get_active_es_options_clusters_for_date,
 )
@@ -67,3 +70,49 @@ def test_active_clusters_custom_min_rows() -> None:
     active = get_active_es_options_clusters_for_date(date(2024, 6, 17), min_rows_per_cluster=42)
     assert all(v == 42 for v in active.values())
     assert len(active) == 5
+
+
+# ---------------------------------------------------------------------------
+# derive_expiry_bucket tests
+# ---------------------------------------------------------------------------
+
+
+def test_derive_expiry_bucket_spread() -> None:
+    # 2-leg calendar spread — not date-dependent
+    assert derive_expiry_bucket("ESM6-ESU6", date(2026, 5, 19)) == "spread"
+
+
+def test_derive_expiry_bucket_butterfly() -> None:
+    # 3-leg butterfly — not date-dependent
+    assert derive_expiry_bucket("ESH6-ESM6-ESU6", date(2026, 5, 19)) == "butterfly"
+
+
+def test_derive_expiry_bucket_butterfly_4_legs() -> None:
+    # 4-leg condor also maps to butterfly (3+ leg rule)
+    assert derive_expiry_bucket("ESH6-ESM6-ESU6-ESZ6", date(2026, 5, 19)) == "butterfly"
+
+
+def test_derive_expiry_bucket_front() -> None:
+    # ESM6 = June 2026; last day of June = 2026-06-30.
+    # today = 2026-05-19; days_remaining = 42 < 90 → front
+    assert derive_expiry_bucket("ESM6", date(2026, 5, 19)) == "front"
+
+
+def test_derive_expiry_bucket_back() -> None:
+    # ESZ6 = December 2026; last day = 2026-12-31.
+    # today = 2026-05-19; days_remaining = 226 >= 90 → back
+    assert derive_expiry_bucket("ESZ6", date(2026, 5, 19)) == "back"
+
+
+@pytest.mark.parametrize(
+    ("symbol", "today", "expected"),
+    [
+        ("CLF7", date(2026, 12, 15), "front"),  # Jan 2027; last day 2027-01-31, 47 days < 90
+        ("CLZ7", date(2026, 12, 15), "back"),  # Dec 2027; last day 2027-12-31, 381 days >= 90
+        ("NQH7", date(2026, 12, 15), "back"),  # Mar 2027; last day 2027-03-31, 106 days >= 90
+        ("NQU7", date(2026, 12, 15), "back"),  # Sep 2027; last day 2027-09-30, 290 days >= 90
+        ("ESZ6", date(2026, 12, 15), "front"),  # Dec 2026; last day 2026-12-31, 16 days < 90
+    ],
+)
+def test_derive_expiry_bucket_parametrize(symbol: str, today: date, expected: str) -> None:
+    assert derive_expiry_bucket(symbol, today) == expected
