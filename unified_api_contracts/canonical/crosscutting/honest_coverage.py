@@ -457,6 +457,11 @@ BUNDLED_DATA_TYPES: Final[frozenset[str]] = frozenset(
         "futures_chain",
         "prediction_canonical_question_group",
         "sports_fixture_bundle",
+        # Phase 3 of cme_polymarket_arb_2026_05_08: CME event-contract
+        # shard atom (root, resolution_month, day) with cluster validation
+        # on strike_threshold. Registered here so ManifestWriter enforces
+        # cluster validation on record_captured calls for this data_type.
+        "event_contract",
     }
 )
 """Closed set of bundled data_types.

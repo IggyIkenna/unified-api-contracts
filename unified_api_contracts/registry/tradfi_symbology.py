@@ -722,3 +722,74 @@ def derive_expiry_bucket(symbol: str, today: date_type) -> Literal["front", "bac
 
     days_remaining = (expiry - today).days
     return "front" if days_remaining < _FRONT_MONTH_DAYS else "back"
+
+
+# ---------------------------------------------------------------------------
+# CME event-contract shard-key extraction
+# ---------------------------------------------------------------------------
+# Phase 3 of cme_polymarket_arb_2026_05_08: the EVENT_CONTRACT bundled shard
+# atom is (root, resolution_month, day). Cluster validation key is
+# (root, resolution_month, strike_threshold). This function extracts those
+# dimensions from the raw Databento CME event-contract symbol.
+
+# Root set mirrors EVENT_CONTRACT_ROOTS in
+# unified_api_contracts.canonical.domain.derivatives.tradfi_roots — duplicated
+# here to avoid an intra-registry circular import (tradfi_roots imports nothing
+# from registry; registry should not import from canonical.domain).
+_CME_EVENT_CONTRACT_ROOT_SET: frozenset[str] = frozenset(
+    {"ECES", "ECNQ", "ECRTY", "ECYM", "ECGC", "ECCL", "ECNG", "EC6E", "ECBTC"}
+)
+
+# CME month-code → zero-padded month number string.
+_EC_MONTH_TO_NUM: dict[str, str] = {
+    "F": "01",
+    "G": "02",
+    "H": "03",
+    "J": "04",
+    "K": "05",
+    "M": "06",
+    "N": "07",
+    "Q": "08",
+    "U": "09",
+    "V": "10",
+    "X": "11",
+    "Z": "12",
+}
+
+
+def extract_event_contract_shard_key(symbol: str) -> tuple[str, str, str] | None:
+    """Extract ``(root, resolution_month, strike_str)`` from a CME event-contract symbol.
+
+    Parses space-delimited Databento CME event-contract symbols of the form
+    ``{EC_ROOT} {MONTH_CODE}{YEAR_DIGIT} {STRIKE}{C|P}``::
+
+        ``ECBTC H5 62000C``  →  ``("ECBTC", "2025-03", "62000")``
+        ``ECES Z4 4900C``    →  ``("ECES",  "2024-12", "4900")``
+
+    Returns ``None`` when the symbol is unparseable — parent/rollup symbols
+    (e.g. ``ECBTC.OPT``) don't carry a specific (resolution_month, strike)
+    cluster identity.  Callers silently skip ``None`` returns.
+
+    Used by ``PartitionedTickWriter.write_chunk`` to accumulate per-
+    ``(root, resolution_month)`` cluster counts for the Phase-3 EVENT_CONTRACT
+    bundled manifest shard atom per ``cme_polymarket_arb_2026_05_08``.
+    """
+    parts = symbol.strip().upper().split()
+    if len(parts) < 3:
+        return None
+    root = parts[0]
+    if root not in _CME_EVENT_CONTRACT_ROOT_SET:
+        return None
+    month_year = parts[1]
+    if len(month_year) < 2:
+        return None
+    month_code = month_year[0]
+    year_part = month_year[1:]
+    if month_code not in _EC_MONTH_TO_NUM or not year_part.isdigit():
+        return None
+    year = 2020 + int(year_part) if len(year_part) == 1 else 2000 + int(year_part)
+    resolution_month = f"{year:04d}-{_EC_MONTH_TO_NUM[month_code]}"
+    strike_part = parts[2].rstrip("CP")
+    if not strike_part:
+        return None
+    return (root, resolution_month, strike_part)
