@@ -610,6 +610,7 @@ DATA_TYPE_TO_CLUSTER_REGISTRY: Final[dict[str, str]] = {
     "futures_chain": "FUTURES_CHAIN_BUCKETS",
     "prediction_canonical_question_group": "PREDICTION_GROUPS",
     "sports_fixture_bundle": "SPORTS_FIXTURE_CLUSTERS",
+    "event_contract": "EVENT_CONTRACT_ROOT_CLUSTERS",
 }
 
 
@@ -706,6 +707,51 @@ Phase 1A.
 """
 
 
+# ---------------------------------------------------------------------------
+# EVENT_CONTRACT_ROOT_CLUSTERS — CME binary event-contract shard atom.
+#
+# Shard atom: (asset_group=tradfi, venue=CME, data_type=EVENT_CONTRACT,
+#   root, resolution_date, day). Each root (ECES/ECBTC/etc.) bundles
+# multiple (resolution_date, strike_threshold) clusters in one per-day
+# parquet. The expected cluster set is derived at runtime from the
+# instruments-service catalog; this registry carries the per-cluster
+# min-rows floor (1 row per (resolution_date, strike_threshold) pair is
+# the minimum — each binary is a distinct YES/NO contract).
+#
+# 9 roots: ECES (SP500) · ECNQ (NASDAQ100) · ECRTY (RUSSELL2000) ·
+#   ECYM (DOW) · ECGC (GOLD) · ECCL (CRUDE) · ECNG (NATGAS) ·
+#   EC6E (EUR) · ECBTC (BTC).
+# Databento coverage starts 2025-09-28 for all roots.
+# SSOT: cme_polymarket_arb_2026_05_08.md Phase 3.
+# ---------------------------------------------------------------------------
+
+
+EVENT_CONTRACT_ROOT_CLUSTERS: Final[dict[str, dict[str, int]]] = {
+    "ECES": {"_per_cluster_min_rows": 1},
+    "ECNQ": {"_per_cluster_min_rows": 1},
+    "ECRTY": {"_per_cluster_min_rows": 1},
+    "ECYM": {"_per_cluster_min_rows": 1},
+    "ECGC": {"_per_cluster_min_rows": 1},
+    "ECCL": {"_per_cluster_min_rows": 1},
+    "ECNG": {"_per_cluster_min_rows": 1},
+    "EC6E": {"_per_cluster_min_rows": 1},
+    "ECBTC": {"_per_cluster_min_rows": 1},
+}
+"""Per-root minimum-rows floor for CME EVENT_CONTRACT bundle shards.
+
+Keyed by CME root symbol (ECES, ECNQ, etc.). The actual expected cluster
+set (resolution_date x strike_threshold tuples) is derived at runtime
+from the instruments-service catalog — this registry only supplies the
+``_per_cluster_min_rows`` floor. A bundle missing any expected cluster
+flips to ``attempted_failed[ClusterCoverageError]`` instead of silently
+passing as ``captured``.
+
+Registered in :data:`DATA_TYPE_TO_CLUSTER_REGISTRY` under key
+``"EVENT_CONTRACT"`` and in :data:`BUNDLED_DATA_TYPES`.
+Populated by cme_polymarket_arb_2026_05_08 Phase 3.
+"""
+
+
 class EmptyFromLiveInstrumentError(ValueError):
     """Raised when an adapter tries to ``record_empty(reason=SOURCE_RETURNED_ZERO)`` for a
     ``(venue, instrument_id, day)`` tuple that the instruments-service catalog says was ALIVE on the day.
@@ -791,6 +837,7 @@ __all__ = [
     "EMPTY_CONFIRMED_REASONS",
     "ES_OPTIONS_CLUSTERS",
     "ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER",
+    "EVENT_CONTRACT_ROOT_CLUSTERS",
     "EXPECTED_EMPTY_REASON_PREFIX",
     "FUTURES_CHAIN_BUCKETS",
     "PREDICTION_GROUPS",

@@ -13,8 +13,10 @@ import pytest
 
 from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     BUNDLED_DATA_TYPES,
+    DATA_TYPE_TO_CLUSTER_REGISTRY,
     EMPTY_CONFIRMED_REASONS,
     ES_OPTIONS_CLUSTERS,
+    EVENT_CONTRACT_ROOT_CLUSTERS,
     FUTURES_CHAIN_BUCKETS,
     EmptyConfirmedReason,
     extract_es_options_cluster,
@@ -47,11 +49,36 @@ def test_bundled_data_types_contains_sports_fixture_bundle() -> None:
     assert "sports_fixture_bundle" in BUNDLED_DATA_TYPES
 
 
+def test_bundled_data_types_contains_event_contract() -> None:
+    assert "event_contract" in BUNDLED_DATA_TYPES
+
+
 def test_bundled_data_types_excludes_unbundled() -> None:
     # Smoke: per-instrument data_types are NOT in the bundled set.
     assert "ohlcv_1m" not in BUNDLED_DATA_TYPES
     assert "trades" not in BUNDLED_DATA_TYPES
     assert "perpetual" not in BUNDLED_DATA_TYPES
+
+
+# ---------------------------------------------------------------------------
+# EVENT_CONTRACT_ROOT_CLUSTERS
+# ---------------------------------------------------------------------------
+
+
+_EXPECTED_EC_ROOTS = {"ECES", "ECNQ", "ECRTY", "ECYM", "ECGC", "ECCL", "ECNG", "EC6E", "ECBTC"}
+
+
+def test_event_contract_root_clusters_has_all_9_roots() -> None:
+    assert set(EVENT_CONTRACT_ROOT_CLUSTERS.keys()) == _EXPECTED_EC_ROOTS
+
+
+def test_event_contract_root_clusters_min_rows_is_one() -> None:
+    for root, config in EVENT_CONTRACT_ROOT_CLUSTERS.items():
+        assert config.get("_per_cluster_min_rows") == 1, f"{root} missing _per_cluster_min_rows=1"
+
+
+def test_data_type_to_cluster_registry_has_event_contract() -> None:
+    assert DATA_TYPE_TO_CLUSTER_REGISTRY["event_contract"] == "EVENT_CONTRACT_ROOT_CLUSTERS"
 
 
 # ---------------------------------------------------------------------------
