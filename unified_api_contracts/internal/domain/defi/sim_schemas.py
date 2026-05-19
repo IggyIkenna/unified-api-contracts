@@ -279,3 +279,59 @@ class StrategyDecisionContextRecord(StrategyDecisionContext):
     partition_dt: str  # YYYY-MM-DD — hive partition key
     available_at: datetime  # write-time stamp (fetch_completed_at semantic)
     correlation_id: str | None = None  # trade-context correlation for audit joins
+
+
+# ----------------------------------------------------------------------------
+# Phase 6 — Feature observation snapshot (per-tick features audit trail)
+# ----------------------------------------------------------------------------
+
+
+class FeatureObservation(BaseModel):
+    """Per-tick feature snapshot emitted by features-onchain-service.
+
+    Captures the exact APY/funding values the carry engine read at tick T,
+    plus provenance metadata (which MTDS rows fed in, staleness gap, fallback
+    fills). Enables hard SQL audit join:
+    ``correlation_id`` → ``StrategyDecisionContextRecord``
+    → ``FeatureObservationRecord`` → MTDS source rows.
+
+    SSOT: ``features_tick_observation_audit_2026_05_18.md``.
+    """
+
+    archetype: str  # carry_staked_basis (DeFi first; cefi/tradfi parallel later)
+    chain: str  # ethereum / solana / arbitrum / etc
+    asset: str  # token identifier (e.g. stETH, jitoSOL, USDC)
+    tick_ts: datetime  # wall-clock timestamp of the features-service on_tick call
+
+    # Carry APY inputs (bps; mirrors StrategyDecisionContext fields)
+    stake_apy_bps: Decimal | None = None  # staking yield from MTDS lst_rates
+    borrow_apy_bps: Decimal | None = None  # Aave/Compound borrow rate from MTDS
+    perp_funding_apy_bps: Decimal | None = None  # CeFi perp funding from MTDS
+    net_apr_computed_bps: Decimal | None = None  # computed net APR
+
+    # Provenance (filled when available; None during scaffold phase)
+    mtds_parquet_path: str | None = None  # GCS path of the source MTDS parquet
+    mtds_row_id: str | None = None  # row-level identifier for hard parquet join
+    staleness_seconds: float | None = None  # age of MTDS row at feature emit time
+    fallback_fired: bool = False  # True if any fill / interpolation applied
+    fallback_reason: str | None = None  # brief description of fallback logic used
+
+
+class FeatureObservationRecord(FeatureObservation):
+    """On-disk parquet shape for ``feature_observation_snapshot`` data_type.
+
+    Extends :class:`FeatureObservation` with standard parquet columns
+    (partition_dt / available_at / correlation_id).  Mirrors
+    :class:`HedgeRatioSnapshotRecord` pattern.
+
+    Phase 1 design (features_tick_observation_audit_2026_05_18):
+    * Bucket kind: ``features-store`` / ``defi`` asset_group.
+    * Writer pattern: inline (Pattern A) on EVERY tick.
+    * Availability semantic: ``fetch_completed_at``.
+    * ``correlation_id`` wired to ``StrategyDecisionContextRecord`` once
+      Ikenna Phase 5 merges to LDR; scaffold as ``str | None = None``.
+    """
+
+    partition_dt: str  # YYYY-MM-DD — hive partition key
+    available_at: datetime  # write-time stamp (fetch_completed_at semantic)
+    correlation_id: str | None = None  # links to StrategyDecisionContextRecord

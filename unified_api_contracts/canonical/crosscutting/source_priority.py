@@ -182,6 +182,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (pre-decision inputs for audit trail); same source as hedge_ratio_snapshot.
     # hedge_ratio_snapshot_persistence_2026_05_13 Phase 5.
     ("defi", "strategy_decision_context"): ["strategy_service"],
+    # feature_observation_snapshot — emitted by features-onchain-service on every
+    # tick (per-tick APY inputs + MTDS provenance for audit chain).
+    # features_tick_observation_audit_2026_05_18 Phase 1.
+    ("defi", "feature_observation_snapshot"): ["features_onchain_service"],
     # ---- TradFi ---------------------------------------------------------
     # Databento for CME/NQ/options/futures; Yahoo for VIX 15m rolling
     # window; Barchart for VIX 15m historical preload (handled at the

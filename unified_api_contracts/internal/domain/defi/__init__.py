@@ -100,6 +100,8 @@ from unified_api_contracts.internal.domain.defi.rate_model import (
 from unified_api_contracts.internal.domain.defi.sim_schemas import (
     AVSRewardComponent,
     DecisionOutcome,
+    FeatureObservation,
+    FeatureObservationRecord,
     GovernanceProposal,
     GovernanceProposalStatus,
     HedgeRatioSnapshot,
@@ -205,6 +207,8 @@ __all__ = [
     "Erc20TransferFromCalldata",
     "EthBalanceImpact",
     "EthSendRawTransactionRequest",
+    "FeatureObservation",
+    "FeatureObservationRecord",
     "EthSendRawTransactionResponse",
     "EthSendTransactionRequest",
     "EthTransactionRequest",
