@@ -133,6 +133,12 @@ from .canonical.crosscutting.scenario_overlay import (
     StaleHold,
     register_scenario,
 )
+from .canonical.crosscutting.scheduler_registry import (
+    SCHEDULER_REGISTRY,
+    SchedulerSpec,
+    SchedulerTargetKind,
+    get_schedulers_for_env,
+)
 from .canonical.crosscutting.source_priority import (
     emission_latency_ms_for_source,
     get_primary_source,
@@ -1021,6 +1027,7 @@ __all__ = [
     "RISK_TYPE_CATEGORIES",
     "SCENARIO_ARCHETYPE_MATRIX",
     "SCENARIO_REGISTRY",
+    "SCHEDULER_REGISTRY",
     "SERVICE_EMISSION_STATES",
     "SERVICE_EMISSION_STATE_COLUMN",
     "SHARE_CLASS_BASE_ASSETS",
@@ -1477,6 +1484,8 @@ __all__ = [
     "ScenarioOverlay",
     "ScenarioOverlayLayer",
     "ScenarioReport",
+    "SchedulerSpec",
+    "SchedulerTargetKind",
     "SchemaContract",
     "SchemaContractNotFoundError",
     "SchemaDepth",
@@ -1595,6 +1604,7 @@ __all__ = [
     # Features DAG — UTL point_in_time + features-* consumers
     "get_required_inputs",
     "get_required_secrets",
+    "get_schedulers_for_env",
     "get_source_priority",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
