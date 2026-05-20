@@ -24,16 +24,6 @@ from ..external.bitget.normalize import (
 from ..external.deribit.normalize import normalize_deribit_fill
 
 # ---------------------------------------------------------------------------
-# dYdX — from external/dydx/normalize.py
-# ---------------------------------------------------------------------------
-from ..external.dydx.normalize import (
-    normalize_dydx_fill,
-    normalize_dydx_order,
-    normalize_dydx_orderbook,
-    normalize_dydx_trade,
-)
-
-# ---------------------------------------------------------------------------
 # Huobi / HTX — from external/huobi/normalize.py
 # ---------------------------------------------------------------------------
 from ..external.huobi.normalize import (
@@ -71,11 +61,6 @@ __all__ = [
     "normalize_bitget_trade",
     # Deribit fill (supplement)
     "normalize_deribit_fill",
-    # dYdX
-    "normalize_dydx_fill",
-    "normalize_dydx_order",
-    "normalize_dydx_orderbook",
-    "normalize_dydx_trade",
     # Huobi / HTX
     "normalize_huobi_fill",
     "normalize_huobi_order",

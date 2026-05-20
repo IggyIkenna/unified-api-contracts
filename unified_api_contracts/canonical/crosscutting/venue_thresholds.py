@@ -48,7 +48,7 @@ DEFAULT_HEARTBEAT_THRESHOLD_BY_CLASS: dict[str, timedelta] = {
     # Prediction REST polling — Polymarket / Kalshi are polled every 5-10s
     # in live mode; 60s threshold catches a missed poll cycle.
     "prediction_rest": timedelta(seconds=60),
-    # Sports REST polling — odds_api / sharpapi polled every 30-60s during
+    # Sports REST polling — odds_api polled every 30-60s during
     # active match windows; 120s catches a missed cycle without false-tripping.
     "sports_rest": timedelta(seconds=120),
 }

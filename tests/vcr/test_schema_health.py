@@ -279,17 +279,6 @@ class TestEcbSchemaHealth(_BaseSchemaHealthTest):
             self._assert_cassette_non_empty(c)
 
 
-class TestFearGreedSchemaHealth(_BaseSchemaHealthTest):
-    provider = "fear_greed"
-
-    def test_cassettes_non_empty(self) -> None:
-        cassettes = self._get_cassettes()
-        if not cassettes:
-            pytest.skip(f"No cassettes for {self.provider}")
-        for c in cassettes:
-            self._assert_cassette_non_empty(c)
-
-
 class TestOpenMeteoSchemaHealth(_BaseSchemaHealthTest):
     provider = "open_meteo"
 

@@ -1633,9 +1633,9 @@ __all__ = [
 _VENUES = [
     "alchemy", "api_football", "aster", "barchart", "betfair", "binance",
     "bybit", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
-    "deribit", "fear_greed", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
+    "deribit", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
     "mev", "metabet", "nautilus", "odds_api", "odds_engine", "okx", "open_meteo",
-    "opticodds", "pinnacle", "polymarket", "soccer_football_info", "sharpapi", "tardis",
+    "opticodds", "pinnacle", "polymarket", "soccer_football_info", "tardis",
     "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
 ]
 # fmt: on

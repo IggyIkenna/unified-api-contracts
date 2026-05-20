@@ -21,7 +21,6 @@ from ..external.databento.normalize import (
     normalize_databento_symbol,
 )
 from ..external.deribit.normalize import normalize_deribit_instrument
-from ..external.dydx.normalize import normalize_dydx_perpetual_market
 from ..external.fix.normalize import (
     normalize_fix_market_data_request,
     normalize_fix_market_data_snapshot,
@@ -75,7 +74,6 @@ __all__ = [
     "normalize_databento_definition",
     "normalize_databento_symbol",
     "normalize_deribit_instrument",
-    "normalize_dydx_perpetual_market",
     "normalize_fix_market_data_request",
     "normalize_fix_market_data_snapshot",
     "normalize_ibkr_contract_details",

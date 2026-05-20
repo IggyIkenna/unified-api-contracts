@@ -636,43 +636,6 @@ def normalize_bitget_error(
 
 
 # ---------------------------------------------------------------------------
-# dYdX v4
-# ---------------------------------------------------------------------------
-
-DYDX_MAP: dict[str, Callable[..., CanonicalError]] = {
-    "INVALID_ARGUMENT": CanonicalInvalidRequestError,
-    "NOT_FOUND": CanonicalOrderRejectedError,
-    "ALREADY_EXISTS": CanonicalDuplicateOrderError,
-    "PERMISSION_DENIED": CanonicalAuthorizationError,
-    "UNAUTHENTICATED": CanonicalAuthenticationError,
-    "RESOURCE_EXHAUSTED": CanonicalRateLimitError,
-    "INTERNAL": CanonicalInternalServerError,
-    "UNAVAILABLE": CanonicalServiceUnavailableError,
-    "429": CanonicalRateLimitError,
-    "401": CanonicalAuthenticationError,
-    "403": CanonicalAuthorizationError,
-    "500": CanonicalInternalServerError,
-}
-
-
-def normalize_dydx_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "dydx",
-) -> CanonicalError:
-    """Map a dYdX v4 gRPC/HTTP error code to a CanonicalError subclass."""
-    code = str(error_code)
-    cls = DYDX_MAP.get(code)
-    if cls is not None:
-        return cls(message=message or code, venue=venue)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # Databento
 # ---------------------------------------------------------------------------
 

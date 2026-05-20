@@ -184,12 +184,6 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
         ),
     ],
     # NOT lifted (and intentionally so):
-    #   * fear_greed — live HTTP fetch from Alternative.me sentiment API; no
-    #     registered DeFi raw data_type. The calculator is a pass-through over
-    #     an external sentiment endpoint (alternative.me/api/v2/), which
-    #     never lands in a manifest. ``stamp_available_at`` would still apply
-    #     when the calculator persists its output, but there's no upstream
-    #     ``(asset_group, data_type)`` to enforce LookaheadBias against.
     #   * macro_sentiment — live HTTP fetches from CoinGecko + DefiLlama
     #     APIs; same situation. The DefiLlama leg COULD point at
     #     ``(defi, liquidity)`` but the CoinGecko macro feeds (BTC dominance,

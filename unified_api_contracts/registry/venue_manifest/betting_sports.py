@@ -226,27 +226,6 @@ BETTING_SPORTS_VENUES: dict[str, VenueContract] = {
             "error_example.json": "OddsEngineError",
         },
     },
-    "sharpapi": {
-        "has_rest": True,
-        "has_websocket": False,
-        "has_fix": False,
-        "config_secret_field": "sharpapi_secret_name",
-        "response_schema_classes": [
-            "SharpApiOddsItem",
-            "SharpApiOddsResponse",
-            "SharpApiBestOddsResponse",
-            "SharpApiEvent",
-            "SharpApiScheduleResponse",
-            "SharpApiEventsResponse",
-        ],
-        "error_schema_classes": ["SharpApiError"],
-        "example_schema_map": {
-            "odds_example.json": "SharpApiOddsResponse",
-            "best_odds_example.json": "SharpApiBestOddsResponse",
-            "events_example.json": "SharpApiEventsResponse",
-            "error_example.json": "SharpApiError",
-        },
-    },
     "matchbook": {
         "has_rest": True,
         "has_websocket": False,

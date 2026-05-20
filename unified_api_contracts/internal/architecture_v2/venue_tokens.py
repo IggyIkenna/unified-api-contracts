@@ -116,7 +116,6 @@ _DEFI_STAKING_TOKENS: frozenset[str] = frozenset(
 # DeFi perp protocols
 _DEFI_PERP_TOKENS: frozenset[str] = frozenset(
     {
-        "dydx",
         "gmx",
         # Added 2026-04-19 after operator approval (Phase 7 NEEDS_REVIEW resolution).
         # Drift is Solana-native perps — required for SOL basis + staked-basis
@@ -147,7 +146,6 @@ _PREDICTION_TOKENS: frozenset[str] = frozenset(
 # Data aggregators (used as data "venues" in slot labels where relevant)
 _DATA_AGGREGATOR_TOKENS: frozenset[str] = frozenset(
     {
-        "sharpapi",
         "oddsapi",
         "footystats",
         "sfi",

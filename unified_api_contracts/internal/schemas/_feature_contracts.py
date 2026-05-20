@@ -43,7 +43,7 @@ Enumeration source (as of 2026-04-18):
                                second_order_greeks, tradfi_vol_surface,
                                vol_surface_term_structure
     features-onchain           aave_lending_rates, aave_utilization,
-                               aave_risk_params, defillama_tvl, fear_greed,
+                               aave_risk_params, defillama_tvl,
                                lst_staking_yields, macro_sentiment,
                                eigen_rewards, protocol_rewards,
                                flash_loan_availability, aave_rate_impact
@@ -233,7 +233,6 @@ ONCHAIN_FEATURE_GROUPS: tuple[str, ...] = (
     "aave_risk_params",
     "aave_rate_impact",
     "defillama_tvl",
-    "fear_greed",
     "lst_staking_yields",
     "macro_sentiment",
     "eigen_rewards",
@@ -404,7 +403,6 @@ _ONCHAIN_ROUTE: dict[str, tuple[str, ...]] = {
     # LST staking yields
     "lst_staking_yields": _ONCHAIN_LST_TARGETS,
     # Macro / sentiment cross-asset — scoped at spot_asset + pool.
-    "fear_greed": _ONCHAIN_SPOT_TARGETS,
     "macro_sentiment": _ONCHAIN_SPOT_TARGETS,
 }
 

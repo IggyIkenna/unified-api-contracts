@@ -243,7 +243,7 @@ class TestMultiLegAndSportsHappyPath:
 
     def test_prop(self) -> None:
         inner = "PROP:ANYTIME_SCORER:SAKA_B"
-        assert build_instrument_id("sharpapi", InstrumentType.PROP, inner) == f"SHARPAPI:PROP:{inner}"
+        assert build_instrument_id("opticodds", InstrumentType.PROP, inner) == f"OPTICODDS:PROP:{inner}"
 
 
 # ---------------------------------------------------------------------------

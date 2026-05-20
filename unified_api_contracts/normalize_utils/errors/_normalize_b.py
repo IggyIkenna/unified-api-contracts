@@ -295,24 +295,6 @@ def normalize_open_meteo_error(
 
 
 # ---------------------------------------------------------------------------
-# SharpAPI
-# ---------------------------------------------------------------------------
-
-
-def normalize_sharpapi_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "sharpapi",
-) -> CanonicalError:
-    """Map a SharpAPI error code to a CanonicalError subclass."""
-    code = str(error_code)
-    try:
-        return from_http_status(int(code), message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # Sports (generic)
 # ---------------------------------------------------------------------------
 

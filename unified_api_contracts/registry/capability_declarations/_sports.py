@@ -430,28 +430,6 @@ _UNDERSTAT = SourceCapability(
     kind=None,
 )
 
-_SHARPAPI = SourceCapability(
-    source="sharpapi",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["odds", "markets"],
-        "reference": ["sports", "leagues"],
-    },
-    base_urls={"mainnet": "https://api.sharpapi.com"},
-    operation_details={},
-    chain=None,
-    kind=None,
-)
-
-
 # ---------------------------------------------------------------------------
 # Ordered list -- Sports
 # ---------------------------------------------------------------------------
@@ -475,5 +453,4 @@ SPORTS_CAPABILITIES: list[SourceCapability] = [
     _SOCCER_FOOTBALL_INFO,
     _TRANSFERMARKT,
     _UNDERSTAT,
-    _SHARPAPI,
 ]

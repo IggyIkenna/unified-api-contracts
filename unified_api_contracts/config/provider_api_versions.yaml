@@ -160,23 +160,9 @@ providers:
     status: green
     modes: [live, historical]
 
-  dydx:
-    api_version: "v4"
-    spec_url: "https://docs.dydx.exchange/"
-    last_verified: "2026-03-15"
-    status: green
-
   ecb:
     api_version: "v1"
     spec_url: "https://www.ecb.europa.eu/stats/eurofxref/eurofxref-daily.xml"
-    last_verified: "2026-03-15"
-    status: green
-    modes: [historical]
-    free_tier: true
-
-  fear_greed:
-    api_version: "v1"
-    spec_url: "https://alternative.me/crypto/fear-and-greed-index/"
     last_verified: "2026-03-15"
     status: green
     modes: [historical]
@@ -450,13 +436,6 @@ providers:
     last_verified: "2026-03-06"
     status: dormant
     free_tier: true
-
-  sharpapi:
-    api_version: "v1"
-    spec_url: "https://sharpapi.com/documentation"
-    last_verified: "2026-03-06"
-    status: yellow
-    cassette_status: pending
 
   smarkets:
     api_version: "v3"

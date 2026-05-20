@@ -573,14 +573,6 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
         ve("opticodds", "500", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Internal server error"),
         ve("opticodds", "503", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Service unavailable"),
     ],
-    "sharpapi": [
-        ve("sharpapi", "400", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Bad request"),
-        ve("sharpapi", "401", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Unauthorized"),
-        ve("sharpapi", "403", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Forbidden"),
-        ve("sharpapi", "429", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Rate limit exceeded"),
-        ve("sharpapi", "500", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Internal server error"),
-        ve("sharpapi", "503", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Service unavailable"),
-    ],
     "matchbook": [
         ve("matchbook", "400", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Bad request"),
         ve("matchbook", "401", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Unauthorized"),

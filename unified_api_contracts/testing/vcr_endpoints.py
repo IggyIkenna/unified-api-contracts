@@ -431,15 +431,6 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     # ------------------------------------------------------------------
     # On-chain / DeFi analytics
     # ------------------------------------------------------------------
-    "fear_greed": [
-        _get(
-            "https://api.alternative.me/fng/?limit=1&format=json",
-            "fng.yaml",
-            "data.0",
-            "FearGreedReading",
-            schema_version="1.0",
-        ),
-    ],
     "defillama": [
         _get(
             "https://api.llama.fi/protocols",
@@ -586,7 +577,6 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     "tardis:exchanges": "TardisExchange",
     "tardis:instruments": "TardisInstrument",
     # On-chain analytics
-    "fear_greed:fng": "FearGreedReading",
     "defillama:protocol": "DefiLlamaProtocol",
     "defillama_tvl:tvl": "DefiLlamaTvlValue",
     "defillama_yields:pool": "DefiLlamaYieldPool",

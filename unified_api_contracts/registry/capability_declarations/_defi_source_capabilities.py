@@ -190,53 +190,6 @@ _CURVE = SourceCapability(
     coverage_start={"candles": date(2020, 1, 19)},
 )
 
-_DYDX = SourceCapability(
-    source="dydx",
-    domains=["market", "execution", "position", "reference"],
-    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=True,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"test": "testnet_key", "prod": "prod_key"},
-    operations={
-        "market": ["orderbook", "trades", "candles", "ws_orderbook", "ws_trades"],
-        "execution": ["place_order", "cancel_order", "list_orders", "get_order"],
-        "position": ["account", "positions", "fills", "funding_payments"],
-        "reference": ["markets", "stats"],
-    },
-    base_urls={"mainnet": "https://indexer.dydx.trade", "testnet": "https://indexer.v4testnet.dydx.exchange"},
-    margin_model={"mainnet": "cross", "testnet": "cross"},
-    operation_details={
-        "place_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
-                "testnet": OperationEnvDetail(
-                    signing_scheme="eip712", required_credential="wallet_private_key", data_fidelity="synthetic"
-                ),
-            }
-        ),
-        "cancel_order": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
-                "testnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
-            }
-        ),
-        "orderbook": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
-                "testnet": OperationEnvDetail(
-                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
-                ),
-            }
-        ),
-    },
-    chain="dydx-chain",
-    kind="perp_dex",
-)
-
 _INSTADAPP = SourceCapability(
     source="instadapp",
     domains=["market", "position", "reference"],
@@ -340,7 +293,6 @@ DEFI_CAPABILITIES: list[SourceCapability] = [
     _UNISWAP,
     _AAVE,
     _CURVE,
-    _DYDX,
     _INSTADAPP,
     # DeFi data / on-chain analytics
     _MEV,

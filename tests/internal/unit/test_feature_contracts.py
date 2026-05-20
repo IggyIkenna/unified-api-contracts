@@ -91,11 +91,6 @@ def test_onchain_lst_staking_yields_registered_for_lst() -> None:
     assert "chain" in {c.name for c in contract.columns}
 
 
-def test_onchain_fear_greed_registered_for_spot_asset() -> None:
-    contract = lookup_contract(asset_group="defi", instrument_type="spot_asset", data_type="fear_greed")
-    assert contract.symbol_column == "symbol"
-
-
 @pytest.mark.parametrize("fg", SPORTS_FEATURE_GROUPS)
 def test_sports_registered(fg: str) -> None:
     contract = lookup_contract(asset_group="sports", instrument_type="odds", data_type=fg)

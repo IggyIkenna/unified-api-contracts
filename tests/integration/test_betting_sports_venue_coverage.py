@@ -56,7 +56,7 @@ def test_scraper_venues_present() -> None:
 
 def test_aggregator_venues_present() -> None:
     """Odds aggregator venues must be in the manifest."""
-    for key in ("odds_api", "opticodds", "sharpapi", "odds_engine", "metabet"):
+    for key in ("odds_api", "opticodds", "odds_engine", "metabet"):
         assert key in BETTING_SPORTS_VENUES, f"Aggregator venue {key} missing"
 
 

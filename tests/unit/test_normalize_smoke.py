@@ -223,16 +223,6 @@ class TestErrorNormalizersExchanges:
         assert isinstance(normalize_bitget_error(500), CanonicalInternalServerError)
         assert isinstance(normalize_bitget_error("NOCODE"), CanonicalError)
 
-    def test_dydx_known_and_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_dydx_error,
-        )
-
-        assert isinstance(normalize_dydx_error("RESOURCE_EXHAUSTED"), CanonicalRateLimitError)
-        assert isinstance(normalize_dydx_error("UNAUTHENTICATED"), CanonicalAuthenticationError)
-        assert isinstance(normalize_dydx_error(429), CanonicalRateLimitError)
-        assert isinstance(normalize_dydx_error("NOCODE"), CanonicalError)
-
     def test_databento_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_databento_error,
@@ -367,14 +357,6 @@ class TestErrorNormalizersProviders:
 
         assert isinstance(normalize_open_meteo_error(500), CanonicalInternalServerError)
         assert isinstance(normalize_open_meteo_error("NOCODE"), CanonicalError)
-
-    def test_sharpapi_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_sharpapi_error,
-        )
-
-        assert isinstance(normalize_sharpapi_error(401), CanonicalAuthenticationError)
-        assert isinstance(normalize_sharpapi_error("NOCODE"), CanonicalError)
 
     def test_sports_error_keyword_dispatch(self):
         from unified_api_contracts.normalize_utils.errors import (

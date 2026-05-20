@@ -127,19 +127,6 @@ def _normalize_kucoin(raw: str) -> str:
 
 
 # ---------------------------------------------------------------------------
-# dYdX
-# ---------------------------------------------------------------------------
-
-
-def _normalize_dydx(raw: str) -> str:
-    """BTC-USD -> BTC-USD-PERP (all dYdX v4 markets are perps)."""
-    upper = raw.upper()
-    if not upper.endswith("-PERP"):
-        return f"{upper}-PERP"
-    return upper
-
-
-# ---------------------------------------------------------------------------
 # Tardis / Databento passthrough
 # ---------------------------------------------------------------------------
 
@@ -169,7 +156,6 @@ _VENUE_MAP: dict[str, Callable[[str], str]] = {
     "deribit": _normalize_deribit,
     "hyperliquid": _normalize_hyperliquid,
     "kucoin": _normalize_kucoin,
-    "dydx": _normalize_dydx,
     "tardis": _normalize_tardis,
     "databento": _normalize_databento,
 }

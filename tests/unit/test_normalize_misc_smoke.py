@@ -370,14 +370,6 @@ class TestSymbolNormalizer:
 
         assert normalize_symbol("kucoin", "BTC-USDT") == "BTC-USDT"
 
-    def test_dydx_perp(self):
-        from unified_api_contracts.normalize_utils.symbols import (
-            normalize_symbol,
-        )
-
-        assert normalize_symbol("dydx", "BTC-USD") == "BTC-USD-PERP"
-        assert normalize_symbol("dydx", "ETH-USD-PERP") == "ETH-USD-PERP"
-
     def test_tardis_passthrough(self):
         from unified_api_contracts.normalize_utils.symbols import (
             normalize_symbol,

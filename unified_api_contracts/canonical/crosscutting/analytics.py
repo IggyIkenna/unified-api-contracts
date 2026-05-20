@@ -30,7 +30,7 @@ class SentimentScore(BaseModel):
     """Aggregated sentiment score for an asset from a data source."""
 
     signal_id: str
-    source: str = Field(description="e.g. twitter, reddit, news_aggregator, fear_greed_index")
+    source: str = Field(description="e.g. twitter, reddit, news_aggregator")
     asset: str
     score: float = Field(description="-1 (extreme bearish) to +1 (extreme bullish)")
     normalized_score: float | None = Field(default=None, description="0-100 scale if source-specific")

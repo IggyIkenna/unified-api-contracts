@@ -225,22 +225,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=False,
         cassette_status=CassetteStatus.RECORDED,
     ),
-    # --- alternative.me Fear & Greed ---
-    EndpointSpec(
-        venue="fear_greed",
-        endpoint_path="https://api.alternative.me/fng/",
-        http_method="GET",
-        schema_class="FearGreedResponse",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.BOTH,
-        version=None,
-        notes=(
-            "Free, no auth. Updates once daily at midnight UTC. Crypto-specific (not CNN stock F&G). "
-            "Use ?limit=N for history, ?limit=1 for latest (includes time_until_update)."
-        ),
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
     # --- Hyperliquid ---
     EndpointSpec(
         venue="hyperliquid",
@@ -553,34 +537,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         notes=(
             "Private order. Auth: AccessKeyId + HMAC-SHA256 signature + Timestamp. "
             "Secret Manager key: huobi-api-credentials."
-        ),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
-    # --- dYdX ---
-    EndpointSpec(
-        venue="dydx",
-        endpoint_path="https://indexer.dydx.trade/v4/markets",
-        http_method="GET",
-        schema_class="DydxMarket",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.BOTH,
-        version="v4",
-        notes="Public dYdX v4 (Cosmos chain) markets via indexer. No auth required.",
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
-    ),
-    EndpointSpec(
-        venue="dydx",
-        endpoint_path="https://indexer.dydx.trade/v4/orders",
-        http_method="POST",
-        schema_class="DydxOrderRequest",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.LIVE_ONLY,
-        version="v4",
-        notes=(
-            "Private order placement. Auth: cosmos-sdk signed tx via dydx-v4-client. "
-            "Secret Manager key: dydx-api-credentials (mnemonic or private key)."
         ),
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,

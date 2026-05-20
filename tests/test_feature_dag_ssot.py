@@ -200,14 +200,13 @@ def test_onchain_regime_has_two_inputs() -> None:
     assert all(i.available_at_rule == "tick_timestamp" for i in inputs)
 
 
-def test_fear_greed_and_macro_sentiment_intentionally_not_seeded() -> None:
-    """fear_greed + macro_sentiment do live HTTP fetches from external
-    sentiment APIs (Alternative.me, CoinGecko) — no registered DeFi raw
-    data_type to enforce LookaheadBias against. Intentionally absent from
-    FEATURE_REQUIRED_INPUTS; documented in the inline comment + the
-    feature_dag plan's Temporary states section.
+def test_macro_sentiment_intentionally_not_seeded() -> None:
+    """macro_sentiment does live HTTP fetches from external sentiment APIs
+    (CoinGecko) — no registered DeFi raw data_type to enforce
+    LookaheadBias against. Intentionally absent from FEATURE_REQUIRED_INPUTS;
+    documented in the inline comment + the feature_dag plan's Temporary
+    states section.
     """
-    assert not has_required_inputs("fear_greed")
     assert not has_required_inputs("macro_sentiment")
 
 
