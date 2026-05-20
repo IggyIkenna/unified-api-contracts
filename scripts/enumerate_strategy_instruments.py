@@ -132,7 +132,6 @@ _CATALOGUE_VENUE_TO_PARQUET: dict[str, list[str]] = {
     "nasdaq": ["NASDAQ"],
     "polymarket": ["POLYMARKET"],
     "kalshi": ["KALSHI"],
-    "manifold": ["MANIFOLD"],
     "unity": ["UNITY"],
     "betfair_direct": ["BETFAIR-DIRECT", "BETFAIR"],
     "smarkets_direct": ["SMARKETS-DIRECT", "SMARKETS"],

@@ -112,7 +112,7 @@ _SPORTS_VENUES = [
     "unity", "betfair_direct", "smarkets_direct", "sporttrade",
     "sportradar", "fanduel", "draftkings",
 ]
-_PREDICTION_VENUES = ["polymarket", "kalshi", "unity", "manifold"]
+_PREDICTION_VENUES = ["polymarket", "kalshi", "unity"]
 
 
 def _category_venues(category: str, instrument: str, archetype_id: str) -> list[str]:
@@ -636,7 +636,7 @@ _CROSS_DOMAIN_SPLIT: list[dict] = [
             },
         ],
     },
-    # Prediction-market MM — 2-sided quoting on Polymarket / Kalshi / Manifold.
+    # Prediction-market MM — 2-sided quoting on Polymarket / Kalshi.
     # Different mechanics from CEFI/DEFI MM: binary outcomes, time-to-resolution
     # decay, low-volume long-tail markets where MM is the main liquidity source.
     {

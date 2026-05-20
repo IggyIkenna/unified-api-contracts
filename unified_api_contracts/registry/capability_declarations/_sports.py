@@ -254,34 +254,6 @@ _MATCHBOOK = SourceCapability(
     kind="sports_book",
 )
 
-_MANIFOLD = SourceCapability(
-    source="manifold",
-    domains=["market", "execution", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["markets", "market_bets", "trades", "odds"],
-        "execution": ["bet", "cancel_bet", "sell_shares"],
-        "reference": ["users", "groups", "tags"],
-    },
-    base_urls={"mainnet": "https://api.manifold.markets"},
-    operation_details={
-        "bet": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            }
-        ),
-    },
-    chain=None,
-    kind=None,
-)
-
 _ONEXBET = SourceCapability(
     source="onexbet",
     domains=["market", "reference"],
@@ -444,7 +416,6 @@ SPORTS_CAPABILITIES: list[SourceCapability] = [
     _ODDS_ENGINE,
     _OPTICODDS,
     _MATCHBOOK,
-    _MANIFOLD,
     _ONEXBET,
     _METABET,
     # Sports reference data

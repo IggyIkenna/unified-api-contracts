@@ -249,19 +249,6 @@ BETTING_SPORTS_VENUES: dict[str, VenueContract] = {
         "error_schema_classes": ["MatchbookErrorResponse"],
         "example_schema_map": {},
     },
-    "manifold": {
-        "has_rest": True,
-        "has_websocket": False,
-        "has_fix": False,
-        "config_secret_field": "manifold_secret_name",
-        "response_schema_classes": [
-            "ManifoldMarket",
-            "ManifoldPrice",
-            "ManifoldTrade",
-        ],
-        "error_schema_classes": [],
-        "example_schema_map": {},
-    },
     "onexbet": {
         "has_rest": True,
         "has_websocket": False,

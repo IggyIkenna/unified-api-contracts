@@ -41,7 +41,7 @@ class CrossVenueLink(BaseModel):
     Price discrepancy = arb opportunity.
     """
 
-    venue_a: Literal["kalshi", "polymarket", "manifold", "metaculus"]
+    venue_a: Literal["kalshi", "polymarket", "metaculus"]
     market_id_a: str
     venue_b: str
     market_id_b: str
