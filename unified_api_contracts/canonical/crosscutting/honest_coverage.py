@@ -91,6 +91,12 @@ class EmptyConfirmedReason(StrEnum):
     EXPECTED_PRE_SOURCE_COVERAGE_START = "EXPECTED_PRE_SOURCE_COVERAGE_START"
     """Date precedes the source's ``SOURCE_COVERAGE_START`` (per UAC sports / databento registries)."""
 
+    EXPECTED_PAST_SOURCE_COVERAGE_END = "EXPECTED_PAST_SOURCE_COVERAGE_END"
+    """Date is after the archive's documented coverage end (``InstrumentRecord.source_coverage_end``).
+    Example: Drift tradeRecords S3 archive stopped writing 2025-01-08 — any date after that is
+    honest-empty by design, not a fetch failure. Sister of ``EXPECTED_PRE_SOURCE_COVERAGE_START``.
+    SSOT: ``is_mtds_contract_audit_2026_05_20.md`` Phase 1."""
+
     EXPECTED_PRE_GENESIS_CHAIN = "EXPECTED_PRE_GENESIS_CHAIN"
     """DeFi: date precedes the chain's genesis block (Solana 2020-03-16, Arbitrum 2021-08-31, etc.)."""
 

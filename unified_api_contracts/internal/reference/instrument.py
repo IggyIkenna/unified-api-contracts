@@ -16,7 +16,7 @@ and are re-exported here so that ``from .internal.reference.instrument import
 InstrumentType`` still works everywhere.
 """
 
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 from pydantic import BaseModel, Field, model_validator
@@ -205,6 +205,60 @@ class InstrumentRecord(BaseModel):
     rate_method_selector: str | None = Field(
         default=None,
         description="On-chain method selector for rate queries (LST contracts); optional parity field",
+    )
+
+    # --- Archive metadata (MTDS handler URL/universe derivation — is_mtds_contract_audit_2026_05_20) ---
+    # MTDS handlers MUST derive fetch URLs from these fields. Hardcoding is banned.
+    source_archive_url_template: str | None = Field(
+        default=None,
+        description=(
+            "URL template for historical data archive "
+            "(e.g. 'https://drift-historical-data-v2.s3.eu-west-1.amazonaws.com/program/{program_id}/"
+            "market/{market}/{record_type}/{year}/{day}'). "
+            "MTDS handlers derive fetch URLs from this field — never hardcode URLs in handlers."
+        ),
+    )
+    source_record_types: dict[str, str] | None = Field(
+        default=None,
+        description=(
+            "Mapping of data_type → archive record-type name "
+            "(e.g. {'trades': 'tradeRecords', 'funding_rate': 'fundingRateRecords'}). "
+            "Serialised as JSON string in parquet."
+        ),
+    )
+    source_coverage_start: dict[str, date] | None = Field(
+        default=None,
+        description=(
+            "Per-data_type archive coverage start date "
+            "(e.g. {'trades': date(2020, 9, 14)}). "
+            "Dates before this trigger EXPECTED_PRE_SOURCE_COVERAGE_START. "
+            "Serialised as JSON string {data_type: 'YYYY-MM-DD'} in parquet."
+        ),
+    )
+    source_coverage_end: dict[str, date] | None = Field(
+        default=None,
+        description=(
+            "Per-data_type archive coverage end date "
+            "(e.g. {'trades': date(2025, 1, 8)} for Drift tradeRecords). "
+            "Dates after this trigger EXPECTED_PAST_SOURCE_COVERAGE_END. "
+            "Serialised as JSON string {data_type: 'YYYY-MM-DD'} in parquet."
+        ),
+    )
+    listed_at: date | None = Field(
+        default=None,
+        description=(
+            "Date instrument was listed/launched. "
+            "Pre-listing dates trigger EXPECTED_INSTRUMENT_NOT_LISTED. "
+            "Serialised as ISO date string 'YYYY-MM-DD' in parquet."
+        ),
+    )
+    delisted_at: date | None = Field(
+        default=None,
+        description=(
+            "Date instrument was delisted/expired. "
+            "Post-delisting dates trigger EXPECTED_INSTRUMENT_DELISTED. "
+            "Serialised as ISO date string 'YYYY-MM-DD' in parquet."
+        ),
     )
 
     # ─────────────────────────────────────────────────────────────────
