@@ -313,6 +313,14 @@ class EmptyConfirmedReason(StrEnum):
 
     Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 2.E.3."""
 
+    EXPECTED_NO_PNL_STREAM = "EXPECTED_NO_PNL_STREAM"
+    """No upstream StrategyPnlStreamEvent received for this date + archetype_id.
+    Emitted by features_service.performance_features when strategy-service has not run
+    for the given archetype on the given date (expected for archetypes not yet in live/paper
+    run mode).
+
+    Plan: trading_agent_service_architecture_unlock_2026_05_22.md Phase 3."""
+
 
 EMPTY_CONFIRMED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in EmptyConfirmedReason)
 """String-membership view of :class:`EmptyConfirmedReason` for fast O(1) validation.
