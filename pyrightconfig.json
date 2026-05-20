@@ -1,9 +1,7 @@
 {
   "pythonVersion": "3.13",
   "typeCheckingMode": "strict",
-  "include": [
-    "unified_api_contracts"
-  ],
+  "include": ["unified_api_contracts"],
   "reportAny": "error",
   "venvPath": ".",
   "venv": ".venv",
