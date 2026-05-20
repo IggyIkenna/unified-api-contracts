@@ -10,7 +10,7 @@ Different perp venues charge funding at different intervals:
 
 Reading raw funding_rate from MTDS adapters and feeding it directly into
 strategy features as an annualised rate without venue-aware scaling produces
-~10× under-estimates for the hourly+sub-hourly venues. This module is the
+~10x under-estimates for the hourly+sub-hourly venues. This module is the
 single source of truth for the conversion. Strategy + features-service +
 risk-and-exposure all consume from here.
 
@@ -87,7 +87,7 @@ def annualise_funding_rate_bps(rate: Decimal, venue: str) -> Decimal:
     comparisons are easier in linear bps; (c) cycle rates are tiny so
     linear ≈ compounded to 1bp anyway.
 
-    Example: Binance 0.01% per 8h → 0.0001 × 3 × 365 × 10000 = 109,500 bps =
+    Example: Binance 0.01% per 8h -> 0.0001 * 3 * 365 * 10000 = 109,500 bps =
     1095% APY (deliberately huge to highlight units in tests; real funding
     is typically 0.001% - 0.01% per cycle = ~11% - 110% APY).
     """
