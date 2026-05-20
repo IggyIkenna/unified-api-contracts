@@ -638,13 +638,23 @@ def expected_coverage(
     if ag == "defi":
         split = _defi_protocol_chain_split(data_source)
         if split is not None:
-            _, chain = split
+            protocol, chain = split
             genesis = _chain_genesis_date_for(chain)
             if genesis is not None and target_date < genesis:
                 return ExpectedCoverageResult(
                     state=ExpectedState.NOT_YET_LIVE,
                     reason="EXPECTED_PRE_GENESIS_CHAIN",
                     diagnostic=f"chain {chain} genesis {genesis.isoformat()} > target {target_date.isoformat()}",
+                )
+            # Protocol pause window check (added 2026-05-20 round 3 — R8 full closure).
+            from .protocol_pause_windows import is_protocol_paused
+
+            paused, pause_desc = is_protocol_paused(protocol, chain, target_date)
+            if paused:
+                return ExpectedCoverageResult(
+                    state=ExpectedState.EXPECTED_EMPTY,
+                    reason="EXPECTED_PROTOCOL_PAUSED",
+                    diagnostic=pause_desc or f"{protocol}-{chain} in pause window covering {target_date.isoformat()}",
                 )
 
     # Sports source-level known gaps (added 2026-05-20 round 2 — operator Q1 fix).

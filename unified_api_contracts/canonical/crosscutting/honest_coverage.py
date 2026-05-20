@@ -201,6 +201,18 @@ class EmptyConfirmedReason(StrEnum):
     Plan: ``manifest_schema_final_gate_2026_05_09.md`` Phase 1 — operator-approved 2026-05-11 in the
     ``plans/active/issues/wave3x_track_d_findings_2026_05_11.md`` § TL;DR point 2 routing decision."""
 
+    EXPECTED_PROTOCOL_PAUSED = "EXPECTED_PROTOCOL_PAUSED"
+    """DeFi protocol pause window — the protocol was operational before and after but paused
+    (intentionally or otherwise) during a documented date range. Examples: Aave V2 → V3
+    migration windows, Compound V2 wind-down, chain-level outages (Solana, Polygon Bor halts).
+    Sister of ``EXPECTED_DEPRECATED_DATA_TYPE`` (permanent retirement) — this is a temporary
+    pause with a known resume date.
+
+    Registry SSOT: ``unified_api_contracts.registry.protocol_pause_windows.PROTOCOL_PAUSE_WINDOWS``
+    keyed by ``(protocol, chain)`` → list of ``(start, end)`` date tuples. Oracle gate added
+    2026-05-20 round 3 per mega-audit Phase A2 gap closure (R8). Operator fills the registry
+    when new pauses are discovered."""
+
     EXPECTED_OUTSIDE_PROCESSING_SCOPE = "EXPECTED_OUTSIDE_PROCESSING_SCOPE"
     """Instrument exists in the instruments-service catalog but is not included in the downstream
     service's subscription_list / MVP-scope configuration. The service explicitly skips it rather

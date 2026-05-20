@@ -117,6 +117,36 @@ class TestDefiDeprecationGates:
         assert result.reason is None
 
 
+class TestProtocolPauseWindows:
+    """2026-05-20 round 3 — PROTOCOL_PAUSE_WINDOWS gate.
+
+    Registry is initially empty; tests verify the gate WIRES correctly + can fire
+    when populated.
+    """
+
+    def test_empty_registry_does_not_fire(self) -> None:
+        # Initial PROTOCOL_PAUSE_WINDOWS is empty — no DeFi cell should be classified as paused.
+        result = expected_coverage("defi", "AAVEV3-ETHEREUM", "lending_indices", date(2025, 6, 15))
+        assert result.reason != "EXPECTED_PROTOCOL_PAUSED"
+
+    def test_gate_fires_when_registry_populated(self) -> None:
+        # Inject a temporary entry to verify the gate wiring.
+        from unified_api_contracts.registry import protocol_pause_windows
+
+        key = ("TESTPROTO", "TESTCHAIN")
+        protocol_pause_windows.PROTOCOL_PAUSE_WINDOWS[key] = [(date(2024, 1, 1), date(2024, 3, 31))]
+        try:
+            # Note: this exercises is_protocol_paused() directly since the oracle's split
+            # function only fires for DeFi tokens that follow the PROTOCOL-CHAIN convention.
+            paused, desc = protocol_pause_windows.is_protocol_paused("TESTPROTO", "TESTCHAIN", date(2024, 2, 15))
+            assert paused is True
+            assert desc is not None and "TESTPROTO" in desc
+            paused_outside, _ = protocol_pause_windows.is_protocol_paused("TESTPROTO", "TESTCHAIN", date(2024, 6, 15))
+            assert paused_outside is False
+        finally:
+            del protocol_pause_windows.PROTOCOL_PAUSE_WINDOWS[key]
+
+
 class TestSportsKnownGap:
     """2026-05-20 round 2 — sports.league_data.is_in_known_gap integration."""
 
