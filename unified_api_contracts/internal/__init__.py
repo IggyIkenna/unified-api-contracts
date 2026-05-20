@@ -945,6 +945,8 @@ from unified_api_contracts.internal.sports import (
     TeamRecord,
     VenueRecord,
 )
+from unified_api_contracts.internal.strategy_directives import ArchetypeAllocationDirective
+from unified_api_contracts.internal.strategy_pnl_stream import StrategyPnlStreamEvent
 from unified_api_contracts.internal.testing.scenario_config import (
     FaultConfig,
     InstrumentFaultRule,
@@ -982,6 +984,8 @@ from unified_api_contracts.internal.unity_commercial_terms import (
 __all__ = [
     "ALLOCATION_MIN_MATURITY",
     "ALL_FRESHNESS_CONTRACTS",
+    "ArchetypeAllocationDirective",
+    "StrategyPnlStreamEvent",
     "ARCHETYPE_TO_FAMILY",
     "BENCHMARK_FILL_MODE_BY_ACTION",
     "COMPATIBILITY_SEED",
