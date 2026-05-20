@@ -1,0 +1,103 @@
+# Cassette orphan allowlist — documented exceptions to the
+# "every cassette MUST have a production consumer" rule.
+#
+# Each entry MUST include:
+#   path: <venue>/mocks/<file>.yaml  (relative to unified_api_contracts/external/)
+#   reason: one of {stub-placeholder, test-only, capability-declaration-only,
+#                   integration-fixture, recording-template}
+#   detail: 1-line human-readable why
+#   acked_by: <agent-or-operator> <YYYY-MM-DD>
+#
+# Adding a new entry requires operator [ack] (or self-evident category like
+# stub-placeholder). The Phase 1 canary plan
+# (plans/active/canary_coverage_qg_enforcement_2026_05_20.md) tracks
+# decisions for non-stub orphans — they belong on the active fix list,
+# NOT on this allowlist, unless the operator explicitly acks.
+#
+# SSOT: plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 1.
+
+allowed:
+  # ---- stub-placeholder cassettes (empty interactions; capability-declaration-only)
+  - path: defi/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — DeFi-aggregate cassette directory holds future on-chain cassettes per protocol."
+    acked_by: ikenna 2026-05-20
+  - path: eia/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — EIA macro provider; cassette to be recorded when macro adapter ships."
+    acked_by: ikenna 2026-05-20
+  - path: fix/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — FIX protocol adapter is binary, not REST; stub kept for symmetry with other venues."
+    acked_by: ikenna 2026-05-20
+  - path: mev/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — MEV-aggregate cassette directory; per-builder cassettes (mev-share, etc.) land separately."
+    acked_by: ikenna 2026-05-20
+  - path: pinnacle/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — Pinnacle sportsbook scraper cassette pending."
+    acked_by: ikenna 2026-05-20
+  - path: versifi/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — Versifi cassette pending."
+    acked_by: ikenna 2026-05-20
+
+  # ---- recorded-but-no-prod-consumer-yet cassettes
+  # These have real recorded interactions but no service-repo consumer reads
+  # the cassette today. Per plans/active/canary_coverage_qg_enforcement_2026_05_20.md
+  # Phase 5, each is targeted for WIRE-TO-CONSUMER or DELETE-CASSETTE
+  # decision; until that phase lands, they're allowlisted with the named
+  # successor.
+  - path: barchart/mocks/get_quote_es1.yaml
+    reason: recording-template
+    detail: "Recorded ES1 quote; barchart adapter consumes via different code-path (UAC capability declaration only). Phase 5 decision: wire or delete."
+    acked_by: ikenna 2026-05-20
+  - path: bitfinex/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Bitfinex ticker recorded for canary coverage; bitfinex live connector not on May-23 critical path. Phase 5 decision."
+    acked_by: ikenna 2026-05-20
+  - path: bitstamp/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Bitstamp not on May-23 critical path. Phase 5 decision."
+    acked_by: ikenna 2026-05-20
+  - path: databento/mocks/batch_list_jobs.yaml
+    reason: recording-template
+    detail: "Databento batch API surfaces; tradfi databento adapter ships post-May-23 (TradFi master 2026-05-07)."
+    acked_by: ikenna 2026-05-20
+  - path: databento/mocks/batch_submit_job.yaml
+    reason: recording-template
+    detail: "See databento/batch_list_jobs.yaml."
+    acked_by: ikenna 2026-05-20
+  - path: databento/mocks/metadata_list_datasets.yaml
+    reason: recording-template
+    detail: "See databento/batch_list_jobs.yaml."
+    acked_by: ikenna 2026-05-20
+  - path: databento/mocks/timeseries_get_range_definition.yaml
+    reason: recording-template
+    detail: "See databento/batch_list_jobs.yaml."
+    acked_by: ikenna 2026-05-20
+  - path: databento/mocks/timeseries_get_range_ohlcv.yaml
+    reason: recording-template
+    detail: "See databento/batch_list_jobs.yaml."
+    acked_by: ikenna 2026-05-20
+  - path: gateio/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Gateio not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
+    acked_by: ikenna 2026-05-20
+  - path: huobi/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Huobi not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
+    acked_by: ikenna 2026-05-20
+  - path: kucoin/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Kucoin not on May-23 critical path. Phase 5 decision."
+    acked_by: ikenna 2026-05-20
+  - path: mexc/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Mexc not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
+    acked_by: ikenna 2026-05-20
+  - path: yahoo_finance/mocks/error_rate_limit.yaml
+    reason: recording-template
+    detail: "Error-path cassette (rate-limit response); used for negative-path testing once Yahoo Finance integration tests land."
+    acked_by: ikenna 2026-05-20

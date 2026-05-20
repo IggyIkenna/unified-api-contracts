@@ -90,10 +90,17 @@ detector's output spot-checks, not type dates.
 
 Two genuinely different categories with different encoding rules:
 
-| Category | Duration | Detector encodes? | Why |
-|---|---|---|---|
-| **Chain-level outage** (Solana 2022-09-30, Polygon Bor halts, Arbitrum sequencer down) | hours to <1 day | **NO by default** — flag operator-review-required if multi-protocol-multi-bucket impact | Too short to safely encode; high false-positive vs adapter bugs / rate limits / wrong sources. Single-day outages should surface as `DIVERGENT_EMPTY` → operator decides per-incident |
-| **Protocol pause** (Aave V2 freeze, Curve emergency-pause, multi-day governance pauses) | days to months; on-chain governance event source | **YES** when governance event clearly fires Pause/Freeze + Unpause/Unfreeze pair | Officially documented; multi-day; on-chain provable; benefit of honest-down outweighs FP risk |
+- Chain-level outage (Solana 2022-09-30, Polygon Bor halts, Arbitrum
+  sequencer down): hours to <1 day. Detector encodes? NO by default —
+  flag operator-review-required if multi-protocol-multi-bucket impact.
+  Too short to safely encode; high false-positive vs adapter bugs /
+  rate limits / wrong sources. Single-day outages should surface as
+  `DIVERGENT_EMPTY` → operator decides per-incident.
+- Protocol pause (Aave V2 freeze, Curve emergency-pause, multi-day
+  governance pauses): days to months; on-chain governance event source.
+  Detector encodes? YES when governance event clearly fires
+  Pause/Freeze + Unpause/Unfreeze pair. Officially documented;
+  multi-day; on-chain provable; benefit of honest-down outweighs FP risk.
 
 The detector defaults to **conservative** — only encode pauses where:
 
@@ -125,7 +132,6 @@ we can't prove from data).
 from __future__ import annotations
 
 from datetime import date
-
 
 # Detector-populated — DO NOT manually edit. The detector (R-NEW-6) refreshes
 # this from on-chain governance events + per-chain RPC block-time analysis.

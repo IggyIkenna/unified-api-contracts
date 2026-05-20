@@ -615,7 +615,10 @@ def expected_coverage(
         return ExpectedCoverageResult(
             state=ExpectedState.EXPECTED_EMPTY,
             reason="EXPECTED_DEPRECATED_DATA_TYPE",
-            diagnostic=f"DeFi venue {data_source} in EMPTY_OR_DEPRECATED_DEFI_VENUES — retired subgraph / no historical parquets",
+            diagnostic=(
+                f"DeFi venue {data_source} in EMPTY_OR_DEPRECATED_DEFI_VENUES — "
+                "retired subgraph / no historical parquets"
+            ),
         )
 
     # DeFi venues with subgraph but no instruments-service backfill yet
@@ -624,7 +627,9 @@ def expected_coverage(
         return ExpectedCoverageResult(
             state=ExpectedState.EXPECTED_EMPTY,
             reason="EXPECTED_INSTRUMENT_NOT_LISTED",
-            diagnostic=f"DeFi venue {data_source} in DEFI_INSTRUMENTS_NOT_YET_COLLECTED — instruments-service backfill pending",
+            diagnostic=(
+                f"DeFi venue {data_source} in DEFI_INSTRUMENTS_NOT_YET_COLLECTED — instruments-service backfill pending"
+            ),
         )
 
     launch = _venue_launch_date_for(ag, data_source)

@@ -57,5 +57,14 @@ MAX_DURATION=600
 # pip-audit. All pre-date Phase 4. Goal: ratchet to 0 incrementally.
 CODEX_MAX_VIOLATIONS=6
 export CODEX_MAX_VIOLATIONS
+# Cassette canary tests live at tests/<file>.py (not tests/unit/<file>.py), so
+# the default PYTEST_UNIT_DIR="tests/unit/" silently skips them. We extend
+# collection to include the canary trio. We do NOT pull all of tests/ into
+# the sweep yet — many root-level UAC tests are pre-existing-broken (318
+# failures surfaced on 2026-05-20; tracked in
+# plans/active/issues/uac_root_level_tests_preexisting_failures_2026_05_20.md).
+# Once those are triaged the override can broaden to tests/.
+# Per CLAUDE.md "PYTEST_UNIT_DIR per-family override" + canary_coverage_qg_enforcement_2026_05_20 Phase 1.
+PYTEST_UNIT_DIR="tests/unit/ tests/test_cassette_orphan_checker.py tests/test_cassette_schema_parity.py tests/test_batch_live_parity.py"
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
