@@ -653,6 +653,8 @@ from .external.upbit.schemas import (
     UpbitTicker,
 )
 from .internal.domain.client_reporting import FundNAVSnapshot
+from .internal.strategy_directives import ArchetypeAllocationDirective
+from .internal.strategy_pnl_stream import StrategyPnlStreamEvent
 from .internal.domain.fund_administration import (
     AllocationExecutionStatus,
     AllocatorCashAccountView,
@@ -1324,7 +1326,9 @@ __all__ = [
     "FluidDepositParams",
     "FluidRepayParams",
     "FundAllocation",
+    "ArchetypeAllocationDirective",
     "FundNAVSnapshot",
+    "StrategyPnlStreamEvent",
     "FundTransferContext",
     "FundingRateHistory",
     "FuturesContractLifecyclePhase",
