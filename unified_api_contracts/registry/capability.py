@@ -8,7 +8,10 @@ Layers of granularity (coarse → fine):
 
 from __future__ import annotations
 
-from pydantic import BaseModel
+from datetime import date
+from typing import Literal
+
+from pydantic import BaseModel, field_validator
 
 __all__ = [
     "CapabilityResolutionError",
@@ -128,6 +131,58 @@ class SourceCapability(BaseModel):
     margin_model: dict[str, str] = {}
     """Per-environment margin model. e.g. {"mainnet": "cross", "testnet": "unified"}
     Common values: "cross", "isolated", "unified", "portfolio", "none"."""
+
+    # --- New: structured venue metadata (optional, defaults None) ---
+
+    chain: str | None = None
+    """Underlying chain / settlement layer. None for pure off-chain CEX or data providers.
+
+    Canonical values: "ethereum", "starknet", "solana", "bnb-chain", "arbitrum",
+    "optimism", "polygon", "avalanche", "base", "centralized" (CeFi with no on-chain
+    settlement), "hyperevm" (Hyperliquid L1), "off-chain-clob" (hybrid CLOB with
+    batched settlement).
+    """
+
+    kind: (
+        Literal[
+            "perp_dex",
+            "spot_dex",
+            "perp_cex",
+            "spot_cex",
+            "options_cex",
+            "options_dex",
+            "prediction_dex",
+            "sports_book",
+            "lending_protocol",
+            "staking_protocol",
+            "amm_dex",
+            "vault_protocol",
+        ]
+        | None
+    ) = None
+    """Venue class taxonomy. Drives consumer-side filtering (e.g. "all perp DEXes").
+    None for infrastructure/data providers that don't fit a trading venue category."""
+
+    mandatory_user_agent: str | None = None
+    """If set, REST/WS clients MUST include this exact string as the User-Agent header.
+    Extended Starknet is the canonical case (returns 403 without it)."""
+
+    coverage_start: dict[str, date] | None = None
+    """Per-data_type earliest available date in the venue's archive.
+
+    Keys are workspace-canonical data_type names (e.g. "candles", "trades",
+    "funding_rates", "orderbook"). Values are ISO dates. Consumer: Phase A2
+    ``expected_coverage()`` for ``EXPECTED_PRE_SOURCE_COVERAGE_START`` reason.
+    """
+
+    @field_validator("coverage_start")
+    @classmethod
+    def _validate_coverage_start_keys(cls, v: dict[str, date] | None) -> dict[str, date] | None:
+        if v is not None:
+            for key in v:
+                if not key:
+                    raise ValueError("coverage_start keys must be non-empty strings")
+        return v
 
 
 class CapabilityResolutionError(RuntimeError):
