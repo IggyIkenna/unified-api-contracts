@@ -53,6 +53,7 @@ class PipelineMode(StrEnum):
     BATCH_API_FOOTBALL = "batch_api_football"
     BATCH_BARCHART = "batch_barchart"
     BATCH_CHAINLINK = "batch_chainlink"
+    BATCH_CROSS_INSTRUMENT = "batch_cross_instrument"
     BATCH_DATABENTO = "batch_databento"
     BATCH_EIA = "batch_eia"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
