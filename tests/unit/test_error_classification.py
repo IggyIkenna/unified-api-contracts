@@ -472,7 +472,6 @@ class TestClassifyVenueError:
             "opticodds",
             "matchbook",
             "metabet",
-            "manifold",
             "polygon",
             "transfermarkt",
             "footystats",
@@ -496,7 +495,6 @@ class TestClassifyVenueError:
             "opticodds",
             "matchbook",
             "metabet",
-            "manifold",
             "polygon",
         ]
         for venue in new_venues:
@@ -513,7 +511,6 @@ class TestClassifyVenueError:
             "opticodds",
             "matchbook",
             "metabet",
-            "manifold",
             "polygon",
         ]
         for venue in new_venues:

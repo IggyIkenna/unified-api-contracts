@@ -590,14 +590,6 @@ VENUE_ERRORS_SPORTS: dict[str, list[VenueErrorClassification]] = {
         ve("metabet", "503", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Service unavailable"),
     ],
     # ── Prediction markets & sports betting ──────────────────────────────
-    "manifold": [
-        ve("manifold", "400", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Bad request"),
-        ve("manifold", "401", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Unauthorized"),
-        ve("manifold", "403", retry=False, reconnect=False, action=ErrorAction.FAIL, desc="Forbidden"),
-        ve("manifold", "429", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Rate limit exceeded"),
-        ve("manifold", "500", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Internal server error"),
-        ve("manifold", "503", retry=True, reconnect=False, action=ErrorAction.RETRY, desc="Service unavailable"),
-    ],
     "polymarket": [
         ve(
             "polymarket",

@@ -28,7 +28,6 @@ from ..external.kalshi.normalize import (
     normalize_kalshi_trade,
     normalize_kalshi_ws_trade,
 )
-from ..external.manifold.normalize import normalize_manifold_trade
 from ..external.okx.normalize import normalize_okx_trade
 from ..external.polymarket.normalize import normalize_polymarket_trade
 from ..external.tardis.normalize import normalize_tardis_trade
@@ -94,7 +93,6 @@ __all__ = [
     "normalize_ibkr_trade",
     "normalize_kalshi_trade",
     "normalize_kalshi_ws_trade",
-    "normalize_manifold_trade",
     "normalize_okx_trade",
     "normalize_polymarket_trade",
     "normalize_sports_trade",

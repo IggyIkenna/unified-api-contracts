@@ -246,17 +246,6 @@ class TestMatchbookSchemaHealth(_BaseSchemaHealthTest):
             self._assert_cassette_non_empty(c)
 
 
-class TestManifoldSchemaHealth(_BaseSchemaHealthTest):
-    provider = "manifold"
-
-    def test_cassettes_non_empty(self) -> None:
-        cassettes = self._get_cassettes()
-        if not cassettes:
-            pytest.skip(f"No cassettes for {self.provider}")
-        for c in cassettes:
-            self._assert_cassette_non_empty(c)
-
-
 class TestFredSchemaHealth(_BaseSchemaHealthTest):
     provider = "fred"
 

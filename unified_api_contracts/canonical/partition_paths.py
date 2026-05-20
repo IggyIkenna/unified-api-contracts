@@ -260,8 +260,8 @@ def build_tradfi_partition_path(
 # ---------------------------------------------------------------------------
 # Prediction
 # ---------------------------------------------------------------------------
-# Pattern derived from MTDS prediction adapters (polymarket, kalshi,
-# manifold). Prediction venues key by ``condition_id`` (the on-chain market
+# Pattern derived from MTDS prediction adapters (polymarket, kalshi).
+# Prediction venues key by ``condition_id`` (the on-chain market
 # resolution identifier) — a market lifetime spans many days, but each
 # day's tick shard partitions by condition. instrument_type carries the
 # market category (``binary`` / ``categorical`` / ``scalar``).
@@ -296,14 +296,14 @@ def build_prediction_partition_path(
 
     The ``condition_id`` is used as the per-instrument FILENAME (matching
     the per-instrument-symbol writer pattern), NOT a partition segment.
-    All Polymarket/Kalshi/Manifold markets share
+    All Polymarket/Kalshi markets share
     ``instrument_type=prediction_market``; per-market disambiguation
     happens via the ``condition_id`` filename.
 
     Args:
-        venue: ``POLYMARKET`` / ``KALSHI`` / ``MANIFOLD``.
+        venue: ``POLYMARKET`` / ``KALSHI``.
         condition_id: Per-market identifier (Polymarket
-            ``conditionId`` / Kalshi event_ticker / Manifold market_id).
+            ``conditionId`` / Kalshi event_ticker).
             Used as the parquet file stem.
         instrument_type: Defaults to ``"prediction_market"`` matching
             production. Override only if a future variant emerges.

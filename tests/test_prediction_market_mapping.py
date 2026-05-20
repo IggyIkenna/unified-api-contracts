@@ -124,8 +124,8 @@ class TestOrphanDetection:
     def test_unclassifiable_question_is_orphan(self) -> None:
         mapper = PredictionMarketMapper()
         result = mapper.map_market(
-            venue="manifold",
-            market_id="mf-999",
+            venue="polymarket",
+            market_id="pm-999",
             question="Will my cat learn to fetch by next Tuesday?",
         )
         assert result.category == PredictionMarketCategory.OTHER
@@ -133,7 +133,7 @@ class TestOrphanDetection:
         detector = OrphanDetector()
         orphans = detector.detect_orphans([result])
         assert len(orphans) == 1
-        assert orphans[0].source_market_id == "mf-999"
+        assert orphans[0].source_market_id == "pm-999"
 
     def test_classified_market_is_not_orphan(self) -> None:
         mapper = PredictionMarketMapper()
@@ -192,8 +192,8 @@ class TestCustomRulesOverride:
         ]
         mapper = PredictionMarketMapper(custom_rules=custom)
         result = mapper.map_market(
-            venue="manifold",
-            market_id="mf-cat",
+            venue="polymarket",
+            market_id="pm-cat",
             question="Will my cat learn to fetch by next Tuesday?",
         )
         # Custom rule at priority=100 matches "cat" and overrides OTHER
@@ -284,8 +284,8 @@ class TestCategoryKeywords:
     def test_entertainment_category(self) -> None:
         mapper = PredictionMarketMapper()
         result = mapper.map_market(
-            venue="manifold",
-            market_id="mf-oscar",
+            venue="polymarket",
+            market_id="pm-oscar",
             question="Will Oppenheimer take home the Oscar for best picture?",
         )
         assert result.category == PredictionMarketCategory.ENTERTAINMENT

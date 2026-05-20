@@ -89,25 +89,6 @@ def normalize_pinnacle_error(
 
 
 # ---------------------------------------------------------------------------
-# Manifold Markets
-# ---------------------------------------------------------------------------
-
-
-def normalize_manifold_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "manifold",
-) -> CanonicalError:
-    """Map a Manifold Markets HTTP status to a CanonicalError subclass."""
-    code = str(error_code)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # API-Football
 # ---------------------------------------------------------------------------
 

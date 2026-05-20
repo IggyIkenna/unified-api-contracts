@@ -11,7 +11,7 @@ from unified_api_contracts.registry.capability_declarations import (
 )
 
 # Prediction market slugs within SPORTS_CAPABILITIES — binary YES/NO sides, not HOME/AWAY/DRAW.
-_PREDICTION_SOURCES: frozenset[str] = frozenset({"kalshi", "polymarket", "manifold"})
+_PREDICTION_SOURCES: frozenset[str] = frozenset({"kalshi", "polymarket"})
 
 
 def _build_venue_asset_group_lookup() -> dict[str, str]:

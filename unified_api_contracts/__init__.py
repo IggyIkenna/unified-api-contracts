@@ -573,11 +573,6 @@ from .external.kalshi.schemas import (
     KalshiOrderBook,
     KalshiTrade,
 )
-from .external.manifold.schemas import (
-    ManifoldMarket,
-    ManifoldPrice,
-    ManifoldTrade,
-)
 from .external.okx.schemas import (
     OKXFundingRate,
     OKXInstrumentInfo,
@@ -1376,9 +1371,6 @@ __all__ = [
     "LongShortRatio",
     "ManifestPhantom",
     "ManifestRowBlockedError",
-    "ManifoldMarket",
-    "ManifoldPrice",
-    "ManifoldTrade",
     "MappingRule",
     "MarginType",
     "MarketClosedError",

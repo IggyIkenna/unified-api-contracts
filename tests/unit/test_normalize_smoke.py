@@ -274,14 +274,6 @@ class TestErrorNormalizersProviders:
         assert isinstance(normalize_pinnacle_error(429), CanonicalRateLimitError)
         assert isinstance(normalize_pinnacle_error("NOCODE"), CanonicalError)
 
-    def test_manifold_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_manifold_error,
-        )
-
-        assert isinstance(normalize_manifold_error(401), CanonicalAuthenticationError)
-        assert isinstance(normalize_manifold_error("NOCODE"), CanonicalError)
-
     def test_api_football_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_api_football_error,

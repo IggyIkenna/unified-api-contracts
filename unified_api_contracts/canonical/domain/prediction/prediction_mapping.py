@@ -1,6 +1,6 @@
 """Canonical prediction market mapping — maps markets from various venues to canonical IDs.
 
-Supports Polymarket, Kalshi, Manifold, and other prediction market venues.
+Supports Polymarket, Kalshi, and other prediction market venues.
 Provides deterministic canonical IDs, keyword-based categorization, and
 cross-venue matching via normalized question hashing.
 """
@@ -37,7 +37,7 @@ class CanonicalPredictionMarket(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     canonical_id: str  # PRED:{category}:{normalized_hash[:12]}
-    source_venue: str  # polymarket, kalshi, manifold, etc.
+    source_venue: str  # polymarket, kalshi, etc.
     source_market_id: str  # venue-native identifier
     category: PredictionMarketCategory
     question_normalized: str  # lowercased, whitespace-collapsed, stripped

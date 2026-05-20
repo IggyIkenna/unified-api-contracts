@@ -19,10 +19,6 @@ from ..external.kalshi.normalize import (
     normalize_kalshi_odds,
     normalize_kalshi_order,
 )
-from ..external.manifold.normalize import (
-    normalize_manifold_market,
-    normalize_manifold_odds,
-)
 from ..external.odds_api.normalize import normalize_odds_api_fixture
 from ..external.onexbet.normalize import normalize_onexbet_market
 from ..external.pinnacle.normalize import normalize_pinnacle_event
@@ -99,8 +95,6 @@ __all__ = [
     "normalize_kalshi_market",
     "normalize_kalshi_odds",
     "normalize_kalshi_order",
-    "normalize_manifold_market",
-    "normalize_manifold_odds",
     "normalize_odds_api_fixture",
     "normalize_onexbet_market",
     "normalize_pinnacle_event",
