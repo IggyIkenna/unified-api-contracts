@@ -186,6 +186,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # tick (per-tick APY inputs + MTDS provenance for audit chain).
     # features_tick_observation_audit_2026_05_18 Phase 1.
     ("defi", "feature_observation_snapshot"): ["features_onchain_service"],
+    # cross_instrument_signal — emitted by features-service cross_instrument
+    # family on every batch run (multi-asset / multi-venue derived features).
+    # d5_features_missing_data_downgrade_2026_05_20 Phase 2 — closes
+    # PipelineMode.BATCH_CROSS_INSTRUMENT closed-set round-trip with
+    # SOURCE_PRIORITY (the family crosses asset_groups; registered under
+    # "defi" as the primary live archetype consumer per CLAUDE.md
+    # "DeFi + CeFi hybrid" rule — carry_staked_basis + perp_funding_vs_spot
+    # are the cross_instrument family's live targets).
+    ("defi", "cross_instrument_signal"): ["cross_instrument"],
     # ---- TradFi ---------------------------------------------------------
     # Databento for CME/NQ/options/futures; Yahoo for VIX 15m rolling
     # window; Barchart for VIX 15m historical preload (handled at the
@@ -201,6 +210,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("tradfi", "ohlcv_15m"): ["databento", "yahoo", "barchart"],
     ("tradfi", "options_chain"): ["databento"],
     ("tradfi", "futures_chain"): ["databento"],
+    # commodity_signal — emitted by features-service commodity family from
+    # EIA (crude oil + natural gas weekly storage) + CFTC + Baker Hughes +
+    # Open-Meteo + Yahoo factor inputs. Top entry is EIA per the storage
+    # factor's dominant role in the commodity feature set (per
+    # features_service/commodity/README.md factor table).
+    # d5_features_missing_data_downgrade_2026_05_20 Phase 1 — closes
+    # PipelineMode.BATCH_EIA closed-set round-trip with SOURCE_PRIORITY.
+    ("tradfi", "commodity_signal"): ["eia"],
     # ---- Prediction -----------------------------------------------------
     ("prediction", "trades"): ["polymarket_clob"],
     ("prediction", "book_snapshot"): ["polymarket_clob"],
@@ -292,6 +309,15 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # features-onchain-service — feature snapshots emitted inline at calculation
     # time; latency = 0ms relative to the observation trigger.
     "features_onchain_service": 0,
+    # cross_instrument feature family — features emitted inline at batch-tick
+    # calculation time; latency = 0ms relative to the upstream multi-asset
+    # delta_one/MTDS read-event that triggered it.
+    "cross_instrument": 0,
+    # EIA weekly storage publication — Wednesdays 10:30 AM ET covering the
+    # prior Friday → ~5 day publication lag. Conservative 86_400_000 (24h)
+    # matches barchart-tier daily-archive sources; tightenable later via
+    # source_emission_latency_calibration_2026_*<TBD>.md.
+    "eia": 86_400_000,
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid_rest": 1_000,  # 1s: HL REST API polling cadence
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint

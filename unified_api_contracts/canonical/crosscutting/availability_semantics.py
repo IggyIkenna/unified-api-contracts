@@ -145,6 +145,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # EVERY tick (per-tick APY inputs + provenance for audit chain).
     # features_tick_observation_audit_2026_05_18 Phase 1.
     ("defi", "feature_observation_snapshot"): "fetch_completed_at",
+    # cross_instrument_signal — emitted by features-service cross_instrument
+    # family at each batch run (multi-asset derived features); available_at =
+    # write-time per ``fetch_completed_at`` (same pattern as other service-emitted
+    # snapshots above). d5_features_missing_data_downgrade_2026_05_20 Phase 2.
+    ("defi", "cross_instrument_signal"): "fetch_completed_at",
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",
@@ -152,6 +157,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("tradfi", "ohlcv_15m"): "tick_timestamp",
     ("tradfi", "options_chain"): "tick_timestamp",
     ("tradfi", "futures_chain"): "tick_timestamp",
+    # commodity_signal — emitted by features-service commodity family from
+    # EIA + CFTC + Baker Hughes + Open-Meteo + Yahoo factor inputs;
+    # available_at = write-time per ``fetch_completed_at`` (downstream of
+    # weekly EIA publication cadence). d5_features_missing_data_downgrade_2026_05_20 Phase 1.
+    ("tradfi", "commodity_signal"): "fetch_completed_at",
     # ---- Prediction -----------------------------------------------------
     # Prediction CLOB ticks: tick_timestamp at write, but the orchestrator
     # ALSO clips by market_created_at upstream (no ticks before market
