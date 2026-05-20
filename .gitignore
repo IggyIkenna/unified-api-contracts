@@ -135,3 +135,7 @@ logs/
 # --- Optional: Jupyter (uncomment if repo has notebooks) ---
 # .ipynb_checkpoints/
 # profile_default/
+
+# Weekly schema-validation canary runtime output
+collected_responses/
+validation_report.txt
