@@ -108,6 +108,48 @@ AUTH_CONFIG: dict[str, dict[str, str]] = {
 }
 
 
+# Venue-specific URI rewriters: cassettes recorded against a specific
+# market/condition_id may go stale as the market resolves and disappears.
+# Each override callable receives (uri, headers) of the cassette interaction
+# and returns a rewritten (uri, headers) targeting a currently-active equivalent.
+# Returning the inputs unchanged means "replay as-is".
+#
+# Polymarket override (rationale 2026-05-20):
+#   * /markets/<condition_id> or /market/<id> single-market lookups go 404 once
+#     the recorded market resolves. The override redirects to the listing
+#     endpoint with active=true&closed=false&limit=1 so the canary always hits
+#     a live market shape rather than the resolved 404.
+#   * Listing endpoints (/markets?active=true&...) are kept as-is — they're
+#     intrinsically rolling.
+def _polymarket_override(uri: str, headers: dict[str, str]) -> tuple[str, dict[str, str]]:
+    from urllib.parse import urlsplit, urlunsplit
+
+    parts = urlsplit(uri)
+    path = parts.path
+    # Single-market lookups: /markets/{condition_id} or /market/{id}
+    # Match path with exactly one segment after /markets or /market.
+    segs = [s for s in path.split("/") if s]
+    is_single_market = (
+        len(segs) >= 2
+        and segs[-2] in ("markets", "market")
+        # condition_id / market id are non-empty and not the listing keyword
+        and segs[-1]
+        and segs[-1] != "markets"
+    )
+    if is_single_market:
+        # Rewrite to listing endpoint that always has live data
+        new_path = "/markets"
+        new_query = "active=true&closed=false&limit=1"
+        new_uri = urlunsplit((parts.scheme, parts.netloc, new_path, new_query, ""))
+        return new_uri, headers
+    return uri, headers
+
+
+VENUE_OVERRIDES: dict[str, "object"] = {
+    "polymarket": _polymarket_override,
+}
+
+
 @dataclass
 class ReplayResult:
     venue: str
@@ -206,6 +248,12 @@ def _replay_one(venue: str, stem: str, interaction: dict[str, Any]) -> ReplayRes
         if h.lower() in _AUTH_HEADER_NAMES_LOWER:
             del headers[h]
     headers["User-Agent"] = USER_AGENT
+
+    # Apply venue-specific URI/header rewriter (e.g. roll a stale Polymarket
+    # condition_id to the live-listing endpoint so resolved markets don't 404).
+    override = VENUE_OVERRIDES.get(venue)
+    if override is not None:
+        uri, headers = override(uri, headers)
 
     auth_cfg = AUTH_CONFIG.get(venue)
     if auth_cfg:
