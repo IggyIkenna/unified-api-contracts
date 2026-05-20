@@ -1,4 +1,4 @@
-"""CeFi extended normalizers (part 2): MEXC, Huobi/HTX, Bitget, dYdX v4, OKX fill, Deribit fill, Upbit fill.
+"""CeFi extended normalizers (part 2): MEXC, Huobi/HTX, Bitget, OKX fill, Deribit fill, Upbit fill.
 
 Split from cefi_extended.py to keep each file under the 900-line limit.
 
