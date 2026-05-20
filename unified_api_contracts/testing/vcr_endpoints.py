@@ -307,21 +307,49 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     # DeFi protocols — DefiLlama additional endpoints
     # (defillama entry above has protocols + chains; add TVL + yields here)
     # ------------------------------------------------------------------
-    "defillama_tvl": [
-        _get(
-            "https://api.llama.fi/tvl/aave",
-            "aave_tvl.yaml",
+    # defillama_tvl: cassette in external/defillama/mocks/ → registered under "defillama" below
+    # defillama_yields: cassette in external/defillama/mocks/ → registered under "defillama" below
+    # defillama_coins: cassette in external/defillama/mocks/ → registered under "defillama" below
+    "morpho_blue_api": [
+        # Covers: Morpho Blue lending markets (MTDS morpho_adapter.py)
+        # Separate from thegraph_morpho — this is the native Morpho Blue API (not The Graph).
+        _post(
+            "https://blue-api.morpho.org/graphql",
+            "markets.yaml",
             "",
-            "DefiLlamaTvlValue",
+            "MorphoBlueMarketsResponse",
+            json_body={
+                "query": (
+                    "query GetMarkets { markets(where: {chainId_in: [1]}) {"
+                    " items { uniqueKey loanAsset { address symbol decimals }"
+                    " collateralAsset { address symbol decimals } lltv"
+                    " state { supplyAssets borrowAssets supplyApy borrowApy } } } }"
+                )
+            },
             schema_version="1.0",
         ),
     ],
-    "defillama_yields": [
+    "eigenlayer": [
+        # Covers: EigenLayer restaking rewards for EtherFi weETH holders
+        # BLOCKED-CREDENTIALS: sidecar-rpc.eigenlayer.xyz is Cloudflare-protected.
+        # Stub cassette ships; re-record from production environment.
         _get(
-            "https://yields.llama.fi/pools",
-            "pools.yaml",
-            "data.0",
-            "DefiLlamaYieldPool",
+            "https://sidecar-rpc.eigenlayer.xyz/eigenlayer/rewards/v1/earner-historical-rewards",
+            "earner_historical_rewards.yaml",
+            "",
+            "EigenLayerRewardsResponse",
+            schema_version="1.0",
+        ),
+    ],
+    "solayer": [
+        # Covers: Solayer sSOL restaking APY (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
+        # API URL declared in UAC _defi.py capability: https://app.solayer.org/api
+        # Stub cassette ships; re-record when MTDS adapter is implemented.
+        _get(
+            "https://app.solayer.org/api/info/restaking",
+            "restaking_apy.yaml",
+            "",
+            "SolayerRestakingResponse",
             schema_version="1.0",
         ),
     ],
@@ -444,6 +472,23 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             "chains.yaml",
             "0",
             "DefiLlamaChainTvl",
+            schema_version="1.0",
+        ),
+        # yields.llama.fi/pools — covers Ethena, Pendle, Beefy, Yearn, Convex, Karak,
+        # Symbiotic, Idle (all MTDS adapters filter this shared endpoint by project name)
+        _get(
+            "https://yields.llama.fi/pools",
+            "yields.yaml",
+            "data.0",
+            "DefiLlamaYieldPool",
+            schema_version="1.0",
+        ),
+        # coins.llama.fi — covers Solblaze(bSOL), Puffer(pufETH), EtherFi(eETH/weETH)
+        _get(
+            "https://coins.llama.fi/prices/historical/1779223474/solana:bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1",
+            "coins_historical.yaml",
+            "",
+            "DefiLlamaCoinsResponse",
             schema_version="1.0",
         ),
     ],
@@ -578,8 +623,13 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     "tardis:instruments": "TardisInstrument",
     # On-chain analytics
     "defillama:protocol": "DefiLlamaProtocol",
-    "defillama_tvl:tvl": "DefiLlamaTvlValue",
-    "defillama_yields:pool": "DefiLlamaYieldPool",
+    "defillama:tvl": "DefiLlamaTvlValue",
+    "defillama:pool": "DefiLlamaYieldPool",
+    "defillama:coins": "DefiLlamaCoinsResponse",
+    # DeFi protocol direct APIs (non-subgraph)
+    "morpho_blue_api:markets": "MorphoBlueMarketsResponse",
+    "eigenlayer:rewards": "EigenLayerRewardsResponse",
+    "solayer:restaking": "SolayerRestakingResponse",
     # DeFi protocol subgraphs (The Graph)
     "thegraph_aave:reserves": "TheGraphResponse",
     "thegraph_morpho:markets": "TheGraphResponse",

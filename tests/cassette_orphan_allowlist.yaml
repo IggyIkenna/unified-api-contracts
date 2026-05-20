@@ -42,6 +42,10 @@ allowed:
     reason: stub-placeholder
     detail: "Empty interactions stub — Versifi cassette pending."
     acked_by: ikenna 2026-05-20
+  - path: solayer/mocks/restaking_apy.yaml
+    reason: capability-declaration-only
+    detail: "Stub cassette — Solayer adapter not yet implemented in MTDS. Capability declared in UAC _defi.py. MTDS adapter ships post-Phase-5 per canary_coverage_qg_enforcement_2026_05_20.md Phase 3."
+    acked_by: slot-4 2026-05-20
 
   # ---- recorded-but-no-prod-consumer-yet cassettes
   # These have real recorded interactions but no service-repo consumer reads

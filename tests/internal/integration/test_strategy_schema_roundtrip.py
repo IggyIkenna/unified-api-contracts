@@ -12,7 +12,6 @@ from decimal import Decimal
 
 from unified_api_contracts import ArchetypeAllocationDirective, StrategyPnlStreamEvent
 
-
 _T0 = datetime(2026, 5, 20, 12, 0, 0, tzinfo=UTC)
 _T1 = datetime(2026, 5, 20, 13, 0, 0, tzinfo=UTC)
 _T2 = datetime(2026, 5, 20, 14, 0, 0, tzinfo=UTC)

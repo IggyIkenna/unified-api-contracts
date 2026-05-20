@@ -1,0 +1,22 @@
+interactions:
+  - request:
+      body: '{"query": "query GetMarkets { markets(where: {chainId_in: [1]}) { items { uniqueKey loanAsset { address symbol decimals } collateralAsset { address symbol decimals } lltv state { supplyAssets borrowAssets supplyApy borrowApy } } } }"}'
+      headers:
+        Accept:
+          - application/json
+        Content-Type:
+          - application/json
+      method: POST
+      uri: https://blue-api.morpho.org/graphql
+    response:
+      body:
+        string: '{"data":{"markets":{"items":[{"uniqueKey":"0xfff1970c0ffae288764186fbb38a9171a17e98676744a1e345809cb8b9e73342","loanAsset":{"address":"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48","symbol":"USDC","decimals":6},"collateralAsset":{"address":"0x4cE9c93513DfF543Bc392870d57dF8C04e89Ba0a","symbol":"ysUSDS","decimals":18},"lltv":"965000000000000000","state":{"supplyAssets":0,"borrowAssets":0,"supplyApy":0,"borrowApy":0.002691114535206732}},{"uniqueKey":"0xffd010618ed3cb39bb2c5de0e3e58d3d2ec9f52187a180f29723c31756a939bc","loanAsset":{"address":"0x8292Bb45bf1Ee4d140127049757C2E0fF06317eD","symbol":"RLUSD","decimals":18},"collateralAsset":{"address":"0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf","symbol":"cbBTC","decimals":8},"lltv":"860000000000000000","state":{"supplyAssets":"17504270319819423492914796","borrowAssets":"15753901114781970403265968","supplyApy":0.022753181047160453,"borrowApy":0.025313056315515763}}]}}}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

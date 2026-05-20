@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+      method: GET
+      uri: https://coins.llama.fi/prices/historical/1779223474/solana:bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1
+    response:
+      body:
+        string: '{"coins":{"solana:bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1":{"decimals":9,"symbol":"bSOL","price":109.21066102799404,"timestamp":1779224342,"confidence":0.99}}}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -154,6 +154,25 @@ class DefiLlamaBridgeActivityPoint(BaseModel):
     withdrawTxs: int | None = None
 
 
+class DefiLlamaCoinsPrice(BaseModel):
+    """Single coin entry from GET https://coins.llama.fi/prices/historical/{timestamp}/{coin_id}."""
+
+    price: float | None = None
+    symbol: str | None = None
+    timestamp: int | None = None
+    confidence: float | None = None
+    decimals: int | None = None
+
+
+class DefiLlamaCoinsResponse(BaseModel):
+    """GET https://coins.llama.fi/prices/historical/{timestamp}/{coin_id}.
+
+    Keys of `coins` are DeFiLlama coin IDs e.g. 'solana:bSo13r4T...'.
+    """
+
+    coins: dict[str, DefiLlamaCoinsPrice] | None = None
+
+
 class DefiLlamaError(BaseModel):
     """DefiLlama API error."""
 

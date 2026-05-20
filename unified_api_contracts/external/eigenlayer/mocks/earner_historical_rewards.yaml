@@ -1,0 +1,26 @@
+# BLOCKED-CREDENTIALS — cassette not live-recorded.
+# sidecar-rpc.eigenlayer.xyz is Cloudflare-protected; live recording requires
+# a production environment with the EigenLayer sidecar accessible.
+# Adapter: market-tick-data-service/adapters/defi/lst_etherfi_adapter.py
+# Run with INTEGRATION_TEST_MODE=live from a production-environment agent to record.
+# See unified-trading-codex/07-security/testing-with-api-keys.md for procedure.
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+      method: GET
+      uri: https://sidecar-rpc.eigenlayer.xyz/eigenlayer/rewards/v1/earner-historical-rewards
+    response:
+      body:
+        string: '{"rewards":[]}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1
