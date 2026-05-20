@@ -177,9 +177,9 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("features-service", "pairwise_correlation"): ServiceEmissionPolicy.NAN_FILL,
     # ml-training — training a model on incomplete data is the worst-case silent corruption.
     # block_critical forces operator review.
-    ("ml-training-service", "model_version"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    ("ml-service", "model_version"): ServiceEmissionPolicy.BLOCK_CRITICAL,
     # ml-inference — signals off stale features pollute strategy decisions.
-    ("ml-inference-service", "per_strategy_signal"): ServiceEmissionPolicy.STRICT_FAIL,
+    ("ml-service", "per_strategy_signal"): ServiceEmissionPolicy.STRICT_FAIL,
     # strategy — same as ml-inference; partial-truth signals fire wrong orders.
     ("strategy-service", "per_archetype_signal"): ServiceEmissionPolicy.STRICT_FAIL,
     # execution — orders + fill confirmations are no-partial-truth zones.
