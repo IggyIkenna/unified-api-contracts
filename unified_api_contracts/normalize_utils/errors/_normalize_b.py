@@ -24,24 +24,6 @@ from unified_api_contracts.normalize_utils.errors._utils import (
     from_http_status,
 )
 
-
-def normalize_prime_broker_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "prime_broker",
-) -> CanonicalError:
-    """Map a prime broker HTTP status to a CanonicalError subclass.
-
-    Prime brokers typically use standard HTTP semantics.
-    """
-    code = str(error_code)
-    try:
-        status = int(code)
-        return from_http_status(status, message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
 # ---------------------------------------------------------------------------
 # Nautilus Trader
 # ---------------------------------------------------------------------------
@@ -241,24 +223,6 @@ def normalize_github_error(
 
 
 # ---------------------------------------------------------------------------
-# Glassnode
-# ---------------------------------------------------------------------------
-
-
-def normalize_glassnode_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "glassnode",
-) -> CanonicalError:
-    """Map a Glassnode HTTP error code to a CanonicalError subclass."""
-    code = str(error_code)
-    try:
-        return from_http_status(int(code), message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
 # Metabet
 # ---------------------------------------------------------------------------
 
@@ -324,28 +288,6 @@ def normalize_open_meteo_error(
 ) -> CanonicalError:
     """Map an Open-Meteo API error to a CanonicalError subclass."""
     code = str(error_code)
-    try:
-        return from_http_status(int(code), message, venue)
-    except ValueError:
-        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
-
-
-# ---------------------------------------------------------------------------
-# Regulatory (trade reporting)
-# ---------------------------------------------------------------------------
-
-
-def normalize_regulatory_error(
-    error_code: str | int,
-    message: str = "",
-    venue: str = "regulatory",
-) -> CanonicalError:
-    """Map a trade-reporting / regulatory API error to a CanonicalError subclass."""
-    code = str(error_code)
-    if code.startswith("VALIDATION"):
-        return CanonicalInvalidRequestError(message=message, venue=venue)
-    if code.startswith("AUTH"):
-        return CanonicalAuthorizationError(message=message, venue=venue)
     try:
         return from_http_status(int(code), message, venue)
     except ValueError:

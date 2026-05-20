@@ -46,10 +46,6 @@ VENUE_RATE_LIMITS: dict[str, VenueRateLimitSpec] = {
         venue="databento",
         notes="No req/s limit but daily quota",
     ),
-    "glassnode": VenueRateLimitSpec(
-        venue="glassnode",
-        notes="Tier-dependent",
-    ),
     "github": VenueRateLimitSpec(
         venue="github",
         requests_per_minute=5000,

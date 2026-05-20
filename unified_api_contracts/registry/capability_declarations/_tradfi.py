@@ -253,28 +253,6 @@ _OFR = SourceCapability(
     kind=None,
 )
 
-_REGULATORY = SourceCapability(
-    source="regulatory",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=False,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["trade_reports"],
-        "reference": ["regulatory_filings", "compliance_data"],
-    },
-    base_urls={},
-    operation_details={},
-    chain=None,
-    kind=None,
-)
-
-
 # ---------------------------------------------------------------------------
 # Ordered list -- TradFi
 # ---------------------------------------------------------------------------
@@ -289,5 +267,4 @@ TRADFI_CAPABILITIES: list[SourceCapability] = [
     _ECB,
     _OPENBB,
     _OFR,
-    _REGULATORY,
 ]

@@ -225,25 +225,6 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=False,
         cassette_status=CassetteStatus.RECORDED,
     ),
-    # --- Glassnode ---
-    EndpointSpec(
-        venue="glassnode",
-        endpoint_path="https://api.glassnode.com/v1/metrics/{category}/{metric}",
-        http_method="GET",
-        schema_class="GlassnodeMetricResponse",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.BOTH,
-        version="v1",
-        is_paginated=False,
-        max_lookback_days=365,
-        notes=(
-            "Auth via ?api_key=KEY query param. Free tier limited to daily (24h) resolution and "
-            "1-year history. Paid tier: 10-minute resolution, full history. "
-            "Response always: list[{t: int, v: float|dict}]. Secret Manager key: glassnode-api-key."
-        ),
-        requires_auth=True,
-        cassette_status=CassetteStatus.AUTH_BLOCKED,
-    ),
     # --- alternative.me Fear & Greed ---
     EndpointSpec(
         venue="fear_greed",
@@ -775,21 +756,5 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         notes="Free, no auth. Historical weather (dates older than ~3 months).",
         requires_auth=False,
         cassette_status=CassetteStatus.PENDING,
-    ),
-    # --- CoinGecko ---
-    EndpointSpec(
-        venue="coingecko",
-        endpoint_path="https://api.coingecko.com/api/v3/coins/markets",
-        http_method="GET",
-        schema_class="CoinGeckoMarket",
-        access_mode=AccessMode.REST_POLLING,
-        data_availability=DataAvailability.BOTH,
-        version="v3",
-        notes=(
-            "Free tier: no auth, 30 calls/min. Pro: x-cg-pro-api-key header. "
-            "Secret Manager key: coingecko-api-key (optional for free tier)."
-        ),
-        requires_auth=False,
-        cassette_status=CassetteStatus.RECORDED,
     ),
 ]

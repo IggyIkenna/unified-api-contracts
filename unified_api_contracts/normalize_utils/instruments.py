@@ -16,10 +16,6 @@ from ..external.aster.normalize import (
 from ..external.binance.normalize import normalize_binance_symbol
 from ..external.bybit.normalize import normalize_bybit_market
 from ..external.ccxt.normalize import normalize_ccxt_market
-from ..external.coingecko.normalize import (
-    normalize_coingecko_global_market,
-    normalize_coingecko_global_market_response,
-)
 from ..external.databento.normalize import (
     normalize_databento_definition,
     normalize_databento_symbol,
@@ -76,8 +72,6 @@ __all__ = [
     "normalize_binance_symbol",
     "normalize_bybit_market",
     "normalize_ccxt_market",
-    "normalize_coingecko_global_market",
-    "normalize_coingecko_global_market_response",
     "normalize_databento_definition",
     "normalize_databento_symbol",
     "normalize_deribit_instrument",

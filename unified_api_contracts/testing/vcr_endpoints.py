@@ -431,17 +431,6 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     # ------------------------------------------------------------------
     # On-chain / DeFi analytics
     # ------------------------------------------------------------------
-    "glassnode": [
-        _get(
-            "https://api.glassnode.com/v1/metrics/market/price_usd_close?a=BTC&i=24h&f=JSON",
-            "price_usd_close.yaml",
-            "0",
-            "GlassnodeTimeseriesPoint",
-            key_env="GLASSNODE_API_KEY",
-            header_name="X-Api-Key",
-            schema_version="1.0",
-        ),
-    ],
     "fear_greed": [
         _get(
             "https://api.alternative.me/fng/?limit=1&format=json",
@@ -597,8 +586,6 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     "tardis:exchanges": "TardisExchange",
     "tardis:instruments": "TardisInstrument",
     # On-chain analytics
-    "glassnode:timeseries": "GlassnodeTimeseriesPoint",
-    "glassnode:metric": "GlassnodeMetricResponse",
     "fear_greed:fng": "FearGreedReading",
     "defillama:protocol": "DefiLlamaProtocol",
     "defillama_tvl:tvl": "DefiLlamaTvlValue",

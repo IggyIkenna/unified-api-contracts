@@ -26,7 +26,6 @@ from ..external.aster.normalize import normalize_aster_liquidation
 from ..external.binance.normalize import normalize_binance_liquidation
 from ..external.bybit.normalize import normalize_bybit_liquidation
 from ..external.ccxt.normalize import normalize_ccxt_liquidation
-from ..external.coinglass.normalize import normalize_coinglass_liquidation
 from ..external.deribit.normalize import normalize_deribit_liquidation
 from ..external.hyperliquid.normalize import normalize_hyperliquid_liquidation
 from ..external.okx.normalize import normalize_okx_liquidation
@@ -37,7 +36,6 @@ __all__ = [
     "normalize_binance_liquidation",
     "normalize_bybit_liquidation",
     "normalize_ccxt_liquidation",
-    "normalize_coinglass_liquidation",
     "normalize_deribit_liquidation",
     "normalize_hyperliquid_liquidation",
     "normalize_okx_liquidation",

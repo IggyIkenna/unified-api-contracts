@@ -130,7 +130,7 @@ class LiquidationClusterFeature1m(BaseModel):
         default=None, description="Number of price levels where a wall and cluster co-occur"
     )
 
-    source: str = Field(description="Data provider: coinglass | hyblock")
+    source: str = Field(description="Data provider")
     schema_version: str = "1.0.0"
 
 

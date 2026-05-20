@@ -265,14 +265,6 @@ class TestErrorNormalizersExchanges:
 class TestErrorNormalizersProviders:
     """Smoke test normalize_<venue>_error functions for prime broker and data providers."""
 
-    def test_prime_broker_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_prime_broker_error,
-        )
-
-        assert isinstance(normalize_prime_broker_error(400), CanonicalInvalidRequestError)
-        assert isinstance(normalize_prime_broker_error("NOCODE"), CanonicalError)
-
     def test_nautilus_known(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_nautilus_error,
@@ -344,14 +336,6 @@ class TestErrorNormalizersProviders:
         assert isinstance(normalize_github_error(429), CanonicalRateLimitError)
         assert isinstance(normalize_github_error("NOCODE"), CanonicalError)
 
-    def test_glassnode_http_fallback(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_glassnode_error,
-        )
-
-        assert isinstance(normalize_glassnode_error(401), CanonicalAuthenticationError)
-        assert isinstance(normalize_glassnode_error("NOCODE"), CanonicalError)
-
     def test_metabet_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (
             normalize_metabet_error,
@@ -383,16 +367,6 @@ class TestErrorNormalizersProviders:
 
         assert isinstance(normalize_open_meteo_error(500), CanonicalInternalServerError)
         assert isinstance(normalize_open_meteo_error("NOCODE"), CanonicalError)
-
-    def test_regulatory_prefix_dispatch(self):
-        from unified_api_contracts.normalize_utils.errors import (
-            normalize_regulatory_error,
-        )
-
-        assert isinstance(normalize_regulatory_error("VALIDATION_FAILED"), CanonicalInvalidRequestError)
-        assert isinstance(normalize_regulatory_error("AUTH_MISSING"), CanonicalAuthorizationError)
-        assert isinstance(normalize_regulatory_error(429), CanonicalRateLimitError)
-        assert isinstance(normalize_regulatory_error("NOCODE"), CanonicalError)
 
     def test_sharpapi_http_fallback(self):
         from unified_api_contracts.normalize_utils.errors import (

@@ -245,23 +245,6 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         expected_cadence_seconds=5,
         criticality="important",
     ),
-    # Onchain analytics providers (hourly cadence)
-    "glassnode": DataFreshnessContract(
-        source="glassnode",
-        asset_class="onchain",
-        max_age_seconds=3600,
-        warn_age_seconds=1800,
-        expected_cadence_seconds=3600,
-        criticality="important",
-    ),
-    "coinglass": DataFreshnessContract(
-        source="coinglass",
-        asset_class="onchain",
-        max_age_seconds=3600,
-        warn_age_seconds=1800,
-        expected_cadence_seconds=3600,
-        criticality="important",
-    ),
 }
 
 # ---------------------------------------------------------------------------

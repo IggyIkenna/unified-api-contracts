@@ -459,10 +459,8 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "barchart": None,
     "ccxt": None,
     "ibkr": "ibkr-account-credentials",
-    "glassnode": None,
     "defillama": None,
     "betfair": "betfair-api-key",
-    "coingecko": None,
     "rpc": None,
     "balancer_api_v3": None,
     "api_football": "api-football-api-key",
@@ -476,7 +474,6 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "pinnacle": None,
     "polygon": "polygon-api-key",
     "polymarket": "polymarket-api-key",
-    "cryptoquant": "cryptoquant-api-key",
     "fred": "fred-api-key",
 }
 

@@ -76,51 +76,6 @@ INTERNAL_CONTRACTS: dict[str, ContractEntry] = {
             "3": "FixReject",
         },
     },
-    "prime_broker": {
-        "module": "unified_api_contracts.canonical.domain.execution.prime_broker",
-        "description": (
-            "Prime broker integration schemas — HiddenRoad / Talos / FalconX style. "
-            "Covers credit accounts, cross-venue position netting, margin calls, "
-            "net clearing instructions, and cleared fills."
-        ),
-        "is_internal": False,
-        "has_rest": True,
-        "has_websocket": False,
-        "has_fix": False,
-        "has_vcr_cassettes": False,
-        "cassette_schema_version": "1.0",
-        "supported_providers": ["hidden_road", "talos", "falconx", "genesis", "cumberland"],
-        "response_schema_classes": [
-            "PrimeBrokerAccount",
-            "PrimeBrokerPosition",
-            "PrimeBrokerMarginCall",
-            "NetClearingInstruction",
-            "CrossMarginNettingResult",
-            "PrimeBrokerFill",
-            "CollateralAsset",
-        ],
-        "error_schema_classes": ["PrimeBrokerError"],
-    },
-    "regulatory": {
-        "module": "unified_api_contracts.external.regulatory.schemas",
-        "description": (
-            "Regulatory reporting schemas: MiFID II (RTS 22/27/28), EMIR, Dodd-Frank, "
-            "trade surveillance, and best execution monitoring."
-        ),
-        "is_internal": True,
-        "has_vcr_cassettes": False,
-        "cassette_schema_version": "1.0",
-        "regimes": ["mifid_ii", "emir", "dodd_frank", "mas", "asic", "cftc", "sec"],
-        "response_schema_classes": [
-            "MifidIITradeReport",
-            "BestExecutionRecord",
-            "BestExecutionMonitoringRecord",
-            "EmirTradeReport",
-            "DoddFrankSwapReport",
-            "TradeSurveillanceAlert",
-        ],
-        "error_schema_classes": ["TradeReportingError"],
-    },
     "latency": {
         "module": "unified_api_contracts.canonical.crosscutting.latency",
         "description": (
