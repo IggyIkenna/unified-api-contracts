@@ -959,6 +959,8 @@ __all__ = [
     "BREAKER_RECOVERY_DEFAULTS",
     "BUNDESLIGA_TEAM_ALIASES",
     "BUNDLED_DATA_TYPES",
+    "CaptureStatusCounts",
+    "compute_honest_coverage",
     "CANONICAL_TO_ODDS_API_BUNDESLIGA",
     "CANONICAL_TO_ODDS_API_EPL",
     "CANONICAL_TO_UNDERSTAT_EPL",
