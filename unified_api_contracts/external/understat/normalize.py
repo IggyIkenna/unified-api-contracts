@@ -263,13 +263,13 @@ def normalize_understat_shot(
     raw: UnderstatShot | UnderstatShotSource,
     venue: str = "understat",
 ) -> dict[str, object]:
-    """Convert UnderstatShot/UnderstatShotSource to flat dict with all shot fields.
+    """Convert UnderstatShot/UnderstatShotSource to a flat dict with all shot fields.
 
-    Captures full per-shot context (18 fields) replacing the old
-    normalize_understat_feature_record which dropped ~14 fields per shot.
-    Fields: shot_id, match_id, fixture_id, player_id, player_name, minute,
+    Replaces the prior normalize_understat_feature_record which only captured
+    xg and dropped ~14 contextual fields per shot (C.7 Follow-up #2).
+    Columns: shot_id, match_id, fixture_id, player_id, player_name, minute,
     result, xg, x, y, situation, shot_type, home_or_away, last_action,
-    home_goals, away_goals, period, source.
+    home_goals, away_goals, source, period.
     """
     if isinstance(raw, UnderstatShotSource):
         return {
