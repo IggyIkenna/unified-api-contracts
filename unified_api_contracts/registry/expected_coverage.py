@@ -443,6 +443,49 @@ def _parse_iso_date(value: str | None) -> _date | None:
         return None
 
 
+def _is_deprecated_defi_venue(data_source: str) -> bool:
+    """True if the DeFi venue is in the workspace-canonical deprecated/empty set.
+
+    SSOT: ``capability_declarations._defi_coverage.EMPTY_OR_DEPRECATED_DEFI_VENUES``
+    (e.g. ``TRADER_JOEV2-AVALANCHE``, ``UNISWAPV3-POLYGON``, ``GMX-AVALANCHE``).
+    These venues either have empty/retired subgraphs or no historical parquets;
+    flagging them as ``EXPECTED_DEPRECATED_DATA_TYPE`` keeps the divergence
+    report honest.
+    """
+    from .capability_declarations import EMPTY_OR_DEPRECATED_DEFI_VENUES
+
+    return data_source in EMPTY_OR_DEPRECATED_DEFI_VENUES
+
+
+def _is_defi_not_yet_collected(data_source: str) -> bool:
+    """True if the DeFi venue has a subgraph but instruments-service hasn't
+    backfilled it yet.
+
+    SSOT: ``capability_declarations._defi_coverage.DEFI_INSTRUMENTS_NOT_YET_COLLECTED``
+    (e.g. ``VELODROMEV2-OPTIMISM``, ``SPARK-ETHEREUM``, ``SANCTUM-SOLANA``,
+    ``SOLBLAZE-SOLANA``). Until first parquet writes land, historical days for
+    these venues should NOT count as ``MISSING_EXPECTED``.
+    """
+    from .capability_declarations import DEFI_INSTRUMENTS_NOT_YET_COLLECTED
+
+    return data_source in DEFI_INSTRUMENTS_NOT_YET_COLLECTED
+
+
+def _is_sports_in_known_source_gap(data_source: str, data_type: str, target_date: _date) -> bool:
+    """True if (source, data_type, date) is inside a registered sports
+    known-gap window.
+
+    SSOT: ``unified_api_contracts.canonical.domain.sports.is_in_known_gap``
+    which reads ``KNOWN_COVERAGE_GAPS[(source, data_type)]``. Sister to the
+    pre-source-coverage-start gate but operates on per-source-published gaps
+    (e.g. API-Football historical-stats outage windows) rather than the source
+    archive's start date.
+    """
+    from unified_api_contracts.canonical.domain.sports import is_in_known_gap
+
+    return is_in_known_gap(data_source, data_type, target_date.isoformat())
+
+
 def _is_us_trading_day(target_date: _date) -> tuple[bool, str | None]:
     """Return (is_trading_day, reason_if_not).
 
@@ -539,14 +582,20 @@ def expected_coverage(
     Returns:
         :class:`ExpectedCoverageResult` with state + typed reason + diagnostic.
 
-    Known gaps (Phase A2 v1):
+    Known gaps (Phase A2 v2 — 2026-05-20 round 2 update):
+
     * Per-symbol granularity (``EXPECTED_INSTRUMENT_NOT_LISTED`` /
       ``EXPECTED_INSTRUMENT_DELISTED``) requires IS catalogue access; out of
-      scope here. Pair this oracle with IS at the call site.
-    * Sports off-season / no-fixture calendars not yet encoded in UAC; sports
-      cells default to ``SHOULD_HAVE_DATA`` once venue launch passes.
-    * DeFi protocol pause windows not yet encoded; cells default to
-      ``SHOULD_HAVE_DATA`` once chain genesis + venue launch pass.
+      scope here. Pair this oracle with IS at the call site (R9 in mega-audit
+      delegation SSOT).
+    * Sports league off-season (per-league fixture calendar) requires league_id
+      axis on the oracle signature; current gate only covers source-level
+      known-gap windows via `is_in_known_gap`. Per-league off-season check
+      lives in `unified_api_contracts.canonical.domain.sports.get_league_fixture_calendar`
+      and should be called by callers that know the league_id.
+    * DeFi protocol pause windows (time-windowed, e.g. Aave V2 deprecation)
+      not yet encoded. Venue-level deprecation IS handled via
+      `EMPTY_OR_DEPRECATED_DEFI_VENUES` (gate added 2026-05-20 round 2).
     """
     ag = asset_group.lower()
     ag_scope = EXPECTED_COVERAGE_BY_ASSET_GROUP.get(ag, {})
@@ -556,6 +605,26 @@ def expected_coverage(
             state=ExpectedState.NOT_IN_SCOPE,
             reason=None,
             diagnostic=f"({ag}, {data_source}, {data_type}) not in EXPECTED_COVERAGE_BY_ASSET_GROUP",
+        )
+
+    # DeFi venue-level deprecation (added 2026-05-20 round 2 — operator Q1 fix).
+    # Even when the venue is in scope policy, the workspace-canonical
+    # `EMPTY_OR_DEPRECATED_DEFI_VENUES` overrides — these venues have empty
+    # or retired subgraphs.
+    if ag == "defi" and _is_deprecated_defi_venue(data_source):
+        return ExpectedCoverageResult(
+            state=ExpectedState.EXPECTED_EMPTY,
+            reason="EXPECTED_DEPRECATED_DATA_TYPE",
+            diagnostic=f"DeFi venue {data_source} in EMPTY_OR_DEPRECATED_DEFI_VENUES — retired subgraph / no historical parquets",
+        )
+
+    # DeFi venues with subgraph but no instruments-service backfill yet
+    # (added 2026-05-20 round 2 — sister of EMPTY_OR_DEPRECATED check).
+    if ag == "defi" and _is_defi_not_yet_collected(data_source):
+        return ExpectedCoverageResult(
+            state=ExpectedState.EXPECTED_EMPTY,
+            reason="EXPECTED_INSTRUMENT_NOT_LISTED",
+            diagnostic=f"DeFi venue {data_source} in DEFI_INSTRUMENTS_NOT_YET_COLLECTED — instruments-service backfill pending",
         )
 
     launch = _venue_launch_date_for(ag, data_source)
@@ -577,6 +646,19 @@ def expected_coverage(
                     reason="EXPECTED_PRE_GENESIS_CHAIN",
                     diagnostic=f"chain {chain} genesis {genesis.isoformat()} > target {target_date.isoformat()}",
                 )
+
+    # Sports source-level known gaps (added 2026-05-20 round 2 — operator Q1 fix).
+    # Composes with sports.league_data.is_in_known_gap which reads the canonical
+    # KNOWN_COVERAGE_GAPS registry per (source, data_type).
+    if ag == "sports" and _is_sports_in_known_source_gap(data_source, data_type, target_date):
+        return ExpectedCoverageResult(
+            state=ExpectedState.EXPECTED_EMPTY,
+            reason="EXPECTED_KNOWN_SOURCE_GAP",
+            diagnostic=(
+                f"sports source {data_source} data_type {data_type} in known-gap window "
+                f"covering {target_date.isoformat()} (see sports.league_data.KNOWN_COVERAGE_GAPS)"
+            ),
+        )
 
     # Phase 4 helper: per-data_type source coverage start.
     if is_before_source_coverage_start(data_source, data_type, target_date):
