@@ -10,6 +10,14 @@ from .bar_boundary import BarBoundaryViolationError as BarBoundaryViolationError
 from .bar_boundary import BarTimeframe as BarTimeframe
 from .bar_boundary import assert_bar_boundary_contract as assert_bar_boundary_contract
 from .bar_boundary import bar_window_for_close as bar_window_for_close
+from .client_lifecycle_events import ClientLifecycleEvent as ClientLifecycleEvent
+from .client_lifecycle_events import ClientLifecycleKind as ClientLifecycleKind
+from .client_lifecycle_events import ClientQuarantinedEvent as ClientQuarantinedEvent
+from .client_lifecycle_events import ClientReadyEvent as ClientReadyEvent
+from .client_lifecycle_events import QuarantineReason as QuarantineReason
+from .client_lifecycle_events import ShardCapacityEvent as ShardCapacityEvent
+from .client_lifecycle_events import ShardRecommendedAction as ShardRecommendedAction
+from .client_lifecycle_events import VenueAuthStatus as VenueAuthStatus
 from .cloud_target import CloudTarget as CloudTarget
 from .defi import CHAIN_BRIDGE_GRAPH as CHAIN_BRIDGE_GRAPH
 from .defi import ChainKind as ChainKind
@@ -68,3 +76,7 @@ from .source_priority import get_primary_source_with_latency as get_primary_sour
 from .source_priority import get_source_priority as get_source_priority
 from .source_priority import has_source_priority as has_source_priority
 from .source_priority import read_with_source_priority as read_with_source_priority
+from .transfer_events import BusTransferType as BusTransferType
+from .transfer_events import TransferIntent as TransferIntent
+from .transfer_events import TransferResult as TransferResult
+from .transfer_events import TransferResultStatus as TransferResultStatus

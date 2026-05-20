@@ -167,6 +167,13 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ``predictions_canonical_question_group_polymarket_migration_2026_05_06.md``
     # Phase 1A.
     ("prediction", "MARKET_LIFECYCLE"): "market_created_at",
+    # EIA commodity storage/series — weekly publication; available_at = fetch
+    # completion time (row written after the weekly report is fetched and parsed).
+    # features-commodity-service D5 Phase 1.
+    ("tradfi", "energy_data"): "fetch_completed_at",
+    # cross_instrument — features-service derived enrichment; written inline
+    # at calculation time; available_at = write-time. D5 Phase 2.
+    ("cefi", "cross_instrument"): "fetch_completed_at",
     # ---- Reference data (asset-group-agnostic) --------------------------
     ("reference", "instruments"): "fetch_completed_at",
     ("reference", "venue_trading_calendar"): "fetch_completed_at",

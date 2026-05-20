@@ -57,6 +57,16 @@ from .canonical.crosscutting.circuit_breaker import (
     CircuitBreakerId,
     breaker_fired_event,
 )
+from .canonical.crosscutting.client_lifecycle_events import (
+    ClientLifecycleEvent,
+    ClientLifecycleKind,
+    ClientQuarantinedEvent,
+    ClientReadyEvent,
+    QuarantineReason,
+    ShardCapacityEvent,
+    ShardRecommendedAction,
+    VenueAuthStatus,
+)
 from .canonical.crosscutting.defi import ChainKind
 from .canonical.crosscutting.errors import (
     DATABENTO_ERROR_MAP,
@@ -178,6 +188,12 @@ from .canonical.crosscutting.synthetic_generator import (
     generators_for_archetype,
     get_generator_spec,
     register_generator,
+)
+from .canonical.crosscutting.transfer_events import (
+    BusTransferType,
+    TransferIntent,
+    TransferResult,
+    TransferResultStatus,
 )
 from .canonical.domain import (
     BOOKMAKER_REGISTRY,
@@ -653,8 +669,6 @@ from .external.upbit.schemas import (
     UpbitTicker,
 )
 from .internal.domain.client_reporting import FundNAVSnapshot
-from .internal.strategy_directives import ArchetypeAllocationDirective
-from .internal.strategy_pnl_stream import StrategyPnlStreamEvent
 from .internal.domain.fund_administration import (
     AllocationExecutionStatus,
     AllocatorCashAccountView,
@@ -731,6 +745,8 @@ from .internal.schemas.contracts import (
     validate_dataframe,
     validate_row_df,
 )
+from .internal.strategy_directives import ArchetypeAllocationDirective
+from .internal.strategy_pnl_stream import StrategyPnlStreamEvent
 from .normalize_utils import american_to_decimal, decimal_to_american
 from .registry import (
     ALL_VENUES,
@@ -1131,6 +1147,7 @@ __all__ = [
     "BreakerScope",
     "BreakerTrigger",
     "BucketMarket",
+    "BusTransferType",
     "BybitInstrumentInfo",
     "BybitInstrumentsResponse",
     "BybitLiquidationOrder",
@@ -1226,6 +1243,10 @@ __all__ = [
     "CcxtTrade",
     "ChainKind",
     "CircuitBreakerId",
+    "ClientLifecycleEvent",
+    "ClientLifecycleKind",
+    "ClientQuarantinedEvent",
+    "ClientReadyEvent",
     "CloudProvider",
     "CloudTarget",
     "CoinbaseOrderBook",
@@ -1452,6 +1473,7 @@ __all__ = [
     "ProcessedOddsOutput",
     "ProtocolHealthBreakdown",
     "ProviderDataAvailability",
+    "QuarantineReason",
     "RateLimitConfig",
     "RateLimitInfo",
     "RateLimitResponse",
@@ -1488,6 +1510,8 @@ __all__ = [
     "SessionPhase",
     "SettlementEvent",
     "ShareClass",
+    "ShardCapacityEvent",
+    "ShardRecommendedAction",
     "SignalAcknowledgement",
     "SignalEmission",
     "SignalPayload",
@@ -1524,6 +1548,9 @@ __all__ = [
     "TardisInstrumentDetail",
     "TeamMapping",
     "ThresholdUnit",
+    "TransferIntent",
+    "TransferResult",
+    "TransferResultStatus",
     "TimeInForce",
     "UnderlyingGreeksBreakdown",
     "UniswapV3PoolStateResponse",
@@ -1536,6 +1563,7 @@ __all__ = [
     "UpbitTicker",
     "UpbitWithdrawRequest",
     "UpbitWithdrawResponse",
+    "VenueAuthStatus",
     "VenueCategory",
     "VenueCoordinates",
     "VenueErrorClassification",
