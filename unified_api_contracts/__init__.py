@@ -459,12 +459,15 @@ from .registry.scenario_archetype_matrix import (
 # import — see ``canonical.crosscutting.alerting`` comment block above.
 from .canonical.crosscutting.honest_coverage import (
     BUNDLED_DATA_TYPES,
+    CaptureStatusCounts,
     DATA_TYPE_TO_CLUSTER_REGISTRY,
     EMPTY_CONFIRMED_REASONS,
     EVENT_CONTRACT_ROOT_CLUSTERS,
     EXPECTED_EMPTY_REASON_PREFIX,
     EmptyConfirmedReason,
+    HONEST_COVERAGE_GAP_FIELDS,
     LegacyBlankErrorReasonError,
+    compute_honest_coverage,
 )
 from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
