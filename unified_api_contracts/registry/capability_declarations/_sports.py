@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
@@ -41,6 +43,8 @@ _BETFAIR = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="sports_book",
 )
 
 _PINNACLE = SourceCapability(
@@ -66,6 +70,8 @@ _PINNACLE = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="sports_book",
 )
 
 _KALSHI = SourceCapability(
@@ -108,6 +114,9 @@ _KALSHI = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
+    coverage_start={"candles": date(2021, 7, 30)},
 )
 
 _POLYMARKET = SourceCapability(
@@ -149,6 +158,9 @@ _POLYMARKET = SourceCapability(
             }
         ),
     },
+    chain="polygon",
+    kind="prediction_dex",
+    coverage_start={"candles": date(2020, 9, 1)},
 )
 
 _ODDS_API = SourceCapability(
@@ -168,6 +180,8 @@ _ODDS_API = SourceCapability(
     },
     base_urls={"mainnet": "https://api.the-odds-api.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _ODDS_ENGINE = SourceCapability(
@@ -187,6 +201,8 @@ _ODDS_ENGINE = SourceCapability(
     },
     base_urls={"mainnet": "https://api.oddsengine.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _OPTICODDS = SourceCapability(
@@ -206,6 +222,8 @@ _OPTICODDS = SourceCapability(
     },
     base_urls={"mainnet": "https://api.opticodds.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _MATCHBOOK = SourceCapability(
@@ -232,6 +250,8 @@ _MATCHBOOK = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="sports_book",
 )
 
 _MANIFOLD = SourceCapability(
@@ -258,6 +278,8 @@ _MANIFOLD = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _ONEXBET = SourceCapability(
@@ -277,6 +299,8 @@ _ONEXBET = SourceCapability(
     },
     base_urls={"mainnet": "https://1xbet.com/api"},
     operation_details={},
+    chain=None,
+    kind="sports_book",
 )
 
 _METABET = SourceCapability(
@@ -296,6 +320,8 @@ _METABET = SourceCapability(
     },
     base_urls={"mainnet": "https://api.metabet.io"},
     operation_details={},
+    chain=None,
+    kind="sports_book",
 )
 
 # ---------------------------------------------------------------------------
@@ -319,6 +345,8 @@ _API_FOOTBALL = SourceCapability(
     },
     base_urls={"mainnet": "https://v3.football.api-sports.io"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _FOOTYSTATS = SourceCapability(
@@ -338,6 +366,8 @@ _FOOTYSTATS = SourceCapability(
     },
     base_urls={"mainnet": "https://api.football-data-api.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _SOCCER_FOOTBALL_INFO = SourceCapability(
@@ -356,6 +386,8 @@ _SOCCER_FOOTBALL_INFO = SourceCapability(
     },
     base_urls={"mainnet": "https://api.soccer-football.info"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _TRANSFERMARKT = SourceCapability(
@@ -374,6 +406,8 @@ _TRANSFERMARKT = SourceCapability(
     },
     base_urls={"mainnet": "https://www.transfermarkt.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _UNDERSTAT = SourceCapability(
@@ -392,6 +426,8 @@ _UNDERSTAT = SourceCapability(
     },
     base_urls={"mainnet": "https://understat.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _SHARPAPI = SourceCapability(
@@ -411,6 +447,8 @@ _SHARPAPI = SourceCapability(
     },
     base_urls={"mainnet": "https://api.sharpapi.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 

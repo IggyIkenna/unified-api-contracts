@@ -7,6 +7,8 @@ DEFI_CAPABILITIES list. Re-exported by _defi.py.
 
 from __future__ import annotations
 
+from datetime import date
+
 from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
@@ -53,6 +55,9 @@ _UNISWAP = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind="amm_dex",
+    coverage_start={"candles": date(2020, 5, 5)},
 )
 
 _AAVE = SourceCapability(
@@ -141,6 +146,9 @@ _AAVE = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind="lending_protocol",
+    coverage_start={"rates": date(2022, 3, 16)},
 )
 
 _CURVE = SourceCapability(
@@ -177,6 +185,9 @@ _CURVE = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind="amm_dex",
+    coverage_start={"candles": date(2020, 1, 19)},
 )
 
 _DYDX = SourceCapability(
@@ -222,6 +233,8 @@ _DYDX = SourceCapability(
             }
         ),
     },
+    chain="dydx-chain",
+    kind="perp_dex",
 )
 
 _INSTADAPP = SourceCapability(
@@ -251,6 +264,8 @@ _INSTADAPP = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind="vault_protocol",
 )
 
 # ---------------------------------------------------------------------------
@@ -280,6 +295,8 @@ _MEV = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind=None,
 )
 
 _VERSIFI = SourceCapability(
@@ -309,6 +326,8 @@ _VERSIFI = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind="spot_dex",
 )
 
 

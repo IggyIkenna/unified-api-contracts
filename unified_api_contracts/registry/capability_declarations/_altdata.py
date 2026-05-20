@@ -53,6 +53,8 @@ _ALCHEMY = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind=None,
 )
 
 _THEGRAPH = SourceCapability(
@@ -78,6 +80,8 @@ _THEGRAPH = SourceCapability(
             }
         ),
     },
+    chain="ethereum",
+    kind=None,
 )
 
 _COINGECKO = SourceCapability(
@@ -103,6 +107,8 @@ _COINGECKO = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _COINGLASS = SourceCapability(
@@ -128,6 +134,8 @@ _COINGLASS = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _GLASSNODE = SourceCapability(
@@ -153,6 +161,8 @@ _GLASSNODE = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _CRYPTOQUANT = SourceCapability(
@@ -178,6 +188,8 @@ _CRYPTOQUANT = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _HYBLOCK = SourceCapability(
@@ -203,6 +215,8 @@ _HYBLOCK = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _DEFILLAMA = SourceCapability(
@@ -233,6 +247,8 @@ _DEFILLAMA = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 # ---------------------------------------------------------------------------
@@ -256,6 +272,8 @@ _BAKER_HUGHES = SourceCapability(
     },
     base_urls={"mainnet": "https://rigcount.bakerhughes.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _CFTC = SourceCapability(
@@ -275,6 +293,8 @@ _CFTC = SourceCapability(
     },
     base_urls={"mainnet": "https://publicreporting.cftc.gov"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _EIA = SourceCapability(
@@ -300,6 +320,8 @@ _EIA = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _FEAR_GREED = SourceCapability(
@@ -319,6 +341,8 @@ _FEAR_GREED = SourceCapability(
     },
     base_urls={"mainnet": "https://api.alternative.me"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _OPEN_METEO = SourceCapability(
@@ -337,6 +361,8 @@ _OPEN_METEO = SourceCapability(
     },
     base_urls={"mainnet": "https://api.open-meteo.com"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 # ---------------------------------------------------------------------------
@@ -359,6 +385,8 @@ _AWS = SourceCapability(
     },
     base_urls={},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _GCP = SourceCapability(
@@ -377,6 +405,8 @@ _GCP = SourceCapability(
     },
     base_urls={},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _GITHUB = SourceCapability(
@@ -401,6 +431,8 @@ _GITHUB = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 

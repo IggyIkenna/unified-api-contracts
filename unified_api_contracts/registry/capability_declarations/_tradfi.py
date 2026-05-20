@@ -52,6 +52,8 @@ _IBKR = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _DATABENTO = SourceCapability(
@@ -77,6 +79,8 @@ _DATABENTO = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _FRED = SourceCapability(
@@ -101,6 +105,8 @@ _FRED = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _POLYGON = SourceCapability(
@@ -126,6 +132,8 @@ _POLYGON = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _BARCHART = SourceCapability(
@@ -151,6 +159,8 @@ _BARCHART = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _YAHOO_FINANCE = SourceCapability(
@@ -176,6 +186,8 @@ _YAHOO_FINANCE = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _ECB = SourceCapability(
@@ -195,6 +207,8 @@ _ECB = SourceCapability(
     },
     base_urls={"mainnet": "https://data-api.ecb.europa.eu"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _OPENBB = SourceCapability(
@@ -214,6 +228,8 @@ _OPENBB = SourceCapability(
     },
     base_urls={},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _OFR = SourceCapability(
@@ -233,6 +249,8 @@ _OFR = SourceCapability(
     },
     base_urls={"mainnet": "https://data.financialresearch.gov"},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _REGULATORY = SourceCapability(
@@ -252,6 +270,8 @@ _REGULATORY = SourceCapability(
     },
     base_urls={},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import date
+
 from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
 # ---------------------------------------------------------------------------
@@ -57,6 +59,8 @@ _BINANCE = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
 )
 
 _BYBIT = SourceCapability(
@@ -100,6 +104,9 @@ _BYBIT = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
+    coverage_start={"candles": date(2018, 12, 1)},
 )
 
 _OKX = SourceCapability(
@@ -140,6 +147,8 @@ _OKX = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
 )
 
 _COINBASE = SourceCapability(
@@ -171,6 +180,8 @@ _COINBASE = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="spot_cex",
 )
 
 _DERIBIT = SourceCapability(
@@ -216,6 +227,8 @@ _DERIBIT = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="options_cex",
 )
 
 # OPTIONS: not supported — venue does not offer listed options contracts
@@ -397,6 +410,9 @@ _HYPERLIQUID = SourceCapability(
             }
         ),
     },
+    chain="hyperevm",
+    kind="perp_dex",
+    coverage_start={"candles": date(2023, 6, 14)},
 )
 
 
@@ -432,6 +448,9 @@ _BITGET = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
+    coverage_start={"candles": date(2019, 4, 1)},
 )
 
 _BITSTAMP = SourceCapability(
@@ -459,6 +478,8 @@ _BITSTAMP = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="spot_cex",
 )
 
 _HUOBI = SourceCapability(
@@ -486,6 +507,8 @@ _HUOBI = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
 )
 
 _KUCOIN = SourceCapability(
@@ -516,6 +539,8 @@ _KUCOIN = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="spot_cex",
 )
 
 _MEXC = SourceCapability(
@@ -543,6 +568,8 @@ _MEXC = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="spot_cex",
 )
 
 _UPBIT = SourceCapability(
@@ -579,6 +606,8 @@ _UPBIT = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="spot_cex",
 )
 
 # ---------------------------------------------------------------------------
@@ -611,6 +640,8 @@ _CCXT = SourceCapability(
     },
     base_urls={},
     operation_details={},
+    chain=None,
+    kind=None,
 )
 
 _TARDIS = SourceCapability(
@@ -636,6 +667,8 @@ _TARDIS = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 # OPTIONS: not supported — venue does not offer listed options contracts
@@ -791,6 +824,10 @@ _EXTENDED = SourceCapability(
             }
         ),
     },
+    chain="starknet",
+    kind="perp_dex",
+    mandatory_user_agent="odum-group-unified-trading/extended-mtds",
+    coverage_start={"candles": date(2024, 7, 26), "funding_rates": date(2025, 7, 18)},
 )
 
 
@@ -836,6 +873,9 @@ _ASTER = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
+    coverage_start={"candles": date(2024, 9, 25)},
 )
 
 # ---------------------------------------------------------------------------
@@ -869,6 +909,8 @@ _FIX = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 _NAUTILUS = SourceCapability(
@@ -898,6 +940,8 @@ _NAUTILUS = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind=None,
 )
 
 
@@ -955,6 +999,8 @@ _KRAKEN = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="spot_cex",
 )
 
 # Kraken Futures (via cryptofacilities CCXT id / Kraken Futures REST API)
@@ -997,6 +1043,9 @@ _KRAKEN_FUTURES = SourceCapability(
             }
         ),
     },
+    chain=None,
+    kind="perp_cex",
+    coverage_start={"candles": date(2019, 9, 1)},
 )
 
 
