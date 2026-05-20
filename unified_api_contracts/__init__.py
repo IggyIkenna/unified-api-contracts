@@ -195,6 +195,10 @@ from .canonical.crosscutting.transfer_events import (
     TransferResult,
     TransferResultStatus,
 )
+from .canonical.crosscutting.venue_thresholds import (
+    VENUE_HEARTBEAT_THRESHOLDS,
+    get_heartbeat_threshold,
+)
 from .canonical.domain import (
     BOOKMAKER_REGISTRY,
     ODDS_API_KEY_TO_VENUE,
@@ -1076,6 +1080,7 @@ __all__ = [
     "VENUE_DATA_AVAILABILITY",
     "VENUE_ERROR_MAP",
     "VENUE_EXECUTION_REGISTRY",
+    "VENUE_HEARTBEAT_THRESHOLDS",
     "VENUE_TO_ASSET_GROUP",
     "VENUE_TO_DATA_SOURCE",
     "VENUE_TO_DATA_SOURCES",
@@ -1617,6 +1622,7 @@ __all__ = [
     "get_expected_instruments_for_venue",
     "get_expected_leagues_for_source",
     "get_generator_spec",
+    "get_heartbeat_threshold",
     "get_prediction_leagues",
     "get_primary_source",
     "get_primary_source_with_latency",
