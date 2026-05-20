@@ -1,6 +1,6 @@
 """Unit tests for client lifecycle contracts."""
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 
 import pytest
@@ -74,7 +74,7 @@ class TestClientKYCStub:
 
     def test_kyc_stub_with_submission(self) -> None:
         """Create KYC stub with submission + approval."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         later = now + timedelta(hours=1)
         stub = ClientKYCStub(
             client_name="Test Fund",
@@ -128,7 +128,7 @@ class TestClientApiKeyMaterial:
 
     def test_api_key_with_expiry(self) -> None:
         """Create API key with expiry date."""
-        created = datetime.now(timezone.utc)
+        created = datetime.now(UTC)
         expires = created + timedelta(days=365)
         key = ClientApiKeyMaterial(
             api_key_id="key-annual",
@@ -262,7 +262,7 @@ class TestClientShareClassSubscription:
 
     def test_subscription_is_inactive_when_suspended(self) -> None:
         """Verify is_active() returns False when suspended."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         sub = ClientShareClassSubscription(
             client_id="client-suspended",
             share_class_id="USDC_V1",
