@@ -1,4 +1,29 @@
-"""Operator-expected coverage policy (SSOT).
+"""Operator-expected coverage policy + deterministic availability oracle (SSOT).
+
+This module holds two related-but-distinct contracts:
+
+1. **Scope policy** (`EXPECTED_COVERAGE_BY_ASSET_GROUP`, `is_expected`,
+   `get_expected_*`, `get_source_coverage_start_for_data_type`,
+   `is_before_source_coverage_start`): declares which
+   (asset_group, venue, data_type) tuples we *intend* to keep filled +
+   per-(venue, data_type) coverage-start lookups. Powers the four-state
+   data-status view in deployment-ui.
+
+2. **Availability oracle** (`expected_coverage`, `ExpectedCoverageResult`,
+   `ExpectedState`): deterministic per-(asset_group, source, data_type,
+   date) answer to "should this cell have data?". Composes the scope
+   policy with venue/chain launch dates, SourceCapability.coverage_start
+   per data_type, and trading-calendar gap data already encoded in UAC
+   (`venue_launch_dates`, `chain_env`, `venue_trading_calendar`,
+   `half_day_sessions`). Output mirrors the `EmptyConfirmedReason`
+   taxonomy so divergence between expected + actual manifest state can
+   be classified deterministically. Mega-audit Phase A2 deliverable
+   (`plans/active/issues/mega_audit_and_plan_beefup_progression_2026_05_20.md`).
+
+Both contracts live here per operator directive 2026-05-20 — single SSOT,
+single module to consult for "is this cell expected to have data".
+
+## Scope-policy section
 
 Phase 1 of the unified-data-status work — declares the subset of
 (asset_group, venue, data_type) tuples we *intend* to keep filled.
@@ -30,7 +55,9 @@ expanding it.
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from datetime import date as _date
+from enum import StrEnum
 
 from unified_api_contracts.registry.capability import (
     CapabilityResolutionError,
@@ -311,6 +338,9 @@ def is_before_source_coverage_start(venue: str, data_type: str, check_date: _dat
 
 __all__ = [
     "EXPECTED_COVERAGE_BY_ASSET_GROUP",
+    "ExpectedCoverageResult",
+    "ExpectedState",
+    "expected_coverage",
     "get_expected_data_types_for_venue_in_scope",
     "get_expected_pairs",
     "get_expected_venues_in_scope",
@@ -318,3 +348,266 @@ __all__ = [
     "is_before_source_coverage_start",
     "is_expected",
 ]
+
+
+# ────────────────────────────────────────────────────────────────────────────
+# Availability oracle — `expected_coverage()` and supporting types.
+#
+# Mega-audit Phase A2 deliverable (2026-05-20).
+#
+# Given (asset_group, source, data_type, date), returns a deterministic answer
+# to "should this cell have data?". Consumed by:
+#
+#   1. Manifest divergence reporting (Phase A3) — classify
+#      ``actual=empty_confirmed`` rows: if oracle says ``SHOULD_HAVE_DATA`` it
+#      is a ``DIVERGENT_EMPTY`` (likely adapter bug); if oracle says
+#      ``EXPECTED_EMPTY:<reason>`` it is an honest empty.
+#   2. Pre-flight gates in MTDS/features-service handlers — skip-with-typed-
+#      reason rather than record_empty(reason="") at write-time.
+#   3. Coverage denominator in deployment-ui — combine with scope policy
+#      (this same module's ``is_expected``) to render the four-state view.
+#
+# Data inputs (all already in UAC — no new SSOT):
+#   - scope policy (this module's ``EXPECTED_COVERAGE_BY_ASSET_GROUP``)
+#   - SourceCapability.coverage_start via ``is_before_source_coverage_start``
+#     (Phase 4 of `uac_source_capability_metadata_promotion_2026_05_20.md`)
+#   - venue launch dates (`venue_launch_dates`)
+#   - DeFi chain genesis dates (`chain_env.CHAIN_GENESIS_DATES`)
+#   - US trading calendar (`venue_trading_calendar.US_MARKET_HOLIDAYS`)
+#   - half-day sessions (`half_day_sessions.HALF_DAY_SESSIONS`)
+# ────────────────────────────────────────────────────────────────────────────
+
+
+class ExpectedState(StrEnum):
+    """Deterministic outcome of the availability oracle.
+
+    Closed set of four states. Pair with ``EmptyConfirmedReason`` to get the
+    full per-cell expectation:
+
+    - ``SHOULD_HAVE_DATA``: cell should be ``captured`` in the manifest. If
+      ``empty_confirmed`` instead → ``DIVERGENT_EMPTY`` (review-blocking).
+    - ``EXPECTED_EMPTY``: cell should be ``empty_confirmed`` with a specific
+      ``EmptyConfirmedReason``. Caller composes the typed reason from the
+      ``reason`` attribute of :class:`ExpectedCoverageResult`.
+    - ``NOT_YET_LIVE``: target_date precedes the venue's / chain's public
+      launch date. Distinct from ``EXPECTED_EMPTY`` so launchers can entirely
+      skip the fetch rather than write an ``empty_confirmed`` row.
+    - ``NOT_IN_SCOPE``: (asset_group, source, data_type) tuple is excluded
+      from the scope policy; the cell is out_of_scope for the denominator.
+    """
+
+    SHOULD_HAVE_DATA = "SHOULD_HAVE_DATA"
+    EXPECTED_EMPTY = "EXPECTED_EMPTY"
+    NOT_YET_LIVE = "NOT_YET_LIVE"
+    NOT_IN_SCOPE = "NOT_IN_SCOPE"
+
+
+@dataclass(frozen=True, slots=True)
+class ExpectedCoverageResult:
+    """Per-cell outcome of :func:`expected_coverage`.
+
+    Attributes:
+        state: closed-set classification (see :class:`ExpectedState`).
+        reason: when ``state in {EXPECTED_EMPTY, NOT_YET_LIVE}``, the
+            ``EmptyConfirmedReason`` taxonomy member as a string-typed enum
+            value (`"EXPECTED_HOLIDAY"`, `"EXPECTED_PRE_VENUE_LAUNCH"`,
+            etc.); ``None`` otherwise. Always a string-typed enum member,
+            never a free-form string — this is the same reason taxonomy
+            ``record_empty()`` uses.
+        diagnostic: human-readable one-liner explaining the result.
+            For SHOULD_HAVE_DATA this is a short positive note; for
+            EXPECTED_EMPTY / NOT_YET_LIVE it cites the gate that fired
+            (e.g. "venue_launch_dates: BINANCE-SPOT launched 2017-07-14").
+    """
+
+    state: ExpectedState
+    reason: str | None
+    diagnostic: str
+
+
+# Asset groups whose calendars follow US-equity trading days. Crypto markets
+# (CeFi spot/perp, DeFi) are 24/7; sports + prediction are per-event /
+# per-league (handled separately when calendars land).
+_US_TRADFI_ASSET_GROUPS: frozenset[str] = frozenset({"tradfi"})
+
+
+def _parse_iso_date(value: str | None) -> _date | None:
+    if value is None:
+        return None
+    parts = value.split("-")
+    if len(parts) != 3:
+        return None
+    try:
+        return _date(int(parts[0]), int(parts[1]), int(parts[2]))
+    except ValueError:
+        return None
+
+
+def _is_us_trading_day(target_date: _date) -> tuple[bool, str | None]:
+    """Return (is_trading_day, reason_if_not).
+
+    Imports are local to avoid module-load cycles when expected_coverage.py
+    is imported by handlers that themselves live below the registry layer.
+    """
+    if target_date.weekday() >= 5:
+        return False, "EXPECTED_WEEKEND"
+    from .venue_trading_calendar import US_MARKET_HOLIDAYS
+
+    if target_date.isoformat() in US_MARKET_HOLIDAYS:
+        return False, "EXPECTED_HOLIDAY"
+    return True, None
+
+
+def _is_us_half_day(venue: str, target_date: _date) -> bool:
+    """True if ``venue``'s US session is shortened (not closed) on target_date."""
+    from .half_day_sessions import is_half_day_session
+
+    return is_half_day_session(venue, target_date)
+
+
+def _defi_protocol_chain_split(source: str) -> tuple[str, str] | None:
+    """Split a DeFi source like 'AAVEV3-ETHEREUM' into ('AAVEV3', 'ETHEREUM')."""
+    if "-" not in source:
+        return None
+    protocol, _, chain = source.rpartition("-")
+    if not protocol or not chain:
+        return None
+    return protocol.upper(), chain.upper()
+
+
+def _venue_launch_date_for(asset_group: str, source: str) -> _date | None:
+    """Lookup the public-launch date for ``source`` in the given ``asset_group``."""
+    from .venue_launch_dates import (
+        CEFI_VENUE_LAUNCH_DATES,
+        DEFI_VENUE_LAUNCH_DATES,
+        PREDICTION_VENUE_LAUNCH_DATES,
+    )
+
+    table_by_group: dict[str, dict[str, str]] = {
+        "cefi": CEFI_VENUE_LAUNCH_DATES,
+        "defi": DEFI_VENUE_LAUNCH_DATES,
+        "prediction": PREDICTION_VENUE_LAUNCH_DATES,
+    }
+    table = table_by_group.get(asset_group.lower())
+    if table is None:
+        return None
+    return _parse_iso_date(table.get(source))
+
+
+def _chain_genesis_date_for(chain: str) -> _date | None:
+    """Lookup the chain's genesis date (DeFi only)."""
+    from .chain_env import CHAIN_GENESIS_DATES
+
+    return _parse_iso_date(CHAIN_GENESIS_DATES.get(chain.upper()))
+
+
+def expected_coverage(
+    asset_group: str,
+    data_source: str,
+    data_type: str,
+    target_date: _date,
+) -> ExpectedCoverageResult:
+    """Return the deterministic expected-coverage state for one cell.
+
+    Composes the scope policy with launch/genesis dates and trading-calendar
+    data already encoded in UAC. No I/O — same inputs return the same result.
+
+    Order of checks (first matching gate fires):
+
+    1. **Scope policy** — ``NOT_IN_SCOPE`` if tuple not in
+       ``EXPECTED_COVERAGE_BY_ASSET_GROUP``.
+    2. **Pre-venue-launch** — ``NOT_YET_LIVE`` +
+       ``EXPECTED_PRE_VENUE_LAUNCH`` if before venue_launch_dates entry.
+    3. **Pre-chain-genesis (DeFi only)** — ``NOT_YET_LIVE`` +
+       ``EXPECTED_PRE_GENESIS_CHAIN`` if before chain genesis.
+    4. **Pre-source-coverage-start** — ``EXPECTED_EMPTY`` +
+       ``EXPECTED_PRE_SOURCE_COVERAGE_START`` if before
+       ``SourceCapability.coverage_start[data_type]``. Composes with the
+       Phase 4 helper :func:`is_before_source_coverage_start`.
+    5. **TradFi calendar** — weekend / holiday / half-day.
+    6. **Default** → ``SHOULD_HAVE_DATA``.
+
+    Args:
+        asset_group: workspace-canonical lowercase (``cefi`` / ``defi`` /
+            ``tradfi`` / ``sports`` / ``prediction``).
+        data_source: venue token as used in
+            ``EXPECTED_COVERAGE_BY_ASSET_GROUP`` (e.g. ``BINANCE-SPOT``,
+            ``AAVEV3-ETHEREUM``, ``CME``).
+        data_type: data_type as used in the scope policy.
+        target_date: the date being queried.
+
+    Returns:
+        :class:`ExpectedCoverageResult` with state + typed reason + diagnostic.
+
+    Known gaps (Phase A2 v1):
+    * Per-symbol granularity (``EXPECTED_INSTRUMENT_NOT_LISTED`` /
+      ``EXPECTED_INSTRUMENT_DELISTED``) requires IS catalogue access; out of
+      scope here. Pair this oracle with IS at the call site.
+    * Sports off-season / no-fixture calendars not yet encoded in UAC; sports
+      cells default to ``SHOULD_HAVE_DATA`` once venue launch passes.
+    * DeFi protocol pause windows not yet encoded; cells default to
+      ``SHOULD_HAVE_DATA`` once chain genesis + venue launch pass.
+    """
+    ag = asset_group.lower()
+    ag_scope = EXPECTED_COVERAGE_BY_ASSET_GROUP.get(ag, {})
+    in_scope_types = ag_scope.get(data_source, [])
+    if data_type not in in_scope_types:
+        return ExpectedCoverageResult(
+            state=ExpectedState.NOT_IN_SCOPE,
+            reason=None,
+            diagnostic=f"({ag}, {data_source}, {data_type}) not in EXPECTED_COVERAGE_BY_ASSET_GROUP",
+        )
+
+    launch = _venue_launch_date_for(ag, data_source)
+    if launch is not None and target_date < launch:
+        return ExpectedCoverageResult(
+            state=ExpectedState.NOT_YET_LIVE,
+            reason="EXPECTED_PRE_VENUE_LAUNCH",
+            diagnostic=f"venue {data_source} public launch {launch.isoformat()} > target {target_date.isoformat()}",
+        )
+
+    if ag == "defi":
+        split = _defi_protocol_chain_split(data_source)
+        if split is not None:
+            _, chain = split
+            genesis = _chain_genesis_date_for(chain)
+            if genesis is not None and target_date < genesis:
+                return ExpectedCoverageResult(
+                    state=ExpectedState.NOT_YET_LIVE,
+                    reason="EXPECTED_PRE_GENESIS_CHAIN",
+                    diagnostic=f"chain {chain} genesis {genesis.isoformat()} > target {target_date.isoformat()}",
+                )
+
+    # Phase 4 helper: per-data_type source coverage start.
+    if is_before_source_coverage_start(data_source, data_type, target_date):
+        start = get_source_coverage_start_for_data_type(data_source, data_type)
+        return ExpectedCoverageResult(
+            state=ExpectedState.EXPECTED_EMPTY,
+            reason="EXPECTED_PRE_SOURCE_COVERAGE_START",
+            diagnostic=(
+                f"source {data_source} coverage_start[{data_type}] = "
+                f"{start.isoformat() if start else '?'} > target {target_date.isoformat()}"
+            ),
+        )
+
+    if ag in _US_TRADFI_ASSET_GROUPS:
+        is_trading_day, calendar_reason = _is_us_trading_day(target_date)
+        if not is_trading_day:
+            assert calendar_reason is not None
+            return ExpectedCoverageResult(
+                state=ExpectedState.EXPECTED_EMPTY,
+                reason=calendar_reason,
+                diagnostic=f"US calendar: {calendar_reason} on {target_date.isoformat()}",
+            )
+        if _is_us_half_day(data_source, target_date):
+            return ExpectedCoverageResult(
+                state=ExpectedState.SHOULD_HAVE_DATA,
+                reason="EXPECTED_PARTIAL_HALF_DAY",
+                diagnostic=f"US half-day session on {target_date.isoformat()} (shortened, not closed)",
+            )
+
+    return ExpectedCoverageResult(
+        state=ExpectedState.SHOULD_HAVE_DATA,
+        reason=None,
+        diagnostic=f"({ag}, {data_source}, {data_type}) in scope on {target_date.isoformat()}",
+    )
