@@ -114,11 +114,13 @@ The detector defaults to **conservative** — only encode pauses where:
 
 This module exposes:
 
-- `PROTOCOL_PAUSE_WINDOWS: dict[tuple[str, str], list[tuple[date, date]]]`
+- `PROTOCOL_PAUSE_WINDOWS: dict[tuple[str, str], list[tuple[date, date | None]]]`
   keyed by `(protocol, chain)` (workspace-canonical UPPERCASE tokens). Read
-  by the oracle. **Empty initial state**; refreshed by detector cron.
+  by the oracle. Loaded from `registry/data/protocol_pause_windows_cache.json`
+  at import time; **empty initial state** until detector first runs.
 - `is_protocol_paused(protocol, chain, target_date) -> tuple[bool, str | None]`.
   Oracle calls this; returns (paused, human-readable-window-description).
+  Ongoing windows (``end_date=None``) are treated as extending to the present.
 
 Detector implementation lives in a separate slot per R-NEW-6 — see
 `plans/audit/results/mega_audit_phase_a_issues_human_readable_2026_05_20.md`
@@ -131,12 +133,48 @@ we can't prove from data).
 
 from __future__ import annotations
 
+import json
 from datetime import date
+from pathlib import Path
 
-# Detector-populated — DO NOT manually edit. The detector (R-NEW-6) refreshes
-# this from on-chain governance events + per-chain RPC block-time analysis.
-# Empty initial state is correct + honest until detector lands.
-PROTOCOL_PAUSE_WINDOWS: dict[tuple[str, str], list[tuple[date, date]]] = {}
+# JSON cache written by market-tick-data-service scripts/refresh_protocol_pause_windows.py
+# after each daily detect-protocol-outages batch run. Falls back to empty on first boot.
+_CACHE_PATH = Path(__file__).parent / "data" / "protocol_pause_windows_cache.json"
+
+
+def _load_cache() -> dict[tuple[str, str], list[tuple[date, date | None]]]:
+    """Load protocol pause windows from the JSON cache. Returns empty dict if absent."""
+    if not _CACHE_PATH.exists():
+        return {}
+    try:
+        raw: dict[str, object] = json.loads(_CACHE_PATH.read_text())
+        raw_windows = raw.get("windows") or {}
+        if not isinstance(raw_windows, dict):
+            return {}
+        result: dict[tuple[str, str], list[tuple[date, date | None]]] = {}
+        for key_str, wins in raw_windows.items():
+            if "|" not in key_str or not isinstance(wins, list):
+                continue
+            protocol, chain = key_str.split("|", 1)
+            parsed: list[tuple[date, date | None]] = []
+            for w in wins:
+                if not isinstance(w, dict) or not w.get("start_date"):
+                    continue
+                start = date.fromisoformat(str(w["start_date"]))
+                end_raw = w.get("end_date")
+                end: date | None = date.fromisoformat(str(end_raw)) if end_raw else None
+                parsed.append((start, end))
+            if parsed:
+                result[(protocol, chain)] = parsed
+        return result
+    except Exception:
+        return {}
+
+
+# Detector-populated — DO NOT manually edit. Refreshed daily by
+# refresh_protocol_pause_windows.py from GCS protocol_outages parquets.
+# Empty initial state is correct + honest until the detector first runs.
+PROTOCOL_PAUSE_WINDOWS: dict[tuple[str, str], list[tuple[date, date | None]]] = _load_cache()
 
 
 def is_protocol_paused(protocol: str, chain: str, target_date: date) -> tuple[bool, str | None]:
@@ -144,16 +182,19 @@ def is_protocol_paused(protocol: str, chain: str, target_date: date) -> tuple[bo
 
     Consumer interface — read by `expected_coverage()` oracle gate. Returns
     True when `target_date` falls inside a detector-confirmed pause window
-    for `(protocol, chain)`. Detector refreshes the underlying registry
-    daily from on-chain governance events + chain RPC block-time anomalies.
+    for `(protocol, chain)`. Ongoing windows (end_date=None) are treated as
+    extending to the present. Detector refreshes the registry daily from
+    on-chain governance events + chain RPC block-time anomalies.
     """
     key = (protocol.upper(), chain.upper())
     windows = PROTOCOL_PAUSE_WINDOWS.get(key)
     if not windows:
         return False, None
     for start, end in windows:
-        if start <= target_date <= end:
-            return True, f"{protocol}-{chain} paused {start.isoformat()} → {end.isoformat()} (detector-confirmed)"
+        end_check = end if end is not None else date.today()
+        if start <= target_date <= end_check:
+            end_desc = end.isoformat() if end is not None else "ongoing"
+            return True, f"{protocol}-{chain} paused {start.isoformat()} → {end_desc} (detector-confirmed)"
     return False, None
 
 
