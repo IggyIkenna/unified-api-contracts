@@ -186,9 +186,15 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     ("execution-service", "order_intent"): ServiceEmissionPolicy.STRICT_FAIL,
     ("execution-service", "fill_confirmation"): ServiceEmissionPolicy.BLOCK_CRITICAL,
     # position-balance-monitor — portfolio_state must be authoritative; partial = wrong.
+    # Kept for backwards-compat; canonical producer is now strategy-service (Phase 3 consolidation).
     ("position-balance-monitor-service", "portfolio_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    # strategy-service (position sub-package) — same constraint post-consolidation.
+    ("strategy-service", "portfolio_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
     # risk-and-exposure — same.
+    # Kept for backwards-compat; canonical producer is now strategy-service (Phase 3 consolidation).
     ("risk-and-exposure-service", "risk_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    # strategy-service (risk sub-package) — same constraint post-consolidation.
+    ("strategy-service", "risk_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
     # instruments-service — catalog snapshot is best-effort union of multiple source
     # feeds; partial publish is normal. Per-source partial coverage handled at
     # the manifest layer (per-row capture_status), not at the catalog-publish layer.
