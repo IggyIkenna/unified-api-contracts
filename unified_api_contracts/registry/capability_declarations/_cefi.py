@@ -640,6 +640,160 @@ _TARDIS = SourceCapability(
 
 # OPTIONS: not supported — venue does not offer listed options contracts
 # FUTURE: not supported — Aster only offers perpetual futures (CLOB model, no fixed-expiry contracts)
+# Extended (Starknet L2 perp DEX, formerly X10).
+# Hybrid CLOB: off-chain matching + on-chain settlement via StarkEx. Read endpoints
+# (market data) authed by X-Api-Key header; write endpoints (orders/transfers)
+# additionally require a SNIP-12 typed-data signature with a Stark private key.
+# Entity binding: odum-group-cayman (Odum Research UK is on Extended's restricted
+# territory list — see memory/project_trading_entities.md). Account identifiers
+# (non-secret, operator 2026-05-20): stark_public_key
+# 0x276f6bb00fa3f451988872959ee5cf24031bb96d5a0aa6ed9e7a07d24f36e03, vault_id 380539,
+# client_id 263651, wallet 0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f.
+# Secrets resolved at runtime via GCP Secret Manager (central-element-323112):
+#   - extended-starknet-api-key/versions/latest
+#   - extended-starknet-stark-private-key/versions/latest
+# (versions/latest so rotation flows without redeploy — mirrors workspace pattern.)
+# Mandatory request header: User-Agent (required by Extended API gateway).
+# Coverage: candles since 2024-07-26, funding since 2025-07-18
+# (per extended_starknet_historical_data_path_2026_05_20.md). Live=batch via REST
+# pagination on the same endpoints.
+# OPTIONS / FUTURE: not supported — Extended only offers perpetual futures.
+_EXTENDED = SourceCapability(
+    source="extended",
+    domains=["market", "execution", "position", "reference"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=True,
+    supports_mainnet=True,
+    auth_scope=["api_key", "wallet_private_key"],
+    auth_environments={"test": "testnet_key", "prod": "prod_key"},
+    operations={
+        "market": [
+            "ticker",
+            "orderbook",
+            "trades",
+            "candles",
+            "funding_rates",
+            "derivative_ticker",
+            "ws_ticker",
+            "ws_orderbook",
+            "ws_trades",
+        ],
+        "execution": ["place_order", "cancel_order", "open_orders", "order_status"],
+        "position": ["account", "positions", "balances"],
+        "reference": ["markets", "instruments", "server_time"],
+    },
+    base_urls={
+        "mainnet": "https://api.starknet.extended.exchange/api/v1",
+        "testnet": "https://api.starknet.sepolia.extended.exchange/api/v1",
+    },
+    margin_model={"mainnet": "cross", "testnet": "cross"},
+    operation_details={
+        "place_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="eip712",
+                    required_credential="wallet_private_key",
+                    notes="X-Api-Key header + SNIP-12 typed-data signature (Stark key). Entity: odum-group-cayman.",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="eip712",
+                    required_credential="wallet_private_key",
+                    data_fidelity="synthetic",
+                    notes="Sepolia. X-Api-Key + SNIP-12 Stark signature.",
+                ),
+            }
+        ),
+        "cancel_order": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+                "testnet": OperationEnvDetail(signing_scheme="eip712", required_credential="wallet_private_key"),
+            }
+        ),
+        "account": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="api_key_header", required_credential="api_key", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "ticker": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "orderbook": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="none", required_credential="none"),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "candles": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Coverage start 2024-07-26. REST pagination — live=batch path.",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "funding_rates": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Coverage start 2025-07-18. 1h funding interval.",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none", required_credential="none", data_fidelity="synthetic"
+                ),
+            }
+        ),
+        "ws_orderbook": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    base_url="wss://api.starknet.extended.exchange/stream.extended.exchange/v1",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    base_url="wss://starknet.sepolia.extended.exchange/stream.extended.exchange/v1",
+                    data_fidelity="synthetic",
+                ),
+            }
+        ),
+        "ws_trades": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    base_url="wss://api.starknet.extended.exchange/stream.extended.exchange/v1",
+                ),
+                "testnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    base_url="wss://starknet.sepolia.extended.exchange/stream.extended.exchange/v1",
+                    data_fidelity="synthetic",
+                ),
+            }
+        ),
+    },
+)
+
+
 _ASTER = SourceCapability(
     source="aster",
     domains=["market", "execution", "position", "reference"],
@@ -871,6 +1025,7 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     _CCXT,
     _TARDIS,
     _ASTER,
+    _EXTENDED,
     # FIX protocol / trading connectors
     _FIX,
     _NAUTILUS,

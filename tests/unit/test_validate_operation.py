@@ -333,6 +333,67 @@ class TestCrossDomainSpotChecks:
         assert detail.data_fidelity == "synthetic"
 
 
+class TestExtendedStarknetOperationDetails:
+    """Validate Extended (Starknet L2 perp DEX) capability declaration.
+
+    Operator-authorized 2026-05-20: UAC declaration only; MTDS adapter scaffold
+    is a separate later ticket. Entity binding: odum-group-cayman (UK is on
+    Extended's restricted territory list).
+    """
+
+    def test_place_order_mainnet_requires_stark_signature(self) -> None:
+        detail = validate_operation("extended", "place_order", "mainnet")
+        assert detail.signing_scheme == "eip712"
+        assert detail.required_credential == "wallet_private_key"
+
+    def test_place_order_testnet_synthetic_fidelity(self) -> None:
+        detail = validate_operation("extended", "place_order", "testnet")
+        assert detail.signing_scheme == "eip712"
+        assert detail.required_credential == "wallet_private_key"
+        assert detail.data_fidelity == "synthetic"
+
+    def test_account_uses_api_key_header(self) -> None:
+        detail = validate_operation("extended", "account", "mainnet")
+        assert detail.signing_scheme == "api_key_header"
+        assert detail.required_credential == "api_key"
+
+    def test_public_market_data_unauthed(self) -> None:
+        for op in ("ticker", "orderbook", "candles", "funding_rates"):
+            detail = validate_operation("extended", op, "mainnet")
+            assert detail.signing_scheme == "none", op
+            assert detail.required_credential == "none", op
+
+    def test_ws_endpoints_carry_stream_base_url(self) -> None:
+        detail = validate_operation("extended", "ws_orderbook", "mainnet")
+        assert detail.base_url == "wss://api.starknet.extended.exchange/stream.extended.exchange/v1"
+        testnet = validate_operation("extended", "ws_orderbook", "testnet")
+        assert testnet.base_url == "wss://starknet.sepolia.extended.exchange/stream.extended.exchange/v1"
+
+    def test_base_urls(self) -> None:
+        from unified_api_contracts.registry.capability import resolve_capability
+
+        cap = resolve_capability("extended")
+        assert cap.base_urls["mainnet"] == "https://api.starknet.extended.exchange/api/v1"
+        assert cap.base_urls["testnet"] == "https://api.starknet.sepolia.extended.exchange/api/v1"
+
+    def test_capability_envelope(self) -> None:
+        from unified_api_contracts.registry.capability import resolve_capability
+
+        cap = resolve_capability("extended")
+        assert cap.supports_live is True
+        assert cap.supports_batch is True
+        assert cap.supports_historical is True
+        assert cap.supports_testnet is True
+        assert cap.supports_mainnet is True
+        assert "market" in cap.domains
+        assert "execution" in cap.domains
+        # Auth scope reflects dual-credential model: X-Api-Key (read) + Stark key (write).
+        assert "api_key" in cap.auth_scope
+        assert "wallet_private_key" in cap.auth_scope
+        # Margin model: cross (Extended is cross-margin only — no isolated mode).
+        assert cap.margin_model["mainnet"] == "cross"
+
+
 # ---------------------------------------------------------------------------
 # Test: Parametrized — all sources with operation_details bootstrap correctly
 # ---------------------------------------------------------------------------
