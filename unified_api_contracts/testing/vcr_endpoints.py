@@ -353,6 +353,42 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
+    "cambrian": [
+        # Covers: Cambrian Network AVS restaking (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
+        # API URL declared in UAC _defi_chain_data.py: https://api.cambrian.network
+        # Stub cassette ships; re-record when MTDS adapter is implemented.
+        _get(
+            "https://api.cambrian.network/restaking/operator-sets",
+            "restaking_rewards.yaml",
+            "",
+            "CambrianRestakingResponse",
+            schema_version="1.0",
+        ),
+    ],
+    "picasso": [
+        # Covers: Picasso Network cross-chain restaking (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
+        # API URL declared in UAC _defi_chain_data.py: https://api.picasso.network
+        # Stub cassette ships; re-record when MTDS adapter is implemented.
+        _get(
+            "https://api.picasso.network/restaking/routes",
+            "restaking_rewards.yaml",
+            "",
+            "PicassoRestakingResponse",
+            schema_version="1.0",
+        ),
+    ],
+    "sky": [
+        # Covers: Sky Protocol (MakerDAO rebrand) savings rate (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
+        # DSR/SSR yield products — DAI Savings Rate + Sky Savings Rate (sUSDS).
+        # Stub cassette ships; re-record when MTDS adapter is implemented.
+        _get(
+            "https://api.sky.money/rates",
+            "savings_rate.yaml",
+            "",
+            "SkySavingsRateResponse",
+            schema_version="1.0",
+        ),
+    ],
     # ------------------------------------------------------------------
     # DeFi protocols — AaveScan analytics
     # ------------------------------------------------------------------
@@ -630,6 +666,9 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     "morpho_blue_api:markets": "MorphoBlueMarketsResponse",
     "eigenlayer:rewards": "EigenLayerRewardsResponse",
     "solayer:restaking": "SolayerRestakingResponse",
+    "cambrian:restaking": "CambrianRestakingResponse",
+    "picasso:restaking": "PicassoRestakingResponse",
+    "sky:savings_rate": "SkySavingsRateResponse",
     # DeFi protocol subgraphs (The Graph)
     "thegraph_aave:reserves": "TheGraphResponse",
     "thegraph_morpho:markets": "TheGraphResponse",

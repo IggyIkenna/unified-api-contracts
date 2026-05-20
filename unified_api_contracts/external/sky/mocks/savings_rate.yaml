@@ -1,0 +1,8 @@
+# BLOCKED-NO-ADAPTER — cassette not yet live-recorded.
+# Sky Protocol (MakerDAO rebrand) adapter not yet implemented in market-tick-data-service.
+# No capability declaration in UAC _defi.py yet — to be added with adapter.
+# API URL: https://api.sky.money
+# Products: DAI Savings Rate (DSR) + Sky Savings Rate (SSR) / sUSDS yield.
+# Run with INTEGRATION_TEST_MODE=live once the adapter is implemented.
+interactions: []
+version: 1
