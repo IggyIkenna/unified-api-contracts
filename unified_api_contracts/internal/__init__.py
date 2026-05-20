@@ -3,6 +3,7 @@
 NO cloud SDKs (google-cloud-*, boto3, redis). Pure Pydantic schemas only.
 """
 
+from unified_api_contracts.internal.agent_inference_cache import AgentInferenceCacheRecord
 from unified_api_contracts.internal.alerting import AlertEvent, DefiAlert, GovernanceForumProposal, IssuePauseEvent
 from unified_api_contracts.internal.architecture_v2 import (
     ALLOCATION_MIN_MATURITY,
@@ -1031,6 +1032,7 @@ __all__ = [
     "AccountState",
     "AccountType",
     "AgentEventDetails",
+    "AgentInferenceCacheRecord",
     "AggregatedPositionMessage",
     "AlertContextData",
     "AlertEvent",
