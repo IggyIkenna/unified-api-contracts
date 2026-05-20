@@ -30,6 +30,14 @@ expanding it.
 
 from __future__ import annotations
 
+from datetime import date as _date
+
+from unified_api_contracts.registry.capability import (
+    CapabilityResolutionError,
+    SourceCapability,
+    resolve_capability,
+)
+
 # ---------------------------------------------------------------------------
 # CeFi — full Tardis sharded backfill coverage (9 venues x 6 data types).
 # All venues capable of every data_type are expected to fill it. Deribit gets
@@ -247,10 +255,66 @@ def get_expected_pairs(asset_group: str) -> list[tuple[str, str]]:
     return [(venue, dt) for venue, dts in ag_scope.items() for dt in dts]
 
 
+def _resolve_capability_for_venue(venue: str) -> SourceCapability | None:
+    """Resolve a SourceCapability from an expected_coverage venue token.
+
+    Venue tokens in EXPECTED_COVERAGE_BY_ASSET_GROUP are uppercase
+    (e.g. "HYPERLIQUID", "BINANCE-SPOT"). SourceCapability.source is
+    lowercase (e.g. "hyperliquid", "binance"). Strategy: try the exact
+    lowercase match first; if not found, try the base name before the
+    first "-" (e.g. "binance-spot" → "binance"). Returns None if neither
+    matches a registered declaration.
+    """
+    lowered = venue.lower()
+    try:
+        return resolve_capability(lowered)
+    except CapabilityResolutionError:
+        pass
+    base = lowered.split("-")[0]
+    if base != lowered:
+        try:
+            return resolve_capability(base)
+        except CapabilityResolutionError:
+            pass
+    return None
+
+
+def get_source_coverage_start_for_data_type(venue: str, data_type: str) -> _date | None:
+    """Return the earliest date a venue has data for a specific data_type.
+
+    Reads from SourceCapability.coverage_start[data_type]. Returns None if
+    the venue has no capability record, no coverage_start dict, or no entry
+    for this data_type. Callers treat None as "no clip".
+    """
+    cap = _resolve_capability_for_venue(venue)
+    if cap is None or cap.coverage_start is None:
+        return None
+    return cap.coverage_start.get(data_type)
+
+
+def is_before_source_coverage_start(venue: str, data_type: str, check_date: _date) -> bool:
+    """Return True if check_date is before the venue's coverage start for data_type.
+
+    Callers use this to emit EXPECTED_PRE_SOURCE_COVERAGE_START in
+    record_empty() calls. Returns False when no coverage start is known
+    (no clip — do not exclude the date from the expected denominator).
+
+    Example:
+        if is_before_source_coverage_start(venue, data_type, day):
+            record_empty(reason=EmptyConfirmedReason.EXPECTED_PRE_SOURCE_COVERAGE_START)
+    """
+    start = get_source_coverage_start_for_data_type(venue, data_type)
+    if start is None:
+        return False
+    return check_date < start
+
+
 __all__ = [
     "EXPECTED_COVERAGE_BY_ASSET_GROUP",
     "get_expected_data_types_for_venue_in_scope",
     "get_expected_pairs",
     "get_expected_venues_in_scope",
+    "get_source_coverage_start_for_data_type",
+    "is_before_source_coverage_start",
     "is_expected",
 ]

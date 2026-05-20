@@ -104,7 +104,7 @@ def test_seed_contains_features_cross_instrument_paired_spec_strict_fail() -> No
 
 def test_seed_contains_ml_training_model_version_block_critical() -> None:
     """Training a model on incomplete data is silent corruption — operator review forced."""
-    assert SERVICE_OUTPUT_POLICIES[("ml-training-service", "model_version")] is ServiceEmissionPolicy.BLOCK_CRITICAL
+    assert SERVICE_OUTPUT_POLICIES[("ml-service", "model_version")] is ServiceEmissionPolicy.BLOCK_CRITICAL
 
 
 def test_seed_contains_strategy_per_archetype_signal_strict_fail() -> None:

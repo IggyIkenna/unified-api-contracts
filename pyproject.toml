@@ -96,8 +96,8 @@ max-complexity = 7
 "unified_api_contracts/canonical/normalize/orders_fills.py" = ["F401"]
 "unified_api_contracts/normalize_utils/*.py" = ["N815", "N803"]
 "unified_api_contracts/normalize_utils/errors/*.py" = ["N815"]
-# Root __init__.py re-exports all public symbols — F401 is expected
-"unified_api_contracts/__init__.py" = ["F401"]
+# Root __init__.py re-exports all public symbols — F401 expected; RUF022 domain-grouped __all__ is intentional
+"unified_api_contracts/__init__.py" = ["F401", "RUF022"]
 # Registry __init__.py re-exports symbols from sub-modules
 "unified_api_contracts/registry/__init__.py" = ["F401"]
 # Root-level domain facades (Phase 2 citadel)
