@@ -431,6 +431,12 @@ from .canonical.domain import (
 from .canonical.domain.features import (
     get_required_inputs,
 )
+from .canonical.domain.strategy import (
+    ClientRiskLimits,
+    ClientsYaml,
+    ClientsYamlEntry,
+    MinBalancePerVenue,
+)
 from .canonical.partition_paths import (
     build_cefi_partition_path,
     build_defi_partition_path,
@@ -1269,6 +1275,9 @@ __all__ = [
     "ClientLifecycleKind",
     "ClientQuarantinedEvent",
     "ClientReadyEvent",
+    "ClientRiskLimits",
+    "ClientsYaml",
+    "ClientsYamlEntry",
     "CloudProvider",
     "CloudTarget",
     "CoinbaseOrderBook",
@@ -1427,6 +1436,7 @@ __all__ = [
     "MarketStatus",
     "MarketTrade",
     "MatchPeriod",
+    "MinBalancePerVenue",
     "MorphoBorrowParams",
     "MorphoFlashLoanParams",
     "MorphoMarketParams",
