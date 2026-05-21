@@ -11,7 +11,7 @@ interactions:
         User-Agent:
           - python-requests/2.32.5
       method: GET
-      uri: https://trading-api.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook
+      uri: https://api.elections.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook
     response:
       body:
         string: '{"ticker":"KXHIGHNY-24JAN01-T60","yes_dollars":[["0.4500","100.00"],["0.4400","250.00"],["0.4300","500.00"]],"no_dollars":[["0.5500","100.00"],["0.5600","200.00"],["0.5700","400.00"]]}'

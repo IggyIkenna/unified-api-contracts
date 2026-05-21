@@ -444,14 +444,14 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
     ],
     "kalshi": [
         _get(
-            "https://trading-api.kalshi.com/trade-api/v2/markets?limit=1&status=open",
+            "https://api.elections.kalshi.com/trade-api/v2/markets?limit=1&status=open",
             "markets.yaml",
             "markets.0",
             "KalshiMarket",
             schema_version="1.0",
         ),
         _get(
-            "https://trading-api.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook",
+            "https://api.elections.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook",
             "orderbook.yaml",
             "",
             "KalshiOrderBook",

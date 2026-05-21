@@ -49,7 +49,7 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
     ),
     EndpointSpec(
         venue="kalshi",
-        endpoint_path="wss://trading-api.kalshi.com/trade-api/ws/v2",
+        endpoint_path="wss://api.elections.kalshi.com/trade-api/ws/v2",
         http_method="WS",
         schema_class="KalshiWebSocketTickerMsg",
         access_mode=AccessMode.STREAMING_WEBSOCKET,

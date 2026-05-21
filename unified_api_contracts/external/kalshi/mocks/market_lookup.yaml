@@ -7,7 +7,7 @@ interactions:
         User-Agent:
           - python-urllib/3.13
       method: GET
-      uri: https://trading-api.kalshi.com/trade-api/v2/markets/KXCPI-24DEC-T3.2
+      uri: https://api.elections.kalshi.com/trade-api/v2/markets/KXCPI-24DEC-T3.2
     response:
       body:
         string: '{"market":{"ticker":"KXCPI-24DEC-T3.2","event_ticker":"KXCPI-24DEC","market_type":"binary","title":"Will CPI YoY be above 3.2%?","subtitle":"December 2024 CPI release","result":null,"status":"active","yes_bid_dollars":"0.4500","yes_ask_dollars":"0.4600","no_bid_dollars":"0.5400","no_ask_dollars":"0.5500","volume_fp":"1234.00","open_interest_fp":"567.00","liquidity":"10000.00","yes_bid":45,"yes_ask":46,"no_bid":54,"no_ask":55,"volume":1234,"open_interest":567,"expiration_time":"2024-12-13T13:30:00Z","open_time":"2024-11-01T00:00:00Z","close_time":"2024-12-13T13:30:00Z","resolution_source":"BLS","can_close_early":false,"expected_expiration_time":"2024-12-13T13:30:00Z","strike_type":"range","floor_strike":3.0,"cap_strike":3.5}}'

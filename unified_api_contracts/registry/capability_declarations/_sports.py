@@ -91,7 +91,7 @@ _KALSHI = SourceCapability(
         "position": ["portfolio", "positions", "fills", "settlements"],
         "reference": ["events", "series", "categories"],
     },
-    base_urls={"mainnet": "https://trading-api.kalshi.com", "testnet": "https://demo-api.kalshi.co"},
+    base_urls={"mainnet": "https://api.elections.kalshi.com", "testnet": "https://demo-api.kalshi.co"},
     operation_details={
         "create_order": OperationDetail(
             environments={

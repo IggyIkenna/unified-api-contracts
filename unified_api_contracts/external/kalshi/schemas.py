@@ -1,7 +1,7 @@
 """Kalshi prediction exchange API: series, events, markets, orders, positions.
 
 Kalshi is a regulated US prediction exchange. API hierarchy: Series → Event → Market.
-Base URL: https://trading-api.kalshi.com/trade-api/v2
+Base URL: https://api.elections.kalshi.com/trade-api/v2
 
 Versioning notes:
 - String fixed-point fields are used for all prices: yes_bid_dollars ("0.4500"),

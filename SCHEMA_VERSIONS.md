@@ -546,14 +546,14 @@ Schema–version alignment for sports betting and prediction market APIs.
 
 ### Version Targets
 
-| Venue            | API Version               | Base URL                                                                                      | Recommended Pin |
-| ---------------- | ------------------------- | --------------------------------------------------------------------------------------------- | --------------- |
-| **Betfair**      | REST v1.0, Stream API     | `https://api.betfair.com/exchange/betting/rest/v1.0`                                          | v1.0            |
-| **Kalshi**       | REST v2, WebSocket v2     | `https://trading-api.kalshi.com/trade-api/v2`, `wss://trading-api.kalshi.com/trade-api/ws/v2` | v2              |
-| **Pinnacle**     | REST (no version in path) | `https://api.pinnacle.com`                                                                    | —               |
-| **Polymarket**   | CLOB API                  | `https://clob.polymarket.com`                                                                 | —               |
-| **Odds API**     | v4                        | `https://api.the-odds-api.com/v4`                                                             | v4              |
-| **API-Football** | v3                        | `https://v3.football.api-sports.io`                                                           | v3              |
+| Venue            | API Version               | Base URL                                                                                          | Recommended Pin |
+| ---------------- | ------------------------- | ------------------------------------------------------------------------------------------------- | --------------- |
+| **Betfair**      | REST v1.0, Stream API     | `https://api.betfair.com/exchange/betting/rest/v1.0`                                              | v1.0            |
+| **Kalshi**       | REST v2, WebSocket v2     | `https://api.elections.kalshi.com/trade-api/v2`, `wss://api.elections.kalshi.com/trade-api/ws/v2` | v2              |
+| **Pinnacle**     | REST (no version in path) | `https://api.pinnacle.com`                                                                        | —               |
+| **Polymarket**   | CLOB API                  | `https://clob.polymarket.com`                                                                     | —               |
+| **Odds API**     | v4                        | `https://api.the-odds-api.com/v4`                                                                 | v4              |
+| **API-Football** | v3                        | `https://v3.football.api-sports.io`                                                               | v3              |
 
 ### Schema → Version Mapping (Sports)
 

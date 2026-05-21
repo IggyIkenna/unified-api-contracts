@@ -22,7 +22,7 @@ def test_kalshi_markets_cassette() -> None:
 
     with VCR().use_cassette(str(cassette_path)):
         response = httpx.get(
-            "https://trading-api.kalshi.com/trade-api/v2/markets",
+            "https://api.elections.kalshi.com/trade-api/v2/markets",
             params={"limit": "1", "status": "open"},
         )
         assert response.status_code == 200
@@ -38,7 +38,7 @@ def test_kalshi_market_schema_valid() -> None:
 
     with VCR().use_cassette(str(cassette_path)):
         response = httpx.get(
-            "https://trading-api.kalshi.com/trade-api/v2/markets",
+            "https://api.elections.kalshi.com/trade-api/v2/markets",
             params={"limit": "1", "status": "open"},
         )
         data = response.json()
@@ -56,7 +56,7 @@ def test_kalshi_orderbook_cassette() -> None:
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
     with VCR().use_cassette(str(cassette_path)):
-        response = httpx.get("https://trading-api.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook")
+        response = httpx.get("https://api.elections.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook")
         assert response.status_code == 200
         data = response.json()
         assert "ticker" in data
@@ -69,7 +69,7 @@ def test_kalshi_orderbook_schema_valid() -> None:
     assert cassette_path.exists(), f"Cassette not found: {cassette_path}"
 
     with VCR().use_cassette(str(cassette_path)):
-        response = httpx.get("https://trading-api.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook")
+        response = httpx.get("https://api.elections.kalshi.com/trade-api/v2/markets/KXHIGHNY-24JAN01-T60/orderbook")
         data = response.json()
         validated = KalshiOrderBook.model_validate(data)
         assert validated.ticker == "KXHIGHNY-24JAN01-T60"

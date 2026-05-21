@@ -21,7 +21,7 @@ from pydantic import BaseModel
 BASE_URLS: dict[str, str] = {
     # Sports
     "betfair": "https://api.betfair.com/exchange/betting/rest/v1.0",
-    "kalshi": "https://trading-api.kalshi.com/trade-api/v2",
+    "kalshi": "https://api.elections.kalshi.com/trade-api/v2",
     "pinnacle": "https://api.pinnacle.com",
     "polymarket": "https://clob.polymarket.com",
     "polymarket-gamma": "https://gamma-api.polymarket.com",
