@@ -72,6 +72,7 @@ _PINNACLE = SourceCapability(
     },
     chain=None,
     kind="sports_book",
+    coverage_start={"trades": date(2020, 6, 1)},
 )
 
 _KALSHI = SourceCapability(
@@ -182,6 +183,7 @@ _ODDS_API = SourceCapability(
     operation_details={},
     chain=None,
     kind=None,
+    coverage_start={"ODDS": date(2020, 6, 6)},
 )
 
 _ODDS_ENGINE = SourceCapability(

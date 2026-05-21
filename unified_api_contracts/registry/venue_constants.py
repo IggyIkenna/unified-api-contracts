@@ -53,6 +53,9 @@ ETHENA = "ETHENA"
 
 # Sports Betting Exchanges — two-sided markets with API access
 BETFAIR = "BETFAIR"
+BETFAIR_SB_UK = "BETFAIR_SB_UK"  # Betfair Sportsbook (UK)
+BETFAIR_EX_UK = "BETFAIR_EX_UK"  # Betfair Exchange (UK)
+BETFAIR_EX_EU = "BETFAIR_EX_EU"  # Betfair Exchange (EU)
 MATCHBOOK = "MATCHBOOK"
 
 # Prediction Markets — crypto/blockchain-based prediction exchanges
@@ -159,7 +162,7 @@ METABET = "METABET"
 OPTICODDS = "OPTICODDS"
 
 # Sports Venue Sub-Sets — grouped by execution semantics
-SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK}
+SPORTS_EXCHANGE_VENUES: set[str] = {BETFAIR, MATCHBOOK, BETFAIR_SB_UK, BETFAIR_EX_UK, BETFAIR_EX_EU}
 
 SPORTS_PREDICTION_MARKET_VENUES: set[str] = {POLYMARKET, KALSHI, NOVIG, BETOPENLY, PROPHETX}
 

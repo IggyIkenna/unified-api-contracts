@@ -312,20 +312,26 @@ _DEFI: dict[str, list[str]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Sports — ODDS_API is the raw odds source; per-bookmaker venues emit
-# point-in-time odds_snapshot + odds_movement for cross-feed validation.
+# Sports — ODDS_API ingests raw bookmaker odds (data_type=ODDS, uppercase).
+# Per-bookmaker venues emit trade-level data (data_type=trades). BETFAIR
+# sub-splits into three exchange segments as stored in the MTDS manifest:
+# BETFAIR_SB_UK (sportsbook), BETFAIR_EX_UK (exchange UK), BETFAIR_EX_EU
+# (exchange EU).
 #
 # DELIBERATELY OMITTED on capability rows: arbitrage_opportunity. It is a
 # purely-derived MDPS output (cross-bookmaker disparity) — not emitted by
 # any venue. Lives in :mod:`processed_data_dependencies` instead.
+#
+# BET365 removed — 0 manifest rows (DEFERRED-INDEFINITELY 2026-05-12).
 # ---------------------------------------------------------------------------
 _SPORTS: dict[str, list[str]] = {
-    "ODDS_API": ["odds"],
-    "PINNACLE": ["odds_snapshot", "odds_movement"],
-    "BETFAIR": ["odds_snapshot", "odds_movement"],
-    "DRAFTKINGS": ["odds_snapshot", "odds_movement"],
-    "FANDUEL": ["odds_snapshot", "odds_movement"],
-    "BET365": ["odds_snapshot", "odds_movement"],
+    "ODDS_API": ["ODDS"],
+    "PINNACLE": ["trades"],
+    "BETFAIR_SB_UK": ["trades"],
+    "BETFAIR_EX_UK": ["trades"],
+    "BETFAIR_EX_EU": ["trades"],
+    "DRAFTKINGS": ["trades"],
+    "FANDUEL": ["trades"],
 }
 
 # ---------------------------------------------------------------------------

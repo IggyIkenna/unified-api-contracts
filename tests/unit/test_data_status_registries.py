@@ -131,7 +131,8 @@ class TestExpectedCoverageByAssetGroup:
     def test_is_expected_in_scope_returns_true(self) -> None:
         assert is_expected("tradfi", "CME", "trades")
         assert is_expected("cefi", "BINANCE-FUTURES", "derivative_ticker")
-        assert is_expected("sports", "ODDS_API", "odds")
+        assert is_expected("sports", "ODDS_API", "ODDS")  # uppercase ODDS — canonical manifest key
+        assert is_expected("sports", "PINNACLE", "trades")
         assert is_expected("prediction", "POLYMARKET", "trades")
         assert is_expected("defi", "AAVE_V3-ETHEREUM", "lending_indices")
 

@@ -255,8 +255,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # `unified-trading-pm/plans/epics/sports_master.md` §
         # "Scrapers DEFERRED-INDEFINITELY 2026-05-12 per operator".
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
-        "PINNACLE",
-        "BETFAIR",
+        "PINNACLE",  # Bookmaker API (ODDS_API fan-out + direct)
+        "BETFAIR",  # Canonical exchange venue constant (execution/reference)
+        "BETFAIR_SB_UK",  # MTDS manifest sub-venue: Betfair Sportsbook UK
+        "BETFAIR_EX_UK",  # MTDS manifest sub-venue: Betfair Exchange UK
+        "BETFAIR_EX_EU",  # MTDS manifest sub-venue: Betfair Exchange EU
+        "DRAFTKINGS",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
+        "FANDUEL",  # US bookmaker via ODDS_API fan-out (manifest-confirmed)
     ],
     "prediction": [
         # Prediction markets (binary / multi-outcome)
@@ -659,6 +664,9 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # are merged into this dict at module-load time (see below). Split out
     # to keep this file under the 900-line QG ceiling.
     # ── Sports ──
+    # Corrected 2026-05-20 (mega-audit R2): ODDS_API emits "ODDS" (uppercase),
+    # bookmaker venues emit "trades". Old data_types (odds_snapshot, odds_movement)
+    # were the oracle bug root cause (25,652 MISSING_EXPECTED).
     "ODDS_API": {
         "odds": "2024-01-01",
         "odds_snapshot": "2024-01-01",
