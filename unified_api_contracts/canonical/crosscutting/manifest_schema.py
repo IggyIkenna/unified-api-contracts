@@ -60,9 +60,9 @@ MANIFEST_SCHEMA_VERSION_V8: Final[int] = 8
 """The manifest schema version this module declares.
 
 v8 adds three NULLABLE columns to v7 — see :data:`V8_NEW_COLUMNS`. v7's row
-shape (UTL ``manifest_writer.MANIFEST_SCHEMA_VERSION = 7``) remains the
-read-side back-compat target until the Phase 7 bundled walk migrates every
-parquet to v8 + the 30-day reader-fallback window expires."""
+shape (UTL ``manifest_writer.MANIFEST_SCHEMA_VERSION = 8``) is the writer
+default; the 30-day reader-fallback window for pre-v8 rows expires after the
+Phase 7 bundled walk migrates all prod parquets to v8."""
 
 
 # ---------------------------------------------------------------------------
