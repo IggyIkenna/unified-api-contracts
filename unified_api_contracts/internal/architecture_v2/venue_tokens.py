@@ -123,6 +123,9 @@ _DEFI_PERP_TOKENS: frozenset[str] = frozenset(
         # the hedge to an EVM perp venue (Hyperliquid) was economically worse
         # than the native path on every per-hedge cross-chain transfer.
         "drift",
+        # dYdX is a Cosmos-native perpetuals DEX (dYdX Chain L1). Required for
+        # ML_DIRECTIONAL_CONTINUOUS DeFi perp slots in target_universe catalog.
+        "dydx",
     }
 )
 

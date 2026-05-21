@@ -235,6 +235,16 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # ---- Reference (asset-group-agnostic) -------------------------------
     ("reference", "instruments"): ["instruments_service"],
     ("reference", "venue_trading_calendar"): ["instruments_service"],
+    # ---- Features-service computed outputs ------------------------------
+    # commodity_features — tradfi energy signals (storage, weather, COT, rig_count,
+    # price_momentum) produced by features-service commodity sub-package from EIA + CFTC + BH feeds.
+    # BATCH_EIA PipelineMode prerequisite (D5 Phase 1 / uac@fb3751e8).
+    ("tradfi", "commodity_features"): ["eia"],
+    # cross_instrument_features — cross-asset/cross-venue signals (paired_price_dispersion,
+    # cross_venue_spreads, regime_detection, cross_asset_correlation, cross_instrument_dynamics)
+    # produced by features-service cross_instrument sub-package from delta-one inputs.
+    # BATCH_CROSS_INSTRUMENT PipelineMode prerequisite (D5 Phase 2 / uac@39733749).
+    ("cefi", "cross_instrument_features"): ["cross_instrument"],
 }
 
 

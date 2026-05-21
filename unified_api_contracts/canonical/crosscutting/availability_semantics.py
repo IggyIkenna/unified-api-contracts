@@ -187,6 +187,13 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ---- Reference data (asset-group-agnostic) --------------------------
     ("reference", "instruments"): "fetch_completed_at",
     ("reference", "venue_trading_calendar"): "fetch_completed_at",
+    # ---- Features-service computed outputs ------------------------------
+    # commodity_features: batch-computed at write-time; available_at = fetch_completed_at.
+    # D5 Phase 1 prerequisite — BATCH_EIA PipelineMode / SOURCE_PRIORITY round-trip.
+    ("tradfi", "commodity_features"): "fetch_completed_at",
+    # cross_instrument_features: batch-computed at write-time; available_at = fetch_completed_at.
+    # D5 Phase 2 prerequisite — BATCH_CROSS_INSTRUMENT PipelineMode / SOURCE_PRIORITY round-trip.
+    ("cefi", "cross_instrument_features"): "fetch_completed_at",
 }
 
 
