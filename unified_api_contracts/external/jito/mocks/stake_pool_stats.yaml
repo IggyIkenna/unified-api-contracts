@@ -1,0 +1,38 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://kobe.mainnet.jito.network/api/v1/stake_pool_stats
+    response:
+      body:
+        string: '{"pool_address":"Jito4APyf642JPZPx3hGc6WWJ8zPKtRbRs4P3eg9gB","apy":7.12,"staked_validator_count":11234,"total_lamports":12345678901234567}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://kobe.mainnet.jito.network/api/v1/mev_rewards
+    response:
+      body:
+        string: '{"epoch":678,"total_mev_lamports":45678901234,"mev_apy_contribution":0.42}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

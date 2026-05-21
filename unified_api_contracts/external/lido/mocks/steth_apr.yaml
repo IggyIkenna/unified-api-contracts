@@ -1,0 +1,22 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.lido.fi/v1/protocol/steth/apr/last
+    response:
+      body:
+        string: '{"data":{"timeUnix":1716249600,"apr":3.5}}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

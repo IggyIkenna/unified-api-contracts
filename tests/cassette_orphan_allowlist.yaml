@@ -129,3 +129,23 @@ allowed:
     reason: recording-template
     detail: "Curve Finance REST API (api.curve.finance/v1/getPools/ethereum/main). IS adapter instruments_service/reference_data/adapters/defi/curve.py calls this URL but imports from unified_api_contracts.internal (not curve_fi schemas yet). Wiring IS adapter to import from unified_api_contracts.external.curve_fi is Phase 2 QG task tracked in canary_coverage_qg_enforcement_2026_05_20.md Phase 2."
     acked_by: slot-2 2026-05-21
+  - path: rocket_pool/mocks/onchain_reth.yaml
+    reason: capability-declaration-only
+    detail: "Rocket Pool has no public REST API for rETH rates. IS adapter (instruments_service/reference_data/adapters/defi/rocket_pool.py) is a pure static registry with zero HTTP calls. rETH APY data flows through DeFiLlama (project: rocket-pool, covered by defillama/mocks/yields.yaml). Cassette documents the eth_call to RocketTokenRETH.getExchangeRate() (0xae78736Cd615f374D3085123A210448E74Fc6393) for carry_staked_basis instrumentation."
+    acked_by: slot-2 2026-05-21
+  - path: sanctum/mocks/lst_static_registry.yaml
+    reason: capability-declaration-only
+    detail: "Sanctum has no public REST API for LST rates. IS adapter (instruments_service/reference_data/adapters/defi/sanctum.py) is a pure static registry returning hardcoded mint addresses (INF, jupSOL, laineSOL) with zero HTTP calls. APY data for Sanctum LSTs flows through DeFiLlama or per-protocol adapters. Cassette documents the LST catalogue for carry_staked_basis instrumentation."
+    acked_by: slot-2 2026-05-21
+  - path: lido/mocks/steth_apr.yaml
+    reason: recording-template
+    detail: "Lido stETH APR REST API (api.lido.fi/v1/protocol/steth/apr/last). IS adapter (instruments_service/reference_data/adapters/defi/lido.py) sets source_archive_url_template to this URL but the IS adapter itself makes no live HTTP call (static InstrumentRecord). MTDS handler derives the URL from source_archive_url_template; cassette covers the api.lido.fi host for canary drift detection. Phase 2 QG task wires the IS-schema import."
+    acked_by: slot-2 2026-05-21
+  - path: jito/mocks/stake_pool_stats.yaml
+    reason: recording-template
+    detail: "Jito Stakenet REST API (kobe.mainnet.jito.network/api/v1/stake_pool_stats + mev_rewards). IS adapter (instruments_service/reference_data/adapters/defi/jito.py) calls this URL in get_instruments(). UAC external/jito schemas not yet imported by IS adapter (still uses unified_api_contracts.internal). Wiring IS import to external.jito is Phase 2 QG task. Cassette covers the kobe.mainnet.jito.network host."
+    acked_by: slot-2 2026-05-21
+  - path: marinade/mocks/msol_apy.yaml
+    reason: recording-template
+    detail: "Marinade Finance mSOL APY REST API (api.marinade.finance/msol/apy/30d and /365d). IS adapter (instruments_service/reference_data/adapters/defi/marinade.py) calls this URL in get_instruments(). UAC external/marinade schemas not yet imported by IS adapter (still uses unified_api_contracts.internal). Wiring IS import to external.marinade is Phase 2 QG task. Cassette covers the api.marinade.finance host."
+    acked_by: slot-2 2026-05-21

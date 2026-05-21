@@ -1,0 +1,38 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.marinade.finance/msol/apy/30d
+    response:
+      body:
+        string: '{"value":0.0698,"extras":{"stakingRewards":0.063,"mevRewards":0.0068}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.marinade.finance/msol/apy/365d
+    response:
+      body:
+        string: '{"value":0.0706,"extras":{"stakingRewards":0.064,"mevRewards":0.0066}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

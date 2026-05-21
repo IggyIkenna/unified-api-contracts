@@ -1,0 +1,18 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+      method: GET
+      uri: https://sanctum.so/api/v1/lst
+    response:
+      body:
+        string: '{"tokens":[{"symbol":"INF","mint_address":"5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm","underlying":"SOL","decimals":9},{"symbol":"JUPSOL","mint_address":"jupSoLaHXQiZZTSfEWMTRRgpnyFm8f6sZdosWBjx93v","underlying":"SOL","decimals":9},{"symbol":"LAINESOL","mint_address":"LAinEtNLgpmCP9Rvsf5Hn8W6EhNiKLZMTlkPradhmPuA","underlying":"SOL","decimals":9}],"deploy_date":"2023-06-01"}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"jsonrpc":"2.0","id":1,"method":"eth_call","params":[{"to":"0xae78736Cd615f374D3085123A210448E74Fc6393","data":"0x3ba0b9a9"},"latest"]}'
+      headers:
+        Content-Type:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: POST
+      uri: https://eth-mainnet.g.alchemy.com/v2/{API_KEY}
+    response:
+      body:
+        string: '{"jsonrpc":"2.0","id":1,"result":"0x0000000000000000000000000000000000000000000000000e0a7e65b88d7800"}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1
