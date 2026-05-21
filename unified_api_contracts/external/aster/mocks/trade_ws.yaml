@@ -1,0 +1,14 @@
+ws_url: wss://fstream.asterdex.com/ws
+subscription:
+  method: SUBSCRIBE
+  params:
+    - btcusdt@trade
+  id: 1
+frames:
+  - direction: recv
+    payload: '{"e":"trade","E":1716249600000,"T":1716249600000,"s":"BTCUSDT","t":123456789,"p":"67500.00","q":"0.001","X":"MARKET","m":false}'
+  - direction: recv
+    payload: '{"e":"trade","E":1716249600100,"T":1716249600100,"s":"BTCUSDT","t":123456790,"p":"67498.50","q":"0.005","X":"MARKET","m":true}'
+  - direction: recv
+    payload: '{"e":"trade","E":1716249600200,"T":1716249600200,"s":"BTCUSDT","t":123456791,"p":"67501.00","q":"0.002","X":"MARKET","m":false}'
+version: 1

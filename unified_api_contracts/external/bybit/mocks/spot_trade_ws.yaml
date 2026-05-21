@@ -1,0 +1,13 @@
+ws_url: wss://stream.bybit.com/v5/public/spot
+subscription:
+  op: subscribe
+  args:
+    - publicTrade.BTCUSDT
+frames:
+  - direction: recv
+    payload: '{"topic":"publicTrade.BTCUSDT","type":"snapshot","ts":1716249600000,"data":[{"T":1716249600000,"s":"BTCUSDT","S":"Buy","v":"0.001","p":"67500.00","L":"PlusTick","i":"xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx","BT":false}]}'
+  - direction: recv
+    payload: '{"topic":"publicTrade.BTCUSDT","type":"snapshot","ts":1716249600100,"data":[{"T":1716249600100,"s":"BTCUSDT","S":"Sell","v":"0.005","p":"67498.50","L":"MinusTick","i":"yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy","BT":false}]}'
+  - direction: recv
+    payload: '{"topic":"publicTrade.BTCUSDT","type":"snapshot","ts":1716249600200,"data":[{"T":1716249600200,"s":"BTCUSDT","S":"Buy","v":"0.002","p":"67501.00","L":"PlusTick","i":"zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz","BT":false}]}'
+version: 1

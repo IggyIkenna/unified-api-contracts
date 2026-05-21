@@ -1,0 +1,14 @@
+ws_url: wss://fstream.binance.com/ws
+subscription:
+  method: SUBSCRIBE
+  params:
+    - btcusdt@aggTrade
+  id: 1
+frames:
+  - direction: recv
+    payload: '{"e":"aggTrade","E":1716249600000,"T":1716249599999,"s":"BTCUSDT","a":123456789,"p":"67500.00","q":"0.001","f":234567890,"l":234567890,"m":false}'
+  - direction: recv
+    payload: '{"e":"aggTrade","E":1716249600100,"T":1716249600099,"s":"BTCUSDT","a":123456790,"p":"67498.50","q":"0.005","f":234567891,"l":234567892,"m":true}'
+  - direction: recv
+    payload: '{"e":"aggTrade","E":1716249600200,"T":1716249600199,"s":"BTCUSDT","a":123456791,"p":"67501.00","q":"0.002","f":234567893,"l":234567893,"m":false}'
+version: 1

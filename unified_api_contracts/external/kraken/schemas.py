@@ -14,7 +14,7 @@ class KrakenTickerData(BaseModel):
     v: list[str] = Field(..., description="Volume [today, last 24h]")
     p: list[str] = Field(..., description="Volume weighted average price [today, last 24h]")
     t: list[int] = Field(..., description="Number of trades [today, last 24h]")
-    l: list[str] = Field(..., description="Low [today, last 24h]")
+    l: list[str] = Field(..., description="Low [today, last 24h]")  # noqa: E741
     h: list[str] = Field(..., description="High [today, last 24h]")
     o: str = Field(..., description="Today's opening price")
 

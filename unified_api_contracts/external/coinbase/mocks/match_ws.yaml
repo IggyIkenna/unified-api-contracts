@@ -1,0 +1,15 @@
+ws_url: wss://ws-feed.exchange.coinbase.com
+subscription:
+  type: subscribe
+  product_ids:
+    - BTC-USD
+  channels:
+    - matches
+frames:
+  - direction: recv
+    payload: '{"type":"last_match","trade_id":12345678,"sequence":98765432,"maker_order_id":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","taker_order_id":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb","time":"2024-05-20T12:00:00.000000Z","product_id":"BTC-USD","size":"0.001","price":"67500.00","side":"sell"}'
+  - direction: recv
+    payload: '{"type":"match","trade_id":12345679,"sequence":98765433,"maker_order_id":"cccccccc-cccc-cccc-cccc-cccccccccccc","taker_order_id":"dddddddd-dddd-dddd-dddd-dddddddddddd","time":"2024-05-20T12:00:00.100000Z","product_id":"BTC-USD","size":"0.005","price":"67498.50","side":"buy"}'
+  - direction: recv
+    payload: '{"type":"match","trade_id":12345680,"sequence":98765434,"maker_order_id":"eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee","taker_order_id":"ffffffff-ffff-ffff-ffff-ffffffffffff","time":"2024-05-20T12:00:00.200000Z","product_id":"BTC-USD","size":"0.002","price":"67501.00","side":"sell"}'
+version: 1

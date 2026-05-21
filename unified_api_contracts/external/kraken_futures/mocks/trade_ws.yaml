@@ -1,0 +1,14 @@
+ws_url: wss://futures.kraken.com/ws/v1
+subscription:
+  event: subscribe
+  feed: trade
+  product_ids:
+    - PF_XBTUSD
+frames:
+  - direction: recv
+    payload: '{"feed":"trade_snapshot","product_id":"PF_XBTUSD","trades":[{"feed":"trade","product_id":"PF_XBTUSD","uid":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa","side":"buy","type":"fill","seq":1234560,"time":1716249599000,"qty":0.001,"price":67490.0}]}'
+  - direction: recv
+    payload: '{"feed":"trade","product_id":"PF_XBTUSD","uid":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb","side":"buy","type":"fill","seq":1234567,"time":1716249600000,"qty":0.001,"price":67500.0}'
+  - direction: recv
+    payload: '{"feed":"trade","product_id":"PF_XBTUSD","uid":"cccccccc-cccc-cccc-cccc-cccccccccccc","side":"sell","type":"fill","seq":1234568,"time":1716249600100,"qty":0.005,"price":67498.5}'
+version: 1

@@ -1,0 +1,14 @@
+ws_url: wss://api.hyperliquid.xyz/ws
+subscription:
+  method: subscribe
+  subscription:
+    type: trades
+    coin: BTC
+frames:
+  - direction: recv
+    payload: '{"channel":"trades","data":[{"coin":"BTC","side":"A","px":"67500.0","sz":"0.001","time":1716249600000,"hash":"0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab","tid":123456}]}'
+  - direction: recv
+    payload: '{"channel":"trades","data":[{"coin":"BTC","side":"B","px":"67498.5","sz":"0.005","time":1716249600100,"hash":"0xbcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abc","tid":123457}]}'
+  - direction: recv
+    payload: '{"channel":"trades","data":[{"coin":"BTC","side":"A","px":"67501.0","sz":"0.002","time":1716249600200,"hash":"0xcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcd","tid":123458}]}'
+version: 1

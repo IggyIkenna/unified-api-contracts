@@ -35,16 +35,33 @@ COLLECTED_DIR = ROOT / "collected_responses"
 
 
 def main() -> int:
+    lines: list[str] = []
+
+    # Validate WS cassette frame payloads (no network needed).
+    ws_cassettes = sorted(EXTERNAL_DIR.glob("*/mocks/*_ws.yaml"))
+    for ws_cassette in ws_cassettes:
+        lines.append(_validate_ws_cassette(ws_cassette))
+
     if not COLLECTED_DIR.exists():
-        print("⚠️  No collected_responses/ directory — collect_responses.py did not run")
+        if not ws_cassettes:
+            print("⚠️  No collected_responses/ directory and no WS cassettes found")
+        for line in lines:
+            print(line)
+        if lines:
+            failed = sum(1 for line in lines if line.startswith("❌"))
+            passed = sum(1 for line in lines if line.startswith("✅"))
+            warned = len(lines) - failed - passed
+            print()
+            print(f"WS cassette summary: {passed} ✅ / {failed} ❌ / {warned} ⚠️")
         return 0
 
     collected_files = sorted(COLLECTED_DIR.glob("*/*.json"))
     if not collected_files:
         print("⚠️  No collected responses to validate")
+        for line in lines:
+            print(line)
         return 0
 
-    lines: list[str] = []
     for cf in collected_files:
         lines.append(_validate_one(cf))
 
@@ -57,6 +74,40 @@ def main() -> int:
     print()
     print(f"Summary: {passed} ✅ / {failed} ❌ / {warned} ⚠️")
     return 0
+
+
+def _validate_ws_cassette(cassette_path: Path) -> str:
+    """Validate a WS frame cassette (*_ws.yaml with ws_url: key).
+
+    Checks:
+    - ws_url starts with wss://
+    - Each frame payload is valid JSON (stub cassettes with frames=[] are ✅)
+    """
+    venue = cassette_path.parent.parent.name
+    label = f"{venue}/{cassette_path.name}"
+    try:
+        cassette = yaml.safe_load(cassette_path.read_text()) or {}
+    except yaml.YAMLError as exc:
+        return f"❌ {label}: WS cassette YAML parse: {exc}"
+
+    ws_url = cassette.get("ws_url", "")
+    if not isinstance(ws_url, str) or not ws_url.startswith("wss://"):
+        return f"❌ {label}: ws_url missing or not wss:// — got {ws_url!r}"
+
+    frames = cassette.get("frames") or []
+    if not frames:
+        return f"✅ {label} (WS stub — frames=[])"
+
+    for i, frame in enumerate(frames):
+        payload = frame.get("payload")
+        if payload is None:
+            return f"❌ {label}: frame[{i}] missing payload"
+        try:
+            json.loads(str(payload))
+        except json.JSONDecodeError as exc:
+            return f"❌ {label}: frame[{i}] payload not valid JSON: {exc}"
+
+    return f"✅ {label} (WS — {len(frames)} frames)"
 
 
 def _validate_one(collected_path: Path) -> str:
@@ -81,6 +132,10 @@ def _validate_one(collected_path: Path) -> str:
         cassette = yaml.safe_load(cassette_path.read_text()) or {}
     except yaml.YAMLError as exc:
         return f"⚠️  {label}: cassette YAML parse: {exc}"
+
+    # WS cassettes are identified by ws_url key; they don't have interactions.
+    if "ws_url" in cassette:
+        return f"⚠️  {label}: cassette is a WS frame cassette — use collect_ws_frames.py for live WS comparison"
 
     interactions = cassette.get("interactions") or []
     if not interactions:

@@ -1,0 +1,15 @@
+ws_url: wss://api.hyperliquid.xyz/ws
+subscription:
+  method: subscribe
+  subscription:
+    type: l2Book
+    coin: BTC
+    nSigFigs: 5
+frames:
+  - direction: recv
+    payload: '{"channel":"l2Book","data":{"coin":"BTC","levels":[[{"px":"67495.0","sz":"0.1","n":1},{"px":"67490.0","sz":"0.2","n":3},{"px":"67485.0","sz":"0.5","n":5}],[{"px":"67505.0","sz":"0.1","n":1},{"px":"67510.0","sz":"0.3","n":4},{"px":"67515.0","sz":"0.6","n":6}]],"time":1716249600000}}'
+  - direction: recv
+    payload: '{"channel":"l2Book","data":{"coin":"BTC","levels":[[{"px":"67494.0","sz":"0.15","n":2},{"px":"67489.0","sz":"0.25","n":4}],[{"px":"67506.0","sz":"0.12","n":2},{"px":"67511.0","sz":"0.35","n":5}]],"time":1716249600500}}'
+  - direction: recv
+    payload: '{"channel":"l2Book","data":{"coin":"BTC","levels":[[{"px":"67496.0","sz":"0.08","n":1},{"px":"67491.0","sz":"0.18","n":2},{"px":"67486.0","sz":"0.45","n":4}],[{"px":"67504.0","sz":"0.09","n":1},{"px":"67509.0","sz":"0.28","n":3},{"px":"67514.0","sz":"0.55","n":5}]],"time":1716249601000}}'
+version: 1

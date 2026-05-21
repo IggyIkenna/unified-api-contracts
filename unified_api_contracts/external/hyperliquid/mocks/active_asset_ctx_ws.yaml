@@ -1,0 +1,14 @@
+ws_url: wss://api.hyperliquid.xyz/ws
+subscription:
+  method: subscribe
+  subscription:
+    type: activeAssetCtx
+    coin: SOL
+frames:
+  - direction: recv
+    payload: '{"channel":"activeAssetCtx","data":{"coin":"SOL","ctx":{"dayNtlVlm":"12345678.90","prevDayPx":"150.00","markPx":"152.34","midPx":"152.35","funding":"0.0001","openInterest":"123456.7","oraclePx":"152.30","premium":"0.000026","impactPxs":["152.33","152.36"]}}}'
+  - direction: recv
+    payload: '{"channel":"activeAssetCtx","data":{"coin":"SOL","ctx":{"dayNtlVlm":"12348000.00","prevDayPx":"150.00","markPx":"152.41","midPx":"152.42","funding":"0.0001","openInterest":"123460.2","oraclePx":"152.38","premium":"0.000020","impactPxs":["152.40","152.43"]}}}'
+  - direction: recv
+    payload: '{"channel":"activeAssetCtx","data":{"coin":"SOL","ctx":{"dayNtlVlm":"12351000.00","prevDayPx":"150.00","markPx":"152.38","midPx":"152.39","funding":"0.0001","openInterest":"123459.1","oraclePx":"152.35","premium":"0.000020","impactPxs":["152.37","152.40"]}}}'
+version: 1

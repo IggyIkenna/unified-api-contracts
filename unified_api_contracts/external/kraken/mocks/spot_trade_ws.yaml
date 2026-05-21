@@ -1,0 +1,15 @@
+ws_url: wss://ws.kraken.com/v2
+subscription:
+  method: subscribe
+  params:
+    channel: trade
+    symbol:
+      - BTC/USD
+frames:
+  - direction: recv
+    payload: '{"channel":"trade","type":"snapshot","data":[{"symbol":"BTC/USD","side":"buy","qty":"0.001","price":"67500.00","ord_type":"market","trade_id":1234567,"timestamp":"2024-05-20T12:00:00.000000Z","taker_side":"buy"}]}'
+  - direction: recv
+    payload: '{"channel":"trade","type":"update","data":[{"symbol":"BTC/USD","side":"sell","qty":"0.005","price":"67498.50","ord_type":"market","trade_id":1234568,"timestamp":"2024-05-20T12:00:00.100000Z","taker_side":"sell"}]}'
+  - direction: recv
+    payload: '{"channel":"trade","type":"update","data":[{"symbol":"BTC/USD","side":"buy","qty":"0.002","price":"67501.00","ord_type":"limit","trade_id":1234569,"timestamp":"2024-05-20T12:00:00.200000Z","taker_side":"buy"}]}'
+version: 1

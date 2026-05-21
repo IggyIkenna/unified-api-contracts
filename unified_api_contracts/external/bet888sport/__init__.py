@@ -6,9 +6,9 @@ Playwright session capture infrastructure.
 """
 
 from unified_api_contracts.external.bet888sport.schemas import (
-    888sportFixtureOdds,
-    888sportMarket,
-    888sportOutcome,
+    Bet888sportFixtureOdds,
+    Bet888sportMarket,
+    Bet888sportOutcome,
 )
 
-__all__ = ["888sportFixtureOdds", "888sportMarket", "888sportOutcome"]
+__all__ = ["Bet888sportFixtureOdds", "Bet888sportMarket", "Bet888sportOutcome"]

@@ -1,0 +1,191 @@
+"""STEP 5.7X — WS cassette coexistence: every live WS connector must have a WS cassette.
+
+Per plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 4.
+The "Batch = Live" SSOT requires that every venue with a live WebSocket
+connector in MTDS also has at least one ``*_ws.yaml`` cassette in
+``unified_api_contracts/external/<venue>/mocks/``.
+
+Two checks:
+1. Coexistence: every true WS connector → at least one *_ws.yaml cassette.
+2. Frame JSON: every *_ws.yaml cassette frame payload parses as valid JSON.
+
+REST-polling connectors that happen to be named *_ws.py are excluded from
+the coexistence check (they use REST cassettes, not WS frame cassettes).
+"""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+from typing import Final
+
+import pytest
+import yaml
+
+# ---------------------------------------------------------------------------
+# Paths
+# ---------------------------------------------------------------------------
+_REPO_ROOT: Final[Path] = Path(__file__).resolve().parents[1]
+_UAC_EXTERNAL: Final[Path] = _REPO_ROOT / "unified_api_contracts" / "external"
+
+# MTDS connector directory — resolved relative to workspace root.
+# UAC is at <workspace>/.tabs/2/unified-api-contracts/
+_WORKSPACE: Final[Path] = _REPO_ROOT.parents[2]  # .tabs/2/
+_MTDS_CONNECTORS: Final[Path] = (
+    _WORKSPACE / "market-tick-data-service" / "market_tick_data_service" / "live" / "connectors"
+)
+
+# REST pollers that are *_ws.py in name but don't use true WebSocket — they
+# already have REST cassettes from Phase 3; WS frame cassettes don't apply.
+_REST_POLLER_CONNECTORS: Final[frozenset[str]] = frozenset(
+    {
+        "curve_defi_ws",
+        "jito_defi_ws",
+        "morpho_defi_ws",
+        "odds_api_ws",
+        "phoenix_ws",
+        "polymarket_ws",
+    }
+)
+
+# Static map: connector stem → (UAC venue dir, at least one expected *_ws.yaml glob).
+# Built from Phase 4 cassette creation — updated when new connectors land.
+_CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
+    "aster_ws": "aster",
+    "binance_futures_ws": "binance",
+    "binance_spot_ws": "binance",
+    "bybit_ws": "bybit",
+    "bybit_spot_ws": "bybit",
+    "coinbase_spot_ws": "coinbase",
+    "databento_tradfi_ws": "databento",
+    "deribit_ws": "deribit",
+    "drift_solana_ws": "drift",
+    "hyperliquid_ws": "hyperliquid",
+    "hyperliquid_l2book_ws": "hyperliquid",
+    "hyperliquid_ticker_ws": "hyperliquid",
+    "kalshi_ws": "kalshi",
+    "kraken_futures_ws": "kraken_futures",
+    "kraken_spot_ws": "kraken",
+    "okx_ws": "okx",
+    "okx_spot_ws": "okx",
+}
+
+
+def _collect_ws_cassettes() -> list[Path]:
+    """Return all *_ws.yaml files under external/<venue>/mocks/."""
+    return sorted(_UAC_EXTERNAL.glob("*/mocks/*_ws.yaml"))
+
+
+def _cassette_id(p: Path) -> str:
+    return f"{p.parent.parent.name}/{p.name}"
+
+
+_ALL_WS_CASSETTES: Final[list[Path]] = _collect_ws_cassettes()
+
+
+# ---------------------------------------------------------------------------
+# 1. WS cassette frame JSON validity
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "cassette_path",
+    _ALL_WS_CASSETTES,
+    ids=[_cassette_id(p) for p in _ALL_WS_CASSETTES],
+)
+def test_ws_cassette_is_valid_yaml(cassette_path: Path) -> None:
+    """Each *_ws.yaml must parse as valid YAML."""
+    parsed = yaml.safe_load(cassette_path.read_text(encoding="utf-8"))
+    assert parsed is not None, f"{cassette_path.name}: empty file"
+
+
+@pytest.mark.parametrize(
+    "cassette_path",
+    _ALL_WS_CASSETTES,
+    ids=[_cassette_id(p) for p in _ALL_WS_CASSETTES],
+)
+def test_ws_cassette_has_ws_url(cassette_path: Path) -> None:
+    """Each *_ws.yaml must have a ws_url field (distinguishes WS from REST cassettes)."""
+    parsed = yaml.safe_load(cassette_path.read_text(encoding="utf-8"))
+    assert isinstance(parsed, dict), f"{cassette_path.name}: root is not a dict"
+    assert "ws_url" in parsed, (
+        f"{cassette_path.name}: missing 'ws_url' — WS cassettes must have this field. "
+        "If this is a REST cassette, rename it without _ws suffix."
+    )
+    ws_url = parsed["ws_url"]
+    assert isinstance(ws_url, str) and ws_url.startswith("wss://"), (
+        f"{cassette_path.name}: ws_url must start with wss://, got {ws_url!r}"
+    )
+
+
+@pytest.mark.parametrize(
+    "cassette_path",
+    _ALL_WS_CASSETTES,
+    ids=[_cassette_id(p) for p in _ALL_WS_CASSETTES],
+)
+def test_ws_cassette_frames_are_valid_json(cassette_path: Path) -> None:
+    """Each frame payload in a *_ws.yaml must be valid JSON.
+
+    Stub cassettes (frames: []) are explicitly allowed — they are placeholders
+    for BLOCKED-CREDENTIALS connectors.
+    """
+    parsed = yaml.safe_load(cassette_path.read_text(encoding="utf-8"))
+    if not isinstance(parsed, dict):
+        pytest.skip("not a dict — caught by test_ws_cassette_is_valid_yaml")
+    frames = parsed.get("frames") or []
+    if not frames:
+        pytest.skip(f"{cassette_path.name}: stub cassette (frames=[]) — skipping frame JSON check")
+    for i, frame in enumerate(frames):
+        payload = frame.get("payload")
+        assert payload is not None, f"{cassette_path.name} frame[{i}]: missing 'payload' field"
+        try:
+            json.loads(str(payload))
+        except json.JSONDecodeError as exc:
+            pytest.fail(
+                f"{cassette_path.name} frame[{i}]: payload is not valid JSON: {exc}\n"
+                f"payload preview: {str(payload)[:200]}"
+            )
+
+
+# ---------------------------------------------------------------------------
+# 2. Coexistence: every true WS connector has at least one *_ws.yaml
+# ---------------------------------------------------------------------------
+
+
+def test_mtds_connectors_dir_exists() -> None:
+    """MTDS live/connectors/ must exist for coexistence checks to be meaningful."""
+    if not _MTDS_CONNECTORS.exists():
+        pytest.skip(
+            f"MTDS connectors dir not found at {_MTDS_CONNECTORS} — run from workspace root or check MTDS checkout"
+        )
+
+
+def _get_true_ws_connector_stems() -> list[str]:
+    """Return connector stems (no .py) that are true WS connectors."""
+    if not _MTDS_CONNECTORS.exists():
+        return []
+    return [p.stem for p in sorted(_MTDS_CONNECTORS.glob("*_ws.py")) if p.stem not in _REST_POLLER_CONNECTORS]
+
+
+_TRUE_WS_CONNECTORS: Final[list[str]] = _get_true_ws_connector_stems()
+
+
+@pytest.mark.parametrize("connector_stem", _TRUE_WS_CONNECTORS)
+def test_ws_connector_has_cassette(connector_stem: str) -> None:
+    """Every true WS connector must have at least one *_ws.yaml in its UAC venue dir.
+
+    Enforces the "Batch = Live" SSOT: if a venue is live (has a WS connector),
+    it must have a WS frame cassette so the canary can detect schema drift.
+    """
+    venue = _CONNECTOR_TO_VENUE.get(connector_stem)
+    assert venue is not None, (
+        f"Connector '{connector_stem}' not in _CONNECTOR_TO_VENUE map. "
+        "Add it to test_ws_cassette_coexistence.py when landing a new WS connector."
+    )
+    venue_mocks = _UAC_EXTERNAL / venue / "mocks"
+    ws_cassettes = list(venue_mocks.glob("*_ws.yaml"))
+    assert ws_cassettes, (
+        f"No *_ws.yaml cassette found for connector '{connector_stem}' in {venue_mocks}. "
+        "Create at least one WS frame cassette per venue per "
+        "canary_coverage_qg_enforcement_2026_05_20.md Phase 4."
+    )

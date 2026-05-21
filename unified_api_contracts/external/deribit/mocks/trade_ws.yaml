@@ -1,0 +1,16 @@
+ws_url: wss://www.deribit.com/ws/api/v2
+subscription:
+  jsonrpc: "2.0"
+  method: public/subscribe
+  params:
+    channels:
+      - trades.BTC-PERPETUAL.raw
+  id: 1
+frames:
+  - direction: recv
+    payload: '{"jsonrpc":"2.0","method":"subscription","params":{"channel":"trades.BTC-PERPETUAL.raw","data":[{"trade_id":"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx","timestamp":1716249600000,"price":67500.0,"amount":0.1,"direction":"buy","instrument_name":"BTC-PERPETUAL","trade_seq":123456,"iv":null,"mark_price":67490.0,"index_price":67495.0,"fee":0.0001,"fee_currency":"BTC","tick_direction":0,"combo_id":null,"combo_trade_id":null,"block_trade_id":null}]}}'
+  - direction: recv
+    payload: '{"jsonrpc":"2.0","method":"subscription","params":{"channel":"trades.BTC-PERPETUAL.raw","data":[{"trade_id":"yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy","timestamp":1716249600100,"price":67498.5,"amount":0.05,"direction":"sell","instrument_name":"BTC-PERPETUAL","trade_seq":123457,"iv":null,"mark_price":67490.0,"index_price":67495.0,"fee":0.00005,"fee_currency":"BTC","tick_direction":-1,"combo_id":null,"combo_trade_id":null,"block_trade_id":null}]}}'
+  - direction: recv
+    payload: '{"jsonrpc":"2.0","method":"subscription","params":{"channel":"trades.BTC-PERPETUAL.raw","data":[{"trade_id":"zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz","timestamp":1716249600200,"price":67501.0,"amount":0.2,"direction":"buy","instrument_name":"BTC-PERPETUAL","trade_seq":123458,"iv":null,"mark_price":67491.0,"index_price":67496.0,"fee":0.0002,"fee_currency":"BTC","tick_direction":1,"combo_id":null,"combo_trade_id":null,"block_trade_id":null}]}}'
+version: 1

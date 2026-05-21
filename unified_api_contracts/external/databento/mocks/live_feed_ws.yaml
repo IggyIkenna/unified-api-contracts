@@ -1,0 +1,9 @@
+# STUB — BLOCKED-CREDENTIALS
+# Databento live WebSocket (wss://live.databento.com) requires a paid subscription key.
+# Connector: market_tick_data_service/live/connectors/databento_tradfi_ws.py
+# Status: BLOCKED-CREDENTIALS — operator credential request in ikenna_orchestrator/pings/slot_2.md
+# Authentication shape: CRAM-SHA-256 challenge on connect (API key required).
+ws_url: wss://live.databento.com
+subscription: null
+frames: []
+version: 1

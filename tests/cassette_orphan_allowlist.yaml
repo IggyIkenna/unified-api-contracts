@@ -97,6 +97,10 @@ allowed:
     reason: recording-template
     detail: "See databento/batch_list_jobs.yaml."
     acked_by: ikenna 2026-05-20
+  - path: databento/mocks/live_feed_ws.yaml
+    reason: stub-placeholder
+    detail: "Databento live WS (wss://live.databento.com) requires paid API key (CRAM-SHA-256 auth). BLOCKED-CREDENTIALS — frames intentionally empty pending operator credential provision."
+    acked_by: ikenna 2026-05-21
   - path: gateio/mocks/ticker.yaml
     reason: recording-template
     detail: "Gateio not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
@@ -194,6 +198,14 @@ allowed:
   - path: kraken_futures/mocks/tickers.yaml
     reason: recording-template
     detail: "Kraken Futures public tickers (futures.kraken.com/derivatives/api/v3/tickers). IS adapter uses CCXTReferenceDataAdapter(exchange_id='krakenfutures'). UAC external/kraken_futures schemas not yet imported by CCXT adapter. Phase 2 QG task. Cassette covers the futures.kraken.com host."
+    acked_by: slot-2 2026-05-21
+  - path: kraken/mocks/spot_trade_ws.yaml
+    reason: recording-template
+    detail: "Kraken Spot WS trade frames (wss://ws.kraken.com/v2). MTDS live connector kraken_spot_ws.py streams this channel. UAC external/kraken schemas not yet imported by the WS connector. Phase 4 WS cassette; venue hit wired post-Phase-2 QG."
+    acked_by: slot-2 2026-05-21
+  - path: kraken_futures/mocks/trade_ws.yaml
+    reason: recording-template
+    detail: "Kraken Futures WS trade frames (wss://futures.kraken.com/ws/v1). MTDS live connector kraken_futures_ws.py streams this channel. UAC external/kraken_futures schemas not yet imported by the WS connector. Phase 4 WS cassette; venue hit wired post-Phase-2 QG."
     acked_by: slot-2 2026-05-21
   - path: pacifica/mocks/funding_rate_history.yaml
     reason: recording-template
