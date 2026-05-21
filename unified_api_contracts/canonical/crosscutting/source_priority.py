@@ -174,6 +174,13 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("defi", "staking_yields"): ["onchain_subgraph"],
     ("defi", "token_transfers"): ["onchain_rpc"],
     ("defi", "vault_share_price"): ["onchain_subgraph"],
+    # execution_fills — emitted by execution-service (not an external
+    # market-data vendor); source tag is ``execution_service``.
+    # d3_manifest_v8_finish_2026_05_20 Phase 1 — closes
+    # PipelineMode.BATCH_EXECUTION_SERVICE closed-set round-trip with
+    # SOURCE_PRIORITY (both CeFi + DeFi execution legs write execution_fills).
+    ("cefi", "execution_fills"): ["execution_service"],
+    ("defi", "execution_fills"): ["execution_service"],
     # hedge_ratio_snapshot — emitted by strategy-service (not an external
     # market-data vendor); source tag is ``strategy_service``.
     # hedge_ratio_snapshot_persistence_2026_05_13 Phase 1.
@@ -316,6 +323,9 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # latency = 0ms relative to the event that triggered it (the rebalance
     # decision is the event; available_at = captured_at = write time).
     "strategy_service": 0,
+    # execution-service result writes — emitted inline at write time;
+    # latency = 0ms (available_at = captured_at = write time).
+    "execution_service": 0,
     # features-onchain-service — feature snapshots emitted inline at calculation
     # time; latency = 0ms relative to the observation trigger.
     "features_onchain_service": 0,

@@ -150,6 +150,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # write-time per ``fetch_completed_at`` (same pattern as other service-emitted
     # snapshots above). d5_features_missing_data_downgrade_2026_05_20 Phase 2.
     ("defi", "cross_instrument_signal"): "fetch_completed_at",
+    # execution_fills — emitted by execution-service at result write time
+    # (orders/fills/positions/equity batch + live paths); available_at = write-time.
+    # d3_manifest_v8_finish_2026_05_20 Phase 1 — closes PipelineMode.BATCH_EXECUTION_SERVICE.
+    ("cefi", "execution_fills"): "fetch_completed_at",
+    ("defi", "execution_fills"): "fetch_completed_at",
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",

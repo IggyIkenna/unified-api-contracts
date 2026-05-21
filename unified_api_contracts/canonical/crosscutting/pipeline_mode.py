@@ -56,6 +56,7 @@ class PipelineMode(StrEnum):
     BATCH_CROSS_INSTRUMENT = "batch_cross_instrument"
     BATCH_DATABENTO = "batch_databento"
     BATCH_EIA = "batch_eia"
+    BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
     BATCH_HYPERLIQUID_REST = "batch_hyperliquid_rest"
