@@ -60,23 +60,11 @@ allowed:
     acked_by: slot-4 2026-05-20
 
   # ---- recorded-but-no-prod-consumer-yet cassettes
-  # These have real recorded interactions but no service-repo consumer reads
-  # the cassette today. Per plans/active/canary_coverage_qg_enforcement_2026_05_20.md
-  # Phase 5, each is targeted for WIRE-TO-CONSUMER or DELETE-CASSETTE
-  # decision; until that phase lands, they're allowlisted with the named
-  # successor.
-  - path: barchart/mocks/get_quote_es1.yaml
-    reason: recording-template
-    detail: "Recorded ES1 quote; barchart adapter consumes via different code-path (UAC capability declaration only). Phase 5 decision: wire or delete."
-    acked_by: ikenna 2026-05-20
-  - path: bitfinex/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Bitfinex ticker recorded for canary coverage; bitfinex live connector not on May-23 critical path. Phase 5 decision."
-    acked_by: ikenna 2026-05-20
-  - path: bitstamp/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Bitstamp not on May-23 critical path. Phase 5 decision."
-    acked_by: ikenna 2026-05-20
+  # Per plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 5:
+  # barchart/get_quote_es1, bitfinex/ticker, bitstamp/ticker, gateio/ticker,
+  # huobi/ticker, kucoin/ticker, mexc/ticker → DELETED 2026-05-21 (not on
+  # May-23 critical path; full-venue orphans with no production adapter).
+  # Decisions recorded in scripts/canary/orphan-decisions.yaml.
   - path: databento/mocks/batch_list_jobs.yaml
     reason: recording-template
     detail: "Databento batch API surfaces; tradfi databento adapter ships post-May-23 (TradFi master 2026-05-07)."
@@ -101,22 +89,6 @@ allowed:
     reason: stub-placeholder
     detail: "Databento live WS (wss://live.databento.com) requires paid API key (CRAM-SHA-256 auth). BLOCKED-CREDENTIALS — frames intentionally empty pending operator credential provision."
     acked_by: ikenna 2026-05-21
-  - path: gateio/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Gateio not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
-    acked_by: ikenna 2026-05-20
-  - path: huobi/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Huobi not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
-    acked_by: ikenna 2026-05-20
-  - path: kucoin/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Kucoin not on May-23 critical path. Phase 5 decision."
-    acked_by: ikenna 2026-05-20
-  - path: mexc/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Mexc not on May-23 critical path; full-venue orphan per audit. Phase 5 decision: likely DELETE."
-    acked_by: ikenna 2026-05-20
   - path: yahoo_finance/mocks/error_rate_limit.yaml
     reason: recording-template
     detail: "Error-path cassette (rate-limit response); used for negative-path testing once Yahoo Finance integration tests land."

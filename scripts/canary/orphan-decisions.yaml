@@ -1,0 +1,105 @@
+# Orphan cassette decisions — Phase 5
+# Per plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 5.
+#
+# Action options: DELETE | WIRE-TO-CONSUMER | ALLOWLIST
+# Each DELETE removes the cassette file AND its allowlist entry (if any).
+# Each ALLOWLIST keeps the file + adds/retains an allowlist entry with justification.
+#
+# SSOT: tests/cassette_orphan_allowlist.yaml (allowlist entries)
+#       unified_api_contracts/external/<venue>/mocks/ (cassette files)
+
+decisions:
+  # ---- Full-venue orphans: no production adapter anywhere in workspace ----
+
+  - path: gateio/mocks/ticker.yaml
+    action: DELETE
+    reason: >
+      Full-venue orphan. Gate.io not on May-23 critical path; no production adapter in
+      MTDS, instruments-service, or execution-service. Venue schemas (external/gateio/)
+      exist as stubs only. Cassette file deleted; allowlist entry removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: mexc/mocks/ticker.yaml
+    action: DELETE
+    reason: >
+      Full-venue orphan. MEXC not on May-23 critical path; no production adapter in any
+      service repo. Venue schemas are stubs only. Cassette file deleted; allowlist entry
+      removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: bitstamp/mocks/ticker.yaml
+    action: DELETE
+    reason: >
+      Full-venue orphan. Bitstamp not on May-23 critical path; no production adapter.
+      Cassette file deleted; allowlist entry removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: huobi/mocks/ticker.yaml
+    action: DELETE
+    reason: >
+      Full-venue orphan. Huobi (now HTX) not on May-23 critical path; no production
+      adapter. Cassette file deleted; allowlist entry removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: bitfinex/mocks/ticker.yaml
+    action: DELETE
+    reason: >
+      Full-venue orphan. Bitfinex not on May-23 critical path; no production adapter in
+      any service repo. Cassette file deleted; allowlist entry removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: kucoin/mocks/ticker.yaml
+    action: DELETE
+    reason: >
+      Full-venue orphan. KuCoin not on May-23 critical path; no production adapter.
+      Cassette file deleted; allowlist entry removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  # ---- Per-cassette orphan: venue has other cassettes with consumers ----
+
+  - path: barchart/mocks/get_quote_es1.yaml
+    action: DELETE
+    reason: >
+      Per-cassette orphan within barchart venue. The get_quote_es1 cassette records a
+      Barchart /getQuote call for the ES1 front-month futures contract. No production
+      consumer imports or uses this specific cassette; the VIX/barchart adapter uses
+      the get_quote_vix cassette. ES1 historical tick ingestion is a TradFi Phase 3
+      task (tradfi_master.md) — cassette can be re-recorded when that adapter ships.
+      Cassette file deleted; allowlist entry removed.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  # ---- WS cassettes allowlisted (no delete) ----
+
+  - path: databento/mocks/live_feed_ws.yaml
+    action: ALLOWLIST
+    reason: >
+      BLOCKED-CREDENTIALS: Databento live WS requires CRAM-SHA-256 auth (paid API key).
+      Stub cassette with empty frames. Retained in allowlist as stub-placeholder.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: kraken/mocks/spot_trade_ws.yaml
+    action: ALLOWLIST
+    reason: >
+      Phase 4 WS cassette for kraken_spot_ws.py connector. UAC external/kraken schemas
+      not yet imported by WS connector; venue covered by allowlist as recording-template
+      (same status as kraken/ticker.yaml REST cassette). Will be wired when Phase 2 QG
+      task imports external.kraken in the connector.
+    executed: 2026-05-21
+    executed_by: slot-2
+
+  - path: kraken_futures/mocks/trade_ws.yaml
+    action: ALLOWLIST
+    reason: >
+      Phase 4 WS cassette for kraken_futures_ws.py connector. UAC external/kraken_futures
+      schemas not yet imported by WS connector. Same allowlist status as
+      kraken_futures/tickers.yaml REST cassette (recording-template, Phase 2 QG task).
+    executed: 2026-05-21
+    executed_by: slot-2
