@@ -37,6 +37,7 @@ from .canonical_ids import (
 from .canonical_ids import (
     ODDS_API_OUTCOME_TO_CANONICAL as ODDS_API_OUTCOME_TO_CANONICAL,
 )
+from .canonical_ids import POLYMARKET_MARKET_TO_CANONICAL as POLYMARKET_MARKET_TO_CANONICAL
 from .canonical_ids import build_crypto_prediction_id as build_crypto_prediction_id
 from .canonical_ids import build_fixture_id as build_fixture_id
 from .canonical_ids import build_instrument_id as build_instrument_id
@@ -48,6 +49,7 @@ from .canonical_ids import build_referee_id as build_referee_id
 from .canonical_ids import build_season_id as build_season_id
 from .canonical_ids import build_team_id as build_team_id
 from .canonical_ids import build_venue_id as build_venue_id
+from .canonical_ids import slugify_canonical_name as slugify_canonical_name
 from .feature_upstream import FEATURE_UPSTREAM_REQUIREMENTS as FEATURE_UPSTREAM_REQUIREMENTS
 from .feature_upstream import UpstreamReq as UpstreamReq
 from .feature_upstream import in_coverage as in_coverage

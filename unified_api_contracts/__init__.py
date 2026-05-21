@@ -105,6 +105,12 @@ from .canonical.crosscutting.errors import (
     WebSocketCloseInfo,
     classify_venue_error,
 )
+from .canonical.crosscutting.execution import (
+    BATCH_FILL_ALGO_TYPES,
+    BENCHMARK_FILL_ALGO_TYPE,
+    NORMAL_ALGO_TYPE,
+    BatchExecutionMode,
+)
 from .canonical.crosscutting.experiment_registry import (
     ExperimentKind,
     ExperimentRunSpec,
@@ -1140,6 +1146,10 @@ __all__ = [
     "BinanceLiquidationOrder",
     "BinanceMarkPriceUpdate",
     "BinanceOptionInstrumentInfo",
+    "BATCH_FILL_ALGO_TYPES",
+    "BENCHMARK_FILL_ALGO_TYPE",
+    "NORMAL_ALGO_TYPE",
+    "BatchExecutionMode",
     "BinanceOrderBook",
     "BinanceTicker",
     "BinanceTrade",

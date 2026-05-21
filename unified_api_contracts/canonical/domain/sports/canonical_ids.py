@@ -316,3 +316,7 @@ def build_macro_prediction_id(
     """
     date_digits = re.sub(r"[^0-9]", "", date)[:8]
     return f"PREDICTION:{_slug(venue)}:UP_DOWN:{_slug(index)}:{_slug(timeframe)}:{date_digits}"
+
+
+#: Public alias for the private ``_slug`` helper — for use outside UAC-internal code.
+slugify_canonical_name = _slug
