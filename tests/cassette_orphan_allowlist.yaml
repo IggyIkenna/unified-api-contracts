@@ -185,3 +185,39 @@ allowed:
     reason: recording-template
     detail: "Jupiter strict-tagged token list (tokens.jup.ag/tokens?tags=strict). IS adapter instruments_service/reference_data/adapters/defi/jupiter.py calls _TOKEN_LIST_URL in _fetch_token_list(). UAC external/jupiter schemas not yet imported by IS adapter (still uses unified_api_contracts.internal). Wiring IS import to external.jupiter is Phase 2 QG task. Cassette covers the tokens.jup.ag host."
     acked_by: slot-2 2026-05-21
+
+  # ---- Phase 3 CeFi blind spots
+  - path: kraken/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Kraken Spot public ticker (api.kraken.com/0/public/Ticker?pair=XBTUSD). IS adapter uses CCXTReferenceDataAdapter(exchange_id='kraken') which calls this endpoint internally. UAC external/kraken schemas not yet imported by CCXT adapter. Phase 2 QG task. Cassette covers the api.kraken.com host."
+    acked_by: slot-2 2026-05-21
+  - path: kraken_futures/mocks/tickers.yaml
+    reason: recording-template
+    detail: "Kraken Futures public tickers (futures.kraken.com/derivatives/api/v3/tickers). IS adapter uses CCXTReferenceDataAdapter(exchange_id='krakenfutures'). UAC external/kraken_futures schemas not yet imported by CCXT adapter. Phase 2 QG task. Cassette covers the futures.kraken.com host."
+    acked_by: slot-2 2026-05-21
+  - path: pacifica/mocks/funding_rate_history.yaml
+    reason: recording-template
+    detail: "Pacifica perp funding rate history (api.pacifica.fi/api/v1/funding_rate/history). MTDS perp_funding_handler.py calls _PACIFICA_API_URL. UAC external/pacifica schemas not yet imported by MTDS. Phase 2 QG task. Cassette covers the api.pacifica.fi host."
+    acked_by: slot-2 2026-05-21
+  - path: extended/mocks/markets.yaml
+    reason: recording-template
+    detail: "Extended.exchange (StarkNet) market list (api.starknet.extended.exchange/api/v1/info/markets). MTDS extended_base_client.py calls this endpoint. UAC external/extended schemas not yet imported by MTDS adapter. Phase 2 QG task. Cassette covers the api.starknet.extended.exchange host."
+    acked_by: slot-2 2026-05-21
+
+  # ---- Phase 3 Execution/infra blind spots
+  - path: copper/mocks/wallet_balances.yaml
+    reason: capability-declaration-only
+    detail: "Copper custody platform wallet balances (api.copper.co/platform/wallets/{id}/balances). Requires HMAC-signed auth (execution-service/execution_service/custody/copper.py). Cassette documents the interaction pattern with redacted auth headers. Status: BLOCKED-CREDENTIALS (copper-api-key in Secret Manager; June-1 custody integration per custody-providers.md)."
+    acked_by: slot-2 2026-05-21
+  - path: tenderly/mocks/create_vnet.yaml
+    reason: capability-declaration-only
+    detail: "Tenderly Virtual TestNet creation (api.tenderly.co/api/v1/account/{acct}/project/{proj}/vnets). Requires X-Access-Key header (execution-service/execution_service/providers/tenderly.py). Cassette documents the POST/response pattern for mainnet fork creation with redacted API key. IS not the consumer — execution-service is."
+    acked_by: slot-2 2026-05-21
+  - path: socket/mocks/bridge_quote.yaml
+    reason: capability-declaration-only
+    detail: "Socket.tech bridge quote (api.socket.tech/v2/quote). Requires API-KEY header (socket-api-key in Secret Manager, execution-service/execution_service/defi_execution/protocols/bridge.py). Cassette documents ETH→Polygon USDC bridge quote interaction pattern with redacted key. Status: BLOCKED-CREDENTIALS."
+    acked_by: slot-2 2026-05-21
+  - path: circle_cctp/mocks/attestation.yaml
+    reason: recording-template
+    detail: "Circle CCTP Iris attestation polling (iris-api.circle.com/v1/attestations/{hash}). No auth required — public endpoint. Used by execution-service/execution_service/defi_execution/protocols/cctp.py to poll burn attestation status. UAC external/circle_cctp schemas not yet imported by execution adapter. Phase 2 QG task."
+    acked_by: slot-2 2026-05-21

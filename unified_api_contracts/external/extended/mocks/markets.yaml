@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.starknet.extended.exchange/api/v1/info/markets
+    response:
+      body:
+        string: '{"markets":[{"symbol":"BTC-USD","base_asset":"BTC","quote_asset":"USD","status":"ACTIVE","tick_size":"0.1","step_size":"0.0001","min_order_size":"0.0001","max_leverage":20},{"symbol":"ETH-USD","base_asset":"ETH","quote_asset":"USD","status":"ACTIVE","tick_size":"0.01","step_size":"0.001","min_order_size":"0.001","max_leverage":20},{"symbol":"SOL-USD","base_asset":"SOL","quote_asset":"USD","status":"ACTIVE","tick_size":"0.001","step_size":"0.01","min_order_size":"0.01","max_leverage":10}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

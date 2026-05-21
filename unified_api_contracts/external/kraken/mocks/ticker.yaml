@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.kraken.com/0/public/Ticker?pair=XBTUSD
+    response:
+      body:
+        string: '{"error":[],"result":{"XXBTZUSD":{"a":["67500.00000","1","1.000"],"b":["67499.90000","1","1.000"],"c":["67500.00000","0.00100000"],"v":["1234.56789000","5678.90123000"],"p":["67350.12345","67400.56789"],"t":[4521,18203],"l":["66800.00000","66500.00000"],"h":["68000.00000","68500.00000"],"o":"67100.00000"}}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

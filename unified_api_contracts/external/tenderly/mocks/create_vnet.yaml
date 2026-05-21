@@ -1,0 +1,24 @@
+interactions:
+  - request:
+      body: '{"display_name":"uac-canary-fork","slug":"uac-canary-fork","fork_config":{"network_id":"1","block_number":"latest"},"virtual_network_config":{"chain_config":{"chain_id":1}}}'
+      headers:
+        Accept:
+          - application/json
+        Content-Type:
+          - application/json
+        X-Access-Key:
+          - '{TENDERLY_API_KEY}'
+        User-Agent:
+          - python-httpx/0.27.0
+      method: POST
+      uri: https://api.tenderly.co/api/v1/account/{TENDERLY_ACCOUNT}/project/{TENDERLY_PROJECT}/vnets
+    response:
+      body:
+        string: '{"id":"vnet-abc123def456","slug":"uac-canary-fork","status":"ACTIVE","rpcs":[{"admin":"https://virtual.mainnet.rpc.tenderly.co/abc123def456","public":null}],"fork_config":{"network_id":"1","block_number":"latest"}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 201
+        message: Created
+version: 1

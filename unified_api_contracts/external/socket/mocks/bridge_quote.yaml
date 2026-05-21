@@ -1,0 +1,22 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        API-KEY:
+          - '{SOCKET_API_KEY}'
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.socket.tech/v2/quote?fromChainId=1&toChainId=137&fromTokenAddress=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&toTokenAddress=0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174&fromAmount=1000000000&userAddress=0x0000000000000000000000000000000000000001&uniqueRoutesPerBridge=true&sort=output
+    response:
+      body:
+        string: '{"success":true,"result":{"routes":[{"routeId":"route-abc123","fromAmount":"1000000000","toAmount":"999100000","minimumToAmount":"994000000","estimatedGas":"150000","serviceTime":300,"fromAsset":{"address":"0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48","chainId":1,"decimals":6,"symbol":"USDC","name":"USD Coin","icon":null},"toAsset":{"address":"0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174","chainId":137,"decimals":6,"symbol":"USDC","name":"USD Coin (PoS)","icon":null}}]}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

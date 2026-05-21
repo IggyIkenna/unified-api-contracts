@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://futures.kraken.com/derivatives/api/v3/tickers
+    response:
+      body:
+        string: '{"result":"success","tickers":[{"symbol":"PI_XBTUSD","bid":67499.0,"bidSize":1.5,"ask":67501.0,"askSize":2.0,"vol24h":12345.678,"last":67500.0,"lastTime":"2026-05-21T18:00:00Z","markPrice":67500.5,"indexPrice":67499.8,"fundingRate":0.0001,"fundingRatePrediction":0.00012,"openInterest":45678.9},{"symbol":"PI_ETHUSD","bid":3499.0,"bidSize":10.0,"ask":3501.0,"askSize":15.0,"vol24h":98765.0,"last":3500.0,"lastTime":"2026-05-21T18:00:00Z","markPrice":3500.2,"indexPrice":3499.9,"fundingRate":0.00008,"fundingRatePrediction":0.0001,"openInterest":123456.0}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1
