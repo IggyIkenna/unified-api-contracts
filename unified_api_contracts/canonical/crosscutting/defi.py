@@ -12,7 +12,7 @@ adapter keys — four services, one source of truth.
 Plans:
 - ``plans/active/defi_recursive_borrow_archetypes_2026_05_10.md`` Phase 2
   (UAC config schema extension — LendingProtocol)
-- ``plans/active/defi_master_2026_05_07.md`` § "Chain coverage + CLOB-on-chain"
+- ``plans/active/defi_master.md`` § "Chain coverage + CLOB-on-chain"
   Phase 1 (ChainKind + CHAIN_BRIDGE_GRAPH)
 """
 
@@ -114,7 +114,7 @@ class ChainKind(StrEnum):
 # Extended with all EVM L2 ↔ Ethereum bridges (used by transfer-rebalance
 # service to enumerate valid rebalance paths).
 #
-# Plan: defi_master_2026_05_07.md § "Chain coverage + CLOB-on-chain" Phase 1.
+# Plan: defi_master.md § "Chain coverage + CLOB-on-chain" Phase 1.
 # ---------------------------------------------------------------------------
 CHAIN_BRIDGE_GRAPH: dict[str, list[str]] = {
     # New non-EVM chain bridges (2026-05-18)

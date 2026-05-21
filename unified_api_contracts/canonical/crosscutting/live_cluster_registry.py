@@ -100,7 +100,7 @@ class LiveClusterSpec:
 
 
 _DEPLOYMENT_UI_PLAN = "deployment_ui_lifecycle_tabs_2026_05_08"
-_INSTRUMENTS_LIVE_PLAN = "instruments_live_master_2026_05_08"
+_INSTRUMENTS_LIVE_PLAN = "instruments_master"
 
 _MTDS_VENUES: tuple[str, ...] = (
     "binance",

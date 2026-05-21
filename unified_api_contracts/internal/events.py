@@ -101,7 +101,7 @@ class LifecycleEventType(StrEnum):
     AGENT_INVESTIGATION_COMPLETED = "AGENT_INVESTIGATION_COMPLETED"
     AGENT_FIX_APPLIED = "AGENT_FIX_APPLIED"
     AGENT_FIX_FAILED = "AGENT_FIX_FAILED"
-    # Instruments-live trigger lifecycle (instruments_live_master_2026_05_08
+    # Instruments-live trigger lifecycle (instruments_master
     # Phase A.5 — codifying the typed event surface for Cloud Scheduler /
     # Cloud Run instruments-live triggers across cefi / defi / tradfi /
     # sports / prediction). Per Phase A.4 alerting taxonomy:
@@ -364,7 +364,7 @@ class PreflightSkippedDetails(BaseModel):
 
 # ---------------------------------------------------------------------------
 # Instruments-live trigger metadata payloads (Phase A.5 of
-# instruments_live_master_2026_05_08). These payloads carry the metadata
+# instruments_master). These payloads carry the metadata
 # required by the Phase H.1 alerting rules (alerting_service_live_rules)
 # to format Telegram / PagerDuty messages with operator-actionable detail —
 # specifically `missing_dependencies` payloads name the exact upstream that

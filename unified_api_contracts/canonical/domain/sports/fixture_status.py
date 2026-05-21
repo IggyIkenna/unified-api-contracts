@@ -5,7 +5,7 @@ and pipeline consumers.  The values are **canonical grouped states**, NOT raw
 API-Football ``status.short`` codes.  See ``AF_STATUS_SHORT_MAP`` for the
 mapping from raw codes to canonical states.
 
-SSOT: ``plans/epics/sports_master_2026_05_07.md`` § "Cross-source fixture
+SSOT: ``plans/epics/sports_master.md`` § "Cross-source fixture
 status verifier + status enum".
 """
 

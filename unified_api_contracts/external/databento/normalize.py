@@ -65,7 +65,7 @@ def _d_opt(value: float | int | str | Decimal | None) -> Decimal | None:
 # Kept inline here to avoid a circular import (registry/ → canonical/ → external/ →
 # back to registry/). When the registry list grows beyond the 9 canonical roots,
 # the loader will need to keep this tuple in sync (covered by the
-# tradfi_master_2026_05_07 plan + cme_polymarket_arb_2026_05_08 plan Phase 4).
+# tradfi_master plan + cme_polymarket_arb_2026_05_08 plan Phase 4).
 _CME_EVENT_CONTRACT_ROOTS: tuple[str, ...] = (
     "ECES",
     "ECNQ",

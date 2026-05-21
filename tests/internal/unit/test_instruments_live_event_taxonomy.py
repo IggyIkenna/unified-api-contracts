@@ -1,6 +1,6 @@
 """Tests for instruments-live trigger event taxonomy.
 
-Phase A.5 of ``instruments_live_master_2026_05_08.md`` — adds 7 typed
+Phase A.5 of ``instruments_master.md`` — adds 7 typed
 ``LifecycleEventType`` members + 7 Pydantic detail models + 1 sub-model
 (``MissingDependency``) for the instruments-live trigger lifecycle.
 

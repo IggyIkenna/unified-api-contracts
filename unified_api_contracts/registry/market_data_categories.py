@@ -218,7 +218,7 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # constants + capability flags + execution adapter stubs remain in the
         # codebase as future-work scaffolding but they do NOT participate in MTDS
         # market-data ingestion or in `VENUES_BY_ASSET_GROUP["sports"]`. See
-        # `unified-trading-pm/plans/epics/sports_master_2026_05_07.md` §
+        # `unified-trading-pm/plans/epics/sports_master.md` §
         # "Scrapers DEFERRED-INDEFINITELY 2026-05-12 per operator".
         "ODDS_API",  # Multi-bookmaker odds aggregator (raw tick data source)
         "PINNACLE",

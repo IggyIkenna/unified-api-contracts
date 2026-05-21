@@ -6,7 +6,7 @@ detection + odds settlement timing + lifecycle-phase-aware features.
 
 Schema design references the predictions market lifecycle (gold standard) which
 already has `market_created_at` / `resolution_time` / `settlement_time` as
-hard-required fields per `predictions_master_2026_05_07.md`. This module brings
+hard-required fields per `predictions_master.md`. This module brings
 tradfi futures to the same bar.
 
 ## Plan SSOT

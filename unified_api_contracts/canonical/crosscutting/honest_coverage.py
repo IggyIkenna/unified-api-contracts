@@ -175,13 +175,13 @@ class EmptyConfirmedReason(StrEnum):
     making the daily-cadence GCS dump pure waste). Existing manifest rows for retired data_types get flipped to
     ``empty_confirmed`` with this reason rather than left as `captured` (which would mislead consumers into reading
     deleted parquets) or `attempted_failed` (which would force orchestrator backfill VMs to keep retrying a deleted
-    write path). Plan: ``manifest_migration_master_2026_05_07.plan`` § Audit findings 2026-05-07 → C.1."""
+    write path). Plan: ``manifest_migration_SUPERSEDED_2026_05_21.plan`` § Audit findings 2026-05-07 → C.1."""
 
     EXPECTED_REFDATA_CADENCE_CHANGE = "EXPECTED_REFDATA_CADENCE_CHANGE"
     """Refdata-cadence migration: data_type's shard cadence was changed (e.g. TEAMS migrated from per-day to
     per-(team, season) — pre-migration daily shards become honest absence under the new cadence). Distinct from
     `EXPECTED_DEPRECATED_DATA_TYPE` (data_type still exists, just at a different cadence). Plan:
-    ``manifest_migration_master_2026_05_07.plan`` § Audit findings 2026-05-07 → C.11."""
+    ``manifest_migration_SUPERSEDED_2026_05_21.plan`` § Audit findings 2026-05-07 → C.11."""
 
     EXPECTED_KNOWN_SOURCE_GAP = "EXPECTED_KNOWN_SOURCE_GAP"
     """Documented mid-history source gap that doesn't fit the venue-launch / source-coverage-start /

@@ -17,7 +17,7 @@ Per Tab 14 fork1 prep audit 2026-05-08
 * jitoSOL pre-archive gap (2022-11-01 to 2023-10-01) -- the Pyth Hermes archive
   does NOT cover the ~11-month window between jitoSOL token genesis (2022-11-01,
   see ``LST_TOKEN_GENESIS["jitoSOL"]``) and Hermes archive start. Operator
-  decision pending on backfill source -- see ``defi_master_2026_05_07.md``.
+  decision pending on backfill source -- see ``defi_master.md``.
 
 Consumers:
 * MTDS ``oracle_prices_handler`` -- short-circuit Hermes fetches for

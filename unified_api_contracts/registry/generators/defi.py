@@ -9,7 +9,7 @@ generators covering the on-chain data_types ``carry_staked_basis`` reads:
 ``oracle_feeds`` (Pyth Hermes batches + Chainlink aggregator rounds).
 
 Shard atoms per the per-asset_group matrix in
-``plans/epics/infrastructure_master_2026_05_07.md``: gas is ``(chain,)``;
+``plans/epics/infrastructure_master.md``: gas is ``(chain,)``;
 LST rates / lending indices are ``(chain, protocol)``; DEX pool state is
 ``(chain, pool)`` (pool == protocol-instance here); oracle feeds are
 ``(chain, oracle_feed)``.

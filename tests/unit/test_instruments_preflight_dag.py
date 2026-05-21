@@ -6,7 +6,7 @@ seed, and the :func:`validate_preflight_for_trigger` helper's per-asset-group
 behaviour (sports lineups / weather / injuries / fixtures / teams / player
 values, cefi 15m, tradfi 15m, prediction market-discovery).
 
-Plan: ``plans/epics/instruments_live_master_2026_05_08.md`` § Phase A.9.
+Plan: ``plans/epics/instruments_master.md`` § Phase A.9.
 """
 
 from __future__ import annotations

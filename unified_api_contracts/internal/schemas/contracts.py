@@ -91,7 +91,7 @@ class ColumnSpec(BaseModel):
 
 CadenceLiteral = Literal["singleton", "per_season", "per_day"]
 """Refdata cadence — how often a data_type's shard atom changes (C.11 audit
-2026-05-07, manifest_migration_master_2026_05_07.md § Audit findings).
+2026-05-07, manifest_migration_SUPERSEDED_2026_05_21.md § Audit findings).
 
 * ``"singleton"`` — one shard per (asset_group, data_type) total. Source
   data effectively never changes (e.g. VENUES geo coordinates). Manifest

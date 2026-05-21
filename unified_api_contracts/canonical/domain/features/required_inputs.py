@@ -405,7 +405,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     # Reads bundled options_chain / futures_chain shards for the TradFi
     # archetype universe (CME ES.OPT clusters, CBOE VIX, NASDAQ ETF options
     # post-cutover). Cross-listed for cefi where Deribit/Tardis supply
-    # parallel coverage (per `tradfi_master_2026_05_07` § feature_groups).
+    # parallel coverage (per `tradfi_master` § feature_groups).
     "options_iv": [
         InputReq(asset_group="cefi", data_type="options_chain", available_at_rule="tick_timestamp"),
         InputReq(asset_group="tradfi", data_type="options_chain", available_at_rule="tick_timestamp"),

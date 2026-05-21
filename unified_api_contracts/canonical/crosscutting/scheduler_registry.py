@@ -11,7 +11,7 @@ Governance rule
 Adding a new scheduler in ANY plan == adding a row here first.
 No ad-hoc ``gcloud scheduler jobs create`` outside this registry.
 
-Phase 1 entries (instruments_live_master_2026_05_08 Phase A.3 topology +
+Phase 1 entries (instruments_master Phase A.3 topology +
 infra schedulers declared in deployment_ui_lifecycle_tabs_2026_05_08 Phase D.1):
 
   Instruments-live:
@@ -103,7 +103,7 @@ _STAGING_PROD: frozenset[EnvironmentTier] = frozenset({EnvironmentTier.STAGING, 
 _ALL_TIERS: frozenset[EnvironmentTier] = frozenset({EnvironmentTier.DEV, EnvironmentTier.STAGING, EnvironmentTier.PROD})
 _BOTH_CLOUDS: frozenset[CloudTarget] = frozenset({CloudTarget.GCP, CloudTarget.AWS})
 
-_INSTRUMENTS_PLAN = "instruments_live_master_2026_05_08"
+_INSTRUMENTS_PLAN = "instruments_master"
 _DEPLOYMENT_UI_PLAN = "deployment_ui_lifecycle_tabs_2026_05_08"
 
 SCHEDULER_REGISTRY: tuple[SchedulerSpec, ...] = (

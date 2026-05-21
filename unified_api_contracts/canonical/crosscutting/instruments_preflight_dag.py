@@ -33,7 +33,7 @@ from the same table.
 * UTL helper: :func:`unified_trading_library.instruments_preflight.run_preflight`
   (Phase A.10 — the runtime caller of :func:`validate_preflight_for_trigger`).
 
-**Plan**: ``plans/epics/instruments_live_master_2026_05_08.md`` § Phase A.9.
+**Plan**: ``plans/epics/instruments_master.md`` § Phase A.9.
 """
 
 from __future__ import annotations

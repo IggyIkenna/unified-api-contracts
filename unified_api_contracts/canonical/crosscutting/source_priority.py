@@ -377,9 +377,9 @@ into the UAC unit-test suite.
 
 Plans:
 
-* ``cefi_master_2026_05_07`` Q1 — F2-v2 prerequisite for CeFi adapter
+* ``cefi_master`` Q1 — F2-v2 prerequisite for CeFi adapter
   ``available_at`` stamping.
-* ``predictions_master_2026_05_07`` Q2 — Polymarket / Kalshi bundled-row
+* ``predictions_master`` Q2 — Polymarket / Kalshi bundled-row
   ``available_at`` stamping.
 """
 

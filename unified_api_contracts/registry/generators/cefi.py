@@ -9,7 +9,7 @@ generators covering the CeFi data_types the cutover hedge + arb legs read:
 Per-day row counts are realism-axis-1 defaults; calibrate against real
 backfill samples per plan § Audit findings 0.B before the Phase 5 VM runs.
 Shard-key axes match the per-asset_group shard-atom matrix in
-``plans/epics/infrastructure_master_2026_05_07.md`` (CeFi tick/bar/derivative
+``plans/epics/infrastructure_master.md`` (CeFi tick/bar/derivative
 data sharded ``(venue, instrument)``).
 """
 

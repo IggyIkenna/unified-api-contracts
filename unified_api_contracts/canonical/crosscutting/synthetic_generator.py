@@ -199,7 +199,7 @@ _SHARD_AXIS_PATTERN: Final = frozenset(
 """The closed set of shard-key axes a synthetic generator may fan out on.
 
 Must be a subset of the per-asset_group shard-atom matrix in
-``plans/epics/infrastructure_master_2026_05_07.md`` — drift between this
+``plans/epics/infrastructure_master.md`` — drift between this
 list and that matrix is a silent correctness bug per CLAUDE.md
 "Shard-granularity SSOT (CRITICAL)".
 """
