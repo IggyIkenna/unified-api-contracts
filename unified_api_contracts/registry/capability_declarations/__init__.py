@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from ._altdata import ALTDATA_CAPABILITIES
+from ._altdata import ALTDATA_CAPABILITIES, GLASSNODE_BASE_URL
 from ._cefi import CEFI_CAPABILITIES
 from ._defi import (
     BITCOIN_RPC_TEMPLATES,
@@ -70,6 +70,7 @@ __all__ = [
     "DEFI_CAPABILITIES",
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
     "EMPTY_OR_DEPRECATED_DEFI_VENUES",
+    "GLASSNODE_BASE_URL",
     "HYPERLIQUID_RPC_TEMPLATES",
     "LST_TOKEN_GENESIS",
     "LST_VENUE_TO_TOKENS",

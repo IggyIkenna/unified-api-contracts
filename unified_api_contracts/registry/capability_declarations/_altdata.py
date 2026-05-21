@@ -4,9 +4,69 @@ from __future__ import annotations
 
 from ..capability import OperationDetail, OperationEnvDetail, SourceCapability
 
+# Glassnode REST API base URL — injected as query-param auth (?a={api_key})
+GLASSNODE_BASE_URL = "https://api.glassnode.com/v1/metrics"
+
 # ---------------------------------------------------------------------------
-# Alt data / on-chain analytics (9)
+# Alt data / on-chain analytics (10)
 # ---------------------------------------------------------------------------
+
+_GLASSNODE = SourceCapability(
+    source="glassnode",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits", "latency"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["api_key"],
+    auth_environments={"prod": "prod_key"},
+    operations={
+        "market": [
+            "price_usd_close",
+            "mvrv",
+            "sopr",
+            "nvt",
+            "nupl",
+            "exchange_balance",
+            "exchange_net_position_change",
+            "active_addresses",
+            "transaction_count",
+            "mining_difficulty",
+        ],
+        "reference": ["supported_assets", "supported_metrics"],
+    },
+    base_urls={"mainnet": GLASSNODE_BASE_URL},
+    operation_details={
+        "price_usd_close": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="api_key_query_param",
+                    required_credential="api_key",
+                    notes="Query param 'a={api_key}'. Standard plan ($29/mo) required for most indicators.",
+                ),
+            }
+        ),
+        "mvrv": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_query_param", required_credential="api_key"),
+            }
+        ),
+        "sopr": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_query_param", required_credential="api_key"),
+            }
+        ),
+        "exchange_balance": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(signing_scheme="api_key_query_param", required_credential="api_key"),
+            }
+        ),
+    },
+    chain=None,
+    kind=None,
+)
 
 _ALCHEMY = SourceCapability(
     source="alchemy",
@@ -289,6 +349,7 @@ ALTDATA_CAPABILITIES: list[SourceCapability] = [
     _ALCHEMY,
     _THEGRAPH,
     _DEFILLAMA,
+    _GLASSNODE,
     # Macro / commodity data
     _BAKER_HUGHES,
     _CFTC,
