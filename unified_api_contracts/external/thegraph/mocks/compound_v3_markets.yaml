@@ -1,0 +1,19 @@
+interactions:
+  - request:
+      body: '{"query":"{ markets(first: 100) { id cometProxy creationBlockNumber configuration { name symbol baseToken { token { id symbol name decimals } lastPriceUsd } } accounting { totalBaseSupplyUsd totalBaseBorrowUsd supplyApr borrowApr } } }"}'
+      headers:
+        Content-Type: application/json
+      method: POST
+      uri: https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/5nwMCSHaTqG3Kd2gHznbTXEnZ9QNWsssQfbHhDqQSQFp
+    response:
+      body:
+        string: '{"data":{"markets":[{"id":"0xc3d688B66703497DAA19211EEdff47f25384cdc3","cometProxy":"0xc3d688B66703497DAA19211EEdff47f25384cdc3","creationBlockNumber":"15331586","configuration":{"name":"Compound USDC","symbol":"cUSDCv3","baseToken":{"token":{"id":"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48","symbol":"USDC","name":"USD Coin","decimals":6},"lastPriceUsd":"1.0"}},"accounting":{"totalBaseSupplyUsd":"342817293.4","totalBaseBorrowUsd":"289134021.7","supplyApr":"0.0521","borrowApr":"0.0634"}},{"id":"0xA17581A9E3012d4a87E0e4f2c38cC4d83BbAfE39","cometProxy":"0xA17581A9E3012d4a87E0e4f2c38cC4d83BbAfE39","creationBlockNumber":"17462195","configuration":{"name":"Compound WETH","symbol":"cWETHv3","baseToken":{"token":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","name":"Wrapped Ether","decimals":18},"lastPriceUsd":"3412.50"}},"accounting":{"totalBaseSupplyUsd":"95432178.3","totalBaseBorrowUsd":"61287044.1","supplyApr":"0.0198","borrowApr":"0.0287"}}]}}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

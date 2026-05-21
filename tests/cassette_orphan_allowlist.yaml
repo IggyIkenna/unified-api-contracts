@@ -117,3 +117,15 @@ allowed:
     reason: recording-template
     detail: "Error-path cassette (rate-limit response); used for negative-path testing once Yahoo Finance integration tests land."
     acked_by: ikenna 2026-05-20
+  - path: euler_v2/mocks/onchain_lending_market.yaml
+    reason: capability-declaration-only
+    detail: "Euler V2 has no public REST API — all data reads are on-chain via EVM RPC (Alchemy). Cassette documents the eth_call contract interaction pattern for WETH/USDC, wstETH/WETH, USDC/USDT EVK vaults. IS adapter (instruments_service/reference_data/adapters/defi/euler_v2.py) uses curated vault addresses + RPC; Alchemy cassette covers the RPC host."
+    acked_by: slot-2 2026-05-21
+  - path: venus/mocks/onchain_lending_market.yaml
+    reason: capability-declaration-only
+    detail: "Venus Protocol has no public REST API for market rates — reads via BNB Chain RPC / Alchemy (eth_call against vToken contracts). Cassette documents the supplyRatePerBlock / borrowRatePerBlock call pattern for vBNB, vBTCB, vUSDT (BSC) + vWETH-Core (ETH). IS adapter (instruments_service/reference_data/adapters/defi/venus.py) uses curated vToken addresses + RPC."
+    acked_by: slot-2 2026-05-21
+  - path: curve_fi/mocks/pools.yaml
+    reason: recording-template
+    detail: "Curve Finance REST API (api.curve.finance/v1/getPools/ethereum/main). IS adapter instruments_service/reference_data/adapters/defi/curve.py calls this URL but imports from unified_api_contracts.internal (not curve_fi schemas yet). Wiring IS adapter to import from unified_api_contracts.external.curve_fi is Phase 2 QG task tracked in canary_coverage_qg_enforcement_2026_05_20.md Phase 2."
+    acked_by: slot-2 2026-05-21

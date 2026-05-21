@@ -1,0 +1,22 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.curve.finance/v1/getPools/ethereum/main
+    response:
+      body:
+        string: '{"success":true,"data":{"poolData":[{"id":"factory-crypto-0","address":"0xD51a44d3FaE010294C616388b506AcdA1bfAAE46","name":"TriCrypto-2","symbol":"crv3crypto","assetType":"crypto","implementationAddress":"0x0","coins":["0xdac17f958d2ee523a2206206994597c13d831ec7","0x2260fac5e5542a773aa44fbcfedf7c193bc2c599","0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],"coinNames":["USDT","WBTC","WETH"],"coinDecimals":[6,8,18],"totalSupply":"1234567890123456789","virtualPrice":"1082341298765432198","amplificationCoefficient":"1707629","fee":"400000","adminFee":"5000000000","usdTotal":487293041.2,"usdTotalExcludingBasePool":487293041.2,"isMetaPool":false,"basePoolAddress":null},{"id":"0","address":"0xbEbc44782C7dB0a1A60Cb6fe97d0b483032FF1C7","name":"3pool","symbol":"3CRV","assetType":"stable","implementationAddress":"0x0","coins":["0x6b175474e89094c44da98b954eedeac495271d0f","0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48","0xdac17f958d2ee523a2206206994597c13d831ec7"],"coinNames":["DAI","USDC","USDT"],"coinDecimals":[18,6,6],"totalSupply":"345671234567890123456","virtualPrice":"1014523678901234","amplificationCoefficient":"2000","fee":"1000000","adminFee":"5000000000","usdTotal":312456789.5,"usdTotalExcludingBasePool":312456789.5,"isMetaPool":false,"basePoolAddress":null},{"id":"factory-stable-0","address":"0xDC24316b9AE028F1497c275EB9192a3Ea0f67022","name":"stETH","symbol":"stethCRV","assetType":"eth","implementationAddress":"0x0","coins":["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee","0xae7ab96520DE3A18E5e111B5EaAb095312D7fE84"],"coinNames":["ETH","stETH"],"coinDecimals":[18,18],"totalSupply":"892345678901234567890","virtualPrice":"1002198765432109","amplificationCoefficient":"50","fee":"1000000","adminFee":"5000000000","usdTotal":298123456.7,"usdTotalExcludingBasePool":298123456.7,"isMetaPool":false,"basePoolAddress":null}],"tvl":1312847823.4}}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

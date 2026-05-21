@@ -1,0 +1,19 @@
+interactions:
+  - request:
+      body: '{"query":"query GetSparkMarkets { markets(first: 100, where: { isActive: true }) { id name isActive canBorrowFrom canUseAsCollateral maximumLTV liquidationThreshold liquidationPenalty reserveFactor createdTimestamp inputToken { id symbol name decimals } outputToken { id symbol name decimals } _vToken { id symbol } } }"}'
+      headers:
+        Content-Type: application/json
+      method: POST
+      uri: https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si
+    response:
+      body:
+        string: '{"data":{"markets":[{"id":"0x5Ee5bf7ae06D1Be5997A1A72006FE6C607eC6DE8","name":"Spark WETH","isActive":true,"canBorrowFrom":true,"canUseAsCollateral":true,"maximumLTV":"80","liquidationThreshold":"83","liquidationPenalty":"5","reserveFactor":"15","createdTimestamp":"1686239759","inputToken":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","name":"Wrapped Ether","decimals":18},"outputToken":{"id":"0x59cD1C87501baa753d0B5B5Ab5D8416A45cD71b3","symbol":"spWETH","name":"Spark WETH","decimals":18},"_vToken":{"id":"0x2e7576042566f8D6990e07A1B61Ad1efd86Ae70d","symbol":"variableDebtspWETH"}},{"id":"0x4DEDf26112B3Ec8eC46e7E31EA5e123490B05B8B","name":"Spark DAI","isActive":true,"canBorrowFrom":true,"canUseAsCollateral":false,"maximumLTV":"0","liquidationThreshold":"0","liquidationPenalty":"0","reserveFactor":"15","createdTimestamp":"1686239759","inputToken":{"id":"0x6b175474e89094c44da98b954eedeac495271d0f","symbol":"DAI","name":"Dai Stablecoin","decimals":18},"outputToken":{"id":"0x83F20F44975D03b1b09e64809B757c47f942BEeA","symbol":"sDAI","name":"Savings DAI","decimals":18},"_vToken":{"id":"0xf705d2B7e92B3F38e6ae7afaDb2d11D9Et62cf98","symbol":"variableDebtspDAI"}},{"id":"0x01e0B9e53a46CE7f04D4a7b57047A4Ed4f06B717","name":"Spark wstETH","isActive":true,"canBorrowFrom":false,"canUseAsCollateral":true,"maximumLTV":"80","liquidationThreshold":"83","liquidationPenalty":"6","reserveFactor":"0","createdTimestamp":"1686239759","inputToken":{"id":"0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0","symbol":"wstETH","name":"Wrapped liquid staked Ether 2.0","decimals":18},"outputToken":{"id":"0x12B54025C112Aa61fAce2CDB7118740875A566E9","symbol":"spwstETH","name":"Spark wstETH","decimals":18},"_vToken":null}]}}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1

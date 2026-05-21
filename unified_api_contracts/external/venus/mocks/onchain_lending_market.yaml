@@ -1,0 +1,33 @@
+# BLOCKED-NO-DIRECT-REST-API — Venus Protocol reads are on-chain only via EVM RPC.
+# Venus is a Compound-fork lending protocol on BNB Chain (primary) + Ethereum.
+# Production calls use BNB Chain RPC / Alchemy (eth_call) against vToken contracts.
+# vToken addresses: see instruments-service/instruments_service/reference_data/adapters/defi/venus.py
+# _MVP_MARKETS_BY_CHAIN — curated vBNB (BSC), vBTCB (BSC), vUSDT (BSC), vWETH-Core (ETH).
+# Run with INTEGRATION_TEST_MODE=live + BNB_CHAIN_RPC_URL once credentials land.
+#
+# Canonical contract call shape (encoded ABI):
+#   eth_call to vToken.supplyRatePerBlock() → uint256 (supply rate per block mantissa)
+#   eth_call to vToken.borrowRatePerBlock() → uint256 (borrow rate per block mantissa)
+#   eth_call to vToken.totalBorrowsCurrent() → uint256 (total borrows in underlying)
+#   eth_call to vToken.exchangeRateCurrent() → uint256 (vToken to underlying exchange rate)
+#
+# Sample decoded output for vBNB (0xA07c5b74C9B40447a954e1466938b865b6BBea36) on BSC:
+interactions:
+  - request:
+      body: '{"jsonrpc":"2.0","method":"eth_call","params":[{"to":"0xA07c5b74C9B40447a954e1466938b865b6BBea36","data":"0xae9d70b0"},"latest"],"id":1}'
+      headers:
+        Content-Type: application/json
+      method: POST
+      uri: https://bsc-dataseed.binance.org/
+    response:
+      body:
+        string: '{"jsonrpc":"2.0","id":1,"result":"0x000000000000000000000000000000000000000000000000000000001c2a2b6c"}'
+      headers:
+        Content-Type:
+          - application/json
+        x-contract-schema-version:
+          - "1.0"
+      status:
+        code: 200
+        message: OK
+version: 1
