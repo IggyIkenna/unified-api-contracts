@@ -61,6 +61,11 @@ _BINANCE = SourceCapability(
     },
     chain=None,
     kind="perp_cex",
+    # Tardis archive starts 2019-01-01 for Binance Spot; venue launched 2017-07-14 but
+    # the Tardis historical capture did not begin until Jan 2019. Applies to BINANCE-SPOT
+    # oracle lookups; BINANCE-FUTURES dates pre-2019-09-08 are handled by NOT_YET_LIVE
+    # via venue_launch_dates (venue_launch_dates["BINANCE-FUTURES"] = 2019-09-08).
+    coverage_start={"trades": date(2019, 1, 1), "book_snapshot_5": date(2019, 1, 1)},
 )
 
 _BYBIT = SourceCapability(
@@ -106,7 +111,16 @@ _BYBIT = SourceCapability(
     },
     chain=None,
     kind="perp_cex",
-    coverage_start={"candles": date(2018, 12, 1)},
+    # Tardis archive starts 2019-01-01 for Bybit Spot; venue launched 2018-12-01.
+    # Perp derivatives (inverse perps) also from 2019-01-01 on Tardis.
+    coverage_start={
+        "candles": date(2018, 12, 1),
+        "trades": date(2019, 1, 1),
+        "book_snapshot_5": date(2019, 1, 1),
+        "derivative_ticker": date(2019, 1, 1),
+        "liquidations": date(2019, 1, 1),
+        "futures_chain": date(2019, 1, 1),
+    },
 )
 
 _OKX = SourceCapability(
@@ -149,6 +163,15 @@ _OKX = SourceCapability(
     },
     chain=None,
     kind="perp_cex",
+    # Tardis archive starts 2020-01-01 for OKX (was OKEx); venue launched 2017-01-01
+    # but Tardis historical capture for OKEx began in early 2020. All data types
+    # (spot + derivatives) from the same Tardis collection start date.
+    coverage_start={
+        "trades": date(2020, 1, 1),
+        "book_snapshot_5": date(2020, 1, 1),
+        "derivative_ticker": date(2020, 1, 1),
+        "liquidations": date(2020, 1, 1),
+    },
 )
 
 _COINBASE = SourceCapability(
@@ -182,6 +205,9 @@ _COINBASE = SourceCapability(
     },
     chain=None,
     kind="spot_cex",
+    # Tardis archive starts 2019-01-01 for Coinbase (was GDAX/Coinbase Pro); venue
+    # launched 2014-12-08 but Tardis historical capture began in 2019.
+    coverage_start={"trades": date(2019, 1, 1), "book_snapshot_5": date(2019, 1, 1)},
 )
 
 _DERIBIT = SourceCapability(
@@ -229,6 +255,17 @@ _DERIBIT = SourceCapability(
     },
     chain=None,
     kind="options_cex",
+    # Tardis archive starts 2019-01-01 for Deribit; venue launched 2016-06-29 but Tardis
+    # historical capture began in 2019. All data types (spot trades + options/futures
+    # derivatives) from the same Tardis collection start date.
+    coverage_start={
+        "trades": date(2019, 1, 1),
+        "book_snapshot_5": date(2019, 1, 1),
+        "derivative_ticker": date(2019, 1, 1),
+        "liquidations": date(2019, 1, 1),
+        "options_chain": date(2019, 1, 1),
+        "futures_chain": date(2019, 1, 1),
+    },
 )
 
 # OPTIONS: not supported — venue does not offer listed options contracts
@@ -412,7 +449,15 @@ _HYPERLIQUID = SourceCapability(
     },
     chain="hyperevm",
     kind="perp_dex",
-    coverage_start={"candles": date(2023, 6, 14)},
+    # Tardis archive starts at Hyperliquid mainnet launch 2023-06-14 (venue + Tardis
+    # collection both began on this date). All data types from launch.
+    coverage_start={
+        "candles": date(2023, 6, 14),
+        "trades": date(2023, 6, 14),
+        "book_snapshot_5": date(2023, 6, 14),
+        "derivative_ticker": date(2023, 6, 14),
+        "liquidations": date(2023, 6, 14),
+    },
 )
 
 
@@ -608,6 +653,9 @@ _UPBIT = SourceCapability(
     },
     chain=None,
     kind="spot_cex",
+    # Tardis archive starts 2019-06-01 for Upbit; venue launched 2017-10-24 but
+    # Tardis historical capture for Upbit began mid-2019.
+    coverage_start={"trades": date(2019, 6, 1), "book_snapshot_5": date(2019, 6, 1)},
 )
 
 # ---------------------------------------------------------------------------
@@ -875,7 +923,15 @@ _ASTER = SourceCapability(
     },
     chain=None,
     kind="perp_cex",
-    coverage_start={"candles": date(2024, 9, 25)},
+    # Tardis archive starts at Aster mainnet launch 2024-09-25 (post-rebrand from
+    # Astherus). Venue + Tardis collection both began on this date.
+    coverage_start={
+        "candles": date(2024, 9, 25),
+        "trades": date(2024, 9, 25),
+        "book_snapshot_5": date(2024, 9, 25),
+        "derivative_ticker": date(2024, 9, 25),
+        "liquidations": date(2024, 9, 25),
+    },
 )
 
 # ---------------------------------------------------------------------------

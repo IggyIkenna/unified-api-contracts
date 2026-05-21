@@ -112,6 +112,20 @@ DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
 # leagues paused). Sparse-but-not-empty windows (like SFI_PROGRESSIVE_STATS
 # 2020-2021, where some matches return data and most don't) are NOT a good
 # fit — those still count as expected, just under-captured.
+#
+# Design decision — sports off-seasons (D2 Phase 2, Decision 1, 2026-05-21):
+# Per-league off-season windows are handled SEPARATELY by
+# ``get_league_fixture_calendar()`` + ``SEASON_BY_COUNTRY`` (fixture-calendar
+# level), NOT via KNOWN_COVERAGE_GAPS. The oracle ``expected_coverage()`` in
+# ``registry/expected_coverage.py`` does not include a per-league off-season
+# gate because the oracle signature is per-(asset_group, source, data_type)
+# without a league_id axis. Per-league oracle integration is Decision 3
+# (deferred — requires IS instrument-catalogue access).
+#
+# This dict is ONLY for SOURCE-LEVEL gaps: complete provider outages or
+# protocol-level blackout periods where the source produced NO data at all
+# for a date range. Population happens as such gaps are discovered from
+# data audits or provider communications.
 KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 
 

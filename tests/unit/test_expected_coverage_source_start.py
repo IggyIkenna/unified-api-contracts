@@ -136,9 +136,13 @@ class TestRealDeclarationSmokeTest:
         # funding_rates not in hyperliquid's coverage_start → no clip
         assert not is_before_source_coverage_start("HYPERLIQUID", "funding_rates", date(2020, 1, 1))
 
-    def test_binance_spot_no_clip(self) -> None:
-        # binance has coverage_start=None → no clip for any date
-        assert not is_before_source_coverage_start("BINANCE-SPOT", "trades", date(2010, 1, 1))
+    def test_binance_spot_trades_before_tardis_archive(self) -> None:
+        # Tardis archive for Binance starts 2019-01-01; venue launched 2017-07-14.
+        # Dates in the 2017-2018 gap should be clipped.
+        assert is_before_source_coverage_start("BINANCE-SPOT", "trades", date(2018, 6, 1))
+
+    def test_binance_spot_trades_after_tardis_archive(self) -> None:
+        assert not is_before_source_coverage_start("BINANCE-SPOT", "trades", date(2020, 1, 1))
 
     def test_polymarket_before_launch(self) -> None:
         # polymarket coverage_start={"candles": date(2020, 9, 1)} from Phase 2 migration
