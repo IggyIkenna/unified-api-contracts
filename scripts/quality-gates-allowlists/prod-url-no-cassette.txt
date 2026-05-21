@@ -1,0 +1,80 @@
+# prod-url-no-cassette.txt — hosts that legitimately have no UAC cassette.
+#
+# Format: one hostname (or hostname suffix) per line.
+# Lines starting with # are comments. Blank lines ignored.
+# A suffix entry like ".googleapis.com" matches any subdomain.
+#
+# SSOT: plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 2
+# Managed by: slot-2 / scan_prod_url_cassette_coverage.py
+
+# ---- Infrastructure / cloud SDKs (no REST API cassette needed) ----
+.googleapis.com
+.amazon.com
+.amazonaws.com
+accounts.google.com
+oauth2.googleapis.com
+metadata.google.internal
+iam.googleapis.com
+
+# ---- Internal / local addresses ----
+localhost
+127.0.0.1
+0.0.0.0
+.local
+.internal
+.svc.cluster.local
+.cluster.local
+
+# ---- Operator-acked no-cassette hosts (BLOCKED-CREDENTIALS) ----
+# Copper custody: requires HMAC auth, June-1 integration
+.copper.co
+# Tenderly VNet: requires X-Access-Key, execution-service only
+api.tenderly.co
+# Socket.tech bridge: requires API key
+api.socket.tech
+# EigenLayer AVS registry: BLOCKED-CREDENTIALS stub
+.eigenlayer.xyz
+
+# ---- GitHub / package registries ----
+github.com
+raw.githubusercontent.com
+api.github.com
+pypi.org
+.pypi.org
+registry.npmjs.org
+.docker.io
+.gcr.io
+.pkg.dev
+
+# ---- Monitoring / error tracking / comms ----
+sentry.io
+.sentry.io
+honeybadger.io
+api.telegram.org
+.slack.com
+.twilio.com
+smtp.gmail.com
+
+# ---- OpenAI / Anthropic (AI providers, not data APIs) ----
+api.openai.com
+.anthropic.com
+api.anthropic.com
+
+# ---- Circle CCTP — has cassette at circle_cctp/mocks/attestation.yaml ----
+# (host: iris-api.circle.com — covered by cassette, listed here as reference)
+
+# ---- Blockchain RPC infrastructure (covered by alchemy/mocks/) ----
+# eth-mainnet.g.alchemy.com → alchemy venue
+# solana-mainnet.g.alchemy.com → alchemy venue
+# Any *.g.alchemy.com covered by alchemy cassette
+
+# ---- Deprecated / offline endpoints ----
+# api.phoenix.trade — BLOCKED-UPSTREAM-OUTAGE (covered by phoenix/mocks/markets.yaml)
+
+# ---- Kubernetes service DNS (internal cluster traffic) ----
+instruments-service
+market-tick-data-service
+strategy-service
+execution-service
+features-service
+features-onchain-service

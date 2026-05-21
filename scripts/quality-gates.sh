@@ -65,6 +65,6 @@ export CODEX_MAX_VIOLATIONS
 # plans/active/issues/uac_root_level_tests_preexisting_failures_2026_05_20.md).
 # Once those are triaged the override can broaden to tests/.
 # Per CLAUDE.md "PYTEST_UNIT_DIR per-family override" + canary_coverage_qg_enforcement_2026_05_20 Phase 1.
-PYTEST_UNIT_DIR="tests/unit/ tests/test_cassette_orphan_checker.py tests/test_cassette_schema_parity.py tests/test_batch_live_parity.py tests/test_ws_cassette_coexistence.py"
+PYTEST_UNIT_DIR="tests/unit/ tests/test_cassette_orphan_checker.py tests/test_cassette_schema_parity.py tests/test_batch_live_parity.py tests/test_ws_cassette_coexistence.py tests/test_cassette_offline_check.py"
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
