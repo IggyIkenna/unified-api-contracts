@@ -339,12 +339,6 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "footystats": 3_600_000,  # 1h: Footystats batch publication cadence
     # Historical preload archive — daily publication delay.
     "barchart": 86_400_000,  # 24h: Barchart VIX 15m historical preload (2020-2025)
-    # EIA — weekly commodity storage + series reports (natural gas, crude oil).
-    # Published weekly; 7-day cadence is conservative (same-day release is typical).
-    "eia": 86_400_000,  # 24h: EIA weekly report publication cadence
-    # cross_instrument — features-service computed enrichment; emitted inline at
-    # calculation time; latency = 0ms relative to the observation trigger.
-    "cross_instrument": 0,
 }
 """Per-source emission latency (ms) — live-pipeline tick-to-pipeline arrival.
 
