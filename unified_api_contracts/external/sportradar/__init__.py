@@ -1,0 +1,41 @@
+"""Sportradar REST API contracts: sport events, competitors, odds."""
+
+from .schemas import (
+    SportradarBook,
+    SportradarCategory,
+    SportradarCompetitor,
+    SportradarError,
+    SportradarEventConditions,
+    SportradarMarket,
+    SportradarOddsOutcome,
+    SportradarOddsResponse,
+    SportradarResultsResponse,
+    SportradarScheduleResponse,
+    SportradarSeason,
+    SportradarSport,
+    SportradarSportEvent,
+    SportradarSportEventStatus,
+    SportradarSportEventSummary,
+    SportradarTournament,
+    SportradarVenue,
+)
+
+__all__ = [
+    "SportradarBook",
+    "SportradarCategory",
+    "SportradarCompetitor",
+    "SportradarError",
+    "SportradarEventConditions",
+    "SportradarMarket",
+    "SportradarOddsOutcome",
+    "SportradarOddsResponse",
+    "SportradarResultsResponse",
+    "SportradarScheduleResponse",
+    "SportradarSeason",
+    "SportradarSport",
+    "SportradarSportEvent",
+    "SportradarSportEventStatus",
+    "SportradarSportEventSummary",
+    "SportradarTournament",
+    "SportradarVenue",
+]
