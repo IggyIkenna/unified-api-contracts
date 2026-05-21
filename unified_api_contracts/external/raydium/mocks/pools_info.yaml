@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api-v3.raydium.io/pools/info/list
+    response:
+      body:
+        string: '{"data":[{"id":"58oQChx4yWmvKdwLLZzBi4ChoCc2fqCUWaEMK6d8PKkT","mintA":{"address":"So11111111111111111111111111111111111111112","symbol":"SOL","decimals":9},"mintB":{"address":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","symbol":"USDC","decimals":6},"feeRate":0.0025,"tvl":45678901.23,"price":145.23456789,"type":"Standard"},{"id":"6UmmUiYoBjSrhakAobJw8BvkmJtDVxaeBtbt7rxWo1mg","mintA":{"address":"4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R","symbol":"RAY","decimals":6},"mintB":{"address":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","symbol":"USDC","decimals":6},"feeRate":0.0025,"tvl":23456789.01,"price":1.87654321,"type":"Standard"}],"hasNextPage":false}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

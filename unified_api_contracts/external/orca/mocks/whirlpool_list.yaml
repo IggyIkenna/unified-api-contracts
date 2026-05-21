@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.mainnet.orca.so/v1/whirlpool/list
+    response:
+      body:
+        string: '{"whirlpools":[{"address":"HJPjoWUrhoZzkNfRpHuieeFk9WcZWjwy6PBjZ81ngndJ","tokenA":{"mint":"So11111111111111111111111111111111111111112","symbol":"SOL","decimals":9},"tokenB":{"mint":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","symbol":"USDC","decimals":6},"tickSpacing":64,"price":"145.23456789","lpFeeRate":0.003,"tvl":87234567.12},{"address":"7qbRF6YsyGuLUVs6Y1q64bdVrfe4ZcUUz1JRdoVNUJnm","tokenA":{"mint":"So11111111111111111111111111111111111111112","symbol":"SOL","decimals":9},"tokenB":{"mint":"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB","symbol":"USDT","decimals":6},"tickSpacing":64,"price":"145.18234","lpFeeRate":0.003,"tvl":32145678.90}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

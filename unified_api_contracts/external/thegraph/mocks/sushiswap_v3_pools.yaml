@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"query":"{ liquidityPools(first: 20, orderBy: totalValueLockedUSD, orderDirection: desc) { id name symbol inputTokens { id symbol decimals } totalValueLockedUSD fees { feePercentage feeType } } }"}'
+      headers:
+        Content-Type:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: POST
+      uri: https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/2tGWMrDha4164KkFAfkU3rDCtuxGb4q1emXmFdLLzJ8x
+    response:
+      body:
+        string: '{"data":{"liquidityPools":[{"id":"0x4e68ccd3e89f51c3074ca5072bbac773960dfa36","name":"Sushi V3 WETH/USDT 0.3%","symbol":"SLP","inputTokens":[{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","decimals":18},{"id":"0xdac17f958d2ee523a2206206994597c13d831ec7","symbol":"USDT","decimals":6}],"totalValueLockedUSD":"87234567.12","fees":[{"feePercentage":"0.003","feeType":"FIXED_TRADING_FEE"}]},{"id":"0x397ff1542f962076d0bfe58ea045ffa2d347aca0","name":"Sushi V3 USDC/WETH 0.05%","symbol":"SLP","inputTokens":[{"id":"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48","symbol":"USDC","decimals":6},{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","decimals":18}],"totalValueLockedUSD":"54321098.45","fees":[{"feePercentage":"0.0005","feeType":"FIXED_TRADING_FEE"}]}]}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"query":"{ pools(first: 20, orderBy: totalValueLockedUSD, orderDirection: desc) { id token0 { id symbol decimals } token1 { id symbol decimals } feeTier totalValueLockedUSD sqrtPrice tick } }"}'
+      headers:
+        Content-Type:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: POST
+      uri: https://gateway.thegraph.com/api/{API_KEY}/subgraphs/id/CJYGNhb7RvnhfBDjqpRnD3oxgyhibzc7fkAMa38YV3oS
+    response:
+      body:
+        string: '{"data":{"pools":[{"id":"0x6ca298d2983ab03aa1da7679389d955a4efee15c","token0":{"id":"0x2260fac5e5542a773aa44fbcfedf7c193bc2c599","symbol":"WBTC","decimals":8},"token1":{"id":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","decimals":18},"feeTier":"500","totalValueLockedUSD":"42187654.33","sqrtPrice":"1849274103920284","tick":"-23684"},{"id":"0x04c8577958ccc170eb3d2cca76f9d51bc6e42d8f","token0":{"id":"0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48","symbol":"USDC","decimals":6},"token1":{"id":"0xdac17f958d2ee523a2206206994597c13d831ec7","symbol":"USDT","decimals":6},"feeTier":"100","totalValueLockedUSD":"31456789.21","sqrtPrice":"79233636849980040443","tick":"-1"}]}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

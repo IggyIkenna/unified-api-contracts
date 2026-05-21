@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.lifinity.io/pools
+    response:
+      body:
+        string: '{"pools":[{"pubkey":"2JYKAwnfPdT3tBHGMFyFYbPpqt6Hqq5V1mNQB7oZXCW7","tokenA":{"mint":"So11111111111111111111111111111111111111112","symbol":"SOL","decimals":9},"tokenB":{"mint":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","symbol":"USDC","decimals":6},"tradeFeeRate":0.003,"tvl":8765432.10,"price":145.23456789},{"pubkey":"3AMCnHCMkLbWfmVqxqkW6jc9mJ2WpyA5VoVY7oQFiVij","tokenA":{"mint":"So11111111111111111111111111111111111111112","symbol":"SOL","decimals":9},"tokenB":{"mint":"Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB","symbol":"USDT","decimals":6},"tradeFeeRate":0.003,"tvl":5432109.87,"price":145.18234}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

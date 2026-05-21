@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: GET
+      uri: https://api.phoenix.trade/markets
+    response:
+      body:
+        string: '{"markets":[{"market_address":"4DoNfFBfF7UokCC2FQzriy7yHK6DY6NVdYpuekQ5pRgg","base_mint":"So11111111111111111111111111111111111111112","quote_mint":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","base_symbol":"SOL","quote_symbol":"USDC","tick_size":0.001,"base_lot_size":0.001},{"market_address":"GQDTQSqmF4vMkiaVAQpF5oiHJb1cWzWaXWt1orNMJdC9","base_mint":"4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R","quote_mint":"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v","base_symbol":"RAY","quote_symbol":"USDC","tick_size":0.0001,"base_lot_size":0.1}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

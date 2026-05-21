@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: '{"query":"query GetPools($chain: [GqlChain!]!, $first: Int!, $skip: Int!) { poolGetPools(first: $first, skip: $skip, orderBy: totalLiquidity, orderDirection: desc, where: { chainIn: $chain }) { id name type address chain protocolVersion createTime dynamicData { totalLiquidity swapFee } poolTokens { address symbol decimals } } }","variables":{"chain":["MAINNET"],"first":1000,"skip":0}}'
+      headers:
+        Content-Type:
+          - application/json
+        User-Agent:
+          - python-aiohttp/3.9.5
+      method: POST
+      uri: https://api-v3.balancer.fi/graphql
+    response:
+      body:
+        string: '{"data":{"poolGetPools":[{"id":"0x5c6ee304399dbdb9c8ef030ab642b10820db8f56000200000000000000000014","name":"Balancer 80 BAL 20 WETH","type":"WEIGHTED","address":"0x5c6ee304399dbdb9c8ef030ab642b10820db8f56","chain":"MAINNET","protocolVersion":2,"createTime":1619631660,"dynamicData":{"totalLiquidity":"67234567.89","swapFee":"0.001"},"poolTokens":[{"address":"0xba100000625a3754423978a60c9317c58a424e3d","symbol":"BAL","decimals":18},{"address":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","decimals":18}]},{"id":"0x1e19cf2d73a72ef1332c882f20534b6519be0276000200000000000000000112","name":"Rocket Pool ETH","type":"WEIGHTED","address":"0x1e19cf2d73a72ef1332c882f20534b6519be0276","chain":"MAINNET","protocolVersion":2,"createTime":1638226000,"dynamicData":{"totalLiquidity":"43218765.12","swapFee":"0.001"},"poolTokens":[{"address":"0xae78736cd615f374d3085123a210448e74fc6393","symbol":"rETH","decimals":18},{"address":"0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2","symbol":"WETH","decimals":18}]}]}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1
