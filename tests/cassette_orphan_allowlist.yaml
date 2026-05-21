@@ -221,3 +221,68 @@ allowed:
     reason: recording-template
     detail: "Circle CCTP Iris attestation polling (iris-api.circle.com/v1/attestations/{hash}). No auth required — public endpoint. Used by execution-service/execution_service/defi_execution/protocols/cctp.py to poll burn attestation status. UAC external/circle_cctp schemas not yet imported by execution adapter. Phase 2 QG task."
     acked_by: slot-2 2026-05-21
+
+  # ---- Phase 3 Sports / Prediction stub-placeholder cassettes
+  # Sportsbook scrapers use Playwright headless browser — not aiohttp/httpx.
+  # VCR cassette recording requires Playwright session capture infrastructure
+  # (post-Phase-3 scope). Stubs document the base URL pattern per scraper.
+  - path: bet365/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Bet365 Playwright scraper (www.bet365.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: bet888sport/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "888sport Playwright scraper (www.888sport.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: betfred/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Betfred Playwright scraper (www.betfred.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: betvictor/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "BetVictor Playwright scraper (www.betvictor.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: betway/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Betway Playwright scraper (betway.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: boylesports/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "BoyleSports Playwright scraper (www.boylesports.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: bwin/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Bwin Playwright scraper (sports.bwin.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: coral/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Coral Playwright scraper (sports.coral.co.uk). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: ladbrokes/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Ladbrokes Playwright scraper (sports.ladbrokes.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: paddypower/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Paddy Power Playwright scraper (www.paddypower.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: sbobet/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "SBOBET Playwright scraper (www.sbobet.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: skybet/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Sky Bet Playwright scraper (www.skybet.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: unibet/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Unibet Playwright scraper (www.unibet.co.uk). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: williamhill/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "William Hill Playwright scraper (sports.williamhill.com). HTML-only, no REST API. VCR recording deferred pending Playwright session capture infrastructure."
+    acked_by: slot-2 2026-05-21
+  - path: oddspapi/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "OddsPapi historical odds API (api.oddspapi.io/v4). Status: BLOCKED-CREDENTIALS — requires oddspapi-api-key in Secret Manager. Used by e2e-testing/scripts/sports/oddspapi_historical_backfill.py."
+    acked_by: slot-2 2026-05-21

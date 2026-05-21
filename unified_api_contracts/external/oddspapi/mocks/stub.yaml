@@ -1,0 +1,6 @@
+# STUB — cassette not yet recorded.
+# OddsPapi API (api.oddspapi.io/v4) requires API key (apiKey= query param).
+# Status: BLOCKED-CREDENTIALS — operator must provision oddspapi-api-key in Secret Manager.
+# Endpoints: /v4/tournaments, /v4/fixtures, /v4/participants
+interactions: []
+version: 1

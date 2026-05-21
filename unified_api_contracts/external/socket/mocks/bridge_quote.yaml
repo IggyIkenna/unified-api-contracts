@@ -5,7 +5,7 @@ interactions:
         Accept:
           - application/json
         API-KEY:
-          - '{SOCKET_API_KEY}'
+          - "{SOCKET_API_KEY}"
         User-Agent:
           - python-aiohttp/3.9.5
       method: GET

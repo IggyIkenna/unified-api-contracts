@@ -1,0 +1,6 @@
+# STUB — cassette not yet recorded.
+# Sportsbook scraper uses Playwright (headless browser); VCR recording requires
+# Playwright session capture infrastructure (post-Phase-3 scope).
+# See plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 3.
+interactions: []
+version: 1
