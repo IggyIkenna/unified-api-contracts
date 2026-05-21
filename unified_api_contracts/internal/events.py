@@ -166,6 +166,12 @@ class LifecycleEventType(StrEnum):
     CONNECTIVITY_GAP_DETECTED = "CONNECTIVITY_GAP_DETECTED"
     CONNECTIVITY_RECOVERED = "CONNECTIVITY_RECOVERED"
     CONNECTIVITY_GAP_BACKFILLED = "CONNECTIVITY_GAP_BACKFILLED"
+    # APD per-venue viability (D5 Phase 4 — batch-live parity).
+    # Emitted by strategy-service APD engine when a configured venue is absent
+    # from the loaded paired_price_dispersion features DataFrame (no non-null
+    # spread_bps rows for that venue pair). Downstream: pairs for that venue
+    # are dropped before signal generation — no silent zero-spread signals.
+    VENUE_DATA_ABSENT = "VENUE_DATA_ABSENT"
 
 
 # Backward-compat alias — LogLevel is the canonical severity enum (modes.py).
