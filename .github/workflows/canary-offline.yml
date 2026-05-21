@@ -1,0 +1,76 @@
+name: Canary Offline Check
+
+# Structural cassette validation on every push to live-defi-rollout that touches
+# cassette YAML files, test files, or QG scripts. No live network calls.
+#
+# Three offline gates:
+#   1. test_cassette_offline_check.py — YAML parse + VCR/WS/doc-cassette format
+#   2. test_cassette_orphan_checker.py — zero unallowlisted orphan cassettes
+#   3. check_cassette_prod_consumer_linkage.py — STEP 5.86 standalone failpoint
+#
+# Guard against firing 20×/day: paths: filter — only fires when cassette YAMLs,
+# tests, or QG scripts change. Schedule: Monday 06:00 UTC (offset from
+# weekly-validation.yml's Monday 08:00 to avoid collision).
+#
+# SSOT: plans/active/canary_coverage_qg_enforcement_2026_05_20.md Phase 5 CI
+
+on:
+  push:
+    branches:
+      - live-defi-rollout
+    paths:
+      - "unified_api_contracts/external/**/mocks/*.yaml"
+      - "tests/test_cassette_offline_check.py"
+      - "tests/test_cassette_orphan_checker.py"
+      - "tests/cassette_orphan_allowlist.yaml"
+      - "scripts/check_cassette_prod_consumer_linkage.py"
+      - "scripts/quality-gates-allowlists/**"
+      - "unified_api_contracts/testing/cassette_orphan_checker.py"
+  schedule:
+    # Monday 06:00 UTC — offset from weekly-validation (08:00) to avoid collision
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  canary-offline:
+    name: Cassette offline structural check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install --system -e ".[dev]"
+
+      - name: Cassette YAML structure (test_cassette_offline_check)
+        run: |
+          python -m pytest tests/test_cassette_offline_check.py \
+            -v --tb=short -q \
+            --no-header
+
+      - name: Orphan checker assertion (test_cassette_orphan_checker)
+        run: |
+          python -m pytest tests/test_cassette_orphan_checker.py \
+            -v --tb=short -q \
+            --no-header
+
+      - name: STEP 5.86 — prod-consumer linkage (standalone)
+        run: |
+          python scripts/check_cassette_prod_consumer_linkage.py
