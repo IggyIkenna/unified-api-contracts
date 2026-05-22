@@ -20,7 +20,7 @@ import json
 import logging
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Final, cast
+from typing import Any, Final, cast
 
 import numpy as np
 import pandas as pd
@@ -123,7 +123,7 @@ class SyntheticDataGenerator:
 
     def __init__(
         self,
-        spec: dict[str, object],
+        spec: dict[str, Any],
         seed: int = 42,
         scenario: ScenarioConfig | None = None,
     ) -> None:
@@ -133,27 +133,27 @@ class SyntheticDataGenerator:
         self._rng = np.random.default_rng(effective_seed)
 
         vol_mult = scenario.vol_multiplier if scenario is not None else 1.0
-        raw_gbm: dict[str, object] = {str(k): v for k, v in (spec.get("gbm_params") or {}).items()}
+        raw_gbm: dict[str, Any] = {str(k): v for k, v in (spec.get("gbm_params") or {}).items()}
         self._gbm_params: dict[str, dict[str, float]] = {}
         for sym, p in raw_gbm.items():
             if isinstance(p, dict):
-                params: dict[str, object] = cast("dict[str, object]", p)
+                gbm_params: dict[str, Any] = cast("dict[str, Any]", p)
                 self._gbm_params[sym] = {
                     str(pk): float(pv) * (vol_mult if pk == "vol" else 1.0)
-                    for pk, pv in params.items()
+                    for pk, pv in gbm_params.items()
                     if isinstance(pv, (int, float))
                 }
 
-        raw_defi: dict[str, object] = {str(k): v for k, v in (spec.get("defi_yield_params") or {}).items()}
+        raw_defi: dict[str, Any] = {str(k): v for k, v in (spec.get("defi_yield_params") or {}).items()}
         self._defi_params: dict[str, dict[str, float]] = {}
         for key, p in raw_defi.items():
             if isinstance(p, dict):
-                params: dict[str, object] = cast("dict[str, object]", p)
+                defi_params: dict[str, Any] = cast("dict[str, Any]", p)
                 self._defi_params[key] = {
-                    str(pk): float(pv) for pk, pv in params.items() if isinstance(pv, (int, float))
+                    str(pk): float(pv) for pk, pv in defi_params.items() if isinstance(pv, (int, float))
                 }
 
-        correlations_raw = spec.get("correlations") or {}
+        correlations_raw: dict[str, Any] = spec.get("correlations") or {}
         self._correlations: dict[str, float] = {}
         for k, v in correlations_raw.items():
             if isinstance(v, (int, float, str)):
@@ -379,7 +379,7 @@ class SyntheticDataGenerator:
         num_matches: int = 50,
     ) -> pd.DataFrame:
         """Generate pre-match odds for a sports league (CanonicalOdds-compatible)."""
-        rows: list[dict[str, object]] = []
+        rows: list[dict[str, Any]] = []
         base_date = datetime(2024, 1, 6, 15, 0, 0, tzinfo=UTC)
         match_interval_days = 7
 
@@ -423,7 +423,7 @@ class SyntheticDataGenerator:
         levels: int = 10,
         mid_price: float = 60000.0,
         spread_bps: float = 5.0,
-    ) -> list[dict[str, object]]:
+    ) -> list[dict[str, Any]]:
         """Generate L2 orderbook snapshots with realistic bid/ask levels.
 
         Each snapshot contains ``levels`` bid and ``levels`` ask levels around a
@@ -451,7 +451,7 @@ class SyntheticDataGenerator:
         # at top of book).  Index 0 (best price) gets the largest size.
         power_exp = 1.5
 
-        snapshots: list[dict[str, object]] = []
+        snapshots: list[dict[str, Any]] = []
         current_mid = mid_price
 
         for i in range(num_snapshots):
@@ -520,7 +520,7 @@ class SyntheticDataGenerator:
 
     def generate_for_instruments(
         self,
-        instruments: list[object],
+        instruments: list[Any],
         start: date,
         end: date,
         interval: str = "1h",
@@ -575,7 +575,7 @@ class SyntheticDataGenerator:
 
     def _generate_for_single_instrument(
         self,
-        inst: object,
+        inst: Any,
         start: date,
         end: date,
         interval: str,
@@ -641,7 +641,7 @@ class SyntheticDataGenerator:
         vol_mult = self._scenario.volume_multiplier if self._scenario is not None else 1.0
         timestamps = cast("list[datetime]", prices_1m["timestamps"])
         close_prices = cast("list[float]", prices_1m["close"])
-        rows: list[dict[str, object]] = []
+        rows: list[dict[str, Any]] = []
         for bar_ts, bar_price in zip(timestamps, close_prices, strict=False):
             self._append_bar_ticks(rows, bar_ts, bar_price, venue, symbol, trades_per_minute, vol_mult)
         log.info(
@@ -656,7 +656,7 @@ class SyntheticDataGenerator:
 
     def _append_bar_ticks(
         self,
-        rows: list[dict[str, object]],
+        rows: list[dict[str, Any]],
         bar_ts: datetime,
         bar_price: float,
         venue: str,
@@ -699,7 +699,7 @@ class SyntheticDataGenerator:
         start: date,
         end: date,
         interval: str,
-    ) -> dict[str, object]:
+    ) -> dict[str, Any]:
         """Geometric Brownian Motion price path."""
         timestamps = self._make_timestamps(start, end, interval)
         n = len(timestamps)
@@ -716,7 +716,7 @@ class SyntheticDataGenerator:
 
     def _prices_to_ohlcv(
         self,
-        path: dict[str, object],
+        path: dict[str, Any],
         symbol: str,
         venue: str,
         interval: str,
@@ -887,7 +887,7 @@ class SeedDataWriter:
         log.info("Wrote %d sports rows → %s", len(df), out_path)
         return out_path
 
-    def write_orderbook(self, snapshots: list[dict[str, object]], symbol: str, venue: str) -> Path:
+    def write_orderbook(self, snapshots: list[dict[str, Any]], symbol: str, venue: str) -> Path:
         """Write orderbook snapshots to a JSON file."""
         if not snapshots:
             log.warning("Empty orderbook snapshots for %s/%s — skipping", venue, symbol)
@@ -900,7 +900,7 @@ class SeedDataWriter:
         log.info("Wrote %d orderbook snapshots → %s", len(snapshots), out_path)
         return out_path
 
-    def write_manifest(self, manifest: dict[str, object]) -> Path:
+    def write_manifest(self, manifest: dict[str, Any]) -> Path:
         """Write a JSON manifest summarising all generated files."""
         out_path = self._output_dir / "seed_manifest.json"
         out_path.write_text(json.dumps(manifest, indent=2, default=str))
