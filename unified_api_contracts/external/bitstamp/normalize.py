@@ -9,12 +9,22 @@ from decimal import Decimal
 from ...canonical.domain import CanonicalOrderBook, CanonicalTicker, CanonicalTrade
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderType
 from ...normalize_utils._helpers import (
-    _d,
-    _iso,
-    _side,
-    _status,
-    _to_decimal,
-    _ts_sec,
+    d as _d,
+)
+from ...normalize_utils._helpers import (
+    iso as _iso,
+)
+from ...normalize_utils._helpers import (
+    side as _side,
+)
+from ...normalize_utils._helpers import (
+    status as _status,
+)
+from ...normalize_utils._helpers import (
+    to_decimal as _to_decimal,
+)
+from ...normalize_utils._helpers import (
+    unix_sec_to_utc as _ts_sec,
 )
 from .schemas import (
     BitstampFill,
