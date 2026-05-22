@@ -110,12 +110,18 @@ def main() -> None:
     parser.add_argument("--scenario", type=str, default=None, help="MockScenario name for overrides")
     args = parser.parse_args()
 
-    ref = date.fromisoformat(args.ref_date) if args.ref_date else None
+    ref_date_str: str | None = args.ref_date
+    seed: int = args.seed
+    include_options: bool = args.include_options
+    scenario: str | None = args.scenario
+    dry_run: bool = args.dry_run
+
+    ref = date.fromisoformat(ref_date_str) if ref_date_str else None
     instruments = build_instruments(
         ref_date=ref,
-        seed=args.seed,
-        include_options_chain=args.include_options,
-        scenario_name=args.scenario,
+        seed=seed,
+        include_options_chain=include_options,
+        scenario_name=scenario,
     )
 
     errors = _validate_instruments(instruments)
@@ -125,12 +131,13 @@ def main() -> None:
 
     log.info("All %d instruments validated successfully", len(instruments))
 
-    if args.dry_run:
+    if dry_run:
         log.info("Dry run — not writing files")
         return
 
-    output_path = args.output / "instruments.json"
-    args.output.mkdir(parents=True, exist_ok=True)
+    output_dir: Path = args.output
+    output_path = output_dir / "instruments.json"
+    output_dir.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(instruments, indent=2, default=str) + "\n")
     log.info("Wrote %s (%d instruments)", output_path, len(instruments))
 
