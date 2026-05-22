@@ -10,27 +10,24 @@ Note: InstrumentWarehouseRow was renamed from InstrumentRecord to avoid collisio
 with UIC's InstrumentRecord (31-field, Decimal, normalized adapter contract).
 """
 
-from .domain import (
+from ..canonical import (
     CanonicalBalance,
-    CanonicalDerivativeTicker,
+    CanonicalError,
+    CanonicalFill,
     CanonicalFundingRate,
     CanonicalLiquidation,
+    CanonicalOrder,
     CanonicalOrderBook,
     CanonicalPosition,
+    CanonicalRateLimitError,
     CanonicalTicker,
     CanonicalTrade,
+    ExecutionInstruction,
+    ExecutionResult,
     InstrumentType,
     InstrumentWarehouseRow,
     MarketTrade,
     OrderBookSnapshot5,
-    ProcessedCandle,
-)
-from .errors import CanonicalError, CanonicalRateLimitError
-from .execution import (
-    CanonicalFill,
-    CanonicalOrder,
-    ExecutionInstruction,
-    ExecutionResult,
     OrderSide,
     OrderStatus,
     OrderType,
@@ -38,7 +35,6 @@ from .execution import (
 
 __all__ = [
     "CanonicalBalance",
-    "CanonicalDerivativeTicker",
     "CanonicalError",
     "CanonicalFill",
     "CanonicalFundingRate",
@@ -59,5 +55,4 @@ __all__ = [
     "OrderSide",
     "OrderStatus",
     "OrderType",
-    "ProcessedCandle",
 ]
