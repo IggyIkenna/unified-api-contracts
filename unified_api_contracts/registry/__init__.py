@@ -79,6 +79,10 @@ from .cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
 )
+from .cefi_perp_venue_endpoints import (
+    CEFI_PERP_VENUE_API_ENDPOINTS,
+    get_cefi_perp_venue_api_url,
+)
 
 # cefi_margin_tiers imports removed - unused
 from .chain_env import (
@@ -157,10 +161,6 @@ from .defi_reserve_params import (
     get_spark_reserve_params,
 )
 from .defi_venues import to_canonical_venue
-from .cefi_perp_venue_endpoints import (
-    CEFI_PERP_VENUE_API_ENDPOINTS,
-    get_cefi_perp_venue_api_url,
-)
 from .dex_router_addresses import (
     UNISWAP_QUOTER_V2_BY_CHAIN,
     UNISWAP_SWAP_ROUTER_BY_CHAIN,
@@ -815,7 +815,6 @@ __all__ = [
     "get_raw_source_data_types",
     "get_required_tokens_for_protocol",
     "get_required_tokens_for_venue",
-    "get_raw_source_data_types",
     "get_reserve_params",
     "get_schema_class_for_endpoint",
     "get_shard_axes",
@@ -842,7 +841,6 @@ __all__ = [
     "is_in_coverage_window",
     "is_in_tradfi_tick_window",
     "is_lst",
-    "is_processed_data_type",
     "is_non_trading_day",
     "is_per_instrument_shard_data_type",
     "is_processed_data_type",
