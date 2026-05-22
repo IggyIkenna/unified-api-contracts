@@ -32,13 +32,13 @@ from unified_api_contracts.canonical.domain.execution import (
     CanonicalOrder,
 )
 from unified_api_contracts.normalize_utils._helpers import (
-    _d,
-    _order_type,
-    _side,
-    _status,
-    _tif,
-    _to_decimal,
-    _ts_ms,
+    d,
+    order_type,
+    side,
+    status,
+    tif,
+    to_decimal,
+    ts_ms,
 )
 from unified_api_contracts.normalize_utils.errors._utils import from_http_status
 
@@ -82,13 +82,13 @@ def normalize_mexc_ticker(raw: MexcTicker, instrument_key: str | None = None, ve
         instrument_key=ik,
         venue=venue,
         timestamp=datetime.now(UTC),
-        last_price=_to_decimal(raw.lastPrice) or Decimal("0"),
-        bid_price=_to_decimal(raw.bidPrice),
-        ask_price=_to_decimal(raw.askPrice),
-        volume_24h=_to_decimal(raw.volume),
-        quote_volume_24h=_to_decimal(raw.quoteVolume),
-        price_change_24h=_to_decimal(raw.priceChange),
-        price_change_percent_24h=_to_decimal(raw.priceChangePercent),
+        last_price=to_decimal(raw.lastPrice) or Decimal("0"),
+        bid_price=to_decimal(raw.bidPrice),
+        ask_price=to_decimal(raw.askPrice),
+        volume_24h=to_decimal(raw.volume),
+        quote_volume_24h=to_decimal(raw.quoteVolume),
+        price_change_24h=to_decimal(raw.priceChange),
+        price_change_percent_24h=to_decimal(raw.priceChangePercent),
     )
 
 
@@ -99,10 +99,10 @@ def normalize_mexc_ticker(raw: MexcTicker, instrument_key: str | None = None, ve
 
 def normalize_mexc_trade(raw: MexcTrade, symbol: str = "", venue: str = "mexc") -> CanonicalTrade:
     """Convert MexcTrade to CanonicalTrade."""
-    ts = _ts_ms(raw.time)
-    side = "sell" if raw.isBuyerMaker else "buy"
+    ts = ts_ms(raw.time)
+    trade_side = "sell" if raw.isBuyerMaker else "buy"
     if raw.tradeType:
-        side = "sell" if raw.tradeType.upper() == "ASK" else "buy"
+        trade_side = "sell" if raw.tradeType.upper() == "ASK" else "buy"
     trade_id = str(raw.id) if raw.id else ""
     sym = symbol or "UNKNOWN"
     return CanonicalTrade(
@@ -110,9 +110,9 @@ def normalize_mexc_trade(raw: MexcTrade, symbol: str = "", venue: str = "mexc") 
         symbol=sym,
         trade_id=trade_id,
         timestamp=ts,
-        price=_d(raw.price),
-        quantity=_d(raw.qty),
-        side=side,
+        price=d(raw.price),
+        quantity=d(raw.qty),
+        side=trade_side,
         buyer_maker=raw.isBuyerMaker,
         venue_trade_id=trade_id or None,
     )
@@ -125,7 +125,7 @@ def normalize_mexc_trade(raw: MexcTrade, symbol: str = "", venue: str = "mexc") 
 
 def normalize_mexc_orderbook(raw: MexcOrderBook, symbol: str = "", venue: str = "mexc") -> CanonicalOrderBook:
     """Convert MexcOrderBook to CanonicalOrderBook."""
-    ts = _ts_ms(raw.timestamp) if raw.timestamp else datetime.now(UTC)
+    ts = ts_ms(raw.timestamp) if raw.timestamp else datetime.now(UTC)
     bids = [(Decimal(row[0]), Decimal(row[1])) for row in raw.bids if len(row) >= 2]
     asks = [(Decimal(row[0]), Decimal(row[1])) for row in raw.asks if len(row) >= 2]
     return CanonicalOrderBook(
@@ -145,22 +145,22 @@ def normalize_mexc_orderbook(raw: MexcOrderBook, symbol: str = "", venue: str = 
 
 def normalize_mexc_order(raw: MexcOrder, venue: str = "mexc") -> CanonicalOrder:
     """Convert MexcOrder to CanonicalOrder."""
-    ts = _ts_ms(raw.time)
+    ts = ts_ms(raw.time)
     return CanonicalOrder(
         order_id=str(raw.orderId or ""),
         client_order_id=raw.clientOrderId,
         timestamp=ts,
         venue=venue,
         instrument_id=raw.symbol or "",
-        side=_side(raw.side),
-        order_type=_order_type(raw.type),
-        quantity=_d(raw.origQty),
-        price=_d(raw.price) if raw.price else None,
-        time_in_force=_tif(raw.timeInForce),
-        status=_status(raw.status),
-        filled_quantity=_d(raw.executedQty),
+        side=side(raw.side),
+        order_type=order_type(raw.type),
+        quantity=d(raw.origQty),
+        price=d(raw.price) if raw.price else None,
+        time_in_force=tif(raw.timeInForce),
+        status=status(raw.status),
+        filled_quantity=d(raw.executedQty),
         remaining_quantity=None,
-        average_fill_price=_d(raw.avgPrice) if raw.avgPrice else None,
+        average_fill_price=d(raw.avgPrice) if raw.avgPrice else None,
     )
 
 
@@ -171,18 +171,18 @@ def normalize_mexc_order(raw: MexcOrder, venue: str = "mexc") -> CanonicalOrder:
 
 def normalize_mexc_fill(raw: MexcFill, venue: str = "mexc") -> CanonicalFill:
     """Convert MexcFill to CanonicalFill."""
-    ts = _ts_ms(raw.time)
-    side = "buy" if raw.isBuyer else "sell"
+    ts = ts_ms(raw.time)
+    fill_side = "buy" if raw.isBuyer else "sell"
     return CanonicalFill(
         fill_id=str(raw.id or ""),
         order_id=str(raw.orderId or ""),
         timestamp=ts,
         venue=venue,
         instrument_id=raw.symbol or "",
-        side=_side(side),
-        price=_d(raw.price),
-        quantity=_d(raw.qty),
-        fee=_d(raw.commission) if raw.commission else None,
+        side=side(fill_side),
+        price=d(raw.price),
+        quantity=d(raw.qty),
+        fee=d(raw.commission) if raw.commission else None,
         fee_currency=raw.commissionAsset,
         is_maker=raw.isMaker,
     )
@@ -204,8 +204,8 @@ def normalize_mexc_error(
     if cls is not None:
         return cls(message=message or code, venue=venue)
     try:
-        status = int(code)
-        return from_http_status(status, message, venue)
+        http_status = int(code)
+        return from_http_status(http_status, message, venue)
     except ValueError:
         return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
 

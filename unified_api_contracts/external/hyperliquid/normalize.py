@@ -20,7 +20,7 @@ from ...canonical.domain import (
     WebSocketEvent,
 )
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
-from ...normalize_utils._helpers import _d, _to_decimal, _ts_ms_to_datetime
+from ...normalize_utils._helpers import d, to_decimal, ts_ms_to_datetime
 from ..hyperliquid.schemas import (
     HyperliquidCandle,
     HyperliquidFill,
@@ -61,10 +61,10 @@ def normalize_hyperliquid_ticker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=_to_decimal(raw.markPx or raw.midPx) or Decimal("0"),
+        last_price=to_decimal(raw.markPx or raw.midPx) or Decimal("0"),
         bid_price=None,
         ask_price=None,
-        volume_24h=_to_decimal(raw.dayNtlVlm),
+        volume_24h=to_decimal(raw.dayNtlVlm),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,
@@ -112,7 +112,7 @@ def normalize_hyperliquid_orderbook(
 
 def normalize_hyperliquid_order(raw: HyperliquidOpenOrder, venue: str = "hyperliquid") -> CanonicalOrder:
     """Convert HyperliquidOpenOrder to CanonicalOrder."""
-    ts = _ts_ms_to_datetime(raw.timestamp)
+    ts = ts_ms_to_datetime(raw.timestamp)
     symbol = raw.coin or ""
     return CanonicalOrder(
         order_id=str(raw.oid or ""),
@@ -138,7 +138,7 @@ def normalize_hyperliquid_order(raw: HyperliquidOpenOrder, venue: str = "hyperli
 
 def normalize_hyperliquid_fill(raw: HyperliquidFill, venue: str = "hyperliquid") -> CanonicalFill:
     """Convert HyperliquidFill to CanonicalFill."""
-    ts = _ts_ms_to_datetime(raw.time)
+    ts = ts_ms_to_datetime(raw.time)
     symbol = raw.coin or ""
     fill_id = str(raw.tid or raw.oid or "unknown")
     return CanonicalFill(
@@ -170,12 +170,12 @@ def normalize_hyperliquid_derivative_ticker(
     coin = raw.coin or ""
     ik = instrument_key or f"{venue}:PERPETUAL:{coin}"
     timestamp = datetime.now(UTC)
-    mark_price = _to_decimal(raw.markPx)
-    mid_price = _to_decimal(raw.midPx)
-    prev_day_price = _to_decimal(raw.prevDayPx)
-    funding_rate = _to_decimal(raw.funding)
-    open_interest = _to_decimal(raw.openInterest)
-    day_ntl_volume = _to_decimal(raw.dayNtlVlm)
+    mark_price = to_decimal(raw.markPx)
+    mid_price = to_decimal(raw.midPx)
+    prev_day_price = to_decimal(raw.prevDayPx)
+    funding_rate = to_decimal(raw.funding)
+    open_interest = to_decimal(raw.openInterest)
+    day_ntl_volume = to_decimal(raw.dayNtlVlm)
     return CanonicalDerivativeTicker(
         instrument_key=ik,
         venue=venue,
@@ -204,11 +204,11 @@ def normalize_hyperliquid_candle(
         timestamp=ts,
         venue=venue,
         symbol=sym,
-        open=_d(raw.o),
-        high=_d(raw.h),
-        low=_d(raw.low),
-        close=_d(raw.c),
-        volume=_d(raw.v),
+        open=d(raw.o),
+        high=d(raw.h),
+        low=d(raw.low),
+        close=d(raw.c),
+        volume=d(raw.v),
         quote_volume=None,
         count=raw.n,
         vwap=None,

@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from unified_api_contracts.canonical.domain import CanonicalBetMarket, CanonicalOdds
-from unified_api_contracts.normalize_utils._helpers import _d, _to_decimal
+from unified_api_contracts.normalize_utils._helpers import d, to_decimal
 
 from .schemas import OpticOddsFixture, OpticOddsMarket
 
@@ -91,10 +91,10 @@ def normalize_opticodds_odds(
         odds_val = raw.under_odds
     if odds_val is None:
         return None
-    dec = _to_decimal(odds_val)
-    decimal_odds = dec if dec is not None else _d("2.0")
-    if decimal_odds <= _d("0"):
-        decimal_odds = _d("2.0")
+    dec = to_decimal(odds_val)
+    decimal_odds = dec if dec is not None else d("2.0")
+    if decimal_odds <= d("0"):
+        decimal_odds = d("2.0")
     market_id = f"{fixture_id}:{sportsbook_id}:{raw.market_id}"
     selection_id = f"{raw.market_id}:{selection}"
     return CanonicalOdds(

@@ -35,7 +35,7 @@ from ...canonical.domain.execution import (
     OrderStatus,
     OrderType,
 )
-from ...normalize_utils._helpers import _to_decimal
+from ...normalize_utils._helpers import to_decimal
 from ...normalize_utils.connectivity import normalize_ws_disconnect
 from ...normalize_utils.market_state import _IBKR_STATE_MAP, normalize_market_state
 from .schemas import (
@@ -326,10 +326,10 @@ def normalize_ibkr_ticker(raw: IBKRTicker, instrument_key: str, venue: str = "ib
         instrument_key=instrument_key,
         venue=venue,
         timestamp=ts,
-        last_price=_to_decimal(raw.last) or Decimal("0"),
-        bid_price=_to_decimal(raw.bid),
-        ask_price=_to_decimal(raw.ask),
-        volume_24h=_to_decimal(raw.volume),
+        last_price=to_decimal(raw.last) or Decimal("0"),
+        bid_price=to_decimal(raw.bid),
+        ask_price=to_decimal(raw.ask),
+        volume_24h=to_decimal(raw.volume),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,
