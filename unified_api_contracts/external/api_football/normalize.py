@@ -730,7 +730,7 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
     elif "response" in raw:
         resp = raw["response"]
         if isinstance(resp, list):
-            teams = [cast(dict[str, object], t) for t in resp if isinstance(t, dict)]
+            teams = [cast(dict[str, object], t) for t in cast(list[object], resp) if isinstance(t, dict)]
     else:
         # Flat record — sanitise int fields and drop nested structures
         result = {k: v for k, v in raw.items() if not isinstance(v, (dict, list))}

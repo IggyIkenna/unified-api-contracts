@@ -11,6 +11,7 @@ Three-API architecture:
 __api_version__ = "v2"  # matches provider_api_versions.yaml
 
 import json
+from typing import cast
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -270,7 +271,7 @@ def _parse_json_string_list(v: list[str] | str | None) -> list[str] | None:
         try:
             parsed = json.loads(v)
             if isinstance(parsed, list):
-                return [str(x) for x in parsed]
+                return [str(x) for x in cast(list[object], parsed)]
         except (json.JSONDecodeError, ValueError):
             pass
     return None

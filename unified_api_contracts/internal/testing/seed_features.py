@@ -23,6 +23,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -47,8 +48,8 @@ def _read_ohlcv_files(data_dir: Path) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     for pf in ohlcv_root.rglob("*.parquet"):
         try:
-            table = pq.read_table(str(pf))
-            frames.append(table.to_pandas())
+            table = cast(pa.Table, pq.read_table(str(pf)))
+            frames.append(cast(pd.DataFrame, table.to_pandas()))
         except Exception as exc:
             log.warning("Failed to read %s: %s", pf, exc)
 
@@ -109,10 +110,10 @@ def compute_volatility(df: pd.DataFrame) -> pd.DataFrame:
     out_frames: list[pd.DataFrame] = []
     for symbol, grp in df.groupby("symbol"):
         grp = grp.copy().sort_values("timestamp")
-        close = pd.to_numeric(grp["close"], errors="coerce")
-        high = pd.to_numeric(grp["high"], errors="coerce")
-        low = pd.to_numeric(grp["low"], errors="coerce")
-        log_ret = np.log(close / close.shift(1))
+        close = cast(pd.Series, pd.to_numeric(grp["close"], errors="coerce"))
+        high = cast(pd.Series, pd.to_numeric(grp["high"], errors="coerce"))
+        low = cast(pd.Series, pd.to_numeric(grp["low"], errors="coerce"))
+        log_ret = cast(pd.Series, np.log(close / close.shift(1)))
 
         result = grp[["timestamp", "symbol", "venue"]].copy()
         result["realised_vol_20"] = log_ret.rolling(20).std() * np.sqrt(252)

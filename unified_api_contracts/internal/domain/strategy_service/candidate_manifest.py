@@ -15,6 +15,7 @@ from __future__ import annotations
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from typing import cast
 
 from unified_api_contracts.internal.architecture_v2.enums import StrategyArchetype
 from unified_api_contracts.internal.domain.strategy_service.lifecycle import (
@@ -162,11 +163,11 @@ class MinimalCandidateManifest:
         if isinstance(model_refs_raw, list):
             model_refs = [
                 ModelRef(
-                    model_id=str(r.get("model_id") or ""),
-                    version=str(r.get("version") or ""),
-                    artifact_uri=str(r.get("artifact_uri") or ""),
+                    model_id=str(cast(dict[str, object], r).get("model_id") or ""),
+                    version=str(cast(dict[str, object], r).get("version") or ""),
+                    artifact_uri=str(cast(dict[str, object], r).get("artifact_uri") or ""),
                 )
-                for r in model_refs_raw
+                for r in cast(list[object], model_refs_raw)
                 if isinstance(r, dict)
             ]
 
@@ -179,12 +180,12 @@ class MinimalCandidateManifest:
         pinned_shas_raw = data.get("pinned_shas")
         pinned_shas: dict[str, str] | None = None
         if isinstance(pinned_shas_raw, dict):
-            pinned_shas = {str(k): str(v) for k, v in pinned_shas_raw.items()}
+            pinned_shas = {str(k): str(v) for k, v in cast(dict[str, object], pinned_shas_raw).items()}
 
         chain_rpc_pins_raw = data.get("chain_rpc_pins")
         chain_rpc_pins: dict[str, str] | None = None
         if isinstance(chain_rpc_pins_raw, dict):
-            chain_rpc_pins = {str(k): str(v) for k, v in chain_rpc_pins_raw.items()}
+            chain_rpc_pins = {str(k): str(v) for k, v in cast(dict[str, object], chain_rpc_pins_raw).items()}
 
         version_id_raw = data.get("version_id")
         version_id: str | None = str(version_id_raw) if version_id_raw is not None else None
