@@ -136,6 +136,7 @@ from __future__ import annotations
 import json
 from datetime import date
 from pathlib import Path
+from typing import Any, cast
 
 # JSON cache written by market-tick-data-service scripts/refresh_protocol_pause_windows.py
 # after each daily detect-protocol-outages batch run. Falls back to empty on first boot.
@@ -147,22 +148,22 @@ def _load_cache() -> dict[tuple[str, str], list[tuple[date, date | None]]]:
     if not _CACHE_PATH.exists():
         return {}
     try:
-        raw: dict[str, object] = json.loads(_CACHE_PATH.read_text())
-        raw_windows = raw.get("windows") or {}
-        if not isinstance(raw_windows, dict):
-            return {}
+        raw = cast(dict[str, Any], json.loads(_CACHE_PATH.read_text()))
+        raw_windows = cast(dict[str, Any], raw.get("windows", {}))
         result: dict[tuple[str, str], list[tuple[date, date | None]]] = {}
-        for key_str, wins in raw_windows.items():
-            if "|" not in key_str or not isinstance(wins, list):
+        for key_str, wins_raw in raw_windows.items():  # type: ignore[reportAny]
+            wins_list = cast(list[dict[str, Any]], wins_raw)
+            if "|" not in key_str:
                 continue
             protocol, chain = key_str.split("|", 1)
             parsed: list[tuple[date, date | None]] = []
-            for w in wins:
-                if not isinstance(w, dict) or not w.get("start_date"):
+            for w_dict in wins_list:
+                if not w_dict.get("start_date"):
                     continue
-                start = date.fromisoformat(str(w["start_date"]))
-                end_raw = w.get("end_date")
-                end: date | None = date.fromisoformat(str(end_raw)) if end_raw else None
+                start_date_raw = cast(str, w_dict["start_date"])
+                start = date.fromisoformat(start_date_raw)
+                end_raw = w_dict.get("end_date")
+                end: date | None = date.fromisoformat(cast(str, end_raw)) if end_raw else None
                 parsed.append((start, end))
             if parsed:
                 result[(protocol, chain)] = parsed
