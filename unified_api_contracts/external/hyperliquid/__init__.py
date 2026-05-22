@@ -2,6 +2,4 @@
 
 from unified_api_contracts.external.hyperliquid.schemas import *
 
-from .schemas import (
-    HyperliquidMeta,
-)
+# Explicit imports removed - already covered by star import above

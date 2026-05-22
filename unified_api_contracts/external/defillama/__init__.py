@@ -2,7 +2,4 @@
 
 from unified_api_contracts.external.defillama.schemas import *
 
-from .schemas import (
-    DefiLlamaChainTvl,
-    DefiLlamaProtocol,
-)
+# Explicit imports removed - already covered by star import above

@@ -2,10 +2,4 @@
 
 from unified_api_contracts.external.coinbase.schemas import *
 
-from .schemas import (
-    CbEthAprResponse,
-    CbEthAssetData,
-    CoinbaseOrderBook,
-    CoinbaseTicker,
-    CoinbaseTrade,
-)
+# Explicit imports removed - already covered by star import above

@@ -78,9 +78,8 @@ from .cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
 )
-from .cefi_margin_tiers import (
-    maintenance_margin_for,
-)
+
+# cefi_margin_tiers imports removed - unused
 from .chain_env import (
     BLOCK_EXPLORER_URLS,
     CHAIN_ENVS,
@@ -125,9 +124,6 @@ from .data_status_axis_matrix import (
     is_shard_axis,
 )
 from .defi_major_assets import (
-    DEFI_MAJOR_ASSET_ADDRESS_LIST,
-    DEFI_MAJOR_ASSET_ADDRESSES,
-    DEFI_MAJOR_ASSET_SYMBOLS,
     DEX_VENUE_KEYWORDS,
 )
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
@@ -174,10 +170,6 @@ from .endpoint_registry import (
 from .endpoints import BASE_URLS, ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 from .expected_coverage import (
     EXPECTED_COVERAGE_BY_ASSET_GROUP,
-    get_expected_data_types_for_venue_in_scope,
-    get_expected_pairs,
-    get_expected_venues_in_scope,
-    is_expected,
 )
 from .instruction_constraints import (
     INSTRUCTION_CONSTRAINTS,
