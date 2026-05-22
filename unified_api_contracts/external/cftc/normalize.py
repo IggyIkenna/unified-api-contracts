@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from ...canonical.domain import CanonicalOnChainMetric
-from ...normalize_utils._helpers import _to_decimal
+from ...normalize_utils._helpers import to_decimal as _to_decimal
 from .schemas import CFTCCOTReport, CFTCManagedMoneyPosition
 
 

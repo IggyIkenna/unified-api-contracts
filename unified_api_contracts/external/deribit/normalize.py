@@ -24,8 +24,8 @@ from ...canonical.domain import (
     WebSocketEvent,
 )
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
-from ...normalize_utils._helpers import _d, _to_decimal, _to_levels, _ts_ms, _ts_ms_to_datetime
-from ...normalize_utils._helpers import _side as _side_helper
+from ...normalize_utils._helpers import d as _d, to_decimal as _to_decimal, to_levels as _to_levels, ts_ms as _ts_ms, ts_ms_to_datetime as _ts_ms_to_datetime
+from ...normalize_utils._helpers import side as _side_helper
 from ...normalize_utils.market_state import _DERIBIT_STATE_MAP, normalize_market_state
 from ..deribit.schemas import (
     DeribitInstrument,

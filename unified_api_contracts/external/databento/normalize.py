@@ -22,7 +22,7 @@ from ...canonical.domain import (
     InstrumentType,
     OptionType,
 )
-from ...normalize_utils._helpers import _d, _databento_price
+from ...normalize_utils._helpers import d as _d, databento_price as _databento_price
 from ...normalize_utils.errors._utils import from_http_status
 from .schemas import (
     DATABENTO_PRICE_DIVISOR,
