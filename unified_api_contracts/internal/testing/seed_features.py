@@ -23,6 +23,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
+from typing import cast
 
 import numpy as np
 import pandas as pd
@@ -47,10 +48,11 @@ def _read_ohlcv_files(data_dir: Path) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     for pf in ohlcv_root.rglob("*.parquet"):
         try:
-            table = pq.read_table(str(pf))
-            df_result: pd.DataFrame = table.to_pandas()
-            if isinstance(df_result, pd.DataFrame):
-                frames.append(df_result)
+            df_result: pd.DataFrame = cast(  # pyright: ignore[reportUnknownMemberType]
+                pd.DataFrame,
+                pq.read_table(str(pf)).to_pandas(),  # pyright: ignore[reportUnknownMemberType]
+            )
+            frames.append(df_result)
         except Exception as exc:
             log.warning("Failed to read %s: %s", pf, exc)
 
@@ -114,7 +116,7 @@ def compute_volatility(df: pd.DataFrame) -> pd.DataFrame:
         close: pd.Series[float] = pd.to_numeric(grp["close"], errors="coerce")
         high: pd.Series[float] = pd.to_numeric(grp["high"], errors="coerce")
         low: pd.Series[float] = pd.to_numeric(grp["low"], errors="coerce")
-        log_ret: pd.Series[float] = np.log(close / close.shift(1))
+        log_ret: pd.Series[float] = (close / close.shift(1)).apply(np.log)
 
         result = grp[["timestamp", "symbol", "venue"]].copy()
         result["realised_vol_20"] = log_ret.rolling(20).std() * np.sqrt(252)
@@ -280,8 +282,10 @@ def _write_feature_df(df: pd.DataFrame, name: str, output_dir: Path, dry_run: bo
         # Ensure timestamp column is serializable
         if "timestamp" in df_clean.columns:
             df_clean["timestamp"] = pd.to_datetime(df_clean["timestamp"], utc=True)
-        table = pa.Table.from_pandas(df_clean, preserve_index=False)
-        pq.write_table(table, out_path, compression="snappy")
+        table: object = pa.Table.from_pandas(  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+            df_clean, preserve_index=False
+        )
+        pq.write_table(table, out_path, compression="snappy")  # pyright: ignore[reportUnknownMemberType,reportArgumentType]
         log.info("Wrote %d rows → %s", len(df_clean), out_path)
 
 
@@ -362,11 +366,11 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv if argv is not None else sys.argv[1:])
     return run(
-        mode=args.mode,
-        input_dir=args.input,
-        output_dir=args.output,
-        project=args.project,
-        dry_run=args.dry_run,
+        mode=cast(str, args.mode),
+        input_dir=cast(Path, args.input),
+        output_dir=cast(Path, args.output),
+        project=cast(str | None, args.project),
+        dry_run=cast(bool, args.dry_run),
     )
 
 

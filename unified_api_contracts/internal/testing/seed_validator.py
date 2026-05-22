@@ -21,7 +21,7 @@ import logging
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Final
+from typing import Any, Final, cast
 
 import pandas as pd
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
@@ -131,8 +131,10 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
     date_max = ""
 
     try:
-        table: Any = pq.read_table(str(parquet_path))
-        df: Any = table.to_pandas()
+        df: pd.DataFrame = cast(  # pyright: ignore[reportUnknownMemberType]
+            pd.DataFrame,
+            pq.read_table(str(parquet_path)).to_pandas(),  # pyright: ignore[reportUnknownMemberType]
+        )
         row_count = len(df)
 
         if schema_type == "unknown":
@@ -151,8 +153,8 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
                 if null_ts > 0:
                     errors.append(f"{null_ts} null/invalid timestamps found")
                 else:
-                    date_min = str(ts_col.min())
-                    date_max = str(ts_col.max())
+                    date_min = str(cast(object, ts_col.min()))
+                    date_max = str(cast(object, ts_col.max()))
 
             # OHLCV-specific: OHLC sanity
             if schema_type == "ohlcv":
@@ -299,9 +301,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv if argv is not None else sys.argv[1:])
-    report = validate_seed_data(args.data_dir, strict=args.strict)
+    report = validate_seed_data(cast(str, args.data_dir), strict=cast(bool, args.strict))
 
-    if args.json_report:
+    json_report_path: Path | None = cast(Path | None, args.json_report)
+    if json_report_path is not None:
         report_dict: dict[str, Any] = {
             "total_files": report.total_files,
             "passed_files": report.passed_files,
@@ -321,8 +324,8 @@ def main(argv: list[str] | None = None) -> int:
                 for fr in report.file_reports
             ],
         }
-        args.json_report.write_text(json.dumps(report_dict, indent=2))
-        log.info("JSON report → %s", args.json_report)
+        json_report_path.write_text(json.dumps(report_dict, indent=2))
+        log.info("JSON report → %s", json_report_path)
 
     return 0 if report.success else 1
 
