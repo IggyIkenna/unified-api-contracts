@@ -183,6 +183,8 @@ class TestPerpetual:
             InstrumentType.PERPETUAL,
             available_from=None,
             available_to=None,
+            base_asset="ETH",
+            quote_asset="USDT",
         )
         out = get_instruments_available_on(_dt.date(1999, 1, 1), [record])
         assert out == [record]
@@ -232,6 +234,8 @@ class TestCombinedFilters:
                 InstrumentType.PERPETUAL,
                 available_from=_utc(2020, 1, 1),
                 available_to=None,
+                base_asset="BTC",
+                quote_asset="USDT",
             ),
             _make(
                 "BINANCE_FUTURES:FUTURE:BTCUSDT-250627",
@@ -246,6 +250,8 @@ class TestCombinedFilters:
                 InstrumentType.PERPETUAL,
                 available_from=_utc(2020, 1, 1),
                 available_to=None,
+                base_asset="BTC",
+                quote_asset="USDT",
             ),
             _make(
                 "IBKR:EQUITY:AAPL",
@@ -324,6 +330,8 @@ class TestBoundaries:
             InstrumentType.SPOT_PAIR,
             available_from=_utc(2020, 6, 15),
             available_to=None,
+            base_asset="BTC",
+            quote_asset="USDT",
         )
         out = get_instruments_available_on(_dt.date(2020, 6, 15), [record])
         assert out == [record]
@@ -335,6 +343,8 @@ class TestBoundaries:
             InstrumentType.SPOT_PAIR,
             available_from=_utc(2020, 1, 1),
             available_to=_utc(2024, 7, 4),
+            base_asset="XYZ",
+            quote_asset="USDT",
         )
         out = get_instruments_available_on(_dt.date(2024, 7, 4), [record])
         assert out == [record]
@@ -346,6 +356,8 @@ class TestBoundaries:
             InstrumentType.SPOT_PAIR,
             available_from=_utc(2020, 6, 15),
             available_to=None,
+            base_asset="BTC",
+            quote_asset="USDT",
         )
         out = get_instruments_available_on(_dt.date(2020, 6, 14), [record])
         assert out == []
@@ -357,6 +369,8 @@ class TestBoundaries:
             InstrumentType.SPOT_PAIR,
             available_from=_utc(2020, 1, 1),
             available_to=_utc(2024, 7, 4),
+            base_asset="XYZ",
+            quote_asset="USDT",
         )
         out = get_instruments_available_on(_dt.date(2024, 7, 5), [record])
         assert out == []
@@ -369,6 +383,8 @@ class TestBoundaries:
             InstrumentType.SPOT_PAIR,
             available_from=_dt.datetime(2020, 6, 15, 23, 59, tzinfo=_dt.UTC),
             available_to=None,
+            base_asset="BTC",
+            quote_asset="USDT",
         )
         out = get_instruments_available_on(_dt.date(2020, 6, 15), [record])
         assert out == [record]
