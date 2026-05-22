@@ -120,6 +120,18 @@ from .infrastructure import (
     SourceControlProvider,
 )
 from .infrastructure.compute import ComputeType, VmQuotaShape
+from .instruments_catalog import (
+    CatalogRow as CatalogRow,
+)
+from .instruments_catalog import (
+    InstrumentCatalogReader as InstrumentCatalogReader,
+)
+from .instruments_catalog import (
+    list_instruments as list_instruments,
+)
+from .instruments_catalog import (
+    register_catalog_reader as register_catalog_reader,
+)
 from .market import (
     BookLevel,
     CanonicalMarketStateEvent,
