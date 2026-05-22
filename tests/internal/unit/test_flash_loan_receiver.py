@@ -24,7 +24,9 @@ class TestRegistryShape:
         assert len(FLASH_LOAN_RECEIVER_REGISTRY) >= 5
 
     def test_chain_protocol_pairs_unique(self) -> None:
-        pairs = [(e.chain, e.protocol) for e in FLASH_LOAN_RECEIVER_REGISTRY]
+        # Phase 4 added recursive_leverage entries that share (chain, protocol)
+        # with passthrough entries, so uniqueness key is (chain, protocol, kind).
+        pairs = [(e.chain, e.protocol, e.receiver_kind) for e in FLASH_LOAN_RECEIVER_REGISTRY]
         assert len(pairs) == len(set(pairs))
 
     def test_every_entry_frozen(self) -> None:
