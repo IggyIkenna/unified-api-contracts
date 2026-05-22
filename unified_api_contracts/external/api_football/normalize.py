@@ -24,7 +24,7 @@ from unified_api_contracts.canonical.domain.sports import (
     build_team_id,
     build_venue_id,
 )
-from unified_api_contracts.normalize_utils._helpers import _iso, _to_decimal, _ts_ms_to_datetime
+from unified_api_contracts.normalize_utils import _helpers
 
 from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue
 
@@ -51,7 +51,7 @@ def _extract_dict(container: dict[str, object], key: str) -> dict[str, object]:
     """
     val = container.get(key)
     if isinstance(val, dict):
-        return val
+        return val  # type: ignore[return-value]
     return {}
 
 
@@ -59,7 +59,7 @@ def _extract_list(container: dict[str, object], key: str) -> list[object]:
     """Safely extract a nested list, returning empty list for None/missing."""
     val = container.get(key)
     if isinstance(val, list):
-        return val
+        return val  # type: ignore[return-value]
     return []
 
 
@@ -95,9 +95,9 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     raw_fixture_id = str(raw.id or "")
     kickoff_utc: datetime
     if raw.date:
-        kickoff_utc = _iso(raw.date)
+        kickoff_utc = _helpers._iso(raw.date)
     elif raw.timestamp is not None and raw.timestamp > 0:
-        kickoff_utc = _ts_ms_to_datetime(raw.timestamp * 1000)
+        kickoff_utc = _helpers._ts_ms_to_datetime(raw.timestamp * 1000)
     else:
         kickoff_utc = datetime.now(UTC)
 
@@ -177,8 +177,8 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     away_goals: int | None = None
     if raw.goals:
         if isinstance(raw.goals, dict):
-            _h = raw.goals.get("home")
-            _a = raw.goals.get("away")
+            _h: object = raw.goals.get("home")
+            _a: object = raw.goals.get("away")
         else:
             _h = raw.goals.home
             _a = raw.goals.away
@@ -187,15 +187,17 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     home_ht_int: int | None = None
     away_ht_int: int | None = None
     if raw.score and isinstance(raw.score, dict):
-        ht = raw.score.get("halftime")
+        ht: object = raw.score.get("halftime")
         if isinstance(ht, dict):
-            h = ht.get("home")
-            a = ht.get("away")
+            h: object = ht.get("home")
+            a: object = ht.get("away")
             home_ht_int = int(h) if h is not None and isinstance(h, (int, float)) else None
             away_ht_int = int(a) if a is not None and isinstance(a, (int, float)) else None
     elif hasattr(raw.score, "halftime") and raw.score and raw.score.halftime:
-        home_ht_int = raw.score.halftime.home
-        away_ht_int = raw.score.halftime.away
+        halftime_obj = raw.score.halftime
+        if hasattr(halftime_obj, "home") and hasattr(halftime_obj, "away"):
+            home_ht_int = halftime_obj.home
+            away_ht_int = halftime_obj.away
 
     status: str | None = None
     if raw.status:
@@ -274,9 +276,9 @@ def normalize_api_football_fixture_to_market(
     now = datetime.now(UTC)
     close_time: datetime | None = None
     if raw.date:
-        close_time = _iso(raw.date)
+        close_time = _helpers._iso(raw.date)
     elif raw.timestamp is not None and raw.timestamp > 0:
-        close_time = _ts_ms_to_datetime(raw.timestamp * 1000)
+        close_time = _helpers._ts_ms_to_datetime(raw.timestamp * 1000)
 
     event_name = ""
     if raw.teams:
@@ -318,7 +320,7 @@ def _normalize_api_football_odds_value(
 ) -> CanonicalOdds | None:
     """Convert a single ApiFootballOddsValue to CanonicalOdds."""
     odd_str = val.odd if val.odd else None
-    dec = _to_decimal(odd_str) if odd_str else None
+    dec = _helpers._to_decimal(odd_str) if odd_str else None
     if dec is None or dec <= 0:
         return None
     selection_name = val.value or ""
@@ -377,7 +379,7 @@ def normalize_api_football_standing(raw: dict[str, object], league_id: str = "",
     See ``codex/02-data/match-end-time-cascade.md`` neighbouring docs for the
     motivation: nested-struct columns are a wide spot for silent data loss.
     """
-    if not isinstance(raw, dict):
+    if raw is None or not isinstance(raw, dict):
         return {"league_id": league_id, "season": season}
 
     team = _extract_dict(raw, "team")
@@ -432,7 +434,7 @@ def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:
 
     Returns a single dict (one injury report = one row).
     """
-    if not isinstance(raw, dict):
+    if raw is None or not isinstance(raw, dict):
         return {}
     player = _extract_dict(raw, "player")
     team = _extract_dict(raw, "team")
