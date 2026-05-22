@@ -24,7 +24,7 @@ from unified_api_contracts.canonical.domain.sports import (
     build_team_id,
     build_venue_id,
 )
-from unified_api_contracts.normalize_utils import _helpers
+from unified_api_contracts.normalize_utils._helpers import iso, to_decimal, ts_ms_to_datetime
 
 from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue, ApiFootballScore
 
@@ -95,9 +95,9 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     raw_fixture_id = str(raw.id or "")
     kickoff_utc: datetime
     if raw.date:
-        kickoff_utc = _helpers.iso(raw.date)
+        kickoff_utc = iso(raw.date)
     elif raw.timestamp is not None and raw.timestamp > 0:
-        kickoff_utc = _helpers.ts_ms_to_datetime(raw.timestamp * 1000)
+        kickoff_utc = ts_ms_to_datetime(raw.timestamp * 1000)
     else:
         kickoff_utc = datetime.now(UTC)
 
@@ -276,9 +276,9 @@ def normalize_api_football_fixture_to_market(
     now = datetime.now(UTC)
     close_time: datetime | None = None
     if raw.date:
-        close_time = _helpers.iso(raw.date)
+        close_time = iso(raw.date)
     elif raw.timestamp is not None and raw.timestamp > 0:
-        close_time = _helpers.ts_ms_to_datetime(raw.timestamp * 1000)
+        close_time = ts_ms_to_datetime(raw.timestamp * 1000)
 
     event_name = ""
     if raw.teams:
@@ -320,7 +320,7 @@ def _normalize_api_football_odds_value(
 ) -> CanonicalOdds | None:
     """Convert a single ApiFootballOddsValue to CanonicalOdds."""
     odd_str = val.odd if val.odd else None
-    dec = _helpers.to_decimal(odd_str) if odd_str else None
+    dec = to_decimal(odd_str) if odd_str else None
     if dec is None or dec <= 0:
         return None
     selection_name = val.value or ""
