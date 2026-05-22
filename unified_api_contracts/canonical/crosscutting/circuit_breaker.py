@@ -166,6 +166,23 @@ class CircuitBreakerId(StrEnum):
     STABLECOIN_DEPEG_CATASTROPHIC = "STABLECOIN_DEPEG_CATASTROPHIC"
     """Stablecoin peg deviation ≥ 1000bps (standard) / 500bps (synthetic) — KILL_ALL + MANUAL_UNKILL."""
 
+    # ── LST depeg ladder (D.2 — risk plan Phase D) ────────────────────────────────────
+    LST_DEPEG_WARNING = "LST_DEPEG_WARNING"
+    """LST/ETH peg deviation ≥ 100bps — BLOCK_NEW. Monitors stETH/rETH/cbETH/JitoSOL/mSOL
+    secondary-market price vs protocol exchange rate. 100bps is notable (stETH 2022 event
+    touched -630bps at trough); normal rebalancing noise is ≤ 30bps."""
+    LST_DEPEG_SMALL = "LST_DEPEG_SMALL"
+    """LST/ETH peg deviation ≥ 300bps — SCALE_DOWN. Meaningful adverse move; reduce
+    carry_staked_basis leverage before redemption-queue pressure worsens."""
+    LST_DEPEG_MODERATE = "LST_DEPEG_MODERATE"
+    """LST/ETH peg deviation ≥ 500bps — CANCEL_OPEN. Mirrors the
+    ``DEFI_LST_DEPEG_STETH_5PCT`` scenario trigger point; carry leg loses 5% vs perp
+    hedge; replaces generic ``DRAWDOWN_DAILY_BPS`` trip for LST-specific depeg path."""
+    LST_DEPEG_CATASTROPHIC = "LST_DEPEG_CATASTROPHIC"
+    """LST/ETH peg deviation ≥ 1500bps — KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS +
+    MANUAL_UNKILL. Extreme event (e.g. mass validator slashing + redemption freeze);
+    carry position structurally broken; requires operator review before re-arming."""
+
     # ── DR Phase 1.A+4 extensions — simulation_scenarios Day-1 follow-up (2026-05-13) ──
     # 4 breakers surfaced from simulation_scenarios_topology_price_shocks_2026_05_09
     # Day-1 run: per-chain RPC outage disambiguation, oracle staleness, lending
