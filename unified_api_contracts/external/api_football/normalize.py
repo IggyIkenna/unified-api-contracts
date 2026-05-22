@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime, timedelta
-from typing import Any, cast
+from typing import cast
 
 from unified_api_contracts.canonical.domain import CanonicalBetMarket, CanonicalOdds
 from unified_api_contracts.canonical.domain.sports import (
@@ -26,7 +26,7 @@ from unified_api_contracts.canonical.domain.sports import (
 )
 from unified_api_contracts.normalize_utils import _helpers
 
-from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue
+from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue, ApiFootballScore
 
 logger = logging.getLogger(__name__)
 
@@ -42,7 +42,7 @@ _REQUIRED_FIELDS: dict[str, frozenset[str]] = {
 }
 
 
-def _extract_dict(container: dict[str, Any], key: str) -> dict[str, Any]:
+def _extract_dict(container: dict[str, object], key: str) -> dict[str, object]:
     """Safely extract a nested dict, returning empty dict for None/missing.
 
     API Football nests stat categories (games, shots, goals, etc.) as sub-dicts.
@@ -55,7 +55,7 @@ def _extract_dict(container: dict[str, Any], key: str) -> dict[str, Any]:
     return {}
 
 
-def _extract_list(container: dict[str, Any], key: str) -> list[Any]:
+def _extract_list(container: dict[str, object], key: str) -> list[object]:
     """Safely extract a nested list, returning empty list for None/missing."""
     val = container.get(key)
     if isinstance(val, list):
@@ -63,7 +63,7 @@ def _extract_list(container: dict[str, Any], key: str) -> list[Any]:
     return []
 
 
-def _require_str(container: dict[str, Any], key: str, entity_context: str) -> str | None:
+def _require_str(container: dict[str, object], key: str, entity_context: str) -> str | None:
     """Extract a required string field. Returns None and logs warning if missing/empty."""
     val = container.get(key)
     if val is None or str(val).strip() == "":
@@ -177,8 +177,8 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     away_goals: int | None = None
     if raw.goals:
         if isinstance(raw.goals, dict):
-            _h: Any = raw.goals.get("home")
-            _a: Any = raw.goals.get("away")
+            _h: object | None = raw.goals.get("home")
+            _a: object | None = raw.goals.get("away")
         else:
             _h = raw.goals.home
             _a = raw.goals.away
@@ -187,15 +187,15 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     home_ht_int: int | None = None
     away_ht_int: int | None = None
     if raw.score and isinstance(raw.score, dict):
-        ht: Any = raw.score.get("halftime")
+        ht: object | None = raw.score.get("halftime")
         if isinstance(ht, dict):
-            h: Any = ht.get("home")
-            a: Any = ht.get("away")
+            h: object | None = ht.get("home")
+            a: object | None = ht.get("away")
             home_ht_int = int(h) if h is not None and isinstance(h, (int, float)) else None
             away_ht_int = int(a) if a is not None and isinstance(a, (int, float)) else None
     elif hasattr(raw.score, "halftime") and raw.score and raw.score.halftime:
-        halftime_obj = raw.score.halftime
-        if hasattr(halftime_obj, "home") and hasattr(halftime_obj, "away"):
+        halftime_obj: ApiFootballScore | None = raw.score.halftime
+        if hasattr(halftime_obj, "home") and hasattr(halftime_obj, "away") and halftime_obj is not None:
             home_ht_int = halftime_obj.home
             away_ht_int = halftime_obj.away
 
@@ -368,7 +368,7 @@ def normalize_api_football_odds(
     return out
 
 
-def normalize_api_football_standing(raw: dict[str, Any], league_id: str = "", season: str = "") -> dict[str, Any]:
+def normalize_api_football_standing(raw: dict[str, object], league_id: str = "", season: str = "") -> dict[str, object]:
     """Flatten a single API-Football standing row to a flat dict.
 
     Raw API-Football payload has nested team / all / home / away structs.
@@ -425,7 +425,7 @@ def normalize_api_football_standing(raw: dict[str, Any], league_id: str = "", se
     }
 
 
-def normalize_api_football_injury(raw: dict[str, Any]) -> dict[str, Any]:
+def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:
     """Flatten a single API-Football ``/injuries`` row into a flat dict.
 
     The raw shape has 4 nested struct columns (``player`` / ``team`` /
@@ -440,7 +440,7 @@ def normalize_api_football_injury(raw: dict[str, Any]) -> dict[str, Any]:
     team = _extract_dict(raw, "team")
     fixture = _extract_dict(raw, "fixture")
     league = _extract_dict(raw, "league")
-    out: dict[str, Any] = {
+    out: dict[str, object] = {
         "player_id": _safe_int(player.get("id")),
         "player_name": player.get("name"),
         "player_photo": player.get("photo"),
@@ -455,7 +455,7 @@ def normalize_api_football_injury(raw: dict[str, Any]) -> dict[str, Any]:
     return out
 
 
-def _safe_pct(val: Any) -> int | None:
+def _safe_pct(val: object) -> int | None:
     """Parse a percentage value to int 0..100.
 
     Handles ``"44%"``, ``"44"``, ``44``, ``44.0``, ``None``. Returns
@@ -464,7 +464,7 @@ def _safe_pct(val: Any) -> int | None:
     return _safe_int(val)
 
 
-def _safe_float(val: Any) -> float | None:
+def _safe_float(val: object) -> float | None:
     """Parse a numeric value to float, accepting strings + percent suffix."""
     if val is None:
         return None
@@ -506,7 +506,7 @@ _FIXTURE_STAT_TYPE_MAP: dict[str, tuple[str, str]] = {
 }
 
 
-def normalize_api_football_fixture_stats(raw: dict[str, Any], fixture_id: str = "") -> list[dict[str, Any]]:
+def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten a single API-Football ``/fixtures/statistics`` team-stats row.
 
     Each call covers ONE team's stat block — the API returns a list of
@@ -526,7 +526,7 @@ def normalize_api_football_fixture_stats(raw: dict[str, Any], fixture_id: str = 
     team = _extract_dict(raw, "team")
     stats_list = _extract_list(raw, "statistics")
 
-    row: dict[str, Any] = {
+    row: dict[str, object] = {
         "fixture_id": fixture_id,
         "team_id": _safe_int(team.get("id")),
         "team_name": team.get("name"),
@@ -562,7 +562,7 @@ def normalize_api_football_fixture_stats(raw: dict[str, Any], fixture_id: str = 
     return [row]
 
 
-def normalize_api_football_fixture_event(raw: dict[str, Any], fixture_id: str = "") -> list[dict[str, Any]]:
+def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten one API-Football ``/fixtures/events`` row into one event row.
 
     Each call covers a single event (goal / card / sub / VAR) with nested
@@ -583,7 +583,7 @@ def normalize_api_football_fixture_event(raw: dict[str, Any], fixture_id: str = 
     player = _extract_dict(raw, "player")
     assist = _extract_dict(raw, "assist")
 
-    row: dict[str, Any] = {
+    row: dict[str, object] = {
         "fixture_id": fixture_id,
         "time_elapsed": _safe_int(time_block.get("elapsed")),
         "time_extra": _safe_int(time_block.get("extra")),
@@ -600,7 +600,7 @@ def normalize_api_football_fixture_event(raw: dict[str, Any], fixture_id: str = 
     return [row]
 
 
-def normalize_api_football_lineup(raw: dict[str, Any], fixture_id: str = "") -> list[dict[str, Any]]:
+def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten one API-Football ``/fixtures/lineups`` team block into rows.
 
     Each call covers ONE team's lineup with nested ``startXI`` (11 starters),
@@ -626,9 +626,9 @@ def normalize_api_football_lineup(raw: dict[str, Any], fixture_id: str = "") -> 
     coach_id = _safe_int(coach.get("id")) if coach else None
     coach_name = coach.get("name") if coach else None
 
-    rows: list[dict[str, Any]] = []
+    rows: list[dict[str, object]] = []
 
-    def _emit(entry: Any, is_starter: bool) -> None:
+    def _emit(entry: object, is_starter: bool) -> None:
         # API-Football wraps each player block as {"player": {id, name, number, pos, grid}}.
         if not isinstance(entry, dict):
             return
@@ -660,7 +660,7 @@ def normalize_api_football_lineup(raw: dict[str, Any], fixture_id: str = "") -> 
     return rows
 
 
-def _safe_int(val: Any) -> int | None:
+def _safe_int(val: object) -> int | None:
     """Parse a value to int, stripping percentage signs and other suffixes.
 
     API Football returns some stats as ``"44%"`` strings. This function
@@ -715,7 +715,7 @@ _INT_STAT_FIELDS = frozenset(
 )
 
 
-def normalize_api_football_player_stats(raw: dict[str, Any], fixture_id: str = "") -> list[dict[str, Any]]:
+def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
     """Normalize API-Football player statistics into per-player records.
 
     Handles percentage strings (``"44%"`` → ``44``) and nested stat
@@ -726,13 +726,13 @@ def normalize_api_football_player_stats(raw: dict[str, Any], fixture_id: str = "
 
     # API Football nests player stats under teams→players→statistics
     # The raw dict may be a team-level response or a flat player record.
-    teams: list[dict[str, Any]] = []
+    teams: list[dict[str, object]] = []
     if "team" in raw and "players" in raw:
         teams = [raw]
     elif "response" in raw:
         resp = raw["response"]
         if isinstance(resp, list):
-            teams = [cast(dict[str, Any], t) for t in cast(list[Any], resp) if isinstance(t, dict)]
+            teams = [cast(dict[str, object], t) for t in cast(list[object], resp) if isinstance(t, dict)]
     else:
         # Flat record — sanitise int fields and drop nested structures
         result = {k: v for k, v in raw.items() if not isinstance(v, (dict, list))}
@@ -742,7 +742,7 @@ def normalize_api_football_player_stats(raw: dict[str, Any], fixture_id: str = "
                 result[field] = _safe_int(result[field])
         return [result]
 
-    records: list[dict[str, Any]] = []
+    records: list[dict[str, object]] = []
     for team_block in teams:
         team_info = _extract_dict(team_block, "team")
         if not team_info:
@@ -773,7 +773,7 @@ def normalize_api_football_player_stats(raw: dict[str, Any], fixture_id: str = "
                 continue
 
             # Merge all stat blocks (usually just one per player per fixture)
-            merged: dict[str, Any] = {
+            merged: dict[str, object] = {
                 "fixture_id": fixture_id,
                 "team_id": team_id,
                 "team_name": team_name,
