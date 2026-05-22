@@ -813,6 +813,7 @@ from .registry import (
     get_venue_data_type_start_date,
     is_per_instrument_shard_data_type,
     needs_candle_processing,
+    non_trading_day_reason,
     validate_data_type_for_venue,
 )
 from .signal_broadcast import (
