@@ -6,10 +6,10 @@ from decimal import Decimal
 
 from pydantic import AwareDatetime, Field
 
-from .base import _CanonicalBase
+from .._base import CanonicalBase
 
 
-class CanonicalMarginState(_CanonicalBase):
+class CanonicalMarginState(CanonicalBase):
     """Canonical margin account state — all venues."""
 
     account_id: str
@@ -22,7 +22,7 @@ class CanonicalMarginState(_CanonicalBase):
     liquidation_price: Decimal | None = None
 
 
-class CanonicalAccountState(_CanonicalBase):
+class CanonicalAccountState(CanonicalBase):
     """Canonical complete account state — all venues.
 
     ``positions`` and ``balances`` use the canonical types from domain.py.
@@ -38,7 +38,7 @@ class CanonicalAccountState(_CanonicalBase):
     margins: CanonicalMarginState | None = None
 
 
-class CanonicalOrderRejection(_CanonicalBase):
+class CanonicalOrderRejection(CanonicalBase):
     """Canonical order rejection event — all venues."""
 
     venue: str
@@ -50,7 +50,7 @@ class CanonicalOrderRejection(_CanonicalBase):
     timestamp: AwareDatetime
 
 
-class CanonicalOrderAmendment(_CanonicalBase):
+class CanonicalOrderAmendment(CanonicalBase):
     """Canonical order amendment event — all venues."""
 
     venue: str

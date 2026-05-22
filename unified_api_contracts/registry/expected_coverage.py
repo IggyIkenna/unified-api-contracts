@@ -164,7 +164,28 @@ _DEFI_LENDING_AAVE_PAIRS: list[str] = [*_DEFI_LENDING_PAIRS, "flash_loan_events"
 _DEFI_LST_PAIRS: list[str] = ["lst_rates", "staking_yields"]
 
 _DEFI: dict[str, list[str]] = {
-    # --- DEX protocols ---
+    # -------------------------------------------------------------------------
+    # DEX protocols — flat venue name matching handler output: protocol.upper()
+    # (dex_pools_handler + dex_swaps_handler use lowercase protocol → .upper()
+    # via DefiManifestRecorder._normalise_venue). Chain is a SEPARATE manifest
+    # field — do NOT embed chain in the key here.
+    # Bug fixed 2026-05-22: prior entries used VENUE-CHAIN format (e.g.
+    # "UNISWAPV3-ETHEREUM") which never matched any manifest row and caused
+    # all DEX/lending shard counts to be missing from the 88.5% coverage score.
+    # -------------------------------------------------------------------------
+    "UNISWAP_V2": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V3": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V4": list(_DEFI_DEX_PAIRS),
+    "PANCAKESWAP_V3": list(_DEFI_DEX_PAIRS),
+    "SUSHISWAP_V3": list(_DEFI_DEX_PAIRS),
+    "SUSHISWAP": list(_DEFI_DEX_PAIRS),
+    "AERODROME_V3": list(_DEFI_DEX_PAIRS),
+    "CAMELOT_V3": list(_DEFI_DEX_PAIRS),
+    "BALANCER": list(_DEFI_DEX_PAIRS),
+    "CURVE": list(_DEFI_DEX_PAIRS),
+    # Legacy VENUE-CHAIN format: 411k rows migrated 2026-05-07 from UNISWAP_V3 →
+    # UNISWAPV3-ETHEREUM (chain embedded, chain field = ""). Both formats coexist
+    # until a follow-up migration normalises all rows to flat format.
     "UNISWAPV2-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "UNISWAPV3-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "UNISWAPV3-ARBITRUM": list(_DEFI_DEX_PAIRS),
@@ -181,31 +202,31 @@ _DEFI: dict[str, list[str]] = {
     "BALANCER-BASE": list(_DEFI_DEX_PAIRS),
     "BALANCER-OPTIMISM": list(_DEFI_DEX_PAIRS),
     "BALANCER-POLYGON": list(_DEFI_DEX_PAIRS),
-    # --- Lending protocols ---
-    "AAVEV3-ETHEREUM": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-ARBITRUM": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-AVALANCHE": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-BASE": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-BSC": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-LINEA": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-OPTIMISM": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-POLYGON": list(_DEFI_LENDING_AAVE_PAIRS),
-    "COMPOUNDV3-ETHEREUM": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-ARBITRUM": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-BASE": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-OPTIMISM": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-POLYGON": list(_DEFI_LENDING_PAIRS),
-    "MORPHO-ETHEREUM": list(_DEFI_LENDING_PAIRS),
-    "MORPHO-ARBITRUM": list(_DEFI_LENDING_PAIRS),
-    "MORPHO-BASE": list(_DEFI_LENDING_PAIRS),
-    "MORPHO-OPTIMISM": list(_DEFI_LENDING_PAIRS),
-    "MORPHO-POLYGON": list(_DEFI_LENDING_PAIRS),
-    "FLUID-ETHEREUM": list(_DEFI_LENDING_PAIRS),
-    # --- LST / yield ---
-    "LIDO-ETHEREUM": list(_DEFI_LST_PAIRS),
-    "ETHERFI-ETHEREUM": [*_DEFI_LST_PAIRS, "eigenlayer_rewards"],
-    "ETHENA-ETHEREUM": list(_DEFI_LST_PAIRS),
-    "JITO-SOLANA": list(_DEFI_LST_PAIRS),
+    # --- Lending protocols — evm_defi_handler uses "aave_v3".upper() = "AAVE_V3" ---
+    # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVEV3"
+    # (no underscore) — both names needed until those handlers are normalised.
+    "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3": list(_DEFI_LENDING_AAVE_PAIRS),  # hardcoded in flash_loan + position_data handlers
+    "COMPOUND_V3": list(_DEFI_LENDING_PAIRS),
+    "MORPHO": list(_DEFI_LENDING_PAIRS),
+    "FLUID": list(_DEFI_LENDING_PAIRS),
+    # --- LST / yield — lst_rates_handler maps token→protocol then .upper() ---
+    # protocol strings: lido, rocketpool, coinbase, ethena, maker, mantle,
+    # swell, stader, stakewise, ankr, etherfi, puffer, marinade, jito, sanctum
+    "LIDO": list(_DEFI_LST_PAIRS),
+    "ETHERFI": [*_DEFI_LST_PAIRS, "eigenlayer_rewards"],
+    "ETHENA": list(_DEFI_LST_PAIRS),
+    "ROCKETPOOL": list(_DEFI_LST_PAIRS),
+    "STADER": list(_DEFI_LST_PAIRS),
+    "PUFFER": list(_DEFI_LST_PAIRS),
+    "SWELL": list(_DEFI_LST_PAIRS),
+    "STAKEWISE": list(_DEFI_LST_PAIRS),
+    "ANKR": list(_DEFI_LST_PAIRS),
+    "COINBASE": list(_DEFI_LST_PAIRS),  # cbETH
+    "MAKER": list(_DEFI_LST_PAIRS),  # sDAI
+    "MANTLE": list(_DEFI_LST_PAIRS),  # mETH
+    "MARINADE": list(_DEFI_LST_PAIRS),  # Solana marinade
+    "JITO": list(_DEFI_LST_PAIRS),  # jitoSOL / Solana
     # --- Oracle / gas / token infra (provider-level, chain is a separate shard dim) ---
     # "venue" here means data-source provider, not exchange. These are RPC
     # providers / oracle protocols — conceptually data_source_type=ORACLE|RPC_PROVIDER.

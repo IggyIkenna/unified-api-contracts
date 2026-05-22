@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
+from .betting import CommissionModel
 from .venue_execution import (
     AntiDetectionLevel,
     CredentialType,
@@ -24,14 +25,14 @@ EXCHANGE_REGISTRY: dict[str, VenueExecutionProfile] = {
         credential_type=CredentialType.API_KEY,
         venue_category=VenueCategory.EXCHANGE,
         config_secret_field="betfair_secret_name",
-        min_bet="2.00",
-        commission_model="net_winnings_pct",
+        min_bet=Decimal("2.00"),
+        commission_model=CommissionModel.NET_WINNINGS_PCT,
         available_countries=["GB", "IE"],
         withdrawal_delay_hours_min=24,
         withdrawal_delay_hours_max=72,
-        commission_rate="5.0",
+        commission_rate=Decimal("5.0"),
         min_bet_currency="GBP",
-        withdrawal_fee="0",
+        withdrawal_fee=Decimal("0"),
     ),
     "betfair_ex_eu": VenueExecutionProfile(
         venue_key="betfair_ex_eu",
@@ -43,14 +44,14 @@ EXCHANGE_REGISTRY: dict[str, VenueExecutionProfile] = {
         credential_type=CredentialType.API_KEY,
         venue_category=VenueCategory.EXCHANGE,
         config_secret_field="betfair_secret_name",
-        min_bet="2.00",
-        commission_model="net_winnings_pct",
+        min_bet=Decimal("2.00"),
+        commission_model=CommissionModel.NET_WINNINGS_PCT,
         available_countries=["ES", "IT", "PT", "RO"],
         withdrawal_delay_hours_min=24,
         withdrawal_delay_hours_max=72,
-        commission_rate="5.0",
+        commission_rate=Decimal("5.0"),
         min_bet_currency="GBP",
-        withdrawal_fee="0",
+        withdrawal_fee=Decimal("0"),
     ),
     "betfair_ex_au": VenueExecutionProfile(
         venue_key="betfair_ex_au",
@@ -62,14 +63,14 @@ EXCHANGE_REGISTRY: dict[str, VenueExecutionProfile] = {
         credential_type=CredentialType.API_KEY,
         venue_category=VenueCategory.EXCHANGE,
         config_secret_field="betfair_secret_name",
-        min_bet="2.00",
-        commission_model="net_winnings_pct",
+        min_bet=Decimal("2.00"),
+        commission_model=CommissionModel.NET_WINNINGS_PCT,
         available_countries=["AU"],
         withdrawal_delay_hours_min=24,
         withdrawal_delay_hours_max=72,
-        commission_rate="5.0",
+        commission_rate=Decimal("5.0"),
         min_bet_currency="GBP",
-        withdrawal_fee="0",
+        withdrawal_fee=Decimal("0"),
     ),
     "pinnacle": VenueExecutionProfile(
         venue_key="pinnacle",
@@ -87,7 +88,7 @@ EXCHANGE_REGISTRY: dict[str, VenueExecutionProfile] = {
         withdrawal_delay_hours_min=24,
         withdrawal_delay_hours_max=48,
         min_bet_currency="USD",
-        withdrawal_fee="0",
+        withdrawal_fee=Decimal("0"),
     ),
     "matchbook": VenueExecutionProfile(
         venue_key="matchbook",
@@ -106,7 +107,7 @@ EXCHANGE_REGISTRY: dict[str, VenueExecutionProfile] = {
         withdrawal_delay_hours_max=72,
         commission_rate="1.5",
         min_bet_currency="GBP",
-        withdrawal_fee="0",
+        withdrawal_fee=Decimal("0"),
     ),
     # ── Prediction Markets / Crypto Exchanges (REST API) ─────────────────
     "polymarket": VenueExecutionProfile(

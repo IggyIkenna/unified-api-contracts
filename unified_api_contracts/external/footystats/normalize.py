@@ -159,7 +159,7 @@ def normalize_footystats_odds(
     Sister fn ``normalize_footystats_odds_snapshot`` (below) is the pre-match-
     snapshot variant captured by ``get_fixture_odds_snapshot()``; same source,
     flat-row shape covering 68 markets, written to ``entity=footystats_odds``
-    in instruments-service. ``data_available_at = kickoff - 72h`` (FootyStats
+    in instruments-service. ``available_at = kickoff - 72h`` (FootyStats
     publishes opening odds ~3 days before kickoff).
     """
     match_id = str(raw.match_id or "")
@@ -210,7 +210,7 @@ def normalize_footystats_predictions(raw: FootyStatsMatch, venue: str = "footyst
     → ``data_type=ODDS``, ``entity=footystats_odds``).
 
     Both data_types share the same source (FootyStats) and similar
-    `data_available_at` (kickoff - 72h, since FootyStats publishes both
+    `available_at` (kickoff - 72h, since FootyStats publishes both
     opening odds and prematch predictions on the same ~3-day-out cadence)
     but they ARE NOT the same data and SHOULD NOT be merged in features.
     """
