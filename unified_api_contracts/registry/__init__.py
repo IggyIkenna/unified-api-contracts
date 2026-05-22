@@ -157,6 +157,10 @@ from .defi_reserve_params import (
     get_spark_reserve_params,
 )
 from .defi_venues import to_canonical_venue
+from .cefi_perp_venue_endpoints import (
+    CEFI_PERP_VENUE_API_ENDPOINTS,
+    get_cefi_perp_venue_api_url,
+)
 from .dex_router_addresses import (
     UNISWAP_QUOTER_V2_BY_CHAIN,
     UNISWAP_SWAP_ROUTER_BY_CHAIN,
@@ -255,6 +259,7 @@ from .tradfi_instrument_universe import (
     FX_SPOT_PAIRS,
     TRADFI_DATABENTO_INSTRUMENTS,
     get_databento_symbols_for_venue,
+    get_mvp_databento_symbols_for_venue,
 )
 from .tradfi_symbology import (
     DATABENTO_VALID_OPTIONS_SYMBOLS,
@@ -509,6 +514,7 @@ __all__ = [
     "CEFI_BASE_ASSETS",
     "CEFI_BASE_ASSET_UNIVERSE",
     "CEFI_OPTIONS_UNDERLYINGS",
+    "CEFI_PERP_VENUE_API_ENDPOINTS",
     "CHAIN_CONFIGS",
     "CHAIN_ENVS",
     "CHAIN_REQUIRED_TOKENS",
@@ -779,6 +785,7 @@ __all__ = [
     "get_bindings_for_symbol",
     "get_block_explorer_url",
     "get_breakdown_axes",
+    "get_cefi_perp_venue_api_url",
     "get_chain_config",
     "get_collateral_haircut",
     "get_compound_reserve_params",
@@ -797,6 +804,7 @@ __all__ = [
     "get_morpho_market_lltv",
     "get_morpho_reserve_params",
     "get_mtds_operations_for_protocol",
+    "get_mvp_databento_symbols_for_venue",
     "get_perp_venues",
     "get_primary_axis",
     "get_primary_binding",
