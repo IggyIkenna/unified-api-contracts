@@ -267,13 +267,13 @@ def _parse_json_string_list(v: list[str] | str | None) -> list[str] | None:
         return None
     if isinstance(v, list):
         return v
-    if isinstance(v, str):
-        try:
-            parsed = json.loads(v)
-            if isinstance(parsed, list):
-                return [str(x) for x in cast(list[object], parsed)]
-        except (json.JSONDecodeError, ValueError):
-            pass
+    # v is str here
+    try:
+        parsed: list[object] | object = cast(object, json.loads(v))
+        if isinstance(parsed, list):
+            return [str(x) for x in cast(list[object], parsed)]
+    except (json.JSONDecodeError, ValueError):
+        pass
     return None
 
 

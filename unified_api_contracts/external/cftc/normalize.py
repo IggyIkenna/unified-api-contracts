@@ -6,18 +6,19 @@ Managed money positioning used by features-commodity-service.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 
 from ...canonical.domain import CanonicalOnChainMetric
 from ...normalize_utils._helpers import to_decimal as _to_decimal
 from .schemas import CFTCCOTReport, CFTCManagedMoneyPosition
 
 
-def _date_to_utc(d: object) -> datetime:
+def _date_to_utc(d: date | datetime | object) -> datetime:
     """Convert date or datetime to aware UTC datetime."""
-    if hasattr(d, "year") and hasattr(d, "month") and hasattr(d, "day"):
-        dt = d if hasattr(d, "hour") else datetime.combine(d, datetime.min.time())
-        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)
+    if isinstance(d, datetime):
+        return d.replace(tzinfo=UTC) if d.tzinfo is None else d.astimezone(UTC)
+    if isinstance(d, date):
+        return datetime.combine(d, datetime.min.time(), tzinfo=UTC)
     return datetime.now(UTC)
 
 

@@ -237,7 +237,6 @@ class InstrumentGenerator:
                     available_from_datetime=_parse_date(str(spec["available_from"])),
                     available_to_datetime=None,
                     timestamp=ts,
-                    data_types=["ohlcv", "trades", "orderbook"],
                 )
             )
         return instruments
@@ -268,7 +267,6 @@ class InstrumentGenerator:
                     available_from_datetime=_parse_date(str(spec["available_from"])),
                     available_to_datetime=None,
                     timestamp=ts,
-                    data_types=["ohlcv", "trades", "funding_rate"],
                 )
             )
         return instruments
@@ -305,7 +303,6 @@ class InstrumentGenerator:
                         available_from_datetime=expiry_dt - timedelta(days=365),
                         available_to_datetime=None,
                         timestamp=ts,
-                        data_types=["ohlcv", "trades"],
                     )
                 )
 
@@ -338,7 +335,6 @@ class InstrumentGenerator:
                         available_from_datetime=expiry_dt - timedelta(days=365),
                         available_to_datetime=None,
                         timestamp=ts,
-                        data_types=["ohlcv", "trades"],
                     )
                 )
 
@@ -409,7 +405,6 @@ class InstrumentGenerator:
                             available_from_datetime=listed,
                             available_to_datetime=None,
                             timestamp=ts,
-                            data_types=["ohlcv", "trades"],
                         )
                     )
         return instruments
@@ -444,7 +439,6 @@ class InstrumentGenerator:
                     available_from_datetime=_parse_date(str(spec["available_from"])),
                     available_to_datetime=None,
                     timestamp=ts,
-                    data_types=["ohlcv"] if spec["type"] == "INDEX" else ["ohlcv", "trades"],
                 )
             )
 
@@ -488,7 +482,6 @@ class InstrumentGenerator:
                         available_from_datetime=expiry_dt - timedelta(days=365),
                         available_to_datetime=None,
                         timestamp=ts,
-                        data_types=["ohlcv", "trades"],
                     )
                 )
 

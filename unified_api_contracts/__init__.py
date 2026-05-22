@@ -814,12 +814,14 @@ from .registry import (
     get_valid_data_types_for_venue,
     get_venue_coordinates,
     get_venue_data_type_start_date,
-    is_expected,
     is_per_instrument_shard_data_type,
     needs_candle_processing,
     non_trading_day_reason,
     validate_data_type_for_venue,
     venue_has_no_expected_defi_coverage,
+)
+from .registry import (
+    is_expected as is_expected,
 )
 from .signal_broadcast import (
     COUNTERPARTY_ENTITLEMENTS as COUNTERPARTY_ENTITLEMENTS,

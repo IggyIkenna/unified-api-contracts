@@ -61,12 +61,14 @@ def normalize_github_pull_request_to_pr(
     """Route GitHubPullRequest to CanonicalPullRequest."""
     if not raw or raw.number is None:
         return None
-    head_ref = None
-    base_ref = None
-    if raw.head and isinstance(raw.head, dict):
-        head_ref = raw.head.get("ref") if isinstance(raw.head.get("ref"), str) else None
-    if raw.base and isinstance(raw.base, dict):
-        base_ref = raw.base.get("ref") if isinstance(raw.base.get("ref"), str) else None
+    head_ref: str | None = None
+    base_ref: str | None = None
+    if raw.head:
+        _head_ref = raw.head.get("ref")
+        head_ref = _head_ref if isinstance(_head_ref, str) else None
+    if raw.base:
+        _base_ref = raw.base.get("ref")
+        base_ref = _base_ref if isinstance(_base_ref, str) else None
     return CanonicalPullRequest(
         provider=SourceControlProvider.GITHUB,
         number=raw.number,

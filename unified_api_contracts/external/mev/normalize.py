@@ -25,11 +25,11 @@ def normalize_flashbots_bundle_result(
     value = 1 (success indicator)
     entity = bundleHash
     """
-    if raw.bundleHash is None or raw.bundleHash == "":
+    if not raw.bundleHash:
         return None
-    raw_dict: dict[str, object] = {
+    raw_dict: dict[str, float | int | str | None] = {
         "bundleHash": raw.bundleHash,
-        "smart": raw.smart,
+        "smart": str(raw.smart) if raw.smart is not None else None,
         "blockNumber": block_number,
     }
     return CanonicalOnChainMetric(
@@ -53,9 +53,9 @@ def normalize_mev_share_bundle_result(
     value = 1 (success indicator)
     entity = bundleHash
     """
-    if raw.bundleHash is None or raw.bundleHash == "":
+    if not raw.bundleHash:
         return None
-    raw_dict: dict[str, object] = {"bundleHash": raw.bundleHash}
+    raw_dict: dict[str, float | int | str | None] = {"bundleHash": raw.bundleHash}
     return CanonicalOnChainMetric(
         timestamp=datetime.now(UTC),
         venue=venue,

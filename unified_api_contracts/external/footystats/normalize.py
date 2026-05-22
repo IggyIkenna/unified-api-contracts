@@ -18,7 +18,8 @@ from unified_api_contracts.canonical.domain.sports import (
     build_league_id,
     build_team_id,
 )
-from unified_api_contracts.normalize_utils._helpers import to_decimal as _to_decimal, unix_sec_to_utc as _ts_sec
+from unified_api_contracts.normalize_utils._helpers import to_decimal as _to_decimal
+from unified_api_contracts.normalize_utils._helpers import unix_sec_to_utc as _ts_sec
 
 from .schemas import FootyStatsMatch, FootyStatsOdds, FTMatchRaw
 
@@ -288,7 +289,7 @@ def normalize_footystats_odds_snapshot(
 
     Returns a row suitable for a DataFrame written to ``entity=footystats_odds``.
     """
-    kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix > 0 else datetime.now(UTC)
+    kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix is not None and raw.date_unix > 0 else datetime.now(UTC)
     home_name = raw.home_name or ""
     away_name = raw.away_name or ""
 
