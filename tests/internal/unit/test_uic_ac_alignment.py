@@ -302,5 +302,7 @@ class TestUICExportsResolve:
             instrument_type="SPOT_PAIR",
             symbol="BTC/USDT",
             raw_symbol="BTCUSDT",
+            base_asset="BTC",
+            quote_asset="USDT",
         )
         assert rec.venue == "binance"
