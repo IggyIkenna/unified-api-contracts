@@ -86,7 +86,10 @@ _CEFI: dict[str, list[str]] = {
         "liquidations",
         "futures_chain",
     ],
-    "OKX": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations"],
+    # OKX uses suffixed venue names in manifest (OKX-SPOT / OKX-FUTURES / OKX-SWAP)
+    "OKX-SPOT": ["trades", "book_snapshot_5"],
+    "OKX-FUTURES": ["trades", "book_snapshot_5", "derivative_ticker"],
+    "OKX-SWAP": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations"],
     "DERIBIT": [
         "trades",
         "book_snapshot_5",
@@ -96,7 +99,7 @@ _CEFI: dict[str, list[str]] = {
         "futures_chain",
     ],
     "UPBIT": ["trades", "book_snapshot_5"],
-    "COINBASE": ["trades", "book_snapshot_5"],
+    "COINBASE-SPOT": ["trades", "book_snapshot_5"],
     "HYPERLIQUID": [
         "trades",
         "book_snapshot_5",
@@ -109,6 +112,14 @@ _CEFI: dict[str, list[str]] = {
         "derivative_ticker",
         "liquidations",
     ],
+    # Tier-3 venues (Tardis — added 2026-05-01). BITFINEX + BITGET have data
+    # in manifest; KRAKEN adapters exist but no manifest rows yet (backfill pending).
+    "BITFINEX-SPOT": ["trades", "book_snapshot_5"],
+    "BITFINEX-FUTURES": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations"],
+    "BITGET-SPOT": ["trades", "book_snapshot_5"],
+    "BITGET-FUTURES": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations"],
+    "KRAKEN-SPOT": ["trades", "book_snapshot_5"],
+    "KRAKEN-FUTURES": ["trades", "book_snapshot_5", "derivative_ticker", "liquidations"],
 }
 
 # ---------------------------------------------------------------------------
@@ -202,14 +213,39 @@ _DEFI: dict[str, list[str]] = {
     "BALANCER-BASE": list(_DEFI_DEX_PAIRS),
     "BALANCER-OPTIMISM": list(_DEFI_DEX_PAIRS),
     "BALANCER-POLYGON": list(_DEFI_DEX_PAIRS),
+    "SUSHISWAPV3-ETHEREUM": list(_DEFI_DEX_PAIRS),
+    "ORCA-SOLANA": list(_DEFI_DEX_PAIRS),
+    "RAYDIUM-SOLANA": list(_DEFI_DEX_PAIRS),
     # --- Lending protocols — evm_defi_handler uses "aave_v3".upper() = "AAVE_V3" ---
     # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVEV3"
-    # (no underscore) — both names needed until those handlers are normalised.
+    # (no underscore) — both names needed until those handlers are normalised (Bug 2).
     "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),
     "AAVEV3": list(_DEFI_LENDING_AAVE_PAIRS),  # hardcoded in flash_loan + position_data handlers
+    # Legacy VENUE-CHAIN format for lending (411k migrated rows, chain embedded in venue):
+    "AAVEV3-ARBITRUM": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-AVALANCHE": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-BASE": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-BSC": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-ETHEREUM": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-LINEA": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-OPTIMISM": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-POLYGON": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-SCROLL": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVEV3-ZKSYNC": list(_DEFI_LENDING_AAVE_PAIRS),
+    "COMPOUNDV3-ARBITRUM": list(_DEFI_LENDING_PAIRS),
+    "COMPOUNDV3-BASE": list(_DEFI_LENDING_PAIRS),
+    "COMPOUNDV3-ETHEREUM": list(_DEFI_LENDING_PAIRS),
+    "COMPOUNDV3-OPTIMISM": list(_DEFI_LENDING_PAIRS),
+    "COMPOUNDV3-POLYGON": list(_DEFI_LENDING_PAIRS),
+    "COMPOUNDV3-SCROLL": list(_DEFI_LENDING_PAIRS),
     "COMPOUND_V3": list(_DEFI_LENDING_PAIRS),
     "MORPHO": list(_DEFI_LENDING_PAIRS),
     "FLUID": list(_DEFI_LENDING_PAIRS),
+    "KAMINO-SOLANA": list(_DEFI_LENDING_PAIRS),
+    # On-chain perps (VENUE-CHAIN format coexists with flat GMX entry above)
+    "GMX-ARBITRUM": ["perp_funding"],
+    "GMX-AVALANCHE": ["perp_funding"],
+    "DRIFT-SOLANA": ["perp_funding", "position_data"],
     # --- LST / yield — lst_rates_handler maps token→protocol then .upper() ---
     # protocol strings: lido, rocketpool, coinbase, ethena, maker, mantle,
     # swell, stader, stakewise, ankr, etherfi, puffer, marinade, jito, sanctum
@@ -227,6 +263,15 @@ _DEFI: dict[str, list[str]] = {
     "MANTLE": list(_DEFI_LST_PAIRS),  # mETH
     "MARINADE": list(_DEFI_LST_PAIRS),  # Solana marinade
     "JITO": list(_DEFI_LST_PAIRS),  # jitoSOL / Solana
+    "FRAX": list(_DEFI_LST_PAIRS),  # sFRAX staked yield
+    # Legacy VENUE-CHAIN format for LST (411k migrated rows):
+    "LIDO-ETHEREUM": list(_DEFI_LST_PAIRS),
+    "ETHERFI-ETHEREUM": [*_DEFI_LST_PAIRS, "eigenlayer_rewards"],
+    "ETHENA-ETHEREUM": list(_DEFI_LST_PAIRS),
+    "ROCKETPOOL-ETHEREUM": list(_DEFI_LST_PAIRS),
+    "JITO-SOLANA": list(_DEFI_LST_PAIRS),
+    "MARINADE-SOLANA": list(_DEFI_LST_PAIRS),
+    "FRAX-ETHEREUM": list(_DEFI_LST_PAIRS),
     # --- Oracle / gas / token infra (provider-level, chain is a separate shard dim) ---
     # "venue" here means data-source provider, not exchange. These are RPC
     # providers / oracle protocols — conceptually data_source_type=ORACLE|RPC_PROVIDER.
