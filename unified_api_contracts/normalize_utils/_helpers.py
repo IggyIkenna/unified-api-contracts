@@ -167,6 +167,9 @@ def _tif(t: str | None) -> TimeInForce:
 
 # Public aliases for cross-module use (avoids reportPrivateUsage when importing)
 to_decimal = _to_decimal
+to_levels = _to_levels
+ts_ms_to_datetime = _ts_ms_to_datetime
+d = _d
 unix_sec_to_utc = _ts_sec
 
 __all__ = [
@@ -183,5 +186,8 @@ __all__ = [
     "_ts_ms_to_datetime",
     "_ts_sec",
     "to_decimal",
+    "to_levels",
+    "ts_ms_to_datetime",
+    "d",
     "unix_sec_to_utc",
 ]

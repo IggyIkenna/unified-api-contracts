@@ -120,18 +120,18 @@ def normalize_binance_ticker(
     raw: BinanceTicker, instrument_key: str | None = None, venue: str = "binance"
 ) -> CanonicalTicker:
     ik = instrument_key or f"{venue}:SPOT:{raw.symbol}"
-    ts = _helpers._ts_ms_to_datetime(raw.time or raw.closeTime)
+    ts = _helpers.ts_ms_to_datetime(raw.time or raw.closeTime)
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=_helpers._to_decimal(raw.lastPrice) or Decimal("0"),
-        bid_price=_helpers._to_decimal(raw.bidPrice),
-        ask_price=_helpers._to_decimal(raw.askPrice),
-        volume_24h=_helpers._to_decimal(raw.volume),
-        quote_volume_24h=_helpers._to_decimal(raw.quoteVolume),
-        price_change_24h=_helpers._to_decimal(raw.priceChange),
-        price_change_percent_24h=_helpers._to_decimal(raw.priceChangePercent),
+        last_price=_helpers.to_decimal(raw.lastPrice) or Decimal("0"),
+        bid_price=_helpers.to_decimal(raw.bidPrice),
+        ask_price=_helpers.to_decimal(raw.askPrice),
+        volume_24h=_helpers.to_decimal(raw.volume),
+        quote_volume_24h=_helpers.to_decimal(raw.quoteVolume),
+        price_change_24h=_helpers.to_decimal(raw.priceChange),
+        price_change_percent_24h=_helpers.to_decimal(raw.priceChangePercent),
     )
 
 
@@ -148,8 +148,8 @@ def normalize_binance_orderbook(
 ) -> CanonicalOrderBook:
     """Convert BinanceOrderBook to CanonicalOrderBook."""
     ts = datetime.fromtimestamp(timestamp_ms / 1000.0, tz=UTC) if timestamp_ms is not None else datetime.now(UTC)
-    bids = _helpers._to_levels([[p, q] for p, q in raw.bids])
-    asks = _helpers._to_levels([[p, q] for p, q in raw.asks])
+    bids = _helpers.to_levels([[p, q] for p, q in raw.bids])
+    asks = _helpers.to_levels([[p, q] for p, q in raw.asks])
     return CanonicalOrderBook(
         venue=venue,
         symbol=symbol,
@@ -188,7 +188,7 @@ def normalize_binance_trade(raw: BinanceTrade, venue: str = "binance", symbol: s
 
 
 def normalize_binance_order(raw: BinanceOrder, venue: str = "binance") -> CanonicalOrder:
-    ts = _helpers._ts_ms_to_datetime(raw.time or raw.updateTime)
+    ts = _helpers.ts_ms_to_datetime(raw.time or raw.updateTime)
     symbol = raw.symbol or ""
     return CanonicalOrder(
         order_id=str(raw.orderId or ""),
@@ -214,7 +214,7 @@ def normalize_binance_order(raw: BinanceOrder, venue: str = "binance") -> Canoni
 
 
 def normalize_binance_fill(raw: BinanceMyTrades, venue: str = "binance") -> CanonicalFill:
-    ts = _helpers._ts_ms_to_datetime(raw.time)
+    ts = _helpers.ts_ms_to_datetime(raw.time)
     symbol = raw.symbol or ""
     return CanonicalFill(
         fill_id=str(raw.id),
@@ -263,17 +263,17 @@ def normalize_binance_derivative_ticker(
 
     if isinstance(raw, BinancePremiumIndex):
         symbol = raw.symbol or ""
-        mark_price = _helpers._to_decimal(raw.markPrice)
-        index_price = _helpers._to_decimal(raw.indexPrice)
-        funding_rate = _helpers._to_decimal(raw.lastFundingRate)
+        mark_price = _helpers.to_decimal(raw.markPrice)
+        index_price = _helpers.to_decimal(raw.indexPrice)
+        funding_rate = _helpers.to_decimal(raw.lastFundingRate)
         next_funding_timestamp = _ms_to_utc(raw.nextFundingTime)
         ts_dt = _ms_to_utc(raw.time)
         if ts_dt is not None:
             timestamp = ts_dt
     else:
         symbol = raw.symbol
-        last_price = _helpers._to_decimal(raw.lastPrice)
-        funding_rate = _helpers._to_decimal(raw.lastFundingRate)
+        last_price = _helpers.to_decimal(raw.lastPrice)
+        funding_rate = _helpers.to_decimal(raw.lastFundingRate)
         next_funding_timestamp = _ms_to_utc(raw.nextFundingTime)
         ts_dt = _ms_to_utc(raw.time or raw.closeTime)
         if ts_dt is not None:
@@ -304,12 +304,12 @@ def normalize_binance_kline(raw: BinanceKline, symbol: str, venue: str = "binanc
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_helpers._d(raw.open_price),
-        high=_helpers._d(raw.high_price),
-        low=_helpers._d(raw.low_price),
-        close=_helpers._d(raw.close_price),
-        volume=_helpers._d(raw.volume),
-        quote_volume=_helpers._d(raw.quote_asset_volume),
+        open=_helpers.d(raw.open_price),
+        high=_helpers.d(raw.high_price),
+        low=_helpers.d(raw.low_price),
+        close=_helpers.d(raw.close_price),
+        volume=_helpers.d(raw.volume),
+        quote_volume=_helpers.d(raw.quote_asset_volume),
         count=raw.number_of_trades,
         vwap=None,
     )
