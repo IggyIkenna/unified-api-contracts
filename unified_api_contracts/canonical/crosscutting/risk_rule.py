@@ -118,6 +118,9 @@ class RiskRuleId(StrEnum):
     # ── Global kill-conditions axis ─────────────────────────────────────────
     GLOBAL_PORTFOLIO_DRAWDOWN_HALT = "GLOBAL_PORTFOLIO_DRAWDOWN_HALT"
     GLOBAL_DATA_STALENESS_HALT = "GLOBAL_DATA_STALENESS_HALT"
+    ORACLE_OUTAGE_HALT = "ORACLE_OUTAGE_HALT"
+    CROSS_CLOUD_EGRESS_HALT = "CROSS_CLOUD_EGRESS_HALT"
+    CUSTODY_ENDPOINT_HALT = "CUSTODY_ENDPOINT_HALT"
 
     # ── Strategy-family aggregate axis (Phase 2.H) ──────────────────────────
     # § 7 SSOT reconciliation — strategy-family rules aggregate per-archetype
@@ -375,6 +378,30 @@ class CounterpartyRatioCapTrigger(_TriggerBase):
     secondary_venue: str
 
 
+class BinaryEventTrigger(_TriggerBase):
+    """Binary event-driven halt trigger.
+
+    Fires when the named infrastructure event is detected. Unlike metric
+    triggers, there is no numeric threshold — the condition is boolean:
+    the event is either present or absent. The evaluator in UTL
+    ``risk/rule_evaluator.py`` checks ``event_source`` via the registered
+    health-probe table on every order.
+
+    Used for oracle-outage, cross-cloud-egress, and custody-endpoint-halt
+    rules (``ORACLE_OUTAGE_HALT``, ``CROSS_CLOUD_EGRESS_HALT``,
+    ``CUSTODY_ENDPOINT_HALT``) where the trigger is an infrastructure
+    health boolean, not a rolling metric.
+
+    Attributes:
+        event_source: Probe key identifying the infrastructure health signal
+            (e.g. ``"chainlink_oracle"``, ``"cross_cloud_egress"``,
+            ``"copper_custody_endpoint"``).
+    """
+
+    trigger_type: Literal["binary_event"] = "binary_event"
+    event_source: str
+
+
 RiskRuleTrigger = Annotated[
     (
         MaxPositionSizeTrigger
@@ -391,6 +418,7 @@ RiskRuleTrigger = Annotated[
         | MaxNetExposureTrigger
         | MaxDailyLossTrigger
         | CounterpartyRatioCapTrigger
+        | BinaryEventTrigger
     ),
     Field(discriminator="trigger_type"),
 ]
@@ -717,7 +745,9 @@ __all__ = [
     "CONSEQUENCE_ALERT_CODES",
     "CONSEQUENCE_EVENTS_EMITTED",
     "RISK_RULE_IDS",
+    "BinaryEventTrigger",
     "CapitalAtRiskCeilingTrigger",
+    "CounterpartyRatioCapTrigger",
     "FundingCostCeilingTrigger",
     "GasBudgetTrigger",
     "MaxConcentrationTrigger",
