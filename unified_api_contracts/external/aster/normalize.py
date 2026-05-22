@@ -17,7 +17,7 @@ from ...canonical.domain import (
     WebSocketEvent,
 )
 from ...canonical.domain.execution import CanonicalOrder, OrderSide, OrderStatus, OrderType
-from ...normalize_utils import _helpers
+from ...normalize_utils._helpers import d, to_decimal, to_levels, ts_ms_to_datetime
 from ...normalize_utils.connectivity import normalize_ws_disconnect
 from .schemas import (
     AsterExchangeInfo,
@@ -37,7 +37,7 @@ from .schemas import (
 # Helpers (module-level)
 # ---------------------------------------------------------------------------
 
-_parse_decimal = _helpers._d
+_parse_decimal = d
 
 
 def _now_utc() -> datetime:
@@ -91,18 +91,18 @@ def normalize_aster_ticker(
 ) -> CanonicalTicker:
     """Convert AsterTicker24hr to CanonicalTicker."""
     ik = instrument_key or f"{venue}:PERPETUAL:{raw.symbol or ''}"
-    ts = _helpers._ts_ms_to_datetime(raw.closeTime or raw.openTime)
+    ts = ts_ms_to_datetime(raw.closeTime or raw.openTime)
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=_helpers._to_decimal(raw.lastPrice) or Decimal("0"),
+        last_price=to_decimal(raw.lastPrice) or Decimal("0"),
         bid_price=None,
         ask_price=None,
-        volume_24h=_helpers._to_decimal(raw.volume),
-        quote_volume_24h=_helpers._to_decimal(raw.quoteVolume),
-        price_change_24h=_helpers._to_decimal(raw.priceChange),
-        price_change_percent_24h=_helpers._to_decimal(raw.priceChangePercent),
+        volume_24h=to_decimal(raw.volume),
+        quote_volume_24h=to_decimal(raw.quoteVolume),
+        price_change_24h=to_decimal(raw.priceChange),
+        price_change_percent_24h=to_decimal(raw.priceChangePercent),
     )
 
 
@@ -123,8 +123,8 @@ def normalize_aster_orderbook(
         if timestamp_ms is not None
         else (datetime.fromtimestamp(raw.timestamp / 1000.0, tz=UTC) if raw.timestamp else datetime.now(UTC))
     )
-    bids = _helpers._to_levels(raw.bids or [])
-    asks = _helpers._to_levels(raw.asks or [])
+    bids = to_levels(raw.bids or [])
+    asks = to_levels(raw.asks or [])
     return CanonicalOrderBook(
         venue=venue,
         symbol=symbol or (raw.market_id or ""),
@@ -199,19 +199,19 @@ def normalize_aster_derivative_ticker(
     ik = instrument_key or f"{venue}:PERPETUAL:{symbol}"
 
     timestamp = _ms_to_utc(mark.time) or _now_utc()
-    mark_price = _helpers._to_decimal(mark.markPrice) if mark.markPrice else None
-    index_price = _helpers._to_decimal(mark.indexPrice) if mark.indexPrice else None
-    funding_rate = _helpers._to_decimal(mark.lastFundingRate) if mark.lastFundingRate else None
+    mark_price = to_decimal(mark.markPrice) if mark.markPrice else None
+    index_price = to_decimal(mark.indexPrice) if mark.indexPrice else None
+    funding_rate = to_decimal(mark.lastFundingRate) if mark.lastFundingRate else None
     next_funding_timestamp = _ms_to_utc(mark.nextFundingTime) if mark.nextFundingTime else None
 
     open_interest: Decimal | None = None
     if oi is not None and oi.openInterest:
-        open_interest = _helpers._to_decimal(oi.openInterest)
+        open_interest = to_decimal(oi.openInterest)
 
     explicit_funding_dt: datetime | None = None
     if funding is not None:
         if funding.fundingRate:
-            funding_rate = _helpers._to_decimal(funding.fundingRate)
+            funding_rate = to_decimal(funding.fundingRate)
         if funding.fundingTime:
             explicit_funding_dt = _ms_to_utc(funding.fundingTime)
 
@@ -240,11 +240,11 @@ def normalize_aster_kline(raw: AsterKline, symbol: str = "", venue: str = "aster
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_helpers._d(raw.open),
-        high=_helpers._d(raw.high),
-        low=_helpers._d(raw.low),
-        close=_helpers._d(raw.close),
-        volume=_helpers._d(raw.volume),
+        open=d(raw.open),
+        high=d(raw.high),
+        low=d(raw.low),
+        close=d(raw.close),
+        volume=d(raw.volume),
         quote_volume=None,
         count=None,
         vwap=None,

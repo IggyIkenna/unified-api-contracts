@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from ...canonical.domain import CanonicalOhlcvBar
-from ...normalize_utils import _helpers
+from ...normalize_utils._helpers import d
 from .schemas import BarchartOhlcv15m
 
 # ---------------------------------------------------------------------------
@@ -32,11 +32,11 @@ def normalize_barchart_ohlcv(raw: BarchartOhlcv15m, venue: str = "barchart") -> 
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_helpers._d(raw.Open),
-        high=_helpers._d(raw.High),
-        low=_helpers._d(raw.Low),
-        close=_helpers._d(raw.Last),
-        volume=_helpers._d(raw.Volume),
+        open=d(raw.Open),
+        high=d(raw.High),
+        low=d(raw.Low),
+        close=d(raw.Last),
+        volume=d(raw.Volume),
         quote_volume=None,
         count=None,
         vwap=None,
