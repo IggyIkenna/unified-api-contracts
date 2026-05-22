@@ -12,8 +12,15 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -25,8 +32,16 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -39,8 +54,12 @@
           "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["deribit"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "deribit"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "both",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -52,8 +71,13 @@
           "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["deribit", "okx"],
-          "signal_variants": ["delta_as_expression"],
+          "venue_ids": [
+            "deribit",
+            "okx"
+          ],
+          "signal_variants": [
+            "delta_as_expression"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -65,8 +89,13 @@
           "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["uniswap_v3", "balancer"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "uniswap_v3",
+            "balancer"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -78,8 +107,14 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "hyperliquid",
+            "gmx_v2",
+            "drift"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -94,7 +129,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-2"],
+          "block_list_refs": [
+            "BL-2"
+          ],
           "representative_slot_labels": [],
           "notes": "No DeFi dated-future venue."
         },
@@ -105,7 +142,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-1"],
+          "block_list_refs": [
+            "BL-1"
+          ],
           "representative_slot_labels": [],
           "notes": "No supported DeFi options venue (Lyra / Dopex archived)."
         },
@@ -113,8 +152,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "ibkr"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -126,10 +169,17 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["cme", "ice"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "cme",
+            "ice"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "both",
-          "block_list_refs": ["BL-10"],
+          "block_list_refs": [
+            "BL-10"
+          ],
           "representative_slot_labels": [
             "ML_DIRECTIONAL_CONTINUOUS@cme-es-dated-1m-usd-prod",
             "ML_DIRECTIONAL_CONTINUOUS@ice-brent-dated-daily-usd-prod"
@@ -140,8 +190,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["cboe"],
-          "signal_variants": ["delta_as_expression"],
+          "venue_ids": [
+            "cboe"
+          ],
+          "signal_variants": [
+            "delta_as_expression"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -166,7 +220,9 @@
             "smarkets_direct",
             "matchbook_direct"
           ],
-          "signal_variants": ["odds"],
+          "signal_variants": [
+            "odds"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -182,8 +238,12 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
-          "venue_ids": ["polymarket"],
-          "signal_variants": ["odds"],
+          "venue_ids": [
+            "polymarket"
+          ],
+          "signal_variants": [
+            "odds"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -195,10 +255,14 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "BLOCKED",
-          "venue_ids": ["kalshi"],
+          "venue_ids": [
+            "kalshi"
+          ],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-5"],
+          "block_list_refs": [
+            "BL-5"
+          ],
           "representative_slot_labels": [],
           "notes": "Kalshi execution adapter pending."
         }
@@ -213,8 +277,15 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -226,8 +297,16 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
-          "signal_variants": ["price", "funding_rate"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "price",
+            "funding_rate"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -240,8 +319,12 @@
           "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["deribit"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "deribit"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "both",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -254,7 +337,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-4"],
+          "block_list_refs": [
+            "BL-4"
+          ],
           "representative_slot_labels": [],
           "notes": "Directional options via rules is non-standard; use VOL_TRADING_OPTIONS or ML with expression=atm_call."
         },
@@ -262,8 +347,12 @@
           "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["uniswap_v3"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "uniswap_v3"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -273,8 +362,15 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["gmx_v2", "drift", "hyperliquid"],
-          "signal_variants": ["price", "funding_rate"],
+          "venue_ids": [
+            "gmx_v2",
+            "drift",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "price",
+            "funding_rate"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -286,8 +382,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "ibkr"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -299,10 +399,17 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["cme", "ice"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "cme",
+            "ice"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "both",
-          "block_list_refs": ["BL-10"],
+          "block_list_refs": [
+            "BL-10"
+          ],
           "representative_slot_labels": [
             "RULES_DIRECTIONAL_CONTINUOUS@cme-es-dated-1m-ta-usd-prod"
           ],
@@ -315,7 +422,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-4"],
+          "block_list_refs": [
+            "BL-4"
+          ],
           "representative_slot_labels": [],
           "notes": "Same BL-4 \u2014 directional options via rules is non-standard."
         }
@@ -330,8 +439,14 @@
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["unity", "betfair_direct", "smarkets_direct"],
-          "signal_variants": ["odds"],
+          "venue_ids": [
+            "unity",
+            "betfair_direct",
+            "smarkets_direct"
+          ],
+          "signal_variants": [
+            "odds"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -344,8 +459,12 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["polymarket"],
-          "signal_variants": ["odds"],
+          "venue_ids": [
+            "polymarket"
+          ],
+          "signal_variants": [
+            "odds"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -364,8 +483,14 @@
           "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "coinbase", "deribit"],
-          "signal_variants": ["basis"],
+          "venue_ids": [
+            "binance",
+            "coinbase",
+            "deribit"
+          ],
+          "signal_variants": [
+            "basis"
+          ],
           "roll_mode": "both",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -378,8 +503,12 @@
           "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["deribit"],
-          "signal_variants": ["basis"],
+          "venue_ids": [
+            "deribit"
+          ],
+          "signal_variants": [
+            "basis"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -394,7 +523,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-2"],
+          "block_list_refs": [
+            "BL-2"
+          ],
           "representative_slot_labels": [],
           "notes": "No DeFi dated-future venue."
         },
@@ -402,10 +533,18 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr", "cme", "ice"],
-          "signal_variants": ["basis"],
+          "venue_ids": [
+            "ibkr",
+            "cme",
+            "ice"
+          ],
+          "signal_variants": [
+            "basis"
+          ],
           "roll_mode": "both",
-          "block_list_refs": ["BL-10"],
+          "block_list_refs": [
+            "BL-10"
+          ],
           "representative_slot_labels": [
             "CARRY_BASIS_DATED@ibkr-cme-spy-es-dated-usd-prod",
             "CARRY_BASIS_DATED@ibkr-ice-brent-fixed-feb26-usd-prod"
@@ -423,8 +562,16 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
-          "signal_variants": ["funding_rate"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit"
+          ],
+          "signal_variants": [
+            "funding_rate"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -437,8 +584,17 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["uniswap_v3", "hyperliquid", "gmx_v2", "drift", "lido"],
-          "signal_variants": ["funding_rate", "staking_yield"],
+          "venue_ids": [
+            "uniswap_v3",
+            "hyperliquid",
+            "gmx_v2",
+            "drift",
+            "lido"
+          ],
+          "signal_variants": [
+            "funding_rate",
+            "staking_yield"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -473,7 +629,11 @@
             "deribit",
             "okx"
           ],
-          "signal_variants": ["staking_yield", "funding_rate", "rate_spread"],
+          "signal_variants": [
+            "staking_yield",
+            "funding_rate",
+            "rate_spread"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -506,7 +666,10 @@
             "aave_v3",
             "kamino"
           ],
-          "signal_variants": ["staking_yield", "rate_spread"],
+          "signal_variants": [
+            "staking_yield",
+            "rate_spread"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -529,7 +692,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-3"],
+          "block_list_refs": [
+            "BL-3"
+          ],
           "representative_slot_labels": [],
           "notes": "CeFi lending out-of-scope: withdrawal lockups + counterparty risk (BL-3)."
         },
@@ -537,8 +702,16 @@
           "asset_group": "DEFI",
           "instrument_type": "lending",
           "status": "SUPPORTED",
-          "venue_ids": ["aave_v3", "compound_v3", "euler", "morpho", "kamino"],
-          "signal_variants": ["rate_spread"],
+          "venue_ids": [
+            "aave_v3",
+            "compound_v3",
+            "euler",
+            "morpho",
+            "kamino"
+          ],
+          "signal_variants": [
+            "rate_spread"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -559,8 +732,16 @@
           "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "SUPPORTED",
-          "venue_ids": ["lido", "rocketpool", "etherfi", "jito", "marinade"],
-          "signal_variants": ["staking_yield"],
+          "venue_ids": [
+            "lido",
+            "rocketpool",
+            "etherfi",
+            "jito",
+            "marinade"
+          ],
+          "signal_variants": [
+            "staking_yield"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -580,8 +761,15 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -593,8 +781,17 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
-          "signal_variants": ["price", "funding_rate"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit"
+          ],
+          "signal_variants": [
+            "price",
+            "funding_rate"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -607,8 +804,13 @@
           "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["deribit", "okx"],
-          "signal_variants": ["iv_dispersion"],
+          "venue_ids": [
+            "deribit",
+            "okx"
+          ],
+          "signal_variants": [
+            "iv_dispersion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -620,8 +822,15 @@
           "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
-          "venue_ids": ["uniswap_v3", "balancer", "curve", "sushiswap"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "uniswap_v3",
+            "balancer",
+            "curve",
+            "sushiswap"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -633,8 +842,15 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
-          "signal_variants": ["price", "funding_rate"],
+          "venue_ids": [
+            "hyperliquid",
+            "gmx_v2",
+            "drift"
+          ],
+          "signal_variants": [
+            "price",
+            "funding_rate"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -646,8 +862,12 @@
           "asset_group": "DEFI",
           "instrument_type": "lp",
           "status": "PARTIAL",
-          "venue_ids": ["uniswap_v3"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "uniswap_v3"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -662,7 +882,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-1"],
+          "block_list_refs": [
+            "BL-1"
+          ],
           "representative_slot_labels": [],
           "notes": "No supported DeFi options venue."
         },
@@ -670,8 +892,13 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr", "cme"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "ibkr",
+            "cme"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -681,10 +908,17 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["cme", "ice"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "cme",
+            "ice"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "both",
-          "block_list_refs": ["BL-10"],
+          "block_list_refs": [
+            "BL-10"
+          ],
           "representative_slot_labels": [
             "ARBITRAGE_PRICE_DISPERSION@cme-es-nq-dated-ratio-usd-prod",
             "ARBITRAGE_PRICE_DISPERSION@cme-es-calendar-fixed-dec25-mar26-usd-prod"
@@ -695,8 +929,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["cboe"],
-          "signal_variants": ["iv_dispersion"],
+          "venue_ids": [
+            "cboe"
+          ],
+          "signal_variants": [
+            "iv_dispersion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -708,8 +946,15 @@
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
-          "venue_ids": ["unity", "betfair_direct", "smarkets_direct"],
-          "signal_variants": ["odds", "price"],
+          "venue_ids": [
+            "unity",
+            "betfair_direct",
+            "smarkets_direct"
+          ],
+          "signal_variants": [
+            "odds",
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -722,8 +967,15 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
-          "venue_ids": ["polymarket", "unity", "betfair_direct"],
-          "signal_variants": ["price", "odds"],
+          "venue_ids": [
+            "polymarket",
+            "unity",
+            "betfair_direct"
+          ],
+          "signal_variants": [
+            "price",
+            "odds"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -742,8 +994,12 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["hyperliquid"],
-          "signal_variants": ["liquidation_bonus"],
+          "venue_ids": [
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "liquidation_bonus"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -755,8 +1011,13 @@
           "asset_group": "DEFI",
           "instrument_type": "lending",
           "status": "SUPPORTED",
-          "venue_ids": ["aave_v3", "kamino"],
-          "signal_variants": ["liquidation_bonus"],
+          "venue_ids": [
+            "aave_v3",
+            "kamino"
+          ],
+          "signal_variants": [
+            "liquidation_bonus"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -770,8 +1031,12 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["gmx_v2"],
-          "signal_variants": ["liquidation_bonus"],
+          "venue_ids": [
+            "gmx_v2"
+          ],
+          "signal_variants": [
+            "liquidation_bonus"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -790,8 +1055,15 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
-          "signal_variants": ["spread_capture"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "spread_capture"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -803,8 +1075,17 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid", "deribit"],
-          "signal_variants": ["spread_capture", "funding_rate"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit"
+          ],
+          "signal_variants": [
+            "spread_capture",
+            "funding_rate"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -816,8 +1097,14 @@
           "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["deribit", "okx"],
-          "signal_variants": ["spread_capture", "vol_metric"],
+          "venue_ids": [
+            "deribit",
+            "okx"
+          ],
+          "signal_variants": [
+            "spread_capture",
+            "vol_metric"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -838,7 +1125,9 @@
             "balancer",
             "uniswap_v2"
           ],
-          "signal_variants": ["spread_capture"],
+          "signal_variants": [
+            "spread_capture"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -854,7 +1143,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-7"],
+          "block_list_refs": [
+            "BL-7"
+          ],
           "representative_slot_labels": [],
           "notes": "DeFi perp MM not exposed as third-party role."
         },
@@ -865,7 +1156,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-1"],
+          "block_list_refs": [
+            "BL-1"
+          ],
           "representative_slot_labels": [],
           "notes": "No supported DeFi options venue."
         },
@@ -873,8 +1166,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr"],
-          "signal_variants": ["spread_capture"],
+          "venue_ids": [
+            "ibkr"
+          ],
+          "signal_variants": [
+            "spread_capture"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -884,8 +1181,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["cme"],
-          "signal_variants": ["spread_capture"],
+          "venue_ids": [
+            "cme"
+          ],
+          "signal_variants": [
+            "spread_capture"
+          ],
           "roll_mode": "rolling",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -895,8 +1196,14 @@
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["betfair_direct", "unity"],
-          "signal_variants": ["odds", "spread_capture"],
+          "venue_ids": [
+            "betfair_direct",
+            "unity"
+          ],
+          "signal_variants": [
+            "odds",
+            "spread_capture"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -915,8 +1222,13 @@
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "SUPPORTED",
-          "venue_ids": ["betfair_direct"],
-          "signal_variants": ["odds", "spread_capture"],
+          "venue_ids": [
+            "betfair_direct"
+          ],
+          "signal_variants": [
+            "odds",
+            "spread_capture"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -929,8 +1241,14 @@
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["smarkets_direct", "matchbook_direct", "betdaq_direct"],
-          "signal_variants": ["odds"],
+          "venue_ids": [
+            "smarkets_direct",
+            "matchbook_direct",
+            "betdaq_direct"
+          ],
+          "signal_variants": [
+            "odds"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -942,10 +1260,14 @@
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "BLOCKED",
-          "venue_ids": ["unity"],
+          "venue_ids": [
+            "unity"
+          ],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-6"],
+          "block_list_refs": [
+            "BL-6"
+          ],
           "representative_slot_labels": [],
           "notes": "Unity Feed Connector is place-only, not quoting."
         },
@@ -953,8 +1275,12 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["polymarket"],
-          "signal_variants": ["price"],
+          "venue_ids": [
+            "polymarket"
+          ],
+          "signal_variants": [
+            "price"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -966,10 +1292,14 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "BLOCKED",
-          "venue_ids": ["kalshi"],
+          "venue_ids": [
+            "kalshi"
+          ],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-5"],
+          "block_list_refs": [
+            "BL-5"
+          ],
           "representative_slot_labels": [],
           "notes": "Kalshi execution adapter pending."
         }
@@ -984,8 +1314,13 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["binance", "okx"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "binance",
+            "okx"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -997,8 +1332,14 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["binance", "hyperliquid", "bybit"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "binance",
+            "hyperliquid",
+            "bybit"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1010,8 +1351,13 @@
           "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["deribit"],
-          "signal_variants": ["event_surprise", "iv_dispersion"],
+          "venue_ids": [
+            "deribit"
+          ],
+          "signal_variants": [
+            "event_surprise",
+            "iv_dispersion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1023,8 +1369,12 @@
           "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["uniswap_v3"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "uniswap_v3"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1036,8 +1386,13 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["hyperliquid", "gmx_v2"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "hyperliquid",
+            "gmx_v2"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -1047,8 +1402,13 @@
           "asset_group": "DEFI",
           "instrument_type": "lending",
           "status": "PARTIAL",
-          "venue_ids": ["aave_v3"],
-          "signal_variants": ["event_surprise", "rate_spread"],
+          "venue_ids": [
+            "aave_v3"
+          ],
+          "signal_variants": [
+            "event_surprise",
+            "rate_spread"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1060,8 +1420,12 @@
           "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "PARTIAL",
-          "venue_ids": ["lido"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "lido"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [],
@@ -1071,8 +1435,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "ibkr"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1084,10 +1452,16 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["cme"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "cme"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "rolling",
-          "block_list_refs": ["BL-10"],
+          "block_list_refs": [
+            "BL-10"
+          ],
           "representative_slot_labels": [
             "EVENT_DRIVEN@cme-es-dated-nfp-usd-prod"
           ],
@@ -1097,19 +1471,30 @@
           "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["cboe"],
-          "signal_variants": ["event_surprise", "iv_dispersion"],
+          "venue_ids": [
+            "cboe"
+          ],
+          "signal_variants": [
+            "event_surprise",
+            "iv_dispersion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
-          "representative_slot_labels": ["EVENT_DRIVEN@cboe-vix-cpi-usd-prod"],
+          "representative_slot_labels": [
+            "EVENT_DRIVEN@cboe-vix-cpi-usd-prod"
+          ],
           "notes": "Same as CeFi option."
         },
         {
           "asset_group": "SPORTS",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["unity"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "unity"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1121,8 +1506,12 @@
           "asset_group": "PREDICTION",
           "instrument_type": "event_settled",
           "status": "PARTIAL",
-          "venue_ids": ["polymarket"],
-          "signal_variants": ["event_surprise"],
+          "venue_ids": [
+            "polymarket"
+          ],
+          "signal_variants": [
+            "event_surprise"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1141,8 +1530,14 @@
           "asset_group": "CEFI",
           "instrument_type": "option",
           "status": "SUPPORTED",
-          "venue_ids": ["deribit", "okx"],
-          "signal_variants": ["vol_metric", "iv_dispersion"],
+          "venue_ids": [
+            "deribit",
+            "okx"
+          ],
+          "signal_variants": [
+            "vol_metric",
+            "iv_dispersion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1158,7 +1553,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-1"],
+          "block_list_refs": [
+            "BL-1"
+          ],
           "representative_slot_labels": [],
           "notes": "No supported DeFi options venue (Lyra / Dopex archived)."
         },
@@ -1166,8 +1563,13 @@
           "asset_group": "TRADFI",
           "instrument_type": "option",
           "status": "PARTIAL",
-          "venue_ids": ["cboe"],
-          "signal_variants": ["vol_metric", "iv_dispersion"],
+          "venue_ids": [
+            "cboe"
+          ],
+          "signal_variants": [
+            "vol_metric",
+            "iv_dispersion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1186,8 +1588,14 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit"],
-          "signal_variants": ["zscore_reversion"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit"
+          ],
+          "signal_variants": [
+            "zscore_reversion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1199,8 +1607,15 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "okx", "bybit", "hyperliquid"],
-          "signal_variants": ["zscore_reversion"],
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "zscore_reversion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1212,8 +1627,12 @@
           "asset_group": "DEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["uniswap_v3"],
-          "signal_variants": ["zscore_reversion"],
+          "venue_ids": [
+            "uniswap_v3"
+          ],
+          "signal_variants": [
+            "zscore_reversion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1225,8 +1644,14 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
-          "signal_variants": ["zscore_reversion"],
+          "venue_ids": [
+            "hyperliquid",
+            "gmx_v2",
+            "drift"
+          ],
+          "signal_variants": [
+            "zscore_reversion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1238,8 +1663,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr"],
-          "signal_variants": ["zscore_reversion"],
+          "venue_ids": [
+            "ibkr"
+          ],
+          "signal_variants": [
+            "zscore_reversion"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1253,10 +1682,17 @@
           "asset_group": "TRADFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["cme", "ice"],
-          "signal_variants": ["zscore_reversion"],
+          "venue_ids": [
+            "cme",
+            "ice"
+          ],
+          "signal_variants": [
+            "zscore_reversion"
+          ],
           "roll_mode": "rolling",
-          "block_list_refs": ["BL-10"],
+          "block_list_refs": [
+            "BL-10"
+          ],
           "representative_slot_labels": [
             "STAT_ARB_PAIRS_FIXED@cme-es-nq-dated-zscore-usd-prod",
             "STAT_ARB_PAIRS_FIXED@ice-brent-cme-wti-dated-usd-prod"
@@ -1274,8 +1710,12 @@
           "asset_group": "CEFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["binance"],
-          "signal_variants": ["momentum_ranking"],
+          "venue_ids": [
+            "binance"
+          ],
+          "signal_variants": [
+            "momentum_ranking"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1287,8 +1727,13 @@
           "asset_group": "CEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["hyperliquid", "bybit"],
-          "signal_variants": ["momentum_ranking"],
+          "venue_ids": [
+            "hyperliquid",
+            "bybit"
+          ],
+          "signal_variants": [
+            "momentum_ranking"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1303,7 +1748,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-8"],
+          "block_list_refs": [
+            "BL-8"
+          ],
           "representative_slot_labels": [],
           "notes": "Multi-token atomic basket trade on DeFi is gas-prohibitive; needs specialised router."
         },
@@ -1311,8 +1758,14 @@
           "asset_group": "DEFI",
           "instrument_type": "perp",
           "status": "PARTIAL",
-          "venue_ids": ["hyperliquid", "gmx_v2", "drift"],
-          "signal_variants": ["momentum_ranking"],
+          "venue_ids": [
+            "hyperliquid",
+            "gmx_v2",
+            "drift"
+          ],
+          "signal_variants": [
+            "momentum_ranking"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1324,8 +1777,12 @@
           "asset_group": "TRADFI",
           "instrument_type": "spot",
           "status": "PARTIAL",
-          "venue_ids": ["ibkr"],
-          "signal_variants": ["momentum_ranking"],
+          "venue_ids": [
+            "ibkr"
+          ],
+          "signal_variants": [
+            "momentum_ranking"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1341,7 +1798,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-9"],
+          "block_list_refs": [
+            "BL-9"
+          ],
           "representative_slot_labels": [],
           "notes": "Cross-sectional basket on CME requires multi-leg order capability not declared."
         }
@@ -1356,8 +1815,16 @@
           "asset_group": "DEFI",
           "instrument_type": "staking",
           "status": "PARTIAL",
-          "venue_ids": ["lido", "rocketpool", "aave_v3", "deribit"],
-          "signal_variants": ["staking_yield", "basis"],
+          "venue_ids": [
+            "lido",
+            "rocketpool",
+            "aave_v3",
+            "deribit"
+          ],
+          "signal_variants": [
+            "staking_yield",
+            "basis"
+          ],
           "roll_mode": "both",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1369,8 +1836,14 @@
           "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "PARTIAL",
-          "venue_ids": ["deribit", "binance"],
-          "signal_variants": ["basis", "staking_yield"],
+          "venue_ids": [
+            "deribit",
+            "binance"
+          ],
+          "signal_variants": [
+            "basis",
+            "staking_yield"
+          ],
           "roll_mode": "both",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1396,7 +1869,11 @@
             "hyperliquid",
             "bybit"
           ],
-          "signal_variants": ["staking_yield", "funding_rate", "rate_spread"],
+          "signal_variants": [
+            "staking_yield",
+            "funding_rate",
+            "rate_spread"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1424,7 +1901,9 @@
             "jito",
             "marinade"
           ],
-          "signal_variants": ["rate_spread"],
+          "signal_variants": [
+            "rate_spread"
+          ],
           "roll_mode": "n/a",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1444,8 +1923,14 @@
           "asset_group": "CEFI",
           "instrument_type": "dated_future",
           "status": "SUPPORTED",
-          "venue_ids": ["binance", "deribit", "coinbase"],
-          "signal_variants": ["basis"],
+          "venue_ids": [
+            "binance",
+            "deribit",
+            "coinbase"
+          ],
+          "signal_variants": [
+            "basis"
+          ],
           "roll_mode": "both",
           "block_list_refs": [],
           "representative_slot_labels": [
@@ -1461,7 +1946,9 @@
           "venue_ids": [],
           "signal_variants": [],
           "roll_mode": "n/a",
-          "block_list_refs": ["BL-2"],
+          "block_list_refs": [
+            "BL-2"
+          ],
           "representative_slot_labels": [],
           "notes": "No DeFi dated-future venue available \u2014 mirrors CARRY_BASIS_DATED DeFi BLOCKED cell."
         }

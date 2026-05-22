@@ -80,6 +80,25 @@ ALL_DEFI_VENUES: list[str] = [
     "KARAK-ETHEREUM",
     "RENZO-ETHEREUM",
     "KELPDAO-ETHEREUM",
+    # ── Ethereum lending v2 (MTDS-backfilled, added 2026-05-22) ──
+    "EULER_V2-ETHEREUM",
+    # ── Ethereum governance + on-chain analytics (DEFI_VENUE_DATA_TYPE_CAPABILITIES
+    #    has start dates for these; added 2026-05-22 to unblock parity tests) ──
+    "AAVE-ETHEREUM",
+    "COMPOUND-ETHEREUM",
+    "UNISWAP-ETHEREUM",
+    "FLASHBOTS-ETHEREUM",
+    # ── Cross-chain bridge data (bridge_events sub-bucket, added 2026-05-22) ──
+    "ACROSS-ETHEREUM",
+    "STARGATE-ETHEREUM",
+    # ── Plasma-chain protocol variants (protocol registry entries,
+    #    added 2026-05-22 — no MTDS tick data yet; pipeline phase) ──
+    "AAVE-PLASMA",
+    "FLUID-PLASMA",
+    # ── Chain-agnostic perp/hybrid venues (own L1 or multi-chain settlement;
+    #    added 2026-05-22 per protocol registry audit) ──
+    "HYPERLIQUID",
+    "ASTER",
     # ── Arbitrum ──
     "UNISWAPV3-ARBITRUM",
     "AAVEV3-ARBITRUM",
@@ -97,6 +116,10 @@ ALL_DEFI_VENUES: list[str] = [
     "RADIANT-ARBITRUM",
     "KARAK-ARBITRUM",
     "RENZO-ARBITRUM",
+    # ── Arbitrum MTDS-backfilled lending (added 2026-05-22) ──
+    "EULER_V2-ARBITRUM",
+    "MORPHO-ARBITRUM",
+    "FLUID-ARBITRUM",
     # ── Base ──
     "UNISWAPV3-BASE",
     "AAVEV3-BASE",
@@ -117,6 +140,8 @@ ALL_DEFI_VENUES: list[str] = [
     "VELODROMEV2-OPTIMISM",
     # ── Catalogue Phase 1A new Optimism entries (slot 5 2026-05-11) ──
     "YEARNV3-OPTIMISM",
+    # ── Optimism MTDS-backfilled lending (added 2026-05-22) ──
+    "MORPHO-OPTIMISM",
     # ── Polygon ──
     "UNISWAPV3-POLYGON",
     "AAVEV3-POLYGON",
@@ -125,6 +150,8 @@ ALL_DEFI_VENUES: list[str] = [
     # ── Catalogue Phase 1A new Polygon entries (slot 5 2026-05-11) ──
     "BEEFY-POLYGON",
     "IDLE-POLYGON",
+    # ── Polygon MTDS-backfilled lending (added 2026-05-22) ──
+    "MORPHO-POLYGON",
     # ── Avalanche ──
     "AAVEV3-AVALANCHE",
     "BALANCER-AVALANCHE",
@@ -134,12 +161,27 @@ ALL_DEFI_VENUES: list[str] = [
     "TRADER_JOEV2-AVALANCHE",
     # ── Catalogue Phase 1A new Avalanche entries (slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE",
+    # ── Avalanche MTDS-backfilled lending (added 2026-05-22) ──
+    "BENQI-AVALANCHE",
     # ── BSC ──
     "AAVEV3-BSC",
     "PANCAKESWAPV3-BSC",
     # ── Catalogue Phase 1A new BSC entries (slot 5 2026-05-11) ──
     "BEEFY-BSC",
     "RADIANT-BSC",
+    # ── BSC + Ethereum MTDS-backfilled Venus lending (added 2026-05-22) ──
+    "VENUS-BSC",
+    "VENUS-ETHEREUM",
+    # ── Ethereum MTDS-backfilled Radiant (Arbitrum-primary, Ethereum also live,
+    #    added 2026-05-22) ──
+    "RADIANT-ETHEREUM",
+    # ── Multi-chain Alchemy gas-fee oracles (gas-fees sub-bucket, added 2026-05-22;
+    #    ALCHEMY-ETHEREUM already declared above in the Ethereum section) ──
+    "ALCHEMY-ARBITRUM",
+    "ALCHEMY-BASE",
+    "ALCHEMY-ONCHAIN",
+    "ALCHEMY-OPTIMISM",
+    "ALCHEMY-POLYGON",
     # ── Linea / Scroll / zkSync ──
     "AAVEV3-LINEA",
     "AAVEV3-SCROLL",
@@ -189,7 +231,7 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "UNISWAPV4": "UNISWAPV4-ETHEREUM",
     "CURVE": "CURVE-ETHEREUM",
     "BALANCER": "BALANCER-ETHEREUM",
-    "SUSHISWAP": "SUSHISWAP-ETHEREUM",
+    "SUSHISWAP": "SUSHISWAPV3-ETHEREUM",
     "SUSHISWAP_V3": "SUSHISWAPV3-ETHEREUM",
     "SUSHISWAPV3": "SUSHISWAPV3-ETHEREUM",
     "PANCAKESWAP_V3": "PANCAKESWAPV3-ETHEREUM",
@@ -369,6 +411,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "RADIANT-ARBITRUM": "pipeline",
     "KARAK-ARBITRUM": "pipeline",
     "RENZO-ARBITRUM": "pipeline",
+    # ── Live (Arbitrum MTDS-backfilled lending, added 2026-05-22) ──
+    "EULER_V2-ARBITRUM": "live",
+    "MORPHO-ARBITRUM": "live",
+    "FLUID-ARBITRUM": "live",
     # ── Pipeline (Base) ──
     "UNISWAPV3-BASE": "pipeline",
     "AAVEV3-BASE": "pipeline",
@@ -412,6 +458,34 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BSC": "pipeline",
     "RADIANT-BSC": "pipeline",
+    # ── Live (MTDS-backfilled multi-chain lending + bridges, added 2026-05-22) ──
+    "VENUS-BSC": "live",
+    "VENUS-ETHEREUM": "live",
+    "RADIANT-ETHEREUM": "live",
+    "BENQI-AVALANCHE": "live",
+    "MORPHO-OPTIMISM": "live",
+    "MORPHO-POLYGON": "live",
+    # ── Live (Ethereum analytics / governance / MEV sub-buckets, added 2026-05-22) ──
+    "AAVE-ETHEREUM": "live",
+    "COMPOUND-ETHEREUM": "live",
+    "UNISWAP-ETHEREUM": "live",
+    "FLASHBOTS-ETHEREUM": "live",
+    "ACROSS-ETHEREUM": "live",
+    "STARGATE-ETHEREUM": "live",
+    # ── Live (Euler V2 lending, added 2026-05-22) ──
+    "EULER_V2-ETHEREUM": "live",
+    # ── Live (Alchemy multi-chain gas-fee oracles, added 2026-05-22) ──
+    "ALCHEMY-ARBITRUM": "live",
+    "ALCHEMY-BASE": "live",
+    "ALCHEMY-ONCHAIN": "live",
+    "ALCHEMY-OPTIMISM": "live",
+    "ALCHEMY-POLYGON": "live",
+    # ── Pipeline (Plasma chain variants — no MTDS tick data yet, added 2026-05-22) ──
+    "AAVE-PLASMA": "pipeline",
+    "FLUID-PLASMA": "pipeline",
+    # ── Pipeline (chain-agnostic perp/hybrid — own L1 settlement, added 2026-05-22) ──
+    "HYPERLIQUID": "pipeline",
+    "ASTER": "pipeline",
     # ── Pipeline (Linea / Scroll / zkSync) ──
     "AAVEV3-LINEA": "pipeline",
     "AAVEV3-SCROLL": "pipeline",
