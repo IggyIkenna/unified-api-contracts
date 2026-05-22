@@ -147,6 +147,9 @@ SLUG_PREFIX_MAP: dict[str, tuple[PredictionShardCategory, str]] = {
     "nasdaq-": (PredictionShardCategory.EQUITY_INDEX, "NDX"),
     "djia-": (PredictionShardCategory.EQUITY_INDEX, "DJIA"),
     "dow-": (PredictionShardCategory.EQUITY_INDEX, "DJIA"),
+    "rut-": (PredictionShardCategory.EQUITY_INDEX, "RUT"),
+    "russell-2000-": (PredictionShardCategory.EQUITY_INDEX, "RUT"),
+    "russell-": (PredictionShardCategory.EQUITY_INDEX, "RUT"),
     # --- Commodities ---
     "gold-": (PredictionShardCategory.COMMODITY, "GOLD"),
     "silver-": (PredictionShardCategory.COMMODITY, "SILVER"),
@@ -421,7 +424,7 @@ _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
 # so adding a new entry to ``SLUG_PREFIX_MAP`` (or any other table) flips the
 # hash automatically — no manual sync required.
 
-CLASSIFIER_VERSION = "2026-05-06.1"
+CLASSIFIER_VERSION = "2026-05-22.1"
 
 
 def _compute_classifier_stability_hash() -> str:

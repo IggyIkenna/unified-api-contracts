@@ -91,6 +91,81 @@ def test_classify_eth_daily_range_bracket() -> None:
     assert group == CanonicalQuestionGroup.ETH_UP_DOWN_DAILY
 
 
+def test_classify_cme_linked_groups_daily() -> None:
+    """7 CME-linked groups (predictions_master Phase 5) classify from real Polymarket slugs."""
+    cases: list[tuple[str, str, str, str, CanonicalQuestionGroup]] = [
+        # (title, slug, event_slug, outcome, expected_group)
+        (
+            "Will NDX be up or down today?",
+            "ndx-daily-up-or-down",
+            "ndx-price-daily",
+            "Up",
+            CanonicalQuestionGroup.NDX_UP_DOWN_DAILY,
+        ),
+        (
+            "Will DJIA be up or down today?",
+            "dow-jones-daily-up-or-down",
+            "djia-price-daily",
+            "Down",
+            CanonicalQuestionGroup.DJIA_UP_DOWN_DAILY,
+        ),
+        (
+            "Will Russell 2000 be up or down?",
+            "rut-daily-up-or-down",
+            "rut-price-daily",
+            "Up",
+            CanonicalQuestionGroup.RUT_UP_DOWN_DAILY,
+        ),
+        (
+            "Will Gold be up or down today?",
+            "gold-daily-up-or-down",
+            "gold-price-daily",
+            "Up",
+            CanonicalQuestionGroup.GOLD_UP_DOWN_DAILY,
+        ),
+        (
+            "Will Crude Oil be up or down today?",
+            "crude-oil-daily-up-or-down",
+            "oil-price-daily",
+            "Down",
+            CanonicalQuestionGroup.CRUDE_OIL_UP_DOWN_DAILY,
+        ),
+        (
+            "Will Natural Gas be up or down today?",
+            "nat-gas-daily-up-or-down",
+            "natgas-price-daily",
+            "Up",
+            CanonicalQuestionGroup.NATGAS_UP_DOWN_DAILY,
+        ),
+        (
+            "Will EUR/USD be up or down today?",
+            "eur-usd-daily-up-or-down",
+            "eurusd-price-daily",
+            "Down",
+            CanonicalQuestionGroup.EUR_UP_DOWN_DAILY,
+        ),
+    ]
+    for title, slug, event_slug, outcome, expected in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=title,
+            slug=slug,
+            event_slug=event_slug,
+            outcome=outcome,
+        )
+        assert group == expected, f"Expected {expected} for slug={slug!r}, got {group!r}"
+
+
+def test_classify_russell_2000_slug_variant() -> None:
+    """russell-2000- slug prefix also maps to RUT_UP_DOWN_DAILY."""
+    group = classify_polymarket_to_canonical_group(
+        title="Will Russell 2000 be up or down at close?",
+        slug="russell-2000-daily-up-or-down",
+        event_slug="russell-2000-price-daily",
+        outcome="Up",
+    )
+    assert group == CanonicalQuestionGroup.RUT_UP_DOWN_DAILY
+
+
 def test_classify_eth_monthly_returns_none_no_canonical_group() -> None:
     """Monthly resolution period has no canonical group → None.
 
