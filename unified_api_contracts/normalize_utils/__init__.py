@@ -5,7 +5,7 @@ One-hop conversion: BinanceTrade -> CanonicalTrade, BinanceOrderBook -> Canonica
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Callable, cast
 
 from ..canonical.domain.sports.odds_canonical import american_to_decimal, decimal_to_american, fractional_to_decimal
 from ..external.eia.normalize import (
@@ -332,11 +332,11 @@ _SPORTS_NAMES = [
 ]
 
 
-def __getattr__(name: str) -> Any:
+def __getattr__(name: str) -> Callable[..., Any]:
     if name in _SPORTS_NAMES:
         from . import sports as _sports
 
-        return getattr(_sports, name)
+        return cast(Callable[..., Any], getattr(_sports, name))
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
