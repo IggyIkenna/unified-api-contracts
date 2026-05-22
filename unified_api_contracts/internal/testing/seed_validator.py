@@ -21,7 +21,7 @@ import logging
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Final
+from typing import Any, Final
 
 import pandas as pd
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
@@ -131,8 +131,8 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
     date_max = ""
 
     try:
-        table = pq.read_table(str(parquet_path))
-        df: pd.DataFrame = table.to_pandas()
+        table: Any = pq.read_table(str(parquet_path))
+        df: Any = table.to_pandas()
         row_count = len(df)
 
         if schema_type == "unknown":
@@ -146,7 +146,7 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
 
             # Timestamp checks
             if "timestamp" in df.columns:
-                ts_col: pd.Series[pd.Timestamp] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
+                ts_col: pd.Series[Any] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
                 null_ts: int = int(ts_col.isna().sum())
                 if null_ts > 0:
                     errors.append(f"{null_ts} null/invalid timestamps found")
@@ -163,12 +163,12 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
                         if neg_count > 0:
                             errors.append(f"Column '{col}' has {neg_count} non-positive values")
                 if all(c in df.columns for c in ["open", "high", "low", "close"]):
-                    open_v: pd.Series[float] = pd.to_numeric(df["open"], errors="coerce")
-                    high_v: pd.Series[float] = pd.to_numeric(df["high"], errors="coerce")
-                    low_v: pd.Series[float] = pd.to_numeric(df["low"], errors="coerce")
-                    close_v: pd.Series[float] = pd.to_numeric(df["close"], errors="coerce")
-                    bad_high: pd.Series[bool] = (high_v < open_v) | (high_v < close_v)
-                    bad_low: pd.Series[bool] = (low_v > open_v) | (low_v > close_v)
+                    open_v: pd.Series[Any] = pd.to_numeric(df["open"], errors="coerce")
+                    high_v: pd.Series[Any] = pd.to_numeric(df["high"], errors="coerce")
+                    low_v: pd.Series[Any] = pd.to_numeric(df["low"], errors="coerce")
+                    close_v: pd.Series[Any] = pd.to_numeric(df["close"], errors="coerce")
+                    bad_high: pd.Series[Any] = (high_v < open_v) | (high_v < close_v)
+                    bad_low: pd.Series[Any] = (low_v > open_v) | (low_v > close_v)
                     hloc_violations: int = int((bad_high | bad_low).sum())
                     if hloc_violations > 0:
                         errors.append(f"{hloc_violations} bars violate high >= open/close >= low invariant")
@@ -181,7 +181,7 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
 
             # DeFi-specific: APY range
             if schema_type == "defi" and "apy" in df.columns:
-                apy: pd.Series[float] = pd.to_numeric(df["apy"], errors="coerce")
+                apy: pd.Series[Any] = pd.to_numeric(df["apy"], errors="coerce")
                 neg_apy: int = int((apy < 0).sum())
                 if neg_apy > 0:
                     errors.append(f"{neg_apy} rows have negative APY")
@@ -193,7 +193,7 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
             if schema_type == "sports":
                 for odds_col in ["odds_home", "odds_draw", "odds_away"]:
                     if odds_col in df.columns:
-                        odds: pd.Series[float] = pd.to_numeric(df[odds_col], errors="coerce")
+                        odds: pd.Series[Any] = pd.to_numeric(df[odds_col], errors="coerce")
                         low_odds: int = int((odds < 1.01).sum())
                         if low_odds > 0:
                             errors.append(f"{low_odds} rows in '{odds_col}' below 1.01 (invalid odds)")
@@ -302,7 +302,7 @@ def main(argv: list[str] | None = None) -> int:
     report = validate_seed_data(args.data_dir, strict=args.strict)
 
     if args.json_report:
-        report_dict: dict[str, object] = {
+        report_dict: dict[str, Any] = {
             "total_files": report.total_files,
             "passed_files": report.passed_files,
             "failed_files": report.failed_files,
