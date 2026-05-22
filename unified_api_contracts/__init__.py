@@ -812,6 +812,7 @@ from .registry import (
     get_venue_coordinates,
     get_venue_data_type_start_date,
     is_per_instrument_shard_data_type,
+    needs_candle_processing,
     validate_data_type_for_venue,
 )
 from .signal_broadcast import (
@@ -1598,6 +1599,7 @@ __all__ = [
     "get_expected_data_types_for_venue",
     "get_valid_data_types_for_venue",
     "get_expected_instruments_for_venue",
+    "needs_candle_processing",
     "get_expected_leagues_for_source",
     "get_generator_spec",
     "get_heartbeat_threshold",
