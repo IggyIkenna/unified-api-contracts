@@ -239,7 +239,10 @@ def test_every_candle_contract_has_timeframe_column() -> None:
         # Candle data_types end with a recognised timeframe suffix.
         names = {c.name for c in contract.columns}
         if "timeframe" not in names:
-            # OK only for the 2 pre-existing tradfi ohlcv_1m pass-throughs.
-            assert dt == "ohlcv_1m" and category == "tradfi" and itype in {"future", "equity"}, (
-                f"candle contract {(category, itype, dt)} missing 'timeframe' column"
-            )
+            # OK for pre-existing tradfi ohlcv_1m Databento pass-throughs (future, equity,
+            # futures_chain, combo, UNKNOWN aliases all share TRADFI_FUTURE_OHLCV_1M schema).
+            assert (
+                dt == "ohlcv_1m"
+                and category == "tradfi"
+                and itype in {"future", "equity", "futures_chain", "combo", "UNKNOWN"}
+            ), f"candle contract {(category, itype, dt)} missing 'timeframe' column"
