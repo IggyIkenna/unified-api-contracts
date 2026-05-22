@@ -22,9 +22,11 @@ class VenueContract(TypedDict):
     error_schema_classes: list[str]
     """Example file name pattern -> schema class name for validation."""
     example_schema_map: dict[str, str]
+    """Module path for venue-specific schemas."""
+    module: str
 
 
-BETTING_SPORTS_VENUES: dict[str, VenueContract] = {
+BETTING_SPORTS_VENUES: dict[str, VenueContract] = {  # type: ignore[reportAssignmentType]
     "betfair": {
         "has_rest": True,
         "has_websocket": True,
