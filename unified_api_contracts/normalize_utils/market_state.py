@@ -179,6 +179,7 @@ _OKX_STATE_MAP: dict[str, MarketState] = {
     "EXPIRED": MarketState.CLOSED,
     "SETTLEMENT": MarketState.CLOSED,
 }
+OKX_STATE_MAP = _OKX_STATE_MAP
 
 
 def normalize_okx_market_state(
@@ -323,6 +324,7 @@ _IBKR_STATE_MAP: dict[str, MarketState] = {
     "HALTED": MarketState.HALTED,
     "SUSPENDED": MarketState.HALTED,
 }
+IBKR_STATE_MAP = _IBKR_STATE_MAP
 
 
 def normalize_ibkr_market_state(
@@ -452,7 +454,13 @@ def normalize_betfair_market_state(
     )
 
 
+# Public aliases for state maps needed by external venue normalize.py files
+IBKR_STATE_MAP = _IBKR_STATE_MAP
+OKX_STATE_MAP = _OKX_STATE_MAP
+
 __all__ = [
+    "IBKR_STATE_MAP",
+    "OKX_STATE_MAP",
     "normalize_betfair_market_state",
     "normalize_binance_market_state",
     "normalize_bybit_market_state",

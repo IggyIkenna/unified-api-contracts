@@ -37,7 +37,8 @@ from ...canonical.domain.execution import (
 )
 from ...normalize_utils._helpers import to_decimal
 from ...normalize_utils.connectivity import normalize_ws_disconnect
-from ...normalize_utils.market_state import _IBKR_STATE_MAP, normalize_market_state
+from ...normalize_utils.market_state import IBKR_STATE_MAP as _IBKR_STATE_MAP
+from ...normalize_utils.market_state import normalize_market_state
 from .schemas import (
     IBKRContractDetails,
     IBKRExecution,

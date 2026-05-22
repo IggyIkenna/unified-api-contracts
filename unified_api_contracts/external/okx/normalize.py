@@ -31,7 +31,8 @@ from ...canonical.domain.execution import (
     OrderType,
 )
 from ...normalize_utils._helpers import d, side, to_decimal, to_levels, ts_ms, ts_ms_to_datetime
-from ...normalize_utils.market_state import _OKX_STATE_MAP, normalize_market_state
+from ...normalize_utils.market_state import OKX_STATE_MAP as _OKX_STATE_MAP
+from ...normalize_utils.market_state import normalize_market_state
 from ..okx.schemas import (
     OKXCandleWS,
     OKXFeeRate,
