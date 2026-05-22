@@ -206,14 +206,44 @@ _DEFI: dict[str, list[str]] = {
     "ETHERFI-ETHEREUM": [*_DEFI_LST_PAIRS, "eigenlayer_rewards"],
     "ETHENA-ETHEREUM": list(_DEFI_LST_PAIRS),
     "JITO-SOLANA": list(_DEFI_LST_PAIRS),
-    # --- Oracle / gas (provider-level, chain is a separate shard dimension) ---
-    # gas_fee_handler emits venue="ALCHEMY" per chain; oracle_prices_handler
-    # emits venue="CHAINLINK" (EVM) and venue="PYTH" (Solana + EVM) per chain.
-    # These were omitted at initial registration — manifest rows exist but were
-    # invisible to data-status denominator. Added 2026-05-22.
-    "ALCHEMY": ["gas_fees"],
+    # --- Oracle / gas / token infra (provider-level, chain is a separate shard dim) ---
+    # "venue" here means data-source provider, not exchange. These are RPC
+    # providers / oracle protocols — conceptually data_source_type=ORACLE|RPC_PROVIDER.
+    # All were missing from initial registration; manifest rows exist but were
+    # invisible to data-status denominator. Batch-added 2026-05-22.
+    "ALCHEMY": ["gas_fees", "token_transfers"],
     "CHAINLINK": ["oracle_prices"],
     "PYTH": ["oracle_prices"],
+    # --- Perp funding (DeFi perpetual protocols) ---
+    # perp_funding_handler DEFAULT_PROTOCOLS; venue is protocol-only (chain in shard dim).
+    "HYPERLIQUID": ["perp_funding"],
+    "ASTER": ["perp_funding"],
+    "GMX": ["perp_funding"],
+    "PACIFICA-SOLANA": ["perp_funding"],
+    "LIGHTER-ZKSYNC": ["perp_funding"],
+    # --- Bridge protocols ---
+    # bridge_events_handler _BRIDGE_PROTOCOLS = ["ACROSS", "STARGATE"]
+    "ACROSS": ["bridge_events"],
+    "STARGATE": ["bridge_events"],
+    # --- MEV / block-builder data ---
+    # mev_events_handler _VENUE = "FLASHBOTS"
+    "FLASHBOTS": ["mev_events"],
+    # --- Governance (on-chain votes, protocol-level, EVM) ---
+    # governance_events_handler _GOVERNANCE_PROTOCOLS = ["COMPOUND", "AAVE", "UNISWAP"]
+    # Note: governance_proposals uses same protocols but data_type "governance_proposals"
+    # is not yet in the defi capability set — deferred to handler/capability alignment plan.
+    "COMPOUND": ["governance_events"],
+    "AAVE": ["governance_events"],
+    "UNISWAP": ["governance_events"],
+    # --- EigenLayer restaking rewards (separate from ETHERFI LST restaking) ---
+    # eigenlayer_rewards_handler venue="EIGENLAYER"
+    "EIGENLAYER": ["eigenlayer_rewards"],
+    # --- Deferred (handler→capability venue naming inconsistency) ---
+    # native_staking_rates (SOLANA-NATIVE-SOLANA) + vault_share_price (YEARNV3/MAKER/
+    # FRAX/MORPHOVAULTS/ETHENA) + governance_proposals (COMPOUND/AAVE/UNISWAP) have
+    # capabilities dict entries using VENUE-CHAIN format while handlers emit bare VENUE.
+    # These 3 data_type families are NOT yet in DATA_TYPES_BY_ASSET_GROUP["defi"].
+    # Tracked: plans/active/issues/defi_coverage_capability_alignment_2026_05_22.md
 }
 
 # ---------------------------------------------------------------------------
