@@ -812,6 +812,7 @@ from .registry import (
     get_venue_coordinates,
     get_venue_data_type_start_date,
     is_per_instrument_shard_data_type,
+    validate_data_type_for_venue,
 )
 from .signal_broadcast import (
     COUNTERPARTY_ENTITLEMENTS as COUNTERPARTY_ENTITLEMENTS,
@@ -1631,6 +1632,7 @@ __all__ = [
     "resolve_exchange",
     "scenarios_for_archetype",
     "source_string_for",
+    "validate_data_type_for_venue",
     "validate_dataframe",
     "validate_preflight_for_trigger",
     "validate_row_df",
