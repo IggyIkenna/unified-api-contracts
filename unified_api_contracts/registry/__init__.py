@@ -158,8 +158,10 @@ from .defi_reserve_params import (
 )
 from .defi_venues import to_canonical_venue
 from .dex_router_addresses import (
+    UNISWAP_QUOTER_V2_BY_CHAIN,
     UNISWAP_SWAP_ROUTER_BY_CHAIN,
     UNISWAP_V3_FACTORY_BY_CHAIN,
+    get_uniswap_quoter_v2,
     get_uniswap_swap_router,
     get_uniswap_v3_factory,
 )
@@ -680,6 +682,7 @@ __all__ = [
     "UNISWAPV2_ETH",
     "UNISWAPV3_ETH",
     "UNISWAPV4_ETH",
+    "UNISWAP_QUOTER_V2_BY_CHAIN",
     "UNISWAP_SWAP_ROUTER_BY_CHAIN",
     "UNISWAP_V3_FACTORY_BY_CHAIN",
     "UPBIT",
@@ -813,6 +816,7 @@ __all__ = [
     "get_spark_reserve_params",
     "get_subgraph_id",
     "get_supported_chains_for_protocol",
+    "get_uniswap_quoter_v2",
     "get_uniswap_swap_router",
     "get_uniswap_v3_factory",
     "get_unwrapped_form",
