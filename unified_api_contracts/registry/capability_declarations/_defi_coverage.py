@@ -36,6 +36,7 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
         "SUSHISWAPV3",  # superseded by SUSHISWAP_V3
         "VELODROMEV2",  # superseded by VELODROME_V2
         "YEARNV3",  # superseded by YEARN_V3
+        "AERODROMEV3",  # superseded by AERODROME_V3 (Base chain Velodrome fork)
     }
 )
 
