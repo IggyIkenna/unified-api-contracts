@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
 from unified_api_contracts.canonical.domain import CanonicalBetMarket, CanonicalOdds
 from unified_api_contracts.canonical.domain.sports import (
@@ -729,7 +730,7 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
     elif "response" in raw:
         resp = raw["response"]
         if isinstance(resp, list):
-            teams = [t for t in resp if isinstance(t, dict)]
+            teams = [cast(dict[str, object], t) for t in resp if isinstance(t, dict)]
     else:
         # Flat record — sanitise int fields and drop nested structures
         result = {k: v for k, v in raw.items() if not isinstance(v, (dict, list))}
