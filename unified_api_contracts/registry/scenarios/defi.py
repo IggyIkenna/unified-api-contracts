@@ -307,19 +307,19 @@ DEFI_LST_DEPEG_STETH_5PCT = ScenarioOverlay(
     expected_outcomes=(
         ScenarioOutcomeAssertion(
             archetype="carry_staked_basis",
-            category=OutcomeCategory.KILL_SWITCH_ARMED,
+            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
             consequence=RiskRuleConsequence.BLOCK,
-            breaker_id=CircuitBreakerId.DRAWDOWN_DAILY_BPS,
-            breaker_action=BreakerAction.KILL_ALL,
-            kill_switch_id=KillSwitchId.KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS,
-            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN, AlertCode.KILL_SWITCH_PORTFOLIO_DRAWDOWN}),
+            breaker_id=CircuitBreakerId.LST_DEPEG_MODERATE,
+            breaker_action=BreakerAction.CANCEL_OPEN,
+            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN}),
             expected_within_seconds=30,
         ),
     ),
     description=(
         "LST/ETH peg break: stETH/wstETH (and rETH/cbETH/JitoSOL/mSOL by parametrisation) "
-        "priced 5% below ETH par. Staked leg loses 5% relative to perp hedge; daily drawdown "
-        "threshold breached; carry kill-switch fires within 30s (CSB-12)."
+        "priced 5% below ETH par. LST_DEPEG_MODERATE breaker (>=500bps) fires CANCEL_OPEN "
+        "within 30s (D.2 ladder calibration). Prior to the LST depeg ladder, this scenario "
+        "routed via the generic DRAWDOWN_DAILY_BPS breaker."
     ),
     real_world_referent=(
         "stETH 2022-06 Celsius/3AC redemption freeze ($0.9377 min vs ETH); "
