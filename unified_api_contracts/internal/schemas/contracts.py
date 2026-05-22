@@ -952,6 +952,9 @@ from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_POOL_DEX_SWAPS as DEFI_POOL_DEX_SWAPS,
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (
+    DEFI_SPOT_ASSET_AGGREGATOR_ROUTE as DEFI_SPOT_ASSET_AGGREGATOR_ROUTE,
+)
+from unified_api_contracts.internal.schemas._defi_v2_contracts import (
     DEFI_SPOT_ASSET_BRIDGE_EVENTS as DEFI_SPOT_ASSET_BRIDGE_EVENTS,
 )
 from unified_api_contracts.internal.schemas._defi_v2_contracts import (

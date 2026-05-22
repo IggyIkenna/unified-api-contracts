@@ -178,6 +178,21 @@ _DEFI_DEX_POOL_SWAPS_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("captured_at", "timestamp[us, UTC]"),
 )
 
+_DEFI_AGGREGATOR_ROUTE_COLUMNS: tuple[ColumnSpec, ...] = (
+    ColumnSpec("instrument_id", "string"),
+    ColumnSpec("venue", "string", description="aggregator: jupiter | 1inch | 0x | paraswap"),
+    ColumnSpec("chain", "string"),
+    ColumnSpec("token_in", "string"),
+    ColumnSpec("token_out", "string"),
+    ColumnSpec("amount_in", "float64"),
+    ColumnSpec("amount_out", "float64"),
+    ColumnSpec("route_kind", "string", description="split | chain"),
+    ColumnSpec("route_json", "string", description="JSON-serialized list of RouteLeg dicts"),
+    ColumnSpec("source", "string", description="jupiter-quote-api | 1inch-quote-api | 0x-quote-api"),
+    ColumnSpec("quote_block_number", "int64", nullable=True),
+    ColumnSpec("captured_at", "timestamp[us, UTC]"),
+)
+
 _TRADFI_RATES_CURVE_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("series_id", "string", description="FRED DGS series identifier"),
     ColumnSpec("maturity_years", "float64"),
@@ -282,6 +297,12 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         asset_group=AssetGroup.DEFI,
         data_type="dex_pool_swaps",
         columns=_DEFI_DEX_POOL_SWAPS_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="aggregator_route",
+        columns=_DEFI_AGGREGATOR_ROUTE_COLUMNS,
         source="manual",
     ),
     # =====================================================================

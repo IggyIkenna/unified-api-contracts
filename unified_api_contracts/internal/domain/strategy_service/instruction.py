@@ -478,7 +478,7 @@ class StrategyInstruction:
             chain=cast("str | None", data.get("chain")),
             source_chain=cast("str | None", data.get("source_chain")),
             dest_chain=cast("str | None", data.get("dest_chain")),
-            client_id=cast("str", data.get("client_id") or ""),
+            client_id=cast("str | None", data.get("client_id")) or None,
             mode=OperationalMode(data["mode"])
             if "mode" in data and isinstance(data["mode"], str)
             else OperationalMode.LIVE,

@@ -336,6 +336,39 @@ DEFI_POOL_DEX_SWAPS = SchemaContract(
     required_row_count_min=0,
 )
 
+# DEX aggregator route capture — Jupiter / 1inch / 0x / ParaSwap.
+# Captured at decision time; ``route_json`` holds the full RouteLeg list
+# serialized to JSON (see execution-service ``aggregator.py`` ``RouteLeg``
+# dataclass). Used by ``AggregatorRouteMatcher`` for batch replay.
+DEFI_SPOT_ASSET_AGGREGATOR_ROUTE = SchemaContract(
+    asset_group="defi",
+    instrument_type="spot_asset",
+    data_type="aggregator_route",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        ColumnSpec(name="token_in", dtype="string", nullable=False),
+        ColumnSpec(name="token_out", dtype="string", nullable=False),
+        ColumnSpec(name="amount_in", dtype="float64", nullable=False),
+        ColumnSpec(name="amount_out", dtype="float64", nullable=False),
+        ColumnSpec(name="route_kind", dtype="string", nullable=False, description="split | chain"),
+        ColumnSpec(
+            name="route_json", dtype="string", nullable=False, description="JSON-serialized list of RouteLeg dicts"
+        ),
+        ColumnSpec(
+            name="source",
+            dtype="string",
+            nullable=False,
+            description="jupiter-quote-api | 1inch-quote-api | 0x-quote-api | paraswap-quote-api",
+        ),
+        ColumnSpec(name="quote_block_number", dtype="int64", nullable=True),
+        ColumnSpec(name="captured_at", dtype="datetime64[ns, UTC]", nullable=False),
+    ],
+    symbol_column="instrument_id",
+    required_row_count_min=0,
+)
+
 # ---------------------------------------------------------------------------
 # Register into CONTRACT_REGISTRY (side-effect on import)
 # ---------------------------------------------------------------------------
@@ -354,5 +387,6 @@ CONTRACT_REGISTRY.update(
         ("defi", "pool", "dex_swaps"): DEFI_POOL_DEX_SWAPS,
         ("defi", "debt_token", "lending_indices"): DEFI_DEBT_TOKEN_LENDING_INDICES,
         ("defi", "yield_bearing", "yield_snapshots"): DEFI_YIELD_BEARING_YIELD_SNAPSHOTS,
+        ("defi", "spot_asset", "aggregator_route"): DEFI_SPOT_ASSET_AGGREGATOR_ROUTE,
     }
 )
