@@ -18,6 +18,21 @@ EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
     }
 )
 
+# Era-2 ghost venue names (capabilities-era handlers, no underscore) that have been
+# superseded by canonical underscore names. These should never appear in the manifest
+# or data-status UI. Consolidator drops them at merge time; data-status service
+# filters them at read time. Audit: defi_coverage_capability_alignment_2026_05_22.md
+DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
+    {
+        "UNISWAPV3",  # superseded by UNISWAP_V3
+        "UNISWAPV2",  # superseded by UNISWAP_V2
+        "AAVEV3",  # superseded by AAVE_V3
+        "COMPOUNDV3",  # superseded by COMPOUND_V3
+        "MORPHOVAULTS",  # superseded by MORPHO_VAULTS
+        "YEARNV3",  # superseded by YEARN_V3
+    }
+)
+
 # Venues that have a subgraph (and may receive future coverage) but have not been
 # collected by instruments-service yet. data-status should not flag historical
 # days as missing until the venue's first parquet write.
@@ -46,11 +61,16 @@ def venue_has_no_expected_defi_coverage(venue: str) -> bool:
     coverage for this venue — either deprecated subgraph or not yet onboarded.
     """
     upper = venue.upper()
-    return upper in EMPTY_OR_DEPRECATED_DEFI_VENUES or upper in DEFI_INSTRUMENTS_NOT_YET_COLLECTED
+    return (
+        upper in EMPTY_OR_DEPRECATED_DEFI_VENUES
+        or upper in DEFI_INSTRUMENTS_NOT_YET_COLLECTED
+        or upper in DEPRECATED_DEFI_GHOST_VENUE_NAMES
+    )
 
 
 __all__ = [
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
+    "DEPRECATED_DEFI_GHOST_VENUE_NAMES",
     "EMPTY_OR_DEPRECATED_DEFI_VENUES",
     "venue_has_no_expected_defi_coverage",
 ]

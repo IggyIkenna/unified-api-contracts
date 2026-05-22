@@ -642,6 +642,7 @@ _TOKEN_TO_GROUP: dict[str, str] = {tok: group for group, tokens in TOKEN_EQUIVAL
 # whose subgraph is retired or whose parquets haven't been collected yet.
 from ._defi_coverage import (  # noqa: E402  # placed after conditional setup to avoid circular import at load time
     DEFI_INSTRUMENTS_NOT_YET_COLLECTED,
+    DEPRECATED_DEFI_GHOST_VENUE_NAMES,
     EMPTY_OR_DEPRECATED_DEFI_VENUES,
     venue_has_no_expected_defi_coverage,
 )
@@ -866,6 +867,7 @@ __all__ = [
     "CHAIN_RPC_TEMPLATES",
     "DEFI_CAPABILITIES",
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
+    "DEPRECATED_DEFI_GHOST_VENUE_NAMES",
     "EMPTY_OR_DEPRECATED_DEFI_VENUES",
     "HYPERLIQUID_RPC_TEMPLATES",
     "HYPERLIQUID_RPC_TEMPLATES",
