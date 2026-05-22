@@ -109,33 +109,6 @@ _FRED = SourceCapability(
     kind=None,
 )
 
-_POLYGON = SourceCapability(
-    source="polygon",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["aggregates", "trades", "quotes", "last_trade", "last_quote", "snapshot", "ws_trades", "ws_quotes"],
-        "reference": ["tickers", "ticker_details", "exchanges", "conditions", "dividends", "splits"],
-    },
-    base_urls={"mainnet": "https://api.polygon.io"},
-    operation_details={
-        "aggregates": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            }
-        ),
-    },
-    chain=None,
-    kind=None,
-)
-
 _BARCHART = SourceCapability(
     source="barchart",
     domains=["market", "reference"],
@@ -261,7 +234,6 @@ TRADFI_CAPABILITIES: list[SourceCapability] = [
     _IBKR,
     _DATABENTO,
     _FRED,
-    _POLYGON,
     _BARCHART,
     _YAHOO_FINANCE,
     _ECB,

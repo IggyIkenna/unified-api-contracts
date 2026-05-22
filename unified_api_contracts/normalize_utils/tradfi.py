@@ -42,13 +42,6 @@ from ..external.openbb.normalize import (
     normalize_openbb_treasury_prices_response,
 )
 
-# Polygon (already external)
-from ..external.polygon.normalize import (
-    normalize_polygon_aggregate,
-    normalize_polygon_aggregates_response,
-    normalize_polygon_ticker,
-)
-
 __all__ = [
     "normalize_baker_hughes_rig_count",
     "normalize_cftc_cot_report",
@@ -61,7 +54,4 @@ __all__ = [
     "normalize_ofr_cds_spread",
     "normalize_openbb_treasury_price",
     "normalize_openbb_treasury_prices_response",
-    "normalize_polygon_aggregate",
-    "normalize_polygon_aggregates_response",
-    "normalize_polygon_ticker",
 ]

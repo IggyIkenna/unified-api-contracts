@@ -472,7 +472,6 @@ class TestClassifyVenueError:
             "opticodds",
             "matchbook",
             "metabet",
-            "polygon",
             "transfermarkt",
             "footystats",
             "soccer_football_info",
@@ -495,7 +494,6 @@ class TestClassifyVenueError:
             "opticodds",
             "matchbook",
             "metabet",
-            "polygon",
         ]
         for venue in new_venues:
             result = classify_venue_error(venue, "429")
@@ -511,7 +509,6 @@ class TestClassifyVenueError:
             "opticodds",
             "matchbook",
             "metabet",
-            "polygon",
         ]
         for venue in new_venues:
             result = classify_venue_error(venue, "400")

@@ -618,16 +618,6 @@ from .external.okx.schemas import (
     OKXOrderBook,
     OKXTicker,
 )
-from .external.polygon.schemas import (
-    PolygonDividend,
-    PolygonDividendsResponse,
-    PolygonOptionContract,
-    PolygonOptionContractsResponse,
-    PolygonSplit,
-    PolygonSplitsResponse,
-    PolygonTicker,
-    PolygonTickersResponse,
-)
 from .external.polymarket import (
     PolymarketGammaMarket,
     PolymarketPosition,
