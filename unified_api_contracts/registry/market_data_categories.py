@@ -16,7 +16,7 @@ from collections.abc import Callable
 from datetime import date as _date
 from datetime import timedelta as _timedelta
 
-from unified_api_contracts.registry.defi_venues import MTDS_DEFI_VENUES as _MTDS_DEFI_VENUES
+from unified_api_contracts.registry.defi_venues import ALL_DEFI_VENUES as _ALL_DEFI_VENUES
 
 # Default timeframes for candle processing (used by sharding and CLI)
 TIMEFRAMES: list[str] = ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
@@ -208,7 +208,7 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)
         "YAHOO_FINANCE",  # VIX 15m ongoing: rolling 60-day window; KRW/USD daily rates
     ],
-    "defi": list(_MTDS_DEFI_VENUES),
+    "defi": list(_ALL_DEFI_VENUES),
     "sports": [
         # Sports betting exchanges and bookmakers active in the May-23 universe.
         # DEFERRED-INDEFINITELY 2026-05-12 per operator: scraper bookmakers
