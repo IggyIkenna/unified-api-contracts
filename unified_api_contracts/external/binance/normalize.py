@@ -33,13 +33,8 @@ from ...canonical.domain.execution import (
     OrderType,
     TimeInForce,
 )
-from ...normalize_utils._helpers import (
-    _d,
-    _to_decimal,
-    _to_levels,
-    _ts_ms_to_datetime,
-)
-from ...normalize_utils.market_state import _BINANCE_STATE_MAP, normalize_market_state
+from ...normalize_utils import _helpers
+from ...normalize_utils.market_state import normalize_binance_market_state
 from ..binance.account_schemas import BinanceFeeRate
 from ..binance.market_schemas import (
     BinanceInstrumentInfo,
@@ -58,14 +53,14 @@ from ..binance.ws_schemas import BinanceLiquidationOrder
 # ---------------------------------------------------------------------------
 
 
-def _normalize_side(s: str | None) -> str:
+def _normalize_side(s: str | None) -> OrderSide:
     """Side helper for orders/fills (returns enum, import-free)."""
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short") else OrderSide.BUY
 
 
-def _normalize_order_type(t: str | None) -> str:
+def _normalize_order_type(t: str | None) -> OrderType:
     if not t:
         return OrderType.LIMIT
     t = str(t).lower()
@@ -80,7 +75,7 @@ def _normalize_order_type(t: str | None) -> str:
     return OrderType.LIMIT
 
 
-def _normalize_order_status(s: str | None) -> str:
+def _normalize_order_status(s: str | None) -> OrderStatus:
     if not s:
         return OrderStatus.PENDING
     s = str(s).lower()
@@ -99,7 +94,7 @@ def _normalize_order_status(s: str | None) -> str:
     return OrderStatus.PENDING
 
 
-def _normalize_tif(tif: str | None) -> str:
+def _normalize_tif(tif: str | None) -> TimeInForce:
     if not tif:
         return TimeInForce.GTC
     t = str(tif).upper()
@@ -125,18 +120,18 @@ def normalize_binance_ticker(
     raw: BinanceTicker, instrument_key: str | None = None, venue: str = "binance"
 ) -> CanonicalTicker:
     ik = instrument_key or f"{venue}:SPOT:{raw.symbol}"
-    ts = _ts_ms_to_datetime(raw.time or raw.closeTime)
+    ts = _helpers._ts_ms_to_datetime(raw.time or raw.closeTime)
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=_to_decimal(raw.lastPrice) or Decimal("0"),
-        bid_price=_to_decimal(raw.bidPrice),
-        ask_price=_to_decimal(raw.askPrice),
-        volume_24h=_to_decimal(raw.volume),
-        quote_volume_24h=_to_decimal(raw.quoteVolume),
-        price_change_24h=_to_decimal(raw.priceChange),
-        price_change_percent_24h=_to_decimal(raw.priceChangePercent),
+        last_price=_helpers._to_decimal(raw.lastPrice) or Decimal("0"),
+        bid_price=_helpers._to_decimal(raw.bidPrice),
+        ask_price=_helpers._to_decimal(raw.askPrice),
+        volume_24h=_helpers._to_decimal(raw.volume),
+        quote_volume_24h=_helpers._to_decimal(raw.quoteVolume),
+        price_change_24h=_helpers._to_decimal(raw.priceChange),
+        price_change_percent_24h=_helpers._to_decimal(raw.priceChangePercent),
     )
 
 
@@ -153,8 +148,8 @@ def normalize_binance_orderbook(
 ) -> CanonicalOrderBook:
     """Convert BinanceOrderBook to CanonicalOrderBook."""
     ts = datetime.fromtimestamp(timestamp_ms / 1000.0, tz=UTC) if timestamp_ms is not None else datetime.now(UTC)
-    bids = _to_levels([[p, q] for p, q in raw.bids])
-    asks = _to_levels([[p, q] for p, q in raw.asks])
+    bids = _helpers._to_levels([[p, q] for p, q in raw.bids])
+    asks = _helpers._to_levels([[p, q] for p, q in raw.asks])
     return CanonicalOrderBook(
         venue=venue,
         symbol=symbol,
@@ -193,7 +188,7 @@ def normalize_binance_trade(raw: BinanceTrade, venue: str = "binance", symbol: s
 
 
 def normalize_binance_order(raw: BinanceOrder, venue: str = "binance") -> CanonicalOrder:
-    ts = _ts_ms_to_datetime(raw.time or raw.updateTime)
+    ts = _helpers._ts_ms_to_datetime(raw.time or raw.updateTime)
     symbol = raw.symbol or ""
     return CanonicalOrder(
         order_id=str(raw.orderId or ""),
@@ -219,7 +214,7 @@ def normalize_binance_order(raw: BinanceOrder, venue: str = "binance") -> Canoni
 
 
 def normalize_binance_fill(raw: BinanceMyTrades, venue: str = "binance") -> CanonicalFill:
-    ts = _ts_ms_to_datetime(raw.time)
+    ts = _helpers._ts_ms_to_datetime(raw.time)
     symbol = raw.symbol or ""
     return CanonicalFill(
         fill_id=str(raw.id),
@@ -268,17 +263,17 @@ def normalize_binance_derivative_ticker(
 
     if isinstance(raw, BinancePremiumIndex):
         symbol = raw.symbol or ""
-        mark_price = _to_decimal(raw.markPrice)
-        index_price = _to_decimal(raw.indexPrice)
-        funding_rate = _to_decimal(raw.lastFundingRate)
+        mark_price = _helpers._to_decimal(raw.markPrice)
+        index_price = _helpers._to_decimal(raw.indexPrice)
+        funding_rate = _helpers._to_decimal(raw.lastFundingRate)
         next_funding_timestamp = _ms_to_utc(raw.nextFundingTime)
         ts_dt = _ms_to_utc(raw.time)
         if ts_dt is not None:
             timestamp = ts_dt
     else:
         symbol = raw.symbol
-        last_price = _to_decimal(raw.lastPrice)
-        funding_rate = _to_decimal(raw.lastFundingRate)
+        last_price = _helpers._to_decimal(raw.lastPrice)
+        funding_rate = _helpers._to_decimal(raw.lastFundingRate)
         next_funding_timestamp = _ms_to_utc(raw.nextFundingTime)
         ts_dt = _ms_to_utc(raw.time or raw.closeTime)
         if ts_dt is not None:
@@ -309,12 +304,12 @@ def normalize_binance_kline(raw: BinanceKline, symbol: str, venue: str = "binanc
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_d(raw.open_price),
-        high=_d(raw.high_price),
-        low=_d(raw.low_price),
-        close=_d(raw.close_price),
-        volume=_d(raw.volume),
-        quote_volume=_d(raw.quote_asset_volume),
+        open=_helpers._d(raw.open_price),
+        high=_helpers._d(raw.high_price),
+        low=_helpers._d(raw.low_price),
+        close=_helpers._d(raw.close_price),
+        volume=_helpers._d(raw.volume),
+        quote_volume=_helpers._d(raw.quote_asset_volume),
         count=raw.number_of_trades,
         vwap=None,
     )
@@ -448,7 +443,7 @@ def normalize_binance_liquidation(
 # ---------------------------------------------------------------------------
 
 
-def normalize_binance_market_state(
+def normalize_binance_market_state_local(
     status: str,
     symbol: str,
     instrument_type: str = "SPOT_PAIR",
@@ -458,15 +453,14 @@ def normalize_binance_market_state(
     venue: str = "binance",
 ) -> CanonicalMarketStateEvent:
     """Normalize a Binance symbol status string to CanonicalMarketStateEvent."""
-    ik = f"{venue}:{instrument_type}:{symbol}"
-    return normalize_market_state(
-        raw_state=status,
-        venue=venue,
-        instrument_key=ik,
-        state_map=_BINANCE_STATE_MAP,
+    return normalize_binance_market_state(
+        status=status,
+        symbol=symbol,
+        instrument_type=instrument_type,
         previous_state=previous_state,
         reason=reason,
         timestamp=timestamp,
+        venue=venue,
     )
 
 
