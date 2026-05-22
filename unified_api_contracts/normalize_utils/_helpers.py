@@ -171,6 +171,7 @@ to_levels = _to_levels
 ts_ms_to_datetime = _ts_ms_to_datetime
 d = _d
 unix_sec_to_utc = _ts_sec
+iso = _iso
 
 __all__ = [
     "_d",
@@ -185,9 +186,10 @@ __all__ = [
     "_ts_ms",
     "_ts_ms_to_datetime",
     "_ts_sec",
+    "d",
+    "iso",
     "to_decimal",
     "to_levels",
     "ts_ms_to_datetime",
-    "d",
     "unix_sec_to_utc",
 ]
