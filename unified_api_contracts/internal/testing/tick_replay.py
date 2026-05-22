@@ -124,7 +124,7 @@ class TickReplayEngine:
             result = [t for t in result if t.get("venue") == self._venue_filter]
         if self._symbol_filter:
             result = [t for t in result if t.get("symbol") == self._symbol_filter]
-        return sorted(result, key=lambda t: str(t.get("timestamp", "")))  # noqa: qg-empty-fallback  # honest absence: field optional in this context; caller validates
+        return sorted(result, key=lambda t: str(t.get("timestamp", "")))  # qg-empty-fallback: honest absence: field optional in this context; caller validates
 
     async def replay(self, scenario: ScenarioConfig | None = None) -> AsyncIterator[dict[str, object]]:
         """Yield ticks from fixture in timestamp order.

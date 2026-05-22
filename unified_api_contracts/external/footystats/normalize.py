@@ -18,7 +18,7 @@ from unified_api_contracts.canonical.domain.sports import (
     build_league_id,
     build_team_id,
 )
-from unified_api_contracts.normalize_utils._helpers import _to_decimal, _ts_sec
+from unified_api_contracts.normalize_utils._helpers import to_decimal as _to_decimal, unix_sec_to_utc as _ts_sec
 
 from .schemas import FootyStatsMatch, FootyStatsOdds, FTMatchRaw
 

@@ -849,7 +849,7 @@ def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
         return ref_caps[data_type]
     # Fall back to venue start date from VenueMapping
     from .venue_mapping import (
-        VenueMapping,  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
+        VenueMapping,  # qg-inside-import: lazy import to avoid circular dependency at module load
     )
 
     vm = VenueMapping()

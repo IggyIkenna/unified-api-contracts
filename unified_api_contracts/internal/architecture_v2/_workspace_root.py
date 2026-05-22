@@ -13,7 +13,7 @@ Per-service-config env reads are still forbidden.
 
 from __future__ import annotations
 
-import os  # noqa: qg-os-environ — see module docstring (single permitted env reader)
+import os  # qg-os-environ: see module docstring (single permitted env reader)
 from pathlib import Path
 
 _ENV_VAR = "UNIFIED_TRADING_WORKSPACE_ROOT"
@@ -26,7 +26,7 @@ def workspace_root_env() -> Path | None:
     an ancestor-walk fallback on top — this helper does NOT walk.
     """
 
-    env_root = os.environ.get(_ENV_VAR)  # noqa: qg-os-environ — workspace-root discovery (module docstring)
+    env_root = os.environ.get(_ENV_VAR)  # qg-os-environ: workspace-root discovery (module docstring)
     if env_root:
         return Path(env_root)
     return None

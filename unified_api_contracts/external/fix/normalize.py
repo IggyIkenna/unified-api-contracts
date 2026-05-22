@@ -30,9 +30,9 @@ from unified_api_contracts.canonical.domain.execution import (
     OrderType,
 )
 from unified_api_contracts.normalize_utils._helpers import (
-    _order_type,
-    _status,
-    _tif,
+    order_type as _order_type,
+    status as _status,
+    tif as _tif,
 )
 
 from .schemas import (

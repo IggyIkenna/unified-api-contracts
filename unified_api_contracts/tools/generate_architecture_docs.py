@@ -28,16 +28,16 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import TextIO
 
-from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # qg-deep-import: symbol not yet on library root facade
     ARCHETYPE_CAPABILITY_REGISTRY,
 )
-from unified_api_contracts.internal.event_topics import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.internal.event_topics import (  # qg-deep-import: symbol not yet on library root facade
     EVENT_TOPIC_REGISTRY,
 )
-from unified_api_contracts.registry.archetype_capability_matrix import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.registry.archetype_capability_matrix import (  # qg-deep-import: symbol not yet on library root facade
     ASSET_GROUP_ONTOLOGY,
 )
-from unified_api_contracts.registry.service_contract_map import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.registry.service_contract_map import (  # qg-deep-import: symbol not yet on library root facade
     SERVICE_CONTRACT_MAP,
 )
 

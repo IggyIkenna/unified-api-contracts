@@ -80,18 +80,18 @@ def replay_cassette(
         uri = request.get("uri", "")
         method_str = request.get("method", "GET").upper()
 
-        body = response.get("body", {})  # noqa: qg-empty-fallback — VCR cassette may omit body
+        body = response.get("body", {})  # qg-empty-fallback: VCR cassette may omit body
         body_string = ""
         if isinstance(body, dict):
             body_string = body.get("string", "")
 
-        status_info = response.get("status", {})  # noqa: qg-empty-fallback — VCR cassette may omit status
+        status_info = response.get("status", {})  # qg-empty-fallback: VCR cassette may omit status
         status_code = 200
         if isinstance(status_info, dict):
             status_code = status_info.get("code", 200)
 
         # Determine content type from response headers
-        resp_headers = response.get("headers", {})  # noqa: qg-empty-fallback — VCR cassette may omit headers
+        resp_headers = response.get("headers", {})  # qg-empty-fallback: VCR cassette may omit headers
         content_type = "application/json"
         if isinstance(resp_headers, dict):
             ct_values = resp_headers.get("Content-Type", resp_headers.get("content-type"))
@@ -167,7 +167,7 @@ def cassette_to_dict(venue: str, cassette_name: str) -> dict[str, object]:
             continue
 
         uri = request.get("uri", "unknown")
-        body = response.get("body", {})  # noqa: qg-empty-fallback — VCR cassette may omit body
+        body = response.get("body", {})  # qg-empty-fallback: VCR cassette may omit body
         if isinstance(body, dict):
             body_string = body.get("string", "")
             if isinstance(body_string, str) and body_string.strip():

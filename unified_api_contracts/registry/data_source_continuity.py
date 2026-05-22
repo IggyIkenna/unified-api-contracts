@@ -150,7 +150,7 @@ def get_vix_15m_source(query_date: date) -> str:
     available data for this range is daily VIXCLS from FRED — a different
     data product not covered by this function.
     """
-    from datetime import UTC, datetime, timedelta  # noqa: qg-inside-import (runtime only)
+    from datetime import UTC, datetime, timedelta  # qg-inside-import: runtime only
 
     today = datetime.now(UTC).date()
     yahoo_start = today - timedelta(days=YAHOO_VIX_15M_WINDOW_DAYS - 1)
@@ -177,7 +177,7 @@ def is_vix_15m_gap_date(query_date: date) -> bool:
 
 def get_yahoo_vix_15m_start() -> date:
     """Return the earliest date Yahoo Finance 15m data is available (today - 59 days)."""
-    from datetime import UTC, datetime, timedelta  # noqa: qg-inside-import (runtime only)
+    from datetime import UTC, datetime, timedelta  # qg-inside-import: runtime only
 
     return datetime.now(UTC).date() - timedelta(days=YAHOO_VIX_15M_WINDOW_DAYS - 1)
 
@@ -205,7 +205,7 @@ def get_source_for_instrument(
     registered (caller should fall back to VENUE_TO_DATA_SOURCE).
     """
     from collections.abc import (
-        Callable,  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
+        Callable,  # qg-inside-import: lazy import to avoid circular dependency at module load
     )
 
     resolver = _SOURCE_RESOLVERS.get((instrument_key, data_type))
