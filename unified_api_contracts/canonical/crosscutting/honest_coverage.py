@@ -857,6 +857,16 @@ PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
     "ETH_UP_DOWN_HOURLY": {"_per_market_min_rows": 100},
     "ETH_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
     "SPX_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
+    # CME event-contract linked groups — predictions_master Phase 5.
+    # Min-row floors set conservatively at 500 (daily market, ~30min resolution
+    # window before CME 21:00 UTC settlement; Polymarket thinner than BTC/ETH).
+    "NDX_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "RUT_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "DJIA_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "GOLD_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "CRUDE_OIL_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "NATGAS_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "EUR_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
     "FED_RATE_DECISION_PER_FOMC": {"_per_market_min_rows": 100},
     "CPI_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
     "ELECTION_PRESIDENT_2028": {"_per_market_min_rows": 100},

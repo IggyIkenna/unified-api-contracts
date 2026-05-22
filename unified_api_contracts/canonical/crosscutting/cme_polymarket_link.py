@@ -6,10 +6,7 @@ is the single authoritative mapping between the two venues' question taxonomy,
 enabling ``ArbitrageCrossDomainEventEngine`` to build paired positions when the
 basis exceeds a threshold.
 
-**PARTIAL (2026-05-22)** — only ECES (S&P 500) and ECBTC (Bitcoin) are wired.
-The remaining 7 roots (ECRTY/ECYM/ECGC/ECCL/ECNG/EC6E/ECNQ) require 6 new
-``CanonicalQuestionGroup`` variants from ``predictions_master`` Phase 5.
-Do NOT add those roots here until Phase 5 ships.
+All 9 CME EC* roots are wired as of predictions_master Phase 5 (2026-05-22).
 
 Plan: ``cme_polymarket_arb_2026_05_08.md`` Phase 2.
 """
@@ -25,16 +22,20 @@ from unified_api_contracts.canonical.domain.predictions.canonical_groups import 
 # ---------------------------------------------------------------------------
 # Canonical cross-link map — CME root → CanonicalQuestionGroup
 #
-# ECES (E-mini S&P 500 event contract) → Polymarket SPX up/down daily markets.
-# ECBTC (Bitcoin event contract)       → Polymarket BTC up/down daily markets.
-#
-# Roots absent from this dict have no wired Polymarket counterpart yet.
+# All 9 CME event-contract roots wired to their Polymarket canonical groups.
+# Roots absent from this dict have no wired Polymarket counterpart.
 # Call ``linked_question_group`` and check for None before building arb pairs.
 # ---------------------------------------------------------------------------
 CME_ROOT_TO_POLYMARKET_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
-    "ECES": CanonicalQuestionGroup.SPX_UP_DOWN_DAILY,
-    "ECBTC": CanonicalQuestionGroup.BTC_UP_DOWN_DAILY,
-    # BLOCKED: ECRTY/ECYM/ECGC/ECCL/ECNG/EC6E/ECNQ — predictions_master Phase 5
+    "ECES": CanonicalQuestionGroup.SPX_UP_DOWN_DAILY,  # E-mini S&P 500
+    "ECBTC": CanonicalQuestionGroup.BTC_UP_DOWN_DAILY,  # Bitcoin
+    "ECNQ": CanonicalQuestionGroup.NDX_UP_DOWN_DAILY,  # E-mini NDX 100
+    "ECRTY": CanonicalQuestionGroup.RUT_UP_DOWN_DAILY,  # E-mini Russell 2000
+    "ECYM": CanonicalQuestionGroup.DJIA_UP_DOWN_DAILY,  # E-mini Dow Jones
+    "ECGC": CanonicalQuestionGroup.GOLD_UP_DOWN_DAILY,  # Gold
+    "ECCL": CanonicalQuestionGroup.CRUDE_OIL_UP_DOWN_DAILY,  # Crude WTI
+    "ECNG": CanonicalQuestionGroup.NATGAS_UP_DOWN_DAILY,  # Natural Gas
+    "EC6E": CanonicalQuestionGroup.EUR_UP_DOWN_DAILY,  # Euro FX
 }
 
 # Frozenset of CME roots with a live Polymarket link (convenience for callers).
