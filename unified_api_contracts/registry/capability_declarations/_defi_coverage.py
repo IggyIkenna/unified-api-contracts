@@ -27,12 +27,15 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
         "UNISWAPV3",  # superseded by UNISWAP_V3
         "UNISWAPV2",  # superseded by UNISWAP_V2
         "UNISWAPV4",  # superseded by UNISWAP_V4
+        "AAVEV2",  # superseded by AAVE_V2 (canonical) or dropped
         "AAVEV3",  # superseded by AAVE_V3
+        "CAMELOTV3",  # superseded by CAMELOT_V3
         "COMPOUNDV3",  # superseded by COMPOUND_V3
         "MORPHOVAULTS",  # superseded by MORPHO_VAULTS
-        "YEARNV3",  # superseded by YEARN_V3
-        "SUSHISWAPV3",  # superseded by SUSHISWAP_V3
         "PANCAKESWAPV3",  # superseded by PANCAKESWAP_V3
+        "SUSHISWAPV3",  # superseded by SUSHISWAP_V3
+        "VELODROMEV2",  # superseded by VELODROME_V2
+        "YEARNV3",  # superseded by YEARN_V3
     }
 )
 
