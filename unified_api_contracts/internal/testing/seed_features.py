@@ -48,8 +48,10 @@ def _read_ohlcv_files(data_dir: Path) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     for pf in ohlcv_root.rglob("*.parquet"):
         try:
-            table = cast(pa.Table, pq.read_table(str(pf)))
-            frames.append(cast(pd.DataFrame, table.to_pandas()))
+            table = pq.read_table(str(pf))
+            df_result = table.to_pandas()
+            if isinstance(df_result, pd.DataFrame):
+                frames.append(df_result)
         except Exception as exc:
             log.warning("Failed to read %s: %s", pf, exc)
 
@@ -196,11 +198,11 @@ def compute_cross_instrument(df: pd.DataFrame) -> pd.DataFrame:
     pivot = df.pivot_table(index="timestamp", columns="symbol", values="close", aggfunc="last")
     if "BTC/USDT" not in pivot.columns or "ETH/USDT" not in pivot.columns:
         return pd.DataFrame()
-    btc = pd.to_numeric(pivot.get("BTC/USDT"), errors="coerce")
-    eth = pd.to_numeric(pivot.get("ETH/USDT"), errors="coerce")
+    btc = cast(pd.Series, pd.to_numeric(pivot.get("BTC/USDT"), errors="coerce"))
+    eth = cast(pd.Series, pd.to_numeric(pivot.get("ETH/USDT"), errors="coerce"))
     combined = pd.DataFrame({"timestamp": pivot.index, "symbol": "cross"})
-    combined["btc_eth_corr_20"] = btc.pct_change().rolling(20).corr(eth.pct_change())
-    combined["btc_eth_ratio"] = btc / eth.replace(0, np.nan)
+    combined["btc_eth_corr_20"] = cast(pd.Series, btc.pct_change()).rolling(20).corr(cast(pd.Series, eth.pct_change()))
+    combined["btc_eth_ratio"] = btc / cast(pd.Series, eth.replace(0, np.nan))
     combined["feature_service"] = "features-cross-instrument"
     return combined.reset_index(drop=True)
 
