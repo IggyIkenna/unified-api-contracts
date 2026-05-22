@@ -41,6 +41,10 @@ from unified_api_contracts.canonical.domain import (
 from unified_api_contracts.canonical.domain.execution import (
     CanonicalFill,
     CanonicalOrder,
+    OrderSide,
+    OrderStatus,
+    OrderType,
+    TimeInForce,
 )
 from unified_api_contracts.normalize_utils._helpers import (
     d as _d,
@@ -91,17 +95,13 @@ def _ts_ms_to_dt(ts: int | None) -> datetime:
     return datetime.fromtimestamp(ts / 1000.0, tz=UTC)
 
 
-def _normalize_side(s: str | None) -> str:
-    from unified_api_contracts.canonical.domain.execution import OrderSide
-
+def _normalize_side(s: str | None) -> OrderSide:
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short") else OrderSide.BUY
 
 
-def _normalize_order_type(t: str | None) -> str:
-    from unified_api_contracts.canonical.domain.execution import OrderType
-
+def _normalize_order_type(t: str | None) -> OrderType:
     if not t:
         return OrderType.LIMIT
     t_val = str(t).lower()
@@ -116,9 +116,7 @@ def _normalize_order_type(t: str | None) -> str:
     return OrderType.LIMIT
 
 
-def _normalize_order_status(s: str | None) -> str:
-    from unified_api_contracts.canonical.domain.execution import OrderStatus
-
+def _normalize_order_status(s: str | None) -> OrderStatus:
     if not s:
         return OrderStatus.PENDING
     s_val = str(s).lower()
@@ -138,8 +136,6 @@ def _normalize_order_status(s: str | None) -> str:
 
 
 def _normalize_tif(tif: str | None) -> str:
-    from unified_api_contracts.canonical.domain.execution import TimeInForce
-
     if not tif:
         return TimeInForce.GTC
     t = str(tif).upper()

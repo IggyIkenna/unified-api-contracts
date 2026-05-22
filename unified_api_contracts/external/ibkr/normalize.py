@@ -63,13 +63,13 @@ def _d(value: float | int | str | Decimal | None) -> Decimal | None:
     return Decimal(str(value))
 
 
-def _normalize_side(s: str | None) -> str:
+def _normalize_side(s: str | None) -> OrderSide:
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short", "sld") else OrderSide.BUY
 
 
-def _normalize_order_type(t: str | None) -> str:
+def _normalize_order_type(t: str | None) -> OrderType:
     if not t:
         return OrderType.LIMIT
     t_lower = str(t).lower()
@@ -82,7 +82,7 @@ def _normalize_order_type(t: str | None) -> str:
     return OrderType.LIMIT
 
 
-def _normalize_order_status(s: str | None) -> str:
+def _normalize_order_status(s: str | None) -> OrderStatus:
     if not s:
         return OrderStatus.PENDING
     s_lower = str(s).lower()

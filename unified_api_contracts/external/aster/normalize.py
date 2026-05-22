@@ -56,13 +56,13 @@ def _ms_to_utc(ts_ms: object | None) -> datetime | None:
         return None
 
 
-def _normalize_side(s: str | None) -> str:
+def _normalize_side(s: str | None) -> OrderSide:
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short") else OrderSide.BUY
 
 
-def _normalize_order_status(s: str | None) -> str:
+def _normalize_order_status(s: str | None) -> OrderStatus:
     if not s:
         return OrderStatus.PENDING
     s = str(s).lower()
