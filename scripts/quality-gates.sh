@@ -68,14 +68,14 @@ QG_MEMORY_CHECK_INTERVAL=${QG_MEMORY_CHECK_INTERVAL:-20}  # More frequent checks
 # predates Phase 4 cassette work). Tracked in uac_qg_preexisting_size_violations_2026_05_14.md.
 CODEX_MAX_VIOLATIONS=7
 export CODEX_MAX_VIOLATIONS
-# Cassette canary tests live at tests/<file>.py (not tests/unit/<file>.py), so
-# the default PYTEST_UNIT_DIR="tests/unit/" silently skips them. We extend
-# collection to include the canary trio. We do NOT pull all of tests/ into
-# the sweep yet — many root-level UAC tests are pre-existing-broken (318
-# failures surfaced on 2026-05-20; tracked in
+# Broadened to tests/ (Wave 3 QG broadening, slot 6 2026-05-22). Previously
+# limited to tests/unit/ + cassette canary files due to 318 pre-existing
+# failures surfaced 2026-05-20 (tracked in
 # plans/active/issues/uac_root_level_tests_preexisting_failures_2026_05_20.md).
-# Once those are triaged the override can broaden to tests/.
-# Per CLAUDE.md "PYTEST_UNIT_DIR per-family override" + canary_coverage_qg_enforcement_2026_05_20 Phase 1.
-PYTEST_UNIT_DIR="tests/unit/ tests/test_cassette_orphan_checker.py tests/test_cassette_schema_parity.py tests/test_batch_live_parity.py tests/test_ws_cassette_coexistence.py tests/test_cassette_offline_check.py"
+# All failures have been resolved — full suite passes (3570+ tests, 0 failures).
+# Unlocks parity tests: test_venue_contract_coverage.py, internal/unit/
+# test_archetype_capability_manifest_parity.py, test_protocol_launch_dates.py,
+# internal/test_ac_uic_alignment.py. Per CLAUDE.md "PYTEST_UNIT_DIR per-family override".
+PYTEST_UNIT_DIR="tests/"
 WORKSPACE_ROOT="$(cd "$(git rev-parse --show-toplevel)/.." && pwd)"
 source "${WORKSPACE_ROOT}/unified-trading-pm/scripts/quality-gates-base/base-library.sh"
