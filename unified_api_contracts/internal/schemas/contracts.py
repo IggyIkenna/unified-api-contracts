@@ -762,7 +762,15 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("tradfi", "equity", "trades"): TRADFI_EQUITY_TRADES,
     ("tradfi", "equity", "ohlcv_1m"): TRADFI_EQUITY_OHLCV_1M,
     ("tradfi", "index", "trades"): TRADFI_INDEX_TRADES,
+    ("tradfi", "index", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
     ("tradfi", "combo", "trades"): TRADFI_COMBO_TRADES,
+    # Databento continuous (futures_chain) and multi-leg (combo) instruments
+    # write instrument_type="UNKNOWN" in parquet row data (stype_out=UNKNOWN for
+    # continuous + calendar spread contracts). These entries allow MDPS to read
+    # existing data without SchemaContract errors. Same column schema as future/ohlcv_1m.
+    ("tradfi", "futures_chain", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
+    ("tradfi", "combo", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
+    ("tradfi", "UNKNOWN", "ohlcv_1m"): TRADFI_FUTURE_OHLCV_1M,
     # TradFi options_chain / futures_chain snapshot registered via
     # _snapshot_contracts side-effect import (see end of file).
     # DeFi
