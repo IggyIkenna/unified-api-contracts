@@ -103,7 +103,9 @@ def normalize_yahoo_option(raw: YahooOptionContract, venue: str = "yahoo_finance
         if raw.lastTradeDate is not None
         else datetime.now(tz=UTC)
     )
-    exp = datetime.fromtimestamp(raw.expiration / 1000.0, tz=UTC) if raw.expiration is not None else None
+    exp = (
+        datetime.fromtimestamp(raw.expiration / 1000.0, tz=UTC) if raw.expiration is not None else datetime.now(tz=UTC)
+    )
     opt_type = (raw.option_type or "call").lower()
     return CanonicalOptionsChainEntry(
         timestamp=ts,
@@ -135,7 +137,7 @@ def normalize_yahoo_finance_option(
     This is the newer schema format with snake_case fields (from ticker.option_chain()).
     """
     ts = datetime.now(tz=UTC)
-    exp: datetime | None = None
+    exp: datetime = ts  # Default fallback
     if raw.expiration:
         with contextlib.suppress(ValueError, AttributeError):
             exp = datetime.fromisoformat(raw.expiration.replace("Z", "+00:00"))
