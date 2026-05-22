@@ -618,6 +618,12 @@ from .external.okx.schemas import (
     OKXOrderBook,
     OKXTicker,
 )
+from .external.polygon.schemas import (
+    PolygonOptionContract,
+    PolygonOptionContractsResponse,
+    PolygonTicker,
+    PolygonTickersResponse,
+)
 from .external.polymarket import (
     PolymarketGammaMarket,
     PolymarketPosition,
@@ -1469,16 +1475,12 @@ __all__ = [
     "PayloadDepth",
     "PipelineMode",
     "PlayerMapping",
-    "PolygonDividend",
-    "PolygonDividendsResponse",
-    "PolygonOptionContract",
-    "PolygonOptionContractsResponse",
-    "PolygonSplit",
-    "PolygonSplitsResponse",
-    "PolygonTicker",
-    "PolygonTickersResponse",
     "PolymarketGammaMarket",
     "PolymarketPosition",
+    "PolygonOptionContract",
+    "PolygonOptionContractsResponse",
+    "PolygonTicker",
+    "PolygonTickersResponse",
     "PortfolioGreeksSnapshot",
     "PortfolioMarginAccount",
     "PortfolioPnLAttribution",
