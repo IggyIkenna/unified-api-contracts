@@ -627,6 +627,11 @@ BUNDLED_DATA_TYPES: Final[frozenset[str]] = frozenset(
         # on strike_threshold. Registered here so ManifestWriter enforces
         # cluster validation on record_captured calls for this data_type.
         "event_contract",
+        # Per-fixture sports data_types — bundle = multiple bookmakers per fixture.
+        # cluster_extractor: bookmaker. Registry: SPORTS_FIXTURE_CLUSTERS.
+        "odds_snapshot",
+        "odds_movement",
+        "arbitrage_opportunity",
     }
 )
 """Closed set of bundled data_types.
@@ -776,6 +781,9 @@ DATA_TYPE_TO_CLUSTER_REGISTRY: Final[dict[str, str]] = {
     "prediction_canonical_question_group": "PREDICTION_GROUPS",
     "sports_fixture_bundle": "SPORTS_FIXTURE_CLUSTERS",
     "event_contract": "EVENT_CONTRACT_ROOT_CLUSTERS",
+    "odds_snapshot": "SPORTS_FIXTURE_CLUSTERS",
+    "odds_movement": "SPORTS_FIXTURE_CLUSTERS",
+    "arbitrage_opportunity": "SPORTS_FIXTURE_CLUSTERS",
 }
 
 
