@@ -93,8 +93,8 @@ _CATEGORY_ALLOWED_MODES: dict[Category, frozenset[ExecutionMode]] = {
 
 def validate_mode_for_category(category: Category | str, mode: ExecutionMode | str) -> bool:
     """Check if a mode is valid for a given category."""
-    cat = Category(category) if isinstance(category, str) else category
-    m = ExecutionMode(mode) if isinstance(mode, str) else mode
+    cat = Category(category)
+    m = ExecutionMode(mode)
     return m in _CATEGORY_ALLOWED_MODES.get(cat, frozenset())
 
 
@@ -241,17 +241,17 @@ class StrategyRegistry:
 
     def get_by_family(self, family: StrategyFamily | str) -> list[StrategyDefinition]:
         """Get all strategies in a family."""
-        f = StrategyFamily(family) if isinstance(family, str) else family
+        f = StrategyFamily(family)
         return [s for s in self._by_id.values() if s.family == f]
 
     def get_by_asset_group(self, asset_group: Category | str) -> list[StrategyDefinition]:
         """Get all strategies in an asset group."""
-        c = Category(asset_group) if isinstance(asset_group, str) else asset_group
+        c = Category(asset_group)
         return [s for s in self._by_id.values() if s.asset_group == c]
 
     def get_by_archetype(self, archetype: StrategyArchetype | str) -> list[StrategyDefinition]:
         """Get all strategies with a given archetype."""
-        a = StrategyArchetype(archetype) if isinstance(archetype, str) else archetype
+        a = StrategyArchetype(archetype)
         return [s for s in self._by_id.values() if s.archetype == a]
 
     # -- Iteration ---------------------------------------------------------

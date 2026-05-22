@@ -18,6 +18,7 @@ from __future__ import annotations
 import fnmatch
 import json
 import logging
+import math
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Final, cast
@@ -237,7 +238,7 @@ class SyntheticDataGenerator:
         )
 
         # Inject flash crash if configured (FLASH_CRASH scenario)
-        path_prices: npt.NDArray[np.float64] = path["prices"]
+        path_prices: npt.NDArray[np.float64] = cast(npt.NDArray[np.float64], path["prices"])
         path["prices"] = self._apply_flash_crash(path_prices)
         path["close"] = path["prices"]
 
@@ -289,13 +290,13 @@ class SyntheticDataGenerator:
         apy[0] = params["base_apy"]
         for i in range(1, n):
             mean_rev: float = params["kappa"] * (params["mean"] - cast(float, apy[i - 1])) * dt
-            noise: float = params["sigma"] * float(np.sqrt(dt)) * float(self._rng.standard_normal())
+            noise: float = params["sigma"] * math.sqrt(dt) * self._rng.standard_normal()
             apy[i] = max(0.0, cast(float, apy[i - 1]) + mean_rev + noise)
 
         from unified_api_contracts.internal.index_utils import apy_to_cumulative_index
 
         # Convert APY series to cumulative liquidity index
-        apy_list: list[float] = [float(cast(float, v)) for v in apy]
+        apy_list: list[float] = cast(list[float], apy.tolist())
         liquidity_index = apy_to_cumulative_index(apy_list, timestamps, base=1.0)
 
         # Borrow APY: supply * spread factor (1.2-1.5x, deterministic per protocol)
@@ -352,13 +353,13 @@ class SyntheticDataGenerator:
             apy_arr[0] = params["base_apy"]
             for i in range(1, n):
                 mean_rev: float = params["kappa"] * (params["mean"] - cast(float, apy_arr[i - 1])) * dt
-                noise: float = params["sigma"] * float(np.sqrt(dt)) * float(self._rng.standard_normal())
+                noise: float = params["sigma"] * math.sqrt(dt) * self._rng.standard_normal()
                 apy_arr[i] = max(0.001, cast(float, apy_arr[i - 1]) + mean_rev + noise)
             apy = apy_arr
 
             from unified_api_contracts.internal.index_utils import staking_rate_to_index
 
-            apy_list: list[float] = [float(cast(float, v)) for v in apy]
+            apy_list: list[float] = cast(list[float], apy.tolist())
             index_values = staking_rate_to_index(apy_list, timestamps, base=1.0)
 
             frames.append(
@@ -462,10 +463,10 @@ class SyntheticDataGenerator:
             ts = base_ts + timedelta(seconds=i * interval_s)
 
             # Mid-price random walk (small increments)
-            current_mid *= 1.0 + 0.0001 * float(self._rng.standard_normal())
+            current_mid *= 1.0 + 0.0001 * self._rng.standard_normal()
 
             # Spread varies around spread_bps (clamped to >= 1 bp)
-            actual_spread_bps = max(1.0, spread_bps + 2.0 * float(self._rng.standard_normal()))
+            actual_spread_bps = max(1.0, spread_bps + 2.0 * self._rng.standard_normal())
             half_spread = current_mid * actual_spread_bps / 10_000.0
 
             best_bid = current_mid - half_spread
@@ -484,8 +485,10 @@ class SyntheticDataGenerator:
             for lvl in range(levels):
                 price: float = round(best_bid - lvl * tick * (1 + lvl * 0.5), 8)
                 # Power-law: top-of-book has the most liquidity
-                base_size: float = float(self._rng.exponential(1.0))
-                size: float = round(float(base_size * (levels / (lvl + 1)) ** power_exp), 8)
+                base_size: float = self._rng.exponential(1.0)
+                lvl_ratio: float = levels / (lvl + 1)
+                raw_size: float = base_size * math.pow(lvl_ratio, power_exp)
+                size: float = round(raw_size, 8)
                 size = max(0.001, size)
                 bids.append([price, size])
 
@@ -493,8 +496,10 @@ class SyntheticDataGenerator:
             asks: list[list[float]] = []
             for lvl in range(levels):
                 price = round(best_ask + lvl * tick * (1 + lvl * 0.5), 8)
-                base_size = float(self._rng.exponential(1.0))
-                size = round(float(base_size * (levels / (lvl + 1)) ** power_exp), 8)
+                base_size = self._rng.exponential(1.0)
+                lvl_ratio = levels / (lvl + 1)
+                raw_size = base_size * math.pow(lvl_ratio, power_exp)
+                size = round(raw_size, 8)
                 size = max(0.001, size)
                 asks.append([price, size])
 
@@ -672,7 +677,7 @@ class SyntheticDataGenerator:
         for t in range(trades_per_minute):
             tick_ts = bar_ts + timedelta(seconds=int(t * SECONDS_PER_MINUTE / trades_per_minute))
             spread_pct = 0.0005 + 0.0005 * float(self._rng.random())
-            price = bar_price * (1.0 + spread_pct * float(self._rng.standard_normal()))
+            price = bar_price * (1.0 + spread_pct * self._rng.standard_normal())
             qty_raw = float(self._rng.exponential(0.5)) * vol_mult
             qty = max(0.001, qty_raw)
             side = "buy" if self._rng.random() > 0.5 else "sell"
@@ -710,11 +715,11 @@ class SyntheticDataGenerator:
         interval_minutes = INTERVAL_MINUTES.get(interval, 1)
         dt = interval_minutes / MINUTES_PER_YEAR
         drift_term = (annual_drift - 0.5 * annual_vol**2) * dt
-        vol_term: float = annual_vol * float(np.sqrt(dt))
+        vol_term: float = annual_vol * math.sqrt(dt)
         shocks: npt.NDArray[np.float64] = self._rng.standard_normal(n)
         log_returns: npt.NDArray[np.float64] = drift_term + vol_term * shocks
-        log_prices: npt.NDArray[np.float64] = float(np.log(base_price)) + np.cumsum(log_returns)
-        log_prices = np.insert(log_prices[:-1], 0, float(np.log(base_price)))
+        log_prices: npt.NDArray[np.float64] = math.log(base_price) + np.cumsum(log_returns)
+        log_prices = np.insert(log_prices[:-1], 0, math.log(base_price))
         prices: npt.NDArray[np.float64] = np.exp(log_prices)
         return {"timestamps": timestamps, "prices": prices, "close": prices}
 
@@ -729,10 +734,10 @@ class SyntheticDataGenerator:
     ) -> pd.DataFrame:
         """Convert GBM price path to OHLCV bars."""
         timestamps = cast("list[datetime]", path["timestamps"])
-        prices: npt.NDArray[np.float64] = np.asarray(path["prices"])
+        prices: npt.NDArray[np.float64] = cast(npt.NDArray[np.float64], path["prices"])
         n = len(timestamps)
         interval_minutes = INTERVAL_MINUTES.get(interval, 1)
-        intrabar_vol: float = 0.002 * float(np.sqrt(interval_minutes))
+        intrabar_vol: float = 0.002 * math.sqrt(float(interval_minutes))
 
         opens: npt.NDArray[np.float64] = prices.copy()
         closes: npt.NDArray[np.float64] = prices * np.exp(intrabar_vol * self._rng.standard_normal(n))
@@ -811,9 +816,9 @@ class SyntheticDataGenerator:
             "lido": 20_000_000_000.0,
         }
         base = tvl_base.get(protocol, 1_000_000_000.0)
-        shocks = self._rng.standard_normal(n) * 0.005
-        log_tvl = np.log(base) + np.cumsum(shocks)
-        log_tvl = np.insert(log_tvl[:-1], 0, np.log(base))
+        shocks: npt.NDArray[np.float64] = self._rng.standard_normal(n) * 0.005
+        log_tvl: npt.NDArray[np.float64] = math.log(base) + np.cumsum(shocks)
+        log_tvl = np.insert(log_tvl[:-1], 0, math.log(base))
         return np.round(np.exp(log_tvl), 0)
 
 
@@ -831,6 +836,17 @@ def build_instrument_key(venue: str, symbol: str, instrument_type: str = "SPOT_P
 # ---------------------------------------------------------------------------
 # Output writer
 # ---------------------------------------------------------------------------
+
+
+def _df_to_parquet(df: pd.DataFrame, out_path: Path) -> None:
+    """Write a DataFrame to a Parquet file (snappy compression).
+
+    Isolated helper so pyarrow unknown-type errors are contained to one place.
+    """
+    table: object = pa.Table.from_pandas(  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
+        df, preserve_index=False
+    )
+    pq.write_table(table, out_path, compression="snappy")  # pyright: ignore[reportUnknownMemberType,reportArgumentType]
 
 
 class SeedDataWriter:
@@ -852,8 +868,7 @@ class SeedDataWriter:
         out_dir = self._output_dir / "ohlcv" / clean_symbol / str(year) / month / day
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "data.parquet"
-        table = pa.Table.from_pandas(df, preserve_index=False)
-        pq.write_table(table, out_path, compression="snappy")
+        _df_to_parquet(df, out_path)
         log.info("Wrote %d rows → %s", len(df), out_path)
         return out_path
 
@@ -866,8 +881,7 @@ class SeedDataWriter:
         out_dir = self._output_dir / "tick" / venue / clean_symbol
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "data.parquet"
-        table = pa.Table.from_pandas(df, preserve_index=False)
-        pq.write_table(table, out_path, compression="snappy")
+        _df_to_parquet(df, out_path)
         log.info("Wrote %d tick rows → %s", len(df), out_path)
         return out_path
 
@@ -879,8 +893,7 @@ class SeedDataWriter:
         out_dir = self._output_dir / "defi" / protocol / asset
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "yields.parquet"
-        table = pa.Table.from_pandas(df, preserve_index=False)
-        pq.write_table(table, out_path, compression="snappy")
+        _df_to_parquet(df, out_path)
         log.info("Wrote %d DeFi rows → %s", len(df), out_path)
         return out_path
 
@@ -892,8 +905,7 @@ class SeedDataWriter:
         out_dir = self._output_dir / "sports" / venue / league
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "odds.parquet"
-        table = pa.Table.from_pandas(df, preserve_index=False)
-        pq.write_table(table, out_path, compression="snappy")
+        _df_to_parquet(df, out_path)
         log.info("Wrote %d sports rows → %s", len(df), out_path)
         return out_path
 

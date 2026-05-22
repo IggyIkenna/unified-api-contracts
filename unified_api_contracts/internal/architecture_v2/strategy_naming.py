@@ -145,8 +145,6 @@ def parse_strategy_id(fq_id: str) -> ParsedStrategyId:
     """
     if not fq_id:
         raise ValueError("strategy_id must be a non-empty string")
-    if not isinstance(fq_id, str):  # pragma: no cover - belt-and-braces for bad callers
-        raise TypeError(f"strategy_id must be str, got {type(fq_id).__name__}")
     if "@" in fq_id:
         return _parse_slot_label(fq_id)
     if "." in fq_id:

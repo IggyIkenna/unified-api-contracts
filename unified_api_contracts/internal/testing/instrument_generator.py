@@ -36,7 +36,7 @@ from decimal import Decimal
 
 import numpy as np
 
-from unified_api_contracts._instrument_enums import InstrumentType, OptionType
+from unified_api_contracts._instrument_enums import AssetClass, InstrumentType, OptionType
 from unified_api_contracts.canonical.domain.reference import CanonicalInstrument
 from unified_api_contracts.registry.representative_sample import (
     CEFI_FUTURES_SPECS,
@@ -130,6 +130,28 @@ def _deterministic_address(rng: np.random.Generator) -> str:
     return "0x" + raw_bytes.hex()
 
 
+_LEGACY_ASSET_CLASS_MAP: dict[str, AssetClass] = {
+    "crypto_cefi": AssetClass.CRYPTO,
+    "crypto_defi": AssetClass.CRYPTO,
+    "tradfi_equity": AssetClass.EQUITY,
+    "tradfi_etf": AssetClass.EQUITY,
+    "tradfi_index": AssetClass.EQUITY,
+    "tradfi_futures": AssetClass.EQUITY,
+    "sports": AssetClass.EQUITY,  # closest available; no sports category in AssetClass
+    "prediction": AssetClass.EQUITY,  # closest available; no prediction category in AssetClass
+}
+
+
+def _to_asset_class(value: str) -> AssetClass | None:
+    """Convert a legacy or canonical asset_class string to AssetClass enum."""
+    if value in _LEGACY_ASSET_CLASS_MAP:
+        return _LEGACY_ASSET_CLASS_MAP[value]
+    try:
+        return AssetClass(value)
+    except ValueError:
+        return None
+
+
 def _defi_data_types(itype: InstrumentType, venue: str) -> list[str]:
     """Return data_types for a DeFi instrument based on type and venue."""
     # tvl is a column in dex_pools, not a separate data type
@@ -159,7 +181,7 @@ class InstrumentGenerator:
 
     # -- Ad-hoc lifecycle (Layer 3) -----------------------------------------
 
-    def create_instrument(self, **kwargs: str | float | int | None) -> CanonicalInstrument:
+    def create_instrument(self, **kwargs: str | float | int | datetime | None) -> CanonicalInstrument:
         """Create a custom instrument and add it to the ad-hoc pool.
 
         Accepts any CanonicalInstrument field as a keyword argument.
@@ -229,11 +251,11 @@ class InstrumentGenerator:
                     symbol=spec["symbol"],
                     base_asset=spec["base"],
                     quote_asset=spec["quote"],
-                    asset_class="crypto_cefi",
+                    asset_class=AssetClass.CRYPTO,
                     asset_group="CEFI",
                     ccxt_symbol=spec.get("ccxt_symbol"),
                     ccxt_exchange=spec.get("ccxt_exchange"),
-                    tick_size=0.01,
+                    tick_size=Decimal("0.01"),
                     available_from_datetime=_parse_date(str(spec["available_from"])),
                     available_to_datetime=None,
                     timestamp=ts,
@@ -257,10 +279,10 @@ class InstrumentGenerator:
                     symbol=str(spec["symbol"]),
                     base_asset=str(spec["base"]),
                     quote_asset=str(spec["quote"]),
-                    asset_class="crypto_cefi",
+                    asset_class=AssetClass.CRYPTO,
                     asset_group="CEFI",
                     exchange_raw_symbol=str(spec["raw_symbol"]),
-                    tick_size=0.5,
+                    tick_size=Decimal("0.5"),
                     max_leverage=10.0,
                     initial_margin_rate=0.1,
                     maintenance_margin_rate=0.05,
@@ -296,7 +318,7 @@ class InstrumentGenerator:
                         symbol=symbol,
                         base_asset=underlying,
                         quote_asset=quote,
-                        asset_class="crypto_cefi",
+                        asset_class=AssetClass.CRYPTO,
                         asset_group="CEFI",
                         exchange_raw_symbol=symbol,
                         expiry=expiry_dt,
@@ -327,7 +349,7 @@ class InstrumentGenerator:
                         symbol=cme_symbol,
                         base_asset=root,
                         quote_asset="USD",
-                        asset_class="tradfi_futures",
+                        asset_class=AssetClass.EQUITY,
                         asset_group="TRADFI",
                         exchange_raw_symbol=cme_symbol,
                         contract_size=Decimal(str(tspec["contract_size"])),
@@ -395,7 +417,7 @@ class InstrumentGenerator:
                             symbol=symbol,
                             base_asset=_underlying,
                             quote_asset="USD",
-                            asset_class="crypto_cefi",
+                            asset_class=AssetClass.CRYPTO,
                             asset_group="CEFI",
                             exchange_raw_symbol=symbol,
                             strike=Decimal(str(strike_val)),
@@ -428,9 +450,9 @@ class InstrumentGenerator:
                     symbol=spec["symbol"],
                     base_asset=spec["symbol"],
                     quote_asset="USD",
-                    asset_class=spec["asset_class"],
+                    asset_class=_to_asset_class(str(spec["asset_class"])),
                     asset_group="TRADFI",
-                    tick_size=0.01,
+                    tick_size=Decimal("0.01"),
                     trading_hours_open=spec.get("trading_hours_open"),
                     trading_hours_close=spec.get("trading_hours_close"),
                     regular_open_utc=spec.get("regular_open_utc"),
@@ -455,8 +477,8 @@ class InstrumentGenerator:
             venue = str(spec["venue"])
             root = str(spec["root"])
             base = str(spec["base"])
-            csz = float(spec["contract_size"])
-            tsz = float(spec["tick_size"])
+            csz = Decimal(str(spec["contract_size"]))
+            tsz = Decimal(str(spec["tick_size"]))
             for exp_date in expiries:
                 mc = CME_MONTH_CODES.get(exp_date.month)
                 if mc is None:
@@ -473,7 +495,7 @@ class InstrumentGenerator:
                         symbol=symbol,
                         base_asset=base,
                         quote_asset="USD",
-                        asset_class="tradfi_futures",
+                        asset_class=AssetClass.EQUITY,
                         asset_group="TRADFI",
                         exchange_raw_symbol=symbol,
                         contract_size=csz,
