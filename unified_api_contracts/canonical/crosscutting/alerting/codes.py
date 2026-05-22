@@ -91,7 +91,7 @@ class AlertCode(StrEnum):
     RECON_DEGRADED_CLOSE = "RECON_DEGRADED_CLOSE"
     """Reconciliation degraded — closing positions without verified state.
     Mirrors the UTL ``RECON_DEGRADED_CLOSE`` lifecycle event emitted by
-    position-balance-monitor + risk-and-exposure-service."""
+    strategy-service/position and strategy-service/risk."""
 
     # ── Order / execution health
     ORDER_REJECTION_SPIKE = "ORDER_REJECTION_SPIKE"
@@ -148,7 +148,7 @@ class AlertCode(StrEnum):
     # channels (e.g. BLOCK pages; SCALE_DOWN dashboards; MONITOR + TEST_ONLY
     # log-only). The corresponding LIVE_ALERT_RULES entries are seeded by the
     # master coordinator after Sub-A's ``event_pattern`` rename lands
-    # (UAC@0b61aec). Producers: risk-and-exposure-service ``rule_evaluator``.
+    # (UAC@0b61aec). Producers: strategy-service/risk ``rule_evaluator``.
     # SSOT seam: ``plans/active/risk_simulations_limits_alerting_2026_05_10.md``
     # § "§ 7 SSOT reconciliation seam (Framing 1)" cross-product table.
     RISK_RULE_BLOCKED = "RISK_RULE_BLOCKED"
@@ -186,7 +186,7 @@ class AlertCode(StrEnum):
     # modes per ``BREAKER_RECOVERY_DEFAULTS`` per-action defaults). Distinct
     # codes so dashboards can show "auto-recovered vs operator-unkilled"
     # separately, and so operator-attention auditing distinguishes the two.
-    # Producers: execution-service breaker / risk-and-exposure-service
+    # Producers: execution-service breaker / strategy-service/risk
     # kill-switch on transition out of armed state.
     KILL_SWITCH_AUTO_RECOVERED = "KILL_SWITCH_AUTO_RECOVERED"
     """Kill-switch transitioned from armed to inactive via the auto-cooldown
