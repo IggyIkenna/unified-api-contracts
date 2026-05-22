@@ -37,6 +37,8 @@ def _make(
     strike: Decimal | None = None,
     option_type: OptionType | None = None,
     underlying: str | None = None,
+    base_asset: str = "",
+    quote_asset: str = "",
 ) -> InstrumentRecord:
     return InstrumentRecord(
         instrument_key=instrument_key,
@@ -48,6 +50,8 @@ def _make(
         strike=strike,
         option_type=option_type,
         underlying=underlying,
+        base_asset=base_asset,
+        quote_asset=quote_asset,
     )
 
 

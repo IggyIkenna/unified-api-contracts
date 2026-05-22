@@ -149,13 +149,40 @@ class MinimalCandidateManifest:
         """Deserialise from a Firestore document dict."""
         score_raw = data.get("score_vector")
         score_dict: dict[str, object] = score_raw if isinstance(score_raw, dict) else {}
+
+        def _safe_float(value: object | None, default: float = 0.0) -> float:
+            """Safely convert object to float with default fallback."""
+            if value is None:
+                return default
+            if isinstance(value, (int, float)):
+                return float(value)
+            if isinstance(value, str):
+                try:
+                    return float(value)
+                except ValueError:
+                    return default
+            return default
+
+        def _safe_int(value: object | None, default: int = 0) -> int:
+            """Safely convert object to int with default fallback."""
+            if value is None:
+                return default
+            if isinstance(value, (int, float)):
+                return int(value)
+            if isinstance(value, str):
+                try:
+                    return int(float(value))
+                except ValueError:
+                    return default
+            return default
+
         score = GroupBMetrics(
-            sharpe_ratio=float(score_dict.get("sharpe_ratio") or 0.0),
-            calmar_ratio=float(score_dict.get("calmar_ratio") or 0.0),
-            max_drawdown_pct=float(score_dict.get("max_drawdown_pct") or 0.0),
-            win_rate=float(score_dict.get("win_rate") or 0.0),
-            backtest_days=int(score_dict.get("backtest_days") or 0),
-            total_return_pct=float(score_dict.get("total_return_pct") or 0.0),
+            sharpe_ratio=_safe_float(score_dict.get("sharpe_ratio")),
+            calmar_ratio=_safe_float(score_dict.get("calmar_ratio")),
+            max_drawdown_pct=_safe_float(score_dict.get("max_drawdown_pct")),
+            win_rate=_safe_float(score_dict.get("win_rate")),
+            backtest_days=_safe_int(score_dict.get("backtest_days")),
+            total_return_pct=_safe_float(score_dict.get("total_return_pct")),
         )
 
         model_refs_raw = data.get("model_refs")
