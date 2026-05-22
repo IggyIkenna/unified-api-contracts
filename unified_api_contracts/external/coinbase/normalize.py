@@ -11,19 +11,18 @@ from decimal import Decimal
 
 from ...canonical.domain import (
     CanonicalFee,
-    CanonicalMarketStateEvent,
     CanonicalOhlcvBar,
     CanonicalOrderBook,
     CanonicalTicker,
     CanonicalTrade,
     CanonicalWebSocketLifecycle,
     FeeType,
-    MarketState,
     WebSocketEvent,
 )
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType, TimeInForce
-from ...normalize_utils._helpers import to_decimal as _to_decimal, to_levels as _to_levels, d as _d
-from ...normalize_utils.market_state import normalize_market_state, _COINBASE_STATE_MAP
+from ...normalize_utils._helpers import d as _d
+from ...normalize_utils._helpers import to_decimal as _to_decimal
+from ...normalize_utils._helpers import to_levels as _to_levels
 from ..coinbase.schemas import (
     CoinbaseCandle,
     CoinbaseFill,

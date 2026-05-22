@@ -5,7 +5,8 @@ One-hop conversion: BinanceTrade -> CanonicalTrade, BinanceOrderBook -> Canonica
 
 from __future__ import annotations
 
-from typing import Any, Callable, cast
+from collections.abc import Callable
+from typing import Any, cast
 
 from ..canonical.domain.sports.odds_canonical import american_to_decimal, decimal_to_american, fractional_to_decimal
 from ..external.eia.normalize import (

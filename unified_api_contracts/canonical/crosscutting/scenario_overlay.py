@@ -513,8 +513,9 @@ class ScenarioOverlay(BaseModel):
         Phase 6.C facade used by the backtest CLI ``--scenario-overlay-yaml`` path.
         Importable as ``unified_api_contracts.scenario_overlay.ScenarioOverlay.model_validate_yaml``.
         """
-        import yaml
         from typing import cast
+
+        import yaml
 
         data = cast(dict[str, object], yaml.safe_load(yaml_content))
         return cls.model_validate(data)
