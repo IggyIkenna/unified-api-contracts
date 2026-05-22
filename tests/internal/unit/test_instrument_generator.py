@@ -346,7 +346,7 @@ class TestIceFutures:
         instruments = gen.generate_tradfi(REF_DATE)
         ice = [i for i in instruments if i.venue == "ICE"]
         for inst in ice:
-            assert inst.asset_group == "tradfi_futures"
+            assert inst.asset_group == "tradfi"
 
     def test_ice_available_from_before_expiry(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_tradfi(REF_DATE)

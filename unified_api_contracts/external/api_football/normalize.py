@@ -417,7 +417,7 @@ def normalize_api_football_standing(
     }
 
 
-def normalize_api_football_injury(raw: dict[str, object] | None) -> dict[str, object]:
+def normalize_api_football_injury(raw: object) -> dict[str, object]:
     """Flatten a single API-Football ``/injuries`` row into a flat dict.
 
     The raw shape has 4 nested struct columns (``player`` / ``team`` /
@@ -426,12 +426,13 @@ def normalize_api_football_injury(raw: dict[str, object] | None) -> dict[str, ob
 
     Returns a single dict (one injury report = one row).
     """
-    if raw is None:
+    if not isinstance(raw, dict):
         return {}
-    player = _extract_dict(raw, "player")
-    team = _extract_dict(raw, "team")
-    fixture = _extract_dict(raw, "fixture")
-    league = _extract_dict(raw, "league")
+    raw_d = cast(dict[str, object], raw)
+    player = _extract_dict(raw_d, "player")
+    team = _extract_dict(raw_d, "team")
+    fixture = _extract_dict(raw_d, "fixture")
+    league = _extract_dict(raw_d, "league")
     out: dict[str, object] = {
         "player_id": _safe_int(player.get("id")),
         "player_name": player.get("name"),
@@ -498,7 +499,7 @@ _FIXTURE_STAT_TYPE_MAP: dict[str, tuple[str, str]] = {
 }
 
 
-def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+def normalize_api_football_fixture_stats(raw: object, fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten a single API-Football ``/fixtures/statistics`` team-stats row.
 
     Each call covers ONE team's stat block — the API returns a list of
@@ -512,8 +513,11 @@ def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str
 
     Returns ``[]`` if the row shape is malformed.
     """
-    team = _extract_dict(raw, "team")
-    stats_list = _extract_list(raw, "statistics")
+    if not isinstance(raw, dict):
+        return []
+    raw_d = cast(dict[str, object], raw)
+    team = _extract_dict(raw_d, "team")
+    stats_list = _extract_list(raw_d, "statistics")
 
     row: dict[str, object] = {
         "fixture_id": fixture_id,
@@ -552,7 +556,7 @@ def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str
     return [row]
 
 
-def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+def normalize_api_football_fixture_event(raw: object, fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten one API-Football ``/fixtures/events`` row into one event row.
 
     Each call covers a single event (goal / card / sub / VAR) with nested
@@ -565,10 +569,13 @@ def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str
     ``normalize_api_football_lineup`` so the orchestrator can use a
     uniform ``chain.from_iterable`` regardless of normalizer.
     """
-    time_block = _extract_dict(raw, "time")
-    team = _extract_dict(raw, "team")
-    player = _extract_dict(raw, "player")
-    assist = _extract_dict(raw, "assist")
+    if not isinstance(raw, dict):
+        return []
+    raw_d = cast(dict[str, object], raw)
+    time_block = _extract_dict(raw_d, "time")
+    team = _extract_dict(raw_d, "team")
+    player = _extract_dict(raw_d, "player")
+    assist = _extract_dict(raw_d, "assist")
 
     row: dict[str, object] = {
         "fixture_id": fixture_id,
@@ -580,14 +587,14 @@ def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str
         "player_name": player.get("name"),
         "assist_id": _safe_int(assist.get("id")) if assist else None,
         "assist_name": assist.get("name") if assist else None,
-        "event_type": raw.get("type"),
-        "event_detail": raw.get("detail"),
-        "comments": raw.get("comments"),
+        "event_type": raw_d.get("type"),
+        "event_detail": raw_d.get("detail"),
+        "comments": raw_d.get("comments"),
     }
     return [row]
 
 
-def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+def normalize_api_football_lineup(raw: object, fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten one API-Football ``/fixtures/lineups`` team block into rows.
 
     Each call covers ONE team's lineup with nested ``startXI`` (11 starters),
@@ -599,11 +606,14 @@ def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") 
     Returns a list of length ~18 (11 starters + 7 subs); returns ``[]``
     for malformed input.
     """
-    team = _extract_dict(raw, "team")
-    coach = _extract_dict(raw, "coach")
-    formation = raw.get("formation")
-    start_xi = _extract_list(raw, "startXI")
-    substitutes = _extract_list(raw, "substitutes")
+    if not isinstance(raw, dict):
+        return []
+    raw_d = cast(dict[str, object], raw)
+    team = _extract_dict(raw_d, "team")
+    coach = _extract_dict(raw_d, "coach")
+    formation = raw_d.get("formation")
+    start_xi = _extract_list(raw_d, "startXI")
+    substitutes = _extract_list(raw_d, "substitutes")
 
     team_id = _safe_int(team.get("id"))
     team_name = team.get("name")

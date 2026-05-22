@@ -152,14 +152,6 @@ def _to_asset_class(value: str) -> AssetClass | None:
         return None
 
 
-def _defi_data_types(itype: InstrumentType, venue: str) -> list[str]:
-    """Return data_types for a DeFi instrument based on type and venue."""
-    # tvl is a column in dex_pools, not a separate data type
-    if itype == InstrumentType.POOL and venue != "COMPOUND_V3_ETH":
-        return ["apy", "dex_pools"] if venue == "CURVE-ETHEREUM" else ["ohlcv", "dex_pools"]
-    return ["apy", "lending_indices"]
-
-
 # ---------------------------------------------------------------------------
 # InstrumentGenerator — registry-driven, full lifecycle support
 # ---------------------------------------------------------------------------
@@ -252,7 +244,7 @@ class InstrumentGenerator:
                     base_asset=spec["base"],
                     quote_asset=spec["quote"],
                     asset_class=AssetClass.CRYPTO,
-                    asset_group="CEFI",
+                    asset_group="cefi",
                     ccxt_symbol=spec.get("ccxt_symbol"),
                     ccxt_exchange=spec.get("ccxt_exchange"),
                     tick_size=Decimal("0.01"),
@@ -280,7 +272,7 @@ class InstrumentGenerator:
                     base_asset=str(spec["base"]),
                     quote_asset=str(spec["quote"]),
                     asset_class=AssetClass.CRYPTO,
-                    asset_group="CEFI",
+                    asset_group="cefi",
                     exchange_raw_symbol=str(spec["raw_symbol"]),
                     tick_size=Decimal("0.5"),
                     max_leverage=10.0,
@@ -319,7 +311,7 @@ class InstrumentGenerator:
                         base_asset=underlying,
                         quote_asset=quote,
                         asset_class=AssetClass.CRYPTO,
-                        asset_group="CEFI",
+                        asset_group="cefi",
                         exchange_raw_symbol=symbol,
                         expiry=expiry_dt,
                         available_from_datetime=expiry_dt - timedelta(days=365),
@@ -350,7 +342,7 @@ class InstrumentGenerator:
                         base_asset=root,
                         quote_asset="USD",
                         asset_class=AssetClass.EQUITY,
-                        asset_group="TRADFI",
+                        asset_group="tradfi",
                         exchange_raw_symbol=cme_symbol,
                         contract_size=Decimal(str(tspec["contract_size"])),
                         expiry=expiry_dt,
@@ -418,7 +410,7 @@ class InstrumentGenerator:
                             base_asset=_underlying,
                             quote_asset="USD",
                             asset_class=AssetClass.CRYPTO,
-                            asset_group="CEFI",
+                            asset_group="cefi",
                             exchange_raw_symbol=symbol,
                             strike=Decimal(str(strike_val)),
                             option_type=opt_type,
@@ -451,7 +443,7 @@ class InstrumentGenerator:
                     base_asset=spec["symbol"],
                     quote_asset="USD",
                     asset_class=_to_asset_class(str(spec["asset_class"])),
-                    asset_group="TRADFI",
+                    asset_group="tradfi",
                     tick_size=Decimal("0.01"),
                     trading_hours_open=spec.get("trading_hours_open"),
                     trading_hours_close=spec.get("trading_hours_close"),
@@ -496,7 +488,7 @@ class InstrumentGenerator:
                         base_asset=base,
                         quote_asset="USD",
                         asset_class=AssetClass.EQUITY,
-                        asset_group="TRADFI",
+                        asset_group="tradfi",
                         exchange_raw_symbol=symbol,
                         contract_size=csz,
                         tick_size=tsz,
@@ -527,15 +519,15 @@ class InstrumentGenerator:
         base = str(spec.get("base", spec.get("underlying", "")))
         quote = str(spec.get("quote", "USD"))
 
-        inst_kwargs: dict[str, str | float | int | datetime | list[str] | None] = {
+        inst_kwargs: dict[str, str | float | int | datetime | None] = {
             "instrument_key": key,
             "venue": venue,
             "instrument_type": itype,
             "symbol": str(spec.get("display", symbol)) if spec.get("display") else symbol,
             "base_asset": base,
             "quote_asset": quote,
-            "asset_class": "crypto_defi",
-            "asset_group": "DEFI",
+            "asset_class": _to_asset_class("crypto_defi"),
+            "asset_group": "defi",
             "pool_address": _deterministic_address(addr_rng),
             "available_from_datetime": _parse_date(str(spec["available_from"])),
             "available_to_datetime": None,
@@ -552,7 +544,6 @@ class InstrumentGenerator:
             inst_kwargs["underlying"] = str(spec["underlying"])
         if "staked_underlying" in spec:
             inst_kwargs["underlying"] = str(spec["staked_underlying"])
-        inst_kwargs["data_types"] = _defi_data_types(itype, venue)
 
         return CanonicalInstrument.model_validate(inst_kwargs)
 
@@ -571,13 +562,13 @@ class InstrumentGenerator:
             key = f"{venue}:{itype}:{symbol}"
 
             asset_class = spec.get("asset_class", "sports")
-            market_cat = "PREDICTION" if asset_class == "prediction" else "SPORTS"
-            inst_kwargs: dict[str, str | float | int | datetime | list[str] | None] = {
+            market_cat = "prediction" if asset_class == "prediction" else "sports"
+            inst_kwargs: dict[str, str | float | int | datetime | None] = {
                 "instrument_key": key,
                 "venue": venue,
                 "instrument_type": itype,
                 "symbol": symbol,
-                "asset_class": asset_class,
+                "asset_class": _to_asset_class(str(asset_class)),
                 "asset_group": market_cat,
                 "timestamp": ts,
                 "available_from_datetime": _parse_date(spec["available_from"]),
@@ -588,17 +579,14 @@ class InstrumentGenerator:
             # Venue-specific IDs
             if "condition_id" in spec:
                 inst_kwargs["pool_id"] = spec["condition_id"]
-                inst_kwargs["data_types"] = ["odds", "volume"]
             elif itype == InstrumentType.EXCHANGE_ODDS:
                 market_id_bytes: bytes = sport_rng.bytes(8)
                 inst_kwargs["pool_id"] = str(int.from_bytes(market_id_bytes[:4], "big") % 10_000_000)
                 inst_kwargs["venue_type"] = spec.get("venue_type")
-                inst_kwargs["data_types"] = ["match_odds", "in_play"]
             elif itype == InstrumentType.FIXED_ODDS:
                 event_id_bytes: bytes = sport_rng.bytes(8)
                 inst_kwargs["pool_id"] = str(int.from_bytes(event_id_bytes[:4], "big") % 10_000_000)
                 inst_kwargs["venue_type"] = spec.get("venue_type")
-                inst_kwargs["data_types"] = ["odds"]
 
             instruments.append(CanonicalInstrument.model_validate(inst_kwargs))
 
