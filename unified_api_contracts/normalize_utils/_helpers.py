@@ -169,9 +169,15 @@ def _tif(t: str | None) -> TimeInForce:
 to_decimal = _to_decimal
 to_levels = _to_levels
 ts_ms_to_datetime = _ts_ms_to_datetime
+ts_ms = _ts_ms
 d = _d
 unix_sec_to_utc = _ts_sec
 iso = _iso
+side = _side
+order_type = _order_type
+status = _status
+tif = _tif
+databento_price = _databento_price
 
 __all__ = [
     "_d",
@@ -187,9 +193,15 @@ __all__ = [
     "_ts_ms_to_datetime",
     "_ts_sec",
     "d",
+    "databento_price",
     "iso",
+    "order_type",
+    "side",
+    "status",
+    "tif",
     "to_decimal",
     "to_levels",
+    "ts_ms",
     "ts_ms_to_datetime",
     "unix_sec_to_utc",
 ]
