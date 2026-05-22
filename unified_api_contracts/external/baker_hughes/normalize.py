@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from ...canonical.domain import CanonicalOnChainMetric
-from ...normalize_utils._helpers import _to_decimal
+from ...normalize_utils import _helpers
 from .schemas import BakerHughesRigCount
 
 
@@ -37,8 +37,8 @@ def normalize_baker_hughes_rig_count(
         venue=venue,
         metric_type="rig_count",
         asset=None,
-        value=_to_decimal(raw.total_rigs),
-        secondary_value=_to_decimal(raw.gas_rigs),
+        value=_helpers._to_decimal(raw.total_rigs),
+        secondary_value=_helpers._to_decimal(raw.gas_rigs),
         entity="na",
         raw={
             "gas_rigs": raw.gas_rigs,
