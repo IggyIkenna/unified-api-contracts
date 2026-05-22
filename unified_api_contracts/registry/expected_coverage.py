@@ -206,6 +206,14 @@ _DEFI: dict[str, list[str]] = {
     "ETHERFI-ETHEREUM": [*_DEFI_LST_PAIRS, "eigenlayer_rewards"],
     "ETHENA-ETHEREUM": list(_DEFI_LST_PAIRS),
     "JITO-SOLANA": list(_DEFI_LST_PAIRS),
+    # --- Oracle / gas (provider-level, chain is a separate shard dimension) ---
+    # gas_fee_handler emits venue="ALCHEMY" per chain; oracle_prices_handler
+    # emits venue="CHAINLINK" (EVM) and venue="PYTH" (Solana + EVM) per chain.
+    # These were omitted at initial registration — manifest rows exist but were
+    # invisible to data-status denominator. Added 2026-05-22.
+    "ALCHEMY": ["gas_fees"],
+    "CHAINLINK": ["oracle_prices"],
+    "PYTH": ["oracle_prices"],
 }
 
 # ---------------------------------------------------------------------------
