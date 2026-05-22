@@ -19,6 +19,9 @@ from .client_lifecycle_events import ShardCapacityEvent as ShardCapacityEvent
 from .client_lifecycle_events import ShardRecommendedAction as ShardRecommendedAction
 from .client_lifecycle_events import VenueAuthStatus as VenueAuthStatus
 from .cloud_target import CloudTarget as CloudTarget
+from .cme_polymarket_link import CME_ROOT_TO_POLYMARKET_GROUP as CME_ROOT_TO_POLYMARKET_GROUP
+from .cme_polymarket_link import LINKED_CME_ROOTS as LINKED_CME_ROOTS
+from .cme_polymarket_link import linked_question_group as linked_question_group
 from .defi import CHAIN_BRIDGE_GRAPH as CHAIN_BRIDGE_GRAPH
 from .defi import ChainKind as ChainKind
 from .defi import LendingProtocol as LendingProtocol
