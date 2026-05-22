@@ -9,7 +9,7 @@
 PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
 MIN_COVERAGE=84
-PYTEST_WORKERS=${PYTEST_WORKERS:-2}
+PYTEST_WORKERS=${PYTEST_WORKERS:-1}  # Reduced from 2 due to 565+ cassette test cases
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
 BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py" "**/mapping_resolver.py")
@@ -55,6 +55,9 @@ SIZE_EXTRA_EXCLUDES=(
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
 # without masking runaway regressions (a 60% overrun would still trip).
 MAX_DURATION=600
+# Memory monitoring settings for this heavy test suite
+QG_MEMORY_THRESHOLD=${QG_MEMORY_THRESHOLD:-80}  # Lower threshold due to cassette tests
+QG_MEMORY_CHECK_INTERVAL=${QG_MEMORY_CHECK_INTERVAL:-20}  # More frequent checks
 # Pre-existing size violations in large generated/registry files (events.py remediated 2026-05-18).
 # See plans/active/issues/uac_qg_preexisting_size_violations_2026_05_14.md for remaining items.
 # Bumped 5→6 (2026-05-20): after fixing RUF022 lint suppression (which was masking codex eval),
