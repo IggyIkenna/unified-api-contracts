@@ -156,7 +156,7 @@ def validate_row_df(
         # df.dtypes carries an untyped element under pandas' stubs; call
         # ``str()`` on both axes so we end up with a plain ``dict[str, str]``.
         actual_dtypes: dict[str, str] = {
-            str(col): str(df.dtypes[col])
+            str(col): str(df.dtypes[col])  # pyright: ignore[reportAny]
             for col in df.columns  # pyright: ignore[reportAny]
         }
         for spec in expected:

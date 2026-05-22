@@ -148,7 +148,7 @@ class MinimalCandidateManifest:
     def from_firestore_dict(cls, data: dict[str, object]) -> MinimalCandidateManifest:
         """Deserialise from a Firestore document dict."""
         score_raw = data.get("score_vector")
-        score_dict: dict[str, object] = score_raw if isinstance(score_raw, dict) else {}
+        score_dict: dict[str, object] = cast("dict[str, object]", score_raw) if isinstance(score_raw, dict) else {}
 
         def _safe_float(value: object | None, default: float = 0.0) -> float:
             """Safely convert object to float with default fallback."""
@@ -202,7 +202,7 @@ class MinimalCandidateManifest:
         created_at: datetime = created_at_raw if isinstance(created_at_raw, datetime) else datetime.now(UTC)
 
         config_raw = data.get("config_json")
-        config_json: dict[str, object] = config_raw if isinstance(config_raw, dict) else {}
+        config_json: dict[str, object] = cast("dict[str, object]", config_raw) if isinstance(config_raw, dict) else {}
 
         pinned_shas_raw = data.get("pinned_shas")
         pinned_shas: dict[str, str] | None = None

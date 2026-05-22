@@ -9,7 +9,7 @@ Per ``wallet_treasury_client_flow_2026_05_10.md`` Phase 1.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
 
@@ -93,7 +93,7 @@ class ClientApiKeyMaterial:
     label: str = ""
     """Human-readable label (e.g., 'production', 'staging')."""
 
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     """Creation timestamp."""
 
     expires_at: datetime | None = None
@@ -156,7 +156,7 @@ class ClientShareClassSubscription:
     max_drawdown_for_suspension_pct: Decimal = Decimal("15")
     """Archetype-specific drawdown gate (may tighten the global setting)."""
 
-    subscribed_at: datetime = field(default_factory=datetime.utcnow)
+    subscribed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     """Subscription timestamp."""
 
     suspended_at: datetime | None = None

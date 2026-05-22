@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Annotated, Literal
+from typing import Annotated, Literal, cast
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -403,12 +403,11 @@ def _migrate_flat_to_target_params(values: dict[str, object]) -> dict[str, objec
     """Move legacy flat swing fields into target_params dict."""
     if "lookback_window" in values and "swing_lookback_window" not in values:
         values["swing_lookback_window"] = values.pop("lookback_window")
-    tp = values.get("target_params")
-    if not tp or not isinstance(tp, dict):
-        tp = {}
+    raw_tp = values.get("target_params")
+    tp: dict[str, object] = cast("dict[str, object]", raw_tp) if isinstance(raw_tp, dict) else {}
     for key in _FLAT_TARGET_KEYS:
-        if key in values:
-            tp.setdefault(key, values.pop(key))
+        if key in values and key not in tp:
+            tp[key] = values.pop(key)
     if tp:
         values["target_params"] = tp
     return values
@@ -446,8 +445,6 @@ class ModelVariantConfig(BaseModel):
     @classmethod
     def _compat_flat_to_target_params(cls, values: dict[str, object]) -> dict[str, object]:
         """Backwards compat: migrate flat swing fields into target_params."""
-        if not isinstance(values, dict):
-            return values
         return _migrate_flat_to_target_params(values)
 
 
@@ -479,8 +476,6 @@ class ModelMetadata(BaseModel):
     @classmethod
     def _compat_flat_to_target_params(cls, values: dict[str, object]) -> dict[str, object]:
         """Backwards compat: migrate flat swing fields into target_params."""
-        if not isinstance(values, dict):
-            return values
         return _migrate_flat_to_target_params(values)
 
 
@@ -511,8 +506,6 @@ class MLConfigDict(BaseModel):
     @classmethod
     def _compat_flat_to_target_params(cls, values: dict[str, object]) -> dict[str, object]:
         """Backwards compat: migrate flat swing fields into target_params."""
-        if not isinstance(values, dict):
-            return values
         return _migrate_flat_to_target_params(values)
 
 
