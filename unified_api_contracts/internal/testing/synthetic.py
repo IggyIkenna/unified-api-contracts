@@ -24,8 +24,8 @@ from typing import Final, cast
 
 import numpy as np
 import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
+import pyarrow as pa  # type: ignore[import-untyped]
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
 from unified_api_contracts.internal.testing.scenario_config import (
     InstrumentOverrideAction,
@@ -123,7 +123,7 @@ class SyntheticDataGenerator:
 
     def __init__(
         self,
-        spec: dict[object, object],
+        spec: dict[str, object],
         seed: int = 42,
         scenario: ScenarioConfig | None = None,
     ) -> None:
@@ -134,23 +134,30 @@ class SyntheticDataGenerator:
 
         vol_mult = scenario.vol_multiplier if scenario is not None else 1.0
         raw_gbm: dict[str, object] = {str(k): v for k, v in (spec.get("gbm_params") or {}).items()}
-        self._gbm_params: dict[str, dict[str, float]] = {
-            sym: {str(pk): float(pv) * (vol_mult if pk == "vol" else 1.0) for pk, pv in params.items()}
-            for sym, params in (
-                (sym, {str(pk): pv for pk, pv in p.items()}) for sym, p in raw_gbm.items() if isinstance(p, dict)
-            )
-        }
+        self._gbm_params: dict[str, dict[str, float]] = {}
+        for sym, p in raw_gbm.items():
+            if isinstance(p, dict):
+                params: dict[str, object] = cast("dict[str, object]", p)
+                self._gbm_params[sym] = {
+                    str(pk): float(pv) * (vol_mult if pk == "vol" else 1.0)
+                    for pk, pv in params.items()
+                    if isinstance(pv, (int, float))
+                }
+
         raw_defi: dict[str, object] = {str(k): v for k, v in (spec.get("defi_yield_params") or {}).items()}
-        self._defi_params: dict[str, dict[str, float]] = {
-            key: {str(pk): float(pv) for pk, pv in params.items()}
-            for key, params in (
-                (key, {str(pk): pv for pk, pv in p.items()}) for key, p in raw_defi.items() if isinstance(p, dict)
-            )
-        }
+        self._defi_params: dict[str, dict[str, float]] = {}
+        for key, p in raw_defi.items():
+            if isinstance(p, dict):
+                params: dict[str, object] = cast("dict[str, object]", p)
+                self._defi_params[key] = {
+                    str(pk): float(pv) for pk, pv in params.items() if isinstance(pv, (int, float))
+                }
+
         correlations_raw = spec.get("correlations") or {}
-        self._correlations: dict[str, float] = cast(
-            "dict[str, float]", {str(k): float(cast("float | str | int", v)) for k, v in correlations_raw.items()}
-        )
+        self._correlations: dict[str, float] = {}
+        for k, v in correlations_raw.items():
+            if isinstance(v, (int, float, str)):
+                self._correlations[str(k)] = float(v)
 
     # ------------------------------------------------------------------
     # Fault injection helpers

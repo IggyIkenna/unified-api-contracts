@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Final
 
 import pandas as pd
-import pyarrow.parquet as pq
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -132,7 +132,7 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
 
     try:
         table = pq.read_table(str(parquet_path))
-        df = table.to_pandas()
+        df: pd.DataFrame = table.to_pandas()
         row_count = len(df)
 
         if schema_type == "unknown":
@@ -146,8 +146,8 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
 
             # Timestamp checks
             if "timestamp" in df.columns:
-                ts_col = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
-                null_ts = ts_col.isna().sum()
+                ts_col: pd.Series[pd.Timestamp] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
+                null_ts: int = int(ts_col.isna().sum())
                 if null_ts > 0:
                     errors.append(f"{null_ts} null/invalid timestamps found")
                 else:
@@ -159,33 +159,33 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
                 numeric_cols = ["open", "high", "low", "close", "volume"]
                 for col in numeric_cols:
                     if col in df.columns:
-                        neg_count = (pd.to_numeric(df[col], errors="coerce") <= 0).sum()
+                        neg_count: int = int((pd.to_numeric(df[col], errors="coerce") <= 0).sum())
                         if neg_count > 0:
                             errors.append(f"Column '{col}' has {neg_count} non-positive values")
                 if all(c in df.columns for c in ["open", "high", "low", "close"]):
-                    open_v = pd.to_numeric(df["open"], errors="coerce")
-                    high_v = pd.to_numeric(df["high"], errors="coerce")
-                    low_v = pd.to_numeric(df["low"], errors="coerce")
-                    close_v = pd.to_numeric(df["close"], errors="coerce")
-                    bad_high = (high_v < open_v) | (high_v < close_v)
-                    bad_low = (low_v > open_v) | (low_v > close_v)
-                    hloc_violations = (bad_high | bad_low).sum()
+                    open_v: pd.Series[float] = pd.to_numeric(df["open"], errors="coerce")
+                    high_v: pd.Series[float] = pd.to_numeric(df["high"], errors="coerce")
+                    low_v: pd.Series[float] = pd.to_numeric(df["low"], errors="coerce")
+                    close_v: pd.Series[float] = pd.to_numeric(df["close"], errors="coerce")
+                    bad_high: pd.Series[bool] = (high_v < open_v) | (high_v < close_v)
+                    bad_low: pd.Series[bool] = (low_v > open_v) | (low_v > close_v)
+                    hloc_violations: int = int((bad_high | bad_low).sum())
                     if hloc_violations > 0:
                         errors.append(f"{hloc_violations} bars violate high >= open/close >= low invariant")
 
             # Tick-specific: side validation
             if schema_type == "tick" and "side" in df.columns:
-                invalid_sides = (~df["side"].isin(["buy", "sell"])).sum()
+                invalid_sides: int = int((~df["side"].isin(["buy", "sell"])).sum())
                 if invalid_sides > 0:
                     errors.append(f"{invalid_sides} rows have invalid 'side' (must be buy or sell)")
 
             # DeFi-specific: APY range
             if schema_type == "defi" and "apy" in df.columns:
-                apy = pd.to_numeric(df["apy"], errors="coerce")
-                neg_apy = (apy < 0).sum()
+                apy: pd.Series[float] = pd.to_numeric(df["apy"], errors="coerce")
+                neg_apy: int = int((apy < 0).sum())
                 if neg_apy > 0:
                     errors.append(f"{neg_apy} rows have negative APY")
-                high_apy = (apy > 5.0).sum()  # >500% APY is suspicious
+                high_apy: int = int((apy > 5.0).sum())  # >500% APY is suspicious
                 if high_apy > 0 and strict:
                     errors.append(f"{high_apy} rows have suspiciously high APY (>500%)")
 
@@ -193,15 +193,15 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
             if schema_type == "sports":
                 for odds_col in ["odds_home", "odds_draw", "odds_away"]:
                     if odds_col in df.columns:
-                        odds = pd.to_numeric(df[odds_col], errors="coerce")
-                        low_odds = (odds < 1.01).sum()
+                        odds: pd.Series[float] = pd.to_numeric(df[odds_col], errors="coerce")
+                        low_odds: int = int((odds < 1.01).sum())
                         if low_odds > 0:
                             errors.append(f"{low_odds} rows in '{odds_col}' below 1.01 (invalid odds)")
 
             # NaN checks in required fields
             for col in required_cols:
                 if col in df.columns:
-                    nan_count = df[col].isna().sum()
+                    nan_count: int = int(df[col].isna().sum())
                     if nan_count > 0:
                         errors.append(f"Required column '{col}' has {nan_count} NaN values")
 
