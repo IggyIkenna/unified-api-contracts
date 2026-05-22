@@ -14,7 +14,7 @@ that vary per protocol) we hand-write the spec.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Final, get_args, get_origin
+from typing import Final, cast, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
@@ -81,18 +81,18 @@ def _annotation_dtype(annotation: object) -> tuple[str, bool]:
     # Union / Optional handling.
     args = get_args(annotation)
     if origin is type and len(args) == 1:
-        return _annotation_dtype(args[0])
+        return _annotation_dtype(cast(object, args[0]))
 
     # Optional[X] = Union[X, None]
-    non_none = [a for a in args if a is not type(None)]
+    non_none = [a for a in args if a is not type(None)]  # type: ignore[reportAny]
     nullable = len(non_none) != len(args)
     if len(non_none) == 1:
-        dtype, _ = _annotation_dtype(non_none[0])
+        dtype, _ = _annotation_dtype(non_none[0])  # type: ignore[reportAny]
         return dtype, nullable
 
     if origin is list:
         if non_none:
-            inner_dtype, _ = _annotation_dtype(non_none[0])
+            inner_dtype, _ = _annotation_dtype(non_none[0])  # type: ignore[reportAny]
             return f"list<{inner_dtype}>", nullable
         return "list<any>", nullable
 
