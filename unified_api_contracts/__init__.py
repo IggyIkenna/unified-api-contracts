@@ -1622,6 +1622,7 @@ __all__ = [
     "lookup_contract",
     "matrix_cell_count",
     "next_state",
+    "needs_candle_processing",
     "normalize_underlying",
     "pipeline_mode_for_source",
     "policy_is_alert",
