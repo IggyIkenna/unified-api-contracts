@@ -246,7 +246,7 @@ def normalize_ibkr_option_quote(
         underlying=underlying,
         strike=_d(raw.strike) or Decimal("0"),
         option_type=opt_type,
-        expiration=exp,
+        expiration=exp if exp is not None else datetime.now(tz=UTC),
         bid_price=_d(bid),
         ask_price=_d(ask),
         bid_size=_d(bid_sz),

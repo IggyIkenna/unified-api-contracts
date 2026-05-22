@@ -181,7 +181,7 @@ def normalize_tardis_option_quote(raw: TardisOptionQuote, venue: str = "tardis")
         underlying=(raw.underlying_price is not None and str(raw.underlying_price)) or raw.symbol.split("-")[0],
         strike=_d(raw.strike_price) or Decimal("0"),
         option_type=opt_type,
-        expiration=exp,
+        expiration=exp if exp is not None else datetime.now(tz=UTC),
         bid_price=_d(raw.bid_price),
         ask_price=_d(raw.ask_price),
         bid_size=_d(raw.bid_amount),

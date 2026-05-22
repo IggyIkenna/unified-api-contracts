@@ -135,7 +135,7 @@ def _normalize_order_status(s: str | None) -> OrderStatus:
     return OrderStatus.PENDING
 
 
-def _normalize_tif(tif: str | None) -> str:
+def _normalize_tif(tif: str | None) -> TimeInForce:
     if not tif:
         return TimeInForce.GTC
     t = str(tif).upper()

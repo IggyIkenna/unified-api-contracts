@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import cast
 
 from ...canonical.domain import (
     CanonicalDerivativeTicker,
@@ -256,8 +257,8 @@ def normalize_okx_derivative_ticker(
         except (ValueError, TypeError, OSError):
             return None
 
-    mark_price = to_decimal(info.get("markPx") or info.get("mark_px"))
-    index_price = to_decimal(info.get("idxPx") or info.get("idx_px"))
+    mark_price = to_decimal(cast(str | float | None, info.get("markPx") or info.get("mark_px")))
+    index_price = to_decimal(cast(str | float | None, info.get("idxPx") or info.get("idx_px")))
     ts_raw = info.get("ts")
     timestamp: datetime = _ms_to_utc(ts_raw) or datetime.now(UTC) if ts_raw is not None else datetime.now(UTC)
 
