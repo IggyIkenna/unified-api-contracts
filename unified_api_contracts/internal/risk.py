@@ -32,7 +32,7 @@ class AlertType(StrEnum):
     configured alert tightness multiplier on the leg's ``rebalance_trigger_bps``.
     Independent of the LeveragedLegController auto-rebalance — operator-visible
     safety overlay raised after the controller's chance to act has passed.
-    Emitted by risk-and-exposure-service. SSOT for the LegPortfolioState risk
+    Emitted by strategy-service/risk. SSOT for the LegPortfolioState risk
     overlay declared in
     ``unified-trading-pm/plans/active/leveraged_leg_controller_2026_05_01.md``."""
 
@@ -45,7 +45,7 @@ class PositionSide(StrEnum):
 
 
 class RiskPosition(BaseModel):
-    """Position as tracked by risk-and-exposure-service."""
+    """Position as tracked by strategy-service/risk."""
 
     client_id: str = Field(..., json_schema_extra={"pii": True})
     strategy_id: str | None = None
@@ -321,7 +321,7 @@ class CircuitBreakerEvent(BaseModel):
 class EODSettlementTrigger(BaseModel):
     """End-of-day settlement trigger published to the ``eod-settlement`` Pub/Sub topic.
 
-    Consumed by pnl-attribution-service and risk-and-exposure-service to
+    Consumed by strategy-service/pnl and strategy-service/risk to
     lock in daily PnL, settle positions, and archive daily snapshots.
     """
 

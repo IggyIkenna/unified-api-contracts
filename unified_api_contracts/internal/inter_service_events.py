@@ -90,11 +90,11 @@ class MarginEventSeverity(StrEnum):
 class MarginEvent(EventEnvelope):
     """Emitted by position-balance-monitor whenever margin/HF crosses a threshold.
 
-    Single canonical producer: position-balance-monitor-service. Consumers:
+    Single canonical producer: strategy-service/position. Consumers:
     alerting-service (route by severity), strategy-service (kill-switch guard),
     execution-service (deleverage executor on critical/liquidation),
-    risk-and-exposure-service (time-series logging), pnl-attribution-service
-    (liquidation attribution).
+    strategy-service/risk (time-series logging),
+    strategy-service/pnl (liquidation attribution).
     """
 
     event_type: Literal["MarginEvent"] = "MarginEvent"
@@ -114,7 +114,7 @@ class LiquidationAlert(EventEnvelope):
     """Emitted when an actual liquidation event occurred (post-fact).
 
     Distinct from ``MarginEvent`` (forward-looking warning). Consumed by
-    pnl-attribution-service for liquidation P&L attribution and by
+    strategy-service/pnl for liquidation P&L attribution and by
     alerting-service for incident routing.
     """
 
@@ -208,7 +208,7 @@ class PriceSnapshot(EventEnvelope):
 
 
 class RiskEvent(EventEnvelope):
-    """Risk threshold breach. Emitted by risk-and-exposure-service."""
+    """Risk threshold breach. Emitted by strategy-service/risk."""
 
     event_type: Literal["RiskEvent"] = "RiskEvent"
     alert_type: AlertType
@@ -274,7 +274,7 @@ class PnLPoint(EventEnvelope):
 
 
 class PnLAttributionPublished(EventEnvelope):
-    """Daily attribution decomposition. Emitted by pnl-attribution-service."""
+    """Daily attribution decomposition. Emitted by strategy-service/pnl."""
 
     event_type: Literal["PnLAttributionPublished"] = "PnLAttributionPublished"
     record: PnLAttributionRecord

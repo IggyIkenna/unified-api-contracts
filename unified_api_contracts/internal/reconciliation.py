@@ -1,6 +1,6 @@
 """Reconciliation resolution schemas — cross-service contract.
 
-Used by position-balance-monitor-service and batch-live-reconciliation-service
+Used by strategy-service/position and batch-live-reconciliation-service
 to persist break resolutions and by the UI reporting API to submit operator
 decisions.
 

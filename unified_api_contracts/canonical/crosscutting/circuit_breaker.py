@@ -2,7 +2,7 @@
 
 Phase 1.A of ``disaster_recovery_circuit_breakers_2026_05_10.md``
 (``unified-trading-pm/plans/active/``). Defines the canonical breaker
-taxonomy that the risk-and-exposure-service, execution-service, and
+taxonomy that the strategy-service/risk, execution-service, and
 alerting-service all consume.
 
 Five orthogonal axes per breaker:
@@ -321,7 +321,7 @@ class BreakerTrigger(BaseModel):
 
     Captures the numeric threshold (value + unit) plus optional time-window
     semantics (consecutive-count + window-seconds). Concrete trigger semantics
-    are implementation-side (risk-and-exposure-service consumes these and
+    are implementation-side (strategy-service/risk consumes these and
     evaluates against live metrics).
 
     § 7 SSOT reconciliation

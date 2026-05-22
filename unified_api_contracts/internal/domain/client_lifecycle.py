@@ -108,7 +108,7 @@ class ClientRiskPreferences:
     """Per-client risk profile + constraints.
 
     Drives per-archetype position limits + leverage caps via
-    ``risk-and-exposure-service`` integration. Per ``risk_simulations_limits_alerting_2026_05_10.md``
+    ``strategy-service/risk`` integration. Per ``risk_simulations_limits_alerting_2026_05_10.md``
     Phase 2.
     """
 

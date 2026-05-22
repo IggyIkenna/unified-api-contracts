@@ -6,7 +6,7 @@ and requesting auto-deleverage operations.
 
 Used by:
 - execution-service (checks recon health before exit playbook)
-- position-balance-monitor-service (detects dual failure, marks stale recon)
+- strategy-service/position (detects dual failure, marks stale recon)
 - unified-trading-system-ui Observe tab (recovery controls dashboard)
 """
 

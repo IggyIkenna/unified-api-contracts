@@ -331,7 +331,7 @@ class ManualInstructionAuditLog(BaseModel):
 
     Single audit-log surface for both `ManualInstruction` submissions and
     `MLTrainingControlRequest` submissions. Consumed by:
-    - `pnl-attribution-service` — rolls up manual fills by strategy_id alongside automated fills.
+    - `strategy-service/pnl` — rolls up manual fills by strategy_id alongside automated fills.
     - `batch-live-reconciliation-service` — isolates execution alpha by comparing manual vs simulated fills.
     - `alerting-service` — emits strategy_id per fired alert when manual action triggers a threshold.
 

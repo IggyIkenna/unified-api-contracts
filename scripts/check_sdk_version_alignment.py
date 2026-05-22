@@ -47,15 +47,15 @@ INTERFACES: list[tuple[str, Path]] = [
     ("market-tick-data-handler", Path("../market-tick-data-handler")),
     ("instruments-service", Path("../instruments-service")),
     ("execution-services", Path("../execution-services")),
-    ("pnl-attribution-service", Path("../pnl-attribution-service")),
+    # pnl-attribution-service archived — consolidated into strategy-service/pnl
     ("ml-inference-service", Path("../ml-inference-service")),
     ("ml-training-service", Path("../ml-training-service")),
     ("features-volatility-service", Path("../features-volatility-service")),
     ("features-onchain-service", Path("../features-onchain-service")),
-    ("position-balance-monitor-service", Path("../position-balance-monitor-service")),
+    # position-balance-monitor-service archived — consolidated into strategy-service/position
     ("features-calendar-service", Path("../features-calendar-service")),
     ("features-delta-one-service", Path("../features-delta-one-service")),
-    ("risk-and-exposure-service", Path("../risk-and-exposure-service")),
+    # risk-and-exposure-service archived — consolidated into strategy-service/risk
     ("strategy-service", Path("../strategy-service")),
     ("alerting-service", Path("../alerting-service")),
     ("market-data-processing-service", Path("../market-data-processing-service")),

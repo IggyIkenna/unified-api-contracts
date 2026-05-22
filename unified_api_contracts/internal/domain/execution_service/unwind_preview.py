@@ -11,7 +11,7 @@ Live-mode only — these operations make no sense in batch/backtest.
 Used by:
 - execution-service ``/preview/unwind`` endpoint (produces responses)
 - unified-trading-system-ui intervention controls (consumes responses)
-- position-balance-monitor-service reconciliation page (consumes responses)
+- strategy-service/position reconciliation page (consumes responses)
 """
 
 from __future__ import annotations

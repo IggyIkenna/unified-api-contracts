@@ -18,7 +18,7 @@ Per-wallet provisioning surface (added 2026-05-12 slot 4 per
   touching strategy code (per ``custody-providers.md`` § 1 factory pattern).
 - :class:`WalletKind` — TREASURY / HOT_TRADING / GAS_RESERVE / FLASH_LOAN_RECEIVER.
 - :class:`SpendingCaps` — per-wallet per-tx + per-hour + per-day caps,
-  consumed by ``risk-and-exposure-service`` pre-flight check + wallet-tier
+  consumed by ``strategy-service/risk`` pre-flight check + wallet-tier
   kill-switch hook.
 - :class:`WalletProvisioningConfig` — the per-wallet operational envelope
   (chain + protocol allowlist + signing surface + spending caps +

@@ -17,8 +17,8 @@ diagram + cross-product table in that plan body is the canonical reconciliation
 between ``RiskRuleConsequence`` and the 5 canonical SSOTs:
 
 * **Risk-gates 4 layers** — ``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md``.
-  ``RiskRuleConsequence`` evaluates at Layer 2 (risk-and-exposure-service
-  pre-flight); ``ErrorAction`` taxonomy classifies Layer 4 (venue-side) errors.
+  ``RiskRuleConsequence`` evaluates at Layer 2 (strategy-service/risk pre-flight);
+  ``ErrorAction`` taxonomy classifies Layer 4 (venue-side) errors.
   They don't overlap.
 * **8-event lifecycle SSOT** — every fire emits ``RiskRuleFiredEvent`` plus
   the corresponding instruction-lifecycle event (BLOCK → ``INSTRUCTION_REJECTED_RISK``;
@@ -560,7 +560,7 @@ class RiskRuleFiredEvent(BaseModel):
       the seam-diagram orthogonality declarations.
 
     Producers: ``risk/preflight.py`` (UTL Phase 3.B) builds one per fired rule
-    from ``risk_preflight()``; risk-and-exposure-service / execution-service /
+    from ``risk_preflight()``; strategy-service/risk / execution-service /
     strategy-service emit them on their pre-flight call sites (risk plan Phase
     4). Use :func:`risk_rule_fired_event` to construct one from a ``RiskRule``.
     """
@@ -692,7 +692,7 @@ def risk_rule_fired_event(
     seam-diagram orthogonality). Callers supply ``fired_at`` (UTC) +
     optional ``instruction_id`` / ``trigger_detail`` / ``metadata``.
 
-    This is the SSOT constructor — risk-and-exposure-service, execution-service
+    This is the SSOT constructor — strategy-service/risk, execution-service
     and ``risk/preflight.py`` (UTL) all build the event through here so the
     ``consequence → alert_code`` and kill-switch derivations stay single-source.
     """

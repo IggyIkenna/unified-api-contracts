@@ -118,10 +118,7 @@ def test_seed_contains_execution_fill_confirmation_block_critical() -> None:
 
 
 def test_seed_contains_position_balance_monitor_portfolio_state_block_critical() -> None:
-    assert (
-        SERVICE_OUTPUT_POLICIES[("position-balance-monitor-service", "portfolio_state")]
-        is ServiceEmissionPolicy.BLOCK_CRITICAL
-    )
+    assert SERVICE_OUTPUT_POLICIES[("strategy-service", "portfolio_state")] is ServiceEmissionPolicy.BLOCK_CRITICAL
 
 
 def test_seed_contains_instruments_catalog_snapshot_partial_ok() -> None:

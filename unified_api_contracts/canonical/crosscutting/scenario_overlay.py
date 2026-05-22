@@ -3,7 +3,7 @@
 Phase 1.A-1.D of `simulation_scenarios_topology_price_shocks_2026_05_09.md`
 (`unified-trading-pm/plans/active/`). Defines the canonical scenario taxonomy
 that UTL `scenario/{applier,checker,runner}.py` consumes + that
-risk-and-exposure-service + execution-service + alerting-service all observe
+strategy-service/risk + execution-service + alerting-service all observe
 when scenarios fire `synthetic=true` events.
 
 Five orthogonal axes per scenario:
