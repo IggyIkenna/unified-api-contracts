@@ -304,7 +304,7 @@ class StrategyInstruction:
     )
 
     # Client and account routing
-    client_id: str = field(default="", metadata={"description": "Client identifier for routing."})
+    client_id: str | None = field(default=None, metadata={"description": "Client identifier for routing."})
     account_id: str | None = field(default=None, metadata={"description": "Account key (client:venue:label)."})
 
     # Operational mode — determines execution pathway (live/paper/backtest/manual)

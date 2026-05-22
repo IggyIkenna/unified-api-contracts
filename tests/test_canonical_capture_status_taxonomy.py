@@ -43,17 +43,19 @@ def test_every_enum_member_is_a_nonempty_string() -> None:
 def test_expected_prefix_members_carry_expected_prefix() -> None:
     """All EXPECTED_* members start with EXPECTED_EMPTY_REASON_PREFIX.
 
-    SOURCE_RETURNED_ZERO is the only valid non-prefixed member. Any other non-prefixed
-    member is a taxonomy violation (calendar pre-skips must be distinguishable from
-    fetch-returned-empty by downstream consumers).
+    Non-prefixed members are a closed set:
+    - SOURCE_RETURNED_ZERO: source returned zero rows (not a calendar skip)
+    - NO_INPUT_AVAILABLE: upstream input had attempted_failed status
+    - LEG_ABSENT_LEFT / LEG_ABSENT_RIGHT: cross-instrument paired calc leg absent
+      (writegate_honest_coverage_endtoend_2026_05_06.md Phase 2.E.3)
     """
-    allowed_non_prefixed = {"SOURCE_RETURNED_ZERO"}
+    allowed_non_prefixed = {"SOURCE_RETURNED_ZERO", "NO_INPUT_AVAILABLE", "LEG_ABSENT_LEFT", "LEG_ABSENT_RIGHT"}
     non_prefixed = {e.value for e in EmptyConfirmedReason if not e.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)}
     unexpected_non_prefixed = non_prefixed - allowed_non_prefixed
     assert not unexpected_non_prefixed, (
-        f"Non-EXPECTED_ reasons beyond SOURCE_RETURNED_ZERO detected: {unexpected_non_prefixed}. "
+        f"Non-EXPECTED_ reasons beyond the allowed set detected: {unexpected_non_prefixed}. "
         f"Calendar/schedule-driven reasons MUST start with '{EXPECTED_EMPTY_REASON_PREFIX}' so "
-        f"downstream consumers can distinguish them from SOURCE_RETURNED_ZERO."
+        f"downstream consumers can distinguish them from non-calendar empty reasons."
     )
 
 
