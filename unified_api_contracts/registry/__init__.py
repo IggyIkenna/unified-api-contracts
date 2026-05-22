@@ -183,33 +183,16 @@ from .instruction_constraints import (
 )
 from .market_data_categories import (
     ALL_DATA_TYPES,
-    ALL_VENUES,
-    BASE_GRANULARITY_BY_DATA_TYPE,
     DATA_TYPES_BY_ASSET_GROUP,
-    FEATURE_GROUP_DATA_TYPE_OVERRIDES,
-    FEATURE_GROUP_DATA_TYPES,
-    NEEDS_CANDLE_PROCESSING,
-    TIMEFRAME_SECONDS,
     TIMEFRAMES,
     TRADFI_TICK_DATA_WINDOWS,
-    VENUE_DATA_TYPE_CAPABILITIES,
     VENUE_DATA_TYPE_COVERAGE_WINDOWS,
-    VENUE_REFERENCE_DATA_CAPABILITIES,
     VENUE_TO_ASSET_GROUP,
     VENUES_BY_ASSET_GROUP,
     get_coverage_windows,
-    get_expected_data_types_for_venue,
-    get_expected_instruments_for_venue,
-    get_valid_data_types_for_venue,
-    get_valid_timeframes_for_data_type,
-    get_venue_data_type_start_date,
     is_in_coverage_window,
     is_in_tradfi_tick_window,
-    is_per_instrument_shard_data_type,
     is_tradfi_futures_instrument_active,
-    needs_candle_processing,
-    resolve_data_type_for_feature_group,
-    validate_data_type_for_venue,
 )
 from .max_underlying_moves import (
     MAX_UNDERLYING_MOVES,
@@ -220,8 +203,6 @@ from .max_underlying_moves import (
 )
 from .processed_data_dependencies import (
     PROCESSED_REQUIRES_RAW,
-    get_raw_source_data_types,
-    is_processed_data_type,
 )
 from .representative_sample import (
     CEFI_BASE_ASSETS,
@@ -236,7 +217,6 @@ from .representative_sample import (
     TRADFI_FUTURES,
 )
 from .reward_schedules import REWARD_SCHEDULES, RewardScheduleEntry
-from .session_times import SessionTimes, get_session_times, is_trading_hours
 from .sports_venue_coordinates import (
     VENUE_COORDINATES,
     VenueCoordinates,
@@ -259,16 +239,6 @@ from .token_wrapping import (
 )
 from .tradfi_instrument_universe import (
     FX_SPOT_PAIRS,
-    MVP_CME_EXCHANGE_CODES,
-    TRADFI_DATABENTO_INSTRUMENTS,
-    YAHOO_INDICES,
-    DatabentoInstrumentDef,
-    FxSpotPairDef,
-    YahooIndexDef,
-    get_databento_symbols_for_dataset,
-    get_databento_symbols_for_venue,
-    get_mvp_databento_symbols_for_venue,
-    get_required_datasets,
 )
 from .tradfi_symbology import (
     DATABENTO_VALID_OPTIONS_SYMBOLS,

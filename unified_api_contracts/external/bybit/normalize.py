@@ -98,15 +98,15 @@ def normalize_bybit_ticker(
     ts = datetime.now(UTC)
     t_ts = raw.info.get("ts") if raw.info else None
     if isinstance(t_ts, (int, float)):
-        ts = _helpers._ts_ms_to_datetime(int(t_ts))
+        ts = _helpers.ts_ms_to_datetime(int(t_ts))
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=_helpers._to_decimal(raw.lastPrice) or Decimal("0"),
-        bid_price=_helpers._to_decimal(raw.bid1Price),
-        ask_price=_helpers._to_decimal(raw.ask1Price),
-        volume_24h=_helpers._to_decimal(raw.volume24h),
+        last_price=_helpers.to_decimal(raw.lastPrice) or Decimal("0"),
+        bid_price=_helpers.to_decimal(raw.bid1Price),
+        ask_price=_helpers.to_decimal(raw.ask1Price),
+        volume_24h=_helpers.to_decimal(raw.volume24h),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,
@@ -126,8 +126,8 @@ def normalize_bybit_orderbook(
     """Convert BybitOrderBook to CanonicalOrderBook."""
     ts = datetime.fromtimestamp(raw.ts / 1000.0, tz=UTC) if raw.ts is not None else datetime.now(UTC)
     sym = symbol or (raw.s or "")
-    bids = _helpers._to_levels(raw.b)
-    asks = _helpers._to_levels(raw.a)
+    bids = _helpers.to_levels(raw.b)
+    asks = _helpers.to_levels(raw.a)
     return CanonicalOrderBook(
         venue=venue,
         symbol=sym,
@@ -192,7 +192,7 @@ def normalize_bybit_order(raw: BybitOrder, venue: str = "bybit") -> CanonicalOrd
 
 
 def normalize_bybit_fill(raw: BybitExecutionWS, venue: str = "bybit") -> CanonicalFill:
-    ts = _helpers._ts_ms_to_datetime(raw.execTime)
+    ts = _helpers.ts_ms_to_datetime(raw.execTime)
     symbol = raw.symbol or ""
     return CanonicalFill(
         fill_id=str(raw.execId),
@@ -223,7 +223,7 @@ def normalize_bybit_derivative_ticker(
     """Normalize Bybit ticker (+ optional funding history) to CanonicalDerivativeTicker."""
     symbol = raw.symbol or ""
     ik = instrument_key or f"{venue}:PERPETUAL:{symbol}"
-    last_price = _helpers._to_decimal(raw.lastPrice)
+    last_price = _helpers.to_decimal(raw.lastPrice)
     info: dict[str, object] = raw.info or {}
 
     def _ms_to_utc(ts_ms: object | None) -> datetime | None:
@@ -237,19 +237,17 @@ def normalize_bybit_derivative_ticker(
         except (ValueError, TypeError, OSError):
             return None
 
-    mark_price = _helpers._to_decimal(str(info.get("markPrice")) if info.get("markPrice") is not None else None)
-    index_price = _helpers._to_decimal(str(info.get("indexPrice")) if info.get("indexPrice") is not None else None)
-    funding_rate_val = _helpers._to_decimal(
+    mark_price = _helpers.to_decimal(str(info.get("markPrice")) if info.get("markPrice") is not None else None)
+    index_price = _helpers.to_decimal(str(info.get("indexPrice")) if info.get("indexPrice") is not None else None)
+    funding_rate_val = _helpers.to_decimal(
         str(info.get("fundingRate")) if info.get("fundingRate") is not None else None
     )
     next_funding_ts = _ms_to_utc(str(info["nextFundingTime"]) if info.get("nextFundingTime") else None)
-    open_interest = _helpers._to_decimal(
-        str(info.get("openInterest")) if info.get("openInterest") is not None else None
-    )
-    open_interest_value = _helpers._to_decimal(
+    open_interest = _helpers.to_decimal(str(info.get("openInterest")) if info.get("openInterest") is not None else None)
+    open_interest_value = _helpers.to_decimal(
         str(info.get("openInterestValue")) if info.get("openInterestValue") is not None else None
     )
-    predicted_funding = _helpers._to_decimal(
+    predicted_funding = _helpers.to_decimal(
         str(info.get("predictedFundingRate")) if info.get("predictedFundingRate") is not None else None
     )
 
@@ -261,7 +259,7 @@ def normalize_bybit_derivative_ticker(
     funding_timestamp: datetime | None = None
     if funding is not None:
         if funding.fundingRate is not None:
-            funding_rate_val = _helpers._to_decimal(funding.fundingRate)
+            funding_rate_val = _helpers.to_decimal(funding.fundingRate)
         if funding.fundingRateTimestamp is not None:
             funding_timestamp = _ms_to_utc(funding.fundingRateTimestamp)
 
@@ -289,16 +287,16 @@ def normalize_bybit_derivative_ticker(
 def normalize_bybit_kline(raw: BybitKline, symbol: str, venue: str = "bybit") -> CanonicalOhlcvBar:
     """Convert BybitKline to CanonicalOhlcvBar."""
     ts = datetime.fromtimestamp(int(raw.startTime) / 1000.0, tz=UTC)
-    quote_vol = _helpers._d(raw.turnover) if raw.turnover is not None else None
+    quote_vol = _helpers.d(raw.turnover) if raw.turnover is not None else None
     return CanonicalOhlcvBar(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_helpers._d(raw.openPrice),
-        high=_helpers._d(raw.highPrice),
-        low=_helpers._d(raw.lowPrice),
-        close=_helpers._d(raw.closePrice),
-        volume=_helpers._d(raw.volume),
+        open=_helpers.d(raw.openPrice),
+        high=_helpers.d(raw.highPrice),
+        low=_helpers.d(raw.lowPrice),
+        close=_helpers.d(raw.closePrice),
+        volume=_helpers.d(raw.volume),
         quote_volume=quote_vol,
         count=None,
         vwap=None,

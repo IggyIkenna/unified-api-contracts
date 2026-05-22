@@ -165,6 +165,8 @@ class TestPerpetual:
             InstrumentType.PERPETUAL,
             available_from=_utc(2020, 1, 1),
             available_to=None,
+            base_asset="BTC",
+            quote_asset="USDT",
         )
         # Well after listing
         out = get_instruments_available_on(_dt.date(2030, 12, 31), [record])
