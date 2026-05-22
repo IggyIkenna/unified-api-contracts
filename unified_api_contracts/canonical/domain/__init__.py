@@ -111,12 +111,14 @@ from .features import (
 )
 from .infrastructure import (
     CanonicalComputeService,
-    CanonicalPullRequest,
-    CanonicalRepository,
-    CanonicalWorkflowRun,
     CloudProvider,
     ComputeTarget,
     ScalingMode,
+)
+from .infrastructure.ci import (
+    CanonicalPullRequest,
+    CanonicalRepository,
+    CanonicalWorkflowRun,
     SourceControlProvider,
 )
 from .infrastructure.compute import ComputeType, VmQuotaShape

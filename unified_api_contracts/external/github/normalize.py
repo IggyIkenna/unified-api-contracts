@@ -7,7 +7,7 @@ across quickmerge, CI monitoring, VCR, deployment-api.
 
 from __future__ import annotations
 
-from ...canonical.domain.infrastructure import (
+from ...canonical.domain.infrastructure.ci import (
     CanonicalPullRequest,
     CanonicalRepository,
     CanonicalWorkflowRun,
