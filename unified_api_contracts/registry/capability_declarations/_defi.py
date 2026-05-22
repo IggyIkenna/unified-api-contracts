@@ -243,12 +243,12 @@ class _ProtocolCapability:
 
 
 # Instrument type shorthands
-_LENDING = [_IT.LENDING]
-_POOL = [_IT.POOL]
-_YIELD = [_IT.YIELD_BEARING]
-_STAKING = [_IT.STAKING]
-_PERPS = [_IT.PERPETUAL, _IT.SPOT_PAIR]
-_RESTAKING = [_IT.SPOT_ASSET]
+_LENDING = [_IT.LENDING.value]
+_POOL = [_IT.POOL.value]
+_YIELD = [_IT.YIELD_BEARING.value]
+_STAKING = [_IT.STAKING.value]
+_PERPS = [_IT.PERPETUAL.value, _IT.SPOT_PAIR.value]
+_RESTAKING = [_IT.SPOT_ASSET.value]
 
 # Data type groups
 #
