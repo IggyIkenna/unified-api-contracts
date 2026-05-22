@@ -49,7 +49,9 @@ def _load_team_mapping() -> pd.DataFrame:
         return _team_mapping_df
 
     bucket = _get_mapping_bucket()
-    path = f"gs://{bucket}/sports_reference/mappings/team_mapping.parquet"  # gs-uri: URI composer, bucket already resolved
+    path = (
+        f"gs://{bucket}/sports_reference/mappings/team_mapping.parquet"  # gs-uri: URI composer, bucket already resolved
+    )
     try:
         _team_mapping_df = pd.read_parquet(path)
         logger.info("Team mapping loaded: %d rows from %s", len(_team_mapping_df), path)
@@ -66,7 +68,8 @@ def _load_fixture_mapping() -> pd.DataFrame:
         return _fixture_mapping_df
 
     bucket = _get_mapping_bucket()
-    path = f"gs://{bucket}/sports_reference/mappings/fixture_mapping.parquet"  # gs-uri: URI composer, bucket already resolved
+    # gs-uri: URI composer, bucket already resolved
+    path = f"gs://{bucket}/sports_reference/mappings/fixture_mapping.parquet"
     try:
         _fixture_mapping_df = pd.read_parquet(path)
         logger.info("Fixture mapping loaded: %d rows from %s", len(_fixture_mapping_df), path)
@@ -83,7 +86,8 @@ def _load_league_mapping() -> pd.DataFrame:
         return _league_mapping_df
 
     bucket = _get_mapping_bucket()
-    path = f"gs://{bucket}/sports_reference/mappings/league_mapping.parquet"  # gs-uri: URI composer, bucket already resolved
+    # gs-uri: URI composer, bucket already resolved
+    path = f"gs://{bucket}/sports_reference/mappings/league_mapping.parquet"
     try:
         _league_mapping_df = pd.read_parquet(path)
         logger.info("League mapping loaded: %d rows from %s", len(_league_mapping_df), path)
