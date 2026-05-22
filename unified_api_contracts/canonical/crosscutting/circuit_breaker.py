@@ -240,6 +240,8 @@ class BreakerScope(StrEnum):
     PER_ASSET_GROUP = "PER_ASSET_GROUP"
     PER_STABLE = "PER_STABLE"
     """Per-stablecoin scope — ``applies_to`` is the stable symbol (e.g. ``"USDC"``)."""
+    PER_LST = "PER_LST"
+    """Per-LST scope — ``applies_to`` is the LST symbol (e.g. ``"stETH"``)."""
     GLOBAL = "GLOBAL"
 
 

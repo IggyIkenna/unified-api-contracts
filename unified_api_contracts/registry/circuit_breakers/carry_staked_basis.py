@@ -39,7 +39,7 @@ _SYNTHETIC_STABLES: Final[tuple[str, ...]] = ("USDE", "CRVUSD", "FRAX")
 
 # ── LST depeg ladder helpers (D.2 — risk plan Phase D) ──────────────────────
 
-_LST_TOKENS: Final[tuple[str, ...]] = ("stETH", "wstETH", "rETH", "cbETH", "JitoSOL", "mSOL")
+_LST_SYMBOLS: Final[tuple[str, ...]] = ("stETH", "wstETH", "rETH", "cbETH", "JitoSOL", "mSOL")
 
 # (breaker_id, threshold_bps, action, severity, cooldown_seconds, recovery_mode_override)
 # 500bps = MODERATE/CANCEL_OPEN mirrors the defi_lst_depeg_steth_5pct scenario.
@@ -63,13 +63,13 @@ _LST_DEPEG_TIERS: Final[
 
 def _lst_depeg_configs() -> tuple[BreakerConfig, ...]:
     configs: list[BreakerConfig] = []
-    for token in _LST_TOKENS:
+    for lst in _LST_SYMBOLS:
         for breaker_id, threshold_bps, action, severity, cooldown, recovery_override in _LST_DEPEG_TIERS:
             configs.append(
                 BreakerConfig(
                     breaker_id=breaker_id,
-                    scope=BreakerScope.PER_STABLE,
-                    applies_to=token,
+                    scope=BreakerScope.PER_LST,
+                    applies_to=lst,
                     trigger=BreakerTrigger(
                         trigger_type=breaker_id,
                         threshold_value=Decimal(str(threshold_bps)),
@@ -79,7 +79,7 @@ def _lst_depeg_configs() -> tuple[BreakerConfig, ...]:
                     cooldown_seconds=cooldown,
                     recovery_mode=recovery_override,
                     alerting_severity=severity,
-                    description=f"{token} LST/ETH peg deviation >= {threshold_bps}bps.",
+                    description=f"{lst} LST/ETH peg deviation >= {threshold_bps}bps.",
                 )
             )
     return tuple(configs)
@@ -437,7 +437,7 @@ RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
     ),
     BreakerRecoveryRule(
         breaker_id=CircuitBreakerId.LST_DEPEG_CATASTROPHIC,
-        guard_description="Operator confirms LST peg recovered + carry positions crystallized.",
+        guard_description="Operator confirms LST/ETH peg restored + all leveraged positions crystallized.",
         retry_policy="none",
         auto_disarm_after_seconds=None,
     ),

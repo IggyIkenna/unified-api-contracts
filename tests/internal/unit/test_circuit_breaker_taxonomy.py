@@ -65,6 +65,7 @@ def test_breaker_scope_closed_set() -> None:
         "PER_ACCOUNT",
         "PER_ASSET_GROUP",
         "PER_STABLE",
+        "PER_LST",
         "GLOBAL",
     }
 
