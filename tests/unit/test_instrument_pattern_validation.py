@@ -150,6 +150,9 @@ class TestVenueNameValidation:
             "LIDO",
             "UNISWAPV3",
             "HYPERLIQUID",
+            "DERIBIT",
+            "BYBIT",
+            "OKX",
         }
         actual_protocols = set(PROTOCOL_TOKEN_PREFERENCE.keys())
         assert actual_protocols == expected_protocols, (

@@ -71,6 +71,36 @@ PROTOCOL_TOKEN_PREFERENCE: dict[str, dict[str, str]] = {
     "LIDO": {"ETH": "ETH"},
     "UNISWAPV3": {"ETH": "WETH"},
     "HYPERLIQUID": {"USDC": "USDC"},
+    # CeFi perp venues — stETH/wstETH preferred form per venue_collateral.py matrix.
+    # DERIBIT: accepts stETH (PM/SM, 7.5% haircut); wstETH is not accepted.
+    # BYBIT: accepts both stETH and wstETH (UTA, 10% haircut each).
+    # OKX: accepts wstETH only (multi-currency-margin, 10% haircut); stETH not on discount list.
+    # These entries guard the execution-layer wrap preprocessor (F-28) and
+    # the strategy-layer _build_legs banned-combo check (F-11).
+    "DERIBIT": {
+        "stETH": "stETH",
+        "wstETH": "stETH",  # wstETH → must unwrap to stETH for Deribit; reject if not possible
+        "ETH": "ETH",
+        "BTC": "BTC",
+        "USDC": "USDC",
+    },
+    "BYBIT": {
+        "stETH": "stETH",
+        "wstETH": "wstETH",
+        "ETH": "ETH",
+        "BTC": "BTC",
+        "USDT": "USDT",
+        "USDC": "USDC",
+        "USDe": "USDe",
+    },
+    "OKX": {
+        "stETH": "wstETH",  # OKX requires non-rebasing wstETH; wrap stETH first
+        "wstETH": "wstETH",
+        "ETH": "ETH",
+        "BTC": "BTC",
+        "USDT": "USDT",
+        "USDC": "USDC",
+    },
 }
 
 
