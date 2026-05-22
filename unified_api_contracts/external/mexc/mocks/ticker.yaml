@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        User-Agent:
+          - python-httpx/0.27.0
+      method: GET
+      uri: https://api.mexc.com/api/v3/ticker/24hr?symbol=BTCUSDT
+    response:
+      body:
+        string: '{"symbol":"BTCUSDT","priceChange":"1250.00","priceChangePercent":"3.05","prevClosePrice":"41000.00","lastPrice":"42250.00","bidPrice":"42248.00","bidQty":"0.5","askPrice":"42252.00","askQty":"1.2","openPrice":"41000.00","highPrice":"43100.00","lowPrice":"41000.00","volume":"1543.21","quoteVolume":"65043210.50","openTime":1705242600000,"closeTime":1705329000000,"count":185432}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

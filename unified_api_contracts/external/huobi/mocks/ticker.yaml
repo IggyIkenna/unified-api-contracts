@@ -1,0 +1,20 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        User-Agent:
+          - python-httpx/0.27.0
+      method: GET
+      uri: https://api.huobi.pro/market/detail/merged?symbol=btcusdt
+    response:
+      body:
+        string: '{"status":"ok","ch":"market.btcusdt.detail.merged","ts":1705329000000,"tick":{"id":1705329000,"version":1705329000,"open":41000.0,"close":42250.0,"low":41000.0,"high":43100.0,"amount":1543.21,"vol":65043210.5,"count":185432,"bid":[42248.0,0.5],"ask":[42252.0,1.2]}}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1
