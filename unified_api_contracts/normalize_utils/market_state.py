@@ -454,10 +454,6 @@ def normalize_betfair_market_state(
     )
 
 
-# Public aliases for state maps needed by external venue normalize.py files
-IBKR_STATE_MAP = _IBKR_STATE_MAP
-OKX_STATE_MAP = _OKX_STATE_MAP
-
 __all__ = [
     "IBKR_STATE_MAP",
     "OKX_STATE_MAP",
