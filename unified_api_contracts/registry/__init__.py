@@ -124,6 +124,9 @@ from .data_status_axis_matrix import (
     is_shard_axis,
 )
 from .defi_major_assets import (
+    DEFI_MAJOR_ASSET_ADDRESS_LIST,
+    DEFI_MAJOR_ASSET_ADDRESSES,
+    DEFI_MAJOR_ASSET_SYMBOLS,
     DEX_VENUE_KEYWORDS,
 )
 from .defi_protocol_registry import DEFI_PROTOCOLS, DEFI_VENUE_TO_PROTOCOL
@@ -543,6 +546,9 @@ __all__ = [
     "DEFI_INSTRUMENTS",
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
     "DEFI_LENDING_ASSETS",
+    "DEFI_MAJOR_ASSET_ADDRESSES",
+    "DEFI_MAJOR_ASSET_ADDRESS_LIST",
+    "DEFI_MAJOR_ASSET_SYMBOLS",
     "DEFI_POOL_PAIRS",
     "DEFI_PROTOCOLS",
     "DEFI_VENUE_TO_PROTOCOL",
