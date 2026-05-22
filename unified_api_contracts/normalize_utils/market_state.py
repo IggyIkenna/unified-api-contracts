@@ -228,6 +228,9 @@ _DERIBIT_STATE_MAP: dict[str, MarketState] = {
     "CREATED": MarketState.PRE_MARKET,
 }
 
+# Public alias to allow cross-module import without reportPrivateUsage
+DERIBIT_STATE_MAP = _DERIBIT_STATE_MAP
+
 
 def normalize_deribit_market_state(
     state: str,
