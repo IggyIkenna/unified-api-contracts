@@ -147,8 +147,9 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     "ODDS": "footystats",
     "STANDINGS": "footystats",
     "TEAMS": "footystats",
-    # Understat — xG model
+    # Understat — xG model + per-shot xG
     "XG": "understat",
+    "XG_SHOTS": "understat",
     # API-Football — per-fixture detail
     "FIXTURES": "api_football",
     "INJURIES": "api_football",

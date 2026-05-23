@@ -764,6 +764,7 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "PLAYER_STATS": None,
     # Enrichment entities — coverage varies by source
     "XG": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: 5 European leagues
+    "XG_SHOTS": _UNDERSTAT_LEAGUE_COVERAGE,  # Understat: per-shot xG, same leagues
     "MATCHES": None,  # FootyStats: all leagues
     "PREDICTIONS": None,  # FootyStats: all leagues
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider catalog
@@ -799,6 +800,8 @@ SPORTS_ENTITY_START_DATES: dict[str, str] = {
     "SFI_PROGRESSIVE_STATS": "2024-03-15",
     # Understat xG — backfilled from 2019-01-01
     "XG": "2019-01-01",
+    # Understat per-shot xG — same coverage window as XG
+    "XG_SHOTS": "2019-01-01",
     # FootyStats entities — backfilled from 2019-01-01
     "MATCHES": "2019-01-01",
     "PREDICTIONS": "2019-01-01",

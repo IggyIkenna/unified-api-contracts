@@ -50,6 +50,7 @@ SPORTS_DATA_TYPE_TO_FOLDER: dict[str, str] = {
     "PREDICTIONS": "footystats_predictions",
     # understat
     "XG": "understat_xg",
+    "XG_SHOTS": "understat_xg_shots",
     # transfermarkt — TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static
     # provider-catalog mapping, belongs in UAC TRANSFERMARKT_IDS not as
     # captured GCS data; orchestrator still calls adapter.get_leagues() at
@@ -118,6 +119,8 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider
     # catalog mappings live in UAC, not as captured GCS data.
     "SFI_PROGRESSIVE_STATS": SportsPathLayout.PER_DAY_PER_LEAGUE,
+    # Per-shot xG — per-league subpartition (one file per league per day)
+    "XG_SHOTS": SportsPathLayout.PER_DAY_PER_LEAGUE,
     # Bare path (single file per day — XG/WEATHER often un-partitioned)
     "XG": SportsPathLayout.PER_DAY_BARE,
     "WEATHER": SportsPathLayout.PER_DAY_BARE,
