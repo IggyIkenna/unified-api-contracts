@@ -311,6 +311,57 @@ SPORTS_XG = SchemaContract(
 )
 
 
+SPORTS_XG_SHOTS = SchemaContract(
+    asset_group="sports",
+    instrument_type="shot",
+    data_type="xg_shots",
+    columns=[
+        _stringy("shot_id", "Understat shot ID (string-coerced int).", nullable=False),
+        _stringy("match_id", "Understat match ID; populated when fetched from match endpoint."),
+        _stringy("fixture_id", "Canonical fixture_id (build_fixture_id output); populated via source-level lookup."),
+        _stringy("player_id", "Understat player ID (string-coerced int).", nullable=False),
+        _stringy("player_name", "Player name as returned by Understat.", nullable=False),
+        _i64("minute", "Match minute of the shot (0-120+)."),
+        _stringy("result", "Shot outcome: goal | saved | missed | blocked | post.", nullable=False),
+        _f64("xg", "Understat expected goals value for this shot (0.0-1.0)."),
+        _f64("xa", "Understat expected assists value (populated where available)."),
+        _f64("x", "Shot x-coordinate (0.0-1.0, Understat normalised pitch)."),
+        _f64("y", "Shot y-coordinate (0.0-1.0, Understat normalised pitch)."),
+        _stringy("situation", "Chance situation: open_play | set_piece | penalty | counter_attack."),
+        _stringy("shot_type", "Shot type: head | left_foot | right_foot | other."),
+        _stringy("home_or_away", "h (home team) or a (away team)."),
+        _stringy("last_action", "Last action before the shot (pass, cross, rebound, etc.)."),
+        _i64("home_goals", "Home team goals at time of shot (from source where available)."),
+        _i64("away_goals", "Away team goals at time of shot (from source where available)."),
+        _i64("period", "Match period: 1 (first half) or 2 (second half / extra time)."),
+        _stringy("source", "Provider slug: 'understat'.", nullable=False),
+        _DATA_AVAILABLE_AT,
+    ],
+    symbol_column="shot_id",
+    required_row_count_min=0,
+)
+"""Per-shot xG schema from Understat.
+
+Replaces the prior match-level feature_record approach
+(``normalize_understat_feature_record`` emitting one ``shot_xg`` value per shot).
+Each row is one shot with full context (coordinates, player, situation, shot_type,
+result) enabling per-shot feature engineering: position-on-pitch decomposition,
+set-piece vs open-play xG, shot quality by situation/type, player-level xG
+aggregation, etc.
+
+This schema is written by the instruments-service Understat XG_SHOTS write path
+(a new orchestrator pass, separate from the existing match-level XG pass which
+writes match aggregates). The existing SPORTS_XG contract for match-level xG
+aggregates (home_xg, away_xg) is NOT replaced — both coexist.
+
+Normalizer: ``unified_api_contracts.external.understat.normalize.normalize_understat_shot``.
+Source endpoint: ``GET /getMatch/{understat_match_id}`` (per-match shots fetch),
+called once per fixture identified from the ``/getLeagueData/{league}/{season}`` feed.
+
+Plan: ``plans/epics/sports_master.md`` § C.7 Follow-up #2.
+"""
+
+
 SPORTS_WEATHER = SchemaContract(
     asset_group="sports",
     instrument_type="match",
@@ -568,6 +619,7 @@ SPORTS_FIXTURE_FEATURES = SchemaContract(
 CONTRACT_REGISTRY[("sports", "match", "matches")] = SPORTS_MATCHES
 CONTRACT_REGISTRY[("sports", "match", "predictions")] = SPORTS_PREDICTIONS
 CONTRACT_REGISTRY[("sports", "match", "xg")] = SPORTS_XG
+CONTRACT_REGISTRY[("sports", "shot", "xg_shots")] = SPORTS_XG_SHOTS
 CONTRACT_REGISTRY[("sports", "match", "weather")] = SPORTS_WEATHER
 CONTRACT_REGISTRY[("sports", "feature", "fixture_features")] = SPORTS_FIXTURE_FEATURES
 
@@ -578,4 +630,5 @@ __all__ = [
     "SPORTS_PREDICTIONS",
     "SPORTS_WEATHER",
     "SPORTS_XG",
+    "SPORTS_XG_SHOTS",
 ]
