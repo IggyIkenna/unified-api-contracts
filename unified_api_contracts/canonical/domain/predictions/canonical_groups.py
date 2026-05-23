@@ -44,12 +44,17 @@ class CanonicalQuestionGroup(StrEnum):
     """
 
     # Cadenced range-bracket markets — BTC / ETH / SPX up-or-down at the
-    # close of a 5m/15m interval / hour / day.
-    # INTRADAY → ~288 markets/day (5m cadence); HOURLY → ~24; DAILY → 1.
-    BTC_UP_DOWN_INTRADAY = "BTC_UP_DOWN_INTRADAY"  # 5m / 15m slug patterns
+    # close of a 1m/5m/15m interval / hour / day.
+    # INTRADAY is a fallback for unknown-interval intraday slugs.
+    # HOURLY → ~24/day; DAILY → 1/day; 5MIN → 288/day; 15MIN → 96/day.
+    BTC_UP_DOWN_5MIN = "BTC_UP_DOWN_5MIN"
+    BTC_UP_DOWN_15MIN = "BTC_UP_DOWN_15MIN"
+    BTC_UP_DOWN_INTRADAY = "BTC_UP_DOWN_INTRADAY"  # fallback for unknown-interval intraday
     BTC_UP_DOWN_HOURLY = "BTC_UP_DOWN_HOURLY"
     BTC_UP_DOWN_DAILY = "BTC_UP_DOWN_DAILY"
-    ETH_UP_DOWN_INTRADAY = "ETH_UP_DOWN_INTRADAY"  # 5m / 15m slug patterns
+    ETH_UP_DOWN_5MIN = "ETH_UP_DOWN_5MIN"
+    ETH_UP_DOWN_15MIN = "ETH_UP_DOWN_15MIN"
+    ETH_UP_DOWN_INTRADAY = "ETH_UP_DOWN_INTRADAY"  # fallback for unknown-interval intraday
     ETH_UP_DOWN_HOURLY = "ETH_UP_DOWN_HOURLY"
     ETH_UP_DOWN_DAILY = "ETH_UP_DOWN_DAILY"
     SPX_UP_DOWN_DAILY = "SPX_UP_DOWN_DAILY"
@@ -81,7 +86,7 @@ class CanonicalQuestionGroup(StrEnum):
     OTHER = "OTHER"
 
 
-_Cadence = Literal["intraday", "hourly", "daily", "weekly", "monthly", "irregular", "single"]
+_Cadence = Literal["1min", "5min", "15min", "intraday", "hourly", "daily", "weekly", "monthly", "irregular", "single"]
 _ResolutionBasis = Literal["price_threshold", "binary_outcome", "multi_outcome"]
 
 
@@ -118,10 +123,24 @@ _WEEK = timedelta(weeks=1)
 
 
 CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetadata]] = {
+    CanonicalQuestionGroup.BTC_UP_DOWN_5MIN: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.BTC_UP_DOWN_5MIN,
+        cadence="5min",
+        expected_market_ids_per_day=288,
+        resolution_basis="price_threshold",
+        settlement_lag=2 * _HOUR,
+    ),
+    CanonicalQuestionGroup.BTC_UP_DOWN_15MIN: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.BTC_UP_DOWN_15MIN,
+        cadence="15min",
+        expected_market_ids_per_day=96,
+        resolution_basis="price_threshold",
+        settlement_lag=2 * _HOUR,
+    ),
     CanonicalQuestionGroup.BTC_UP_DOWN_INTRADAY: CanonicalGroupMetadata(
         group=CanonicalQuestionGroup.BTC_UP_DOWN_INTRADAY,
         cadence="intraday",
-        expected_market_ids_per_day=288,  # 5m cadence worst-case; lifecycle table overrides
+        expected_market_ids_per_day=288,  # fallback for unknown-interval; lifecycle table overrides
         resolution_basis="price_threshold",
         settlement_lag=2 * _HOUR,
     ),
@@ -139,10 +158,24 @@ CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetad
         resolution_basis="price_threshold",
         settlement_lag=2 * _HOUR,
     ),
+    CanonicalQuestionGroup.ETH_UP_DOWN_5MIN: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.ETH_UP_DOWN_5MIN,
+        cadence="5min",
+        expected_market_ids_per_day=288,
+        resolution_basis="price_threshold",
+        settlement_lag=2 * _HOUR,
+    ),
+    CanonicalQuestionGroup.ETH_UP_DOWN_15MIN: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.ETH_UP_DOWN_15MIN,
+        cadence="15min",
+        expected_market_ids_per_day=96,
+        resolution_basis="price_threshold",
+        settlement_lag=2 * _HOUR,
+    ),
     CanonicalQuestionGroup.ETH_UP_DOWN_INTRADAY: CanonicalGroupMetadata(
         group=CanonicalQuestionGroup.ETH_UP_DOWN_INTRADAY,
         cadence="intraday",
-        expected_market_ids_per_day=288,  # 5m cadence worst-case; lifecycle table overrides
+        expected_market_ids_per_day=288,  # fallback for unknown-interval; lifecycle table overrides
         resolution_basis="price_threshold",
         settlement_lag=2 * _HOUR,
     ),

@@ -98,6 +98,9 @@ class PredictionShardMarketType(StrEnum):
 class PredictionShardResolutionPeriod(StrEnum):
     """Resolution horizon."""
 
+    ONE_MIN = "1min"
+    FIVE_MIN = "5min"
+    FIFTEEN_MIN = "15min"
     INTRADAY = "intraday"
     HOURLY = "hourly"
     DAILY = "daily"
@@ -424,7 +427,7 @@ _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
 # so adding a new entry to ``SLUG_PREFIX_MAP`` (or any other table) flips the
 # hash automatically — no manual sync required.
 
-CLASSIFIER_VERSION = "2026-05-23.2"
+CLASSIFIER_VERSION = "2026-05-23.3"
 
 
 def _compute_classifier_stability_hash() -> str:
@@ -586,6 +589,12 @@ def _infer_resolution_period(
     if "hour" in combined or "hourly" in combined:
         return PredictionShardResolutionPeriod.HOURLY
     if "minute" in combined or "intraday" in combined:
+        if "15" in tokens and "minute" in combined:
+            return PredictionShardResolutionPeriod.FIFTEEN_MIN
+        if "5" in tokens and "minute" in combined:
+            return PredictionShardResolutionPeriod.FIVE_MIN
+        if "1" in tokens and "minute" in combined:
+            return PredictionShardResolutionPeriod.ONE_MIN
         return PredictionShardResolutionPeriod.INTRADAY
     # Direct tokens.
     if tokens & _WEEKLY_TOKENS:
