@@ -880,13 +880,18 @@ def lookup_contract(
 ) -> SchemaContract:
     """Return the canonical :class:`SchemaContract` for a shard key.
 
-    Resolution order:
+    Resolution order (each step falls through to the next on miss):
         1. ``VENUE_CONTRACT_OVERRIDES[(asset_group, venue.upper(), instrument_type, data_type)]``
            — only consulted when ``venue`` is supplied.
         2. ``CONTRACT_REGISTRY[(asset_group, instrument_type, data_type)]``.
+        3. Repeat steps 1-2 with ``instrument_type.lower()`` as a normalisation
+           fallback.  Raw tick parquets written by MTDS use uppercase
+           ``instrument_type`` (e.g. ``POOL``, ``DEX_POOL``); the registry uses
+           lowercase (e.g. ``pool``, ``dex_pool``).  The fallback ensures that
+           both cases resolve without requiring a schema-version migration.
 
     Raises:
-        SchemaContractNotFoundError: If neither lookup resolves. Callers are
+        SchemaContractNotFoundError: If no lookup resolves. Callers are
             expected to emit ``log_event("DEPLOYMENT_FAILED", ...)`` (or
             equivalent) and re-raise; G3 forbids silent fallback.
     """
@@ -897,6 +902,15 @@ def lookup_contract(
             return contract
     key = (asset_group, instrument_type, data_type)
     contract = CONTRACT_REGISTRY.get(key)
+    if contract is None:
+        # Lowercase normalisation fallback: raw parquets store uppercase
+        # instrument_type (POOL → pool, DEX_POOL → dex_pool).
+        norm_it = instrument_type.lower()
+        if norm_it != instrument_type:
+            if venue is not None:
+                contract = VENUE_CONTRACT_OVERRIDES.get((asset_group, venue.upper(), norm_it, data_type))
+            if contract is None:
+                contract = CONTRACT_REGISTRY.get((asset_group, norm_it, data_type))
     if contract is None:
         raise SchemaContractNotFoundError(
             asset_group=asset_group,
