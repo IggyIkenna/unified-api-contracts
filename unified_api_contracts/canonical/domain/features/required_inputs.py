@@ -101,7 +101,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     "defillama_tvl": [
         InputReq(
             asset_group="defi",
-            data_type="liquidity",
+            data_type="dex_pools",
             available_at_rule="tick_timestamp",
             source="defillama_api",
         ),
@@ -178,7 +178,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
         ),
         InputReq(
             asset_group="defi",
-            data_type="liquidity",
+            data_type="dex_pools",
             available_at_rule="tick_timestamp",
             source="defillama_api",
         ),
