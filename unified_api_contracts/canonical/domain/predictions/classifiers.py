@@ -152,7 +152,17 @@ def classify_polymarket_to_canonical_group(
 
     if market_type == PredictionShardMarketType.RANGE_BRACKET:
         cadence_key = (category, underlying.upper(), resolution_period)
-        return _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(cadence_key)
+        result = _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(cadence_key)
+        if result is not None:
+            return result
+        # Polymarket daily price markets encode their date as month+day in the
+        # slug (e.g. "btc-up-or-down-may-22"), causing the taxonomy to assign
+        # MONTHLY resolution.  Fall back to DAILY so those markets route to
+        # BTC_UP_DOWN_DAILY / SPX_UP_DOWN_DAILY / CRUDE_OIL_UP_DOWN_DAILY etc.
+        if resolution_period == PredictionShardResolutionPeriod.MONTHLY:
+            daily_key = (category, underlying.upper(), PredictionShardResolutionPeriod.DAILY)
+            return _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(daily_key)
+        return None
 
     event_key = (category, underlying.upper())
     return _CATEGORY_UNDERLYING_TO_EVENT_GROUP.get(event_key)

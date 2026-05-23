@@ -424,7 +424,7 @@ _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
 # so adding a new entry to ``SLUG_PREFIX_MAP`` (or any other table) flips the
 # hash automatically — no manual sync required.
 
-CLASSIFIER_VERSION = "2026-05-22.1"
+CLASSIFIER_VERSION = "2026-05-23.1"
 
 
 def _compute_classifier_stability_hash() -> str:
