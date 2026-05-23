@@ -599,6 +599,14 @@ from unified_api_contracts.internal.domain.strategy_service.trigger_subscription
     TriggerEventType,
     TriggerSubscription,
 )
+from unified_api_contracts.internal.domain.treasury import (
+    TreasuryNAVByClient,
+    TreasuryRollupResponse,
+    TreasurySource,
+    TreasurySourceBalance,
+    compute_nav_by_client,
+    compute_unified_nav,
+)
 from unified_api_contracts.internal.domain.websocket.lifecycle import (
     HealthPingResponse,
     UnsubscribeRequest,
@@ -1758,6 +1766,12 @@ __all__ = [
     "user_context_for_allocator",
     "validate_allocation_authorised",
     "validate_feature_columns_not_null",
+    "TreasuryNAVByClient",
+    "TreasuryRollupResponse",
+    "TreasurySource",
+    "TreasurySourceBalance",
+    "compute_nav_by_client",
+    "compute_unified_nav",
     "validate_instrument_records",
     "validate_unity_child_book",
 ]

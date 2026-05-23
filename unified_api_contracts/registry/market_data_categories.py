@@ -152,6 +152,7 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
+        "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
