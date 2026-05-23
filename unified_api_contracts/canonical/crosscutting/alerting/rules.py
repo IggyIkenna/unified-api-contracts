@@ -1057,6 +1057,72 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " Emitter: batch-live-reconciliation-service post stage3."
         ),
     ),
+    # ── Liquidation family (2026-05-23, drawdown_liquidation_policy Phase 4 P0.12) ──
+    AlertRule(
+        code=AlertCode.LIQUIDATION_RISK_IMMINENT,
+        event_pattern="LIQUIDATION_RISK_IMMINENT",
+        severity=AlertSeverity.CRITICAL,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM, AlertChannel.TWILIO_VOICE),
+        runbook_doc=_runbook("liquidation_risk_imminent"),
+        description=(
+            "Predictive liquidation risk — HF / collateral ratio approaching"
+            " liquidation threshold; estimated time-to-liquidation below threshold."
+            " SEV0: page + voice call. Operator evaluates position reduction"
+            " or collateral top-up."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.LIQUIDATION_EVENT_DETECTED,
+        event_pattern="LIQUIDATION_EVENT_DETECTED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("liquidation_event_detected"),
+        description=(
+            "Position liquidated by venue or protocol — post-event telemetry."
+            " SEV1: page + investigate. Triggers investigation report workflow."
+            " Distinct from LIQUIDATION_RISK_IMMINENT (predictive) and"
+            " DEFI_POSITION_LIQUIDATED (DeFi on-chain protocol-level event)."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.LIQUIDATION_INVESTIGATION_REPORT_WRITTEN,
+        event_pattern="LIQUIDATION_INVESTIGATION_REPORT_WRITTEN",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("liquidation_investigation_report_written"),
+        description=(
+            "Liquidation investigation report written to audit store — closes the"
+            " investigation loop for a LIQUIDATION_EVENT_DETECTED. Telegram-only;"
+            " operator reviews report in DART safety-ops tab."
+        ),
+    ),
+    # ── Dependency health (2026-05-23, connectivity_dependency_buffer_policy Phase 3 P0.7) ──
+    AlertRule(
+        code=AlertCode.DEPENDENCY_DEGRADED,
+        event_pattern="DEPENDENCY_DEGRADED",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("dependency_degraded"),
+        description=(
+            "Dependency outage exceeded expected_recovery_time + warning_buffer."
+            " Severity dynamically escalates per evaluate_dependency_health():"
+            " HIGH when expected+warning exceeded; CRITICAL when"
+            " hard_escalation_seconds breached or fallback_available=False."
+            " Payload includes dependency_id, dependency_class, outage_seconds."
+        ),
+    ),
+    AlertRule(
+        code=AlertCode.DEPENDENCY_RECOVERED,
+        event_pattern="DEPENDENCY_RECOVERED",
+        severity=AlertSeverity.INFO,
+        channels=(AlertChannel.TELEGRAM,),
+        runbook_doc=_runbook("dependency_recovered"),
+        description=(
+            "Dependency restored after outage — closes the loop on a previously-fired"
+            " DEPENDENCY_DEGRADED. Telegram-only; payload includes"
+            " dependency_id, outage_seconds, recovered_at."
+        ),
+    ),
     # ── T4 INFO — catch-all so nothing fires silently ──────────────────────
     AlertRule(
         code=AlertCode.SERVICE_DEGRADED,  # Catch-all uses SERVICE_DEGRADED as anchor code.

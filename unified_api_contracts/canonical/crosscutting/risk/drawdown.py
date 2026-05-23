@@ -111,7 +111,7 @@ class RiskThresholds(BaseModel):
     @model_validator(mode="after")
     def _all_kinds_declared(self) -> RiskThresholds:
         """Every DrawdownThresholdKind MUST appear as a key (value may be None)."""
-        missing = {k for k in DrawdownThresholdKind} - self.pnl_drawdown.keys()
+        missing = set(DrawdownThresholdKind) - self.pnl_drawdown.keys()
         if missing:
             raise ValueError(
                 f"RiskThresholds.pnl_drawdown must declare every DrawdownThresholdKind; "
@@ -144,8 +144,10 @@ class RiskThresholds(BaseModel):
             if val is None:
                 continue
             if prev_val is not None and val > prev_val:
+                prev_name = prev_kind.value if prev_kind else None
                 raise ValueError(
-                    f"RiskThresholds non-monotonic: {kind.value}={val} > {prev_kind.value if prev_kind else None}={prev_val}; "
+                    f"RiskThresholds non-monotonic: {kind.value}={val} > "
+                    f"{prev_name}={prev_val}; "
                     f"thresholds must be more-negative further down the ladder"
                 )
             prev_val, prev_kind = val, kind

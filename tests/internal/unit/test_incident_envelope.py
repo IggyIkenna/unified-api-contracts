@@ -78,7 +78,7 @@ def test_action_type_has_10_members() -> None:
 
 
 def test_signoff_verdict_has_4_members() -> None:
-    verdicts = {v for v in SignoffVerdict}
+    verdicts = set(SignoffVerdict)
     assert verdicts == {
         SignoffVerdict.APPROVED,
         SignoffVerdict.APPROVED_WITH_NOTES,
@@ -95,7 +95,7 @@ def test_action_status_includes_blocked_by_loop_detector() -> None:
 
 def test_action_provenance_5_set() -> None:
     """5-set: AUTOMATIC / MANUAL_OPERATOR / LLM_LAYER15 / GATEWAY_DISPUTE / BREAKER_AUTO."""
-    provs = {p for p in ActionProvenance}
+    provs = set(ActionProvenance)
     assert provs == {
         ActionProvenance.AUTOMATIC,
         ActionProvenance.MANUAL_OPERATOR,

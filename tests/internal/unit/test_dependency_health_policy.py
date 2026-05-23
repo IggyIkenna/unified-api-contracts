@@ -16,7 +16,7 @@ def test_dependency_class_has_5_members() -> None:
 
 
 def test_dependency_class_closed_set() -> None:
-    classes = {c for c in DependencyClass}
+    classes = set(DependencyClass)
     assert classes == {
         DependencyClass.EXECUTION_CRITICAL_EXTERNAL,
         DependencyClass.MARKET_DATA_CRITICAL_EXTERNAL,

@@ -219,8 +219,7 @@ _DEFI: dict[str, list[str]] = {
     # --- Lending protocols — evm_defi_handler uses "aave_v3".upper() = "AAVE_V3" ---
     # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVE_V3"
     # (no underscore) — both names needed until those handlers are normalised (Bug 2).
-    "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),  # hardcoded in flash_loan + position_data handlers
+    "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),  # used by evm_defi_handler + flash_loan + position_data handlers
     # Legacy VENUE-CHAIN format for lending (411k migrated rows, chain embedded in venue):
     "AAVE_V3-ARBITRUM": list(_DEFI_LENDING_AAVE_PAIRS),
     "AAVE_V3-AVALANCHE": list(_DEFI_LENDING_AAVE_PAIRS),

@@ -87,6 +87,10 @@ __all__ = [
     "BinaryEventTrigger",
     "CapitalAtRiskCeilingTrigger",
     "CounterpartyRatioCapTrigger",
+    # Drawdown + response-policy schemas (added 2026-05-23)
+    "DrawdownThresholdKind",
+    "ExpectedDrawdownModel",
+    "ExpectedDrawdownModelBasis",
     "FundingCostCeilingTrigger",
     "GasBudgetTrigger",
     "MaxConcentrationTrigger",
@@ -98,12 +102,14 @@ __all__ = [
     "MaxNetExposureTrigger",
     "MaxOITrigger",
     "MaxPositionSizeTrigger",
+    "ResponsePolicy",
     "RiskRule",
     "RiskRuleConsequence",
     "RiskRuleFiredEvent",
     "RiskRuleId",
     "RiskRuleScope",
     "RiskRuleTrigger",
+    "RiskThresholds",
     "SlippageBudgetTrigger",
     "StrategyFamily",
     "StrategyFamilyId",
@@ -113,6 +119,14 @@ __all__ = [
     "iter_applicable_rules",
     "risk_rule_fired_event",
 ]
+
+from .canonical.crosscutting.risk.drawdown import (
+    DrawdownThresholdKind,
+    ExpectedDrawdownModel,
+    ExpectedDrawdownModelBasis,
+    ResponsePolicy,
+    RiskThresholds,
+)
 
 # Re-export the per-axis registry aggregator at the risk facade.
 # Per-strategy drawdown + response-policy schemas (added 2026-05-23).

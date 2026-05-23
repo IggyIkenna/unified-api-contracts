@@ -80,6 +80,25 @@ class AlertCode(StrEnum):
     """Informational margin event from PBM canonical ladder — position within safe band
     but metric is being tracked. Severity INFO; log-only, no page."""
 
+    # ── Liquidation family (2026-05-23, drawdown_liquidation_policy Phase 4 P0.12) ──
+    LIQUIDATION_RISK_IMMINENT = "LIQUIDATION_RISK_IMMINENT"
+    """Predictive liquidation risk — collateral ratio / health factor approaching
+    liquidation threshold before the position is actually closed by the venue.
+    Severity CRITICAL (SEV0). Fires when estimated time-to-liquidation < threshold.
+    Payload: ``venue``, ``instrument``, ``health_factor``, ``liquidation_threshold``,
+    ``estimated_seconds_to_liquidation``."""
+    LIQUIDATION_EVENT_DETECTED = "LIQUIDATION_EVENT_DETECTED"
+    """Position was liquidated by venue or protocol — post-event telemetry +
+    investigation trigger. Severity HIGH (SEV1). Fires once per liquidation event.
+    Distinct from ``DEFI_POSITION_LIQUIDATED`` (DeFi on-chain protocol event) —
+    this is the cross-venue investigation trigger.
+    Payload: ``venue``, ``instrument``, ``position_size_usd``, ``realized_loss_usd``,
+    ``liquidated_at``."""
+    LIQUIDATION_INVESTIGATION_REPORT_WRITTEN = "LIQUIDATION_INVESTIGATION_REPORT_WRITTEN"
+    """Liquidation investigation report written to audit store — closes the
+    investigation loop for a ``LIQUIDATION_EVENT_DETECTED``. Severity INFO.
+    Payload: ``incident_key``, ``report_gcs_path``, ``written_at``."""
+
     # ── Position / reconciliation
     POSITION_DRIFT = "POSITION_DRIFT"
     POSITION_DRIFT_DETECTED = "POSITION_DRIFT_DETECTED"
@@ -245,6 +264,20 @@ class AlertCode(StrEnum):
     ``CONNECTIVITY_GAP_DETECTED`` event), ``recovered_at`` (ISO timestamp).
     Severity INFO — recovery event, Telegram-only (no page). Operators
     rely on this to close the loop on a previously-fired gap alert."""
+    # ── Dependency health (2026-05-23, connectivity_dependency_buffer_policy Phase 3 P0.7) ──
+    DEPENDENCY_DEGRADED = "DEPENDENCY_DEGRADED"
+    """A dependency in the 5-class taxonomy has exceeded its expected recovery
+    time + warning buffer. Severity escalates with outage duration per
+    ``evaluate_dependency_health()``: expected+warning exceeded → HIGH;
+    hard_escalation_seconds breached OR fallback_available=False → CRITICAL.
+    Payload: ``dependency_id``, ``dependency_class``, ``outage_seconds``,
+    ``expected_recovery_time_seconds``, ``fallback_available``."""
+    DEPENDENCY_RECOVERED = "DEPENDENCY_RECOVERED"
+    """Dependency has recovered from an outage — health restored. Severity INFO.
+    Closes the loop on a previously-fired ``DEPENDENCY_DEGRADED`` alert.
+    Payload: ``dependency_id``, ``dependency_class``, ``outage_seconds``,
+    ``recovered_at``."""
+
     CONNECTIVITY_GAP_BACKFILLED = "CONNECTIVITY_GAP_BACKFILLED"
     """MTDS replay/backfill closed the connectivity gap with historical
     data — the gap window was retrofilled from a secondary source (REST
