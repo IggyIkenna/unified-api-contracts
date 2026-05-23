@@ -27,7 +27,7 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
         "UNISWAPV3",  # superseded by UNISWAP_V3
         "UNISWAPV2",  # superseded by UNISWAP_V2
         "UNISWAPV4",  # superseded by UNISWAP_V4
-        "AAVEV2",  # superseded by AAVE_V2 (canonical) or dropped
+        "AAVEV2",  # superseded by AAVE_V2
         "AAVEV3",  # superseded by AAVE_V3
         "CAMELOTV3",  # superseded by CAMELOT_V3
         "COMPOUNDV3",  # superseded by COMPOUND_V3
