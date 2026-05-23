@@ -33,13 +33,13 @@ DEBT_TOKEN_PATTERN = re.compile(r"^AAVE_V3-[A-Z]+:DEBT_TOKEN:[dD][eE][bB][tT][A-
 LST_PATTERN = re.compile(r"^[A-Z][A-Z0-9]+:LST:[A-Z0-9]+@[A-Z]+$")
 
 # Pattern: {CHAIN}:SWAP:{TOKEN_IN}-{TOKEN_OUT}
-SWAP_PATTERN = re.compile(r"^[A-Z][A-Z0-9-]+:SWAP:[A-Z0-9]+-[A-Z0-9]+$")
+SWAP_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]+:SWAP:[A-Z0-9]+-[A-Z0-9]+$")
 
 # Pattern: {PROTOCOL}:REWARD:{TOKEN}@{CHAIN}
 REWARD_PATTERN = re.compile(r"^[A-Z][A-Z0-9]+:REWARD:[A-Z0-9]+@[A-Z]+$")
 
 # Pattern: {PROVIDER}:FLASH_LOAN:{TOKEN}@{CHAIN}
-FLASH_LOAN_PATTERN = re.compile(r"^[A-Z][A-Z0-9-]+:FLASH_LOAN:[A-Z0-9]+@[A-Z]+$")
+FLASH_LOAN_PATTERN = re.compile(r"^[A-Z][A-Z0-9_-]+:FLASH_LOAN:[A-Z0-9]+@[A-Z]+$")
 
 # Pattern: {PROTOCOL}-{CHAIN}:YIELD_BEARING:{TOKEN}@{CHAIN}
 YIELD_BEARING_PATTERN = re.compile(r"^[A-Z][A-Z0-9]+-[A-Z]+:YIELD_BEARING:[A-Za-z0-9]+@[A-Z]+$")

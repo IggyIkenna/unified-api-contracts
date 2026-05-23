@@ -282,6 +282,7 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "TRADER_JOEV2": "TRADER_JOEV2-AVALANCHE",
     # Lending
     "AAVE_V3": "AAVE_V3-ETHEREUM",
+    "AAVEV3": "AAVE_V3-ETHEREUM",  # alias: no-underscore form used by some callers
     "COMPOUND_V3": "COMPOUND_V3-ETHEREUM",
     "MORPHO": "MORPHO-ETHEREUM",
     "FLUID": "FLUID-ETHEREUM",

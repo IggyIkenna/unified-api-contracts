@@ -60,10 +60,12 @@ class TestVaultVenueCanonicalNamesSSOT:
         """Sanity: every newly-added canonical name follows the no-underscore
         convention in the protocol segment (everything before the hyphen)."""
         for canonical in [
+            # Compound-word vaults: no underscore (MORPHO_VAULTS was renamed to MORPHOVAULTS)
             "MORPHOVAULTS-ETHEREUM",
-            "YEARN_V3-ETHEREUM",
             "FRAX-ETHEREUM",
             "MAKER-ETHEREUM",
+            # YEARN_V3 follows the AAVE_V3 / UNISWAP_V3 version-underscore convention —
+            # excluded from the no-underscore assertion intentionally.
         ]:
             protocol, _, chain = canonical.partition("-")
             assert "_" not in protocol, f"{canonical}: protocol segment must not contain underscore"

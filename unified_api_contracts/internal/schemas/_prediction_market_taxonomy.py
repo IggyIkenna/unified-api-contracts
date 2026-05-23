@@ -26,9 +26,9 @@ normalise into at ingest time:
     WEATHER, MISC).
 *   :class:`PredictionShardMarketType` — 5 market structures (BINARY,
     SCALAR, CATEGORICAL, RANKED, RANGE_BRACKET).
-*   :class:`PredictionShardResolutionPeriod` — 8 resolution horizons
-    (INTRADAY, HOURLY, DAILY, WEEKLY, MONTHLY, QUARTERLY, YEARLY,
-    EVENT).
+*   :class:`PredictionShardResolutionPeriod` — 11 resolution horizons
+    (ONE_MIN, FIVE_MIN, FIFTEEN_MIN, INTRADAY, HOURLY, DAILY, WEEKLY,
+    MONTHLY, QUARTERLY, YEARLY, EVENT).
 *   :func:`classify_polymarket_market` — rule-first classifier
     returning ``(category, underlying, market_type, resolution_period)``
     with deterministic slug-pattern matching and keyword fallbacks.

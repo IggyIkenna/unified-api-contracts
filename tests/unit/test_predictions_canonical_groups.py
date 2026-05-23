@@ -45,7 +45,7 @@ def test_every_canonical_group_has_metadata() -> None:
 
 def test_metadata_cadence_lit_set() -> None:
     """Cadence values are within the documented literal set."""
-    valid = {"hourly", "daily", "weekly", "monthly", "irregular", "single"}
+    valid = {"1min", "5min", "15min", "intraday", "hourly", "daily", "weekly", "monthly", "irregular", "single"}
     for meta in CANONICAL_GROUP_METADATA.values():
         assert meta.cadence in valid
 

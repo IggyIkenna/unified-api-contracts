@@ -187,6 +187,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # ``plans/active/issues/lending_indices_handler_bugs_2026_05_07.md``
     # — actually a UAC SSOT misdiagnosis, not a code bug.
     ("ETHEREUM", "AAVE_V3"): "2023-01-27",
+    ("ETHEREUM", "AAVEV3"): "2023-01-27",  # alias: no-underscore form used by some callers
     ("ARBITRUM", "AAVE_V3"): "2022-03-16",
     # OPTIMISM AAVE V3 actually deployed 2022-03-15 (subgraph indexes
     # ``reserveParamsHistoryItems`` from 2022-03-15 21:48:18 UTC) — not

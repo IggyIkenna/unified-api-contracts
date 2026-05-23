@@ -33,7 +33,7 @@ def test_market_type_has_5_values() -> None:
 
 
 def test_resolution_period_has_8_values() -> None:
-    assert len(PredictionShardResolutionPeriod) == 8
+    assert len(PredictionShardResolutionPeriod) == 11
 
 
 def test_category_values_are_canonical() -> None:
