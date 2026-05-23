@@ -102,6 +102,16 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "ODDS_MOVEMENT"): ["odds_api"],
     ("sports", "ARBITRAGE"): ["odds_api"],
     ("sports", "WEATHER_FORECAST"): ["open_meteo"],
+    # Sports raw data types (instruments-service manifest data_type names).
+    ("sports", "XG"): ["understat"],
+    ("sports", "XG_SHOTS"): ["understat"],
+    ("sports", "MATCHES"): ["footystats"],
+    ("sports", "STANDINGS"): ["api_football"],
+    ("sports", "WEATHER"): ["open_meteo"],
+    ("sports", "PREDICTIONS"): ["footystats"],
+    ("sports", "ODDS"): ["footystats"],
+    ("sports", "ODDS_HORIZON_BUCKET"): ["mdps_odds_horizon_bucket"],
+    ("sports", "TRANSFER_RECORDS"): ["transfermarkt"],
     # Sports reference tables.
     ("sports", "TEAMS"): ["api_football"],
     ("sports", "PLAYERS"): ["api_football"],

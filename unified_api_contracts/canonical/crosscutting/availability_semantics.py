@@ -71,6 +71,19 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("sports", "ODDS_MOVEMENT"): "publication_time",
     ("sports", "ARBITRAGE"): "publication_time",
     ("sports", "WEATHER_FORECAST"): "forecast_issue_time",
+    # Sports raw data types written by instruments-service (as recorded in
+    # the manifest and used by features-sports-service as upstream inputs).
+    # These differ from the processed output types above (UNDERSTAT_XG,
+    # WEATHER_FORECAST, ODDS_SNAPSHOT) which represent features-service outputs.
+    ("sports", "XG"): "match_end_time",  # understat raw XG; post-match
+    ("sports", "XG_SHOTS"): "match_end_time",  # understat per-shot XG; post-match
+    ("sports", "MATCHES"): "match_end_time",  # footystats match data; post-match
+    ("sports", "STANDINGS"): "fetch_completed_at",  # api_football standings; polled
+    ("sports", "WEATHER"): "match_end_time",  # open_meteo reanalysis; post-match
+    ("sports", "PREDICTIONS"): "announced_at",  # footystats pre-match predictions
+    ("sports", "ODDS"): "publication_time",  # footystats raw odds
+    ("sports", "ODDS_HORIZON_BUCKET"): "publication_time",  # MDPS bucketed odds
+    ("sports", "TRANSFER_RECORDS"): "fetch_completed_at",  # transfermarkt transfers
     # Sports reference tables.
     ("sports", "TEAMS"): "fetch_completed_at",
     ("sports", "PLAYERS"): "fetch_completed_at",

@@ -440,6 +440,148 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
         InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
         InputReq(asset_group="tradfi", data_type="ohlcv_15m", available_at_rule="tick_timestamp"),
     ],
+    # ---- features-sports (sports) ----------------------------------------
+    # Mapping derived from features_sports_service.calculators + the
+    # FEATURE_UPSTREAM_REQUIREMENTS registry in
+    # unified_api_contracts.canonical.domain.sports.feature_upstream.
+    # All sports data_types use asset_group="sports". Derived inputs (those
+    # whose source="derived" in FEATURE_UPSTREAM_REQUIREMENTS) declare the
+    # transitive leaf data_types so the lookahead-bias check can walk the DAG
+    # without needing a separate inter-feature-group topological sort.
+    # Stage A — single-source calculators
+    "team_form": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "team_goals": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "season_context": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="STANDINGS", available_at_rule="fetch_completed_at"),
+    ],
+    "goal_timing": [
+        InputReq(asset_group="sports", data_type="FIXTURE_EVENTS", available_at_rule="event_time"),
+    ],
+    "ht_features": [
+        InputReq(asset_group="sports", data_type="MATCHES", available_at_rule="match_end_time"),
+    ],
+    "manager_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="TEAMS", available_at_rule="fetch_completed_at"),
+    ],
+    "formation_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURE_LINEUPS", available_at_rule="kickoff_minus_60min"),
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "injury_impact_calculator": [
+        InputReq(asset_group="sports", data_type="INJURIES", available_at_rule="report_time"),
+    ],
+    "travel_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="VENUES", available_at_rule="fetch_completed_at"),
+    ],
+    "european_fatigue_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "elo_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "h2h_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "advanced_stats_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURE_STATS", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "venue_context": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="VENUES", available_at_rule="fetch_completed_at"),
+    ],
+    "league_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="STANDINGS", available_at_rule="fetch_completed_at"),
+    ],
+    "referee_features": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "squad_value_calculator": [
+        InputReq(asset_group="sports", data_type="PLAYER_VALUES", available_at_rule="fetch_completed_at"),
+        InputReq(asset_group="sports", data_type="TRANSFER_RECORDS", available_at_rule="fetch_completed_at"),
+    ],
+    "weather_calculator": [
+        InputReq(asset_group="sports", data_type="WEATHER", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "sfi_progressive": [
+        InputReq(asset_group="sports", data_type="SFI_PROGRESSIVE_STATS", available_at_rule="match_end_time"),
+    ],
+    "footystats_predictions": [
+        InputReq(asset_group="sports", data_type="PREDICTIONS", available_at_rule="announced_at"),
+    ],
+    # Stage C — cross-source join calculators
+    "team_xg": [
+        InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "halftime_calculator": [
+        InputReq(asset_group="sports", data_type="MATCHES", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="FIXTURE_STATS", available_at_rule="match_end_time"),
+    ],
+    "transfer_window_calculator": [
+        InputReq(asset_group="sports", data_type="PLAYER_VALUES", available_at_rule="fetch_completed_at"),
+        InputReq(asset_group="sports", data_type="TRANSFER_RECORDS", available_at_rule="fetch_completed_at"),
+        InputReq(asset_group="sports", data_type="FIXTURE_LINEUPS", available_at_rule="kickoff_minus_60min"),
+    ],
+    "player_lineup_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURE_LINEUPS", available_at_rule="kickoff_minus_60min"),
+        InputReq(asset_group="sports", data_type="PLAYER_VALUES", available_at_rule="fetch_completed_at"),
+    ],
+    "bench_sub_calculator": [
+        InputReq(asset_group="sports", data_type="FIXTURE_EVENTS", available_at_rule="event_time"),
+        InputReq(asset_group="sports", data_type="FIXTURE_LINEUPS", available_at_rule="kickoff_minus_60min"),
+    ],
+    "odds_calculator": [
+        InputReq(asset_group="sports", data_type="ODDS", available_at_rule="publication_time"),
+        InputReq(asset_group="sports", data_type="ODDS_HORIZON_BUCKET", available_at_rule="publication_time"),
+    ],
+    "multisource_xg": [
+        InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="MATCHES", available_at_rule="match_end_time"),
+    ],
+    "xg_decomposition": [
+        InputReq(asset_group="sports", data_type="FIXTURE_STATS", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
+    ],
+    # Stage D — enriched / derived calculators (declare transitive leaf inputs)
+    "team_derived": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "relative_context": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="STANDINGS", available_at_rule="fetch_completed_at"),
+    ],
+    "meta_features": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
+    ],
+    "ml_predictions": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+        InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="ODDS", available_at_rule="publication_time"),
+    ],
+    "replacement_model": [
+        InputReq(asset_group="sports", data_type="PLAYER_VALUES", available_at_rule="fetch_completed_at"),
+    ],
+    "bucketed_features": [
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
+    "poisson_xg_calculator": [
+        InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
+    ],
+    "shot_quality": [
+        InputReq(asset_group="sports", data_type="XG_SHOTS", available_at_rule="match_end_time"),
+        InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
+    ],
 }
 """Registry — feature_group -> list of upstream input requirements.
 
