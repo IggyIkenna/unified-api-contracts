@@ -133,6 +133,11 @@ class InstrumentRecord(BaseModel):
     expiry: datetime | None = None
     strike: Decimal | None = None
     option_type: OptionType | None = None
+    # AMERICAN | EUROPEAN — required by PassiveLedger synthesiser to distinguish
+    # early-exercise (instruction event) from expiry-without-action (passive event).
+    # Populated by Databento adapter from definition.exercise_style; None for non-options
+    # and for options where the source does not provide this field.
+    exercise_style: str | None = None
     underlying: str | None = None
     margin_type: MarginType | None = None
 
