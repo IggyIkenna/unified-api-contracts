@@ -3667,25 +3667,25 @@
           "UPBIT"
         ],
         "defi": [
-          "AAVEV3-ARBITRUM",
-          "AAVEV3-AVALANCHE",
-          "AAVEV3-BASE",
-          "AAVEV3-BSC",
-          "AAVEV3-ETHEREUM",
-          "AAVEV3-LINEA",
-          "AAVEV3-OPTIMISM",
-          "AAVEV3-POLYGON",
+          "AAVE_V3-ARBITRUM",
+          "AAVE_V3-AVALANCHE",
+          "AAVE_V3-BASE",
+          "AAVE_V3-BSC",
+          "AAVE_V3-ETHEREUM",
+          "AAVE_V3-LINEA",
+          "AAVE_V3-OPTIMISM",
+          "AAVE_V3-POLYGON",
           "BALANCER-ARBITRUM",
           "BALANCER-AVALANCHE",
           "BALANCER-BASE",
           "BALANCER-ETHEREUM",
           "BALANCER-OPTIMISM",
           "BALANCER-POLYGON",
-          "COMPOUNDV3-ARBITRUM",
-          "COMPOUNDV3-BASE",
-          "COMPOUNDV3-ETHEREUM",
-          "COMPOUNDV3-OPTIMISM",
-          "COMPOUNDV3-POLYGON",
+          "COMPOUND_V3-ARBITRUM",
+          "COMPOUND_V3-BASE",
+          "COMPOUND_V3-ETHEREUM",
+          "COMPOUND_V3-OPTIMISM",
+          "COMPOUND_V3-POLYGON",
           "CURVE-AVALANCHE",
           "CURVE-ETHEREUM",
           "CURVE-OPTIMISM",
@@ -3699,13 +3699,13 @@
           "MORPHO-ETHEREUM",
           "MORPHO-OPTIMISM",
           "MORPHO-POLYGON",
-          "UNISWAPV2-ETHEREUM",
-          "UNISWAPV3-ARBITRUM",
-          "UNISWAPV3-BASE",
-          "UNISWAPV3-ETHEREUM",
-          "UNISWAPV3-OPTIMISM",
-          "UNISWAPV3-POLYGON",
-          "UNISWAPV4-ETHEREUM"
+          "UNISWAP_V2-ETHEREUM",
+          "UNISWAP_V3-ARBITRUM",
+          "UNISWAP_V3-BASE",
+          "UNISWAP_V3-ETHEREUM",
+          "UNISWAP_V3-OPTIMISM",
+          "UNISWAP_V3-POLYGON",
+          "UNISWAP_V4-ETHEREUM"
         ],
         "prediction": ["KALSHI", "POLYMARKET"],
         "sports": [
@@ -4035,10 +4035,10 @@
       ],
       "venue_to_protocol": {
         "AAVE-PLASMA": ["aave_plasma", null],
-        "AAVEV3-ETHEREUM": ["aave_v3", "ETHEREUM"],
-        "AERODROMEV3-BASE": ["aerodrome_v3", "BASE"],
+        "AAVE_V3-ETHEREUM": ["aave_v3", "ETHEREUM"],
+        "AERODROME_V3-BASE": ["aerodrome_v3", "BASE"],
         "ASTER": ["aster", null],
-        "CAMELOTV3-ARBITRUM": ["camelot_v3", "ARBITRUM"],
+        "CAMELOT_V3-ARBITRUM": ["camelot_v3", "ARBITRUM"],
         "CURVE-ETHEREUM": ["curve", "ETHEREUM"],
         "ETHENA": ["ethena", "ETHEREUM"],
         "ETHERFI": ["etherfi", "ETHEREUM"],
@@ -4048,17 +4048,17 @@
         "HYPERLIQUID": ["hyperliquid", null],
         "LIDO": ["lido", "ETHEREUM"],
         "MORPHO-ETHEREUM": ["morpho", "ETHEREUM"],
-        "PANCAKESWAPV3-BASE": ["pancakeswap_v3", "BASE"],
-        "PANCAKESWAPV3-BSC": ["pancakeswap_v3", "BSC"],
-        "PANCAKESWAPV3-ETHEREUM": ["pancakeswap_v3", "ETHEREUM"],
+        "PANCAKESWAP_V3-BASE": ["pancakeswap_v3", "BASE"],
+        "PANCAKESWAP_V3-BSC": ["pancakeswap_v3", "BSC"],
+        "PANCAKESWAP_V3-ETHEREUM": ["pancakeswap_v3", "ETHEREUM"],
         "SPARK-ETHEREUM": ["spark", "ETHEREUM"],
         "SUSHISWAP-ARBITRUM": ["sushiswap", "ARBITRUM"],
-        "SUSHISWAPV3-AVALANCHE": ["sushiswap_v3", "AVALANCHE"],
-        "SUSHISWAPV3-ETHEREUM": ["sushiswap_v3", "ETHEREUM"],
+        "SUSHISWAP_V3-AVALANCHE": ["sushiswap_v3", "AVALANCHE"],
+        "SUSHISWAP_V3-ETHEREUM": ["sushiswap_v3", "ETHEREUM"],
         "TRADERJOEV2-AVALANCHE": ["trader_joe_v2", "AVALANCHE"],
-        "UNISWAPV2-ETHEREUM": ["uniswap_v2", "ETHEREUM"],
-        "UNISWAPV3-ETHEREUM": ["uniswap_v3", "ETHEREUM"],
-        "UNISWAPV4-ETHEREUM": ["uniswap_v4", "ETHEREUM"],
+        "UNISWAP_V2-ETHEREUM": ["uniswap_v2", "ETHEREUM"],
+        "UNISWAP_V3-ETHEREUM": ["uniswap_v3", "ETHEREUM"],
+        "UNISWAP_V4-ETHEREUM": ["uniswap_v4", "ETHEREUM"],
         "VELODROMEV2-OPTIMISM": ["velodrome_v2", "OPTIMISM"]
       }
     }
@@ -6215,9 +6215,9 @@
         ]
       },
       "defi_instruments": {
-        "AAVEV3-ETHEREUM": [
+        "AAVE_V3-ETHEREUM": [
           {
-            "venue": "AAVEV3-ETHEREUM",
+            "venue": "AAVE_V3-ETHEREUM",
             "symbol": "aWETH",
             "underlying": "WETH",
             "type": "A_TOKEN",
@@ -6226,7 +6226,7 @@
             "available_from": "2023-01-27"
           },
           {
-            "venue": "AAVEV3-ETHEREUM",
+            "venue": "AAVE_V3-ETHEREUM",
             "symbol": "aUSDC",
             "underlying": "USDC",
             "type": "A_TOKEN",
@@ -6235,7 +6235,7 @@
             "available_from": "2023-01-27"
           },
           {
-            "venue": "AAVEV3-ETHEREUM",
+            "venue": "AAVE_V3-ETHEREUM",
             "symbol": "aUSDT",
             "underlying": "USDT",
             "type": "A_TOKEN",
@@ -6244,21 +6244,21 @@
             "available_from": "2023-01-27"
           },
           {
-            "venue": "AAVEV3-ETHEREUM",
+            "venue": "AAVE_V3-ETHEREUM",
             "symbol": "variableDebtWETH",
             "underlying": "WETH",
             "type": "DEBT_TOKEN",
             "available_from": "2023-01-27"
           },
           {
-            "venue": "AAVEV3-ETHEREUM",
+            "venue": "AAVE_V3-ETHEREUM",
             "symbol": "variableDebtUSDC",
             "underlying": "USDC",
             "type": "DEBT_TOKEN",
             "available_from": "2023-01-27"
           },
           {
-            "venue": "AAVEV3-ETHEREUM",
+            "venue": "AAVE_V3-ETHEREUM",
             "symbol": "variableDebtUSDT",
             "underlying": "USDT",
             "type": "DEBT_TOKEN",
@@ -6347,9 +6347,9 @@
             "available_from": "2024-01-10"
           }
         ],
-        "UNISWAPV2-ETHEREUM": [
+        "UNISWAP_V2-ETHEREUM": [
           {
-            "venue": "UNISWAPV2-ETHEREUM",
+            "venue": "UNISWAP_V2-ETHEREUM",
             "symbol": "USDT-ETH",
             "underlying": "ETH",
             "type": "POOL",
@@ -6359,9 +6359,9 @@
             "available_from": "2020-09-17"
           }
         ],
-        "UNISWAPV3-ETHEREUM": [
+        "UNISWAP_V3-ETHEREUM": [
           {
-            "venue": "UNISWAPV3-ETHEREUM",
+            "venue": "UNISWAP_V3-ETHEREUM",
             "symbol": "USDT-ETH-3000",
             "underlying": "ETH",
             "type": "POOL",
@@ -6372,9 +6372,9 @@
             "available_from": "2021-05-05"
           }
         ],
-        "UNISWAPV4-ETHEREUM": [
+        "UNISWAP_V4-ETHEREUM": [
           {
-            "venue": "UNISWAPV4-ETHEREUM",
+            "venue": "UNISWAP_V4-ETHEREUM",
             "symbol": "USDT-ETH",
             "underlying": "ETH",
             "type": "POOL",

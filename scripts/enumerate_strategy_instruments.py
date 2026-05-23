@@ -35,16 +35,15 @@ from pathlib import Path
 # Reuse all the archetype/category/venue declarations from enumerate_envelope.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from enumerate_envelope import (  # noqa: E402  (path setup precedes import)
-    _ARCHETYPE_ALLOWED_CATEGORIES,
+from enumerate_envelope import (
     _CROSS_DOMAIN_SPLIT,
+    _MANIFEST_PATH,
     _MEV_SPLIT,
     _MM_SPLIT,
     _VOL_SPLIT,
     _category_allowed,
     _category_venues,
     _expand_defi_venues,
-    _MANIFEST_PATH,
 )
 
 from unified_api_contracts.gcs_paths import AssetGroup, bucket_name, strategy_store_bucket
@@ -159,6 +158,7 @@ _VENUE_INSTRUMENT_CACHE: dict[tuple[str, str], list[dict]] = {}
 
 def _gcs_fs():
     import gcsfs
+
     return gcsfs.GCSFileSystem()
 
 
@@ -213,6 +213,7 @@ def _read_venue_parquet(category: str, parquet_venue: str) -> list[dict]:
         _VENUE_INSTRUMENT_CACHE[cache_key] = []
         return []
     import pyarrow.parquet as pq
+
     fs = _gcs_fs()
     with fs.open(path, "rb") as fh:
         table = pq.read_table(fh)
@@ -327,10 +328,7 @@ def _upload_to_gcs(content: str, target: str) -> None:
         data=content.encode("utf-8"),
         content_type="application/json; charset=utf-8",
     )
-    https_url = (
-        f"https://console.cloud.google.com/storage/browser/_details/"
-        f"{bucket_name}/{object_path}"
-    )
+    https_url = f"https://console.cloud.google.com/storage/browser/_details/{bucket_name}/{object_path}"
     print(
         f"Uploaded {len(content):,} bytes to gs://{bucket_name}/{object_path}",
         file=sys.stderr,
@@ -354,8 +352,7 @@ def main() -> None:
     parser.add_argument(
         "--with-real-instruments",
         action="store_true",
-        help="(Phase 10) Read real parquet from instruments-store-* buckets. "
-        "Currently no-op — uses stub resolver.",
+        help="(Phase 10) Read real parquet from instruments-store-* buckets. Currently no-op — uses stub resolver.",
     )
     args = parser.parse_args()
 
@@ -370,9 +367,7 @@ def main() -> None:
     }
     output = json.dumps(payload, indent=2, sort_keys=True)
 
-    target = args.gcs_target or (
-        f"{GCS_BUCKET}/{GCS_OBJECT_PATH}" if args.upload else None
-    )
+    target = args.gcs_target or (f"{GCS_BUCKET}/{GCS_OBJECT_PATH}" if args.upload else None)
     if target is None:
         print(output)
     else:

@@ -1523,8 +1523,8 @@
       "subcategory": "LENDING",
       "domain": "defi",
       "asset_groupes": ["A_TOKEN"],
-      "venues": ["AAVEV3-ETHEREUM"],
-      "instruments": ["AAVEV3-ETHEREUM:A_TOKEN:AUSDT@ETHEREUM"],
+      "venues": ["AAVE_V3-ETHEREUM"],
+      "instruments": ["AAVE_V3-ETHEREUM:A_TOKEN:AUSDT@ETHEREUM"],
       "data_sources": {
         "features": ["features-onchain-service"],
         "market_data_processed": true,
@@ -1577,7 +1577,7 @@
       "venues": [
         "WALLET",
         "HYPERLIQUID",
-        "UNISWAPV3-ETHEREUM",
+        "UNISWAP_V3-ETHEREUM",
         "CURVE-ETHEREUM",
         "BALANCER-ETH"
       ],
@@ -1637,7 +1637,7 @@
       "venues": [
         "ETHERFI-ETHEREUM",
         "HYPERLIQUID",
-        "UNISWAPV3-ETHEREUM",
+        "UNISWAP_V3-ETHEREUM",
         "CURVE-ETHEREUM",
         "BALANCER-ETH"
       ],
@@ -1694,10 +1694,10 @@
       "subcategory": "RECURSIVE_STAKED_BASIS",
       "domain": "defi",
       "asset_groupes": ["A_TOKEN", "DEBT_TOKEN", "PERPETUAL"],
-      "venues": ["AAVEV3-ETHEREUM", "HYPERLIQUID", "MORPHO-ETHEREUM"],
+      "venues": ["AAVE_V3-ETHEREUM", "HYPERLIQUID", "MORPHO-ETHEREUM"],
       "instruments": [
-        "AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM",
-        "AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM",
+        "AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM",
+        "AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM",
         "HYPERLIQUID:PERPETUAL:ETH-USDC@LIN@HYPERLIQUID"
       ],
       "data_sources": {
@@ -3027,8 +3027,8 @@
       "subcategory": "BTC_LENDING",
       "domain": "defi",
       "asset_groupes": ["A_TOKEN"],
-      "venues": ["AAVEV3-ETHEREUM"],
-      "instruments": ["AAVEV3-ETHEREUM:A_TOKEN:AWBTC@ETHEREUM"],
+      "venues": ["AAVE_V3-ETHEREUM"],
+      "instruments": ["AAVE_V3-ETHEREUM:A_TOKEN:AWBTC@ETHEREUM"],
       "data_sources": {
         "features": ["features-onchain-service"],
         "market_data_processed": true,
@@ -3288,7 +3288,7 @@
       "subcategory": "AMM_LP",
       "domain": "defi",
       "asset_groupes": ["LP_TOKEN"],
-      "venues": ["UNISWAPV3-ETHEREUM", "CURVE-ETHEREUM", "BALANCER-ETH"],
+      "venues": ["UNISWAP_V3-ETHEREUM", "CURVE-ETHEREUM", "BALANCER-ETH"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
@@ -3339,7 +3339,7 @@
       "subcategory": "ACTIVE_LP",
       "domain": "defi",
       "asset_groupes": ["LP_TOKEN"],
-      "venues": ["UNISWAPV3-ETHEREUM"],
+      "venues": ["UNISWAP_V3-ETHEREUM"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
@@ -3393,7 +3393,7 @@
       "venues": [
         "WALLET",
         "HYPERLIQUID",
-        "UNISWAPV3-ETHEREUM",
+        "UNISWAP_V3-ETHEREUM",
         "CURVE-ETHEREUM"
       ],
       "instruments": [],
@@ -3548,7 +3548,7 @@
       "subcategory": "LENDING_ARB",
       "domain": "defi",
       "asset_groupes": ["A_TOKEN"],
-      "venues": ["AAVEV3-ETHEREUM", "COMPOUNDV3-ETHEREUM", "MORPHO-ETHEREUM"],
+      "venues": ["AAVE_V3-ETHEREUM", "COMPOUND_V3-ETHEREUM", "MORPHO-ETHEREUM"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
@@ -3599,7 +3599,7 @@
       "subcategory": "MULTI_CHAIN_LENDING",
       "domain": "defi",
       "asset_groupes": ["A_TOKEN"],
-      "venues": ["AAVEV3-ETHEREUM", "COMPOUNDV3-ETHEREUM", "KAMINO-SOLANA"],
+      "venues": ["AAVE_V3-ETHEREUM", "COMPOUND_V3-ETHEREUM", "KAMINO-SOLANA"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
@@ -3650,7 +3650,7 @@
       "subcategory": "CROSS_CHAIN_SOR",
       "domain": "defi",
       "asset_groupes": ["SPOT_ASSET"],
-      "venues": ["UNISWAPV3-ETHEREUM", "ORCA-SOLANA", "RAYDIUM-SOLANA"],
+      "venues": ["UNISWAP_V3-ETHEREUM", "ORCA-SOLANA", "RAYDIUM-SOLANA"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
@@ -3701,7 +3701,7 @@
       "subcategory": "CROSS_CHAIN_YIELD_ARB",
       "domain": "defi",
       "asset_groupes": ["A_TOKEN"],
-      "venues": ["AAVEV3-ETHEREUM", "KAMINO-SOLANA"],
+      "venues": ["AAVE_V3-ETHEREUM", "KAMINO-SOLANA"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
@@ -3803,7 +3803,7 @@
       "subcategory": "LIQUIDATION_CAPTURE",
       "domain": "defi",
       "asset_groupes": ["SPOT_ASSET", "PERPETUAL"],
-      "venues": ["AAVEV3-ETHEREUM", "HYPERLIQUID"],
+      "venues": ["AAVE_V3-ETHEREUM", "HYPERLIQUID"],
       "instruments": [],
       "data_sources": {
         "features": ["features-onchain-service"],
