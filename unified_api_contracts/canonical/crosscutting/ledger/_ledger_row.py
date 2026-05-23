@@ -98,6 +98,34 @@ class LedgerRow(BaseModel):
     When ``parent_event_id`` is ``None``, the row is an autonomous originating
     event (a trade fill, a bridge, a mark update).
 
+    Greek + carry-family rate columns (PricingLedger MARK_UPDATE enrichment)
+    ──────────────────────────────────────────────────────────────────────────
+    The following nullable :class:`~decimal.Decimal` columns are populated by
+    greeks-service when emitting :attr:`EventType.MARK_UPDATE` rows for
+    options / futures / perps. They are :data:`None` on every other
+    ``event_type`` (and on MARK_UPDATE rows for instruments where they don't
+    apply, e.g. spot equity has no greeks; non-perp spot has no
+    ``funding_rate``):
+
+    - **Greeks** (option / derivative sensitivities):
+      ``option_delta`` (∂P/∂S — note: the asset-quantity field ``delta`` is
+      distinct and predates this field; greeks-service emits ``option_delta``
+      to avoid collision), ``gamma`` (∂²P/∂S²), ``theta`` (∂P/∂t per day),
+      ``vega`` (∂P/∂Vol), ``rho`` (∂P/∂r).
+
+    - **Carry-family rates** (per-unit-time rates affecting forward
+      valuation): ``funding_rate`` (perp funding — MTDS ``perp_funding``),
+      ``lending_rate`` (supply APR — MTDS ``lending_indices.liquidity_rate``),
+      ``borrow_rate`` (variable APR — MTDS
+      ``lending_indices.variable_borrow_rate``), ``staking_apy`` (LST/native
+      APY — MTDS ``staking_yields.apy`` or ``lst_rates`` derived),
+      ``dividend_yield`` (annualised, from IS ``CanonicalCorporateAction``;
+      per-event accrual ALSO emitted as a PassiveLedger ``DIVIDEND`` row),
+      ``rebase_rate`` (per-snapshot LST ``exchange_rate`` delta — cumulative
+      ``exchange_rate`` lives in IS ``lst_rates``; per-event accrual ALSO
+      emitted as a PassiveLedger ``STAKING_REWARD`` /
+      ``LENDING_INTEREST`` row).
+
     ``accrual_period_start_utc`` / ``accrual_period_end_utc`` convention
     ─────────────────────────────────────────────────────────────────────
     Required on every ``EventOrigin.PASSIVE`` row.  ``None`` on INSTRUCTION rows.
@@ -296,6 +324,68 @@ class LedgerRow(BaseModel):
             "LST rebase=current oracle report block; validator=epoch end; lending=current block. "
             "SHOULD equal timestamp_utc when payment is realised at the period boundary. "
             "See class docstring for per-event-type convention."
+        ),
+    )
+
+    # ── Greeks (MARK_UPDATE enrichment for options / derivatives) ────────────
+    # Populated by greeks-service for EventType.MARK_UPDATE rows on
+    # options / futures / perps; None on every other event_type.
+    # NB: the asset-quantity column ``delta`` (signed received/sent) is a
+    # distinct, non-greek field defined above and predates these columns —
+    # the greek is emitted as ``option_delta`` to avoid collision.
+    option_delta: Decimal | None = Field(
+        default=None,
+        description="∂Price/∂Underlying — first-order price sensitivity (greek delta).",
+    )
+    gamma: Decimal | None = Field(
+        default=None,
+        description="∂²Price/∂Underlying² — second-order price sensitivity.",
+    )
+    theta: Decimal | None = Field(
+        default=None,
+        description="∂Price/∂Time — time decay (per day).",
+    )
+    vega: Decimal | None = Field(
+        default=None,
+        description="∂Price/∂Vol — vol sensitivity.",
+    )
+    rho: Decimal | None = Field(
+        default=None,
+        description="∂Price/∂InterestRate — rates sensitivity.",
+    )
+
+    # ── Carry-family rates (MARK_UPDATE enrichment from MTDS rate feeds) ─────
+    # Per-unit-time rates affecting forward valuation; populated by
+    # greeks-service for MARK_UPDATE rows on the relevant instrument.
+    # Per-event accrual ALSO flows through PassiveLedger
+    # (FUNDING_ACCRUAL / DIVIDEND / STAKING_REWARD / LENDING_INTEREST) rows.
+    funding_rate: Decimal | None = Field(
+        default=None,
+        description="Perp funding rate (CeFi 8h / DeFi block cadence). Source: MTDS perp_funding.",
+    )
+    lending_rate: Decimal | None = Field(
+        default=None,
+        description="Lending supply APR. Source: MTDS lending_indices.liquidity_rate.",
+    )
+    borrow_rate: Decimal | None = Field(
+        default=None,
+        description="Variable borrow APR. Source: MTDS lending_indices.variable_borrow_rate.",
+    )
+    staking_apy: Decimal | None = Field(
+        default=None,
+        description="Staking APY (LST/native). Source: MTDS staking_yields.apy or lst_rates.exchange_rate-derived.",
+    )
+    dividend_yield: Decimal | None = Field(
+        default=None,
+        description=(
+            "Annualised dividend yield derived from IS CanonicalCorporateAction "
+            "(per-event row also emitted as PassiveLedger DIVIDEND)."
+        ),
+    )
+    rebase_rate: Decimal | None = Field(
+        default=None,
+        description=(
+            "Per-snapshot rebase delta (LST exchange_rate delta). Cumulative exchange_rate stays in IS lst_rates."
         ),
     )
 
