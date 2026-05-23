@@ -103,6 +103,12 @@ class EnvVars:
     POLYMARKET_START_CURSOR = "POLYMARKET_START_CURSOR"  # base64 offset; first scan position
     POLYMARKET_END_CURSOR = "POLYMARKET_END_CURSOR"  # base64 offset; early-exit bound
 
+    # Deployment identity (set by Cloud Build / CI when container is built)
+    CODE_VERSION = "CODE_VERSION"  # git SHA or semver tag of the deployed build
+
+    # Recovery subsystem (Layer-0 deterministic recovery helper)
+    RECOVERY_LOCAL_JSONL_DIR = "RECOVERY_LOCAL_JSONL_DIR"  # override local JSONL write dir
+
     @classmethod
     def _core_canonical(cls) -> set[str]:
         return {
@@ -171,6 +177,8 @@ class EnvVars:
             cls.MDPS_TIMEFRAMES,
             cls.POLYMARKET_START_CURSOR,
             cls.POLYMARKET_END_CURSOR,
+            cls.CODE_VERSION,
+            cls.RECOVERY_LOCAL_JSONL_DIR,
         }
 
     @classmethod
