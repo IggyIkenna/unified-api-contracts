@@ -24,19 +24,19 @@ EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
 # filters them at read time. Audit: defi_coverage_capability_alignment_2026_05_22.md
 DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
     {
-        "UNISWAP_V3",  # superseded by UNISWAP_V3
-        "UNISWAP_V2",  # superseded by UNISWAP_V2
-        "UNISWAP_V4",  # superseded by UNISWAP_V4
+        "UNISWAPV3",  # superseded by UNISWAP_V3
+        "UNISWAPV2",  # superseded by UNISWAP_V2
+        "UNISWAPV4",  # superseded by UNISWAP_V4
         "AAVEV2",  # superseded by AAVE_V2
-        "AAVE_V3",  # superseded by AAVE_V3
-        "CAMELOT_V3",  # superseded by CAMELOT_V3
-        "COMPOUND_V3",  # superseded by COMPOUND_V3
+        "AAVEV3",  # superseded by AAVE_V3
+        "CAMELOTV3",  # superseded by CAMELOT_V3
+        "COMPOUNDV3",  # superseded by COMPOUND_V3
         "MORPHOVAULTS",  # superseded by MORPHO_VAULTS
-        "PANCAKESWAP_V3",  # superseded by PANCAKESWAP_V3
-        "SUSHISWAP_V3",  # superseded by SUSHISWAP_V3
+        "PANCAKESWAPV3",  # superseded by PANCAKESWAP_V3
+        "SUSHISWAPV3",  # superseded by SUSHISWAP_V3
         "VELODROMEV2",  # superseded by VELODROME_V2
-        "YEARN_V3",  # superseded by YEARN_V3
-        "AERODROME_V3",  # superseded by AERODROME_V3 (Base chain Velodrome fork)
+        "YEARNV3",  # superseded by YEARN_V3
+        "AERODROMEV3",  # superseded by AERODROME_V3 (Base chain Velodrome fork)
     }
 )
 
