@@ -166,13 +166,13 @@ def test_classify_russell_2000_slug_variant() -> None:
     assert group == CanonicalQuestionGroup.RUT_UP_DOWN_DAILY
 
 
-def test_classify_eth_monthly_returns_none_no_canonical_group() -> None:
-    """Monthly resolution period has no canonical group → None.
+def test_classify_eth_monthly_falls_back_to_daily_canonical_group() -> None:
+    """ETH slugs with MONTHLY resolution fall back to ETH_UP_DOWN_DAILY.
 
-    The canonical group enum only covers HOURLY + DAILY range-bracket
-    cadences for crypto-up-down markets; MONTHLY markets exist on
-    Polymarket but don't yet have a canonical group seeded. Caller
-    routes such markets to ``attempted_failed[reason=ClassifierConfidenceLow]``.
+    Polymarket daily price markets use month-only or month+day slugs
+    (e.g. "eth-up-or-down-april", "eth-up-or-down-may-22"). The taxonomy
+    assigns MONTHLY resolution; classify_polymarket_to_canonical_group falls
+    back to DAILY so these route to ETH_UP_DOWN_DAILY instead of None.
     """
     group = classify_polymarket_to_canonical_group(
         title="Will ETH be up or down by end of April?",
@@ -180,7 +180,7 @@ def test_classify_eth_monthly_returns_none_no_canonical_group() -> None:
         event_slug="eth-monthly",
         outcome="Up",
     )
-    assert group is None
+    assert group == CanonicalQuestionGroup.ETH_UP_DOWN_DAILY
 
 
 def test_classify_unknown_returns_none() -> None:
