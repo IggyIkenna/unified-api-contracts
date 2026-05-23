@@ -212,6 +212,50 @@ ALL_DEFI_VENUES: list[str] = [
     "JITORESTAKING-SOLANA",
 ]
 
+# ── Canonical underscore-name aliases (additive beside ghost names above) ──
+# Ghost no-underscore names (UNISWAPV3-*, AAVEV3-*, etc.) kept for backward-compat
+# with historical GCS paths. New MTDS writers use canonical underscore names; these
+# entries ensure venue-parity tests pass for both forms.
+ALL_DEFI_VENUES.extend(
+    [
+        "UNISWAP_V2-ETHEREUM",
+        "UNISWAP_V3-ETHEREUM",
+        "UNISWAP_V3-ARBITRUM",
+        "UNISWAP_V3-BASE",
+        "UNISWAP_V3-OPTIMISM",
+        "UNISWAP_V3-POLYGON",
+        "UNISWAP_V4-ETHEREUM",
+        "AAVE_V3-ETHEREUM",
+        "AAVE_V3-ARBITRUM",
+        "AAVE_V3-AVALANCHE",
+        "AAVE_V3-BASE",
+        "AAVE_V3-BSC",
+        "AAVE_V3-LINEA",
+        "AAVE_V3-OPTIMISM",
+        "AAVE_V3-POLYGON",
+        "AAVE_V3-SCROLL",
+        "AAVE_V3-ZKSYNC",
+        "COMPOUND_V3-ETHEREUM",
+        "COMPOUND_V3-ARBITRUM",
+        "COMPOUND_V3-BASE",
+        "COMPOUND_V3-OPTIMISM",
+        "COMPOUND_V3-POLYGON",
+        "COMPOUND_V3-SCROLL",
+        "SUSHISWAP_V3-ETHEREUM",
+        "SUSHISWAP_V3-BASE",
+        "SUSHISWAP_V3-AVALANCHE",
+        "PANCAKESWAP_V3-ETHEREUM",
+        "PANCAKESWAP_V3-ARBITRUM",
+        "PANCAKESWAP_V3-BASE",
+        "PANCAKESWAP_V3-BSC",
+        "CAMELOT_V3-ARBITRUM",
+        "AERODROME_V3-BASE",
+        "YEARN_V3-ETHEREUM",
+        "YEARN_V3-ARBITRUM",
+        "YEARN_V3-OPTIMISM",
+    ]
+)
+
 
 # ---------------------------------------------------------------------------
 # Legacy → canonical aliases

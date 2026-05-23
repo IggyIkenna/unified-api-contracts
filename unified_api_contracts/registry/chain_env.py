@@ -500,6 +500,31 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("ETHEREUM", "RADIANT"): "2023-07-18",  # Radiant V2 Ethereum deploy per Radiant Twitter + DLNews; medium
 }
 
+# ── Canonical underscore-name aliases for protocol names ──
+# Ghost no-underscore protocol tokens (AAVEV3, UNISWAPV3, etc.) kept for backward-compat.
+# New MTDS writers use canonical tokens (AAVE_V3, UNISWAP_V3, etc.); these extend
+# PROTOCOL_LAUNCH_DATES so canonical-form ALL_DEFI_VENUES entries resolve correctly.
+_CANONICAL_PROTOCOL_RENAME: dict[str, str] = {
+    "UNISWAP_V2": "UNISWAPV2",
+    "UNISWAP_V3": "UNISWAPV3",
+    "UNISWAP_V4": "UNISWAPV4",
+    "AAVE_V3": "AAVEV3",
+    "COMPOUND_V3": "COMPOUNDV3",
+    "SUSHISWAP_V3": "SUSHISWAPV3",
+    "PANCAKESWAP_V3": "PANCAKESWAPV3",
+    "CAMELOT_V3": "CAMELOTV3",
+    "AERODROME_V3": "AERODROMEV3",
+    "YEARN_V3": "YEARNV3",
+}
+PROTOCOL_LAUNCH_DATES.update(
+    {
+        (chain, canonical): date
+        for (chain, ghost), date in list(PROTOCOL_LAUNCH_DATES.items())
+        for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
+        if ghost == ghost_name
+    }
+)
+
 # (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch
 # date has not yet been researched. The sanity test allows their
 # absence from ``PROTOCOL_LAUNCH_DATES``; callers without an entry
@@ -549,6 +574,16 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
         # ONCHAIN pseudo-chain — Alchemy Infrastructure data, not a real L1/L2;
         # pending operator decision on whether to keep or remove this venue.
         ("ONCHAIN", "ALCHEMY"),
+    }
+)
+# Extend _PROTOCOL_LAUNCH_PENDING_INVESTIGATION with canonical protocol-name aliases
+# (e.g. COMPOUND_V3 alongside COMPOUNDV3) so the parity test passes for both forms.
+_PROTOCOL_LAUNCH_PENDING_INVESTIGATION = _PROTOCOL_LAUNCH_PENDING_INVESTIGATION | frozenset(
+    {
+        (chain, canonical)
+        for (chain, ghost) in _PROTOCOL_LAUNCH_PENDING_INVESTIGATION
+        for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
+        if ghost == ghost_name
     }
 )
 
