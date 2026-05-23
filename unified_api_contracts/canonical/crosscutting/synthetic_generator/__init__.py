@@ -24,7 +24,6 @@ from ..synthetic_generator_backup import (
 
 # Also import from our new split modules for verification
 from ._enums import SyntheticDataDomain as _SyntheticDataDomain
-from ._models import SyntheticParams as _SyntheticParams  # noqa: F401
 
 # Verify consistency
 assert SyntheticDataDomain.CEFI_TICK == _SyntheticDataDomain.CEFI_TICK

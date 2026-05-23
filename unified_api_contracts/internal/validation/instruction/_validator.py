@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Sequence
+from typing import cast
 
 from unified_api_contracts.internal.architecture_v2.archetype_capability import (
     ArchetypeCapability,
@@ -129,6 +130,42 @@ class InstructionValidator:
                 "venue list."
             ),
         )
+
+    @staticmethod
+    def errors_from_pydantic(
+        pydantic_errors: Sequence[dict[str, object]],
+    ) -> tuple[InstructionFieldError, ...]:
+        """Translate ``pydantic.ValidationError.errors()`` output.
+
+        Utility for middleware that does ``ClientInstruction.model_validate``
+        on the raw payload and catches ``ValidationError``. Each pydantic
+        row becomes one :class:`InstructionFieldError` so the caller can
+        return a uniformly-shaped 400 regardless of whether the failure
+        came from structural parsing or business-rule validation.
+        """
+
+        out: list[InstructionFieldError] = []
+        for err in pydantic_errors:
+            loc_raw: object = err.get("loc", ())
+            if isinstance(loc_raw, tuple | list):
+                parts = cast("tuple[object, ...] | list[object]", loc_raw)
+                field_path = ".".join(str(part) for part in parts)
+            else:
+                field_path = str(loc_raw)
+            msg = str(err.get("msg", "validation failed"))
+            err_type = str(err.get("type", "value_error"))
+            out.append(
+                InstructionFieldError(
+                    field=field_path or "<root>",
+                    violation=msg,
+                    allowed=(),
+                    why=(
+                        "Pydantic-layer rejection — see stage-3b §2 for the authoritative "
+                        f"field contract. Error type: {err_type}."
+                    ),
+                ),
+            )
+        return tuple(out)
 
 
 def _allowed_pairs_digest() -> tuple[str, ...]:

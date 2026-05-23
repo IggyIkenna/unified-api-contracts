@@ -55,7 +55,6 @@ from ._main_models import (
     ClientInstruction,
     InstructionFieldError,
     InstructionValidationResult,
-    errors_from_pydantic,
 )
 
 # Import all nested models
@@ -78,8 +77,7 @@ from ._scoring import compute_integration_depth
 # Import validator
 from ._validator import InstructionValidator
 
-# Make errors_from_pydantic a static method of InstructionValidator for backward compatibility
-InstructionValidator.errors_from_pydantic = staticmethod(errors_from_pydantic)
+# errors_from_pydantic is now a static method of InstructionValidator class
 
 __all__ = [
     "AtomicLeg",

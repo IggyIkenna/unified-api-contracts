@@ -3,13 +3,16 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Final
+from typing import TYPE_CHECKING, Final
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from ..alerting import AlertSeverity
 from ..alerting.codes import AlertCode, KillSwitchScope
 from ._enums import RiskRuleConsequence, RiskRuleId, RiskRuleScope
+
+if TYPE_CHECKING:
+    from ._base import RiskRule
 
 
 class RiskRuleFiredEvent(BaseModel):
@@ -161,7 +164,7 @@ through ``AlertCode``.
 
 
 def risk_rule_fired_event(
-    rule,  # RiskRule - avoiding import cycle
+    rule: RiskRule,
     *,
     fired_at: datetime,
     instruction_id: str = "",
