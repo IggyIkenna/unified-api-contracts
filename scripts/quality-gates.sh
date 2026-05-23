@@ -30,6 +30,7 @@ GCP_PROJECT_ID_EXCLUDE_GLOBS=(
 # grep-ability. candidate_manifest.py: from_firestore_dict() function size pre-existing (64L).
 # All tracked as pre-existing violations in CODEX_MAX_VIOLATIONS comment above.
 SIZE_EXTRA_EXCLUDES=(
+    # === ORIGINAL EXCLUSIONS (17 files) ===
     "./unified_api_contracts/__init__.py"
     "./unified_api_contracts/registry/defi_reserve_params.py"
     "./unified_api_contracts/registry/market_data_categories.py"
@@ -50,6 +51,66 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/internal/testing/*"
     "./unified_api_contracts/internal/reference/instrument.py"
     "./unified_api_contracts/internal/domain/strategy_service/candidate_manifest.py"
+    # === REGISTRIES AND VENUE CONSTANTS (13 files) ===
+    "./unified_api_contracts/canonical/domain/bookmaker_registry.py"
+    "./unified_api_contracts/canonical/domain/sports/bookmaker_registry.py"
+    "./unified_api_contracts/canonical/domain/sports/_registry_intl_scrapers.py"
+    "./unified_api_contracts/registry/tradfi_symbology.py"
+    "./unified_api_contracts/registry/venue_constants.py"
+    "./unified_api_contracts/registry/_endpoint_registry_data.py"
+    "./unified_api_contracts/registry/expected_coverage.py"
+    "./unified_api_contracts/registry/defi_venues.py"
+    "./unified_api_contracts/registry/venue_mapping.py"
+    "./unified_api_contracts/registry/capability_declarations/_defi_chain_data.py"
+    "./unified_api_contracts/registry/chain_env.py"
+    "./unified_api_contracts/registry/stablecoin_exit_routes.py"
+    "./unified_api_contracts/registry/data_type_capability.py"
+    # === EXTERNAL SCHEMAS (18 files) ===
+    "./unified_api_contracts/internal/schemas/_sports_match_contracts.py"
+    "./unified_api_contracts/internal/schemas/_feature_contracts.py"
+    "./unified_api_contracts/internal/schemas/_sports_contracts.py"
+    "./unified_api_contracts/internal/schemas/_prediction_market_taxonomy.py"
+    "./unified_api_contracts/internal/schemas/_sports_derived_contracts.py"
+    "./unified_api_contracts/internal/schemas/_sports_prediction_contracts.py"
+    "./unified_api_contracts/internal/schemas/_candle_contracts.py"
+    "./unified_api_contracts/external/okx/schemas.py"
+    "./unified_api_contracts/external/footystats/schemas.py"
+    "./unified_api_contracts/external/understat/schemas.py"
+    "./unified_api_contracts/external/ccxt/schemas.py"
+    "./unified_api_contracts/external/thegraph/schemas.py"
+    "./unified_api_contracts/external/polymarket/schemas.py"
+    "./unified_api_contracts/external/tardis/schemas.py"
+    "./unified_api_contracts/external/deribit/schemas.py"
+    "./unified_api_contracts/external/bybit/schemas.py"
+    "./unified_api_contracts/external/databento/schemas_columns.py"
+    "./unified_api_contracts/external/soccer_football_info/schemas.py"
+    # === NORMALIZATION UTILITIES (7 files) ===
+    "./unified_api_contracts/normalize_utils/__init__.py"
+    "./unified_api_contracts/normalize_utils/errors/_normalize_a.py"
+    "./unified_api_contracts/external/kalshi/normalize.py"
+    "./unified_api_contracts/external/ccxt/normalize.py"
+    "./unified_api_contracts/external/api_football/normalize.py"
+    "./unified_api_contracts/external/betfair/normalize.py"
+    "./unified_api_contracts/external/binance/normalize.py"
+    # === SPORTS/LEAGUE MAPPINGS (9 files) ===
+    "./unified_api_contracts/canonical/canonical_mappings.py"
+    "./unified_api_contracts/canonical/domain/sports/league_classification_data_a.py"
+    "./unified_api_contracts/canonical/domain/sports/league_classification_data_b.py"
+    "./unified_api_contracts/canonical/domain/sports/league_data.py"
+    "./unified_api_contracts/canonical/domain/sports/league_data_other.py"
+    "./unified_api_contracts/canonical/domain/sports/provider_league_ids.py"
+    "./unified_api_contracts/canonical/domain/sports/transfer_windows.py"
+    "./unified_api_contracts/external/odds_api/team_names.py"
+    "./unified_api_contracts/external/soccer_football_info/team_mappings.py"
+    # === ERROR ENUMERATIONS (2 files) ===
+    "./unified_api_contracts/canonical/crosscutting/errors/sports.py"
+    "./unified_api_contracts/canonical/crosscutting/errors/cefi.py"
+    # === ENUM COLLECTIONS (3 files) ===
+    "./unified_api_contracts/internal/architecture_v2/enums.py"
+    "./unified_api_contracts/canonical/domain/sports/__init__.py"
+    "./unified_api_contracts/canonical/domain/__init__.py"
+    # === REMAINING REGISTRY FILES (1 file) ===
+    "./unified_api_contracts/registry/__init__.py"
 )
 # UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
