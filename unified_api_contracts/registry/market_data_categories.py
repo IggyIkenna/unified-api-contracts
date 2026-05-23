@@ -66,8 +66,24 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "odds_snapshot": "15m",
     "odds_movement": "15m",
     "arbitrage_opportunity": "15m",
+    "odds_horizon_bucket": "15m",
+    "markets": "24h",
+    "outcomes": "24h",
+    "settlements": "24h",
     # Prediction — tick-level from CLOB (uses canonical "trades" / "book_snapshot_5",
     # aligned with CeFi; no category-specific data_type names).
+    # DeFi adapter-produced types (canonicalized 2026-05-23).
+    "utilization": "15m",
+    "flash_loan_availability": "15m",
+    "vault_apy": "24h",
+    "vault_tvl": "24h",
+    # TradFi reference/event types — daily grain.
+    "corporate_action_confirmed": "24h",
+    "earnings_result": "24h",
+    "macro_result": "24h",
+    "mbp_10": "15s",  # Market by price 10 levels — tick-level from CME/Databento
+    # Prediction lifecycle
+    "market_lifecycle": "24h",  # Market creation/resolution/settlement events
 }
 
 # Timeframe ordering in seconds (used for validation and aggregation)
@@ -119,6 +135,11 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "ohlcv_15m",  # VIX 15m: Barchart CSV (2020-01-07→2021-04-21, discontinued) then Yahoo Finance; KRW rates
         "ohlcv_24h",  # Yahoo Finance daily rates (KRW/USD, etc.)
         "tbbo",  # Top-of-book quotes
+        "mbp_10",  # Market by price — 10 levels (CME Databento)
+        # ── Reference/event types from Polygon.io and FRED (canonicalized 2026-05-23) ──
+        "corporate_action_confirmed",  # Confirmed dividends + splits (Polygon.io Equities Basic)
+        "earnings_result",  # Earnings results (Polygon.io)
+        "macro_result",  # Macro economic results: NFP/CPI/GDP/FOMC/Claims/PCE (FRED)
     ],
     "defi": [
         "dex_pools",  # DEX pool metrics (TVL, liquidity depth)
@@ -146,6 +167,13 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # across Yearn V3 / Morpho / Aave Vaults / Sommelier / MetaMorpho).
         "vault_share_price",
         "native_staking_rates",  # Solana validator native staking APY per epoch
+        # ── Adapter-produced types (canonicalized 2026-05-23) ──
+        # Written as separate GCS parquets by lending/vault adapters;
+        # distinct from their parent data types.
+        "utilization",  # Utilization rate extracted alongside lending_indices (Aave, Morpho, Fluid)
+        "flash_loan_availability",  # Available flash-loan liquidity (Morpho historicalState)
+        "vault_apy",  # ERC-4626 vault APY (Yearn/Beefy/Pendle/Convex/Idle)
+        "vault_tvl",  # ERC-4626 vault TVL (same adapters as vault_apy)
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
@@ -153,6 +181,10 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
         "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
+        # ── Exchange/market lifecycle types (in venue_data_types.yaml, canonicalized 2026-05-23) ──
+        "markets",  # Market metadata (event/market listings per bookmaker)
+        "outcomes",  # Outcome results (settled markets)
+        "settlements",  # Settlement records (payout confirmation)
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
@@ -167,7 +199,8 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # denominators; segregate by grain before summing. See predictions_master plan
         # PR-3/PR-4 and catalogue_audit_prediction_2026_05_12.md findings PR-3/PR-4.
         "prediction_canonical_question_group",  # cluster-grain (CanonicalQuestionGroup)
-        "MARKET_LIFECYCLE",  # market_id-grain (lifecycle timestamps per market)
+        "market_lifecycle",  # market_id-grain — MTDS/YAML canonical name (lowercase)
+        "MARKET_LIFECYCLE",  # market_id-grain — instruments-service GCS data_type (uppercase legacy)
     ],
 }
 
@@ -283,7 +316,20 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "odds_snapshot": True,
     "odds_movement": True,
     "arbitrage_opportunity": True,
+    "odds_horizon_bucket": True,
+    "markets": False,  # Reference/lifecycle data — pass-through
+    "outcomes": False,  # Settlement results — pass-through
+    "settlements": False,  # Settlement records — pass-through
     # Prediction — uses canonical "trades" / "book_snapshot_5" (same keys as CeFi).
+    # DeFi adapter-produced types — all pass-through (snapshot/event data).
+    "utilization": False,
+    "flash_loan_availability": False,
+    "vault_apy": False,
+    "vault_tvl": False,
+    # TradFi reference types — pass-through (no candle processing needed).
+    "corporate_action_confirmed": False,
+    "earnings_result": False,
+    "macro_result": False,
 }
 
 
@@ -601,17 +647,42 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_15m": "2021-04-22",  # VIX 15m rolling 60-day window
         "ohlcv_24h": "2020-01-01",  # KRW/USD daily rates
     },
+    # ── TradFi reference data venues (canonicalized 2026-05-23) ──
+    "POLYGON": {
+        "corporate_action_confirmed": "2020-01-01",
+        "earnings_result": "2020-01-01",
+    },
+    "FRED": {
+        "macro_result": "2010-01-01",
+    },
     # ── DeFi — multi-chain entries live in defi_venue_capabilities.py and
     # are merged into this dict at module-load time (see below). Split out
     # to keep this file under the 900-line QG ceiling.
     # ── Sports ──
     "ODDS_API": {
+        "odds": "2024-01-01",
         "odds_snapshot": "2024-01-01",
         "odds_movement": "2024-01-01",
         "arbitrage_opportunity": "2024-01-01",
+        "odds_horizon_bucket": "2024-01-01",
+        "markets": "2024-01-01",
+        "outcomes": "2024-01-01",
+        "settlements": "2024-01-01",
     },
-    "PINNACLE": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
-    "BETFAIR": {"odds_snapshot": "2024-01-01", "odds_movement": "2024-01-01"},
+    "PINNACLE": {
+        "odds_snapshot": "2024-01-01",
+        "odds_movement": "2024-01-01",
+        "markets": "2024-01-01",
+        "outcomes": "2024-01-01",
+        "settlements": "2024-01-01",
+    },
+    "BETFAIR": {
+        "odds_snapshot": "2024-01-01",
+        "odds_movement": "2024-01-01",
+        "markets": "2024-01-01",
+        "outcomes": "2024-01-01",
+        "settlements": "2024-01-01",
+    },
     # DRAFTKINGS / FANDUEL / BET365 + the 14 UK/EU scraper bookmakers are
     # DEFERRED-INDEFINITELY 2026-05-12 per operator (see VENUES_BY_ASSET_GROUP
     # comment above + sports_master plan).
@@ -920,10 +991,7 @@ _PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
         "lst_rates",
         "rewards",
         "risk_params",
-        # PREDICTION per-conditionId shards
-        "prediction_trades",
-        "prediction_book_snapshot",
-        "prediction_market_metadata",
+        # PREDICTION — uses canonical "trades" (retired prediction_* names 2026-04-19)
     }
 )
 

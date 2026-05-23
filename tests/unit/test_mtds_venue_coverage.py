@@ -291,9 +291,11 @@ class TestIsPerInstrumentShardDataType:
         for dt in ("dex_swaps", "dex_pools", "lending_indices", "oracle_prices", "lst_rates", "rewards", "risk_params"):
             assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
 
-    def test_prediction_per_instrument_dts(self) -> None:
+    def test_retired_prediction_dts_not_per_instrument(self) -> None:
+        # prediction_trades/book_snapshot/market_metadata are retired; canonical replacements
+        # are 'trades', 'book_snapshot_5', and metadata fields on the instrument record.
         for dt in ("prediction_trades", "prediction_book_snapshot", "prediction_market_metadata"):
-            assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
+            assert not is_per_instrument_shard_data_type(dt), f"Retired type {dt} must not be per-instrument"
 
 
 class TestGetExpectedInstrumentsForVenueMvpSeed:

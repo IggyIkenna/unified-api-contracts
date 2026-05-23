@@ -125,7 +125,8 @@ class TestExpectedCoverageByAssetGroup:
         assert "prediction_canonical_question_group" in dts, (
             "cluster-grain type missing from DATA_TYPES_BY_ASSET_GROUP[prediction]"
         )
-        assert "MARKET_LIFECYCLE" in dts, "market_id-grain type missing from DATA_TYPES_BY_ASSET_GROUP[prediction]"
+        assert "market_lifecycle" in dts, "market_id-grain type (MTDS/YAML lowercase) missing from prediction"
+        assert "MARKET_LIFECYCLE" in dts, "market_id-grain type (instruments-service uppercase) missing from prediction"
 
     def test_is_expected_in_scope_returns_true(self) -> None:
         assert is_expected("tradfi", "CME", "trades")
