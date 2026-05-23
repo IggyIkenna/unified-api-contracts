@@ -907,6 +907,10 @@ _PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
         "derivative_ticker",
         "options_chain",
         "futures_chain",
+        # TradFi + CeFi DEX OHLCV (Phase 3.D.5 v2 enumerator — per-equity-ticker
+        # and per-pool denominator; TradFi catalog reader provides equity tickers,
+        # CeFi catalog reader provides DEX pool instrument IDs for LIGHTER/PACIFICA).
+        "ohlcv_1m",
         # DEFI per-pool / per-market / per-asset shards
         "dex_swaps",
         "dex_pools",
@@ -1062,6 +1066,15 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
     on PREDICTION dts (Wave 8G — see
     ``registry.defi_prediction_instrument_seeds``).
     """
+    # ohlcv_1m is per-instrument (Phase 3.D.5 v2). Per-instrument universe is
+    # always provided by a catalog reader (TradFiCatalogReader for equity
+    # tickers; CeFiCatalogReader for DEX pools on LIGHTER/PACIFICA). When no
+    # catalog reader is registered for a venue, return () so Tier-3 degrades
+    # to Tier-2 — same as today's behaviour (no regression on first-boot or
+    # test environments where the catalog is absent).
+    if data_type == "ohlcv_1m":
+        return ()
+
     # CEFI spot_pair path for `trades` + `book_snapshot_5`. PREDICTION
     # venues also write canonical `trades` (since 2026-04-19
     # `prediction_trades` rename) so they branch off first.

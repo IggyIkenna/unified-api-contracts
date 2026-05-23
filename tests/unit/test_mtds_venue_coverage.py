@@ -277,8 +277,14 @@ class TestIsPerInstrumentShardDataType:
         for dt in ("trades", "book_snapshot_5", "derivative_ticker", "options_chain", "futures_chain"):
             assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
 
+    def test_ohlcv_1m_is_per_instrument(self) -> None:
+        # Phase 3.D.5 v2: ohlcv_1m promoted to per-instrument shard.
+        # TradFiCatalogReader provides equity tickers; CeFiCatalogReader
+        # provides DEX pool IDs for LIGHTER/PACIFICA.
+        assert is_per_instrument_shard_data_type("ohlcv_1m")
+
     def test_venue_level_dts(self) -> None:
-        for dt in ("liquidations", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "gas_fees", "perp_funding", "odds"):
+        for dt in ("liquidations", "ohlcv_15m", "ohlcv_24h", "tbbo", "gas_fees", "perp_funding", "odds"):
             assert not is_per_instrument_shard_data_type(dt), f"{dt} should be venue-level"
 
     def test_defi_per_instrument_dts(self) -> None:
