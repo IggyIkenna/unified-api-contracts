@@ -116,42 +116,6 @@ def test_thresholds_have_source_doc() -> None:
         )
 
 
-def test_phase7_baseline_date_on_core_defi_thresholds() -> None:
-    """Phase 7 quietness baseline (2026-05-20 to 2026-05-22) confirmed core
-    Phase-1 DeFi thresholds. Each confirmed entry must carry
-    ``quietness_baseline_date="2026-05-20"``."""
-    phase1_core_keys = {
-        "defi_health_factor_critical",
-        "defi_weeth_depeg_bps",
-        "defi_aave_utilization_spike_bps",
-        "defi_funding_rate_flip_bps_5m",
-        "defi_feature_stale_minutes",
-        "balance_drift_usd",
-        "order_rejection_spike_per_min",
-        "margin_threshold_breach_bps",
-        "position_drift_bps",
-        "cross_cloud_egress_bytes_per_request",
-        "tick_staleness_seconds",
-    }
-    for key in phase1_core_keys:
-        assert key in ALERT_THRESHOLDS, f"{key!r} missing from ALERT_THRESHOLDS"
-        t = ALERT_THRESHOLDS[key]
-        assert t.quietness_baseline_date == "2026-05-20", (
-            f"ALERT_THRESHOLDS[{key!r}].quietness_baseline_date must be '2026-05-20'"
-            " — Phase 7 quietness baseline confirmed this threshold."
-        )
-
-
-def test_alertthreshold_quietness_baseline_date_field_defaults_empty() -> None:
-    """New thresholds that haven't yet been baselined should default to empty."""
-    ml_keys = {"ml_signal_staleness_minutes", "ml_model_drift_psi", "ml_pnl_deviation_bps"}
-    for key in ml_keys:
-        assert key in ALERT_THRESHOLDS
-        assert ALERT_THRESHOLDS[key].quietness_baseline_date == "", (
-            f"ML threshold {key!r} should not have a baseline date yet"
-        )
-
-
 # ---------------------------------------------------------------------------
 # AlertRule construction-time validation
 # ---------------------------------------------------------------------------
@@ -965,6 +929,69 @@ def test_oracle_stale_error_is_canonical_error_subclass() -> None:
 
     assert issubclass(OracleStaleError, CanonicalError)
     assert issubclass(OracleDeviationError, CanonicalError)
+
+
+# ---------------------------------------------------------------------------
+# Phase 7 quietness baseline — quietness_baseline_date annotation tests
+# (alerting_service_live_rules_2026_05_07 Phase 7 — 48h staging run
+#  alerting-quietness-20260520-111232, 2026-05-20 to 2026-05-22)
+# ---------------------------------------------------------------------------
+
+_PHASE7_BASELINE_DATE = "2026-05-20"
+
+# All operational thresholds validated by the 48h alerting-service staging run.
+# ML-lifecycle thresholds are excluded: they require ml-inference-service
+# emission, which was not part of the alerting-service quietness baseline.
+_ML_ONLY_THRESHOLD_KEYS: frozenset[str] = frozenset(
+    {
+        "ml_signal_staleness_minutes",
+        "ml_model_drift_psi",
+        "ml_pnl_deviation_bps",
+        "ml_inference_latency_p99_ms",
+        "ml_model_version_mismatch_minutes",
+    }
+)
+
+# Operational thresholds that were part of the Phase 7 alerting-service
+# quietness baseline run (all non-ML thresholds).
+_PHASE7_BASELINED_KEYS: frozenset[str] = frozenset(ALERT_THRESHOLDS.keys()) - _ML_ONLY_THRESHOLD_KEYS
+
+
+def test_phase7_baselined_thresholds_have_baseline_date() -> None:
+    """All operational (non-ML) thresholds validated by the Phase 7 quietness
+    baseline run must carry quietness_baseline_date="2026-05-20"."""
+    for key in _PHASE7_BASELINED_KEYS:
+        threshold = ALERT_THRESHOLDS[key]
+        assert threshold.quietness_baseline_date == _PHASE7_BASELINE_DATE, (
+            f"ALERT_THRESHOLDS[{key!r}].quietness_baseline_date={threshold.quietness_baseline_date!r}"
+            f" expected {_PHASE7_BASELINE_DATE!r}; set after alerting-quietness-20260520-111232 48h run."
+        )
+
+
+def test_ml_only_thresholds_have_empty_baseline_date() -> None:
+    """ML-lifecycle thresholds have not yet been validated by an alerting-service
+    staging run (they require ml-inference-service emission). Their
+    quietness_baseline_date must be empty until that run completes."""
+    for key in _ML_ONLY_THRESHOLD_KEYS:
+        threshold = ALERT_THRESHOLDS[key]
+        assert threshold.quietness_baseline_date == "", (
+            f"ALERT_THRESHOLDS[{key!r}].quietness_baseline_date={threshold.quietness_baseline_date!r}"
+            " expected '' (ML thresholds are not yet validated by alerting-service quietness run)."
+        )
+
+
+def test_quietness_baseline_date_format_when_non_empty() -> None:
+    """Any non-empty quietness_baseline_date MUST be an ISO date (YYYY-MM-DD).
+    Catches future entries that use a different date format."""
+    import re
+
+    date_pattern = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+    for key, threshold in ALERT_THRESHOLDS.items():
+        if threshold.quietness_baseline_date:
+            assert date_pattern.fullmatch(threshold.quietness_baseline_date), (
+                f"ALERT_THRESHOLDS[{key!r}].quietness_baseline_date={threshold.quietness_baseline_date!r}"
+                " is not ISO format YYYY-MM-DD."
+            )
 
 
 def test_oracle_stale_error_with_venue() -> None:
