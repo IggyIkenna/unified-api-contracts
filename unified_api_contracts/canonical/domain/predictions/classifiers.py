@@ -81,6 +81,9 @@ _G = CanonicalQuestionGroup
 
 
 _CATEGORY_UNDERLYING_PERIOD_TO_GROUP: Final[dict[tuple[_C, str, _P], CanonicalQuestionGroup]] = {
+    # 5m / 15m slug patterns → INTRADAY resolution period
+    (_C.CRYPTO_PRICE, "BTC", _P.INTRADAY): _G.BTC_UP_DOWN_INTRADAY,
+    (_C.CRYPTO_PRICE, "ETH", _P.INTRADAY): _G.ETH_UP_DOWN_INTRADAY,
     (_C.CRYPTO_PRICE, "BTC", _P.HOURLY): _G.BTC_UP_DOWN_HOURLY,
     (_C.CRYPTO_PRICE, "BTC", _P.DAILY): _G.BTC_UP_DOWN_DAILY,
     (_C.CRYPTO_PRICE, "ETH", _P.HOURLY): _G.ETH_UP_DOWN_HOURLY,

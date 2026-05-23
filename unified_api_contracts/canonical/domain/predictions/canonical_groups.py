@@ -44,9 +44,12 @@ class CanonicalQuestionGroup(StrEnum):
     """
 
     # Cadenced range-bracket markets — BTC / ETH / SPX up-or-down at the
-    # close of an hour / day. HOURLY → ~24 markets/day; DAILY → 1 market/day.
+    # close of a 5m/15m interval / hour / day.
+    # INTRADAY → ~288 markets/day (5m cadence); HOURLY → ~24; DAILY → 1.
+    BTC_UP_DOWN_INTRADAY = "BTC_UP_DOWN_INTRADAY"  # 5m / 15m slug patterns
     BTC_UP_DOWN_HOURLY = "BTC_UP_DOWN_HOURLY"
     BTC_UP_DOWN_DAILY = "BTC_UP_DOWN_DAILY"
+    ETH_UP_DOWN_INTRADAY = "ETH_UP_DOWN_INTRADAY"  # 5m / 15m slug patterns
     ETH_UP_DOWN_HOURLY = "ETH_UP_DOWN_HOURLY"
     ETH_UP_DOWN_DAILY = "ETH_UP_DOWN_DAILY"
     SPX_UP_DOWN_DAILY = "SPX_UP_DOWN_DAILY"
@@ -78,7 +81,7 @@ class CanonicalQuestionGroup(StrEnum):
     OTHER = "OTHER"
 
 
-_Cadence = Literal["hourly", "daily", "weekly", "monthly", "irregular", "single"]
+_Cadence = Literal["intraday", "hourly", "daily", "weekly", "monthly", "irregular", "single"]
 _ResolutionBasis = Literal["price_threshold", "binary_outcome", "multi_outcome"]
 
 
@@ -115,6 +118,13 @@ _WEEK = timedelta(weeks=1)
 
 
 CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetadata]] = {
+    CanonicalQuestionGroup.BTC_UP_DOWN_INTRADAY: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.BTC_UP_DOWN_INTRADAY,
+        cadence="intraday",
+        expected_market_ids_per_day=288,  # 5m cadence worst-case; lifecycle table overrides
+        resolution_basis="price_threshold",
+        settlement_lag=2 * _HOUR,
+    ),
     CanonicalQuestionGroup.BTC_UP_DOWN_HOURLY: CanonicalGroupMetadata(
         group=CanonicalQuestionGroup.BTC_UP_DOWN_HOURLY,
         cadence="hourly",
@@ -126,6 +136,13 @@ CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetad
         group=CanonicalQuestionGroup.BTC_UP_DOWN_DAILY,
         cadence="daily",
         expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=2 * _HOUR,
+    ),
+    CanonicalQuestionGroup.ETH_UP_DOWN_INTRADAY: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.ETH_UP_DOWN_INTRADAY,
+        cadence="intraday",
+        expected_market_ids_per_day=288,  # 5m cadence worst-case; lifecycle table overrides
         resolution_basis="price_threshold",
         settlement_lag=2 * _HOUR,
     ),

@@ -871,8 +871,10 @@ PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
     # is derived at runtime from the lifecycle table
     # (via ``unified_api_contracts.canonical.domain.predictions.lifecycle.expected_market_ids_for_canonical_group``);
     # the registry carries the per-market min row count only.
+    "BTC_UP_DOWN_INTRADAY": {"_per_market_min_rows": 20},  # 5m market: ~60 ticks in window
     "BTC_UP_DOWN_HOURLY": {"_per_market_min_rows": 100},
     "BTC_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
+    "ETH_UP_DOWN_INTRADAY": {"_per_market_min_rows": 20},
     "ETH_UP_DOWN_HOURLY": {"_per_market_min_rows": 100},
     "ETH_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
     "SPX_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
