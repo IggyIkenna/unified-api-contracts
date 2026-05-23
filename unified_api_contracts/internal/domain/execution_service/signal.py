@@ -44,11 +44,11 @@ class AtomicLeg:
         """Convert to ExecutionInstruction."""
         # Map protocol to venue
         protocol_to_venue = {
-            "AAVE": "AAVEV3-ETHEREUM",
+            "AAVE": "AAVE_V3-ETHEREUM",
             "MORPHO": "MORPHO",
             "ETHERFI-ETHEREUM": "ETHERFI-ETHEREUM",
             "LIDO": "LIDO-ETHEREUM",
-            "UNISWAP": "UNISWAPV3-ETHEREUM",
+            "UNISWAP": "UNISWAP_V3-ETHEREUM",
             "CURVE": "CURVE-ETHEREUM",
             "BALANCER": "BALANCER-ETH",
         }

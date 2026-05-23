@@ -106,7 +106,5 @@ class RecoveryAuditSignoff(BaseModel):
     @classmethod
     def _at_least_one_action_id(cls, v: tuple[str, ...]) -> tuple[str, ...]:
         if len(v) == 0:
-            raise ValueError(
-                "RecoveryAuditSignoff must reference at least 1 AgentActionEvent"
-            )
+            raise ValueError("RecoveryAuditSignoff must reference at least 1 AgentActionEvent")
         return v

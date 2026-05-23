@@ -99,7 +99,7 @@ DEFI_LST_RATES_SPEC = SyntheticGeneratorSpec(
     data_type="lst_rates",
     schema_version="lst_rates.v1",
     # ESTIMATE — no lst_rates data_type in raw_tick GCS as of 2026-05-12. DeFi bucket contains
-    # vault_share_price (ETHENA/FRAX/MAKER/MORPHOVAULTS/YEARNV3, 1 row/instrument/day) which is adjacent
+    # vault_share_price (ETHENA/FRAX/MAKER/MORPHOVAULTS/YEARN_V3, 1 row/instrument/day) which is adjacent
     # but not the same data_type. Calibrate when on-chain indexer ships LST rate snapshots.
     # ~1 snapshot/epoch on Solana (~2-day epoch → sub-daily) + per-block-ish on EVM;
     # model ~96 (15-min) snapshots/day/cell.

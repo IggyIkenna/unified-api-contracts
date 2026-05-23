@@ -371,7 +371,7 @@ class TestDefi:
         """Aave instruments should use WETH, not ETH."""
         instruments = gen.generate_defi(REF_DATE)
         aave_a_tokens = [
-            i for i in instruments if i.venue == "AAVEV3-ETHEREUM" and i.instrument_type == InstrumentType.A_TOKEN
+            i for i in instruments if i.venue == "AAVE_V3-ETHEREUM" and i.instrument_type == InstrumentType.A_TOKEN
         ]
         eth_underlying = [i for i in aave_a_tokens if i.base_asset == "WETH"]
         assert len(eth_underlying) >= 1, "Aave aTokens should use WETH not ETH"
@@ -386,7 +386,7 @@ class TestDefi:
     def test_ltv_set_for_aave(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
         aave_a_tokens = [
-            i for i in instruments if i.venue == "AAVEV3-ETHEREUM" and i.instrument_type == InstrumentType.A_TOKEN
+            i for i in instruments if i.venue == "AAVE_V3-ETHEREUM" and i.instrument_type == InstrumentType.A_TOKEN
         ]
         assert len(aave_a_tokens) == 3
         for inst in aave_a_tokens:
@@ -397,7 +397,7 @@ class TestDefi:
 
     def test_uniswap_v3_fee_tier(self, gen: InstrumentGenerator) -> None:
         instruments = gen.generate_defi(REF_DATE)
-        uni_v3 = [i for i in instruments if i.venue == "UNISWAPV3-ETHEREUM"]
+        uni_v3 = [i for i in instruments if i.venue == "UNISWAP_V3-ETHEREUM"]
         assert len(uni_v3) == 1
         assert uni_v3[0].pool_fee_tier == "3000"
 
@@ -423,11 +423,11 @@ class TestDefi:
         instruments = gen.generate_defi(REF_DATE)
         venues = {i.venue for i in instruments}
         expected = {
-            "AAVEV3-ETHEREUM",
+            "AAVE_V3-ETHEREUM",
             "COMPOUND_V3_ETH",
-            "UNISWAPV3-ETHEREUM",
-            "UNISWAPV2-ETHEREUM",
-            "UNISWAPV4-ETHEREUM",
+            "UNISWAP_V3-ETHEREUM",
+            "UNISWAP_V2-ETHEREUM",
+            "UNISWAP_V4-ETHEREUM",
             "LIDO",
             "ETHERFI",
             "MORPHO-ETHEREUM",

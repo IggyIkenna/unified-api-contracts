@@ -367,12 +367,12 @@ _DATABENTO_VENUES: frozenset[str] = frozenset(
 )
 
 _DEFI_PROTOCOL_PREFIXES: tuple[tuple[str, str], ...] = (
-    ("AAVEV3-", "AAVE_V3"),
-    ("COMPOUNDV3-", "COMPOUND_V3"),
+    ("AAVE_V3-", "AAVE_V3"),
+    ("COMPOUND_V3-", "COMPOUND_V3"),
     ("MORPHO-", "MORPHO"),
-    ("UNISWAPV2-", "UNISWAP_V2"),
-    ("UNISWAPV3-", "UNISWAP_V3"),
-    ("UNISWAPV4-", "UNISWAP_V4"),
+    ("UNISWAP_V2-", "UNISWAP_V2"),
+    ("UNISWAP_V3-", "UNISWAP_V3"),
+    ("UNISWAP_V4-", "UNISWAP_V4"),
     ("CURVE-", "CURVE"),
     ("BALANCER-", "BALANCER"),
     ("AERODROME-", "AERODROME"),
@@ -383,7 +383,7 @@ def get_provider_availability(venue: str) -> ProviderDataAvailability | None:
     """Resolve the data availability metadata for a venue.
 
     Handles composite venue names like ``BINANCE-FUTURES`` (→ TARDIS),
-    ``AAVEV3-ETHEREUM`` (→ AAVE_V3), etc.
+    ``AAVE_V3-ETHEREUM`` (→ AAVE_V3), etc.
 
     Returns ``None`` if the venue is not recognised.
     """

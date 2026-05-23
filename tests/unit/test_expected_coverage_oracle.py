@@ -55,8 +55,8 @@ class TestVenueLaunch:
 
 class TestDefiChainGenesis:
     def test_pre_chain_genesis_fires_not_yet_live(self) -> None:
-        # AAVEV3-LINEA: LINEA chain has its own genesis date. A date pre-2018 must precede most chains.
-        result = expected_coverage("defi", "AAVEV3-LINEA", "lending_indices", date(2018, 1, 1))
+        # AAVE_V3-LINEA: LINEA chain has its own genesis date. A date pre-2018 must precede most chains.
+        result = expected_coverage("defi", "AAVE_V3-LINEA", "lending_indices", date(2018, 1, 1))
         # Either pre-venue-launch OR pre-chain-genesis fires — both yield NOT_YET_LIVE.
         assert result.state is ExpectedState.NOT_YET_LIVE
         assert result.reason in {"EXPECTED_PRE_VENUE_LAUNCH", "EXPECTED_PRE_GENESIS_CHAIN"}
@@ -96,7 +96,7 @@ class TestCryptoAlwaysOn:
 
     def test_defi_weekend_returns_should_have_data(self) -> None:
         # 2024-06-15 = Saturday; DeFi has no weekend.
-        result = expected_coverage("defi", "AAVEV3-ETHEREUM", "lending_indices", date(2024, 6, 15))
+        result = expected_coverage("defi", "AAVE_V3-ETHEREUM", "lending_indices", date(2024, 6, 15))
         assert result.state is ExpectedState.SHOULD_HAVE_DATA
 
 
@@ -104,15 +104,15 @@ class TestDefiDeprecationGates:
     """2026-05-20 round 2 — EMPTY_OR_DEPRECATED + DEFI_NOT_YET_COLLECTED gates."""
 
     def test_deprecated_defi_venue_returns_expected_empty(self) -> None:
-        # UNISWAPV3-POLYGON is in scope policy AND in EMPTY_OR_DEPRECATED_DEFI_VENUES.
+        # UNISWAP_V3-POLYGON is in scope policy AND in EMPTY_OR_DEPRECATED_DEFI_VENUES.
         # The deprecation gate must fire over the scope policy.
-        result = expected_coverage("defi", "UNISWAPV3-POLYGON", "dex_swaps", date(2025, 6, 15))
+        result = expected_coverage("defi", "UNISWAP_V3-POLYGON", "dex_swaps", date(2025, 6, 15))
         assert result.state is ExpectedState.EXPECTED_EMPTY
         assert result.reason == "EXPECTED_DEPRECATED_DATA_TYPE"
         assert "EMPTY_OR_DEPRECATED_DEFI_VENUES" in result.diagnostic
 
     def test_active_defi_venue_does_not_trigger_deprecation_gate(self) -> None:
-        result = expected_coverage("defi", "AAVEV3-ETHEREUM", "lending_indices", date(2025, 6, 15))
+        result = expected_coverage("defi", "AAVE_V3-ETHEREUM", "lending_indices", date(2025, 6, 15))
         assert result.state is ExpectedState.SHOULD_HAVE_DATA
         assert result.reason is None
 
@@ -126,7 +126,7 @@ class TestProtocolPauseWindows:
 
     def test_empty_registry_does_not_fire(self) -> None:
         # Initial PROTOCOL_PAUSE_WINDOWS is empty — no DeFi cell should be classified as paused.
-        result = expected_coverage("defi", "AAVEV3-ETHEREUM", "lending_indices", date(2025, 6, 15))
+        result = expected_coverage("defi", "AAVE_V3-ETHEREUM", "lending_indices", date(2025, 6, 15))
         assert result.reason != "EXPECTED_PROTOCOL_PAUSED"
 
     def test_gate_fires_when_registry_populated(self) -> None:

@@ -158,7 +158,7 @@ def get_chain_genesis_date(chain_name: str) -> str | None:
 # Per-(chain, protocol) launch dates for DeFi protocols. Mirrors the role
 # ``CHAIN_GENESIS_DATES`` plays for chains: clips pre-protocol-launch days
 # from the data-status panel's expected denominator. Without this clip,
-# AAVEV3-ARBITRUM's "expected dates" stretch back to ARBITRUM genesis
+# AAVE_V3-ARBITRUM's "expected dates" stretch back to ARBITRUM genesis
 # (2021-08-31) even though Aave V3 didn't deploy on Arbitrum until
 # 2022-03-16, inflating the leaf-shard denominator by ~6 months of
 # always-empty days.
@@ -186,8 +186,8 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # "Bug 1 silent zero" in
     # ``plans/active/issues/lending_indices_handler_bugs_2026_05_07.md``
     # — actually a UAC SSOT misdiagnosis, not a code bug.
-    ("ETHEREUM", "AAVEV3"): "2023-01-27",
-    ("ARBITRUM", "AAVEV3"): "2022-03-16",
+    ("ETHEREUM", "AAVE_V3"): "2023-01-27",
+    ("ARBITRUM", "AAVE_V3"): "2022-03-16",
     # OPTIMISM AAVE V3 actually deployed 2022-03-15 (subgraph indexes
     # ``reserveParamsHistoryItems`` from 2022-03-15 21:48:18 UTC) — not
     # 2022-08-04 as the pre-2026-05-08 entry claimed. Tab 14 audit
@@ -195,71 +195,71 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # was being silently clipped as ``EXPECTED_PRE_GENESIS_CHAIN`` because
     # the 2022-08-04 floor pre-skipped the 2022-03-15 → 2022-08-03 window.
     # See plans/archive/issues/defi_fork1_prep_audit_2026_05_08.md.
-    ("OPTIMISM", "AAVEV3"): "2022-03-15",
+    ("OPTIMISM", "AAVE_V3"): "2022-03-15",
     # POLYGON earliest event 2022-03-12 (Tab 14 audit 2026-05-08); pre-fix
     # entry 2022-03-16 was 4 days late.
-    ("POLYGON", "AAVEV3"): "2022-03-12",
+    ("POLYGON", "AAVE_V3"): "2022-03-12",
     # AVALANCHE earliest event 2022-03-12 (Tab 14 audit 2026-05-08);
     # pre-fix entry 2022-03-16 was 4 days late.
-    ("AVALANCHE", "AAVEV3"): "2022-03-12",
+    ("AVALANCHE", "AAVE_V3"): "2022-03-12",
     # BASE earliest event 2023-08-22 (Tab 14 audit 2026-05-08); pre-fix
     # 2023-08-09 (BASE chain genesis) was 13 days early — caused 13d of
     # ``SOURCE_RETURNED_ZERO`` rows that should have been
     # ``EXPECTED_PRE_PROTOCOL_LAUNCH``.
-    ("BASE", "AAVEV3"): "2023-08-22",
+    ("BASE", "AAVE_V3"): "2023-08-22",
     # BSC earliest event 2024-01-23 (Tab 14 audit 2026-05-08); pre-fix
     # 2023-04-06 was 293 days early — caused ~293d of ``SOURCE_RETURNED_ZERO``
     # false-empty rows.
-    ("BSC", "AAVEV3"): "2024-01-23",
+    ("BSC", "AAVE_V3"): "2024-01-23",
     # LINEA earliest event 2025-02-11 (Tab 14 audit 2026-05-08); pre-fix
     # 2024-09-26 was 138 days early — caused ~138d of false-empty rows.
-    ("LINEA", "AAVEV3"): "2025-02-11",
-    ("SCROLL", "AAVEV3"): "2024-04-29",
-    ("ZKSYNC", "AAVEV3"): "2024-04-09",
+    ("LINEA", "AAVE_V3"): "2025-02-11",
+    ("SCROLL", "AAVE_V3"): "2024-04-29",
+    ("ZKSYNC", "AAVE_V3"): "2024-04-09",
     # ── Compound V3 (Comet) ──
     # ETHEREUM earliest ``dailyMarketAccountings`` event 2022-08-13 04:18:30
     # UTC (Tab 14 audit 2026-05-08); pre-fix 2022-08-25 was 12 days late —
     # caused 12d of legitimate post-deploy ETH Compound V3 data to be
     # silently clipped as pre-launch.
-    ("ETHEREUM", "COMPOUNDV3"): "2022-08-13",
+    ("ETHEREUM", "COMPOUND_V3"): "2022-08-13",
     # ARBITRUM earliest event 2023-05-04 22:00:26 UTC (Tab 14 audit
     # 2026-05-08); pre-fix 2023-04-13 was 21 days early — caused 21d of
     # ``SOURCE_RETURNED_ZERO`` false-empty rows.
-    ("ARBITRUM", "COMPOUNDV3"): "2023-05-04",
+    ("ARBITRUM", "COMPOUND_V3"): "2023-05-04",
     # BASE earliest event 2023-08-04 23:29:21 UTC (subgraph indexes
     # pre-mainnet-open BASE blocks); pre-fix 2023-08-26 was 22 days late —
     # caused 22d of legitimate post-deploy BASE data to be silently clipped.
-    ("BASE", "COMPOUNDV3"): "2023-08-04",
+    ("BASE", "COMPOUND_V3"): "2023-08-04",
     # OPTIMISM earliest event 2024-04-06 17:09:21 UTC (Tab 14 audit
     # 2026-05-08); pre-fix 2024-02-15 was 51 days early — caused 51d of
     # false-empty rows.
-    ("OPTIMISM", "COMPOUNDV3"): "2024-04-06",
+    ("OPTIMISM", "COMPOUND_V3"): "2024-04-06",
     # POLYGON entry removed 2026-05-08 — Tab 14 audit confirmed
     # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (subgraph returned
     # 0 markets, Compound V3 not active on Polygon). The lingering UAC entry
     # was inflating the data-status denominator with always-empty days.
-    ("SCROLL", "COMPOUNDV3"): "2024-04-22",
+    ("SCROLL", "COMPOUND_V3"): "2024-04-22",
     # ── Uniswap (V2 / V3 / V4) ──
-    ("ETHEREUM", "UNISWAPV2"): "2020-05-04",
-    ("ETHEREUM", "UNISWAPV3"): "2021-05-04",
+    ("ETHEREUM", "UNISWAP_V2"): "2020-05-04",
+    ("ETHEREUM", "UNISWAP_V3"): "2021-05-04",
     # ARBITRUM earliest ``poolDayDatas`` event 2021-06-01 (subgraph
     # indexes pre-mainnet-open Arbitrum blocks); pre-fix 2021-08-31
     # (chain genesis) was 91 days late — caused 91d of legitimate
     # pre-public-launch indexed data to be silently clipped. Tab 14
     # audit 2026-05-08.
-    ("ARBITRUM", "UNISWAPV3"): "2021-06-01",
+    ("ARBITRUM", "UNISWAP_V3"): "2021-06-01",
     # OPTIMISM earliest event 2021-11-11 (subgraph indexes pre-mainnet-open
     # Optimism blocks); pre-fix 2021-12-16 (OP chain-genesis) was 35d late.
-    ("OPTIMISM", "UNISWAPV3"): "2021-11-11",
-    ("POLYGON", "UNISWAPV3"): "2021-12-21",
+    ("OPTIMISM", "UNISWAP_V3"): "2021-11-11",
+    ("POLYGON", "UNISWAP_V3"): "2021-12-21",
     # BASE earliest event 2023-07-31 (subgraph indexes pre-mainnet-open
     # BASE blocks); pre-fix 2023-08-09 (BASE chain genesis) was 9d late.
-    ("BASE", "UNISWAPV3"): "2023-07-31",
-    ("ETHEREUM", "UNISWAPV4"): "2025-01-31",
+    ("BASE", "UNISWAP_V3"): "2023-07-31",
+    ("ETHEREUM", "UNISWAP_V4"): "2025-01-31",
     # ── Curve / Balancer / SushiSwap ──
     ("ETHEREUM", "CURVE"): "2020-01-19",
     ("ETHEREUM", "BALANCER"): "2020-03-31",
-    ("ETHEREUM", "SUSHISWAPV3"): "2023-04-04",
+    ("ETHEREUM", "SUSHISWAP_V3"): "2023-04-04",
     # ── Liquid Staking / yield protocols (Ethereum) ──
     ("ETHEREUM", "LIDO"): "2020-12-19",
     ("ETHEREUM", "ROCKETPOOL"): "2021-11-08",
@@ -333,7 +333,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
         "ETHEREUM",
         "MORPHOVAULTS",
     ): "2024-01-04",  # MetaMorpho factory 0xA9c3...c41101 ~2024-01-04; first Steakhouse USDC vault Jan 2024; medium
-    ("ETHEREUM", "YEARNV3"): "2024-03-20",  # Yearn V3 mainnet launch per Yearn / Binance Square + Token Terminal; high
+    ("ETHEREUM", "YEARN_V3"): "2024-03-20",  # Yearn V3 mainnet launch per Yearn / Binance Square + Token Terminal; high
     (
         "ETHEREUM",
         "ANKR",
@@ -357,7 +357,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ("ETHEREUM", "ALCHEMY"): "2021-02-27",  # Alchemix alUSD mainnet + ALCX token launch (alETH followed Jun 2021); high
     (
         "ETHEREUM",
-        "PANCAKESWAPV3",
+        "PANCAKESWAP_V3",
     ): "2023-04-01",  # PancakeSwap V3 Factory deployed 2023-04-01 per Etherscan; public announce 2023-04-03; high
     # ── Solana lending/LST (Sub-agent B) ── SolBlaze deferred (low confidence)
     (
@@ -390,27 +390,27 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # ── PancakeSwap V3 multi-chain rollout (Sub-agent C) ──
     (
         "ARBITRUM",
-        "PANCAKESWAPV3",
+        "PANCAKESWAP_V3",
     ): "2023-08-09",  # PancakeSwap V3 Arbitrum deploy Aug 10 per Coindesk + BSC News + DL News; conservative -1d; high
     (
         "BASE",
-        "PANCAKESWAPV3",
+        "PANCAKESWAP_V3",
     ): "2023-08-30",  # PancakeSwap V3 Base Aug 31 per PancakeSwap blog + Galxe Traverse; conservative -1d; medium
     (
         "BSC",
-        "PANCAKESWAPV3",
+        "PANCAKESWAP_V3",
     ): "2023-04-03",  # PancakeSwap V3 BNB Chain Apr 3 per CoinCarp + BSC News "Chef's Special" + Crypto Times; high
     # ── SushiSwap multi-chain (Sub-agent C + D) ──
     ("ARBITRUM", "SUSHISWAP"): "2021-08-31",  # Arbitrum One full public mainnet (Sushi among earliest); high
-    ("AVALANCHE", "SUSHISWAPV3"): "2023-05-04",  # SushiSwap V3 13-chain rollout per CoinDesk 2023-05-04; high
+    ("AVALANCHE", "SUSHISWAP_V3"): "2023-05-04",  # SushiSwap V3 13-chain rollout per CoinDesk 2023-05-04; high
     (
         "BASE",
-        "SUSHISWAPV3",
+        "SUSHISWAP_V3",
     ): "2023-08-09",  # SushiSwap on Base: CLAMPED to genesis 2023-08-09 (Aug 4 announced; D flagged); medium
     # ── DEX/AMM multi-chain rollouts (Sub-agent D) ──
     (
         "ARBITRUM",
-        "CAMELOTV3",
+        "CAMELOT_V3",
     ): "2023-04-08",  # Camelot V2 (Algebra conc-liq) stage-1; V3 same Algebra fork per CoinDesk + Camelot docs; medium
     ("OPTIMISM", "VELODROMEV2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
     ("OPTIMISM", "CURVE"): "2022-01-18",  # Curve Optimism deployment announcement tweet (TheDefiant, TheBlock); high
@@ -424,7 +424,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ): "2022-11-17",  # Trader Joe Liquidity Book V2 live per TokenInsight + TheDefiant; high
     (
         "BASE",
-        "AERODROMEV3",
+        "AERODROME_V3",
     ): "2024-04-22",  # Aerodrome Slipstream (concentrated-liq V3) launch per Aerodrome official X + CCN; high
     (
         "BASE",
@@ -452,11 +452,11 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     # ── Yearn V3 + Idle + Karak + Renzo on L2s (Sub-agent E) ──
     (
         "ARBITRUM",
-        "YEARNV3",
+        "YEARN_V3",
     ): "2023-11-15",  # Yearn V3 cross-chain per Yearn docs; Polygon Nov 2023; ETH GA Mar 2024; low (conservative)
     (
         "OPTIMISM",
-        "YEARNV3",
+        "YEARN_V3",
     ): "2023-11-15",  # Yearn V3 v3.0.0 deployed cross-chain incl. Optimism per Yearn docs Nov 2023; low
     (
         "ARBITRUM",
@@ -501,20 +501,20 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
 }
 
 # ── Canonical underscore-name aliases for protocol names ──
-# Ghost no-underscore protocol tokens (AAVEV3, UNISWAPV3, etc.) kept for backward-compat.
+# Ghost no-underscore protocol tokens (AAVE_V3, UNISWAP_V3, etc.) kept for backward-compat.
 # New MTDS writers use canonical tokens (AAVE_V3, UNISWAP_V3, etc.); these extend
 # PROTOCOL_LAUNCH_DATES so canonical-form ALL_DEFI_VENUES entries resolve correctly.
 _CANONICAL_PROTOCOL_RENAME: dict[str, str] = {
-    "UNISWAP_V2": "UNISWAPV2",
-    "UNISWAP_V3": "UNISWAPV3",
-    "UNISWAP_V4": "UNISWAPV4",
-    "AAVE_V3": "AAVEV3",
-    "COMPOUND_V3": "COMPOUNDV3",
-    "SUSHISWAP_V3": "SUSHISWAPV3",
-    "PANCAKESWAP_V3": "PANCAKESWAPV3",
-    "CAMELOT_V3": "CAMELOTV3",
-    "AERODROME_V3": "AERODROMEV3",
-    "YEARN_V3": "YEARNV3",
+    "UNISWAP_V2": "UNISWAP_V2",
+    "UNISWAP_V3": "UNISWAP_V3",
+    "UNISWAP_V4": "UNISWAP_V4",
+    "AAVE_V3": "AAVE_V3",
+    "COMPOUND_V3": "COMPOUND_V3",
+    "SUSHISWAP_V3": "SUSHISWAP_V3",
+    "PANCAKESWAP_V3": "PANCAKESWAP_V3",
+    "CAMELOT_V3": "CAMELOT_V3",
+    "AERODROME_V3": "AERODROME_V3",
+    "YEARN_V3": "YEARN_V3",
 }
 PROTOCOL_LAUNCH_DATES.update(
     {
@@ -539,12 +539,12 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
         # ── Catalogue Phase 1B research (slot 5 2026-05-12 5-sub-agent fan-out)
         # moved 45 pairs to ``PROTOCOL_LAUNCH_DATES``. The remaining pending
         # entries are below + (SOLANA, SOLBLAZE) flagged for follow-up.
-        # POLYGON / COMPOUNDV3 — UAC ``ALL_DEFI_VENUES`` declares it but
+        # POLYGON / COMPOUND_V3 — UAC ``ALL_DEFI_VENUES`` declares it but
         # ``SUBGRAPH_IDS["compound_v3"]`` has no POLYGON entry (Compound V3
         # is not active on Polygon — subgraph returned 0 markets). Removed
         # from ``PROTOCOL_LAUNCH_DATES`` 2026-05-08 (Tab 14 audit) to stop
         # inflating the data-status denominator with always-empty days.
-        ("POLYGON", "COMPOUNDV3"),
+        ("POLYGON", "COMPOUND_V3"),
         # (SOLANA, SOLBLAZE) — slot 5 2026-05-12 Sub-agent B research returned
         # only medium-low confidence (date 2022-10-15 anchored to Solanacompass
         # stake-pool Epoch 345 + Nov 2022 X promo; no primary-source pool-
@@ -577,7 +577,7 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
     }
 )
 # Extend _PROTOCOL_LAUNCH_PENDING_INVESTIGATION with canonical protocol-name aliases
-# (e.g. COMPOUND_V3 alongside COMPOUNDV3) so the parity test passes for both forms.
+# (e.g. COMPOUND_V3 alongside COMPOUND_V3) so the parity test passes for both forms.
 _PROTOCOL_LAUNCH_PENDING_INVESTIGATION = _PROTOCOL_LAUNCH_PENDING_INVESTIGATION | frozenset(
     {
         (chain, canonical)

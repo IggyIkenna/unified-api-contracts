@@ -3,7 +3,7 @@
 SSOT for the lowercase-alnum venue tokens used inside slot labels (the
 `{venue_scope}` segment of the grammar). This is a separate concern from the
 full venue registry: slot labels use the *family* name of a venue (e.g.
-`binance` not `BINANCE-SPOT`, `uniswap` not `UNISWAPV3-ETHEREUM`) so that one
+`binance` not `BINANCE-SPOT`, `uniswap` not `UNISWAP_V3-ETHEREUM`) so that one
 strategy instance can span spot+perp+options on the same venue.
 
 Callers (strategy-service slot_label parser, etc.) use `is_venue_token()` to

@@ -29,7 +29,7 @@ class DeFiPosition:
     Attributes:
         position_id: Unique identifier
         position_type: Type of position (A_TOKEN, DEBT_TOKEN, LST, etc.)
-        venue: Protocol/venue (AAVEV3-ETHEREUM, ETHERFI-ETHEREUM, etc.)
+        venue: Protocol/venue (AAVE_V3-ETHEREUM, ETHERFI-ETHEREUM, etc.)
         token: Position token symbol (aWETH, weETH, etc.)
         underlying: Underlying token symbol (WETH, ETH, etc.)
         amount: Current position amount (in token units)

@@ -52,7 +52,7 @@ from __future__ import annotations
 # daily, sorted by tvl_usd descending, top 20 taken). Top 5 are the
 # USDC/WETH 0.05%, USDC/WETH 0.3%, WETH/USDT 0.3%, WBTC/WETH 0.3%, and
 # WBTC/USDC 0.3% pools — aggregate ~$1.2B TVL.
-_UNISWAPV3_ETHEREUM_TOP_POOLS: tuple[str, ...] = (
+_UNISWAP_V3_ETHEREUM_TOP_POOLS: tuple[str, ...] = (
     "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",  # USDC/WETH 0.05%
     "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",  # USDC/WETH 0.3%
     "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",  # WETH/USDT 0.3%
@@ -79,7 +79,7 @@ _UNISWAPV3_ETHEREUM_TOP_POOLS: tuple[str, ...] = (
 # liquidity on 2026-04-14. Data source: ``aave_v3_ETHEREUM_20260415_
 # 191702.parquet`` (21 reserves observed). Symbol form (not underlying
 # address) — Aave's per-reserve parquets are keyed on ``symbol``.
-_AAVEV3_ETHEREUM_TOP_RESERVES: tuple[str, ...] = (
+_AAVE_V3_ETHEREUM_TOP_RESERVES: tuple[str, ...] = (
     "USDC",
     "USDT",
     "DAI",
@@ -143,15 +143,15 @@ _KALSHI_TOP_CONDITION_IDS: tuple[str, ...] = ()
 # which already handles the ``cap`` + ``instruments_provider`` paths.
 
 DEFI_MVP_SEED_INSTRUMENTS: dict[tuple[str, str], tuple[str, ...]] = {
-    # UNISWAPV3-ETHEREUM — dex_pools + dex_swaps share the pool set.
-    ("UNISWAPV3-ETHEREUM", "dex_pools"): _UNISWAPV3_ETHEREUM_TOP_POOLS,
-    ("UNISWAPV3-ETHEREUM", "dex_swaps"): _UNISWAPV3_ETHEREUM_TOP_POOLS,
-    # AAVEV3-ETHEREUM — every per-reserve dt expands to the same reserve
+    # UNISWAP_V3-ETHEREUM — dex_pools + dex_swaps share the pool set.
+    ("UNISWAP_V3-ETHEREUM", "dex_pools"): _UNISWAP_V3_ETHEREUM_TOP_POOLS,
+    ("UNISWAP_V3-ETHEREUM", "dex_swaps"): _UNISWAP_V3_ETHEREUM_TOP_POOLS,
+    # AAVE_V3-ETHEREUM — every per-reserve dt expands to the same reserve
     # universe (lending_indices / oracle_prices / rewards / risk_params).
-    ("AAVEV3-ETHEREUM", "lending_indices"): _AAVEV3_ETHEREUM_TOP_RESERVES,
-    ("AAVEV3-ETHEREUM", "oracle_prices"): _AAVEV3_ETHEREUM_TOP_RESERVES,
-    ("AAVEV3-ETHEREUM", "rewards"): _AAVEV3_ETHEREUM_TOP_RESERVES,
-    ("AAVEV3-ETHEREUM", "risk_params"): _AAVEV3_ETHEREUM_TOP_RESERVES,
+    ("AAVE_V3-ETHEREUM", "lending_indices"): _AAVE_V3_ETHEREUM_TOP_RESERVES,
+    ("AAVE_V3-ETHEREUM", "oracle_prices"): _AAVE_V3_ETHEREUM_TOP_RESERVES,
+    ("AAVE_V3-ETHEREUM", "rewards"): _AAVE_V3_ETHEREUM_TOP_RESERVES,
+    ("AAVE_V3-ETHEREUM", "risk_params"): _AAVE_V3_ETHEREUM_TOP_RESERVES,
     # LST protocols — lst_rates + oracle_prices share the token set.
     ("LIDO-ETHEREUM", "lst_rates"): _LIDO_ETHEREUM_LST_TOKENS,
     ("LIDO-ETHEREUM", "oracle_prices"): _LIDO_ETHEREUM_LST_TOKENS,

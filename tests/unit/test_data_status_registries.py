@@ -132,7 +132,7 @@ class TestExpectedCoverageByAssetGroup:
         assert is_expected("cefi", "BINANCE-FUTURES", "derivative_ticker")
         assert is_expected("sports", "ODDS_API", "odds")
         assert is_expected("prediction", "POLYMARKET", "trades")
-        assert is_expected("defi", "AAVEV3-ETHEREUM", "lending_indices")
+        assert is_expected("defi", "AAVE_V3-ETHEREUM", "lending_indices")
 
     def test_is_expected_out_of_scope_returns_false(self) -> None:
         # NASDAQ trades — capable but not in scope.

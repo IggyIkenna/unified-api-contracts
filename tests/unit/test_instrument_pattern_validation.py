@@ -47,12 +47,12 @@ class TestInstrumentIdFormat:
     """Validate instrument ID format: VENUE:INSTRUMENT_TYPE:DETAILS."""
 
     def test_aave_a_token_format(self) -> None:
-        """AAVEV3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM is valid format."""
-        instrument_id = "AAVEV3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM"
+        """AAVE_V3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM is valid format."""
+        instrument_id = "AAVE_V3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM"
         assert INSTRUMENT_ID_PATTERN.match(instrument_id), f"Instrument ID does not match pattern: {instrument_id}"
         parts = instrument_id.split(":")
         assert len(parts) == 3
-        assert parts[0] == "AAVEV3-ETHEREUM"
+        assert parts[0] == "AAVE_V3-ETHEREUM"
         assert parts[1] == "A_TOKEN"
         assert parts[2] == "aUSDT@ETHEREUM"
 
@@ -88,7 +88,7 @@ class TestInstrumentIdFormat:
     def test_three_part_structure_enforced(self) -> None:
         """Instrument IDs must have exactly 3 colon-separated parts."""
         valid_ids = [
-            "AAVEV3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM",
+            "AAVE_V3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM",
             "HYPERLIQUID:PERPETUAL:ETH-USDC@LIN@HYPERLIQUID",
             "WALLET:SPOT_ASSET:ETH",
             "ETHERFI:LST:WEETH@ETHEREUM",
@@ -102,12 +102,12 @@ class TestInstrumentIdFormat:
     def test_instrument_type_segment_is_known(self) -> None:
         """The instrument type segment should be a known type."""
         sample_ids = [
-            "AAVEV3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM",
+            "AAVE_V3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM",
             "HYPERLIQUID:PERPETUAL:ETH-USDC@LIN@HYPERLIQUID",
             "WALLET:SPOT_ASSET:ETH",
             "ETHERFI:LST:WEETH@ETHEREUM",
-            "UNISWAPV3-ETHEREUM:POOL:WETH-USDC@3000",
-            "AAVEV3-ETHEREUM:DEBT_TOKEN:debtWETH@ETHEREUM",
+            "UNISWAP_V3-ETHEREUM:POOL:WETH-USDC@3000",
+            "AAVE_V3-ETHEREUM:DEBT_TOKEN:debtWETH@ETHEREUM",
         ]
         for iid in sample_ids:
             inst_type = iid.split(":")[1]
@@ -144,11 +144,11 @@ class TestVenueNameValidation:
     def test_protocol_token_preference_keys_are_protocol_names(self) -> None:
         """All keys in PROTOCOL_TOKEN_PREFERENCE map to real protocol names."""
         expected_protocols = {
-            "AAVEV3",
+            "AAVE_V3",
             "MORPHO",
             "ETHERFI",
             "LIDO",
-            "UNISWAPV3",
+            "UNISWAP_V3",
             "HYPERLIQUID",
             "DERIBIT",
             "BYBIT",

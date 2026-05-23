@@ -166,9 +166,7 @@ class IllegalIncidentTransitionError(ValueError):
     """Raised when a state transition outside ``ALLOWED_TRANSITIONS`` is attempted."""
 
 
-def assert_allowed_transition(
-    current: IncidentState, target: IncidentState
-) -> None:
+def assert_allowed_transition(current: IncidentState, target: IncidentState) -> None:
     """Raise ``IllegalIncidentTransitionError`` if ``current → target`` is not allowed.
 
     Use at every state-write site in alerting-service incident-gateway. The

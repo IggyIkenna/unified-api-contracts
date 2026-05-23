@@ -21,13 +21,13 @@ SPOT_ASSET_PATTERN = re.compile(r"^WALLET:SPOT_ASSET:[A-Z]+$")
 # Venue is uppercase alphanumeric with optional chain suffix (e.g. BINANCE-FUTURES)
 PERPETUAL_PATTERN = re.compile(r"^[A-Z][A-Z0-9-]+:PERPETUAL:[A-Z0-9]+-[A-Z0-9]+@LIN@[A-Z][A-Z0-9-]+$")
 
-# Pattern: AAVEV3-{CHAIN}:A_TOKEN:A{TOKEN}@{CHAIN}
+# Pattern: AAVE_V3-{CHAIN}:A_TOKEN:A{TOKEN}@{CHAIN}
 # Note: historical IDs use lowercase 'a' prefix (aUSDT) so we allow both
-A_TOKEN_PATTERN = re.compile(r"^AAVEV3-[A-Z]+:A_TOKEN:[aA][A-Za-z0-9]+@[A-Z]+$")
+A_TOKEN_PATTERN = re.compile(r"^AAVE_V3-[A-Z]+:A_TOKEN:[aA][A-Za-z0-9]+@[A-Z]+$")
 
-# Pattern: AAVEV3-{CHAIN}:DEBT_TOKEN:DEBT{TOKEN}@{CHAIN}
+# Pattern: AAVE_V3-{CHAIN}:DEBT_TOKEN:DEBT{TOKEN}@{CHAIN}
 # Note: historical IDs use lowercase 'debt' prefix so we allow both
-DEBT_TOKEN_PATTERN = re.compile(r"^AAVEV3-[A-Z]+:DEBT_TOKEN:[dD][eE][bB][tT][A-Za-z0-9]+@[A-Z]+$")
+DEBT_TOKEN_PATTERN = re.compile(r"^AAVE_V3-[A-Z]+:DEBT_TOKEN:[dD][eE][bB][tT][A-Za-z0-9]+@[A-Z]+$")
 
 # Pattern: {PROTOCOL}:LST:{TOKEN}@{CHAIN}
 LST_PATTERN = re.compile(r"^[A-Z][A-Z0-9]+:LST:[A-Z0-9]+@[A-Z]+$")
@@ -97,35 +97,35 @@ class TestPerpetualPattern:
 
 
 class TestATokenPattern:
-    """AAVEV3-{CHAIN}:A_TOKEN:A{TOKEN}@{CHAIN} format."""
+    """AAVE_V3-{CHAIN}:A_TOKEN:A{TOKEN}@{CHAIN} format."""
 
     def test_valid_ausdt(self) -> None:
-        assert A_TOKEN_PATTERN.match("AAVEV3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM")
+        assert A_TOKEN_PATTERN.match("AAVE_V3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM")
 
     def test_valid_aweth(self) -> None:
-        assert A_TOKEN_PATTERN.match("AAVEV3-ETHEREUM:A_TOKEN:aWETH@ETHEREUM")
+        assert A_TOKEN_PATTERN.match("AAVE_V3-ETHEREUM:A_TOKEN:aWETH@ETHEREUM")
 
     def test_valid_arbitrum(self) -> None:
-        assert A_TOKEN_PATTERN.match("AAVEV3-ARBITRUM:A_TOKEN:aUSDC@ARBITRUM")
+        assert A_TOKEN_PATTERN.match("AAVE_V3-ARBITRUM:A_TOKEN:aUSDC@ARBITRUM")
 
     def test_invalid_no_a_prefix(self) -> None:
-        assert not A_TOKEN_PATTERN.match("AAVEV3-ETHEREUM:A_TOKEN:USDT@ETHEREUM")
+        assert not A_TOKEN_PATTERN.match("AAVE_V3-ETHEREUM:A_TOKEN:USDT@ETHEREUM")
 
     def test_invalid_wrong_venue(self) -> None:
         assert not A_TOKEN_PATTERN.match("MORPHO-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM")
 
 
 class TestDebtTokenPattern:
-    """AAVEV3-{CHAIN}:DEBT_TOKEN:DEBT{TOKEN}@{CHAIN} format."""
+    """AAVE_V3-{CHAIN}:DEBT_TOKEN:DEBT{TOKEN}@{CHAIN} format."""
 
     def test_valid_debtweth(self) -> None:
-        assert DEBT_TOKEN_PATTERN.match("AAVEV3-ETHEREUM:DEBT_TOKEN:debtWETH@ETHEREUM")
+        assert DEBT_TOKEN_PATTERN.match("AAVE_V3-ETHEREUM:DEBT_TOKEN:debtWETH@ETHEREUM")
 
     def test_valid_debtusdc(self) -> None:
-        assert DEBT_TOKEN_PATTERN.match("AAVEV3-ETHEREUM:DEBT_TOKEN:debtUSDC@ETHEREUM")
+        assert DEBT_TOKEN_PATTERN.match("AAVE_V3-ETHEREUM:DEBT_TOKEN:debtUSDC@ETHEREUM")
 
     def test_invalid_no_debt_prefix(self) -> None:
-        assert not DEBT_TOKEN_PATTERN.match("AAVEV3-ETHEREUM:DEBT_TOKEN:WETH@ETHEREUM")
+        assert not DEBT_TOKEN_PATTERN.match("AAVE_V3-ETHEREUM:DEBT_TOKEN:WETH@ETHEREUM")
 
 
 class TestLstPattern:
@@ -151,7 +151,7 @@ class TestSwapPattern:
         assert SWAP_PATTERN.match("ETHEREUM:SWAP:WETH-USDC")
 
     def test_valid_uniswap_swap(self) -> None:
-        assert SWAP_PATTERN.match("UNISWAPV3-ETHEREUM:SWAP:WETH-USDT")
+        assert SWAP_PATTERN.match("UNISWAP_V3-ETHEREUM:SWAP:WETH-USDT")
 
     def test_invalid_missing_token_out(self) -> None:
         assert not SWAP_PATTERN.match("ETHEREUM:SWAP:WETH")
@@ -174,13 +174,13 @@ class TestFlashLoanPattern:
     """{PROVIDER}:FLASH_LOAN:{TOKEN}@{CHAIN} format."""
 
     def test_valid_aave_flash_loan(self) -> None:
-        assert FLASH_LOAN_PATTERN.match("AAVEV3-ETHEREUM:FLASH_LOAN:WETH@ETHEREUM")
+        assert FLASH_LOAN_PATTERN.match("AAVE_V3-ETHEREUM:FLASH_LOAN:WETH@ETHEREUM")
 
     def test_valid_morpho_flash_loan(self) -> None:
         assert FLASH_LOAN_PATTERN.match("MORPHO-ETHEREUM:FLASH_LOAN:USDC@ETHEREUM")
 
     def test_invalid_missing_chain(self) -> None:
-        assert not FLASH_LOAN_PATTERN.match("AAVEV3-ETHEREUM:FLASH_LOAN:WETH")
+        assert not FLASH_LOAN_PATTERN.match("AAVE_V3-ETHEREUM:FLASH_LOAN:WETH")
 
 
 class TestYieldBearingPattern:
@@ -256,12 +256,12 @@ SAMPLE_VALID_IDS: dict[str, list[str]] = {
         "BINANCE-FUTURES:PERPETUAL:BTC-USDT@LIN@BINANCE-FUTURES",
         "ASTER:PERPETUAL:ETH-USDC@LIN@ASTER",
     ],
-    "A_TOKEN": ["AAVEV3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM", "AAVEV3-ETHEREUM:A_TOKEN:aWETH@ETHEREUM"],
-    "DEBT_TOKEN": ["AAVEV3-ETHEREUM:DEBT_TOKEN:debtWETH@ETHEREUM"],
+    "A_TOKEN": ["AAVE_V3-ETHEREUM:A_TOKEN:aUSDT@ETHEREUM", "AAVE_V3-ETHEREUM:A_TOKEN:aWETH@ETHEREUM"],
+    "DEBT_TOKEN": ["AAVE_V3-ETHEREUM:DEBT_TOKEN:debtWETH@ETHEREUM"],
     "LST": ["ETHERFI:LST:WEETH@ETHEREUM", "LIDO:LST:STETH@ETHEREUM"],
-    "SWAP": ["ETHEREUM:SWAP:WETH-USDC", "UNISWAPV3-ETHEREUM:SWAP:WETH-USDT"],
+    "SWAP": ["ETHEREUM:SWAP:WETH-USDC", "UNISWAP_V3-ETHEREUM:SWAP:WETH-USDT"],
     "REWARD": ["EIGENLAYER:REWARD:EIGEN@ETHEREUM", "ETHERFI:REWARD:ETHFI@ETHEREUM"],
-    "FLASH_LOAN": ["AAVEV3-ETHEREUM:FLASH_LOAN:WETH@ETHEREUM"],
+    "FLASH_LOAN": ["AAVE_V3-ETHEREUM:FLASH_LOAN:WETH@ETHEREUM"],
     "YIELD_BEARING": ["ETHENA-ETHEREUM:YIELD_BEARING:sUSDe@ETHEREUM"],
 }
 

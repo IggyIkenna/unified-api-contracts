@@ -1011,7 +1011,7 @@ def get_expected_instruments_for_venue(
     ----------
     venue:
         Canonical MTDS venue key (``BINANCE-SPOT``, ``DERIBIT``,
-        ``AAVEV3-ETHEREUM`` …) as used by ``VenueMapping``.
+        ``AAVE_V3-ETHEREUM`` …) as used by ``VenueMapping``.
     data_type:
         Canonical MTDS data_type (``trades``, ``book_snapshot_5``,
         ``dex_swaps`` …).

@@ -27,7 +27,7 @@ _ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 def _split_canonical_venue(canonical: str) -> tuple[str, str] | None:
-    """``"AAVEV3-ARBITRUM"`` → ``("ARBITRUM", "AAVEV3")``.
+    """``"AAVE_V3-ARBITRUM"`` → ``("ARBITRUM", "AAVE_V3")``.
 
     Returns ``None`` for venues that don't follow the ``PROTOCOL-CHAIN``
     convention (currently none, but the helper future-proofs the test).
@@ -71,14 +71,14 @@ def test_protocol_launch_dates_chain_known_to_genesis_ssot() -> None:
 # here requires inline subgraph-probe citation in ``PROTOCOL_LAUNCH_DATES``.
 _PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST: frozenset[tuple[str, str]] = frozenset(
     {
-        ("ARBITRUM", "UNISWAPV3"),  # subgraph indexes 2021-06-01; ARB public mainnet 2021-08-31
-        ("ARBITRUM", "UNISWAP_V3"),  # canonical alias for UNISWAPV3
-        ("OPTIMISM", "UNISWAPV3"),  # subgraph indexes 2021-11-11; OP regenesis mainnet 2021-12-16
-        ("OPTIMISM", "UNISWAP_V3"),  # canonical alias for UNISWAPV3
-        ("BASE", "UNISWAPV3"),  # subgraph indexes 2023-07-31; BASE public mainnet 2023-08-09
-        ("BASE", "UNISWAP_V3"),  # canonical alias for UNISWAPV3
-        ("BASE", "COMPOUNDV3"),  # subgraph indexes 2023-08-04; BASE public mainnet 2023-08-09
-        ("BASE", "COMPOUND_V3"),  # canonical alias for COMPOUNDV3
+        ("ARBITRUM", "UNISWAP_V3"),  # subgraph indexes 2021-06-01; ARB public mainnet 2021-08-31
+        ("ARBITRUM", "UNISWAP_V3"),  # canonical alias for UNISWAP_V3
+        ("OPTIMISM", "UNISWAP_V3"),  # subgraph indexes 2021-11-11; OP regenesis mainnet 2021-12-16
+        ("OPTIMISM", "UNISWAP_V3"),  # canonical alias for UNISWAP_V3
+        ("BASE", "UNISWAP_V3"),  # subgraph indexes 2023-07-31; BASE public mainnet 2023-08-09
+        ("BASE", "UNISWAP_V3"),  # canonical alias for UNISWAP_V3
+        ("BASE", "COMPOUND_V3"),  # subgraph indexes 2023-08-04; BASE public mainnet 2023-08-09
+        ("BASE", "COMPOUND_V3"),  # canonical alias for COMPOUND_V3
     }
 )
 
@@ -89,7 +89,7 @@ def test_protocol_launch_after_chain_genesis() -> None:
     pre-public-launch blocks (see ``_PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST``).
     Catches typo-class data-entry errors while permitting the legitimate
     "subgraph indexes pre-mainnet" shape Tab 14's 2026-05-08 audit
-    documented across UNISWAPV3 ARB/OPT/BASE + COMPOUNDV3 BASE."""
+    documented across UNISWAP_V3 ARB/OPT/BASE + COMPOUND_V3 BASE."""
     for (chain, protocol), launch_iso in PROTOCOL_LAUNCH_DATES.items():
         if (chain, protocol) in _PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST:
             continue
@@ -138,18 +138,18 @@ def test_pending_investigation_disjoint_from_declared() -> None:
 @pytest.mark.parametrize(
     ("chain", "protocol", "expected"),
     [
-        ("ETHEREUM", "AAVEV3", "2023-01-27"),  # AAVE V3 ETH mainnet — first
+        ("ETHEREUM", "AAVE_V3", "2023-01-27"),  # AAVE V3 ETH mainnet — first
         # subgraph event 2023-01-27 08:00:11 UTC, verified 2026-05-08 via
         # gateway.thegraph.com Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g.
         ("ethereum", "aavev3", "2023-01-27"),  # case-insensitive
-        ("ARBITRUM", "AAVEV3", "2022-03-16"),
-        ("BASE", "AAVEV3", "2023-08-22"),  # Tab 14 audit 2026-05-08
-        ("OPTIMISM", "AAVEV3", "2022-03-15"),  # Tab 14 audit 2026-05-08
-        ("BSC", "AAVEV3", "2024-01-23"),  # Tab 14 audit 2026-05-08
-        ("ETHEREUM", "COMPOUNDV3", "2022-08-13"),  # Tab 14 audit 2026-05-08
-        ("ARBITRUM", "UNISWAPV3", "2021-06-01"),  # Tab 14 audit; pre-mainnet-open indexed
+        ("ARBITRUM", "AAVE_V3", "2022-03-16"),
+        ("BASE", "AAVE_V3", "2023-08-22"),  # Tab 14 audit 2026-05-08
+        ("OPTIMISM", "AAVE_V3", "2022-03-15"),  # Tab 14 audit 2026-05-08
+        ("BSC", "AAVE_V3", "2024-01-23"),  # Tab 14 audit 2026-05-08
+        ("ETHEREUM", "COMPOUND_V3", "2022-08-13"),  # Tab 14 audit 2026-05-08
+        ("ARBITRUM", "UNISWAP_V3", "2021-06-01"),  # Tab 14 audit; pre-mainnet-open indexed
         ("ETHEREUM", "SPARK", "2023-03-07"),  # Tab 14 audit; added 2026-05-08
-        ("ETHEREUM", "UNISWAPV3", "2021-05-04"),
+        ("ETHEREUM", "UNISWAP_V3", "2021-05-04"),
         ("SOLANA", "JITO", "2022-08-15"),
     ],
 )
@@ -158,18 +158,18 @@ def test_get_protocol_launch_date_known(chain: str, protocol: str, expected: str
 
 
 def test_get_protocol_launch_date_unknown_returns_none() -> None:
-    assert get_protocol_launch_date("UNKNOWN_CHAIN", "AAVEV3") is None
+    assert get_protocol_launch_date("UNKNOWN_CHAIN", "AAVE_V3") is None
     assert get_protocol_launch_date("ETHEREUM", "UNKNOWN_PROTOCOL") is None
-    assert get_protocol_launch_date("", "AAVEV3") is None
+    assert get_protocol_launch_date("", "AAVE_V3") is None
     assert get_protocol_launch_date("ETHEREUM", "") is None
 
 
 def test_compose_with_chain_genesis_takes_max() -> None:
     """The documented composition ``max(chain_genesis, protocol_launch)``
     is the contract callers depend on. Verify with a concrete pair where
-    the protocol launch postdates chain genesis (AAVEV3-ARBITRUM)."""
+    the protocol launch postdates chain genesis (AAVE_V3-ARBITRUM)."""
     chain_genesis = get_chain_genesis_date("ARBITRUM")
-    protocol_launch = get_protocol_launch_date("ARBITRUM", "AAVEV3")
+    protocol_launch = get_protocol_launch_date("ARBITRUM", "AAVE_V3")
     assert chain_genesis == "2021-08-31"
     assert protocol_launch == "2022-03-16"
     # max of the two iso strings is the protocol launch (later)

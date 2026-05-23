@@ -881,7 +881,7 @@ def get_reserve_params(asset: str, chain: str = "ETHEREUM") -> ReserveParams | N
         return chain_dict[upper]
 
     # Extract asset from A_TOKEN/DEBT_TOKEN instrument_id
-    # Format: AAVEV3-ETHEREUM:A_TOKEN:AUSDC → USDC
+    # Format: AAVE_V3-ETHEREUM:A_TOKEN:AUSDC → USDC
     if ":" in upper:
         parts = upper.split(":")
         if len(parts) >= 3:
@@ -988,14 +988,14 @@ def _extract_asset_symbol(inst_id: str) -> str:
 
     Handles formats like:
     - "WETH" → "WETH"
-    - "AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM" → "WEETH"
-    - "AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM" → "WETH"
+    - "AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM" → "WEETH"
+    - "AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM" → "WETH"
     - "AAVE_V3_WEETH_A_TOKEN" → "WEETH"
     - "AAVE_V3_WETH_DEBT_TOKEN" → "WETH"
     """
     upper = inst_id.upper()
 
-    # Colon-delimited format: AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM
+    # Colon-delimited format: AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM
     if ":" in upper:
         parts = upper.split(":")
         if len(parts) >= 3:

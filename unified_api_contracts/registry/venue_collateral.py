@@ -44,12 +44,12 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("ASTER", "USDC", True, Decimal("0"), "CROSS", "Primary margin", "PERP_CEX"),
     CollateralAcceptance("ASTER", "USDT", True, Decimal("0.01"), "CROSS", "Slight haircut", "PERP_CEX"),
     # Aave V3 (referencing defi_reserve_params.py LTV values)
-    CollateralAcceptance("AAVEV3-ETHEREUM", "WETH", True, Decimal("0.175"), "ISOLATED", "LTV 82.5%", "LENDING"),
-    CollateralAcceptance("AAVEV3-ETHEREUM", "weETH", True, Decimal("0.275"), "ISOLATED", "LTV 72.5%", "LENDING"),
-    CollateralAcceptance("AAVEV3-ETHEREUM", "wstETH", True, Decimal("0.205"), "ISOLATED", "LTV 79.5%", "LENDING"),
-    CollateralAcceptance("AAVEV3-ETHEREUM", "USDT", True, Decimal("0.23"), "ISOLATED", "LTV 77%", "LENDING"),
-    CollateralAcceptance("AAVEV3-ETHEREUM", "USDC", True, Decimal("0.23"), "ISOLATED", "LTV 77%", "LENDING"),
-    CollateralAcceptance("AAVEV3-ETHEREUM", "WBTC", True, Decimal("0.27"), "ISOLATED", "LTV 73%", "LENDING"),
+    CollateralAcceptance("AAVE_V3-ETHEREUM", "WETH", True, Decimal("0.175"), "ISOLATED", "LTV 82.5%", "LENDING"),
+    CollateralAcceptance("AAVE_V3-ETHEREUM", "weETH", True, Decimal("0.275"), "ISOLATED", "LTV 72.5%", "LENDING"),
+    CollateralAcceptance("AAVE_V3-ETHEREUM", "wstETH", True, Decimal("0.205"), "ISOLATED", "LTV 79.5%", "LENDING"),
+    CollateralAcceptance("AAVE_V3-ETHEREUM", "USDT", True, Decimal("0.23"), "ISOLATED", "LTV 77%", "LENDING"),
+    CollateralAcceptance("AAVE_V3-ETHEREUM", "USDC", True, Decimal("0.23"), "ISOLATED", "LTV 77%", "LENDING"),
+    CollateralAcceptance("AAVE_V3-ETHEREUM", "WBTC", True, Decimal("0.27"), "ISOLATED", "LTV 73%", "LENDING"),
     # Binance
     CollateralAcceptance("BINANCE", "USDT", True, Decimal("0"), "CROSS", "Linear futures", "PERP_CEX"),
     CollateralAcceptance("BINANCE", "BTC", True, Decimal("0.05"), "CROSS", "Coin-margined", "PERP_CEX"),

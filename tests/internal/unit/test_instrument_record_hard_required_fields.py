@@ -91,15 +91,15 @@ class TestDeFiOnchainRules:
     def test_pool_without_identifier_fails(self) -> None:
         with pytest.raises(ValueError, match="on-chain identifier"):
             InstrumentRecord(
-                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
-                venue="UNISWAPV3-ETHEREUM",
+                instrument_key="UNISWAP_V3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAP_V3-ETHEREUM",
                 instrument_type=InstrumentType.POOL,
             )
 
     def test_pool_with_pool_address_passes(self) -> None:
         rec = InstrumentRecord(
-            instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
-            venue="UNISWAPV3-ETHEREUM",
+            instrument_key="UNISWAP_V3-ETHEREUM:POOL:WETH-USDC",
+            venue="UNISWAP_V3-ETHEREUM",
             instrument_type=InstrumentType.POOL,
             pool_address=_DUMMY_ADDR,
             base_asset_decimals=18,
@@ -109,8 +109,8 @@ class TestDeFiOnchainRules:
 
     def test_lending_with_base_contract_address_passes(self) -> None:
         rec = InstrumentRecord(
-            instrument_key="AAVEV3-ETHEREUM:LENDING:USDC",
-            venue="AAVEV3-ETHEREUM",
+            instrument_key="AAVE_V3-ETHEREUM:LENDING:USDC",
+            venue="AAVE_V3-ETHEREUM",
             instrument_type=InstrumentType.LENDING,
             base_asset_contract_address=_DUMMY_ADDR,
             base_asset_decimals=6,
@@ -131,8 +131,8 @@ class TestDeFiDecimalsRules:
     def test_pool_without_base_decimals_fails(self) -> None:
         with pytest.raises(ValueError, match="base_asset_decimals"):
             InstrumentRecord(
-                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
-                venue="UNISWAPV3-ETHEREUM",
+                instrument_key="UNISWAP_V3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAP_V3-ETHEREUM",
                 instrument_type=InstrumentType.POOL,
                 pool_address=_DUMMY_ADDR,
                 base_asset_decimals=None,
@@ -142,8 +142,8 @@ class TestDeFiDecimalsRules:
     def test_lending_without_base_decimals_fails(self) -> None:
         with pytest.raises(ValueError, match="base_asset_decimals"):
             InstrumentRecord(
-                instrument_key="AAVEV3-ETHEREUM:LENDING:USDC",
-                venue="AAVEV3-ETHEREUM",
+                instrument_key="AAVE_V3-ETHEREUM:LENDING:USDC",
+                venue="AAVE_V3-ETHEREUM",
                 instrument_type=InstrumentType.LENDING,
                 base_asset_contract_address=_DUMMY_ADDR,
                 base_asset_decimals=None,
@@ -162,8 +162,8 @@ class TestDeFiDecimalsRules:
     def test_pool_without_quote_decimals_fails(self) -> None:
         with pytest.raises(ValueError, match="quote_asset_decimals"):
             InstrumentRecord(
-                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
-                venue="UNISWAPV3-ETHEREUM",
+                instrument_key="UNISWAP_V3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAP_V3-ETHEREUM",
                 instrument_type=InstrumentType.POOL,
                 pool_address=_DUMMY_ADDR,
                 base_asset_decimals=18,
@@ -172,8 +172,8 @@ class TestDeFiDecimalsRules:
 
     def test_pool_with_both_decimals_passes(self) -> None:
         rec = InstrumentRecord(
-            instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
-            venue="UNISWAPV3-ETHEREUM",
+            instrument_key="UNISWAP_V3-ETHEREUM:POOL:WETH-USDC",
+            venue="UNISWAP_V3-ETHEREUM",
             instrument_type=InstrumentType.POOL,
             pool_address=_DUMMY_ADDR,
             base_asset_decimals=18,
@@ -185,8 +185,8 @@ class TestDeFiDecimalsRules:
     def test_lending_without_quote_decimals_passes(self) -> None:
         """LENDING is single-asset — quote_asset_decimals legitimately None."""
         rec = InstrumentRecord(
-            instrument_key="AAVEV3-ETHEREUM:LENDING:USDC",
-            venue="AAVEV3-ETHEREUM",
+            instrument_key="AAVE_V3-ETHEREUM:LENDING:USDC",
+            venue="AAVE_V3-ETHEREUM",
             instrument_type=InstrumentType.LENDING,
             base_asset_contract_address=_DUMMY_ADDR,
             base_asset_decimals=6,
@@ -222,8 +222,8 @@ class TestDeFiDecimalsRules:
     def test_error_message_cites_phase_a_plan(self) -> None:
         with pytest.raises(ValueError, match="hard_schema_phase1_field_flip_migration_2026_05_19"):
             InstrumentRecord(
-                instrument_key="UNISWAPV3-ETHEREUM:POOL:WETH-USDC",
-                venue="UNISWAPV3-ETHEREUM",
+                instrument_key="UNISWAP_V3-ETHEREUM:POOL:WETH-USDC",
+                venue="UNISWAP_V3-ETHEREUM",
                 instrument_type=InstrumentType.POOL,
                 pool_address=_DUMMY_ADDR,
                 base_asset_decimals=None,

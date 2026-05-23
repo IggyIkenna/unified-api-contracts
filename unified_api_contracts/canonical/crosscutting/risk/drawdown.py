@@ -109,7 +109,7 @@ class RiskThresholds(BaseModel):
     (e.g. -0.02 = 2% drawdown). None opts out of that threshold for this strategy."""
 
     @model_validator(mode="after")
-    def _all_kinds_declared(self) -> "RiskThresholds":
+    def _all_kinds_declared(self) -> RiskThresholds:
         """Every DrawdownThresholdKind MUST appear as a key (value may be None)."""
         missing = {k for k in DrawdownThresholdKind} - self.pnl_drawdown.keys()
         if missing:
@@ -120,7 +120,7 @@ class RiskThresholds(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def _monotonic_severity(self) -> "RiskThresholds":
+    def _monotonic_severity(self) -> RiskThresholds:
         """Declared (non-None) thresholds must be monotonically decreasing
         along the severity ladder (more-negative = worse).
 

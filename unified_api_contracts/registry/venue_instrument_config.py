@@ -43,13 +43,13 @@ class ExchangeInstrumentConfig:
             "EXTENDED-STARKNET": ["PERPETUAL"],
             "LIGHTER-ZKSYNC": ["PERPETUAL"],
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
-            "UNISWAPV2-ETHEREUM": ["POOL"],
-            "UNISWAPV3-ETHEREUM": ["POOL"],
-            "UNISWAPV4-ETHEREUM": ["POOL"],
+            "UNISWAP_V2-ETHEREUM": ["POOL"],
+            "UNISWAP_V3-ETHEREUM": ["POOL"],
+            "UNISWAP_V4-ETHEREUM": ["POOL"],
             "CURVE-ETHEREUM": ["POOL"],
             "BALANCER-ETHEREUM": ["POOL"],
             # DeFi - Lending protocols
-            "AAVEV3-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
+            "AAVE_V3-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             "MORPHO-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             "FLUID-ETHEREUM": ["A_TOKEN", "DEBT_TOKEN"],
             # DeFi - LST/Yield protocols

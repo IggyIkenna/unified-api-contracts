@@ -229,22 +229,22 @@ class TestComposeValidationHappyPath:
 
 
 class TestComposeValidationSwapUniswap:
-    """SWAP + UNISWAPV3-ETHEREUM: structural + capability resolution both pass.
+    """SWAP + UNISWAP_V3-ETHEREUM: structural + capability resolution both pass.
 
-    UNISWAPV3-ETHEREUM lowercases to "uniswapv3_ethereum"; the candidate chain
+    UNISWAP_V3-ETHEREUM lowercases to "uniswapv3_ethereum"; the candidate chain
     strips the chain suffix to "uniswapv3", then strips the version suffix to
     "uniswap", which is a registered SourceCapability with swap_events support.
     """
 
     def test_swap_uniswap_pool_market_resolves_successfully(self) -> None:
-        """SWAP + UNISWAPV3-ETHEREUM + MARKET + POOL + mainnet resolves via 'uniswap' source.
+        """SWAP + UNISWAP_V3-ETHEREUM + MARKET + POOL + mainnet resolves via 'uniswap' source.
 
         Structural validation passes (SWAP allows MARKET, POOL, defi), and
         the candidate chain uniswapv3_ethereum -> uniswapv3 -> uniswap resolves
         to the registered 'uniswap' SourceCapability which supports swap_events.
         """
         result = compose_validation(
-            venue="UNISWAPV3-ETHEREUM",
+            venue="UNISWAP_V3-ETHEREUM",
             instruction_type="SWAP",
             operation="swap_events",
             env="mainnet",
@@ -329,7 +329,7 @@ class TestResolveVenueContextParametrized:
         [
             ("HYPERLIQUID", "cefi"),
             ("AAVE_V3", "defi"),
-            ("UNISWAPV3-ETHEREUM", "defi"),
+            ("UNISWAP_V3-ETHEREUM", "defi"),
             ("BETFAIR", "sports"),
             ("DRAFTKINGS", "sports"),
             ("KALSHI", "sports"),

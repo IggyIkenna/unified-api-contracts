@@ -196,12 +196,12 @@ class VenueMapping:
             "LIGHTER-ZKSYNC": "lighter_api",  # pre-2026-04-17; post routes to Tardis
             "DRIFT": "drift_api",  # S3 archive (2022-2025) + Data API (2025-present)
             # DeFi venues — canonical PROTOCOL-CHAIN format
-            "UNISWAPV2-ETHEREUM": "the_graph",
-            "UNISWAPV3-ETHEREUM": "the_graph",
-            "UNISWAPV4-ETHEREUM": "the_graph",
+            "UNISWAP_V2-ETHEREUM": "the_graph",
+            "UNISWAP_V3-ETHEREUM": "the_graph",
+            "UNISWAP_V4-ETHEREUM": "the_graph",
             "CURVE-ETHEREUM": "rpc",
             "BALANCER-ETHEREUM": "balancer_api_v3",
-            "AAVEV3-ETHEREUM": "the_graph",
+            "AAVE_V3-ETHEREUM": "the_graph",
             "MORPHO-ETHEREUM": "the_graph",
             "FLUID-ETHEREUM": "the_graph",
             "LIDO-ETHEREUM": "protocol_sdk",
@@ -254,13 +254,13 @@ class VenueMapping:
             "FX": "2020-01-01",
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
             # Start dates = earliest manifest data
-            "UNISWAPV2-ETHEREUM": "2020-05-06",  # Uniswap V2 factory deployed May 2020
-            "UNISWAPV3-ETHEREUM": "2021-05-05",  # Uniswap V3 mainnet launch
-            "UNISWAPV3-ARBITRUM": "2021-06-18",
-            "UNISWAPV3-POLYGON": "2021-12-22",  # Uniswap V3 Polygon deployment
-            "UNISWAPV3-OPTIMISM": "2021-11-12",
-            "UNISWAPV3-BASE": "2023-09-03",  # Earliest subgraph data (Base launched 2023-08-09)
-            "UNISWAPV4-ETHEREUM": "2025-01-30",  # Uniswap V4 mainnet deployment
+            "UNISWAP_V2-ETHEREUM": "2020-05-06",  # Uniswap V2 factory deployed May 2020
+            "UNISWAP_V3-ETHEREUM": "2021-05-05",  # Uniswap V3 mainnet launch
+            "UNISWAP_V3-ARBITRUM": "2021-06-18",
+            "UNISWAP_V3-POLYGON": "2021-12-22",  # Uniswap V3 Polygon deployment
+            "UNISWAP_V3-OPTIMISM": "2021-11-12",
+            "UNISWAP_V3-BASE": "2023-09-03",  # Earliest subgraph data (Base launched 2023-08-09)
+            "UNISWAP_V4-ETHEREUM": "2025-01-30",  # Uniswap V4 mainnet deployment
             "CURVE-ETHEREUM": "2020-01-20",  # Curve genesis pool
             "CURVE-AVALANCHE": "2021-11-10",  # Curve Avalanche deployment
             "CURVE-OPTIMISM": "2022-01-13",  # Curve Optimism deployment
@@ -270,30 +270,30 @@ class VenueMapping:
             "BALANCER-OPTIMISM": "2022-05-20",
             "BALANCER-AVALANCHE": "2023-08-17",
             "BALANCER-BASE": "2023-07-29",
-            "PANCAKESWAPV3-BSC": "2023-04-03",  # PancakeSwap V3 BSC launch
-            "PANCAKESWAPV3-ETHEREUM": "2023-04-03",  # PancakeSwap V3 ETH launch
-            "PANCAKESWAPV3-BASE": "2023-09-01",
-            "CAMELOTV3-ARBITRUM": "2023-06-14",  # Earliest pool createdAtTimestamp
-            "SUSHISWAPV3-ETHEREUM": "2023-04-01",  # SushiSwap V3 ETH launch
-            "SUSHISWAPV3-AVALANCHE": "2023-04-01",
+            "PANCAKESWAP_V3-BSC": "2023-04-03",  # PancakeSwap V3 BSC launch
+            "PANCAKESWAP_V3-ETHEREUM": "2023-04-03",  # PancakeSwap V3 ETH launch
+            "PANCAKESWAP_V3-BASE": "2023-09-01",
+            "CAMELOT_V3-ARBITRUM": "2023-06-14",  # Earliest pool createdAtTimestamp
+            "SUSHISWAP_V3-ETHEREUM": "2023-04-01",  # SushiSwap V3 ETH launch
+            "SUSHISWAP_V3-AVALANCHE": "2023-04-01",
             "GMX-ARBITRUM": "2021-09-06",  # GMX Arbitrum launch
             "GMX-AVALANCHE": "2022-01-05",  # GMX Avalanche launch
-            "AERODROMEV3-BASE": "2024-05-01",  # Earliest pool createdAtTimestamp from subgraph
+            "AERODROME_V3-BASE": "2024-05-01",  # Earliest pool createdAtTimestamp from subgraph
             "VELODROMEV2-OPTIMISM": "2023-06-15",  # Velodrome V2 Optimism launch
             "TRADERJOE-AVALANCHE": "2021-07-04",  # TraderJoe Avalanche launch
             # DeFi - Lending protocols
-            "AAVEV3-ETHEREUM": "2023-01-27",
-            "AAVEV3-POLYGON": "2022-03-12",
-            "AAVEV3-AVALANCHE": "2022-03-12",
-            "AAVEV3-ARBITRUM": "2022-03-12",
-            "AAVEV3-OPTIMISM": "2022-03-12",
-            "AAVEV3-BASE": "2023-08-23",
-            "AAVEV3-BSC": "2024-01-24",
-            "AAVEV3-LINEA": "2025-02-12",
-            "COMPOUNDV3-ETHEREUM": "2022-08-14",
-            "COMPOUNDV3-ARBITRUM": "2023-05-05",
-            "COMPOUNDV3-BASE": "2023-08-20",
-            "COMPOUNDV3-OPTIMISM": "2024-04-07",
+            "AAVE_V3-ETHEREUM": "2023-01-27",
+            "AAVE_V3-POLYGON": "2022-03-12",
+            "AAVE_V3-AVALANCHE": "2022-03-12",
+            "AAVE_V3-ARBITRUM": "2022-03-12",
+            "AAVE_V3-OPTIMISM": "2022-03-12",
+            "AAVE_V3-BASE": "2023-08-23",
+            "AAVE_V3-BSC": "2024-01-24",
+            "AAVE_V3-LINEA": "2025-02-12",
+            "COMPOUND_V3-ETHEREUM": "2022-08-14",
+            "COMPOUND_V3-ARBITRUM": "2023-05-05",
+            "COMPOUND_V3-BASE": "2023-08-20",
+            "COMPOUND_V3-OPTIMISM": "2024-04-07",
             "MORPHO-ETHEREUM": "2024-01-08",
             "MORPHO-BASE": "2024-06-01",
             "FLUID-ETHEREUM": "2024-02-27",
@@ -402,7 +402,7 @@ class VenueMapping:
     def is_defi_venue(self, venue: str) -> bool:
         """Check if venue is a DeFi protocol (swaps, lending, staking).
 
-        Accepts both canonical (``AAVEV3-ETHEREUM``) and legacy
+        Accepts both canonical (``AAVE_V3-ETHEREUM``) and legacy
         (``AAVE_V3``) forms.
         """
         if venue in self.all_defi_venues:
@@ -414,8 +414,8 @@ class VenueMapping:
 
         Manifests pre-dating the canonical-naming migration carry legacy forms
         such as ``AAVE_V3`` / ``UNISWAP_V2`` / ``CURVE`` / ``ETHENA``. This
-        helper resolves either form to the canonical ``AAVEV3-ETHEREUM`` /
-        ``UNISWAPV2-ETHEREUM`` / etc. so data-status aggregators, feature
+        helper resolves either form to the canonical ``AAVE_V3-ETHEREUM`` /
+        ``UNISWAP_V2-ETHEREUM`` / etc. so data-status aggregators, feature
         services, and ML pipelines can look up by a single key.
 
         Args:

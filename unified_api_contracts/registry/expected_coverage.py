@@ -181,7 +181,7 @@ _DEFI: dict[str, list[str]] = {
     # via DefiManifestRecorder._normalise_venue). Chain is a SEPARATE manifest
     # field — do NOT embed chain in the key here.
     # Bug fixed 2026-05-22: prior entries used VENUE-CHAIN format (e.g.
-    # "UNISWAPV3-ETHEREUM") which never matched any manifest row and caused
+    # "UNISWAP_V3-ETHEREUM") which never matched any manifest row and caused
     # all DEX/lending shard counts to be missing from the 88.5% coverage score.
     # -------------------------------------------------------------------------
     "UNISWAP_V2": list(_DEFI_DEX_PAIRS),
@@ -195,15 +195,15 @@ _DEFI: dict[str, list[str]] = {
     "BALANCER": list(_DEFI_DEX_PAIRS),
     "CURVE": list(_DEFI_DEX_PAIRS),
     # Legacy VENUE-CHAIN format: 411k rows migrated 2026-05-07 from UNISWAP_V3 →
-    # UNISWAPV3-ETHEREUM (chain embedded, chain field = ""). Both formats coexist
+    # UNISWAP_V3-ETHEREUM (chain embedded, chain field = ""). Both formats coexist
     # until a follow-up migration normalises all rows to flat format.
-    "UNISWAPV2-ETHEREUM": list(_DEFI_DEX_PAIRS),
-    "UNISWAPV3-ETHEREUM": list(_DEFI_DEX_PAIRS),
-    "UNISWAPV3-ARBITRUM": list(_DEFI_DEX_PAIRS),
-    "UNISWAPV3-BASE": list(_DEFI_DEX_PAIRS),
-    "UNISWAPV3-OPTIMISM": list(_DEFI_DEX_PAIRS),
-    "UNISWAPV3-POLYGON": list(_DEFI_DEX_PAIRS),
-    "UNISWAPV4-ETHEREUM": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V2-ETHEREUM": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V3-ETHEREUM": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V3-ARBITRUM": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V3-BASE": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V3-OPTIMISM": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V3-POLYGON": list(_DEFI_DEX_PAIRS),
+    "UNISWAP_V4-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "CURVE-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "CURVE-AVALANCHE": list(_DEFI_DEX_PAIRS),
     "CURVE-OPTIMISM": list(_DEFI_DEX_PAIRS),
@@ -213,31 +213,31 @@ _DEFI: dict[str, list[str]] = {
     "BALANCER-BASE": list(_DEFI_DEX_PAIRS),
     "BALANCER-OPTIMISM": list(_DEFI_DEX_PAIRS),
     "BALANCER-POLYGON": list(_DEFI_DEX_PAIRS),
-    "SUSHISWAPV3-ETHEREUM": list(_DEFI_DEX_PAIRS),
+    "SUSHISWAP_V3-ETHEREUM": list(_DEFI_DEX_PAIRS),
     "ORCA-SOLANA": list(_DEFI_DEX_PAIRS),
     "RAYDIUM-SOLANA": list(_DEFI_DEX_PAIRS),
     # --- Lending protocols — evm_defi_handler uses "aave_v3".upper() = "AAVE_V3" ---
-    # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVEV3"
+    # ALSO: flash_loan_events_handler + position_data_handler hardcode "AAVE_V3"
     # (no underscore) — both names needed until those handlers are normalised (Bug 2).
     "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3": list(_DEFI_LENDING_AAVE_PAIRS),  # hardcoded in flash_loan + position_data handlers
+    "AAVE_V3": list(_DEFI_LENDING_AAVE_PAIRS),  # hardcoded in flash_loan + position_data handlers
     # Legacy VENUE-CHAIN format for lending (411k migrated rows, chain embedded in venue):
-    "AAVEV3-ARBITRUM": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-AVALANCHE": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-BASE": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-BSC": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-ETHEREUM": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-LINEA": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-OPTIMISM": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-POLYGON": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-SCROLL": list(_DEFI_LENDING_AAVE_PAIRS),
-    "AAVEV3-ZKSYNC": list(_DEFI_LENDING_AAVE_PAIRS),
-    "COMPOUNDV3-ARBITRUM": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-BASE": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-ETHEREUM": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-OPTIMISM": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-POLYGON": list(_DEFI_LENDING_PAIRS),
-    "COMPOUNDV3-SCROLL": list(_DEFI_LENDING_PAIRS),
+    "AAVE_V3-ARBITRUM": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-AVALANCHE": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-BASE": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-BSC": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-ETHEREUM": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-LINEA": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-OPTIMISM": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-POLYGON": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-SCROLL": list(_DEFI_LENDING_AAVE_PAIRS),
+    "AAVE_V3-ZKSYNC": list(_DEFI_LENDING_AAVE_PAIRS),
+    "COMPOUND_V3-ARBITRUM": list(_DEFI_LENDING_PAIRS),
+    "COMPOUND_V3-BASE": list(_DEFI_LENDING_PAIRS),
+    "COMPOUND_V3-ETHEREUM": list(_DEFI_LENDING_PAIRS),
+    "COMPOUND_V3-OPTIMISM": list(_DEFI_LENDING_PAIRS),
+    "COMPOUND_V3-POLYGON": list(_DEFI_LENDING_PAIRS),
+    "COMPOUND_V3-SCROLL": list(_DEFI_LENDING_PAIRS),
     "COMPOUND_V3": list(_DEFI_LENDING_PAIRS),
     "MORPHO": list(_DEFI_LENDING_PAIRS),
     "FLUID": list(_DEFI_LENDING_PAIRS),
@@ -305,7 +305,7 @@ _DEFI: dict[str, list[str]] = {
     # eigenlayer_rewards_handler venue="EIGENLAYER"
     "EIGENLAYER": ["eigenlayer_rewards"],
     # --- Deferred (handler→capability venue naming inconsistency) ---
-    # native_staking_rates (SOLANA-NATIVE-SOLANA) + vault_share_price (YEARNV3/MAKER/
+    # native_staking_rates (SOLANA-NATIVE-SOLANA) + vault_share_price (YEARN_V3/MAKER/
     # FRAX/MORPHOVAULTS/ETHENA) + governance_proposals (COMPOUND/AAVE/UNISWAP) have
     # capabilities dict entries using VENUE-CHAIN format while handlers emit bare VENUE.
     # These 3 data_type families are NOT yet in DATA_TYPES_BY_ASSET_GROUP["defi"].
@@ -551,7 +551,7 @@ def _is_deprecated_defi_venue(data_source: str) -> bool:
     """True if the DeFi venue is in the workspace-canonical deprecated/empty set.
 
     SSOT: ``capability_declarations._defi_coverage.EMPTY_OR_DEPRECATED_DEFI_VENUES``
-    (e.g. ``TRADER_JOEV2-AVALANCHE``, ``UNISWAPV3-POLYGON``, ``GMX-AVALANCHE``).
+    (e.g. ``TRADER_JOEV2-AVALANCHE``, ``UNISWAP_V3-POLYGON``, ``GMX-AVALANCHE``).
     These venues either have empty/retired subgraphs or no historical parquets;
     flagging them as ``EXPECTED_DEPRECATED_DATA_TYPE`` keeps the divergence
     report honest.
@@ -613,7 +613,7 @@ def _is_us_half_day(venue: str, target_date: _date) -> bool:
 
 
 def _defi_protocol_chain_split(source: str) -> tuple[str, str] | None:
-    """Split a DeFi source like 'AAVEV3-ETHEREUM' into ('AAVEV3', 'ETHEREUM')."""
+    """Split a DeFi source like 'AAVE_V3-ETHEREUM' into ('AAVE_V3', 'ETHEREUM')."""
     if "-" not in source:
         return None
     protocol, _, chain = source.rpartition("-")
@@ -679,7 +679,7 @@ def expected_coverage(
             ``tradfi`` / ``sports`` / ``prediction``).
         data_source: venue token as used in
             ``EXPECTED_COVERAGE_BY_ASSET_GROUP`` (e.g. ``BINANCE-SPOT``,
-            ``AAVEV3-ETHEREUM``, ``CME``).
+            ``AAVE_V3-ETHEREUM``, ``CME``).
         data_type: data_type as used in the scope policy.
         target_date: the date being queried.
 

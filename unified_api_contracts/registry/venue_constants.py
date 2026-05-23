@@ -35,15 +35,15 @@ XNAS = "XNAS"
 XNYS = "XNYS"
 
 # DEX Constants
-UNISWAPV2_ETH = "UNISWAPV2-ETHEREUM"
-UNISWAPV3_ETH = "UNISWAPV3-ETHEREUM"
-UNISWAPV4_ETH = "UNISWAPV4-ETHEREUM"
+UNISWAP_V2_ETH = "UNISWAP_V2-ETHEREUM"
+UNISWAP_V3_ETH = "UNISWAP_V3-ETHEREUM"
+UNISWAP_V4_ETH = "UNISWAP_V4-ETHEREUM"
 CURVE_ETH = "CURVE-ETHEREUM"
 AERODROME_BASE = "AERODROME-BASE"
 
 # DeFi Lending/Staking Constants
 AAVE_V3 = "AAVE_V3"
-AAVE_V3_ETH = "AAVEV3-ETHEREUM"
+AAVE_V3_ETH = "AAVE_V3-ETHEREUM"
 MORPHO_ETHEREUM = "MORPHO-ETHEREUM"
 FLUID_PLASMA = "FLUID-PLASMA"
 AAVE_PLASMA = "AAVE-PLASMA"
@@ -261,9 +261,9 @@ SPORTS_VENUES: set[str] = SPORTS_BET_PLACEMENT_VENUES | SPORTS_DFS_VENUES | SPOR
 # Venue Sets — grouped by execution semantics (non-sports)
 
 DEX_VENUES: set[str] = {
-    UNISWAPV2_ETH,
-    UNISWAPV3_ETH,
-    UNISWAPV4_ETH,
+    UNISWAP_V2_ETH,
+    UNISWAP_V3_ETH,
+    UNISWAP_V4_ETH,
     CURVE_ETH,
     AERODROME_BASE,
 }
@@ -327,9 +327,9 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     CBOE: "tradfi",
     XNAS: "tradfi",
     XNYS: "tradfi",
-    UNISWAPV2_ETH: "defi",
-    UNISWAPV3_ETH: "defi",
-    UNISWAPV4_ETH: "defi",
+    UNISWAP_V2_ETH: "defi",
+    UNISWAP_V3_ETH: "defi",
+    UNISWAP_V4_ETH: "defi",
     CURVE_ETH: "defi",
     AERODROME_BASE: "defi",
     AAVE_V3: "defi",
@@ -369,9 +369,9 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     CBOE: {"EQUITY", "ETF", "OPTION", "INDEX"},
     XNAS: {"EQUITY", "ETF"},
     XNYS: {"EQUITY", "ETF"},
-    UNISWAPV2_ETH: {"POOL"},
-    UNISWAPV3_ETH: {"POOL"},
-    UNISWAPV4_ETH: {"POOL"},
+    UNISWAP_V2_ETH: {"POOL"},
+    UNISWAP_V3_ETH: {"POOL"},
+    UNISWAP_V4_ETH: {"POOL"},
     CURVE_ETH: {"POOL"},
     AERODROME_BASE: {"POOL"},
     AAVE_V3: {"LENDING"},
@@ -471,9 +471,9 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     COMEX: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     ICE: {VenueCapability.FUTURES_TRADE, VenueCapability.OPTIONS_TRADE},
     CBOE: {VenueCapability.SPOT_TRADE, VenueCapability.OPTIONS_TRADE},
-    UNISWAPV2_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
-    UNISWAPV3_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
-    UNISWAPV4_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    UNISWAP_V2_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    UNISWAP_V3_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
+    UNISWAP_V4_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
     CURVE_ETH: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
     AERODROME_BASE: {VenueCapability.SWAP, VenueCapability.PROVIDE_LIQUIDITY},
     AAVE_V3: {VenueCapability.LEND, VenueCapability.BORROW, VenueCapability.FLASH_LOAN},
@@ -623,9 +623,9 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     ICE: _TRADFI_DERIVATIVES,
     CBOE: _TRADFI_EXCHANGE,
     # DEX / AMM venues (no order-level sub-capabilities)
-    UNISWAPV2_ETH: _DEX_AMM,
-    UNISWAPV3_ETH: _DEX_AMM,
-    UNISWAPV4_ETH: _DEX_AMM,
+    UNISWAP_V2_ETH: _DEX_AMM,
+    UNISWAP_V3_ETH: _DEX_AMM,
+    UNISWAP_V4_ETH: _DEX_AMM,
     CURVE_ETH: _DEX_AMM,
     AERODROME_BASE: _DEX_AMM,
     # DeFi lending
@@ -661,9 +661,9 @@ class DefiProtocolType(StrEnum):
 
 
 VENUE_PROTOCOL_TYPE: dict[str, DefiProtocolType] = {
-    UNISWAPV2_ETH: DefiProtocolType.DEX_AMM,
-    UNISWAPV3_ETH: DefiProtocolType.DEX_AMM,
-    UNISWAPV4_ETH: DefiProtocolType.DEX_AMM,
+    UNISWAP_V2_ETH: DefiProtocolType.DEX_AMM,
+    UNISWAP_V3_ETH: DefiProtocolType.DEX_AMM,
+    UNISWAP_V4_ETH: DefiProtocolType.DEX_AMM,
     CURVE_ETH: DefiProtocolType.DEX_AMM,
     AERODROME_BASE: DefiProtocolType.DEX_AMM,
     AAVE_V3: DefiProtocolType.LENDING,
@@ -678,9 +678,9 @@ VENUE_PROTOCOL_TYPE: dict[str, DefiProtocolType] = {
 
 # Venue -> Blockchain (DeFi smart order routing: shared wallet)
 VENUE_CHAIN_MAP: dict[str, str] = {
-    UNISWAPV2_ETH: "ethereum",
-    UNISWAPV3_ETH: "ethereum",
-    UNISWAPV4_ETH: "ethereum",
+    UNISWAP_V2_ETH: "ethereum",
+    UNISWAP_V3_ETH: "ethereum",
+    UNISWAP_V4_ETH: "ethereum",
     CURVE_ETH: "ethereum",
     AERODROME_BASE: "base",
     AAVE_V3: "ethereum",
@@ -699,9 +699,9 @@ for _venue, _chain in VENUE_CHAIN_MAP.items():
     SHARED_WALLET_GROUPS.setdefault(_chain, set()).add(_venue)
 
 DEX_FEE_TIERS: dict[str, list[int]] = {
-    UNISWAPV2_ETH: [30],
-    UNISWAPV3_ETH: [1, 5, 30, 100],
-    UNISWAPV4_ETH: [1, 5, 30, 100],
+    UNISWAP_V2_ETH: [30],
+    UNISWAP_V3_ETH: [1, 5, 30, 100],
+    UNISWAP_V4_ETH: [1, 5, 30, 100],
     CURVE_ETH: [1, 4],
     AERODROME_BASE: [1, 5, 30, 100],
 }
@@ -736,9 +736,9 @@ VENUE_FEE_MODEL_MAP: dict[str, VenueFeeModel] = {
     COMEX: VenueFeeModel.COMMISSION,
     ICE: VenueFeeModel.COMMISSION,
     CBOE: VenueFeeModel.COMMISSION,
-    UNISWAPV2_ETH: VenueFeeModel.POOL_FEE,
-    UNISWAPV3_ETH: VenueFeeModel.POOL_FEE,
-    UNISWAPV4_ETH: VenueFeeModel.POOL_FEE,
+    UNISWAP_V2_ETH: VenueFeeModel.POOL_FEE,
+    UNISWAP_V3_ETH: VenueFeeModel.POOL_FEE,
+    UNISWAP_V4_ETH: VenueFeeModel.POOL_FEE,
     CURVE_ETH: VenueFeeModel.POOL_FEE,
     AERODROME_BASE: VenueFeeModel.POOL_FEE,
     AAVE_V3: VenueFeeModel.RATE_BASED,
@@ -838,9 +838,9 @@ VENUE_ALPHA_PROFILE: dict[str, AlphaProfile] = {
     COMEX: AlphaProfile.ALPHA_SEEKING,
     ICE: AlphaProfile.ALPHA_SEEKING,
     CBOE: AlphaProfile.ALPHA_SEEKING,
-    UNISWAPV2_ETH: AlphaProfile.ALPHA_SEEKING,
-    UNISWAPV3_ETH: AlphaProfile.ALPHA_SEEKING,
-    UNISWAPV4_ETH: AlphaProfile.ALPHA_SEEKING,
+    UNISWAP_V2_ETH: AlphaProfile.ALPHA_SEEKING,
+    UNISWAP_V3_ETH: AlphaProfile.ALPHA_SEEKING,
+    UNISWAP_V4_ETH: AlphaProfile.ALPHA_SEEKING,
     CURVE_ETH: AlphaProfile.ALPHA_SEEKING,
     AERODROME_BASE: AlphaProfile.ALPHA_SEEKING,
     AAVE_V3: AlphaProfile.ZERO_ALPHA,

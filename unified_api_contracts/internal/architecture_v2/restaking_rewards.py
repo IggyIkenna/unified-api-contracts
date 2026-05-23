@@ -115,7 +115,7 @@ class RewardTokenEconomics(BaseModel):
     primary_dex_pools: list[str] = Field(
         default_factory=list,
         description=(
-            "Pool keys (e.g. ['UNISWAPV3-ETHEREUM:WETH-ETHFI:0x...', "
+            "Pool keys (e.g. ['UNISWAP_V3-ETHEREUM:WETH-ETHFI:0x...', "
             "'CURVE-ETHEREUM:USDC-ETHFI:0x...']) the router should consider "
             "for on-chain conversion. Resolved via instruments-service. "
             "Empty list = no liquid DEX pool (points / pre-TGE)."
@@ -353,7 +353,7 @@ class ConvertedTokenLeg(BaseModel):
     """What the router would have realised at the mid-price quote (no
     slippage). Realised - at_mark = REWARD_REALISATION_SLIPPAGE factor."""
     route_taken: list[str]
-    """Ordered hop list, e.g. ['BINANCE:ETHFI-USDC', 'UNISWAPV3-ETHEREUM:USDC-WETH']
+    """Ordered hop list, e.g. ['BINANCE:ETHFI-USDC', 'UNISWAP_V3-ETHEREUM:USDC-WETH']
     or ['JUPITER:JTO-SOL']."""
     fees_paid_target: Decimal
     """Total fees in target denomination (exchange + gas + protocol)."""

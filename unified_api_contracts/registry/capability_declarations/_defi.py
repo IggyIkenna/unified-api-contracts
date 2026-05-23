@@ -185,7 +185,7 @@ def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
 #   - instrument_types: what InstrumentType each protocol produces
 #   - data_types: what MTDS data types each protocol produces
 #   - mtds_operation: which MTDS --operation collects data for this protocol
-#   - venue_prefix: canonical venue prefix (e.g. "AAVEV3")
+#   - venue_prefix: canonical venue prefix (e.g. "AAVE_V3")
 #   - protocol_class: classification for filtering/routing
 #   - required_tokens: protocol-native tokens that MUST be in the major assets
 #     filter (governance, reward, staking tokens that our strategies need)
@@ -278,7 +278,7 @@ _PERPS_DATA = ["perp_funding"]
 PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     # ── EVM Lending ──────────────────────────────────────────────
     "aave_v3": _ProtocolCapability(
-        venue_prefix="AAVEV3",
+        venue_prefix="AAVE_V3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
         data_types=[*_LENDING_DATA, "gas_fees"],
@@ -294,7 +294,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         required_tokens=frozenset({"MKR", "DAI"}),
     ),
     "compound_v3": _ProtocolCapability(
-        venue_prefix="COMPOUNDV3",
+        venue_prefix="COMPOUND_V3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
         data_types=[*_LENDING_DATA, "gas_fees"],
@@ -317,7 +317,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     ),
     # ── EVM DEX — Native schema ─────────────────────────────────
     "uniswap_v2": _ProtocolCapability(
-        venue_prefix="UNISWAPV2",
+        venue_prefix="UNISWAP_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -325,7 +325,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         required_tokens=frozenset({"UNI"}),
     ),
     "uniswap_v3": _ProtocolCapability(
-        venue_prefix="UNISWAPV3",
+        venue_prefix="UNISWAP_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -333,7 +333,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         required_tokens=frozenset({"UNI"}),
     ),
     "uniswap_v4": _ProtocolCapability(
-        venue_prefix="UNISWAPV4",
+        venue_prefix="UNISWAP_V4",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -358,14 +358,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     ),
     # ── EVM DEX — Forks (reuse uniswap_v3 adapter) ─────────────
     "pancakeswap_v3": _ProtocolCapability(
-        venue_prefix="PANCAKESWAPV3",
+        venue_prefix="PANCAKESWAP_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "sushiswap_v3": _ProtocolCapability(
-        venue_prefix="SUSHISWAPV3",
+        venue_prefix="SUSHISWAP_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -381,14 +381,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         required_tokens=frozenset({"SUSHI"}),
     ),
     "aerodrome_v3": _ProtocolCapability(
-        venue_prefix="AERODROMEV3",
+        venue_prefix="AERODROME_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "camelot_v3": _ProtocolCapability(
-        venue_prefix="CAMELOTV3",
+        venue_prefix="CAMELOT_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -660,7 +660,7 @@ def get_protocol_capability(protocol: str) -> _ProtocolCapability | None:
 
 
 def get_venue_prefix(protocol: str) -> str | None:
-    """Get the canonical venue prefix for a protocol (e.g. 'aave_v3' -> 'AAVEV3')."""
+    """Get the canonical venue prefix for a protocol (e.g. 'aave_v3' -> 'AAVE_V3')."""
     cap = PROTOCOL_CAPABILITIES.get(protocol)
     return cap.venue_prefix if cap else None
 
@@ -687,7 +687,7 @@ def get_required_tokens_for_venue(venue: str) -> frozenset[str]:
     """Get all required tokens for a venue (protocol + chain tokens).
 
     Args:
-        venue: Canonical venue name (e.g. "AAVEV3-ETHEREUM", "DRIFT-SOLANA").
+        venue: Canonical venue name (e.g. "AAVE_V3-ETHEREUM", "DRIFT-SOLANA").
 
     Returns:
         Union of protocol-required tokens + chain-native tokens.
@@ -821,8 +821,8 @@ KNOWN_CHAINS: frozenset[str] = frozenset(
 def parse_defi_venue(venue_str: str) -> tuple[str, str]:
     """Split a DeFi venue string into (protocol_slug, chain).
 
-    Parses "AAVEV3-ETHEREUM" → ("aave_v3", "ETHEREUM"),
-    "UNISWAPV3-BASE" → ("uniswap_v3", "BASE"), etc.
+    Parses "AAVE_V3-ETHEREUM" → ("aave_v3", "ETHEREUM"),
+    "UNISWAP_V3-BASE" → ("uniswap_v3", "BASE"), etc.
 
     Uses the PROTOCOL_CAPABILITIES venue_prefix as the authority
     for how to split the string. Falls back to splitting on the
@@ -831,7 +831,7 @@ def parse_defi_venue(venue_str: str) -> tuple[str, str]:
     Returns:
         (protocol_slug, chain_name) — protocol_slug matches PROTOCOL_CAPABILITIES keys.
     """
-    # Try known prefixes (longest match first to handle UNISWAPV3 vs UNISWAPV2)
+    # Try known prefixes (longest match first to handle UNISWAP_V3 vs UNISWAP_V2)
     for prefix in sorted(_PREFIX_TO_PROTOCOL, key=len, reverse=True):
         if venue_str.startswith(prefix + "-"):
             chain = venue_str[len(prefix) + 1 :]

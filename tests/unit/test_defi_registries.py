@@ -59,32 +59,32 @@ class TestTokenWrapping:
     """Token wrapping rules for DeFi protocols."""
 
     def test_eth_needs_wrapping_for_aavev3(self) -> None:
-        wrap, target = needs_wrapping("ETH", "AAVEV3")
+        wrap, target = needs_wrapping("ETH", "AAVE_V3")
         assert wrap is True
         assert target == "WETH"
 
     def test_eth_needs_wrapping_for_uniswapv3(self) -> None:
-        wrap, target = needs_wrapping("ETH", "UNISWAPV3")
+        wrap, target = needs_wrapping("ETH", "UNISWAP_V3")
         assert wrap is True
         assert target == "WETH"
 
     def test_eeth_needs_wrapping_for_aavev3(self) -> None:
-        wrap, target = needs_wrapping("eETH", "AAVEV3")
+        wrap, target = needs_wrapping("eETH", "AAVE_V3")
         assert wrap is True
         assert target == "weETH"
 
     def test_steth_needs_wrapping_for_aavev3(self) -> None:
-        wrap, target = needs_wrapping("stETH", "AAVEV3")
+        wrap, target = needs_wrapping("stETH", "AAVE_V3")
         assert wrap is True
         assert target == "wstETH"
 
     def test_weth_does_not_need_wrapping_for_aavev3(self) -> None:
-        wrap, target = needs_wrapping("WETH", "AAVEV3")
+        wrap, target = needs_wrapping("WETH", "AAVE_V3")
         assert wrap is False
         assert target is None
 
     def test_usdc_does_not_need_wrapping_for_aavev3(self) -> None:
-        wrap, target = needs_wrapping("USDC", "AAVEV3")
+        wrap, target = needs_wrapping("USDC", "AAVE_V3")
         assert wrap is False
         assert target is None
 
@@ -94,10 +94,10 @@ class TestTokenWrapping:
         assert target is None
 
     def test_get_protocol_token_returns_correct_wrapped_form(self) -> None:
-        assert get_protocol_token("ETH", "AAVEV3") == "WETH"
-        assert get_protocol_token("eETH", "AAVEV3") == "weETH"
-        assert get_protocol_token("stETH", "AAVEV3") == "wstETH"
-        assert get_protocol_token("ETH", "UNISWAPV3") == "WETH"
+        assert get_protocol_token("ETH", "AAVE_V3") == "WETH"
+        assert get_protocol_token("eETH", "AAVE_V3") == "weETH"
+        assert get_protocol_token("stETH", "AAVE_V3") == "wstETH"
+        assert get_protocol_token("ETH", "UNISWAP_V3") == "WETH"
 
     def test_unknown_protocol_returns_token_unchanged(self) -> None:
         assert get_protocol_token("ETH", "UNKNOWN_PROTOCOL") == "ETH"
@@ -258,26 +258,26 @@ class TestVenueCollateral:
         assert venue_accepts_collateral("HYPERLIQUID", "weETH") is False
 
     def test_aavev3_ethereum_accepts_weth(self) -> None:
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "WETH") is True
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "WETH") is True
 
     def test_aavev3_ethereum_accepts_weeth(self) -> None:
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "weETH") is True
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "weETH") is True
 
     def test_aavev3_ethereum_accepts_wsteth(self) -> None:
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "wstETH") is True
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "wstETH") is True
 
     def test_aavev3_ethereum_accepts_usdc(self) -> None:
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "USDC") is True
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "USDC") is True
 
     def test_aavev3_ethereum_accepts_usdt(self) -> None:
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "USDT") is True
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "USDT") is True
 
     def test_aavev3_ethereum_accepts_wbtc(self) -> None:
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "WBTC") is True
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "WBTC") is True
 
     def test_aavev3_ethereum_rejects_eth(self) -> None:
         """ETH must be wrapped to WETH before use on Aave V3."""
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "ETH") is False
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "ETH") is False
 
     def test_binance_accepts_usdt(self) -> None:
         assert venue_accepts_collateral("BINANCE", "USDT") is True
@@ -298,15 +298,15 @@ class TestVenueCollateral:
         assert venue_accepts_collateral("OKX", "ETH") is True
 
     def test_haircut_weeth_on_aave(self) -> None:
-        haircut = get_collateral_haircut("AAVEV3-ETHEREUM", "weETH")
+        haircut = get_collateral_haircut("AAVE_V3-ETHEREUM", "weETH")
         assert haircut == Decimal("0.275")
 
     def test_haircut_weth_on_aave(self) -> None:
-        haircut = get_collateral_haircut("AAVEV3-ETHEREUM", "WETH")
+        haircut = get_collateral_haircut("AAVE_V3-ETHEREUM", "WETH")
         assert haircut == Decimal("0.175")
 
     def test_haircut_unknown_token_returns_none(self) -> None:
-        haircut = get_collateral_haircut("AAVEV3-ETHEREUM", "SHIB")
+        haircut = get_collateral_haircut("AAVE_V3-ETHEREUM", "SHIB")
         assert haircut is None
 
     def test_accepted_collateral_hyperliquid(self) -> None:
@@ -326,7 +326,7 @@ class TestVenueCollateral:
     def test_accepted_perp_collateral_excludes_lending(self) -> None:
         from unified_api_contracts.registry import accepted_perp_collateral
 
-        assert accepted_perp_collateral("AAVEV3-ETHEREUM") == []
+        assert accepted_perp_collateral("AAVE_V3-ETHEREUM") == []
 
     def test_accepted_perp_collateral_excludes_staking(self) -> None:
         from unified_api_contracts.registry import accepted_perp_collateral
@@ -665,8 +665,8 @@ class TestEModeHealthFactor:
 
     def test_health_factor_standard_mode(self) -> None:
         """Without E-Mode, weETH collateral uses standard 77.5% liq threshold."""
-        collateral = [("AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM", Decimal("10"), Decimal("3000"))]
-        debt = [("AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM", Decimal("8"), Decimal("3000"))]
+        collateral = [("AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM", Decimal("10"), Decimal("3000"))]
+        debt = [("AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM", Decimal("8"), Decimal("3000"))]
         hf, _ltv = compute_health_factor(collateral, debt)
         # HF = (10 * 3000 * 0.775) / (8 * 3000) = 23250 / 24000 ≈ 0.969
         assert hf < Decimal("1.0")  # Under-collateralized at standard params
@@ -674,8 +674,8 @@ class TestEModeHealthFactor:
     def test_health_factor_emode(self) -> None:
         """With E-Mode, weETH collateral uses elevated 95% liq threshold."""
         emode = get_emode_params("WEETH", "WETH")
-        collateral = [("AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM", Decimal("10"), Decimal("3000"))]
-        debt = [("AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM", Decimal("8"), Decimal("3000"))]
+        collateral = [("AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM", Decimal("10"), Decimal("3000"))]
+        debt = [("AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM", Decimal("8"), Decimal("3000"))]
         hf, _ltv = compute_health_factor(collateral, debt, emode_category=emode)
         # HF = (10 * 3000 * 0.95) / (8 * 3000) = 28500 / 24000 = 1.1875
         assert hf > Decimal("1.0")  # Safe with E-Mode!
@@ -684,8 +684,8 @@ class TestEModeHealthFactor:
     def test_health_factor_emode_vs_standard_significant_difference(self) -> None:
         """E-Mode HF must be meaningfully higher than standard for same positions."""
         emode = get_emode_params("WEETH", "WETH")
-        collateral = [("AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM", Decimal("10"), Decimal("3000"))]
-        debt = [("AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM", Decimal("7"), Decimal("3000"))]
+        collateral = [("AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM", Decimal("10"), Decimal("3000"))]
+        debt = [("AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM", Decimal("7"), Decimal("3000"))]
         hf_standard, _ = compute_health_factor(collateral, debt)
         hf_emode, _ = compute_health_factor(collateral, debt, emode_category=emode)
         assert hf_emode > hf_standard + Decimal("0.2")  # E-Mode gives ~0.25 extra HF
@@ -713,12 +713,12 @@ class TestReserveParams:
         assert params.max_ltv == Decimal("0.825")
 
     def test_get_params_from_instrument_id(self) -> None:
-        params = get_reserve_params("AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM")
+        params = get_reserve_params("AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM")
         assert params is not None
         assert params.max_ltv == Decimal("0.725")
 
     def test_get_params_from_debt_instrument_id(self) -> None:
-        params = get_reserve_params("AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM")
+        params = get_reserve_params("AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM")
         assert params is not None
         assert params.max_ltv == Decimal("0.825")  # WETH params
 
@@ -730,10 +730,10 @@ class TestExtractAssetSymbol:
     """_extract_asset_symbol handles both colon and underscore instrument formats."""
 
     def test_colon_atoken_format(self) -> None:
-        assert _extract_asset_symbol("AAVEV3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM") == "WEETH"
+        assert _extract_asset_symbol("AAVE_V3-ETHEREUM:A_TOKEN:AWEETH@ETHEREUM") == "WEETH"
 
     def test_colon_debt_format(self) -> None:
-        assert _extract_asset_symbol("AAVEV3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM") == "WETH"
+        assert _extract_asset_symbol("AAVE_V3-ETHEREUM:DEBT_TOKEN:DEBTWETH@ETHEREUM") == "WETH"
 
     def test_underscore_atoken_format(self) -> None:
         assert _extract_asset_symbol("AAVE_V3_WEETH_A_TOKEN") == "WEETH"

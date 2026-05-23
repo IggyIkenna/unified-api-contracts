@@ -47,7 +47,7 @@ class AuditAckSLAPolicy(BaseModel):
     severity (e.g. WARN should not trigger the pager)."""
 
     @model_validator(mode="after")
-    def _enforce_monotonic(self) -> "AuditAckSLAPolicy":
+    def _enforce_monotonic(self) -> AuditAckSLAPolicy:
         """The 3 core escalation timers MUST be monotonically increasing:
         default < secondary_human_after < founder_after.
 
@@ -68,9 +68,7 @@ class AuditAckSLAPolicy(BaseModel):
             if val is None:
                 continue
             if prev_val is not None and val <= prev_val:
-                raise ValueError(
-                    f"{name}={val} must be > {prev_name}={prev_val} (monotonic ladder)"
-                )
+                raise ValueError(f"{name}={val} must be > {prev_name}={prev_val} (monotonic ladder)")
             prev_name, prev_val = name, val
 
         # Step 2: physical_pager_after >= founder_after (may fire alongside).

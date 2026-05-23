@@ -319,7 +319,7 @@ def has_liquidations(asset_group: MarketAssetGroup) -> bool:
 # strategy-service/config.py:577-582 used to inline these. They now live here
 # as the single source of truth for risk subscriptions.
 
-AAVE_COLLATERAL_PATTERNS: Final[tuple[str, ...]] = ("AAVEV3-ETHEREUM:A_TOKEN:*",)
+AAVE_COLLATERAL_PATTERNS: Final[tuple[str, ...]] = ("AAVE_V3-ETHEREUM:A_TOKEN:*",)
 
 CEX_MARGIN_VENUES: Final[tuple[str, ...]] = (
     "BINANCE:PERPETUAL:*",

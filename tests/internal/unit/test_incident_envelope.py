@@ -21,7 +21,7 @@ Enforces:
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from decimal import Decimal
 
 import pytest
@@ -47,7 +47,6 @@ from unified_api_contracts.incident import (
     assert_allowed_transition,
     lookup_sla,
 )
-
 
 # ---------------------------------------------------------------------------
 # Closed-set sanity
@@ -127,9 +126,7 @@ def test_auto_action_succeeded_transitions_only_to_recovery_verification_started
 
 def test_assert_allowed_transition_raises_on_forbidden_jump() -> None:
     with pytest.raises(IllegalIncidentTransitionError):
-        assert_allowed_transition(
-            IncidentState.AUTO_ACTION_SUCCEEDED, IncidentState.RESOLVED
-        )
+        assert_allowed_transition(IncidentState.AUTO_ACTION_SUCCEEDED, IncidentState.RESOLVED)
 
 
 def test_assert_allowed_transition_passes_on_valid() -> None:

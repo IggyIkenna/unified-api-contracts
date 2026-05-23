@@ -1,11 +1,11 @@
 """Lock the canonical names + legacy aliases for vault / yield-bearing DeFi
-venues — MORPHOVAULTS, YEARNV3, FRAX, MAKER (added 2026-05-06 as part of
+venues — MORPHOVAULTS, YEARN_V3, FRAX, MAKER (added 2026-05-06 as part of
 Phase 1.5a-1 of plans/active/market_tick_data_to_100pct_2026_05_05.plan).
 
 Pre-2026-05-06 MTDS ``vault_share_price_handler`` emitted manifest rows with
 underscore protocol forms (``MORPHO_VAULTS``, ``YEARN_V3``) that did not match
 the no-underscore canonical convention used by every other DeFi venue
-(``AAVEV3-ETHEREUM``, ``COMPOUNDV3-ETHEREUM``, ``UNISWAPV2-ETHEREUM``). Without
+(``AAVE_V3-ETHEREUM``, ``COMPOUND_V3-ETHEREUM``, ``UNISWAP_V2-ETHEREUM``). Without
 this test, a future refactor could re-introduce the underscore form, leaving
 the manifest with two parallel canonical names for the same protocol-chain.
 
@@ -32,7 +32,7 @@ class TestVaultVenueCanonicalNamesSSOT:
         assert "MORPHOVAULTS-ETHEREUM" in ALL_DEFI_VENUES
 
     def test_yearnv3_canonical_in_all_defi_venues(self) -> None:
-        assert "YEARNV3-ETHEREUM" in ALL_DEFI_VENUES
+        assert "YEARN_V3-ETHEREUM" in ALL_DEFI_VENUES
 
     def test_frax_canonical_in_all_defi_venues(self) -> None:
         assert "FRAX-ETHEREUM" in ALL_DEFI_VENUES
@@ -47,8 +47,8 @@ class TestVaultVenueCanonicalNamesSSOT:
 
     def test_yearn_v3_legacy_alias_resolves(self) -> None:
         """Legacy underscore form from pre-2026-05-06 manifest rows."""
-        assert LEGACY_DEFI_VENUE_ALIASES["YEARN_V3"] == "YEARNV3-ETHEREUM"
-        assert LEGACY_DEFI_VENUE_ALIASES["YEARNV3"] == "YEARNV3-ETHEREUM"
+        assert LEGACY_DEFI_VENUE_ALIASES["YEARN_V3"] == "YEARN_V3-ETHEREUM"
+        assert LEGACY_DEFI_VENUE_ALIASES["YEARN_V3"] == "YEARN_V3-ETHEREUM"
 
     def test_frax_bare_alias_resolves(self) -> None:
         assert LEGACY_DEFI_VENUE_ALIASES["FRAX"] == "FRAX-ETHEREUM"
@@ -61,7 +61,7 @@ class TestVaultVenueCanonicalNamesSSOT:
         convention in the protocol segment (everything before the hyphen)."""
         for canonical in [
             "MORPHOVAULTS-ETHEREUM",
-            "YEARNV3-ETHEREUM",
+            "YEARN_V3-ETHEREUM",
             "FRAX-ETHEREUM",
             "MAKER-ETHEREUM",
         ]:

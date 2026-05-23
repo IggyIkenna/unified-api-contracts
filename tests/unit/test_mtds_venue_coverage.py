@@ -105,13 +105,13 @@ class TestNormalizeDefiVenue:
 
     def test_legacy_aave_v3_maps_to_canonical(self) -> None:
         vm = VenueMapping()
-        assert vm.normalize_defi_venue("AAVE_V3") == "AAVEV3-ETHEREUM"
+        assert vm.normalize_defi_venue("AAVE_V3") == "AAVE_V3-ETHEREUM"
 
     def test_legacy_uniswap_variants(self) -> None:
         vm = VenueMapping()
-        assert vm.normalize_defi_venue("UNISWAP_V2") == "UNISWAPV2-ETHEREUM"
-        assert vm.normalize_defi_venue("UNISWAP_V3") == "UNISWAPV3-ETHEREUM"
-        assert vm.normalize_defi_venue("UNISWAP_V4") == "UNISWAPV4-ETHEREUM"
+        assert vm.normalize_defi_venue("UNISWAP_V2") == "UNISWAP_V2-ETHEREUM"
+        assert vm.normalize_defi_venue("UNISWAP_V3") == "UNISWAP_V3-ETHEREUM"
+        assert vm.normalize_defi_venue("UNISWAP_V4") == "UNISWAP_V4-ETHEREUM"
 
     def test_legacy_single_token_protocols(self) -> None:
         vm = VenueMapping()
@@ -139,16 +139,16 @@ class TestNormalizeDefiVenue:
     def test_chain_override_for_multi_chain_expansion(self) -> None:
         vm = VenueMapping()
         # When adapters start writing AAVE_V3 on Arbitrum, passing chain=ARBITRUM
-        # should resolve to AAVEV3-ARBITRUM (not registered yet — returned for
+        # should resolve to AAVE_V3-ARBITRUM (not registered yet — returned for
         # the caller to decide whether to accept).
-        assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVEV3-ARBITRUM"
-        assert vm.normalize_defi_venue("UNISWAP_V3", chain="BASE") == "UNISWAPV3-BASE"
+        assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVE_V3-ARBITRUM"
+        assert vm.normalize_defi_venue("UNISWAP_V3", chain="BASE") == "UNISWAP_V3-BASE"
 
     def test_is_defi_venue_accepts_legacy(self) -> None:
         vm = VenueMapping()
         assert vm.is_defi_venue("AAVE_V3")
         assert vm.is_defi_venue("UNISWAP_V3")
-        assert vm.is_defi_venue("AAVEV3-ETHEREUM")
+        assert vm.is_defi_venue("AAVE_V3-ETHEREUM")
         assert not vm.is_defi_venue("BINANCE-SPOT")
 
 
@@ -215,7 +215,7 @@ class TestMultiChainDefiExpansion:
             ("PANCAKESWAP_V3", "ARBITRUM"),
             ("PANCAKESWAP_V3", "BASE"),
             ("PANCAKESWAP_V3", "BSC"),
-            # PANCAKESWAPV3-ZKSYNC dropped 2026-05-06 (UAC@7cb9068) — low-quality +
+            # PANCAKESWAP_V3-ZKSYNC dropped 2026-05-06 (UAC@7cb9068) — low-quality +
             # low-volume data; 446 manifest rows purged. Do NOT re-add without
             # data-quality + liquidity validation. SSOT comment in
             # `unified_api_contracts/registry/defi_venues.py:116`.
@@ -251,9 +251,9 @@ class TestMultiChainDefiExpansion:
     def test_non_ethereum_chain_override(self) -> None:
         vm = VenueMapping()
         # Chain override flips the canonical suffix
-        assert vm.normalize_defi_venue("AAVE_V3", chain="POLYGON") == "AAVEV3-POLYGON"
-        assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVEV3-ARBITRUM"
-        assert vm.normalize_defi_venue("COMPOUND_V3", chain="SCROLL") == "COMPOUNDV3-SCROLL"
+        assert vm.normalize_defi_venue("AAVE_V3", chain="POLYGON") == "AAVE_V3-POLYGON"
+        assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVE_V3-ARBITRUM"
+        assert vm.normalize_defi_venue("COMPOUND_V3", chain="SCROLL") == "COMPOUND_V3-SCROLL"
 
 
 # ---------------------------------------------------------------------------
@@ -326,12 +326,12 @@ class TestGetExpectedInstrumentsForVenueMvpSeed:
     def test_defi_dt_returns_seeded_mvp(self) -> None:
         # Wave 8G populated the DeFi seeds — top-20 UNI V3 ETH pools,
         # top-10 Aave ETH reserves.
-        swaps = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_swaps")
+        swaps = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_swaps")
         assert len(swaps) == 20
         # canonical lowercase pool addresses
         for pool in swaps:
             assert pool.startswith("0x") and pool.lower() == pool
-        assert len(get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices")) == 10
+        assert len(get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "lending_indices")) == 10
 
 
 class TestGetExpectedInstrumentsForVenueInjectedProvider:
@@ -419,7 +419,7 @@ class TestWave8GDefiSeeds:
     """Wave 8G DEFI seed — top-N pools / reserves / LST tokens."""
 
     def test_uniswapv3_ethereum_dex_pools_top20(self) -> None:
-        result = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_pools")
+        result = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pools")
         assert len(result) == 20
         # First 5 must match the observed 2026-04-14 TVL order.
         assert result[0] == "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"  # USDC/WETH 0.05%
@@ -430,22 +430,22 @@ class TestWave8GDefiSeeds:
             assert pool.lower() == pool
 
     def test_uniswapv3_ethereum_dex_swaps_same_pool_set(self) -> None:
-        pools = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_pools")
-        swaps = get_expected_instruments_for_venue("UNISWAPV3-ETHEREUM", "dex_swaps")
+        pools = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pools")
+        swaps = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_swaps")
         assert pools == swaps, "dex_pools and dex_swaps share the pool universe"
 
     def test_aavev3_ethereum_lending_indices_top10_reserves(self) -> None:
-        result = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices")
+        result = get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "lending_indices")
         assert len(result) == 10
         # Canonical liquid reserves must be present.
         for sym in ("USDC", "USDT", "DAI", "WETH", "WBTC", "AAVE", "LINK"):
             assert sym in result, f"{sym} missing from Aave top-10 seed"
 
     def test_aavev3_ethereum_dts_share_reserve_universe(self) -> None:
-        li = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "lending_indices")
-        op = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "oracle_prices")
-        rw = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "rewards")
-        rp = get_expected_instruments_for_venue("AAVEV3-ETHEREUM", "risk_params")
+        li = get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "lending_indices")
+        op = get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "oracle_prices")
+        rw = get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "rewards")
+        rp = get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "risk_params")
         assert li == op == rw == rp
 
     def test_lst_rates_per_protocol_seed(self) -> None:
@@ -485,8 +485,8 @@ class TestWave8GSeedHelper:
     """Direct tests on the ``seed_for_venue_and_data_type`` helper."""
 
     def test_defi_map_entries(self) -> None:
-        assert ("UNISWAPV3-ETHEREUM", "dex_pools") in DEFI_MVP_SEED_INSTRUMENTS
-        assert ("AAVEV3-ETHEREUM", "lending_indices") in DEFI_MVP_SEED_INSTRUMENTS
+        assert ("UNISWAP_V3-ETHEREUM", "dex_pools") in DEFI_MVP_SEED_INSTRUMENTS
+        assert ("AAVE_V3-ETHEREUM", "lending_indices") in DEFI_MVP_SEED_INSTRUMENTS
         assert ("LIDO-ETHEREUM", "lst_rates") in DEFI_MVP_SEED_INSTRUMENTS
 
     def test_prediction_map_entries(self) -> None:
@@ -495,7 +495,7 @@ class TestWave8GSeedHelper:
 
     def test_unknown_venue_dt_returns_empty_tuple(self) -> None:
         assert seed_for_venue_and_data_type("FAKE-CHAIN", "dex_pools") == ()
-        assert seed_for_venue_and_data_type("UNISWAPV3-ETHEREUM", "unknown_dt") == ()
+        assert seed_for_venue_and_data_type("UNISWAP_V3-ETHEREUM", "unknown_dt") == ()
 
 
 class TestSeedDispatcherVenueClassification:

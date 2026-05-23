@@ -115,6 +115,9 @@ __all__ = [
 ]
 
 # Re-export the per-axis registry aggregator at the risk facade.
+# Per-strategy drawdown + response-policy schemas (added 2026-05-23).
+# Implementation plan:
+# ``plans/active/drawdown_liquidation_policy_and_strategy_risk_config_2026_05_23.md``.
 from .registry.risk_rules import (
     ACCOUNT_RULES,
     ALL_RULES,
@@ -127,15 +130,4 @@ from .registry.risk_rules import (
     get_max_position_size_usd_for_venue,
     get_rules_for,
     iter_applicable_rules,
-)
-
-# Per-strategy drawdown + response-policy schemas (added 2026-05-23).
-# Implementation plan:
-# ``plans/active/drawdown_liquidation_policy_and_strategy_risk_config_2026_05_23.md``.
-from .canonical.crosscutting.risk import (
-    DrawdownThresholdKind,
-    ExpectedDrawdownModel,
-    ExpectedDrawdownModelBasis,
-    ResponsePolicy,
-    RiskThresholds,
 )

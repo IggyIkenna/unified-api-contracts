@@ -133,13 +133,9 @@ class AgentActionEvent(BaseModel):
     runbook_id: str
     """e.g. 'RB-INFRA-001' — links to the operator runbook in
     ``codex/15-runbooks/incidents/``."""
-    pre_action_state: dict[str, str | bool | int | float | None] = Field(
-        default_factory=dict
-    )
+    pre_action_state: dict[str, str | bool | int | float | None] = Field(default_factory=dict)
     """Free-form snapshot of service state BEFORE action."""
-    post_action_state: dict[str, str | bool | int | float | None] = Field(
-        default_factory=dict
-    )
+    post_action_state: dict[str, str | bool | int | float | None] = Field(default_factory=dict)
     """Free-form snapshot AFTER action."""
     recovery_verification: RecoveryVerificationResult | None = None
     """5-tuple result, populated when state transitions through

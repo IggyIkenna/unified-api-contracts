@@ -48,7 +48,7 @@ class TradingAccount:
 
     Supports:
     - CeFi: venue=BINANCE, account_label=main (or sub-account ID)
-    - DeFi: venue=AAVEV3-ETHEREUM, account_label=0x... (wallet address)
+    - DeFi: venue=AAVE_V3-ETHEREUM, account_label=0x... (wallet address)
     - TradFi: venue=IBKR, account_label=DU1234567
     - Sports: venue=BETFAIR, account_label=main
     """

@@ -23,8 +23,8 @@ from __future__ import annotations
 # ---------------------------------------------------------------------------
 # Canonical PROTOCOL-CHAIN venues
 # ---------------------------------------------------------------------------
-# Naming convention: protocol versioning is collapsed (AAVEV3, not AAVE_V3;
-# COMPOUNDV3, not COMPOUND_V3; PANCAKESWAPV3) to match
+# Naming convention: protocol versioning is collapsed (AAVE_V3, not AAVE_V3;
+# COMPOUND_V3, not COMPOUND_V3; PANCAKESWAP_V3) to match
 # ``VENUE_DATA_TYPE_CAPABILITIES`` keys. Raw manifest values with underscores
 # (``AAVE_V3`` + ``chain=POLYGON``, ``COMPOUND_V3`` + ``chain=SCROLL``,
 # ``PANCAKESWAP_V3`` + ``chain=BSC``) resolve to these canonical names via
@@ -32,23 +32,23 @@ from __future__ import annotations
 
 ALL_DEFI_VENUES: list[str] = [
     # ── Ethereum ──
-    "UNISWAPV2-ETHEREUM",
-    "UNISWAPV3-ETHEREUM",
-    "UNISWAPV4-ETHEREUM",
+    "UNISWAP_V2-ETHEREUM",
+    "UNISWAP_V3-ETHEREUM",
+    "UNISWAP_V4-ETHEREUM",
     "CURVE-ETHEREUM",
     "BALANCER-ETHEREUM",
-    "AAVEV3-ETHEREUM",
-    "COMPOUNDV3-ETHEREUM",
+    "AAVE_V3-ETHEREUM",
+    "COMPOUND_V3-ETHEREUM",
     "MORPHO-ETHEREUM",
     "FLUID-ETHEREUM",
     "SPARK-ETHEREUM",
     "LIDO-ETHEREUM",
     "ETHERFI-ETHEREUM",
     "ETHENA-ETHEREUM",
-    "SUSHISWAPV3-ETHEREUM",
-    "PANCAKESWAPV3-ETHEREUM",
+    "SUSHISWAP_V3-ETHEREUM",
+    "PANCAKESWAP_V3-ETHEREUM",
     "MORPHOVAULTS-ETHEREUM",
-    "YEARNV3-ETHEREUM",
+    "YEARN_V3-ETHEREUM",
     "FRAX-ETHEREUM",
     "MAKER-ETHEREUM",
     # ── LST / staking-yield protocols on Ethereum (added 2026-05-07 per
@@ -100,16 +100,16 @@ ALL_DEFI_VENUES: list[str] = [
     "HYPERLIQUID",
     "ASTER",
     # ── Arbitrum ──
-    "UNISWAPV3-ARBITRUM",
-    "AAVEV3-ARBITRUM",
-    "COMPOUNDV3-ARBITRUM",
+    "UNISWAP_V3-ARBITRUM",
+    "AAVE_V3-ARBITRUM",
+    "COMPOUND_V3-ARBITRUM",
     "BALANCER-ARBITRUM",
     "SUSHISWAP-ARBITRUM",
-    "PANCAKESWAPV3-ARBITRUM",
-    "CAMELOTV3-ARBITRUM",
+    "PANCAKESWAP_V3-ARBITRUM",
+    "CAMELOT_V3-ARBITRUM",
     "GMX-ARBITRUM",
     # ── Catalogue Phase 1A new Arbitrum entries (slot 5 2026-05-11) ──
-    "YEARNV3-ARBITRUM",
+    "YEARN_V3-ARBITRUM",
     "BEEFY-ARBITRUM",
     "PENDLE-ARBITRUM",
     "IDLE-ARBITRUM",
@@ -121,51 +121,51 @@ ALL_DEFI_VENUES: list[str] = [
     "MORPHO-ARBITRUM",
     "FLUID-ARBITRUM",
     # ── Base ──
-    "UNISWAPV3-BASE",
-    "AAVEV3-BASE",
-    "COMPOUNDV3-BASE",
+    "UNISWAP_V3-BASE",
+    "AAVE_V3-BASE",
+    "COMPOUND_V3-BASE",
     "BALANCER-BASE",
     "MORPHO-BASE",
-    "SUSHISWAPV3-BASE",
-    "PANCAKESWAPV3-BASE",
-    "AERODROMEV3-BASE",
+    "SUSHISWAP_V3-BASE",
+    "PANCAKESWAP_V3-BASE",
+    "AERODROME_V3-BASE",
     # ── Catalogue Phase 1A new Base entries (slot 5 2026-05-11) ──
     "BEEFY-BASE",
     # ── Optimism ──
-    "UNISWAPV3-OPTIMISM",
-    "AAVEV3-OPTIMISM",
-    "COMPOUNDV3-OPTIMISM",
+    "UNISWAP_V3-OPTIMISM",
+    "AAVE_V3-OPTIMISM",
+    "COMPOUND_V3-OPTIMISM",
     "BALANCER-OPTIMISM",
     "CURVE-OPTIMISM",
     "VELODROMEV2-OPTIMISM",
     # ── Catalogue Phase 1A new Optimism entries (slot 5 2026-05-11) ──
-    "YEARNV3-OPTIMISM",
+    "YEARN_V3-OPTIMISM",
     # ── Optimism MTDS-backfilled lending (added 2026-05-22) ──
     "MORPHO-OPTIMISM",
     # ── Polygon ──
-    "UNISWAPV3-POLYGON",
-    "AAVEV3-POLYGON",
+    "UNISWAP_V3-POLYGON",
+    "AAVE_V3-POLYGON",
     "BALANCER-POLYGON",
-    "COMPOUNDV3-POLYGON",
+    "COMPOUND_V3-POLYGON",
     # ── Catalogue Phase 1A new Polygon entries (slot 5 2026-05-11) ──
     "BEEFY-POLYGON",
     "IDLE-POLYGON",
     # ── Polygon MTDS-backfilled lending (added 2026-05-22) ──
     "MORPHO-POLYGON",
     # ── Avalanche ──
-    "AAVEV3-AVALANCHE",
+    "AAVE_V3-AVALANCHE",
     "BALANCER-AVALANCHE",
     "CURVE-AVALANCHE",
     "GMX-AVALANCHE",
-    "SUSHISWAPV3-AVALANCHE",
+    "SUSHISWAP_V3-AVALANCHE",
     "TRADER_JOEV2-AVALANCHE",
     # ── Catalogue Phase 1A new Avalanche entries (slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE",
     # ── Avalanche MTDS-backfilled lending (added 2026-05-22) ──
     "BENQI-AVALANCHE",
     # ── BSC ──
-    "AAVEV3-BSC",
-    "PANCAKESWAPV3-BSC",
+    "AAVE_V3-BSC",
+    "PANCAKESWAP_V3-BSC",
     # ── Catalogue Phase 1A new BSC entries (slot 5 2026-05-11) ──
     "BEEFY-BSC",
     "RADIANT-BSC",
@@ -183,11 +183,11 @@ ALL_DEFI_VENUES: list[str] = [
     "ALCHEMY-OPTIMISM",
     "ALCHEMY-POLYGON",
     # ── Linea / Scroll / zkSync ──
-    "AAVEV3-LINEA",
-    "AAVEV3-SCROLL",
-    "COMPOUNDV3-SCROLL",
-    "AAVEV3-ZKSYNC",
-    # PANCAKESWAPV3-ZKSYNC dropped 2026-05-06 — low-quality + low-volume data,
+    "AAVE_V3-LINEA",
+    "AAVE_V3-SCROLL",
+    "COMPOUND_V3-SCROLL",
+    "AAVE_V3-ZKSYNC",
+    # PANCAKESWAP_V3-ZKSYNC dropped 2026-05-06 — low-quality + low-volume data,
     # never produced useful captures. The 446 manifest rows that existed were
     # purged via `migrate_defi_legacy_venue_chain.py`. Do NOT re-add without
     # validating data quality + non-trivial liquidity on the chain.
@@ -213,7 +213,7 @@ ALL_DEFI_VENUES: list[str] = [
 ]
 
 # ── Canonical underscore-name aliases (additive beside ghost names above) ──
-# Ghost no-underscore names (UNISWAPV3-*, AAVEV3-*, etc.) kept for backward-compat
+# Ghost no-underscore names (UNISWAP_V3-*, AAVE_V3-*, etc.) kept for backward-compat
 # with historical GCS paths. New MTDS writers use canonical underscore names; these
 # entries ensure venue-parity tests pass for both forms.
 ALL_DEFI_VENUES.extend(
@@ -262,37 +262,37 @@ ALL_DEFI_VENUES.extend(
 # ---------------------------------------------------------------------------
 # Chain-less legacy names default to ETHEREUM canonical. Callers that pass
 # the chain kwarg via ``VenueMapping.normalize_defi_venue(raw, chain)`` get
-# the non-Ethereum canonical (``AAVEV3-ARBITRUM`` etc) synthesised by
+# the non-Ethereum canonical (``AAVE_V3-ARBITRUM`` etc) synthesised by
 # replacing the ``-ETHEREUM`` suffix.
 
 LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     # DEX swap protocols
-    "UNISWAP_V2": "UNISWAPV2-ETHEREUM",
-    "UNISWAP_V3": "UNISWAPV3-ETHEREUM",
-    "UNISWAP_V4": "UNISWAPV4-ETHEREUM",
-    "UNISWAPV2": "UNISWAPV2-ETHEREUM",
-    "UNISWAPV3": "UNISWAPV3-ETHEREUM",
-    "UNISWAPV4": "UNISWAPV4-ETHEREUM",
+    "UNISWAP_V2": "UNISWAP_V2-ETHEREUM",
+    "UNISWAP_V3": "UNISWAP_V3-ETHEREUM",
+    "UNISWAP_V4": "UNISWAP_V4-ETHEREUM",
+    "UNISWAP_V2": "UNISWAP_V2-ETHEREUM",
+    "UNISWAP_V3": "UNISWAP_V3-ETHEREUM",
+    "UNISWAP_V4": "UNISWAP_V4-ETHEREUM",
     "CURVE": "CURVE-ETHEREUM",
     "BALANCER": "BALANCER-ETHEREUM",
-    "SUSHISWAP": "SUSHISWAPV3-ETHEREUM",
-    "SUSHISWAP_V3": "SUSHISWAPV3-ETHEREUM",
-    "SUSHISWAPV3": "SUSHISWAPV3-ETHEREUM",
-    "PANCAKESWAP_V3": "PANCAKESWAPV3-ETHEREUM",
-    "PANCAKESWAPV3": "PANCAKESWAPV3-ETHEREUM",
-    "CAMELOT_V3": "CAMELOTV3-ARBITRUM",
-    "CAMELOTV3": "CAMELOTV3-ARBITRUM",
-    "AERODROME_V3": "AERODROMEV3-BASE",
-    "AERODROMEV3": "AERODROMEV3-BASE",
+    "SUSHISWAP": "SUSHISWAP_V3-ETHEREUM",
+    "SUSHISWAP_V3": "SUSHISWAP_V3-ETHEREUM",
+    "SUSHISWAP_V3": "SUSHISWAP_V3-ETHEREUM",
+    "PANCAKESWAP_V3": "PANCAKESWAP_V3-ETHEREUM",
+    "PANCAKESWAP_V3": "PANCAKESWAP_V3-ETHEREUM",
+    "CAMELOT_V3": "CAMELOT_V3-ARBITRUM",
+    "CAMELOT_V3": "CAMELOT_V3-ARBITRUM",
+    "AERODROME_V3": "AERODROME_V3-BASE",
+    "AERODROME_V3": "AERODROME_V3-BASE",
     "VELODROME_V2": "VELODROMEV2-OPTIMISM",
     "VELODROMEV2": "VELODROMEV2-OPTIMISM",
     "TRADER_JOE_V2": "TRADER_JOEV2-AVALANCHE",
     "TRADER_JOEV2": "TRADER_JOEV2-AVALANCHE",
     # Lending
-    "AAVE_V3": "AAVEV3-ETHEREUM",
-    "AAVEV3": "AAVEV3-ETHEREUM",
-    "COMPOUND_V3": "COMPOUNDV3-ETHEREUM",
-    "COMPOUNDV3": "COMPOUNDV3-ETHEREUM",
+    "AAVE_V3": "AAVE_V3-ETHEREUM",
+    "AAVE_V3": "AAVE_V3-ETHEREUM",
+    "COMPOUND_V3": "COMPOUND_V3-ETHEREUM",
+    "COMPOUND_V3": "COMPOUND_V3-ETHEREUM",
     "MORPHO": "MORPHO-ETHEREUM",
     "FLUID": "FLUID-ETHEREUM",
     "SPARK": "SPARK-ETHEREUM",
@@ -305,8 +305,8 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     # Vaults / yield-bearing
     "MORPHO_VAULTS": "MORPHOVAULTS-ETHEREUM",
     "MORPHOVAULTS": "MORPHOVAULTS-ETHEREUM",
-    "YEARN_V3": "YEARNV3-ETHEREUM",
-    "YEARNV3": "YEARNV3-ETHEREUM",
+    "YEARN_V3": "YEARN_V3-ETHEREUM",
+    "YEARN_V3": "YEARN_V3-ETHEREUM",
     "FRAX": "FRAX-ETHEREUM",
     "MAKER": "MAKER-ETHEREUM",
     # Solana
@@ -366,7 +366,7 @@ def to_canonical_venue(venue_id: str) -> str:
 
     For CeFi and sports venues this is equivalent to ``venue_id.upper()``.
     For DeFi venues it also resolves legacy bare-name and underscore forms
-    (e.g. ``aavev3`` → ``AAVEV3-ETHEREUM``, ``TRADERJOEV2-AVALANCHE`` →
+    (e.g. ``aavev3`` → ``AAVE_V3-ETHEREUM``, ``TRADERJOEV2-AVALANCHE`` →
     ``TRADER_JOEV2-AVALANCHE``) via ``LEGACY_DEFI_VENUE_ALIASES``.
 
     Cross-asset-group SSOT for venue-id normalisation.
@@ -398,20 +398,20 @@ def to_canonical_venue(venue_id: str) -> str:
 
 DEFI_VENUE_PHASE: dict[str, str] = {
     # ── Live (Ethereum DEX / lending) ──
-    "UNISWAPV2-ETHEREUM": "live",
-    "UNISWAPV3-ETHEREUM": "live",
-    "UNISWAPV4-ETHEREUM": "live",
+    "UNISWAP_V2-ETHEREUM": "live",
+    "UNISWAP_V3-ETHEREUM": "live",
+    "UNISWAP_V4-ETHEREUM": "live",
     "CURVE-ETHEREUM": "live",
     "BALANCER-ETHEREUM": "live",
-    "AAVEV3-ETHEREUM": "live",
-    "COMPOUNDV3-ETHEREUM": "live",
+    "AAVE_V3-ETHEREUM": "live",
+    "COMPOUND_V3-ETHEREUM": "live",
     "MORPHO-ETHEREUM": "live",
     "FLUID-ETHEREUM": "live",
     "SPARK-ETHEREUM": "live",
-    "SUSHISWAPV3-ETHEREUM": "live",
-    "PANCAKESWAPV3-ETHEREUM": "live",
+    "SUSHISWAP_V3-ETHEREUM": "live",
+    "PANCAKESWAP_V3-ETHEREUM": "live",
     "MORPHOVAULTS-ETHEREUM": "live",
-    "YEARNV3-ETHEREUM": "live",
+    "YEARN_V3-ETHEREUM": "live",
     "FRAX-ETHEREUM": "live",
     "MAKER-ETHEREUM": "live",
     # ── Live (Ethereum LST / staking-yield) ──
@@ -439,16 +439,16 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "RENZO-ETHEREUM": "pipeline",
     "KELPDAO-ETHEREUM": "pipeline",
     # ── Pipeline (Arbitrum) — UAC-declared, MTDS backfill not yet shipping ──
-    "UNISWAPV3-ARBITRUM": "pipeline",
-    "AAVEV3-ARBITRUM": "pipeline",
-    "COMPOUNDV3-ARBITRUM": "pipeline",
+    "UNISWAP_V3-ARBITRUM": "pipeline",
+    "AAVE_V3-ARBITRUM": "pipeline",
+    "COMPOUND_V3-ARBITRUM": "pipeline",
     "BALANCER-ARBITRUM": "pipeline",
     "SUSHISWAP-ARBITRUM": "pipeline",
-    "PANCAKESWAPV3-ARBITRUM": "pipeline",
-    "CAMELOTV3-ARBITRUM": "pipeline",
+    "PANCAKESWAP_V3-ARBITRUM": "pipeline",
+    "CAMELOT_V3-ARBITRUM": "pipeline",
     "GMX-ARBITRUM": "pipeline",
     # ── Pipeline (Arbitrum catalogue Phase 1A, slot 5 2026-05-11) ──
-    "YEARNV3-ARBITRUM": "pipeline",
+    "YEARN_V3-ARBITRUM": "pipeline",
     "BEEFY-ARBITRUM": "pipeline",
     "PENDLE-ARBITRUM": "pipeline",
     "IDLE-ARBITRUM": "pipeline",
@@ -460,45 +460,45 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "MORPHO-ARBITRUM": "live",
     "FLUID-ARBITRUM": "live",
     # ── Pipeline (Base) ──
-    "UNISWAPV3-BASE": "pipeline",
-    "AAVEV3-BASE": "pipeline",
-    "COMPOUNDV3-BASE": "pipeline",
+    "UNISWAP_V3-BASE": "pipeline",
+    "AAVE_V3-BASE": "pipeline",
+    "COMPOUND_V3-BASE": "pipeline",
     "BALANCER-BASE": "pipeline",
     "MORPHO-BASE": "pipeline",
-    "SUSHISWAPV3-BASE": "pipeline",
-    "PANCAKESWAPV3-BASE": "pipeline",
-    "AERODROMEV3-BASE": "pipeline",
+    "SUSHISWAP_V3-BASE": "pipeline",
+    "PANCAKESWAP_V3-BASE": "pipeline",
+    "AERODROME_V3-BASE": "pipeline",
     # ── Pipeline (Base catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BASE": "pipeline",
     # ── Pipeline (Optimism) ──
-    "UNISWAPV3-OPTIMISM": "pipeline",
-    "AAVEV3-OPTIMISM": "pipeline",
-    "COMPOUNDV3-OPTIMISM": "pipeline",
+    "UNISWAP_V3-OPTIMISM": "pipeline",
+    "AAVE_V3-OPTIMISM": "pipeline",
+    "COMPOUND_V3-OPTIMISM": "pipeline",
     "BALANCER-OPTIMISM": "pipeline",
     "CURVE-OPTIMISM": "pipeline",
     "VELODROMEV2-OPTIMISM": "pipeline",
     # ── Pipeline (Optimism catalogue Phase 1A, slot 5 2026-05-11) ──
-    "YEARNV3-OPTIMISM": "pipeline",
+    "YEARN_V3-OPTIMISM": "pipeline",
     # ── Pipeline (Polygon) ──
-    "UNISWAPV3-POLYGON": "pipeline",
-    "AAVEV3-POLYGON": "pipeline",
+    "UNISWAP_V3-POLYGON": "pipeline",
+    "AAVE_V3-POLYGON": "pipeline",
     "BALANCER-POLYGON": "pipeline",
-    "COMPOUNDV3-POLYGON": "pipeline",
+    "COMPOUND_V3-POLYGON": "pipeline",
     # ── Pipeline (Polygon catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-POLYGON": "pipeline",
     "IDLE-POLYGON": "pipeline",
     # ── Pipeline (Avalanche) ──
-    "AAVEV3-AVALANCHE": "pipeline",
+    "AAVE_V3-AVALANCHE": "pipeline",
     "BALANCER-AVALANCHE": "pipeline",
     "CURVE-AVALANCHE": "pipeline",
     "GMX-AVALANCHE": "pipeline",
-    "SUSHISWAPV3-AVALANCHE": "pipeline",
+    "SUSHISWAP_V3-AVALANCHE": "pipeline",
     "TRADER_JOEV2-AVALANCHE": "pipeline",
     # ── Pipeline (Avalanche catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE": "pipeline",
     # ── Pipeline (BSC) ──
-    "AAVEV3-BSC": "pipeline",
-    "PANCAKESWAPV3-BSC": "pipeline",
+    "AAVE_V3-BSC": "pipeline",
+    "PANCAKESWAP_V3-BSC": "pipeline",
     # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BSC": "pipeline",
     "RADIANT-BSC": "pipeline",
@@ -531,10 +531,10 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "HYPERLIQUID": "pipeline",
     "ASTER": "pipeline",
     # ── Pipeline (Linea / Scroll / zkSync) ──
-    "AAVEV3-LINEA": "pipeline",
-    "AAVEV3-SCROLL": "pipeline",
-    "COMPOUNDV3-SCROLL": "pipeline",
-    "AAVEV3-ZKSYNC": "pipeline",
+    "AAVE_V3-LINEA": "pipeline",
+    "AAVE_V3-SCROLL": "pipeline",
+    "COMPOUND_V3-SCROLL": "pipeline",
+    "AAVE_V3-ZKSYNC": "pipeline",
     # ── Live (Solana — JITO, MARINADE, ORCA, RAYDIUM, KAMINO actively
     #    backfilled per memory.project_carry_tracer_session_2026_05_06) ──
     "KAMINO-SOLANA": "live",
@@ -581,13 +581,13 @@ DEFI_VENUE_AXIS_OVERRIDES: dict[str, str] = {}
 # DeFi multi-chain coverage grows.
 MTDS_DEFI_VENUES: list[str] = [
     # --- DEX protocols (swaps + liquidity) ---
-    "UNISWAPV2-ETHEREUM",
-    "UNISWAPV3-ETHEREUM",
-    "UNISWAPV3-ARBITRUM",
-    "UNISWAPV3-BASE",
-    "UNISWAPV3-OPTIMISM",
-    "UNISWAPV3-POLYGON",
-    "UNISWAPV4-ETHEREUM",
+    "UNISWAP_V2-ETHEREUM",
+    "UNISWAP_V3-ETHEREUM",
+    "UNISWAP_V3-ARBITRUM",
+    "UNISWAP_V3-BASE",
+    "UNISWAP_V3-OPTIMISM",
+    "UNISWAP_V3-POLYGON",
+    "UNISWAP_V4-ETHEREUM",
     "CURVE-ETHEREUM",
     "CURVE-AVALANCHE",
     "CURVE-OPTIMISM",
@@ -598,19 +598,19 @@ MTDS_DEFI_VENUES: list[str] = [
     "BALANCER-OPTIMISM",
     "BALANCER-POLYGON",
     # --- Lending protocols ---
-    "AAVEV3-ETHEREUM",
-    "AAVEV3-ARBITRUM",
-    "AAVEV3-AVALANCHE",
-    "AAVEV3-BASE",
-    "AAVEV3-BSC",
-    "AAVEV3-LINEA",
-    "AAVEV3-OPTIMISM",
-    "AAVEV3-POLYGON",
-    "COMPOUNDV3-ETHEREUM",
-    "COMPOUNDV3-ARBITRUM",
-    "COMPOUNDV3-BASE",
-    "COMPOUNDV3-OPTIMISM",
-    "COMPOUNDV3-POLYGON",
+    "AAVE_V3-ETHEREUM",
+    "AAVE_V3-ARBITRUM",
+    "AAVE_V3-AVALANCHE",
+    "AAVE_V3-BASE",
+    "AAVE_V3-BSC",
+    "AAVE_V3-LINEA",
+    "AAVE_V3-OPTIMISM",
+    "AAVE_V3-POLYGON",
+    "COMPOUND_V3-ETHEREUM",
+    "COMPOUND_V3-ARBITRUM",
+    "COMPOUND_V3-BASE",
+    "COMPOUND_V3-OPTIMISM",
+    "COMPOUND_V3-POLYGON",
     "MORPHO-ETHEREUM",
     "MORPHO-ARBITRUM",
     "MORPHO-BASE",

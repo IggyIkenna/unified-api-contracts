@@ -42,8 +42,8 @@ from unified_api_contracts.registry.market_data_categories import VENUES_BY_ASSE
         ("odds_api", "ODDS_API"),
         ("pinnacle", "PINNACLE"),
         # DeFi alias resolution
-        ("aavev3", "AAVEV3-ETHEREUM"),
-        ("AAVEV3", "AAVEV3-ETHEREUM"),
+        ("aavev3", "AAVE_V3-ETHEREUM"),
+        ("AAVE_V3", "AAVE_V3-ETHEREUM"),
         ("trader_joev2", "TRADER_JOEV2-AVALANCHE"),
         ("TRADERJOEV2-AVALANCHE", "TRADER_JOEV2-AVALANCHE"),  # DF-17
         ("blazestake", "SOLBLAZE-SOLANA"),  # DF-4

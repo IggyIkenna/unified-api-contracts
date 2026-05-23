@@ -157,7 +157,5 @@ class IncidentEnvelope(BaseModel):
     @classmethod
     def _risk_state_closed_set(cls, v: str) -> str:
         if v not in ("safe", "protected_mode", "unknown", "live_unresolved"):
-            raise ValueError(
-                f"risk_state must be safe|protected_mode|unknown|live_unresolved; got {v!r}"
-            )
+            raise ValueError(f"risk_state must be safe|protected_mode|unknown|live_unresolved; got {v!r}")
         return v

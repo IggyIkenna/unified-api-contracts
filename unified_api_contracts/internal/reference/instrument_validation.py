@@ -21,14 +21,14 @@ logger = logging.getLogger(__name__)
 # Asset group (CEFI/DEFI/…) is derived from venue patterns
 _DEFI_VENUE_PREFIXES = frozenset(
     {
-        "AAVEV3",
-        "UNISWAPV2",
-        "UNISWAPV3",
-        "UNISWAPV4",
+        "AAVE_V3",
+        "UNISWAP_V2",
+        "UNISWAP_V3",
+        "UNISWAP_V4",
         "BALANCER",
         "MORPHO",
         "CURVE",
-        "COMPOUNDV3",
+        "COMPOUND_V3",
         "FLUID",
         "LIDO",
         "ETHERFI",
@@ -40,10 +40,10 @@ _DEFI_VENUE_PREFIXES = frozenset(
         "MARINADE",
         "JITO",
         # DEX forks (UniV3 adapter with protocol_slug)
-        "PANCAKESWAPV3",
-        "SUSHISWAPV3",
-        "AERODROMEV3",
-        "CAMELOTV3",
+        "PANCAKESWAP_V3",
+        "SUSHISWAP_V3",
+        "AERODROME_V3",
+        "CAMELOT_V3",
         "VELODROMEV2",
         "TRADER_JOEV2",
         "GMX",
@@ -91,8 +91,8 @@ _SOLANA_DEFI_PREFIXES = frozenset({"DRIFT", "KAMINO", "RAYDIUM", "ORCA", "MARINA
 
 # DeFi protocols where raw_symbol is NOT a standard address:
 # - DRIFT: uses market symbols ("BTC-PERP", "SOL")
-# - COMPOUNDV3: uses market names ("USDC", "ETH") or numeric IDs
-_DEFI_NON_ADDRESS_RAW_SYMBOL = frozenset({"DRIFT", "COMPOUNDV3"})
+# - COMPOUND_V3: uses market names ("USDC", "ETH") or numeric IDs
+_DEFI_NON_ADDRESS_RAW_SYMBOL = frozenset({"DRIFT", "COMPOUND_V3"})
 
 # EVM hex address: 0x followed by exactly 40 hex digits
 _EVM_ADDRESS_RE = re.compile(r"^0x[0-9a-fA-F]{40}$")
@@ -201,7 +201,7 @@ def _validate_defi_raw_symbol(rec: InstrumentRecord, protocol: str, chain: str) 
     # Morpho and UniswapV4 use bytes32 identifiers (0x + 64 hex):
     # - Morpho: uniqueKey (market ID)
     # - UniswapV4: PoolId (keccak256 of pool params)
-    if protocol in ("MORPHO", "UNISWAPV4"):
+    if protocol in ("MORPHO", "UNISWAP_V4"):
         if not _EVM_BYTES32_RE.match(raw):
             return f"{protocol} raw_symbol must be bytes32 hex (0x + 64 hex chars), got {raw!r} (venue={rec.venue})"
         return None

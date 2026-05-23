@@ -348,7 +348,7 @@ class TestTradingAccountWalletRole:
 
         account = TradingAccount(
             client_id="fund-alpha",
-            venue="AAVEV3-ETHEREUM",
+            venue="AAVE_V3-ETHEREUM",
             account_label="0xabc",
             account_type=AccountType.DEFI_WALLET,
             chain="ETHEREUM",

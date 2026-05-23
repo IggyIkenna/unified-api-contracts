@@ -159,25 +159,25 @@ class TestTokenWrappingVenueCollateralConsistency:
     """Verify that wrapped tokens are accepted by the venues that need wrapping."""
 
     def test_eth_wraps_to_weth_and_aave_accepts_weth(self) -> None:
-        """ETH wraps to WETH, and AAVEV3-ETHEREUM accepts WETH."""
-        wrap_needed, target = needs_wrapping("ETH", "AAVEV3")
+        """ETH wraps to WETH, and AAVE_V3-ETHEREUM accepts WETH."""
+        wrap_needed, target = needs_wrapping("ETH", "AAVE_V3")
         assert wrap_needed is True
         assert target == "WETH"
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "WETH")
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "WETH")
 
     def test_eeth_wraps_to_weeth_and_aave_accepts_weeth(self) -> None:
-        """eETH wraps to weETH, and AAVEV3-ETHEREUM accepts weETH."""
-        wrap_needed, target = needs_wrapping("eETH", "AAVEV3")
+        """eETH wraps to weETH, and AAVE_V3-ETHEREUM accepts weETH."""
+        wrap_needed, target = needs_wrapping("eETH", "AAVE_V3")
         assert wrap_needed is True
         assert target == "weETH"
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "weETH")
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "weETH")
 
     def test_steth_wraps_to_wsteth_and_aave_accepts_wsteth(self) -> None:
-        """stETH wraps to wstETH, and AAVEV3-ETHEREUM accepts wstETH."""
-        wrap_needed, target = needs_wrapping("stETH", "AAVEV3")
+        """stETH wraps to wstETH, and AAVE_V3-ETHEREUM accepts wstETH."""
+        wrap_needed, target = needs_wrapping("stETH", "AAVE_V3")
         assert wrap_needed is True
         assert target == "wstETH"
-        assert venue_accepts_collateral("AAVEV3-ETHEREUM", "wstETH")
+        assert venue_accepts_collateral("AAVE_V3-ETHEREUM", "wstETH")
 
     def test_hyperliquid_only_accepts_usdc(self) -> None:
         """HYPERLIQUID only accepts USDC; ETH/WETH/weETH are rejected."""

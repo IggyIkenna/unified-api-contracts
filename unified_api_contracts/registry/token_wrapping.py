@@ -47,7 +47,7 @@ LST_BASE_ASSET: dict[str, str] = {
 }
 
 PROTOCOL_TOKEN_PREFERENCE: dict[str, dict[str, str]] = {
-    "AAVEV3": {
+    "AAVE_V3": {
         "ETH": "WETH",
         "eETH": "weETH",
         "stETH": "wstETH",
@@ -69,7 +69,7 @@ PROTOCOL_TOKEN_PREFERENCE: dict[str, dict[str, str]] = {
     },
     "ETHERFI": {"ETH": "ETH", "WETH": "WETH"},
     "LIDO": {"ETH": "ETH"},
-    "UNISWAPV3": {"ETH": "WETH"},
+    "UNISWAP_V3": {"ETH": "WETH"},
     "HYPERLIQUID": {"USDC": "USDC"},
     # CeFi perp venues — stETH/wstETH preferred form per venue_collateral.py matrix.
     # DERIBIT: accepts stETH (PM/SM, 7.5% haircut); wstETH is not accepted.

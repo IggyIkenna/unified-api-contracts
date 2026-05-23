@@ -117,8 +117,8 @@ EXPECTED_PRE_VENUE_LAUNCH rows in the default window.
 # ``plans/active/issues/defi_legacy_blank_reclassification_2026_05_13.md``.
 #
 # Keys are the ``protocol-chain`` venue string used in the defi manifest's
-# ``venue`` column (e.g. ``"AAVEV3-ETHEREUM"``). Bare protocol names (e.g.
-# ``"MAKER"``, ``"YEARNV3"``) are protocols that span all chains via a single
+# ``venue`` column (e.g. ``"AAVE_V3-ETHEREUM"``). Bare protocol names (e.g.
+# ``"MAKER"``, ``"YEARN_V3"``) are protocols that span all chains via a single
 # manifest row — those use just the protocol name without chain suffix.
 #
 # Per the conservative-prefer-later principle (see CeFi block above):
@@ -129,29 +129,29 @@ EXPECTED_PRE_VENUE_LAUNCH rows in the default window.
 DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # Aave V3 — March 16 2022 multi-chain launch (ETH/POLY/AVAX/ARB/OPT).
     # BSC/LINEA/ZKSYNC/SCROLL came later per official deployment timelines.
-    "AAVEV3-ETHEREUM": "2022-03-16",
-    "AAVEV3-POLYGON": "2022-03-16",
-    "AAVEV3-AVALANCHE": "2022-03-16",
-    "AAVEV3-ARBITRUM": "2022-03-16",
-    "AAVEV3-OPTIMISM": "2022-03-16",
-    "AAVEV3-BSC": "2023-04-06",
-    "AAVEV3-LINEA": "2024-09-26",
-    "AAVEV3-ZKSYNC": "2024-04-09",
-    "AAVEV3-SCROLL": "2024-04-29",
+    "AAVE_V3-ETHEREUM": "2022-03-16",
+    "AAVE_V3-POLYGON": "2022-03-16",
+    "AAVE_V3-AVALANCHE": "2022-03-16",
+    "AAVE_V3-ARBITRUM": "2022-03-16",
+    "AAVE_V3-OPTIMISM": "2022-03-16",
+    "AAVE_V3-BSC": "2023-04-06",
+    "AAVE_V3-LINEA": "2024-09-26",
+    "AAVE_V3-ZKSYNC": "2024-04-09",
+    "AAVE_V3-SCROLL": "2024-04-29",
     # Compound V3 ("Comet") — Aug 26 2022 on Ethereum; multi-chain later.
-    "COMPOUNDV3-ETHEREUM": "2022-08-26",
-    "COMPOUNDV3-POLYGON": "2023-02-15",
-    "COMPOUNDV3-ARBITRUM": "2023-04-14",
-    "COMPOUNDV3-BASE": "2023-08-11",
-    "COMPOUNDV3-OPTIMISM": "2024-02-16",
-    "COMPOUNDV3-SCROLL": "2024-04-23",
+    "COMPOUND_V3-ETHEREUM": "2022-08-26",
+    "COMPOUND_V3-POLYGON": "2023-02-15",
+    "COMPOUND_V3-ARBITRUM": "2023-04-14",
+    "COMPOUND_V3-BASE": "2023-08-11",
+    "COMPOUND_V3-OPTIMISM": "2024-02-16",
+    "COMPOUND_V3-SCROLL": "2024-04-23",
     # Uniswap V2 (May 2020), V3 (May 2021 ETH, Dec 2021 Polygon), V4 (Jan 2025).
-    "UNISWAPV2-ETHEREUM": "2020-05-05",
-    "UNISWAPV3-ETHEREUM": "2021-05-05",
-    "UNISWAPV3-POLYGON": "2021-12-22",
-    "UNISWAPV4-ETHEREUM": "2025-01-31",
+    "UNISWAP_V2-ETHEREUM": "2020-05-05",
+    "UNISWAP_V3-ETHEREUM": "2021-05-05",
+    "UNISWAP_V3-POLYGON": "2021-12-22",
+    "UNISWAP_V4-ETHEREUM": "2025-01-31",
     # SushiSwap V3 — April 2023.
-    "SUSHISWAPV3-ETHEREUM": "2023-04-04",
+    "SUSHISWAP_V3-ETHEREUM": "2023-04-04",
     # Curve — Jan 2020 launch (CRV token mainnet later, but pools live earlier).
     "CURVE-ETHEREUM": "2020-01-19",
     # Balancer V2 — March 2020 (V1 earlier but V2 is the active reference).
@@ -179,7 +179,7 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "GMX-ARBITRUM": "2021-09-01",
     "GMX-AVALANCHE": "2022-01-06",
     # Yearn V3 — March 13 2024 launch (V2 earlier but V3 is referenced here).
-    "YEARNV3": "2024-03-13",
+    "YEARN_V3": "2024-03-13",
     # Morpho Vaults (MetaMorpho) — Jan 4 2024 launch.
     "MORPHOVAULTS": "2024-01-04",
     # Pre-2018 venues kept for completeness (no EXPECTED_PRE_VENUE_LAUNCH rows
