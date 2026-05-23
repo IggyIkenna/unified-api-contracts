@@ -182,8 +182,6 @@ class CandleOutput:
     price_impact: object = None
     fee: object = None
     protocol: object = None
-    swap_count: object = None
-    volume_quote_usd: object = None
 
     # Rate indices
     rate: object = None
