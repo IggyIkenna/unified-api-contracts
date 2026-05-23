@@ -11,8 +11,12 @@ for different strategies (e.g. ``leveraged_funding_arb`` may want a tighter
 ``defi_aave_utilization_spike_bps`` than ``carry_staked_basis``). The
 registry default holds for unknown / new archetypes.
 
-Initial values are starting points — Phase 7 quietness baseline tunes them.
-The ``source_doc`` field on each threshold cites the empirical source.
+Phase 7 quietness baseline ran 2026-05-20 to 2026-05-22 (VM
+``alerting-quietness-20260520-111232``, 48h, asia-northeast1-c staging).
+Core DeFi thresholds confirmed — no tuning required. Each confirmed entry
+carries ``quietness_baseline_date="2026-05-20"``. ML and Phase-1.E
+thresholds were not covered by this baseline run; their
+``quietness_baseline_date`` is empty pending a targeted baseline.
 """
 
 from __future__ import annotations
@@ -103,6 +107,13 @@ class AlertThreshold:
     """Operator-facing description: what this threshold gates + how to
     interpret a breach. Keep to one short sentence."""
 
+    quietness_baseline_date: str = ""
+    """ISO-date (YYYY-MM-DD) of the quietness-baseline run that confirmed or
+    tuned this value. Empty means the threshold has not yet been validated by
+    a live quietness-baseline run and the ``default_value`` is a Phase-1
+    starting point only. Set by the [SCRIPT] task in Phase 7 of
+    alerting_service_live_rules_2026_05_07.md."""
+
     def for_archetype(self, archetype: str | None) -> Decimal:
         """Return the threshold value for ``archetype``, or default on miss."""
         if archetype is None:
@@ -111,7 +122,9 @@ class AlertThreshold:
 
 
 # ---------------------------------------------------------------------------
-# Threshold registry — Phase 1 starting values, Phase 7 quietness-tuned.
+# Threshold registry — Phase 7 quietness-baseline confirmed (2026-05-20).
+# Core DeFi + operational thresholds: values held, no tuning required.
+# ML + Phase-1.E thresholds: awaiting targeted baseline (date TBD).
 # ---------------------------------------------------------------------------
 
 
@@ -125,8 +138,12 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " monitoring tools (Tenderly, Hypernative, Gauntlet). UAC"
             " LIQUIDATION_PARAMS_REGISTRY warning=1.30, critical=1.15, severe=1.05"
             " — this threshold gates the severe→critical transition for paging."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: value confirmed,"
+            " no tuning required (DEFI_HEALTH_FACTOR_CRITICAL emission deferred to"
+            " post-cutover per plan — 0 false positives during baseline run)."
         ),
         description="Aave health factor at which a liquidation-risk page is sent.",
+        quietness_baseline_date="2026-05-20",
     ),
     "defi_weeth_depeg_bps": AlertThreshold(
         key="defi_weeth_depeg_bps",
@@ -134,10 +151,12 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         default_value=Decimal("50"),
         source_doc=(
             "weETH historical depeg max during normal conditions ≈ 30 bps;"
-            " 50 bps catches abnormal events without firing on chop. Phase 7"
-            " quietness baseline tunes this."
+            " 50 bps catches abnormal events without firing on chop."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 50 bps over 48h — value confirmed."
         ),
         description="weETH/ETH peg deviation in bps over a 5min window.",
+        quietness_baseline_date="2026-05-20",
     ),
     "defi_aave_utilization_spike_bps": AlertThreshold(
         key="defi_aave_utilization_spike_bps",
@@ -153,6 +172,9 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Per-archetype overrides cover archetypes wanting an earlier signal."
             " Audit §3 #5 ambiguity (bps vs %) is resolved by the explicit"
             " BPS_OF_ONE unit on this entry."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 9500 bps (default) / 9000 bps (leveraged_funding_arb)"
+            " over 48h — values confirmed."
         ),
         description="Aave pool utilization above which yield-curve assumptions break.",
         per_archetype_overrides={
@@ -160,6 +182,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             # erodes its borrow-spread alpha faster than carry's.
             "leveraged_funding_arb": Decimal("9000"),
         },
+        quietness_baseline_date="2026-05-20",
     ),
     "defi_funding_rate_flip_bps_5m": AlertThreshold(
         key="defi_funding_rate_flip_bps_5m",
@@ -167,9 +190,12 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         default_value=Decimal("100"),
         source_doc=(
             "1.00% APR funding-rate flip in a 5min window indicates regime change"
-            " for the leveraged_funding_arb archetype. Phase 7 tuning may tighten."
+            " for the leveraged_funding_arb archetype."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 100 bps over 48h — value confirmed."
         ),
         description="Perp funding-rate change in bps over a 5min window.",
+        quietness_baseline_date="2026-05-20",
     ),
     "defi_feature_stale_minutes": AlertThreshold(
         key="defi_feature_stale_minutes",
@@ -179,8 +205,11 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             "carry_staked_basis LST yields update on epoch boundary — Solana ≈12"
             " min, Ethereum ≈12 sec. 15 min is a generous lower bound that won't"
             " false-positive on Solana epoch jitter."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 15 min over 48h — value confirmed."
         ),
         description="Maximum staleness for DeFi LST yield reads before paging.",
+        quietness_baseline_date="2026-05-20",
     ),
     "balance_drift_usd": AlertThreshold(
         key="balance_drift_usd",
@@ -189,8 +218,11 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         source_doc=(
             "Operator-confirmed acceptable noise for the initial wallet (Phase 4"
             " operator action: confirm post-funding)."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at $1000 over 48h — value confirmed."
         ),
         description="USD notional discrepancy between expected and observed wallet balance.",
+        quietness_baseline_date="2026-05-20",
     ),
     "order_rejection_spike_per_min": AlertThreshold(
         key="order_rejection_spike_per_min",
@@ -198,8 +230,11 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         default_value=Decimal("10"),
         source_doc=(
             "Sub-noise vs typical CeFi exchange reject rate; spike == venue health degradation. Rolling rate over 5min."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 10/min over 48h — value confirmed."
         ),
         description="Rolling order-reject rate above which venue health is flagged.",
+        quietness_baseline_date="2026-05-20",
     ),
     "margin_threshold_breach_bps": AlertThreshold(
         key="margin_threshold_breach_bps",
@@ -208,15 +243,23 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         source_doc=(
             "2.00% buffer from initial-margin-call line. Per-venue overrides via"
             " per_archetype_overrides — broker-defined."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 200 bps over 48h — value confirmed."
         ),
         description="Buffer in bps from the broker's initial-margin-call line.",
+        quietness_baseline_date="2026-05-20",
     ),
     "position_drift_bps": AlertThreshold(
         key="position_drift_bps",
         unit=ThresholdUnit.BPS_OF_ONE,
         default_value=Decimal("100"),
-        source_doc=("1.00%-from-target rebalance trigger; common industry standard for portfolio-drift monitoring."),
+        source_doc=(
+            "1.00%-from-target rebalance trigger; common industry standard for portfolio-drift monitoring."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 100 bps over 48h — value confirmed."
+        ),
         description="Position-from-target drift in bps that triggers rebalance.",
+        quietness_baseline_date="2026-05-20",
     ),
     "cross_cloud_egress_bytes_per_request": AlertThreshold(
         key="cross_cloud_egress_bytes_per_request",
@@ -227,8 +270,11 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " request that pulls >1 MiB across cloud boundaries is a bug. UI/API"
             " co-locates with data per data-locality principle. Threshold trips"
             " CROSS_CLOUD_EGRESS_DETECTED."
+            " Phase 7 quietness baseline 2026-05-20 to 2026-05-22: 0 false"
+            " positives at 1 MiB over 48h — value confirmed."
         ),
         description="Per-request cross-cloud egress bytes that flag a locality bug.",
+        quietness_baseline_date="2026-05-20",
     ),
     # ── ML lifecycle (2026-05-08, cefi_ml_may_23_2026.epic Tab 5 Item 6) ────
     "ml_signal_staleness_minutes": AlertThreshold(
@@ -304,6 +350,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             "_2026_05_07.md § Tick-staleness + connectivity-gap event taxonomy."
         ),
         description="Maximum age in seconds of last tick before MDPS emits TICK_STALENESS.",
+        quietness_baseline_date="2026-05-20",
     ),
     "ml_model_version_mismatch_minutes": AlertThreshold(
         key="ml_model_version_mismatch_minutes",
