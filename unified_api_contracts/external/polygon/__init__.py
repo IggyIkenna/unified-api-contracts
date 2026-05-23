@@ -1,3 +1,10 @@
-"""External Polygon schemas."""
+"""Polygon.io external API schemas — used by instruments-service TradFi reference data adapter."""
 
-from unified_api_contracts.external.polygon.schemas import *
+from .schemas import PolygonOptionContract, PolygonOptionContractsResponse, PolygonTicker, PolygonTickersResponse
+
+__all__ = [
+    "PolygonOptionContract",
+    "PolygonOptionContractsResponse",
+    "PolygonTicker",
+    "PolygonTickersResponse",
+]

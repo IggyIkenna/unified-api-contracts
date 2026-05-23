@@ -16,7 +16,7 @@ from collections.abc import Callable
 from datetime import date as _date
 from datetime import timedelta as _timedelta
 
-from unified_api_contracts.registry.defi_venues import MTDS_DEFI_VENUES as _MTDS_DEFI_VENUES
+from unified_api_contracts.registry.defi_venues import ALL_DEFI_VENUES as _ALL_DEFI_VENUES
 
 # Default timeframes for candle processing (used by sharding and CLI)
 TIMEFRAMES: list[str] = ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
@@ -152,6 +152,7 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
+        "odds_horizon_bucket",  # Time-to-event horizon bucket assignment for odds
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
@@ -208,7 +209,7 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)
         "YAHOO_FINANCE",  # VIX 15m ongoing: rolling 60-day window; KRW/USD daily rates
     ],
-    "defi": list(_MTDS_DEFI_VENUES),
+    "defi": list(_ALL_DEFI_VENUES),
     "sports": [
         # Sports betting exchanges and bookmakers active in the May-23 universe.
         # DEFERRED-INDEFINITELY 2026-05-12 per operator: scraper bookmakers
@@ -849,7 +850,7 @@ def get_venue_data_type_start_date(venue: str, data_type: str) -> str | None:
         return ref_caps[data_type]
     # Fall back to venue start date from VenueMapping
     from .venue_mapping import (
-        VenueMapping,  # noqa: qg-inside-import  # lazy import to avoid circular dependency at module load
+        VenueMapping,  # qg-inside-import: lazy import to avoid circular dependency at module load
     )
 
     vm = VenueMapping()
@@ -907,6 +908,10 @@ _PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
         "derivative_ticker",
         "options_chain",
         "futures_chain",
+        # TradFi + CeFi DEX OHLCV (Phase 3.D.5 v2 enumerator — per-equity-ticker
+        # and per-pool denominator; TradFi catalog reader provides equity tickers,
+        # CeFi catalog reader provides DEX pool instrument IDs for LIGHTER/PACIFICA).
+        "ohlcv_1m",
         # DEFI per-pool / per-market / per-asset shards
         "dex_swaps",
         "dex_pools",
@@ -1062,6 +1067,15 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
     on PREDICTION dts (Wave 8G — see
     ``registry.defi_prediction_instrument_seeds``).
     """
+    # ohlcv_1m is per-instrument (Phase 3.D.5 v2). Per-instrument universe is
+    # always provided by a catalog reader (TradFiCatalogReader for equity
+    # tickers; CeFiCatalogReader for DEX pools on LIGHTER/PACIFICA). When no
+    # catalog reader is registered for a venue, return () so Tier-3 degrades
+    # to Tier-2 — same as today's behaviour (no regression on first-boot or
+    # test environments where the catalog is absent).
+    if data_type == "ohlcv_1m":
+        return ()
+
     # CEFI spot_pair path for `trades` + `book_snapshot_5`. PREDICTION
     # venues also write canonical `trades` (since 2026-04-19
     # `prediction_trades` rename) so they branch off first.

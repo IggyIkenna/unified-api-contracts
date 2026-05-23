@@ -4,7 +4,7 @@ Maps each InstructionType to its allowed order types, instrument types,
 venue categories, and operation types. Replaces ad-hoc validation scattered
 across execution-service.
 
-Consumers: execution-service, strategy-service, risk-and-exposure-service.
+Consumers: execution-service, strategy-service/risk.
 Import via: ``from unified_api_contracts.registry import INSTRUCTION_CONSTRAINTS``
 """
 

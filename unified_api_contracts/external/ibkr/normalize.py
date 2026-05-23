@@ -35,9 +35,10 @@ from ...canonical.domain.execution import (
     OrderStatus,
     OrderType,
 )
-from ...normalize_utils._helpers import _to_decimal
+from ...normalize_utils._helpers import to_decimal
 from ...normalize_utils.connectivity import normalize_ws_disconnect
-from ...normalize_utils.market_state import _IBKR_STATE_MAP, normalize_market_state
+from ...normalize_utils.market_state import IBKR_STATE_MAP as _IBKR_STATE_MAP
+from ...normalize_utils.market_state import normalize_market_state
 from .schemas import (
     IBKRContractDetails,
     IBKRExecution,
@@ -62,13 +63,13 @@ def _d(value: float | int | str | Decimal | None) -> Decimal | None:
     return Decimal(str(value))
 
 
-def _normalize_side(s: str | None) -> str:
+def _normalize_side(s: str | None) -> OrderSide:
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short", "sld") else OrderSide.BUY
 
 
-def _normalize_order_type(t: str | None) -> str:
+def _normalize_order_type(t: str | None) -> OrderType:
     if not t:
         return OrderType.LIMIT
     t_lower = str(t).lower()
@@ -81,7 +82,7 @@ def _normalize_order_type(t: str | None) -> str:
     return OrderType.LIMIT
 
 
-def _normalize_order_status(s: str | None) -> str:
+def _normalize_order_status(s: str | None) -> OrderStatus:
     if not s:
         return OrderStatus.PENDING
     s_lower = str(s).lower()
@@ -245,7 +246,7 @@ def normalize_ibkr_option_quote(
         underlying=underlying,
         strike=_d(raw.strike) or Decimal("0"),
         option_type=opt_type,
-        expiration=exp,
+        expiration=exp if exp is not None else datetime.now(tz=UTC),
         bid_price=_d(bid),
         ask_price=_d(ask),
         bid_size=_d(bid_sz),
@@ -326,10 +327,10 @@ def normalize_ibkr_ticker(raw: IBKRTicker, instrument_key: str, venue: str = "ib
         instrument_key=instrument_key,
         venue=venue,
         timestamp=ts,
-        last_price=_to_decimal(raw.last) or Decimal("0"),
-        bid_price=_to_decimal(raw.bid),
-        ask_price=_to_decimal(raw.ask),
-        volume_24h=_to_decimal(raw.volume),
+        last_price=to_decimal(raw.last) or Decimal("0"),
+        bid_price=to_decimal(raw.bid),
+        ask_price=to_decimal(raw.ask),
+        volume_24h=to_decimal(raw.volume),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,

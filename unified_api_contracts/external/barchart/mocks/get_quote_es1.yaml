@@ -1,0 +1,22 @@
+interactions:
+  - request:
+      body: null
+      headers:
+        Accept:
+          - "*/*"
+        User-Agent:
+          - python-httpx/0.27.0
+      method: GET
+      uri: https://ondemand.websol.barchart.com/getQuote.json?apikey=MOCK_KEY&symbols=ES%2C1
+    response:
+      body:
+        string:
+          '{"status":{"code":200,"message":"Success."},"results":[{"symbol":"ES,1","name":"E-mini
+          S&P 500 Continuous Contract","dayCode":"A","serverTimestamp":"2024-01-15T14:30:00-06:00","mode":"I","lastPrice":4900.25,"tradeTimestamp":"2024-01-15T14:29:59-06:00","netChange":12.50,"percentChange":0.26,"unitCode":"2","open":4887.75,"high":4905.50,"low":4882.25,"close":null,"numTrades":325420,"dollarVolume":47829234750.00,"flag":"","volume":9753,"previousVolume":1234567}]}'
+      headers:
+        Content-Type:
+          - application/json
+      status:
+        code: 200
+        message: OK
+version: 1

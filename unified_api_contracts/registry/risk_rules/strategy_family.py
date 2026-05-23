@@ -346,8 +346,8 @@ STRATEGY_FAMILY_RULES: Final[tuple[RiskRule, ...]] = (
 -----------------------
 
 Aggregates the per-family rule tuples in a single ordered SSOT. Consumers
-(``risk-and-exposure-service`` Phase 4.A; UTL ``risk/preflight.py`` Phase
-3.B) iterate this tuple filtered by ``rule.applies_to`` matching the
+(``strategy-service/risk`` Phase 4.A; UTL ``risk/preflight.py`` Phase 3.B) iterate
+this tuple filtered by ``rule.applies_to`` matching the
 family-id of the proposed instruction's owning archetype.
 
 Coverage invariant: every member of ``StrategyFamilyId`` enum has at least

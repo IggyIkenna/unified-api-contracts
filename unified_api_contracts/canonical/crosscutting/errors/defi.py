@@ -24,7 +24,7 @@ class DefiAlertType(StrEnum):
     RATE_DEVIATION = "rate_deviation"
 
 
-class DefiErrorCode:
+class DefiErrorCode(StrEnum):
     """Known DeFi error codes for structured error classification.
 
     These codes are used by execution-service DeFi connectors (e.g.

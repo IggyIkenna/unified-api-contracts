@@ -145,6 +145,13 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "description": "Option type: 'CALL' or 'PUT'",
     },
     {
+        "name": "exercise_style",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Option exercise style: 'AMERICAN' or 'EUROPEAN'. None for non-options.",
+    },
+    {
         "name": "expiry",
         "type": "datetime64[ns]",
         "required": False,

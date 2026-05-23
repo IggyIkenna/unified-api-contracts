@@ -85,7 +85,18 @@ _CATEGORY_UNDERLYING_PERIOD_TO_GROUP: Final[dict[tuple[_C, str, _P], CanonicalQu
     (_C.CRYPTO_PRICE, "BTC", _P.DAILY): _G.BTC_UP_DOWN_DAILY,
     (_C.CRYPTO_PRICE, "ETH", _P.HOURLY): _G.ETH_UP_DOWN_HOURLY,
     (_C.CRYPTO_PRICE, "ETH", _P.DAILY): _G.ETH_UP_DOWN_DAILY,
+    # Equity indices — CME event-contract linked (predictions_master Phase 5, 2026-05-22)
     (_C.EQUITY_INDEX, "SPX", _P.DAILY): _G.SPX_UP_DOWN_DAILY,
+    (_C.EQUITY_INDEX, "NDX", _P.DAILY): _G.NDX_UP_DOWN_DAILY,
+    (_C.EQUITY_INDEX, "DJIA", _P.DAILY): _G.DJIA_UP_DOWN_DAILY,
+    (_C.EQUITY_INDEX, "RUT", _P.DAILY): _G.RUT_UP_DOWN_DAILY,
+    # Commodities — CME event-contract linked
+    (_C.COMMODITY, "GOLD", _P.DAILY): _G.GOLD_UP_DOWN_DAILY,
+    (_C.COMMODITY, "CRUDE_OIL", _P.DAILY): _G.CRUDE_OIL_UP_DOWN_DAILY,
+    # NAT_GAS: taxonomy underlying uses "NAT_GAS" (from nat-gas-/natural-gas- prefixes)
+    (_C.COMMODITY, "NAT_GAS", _P.DAILY): _G.NATGAS_UP_DOWN_DAILY,
+    # FX — EURUSD: taxonomy underlying uses "EURUSD" (from eur-usd-/usd-eur- prefixes)
+    (_C.FX, "EURUSD", _P.DAILY): _G.EUR_UP_DOWN_DAILY,
 }
 """(category, underlying, resolution_period) → canonical group.
 
@@ -141,7 +152,17 @@ def classify_polymarket_to_canonical_group(
 
     if market_type == PredictionShardMarketType.RANGE_BRACKET:
         cadence_key = (category, underlying.upper(), resolution_period)
-        return _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(cadence_key)
+        result = _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(cadence_key)
+        if result is not None:
+            return result
+        # Polymarket daily price markets encode their date as month+day in the
+        # slug (e.g. "btc-up-or-down-may-22"), causing the taxonomy to assign
+        # MONTHLY resolution.  Fall back to DAILY so those markets route to
+        # BTC_UP_DOWN_DAILY / SPX_UP_DOWN_DAILY / CRUDE_OIL_UP_DOWN_DAILY etc.
+        if resolution_period == PredictionShardResolutionPeriod.MONTHLY:
+            daily_key = (category, underlying.upper(), PredictionShardResolutionPeriod.DAILY)
+            return _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(daily_key)
+        return None
 
     event_key = (category, underlying.upper())
     return _CATEGORY_UNDERLYING_TO_EVENT_GROUP.get(event_key)

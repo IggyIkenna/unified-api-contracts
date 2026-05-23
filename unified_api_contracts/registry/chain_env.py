@@ -474,7 +474,56 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
         "ARBITRUM",
         "RENZO",
     ): "2024-02-29",  # Renzo + Connext native restaking on Arbitrum per official X (1763237166459527250); high
+    # ── Slot 6 2026-05-22 additions — venues added to ALL_DEFI_VENUES for parity ──
+    # Euler v2 rebuilt and launched post-exploit (v1 hacked Mar 2023). v2 GA:
+    ("ETHEREUM", "EULER_V2"): "2024-08-01",  # Euler v2 mainnet GA ~August 2024 per Euler docs; medium
+    ("ARBITRUM", "EULER_V2"): "2024-08-01",  # Euler v2 multi-chain same-day launch; medium
+    # Generic "AAVE" key (V2 vintage) — Aave V2 Ethereum mainnet launch:
+    ("ETHEREUM", "AAVE"): "2020-12-03",  # Aave V2 mainnet Dec 2020 per Aave blog; high
+    # Generic "COMPOUND" key (V2 vintage) — Compound V2 mainnet:
+    ("ETHEREUM", "COMPOUND"): "2019-09-25",  # Compound V2 cToken system launch per Compound Medium; high
+    # Generic "UNISWAP" key — earliest Uniswap on Ethereum (V1):
+    ("ETHEREUM", "UNISWAP"): "2018-11-02",  # Uniswap V1 Devcon mainnet deploy per Uniswap blog; high
+    # Across Protocol bridge — cross-chain messaging / bridge:
+    ("ETHEREUM", "ACROSS"): "2021-11-11",  # Across Protocol v1 mainnet per Across blog; high
+    # Stargate Finance layerzero bridge:
+    ("ETHEREUM", "STARGATE"): "2022-03-17",  # Stargate mainnet launch per CoinDesk + Stargate blog; high
+    # Flashbots MEV infrastructure (earliest mainnet activity via bundle relay):
+    ("ETHEREUM", "FLASHBOTS"): "2021-01-14",  # Flashbots alpha RPC relay launch per Flashbots GitHub; high
+    # BenQi Finance on Avalanche — lending + liquid staking:
+    ("AVALANCHE", "BENQI"): "2021-08-19",  # BenQi Avalanche mainnet per DeFiLlama + Avalanche Foundation; high
+    # Venus Protocol on BSC:
+    ("BSC", "VENUS"): "2020-10-08",  # Venus Protocol BSC mainnet per PancakeSwap-era BSC ecosystem docs; high
+    # Venus Protocol Ethereum expansion (XVS token bridge + staking):
+    ("ETHEREUM", "VENUS"): "2023-06-01",  # Venus v4 cross-chain expansion incl. ETH per Venus blog; medium
+    # Radiant Capital Ethereum expansion (V2 multi-chain after Arbitrum V1):
+    ("ETHEREUM", "RADIANT"): "2023-07-18",  # Radiant V2 Ethereum deploy per Radiant Twitter + DLNews; medium
 }
+
+# ── Canonical underscore-name aliases for protocol names ──
+# Ghost no-underscore protocol tokens (AAVEV3, UNISWAPV3, etc.) kept for backward-compat.
+# New MTDS writers use canonical tokens (AAVE_V3, UNISWAP_V3, etc.); these extend
+# PROTOCOL_LAUNCH_DATES so canonical-form ALL_DEFI_VENUES entries resolve correctly.
+_CANONICAL_PROTOCOL_RENAME: dict[str, str] = {
+    "UNISWAP_V2": "UNISWAPV2",
+    "UNISWAP_V3": "UNISWAPV3",
+    "UNISWAP_V4": "UNISWAPV4",
+    "AAVE_V3": "AAVEV3",
+    "COMPOUND_V3": "COMPOUNDV3",
+    "SUSHISWAP_V3": "SUSHISWAPV3",
+    "PANCAKESWAP_V3": "PANCAKESWAPV3",
+    "CAMELOT_V3": "CAMELOTV3",
+    "AERODROME_V3": "AERODROMEV3",
+    "YEARN_V3": "YEARNV3",
+}
+PROTOCOL_LAUNCH_DATES.update(
+    {
+        (chain, canonical): date
+        for (chain, ghost), date in list(PROTOCOL_LAUNCH_DATES.items())
+        for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
+        if ghost == ghost_name
+    }
+)
 
 # (chain, protocol) pairs declared in ``ALL_DEFI_VENUES`` whose launch
 # date has not yet been researched. The sanity test allows their
@@ -503,6 +552,38 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
         # creation tx for pool address `stk9ApL5HeVAwPLr3TLhDXdZS8ptVu7zp6ov8HFDuMi`
         # before tightening the floor.
         ("SOLANA", "SOLBLAZE"),
+        # ── Slot 6 2026-05-22: venues added for parity; dates pending subgraph audit ──
+        # Morpho Blue on L2s — launched on Base 2024-06-18 (in PROTOCOL_LAUNCH_DATES);
+        # Arbitrum / Optimism / Polygon deployments in late 2024; exact dates TBD.
+        ("ARBITRUM", "MORPHO"),
+        ("OPTIMISM", "MORPHO"),
+        ("POLYGON", "MORPHO"),
+        # Fluid (Instadapp) on Arbitrum — expanded post-Ethereum (2024-02-15);
+        # Arbitrum deployment date pending Arbiscan contract-creation audit.
+        ("ARBITRUM", "FLUID"),
+        # Alchemix multi-chain expansion — ETH date (2021-02-27) in PROTOCOL_LAUNCH_DATES;
+        # L2 expansion dates pending alchemix.fi changelog audit.
+        ("ARBITRUM", "ALCHEMY"),
+        ("BASE", "ALCHEMY"),
+        ("OPTIMISM", "ALCHEMY"),
+        ("POLYGON", "ALCHEMY"),
+        # PLASMA chain — Polygon Plasma bridge-side; non-standard chain;
+        # date pending operator decision on scope.
+        ("PLASMA", "AAVE"),
+        ("PLASMA", "FLUID"),
+        # ONCHAIN pseudo-chain — Alchemy Infrastructure data, not a real L1/L2;
+        # pending operator decision on whether to keep or remove this venue.
+        ("ONCHAIN", "ALCHEMY"),
+    }
+)
+# Extend _PROTOCOL_LAUNCH_PENDING_INVESTIGATION with canonical protocol-name aliases
+# (e.g. COMPOUND_V3 alongside COMPOUNDV3) so the parity test passes for both forms.
+_PROTOCOL_LAUNCH_PENDING_INVESTIGATION = _PROTOCOL_LAUNCH_PENDING_INVESTIGATION | frozenset(
+    {
+        (chain, canonical)
+        for (chain, ghost) in _PROTOCOL_LAUNCH_PENDING_INVESTIGATION
+        for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
+        if ghost == ghost_name
     }
 )
 

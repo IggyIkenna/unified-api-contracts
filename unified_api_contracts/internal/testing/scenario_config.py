@@ -83,10 +83,11 @@ class FaultConfig(BaseModel):
         """
         for rule in self.instrument_faults:
             if fnmatch.fnmatch(instrument_key, rule.pattern):
-                override = getattr(rule, field, None)
+                override: float | None = getattr(rule, field, None)
                 if override is not None:
                     return float(override)
-        return float(getattr(self, field, 0.0))
+        global_val: float = getattr(self, field, 0.0)
+        return float(global_val)
 
 
 class ScenarioConfig(BaseModel):

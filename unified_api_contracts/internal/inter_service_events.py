@@ -90,14 +90,14 @@ class MarginEventSeverity(StrEnum):
 class MarginEvent(EventEnvelope):
     """Emitted by position-balance-monitor whenever margin/HF crosses a threshold.
 
-    Single canonical producer: position-balance-monitor-service. Consumers:
+    Single canonical producer: strategy-service/position. Consumers:
     alerting-service (route by severity), strategy-service (kill-switch guard),
     execution-service (deleverage executor on critical/liquidation),
-    risk-and-exposure-service (time-series logging), pnl-attribution-service
-    (liquidation attribution).
+    strategy-service/risk (time-series logging),
+    strategy-service/pnl (liquidation attribution).
     """
 
-    event_type: Literal["MarginEvent"] = "MarginEvent"
+    event_type: str = Field(default="MarginEvent", description="Event discriminator")
     margin_severity: MarginEventSeverity
     snapshot: MarginHealthSnapshot
     threshold_breached: str = Field(
@@ -114,12 +114,12 @@ class LiquidationAlert(EventEnvelope):
     """Emitted when an actual liquidation event occurred (post-fact).
 
     Distinct from ``MarginEvent`` (forward-looking warning). Consumed by
-    pnl-attribution-service for liquidation P&L attribution and by
+    strategy-service/pnl for liquidation P&L attribution and by
     alerting-service for incident routing.
     """
 
-    event_type: Literal["LiquidationAlert"] = "LiquidationAlert"
-    venue_id: str
+    event_type: str = Field(default="LiquidationAlert", description="Event discriminator")
+    venue_id: str | None = None
     protocol: str
     instrument_liquidated: str
     quantity_liquidated: Decimal
@@ -137,18 +137,18 @@ class LiquidationAlert(EventEnvelope):
 class PositionSnapshotEvent(EventEnvelope):
     """Per-account position snapshot. Emitted by PBM after each material change."""
 
-    event_type: Literal["PositionSnapshotEvent"] = "PositionSnapshotEvent"
+    event_type: str = Field(default="PositionSnapshotEvent", description="Event discriminator")
     account_id: str = Field(json_schema_extra={"pii": True})
-    venue_id: str
+    venue_id: str | None = None
     positions: list[InternalPosition] = Field(default_factory=list)
 
 
 class BalanceSnapshot(EventEnvelope):
     """Per-account balance snapshot. Emitted by PBM."""
 
-    event_type: Literal["BalanceSnapshot"] = "BalanceSnapshot"
+    event_type: str = Field(default="BalanceSnapshot", description="Event discriminator")
     account_id: str = Field(json_schema_extra={"pii": True})
-    venue_id: str
+    venue_id: str | None = None
     balances: dict[str, Balance] = Field(default_factory=dict)
 
 
@@ -161,9 +161,9 @@ class FillEvent(EventEnvelope):
     path produced this fill for reconciliation purposes only.
     """
 
-    event_type: Literal["FillEvent"] = "FillEvent"
-    instrument_id: str
-    venue_id: str
+    event_type: str = Field(default="FillEvent", description="Event discriminator")
+    instrument_id: str | None = None
+    venue_id: str | None = None
     side: str
     quantity: Decimal
     price: Decimal
@@ -176,11 +176,11 @@ class FillEvent(EventEnvelope):
 class OrderSubmitted(EventEnvelope):
     """Order submission acknowledged by the venue (or matching engine in batch)."""
 
-    event_type: Literal["OrderSubmitted"] = "OrderSubmitted"
+    event_type: str = Field(default="OrderSubmitted", description="Event discriminator")
     client_order_id: str
     venue_order_id: str | None = None
-    instrument_id: str
-    venue_id: str
+    instrument_id: str | None = None
+    venue_id: str | None = None
     side: str
     quantity: Decimal
     submitted_price: Decimal | None = None
@@ -194,12 +194,10 @@ class OrderSubmitted(EventEnvelope):
 class PriceSnapshot(EventEnvelope):
     """Mark-price snapshot. Emitted by market-tick-data-service feeders."""
 
-    event_type: Literal["PriceSnapshot"] = "PriceSnapshot"
-    instrument_id: str
+    event_type: str = Field(default="PriceSnapshot", description="Event discriminator")
     mark_price: Decimal
     bid: Decimal | None = None
     ask: Decimal | None = None
-    venue_id: str | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -208,9 +206,9 @@ class PriceSnapshot(EventEnvelope):
 
 
 class RiskEvent(EventEnvelope):
-    """Risk threshold breach. Emitted by risk-and-exposure-service."""
+    """Risk threshold breach. Emitted by strategy-service/risk."""
 
-    event_type: Literal["RiskEvent"] = "RiskEvent"
+    event_type: str = Field(default="RiskEvent", description="Event discriminator")
     alert_type: AlertType
     metric: str
     current_value: Decimal
@@ -222,7 +220,7 @@ class KillSwitchTrigger(EventEnvelope):
     """Kill switch fired. Consumed by execution (drain), strategy (pause),
     alerting (route to incident channels)."""
 
-    event_type: Literal["KillSwitchTrigger"] = "KillSwitchTrigger"
+    event_type: str = Field(default="KillSwitchTrigger", description="Event discriminator")
     reason: str
     triggered_by: str = Field(description="company | client | account | strategy id")
     scope: dict[str, str] = Field(
@@ -240,7 +238,7 @@ class DeleverageActionSubmitted(EventEnvelope):
     matching engine simulates the action's fill.
     """
 
-    event_type: Literal["DeleverageActionSubmitted"] = "DeleverageActionSubmitted"
+    event_type: str = Field(default="DeleverageActionSubmitted", description="Event discriminator")
     margin_event_id: str = Field(description="Caused-by event_id (causation chain).")
     action_kind: Literal[
         "topup_collateral",
@@ -265,7 +263,7 @@ class PnLPoint(EventEnvelope):
     decomposition and by alerting for drawdown rules.
     """
 
-    event_type: Literal["PnLPoint"] = "PnLPoint"
+    event_type: str = Field(default="PnLPoint", description="Event discriminator")
     account_id: str = Field(json_schema_extra={"pii": True})
     realized_pnl: Decimal
     unrealized_pnl: Decimal
@@ -274,7 +272,7 @@ class PnLPoint(EventEnvelope):
 
 
 class PnLAttributionPublished(EventEnvelope):
-    """Daily attribution decomposition. Emitted by pnl-attribution-service."""
+    """Daily attribution decomposition. Emitted by strategy-service/pnl."""
 
-    event_type: Literal["PnLAttributionPublished"] = "PnLAttributionPublished"
+    event_type: str = Field(default="PnLAttributionPublished", description="Event discriminator")
     record: PnLAttributionRecord

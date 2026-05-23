@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import cast
 
 from unified_api_contracts.canonical.domain import CanonicalBetMarket, CanonicalOdds
 from unified_api_contracts.canonical.domain.sports import (
@@ -23,7 +24,7 @@ from unified_api_contracts.canonical.domain.sports import (
     build_team_id,
     build_venue_id,
 )
-from unified_api_contracts.normalize_utils._helpers import _iso, _to_decimal, _ts_ms_to_datetime
+from unified_api_contracts.normalize_utils._helpers import iso, to_decimal, ts_ms_to_datetime
 
 from .schemas import ApiFootballFixture, ApiFootballOdds, ApiFootballOddsValue
 
@@ -50,7 +51,7 @@ def _extract_dict(container: dict[str, object], key: str) -> dict[str, object]:
     """
     val = container.get(key)
     if isinstance(val, dict):
-        return val
+        return cast(dict[str, object], val)
     return {}
 
 
@@ -58,7 +59,7 @@ def _extract_list(container: dict[str, object], key: str) -> list[object]:
     """Safely extract a nested list, returning empty list for None/missing."""
     val = container.get(key)
     if isinstance(val, list):
-        return val
+        return cast(list[object], val)
     return []
 
 
@@ -94,9 +95,9 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     raw_fixture_id = str(raw.id or "")
     kickoff_utc: datetime
     if raw.date:
-        kickoff_utc = _iso(raw.date)
+        kickoff_utc = iso(raw.date)
     elif raw.timestamp is not None and raw.timestamp > 0:
-        kickoff_utc = _ts_ms_to_datetime(raw.timestamp * 1000)
+        kickoff_utc = ts_ms_to_datetime(raw.timestamp * 1000)
     else:
         kickoff_utc = datetime.now(UTC)
 
@@ -175,24 +176,16 @@ def normalize_api_football_fixture(raw: ApiFootballFixture, venue: str = "api_fo
     home_goals: int | None = None
     away_goals: int | None = None
     if raw.goals:
-        if isinstance(raw.goals, dict):
-            _h = raw.goals.get("home")
-            _a = raw.goals.get("away")
-        else:
-            _h = raw.goals.home
-            _a = raw.goals.away
-        home_goals = int(_h) if _h is not None and isinstance(_h, (int, float)) else None
-        away_goals = int(_a) if _a is not None and isinstance(_a, (int, float)) else None
+        home_goals = raw.goals.home
+        away_goals = raw.goals.away
     home_ht_int: int | None = None
     away_ht_int: int | None = None
     if raw.score and isinstance(raw.score, dict):
-        ht = raw.score.get("halftime")
-        if isinstance(ht, dict):
-            h = ht.get("home")
-            a = ht.get("away")
-            home_ht_int = int(h) if h is not None and isinstance(h, (int, float)) else None
-            away_ht_int = int(a) if a is not None and isinstance(a, (int, float)) else None
-    elif hasattr(raw.score, "halftime") and raw.score and raw.score.halftime:
+        ht = cast(dict[str, object] | None, raw.score.get("halftime"))
+        if ht is not None:
+            home_ht_int = cast(int | None, ht.get("home"))
+            away_ht_int = cast(int | None, ht.get("away"))
+    elif raw.score and not isinstance(raw.score, dict) and raw.score.halftime:
         home_ht_int = raw.score.halftime.home
         away_ht_int = raw.score.halftime.away
 
@@ -273,9 +266,9 @@ def normalize_api_football_fixture_to_market(
     now = datetime.now(UTC)
     close_time: datetime | None = None
     if raw.date:
-        close_time = _iso(raw.date)
+        close_time = iso(raw.date)
     elif raw.timestamp is not None and raw.timestamp > 0:
-        close_time = _ts_ms_to_datetime(raw.timestamp * 1000)
+        close_time = ts_ms_to_datetime(raw.timestamp * 1000)
 
     event_name = ""
     if raw.teams:
@@ -317,7 +310,7 @@ def _normalize_api_football_odds_value(
 ) -> CanonicalOdds | None:
     """Convert a single ApiFootballOddsValue to CanonicalOdds."""
     odd_str = val.odd if val.odd else None
-    dec = _to_decimal(odd_str) if odd_str else None
+    dec = to_decimal(odd_str) if odd_str else None
     if dec is None or dec <= 0:
         return None
     selection_name = val.value or ""
@@ -365,7 +358,9 @@ def normalize_api_football_odds(
     return out
 
 
-def normalize_api_football_standing(raw: dict[str, object], league_id: str = "", season: str = "") -> dict[str, object]:
+def normalize_api_football_standing(
+    raw: dict[str, object] | None, league_id: str = "", season: str = ""
+) -> dict[str, object]:
     """Flatten a single API-Football standing row to a flat dict.
 
     Raw API-Football payload has nested team / all / home / away structs.
@@ -376,7 +371,7 @@ def normalize_api_football_standing(raw: dict[str, object], league_id: str = "",
     See ``codex/02-data/match-end-time-cascade.md`` neighbouring docs for the
     motivation: nested-struct columns are a wide spot for silent data loss.
     """
-    if not isinstance(raw, dict):
+    if raw is None:
         return {"league_id": league_id, "season": season}
 
     team = _extract_dict(raw, "team")
@@ -422,7 +417,7 @@ def normalize_api_football_standing(raw: dict[str, object], league_id: str = "",
     }
 
 
-def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:
+def normalize_api_football_injury(raw: object) -> dict[str, object]:
     """Flatten a single API-Football ``/injuries`` row into a flat dict.
 
     The raw shape has 4 nested struct columns (``player`` / ``team`` /
@@ -433,10 +428,11 @@ def normalize_api_football_injury(raw: dict[str, object]) -> dict[str, object]:
     """
     if not isinstance(raw, dict):
         return {}
-    player = _extract_dict(raw, "player")
-    team = _extract_dict(raw, "team")
-    fixture = _extract_dict(raw, "fixture")
-    league = _extract_dict(raw, "league")
+    raw_d = cast(dict[str, object], raw)
+    player = _extract_dict(raw_d, "player")
+    team = _extract_dict(raw_d, "team")
+    fixture = _extract_dict(raw_d, "fixture")
+    league = _extract_dict(raw_d, "league")
     out: dict[str, object] = {
         "player_id": _safe_int(player.get("id")),
         "player_name": player.get("name"),
@@ -503,7 +499,7 @@ _FIXTURE_STAT_TYPE_MAP: dict[str, tuple[str, str]] = {
 }
 
 
-def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+def normalize_api_football_fixture_stats(raw: object, fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten a single API-Football ``/fixtures/statistics`` team-stats row.
 
     Each call covers ONE team's stat block — the API returns a list of
@@ -519,9 +515,9 @@ def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str
     """
     if not isinstance(raw, dict):
         return []
-
-    team = _extract_dict(raw, "team")
-    stats_list = _extract_list(raw, "statistics")
+    raw_d = cast(dict[str, object], raw)
+    team = _extract_dict(raw_d, "team")
+    stats_list = _extract_list(raw_d, "statistics")
 
     row: dict[str, object] = {
         "fixture_id": fixture_id,
@@ -539,8 +535,9 @@ def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str
     for stat in stats_list:
         if not isinstance(stat, dict):
             continue
-        stat_type = stat.get("type")
-        stat_value = stat.get("value")
+        stat_d = cast(dict[str, object], stat)
+        stat_type = cast(str | None, stat_d.get("type"))
+        stat_value = stat_d.get("value")
         if not isinstance(stat_type, str):
             continue
         mapping = _FIXTURE_STAT_TYPE_MAP.get(stat_type)
@@ -559,7 +556,7 @@ def normalize_api_football_fixture_stats(raw: dict[str, object], fixture_id: str
     return [row]
 
 
-def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+def normalize_api_football_fixture_event(raw: object, fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten one API-Football ``/fixtures/events`` row into one event row.
 
     Each call covers a single event (goal / card / sub / VAR) with nested
@@ -574,11 +571,11 @@ def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str
     """
     if not isinstance(raw, dict):
         return []
-
-    time_block = _extract_dict(raw, "time")
-    team = _extract_dict(raw, "team")
-    player = _extract_dict(raw, "player")
-    assist = _extract_dict(raw, "assist")
+    raw_d = cast(dict[str, object], raw)
+    time_block = _extract_dict(raw_d, "time")
+    team = _extract_dict(raw_d, "team")
+    player = _extract_dict(raw_d, "player")
+    assist = _extract_dict(raw_d, "assist")
 
     row: dict[str, object] = {
         "fixture_id": fixture_id,
@@ -590,14 +587,14 @@ def normalize_api_football_fixture_event(raw: dict[str, object], fixture_id: str
         "player_name": player.get("name"),
         "assist_id": _safe_int(assist.get("id")) if assist else None,
         "assist_name": assist.get("name") if assist else None,
-        "event_type": raw.get("type"),
-        "event_detail": raw.get("detail"),
-        "comments": raw.get("comments"),
+        "event_type": raw_d.get("type"),
+        "event_detail": raw_d.get("detail"),
+        "comments": raw_d.get("comments"),
     }
     return [row]
 
 
-def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") -> list[dict[str, object]]:
+def normalize_api_football_lineup(raw: object, fixture_id: str = "") -> list[dict[str, object]]:
     """Flatten one API-Football ``/fixtures/lineups`` team block into rows.
 
     Each call covers ONE team's lineup with nested ``startXI`` (11 starters),
@@ -611,12 +608,12 @@ def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") 
     """
     if not isinstance(raw, dict):
         return []
-
-    team = _extract_dict(raw, "team")
-    coach = _extract_dict(raw, "coach")
-    formation = raw.get("formation")
-    start_xi = _extract_list(raw, "startXI")
-    substitutes = _extract_list(raw, "substitutes")
+    raw_d = cast(dict[str, object], raw)
+    team = _extract_dict(raw_d, "team")
+    coach = _extract_dict(raw_d, "coach")
+    formation = raw_d.get("formation")
+    start_xi = _extract_list(raw_d, "startXI")
+    substitutes = _extract_list(raw_d, "substitutes")
 
     team_id = _safe_int(team.get("id"))
     team_name = team.get("name")
@@ -629,7 +626,7 @@ def normalize_api_football_lineup(raw: dict[str, object], fixture_id: str = "") 
         # API-Football wraps each player block as {"player": {id, name, number, pos, grid}}.
         if not isinstance(entry, dict):
             return
-        player = _extract_dict(entry, "player")
+        player = _extract_dict(cast(dict[str, object], entry), "player")
         if not player:
             return
         rows.append(
@@ -718,9 +715,6 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
     Handles percentage strings (``"44%"`` → ``44``) and nested stat
     structures from the API Football ``/fixtures/players`` endpoint.
     """
-    if not isinstance(raw, dict):
-        return []
-
     # API Football nests player stats under teams→players→statistics
     # The raw dict may be a team-level response or a flat player record.
     teams: list[dict[str, object]] = []
@@ -729,7 +723,7 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
     elif "response" in raw:
         resp = raw["response"]
         if isinstance(resp, list):
-            teams = [t for t in resp if isinstance(t, dict)]
+            teams = [cast(dict[str, object], t) for t in cast(list[object], resp) if isinstance(t, dict)]
     else:
         # Flat record — sanitise int fields and drop nested structures
         result = {k: v for k, v in raw.items() if not isinstance(v, (dict, list))}
@@ -756,7 +750,8 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
         for player_block in players:
             if not isinstance(player_block, dict):
                 continue
-            player_info = _extract_dict(player_block, "player")
+            player_block_d = cast(dict[str, object], player_block)
+            player_info = _extract_dict(player_block_d, "player")
             if not player_info:
                 continue
 
@@ -765,7 +760,7 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
                 continue
             player_name = str(player_info.get("name") or player_id)
 
-            stats_list = _extract_list(player_block, "statistics")
+            stats_list = _extract_list(player_block_d, "statistics")
             if not stats_list:
                 continue
 
@@ -781,53 +776,54 @@ def normalize_api_football_player_stats(raw: dict[str, object], fixture_id: str 
             for stat_block in stats_list:
                 if not isinstance(stat_block, dict):
                     continue
+                stat_block_d = cast(dict[str, object], stat_block)
                 # Map API Football nested keys to flat CanonicalPlayerPerformance fields
-                games = _extract_dict(stat_block, "games")
+                games = _extract_dict(stat_block_d, "games")
                 merged["minutes_played"] = _safe_int(games.get("minutes"))
                 merged["position"] = games.get("position")
-                merged["rating"] = float(games.get("rating", 0) or 0) if games.get("rating") else None
+                merged["rating"] = _safe_float(games.get("rating"))
                 merged["captain"] = games.get("captain")
                 merged["substitute"] = games.get("substitute")
-                merged["offsides"] = _safe_int(games.get("offsides") or stat_block.get("offsides"))
+                merged["offsides"] = _safe_int(games.get("offsides") or stat_block_d.get("offsides"))
 
-                shots = _extract_dict(stat_block, "shots")
+                shots = _extract_dict(stat_block_d, "shots")
                 merged["shots_total"] = _safe_int(shots.get("total"))
                 merged["shots_on"] = _safe_int(shots.get("on"))
 
-                goals = _extract_dict(stat_block, "goals")
+                goals = _extract_dict(stat_block_d, "goals")
                 merged["goals_total"] = _safe_int(goals.get("total"))
                 merged["goals_conceded"] = _safe_int(goals.get("conceded"))
                 merged["assists"] = _safe_int(goals.get("assists"))
                 merged["saves"] = _safe_int(goals.get("saves"))
 
-                passes = _extract_dict(stat_block, "passes")
+                passes = _extract_dict(stat_block_d, "passes")
                 merged["passes_total"] = _safe_int(passes.get("total"))
                 merged["passes_key"] = _safe_int(passes.get("key"))
                 merged["passes_accuracy"] = _safe_int(passes.get("accuracy"))
 
-                tackles = _extract_dict(stat_block, "tackles")
+                tackles = _extract_dict(stat_block_d, "tackles")
                 merged["tackles_total"] = _safe_int(tackles.get("total"))
                 merged["blocks"] = _safe_int(tackles.get("blocks"))
                 merged["interceptions"] = _safe_int(tackles.get("interceptions"))
 
-                duels = _extract_dict(stat_block, "duels")
+                duels = _extract_dict(stat_block_d, "duels")
                 merged["duels_total"] = _safe_int(duels.get("total"))
                 merged["duels_won"] = _safe_int(duels.get("won"))
 
-                dribbles = _extract_dict(stat_block, "dribbles")
+                dribbles = _extract_dict(stat_block_d, "dribbles")
                 merged["dribbles_attempts"] = _safe_int(dribbles.get("attempts"))
                 merged["dribbles_success"] = _safe_int(dribbles.get("success"))
                 merged["dribbles_past"] = _safe_int(dribbles.get("past"))
 
-                fouls = _extract_dict(stat_block, "fouls")
+                fouls = _extract_dict(stat_block_d, "fouls")
                 merged["fouls_drawn"] = _safe_int(fouls.get("drawn"))
                 merged["fouls_committed"] = _safe_int(fouls.get("committed"))
 
-                cards = _extract_dict(stat_block, "cards")
+                cards = _extract_dict(stat_block_d, "cards")
                 merged["yellow_cards"] = _safe_int(cards.get("yellow"))
                 merged["red_cards"] = _safe_int(cards.get("red"))
 
-                penalty = _extract_dict(stat_block, "penalty")
+                penalty = _extract_dict(stat_block_d, "penalty")
                 merged["penalty_won"] = _safe_int(penalty.get("won"))
                 merged["penalty_committed"] = _safe_int(penalty.get("commited"))  # API typo: "commited"
                 merged["penalty_scored"] = _safe_int(penalty.get("scored"))

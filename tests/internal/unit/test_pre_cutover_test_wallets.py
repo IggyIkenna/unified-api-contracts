@@ -140,4 +140,4 @@ def test_solana_pending_flagged_in_meta() -> None:
     with CONFIG_PATH.open() as f:
         data = json.load(f)
     assert "_pending_solana_wallets" in data
-    assert "test-sol-devnet" in data["_pending_solana_wallets"]["missing"]
+    assert "test-sol-devnet-trust" in data["_pending_solana_wallets"]["missing_wallet_entries"]

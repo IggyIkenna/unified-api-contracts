@@ -11,19 +11,18 @@ from decimal import Decimal
 
 from ...canonical.domain import (
     CanonicalFee,
-    CanonicalMarketStateEvent,
     CanonicalOhlcvBar,
     CanonicalOrderBook,
     CanonicalTicker,
     CanonicalTrade,
     CanonicalWebSocketLifecycle,
     FeeType,
-    MarketState,
     WebSocketEvent,
 )
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType, TimeInForce
-from ...normalize_utils._helpers import _d, _to_decimal, _to_levels
-from ...normalize_utils.market_state import _COINBASE_STATE_MAP, normalize_market_state
+from ...normalize_utils._helpers import d as _d
+from ...normalize_utils._helpers import to_decimal as _to_decimal
+from ...normalize_utils._helpers import to_levels as _to_levels
 from ..coinbase.schemas import (
     CoinbaseCandle,
     CoinbaseFill,
@@ -268,25 +267,7 @@ def normalize_coinbase_fee(
 # ---------------------------------------------------------------------------
 
 
-def normalize_coinbase_market_state(
-    trading_mode: str,
-    product_id: str,
-    previous_state: MarketState | None = None,
-    reason: str | None = None,
-    timestamp: datetime | None = None,
-    venue: str = "coinbase",
-) -> CanonicalMarketStateEvent:
-    """Normalize a Coinbase product trading_mode to CanonicalMarketStateEvent."""
-    ik = f"{venue}:SPOT:{product_id}"
-    return normalize_market_state(
-        raw_state=trading_mode,
-        venue=venue,
-        instrument_key=ik,
-        state_map=_COINBASE_STATE_MAP,
-        previous_state=previous_state,
-        reason=reason,
-        timestamp=timestamp,
-    )
+# normalize_coinbase_market_state is imported from normalize_utils.market_state
 
 
 # ---------------------------------------------------------------------------
@@ -325,7 +306,6 @@ __all__ = [
     "normalize_coinbase_candle",
     "normalize_coinbase_fee",
     "normalize_coinbase_fill",
-    "normalize_coinbase_market_state",
     "normalize_coinbase_order",
     "normalize_coinbase_orderbook",
     "normalize_coinbase_ticker",

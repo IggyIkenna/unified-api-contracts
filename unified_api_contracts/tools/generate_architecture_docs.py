@@ -26,18 +26,18 @@ import argparse
 import sys
 from collections.abc import Callable
 from pathlib import Path
-from typing import TextIO
+from typing import TextIO, cast
 
-from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # qg-deep-import: symbol not yet on library root facade  # noqa: E501
     ARCHETYPE_CAPABILITY_REGISTRY,
 )
-from unified_api_contracts.internal.event_topics import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.internal.event_topics import (  # qg-deep-import: symbol not yet on library root facade  # noqa: E501
     EVENT_TOPIC_REGISTRY,
 )
-from unified_api_contracts.registry.archetype_capability_matrix import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.registry.archetype_capability_matrix import (  # qg-deep-import: symbol not yet on library root facade  # noqa: E501
     ASSET_GROUP_ONTOLOGY,
 )
-from unified_api_contracts.registry.service_contract_map import (  # noqa: qg-deep-import  # symbol not yet on library root facade
+from unified_api_contracts.registry.service_contract_map import (  # qg-deep-import: symbol not yet on library root facade  # noqa: E501
     SERVICE_CONTRACT_MAP,
 )
 
@@ -162,11 +162,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     args = parser.parse_args(argv)
 
-    if args.stdout:
+    if cast(bool, args.stdout):
         _write_index(sys.stdout)
         return 0
 
-    out_dir = Path(args.out_dir)
+    out_dir = Path(cast(str, args.out_dir))
     _emit(out_dir / "event_catalog.md", _write_event_catalog)
     _emit(out_dir / "service_contracts.md", _write_service_contracts)
     _emit(out_dir / "archetype_capability.md", _write_archetype_capability)

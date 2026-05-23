@@ -23,7 +23,7 @@ from typing import Literal, NamedTuple
 from .league_data import LEAGUE_REGISTRY
 from .league_registry import LeagueDefinition
 from .transfer_windows import (
-    _LEAGUE_TO_COUNTRY,
+    get_country_for_league,
     get_transfer_windows_for_year,
 )
 
@@ -213,7 +213,7 @@ def get_reference_refresh_dates(league_id: str, year: int) -> list[date]:
     triggers.add(get_season_start(league_id, year))
 
     # 2. Transfer window dates
-    tw_country = _LEAGUE_TO_COUNTRY.get(league_id, "_GENERIC")
+    tw_country = get_country_for_league(league_id) or "_GENERIC"
     for window in get_transfer_windows_for_year(tw_country, year):
         triggers.add(window.open_date)
         triggers.add(window.close_date)
@@ -252,10 +252,7 @@ def is_any_league_refresh_date(
     Used by the orchestrator to decide whether to run the slow-moving
     reference data fetch on a given batch date.
     """
-    for league_id in _LEAGUE_TO_COUNTRY:
-        if is_reference_refresh_date(league_id, d, tolerance_days=tolerance_days):
-            return True
-    return False
+    return any(is_reference_refresh_date(league_id, d, tolerance_days=tolerance_days) for league_id in LEAGUE_REGISTRY)
 
 
 def get_leagues_needing_refresh(
@@ -266,7 +263,7 @@ def get_leagues_needing_refresh(
     """Return league IDs that need reference data refresh on date ``d``."""
     return [
         league_id
-        for league_id in _LEAGUE_TO_COUNTRY
+        for league_id in LEAGUE_REGISTRY
         if is_reference_refresh_date(league_id, d, tolerance_days=tolerance_days)
     ]
 
@@ -278,7 +275,7 @@ def get_transfer_window_country(league_id: str) -> str:
     _COUNTRY_2_TO_3.  Returns '_GENERIC' if no mapping found.
     """
     # Direct lookup in transfer_windows mapping
-    direct = _LEAGUE_TO_COUNTRY.get(league_id)
+    direct = get_country_for_league(league_id)
     if direct is not None:
         return direct
 

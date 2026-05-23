@@ -472,7 +472,6 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "understat": None,
     "open_meteo": "open-meteo-api-key",
     "pinnacle": None,
-    "polygon": "polygon-api-key",
     "polymarket": "polymarket-api-key",
     "fred": "fred-api-key",
 }

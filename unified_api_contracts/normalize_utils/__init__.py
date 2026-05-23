@@ -3,6 +3,11 @@
 One-hop conversion: BinanceTrade -> CanonicalTrade, BinanceOrderBook -> CanonicalOrderBook, etc.
 """
 
+from __future__ import annotations
+
+from collections.abc import Callable
+from typing import Any, cast
+
 from ..canonical.domain.sports.odds_canonical import american_to_decimal, decimal_to_american, fractional_to_decimal
 from ..external.eia.normalize import (
     normalize_eia_crude_storage_report,
@@ -328,11 +333,11 @@ _SPORTS_NAMES = [
 ]
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> Callable[..., Any]:
     if name in _SPORTS_NAMES:
         from . import sports as _sports
 
-        return getattr(_sports, name)
+        return cast(Callable[..., Any], getattr(_sports, name))
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
@@ -369,11 +374,8 @@ __all__ = [
     "normalize_aster_ws_subscription",
     "normalize_barchart_ohlcv",
     "normalize_betfair_error",
-    "normalize_betfair_market",
     # Market state normalizers (phase6-market-state)
     "normalize_betfair_market_state",
-    "normalize_betfair_odds",
-    "normalize_betfair_order",
     "normalize_binance_derivative_ticker",
     "normalize_binance_error",
     "normalize_binance_fee_rate",
@@ -507,10 +509,7 @@ __all__ = [
     "normalize_kalshi_candlestick",
     "normalize_kalshi_error",
     "normalize_kalshi_fill",
-    "normalize_kalshi_market",
     "normalize_kalshi_market_state",
-    "normalize_kalshi_odds",
-    "normalize_kalshi_order",
     "normalize_kalshi_orderbook",
     "normalize_kalshi_ticker",
     "normalize_kalshi_trade",
@@ -538,7 +537,6 @@ __all__ = [
     "normalize_nautilus_instrument",
     "normalize_nautilus_order",
     "normalize_odds_api_error",
-    "normalize_odds_api_fixture",
     "normalize_odds_api_market",
     "normalize_odds_engine_error",
     "normalize_odds_engine_market",
@@ -557,7 +555,6 @@ __all__ = [
     "normalize_okx_ticker",
     "normalize_okx_trade",
     "normalize_okx_ws_subscription",
-    "normalize_onexbet_market",
     "normalize_open_meteo_error",
     "normalize_open_meteo_forecast",
     "normalize_open_meteo_weather",
@@ -565,17 +562,13 @@ __all__ = [
     "normalize_openbb_treasury_price",
     "normalize_openbb_treasury_prices_response",
     "normalize_pinnacle_error",
-    "normalize_pinnacle_event",
     "normalize_polymarket_error",
     "normalize_polymarket_fill",
-    "normalize_polymarket_market",
     "normalize_polymarket_order",
     "normalize_polymarket_orderbook",
     "normalize_polymarket_trade",
     "normalize_side",
     "normalize_sports_error",
-    "normalize_sports_market",
-    "normalize_sports_order",
     "normalize_sports_trade",
     "normalize_symbol",
     "normalize_tardis_derivative_ticker",

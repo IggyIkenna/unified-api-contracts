@@ -100,7 +100,7 @@ FEATURE_SERVICES: list[str] = [
 # ---------------------------------------------------------------------------
 
 
-def _softmax(logits: list[float]) -> list[float]:
+def _softmax(logits: list[float]) -> list[float]:  # pyright: ignore[reportUnusedFunction]
     """Numerically stable softmax."""
     max_l = max(logits)
     exps = [math.exp(x - max_l) for x in logits]
@@ -108,7 +108,7 @@ def _softmax(logits: list[float]) -> list[float]:
     return [e / total for e in exps]
 
 
-def _sigmoid(x: float) -> float:
+def _sigmoid(x: float) -> float:  # pyright: ignore[reportUnusedFunction]
     return 1.0 / (1.0 + math.exp(-x))
 
 
@@ -163,8 +163,8 @@ def generate_scaler(service_name: str, rng: np.random.Generator) -> dict[str, ob
     }
     mean_scale, std_scale = scales.get(service_name, (0.0, 1.0))
     n_features = 10
-    means = (rng.standard_normal(n_features) * std_scale + mean_scale).tolist()
-    stds = (np.abs(rng.standard_normal(n_features)) * std_scale + 0.1).tolist()
+    means: list[float] = cast(list[float], (rng.standard_normal(n_features) * std_scale + mean_scale).tolist())
+    stds: list[float] = cast(list[float], (np.abs(rng.standard_normal(n_features)) * std_scale + 0.1).tolist())
 
     return {
         "scaler_type": "standard",
@@ -253,7 +253,7 @@ def run(output_dir: Path, version: str, project: str | None, dry_run: bool) -> i
 
     # GCS hint
     if project:
-        gcs_path = f"gs://{project}-models/v{version}/"  # noqa: gs-uri — test seed utility; ml-models bucket kind pending Phase 2.6 L3 delegate
+        gcs_path = f"gs://{project}-models/v{version}/"  # gs-uri: test seed utility; ml-models bucket kind pending Phase 2.6 L3 delegate
         if dry_run:
             log.info("[DRY RUN] Would upload: gsutil -m cp -r %s %s", version_dir, gcs_path)
         else:
@@ -292,10 +292,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv if argv is not None else sys.argv[1:])
     return run(
-        output_dir=args.output,
-        version=args.version,
-        project=args.project,
-        dry_run=args.dry_run,
+        output_dir=cast(Path, args.output),
+        version=cast(str, args.version),
+        project=cast(str | None, args.project),
+        dry_run=cast(bool, args.dry_run),
     )
 
 

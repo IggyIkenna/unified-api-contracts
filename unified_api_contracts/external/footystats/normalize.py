@@ -18,7 +18,8 @@ from unified_api_contracts.canonical.domain.sports import (
     build_league_id,
     build_team_id,
 )
-from unified_api_contracts.normalize_utils._helpers import _to_decimal, _ts_sec
+from unified_api_contracts.normalize_utils._helpers import to_decimal as _to_decimal
+from unified_api_contracts.normalize_utils._helpers import unix_sec_to_utc as _ts_sec
 
 from .schemas import FootyStatsMatch, FootyStatsOdds, FTMatchRaw
 
@@ -159,7 +160,7 @@ def normalize_footystats_odds(
     Sister fn ``normalize_footystats_odds_snapshot`` (below) is the pre-match-
     snapshot variant captured by ``get_fixture_odds_snapshot()``; same source,
     flat-row shape covering 68 markets, written to ``entity=footystats_odds``
-    in instruments-service. ``data_available_at = kickoff - 72h`` (FootyStats
+    in instruments-service. ``available_at = kickoff - 72h`` (FootyStats
     publishes opening odds ~3 days before kickoff).
     """
     match_id = str(raw.match_id or "")
@@ -210,7 +211,7 @@ def normalize_footystats_predictions(raw: FootyStatsMatch, venue: str = "footyst
     → ``data_type=ODDS``, ``entity=footystats_odds``).
 
     Both data_types share the same source (FootyStats) and similar
-    `data_available_at` (kickoff - 72h, since FootyStats publishes both
+    `available_at` (kickoff - 72h, since FootyStats publishes both
     opening odds and prematch predictions on the same ~3-day-out cadence)
     but they ARE NOT the same data and SHOULD NOT be merged in features.
     """
@@ -288,7 +289,7 @@ def normalize_footystats_odds_snapshot(
 
     Returns a row suitable for a DataFrame written to ``entity=footystats_odds``.
     """
-    kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix > 0 else datetime.now(UTC)
+    kickoff_utc = _ts_sec(raw.date_unix) if raw.date_unix is not None and raw.date_unix > 0 else datetime.now(UTC)
     home_name = raw.home_name or ""
     away_name = raw.away_name or ""
 

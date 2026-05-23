@@ -72,9 +72,13 @@ def test_protocol_launch_dates_chain_known_to_genesis_ssot() -> None:
 _PRE_GENESIS_SUBGRAPH_INDEXED_ALLOWLIST: frozenset[tuple[str, str]] = frozenset(
     {
         ("ARBITRUM", "UNISWAPV3"),  # subgraph indexes 2021-06-01; ARB public mainnet 2021-08-31
+        ("ARBITRUM", "UNISWAP_V3"),  # canonical alias for UNISWAPV3
         ("OPTIMISM", "UNISWAPV3"),  # subgraph indexes 2021-11-11; OP regenesis mainnet 2021-12-16
+        ("OPTIMISM", "UNISWAP_V3"),  # canonical alias for UNISWAPV3
         ("BASE", "UNISWAPV3"),  # subgraph indexes 2023-07-31; BASE public mainnet 2023-08-09
+        ("BASE", "UNISWAP_V3"),  # canonical alias for UNISWAPV3
         ("BASE", "COMPOUNDV3"),  # subgraph indexes 2023-08-04; BASE public mainnet 2023-08-09
+        ("BASE", "COMPOUND_V3"),  # canonical alias for COMPOUNDV3
     }
 )
 

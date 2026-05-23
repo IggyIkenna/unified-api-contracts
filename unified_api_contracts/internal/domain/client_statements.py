@@ -12,7 +12,7 @@ GCS path:
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from decimal import Decimal
 
 from unified_api_contracts.internal.domain.hwm_ledger import (
@@ -47,9 +47,7 @@ class ClientDailyStatement:
     fees_today_breakdown: dict[str, Decimal]
     hwm_section: list[HighWaterMarkLedgerRow]
     recent_crystallizations: dict[str, FeeRecognitionRow | None]
-    generated_at: datetime = field(
-        default_factory=lambda: __import__("datetime").datetime.now(tz=__import__("datetime").timezone.utc)
-    )
+    generated_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def total_fees_today_usd(self) -> Decimal:
         """Sum of all fee types for the day."""

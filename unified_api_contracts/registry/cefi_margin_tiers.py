@@ -28,7 +28,7 @@ Sources:
 - Aster: on-chain ``getLeverageBracket(market)`` per market; conservative defaults
   pending live read.
 
-The values are conservative defaults — risk-and-exposure-service may override
+The values are conservative defaults — strategy-service/risk may override
 per-client based on the venue's actual returned tier in real-time queries.
 """
 

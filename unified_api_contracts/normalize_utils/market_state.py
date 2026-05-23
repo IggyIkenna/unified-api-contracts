@@ -179,6 +179,7 @@ _OKX_STATE_MAP: dict[str, MarketState] = {
     "EXPIRED": MarketState.CLOSED,
     "SETTLEMENT": MarketState.CLOSED,
 }
+OKX_STATE_MAP = _OKX_STATE_MAP
 
 
 def normalize_okx_market_state(
@@ -227,6 +228,9 @@ _DERIBIT_STATE_MAP: dict[str, MarketState] = {
     "SETTLEMENT": MarketState.CLOSED,
     "CREATED": MarketState.PRE_MARKET,
 }
+
+# Public alias to allow cross-module import without reportPrivateUsage
+DERIBIT_STATE_MAP = _DERIBIT_STATE_MAP
 
 
 def normalize_deribit_market_state(
@@ -320,6 +324,7 @@ _IBKR_STATE_MAP: dict[str, MarketState] = {
     "HALTED": MarketState.HALTED,
     "SUSPENDED": MarketState.HALTED,
 }
+IBKR_STATE_MAP = _IBKR_STATE_MAP
 
 
 def normalize_ibkr_market_state(
@@ -450,6 +455,8 @@ def normalize_betfair_market_state(
 
 
 __all__ = [
+    "IBKR_STATE_MAP",
+    "OKX_STATE_MAP",
     "normalize_betfair_market_state",
     "normalize_binance_market_state",
     "normalize_bybit_market_state",

@@ -10,12 +10,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from .ci import (
-    CanonicalPullRequest,
-    CanonicalRepository,
-    CanonicalWorkflowRun,
-    SourceControlProvider,
-)
+# CI types available but not re-exported at package level
+# Import directly: from .ci import CanonicalPullRequest, etc.
 from .compute import ComputeType as ComputeType
 from .compute import VmQuotaShape as VmQuotaShape
 

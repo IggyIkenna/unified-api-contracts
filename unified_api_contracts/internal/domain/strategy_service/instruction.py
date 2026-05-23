@@ -304,7 +304,7 @@ class StrategyInstruction:
     )
 
     # Client and account routing
-    client_id: str = field(default="", metadata={"description": "Client identifier for routing."})
+    client_id: str | None = field(default=None, metadata={"description": "Client identifier for routing."})
     account_id: str | None = field(default=None, metadata={"description": "Account key (client:venue:label)."})
 
     # Operational mode — determines execution pathway (live/paper/backtest/manual)
@@ -478,7 +478,7 @@ class StrategyInstruction:
             chain=cast("str | None", data.get("chain")),
             source_chain=cast("str | None", data.get("source_chain")),
             dest_chain=cast("str | None", data.get("dest_chain")),
-            client_id=cast("str | None", data.get("client_id")),
+            client_id=cast("str | None", data.get("client_id")) or None,
             mode=OperationalMode(data["mode"])
             if "mode" in data and isinstance(data["mode"], str)
             else OperationalMode.LIVE,

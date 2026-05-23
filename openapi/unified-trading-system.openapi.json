@@ -12770,7 +12770,7 @@
       "post": {
         "tags": ["unified-trading-api", "compliance"],
         "summary": "Pre Trade Check",
-        "description": "Run pre-trade compliance checks against risk limits.\n\nSimulates risk-and-exposure-service PreTradeCheckEngine:\n6 checks (position limit, exposure limit, capital limit, leverage limit,\nVaR limit, stale price guard).",
+        "description": "Run pre-trade compliance checks against risk limits.\n\nSimulates strategy-service PreTradeCheckEngine:\n6 checks (position limit, exposure limit, capital limit, leverage limit,\nVaR limit, stale price guard).",
         "operationId": "pre_trade_check_compliance_pre_trade_check_post",
         "responses": {
           "200": {
@@ -22640,9 +22640,9 @@
         "tags": ["execution-service"]
       }
     },
-    "/risk-and-exposure-service/health": {
+    "/strategy-service/health": {
       "get": {
-        "tags": ["risk-and-exposure-service", "health"],
+        "tags": ["strategy-service", "health"],
         "summary": "Health",
         "operationId": "health_health_get",
         "responses": {
@@ -22657,9 +22657,9 @@
         }
       }
     },
-    "/risk-and-exposure-service/readiness": {
+    "/strategy-service/readiness": {
       "get": {
-        "tags": ["risk-and-exposure-service", "health"],
+        "tags": ["strategy-service", "health"],
         "summary": "Readiness",
         "operationId": "readiness_readiness_get",
         "responses": {
@@ -22674,9 +22674,9 @@
         }
       }
     },
-    "/risk-and-exposure-service/stream/risk_alerts": {
+    "/strategy-service/stream/risk_alerts": {
       "get": {
-        "tags": ["risk-and-exposure-service", "sse"],
+        "tags": ["strategy-service", "sse"],
         "summary": "Stream",
         "operationId": "stream_stream_risk_alerts_get",
         "responses": {
@@ -22686,7 +22686,7 @@
         }
       }
     },
-    "/risk-and-exposure-service/": {
+    "/strategy-service/": {
       "get": {
         "summary": "Root",
         "description": "Service info.",
@@ -22707,10 +22707,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/pre-trade-check": {
+    "/strategy-service/pre-trade-check": {
       "post": {
         "summary": "Pre Trade Check",
         "description": "Run pre-trade risk checks.",
@@ -22781,10 +22781,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/exposure/summary": {
+    "/strategy-service/exposure/summary": {
       "get": {
         "summary": "Exposure Summary",
         "description": "Get exposure summary for client.",
@@ -22824,10 +22824,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/exposure/by-venue": {
+    "/strategy-service/exposure/by-venue": {
       "get": {
         "summary": "Exposure By Venue",
         "description": "Get exposure by venue.",
@@ -22867,10 +22867,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/exposure/by-instrument": {
+    "/strategy-service/exposure/by-instrument": {
       "get": {
         "summary": "Exposure By Instrument",
         "description": "Get exposure by instrument.",
@@ -22910,10 +22910,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/risk-limits/{client_id}": {
+    "/strategy-service/risk-limits/{client_id}": {
       "get": {
         "summary": "Get Risk Limits",
         "description": "Get risk limits for client.",
@@ -22951,10 +22951,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/risk-limits": {
+    "/strategy-service/risk-limits": {
       "post": {
         "summary": "Save Risk Limits",
         "description": "Save risk limits.",
@@ -23029,7 +23029,7 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       },
       "get": {
         "summary": "List Risk Limits Clients",
@@ -23054,10 +23054,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/risk/var": {
+    "/strategy-service/risk/var": {
       "get": {
         "summary": "Get Var",
         "description": "Compute VaR, CVaR, and optional Stress VaR for a returns series.\n\nPhase 1: caller supplies `returns[]` in query params.\nPhase 2: fetch from position-monitor returns history.\n\nArgs:\n    client_id: Client identifier (logged with event).\n    confidence: Confidence level in (0, 1). Default 0.99.\n    horizon_days: Holding period. Default 1-day.\n    scenario: Optional stress scenario name.\n    returns: Daily P&L returns as decimals (e.g. -0.02 for -2%).\n\nReturns:\n    VaRResponse with var, cvar, stress_var, confidence, horizon_days, scenario.",
@@ -23156,10 +23156,10 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/risk-and-exposure-service/risk/strategy-status": {
+    "/strategy-service/risk/strategy-status": {
       "post": {
         "summary": "Strategy Risk Status",
         "description": "Evaluate a client's current risk metrics against a strategy risk profile.\n\nAccepts a StrategyRiskProfile (from UAC internal) declaring which risk types\nthe strategy subscribes to. Returns the status (OK/WARNING/CRITICAL) for\neach subscribed risk type based on the client's current positions.\n\nReturns:\n    Dict with strategy_type and per-risk-type statuses.",
@@ -23255,12 +23255,12 @@
             }
           }
         },
-        "tags": ["risk-and-exposure-service"]
+        "tags": ["strategy-service"]
       }
     },
-    "/position-balance-monitor-service/health": {
+    "/strategy-service/health": {
       "get": {
-        "tags": ["position-balance-monitor-service", "health"],
+        "tags": ["strategy-service", "health"],
         "summary": "Health",
         "operationId": "health_health_get",
         "responses": {
@@ -23275,9 +23275,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/readiness": {
+    "/strategy-service/readiness": {
       "get": {
-        "tags": ["position-balance-monitor-service", "health"],
+        "tags": ["strategy-service", "health"],
         "summary": "Readiness",
         "operationId": "readiness_readiness_get",
         "responses": {
@@ -23292,9 +23292,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/deviations": {
+    "/strategy-service/reconciliation/deviations": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "List Deviations",
         "description": "List active deviations with optional status filter.",
         "operationId": "list_deviations_reconciliation_deviations_get",
@@ -23345,9 +23345,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/balances": {
+    "/strategy-service/reconciliation/balances": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "List Balance Snapshots",
         "description": "List recent balance reconciliation snapshots.",
         "operationId": "list_balance_snapshots_reconciliation_balances_get",
@@ -23398,9 +23398,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/pnl": {
+    "/strategy-service/reconciliation/pnl": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "List Pnl Snapshots",
         "description": "List recent PnL reconciliation snapshots with component breakdown.",
         "operationId": "list_pnl_snapshots_reconciliation_pnl_get",
@@ -23451,9 +23451,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/summary": {
+    "/strategy-service/reconciliation/summary": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Reconciliation Summary",
         "description": "Get aggregate reconciliation statistics.",
         "operationId": "reconciliation_summary_reconciliation_summary_get",
@@ -23471,9 +23471,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/resolve": {
+    "/strategy-service/reconciliation/resolve": {
       "post": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Resolve Deviation",
         "description": "Resolve a deviation (accept/reject/investigate).",
         "operationId": "resolve_deviation_reconciliation_resolve_post",
@@ -23511,9 +23511,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/auto-recon/history": {
+    "/strategy-service/reconciliation/auto-recon/history": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Auto Recon History",
         "description": "List auto-reconciled deviations with reasons.",
         "operationId": "auto_recon_history_reconciliation_auto_recon_history_get",
@@ -23536,9 +23536,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/snapshots/history": {
+    "/strategy-service/reconciliation/snapshots/history": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Reconciliation Snapshot History",
         "description": "Query persistent reconciliation snapshots with full filtering.\n\nUnlike /balances and /pnl (which return in-memory cache), this endpoint\nqueries the database directly. Supports date range, instrument, and status\nfiltering with pagination.\n\nPOD reconciliation: pair this with /trades to pinpoint exactly where\nreconciliation breaks occurred.",
         "operationId": "reconciliation_snapshot_history_reconciliation_snapshots_history_get",
@@ -23689,9 +23689,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/nav-snapshot/trigger": {
+    "/strategy-service/nav-snapshot/trigger": {
       "post": {
-        "tags": ["position-balance-monitor-service", "nav-snapshot"],
+        "tags": ["strategy-service", "nav-snapshot"],
         "summary": "Trigger Nav Snapshot",
         "description": "Build and deliver a NAV snapshot immediately.",
         "operationId": "trigger_nav_snapshot_nav_snapshot_trigger_post",
@@ -23713,9 +23713,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/nav-snapshot/preview": {
+    "/strategy-service/nav-snapshot/preview": {
       "get": {
-        "tags": ["position-balance-monitor-service", "nav-snapshot"],
+        "tags": ["strategy-service", "nav-snapshot"],
         "summary": "Preview Nav Snapshot",
         "description": "Build a NAV snapshot without delivering (dry run).",
         "operationId": "preview_nav_snapshot_nav_snapshot_preview_get",
@@ -23733,11 +23733,11 @@
         }
       }
     },
-    "/position-balance-monitor-service/risk/summary": {
+    "/strategy-service/risk/summary": {
       "get": {
-        "tags": ["position-balance-monitor-service", "risk"],
+        "tags": ["strategy-service", "risk"],
         "summary": "Get Risk Summary",
-        "description": "Return current risk metrics: leverage, health_factor, concentration, drawdown.\n\nComputes risk from the latest aggregated positions. Includes DeFi health\nfactor when lending positions are available. For full risk metrics (VaR,\nstress testing, pre-trade checks), query risk-and-exposure-service.",
+        "description": "Return current risk metrics: leverage, health_factor, concentration, drawdown.\n\nComputes risk from the latest aggregated positions. Includes DeFi health\nfactor when lending positions are available. For full risk metrics (VaR,\nstress testing, pre-trade checks), query strategy-service.",
         "operationId": "get_risk_summary_risk_summary_get",
         "parameters": [
           {
@@ -23779,9 +23779,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/risk/defi-health": {
+    "/strategy-service/risk/defi-health": {
       "get": {
-        "tags": ["position-balance-monitor-service", "risk"],
+        "tags": ["strategy-service", "risk"],
         "summary": "Get Defi Health",
         "description": "Return DeFi health aggregation: combined_hf, per-protocol breakdown.\n\nComputes from cached lending positions. Returns 404 if no lending\npositions are available for the client.",
         "operationId": "get_defi_health_risk_defi_health_get",
@@ -23823,9 +23823,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/trades": {
+    "/strategy-service/trades": {
       "get": {
-        "tags": ["position-balance-monitor-service", "trades"],
+        "tags": ["strategy-service", "trades"],
         "summary": "List Trades",
         "description": "Query trade/fill history with filtering and pagination.\n\nReturns fills ordered by fill_timestamp descending (most recent first).\nPOD uses this to reconcile their balance calculations against our trade history.",
         "operationId": "list_trades_trades_get",
@@ -23994,9 +23994,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/trades/count": {
+    "/strategy-service/trades/count": {
       "get": {
-        "tags": ["position-balance-monitor-service", "trades"],
+        "tags": ["strategy-service", "trades"],
         "summary": "Trade Count",
         "description": "Count fills matching the given filters.",
         "operationId": "trade_count_trades_count_get",
@@ -24096,9 +24096,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/trades/summary": {
+    "/strategy-service/trades/summary": {
       "get": {
-        "tags": ["position-balance-monitor-service", "trades"],
+        "tags": ["strategy-service", "trades"],
         "summary": "Trade Summary",
         "description": "Aggregate trade activity for a period (trade count, volume, fees).",
         "operationId": "trade_summary_trades_summary_get",
@@ -24168,9 +24168,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/trades/{fill_id}": {
+    "/strategy-service/trades/{fill_id}": {
       "get": {
-        "tags": ["position-balance-monitor-service", "trades"],
+        "tags": ["strategy-service", "trades"],
         "summary": "Get Trade",
         "description": "Get a single fill by fill_id.",
         "operationId": "get_trade_trades__fill_id__get",
@@ -24211,9 +24211,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/drift/portfolio-snapshot": {
+    "/strategy-service/reconciliation/drift/portfolio-snapshot": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Get Portfolio Snapshot",
         "description": "Get the latest portfolio reconciliation snapshot.\n\nReturns the most recent PortfolioReconciliationSnapshot with:\n- total_equity_usd, allocated/unallocated equity\n- per-strategy drift metrics (delta + equity dimensions)\n- per-share-class aggregated summaries\n- worst drift KPI for quick alerting",
         "operationId": "get_portfolio_snapshot_reconciliation_drift_portfolio_snapshot_get",
@@ -24233,9 +24233,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/drift/history": {
+    "/strategy-service/reconciliation/drift/history": {
       "get": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Get Drift History",
         "description": "Get recent drift metric snapshots for charting.\n\nReturns most recent N PortfolioReconciliationSnapshots.",
         "operationId": "get_drift_history_reconciliation_drift_history_get",
@@ -24281,9 +24281,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/reconciliation/drift/evaluate": {
+    "/strategy-service/reconciliation/drift/evaluate": {
       "post": {
-        "tags": ["position-balance-monitor-service", "reconciliation"],
+        "tags": ["strategy-service", "reconciliation"],
         "summary": "Evaluate Drift",
         "description": "Trigger an immediate drift evaluation (manual refresh).\n\nUses current strategy targets and actual positions to compute drift.\nIn mock mode, uses built-in mock data.",
         "operationId": "evaluate_drift_reconciliation_drift_evaluate_post",
@@ -24303,9 +24303,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/treasury/balance": {
+    "/strategy-service/treasury/balance": {
       "get": {
-        "tags": ["position-balance-monitor-service", "treasury"],
+        "tags": ["strategy-service", "treasury"],
         "summary": "Get Treasury Balance",
         "description": "Get current treasury balance and status.\n\nReturns the latest treasury snapshot with:\n- treasury_balance_usd: USD value in treasury wallet\n- total_trading_balance_usd: USD value across all trading wallets\n- total_aum_usd: total AUM (treasury + trading)\n- treasury_pct: treasury as % of AUM\n- status: \"normal\", \"low\", or \"high\"\n- per_strategy_balance: {strategy_id: usd_balance}",
         "operationId": "get_treasury_balance_treasury_balance_get",
@@ -24349,9 +24349,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/treasury/balance/history": {
+    "/strategy-service/treasury/balance/history": {
       "get": {
-        "tags": ["position-balance-monitor-service", "treasury"],
+        "tags": ["strategy-service", "treasury"],
         "summary": "Get Treasury History",
         "description": "Get historical treasury snapshots.\n\nReturns most recent N snapshots for charting treasury balance over time.",
         "operationId": "get_treasury_history_treasury_balance_history_get",
@@ -24397,9 +24397,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/treasury/config": {
+    "/strategy-service/treasury/config": {
       "get": {
-        "tags": ["position-balance-monitor-service", "treasury"],
+        "tags": ["strategy-service", "treasury"],
         "summary": "Get Treasury Config",
         "description": "Get current treasury monitoring configuration.",
         "operationId": "get_treasury_config_treasury_config_get",
@@ -24419,9 +24419,9 @@
         }
       }
     },
-    "/position-balance-monitor-service/treasury/evaluate": {
+    "/strategy-service/treasury/evaluate": {
       "post": {
-        "tags": ["position-balance-monitor-service", "treasury"],
+        "tags": ["strategy-service", "treasury"],
         "summary": "Evaluate Treasury",
         "description": "Manually trigger treasury evaluation with provided balance.\n\nUseful for demo/testing \u2014 in production, balances come from custodian API polling.",
         "operationId": "evaluate_treasury_treasury_evaluate_post",
@@ -26404,9 +26404,9 @@
         }
       }
     },
-    "/pnl-attribution-service/health": {
+    "/strategy-service/health": {
       "get": {
-        "tags": ["pnl-attribution-service", "health"],
+        "tags": ["strategy-service", "health"],
         "summary": "Health",
         "operationId": "health_health_get",
         "responses": {
@@ -26421,9 +26421,9 @@
         }
       }
     },
-    "/pnl-attribution-service/readiness": {
+    "/strategy-service/readiness": {
       "get": {
-        "tags": ["pnl-attribution-service", "health"],
+        "tags": ["strategy-service", "health"],
         "summary": "Readiness",
         "operationId": "readiness_readiness_get",
         "responses": {
@@ -30797,7 +30797,7 @@
             "type": "string",
             "title": "Source Service",
             "description": "Service that produced this snapshot",
-            "default": "position-balance-monitor-service"
+            "default": "strategy-service"
           },
           "reconciliation_status": {
             "type": "string",
@@ -30809,7 +30809,7 @@
         "type": "object",
         "required": ["snapshot_id", "fund_id", "snapshot_timestamp", "nav_usd"],
         "title": "FundNAVSnapshot",
-        "description": "NAV snapshot payload pushed to external operations partners.\n\nThis is the contract between Odum's position-balance-monitor-service and\nexternal operations partners (e.g. POD/Elysium). At each NAV cut-off point,\na snapshot is built from cross-venue balances and positions, then POSTed\nto the configured webhook endpoint.\n\nThe operations partner uses this to compute official NAV, update smart contract\nsettlement layers, and generate investor reports."
+        "description": "NAV snapshot payload pushed to external operations partners.\n\nThis is the contract between Odum's strategy-service and\nexternal operations partners (e.g. POD/Elysium). At each NAV cut-off point,\na snapshot is built from cross-venue balances and positions, then POSTed\nto the configured webhook endpoint.\n\nThe operations partner uses this to compute official NAV, update smart contract\nsettlement layers, and generate investor reports."
       },
       "NAVSnapshotFrequency": {
         "type": "string",
@@ -31918,12 +31918,12 @@
       "description": "Execution Services API"
     },
     {
-      "name": "risk-and-exposure-service",
-      "description": "risk-and-exposure-service"
+      "name": "strategy-service",
+      "description": "strategy-service"
     },
     {
-      "name": "position-balance-monitor-service",
-      "description": "position-balance-monitor-service"
+      "name": "strategy-service",
+      "description": "strategy-service"
     },
     {
       "name": "deployment-service",
@@ -31934,8 +31934,8 @@
       "description": "market-tick-data-service"
     },
     {
-      "name": "pnl-attribution-service",
-      "description": "pnl-attribution-service"
+      "name": "strategy-service",
+      "description": "strategy-service"
     },
     {
       "name": "strategy-service",

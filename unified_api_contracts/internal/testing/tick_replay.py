@@ -23,6 +23,7 @@ import logging
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import cast
 
 from unified_api_contracts.internal.testing.scenario_config import ScenarioConfig
 
@@ -113,7 +114,7 @@ class TickReplayEngine:
             return _BUILTIN_TICK_FIXTURES
 
         with self._fixture_path.open() as f:
-            data: list[dict[str, object]] = json.load(f)
+            data: list[dict[str, object]] = cast(list[dict[str, object]], json.load(f))
         logger.info("Loaded %d ticks from %s", len(data), self._fixture_path)
         return data
 
@@ -124,7 +125,9 @@ class TickReplayEngine:
             result = [t for t in result if t.get("venue") == self._venue_filter]
         if self._symbol_filter:
             result = [t for t in result if t.get("symbol") == self._symbol_filter]
-        return sorted(result, key=lambda t: str(t.get("timestamp", "")))  # noqa: qg-empty-fallback  # honest absence: field optional in this context; caller validates
+        return sorted(
+            result, key=lambda t: str(t.get("timestamp", ""))
+        )  # qg-empty-fallback: honest absence: field optional in this context; caller validates
 
     async def replay(self, scenario: ScenarioConfig | None = None) -> AsyncIterator[dict[str, object]]:
         """Yield ticks from fixture in timestamp order.

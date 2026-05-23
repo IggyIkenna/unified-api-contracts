@@ -10,7 +10,7 @@ direct-to-trading deposits, and which use custody providers.
 
 Used by:
 - execution-service transfer_handler (routes transfers by type)
-- position-balance-monitor-service treasury_monitor (initiates transfers)
+- strategy-service/position treasury_monitor (initiates transfers)
 - unified-trading-system-ui Transfer Monitor page (displays wallet state)
 """
 

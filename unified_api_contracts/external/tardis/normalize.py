@@ -29,7 +29,7 @@ from ...canonical.domain import (
     CanonicalWebSocketLifecycle,
     WebSocketEvent,
 )
-from ...normalize_utils._helpers import _to_levels
+from ...normalize_utils._helpers import to_levels
 from ...normalize_utils.errors._utils import from_http_status
 from ..tardis import TardisOptionQuote
 from .schemas import (
@@ -126,8 +126,8 @@ def normalize_tardis_orderbook(
         ts = datetime.fromtimestamp(ts_val, tz=UTC)
     except (ValueError, TypeError):
         ts = datetime.now(UTC)
-    bids = _to_levels(raw.bids or [])
-    asks = _to_levels(raw.asks or [])
+    bids = to_levels(raw.bids or [])
+    asks = to_levels(raw.asks or [])
     return CanonicalOrderBook(
         venue=v,
         symbol=s,
@@ -181,7 +181,7 @@ def normalize_tardis_option_quote(raw: TardisOptionQuote, venue: str = "tardis")
         underlying=(raw.underlying_price is not None and str(raw.underlying_price)) or raw.symbol.split("-")[0],
         strike=_d(raw.strike_price) or Decimal("0"),
         option_type=opt_type,
-        expiration=exp,
+        expiration=exp if exp is not None else datetime.now(tz=UTC),
         bid_price=_d(raw.bid_price),
         ask_price=_d(raw.ask_price),
         bid_size=_d(raw.bid_amount),

@@ -785,97 +785,97 @@
         "ml_training_service/__init__.py"
       ]
     },
-    "pnl-attribution-service": {
+    "strategy-service": {
       "total": 26,
       "reachable": 16,
       "orphan_modules": [
-        "pnl_attribution_service/auth_s2s.py",
-        "pnl_attribution_service/config_reloaders.py",
-        "pnl_attribution_service/engine/__init__.py",
-        "pnl_attribution_service/engine/sports_pnl.py"
+        "strategy_service.pnl/auth_s2s.py",
+        "strategy_service.pnl/config_reloaders.py",
+        "strategy_service.pnl/engine/__init__.py",
+        "strategy_service.pnl/engine/sports_pnl.py"
       ],
       "dead_branch_modules": [
-        "pnl_attribution_service/engine/breakdown.py",
-        "pnl_attribution_service/engine/mock_data_provider.py",
-        "pnl_attribution_service/engine/orchestrator.py",
-        "pnl_attribution_service/engine/pnl_input_builder.py",
-        "pnl_attribution_service/engine/types.py",
-        "pnl_attribution_service/metrics.py"
+        "strategy_service.pnl/engine/breakdown.py",
+        "strategy_service.pnl/engine/mock_data_provider.py",
+        "strategy_service.pnl/engine/orchestrator.py",
+        "strategy_service.pnl/engine/pnl_input_builder.py",
+        "strategy_service.pnl/engine/types.py",
+        "strategy_service.pnl/metrics.py"
       ],
       "entry_points": [
-        "pnl_attribution_service/cli/main.py",
-        "pnl_attribution_service/__main__.py",
-        "pnl_attribution_service/api/main.py",
-        "pnl_attribution_service/config.py",
-        "pnl_attribution_service/__init__.py"
+        "strategy_service.pnl/cli/main.py",
+        "strategy_service.pnl/__main__.py",
+        "strategy_service.pnl/api/main.py",
+        "strategy_service.pnl/config.py",
+        "strategy_service.pnl/__init__.py"
       ]
     },
-    "position-balance-monitor-service": {
+    "strategy-service": {
       "total": 85,
       "reachable": 65,
       "orphan_modules": [
-        "position_balance_monitor_service/adapters/__init__.py",
-        "position_balance_monitor_service/api/margin_health.py",
-        "position_balance_monitor_service/api/routes/aggregated.py",
-        "position_balance_monitor_service/api/routes/positions_stream.py",
-        "position_balance_monitor_service/auth_s2s.py",
-        "position_balance_monitor_service/cli/service_entry.py",
-        "position_balance_monitor_service/config_reloaders.py",
-        "position_balance_monitor_service/core/correlation_config.py",
-        "position_balance_monitor_service/core/defi_lp_aggregator.py",
-        "position_balance_monitor_service/core/defi_staking_aggregator.py",
-        "position_balance_monitor_service/core/fee_reconciliation_engine.py",
-        "position_balance_monitor_service/core/greeks_aggregator.py",
-        "position_balance_monitor_service/core/mark_price_subscriber.py",
-        "position_balance_monitor_service/core/pnl_attribution_aggregator.py",
-        "position_balance_monitor_service/core/risk_group_aggregator.py",
-        "position_balance_monitor_service/core/transfer_reconciler.py"
+        "strategy_service.position/adapters/__init__.py",
+        "strategy_service.position/api/margin_health.py",
+        "strategy_service.position/api/routes/aggregated.py",
+        "strategy_service.position/api/routes/positions_stream.py",
+        "strategy_service.position/auth_s2s.py",
+        "strategy_service.position/cli/service_entry.py",
+        "strategy_service.position/config_reloaders.py",
+        "strategy_service.position/core/correlation_config.py",
+        "strategy_service.position/core/defi_lp_aggregator.py",
+        "strategy_service.position/core/defi_staking_aggregator.py",
+        "strategy_service.position/core/fee_reconciliation_engine.py",
+        "strategy_service.position/core/greeks_aggregator.py",
+        "strategy_service.position/core/mark_price_subscriber.py",
+        "strategy_service.position/core/pnl_attribution_aggregator.py",
+        "strategy_service.position/core/risk_group_aggregator.py",
+        "strategy_service.position/core/transfer_reconciler.py"
       ],
       "dead_branch_modules": [
-        "position_balance_monitor_service/adapters/domain_adapter.py",
-        "position_balance_monitor_service/adapters/position_store_adapter.py",
-        "position_balance_monitor_service/core/sports_arb_engine.py",
-        "position_balance_monitor_service/core/sports_position_tracker.py"
+        "strategy_service.position/adapters/domain_adapter.py",
+        "strategy_service.position/adapters/position_store_adapter.py",
+        "strategy_service.position/core/sports_arb_engine.py",
+        "strategy_service.position/core/sports_position_tracker.py"
       ],
       "entry_points": [
-        "position_balance_monitor_service/cli/main.py",
-        "position_balance_monitor_service/__main__.py",
-        "position_balance_monitor_service/api/main.py",
-        "position_balance_monitor_service/config.py",
-        "position_balance_monitor_service/__init__.py"
+        "strategy_service.position/cli/main.py",
+        "strategy_service.position/__main__.py",
+        "strategy_service.position/api/main.py",
+        "strategy_service.position/config.py",
+        "strategy_service.position/__init__.py"
       ]
     },
-    "risk-and-exposure-service": {
+    "strategy-service": {
       "total": 50,
       "reachable": 32,
       "orphan_modules": [
-        "risk_and_exposure_service/adapters/__init__.py",
-        "risk_and_exposure_service/cli/handlers/__init__.py",
-        "risk_and_exposure_service/cli/parser.py",
-        "risk_and_exposure_service/config_reloaders.py",
-        "risk_and_exposure_service/core/aggregated_position_subscriber.py",
-        "risk_and_exposure_service/core/commodity_checks.py",
-        "risk_and_exposure_service/core/correlation_matrix.py",
-        "risk_and_exposure_service/core/greeks_risk.py",
-        "risk_and_exposure_service/core/monte_carlo_var.py",
-        "risk_and_exposure_service/core/risk_dimensions/__init__.py",
-        "risk_and_exposure_service/engine/sports_risk.py"
+        "strategy_service.risk/adapters/__init__.py",
+        "strategy_service.risk/cli/handlers/__init__.py",
+        "strategy_service.risk/cli/parser.py",
+        "strategy_service.risk/config_reloaders.py",
+        "strategy_service.risk/core/aggregated_position_subscriber.py",
+        "strategy_service.risk/core/commodity_checks.py",
+        "strategy_service.risk/core/correlation_matrix.py",
+        "strategy_service.risk/core/greeks_risk.py",
+        "strategy_service.risk/core/monte_carlo_var.py",
+        "strategy_service.risk/core/risk_dimensions/__init__.py",
+        "strategy_service.risk/engine/sports_risk.py"
       ],
       "dead_branch_modules": [
-        "risk_and_exposure_service/adapters/alert_adapter.py",
-        "risk_and_exposure_service/adapters/position_adapter.py",
-        "risk_and_exposure_service/cli/handlers/compute_handler.py",
-        "risk_and_exposure_service/core/risk_dimensions/duration.py",
-        "risk_and_exposure_service/core/risk_dimensions/second_order_vol.py",
-        "risk_and_exposure_service/core/risk_dimensions/spread.py",
-        "risk_and_exposure_service/core/risk_dimensions/venue_protocol.py"
+        "strategy_service.risk/adapters/alert_adapter.py",
+        "strategy_service.risk/adapters/position_adapter.py",
+        "strategy_service.risk/cli/handlers/compute_handler.py",
+        "strategy_service.risk/core/risk_dimensions/duration.py",
+        "strategy_service.risk/core/risk_dimensions/second_order_vol.py",
+        "strategy_service.risk/core/risk_dimensions/spread.py",
+        "strategy_service.risk/core/risk_dimensions/venue_protocol.py"
       ],
       "entry_points": [
-        "risk_and_exposure_service/cli/main.py",
-        "risk_and_exposure_service/__main__.py",
-        "risk_and_exposure_service/api/main.py",
-        "risk_and_exposure_service/config.py",
-        "risk_and_exposure_service/__init__.py"
+        "strategy_service.risk/cli/main.py",
+        "strategy_service.risk/__main__.py",
+        "strategy_service.risk/api/main.py",
+        "strategy_service.risk/config.py",
+        "strategy_service.risk/__init__.py"
       ]
     },
     "strategy-service": {

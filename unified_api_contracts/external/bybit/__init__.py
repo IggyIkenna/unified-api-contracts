@@ -2,11 +2,4 @@
 
 from unified_api_contracts.external.bybit.schemas import *
 
-from .schemas import (
-    BybitLiquidationOrder,
-    BybitOrder,
-    BybitOrderBook,
-    BybitPosition,
-    BybitTicker,
-    BybitTrade,
-)
+# Explicit imports removed - already covered by star import above

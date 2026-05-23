@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
+from typing import cast
 
 from ...canonical.domain import (
     CanonicalInstrument,
@@ -63,8 +64,10 @@ def _token_symbol(tok: dict[str, object] | object | None) -> str:
     if tok is None:
         return "UNKNOWN"
     if isinstance(tok, dict):
-        s = tok.get("symbol") or tok.get("Symbol")
-        return str(s) if s else "UNKNOWN"
+        # Use cast to narrow dict value type for type-safe lookup
+        d = cast("dict[str, str | None]", tok)
+        sym = d.get("symbol") or d.get("Symbol")
+        return sym if sym else "UNKNOWN"
     return str(getattr(tok, "symbol", "UNKNOWN"))
 
 
@@ -79,7 +82,7 @@ def normalize_thegraph_pool_to_instrument(
     chain: str = "ethereum",
 ) -> CanonicalInstrument | None:
     """Normalize SubgraphPool, GraphUniswapPool, or GraphUniswapV2Pair to CanonicalInstrument."""
-    pool_id = getattr(raw, "id", None) or ""
+    pool_id: str = str(getattr(raw, "id", "") or "")
     if not pool_id:
         return None
     token0 = getattr(raw, "token0", None)
@@ -95,10 +98,9 @@ def normalize_thegraph_pool_to_instrument(
         symbol=symbol,
         timestamp=datetime.now(UTC),
         instruction_type=InstructionType.SWAP,
-        pool_id=str(pool_id),
+        pool_id=pool_id,
         base_asset=sym0,
         quote_asset=sym1,
-        schema_version="1.0",
     )
 
 
@@ -120,7 +122,6 @@ def normalize_thegraph_token_to_instrument(
         symbol=str(symbol),
         timestamp=datetime.now(UTC),
         instruction_type=InstructionType.SWAP,
-        schema_version="1.0",
     )
 
 
@@ -135,7 +136,7 @@ def normalize_thegraph_swap_to_trade(
     symbol: str = "UNKNOWN",
 ) -> CanonicalTrade | None:
     """Normalize SubgraphSwap, GraphUniswapSwap, or GraphUniswapV2Swap to CanonicalTrade."""
-    swap_id = getattr(raw, "id", None) or ""
+    swap_id: str = str(getattr(raw, "id", "") or "")
     if not swap_id:
         return None
     amount_usd = _d(getattr(raw, "amountUSD", 0))

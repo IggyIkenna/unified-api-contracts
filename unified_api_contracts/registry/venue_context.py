@@ -75,15 +75,15 @@ def _resolve_venue_value(
     if venue_attr is not None:
         parts = venue_attr.split(".")
         # First part must be "self" — the first positional arg
-        obj = args[0]
+        obj: object = args[0]
         for attr_name in parts[1:]:
-            obj = getattr(obj, attr_name)
+            obj = getattr(obj, attr_name)  # type: ignore[reportAny]
         return str(obj)
 
     if venue_param is not None:
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
-        return str(bound.arguments[venue_param])
+        return str(bound.arguments[venue_param])  # type: ignore[reportAny]
 
     msg = "Either venue_param or venue_attr must be provided"
     raise TypeError(msg)
@@ -99,7 +99,7 @@ def _resolve_env_value(
     """Extract the env string from method arguments."""
     bound = sig.bind(*args, **kwargs)
     bound.apply_defaults()
-    return str(bound.arguments[env_param])
+    return str(bound.arguments[env_param])  # type: ignore[reportAny]
 
 
 def requires_operation_validation(
@@ -168,7 +168,7 @@ def requires_operation_validation(
                         operation_name,
                         exc_info=True,
                     )
-                return await fn(*args, **kwargs)
+                return await fn(*args, **kwargs)  # type: ignore[reportAny]
 
             return cast(_F, async_wrapper)
 

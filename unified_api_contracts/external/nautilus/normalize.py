@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from datetime import UTC, datetime
-from decimal import Decimal
 
 from ...canonical.crosscutting.errors import (
     CanonicalError,
@@ -26,7 +25,7 @@ from ...canonical.domain.execution import (
     OrderStatus,
     OrderType,
 )
-from ...normalize_utils._helpers import _d, _order_type, _side, _status
+from ...normalize_utils._helpers import order_type, side, status
 from .schemas import Fill as NautilusFill
 from .schemas import Instrument as NautilusInstrument
 from .schemas import Order as NautilusOrder
@@ -37,19 +36,15 @@ from .schemas import Order as NautilusOrder
 
 
 def _normalize_side(s: str | None) -> OrderSide:
-    return _side(s)
+    return side(s)
 
 
 def _normalize_order_type(t: str | None) -> OrderType:
-    return _order_type(t)
+    return order_type(t)
 
 
 def _normalize_order_status(s: str | None) -> OrderStatus:
-    return _status(s)
-
-
-def _parse_decimal(val: str | float | Decimal | None) -> Decimal:
-    return _d(val)
+    return status(s)
 
 
 # ---------------------------------------------------------------------------

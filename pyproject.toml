@@ -192,6 +192,8 @@ reportUnknownVariableType = "error"
 reportUnknownArgumentType = "error"
 reportUnknownParameterType = "error"
 reportUnknownMemberType = "error"
+# Disable private usage for external modules importing normalize_utils helpers
+reportPrivateUsage = "warning"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]

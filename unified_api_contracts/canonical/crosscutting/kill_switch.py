@@ -172,7 +172,7 @@ class KillSwitchArmRequest(BaseModel):
     Composes with the 8-event lifecycle SSOT — arming a kill-switch emits
     ``BREAKER_ARMED`` (for breaker-initiated arms) followed by a
     ``KILL_SWITCH_FIRED`` event consumed by execution-service +
-    strategy-service + position-balance-monitor-service subscribers.
+    strategy-service + strategy-service/position subscribers.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")

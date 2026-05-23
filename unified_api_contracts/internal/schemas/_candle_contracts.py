@@ -82,6 +82,17 @@ _OHLCV_CORE: list[ColumnSpec] = [
     ColumnSpec(name="trade_count", dtype="int64", nullable=True),
 ]
 
+# Trades-derived bars: OHLC is nullable when no trades occur in the interval.
+# Book/derivative bars use _OHLCV_CORE (non-nullable) since a quote always exists.
+_OHLCV_CORE_TRADES: list[ColumnSpec] = [
+    ColumnSpec(name="open", dtype="float64", nullable=True),
+    ColumnSpec(name="high", dtype="float64", nullable=True),
+    ColumnSpec(name="low", dtype="float64", nullable=True),
+    ColumnSpec(name="close", dtype="float64", nullable=True),
+    ColumnSpec(name="volume", dtype="float64", nullable=True),
+    ColumnSpec(name="trade_count", dtype="int64", nullable=True),
+]
+
 _TIMEFRAME_COL = ColumnSpec(
     name="timeframe",
     dtype="string",
@@ -206,6 +217,7 @@ def _build(
     extra_cols: list[ColumnSpec],
     include_chain: bool = False,
     ohlcv_core: bool = True,
+    nullable_ohlcv: bool = False,
     liq_shape: bool = False,
     anchor_col: ColumnSpec | None = None,
 ) -> SchemaContract:
@@ -213,6 +225,8 @@ def _build(
 
     ``ohlcv_core=True`` prepends the OHLCV+volume+trade_count pack; pass
     ``False`` for liquidation aggregates which don't carry OHLCV.
+    ``nullable_ohlcv=True`` switches to the trades-derived OHLC pack where
+    open/high/low/close are nullable (empty intervals have no price formation).
     ``liq_shape=True`` uses the liquidation (count, notional_usd) pair.
     ``anchor_col`` — defaults to ``symbol`` — the per-row symbol anchor
     column declared on the schema alongside instrument_id.
@@ -230,7 +244,7 @@ def _build(
             ]
         )
     elif ohlcv_core:
-        columns.extend(_OHLCV_CORE)
+        columns.extend(_OHLCV_CORE_TRADES if nullable_ohlcv else _OHLCV_CORE)
     columns.append(_TIMEFRAME_COL)
     columns.extend(extra_cols)
     return SchemaContract(
@@ -257,7 +271,7 @@ def _register(contract: SchemaContract) -> None:
 
 for _tf in _TIMEFRAMES_CEFI:
     # perpetual
-    _register(_build("cefi", "perpetual", _trades_key(_tf), symbol_column="symbol", extra_cols=[]))
+    _register(_build("cefi", "perpetual", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
     _register(_build("cefi", "perpetual", _book5_key(_tf), symbol_column="symbol", extra_cols=_BOOK5_EXT))
     _register(_build("cefi", "perpetual", _deriv_key(_tf), symbol_column="symbol", extra_cols=_DERIV_EXT))
     _register(
@@ -272,7 +286,7 @@ for _tf in _TIMEFRAMES_CEFI:
         )
     )
     # spot_pair — no derivative_ticker / liquidations
-    _register(_build("cefi", "spot_pair", _trades_key(_tf), symbol_column="symbol", extra_cols=[]))
+    _register(_build("cefi", "spot_pair", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
     _register(_build("cefi", "spot_pair", _book5_key(_tf), symbol_column="symbol", extra_cols=_BOOK5_EXT))
 
 for _tf in _TIMEFRAMES_OPTIONS:
@@ -284,6 +298,7 @@ for _tf in _TIMEFRAMES_OPTIONS:
             symbol_column="underlying",
             extra_cols=[],
             anchor_col=UNDERLYING_COL,
+            nullable_ohlcv=True,
         )
     )
     _register(
@@ -294,6 +309,7 @@ for _tf in _TIMEFRAMES_OPTIONS:
             symbol_column="underlying",
             extra_cols=[],
             anchor_col=UNDERLYING_COL,
+            nullable_ohlcv=True,
         )
     )
 
@@ -313,8 +329,8 @@ for _tf in _TIMEFRAMES_OPTIONS:
 _TIMEFRAMES_TRADFI_RE_AGGREGATED: tuple[str, ...] = tuple(tf for tf in _TIMEFRAMES_TRADFI if tf != "1m")
 
 for _tf in _TIMEFRAMES_TRADFI_RE_AGGREGATED:
-    _register(_build("tradfi", "future", _trades_key(_tf), symbol_column="symbol", extra_cols=[]))
-    _register(_build("tradfi", "equity", _trades_key(_tf), symbol_column="symbol", extra_cols=[]))
+    _register(_build("tradfi", "future", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
+    _register(_build("tradfi", "equity", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
 
 for _tf in _TIMEFRAMES_OPTIONS:
     _register(
@@ -325,11 +341,12 @@ for _tf in _TIMEFRAMES_OPTIONS:
             symbol_column="underlying",
             extra_cols=[],
             anchor_col=UNDERLYING_COL,
+            nullable_ohlcv=True,
         )
     )
 
 for _tf in _TIMEFRAMES_INDEX:
-    _register(_build("tradfi", "index", _trades_key(_tf), symbol_column="symbol", extra_cols=[]))
+    _register(_build("tradfi", "index", _trades_key(_tf), symbol_column="symbol", extra_cols=[], nullable_ohlcv=True))
 
 
 # ---------------------------------------------------------------------------
@@ -348,6 +365,7 @@ for _tf in _TIMEFRAMES_DEFI:
             symbol_column="pool_id",
             extra_cols=_DEX_EXT,
             include_chain=True,
+            nullable_ohlcv=True,
         )
     )
     _register(
@@ -430,6 +448,7 @@ for _tf in _TIMEFRAMES_SPORTS:
             symbol_column="fixture_id",
             extra_cols=_ODDS_EXT,
             anchor_col=ColumnSpec(name="fixture_id", dtype="string", nullable=False),
+            nullable_ohlcv=True,
         )
     )
 
@@ -448,6 +467,34 @@ for _tf in _TIMEFRAMES_PREDICTION:
             extra_cols=_PRED_EXT,
             include_chain=True,
             anchor_col=ColumnSpec(name="condition_id", dtype="string", nullable=False),
+            nullable_ohlcv=True,
+        )
+    )
+
+
+# ---------------------------------------------------------------------------
+# Prediction trades-derived candles — PREDICTION_MARKET x trades
+#
+# The Polymarket MTDS tick parquets store instrument_type="PREDICTION_MARKET"
+# (uppercase) as the canonical row value. When MDPS aggregates those rows into
+# OHLCV bars via the trades→ohlcv prefix mapping, it calls lookup_contract with
+# instrument_type="PREDICTION_MARKET". These entries close that registry gap so
+# every MDPS default timeframe resolves without SchemaContractNotFoundError.
+# ---------------------------------------------------------------------------
+
+_TIMEFRAMES_PREDICTION_TRADES: tuple[str, ...] = ("15s", "1m", "5m", "15m", "1h", "4h", "1d")
+
+for _tf in _TIMEFRAMES_PREDICTION_TRADES:
+    _register(
+        _build(
+            "prediction",
+            "PREDICTION_MARKET",
+            _trades_key(_tf),
+            symbol_column="symbol",
+            extra_cols=[],
+            include_chain=False,
+            anchor_col=None,
+            nullable_ohlcv=True,
         )
     )
 
@@ -464,6 +511,7 @@ MDPS_TIMEFRAMES_DEFI = _TIMEFRAMES_DEFI
 MDPS_TIMEFRAMES_OPTIONS = _TIMEFRAMES_OPTIONS
 MDPS_TIMEFRAMES_SPORTS = _TIMEFRAMES_SPORTS
 MDPS_TIMEFRAMES_PREDICTION = _TIMEFRAMES_PREDICTION
+MDPS_TIMEFRAMES_PREDICTION_TRADES = _TIMEFRAMES_PREDICTION_TRADES
 MDPS_TIMEFRAMES_INDEX = _TIMEFRAMES_INDEX
 
 MDPS_KEY_TRADES = _trades_key
@@ -498,6 +546,7 @@ __all__ = [
     "MDPS_TIMEFRAMES_INDEX",
     "MDPS_TIMEFRAMES_OPTIONS",
     "MDPS_TIMEFRAMES_PREDICTION",
+    "MDPS_TIMEFRAMES_PREDICTION_TRADES",
     "MDPS_TIMEFRAMES_SPORTS",
     "MDPS_TIMEFRAMES_TRADFI",
     "MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED",

@@ -27,9 +27,8 @@ TERMINAL_CONSUMER_SERVICES = [
     "market-data-api",
     "instruments-service",
     "alerting-service",
-    "risk-and-exposure-service",
-    "position-balance-monitor-service",
-    "pnl-attribution-service",
+    # risk-and-exposure-service, position-balance-monitor-service, pnl-attribution-service
+    # are archived — consolidated into strategy-service/{risk,position,pnl}
     "ml-inference-service",
     "ml-training-service",
     "features-delta-one-service",

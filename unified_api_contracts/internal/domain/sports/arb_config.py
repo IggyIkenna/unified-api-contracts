@@ -6,7 +6,7 @@ VenueAllocationWeights: rolling-window venue allocation (written to GCS daily).
 
 These schemas are consumed by:
   - strategy-service: ArbitrageStrategy reads config + weights
-  - position-balance-monitor-service: tracks VenueBalance per venue
+  - strategy-service (position sub-package, formerly strategy-service/position): tracks VenueBalance per venue
   - execution-service: checks available balance before placing bets
 """
 
@@ -92,7 +92,7 @@ class ArbitrageStrategyConfig(BaseModel):
 
 
 class VenueBalance(BaseModel):
-    """Per-venue capital state. Tracked by position-balance-monitor-service.
+    """Per-venue capital state. Tracked by strategy-service/position.
 
     Written to GCS daily:
       position-store-sports-{project}/venue_balances/day={date}/balances.parquet
@@ -138,7 +138,7 @@ class VenueAllocationWeights(BaseModel):
 class VenueLedgerEntry(BaseModel):
     """Per-venue capital ledger entry. Separates transfers from trading P&L.
 
-    Used by position-balance-monitor-service VenueBalanceTracker.get_ledger()
+    Used by strategy-service/position VenueBalanceTracker.get_ledger()
     to provide a clear breakdown of where capital came from / went.
     """
 

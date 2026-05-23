@@ -43,6 +43,77 @@ def normalize_binance_error(
 
 
 # ---------------------------------------------------------------------------
+# Bitfinex
+# ---------------------------------------------------------------------------
+
+BITFINEX_MAP: dict[str, Callable[..., CanonicalError]] = {
+    "10001": CanonicalAuthenticationError,  # Invalid API key
+    "10020": CanonicalRateLimitError,  # Too many requests
+    "10028": CanonicalInvalidRequestError,  # Invalid parameters
+    "11000": CanonicalInsufficientBalanceError,  # Insufficient balance
+    "11010": CanonicalOrderRejectedError,  # Order would immediately fill
+    "401": CanonicalAuthenticationError,
+    "403": CanonicalAuthorizationError,
+    "429": CanonicalRateLimitError,
+    "500": CanonicalInternalServerError,
+    "503": CanonicalServiceUnavailableError,
+}
+
+
+def normalize_bitfinex_error(
+    error_code: str | int,
+    message: str = "",
+    venue: str = "bitfinex",
+) -> CanonicalError:
+    """Map a Bitfinex REST error code to a CanonicalError subclass."""
+    code = str(error_code)
+    cls = BITFINEX_MAP.get(code)
+    if cls is not None:
+        return cls(message=message or code, venue=venue)
+    try:
+        status = int(code)
+        return from_http_status(status, message, venue)
+    except ValueError:
+        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
+
+
+# ---------------------------------------------------------------------------
+# Bitstamp
+# ---------------------------------------------------------------------------
+
+BITSTAMP_MAP: dict[str, Callable[..., CanonicalError]] = {
+    "API0000": CanonicalInvalidRequestError,  # Missing parameters
+    "API0001": CanonicalAuthenticationError,  # Invalid API key
+    "API0002": CanonicalAuthorizationError,  # Invalid API secret
+    "API0005": CanonicalRateLimitError,  # Too many requests
+    "API0013": CanonicalInsufficientBalanceError,  # Insufficient balance
+    "API0020": CanonicalOrderRejectedError,  # Order rejected
+    "401": CanonicalAuthenticationError,
+    "403": CanonicalAuthorizationError,
+    "429": CanonicalRateLimitError,
+    "500": CanonicalInternalServerError,
+    "503": CanonicalServiceUnavailableError,
+}
+
+
+def normalize_bitstamp_error(
+    error_code: str | int,
+    message: str = "",
+    venue: str = "bitstamp",
+) -> CanonicalError:
+    """Map a Bitstamp REST error code to a CanonicalError subclass."""
+    code = str(error_code)
+    cls = BITSTAMP_MAP.get(code)
+    if cls is not None:
+        return cls(message=message or code, venue=venue)
+    try:
+        status = int(code)
+        return from_http_status(status, message, venue)
+    except ValueError:
+        return CanonicalError(code=code, message=message, action=ErrorAction.FAIL, venue=venue)
+
+
+# ---------------------------------------------------------------------------
 # Bybit
 # ---------------------------------------------------------------------------
 

@@ -497,7 +497,7 @@ def get_perp_venues() -> frozenset[str]:
     """Return the canonical set of venues with PERP_TRADE capability.
 
     Filters ``VENUE_CAPABILITIES`` by ``VenueCapability.PERP_TRADE``. Used by
-    strategy-service / execution-service / risk-and-exposure-service to validate
+    strategy-service / execution-service to validate
     ``perp_venue`` config fields (e.g. ``CARRY_BASIS_PERP_INV``)
     without introducing a per-archetype ``PerpVenue`` StrEnum.
     """

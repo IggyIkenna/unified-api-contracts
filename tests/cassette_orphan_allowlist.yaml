@@ -206,6 +206,35 @@ allowed:
     detail: "Circle CCTP Iris attestation polling (iris-api.circle.com/v1/attestations/{hash}). No auth required — public endpoint. Used by execution-service/execution_service/defi_execution/protocols/cctp.py to poll burn attestation status. UAC external/circle_cctp schemas not yet imported by execution adapter. Phase 2 QG task."
     acked_by: slot-2 2026-05-21
 
+  # ---- VCR test cassettes (test-only; no production consumer yet)
+  # The corresponding VCR test files exercise UAC schema parsing; these
+  # cassettes will gain a production consumer when MTDS CeFi adapters
+  # import from the UAC external modules (Phase 2 QG task).
+  - path: barchart/mocks/get_quote_es1.yaml
+    reason: test-only
+    detail: "Barchart OnDemand getQuote (ES,1 continuous contract). MTDS tradfi handler does not yet import from unified_api_contracts.external.barchart. VCR test validates schema parsing only."
+    acked_by: slot-1 2026-05-22
+  - path: bitfinex/mocks/ticker.yaml
+    reason: test-only
+    detail: "Bitfinex v2 public ticker (tBTCUSD). VCR test validates BitfinexTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.bitfinex."
+    acked_by: slot-1 2026-05-22
+  - path: bitstamp/mocks/ticker.yaml
+    reason: test-only
+    detail: "Bitstamp v2 public ticker (btcusd). VCR test validates BitstampTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.bitstamp."
+    acked_by: slot-1 2026-05-22
+  - path: huobi/mocks/ticker.yaml
+    reason: test-only
+    detail: "Huobi market detail merged (btcusdt). VCR test validates HuobiTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.huobi."
+    acked_by: slot-1 2026-05-22
+  - path: kucoin/mocks/ticker.yaml
+    reason: test-only
+    detail: "KuCoin orderbook level1 (BTC-USDT). VCR test validates KuCoinTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.kucoin."
+    acked_by: slot-1 2026-05-22
+  - path: mexc/mocks/ticker.yaml
+    reason: test-only
+    detail: "MEXC 24hr ticker (BTCUSDT). VCR test validates MexcTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.mexc."
+    acked_by: slot-1 2026-05-22
+
   # ---- Phase 3 Sports / Prediction stub-placeholder cassettes
   # Sportsbook scrapers use Playwright headless browser — not aiohttp/httpx.
   # VCR cassette recording requires Playwright session capture infrastructure

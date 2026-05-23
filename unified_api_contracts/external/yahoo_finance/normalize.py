@@ -14,7 +14,7 @@ from ...canonical.crosscutting.errors import (
     ErrorAction,
 )
 from ...canonical.domain import CanonicalOhlcvBar, CanonicalOptionsChainEntry
-from ...normalize_utils._helpers import _d
+from ...normalize_utils._helpers import d
 from ...normalize_utils.errors._utils import from_http_status
 from . import YahooOhlcv, YahooOptionContract
 from .schemas import (
@@ -54,11 +54,11 @@ def normalize_yahoo_ohlcv(raw: YahooOhlcv, venue: str = "yahoo_finance") -> Cano
         timestamp=ts,
         venue=venue,
         symbol=raw.symbol,
-        open=_d(raw.Open),
-        high=_d(raw.High),
-        low=_d(raw.Low),
-        close=_d(raw.Close),
-        volume=_d(raw.Volume),
+        open=d(raw.Open),
+        high=d(raw.High),
+        low=d(raw.Low),
+        close=d(raw.Close),
+        volume=d(raw.Volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -80,11 +80,11 @@ def normalize_yahoo_finance_ohlcv24h(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_d(raw.Open),
-        high=_d(raw.High),
-        low=_d(raw.Low),
-        close=_d(raw.Close),
-        volume=_d(raw.Volume),
+        open=d(raw.Open),
+        high=d(raw.High),
+        low=d(raw.Low),
+        close=d(raw.Close),
+        volume=d(raw.Volume),
         quote_volume=None,
         count=None,
         vwap=None,
@@ -103,7 +103,9 @@ def normalize_yahoo_option(raw: YahooOptionContract, venue: str = "yahoo_finance
         if raw.lastTradeDate is not None
         else datetime.now(tz=UTC)
     )
-    exp = datetime.fromtimestamp(raw.expiration / 1000.0, tz=UTC) if raw.expiration is not None else None
+    exp = (
+        datetime.fromtimestamp(raw.expiration / 1000.0, tz=UTC) if raw.expiration is not None else datetime.now(tz=UTC)
+    )
     opt_type = (raw.option_type or "call").lower()
     return CanonicalOptionsChainEntry(
         timestamp=ts,
@@ -135,7 +137,7 @@ def normalize_yahoo_finance_option(
     This is the newer schema format with snake_case fields (from ticker.option_chain()).
     """
     ts = datetime.now(tz=UTC)
-    exp: datetime | None = None
+    exp: datetime = ts  # Default fallback
     if raw.expiration:
         with contextlib.suppress(ValueError, AttributeError):
             exp = datetime.fromisoformat(raw.expiration.replace("Z", "+00:00"))

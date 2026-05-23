@@ -1,7 +1,7 @@
 """Sports-specific risk and exposure types.
 
 SportsBetPosition and SportsExposure define the risk schemas for sports
-betting positions. Consumed by risk-and-exposure-service and pnl-attribution-service.
+betting positions. Consumed by strategy-service/risk and strategy-service/pnl.
 """
 
 from __future__ import annotations

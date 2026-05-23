@@ -102,7 +102,7 @@ def iter_applicable_rules(
     always yield.
 
     This is the canonical helper consumers (UTL ``risk_preflight``,
-    risk-and-exposure-service, execution-service) should use when building
+    strategy-service/risk, execution-service) should use when building
     the ``applicable_rules`` argument for pre-flight evaluation.
     """
     if archetype_id is not None:

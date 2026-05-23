@@ -84,7 +84,7 @@ class AggregatedPosition(CanonicalBase):
     """Cross-venue aggregated position for a single instrument.
 
     Net position computed from per-venue constituents. Published to
-    AGGREGATED_POSITIONS PubSub topic by position-balance-monitor-service.
+    AGGREGATED_POSITIONS PubSub topic by strategy-service/position.
     """
 
     instrument_id: str

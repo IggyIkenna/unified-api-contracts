@@ -8,12 +8,22 @@ from decimal import Decimal
 from ...canonical.domain import CanonicalOrderBook, CanonicalTicker, CanonicalTrade
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder
 from ...normalize_utils._helpers import (
-    _d,
-    _order_type,
-    _side,
-    _status,
-    _to_decimal,
-    _ts_ms,
+    d as _d,
+)
+from ...normalize_utils._helpers import (
+    order_type as _order_type,
+)
+from ...normalize_utils._helpers import (
+    side as _side,
+)
+from ...normalize_utils._helpers import (
+    status as _status,
+)
+from ...normalize_utils._helpers import (
+    to_decimal as _to_decimal,
+)
+from ...normalize_utils._helpers import (
+    ts_ms as _ts_ms,
 )
 from .schemas import (
     BitfinexFill,
@@ -168,7 +178,7 @@ def normalize_bitfinex_fill(raw: BitfinexFill, venue: str = "bitfinex") -> Canon
 # Error
 # ---------------------------------------------------------------------------
 
-from ...normalize_utils.errors._normalize_b import normalize_bitfinex_error
+from ...normalize_utils.errors._normalize_a import normalize_bitfinex_error
 
 __all__ = [
     "normalize_bitfinex_error",

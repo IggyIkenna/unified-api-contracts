@@ -72,6 +72,7 @@ class DataType(StrEnum):
     GOVERNANCE_EVENTS = "governance_events"
     EIGENLAYER_REWARDS = "eigenlayer_rewards"
     NATIVE_STAKING_RATES = "native_staking_rates"
+    AGGREGATOR_ROUTE = "aggregator_route"
 
 
 __all__ = ["DataType", "MarketState"]

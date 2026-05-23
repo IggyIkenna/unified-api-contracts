@@ -7,7 +7,7 @@ Live-mode only — reconciliation runs as a background process and emits
 high-severity alerts when drift exceeds configured thresholds.
 
 Used by:
-- position-balance-monitor-service (produces snapshots via background loop)
+- strategy-service/position (produces snapshots via background loop)
 - unified-trading-system-ui Observe tab (consumes snapshots for visualization)
 - alert pipeline (consumes POSITION_DRIFT_DETECTED events)
 """
@@ -83,7 +83,7 @@ class ShareClassSummary(BaseModel, frozen=True):
 class PortfolioReconciliationSnapshot(BaseModel, frozen=True):
     """Full portfolio reconciliation state at a point in time.
 
-    Produced by position-balance-monitor-service background reconciliation loop.
+    Produced by strategy-service/position background reconciliation loop.
     Consumed by the Observe tab Position Reconciliation page.
     """
 

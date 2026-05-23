@@ -208,7 +208,7 @@ class LendingMarketState(BaseModel):
     - features-onchain rate-impact analytics (``aave_rate_impact_calculator``
       is the historical Aave-only consumer; that consumer reads
       ``LendingMarketState`` and adapts via ``protocol_irm_shape == AAVE_KINKED``).
-    - risk-and-exposure-service forward-impact projection for archetype
+    - strategy-service/risk forward-impact projection for archetype
       capital-allocation gates.
 
     Compound V3 specific fields (``compound_kink``, ``compound_below_kink_slope``,

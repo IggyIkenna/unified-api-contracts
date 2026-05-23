@@ -50,7 +50,7 @@
 
 1. **coinbase** - Referenced in:
    - market-data-processing-service (CLI parser mentions "CeFi venues: Binance, Coinbase")
-   - position-balance-monitor-service
+   - strategy-service
 
 ### Recommended Priority Schema Classes for Missing Venues
 
@@ -110,7 +110,7 @@ volume: Decimal
 
 ### Services Using API Contracts
 
-1. **position-balance-monitor-service** - Uses venue APIs for account queries
+1. **strategy-service** - Uses venue APIs for account queries
 2. **market-data-processing-service** - References CeFi venues including Coinbase
 3. **unified-trade-execution-interface** - Test references to coinbase
 4. **instruments-service** - Adapter loading mentions venues

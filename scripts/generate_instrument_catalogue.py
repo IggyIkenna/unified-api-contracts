@@ -546,12 +546,13 @@ def main() -> None:
         return
 
     from unified_api_contracts.canonical.gcs_paths import strategy_store_bucket
-    from unified_cloud_interface.gcs import upload_blob
+    from unified_trading_library.cloud_interface import upload_to_storage
 
     target_bucket = strategy_store_bucket(args.project_id)
     for path in (catalogue_path, shard_path, md_path):
         gcs_uri = f"catalogue/instrument/{path.name}"
-        upload_blob(bucket=target_bucket, blob_name=gcs_uri, source_path=str(path))
+        with open(path, 'rb') as f:
+            upload_to_storage(bucket=target_bucket, path=gcs_uri, data=f.read())
         print(f"Uploaded gs://{target_bucket}/{gcs_uri}")
 
 

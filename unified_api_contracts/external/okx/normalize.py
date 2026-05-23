@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import cast
 
 from ...canonical.domain import (
     CanonicalDerivativeTicker,
@@ -30,9 +31,9 @@ from ...canonical.domain.execution import (
     OrderStatus,
     OrderType,
 )
-from ...normalize_utils._helpers import _d, _to_decimal, _to_levels, _ts_ms, _ts_ms_to_datetime
-from ...normalize_utils._helpers import _side as _side_helper
-from ...normalize_utils.market_state import _OKX_STATE_MAP, normalize_market_state
+from ...normalize_utils._helpers import d, side, to_decimal, to_levels, ts_ms, ts_ms_to_datetime
+from ...normalize_utils.market_state import OKX_STATE_MAP as _OKX_STATE_MAP
+from ...normalize_utils.market_state import normalize_market_state
 from ..okx.schemas import (
     OKXCandleWS,
     OKXFeeRate,
@@ -104,15 +105,15 @@ def normalize_okx_ticker(raw: OKXTicker, instrument_key: str | None = None, venu
     ts = datetime.now(UTC)
     t_ts = raw.info.get("ts") if raw.info else None
     if isinstance(t_ts, (int, float, str)):
-        ts = _ts_ms_to_datetime(int(t_ts))
+        ts = ts_ms_to_datetime(int(t_ts))
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=_to_decimal(raw.last) or Decimal("0"),
-        bid_price=_to_decimal(raw.bidPx),
-        ask_price=_to_decimal(raw.askPx),
-        volume_24h=_to_decimal(raw.vol24h),
+        last_price=to_decimal(raw.last) or Decimal("0"),
+        bid_price=to_decimal(raw.bidPx),
+        ask_price=to_decimal(raw.askPx),
+        volume_24h=to_decimal(raw.vol24h),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,
@@ -131,8 +132,8 @@ def normalize_okx_orderbook(
 ) -> CanonicalOrderBook:
     """Convert OKXOrderBook to CanonicalOrderBook."""
     ts = datetime.fromtimestamp(int(raw.ts) / 1000.0, tz=UTC) if raw.ts is not None else datetime.now(UTC)
-    bids = _to_levels(raw.bids)
-    asks = _to_levels(raw.asks)
+    bids = to_levels(raw.bids)
+    asks = to_levels(raw.asks)
     return CanonicalOrderBook(
         venue=venue,
         symbol=symbol,
@@ -205,9 +206,9 @@ def normalize_okx_fill(raw: OKXOrderUpdateWS, venue: str = "okx") -> CanonicalFi
         return None
     ts = datetime.now(UTC)
     if raw.fillTime:
-        ts = _ts_ms(raw.fillTime)
+        ts = ts_ms(raw.fillTime)
     elif raw.uTime:
-        ts = _ts_ms(raw.uTime)
+        ts = ts_ms(raw.uTime)
     is_maker: bool | None = None
     if raw.execType:
         is_maker = raw.execType.upper() == "M"
@@ -218,9 +219,9 @@ def normalize_okx_fill(raw: OKXOrderUpdateWS, venue: str = "okx") -> CanonicalFi
         timestamp=ts,
         venue=venue,
         instrument_id=raw.instId or "",
-        side=_side_helper(raw.side),
-        price=_d(raw.fillPx),
-        quantity=_d(raw.fillSz),
+        side=side(raw.side),
+        price=d(raw.fillPx),
+        quantity=d(raw.fillSz),
         fee=None,
         fee_currency=None,
         is_maker=is_maker,
@@ -242,22 +243,22 @@ def normalize_okx_derivative_ticker(
     """Normalize OKX ticker (+ optional funding + OI) to CanonicalDerivativeTicker."""
     inst_id = raw.instId or ""
     ik = instrument_key or f"{venue}:PERPETUAL:{inst_id}"
-    last_price = _to_decimal(raw.last)
+    last_price = to_decimal(raw.last)
     info: dict[str, object] = raw.info or {}
 
-    def _ms_to_utc(ts_ms: object | None) -> datetime | None:
-        if ts_ms is None:
+    def _ms_to_utc(ts_ms_val: object | None) -> datetime | None:
+        if ts_ms_val is None:
             return None
         try:
-            ms = int(str(ts_ms))
+            ms = int(str(ts_ms_val))
             if ms <= 0:
                 return None
             return datetime.fromtimestamp(ms / 1000.0, tz=UTC)
         except (ValueError, TypeError, OSError):
             return None
 
-    mark_price = _to_decimal(info.get("markPx") or info.get("mark_px"))
-    index_price = _to_decimal(info.get("idxPx") or info.get("idx_px"))
+    mark_price = to_decimal(cast(str | float | None, info.get("markPx") or info.get("mark_px")))
+    index_price = to_decimal(cast(str | float | None, info.get("idxPx") or info.get("idx_px")))
     ts_raw = info.get("ts")
     timestamp: datetime = _ms_to_utc(ts_raw) or datetime.now(UTC) if ts_raw is not None else datetime.now(UTC)
 
@@ -267,16 +268,16 @@ def normalize_okx_derivative_ticker(
     funding_timestamp: datetime | None = None
 
     if funding is not None:
-        funding_rate_val = _to_decimal(funding.fundingRate)
+        funding_rate_val = to_decimal(funding.fundingRate)
         funding_timestamp = _ms_to_utc(funding.fundingTime)
-        predicted_funding = _to_decimal(funding.nextFundingRate)
+        predicted_funding = to_decimal(funding.nextFundingRate)
         next_funding_timestamp = _ms_to_utc(funding.nextFundingTime)
 
     open_interest_val: Decimal | None = None
     open_interest_value_val: Decimal | None = None
     if oi is not None:
-        open_interest_val = _to_decimal(oi.oi)
-        open_interest_value_val = _to_decimal(oi.oiCcy)
+        open_interest_val = to_decimal(oi.oi)
+        open_interest_value_val = to_decimal(oi.oiCcy)
 
     return CanonicalDerivativeTicker(
         instrument_key=ik,
@@ -302,16 +303,16 @@ def normalize_okx_derivative_ticker(
 def normalize_okx_kline(raw: OKXCandleWS, symbol: str, venue: str = "okx") -> CanonicalOhlcvBar:
     """Convert OKXCandleWS to CanonicalOhlcvBar."""
     ts = datetime.fromtimestamp(int(raw.ts) / 1000.0, tz=UTC)
-    quote_vol = _d(raw.volCcyQuote) if raw.volCcyQuote is not None else None
+    quote_vol = d(raw.volCcyQuote) if raw.volCcyQuote is not None else None
     return CanonicalOhlcvBar(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=_d(raw.o),
-        high=_d(raw.h),
-        low=_d(raw.low),
-        close=_d(raw.c),
-        volume=_d(raw.vol),
+        open=d(raw.o),
+        high=d(raw.h),
+        low=d(raw.low),
+        close=d(raw.c),
+        volume=d(raw.vol),
         quote_volume=quote_vol,
         count=None,
         vwap=None,
@@ -405,7 +406,7 @@ def normalize_okx_liquidation(
     }
     inst_type: str = inst_type_map.get(str(raw.instType or "SWAP"), "PERPETUAL")
     instrument_key = f"{venue}:{inst_type}:{raw_symbol}"
-    side: str = str(raw.side or "buy").lower()
+    liq_side: str = str(raw.side or "buy").lower()
     price = Decimal(str(raw.liqPx or "0"))
     size = Decimal(str(raw.sz or "0"))
     ts_ms_raw = raw.ts or "0"
@@ -414,7 +415,7 @@ def normalize_okx_liquidation(
         instrument_key=instrument_key,
         venue=venue,
         timestamp=ts,
-        side=side,
+        side=liq_side,
         price=price,
         size=size,
         order_id=None,

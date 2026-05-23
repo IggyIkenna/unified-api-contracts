@@ -1053,7 +1053,7 @@ GCS_OBJECT_PATH = "catalogue/envelope.md"
 
 def _upload_to_gcs(content: str, target: str) -> None:
     """Upload to GCS. content_type derived from object_path extension."""
-    from unified_cloud_interface import upload_to_storage
+    from unified_trading_library.cloud_interface import upload_to_storage
 
     bucket_name, _, object_path = target.partition("/")
     if not object_path:

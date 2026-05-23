@@ -1,7 +1,7 @@
 """Strategy type classification — cross-service contract.
 
 Used by strategy-service (signal generation), execution-service (routing),
-risk-and-exposure-service (exposure attribution), ML services (training targets).
+strategy-service/risk (exposure attribution), ML services (training targets).
 """
 
 from enum import StrEnum

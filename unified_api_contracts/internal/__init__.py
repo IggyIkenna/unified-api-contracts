@@ -218,9 +218,7 @@ from unified_api_contracts.internal.domain.defi import (
     AaveV3ReserveData,
     AaveV3UserAccountData,
     AaveV3UserReserveData,
-    AggregateSignal,
     AVSRewardComponent,
-    BacktestFidelityReport,
     CompoundV3MarketInfo,
     CompoundV3UserPosition,
     CurveSwapParams,
@@ -273,24 +271,24 @@ from unified_api_contracts.internal.domain.defi import (
     MorphoRepayParams,
     MorphoSupplyParams,
     MorphoUserPosition,
-    OperatorSignOffStatus,
     OraclePrice,
-    PerLegAttribution,
     PerpFundingRecord,
-    PerPoolShapeReconciliation,
     ProtocolIRMShape,
-    SignOffReport,
     SlashingEvent,
     SlashingReason,
     StakingRate,
     StakingYieldDecomposition,
     StrategyDecisionContext,
     StrategyDecisionContextRecord,
-    TenderlyReconciliationReport,
     UniswapV3PoolStateResponse,
     UniswapV3QuoteResponse,
     UniswapV3SwapTxReceipt,
-    compute_aggregate_signal,
+)
+from unified_api_contracts.internal.domain.defi import (
+    AggregateSignal as AggregateSignal,
+)
+from unified_api_contracts.internal.domain.defi import (
+    BacktestFidelityReport as BacktestFidelityReport,
 )
 from unified_api_contracts.internal.domain.defi import (
     CurveDepositParams as CurveDepositParams,
@@ -320,16 +318,34 @@ from unified_api_contracts.internal.domain.defi import (
     KaminoReserve as KaminoReserve,
 )
 from unified_api_contracts.internal.domain.defi import (
+    OperatorSignOffStatus as OperatorSignOffStatus,
+)
+from unified_api_contracts.internal.domain.defi import (
     OrcaWhirlpoolInfo as OrcaWhirlpoolInfo,
 )
 from unified_api_contracts.internal.domain.defi import (
+    PerLegAttribution as PerLegAttribution,
+)
+from unified_api_contracts.internal.domain.defi import (
+    PerPoolShapeReconciliation as PerPoolShapeReconciliation,
+)
+from unified_api_contracts.internal.domain.defi import (
     RaydiumPoolInfo as RaydiumPoolInfo,
+)
+from unified_api_contracts.internal.domain.defi import (
+    SignOffReport as SignOffReport,
 )
 from unified_api_contracts.internal.domain.defi import (
     SolanaStakePoolInfo as SolanaStakePoolInfo,
 )
 from unified_api_contracts.internal.domain.defi import (
     SolanaTransactionResult as SolanaTransactionResult,
+)
+from unified_api_contracts.internal.domain.defi import (
+    TenderlyReconciliationReport as TenderlyReconciliationReport,
+)
+from unified_api_contracts.internal.domain.defi import (
+    compute_aggregate_signal as compute_aggregate_signal,
 )
 from unified_api_contracts.internal.domain.deployment_service import (
     ChaosHookSpec,
@@ -582,6 +598,14 @@ from unified_api_contracts.internal.domain.strategy_service.trigger_subscription
     TriggerEvent,
     TriggerEventType,
     TriggerSubscription,
+)
+from unified_api_contracts.internal.domain.treasury import (
+    TreasuryNAVByClient,
+    TreasuryRollupResponse,
+    TreasurySource,
+    TreasurySourceBalance,
+    compute_nav_by_client,
+    compute_unified_nav,
 )
 from unified_api_contracts.internal.domain.websocket.lifecycle import (
     HealthPingResponse,
@@ -1742,6 +1766,12 @@ __all__ = [
     "user_context_for_allocator",
     "validate_allocation_authorised",
     "validate_feature_columns_not_null",
+    "TreasuryNAVByClient",
+    "TreasuryRollupResponse",
+    "TreasurySource",
+    "TreasurySourceBalance",
+    "compute_nav_by_client",
+    "compute_unified_nav",
     "validate_instrument_records",
     "validate_unity_child_book",
 ]

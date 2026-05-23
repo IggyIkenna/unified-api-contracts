@@ -77,7 +77,7 @@
           "protocol_default_set": "gcp_live"
         },
         "serves_ui": ["unified-trading-system-ui"],
-        "proxies_service": "pnl-attribution-service",
+        "proxies_service": "strategy-service",
         "completion_path": "cefi",
         "sit_level": "standard"
       },
@@ -478,7 +478,7 @@
         "completion_path": "cefi",
         "sit_level": "standard"
       },
-      "pnl-attribution-service": {
+      "strategy-service": {
         "type": "service",
         "tier": 3,
         "role": "service",
@@ -499,7 +499,7 @@
         "completion_path": "cefi",
         "sit_level": "standard"
       },
-      "position-balance-monitor-service": {
+      "strategy-service": {
         "type": "service",
         "tier": 3,
         "role": "service",
@@ -525,7 +525,7 @@
         "completion_path": "cefi",
         "sit_level": "standard"
       },
-      "risk-and-exposure-service": {
+      "strategy-service": {
         "type": "service",
         "tier": 3,
         "role": "service",
@@ -753,7 +753,7 @@
       "ibkr-gateway-infra": "0.1.0",
       "instruments-service": "0.1.22",
       "market-tick-data-service": "0.3.1",
-      "pnl-attribution-service": "0.1.0",
+      "strategy-service": "0.1.0",
       "system-integration-tests": "0.2.0",
       "unified-api-contracts": "0.1.20",
       "unified-trading-library": "0.3.167",
@@ -802,7 +802,7 @@
             "market-tick-data-service",
             "ml-inference-service",
             "ml-training-service",
-            "pnl-attribution-service",
+            "strategy-service",
             "strategy-service",
             "trading-agent-service"
           ]
@@ -812,8 +812,8 @@
           "description": "Client-facing APIs and operational services.",
           "repos": [
             "client-reporting-api",
-            "position-balance-monitor-service",
-            "risk-and-exposure-service",
+            "strategy-service",
+            "strategy-service",
             "unified-trading-api"
           ]
         },
@@ -921,9 +921,9 @@
           "ml-inference-service",
           "strategy-service (+ live mode seams)",
           "execution-service",
-          "pnl-attribution-service",
-          "risk-and-exposure-service",
-          "position-balance-monitor-service",
+          "strategy-service",
+          "strategy-service",
+          "strategy-service",
           "alerting-service"
         ],
         "required_api_services": [
@@ -974,7 +974,7 @@
           "ml-training-service",
           "ml-inference-service",
           "strategy-service (sports strategy module)",
-          "pnl-attribution-service"
+          "strategy-service"
         ],
         "requires_cefi_path": false,
         "note": "Sports services consolidated 2026-03-01: sports-reference-data-service merged into instruments-service, sports-odds-processing-service merged into market-data-processing-service, sports-strategy-service merged into strategy-service, sports-execution-service merged into execution-service. features-sports-service and unified-sports-execution-interface remain standalone. Can develop sports ML pipeline in parallel with CeFi. Only needs USEI v1.0.0 for live execution."
@@ -1108,7 +1108,7 @@
     "colocation_groups": [
       {
         "group_id": "execution-core",
-        "services": ["execution-service", "risk-and-exposure-service"],
+        "services": ["execution-service", "strategy-service"],
         "transport": "shared_memory",
         "note": "Latency-critical path; must deploy together on same host; no network hop between them"
       }
@@ -1128,7 +1128,7 @@
       "id": "client-reporting",
       "domain": "client-reporting",
       "mode": "batch",
-      "service": "pnl-attribution-service",
+      "service": "strategy-service",
       "data_source": "gcs",
       "api": "client-reporting-api",
       "ui": "unified-trading-system-ui"
@@ -1137,7 +1137,7 @@
       "id": "client-reporting-live",
       "domain": "client-reporting",
       "mode": "live",
-      "service": "pnl-attribution-service",
+      "service": "strategy-service",
       "data_source": "pubsub",
       "api": "client-reporting-api",
       "ui": "unified-trading-system-ui"
@@ -1284,7 +1284,7 @@
       "id": "settlement",
       "domain": "settlement",
       "mode": "batch",
-      "service": "position-balance-monitor-service",
+      "service": "strategy-service",
       "data_source": "gcs",
       "api": "settlement-api",
       "ui": "settlement-ui",
@@ -1294,7 +1294,7 @@
       "id": "settlement-live",
       "domain": "settlement",
       "mode": "live",
-      "service": "position-balance-monitor-service",
+      "service": "strategy-service",
       "data_source": "pubsub",
       "api": "settlement-api",
       "ui": "settlement-ui",
@@ -5001,7 +5001,7 @@
         "internal_count": 2,
         "external_count": 40
       },
-      "pnl-attribution-service": {
+      "strategy-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -5159,7 +5159,7 @@
         "internal_count": 2,
         "external_count": 29
       },
-      "position-balance-monitor-service": {
+      "strategy-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.1.0,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"
@@ -5203,7 +5203,7 @@
         "internal_count": 2,
         "external_count": 34
       },
-      "risk-and-exposure-service": {
+      "strategy-service": {
         "internal_deps": {
           "unified-api-contracts": "unified-api-contracts>=0.2.38,<1.0.0",
           "unified-trading-library": "unified-trading-library>=0.1.0,<1.0.0"

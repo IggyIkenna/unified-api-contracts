@@ -9,9 +9,10 @@ helper. Per CLAUDE.md asset-group vocabulary rule: lowercase keys.
 Compressed-scope (2026-05-12 slot 7 Day-2): 10 scenarios shipped.
 
 - ``cefi.py`` (2): ``cefi_venue_circuit_breaker_trip``, ``cefi_funding_spike_10x``.
-- ``defi.py`` (6): ``defi_chain_rpc_outage_solana``, ``defi_liquidity_drain_lending_pool``,
+- ``defi.py`` (7): ``defi_chain_rpc_outage_solana``, ``defi_liquidity_drain_lending_pool``,
   ``defi_oracle_deviation_30sigma``, ``defi_gas_surge_50x``,
-  ``defi_mempool_congestion_inclusion_delay``, ``defi_stablecoin_depeg``.
+  ``defi_mempool_congestion_inclusion_delay``, ``defi_stablecoin_depeg``,
+  ``defi_lst_depeg_steth_5pct``.
 - ``cross_asset.py`` (2): ``cross_asset_flash_crash``,
   ``cross_asset_basis_blowout_perp_spot``.
 
