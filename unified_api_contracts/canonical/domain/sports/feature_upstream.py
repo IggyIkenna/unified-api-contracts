@@ -225,6 +225,14 @@ FEATURE_UPSTREAM_REQUIREMENTS: dict[str, list[UpstreamReq]] = {
     "poisson_xg_calculator": [
         UpstreamReq(source="derived", data_type="team_xg"),
     ],
+    "shot_quality": [
+        UpstreamReq(
+            source="understat",
+            data_type="XG_SHOTS",
+            notes="Per-shot xG dimensional data; same 6-league coverage as XG (2019-01-01+)",
+        ),
+        UpstreamReq(source="api_football", data_type="FIXTURES"),
+    ],
 }
 
 
