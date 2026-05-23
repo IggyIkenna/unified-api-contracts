@@ -370,6 +370,90 @@ DEFI_SPOT_ASSET_AGGREGATOR_ROUTE = SchemaContract(
 )
 
 # ---------------------------------------------------------------------------
+# Per-protocol lending-rate breakouts (defi_recursive_borrow_archetypes_2026_05_10 Phase 1)
+# Aave V3 / Compound V3 / Spark / Morpho granular rate variants of lending_indices.
+# ---------------------------------------------------------------------------
+
+DEFI_LENDING_SUPPLY_APY = SchemaContract(
+    asset_group="defi",
+    instrument_type="lending",
+    data_type="supply_apy",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="supply_apy", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_LENDING_BORROW_APY = SchemaContract(
+    asset_group="defi",
+    instrument_type="lending",
+    data_type="borrow_apy",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="borrow_apy_variable", dtype="float64", nullable=False),
+        ColumnSpec(name="borrow_apy_stable", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_LENDING_UTILISATION = SchemaContract(
+    asset_group="defi",
+    instrument_type="lending",
+    data_type="utilisation",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="utilisation_rate", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_LENDING_LIQUIDATION_THRESHOLD = SchemaContract(
+    asset_group="defi",
+    instrument_type="lending",
+    data_type="liquidation_threshold",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="liquidation_threshold", dtype="float64", nullable=False),
+        ColumnSpec(name="ltv", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+DEFI_LENDING_EMODE_PARAMS = SchemaContract(
+    asset_group="defi",
+    instrument_type="lending",
+    data_type="emode_params",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="emode_category", dtype="int64", nullable=False),
+        ColumnSpec(name="emode_ltv", dtype="float64", nullable=False),
+        ColumnSpec(name="emode_liquidation_threshold", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# ---------------------------------------------------------------------------
 # Register into CONTRACT_REGISTRY (side-effect on import)
 # ---------------------------------------------------------------------------
 
@@ -388,5 +472,10 @@ CONTRACT_REGISTRY.update(
         ("defi", "debt_token", "lending_indices"): DEFI_DEBT_TOKEN_LENDING_INDICES,
         ("defi", "yield_bearing", "yield_snapshots"): DEFI_YIELD_BEARING_YIELD_SNAPSHOTS,
         ("defi", "spot_asset", "aggregator_route"): DEFI_SPOT_ASSET_AGGREGATOR_ROUTE,
+        ("defi", "lending", "supply_apy"): DEFI_LENDING_SUPPLY_APY,
+        ("defi", "lending", "borrow_apy"): DEFI_LENDING_BORROW_APY,
+        ("defi", "lending", "utilisation"): DEFI_LENDING_UTILISATION,
+        ("defi", "lending", "liquidation_threshold"): DEFI_LENDING_LIQUIDATION_THRESHOLD,
+        ("defi", "lending", "emode_params"): DEFI_LENDING_EMODE_PARAMS,
     }
 )
