@@ -26,7 +26,7 @@ def workspace_root_env() -> Path | None:
     an ancestor-walk fallback on top — this helper does NOT walk.
     """
 
-    env_root = os.environ.get(_ENV_VAR)  # qg-os-environ: workspace-root discovery (module docstring)
+    env_root = os.environ.get(_ENV_VAR)  # noqa: qg-os-environ
     if env_root:
         return Path(env_root)
     return None
