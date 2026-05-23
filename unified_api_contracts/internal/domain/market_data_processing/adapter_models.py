@@ -167,6 +167,15 @@ class CandleOutput:
     liquidation_volume: object = None
     liquidation_notional: object = None
 
+    # DeFi pool-swap schema columns (UAC _DEX_EXT: swap_count + volume_quote_usd + chain)
+    # These must match the (defi, pool, swaps_ohlcv_*) contract column names exactly.
+    # chain: blockchain name (e.g. "ETHEREUM") — non-nullable in UAC contract.
+    # swap_count: DeFi-specific alias for trade_count.
+    # volume_quote_usd: DeFi-specific alias for USD-denominated volume.
+    chain: object = None
+    swap_count: object = None
+    volume_quote_usd: object = None
+
     # DeFi / swap fields
     amount_in: object = None
     amount_out: object = None
