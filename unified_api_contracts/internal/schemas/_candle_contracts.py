@@ -490,10 +490,10 @@ for _tf in _TIMEFRAMES_PREDICTION_TRADES:
             "prediction",
             "PREDICTION_MARKET",
             _trades_key(_tf),
-            symbol_column="condition_id",
+            symbol_column="symbol",
             extra_cols=[],
-            include_chain=True,
-            anchor_col=ColumnSpec(name="condition_id", dtype="string", nullable=False),
+            include_chain=False,
+            anchor_col=None,
             nullable_ohlcv=True,
         )
     )

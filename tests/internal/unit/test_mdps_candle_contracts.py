@@ -29,6 +29,7 @@ from unified_api_contracts.internal.schemas._candle_contracts import (
     MDPS_TIMEFRAMES_INDEX,
     MDPS_TIMEFRAMES_OPTIONS,
     MDPS_TIMEFRAMES_PREDICTION,
+    MDPS_TIMEFRAMES_PREDICTION_TRADES,
     MDPS_TIMEFRAMES_SPORTS,
     MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED,
 )
@@ -220,6 +221,28 @@ def test_prediction_market_candles(tf: str) -> None:
     names = {c.name for c in contract.columns}
     assert "chain" in names
     assert "quote_count" in names
+
+
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_PREDICTION_TRADES)
+def test_prediction_market_uppercase_trades_candles(tf: str) -> None:
+    """PREDICTION_MARKET (uppercase) contracts are for MDPS candle output.
+
+    Polymarket MTDS tick parquets use instrument_type="PREDICTION_MARKET" (uppercase).
+    MDPS aggregates them via the trades→ohlcv key mapping. These contracts must:
+    - NOT include chain (prediction is not DeFi onchain)
+    - use symbol as anchor (CandleOutput.symbol, not condition_id)
+    - have nullable OHLCV (alive market with zero trades → Category D NaN bars)
+    """
+    contract = lookup_contract(
+        asset_group="prediction",
+        instrument_type="PREDICTION_MARKET",
+        data_type=MDPS_KEY_TRADES(tf),
+    )
+    assert contract.symbol_column == "symbol"
+    names = {c.name for c in contract.columns}
+    assert "chain" not in names
+    open_col = next(c for c in contract.columns if c.name == "open")
+    assert open_col.nullable is True, "OHLCV must be nullable for Category D prediction bars"
 
 
 # ---------------------------------------------------------------------------
