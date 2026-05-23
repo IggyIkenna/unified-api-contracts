@@ -23,12 +23,11 @@ from __future__ import annotations
 # ---------------------------------------------------------------------------
 # Canonical PROTOCOL-CHAIN venues
 # ---------------------------------------------------------------------------
-# Naming convention: protocol versioning is collapsed (AAVE_V3, not AAVE_V3;
-# COMPOUND_V3, not COMPOUND_V3; PANCAKESWAP_V3) to match
-# ``VENUE_DATA_TYPE_CAPABILITIES`` keys. Raw manifest values with underscores
-# (``AAVE_V3`` + ``chain=POLYGON``, ``COMPOUND_V3`` + ``chain=SCROLL``,
-# ``PANCAKESWAP_V3`` + ``chain=BSC``) resolve to these canonical names via
-# ``VenueMapping.normalize_defi_venue``.
+# Naming convention: protocol versioning uses underscore form (AAVE_V3,
+# COMPOUND_V3, PANCAKESWAP_V3) to match ``VENUE_DATA_TYPE_CAPABILITIES`` keys.
+# Raw manifest values (``AAVE_V3`` + ``chain=POLYGON``, ``COMPOUND_V3`` +
+# ``chain=SCROLL``, ``PANCAKESWAP_V3`` + ``chain=BSC``) resolve to these
+# canonical names via ``VenueMapping.normalize_defi_venue``.
 
 ALL_DEFI_VENUES: list[str] = [
     # ── Ethereum ──
