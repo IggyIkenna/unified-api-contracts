@@ -368,6 +368,21 @@ for _tf in _TIMEFRAMES_DEFI:
             nullable_ohlcv=True,
         )
     )
+    # Fallback for migrated DEX files whose instrument_type cannot be inferred
+    # (no instrument_type column + instrument_id lacks the ":pool:" colon-token).
+    # Mirrors the tradfi UNKNOWN pattern at contracts.py:773. include_chain=False
+    # because CandleOutput from the swap adapter does not populate a chain column.
+    _register(
+        _build(
+            "defi",
+            "UNKNOWN",
+            _swaps_key(_tf),
+            symbol_column="symbol",
+            extra_cols=_DEX_EXT,
+            include_chain=False,
+            nullable_ohlcv=True,
+        )
+    )
     _register(
         _build(
             "defi",
