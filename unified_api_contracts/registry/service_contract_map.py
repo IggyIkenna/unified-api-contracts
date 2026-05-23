@@ -51,11 +51,6 @@ class ServiceContract:
 # :mod:`unified_api_contracts.internal.inter_service_events` for the schemas
 # and :mod:`unified_api_contracts.internal.event_topics` for the topic mapping.
 SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
-    # NOTE: position-balance-monitor-service, risk-and-exposure-service, and
-    # pnl-attribution-service have been consolidated into strategy-service
-    # sub-packages (strategy_service.position, strategy_service.risk,
-    # strategy_service.pnl respectively). These services are archived.
-    # Their contracts are now expressed via the strategy-service entry below.
     "alerting-service": ServiceContract(
         service_name="alerting-service",
         owns=frozenset(
@@ -101,6 +96,21 @@ SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
                 "strategy_instances",
                 "signal_generation",
                 "instruction_lifecycle",
+                # Absorbed from position-balance-monitor-service (Phase 3 consolidation)
+                "canonical_position_state",
+                "canonical_balance_state",
+                "pnl_ledger",
+                "pnl_series",
+                # Absorbed from risk-and-exposure-service
+                "risk_limits",
+                "exposure_aggregates",
+                "var_results",
+                "kill_switch_state",
+                # Absorbed from pnl-attribution-service
+                "alpha_decomposition",
+                "strategy_alpha",
+                "execution_alpha",
+                "risk_alpha",
             }
         ),
         emits=frozenset(
@@ -108,6 +118,17 @@ SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
                 "StrategyInstruction",
                 "SignalEvent",
                 "ShadowComparisonMetrics",
+                # Absorbed from position-balance-monitor-service
+                "PositionSnapshotEvent",
+                "BalanceSnapshot",
+                "PnLPoint",
+                "MarginEvent",
+                # Absorbed from risk-and-exposure-service
+                "RiskEvent",
+                "KillSwitchTrigger",
+                "PreTradeCheckResponse",
+                # Absorbed from pnl-attribution-service
+                "PnLAttributionRecord",
             }
         ),
         consumes=frozenset(
@@ -118,19 +139,29 @@ SERVICE_CONTRACT_MAP: Final[dict[str, ServiceContract]] = {
                 "FillEvent",
                 "PriceSnapshot",
                 "KillSwitchTrigger",
+                "LiquidationAlert",
+                "PnLPoint",
+                "DeleverageActionSubmitted",
+                "RiskEvent",
             }
         ),
         persists=frozenset(
             {
                 "firestore:strategy_state/",
                 "gcs:signals/",
+                # Absorbed from position-balance-monitor-service
+                "postgres:position_balance_monitor.positions",
+                "postgres:position_balance_monitor.balances",
+                "gcs:pnl-ledger/",
+                # Absorbed from risk-and-exposure-service
+                "gcs:risk-limits/",
+                "gcs:exposure-snapshots/",
+                # Absorbed from pnl-attribution-service
+                "gcs:pnl-attribution/",
             }
         ),
         forbidden_imports=frozenset(
             {
-                "strategy_service.position",
-                "strategy_service.risk",
-                "strategy_service.pnl",
                 "execution_service.connectors",
                 "execution_service.matching_engine",
             }

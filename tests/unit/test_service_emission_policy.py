@@ -117,7 +117,7 @@ def test_seed_contains_execution_fill_confirmation_block_critical() -> None:
     assert SERVICE_OUTPUT_POLICIES[("execution-service", "fill_confirmation")] is ServiceEmissionPolicy.BLOCK_CRITICAL
 
 
-def test_seed_contains_position_balance_monitor_portfolio_state_block_critical() -> None:
+def test_seed_contains_strategy_service_portfolio_state_block_critical() -> None:
     assert SERVICE_OUTPUT_POLICIES[("strategy-service", "portfolio_state")] is ServiceEmissionPolicy.BLOCK_CRITICAL
 
 

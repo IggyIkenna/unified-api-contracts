@@ -206,35 +206,6 @@ allowed:
     detail: "Circle CCTP Iris attestation polling (iris-api.circle.com/v1/attestations/{hash}). No auth required — public endpoint. Used by execution-service/execution_service/defi_execution/protocols/cctp.py to poll burn attestation status. UAC external/circle_cctp schemas not yet imported by execution adapter. Phase 2 QG task."
     acked_by: slot-2 2026-05-21
 
-  # ---- VCR test cassettes (test-only; no production consumer yet)
-  # The corresponding VCR test files exercise UAC schema parsing; these
-  # cassettes will gain a production consumer when MTDS CeFi adapters
-  # import from the UAC external modules (Phase 2 QG task).
-  - path: barchart/mocks/get_quote_es1.yaml
-    reason: test-only
-    detail: "Barchart OnDemand getQuote (ES,1 continuous contract). MTDS tradfi handler does not yet import from unified_api_contracts.external.barchart. VCR test validates schema parsing only."
-    acked_by: slot-1 2026-05-22
-  - path: bitfinex/mocks/ticker.yaml
-    reason: test-only
-    detail: "Bitfinex v2 public ticker (tBTCUSD). VCR test validates BitfinexTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.bitfinex."
-    acked_by: slot-1 2026-05-22
-  - path: bitstamp/mocks/ticker.yaml
-    reason: test-only
-    detail: "Bitstamp v2 public ticker (btcusd). VCR test validates BitstampTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.bitstamp."
-    acked_by: slot-1 2026-05-22
-  - path: huobi/mocks/ticker.yaml
-    reason: test-only
-    detail: "Huobi market detail merged (btcusdt). VCR test validates HuobiTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.huobi."
-    acked_by: slot-1 2026-05-22
-  - path: kucoin/mocks/ticker.yaml
-    reason: test-only
-    detail: "KuCoin orderbook level1 (BTC-USDT). VCR test validates KuCoinTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.kucoin."
-    acked_by: slot-1 2026-05-22
-  - path: mexc/mocks/ticker.yaml
-    reason: test-only
-    detail: "MEXC 24hr ticker (BTCUSDT). VCR test validates MexcTicker schema parsing; MTDS cefi handler imports via ccxt, not unified_api_contracts.external.mexc."
-    acked_by: slot-1 2026-05-22
-
   # ---- Phase 3 Sports / Prediction stub-placeholder cassettes
   # Sportsbook scrapers use Playwright headless browser — not aiohttp/httpx.
   # VCR cassette recording requires Playwright session capture infrastructure
@@ -299,3 +270,295 @@ allowed:
     reason: stub-placeholder
     detail: "OddsPapi historical odds API (api.oddspapi.io/v4). Status: BLOCKED-CREDENTIALS — requires oddspapi-api-key in Secret Manager. Used by e2e-testing/scripts/sports/oddspapi_historical_backfill.py."
     acked_by: slot-2 2026-05-21
+
+  # ---- Phase 4 stub-placeholder stubs (empty interactions; no adapter implemented yet)
+  - path: api_football/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — API-Football sports data provider; adapter pending under sports master epic."
+    acked_by: slot-3 2026-05-23
+  - path: baker_hughes/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — Baker Hughes commodity/macro data provider; tradfi adapter pending."
+    acked_by: slot-3 2026-05-23
+  - path: instadapp/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — Instadapp DeFi account aggregator; adapter pending under DeFi master epic."
+    acked_by: slot-3 2026-05-23
+  - path: metabet/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — MetaBet odds aggregator; adapter pending under sports master epic."
+    acked_by: slot-3 2026-05-23
+  - path: odds_api/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — The Odds API (api.the-odds-api.com); adapter pending under sports master epic."
+    acked_by: slot-3 2026-05-23
+  - path: odds_engine/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — OddsEngine sports odds feed; adapter pending under sports master epic."
+    acked_by: slot-3 2026-05-23
+  - path: onexbet/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — 1xBet sportsbook scraper; Playwright-based, cassette pending."
+    acked_by: slot-3 2026-05-23
+  - path: openbb/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — OpenBB Platform API; tradfi data aggregator adapter pending."
+    acked_by: slot-3 2026-05-23
+  - path: polygon/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — Polygon.io tradfi tick data (polygon.io/docs); adapter pending under tradfi master epic."
+    acked_by: slot-3 2026-05-23
+
+  # ---- Phase 4 CeFi blind spots — production adapters exist but UAC external import not yet wired
+  - path: aster/mocks/trade_ws.yaml
+    reason: recording-template
+    detail: "AsterDEX WS trade frames (wss://fstream.asterdex.com/ws). MTDS aster_ws.py connector streams this channel. UAC external/aster schemas not yet imported by MTDS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: binance/mocks/futures_trade_ws.yaml
+    reason: recording-template
+    detail: "Binance Futures WS trade frames (wss://fstream.binance.com/ws/). MTDS binance_futures_ws.py connector. UAC external/binance schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: binance/mocks/spot_exchange_info.yaml
+    reason: recording-template
+    detail: "Binance Spot exchange info (api.binance.com/api/v3/exchangeInfo). IS adapter CCXTReferenceDataAdapter(exchange_id='binance'). UAC external/binance schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: binance/mocks/spot_trade_ws.yaml
+    reason: recording-template
+    detail: "Binance Spot WS trade frames (wss://stream.binance.com/ws/). MTDS binance_spot_ws.py connector. UAC external/binance schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: binance/mocks/ticker_24hr.yaml
+    reason: recording-template
+    detail: "Binance 24hr ticker (api.binance.com/api/v3/ticker/24hr). MTDS binance_rest_handler.py. UAC external/binance schemas not yet imported by MTDS handler. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: bitget/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Bitget public ticker (api.bitget.com/api/v2/spot/market/tickers). MTDS bitget_handler.py. UAC external/bitget schemas not yet imported by MTDS handler. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: bybit/mocks/linear_trade_ws.yaml
+    reason: recording-template
+    detail: "Bybit Linear Futures WS trade frames (stream.bybit.com/v5/public/linear). MTDS bybit_linear_ws.py connector. UAC external/bybit schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: bybit/mocks/spot_trade_ws.yaml
+    reason: recording-template
+    detail: "Bybit Spot WS trade frames (stream.bybit.com/v5/public/spot). MTDS bybit_spot_ws.py connector. UAC external/bybit schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: bybit/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Bybit REST ticker (api.bybit.com/v5/market/tickers). MTDS bybit_rest_handler.py. UAC external/bybit schemas not yet imported by MTDS handler. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: coinbase/mocks/match_ws.yaml
+    reason: recording-template
+    detail: "Coinbase Advanced Trade WS match frames (advanced-trade-ws.coinbase.com). MTDS coinbase_ws.py connector. UAC external/coinbase schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: coinbase/mocks/products.yaml
+    reason: recording-template
+    detail: "Coinbase Advanced Trade REST products (api.coinbase.com/api/v3/brokerage/products). IS CCXTReferenceDataAdapter(exchange_id='coinbase'). UAC external/coinbase schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: deribit/mocks/auth_test.yaml
+    reason: recording-template
+    detail: "Deribit auth/test RPC (www.deribit.com/api/v2/public/test). execution-service deribit connector uses auth handshake. UAC external/deribit schemas not yet imported by execution adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: deribit/mocks/get_instruments_multi.yaml
+    reason: recording-template
+    detail: "Deribit get_instruments REST (www.deribit.com/api/v2/public/get_instruments). IS adapter calls this for instrument discovery. UAC external/deribit schemas not yet imported by IS adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: deribit/mocks/risk_service_health.yaml
+    reason: integration-fixture
+    detail: "Internal risk-service health probe (http://risk-service:8080/health) recorded in Deribit mocks dir. Used by execution-service integration tests verifying Deribit connector health-check wiring. Not a Deribit API call."
+    acked_by: slot-3 2026-05-23
+  - path: deribit/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Deribit REST ticker (www.deribit.com/api/v2/public/ticker). MTDS deribit_rest_handler.py. UAC external/deribit schemas not yet imported by MTDS handler. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: deribit/mocks/trade_ws.yaml
+    reason: recording-template
+    detail: "Deribit WS trade frames (wss://www.deribit.com/ws/api/v2). MTDS deribit_ws.py connector. UAC external/deribit schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: drift/mocks/trade_ws.yaml
+    reason: recording-template
+    detail: "Drift Protocol WS trade frames. MTDS drift_ws.py connector streams this channel. UAC external/drift schemas not yet imported by WS connector (drift/mocks/markets.yaml already allowlisted). Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: okx/mocks/futures_trade_ws.yaml
+    reason: recording-template
+    detail: "OKX Futures WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS okx_futures_ws.py connector. UAC external/okx schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: okx/mocks/spot_trade_ws.yaml
+    reason: recording-template
+    detail: "OKX Spot WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS okx_spot_ws.py connector. UAC external/okx schemas not yet imported by WS connector. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: okx/mocks/ticker.yaml
+    reason: recording-template
+    detail: "OKX REST ticker (www.okx.com/api/v5/market/ticker). MTDS okx_rest_handler.py. UAC external/okx schemas not yet imported by MTDS handler. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: upbit/mocks/ticker.yaml
+    reason: recording-template
+    detail: "Upbit Korean exchange REST ticker (api.upbit.com/v1/ticker). IS CCXTReferenceDataAdapter(exchange_id='upbit'). UAC external/upbit schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+
+  # ---- Phase 4 Hyperliquid blind spots — production adapters exist, UAC import not yet wired
+  - path: hyperliquid/mocks/active_asset_ctx_ws.yaml
+    reason: recording-template
+    detail: "Hyperliquid activeAssetCtx WS subscription (api.hyperliquid.xyz/ws). MTDS hyperliquid_ws.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/all_mids.yaml
+    reason: recording-template
+    detail: "Hyperliquid allMids REST (api.hyperliquid.xyz/info). MTDS hyperliquid_rest_handler.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/cancel_order.yaml
+    reason: recording-template
+    detail: "Hyperliquid cancel order REST (api.hyperliquid.xyz/exchange). execution-service hyperliquid connector. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/candle_snapshot.yaml
+    reason: recording-template
+    detail: "Hyperliquid candleSnapshot REST (api.hyperliquid.xyz/info). MTDS hyperliquid OHLCV handler. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/clearinghouse_state.yaml
+    reason: recording-template
+    detail: "Hyperliquid clearinghouseState REST (api.hyperliquid.xyz/info). execution-service position fetch. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/funding_history.yaml
+    reason: recording-template
+    detail: "Hyperliquid fundingHistory REST (api.hyperliquid.xyz/info). MTDS perp_funding_handler.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/l2_book.yaml
+    reason: recording-template
+    detail: "Hyperliquid l2Book REST (api.hyperliquid.xyz/info). execution-service order book depth. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/l2book_ws.yaml
+    reason: recording-template
+    detail: "Hyperliquid l2Book WS subscription (api.hyperliquid.xyz/ws). MTDS hyperliquid_ws.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/meta.yaml
+    reason: recording-template
+    detail: "Hyperliquid meta REST (api.hyperliquid.xyz/info). IS hyperliquid adapter instrument discovery. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/meta_and_asset_ctxs.yaml
+    reason: recording-template
+    detail: "Hyperliquid metaAndAssetCtxs REST (api.hyperliquid.xyz/info). MTDS context fetch. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/open_orders.yaml
+    reason: recording-template
+    detail: "Hyperliquid openOrders REST (api.hyperliquid.xyz/info). execution-service order state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/order_submit.yaml
+    reason: recording-template
+    detail: "Hyperliquid order submit REST (api.hyperliquid.xyz/exchange). execution-service order placement. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: hyperliquid/mocks/trade_ws.yaml
+    reason: recording-template
+    detail: "Hyperliquid trade WS subscription (api.hyperliquid.xyz/ws). MTDS hyperliquid_ws.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+
+  # ---- Phase 4 DeFi blind spots — on-chain / DeFi protocol cassettes
+  - path: alchemy/mocks/aave_get_reserve_data.yaml
+    reason: capability-declaration-only
+    detail: "Aave V3 getReserveData eth_call via Alchemy RPC (eth-mainnet.g.alchemy.com). execution-service defi_execution/protocols/aave.py calls this. UAC external/alchemy schemas document the RPC pattern; execution adapter not yet importing from external.alchemy. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: alchemy/mocks/aave_get_user_account_data.yaml
+    reason: capability-declaration-only
+    detail: "Aave V3 getUserAccountData eth_call via Alchemy RPC (eth-mainnet.g.alchemy.com). execution-service defi_execution/protocols/aave.py. See alchemy/aave_get_reserve_data.yaml. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: alchemy/mocks/alchemy_ws_eth_subscription.yaml
+    reason: capability-declaration-only
+    detail: "Alchemy WebSocket eth_subscribe log subscription (wss://eth-mainnet.g.alchemy.com). execution-service on-chain event listener. UAC external/alchemy schemas document WS auth pattern; Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: eigenlayer/mocks/earner_historical_rewards.yaml
+    reason: recording-template
+    detail: "EigenLayer sidecar rewards REST (sidecar-rpc.eigenlayer.xyz/eigenlayer/rewards/v1/earner-historical-rewards). MTDS lst_etherfi_adapter.py or equivalent restaking handler. Status: BLOCKED-CREDENTIALS (Cloudflare-protected, production env needed). Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: morpho_blue_api/mocks/markets.yaml
+    reason: recording-template
+    detail: "Morpho Blue GraphQL API (blue-api.morpho.org/graphql). IS morpho_blue adapter for lending market discovery. UAC external/morpho_blue_api schemas not yet imported by IS adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+
+  # ---- Phase 4 Sports / prediction market blind spots
+  - path: betfair/mocks/list_market_book.yaml
+    reason: recording-template
+    detail: "Betfair Exchange listMarketBook REST (api.betfair.com/exchange/betting/rest/v1.0/listMarketBook). sports adapter betfair_client.py. UAC external/betfair schemas not yet imported by sports adapter. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: betfair/mocks/list_market_catalogue.yaml
+    reason: recording-template
+    detail: "Betfair Exchange listMarketCatalogue REST (api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue). sports adapter betfair_client.py. UAC external/betfair schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: kalshi/mocks/market_lookup.yaml
+    reason: recording-template
+    detail: "Kalshi prediction market lookup REST (trading-api.kalshi.com/trade-api/v2/markets/{ticker}). IS or MTDS kalshi_adapter.py. UAC external/kalshi schemas not yet imported by consumer. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: kalshi/mocks/markets.yaml
+    reason: recording-template
+    detail: "Kalshi markets list REST (trading-api.kalshi.com/trade-api/v2/markets). IS or MTDS kalshi_adapter.py. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: kalshi/mocks/orderbook.yaml
+    reason: recording-template
+    detail: "Kalshi orderbook REST (trading-api.kalshi.com/trade-api/v2/markets/{ticker}/orderbook). execution-service kalshi connector. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: kalshi/mocks/ticker_ws.yaml
+    reason: recording-template
+    detail: "Kalshi WS ticker subscription (trading-api.kalshi.com WS). MTDS kalshi_ws.py connector. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: matchbook/mocks/matchbook_get_markets.yaml
+    reason: recording-template
+    detail: "Matchbook Exchange getMarkets REST (api.matchbook.com/edge/rest/events). sports adapter matchbook_client.py. UAC external/matchbook schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: polymarket/mocks/clob_markets.yaml
+    reason: recording-template
+    detail: "Polymarket CLOB markets REST (clob.polymarket.com/markets). IS or MTDS polymarket_clob_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: polymarket/mocks/gamma_events_sports.yaml
+    reason: recording-template
+    detail: "Polymarket Gamma sports events REST (gamma-api.polymarket.com/events). IS polymarket_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: polymarket/mocks/gamma_markets_crypto.yaml
+    reason: recording-template
+    detail: "Polymarket Gamma crypto markets REST (gamma-api.polymarket.com/markets). IS polymarket_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: polymarket/mocks/gamma_markets_sports.yaml
+    reason: recording-template
+    detail: "Polymarket Gamma sports markets REST (gamma-api.polymarket.com/markets). IS polymarket_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+
+  # ---- Phase 4 Tradfi / macro blind spots
+  - path: cftc/mocks/commitments_of_traders.yaml
+    reason: recording-template
+    detail: "CFTC Commitments of Traders REST (publicreporting.cftc.gov/api). tradfi macro_handler or IS cftc_adapter.py. UAC external/cftc schemas not yet imported by consumer. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: ecb/mocks/ticker.yaml
+    reason: recording-template
+    detail: "ECB Statistical Data Warehouse FX REST (data-api.ecb.europa.eu/service/data/EXR/). IS ecb_adapter.py or MTDS fx_handler. UAC external/ecb schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: ofr/mocks/short_term_funding.yaml
+    reason: recording-template
+    detail: "OFR (Office of Financial Research) SOFR/short-term funding REST (data.financialresearch.gov/v1/series/timeseries). tradfi macro_handler or IS ofr_adapter.py. UAC external/ofr schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: open_meteo/mocks/forecast_current_weather.yaml
+    reason: recording-template
+    detail: "Open-Meteo weather forecast REST (api.open-meteo.com/v1/forecast). IS or strategy-service weather signal adapter. UAC external/open_meteo schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: thegraph/mocks/pools_query.yaml
+    reason: recording-template
+    detail: "TheGraph Uniswap V2 pools subgraph (api.thegraph.com/subgraphs/name/uniswap/uniswap-v2). IS uniswap_v2.py adapter queries V2 pools via TheGraph. UAC external/thegraph V2 subgraph query not yet wired. Phase 2 QG task (see also thegraph/sushiswap_v3 + pancakeswap_v3 already allowlisted)."
+    acked_by: slot-3 2026-05-23
+  - path: yahoo_finance/mocks/chart_aapl_1d.yaml
+    reason: recording-template
+    detail: "Yahoo Finance chart endpoint (query1.finance.yahoo.com/v8/finance/chart/AAPL). IS yahoo_finance_adapter.py or MTDS tradfi handler. UAC external/yahoo_finance schemas not yet imported by consumer (yahoo_finance/error_rate_limit.yaml already allowlisted). Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: yahoo_finance/mocks/dividends_aapl.yaml
+    reason: recording-template
+    detail: "Yahoo Finance dividends endpoint (query1.finance.yahoo.com/v8/finance/chart/AAPL?events=div). IS yahoo_finance corporate-actions adapter. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: yahoo_finance/mocks/earnings_msft.yaml
+    reason: recording-template
+    detail: "Yahoo Finance earnings endpoint (query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=earnings). IS yahoo_finance fundamental data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: yahoo_finance/mocks/error_invalid_symbol.yaml
+    reason: recording-template
+    detail: "Yahoo Finance error-path cassette (invalid symbol response). Negative-path fixture for IS yahoo_finance adapter error handling. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: yahoo_finance/mocks/splits_tsla.yaml
+    reason: recording-template
+    detail: "Yahoo Finance splits endpoint (query1.finance.yahoo.com/v8/finance/chart/TSLA?events=split). IS yahoo_finance corporate-actions adapter. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23
+  - path: yahoo_finance/mocks/treasury_yield.yaml
+    reason: recording-template
+    detail: "Yahoo Finance treasury yield endpoint (query1.finance.yahoo.com/v8/finance/chart/^TNX). IS yahoo_finance rates adapter or macro_handler. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    acked_by: slot-3 2026-05-23

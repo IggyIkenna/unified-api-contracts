@@ -4,7 +4,7 @@ FundNAVSnapshot is the payload pushed to external operations partners (e.g. POD/
 at each NAV cut-off point. It aggregates cross-venue balances and positions into a
 structured payload suitable for NAV calculation and on-chain settlement.
 
-The strategy-service builds these snapshots and pushes them via webhook.
+The position-balance-monitor-service builds these snapshots and pushes them via webhook.
 """
 
 from __future__ import annotations
@@ -104,7 +104,7 @@ class WebhookDeliveryConfig(BaseModel, frozen=True):
 class FundNAVSnapshot(BaseModel, frozen=True):
     """NAV snapshot payload pushed to external operations partners.
 
-    This is the contract between Odum's strategy-service and
+    This is the contract between Odum's position-balance-monitor-service and
     external operations partners (e.g. POD/Elysium). At each NAV cut-off point,
     a snapshot is built from cross-venue balances and positions, then POSTed
     to the configured webhook endpoint.

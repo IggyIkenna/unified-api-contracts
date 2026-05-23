@@ -172,7 +172,6 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
         consumers=frozenset(
             {
                 "execution-service",
-                "strategy-service",
                 "batch-live-reconciliation-service",
             }
         ),
@@ -207,7 +206,6 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
         consumers=frozenset(
             {
                 "alerting-service",
-                "strategy-service",
             }
         ),
     ),
