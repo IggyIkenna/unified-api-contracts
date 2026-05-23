@@ -430,13 +430,32 @@ class AlertSeverity(StrEnum):
 
 
 class AlertChannel(StrEnum):
-    """Dispatch channels available to AlertRule routing."""
+    """Dispatch channels available to AlertRule routing.
+
+    Added 2026-05-23 (3 channels): TWILIO_VOICE / TWILIO_SMS / PHYSICAL_PAGER
+    for the Layer-3 (Twilio voice/SMS — independent of PagerDuty) and Layer-4
+    (physical pager device) escalation paths per
+    ``codex/04-architecture/recovery-defence-in-depth-layers.md``.
+    """
 
     PAGERDUTY = "pagerduty"
     TELEGRAM = "telegram"
     SLACK = "slack"
     EMAIL = "email"
     LOG_ONLY = "log_only"
+    TWILIO_VOICE = "twilio_voice"
+    """Layer-3 independent fallback voice call — survives PagerDuty API outage
+    + phone-on-DND. Routes via ``alerting-service/notifiers/twilio_voice.py``.
+    Operator must configure dedicated Twilio account (not shared with other
+    workspace tools) per
+    ``plans/active/independent_fallback_twilio_voice_2026_05_23.md``."""
+    TWILIO_SMS = "twilio_sms"
+    """Layer-3 SMS fallback. Cheaper than voice; for HIGH-severity alerts
+    where DND-bypass is not required."""
+    PHYSICAL_PAGER = "physical_pager"
+    """Layer-4 physical device — LoRa pager / dedicated SIM phone / GSM
+    siren / satellite messenger. Triggered ONLY by the 5 closed-set
+    conditions per ``codex/05-infrastructure/physical-pager-layer.md``."""
 
 
 class KillSwitchScope(StrEnum):

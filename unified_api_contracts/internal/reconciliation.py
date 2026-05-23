@@ -205,6 +205,81 @@ class PnLReconciliationSnapshot(BaseModel):
     )
 
 
+# ---------------------------------------------------------------------------
+# 12-dimension reconciliation taxonomy + age-tracking mixin (added 2026-05-23)
+# ---------------------------------------------------------------------------
+#
+# Implementation plan: ``plans/active/reconciliation_age_tracking_and_escalation_2026_05_23.md``.
+# Codex SSOT: planned ``codex/04-architecture/reconciliation-age-tracking.md`` (stub via plan).
+
+
+class ReconciliationDimension(StrEnum):
+    """Closed set of 12 dimensions the batch-live-reconciliation-service tracks
+    independently. Every reconciliation delta MUST tag its dimension so the
+    audit + alerting routing can apply per-dimension thresholds + escalation.
+    """
+
+    ORDERS = "ORDERS"
+    FILLS = "FILLS"
+    POSITIONS = "POSITIONS"
+    BALANCES = "BALANCES"
+    FUNDING_PAYMENTS = "FUNDING_PAYMENTS"
+    FEES = "FEES"
+    TRANSFERS = "TRANSFERS"
+    BORROW_LENDING_BALANCES = "BORROW_LENDING_BALANCES"
+    COLLATERAL_BALANCES = "COLLATERAL_BALANCES"
+    MARGIN_MODE_AND_LEVERAGE = "MARGIN_MODE_AND_LEVERAGE"
+    STRATEGY_LEVEL_ALLOCATION = "STRATEGY_LEVEL_ALLOCATION"
+    ACCOUNT_LEVEL_AGGREGATE = "ACCOUNT_LEVEL_AGGREGATE"
+
+
+class ReconciliationAgeFields(BaseModel):
+    """Age-tracking mixin for reconciliation delta rows.
+
+    Populate at row-write time (NEVER at query time — ages would drift). Use
+    via composition or inheritance from existing delta models. The alerting
+    rule ``evaluate_dependency_health`` reads ``unreconciled_age_seconds`` to
+    decide WARN / SEV1 / SEV0 escalation per the 15-min / 30-min thresholds
+    from ``disaster_recovery.md`` §7.
+
+    All datetime fields are tz-aware UTC.
+    """
+
+    first_seen_at: datetime
+    """When this specific reconciliation delta was first observed by the
+    reconciliation engine."""
+
+    last_seen_at: datetime
+    """Most recent observation of this delta (re-observed if it persists
+    across reconciliation cycles)."""
+
+    event_time: datetime | None = None
+    """The event time the delta is about (may be earlier than first_seen_at
+    if the engine catches up after a delay)."""
+
+    venue_trade_time: datetime | None = None
+    """The venue-reported trade/event time, for delta scope linked to a
+    specific venue event."""
+
+    internal_trade_time: datetime | None = None
+    """The internal-system trade/event time."""
+
+    last_successful_reconciliation_at: datetime | None = None
+    """The most recent timestamp at which this dimension fully reconciled
+    (used to compute "time since last green")."""
+
+    unreconciled_age_seconds: int
+    """Computed at write time as ``int((last_seen_at - first_seen_at).total_seconds())``.
+    NOT computed at query time to avoid drift."""
+
+    oldest_unreconciled_trade_age_seconds: int | None = None
+    """Among unreconciled trades in this dimension, the oldest's age."""
+
+    oldest_unreconciled_order_age_seconds: int | None = None
+
+    oldest_unreconciled_position_age_seconds: int | None = None
+
+
 __all__ = [
     "AutoReconcileReason",
     "BalanceReconciliationSnapshot",
@@ -214,5 +289,7 @@ __all__ = [
     "DeviationType",
     "PnLReconciliationSnapshot",
     "ReconciliationAction",
+    "ReconciliationAgeFields",
+    "ReconciliationDimension",
     "ReconciliationResolution",
 ]

@@ -128,3 +128,14 @@ from .registry.risk_rules import (
     get_rules_for,
     iter_applicable_rules,
 )
+
+# Per-strategy drawdown + response-policy schemas (added 2026-05-23).
+# Implementation plan:
+# ``plans/active/drawdown_liquidation_policy_and_strategy_risk_config_2026_05_23.md``.
+from .canonical.crosscutting.risk import (
+    DrawdownThresholdKind,
+    ExpectedDrawdownModel,
+    ExpectedDrawdownModelBasis,
+    ResponsePolicy,
+    RiskThresholds,
+)
