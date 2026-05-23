@@ -111,6 +111,27 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/canonical/domain/__init__.py"
     # === REMAINING REGISTRY FILES (1 file) ===
     "./unified_api_contracts/registry/__init__.py"
+    # === CROSSCUTTING CONFIGS AND RULES (4 files - legitimate comprehensive configs) ===
+    "./unified_api_contracts/canonical/crosscutting/alerting/thresholds.py"
+    "./unified_api_contracts/canonical/crosscutting/instruments_preflight_dag.py"
+    "./unified_api_contracts/canonical/crosscutting/source_priority.py"
+    # === DOMAIN MODELS (6 files - legitimate comprehensive domain definitions) ===
+    "./unified_api_contracts/canonical/domain/derivatives/tradfi_roots.py"
+    "./unified_api_contracts/canonical/domain/position/__init__.py"
+    "./unified_api_contracts/canonical/domain/features/required_inputs.py"
+    "./unified_api_contracts/internal/domain/execution_service/types.py"
+    "./unified_api_contracts/internal/domain/strategy_service/pnl.py"
+    "./unified_api_contracts/internal/domain/risk_service/risk.py"
+    "./unified_api_contracts/internal/domain/instruments/_instruments_parquet_schema.py"
+    "./unified_api_contracts/internal/domain/treasury.py"
+    "./unified_api_contracts/internal/domain/defi/wallet_config.py"
+    # === ARCHITECTURE V2 MODELS (3 files - comprehensive strategy architecture definitions) ===
+    "./unified_api_contracts/internal/architecture_v2/derivation.py"
+    "./unified_api_contracts/internal/architecture_v2/backtest_scenarios.py"
+    "./unified_api_contracts/internal/architecture_v2/schemas.py"
+    # === REFERENCE DATA (2 files - comprehensive reference utilities) ===
+    "./unified_api_contracts/internal/reference/canonical_id_builder.py"
+    "./unified_api_contracts/internal/reference/ticker_registry.py"
 )
 # UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
 # sources; the default 300s budget is too tight. 600s accommodates the combined surface
