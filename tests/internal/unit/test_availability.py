@@ -243,6 +243,7 @@ class TestCombinedFilters:
                 InstrumentType.FUTURE,
                 available_from=_utc(2025, 3, 28),
                 available_to=_utc(2025, 6, 27),
+                expiry=_utc(2025, 6, 27),
             ),
             _make(
                 "BYBIT:PERPETUAL:BTCUSDT",
