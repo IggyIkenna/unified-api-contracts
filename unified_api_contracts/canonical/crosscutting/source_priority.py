@@ -355,6 +355,8 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
     "solana_rpc": 60_000,  # 1 min: Solana RPC getInflationRate/getEpochInfo polling
     "helius_rpc": 60_000,  # 1 min: Helius APY aggregation endpoint polling
+    # Sports odds-horizon bucket — GCS batch writes by mdps-sports VM.
+    "mdps_odds_horizon_bucket": 3_600_000,  # 1h: conservative batch-write cadence (VM-driven)
     # Sports batch-data provider (deferred multi-source merge candidate).
     "footystats": 3_600_000,  # 1h: Footystats batch publication cadence
     # Historical preload archive — daily publication delay.
