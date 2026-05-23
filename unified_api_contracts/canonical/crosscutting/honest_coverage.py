@@ -466,6 +466,25 @@ class RecordFailedReason(StrEnum):
     when MTDS auto-backfills the window on ``CONNECTIVITY_RECOVERED``.
     SSOT: ``plans/active/mdps_streaming_and_backpressure_2026_05_07.md`` § item 524."""
 
+    INCOMPLETE_PAYLOAD_PRE_FLATTENING = "INCOMPLETE_PAYLOAD_PRE_FLATTENING"
+    """Historical shard written before the normalizer flattened nested sub-objects.
+    The parquet exists but carries only stub pass-through columns (e.g. ``**raw``),
+    not the per-row, per-entity columns the current schema declares.
+
+    Migration shape (B.1 / C.4): flip manifest row to ``attempted_failed`` with this
+    reason, delete the thin parquet, then re-fetch via a dedicated backfill VM so the
+    normalizer writes the full flattened schema.
+
+    Applies to:
+    * instruments-service AF FIXTURE_STATS / FIXTURE_EVENTS / FIXTURE_LINEUPS / INJURIES
+      (B.1 — flattening added UAC@c76e6d0)
+    * instruments-service STANDINGS (Follow-up #1 — flattening added UAC@ac12d80)
+    * instruments-service PLAYER_VALUES (C.4 — per-player flatten added UAC@3b29f7e)
+
+    Downstream: callers SHOULD NOT attempt to join on per-entity columns; re-fetch
+    is the only unblock. Re-fetch VMs should emit ``captured`` once the flat schema lands.
+    Plan: ``plans/epics/sports_master.md`` § B.1."""
+
     UPSTREAM_LEG_FAILED = "UPSTREAM_LEG_FAILED"
     """Cross-instrument paired calc: one or both legs had ``attempted_failed`` status in the
     availability manifest for this date. The pairing cannot proceed — the failure propagates
