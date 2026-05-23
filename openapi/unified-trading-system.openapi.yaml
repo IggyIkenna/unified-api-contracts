@@ -9190,7 +9190,7 @@ paths:
       description: "Run pre-trade compliance checks against risk limits.
 
 
-        Simulates strategy-service PreTradeCheckEngine:
+        Simulates risk-and-exposure-service PreTradeCheckEngine:
 
         6 checks (position limit, exposure limit, capital limit, leverage limit,
 
@@ -15960,10 +15960,10 @@ paths:
                 title: Response Get Active Transfers Transfers Active Get
       tags:
         - execution-service
-  /strategy-service/health:
+  /risk-and-exposure-service/health:
     get:
       tags:
-        - strategy-service
+        - risk-and-exposure-service
         - health
       summary: Health
       operationId: health_health_get
@@ -15973,10 +15973,10 @@ paths:
           content:
             application/json:
               schema: {}
-  /strategy-service/readiness:
+  /risk-and-exposure-service/readiness:
     get:
       tags:
-        - strategy-service
+        - risk-and-exposure-service
         - health
       summary: Readiness
       operationId: readiness_readiness_get
@@ -15986,17 +15986,17 @@ paths:
           content:
             application/json:
               schema: {}
-  /strategy-service/stream/risk_alerts:
+  /risk-and-exposure-service/stream/risk_alerts:
     get:
       tags:
-        - strategy-service
+        - risk-and-exposure-service
         - sse
       summary: Stream
       operationId: stream_stream_risk_alerts_get
       responses:
         "200":
           description: Successful Response
-  /strategy-service/:
+  /risk-and-exposure-service/:
     get:
       summary: Root
       description: Service info.
@@ -16012,8 +16012,8 @@ paths:
                 type: object
                 title: Response Root  Get
       tags:
-        - strategy-service
-  /strategy-service/pre-trade-check:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/pre-trade-check:
     post:
       summary: Pre Trade Check
       description: Run pre-trade risk checks.
@@ -16055,8 +16055,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/exposure/summary:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/exposure/summary:
     get:
       summary: Exposure Summary
       description: Get exposure summary for client.
@@ -16084,8 +16084,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/exposure/by-venue:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/exposure/by-venue:
     get:
       summary: Exposure By Venue
       description: Get exposure by venue.
@@ -16113,8 +16113,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/exposure/by-instrument:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/exposure/by-instrument:
     get:
       summary: Exposure By Instrument
       description: Get exposure by instrument.
@@ -16142,8 +16142,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/risk-limits/{client_id}:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/risk-limits/{client_id}:
     get:
       summary: Get Risk Limits
       description: Get risk limits for client.
@@ -16169,8 +16169,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/risk-limits:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/risk-limits:
     post:
       summary: Save Risk Limits
       description: Save risk limits.
@@ -16215,7 +16215,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
+        - risk-and-exposure-service
     get:
       summary: List Risk Limits Clients
       description: List client IDs with risk limits.
@@ -16233,8 +16233,8 @@ paths:
                     type: string
                 title: Response List Risk Limits Clients Risk Limits Get
       tags:
-        - strategy-service
-  /strategy-service/risk/var:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/risk/var:
     get:
       summary: Get Var
       description:
@@ -16311,8 +16311,8 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/risk/strategy-status:
+        - risk-and-exposure-service
+  /risk-and-exposure-service/risk/strategy-status:
     post:
       summary: Strategy Risk Status
       description:
@@ -16374,11 +16374,37 @@ paths:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
       tags:
-        - strategy-service
-  /strategy-service/reconciliation/deviations:
+        - risk-and-exposure-service
+  /position-balance-monitor-service/health:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
+        - health
+      summary: Health
+      operationId: health_health_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /position-balance-monitor-service/readiness:
+    get:
+      tags:
+        - position-balance-monitor-service
+        - health
+      summary: Readiness
+      operationId: readiness_readiness_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /position-balance-monitor-service/reconciliation/deviations:
+    get:
+      tags:
+        - position-balance-monitor-service
         - reconciliation
       summary: List Deviations
       description: List active deviations with optional status filter.
@@ -16409,10 +16435,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/reconciliation/balances:
+  /position-balance-monitor-service/reconciliation/balances:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: List Balance Snapshots
       description: List recent balance reconciliation snapshots.
@@ -16443,10 +16469,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/reconciliation/pnl:
+  /position-balance-monitor-service/reconciliation/pnl:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: List Pnl Snapshots
       description: List recent PnL reconciliation snapshots with component breakdown.
@@ -16477,10 +16503,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/reconciliation/summary:
+  /position-balance-monitor-service/reconciliation/summary:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Reconciliation Summary
       description: Get aggregate reconciliation statistics.
@@ -16492,10 +16518,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ReconciliationSummaryResponse"
-  /strategy-service/reconciliation/resolve:
+  /position-balance-monitor-service/reconciliation/resolve:
     post:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Resolve Deviation
       description: Resolve a deviation (accept/reject/investigate).
@@ -16519,10 +16545,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/reconciliation/auto-recon/history:
+  /position-balance-monitor-service/reconciliation/auto-recon/history:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Auto Recon History
       description: List auto-reconciled deviations with reasons.
@@ -16540,10 +16566,10 @@ paths:
                 title:
                   Response Auto Recon History Reconciliation Auto Recon History
                   Get
-  /strategy-service/reconciliation/snapshots/history:
+  /position-balance-monitor-service/reconciliation/snapshots/history:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Reconciliation Snapshot History
       description:
@@ -16652,10 +16678,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/nav-snapshot/trigger:
+  /position-balance-monitor-service/nav-snapshot/trigger:
     post:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - nav-snapshot
       summary: Trigger Nav Snapshot
       description: Build and deliver a NAV snapshot immediately.
@@ -16670,10 +16696,10 @@ paths:
                   type: string
                 type: object
                 title: Response Trigger Nav Snapshot Nav Snapshot Trigger Post
-  /strategy-service/nav-snapshot/preview:
+  /position-balance-monitor-service/nav-snapshot/preview:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - nav-snapshot
       summary: Preview Nav Snapshot
       description: Build a NAV snapshot without delivering (dry run).
@@ -16685,10 +16711,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/FundNAVSnapshot"
-  /strategy-service/risk/summary:
+  /position-balance-monitor-service/risk/summary:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - risk
       summary: Get Risk Summary
       description:
@@ -16700,7 +16726,7 @@ paths:
 
         factor when lending positions are available. For full risk metrics (VaR,
 
-        stress testing, pre-trade checks), query strategy-service."
+        stress testing, pre-trade checks), query risk-and-exposure-service."
       operationId: get_risk_summary_risk_summary_get
       parameters:
         - name: client_id
@@ -16727,10 +16753,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/risk/defi-health:
+  /position-balance-monitor-service/risk/defi-health:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - risk
       summary: Get Defi Health
       description:
@@ -16764,10 +16790,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/trades:
+  /position-balance-monitor-service/trades:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - trades
       summary: List Trades
       description: "Query trade/fill history with filtering and pagination.
@@ -16876,10 +16902,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/trades/count:
+  /position-balance-monitor-service/trades/count:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - trades
       summary: Trade Count
       description: Count fills matching the given filters.
@@ -16935,10 +16961,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/trades/summary:
+  /position-balance-monitor-service/trades/summary:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - trades
       summary: Trade Summary
       description: Aggregate trade activity for a period (trade count, volume, fees).
@@ -16981,10 +17007,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/trades/{fill_id}:
+  /position-balance-monitor-service/trades/{fill_id}:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - trades
       summary: Get Trade
       description: Get a single fill by fill_id.
@@ -17011,10 +17037,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/reconciliation/drift/portfolio-snapshot:
+  /position-balance-monitor-service/reconciliation/drift/portfolio-snapshot:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Get Portfolio Snapshot
       description: "Get the latest portfolio reconciliation snapshot.
@@ -17041,10 +17067,10 @@ paths:
                 title:
                   Response Get Portfolio Snapshot Reconciliation Drift Portfolio
                   Snapshot Get
-  /strategy-service/reconciliation/drift/history:
+  /position-balance-monitor-service/reconciliation/drift/history:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Get Drift History
       description: "Get recent drift metric snapshots for charting.
@@ -17079,10 +17105,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/reconciliation/drift/evaluate:
+  /position-balance-monitor-service/reconciliation/drift/evaluate:
     post:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - reconciliation
       summary: Evaluate Drift
       description: "Trigger an immediate drift evaluation (manual refresh).
@@ -17101,10 +17127,10 @@ paths:
                 additionalProperties: true
                 type: object
                 title: Response Evaluate Drift Reconciliation Drift Evaluate Post
-  /strategy-service/treasury/balance:
+  /position-balance-monitor-service/treasury/balance:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - treasury
       summary: Get Treasury Balance
       description: 'Get current treasury balance and status.
@@ -17149,10 +17175,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/treasury/balance/history:
+  /position-balance-monitor-service/treasury/balance/history:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - treasury
       summary: Get Treasury History
       description: "Get historical treasury snapshots.
@@ -17187,10 +17213,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HTTPValidationError"
-  /strategy-service/treasury/config:
+  /position-balance-monitor-service/treasury/config:
     get:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - treasury
       summary: Get Treasury Config
       description: Get current treasury monitoring configuration.
@@ -17204,10 +17230,10 @@ paths:
                 additionalProperties: true
                 type: object
                 title: Response Get Treasury Config Treasury Config Get
-  /strategy-service/treasury/evaluate:
+  /position-balance-monitor-service/treasury/evaluate:
     post:
       tags:
-        - strategy-service
+        - position-balance-monitor-service
         - treasury
       summary: Evaluate Treasury
       description: "Manually trigger treasury evaluation with provided balance.
@@ -18479,6 +18505,58 @@ paths:
     get:
       tags:
         - market-tick-data-service
+        - health
+      summary: Readiness
+      operationId: readiness_readiness_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /pnl-attribution-service/health:
+    get:
+      tags:
+        - pnl-attribution-service
+        - health
+      summary: Health
+      operationId: health_health_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /pnl-attribution-service/readiness:
+    get:
+      tags:
+        - pnl-attribution-service
+        - health
+      summary: Readiness
+      operationId: readiness_readiness_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /strategy-service/health:
+    get:
+      tags:
+        - strategy-service
+        - health
+      summary: Health
+      operationId: health_health_get
+      responses:
+        "200":
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /strategy-service/readiness:
+    get:
+      tags:
+        - strategy-service
         - health
       summary: Readiness
       operationId: readiness_readiness_get
@@ -21553,7 +21631,7 @@ components:
           type: string
           title: Source Service
           description: Service that produced this snapshot
-          default: strategy-service
+          default: position-balance-monitor-service
         reconciliation_status:
           type: string
           title: Reconciliation Status
@@ -21569,7 +21647,7 @@ components:
       description: "NAV snapshot payload pushed to external operations partners.
 
 
-        This is the contract between Odum's strategy-service and
+        This is the contract between Odum's position-balance-monitor-service and
 
         external operations partners (e.g. POD/Elysium). At each NAV cut-off point,
 
@@ -22403,16 +22481,16 @@ tags:
     description: alerting-service
   - name: execution-service
     description: Execution Services API
-  - name: strategy-service
-    description: strategy-service
-  - name: strategy-service
-    description: strategy-service
+  - name: risk-and-exposure-service
+    description: risk-and-exposure-service
+  - name: position-balance-monitor-service
+    description: position-balance-monitor-service
   - name: deployment-service
     description: Deployment Service API
   - name: market-tick-data-service
     description: market-tick-data-service
-  - name: strategy-service
-    description: strategy-service
+  - name: pnl-attribution-service
+    description: pnl-attribution-service
   - name: strategy-service
     description: strategy-service
   - name: instruments-service

@@ -9,7 +9,7 @@ Per ``wallet_treasury_client_flow_2026_05_10.md`` Phase 1.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import datetime
 from decimal import Decimal
 from enum import StrEnum
 
@@ -93,7 +93,7 @@ class ClientApiKeyMaterial:
     label: str = ""
     """Human-readable label (e.g., 'production', 'staging')."""
 
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    created_at: datetime = field(default_factory=datetime.utcnow)
     """Creation timestamp."""
 
     expires_at: datetime | None = None
@@ -108,7 +108,7 @@ class ClientRiskPreferences:
     """Per-client risk profile + constraints.
 
     Drives per-archetype position limits + leverage caps via
-    ``strategy-service/risk`` integration. Per ``risk_simulations_limits_alerting_2026_05_10.md``
+    ``risk-and-exposure-service`` integration. Per ``risk_simulations_limits_alerting_2026_05_10.md``
     Phase 2.
     """
 
@@ -156,7 +156,7 @@ class ClientShareClassSubscription:
     max_drawdown_for_suspension_pct: Decimal = Decimal("15")
     """Archetype-specific drawdown gate (may tighten the global setting)."""
 
-    subscribed_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    subscribed_at: datetime = field(default_factory=datetime.utcnow)
     """Subscription timestamp."""
 
     suspended_at: datetime | None = None

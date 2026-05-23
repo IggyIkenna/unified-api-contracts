@@ -18,7 +18,7 @@ reconciliation seam (Framing 1)" — picked by operator 2026-05-10. Each
 ``RiskRule`` here is evaluated at Layer 2 of the risk-gates model and composes
 with the 5 canonical SSOTs:
 
-* **Risk-gates 4 layers** — Layer 2 (strategy-service/risk, pre-flight). UTL
+* **Risk-gates 4 layers** — Layer 2 (risk-and-exposure-service pre-flight). UTL
   ``risk/rule_evaluator.py`` (Phase 3.A) dispatches on
   ``trigger.trigger_type``.
 * **8-event lifecycle SSOT** — every fire emits ``RiskRuleFiredEvent`` (per

@@ -284,51 +284,6 @@ DEFI_STABLECOIN_DEPEG = ScenarioOverlay(
 )
 
 
-# ---------------------------------------------------------------------------
-# defi_lst_depeg_steth_5pct — LST/ETH peg break (5% below par)
-# ---------------------------------------------------------------------------
-
-DEFI_LST_DEPEG_STETH_5PCT = ScenarioOverlay(
-    scenario_id="defi_lst_depeg_steth_5pct",
-    category=ScenarioCategory.PRICE_SHOCK,
-    layer=ScenarioOverlayLayer.RAW_TICK,
-    asset_groups=frozenset({"defi"}),
-    applies_to=ScenarioApplicabilityFilter(
-        instruments=frozenset({"stETH", "wstETH", "rETH", "cbETH", "JitoSOL", "mSOL"}),
-        chains=frozenset({"ethereum", "solana"}),
-        archetypes=frozenset({"carry_staked_basis"}),
-    ),
-    mutation_spec=PriceShift(
-        target_value_bps=Decimal("-500"),
-        baseline_bps=Decimal("0"),
-        duration_seconds=3600,
-        recovery_curve="exponential_decay",
-    ),
-    expected_outcomes=(
-        ScenarioOutcomeAssertion(
-            archetype="carry_staked_basis",
-            category=OutcomeCategory.RISK_BREAKER_TRIPPED,
-            consequence=RiskRuleConsequence.BLOCK,
-            breaker_id=CircuitBreakerId.LST_DEPEG_MODERATE,
-            breaker_action=BreakerAction.CANCEL_OPEN,
-            alert_codes=frozenset({AlertCode.CIRCUIT_BREAKER_OPEN}),
-            expected_within_seconds=30,
-        ),
-    ),
-    description=(
-        "LST/ETH peg break: stETH/wstETH (and rETH/cbETH/JitoSOL/mSOL by parametrisation) "
-        "priced 5% below ETH par. LST_DEPEG_MODERATE breaker (>=500bps) fires CANCEL_OPEN "
-        "within 30s (D.2 ladder calibration). Prior to the LST depeg ladder, this scenario "
-        "routed via the generic DRAWDOWN_DAILY_BPS breaker."
-    ),
-    real_world_referent=(
-        "stETH 2022-06 Celsius/3AC redemption freeze ($0.9377 min vs ETH); "
-        "rETH 2024-04 Pendle rebalancing; JitoSOL/mSOL Solana validator slashing events."
-    ),
-    composes_with=frozenset({"defi_oracle_deviation_30sigma", "defi_liquidity_drain_lending_pool"}),
-)
-
-
 SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     DEFI_CHAIN_RPC_OUTAGE_SOLANA,
     DEFI_LIQUIDITY_DRAIN_LENDING_POOL,
@@ -336,7 +291,6 @@ SCENARIOS: Final[tuple[ScenarioOverlay, ...]] = (
     DEFI_GAS_SURGE_50X,
     DEFI_MEMPOOL_CONGESTION_INCLUSION_DELAY,
     DEFI_STABLECOIN_DEPEG,
-    DEFI_LST_DEPEG_STETH_5PCT,
 )
 
 for _scenario in SCENARIOS:

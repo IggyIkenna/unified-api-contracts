@@ -382,7 +382,7 @@ def candidate_parquet_paths(
         include_legacy_archive = bool(kwargs.get("include_legacy_archive", False))
         return sports_candidates(
             data_type=data_type,
-            day=day.strftime("%Y-%m-%d"),
+            day=day.strftime("%Y-%m-%d") if isinstance(day, _dt.date) else str(day),
             league_id=league_id,
             include_legacy_archive=include_legacy_archive,
             pipeline_mode=pipeline_mode,

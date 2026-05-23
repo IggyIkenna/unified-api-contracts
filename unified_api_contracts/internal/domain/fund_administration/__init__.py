@@ -10,7 +10,7 @@ These types are consumed by:
 - fund-administration-service (subscription/redemption state machines,
   capital-routing orchestrator)
 - client-reporting-api (allocator-facing subscription/redemption history)
-- strategy-service/position (target_allocations delta computation)
+- position-balance-monitor-service (target_allocations delta computation)
 - UTL lifecycle events (SUBSCRIPTION_* / REDEMPTION_* / FUND_ALLOCATION_REBALANCED)
 
 Scope is **IM Pooled ONLY**. SMA / DART / Reg Umbrella clients hold their

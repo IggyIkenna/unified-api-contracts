@@ -37,54 +37,6 @@ from ...canonical.crosscutting.circuit_breaker import (
 _STANDARD_STABLES: Final[tuple[str, ...]] = ("USDC", "USDT", "DAI", "GHO", "SUSDE")
 _SYNTHETIC_STABLES: Final[tuple[str, ...]] = ("USDE", "CRVUSD", "FRAX")
 
-# ── LST depeg ladder helpers (D.2 — risk plan Phase D) ──────────────────────
-
-_LST_SYMBOLS: Final[tuple[str, ...]] = ("stETH", "wstETH", "rETH", "cbETH", "JitoSOL", "mSOL")
-
-# (breaker_id, threshold_bps, action, severity, cooldown_seconds, recovery_mode_override)
-# 500bps = MODERATE/CANCEL_OPEN mirrors the defi_lst_depeg_steth_5pct scenario.
-# 1500bps = CATASTROPHIC/KILL_ALL for extreme events (mass slashing + redemption freeze).
-_LST_DEPEG_TIERS: Final[
-    tuple[tuple[CircuitBreakerId, int, BreakerAction, AlertSeverity, int | None, BreakerRecoveryMode | None], ...]
-] = (
-    (CircuitBreakerId.LST_DEPEG_WARNING, 100, BreakerAction.BLOCK_NEW, AlertSeverity.WARN, 600, None),
-    (CircuitBreakerId.LST_DEPEG_SMALL, 300, BreakerAction.SCALE_DOWN, AlertSeverity.HIGH, 900, None),
-    (
-        CircuitBreakerId.LST_DEPEG_MODERATE,
-        500,
-        BreakerAction.CANCEL_OPEN,
-        AlertSeverity.HIGH,
-        1800,
-        BreakerRecoveryMode.AUTO_COOLDOWN,
-    ),
-    (CircuitBreakerId.LST_DEPEG_CATASTROPHIC, 1500, BreakerAction.KILL_ALL, AlertSeverity.CRITICAL, None, None),
-)
-
-
-def _lst_depeg_configs() -> tuple[BreakerConfig, ...]:
-    configs: list[BreakerConfig] = []
-    for lst in _LST_SYMBOLS:
-        for breaker_id, threshold_bps, action, severity, cooldown, recovery_override in _LST_DEPEG_TIERS:
-            configs.append(
-                BreakerConfig(
-                    breaker_id=breaker_id,
-                    scope=BreakerScope.PER_LST,
-                    applies_to=lst,
-                    trigger=BreakerTrigger(
-                        trigger_type=breaker_id,
-                        threshold_value=Decimal(str(threshold_bps)),
-                        threshold_unit=ThresholdUnit.BPS_OF_ONE,
-                    ),
-                    action=action,
-                    cooldown_seconds=cooldown,
-                    recovery_mode=recovery_override,
-                    alerting_severity=severity,
-                    description=f"{lst} LST/ETH peg deviation >= {threshold_bps}bps.",
-                )
-            )
-    return tuple(configs)
-
-
 # (breaker_id, base_bps, action, severity, cooldown_seconds, recovery_mode_override)
 # STABLECOIN_DEPEG_MODERATE uses CANCEL_OPEN with explicit AUTO_COOLDOWN override —
 # CANCEL_OPEN defaults to MANUAL_UNKILL per BREAKER_RECOVERY_DEFAULTS but 500bps
@@ -317,7 +269,6 @@ BREAKERS: Final[tuple[BreakerConfig, ...]] = (
         ),
     ),
     *_depeg_configs(),
-    *_lst_depeg_configs(),
 )
 
 RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
@@ -414,30 +365,6 @@ RECOVERY_RULES: Final[tuple[BreakerRecoveryRule, ...]] = (
     BreakerRecoveryRule(
         breaker_id=CircuitBreakerId.STABLECOIN_DEPEG_CATASTROPHIC,
         guard_description="Operator confirms stable peg restored + all positions crystallized.",
-        retry_policy="none",
-        auto_disarm_after_seconds=None,
-    ),
-    BreakerRecoveryRule(
-        breaker_id=CircuitBreakerId.LST_DEPEG_WARNING,
-        guard_description="LST/ETH peg-monitor shows < 30bps deviation for 10min.",
-        retry_policy="exponential",
-        auto_disarm_after_seconds=600,
-    ),
-    BreakerRecoveryRule(
-        breaker_id=CircuitBreakerId.LST_DEPEG_SMALL,
-        guard_description="LST/ETH peg-monitor shows < 100bps deviation for 15min.",
-        retry_policy="exponential",
-        auto_disarm_after_seconds=900,
-    ),
-    BreakerRecoveryRule(
-        breaker_id=CircuitBreakerId.LST_DEPEG_MODERATE,
-        guard_description="LST/ETH peg-monitor shows < 200bps deviation for 30min.",
-        retry_policy="linear",
-        auto_disarm_after_seconds=1800,
-    ),
-    BreakerRecoveryRule(
-        breaker_id=CircuitBreakerId.LST_DEPEG_CATASTROPHIC,
-        guard_description="Operator confirms LST/ETH peg restored + all leveraged positions crystallized.",
         retry_policy="none",
         auto_disarm_after_seconds=None,
     ),

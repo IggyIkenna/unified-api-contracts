@@ -133,7 +133,7 @@ def clip_dates_to_trading_days(venue: str, start: str, end: str) -> list[str]:
     all_dates = pd.date_range(start, end, freq="D")
     if _venue_excludes_weekends_holidays(venue):
         all_dates = all_dates[all_dates.weekday < 5]
-        date_strs: list[str] = all_dates.strftime("%Y-%m-%d").tolist()
+        date_strs = all_dates.strftime("%Y-%m-%d")
         return [d for d in date_strs if d not in US_MARKET_HOLIDAYS]
     return [d.strftime("%Y-%m-%d") for d in all_dates]
 

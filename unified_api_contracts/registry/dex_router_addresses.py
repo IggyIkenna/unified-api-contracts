@@ -73,33 +73,9 @@ def get_uniswap_v3_factory(chain: str) -> str | None:
     return UNISWAP_V3_FACTORY_BY_CHAIN.get(chain.upper())
 
 
-# Uniswap V3 QuoterV2 addresses, keyed by chain name (uppercase).
-# QuoterV2 is the on-chain quote contract for Uniswap V3 (replaces the original
-# Quoter). Used by execution-service UniswapConnector for off-chain quote lookups.
-# Only chains confirmed from deployment docs are populated; consumers must handle
-# None (chain not yet verified).
-UNISWAP_QUOTER_V2_BY_CHAIN: Final[dict[str, str]] = {
-    "ETHEREUM": "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
-}
-
-
-def get_uniswap_quoter_v2(chain: str) -> str | None:
-    """Return the Uniswap V3 QuoterV2 address for a chain.
-
-    Args:
-        chain: Chain name (case-insensitive; canonicalised internally).
-
-    Returns:
-        EIP-55 checksummed address or None if chain not supported.
-    """
-    return UNISWAP_QUOTER_V2_BY_CHAIN.get(chain.upper())
-
-
 __all__ = [
-    "UNISWAP_QUOTER_V2_BY_CHAIN",
     "UNISWAP_SWAP_ROUTER_BY_CHAIN",
     "UNISWAP_V3_FACTORY_BY_CHAIN",
-    "get_uniswap_quoter_v2",
     "get_uniswap_swap_router",
     "get_uniswap_v3_factory",
 ]

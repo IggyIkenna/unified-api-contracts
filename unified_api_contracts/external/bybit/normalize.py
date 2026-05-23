@@ -24,8 +24,8 @@ from ...canonical.domain import (
     WebSocketEvent,
 )
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder, OrderSide, OrderStatus, OrderType
-from ...normalize_utils._helpers import d, to_decimal, to_levels, ts_ms_to_datetime
-from ...normalize_utils.market_state import normalize_bybit_market_state
+from ...normalize_utils._helpers import _d, _to_decimal, _to_levels, _ts_ms_to_datetime
+from ...normalize_utils.market_state import _BYBIT_STATE_MAP, normalize_market_state
 from ..bybit.schemas import (
     BybitExecutionWS,
     BybitFeeRate,
@@ -98,15 +98,15 @@ def normalize_bybit_ticker(
     ts = datetime.now(UTC)
     t_ts = raw.info.get("ts") if raw.info else None
     if isinstance(t_ts, (int, float)):
-        ts = ts_ms_to_datetime(int(t_ts))
+        ts = _ts_ms_to_datetime(int(t_ts))
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=to_decimal(raw.lastPrice) or Decimal("0"),
-        bid_price=to_decimal(raw.bid1Price),
-        ask_price=to_decimal(raw.ask1Price),
-        volume_24h=to_decimal(raw.volume24h),
+        last_price=_to_decimal(raw.lastPrice) or Decimal("0"),
+        bid_price=_to_decimal(raw.bid1Price),
+        ask_price=_to_decimal(raw.ask1Price),
+        volume_24h=_to_decimal(raw.volume24h),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,
@@ -126,8 +126,8 @@ def normalize_bybit_orderbook(
     """Convert BybitOrderBook to CanonicalOrderBook."""
     ts = datetime.fromtimestamp(raw.ts / 1000.0, tz=UTC) if raw.ts is not None else datetime.now(UTC)
     sym = symbol or (raw.s or "")
-    bids = to_levels(raw.b)
-    asks = to_levels(raw.a)
+    bids = _to_levels(raw.b)
+    asks = _to_levels(raw.a)
     return CanonicalOrderBook(
         venue=venue,
         symbol=sym,
@@ -192,7 +192,7 @@ def normalize_bybit_order(raw: BybitOrder, venue: str = "bybit") -> CanonicalOrd
 
 
 def normalize_bybit_fill(raw: BybitExecutionWS, venue: str = "bybit") -> CanonicalFill:
-    ts = ts_ms_to_datetime(raw.execTime)
+    ts = _ts_ms_to_datetime(raw.execTime)
     symbol = raw.symbol or ""
     return CanonicalFill(
         fill_id=str(raw.execId),
@@ -223,7 +223,7 @@ def normalize_bybit_derivative_ticker(
     """Normalize Bybit ticker (+ optional funding history) to CanonicalDerivativeTicker."""
     symbol = raw.symbol or ""
     ik = instrument_key or f"{venue}:PERPETUAL:{symbol}"
-    last_price = to_decimal(raw.lastPrice)
+    last_price = _to_decimal(raw.lastPrice)
     info: dict[str, object] = raw.info or {}
 
     def _ms_to_utc(ts_ms: object | None) -> datetime | None:
@@ -237,17 +237,13 @@ def normalize_bybit_derivative_ticker(
         except (ValueError, TypeError, OSError):
             return None
 
-    mark_price = to_decimal(str(info.get("markPrice")) if info.get("markPrice") is not None else None)
-    index_price = to_decimal(str(info.get("indexPrice")) if info.get("indexPrice") is not None else None)
-    funding_rate_val = to_decimal(str(info.get("fundingRate")) if info.get("fundingRate") is not None else None)
+    mark_price = _to_decimal(info.get("markPrice"))
+    index_price = _to_decimal(info.get("indexPrice"))
+    funding_rate_val = _to_decimal(info.get("fundingRate"))
     next_funding_ts = _ms_to_utc(str(info["nextFundingTime"]) if info.get("nextFundingTime") else None)
-    open_interest = to_decimal(str(info.get("openInterest")) if info.get("openInterest") is not None else None)
-    open_interest_value = to_decimal(
-        str(info.get("openInterestValue")) if info.get("openInterestValue") is not None else None
-    )
-    predicted_funding = to_decimal(
-        str(info.get("predictedFundingRate")) if info.get("predictedFundingRate") is not None else None
-    )
+    open_interest = _to_decimal(info.get("openInterest"))
+    open_interest_value = _to_decimal(info.get("openInterestValue"))
+    predicted_funding = _to_decimal(info.get("predictedFundingRate"))
 
     ts_raw = info.get("ts")
     timestamp: datetime = (
@@ -257,7 +253,7 @@ def normalize_bybit_derivative_ticker(
     funding_timestamp: datetime | None = None
     if funding is not None:
         if funding.fundingRate is not None:
-            funding_rate_val = to_decimal(funding.fundingRate)
+            funding_rate_val = _to_decimal(funding.fundingRate)
         if funding.fundingRateTimestamp is not None:
             funding_timestamp = _ms_to_utc(funding.fundingRateTimestamp)
 
@@ -285,16 +281,16 @@ def normalize_bybit_derivative_ticker(
 def normalize_bybit_kline(raw: BybitKline, symbol: str, venue: str = "bybit") -> CanonicalOhlcvBar:
     """Convert BybitKline to CanonicalOhlcvBar."""
     ts = datetime.fromtimestamp(int(raw.startTime) / 1000.0, tz=UTC)
-    quote_vol = d(raw.turnover) if raw.turnover is not None else None
+    quote_vol = _d(raw.turnover) if raw.turnover is not None else None
     return CanonicalOhlcvBar(
         timestamp=ts,
         venue=venue,
         symbol=symbol,
-        open=d(raw.openPrice),
-        high=d(raw.highPrice),
-        low=d(raw.lowPrice),
-        close=d(raw.closePrice),
-        volume=d(raw.volume),
+        open=_d(raw.openPrice),
+        high=_d(raw.highPrice),
+        low=_d(raw.lowPrice),
+        close=_d(raw.closePrice),
+        volume=_d(raw.volume),
         quote_volume=quote_vol,
         count=None,
         vwap=None,
@@ -410,7 +406,7 @@ def normalize_bybit_liquidation(
 # ---------------------------------------------------------------------------
 
 
-def normalize_bybit_market_state_local(
+def normalize_bybit_market_state(
     status: str,
     symbol: str,
     instrument_type: str = "PERPETUAL",
@@ -420,14 +416,15 @@ def normalize_bybit_market_state_local(
     venue: str = "bybit",
 ) -> CanonicalMarketStateEvent:
     """Normalize a Bybit symbol status to CanonicalMarketStateEvent."""
-    return normalize_bybit_market_state(
-        status=status,
-        symbol=symbol,
-        instrument_type=instrument_type,
+    ik = f"{venue}:{instrument_type}:{symbol}"
+    return normalize_market_state(
+        raw_state=status,
+        venue=venue,
+        instrument_key=ik,
+        state_map=_BYBIT_STATE_MAP,
         previous_state=previous_state,
         reason=reason,
         timestamp=timestamp,
-        venue=venue,
     )
 
 

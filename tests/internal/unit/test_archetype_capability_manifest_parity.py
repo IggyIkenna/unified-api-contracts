@@ -58,15 +58,14 @@ def _find_codex_markdown() -> Path | None:
 
 
 def test_registry_has_eighteen_archetypes() -> None:
-    # Updated 2026-05-22: registry grew from 18 → 22 as new archetypes were added.
-    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 22
-    assert len(all_capabilities()) == 22
+    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 18
+    assert len(all_capabilities()) == 18
 
 
 def test_manifest_archetype_ids_are_valid_strategy_archetype_values() -> None:
     """Each manifest row must use a real :class:`StrategyArchetype` value.
 
-    Committed manifest is intentionally a *partial* map (22 rows as of 2026-05-22);
+    Committed manifest is intentionally a *partial* map (18 rows today);
     full one-row-per-enum is WIP — see :class:`StrategyArchetype` docstring.
     """
     registered = {entry.archetype_id for entry in ARCHETYPE_CAPABILITY_REGISTRY}

@@ -10,15 +10,15 @@ from __future__ import annotations
 
 from unified_api_contracts.canonical.domain.sports.canonical_ids import build_team_id
 
-_sfi_index_cache: dict[str, str] | None = None
+_SFI_INDEX: dict[str, str] | None = None
 
 
 def _sfi_name_index() -> dict[str, str]:
     """Build a case-insensitive index on first access."""
-    global _sfi_index_cache
-    if _sfi_index_cache is None:
-        _sfi_index_cache = {k.lower().strip(): v for k, v in SFI_TEAM_NAME_TO_CANONICAL.items()}
-    return _sfi_index_cache
+    global _SFI_INDEX
+    if _SFI_INDEX is None:
+        _SFI_INDEX = {k.lower().strip(): v for k, v in SFI_TEAM_NAME_TO_CANONICAL.items()}
+    return _SFI_INDEX
 
 
 def resolve_sfi_team(team_name: str) -> str:

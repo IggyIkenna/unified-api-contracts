@@ -325,12 +325,12 @@ def test_per_scenario_in_registry_has_outcomes(scenario_id: str) -> None:
 
 
 def test_per_asset_group_split() -> None:
-    """2 cefi + 7 defi + 2 cross_asset = 11 total."""
+    """2 cefi + 6 defi + 2 cross_asset = 10 total."""
     cefi = [s for s in SCENARIO_REGISTRY.values() if s.scenario_id.startswith("cefi_")]
     defi = [s for s in SCENARIO_REGISTRY.values() if s.scenario_id.startswith("defi_")]
     cross = [s for s in SCENARIO_REGISTRY.values() if s.scenario_id.startswith("cross_asset_")]
     assert len(cefi) == 2
-    assert len(defi) == 7
+    assert len(defi) == 6
     assert len(cross) == 2
 
 

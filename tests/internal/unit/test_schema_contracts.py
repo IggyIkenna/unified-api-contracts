@@ -303,9 +303,6 @@ def test_every_contract_requires_instrument_id_non_nullable_string() -> None:
         if contract.asset_group == "sports":
             # Sports reference/match shards key on league_id, fixture_id, etc.
             continue
-        if contract.data_type == "instrument_catalogue":
-            # Instrument catalogue is keyed by instrument_key, not instrument_id.
-            continue
         id_specs = [c for c in contract.columns if c.name == "instrument_id"]
         assert len(id_specs) == 1, f"{contract.data_type} missing instrument_id spec"
         assert id_specs[0].dtype == "string"

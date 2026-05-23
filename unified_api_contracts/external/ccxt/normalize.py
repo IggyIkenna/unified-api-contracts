@@ -41,22 +41,12 @@ from unified_api_contracts.canonical.domain import (
 from unified_api_contracts.canonical.domain.execution import (
     CanonicalFill,
     CanonicalOrder,
-    OrderSide,
-    OrderStatus,
-    OrderType,
-    TimeInForce,
 )
 from unified_api_contracts.normalize_utils._helpers import (
-    d as _d,
-)
-from unified_api_contracts.normalize_utils._helpers import (
-    to_decimal as _to_decimal,
-)
-from unified_api_contracts.normalize_utils._helpers import (
-    to_levels as _to_levels,
-)
-from unified_api_contracts.normalize_utils._helpers import (
-    ts_ms_to_datetime as _ts_ms_to_datetime,
+    _d,
+    _to_decimal,
+    _to_levels,
+    _ts_ms_to_datetime,
 )
 
 from .schemas import (
@@ -95,13 +85,17 @@ def _ts_ms_to_dt(ts: int | None) -> datetime:
     return datetime.fromtimestamp(ts / 1000.0, tz=UTC)
 
 
-def _normalize_side(s: str | None) -> OrderSide:
+def _normalize_side(s: str | None) -> str:
+    from unified_api_contracts.canonical.domain.execution import OrderSide
+
     if not s:
         return OrderSide.BUY
     return OrderSide.SELL if str(s).lower() in ("sell", "short") else OrderSide.BUY
 
 
-def _normalize_order_type(t: str | None) -> OrderType:
+def _normalize_order_type(t: str | None) -> str:
+    from unified_api_contracts.canonical.domain.execution import OrderType
+
     if not t:
         return OrderType.LIMIT
     t_val = str(t).lower()
@@ -116,7 +110,9 @@ def _normalize_order_type(t: str | None) -> OrderType:
     return OrderType.LIMIT
 
 
-def _normalize_order_status(s: str | None) -> OrderStatus:
+def _normalize_order_status(s: str | None) -> str:
+    from unified_api_contracts.canonical.domain.execution import OrderStatus
+
     if not s:
         return OrderStatus.PENDING
     s_val = str(s).lower()
@@ -135,7 +131,9 @@ def _normalize_order_status(s: str | None) -> OrderStatus:
     return OrderStatus.PENDING
 
 
-def _normalize_tif(tif: str | None) -> TimeInForce:
+def _normalize_tif(tif: str | None) -> str:
+    from unified_api_contracts.canonical.domain.execution import TimeInForce
+
     if not tif:
         return TimeInForce.GTC
     t = str(tif).upper()

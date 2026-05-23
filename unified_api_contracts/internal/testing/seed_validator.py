@@ -21,10 +21,10 @@ import logging
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Final
 
 import pandas as pd
-import pyarrow.parquet as pq  # type: ignore[import-untyped]
+import pyarrow.parquet as pq
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -131,10 +131,8 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
     date_max = ""
 
     try:
-        df: pd.DataFrame = cast(  # pyright: ignore[reportUnknownMemberType]
-            pd.DataFrame,
-            pq.read_table(str(parquet_path)).to_pandas(),  # pyright: ignore[reportUnknownMemberType]
-        )
+        table = pq.read_table(str(parquet_path))
+        df = table.to_pandas()
         row_count = len(df)
 
         if schema_type == "unknown":
@@ -148,46 +146,46 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
 
             # Timestamp checks
             if "timestamp" in df.columns:
-                ts_col: pd.Series[Any] = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
-                null_ts: int = int(ts_col.isna().sum())
+                ts_col = pd.to_datetime(df["timestamp"], utc=True, errors="coerce")
+                null_ts = ts_col.isna().sum()
                 if null_ts > 0:
                     errors.append(f"{null_ts} null/invalid timestamps found")
                 else:
-                    date_min = str(cast(object, ts_col.min()))
-                    date_max = str(cast(object, ts_col.max()))
+                    date_min = str(ts_col.min())
+                    date_max = str(ts_col.max())
 
             # OHLCV-specific: OHLC sanity
             if schema_type == "ohlcv":
                 numeric_cols = ["open", "high", "low", "close", "volume"]
                 for col in numeric_cols:
                     if col in df.columns:
-                        neg_count: int = int((pd.to_numeric(df[col], errors="coerce") <= 0).sum())
+                        neg_count = (pd.to_numeric(df[col], errors="coerce") <= 0).sum()
                         if neg_count > 0:
                             errors.append(f"Column '{col}' has {neg_count} non-positive values")
                 if all(c in df.columns for c in ["open", "high", "low", "close"]):
-                    open_v: pd.Series[Any] = pd.to_numeric(df["open"], errors="coerce")
-                    high_v: pd.Series[Any] = pd.to_numeric(df["high"], errors="coerce")
-                    low_v: pd.Series[Any] = pd.to_numeric(df["low"], errors="coerce")
-                    close_v: pd.Series[Any] = pd.to_numeric(df["close"], errors="coerce")
-                    bad_high: pd.Series[Any] = (high_v < open_v) | (high_v < close_v)
-                    bad_low: pd.Series[Any] = (low_v > open_v) | (low_v > close_v)
-                    hloc_violations: int = int((bad_high | bad_low).sum())
+                    open_v = pd.to_numeric(df["open"], errors="coerce")
+                    high_v = pd.to_numeric(df["high"], errors="coerce")
+                    low_v = pd.to_numeric(df["low"], errors="coerce")
+                    close_v = pd.to_numeric(df["close"], errors="coerce")
+                    bad_high = (high_v < open_v) | (high_v < close_v)
+                    bad_low = (low_v > open_v) | (low_v > close_v)
+                    hloc_violations = (bad_high | bad_low).sum()
                     if hloc_violations > 0:
                         errors.append(f"{hloc_violations} bars violate high >= open/close >= low invariant")
 
             # Tick-specific: side validation
             if schema_type == "tick" and "side" in df.columns:
-                invalid_sides: int = int((~df["side"].isin(["buy", "sell"])).sum())
+                invalid_sides = (~df["side"].isin(["buy", "sell"])).sum()
                 if invalid_sides > 0:
                     errors.append(f"{invalid_sides} rows have invalid 'side' (must be buy or sell)")
 
             # DeFi-specific: APY range
             if schema_type == "defi" and "apy" in df.columns:
-                apy: pd.Series[Any] = pd.to_numeric(df["apy"], errors="coerce")
-                neg_apy: int = int((apy < 0).sum())
+                apy = pd.to_numeric(df["apy"], errors="coerce")
+                neg_apy = (apy < 0).sum()
                 if neg_apy > 0:
                     errors.append(f"{neg_apy} rows have negative APY")
-                high_apy: int = int((apy > 5.0).sum())  # >500% APY is suspicious
+                high_apy = (apy > 5.0).sum()  # >500% APY is suspicious
                 if high_apy > 0 and strict:
                     errors.append(f"{high_apy} rows have suspiciously high APY (>500%)")
 
@@ -195,15 +193,15 @@ def _validate_file(parquet_path: Path, strict: bool) -> FileReport:
             if schema_type == "sports":
                 for odds_col in ["odds_home", "odds_draw", "odds_away"]:
                     if odds_col in df.columns:
-                        odds: pd.Series[Any] = pd.to_numeric(df[odds_col], errors="coerce")
-                        low_odds: int = int((odds < 1.01).sum())
+                        odds = pd.to_numeric(df[odds_col], errors="coerce")
+                        low_odds = (odds < 1.01).sum()
                         if low_odds > 0:
                             errors.append(f"{low_odds} rows in '{odds_col}' below 1.01 (invalid odds)")
 
             # NaN checks in required fields
             for col in required_cols:
                 if col in df.columns:
-                    nan_count: int = int(df[col].isna().sum())
+                    nan_count = df[col].isna().sum()
                     if nan_count > 0:
                         errors.append(f"Required column '{col}' has {nan_count} NaN values")
 
@@ -301,11 +299,10 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv if argv is not None else sys.argv[1:])
-    report = validate_seed_data(cast(str, args.data_dir), strict=cast(bool, args.strict))
+    report = validate_seed_data(args.data_dir, strict=args.strict)
 
-    json_report_path: Path | None = cast(Path | None, args.json_report)
-    if json_report_path is not None:
-        report_dict: dict[str, Any] = {
+    if args.json_report:
+        report_dict: dict[str, object] = {
             "total_files": report.total_files,
             "passed_files": report.passed_files,
             "failed_files": report.failed_files,
@@ -324,8 +321,8 @@ def main(argv: list[str] | None = None) -> int:
                 for fr in report.file_reports
             ],
         }
-        json_report_path.write_text(json.dumps(report_dict, indent=2))
-        log.info("JSON report → %s", json_report_path)
+        args.json_report.write_text(json.dumps(report_dict, indent=2))
+        log.info("JSON report → %s", args.json_report)
 
     return 0 if report.success else 1
 

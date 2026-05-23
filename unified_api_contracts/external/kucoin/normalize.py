@@ -8,13 +8,13 @@ from decimal import Decimal
 from ...canonical.domain import CanonicalOrderBook, CanonicalTicker, CanonicalTrade
 from ...canonical.domain.execution import CanonicalFill, CanonicalOrder
 from ...normalize_utils._helpers import (
-    d,
-    order_type,
-    side,
-    status,
-    tif,
-    to_decimal,
-    ts_ms,
+    _d,
+    _order_type,
+    _side,
+    _status,
+    _tif,
+    _to_decimal,
+    _ts_ms,
 )
 from .schemas import (
     KucoinFill,
@@ -38,13 +38,13 @@ def normalize_kucoin_ticker(
         instrument_key=ik,
         venue=venue,
         timestamp=datetime.now(UTC),
-        last_price=to_decimal(raw.last) or Decimal("0"),
-        bid_price=to_decimal(raw.buy),
-        ask_price=to_decimal(raw.sell),
-        volume_24h=to_decimal(raw.vol),
-        quote_volume_24h=to_decimal(raw.volValue),
-        price_change_24h=to_decimal(raw.changePrice),
-        price_change_percent_24h=to_decimal(raw.changeRate),
+        last_price=_to_decimal(raw.last) or Decimal("0"),
+        bid_price=_to_decimal(raw.buy),
+        ask_price=_to_decimal(raw.sell),
+        volume_24h=_to_decimal(raw.vol),
+        quote_volume_24h=_to_decimal(raw.volValue),
+        price_change_24h=_to_decimal(raw.changePrice),
+        price_change_percent_24h=_to_decimal(raw.changeRate),
     )
 
 
@@ -69,8 +69,8 @@ def normalize_kucoin_trade(raw: KucoinTrade, symbol: str = "", venue: str = "kuc
         symbol=symbol or "UNKNOWN",
         trade_id=trade_id,
         timestamp=ts,
-        price=d(raw.price),
-        quantity=d(raw.size),
+        price=_d(raw.price),
+        quantity=_d(raw.size),
         side=(raw.side or "buy").lower(),
         buyer_maker=None,
         venue_trade_id=str(raw.tradeId) if raw.tradeId else None,
@@ -107,23 +107,23 @@ def normalize_kucoin_orderbook(raw: KucoinOrderBook, symbol: str = "", venue: st
 
 def normalize_kucoin_order(raw: KucoinOrder, venue: str = "kucoin") -> CanonicalOrder:
     """Convert KucoinOrder to CanonicalOrder."""
-    ts = ts_ms(raw.createdAt)
-    order_status = status("filled" if not raw.isActive else "open")
+    ts = _ts_ms(raw.createdAt)
+    status = _status("filled" if not raw.isActive else "open")
     if raw.status:
-        order_status = status(raw.status)
+        status = _status(raw.status)
     return CanonicalOrder(
         order_id=str(raw.id or ""),
         client_order_id=None,
         timestamp=ts,
         venue=venue,
         instrument_id=raw.symbol or "",
-        side=side(raw.side),
-        order_type=order_type(raw.type),
-        quantity=d(raw.size),
-        price=d(raw.price) if raw.price else None,
-        time_in_force=tif(raw.timeInForce),
-        status=order_status,
-        filled_quantity=d(raw.dealSize),
+        side=_side(raw.side),
+        order_type=_order_type(raw.type),
+        quantity=_d(raw.size),
+        price=_d(raw.price) if raw.price else None,
+        time_in_force=_tif(raw.timeInForce),
+        status=status,
+        filled_quantity=_d(raw.dealSize),
         remaining_quantity=None,
         average_fill_price=None,
     )
@@ -136,7 +136,7 @@ def normalize_kucoin_order(raw: KucoinOrder, venue: str = "kucoin") -> Canonical
 
 def normalize_kucoin_fill(raw: KucoinFill, venue: str = "kucoin") -> CanonicalFill:
     """Convert KucoinFill to CanonicalFill."""
-    ts = ts_ms(raw.createdAt)
+    ts = _ts_ms(raw.createdAt)
     is_maker: bool | None = None
     if raw.liquidity:
         is_maker = raw.liquidity.lower() == "maker"
@@ -146,10 +146,10 @@ def normalize_kucoin_fill(raw: KucoinFill, venue: str = "kucoin") -> CanonicalFi
         timestamp=ts,
         venue=venue,
         instrument_id=raw.symbol or "",
-        side=side(raw.side),
-        price=d(raw.price),
-        quantity=d(raw.size),
-        fee=d(raw.fee) if raw.fee else None,
+        side=_side(raw.side),
+        price=_d(raw.price),
+        quantity=_d(raw.size),
+        fee=_d(raw.fee) if raw.fee else None,
         fee_currency=raw.feeCurrency,
         is_maker=is_maker,
     )

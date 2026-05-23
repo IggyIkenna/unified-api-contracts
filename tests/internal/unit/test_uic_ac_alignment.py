@@ -1,14 +1,62 @@
-"""UIC domain schema smoke tests.
+"""Boundary tests: UIC domain schemas must not import from UAC.
 
-Verifies that internal schemas (execution, strategy, risk, circuit_breaker)
-instantiate cleanly. The former cross-repo UAC→UIC boundary test was removed
-when the repos were merged (UIC is now unified_api_contracts.internal).
+Integration Layer 0 — UIC side.
+
+Import direction rule:
+    UIC → UAC (specifically: unified_api_contracts.canonical)
+    is PERMITTED where UIC re-exports or wraps UAC canonical types.
+    UAC → UIC is FORBIDDEN (circular dependency).
+
+This file verifies:
+1. UIC domain schemas (execution, strategy, risk) instantiate cleanly.
+2. circuit_breaker (CircuitBreakerEventMessage) schema instantiates cleanly.
+3. Compliance-adjacent schemas instantiate cleanly.
+4. UIC does NOT import from UAC in violation of the boundary
+   (UAC imports from UIC are forbidden; UIC may import UAC canonical layer).
 """
 
 from __future__ import annotations
 
 from datetime import UTC, datetime
 from decimal import Decimal
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
+
+
+def _all_uic_python_files() -> list[Path]:
+    import unified_api_contracts.internal
+
+    src_root = Path(unified_api_contracts.internal.__file__).resolve().parent
+    return [p for p in src_root.rglob("*.py") if "__pycache__" not in p.parts and ".venv" not in p.parts]
+
+
+# ---------------------------------------------------------------------------
+# Boundary: UAC must not import from UIC (run from UIC test suite)
+# ---------------------------------------------------------------------------
+
+
+class TestUACBoundary:
+    """UAC source files must never import from unified_api_contracts.internal."""
+
+    def test_uac_does_not_import_uic(self) -> None:
+        """Walk all UAC source files and assert none import from UIC."""
+        import unified_api_contracts
+
+        uac_root = Path(unified_api_contracts.__file__).resolve().parent
+        forbidden = "unified_api_contracts.internal"
+        violations: list[str] = []
+        for py_file in uac_root.rglob("*.py"):
+            if "__pycache__" in py_file.parts or ".venv" in py_file.parts:
+                continue
+            if forbidden in py_file.read_text():
+                violations.append(str(py_file.relative_to(uac_root)))
+        assert violations == [], (
+            "UAC files import from unified_api_contracts.internal (FORBIDDEN circular dep):\n" + "\n".join(violations)
+        )
+
 
 # ---------------------------------------------------------------------------
 # UIC execution schemas
@@ -254,7 +302,5 @@ class TestUICExportsResolve:
             instrument_type="SPOT_PAIR",
             symbol="BTC/USDT",
             raw_symbol="BTCUSDT",
-            base_asset="BTC",
-            quote_asset="USDT",
         )
         assert rec.venue == "binance"

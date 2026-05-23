@@ -227,7 +227,7 @@ SPORTS_PREDICTIONS = SchemaContract(
             dtype="datetime64[ns, UTC]",
             nullable=True,
             description=(
-                "Timestamp when the adapter actually fetched the prediction (precedes available_at when batched)."
+                "Timestamp when the adapter actually fetched the prediction (precedes data_available_at when batched)."
             ),
         ),
         _stringy(

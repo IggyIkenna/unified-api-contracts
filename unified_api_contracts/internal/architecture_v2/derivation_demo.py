@@ -27,9 +27,7 @@ from unified_api_contracts.internal.architecture_v2.derivation import (
     RestrictionProfile,
     RouteDescriptor,
     SlotFilter,
-)
-from unified_api_contracts.internal.architecture_v2.derivation import (
-    all_supported_combos as _all_supported_combos,
+    _all_supported_combos,
 )
 from unified_api_contracts.internal.architecture_v2.strategy_availability import (
     LockState,

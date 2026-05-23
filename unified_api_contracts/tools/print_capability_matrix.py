@@ -19,15 +19,14 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Iterable
-from typing import cast
 
-from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # qg-deep-import: symbol not yet on library root facade  # noqa: E501
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (  # noqa: qg-deep-import  # symbol not yet on library root facade
     ARCHETYPE_CAPABILITY_REGISTRY,
     ArchetypeCapability,
     CoverageStatus,
     capability_for,
 )
-from unified_api_contracts.internal.architecture_v2.enums import (  # qg-deep-import: symbol not yet on library root facade  # noqa: E501
+from unified_api_contracts.internal.architecture_v2.enums import (  # noqa: qg-deep-import  # symbol not yet on library root facade
     StrategyArchetype,
 )
 
@@ -144,8 +143,8 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = _build_parser().parse_args(argv)
-    rows = _select_archetypes(cast(str | None, args.archetype))
-    if cast(bool, args.markdown):
+    rows = _select_archetypes(args.archetype)
+    if args.markdown:
         _emit_markdown(rows)
     else:
         _emit_text(rows)

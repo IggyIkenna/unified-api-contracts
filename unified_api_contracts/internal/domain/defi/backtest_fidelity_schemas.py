@@ -6,7 +6,7 @@ Phase 8C — ``TenderlyReconciliationReport`` (live-vs-simulated reconciliation
 across 1 day of paper-trade; per-tick |delta| < 10bps acceptance gate at the
 95% coverage threshold; per-pool-shape failure-mode breakdown).
 Phase 8D — ``SignOffReport`` (operator dashboard composite — aggregate signal
-GREEN/YELLOW/RED + sign-off status persisted by ``strategy-service/pnl`` as
+GREEN/YELLOW/RED + sign-off status persisted by ``pnl-attribution-service`` as
 the May-23 cutover gate audit row).
 
 Consumed by ``execution-service/tests/integration/backtest_fidelity/`` harness
@@ -187,7 +187,7 @@ class SignOffReport(BaseModel):
 
     The ``deployment-ui`` Phase-8 tile renders this report; the operator clicks
     APPROVE / REJECT + types notes. The completed report is persisted to
-    ``strategy-service/pnl`` as a one-off audit row keyed by ``plan_version``.
+    ``pnl-attribution-service`` as a one-off audit row keyed by ``plan_version``.
 
     Gate semantics in ``gate_pass_summary``:
 

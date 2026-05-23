@@ -10,7 +10,7 @@ from __future__ import annotations
 from unified_api_contracts.internal.schemas.contracts import ColumnSpec
 
 DATA_AVAILABLE_AT = ColumnSpec(
-    name="available_at",
+    name="data_available_at",
     dtype="datetime64[ns, UTC]",
     nullable=False,
     description=(

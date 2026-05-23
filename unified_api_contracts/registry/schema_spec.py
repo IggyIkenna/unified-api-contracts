@@ -14,7 +14,7 @@ that vary per protocol) we hand-write the spec.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Final, cast, get_args, get_origin
+from typing import Final, get_args, get_origin
 
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
@@ -81,18 +81,18 @@ def _annotation_dtype(annotation: object) -> tuple[str, bool]:
     # Union / Optional handling.
     args = get_args(annotation)
     if origin is type and len(args) == 1:
-        return _annotation_dtype(cast(object, args[0]))
+        return _annotation_dtype(args[0])
 
     # Optional[X] = Union[X, None]
-    non_none = [a for a in args if a is not type(None)]  # type: ignore[reportAny]
+    non_none = [a for a in args if a is not type(None)]
     nullable = len(non_none) != len(args)
     if len(non_none) == 1:
-        dtype, _ = _annotation_dtype(non_none[0])  # type: ignore[reportAny]
+        dtype, _ = _annotation_dtype(non_none[0])
         return dtype, nullable
 
     if origin is list:
         if non_none:
-            inner_dtype, _ = _annotation_dtype(non_none[0])  # type: ignore[reportAny]
+            inner_dtype, _ = _annotation_dtype(non_none[0])
             return f"list<{inner_dtype}>", nullable
         return "list<any>", nullable
 
@@ -175,21 +175,6 @@ _DEFI_DEX_POOL_SWAPS_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("fee_tier_bps", "int64", nullable=True),
     ColumnSpec("tx_hash", "string"),
     ColumnSpec("block_number", "int64"),
-    ColumnSpec("captured_at", "timestamp[us, UTC]"),
-)
-
-_DEFI_AGGREGATOR_ROUTE_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("instrument_id", "string"),
-    ColumnSpec("venue", "string", description="aggregator: jupiter | 1inch | 0x | paraswap"),
-    ColumnSpec("chain", "string"),
-    ColumnSpec("token_in", "string"),
-    ColumnSpec("token_out", "string"),
-    ColumnSpec("amount_in", "float64"),
-    ColumnSpec("amount_out", "float64"),
-    ColumnSpec("route_kind", "string", description="split | chain"),
-    ColumnSpec("route_json", "string", description="JSON-serialized list of RouteLeg dicts"),
-    ColumnSpec("source", "string", description="jupiter-quote-api | 1inch-quote-api | 0x-quote-api"),
-    ColumnSpec("quote_block_number", "int64", nullable=True),
     ColumnSpec("captured_at", "timestamp[us, UTC]"),
 )
 
@@ -297,12 +282,6 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         asset_group=AssetGroup.DEFI,
         data_type="dex_pool_swaps",
         columns=_DEFI_DEX_POOL_SWAPS_COLUMNS,
-        source="manual",
-    ),
-    SchemaSpec(
-        asset_group=AssetGroup.DEFI,
-        data_type="aggregator_route",
-        columns=_DEFI_AGGREGATOR_ROUTE_COLUMNS,
         source="manual",
     ),
     # =====================================================================

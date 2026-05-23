@@ -51,16 +51,6 @@ class CanonicalQuestionGroup(StrEnum):
     ETH_UP_DOWN_DAILY = "ETH_UP_DOWN_DAILY"
     SPX_UP_DOWN_DAILY = "SPX_UP_DOWN_DAILY"
 
-    # CME event-contract linked groups — added Phase 5 (predictions_master).
-    # Each maps 1:1 to a CME EC* root via cme_polymarket_link.py.
-    NDX_UP_DOWN_DAILY = "NDX_UP_DOWN_DAILY"  # ECNQ (E-mini NDX 100)
-    RUT_UP_DOWN_DAILY = "RUT_UP_DOWN_DAILY"  # ECRTY (E-mini Russell 2000)
-    DJIA_UP_DOWN_DAILY = "DJIA_UP_DOWN_DAILY"  # ECYM (E-mini Dow Jones)
-    GOLD_UP_DOWN_DAILY = "GOLD_UP_DOWN_DAILY"  # ECGC (Gold)
-    CRUDE_OIL_UP_DOWN_DAILY = "CRUDE_OIL_UP_DOWN_DAILY"  # ECCL (Crude WTI)
-    NATGAS_UP_DOWN_DAILY = "NATGAS_UP_DOWN_DAILY"  # ECNG (Natural Gas)
-    EUR_UP_DOWN_DAILY = "EUR_UP_DOWN_DAILY"  # EC6E (Euro FX)
-
     # Macro events with FOMC / CPI cadence.
     FED_RATE_DECISION_PER_FOMC = "FED_RATE_DECISION_PER_FOMC"
     CPI_PRINT_PER_MONTH = "CPI_PRINT_PER_MONTH"
@@ -145,55 +135,6 @@ CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetad
     ),
     CanonicalQuestionGroup.SPX_UP_DOWN_DAILY: CanonicalGroupMetadata(
         group=CanonicalQuestionGroup.SPX_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.NDX_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.NDX_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.RUT_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.RUT_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.DJIA_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.DJIA_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.GOLD_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.GOLD_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.CRUDE_OIL_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.CRUDE_OIL_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.NATGAS_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.NATGAS_UP_DOWN_DAILY,
-        cadence="daily",
-        expected_market_ids_per_day=1,
-        resolution_basis="price_threshold",
-        settlement_lag=2 * _HOUR,
-    ),
-    CanonicalQuestionGroup.EUR_UP_DOWN_DAILY: CanonicalGroupMetadata(
-        group=CanonicalQuestionGroup.EUR_UP_DOWN_DAILY,
         cadence="daily",
         expected_market_ids_per_day=1,
         resolution_basis="price_threshold",

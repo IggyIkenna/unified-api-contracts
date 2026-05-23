@@ -2,4 +2,13 @@
 
 from unified_api_contracts.external.okx.schemas import *
 
-# Explicit imports removed - already covered by star import above
+from .schemas import (
+    OKXFundingRate,
+    OKXLiquidationOrder,
+    OKXMarkPrice,
+    OKXOrder,
+    OKXOrderBook,
+    OKXPosition,
+    OKXTicker,
+    OKXTrade,
+)

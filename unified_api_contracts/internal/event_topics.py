@@ -44,12 +44,14 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "MarginEvent": TopicSpec(
         event_type="MarginEvent",
         topic="margin-events",
-        producer="strategy-service",
+        producer="position-balance-monitor-service",
         consumers=frozenset(
             {
                 "alerting-service",
+                "risk-and-exposure-service",
                 "strategy-service",
                 "execution-service",
+                "pnl-attribution-service",
             }
         ),
         replayable=True,
@@ -58,11 +60,12 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "LiquidationAlert": TopicSpec(
         event_type="LiquidationAlert",
         topic="liquidation-alerts",
-        producer="strategy-service",
+        producer="position-balance-monitor-service",
         consumers=frozenset(
             {
                 "alerting-service",
-                "strategy-service",
+                "pnl-attribution-service",
+                "risk-and-exposure-service",
             }
         ),
         retention_days=30,
@@ -71,10 +74,12 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "PositionSnapshotEvent": TopicSpec(
         event_type="PositionSnapshotEvent",
         topic="position-snapshots",
-        producer="strategy-service",
+        producer="position-balance-monitor-service",
         consumers=frozenset(
             {
                 "strategy-service",
+                "risk-and-exposure-service",
+                "pnl-attribution-service",
                 "batch-live-reconciliation-service",
             }
         ),
@@ -82,10 +87,11 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "BalanceSnapshot": TopicSpec(
         event_type="BalanceSnapshot",
         topic="balance-snapshots",
-        producer="strategy-service",
+        producer="position-balance-monitor-service",
         consumers=frozenset(
             {
                 "strategy-service",
+                "risk-and-exposure-service",
             }
         ),
     ),
@@ -95,6 +101,8 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
         producer="execution-service",
         consumers=frozenset(
             {
+                "position-balance-monitor-service",
+                "pnl-attribution-service",
                 "strategy-service",
                 "alerting-service",
                 "batch-live-reconciliation-service",
@@ -120,7 +128,8 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
         consumers=frozenset(
             {
                 "alerting-service",
-                "strategy-service",
+                "risk-and-exposure-service",
+                "pnl-attribution-service",
             }
         ),
         retention_days=30,
@@ -133,6 +142,8 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
         consumers=frozenset(
             {
                 "strategy-service",
+                "position-balance-monitor-service",
+                "risk-and-exposure-service",
             }
         ),
         retention_days=2,
@@ -141,7 +152,7 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "RiskEvent": TopicSpec(
         event_type="RiskEvent",
         topic="risk-events",
-        producer="strategy-service",
+        producer="risk-and-exposure-service",
         consumers=frozenset(
             {
                 "alerting-service",
@@ -154,12 +165,13 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "KillSwitchTrigger": TopicSpec(
         event_type="KillSwitchTrigger",
         topic="kill-switch-triggers",
-        producer="strategy-service",
+        producer="risk-and-exposure-service",
         consumers=frozenset(
             {
                 "execution-service",
                 "strategy-service",
                 "alerting-service",
+                "position-balance-monitor-service",
             }
         ),
         retention_days=30,
@@ -172,7 +184,7 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
         consumers=frozenset(
             {
                 "execution-service",
-                "strategy-service",
+                "risk-and-exposure-service",
                 "batch-live-reconciliation-service",
             }
         ),
@@ -203,9 +215,10 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "PnLPoint": TopicSpec(
         event_type="PnLPoint",
         topic="pnl-points",
-        producer="strategy-service",
+        producer="position-balance-monitor-service",
         consumers=frozenset(
             {
+                "pnl-attribution-service",
                 "alerting-service",
                 "strategy-service",
             }
@@ -214,7 +227,7 @@ EVENT_TOPIC_REGISTRY: Final[dict[str, TopicSpec]] = {
     "PnLAttributionPublished": TopicSpec(
         event_type="PnLAttributionPublished",
         topic="pnl-attribution",
-        producer="strategy-service",
+        producer="pnl-attribution-service",
         consumers=frozenset(
             {
                 "alerting-service",

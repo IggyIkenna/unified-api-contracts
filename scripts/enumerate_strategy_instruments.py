@@ -318,7 +318,7 @@ def _build_mapping(use_real: bool = False) -> dict[str, dict]:
 
 
 def _upload_to_gcs(content: str, target: str) -> None:
-    from unified_trading_library.cloud_interface import upload_to_storage
+    from unified_cloud_interface import upload_to_storage
 
     bucket_name, _, object_path = target.partition("/")
     upload_to_storage(

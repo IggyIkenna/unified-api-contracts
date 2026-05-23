@@ -1,7 +1,7 @@
 """Aave V3 reserve parameters — SSOT for risk calculations.
 
 These are per-asset protocol parameters from Aave V3 governance.
-Used by strategy-service/risk to compute HF and LTV mathematically
+Used by risk-and-exposure-service to compute HF and LTV mathematically
 from positions, without querying the protocol.
 
 Values from: https://app.aave.com/reserve-overview/ (Ethereum mainnet + multi-chain

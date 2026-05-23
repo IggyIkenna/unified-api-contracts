@@ -25,7 +25,7 @@ import json
 from collections.abc import Iterator
 from enum import StrEnum
 from importlib import resources
-from typing import Final, cast
+from typing import Final
 
 from pydantic import BaseModel, ConfigDict
 
@@ -139,8 +139,8 @@ def _load_registry() -> tuple[ArchetypeCapability, ...]:
         .joinpath(_MANIFEST_FILENAME)
         .read_text(encoding="utf-8")
     )
-    payload = cast("dict[str, object]", json.loads(data))
-    archetypes = cast("list[object]", payload["archetypes"])
+    payload = json.loads(data)
+    archetypes = payload["archetypes"]
     return tuple(ArchetypeCapability.model_validate(entry) for entry in archetypes)
 
 

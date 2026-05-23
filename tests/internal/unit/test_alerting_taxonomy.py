@@ -116,42 +116,6 @@ def test_thresholds_have_source_doc() -> None:
         )
 
 
-def test_phase7_baseline_date_on_core_defi_thresholds() -> None:
-    """Phase 7 quietness baseline (2026-05-20 to 2026-05-22) confirmed core
-    Phase-1 DeFi thresholds. Each confirmed entry must carry
-    ``quietness_baseline_date="2026-05-20"``."""
-    phase1_core_keys = {
-        "defi_health_factor_critical",
-        "defi_weeth_depeg_bps",
-        "defi_aave_utilization_spike_bps",
-        "defi_funding_rate_flip_bps_5m",
-        "defi_feature_stale_minutes",
-        "balance_drift_usd",
-        "order_rejection_spike_per_min",
-        "margin_threshold_breach_bps",
-        "position_drift_bps",
-        "cross_cloud_egress_bytes_per_request",
-        "tick_staleness_seconds",
-    }
-    for key in phase1_core_keys:
-        assert key in ALERT_THRESHOLDS, f"{key!r} missing from ALERT_THRESHOLDS"
-        t = ALERT_THRESHOLDS[key]
-        assert t.quietness_baseline_date == "2026-05-20", (
-            f"ALERT_THRESHOLDS[{key!r}].quietness_baseline_date must be '2026-05-20'"
-            " — Phase 7 quietness baseline confirmed this threshold."
-        )
-
-
-def test_alertthreshold_quietness_baseline_date_field_defaults_empty() -> None:
-    """New thresholds that haven't yet been baselined should default to empty."""
-    ml_keys = {"ml_signal_staleness_minutes", "ml_model_drift_psi", "ml_pnl_deviation_bps"}
-    for key in ml_keys:
-        assert key in ALERT_THRESHOLDS
-        assert ALERT_THRESHOLDS[key].quietness_baseline_date == "", (
-            f"ML threshold {key!r} should not have a baseline date yet"
-        )
-
-
 # ---------------------------------------------------------------------------
 # AlertRule construction-time validation
 # ---------------------------------------------------------------------------

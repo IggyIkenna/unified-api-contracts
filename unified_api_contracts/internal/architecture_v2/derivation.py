@@ -610,9 +610,6 @@ def _all_supported_combos(
     return tuple(out)
 
 
-all_supported_combos = _all_supported_combos
-
-
 # ---------------------------------------------------------------------------
 # Formula 4 — prod_restrictions(client, package)
 # ---------------------------------------------------------------------------

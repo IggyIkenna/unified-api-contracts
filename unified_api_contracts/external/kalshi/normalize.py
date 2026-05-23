@@ -37,7 +37,7 @@ from unified_api_contracts.canonical.domain.execution import (
     CanonicalFill,
     OrderSide,
 )
-from unified_api_contracts.normalize_utils._helpers import d
+from unified_api_contracts.normalize_utils._helpers import _d
 from unified_api_contracts.normalize_utils.errors._utils import from_http_status
 from unified_api_contracts.normalize_utils.market_state import normalize_market_state
 
@@ -218,11 +218,11 @@ def normalize_kalshi_candlestick(raw: KalshiCandlestick, symbol: str = "", venue
         timestamp=ts,
         venue=venue,
         symbol=sym,
-        open=d(raw.yes_open_dollars),
-        high=d(raw.yes_high_dollars),
-        low=d(raw.yes_low_dollars),
-        close=d(raw.yes_close_dollars),
-        volume=d(raw.volume_fp),
+        open=_d(raw.yes_open_dollars),
+        high=_d(raw.yes_high_dollars),
+        low=_d(raw.yes_low_dollars),
+        close=_d(raw.yes_close_dollars),
+        volume=_d(raw.volume_fp),
         quote_volume=None,
         count=None,
         vwap=None,

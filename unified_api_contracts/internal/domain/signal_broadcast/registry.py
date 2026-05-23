@@ -30,8 +30,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 
-from pydantic import HttpUrl
-
 from unified_api_contracts.internal.domain.signal_broadcast.counterparty import (
     Counterparty,
     CounterpartyStatus,
@@ -73,7 +71,7 @@ _COUNTERPARTY_SEED: tuple[Counterparty, ...] = (
         id="counterparty-stub-1",
         name="Signal-Leasing Counterparty 1 (stub)",
         status=CounterpartyStatus.SUSPENDED,
-        endpoint=HttpUrl("https://webhook.example.invalid/counterparty-stub-1"),
+        endpoint="https://webhook.example.invalid/counterparty-stub-1",
         allowed_slots=frozenset({"stat-arb-pairs-fixed-cefi-spot-btc-eth"}),
         hmac_secret_ref="projects/-/secrets/signal-broadcast-counterparty-stub-1-hmac",
         rate_limit_ref="default",
@@ -84,7 +82,7 @@ _COUNTERPARTY_SEED: tuple[Counterparty, ...] = (
         id="counterparty-stub-2",
         name="Signal-Leasing Counterparty 2 (stub)",
         status=CounterpartyStatus.SUSPENDED,
-        endpoint=HttpUrl("https://webhook.example.invalid/counterparty-stub-2"),
+        endpoint="https://webhook.example.invalid/counterparty-stub-2",
         allowed_slots=frozenset({"stat-arb-pairs-fixed-cefi-spot-btc-eth"}),
         hmac_secret_ref="projects/-/secrets/signal-broadcast-counterparty-stub-2-hmac",
         rate_limit_ref="minimal",

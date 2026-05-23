@@ -133,7 +133,7 @@ def _load_rules() -> dict[str, ServiceFamilyScopeRule]:
         return {}
     raw_typed = cast(dict[str, object], raw)
     families: dict[str, ServiceFamilyScopeRule] = {}
-    families_raw = raw_typed.get("service_families", {})  # qg-empty-fallback: YAML may legitimately omit the key
+    families_raw = raw_typed.get("service_families", {})  # noqa: qg-empty-fallback — YAML may legitimately omit the key
     if not isinstance(families_raw, dict):
         return {}
     families_raw_typed = cast(dict[str, object], families_raw)

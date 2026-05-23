@@ -107,8 +107,6 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.EXCHANGE_ODDS,
         InstrumentType.FIXED_ODDS,
         InstrumentType.PROP,
-        # TradFi x Prediction cross-venue
-        InstrumentType.EVENT_CONTRACT,
     }
 )
 
@@ -558,10 +556,6 @@ def build_instrument_id(
     # Sports / prediction
     if instrument_type in _SPORTS_AND_PREDICTION_TYPES:
         return _build_sports_or_prediction(venue, instrument_type, symbol)
-
-    # TradFi x Prediction cross-venue (EVENT_CONTRACT) -- resolution_date axis
-    if instrument_type is InstrumentType.EVENT_CONTRACT:
-        return _build_future(venue, instrument_type, symbol, expiry_date)
 
     # Should be unreachable given the membership check above — defend anyway.
     msg = f"No builder registered for InstrumentType {instrument_type.value}"

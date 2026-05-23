@@ -8,7 +8,7 @@ interactions:
       uri: http://risk-service:8080/health
     response:
       body:
-        string: '{"status":"healthy","service":"strategy-service"}'
+        string: '{"status":"healthy","service":"risk-and-exposure-service"}'
       headers:
         Content-Type:
           - application/json

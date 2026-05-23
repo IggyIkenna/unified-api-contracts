@@ -993,7 +993,7 @@
       "name": "FeeType",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/strategy-service/tests/unit/test_fee_reconciliation_engine.py",
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/position-balance-monitor-service/tests/unit/test_fee_reconciliation_engine.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/api-contracts/canonical-schemas/domain/position/__init__.py",
         "/Users/ikennaigboaka/Code/unified-trading-system-repos/unified-trading-system-ui/context/internal-contracts/schemas/domain/matching_engine/__init__.py"
       ]
@@ -1018,7 +1018,7 @@
       "name": "HyperliquidPosition",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/strategy-service/tests/position_interface/unit/test_routing.py"
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/position-balance-monitor-service/tests/position_interface/unit/test_routing.py"
       ]
     },
     {
@@ -1088,7 +1088,7 @@
       "name": "UpbitBalanceQueryResponse",
       "source": "UAC",
       "test_files": [
-        "/Users/ikennaigboaka/Code/unified-trading-system-repos/strategy-service/tests/position_interface/integration/test_library_deps_integration.py"
+        "/Users/ikennaigboaka/Code/unified-trading-system-repos/position-balance-monitor-service/tests/position_interface/integration/test_library_deps_integration.py"
       ]
     },
     {

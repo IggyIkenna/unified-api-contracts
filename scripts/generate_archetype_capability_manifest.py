@@ -42,7 +42,7 @@ def _entry_to_dict(entry: ArchetypeCapability) -> dict[str, object]:
         "uses_rolling_futures": entry.uses_rolling_futures,
         "cells": [
             {
-                "asset_group": cell.asset_group.value,
+                "category": cell.category.value,
                 "instrument_type": cell.instrument_type.value,
                 "status": cell.status.value,
                 "venue_ids": list(cell.venue_ids),

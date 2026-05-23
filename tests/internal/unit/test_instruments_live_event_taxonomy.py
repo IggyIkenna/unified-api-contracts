@@ -150,7 +150,7 @@ class TestInstrumentsLiveSourceDegraded:
         details = InstrumentsLiveSourceDegradedDetails(
             asset_group="tradfi",
             trigger_name="tradfi.ohlcv_15m.wallclock",
-            primary_source="databento",
+            primary_source="polygon",
             degradation_reason="HTTP_5XX",
         )
         assert details.secondary_source is None
@@ -178,7 +178,7 @@ class TestInstrumentsLiveSchemaDrift:
         details = InstrumentsLiveSchemaDriftDetails(
             asset_group="tradfi",
             trigger_name="tradfi.ohlcv_15m.wallclock",
-            source="databento",
+            source="polygon",
             entity_type="ohlcv_15m",
             expected_columns=["ts_event", "open", "high", "low", "close", "volume"],
             observed_columns=["ts_event", "open", "high", "low", "close"],
@@ -375,7 +375,7 @@ class TestInstrumentsLiveEventTaxonomyIntegration:
                     "details": InstrumentsLiveSourceDegradedDetails(
                         asset_group="tradfi",
                         trigger_name="tradfi.ohlcv_15m.wallclock",
-                        primary_source="databento",
+                        primary_source="polygon",
                         degradation_reason="HTTP_5XX",
                     )
                 },

@@ -120,7 +120,7 @@ def test_client_subscription_premium_with_overrides() -> None:
         sla_tier=SLATier.PREMIUM,
         service_overrides=[
             ClientServiceOverride(
-                service_name="strategy-service",
+                service_name="pnl-attribution-service",
                 isolation=IsolationPolicy.ISOLATED,
             ),
         ],

@@ -1,4 +1,0 @@
-# archetype_capability_manifest.json is maintained by
-# scripts/generate_archetype_capability_manifest.py which uses json.dumps(indent=2).
-# Prettier's array compaction would cause test_manifest_is_round_trip_stable to fail.
-unified_api_contracts/internal/architecture_v2/archetype_capability_manifest.json

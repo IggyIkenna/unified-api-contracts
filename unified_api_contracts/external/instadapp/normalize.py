@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from decimal import Decimal
 
 from ...canonical.domain import CanonicalBalance, CanonicalPosition
-from ...normalize_utils._helpers import d
+from ...normalize_utils._helpers import _d
 from .schemas import InstadappPosition, InstadappReserve, InstadappSmartAccount
 
 
@@ -28,8 +28,8 @@ def normalize_instadapp_position(
     """
     if raw.protocol is None and raw.collateral is None and raw.debt is None:
         return None
-    collateral = d(raw.collateral)
-    debt = d(raw.debt)
+    collateral = _d(raw.collateral)
+    debt = _d(raw.debt)
     quantity = collateral
     if quantity <= 0 and debt <= 0:
         return None

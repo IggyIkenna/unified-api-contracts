@@ -14,8 +14,8 @@ with strategy-specific code. See
 The wire-format primitive here is consumed by:
   - ``execution_service.algo_library.leveraged_leg_controller`` — drift +
     rebalance emission.
-  - ``strategy-service/risk`` — LEVERAGE_BREACH alerts on drift.
-  - ``strategy-service/position`` — per-leg current_leverage on snapshot.
+  - ``risk-and-exposure-service`` — LEVERAGE_BREACH alerts on drift.
+  - ``position-balance-monitor-service`` — per-leg current_leverage on snapshot.
 
 Time-varying ``target_leverage``: strategies publish ``target_leverage_now``
 per tick (e.g. ML_DIRECTIONAL scales with conviction_pct, VOL_TRADING with

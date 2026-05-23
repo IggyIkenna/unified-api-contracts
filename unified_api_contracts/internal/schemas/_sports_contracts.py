@@ -185,7 +185,7 @@ SPORTS_TEAMS = SchemaContract(
             description="API-Football numeric league ID this team row was fetched under.",
         ),
         ColumnSpec(
-            name="available_at",
+            name="data_available_at",
             dtype="string",
             nullable=True,
             description=(
@@ -285,7 +285,7 @@ SPORTS_VENUES = SchemaContract(
             description="Venue altitude in metres above sea level — influences ball flight / atmospheric features.",
         ),
         ColumnSpec(
-            name="available_at",
+            name="data_available_at",
             dtype="string",
             nullable=True,
             description="Fetch timestamp; stored as string in the static VENUES reference parquet.",
@@ -393,7 +393,7 @@ SPORTS_STANDINGS = SchemaContract(
             name="update",
             dtype="string",
             nullable=True,
-            description="API-Football's own update timestamp (ISO string) — distinct from available_at.",
+            description="API-Football's own update timestamp (ISO string) — distinct from data_available_at.",
         ),
         ColumnSpec(
             name="league_id",
@@ -692,7 +692,7 @@ SPORTS_SFI_PROGRESSIVE_STATS = SchemaContract(
             ),
         ),
         ColumnSpec(
-            name="available_at",
+            name="data_available_at",
             dtype="datetime64[ns, UTC]",
             nullable=True,
             description=(

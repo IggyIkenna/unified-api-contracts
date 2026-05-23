@@ -384,6 +384,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Day-1 follow-up gap #4."
         ),
         description="Sigma threshold for borrow-rate deviation from rolling mean.",
+        quietness_baseline_date="2026-05-20",
     ),
     "gas_price_spike_gwei": AlertThreshold(
         key="gas_price_spike_gwei",
@@ -398,6 +399,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " will tune per-chain if L2s are added. Alert plan Phase 1.E (2026-05-13)."
         ),
         description="L1/L2 gas price in gwei above which on-chain tx cost renders execution uneconomic.",
+        quietness_baseline_date="2026-05-20",
     ),
     "gas_budget_exceeded_eth": AlertThreshold(
         key="gas_budget_exceeded_eth",
@@ -412,6 +414,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Alert plan Phase 1.E (2026-05-13)."
         ),
         description="Cumulative gas spent in ETH per wallet per session/day above which budget alert fires.",
+        quietness_baseline_date="2026-05-20",
     ),
     "gas_surge_multiple": AlertThreshold(
         key="gas_surge_multiple",
@@ -425,6 +428,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " simulation_scenarios Day-1 follow-up gap #6."
         ),
         description="Gas surge multiple above rolling baseline that triggers GAS_SURGE_50X.",
+        quietness_baseline_date="2026-05-20",
     ),
     "gas_mempool_confirmation_delay_seconds": AlertThreshold(
         key="gas_mempool_confirmation_delay_seconds",
@@ -437,6 +441,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Reference: simulation_scenarios Day-1 follow-up gap #7."
         ),
         description="P99 confirmation latency threshold in seconds before GAS_MEMPOOL_CONGESTION fires.",
+        quietness_baseline_date="2026-05-20",
     ),
     "lending_utilization_high_bps": AlertThreshold(
         key="lending_utilization_high_bps",
@@ -453,6 +458,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
         per_archetype_overrides={
             "leveraged_funding_arb": Decimal("8500"),
         },
+        quietness_baseline_date="2026-05-20",
     ),
     "lending_pool_outage_seconds": AlertThreshold(
         key="lending_pool_outage_seconds",
@@ -465,6 +471,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Day-1 follow-up gap #3."
         ),
         description="Seconds of RPC unavailability before LENDING_POOL_UNAVAILABLE fires.",
+        quietness_baseline_date="2026-05-20",
     ),
     "oracle_staleness_seconds": AlertThreshold(
         key="oracle_staleness_seconds",
@@ -480,6 +487,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Alert plan Phase 1.E (2026-05-13)."
         ),
         description="Maximum seconds since oracle last published before KILL_SWITCH_ORACLE_DIVERGENCE fires.",
+        quietness_baseline_date="2026-05-20",
     ),
     "lending_pool_unavailable_seconds": AlertThreshold(
         key="lending_pool_unavailable_seconds",
@@ -495,6 +503,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Alert plan Phase 1.E (2026-05-13)."
         ),
         description="Seconds a lending pool has been paused or borrow-cap-locked before breaker fires.",
+        quietness_baseline_date="2026-05-20",
     ),
     "oracle_divergence_sigma": AlertThreshold(
         key="oracle_divergence_sigma",
@@ -508,6 +517,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Reference: simulation_scenarios Day-1 follow-up gap #8."
         ),
         description="Oracle price divergence sigma threshold that fires the oracle kill-switch.",
+        quietness_baseline_date="2026-05-20",
     ),
     "market_data_stale_seconds": AlertThreshold(
         key="market_data_stale_seconds",
@@ -522,6 +532,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " Alert plan Phase 1.E (2026-05-13)."
         ),
         description="Maximum age in seconds of any market-data feed before MARKET_DATA_STALE fires.",
+        quietness_baseline_date="2026-05-20",
     ),
     "qg_snapshot_stale_days": AlertThreshold(
         key="qg_snapshot_stale_days",
@@ -536,6 +547,7 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
             " B-018 Phase 4.A monitoring (2026-05-15)."
         ),
         description="Consecutive days without a GCS QG snapshot before QG_SNAPSHOT_STALE fires.",
+        quietness_baseline_date="2026-05-20",
     ),
 }
 """Threshold registry. New rules must add an entry here AND reference the key

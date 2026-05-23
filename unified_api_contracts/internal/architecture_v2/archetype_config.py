@@ -3,7 +3,7 @@
 Closes the genuine gap identified in the cross_cutting Tab 6.A finding (issue
 doc ``plans/active/issues/cross_cutting_strategy_catalogue_already_shipped_2026_05_08.md``):
 operational risk knobs were scattered across strategy-service runtime config and
-strategy-service/risk. They now have a single canonical SSOT — this module —
+risk-and-exposure-service. They now have a single canonical SSOT — this module —
 re-exported through :mod:`unified_api_contracts.strategy`.
 
 This is the **schema floor** + **May-23 cutover seed**. Per-archetype knobs for
@@ -373,7 +373,7 @@ def archetype_kill_switch_thresholds(
 
     Convenience accessor consumed by the alerting-service kill-switch wiring
     (per ``alerting_service_live_rules_2026_05_07.md``) and by the
-    strategy-service/risk pre-trade gate (per
+    risk-and-exposure-service pre-trade gate (per
     ``codex/09-strategy/architecture-v2/cross-cutting/risk-gates.md``).
 
     Args:

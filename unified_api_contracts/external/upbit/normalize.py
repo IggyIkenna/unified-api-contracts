@@ -33,11 +33,11 @@ from unified_api_contracts.canonical.domain.execution import (
     OrderSide,
 )
 from unified_api_contracts.normalize_utils._helpers import (
-    d,
-    order_type,
-    status,
-    to_decimal,
-    ts_ms_to_datetime,
+    _d,
+    _order_type,
+    _status,
+    _to_decimal,
+    _ts_ms_to_datetime,
 )
 from unified_api_contracts.normalize_utils.connectivity import normalize_ws_disconnect
 
@@ -89,15 +89,15 @@ def normalize_upbit_ticker(
     ts = datetime.now(UTC)
     t_ts = raw.info.get("timestamp") if raw.info else None
     if isinstance(t_ts, (int, float)):
-        ts = ts_ms_to_datetime(int(t_ts))
+        ts = _ts_ms_to_datetime(int(t_ts))
     return CanonicalTicker(
         instrument_key=ik,
         venue=venue,
         timestamp=ts,
-        last_price=to_decimal(raw.trade_price) or Decimal("0"),
-        bid_price=to_decimal(raw.bid_price),
-        ask_price=to_decimal(raw.ask_price),
-        volume_24h=to_decimal(raw.acc_trade_volume_24h),
+        last_price=_to_decimal(raw.trade_price) or Decimal("0"),
+        bid_price=_to_decimal(raw.bid_price),
+        ask_price=_to_decimal(raw.ask_price),
+        volume_24h=_to_decimal(raw.acc_trade_volume_24h),
         quote_volume_24h=None,
         price_change_24h=None,
         price_change_percent_24h=None,
@@ -175,10 +175,10 @@ def normalize_upbit_order(raw: UpbitOrderSchema, venue: str = "upbit") -> Canoni
         venue=venue,
         instrument_id=symbol,
         side=OrderSide.SELL if (raw.side or "").lower() == "ask" else OrderSide.BUY,
-        order_type=order_type(raw.ord_type),
+        order_type=_order_type(raw.ord_type),
         quantity=_parse_decimal(raw.volume or 0),
         price=_parse_decimal(raw.price) if raw.price else None,
-        status=status(raw.state),
+        status=_status(raw.state),
         filled_quantity=_parse_decimal(raw.executed_volume or 0),
         remaining_quantity=None,
         average_fill_price=None,
@@ -195,7 +195,7 @@ def normalize_upbit_fill(raw: UpbitOrderSchema, venue: str = "upbit") -> Canonic
 
     Returns None if executed_volume is zero (order not filled).
     """
-    exec_vol = d(raw.executed_volume)
+    exec_vol = _d(raw.executed_volume)
     if exec_vol == Decimal("0"):
         return None
     ts = datetime.now(UTC)
@@ -208,7 +208,7 @@ def normalize_upbit_fill(raw: UpbitOrderSchema, venue: str = "upbit") -> Canonic
         venue=venue,
         instrument_id="",
         side=side,
-        price=d(raw.price),
+        price=_d(raw.price),
         quantity=exec_vol,
         fee=None,
         fee_currency=None,

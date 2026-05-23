@@ -65,7 +65,6 @@ def test_breaker_scope_closed_set() -> None:
         "PER_ACCOUNT",
         "PER_ASSET_GROUP",
         "PER_STABLE",
-        "PER_LST",
         "GLOBAL",
     }
 
@@ -330,7 +329,6 @@ def test_registry_has_two_cutover_archetypes() -> None:
     assert set(PER_ARCHETYPE_BREAKERS.keys()) == {
         "CARRY_STAKED_BASIS",
         "ARBITRAGE_PRICE_DISPERSION",
-        "LEVERAGED_FUNDING_ARB",
     }
 
 
@@ -367,11 +365,9 @@ def test_registry_recovery_rules_use_valid_enum_ids(archetype: str) -> None:
 
 
 def test_registry_no_duplicate_breaker_ids_per_archetype() -> None:
-    # Per-stable/per-asset archetypes use (breaker_id, applies_to) as the
-    # unique key — the same breaker_id can appear once per asset.
     for archetype, configs in PER_ARCHETYPE_BREAKERS.items():
-        keys = [(c.breaker_id, c.applies_to) for c in configs]
-        assert len(keys) == len(set(keys)), f"{archetype} has duplicate (breaker_id, applies_to) pairs"
+        ids = [c.breaker_id for c in configs]
+        assert len(ids) == len(set(ids)), f"{archetype} has duplicate breaker IDs"
 
 
 def test_registry_combined_breaker_count() -> None:

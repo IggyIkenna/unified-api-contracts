@@ -2,7 +2,7 @@
 
 SSOT for "was this instrument listed on date D?" logic. Consumers
 (instruments-service, market-tick-data-service, features-*, strategy-service,
-execution-service, risk-service, strategy-service/position) MUST use
+execution-service, risk-service, position-balance-monitor-service) MUST use
 this function rather than re-implementing the `available_from/to` window
 check locally.
 

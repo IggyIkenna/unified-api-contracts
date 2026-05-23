@@ -26,7 +26,7 @@ on-chain distributor addresses for discovery, and provides the schema for
 (ETH for ETH-side LSTs, SOL for SOL-side, USD for fund-level NAV).
 
 PnL attribution: each realised reward is tagged with its ``RewardPnLLayer``
-so strategy-service/pnl can decompose the CARRY factor into
+so pnl-attribution-service can decompose the CARRY factor into
 CARRY_BASE / CARRY_AVS_CONTINUOUS / CARRY_ISSUER_SEASONAL, plus a separate
 REWARD_REALISATION_SLIPPAGE factor capturing the dust-conversion cost.
 """
@@ -54,7 +54,7 @@ class RewardPnLLayer(StrEnum):
 
     Maps 1:1 to PnL attribution sub-factors under the CARRY parent factor.
     Each LST holding accrues yield from up to all three layers
-    simultaneously; strategy-service/pnl produces one row per (holding,
+    simultaneously; pnl-attribution-service produces one row per (holding,
     layer, token) tuple per accrual period.
     """
 
@@ -85,7 +85,7 @@ class RewardPnLLayer(StrEnum):
 class RewardTokenEconomics(BaseModel):
     """Per-reward-token realisation economics.
 
-    Used by the dust-conversion router and strategy-service/pnl to
+    Used by the dust-conversion router and pnl-attribution-service to
     convert raw token amounts to target-denomination values WITHOUT
     pre-baking a haircut: the router quotes the actual conversion route
     through existing market data (Binance spot ticks, Uniswap V3 pools,
@@ -294,7 +294,7 @@ class ConvertDustInstruction(StrategyInstructionEnvelope):
         default=None,
         description=(
             "Source layer that emitted these dust tokens — used by "
-            "strategy-service/pnl to tag the resulting realised PnL "
+            "pnl-attribution-service to tag the resulting realised PnL "
             "rows with the right CARRY sub-factor. None means "
             "pnl-attribution will fall back to per-token-stream lookup."
         ),
@@ -395,7 +395,7 @@ class DustRouterResult(BaseModel):
         receive the equity bump. ``None`` for strategies without
         leg-controller wiring.
       reward_attribution_rows: per-token detail rows for
-        strategy-service/pnl. One row per converted token tagged with
+        pnl-attribution-service. One row per converted token tagged with
         the matching ``RewardPnLLayer`` from
         ``LST_REWARD_STREAMS``.
     """
@@ -413,7 +413,7 @@ class DustRouterResult(BaseModel):
     """``RewardAttributionRow`` objects — typed as ``object`` to avoid the
     circular import with ``internal.domain.strategy_service.pnl`` (that
     module already imports ``RewardPnLLayer`` from this package).
-    Consumers (strategy-service/pnl ``attribute_reward_realisation_from_rows``)
+    Consumers (pnl-attribution-service ``attribute_reward_realisation_from_rows``)
     cast at the import boundary."""
 
 
@@ -434,7 +434,7 @@ class LstSeasonalRewardRow(BaseModel):
       - strategy-service: archetypes holding restaking-eligible LSTs
         consume these rows as ``lst_seasonal_rewards_<token>_amount``
         features and emit ``ConvertDustInstruction`` once-per-epoch.
-      - strategy-service/pnl: tags rows with the source ``RewardPnLLayer``
+      - pnl-attribution-service: tags rows with the source ``RewardPnLLayer``
         for the CARRY decomposition.
     """
 

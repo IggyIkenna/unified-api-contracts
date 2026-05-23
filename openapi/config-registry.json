@@ -2370,16 +2370,16 @@
         }
       }
     ],
-    "strategy-service": [
+    "risk-and-exposure-service": [
       {
         "class_name": "RiskAndExposureServiceConfig",
-        "module": "strategy_service.risk.config",
+        "module": "risk_and_exposure_service.config",
         "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 110,
         "fields": {
           "service_name": {
             "type": "<class 'str'>",
-            "default": "strategy-service",
+            "default": "risk-and-exposure-service",
             "required": false
           },
           "project_id": {
@@ -2789,7 +2789,7 @@
           },
           "position_monitor_api_url": {
             "type": "<class 'str'>",
-            "default": "http://strategy-service:8000",
+            "default": "http://position-balance-monitor-service:8000",
             "required": false
           },
           "position_monitor_api_timeout": {
@@ -2930,16 +2930,16 @@
         }
       }
     ],
-    "strategy-service": [
+    "position-balance-monitor-service": [
       {
         "class_name": "PositionBalanceMonitorServiceConfig",
-        "module": "strategy_service.position.config",
+        "module": "position_balance_monitor_service.config",
         "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 128,
         "fields": {
           "service_name": {
             "type": "<class 'str'>",
-            "default": "strategy-service",
+            "default": "position-balance-monitor-service",
             "required": false
           },
           "project_id": {
@@ -4290,16 +4290,16 @@
         }
       }
     ],
-    "strategy-service": [
+    "pnl-attribution-service": [
       {
         "class_name": "PnlAttributionServiceConfig",
-        "module": "strategy_service.pnl.config",
+        "module": "pnl_attribution_service.config",
         "bases": ["UnifiedCloudConfig", "_ApiClientFields", "BaseConfig"],
         "field_count": 84,
         "fields": {
           "service_name": {
             "type": "<class 'str'>",
-            "default": "strategy-service",
+            "default": "pnl-attribution-service",
             "required": false
           },
           "project_id": {

@@ -548,7 +548,7 @@ class VenueMapping:
         if weekday_only:
             all_dates = all_dates[all_dates.weekday < 5]
             # Exclude US market holidays
-            date_strs: list[str] = all_dates.strftime("%Y-%m-%d").tolist()
+            date_strs = all_dates.strftime("%Y-%m-%d")
             return [d for d in date_strs if d not in self._US_MARKET_HOLIDAYS]
         return [d.strftime("%Y-%m-%d") for d in all_dates]
 

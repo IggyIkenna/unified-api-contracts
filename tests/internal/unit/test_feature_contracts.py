@@ -110,12 +110,7 @@ def test_multi_timeframe_registered_for_cefi_perpetual(fg: str) -> None:
     assert _has_core([c.name for c in contract.columns])
 
 
-@pytest.mark.parametrize(
-    "fg",
-    # paired_price_dispersion has a per-pair shard atom (not per-instrument)
-    # and is intentionally excluded from the per-instrument registration loop.
-    [fg for fg in CROSS_INSTRUMENT_FEATURE_GROUPS if fg != "paired_price_dispersion"],
-)
+@pytest.mark.parametrize("fg", CROSS_INSTRUMENT_FEATURE_GROUPS)
 def test_cross_instrument_registered_for_cefi_perpetual(fg: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=fg)
     assert _has_core([c.name for c in contract.columns])

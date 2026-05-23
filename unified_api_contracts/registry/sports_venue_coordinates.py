@@ -20,7 +20,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import NamedTuple, cast
+from typing import NamedTuple
 
 
 class VenueCoordinates(NamedTuple):
@@ -32,7 +32,7 @@ class VenueCoordinates(NamedTuple):
 
 _DATA_PATH = Path(__file__).parent / "data" / "sports_venue_coordinates.json"
 
-_raw: dict[str, dict[str, float]] = cast(dict[str, dict[str, float]], json.loads(_DATA_PATH.read_text()))
+_raw: dict[str, dict[str, float]] = json.loads(_DATA_PATH.read_text())
 
 VENUE_COORDINATES: dict[str, VenueCoordinates] = {
     k: VenueCoordinates(latitude=v["latitude"], longitude=v["longitude"]) for k, v in _raw.items()

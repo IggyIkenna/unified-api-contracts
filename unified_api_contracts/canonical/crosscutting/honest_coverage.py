@@ -627,11 +627,6 @@ BUNDLED_DATA_TYPES: Final[frozenset[str]] = frozenset(
         # on strike_threshold. Registered here so ManifestWriter enforces
         # cluster validation on record_captured calls for this data_type.
         "event_contract",
-        # Per-fixture sports data_types — bundle = multiple bookmakers per fixture.
-        # cluster_extractor: bookmaker. Registry: SPORTS_FIXTURE_CLUSTERS.
-        "odds_snapshot",
-        "odds_movement",
-        "arbitrage_opportunity",
     }
 )
 """Closed set of bundled data_types.
@@ -781,9 +776,6 @@ DATA_TYPE_TO_CLUSTER_REGISTRY: Final[dict[str, str]] = {
     "prediction_canonical_question_group": "PREDICTION_GROUPS",
     "sports_fixture_bundle": "SPORTS_FIXTURE_CLUSTERS",
     "event_contract": "EVENT_CONTRACT_ROOT_CLUSTERS",
-    "odds_snapshot": "SPORTS_FIXTURE_CLUSTERS",
-    "odds_movement": "SPORTS_FIXTURE_CLUSTERS",
-    "arbitrage_opportunity": "SPORTS_FIXTURE_CLUSTERS",
 }
 
 
@@ -857,16 +849,6 @@ PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
     "ETH_UP_DOWN_HOURLY": {"_per_market_min_rows": 100},
     "ETH_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
     "SPX_UP_DOWN_DAILY": {"_per_market_min_rows": 1000},
-    # CME event-contract linked groups — predictions_master Phase 5.
-    # Min-row floors set conservatively at 500 (daily market, ~30min resolution
-    # window before CME 21:00 UTC settlement; Polymarket thinner than BTC/ETH).
-    "NDX_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
-    "RUT_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
-    "DJIA_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
-    "GOLD_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
-    "CRUDE_OIL_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
-    "NATGAS_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
-    "EUR_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
     "FED_RATE_DECISION_PER_FOMC": {"_per_market_min_rows": 100},
     "CPI_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
     "ELECTION_PRESIDENT_2028": {"_per_market_min_rows": 100},

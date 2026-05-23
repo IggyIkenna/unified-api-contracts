@@ -24,7 +24,7 @@ into per-row dicts that match the contract column shape declared here.
 Flattening shipped via plan
 ``plans/active/api_football_minimal_flattening_removal_2026_05_07.plan.md``
 (2026-05-08) — prior to that ``fixture_events`` / ``fixture_stats`` /
-``fixture_lineups`` only persisted ``fixture_id + available_at`` with
+``fixture_lineups`` only persisted ``fixture_id + data_available_at`` with
 the nested arrays dropped, and ``injuries`` persisted four opaque
 ``struct<>`` columns. Reach the canonical column shape via the
 post-flattening commits in UAC + instruments-service.

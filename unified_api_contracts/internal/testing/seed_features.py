@@ -23,12 +23,11 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import cast
 
 import numpy as np
 import pandas as pd
-import pyarrow as pa  # type: ignore[import-untyped]
-import pyarrow.parquet as pq  # type: ignore[import-untyped]
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 log = logging.getLogger(__name__)
@@ -48,11 +47,8 @@ def _read_ohlcv_files(data_dir: Path) -> pd.DataFrame:
     frames: list[pd.DataFrame] = []
     for pf in ohlcv_root.rglob("*.parquet"):
         try:
-            df_result: pd.DataFrame = cast(  # pyright: ignore[reportUnknownMemberType]
-                pd.DataFrame,
-                pq.read_table(str(pf)).to_pandas(),  # pyright: ignore[reportUnknownMemberType]
-            )
-            frames.append(df_result)
+            table = pq.read_table(str(pf))
+            frames.append(table.to_pandas())
         except Exception as exc:
             log.warning("Failed to read %s: %s", pf, exc)
 
@@ -75,9 +71,9 @@ def compute_delta_one(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame()
     out_frames: list[pd.DataFrame] = []
-    for _, grp in df.groupby("symbol"):
+    for symbol, grp in df.groupby("symbol"):
         grp = grp.copy().sort_values("timestamp")
-        close: pd.Series[float] = pd.to_numeric(grp["close"], errors="coerce")
+        close = pd.to_numeric(grp["close"], errors="coerce")
         result = grp[["timestamp", "symbol", "venue"]].copy()
         result["return_1"] = close.pct_change(1)
         result["return_5"] = close.pct_change(5)
@@ -111,12 +107,12 @@ def compute_volatility(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
         return pd.DataFrame()
     out_frames: list[pd.DataFrame] = []
-    for _, grp in df.groupby("symbol"):
+    for symbol, grp in df.groupby("symbol"):
         grp = grp.copy().sort_values("timestamp")
-        close: pd.Series[float] = pd.to_numeric(grp["close"], errors="coerce")
-        high: pd.Series[float] = pd.to_numeric(grp["high"], errors="coerce")
-        low: pd.Series[float] = pd.to_numeric(grp["low"], errors="coerce")
-        log_ret: pd.Series[float] = (close / close.shift(1)).apply(np.log)
+        close = pd.to_numeric(grp["close"], errors="coerce")
+        high = pd.to_numeric(grp["high"], errors="coerce")
+        low = pd.to_numeric(grp["low"], errors="coerce")
+        log_ret = np.log(close / close.shift(1))
 
         result = grp[["timestamp", "symbol", "venue"]].copy()
         result["realised_vol_20"] = log_ret.rolling(20).std() * np.sqrt(252)
@@ -199,12 +195,8 @@ def compute_cross_instrument(df: pd.DataFrame) -> pd.DataFrame:
     pivot = df.pivot_table(index="timestamp", columns="symbol", values="close", aggfunc="last")
     if "BTC/USDT" not in pivot.columns or "ETH/USDT" not in pivot.columns:
         return pd.DataFrame()
-    btc_series = pivot.get("BTC/USDT")
-    eth_series = pivot.get("ETH/USDT")
-    if btc_series is None or eth_series is None:
-        return pd.DataFrame()
-    btc: pd.Series[float] = pd.to_numeric(btc_series, errors="coerce")
-    eth: pd.Series[float] = pd.to_numeric(eth_series, errors="coerce")
+    btc = pd.to_numeric(pivot.get("BTC/USDT"), errors="coerce")
+    eth = pd.to_numeric(pivot.get("ETH/USDT"), errors="coerce")
     combined = pd.DataFrame({"timestamp": pivot.index, "symbol": "cross"})
     combined["btc_eth_corr_20"] = btc.pct_change().rolling(20).corr(eth.pct_change())
     combined["btc_eth_ratio"] = btc / eth.replace(0, np.nan)
@@ -282,10 +274,8 @@ def _write_feature_df(df: pd.DataFrame, name: str, output_dir: Path, dry_run: bo
         # Ensure timestamp column is serializable
         if "timestamp" in df_clean.columns:
             df_clean["timestamp"] = pd.to_datetime(df_clean["timestamp"], utc=True)
-        table: object = pa.Table.from_pandas(  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
-            df_clean, preserve_index=False
-        )
-        pq.write_table(table, out_path, compression="snappy")  # pyright: ignore[reportUnknownMemberType,reportArgumentType]
+        table = pa.Table.from_pandas(df_clean, preserve_index=False)
+        pq.write_table(table, out_path, compression="snappy")
         log.info("Wrote %d rows → %s", len(df_clean), out_path)
 
 
@@ -366,11 +356,11 @@ def _parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = _parse_args(argv if argv is not None else sys.argv[1:])
     return run(
-        mode=cast(str, args.mode),
-        input_dir=cast(Path, args.input),
-        output_dir=cast(Path, args.output),
-        project=cast(str | None, args.project),
-        dry_run=cast(bool, args.dry_run),
+        mode=args.mode,
+        input_dir=args.input,
+        output_dir=args.output,
+        project=args.project,
+        dry_run=args.dry_run,
     )
 
 

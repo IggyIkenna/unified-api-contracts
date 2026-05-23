@@ -1,9 +1,75 @@
-"""Circuit breaker enums — breaker IDs, scopes, actions and recovery modes."""
+"""Circuit-breaker taxonomy — closed-set workspace SSOT.
+
+Phase 1.A of ``disaster_recovery_circuit_breakers_2026_05_10.md``
+(``unified-trading-pm/plans/active/``). Defines the canonical breaker
+taxonomy that the risk-and-exposure-service, execution-service, and
+alerting-service all consume.
+
+Five orthogonal axes per breaker:
+
+1. :class:`CircuitBreakerId` — closed-set identifier (per-archetype x per-trigger).
+2. :class:`BreakerScope` — applicability blast radius
+   (per-venue / per-archetype / per-account / per-asset_group / global).
+3. :class:`BreakerTrigger` — typed condition the breaker watches
+   (threshold value + unit + optional window / consecutive-count).
+4. :class:`BreakerAction` — execution-side response when the trigger fires
+   (BLOCK_NEW / CANCEL_OPEN / SCALE_DOWN / KILL_ALL).
+5. :class:`BreakerRecoveryMode` — recovery semantics
+   (``manual_unkill`` / ``auto_cooldown``).
+
+The :data:`BREAKER_RECOVERY_DEFAULTS` SSOT maps :class:`BreakerAction` to its
+default :class:`BreakerRecoveryMode`. Per-breaker override is supported via
+:attr:`BreakerConfig.recovery_mode`. Per Q8 ratification 2026-05-10 cross-plan
+audit with
+[`risk_simulations_limits_alerting_2026_05_10.md`](../../../../unified-trading-pm/plans/active/risk_simulations_limits_alerting_2026_05_10.md)
+Phase 1.F, recovery wiring is owned here (DR plan Phase 1.A) and the risk plan
+Phase 1.F flips to ``[x]`` once this module ships.
+
+§ 7 SSOT reconciliation seam
+----------------------------
+
+Every Pydantic class docstring below includes a "§ 7 SSOT reconciliation"
+subsection per the seam mandate in
+[`risk_simulations_limits_alerting_2026_05_10.md:44-87`](../../../../unified-trading-pm/plans/active/risk_simulations_limits_alerting_2026_05_10.md).
+The seam:
+
+- :class:`BreakerAction` is a Layer-3 execution-side response distinct from
+  :class:`unified_api_contracts.errors.ErrorAction` (Layer-4 post-venue-error
+  classification per
+  ``codex/04-architecture/autonomous-recovery-matrix.md``).
+- :class:`BreakerScope` composes with
+  :class:`unified_api_contracts.alerting.KillSwitchScope`
+  (per ``codex/04-architecture/kill-switch-circuit-breaker.md``) —
+  breaker firing at ``PER_VENUE`` may engage a :class:`KillSwitchId` at
+  ``KillSwitchScope.VENUE``.
+- :class:`BreakerRecoveryMode` orthogonal to the kill-switch 4-set strategy
+  behaviours (``STOP_NEW_ONLY`` / ``FAST_UNWIND`` / ``SLOW_UNWIND`` /
+  ``DELTA_HEDGE``) — recovery decides WHEN the breaker disarms; strategy
+  behaviour decides WHAT the strategy does while armed.
+
+Adding a new breaker
+--------------------
+
+1. Append the identifier to :class:`CircuitBreakerId` here.
+2. Add a :class:`BreakerConfig` entry to the per-archetype registry under
+   ``unified_api_contracts/registry/circuit_breakers/<archetype>.py``.
+3. If the trigger maps to an alert, append the corresponding :class:`AlertCode`
+   in ``alerting/codes.py`` (Sub-B's scope).
+4. Update the codex doc list per
+   ``disaster_recovery_circuit_breakers_2026_05_10.md`` Phase 8.
+"""
 
 from __future__ import annotations
 
+from datetime import datetime
+from decimal import Decimal
 from enum import StrEnum
-from typing import Final
+from typing import Final, Literal
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+from .alerting.codes import AlertCode, AlertSeverity
+from .alerting.thresholds import ThresholdUnit
 
 
 class CircuitBreakerId(StrEnum):
@@ -100,23 +166,6 @@ class CircuitBreakerId(StrEnum):
     STABLECOIN_DEPEG_CATASTROPHIC = "STABLECOIN_DEPEG_CATASTROPHIC"
     """Stablecoin peg deviation ≥ 1000bps (standard) / 500bps (synthetic) — KILL_ALL + MANUAL_UNKILL."""
 
-    # ── LST depeg ladder (D.2 — risk plan Phase D) ────────────────────────────────────
-    LST_DEPEG_WARNING = "LST_DEPEG_WARNING"
-    """LST/ETH peg deviation ≥ 100bps — BLOCK_NEW. Monitors stETH/rETH/cbETH/JitoSOL/mSOL
-    secondary-market price vs protocol exchange rate. 100bps is notable (stETH 2022 event
-    touched -630bps at trough); normal rebalancing noise is ≤ 30bps."""
-    LST_DEPEG_SMALL = "LST_DEPEG_SMALL"
-    """LST/ETH peg deviation ≥ 300bps — SCALE_DOWN. Meaningful adverse move; reduce
-    carry_staked_basis leverage before redemption-queue pressure worsens."""
-    LST_DEPEG_MODERATE = "LST_DEPEG_MODERATE"
-    """LST/ETH peg deviation ≥ 500bps — CANCEL_OPEN. Mirrors the
-    ``DEFI_LST_DEPEG_STETH_5PCT`` scenario trigger point; carry leg loses 5% vs perp
-    hedge; replaces generic ``DRAWDOWN_DAILY_BPS`` trip for LST-specific depeg path."""
-    LST_DEPEG_CATASTROPHIC = "LST_DEPEG_CATASTROPHIC"
-    """LST/ETH peg deviation ≥ 1500bps — KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS +
-    MANUAL_UNKILL. Extreme event (e.g. mass validator slashing + redemption freeze);
-    carry position structurally broken; requires operator review before re-arming."""
-
     # ── DR Phase 1.A+4 extensions — simulation_scenarios Day-1 follow-up (2026-05-13) ──
     # 4 breakers surfaced from simulation_scenarios_topology_price_shocks_2026_05_09
     # Day-1 run: per-chain RPC outage disambiguation, oracle staleness, lending
@@ -145,6 +194,11 @@ class CircuitBreakerId(StrEnum):
     default = 30s (same as Ethereum for operational simplicity; per-archetype
     override can tighten). Added 2026-05-13 per simulation_scenarios Day-1."""
 
+    # NOTE 2026-05-13 (slot 5): LENDING_POOL_UNAVAILABLE_SECONDS was duplicated
+    # here in commit adcfcf5 — already defined at line 153 above with the same
+    # semantic ("Aave / lending pool paused OR borrow-cap-locked"). Duplicate
+    # removed to unblock workspace-wide UAC imports.
+
 
 class BreakerScope(StrEnum):
     """Blast-radius scope for a breaker.
@@ -169,8 +223,6 @@ class BreakerScope(StrEnum):
     PER_ASSET_GROUP = "PER_ASSET_GROUP"
     PER_STABLE = "PER_STABLE"
     """Per-stablecoin scope — ``applies_to`` is the stable symbol (e.g. ``"USDC"``)."""
-    PER_LST = "PER_LST"
-    """Per-LST scope — ``applies_to`` is the LST symbol (e.g. ``"stETH"``)."""
     GLOBAL = "GLOBAL"
 
 
@@ -264,10 +316,212 @@ rationale in the registry seed.
 """
 
 
-__all__ = [
-    "BREAKER_RECOVERY_DEFAULTS",
-    "BreakerAction",
-    "BreakerRecoveryMode",
-    "BreakerScope",
-    "CircuitBreakerId",
-]
+class BreakerTrigger(BaseModel):
+    """Typed condition union — what the breaker watches.
+
+    Captures the numeric threshold (value + unit) plus optional time-window
+    semantics (consecutive-count + window-seconds). Concrete trigger semantics
+    are implementation-side (risk-and-exposure-service consumes these and
+    evaluates against live metrics).
+
+    § 7 SSOT reconciliation
+    ~~~~~~~~~~~~~~~~~~~~~~~
+
+    Composes with :class:`unified_api_contracts.alerting.AlertThreshold` —
+    breaker triggers use the same :class:`ThresholdUnit` vocabulary so the
+    unit-disambiguation rules (bps vs ratio vs USD) carry through. Where a
+    breaker maps 1:1 to an existing :class:`AlertThreshold` entry, the
+    registry seed should reuse the threshold key rather than duplicate the
+    value.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    trigger_type: CircuitBreakerId
+    """Which :class:`CircuitBreakerId` this trigger evaluates."""
+
+    threshold_value: Decimal
+    """Numeric threshold the metric must cross to fire."""
+
+    threshold_unit: ThresholdUnit
+    """Unit of the threshold value. Mirrors
+    :class:`unified_api_contracts.alerting.ThresholdUnit` vocabulary so
+    consumers normalise observed values to the same unit."""
+
+    window_seconds: int | None = Field(default=None)
+    """Optional rolling-window length for time-window-based triggers
+    (e.g. ``REJECT_RATE_BPS`` over a 60s window). ``None`` = instantaneous."""
+
+    consecutive_count: int | None = Field(default=None)
+    """Optional consecutive-evaluation count required before firing
+    (e.g. trigger fires only after 3 consecutive readings above threshold).
+    ``None`` = single-evaluation fire."""
+
+
+class BreakerConfig(BaseModel):
+    """A single breaker's full configuration.
+
+    Each entry in the per-archetype registry seed (under
+    ``unified_api_contracts/registry/circuit_breakers/<archetype>.py``) is a
+    :class:`BreakerConfig` instance. Reviewers cross-check that every
+    :class:`CircuitBreakerId` listed for an archetype has both a config here
+    AND a recovery rule in :class:`BreakerRecoveryRule`.
+
+    Validator semantics
+    ~~~~~~~~~~~~~~~~~~~
+
+    - If ``recovery_mode is None`` at construction, the default from
+      :data:`BREAKER_RECOVERY_DEFAULTS` is filled in via :class:`model_validator`.
+    - If ``recovery_mode == BreakerRecoveryMode.AUTO_COOLDOWN``,
+      ``cooldown_seconds`` MUST be a positive int.
+    - If ``recovery_mode == BreakerRecoveryMode.MANUAL_UNKILL``,
+      ``cooldown_seconds`` MUST be ``None``.
+
+    § 7 SSOT reconciliation
+    ~~~~~~~~~~~~~~~~~~~~~~~
+
+    Composes with the cross-plan seam declared in
+    ``risk_simulations_limits_alerting_2026_05_10.md:44-87``: this
+    :class:`BreakerConfig` ships from DR plan Phase 1.A; the risk plan
+    Phase 1.F flips on the same UAC commit since both depend on
+    :class:`BreakerRecoveryMode` + :data:`BREAKER_RECOVERY_DEFAULTS` being
+    available in UAC.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    breaker_id: CircuitBreakerId
+    scope: BreakerScope
+    applies_to: str = Field(default="*")
+    """Scope-key (e.g. venue name when scope=PER_VENUE; archetype string when
+    scope=PER_ARCHETYPE). ``"*"`` means scope-wide (every member of the scope)."""
+
+    trigger: BreakerTrigger
+    action: BreakerAction
+    recovery_mode: BreakerRecoveryMode | None = Field(default=None)
+    """Recovery mode; if ``None``, falls back to
+    :data:`BREAKER_RECOVERY_DEFAULTS[action]` at validation time."""
+
+    cooldown_seconds: int | None = Field(default=None)
+    """Required when ``recovery_mode == AUTO_COOLDOWN``; MUST be ``None`` when
+    ``recovery_mode == MANUAL_UNKILL``."""
+
+    alerting_severity: AlertSeverity
+    """Severity tier for the ``BREAKER_ARMED`` / ``BREAKER_DISARMED`` alert
+    rule. Mirrors :class:`AlertSeverity` 4-set."""
+
+    description: str = Field(default="")
+
+    @model_validator(mode="after")
+    def _fill_recovery_default_and_validate(self) -> BreakerConfig:
+        # Fill default recovery mode if not set
+        effective_recovery = self.recovery_mode
+        if effective_recovery is None:
+            effective_recovery = BREAKER_RECOVERY_DEFAULTS[self.action]
+            object.__setattr__(self, "recovery_mode", effective_recovery)
+        # Validate cooldown_seconds consistency with recovery_mode
+        if effective_recovery == BreakerRecoveryMode.AUTO_COOLDOWN:
+            if self.cooldown_seconds is None or self.cooldown_seconds <= 0:
+                raise ValueError(
+                    f"BreakerConfig({self.breaker_id.value}): cooldown_seconds REQUIRED "
+                    f"and > 0 when recovery_mode=AUTO_COOLDOWN; got {self.cooldown_seconds!r}"
+                )
+        else:  # MANUAL_UNKILL
+            if self.cooldown_seconds is not None:
+                raise ValueError(
+                    f"BreakerConfig({self.breaker_id.value}): cooldown_seconds MUST be None "
+                    f"when recovery_mode=MANUAL_UNKILL; got {self.cooldown_seconds!r}"
+                )
+        return self
+
+
+class BreakerRecoveryRule(BaseModel):
+    """Per-breaker recovery semantics — guard predicate + retry policy.
+
+    One :class:`BreakerRecoveryRule` per :class:`CircuitBreakerId` is required
+    in the per-archetype registry. The rule encodes:
+
+    - What named guard the breaker must observe green before disarming
+      (e.g. ``"oracle deviation < 5 sigma for 5min"``).
+    - Whether retry escalates (exponential / linear / none).
+    - Whether the breaker auto-disarms after a hard timeout regardless of
+      guard state, or stays armed until manual action.
+
+    § 7 SSOT reconciliation
+    ~~~~~~~~~~~~~~~~~~~~~~~
+
+    Composes with :data:`BREAKER_RECOVERY_DEFAULTS` — the rule's
+    ``auto_disarm_after_seconds`` semantics are gated by the
+    :class:`BreakerRecoveryMode` from the matching :class:`BreakerConfig`:
+    ``MANUAL_UNKILL`` rules ignore ``auto_disarm_after_seconds`` (always
+    ``None``); ``AUTO_COOLDOWN`` rules MUST declare a positive value matching
+    ``BreakerConfig.cooldown_seconds``.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    breaker_id: CircuitBreakerId
+    guard_description: str
+    """One-line description of the green-condition guard the breaker checks
+    before disarming. Operator-readable; not parsed by code."""
+
+    retry_policy: str = Field(default="none")
+    """``"exponential"`` / ``"linear"`` / ``"none"`` — retry semantics if the
+    breaker tries to disarm and the guard is still red."""
+
+    auto_disarm_after_seconds: int | None = Field(default=None)
+    """If set, breaker auto-disarms after this many seconds regardless of
+    guard state. ``None`` = breaker stays armed indefinitely (manual disarm
+    only) — typical for ``MANUAL_UNKILL`` mode."""
+
+
+class BreakerFiredEvent(BaseModel):
+    """Emitted when a circuit breaker arms (``state="armed"``) or disarms
+    (``state="disarmed"``).
+
+    Mirrors :class:`unified_api_contracts.canonical.crosscutting.risk_rule.RiskRuleFiredEvent`.
+    Frozen + extra=forbid.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    breaker_id: CircuitBreakerId
+    scope: BreakerScope
+    applies_to: str
+    """Archetype name, venue slug, or ``"*"`` for global scope."""
+    action: BreakerAction
+    recovery_mode: BreakerRecoveryMode
+    cooldown_seconds: int | None
+    alerting_severity: AlertSeverity
+    alert_code: AlertCode
+    fired_at: datetime
+    state: Literal["armed", "disarmed"]
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+def breaker_fired_event(
+    config: BreakerConfig,
+    *,
+    fired_at: datetime,
+    alert_code: AlertCode,
+    state: Literal["armed", "disarmed"],
+    metadata: dict[str, str] | None = None,
+) -> BreakerFiredEvent:
+    """Convenience constructor that hydrates :class:`BreakerFiredEvent` from a
+    :class:`BreakerConfig`.
+    """
+    recovery_mode = config.recovery_mode
+    assert recovery_mode is not None  # model_validator always fills this field
+    return BreakerFiredEvent(
+        breaker_id=config.breaker_id,
+        scope=config.scope,
+        applies_to=config.applies_to,
+        action=config.action,
+        recovery_mode=recovery_mode,
+        cooldown_seconds=config.cooldown_seconds,
+        alerting_severity=config.alerting_severity,
+        alert_code=alert_code,
+        fired_at=fired_at,
+        state=state,
+        metadata=metadata or {},
+    )

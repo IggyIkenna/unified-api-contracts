@@ -2,11 +2,11 @@
 
 These enums identify DeFi lending protocols and chain identifiers used across
 the DeFi pipeline (MTDS adapters, strategy-service archetype configs, execution-service
-connectors, strategy-service/risk HF calculations).
+connectors, risk-and-exposure-service HF calculations).
 
 They live here (not in a service-specific module) because the same enum values
 flow through UAC archetype config, strategy-service factory, execution-service
-orchestrator, strategy-service/risk HF calculation, and MTDS lending-rate
+orchestrator, risk-and-exposure-service HF calculation, and MTDS lending-rate
 adapter keys — four services, one source of truth.
 
 Plans:

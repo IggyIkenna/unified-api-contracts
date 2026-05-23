@@ -143,7 +143,7 @@ class TestNoAnyAnnotations:
         "module_path",
         [
             "unified_api_contracts.canonical.domain",
-            "unified_api_contracts.canonical.domain.execution",
+            "unified_api_contracts.canonical.execution",
             "unified_api_contracts.canonical.crosscutting.errors",
         ],
     )

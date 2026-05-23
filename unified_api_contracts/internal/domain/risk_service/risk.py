@@ -33,7 +33,7 @@ class PositionSide(StrEnum):
 
 
 class RiskPosition(BaseModel):
-    """Position as tracked by strategy-service/risk."""
+    """Position as tracked by risk-and-exposure-service."""
 
     client_id: str = Field(..., json_schema_extra={"pii": True})
     strategy_id: str | None = None
@@ -217,7 +217,7 @@ class CircuitBreakerEvent(BaseModel):
 class EODSettlementTrigger(BaseModel):
     """End-of-day settlement trigger published to the ``eod-settlement`` Pub/Sub topic.
 
-    Consumed by strategy-service/pnl and strategy-service/risk to
+    Consumed by pnl-attribution-service and risk-and-exposure-service to
     lock in daily PnL, settle positions, and archive daily snapshots.
     """
 

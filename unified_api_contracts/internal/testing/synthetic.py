@@ -18,16 +18,14 @@ from __future__ import annotations
 import fnmatch
 import json
 import logging
-import math
 from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
-from typing import Any, Final, cast
+from typing import Final, cast
 
 import numpy as np
-import numpy.typing as npt
 import pandas as pd
-import pyarrow as pa  # type: ignore[import-untyped]
-import pyarrow.parquet as pq  # type: ignore[import-untyped]
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 from unified_api_contracts.internal.testing.scenario_config import (
     InstrumentOverrideAction,
@@ -125,7 +123,7 @@ class SyntheticDataGenerator:
 
     def __init__(
         self,
-        spec: dict[str, Any],
+        spec: dict[object, object],
         seed: int = 42,
         scenario: ScenarioConfig | None = None,
     ) -> None:
@@ -135,31 +133,24 @@ class SyntheticDataGenerator:
         self._rng = np.random.default_rng(effective_seed)
 
         vol_mult = scenario.vol_multiplier if scenario is not None else 1.0
-        raw_gbm: dict[str, object] = cast(dict[str, object], spec.get("gbm_params") or {})
-        self._gbm_params: dict[str, dict[str, float]] = {}
-        for sym, p in raw_gbm.items():
-            if isinstance(p, dict):
-                gbm_params: dict[str, object] = cast("dict[str, object]", p)
-                self._gbm_params[sym] = {
-                    str(pk): float(cast(float, pv)) * (vol_mult if pk == "vol" else 1.0)
-                    for pk, pv in gbm_params.items()
-                    if isinstance(pv, (int, float))
-                }
-
-        raw_defi: dict[str, object] = cast(dict[str, object], spec.get("defi_yield_params") or {})
-        self._defi_params: dict[str, dict[str, float]] = {}
-        for key, p in raw_defi.items():
-            if isinstance(p, dict):
-                defi_params: dict[str, object] = cast("dict[str, object]", p)
-                self._defi_params[key] = {
-                    str(pk): float(cast(float, pv)) for pk, pv in defi_params.items() if isinstance(pv, (int, float))
-                }
-
-        correlations_raw: dict[str, object] = cast(dict[str, object], spec.get("correlations") or {})
-        self._correlations: dict[str, float] = {}
-        for k, v in correlations_raw.items():
-            if isinstance(v, (int, float, str)):
-                self._correlations[str(k)] = float(v)
+        raw_gbm: dict[str, object] = {str(k): v for k, v in (spec.get("gbm_params") or {}).items()}
+        self._gbm_params: dict[str, dict[str, float]] = {
+            sym: {str(pk): float(pv) * (vol_mult if pk == "vol" else 1.0) for pk, pv in params.items()}
+            for sym, params in (
+                (sym, {str(pk): pv for pk, pv in p.items()}) for sym, p in raw_gbm.items() if isinstance(p, dict)
+            )
+        }
+        raw_defi: dict[str, object] = {str(k): v for k, v in (spec.get("defi_yield_params") or {}).items()}
+        self._defi_params: dict[str, dict[str, float]] = {
+            key: {str(pk): float(pv) for pk, pv in params.items()}
+            for key, params in (
+                (key, {str(pk): pv for pk, pv in p.items()}) for key, p in raw_defi.items() if isinstance(p, dict)
+            )
+        }
+        correlations_raw = spec.get("correlations") or {}
+        self._correlations: dict[str, float] = cast(
+            "dict[str, float]", {str(k): float(cast("float | str | int", v)) for k, v in correlations_raw.items()}
+        )
 
     # ------------------------------------------------------------------
     # Fault injection helpers
@@ -182,7 +173,7 @@ class SyntheticDataGenerator:
         corrupt_indices = self._rng.choice(len(df), size=n_corrupt, replace=False)
         numeric_cols = df.select_dtypes(include=["number"]).columns.tolist()
         if numeric_cols:
-            col: str = cast(str, self._rng.choice(numeric_cols))
+            col = self._rng.choice(numeric_cols)
             df.loc[df.index[corrupt_indices], col] = np.nan
         log.info("Corrupted %d rows (%.1f%%) for BAD_SCHEMA scenario", n_corrupt, rate * 100)
         return df
@@ -228,7 +219,7 @@ class SyntheticDataGenerator:
     ) -> pd.DataFrame:
         """Generate OHLCV bars matching CanonicalOhlcvBar schema."""
         params = self._gbm_params.get(symbol, {"vol": 0.50, "drift": 0.05, "base_price": 100.0})
-        path = self._gbm_path(
+        prices = self._gbm_path(
             base_price=params["base_price"],
             annual_vol=params["vol"],
             annual_drift=params["drift"],
@@ -238,11 +229,9 @@ class SyntheticDataGenerator:
         )
 
         # Inject flash crash if configured (FLASH_CRASH scenario)
-        path_prices: npt.NDArray[np.float64] = cast(npt.NDArray[np.float64], path["prices"])
-        path["prices"] = self._apply_flash_crash(path_prices)
-        path["close"] = path["prices"]
+        prices = self._apply_flash_crash(prices)
 
-        df = self._prices_to_ohlcv(path, symbol, venue, interval, start, end)
+        df = self._prices_to_ohlcv(prices, symbol, venue, interval, start, end)
 
         # Apply missing_data_rate dropout
         missing_rate = self._scenario.missing_data_rate if self._scenario is not None else 0.0
@@ -286,23 +275,23 @@ class SyntheticDataGenerator:
         timestamps = self._make_timestamps(start, end, interval)
         n = len(timestamps)
         dt = INTERVAL_MINUTES.get(interval, 60) / (MINUTES_PER_YEAR)
-        apy: npt.NDArray[np.float64] = np.empty(n)
+        apy = np.empty(n)
         apy[0] = params["base_apy"]
         for i in range(1, n):
-            mean_rev: float = params["kappa"] * (params["mean"] - cast(float, apy[i - 1])) * dt
-            noise: float = params["sigma"] * math.sqrt(dt) * self._rng.standard_normal()
-            apy[i] = max(0.0, cast(float, apy[i - 1]) + mean_rev + noise)
+            mean_rev = params["kappa"] * (params["mean"] - apy[i - 1]) * dt
+            noise = params["sigma"] * np.sqrt(dt) * float(self._rng.standard_normal())
+            apy[i] = max(0.0, apy[i - 1] + mean_rev + noise)
 
         from unified_api_contracts.internal.index_utils import apy_to_cumulative_index
 
         # Convert APY series to cumulative liquidity index
-        apy_list: list[float] = cast(list[float], apy.tolist())
+        apy_list: list[float] = [float(v) for v in apy]
         liquidity_index = apy_to_cumulative_index(apy_list, timestamps, base=1.0)
 
         # Borrow APY: supply * spread factor (1.2-1.5x, deterministic per protocol)
         borrow_spread = self._borrow_spread(protocol)
-        borrow_apy_list: list[float] = [v * borrow_spread for v in apy_list]
-        borrow_apy: npt.NDArray[np.float64] = np.array(borrow_apy_list, dtype=np.float64)
+        borrow_apy = np.array([v * borrow_spread for v in apy_list])
+        borrow_apy_list: list[float] = [float(v) for v in borrow_apy]
         variable_borrow_index = apy_to_cumulative_index(borrow_apy_list, timestamps, base=1.0)
 
         return pd.DataFrame(
@@ -349,17 +338,16 @@ class SyntheticDataGenerator:
         for proto in protocols:
             params = _STAKING_PARAMS.get(proto, _STAKING_PARAMS["_default"])
             dt = (interval_hours * 60) / MINUTES_PER_YEAR
-            apy_arr: npt.NDArray[np.float64] = np.empty(n)
-            apy_arr[0] = params["base_apy"]
+            apy = np.empty(n)
+            apy[0] = params["base_apy"]
             for i in range(1, n):
-                mean_rev: float = params["kappa"] * (params["mean"] - cast(float, apy_arr[i - 1])) * dt
-                noise: float = params["sigma"] * math.sqrt(dt) * self._rng.standard_normal()
-                apy_arr[i] = max(0.001, cast(float, apy_arr[i - 1]) + mean_rev + noise)
-            apy = apy_arr
+                mean_rev = params["kappa"] * (params["mean"] - apy[i - 1]) * dt
+                noise = params["sigma"] * np.sqrt(dt) * float(self._rng.standard_normal())
+                apy[i] = max(0.001, apy[i - 1] + mean_rev + noise)
 
             from unified_api_contracts.internal.index_utils import staking_rate_to_index
 
-            apy_list: list[float] = cast(list[float], apy.tolist())
+            apy_list: list[float] = [float(v) for v in apy]
             index_values = staking_rate_to_index(apy_list, timestamps, base=1.0)
 
             frames.append(
@@ -384,7 +372,7 @@ class SyntheticDataGenerator:
         num_matches: int = 50,
     ) -> pd.DataFrame:
         """Generate pre-match odds for a sports league (CanonicalOdds-compatible)."""
-        rows: list[dict[str, Any]] = []
+        rows: list[dict[str, object]] = []
         base_date = datetime(2024, 1, 6, 15, 0, 0, tzinfo=UTC)
         match_interval_days = 7
 
@@ -428,7 +416,7 @@ class SyntheticDataGenerator:
         levels: int = 10,
         mid_price: float = 60000.0,
         spread_bps: float = 5.0,
-    ) -> list[dict[str, Any]]:
+    ) -> list[dict[str, object]]:
         """Generate L2 orderbook snapshots with realistic bid/ask levels.
 
         Each snapshot contains ``levels`` bid and ``levels`` ask levels around a
@@ -456,17 +444,17 @@ class SyntheticDataGenerator:
         # at top of book).  Index 0 (best price) gets the largest size.
         power_exp = 1.5
 
-        snapshots: list[dict[str, Any]] = []
+        snapshots: list[dict[str, object]] = []
         current_mid = mid_price
 
         for i in range(num_snapshots):
             ts = base_ts + timedelta(seconds=i * interval_s)
 
             # Mid-price random walk (small increments)
-            current_mid *= 1.0 + 0.0001 * self._rng.standard_normal()
+            current_mid *= 1.0 + 0.0001 * float(self._rng.standard_normal())
 
             # Spread varies around spread_bps (clamped to >= 1 bp)
-            actual_spread_bps = max(1.0, spread_bps + 2.0 * self._rng.standard_normal())
+            actual_spread_bps = max(1.0, spread_bps + 2.0 * float(self._rng.standard_normal()))
             half_spread = current_mid * actual_spread_bps / 10_000.0
 
             best_bid = current_mid - half_spread
@@ -483,12 +471,10 @@ class SyntheticDataGenerator:
             # Build bid levels (descending prices from best_bid)
             bids: list[list[float]] = []
             for lvl in range(levels):
-                price: float = round(best_bid - lvl * tick * (1 + lvl * 0.5), 8)
+                price = round(best_bid - lvl * tick * (1 + lvl * 0.5), 8)
                 # Power-law: top-of-book has the most liquidity
-                base_size: float = self._rng.exponential(1.0)
-                lvl_ratio: float = levels / (lvl + 1)
-                raw_size: float = base_size * math.pow(lvl_ratio, power_exp)
-                size: float = round(raw_size, 8)
+                base_size = float(self._rng.exponential(1.0))
+                size = round(base_size * (levels / (lvl + 1)) ** power_exp, 8)
                 size = max(0.001, size)
                 bids.append([price, size])
 
@@ -496,10 +482,8 @@ class SyntheticDataGenerator:
             asks: list[list[float]] = []
             for lvl in range(levels):
                 price = round(best_ask + lvl * tick * (1 + lvl * 0.5), 8)
-                base_size = self._rng.exponential(1.0)
-                lvl_ratio = levels / (lvl + 1)
-                raw_size = base_size * math.pow(lvl_ratio, power_exp)
-                size = round(raw_size, 8)
+                base_size = float(self._rng.exponential(1.0))
+                size = round(base_size * (levels / (lvl + 1)) ** power_exp, 8)
                 size = max(0.001, size)
                 asks.append([price, size])
 
@@ -650,7 +634,7 @@ class SyntheticDataGenerator:
         vol_mult = self._scenario.volume_multiplier if self._scenario is not None else 1.0
         timestamps = cast("list[datetime]", prices_1m["timestamps"])
         close_prices = cast("list[float]", prices_1m["close"])
-        rows: list[dict[str, Any]] = []
+        rows: list[dict[str, object]] = []
         for bar_ts, bar_price in zip(timestamps, close_prices, strict=False):
             self._append_bar_ticks(rows, bar_ts, bar_price, venue, symbol, trades_per_minute, vol_mult)
         log.info(
@@ -665,7 +649,7 @@ class SyntheticDataGenerator:
 
     def _append_bar_ticks(
         self,
-        rows: list[dict[str, Any]],
+        rows: list[dict[str, object]],
         bar_ts: datetime,
         bar_price: float,
         venue: str,
@@ -677,7 +661,7 @@ class SyntheticDataGenerator:
         for t in range(trades_per_minute):
             tick_ts = bar_ts + timedelta(seconds=int(t * SECONDS_PER_MINUTE / trades_per_minute))
             spread_pct = 0.0005 + 0.0005 * float(self._rng.random())
-            price = bar_price * (1.0 + spread_pct * self._rng.standard_normal())
+            price = bar_price * (1.0 + spread_pct * float(self._rng.standard_normal()))
             qty_raw = float(self._rng.exponential(0.5)) * vol_mult
             qty = max(0.001, qty_raw)
             side = "buy" if self._rng.random() > 0.5 else "sell"
@@ -708,24 +692,24 @@ class SyntheticDataGenerator:
         start: date,
         end: date,
         interval: str,
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Geometric Brownian Motion price path."""
         timestamps = self._make_timestamps(start, end, interval)
         n = len(timestamps)
         interval_minutes = INTERVAL_MINUTES.get(interval, 1)
         dt = interval_minutes / MINUTES_PER_YEAR
         drift_term = (annual_drift - 0.5 * annual_vol**2) * dt
-        vol_term: float = annual_vol * math.sqrt(dt)
-        shocks: npt.NDArray[np.float64] = self._rng.standard_normal(n)
-        log_returns: npt.NDArray[np.float64] = drift_term + vol_term * shocks
-        log_prices: npt.NDArray[np.float64] = math.log(base_price) + np.cumsum(log_returns)
-        log_prices = np.insert(log_prices[:-1], 0, math.log(base_price))
-        prices: npt.NDArray[np.float64] = np.exp(log_prices)
+        vol_term = annual_vol * np.sqrt(dt)
+        shocks = self._rng.standard_normal(n)
+        log_returns = drift_term + vol_term * shocks
+        log_prices = np.log(base_price) + np.cumsum(log_returns)
+        log_prices = np.insert(log_prices[:-1], 0, np.log(base_price))
+        prices = np.exp(log_prices)
         return {"timestamps": timestamps, "prices": prices, "close": prices}
 
     def _prices_to_ohlcv(
         self,
-        path: dict[str, Any],
+        path: dict[str, object],
         symbol: str,
         venue: str,
         interval: str,
@@ -734,27 +718,21 @@ class SyntheticDataGenerator:
     ) -> pd.DataFrame:
         """Convert GBM price path to OHLCV bars."""
         timestamps = cast("list[datetime]", path["timestamps"])
-        prices: npt.NDArray[np.float64] = cast(npt.NDArray[np.float64], path["prices"])
+        prices: np.ndarray = np.asarray(path["prices"])
         n = len(timestamps)
         interval_minutes = INTERVAL_MINUTES.get(interval, 1)
-        intrabar_vol: float = 0.002 * math.sqrt(float(interval_minutes))
+        intrabar_vol = 0.002 * np.sqrt(interval_minutes)
 
-        opens: npt.NDArray[np.float64] = prices.copy()
-        closes: npt.NDArray[np.float64] = prices * np.exp(intrabar_vol * self._rng.standard_normal(n))
-        highs: npt.NDArray[np.float64] = np.maximum(opens, closes) * (
-            1.0 + abs(intrabar_vol * self._rng.standard_normal(n) * 0.5)
-        )
-        lows: npt.NDArray[np.float64] = np.minimum(opens, closes) * (
-            1.0 - abs(intrabar_vol * self._rng.standard_normal(n) * 0.5)
-        )
+        opens = prices.copy()
+        closes = prices * np.exp(intrabar_vol * self._rng.standard_normal(n))
+        highs = np.maximum(opens, closes) * (1.0 + abs(intrabar_vol * self._rng.standard_normal(n) * 0.5))
+        lows = np.minimum(opens, closes) * (1.0 - abs(intrabar_vol * self._rng.standard_normal(n) * 0.5))
 
-        hour_weights: npt.NDArray[np.float64] = np.array(
-            [_HOUR_VOLUME_WEIGHTS[ts.hour] for ts in timestamps], dtype=np.float64
-        )
+        hour_weights = np.array([_HOUR_VOLUME_WEIGHTS[ts.hour] for ts in timestamps])
         base_volume = self._base_volume_for_symbol(symbol)
         vol_mult = self._scenario.volume_multiplier if self._scenario is not None else 1.0
-        volumes: npt.NDArray[np.float64] = base_volume * hour_weights * (0.5 + self._rng.random(n)) * vol_mult
-        quote_volumes: npt.NDArray[np.float64] = volumes * prices
+        volumes = base_volume * hour_weights * (0.5 + self._rng.random(n)) * vol_mult
+        quote_volumes = volumes * prices
 
         return pd.DataFrame(
             {
@@ -816,9 +794,9 @@ class SyntheticDataGenerator:
             "lido": 20_000_000_000.0,
         }
         base = tvl_base.get(protocol, 1_000_000_000.0)
-        shocks: npt.NDArray[np.float64] = self._rng.standard_normal(n) * 0.005
-        log_tvl: npt.NDArray[np.float64] = math.log(base) + np.cumsum(shocks)
-        log_tvl = np.insert(log_tvl[:-1], 0, math.log(base))
+        shocks = self._rng.standard_normal(n) * 0.005
+        log_tvl = np.log(base) + np.cumsum(shocks)
+        log_tvl = np.insert(log_tvl[:-1], 0, np.log(base))
         return np.round(np.exp(log_tvl), 0)
 
 
@@ -836,17 +814,6 @@ def build_instrument_key(venue: str, symbol: str, instrument_type: str = "SPOT_P
 # ---------------------------------------------------------------------------
 # Output writer
 # ---------------------------------------------------------------------------
-
-
-def _df_to_parquet(df: pd.DataFrame, out_path: Path) -> None:
-    """Write a DataFrame to a Parquet file (snappy compression).
-
-    Isolated helper so pyarrow unknown-type errors are contained to one place.
-    """
-    table: object = pa.Table.from_pandas(  # pyright: ignore[reportUnknownMemberType,reportUnknownVariableType]
-        df, preserve_index=False
-    )
-    pq.write_table(table, out_path, compression="snappy")  # pyright: ignore[reportUnknownMemberType,reportArgumentType]
 
 
 class SeedDataWriter:
@@ -868,7 +835,8 @@ class SeedDataWriter:
         out_dir = self._output_dir / "ohlcv" / clean_symbol / str(year) / month / day
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "data.parquet"
-        _df_to_parquet(df, out_path)
+        table = pa.Table.from_pandas(df, preserve_index=False)
+        pq.write_table(table, out_path, compression="snappy")
         log.info("Wrote %d rows → %s", len(df), out_path)
         return out_path
 
@@ -881,7 +849,8 @@ class SeedDataWriter:
         out_dir = self._output_dir / "tick" / venue / clean_symbol
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "data.parquet"
-        _df_to_parquet(df, out_path)
+        table = pa.Table.from_pandas(df, preserve_index=False)
+        pq.write_table(table, out_path, compression="snappy")
         log.info("Wrote %d tick rows → %s", len(df), out_path)
         return out_path
 
@@ -893,7 +862,8 @@ class SeedDataWriter:
         out_dir = self._output_dir / "defi" / protocol / asset
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "yields.parquet"
-        _df_to_parquet(df, out_path)
+        table = pa.Table.from_pandas(df, preserve_index=False)
+        pq.write_table(table, out_path, compression="snappy")
         log.info("Wrote %d DeFi rows → %s", len(df), out_path)
         return out_path
 
@@ -905,11 +875,12 @@ class SeedDataWriter:
         out_dir = self._output_dir / "sports" / venue / league
         out_dir.mkdir(parents=True, exist_ok=True)
         out_path = out_dir / "odds.parquet"
-        _df_to_parquet(df, out_path)
+        table = pa.Table.from_pandas(df, preserve_index=False)
+        pq.write_table(table, out_path, compression="snappy")
         log.info("Wrote %d sports rows → %s", len(df), out_path)
         return out_path
 
-    def write_orderbook(self, snapshots: list[dict[str, Any]], symbol: str, venue: str) -> Path:
+    def write_orderbook(self, snapshots: list[dict[str, object]], symbol: str, venue: str) -> Path:
         """Write orderbook snapshots to a JSON file."""
         if not snapshots:
             log.warning("Empty orderbook snapshots for %s/%s — skipping", venue, symbol)
@@ -922,7 +893,7 @@ class SeedDataWriter:
         log.info("Wrote %d orderbook snapshots → %s", len(snapshots), out_path)
         return out_path
 
-    def write_manifest(self, manifest: dict[str, Any]) -> Path:
+    def write_manifest(self, manifest: dict[str, object]) -> Path:
         """Write a JSON manifest summarising all generated files."""
         out_path = self._output_dir / "seed_manifest.json"
         out_path.write_text(json.dumps(manifest, indent=2, default=str))

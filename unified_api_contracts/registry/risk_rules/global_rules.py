@@ -43,7 +43,6 @@ from decimal import Decimal
 
 from unified_api_contracts.canonical.crosscutting.alerting import AlertSeverity
 from unified_api_contracts.canonical.crosscutting.risk_rule import (
-    BinaryEventTrigger,
     CapitalAtRiskCeilingTrigger,
     MaxDrawdownTrigger,
     RiskRule,
@@ -94,51 +93,6 @@ _GLOBAL_RULES: tuple[RiskRule, ...] = (
         description=(
             "Workspace-wide total 95% VaR ceiling (USD-notional). Fires when "
             "aggregated portfolio CaR exceeds the workspace cap. Triggers "
-            "GLOBAL kill-switch — human operator restart required."
-        ),
-        triggers_kill_switch=True,
-    ),
-    RiskRule(
-        rule_id=RiskRuleId.ORACLE_OUTAGE_HALT,
-        scope=RiskRuleScope.GLOBAL,
-        applies_to="*",
-        trigger=BinaryEventTrigger(event_source="price_oracle"),
-        consequence=RiskRuleConsequence.BLOCK,
-        alerting_severity=AlertSeverity.CRITICAL,
-        description=(
-            "Halt when the primary price oracle (Chainlink / Pyth) is unreachable "
-            "or returning stale data beyond the freshness contract. No order is "
-            "permitted without a live oracle price. Triggers GLOBAL kill-switch — "
-            "human operator restart required."
-        ),
-        triggers_kill_switch=True,
-    ),
-    RiskRule(
-        rule_id=RiskRuleId.CROSS_CLOUD_EGRESS_HALT,
-        scope=RiskRuleScope.GLOBAL,
-        applies_to="*",
-        trigger=BinaryEventTrigger(event_source="cross_cloud_egress"),
-        consequence=RiskRuleConsequence.BLOCK,
-        alerting_severity=AlertSeverity.CRITICAL,
-        description=(
-            "Halt when unexpected cross-cloud egress is detected — data leaving "
-            "GCP to a non-approved destination. Prevents exfiltration under "
-            "compromise. Corresponds to AlertCode.CROSS_CLOUD_EGRESS_DETECTED. "
-            "Triggers GLOBAL kill-switch — human operator restart required."
-        ),
-        triggers_kill_switch=True,
-    ),
-    RiskRule(
-        rule_id=RiskRuleId.CUSTODY_ENDPOINT_HALT,
-        scope=RiskRuleScope.GLOBAL,
-        applies_to="*",
-        trigger=BinaryEventTrigger(event_source="custody_endpoint"),
-        consequence=RiskRuleConsequence.BLOCK,
-        alerting_severity=AlertSeverity.CRITICAL,
-        description=(
-            "Halt when the custody provider endpoint (Copper / CEFFU / "
-            "CLOUD_KMS_ENCRYPTED) is unreachable — no withdrawal or settlement "
-            "can be safely committed without custody confirmation. Triggers "
             "GLOBAL kill-switch — human operator restart required."
         ),
         triggers_kill_switch=True,

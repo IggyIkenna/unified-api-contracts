@@ -2,7 +2,35 @@
 
 from pydantic import BaseModel
 
-# Removed unused schema imports - classes defined locally in this module
+from .schemas import (
+    DXY_STRONG_DOLLAR,
+    DXY_WEAK_DOLLAR,
+    GOLD_SAFE_HAVEN_THRESHOLD,
+    TICKER_DXY,
+    TICKER_GOLD,
+    TICKER_OIL_BRENT,
+    TICKER_OIL_WTI,
+    TICKER_US_2Y,
+    TICKER_US_10Y,
+    TICKER_US_30Y,
+    TICKER_VIX,
+    VIX_HIGH_VOLATILITY,
+    VIX_LOW_VOLATILITY,
+    YAHOO_FINANCE_BASE_URL,
+    YAHOO_FINANCE_RATE_LIMIT_UNOFFICIAL,
+    YIELD_10Y_HIGH,
+    YIELD_10Y_LOW,
+    YIELD_CURVE_INVERSION_THRESHOLD,
+    YahooChartResult,
+    YahooFinanceCommoditySnapshot,
+    YahooFinanceDXYSnapshot,
+    YahooFinanceError,
+    YahooFinanceMacroOhlcv,
+    YahooFinanceMacroOhlcvResponse,
+    YahooFinanceRequestParams,
+    YahooFinanceYieldCurve,
+    YahooFinanceYieldSnapshot,
+)
 
 
 class YahooOptionContract(BaseModel):
