@@ -69,9 +69,62 @@ class LedgerRow(BaseModel):
     - Treasury events (deposits, withdrawals with ``counterparty_client_id=None``) →
       TreasuryLedger (strategy-service writer — see Phase 4 TreasuryLedger split decision)
 
-    Late-arriving enrichments: append a new row with ``parent_event_id`` set to the
-    original ``event_id`` and ``event_type=<same type>_ENRICHMENT`` (provisional —
-    see Phase 3 late-arriving-data discipline decision).
+    ``parent_event_id`` linkage convention
+    ──────────────────────────────────────
+    Set whenever a row is derived from or corrects an earlier row:
+
+    1. **Settlement rows** — futures/options settled at expiry. The settlement
+       row's ``parent_event_id`` = the original TRADE or STAKE ``event_id`` that
+       opened the position.  ``event_type=SETTLEMENT`` or ``EXPIRY``.
+
+    2. **Funding accrual rows** — perpetual funding payments.
+       ``parent_event_id`` = the TRADE ``event_id`` of the perp fill that created
+       the position being funded. Allows join back to the opening fill for
+       per-position P&L attribution.
+
+    3. **Dividend rows** — cash or stock dividends on equity positions.
+       ``parent_event_id`` = the TRADE ``event_id`` of the buy fill on the ex-date.
+
+    4. **Staking reward / lending interest rows** — passive yield on staked or
+       lent assets.  ``parent_event_id`` = the STAKE or BORROW ``event_id`` that
+       opened the earning position.
+
+    5. **Late-arriving enrichment rows** — data known only after settlement
+       (e.g. final fee, FX rate lock, clearing-house ID).  Append a NEW row
+       with ``parent_event_id`` = the original ``event_id`` and
+       ``event_type=<same_type>_ENRICHMENT`` (provisional — see Phase 3
+       late-arriving-data discipline decision).  Do NOT mutate the original row.
+
+    When ``parent_event_id`` is ``None``, the row is an autonomous originating
+    event (a trade fill, a bridge, a mark update).
+
+    ``accrual_period_start_utc`` / ``accrual_period_end_utc`` convention
+    ─────────────────────────────────────────────────────────────────────
+    Required on every ``EventOrigin.PASSIVE`` row.  ``None`` on INSTRUCTION rows.
+
+    The pair represents the closed interval ``[start, end)`` during which the
+    passive cash flow accrued, in UTC:
+
+    - **FUNDING_ACCRUAL** — CeFi perps: 8-hour funding window
+      (e.g. 00:00→08:00, 08:00→16:00, 16:00→00:00 UTC for Binance / Bybit /
+      OKX). DeFi perps (Hyperliquid, Drift): block-level accrual; start =
+      previous block timestamp, end = current block timestamp.
+
+    - **DIVIDEND** — start = ex-dividend date 00:00 UTC;
+      end = payment date 00:00 UTC.
+
+    - **STAKING_REWARD** — LST rebase (stETH): start = previous oracle report
+      block timestamp, end = current oracle report block timestamp.
+      Validator yield (JitoSOL, mSOL): start = epoch start, end = epoch end.
+
+    - **LENDING_INTEREST** — Aave / Compound / Morpho: start = previous
+      liquidity-index snapshot block timestamp, end = current block timestamp.
+      For daily summaries: start = 00:00 UTC of day, end = 00:00 UTC next day.
+
+    The ``accrual_period_end_utc`` SHOULD equal ``timestamp_utc`` for rows
+    where the payment is realised at the period boundary.  For look-back
+    enrichments written after the fact, ``timestamp_utc`` reflects the original
+    event time and the accrual pair reflects the true earning window.
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
@@ -98,8 +151,11 @@ class LedgerRow(BaseModel):
     parent_event_id: str | None = Field(
         default=None,
         description=(
-            "Links settlement/funding/dividend rows to the originating event. "
-            "Also used for late-arriving enrichment rows."
+            "Links derived rows to the originating event. "
+            "Settlement rows → trade event_id; funding rows → perp fill event_id; "
+            "dividend rows → buy fill event_id; staking/lending rows → stake/borrow event_id; "
+            "enrichment rows → original event_id. None on autonomous originating events. "
+            "See class docstring for full linkage convention."
         ),
     )
     timestamp_utc: datetime = Field(
@@ -226,13 +282,21 @@ class LedgerRow(BaseModel):
     accrual_period_start_utc: datetime | None = Field(
         default=None,
         description=(
-            "Start of the accrual period for passive events (funding, dividend, "
-            "staking reward, lending interest). Required on all PASSIVE rows."
+            "Start of the accrual period for passive events — required on all PASSIVE rows, None on INSTRUCTION rows. "
+            "Closed interval [start, end): funding=8h window start; dividend=ex-dividend date 00:00 UTC; "
+            "LST rebase=previous oracle report block; validator=epoch start; lending=previous liquidity-index block. "
+            "See class docstring for per-event-type convention."
         ),
     )
     accrual_period_end_utc: datetime | None = Field(
         default=None,
-        description="End of the accrual period for passive events.",
+        description=(
+            "End of the accrual period for passive events — required on all PASSIVE rows, None on INSTRUCTION rows. "
+            "Closed interval [start, end): funding=8h window end; dividend=payment date 00:00 UTC; "
+            "LST rebase=current oracle report block; validator=epoch end; lending=current block. "
+            "SHOULD equal timestamp_utc when payment is realised at the period boundary. "
+            "See class docstring for per-event-type convention."
+        ),
     )
 
     @model_validator(mode="after")
