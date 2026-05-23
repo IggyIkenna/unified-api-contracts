@@ -63,9 +63,11 @@ from unified_api_contracts.external.soccer_football_info.schemas import (
     SFIMatchProgressiveStats,
     SFITeam,
 )
+from unified_api_contracts.external.understat.normalize import normalize_understat_shot
 from unified_api_contracts.external.understat.schemas import (
     UnderstatMatchSource,
     UnderstatPlayerSeason,
+    UnderstatShot,
     UnderstatShotSource,
     UnderstatTeamHistory,
     UnderstatXGData,
@@ -274,6 +276,87 @@ class TestUnderstatSchemas:
             pts=3,
         )
         assert th.pts == 3
+
+    def test_normalize_shot_from_understat_shot(self) -> None:
+        shot = UnderstatShot(
+            id="42",
+            minute=67,
+            result="Goal",
+            x=0.85,
+            y=0.42,
+            xg=0.31,
+            player="Test Player",
+            situation="OpenPlay",
+            match_id="1001",
+            h_a="h",
+            player_id="999",
+            last_action="Pass",
+            period=1,
+            shot_type="RightFoot",
+        )
+        out = normalize_understat_shot(shot, venue="understat")
+        assert out["shot_id"] == "42"
+        assert out["match_id"] == "1001"
+        assert out["fixture_id"] is None
+        assert out["player_id"] == "999"
+        assert out["player_name"] == "Test Player"
+        assert out["minute"] == 67
+        assert out["result"] == "Goal"
+        assert abs(float(out["xg"]) - 0.31) < 1e-9  # type: ignore[arg-type]
+        assert out["x"] == 0.85
+        assert out["y"] == 0.42
+        assert out["situation"] == "OpenPlay"
+        assert out["shot_type"] == "RightFoot"
+        assert out["home_or_away"] == "h"
+        assert out["last_action"] == "Pass"
+        assert out["period"] == 1
+        assert out["source"] == "understat"
+        _XG_SHOTS_COLS = {
+            "shot_id",
+            "match_id",
+            "fixture_id",
+            "player_id",
+            "player_name",
+            "minute",
+            "result",
+            "xg",
+            "x",
+            "y",
+            "situation",
+            "shot_type",
+            "home_or_away",
+            "last_action",
+            "home_goals",
+            "away_goals",
+            "period",
+            "source",
+        }
+        assert _XG_SHOTS_COLS.issubset(set(out.keys()))
+
+    def test_normalize_shot_from_shot_source(self) -> None:
+        src = UnderstatShotSource(
+            shot_id=7,
+            fixture_id=55,
+            player_id=123,
+            player_name="A. Nother",
+            minute=15,
+            result="Saved",
+            x=0.6,
+            y=0.3,
+            xg=0.08,
+            situation="SetPiece",
+            shot_type="LeftFoot",
+            home_away="a",
+            last_action="Cross",
+        )
+        out = normalize_understat_shot(src, venue="understat")
+        assert out["shot_id"] == 7
+        assert out["fixture_id"] == 55
+        assert out["match_id"] is None
+        assert out["player_name"] == "A. Nother"
+        assert out["result"] == "Saved"
+        assert out["home_or_away"] == "a"
+        assert out["source"] == "understat"
 
     def test_xg_data_construct(self) -> None:
         xg = UnderstatXGData(fixture_id=1, home_xg=1.5, away_xg=0.8)
