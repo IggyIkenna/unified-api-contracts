@@ -473,6 +473,33 @@ for _tf in _TIMEFRAMES_PREDICTION:
 
 
 # ---------------------------------------------------------------------------
+# Prediction trades-derived candles — PREDICTION_MARKET x trades
+#
+# The Polymarket MTDS tick parquets store instrument_type="PREDICTION_MARKET"
+# (uppercase) as the canonical row value. When MDPS aggregates those rows into
+# OHLCV bars via the trades→ohlcv prefix mapping, it calls lookup_contract with
+# instrument_type="PREDICTION_MARKET". These entries close that registry gap so
+# every MDPS default timeframe resolves without SchemaContractNotFoundError.
+# ---------------------------------------------------------------------------
+
+_TIMEFRAMES_PREDICTION_TRADES: tuple[str, ...] = ("15s", "1m", "5m", "15m", "1h", "4h", "1d")
+
+for _tf in _TIMEFRAMES_PREDICTION_TRADES:
+    _register(
+        _build(
+            "prediction",
+            "PREDICTION_MARKET",
+            _trades_key(_tf),
+            symbol_column="condition_id",
+            extra_cols=[],
+            include_chain=True,
+            anchor_col=ColumnSpec(name="condition_id", dtype="string", nullable=False),
+            nullable_ohlcv=True,
+        )
+    )
+
+
+# ---------------------------------------------------------------------------
 # Public API — timeframe catalogues + key helpers (exported for downstream
 # MDPS writers + ml-training / features backfills).
 # ---------------------------------------------------------------------------
@@ -484,6 +511,7 @@ MDPS_TIMEFRAMES_DEFI = _TIMEFRAMES_DEFI
 MDPS_TIMEFRAMES_OPTIONS = _TIMEFRAMES_OPTIONS
 MDPS_TIMEFRAMES_SPORTS = _TIMEFRAMES_SPORTS
 MDPS_TIMEFRAMES_PREDICTION = _TIMEFRAMES_PREDICTION
+MDPS_TIMEFRAMES_PREDICTION_TRADES = _TIMEFRAMES_PREDICTION_TRADES
 MDPS_TIMEFRAMES_INDEX = _TIMEFRAMES_INDEX
 
 MDPS_KEY_TRADES = _trades_key
@@ -518,6 +546,7 @@ __all__ = [
     "MDPS_TIMEFRAMES_INDEX",
     "MDPS_TIMEFRAMES_OPTIONS",
     "MDPS_TIMEFRAMES_PREDICTION",
+    "MDPS_TIMEFRAMES_PREDICTION_TRADES",
     "MDPS_TIMEFRAMES_SPORTS",
     "MDPS_TIMEFRAMES_TRADFI",
     "MDPS_TIMEFRAMES_TRADFI_RE_AGGREGATED",
