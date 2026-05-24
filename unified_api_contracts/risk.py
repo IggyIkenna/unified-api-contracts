@@ -87,9 +87,10 @@ __all__ = [
     "BinaryEventTrigger",
     "CapitalAtRiskCeilingTrigger",
     "CounterpartyRatioCapTrigger",
-    # Drawdown + response-policy + investigation report schemas (2026-05-23/24)
+    # Drawdown/liquidation schemas (P0.6-P0.11 — drawdown_liquidation_policy plan)
     "DrawdownInvestigationReport",
     "DrawdownThresholdKind",
+    "LiquidationInvestigationReport",
     "ExpectedDrawdownModel",
     "ExpectedDrawdownModelBasis",
     "FundingCostCeilingTrigger",
@@ -130,6 +131,9 @@ from .canonical.crosscutting.risk.drawdown import (
 )
 from .canonical.crosscutting.risk.investigation import (
     DrawdownInvestigationReport,
+)
+from .canonical.crosscutting.risk.liquidation import (
+    LiquidationInvestigationReport,
 )
 
 # Re-export the per-axis registry aggregator at the risk facade.
