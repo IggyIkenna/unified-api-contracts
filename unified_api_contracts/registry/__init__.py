@@ -261,6 +261,8 @@ from .token_wrapping import (
 from .tradfi_instrument_universe import (
     FX_SPOT_PAIRS,
     TRADFI_DATABENTO_INSTRUMENTS,
+    YAHOO_INDICES,
+    YahooIndexDef,
     get_databento_symbols_for_venue,
     get_mvp_databento_symbols_for_venue,
 )
