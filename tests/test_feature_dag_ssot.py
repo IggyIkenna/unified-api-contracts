@@ -56,7 +56,18 @@ def test_every_service_has_workspace_directory() -> None:
     """Plan invariant (a): every service in EXPECTED_FEATURE_GROUPS_BY_SERVICE
     has a corresponding directory in the workspace."""
     workspace = _workspace_root()
+    present = [service for service in EXPECTED_FEATURE_GROUPS_BY_SERVICE if (workspace / service).is_dir()]
     missing = [service for service in EXPECTED_FEATURE_GROUPS_BY_SERVICE if not (workspace / service).is_dir()]
+    # Per-repo CI checks out only this repo (workspace-qg renders dep_repos=""), so no
+    # sibling service dirs are present. This cross-repo workspace invariant can only be
+    # verified from a full-workspace checkout (local quality-gates.sh or the full-workspace
+    # SIT job); skip cleanly in isolated CI. When siblings ARE present (full workspace) the
+    # assert still catches a service renamed/removed without updating the SSOT set.
+    if not present:
+        pytest.skip(
+            f"per-repo CI checkout: no sibling service repos under {workspace}; cross-repo "
+            "workspace invariant runs under local quality-gates.sh / full-workspace SIT"
+        )
     assert not missing, (
         f"services declared in EXPECTED_FEATURE_GROUPS_BY_SERVICE but absent from {workspace}: {missing}"
     )

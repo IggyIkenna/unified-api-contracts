@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 import yaml
 
 from unified_api_contracts.testing.cassette_orphan_checker import (
@@ -208,6 +209,18 @@ class TestIntegrationOrphanCheck:
     """
 
     def test_no_unallowlisted_orphans(self) -> None:
+        # Production consumers of these external-source cassettes live in sibling repos
+        # (MTDS / features / instruments adapters). In per-repo CI (workspace-qg renders
+        # dep_repos="") those siblings aren't checked out, so the workspace-wide consumer
+        # scan finds nothing and every cassette looks orphan. Cross-repo consumer linkage
+        # is validated under local quality-gates.sh / the full-workspace SIT job; skip when
+        # the sibling consumer repos are absent rather than flag false orphans.
+        workspace_root = Path(__file__).resolve().parents[1].parent
+        if not (workspace_root / "market-tick-data-service").is_dir():
+            pytest.skip(
+                "per-repo CI checkout: sibling consumer repos absent; orphan-cassette "
+                "linkage validated in the full-workspace SIT"
+            )
         cassette_map = collect_all_cassette_files()
         referenced_keys = set(scan_production_cassette_references(cassette_map=cassette_map).keys())
 
