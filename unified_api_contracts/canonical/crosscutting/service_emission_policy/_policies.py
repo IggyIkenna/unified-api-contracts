@@ -42,6 +42,8 @@ SERVICE_OUTPUT_POLICIES: Final[dict[tuple[str, str], ServiceEmissionPolicy]] = {
     # strategy-service/position —
     # portfolio_state must be authoritative; partial = wrong.
     ("strategy-service", "portfolio_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
+    # position-balance-monitor-service — same portfolio_state contract as strategy-service.
+    ("position-balance-monitor-service", "portfolio_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
     # strategy-service/risk — same constraint.
     ("strategy-service", "risk_state"): ServiceEmissionPolicy.BLOCK_CRITICAL,
     # instruments-service — catalog snapshot is best-effort union of multiple source

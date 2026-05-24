@@ -79,12 +79,11 @@ from .cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
 )
+from .cefi_margin_tiers import maintenance_margin_for
 from .cefi_perp_venue_endpoints import (
     CEFI_PERP_VENUE_API_ENDPOINTS,
     get_cefi_perp_venue_api_url,
 )
-
-# cefi_margin_tiers imports removed - unused
 from .chain_env import (
     BLOCK_EXPLORER_URLS,
     CHAIN_ENVS,
@@ -861,6 +860,7 @@ __all__ = [
     "is_tradfi_futures_instrument_active",
     "is_vix_15m_gap_date",
     "lst_adjusted_value",
+    "maintenance_margin_for",
     "needs_candle_processing",
     "needs_unwrapping",
     "needs_wrapping",
