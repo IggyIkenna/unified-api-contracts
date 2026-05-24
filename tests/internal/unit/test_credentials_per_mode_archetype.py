@@ -81,10 +81,12 @@ def test_batch_mode_includes_read_scope_venue_keys() -> None:
     """Batch mode declares read-scope venue keys (not trade-scope)."""
     data = _load(PER_MODE_PATH)
     batch_creds = [c["id"] for c in data["modes"]["batch"]["required"]]
-    assert "bybit-read-api-key" in batch_creds
+    # bybit has a single unscoped key in Secret Manager (bybit_api_key), not a
+    # read/trade split like binance/deribit — match the real SM secret id.
+    assert "bybit_api_key" in batch_creds
     assert "binance-read-api-key" in batch_creds
-    # No trade-scope keys in batch
-    assert "bybit-trade-api-key" not in batch_creds
+    # No trade-scope keys in batch (binance has a real read/trade split in SM)
+    assert "binance-trade-api-key" not in batch_creds
 
 
 # ---------------------------------------------------------------------------
