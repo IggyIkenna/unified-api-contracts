@@ -126,13 +126,15 @@ def test_carry_staked_basis_declares_perp_hedge_venues() -> None:
     """csb requires 6 perp hedge venue trade keys."""
     data = _load(PER_ARCHETYPE_PATH)
     csb_required = set(data["archetypes"]["carry_staked_basis"]["required_credentials"])
+    # Real GCP Secret Manager ids (one representative key per perp venue). okx is
+    # per-client (exec-<client>-okx-*) so it is declared as a pattern, not a flat id.
     perp_keys = {
-        "bybit-trade-api-key",
+        "bybit_api_key",
         "binance-trade-api-key",
         "deribit-trade-api-key",
-        "okx-trade-api-key",
-        "hyperliquid-trade-api-key",
-        "aster-trade-api-key",
+        "pattern:exec-<client>-okx-api-key",
+        "hyperliquid-trade-key",
+        "aster-api-key",
     }
     assert perp_keys.issubset(csb_required)
 
