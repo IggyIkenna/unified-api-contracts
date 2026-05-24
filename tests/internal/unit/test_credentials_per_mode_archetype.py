@@ -163,11 +163,11 @@ def test_arbitrage_price_dispersion_declares_5_chain_wallets() -> None:
 
 
 def test_every_archetype_declares_telegram() -> None:
-    """Every archetype includes telegram-bot-token-prod (alerting hard requirement)."""
+    """Every archetype includes telegram-bot-token (alerting hard requirement; real SM id)."""
     data = _load(PER_ARCHETYPE_PATH)
     for archetype, bundle in data["archetypes"].items():
         creds = bundle["required_credentials"]
-        assert "telegram-bot-token-prod" in creds, f"{archetype}: missing telegram-bot-token-prod"
+        assert "telegram-bot-token" in creds, f"{archetype}: missing telegram-bot-token"
 
 
 def test_every_archetype_declares_gcp_sa() -> None:
