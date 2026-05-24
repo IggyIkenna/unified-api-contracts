@@ -13,8 +13,12 @@ from unified_api_contracts.canonical.crosscutting.risk.drawdown import (
     ResponsePolicy,
     RiskThresholds,
 )
+from unified_api_contracts.canonical.crosscutting.risk.investigation import (
+    DrawdownInvestigationReport,
+)
 
 __all__ = [
+    "DrawdownInvestigationReport",
     "DrawdownThresholdKind",
     "ExpectedDrawdownModel",
     "ExpectedDrawdownModelBasis",
