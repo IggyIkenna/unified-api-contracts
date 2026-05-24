@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Final
+from typing import Final, cast
 
+import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ._enums import _SCENARIO_ID_PATTERN, ScenarioCategory, ScenarioOverlayLayer
@@ -118,10 +119,6 @@ class ScenarioOverlay(BaseModel):
         Phase 6.C facade used by the backtest CLI ``--scenario-overlay-yaml`` path.
         Importable as ``unified_api_contracts.scenario_overlay.ScenarioOverlay.model_validate_yaml``.
         """
-        from typing import cast
-
-        import yaml
-
         data = cast(dict[str, object], yaml.safe_load(yaml_content))
         return cls.model_validate(data)
 

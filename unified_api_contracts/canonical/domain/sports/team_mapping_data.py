@@ -56,7 +56,7 @@ def _af_id_index() -> dict[int, dict[str, str]]:
     """Index by af_team_id for O(1) lookup."""
     idx: dict[int, dict[str, str]] = {}
     for row in _load_mapping():
-        af_id = row.get("af_team_id", "")  # qg-empty-fallback: CSV field may be absent
+        af_id = row.get("af_team_id", "")  # noqa: qg-empty-fallback
         if af_id:
             with contextlib.suppress(ValueError, TypeError):
                 idx[int(float(af_id))] = row

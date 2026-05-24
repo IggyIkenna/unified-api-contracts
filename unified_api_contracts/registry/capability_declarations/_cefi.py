@@ -730,7 +730,7 @@ _TARDIS = SourceCapability(
 # (non-secret, operator 2026-05-20): stark_public_key
 # 0x276f6bb00fa3f451988872959ee5cf24031bb96d5a0aa6ed9e7a07d24f36e03, vault_id 380539,
 # client_id 263651, wallet 0x992ebFe04DB05f964C45BCE3D73Ca4c81715a79f.
-# Secrets resolved at runtime via GCP Secret Manager (central-element-323112):
+# Secrets resolved at runtime via GCP Secret Manager (project from GCP_PROJECT_ID config):
 #   - extended-starknet-api-key/versions/latest
 #   - extended-starknet-stark-private-key/versions/latest
 # (versions/latest so rotation flows without redeploy — mirrors workspace pattern.)

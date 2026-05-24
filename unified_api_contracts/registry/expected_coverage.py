@@ -555,7 +555,7 @@ def _is_deprecated_defi_venue(data_source: str) -> bool:
     flagging them as ``EXPECTED_DEPRECATED_DATA_TYPE`` keeps the divergence
     report honest.
     """
-    from .capability_declarations import EMPTY_OR_DEPRECATED_DEFI_VENUES
+    from .capability_declarations import EMPTY_OR_DEPRECATED_DEFI_VENUES  # noqa: imports-inside-functions
 
     return data_source in EMPTY_OR_DEPRECATED_DEFI_VENUES
 
@@ -569,7 +569,7 @@ def _is_defi_not_yet_collected(data_source: str) -> bool:
     ``SOLBLAZE-SOLANA``). Until first parquet writes land, historical days for
     these venues should NOT count as ``MISSING_EXPECTED``.
     """
-    from .capability_declarations import DEFI_INSTRUMENTS_NOT_YET_COLLECTED
+    from .capability_declarations import DEFI_INSTRUMENTS_NOT_YET_COLLECTED  # noqa: imports-inside-functions
 
     return data_source in DEFI_INSTRUMENTS_NOT_YET_COLLECTED
 
@@ -597,7 +597,7 @@ def _is_us_trading_day(target_date: _date) -> tuple[bool, str | None]:
     """
     if target_date.weekday() >= 5:
         return False, "EXPECTED_WEEKEND"
-    from .venue_trading_calendar import US_MARKET_HOLIDAYS
+    from .venue_trading_calendar import US_MARKET_HOLIDAYS  # noqa: imports-inside-functions
 
     if target_date.isoformat() in US_MARKET_HOLIDAYS:
         return False, "EXPECTED_HOLIDAY"
@@ -606,7 +606,7 @@ def _is_us_trading_day(target_date: _date) -> tuple[bool, str | None]:
 
 def _is_us_half_day(venue: str, target_date: _date) -> bool:
     """True if ``venue``'s US session is shortened (not closed) on target_date."""
-    from .half_day_sessions import is_half_day_session
+    from .half_day_sessions import is_half_day_session  # noqa: imports-inside-functions
 
     return is_half_day_session(venue, target_date)
 
@@ -623,7 +623,7 @@ def _defi_protocol_chain_split(source: str) -> tuple[str, str] | None:
 
 def _venue_launch_date_for(asset_group: str, source: str) -> _date | None:
     """Lookup the public-launch date for ``source`` in the given ``asset_group``."""
-    from .venue_launch_dates import (
+    from .venue_launch_dates import (  # noqa: imports-inside-functions
         CEFI_VENUE_LAUNCH_DATES,
         DEFI_VENUE_LAUNCH_DATES,
         PREDICTION_VENUE_LAUNCH_DATES,
@@ -642,7 +642,7 @@ def _venue_launch_date_for(asset_group: str, source: str) -> _date | None:
 
 def _chain_genesis_date_for(chain: str) -> _date | None:
     """Lookup the chain's genesis date (DeFi only)."""
-    from .chain_env import CHAIN_GENESIS_DATES
+    from .chain_env import CHAIN_GENESIS_DATES  # noqa: imports-inside-functions
 
     return _parse_iso_date(CHAIN_GENESIS_DATES.get(chain.upper()))
 
@@ -755,7 +755,7 @@ def expected_coverage(
                     diagnostic=f"chain {chain} genesis {genesis.isoformat()} > target {target_date.isoformat()}",
                 )
             # Protocol pause window check (added 2026-05-20 round 3 — R8 full closure).
-            from .protocol_pause_windows import is_protocol_paused
+            from .protocol_pause_windows import is_protocol_paused  # noqa: imports-inside-functions
 
             paused, pause_desc = is_protocol_paused(protocol, chain, target_date)
             if paused:
