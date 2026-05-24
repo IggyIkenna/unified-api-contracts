@@ -29,7 +29,6 @@ _RAW_TO_PROCESSED_PREFIX: dict[str, str] = {
     "dex_pool_swaps": "swaps_ohlcv",
     "dex_pool_state": "state_ohlcv",
     "lending_indices": "lending_ohlcv",
-    "rate_indices": "rate_ohlcv",
     "oracle_prices": "oracle_ohlcv",
     "lst_rates": "lst_ohlcv",
     "odds": "odds_ohlcv",
