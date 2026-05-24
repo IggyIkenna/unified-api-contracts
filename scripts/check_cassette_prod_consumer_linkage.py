@@ -26,7 +26,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[1]
 
 sys.path.insert(0, str(_REPO_ROOT))
 
-from unified_api_contracts.testing.cassette_orphan_checker import (
+from unified_api_contracts.testing.cassette_orphan_checker import (  # noqa: E402 — after sys.path.insert
     collect_all_cassette_files,
     find_orphan_cassettes,
     scan_production_cassette_references,
@@ -34,6 +34,20 @@ from unified_api_contracts.testing.cassette_orphan_checker import (
 
 
 def main() -> int:
+    # Production consumers of external-source cassettes live in SIBLING repos (MTDS /
+    # features / instruments adapters). In per-repo CI (workspace-qg renders dep_repos="")
+    # only this repo is checked out, so the workspace consumer-scan finds nothing and every
+    # such cassette looks orphan. Cross-repo consumer linkage is validated under local
+    # quality-gates.sh / the full-workspace SIT job; skip when siblings are absent rather
+    # than emit false orphans. (Mirrors the test_no_unallowlisted_orphans pytest guard.)
+    _workspace_root = _REPO_ROOT.parent
+    if not (_workspace_root / "market-tick-data-service").is_dir():
+        print(
+            "[STEP 5.86] SKIP: sibling consumer repos not checked out (per-repo CI); "
+            "cassette→prod-consumer linkage is validated in the full-workspace SIT"
+        )
+        return 0
+
     allowlist_path = _REPO_ROOT / "tests" / "cassette_orphan_allowlist.yaml"
     allowlist_data = yaml.safe_load(allowlist_path.read_text()) or {}
     allowed_paths: set[str] = {entry["path"] for entry in allowlist_data.get("allowed", [])}
