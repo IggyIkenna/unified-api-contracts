@@ -59,6 +59,7 @@ Adding a new breaker
    ``disaster_recovery_circuit_breakers_2026_05_10.md`` Phase 8.
 """
 
+from ..alerting.thresholds import ThresholdUnit
 from ._enums import (
     BREAKER_RECOVERY_DEFAULTS,
     BreakerAction,
@@ -79,5 +80,6 @@ __all__ = [
     "BreakerScope",
     "BreakerTrigger",
     "CircuitBreakerId",
+    "ThresholdUnit",
     "breaker_fired_event",
 ]
