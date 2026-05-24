@@ -271,294 +271,232 @@ allowed:
     detail: "OddsPapi historical odds API (api.oddspapi.io/v4). Status: BLOCKED-CREDENTIALS — requires oddspapi-api-key in Secret Manager. Used by e2e-testing/scripts/sports/oddspapi_historical_backfill.py."
     acked_by: slot-2 2026-05-21
 
-  # ---- Phase 4 CeFi venue recording-templates (MTDS live connectors exist; UAC schemas not yet imported by connectors)
-  - path: binance/mocks/futures_trade_ws.yaml
-    reason: recording-template
-    detail: "Binance Futures WS trade frames (wss://fstream.binance.com/ws). MTDS live connector binance_futures_ws.py streams this channel. UAC external/binance schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: binance/mocks/spot_exchange_info.yaml
-    reason: recording-template
-    detail: "Binance Spot exchange info REST (api.binance.com/api/v3/exchangeInfo). IS adapter uses CCXTReferenceDataAdapter(exchange_id='binance'). UAC external/binance schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: binance/mocks/spot_trade_ws.yaml
-    reason: recording-template
-    detail: "Binance Spot WS trade frames (wss://stream.binance.com/ws). MTDS live connector binance_spot_ws.py streams this channel. UAC external/binance schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: binance/mocks/ticker_24hr.yaml
-    reason: recording-template
-    detail: "Binance Spot 24hr ticker (api.binance.com/api/v3/ticker/24hr). IS adapter uses CCXTReferenceDataAdapter(exchange_id='binance'). UAC external/binance schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: bybit/mocks/linear_trade_ws.yaml
-    reason: recording-template
-    detail: "Bybit Linear (perp) WS trade frames (wss://stream.bybit.com/v5/public/linear). MTDS live connector bybit_linear_ws.py streams this channel. UAC external/bybit schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: bybit/mocks/spot_trade_ws.yaml
-    reason: recording-template
-    detail: "Bybit Spot WS trade frames (wss://stream.bybit.com/v5/public/spot). MTDS live connector bybit_spot_ws.py streams this channel. UAC external/bybit schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: bybit/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Bybit ticker REST (api.bybit.com/v5/market/tickers). IS adapter uses CCXTReferenceDataAdapter(exchange_id='bybit'). UAC external/bybit schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: coinbase/mocks/match_ws.yaml
-    reason: recording-template
-    detail: "Coinbase Advanced Trade WS match channel (wss://advanced-trade-ws.coinbase.com). MTDS live connector coinbase_ws.py streams this channel. UAC external/coinbase schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: coinbase/mocks/products.yaml
-    reason: recording-template
-    detail: "Coinbase Advanced Trade products REST (api.coinbase.com/api/v3/brokerage/products). IS adapter uses CCXTReferenceDataAdapter(exchange_id='coinbase'). UAC external/coinbase schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: deribit/mocks/auth_test.yaml
-    reason: recording-template
-    detail: "Deribit auth test interaction (www.deribit.com/api/v2/public/auth). Used for integration-level auth smoke verification. UAC external/deribit schemas wiring to MTDS connector is Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: deribit/mocks/get_instruments_multi.yaml
-    reason: recording-template
-    detail: "Deribit get_instruments multi-currency query (www.deribit.com/api/v2/public/get_instruments). IS adapter uses CCXTReferenceDataAdapter(exchange_id='deribit'). UAC external/deribit schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: deribit/mocks/risk_service_health.yaml
-    reason: recording-template
-    detail: "Deribit risk service health check endpoint (www.deribit.com/api/v2/public/get_portfolio_margins). Used by risk-and-exposure-service for margin monitoring. UAC external/deribit schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: deribit/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Deribit ticker (www.deribit.com/api/v2/public/ticker). IS adapter uses CCXTReferenceDataAdapter(exchange_id='deribit'). UAC external/deribit schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: deribit/mocks/trade_ws.yaml
-    reason: recording-template
-    detail: "Deribit WS trade frames (wss://www.deribit.com/ws/api/v2). MTDS live connector deribit_ws.py streams this channel. UAC external/deribit schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: okx/mocks/futures_trade_ws.yaml
-    reason: recording-template
-    detail: "OKX Futures WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS live connector okx_futures_ws.py streams this channel. UAC external/okx schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: okx/mocks/spot_trade_ws.yaml
-    reason: recording-template
-    detail: "OKX Spot WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS live connector okx_spot_ws.py streams this channel. UAC external/okx schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: okx/mocks/ticker.yaml
-    reason: recording-template
-    detail: "OKX ticker REST (www.okx.com/api/v5/market/ticker). IS adapter uses CCXTReferenceDataAdapter(exchange_id='okx'). UAC external/okx schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: bitget/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Bitget ticker REST (api.bitget.com/api/v2/spot/market/tickers). IS adapter uses CCXTReferenceDataAdapter(exchange_id='bitget'). UAC external/bitget schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: aster/mocks/trade_ws.yaml
-    reason: recording-template
-    detail: "Aster exchange WS trade frames. MTDS live connector aster_ws.py streams this channel. UAC external/aster schemas not yet imported by WS connector. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: upbit/mocks/ticker.yaml
-    reason: recording-template
-    detail: "Upbit ticker REST (api.upbit.com/v1/ticker). IS adapter uses CCXTReferenceDataAdapter(exchange_id='upbit'). UAC external/upbit schemas not yet imported by CCXT adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
 
-  # ---- Phase 4 DeFi/on-chain recording-templates (production consumers exist; UAC schemas not yet imported)
-  - path: alchemy/mocks/aave_get_reserve_data.yaml
-    reason: recording-template
-    detail: "Alchemy JSON-RPC eth_call for Aave V3 Pool.getReserveData() (0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2). features-service onchain adapter calls this via Alchemy RPC. UAC external/alchemy schemas not yet imported by features-service DeFi adapter. Phase 2 QG task."
     acked_by: slot-2 2026-05-23
-  - path: alchemy/mocks/aave_get_user_account_data.yaml
-    reason: recording-template
-    detail: "Alchemy JSON-RPC eth_call for Aave V3 Pool.getUserAccountData() — returns health factor + collateral/debt totals. features-service onchain health-factor monitor calls this via Alchemy RPC. UAC external/alchemy schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: alchemy/mocks/alchemy_ws_eth_subscription.yaml
-    reason: recording-template
-    detail: "Alchemy WebSocket eth_subscribe/eth_unsubscribe frames (wss://eth-mainnet.g.alchemy.com/v2). features-service onchain realtime subscriber uses this for newHeads/logs. UAC external/alchemy WS schemas not yet imported. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: drift/mocks/trade_ws.yaml
-    reason: recording-template
-    detail: "Drift Protocol WS trade frames (dlob.drift.trade/ws). MTDS live connector drift_ws.py streams this channel. UAC external/drift WS schemas not yet imported by WS connector (drift/mocks/markets.yaml covers REST; trade_ws covers WS). Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: eigenlayer/mocks/earner_historical_rewards.yaml
-    reason: recording-template
-    detail: "EigenLayer rewards REST (api.eigenlayer.xyz/eigenlayer/v1/earner/{address}/historical_rewards). features-service onchain restaking adapter or IS reference data adapter calls this URL. UAC external/eigenlayer schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: morpho_blue_api/mocks/markets.yaml
-    reason: recording-template
-    detail: "Morpho Blue REST API (api.morpho.org/markets). IS adapter instruments_service/reference_data/adapters/defi/morpho_blue.py calls this URL. UAC external/morpho_blue_api schemas not yet imported by IS adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: thegraph/mocks/pools_query.yaml
-    reason: recording-template
-    detail: "TheGraph generic DeFi pool subgraph query (gateway.thegraph.com). Covers pool/liquidity queries outside the named sushiswap_v3/pancakeswap_v3 subgraphs already in the allowlist. IS or features-service adapter calls this. UAC external/thegraph schemas not yet fully imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: instadapp/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "Instadapp DeFi aggregator stub — adapter not yet implemented. Capability declaration placeholder."
-    acked_by: slot-2 2026-05-23
-
-  # ---- Phase 4 Macro/financial data recording-templates
-  - path: cftc/mocks/commitments_of_traders.yaml
-    reason: recording-template
-    detail: "CFTC Commitments of Traders report (publicreporting.cftc.gov/api/...COT...). Macro data adapter in IS or features-service calls this REST endpoint for COT positioning data. UAC external/cftc schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: ecb/mocks/ticker.yaml
-    reason: recording-template
-    detail: "ECB data portal ticker/FX rates (data-api.ecb.europa.eu/service/data/...). IS macro adapter calls this for EUR base FX rates. UAC external/ecb schemas not yet imported by IS adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: ofr/mocks/short_term_funding.yaml
-    reason: recording-template
-    detail: "OFR (Office of Financial Research) short-term funding data API (data.financialresearch.gov/api/v1/...). IS or features-service macro adapter calls this for SOFR/repo rate data. UAC external/ofr schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: open_meteo/mocks/forecast_current_weather.yaml
-    reason: recording-template
-    detail: "Open-Meteo weather forecast REST (api.open-meteo.com/v1/forecast). features-service or IS macro adapter calls this for weather data used in energy/commodity strategy features. UAC external/open_meteo schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: baker_hughes/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "Baker Hughes rig count / oil services data stub — adapter not yet implemented. Capability declaration placeholder for energy macro data."
-    acked_by: slot-2 2026-05-23
-  - path: openbb/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "OpenBB Platform SDK stub — adapter not yet implemented. Placeholder for multi-asset data aggregation via OpenBB."
-    acked_by: slot-2 2026-05-23
-  - path: polygon/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "Polygon.io financial data API stub — adapter not yet implemented. Placeholder for equities/options market data via Polygon.io."
-    acked_by: slot-2 2026-05-23
-
-  # ---- Phase 4 Sports/prediction market recording-templates
-  - path: api_football/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "API-Football (api-football.com) stub — sports data adapter not yet implemented. Placeholder cassette for football fixture/odds data."
-    acked_by: slot-2 2026-05-23
-  - path: betfair/mocks/list_market_book.yaml
-    reason: recording-template
-    detail: "Betfair Exchange Sports API listMarketBook (api.betfair.com/exchange/betting/rest/v1.0/listMarketBook). Sports-betting IS adapter calls this for live order book data. UAC external/betfair schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: betfair/mocks/list_market_catalogue.yaml
-    reason: recording-template
-    detail: "Betfair Exchange Sports API listMarketCatalogue (api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue). Sports IS adapter calls this for event/market discovery. UAC external/betfair schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: kalshi/mocks/market_lookup.yaml
-    reason: recording-template
-    detail: "Kalshi prediction market lookup (trading-api.kalshi.com/trade-api/v2/markets/{ticker}). Kalshi IS adapter calls this. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: kalshi/mocks/markets.yaml
-    reason: recording-template
-    detail: "Kalshi prediction market list (trading-api.kalshi.com/trade-api/v2/markets). Kalshi IS adapter calls this for market discovery. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: kalshi/mocks/orderbook.yaml
-    reason: recording-template
-    detail: "Kalshi order book REST (trading-api.kalshi.com/trade-api/v2/markets/{ticker}/orderbook). Kalshi IS adapter or MTDS live connector calls this. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: kalshi/mocks/ticker_ws.yaml
-    reason: recording-template
-    detail: "Kalshi WS ticker frames (wss://trading-api.kalshi.com/trade-api/ws/v2). MTDS live connector kalshi_ws.py streams this channel. UAC external/kalshi WS schemas not yet imported. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: matchbook/mocks/matchbook_get_markets.yaml
-    reason: recording-template
-    detail: "Matchbook exchange markets REST (api.matchbook.com/edge/rest/events). Sports IS adapter calls this for event/market discovery. UAC external/matchbook schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: metabet/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "MetaBet sports analytics stub — adapter not yet implemented. Placeholder for sports betting analytics data."
-    acked_by: slot-2 2026-05-23
-  - path: odds_api/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "The Odds API (api.the-odds-api.com) stub — sports odds aggregator adapter not yet implemented. Placeholder cassette."
-    acked_by: slot-2 2026-05-23
-  - path: odds_engine/mocks/stub.yaml
-    reason: stub-placeholder
-    detail: "Odds engine internal stub — custom odds calculation engine adapter not yet implemented. Placeholder cassette."
-    acked_by: slot-2 2026-05-23
-  - path: onexbet/mocks/stub.yaml
-    reason: stub-placeholder
+    acked_by: slot-3 2026-05-23
     detail: "1xBet sportsbook stub — adapter not yet implemented. Placeholder cassette for 1xBet market data."
-    acked_by: slot-2 2026-05-23
-  - path: polymarket/mocks/clob_markets.yaml
-    reason: recording-template
-    detail: "Polymarket CLOB markets REST (clob.polymarket.com/markets). Polymarket IS adapter calls this for market discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: polymarket/mocks/gamma_events_sports.yaml
-    reason: recording-template
-    detail: "Polymarket Gamma sports events REST (gamma-api.polymarket.com/events?category=sports). Polymarket IS adapter calls this for sports event discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: polymarket/mocks/gamma_markets_crypto.yaml
-    reason: recording-template
-    detail: "Polymarket Gamma crypto markets REST (gamma-api.polymarket.com/markets?category=crypto). Polymarket IS adapter calls this for crypto prediction market discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: polymarket/mocks/gamma_markets_sports.yaml
-    reason: recording-template
-    detail: "Polymarket Gamma sports markets REST (gamma-api.polymarket.com/markets?category=sports). Polymarket IS adapter calls this for sports prediction market discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-
-  # ---- Phase 4 Hyperliquid recording-templates (full connector suite)
-  - path: hyperliquid/mocks/active_asset_ctx_ws.yaml
-    reason: recording-template
-    detail: "Hyperliquid WS activeAssetCtx subscription frames (wss://api.hyperliquid.xyz/ws). MTDS live connector hyperliquid_ws.py streams this channel. UAC external/hyperliquid WS schemas not yet imported. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/all_mids.yaml
-    reason: recording-template
-    detail: "Hyperliquid all mid-prices REST (api.hyperliquid.xyz/info, type=allMids). IS adapter or MTDS connector calls this. UAC external/hyperliquid REST schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/cancel_order.yaml
-    reason: recording-template
-    detail: "Hyperliquid order cancellation (api.hyperliquid.xyz/exchange, action=cancel). execution-service Hyperliquid adapter calls this. UAC external/hyperliquid schemas not yet imported by execution adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/candle_snapshot.yaml
-    reason: recording-template
-    detail: "Hyperliquid candle snapshot REST (api.hyperliquid.xyz/info, type=candleSnapshot). MDPS or features-service calls this for OHLCV data. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/clearinghouse_state.yaml
-    reason: recording-template
-    detail: "Hyperliquid clearinghouse state REST (api.hyperliquid.xyz/info, type=clearinghouseState). execution-service or risk-service calls this for position/margin state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/funding_history.yaml
-    reason: recording-template
-    detail: "Hyperliquid funding history REST (api.hyperliquid.xyz/info, type=fundingHistory). features-service perp funding calculator calls this. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/l2_book.yaml
-    reason: recording-template
-    detail: "Hyperliquid L2 order book REST (api.hyperliquid.xyz/info, type=l2Book). MTDS or execution-service calls this for order book snapshots. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/l2book_ws.yaml
-    reason: recording-template
+    detail: "API-Football (api-football.com) stub — sports data adapter not yet implemented. Placeholder cassette for football fixture/odds data."
+    detail: "Aave V3 getReserveData eth_call via Alchemy RPC (eth-mainnet.g.alchemy.com). execution-service defi_execution/protocols/aave.py calls this. UAC external/alchemy schemas document the RPC pattern; execution adapter not yet importing from external.alchemy. Phase 2 QG task."
+    detail: "Aave V3 getUserAccountData eth_call via Alchemy RPC (eth-mainnet.g.alchemy.com). execution-service defi_execution/protocols/aave.py. See alchemy/aave_get_reserve_data.yaml. Phase 2 QG task."
+    detail: "Alchemy JSON-RPC eth_call for Aave V3 Pool.getReserveData() (0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2). features-service onchain adapter calls this via Alchemy RPC. UAC external/alchemy schemas not yet imported by features-service DeFi adapter. Phase 2 QG task."
+    detail: "Alchemy JSON-RPC eth_call for Aave V3 Pool.getUserAccountData() — returns health factor + collateral/debt totals. features-service onchain health-factor monitor calls this via Alchemy RPC. UAC external/alchemy schemas not yet imported. Phase 2 QG task."
+    detail: "Alchemy WebSocket eth_subscribe log subscription (wss://eth-mainnet.g.alchemy.com). execution-service on-chain event listener. UAC external/alchemy schemas document WS auth pattern; Phase 2 QG task."
+    detail: "Alchemy WebSocket eth_subscribe/eth_unsubscribe frames (wss://eth-mainnet.g.alchemy.com/v2). features-service onchain realtime subscriber uses this for newHeads/logs. UAC external/alchemy WS schemas not yet imported. Phase 4 WS cassette."
+    detail: "Aster exchange WS trade frames. MTDS live connector aster_ws.py streams this channel. UAC external/aster schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "AsterDEX WS trade frames (wss://fstream.asterdex.com/ws). MTDS aster_ws.py connector streams this channel. UAC external/aster schemas not yet imported by MTDS connector. Phase 2 QG task."
+    detail: "Baker Hughes rig count / oil services data stub — adapter not yet implemented. Capability declaration placeholder for energy macro data."
+    detail: "Betfair Exchange Sports API listMarketBook (api.betfair.com/exchange/betting/rest/v1.0/listMarketBook). Sports-betting IS adapter calls this for live order book data. UAC external/betfair schemas not yet imported. Phase 2 QG task."
+    detail: "Betfair Exchange Sports API listMarketCatalogue (api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue). Sports IS adapter calls this for event/market discovery. UAC external/betfair schemas not yet imported. Phase 2 QG task."
+    detail: "Betfair Exchange listMarketBook REST (api.betfair.com/exchange/betting/rest/v1.0/listMarketBook). sports adapter betfair_client.py. UAC external/betfair schemas not yet imported by sports adapter. Phase 2 QG task."
+    detail: "Betfair Exchange listMarketCatalogue REST (api.betfair.com/exchange/betting/rest/v1.0/listMarketCatalogue). sports adapter betfair_client.py. UAC external/betfair schemas not yet imported. Phase 2 QG task."
+    detail: "Binance 24hr ticker (api.binance.com/api/v3/ticker/24hr). MTDS binance_rest_handler.py. UAC external/binance schemas not yet imported by MTDS handler. Phase 2 QG task."
+    detail: "Binance Futures WS trade frames (wss://fstream.binance.com/ws). MTDS live connector binance_futures_ws.py streams this channel. UAC external/binance schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "Binance Futures WS trade frames (wss://fstream.binance.com/ws/). MTDS binance_futures_ws.py connector. UAC external/binance schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "Binance Spot 24hr ticker (api.binance.com/api/v3/ticker/24hr). IS adapter uses CCXTReferenceDataAdapter(exchange_id='binance'). UAC external/binance schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Binance Spot WS trade frames (wss://stream.binance.com/ws). MTDS live connector binance_spot_ws.py streams this channel. UAC external/binance schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "Binance Spot WS trade frames (wss://stream.binance.com/ws/). MTDS binance_spot_ws.py connector. UAC external/binance schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "Binance Spot exchange info (api.binance.com/api/v3/exchangeInfo). IS adapter CCXTReferenceDataAdapter(exchange_id='binance'). UAC external/binance schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Binance Spot exchange info REST (api.binance.com/api/v3/exchangeInfo). IS adapter uses CCXTReferenceDataAdapter(exchange_id='binance'). UAC external/binance schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Bitget public ticker (api.bitget.com/api/v2/spot/market/tickers). MTDS bitget_handler.py. UAC external/bitget schemas not yet imported by MTDS handler. Phase 2 QG task."
+    detail: "Bitget ticker REST (api.bitget.com/api/v2/spot/market/tickers). IS adapter uses CCXTReferenceDataAdapter(exchange_id='bitget'). UAC external/bitget schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Bybit Linear (perp) WS trade frames (wss://stream.bybit.com/v5/public/linear). MTDS live connector bybit_linear_ws.py streams this channel. UAC external/bybit schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "Bybit Linear Futures WS trade frames (stream.bybit.com/v5/public/linear). MTDS bybit_linear_ws.py connector. UAC external/bybit schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "Bybit REST ticker (api.bybit.com/v5/market/tickers). MTDS bybit_rest_handler.py. UAC external/bybit schemas not yet imported by MTDS handler. Phase 2 QG task."
+    detail: "Bybit Spot WS trade frames (stream.bybit.com/v5/public/spot). MTDS bybit_spot_ws.py connector. UAC external/bybit schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "Bybit Spot WS trade frames (wss://stream.bybit.com/v5/public/spot). MTDS live connector bybit_spot_ws.py streams this channel. UAC external/bybit schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "Bybit ticker REST (api.bybit.com/v5/market/tickers). IS adapter uses CCXTReferenceDataAdapter(exchange_id='bybit'). UAC external/bybit schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "CFTC Commitments of Traders REST (publicreporting.cftc.gov/api). tradfi macro_handler or IS cftc_adapter.py. UAC external/cftc schemas not yet imported by consumer. Phase 2 QG task."
+    detail: "CFTC Commitments of Traders report (publicreporting.cftc.gov/api/...COT...). Macro data adapter in IS or features-service calls this REST endpoint for COT positioning data. UAC external/cftc schemas not yet imported. Phase 2 QG task."
+    detail: "Coinbase Advanced Trade REST products (api.coinbase.com/api/v3/brokerage/products). IS CCXTReferenceDataAdapter(exchange_id='coinbase'). UAC external/coinbase schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Coinbase Advanced Trade WS match channel (wss://advanced-trade-ws.coinbase.com). MTDS live connector coinbase_ws.py streams this channel. UAC external/coinbase schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "Coinbase Advanced Trade WS match frames (advanced-trade-ws.coinbase.com). MTDS coinbase_ws.py connector. UAC external/coinbase schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "Coinbase Advanced Trade products REST (api.coinbase.com/api/v3/brokerage/products). IS adapter uses CCXTReferenceDataAdapter(exchange_id='coinbase'). UAC external/coinbase schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Deribit REST ticker (www.deribit.com/api/v2/public/ticker). MTDS deribit_rest_handler.py. UAC external/deribit schemas not yet imported by MTDS handler. Phase 2 QG task."
+    detail: "Deribit WS trade frames (wss://www.deribit.com/ws/api/v2). MTDS deribit_ws.py connector. UAC external/deribit schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "Deribit WS trade frames (wss://www.deribit.com/ws/api/v2). MTDS live connector deribit_ws.py streams this channel. UAC external/deribit schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "Deribit auth test interaction (www.deribit.com/api/v2/public/auth). Used for integration-level auth smoke verification. UAC external/deribit schemas wiring to MTDS connector is Phase 2 QG task."
+    detail: "Deribit auth/test RPC (www.deribit.com/api/v2/public/test). execution-service deribit connector uses auth handshake. UAC external/deribit schemas not yet imported by execution adapter. Phase 2 QG task."
+    detail: "Deribit get_instruments REST (www.deribit.com/api/v2/public/get_instruments). IS adapter calls this for instrument discovery. UAC external/deribit schemas not yet imported by IS adapter. Phase 2 QG task."
+    detail: "Deribit get_instruments multi-currency query (www.deribit.com/api/v2/public/get_instruments). IS adapter uses CCXTReferenceDataAdapter(exchange_id='deribit'). UAC external/deribit schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Deribit risk service health check endpoint (www.deribit.com/api/v2/public/get_portfolio_margins). Used by risk-and-exposure-service for margin monitoring. UAC external/deribit schemas not yet imported. Phase 2 QG task."
+    detail: "Deribit ticker (www.deribit.com/api/v2/public/ticker). IS adapter uses CCXTReferenceDataAdapter(exchange_id='deribit'). UAC external/deribit schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Drift Protocol WS trade frames (dlob.drift.trade/ws). MTDS live connector drift_ws.py streams this channel. UAC external/drift WS schemas not yet imported by WS connector (drift/mocks/markets.yaml covers REST; trade_ws covers WS). Phase 4 WS cassette."
+    detail: "Drift Protocol WS trade frames. MTDS drift_ws.py connector streams this channel. UAC external/drift schemas not yet imported by WS connector (drift/mocks/markets.yaml already allowlisted). Phase 2 QG task."
+    detail: "ECB Statistical Data Warehouse FX REST (data-api.ecb.europa.eu/service/data/EXR/). IS ecb_adapter.py or MTDS fx_handler. UAC external/ecb schemas not yet imported. Phase 2 QG task."
+    detail: "ECB data portal ticker/FX rates (data-api.ecb.europa.eu/service/data/...). IS macro adapter calls this for EUR base FX rates. UAC external/ecb schemas not yet imported by IS adapter. Phase 2 QG task."
+    detail: "EigenLayer rewards REST (api.eigenlayer.xyz/eigenlayer/v1/earner/{address}/historical_rewards). features-service onchain restaking adapter or IS reference data adapter calls this URL. UAC external/eigenlayer schemas not yet imported. Phase 2 QG task."
+    detail: "EigenLayer sidecar rewards REST (sidecar-rpc.eigenlayer.xyz/eigenlayer/rewards/v1/earner-historical-rewards). MTDS lst_etherfi_adapter.py or equivalent restaking handler. Status: BLOCKED-CREDENTIALS (Cloudflare-protected, production env needed). Phase 2 QG task."
+    detail: "Empty interactions stub — 1xBet sportsbook scraper; Playwright-based, cassette pending."
+    detail: "Empty interactions stub — API-Football sports data provider; adapter pending under sports master epic."
+    detail: "Empty interactions stub — Baker Hughes commodity/macro data provider; tradfi adapter pending."
+    detail: "Empty interactions stub — Instadapp DeFi account aggregator; adapter pending under DeFi master epic."
+    detail: "Empty interactions stub — MetaBet odds aggregator; adapter pending under sports master epic."
+    detail: "Empty interactions stub — OddsEngine sports odds feed; adapter pending under sports master epic."
+    detail: "Empty interactions stub — OpenBB Platform API; tradfi data aggregator adapter pending."
+    detail: "Empty interactions stub — Polygon.io tradfi tick data (polygon.io/docs); adapter pending under tradfi master epic."
+    detail: "Empty interactions stub — The Odds API (api.the-odds-api.com); adapter pending under sports master epic."
     detail: "Hyperliquid L2 book WS subscription frames (wss://api.hyperliquid.xyz/ws). MTDS live connector hyperliquid_ws.py streams this channel. UAC external/hyperliquid WS schemas not yet imported. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/meta.yaml
-    reason: recording-template
-    detail: "Hyperliquid meta REST (api.hyperliquid.xyz/info, type=meta). IS adapter calls this for instrument discovery (perp names, szDecimals, etc.). UAC external/hyperliquid schemas not yet imported by IS adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/meta_and_asset_ctxs.yaml
-    reason: recording-template
-    detail: "Hyperliquid meta+assetCtxs batch REST (api.hyperliquid.xyz/info, type=metaAndAssetCtxs). IS adapter calls this for combined instrument+funding state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/open_orders.yaml
-    reason: recording-template
-    detail: "Hyperliquid open orders REST (api.hyperliquid.xyz/info, type=openOrders). execution-service Hyperliquid adapter calls this for order state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/order_submit.yaml
-    reason: recording-template
-    detail: "Hyperliquid order submission (api.hyperliquid.xyz/exchange, action=order). execution-service Hyperliquid adapter calls this. UAC external/hyperliquid schemas not yet imported by execution adapter. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: hyperliquid/mocks/trade_ws.yaml
-    reason: recording-template
+    detail: "Hyperliquid L2 order book REST (api.hyperliquid.xyz/info, type=l2Book). MTDS or execution-service calls this for order book snapshots. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid WS activeAssetCtx subscription frames (wss://api.hyperliquid.xyz/ws). MTDS live connector hyperliquid_ws.py streams this channel. UAC external/hyperliquid WS schemas not yet imported. Phase 4 WS cassette."
     detail: "Hyperliquid WS trade frames (wss://api.hyperliquid.xyz/ws). MTDS live connector hyperliquid_ws.py streams this channel. UAC external/hyperliquid WS schemas not yet imported. Phase 4 WS cassette."
-    acked_by: slot-2 2026-05-23
-
-  # ---- Phase 4 Yahoo Finance recording-templates (additional cassettes beyond error_rate_limit)
-  - path: yahoo_finance/mocks/chart_aapl_1d.yaml
-    reason: recording-template
-    detail: "Yahoo Finance chart API AAPL 1d (query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d). IS equities adapter or features-service macro adapter calls this for OHLCV data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: yahoo_finance/mocks/dividends_aapl.yaml
-    reason: recording-template
-    detail: "Yahoo Finance dividends AAPL (query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=dividendHistory). IS equities adapter calls this for dividend data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: yahoo_finance/mocks/earnings_msft.yaml
-    reason: recording-template
-    detail: "Yahoo Finance earnings MSFT (query1.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=earnings). IS equities adapter calls this for earnings calendar data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: yahoo_finance/mocks/error_invalid_symbol.yaml
-    reason: recording-template
-    detail: "Yahoo Finance error-path cassette (invalid symbol response). Used for negative-path testing of the Yahoo Finance IS/features adapter. Complements the existing error_rate_limit.yaml in the allowlist."
-    acked_by: slot-2 2026-05-23
-  - path: yahoo_finance/mocks/splits_tsla.yaml
-    reason: recording-template
-    detail: "Yahoo Finance splits TSLA (query2.finance.yahoo.com/v10/finance/quoteSummary/TSLA?modules=splitHistory). IS equities adapter calls this for corporate action data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
-  - path: yahoo_finance/mocks/treasury_yield.yaml
-    reason: recording-template
+    detail: "Hyperliquid activeAssetCtx WS subscription (api.hyperliquid.xyz/ws). MTDS hyperliquid_ws.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid all mid-prices REST (api.hyperliquid.xyz/info, type=allMids). IS adapter or MTDS connector calls this. UAC external/hyperliquid REST schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid allMids REST (api.hyperliquid.xyz/info). MTDS hyperliquid_rest_handler.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid cancel order REST (api.hyperliquid.xyz/exchange). execution-service hyperliquid connector. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid candle snapshot REST (api.hyperliquid.xyz/info, type=candleSnapshot). MDPS or features-service calls this for OHLCV data. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid candleSnapshot REST (api.hyperliquid.xyz/info). MTDS hyperliquid OHLCV handler. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid clearinghouse state REST (api.hyperliquid.xyz/info, type=clearinghouseState). execution-service or risk-service calls this for position/margin state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid clearinghouseState REST (api.hyperliquid.xyz/info). execution-service position fetch. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid funding history REST (api.hyperliquid.xyz/info, type=fundingHistory). features-service perp funding calculator calls this. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid fundingHistory REST (api.hyperliquid.xyz/info). MTDS perp_funding_handler.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid l2Book REST (api.hyperliquid.xyz/info). execution-service order book depth. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid l2Book WS subscription (api.hyperliquid.xyz/ws). MTDS hyperliquid_ws.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid meta REST (api.hyperliquid.xyz/info). IS hyperliquid adapter instrument discovery. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid meta REST (api.hyperliquid.xyz/info, type=meta). IS adapter calls this for instrument discovery (perp names, szDecimals, etc.). UAC external/hyperliquid schemas not yet imported by IS adapter. Phase 2 QG task."
+    detail: "Hyperliquid meta+assetCtxs batch REST (api.hyperliquid.xyz/info, type=metaAndAssetCtxs). IS adapter calls this for combined instrument+funding state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid metaAndAssetCtxs REST (api.hyperliquid.xyz/info). MTDS context fetch. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid open orders REST (api.hyperliquid.xyz/info, type=openOrders). execution-service Hyperliquid adapter calls this for order state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid openOrders REST (api.hyperliquid.xyz/info). execution-service order state. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid order cancellation (api.hyperliquid.xyz/exchange, action=cancel). execution-service Hyperliquid adapter calls this. UAC external/hyperliquid schemas not yet imported by execution adapter. Phase 2 QG task."
+    detail: "Hyperliquid order submission (api.hyperliquid.xyz/exchange, action=order). execution-service Hyperliquid adapter calls this. UAC external/hyperliquid schemas not yet imported by execution adapter. Phase 2 QG task."
+    detail: "Hyperliquid order submit REST (api.hyperliquid.xyz/exchange). execution-service order placement. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Hyperliquid trade WS subscription (api.hyperliquid.xyz/ws). MTDS hyperliquid_ws.py. UAC external/hyperliquid schemas not yet imported. Phase 2 QG task."
+    detail: "Instadapp DeFi aggregator stub — adapter not yet implemented. Capability declaration placeholder."
+    detail: "Internal risk-service health probe (http://risk-service:8080/health) recorded in Deribit mocks dir. Used by execution-service integration tests verifying Deribit connector health-check wiring. Not a Deribit API call."
+    detail: "Kalshi WS ticker frames (wss://trading-api.kalshi.com/trade-api/ws/v2). MTDS live connector kalshi_ws.py streams this channel. UAC external/kalshi WS schemas not yet imported. Phase 4 WS cassette."
+    detail: "Kalshi WS ticker subscription (trading-api.kalshi.com WS). MTDS kalshi_ws.py connector. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    detail: "Kalshi markets list REST (trading-api.kalshi.com/trade-api/v2/markets). IS or MTDS kalshi_adapter.py. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    detail: "Kalshi order book REST (trading-api.kalshi.com/trade-api/v2/markets/{ticker}/orderbook). Kalshi IS adapter or MTDS live connector calls this. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    detail: "Kalshi orderbook REST (trading-api.kalshi.com/trade-api/v2/markets/{ticker}/orderbook). execution-service kalshi connector. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    detail: "Kalshi prediction market list (trading-api.kalshi.com/trade-api/v2/markets). Kalshi IS adapter calls this for market discovery. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    detail: "Kalshi prediction market lookup (trading-api.kalshi.com/trade-api/v2/markets/{ticker}). Kalshi IS adapter calls this. UAC external/kalshi schemas not yet imported. Phase 2 QG task."
+    detail: "Kalshi prediction market lookup REST (trading-api.kalshi.com/trade-api/v2/markets/{ticker}). IS or MTDS kalshi_adapter.py. UAC external/kalshi schemas not yet imported by consumer. Phase 2 QG task."
+    detail: "Matchbook Exchange getMarkets REST (api.matchbook.com/edge/rest/events). sports adapter matchbook_client.py. UAC external/matchbook schemas not yet imported. Phase 2 QG task."
+    detail: "Matchbook exchange markets REST (api.matchbook.com/edge/rest/events). Sports IS adapter calls this for event/market discovery. UAC external/matchbook schemas not yet imported. Phase 2 QG task."
+    detail: "MetaBet sports analytics stub — adapter not yet implemented. Placeholder for sports betting analytics data."
+    detail: "Morpho Blue GraphQL API (blue-api.morpho.org/graphql). IS morpho_blue adapter for lending market discovery. UAC external/morpho_blue_api schemas not yet imported by IS adapter. Phase 2 QG task."
+    detail: "Morpho Blue REST API (api.morpho.org/markets). IS adapter instruments_service/reference_data/adapters/defi/morpho_blue.py calls this URL. UAC external/morpho_blue_api schemas not yet imported by IS adapter. Phase 2 QG task."
+    detail: "OFR (Office of Financial Research) SOFR/short-term funding REST (data.financialresearch.gov/v1/series/timeseries). tradfi macro_handler or IS ofr_adapter.py. UAC external/ofr schemas not yet imported. Phase 2 QG task."
+    detail: "OFR (Office of Financial Research) short-term funding data API (data.financialresearch.gov/api/v1/...). IS or features-service macro adapter calls this for SOFR/repo rate data. UAC external/ofr schemas not yet imported. Phase 2 QG task."
+    detail: "OKX Futures WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS live connector okx_futures_ws.py streams this channel. UAC external/okx schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "OKX Futures WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS okx_futures_ws.py connector. UAC external/okx schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "OKX REST ticker (www.okx.com/api/v5/market/ticker). MTDS okx_rest_handler.py. UAC external/okx schemas not yet imported by MTDS handler. Phase 2 QG task."
+    detail: "OKX Spot WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS live connector okx_spot_ws.py streams this channel. UAC external/okx schemas not yet imported by WS connector. Phase 4 WS cassette."
+    detail: "OKX Spot WS trade frames (wss://ws.okx.com:8443/ws/v5/public). MTDS okx_spot_ws.py connector. UAC external/okx schemas not yet imported by WS connector. Phase 2 QG task."
+    detail: "OKX ticker REST (www.okx.com/api/v5/market/ticker). IS adapter uses CCXTReferenceDataAdapter(exchange_id='okx'). UAC external/okx schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Odds engine internal stub — custom odds calculation engine adapter not yet implemented. Placeholder cassette."
+    detail: "Open-Meteo weather forecast REST (api.open-meteo.com/v1/forecast). IS or strategy-service weather signal adapter. UAC external/open_meteo schemas not yet imported. Phase 2 QG task."
+    detail: "Open-Meteo weather forecast REST (api.open-meteo.com/v1/forecast). features-service or IS macro adapter calls this for weather data used in energy/commodity strategy features. UAC external/open_meteo schemas not yet imported. Phase 2 QG task."
+    detail: "OpenBB Platform SDK stub — adapter not yet implemented. Placeholder for multi-asset data aggregation via OpenBB."
+    detail: "Polygon.io financial data API stub — adapter not yet implemented. Placeholder for equities/options market data via Polygon.io."
+    detail: "Polymarket CLOB markets REST (clob.polymarket.com/markets). IS or MTDS polymarket_clob_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket CLOB markets REST (clob.polymarket.com/markets). Polymarket IS adapter calls this for market discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket Gamma crypto markets REST (gamma-api.polymarket.com/markets). IS polymarket_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket Gamma crypto markets REST (gamma-api.polymarket.com/markets?category=crypto). Polymarket IS adapter calls this for crypto prediction market discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket Gamma sports events REST (gamma-api.polymarket.com/events). IS polymarket_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket Gamma sports events REST (gamma-api.polymarket.com/events?category=sports). Polymarket IS adapter calls this for sports event discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket Gamma sports markets REST (gamma-api.polymarket.com/markets). IS polymarket_adapter.py. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "Polymarket Gamma sports markets REST (gamma-api.polymarket.com/markets?category=sports). Polymarket IS adapter calls this for sports prediction market discovery. UAC external/polymarket schemas not yet imported. Phase 2 QG task."
+    detail: "The Odds API (api.the-odds-api.com) stub — sports odds aggregator adapter not yet implemented. Placeholder cassette."
+    detail: "TheGraph Uniswap V2 pools subgraph (api.thegraph.com/subgraphs/name/uniswap/uniswap-v2). IS uniswap_v2.py adapter queries V2 pools via TheGraph. UAC external/thegraph V2 subgraph query not yet wired. Phase 2 QG task (see also thegraph/sushiswap_v3 + pancakeswap_v3 already allowlisted)."
+    detail: "TheGraph generic DeFi pool subgraph query (gateway.thegraph.com). Covers pool/liquidity queries outside the named sushiswap_v3/pancakeswap_v3 subgraphs already in the allowlist. IS or features-service adapter calls this. UAC external/thegraph schemas not yet fully imported. Phase 2 QG task."
+    detail: "Upbit Korean exchange REST ticker (api.upbit.com/v1/ticker). IS CCXTReferenceDataAdapter(exchange_id='upbit'). UAC external/upbit schemas not yet imported by CCXT adapter. Phase 2 QG task."
+    detail: "Upbit ticker REST (api.upbit.com/v1/ticker). IS adapter uses CCXTReferenceDataAdapter(exchange_id='upbit'). UAC external/upbit schemas not yet imported by CCXT adapter. Phase 2 QG task."
     detail: "Yahoo Finance US Treasury yield (query1.finance.yahoo.com/v8/finance/chart/^TNX?interval=1d). IS macro adapter calls this for risk-free rate data used in carry calculations. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
-    acked_by: slot-2 2026-05-23
+    detail: "Yahoo Finance chart API AAPL 1d (query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=1d). IS equities adapter or features-service macro adapter calls this for OHLCV data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance chart endpoint (query1.finance.yahoo.com/v8/finance/chart/AAPL). IS yahoo_finance_adapter.py or MTDS tradfi handler. UAC external/yahoo_finance schemas not yet imported by consumer (yahoo_finance/error_rate_limit.yaml already allowlisted). Phase 2 QG task."
+    detail: "Yahoo Finance dividends AAPL (query2.finance.yahoo.com/v10/finance/quoteSummary/AAPL?modules=dividendHistory). IS equities adapter calls this for dividend data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance dividends endpoint (query1.finance.yahoo.com/v8/finance/chart/AAPL?events=div). IS yahoo_finance corporate-actions adapter. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance earnings MSFT (query1.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=earnings). IS equities adapter calls this for earnings calendar data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance earnings endpoint (query2.finance.yahoo.com/v10/finance/quoteSummary/MSFT?modules=earnings). IS yahoo_finance fundamental data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance error-path cassette (invalid symbol response). Negative-path fixture for IS yahoo_finance adapter error handling. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance error-path cassette (invalid symbol response). Used for negative-path testing of the Yahoo Finance IS/features adapter. Complements the existing error_rate_limit.yaml in the allowlist."
+    detail: "Yahoo Finance splits TSLA (query2.finance.yahoo.com/v10/finance/quoteSummary/TSLA?modules=splitHistory). IS equities adapter calls this for corporate action data. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance splits endpoint (query1.finance.yahoo.com/v8/finance/chart/TSLA?events=split). IS yahoo_finance corporate-actions adapter. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    detail: "Yahoo Finance treasury yield endpoint (query1.finance.yahoo.com/v8/finance/chart/^TNX). IS yahoo_finance rates adapter or macro_handler. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
+    reason: capability-declaration-only
+    reason: integration-fixture
+    reason: recording-template
+    reason: stub-placeholder
+  # ---- Phase 4 CeFi blind spots — production adapters exist but UAC external import not yet wired
+  # ---- Phase 4 DeFi blind spots — on-chain / DeFi protocol cassettes
+  # ---- Phase 4 DeFi/on-chain recording-templates (production consumers exist; UAC schemas not yet imported)
+  # ---- Phase 4 Hyperliquid blind spots — production adapters exist, UAC import not yet wired
+  # ---- Phase 4 Hyperliquid recording-templates (full connector suite)
+  # ---- Phase 4 Macro/financial data recording-templates
+  # ---- Phase 4 Sports / prediction market blind spots
+  # ---- Phase 4 Sports/prediction market recording-templates
+  # ---- Phase 4 Tradfi / macro blind spots
+  # ---- Phase 4 Yahoo Finance recording-templates (additional cassettes beyond error_rate_limit)
+  - path: alchemy/mocks/aave_get_reserve_data.yaml
+  - path: alchemy/mocks/aave_get_user_account_data.yaml
+  - path: alchemy/mocks/alchemy_ws_eth_subscription.yaml
+  - path: api_football/mocks/stub.yaml
+  - path: aster/mocks/trade_ws.yaml
+  - path: baker_hughes/mocks/stub.yaml
+  - path: betfair/mocks/list_market_book.yaml
+  - path: betfair/mocks/list_market_catalogue.yaml
+  - path: binance/mocks/futures_trade_ws.yaml
+  - path: binance/mocks/spot_exchange_info.yaml
+  - path: binance/mocks/spot_trade_ws.yaml
+  - path: binance/mocks/ticker_24hr.yaml
+  - path: bitget/mocks/ticker.yaml
+  - path: bybit/mocks/linear_trade_ws.yaml
+  - path: bybit/mocks/spot_trade_ws.yaml
+  - path: bybit/mocks/ticker.yaml
+  - path: cftc/mocks/commitments_of_traders.yaml
+  - path: coinbase/mocks/match_ws.yaml
+  - path: coinbase/mocks/products.yaml
+  - path: deribit/mocks/auth_test.yaml
+  - path: deribit/mocks/get_instruments_multi.yaml
+  - path: deribit/mocks/risk_service_health.yaml
+  - path: deribit/mocks/ticker.yaml
+  - path: deribit/mocks/trade_ws.yaml
+  - path: drift/mocks/trade_ws.yaml
+  - path: ecb/mocks/ticker.yaml
+  - path: eigenlayer/mocks/earner_historical_rewards.yaml
+  - path: hyperliquid/mocks/active_asset_ctx_ws.yaml
+  - path: hyperliquid/mocks/all_mids.yaml
+  - path: hyperliquid/mocks/cancel_order.yaml
+  - path: hyperliquid/mocks/candle_snapshot.yaml
+  - path: hyperliquid/mocks/clearinghouse_state.yaml
+  - path: hyperliquid/mocks/funding_history.yaml
+  - path: hyperliquid/mocks/l2_book.yaml
+  - path: hyperliquid/mocks/l2book_ws.yaml
+  - path: hyperliquid/mocks/meta.yaml
+  - path: hyperliquid/mocks/meta_and_asset_ctxs.yaml
+  - path: hyperliquid/mocks/open_orders.yaml
+  - path: hyperliquid/mocks/order_submit.yaml
+  - path: hyperliquid/mocks/trade_ws.yaml
+  - path: instadapp/mocks/stub.yaml
+  - path: kalshi/mocks/market_lookup.yaml
+  - path: kalshi/mocks/markets.yaml
+  - path: kalshi/mocks/orderbook.yaml
+  - path: kalshi/mocks/ticker_ws.yaml
+  - path: matchbook/mocks/matchbook_get_markets.yaml
+  - path: metabet/mocks/stub.yaml
+  - path: morpho_blue_api/mocks/markets.yaml
+  - path: odds_api/mocks/stub.yaml
+  - path: odds_engine/mocks/stub.yaml
+  - path: ofr/mocks/short_term_funding.yaml
+  - path: okx/mocks/futures_trade_ws.yaml
+  - path: okx/mocks/spot_trade_ws.yaml
+  - path: okx/mocks/ticker.yaml
+  - path: onexbet/mocks/stub.yaml
+  - path: open_meteo/mocks/forecast_current_weather.yaml
+  - path: openbb/mocks/stub.yaml
+  - path: polygon/mocks/stub.yaml
+  - path: polymarket/mocks/clob_markets.yaml
+  - path: polymarket/mocks/gamma_events_sports.yaml
+  - path: polymarket/mocks/gamma_markets_crypto.yaml
+  - path: polymarket/mocks/gamma_markets_sports.yaml
+  - path: thegraph/mocks/pools_query.yaml
+  - path: upbit/mocks/ticker.yaml
+  - path: yahoo_finance/mocks/chart_aapl_1d.yaml
+  - path: yahoo_finance/mocks/dividends_aapl.yaml
+  - path: yahoo_finance/mocks/earnings_msft.yaml
+  - path: yahoo_finance/mocks/error_invalid_symbol.yaml
+  - path: yahoo_finance/mocks/splits_tsla.yaml
+  - path: yahoo_finance/mocks/treasury_yield.yaml
+# ---- Phase 4 CeFi venue recording-templates (MTDS live connectors exist; UAC schemas not yet imported by connectors)
+# ---- Phase 4 stub-placeholder stubs (empty interactions; no adapter implemented yet)
