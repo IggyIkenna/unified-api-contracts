@@ -291,7 +291,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # DeFi — candle-sampled types need processing; pass-through types do not
     "dex_pools": False,
     "dex_swaps": True,
-    "lending_indices": False,
+    "lending_indices": True,
     # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
     "lst_rates": False,
