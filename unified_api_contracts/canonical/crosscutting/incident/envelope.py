@@ -12,28 +12,57 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from unified_api_contracts.canonical.crosscutting.alerting import AlertSeverity
-from unified_api_contracts.canonical.crosscutting.incident.evidence import IncidentEvidence
 from unified_api_contracts.canonical.crosscutting.incident.state import IncidentState
 
 
 class IncidentEnvelope(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", frozen=True)
 
+    # ── Identity ───────────────────────────────────────────────────────────
+    event_id: str
     incident_key: str
-    detected_at: datetime
-    severity: AlertSeverity
+    timestamp: datetime
     state: IncidentState = IncidentState.DETECTED
-    service: str
-    description: str = ""
-    evidence: IncidentEvidence = Field(default_factory=IncidentEvidence)
-    tags: dict[str, str] = Field(default_factory=dict)
 
-    @field_validator("detected_at")
+    # ── Context ────────────────────────────────────────────────────────────
+    environment: str
+    severity_hint: AlertSeverity
+    domain: str
+    service: str
+    component: str
+    problem_type: str
+    problem_summary: str
+    config_hash: str
+    code_version: str
+
+    # ── Optional scoping ───────────────────────────────────────────────────
+    strategy_id: str | None = None
+    venue: str | None = None
+    account_id: str | None = None
+    instrument_id: str | None = None
+    runbook_id: str | None = None
+
+    # ── Risk context ───────────────────────────────────────────────────────
+    risk_state: str | None = None
+    capital_at_risk: float | None = None
+    auto_action_allowed: bool = False
+
+    # ── Audit-ack / SLA ────────────────────────────────────────────────────
+    human_audit_ack_required: bool = False
+    human_operational_ack_required: bool = False
+    audit_ack_due_at: datetime | None = None
+    audit_acked_by: str | None = None
+    audit_acked_at: datetime | None = None
+    operational_acked_by: str | None = None
+    operational_acked_at: datetime | None = None
+    audit_ack_escalation_history: tuple[dict[str, str], ...] = ()
+
+    @field_validator("timestamp")
     @classmethod
-    def _detected_at_tz_aware(cls, v: datetime) -> datetime:
+    def _timestamp_tz_aware(cls, v: datetime) -> datetime:
         if v.tzinfo is None:
-            raise ValueError("detected_at must be tz-aware UTC")
+            raise ValueError("timestamp must be tz-aware UTC")
         return v
