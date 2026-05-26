@@ -35,55 +35,81 @@ class IncidentState(StrEnum):
 
 
 ALLOWED_TRANSITIONS: Final[dict[IncidentState, frozenset[IncidentState]]] = {
-    IncidentState.DETECTED: frozenset({
-        IncidentState.AUTO_ACTION_STARTED,
-        IncidentState.SAFE_MODE_ACTIVE,
-        IncidentState.ESCALATED,
-    }),
-    IncidentState.AUTO_ACTION_STARTED: frozenset({
-        IncidentState.AUTO_ACTION_SUCCEEDED,
-        IncidentState.AUTO_ACTION_FAILED,
-        IncidentState.SAFE_MODE_ACTIVE,
-    }),
-    IncidentState.AUTO_ACTION_SUCCEEDED: frozenset({
-        IncidentState.RECOVERY_VERIFICATION_STARTED,
-    }),
-    IncidentState.AUTO_ACTION_FAILED: frozenset({
-        IncidentState.ESCALATED,
-        IncidentState.SAFE_MODE_ACTIVE,
-    }),
-    IncidentState.RECOVERY_VERIFICATION_STARTED: frozenset({
-        IncidentState.RECOVERY_CONFIRMED,
-        IncidentState.RECOVERY_UNCERTAIN,
-    }),
-    IncidentState.RECOVERY_CONFIRMED: frozenset({
-        IncidentState.AUDIT_REPORT_GENERATED,
-    }),
-    IncidentState.RECOVERY_UNCERTAIN: frozenset({
-        IncidentState.SAFE_MODE_ACTIVE,
-        IncidentState.ESCALATED,
-    }),
-    IncidentState.SAFE_MODE_ACTIVE: frozenset({
-        IncidentState.HUMAN_OPERATIONAL_ACKED,
-        IncidentState.ESCALATED,
-    }),
-    IncidentState.HUMAN_OPERATIONAL_ACKED: frozenset({
-        IncidentState.RECOVERY_VERIFICATION_STARTED,
-        IncidentState.RESOLVED,
-    }),
-    IncidentState.ESCALATED: frozenset({
-        IncidentState.HUMAN_OPERATIONAL_ACKED,
-        IncidentState.SAFE_MODE_ACTIVE,
-    }),
-    IncidentState.AUDIT_REPORT_GENERATED: frozenset({
-        IncidentState.HUMAN_AUDIT_ACKED,
-    }),
-    IncidentState.HUMAN_AUDIT_ACKED: frozenset({
-        IncidentState.RESOLVED,
-    }),
-    IncidentState.RESOLVED: frozenset({
-        IncidentState.CLOSED,
-    }),
+    IncidentState.DETECTED: frozenset(
+        {
+            IncidentState.AUTO_ACTION_STARTED,
+            IncidentState.SAFE_MODE_ACTIVE,
+            IncidentState.ESCALATED,
+        }
+    ),
+    IncidentState.AUTO_ACTION_STARTED: frozenset(
+        {
+            IncidentState.AUTO_ACTION_SUCCEEDED,
+            IncidentState.AUTO_ACTION_FAILED,
+            IncidentState.SAFE_MODE_ACTIVE,
+        }
+    ),
+    IncidentState.AUTO_ACTION_SUCCEEDED: frozenset(
+        {
+            IncidentState.RECOVERY_VERIFICATION_STARTED,
+        }
+    ),
+    IncidentState.AUTO_ACTION_FAILED: frozenset(
+        {
+            IncidentState.ESCALATED,
+            IncidentState.SAFE_MODE_ACTIVE,
+        }
+    ),
+    IncidentState.RECOVERY_VERIFICATION_STARTED: frozenset(
+        {
+            IncidentState.RECOVERY_CONFIRMED,
+            IncidentState.RECOVERY_UNCERTAIN,
+        }
+    ),
+    IncidentState.RECOVERY_CONFIRMED: frozenset(
+        {
+            IncidentState.AUDIT_REPORT_GENERATED,
+        }
+    ),
+    IncidentState.RECOVERY_UNCERTAIN: frozenset(
+        {
+            IncidentState.SAFE_MODE_ACTIVE,
+            IncidentState.ESCALATED,
+        }
+    ),
+    IncidentState.SAFE_MODE_ACTIVE: frozenset(
+        {
+            IncidentState.HUMAN_OPERATIONAL_ACKED,
+            IncidentState.ESCALATED,
+        }
+    ),
+    IncidentState.HUMAN_OPERATIONAL_ACKED: frozenset(
+        {
+            IncidentState.RECOVERY_VERIFICATION_STARTED,
+            IncidentState.RESOLVED,
+        }
+    ),
+    IncidentState.ESCALATED: frozenset(
+        {
+            IncidentState.HUMAN_OPERATIONAL_ACKED,
+            IncidentState.SAFE_MODE_ACTIVE,
+        }
+    ),
+    IncidentState.AUDIT_REPORT_GENERATED: frozenset(
+        {
+            IncidentState.HUMAN_AUDIT_ACKED,
+        }
+    ),
+    IncidentState.HUMAN_AUDIT_ACKED: frozenset(
+        {
+            IncidentState.RESOLVED,
+        }
+    ),
+    IncidentState.RESOLVED: frozenset(
+        {
+            IncidentState.CLOSED,
+        }
+    ),
     IncidentState.CLOSED: frozenset(),
 }
 

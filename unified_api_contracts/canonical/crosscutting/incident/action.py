@@ -10,7 +10,7 @@ Codex SSOT: ``codex/04-architecture/incident-gateway-state-machine.md``.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator

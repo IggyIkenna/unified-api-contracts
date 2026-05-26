@@ -46,12 +46,15 @@ class IncidentEnvelope(BaseModel):
     runbook_id: str | None = None
 
     # ── Risk context ───────────────────────────────────────────────────────
-    risk_state: str | None = None
+    risk_state: str = "unknown"
+    """Closed-set values: 'safe' / 'protected_mode' / 'unknown' / 'live_unresolved'."""
     capital_at_risk: float | None = None
     auto_action_allowed: bool = False
+    recovery_confirmed: bool = False
+    """Set to True only after RECOVERY_CONFIRMED state transition."""
 
     # ── Audit-ack / SLA ────────────────────────────────────────────────────
-    human_audit_ack_required: bool = False
+    human_audit_ack_required: bool = True
     human_operational_ack_required: bool = False
     audit_ack_due_at: datetime | None = None
     audit_acked_by: str | None = None
@@ -65,4 +68,18 @@ class IncidentEnvelope(BaseModel):
     def _timestamp_tz_aware(cls, v: datetime) -> datetime:
         if v.tzinfo is None:
             raise ValueError("timestamp must be tz-aware UTC")
+        return v
+
+    @field_validator("environment")
+    @classmethod
+    def _environment_closed_set(cls, v: str) -> str:
+        if v not in ("prod", "staging", "dev"):
+            raise ValueError(f"environment must be prod|staging|dev; got {v!r}")
+        return v
+
+    @field_validator("risk_state")
+    @classmethod
+    def _risk_state_closed_set(cls, v: str) -> str:
+        if v not in ("safe", "protected_mode", "unknown", "live_unresolved"):
+            raise ValueError(f"risk_state must be safe|protected_mode|unknown|live_unresolved; got {v!r}")
         return v

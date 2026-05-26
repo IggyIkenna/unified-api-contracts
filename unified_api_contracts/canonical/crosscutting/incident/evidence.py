@@ -18,7 +18,7 @@ class IncidentEvidence(BaseModel):
     traces_url: str | None = None
     agent_action_logs_url: str | None = None
     human_acknowledgement_trail_url: str | None = None
-    config_hash: str = ""
-    code_version: str = ""
-    runbook_version: str = ""
+    config_hash: str
+    code_version: str
+    runbook_version: str
     additional_evidence: dict[str, str] = Field(default_factory=dict)

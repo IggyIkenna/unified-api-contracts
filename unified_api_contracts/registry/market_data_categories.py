@@ -177,6 +177,7 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "sports": [
         "odds",  # Raw bookmaker odds from Odds API (MTDS raw tick data)
+        "ODDS",  # Canonical uppercase form per mega-audit R2 (ODDS_API emits this)
         "odds_snapshot",  # Point-in-time bookmaker odds (LOCF sampled)
         "odds_movement",  # Odds line movement OHLC candles
         "arbitrage_opportunity",  # Cross-bookmaker arbitrage detection
@@ -185,6 +186,8 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "markets",  # Market metadata (event/market listings per bookmaker)
         "outcomes",  # Outcome results (settled markets)
         "settlements",  # Settlement records (payout confirmation)
+        # ── Bet/trade events (PINNACLE, BETFAIR_SB_UK/EX_UK/EX_EU, DRAFTKINGS, FANDUEL) ──
+        "trades",  # Matched bets / trade-level acceptance events (aligned with CeFi/prediction)
     ],
     "prediction": [
         # Canonical names — aligned with CeFi. Legacy prediction_* names retired
@@ -668,6 +671,7 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # bookmaker venues emit "trades". Old data_types (odds_snapshot, odds_movement)
     # were the oracle bug root cause (25,652 MISSING_EXPECTED).
     "ODDS_API": {
+        "ODDS": "2024-01-01",  # canonical uppercase per mega-audit R2 correction
         "odds": "2024-01-01",
         "odds_snapshot": "2024-01-01",
         "odds_movement": "2024-01-01",

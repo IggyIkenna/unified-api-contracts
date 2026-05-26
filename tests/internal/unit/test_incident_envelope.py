@@ -159,7 +159,7 @@ def test_recovery_verification_all_passed_requires_all_5_true() -> None:
         market_data_fresh=True,
         strategy_state_restored=True,
     )
-    assert rv.all_passed() is True
+    assert rv.all_passed is True
 
 
 def test_recovery_verification_any_false_fails_all_passed() -> None:
@@ -170,7 +170,7 @@ def test_recovery_verification_any_false_fails_all_passed() -> None:
         market_data_fresh=True,
         strategy_state_restored=True,
     )
-    assert rv.all_passed() is False
+    assert rv.all_passed is False
 
 
 # ---------------------------------------------------------------------------

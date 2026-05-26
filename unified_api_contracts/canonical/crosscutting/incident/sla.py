@@ -19,7 +19,7 @@ class AuditAckSLAPolicy(BaseModel):
     physical_pager_after_seconds: int | None = None
 
     @model_validator(mode="after")
-    def _enforce_monotonic(self) -> "AuditAckSLAPolicy":
+    def _enforce_monotonic(self) -> AuditAckSLAPolicy:
         d = self.default_seconds
         s = self.secondary_human_after_seconds
         f = self.founder_after_seconds
