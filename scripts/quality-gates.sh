@@ -8,7 +8,8 @@
 #   3. Add LOCAL_DEPS entries if your library has local editable deps
 PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
-MIN_COVERAGE=84
+# Recalibrated from 84→83 after 6fb90b19 added branch=True to coverage config
+MIN_COVERAGE=83
 PYTEST_WORKERS=${PYTEST_WORKERS:-1}  # Reduced from 2 due to 565+ cassette test cases
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
