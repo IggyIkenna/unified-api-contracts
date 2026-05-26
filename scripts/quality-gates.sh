@@ -135,9 +135,9 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/internal/reference/ticker_registry.py"
 )
 # UAC's suite now covers 228-instance catalogue × cassette parity across 80+ external
-# sources; the default 300s budget is too tight. 600s accommodates the combined surface
-# without masking runaway regressions (a 60% overrun would still trip).
-MAX_DURATION=600
+# sources; the default 300s budget is too tight. 720s accommodates the combined surface
+# (CI measured 665s on 2026-05-26; 720 = ~8% headroom without masking runaway regressions).
+MAX_DURATION=720
 # Memory monitoring settings for this heavy test suite
 QG_MEMORY_THRESHOLD=${QG_MEMORY_THRESHOLD:-80}  # Lower threshold due to cassette tests
 QG_MEMORY_CHECK_INTERVAL=${QG_MEMORY_CHECK_INTERVAL:-20}  # More frequent checks
