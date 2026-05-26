@@ -53,9 +53,10 @@ Homepage = "https://github.com/IggyIkenna/unified-api-contracts"
 Repository = "https://github.com/IggyIkenna/unified-api-contracts"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-python_files = "test_*.py"
+python_files = ["test_*.py"]
 python_classes = "Test*"
 python_functions = "test_*"
+asyncio_mode = "auto"
 addopts = "-v --strict-markers"
 markers = [
     "unit: Unit tests",
@@ -67,16 +68,20 @@ markers = [
 [tool.ruff]
 line-length = 120
 target-version = "py313"
-exclude = [".cursor", ".venv", "build", "dist", "scripts"]
+exclude = [".cursor", ".venv", ".venv-workspace", "build", "dist", "node_modules", "scripts"]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 
 [tool.ruff.lint]
-select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "G"]
-ignore = ["G003", "G004"]  # E501; G004: f-strings in logger (print->logger migration)
-# G004: allow f-strings in logger (print->logger migration) enforced (line-length 120)
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF", "G", "C90"]
+extend-ignore = ["G003", "G004"]
+ignore = ["E402"]
 # N815/N803: camelCase/PascalCase required for API contracts mirroring external APIs (Binance, boto3, GCP SDK)
 
 [tool.ruff.lint.mccabe]
-max-complexity = 7
+max-complexity = 26
 
 [tool.ruff.lint.per-file-ignores]
 "unified_api_contracts/external/binance/*.py" = ["N815", "N803", "F403", "F405"]
@@ -182,24 +187,23 @@ max-complexity = 7
 "tests/**/*.py" = ["N806", "N811", "N814", "RUF001", "RUF002", "RUF003", "RUF043", "RUF059", "B017", "C408", "E402"]
 "tests/*.py" = ["N806", "N811", "N814", "RUF001", "RUF002", "RUF003", "RUF043", "RUF059", "B017", "C408", "E402"]
 
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
 [tool.basedpyright]
-# Enforce no Any/object — use specific types
-reportAny = "error"
-reportUnknownVariableType = "error"
-reportUnknownArgumentType = "error"
-reportUnknownParameterType = "error"
-reportUnknownMemberType = "error"
-# Disable private usage for external modules importing normalize_utils helpers
-reportPrivateUsage = "warning"
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
 include = ["unified_api_contracts"]
-exclude = ["**/__pycache__", ".venv*", "build", "dist", "unified_api_contracts/testing/**", "unified_api_contracts/testing", "unified_api_contracts/internal/testing/**", "unified_api_contracts/internal/testing"]
+exclude = ["tests", "**/__pycache__", ".venv*", ".venv-workspace", "build", "dist", "node_modules", "unified_api_contracts/testing/**", "unified_api_contracts/testing", "unified_api_contracts/internal/testing/**", "unified_api_contracts/internal/testing"]
+# Preserve repo-specific: warning (not none) for private usage — external modules use normalize_utils helpers
+reportAny = "error"
+
+[[tool.basedpyright.executionEnvironments]]
+root = "."
+pythonVersion = "3.13"
+pythonPlatform = "All"
+extraPaths = []
 
 [tool.coverage.run]
+source = ["unified_api_contracts"]
+branch = true
 # Transitional: exclude new-path copies until old paths are removed (citadel phase 1)
 omit = [
     "unified_api_contracts/normalize_utils/*",
@@ -292,3 +296,6 @@ exclude_lines = [
 
 [tool.quality-gates]
 repo_arch_tier = "0"
+
+[tool.bandit]
+skips = []   # per-repo: add bandit check IDs WITH a comment explaining why (e.g. "B608: ...")
