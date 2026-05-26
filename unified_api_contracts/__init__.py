@@ -65,6 +65,11 @@ from .canonical.crosscutting.client_lifecycle_events import (
     ShardRecommendedAction,
     VenueAuthStatus,
 )
+from .canonical.crosscutting.cme_polymarket_link import (
+    CME_ROOT_TO_POLYMARKET_GROUP,
+    LINKED_CME_ROOTS,
+    linked_question_group,
+)
 from .canonical.crosscutting.defi import ChainKind
 from .canonical.crosscutting.errors import (
     VENUE_ERROR_MAP,
