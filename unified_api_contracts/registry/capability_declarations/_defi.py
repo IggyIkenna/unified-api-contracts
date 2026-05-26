@@ -199,7 +199,7 @@ def get_subgraph_id(protocol: str, chain: str = "ETHEREUM") -> str | None:
 #   - deployment-ui data-status: shows expected data coverage matrix
 # ---------------------------------------------------------------------------
 
-from ..._instrument_enums import InstrumentType as _IT  # noqa: E402, N814
+from ..._instrument_enums import InstrumentType as _IT  # noqa: N814
 
 
 class ProtocolClass(StrEnum):
@@ -640,13 +640,13 @@ _TOKEN_TO_GROUP: dict[str, str] = {tok: group for group, tokens in TOKEN_EQUIVAL
 # Empty / deprecated DeFi venue metadata lives in ``_defi_coverage`` (co-located
 # re-export). Used by data-status to suppress missing-coverage flags for venues
 # whose subgraph is retired or whose parquets haven't been collected yet.
-from ._defi_coverage import (  # noqa: E402  # placed after conditional setup to avoid circular import at load time
+from ._defi_coverage import (  # placed after conditional setup to avoid circular import at load time
     DEFI_INSTRUMENTS_NOT_YET_COLLECTED,
     DEPRECATED_DEFI_GHOST_VENUE_NAMES,
     EMPTY_OR_DEPRECATED_DEFI_VENUES,
     venue_has_no_expected_defi_coverage,
 )
-from ._defi_lst import (  # noqa: E402  # placed after conditional setup to avoid circular import at load time
+from ._defi_lst import (  # placed after conditional setup to avoid circular import at load time
     LST_TOKEN_GENESIS,
     LST_VENUE_TO_TOKENS,
     get_lst_token_genesis,
