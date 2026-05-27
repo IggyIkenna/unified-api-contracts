@@ -848,6 +848,56 @@ def parse_defi_venue(venue_str: str) -> tuple[str, str]:
     return venue_str.lower(), ""
 
 
+# Strip-underscore lookup: "AAVEV3" → "AAVE_V3" (the authoritative venue_prefix).
+# Built from PROTOCOL_CAPABILITIES venue_prefix set (33 prefixes, verified zero
+# strip-underscore collisions 2026-05-26). For prefixes that are themselves glued
+# in the authoritative set (VELODROMEV2, TRADER_JOEV2), glued IS canonical, so the
+# round-trip is a no-op.
+_STRIPPED_PREFIX_TO_CANONICAL: dict[str, str] = {
+    prefix.replace("_", "").upper(): prefix for prefix in {cap.venue_prefix for cap in PROTOCOL_CAPABILITIES.values()}
+}
+
+
+def canonicalize_defi_venue_combined(raw: str) -> str:
+    """Map a combined DeFi venue (glued OR canonical) to the canonical combined form.
+
+    Examples:
+        "AAVEV3-ARBITRUM"     -> "AAVE_V3-ARBITRUM"
+        "UNISWAPV3-ETHEREUM"  -> "UNISWAP_V3-ETHEREUM"
+        "COMPOUNDV3-BASE"     -> "COMPOUND_V3-BASE"
+        "AAVE_V3-ARBITRUM"    -> "AAVE_V3-ARBITRUM"   (already canonical → passthrough)
+        "VELODROMEV2-OPTIMISM"-> "VELODROMEV2-OPTIMISM" (glued IS canonical for this venue)
+        "BINANCE"             -> "BINANCE"            (no known chain → passthrough)
+
+    Algorithm:
+        1. Split into (protocol, chain): the chain is the suffix after the last "-"
+           that is a known chain (``KNOWN_CHAINS``). If no known-chain suffix, return
+           ``raw`` unchanged (non-DeFi / unrecognised → surface honestly).
+        2. Canonicalise the protocol via strip-underscore match against the
+           authoritative ``venue_prefix`` set. If no match, return ``raw`` unchanged
+           (unknown protocol → surface honestly, never guess).
+
+    The authoritative venue_prefix set is ``PROTOCOL_CAPABILITIES`` — the same source
+    ``parse_defi_venue`` splits on. This function additionally inserts the missing
+    underscore that ``parse_defi_venue`` does NOT (it preserves the glued protocol).
+
+    Returns:
+        Canonical ``f"{venue_prefix}-{chain}"`` or ``raw`` unchanged when no
+        known-chain suffix / no protocol match.
+    """
+    if "-" not in raw:
+        return raw
+    idx = raw.rfind("-")
+    chain = raw[idx + 1 :]
+    if chain not in KNOWN_CHAINS:
+        return raw
+    protocol = raw[:idx]
+    canonical_prefix = _STRIPPED_PREFIX_TO_CANONICAL.get(protocol.upper().replace("_", ""))
+    if canonical_prefix is None:
+        return raw
+    return f"{canonical_prefix}-{chain}"
+
+
 def get_all_defi_chains() -> list[str]:
     """Return all chains with DeFi protocol deployments, sorted."""
     return sorted(KNOWN_CHAINS)
@@ -893,6 +943,7 @@ __all__ = [
     "ProtocolClass",
     "build_complete_major_assets",
     "build_defi_venues",
+    "canonicalize_defi_venue_combined",
     "get_all_defi_chains",
     "get_chain_config",
     "get_data_types_for_protocol",
