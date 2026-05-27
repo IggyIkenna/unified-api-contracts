@@ -41,6 +41,8 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlsplit
 
+import importlib
+
 import requests
 import yaml
 
@@ -365,7 +367,7 @@ def _fetch_api_key(venue: str) -> str | None:
     if not project_id:
         return None
     try:
-        from google.cloud import secretmanager
+        secretmanager = importlib.import_module("google.cloud.secretmanager")
     except ImportError:
         return None
     secret_name = (
