@@ -43,3 +43,16 @@ class TestCanonicalizeDefiVenueCombined:
         # VELODROMEV2 / TRADER_JOEV2 are themselves glued in PROTOCOL_CAPABILITIES,
         # so glued IS canonical for them — the round-trip is a no-op.
         assert canonicalize_defi_venue_combined("VELODROMEV2-OPTIMISM") == "VELODROMEV2-OPTIMISM"
+
+    def test_pancakeswap_v3_zksync_glued_to_canonical(self) -> None:
+        # ZKSYNC is now in KNOWN_CHAINS (B5.9), so PANCAKESWAPV3-ZKSYNC parses and
+        # canonicalises the protocol PANCAKESWAPV3 → PANCAKESWAP_V3.
+        assert canonicalize_defi_venue_combined("PANCAKESWAPV3-ZKSYNC") == "PANCAKESWAP_V3-ZKSYNC"
+
+    def test_lighter_zksync_parses_protocol_unchanged(self) -> None:
+        # ZKSYNC is a KNOWN chain, so the chain suffix now PARSES (no longer an
+        # unknown-chain passthrough). LIGHTER is a perp venue NOT in
+        # PROTOCOL_CAPABILITIES → unknown-protocol passthrough → unchanged. The
+        # observable result is LIGHTER-ZKSYNC either way, but the code path is now
+        # known-chain/unknown-protocol rather than unknown-chain.
+        assert canonicalize_defi_venue_combined("LIGHTER-ZKSYNC") == "LIGHTER-ZKSYNC"

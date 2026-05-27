@@ -811,10 +811,22 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
 # Reverse lookup: venue_prefix → protocol slug (for parse_defi_venue)
 _PREFIX_TO_PROTOCOL: dict[str, str] = {cap.venue_prefix: slug for slug, cap in PROTOCOL_CAPABILITIES.items()}
 
-# All known chain names (from SUBGRAPH_IDS + _STATIC_VENUE_CHAINS)
+# Chain tokens that exist in the DeFi data (GCS venue= partitions, manifest rows)
+# but have NO subgraph/static-protocol mapping, so they would not otherwise be in
+# KNOWN_CHAINS. These are needed by the combined-venue parsers/canonicalizers
+# (parse_defi_venue, canonicalize_defi_venue_combined) to split "<PROTOCOL>-<CHAIN>"
+# correctly. KNOWN_CHAINS is a chain-TOKEN recognition set; membership here does NOT
+# imply a subgraph deployment nor expand any expected-coverage matrix (that lives in
+# EXPECTED_COVERAGE_BY_ASSET_GROUP, keyed by explicit venue tokens).
+#   ZKSYNC — present in IS partitions (PANCAKESWAP_V3-ZKSYNC, AAVE_V3-ZKSYNC) and the
+#   LIGHTER-ZKSYNC perp venue; canonical ChainKind.ZKSYNC = "zksync" (chain id 324).
+_EXTRA_VENUE_PARTITION_CHAINS: frozenset[str] = frozenset({"ZKSYNC"})
+
+# All known chain names (from SUBGRAPH_IDS + _STATIC_VENUE_CHAINS + extra partition chains)
 KNOWN_CHAINS: frozenset[str] = frozenset(
     {chain for chains in SUBGRAPH_IDS.values() for chain in chains}
     | {chain for chains in _STATIC_VENUE_CHAINS.values() for chain in chains}
+    | _EXTRA_VENUE_PARTITION_CHAINS
 )
 
 
