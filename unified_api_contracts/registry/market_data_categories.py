@@ -299,7 +299,11 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     # DeFi — candle-sampled types need processing; pass-through types do not
     "dex_pools": False,
     "dex_swaps": True,
-    "lending_indices": True,
+    # Bypass — periodic supply/borrow-index snapshot read raw by features-onchain
+    # (aave_lending_rates / aave_utilization); no lending_ohlcv consumer exists.
+    # Same class as oracle_prices / lst_rates. Do NOT re-enable without a real
+    # lending_ohlcv consumer (see issue defi_code_codex_drift D3; reverts 4c98a635).
+    "lending_indices": False,
     # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
     "lst_rates": False,
