@@ -245,6 +245,43 @@ def test_prediction_market_uppercase_trades_candles(tf: str) -> None:
     assert open_col.nullable is True, "OHLCV must be nullable for Category D prediction bars"
 
 
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_PREDICTION_TRADES)
+def test_prediction_unknown_fallback_candles(tf: str) -> None:
+    """UNKNOWN fallback contracts guard edge-cases where instrument_type resolves to UNKNOWN."""
+    contract = lookup_contract(
+        asset_group="prediction",
+        instrument_type="UNKNOWN",
+        data_type=MDPS_KEY_TRADES(tf),
+    )
+    assert contract.symbol_column == "symbol"
+    names = {c.name for c in contract.columns}
+    assert "chain" not in names
+    open_col = next(c for c in contract.columns if c.name == "open")
+    assert open_col.nullable is True
+
+
+@pytest.mark.parametrize(
+    "source_dt",
+    ("odds_movement", "odds_horizon_bucket", "arbitrage_opportunity"),
+)
+@pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_SPORTS)
+def test_sports_derived_candles_registered(tf: str, source_dt: str) -> None:
+    """§6E P1: odds_movement / odds_horizon_bucket / arbitrage_opportunity contracts exist."""
+    contract = lookup_contract(
+        asset_group="sports",
+        instrument_type="odds",
+        data_type=f"{source_dt}_{tf}",
+    )
+    assert contract.symbol_column == "symbol"
+    names = {c.name for c in contract.columns}
+    assert "instrument_id" in names
+    assert "venue" in names
+    assert "symbol" in names
+    open_col = next(c for c in contract.columns if c.name == "open")
+    assert open_col.nullable is True
+    assert "quote_count" not in names, f"{source_dt} adapter does not emit quote_count"
+
+
 # ---------------------------------------------------------------------------
 # Cardinality invariant — every registered candle contract has a timeframe
 # column and a valid timeframe suffix on its data_type key.
