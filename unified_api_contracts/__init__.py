@@ -813,6 +813,7 @@ from .registry import (
     PROCESSED_REQUIRES_RAW,
     QUARTERLY_MONTHS,
     SPORTS_VENUES,
+    TARDIS_FREE_ROLLING_WINDOW_DAYS,
     TIMEFRAMES,
     TRADFI_DATABENTO_INSTRUMENTS,
     TRADFI_EQUITIES,
@@ -831,6 +832,7 @@ from .registry import (
     ProviderDataAvailability,
     VenueCoordinates,
     VenueMapping,
+    free_dates_in_range,
     get_databento_symbols_for_venue,
     get_expected_data_types_for_venue,
     get_expected_instruments_for_venue,
@@ -839,6 +841,7 @@ from .registry import (
     get_venue_coordinates,
     get_venue_data_type_start_date,
     is_per_instrument_shard_data_type,
+    is_tardis_free_date,
     needs_candle_processing,
     non_trading_day_reason,
     validate_data_type_for_venue,
@@ -1688,6 +1691,9 @@ __all__ = [
     "validate_preflight_for_trigger",
     "validate_row_df",
     "venue_has_no_expected_defi_coverage",
+    "TARDIS_FREE_ROLLING_WINDOW_DAYS",
+    "free_dates_in_range",
+    "is_tardis_free_date",
 ]
 
 # fmt: off

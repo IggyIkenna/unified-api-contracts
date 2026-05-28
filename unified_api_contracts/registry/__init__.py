@@ -242,6 +242,11 @@ from .sports_venue_coordinates import (
     VenueCoordinates,
     get_venue_coordinates,
 )
+from .tardis_free_coverage import (
+    TARDIS_FREE_ROLLING_WINDOW_DAYS,
+    free_dates_in_range,
+    is_tardis_free_date,
+)
 from .token_wrapping import (
     LST_BASE_ASSET,
     PROTOCOL_TOKEN_PREFERENCE,
@@ -671,6 +676,7 @@ __all__ = [
     "SVENSKASPEL",
     "TAB",
     "TABTOUCH",
+    "TARDIS_FREE_ROLLING_WINDOW_DAYS",
     "TBTC_ADDRESSES",
     "TESTNET_CHAIN_IDS",
     "TIMEFRAMES",
@@ -784,6 +790,7 @@ __all__ = [
     "derive_expiry_bucket",
     "extract_es_options_cluster",
     "extract_event_contract_shard_key",
+    "free_dates_in_range",
     "get_aave_reserve_params",
     "get_accepted_collateral",
     "get_active_es_options_clusters_for_date",
@@ -856,6 +863,7 @@ __all__ = [
     "is_processed_data_type",
     "is_processed_data_type",
     "is_shard_axis",
+    "is_tardis_free_date",
     "is_token_equivalent",
     "is_tradfi_futures_instrument_active",
     "is_vix_15m_gap_date",
