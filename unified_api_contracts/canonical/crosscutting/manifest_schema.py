@@ -66,6 +66,35 @@ Phase 7 bundled walk migrates all prod parquets to v8."""
 
 
 # ---------------------------------------------------------------------------
+# pipeline_mode column — NOT NULL going forward (2026-05-28).
+#
+# Declared here as the UAC SSOT. UTL ``_coerce_pipeline_mode`` enforces the
+# constraint at write time: passing ``None`` now raises ``ValueError``.
+# Existing rows (pre-2026-05-28) may carry ``""`` until Phase 3 backfill
+# completes; Phase 3.4 flips the constraint to "always NOT NULL" once the
+# backfill verification passes.
+# ---------------------------------------------------------------------------
+
+PIPELINE_MODE_COLUMN: Final[str] = "pipeline_mode"
+"""Manifest column name for the source-and-mode tag.
+
+Value type: ``str`` — NOT NULL for new writes from 2026-05-28.  Non-null values
+MUST be members of :class:`~unified_api_contracts.canonical.crosscutting.pipeline_mode.PipelineMode`
+(StrEnum, lower-case ``batch_<source>`` / ``live_websocket``).
+
+Pre-2026-05-28 rows may carry ``""`` (empty-string sentinel from the Phase 1B
+rollout window); those rows are backfilled in Phase 3. The full "always NOT NULL"
+flip happens in Phase 3.4 after the backfill verification passes."""
+
+PIPELINE_MODE_NOT_NULL_SINCE: Final[str] = "2026-05-28"
+"""ISO-8601 date from which new writes MUST carry a non-empty ``pipeline_mode``.
+
+Used in audit tooling to distinguish pre-backfill rows (``written_at <
+PIPELINE_MODE_NOT_NULL_SINCE``) from post-constraint rows (``written_at >=
+PIPELINE_MODE_NOT_NULL_SINCE``) when verifying the Phase 3 backfill result."""
+
+
+# ---------------------------------------------------------------------------
 # v8 column declarations.
 #
 # Each constant pins (a) the canonical column name (parquet header +
@@ -182,6 +211,8 @@ __all__ = [
     "EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN",
     "LAST_EMISSION_DECISION_AT_COLUMN",
     "MANIFEST_SCHEMA_VERSION_V8",
+    "PIPELINE_MODE_COLUMN",
+    "PIPELINE_MODE_NOT_NULL_SINCE",
     "READER_FALLBACK_WINDOW_DAYS",
     "SERVICE_EMISSION_STATE_COLUMN",
     "V8_COLUMN_DEFAULTS",
