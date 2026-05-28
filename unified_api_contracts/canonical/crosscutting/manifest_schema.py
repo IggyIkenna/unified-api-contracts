@@ -66,32 +66,33 @@ Phase 7 bundled walk migrates all prod parquets to v8."""
 
 
 # ---------------------------------------------------------------------------
-# pipeline_mode column — NOT NULL going forward (2026-05-28).
+# pipeline_mode column — always NOT NULL (Phase 3 backfill complete 2026-05-28).
 #
 # Declared here as the UAC SSOT. UTL ``_coerce_pipeline_mode`` enforces the
-# constraint at write time: passing ``None`` now raises ``ValueError``.
-# Existing rows (pre-2026-05-28) may carry ``""`` until Phase 3 backfill
-# completes; Phase 3.4 flips the constraint to "always NOT NULL" once the
-# backfill verification passes.
+# constraint at write time: passing ``None`` raises ``ValueError``.
+# Phase 3 backfill (43.5M+ rows across all asset-group buckets) completed
+# 2026-05-28; all manifest rows now carry a valid PipelineMode value.
 # ---------------------------------------------------------------------------
 
 PIPELINE_MODE_COLUMN: Final[str] = "pipeline_mode"
 """Manifest column name for the source-and-mode tag.
 
-Value type: ``str`` — NOT NULL for new writes from 2026-05-28.  Non-null values
-MUST be members of :class:`~unified_api_contracts.canonical.crosscutting.pipeline_mode.PipelineMode`
+Value type: ``str`` — always NOT NULL (Phase 3 backfill complete 2026-05-28).
+Values MUST be members of
+:class:`~unified_api_contracts.canonical.crosscutting.pipeline_mode.PipelineMode`
 (StrEnum, lower-case ``batch_<source>`` / ``live_websocket``).
 
-Pre-2026-05-28 rows may carry ``""`` (empty-string sentinel from the Phase 1B
-rollout window); those rows are backfilled in Phase 3. The full "always NOT NULL"
-flip happens in Phase 3.4 after the backfill verification passes."""
+Historical note: pre-2026-05-28 rows carried ``""`` (empty-string sentinel
+from the Phase 1B rollout window). Those rows were backfilled in Phase 3 via
+``unified-trading-pm/scripts/migration/backfill_pipeline_mode.py``."""
 
 PIPELINE_MODE_NOT_NULL_SINCE: Final[str] = "2026-05-28"
-"""ISO-8601 date from which new writes MUST carry a non-empty ``pipeline_mode``.
+"""ISO-8601 date from which all manifest rows carry a non-empty ``pipeline_mode``.
 
-Used in audit tooling to distinguish pre-backfill rows (``written_at <
-PIPELINE_MODE_NOT_NULL_SINCE``) from post-constraint rows (``written_at >=
-PIPELINE_MODE_NOT_NULL_SINCE``) when verifying the Phase 3 backfill result."""
+After Phase 3 backfill (completed 2026-05-28), this date marks the transition
+to "always NOT NULL" — there are no longer any exempt pre-history rows.
+Retained for audit tooling that distinguishes write-time-stamped rows from
+Phase 3 backfill-derived rows."""
 
 
 # ---------------------------------------------------------------------------
