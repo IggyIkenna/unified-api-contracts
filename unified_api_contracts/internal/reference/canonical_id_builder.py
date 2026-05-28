@@ -92,6 +92,10 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
         InstrumentType.SPOT_ASSET,
+        # DeFi Solana (distinct shapes; SchemaContracts at UAC@7e9f4ad9)
+        InstrumentType.SOLANA_LENDING,
+        InstrumentType.SOLANA_VAULT,
+        InstrumentType.SOLANA_AMM_POOL,
         # TradFi
         InstrumentType.ETF,
         InstrumentType.EQUITY,
@@ -135,6 +139,10 @@ _DEFI_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
         InstrumentType.SPOT_ASSET,
+        # Solana DeFi (same VENUE-CHAIN:TYPE:SYMBOL builder; chain="SOLANA")
+        InstrumentType.SOLANA_LENDING,
+        InstrumentType.SOLANA_VAULT,
+        InstrumentType.SOLANA_AMM_POOL,
     }
 )
 

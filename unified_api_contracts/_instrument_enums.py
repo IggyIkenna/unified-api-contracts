@@ -41,6 +41,11 @@ class InstrumentType(StrEnum):
     DEBT_TOKEN = "DEBT_TOKEN"
     STAKING = "STAKING"
     SPOT_ASSET = "SPOT_ASSET"
+    # DeFi — Solana (distinct shapes vs EVM lending/pool; see UAC@7e9f4ad9 contracts +
+    # plan solana_defi_legacy_migration_2026_05_27).
+    SOLANA_LENDING = "SOLANA_LENDING"
+    SOLANA_VAULT = "SOLANA_VAULT"
+    SOLANA_AMM_POOL = "SOLANA_AMM_POOL"
     # TradFi
     ETF = "ETF"
     EQUITY = "EQUITY"
