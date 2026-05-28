@@ -23,6 +23,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import pandas as pd
+import polars as pl
 import pytest
 
 if TYPE_CHECKING:
@@ -222,6 +223,39 @@ class TestAdapterModels:
         assert "timestamp" in df.columns
         assert "open" in df.columns
         assert len(df) == 2
+
+    def test_candle_output_to_polars_empty(self) -> None:
+        from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
+            CandleOutput,
+        )
+
+        co = CandleOutput()
+        df = co.to_polars()
+        assert isinstance(df, pl.DataFrame)
+        assert df.is_empty()
+
+    def test_candle_output_to_polars_with_arrays(self) -> None:
+        from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
+            CandleOutput,
+        )
+
+        ts = [1_000_000_000, 2_000_000_000]
+        co = CandleOutput(
+            timestamp=ts,
+            venue=["BINANCE", "BINANCE"],
+            symbol=["BTCUSDT", "BTCUSDT"],
+            instrument_id=["BINANCE:SPOT:BTCUSDT", "BINANCE:SPOT:BTCUSDT"],
+            open=[50000.0, 50100.0],
+            high=[50200.0, 50300.0],
+            low=[49900.0, 50000.0],
+            close=[50100.0, 50200.0],
+            volume=[100.0, 120.0],
+        )
+        df = co.to_polars()
+        assert isinstance(df, pl.DataFrame)
+        assert "timestamp" in df.columns
+        assert "open" in df.columns
+        assert df.height == 2
 
     def test_all_exports(self) -> None:
         import unified_api_contracts.internal.domain.market_data_processing.adapter_models as m
