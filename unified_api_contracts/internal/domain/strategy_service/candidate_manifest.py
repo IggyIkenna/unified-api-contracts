@@ -14,7 +14,8 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import UTC, datetime
+from typing import cast
 
 from unified_api_contracts.internal.architecture_v2.enums import StrategyArchetype
 from unified_api_contracts.internal.domain.strategy_service.lifecycle import (
@@ -81,7 +82,7 @@ class MinimalCandidateManifest:
     reason: str
 
     manifest_id: str = field(default_factory=make_manifest_id)
-    created_at: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     version_id: str | None = None
 
@@ -147,7 +148,9 @@ class MinimalCandidateManifest:
     def from_firestore_dict(cls, data: dict[str, object]) -> MinimalCandidateManifest:
         """Deserialise from a Firestore document dict."""
         score_raw = data.get("score_vector")
-        score_dict: dict[str, object] = score_raw if isinstance(score_raw, dict) else {}
+        score_dict: dict[str, float | int | None] = (
+            cast("dict[str, float | int | None]", score_raw) if isinstance(score_raw, dict) else {}
+        )
         score = GroupBMetrics(
             sharpe_ratio=float(score_dict.get("sharpe_ratio") or 0.0),
             calmar_ratio=float(score_dict.get("calmar_ratio") or 0.0),
@@ -160,31 +163,33 @@ class MinimalCandidateManifest:
         model_refs_raw = data.get("model_refs")
         model_refs: list[ModelRef] | None = None
         if isinstance(model_refs_raw, list):
+            _typed_refs = cast("list[dict[str, str]]", model_refs_raw)
             model_refs = [
                 ModelRef(
                     model_id=str(r.get("model_id") or ""),
                     version=str(r.get("version") or ""),
                     artifact_uri=str(r.get("artifact_uri") or ""),
                 )
-                for r in model_refs_raw
-                if isinstance(r, dict)
+                for r in _typed_refs
             ]
 
         created_at_raw = data.get("created_at")
-        created_at: datetime = created_at_raw if isinstance(created_at_raw, datetime) else datetime.utcnow()
+        created_at: datetime = created_at_raw if isinstance(created_at_raw, datetime) else datetime.now(UTC)
 
         config_raw = data.get("config_json")
-        config_json: dict[str, object] = config_raw if isinstance(config_raw, dict) else {}
+        config_json: dict[str, object] = cast("dict[str, object]", config_raw if isinstance(config_raw, dict) else {})
 
         pinned_shas_raw = data.get("pinned_shas")
         pinned_shas: dict[str, str] | None = None
         if isinstance(pinned_shas_raw, dict):
-            pinned_shas = {str(k): str(v) for k, v in pinned_shas_raw.items()}
+            _typed_pinned = cast("dict[str, str]", pinned_shas_raw)
+            pinned_shas = {str(k): str(v) for k, v in _typed_pinned.items()}
 
         chain_rpc_pins_raw = data.get("chain_rpc_pins")
         chain_rpc_pins: dict[str, str] | None = None
         if isinstance(chain_rpc_pins_raw, dict):
-            chain_rpc_pins = {str(k): str(v) for k, v in chain_rpc_pins_raw.items()}
+            _typed_chain = cast("dict[str, str]", chain_rpc_pins_raw)
+            chain_rpc_pins = {str(k): str(v) for k, v in _typed_chain.items()}
 
         version_id_raw = data.get("version_id")
         version_id: str | None = str(version_id_raw) if version_id_raw is not None else None
