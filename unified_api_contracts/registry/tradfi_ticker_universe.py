@@ -329,16 +329,26 @@ ETF_TICKERS: list[str] = [
     "ARKW",
     "ARKF",
     "ARKQ",
-    # BTC spot ETFs
+    # BTC spot ETFs (all 10 US listings post-2024-01-11)
     "IBIT",
     "FBTC",
+    "BITB",
     "ARKB",
+    "BTCO",
+    "BRRR",
+    "HODL",
+    "EZBC",
     "GBTC",
     "BITO",
-    # ETH spot ETFs (US listings post-2024-07-23)
+    # ETH spot ETFs (all 8 US listings post-2024-07-23)
     "ETHA",
     "FETH",
     "ETHE",
+    "ETHV",
+    "ETHW",
+    "CETH",
+    "QETH",
+    "EZET",
     "VIG",
     "VXUS",
     "AGG",
@@ -355,8 +365,29 @@ ETF_TICKERS: list[str] = [
     "MCHI",
 ]
 
+TRADFI_FUTURES_PRODUCTS: list[str] = [
+    # CME equity-index
+    "ES",
+    "MES",
+    # CME crypto
+    "BTC",
+    "MBT",
+    "ETH",
+    "MET",
+    # NYMEX energy
+    "CL",
+    "MCL",
+    "NG",
+    "QG",
+    # COMEX metals
+    "GC",
+    "MGC",
+]
+
+
 TRADFI_TICKER_UNIVERSE: dict[str, list[str]] = {
     "sp500_tickers": SP500_TICKERS,
     "nasdaq_tickers": NASDAQ_TICKERS,
     "etf_tickers": ETF_TICKERS,
+    "futures_products": TRADFI_FUTURES_PRODUCTS,
 }
