@@ -418,6 +418,9 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PROP": "props",
     "COMBO": "combos",
     "EVENT_CONTRACT": "event_contracts",
+    "SOLANA_LENDING": "solana_lending",
+    "SOLANA_VAULT": "solana_vaults",
+    "SOLANA_AMM_POOL": "solana_amm_pools",
 }
 
 

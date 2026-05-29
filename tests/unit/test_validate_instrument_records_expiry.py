@@ -30,14 +30,15 @@ _DUMMY_EVM_ADDR = "0xBcca60bB61934080951369a648Fb03DF4F96263C"
 def _defi_lending_record(**overrides: object) -> InstrumentRecord:
     """Minimal DeFi LENDING record that passes all validation except what we're testing.
 
-    Uses AAVEV3-ETHEREUM (known DeFi venue). pool_address satisfies the on-chain
+    Uses AAVE_V3-ETHEREUM (known DeFi venue). pool_address satisfies the on-chain
     identifier requirement (hard_schema_enforcement_2026_05_08 Phase 1 EVM check).
     """
     kwargs: dict[str, object] = {
-        "instrument_key": "AAVEV3-ETHEREUM:LENDING:USDC",
-        "venue": "AAVEV3-ETHEREUM",
+        "instrument_key": "AAVE_V3-ETHEREUM:LENDING:USDC",
+        "venue": "AAVE_V3-ETHEREUM",
         "instrument_type": InstrumentType.LENDING,
         "pool_address": _DUMMY_EVM_ADDR,
+        "base_asset_decimals": 6,  # USDC — required by hard_schema_phase1_field_flip_migration Phase A
     }
     kwargs.update(overrides)
     return InstrumentRecord(**kwargs)  # type: ignore[arg-type]

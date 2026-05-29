@@ -578,13 +578,16 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE: frozenset[tuple[str, str]] = frozen
     }
 )
 # Extend with canonical protocol-name aliases so the parity test passes for both forms.
-_PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE | frozenset(
-    {
-        (chain, canonical)
-        for (chain, ghost) in _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE
-        for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
-        if ghost == ghost_name
-    }
+_PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = (
+    _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE
+    | frozenset(
+        {
+            (chain, canonical)
+            for (chain, ghost) in _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE
+            for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
+            if ghost == ghost_name
+        }
+    )
 )
 
 
