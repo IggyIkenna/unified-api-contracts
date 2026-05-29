@@ -64,7 +64,19 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "aave_v3": {  # Verified from github.com/aave/protocol-subgraphs README
         "ETHEREUM": "Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g",
         "ARBITRUM": "DLuE98kEb5pQNXAcKFQGQgfSQ57Xdou4jnVbAEqMfy3B",
-        "OPTIMISM": "DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb",
+        # OPTIMISM: Bug-A fix 2026-05-29. The github-README-listed deployment
+        # `DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb` is schema-valid (has
+        # `reserveParamsHistoryItems` + `reserves`) but contains ZERO entries
+        # at any timestamp despite being indexed at head (verified via
+        # introspection 2026-05-29: head block ~152230969 / ts 1780060715 but
+        # `reserves(first:5)` returns []). Switched to the Messari-style
+        # deployment `3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi` which
+        # exposes `marketDailySnapshots` (the lending-indices cascade's
+        # second variant) with populated history. Coverage: 2022 →
+        # 2024-09-11 (subgraph stops indexing past that); the cascade still
+        # tries the native variant first, so when a fresh native deployment
+        # appears the registry just needs its ID swap.
+        "OPTIMISM": "3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi",
         "POLYGON": "Co2URyXjnxaw8WqxKyVHdirq9Ahhm5vcTs4dMedAq211",
         "AVALANCHE": "2h9woxy8RTjHu1HJsCEnmzpPHFArU33avmUh4f71JpVn",
         "BASE": "GQFbb95cE6d8mV989mL5figjaGaKCQB3xqYrr1bRyXqF",
