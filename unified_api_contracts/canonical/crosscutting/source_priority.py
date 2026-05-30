@@ -221,13 +221,16 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # EIA (US Energy Information Administration) — commodity storage + series data.
     # BATCH_EIA manifest mode: features-commodity-service D5 Phase 1.
     ("tradfi", "energy_data"): ["eia"],
-    ("tradfi", "trades"): ["databento"],
-    ("tradfi", "tbbo"): ["databento"],
-    ("tradfi", "ohlcv_1m"): ["databento"],
-    # databento primary; yahoo: VIX 15m rolling 60d fallback; barchart: VIX 15m historical preload 2020-2025.
-    ("tradfi", "ohlcv_15m"): ["databento", "yahoo", "barchart"],
-    ("tradfi", "options_chain"): ["databento"],
-    ("tradfi", "futures_chain"): ["databento"],
+    ("tradfi", "trades"): ["databento", "massive"],
+    ("tradfi", "tbbo"): ["databento", "massive"],
+    ("tradfi", "ohlcv_1m"): ["databento", "massive"],
+    # databento primary; massive secondary (REST batch, delayed tier); yahoo: VIX 15m rolling 60d fallback;
+    # barchart: VIX 15m historical preload 2020-2025. Massive slotted AFTER databento, BEFORE yahoo/barchart
+    # per tradfi_massive_dual_source_2026_05_28.md Phase 1 operator decision. CFE (VX/VIX futures) is NOT
+    # covered by Massive — existing yahoo+barchart layering handles those via MTDS routing.
+    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
+    ("tradfi", "options_chain"): ["databento", "massive"],
+    ("tradfi", "futures_chain"): ["databento", "massive"],
     # commodity_signal — emitted by features-service commodity family from
     # EIA (crude oil + natural gas weekly storage) + CFTC + Baker Hughes +
     # Open-Meteo + Yahoo factor inputs. Top entry is EIA per the storage
@@ -321,6 +324,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "api_football": 1_000,
     "odds_api": 5_000,
     # Equity / index intraday — free-tier delayed feeds (VIX 15m fallback route).
+    "massive": 900_000,  # 15 min: Massive (formerly Polygon.io) Starter tier delayed feed
     "yahoo": 900_000,  # 15 min: Yahoo Finance free-tier intraday delay for CBOE-sourced indices like ^VIX
     # Post-match / batch-only — cadence is hours-to-day.
     "understat": 7_200_000,  # 2h post-match xG

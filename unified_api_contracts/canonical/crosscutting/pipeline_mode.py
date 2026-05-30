@@ -60,6 +60,7 @@ class PipelineMode(StrEnum):
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
     BATCH_HYPERLIQUID_REST = "batch_hyperliquid_rest"
+    BATCH_MASSIVE = "batch_massive"
     BATCH_MDPS_ODDS_HORIZON_BUCKET = "batch_mdps_odds_horizon_bucket"
     BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"
     BATCH_ODDS_API = "batch_odds_api"
