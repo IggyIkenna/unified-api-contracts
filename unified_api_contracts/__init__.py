@@ -846,6 +846,7 @@ from .registry import (
     is_tardis_free_date,
     needs_candle_processing,
     non_trading_day_reason,
+    resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
     venue_has_no_expected_defi_coverage,
 )
@@ -1689,6 +1690,7 @@ __all__ = [
     "register_generator",
     "register_scenario",
     "resolve_environment_from_env",
+    "resolve_data_type_for_feature_group",
     "resolve_environment_from_hostname",
     "resolve_exchange",
     "scenarios_for_archetype",

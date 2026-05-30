@@ -210,6 +210,7 @@ from .market_data_categories import (
     is_per_instrument_shard_data_type,
     is_tradfi_futures_instrument_active,
     needs_candle_processing,
+    resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
 )
 from .max_underlying_moves import (
@@ -880,6 +881,7 @@ __all__ = [
     "resolve_capability",
     "resolve_chain_id",
     "resolve_rpc_url",
+    "resolve_data_type_for_feature_group",
     "resolve_solana_mint",
     "resolve_venue_context",
     "time_budget_to_block_offset",
