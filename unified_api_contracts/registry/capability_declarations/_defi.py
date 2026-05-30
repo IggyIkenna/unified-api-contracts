@@ -493,7 +493,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.PERPS,
         instrument_types=_PERPS,
         data_types=["perp_funding", "oracle_prices"],
-        mtds_operations=["collect-solana-defi", "collect-perp-funding"],
+        mtds_operations=["collect-perp-funding"],
         required_tokens=frozenset({"DRIFT"}),
     ),
     "kamino": _ProtocolCapability(
@@ -501,7 +501,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=["dex_pools", "lending_indices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-dex-pools", "collect-lending-indices"],
         required_tokens=frozenset({"KMNO"}),
     ),
     "raydium": _ProtocolCapability(
@@ -509,7 +509,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=["dex_pools", "dex_swaps"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"RAY"}),
     ),
     "orca": _ProtocolCapability(
@@ -517,15 +517,36 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=["dex_pools", "dex_swaps"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"ORCA"}),
+    ),
+    "phoenix": _ProtocolCapability(
+        venue_prefix="PHOENIX",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["dex_pools"],
+        mtds_operations=["collect-dex-pools"],
+    ),
+    "marginfi": _ProtocolCapability(
+        venue_prefix="MARGINFI",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+    ),
+    "solend": _ProtocolCapability(
+        venue_prefix="SOLEND",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
     ),
     "marinade": _ProtocolCapability(
         venue_prefix="MARINADE",
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
         data_types=["lst_rates", "oracle_prices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"MNDE", "MSOL"}),
     ),
     "jito": _ProtocolCapability(
@@ -533,7 +554,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
         data_types=["lst_rates", "oracle_prices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),
     # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
@@ -544,7 +565,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_YIELD,
         data_types=["restaking_rewards", "lst_rates"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"SSOL"}),
     ),
     "picasso": _ProtocolCapability(
@@ -552,7 +573,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_YIELD,
         data_types=["restaking_rewards", "cross_chain_restaking_routes"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"PICA"}),
     ),
     "cambrian": _ProtocolCapability(
@@ -560,7 +581,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_YIELD,
         data_types=["restaking_rewards", "restaking_operator_set"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-staking-yields"],
     ),
 }
 
@@ -821,6 +842,9 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "kamino": ["SOLANA"],
     "raydium": ["SOLANA"],
     "orca": ["SOLANA"],
+    "phoenix": ["SOLANA"],
+    "marginfi": ["SOLANA"],
+    "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
     # Plan E: Solana restaking rewards coverage (2026-05-13)

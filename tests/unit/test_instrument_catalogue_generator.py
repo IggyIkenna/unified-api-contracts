@@ -352,11 +352,7 @@ def test_pipeline_modes_collected_from_manifest() -> None:
     loader = StaticManifestLoader({AssetGroup.CEFI: pd.DataFrame(rows)})
     entries, _ = build_catalogue(loader, today=today)
     entry = next(
-        e
-        for e in entries
-        if e["venue"] == "DERIBIT"
-        and e["data_type"] == "trades"
-        and e.get("instrument_type") == ""
+        e for e in entries if e["venue"] == "DERIBIT" and e["data_type"] == "trades" and e.get("instrument_type") == ""
     )
     assert entry["pipeline_modes"] == ["batch_databento", "batch_tardis"]
 
@@ -378,11 +374,7 @@ def test_pipeline_modes_empty_when_column_absent() -> None:
     loader = StaticManifestLoader({AssetGroup.CEFI: df})
     entries, _ = build_catalogue(loader, today=today)
     entry = next(
-        e
-        for e in entries
-        if e["venue"] == "DERIBIT"
-        and e["data_type"] == "trades"
-        and e.get("instrument_type") == ""
+        e for e in entries if e["venue"] == "DERIBIT" and e["data_type"] == "trades" and e.get("instrument_type") == ""
     )
     assert entry["pipeline_modes"] == []
 
