@@ -119,8 +119,7 @@ def format_instrument_key(venue: str, instrument_type: str, symbol: str) -> str:
     """
     if not venue or not instrument_type or not symbol:
         raise ValueError(
-            f"All segments must be non-empty: venue={venue!r}, "
-            f"instrument_type={instrument_type!r}, symbol={symbol!r}"
+            f"All segments must be non-empty: venue={venue!r}, instrument_type={instrument_type!r}, symbol={symbol!r}"
         )
     return f"{venue}:{instrument_type}:{symbol}"
 

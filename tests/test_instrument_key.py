@@ -6,6 +6,8 @@ Verifies parse / format / derive_* helpers in
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 import pytest
 
 from unified_api_contracts.canonical import (
@@ -70,7 +72,7 @@ class TestFormatInstrumentKey:
 
 
 class TestDeriveAxisSets:
-    _KEYS = [
+    _KEYS: ClassVar[list[str]] = [
         "BINANCE-FUTURES:PERPETUAL:BTCUSDT",
         "BYBIT:PERPETUAL:ETHUSDT",
         "BINANCE-FUTURES:SPOT_PAIR:BTCUSDT",
