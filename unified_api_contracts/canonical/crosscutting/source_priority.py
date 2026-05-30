@@ -107,6 +107,7 @@ class DivergenceKind(StrEnum):
 
     DUAL_SOURCE_DUPLICATE = "DUAL_SOURCE_DUPLICATE"
 
+
 SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # ---- Sports ---------------------------------------------------------
     # Fixture lifecycle data — api_football is primary, footystats is the
