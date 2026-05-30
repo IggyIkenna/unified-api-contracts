@@ -338,6 +338,11 @@ class PreflightSkipReason(StrEnum):
     # Per-VM concurrency: another VM is already processing this shard
     # (per-VM shard isolation lock). Skip without retry.
     CONCURRENT_VM_OWNS_SHARD = "CONCURRENT_VM_OWNS_SHARD"
+    # Tardis free-only mode: paid-tier date skipped because TARDIS_FREE_ONLY=1
+    # metadata is set and the target date requires a paid key. Not an error —
+    # the date will be revisited once the Tardis key is renewed. Only fires
+    # for CEFI/TRADFI asset groups (DeFi, sports, prediction are unaffected).
+    TARDIS_FREE_ONLY_MODE = "TARDIS_FREE_ONLY_MODE"
 
 
 class PreflightSkippedDetails(BaseModel):
