@@ -13,13 +13,12 @@ same timing semantics, different sources OK`` rule:
 > emission time, NOT the canonical historical source's slower archive
 > time).
 
-Phase 1B seed: this module ships with **single-source seeds**
-(top-of-list only). Multi-source merge logic and per-tier-tier-tier
-priority tie-breakers are deferred to
-``plans/active/tradfi_massive_dual_source_2026_05_28.md`` Phase 2
-(canonical successor — resolves ``multi_source_priority_merge_2026_*``
-placeholder). Flagged as a documented temporary state per the workspace
-``Temporary state must have a named successor plan`` rule.
+Phase 2 (multi-source merge) is implemented in
+``plans/active/tradfi_massive_dual_source_2026_05_28.md`` (archived once
+complete). The helpers :func:`get_all_sources_with_priority`,
+:func:`select_primary_available_source`, and
+:func:`detect_dual_source_conflicts` land the merge-logic building blocks.
+The ``multi_source_priority_merge_2026_*`` placeholder is resolved.
 
 Tie-breaker rules (when multiple sources are listed):
 
