@@ -146,7 +146,9 @@ EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
         "weather",
         "xg_decomposition",
         # ---- Volatility — stub (populate as IV-surface / realised-vol calculators land)
-        # ---- Cross-instrument — stub (populate as calculators rationalised under BuilderRegistry)
+        # ---- Cross-instrument -----------------------------------------------
+        "regime_clustering",       # Phase 1 of regime_clustering_structure_allocator_2026_05_29
+        "strategy_pnl_archetype",  # Phase 0 of regime_clustering_structure_allocator_2026_05_29
         # ---- Calendar, Commodity, Multi-timeframe — stubs
     ],
 }
