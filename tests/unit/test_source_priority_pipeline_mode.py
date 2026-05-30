@@ -44,6 +44,7 @@ from unified_api_contracts.canonical.crosscutting.source_priority import (
     get_all_sources_with_priority,
     get_primary_source,
     read_with_source_priority,
+    select_primary_available_source,
 )
 
 # ---------------------------------------------------------------------------
@@ -294,3 +295,58 @@ def test_get_all_sources_exposed_from_crosscutting_namespace() -> None:
     )
 
     assert facade_fn is get_all_sources_with_priority
+
+
+# ---------------------------------------------------------------------------
+# Test 10 — select_primary_available_source (Phase 2 tie-breaker)
+# ---------------------------------------------------------------------------
+
+
+def test_select_primary_available_primary_only() -> None:
+    """Primary source available → returned (standard single-source case)."""
+    source, mode = select_primary_available_source("cefi", "trades", {"tardis"})
+    assert source == "tardis"
+    assert mode is PipelineMode.BATCH_TARDIS
+
+
+def test_select_primary_available_multi_source_primary_wins() -> None:
+    """When all sources are present, the primary (index-0) wins."""
+    source, mode = select_primary_available_source(
+        "tradfi", "trades", {"databento", "massive"}
+    )
+    assert source == "databento", "databento is primary for tradfi trades"
+    assert mode is PipelineMode.BATCH_DATABENTO
+
+
+def test_select_primary_available_fallback_to_secondary() -> None:
+    """When primary is absent but secondary is present, secondary wins."""
+    source, mode = select_primary_available_source(
+        "tradfi", "trades", {"massive"}
+    )
+    assert source == "massive"
+    assert mode is PipelineMode.BATCH_MASSIVE
+
+
+def test_select_primary_available_no_sources_raises() -> None:
+    """Empty / non-matching available_sources raises KeyError."""
+    with pytest.raises(KeyError, match="No registered source"):
+        select_primary_available_source("cefi", "trades", {"unknown_source"})
+
+
+def test_select_primary_available_empty_set_raises() -> None:
+    with pytest.raises(KeyError, match="No registered source"):
+        select_primary_available_source("tradfi", "trades", set())
+
+
+def test_select_primary_available_returns_batch_mode() -> None:
+    """Tie-breaker always returns a batch pipeline_mode."""
+    _, mode = select_primary_available_source("tradfi", "trades", {"massive"})
+    assert is_batch(mode)
+
+
+def test_select_primary_available_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import (
+        select_primary_available_source as facade_fn,
+    )
+
+    assert facade_fn is select_primary_available_source

@@ -538,6 +538,60 @@ def read_with_source_priority(
     return primary_source, pipeline_mode
 
 
+def select_primary_available_source(
+    asset_group: str,
+    data_type: str,
+    available_sources: set[str],
+) -> tuple[str, PipelineMode]:
+    """Return the highest-priority available source for ``(asset_group, data_type)``.
+
+    Applies the Phase 2 tie-breaker rules from the module docstring in priority
+    order. The :data:`SOURCE_PRIORITY` list encodes the tie-breaker: index 0 is
+    the winner when all sources are present. When only a subset is available
+    (e.g. Databento has a gap but Massive has the day), this function falls
+    through to the next registered source.
+
+    Tie-breaker rules (in order):
+
+    1. **Timestamp-availability** — sources that emit at live-time win
+       (encoded as lower emission latency in :data:`EMISSION_LATENCY_MS_BY_SOURCE`).
+    2. **Coverage** — broader date / instrument coverage wins.
+    3. **Information richness** — more fields per row wins.
+    4. **Merge-different-fields** — non-overlapping field sets: callers
+       *union* rather than pick, so both sources remain in
+       :data:`SOURCE_PRIORITY` (handled at the consumer / writer layer,
+       not here).
+
+    Rules 1–3 are resolved at registry-design time by the ordering in
+    :data:`SOURCE_PRIORITY`; this helper enforces that ordering at runtime
+    when not all sources have data.
+
+    Args:
+        asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / etc.
+        data_type: Canonical data_type string.
+        available_sources: Set of source strings that have data for the
+            requested ``(asset_group, data_type, day)`` cell (e.g. from
+            a manifest query or filesystem scan).
+
+    Returns:
+        ``(source_string, pipeline_mode)`` for the highest-priority source
+        found in ``available_sources``.
+
+    Raises:
+        KeyError: If ``(asset_group, data_type)`` is not registered, OR if
+            none of the registered sources appear in ``available_sources``.
+    """
+    priority_list = get_source_priority(asset_group, data_type)
+    for source in priority_list:
+        if source in available_sources:
+            return source, pipeline_mode_for_source(source)
+    raise KeyError(
+        f"No registered source for ({asset_group!r}, {data_type!r}) is available. "
+        f"Registered (priority order): {priority_list}. "
+        f"Available: {sorted(available_sources)}."
+    )
+
+
 def get_all_sources_with_priority(
     asset_group: str,
     data_type: str,
@@ -592,4 +646,5 @@ __all__ = [
     "get_source_priority",
     "has_source_priority",
     "read_with_source_priority",
+    "select_primary_available_source",
 ]

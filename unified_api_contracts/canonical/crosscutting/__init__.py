@@ -92,6 +92,7 @@ from .source_priority import get_primary_source_with_latency as get_primary_sour
 from .source_priority import get_source_priority as get_source_priority
 from .source_priority import has_source_priority as has_source_priority
 from .source_priority import read_with_source_priority as read_with_source_priority
+from .source_priority import select_primary_available_source as select_primary_available_source
 from .transfer_events import BusTransferType as BusTransferType
 from .transfer_events import TransferIntent as TransferIntent
 from .transfer_events import TransferResult as TransferResult
