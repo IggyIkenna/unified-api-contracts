@@ -64,18 +64,28 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "aave_v3": {  # Verified from github.com/aave/protocol-subgraphs README
         "ETHEREUM": "Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g",
         "ARBITRUM": "DLuE98kEb5pQNXAcKFQGQgfSQ57Xdou4jnVbAEqMfy3B",
-        # OPTIMISM: Bug-A fix 2026-05-29. The github-README-listed deployment
-        # `DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb` is schema-valid (has
-        # `reserveParamsHistoryItems` + `reserves`) but contains ZERO entries
-        # at any timestamp despite being indexed at head (verified via
-        # introspection 2026-05-29: head block ~152230969 / ts 1780060715 but
-        # `reserves(first:5)` returns []). Switched to the Messari-style
-        # deployment `3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi` which
-        # exposes `marketDailySnapshots` (the lending-indices cascade's
-        # second variant) with populated history. Coverage: 2022 →
-        # 2024-09-11 (subgraph stops indexing past that); the cascade still
-        # tries the native variant first, so when a fresh native deployment
-        # appears the registry just needs its ID swap.
+        # OPTIMISM: AAVE_V3-OPTIMISM canonical data source is the RPC fallback
+        # (policy decision 2026-05-30). Subgraph state on this chain:
+        #   • Aave github-README deployment `DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb`
+        #     is at head with `hasIndexingErrors:false`, BUT both
+        #     `reserveParamsHistoryItems` AND `reserves` return [] — Aave
+        #     republished it to v0.0.5 (an "abandoned" empty entity store)
+        #     between 2026-05-08 and 2026-05-29. Silent abandonment by the
+        #     Aave team, NOT an indexing failure.
+        #   • Messari-style deployment `3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi`
+        #     is also at head (verified 2026-05-30: `_meta.block.timestamp`
+        #     ~1780110035 / ~03:00 UTC, no indexing errors). Coverage is
+        #     sparse post-2024-12: rows present at 2024-12-01 + 2026-04-25
+        #     but [] for 2025-06-01 / 2026-01-01 / 2026-05-01 windows. Also
+        #     the nested `market { inputToken { symbol } }` join raises
+        #     `Null value resolved for non-null field market` — handlers
+        #     MUST query top-level snapshot fields only.
+        # All sibling Aave V3 chains (ETH/ARB/POLY/BASE) work fine; only
+        # OPTIMISM is in this abandoned state. RPC fallback (14-row daily
+        # resolution) is operationally sufficient for the carry archetype
+        # until a fresh rich deployment surfaces. Messari ID stays as the
+        # cascade's 2nd variant for partial coverage; swap to a new rich
+        # native ID + re-backfill if Aave revives the deployment.
         "OPTIMISM": "3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi",
         "POLYGON": "Co2URyXjnxaw8WqxKyVHdirq9Ahhm5vcTs4dMedAq211",
         "AVALANCHE": "2h9woxy8RTjHu1HJsCEnmzpPHFArU33avmUh4f71JpVn",
