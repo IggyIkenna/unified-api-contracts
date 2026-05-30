@@ -19,6 +19,7 @@ from typing import Any
 
 import pytest
 import yaml as pyyaml
+from yaml import CSafeLoader as _YamlLoader  # C extension: avoids pure-Python scanner hang on large cassette files
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTERNAL_DIR = REPO_ROOT / "unified_api_contracts" / "external"
@@ -29,7 +30,7 @@ pytestmark = pytest.mark.integration
 
 def _load_manifest() -> dict[str, Any]:
     with YAML_PATH.open() as fh:
-        return pyyaml.safe_load(fh).get("providers", {})
+        return pyyaml.load(fh, Loader=_YamlLoader).get("providers", {})
 
 
 def _read_cassette_body(cassette_path: Path) -> Any:
@@ -40,7 +41,7 @@ def _read_cassette_body(cassette_path: Path) -> Any:
     binary/gzip/DBN stubs that intentionally record no bytes in YAML.
     """
     with cassette_path.open(encoding="utf-8") as fh:
-        cassette = pyyaml.safe_load(fh)
+        cassette = pyyaml.load(fh, Loader=_YamlLoader)
     interactions = cassette.get("interactions", [])
     if not interactions:
         return None
@@ -74,7 +75,7 @@ def _yaml_has_recorded_interaction(cassette_path: Path) -> bool:
     not valid for body replay — skip them in schema health until recorded.
     """
     with cassette_path.open(encoding="utf-8") as fh:
-        raw = pyyaml.safe_load(fh)
+        raw = pyyaml.load(fh, Loader=_YamlLoader)
     if not isinstance(raw, dict):
         return False
     interactions = raw.get("interactions")
@@ -322,7 +323,7 @@ def test_cassette_body_parseable(provider: str, cassette: Path) -> None:
     files (no ``interactions`` key) are skipped — they are custom mock data.
     """
     with cassette.open(encoding="utf-8") as fh:
-        raw = pyyaml.safe_load(fh)
+        raw = pyyaml.load(fh, Loader=_YamlLoader)
     if not isinstance(raw, dict) or "interactions" not in raw:
         pytest.skip(f"{provider}/{cassette.name}: not a VCR cassette (no 'interactions' key) — skipped")
     if not raw.get("interactions"):

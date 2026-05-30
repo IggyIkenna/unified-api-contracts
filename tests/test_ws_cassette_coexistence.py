@@ -21,6 +21,7 @@ from typing import Final
 
 import pytest
 import yaml
+from yaml import CSafeLoader as _YamlLoader  # C extension: avoids pure-Python scanner hang on large cassette files
 
 # ---------------------------------------------------------------------------
 # Paths
@@ -95,7 +96,7 @@ _ALL_WS_CASSETTES: Final[list[Path]] = _collect_ws_cassettes()
 )
 def test_ws_cassette_is_valid_yaml(cassette_path: Path) -> None:
     """Each *_ws.yaml must parse as valid YAML."""
-    parsed = yaml.safe_load(cassette_path.read_text(encoding="utf-8"))
+    parsed = yaml.load(cassette_path.read_text(encoding="utf-8"), Loader=_YamlLoader)
     assert parsed is not None, f"{cassette_path.name}: empty file"
 
 
@@ -106,7 +107,7 @@ def test_ws_cassette_is_valid_yaml(cassette_path: Path) -> None:
 )
 def test_ws_cassette_has_ws_url(cassette_path: Path) -> None:
     """Each *_ws.yaml must have a ws_url field (distinguishes WS from REST cassettes)."""
-    parsed = yaml.safe_load(cassette_path.read_text(encoding="utf-8"))
+    parsed = yaml.load(cassette_path.read_text(encoding="utf-8"), Loader=_YamlLoader)
     assert isinstance(parsed, dict), f"{cassette_path.name}: root is not a dict"
     assert "ws_url" in parsed, (
         f"{cassette_path.name}: missing 'ws_url' — WS cassettes must have this field. "
@@ -129,7 +130,7 @@ def test_ws_cassette_frames_are_valid_json(cassette_path: Path) -> None:
     Stub cassettes (frames: []) are explicitly allowed — they are placeholders
     for BLOCKED-CREDENTIALS connectors.
     """
-    parsed = yaml.safe_load(cassette_path.read_text(encoding="utf-8"))
+    parsed = yaml.load(cassette_path.read_text(encoding="utf-8"), Loader=_YamlLoader)
     if not isinstance(parsed, dict):
         pytest.skip("not a dict — caught by test_ws_cassette_is_valid_yaml")
     frames = parsed.get("frames") or []
