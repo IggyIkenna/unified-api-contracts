@@ -118,6 +118,13 @@ from .domain.execution import (
     OrderType,
 )
 from .domain.sports.odds_canonical import american_to_decimal, decimal_to_american
+from .instrument_key import (
+    derive_instrument_type_set,
+    derive_symbol_set,
+    derive_venue_set,
+    format_instrument_key,
+    parse_instrument_key,
+)
 
 __all__ = [
     "BOOKMAKER_REGISTRY",
@@ -225,5 +232,10 @@ __all__ = [
     "WebSocketEvent",
     "american_to_decimal",
     "decimal_to_american",
+    "derive_instrument_type_set",
+    "derive_symbol_set",
+    "derive_venue_set",
+    "format_instrument_key",
     "get_expected_bookmakers",
+    "parse_instrument_key",
 ]
