@@ -147,7 +147,7 @@ EXPECTED_FEATURE_GROUPS_BY_SERVICE: Final[dict[str, list[str]]] = {
         "xg_decomposition",
         # ---- Volatility — stub (populate as IV-surface / realised-vol calculators land)
         # ---- Cross-instrument -----------------------------------------------
-        "regime_clustering",       # Phase 1 of regime_clustering_structure_allocator_2026_05_29
+        "regime_clustering",  # Phase 1 of regime_clustering_structure_allocator_2026_05_29
         "strategy_pnl_archetype",  # Phase 0 of regime_clustering_structure_allocator_2026_05_29
         # ---- Calendar, Commodity, Multi-timeframe — stubs
     ],
@@ -382,7 +382,11 @@ _GROUP_FAMILY_MAP: Final[dict[str, FeatureFamily]] = {
     "venue_context": FeatureFamily.SPORTS,
     "weather": FeatureFamily.SPORTS,
     "xg_decomposition": FeatureFamily.SPORTS,
-    # Volatility, Cross-instrument, Calendar, Commodity, Multi-timeframe:
+    # --- Cross-instrument (features-service, cross-asset calculators) ---
+    # regime_clustering_structure_allocator_2026_05_29 Phase 0 + 1
+    "regime_clustering": FeatureFamily.CROSS_INSTRUMENT,
+    "strategy_pnl_archetype": FeatureFamily.CROSS_INSTRUMENT,
+    # Volatility, Calendar, Commodity, Multi-timeframe:
     # no groups yet — add entries here when calculators land under their family.
 }
 
