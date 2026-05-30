@@ -86,6 +86,7 @@ from .source_priority import EMISSION_LATENCY_MS_BY_SOURCE as EMISSION_LATENCY_M
 from .source_priority import SOURCE_PRIORITY as SOURCE_PRIORITY
 from .source_priority import assert_emission_latency_round_trip as assert_emission_latency_round_trip
 from .source_priority import emission_latency_ms_for_source as emission_latency_ms_for_source
+from .source_priority import get_all_sources_with_priority as get_all_sources_with_priority
 from .source_priority import get_primary_source as get_primary_source
 from .source_priority import get_primary_source_with_latency as get_primary_source_with_latency
 from .source_priority import get_source_priority as get_source_priority

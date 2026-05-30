@@ -41,6 +41,7 @@ from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
     SOURCE_PRIORITY,
+    get_all_sources_with_priority,
     get_primary_source,
     read_with_source_priority,
 )
@@ -239,3 +240,57 @@ def test_read_with_source_priority_exposed_from_crosscutting_namespace() -> None
     )
 
     assert facade_reader is read_with_source_priority
+
+
+# ---------------------------------------------------------------------------
+# Test 9 — get_all_sources_with_priority (Phase 2 multi-source building block)
+# ---------------------------------------------------------------------------
+
+
+def test_get_all_sources_single_source_cell_returns_list_of_one() -> None:
+    """Single-source cells return a one-element list."""
+    results = get_all_sources_with_priority("cefi", "trades")
+    assert len(results) == 1
+    source, mode = results[0]
+    assert source == "tardis"
+    assert mode is PipelineMode.BATCH_TARDIS
+
+
+def test_get_all_sources_multi_source_cell_returns_ordered_list() -> None:
+    """Multi-source cells (tradfi trades = databento + massive) return both in priority order."""
+    results = get_all_sources_with_priority("tradfi", "trades")
+    assert len(results) >= 2
+    sources = [s for s, _ in results]
+    assert sources[0] == "databento", "databento is primary for tradfi trades"
+    assert "massive" in sources, "massive is registered for tradfi trades"
+    assert sources.index("databento") < sources.index("massive"), "databento precedes massive"
+
+
+def test_get_all_sources_returns_batch_pipeline_modes() -> None:
+    """Every returned pipeline_mode must be a batch value."""
+    for source, mode in get_all_sources_with_priority("tradfi", "ohlcv_15m"):
+        assert is_batch(mode), f"source {source!r} returned non-batch mode {mode!r}"
+
+
+def test_get_all_sources_primary_matches_read_with_source_priority() -> None:
+    """Index-0 of get_all_sources must equal read_with_source_priority."""
+    for asset_group, data_type in SOURCE_PRIORITY:
+        all_sources = get_all_sources_with_priority(asset_group, data_type)
+        primary_source, primary_mode = read_with_source_priority(asset_group, data_type)
+        assert all_sources[0] == (primary_source, primary_mode), (
+            f"({asset_group!r}, {data_type!r}): all_sources[0]={all_sources[0]!r} "
+            f"!= read_with_source_priority result {(primary_source, primary_mode)!r}"
+        )
+
+
+def test_get_all_sources_raises_for_unknown_pair() -> None:
+    with pytest.raises(KeyError, match="No source priority registered"):
+        get_all_sources_with_priority("alien", "trades")
+
+
+def test_get_all_sources_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import (
+        get_all_sources_with_priority as facade_fn,
+    )
+
+    assert facade_fn is get_all_sources_with_priority

@@ -538,11 +538,55 @@ def read_with_source_priority(
     return primary_source, pipeline_mode
 
 
+def get_all_sources_with_priority(
+    asset_group: str,
+    data_type: str,
+) -> list[tuple[str, PipelineMode]]:
+    """Return all registered sources for ``(asset_group, data_type)`` in priority order.
+
+    Phase 2 of ``tradfi_massive_dual_source_2026_05_28.md`` — multi-source
+    merge building block. Unlike :func:`read_with_source_priority` (which
+    returns only the primary source), this function returns the full ordered
+    list so callers can:
+
+    * Iterate over all available sources for a cell (e.g. ``databento`` +
+      ``massive`` for TradFi trades).
+    * Apply tie-breaker logic at the consumer layer (timestamp-availability
+      → coverage → information richness → field-union per module docstring).
+    * Detect conflicts when the same ``(ticker, ts)`` appears in multiple
+      source parquets.
+
+    The returned list is ordered by priority (index 0 = highest priority,
+    the same as ``read_with_source_priority`` returns). Each element pairs
+    the source string with its batch :class:`PipelineMode`.
+
+    Args:
+        asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / ``prediction``
+            / ``sports`` / ``reference``.
+        data_type: Canonical data_type string.
+
+    Returns:
+        Ordered list of ``(source_string, pipeline_mode)`` tuples, highest
+        priority first. Always non-empty (enforced by
+        ``test_every_source_priority_entry_has_at_least_one_source``).
+
+    Raises:
+        KeyError: If the ``(asset_group, data_type)`` pair is not registered
+            in :data:`SOURCE_PRIORITY`.
+        ValueError: If any source string in the list has no corresponding
+            :class:`PipelineMode` — closed-set round-trip violation prevented
+            in CI by ``test_every_source_priority_source_round_trips_to_pipeline_mode``.
+    """
+    sources = get_source_priority(asset_group, data_type)
+    return [(source, pipeline_mode_for_source(source)) for source in sources]
+
+
 __all__ = [
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",
     "assert_emission_latency_round_trip",
     "emission_latency_ms_for_source",
+    "get_all_sources_with_priority",
     "get_primary_source",
     "get_primary_source_with_latency",
     "get_source_priority",
