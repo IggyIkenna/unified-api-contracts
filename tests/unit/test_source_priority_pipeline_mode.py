@@ -41,6 +41,8 @@ from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
     SOURCE_PRIORITY,
+    DivergenceKind,
+    detect_dual_source_conflicts,
     get_all_sources_with_priority,
     get_primary_source,
     read_with_source_priority,
@@ -350,3 +352,85 @@ def test_select_primary_available_exposed_from_crosscutting_namespace() -> None:
     )
 
     assert facade_fn is select_primary_available_source
+
+
+# ---------------------------------------------------------------------------
+# Tests 11 — DivergenceKind + detect_dual_source_conflicts (tasks -014, -015)
+# ---------------------------------------------------------------------------
+
+
+def test_divergence_kind_dual_source_duplicate_value() -> None:
+    """DivergenceKind.DUAL_SOURCE_DUPLICATE is a manifest-compatible string."""
+    assert DivergenceKind.DUAL_SOURCE_DUPLICATE == "DUAL_SOURCE_DUPLICATE"
+    assert isinstance(DivergenceKind.DUAL_SOURCE_DUPLICATE, str)
+
+
+def test_detect_dual_source_conflicts_happy_path_no_overlap() -> None:
+    """Happy path: two sources with completely distinct row-keys → no conflicts."""
+    keys_databento = {("NYSE", "2026-05-30", "AAPL", 1000), ("NYSE", "2026-05-30", "AAPL", 2000)}
+    keys_massive = {("NYSE", "2026-05-30", "MSFT", 1000), ("NYSE", "2026-05-30", "MSFT", 2000)}
+    result = detect_dual_source_conflicts(
+        "databento", keys_databento, "massive", keys_massive,
+        asset_group="tradfi", data_type="trades",
+    )
+    assert result == []
+
+
+def test_detect_dual_source_conflicts_with_duplicates() -> None:
+    """Conflict path: same row-key in both sources → returned in sorted order."""
+    shared_key = ("NYSE", "2026-05-30", "AAPL", 1000)
+    keys_databento = {shared_key, ("NYSE", "2026-05-30", "AAPL", 2000)}
+    keys_massive = {shared_key, ("NYSE", "2026-05-30", "MSFT", 1000)}
+    result = detect_dual_source_conflicts(
+        "databento", keys_databento, "massive", keys_massive,
+        asset_group="tradfi", data_type="trades",
+    )
+    assert result == [shared_key]
+    assert shared_key in result
+
+
+def test_detect_dual_source_conflicts_missing_source_a_present_source_b() -> None:
+    """Missing-source-A path: keys_a empty → no conflicts even if keys_b is full."""
+    keys_massive = {("NYSE", "2026-05-30", "SPY", 1000)}
+    result = detect_dual_source_conflicts(
+        "databento", set(), "massive", keys_massive,
+        asset_group="tradfi", data_type="ohlcv_1m",
+    )
+    assert result == []
+
+
+def test_detect_dual_source_conflicts_field_union_path() -> None:
+    """Field-union path: no key overlap → no DUAL_SOURCE_DUPLICATE even if both present."""
+    # When sources have non-overlapping keys, there's nothing to flag —
+    # the consumer unions the rows, not picks one.
+    keys_a = {("CME", "2026-05-30", "ES", 1000)}
+    keys_b = {("CME", "2026-05-30", "NQ", 1000)}
+    result = detect_dual_source_conflicts(
+        "databento", keys_a, "massive", keys_b,
+        asset_group="tradfi", data_type="futures_chain",
+    )
+    assert result == []
+
+
+def test_detect_dual_source_conflicts_logs_warning(caplog: pytest.LogCaptureFixture) -> None:
+    """Conflicts log at WARNING level with DUAL_SOURCE_DUPLICATE in the message."""
+    import logging
+    shared = ("NYSE", "2026-05-30", "AAPL", 500)
+    with caplog.at_level(logging.WARNING):
+        detect_dual_source_conflicts(
+            "databento", {shared}, "massive", {shared},
+            asset_group="tradfi", data_type="trades",
+        )
+    assert any("DUAL_SOURCE_DUPLICATE" in r.message for r in caplog.records)
+
+
+def test_divergence_kind_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import DivergenceKind as facade_dk
+    assert facade_dk is DivergenceKind
+
+
+def test_detect_dual_source_conflicts_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import (
+        detect_dual_source_conflicts as facade_fn,
+    )
+    assert facade_fn is detect_dual_source_conflicts

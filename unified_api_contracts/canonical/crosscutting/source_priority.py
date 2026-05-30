@@ -75,12 +75,38 @@ single primary batch source.
 
 from __future__ import annotations
 
+import logging
+from enum import StrEnum
 from typing import Final
 
 from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
     PipelineMode,
     pipeline_mode_for_source,
 )
+
+logger = logging.getLogger(__name__)
+
+
+class DivergenceKind(StrEnum):
+    """Closed-set reasons a manifest row is flagged as a cross-source divergence.
+
+    Written into the manifest ``divergence_kind`` column (nullable; ``None``
+    means no divergence). Per Phase 2 of
+    ``tradfi_massive_dual_source_2026_05_28.md``:
+
+    * ``DUAL_SOURCE_DUPLICATE`` — the same ``(asset_group, venue, day, ticker,
+      ts)`` row-key appears in two or more sources. The sources agree on the
+      key but may differ on values (price, volume). Logged + counted; do NOT
+      silently drop either source's row — downstream reconciliation decides
+      the winner via :func:`select_primary_available_source`.
+
+    Future values (extend this enum, do NOT add bare strings):
+    * ``TEMPORAL_GAP`` — source A has the day; source B is absent.
+    * ``FIELD_UNION`` — sources have non-overlapping field sets (rule 4 of
+      the tie-breaker docstring); consumer unions both rows.
+    """
+
+    DUAL_SOURCE_DUPLICATE = "DUAL_SOURCE_DUPLICATE"
 
 SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # ---- Sports ---------------------------------------------------------
@@ -538,6 +564,56 @@ def read_with_source_priority(
     return primary_source, pipeline_mode
 
 
+def detect_dual_source_conflicts(
+    source_a: str,
+    keys_a: set[tuple],
+    source_b: str,
+    keys_b: set[tuple],
+    *,
+    asset_group: str,
+    data_type: str,
+) -> list[tuple]:
+    """Return row keys present in both source_a and source_b.
+
+    Per Phase 2 of ``tradfi_massive_dual_source_2026_05_28.md`` conflict
+    detection: when the same ``(asset_group, venue, day, ticker, ts)``
+    row-key appears in two sources, this function detects the overlap, logs
+    the count at WARNING level, and returns the duplicate keys so callers can
+    emit ``divergence_kind=DUAL_SOURCE_DUPLICATE`` into the manifest.
+
+    DO NOT silently drop either source's row — downstream reconciliation
+    (e.g. :func:`select_primary_available_source`) decides which source wins.
+
+    Args:
+        source_a: First source string (e.g. ``"databento"``).
+        keys_a: Set of row-key tuples for source_a (e.g.
+            ``{(venue, day, ticker, ts), ...}``). Any hashable tuple shape is
+            accepted — the caller owns the row-key definition.
+        source_b: Second source string (e.g. ``"massive"``).
+        keys_b: Set of row-key tuples for source_b.
+        asset_group: Used in log messages only.
+        data_type: Used in log messages only.
+
+    Returns:
+        Sorted list of row-key tuples present in both ``keys_a`` and
+        ``keys_b``. Empty list when there are no conflicts.
+    """
+    duplicates = keys_a & keys_b
+    if duplicates:
+        logger.warning(
+            "DUAL_SOURCE_DUPLICATE: %d row-key(s) in (%s, %s) appear in both "
+            "source=%r and source=%r. Mark manifest rows with "
+            "divergence_kind=DUAL_SOURCE_DUPLICATE. Sample (up to 3): %s",
+            len(duplicates),
+            asset_group,
+            data_type,
+            source_a,
+            source_b,
+            sorted(duplicates)[:3],
+        )
+    return sorted(duplicates)
+
+
 def select_primary_available_source(
     asset_group: str,
     data_type: str,
@@ -562,7 +638,7 @@ def select_primary_available_source(
        :data:`SOURCE_PRIORITY` (handled at the consumer / writer layer,
        not here).
 
-    Rules 1–3 are resolved at registry-design time by the ordering in
+    Rules 1-3 are resolved at registry-design time by the ordering in
     :data:`SOURCE_PRIORITY`; this helper enforces that ordering at runtime
     when not all sources have data.
 
@@ -638,7 +714,9 @@ def get_all_sources_with_priority(
 __all__ = [
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",
+    "DivergenceKind",
     "assert_emission_latency_round_trip",
+    "detect_dual_source_conflicts",
     "emission_latency_ms_for_source",
     "get_all_sources_with_priority",
     "get_primary_source",
