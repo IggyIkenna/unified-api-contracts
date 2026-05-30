@@ -207,3 +207,28 @@ def list_instruments(
         data_types=data_types,
         venues=venues,
     )
+
+
+def list_not_yet_listed_cefi(
+    processing_date: date,
+    *,
+    venues: list[str] | None = None,
+) -> Iterator[CatalogRow]:
+    """Yield CatalogRows for CeFi instruments not yet listed on processing_date.
+
+    Delegates to the registered "cefi" reader's list_not_yet_listed method when
+    available. Returns an empty iterator when no reader is registered or the
+    reader does not implement the method (e.g. stub readers in test environments).
+
+    Used by the MTDS orchestrator to emit EXPECTED_INSTRUMENT_NOT_LISTED manifest
+    rows for instruments whose available_from_datetime > processing_date,
+    distinguishing the "not-listed-yet" gap from "out-of-window" (OKX expiry)
+    and "blocked-key" (Tardis 401) gaps in the §3 coverage map.
+    """
+    reader = _READERS.get("cefi")
+    if reader is None:
+        return
+    fn = getattr(reader, "list_not_yet_listed", None)
+    if fn is None:
+        return
+    yield from fn(processing_date, venues=venues)
