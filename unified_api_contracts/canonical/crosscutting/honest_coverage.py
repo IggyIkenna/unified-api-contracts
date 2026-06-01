@@ -264,6 +264,22 @@ class EmptyConfirmedReason(StrEnum):
     Plan: ``sports_classifier_sfi_footystats_fixture_pin_2026_05_13.md`` +
     ``sports_classifier_weather_no_fixture_2026_05_13.md`` (slot 4 ownership 2026-05-13)."""
 
+    EXPECTED_NO_MAPPING = "EXPECTED_NO_MAPPING"
+    """A canonical entity exists for the (source, day) but the source-specific provider mapping
+    required to fetch it is absent, so no fetch was attempted. The data is a *legitimate expected
+    absence for this run* — not a calendar gap and not a fetch failure — because the source cannot
+    address the entity without the mapping.
+
+    Distinct from ``EXPECTED_NO_FIXTURE`` (a fixture genuinely was not scheduled — a calendar gap)
+    and from ``attempted_failed`` (a fetch was attempted and errored). Use this when the absence
+    cause is "we have no provider id/route for this entity", e.g. a Transfermarkt league with no
+    ``provider_league_ids["transfermarkt"]`` mapping. If/when the mapping is added, the entity
+    becomes fetchable — so consumers may surface this as "coverage-extendable" rather than
+    "permanently empty".
+
+    Used by: instruments-service sports write-paths when a per-league provider mapping is missing.
+    Added 2026-06-01 (capture_status write-path audit — manifest_master)."""
+
     EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY = "EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY"
     """Tradfi futures/options row from a pre-2026-05-13 historical capture that lacks a
     populated ``expiration`` / ``expiry_date`` field, AND cannot be back-filled from
