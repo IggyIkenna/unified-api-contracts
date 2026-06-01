@@ -12,7 +12,7 @@ from __future__ import annotations
 
 EMPTY_OR_DEPRECATED_DEFI_VENUES: frozenset[str] = frozenset(
     {
-        "TRADER_JOEV2-AVALANCHE",  # 0 instruments as of 2026-04-29 (DF-17 migration 2026-05-13)
+        "TRADER_JOE_V2-AVALANCHE",  # 0 instruments as of 2026-04-29 (DF-17; underscore-canonical 2026-06-01)
         "UNISWAP_V3-POLYGON",  # subgraph returns 0 instruments as of 2026-04-29 (migration finding)
         "GMX-AVALANCHE",  # 0 historical parquets / minimal subgraph data (1 instrument) as of 2026-04-29
     }
@@ -35,6 +35,8 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
         "PANCAKESWAPV3",  # superseded by PANCAKESWAP_V3
         "SUSHISWAPV3",  # superseded by SUSHISWAP_V3
         "VELODROMEV2",  # superseded by VELODROME_V2
+        "TRADER_JOEV2",  # superseded by TRADER_JOE_V2 (DF-17 underscore-canonical 2026-06-01)
+        "TRADERJOEV2",  # fully-glued legacy form, superseded by TRADER_JOE_V2
         "YEARNV3",  # superseded by YEARN_V3
         "AERODROMEV3",  # superseded by AERODROME_V3 (Base chain Velodrome fork)
     }
@@ -45,7 +47,7 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
 # days as missing until the venue's first parquet write.
 DEFI_INSTRUMENTS_NOT_YET_COLLECTED: frozenset[str] = frozenset(
     {
-        "VELODROMEV2-OPTIMISM",  # subgraph: 881 instruments; bucket: 0 parquets as of 2026-04-29
+        "VELODROME_V2-OPTIMISM",  # subgraph: 881 instruments; bucket: 0 parquets as of 2026-04-29
         # Spark adapter shipped 2026-04-29 (separate from aave_v3); subgraph
         # returns 17 markets but instruments-service has never written
         # historical parquets for this venue — until first scheduled run lands

@@ -34,6 +34,13 @@ class InstrumentType(StrEnum):
     OPTION = "OPTION"
     # DeFi
     POOL = "POOL"
+    # DeFi — DEX-pool instrument type (Solana basis trading MVP Phase 2,
+    # 2026-06-01). Used by ``DEFI_DEX_POOL_DEX_ORDERBOOK`` /
+    # ``DEFI_DEX_POOL_DEX_QUOTE`` / ``DEFI_DEX_POOL_DEX_TRADES`` contracts.
+    # Distinct from ``POOL`` (legacy EVM AMM pool snapshots — Uniswap,
+    # Curve) so the spot-DEX orderbook + quote + per-swap shards can carry
+    # venue-specific fields without colliding with the EVM pool contract.
+    DEX_POOL = "DEX_POOL"
     LENDING = "LENDING"
     LST = "LST"
     YIELD_BEARING = "YIELD_BEARING"
@@ -41,6 +48,11 @@ class InstrumentType(StrEnum):
     DEBT_TOKEN = "DEBT_TOKEN"
     STAKING = "STAKING"
     SPOT_ASSET = "SPOT_ASSET"
+    # DeFi — Solana (distinct shapes vs EVM lending/pool; see UAC@7e9f4ad9 contracts +
+    # plan solana_defi_legacy_migration_2026_05_27).
+    SOLANA_LENDING = "SOLANA_LENDING"
+    SOLANA_VAULT = "SOLANA_VAULT"
+    SOLANA_AMM_POOL = "SOLANA_AMM_POOL"
     # TradFi
     ETF = "ETF"
     EQUITY = "EQUITY"

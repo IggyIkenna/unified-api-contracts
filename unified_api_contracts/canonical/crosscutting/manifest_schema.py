@@ -66,6 +66,36 @@ Phase 7 bundled walk migrates all prod parquets to v8."""
 
 
 # ---------------------------------------------------------------------------
+# pipeline_mode column — always NOT NULL (Phase 3 backfill complete 2026-05-28).
+#
+# Declared here as the UAC SSOT. UTL ``_coerce_pipeline_mode`` enforces the
+# constraint at write time: passing ``None`` raises ``ValueError``.
+# Phase 3 backfill (43.5M+ rows across all asset-group buckets) completed
+# 2026-05-28; all manifest rows now carry a valid PipelineMode value.
+# ---------------------------------------------------------------------------
+
+PIPELINE_MODE_COLUMN: Final[str] = "pipeline_mode"
+"""Manifest column name for the source-and-mode tag.
+
+Value type: ``str`` — always NOT NULL (Phase 3 backfill complete 2026-05-28).
+Values MUST be members of
+:class:`~unified_api_contracts.canonical.crosscutting.pipeline_mode.PipelineMode`
+(StrEnum, lower-case ``batch_<source>`` / ``live_websocket``).
+
+Historical note: pre-2026-05-28 rows carried ``""`` (empty-string sentinel
+from the Phase 1B rollout window). Those rows were backfilled in Phase 3 via
+``unified-trading-pm/scripts/migration/backfill_pipeline_mode.py``."""
+
+PIPELINE_MODE_NOT_NULL_SINCE: Final[str] = "2026-05-28"
+"""ISO-8601 date from which all manifest rows carry a non-empty ``pipeline_mode``.
+
+After Phase 3 backfill (completed 2026-05-28), this date marks the transition
+to "always NOT NULL" — there are no longer any exempt pre-history rows.
+Retained for audit tooling that distinguishes write-time-stamped rows from
+Phase 3 backfill-derived rows."""
+
+
+# ---------------------------------------------------------------------------
 # v8 column declarations.
 #
 # Each constant pins (a) the canonical column name (parquet header +
@@ -182,6 +212,8 @@ __all__ = [
     "EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN",
     "LAST_EMISSION_DECISION_AT_COLUMN",
     "MANIFEST_SCHEMA_VERSION_V8",
+    "PIPELINE_MODE_COLUMN",
+    "PIPELINE_MODE_NOT_NULL_SINCE",
     "READER_FALLBACK_WINDOW_DAYS",
     "SERVICE_EMISSION_STATE_COLUMN",
     "V8_COLUMN_DEFAULTS",

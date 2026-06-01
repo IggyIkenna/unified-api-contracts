@@ -413,7 +413,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
         "ARBITRUM",
         "CAMELOT_V3",
     ): "2023-04-08",  # Camelot V2 (Algebra conc-liq) stage-1; V3 same Algebra fork per CoinDesk + Camelot docs; medium
-    ("OPTIMISM", "VELODROMEV2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
+    ("OPTIMISM", "VELODROME_V2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
     ("OPTIMISM", "CURVE"): "2022-01-18",  # Curve Optimism deployment announcement tweet (TheDefiant, TheBlock); high
     (
         "AVALANCHE",
@@ -421,7 +421,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ): "2021-08-18",  # Curve Avalanche deployment via Avalanche Rush program (TheDefiant + Avalanche Medium); high
     (
         "AVALANCHE",
-        "TRADER_JOEV2",
+        "TRADER_JOE_V2",
     ): "2022-11-17",  # Trader Joe Liquidity Book V2 live per TokenInsight + TheDefiant; high
     (
         "BASE",
@@ -533,7 +533,7 @@ PROTOCOL_LAUNCH_DATES.update(
 # genesis is fine — under-clipping inflates the missing-shards
 # denominator). Add a launch date and remove the pair from this set
 # to tighten the clip.
-_PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
+_PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE: frozenset[tuple[str, str]] = frozenset(
     {
         # SPARK / ETHEREUM moved to ``PROTOCOL_LAUNCH_DATES`` 2026-05-08
         # (Tab 14 audit verified 2023-03-07 earliest subgraph event).
@@ -577,15 +577,17 @@ _PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = frozenset(
         ("ONCHAIN", "ALCHEMY"),
     }
 )
-# Extend _PROTOCOL_LAUNCH_PENDING_INVESTIGATION with canonical protocol-name aliases
-# (e.g. COMPOUND_V3 alongside COMPOUND_V3) so the parity test passes for both forms.
-_PROTOCOL_LAUNCH_PENDING_INVESTIGATION = _PROTOCOL_LAUNCH_PENDING_INVESTIGATION | frozenset(
-    {
-        (chain, canonical)
-        for (chain, ghost) in _PROTOCOL_LAUNCH_PENDING_INVESTIGATION
-        for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
-        if ghost == ghost_name
-    }
+# Extend with canonical protocol-name aliases so the parity test passes for both forms.
+_PROTOCOL_LAUNCH_PENDING_INVESTIGATION: frozenset[tuple[str, str]] = (
+    _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE
+    | frozenset(
+        {
+            (chain, canonical)
+            for (chain, ghost) in _PROTOCOL_LAUNCH_PENDING_INVESTIGATION_BASE
+            for canonical, ghost_name in _CANONICAL_PROTOCOL_RENAME.items()
+            if ghost == ghost_name
+        }
+    )
 )
 
 

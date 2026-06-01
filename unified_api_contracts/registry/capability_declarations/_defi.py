@@ -64,7 +64,29 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "aave_v3": {  # Verified from github.com/aave/protocol-subgraphs README
         "ETHEREUM": "Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g",
         "ARBITRUM": "DLuE98kEb5pQNXAcKFQGQgfSQ57Xdou4jnVbAEqMfy3B",
-        "OPTIMISM": "DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb",
+        # OPTIMISM: AAVE_V3-OPTIMISM canonical data source is the RPC fallback
+        # (policy decision 2026-05-30). Subgraph state on this chain:
+        #   • Aave github-README deployment `DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb`
+        #     is at head with `hasIndexingErrors:false`, BUT both
+        #     `reserveParamsHistoryItems` AND `reserves` return [] — Aave
+        #     republished it to v0.0.5 (an "abandoned" empty entity store)
+        #     between 2026-05-08 and 2026-05-29. Silent abandonment by the
+        #     Aave team, NOT an indexing failure.
+        #   • Messari-style deployment `3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi`
+        #     is also at head (verified 2026-05-30: `_meta.block.timestamp`
+        #     ~1780110035 / ~03:00 UTC, no indexing errors). Coverage is
+        #     sparse post-2024-12: rows present at 2024-12-01 + 2026-04-25
+        #     but [] for 2025-06-01 / 2026-01-01 / 2026-05-01 windows. Also
+        #     the nested `market { inputToken { symbol } }` join raises
+        #     `Null value resolved for non-null field market` — handlers
+        #     MUST query top-level snapshot fields only.
+        # All sibling Aave V3 chains (ETH/ARB/POLY/BASE) work fine; only
+        # OPTIMISM is in this abandoned state. RPC fallback (14-row daily
+        # resolution) is operationally sufficient for the carry archetype
+        # until a fresh rich deployment surfaces. Messari ID stays as the
+        # cascade's 2nd variant for partial coverage; swap to a new rich
+        # native ID + re-backfill if Aave revives the deployment.
+        "OPTIMISM": "3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi",
         "POLYGON": "Co2URyXjnxaw8WqxKyVHdirq9Ahhm5vcTs4dMedAq211",
         "AVALANCHE": "2h9woxy8RTjHu1HJsCEnmzpPHFArU33avmUh4f71JpVn",
         "BASE": "GQFbb95cE6d8mV989mL5figjaGaKCQB3xqYrr1bRyXqF",
@@ -395,14 +417,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "velodrome_v2": _ProtocolCapability(
-        venue_prefix="VELODROMEV2",
+        venue_prefix="VELODROME_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "trader_joe_v2": _ProtocolCapability(
-        venue_prefix="TRADER_JOEV2",
+        venue_prefix="TRADER_JOE_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -471,7 +493,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.PERPS,
         instrument_types=_PERPS,
         data_types=["perp_funding", "oracle_prices"],
-        mtds_operations=["collect-solana-defi", "collect-perp-funding"],
+        mtds_operations=["collect-perp-funding"],
         required_tokens=frozenset({"DRIFT"}),
     ),
     "kamino": _ProtocolCapability(
@@ -479,7 +501,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=["dex_pools", "lending_indices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-dex-pools", "collect-lending-indices"],
         required_tokens=frozenset({"KMNO"}),
     ),
     "raydium": _ProtocolCapability(
@@ -487,7 +509,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=["dex_pools", "dex_swaps"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"RAY"}),
     ),
     "orca": _ProtocolCapability(
@@ -495,15 +517,36 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=["dex_pools", "dex_swaps"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"ORCA"}),
+    ),
+    "phoenix": _ProtocolCapability(
+        venue_prefix="PHOENIX",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["dex_pools"],
+        mtds_operations=["collect-dex-pools"],
+    ),
+    "marginfi": _ProtocolCapability(
+        venue_prefix="MARGINFI",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+    ),
+    "solend": _ProtocolCapability(
+        venue_prefix="SOLEND",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
     ),
     "marinade": _ProtocolCapability(
         venue_prefix="MARINADE",
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
         data_types=["lst_rates", "oracle_prices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"MNDE", "MSOL"}),
     ),
     "jito": _ProtocolCapability(
@@ -511,7 +554,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
         data_types=["lst_rates", "oracle_prices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),
     # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
@@ -522,7 +565,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_YIELD,
         data_types=["restaking_rewards", "lst_rates"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"SSOL"}),
     ),
     "picasso": _ProtocolCapability(
@@ -530,7 +573,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_YIELD,
         data_types=["restaking_rewards", "cross_chain_restaking_routes"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"PICA"}),
     ),
     "cambrian": _ProtocolCapability(
@@ -538,7 +581,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_YIELD,
         data_types=["restaking_rewards", "restaking_operator_set"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-staking-yields"],
     ),
 }
 
@@ -799,6 +842,9 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "kamino": ["SOLANA"],
     "raydium": ["SOLANA"],
     "orca": ["SOLANA"],
+    "phoenix": ["SOLANA"],
+    "marginfi": ["SOLANA"],
+    "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
     # Plan E: Solana restaking rewards coverage (2026-05-13)
@@ -862,9 +908,9 @@ def parse_defi_venue(venue_str: str) -> tuple[str, str]:
 
 # Strip-underscore lookup: "AAVEV3" → "AAVE_V3" (the authoritative venue_prefix).
 # Built from PROTOCOL_CAPABILITIES venue_prefix set (33 prefixes, verified zero
-# strip-underscore collisions 2026-05-26). For prefixes that are themselves glued
-# in the authoritative set (VELODROMEV2, TRADER_JOEV2), glued IS canonical, so the
-# round-trip is a no-op.
+# strip-underscore collisions 2026-05-26). VELODROME_V2 / TRADER_JOE_V2 carry the
+# underscore-canonical prefix (operator 2026-06-01 — DF-17 glued-canonical reversed);
+# the stripped legacy form (VELODROMEV2 / TRADERJOEV2) maps back to the canonical.
 _STRIPPED_PREFIX_TO_CANONICAL: dict[str, str] = {
     prefix.replace("_", "").upper(): prefix for prefix in {cap.venue_prefix for cap in PROTOCOL_CAPABILITIES.values()}
 }
@@ -878,7 +924,7 @@ def canonicalize_defi_venue_combined(raw: str) -> str:
         "UNISWAPV3-ETHEREUM"  -> "UNISWAP_V3-ETHEREUM"
         "COMPOUNDV3-BASE"     -> "COMPOUND_V3-BASE"
         "AAVE_V3-ARBITRUM"    -> "AAVE_V3-ARBITRUM"   (already canonical → passthrough)
-        "VELODROMEV2-OPTIMISM"-> "VELODROMEV2-OPTIMISM" (glued IS canonical for this venue)
+        "VELODROMEV2-OPTIMISM"-> "VELODROME_V2-OPTIMISM" (legacy glued → underscore-canonical)
         "BINANCE"             -> "BINANCE"            (no known chain → passthrough)
 
     Algorithm:

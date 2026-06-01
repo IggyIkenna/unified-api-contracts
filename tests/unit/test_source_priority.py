@@ -8,14 +8,18 @@ from unified_api_contracts.canonical.crosscutting.availability_semantics import 
     AVAILABILITY_AT_SEMANTICS,
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
+    COMPUTED_SOURCES,
     EMISSION_LATENCY_MS_BY_SOURCE,
     SOURCE_PRIORITY,
     assert_emission_latency_round_trip,
+    default_source,
     emission_latency_ms_for_source,
+    external_sources_for,
     get_primary_source,
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
+    source_required,
 )
 
 # ---------------------------------------------------------------------------
@@ -97,6 +101,114 @@ def test_has_source_priority_returns_true_for_registered() -> None:
 
 def test_has_source_priority_returns_false_for_unregistered() -> None:
     assert has_source_priority("cefi", "made_up") is False
+
+
+# ---------------------------------------------------------------------------
+# source_required — registry-driven multi-source gate
+# (data_source_provenance_all_asset_groups_2026_06_01.md Phase 1)
+# ---------------------------------------------------------------------------
+
+
+def test_source_required_true_for_tradfi_multi_source() -> None:
+    """TradFi trades has databento + massive → source required."""
+    assert source_required("tradfi", "trades") is True
+    assert source_required("tradfi", "ohlcv_15m") is True
+
+
+def test_source_required_true_for_defi_multi_source() -> None:
+    """DeFi oracle_prices / native_staking_rates are multi-source → required."""
+    assert source_required("defi", "oracle_prices") is True
+    assert source_required("defi", "native_staking_rates") is True
+
+
+def test_source_required_true_for_sports_multi_source() -> None:
+    """Sports FIXTURES has api_football + footystats → source required."""
+    assert source_required("sports", "FIXTURES") is True
+
+
+def test_source_required_false_for_single_source_cells() -> None:
+    """Single-entry SOURCE_PRIORITY lists → no source required."""
+    assert source_required("defi", "swap") is False
+    assert source_required("cefi", "trades") is False
+    assert source_required("sports", "FIXTURE_EVENTS") is False
+
+
+def test_source_required_false_for_prediction() -> None:
+    """Prediction is multi-source-N/A by design (venue != source)."""
+    assert source_required("prediction", "trades") is False
+    assert source_required("prediction", "book_snapshot") is False
+
+
+def test_source_required_false_for_unregistered_pair() -> None:
+    """Unregistered pairs are not gated by source_required (non-raising)."""
+    assert source_required("defi", "made_up_data_type") is False
+    assert source_required("cefi", "made_up") is False
+
+
+def test_source_required_matches_external_cardinality() -> None:
+    """source_required True iff the cell has >1 *external* source — exhaustive."""
+    for asset_group, data_type in SOURCE_PRIORITY:
+        external = external_sources_for(asset_group, data_type)
+        assert source_required(asset_group, data_type) is (len(external) > 1)
+
+
+# ---------------------------------------------------------------------------
+# COMPUTED_SOURCES exemption + external_sources_for
+# ---------------------------------------------------------------------------
+
+
+def test_computed_sources_are_exempt_from_external() -> None:
+    """Computed/service emitters are filtered out of external_sources_for."""
+    # execution_fills / hedge_ratio_snapshot etc. have a computed source only.
+    assert external_sources_for("defi", "execution_fills") == []
+    assert external_sources_for("defi", "hedge_ratio_snapshot") == []
+    assert external_sources_for("defi", "feature_observation_snapshot") == []
+    assert external_sources_for("defi", "cross_instrument_signal") == []
+
+
+def test_external_sources_for_external_vendors() -> None:
+    """External-vendor cells return their full source list."""
+    assert external_sources_for("cefi", "trades") == ["tardis"]
+    assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink"]
+    assert external_sources_for("prediction", "trades") == ["polymarket_clob"]
+
+
+def test_computed_cells_not_source_required() -> None:
+    """Computed/service-only cells are exempt from the source gate."""
+    assert source_required("defi", "execution_fills") is False
+    assert source_required("defi", "hedge_ratio_snapshot") is False
+    assert source_required("cefi", "execution_fills") is False
+
+
+# ---------------------------------------------------------------------------
+# default_source — universal-stamping auto-fill for single external-source cells
+# ---------------------------------------------------------------------------
+
+
+def test_default_source_single_external_returns_that_source() -> None:
+    assert default_source("cefi", "trades") == "tardis"
+    assert default_source("defi", "swap") == "onchain_subgraph"
+    assert default_source("prediction", "trades") == "polymarket_clob"
+
+
+def test_default_source_multi_external_returns_none() -> None:
+    """Multi external-source cells cannot be auto-stamped (ambiguous)."""
+    assert default_source("tradfi", "trades") is None
+    assert default_source("defi", "oracle_prices") is None
+    assert default_source("sports", "FIXTURES") is None
+
+
+def test_default_source_computed_and_unregistered_return_none() -> None:
+    assert default_source("defi", "execution_fills") is None  # computed → exempt
+    assert default_source("defi", "made_up_data_type") is None  # unregistered
+
+
+def test_computed_sources_membership() -> None:
+    """The exempt set names the internal service emitters (not external vendors)."""
+    assert "execution_service" in COMPUTED_SOURCES
+    assert "strategy_service" in COMPUTED_SOURCES
+    assert "tardis" not in COMPUTED_SOURCES
+    assert "databento" not in COMPUTED_SOURCES
 
 
 # ---------------------------------------------------------------------------

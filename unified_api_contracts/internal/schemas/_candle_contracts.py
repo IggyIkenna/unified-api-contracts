@@ -469,6 +469,33 @@ for _tf in _TIMEFRAMES_SPORTS:
 
 
 # ---------------------------------------------------------------------------
+# Sports derived candles — odds_movement, odds_horizon_bucket,
+#                           arbitrage_opportunity  (1m / 15m / 1h)
+#
+# These adapters all produce standard CandleOutput (OHLCV + trade_count) with
+# ``symbol`` as the instrument anchor.  Unlike the base ``odds_ohlcv`` shape
+# they do NOT emit ``quote_count``/``source_count``.
+# base granularity for all three is 15m (UAC BASE_GRANULARITY_BY_DATA_TYPE) so
+# the MDPS timeframe loop skips 1m at runtime — registering 1m here is harmless
+# and keeps the sports timeframe catalogue consistent.
+# ---------------------------------------------------------------------------
+
+for _tf in _TIMEFRAMES_SPORTS:
+    for _sports_derived_dt in ("odds_movement", "odds_horizon_bucket", "arbitrage_opportunity"):
+        _register(
+            _build(
+                "sports",
+                "odds",
+                f"{_sports_derived_dt}_{_tf}",
+                symbol_column="symbol",
+                extra_cols=[],
+                anchor_col=None,
+                nullable_ohlcv=True,
+            )
+        )
+
+
+# ---------------------------------------------------------------------------
 # Prediction candles — prediction_market x trades (1m / 15m / 1h)
 # ---------------------------------------------------------------------------
 
@@ -504,6 +531,33 @@ for _tf in _TIMEFRAMES_PREDICTION_TRADES:
         _build(
             "prediction",
             "PREDICTION_MARKET",
+            _trades_key(_tf),
+            symbol_column="symbol",
+            extra_cols=[],
+            include_chain=False,
+            anchor_col=None,
+            nullable_ohlcv=True,
+        )
+    )
+
+
+# ---------------------------------------------------------------------------
+# Prediction UNKNOWN fallback — defensive safety net
+#
+# 2-segment legacy instrument_ids (``POLYMARKET:condition_id``) flow through
+# ``_infer_instrument_type`` step-5 fallback and emerge as instrument_type=
+# the condition_id string, NOT "UNKNOWN". The root fix for §6F P0 is in
+# ``PredictionTradesAdapter.preprocess()`` (3-segment keys); this UNKNOWN
+# fallback guards any residual edge-cases where the outer instrument_id is
+# empty or single-segment, causing step-6 to return "UNKNOWN".
+# Mirrors the defi UNKNOWN swaps_ohlcv pattern (lines 374-386 above).
+# ---------------------------------------------------------------------------
+
+for _tf in _TIMEFRAMES_PREDICTION_TRADES:
+    _register(
+        _build(
+            "prediction",
+            "UNKNOWN",
             _trades_key(_tf),
             symbol_column="symbol",
             extra_cols=[],

@@ -6,7 +6,7 @@ import re
 from enum import StrEnum
 from typing import Final
 
-_SCENARIO_ID_PATTERN: Final[re.Pattern[str]] = re.compile(r"^[a-z][a-z0-9_]+$")
+SCENARIO_ID_PATTERN: Final[re.Pattern[str]] = re.compile(r"^[a-z][a-z0-9_]+$")
 
 
 class ScenarioCategory(StrEnum):
@@ -98,7 +98,7 @@ class OutcomeCategory(StrEnum):
 
 
 __all__ = [
-    "_SCENARIO_ID_PATTERN",
+    "SCENARIO_ID_PATTERN",
     "OutcomeCategory",
     "ScenarioCategory",
     "ScenarioOverlayLayer",

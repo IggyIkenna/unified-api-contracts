@@ -39,10 +39,12 @@ class TestCanonicalizeDefiVenueCombined:
         # Hyphenated but suffix is not a known chain → passthrough.
         assert canonicalize_defi_venue_combined("BINANCE-SPOT") == "BINANCE-SPOT"
 
-    def test_glued_prefix_venue_stays_glued(self) -> None:
-        # VELODROMEV2 / TRADER_JOEV2 are themselves glued in PROTOCOL_CAPABILITIES,
-        # so glued IS canonical for them — the round-trip is a no-op.
-        assert canonicalize_defi_venue_combined("VELODROMEV2-OPTIMISM") == "VELODROMEV2-OPTIMISM"
+    def test_glued_prefix_venue_canonicalises_to_underscore(self) -> None:
+        # VELODROME_V2 / TRADER_JOE_V2 carry the underscore-canonical venue_prefix
+        # (operator 2026-06-01 — DF-17 glued-canonical reversed); the legacy glued
+        # form maps back to the underscore-canonical combined form.
+        assert canonicalize_defi_venue_combined("VELODROMEV2-OPTIMISM") == "VELODROME_V2-OPTIMISM"
+        assert canonicalize_defi_venue_combined("TRADER_JOEV2-AVALANCHE") == "TRADER_JOE_V2-AVALANCHE"
 
     def test_pancakeswap_v3_zksync_glued_to_canonical(self) -> None:
         # ZKSYNC is now in KNOWN_CHAINS (B5.9), so PANCAKESWAPV3-ZKSYNC parses and

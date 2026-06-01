@@ -41,8 +41,12 @@ from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
     SOURCE_PRIORITY,
+    DivergenceKind,
+    detect_dual_source_conflicts,
+    get_all_sources_with_priority,
     get_primary_source,
     read_with_source_priority,
+    select_primary_available_source,
 )
 
 # ---------------------------------------------------------------------------
@@ -239,3 +243,295 @@ def test_read_with_source_priority_exposed_from_crosscutting_namespace() -> None
     )
 
     assert facade_reader is read_with_source_priority
+
+
+# ---------------------------------------------------------------------------
+# Test 9 — get_all_sources_with_priority (Phase 2 multi-source building block)
+# ---------------------------------------------------------------------------
+
+
+def test_get_all_sources_single_source_cell_returns_list_of_one() -> None:
+    """Single-source cells return a one-element list."""
+    results = get_all_sources_with_priority("cefi", "trades")
+    assert len(results) == 1
+    source, mode = results[0]
+    assert source == "tardis"
+    assert mode is PipelineMode.BATCH_TARDIS
+
+
+def test_get_all_sources_multi_source_cell_returns_ordered_list() -> None:
+    """Multi-source cells (tradfi trades = databento + massive) return both in priority order."""
+    results = get_all_sources_with_priority("tradfi", "trades")
+    assert len(results) >= 2
+    sources = [s for s, _ in results]
+    assert sources[0] == "databento", "databento is primary for tradfi trades"
+    assert "massive" in sources, "massive is registered for tradfi trades"
+    assert sources.index("databento") < sources.index("massive"), "databento precedes massive"
+
+
+def test_get_all_sources_returns_batch_pipeline_modes() -> None:
+    """Every returned pipeline_mode must be a batch value."""
+    for source, mode in get_all_sources_with_priority("tradfi", "ohlcv_15m"):
+        assert is_batch(mode), f"source {source!r} returned non-batch mode {mode!r}"
+
+
+def test_get_all_sources_primary_matches_read_with_source_priority() -> None:
+    """Index-0 of get_all_sources must equal read_with_source_priority."""
+    for asset_group, data_type in SOURCE_PRIORITY:
+        all_sources = get_all_sources_with_priority(asset_group, data_type)
+        primary_source, primary_mode = read_with_source_priority(asset_group, data_type)
+        assert all_sources[0] == (primary_source, primary_mode), (
+            f"({asset_group!r}, {data_type!r}): all_sources[0]={all_sources[0]!r} "
+            f"!= read_with_source_priority result {(primary_source, primary_mode)!r}"
+        )
+
+
+def test_get_all_sources_raises_for_unknown_pair() -> None:
+    with pytest.raises(KeyError, match="No source priority registered"):
+        get_all_sources_with_priority("alien", "trades")
+
+
+def test_get_all_sources_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import (
+        get_all_sources_with_priority as facade_fn,
+    )
+
+    assert facade_fn is get_all_sources_with_priority
+
+
+# ---------------------------------------------------------------------------
+# Test 10 — select_primary_available_source (Phase 2 tie-breaker)
+# ---------------------------------------------------------------------------
+
+
+def test_select_primary_available_primary_only() -> None:
+    """Primary source available → returned (standard single-source case)."""
+    source, mode = select_primary_available_source("cefi", "trades", {"tardis"})
+    assert source == "tardis"
+    assert mode is PipelineMode.BATCH_TARDIS
+
+
+def test_select_primary_available_multi_source_primary_wins() -> None:
+    """When all sources are present, the primary (index-0) wins."""
+    source, mode = select_primary_available_source("tradfi", "trades", {"databento", "massive"})
+    assert source == "databento", "databento is primary for tradfi trades"
+    assert mode is PipelineMode.BATCH_DATABENTO
+
+
+def test_select_primary_available_fallback_to_secondary() -> None:
+    """When primary is absent but secondary is present, secondary wins."""
+    source, mode = select_primary_available_source("tradfi", "trades", {"massive"})
+    assert source == "massive"
+    assert mode is PipelineMode.BATCH_MASSIVE
+
+
+def test_select_primary_available_no_sources_raises() -> None:
+    """Empty / non-matching available_sources raises KeyError."""
+    with pytest.raises(KeyError, match="No registered source"):
+        select_primary_available_source("cefi", "trades", {"unknown_source"})
+
+
+def test_select_primary_available_empty_set_raises() -> None:
+    with pytest.raises(KeyError, match="No registered source"):
+        select_primary_available_source("tradfi", "trades", set())
+
+
+def test_select_primary_available_returns_batch_mode() -> None:
+    """Tie-breaker always returns a batch pipeline_mode."""
+    _, mode = select_primary_available_source("tradfi", "trades", {"massive"})
+    assert is_batch(mode)
+
+
+def test_select_primary_available_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import (
+        select_primary_available_source as facade_fn,
+    )
+
+    assert facade_fn is select_primary_available_source
+
+
+# ---------------------------------------------------------------------------
+# Tests 11 — DivergenceKind + detect_dual_source_conflicts (tasks -014, -015)
+# ---------------------------------------------------------------------------
+
+
+def test_divergence_kind_dual_source_duplicate_value() -> None:
+    """DivergenceKind.DUAL_SOURCE_DUPLICATE is a manifest-compatible string."""
+    assert DivergenceKind.DUAL_SOURCE_DUPLICATE == "DUAL_SOURCE_DUPLICATE"
+    assert isinstance(DivergenceKind.DUAL_SOURCE_DUPLICATE, str)
+
+
+def test_detect_dual_source_conflicts_happy_path_no_overlap() -> None:
+    """Happy path: two sources with completely distinct row-keys → no conflicts."""
+    keys_databento = {("NYSE", "2026-05-30", "AAPL", 1000), ("NYSE", "2026-05-30", "AAPL", 2000)}
+    keys_massive = {("NYSE", "2026-05-30", "MSFT", 1000), ("NYSE", "2026-05-30", "MSFT", 2000)}
+    result = detect_dual_source_conflicts(
+        "databento",
+        keys_databento,
+        "massive",
+        keys_massive,
+        asset_group="tradfi",
+        data_type="trades",
+    )
+    assert result == []
+
+
+def test_detect_dual_source_conflicts_with_duplicates() -> None:
+    """Conflict path: same row-key in both sources → returned in sorted order."""
+    shared_key = ("NYSE", "2026-05-30", "AAPL", 1000)
+    keys_databento = {shared_key, ("NYSE", "2026-05-30", "AAPL", 2000)}
+    keys_massive = {shared_key, ("NYSE", "2026-05-30", "MSFT", 1000)}
+    result = detect_dual_source_conflicts(
+        "databento",
+        keys_databento,
+        "massive",
+        keys_massive,
+        asset_group="tradfi",
+        data_type="trades",
+    )
+    assert result == [shared_key]
+    assert shared_key in result
+
+
+def test_detect_dual_source_conflicts_missing_source_a_present_source_b() -> None:
+    """Missing-source-A path: keys_a empty → no conflicts even if keys_b is full."""
+    keys_massive = {("NYSE", "2026-05-30", "SPY", 1000)}
+    result = detect_dual_source_conflicts(
+        "databento",
+        set(),
+        "massive",
+        keys_massive,
+        asset_group="tradfi",
+        data_type="ohlcv_1m",
+    )
+    assert result == []
+
+
+def test_detect_dual_source_conflicts_field_union_path() -> None:
+    """Field-union path: no key overlap → no DUAL_SOURCE_DUPLICATE even if both present."""
+    # When sources have non-overlapping keys, there's nothing to flag —
+    # the consumer unions the rows, not picks one.
+    keys_a = {("CME", "2026-05-30", "ES", 1000)}
+    keys_b = {("CME", "2026-05-30", "NQ", 1000)}
+    result = detect_dual_source_conflicts(
+        "databento",
+        keys_a,
+        "massive",
+        keys_b,
+        asset_group="tradfi",
+        data_type="futures_chain",
+    )
+    assert result == []
+
+
+def test_detect_dual_source_conflicts_logs_warning(caplog: pytest.LogCaptureFixture) -> None:
+    """Conflicts log at WARNING level with DUAL_SOURCE_DUPLICATE in the message."""
+    import logging
+
+    shared = ("NYSE", "2026-05-30", "AAPL", 500)
+    with caplog.at_level(logging.WARNING):
+        detect_dual_source_conflicts(
+            "databento",
+            {shared},
+            "massive",
+            {shared},
+            asset_group="tradfi",
+            data_type="trades",
+        )
+    assert any("DUAL_SOURCE_DUPLICATE" in r.message for r in caplog.records)
+
+
+def test_divergence_kind_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import DivergenceKind as DivergenceKindFacade
+
+    assert DivergenceKindFacade is DivergenceKind
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — multi-source resolution is GENERIC across cefi/defi/sports
+# (data_source_provenance_all_asset_groups_2026_06_01.md Phase 5 P0).
+# Proves the consumer-layer resolver picks exactly ONE primary source per cell
+# (no silent double-count) for every multi-source asset group, not just tradfi.
+# ---------------------------------------------------------------------------
+
+
+def test_select_primary_defi_oracle_prices_pyth_wins() -> None:
+    """DeFi oracle_prices: pyth_hermes is primary over chainlink → one resolved row."""
+    source, mode = select_primary_available_source(
+        "defi", "oracle_prices", {"pyth_hermes", "chainlink"}
+    )
+    assert source == "pyth_hermes"
+    assert is_batch(mode)
+
+
+def test_select_primary_defi_oracle_prices_fallback_to_chainlink() -> None:
+    """When pyth is absent, chainlink (secondary) wins — single resolved row."""
+    source, _ = select_primary_available_source("defi", "oracle_prices", {"chainlink"})
+    assert source == "chainlink"
+
+
+def test_select_primary_defi_native_staking_solana_rpc_wins() -> None:
+    source, _ = select_primary_available_source(
+        "defi", "native_staking_rates", {"solana_rpc", "helius_rpc"}
+    )
+    assert source == "solana_rpc"
+
+
+def test_select_primary_sports_fixtures_api_football_wins() -> None:
+    """Sports FIXTURES: api_football is primary over footystats → one resolved row."""
+    source, _ = select_primary_available_source(
+        "sports", "FIXTURES", {"api_football", "footystats"}
+    )
+    assert source == "api_football"
+
+
+def test_detect_dual_source_conflicts_defi_oracle_prices() -> None:
+    """DeFi co-mingled cell: same (chain, day, feed, ts) in both sources is flagged."""
+    shared = ("SOLANA", "2026-05-30", "SOL/USD", 1000)
+    result = detect_dual_source_conflicts(
+        "pyth_hermes",
+        {shared, ("SOLANA", "2026-05-30", "SOL/USD", 2000)},
+        "chainlink",
+        {shared},
+        asset_group="defi",
+        data_type="oracle_prices",
+    )
+    assert result == [shared]
+
+
+def test_detect_dual_source_conflicts_sports_fixtures() -> None:
+    """Sports co-mingled cell: same fixture from api_football + footystats flagged."""
+    shared = ("EPL", "2026-05-30", "fixture_42")
+    result = detect_dual_source_conflicts(
+        "api_football",
+        {shared},
+        "footystats",
+        {shared, ("EPL", "2026-05-30", "fixture_99")},
+        asset_group="sports",
+        data_type="FIXTURES",
+    )
+    assert result == [shared]
+
+
+def test_select_primary_resolves_single_row_for_all_multi_source_groups() -> None:
+    """Exhaustive: every multi-source cell resolves to exactly ONE primary source."""
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        SOURCE_PRIORITY,
+        external_sources_for,
+    )
+
+    for asset_group, data_type in SOURCE_PRIORITY:
+        external = external_sources_for(asset_group, data_type)
+        if len(external) <= 1:
+            continue
+        # All external sources present → resolves to the index-0 primary (one row).
+        source, _ = select_primary_available_source(asset_group, data_type, set(external))
+        assert source == external[0], f"{asset_group}/{data_type} primary mismatch"
+
+
+def test_detect_dual_source_conflicts_exposed_from_crosscutting_namespace() -> None:
+    from unified_api_contracts.canonical.crosscutting import (
+        detect_dual_source_conflicts as facade_fn,
+    )
+
+    assert facade_fn is detect_dual_source_conflicts

@@ -4055,11 +4055,11 @@
         "SUSHISWAP-ARBITRUM": ["sushiswap", "ARBITRUM"],
         "SUSHISWAP_V3-AVALANCHE": ["sushiswap_v3", "AVALANCHE"],
         "SUSHISWAP_V3-ETHEREUM": ["sushiswap_v3", "ETHEREUM"],
-        "TRADER_JOEV2-AVALANCHE": ["trader_joe_v2", "AVALANCHE"],
+        "TRADER_JOE_V2-AVALANCHE": ["trader_joe_v2", "AVALANCHE"],
         "UNISWAP_V2-ETHEREUM": ["uniswap_v2", "ETHEREUM"],
         "UNISWAP_V3-ETHEREUM": ["uniswap_v3", "ETHEREUM"],
         "UNISWAP_V4-ETHEREUM": ["uniswap_v4", "ETHEREUM"],
-        "VELODROMEV2-OPTIMISM": ["velodrome_v2", "OPTIMISM"]
+        "VELODROME_V2-OPTIMISM": ["velodrome_v2", "OPTIMISM"]
       }
     }
   },

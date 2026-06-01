@@ -7,7 +7,7 @@ from typing import Final, cast
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from ._enums import _SCENARIO_ID_PATTERN, ScenarioCategory, ScenarioOverlayLayer
+from ._enums import SCENARIO_ID_PATTERN, ScenarioCategory, ScenarioOverlayLayer
 from ._mutations import ScenarioMutationSpec
 from ._outcomes import ScenarioOutcomeAssertion
 
@@ -65,7 +65,7 @@ class ScenarioOverlay(BaseModel):
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     scenario_id: str
-    """Snake-case identifier; must match :data:`_SCENARIO_ID_PATTERN`."""
+    """Snake-case identifier; must match :data:`SCENARIO_ID_PATTERN`."""
 
     category: ScenarioCategory
     layer: ScenarioOverlayLayer
@@ -95,7 +95,7 @@ class ScenarioOverlay(BaseModel):
     @field_validator("scenario_id")
     @classmethod
     def _validate_id_format(cls, v: str) -> str:
-        if not _SCENARIO_ID_PATTERN.match(v):
+        if not SCENARIO_ID_PATTERN.match(v):
             raise ValueError(f"scenario_id {v!r} must match regex ^[a-z][a-z0-9_]+$ (snake_case ASCII identifier)")
         return v
 

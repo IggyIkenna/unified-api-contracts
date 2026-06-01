@@ -31,6 +31,7 @@ def _manifest_row(
     data_type: str,
     instrument_type: str | None,
     capture_status: str,
+    pipeline_mode: str | None = None,
 ) -> dict[str, object]:
     return {
         "date": day,
@@ -39,6 +40,7 @@ def _manifest_row(
         "instrument_type": instrument_type or "",
         "capture_status": capture_status,
         "instrument_count": 1,
+        "pipeline_mode": pipeline_mode,
     }
 
 
@@ -310,3 +312,89 @@ def test_tradfi_entry_bucket_is_none() -> None:
     if not tradfi_entries:
         pytest.skip("No TradFi capabilities seeded")
     assert all(e.get("bucket") is None for e in tradfi_entries)
+
+
+# ---------------------------------------------------------------------------
+# pipeline_modes dimension
+# ---------------------------------------------------------------------------
+
+
+def test_pipeline_modes_collected_from_manifest() -> None:
+    """Distinct pipeline_mode values for the filtered tuple are collected and sorted."""
+    today = date(2026, 4, 29)
+    # DERIBIT + trades is a known registry tuple (instrument_type="").
+    rows = [
+        _manifest_row(
+            day="2026-04-27",
+            venue="DERIBIT",
+            data_type="trades",
+            instrument_type=None,
+            capture_status="captured",
+            pipeline_mode="batch_tardis",
+        ),
+        _manifest_row(
+            day="2026-04-28",
+            venue="DERIBIT",
+            data_type="trades",
+            instrument_type=None,
+            capture_status="captured",
+            pipeline_mode="batch_databento",
+        ),
+        _manifest_row(
+            day="2026-04-29",
+            venue="DERIBIT",
+            data_type="trades",
+            instrument_type=None,
+            capture_status="captured",
+            pipeline_mode="batch_tardis",  # duplicate — deduped
+        ),
+    ]
+    loader = StaticManifestLoader({AssetGroup.CEFI: pd.DataFrame(rows)})
+    entries, _ = build_catalogue(loader, today=today)
+    entry = next(
+        e for e in entries if e["venue"] == "DERIBIT" and e["data_type"] == "trades" and e.get("instrument_type") == ""
+    )
+    assert entry["pipeline_modes"] == ["batch_databento", "batch_tardis"]
+
+
+def test_pipeline_modes_empty_when_column_absent() -> None:
+    """Entries have pipeline_modes=[] when manifest has no pipeline_mode column."""
+    today = date(2026, 4, 29)
+    rows = [
+        _manifest_row(
+            day="2026-04-29",
+            venue="DERIBIT",
+            data_type="trades",
+            instrument_type=None,
+            capture_status="captured",
+        )
+    ]
+    # Drop the pipeline_mode column to simulate pre-Phase-2 manifest
+    df = pd.DataFrame(rows).drop(columns=["pipeline_mode"])
+    loader = StaticManifestLoader({AssetGroup.CEFI: df})
+    entries, _ = build_catalogue(loader, today=today)
+    entry = next(
+        e for e in entries if e["venue"] == "DERIBIT" and e["data_type"] == "trades" and e.get("instrument_type") == ""
+    )
+    assert entry["pipeline_modes"] == []
+
+
+def test_markdown_includes_pipeline_modes_column() -> None:
+    """Pipeline Modes column appears in rendered markdown table."""
+    today = date(2026, 4, 29)
+    rows = [
+        _manifest_row(
+            day=(today - timedelta(days=i)).isoformat(),
+            venue="DERIBIT",
+            data_type="trades",
+            instrument_type=None,
+            capture_status="captured",
+            pipeline_mode="batch_tardis",
+        )
+        for i in range(0, 3)
+    ]
+    loader = StaticManifestLoader({AssetGroup.CEFI: pd.DataFrame(rows)})
+    entries, _ = build_catalogue(loader, today=today)
+    md = render_markdown(entries)
+    assert "Pipeline Modes" in md
+    assert "batch_tardis" in md

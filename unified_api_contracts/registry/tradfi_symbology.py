@@ -793,3 +793,34 @@ def extract_event_contract_shard_key(symbol: str) -> tuple[str, str, str] | None
     if not strike_part:
         return None
     return (root, resolution_month, strike_part)
+
+
+# ---------------------------------------------------------------------------
+# Massive (formerly Polygon.io) ticker helpers
+# ---------------------------------------------------------------------------
+# Massive uses native CME ticker format: ROOT + month_code + 2-digit year.
+# Examples: ESH26 (ES Mar 2026), CLN26 (CL Jul 2026), GCQ26 (GC Aug 2026).
+# No prefix, no separator — same as CME's own symbology and what the
+# Polygon.io /v3/reference/futures/contracts ``ticker`` field returns.
+# Convention determined from Polygon.io API documentation; live verification
+# against Massive REST API is pending MASSIVE_API_KEY availability on worker VMs.
+# See tradfi_massive_dual_source_2026_05_28.md task tradfi_massive_dual_source-005.
+
+
+def massive_futures_ticker(root: str, month_code: str, year_2digit: int) -> str:
+    """Return the Massive ticker string for a CME futures contract.
+
+    Format: ``{ROOT}{month_code}{year_2digit}`` — e.g. ``ESH26``, ``CLN26``, ``GCQ26``.
+
+    Args:
+        root: CME root symbol (``ES``, ``CL``, ``GC``, …).
+        month_code: Single uppercase CME month letter from ``FGHJKMNQUVXZ``.
+        year_2digit: 2-digit year (e.g. 26 for 2026).
+
+    Raises:
+        ValueError: If month_code is not a valid CME month letter.
+    """
+    mc = month_code.upper()
+    if mc not in _FUTURES_MONTH_CODE:
+        raise ValueError(f"Invalid CME month code: {month_code!r}. Must be one of FGHJKMNQUVXZ.")
+    return f"{root.upper()}{mc}{year_2digit:02d}"

@@ -13,6 +13,7 @@ import dataclasses
 from dataclasses import dataclass
 
 import pandas as pd
+import polars as pl
 
 
 class InstrumentInfo(dict[str, object]):
@@ -224,6 +225,24 @@ class CandleOutput:
         if not data:
             return pd.DataFrame()
         return pd.DataFrame(data)
+
+    def to_polars(self) -> pl.DataFrame:
+        """Convert non-None array fields to a polars DataFrame.
+
+        Pure-Polars sibling of to_dataframe() (MDPS pure-Polars migration
+        Stage 3 — plans/active/mdps_pure_polars_migration_2026_05_28.md).
+        Lets MDPS skip the numpy->pandas->parquet roundtrip on the output
+        side; polars writes the parquet directly from arrow arrays.
+        Returns an empty DataFrame if all fields are None.
+        """
+        data: dict[str, object] = {}
+        for f in dataclasses.fields(self):
+            v: object = getattr(self, f.name)  # pyright: ignore[reportAny]
+            if v is not None:
+                data[f.name] = v
+        if not data:
+            return pl.DataFrame()
+        return pl.DataFrame(data)
 
 
 __all__ = ["CandleOutput", "InstrumentInfo", "InstrumentMetadata"]

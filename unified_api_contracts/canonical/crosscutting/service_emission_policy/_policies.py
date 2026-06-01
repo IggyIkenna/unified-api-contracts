@@ -286,7 +286,7 @@ without operator review. Fail-loud forces the decision.
 """
 
 
-_EVENT_TO_STATE: Final[dict[EmissionLifecycleEvent, ServiceEmissionStateEnum]] = {
+EVENT_TO_STATE: Final[dict[EmissionLifecycleEvent, ServiceEmissionStateEnum]] = {
     EmissionLifecycleEvent.PUBLISHED_OK: ServiceEmissionStateEnum.PUBLISHED_OK,
     EmissionLifecycleEvent.PUBLISHED_DEGRADED: ServiceEmissionStateEnum.PUBLISHED_DEGRADED,
     EmissionLifecycleEvent.STALE_DATA: ServiceEmissionStateEnum.STALE_DATA_HEARTBEAT_ONLY,
@@ -295,6 +295,6 @@ _EVENT_TO_STATE: Final[dict[EmissionLifecycleEvent, ServiceEmissionStateEnum]] =
 
 
 __all__ = [
+    "EVENT_TO_STATE",
     "SERVICE_OUTPUT_POLICIES",
-    "_EVENT_TO_STATE",
 ]

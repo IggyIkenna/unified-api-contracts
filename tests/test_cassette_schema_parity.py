@@ -32,6 +32,7 @@ from typing import Final
 
 import pytest
 import yaml
+from yaml import CSafeLoader as _YamlLoader  # C extension: avoids pure-Python scanner hang on large cassette files
 
 logger = logging.getLogger(__name__)
 
@@ -106,7 +107,7 @@ def test_cassette_glob_finds_files() -> None:
 def test_cassette_is_valid_yaml(cassette_path: Path) -> None:
     """Each cassette YAML must parse without error."""
     content = cassette_path.read_text(encoding="utf-8")
-    parsed = yaml.safe_load(content)
+    parsed = yaml.load(content, Loader=_YamlLoader)
     assert parsed is not None, f"{cassette_path.name}: YAML loaded as None (empty file?)"
 
 
@@ -122,7 +123,7 @@ def test_cassette_vcr_format_or_skip(cassette_path: Path) -> None:
     vcrpy cassettes. These are valid files but not subject to VCR parity checks.
     """
     content = cassette_path.read_text(encoding="utf-8")
-    parsed: object = yaml.safe_load(content)
+    parsed: object = yaml.load(content, Loader=_YamlLoader)
     if not isinstance(parsed, dict) or "interactions" not in parsed:
         pytest.skip(f"{cassette_path.name} has no 'interactions' key -- not a vcrpy cassette; skipping parity check")
 
@@ -142,7 +143,7 @@ def test_cassette_response_body_is_valid_json(cassette_path: Path) -> None:
     with empty bodies are explicitly allowed.
     """
     content = cassette_path.read_text(encoding="utf-8")
-    parsed: object = yaml.safe_load(content)
+    parsed: object = yaml.load(content, Loader=_YamlLoader)
 
     if not isinstance(parsed, dict):
         pytest.skip(f"{cassette_path.name}: not a dict-rooted YAML")
@@ -231,7 +232,7 @@ def test_cassette_response_body_is_valid_json(cassette_path: Path) -> None:
 def test_cassette_has_version_field(cassette_path: Path) -> None:
     """VCR cassettes must have a top-level ``version`` field (vcrpy format requirement)."""
     content = cassette_path.read_text(encoding="utf-8")
-    parsed: object = yaml.safe_load(content)
+    parsed: object = yaml.load(content, Loader=_YamlLoader)
 
     if not isinstance(parsed, dict) or "interactions" not in parsed:
         pytest.skip(f"{cassette_path.name}: not a vcrpy cassette -- skipping version check")
