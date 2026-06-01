@@ -401,6 +401,7 @@ INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "FUTURE": "futures_chain",
     "OPTION": "options_chain",
     "POOL": "pools",
+    "DEX_POOL": "dex_pools",
     "LENDING": "lending",
     "STAKING": "staking",
     "BOND": "bonds",
