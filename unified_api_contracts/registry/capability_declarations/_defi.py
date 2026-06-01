@@ -417,14 +417,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "velodrome_v2": _ProtocolCapability(
-        venue_prefix="VELODROMEV2",
+        venue_prefix="VELODROME_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "trader_joe_v2": _ProtocolCapability(
-        venue_prefix="TRADER_JOEV2",
+        venue_prefix="TRADER_JOE_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -908,9 +908,9 @@ def parse_defi_venue(venue_str: str) -> tuple[str, str]:
 
 # Strip-underscore lookup: "AAVEV3" → "AAVE_V3" (the authoritative venue_prefix).
 # Built from PROTOCOL_CAPABILITIES venue_prefix set (33 prefixes, verified zero
-# strip-underscore collisions 2026-05-26). For prefixes that are themselves glued
-# in the authoritative set (VELODROMEV2, TRADER_JOEV2), glued IS canonical, so the
-# round-trip is a no-op.
+# strip-underscore collisions 2026-05-26). VELODROME_V2 / TRADER_JOE_V2 carry the
+# underscore-canonical prefix (operator 2026-06-01 — DF-17 glued-canonical reversed);
+# the stripped legacy form (VELODROMEV2 / TRADERJOEV2) maps back to the canonical.
 _STRIPPED_PREFIX_TO_CANONICAL: dict[str, str] = {
     prefix.replace("_", "").upper(): prefix for prefix in {cap.venue_prefix for cap in PROTOCOL_CAPABILITIES.values()}
 }
@@ -924,7 +924,7 @@ def canonicalize_defi_venue_combined(raw: str) -> str:
         "UNISWAPV3-ETHEREUM"  -> "UNISWAP_V3-ETHEREUM"
         "COMPOUNDV3-BASE"     -> "COMPOUND_V3-BASE"
         "AAVE_V3-ARBITRUM"    -> "AAVE_V3-ARBITRUM"   (already canonical → passthrough)
-        "VELODROMEV2-OPTIMISM"-> "VELODROMEV2-OPTIMISM" (glued IS canonical for this venue)
+        "VELODROMEV2-OPTIMISM"-> "VELODROME_V2-OPTIMISM" (legacy glued → underscore-canonical)
         "BINANCE"             -> "BINANCE"            (no known chain → passthrough)
 
     Algorithm:

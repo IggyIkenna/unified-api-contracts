@@ -413,7 +413,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
         "ARBITRUM",
         "CAMELOT_V3",
     ): "2023-04-08",  # Camelot V2 (Algebra conc-liq) stage-1; V3 same Algebra fork per CoinDesk + Camelot docs; medium
-    ("OPTIMISM", "VELODROMEV2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
+    ("OPTIMISM", "VELODROME_V2"): "2023-06-22",  # Velodrome V2 launch Medium post + Velodrome Finance blog; high
     ("OPTIMISM", "CURVE"): "2022-01-18",  # Curve Optimism deployment announcement tweet (TheDefiant, TheBlock); high
     (
         "AVALANCHE",
@@ -421,7 +421,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
     ): "2021-08-18",  # Curve Avalanche deployment via Avalanche Rush program (TheDefiant + Avalanche Medium); high
     (
         "AVALANCHE",
-        "TRADER_JOEV2",
+        "TRADER_JOE_V2",
     ): "2022-11-17",  # Trader Joe Liquidity Book V2 live per TokenInsight + TheDefiant; high
     (
         "BASE",

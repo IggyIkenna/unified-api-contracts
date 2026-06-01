@@ -3,7 +3,7 @@
 Asserts that every venue-keyed dict in UAC uses canonical uppercase keys and that
 ``to_canonical_venue`` resolves all known aliases.
 
-Covers DF-4 (BLAZESTAKE→SOLBLAZE-SOLANA), DF-17 (TRADERJOEV2→TRADER_JOEV2),
+Covers DF-4 (BLAZESTAKE→SOLBLAZE-SOLANA), DF-17 (TRADERJOEV2→TRADER_JOE_V2, underscore-canonical 2026-06-01),
 CF-3 (CeFi uppercase), SP-3 (Sports uppercase).
 
 CF-4 (BINANCE vs BINANCE-SPOT split) is NOT covered here — requires structural
@@ -44,8 +44,11 @@ from unified_api_contracts.registry.market_data_categories import VENUES_BY_ASSE
         # DeFi alias resolution
         ("aavev3", "AAVE_V3-ETHEREUM"),
         ("AAVE_V3", "AAVE_V3-ETHEREUM"),
-        ("trader_joev2", "TRADER_JOEV2-AVALANCHE"),
-        ("TRADERJOEV2-AVALANCHE", "TRADER_JOEV2-AVALANCHE"),  # DF-17
+        ("trader_joev2", "TRADER_JOE_V2-AVALANCHE"),
+        ("TRADERJOEV2-AVALANCHE", "TRADER_JOE_V2-AVALANCHE"),  # DF-17 (underscore-canonical 2026-06-01)
+        ("TRADER_JOEV2-AVALANCHE", "TRADER_JOE_V2-AVALANCHE"),  # legacy glued -CHAIN → canonical
+        ("velodromev2", "VELODROME_V2-OPTIMISM"),
+        ("VELODROMEV2-OPTIMISM", "VELODROME_V2-OPTIMISM"),  # legacy glued -CHAIN → canonical
         ("blazestake", "SOLBLAZE-SOLANA"),  # DF-4
         ("BLAZESTAKE-SOLANA", "SOLBLAZE-SOLANA"),  # DF-4
         ("solblaze", "SOLBLAZE-SOLANA"),

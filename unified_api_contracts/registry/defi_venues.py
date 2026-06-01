@@ -136,7 +136,7 @@ ALL_DEFI_VENUES: list[str] = [
     "COMPOUND_V3-OPTIMISM",
     "BALANCER-OPTIMISM",
     "CURVE-OPTIMISM",
-    "VELODROMEV2-OPTIMISM",
+    "VELODROME_V2-OPTIMISM",
     # ── Catalogue Phase 1A new Optimism entries (slot 5 2026-05-11) ──
     "YEARN_V3-OPTIMISM",
     # ── Optimism MTDS-backfilled lending (added 2026-05-22) ──
@@ -157,7 +157,7 @@ ALL_DEFI_VENUES: list[str] = [
     "CURVE-AVALANCHE",
     "GMX-AVALANCHE",
     "SUSHISWAP_V3-AVALANCHE",
-    "TRADER_JOEV2-AVALANCHE",
+    "TRADER_JOE_V2-AVALANCHE",
     # ── Catalogue Phase 1A new Avalanche entries (slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE",
     # ── Avalanche MTDS-backfilled lending (added 2026-05-22) ──
@@ -276,10 +276,14 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     "PANCAKESWAP_V3": "PANCAKESWAP_V3-ETHEREUM",
     "CAMELOT_V3": "CAMELOT_V3-ARBITRUM",
     "AERODROME_V3": "AERODROME_V3-BASE",
-    "VELODROME_V2": "VELODROMEV2-OPTIMISM",
-    "VELODROMEV2": "VELODROMEV2-OPTIMISM",
-    "TRADER_JOE_V2": "TRADER_JOEV2-AVALANCHE",
-    "TRADER_JOEV2": "TRADER_JOEV2-AVALANCHE",
+    # Canonical underscore form (operator 2026-06-01 — DF-17 glued-canonical reversed).
+    # Legacy glued forms (VELODROMEV2 / TRADER_JOEV2, bare + full -CHAIN) resolve to it.
+    "VELODROME_V2": "VELODROME_V2-OPTIMISM",
+    "VELODROMEV2": "VELODROME_V2-OPTIMISM",
+    "VELODROMEV2-OPTIMISM": "VELODROME_V2-OPTIMISM",
+    "TRADER_JOE_V2": "TRADER_JOE_V2-AVALANCHE",
+    "TRADER_JOEV2": "TRADER_JOE_V2-AVALANCHE",
+    "TRADER_JOEV2-AVALANCHE": "TRADER_JOE_V2-AVALANCHE",
     # Lending
     "AAVE_V3": "AAVE_V3-ETHEREUM",
     "AAVEV3": "AAVE_V3-ETHEREUM",  # alias: no-underscore form used by some callers
@@ -347,7 +351,7 @@ LEGACY_DEFI_VENUE_ALIASES: dict[str, str] = {
     # Phase 1D case-folding drift fixes (cross_asset_group_catalogue_audit DF-4/DF-17)
     "BLAZESTAKE": "SOLBLAZE-SOLANA",  # DF-4: _defi_lst.py uses BLAZESTAKE; canonical is SOLBLAZE
     "BLAZESTAKE-SOLANA": "SOLBLAZE-SOLANA",  # DF-4: full-form variant
-    "TRADERJOEV2-AVALANCHE": "TRADER_JOEV2-AVALANCHE",  # DF-17: protocol registry had no-underscore form
+    "TRADERJOEV2-AVALANCHE": "TRADER_JOE_V2-AVALANCHE",  # DF-17 (reversed 2026-06-01): underscore canonical
 }
 
 
@@ -357,7 +361,7 @@ def to_canonical_venue(venue_id: str) -> str:
     For CeFi and sports venues this is equivalent to ``venue_id.upper()``.
     For DeFi venues it also resolves legacy bare-name and underscore forms
     (e.g. ``aavev3`` → ``AAVE_V3-ETHEREUM``, ``TRADERJOEV2-AVALANCHE`` →
-    ``TRADER_JOEV2-AVALANCHE``) via ``LEGACY_DEFI_VENUE_ALIASES``.
+    ``TRADER_JOE_V2-AVALANCHE``) via ``LEGACY_DEFI_VENUE_ALIASES``.
 
     Cross-asset-group SSOT for venue-id normalisation.
     SSOT: cross_asset_group_catalogue_audit_2026_05_10.md Phase 1D.
@@ -466,7 +470,7 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "COMPOUND_V3-OPTIMISM": "pipeline",
     "BALANCER-OPTIMISM": "pipeline",
     "CURVE-OPTIMISM": "pipeline",
-    "VELODROMEV2-OPTIMISM": "pipeline",
+    "VELODROME_V2-OPTIMISM": "pipeline",
     # ── Pipeline (Optimism catalogue Phase 1A, slot 5 2026-05-11) ──
     "YEARN_V3-OPTIMISM": "pipeline",
     # ── Pipeline (Polygon) ──
@@ -483,7 +487,7 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "CURVE-AVALANCHE": "pipeline",
     "GMX-AVALANCHE": "pipeline",
     "SUSHISWAP_V3-AVALANCHE": "pipeline",
-    "TRADER_JOEV2-AVALANCHE": "pipeline",
+    "TRADER_JOE_V2-AVALANCHE": "pipeline",
     # ── Pipeline (Avalanche catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE": "pipeline",
     # ── Pipeline (BSC) ──

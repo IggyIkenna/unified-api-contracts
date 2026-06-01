@@ -556,7 +556,7 @@ def _is_deprecated_defi_venue(data_source: str) -> bool:
     """True if the DeFi venue is in the workspace-canonical deprecated/empty set.
 
     SSOT: ``capability_declarations._defi_coverage.EMPTY_OR_DEPRECATED_DEFI_VENUES``
-    (e.g. ``TRADER_JOEV2-AVALANCHE``, ``UNISWAP_V3-POLYGON``, ``GMX-AVALANCHE``).
+    (e.g. ``TRADER_JOE_V2-AVALANCHE``, ``UNISWAP_V3-POLYGON``, ``GMX-AVALANCHE``).
     These venues either have empty/retired subgraphs or no historical parquets;
     flagging them as ``EXPECTED_DEPRECATED_DATA_TYPE`` keeps the divergence
     report honest.
@@ -571,7 +571,7 @@ def _is_defi_not_yet_collected(data_source: str) -> bool:
     backfilled it yet.
 
     SSOT: ``capability_declarations._defi_coverage.DEFI_INSTRUMENTS_NOT_YET_COLLECTED``
-    (e.g. ``VELODROMEV2-OPTIMISM``, ``SPARK-ETHEREUM``, ``SANCTUM-SOLANA``,
+    (e.g. ``VELODROME_V2-OPTIMISM``, ``SPARK-ETHEREUM``, ``SANCTUM-SOLANA``,
     ``SOLBLAZE-SOLANA``). Until first parquet writes land, historical days for
     these venues should NOT count as ``MISSING_EXPECTED``.
     """

@@ -127,8 +127,8 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "PANCAKESWAP_V3-BSC": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
     "CAMELOT_V3-ARBITRUM": {"dex_swaps": "2023-05-01", "dex_pools": "2023-05-01"},
     "AERODROME_V3-BASE": {"dex_swaps": "2023-08-28", "dex_pools": "2023-08-28"},
-    "VELODROMEV2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
-    "TRADER_JOEV2-AVALANCHE": {"dex_swaps": "2022-01-01", "dex_pools": "2022-01-01"},
+    "VELODROME_V2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
+    "TRADER_JOE_V2-AVALANCHE": {"dex_swaps": "2022-01-01", "dex_pools": "2022-01-01"},
     # ── DeFi — Perpetual DEXes (funding + liquidations) ──
     # axis_override = "cefi" — CLOB-style perp funding captured via MTDS
     # perp_funding_handler. See DEFI_VENUE_AXIS_OVERRIDES in defi_venues.py.
