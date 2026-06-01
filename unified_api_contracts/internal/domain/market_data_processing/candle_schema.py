@@ -53,6 +53,26 @@ class DataType(StrEnum):
     LIQUIDATION_THRESHOLD = "liquidation_threshold"
     EMODE_PARAMS = "emode_params"
     PERP_FUNDING = "perp_funding"
+    # Solana basis-trading MVP scope (plan:
+    # plans/active/solana_basis_trading_mvp_2026_06_01.md Phase 1+2).
+    # `PERP_TRADES` is per-fill ground truth for CLOB / hybrid-AMM venues
+    # (Drift V2 backtest); `PERP_MARK_ORACLE` + `PERP_OPEN_INTEREST` are
+    # downstream-consumable derivatives of `PERP_FUNDING` row columns
+    # (`oraclePriceTwap`/`markPriceTwap` and `baseAssetAmountWithAmm`).
+    PERP_TRADES = "perp_trades"
+    PERP_MARK_ORACLE = "perp_mark_oracle"
+    PERP_OPEN_INTEREST = "perp_open_interest"
+    # Spot DEX time-series state (distinct from the existing `DEX_POOLS`
+    # *snapshot* type already declared above). `DEX_POOL_STATE` carries
+    # reserves OR concentrated-liquidity tick arrays at block heights for
+    # backtest replay. `DEX_ORDERBOOK` is CLOB-style bid/ask levels at
+    # block heights (Phoenix). `DEX_QUOTE` is aggregator-sampled quote
+    # responses (Jupiter). `DEX_TRADES` is per-swap fill events on AMM
+    # venues (Orca/Raydium swap event stream).
+    DEX_POOL_STATE = "dex_pool_state"
+    DEX_ORDERBOOK = "dex_orderbook"
+    DEX_QUOTE = "dex_quote"
+    DEX_TRADES = "dex_trades"
     LST_RATES = "lst_rates"
     ORACLE_PRICES = "oracle_prices"
     GAS_FEES = "gas_fees"

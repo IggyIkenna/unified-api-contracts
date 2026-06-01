@@ -299,6 +299,34 @@ class TestCandleSchema:
         # StrEnum means string comparison works
         assert DataType.TRADES == "trades"
 
+    def test_solana_basis_mvp_data_types(self) -> None:
+        """plans/active/solana_basis_trading_mvp_2026_06_01.md — Phase 1+2 scope.
+
+        Asserts that the closed-set DataType enum declares the seven new types
+        required by the Solana basis-trading MVP (Drift V2 perp ground-truth
+        types + Solana spot-DEX time-series state types). These are referenced
+        by ``DriftV2HistoricalIngester`` (MTDS) + the Phase-2 Orca / Raydium /
+        Phoenix / Jupiter ingesters; flipping any of these to a different
+        string is a wire-format break.
+        """
+        from unified_api_contracts.internal.domain.market_data_processing.candle_schema import DataType
+
+        # Drift V2 perp ground-truth (Phase 1)
+        assert DataType.PERP_TRADES == "perp_trades"
+        assert DataType.PERP_MARK_ORACLE == "perp_mark_oracle"
+        assert DataType.PERP_OPEN_INTEREST == "perp_open_interest"
+        # Spot DEX time-series state (Phase 2)
+        assert DataType.DEX_POOL_STATE == "dex_pool_state"
+        assert DataType.DEX_ORDERBOOK == "dex_orderbook"
+        assert DataType.DEX_QUOTE == "dex_quote"
+        assert DataType.DEX_TRADES == "dex_trades"
+        # Sanity: pre-existing perp_funding remains unchanged
+        assert DataType.PERP_FUNDING == "perp_funding"
+        # Sanity: pre-existing dex_pools snapshot type is distinct from
+        # the new dex_pool_state time-series type
+        assert DataType.DEX_POOLS == "dex_pools"
+        assert DataType.DEX_POOLS != DataType.DEX_POOL_STATE
+
     def test_all_exports(self) -> None:
         import unified_api_contracts.internal.domain.market_data_processing.candle_schema as m
 
