@@ -70,7 +70,11 @@ from .canonical.crosscutting.cme_polymarket_link import (
     LINKED_CME_ROOTS,
     linked_question_group,
 )
-from .canonical.crosscutting.defi import ChainKind
+from .canonical.crosscutting.defi import (
+    CHAIN_WIRE_VALUE_OVERRIDES,
+    ChainKind,
+    to_canonical_chain_wire,
+)
 from .canonical.crosscutting.errors import (
     VENUE_ERROR_MAP,
     CanonicalAuthenticationError,
@@ -1271,6 +1275,7 @@ __all__ = [
     "CcxtOrderBook",
     "CcxtTicker",
     "CcxtTrade",
+    "CHAIN_WIRE_VALUE_OVERRIDES",
     "ChainKind",
     "CircuitBreakerId",
     "ClientLifecycleEvent",
@@ -1704,6 +1709,7 @@ __all__ = [
     "validate_data_type_for_venue",
     "validate_dataframe",
     "validate_preflight_for_trigger",
+    "to_canonical_chain_wire",
     "validate_row_df",
     "venue_has_no_expected_defi_coverage",
     "TARDIS_FREE_ROLLING_WINDOW_DAYS",
