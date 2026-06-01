@@ -447,6 +447,88 @@ def test_divergence_kind_exposed_from_crosscutting_namespace() -> None:
     assert DivergenceKindFacade is DivergenceKind
 
 
+# ---------------------------------------------------------------------------
+# Phase 5 — multi-source resolution is GENERIC across cefi/defi/sports
+# (data_source_provenance_all_asset_groups_2026_06_01.md Phase 5 P0).
+# Proves the consumer-layer resolver picks exactly ONE primary source per cell
+# (no silent double-count) for every multi-source asset group, not just tradfi.
+# ---------------------------------------------------------------------------
+
+
+def test_select_primary_defi_oracle_prices_pyth_wins() -> None:
+    """DeFi oracle_prices: pyth_hermes is primary over chainlink → one resolved row."""
+    source, mode = select_primary_available_source(
+        "defi", "oracle_prices", {"pyth_hermes", "chainlink"}
+    )
+    assert source == "pyth_hermes"
+    assert is_batch(mode)
+
+
+def test_select_primary_defi_oracle_prices_fallback_to_chainlink() -> None:
+    """When pyth is absent, chainlink (secondary) wins — single resolved row."""
+    source, _ = select_primary_available_source("defi", "oracle_prices", {"chainlink"})
+    assert source == "chainlink"
+
+
+def test_select_primary_defi_native_staking_solana_rpc_wins() -> None:
+    source, _ = select_primary_available_source(
+        "defi", "native_staking_rates", {"solana_rpc", "helius_rpc"}
+    )
+    assert source == "solana_rpc"
+
+
+def test_select_primary_sports_fixtures_api_football_wins() -> None:
+    """Sports FIXTURES: api_football is primary over footystats → one resolved row."""
+    source, _ = select_primary_available_source(
+        "sports", "FIXTURES", {"api_football", "footystats"}
+    )
+    assert source == "api_football"
+
+
+def test_detect_dual_source_conflicts_defi_oracle_prices() -> None:
+    """DeFi co-mingled cell: same (chain, day, feed, ts) in both sources is flagged."""
+    shared = ("SOLANA", "2026-05-30", "SOL/USD", 1000)
+    result = detect_dual_source_conflicts(
+        "pyth_hermes",
+        {shared, ("SOLANA", "2026-05-30", "SOL/USD", 2000)},
+        "chainlink",
+        {shared},
+        asset_group="defi",
+        data_type="oracle_prices",
+    )
+    assert result == [shared]
+
+
+def test_detect_dual_source_conflicts_sports_fixtures() -> None:
+    """Sports co-mingled cell: same fixture from api_football + footystats flagged."""
+    shared = ("EPL", "2026-05-30", "fixture_42")
+    result = detect_dual_source_conflicts(
+        "api_football",
+        {shared},
+        "footystats",
+        {shared, ("EPL", "2026-05-30", "fixture_99")},
+        asset_group="sports",
+        data_type="FIXTURES",
+    )
+    assert result == [shared]
+
+
+def test_select_primary_resolves_single_row_for_all_multi_source_groups() -> None:
+    """Exhaustive: every multi-source cell resolves to exactly ONE primary source."""
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        SOURCE_PRIORITY,
+        external_sources_for,
+    )
+
+    for asset_group, data_type in SOURCE_PRIORITY:
+        external = external_sources_for(asset_group, data_type)
+        if len(external) <= 1:
+            continue
+        # All external sources present → resolves to the index-0 primary (one row).
+        source, _ = select_primary_available_source(asset_group, data_type, set(external))
+        assert source == external[0], f"{asset_group}/{data_type} primary mismatch"
+
+
 def test_detect_dual_source_conflicts_exposed_from_crosscutting_namespace() -> None:
     from unified_api_contracts.canonical.crosscutting import (
         detect_dual_source_conflicts as facade_fn,
