@@ -188,12 +188,15 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    default_source,
     emission_latency_ms_for_source,
+    external_sources_for,
     get_primary_source,
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
     read_with_source_priority,
+    source_required,
 )
 from .canonical.crosscutting.strategy_family import (
     STRATEGY_FAMILY_REGISTRY,
@@ -1691,9 +1694,12 @@ __all__ = [
     "register_scenario",
     "resolve_environment_from_env",
     "resolve_data_type_for_feature_group",
+    "default_source",
+    "external_sources_for",
     "resolve_environment_from_hostname",
     "resolve_exchange",
     "scenarios_for_archetype",
+    "source_required",
     "source_string_for",
     "validate_data_type_for_venue",
     "validate_dataframe",

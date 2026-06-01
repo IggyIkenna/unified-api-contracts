@@ -338,6 +338,96 @@ def has_source_priority(asset_group: str, data_type: str) -> bool:
     return (asset_group, data_type) in SOURCE_PRIORITY
 
 
+COMPUTED_SOURCES: Final[frozenset[str]] = frozenset(
+    {
+        # Internal service emitters — NOT external market-data vendors. Their
+        # rows' lineage is the upstream cell they were computed from, not a
+        # vendor, so the data-source provenance gate is N/A for them
+        # (data_source_provenance_all_asset_groups_2026_06_01.md § Scope
+        # boundary — "EXEMPT: computed, no external vendor"). These source
+        # strings exist in SOURCE_PRIORITY only to satisfy the PipelineMode
+        # closed-set round-trip; they are exempt from source stamping.
+        "execution_service",  # execution-service fills
+        "strategy_service",  # strategy-service hedge-ratio / decision-context
+        "features_onchain_service",  # features-onchain per-tick snapshots
+        "cross_instrument",  # features-service cross_instrument family outputs
+    }
+)
+"""Source strings denoting internal computed/service emitters (provenance-exempt).
+
+The data-source provenance gate
+(``data_source_provenance_all_asset_groups_2026_06_01.md``) stamps ``source``
+on every *external-vendor* market-data cell. Cells whose only source(s) are
+internal service emitters carry no external provenance — their lineage is the
+upstream cell, not a vendor — so they are exempt from the gate. Membership here
+is the principled exemption (vs a hardcoded data_type list)."""
+
+
+def external_sources_for(asset_group: str, data_type: str) -> list[str]:
+    """Return the external-vendor sources for a cell (computed sources removed).
+
+    A cell's :data:`SOURCE_PRIORITY` list may mix external vendors with
+    internal computed emitters (see :data:`COMPUTED_SOURCES`). This returns
+    only the external entries, preserving priority order. Empty list when the
+    pair is unregistered OR every source is a computed/service emitter.
+    """
+    return [s for s in SOURCE_PRIORITY.get((asset_group, data_type), ()) if s not in COMPUTED_SOURCES]
+
+
+def source_required(asset_group: str, data_type: str) -> bool:
+    """Return True when the writer MUST be *passed* an explicit ``source``.
+
+    SSOT for the multi-source disambiguation half of the writer-side gate in
+    ``unified_trading_library.manifest_writer`` (record_captured / add). A cell
+    requires an explicit source ONLY when it has **more than one external
+    source** — because the writer cannot otherwise know which provider served
+    the row.
+
+    Single-source external cells do NOT require an explicit source: the writer
+    auto-stamps the sole registered external source via :func:`default_source`
+    (universal stamping — every external cell carries ``source`` for
+    swap-resilience, per the 2026-06-01 operator decision). Computed/service
+    cells (:data:`COMPUTED_SOURCES`) and unregistered pairs are exempt.
+
+    * TradFi ``trades`` (databento + massive)        → True (explicit needed)
+    * DeFi ``oracle_prices`` (pyth_hermes+chainlink) → True
+    * DeFi ``native_staking_rates`` (solana+helius)  → True
+    * Sports ``FIXTURES`` (api_football+footystats)  → True
+    * CeFi ``trades`` (tardis)                        → False (auto-stamped)
+    * Prediction ``trades`` (polymarket_clob)         → False (auto-stamped)
+    * DeFi ``execution_fills`` (execution_service)    → False (computed-exempt)
+    * Unregistered pair                               → False
+
+    Args:
+        asset_group: ``cefi`` / ``defi`` / ``tradfi`` / ``prediction`` /
+            ``sports`` / ``reference``. (The writer passes its ``category``.)
+        data_type: Canonical data_type string.
+
+    Returns:
+        ``True`` iff the pair has >1 external source.
+    """
+    return len(external_sources_for(asset_group, data_type)) > 1
+
+
+def default_source(asset_group: str, data_type: str) -> str | None:
+    """Return the auto-stampable source for a single-source external cell.
+
+    Universal-stamping helper (``data_source_provenance_all_asset_groups_2026_06_01.md``):
+    when a cell has exactly **one** external source, the writer auto-stamps it
+    so the row carries provenance even though only one vendor exists today
+    (swap-resilience — when a 2nd vendor or a replacement lands, pre-existing
+    rows stay distinguishable from the new source).
+
+    Returns:
+        The sole external source string when the cell has exactly one external
+        source; ``None`` when the cell is multi-source (caller must pass an
+        explicit source), computed/service-only, or unregistered (nothing to
+        auto-stamp).
+    """
+    external = external_sources_for(asset_group, data_type)
+    return external[0] if len(external) == 1 else None
+
+
 EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # Tick-level live sources — sub-second tick-to-pipeline arrival.
     "tardis": 50,  # multi-venue WS aggregator
@@ -712,12 +802,15 @@ def get_all_sources_with_priority(
 
 
 __all__ = [
+    "COMPUTED_SOURCES",
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",
     "DivergenceKind",
     "assert_emission_latency_round_trip",
+    "default_source",
     "detect_dual_source_conflicts",
     "emission_latency_ms_for_source",
+    "external_sources_for",
     "get_all_sources_with_priority",
     "get_primary_source",
     "get_primary_source_with_latency",
@@ -725,4 +818,5 @@ __all__ = [
     "has_source_priority",
     "read_with_source_priority",
     "select_primary_available_source",
+    "source_required",
 ]
