@@ -457,9 +457,7 @@ def test_divergence_kind_exposed_from_crosscutting_namespace() -> None:
 
 def test_select_primary_defi_oracle_prices_pyth_wins() -> None:
     """DeFi oracle_prices: pyth_hermes is primary over chainlink → one resolved row."""
-    source, mode = select_primary_available_source(
-        "defi", "oracle_prices", {"pyth_hermes", "chainlink"}
-    )
+    source, mode = select_primary_available_source("defi", "oracle_prices", {"pyth_hermes", "chainlink"})
     assert source == "pyth_hermes"
     assert is_batch(mode)
 
@@ -471,17 +469,13 @@ def test_select_primary_defi_oracle_prices_fallback_to_chainlink() -> None:
 
 
 def test_select_primary_defi_native_staking_solana_rpc_wins() -> None:
-    source, _ = select_primary_available_source(
-        "defi", "native_staking_rates", {"solana_rpc", "helius_rpc"}
-    )
+    source, _ = select_primary_available_source("defi", "native_staking_rates", {"solana_rpc", "helius_rpc"})
     assert source == "solana_rpc"
 
 
 def test_select_primary_sports_fixtures_api_football_wins() -> None:
     """Sports FIXTURES: api_football is primary over footystats → one resolved row."""
-    source, _ = select_primary_available_source(
-        "sports", "FIXTURES", {"api_football", "footystats"}
-    )
+    source, _ = select_primary_available_source("sports", "FIXTURES", {"api_football", "footystats"})
     assert source == "api_football"
 
 
