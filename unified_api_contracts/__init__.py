@@ -1724,11 +1724,11 @@ __all__ = [
 # fmt: off
 _VENUES = [
     "alchemy", "api_football", "aster", "barchart", "betfair", "binance",
-    "bybit", "cambrian", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
+    "bybit", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
     "deribit", "eigenlayer", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
     "mev", "metabet", "morpho_blue_api", "nautilus", "odds_api", "odds_engine", "okx",
-    "open_meteo", "opticodds", "picasso", "pinnacle", "polymarket", "soccer_football_info",
-    "sky", "solayer", "tardis", "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
+    "open_meteo", "opticodds", "pinnacle", "polymarket", "soccer_football_info",
+    "sky", "tardis", "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
 ]
 # fmt: on
 for _v in _VENUES:

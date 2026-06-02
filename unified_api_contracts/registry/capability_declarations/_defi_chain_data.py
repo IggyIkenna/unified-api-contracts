@@ -654,20 +654,10 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "pythnet_url": "https://pythnet.rpcpool.com",
         "data_source": "pyth_hermes",
     },
-    # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
-    "solayer": {
-        "name": "Solayer (Endogenous AVS Restaking)",
-        "type": "restaking",
-        # Solayer Endogenous Vault program — best-guess; verify from official Solayer docs.
-        # sSOL token mint (Solscan-verified): sSo14endRuUbvQaJS3dq36Q829a3A6BEfoeeRGJywEh
-        "program_id": "SolayerEndoAVSSo11111111111111111111111111112",
-        "api_url": "https://app.solayer.org/api",
-        "data_source": "solayer_api",
-    },
-    # picasso + cambrian removed 2026-06-02 (operator decision): 2026-06-02 smoke tests
-    # found no usable public DeFi data source (Picasso ~3 tx/month, no yield API; Cambrian
-    # is a dev SDK, not a venue). Their program_ids here were "best-guess" placeholders
-    # anyway. Excluded from the registry. SSOT:
+    # solayer + picasso + cambrian removed 2026-06-02 (operator decision): no usable/decodable
+    # DeFi data source. Solayer = sSOL is a custom LRT vault with no decodable exchange-rate
+    # layout / no IDL (program_id here was a "best-guess" placeholder). Picasso ~3 tx/month,
+    # no yield API; Cambrian is a dev SDK, not a venue. Excluded from the registry. SSOT:
     # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md.
 }
 

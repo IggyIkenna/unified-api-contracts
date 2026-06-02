@@ -1,8 +1,0 @@
-# BLOCKED-NO-ADAPTER — cassette not yet live-recorded.
-# Solayer adapter not yet implemented in market-tick-data-service.
-# Capability declared in UAC registry/capability_declarations/_defi.py.
-# API URL: https://app.solayer.org/api
-# Run with INTEGRATION_TEST_MODE=live once the adapter is implemented.
-# See unified-trading-codex/07-security/testing-with-api-keys.md for procedure.
-interactions: []
-version: 1

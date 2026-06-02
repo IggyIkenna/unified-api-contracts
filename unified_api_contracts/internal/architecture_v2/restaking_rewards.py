@@ -65,7 +65,7 @@ class RewardPnLLayer(StrEnum):
     LST per period."""
 
     CARRY_AVS_CONTINUOUS = "CARRY_AVS_CONTINUOUS"
-    """EigenLayer / Karak / Symbiotic / Solayer continuous AVS rewards,
+    """EigenLayer / Karak / Symbiotic continuous AVS rewards,
     paid per-token (EIGEN, KARAK, ARPA, AVS-specific tokens) and indexed
     to AVS-protocol-level reward distributions. Sourced from
     ``eigenlayer_rewards`` parquet today; per-AVS sources to be added.
