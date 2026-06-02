@@ -176,6 +176,47 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "spark": {  # Messari lending schema (same as Aave V3 — MakerDAO fork)
         "ETHEREUM": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si",
     },
+    # ── Green-venue adapters (2026-06-02 per-venue smoke tests; slot 7) ──
+    # Venus — Venus-native Compound-fork schema (entity ``markets``;
+    # ``supplyRateMantissa``/``borrowRateMantissa`` are PER-BLOCK mantissa
+    # scaled 1e18; ``borrowIndex`` 1e18). Verified GREEN via The Graph
+    # decentralized net 2026-06-02 (BSC isolated + core + Ethereum all live,
+    # ``markets`` returns data, ``_meta.block.timestamp`` at head). No daily
+    # snapshot history entity and no dedicated liquidation/risk-param entity
+    # exists → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    "venus": {
+        "BSC": "H2a3D64RV4NNxyJqx9jVFQRBpQRzD6zNZjLDotgdCrTC",  # isolated pools
+        "ETHEREUM": "Htf6Hh1qgkvxQxqbcv4Jp5AatsaiY5dNLVcySkpCaxQ8",
+    },
+    # BenQi — Compound-fork ``Market`` schema (entity ``markets``;
+    # ``supplyRate``/``borrowRate`` are decimal APY, ``borrowIndex``/
+    # ``exchangeRate`` decimal; ``blockTimestamp`` per market). Verified
+    # GREEN via The Graph (AVALANCHE) 2026-06-02. No snapshot history /
+    # liquidation entity → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    "benqi": {
+        "AVALANCHE": "HcTvZi3fwucvRJvVmtFzNDTnomvMBk64xCLNQQg6GPAV",
+    },
+    # Radiant — Messari Lending schema (entity ``markets`` with
+    # ``rates{rate,side}`` percent, ``supplyIndex``/``borrowIndex`` ray 1e27,
+    # ``maximumLTV``/``liquidationThreshold``/``liquidationPenalty`` risk
+    # params, ``liquidates`` + ``marketDailySnapshots`` history). Verified
+    # GREEN via The Graph (ARBITRUM + ETHEREUM) 2026-06-02. Full data-type
+    # set: ``lending_indices`` + ``liquidations`` + ``risk_params`` + gas.
+    "radiant": {
+        "ARBITRUM": "E1UTUGaNbTb4XbEYoupJZ5hU62hW9CnadKTXLRSP2hM",
+        "ETHEREUM": "683Qhh8TEta6qS5gdTpXCs84xnrp77fPWGQyBmRe6qgo",
+    },
+    # Euler V2 — Goldsky subgraph (NOT The Graph; full endpoint URL routed via
+    # _SUBGRAPH_ENDPOINT_OVERRIDES in the MTDS handler). Entity ``eulerVaults``
+    # (live ``state{supplyApy,borrowApy,interestRate,...}`` — APY ray 1e27) +
+    # ``vaultStatuses`` time-series for history + ``liquidates`` entity.
+    # The IDs below are the Goldsky subgraph SLUGS (mainnet/arbitrum) so
+    # callers that build a Graph-gateway URL fall through to the override map.
+    # Verified GREEN via Goldsky 2026-06-02 (ETH + ARB both live).
+    "euler_v2": {
+        "ETHEREUM": "euler-v2-mainnet",
+        "ARBITRUM": "euler-v2-arbitrum",
+    },
 }
 
 
@@ -329,6 +370,47 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_LENDING,
         data_types=[*_LENDING_DATA, "gas_fees"],
         mtds_operations=["collect-liquidations", "collect-gas-fees"],
+    ),
+    # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
+    # Venus / BenQi: Compound-fork subgraphs whose schema exposes NEITHER a
+    # daily-snapshot history entity NOR a dedicated liquidation/risk-param
+    # entity (introspected 2026-06-02) → lending_indices + gas_fees ONLY.
+    "venus": _ProtocolCapability(
+        venue_prefix="VENUS",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices", "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-gas-fees"],
+        required_tokens=frozenset({"XVS"}),
+    ),
+    "benqi": _ProtocolCapability(
+        venue_prefix="BENQI",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices", "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-gas-fees"],
+        required_tokens=frozenset({"QI"}),
+    ),
+    # Radiant: Messari Lending schema — exposes liquidations + risk params
+    # (maximumLTV/liquidationThreshold/liquidationPenalty) + marketDailySnapshots
+    # history → full lending data-type set.
+    "radiant": _ProtocolCapability(
+        venue_prefix="RADIANT",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        required_tokens=frozenset({"RDNT"}),
+    ),
+    # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
+    # (history) + liquidates entity → full lending data-type set.
+    "euler_v2": _ProtocolCapability(
+        venue_prefix="EULER_V2",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA, "gas_fees"],
+        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        required_tokens=frozenset({"EUL"}),
     ),
     "fluid": _ProtocolCapability(
         venue_prefix="FLUID",
