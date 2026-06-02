@@ -372,44 +372,51 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-liquidations", "collect-gas-fees"],
     ),
     # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
+    # NOTE (2026-06-02): gas_fees is NOT a per-venue data_type — gas is collected
+    # ONCE PER CHAIN (same gas unit cost for every venue/data_type/instruction on
+    # that chain) by gas_fee_handler under the synthetic venue "ALCHEMY", keyed by
+    # chain_id (DEFAULT_GAS_FEE_CHAINS). BSC/AVALANCHE/ARBITRUM/ETHEREUM are all
+    # already in that per-chain set, so these venues' chains have gas coverage
+    # without declaring gas_fees here. (Operator 2026-06-02.)
+    #
     # Venus / BenQi: Compound-fork subgraphs whose schema exposes NEITHER a
     # daily-snapshot history entity NOR a dedicated liquidation/risk-param
-    # entity (introspected 2026-06-02) → lending_indices + gas_fees ONLY.
+    # entity (introspected 2026-06-02) → lending_indices ONLY.
     "venus": _ProtocolCapability(
         venue_prefix="VENUS",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=["lending_indices", "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-gas-fees"],
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
         required_tokens=frozenset({"XVS"}),
     ),
     "benqi": _ProtocolCapability(
         venue_prefix="BENQI",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=["lending_indices", "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-gas-fees"],
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
         required_tokens=frozenset({"QI"}),
     ),
     # Radiant: Messari Lending schema — exposes liquidations + risk params
     # (maximumLTV/liquidationThreshold/liquidationPenalty) + marketDailySnapshots
-    # history → full lending data-type set.
+    # history → full lending data-type set (gas is per-chain, see note above).
     "radiant": _ProtocolCapability(
         venue_prefix="RADIANT",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"RDNT"}),
     ),
     # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
-    # (history) + liquidates entity → full lending data-type set.
+    # (history) + liquidates entity → full lending data-type set (gas per-chain).
     "euler_v2": _ProtocolCapability(
         venue_prefix="EULER_V2",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"EUL"}),
     ),
     "fluid": _ProtocolCapability(
