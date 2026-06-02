@@ -522,6 +522,7 @@ from .canonical.crosscutting.honest_coverage import (
     compute_honest_coverage,
     futures_expiry_bucket,
     get_active_es_options_clusters_for_date,
+    was_instrument_alive,
 )
 from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
@@ -975,6 +976,7 @@ __all__ = [
     "BUNDLED_DATA_TYPES",
     "CaptureStatusCounts",
     "compute_honest_coverage",
+    "was_instrument_alive",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
     "CANONICAL_TO_ODDS_API_BUNDESLIGA",

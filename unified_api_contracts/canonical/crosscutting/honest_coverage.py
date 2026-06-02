@@ -1024,6 +1024,56 @@ class EmptyFromLiveInstrumentError(ValueError):
         )
 
 
+def _to_date(value: _dt.datetime | _dt.date | str) -> _dt.date | None:
+    """Coerce a datetime / date / ISO-string to a ``date`` (None if unparseable)."""
+    if isinstance(value, _dt.datetime):
+        return value.date()
+    if isinstance(value, _dt.date):
+        return value
+    if value:  # remaining type is a non-empty ISO string
+        try:
+            return _dt.date.fromisoformat(value[:10])
+        except ValueError:
+            return None
+    return None
+
+
+def was_instrument_alive(
+    *,
+    available_from: _dt.datetime | _dt.date | str | None,
+    available_to: _dt.datetime | _dt.date | str | None,
+    day: _dt.datetime | _dt.date | str,
+) -> bool:
+    """AFFIRMATIVELY confirm an instrument was listed-and-not-yet-delisted on ``day``.
+
+    The lifecycle primitive behind the :class:`EmptyFromLiveInstrumentError` backstop (DeFi-plan A10 /
+    operator directive 2026-05-07): when a source returns zero rows for an instrument the
+    instruments-service catalog confirms was alive on ``day``, the writer must record ``attempted_failed``
+    (a real fetch failure), NOT ``empty_confirmed`` (honest absence). Inputs are
+    ``InstrumentRecord.available_from_datetime`` / ``available_to_datetime`` (``available_to=None`` ⇒ still
+    active) and the shard ``day``.
+
+    CONSERVATIVE by design: returns ``False`` whenever liveness cannot be CONFIRMED (missing/unparseable
+    ``available_from`` or ``day``) — so the backstop fires only on a positive catalog confirmation, never
+    on an unknown (an unknown stays ``empty_confirmed``, the less-disruptive default). The per-asset-group
+    "expected universe" oracle (sports fixtures, CeFi/DeFi/TradFi instrument lifecycle) feeds this; the
+    routing (was-expected → ``attempted_failed`` else ``empty_confirmed``) is the UTL helper that calls it.
+    """
+    if available_from is None:
+        return False
+    day_d = _to_date(day)
+    from_d = _to_date(available_from)
+    if day_d is None or from_d is None:
+        return False
+    if day_d < from_d:
+        return False  # before listing
+    if available_to is not None:
+        to_d = _to_date(available_to)
+        if to_d is not None and day_d >= to_d:
+            return False  # on/after delisting
+    return True
+
+
 class LegacyBlankErrorReasonError(ValueError):
     """Raised by ``ManifestWriter.record_empty(reason="")`` to surface the silent-fallback bug pattern.
 
@@ -1073,4 +1123,5 @@ __all__ = [
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
     "parse_futures_expiry",
+    "was_instrument_alive",
 ]
