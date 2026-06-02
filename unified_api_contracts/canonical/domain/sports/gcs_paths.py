@@ -133,14 +133,21 @@ SPORTS_DATA_TYPE_LAYOUT: dict[str, SportsPathLayout] = {
 # ---------------------------------------------------------------------------
 # Path builders
 # ---------------------------------------------------------------------------
-SPORTS_BUCKET_TEMPLATE = "instruments-store-sports-{project_id}"
+SPORTS_BUCKET_TEMPLATE = "instruments-store-sports-{env}-{project_id}"
 SPORTS_BY_DATE_PREFIX = "sports_reference/by_date/"
 SPORTS_FLAT_PREFIX = "sports_reference/"
 
 
-def sports_bucket_name(project_id: str) -> str:
-    """Return the canonical sports reference bucket name for a project."""
-    return SPORTS_BUCKET_TEMPLATE.format(project_id=project_id)
+def sports_bucket_name(project_id: str, *, env: str = "prd") -> str:
+    """Return the canonical sports reference bucket name for a project.
+
+    Args:
+        project_id: GCP project id (e.g. ``central-element-323112``).
+        env: Deployment environment short form (``"prd"`` / ``"stg"`` /
+            ``"dev"``). Defaults to ``"prd"`` — the production env.
+            Matches ``DEPLOYMENT_ENV_SHORT`` from cloud-providers.yaml.
+    """
+    return SPORTS_BUCKET_TEMPLATE.format(env=env, project_id=project_id)
 
 
 def candidate_parquet_paths(
@@ -254,12 +261,26 @@ def candidate_parquet_uris(
     league_id: str = "",
     *,
     project_id: str,
+    env: str = "prd",
     season: str | None = None,
     include_legacy_archive: bool = False,
     pipeline_mode: str | None = None,
 ) -> list[str]:
-    """Same as ``candidate_parquet_paths`` but returns full ``gs://`` URIs."""
-    bucket = sports_bucket_name(project_id)
+    """Same as ``candidate_parquet_paths`` but returns full ``gs://`` URIs.
+
+    Args:
+        data_type: Canonical SPORTS data_type (e.g. ``"FIXTURES"``).
+        day: ``YYYY-MM-DD`` partition.
+        league_id: Canonical UAC league_id.
+        project_id: GCP project id (e.g. ``central-element-323112``).
+        env: Deployment environment short form (``"prd"`` / ``"stg"`` /
+            ``"dev"``). Defaults to ``"prd"``. Passed to
+            :func:`sports_bucket_name` to produce the env-tiered bucket name.
+        season: Explicit season for ``PER_DAY_PER_SEASON`` data_types.
+        include_legacy_archive: Include v1 archive paths.
+        pipeline_mode: Pipeline-mode canonical path prefix.
+    """
+    bucket = sports_bucket_name(project_id, env=env)
     return [
         f"gs://{bucket}/{p}"  # gs-uri: URI composer, bucket already resolved via sports_bucket_name()
         for p in candidate_parquet_paths(

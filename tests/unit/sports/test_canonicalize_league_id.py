@@ -2,17 +2,19 @@
 
 Registry facts used in these tests (verified against UAC registry 2026-06-02):
 - SCOTTISH_LEAGUE_CUP: registered, api_football_id=182 (NOT 185).
-  SCOTTISH_LEAGUE_CUP_185 was a retired duplicate where the suffix leaked
-  a historical api_football season id, not the canonical league id.
-  So _185 suffix is NOT a registered provider id → function returns unchanged.
-  Registry-gap note: to strip SCOTTISH_LEAGUE_CUP_185 correctly, either
-  185 needs to be added as an alias api_football id on the SCOTTISH_LEAGUE_CUP
-  registry entry, or the manifest migration needs a direct rewrite table.
-- EPL: registered, api_football_id=39. EPL_39 → strips to EPL.
+  SCOTTISH_LEAGUE_CUP_185: 185 >= 100 (3-digit season/AF id, never a tier).
+  The 3-digit rule (Step 3a) strips SCOTTISH_LEAGUE_CUP_185 → SCOTTISH_LEAGUE_CUP
+  because base resolves AND num >= 100, regardless of provider-id registration.
+  Real league tiers never exceed 2 digits (LIGA_3, LIGUE_2, etc.).
+- EPL: registered, api_football_id=39. EPL_39 → strips to EPL (provider-id match).
 - BUNDESLIGA_2: registered canonical key (tier-2 name, not a suffix). Returns
   unchanged at step 2 (already canonical).
-- EPL_15050: footystats season id 15050 maps to EPL → strips to EPL.
-- UNKNOWN_LEAGUE_99: not in registry → returns unchanged.
+- EPL_15050: footystats season id 15050 (3-digit rule) → strips to EPL.
+- UNKNOWN_LEAGUE_99: base not in registry → returns unchanged.
+- LA_LIGA_2 / FRANCE_NATIONAL_1: 1–2-digit suffix, NOT stripped unless the digit
+  is a registered provider id for the base league. LA_LIGA_2 is canonical; it
+  resolves at step 2 and is returned unchanged. These ambiguous tier-vs-season
+  cases remain operator-decision-only; this function does not touch them.
 """
 
 from __future__ import annotations
@@ -57,28 +59,37 @@ class TestCanonicalizeLeagueId:
         result = canonicalize_league_id("EPL_15050")
         assert result == "EPL", "EPL has footystats season id 15050; EPL_15050 should strip to EPL"
 
-    def test_scottish_league_cup_185_returns_unchanged(self) -> None:
-        """SCOTTISH_LEAGUE_CUP_185 is NOT stripped because 185 is not the
-        registered api_football_id for SCOTTISH_LEAGUE_CUP (which is 182).
+    def test_scottish_league_cup_185_strips_via_3digit_rule(self) -> None:
+        """SCOTTISH_LEAGUE_CUP_185 → SCOTTISH_LEAGUE_CUP via 3-digit season-id rule.
 
-        185 was a historical api_football season id that leaked into manifest
-        league_ids as a suffix (retired registry entry SCOTTISH_LEAGUE_CUP_185).
-        The function conservatively returns it unchanged — the 278,268 manifest
-        rows carrying _185 need a direct rewrite table in the IS/MTDS migrator.
+        185 >= 100 (3+ digits) AND get_league("SCOTTISH_LEAGUE_CUP") resolves →
+        strip unconditionally. Real league tiers never reach 3 digits; any 3+-digit
+        suffix is a provider season/AF id, not a tier qualifier.
 
-        REGISTRY-GAP: to auto-strip via this function, either add 185 as an
-        alternative api_football id on SCOTTISH_LEAGUE_CUP, or add a direct
-        entry in the migrator's static rewrite table.
-        See: sports_manifest_canonicalisation_2026_06_01.md § registry-gap notes.
+        NOTE: LA_LIGA_2 / LIGUE_1 / BUNDESLIGA_2 are untouched — their 1-2-digit
+        suffixes are ambiguous (could be a tier name). Step 2 resolves BUNDESLIGA_2
+        immediately (already canonical key); LA_LIGA_2 similarly stays unchanged
+        because it is already canonical. These cases are operator-decision-only.
         """
         from unified_api_contracts.sports import canonicalize_league_id
 
         result = canonicalize_league_id("SCOTTISH_LEAGUE_CUP_185")
-        assert result == "SCOTTISH_LEAGUE_CUP_185", (
-            "185 is NOT the registered api_football_id for SCOTTISH_LEAGUE_CUP "
-            "(which is 182). Conservative: return unchanged; migrator needs "
-            "direct rewrite table for this registry-gap case."
+        assert result == "SCOTTISH_LEAGUE_CUP", (
+            "185 >= 100 (3-digit season id, never a tier). SCOTTISH_LEAGUE_CUP resolves in registry → strip to base."
         )
+
+    def test_la_liga_2_unchanged_already_canonical(self) -> None:
+        """LA_LIGA_2 is a canonical key in the registry — step 2 returns it unchanged."""
+        from unified_api_contracts.sports import canonicalize_league_id
+
+        assert canonicalize_league_id("LA_LIGA_2") == "LA_LIGA_2"
+        assert canonicalize_league_id("la_liga_2") == "LA_LIGA_2"
+
+    def test_ligue_1_unchanged_already_canonical(self) -> None:
+        """LIGUE_1 is already canonical — step 2 returns it unchanged."""
+        from unified_api_contracts.sports import canonicalize_league_id
+
+        assert canonicalize_league_id("LIGUE_1") == "LIGUE_1"
 
     def test_idempotent(self) -> None:
         """canonicalize_league_id(canonicalize_league_id(x)) == canonicalize_league_id(x)."""
@@ -88,7 +99,11 @@ class TestCanonicalizeLeagueId:
             "EPL",
             "EPL_39",
             "BUNDESLIGA_2",
+            "LA_LIGA_2",
+            "LIGUE_1",
+            # 3-digit rule: SCOTTISH_LEAGUE_CUP_185 → SCOTTISH_LEAGUE_CUP (idempotent)
             "SCOTTISH_LEAGUE_CUP_185",
+            "SCOTTISH_LEAGUE_CUP",
             "UNKNOWN_LEAGUE_99",
         ]
         for case in cases:

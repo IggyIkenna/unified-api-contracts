@@ -925,7 +925,19 @@ def canonicalize_league_id(raw: str) -> str:
         # Base doesn't resolve → not a known canonical key; return unchanged.
         return s
 
-    # Verify the suffix is a known provider ID for this league.
+    # Step 3a: 3+-digit suffix rule (num >= 100).
+    # Real league tiers never exceed 2 digits (e.g. LIGA_3, LIGUE_2).
+    # A suffix with 3+ digits is always a provider season/AF id, never a tier.
+    # Condition: base resolves in the registry AND num >= 100 → strip safely.
+    # This handles cases like SCOTTISH_LEAGUE_CUP_185 → SCOTTISH_LEAGUE_CUP
+    # even when 185 is not registered as a provider id for the base league
+    # (i.e. it was a historical api_football season id, not the canonical
+    # league api_football_id=182).
+    if num >= 100:
+        return base
+
+    # Step 3b: Verify the suffix is a known provider ID for this league
+    # (only applies for 1-2-digit suffixes which could be tier numbers).
     for provider in _SUFFIX_CHECK_PROVIDERS:
         if provider == "api_football":
             # api_football id lives on the LeagueDefinition, not in the dicts.
@@ -945,6 +957,7 @@ def canonicalize_league_id(raw: str) -> str:
             elif isinstance(pid, str) and pid.isdigit() and int(pid) == num:
                 return base
 
-    # Suffix exists but is NOT a registered provider ID for ``base``.
-    # Conservative: return ``s`` unchanged (registry-gap; don't guess).
+    # Suffix exists but is NOT a registered provider ID for ``base``
+    # AND is not a 3+-digit season id.
+    # Conservative: return ``s`` unchanged (ambiguous tier-vs-season; don't guess).
     return s

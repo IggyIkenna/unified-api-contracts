@@ -99,7 +99,7 @@ class TestPlayerValuesSSOT:
             project_id="test-project",
             season="2024",
         )
-        assert uris[0].startswith("gs://instruments-store-sports-test-project/")
+        assert uris[0].startswith("gs://instruments-store-sports-prd-test-project/")
         assert "season=2024" in uris[0]
 
 
