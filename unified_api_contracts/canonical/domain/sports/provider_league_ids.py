@@ -177,11 +177,11 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     36: "LA_LIGA",
     37: "LA_LIGA",
     38: "LA_LIGA",
-    39: "LA_LIGA_2",
-    40: "LA_LIGA_2",
-    41: "LA_LIGA_2",
-    42: "LA_LIGA_2",
-    43: "LA_LIGA_2",
+    39: "SEGUNDA_DIVISION",
+    40: "SEGUNDA_DIVISION",
+    41: "SEGUNDA_DIVISION",
+    42: "SEGUNDA_DIVISION",
+    43: "SEGUNDA_DIVISION",
     44: "ELITESERIEN",
     45: "ELITESERIEN",
     46: "ELITESERIEN",
@@ -238,7 +238,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     169: "SCOTTISH_PREMIERSHIP",
     170: "ENG_LEAGUE_TWO",
     171: "LA_LIGA",
-    172: "LA_LIGA_2",
+    172: "SEGUNDA_DIVISION",
     173: "PRIMEIRA_LIGA",
     175: "SUPER_LIG",
     177: "BUNDESLIGA",
@@ -313,7 +313,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     1624: "ENG_CHAMPIONSHIP",
     1625: "EPL",
     1636: "BUNDESLIGA",
-    1670: "LA_LIGA_2",
+    1670: "SEGUNDA_DIVISION",
     1677: "LA_LIGA",
     1680: "SERIE_A",
     1712: "ARGENTINA_PRIMERA",
@@ -341,7 +341,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     2366: "ARGENTINA_PRIMERA",
     2392: "LIGUE_1",
     2396: "LIGUE_2",
-    2415: "LA_LIGA_2",
+    2415: "SEGUNDA_DIVISION",
     2588: "SERIE_A",
     2642: "SERIE_B",
     2648: "SUPER_LIG",
@@ -385,7 +385,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     4136: "LIGUE_1",
     4140: "BUNDESLIGA",
     4164: "LIGUE_2",
-    4167: "LA_LIGA_2",
+    4167: "SEGUNDA_DIVISION",
     4168: "BUNDESLIGA_2",
     4185: "LIGUE_2",
     4186: "LIGA_3",
@@ -406,8 +406,8 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     4241: "MLS",
     4242: "ELITESERIEN",
     4244: "ELITESERIEN",
-    4245: "LA_LIGA_2",
-    4249: "LA_LIGA_2",
+    4245: "SEGUNDA_DIVISION",
+    4249: "SEGUNDA_DIVISION",
     4307: "ALLSVENSKAN",
     4315: "ALLSVENSKAN",
     4329: "ALLSVENSKAN",
@@ -465,7 +465,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     6079: "JUPILER_PRO",
     6089: "ENG_CHAMPIONSHIP",
     6117: "PRIMEIRA_LIGA",
-    6120: "LA_LIGA_2",
+    6120: "SEGUNDA_DIVISION",
     6125: "SUPER_LIG",
     6135: "EPL",
     6192: "BUNDESLIGA",
@@ -492,7 +492,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     7570: "ENG_LEAGUE_ONE",
     7574: "ENG_LEAGUE_TWO",
     7591: "LIGA_3",
-    7592: "LA_LIGA_2",
+    7592: "SEGUNDA_DIVISION",
     7593: "ENG_CHAMPIONSHIP",
     7608: "SERIE_A",
     7664: "BUNDESLIGA",
@@ -527,7 +527,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     9663: "ENG_CHAMPIONSHIP",
     9665: "LA_LIGA",
     9674: "LIGUE_1",
-    9675: "LA_LIGA_2",
+    9675: "SEGUNDA_DIVISION",
     9697: "SERIE_A",
     9741: "LIGA_3",
     9808: "SERIE_B",
@@ -556,7 +556,7 @@ FOOTYSTATS_HISTORICAL_SEASON_IDS: dict[int, str] = {
     12446: "ENG_LEAGUE_ONE",
     12451: "ENG_CHAMPIONSHIP",
     12455: "SCOTTISH_PREMIERSHIP",
-    12467: "LA_LIGA_2",
+    12467: "SEGUNDA_DIVISION",
     12528: "BUNDESLIGA_2",
     12529: "BUNDESLIGA",
     12530: "SERIE_A",
@@ -859,12 +859,39 @@ _SUFFIX_CHECK_PROVIDERS: tuple[str, ...] = (
 )
 
 
+# ---------------------------------------------------------------------------
+# CF-7 league name drift aliases
+#
+# Maps known alias strings (that have NO LeagueDefinition) → their canonical
+# key (which DOES have a LeagueDefinition).  Applied early in
+# ``canonicalize_league_id`` — before the suffix-strip logic — so that both
+# inbound manifest rows and provider reverse-map lookups are normalised to the
+# single canonical key.
+#
+# Rules for adding entries:
+#  - Only add aliases that are PROVEN wrong: the alias has no LeagueDefinition
+#    AND the canonical target has a confirmed LeagueDefinition + provider IDs.
+#  - Do NOT invent aliases for leagues that are genuinely ambiguous.
+#  - Keep the set conservative and data-driven.
+#
+# Proven aliases (as of 2026-06-02, CF-7 audit):
+#  - LA_LIGA_2 → SEGUNDA_DIVISION: prod manifest has 3,465 rows under the
+#    alias; SEGUNDA_DIVISION has LeagueDefinition + footystats 15066, ES2,
+#    f5e5596b0efdef8e, team-count 22.  LA_LIGA_2 has no LeagueDefinition.
+# ---------------------------------------------------------------------------
+_LEAGUE_ALIASES: dict[str, str] = {
+    "LA_LIGA_2": "SEGUNDA_DIVISION",
+}
+
+
 def canonicalize_league_id(raw: str) -> str:
     """Strip a provider-id suffix from a league_id if — and only if — the
     suffix is provably a provider ID, not part of a legitimate tier name.
 
     Semantics (CF-7 spec):
     1. Normalise: ``s = raw.upper().strip()``.
+    1b. Alias: if ``s`` is in ``_LEAGUE_ALIASES`` → replace with the canonical
+       target (e.g. ``"LA_LIGA_2"`` → ``"SEGUNDA_DIVISION"``). Idempotent.
     2. If ``get_league(s)`` already resolves → return ``s`` unchanged
        (already canonical; covers cases like ``BUNDESLIGA_2`` which is a
        valid tier name).
@@ -903,6 +930,13 @@ def canonicalize_league_id(raw: str) -> str:
     )
 
     s: str = raw.upper().strip()
+
+    # Step 1b: alias resolution (CF-7 name-drift).
+    # Applied BEFORE the canonical-registry check so that known aliases
+    # (e.g. "LA_LIGA_2" → "SEGUNDA_DIVISION") are normalised regardless of
+    # whether the alias happens to resolve in get_league().  Idempotent:
+    # SEGUNDA_DIVISION is not in _LEAGUE_ALIASES, so a second call is a no-op.
+    s = _LEAGUE_ALIASES.get(s, s)
 
     # Step 2: already canonical?
     if get_league(s) is not None:

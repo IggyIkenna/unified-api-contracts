@@ -11,10 +11,11 @@ Registry facts used in these tests (verified against UAC registry 2026-06-02):
   unchanged at step 2 (already canonical).
 - EPL_15050: footystats season id 15050 (3-digit rule) → strips to EPL.
 - UNKNOWN_LEAGUE_99: base not in registry → returns unchanged.
-- LA_LIGA_2 / FRANCE_NATIONAL_1: 1–2-digit suffix, NOT stripped unless the digit
-  is a registered provider id for the base league. LA_LIGA_2 is canonical; it
-  resolves at step 2 and is returned unchanged. These ambiguous tier-vs-season
-  cases remain operator-decision-only; this function does not touch them.
+- LA_LIGA_2: alias in _LEAGUE_ALIASES → resolves to SEGUNDA_DIVISION (step 1b,
+  CF-7 name-drift fix 2026-06-02). LA_LIGA_2 has no LeagueDefinition; prod
+  manifest had 3,465 rows under the alias which must canonicalise to SEGUNDA_DIVISION.
+- SEGUNDA_DIVISION: registered canonical key. Returns unchanged at step 2.
+  Idempotent: canonicalize_league_id("SEGUNDA_DIVISION") == "SEGUNDA_DIVISION".
 """
 
 from __future__ import annotations
@@ -66,10 +67,11 @@ class TestCanonicalizeLeagueId:
         strip unconditionally. Real league tiers never reach 3 digits; any 3+-digit
         suffix is a provider season/AF id, not a tier qualifier.
 
-        NOTE: LA_LIGA_2 / LIGUE_1 / BUNDESLIGA_2 are untouched — their 1-2-digit
-        suffixes are ambiguous (could be a tier name). Step 2 resolves BUNDESLIGA_2
-        immediately (already canonical key); LA_LIGA_2 similarly stays unchanged
-        because it is already canonical. These cases are operator-decision-only.
+        NOTE: LIGUE_1 / BUNDESLIGA_2 are untouched — their 1-2-digit suffixes
+        are ambiguous (could be a tier name). Step 2 resolves BUNDESLIGA_2
+        immediately (already canonical key). LA_LIGA_2 is handled separately
+        via _LEAGUE_ALIASES (step 1b) — it resolves to SEGUNDA_DIVISION, not
+        via the suffix-strip path.
         """
         from unified_api_contracts.sports import canonicalize_league_id
 
@@ -78,12 +80,24 @@ class TestCanonicalizeLeagueId:
             "185 >= 100 (3-digit season id, never a tier). SCOTTISH_LEAGUE_CUP resolves in registry → strip to base."
         )
 
-    def test_la_liga_2_unchanged_already_canonical(self) -> None:
-        """LA_LIGA_2 is a canonical key in the registry — step 2 returns it unchanged."""
+    def test_la_liga_2_alias_resolves_to_segunda_division(self) -> None:
+        """LA_LIGA_2 is a CF-7 alias that maps to SEGUNDA_DIVISION via _LEAGUE_ALIASES.
+
+        LA_LIGA_2 has no LeagueDefinition; prod manifest had 3,465 rows under
+        the alias.  Step 1b (alias map) fires before get_league() so both
+        'LA_LIGA_2' and 'la_liga_2' resolve to the canonical key.
+        """
         from unified_api_contracts.sports import canonicalize_league_id
 
-        assert canonicalize_league_id("LA_LIGA_2") == "LA_LIGA_2"
-        assert canonicalize_league_id("la_liga_2") == "LA_LIGA_2"
+        assert canonicalize_league_id("LA_LIGA_2") == "SEGUNDA_DIVISION"
+        assert canonicalize_league_id("la_liga_2") == "SEGUNDA_DIVISION"
+
+    def test_segunda_division_unchanged_already_canonical(self) -> None:
+        """SEGUNDA_DIVISION is the canonical key — step 2 returns it unchanged."""
+        from unified_api_contracts.sports import canonicalize_league_id
+
+        assert canonicalize_league_id("SEGUNDA_DIVISION") == "SEGUNDA_DIVISION"
+        assert canonicalize_league_id("segunda_division") == "SEGUNDA_DIVISION"
 
     def test_ligue_1_unchanged_already_canonical(self) -> None:
         """LIGUE_1 is already canonical — step 2 returns it unchanged."""
@@ -99,7 +113,10 @@ class TestCanonicalizeLeagueId:
             "EPL",
             "EPL_39",
             "BUNDESLIGA_2",
+            # LA_LIGA_2 alias → first call returns SEGUNDA_DIVISION;
+            # second call on SEGUNDA_DIVISION returns SEGUNDA_DIVISION (idempotent).
             "LA_LIGA_2",
+            "SEGUNDA_DIVISION",
             "LIGUE_1",
             # 3-digit rule: SCOTTISH_LEAGUE_CUP_185 → SCOTTISH_LEAGUE_CUP (idempotent)
             "SCOTTISH_LEAGUE_CUP_185",
