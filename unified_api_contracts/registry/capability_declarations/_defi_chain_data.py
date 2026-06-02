@@ -664,24 +664,11 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "api_url": "https://app.solayer.org/api",
         "data_source": "solayer_api",
     },
-    "picasso": {
-        "name": "Picasso Network (Cross-Chain Restaking)",
-        "type": "restaking",
-        # Picasso Solana program — best-guess; verify from https://docs.picasso.network/
-        # Cross-chain restaking via ICS (Inter-Chain Security); Solana-side program.
-        "program_id": "5nMau41MBCMmPfQHs9FMgzMgCJVA1VdJBV9kLnzBNNDn",
-        "api_url": "https://api.picasso.network",
-        "data_source": "picasso_api",
-    },
-    "cambrian": {
-        "name": "Cambrian Network (Solana AVS Restaking Primitives)",
-        "type": "restaking",
-        # Cambrian Solana program — best-guess; verify from https://docs.cambrian.network/
-        # Provides foundational AVS/NCN restaking primitives for Solana-native protocols.
-        "program_id": "CAMBr1ANreStakingVau1tProgramSo1anaXXXXXXXXXX",
-        "api_url": "https://api.cambrian.network",
-        "data_source": "cambrian_api",
-    },
+    # picasso + cambrian removed 2026-06-02 (operator decision): 2026-06-02 smoke tests
+    # found no usable public DeFi data source (Picasso ~3 tx/month, no yield API; Cambrian
+    # is a dev SDK, not a venue). Their program_ids here were "best-guess" placeholders
+    # anyway. Excluded from the registry. SSOT:
+    # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md.
 }
 
 

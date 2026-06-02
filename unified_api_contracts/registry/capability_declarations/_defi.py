@@ -568,21 +568,12 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-staking-yields"],
         required_tokens=frozenset({"SSOL"}),
     ),
-    "picasso": _ProtocolCapability(
-        venue_prefix="PICASSO",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "cross_chain_restaking_routes"],
-        mtds_operations=["collect-staking-yields"],
-        required_tokens=frozenset({"PICA"}),
-    ),
-    "cambrian": _ProtocolCapability(
-        venue_prefix="CAMBRIAN",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "restaking_operator_set"],
-        mtds_operations=["collect-staking-yields"],
-    ),
+    # PICASSO + CAMBRIAN removed 2026-06-02 (operator decision): 2026-06-02 data-source
+    # smoke tests found no usable public DeFi data source. Picasso = IBC bridge/restaking
+    # program alive but ~3 tx/month + no public yield/rate API; Cambrian = a developer SDK
+    # for building NCNs on Jito Restaking, not a DeFi venue (no TVL/pools/rates/program to
+    # query). Excluded from the venue registry. SSOT:
+    # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md (venue smoke-test results).
 }
 
 # Chain-native tokens — auto-included in major assets for any protocol on that chain.
@@ -849,8 +840,8 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "jito": ["SOLANA"],
     # Plan E: Solana restaking rewards coverage (2026-05-13)
     "solayer": ["SOLANA"],
-    "picasso": ["SOLANA"],
-    "cambrian": ["SOLANA"],
+    # picasso + cambrian removed 2026-06-02 (operator decision; no usable DeFi
+    # data source — see PROTOCOL_CAPABILITIES header note above).
 }
 
 
