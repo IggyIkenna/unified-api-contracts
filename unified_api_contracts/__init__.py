@@ -517,6 +517,7 @@ from .canonical.crosscutting.honest_coverage import (
     EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
     EmptyConfirmedReason,
+    EmptyFromLiveInstrumentError,
     LegacyBlankErrorReasonError,
     RecordFailedReason,
     compute_honest_coverage,
@@ -1349,6 +1350,7 @@ __all__ = [
     # Service emission policy — UTL emission_publisher consumers
     "EmissionLifecycleEvent",
     "EmptyConfirmedReason",
+    "EmptyFromLiveInstrumentError",
     "EndpointSpec",
     "EnvironmentTier",
     "Erc20TransferCalldata",
