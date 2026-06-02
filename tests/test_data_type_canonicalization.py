@@ -66,10 +66,15 @@ _KNOWN_MDPS_DERIVED = frozenset(
     }
 )
 
-# Banned legacy aliases that must never appear in any data_types list
+# Banned legacy aliases that must never appear in any data_types list.
+# 2026-06-02 (A11c): the DeFi pool/swap data_type collapsed to the operator-locked
+# canonical `dex_pool_state` / `dex_pool_swaps` everywhere (defi-canonical-naming-ssot.md),
+# so the former canonical names `dex_pools` / `dex_swaps` are now THEMSELVES banned legacy aliases.
 _BANNED_ALIASES = {
-    "swaps": "dex_swaps",
-    "liquidity": "dex_pools",
+    "swaps": "dex_pool_swaps",
+    "liquidity": "dex_pool_state",
+    "dex_swaps": "dex_pool_swaps",
+    "dex_pools": "dex_pool_state",
     "rate_indices": "lending_indices",
     "mev_bundles": "mev_events",
     "bridge_flows": "bridge_events",
@@ -140,13 +145,19 @@ def test_yaml_data_types_in_uac(yaml_path: Path) -> None:
 
 
 def test_uac_canonical_defi_names_present() -> None:
-    """UAC must register the canonical DeFi data type names (not legacy aliases)."""
+    """UAC must register the canonical DeFi data type names (not legacy aliases).
+
+    Canonical pool/swap names are `dex_pool_state` / `dex_pool_swaps` (operator-locked
+    collapse 2026-06-01, A11c); the former `dex_pools` / `dex_swaps` are now legacy.
+    """
     defi_types = DATA_TYPES_BY_ASSET_GROUP.get("defi", frozenset())
-    assert "dex_swaps" in defi_types, "'dex_swaps' missing from UAC defi data types"
-    assert "dex_pools" in defi_types, "'dex_pools' missing from UAC defi data types"
+    assert "dex_pool_swaps" in defi_types, "'dex_pool_swaps' missing from UAC defi data types"
+    assert "dex_pool_state" in defi_types, "'dex_pool_state' missing from UAC defi data types"
     assert "lending_indices" in defi_types, "'lending_indices' missing from UAC defi data types"
     assert "swaps" not in defi_types, "Legacy 'swaps' alias must not be in UAC defi data types"
     assert "liquidity" not in defi_types, "Legacy 'liquidity' alias must not be in UAC defi data types"
+    assert "dex_swaps" not in defi_types, "Legacy 'dex_swaps' alias must not be in UAC defi data types"
+    assert "dex_pools" not in defi_types, "Legacy 'dex_pools' alias must not be in UAC defi data types"
     assert "rate_indices" not in defi_types, "Legacy 'rate_indices' alias must not be in UAC defi data types"
 
 

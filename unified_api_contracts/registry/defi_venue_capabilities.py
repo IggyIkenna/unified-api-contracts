@@ -15,27 +15,27 @@ multi-chain expansion) + §3 (data_type axes).
 from __future__ import annotations
 
 DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
-    # ── DeFi — DEX protocols (dex_swaps + dex_pools) ──
-    "UNISWAP_V2-ETHEREUM": {"dex_swaps": "2020-05-06", "dex_pools": "2020-05-06"},
+    # ── DeFi — DEX protocols (dex_pool_swaps + dex_pool_state) ──
+    "UNISWAP_V2-ETHEREUM": {"dex_pool_swaps": "2020-05-06", "dex_pool_state": "2020-05-06"},
     "UNISWAP_V3-ETHEREUM": {
-        "dex_swaps": "2021-05-05",
-        "dex_pools": "2021-05-05",
+        "dex_pool_swaps": "2021-05-05",
+        "dex_pool_state": "2021-05-05",
         "position_data": "2021-05-05",  # LP position data (top 1000 by liquidity)
     },
-    "UNISWAP_V3-ARBITRUM": {"dex_swaps": "2021-06-18", "dex_pools": "2021-06-18"},
-    "UNISWAP_V3-BASE": {"dex_swaps": "2023-09-03", "dex_pools": "2023-09-03"},
-    "UNISWAP_V3-OPTIMISM": {"dex_swaps": "2021-11-12", "dex_pools": "2021-11-12"},
-    "UNISWAP_V3-POLYGON": {"dex_swaps": "2021-12-22", "dex_pools": "2021-12-22"},
-    "UNISWAP_V4-ETHEREUM": {"dex_swaps": "2025-01-30", "dex_pools": "2025-01-30"},
-    "CURVE-ETHEREUM": {"dex_swaps": "2020-01-20", "dex_pools": "2020-01-20"},
-    "CURVE-AVALANCHE": {"dex_swaps": "2021-11-10", "dex_pools": "2021-11-10"},
-    "CURVE-OPTIMISM": {"dex_swaps": "2022-01-13", "dex_pools": "2022-01-13"},
-    "BALANCER-ETHEREUM": {"dex_swaps": "2021-04-22", "dex_pools": "2021-04-22"},
-    "BALANCER-ARBITRUM": {"dex_swaps": "2021-08-27", "dex_pools": "2021-08-27"},
-    "BALANCER-AVALANCHE": {"dex_swaps": "2023-08-17", "dex_pools": "2023-08-17"},
-    "BALANCER-BASE": {"dex_swaps": "2023-07-29", "dex_pools": "2023-07-29"},
-    "BALANCER-OPTIMISM": {"dex_swaps": "2022-05-20", "dex_pools": "2022-05-20"},
-    "BALANCER-POLYGON": {"dex_swaps": "2021-06-24", "dex_pools": "2021-06-24"},
+    "UNISWAP_V3-ARBITRUM": {"dex_pool_swaps": "2021-06-18", "dex_pool_state": "2021-06-18"},
+    "UNISWAP_V3-BASE": {"dex_pool_swaps": "2023-09-03", "dex_pool_state": "2023-09-03"},
+    "UNISWAP_V3-OPTIMISM": {"dex_pool_swaps": "2021-11-12", "dex_pool_state": "2021-11-12"},
+    "UNISWAP_V3-POLYGON": {"dex_pool_swaps": "2021-12-22", "dex_pool_state": "2021-12-22"},
+    "UNISWAP_V4-ETHEREUM": {"dex_pool_swaps": "2025-01-30", "dex_pool_state": "2025-01-30"},
+    "CURVE-ETHEREUM": {"dex_pool_swaps": "2020-01-20", "dex_pool_state": "2020-01-20"},
+    "CURVE-AVALANCHE": {"dex_pool_swaps": "2021-11-10", "dex_pool_state": "2021-11-10"},
+    "CURVE-OPTIMISM": {"dex_pool_swaps": "2022-01-13", "dex_pool_state": "2022-01-13"},
+    "BALANCER-ETHEREUM": {"dex_pool_swaps": "2021-04-22", "dex_pool_state": "2021-04-22"},
+    "BALANCER-ARBITRUM": {"dex_pool_swaps": "2021-08-27", "dex_pool_state": "2021-08-27"},
+    "BALANCER-AVALANCHE": {"dex_pool_swaps": "2023-08-17", "dex_pool_state": "2023-08-17"},
+    "BALANCER-BASE": {"dex_pool_swaps": "2023-07-29", "dex_pool_state": "2023-07-29"},
+    "BALANCER-OPTIMISM": {"dex_pool_swaps": "2022-05-20", "dex_pool_state": "2022-05-20"},
+    "BALANCER-POLYGON": {"dex_pool_swaps": "2021-06-24", "dex_pool_state": "2021-06-24"},
     # ── DeFi — Lending protocols ──
     "AAVE_V3-ETHEREUM": {
         "lending_indices": "2023-01-27",
@@ -116,19 +116,19 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # cross_asset Phase 1B(b) — Radiant UAC back-fill (was orphan adapter, now declared)
     "RADIANT-ARBITRUM": {"lending_indices": "2022-07-25", "oracle_prices": "2022-07-25"},
     "RADIANT-BSC": {"lending_indices": "2022-09-21", "oracle_prices": "2022-09-21"},
-    # ── DeFi — Additional DEX protocols (dex_swaps + dex_pools only) ──
-    "SUSHISWAP_V3-ETHEREUM": {"dex_swaps": "2021-11-01", "dex_pools": "2021-11-01"},
-    "SUSHISWAP_V3-BASE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
-    "SUSHISWAP_V3-AVALANCHE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
-    "SUSHISWAP-ARBITRUM": {"dex_swaps": "2021-08-31", "dex_pools": "2021-08-31"},
-    "PANCAKESWAP_V3-ETHEREUM": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
-    "PANCAKESWAP_V3-ARBITRUM": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
-    "PANCAKESWAP_V3-BASE": {"dex_swaps": "2023-08-15", "dex_pools": "2023-08-15"},
-    "PANCAKESWAP_V3-BSC": {"dex_swaps": "2023-04-12", "dex_pools": "2023-04-12"},
-    "CAMELOT_V3-ARBITRUM": {"dex_swaps": "2023-05-01", "dex_pools": "2023-05-01"},
-    "AERODROME_V3-BASE": {"dex_swaps": "2023-08-28", "dex_pools": "2023-08-28"},
-    "VELODROME_V2-OPTIMISM": {"dex_swaps": "2022-06-01", "dex_pools": "2022-06-01"},
-    "TRADER_JOE_V2-AVALANCHE": {"dex_swaps": "2022-01-01", "dex_pools": "2022-01-01"},
+    # ── DeFi — Additional DEX protocols (dex_pool_swaps + dex_pool_state only) ──
+    "SUSHISWAP_V3-ETHEREUM": {"dex_pool_swaps": "2021-11-01", "dex_pool_state": "2021-11-01"},
+    "SUSHISWAP_V3-BASE": {"dex_pool_swaps": "2023-08-15", "dex_pool_state": "2023-08-15"},
+    "SUSHISWAP_V3-AVALANCHE": {"dex_pool_swaps": "2023-08-15", "dex_pool_state": "2023-08-15"},
+    "SUSHISWAP-ARBITRUM": {"dex_pool_swaps": "2021-08-31", "dex_pool_state": "2021-08-31"},
+    "PANCAKESWAP_V3-ETHEREUM": {"dex_pool_swaps": "2023-04-12", "dex_pool_state": "2023-04-12"},
+    "PANCAKESWAP_V3-ARBITRUM": {"dex_pool_swaps": "2023-04-12", "dex_pool_state": "2023-04-12"},
+    "PANCAKESWAP_V3-BASE": {"dex_pool_swaps": "2023-08-15", "dex_pool_state": "2023-08-15"},
+    "PANCAKESWAP_V3-BSC": {"dex_pool_swaps": "2023-04-12", "dex_pool_state": "2023-04-12"},
+    "CAMELOT_V3-ARBITRUM": {"dex_pool_swaps": "2023-05-01", "dex_pool_state": "2023-05-01"},
+    "AERODROME_V3-BASE": {"dex_pool_swaps": "2023-08-28", "dex_pool_state": "2023-08-28"},
+    "VELODROME_V2-OPTIMISM": {"dex_pool_swaps": "2022-06-01", "dex_pool_state": "2022-06-01"},
+    "TRADER_JOE_V2-AVALANCHE": {"dex_pool_swaps": "2022-01-01", "dex_pool_state": "2022-01-01"},
     # ── DeFi — Perpetual DEXes (funding + liquidations) ──
     # axis_override = "cefi" — CLOB-style perp funding captured via MTDS
     # perp_funding_handler. See DEFI_VENUE_AXIS_OVERRIDES in defi_venues.py.
@@ -136,11 +136,11 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "GMX-AVALANCHE": {"perp_funding": "2021-12-31", "liquidations": "2021-12-31", "oracle_prices": "2021-12-31"},
     # ── DeFi — Solana ──
     # Drift perpetual CLOB: V1 S3 archive 2022-01-01; LST margin (JitoSOL/mSOL accepted).
-    "DRIFT-SOLANA": {"perp_funding": "2022-01-01", "dex_swaps": "2022-01-01"},
+    "DRIFT-SOLANA": {"perp_funding": "2022-01-01", "dex_pool_swaps": "2022-01-01"},
     "KAMINO-SOLANA": {"lending_indices": "2023-06-01", "oracle_prices": "2023-06-01"},
     "MARINADE-SOLANA": {"lst_rates": "2021-08-01", "oracle_prices": "2021-08-01"},
-    "ORCA-SOLANA": {"dex_swaps": "2021-03-01", "dex_pools": "2021-03-01"},
-    "RAYDIUM-SOLANA": {"dex_swaps": "2021-02-21", "dex_pools": "2021-02-21"},
+    "ORCA-SOLANA": {"dex_pool_swaps": "2021-03-01", "dex_pool_state": "2021-03-01"},
+    "RAYDIUM-SOLANA": {"dex_pool_swaps": "2021-02-21", "dex_pool_state": "2021-02-21"},
     # ── DeFi — LST/Yield protocols ──
     "LIDO-ETHEREUM": {
         "lst_rates": "2020-12-18",
@@ -210,7 +210,7 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "PUFFER-ETHEREUM": {"staking_yields": "2024-05-09", "oracle_prices": "2024-05-09"},
     "JITORESTAKING-SOLANA": {"staking_yields": "2024-08-01"},
     # ── DeFi — Solana DEX aggregator (Phase 1A) ──
-    "JUPITER-SOLANA": {"dex_swaps": "2021-10-13"},
+    "JUPITER-SOLANA": {"dex_pool_swaps": "2021-10-13"},
 }
 
 

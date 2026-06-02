@@ -190,7 +190,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # node call or signed transaction event; hyperliquid_rest = Hyperliquid
     # REST API for Solana-based perp + DEX legs.
     ("defi", "bridge_events"): ["onchain_rpc"],
-    ("defi", "dex_pools"): ["onchain_subgraph"],
+    ("defi", "dex_pool_state"): ["onchain_subgraph"],
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],

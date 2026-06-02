@@ -336,13 +336,18 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
     # =====================================================================
     # DeFi
     # =====================================================================
-    # Wire-format SSOT verified 2026-04-30. DeFi adapters today write to
-    # the manifest with EMPTY data_type — the data-type axis in market
-    # data is currently unused on the DeFi side. Capabilities are
-    # therefore keyed by venue alone (one row per protocol). Aspirational
-    # data_types (lending_indices / dex_pool_swaps / dex_pool_state /
-    # lst_rates / yield_snapshots) are deferred until the DeFi adapters
-    # start writing them — captured as a follow-up.
+    # Wire-format note (reconciled 2026-06-02, A11c — defi-canonical-naming-ssot.md):
+    # DeFi handlers NOW write canonical data_types to the manifest
+    # (`dex_pool_state` / `dex_pool_swaps` / `lending_indices` / `lst_rates` /
+    # `oracle_prices` / `perp_funding`, operator-locked + shipped via C0-CN2);
+    # the earlier "EMPTY data_type / data-type axis unused" wording was the
+    # pre-canonicalisation state and is now stale. These rows are still keyed by
+    # venue alone (one DataTypeCapability per protocol) — populating the full
+    # per-(venue, data_type) capability matrix with the canonical names is the
+    # larger follow-up tracked in
+    # `plans/active/issues/defi_coverage_capability_alignment_2026_05_22.md`;
+    # the expected-coverage DENOMINATOR (`expected_coverage._DEFI` +
+    # `market_data_categories` + `defi_venue_capabilities`) is already canonical.
     DataTypeCapability(
         asset_group=AssetGroup.DEFI,
         data_type="",

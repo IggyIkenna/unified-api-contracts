@@ -322,8 +322,10 @@ class TestCandleSchema:
         assert DataType.DEX_TRADES == "dex_trades"
         # Sanity: pre-existing perp_funding remains unchanged
         assert DataType.PERP_FUNDING == "perp_funding"
-        # Sanity: pre-existing dex_pools snapshot type is distinct from
-        # the new dex_pool_state time-series type
+        # Sanity: pre-existing dex_pools snapshot type is distinct from the new
+        # dex_pool_state time-series type. (A11c 2026-06-02: legacy DEX_POOLS keeps its
+        # `dex_pools` value to avoid a StrEnum alias-collision with Phase-2 DEX_POOL_STATE;
+        # the canonical pool/swap collapse is enforced on the functional registries.)
         assert DataType.DEX_POOLS == "dex_pools"
         assert DataType.DEX_POOLS != DataType.DEX_POOL_STATE
 

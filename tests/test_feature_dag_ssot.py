@@ -202,12 +202,12 @@ def test_phase_1a_2_lift_8_onchain_feature_groups_seeded() -> None:
 
 def test_onchain_regime_has_two_inputs() -> None:
     """``onchain_regime`` is a Phase 2 derived calculator depending on two
-    leaf data_types: lending_indices (via aave_*) + dex_pools (via
+    leaf data_types: lending_indices (via aave_*) + dex_pool_state (via
     defillama_tvl)."""
     inputs = get_required_inputs("onchain_regime")
     assert len(inputs) == 2
     pairs = {(i.asset_group, i.data_type) for i in inputs}
-    assert pairs == {("defi", "lending_indices"), ("defi", "dex_pools")}
+    assert pairs == {("defi", "lending_indices"), ("defi", "dex_pool_state")}
     assert all(i.available_at_rule == "tick_timestamp" for i in inputs)
 
 

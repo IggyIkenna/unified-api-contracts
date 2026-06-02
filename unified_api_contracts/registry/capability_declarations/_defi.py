@@ -322,18 +322,18 @@ _RESTAKING = [_IT.SPOT_ASSET.value]
 #
 # Key distinctions:
 #   swaps         — individual swap events (amount0, amount1, amountUSD, sender, ts)
-#   dex_pools     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
+#   dex_pool_state     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
 #   oracle_prices — external price feeds (Chainlink, protocol exchange rates)
 #                   needed to compute yield on non-rebasing tokens (sUSDe, wstETH)
 #   gas_fees      — chain-level gas price data (baseFee, priorityFee, gasUsed)
 #
 # Removed phantom data types (not separate data types — they are columns):
-#   tvl           — totalValueLockedUSD is a column in dex_pools, not a separate data type
+#   tvl           — totalValueLockedUSD is a column in dex_pool_state, not a separate data type
 #   utilization   — utilization_rate is a column in lending rate_indices, not a separate data type
 #   evm_defi      — redundant with lending_indices (live snapshot of the same data)
 #
 _LENDING_DATA = ["lending_indices", "liquidations", "risk_params"]
-_DEX_DATA = ["dex_pools", "dex_swaps"]
+_DEX_DATA = ["dex_pool_state", "dex_pool_swaps"]
 _YIELD_DATA = ["lst_rates", "oracle_prices"]
 _STAKING_DATA = ["lst_rates", "oracle_prices"]
 _PERPS_DATA = ["perp_funding"]
@@ -589,7 +589,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "lending_indices"],
+        data_types=["dex_pool_state", "lending_indices"],
         mtds_operations=["collect-dex-pools", "collect-lending-indices"],
         required_tokens=frozenset({"KMNO"}),
     ),
@@ -597,7 +597,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RAYDIUM",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "dex_swaps"],
+        data_types=["dex_pool_state", "dex_pool_swaps"],
         mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"RAY"}),
     ),
@@ -605,7 +605,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="ORCA",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "dex_swaps"],
+        data_types=["dex_pool_state", "dex_pool_swaps"],
         mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"ORCA"}),
     ),
@@ -613,7 +613,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="PHOENIX",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools"],
+        data_types=["dex_pool_state"],
         mtds_operations=["collect-dex-pools"],
     ),
     "marginfi": _ProtocolCapability(

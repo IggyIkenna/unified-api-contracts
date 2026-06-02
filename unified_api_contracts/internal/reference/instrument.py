@@ -185,7 +185,7 @@ class InstrumentRecord(BaseModel):
     # not surfaced on this pydantic model — adapters had to populate them
     # via dict pass-through and they got dropped on serialisation. Lifting
     # them onto the model + adding genuinely-new fields lets MTDS DeFi
-    # handlers (dex_pools, dex_swaps, lending_indices, liquidations)
+    # handlers (dex_pool_state, dex_pool_swaps, lending_indices, liquidations)
     # consume them instead of re-querying The Graph each cycle.
     # Plan: instruments_service_metadata_refactor_2026_04_29.
     pool_address: str | None = Field(

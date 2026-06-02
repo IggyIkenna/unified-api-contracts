@@ -793,7 +793,7 @@ class DataTypeConfig:
             ],
             "OPTION": ["options_chain", "trades", "book_snapshot_5", "liquidations"],
             # DeFi instrument types
-            "POOL": ["dex_swaps", "dex_pools"],  # DEX pools (Uniswap, etc.)
+            "POOL": ["dex_pool_swaps", "dex_pool_state"],  # DEX pools (Uniswap, etc.)
             "A_TOKEN": ["lending_indices", "oracle_prices"],  # Lending supply positions (AAVE, Morpho)
             "DEBT_TOKEN": [
                 "lending_indices",
