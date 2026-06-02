@@ -841,3 +841,110 @@ def get_sports_entity_start_date(entity: str) -> str | None:
         ISO date string, or ``None`` if no start date is registered.
     """
     return SPORTS_ENTITY_START_DATES.get(entity.upper())
+
+
+# ---------------------------------------------------------------------------
+# CF-7 league_id canonicalizer — reverse-strips provider-id suffixes safely
+# ---------------------------------------------------------------------------
+
+# Providers where the suffix integer is compared against a known ID.
+# ``api_football`` is resolved via ``LeagueDefinition.api_football_id``
+# (stored on the registry entry, not in the provider_league_ids dicts).
+_SUFFIX_CHECK_PROVIDERS: tuple[str, ...] = (
+    "api_football",
+    "footystats",
+    "understat",
+    "transfermarkt",
+    "soccer_football_info",
+)
+
+
+def canonicalize_league_id(raw: str) -> str:
+    """Strip a provider-id suffix from a league_id if — and only if — the
+    suffix is provably a provider ID, not part of a legitimate tier name.
+
+    Semantics (CF-7 spec):
+    1. Normalise: ``s = raw.upper().strip()``.
+    2. If ``get_league(s)`` already resolves → return ``s`` unchanged
+       (already canonical; covers cases like ``BUNDESLIGA_2`` which is a
+       valid tier name).
+    3. Else if ``s`` ends with ``_<digits>``: let ``base`` be ``s`` without
+       the trailing ``_<digits>`` segment and ``num = int(digits)``.
+       Strip ONLY IF:
+         - ``get_league(base)`` resolves (base is a known canonical key), AND
+         - for some provider in
+           ``("api_football", "footystats", "understat", "transfermarkt",
+              "soccer_football_info")``,
+           the provider's ID for ``base`` equals ``num``.
+       This ensures ``SCOTTISH_LEAGUE_CUP_185`` is stripped to
+       ``SCOTTISH_LEAGUE_CUP`` only when 185 is the api_football ID
+       registered for ``SCOTTISH_LEAGUE_CUP`` — if 185 is not registered,
+       the raw value is returned unchanged (registry-gap; callers handle).
+    4. Else → return ``s`` unchanged (unresolved registry key; leave raw).
+
+    Idempotent: ``canonicalize_league_id(canonicalize_league_id(x)) ==
+    canonicalize_league_id(x)`` for all ``x``.
+
+    No ``Any`` types; no guessing; conservative and non-lossy.
+
+    Args:
+        raw: Raw league_id string from a manifest row (e.g.
+             ``"SCOTTISH_LEAGUE_CUP_185"``).
+
+    Returns:
+        Canonical league_id string (e.g. ``"SCOTTISH_LEAGUE_CUP"``), or
+        ``raw.upper().strip()`` unchanged when no safe strip is possible.
+    """
+    # Lazy import avoids circular dependency:
+    # provider_league_ids ← (no import) league_data → league_registry
+    # league_data does NOT import provider_league_ids so the cycle is safe.
+    from unified_api_contracts.canonical.domain.sports.league_data import (
+        get_league,
+    )
+
+    s: str = raw.upper().strip()
+
+    # Step 2: already canonical?
+    if get_league(s) is not None:
+        return s
+
+    # Step 3: try stripping a trailing _<digits> suffix.
+    last_underscore = s.rfind("_")
+    if last_underscore == -1:
+        return s
+
+    suffix_part = s[last_underscore + 1 :]
+    if not suffix_part.isdigit():
+        return s
+
+    base: str = s[:last_underscore]
+    num: int = int(suffix_part)
+
+    league = get_league(base)
+    if league is None:
+        # Base doesn't resolve → not a known canonical key; return unchanged.
+        return s
+
+    # Verify the suffix is a known provider ID for this league.
+    for provider in _SUFFIX_CHECK_PROVIDERS:
+        if provider == "api_football":
+            # api_football id lives on the LeagueDefinition, not in the dicts.
+            if league.api_football_id == num:
+                return base
+        else:
+            pid = get_provider_league_id(base, provider)
+            if pid is None:
+                continue
+            # Only compare numerically when pid is already an int or a
+            # purely-numeric string. soccer_football_info uses hex strings
+            # (e.g. "eb57e70ef2e7077e") and understat uses league names —
+            # neither can be meaningfully compared as integers.
+            if isinstance(pid, int):
+                if pid == num:
+                    return base
+            elif isinstance(pid, str) and pid.isdigit() and int(pid) == num:
+                return base
+
+    # Suffix exists but is NOT a registered provider ID for ``base``.
+    # Conservative: return ``s`` unchanged (registry-gap; don't guess).
+    return s
