@@ -130,7 +130,7 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # entry above. Coverage probe: MTDS handler grep across
     # ``market_tick_data_service/cli/handlers/*.py`` for literal
     # ``record_captured(`` callsites with ``data_type=<literal>``.
-    ("defi", "dex_pools"): "tick_timestamp",
+    ("defi", "dex_pool_state"): "tick_timestamp",
     ("defi", "vault_share_price"): "tick_timestamp",
     ("defi", "solana_defi"): "tick_timestamp",
     ("defi", "oracle_prices"): "tick_timestamp",

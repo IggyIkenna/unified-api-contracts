@@ -1,8 +1,0 @@
-# BLOCKED-NO-ADAPTER — cassette not yet live-recorded.
-# Cambrian Network adapter not yet implemented in market-tick-data-service.
-# Capability declared in UAC registry/capability_declarations/_defi.py.
-# API URL: https://api.cambrian.network
-# Solana AVS restaking primitives — on-chain reads preferred; REST API secondary.
-# Run with INTEGRATION_TEST_MODE=live once the adapter is implemented.
-interactions: []
-version: 1

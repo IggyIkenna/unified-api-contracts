@@ -17,11 +17,13 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     EMPTY_CONFIRMED_REASONS,
     ES_OPTIONS_CLUSTERS,
     EVENT_CONTRACT_ROOT_CLUSTERS,
+    EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
     EmptyConfirmedReason,
     extract_es_options_cluster,
     futures_expiry_bucket,
     parse_futures_expiry,
+    was_instrument_alive,
 )
 
 # ---------------------------------------------------------------------------
@@ -250,8 +252,50 @@ def test_expected_known_source_gap_value_present() -> None:
     ``EXPECTED_INSTRUMENT_NOT_LISTED`` — those are pre-launch absence; this is mid-history
     accepted gap.
     """
-    from unified_api_contracts.canonical.crosscutting.honest_coverage import EXPECTED_EMPTY_REASON_PREFIX
 
     assert EmptyConfirmedReason.EXPECTED_KNOWN_SOURCE_GAP.value == "EXPECTED_KNOWN_SOURCE_GAP"
     assert "EXPECTED_KNOWN_SOURCE_GAP" in EMPTY_CONFIRMED_REASONS
     assert EmptyConfirmedReason.EXPECTED_KNOWN_SOURCE_GAP.value.startswith(EXPECTED_EMPTY_REASON_PREFIX)
+
+
+# ---------------------------------------------------------------------------
+# was_instrument_alive — EmptyFromLiveInstrumentError backstop primitive (A10a)
+# ---------------------------------------------------------------------------
+def test_was_instrument_alive_within_window() -> None:
+    # listed 2024-01-01, still active (available_to=None) → alive on a later day.
+    assert was_instrument_alive(available_from=date(2024, 1, 1), available_to=None, day=date(2024, 6, 1)) is True
+
+
+def test_was_instrument_alive_before_listing() -> None:
+    assert was_instrument_alive(available_from=date(2024, 1, 1), available_to=None, day=date(2023, 12, 31)) is False
+
+
+def test_was_instrument_alive_on_or_after_delisting() -> None:
+    # available_to is the latest available date — day >= available_to ⇒ not alive (half-open window).
+    assert (
+        was_instrument_alive(available_from=date(2024, 1, 1), available_to=date(2024, 5, 1), day=date(2024, 5, 1))
+        is False
+    )
+    assert (
+        was_instrument_alive(available_from=date(2024, 1, 1), available_to=date(2024, 5, 1), day=date(2024, 4, 30))
+        is True
+    )
+
+
+def test_was_instrument_alive_unknown_listing_is_conservative_false() -> None:
+    # No available_from ⇒ liveness cannot be CONFIRMED ⇒ False (backstop never fires on unknowns).
+    assert was_instrument_alive(available_from=None, available_to=None, day=date(2024, 6, 1)) is False
+
+
+def test_was_instrument_alive_accepts_datetime_and_iso_string() -> None:
+    from datetime import datetime
+
+    assert (
+        was_instrument_alive(
+            available_from=datetime(2024, 1, 1, 12, 0, 0), available_to=None, day=datetime(2024, 6, 1, 0, 0, 0)
+        )
+        is True
+    )
+    assert was_instrument_alive(available_from="2024-01-01", available_to=None, day="2024-06-01T08:00:00Z") is True
+    # unparseable day → conservative False
+    assert was_instrument_alive(available_from="2024-01-01", available_to=None, day="not-a-date") is False

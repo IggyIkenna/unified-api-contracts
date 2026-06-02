@@ -7,13 +7,25 @@ domain-local ``sports_bucket_name``. This module consolidates the wire-format
 templates so every consumer reads the same source.
 
 Wire-format SSOT (matches deployed Terraform at
-``deployment-service/terraform/gcp/main.tf``):
+``deployment-service/terraform/gcp/main.tf`` and
+``deployment-service/configs/cloud-providers.yaml``):
 
-- Instruments-store buckets: ``instruments-store-{asset_group_lower}-{project_id}``
+- Instruments-store buckets:
+    ``instruments-store-{asset_group_lower}-{env}-{project_id}``
   (TRADFI has no instruments bucket today — universe registry is in UAC).
-- Market-tick-data buckets: ``market-data-tick-{asset_group_lower}-{project_id}``.
-- Test-mode buckets: ``-test-{project_id}`` suffix instead of ``-{project_id}``.
-- Strategy catalogue bucket (single, cross-asset): ``strategy-store-cefi-{project_id}``.
+- Market-tick-data buckets:
+    ``market-data-tick-{asset_group_lower}-{env}-{project_id}``.
+- ``env`` defaults to ``"prd"`` — the production short form matching
+  ``DEPLOYMENT_ENV_SHORT=prd`` in cloud-providers.yaml. Set explicitly for
+  dev/staging buckets.
+- Test-mode buckets: insert ``test-`` before ``{project_id}``
+  (``...-prd-test-{project_id}``).
+- Strategy catalogue bucket (single, cross-asset):
+    ``strategy-store-cefi-{project_id}`` (no env segment — legacy, cross-cutting).
+
+The canonical resolver (UTL ``resolve_bucket_name``) reads the live process env
+for DEPLOYMENT_ENV_SHORT and GCP_PROJECT_ID; this facade is the UAC-layer helper
+for consumers that already know the project_id at call time.
 
 Sports retains its dedicated facade (``sports_bucket_name``) for back-compat;
 this module is what new code should use.
@@ -60,20 +72,20 @@ class BucketKind(StrEnum):
 
 BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND: dict[tuple[AssetGroup, BucketKind], str | None] = {
     # CeFi
-    (AssetGroup.CEFI, BucketKind.INSTRUMENTS): "instruments-store-cefi-{project_id}",
-    (AssetGroup.CEFI, BucketKind.MARKET_DATA): "market-data-tick-cefi-{project_id}",
+    (AssetGroup.CEFI, BucketKind.INSTRUMENTS): "instruments-store-cefi-{env}-{project_id}",
+    (AssetGroup.CEFI, BucketKind.MARKET_DATA): "market-data-tick-cefi-{env}-{project_id}",
     # DeFi
-    (AssetGroup.DEFI, BucketKind.INSTRUMENTS): "instruments-store-defi-{project_id}",
-    (AssetGroup.DEFI, BucketKind.MARKET_DATA): "market-data-tick-defi-{project_id}",
+    (AssetGroup.DEFI, BucketKind.INSTRUMENTS): "instruments-store-defi-{env}-{project_id}",
+    (AssetGroup.DEFI, BucketKind.MARKET_DATA): "market-data-tick-defi-{env}-{project_id}",
     # TradFi — no instruments bucket today; universe is in UAC registry
     (AssetGroup.TRADFI, BucketKind.INSTRUMENTS): None,
-    (AssetGroup.TRADFI, BucketKind.MARKET_DATA): "market-data-tick-tradfi-{project_id}",
+    (AssetGroup.TRADFI, BucketKind.MARKET_DATA): "market-data-tick-tradfi-{env}-{project_id}",
     # Sports — single-bucket-many-leagues
-    (AssetGroup.SPORTS, BucketKind.INSTRUMENTS): "instruments-store-sports-{project_id}",
-    (AssetGroup.SPORTS, BucketKind.MARKET_DATA): "market-data-tick-sports-{project_id}",
+    (AssetGroup.SPORTS, BucketKind.INSTRUMENTS): "instruments-store-sports-{env}-{project_id}",
+    (AssetGroup.SPORTS, BucketKind.MARKET_DATA): "market-data-tick-sports-{env}-{project_id}",
     # Prediction
-    (AssetGroup.PREDICTION, BucketKind.INSTRUMENTS): "instruments-store-prediction-{project_id}",
-    (AssetGroup.PREDICTION, BucketKind.MARKET_DATA): "market-data-tick-prediction-{project_id}",
+    (AssetGroup.PREDICTION, BucketKind.INSTRUMENTS): "instruments-store-prediction-{env}-{project_id}",
+    (AssetGroup.PREDICTION, BucketKind.MARKET_DATA): "market-data-tick-prediction-{env}-{project_id}",
 }
 
 
@@ -92,6 +104,7 @@ def bucket_template(
     asset_group: AssetGroup | str,
     *,
     kind: BucketKind | str = BucketKind.INSTRUMENTS,
+    env: str = "prd",
     test_mode: bool = False,
 ) -> str | None:
     """Return the bucket-name template with ``{project_id}`` placeholder still
@@ -100,12 +113,23 @@ def bucket_template(
     Use this when the caller resolves the project_id later (e.g. MDPS
     ``dependency_checker.py`` framework formats templates at lookup time).
     For immediate resolution, prefer :func:`bucket_name`.
+
+    Args:
+        asset_group: Asset group enum or lowercase string token.
+        kind: Which bucket family.
+        env: Deployment environment short form (``"prd"`` / ``"stg"`` /
+            ``"dev"``). Defaults to ``"prd"`` — the canonical production env.
+            Maps to ``DEPLOYMENT_ENV_SHORT`` in cloud-providers.yaml.
+        test_mode: If True, insert ``test-`` before ``{project_id}``.
     """
     ag = AssetGroup(asset_group) if not isinstance(asset_group, AssetGroup) else asset_group
     bk = BucketKind(kind) if not isinstance(kind, BucketKind) else kind
     template = BUCKET_TEMPLATES_BY_ASSET_GROUP_KIND.get((ag, bk))
     if template is None:
         return None
+    # Substitute env placeholder before the project_id placeholder so callers
+    # that format the template with only ``{project_id}`` still get a valid name.
+    template = template.replace("{env}", env)
     if test_mode:
         template = template.replace("-{project_id}", "-test-{project_id}")
     return template
@@ -116,6 +140,7 @@ def bucket_name(
     project_id: str,
     *,
     kind: BucketKind | str = BucketKind.INSTRUMENTS,
+    env: str = "prd",
     test_mode: bool = False,
 ) -> str | None:
     """Resolve a bucket name for ``(asset_group, kind)``.
@@ -126,14 +151,18 @@ def bucket_name(
         project_id: GCP project id.
         kind: Which bucket family. ``INSTRUMENTS`` for reference / availability
             parquets; ``MARKET_DATA`` for tick / book / trade snapshots.
-        test_mode: If True, swap ``-{project_id}`` for ``-test-{project_id}``
+        env: Deployment environment short form (``"prd"`` / ``"stg"`` /
+            ``"dev"``). Defaults to ``"prd"`` — the canonical production env.
+            Matches ``DEPLOYMENT_ENV_SHORT`` in cloud-providers.yaml. Pass
+            explicitly for non-production buckets.
+        test_mode: If True, insert ``test-`` before the project_id segment
             (matches Terraform test buckets at deployment-service main.tf).
 
     Returns:
         Bucket name. Returns ``None`` for tuples that have no bucket today
         (currently only TRADFI instruments — universe is in UAC registry).
     """
-    template = bucket_template(asset_group, kind=kind, test_mode=test_mode)
+    template = bucket_template(asset_group, kind=kind, env=env, test_mode=test_mode)
     if template is None:
         return None
     return template.format(project_id=project_id)
@@ -154,29 +183,37 @@ def strategy_store_bucket(project_id: str) -> str:
 # the consumer.
 
 _GENERIC_TEMPLATES_BY_KIND: dict[BucketKind, str] = {
-    BucketKind.INSTRUMENTS: "instruments-store-{asset_group_lower}-{project_id}",
-    BucketKind.MARKET_DATA: "market-data-tick-{asset_group_lower}-{project_id}",
+    BucketKind.INSTRUMENTS: "instruments-store-{asset_group_lower}-{env}-{project_id}",
+    BucketKind.MARKET_DATA: "market-data-tick-{asset_group_lower}-{env}-{project_id}",
 }
 
 
 def generic_bucket_template(
     *,
     kind: BucketKind | str = BucketKind.INSTRUMENTS,
+    env: str = "prd",
     test_mode: bool = False,
 ) -> str:
-    """Return a template with BOTH ``{asset_group_lower}`` AND ``{project_id}``
-    placeholders.
+    """Return a template with ``{asset_group_lower}`` AND ``{project_id}``
+    placeholders (env already substituted).
 
     Used by lazy-resolve frameworks (e.g. MDPS ``BaseDependencyChecker``) that
     receive the asset_group at runtime and format the template once per call.
     For asset-group-specific templates use :func:`bucket_template`; for
     immediate resolution use :func:`bucket_name`.
+
+    Args:
+        kind: Which bucket family.
+        env: Deployment environment short form (``"prd"`` / ``"stg"`` /
+            ``"dev"``). Defaults to ``"prd"``.
+        test_mode: If True, insert ``test-`` before ``{project_id}``.
     """
     bk = BucketKind(kind) if not isinstance(kind, BucketKind) else kind
     template = _GENERIC_TEMPLATES_BY_KIND.get(bk)
     if template is None:
         msg = f"unknown bucket kind: {kind!r}"
         raise ValueError(msg)
+    template = template.replace("{env}", env)
     if test_mode:
         template = template.replace("-{project_id}", "-test-{project_id}")
     return template
@@ -185,10 +222,10 @@ def generic_bucket_template(
 # Sports parity import — sports has had its own facade since the phantom-row
 # audit. New code should prefer ``bucket_name(AssetGroup.SPORTS, project_id)``,
 # but importing ``sports_bucket_name`` from this module is the equivalent.
-def sports_bucket_name(project_id: str) -> str:
+def sports_bucket_name(project_id: str, *, env: str = "prd") -> str:
     """Sports parity wrapper. Equivalent to
-    ``bucket_name(AssetGroup.SPORTS, project_id)``."""
-    return f"instruments-store-sports-{project_id}"
+    ``bucket_name(AssetGroup.SPORTS, project_id, env=env)``."""
+    return f"instruments-store-sports-{env}-{project_id}"
 
 
 __all__ = [

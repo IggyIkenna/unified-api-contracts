@@ -354,6 +354,15 @@ for _tf in _TIMEFRAMES_INDEX:
 #                a_token x (lending_indices | rate_indices | oracle_prices)
 #                lst x (lst_rates | oracle_prices)
 # ---------------------------------------------------------------------------
+# OHLC semantics for `swaps_ohlcv_{tf}` (pool x dex_pool_swaps): open/high/low/
+# close are the pool's **USD-normalized spot price**, computed per swap as
+# `amountUSD / |base_amount|` (3-method fallback: amountUSD/base, then
+# amount_in_usd/amount_in, then the raw token0/token1 ratio). This is a
+# price-per-base-token-in-USD-terms, NOT the spot price of the quote asset — so
+# for a USDC/WETH pool the values land near ≈1.0 (USDC-per-WETH expressed in USD
+# units), which is correct and expected, not a bug. Downstream consumers that
+# want ETH spot must read the WETH/USDC orientation accordingly.
+# (features_service_defi_data_loading_blockers_2026_05_29 #3.)
 
 for _tf in _TIMEFRAMES_DEFI:
     # pool

@@ -131,6 +131,7 @@ from .provider_league_ids import SPORTS_ENTITY_START_DATES as SPORTS_ENTITY_STAR
 from .provider_league_ids import TRANSFERMARKT_IDS as TRANSFERMARKT_IDS
 from .provider_league_ids import UNDERSTAT_COVERED_LEAGUES as UNDERSTAT_COVERED_LEAGUES
 from .provider_league_ids import UNDERSTAT_NAMES as UNDERSTAT_NAMES
+from .provider_league_ids import canonicalize_league_id as canonicalize_league_id
 from .provider_league_ids import does_understat_cover as does_understat_cover
 from .provider_league_ids import get_entity_league_coverage as get_entity_league_coverage
 from .provider_league_ids import get_provider_league_id as get_provider_league_id

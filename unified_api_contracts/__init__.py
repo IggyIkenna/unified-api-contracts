@@ -70,7 +70,11 @@ from .canonical.crosscutting.cme_polymarket_link import (
     LINKED_CME_ROOTS,
     linked_question_group,
 )
-from .canonical.crosscutting.defi import ChainKind
+from .canonical.crosscutting.defi import (
+    CHAIN_WIRE_VALUE_OVERRIDES,
+    ChainKind,
+    to_canonical_chain_wire,
+)
 from .canonical.crosscutting.errors import (
     VENUE_ERROR_MAP,
     CanonicalAuthenticationError,
@@ -513,11 +517,13 @@ from .canonical.crosscutting.honest_coverage import (
     EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
     EmptyConfirmedReason,
+    EmptyFromLiveInstrumentError,
     LegacyBlankErrorReasonError,
     RecordFailedReason,
     compute_honest_coverage,
     futures_expiry_bucket,
     get_active_es_options_clusters_for_date,
+    was_instrument_alive,
 )
 from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
@@ -971,6 +977,7 @@ __all__ = [
     "BUNDLED_DATA_TYPES",
     "CaptureStatusCounts",
     "compute_honest_coverage",
+    "was_instrument_alive",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
     "CANONICAL_TO_ODDS_API_BUNDESLIGA",
@@ -1271,6 +1278,7 @@ __all__ = [
     "CcxtOrderBook",
     "CcxtTicker",
     "CcxtTrade",
+    "CHAIN_WIRE_VALUE_OVERRIDES",
     "ChainKind",
     "CircuitBreakerId",
     "ClientLifecycleEvent",
@@ -1342,6 +1350,7 @@ __all__ = [
     # Service emission policy — UTL emission_publisher consumers
     "EmissionLifecycleEvent",
     "EmptyConfirmedReason",
+    "EmptyFromLiveInstrumentError",
     "EndpointSpec",
     "EnvironmentTier",
     "Erc20TransferCalldata",
@@ -1704,6 +1713,7 @@ __all__ = [
     "validate_data_type_for_venue",
     "validate_dataframe",
     "validate_preflight_for_trigger",
+    "to_canonical_chain_wire",
     "validate_row_df",
     "venue_has_no_expected_defi_coverage",
     "TARDIS_FREE_ROLLING_WINDOW_DAYS",
@@ -1714,11 +1724,11 @@ __all__ = [
 # fmt: off
 _VENUES = [
     "alchemy", "api_football", "aster", "barchart", "betfair", "binance",
-    "bybit", "cambrian", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
+    "bybit", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
     "deribit", "eigenlayer", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
     "mev", "metabet", "morpho_blue_api", "nautilus", "odds_api", "odds_engine", "okx",
-    "open_meteo", "opticodds", "picasso", "pinnacle", "polymarket", "soccer_football_info",
-    "sky", "solayer", "tardis", "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
+    "open_meteo", "opticodds", "pinnacle", "polymarket", "soccer_football_info",
+    "sky", "tardis", "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
 ]
 # fmt: on
 for _v in _VENUES:

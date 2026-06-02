@@ -176,6 +176,47 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "spark": {  # Messari lending schema (same as Aave V3 — MakerDAO fork)
         "ETHEREUM": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si",
     },
+    # ── Green-venue adapters (2026-06-02 per-venue smoke tests; slot 7) ──
+    # Venus — Venus-native Compound-fork schema (entity ``markets``;
+    # ``supplyRateMantissa``/``borrowRateMantissa`` are PER-BLOCK mantissa
+    # scaled 1e18; ``borrowIndex`` 1e18). Verified GREEN via The Graph
+    # decentralized net 2026-06-02 (BSC isolated + core + Ethereum all live,
+    # ``markets`` returns data, ``_meta.block.timestamp`` at head). No daily
+    # snapshot history entity and no dedicated liquidation/risk-param entity
+    # exists → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    "venus": {
+        "BSC": "H2a3D64RV4NNxyJqx9jVFQRBpQRzD6zNZjLDotgdCrTC",  # isolated pools
+        "ETHEREUM": "Htf6Hh1qgkvxQxqbcv4Jp5AatsaiY5dNLVcySkpCaxQ8",
+    },
+    # BenQi — Compound-fork ``Market`` schema (entity ``markets``;
+    # ``supplyRate``/``borrowRate`` are decimal APY, ``borrowIndex``/
+    # ``exchangeRate`` decimal; ``blockTimestamp`` per market). Verified
+    # GREEN via The Graph (AVALANCHE) 2026-06-02. No snapshot history /
+    # liquidation entity → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    "benqi": {
+        "AVALANCHE": "HcTvZi3fwucvRJvVmtFzNDTnomvMBk64xCLNQQg6GPAV",
+    },
+    # Radiant — Messari Lending schema (entity ``markets`` with
+    # ``rates{rate,side}`` percent, ``supplyIndex``/``borrowIndex`` ray 1e27,
+    # ``maximumLTV``/``liquidationThreshold``/``liquidationPenalty`` risk
+    # params, ``liquidates`` + ``marketDailySnapshots`` history). Verified
+    # GREEN via The Graph (ARBITRUM + ETHEREUM) 2026-06-02. Full data-type
+    # set: ``lending_indices`` + ``liquidations`` + ``risk_params`` + gas.
+    "radiant": {
+        "ARBITRUM": "E1UTUGaNbTb4XbEYoupJZ5hU62hW9CnadKTXLRSP2hM",
+        "ETHEREUM": "683Qhh8TEta6qS5gdTpXCs84xnrp77fPWGQyBmRe6qgo",
+    },
+    # Euler V2 — Goldsky subgraph (NOT The Graph; full endpoint URL routed via
+    # _SUBGRAPH_ENDPOINT_OVERRIDES in the MTDS handler). Entity ``eulerVaults``
+    # (live ``state{supplyApy,borrowApy,interestRate,...}`` — APY ray 1e27) +
+    # ``vaultStatuses`` time-series for history + ``liquidates`` entity.
+    # The IDs below are the Goldsky subgraph SLUGS (mainnet/arbitrum) so
+    # callers that build a Graph-gateway URL fall through to the override map.
+    # Verified GREEN via Goldsky 2026-06-02 (ETH + ARB both live).
+    "euler_v2": {
+        "ETHEREUM": "euler-v2-mainnet",
+        "ARBITRUM": "euler-v2-arbitrum",
+    },
 }
 
 
@@ -281,18 +322,18 @@ _RESTAKING = [_IT.SPOT_ASSET.value]
 #
 # Key distinctions:
 #   swaps         — individual swap events (amount0, amount1, amountUSD, sender, ts)
-#   dex_pools     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
+#   dex_pool_state     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
 #   oracle_prices — external price feeds (Chainlink, protocol exchange rates)
 #                   needed to compute yield on non-rebasing tokens (sUSDe, wstETH)
 #   gas_fees      — chain-level gas price data (baseFee, priorityFee, gasUsed)
 #
 # Removed phantom data types (not separate data types — they are columns):
-#   tvl           — totalValueLockedUSD is a column in dex_pools, not a separate data type
+#   tvl           — totalValueLockedUSD is a column in dex_pool_state, not a separate data type
 #   utilization   — utilization_rate is a column in lending rate_indices, not a separate data type
 #   evm_defi      — redundant with lending_indices (live snapshot of the same data)
 #
 _LENDING_DATA = ["lending_indices", "liquidations", "risk_params"]
-_DEX_DATA = ["dex_pools", "dex_swaps"]
+_DEX_DATA = ["dex_pool_state", "dex_pool_swaps"]
 _YIELD_DATA = ["lst_rates", "oracle_prices"]
 _STAKING_DATA = ["lst_rates", "oracle_prices"]
 _PERPS_DATA = ["perp_funding"]
@@ -329,6 +370,54 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_LENDING,
         data_types=[*_LENDING_DATA, "gas_fees"],
         mtds_operations=["collect-liquidations", "collect-gas-fees"],
+    ),
+    # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
+    # NOTE (2026-06-02): gas_fees is NOT a per-venue data_type — gas is collected
+    # ONCE PER CHAIN (same gas unit cost for every venue/data_type/instruction on
+    # that chain) by gas_fee_handler under the synthetic venue "ALCHEMY", keyed by
+    # chain_id (DEFAULT_GAS_FEE_CHAINS). BSC/AVALANCHE/ARBITRUM/ETHEREUM are all
+    # already in that per-chain set, so these venues' chains have gas coverage
+    # without declaring gas_fees here. (Operator 2026-06-02.)
+    #
+    # Venus / BenQi: Compound-fork subgraphs whose schema exposes NEITHER a
+    # daily-snapshot history entity NOR a dedicated liquidation/risk-param
+    # entity (introspected 2026-06-02) → lending_indices ONLY.
+    "venus": _ProtocolCapability(
+        venue_prefix="VENUS",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+        required_tokens=frozenset({"XVS"}),
+    ),
+    "benqi": _ProtocolCapability(
+        venue_prefix="BENQI",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+        required_tokens=frozenset({"QI"}),
+    ),
+    # Radiant: Messari Lending schema — exposes liquidations + risk params
+    # (maximumLTV/liquidationThreshold/liquidationPenalty) + marketDailySnapshots
+    # history → full lending data-type set (gas is per-chain, see note above).
+    "radiant": _ProtocolCapability(
+        venue_prefix="RADIANT",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        required_tokens=frozenset({"RDNT"}),
+    ),
+    # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
+    # (history) + liquidates entity → full lending data-type set (gas per-chain).
+    "euler_v2": _ProtocolCapability(
+        venue_prefix="EULER_V2",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        required_tokens=frozenset({"EUL"}),
     ),
     "fluid": _ProtocolCapability(
         venue_prefix="FLUID",
@@ -500,7 +589,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "lending_indices"],
+        data_types=["dex_pool_state", "lending_indices"],
         mtds_operations=["collect-dex-pools", "collect-lending-indices"],
         required_tokens=frozenset({"KMNO"}),
     ),
@@ -508,7 +597,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="RAYDIUM",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "dex_swaps"],
+        data_types=["dex_pool_state", "dex_pool_swaps"],
         mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"RAY"}),
     ),
@@ -516,7 +605,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="ORCA",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "dex_swaps"],
+        data_types=["dex_pool_state", "dex_pool_swaps"],
         mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"ORCA"}),
     ),
@@ -524,7 +613,7 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="PHOENIX",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools"],
+        data_types=["dex_pool_state"],
         mtds_operations=["collect-dex-pools"],
     ),
     "marginfi": _ProtocolCapability(
@@ -557,32 +646,13 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),
-    # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
-    # Second-layer staking: stake LSTs into restaking vaults to earn AVS operator rewards
-    # on top of base staking yield. Critical for carry_staked_basis archetype carry computation.
-    "solayer": _ProtocolCapability(
-        venue_prefix="SOLAYER",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "lst_rates"],
-        mtds_operations=["collect-staking-yields"],
-        required_tokens=frozenset({"SSOL"}),
-    ),
-    "picasso": _ProtocolCapability(
-        venue_prefix="PICASSO",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "cross_chain_restaking_routes"],
-        mtds_operations=["collect-staking-yields"],
-        required_tokens=frozenset({"PICA"}),
-    ),
-    "cambrian": _ProtocolCapability(
-        venue_prefix="CAMBRIAN",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "restaking_operator_set"],
-        mtds_operations=["collect-staking-yields"],
-    ),
+    # SOLAYER + PICASSO + CAMBRIAN removed 2026-06-02 (operator decision): no usable/decodable
+    # DeFi data source. Solayer = sSOL is a custom LRT vault with no decodable exchange-rate
+    # layout / no IDL — could not be field-verified. Picasso = IBC bridge/restaking program
+    # alive but ~3 tx/month + no public yield/rate API; Cambrian = a developer SDK for building
+    # NCNs on Jito Restaking, not a DeFi venue (no TVL/pools/rates/program to query). Excluded
+    # from the venue registry. SSOT:
+    # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md (venue smoke-test results).
 }
 
 # Chain-native tokens — auto-included in major assets for any protocol on that chain.
@@ -847,10 +917,8 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
-    # Plan E: Solana restaking rewards coverage (2026-05-13)
-    "solayer": ["SOLANA"],
-    "picasso": ["SOLANA"],
-    "cambrian": ["SOLANA"],
+    # solayer + picasso + cambrian removed 2026-06-02 (operator decision; no usable/decodable
+    # DeFi data source — see PROTOCOL_CAPABILITIES header note above).
 }
 
 

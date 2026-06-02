@@ -37,6 +37,17 @@ class DataType(StrEnum):
     OHLCV_15M = "ohlcv_15m"
     OHLCV_24H = "ohlcv_24h"
     TBBO = "tbbo"
+    # NOTE (A11c 2026-06-02): these two legacy candle-input members are LEFT on the
+    # pre-collapse values deliberately. The operator-locked canonical pool/swap names
+    # are `dex_pool_state` / `dex_pool_swaps`, but this enum ALSO declares a DISTINCT
+    # Phase-2 member `DEX_POOL_STATE = "dex_pool_state"` (spot-DEX time-series state,
+    # declared below) — renaming DEX_POOLS's VALUE to `dex_pool_state` would
+    # StrEnum-alias-collide the two members. These members are not consumed by
+    # member-name anywhere; the canonical collapse is enforced on the functional
+    # denominator/capability registries (market_data_categories / expected_coverage /
+    # defi_venue_capabilities). Reconciling this enum (merge legacy DEX_POOLS/DEX_SWAPS
+    # into the Phase-2 DEX_POOL_STATE taxonomy, resolving snapshot-vs-timeseries) is the
+    # tracked follow-up A11c-candle-enum in defi_manifest_canonicalisation_2026_06_01.md.
     DEX_POOLS = "dex_pools"
     DEX_SWAPS = "dex_swaps"
     LENDING_INDICES = "lending_indices"
