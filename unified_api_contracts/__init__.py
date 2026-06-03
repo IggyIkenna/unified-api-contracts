@@ -159,6 +159,7 @@ from .canonical.crosscutting.pipeline_mode import (
     is_batch,
     is_live,
     pipeline_mode_for_source,
+    pipeline_mode_for_sports_entity,
     source_string_for,
 )
 from .canonical.crosscutting.scenario_overlay import (
@@ -1696,6 +1697,7 @@ __all__ = [
     "non_trading_day_reason",
     "normalize_underlying",
     "pipeline_mode_for_source",
+    "pipeline_mode_for_sports_entity",
     "policy_is_alert",
     "policy_is_publish_row",
     "read_with_source_priority",

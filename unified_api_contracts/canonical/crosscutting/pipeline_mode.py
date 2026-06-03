@@ -129,10 +129,58 @@ def pipeline_mode_for_source(source: str) -> PipelineMode:
     )
 
 
+# Canonical mapping from sports_reference entity name (lowercase) to PipelineMode.
+# Lifted verbatim from instruments-service ``_ENTITY_NAME_TO_PIPELINE_MODE`` (the
+# verified-correct source, committed at IS@4459799d).  Keyed by the GCS partition
+# key used in sports_reference/by_date/day={D}/entity={E}/ paths.
+# Unknown entity → BATCH_INSTRUMENTS_SERVICE (the instruments-service batch pipeline).
+_SPORTS_ENTITY_TO_PIPELINE_MODE: dict[str, PipelineMode] = {
+    # API Football entities
+    "fixtures": PipelineMode.BATCH_API_FOOTBALL,
+    "injuries": PipelineMode.BATCH_API_FOOTBALL,
+    "fixture_stats": PipelineMode.BATCH_API_FOOTBALL,
+    "fixture_events": PipelineMode.BATCH_API_FOOTBALL,
+    "fixture_lineups": PipelineMode.BATCH_API_FOOTBALL,
+    "player_stats": PipelineMode.BATCH_API_FOOTBALL,
+    "teams": PipelineMode.BATCH_API_FOOTBALL,
+    "standings": PipelineMode.BATCH_API_FOOTBALL,
+    # FootyStats entities
+    "footystats_predictions": PipelineMode.BATCH_FOOTYSTATS,
+    "footystats_matches": PipelineMode.BATCH_FOOTYSTATS,
+    "footystats_odds": PipelineMode.BATCH_ODDS_API,
+    # Understat entities
+    "understat_xg": PipelineMode.BATCH_UNDERSTAT,
+    "understat_xg_shots": PipelineMode.BATCH_UNDERSTAT,
+    # Transfermarkt entities
+    "player_values": PipelineMode.BATCH_TRANSFERMARKT,
+    # SFI entities
+    "progressive_stats": PipelineMode.BATCH_SOCCER_FOOTBALL_INFO,
+    # Open Meteo entities
+    "weather": PipelineMode.BATCH_OPEN_METEO,
+}
+
+
+def pipeline_mode_for_sports_entity(entity_name: str) -> PipelineMode:
+    """Return the batch :class:`PipelineMode` for a sports_reference entity name.
+
+    The entity name is the GCS partition key used in the
+    ``sports_reference/by_date/day={D}/entity={E}/`` hive path (lowercase).
+    Unknown entities fall back to :attr:`PipelineMode.BATCH_INSTRUMENTS_SERVICE`
+    (the instruments-service batch pipeline).
+
+    This is the workspace SSOT for sports_reference ``pipeline_mode`` derivation —
+    instruments-service, market-tick-data-service (migration), and features-service
+    all import from here instead of maintaining their own maps.
+    """
+    return _SPORTS_ENTITY_TO_PIPELINE_MODE.get(entity_name.lower(), PipelineMode.BATCH_INSTRUMENTS_SERVICE)
+
+
 __all__ = [
+    "_SPORTS_ENTITY_TO_PIPELINE_MODE",
     "PipelineMode",
     "is_batch",
     "is_live",
     "pipeline_mode_for_source",
+    "pipeline_mode_for_sports_entity",
     "source_string_for",
 ]
