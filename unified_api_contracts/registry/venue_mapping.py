@@ -391,6 +391,24 @@ class VenueMapping:
         ]
     )
 
+    @property
+    def all_tradfi_venues(self) -> list[str]:
+        """Complete TradFi venue universe — ALL tradfi venues regardless of data source.
+
+        Derived from the authoritative ``all_databento_venues`` field (which, despite its
+        name, already contains the full tradfi universe including non-Databento venues):
+          - CME, NASDAQ, NYSE, ICE → Databento
+          - CBOE → Barchart (VIX index only; see ``venue_to_data_provider`` line 189)
+          - FX   → Yahoo Finance (KRW/USD; see ``venue_to_data_provider`` line 190)
+
+        Use this accessor (not ``all_databento_venues``) for any denominator that must
+        count ALL expected tradfi coverage cells — e.g. the deployment-api
+        MTDS_CATEGORY_META["TRADFI"]["venue_accessor"]. Using ``all_databento_venues``
+        directly on that path caused FLAG-4: CBOE/FX cells excluded from the expected
+        denominator → inflated coverage % + CBOE/FX never showed as expected in drilldown.
+        """
+        return list(self.all_databento_venues)
+
     def is_databento_venue(self, venue: str) -> bool:
         """Check if venue uses Databento (canonical venue name)."""
         return venue in self.all_databento_venues
