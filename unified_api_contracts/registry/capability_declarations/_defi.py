@@ -64,7 +64,29 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     "aave_v3": {  # Verified from github.com/aave/protocol-subgraphs README
         "ETHEREUM": "Cd2gEDVeqnjBn1hSeqFMitw8Q1iiyV9FYUZkLNRcL87g",
         "ARBITRUM": "DLuE98kEb5pQNXAcKFQGQgfSQ57Xdou4jnVbAEqMfy3B",
-        "OPTIMISM": "DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb",
+        # OPTIMISM: AAVE_V3-OPTIMISM canonical data source is the RPC fallback
+        # (policy decision 2026-05-30). Subgraph state on this chain:
+        #   • Aave github-README deployment `DSfLz8oQBUeU5atALgUFQKMTSYV9mZAVYp4noLSXAfvb`
+        #     is at head with `hasIndexingErrors:false`, BUT both
+        #     `reserveParamsHistoryItems` AND `reserves` return [] — Aave
+        #     republished it to v0.0.5 (an "abandoned" empty entity store)
+        #     between 2026-05-08 and 2026-05-29. Silent abandonment by the
+        #     Aave team, NOT an indexing failure.
+        #   • Messari-style deployment `3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi`
+        #     is also at head (verified 2026-05-30: `_meta.block.timestamp`
+        #     ~1780110035 / ~03:00 UTC, no indexing errors). Coverage is
+        #     sparse post-2024-12: rows present at 2024-12-01 + 2026-04-25
+        #     but [] for 2025-06-01 / 2026-01-01 / 2026-05-01 windows. Also
+        #     the nested `market { inputToken { symbol } }` join raises
+        #     `Null value resolved for non-null field market` — handlers
+        #     MUST query top-level snapshot fields only.
+        # All sibling Aave V3 chains (ETH/ARB/POLY/BASE) work fine; only
+        # OPTIMISM is in this abandoned state. RPC fallback (14-row daily
+        # resolution) is operationally sufficient for the carry archetype
+        # until a fresh rich deployment surfaces. Messari ID stays as the
+        # cascade's 2nd variant for partial coverage; swap to a new rich
+        # native ID + re-backfill if Aave revives the deployment.
+        "OPTIMISM": "3RWFxWNstn4nP3dXiDfKi9GgBoHx7xzc7APkXs1MLEgi",
         "POLYGON": "Co2URyXjnxaw8WqxKyVHdirq9Ahhm5vcTs4dMedAq211",
         "AVALANCHE": "2h9woxy8RTjHu1HJsCEnmzpPHFArU33avmUh4f71JpVn",
         "BASE": "GQFbb95cE6d8mV989mL5figjaGaKCQB3xqYrr1bRyXqF",
@@ -153,6 +175,47 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     # ── Additional lending ────────────────────────────────────────
     "spark": {  # Messari lending schema (same as Aave V3 — MakerDAO fork)
         "ETHEREUM": "GbKdmBe4ycCYCQLQSjqGg6UHYoYfbyJyq5WrG35pv1si",
+    },
+    # ── Green-venue adapters (2026-06-02 per-venue smoke tests; slot 7) ──
+    # Venus — Venus-native Compound-fork schema (entity ``markets``;
+    # ``supplyRateMantissa``/``borrowRateMantissa`` are PER-BLOCK mantissa
+    # scaled 1e18; ``borrowIndex`` 1e18). Verified GREEN via The Graph
+    # decentralized net 2026-06-02 (BSC isolated + core + Ethereum all live,
+    # ``markets`` returns data, ``_meta.block.timestamp`` at head). No daily
+    # snapshot history entity and no dedicated liquidation/risk-param entity
+    # exists → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    "venus": {
+        "BSC": "H2a3D64RV4NNxyJqx9jVFQRBpQRzD6zNZjLDotgdCrTC",  # isolated pools
+        "ETHEREUM": "Htf6Hh1qgkvxQxqbcv4Jp5AatsaiY5dNLVcySkpCaxQ8",
+    },
+    # BenQi — Compound-fork ``Market`` schema (entity ``markets``;
+    # ``supplyRate``/``borrowRate`` are decimal APY, ``borrowIndex``/
+    # ``exchangeRate`` decimal; ``blockTimestamp`` per market). Verified
+    # GREEN via The Graph (AVALANCHE) 2026-06-02. No snapshot history /
+    # liquidation entity → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    "benqi": {
+        "AVALANCHE": "HcTvZi3fwucvRJvVmtFzNDTnomvMBk64xCLNQQg6GPAV",
+    },
+    # Radiant — Messari Lending schema (entity ``markets`` with
+    # ``rates{rate,side}`` percent, ``supplyIndex``/``borrowIndex`` ray 1e27,
+    # ``maximumLTV``/``liquidationThreshold``/``liquidationPenalty`` risk
+    # params, ``liquidates`` + ``marketDailySnapshots`` history). Verified
+    # GREEN via The Graph (ARBITRUM + ETHEREUM) 2026-06-02. Full data-type
+    # set: ``lending_indices`` + ``liquidations`` + ``risk_params`` + gas.
+    "radiant": {
+        "ARBITRUM": "E1UTUGaNbTb4XbEYoupJZ5hU62hW9CnadKTXLRSP2hM",
+        "ETHEREUM": "683Qhh8TEta6qS5gdTpXCs84xnrp77fPWGQyBmRe6qgo",
+    },
+    # Euler V2 — Goldsky subgraph (NOT The Graph; full endpoint URL routed via
+    # _SUBGRAPH_ENDPOINT_OVERRIDES in the MTDS handler). Entity ``eulerVaults``
+    # (live ``state{supplyApy,borrowApy,interestRate,...}`` — APY ray 1e27) +
+    # ``vaultStatuses`` time-series for history + ``liquidates`` entity.
+    # The IDs below are the Goldsky subgraph SLUGS (mainnet/arbitrum) so
+    # callers that build a Graph-gateway URL fall through to the override map.
+    # Verified GREEN via Goldsky 2026-06-02 (ETH + ARB both live).
+    "euler_v2": {
+        "ETHEREUM": "euler-v2-mainnet",
+        "ARBITRUM": "euler-v2-arbitrum",
     },
 }
 
@@ -259,18 +322,18 @@ _RESTAKING = [_IT.SPOT_ASSET.value]
 #
 # Key distinctions:
 #   swaps         — individual swap events (amount0, amount1, amountUSD, sender, ts)
-#   dex_pools     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
+#   dex_pool_state     — daily pool aggregates (volume24h, fees24h, tvl) from poolDayDatas
 #   oracle_prices — external price feeds (Chainlink, protocol exchange rates)
 #                   needed to compute yield on non-rebasing tokens (sUSDe, wstETH)
 #   gas_fees      — chain-level gas price data (baseFee, priorityFee, gasUsed)
 #
 # Removed phantom data types (not separate data types — they are columns):
-#   tvl           — totalValueLockedUSD is a column in dex_pools, not a separate data type
+#   tvl           — totalValueLockedUSD is a column in dex_pool_state, not a separate data type
 #   utilization   — utilization_rate is a column in lending rate_indices, not a separate data type
 #   evm_defi      — redundant with lending_indices (live snapshot of the same data)
 #
 _LENDING_DATA = ["lending_indices", "liquidations", "risk_params"]
-_DEX_DATA = ["dex_pools", "dex_swaps"]
+_DEX_DATA = ["dex_pool_state", "dex_pool_swaps"]
 _YIELD_DATA = ["lst_rates", "oracle_prices"]
 _STAKING_DATA = ["lst_rates", "oracle_prices"]
 _PERPS_DATA = ["perp_funding"]
@@ -307,6 +370,54 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         instrument_types=_LENDING,
         data_types=[*_LENDING_DATA, "gas_fees"],
         mtds_operations=["collect-liquidations", "collect-gas-fees"],
+    ),
+    # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
+    # NOTE (2026-06-02): gas_fees is NOT a per-venue data_type — gas is collected
+    # ONCE PER CHAIN (same gas unit cost for every venue/data_type/instruction on
+    # that chain) by gas_fee_handler under the synthetic venue "ALCHEMY", keyed by
+    # chain_id (DEFAULT_GAS_FEE_CHAINS). BSC/AVALANCHE/ARBITRUM/ETHEREUM are all
+    # already in that per-chain set, so these venues' chains have gas coverage
+    # without declaring gas_fees here. (Operator 2026-06-02.)
+    #
+    # Venus / BenQi: Compound-fork subgraphs whose schema exposes NEITHER a
+    # daily-snapshot history entity NOR a dedicated liquidation/risk-param
+    # entity (introspected 2026-06-02) → lending_indices ONLY.
+    "venus": _ProtocolCapability(
+        venue_prefix="VENUS",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+        required_tokens=frozenset({"XVS"}),
+    ),
+    "benqi": _ProtocolCapability(
+        venue_prefix="BENQI",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+        required_tokens=frozenset({"QI"}),
+    ),
+    # Radiant: Messari Lending schema — exposes liquidations + risk params
+    # (maximumLTV/liquidationThreshold/liquidationPenalty) + marketDailySnapshots
+    # history → full lending data-type set (gas is per-chain, see note above).
+    "radiant": _ProtocolCapability(
+        venue_prefix="RADIANT",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        required_tokens=frozenset({"RDNT"}),
+    ),
+    # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
+    # (history) + liquidates entity → full lending data-type set (gas per-chain).
+    "euler_v2": _ProtocolCapability(
+        venue_prefix="EULER_V2",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
+        required_tokens=frozenset({"EUL"}),
     ),
     "fluid": _ProtocolCapability(
         venue_prefix="FLUID",
@@ -395,14 +506,14 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "velodrome_v2": _ProtocolCapability(
-        venue_prefix="VELODROMEV2",
+        venue_prefix="VELODROME_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
         mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
     ),
     "trader_joe_v2": _ProtocolCapability(
-        venue_prefix="TRADER_JOEV2",
+        venue_prefix="TRADER_JOE_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
         data_types=[*_DEX_DATA, "gas_fees"],
@@ -471,39 +582,60 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.PERPS,
         instrument_types=_PERPS,
         data_types=["perp_funding", "oracle_prices"],
-        mtds_operations=["collect-solana-defi", "collect-perp-funding"],
+        mtds_operations=["collect-perp-funding"],
         required_tokens=frozenset({"DRIFT"}),
     ),
     "kamino": _ProtocolCapability(
         venue_prefix="KAMINO",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "lending_indices"],
-        mtds_operations=["collect-solana-defi"],
+        data_types=["dex_pool_state", "lending_indices"],
+        mtds_operations=["collect-dex-pools", "collect-lending-indices"],
         required_tokens=frozenset({"KMNO"}),
     ),
     "raydium": _ProtocolCapability(
         venue_prefix="RAYDIUM",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "dex_swaps"],
-        mtds_operations=["collect-solana-defi"],
+        data_types=["dex_pool_state", "dex_pool_swaps"],
+        mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"RAY"}),
     ),
     "orca": _ProtocolCapability(
         venue_prefix="ORCA",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=["dex_pools", "dex_swaps"],
-        mtds_operations=["collect-solana-defi"],
+        data_types=["dex_pool_state", "dex_pool_swaps"],
+        mtds_operations=["collect-dex-pools"],
         required_tokens=frozenset({"ORCA"}),
+    ),
+    "phoenix": _ProtocolCapability(
+        venue_prefix="PHOENIX",
+        protocol_class=ProtocolClass.DEX,
+        instrument_types=_POOL,
+        data_types=["dex_pool_state"],
+        mtds_operations=["collect-dex-pools"],
+    ),
+    "marginfi": _ProtocolCapability(
+        venue_prefix="MARGINFI",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
+    ),
+    "solend": _ProtocolCapability(
+        venue_prefix="SOLEND",
+        protocol_class=ProtocolClass.LENDING,
+        instrument_types=_LENDING,
+        data_types=["lending_indices"],
+        mtds_operations=["collect-lending-indices"],
     ),
     "marinade": _ProtocolCapability(
         venue_prefix="MARINADE",
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
         data_types=["lst_rates", "oracle_prices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"MNDE", "MSOL"}),
     ),
     "jito": _ProtocolCapability(
@@ -511,35 +643,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         protocol_class=ProtocolClass.STAKING,
         instrument_types=_STAKING,
         data_types=["lst_rates", "oracle_prices"],
-        mtds_operations=["collect-solana-defi"],
+        mtds_operations=["collect-lst-rates"],
         required_tokens=frozenset({"JTO", "JITOSOL", "JSOL"}),
     ),
-    # ── Plan E: Solana restaking rewards coverage (2026-05-13) ────────────
-    # Second-layer staking: stake LSTs into restaking vaults to earn AVS operator rewards
-    # on top of base staking yield. Critical for carry_staked_basis archetype carry computation.
-    "solayer": _ProtocolCapability(
-        venue_prefix="SOLAYER",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "lst_rates"],
-        mtds_operations=["collect-solana-defi"],
-        required_tokens=frozenset({"SSOL"}),
-    ),
-    "picasso": _ProtocolCapability(
-        venue_prefix="PICASSO",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "cross_chain_restaking_routes"],
-        mtds_operations=["collect-solana-defi"],
-        required_tokens=frozenset({"PICA"}),
-    ),
-    "cambrian": _ProtocolCapability(
-        venue_prefix="CAMBRIAN",
-        protocol_class=ProtocolClass.RESTAKING,
-        instrument_types=_YIELD,
-        data_types=["restaking_rewards", "restaking_operator_set"],
-        mtds_operations=["collect-solana-defi"],
-    ),
+    # SOLAYER + PICASSO + CAMBRIAN removed 2026-06-02 (operator decision): no usable/decodable
+    # DeFi data source. Solayer = sSOL is a custom LRT vault with no decodable exchange-rate
+    # layout / no IDL — could not be field-verified. Picasso = IBC bridge/restaking program
+    # alive but ~3 tx/month + no public yield/rate API; Cambrian = a developer SDK for building
+    # NCNs on Jito Restaking, not a DeFi venue (no TVL/pools/rates/program to query). Excluded
+    # from the venue registry. SSOT:
+    # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md (venue smoke-test results).
 }
 
 # Chain-native tokens — auto-included in major assets for any protocol on that chain.
@@ -799,12 +912,13 @@ _STATIC_VENUE_CHAINS: dict[str, list[str]] = {
     "kamino": ["SOLANA"],
     "raydium": ["SOLANA"],
     "orca": ["SOLANA"],
+    "phoenix": ["SOLANA"],
+    "marginfi": ["SOLANA"],
+    "solend": ["SOLANA"],
     "marinade": ["SOLANA"],
     "jito": ["SOLANA"],
-    # Plan E: Solana restaking rewards coverage (2026-05-13)
-    "solayer": ["SOLANA"],
-    "picasso": ["SOLANA"],
-    "cambrian": ["SOLANA"],
+    # solayer + picasso + cambrian removed 2026-06-02 (operator decision; no usable/decodable
+    # DeFi data source — see PROTOCOL_CAPABILITIES header note above).
 }
 
 
@@ -862,9 +976,9 @@ def parse_defi_venue(venue_str: str) -> tuple[str, str]:
 
 # Strip-underscore lookup: "AAVEV3" → "AAVE_V3" (the authoritative venue_prefix).
 # Built from PROTOCOL_CAPABILITIES venue_prefix set (33 prefixes, verified zero
-# strip-underscore collisions 2026-05-26). For prefixes that are themselves glued
-# in the authoritative set (VELODROMEV2, TRADER_JOEV2), glued IS canonical, so the
-# round-trip is a no-op.
+# strip-underscore collisions 2026-05-26). VELODROME_V2 / TRADER_JOE_V2 carry the
+# underscore-canonical prefix (operator 2026-06-01 — DF-17 glued-canonical reversed);
+# the stripped legacy form (VELODROMEV2 / TRADERJOEV2) maps back to the canonical.
 _STRIPPED_PREFIX_TO_CANONICAL: dict[str, str] = {
     prefix.replace("_", "").upper(): prefix for prefix in {cap.venue_prefix for cap in PROTOCOL_CAPABILITIES.values()}
 }
@@ -878,7 +992,7 @@ def canonicalize_defi_venue_combined(raw: str) -> str:
         "UNISWAPV3-ETHEREUM"  -> "UNISWAP_V3-ETHEREUM"
         "COMPOUNDV3-BASE"     -> "COMPOUND_V3-BASE"
         "AAVE_V3-ARBITRUM"    -> "AAVE_V3-ARBITRUM"   (already canonical → passthrough)
-        "VELODROMEV2-OPTIMISM"-> "VELODROMEV2-OPTIMISM" (glued IS canonical for this venue)
+        "VELODROMEV2-OPTIMISM"-> "VELODROME_V2-OPTIMISM" (legacy glued → underscore-canonical)
         "BINANCE"             -> "BINANCE"            (no known chain → passthrough)
 
     Algorithm:

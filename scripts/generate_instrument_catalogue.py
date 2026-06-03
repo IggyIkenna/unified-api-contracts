@@ -79,6 +79,7 @@ class TupleEntry(TypedDict, total=False):
     retention_days: int | None
     notes: str | None
     schema: list[dict[str, object]]
+    pipeline_modes: list[str]
 
 
 # ---------------------------------------------------------------------------
@@ -120,6 +121,7 @@ def _aggregate_tuple(
             empty=0,
             failed=0,
             latest_captured=None,
+            pipeline_modes=[],
             today=today,
         )
 
@@ -209,6 +211,10 @@ def _aggregate_tuple(
             pass
     expected = _expected_day_count(coverage_start_date, today)
 
+    pipeline_modes: list[str] = []
+    if "pipeline_mode" in df.columns and not df.empty:
+        pipeline_modes = sorted(df["pipeline_mode"].dropna().astype(str).unique().tolist())
+
     return _build_entry(
         capability=capability,
         schema_columns=_schema_columns(schema),
@@ -218,6 +224,7 @@ def _aggregate_tuple(
         empty=empty,
         failed=failed,
         latest_captured=latest_captured,
+        pipeline_modes=pipeline_modes,
         today=today,
     )
 
@@ -232,6 +239,7 @@ def _build_entry(
     empty: int,
     failed: int,
     latest_captured: str | None,
+    pipeline_modes: list[str],
     today: date,
 ) -> TupleEntry:
     # honest-coverage: empty_confirmed counts as captured-attempt — the source
@@ -281,6 +289,7 @@ def _build_entry(
         "retention_days": capability.retention_days,
         "notes": capability.notes,
         "schema": schema_columns,
+        "pipeline_modes": pipeline_modes,
     }
 
 
@@ -405,9 +414,9 @@ def render_markdown(entries: list[TupleEntry]) -> str:
         out.append("")
         out.append(
             "| Data type | Venue | Inst. type | Coverage | Captured / Expected | "
-            "Latest | Live | Batch | Retry |"
+            "Latest | Live | Batch | Retry | Pipeline Modes |"
         )
-        out.append("|---|---|---|---|---|---|---|---|---|")
+        out.append("|---|---|---|---|---|---|---|---|---|---|")
         for entry in sorted(
             by_ag[ag],
             key=lambda e: (e["data_type"], e["venue"], e.get("instrument_type") or ""),
@@ -416,13 +425,15 @@ def render_markdown(entries: list[TupleEntry]) -> str:
             live_badge = "🟢-LIVE" if entry["live_ready"] else ""
             batch_badge = "🟢-BATCH" if entry["batch_ready"] else ""
             retry_badge = "⚠️" if entry["retry_needed"] else ""
+            modes = entry.get("pipeline_modes") or []
+            modes_cell = ", ".join(modes) if modes else "—"
             out.append(
                 f"| {entry['data_type']} | {entry['venue']} | "
                 f"{entry.get('instrument_type') or '—'} | "
                 f"{coverage_emoji} {entry['coverage_pct']:.1%} | "
                 f"{entry['captured_days']} / {entry['expected_days']} | "
                 f"{entry.get('latest_captured_day') or '—'} | "
-                f"{live_badge} | {batch_badge} | {retry_badge} |"
+                f"{live_badge} | {batch_badge} | {retry_badge} | {modes_cell} |"
             )
         out.append("")
 

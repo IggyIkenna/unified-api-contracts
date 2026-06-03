@@ -13,6 +13,7 @@ import dataclasses
 from dataclasses import dataclass
 
 import pandas as pd
+import polars as pl
 
 
 class InstrumentInfo(dict[str, object]):
@@ -167,11 +168,16 @@ class CandleOutput:
     liquidation_volume: object = None
     liquidation_notional: object = None
 
-    # DeFi pool-swap schema columns (UAC _DEX_EXT: swap_count + volume_quote_usd + chain)
-    # These must match the (defi, pool, swaps_ohlcv_*) contract column names exactly.
+    # DeFi candle schema columns.
     # chain: blockchain name (e.g. "ETHEREUM") — non-nullable in UAC contract.
-    # swap_count: DeFi-specific alias for trade_count.
-    # volume_quote_usd: DeFi-specific alias for USD-denominated volume.
+    # swap_count: kept ONLY for the `state_ohlcv_*` (dex_pool_state) candle; on
+    #   the `swaps_ohlcv_*` candle it was an exact duplicate of OHLCV-core
+    #   `trade_count` and has been dropped from the swaps contract (DeFi #4 /
+    #   C0-RD6 — _DEX_EXT split).
+    # volume_quote_usd: an exact duplicate of OHLCV-core `volume`, dropped from
+    #   the swaps contract. The MDPS swap_adapter still emits it as a kwarg; once
+    #   that emission is removed (paired market-data-processing-service edit) this
+    #   field can be deleted here too.
     chain: object = None
     swap_count: object = None
     volume_quote_usd: object = None
@@ -224,6 +230,24 @@ class CandleOutput:
         if not data:
             return pd.DataFrame()
         return pd.DataFrame(data)
+
+    def to_polars(self) -> pl.DataFrame:
+        """Convert non-None array fields to a polars DataFrame.
+
+        Pure-Polars sibling of to_dataframe() (MDPS pure-Polars migration
+        Stage 3 — plans/active/mdps_pure_polars_migration_2026_05_28.md).
+        Lets MDPS skip the numpy->pandas->parquet roundtrip on the output
+        side; polars writes the parquet directly from arrow arrays.
+        Returns an empty DataFrame if all fields are None.
+        """
+        data: dict[str, object] = {}
+        for f in dataclasses.fields(self):
+            v: object = getattr(self, f.name)  # pyright: ignore[reportAny]
+            if v is not None:
+                data[f.name] = v
+        if not data:
+            return pl.DataFrame()
+        return pl.DataFrame(data)
 
 
 __all__ = ["CandleOutput", "InstrumentInfo", "InstrumentMetadata"]

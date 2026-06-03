@@ -23,6 +23,7 @@ from decimal import Decimal
 from typing import TYPE_CHECKING
 
 import pandas as pd
+import polars as pl
 import pytest
 
 if TYPE_CHECKING:
@@ -223,6 +224,39 @@ class TestAdapterModels:
         assert "open" in df.columns
         assert len(df) == 2
 
+    def test_candle_output_to_polars_empty(self) -> None:
+        from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
+            CandleOutput,
+        )
+
+        co = CandleOutput()
+        df = co.to_polars()
+        assert isinstance(df, pl.DataFrame)
+        assert df.is_empty()
+
+    def test_candle_output_to_polars_with_arrays(self) -> None:
+        from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
+            CandleOutput,
+        )
+
+        ts = [1_000_000_000, 2_000_000_000]
+        co = CandleOutput(
+            timestamp=ts,
+            venue=["BINANCE", "BINANCE"],
+            symbol=["BTCUSDT", "BTCUSDT"],
+            instrument_id=["BINANCE:SPOT:BTCUSDT", "BINANCE:SPOT:BTCUSDT"],
+            open=[50000.0, 50100.0],
+            high=[50200.0, 50300.0],
+            low=[49900.0, 50000.0],
+            close=[50100.0, 50200.0],
+            volume=[100.0, 120.0],
+        )
+        df = co.to_polars()
+        assert isinstance(df, pl.DataFrame)
+        assert "timestamp" in df.columns
+        assert "open" in df.columns
+        assert df.height == 2
+
     def test_all_exports(self) -> None:
         import unified_api_contracts.internal.domain.market_data_processing.adapter_models as m
 
@@ -264,6 +298,36 @@ class TestCandleSchema:
 
         # StrEnum means string comparison works
         assert DataType.TRADES == "trades"
+
+    def test_solana_basis_mvp_data_types(self) -> None:
+        """plans/active/solana_basis_trading_mvp_2026_06_01.md — Phase 1+2 scope.
+
+        Asserts that the closed-set DataType enum declares the seven new types
+        required by the Solana basis-trading MVP (Drift V2 perp ground-truth
+        types + Solana spot-DEX time-series state types). These are referenced
+        by ``DriftV2HistoricalIngester`` (MTDS) + the Phase-2 Orca / Raydium /
+        Phoenix / Jupiter ingesters; flipping any of these to a different
+        string is a wire-format break.
+        """
+        from unified_api_contracts.internal.domain.market_data_processing.candle_schema import DataType
+
+        # Drift V2 perp ground-truth (Phase 1)
+        assert DataType.PERP_TRADES == "perp_trades"
+        assert DataType.PERP_MARK_ORACLE == "perp_mark_oracle"
+        assert DataType.PERP_OPEN_INTEREST == "perp_open_interest"
+        # Spot DEX time-series state (Phase 2)
+        assert DataType.DEX_POOL_STATE == "dex_pool_state"
+        assert DataType.DEX_ORDERBOOK == "dex_orderbook"
+        assert DataType.DEX_QUOTE == "dex_quote"
+        assert DataType.DEX_TRADES == "dex_trades"
+        # Sanity: pre-existing perp_funding remains unchanged
+        assert DataType.PERP_FUNDING == "perp_funding"
+        # Sanity: pre-existing dex_pools snapshot type is distinct from the new
+        # dex_pool_state time-series type. (A11c 2026-06-02: legacy DEX_POOLS keeps its
+        # `dex_pools` value to avoid a StrEnum alias-collision with Phase-2 DEX_POOL_STATE;
+        # the canonical pool/swap collapse is enforced on the functional registries.)
+        assert DataType.DEX_POOLS == "dex_pools"
+        assert DataType.DEX_POOLS != DataType.DEX_POOL_STATE
 
     def test_all_exports(self) -> None:
         import unified_api_contracts.internal.domain.market_data_processing.candle_schema as m

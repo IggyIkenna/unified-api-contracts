@@ -90,7 +90,7 @@ class SyntheticRealismAxis(StrEnum):
     paths for correctness benchmarking. Not shipped pre-cutover."""
 
 
-_SHARD_AXIS_PATTERN: Final = frozenset(
+SHARD_AXIS_PATTERN: Final = frozenset(
     {"venue", "instrument", "chain", "protocol", "pool", "oracle_feed", "data_type", "day"},
 )
 """The closed set of shard-key axes a synthetic generator may fan out on.
@@ -103,7 +103,7 @@ list and that matrix is a silent correctness bug per CLAUDE.md
 
 
 __all__ = [
-    "_SHARD_AXIS_PATTERN",
+    "SHARD_AXIS_PATTERN",
     "SyntheticDataDomain",
     "SyntheticGeneratorId",
     "SyntheticRealismAxis",

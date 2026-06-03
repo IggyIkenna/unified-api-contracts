@@ -42,8 +42,8 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "tbbo": "15s",
     # DeFi — on-chain sampled (ETH ~12s blocks → 15m safe default)
     # Note: "liquidations" already declared in CeFi section above (same 15s granularity)
-    "dex_pools": "15m",
-    "dex_swaps": "15s",
+    "dex_pool_state": "15m",
+    "dex_pool_swaps": "15s",
     "lending_indices": "15m",
     "perp_funding": "15m",
     "lst_rates": "15m",
@@ -142,8 +142,8 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "macro_result",  # Macro economic results: NFP/CPI/GDP/FOMC/Claims/PCE (FRED)
     ],
     "defi": [
-        "dex_pools",  # DEX pool metrics (TVL, liquidity depth)
-        "dex_swaps",  # DEX swap events (requires candle sampling)
+        "dex_pool_state",  # DEX pool metrics (TVL, liquidity depth)
+        "dex_pool_swaps",  # DEX swap events (requires candle sampling)
         "lending_indices",  # Lending rate indices (supply/borrow APY, utilization)
         "liquidations",  # DeFi liquidation events
         "perp_funding",  # Perpetual funding rates (Hyperliquid, Aster, GMX)
@@ -297,9 +297,13 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "ohlcv_24h": True,
     "tbbo": True,
     # DeFi — candle-sampled types need processing; pass-through types do not
-    "dex_pools": False,
-    "dex_swaps": True,
-    "lending_indices": True,
+    "dex_pool_state": False,
+    "dex_pool_swaps": True,
+    # Bypass — periodic supply/borrow-index snapshot read raw by features-onchain
+    # (aave_lending_rates / aave_utilization); no lending_ohlcv consumer exists.
+    # Same class as oracle_prices / lst_rates. Do NOT re-enable without a real
+    # lending_ohlcv consumer (see issue defi_code_codex_drift D3; reverts 4c98a635).
+    "lending_indices": False,
     # Note: "liquidations" already declared in CeFi section above (True — same for DeFi)
     "perp_funding": False,
     "lst_rates": False,
@@ -400,14 +404,14 @@ FEATURE_GROUP_DATA_TYPE_OVERRIDES: dict[str, dict[str, str]] = {
         "oscillators": "oracle_prices",
         "volatility_realized": "oracle_prices",
         "momentum": "oracle_prices",
-        "volume_analysis": "dex_swaps",
-        "vwap": "dex_swaps",
+        "volume_analysis": "dex_pool_swaps",
+        "vwap": "dex_pool_swaps",
         "candlestick_patterns": "oracle_prices",
         "market_structure": "oracle_prices",
         "returns": "oracle_prices",
         "round_numbers": "oracle_prices",
         "streaks": "oracle_prices",
-        "microstructure": "dex_swaps",
+        "microstructure": "dex_pool_swaps",
         "funding_oi": "perp_funding",
         "liquidations": "liquidations",
         "temporal": "oracle_prices",
@@ -995,8 +999,8 @@ _PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
         # CeFi catalog reader provides DEX pool instrument IDs for LIGHTER/PACIFICA).
         "ohlcv_1m",
         # DEFI per-pool / per-market / per-asset shards
-        "dex_swaps",
-        "dex_pools",
+        "dex_pool_swaps",
+        "dex_pool_state",
         "lending_indices",
         "oracle_prices",
         "lst_rates",
@@ -1093,7 +1097,7 @@ def get_expected_instruments_for_venue(
         ``AAVE_V3-ETHEREUM`` …) as used by ``VenueMapping``.
     data_type:
         Canonical MTDS data_type (``trades``, ``book_snapshot_5``,
-        ``dex_swaps`` …).
+        ``dex_pool_swaps`` …).
     as_of_date:
         ISO date (YYYY-MM-DD). Reserved for future use — today both MVP
         seed tables and injected providers are date-agnostic, but this
@@ -1218,7 +1222,7 @@ def _default_seed_instruments_for(venue: str, data_type: str) -> tuple[str, ...]
     if data_type in ("options_chain", "futures_chain"):
         return _OPTION_FUTURE_MVP_SEED_UNDERLYINGS
 
-    # DEFI per-instrument dts (dex_pools / dex_swaps / lending_indices /
+    # DEFI per-instrument dts (dex_pool_state / dex_pool_swaps / lending_indices /
     # oracle_prices / lst_rates / rewards / risk_params) + PREDICTION
     # legacy `prediction_trades` / `prediction_book_snapshot` /
     # `prediction_market_metadata` — delegated to the Wave 8G seed module.

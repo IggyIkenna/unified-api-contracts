@@ -5,7 +5,7 @@ Wave 8G of the MTDS per-instrument sentinel rollout. The Wave 8B
 ``market_data_categories.py`` returns non-empty lists for CEFI / TRADFI
 via ``_SPOT_MVP_SEED_INSTRUMENTS`` / ``_PERP_MVP_SEED_INSTRUMENTS`` /
 ``_OPTION_FUTURE_MVP_SEED_UNDERLYINGS``. DEFI + PREDICTION per-instrument
-dts (``dex_pools``, ``dex_swaps``, ``lending_indices``, ``oracle_prices``,
+dts (``dex_pool_state``, ``dex_pool_swaps``, ``lending_indices``, ``oracle_prices``,
 ``lst_rates``, ``rewards``, ``risk_params``, ``trades`` on POLYMARKET /
 KALSHI) historically fell through to ``()`` — meaning the Phase 8
 honest-coverage aggregator degraded those categories to the Tier-2
@@ -16,7 +16,7 @@ This module holds the Wave 8G MVP seed tables. Values sourced from the
 live GCS availability manifests on ``central-element-323112`` on
 2026-04-20:
 
-    * DEX pools — ``gs://dex-pools-central-element-323112/dex_pools/
+    * DEX pools — ``gs://dex-pools-central-element-323112/dex_pool_state/
       uniswap_v3/ETHEREUM/date=2026-04-14/*.parquet`` (top 20 by TVL).
     * Aave reserves — ``gs://lending-indices-central-element-323112/
       lending_indices/aave_v3/ETHEREUM/date=2026-04-14/*.parquet``
@@ -143,9 +143,9 @@ _KALSHI_TOP_CONDITION_IDS: tuple[str, ...] = ()
 # which already handles the ``cap`` + ``instruments_provider`` paths.
 
 DEFI_MVP_SEED_INSTRUMENTS: dict[tuple[str, str], tuple[str, ...]] = {
-    # UNISWAP_V3-ETHEREUM — dex_pools + dex_swaps share the pool set.
-    ("UNISWAP_V3-ETHEREUM", "dex_pools"): _UNISWAP_V3_ETHEREUM_TOP_POOLS,
-    ("UNISWAP_V3-ETHEREUM", "dex_swaps"): _UNISWAP_V3_ETHEREUM_TOP_POOLS,
+    # UNISWAP_V3-ETHEREUM — dex_pool_state + dex_pool_swaps share the pool set.
+    ("UNISWAP_V3-ETHEREUM", "dex_pool_state"): _UNISWAP_V3_ETHEREUM_TOP_POOLS,
+    ("UNISWAP_V3-ETHEREUM", "dex_pool_swaps"): _UNISWAP_V3_ETHEREUM_TOP_POOLS,
     # AAVE_V3-ETHEREUM — every per-reserve dt expands to the same reserve
     # universe (lending_indices / oracle_prices / rewards / risk_params).
     ("AAVE_V3-ETHEREUM", "lending_indices"): _AAVE_V3_ETHEREUM_TOP_RESERVES,

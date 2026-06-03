@@ -150,7 +150,7 @@ class PnLAttribution:
     basis_spread_pnl: Decimal = Decimal("0")  # Spot-perp spread changes
     staking_yield_pnl: Decimal = Decimal("0")  # CARRY_BASE — LST exchange_rate appreciation
     avs_continuous_yield_pnl: Decimal = Decimal("0")
-    """CARRY_AVS_CONTINUOUS — EigenLayer / Karak / Symbiotic / Solayer per-token
+    """CARRY_AVS_CONTINUOUS — EigenLayer / Karak / Symbiotic per-token
     rewards realised in target denomination via the dust-conversion router.
     Sourced from eigenlayer_rewards parquet aggregated through ConvertDustInstruction.
     Per-token breakdown lives in `reward_attribution_rows` for granular reporting."""

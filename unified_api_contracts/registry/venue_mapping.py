@@ -279,7 +279,7 @@ class VenueMapping:
             "GMX-ARBITRUM": "2021-09-06",  # GMX Arbitrum launch
             "GMX-AVALANCHE": "2022-01-05",  # GMX Avalanche launch
             "AERODROME_V3-BASE": "2024-05-01",  # Earliest pool createdAtTimestamp from subgraph
-            "VELODROMEV2-OPTIMISM": "2023-06-15",  # Velodrome V2 Optimism launch
+            "VELODROME_V2-OPTIMISM": "2023-06-15",  # Velodrome V2 Optimism launch
             "TRADERJOE-AVALANCHE": "2021-07-04",  # TraderJoe Avalanche launch
             # DeFi - Lending protocols
             "AAVE_V3-ETHEREUM": "2023-01-27",
@@ -793,7 +793,7 @@ class DataTypeConfig:
             ],
             "OPTION": ["options_chain", "trades", "book_snapshot_5", "liquidations"],
             # DeFi instrument types
-            "POOL": ["dex_swaps", "dex_pools"],  # DEX pools (Uniswap, etc.)
+            "POOL": ["dex_pool_swaps", "dex_pool_state"],  # DEX pools (Uniswap, etc.)
             "A_TOKEN": ["lending_indices", "oracle_prices"],  # Lending supply positions (AAVE, Morpho)
             "DEBT_TOKEN": [
                 "lending_indices",

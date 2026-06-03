@@ -13,12 +13,12 @@ same timing semantics, different sources OK`` rule:
 > emission time, NOT the canonical historical source's slower archive
 > time).
 
-Phase 1B seed: this module ships with **single-source seeds**
-(top-of-list only). Multi-source merge logic and per-tier-tier-tier
-priority tie-breakers are deferred to a follow-up plan
-(``multi_source_priority_merge_2026_*<TBD>.md``) — flagged as a
-documented temporary state per the workspace
-``Temporary state must have a named successor plan`` rule.
+Phase 2 (multi-source merge) is implemented in
+``plans/active/tradfi_massive_dual_source_2026_05_28.md`` (archived once
+complete). The helpers :func:`get_all_sources_with_priority`,
+:func:`select_primary_available_source`, and
+:func:`detect_dual_source_conflicts` land the merge-logic building blocks.
+The ``multi_source_priority_merge_2026_*`` placeholder is resolved.
 
 Tie-breaker rules (when multiple sources are listed):
 
@@ -74,12 +74,39 @@ single primary batch source.
 
 from __future__ import annotations
 
+import logging
+from enum import StrEnum
 from typing import Final
 
 from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
     PipelineMode,
     pipeline_mode_for_source,
 )
+
+logger = logging.getLogger(__name__)
+
+
+class DivergenceKind(StrEnum):
+    """Closed-set reasons a manifest row is flagged as a cross-source divergence.
+
+    Written into the manifest ``divergence_kind`` column (nullable; ``None``
+    means no divergence). Per Phase 2 of
+    ``tradfi_massive_dual_source_2026_05_28.md``:
+
+    * ``DUAL_SOURCE_DUPLICATE`` — the same ``(asset_group, venue, day, ticker,
+      ts)`` row-key appears in two or more sources. The sources agree on the
+      key but may differ on values (price, volume). Logged + counted; do NOT
+      silently drop either source's row — downstream reconciliation decides
+      the winner via :func:`select_primary_available_source`.
+
+    Future values (extend this enum, do NOT add bare strings):
+    * ``TEMPORAL_GAP`` — source A has the day; source B is absent.
+    * ``FIELD_UNION`` — sources have non-overlapping field sets (rule 4 of
+      the tie-breaker docstring); consumer unions both rows.
+    """
+
+    DUAL_SOURCE_DUPLICATE = "DUAL_SOURCE_DUPLICATE"
+
 
 SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # ---- Sports ---------------------------------------------------------
@@ -163,7 +190,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # node call or signed transaction event; hyperliquid_rest = Hyperliquid
     # REST API for Solana-based perp + DEX legs.
     ("defi", "bridge_events"): ["onchain_rpc"],
-    ("defi", "dex_pools"): ["onchain_subgraph"],
+    ("defi", "dex_pool_state"): ["onchain_subgraph"],
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],
@@ -220,13 +247,16 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # EIA (US Energy Information Administration) — commodity storage + series data.
     # BATCH_EIA manifest mode: features-commodity-service D5 Phase 1.
     ("tradfi", "energy_data"): ["eia"],
-    ("tradfi", "trades"): ["databento"],
-    ("tradfi", "tbbo"): ["databento"],
-    ("tradfi", "ohlcv_1m"): ["databento"],
-    # databento primary; yahoo: VIX 15m rolling 60d fallback; barchart: VIX 15m historical preload 2020-2025.
-    ("tradfi", "ohlcv_15m"): ["databento", "yahoo", "barchart"],
-    ("tradfi", "options_chain"): ["databento"],
-    ("tradfi", "futures_chain"): ["databento"],
+    ("tradfi", "trades"): ["databento", "massive"],
+    ("tradfi", "tbbo"): ["databento", "massive"],
+    ("tradfi", "ohlcv_1m"): ["databento", "massive"],
+    # databento primary; massive secondary (REST batch, delayed tier); yahoo: VIX 15m rolling 60d fallback;
+    # barchart: VIX 15m historical preload 2020-2025. Massive slotted AFTER databento, BEFORE yahoo/barchart
+    # per tradfi_massive_dual_source_2026_05_28.md Phase 1 operator decision. CFE (VX/VIX futures) is NOT
+    # covered by Massive — existing yahoo+barchart layering handles those via MTDS routing.
+    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
+    ("tradfi", "options_chain"): ["databento", "massive"],
+    ("tradfi", "futures_chain"): ["databento", "massive"],
     # commodity_signal — emitted by features-service commodity family from
     # EIA (crude oil + natural gas weekly storage) + CFTC + Baker Hughes +
     # Open-Meteo + Yahoo factor inputs. Top entry is EIA per the storage
@@ -308,6 +338,96 @@ def has_source_priority(asset_group: str, data_type: str) -> bool:
     return (asset_group, data_type) in SOURCE_PRIORITY
 
 
+COMPUTED_SOURCES: Final[frozenset[str]] = frozenset(
+    {
+        # Internal service emitters — NOT external market-data vendors. Their
+        # rows' lineage is the upstream cell they were computed from, not a
+        # vendor, so the data-source provenance gate is N/A for them
+        # (data_source_provenance_all_asset_groups_2026_06_01.md § Scope
+        # boundary — "EXEMPT: computed, no external vendor"). These source
+        # strings exist in SOURCE_PRIORITY only to satisfy the PipelineMode
+        # closed-set round-trip; they are exempt from source stamping.
+        "execution_service",  # execution-service fills
+        "strategy_service",  # strategy-service hedge-ratio / decision-context
+        "features_onchain_service",  # features-onchain per-tick snapshots
+        "cross_instrument",  # features-service cross_instrument family outputs
+    }
+)
+"""Source strings denoting internal computed/service emitters (provenance-exempt).
+
+The data-source provenance gate
+(``data_source_provenance_all_asset_groups_2026_06_01.md``) stamps ``source``
+on every *external-vendor* market-data cell. Cells whose only source(s) are
+internal service emitters carry no external provenance — their lineage is the
+upstream cell, not a vendor — so they are exempt from the gate. Membership here
+is the principled exemption (vs a hardcoded data_type list)."""
+
+
+def external_sources_for(asset_group: str, data_type: str) -> list[str]:
+    """Return the external-vendor sources for a cell (computed sources removed).
+
+    A cell's :data:`SOURCE_PRIORITY` list may mix external vendors with
+    internal computed emitters (see :data:`COMPUTED_SOURCES`). This returns
+    only the external entries, preserving priority order. Empty list when the
+    pair is unregistered OR every source is a computed/service emitter.
+    """
+    return [s for s in SOURCE_PRIORITY.get((asset_group, data_type), ()) if s not in COMPUTED_SOURCES]
+
+
+def source_required(asset_group: str, data_type: str) -> bool:
+    """Return True when the writer MUST be *passed* an explicit ``source``.
+
+    SSOT for the multi-source disambiguation half of the writer-side gate in
+    ``unified_trading_library.manifest_writer`` (record_captured / add). A cell
+    requires an explicit source ONLY when it has **more than one external
+    source** — because the writer cannot otherwise know which provider served
+    the row.
+
+    Single-source external cells do NOT require an explicit source: the writer
+    auto-stamps the sole registered external source via :func:`default_source`
+    (universal stamping — every external cell carries ``source`` for
+    swap-resilience, per the 2026-06-01 operator decision). Computed/service
+    cells (:data:`COMPUTED_SOURCES`) and unregistered pairs are exempt.
+
+    * TradFi ``trades`` (databento + massive)        → True (explicit needed)
+    * DeFi ``oracle_prices`` (pyth_hermes+chainlink) → True
+    * DeFi ``native_staking_rates`` (solana+helius)  → True
+    * Sports ``FIXTURES`` (api_football+footystats)  → True
+    * CeFi ``trades`` (tardis)                        → False (auto-stamped)
+    * Prediction ``trades`` (polymarket_clob)         → False (auto-stamped)
+    * DeFi ``execution_fills`` (execution_service)    → False (computed-exempt)
+    * Unregistered pair                               → False
+
+    Args:
+        asset_group: ``cefi`` / ``defi`` / ``tradfi`` / ``prediction`` /
+            ``sports`` / ``reference``. (The writer passes its ``category``.)
+        data_type: Canonical data_type string.
+
+    Returns:
+        ``True`` iff the pair has >1 external source.
+    """
+    return len(external_sources_for(asset_group, data_type)) > 1
+
+
+def default_source(asset_group: str, data_type: str) -> str | None:
+    """Return the auto-stampable source for a single-source external cell.
+
+    Universal-stamping helper (``data_source_provenance_all_asset_groups_2026_06_01.md``):
+    when a cell has exactly **one** external source, the writer auto-stamps it
+    so the row carries provenance even though only one vendor exists today
+    (swap-resilience — when a 2nd vendor or a replacement lands, pre-existing
+    rows stay distinguishable from the new source).
+
+    Returns:
+        The sole external source string when the cell has exactly one external
+        source; ``None`` when the cell is multi-source (caller must pass an
+        explicit source), computed/service-only, or unregistered (nothing to
+        auto-stamp).
+    """
+    external = external_sources_for(asset_group, data_type)
+    return external[0] if len(external) == 1 else None
+
+
 EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # Tick-level live sources — sub-second tick-to-pipeline arrival.
     "tardis": 50,  # multi-venue WS aggregator
@@ -320,6 +440,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "api_football": 1_000,
     "odds_api": 5_000,
     # Equity / index intraday — free-tier delayed feeds (VIX 15m fallback route).
+    "massive": 900_000,  # 15 min: Massive (formerly Polygon.io) Starter tier delayed feed
     "yahoo": 900_000,  # 15 min: Yahoo Finance free-tier intraday delay for CBOE-sourced indices like ^VIX
     # Post-match / batch-only — cadence is hours-to-day.
     "understat": 7_200_000,  # 2h post-match xG
@@ -533,14 +654,169 @@ def read_with_source_priority(
     return primary_source, pipeline_mode
 
 
+def detect_dual_source_conflicts(
+    source_a: str,
+    keys_a: set[tuple],
+    source_b: str,
+    keys_b: set[tuple],
+    *,
+    asset_group: str,
+    data_type: str,
+) -> list[tuple]:
+    """Return row keys present in both source_a and source_b.
+
+    Per Phase 2 of ``tradfi_massive_dual_source_2026_05_28.md`` conflict
+    detection: when the same ``(asset_group, venue, day, ticker, ts)``
+    row-key appears in two sources, this function detects the overlap, logs
+    the count at WARNING level, and returns the duplicate keys so callers can
+    emit ``divergence_kind=DUAL_SOURCE_DUPLICATE`` into the manifest.
+
+    DO NOT silently drop either source's row — downstream reconciliation
+    (e.g. :func:`select_primary_available_source`) decides which source wins.
+
+    Args:
+        source_a: First source string (e.g. ``"databento"``).
+        keys_a: Set of row-key tuples for source_a (e.g.
+            ``{(venue, day, ticker, ts), ...}``). Any hashable tuple shape is
+            accepted — the caller owns the row-key definition.
+        source_b: Second source string (e.g. ``"massive"``).
+        keys_b: Set of row-key tuples for source_b.
+        asset_group: Used in log messages only.
+        data_type: Used in log messages only.
+
+    Returns:
+        Sorted list of row-key tuples present in both ``keys_a`` and
+        ``keys_b``. Empty list when there are no conflicts.
+    """
+    duplicates = keys_a & keys_b
+    if duplicates:
+        logger.warning(
+            "DUAL_SOURCE_DUPLICATE: %d row-key(s) in (%s, %s) appear in both "
+            "source=%r and source=%r. Mark manifest rows with "
+            "divergence_kind=DUAL_SOURCE_DUPLICATE. Sample (up to 3): %s",
+            len(duplicates),
+            asset_group,
+            data_type,
+            source_a,
+            source_b,
+            sorted(duplicates)[:3],
+        )
+    return sorted(duplicates)
+
+
+def select_primary_available_source(
+    asset_group: str,
+    data_type: str,
+    available_sources: set[str],
+) -> tuple[str, PipelineMode]:
+    """Return the highest-priority available source for ``(asset_group, data_type)``.
+
+    Applies the Phase 2 tie-breaker rules from the module docstring in priority
+    order. The :data:`SOURCE_PRIORITY` list encodes the tie-breaker: index 0 is
+    the winner when all sources are present. When only a subset is available
+    (e.g. Databento has a gap but Massive has the day), this function falls
+    through to the next registered source.
+
+    Tie-breaker rules (in order):
+
+    1. **Timestamp-availability** — sources that emit at live-time win
+       (encoded as lower emission latency in :data:`EMISSION_LATENCY_MS_BY_SOURCE`).
+    2. **Coverage** — broader date / instrument coverage wins.
+    3. **Information richness** — more fields per row wins.
+    4. **Merge-different-fields** — non-overlapping field sets: callers
+       *union* rather than pick, so both sources remain in
+       :data:`SOURCE_PRIORITY` (handled at the consumer / writer layer,
+       not here).
+
+    Rules 1-3 are resolved at registry-design time by the ordering in
+    :data:`SOURCE_PRIORITY`; this helper enforces that ordering at runtime
+    when not all sources have data.
+
+    Args:
+        asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / etc.
+        data_type: Canonical data_type string.
+        available_sources: Set of source strings that have data for the
+            requested ``(asset_group, data_type, day)`` cell (e.g. from
+            a manifest query or filesystem scan).
+
+    Returns:
+        ``(source_string, pipeline_mode)`` for the highest-priority source
+        found in ``available_sources``.
+
+    Raises:
+        KeyError: If ``(asset_group, data_type)`` is not registered, OR if
+            none of the registered sources appear in ``available_sources``.
+    """
+    priority_list = get_source_priority(asset_group, data_type)
+    for source in priority_list:
+        if source in available_sources:
+            return source, pipeline_mode_for_source(source)
+    raise KeyError(
+        f"No registered source for ({asset_group!r}, {data_type!r}) is available. "
+        f"Registered (priority order): {priority_list}. "
+        f"Available: {sorted(available_sources)}."
+    )
+
+
+def get_all_sources_with_priority(
+    asset_group: str,
+    data_type: str,
+) -> list[tuple[str, PipelineMode]]:
+    """Return all registered sources for ``(asset_group, data_type)`` in priority order.
+
+    Phase 2 of ``tradfi_massive_dual_source_2026_05_28.md`` — multi-source
+    merge building block. Unlike :func:`read_with_source_priority` (which
+    returns only the primary source), this function returns the full ordered
+    list so callers can:
+
+    * Iterate over all available sources for a cell (e.g. ``databento`` +
+      ``massive`` for TradFi trades).
+    * Apply tie-breaker logic at the consumer layer (timestamp-availability
+      → coverage → information richness → field-union per module docstring).
+    * Detect conflicts when the same ``(ticker, ts)`` appears in multiple
+      source parquets.
+
+    The returned list is ordered by priority (index 0 = highest priority,
+    the same as ``read_with_source_priority`` returns). Each element pairs
+    the source string with its batch :class:`PipelineMode`.
+
+    Args:
+        asset_group: One of ``cefi`` / ``defi`` / ``tradfi`` / ``prediction``
+            / ``sports`` / ``reference``.
+        data_type: Canonical data_type string.
+
+    Returns:
+        Ordered list of ``(source_string, pipeline_mode)`` tuples, highest
+        priority first. Always non-empty (enforced by
+        ``test_every_source_priority_entry_has_at_least_one_source``).
+
+    Raises:
+        KeyError: If the ``(asset_group, data_type)`` pair is not registered
+            in :data:`SOURCE_PRIORITY`.
+        ValueError: If any source string in the list has no corresponding
+            :class:`PipelineMode` — closed-set round-trip violation prevented
+            in CI by ``test_every_source_priority_source_round_trips_to_pipeline_mode``.
+    """
+    sources = get_source_priority(asset_group, data_type)
+    return [(source, pipeline_mode_for_source(source)) for source in sources]
+
+
 __all__ = [
+    "COMPUTED_SOURCES",
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",
+    "DivergenceKind",
     "assert_emission_latency_round_trip",
+    "default_source",
+    "detect_dual_source_conflicts",
     "emission_latency_ms_for_source",
+    "external_sources_for",
+    "get_all_sources_with_priority",
     "get_primary_source",
     "get_primary_source_with_latency",
     "get_source_priority",
     "has_source_priority",
     "read_with_source_priority",
+    "select_primary_available_source",
+    "source_required",
 ]

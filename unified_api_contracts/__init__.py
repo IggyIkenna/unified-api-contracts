@@ -70,7 +70,11 @@ from .canonical.crosscutting.cme_polymarket_link import (
     LINKED_CME_ROOTS,
     linked_question_group,
 )
-from .canonical.crosscutting.defi import ChainKind
+from .canonical.crosscutting.defi import (
+    CHAIN_WIRE_VALUE_OVERRIDES,
+    ChainKind,
+    to_canonical_chain_wire,
+)
 from .canonical.crosscutting.errors import (
     VENUE_ERROR_MAP,
     CanonicalAuthenticationError,
@@ -188,12 +192,15 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    default_source,
     emission_latency_ms_for_source,
+    external_sources_for,
     get_primary_source,
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
     read_with_source_priority,
+    source_required,
 )
 from .canonical.crosscutting.strategy_family import (
     STRATEGY_FAMILY_REGISTRY,
@@ -510,11 +517,13 @@ from .canonical.crosscutting.honest_coverage import (
     EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
     EmptyConfirmedReason,
+    EmptyFromLiveInstrumentError,
     LegacyBlankErrorReasonError,
     RecordFailedReason,
     compute_honest_coverage,
     futures_expiry_bucket,
     get_active_es_options_clusters_for_date,
+    was_instrument_alive,
 )
 from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
@@ -526,6 +535,8 @@ from .canonical.crosscutting.manifest_schema import (
     EXPECTED_WINDOW_COMPLETENESS_FRACTION_COLUMN,
     LAST_EMISSION_DECISION_AT_COLUMN,
     MANIFEST_SCHEMA_VERSION_V8,
+    PIPELINE_MODE_COLUMN,
+    PIPELINE_MODE_NOT_NULL_SINCE,
     READER_FALLBACK_WINDOW_DAYS,
     SERVICE_EMISSION_STATE_COLUMN,
     V8_COLUMN_DEFAULTS,
@@ -813,6 +824,7 @@ from .registry import (
     PROCESSED_REQUIRES_RAW,
     QUARTERLY_MONTHS,
     SPORTS_VENUES,
+    TARDIS_FREE_ROLLING_WINDOW_DAYS,
     TIMEFRAMES,
     TRADFI_DATABENTO_INSTRUMENTS,
     TRADFI_EQUITIES,
@@ -831,6 +843,7 @@ from .registry import (
     ProviderDataAvailability,
     VenueCoordinates,
     VenueMapping,
+    free_dates_in_range,
     get_databento_symbols_for_venue,
     get_expected_data_types_for_venue,
     get_expected_instruments_for_venue,
@@ -839,8 +852,10 @@ from .registry import (
     get_venue_coordinates,
     get_venue_data_type_start_date,
     is_per_instrument_shard_data_type,
+    is_tardis_free_date,
     needs_candle_processing,
     non_trading_day_reason,
+    resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
     venue_has_no_expected_defi_coverage,
 )
@@ -962,6 +977,7 @@ __all__ = [
     "BUNDLED_DATA_TYPES",
     "CaptureStatusCounts",
     "compute_honest_coverage",
+    "was_instrument_alive",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
     "CANONICAL_TO_ODDS_API_BUNDESLIGA",
@@ -982,6 +998,7 @@ __all__ = [
     "CEFI_SPOT_PAIR_TRADES",
     "CLOB_VENUES",
     "CME_MONTH_CODES",
+    "CME_ROOT_TO_POLYMARKET_GROUP",
     "CONFIG_REQUIRED_FIELDS",
     "CONFIG_SCHEMA",
     "CONTRACT_REGISTRY",
@@ -1038,6 +1055,7 @@ __all__ = [
     "INSTRUMENT_TYPE_FOLDER_MAP",
     "KNOWN_ETFS",
     "LAST_EMISSION_DECISION_AT_COLUMN",
+    "LINKED_CME_ROOTS",
     "LIVE_ALERT_RULES",
     "LIVE_CLUSTER_REGISTRY",
     "MANIFEST_SCHEMA_VERSION_V8",
@@ -1046,6 +1064,8 @@ __all__ = [
     "OKX_FUTURES",
     "OKX_SPOT",
     "OPTIONAL_CONFIG_FIELDS",
+    "PIPELINE_MODE_COLUMN",
+    "PIPELINE_MODE_NOT_NULL_SINCE",
     "PROCESSED_REQUIRES_RAW",
     "QUARTERLY_MONTHS",
     "READER_FALLBACK_WINDOW_DAYS",
@@ -1258,6 +1278,7 @@ __all__ = [
     "CcxtOrderBook",
     "CcxtTicker",
     "CcxtTrade",
+    "CHAIN_WIRE_VALUE_OVERRIDES",
     "ChainKind",
     "CircuitBreakerId",
     "ClientLifecycleEvent",
@@ -1329,6 +1350,7 @@ __all__ = [
     # Service emission policy — UTL emission_publisher consumers
     "EmissionLifecycleEvent",
     "EmptyConfirmedReason",
+    "EmptyFromLiveInstrumentError",
     "EndpointSpec",
     "EnvironmentTier",
     "Erc20TransferCalldata",
@@ -1666,6 +1688,7 @@ __all__ = [
     "is_emission_policy_declared",
     "is_live",
     "is_per_instrument_shard_data_type",
+    "linked_question_group",
     "lookup_contract",
     "matrix_cell_count",
     "next_state",
@@ -1679,25 +1702,33 @@ __all__ = [
     "register_generator",
     "register_scenario",
     "resolve_environment_from_env",
+    "resolve_data_type_for_feature_group",
+    "default_source",
+    "external_sources_for",
     "resolve_environment_from_hostname",
     "resolve_exchange",
     "scenarios_for_archetype",
+    "source_required",
     "source_string_for",
     "validate_data_type_for_venue",
     "validate_dataframe",
     "validate_preflight_for_trigger",
+    "to_canonical_chain_wire",
     "validate_row_df",
     "venue_has_no_expected_defi_coverage",
+    "TARDIS_FREE_ROLLING_WINDOW_DAYS",
+    "free_dates_in_range",
+    "is_tardis_free_date",
 ]
 
 # fmt: off
 _VENUES = [
     "alchemy", "api_football", "aster", "barchart", "betfair", "binance",
-    "bybit", "cambrian", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
+    "bybit", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
     "deribit", "eigenlayer", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
     "mev", "metabet", "morpho_blue_api", "nautilus", "odds_api", "odds_engine", "okx",
-    "open_meteo", "opticodds", "picasso", "pinnacle", "polymarket", "soccer_football_info",
-    "sky", "solayer", "tardis", "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
+    "open_meteo", "opticodds", "pinnacle", "polymarket", "soccer_football_info",
+    "sky", "tardis", "thegraph", "transfermarkt", "understat", "upbit", "yahoo_finance",
 ]
 # fmt: on
 for _v in _VENUES:

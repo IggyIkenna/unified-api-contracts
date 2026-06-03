@@ -341,42 +341,8 @@ VCR_ENDPOINTS: dict[str, list[VCREndpoint]] = {
             schema_version="1.0",
         ),
     ],
-    "solayer": [
-        # Covers: Solayer sSOL restaking APY (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
-        # API URL declared in UAC _defi.py capability: https://app.solayer.org/api
-        # Stub cassette ships; re-record when MTDS adapter is implemented.
-        _get(
-            "https://app.solayer.org/api/info/restaking",
-            "restaking_apy.yaml",
-            "",
-            "SolayerRestakingResponse",
-            schema_version="1.0",
-        ),
-    ],
-    "cambrian": [
-        # Covers: Cambrian Network AVS restaking (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
-        # API URL declared in UAC _defi_chain_data.py: https://api.cambrian.network
-        # Stub cassette ships; re-record when MTDS adapter is implemented.
-        _get(
-            "https://api.cambrian.network/restaking/operator-sets",
-            "restaking_rewards.yaml",
-            "",
-            "CambrianRestakingResponse",
-            schema_version="1.0",
-        ),
-    ],
-    "picasso": [
-        # Covers: Picasso Network cross-chain restaking (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
-        # API URL declared in UAC _defi_chain_data.py: https://api.picasso.network
-        # Stub cassette ships; re-record when MTDS adapter is implemented.
-        _get(
-            "https://api.picasso.network/restaking/routes",
-            "restaking_rewards.yaml",
-            "",
-            "PicassoRestakingResponse",
-            schema_version="1.0",
-        ),
-    ],
+    # solayer + cambrian + picasso removed 2026-06-02 (operator decision): no usable/decodable
+    # DeFi data source. See plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md.
     "sky": [
         # Covers: Sky Protocol (MakerDAO rebrand) savings rate (BLOCKED-NO-ADAPTER — adapter not yet in MTDS)
         # DSR/SSR yield products — DAI Savings Rate + Sky Savings Rate (sUSDS).
@@ -665,9 +631,7 @@ ENDPOINT_SCHEMA_MAP: dict[str, str] = {
     # DeFi protocol direct APIs (non-subgraph)
     "morpho_blue_api:markets": "MorphoBlueMarketsResponse",
     "eigenlayer:rewards": "EigenLayerRewardsResponse",
-    "solayer:restaking": "SolayerRestakingResponse",
-    "cambrian:restaking": "CambrianRestakingResponse",
-    "picasso:restaking": "PicassoRestakingResponse",
+    # solayer + cambrian + picasso removed 2026-06-02 (operator decision): no usable DeFi data source.
     "sky:savings_rate": "SkySavingsRateResponse",
     # DeFi protocol subgraphs (The Graph)
     "thegraph_aave:reserves": "TheGraphResponse",

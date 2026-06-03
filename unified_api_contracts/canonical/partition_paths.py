@@ -12,8 +12,19 @@ Wire-format SSOT (matches deployed MTDS adapters as of 2026-05-02):
 All 4 asset groups share the ``raw_tick_data/by_date/`` bucket-relative root
 prefix. Concrete patterns:
 
-DeFi: ``raw_tick_data/by_date/day={D}/asset_group=defi/venue={V}/chain={C}/
+DeFi (operator-locked 2026-06-01): ``pipeline_mode={mode}`` IS a CANONICAL
+       segment of the DeFi path, inserted AFTER ``day={D}`` and BEFORE
+       ``asset_group=defi`` (``mode`` ∈ ``batch``/``live``). Pass
+       ``pipeline_mode=`` to :func:`build_defi_partition_path` to get it;
+       ``None`` (the back-compat default) omits the segment.
+
+       ``raw_tick_data/by_date/day={D}/pipeline_mode={mode}/asset_group=defi/
+       venue={V}/chain={C}/instrument_type={IT}/data_type={DT}/{file}``
+
+       (back-compat, ``pipeline_mode=None``):
+       ``raw_tick_data/by_date/day={D}/asset_group=defi/venue={V}/chain={C}/
        instrument_type={IT}/data_type={DT}/{file}``
+       SSOT: ``codex/02-data/defi-canonical-naming-ssot.md``.
 CeFi: ``raw_tick_data/by_date/day={D}/asset_group=cefi/venue={V}/
        instrument_type={IT}/data_type={DT}/{file}``
 TradFi: ``raw_tick_data/by_date/day={D}/asset_group=tradfi/venue={V}/
@@ -79,11 +90,22 @@ def build_defi_partition_path(
     data_type: str,
     day: _dt.date,
     file_name: str,
+    pipeline_mode: str | None = None,
 ) -> str:
     """Build the canonical DeFi partition path (full bucket-relative path).
 
     Wire format (returns the full path including the
-    ``raw_tick_data/by_date/`` prefix — callers MUST NOT prepend further):
+    ``raw_tick_data/by_date/`` prefix — callers MUST NOT prepend further).
+
+    With ``pipeline_mode`` (CANONICAL — operator-locked 2026-06-01), the
+    ``pipeline_mode={mode}/`` segment is inserted AFTER ``day={D}/`` and BEFORE
+    ``asset_group=defi/``:
+
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/pipeline_mode={mode}/
+    asset_group=defi/venue={V}/chain={C}/instrument_type={IT}/
+    data_type={DT}/{file_name}``
+
+    With ``pipeline_mode=None`` (back-compat default) the segment is omitted:
 
     ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=defi/venue={V}/
     chain={C}/instrument_type={IT}/data_type={DT}/{file_name}``
@@ -91,7 +113,14 @@ def build_defi_partition_path(
     Where ``venue`` is the protocol only (e.g. ``AAVE_V3``, ``UNISWAP_V3``,
     ``LIDO``) — never the legacy ``PROTOCOL-CHAIN`` overload — and
     ``chain`` is the uppercased chain identifier
-    (``ETHEREUM`` / ``ARBITRUM`` / ``SOLANA`` / ...).
+    (``ETHEREUM`` / ``ARBITRUM`` / ``SOLANA`` / ``HYPERLIQUID`` / ...; see
+    ``ChainKind`` + ``to_canonical_chain_wire`` for the Hyperliquid wire
+    override). SSOT: ``codex/02-data/defi-canonical-naming-ssot.md``.
+
+    Args:
+        pipeline_mode: When provided, insert the canonical
+            ``pipeline_mode={mode}/`` segment after ``day=`` (``mode`` ∈
+            ``batch``/``live``). ``None`` (default) → no segment (back-compat).
 
     Example:
         >>> build_defi_partition_path(
@@ -103,6 +132,16 @@ def build_defi_partition_path(
         ...     file_name="aUSDC.parquet",
         ... )
         'raw_tick_data/by_date/day=2026-04-17/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/aUSDC.parquet'
+        >>> build_defi_partition_path(
+        ...     venue="AAVE_V3",
+        ...     chain="ETHEREUM",
+        ...     instrument_type=InstrumentType.A_TOKEN,
+        ...     data_type="lending_indices",
+        ...     day=_dt.date(2026, 4, 17),
+        ...     file_name="aUSDC.parquet",
+        ...     pipeline_mode="batch",
+        ... )
+        'raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch/asset_group=defi/venue=AAVE_V3/chain=ETHEREUM/instrument_type=a_token/data_type=lending_indices/aUSDC.parquet'
     """
     if not data_type:
         msg = "data_type must be a non-empty string"
@@ -119,8 +158,14 @@ def build_defi_partition_path(
     # value, so the two forms are deliberately distinct.
     it = instrument_type.value.lower()
     day_str = day.strftime("%Y-%m-%d")
+    # ``pipeline_mode={mode}/`` is a CANONICAL DeFi segment (operator-locked
+    # 2026-06-01) inserted after ``day=`` and before ``asset_group=``. This is
+    # the SINGLE source for that segment — the cross-asset-group dispatcher
+    # ``candidate_parquet_paths`` routes DeFi through here rather than
+    # string-rewriting the bare path. ``None`` omits it (back-compat).
+    pipeline_mode_segment = f"pipeline_mode={pipeline_mode}/" if pipeline_mode else ""
     return (
-        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=defi/"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{pipeline_mode_segment}{ASSET_GROUP_HIVE_KEY}=defi/"
         f"venue={v}/chain={c}/"
         f"instrument_type={it}/data_type={data_type}/"
         f"{file_name}"
@@ -391,12 +436,23 @@ def candidate_parquet_paths(
     day_str = day.strftime("%Y-%m-%d")
 
     def _prepend_pipeline_mode(path: str) -> str:
-        """Insert ``pipeline_mode={mode}/`` after ``day={D}/`` in a canonical path."""
+        """Insert ``pipeline_mode={mode}/`` after ``day={D}/`` in a canonical path.
+
+        Used by CeFi / TradFi / Prediction. DeFi does NOT use this — its
+        ``pipeline_mode={mode}/`` segment is canonical and produced directly by
+        :func:`build_defi_partition_path` (the single source), so the DeFi
+        branch passes ``pipeline_mode`` through to the builder instead.
+        """
         marker = f"day={day_str}/{ASSET_GROUP_HIVE_KEY}="
         return path.replace(marker, f"day={day_str}/pipeline_mode={pipeline_mode}/{ASSET_GROUP_HIVE_KEY}=", 1)
 
     if ag == AssetGroup.DEFI:
-        base = build_defi_partition_path(
+        # DeFi: pipeline_mode= is a CANONICAL segment owned by the builder
+        # (operator-locked 2026-06-01) — pass it through so the builder is the
+        # single source, rather than string-rewriting the bare path. The
+        # canonical (with-segment) path is the first probe; the bare path
+        # follows as a migration fallback.
+        bare = build_defi_partition_path(
             venue=str(kwargs["venue"]),
             chain=str(kwargs["chain"]),
             instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
@@ -405,8 +461,17 @@ def candidate_parquet_paths(
             file_name=str(kwargs["file_name"]),
         )
         if pipeline_mode:
-            return [_prepend_pipeline_mode(base), base]
-        return [base]
+            canonical = build_defi_partition_path(
+                venue=str(kwargs["venue"]),
+                chain=str(kwargs["chain"]),
+                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+                data_type=data_type,
+                day=day,
+                file_name=str(kwargs["file_name"]),
+                pipeline_mode=pipeline_mode,
+            )
+            return [canonical, bare]
+        return [bare]
 
     if ag == AssetGroup.CEFI:
         base = build_cefi_partition_path(

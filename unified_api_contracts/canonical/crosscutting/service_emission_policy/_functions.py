@@ -7,7 +7,7 @@ from unified_api_contracts.canonical.crosscutting.service_emission_state import 
 )
 
 from ._enums import EmissionLifecycleEvent, ServiceEmissionPolicy
-from ._policies import _EVENT_TO_STATE, SERVICE_OUTPUT_POLICIES
+from ._policies import EVENT_TO_STATE, SERVICE_OUTPUT_POLICIES
 
 
 def get_emission_policy(service: str, output_data_type: str) -> ServiceEmissionPolicy:
@@ -99,7 +99,7 @@ def next_state(
     """
     # Mark as referenced — caller-side documentation contract.
     _ = policy
-    return _EVENT_TO_STATE[event]
+    return EVENT_TO_STATE[event]
 
 
 __all__ = [

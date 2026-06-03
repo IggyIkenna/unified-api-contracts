@@ -85,6 +85,11 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.OPTION,
         # DeFi
         InstrumentType.POOL,
+        # DEX_POOL: spot-DEX orderbook + quote + per-swap shards (Solana
+        # basis MVP Phase 2 2026-06-01). Distinct partition from POOL so
+        # Phoenix orderbook / Jupiter quotes / Orca trades don't collide
+        # with the EVM AMM pool contract.
+        InstrumentType.DEX_POOL,
         InstrumentType.LENDING,
         InstrumentType.LST,
         InstrumentType.YIELD_BEARING,
@@ -92,6 +97,10 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
         InstrumentType.SPOT_ASSET,
+        # DeFi Solana (distinct shapes; SchemaContracts at UAC@7e9f4ad9)
+        InstrumentType.SOLANA_LENDING,
+        InstrumentType.SOLANA_VAULT,
+        InstrumentType.SOLANA_AMM_POOL,
         # TradFi
         InstrumentType.ETF,
         InstrumentType.EQUITY,
@@ -128,6 +137,7 @@ _CEFI_DATED_DERIVATIVES: Final[frozenset[InstrumentType]] = frozenset({Instrumen
 _DEFI_TYPES: Final[frozenset[InstrumentType]] = frozenset(
     {
         InstrumentType.POOL,
+        InstrumentType.DEX_POOL,
         InstrumentType.LENDING,
         InstrumentType.LST,
         InstrumentType.YIELD_BEARING,
@@ -135,6 +145,10 @@ _DEFI_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
         InstrumentType.SPOT_ASSET,
+        # Solana DeFi (same VENUE-CHAIN:TYPE:SYMBOL builder; chain="SOLANA")
+        InstrumentType.SOLANA_LENDING,
+        InstrumentType.SOLANA_VAULT,
+        InstrumentType.SOLANA_AMM_POOL,
     }
 )
 

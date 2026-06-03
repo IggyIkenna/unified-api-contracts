@@ -250,6 +250,7 @@ class TestIntegrationOrphanCheck:
             for required_field in ("path", "reason", "detail", "acked_by"):
                 assert required_field in entry, f"allowlist entry missing '{required_field}': {entry}"
 
+    @pytest.mark.timeout(180)  # filesystem scan takes 17-21s alone; allow 3x buffer for full-suite I/O load
     def test_missing_cassettes_is_list(self) -> None:
         """Missing-cassette detection still returns a list (informational)."""
         cassette_map = collect_all_cassette_files()

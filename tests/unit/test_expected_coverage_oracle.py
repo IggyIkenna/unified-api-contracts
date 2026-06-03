@@ -106,7 +106,7 @@ class TestDefiDeprecationGates:
     def test_deprecated_defi_venue_returns_expected_empty(self) -> None:
         # UNISWAP_V3-POLYGON is in scope policy AND in EMPTY_OR_DEPRECATED_DEFI_VENUES.
         # The deprecation gate must fire over the scope policy.
-        result = expected_coverage("defi", "UNISWAP_V3-POLYGON", "dex_swaps", date(2025, 6, 15))
+        result = expected_coverage("defi", "UNISWAP_V3-POLYGON", "dex_pool_swaps", date(2025, 6, 15))
         assert result.state is ExpectedState.EXPECTED_EMPTY
         assert result.reason == "EXPECTED_DEPRECATED_DATA_TYPE"
         assert "EMPTY_OR_DEPRECATED_DEFI_VENUES" in result.diagnostic

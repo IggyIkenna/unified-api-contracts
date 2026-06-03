@@ -10,7 +10,7 @@ different candle shape:
     ``book_snapshot_5``    → OHLCV(mid) + spread/depth/imbalance means
     ``derivative_ticker``  → OHLCV + funding/mark/index means
     ``liquidations``       → count + notional aggregates (not pure OHLCV)
-    ``dex_pool_swaps``     → OHLCV + swap_count + volume_quote_usd
+    ``dex_pool_swaps``     → OHLCV (swap count = ``trade_count``, USD volume = ``volume``)
     ``dex_pool_state``     → OHLCV(mid) + swap_count
     ``lending_indices``    → OHLCV of supply/borrow index
     ``rate_indices``       → OHLCV of rate_indices
@@ -117,9 +117,18 @@ _DERIV_EXT: list[ColumnSpec] = [
     ColumnSpec(name="index_price_mean", dtype="float64", nullable=True),
 ]
 
-_DEX_EXT: list[ColumnSpec] = [
+# DEX candle extensions. `swap_count`/`volume_quote_usd` were originally a
+# shared `_DEX_EXT` applied to BOTH swaps and state candles, but on the SWAPS
+# candle they exactly duplicate the OHLCV-core `trade_count`/`volume` columns
+# (verified identical to the last digit/decimal — DeFi #4 / C0-RD6). The split:
+#   • swaps candle (`swaps_ohlcv_{tf}`)  → NO extension cols (the duplicates are
+#     dropped; the values survive losslessly in `trade_count`/`volume`).
+#   • state candle (`state_ohlcv_{tf}`)  → keeps `swap_count` only (NOT a
+#     duplicate here — `dex_pool_state` carries no per-bar trade_count semantic;
+#     `volume_quote_usd` was never part of the documented state shape).
+_DEX_SWAPS_EXT: list[ColumnSpec] = []
+_DEX_STATE_EXT: list[ColumnSpec] = [
     ColumnSpec(name="swap_count", dtype="int64", nullable=True),
-    ColumnSpec(name="volume_quote_usd", dtype="float64", nullable=True),
 ]
 
 _ODDS_EXT: list[ColumnSpec] = [
@@ -354,6 +363,15 @@ for _tf in _TIMEFRAMES_INDEX:
 #                a_token x (lending_indices | rate_indices | oracle_prices)
 #                lst x (lst_rates | oracle_prices)
 # ---------------------------------------------------------------------------
+# OHLC semantics for `swaps_ohlcv_{tf}` (pool x dex_pool_swaps): open/high/low/
+# close are the pool's **USD-normalized spot price**, computed per swap as
+# `amountUSD / |base_amount|` (3-method fallback: amountUSD/base, then
+# amount_in_usd/amount_in, then the raw token0/token1 ratio). This is a
+# price-per-base-token-in-USD-terms, NOT the spot price of the quote asset — so
+# for a USDC/WETH pool the values land near ≈1.0 (USDC-per-WETH expressed in USD
+# units), which is correct and expected, not a bug. Downstream consumers that
+# want ETH spot must read the WETH/USDC orientation accordingly.
+# (features_service_defi_data_loading_blockers_2026_05_29 #3.)
 
 for _tf in _TIMEFRAMES_DEFI:
     # pool
@@ -363,7 +381,7 @@ for _tf in _TIMEFRAMES_DEFI:
             "pool",
             _swaps_key(_tf),
             symbol_column="pool_id",
-            extra_cols=_DEX_EXT,
+            extra_cols=_DEX_SWAPS_EXT,
             include_chain=True,
             nullable_ohlcv=True,
         )
@@ -378,7 +396,7 @@ for _tf in _TIMEFRAMES_DEFI:
             "UNKNOWN",
             _swaps_key(_tf),
             symbol_column="symbol",
-            extra_cols=_DEX_EXT,
+            extra_cols=_DEX_SWAPS_EXT,
             include_chain=False,
             nullable_ohlcv=True,
         )
@@ -389,7 +407,7 @@ for _tf in _TIMEFRAMES_DEFI:
             "pool",
             _pool_state_key(_tf),
             symbol_column="symbol",
-            extra_cols=_DEX_EXT,
+            extra_cols=_DEX_STATE_EXT,
             include_chain=True,
         )
     )
@@ -469,6 +487,33 @@ for _tf in _TIMEFRAMES_SPORTS:
 
 
 # ---------------------------------------------------------------------------
+# Sports derived candles — odds_movement, odds_horizon_bucket,
+#                           arbitrage_opportunity  (1m / 15m / 1h)
+#
+# These adapters all produce standard CandleOutput (OHLCV + trade_count) with
+# ``symbol`` as the instrument anchor.  Unlike the base ``odds_ohlcv`` shape
+# they do NOT emit ``quote_count``/``source_count``.
+# base granularity for all three is 15m (UAC BASE_GRANULARITY_BY_DATA_TYPE) so
+# the MDPS timeframe loop skips 1m at runtime — registering 1m here is harmless
+# and keeps the sports timeframe catalogue consistent.
+# ---------------------------------------------------------------------------
+
+for _tf in _TIMEFRAMES_SPORTS:
+    for _sports_derived_dt in ("odds_movement", "odds_horizon_bucket", "arbitrage_opportunity"):
+        _register(
+            _build(
+                "sports",
+                "odds",
+                f"{_sports_derived_dt}_{_tf}",
+                symbol_column="symbol",
+                extra_cols=[],
+                anchor_col=None,
+                nullable_ohlcv=True,
+            )
+        )
+
+
+# ---------------------------------------------------------------------------
 # Prediction candles — prediction_market x trades (1m / 15m / 1h)
 # ---------------------------------------------------------------------------
 
@@ -504,6 +549,33 @@ for _tf in _TIMEFRAMES_PREDICTION_TRADES:
         _build(
             "prediction",
             "PREDICTION_MARKET",
+            _trades_key(_tf),
+            symbol_column="symbol",
+            extra_cols=[],
+            include_chain=False,
+            anchor_col=None,
+            nullable_ohlcv=True,
+        )
+    )
+
+
+# ---------------------------------------------------------------------------
+# Prediction UNKNOWN fallback — defensive safety net
+#
+# 2-segment legacy instrument_ids (``POLYMARKET:condition_id``) flow through
+# ``_infer_instrument_type`` step-5 fallback and emerge as instrument_type=
+# the condition_id string, NOT "UNKNOWN". The root fix for §6F P0 is in
+# ``PredictionTradesAdapter.preprocess()`` (3-segment keys); this UNKNOWN
+# fallback guards any residual edge-cases where the outer instrument_id is
+# empty or single-segment, causing step-6 to return "UNKNOWN".
+# Mirrors the defi UNKNOWN swaps_ohlcv pattern (lines 374-386 above).
+# ---------------------------------------------------------------------------
+
+for _tf in _TIMEFRAMES_PREDICTION_TRADES:
+    _register(
+        _build(
+            "prediction",
+            "UNKNOWN",
             _trades_key(_tf),
             symbol_column="symbol",
             extra_cols=[],

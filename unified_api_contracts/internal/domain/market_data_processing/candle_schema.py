@@ -37,6 +37,17 @@ class DataType(StrEnum):
     OHLCV_15M = "ohlcv_15m"
     OHLCV_24H = "ohlcv_24h"
     TBBO = "tbbo"
+    # NOTE (A11c 2026-06-02): these two legacy candle-input members are LEFT on the
+    # pre-collapse values deliberately. The operator-locked canonical pool/swap names
+    # are `dex_pool_state` / `dex_pool_swaps`, but this enum ALSO declares a DISTINCT
+    # Phase-2 member `DEX_POOL_STATE = "dex_pool_state"` (spot-DEX time-series state,
+    # declared below) — renaming DEX_POOLS's VALUE to `dex_pool_state` would
+    # StrEnum-alias-collide the two members. These members are not consumed by
+    # member-name anywhere; the canonical collapse is enforced on the functional
+    # denominator/capability registries (market_data_categories / expected_coverage /
+    # defi_venue_capabilities). Reconciling this enum (merge legacy DEX_POOLS/DEX_SWAPS
+    # into the Phase-2 DEX_POOL_STATE taxonomy, resolving snapshot-vs-timeseries) is the
+    # tracked follow-up A11c-candle-enum in defi_manifest_canonicalisation_2026_06_01.md.
     DEX_POOLS = "dex_pools"
     DEX_SWAPS = "dex_swaps"
     LENDING_INDICES = "lending_indices"
@@ -53,6 +64,26 @@ class DataType(StrEnum):
     LIQUIDATION_THRESHOLD = "liquidation_threshold"
     EMODE_PARAMS = "emode_params"
     PERP_FUNDING = "perp_funding"
+    # Solana basis-trading MVP scope (plan:
+    # plans/active/solana_basis_trading_mvp_2026_06_01.md Phase 1+2).
+    # `PERP_TRADES` is per-fill ground truth for CLOB / hybrid-AMM venues
+    # (Drift V2 backtest); `PERP_MARK_ORACLE` + `PERP_OPEN_INTEREST` are
+    # downstream-consumable derivatives of `PERP_FUNDING` row columns
+    # (`oraclePriceTwap`/`markPriceTwap` and `baseAssetAmountWithAmm`).
+    PERP_TRADES = "perp_trades"
+    PERP_MARK_ORACLE = "perp_mark_oracle"
+    PERP_OPEN_INTEREST = "perp_open_interest"
+    # Spot DEX time-series state (distinct from the existing `DEX_POOLS`
+    # *snapshot* type already declared above). `DEX_POOL_STATE` carries
+    # reserves OR concentrated-liquidity tick arrays at block heights for
+    # backtest replay. `DEX_ORDERBOOK` is CLOB-style bid/ask levels at
+    # block heights (Phoenix). `DEX_QUOTE` is aggregator-sampled quote
+    # responses (Jupiter). `DEX_TRADES` is per-swap fill events on AMM
+    # venues (Orca/Raydium swap event stream).
+    DEX_POOL_STATE = "dex_pool_state"
+    DEX_ORDERBOOK = "dex_orderbook"
+    DEX_QUOTE = "dex_quote"
+    DEX_TRADES = "dex_trades"
     LST_RATES = "lst_rates"
     ORACLE_PRICES = "oracle_prices"
     GAS_FEES = "gas_fees"

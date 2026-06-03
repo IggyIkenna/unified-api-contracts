@@ -20,6 +20,7 @@ from pathlib import Path
 
 import pytest
 import yaml
+from yaml import CSafeLoader as _YamlLoader  # C extension: avoids pure-Python scanner hang on large cassette files
 
 _EXTERNAL_ROOT = Path(__file__).resolve().parents[1] / "unified_api_contracts" / "external"
 
@@ -40,7 +41,7 @@ def cassette_path(request: pytest.FixtureRequest) -> Path:
 
 def _load_cassette(p: Path) -> dict:
     try:
-        data = yaml.safe_load(p.read_text()) or {}
+        data = yaml.load(p.read_text(), Loader=_YamlLoader) or {}
     except yaml.YAMLError as exc:
         pytest.fail(f"{_cassette_id(p)}: YAML parse error: {exc}")
     if not isinstance(data, dict):

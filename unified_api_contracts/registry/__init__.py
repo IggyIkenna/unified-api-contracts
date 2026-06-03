@@ -210,6 +210,7 @@ from .market_data_categories import (
     is_per_instrument_shard_data_type,
     is_tradfi_futures_instrument_active,
     needs_candle_processing,
+    resolve_data_type_for_feature_group,
     validate_data_type_for_venue,
 )
 from .max_underlying_moves import (
@@ -241,6 +242,11 @@ from .sports_venue_coordinates import (
     VENUE_COORDINATES,
     VenueCoordinates,
     get_venue_coordinates,
+)
+from .tardis_free_coverage import (
+    TARDIS_FREE_ROLLING_WINDOW_DAYS,
+    free_dates_in_range,
+    is_tardis_free_date,
 )
 from .token_wrapping import (
     LST_BASE_ASSET,
@@ -671,6 +677,7 @@ __all__ = [
     "SVENSKASPEL",
     "TAB",
     "TABTOUCH",
+    "TARDIS_FREE_ROLLING_WINDOW_DAYS",
     "TBTC_ADDRESSES",
     "TESTNET_CHAIN_IDS",
     "TIMEFRAMES",
@@ -726,6 +733,7 @@ __all__ = [
     "WINAMAX",
     "XNAS",
     "XNYS",
+    "YAHOO_INDICES",
     "YAHOO_VIX_15M_WINDOW_DAYS",
     "ZERO_ALPHA_VENUES",
     "AccessMode",
@@ -772,6 +780,7 @@ __all__ = [
     "VenueKind",
     "VenueMapping",
     "VenueOrderCapability",
+    "YahooIndexDef",
     "accepted_perp_collateral",
     "bootstrap_capabilities",
     "build_complete_major_assets",
@@ -784,6 +793,7 @@ __all__ = [
     "derive_expiry_bucket",
     "extract_es_options_cluster",
     "extract_event_contract_shard_key",
+    "free_dates_in_range",
     "get_aave_reserve_params",
     "get_accepted_collateral",
     "get_active_es_options_clusters_for_date",
@@ -856,6 +866,7 @@ __all__ = [
     "is_processed_data_type",
     "is_processed_data_type",
     "is_shard_axis",
+    "is_tardis_free_date",
     "is_token_equivalent",
     "is_tradfi_futures_instrument_active",
     "is_vix_15m_gap_date",
@@ -869,6 +880,7 @@ __all__ = [
     "requires_operation_validation",
     "resolve_capability",
     "resolve_chain_id",
+    "resolve_data_type_for_feature_group",
     "resolve_rpc_url",
     "resolve_solana_mint",
     "resolve_venue_context",

@@ -38,7 +38,7 @@ def _defi_lending_record(**overrides: object) -> InstrumentRecord:
         "venue": "AAVE_V3-ETHEREUM",
         "instrument_type": InstrumentType.LENDING,
         "pool_address": _DUMMY_EVM_ADDR,
-        "base_asset_decimals": 6,  # USDC — required by Phase A decimals rule
+        "base_asset_decimals": 6,  # USDC — required by hard_schema_phase1_field_flip_migration Phase A
     }
     kwargs.update(overrides)
     return InstrumentRecord(**kwargs)  # type: ignore[arg-type]
@@ -131,14 +131,14 @@ class TestPastExpiry:
 
 class TestBatchValidation:
     def test_mixed_batch_separates_expired_from_active(self) -> None:
-        active = _defi_lending_record(instrument_key="AAVE_V3-ETHEREUM:LENDING:USDC", expiry=_FUTURE_EXPIRY)
+        active = _defi_lending_record(instrument_key="AAVEV3-ETHEREUM:LENDING:USDC", expiry=_FUTURE_EXPIRY)
         expired_status = _defi_lending_record(
-            instrument_key="AAVE_V3-ETHEREUM:LENDING:DAI", status=InstrumentStatus.EXPIRED
+            instrument_key="AAVEV3-ETHEREUM:LENDING:DAI", status=InstrumentStatus.EXPIRED
         )
-        past_expiry = _defi_lending_record(instrument_key="AAVE_V3-ETHEREUM:LENDING:WETH", expiry=_PAST_EXPIRY)
+        past_expiry = _defi_lending_record(instrument_key="AAVEV3-ETHEREUM:LENDING:WETH", expiry=_PAST_EXPIRY)
         valid, rejected = validate_instrument_records([active, expired_status, past_expiry], as_of_date=_AS_OF)
         assert len(valid) == 1
-        assert valid[0].instrument_key == "AAVE_V3-ETHEREUM:LENDING:USDC"
+        assert valid[0].instrument_key == "AAVEV3-ETHEREUM:LENDING:USDC"
         assert len(rejected) == 2
 
     def test_empty_records_returns_empty(self) -> None:

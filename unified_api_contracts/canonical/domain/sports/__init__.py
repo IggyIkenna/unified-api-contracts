@@ -107,10 +107,12 @@ from .league_registry import LeagueClassification as LeagueClassification
 from .league_registry import LeagueClassificationRegistry as LeagueClassificationRegistry
 from .league_registry import LeagueClassificationType as LeagueClassificationType
 from .league_registry import LeagueDefinition as LeagueDefinition
+from .live import SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY as SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY
 from .live import LiveMatchState as LiveMatchState
 from .live import LiveOddsUpdate as LiveOddsUpdate
 from .live import MatchPeriod as MatchPeriod
 from .live import ScraperVersionMeta as ScraperVersionMeta
+from .live import SportsFeatureCaptureStatus as SportsFeatureCaptureStatus
 from .mapping_resolver import clear_mapping_cache as clear_mapping_cache
 from .mapping_resolver import resolve_fixture_mapping as resolve_fixture_mapping
 from .mapping_resolver import resolve_league_mapping as resolve_league_mapping
@@ -131,6 +133,7 @@ from .provider_league_ids import SPORTS_ENTITY_START_DATES as SPORTS_ENTITY_STAR
 from .provider_league_ids import TRANSFERMARKT_IDS as TRANSFERMARKT_IDS
 from .provider_league_ids import UNDERSTAT_COVERED_LEAGUES as UNDERSTAT_COVERED_LEAGUES
 from .provider_league_ids import UNDERSTAT_NAMES as UNDERSTAT_NAMES
+from .provider_league_ids import canonicalize_league_id as canonicalize_league_id
 from .provider_league_ids import does_understat_cover as does_understat_cover
 from .provider_league_ids import get_entity_league_coverage as get_entity_league_coverage
 from .provider_league_ids import get_provider_league_id as get_provider_league_id

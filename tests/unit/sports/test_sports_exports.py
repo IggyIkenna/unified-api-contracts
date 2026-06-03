@@ -121,3 +121,42 @@ class TestSportsExports:
         assert issubclass(MarketClosedError, SportsError)
         assert issubclass(OddsChangedError, SportsError)
         assert issubclass(ScraperError, SportsError)
+
+    # ------------------------------------------------------------------
+    # P2 — FSS→strategy capture_status contract (sports_manifest_canon)
+    # ------------------------------------------------------------------
+
+    def test_sports_feature_capture_status_key_exported(self) -> None:
+        """SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY must be importable from
+        the sports domain and equal the canonical dict key name."""
+        from unified_api_contracts.canonical.domain.sports import (
+            SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY,
+        )
+
+        assert SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY == "capture_status"
+        assert isinstance(SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY, str)
+
+    def test_sports_feature_capture_status_type_exported(self) -> None:
+        """SportsFeatureCaptureStatus must be importable from the sports domain."""
+        from unified_api_contracts.canonical.domain.sports import (
+            SportsFeatureCaptureStatus,
+        )
+
+        # type aliases are not None; runtime value is a typing.Literal
+        assert SportsFeatureCaptureStatus is not None
+
+    def test_sports_feature_capture_status_valid_values(self) -> None:
+        """The 4-state closed set must include all honest-absence states."""
+        import typing
+
+        from unified_api_contracts.canonical.domain.sports.live import (
+            SportsFeatureCaptureStatus,
+        )
+
+        args = typing.get_args(SportsFeatureCaptureStatus)
+        assert set(args) == {
+            "captured",
+            "empty_confirmed",
+            "attempted_failed",
+            "expected_unattempted",
+        }

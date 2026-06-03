@@ -57,11 +57,22 @@ DEFI_ONCHAIN_INSTRUMENT_TYPES: frozenset[InstrumentType] = frozenset(
         InstrumentType.DEBT_TOKEN,
         InstrumentType.STAKING,
         InstrumentType.SPOT_ASSET,
+        # DeFi DOES have on-chain perps (operator-locked 2026-06-01): Drift /
+        # GMX / Hyperliquid are on-chain perp DEXs, so ``instrument_type=
+        # perpetual`` is valid for ``asset_group=defi``. NOTE: PERPETUAL is
+        # also in CEFI_PAIR_INSTRUMENT_TYPES, and the InstrumentRecord
+        # model_validator checks CeFi-pair FIRST (if/elif), so a DeFi perp's
+        # base/quote-asset rule is applied via the CeFi-pair branch — adding
+        # it here is for membership consumers (partition-path coercion etc.)
+        # and does not change validator behaviour. SSOT:
+        # ``codex/02-data/defi-canonical-naming-ssot.md``.
+        InstrumentType.PERPETUAL,
     }
 )
 """DeFi on-chain instrument types. Workspace rule: at least one on-chain
 identifier (pool_address OR base_asset_contract_address) must be non-empty.
-Enforced by InstrumentRecord model_validator."""
+Enforced by InstrumentRecord model_validator. Includes PERPETUAL for DeFi
+on-chain perp DEXs (Drift/GMX/Hyperliquid; operator-locked 2026-06-01)."""
 
 
 class InstrumentLeg(BaseModel):
@@ -174,7 +185,7 @@ class InstrumentRecord(BaseModel):
     # not surfaced on this pydantic model — adapters had to populate them
     # via dict pass-through and they got dropped on serialisation. Lifting
     # them onto the model + adding genuinely-new fields lets MTDS DeFi
-    # handlers (dex_pools, dex_swaps, lending_indices, liquidations)
+    # handlers (dex_pool_state, dex_pool_swaps, lending_indices, liquidations)
     # consume them instead of re-querying The Graph each cycle.
     # Plan: instruments_service_metadata_refactor_2026_04_29.
     pool_address: str | None = Field(

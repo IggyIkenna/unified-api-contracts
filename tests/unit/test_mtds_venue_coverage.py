@@ -288,7 +288,15 @@ class TestIsPerInstrumentShardDataType:
             assert not is_per_instrument_shard_data_type(dt), f"{dt} should be venue-level"
 
     def test_defi_per_instrument_dts(self) -> None:
-        for dt in ("dex_swaps", "dex_pools", "lending_indices", "oracle_prices", "lst_rates", "rewards", "risk_params"):
+        for dt in (
+            "dex_pool_swaps",
+            "dex_pool_state",
+            "lending_indices",
+            "oracle_prices",
+            "lst_rates",
+            "rewards",
+            "risk_params",
+        ):
             assert is_per_instrument_shard_data_type(dt), f"{dt} should be per-instrument"
 
     def test_retired_prediction_dts_not_per_instrument(self) -> None:
@@ -328,7 +336,7 @@ class TestGetExpectedInstrumentsForVenueMvpSeed:
     def test_defi_dt_returns_seeded_mvp(self) -> None:
         # Wave 8G populated the DeFi seeds — top-20 UNI V3 ETH pools,
         # top-10 Aave ETH reserves.
-        swaps = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_swaps")
+        swaps = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pool_swaps")
         assert len(swaps) == 20
         # canonical lowercase pool addresses
         for pool in swaps:
@@ -421,7 +429,7 @@ class TestWave8GDefiSeeds:
     """Wave 8G DEFI seed — top-N pools / reserves / LST tokens."""
 
     def test_uniswapv3_ethereum_dex_pools_top20(self) -> None:
-        result = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pools")
+        result = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pool_state")
         assert len(result) == 20
         # First 5 must match the observed 2026-04-14 TVL order.
         assert result[0] == "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"  # USDC/WETH 0.05%
@@ -432,9 +440,9 @@ class TestWave8GDefiSeeds:
             assert pool.lower() == pool
 
     def test_uniswapv3_ethereum_dex_swaps_same_pool_set(self) -> None:
-        pools = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pools")
-        swaps = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_swaps")
-        assert pools == swaps, "dex_pools and dex_swaps share the pool universe"
+        pools = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pool_state")
+        swaps = get_expected_instruments_for_venue("UNISWAP_V3-ETHEREUM", "dex_pool_swaps")
+        assert pools == swaps, "dex_pool_state and dex_pool_swaps share the pool universe"
 
     def test_aavev3_ethereum_lending_indices_top10_reserves(self) -> None:
         result = get_expected_instruments_for_venue("AAVE_V3-ETHEREUM", "lending_indices")
@@ -487,7 +495,7 @@ class TestWave8GSeedHelper:
     """Direct tests on the ``seed_for_venue_and_data_type`` helper."""
 
     def test_defi_map_entries(self) -> None:
-        assert ("UNISWAP_V3-ETHEREUM", "dex_pools") in DEFI_MVP_SEED_INSTRUMENTS
+        assert ("UNISWAP_V3-ETHEREUM", "dex_pool_state") in DEFI_MVP_SEED_INSTRUMENTS
         assert ("AAVE_V3-ETHEREUM", "lending_indices") in DEFI_MVP_SEED_INSTRUMENTS
         assert ("LIDO-ETHEREUM", "lst_rates") in DEFI_MVP_SEED_INSTRUMENTS
 
@@ -496,7 +504,7 @@ class TestWave8GSeedHelper:
         assert ("KALSHI", "trades") in PREDICTION_MVP_SEED_INSTRUMENTS
 
     def test_unknown_venue_dt_returns_empty_tuple(self) -> None:
-        assert seed_for_venue_and_data_type("FAKE-CHAIN", "dex_pools") == ()
+        assert seed_for_venue_and_data_type("FAKE-CHAIN", "dex_pool_state") == ()
         assert seed_for_venue_and_data_type("UNISWAP_V3-ETHEREUM", "unknown_dt") == ()
 
 

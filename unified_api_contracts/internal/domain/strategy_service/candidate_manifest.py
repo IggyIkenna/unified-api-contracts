@@ -148,71 +148,48 @@ class MinimalCandidateManifest:
     def from_firestore_dict(cls, data: dict[str, object]) -> MinimalCandidateManifest:
         """Deserialise from a Firestore document dict."""
         score_raw = data.get("score_vector")
-        score_dict: dict[str, object] = cast("dict[str, object]", score_raw) if isinstance(score_raw, dict) else {}
-
-        def _safe_float(value: object | None, default: float = 0.0) -> float:
-            """Safely convert object to float with default fallback."""
-            if value is None:
-                return default
-            if isinstance(value, (int, float)):
-                return float(value)
-            if isinstance(value, str):
-                try:
-                    return float(value)
-                except ValueError:
-                    return default
-            return default
-
-        def _safe_int(value: object | None, default: int = 0) -> int:
-            """Safely convert object to int with default fallback."""
-            if value is None:
-                return default
-            if isinstance(value, (int, float)):
-                return int(value)
-            if isinstance(value, str):
-                try:
-                    return int(float(value))
-                except ValueError:
-                    return default
-            return default
-
+        score_dict: dict[str, float | int | None] = (
+            cast("dict[str, float | int | None]", score_raw) if isinstance(score_raw, dict) else {}
+        )
         score = GroupBMetrics(
-            sharpe_ratio=_safe_float(score_dict.get("sharpe_ratio")),
-            calmar_ratio=_safe_float(score_dict.get("calmar_ratio")),
-            max_drawdown_pct=_safe_float(score_dict.get("max_drawdown_pct")),
-            win_rate=_safe_float(score_dict.get("win_rate")),
-            backtest_days=_safe_int(score_dict.get("backtest_days")),
-            total_return_pct=_safe_float(score_dict.get("total_return_pct")),
+            sharpe_ratio=float(score_dict.get("sharpe_ratio") or 0.0),
+            calmar_ratio=float(score_dict.get("calmar_ratio") or 0.0),
+            max_drawdown_pct=float(score_dict.get("max_drawdown_pct") or 0.0),
+            win_rate=float(score_dict.get("win_rate") or 0.0),
+            backtest_days=int(score_dict.get("backtest_days") or 0),
+            total_return_pct=float(score_dict.get("total_return_pct") or 0.0),
         )
 
         model_refs_raw = data.get("model_refs")
         model_refs: list[ModelRef] | None = None
         if isinstance(model_refs_raw, list):
+            _typed_refs = cast("list[dict[str, str]]", model_refs_raw)
             model_refs = [
                 ModelRef(
-                    model_id=str(cast(dict[str, object], r).get("model_id") or ""),
-                    version=str(cast(dict[str, object], r).get("version") or ""),
-                    artifact_uri=str(cast(dict[str, object], r).get("artifact_uri") or ""),
+                    model_id=str(r.get("model_id") or ""),
+                    version=str(r.get("version") or ""),
+                    artifact_uri=str(r.get("artifact_uri") or ""),
                 )
-                for r in cast(list[object], model_refs_raw)
-                if isinstance(r, dict)
+                for r in _typed_refs
             ]
 
         created_at_raw = data.get("created_at")
         created_at: datetime = created_at_raw if isinstance(created_at_raw, datetime) else datetime.now(UTC)
 
         config_raw = data.get("config_json")
-        config_json: dict[str, object] = cast("dict[str, object]", config_raw) if isinstance(config_raw, dict) else {}
+        config_json: dict[str, object] = cast("dict[str, object]", config_raw if isinstance(config_raw, dict) else {})
 
         pinned_shas_raw = data.get("pinned_shas")
         pinned_shas: dict[str, str] | None = None
         if isinstance(pinned_shas_raw, dict):
-            pinned_shas = {str(k): str(v) for k, v in cast(dict[str, object], pinned_shas_raw).items()}
+            _typed_pinned = cast("dict[str, str]", pinned_shas_raw)
+            pinned_shas = {str(k): str(v) for k, v in _typed_pinned.items()}
 
         chain_rpc_pins_raw = data.get("chain_rpc_pins")
         chain_rpc_pins: dict[str, str] | None = None
         if isinstance(chain_rpc_pins_raw, dict):
-            chain_rpc_pins = {str(k): str(v) for k, v in cast(dict[str, object], chain_rpc_pins_raw).items()}
+            _typed_chain = cast("dict[str, str]", chain_rpc_pins_raw)
+            chain_rpc_pins = {str(k): str(v) for k, v in _typed_chain.items()}
 
         version_id_raw = data.get("version_id")
         version_id: str | None = str(version_id_raw) if version_id_raw is not None else None

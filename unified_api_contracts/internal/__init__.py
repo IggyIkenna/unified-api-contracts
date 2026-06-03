@@ -115,6 +115,162 @@ from unified_api_contracts.internal.architecture_v2 import (
 from unified_api_contracts.internal.architecture_v2 import (
     Urgency as UrgencyV2,
 )
+
+# ── canonical re-export surface — added 2026-06-02 to fix SIT test_uic_completeness ──
+from unified_api_contracts.internal.architecture_v2.archetype_capability import (
+    ArchetypeCapability,
+    ArchetypeCapabilityCell,
+    ArchetypeInstrumentType,
+    CoverageStatus,
+    RollMode,
+)
+from unified_api_contracts.internal.architecture_v2.archetype_config import (
+    ArchetypeConfig,
+)
+from unified_api_contracts.internal.architecture_v2.backtest_scenarios import (
+    BacktestRunResult,
+    BacktestScenario,
+    FundingOverride,
+    OracleOverride,
+    ScenarioCategory,
+    ScenarioVerdict,
+    SuccessCriteria,
+    VenueOverride,
+)
+from unified_api_contracts.internal.architecture_v2.capability_claims import (
+    CapabilityClaims,
+)
+from unified_api_contracts.internal.architecture_v2.capital_allocation import (
+    AllocationViolationError,
+    CapitalAllocation,
+)
+from unified_api_contracts.internal.architecture_v2.client_contract import (
+    ClientContract,
+)
+from unified_api_contracts.internal.architecture_v2.compliance import (
+    ComplianceEvent,
+    ComplianceSink,
+)
+from unified_api_contracts.internal.architecture_v2.cross_venue_routing_policy import (
+    CrossVenueLegRole,
+    CrossVenueRoutingPolicy,
+    PolicyNotFoundError,
+    RoutingPriority,
+)
+from unified_api_contracts.internal.architecture_v2.defi_pricing_fidelity import (
+    DefiPoolNotRegisteredError,
+    DefiSpotVenueCapability,
+    PricingFidelity,
+)
+from unified_api_contracts.internal.architecture_v2.derivation import (
+    AccessDecision,
+    ClientContext,
+    ClientPackage,
+    Combo,
+    CommercialPath,
+    DemoUniverse,
+    DenialReason,
+    DimensionQuery,
+    InternalCostLeakageError,
+    ItemRef,
+    Persona,
+    PriceQuote,
+    ProductionRestrictions,
+    QuoteLine,
+    RestrictionProfile,
+    RouteDescriptor,
+    Rule08Violation,
+    SlotFilter,
+    UserContext,
+)
+from unified_api_contracts.internal.architecture_v2.enums import (
+    Urgency,
+)
+from unified_api_contracts.internal.architecture_v2.event_calendar_source import (
+    EventCalendarSource,
+    EventCategory,
+    EventSourceNotFoundError,
+    EventSourceType,
+)
+from unified_api_contracts.internal.architecture_v2.flash_loan_receiver import (
+    FlashLoanProtocol,
+    FlashLoanReceiverDeployment,
+    FlashLoanReceiverNotFoundError,
+)
+from unified_api_contracts.internal.architecture_v2.fund_business_unit import (
+    CustodyModel,
+    FundBusinessUnitEntry,
+    FundNotFoundError,
+)
+from unified_api_contracts.internal.architecture_v2.iv_surface_fidelity import (
+    IvSurfaceFidelity,
+    OptionVenueCapability,
+    OptionVenueNotRegisteredError,
+)
+from unified_api_contracts.internal.architecture_v2.lay_side_execution_semantics import (
+    LayBookType,
+    LaySideExecutionSemantics,
+    LayVenueNotRegisteredError,
+    LiabilityFormula,
+)
+from unified_api_contracts.internal.architecture_v2.liquidation_bonus_schedule import (
+    LiquidationBonusEntry,
+    LiquidationBonusNotFoundError,
+    LiquidationProtocol,
+)
+from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability import (
+    ListedComboType,
+    MultiLegOrderCapability,
+    VenueNotRegisteredError,
+)
+from unified_api_contracts.internal.architecture_v2.paired_dispersion_catalog import (
+    PairedDispersionCatalogRow,
+)
+from unified_api_contracts.internal.architecture_v2.perp_hedge_sizer import (
+    HedgeSizerConfig,
+    MarginTopupInstruction,
+    RebalanceAction,
+    RebalanceInstruction,
+    RebalanceReason,
+    TopupSource,
+)
+from unified_api_contracts.internal.architecture_v2.recursive_loop_orchestrator import (
+    AavePositionState,
+    LendingProtocol,
+    LoopIterEvent,
+    OpeningMode,
+    PerpLegConfig,
+    PerpVenueId,
+    RecursiveLoopRequest,
+    RecursiveLoopResult,
+)
+from unified_api_contracts.internal.architecture_v2.representative_future import (
+    RepresentativeFutureChangedEvent,
+    RollTriggerPolicy,
+    UnderlyingCategory,
+    UnderlyingDeclaration,
+    UnderlyingNotRegisteredError,
+)
+from unified_api_contracts.internal.architecture_v2.restriction_profiles import (
+    ProfileYaml,
+    QuestionnaireResponse,
+)
+from unified_api_contracts.internal.architecture_v2.service_family_scope import (
+    ScopeAllow,
+    ScopeDeny,
+    ServiceFamilyScopeRule,
+)
+from unified_api_contracts.internal.architecture_v2.strategy_naming import (
+    ParsedStrategyId,
+)
+from unified_api_contracts.internal.architecture_v2.usage_meter import (
+    UsageMeterRow,
+)
+from unified_api_contracts.internal.architecture_v2.venue_signal_variants import (
+    SignalVariant,
+    VenueInstrumentNotRegisteredError,
+    VenueInstrumentSignalSupport,
+)
 from unified_api_contracts.internal.connectivity import (
     WebSocketConnectEvent,
     WebSocketDisconnectEvent,
@@ -173,6 +329,16 @@ from unified_api_contracts.internal.domain.cefi_accounts.schemas import (
     SubAccount,
     WithdrawalRecord,
 )
+from unified_api_contracts.internal.domain.cicd import (
+    GitHubWorkflowEvent,
+)
+from unified_api_contracts.internal.domain.client_lifecycle import (
+    ClientApiKeyMaterial,
+    ClientKYCStub,
+    ClientOnboardingState,
+    ClientRiskPreferences,
+    ClientShareClassSubscription,
+)
 from unified_api_contracts.internal.domain.client_reporting import (
     AssetBalanceSummary,
     CoinPnLBreakdown,
@@ -203,6 +369,14 @@ from unified_api_contracts.internal.domain.client_reporting import (
     TransferRecord,
     VenueBalanceSummary,
     WebhookDeliveryConfig,
+)
+from unified_api_contracts.internal.domain.client_reporting.schemas import (
+    DocumentCategory,
+    DocumentMetadata,
+    DocumentStatus,
+)
+from unified_api_contracts.internal.domain.client_statements import (
+    ClientDailyStatement,
 )
 from unified_api_contracts.internal.domain.data_quality.venue_freshness_slas import (
     VenueCategory,
@@ -347,6 +521,40 @@ from unified_api_contracts.internal.domain.defi import (
 from unified_api_contracts.internal.domain.defi import (
     compute_aggregate_signal as compute_aggregate_signal,
 )
+from unified_api_contracts.internal.domain.defi.gas_cost import (
+    BlockGasFee,
+    EthBalanceImpact,
+    GasFeeSnapshot,
+    GasTokenBalanceImpact,
+    InstructionGasCost,
+)
+from unified_api_contracts.internal.domain.defi.rate_model import (
+    AavePoolParams,
+    AaveV3RateModelDefaults,
+    RateImpactResult,
+)
+from unified_api_contracts.internal.domain.defi.solana import (
+    DriftOrderType,
+    SolanaChainId,
+)
+from unified_api_contracts.internal.domain.defi.transfers import (
+    AlchemyTransferRecord,
+    AlchemyTransfersResponse,
+    BridgeProtocol,
+    TransferConfirmation,
+    TransferStatus,
+)
+from unified_api_contracts.internal.domain.defi.wallet_config import (
+    ShareClassWalletMapping,
+    SigningSurface,
+    SpendingCaps,
+    TradingWalletConfig,
+    WalletConfig,
+    WalletKind,
+    WalletMappingConfig,
+    WalletProvisioningConfig,
+    WalletProvisioningError,
+)
 from unified_api_contracts.internal.domain.deployment_service import (
     ChaosHookSpec,
     ChaosInjectionPoint,
@@ -360,6 +568,17 @@ from unified_api_contracts.internal.domain.deployment_service import (
     ServiceIsolationSpec,
     SLATier,
     SLATierSpec,
+)
+from unified_api_contracts.internal.domain.deployment_service.deployment import (
+    DeploymentCluster,
+    DeploymentOperationMode,
+    DeploymentTier,
+)
+from unified_api_contracts.internal.domain.derivatives.options import (
+    OptionContract,
+    OptionGreeks,
+    OptionsChain,
+    SettlementPrice,
 )
 from unified_api_contracts.internal.domain.events_service.lifecycle import (
     RestartDetectedDetails,
@@ -376,6 +595,13 @@ from unified_api_contracts.internal.domain.execution_service.cex_withdrawals imp
     OKXWithdrawResponse,
     UpbitWithdrawRequest,
     UpbitWithdrawResponse,
+)
+from unified_api_contracts.internal.domain.execution_service.cost_estimate import (
+    ExecutionCostEstimate,
+)
+from unified_api_contracts.internal.domain.execution_service.defi_position import (
+    DeFiPosition,
+    PositionPortfolio,
 )
 from unified_api_contracts.internal.domain.execution_service.execution_preferences import (
     ExecutionMode,
@@ -410,10 +636,17 @@ from unified_api_contracts.internal.domain.execution_service.results import (
     DeFiSwapResult,
     DeFiTxResult,
 )
+from unified_api_contracts.internal.domain.execution_service.signal import (
+    DeFiSignal,
+)
 from unified_api_contracts.internal.domain.execution_service.sports import (
     SportsBetResult,
     SportsVenueScore,
     SportsVenueSelection,
+)
+from unified_api_contracts.internal.domain.execution_service.transfer_types import (
+    VenueWalletCapabilities,
+    WalletType,
 )
 from unified_api_contracts.internal.domain.execution_service.types import (
     BenchmarkType,
@@ -423,6 +656,14 @@ from unified_api_contracts.internal.domain.execution_service.types import (
     OrderType,
     PositionSide,
     PositionType,
+)
+from unified_api_contracts.internal.domain.execution_service.unwind_preview import (
+    UnwindAction,
+    UnwindConfidence,
+    UnwindExecutionStyle,
+    UnwindPreviewRequest,
+    UnwindPreviewResponse,
+    UnwindStep,
 )
 from unified_api_contracts.internal.domain.features_commodity import (
     CommodityFeatureRequest as CommodityFeatureRequest,
@@ -444,6 +685,35 @@ from unified_api_contracts.internal.domain.features_sports import (
     FixtureFeatures,
     SportsFeatureVector,
 )
+from unified_api_contracts.internal.domain.features_sports._features_league_halftime_goals import (
+    GoalTimingFeaturesMixin,
+    HalftimeFeaturesMixin,
+    LeagueFeaturesMixin,
+    SeasonContextFeaturesMixin,
+)
+from unified_api_contracts.internal.domain.features_sports._features_promoted_synthetic_schedule import (
+    PromotedTeamFeaturesMixin,
+    ScheduleFatigueFeaturesMixin,
+    SyntheticXGFeaturesMixin,
+)
+from unified_api_contracts.internal.domain.features_sports._features_team_h2h import (
+    H2HFeaturesMixin,
+    TeamFeaturesMixin,
+)
+from unified_api_contracts.internal.domain.features_sports._features_venue_referee_player_odds import (
+    OddsFeaturesMixin,
+    PlayerLineupFeaturesMixin,
+    RefereeFeaturesMixin,
+    VenueContextFeaturesMixin,
+)
+from unified_api_contracts.internal.domain.features_sports._features_xg_advanced_market import (
+    AdvancedStatsFeaturesMixin,
+    ManagerFeaturesMixin,
+    MarketEfficiencyFeaturesMixin,
+    TeamStyleFeaturesMixin,
+    WeatherFeaturesMixin,
+    XGFeaturesMixin,
+)
 from unified_api_contracts.internal.domain.fund_administration import (
     AllocationExecutionStatus,
     AllocatorRedemption,
@@ -452,7 +722,32 @@ from unified_api_contracts.internal.domain.fund_administration import (
     RedemptionStatus,
     SubscriptionStatus,
 )
+from unified_api_contracts.internal.domain.fund_administration._types import (
+    AllocatorCashAccountView,
+    CashAccountMovement,
+)
+from unified_api_contracts.internal.domain.fund_administration.api_requests import (
+    ApproveSubscriptionRequest,
+    ProcessRedemptionRequest,
+    RebalanceRequest,
+    RedeemRequest,
+    RejectRequest,
+    SubscribeRequest,
+)
+from unified_api_contracts.internal.domain.fund_administration.transfer_context import (
+    FundTransferContext,
+)
 from unified_api_contracts.internal.domain.health.service_health import ServiceHealthResponse
+from unified_api_contracts.internal.domain.hwm_ledger import (
+    CrystallizationCadence,
+    FeeRecognitionRow,
+    FeeRecognitionType,
+    HighWaterMarkLedgerRow,
+    ShareClassPerfFeeConfig,
+)
+from unified_api_contracts.internal.domain.market_data_api.orderbook_schema import (
+    OrderBookSnapshot,
+)
 from unified_api_contracts.internal.domain.market_data_processing.adapter_models import (
     CandleOutput,
     InstrumentInfo,
@@ -497,9 +792,21 @@ from unified_api_contracts.internal.domain.matching_engine import (
     SwapResult,
 )
 from unified_api_contracts.internal.domain.ml.schemas import (
+    AlgorithmConfig,
     BacktestExperimentConfig,
     BacktestFixedConfig,
+    CalibrationMethod,
+    DecisionPolicyConfig,
+    EvaluationMetricsConfig,
+    FilterConfig,
     GridDimensions,
+    ModelFamilyConfig,
+    PromotionGate,
+    RankingWeights,
+    RegimeOverride,
+    SignalPackage,
+    SplitStrategy,
+    TargetSpec,
     TargetTypeParams,
 )
 from unified_api_contracts.internal.domain.ml_inference_service import (
@@ -516,6 +823,23 @@ from unified_api_contracts.internal.domain.prediction_market.prediction_market_a
     PredictionMarketUseCase,
     ProbabilityBucket,
     SportsbookLink,
+)
+from unified_api_contracts.internal.domain.risk_service.position_reconciliation import (
+    DriftDimension,
+    DriftSeverity,
+    PortfolioReconciliationSnapshot,
+    PositionDriftMetric,
+    ShareClassSummary,
+)
+from unified_api_contracts.internal.domain.risk_service.recovery import (
+    AutoDeleverageRequest,
+    AutoDeleverageResponse,
+    CascadeState,
+    ExecStatus,
+    PlaybookTriggerMapping,
+    ReconHealthStatus,
+    ReconStatus,
+    TriggerScenario,
 )
 from unified_api_contracts.internal.domain.risk_service.risk import (
     MultiAssetMarginCalculation,
@@ -537,6 +861,17 @@ from unified_api_contracts.internal.domain.signal_broadcast import (
     entitled_slots_for,
     entitlements_for,
 )
+from unified_api_contracts.internal.domain.signal_broadcast.counterparty import (
+    CounterpartyStatus,
+)
+from unified_api_contracts.internal.domain.signal_broadcast.entitlements_v2 import (
+    CounterpartyEntitlementProfile,
+    RateLimitConfig,
+)
+from unified_api_contracts.internal.domain.signal_broadcast.signal_payload import (
+    PayloadDepth,
+    SignalPayload,
+)
 from unified_api_contracts.internal.domain.sports.arb_config import (
     EXCHANGE_COMMISSION_RATES,
     EXCHANGE_VENUES,
@@ -555,6 +890,8 @@ from unified_api_contracts.internal.domain.sports.execution import (
     SportsBetEvent,
 )
 from unified_api_contracts.internal.domain.sports.risk import (
+    BetSide,
+    SportsBetPnL,
     SportsBetPosition,
     SportsExposure,
 )
@@ -567,6 +904,17 @@ from unified_api_contracts.internal.domain.strategy_service import (
     StrategyModeParams,
     make_manifest_id,
 )
+from unified_api_contracts.internal.domain.strategy_service.catalogue import (
+    StrategyInstance,
+    StrategyInstanceCatalogue,
+)
+from unified_api_contracts.internal.domain.strategy_service.client_config import (
+    ClientConfigRegistry,
+)
+from unified_api_contracts.internal.domain.strategy_service.client_registry import (
+    ClientDefinition,
+    ClientRegistry,
+)
 from unified_api_contracts.internal.domain.strategy_service.domain_events import (
     ExposureSnapshot,
     OrderEvent,
@@ -576,6 +924,29 @@ from unified_api_contracts.internal.domain.strategy_service.domain_events import
 )
 from unified_api_contracts.internal.domain.strategy_service.domain_events import (
     PositionSnapshot as StrategyPositionSnapshot,
+)
+from unified_api_contracts.internal.domain.strategy_service.instruction import (
+    FuturesRollInstruction,
+    OptionsComboInstruction,
+    PredictionBetInstruction,
+    SportsBetInstruction,
+    SportsExchangeOrderInstruction,
+    StrategyInstruction,
+    StrategyInstructionType,
+    TransferInstruction,
+)
+from unified_api_contracts.internal.domain.strategy_service.instrument_intent import (
+    ResolvedInstruments,
+    StrategyInstrumentIntent,
+)
+from unified_api_contracts.internal.domain.strategy_service.lifecycle import (
+    PaperTradeComparison,
+    PhaseTransition,
+    ProductRouting,
+    StrategyInstanceLifecycle,
+    StrategyLifecycleStage,
+    StrategyLifecycleTransition,
+    StrategyMaturityPhase,
 )
 from unified_api_contracts.internal.domain.strategy_service.monitoring import (
     ExposureData,
@@ -589,21 +960,64 @@ from unified_api_contracts.internal.domain.strategy_service.monitoring import (
     StrategyNAV,
 )
 from unified_api_contracts.internal.domain.strategy_service.order import Order
+from unified_api_contracts.internal.domain.strategy_service.pnl import (
+    PnLSummary,
+    SettlementDelta,
+)
+from unified_api_contracts.internal.domain.strategy_service.position import (
+    StrategyPosition,
+)
+from unified_api_contracts.internal.domain.strategy_service.registry import (
+    Category,
+    StrategyDefinition,
+    StrategyRegistry,
+)
 from unified_api_contracts.internal.domain.strategy_service.signal_vector import (
     MetaSignalRecord,
     RegimeStateRecord,
     SignalVectorRecord,
+)
+from unified_api_contracts.internal.domain.strategy_service.subscription import (
+    ExclusiveLockViolation,
+    StrategyInstanceSubscription,
+    SubscriptionType,
 )
 from unified_api_contracts.internal.domain.strategy_service.trigger_subscription import (
     TriggerEvent,
     TriggerEventType,
     TriggerSubscription,
 )
+from unified_api_contracts.internal.domain.strategy_service.venue_set_variants import (
+    PricingTier,
+    VenueSetVariant,
+)
+from unified_api_contracts.internal.domain.strategy_service.versions import (
+    ApprovalRecord,
+    ConfigDiff,
+    StrategyVersion,
+    VersionStatus,
+)
+from unified_api_contracts.internal.domain.trading_api.calendar import (
+    CorporateActionItem,
+    EconomicResultItem,
+)
 from unified_api_contracts.internal.domain.treasury import (
+    CEFFUEndpoint,
+    ClientShareClassSubscriptionView,
+    ClientSubscriptionList,
+    ClientTreasuryView,
+    CopperEndpoint,
+    CustodyPingResult,
+    DefiWalletKeyMaterial,
+    SubAccountId,
     TreasuryNAVByClient,
     TreasuryRollupResponse,
     TreasurySource,
+    TreasurySourceAttribution,
     TreasurySourceBalance,
+    WithdrawalApprovalChain,
+    WithdrawalApprovalRule,
+    WithdrawalApprovalSignature,
     compute_nav_by_client,
     compute_unified_nav,
 )
@@ -630,6 +1044,12 @@ from unified_api_contracts.internal.events import (
     CategorizedErrorDetails,
     ConfigChangedDetails,
     ConfigChangedEvent,
+    ConnectivityGapBackfilledDetails,
+    ConnectivityGapBackfilledEvent,
+    ConnectivityGapDetectedDetails,
+    ConnectivityGapDetectedEvent,
+    ConnectivityRecoveredDetails,
+    ConnectivityRecoveredEvent,
     DataBroadcastDetails,
     DataIngestionCompletedDetails,
     DataIngestionDetails,
@@ -638,8 +1058,23 @@ from unified_api_contracts.internal.events import (
     EventSeverity,
     FailedDetails,
     FailedEvent,
+    InstrumentsLivePreflightFailedDetails,
+    InstrumentsLivePreflightFailedEvent,
+    InstrumentsLiveSchemaDriftDetails,
+    InstrumentsLiveSchemaDriftEvent,
+    InstrumentsLiveSourceDegradedDetails,
+    InstrumentsLiveSourceDegradedEvent,
+    InstrumentsLiveT1AuditDiscrepancyDetails,
+    InstrumentsLiveT1AuditDiscrepancyEvent,
+    InstrumentsLiveTriggerFailedDetails,
+    InstrumentsLiveTriggerFailedEvent,
+    InstrumentsLiveTriggerFiredDetails,
+    InstrumentsLiveTriggerFiredEvent,
+    InstrumentsLiveUpstreamStaleDetails,
+    InstrumentsLiveUpstreamStaleEvent,
     LifecycleEventEnvelope,
     LifecycleEventType,
+    MissingDependency,
     PersistenceCompletedDetails,
     PersistenceStartedDetails,
     PreflightSkippedDetails,
@@ -663,11 +1098,15 @@ from unified_api_contracts.internal.events import (
     VersionBumpDetails,
 )
 from unified_api_contracts.internal.execution import (
+    BatchExecutionMode,
     ManualAuditCategory,
     ManualExecutionMode,
     ManualInstruction,
     ManualInstructionAuditLog,
     ManualInstructionPrecheckResponse,
+    ManualMLTrainingAction,
+    MLTrainingControlRequest,
+    MLTrainingControlResponse,
     PositionHealthSnapshot,
     SettlementType,
     WalletSpendingPreCheckResult,
@@ -760,6 +1199,13 @@ from unified_api_contracts.internal.ml import (
     TrainingPipelineConfig,
     XGBoostHyperparams,
 )
+from unified_api_contracts.internal.ml_backup import (
+    CalibrationConfig,
+    IncrementalTrainingConfig,
+    TrainingObjective,
+    TrainingScope,
+    TransferLearningConfig,
+)
 from unified_api_contracts.internal.modes import (
     CloudProvider,
     DataMode,
@@ -825,6 +1271,8 @@ from unified_api_contracts.internal.reconciliation import (
     DeviationType,
     PnLReconciliationSnapshot,
     ReconciliationAction,
+    ReconciliationAgeFields,
+    ReconciliationDimension,
     ReconciliationResolution,
 )
 from unified_api_contracts.internal.reference import (
@@ -858,6 +1306,9 @@ from unified_api_contracts.internal.reference import (
     UniverseSnapshot,
     VenueCircuitBreakerConfig,
     validate_instrument_records,
+)
+from unified_api_contracts.internal.registry import (
+    InternalEndpointSpec,
 )
 from unified_api_contracts.internal.reporting import (
     ClientConfig,
@@ -911,6 +1362,7 @@ from unified_api_contracts.internal.risk import (
     RiskStatus,
     ScopedKillSwitchSpec,
     ScopedKillSwitchState,
+    StablecoinExposure,
     StrategyRiskProfile,
     StressScenario,
     StressScenarioType,
@@ -919,6 +1371,7 @@ from unified_api_contracts.internal.risk import (
     VaRMethod,
     VaRRequest,
     VaRResult,
+    VenueExposureBreakdown,
     get_liquidation_params,
 )
 from unified_api_contracts.internal.schema_definition import (
@@ -938,11 +1391,25 @@ from unified_api_contracts.internal.schemas import (
     StrategySpec,
     StrategyType,
 )
+from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
+    PredictionShardCategory,
+    PredictionShardMarketType,
+    PredictionShardResolutionPeriod,
+)
+from unified_api_contracts.internal.schemas._row_validation import (
+    RowSchemaValidationError,
+)
 from unified_api_contracts.internal.schemas.audit import (
     EXECUTION_AUDIT,
     STRATEGY_AUDIT,
     AuditRequirement,
     AuditRetention,
+)
+from unified_api_contracts.internal.schemas.contracts import (
+    ColumnSpec,
+    SchemaContract,
+    SchemaContractNotFoundError,
+    Violation,
 )
 from unified_api_contracts.internal.schemas.rbac import (
     TIER_ENTITLEMENTS,
@@ -972,9 +1439,14 @@ from unified_api_contracts.internal.sports import (
 )
 from unified_api_contracts.internal.strategy_directives import ArchetypeAllocationDirective
 from unified_api_contracts.internal.strategy_pnl_stream import StrategyPnlStreamEvent
+from unified_api_contracts.internal.testing.instrument_generator import (
+    InstrumentGenerator,
+)
 from unified_api_contracts.internal.testing.scenario_config import (
     FaultConfig,
     InstrumentFaultRule,
+    InstrumentOverride,
+    InstrumentOverrideAction,
     ScenarioConfig,
 )
 from unified_api_contracts.internal.testing.seed_validator import (
@@ -1004,6 +1476,31 @@ from unified_api_contracts.internal.unity_commercial_terms import (
     SupportedCurrency,
     UnityCommercialTerms,
     UnityCurrencyTerms,
+)
+from unified_api_contracts.internal.validation.instruction._enums import (
+    InstructionAction,
+    LifecycleSemantic,
+    TimeframeMode,
+    TimeInForce,
+)
+from unified_api_contracts.internal.validation.instruction._main_models import (
+    ClientInstruction,
+    InstructionFieldError,
+    InstructionValidationResult,
+)
+from unified_api_contracts.internal.validation.instruction._nested_models import (
+    CorrelationLimit,
+    InstrumentVenueContext,
+    KillSwitchCondition,
+    LifecycleReplaceCancel,
+    OrderConstraints,
+    RiskAndAllocationConstraints,
+    SizeOrTargetExposure,
+    StrategyInstructionId,
+    TimeframeUrgency,
+)
+from unified_api_contracts.internal.validation.instruction._validator import (
+    InstructionValidator,
 )
 
 __all__ = [
@@ -1774,4 +2271,355 @@ __all__ = [
     "compute_unified_nav",
     "validate_instrument_records",
     "validate_unity_child_book",
+    # ── 342 classes added 2026-06-02 (SIT test_uic_completeness fix) ──
+    "AavePoolParams",
+    "AavePositionState",
+    "AaveV3RateModelDefaults",
+    "AccessDecision",
+    "AdvancedStatsFeaturesMixin",
+    "AggregateSignal",
+    "AlchemyTransferRecord",
+    "AlchemyTransfersResponse",
+    "AlgorithmConfig",
+    "AllocationViolationError",
+    "AllocatorCashAccountView",
+    "ApprovalRecord",
+    "ApproveSubscriptionRequest",
+    "ArchetypeCapability",
+    "ArchetypeCapabilityCell",
+    "ArchetypeConfig",
+    "ArchetypeInstrumentType",
+    "AutoDeleverageRequest",
+    "AutoDeleverageResponse",
+    "BacktestFidelityReport",
+    "BacktestRunResult",
+    "BacktestScenario",
+    "BatchExecutionMode",
+    "BetSide",
+    "BlockGasFee",
+    "BridgeProtocol",
+    "CEFFUEndpoint",
+    "CalibrationConfig",
+    "CalibrationMethod",
+    "CapabilityClaims",
+    "CapitalAllocation",
+    "CascadeState",
+    "CashAccountMovement",
+    "Category",
+    "ClientApiKeyMaterial",
+    "ClientConfigRegistry",
+    "ClientContext",
+    "ClientContract",
+    "ClientDailyStatement",
+    "ClientDefinition",
+    "ClientInstruction",
+    "ClientKYCStub",
+    "ClientOnboardingState",
+    "ClientPackage",
+    "ClientRegistry",
+    "ClientRiskPreferences",
+    "ClientShareClassSubscription",
+    "ClientShareClassSubscriptionView",
+    "ClientSubscriptionList",
+    "ClientTreasuryView",
+    "ColumnSpec",
+    "Combo",
+    "CommercialPath",
+    "ComplianceEvent",
+    "ComplianceSink",
+    "ConfigDiff",
+    "ConnectivityGapBackfilledDetails",
+    "ConnectivityGapBackfilledEvent",
+    "ConnectivityGapDetectedDetails",
+    "ConnectivityGapDetectedEvent",
+    "ConnectivityRecoveredDetails",
+    "ConnectivityRecoveredEvent",
+    "CopperEndpoint",
+    "CorporateActionItem",
+    "CorrelationLimit",
+    "CounterpartyEntitlementProfile",
+    "CounterpartyStatus",
+    "CoverageStatus",
+    "CrossVenueLegRole",
+    "CrossVenueRoutingPolicy",
+    "CrystallizationCadence",
+    "CustodyModel",
+    "CustodyPingResult",
+    "DeFiPosition",
+    "DeFiSignal",
+    "DecisionPolicyConfig",
+    "DefiPoolNotRegisteredError",
+    "DefiSpotVenueCapability",
+    "DefiWalletKeyMaterial",
+    "DemoUniverse",
+    "DenialReason",
+    "DeploymentCluster",
+    "DeploymentOperationMode",
+    "DeploymentTier",
+    "DimensionQuery",
+    "DocumentCategory",
+    "DocumentMetadata",
+    "DocumentStatus",
+    "DriftDimension",
+    "DriftOrderType",
+    "DriftSeverity",
+    "EconomicResultItem",
+    "EthBalanceImpact",
+    "EvaluationMetricsConfig",
+    "EventCalendarSource",
+    "EventCategory",
+    "EventSourceNotFoundError",
+    "EventSourceType",
+    "ExclusiveLockViolation",
+    "ExecStatus",
+    "ExecutionCostEstimate",
+    "FeeRecognitionRow",
+    "FeeRecognitionType",
+    "FilterConfig",
+    "FlashLoanProtocol",
+    "FlashLoanReceiverDeployment",
+    "FlashLoanReceiverNotFoundError",
+    "FundBusinessUnitEntry",
+    "FundNotFoundError",
+    "FundTransferContext",
+    "FundingOverride",
+    "FuturesRollInstruction",
+    "GasFeeSnapshot",
+    "GasTokenBalanceImpact",
+    "GoalTimingFeaturesMixin",
+    "H2HFeaturesMixin",
+    "HalftimeFeaturesMixin",
+    "HedgeSizerConfig",
+    "HighWaterMarkLedgerRow",
+    "IncrementalTrainingConfig",
+    "InstructionAction",
+    "InstructionFieldError",
+    "InstructionGasCost",
+    "InstructionValidationResult",
+    "InstructionValidator",
+    "InstrumentGenerator",
+    "InstrumentOverride",
+    "InstrumentOverrideAction",
+    "InstrumentVenueContext",
+    "InstrumentsLivePreflightFailedDetails",
+    "InstrumentsLivePreflightFailedEvent",
+    "InstrumentsLiveSchemaDriftDetails",
+    "InstrumentsLiveSchemaDriftEvent",
+    "InstrumentsLiveSourceDegradedDetails",
+    "InstrumentsLiveSourceDegradedEvent",
+    "InstrumentsLiveT1AuditDiscrepancyDetails",
+    "InstrumentsLiveT1AuditDiscrepancyEvent",
+    "InstrumentsLiveTriggerFailedDetails",
+    "InstrumentsLiveTriggerFailedEvent",
+    "InstrumentsLiveTriggerFiredDetails",
+    "InstrumentsLiveTriggerFiredEvent",
+    "InstrumentsLiveUpstreamStaleDetails",
+    "InstrumentsLiveUpstreamStaleEvent",
+    "InternalCostLeakageError",
+    "ItemRef",
+    "IvSurfaceFidelity",
+    "JupiterRoutePlanStep",
+    "JupiterSwapQuote",
+    "JupiterSwapResult",
+    "KillSwitchCondition",
+    "LayBookType",
+    "LaySideExecutionSemantics",
+    "LayVenueNotRegisteredError",
+    "LeagueFeaturesMixin",
+    "LendingProtocol",
+    "LiabilityFormula",
+    "LifecycleReplaceCancel",
+    "LifecycleSemantic",
+    "LiquidationBonusEntry",
+    "LiquidationBonusNotFoundError",
+    "LiquidationProtocol",
+    "ListedComboType",
+    "LoopIterEvent",
+    "MLTrainingControlRequest",
+    "MLTrainingControlResponse",
+    "ManagerFeaturesMixin",
+    "ManualMLTrainingAction",
+    "MarginTopupInstruction",
+    "MarketEfficiencyFeaturesMixin",
+    "MissingDependency",
+    "ModelFamilyConfig",
+    "MultiLegOrderCapability",
+    "OddsFeaturesMixin",
+    "OpeningMode",
+    "OperatorSignOffStatus",
+    "OptionContract",
+    "OptionGreeks",
+    "OptionVenueCapability",
+    "OptionVenueNotRegisteredError",
+    "OptionsChain",
+    "OptionsComboInstruction",
+    "OracleOverride",
+    "OrderBookSnapshot",
+    "OrderConstraints",
+    "PairedDispersionCatalogRow",
+    "PaperTradeComparison",
+    "ParsedStrategyId",
+    "PayloadDepth",
+    "PerLegAttribution",
+    "PerPoolShapeReconciliation",
+    "PerpLegConfig",
+    "PerpVenueId",
+    "Persona",
+    "PhaseTransition",
+    "PlaybookTriggerMapping",
+    "PlayerLineupFeaturesMixin",
+    "PnLSummary",
+    "PolicyNotFoundError",
+    "PortfolioReconciliationSnapshot",
+    "PositionDriftMetric",
+    "PositionPortfolio",
+    "PredictionBetInstruction",
+    "PredictionShardCategory",
+    "PredictionShardMarketType",
+    "PredictionShardResolutionPeriod",
+    "PriceQuote",
+    "PricingFidelity",
+    "PricingTier",
+    "ProcessRedemptionRequest",
+    "ProductRouting",
+    "ProductionRestrictions",
+    "ProfileYaml",
+    "PromotedTeamFeaturesMixin",
+    "PromotionGate",
+    "QuestionnaireResponse",
+    "QuoteLine",
+    "RankingWeights",
+    "RateImpactResult",
+    "RateLimitConfig",
+    "RebalanceAction",
+    "RebalanceInstruction",
+    "RebalanceReason",
+    "RebalanceRequest",
+    "ReconHealthStatus",
+    "ReconStatus",
+    "ReconciliationAgeFields",
+    "ReconciliationDimension",
+    "RecursiveLoopRequest",
+    "RecursiveLoopResult",
+    "RedeemRequest",
+    "RefereeFeaturesMixin",
+    "RegimeOverride",
+    "RejectRequest",
+    "RepresentativeFutureChangedEvent",
+    "ResolvedInstruments",
+    "RestrictionProfile",
+    "RiskAndAllocationConstraints",
+    "RollMode",
+    "RollTriggerPolicy",
+    "RouteDescriptor",
+    "RoutingPriority",
+    "RowSchemaValidationError",
+    "Rule08Violation",
+    "ScenarioCategory",
+    "ScenarioVerdict",
+    "ScheduleFatigueFeaturesMixin",
+    "SchemaContract",
+    "SchemaContractNotFoundError",
+    "ScopeAllow",
+    "ScopeDeny",
+    "SeasonContextFeaturesMixin",
+    "ServiceFamilyScopeRule",
+    "SettlementDelta",
+    "SettlementPrice",
+    "ShareClassPerfFeeConfig",
+    "ShareClassSummary",
+    "ShareClassWalletMapping",
+    "SignOffReport",
+    "SignalPackage",
+    "SignalPayload",
+    "SignalVariant",
+    "SigningSurface",
+    "SizeOrTargetExposure",
+    "SlotFilter",
+    "SolanaChainId",
+    "SolanaTransactionResult",
+    "SpendingCaps",
+    "SplitStrategy",
+    "SportsBetInstruction",
+    "SportsBetPnL",
+    "SportsExchangeOrderInstruction",
+    "StablecoinExposure",
+    "StrategyDefinition",
+    "StrategyInstance",
+    "StrategyInstanceCatalogue",
+    "StrategyInstanceLifecycle",
+    "StrategyInstanceSubscription",
+    "StrategyInstruction",
+    "StrategyInstructionId",
+    "StrategyInstructionType",
+    "StrategyInstrumentIntent",
+    "StrategyLifecycleStage",
+    "StrategyLifecycleTransition",
+    "StrategyMaturityPhase",
+    "StrategyPosition",
+    "StrategyRegistry",
+    "StrategyVersion",
+    "SubAccountId",
+    "SubscribeRequest",
+    "SubscriptionType",
+    "SuccessCriteria",
+    "SyntheticXGFeaturesMixin",
+    "TargetSpec",
+    "TeamFeaturesMixin",
+    "TeamStyleFeaturesMixin",
+    "TenderlyReconciliationReport",
+    "TimeInForce",
+    "TimeframeMode",
+    "TimeframeUrgency",
+    "TopupSource",
+    "TradingWalletConfig",
+    "TrainingObjective",
+    "TrainingScope",
+    "TransferConfirmation",
+    "TransferInstruction",
+    "TransferLearningConfig",
+    "TransferStatus",
+    "TreasurySourceAttribution",
+    "TriggerScenario",
+    "UnderlyingCategory",
+    "UnderlyingDeclaration",
+    "UnderlyingNotRegisteredError",
+    "UnwindAction",
+    "UnwindConfidence",
+    "UnwindExecutionStyle",
+    "UnwindPreviewRequest",
+    "UnwindPreviewResponse",
+    "UnwindStep",
+    "Urgency",
+    "UsageMeterRow",
+    "UserContext",
+    "VenueContextFeaturesMixin",
+    "VenueExposureBreakdown",
+    "VenueInstrumentNotRegisteredError",
+    "VenueInstrumentSignalSupport",
+    "VenueNotRegisteredError",
+    "VenueOverride",
+    "VenueSetVariant",
+    "VenueWalletCapabilities",
+    "VersionStatus",
+    "Violation",
+    "WalletConfig",
+    "WalletKind",
+    "WalletMappingConfig",
+    "WalletProvisioningConfig",
+    "WalletProvisioningError",
+    "WalletType",
+    "WeatherFeaturesMixin",
+    "WithdrawalApprovalChain",
+    "WithdrawalApprovalRule",
+    "WithdrawalApprovalSignature",
+    "XGFeaturesMixin",
+    # ── 7 classes added 2026-06-02 (cicd + matching_engine + registry domains) ──
+    "BookType",
+    "FeeResult",
+    "GitHubWorkflowEvent",
+    "InternalEndpointSpec",
+    "MatchResult",
+    "MatchingFeeType",
+    "OrderRecord",
 ]

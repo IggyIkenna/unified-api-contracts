@@ -97,7 +97,70 @@ class ChainKind(StrEnum):
     RPC: ``STARKNET_RPC_TEMPLATES``. Bridge: STARKNET ↔ ETHEREUM via STARK proof."""
     HYPERLIQUID_L1 = "hyperliquid_l1"
     """Hyperliquid L1 native chain. CLOB-on-chain perp venue (Lighter/Pacifica sibling).
-    RPC: ``HYPERLIQUID_RPC_TEMPLATES``. Bridge: HYPERLIQUID_L1 ↔ ARBITRUM via native bridge."""
+    RPC: ``HYPERLIQUID_RPC_TEMPLATES``. Bridge: HYPERLIQUID_L1 ↔ ARBITRUM via native bridge.
+
+    **Wire/storage chain= segment is ``HYPERLIQUID``, NOT ``HYPERLIQUID_L1``**
+    (operator-locked 2026-06-01 DeFi canonical naming SSOT). The enum member
+    name / ``.value`` are kept (``HYPERLIQUID_L1`` / ``hyperliquid_l1``) so the
+    existing ``CHAIN_GENESIS_DATES`` / ``MAINNET_CHAIN_IDS`` / ``VENUE_CHAIN_MAP``
+    / ``CHAIN_BRIDGE_GRAPH`` keys keep working; the canonical ``chain=`` path
+    segment + ``chain`` column value resolve via
+    :func:`to_canonical_chain_wire` → ``HYPERLIQUID``. SSOT:
+    ``codex/02-data/defi-canonical-naming-ssot.md``."""
+
+
+# ---------------------------------------------------------------------------
+# Canonical chain= wire/storage segment values (operator-locked 2026-06-01).
+#
+# The on-disk ``chain=`` partition segment + the ``chain`` column value are
+# UPPERCASE (``ETHEREUM`` / ``ARBITRUM`` / ``SOLANA`` / ...), matching the enum
+# *member name* — EXCEPT Hyperliquid, whose canonical wire value is
+# ``HYPERLIQUID`` (not the member name ``HYPERLIQUID_L1``), matching the live
+# perp handler ``chain=HYPERLIQUID``. This map holds only the overrides where
+# the wire value differs from ``ChainKind.<MEMBER>.name``; everything else
+# resolves to the member name. SSOT: ``codex/02-data/defi-canonical-naming-ssot.md``.
+# ---------------------------------------------------------------------------
+CHAIN_WIRE_VALUE_OVERRIDES: dict[ChainKind, str] = {
+    ChainKind.HYPERLIQUID_L1: "HYPERLIQUID",
+}
+
+
+def to_canonical_chain_wire(chain: ChainKind | str) -> str:
+    """Resolve a chain to its canonical UPPERCASE ``chain=`` wire/storage value.
+
+    The canonical wire value is the enum member name uppercased
+    (``ChainKind.ETHEREUM`` → ``"ETHEREUM"``), with the Hyperliquid override
+    ``ChainKind.HYPERLIQUID_L1`` → ``"HYPERLIQUID"`` (operator-locked
+    2026-06-01). Accepts either a :class:`ChainKind` member or a raw string
+    (the enum ``.value`` like ``"hyperliquid_l1"``, the member name like
+    ``"HYPERLIQUID_L1"``, or an already-canonical wire value like
+    ``"HYPERLIQUID"`` / ``"ETHEREUM"``).
+
+    Examples:
+        >>> to_canonical_chain_wire(ChainKind.HYPERLIQUID_L1)
+        'HYPERLIQUID'
+        >>> to_canonical_chain_wire("hyperliquid_l1")
+        'HYPERLIQUID'
+        >>> to_canonical_chain_wire("HYPERLIQUID")
+        'HYPERLIQUID'
+        >>> to_canonical_chain_wire(ChainKind.ARBITRUM)
+        'ARBITRUM'
+    """
+    if isinstance(chain, ChainKind):
+        member = chain
+    else:
+        # Try value first (``"hyperliquid_l1"``), then member name
+        # (``"HYPERLIQUID_L1"`` / ``"HYPERLIQUID"`` / ``"ETHEREUM"``).
+        try:
+            member = ChainKind(chain.lower())
+        except ValueError:
+            try:
+                member = ChainKind[chain.upper()]
+            except KeyError:
+                # Already a canonical wire value not equal to a member name
+                # (e.g. ``"HYPERLIQUID"``) — pass through uppercased.
+                return chain.upper()
+    return CHAIN_WIRE_VALUE_OVERRIDES.get(member, member.name)
 
 
 # ---------------------------------------------------------------------------

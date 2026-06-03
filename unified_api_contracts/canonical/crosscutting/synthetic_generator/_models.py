@@ -7,7 +7,7 @@ import json
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
-from ._enums import _SHARD_AXIS_PATTERN, SyntheticGeneratorId, SyntheticRealismAxis
+from ._enums import SHARD_AXIS_PATTERN, SyntheticGeneratorId, SyntheticRealismAxis
 
 
 class SyntheticShardLayout(BaseModel):
@@ -22,11 +22,11 @@ class SyntheticShardLayout(BaseModel):
     @field_validator("shard_key_axes")
     @classmethod
     def _validate_axes(cls, v: tuple[str, ...]) -> tuple[str, ...]:
-        bad = [a for a in v if a not in _SHARD_AXIS_PATTERN]
+        bad = [a for a in v if a not in SHARD_AXIS_PATTERN]
         if bad:
             raise ValueError(
                 f"shard_key_axes {bad!r} not in the closed shard-atom set "
-                f"{sorted(_SHARD_AXIS_PATTERN)!r} (CLAUDE.md Shard-granularity SSOT)",
+                f"{sorted(SHARD_AXIS_PATTERN)!r} (CLAUDE.md Shard-granularity SSOT)",
             )
         if len(set(v)) != len(v):
             raise ValueError(f"shard_key_axes {v!r} contains duplicates")

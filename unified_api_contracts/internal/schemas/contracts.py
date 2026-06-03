@@ -618,6 +618,79 @@ DEFI_LST_LST_RATES = SchemaContract(
     required_row_count_min=1,
 )
 
+# --- Solana DeFi (distinct instrument_types; legacy→canonical migration
+# 2026-05-27, plan solana_defi_legacy_migration_2026_05_27). Kamino/Solend
+# lending is an APY-snapshot shape (NOT the EVM rate/index shape); Solana AMM
+# pools (Orca/Raydium) and Kamino vaults each carry venue-specific fields the
+# EVM pool contracts don't. Same data_type, distinct instrument_type partition.
+DEFI_SOLANA_LENDING_LENDING_INDICES = SchemaContract(
+    asset_group="defi",
+    instrument_type="solana_lending",
+    data_type="lending_indices",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="supply_apy", dtype="float64", nullable=True),
+        ColumnSpec(name="reward_apy", dtype="float64", nullable=True),
+        ColumnSpec(name="apy", dtype="float64", nullable=True),
+        ColumnSpec(name="tvl_usd", dtype="float64", nullable=True),
+    ],
+    symbol_column="market_id",
+    required_row_count_min=1,
+)
+
+DEFI_SOLANA_VAULT_DEX_POOLS = SchemaContract(
+    asset_group="defi",
+    instrument_type="solana_vault",
+    data_type="dex_pools",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="vault_address", dtype="string", nullable=False),
+        ColumnSpec(name="vault_type", dtype="string", nullable=True),
+        ColumnSpec(name="token_a_symbol", dtype="string", nullable=True),
+        ColumnSpec(name="token_b_symbol", dtype="string", nullable=True),
+        ColumnSpec(name="token_a_mint", dtype="string", nullable=True),
+        ColumnSpec(name="token_b_mint", dtype="string", nullable=True),
+        ColumnSpec(name="status", dtype="string", nullable=True),
+    ],
+    symbol_column="vault_address",
+    required_row_count_min=1,
+)
+
+DEFI_SOLANA_AMM_POOL_DEX_POOLS = SchemaContract(
+    asset_group="defi",
+    instrument_type="solana_amm_pool",
+    data_type="dex_pools",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="pool_id", dtype="string", nullable=False),
+        ColumnSpec(name="token_a", dtype="string", nullable=True),
+        ColumnSpec(name="token_b", dtype="string", nullable=True),
+        ColumnSpec(name="price", dtype="float64", nullable=True),
+        ColumnSpec(name="tvl_usd", dtype="float64", nullable=True),
+        ColumnSpec(name="volume_usd", dtype="float64", nullable=True),
+        ColumnSpec(name="fee_rate_bps", dtype="int64", nullable=True),
+        # venue-specific (Orca: tick_spacing + volume_week/month + fee_apr_*; Raydium: pool_type)
+        ColumnSpec(name="tick_spacing", dtype="int64", nullable=True, required=False),
+        ColumnSpec(name="pool_type", dtype="string", nullable=True, required=False),
+        ColumnSpec(name="volume_week", dtype="float64", nullable=True, required=False),
+        ColumnSpec(name="volume_month", dtype="float64", nullable=True, required=False),
+        ColumnSpec(name="fee_apr_day", dtype="float64", nullable=True, required=False),
+        ColumnSpec(name="fee_apr_week", dtype="float64", nullable=True, required=False),
+        ColumnSpec(name="fee_apr_month", dtype="float64", nullable=True, required=False),
+    ],
+    symbol_column="pool_id",
+    required_row_count_min=1,
+)
+
 DEFI_SPOT_ASSET_GAS_FEES = SchemaContract(
     asset_group="defi",
     instrument_type="spot_asset",
@@ -659,6 +732,135 @@ DEFI_PERPETUAL_PERP_FUNDING = SchemaContract(
         _CHAIN,
         _TS_EVENT,
         ColumnSpec(name="funding_rate", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Solana basis-trading MVP (plans/active/solana_basis_trading_mvp_2026_06_01.md
+# Phase 1). Drift V2 per-fill ground truth via the Velocity Data API endpoint
+# ``data.api.drift.trade/market/{market}/trades/{Y}/{M}/{D}?format=csv``.
+# Symbol is the market label (e.g. ``SOL-PERP``); per-fill numerical columns
+# include ``baseAssetAmountFilled`` + ``quoteAssetAmountFilled`` + ``oraclePrice``
+# + ``takerFee`` + ``makerRebate``. ``ts`` is the per-fill UNIX timestamp.
+DEFI_PERPETUAL_PERP_TRADES = SchemaContract(
+    asset_group="defi",
+    instrument_type="perpetual",
+    data_type="perp_trades",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="base_asset_amount_filled", dtype="float64", nullable=False),
+        ColumnSpec(name="quote_asset_amount_filled", dtype="float64", nullable=False),
+        ColumnSpec(name="oracle_price", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# TWAP marks at funding cadence (~hourly on Drift V2). Distinct from the
+# ``perp_funding`` row's funding-rate field — this is the matching-engine
+# top-of-book proxy used by the backtest fill simulator. Derivable from
+# the same Velocity Data API funding response (``oraclePriceTwap`` /
+# ``markPriceTwap`` columns) but emitted as a separate downstream-consumable
+# data_type so consumers don't have to grep funding rows for it.
+DEFI_PERPETUAL_PERP_MARK_ORACLE = SchemaContract(
+    asset_group="defi",
+    instrument_type="perpetual",
+    data_type="perp_mark_oracle",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="oracle_price_twap", dtype="float64", nullable=False),
+        ColumnSpec(name="mark_price_twap", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Signed AMM-side OI at funding cadence — derivable from
+# ``baseAssetAmountWithAmm`` column on each ``perp_funding`` row. Sign
+# convention matches Drift's: positive = net-long AMM exposure (longs out-pay
+# shorts at positive funding); negative = net-short. Used for position-sizing
+# + carry-magnitude calculations in the basis-trade archetype.
+DEFI_PERPETUAL_PERP_OPEN_INTEREST = SchemaContract(
+    asset_group="defi",
+    instrument_type="perpetual",
+    data_type="perp_open_interest",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="base_asset_amount_with_amm", dtype="float64", nullable=False),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Phase 2 — Solana spot-DEX time-series state. CLOB-style orderbook snapshots
+# (Phoenix) at block heights: top-N bid + ask levels with price + size.
+# Distinct from ``dex_pool_state`` (AMM curve) — this is the orderbook
+# vocabulary. Used by the backtest fill simulator for the long-spot leg of
+# the basis trade when routing through Phoenix.
+DEFI_DEX_POOL_DEX_ORDERBOOK = SchemaContract(
+    asset_group="defi",
+    instrument_type="dex_pool",
+    data_type="dex_orderbook",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="bid_price", dtype="float64", nullable=True),
+        ColumnSpec(name="bid_size", dtype="float64", nullable=True),
+        ColumnSpec(name="ask_price", dtype="float64", nullable=True),
+        ColumnSpec(name="ask_size", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Phase 2 — Aggregator quote samples (Jupiter v6 ``/quote``). Sampled at
+# fixed input notionals (e.g. 100/1K/10K USDC -> SOL) for routing-cost
+# analysis + backtest comparison vs the underlying venue states.
+DEFI_DEX_POOL_DEX_QUOTE = SchemaContract(
+    asset_group="defi",
+    instrument_type="dex_pool",
+    data_type="dex_quote",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="input_amount", dtype="float64", nullable=False),
+        ColumnSpec(name="output_amount", dtype="float64", nullable=False),
+        ColumnSpec(name="price_impact_pct", dtype="float64", nullable=True),
+    ],
+    symbol_column="symbol",
+    required_row_count_min=1,
+)
+
+# Phase 2 — Per-swap event stream on AMM venues (Orca / Raydium swap
+# instructions). Distinct from ``dex_pool_swaps`` (subgraph-aggregated) —
+# this is the per-fill canonical event with input + output amounts.
+DEFI_DEX_POOL_DEX_TRADES = SchemaContract(
+    asset_group="defi",
+    instrument_type="dex_pool",
+    data_type="dex_trades",
+    columns=[
+        _INSTRUMENT_ID,
+        _VENUE,
+        _CHAIN,
+        _TS_EVENT,
+        ColumnSpec(name="input_amount", dtype="float64", nullable=False),
+        ColumnSpec(name="output_amount", dtype="float64", nullable=False),
+        ColumnSpec(name="input_token", dtype="string", nullable=True),
+        ColumnSpec(name="output_token", dtype="string", nullable=True),
     ],
     symbol_column="symbol",
     required_row_count_min=1,
@@ -778,6 +980,9 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "a_token", "lending_indices"): DEFI_AAVE_V3_LENDING_INDICES,
     ("defi", "lending", "lending_indices"): DEFI_LENDING_INDICES_MARKET_ID,
     ("defi", "lending", "liquidations"): DEFI_LENDING_LIQUIDATIONS,
+    ("defi", "solana_lending", "lending_indices"): DEFI_SOLANA_LENDING_LENDING_INDICES,
+    ("defi", "solana_vault", "dex_pools"): DEFI_SOLANA_VAULT_DEX_POOLS,
+    ("defi", "solana_amm_pool", "dex_pools"): DEFI_SOLANA_AMM_POOL_DEX_POOLS,
     ("defi", "pool", "dex_pool_state"): DEFI_DEX_POOL_DEX_POOL_STATE,
     ("defi", "pool", "dex_pool_swaps"): DEFI_POOL_DEX_POOL_SWAPS,
     ("defi", "dex_pool", "dex_pool_swaps"): DEFI_DEX_POOL_DEX_POOL_SWAPS,
@@ -785,6 +990,13 @@ CONTRACT_REGISTRY: dict[tuple[str, str, str], SchemaContract] = {
     ("defi", "spot_asset", "gas_fees"): DEFI_SPOT_ASSET_GAS_FEES,
     ("defi", "spot_asset", "oracle_prices"): DEFI_SPOT_ASSET_ORACLE_PRICES,
     ("defi", "perpetual", "perp_funding"): DEFI_PERPETUAL_PERP_FUNDING,
+    # Solana basis MVP (plans/active/solana_basis_trading_mvp_2026_06_01.md)
+    ("defi", "perpetual", "perp_trades"): DEFI_PERPETUAL_PERP_TRADES,
+    ("defi", "perpetual", "perp_mark_oracle"): DEFI_PERPETUAL_PERP_MARK_ORACLE,
+    ("defi", "perpetual", "perp_open_interest"): DEFI_PERPETUAL_PERP_OPEN_INTEREST,
+    ("defi", "dex_pool", "dex_orderbook"): DEFI_DEX_POOL_DEX_ORDERBOOK,
+    ("defi", "dex_pool", "dex_quote"): DEFI_DEX_POOL_DEX_QUOTE,
+    ("defi", "dex_pool", "dex_trades"): DEFI_DEX_POOL_DEX_TRADES,
     ("defi", "staking", "eigenlayer_rewards"): DEFI_STAKING_EIGENLAYER_REWARDS,
     ("defi", "staking", "yield_snapshots"): DEFI_STAKING_YIELD_SNAPSHOTS,
     ("defi", "staking", "native_staking_rates"): DEFI_STAKING_NATIVE_STAKING_RATES,
