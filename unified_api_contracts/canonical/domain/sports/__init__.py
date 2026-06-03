@@ -107,10 +107,12 @@ from .league_registry import LeagueClassification as LeagueClassification
 from .league_registry import LeagueClassificationRegistry as LeagueClassificationRegistry
 from .league_registry import LeagueClassificationType as LeagueClassificationType
 from .league_registry import LeagueDefinition as LeagueDefinition
+from .live import SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY as SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY
 from .live import LiveMatchState as LiveMatchState
 from .live import LiveOddsUpdate as LiveOddsUpdate
 from .live import MatchPeriod as MatchPeriod
 from .live import ScraperVersionMeta as ScraperVersionMeta
+from .live import SportsFeatureCaptureStatus as SportsFeatureCaptureStatus
 from .mapping_resolver import clear_mapping_cache as clear_mapping_cache
 from .mapping_resolver import resolve_fixture_mapping as resolve_fixture_mapping
 from .mapping_resolver import resolve_league_mapping as resolve_league_mapping
