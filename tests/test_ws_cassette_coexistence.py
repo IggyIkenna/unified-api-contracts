@@ -44,8 +44,10 @@ _REST_POLLER_CONNECTORS: Final[frozenset[str]] = frozenset(
         "jito_defi_ws",
         "morpho_defi_ws",
         "odds_api_ws",
+        "orca_defi_ws",
         "phoenix_ws",
         "polymarket_ws",
+        "raydium_defi_ws",
     }
 )
 

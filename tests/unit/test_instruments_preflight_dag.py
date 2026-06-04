@@ -89,6 +89,8 @@ def test_every_trigger_downstream_pair_has_a_dag_entry() -> None:
             asset_group = MarketAssetGroup.TRADFI
         elif trigger.value.startswith("prediction_"):
             asset_group = MarketAssetGroup.PREDICTION
+        elif trigger.value.startswith("defi_"):
+            asset_group = MarketAssetGroup.DEFI
         else:
             pytest.fail(f"trigger {trigger} has no asset_group prefix")
         assert (asset_group, downstream) in INSTRUMENTS_PREFLIGHT_REQUIREMENTS, (
@@ -162,6 +164,63 @@ def test_tradfi_ohlcv_15m_requires_instrument_catalog_24h() -> None:
     assert len(reqs) == 1
     assert reqs[0].upstream_entity_type == "instrument-catalog"
     assert reqs[0].max_staleness_seconds == 24 * 3600
+
+
+def test_defi_collect_daily_requires_instrument_catalog_24h() -> None:
+    """DeFi daily collect requires the DeFi instrument-catalog fresh within 24h (A12a)."""
+    reqs = get_preflight_requirements(MarketAssetGroup.DEFI, "defi_market_data")
+    assert len(reqs) == 1
+    assert reqs[0].upstream_entity_type == "instrument-catalog"
+    assert reqs[0].max_staleness_seconds == 24 * 3600
+
+
+def test_defi_collect_daily_trigger_round_trip() -> None:
+    """DEFI_COLLECT_DAILY resolves to its downstream entity + DAG entry (A12a)."""
+    trigger, downstream = get_trigger_definition("defi_collect_daily")
+    assert trigger is PreflightTrigger.DEFI_COLLECT_DAILY
+    assert downstream == "defi_market_data"
+
+
+def test_validate_defi_collect_daily_failed_when_catalog_missing() -> None:
+    """DeFi collect preflight FAILS loudly when the DeFi catalog is absent (A12a).
+
+    Mirrors the CeFi/TradFi catalog-missing path: missing upstream => PreflightFailed
+    with the instrument-catalog dependency listed, so MTDS DeFi handlers route the
+    shard honestly (record_failed / record_empty) rather than silently fetching
+    against a stale/absent catalog.
+    """
+    reader = _FakeManifestReader()
+    reader.set(MarketAssetGroup.DEFI, "instrument-catalog", _FIXTURE_DAY, None)
+    result = validate_preflight_for_trigger(
+        trigger_name="defi_collect_daily",
+        asset_group=MarketAssetGroup.DEFI,
+        on_date=_FIXTURE_DAY,
+        manifest_reader=reader,
+        now=_NOW,
+    )
+    assert isinstance(result, PreflightFailed)
+    assert len(result.missing) == 1
+    assert result.missing[0].entity_type == "instrument-catalog"
+    assert result.missing[0].actual_age_seconds is None
+
+
+def test_validate_defi_collect_daily_ok_when_catalog_fresh() -> None:
+    """DeFi collect preflight passes when the DeFi catalog is fresh within 24h (A12a)."""
+    reader = _FakeManifestReader()
+    reader.set(
+        MarketAssetGroup.DEFI,
+        "instrument-catalog",
+        _FIXTURE_DAY,
+        _NOW - timedelta(hours=1),
+    )
+    result = validate_preflight_for_trigger(
+        trigger_name="defi_collect_daily",
+        asset_group=MarketAssetGroup.DEFI,
+        on_date=_FIXTURE_DAY,
+        manifest_reader=reader,
+        now=_NOW,
+    )
+    assert isinstance(result, PreflightOK)
 
 
 def test_prediction_market_discovery_uses_static_ssot_sentinel() -> None:

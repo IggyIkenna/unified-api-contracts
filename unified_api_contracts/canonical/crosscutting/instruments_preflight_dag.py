@@ -106,6 +106,15 @@ class PreflightTrigger(StrEnum):
     # Prediction 15-min cron — Polymarket/Kalshi market-discovery polls.
     PREDICTION_MARKET_DISCOVERY = "prediction_market_discovery"
 
+    # DeFi collect-* daily fan-out — MTDS DeFi handlers (dex_pools / lst_rates /
+    # lending_indices / perp_funding / oracle_prices ...) fetch the cross-product
+    # (instruments-service DeFi catalog x time-shards) for ``on_date``. Without a
+    # fresh DeFi catalog the handlers either fetch delisted pools/markets (RPC +
+    # subgraph quota waste) or miss freshly-listed ones (silent gap), mirroring the
+    # CeFi/TradFi 15-min OHLCV catalog-freshness rule. A12a —
+    # data_source_provenance_all_asset_groups_2026_06_01 / DeFi upstream-preflight wiring.
+    DEFI_COLLECT_DAILY = "defi_collect_daily"
+
 
 # Maps each trigger to its produced downstream entity-type. The downstream
 # entity name is what the trigger writes; the upstream-required graph is
@@ -120,6 +129,7 @@ TRIGGER_TO_DOWNSTREAM_ENTITY: Final[Mapping[PreflightTrigger, str]] = {
     PreflightTrigger.CEFI_OHLCV_15M_REFRESH: "ohlcv_15m",
     PreflightTrigger.TRADFI_OHLCV_15M_REFRESH: "ohlcv_15m",
     PreflightTrigger.PREDICTION_MARKET_DISCOVERY: "prediction_markets",
+    PreflightTrigger.DEFI_COLLECT_DAILY: "defi_market_data",
 }
 
 
@@ -304,6 +314,30 @@ INSTRUMENTS_PREFLIGHT_REQUIREMENTS: Final[Mapping[tuple[MarketAssetGroup, str], 
                 "UAC-static SSOT (not a manifest-tracked entity); staleness check "
                 "is structurally not applicable. Presence is asserted at import-time "
                 "by the UAC registry."
+            ),
+        ),
+    ),
+    # ── DeFi ──────────────────────────────────────────────────────────────
+    # DeFi daily collect REQUIRES the instruments-service DeFi catalog fresh
+    # within 24h. Same catalog-freshness rule as CeFi/TradFi OHLCV: the MTDS
+    # DeFi handlers fetch the cross-product (active pools/markets/LST tokens
+    # for the day x per-protocol subgraph/RPC shards). A stale catalog =>
+    # fetching delisted pools (subgraph + RPC quota waste) or missing
+    # freshly-listed ones (silent gap that downstream features-onchain drops).
+    # The DeFi catalog is written by instruments-service to the
+    # ``instruments-store-defi-{pid}`` availability index under
+    # ``data_type='instrument-catalog'`` — the same upstream_entity_type the
+    # CeFi/TradFi entries probe. A12a (DeFi upstream-preflight wiring).
+    (MarketAssetGroup.DEFI, "defi_market_data"): (
+        PreflightRequirement(
+            upstream_entity_type="instrument-catalog",
+            max_staleness_seconds=_24H_SECONDS,
+            rationale=(
+                "DeFi daily collect (dex_pools / lst_rates / lending_indices / "
+                "perp_funding / oracle_prices ...) needs the active-instrument "
+                "DeFi catalog fresh for the fetch-day cross-product. Stale catalog "
+                "=> fetching delisted pools/markets (subgraph + RPC quota waste) or "
+                "missing newly-listed ones (silent gap)."
             ),
         ),
     ),
