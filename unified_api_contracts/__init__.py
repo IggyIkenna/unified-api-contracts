@@ -531,6 +531,7 @@ from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
     PreflightOK,
     PreflightResult,
+    PreflightTrigger,
     validate_preflight_for_trigger,
 )
 from .canonical.crosscutting.manifest_schema import (
@@ -1519,6 +1520,7 @@ __all__ = [
     "PreflightFailed",
     "PreflightOK",
     "PreflightResult",
+    "PreflightTrigger",
     "PriceShift",
     "ProbabilityBucket",
     "ProcessRedemptionRequest",
