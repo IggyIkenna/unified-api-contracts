@@ -27,8 +27,9 @@ DeFi (operator-locked 2026-06-01): ``pipeline_mode={mode}`` IS a CANONICAL
        SSOT: ``codex/02-data/defi-canonical-naming-ssot.md``.
 CeFi: ``raw_tick_data/by_date/day={D}/asset_group=cefi/venue={V}/
        instrument_type={IT}/data_type={DT}/{file}``
-TradFi: ``raw_tick_data/by_date/day={D}/asset_group=tradfi/venue={V}/
+TradFi: ``raw_tick_data/by_date/day={D}/pipeline_mode={mode}/asset_group=tradfi/venue={V}/
          instrument_type={IT}/data_type={DT}/{file}``
+         (back-compat without segment: ``raw_tick_data/by_date/day={D}/asset_group=tradfi/...``)
 Prediction: ``raw_tick_data/by_date/day={D}/asset_group=prediction/
              venue={V}/instrument_type={IT}/data_type={DT}/{condition_id}.parquet``
 
@@ -270,14 +271,23 @@ def build_tradfi_partition_path(
     data_type: str,
     day: _dt.date,
     file_name: str,
+    pipeline_mode: str | None = None,
 ) -> str:
     """Build the canonical TradFi partition path (full bucket-relative path).
 
     Returns the full path including the ``raw_tick_data/by_date/`` prefix —
     callers MUST NOT prepend further.
 
-    Wire format (matches MTDS
-    ``tradfi/tradfi_shared.py::build_partition_path``):
+    With ``pipeline_mode`` (canonical — operator-locked 2026-06-01), the
+    ``pipeline_mode={mode}/`` segment is inserted AFTER ``day={D}/`` and
+    BEFORE ``asset_group=tradfi/``:
+
+    ``raw_tick_data/by_date/day={YYYY-MM-DD}/pipeline_mode={mode}/
+    asset_group=tradfi/venue={V}/instrument_type={IT}/data_type={DT}/{file_name}``
+
+    Without ``pipeline_mode`` (``None``, back-compat default) the segment is
+    omitted — matching the legacy on-disk shape that readers still probe via
+    the fallback chain in :func:`candidate_parquet_paths`.
 
     ``raw_tick_data/by_date/day={YYYY-MM-DD}/asset_group=tradfi/venue={V}/
     instrument_type={IT}/data_type={DT}/{file_name}``
@@ -296,8 +306,10 @@ def build_tradfi_partition_path(
     v = _normalize_venue_upper(venue)
     it = instrument_type.value.lower()
     day_str = day.strftime("%Y-%m-%d")
+    pipeline_mode_segment = f"pipeline_mode={pipeline_mode}/" if pipeline_mode else ""
     return (
-        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{ASSET_GROUP_HIVE_KEY}=tradfi/"
+        f"{RAW_TICK_DATA_PREFIX}day={day_str}/{pipeline_mode_segment}"
+        f"{ASSET_GROUP_HIVE_KEY}=tradfi/"
         f"venue={v}/instrument_type={it}/data_type={data_type}/{file_name}"
     )
 
@@ -486,16 +498,37 @@ def candidate_parquet_paths(
         return [base]
 
     if ag == AssetGroup.TRADFI:
-        base = build_tradfi_partition_path(
-            venue=str(kwargs["venue"]),
-            instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
-            data_type=data_type,
-            day=day,
-            file_name=str(kwargs["file_name"]),
-        )
+        # TradFi: pipeline_mode= is a CANONICAL segment (operator-locked
+        # 2026-06-01) — pass it through to the builder (single code path)
+        # so the UAC builder is the sole source of path-construction logic.
+        # The canonical (with-segment) path is the first probe; the bare
+        # path follows as a migration fallback (Phase 5.3 / 8 window).
         if pipeline_mode:
-            return [_prepend_pipeline_mode(base), base]
-        return [base]
+            canonical = build_tradfi_partition_path(
+                venue=str(kwargs["venue"]),
+                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+                data_type=data_type,
+                day=day,
+                file_name=str(kwargs["file_name"]),
+                pipeline_mode=pipeline_mode,
+            )
+            base = build_tradfi_partition_path(
+                venue=str(kwargs["venue"]),
+                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+                data_type=data_type,
+                day=day,
+                file_name=str(kwargs["file_name"]),
+            )
+            return [canonical, base]
+        return [
+            build_tradfi_partition_path(
+                venue=str(kwargs["venue"]),
+                instrument_type=_coerce_instrument_type(kwargs["instrument_type"]),
+                data_type=data_type,
+                day=day,
+                file_name=str(kwargs["file_name"]),
+            )
+        ]
 
     if ag == AssetGroup.PREDICTION:
         instrument_type_raw = kwargs.get("instrument_type", "prediction_market")

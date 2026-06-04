@@ -67,6 +67,12 @@ class TestMtdsVenueExpectedDataTypes:
         empty = [v for v in set(vm.all_databento_venues) if not get_expected_data_types_for_venue(v)]
         assert not empty, f"TRADFI venues with empty expected_data_types: {empty}"
 
+    def test_no_tradfi_venue_empty_via_all_tradfi_venues(self) -> None:
+        """all_tradfi_venues covers the same complete set as all_databento_venues."""
+        vm = VenueMapping()
+        empty = [v for v in set(vm.all_tradfi_venues) if not get_expected_data_types_for_venue(v)]
+        assert not empty, f"TRADFI venues with empty expected_data_types (via all_tradfi_venues): {empty}"
+
     def test_suffixed_okx_variants_have_correct_scope(self) -> None:
         # OKX-SPOT: no derivatives
         spot = set(get_expected_data_types_for_venue("OKX-SPOT"))
@@ -98,6 +104,46 @@ class TestMtdsVenueExpectedDataTypes:
         for v in ("POLYMARKET", "KALSHI"):
             dts = set(get_expected_data_types_for_venue(v))
             assert "trades" in dts, f"{v} missing 'trades'"
+
+
+class TestAllTradfiVenues:
+    """all_tradfi_venues must be the complete tradfi universe (FLAG-4).
+
+    all_tradfi_venues = all_databento_venues — same 6-venue set, semantically
+    correct name that makes clear CBOE (Barchart) + FX (Yahoo) are included.
+    Using this accessor on the MTDS denominator ensures CBOE/FX expected cells
+    are not excluded (which was causing inflated coverage % pre-fix).
+    """
+
+    def test_includes_non_databento_tradfi_venues(self) -> None:
+        vm = VenueMapping()
+        all_tradfi = set(vm.all_tradfi_venues)
+        # CBOE uses Barchart (VIX index); FX uses Yahoo Finance — both must be in
+        # the complete tradfi universe so their cells appear in the denominator.
+        assert "CBOE" in all_tradfi, f"CBOE missing from all_tradfi_venues: {all_tradfi}"
+        assert "FX" in all_tradfi, f"FX missing from all_tradfi_venues: {all_tradfi}"
+
+    def test_includes_databento_tradfi_venues(self) -> None:
+        vm = VenueMapping()
+        all_tradfi = set(vm.all_tradfi_venues)
+        for venue in ("CME", "NASDAQ", "NYSE", "ICE"):
+            assert venue in all_tradfi, f"{venue} missing from all_tradfi_venues: {all_tradfi}"
+
+    def test_equals_all_databento_venues(self) -> None:
+        """all_tradfi_venues is derived from all_databento_venues (same content)."""
+        vm = VenueMapping()
+        assert sorted(vm.all_tradfi_venues) == sorted(vm.all_databento_venues), (
+            "all_tradfi_venues must equal all_databento_venues (same authoritative set, better name). "
+            f"all_tradfi={sorted(vm.all_tradfi_venues)}, all_databento={sorted(vm.all_databento_venues)}"
+        )
+
+    def test_accessor_attribute_exists_for_getattr_resolution(self) -> None:
+        """deployment-api resolves venue_accessor via getattr(VenueMapping(), 'all_tradfi_venues')."""
+        vm = VenueMapping()
+        result = getattr(vm, "all_tradfi_venues", None)
+        assert result is not None, "all_tradfi_venues attribute not found on VenueMapping"
+        assert isinstance(result, list), f"expected list, got {type(result)}"
+        assert len(result) > 0, "all_tradfi_venues must not be empty"
 
 
 class TestNormalizeDefiVenue:
