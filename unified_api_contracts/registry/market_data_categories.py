@@ -446,15 +446,20 @@ def get_valid_data_types_for_venue(venue: str) -> list[str]:
     return DATA_TYPES_BY_ASSET_GROUP.get(ag, [])
 
 
-def validate_data_type_for_venue(venue: str, data_type: str) -> bool:
+def validate_data_type_for_venue(venue: str, data_type: str, *, strict: bool = False) -> bool:
     """Check if a data type is valid for a venue.
 
     Returns True if the data type is in the venue's asset group's allowed data types.
-    Returns True for unknown venues (permissive — validation is advisory).
+
+    For an UNKNOWN venue (no valid set): ``strict=False`` (default) returns True
+    (permissive — advisory; preserves back-compat for callers that only WARN). The
+    live CAPTURE path passes ``strict=True`` -> returns False (fail-CLOSED): a venue UAC
+    does not recognise cannot have a valid (venue x data_type) combo, so we must NOT
+    attempt/phantom-write it (Dimension-6 guardrail vs typo'd / non-existent venues).
     """
     valid = get_valid_data_types_for_venue(venue)
     if not valid:
-        return True  # Unknown venue — don't block
+        return not strict  # unknown venue: permissive (advisory) by default; fail-closed when strict
     return data_type in valid
 
 
