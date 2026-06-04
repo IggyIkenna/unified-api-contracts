@@ -195,13 +195,16 @@ from .canonical.crosscutting.scheduler_registry import (
 )
 from .canonical.crosscutting.source_priority import (
     default_source,
+    detect_dual_source_conflicts,
     emission_latency_ms_for_source,
     external_sources_for,
+    get_all_sources_with_priority,
     get_primary_source,
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
     read_with_source_priority,
+    select_primary_available_source,
     source_required,
 )
 from .canonical.crosscutting.strategy_family import (
@@ -1681,6 +1684,9 @@ __all__ = [
     "get_primary_source_with_latency",
     "get_provider_availability",
     # Features DAG — UTL point_in_time + features-* consumers
+    "get_all_sources_with_priority",
+    "detect_dual_source_conflicts",
+    "select_primary_available_source",
     "get_required_inputs",
     "get_required_secrets",
     "get_schedulers_for_env",
