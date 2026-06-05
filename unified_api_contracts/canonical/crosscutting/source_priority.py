@@ -392,7 +392,7 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "hyperliquid_rest": frozenset({Mode.BATCH, Mode.REPLAY}),  # exchange REST backfill
     # TradFi
     "databento": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
-    "massive": frozenset({Mode.BATCH}),
+    "massive": frozenset({Mode.BATCH, Mode.LIVE}),  # operator 2026-06-05: massive has live too (replay TBC)
     "yahoo": frozenset({Mode.BATCH}),
     "barchart": frozenset({Mode.BATCH}),
     "eia": frozenset({Mode.BATCH}),
@@ -406,7 +406,10 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # Prediction
     "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE}),
     "polymarket_gamma_api": frozenset({Mode.BATCH}),
-    # Sports / reference (scheduled batch APIs — no live stream, no tick-replay)
+    # Sports / reference. Scheduled batch APIs today; **LIVE sports source is TBD**
+    # (operator 2026-06-05 — undecided; betfair exists as an IS adapter but is NOT a
+    # registered SOURCE_PRIORITY source). Seeded batch-only until a live sports
+    # vendor is chosen, then ratify that source up to {BATCH, LIVE}.
     "api_football": frozenset({Mode.BATCH}),
     "footystats": frozenset({Mode.BATCH}),
     "odds_api": frozenset({Mode.BATCH}),

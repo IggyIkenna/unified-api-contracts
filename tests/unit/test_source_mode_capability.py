@@ -74,10 +74,17 @@ def test_tardis_is_live_but_not_replay() -> None:
     assert not source_supports("tardis", Mode.REPLAY)
 
 
-def test_scheduled_batch_apis_are_batch_only() -> None:
-    """Sparse scheduled APIs have no live stream + no tick-replay."""
-    for src in ("api_football", "yahoo", "barchart", "eia", "massive"):
-        assert modes_for_source(src) == frozenset({Mode.BATCH})
+def test_massive_and_databento_are_live_capable() -> None:
+    """Operator 2026-06-05: the TradFi market-data vendors stream live too."""
+    assert source_supports("massive", Mode.LIVE)
+    assert source_supports("databento", Mode.LIVE)
+
+
+def test_no_sports_source_is_live_yet() -> None:
+    """Operator 2026-06-05: the live sports source is undecided — seeded batch-only
+    until a vendor is chosen. (Change deliberately when a live sports source lands.)"""
+    for src in ("api_football", "footystats", "odds_api", "understat"):
+        assert not source_supports(src, Mode.LIVE)
 
 
 # ---------------------------------------------------------------------------
