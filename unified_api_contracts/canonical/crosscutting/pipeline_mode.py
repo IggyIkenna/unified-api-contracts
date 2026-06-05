@@ -175,11 +175,71 @@ def pipeline_mode_for_sports_entity(entity_name: str) -> PipelineMode:
     return _SPORTS_ENTITY_TO_PIPELINE_MODE.get(entity_name.lower(), PipelineMode.BATCH_INSTRUMENTS_SERVICE)
 
 
+# ---------------------------------------------------------------------------
+# Reconciliation-class (Mode) + operational-cadence axes
+# (pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md — M1/M8)
+# ---------------------------------------------------------------------------
+
+
+class Mode(StrEnum):
+    """The data-class / reconciliation axis — what a reader unions + prioritises.
+
+    Distinct from :class:`PipelineMode` (which is ``mode``-by-``source``): ``Mode`` is
+    the abstract reconciliation class. The full target ``pipeline_mode`` form is
+    ``{mode}_{source}[_{transport}]`` (M1) — e.g. ``batch_databento`` /
+    ``live_tardis`` / ``replay_onchain_rpc``. Precedence is mode-CONTEXTUAL (M4):
+    a live consumer reads ``live > replay > batch``; a batch consumer reads
+    ``batch > replay > live``; ``replay`` is always the middle (gap-fill) tier.
+    """
+
+    BATCH = "batch"
+    LIVE = "live"
+    REPLAY = "replay"
+
+
+class Cadence(StrEnum):
+    """Operational cadence / deployment topology — an OBSERVABILITY axis that is
+    ORTHOGONAL to :class:`Mode`/`PipelineMode` and must NOT be folded into the
+    reconciliation `pipeline_mode` (M8).
+
+    The same logical query (e.g. the same Tardis endpoint for a nightly T+1 and a
+    long-term historical backfill) is the SAME ``pipeline_mode`` (``batch_tardis``)
+    — one pipeline to union — but a DIFFERENT cadence. Cadence lives as a manifest
+    column + the deployment registry (NOT a GCS path key), so it never fragments
+    the data or the union; it powers "what ran / what failed / where backfills
+    started+stopped" in data-status drilldowns.
+    """
+
+    ONE_OFF_BACKFILL = "one_off_backfill"
+    T1_DAILY = "t1_daily"
+    SCHEDULED_RECURRING = "scheduled_recurring"
+    CONTINUOUS_LIVE = "continuous_live"
+    RECOVERY_REPLAY = "recovery_replay"
+
+
+def mode_of(pipeline_mode: PipelineMode) -> Mode:
+    """Return the abstract :class:`Mode` for a concrete :class:`PipelineMode`.
+
+    Today only ``batch_*`` and ``live_websocket`` exist; once M1 lands
+    ``live_<source>`` / ``replay_<source>``, this keys off the leading segment.
+    """
+
+    value = pipeline_mode.value
+    if value.startswith("live"):
+        return Mode.LIVE
+    if value.startswith("replay"):
+        return Mode.REPLAY
+    return Mode.BATCH
+
+
 __all__ = [
     "_SPORTS_ENTITY_TO_PIPELINE_MODE",
+    "Cadence",
+    "Mode",
     "PipelineMode",
     "is_batch",
     "is_live",
+    "mode_of",
     "pipeline_mode_for_source",
     "pipeline_mode_for_sports_entity",
     "source_string_for",

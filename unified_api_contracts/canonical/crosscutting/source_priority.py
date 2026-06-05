@@ -79,6 +79,7 @@ from enum import StrEnum
 from typing import Final
 
 from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
+    Mode,
     PipelineMode,
     pipeline_mode_for_source,
 )
@@ -361,6 +362,80 @@ on every *external-vendor* market-data cell. Cells whose only source(s) are
 internal service emitters carry no external provenance — their lineage is the
 upstream cell, not a vendor — so they are exempt from the gate. Membership here
 is the principled exemption (vs a hardcoded data_type list)."""
+
+
+# ---------------------------------------------------------------------------
+# M2 — source-mode capability registry + M9 mock source
+# (pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md)
+# ---------------------------------------------------------------------------
+
+MOCK_SOURCE: Final[str] = "mock"
+"""M9 — simulated/fake data source. Routes to the DEV cloud-storage path via the
+env-tier bucket split (``-dev-``/`-stg-` vs `-prd-`) so it NEVER touches prod;
+makes test fixtures first-class. Mock implies dev-tier only."""
+
+# Every EXTERNAL source is batch-capable (it has a ``batch_<source>`` PipelineMode
+# by the closed-set round-trip). LIVE = has a real-time stream. REPLAY = can
+# deterministically re-produce a past window for recovery (chain RPCs are fully
+# replayable; an exchange REST can backfill; a vendor that forbids tick-replay,
+# e.g. Tardis per the operator, is NOT replay-capable).
+#
+# ⚠️ DRAFT SEED — the BATCH flags are certain (round-trip-derivable); the LIVE +
+# REPLAY flags are a best-effort seed pending PER-SOURCE OPERATOR/DOMAIN RATIFY
+# (M2 in the plan). Only the operator-stated facts are load-bearing here: chain
+# RPCs are replay-capable; Tardis is live but NOT replay. Refine the rest on
+# ratification — `test_source_mode_capability_*` asserts only completeness +
+# batch-for-all + those stated facts, so the uncertain flags can change freely.
+SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
+    # CeFi
+    "tardis": frozenset({Mode.BATCH, Mode.LIVE}),  # operator: live, NOT tick-replay
+    "hyperliquid_rest": frozenset({Mode.BATCH, Mode.REPLAY}),  # exchange REST backfill
+    # TradFi
+    "databento": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "massive": frozenset({Mode.BATCH}),
+    "yahoo": frozenset({Mode.BATCH}),
+    "barchart": frozenset({Mode.BATCH}),
+    "eia": frozenset({Mode.BATCH}),
+    # DeFi — chain RPCs are deterministic ⇒ fully replayable (operator-stated)
+    "onchain_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "solana_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "helius_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "onchain_subgraph": frozenset({Mode.BATCH}),
+    "chainlink": frozenset({Mode.BATCH, Mode.LIVE}),
+    "pyth_hermes": frozenset({Mode.BATCH, Mode.LIVE}),
+    # Prediction
+    "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE}),
+    "polymarket_gamma_api": frozenset({Mode.BATCH}),
+    # Sports / reference (scheduled batch APIs — no live stream, no tick-replay)
+    "api_football": frozenset({Mode.BATCH}),
+    "footystats": frozenset({Mode.BATCH}),
+    "odds_api": frozenset({Mode.BATCH}),
+    "understat": frozenset({Mode.BATCH}),
+    "transfermarkt": frozenset({Mode.BATCH}),
+    "soccer_football_info": frozenset({Mode.BATCH}),
+    "open_meteo": frozenset({Mode.BATCH}),
+    "mdps_odds_horizon_bucket": frozenset({Mode.BATCH}),
+    "instruments_service": frozenset({Mode.BATCH}),
+}
+
+
+def modes_for_source(source: str) -> frozenset[Mode]:
+    """Return the set of :class:`Mode`s ``source`` can run. ``mock`` ⇒ all modes
+    (a fixture can stand in for any). Unregistered external source ⇒ ``{BATCH}``
+    (the safe default — everything is at least batch-archivable)."""
+    if source == MOCK_SOURCE:
+        return frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
+    return SOURCE_MODE_CAPABILITY.get(source, frozenset({Mode.BATCH}))
+
+
+def source_supports(source: str, mode: Mode) -> bool:
+    """True if ``source`` can run in reconciliation ``mode`` (M2 guardrail)."""
+    return mode in modes_for_source(source)
+
+
+def sources_supporting(mode: Mode) -> set[str]:
+    """All registered sources capable of ``mode`` (e.g. the replay-capable set)."""
+    return {src for src, modes in SOURCE_MODE_CAPABILITY.items() if mode in modes}
 
 
 def external_sources_for(asset_group: str, data_type: str) -> list[str]:

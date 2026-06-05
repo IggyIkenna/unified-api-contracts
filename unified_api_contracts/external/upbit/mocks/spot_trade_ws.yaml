@@ -1,0 +1,13 @@
+ws_url: wss://api.upbit.com/websocket/v1
+subscription:
+  - ticket: "test-uuid-1234"
+  - type: trade
+    codes:
+      - KRW-BTC
+      - KRW-ETH
+frames:
+  - direction: recv
+    payload: '{"type":"trade","code":"KRW-BTC","trade_timestamp":1748908800000,"trade_price":135000000.0,"trade_volume":0.00123,"ask_bid":"BID","sequential_id":202606050001,"stream_type":"SNAPSHOT"}'
+  - direction: recv
+    payload: '{"type":"trade","code":"KRW-ETH","trade_timestamp":1748908800100,"trade_price":4800000.0,"trade_volume":0.05,"ask_bid":"ASK","sequential_id":202606050002,"stream_type":"REALTIME"}'
+version: 1

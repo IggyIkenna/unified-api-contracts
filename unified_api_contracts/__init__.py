@@ -156,9 +156,12 @@ from .canonical.crosscutting.live_cluster_registry import (
 )
 from .canonical.crosscutting.pipeline_mode import (
     _SPORTS_ENTITY_TO_PIPELINE_MODE,
+    Cadence,
+    Mode,
     PipelineMode,
     is_batch,
     is_live,
+    mode_of,
     pipeline_mode_for_source,
     pipeline_mode_for_sports_entity,
     source_string_for,
@@ -194,6 +197,8 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    MOCK_SOURCE,
+    SOURCE_MODE_CAPABILITY,
     default_source,
     detect_dual_source_conflicts,
     emission_latency_ms_for_source,
@@ -203,9 +208,12 @@ from .canonical.crosscutting.source_priority import (
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
+    modes_for_source,
     read_with_source_priority,
     select_primary_available_source,
     source_required,
+    source_supports,
+    sources_supporting,
 )
 from .canonical.crosscutting.strategy_family import (
     STRATEGY_FAMILY_REGISTRY,
@@ -1687,6 +1695,14 @@ __all__ = [
     "get_all_sources_with_priority",
     "detect_dual_source_conflicts",
     "select_primary_available_source",
+    "Mode",
+    "Cadence",
+    "mode_of",
+    "MOCK_SOURCE",
+    "SOURCE_MODE_CAPABILITY",
+    "modes_for_source",
+    "source_supports",
+    "sources_supporting",
     "get_required_inputs",
     "get_required_secrets",
     "get_schedulers_for_env",
