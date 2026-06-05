@@ -15,13 +15,19 @@ from unified_api_contracts.canonical.domain.sports.fixture_status import (
 
 
 def test_match_status_closed_set():
-    """MatchStatus has exactly 9 canonical states."""
+    """MatchStatus has exactly 10 canonical states.
+
+    ``postponed_rescheduled`` was added (fixture-schedule-split Phase 3) for the
+    cross-source verifier — a terminal flag one source set that a cross-source
+    ground truth shows was actually played/rescheduled.
+    """
     expected = {
         "scheduled",
         "live",
         "halftime",
         "finished",
         "postponed",
+        "postponed_rescheduled",
         "cancelled",
         "abandoned",
         "suspended",

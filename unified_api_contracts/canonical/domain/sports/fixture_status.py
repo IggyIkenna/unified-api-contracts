@@ -26,7 +26,7 @@ class MatchStatus(StrEnum):
     - In-play:    LIVE, HALFTIME
     - Finished:   FINISHED
     - Interrupted: SUSPENDED, INTERRUPTED
-    - Terminal:   POSTPONED, CANCELLED, ABANDONED
+    - Terminal:   POSTPONED, POSTPONED_RESCHEDULED, CANCELLED, ABANDONED
     """
 
     SCHEDULED = "scheduled"
@@ -34,6 +34,13 @@ class MatchStatus(StrEnum):
     HALFTIME = "halftime"
     FINISHED = "finished"
     POSTPONED = "postponed"
+    POSTPONED_RESCHEDULED = "postponed_rescheduled"
+    """A fixture one source flagged terminal (CANCELLED/POSTPONED) that a
+    cross-source ground truth shows was actually played / rescheduled. Emitted
+    only by the cross-source status verifier
+    (``unified_trading_library.fixtures.verify_fixture_status``) when the
+    overriding source presents real match data. Distinct from ``POSTPONED``
+    (genuinely not played) — this state means "the terminal flag was wrong"."""
     CANCELLED = "cancelled"
     ABANDONED = "abandoned"
     SUSPENDED = "suspended"
