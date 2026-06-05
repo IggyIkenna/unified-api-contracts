@@ -12,8 +12,20 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock
 
+import aiohttp.streams
 import pytest
 from hypothesis import settings
+
+# vcrpy 8.1.1 references aiohttp.streams.AsyncStreamReaderMixin which was removed
+# in aiohttp>=3.14.0 (CVE-2026-34993 security bump). Patch it back as a no-op mixin
+# so VCR stubs can define MockStream without AttributeError. Must run at import time,
+# before any vcr.stubs.aiohttp_stubs import.
+if not hasattr(aiohttp.streams, "AsyncStreamReaderMixin"):
+
+    class _AsyncStreamReaderMixin:
+        pass
+
+    aiohttp.streams.AsyncStreamReaderMixin = _AsyncStreamReaderMixin  # type: ignore[attr-defined]
 
 # Register the shared network-block plugin (--block-network + allow_network marker).
 # This replaces the hand-rolled version that was previously duplicated here.

@@ -1029,6 +1029,44 @@ def get_all_defi_chains() -> list[str]:
     return sorted(KNOWN_CHAINS)
 
 
+# ---------------------------------------------------------------------------
+# EVM DeFi REST API URLs (parallel to SOLANA_DEFI_PROTOCOLS.api_url)
+#
+# Mirrors the Solana get_solana_protocol_url pattern for EVM protocols whose
+# adapters use a public REST API instead of (or in addition to) The Graph.
+# All callers must derive URLs via get_evm_protocol_rest_url with the literal
+# as the fallback — never embed bare host strings at module level.
+# ---------------------------------------------------------------------------
+EVM_DEFI_REST_URLS: dict[str, dict[str, str]] = {
+    "curve": {
+        # Curve public REST API (no API key required). Uses the canonical
+        # api.curve.finance host (not the legacy api.curve.fi alias).
+        "api_url": "https://api.curve.finance",
+    },
+    "morpho": {
+        # Morpho Blue API — preferred over The Graph subgraphs (see SUBGRAPH_IDS
+        # comment at "morpho"). GraphQL endpoint; append /graphql at call site.
+        "api_url": "https://blue-api.morpho.org",
+    },
+}
+
+
+def get_evm_protocol_rest_url(protocol: str, url_type: str = "api_url") -> str | None:
+    """Get an EVM DeFi protocol REST API URL by protocol name and URL type.
+
+    Args:
+        protocol: Protocol key (curve, morpho).
+        url_type: URL type key (default: api_url).
+
+    Returns:
+        URL string, or None if the protocol or url_type is not registered.
+    """
+    proto = EVM_DEFI_REST_URLS.get(protocol)
+    if proto is None:
+        return None
+    return proto.get(url_type)
+
+
 # Chain data, Solana data, Bitcoin data, and SourceCapability declarations
 # are in _defi_chain_data.py and _defi_source_capabilities.py respectively.
 # All public symbols are re-exported above so the external API is unchanged.
@@ -1045,6 +1083,7 @@ __all__ = [
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
     "DEPRECATED_DEFI_GHOST_VENUE_NAMES",
     "EMPTY_OR_DEPRECATED_DEFI_VENUES",
+    "EVM_DEFI_REST_URLS",
     "HYPERLIQUID_RPC_TEMPLATES",
     "HYPERLIQUID_RPC_TEMPLATES",
     "KNOWN_CHAINS",
@@ -1073,6 +1112,7 @@ __all__ = [
     "get_all_defi_chains",
     "get_chain_config",
     "get_data_types_for_protocol",
+    "get_evm_protocol_rest_url",
     "get_lst_token_genesis",
     "get_lst_venue_genesis",
     "get_mtds_operations_for_protocol",

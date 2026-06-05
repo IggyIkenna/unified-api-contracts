@@ -55,22 +55,29 @@ _REST_POLLER_CONNECTORS: Final[frozenset[str]] = frozenset(
 # Built from Phase 4 cassette creation — updated when new connectors land.
 _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "aster_ws": "aster",
+    "binance_futures_book_ticker_ws": "binance",
     "binance_futures_ws": "binance",
     "binance_spot_ws": "binance",
+    "bybit_futures_book_ticker_ws": "bybit",
     "bybit_ws": "bybit",
     "bybit_spot_ws": "bybit",
+    "coinbase_book_ws": "coinbase",
     "coinbase_spot_ws": "coinbase",
     "databento_tradfi_ws": "databento",
+    "deribit_book_ticker_ws": "deribit",
     "deribit_ws": "deribit",
     "drift_solana_ws": "drift",
     "hyperliquid_ws": "hyperliquid",
     "hyperliquid_l2book_ws": "hyperliquid",
     "hyperliquid_ticker_ws": "hyperliquid",
     "kalshi_ws": "kalshi",
+    "kraken_futures_book_ticker_ws": "kraken_futures",
     "kraken_futures_ws": "kraken_futures",
     "kraken_spot_ws": "kraken",
+    "okx_futures_book_ticker_ws": "okx",
     "okx_ws": "okx",
     "okx_spot_ws": "okx",
+    "upbit_spot_ws": "upbit",
 }
 
 
