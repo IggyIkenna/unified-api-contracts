@@ -54,6 +54,12 @@ from .feature_upstream import FEATURE_UPSTREAM_REQUIREMENTS as FEATURE_UPSTREAM_
 from .feature_upstream import UpstreamReq as UpstreamReq
 from .feature_upstream import in_coverage as in_coverage
 from .feature_upstream import in_coverage_dt as in_coverage_dt
+from .fixture_lifecycle import FIXTURES_OUTCOMES as FIXTURES_OUTCOMES
+from .fixture_lifecycle import FIXTURES_SCHEDULE as FIXTURES_SCHEDULE
+from .fixture_lifecycle import CanonicalFixtureOutcomes as CanonicalFixtureOutcomes
+from .fixture_lifecycle import CanonicalFixtureSchedule as CanonicalFixtureSchedule
+from .fixture_lifecycle import MatchLifecycle as MatchLifecycle
+from .fixture_lifecycle import MatchResult as MatchResult
 from .fixture_status import AF_COMPLETED_CODES as AF_COMPLETED_CODES
 from .fixture_status import AF_STATUS_SHORT_MAP as AF_STATUS_SHORT_MAP
 from .fixture_status import COMPLETED_STATUSES as COMPLETED_STATUSES
