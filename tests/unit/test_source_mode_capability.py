@@ -74,10 +74,14 @@ def test_tardis_is_live_but_not_replay() -> None:
     assert not source_supports("tardis", Mode.REPLAY)
 
 
-def test_massive_and_databento_are_live_capable() -> None:
-    """Operator 2026-06-05: the TradFi market-data vendors stream live too."""
-    assert source_supports("massive", Mode.LIVE)
-    assert source_supports("databento", Mode.LIVE)
+def test_massive_and_databento_are_live_and_replay_capable() -> None:
+    """Operator 2026-06-05 + vendor-doc check: the TradFi vendors stream live AND
+    support intraday replay (today-since-start backfill). databento via the Live-API
+    24h intraday replay (Historical API is 24h-embargoed); massive (=Polygon.io) via
+    REST tick within a time range. (massive live is 15-min delayed on Starter tier.)"""
+    for src in ("massive", "databento"):
+        assert source_supports(src, Mode.LIVE)
+        assert source_supports(src, Mode.REPLAY)
 
 
 def test_no_sports_source_is_live_yet() -> None:
