@@ -375,10 +375,16 @@ env-tier bucket split (``-dev-``/`-stg-` vs `-prd-`) so it NEVER touches prod;
 makes test fixtures first-class. Mock implies dev-tier only."""
 
 # Every EXTERNAL source is batch-capable (it has a ``batch_<source>`` PipelineMode
-# by the closed-set round-trip). LIVE = has a real-time stream. REPLAY = can
-# deterministically re-produce a past window for recovery (chain RPCs are fully
-# replayable; an exchange REST can backfill; a vendor that forbids tick-replay,
-# e.g. Tardis per the operator, is NOT replay-capable).
+# by the closed-set round-trip). LIVE = has a real-time stream.
+#
+# REPLAY (operator 2026-06-05 — FORMAT-AGNOSTIC): the ability to retrieve a recent
+# window ON DEMAND — specifically "today's data from start-of-day" — to fill an
+# intraday / startup / live-downtime gap. Test: "live was down 09:00-11:00 today;
+# can I fetch that window now and backfill it?" CHAIN sources are ALWAYS replay-
+# capable (any past block is queryable intraday). A vendor that only ships END-OF-DAY
+# archives (no current-day intraday retrieval) is NOT replay-capable. Tardis = live
+# but NOT replay (operator). databento/massive intraday-replay = vendor-doc check
+# (open); seeded conservatively until confirmed.
 #
 # ⚠️ DRAFT SEED — the BATCH flags are certain (round-trip-derivable); the LIVE +
 # REPLAY flags are a best-effort seed pending PER-SOURCE OPERATOR/DOMAIN RATIFY
@@ -389,10 +395,21 @@ makes test fixtures first-class. Mock implies dev-tier only."""
 SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # CeFi
     "tardis": frozenset({Mode.BATCH, Mode.LIVE}),  # operator: live, NOT tick-replay
-    "hyperliquid_rest": frozenset({Mode.BATCH, Mode.REPLAY}),  # exchange REST backfill
+    # NB: `hyperliquid_rest` is the REST funding poller (SOURCE_PRIORITY uses it ONLY
+    # for defi perp_funding) → batch + REST-backfill replay. Hyperliquid's LIVE
+    # capability (ws_trades/ws_l2_book per SourceCapability._HYPERLIQUID) is a SEPARATE
+    # ingestion path/source — capability is per-(source, data_type), see plan M2.
+    "hyperliquid_rest": frozenset({Mode.BATCH, Mode.REPLAY}),
     # TradFi
+    # databento: live + intraday-replay DOC-CONFIRMED (databento.com dedicated
+    # "Intraday replay" API — fetch the current session via the live API).
     "databento": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
-    "massive": frozenset({Mode.BATCH, Mode.LIVE}),  # operator 2026-06-05: massive has live too (replay TBC)
+    # massive (= Polygon.io rebrand): live (real-time stream) + intraday-replay INFERRED
+    # (massive.com: real-time + historical tick via REST/ws → today's data retrievable
+    # within a time range). CAVEAT: current Starter tier LIVE is 15-min DELAYED (see
+    # EMISSION_LATENCY_MS_BY_SOURCE) — true real-time needs a tier upgrade; same-day
+    # replay latency not explicitly doc-confirmed → light-verify on ratify.
+    "massive": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "yahoo": frozenset({Mode.BATCH}),
     "barchart": frozenset({Mode.BATCH}),
     "eia": frozenset({Mode.BATCH}),
@@ -425,7 +442,15 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
 def modes_for_source(source: str) -> frozenset[Mode]:
     """Return the set of :class:`Mode`s ``source`` can run. ``mock`` ⇒ all modes
     (a fixture can stand in for any). Unregistered external source ⇒ ``{BATCH}``
-    (the safe default — everything is at least batch-archivable)."""
+    (the safe default — everything is at least batch-archivable).
+
+    ⚠️ COARSE per-source PLACEHOLDER (Phase 0.1). Capability is genuinely per
+    ``(source, data_type)`` — e.g. hyperliquid is LIVE for ``trades``/``l2_book``
+    (``ws_*`` ops) but REST/BATCH-only for ``funding_rates``. This is to be
+    SUPERSEDED by ``modes_for(source, data_type)`` derived from
+    ``registry/capability_declarations`` ``SourceCapability`` (per-operation
+    REST/WS). SSOT: ``pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md``
+    § M2 REFINEMENT."""
     if source == MOCK_SOURCE:
         return frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
     return SOURCE_MODE_CAPABILITY.get(source, frozenset({Mode.BATCH}))
