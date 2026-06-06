@@ -10,7 +10,7 @@ different candle shape:
     ``book_snapshot_5``    → OHLCV(mid) + spread/depth/imbalance means
     ``derivative_ticker``  → OHLCV + funding/mark/index means
     ``liquidations``       → count + notional aggregates (not pure OHLCV)
-    ``dex_pool_swaps``     → OHLCV + swap_count + volume_quote_usd
+    ``dex_pool_swaps``     → OHLCV (swap count = ``trade_count``, USD volume = ``volume``)
     ``dex_pool_state``     → OHLCV(mid) + swap_count
     ``lending_indices``    → OHLCV of supply/borrow index
     ``rate_indices``       → OHLCV of rate_indices
@@ -117,9 +117,18 @@ _DERIV_EXT: list[ColumnSpec] = [
     ColumnSpec(name="index_price_mean", dtype="float64", nullable=True),
 ]
 
-_DEX_EXT: list[ColumnSpec] = [
+# DEX candle extensions. `swap_count`/`volume_quote_usd` were originally a
+# shared `_DEX_EXT` applied to BOTH swaps and state candles, but on the SWAPS
+# candle they exactly duplicate the OHLCV-core `trade_count`/`volume` columns
+# (verified identical to the last digit/decimal — DeFi #4 / C0-RD6). The split:
+#   • swaps candle (`swaps_ohlcv_{tf}`)  → NO extension cols (the duplicates are
+#     dropped; the values survive losslessly in `trade_count`/`volume`).
+#   • state candle (`state_ohlcv_{tf}`)  → keeps `swap_count` only (NOT a
+#     duplicate here — `dex_pool_state` carries no per-bar trade_count semantic;
+#     `volume_quote_usd` was never part of the documented state shape).
+_DEX_SWAPS_EXT: list[ColumnSpec] = []
+_DEX_STATE_EXT: list[ColumnSpec] = [
     ColumnSpec(name="swap_count", dtype="int64", nullable=True),
-    ColumnSpec(name="volume_quote_usd", dtype="float64", nullable=True),
 ]
 
 _ODDS_EXT: list[ColumnSpec] = [
@@ -372,7 +381,7 @@ for _tf in _TIMEFRAMES_DEFI:
             "pool",
             _swaps_key(_tf),
             symbol_column="pool_id",
-            extra_cols=_DEX_EXT,
+            extra_cols=_DEX_SWAPS_EXT,
             include_chain=True,
             nullable_ohlcv=True,
         )
@@ -387,7 +396,7 @@ for _tf in _TIMEFRAMES_DEFI:
             "UNKNOWN",
             _swaps_key(_tf),
             symbol_column="symbol",
-            extra_cols=_DEX_EXT,
+            extra_cols=_DEX_SWAPS_EXT,
             include_chain=False,
             nullable_ohlcv=True,
         )
@@ -398,7 +407,7 @@ for _tf in _TIMEFRAMES_DEFI:
             "pool",
             _pool_state_key(_tf),
             symbol_column="symbol",
-            extra_cols=_DEX_EXT,
+            extra_cols=_DEX_STATE_EXT,
             include_chain=True,
         )
     )

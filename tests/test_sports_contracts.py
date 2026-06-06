@@ -50,7 +50,9 @@ SPORTS_CONTRACT_CASES: list[tuple[str, str, str, SchemaContract, int]] = [
     # STANDINGS: 14 → 32 per C.7 Follow-up #1 flatten (UAC@2026-05-13).
     ("sports", "league", "standings", SPORTS_STANDINGS, 32),
     # Family B — API-Football fact
-    # FIXTURES: 32 → 33 per C.6 Step 1 match_end_time column (UAC@2026-05-13).
+    # FIXTURES: 32 → 33 per C.6 Step 1 match_end_time column (UAC@2026-05-13);
+    # → 53 per fixture-schedule-split Phase 3 (+9 Q5 phase timestamps, +11 Q6
+    # score-distinction columns). The assertion is a >= floor, so 33 still holds.
     ("sports", "match", "fixtures", SPORTS_FIXTURES, 33),
     ("sports", "match", "fixture_events", SPORTS_FIXTURE_EVENTS, 5),
     ("sports", "match", "fixture_stats", SPORTS_FIXTURE_STATS, 2),

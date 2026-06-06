@@ -512,6 +512,20 @@ class RecordFailedReason(StrEnum):
 
     Plan: ``writegate_honest_coverage_endtoend_2026_05_06.md`` Phase 2.E.3."""
 
+    REFERENCE_STATUS_DISCREPANCY = "REFERENCE_STATUS_DISCREPANCY"
+    """A reference-data source (e.g. api_football FIXTURES) reported a fixture
+    as terminal (``CANCELLED`` / ``POSTPONED``) but a cross-source ground truth
+    (footystats / SFI / understat) shows the fixture has real match data
+    (lineups + stats + events present). The cross-source verifier
+    (``unified_trading_library.fixtures.verify_fixture_status``) flips the
+    status to ``POSTPONED_RESCHEDULED`` and re-emits the corrected row as
+    ``captured``; the ORIGINAL mis-flagged row is recorded ``attempted_failed``
+    with this reason so consumers can audit the override. Pairs with the
+    ``FIXTURES_STATUS_DISCREPANCY`` lifecycle event.
+
+    Plan: ``plans/epics/sports_master.md`` § "Cross-source fixture status
+    verifier". SSOT: ``codex/02-data/sports-fixtures-lifecycle.md``."""
+
 
 RECORD_FAILED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in RecordFailedReason)
 """String-membership view of :class:`RecordFailedReason` for fast O(1)

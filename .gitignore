@@ -139,3 +139,7 @@ logs/
 # Weekly schema-validation canary runtime output
 collected_responses/
 validation_report.txt
+
+# QG sentinels — local cache written by quality-gates.sh; never tracked (else untracked churn every run)
+.qg_last_passed_sha
+.qg_content_sentinel

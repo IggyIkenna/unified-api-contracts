@@ -17,10 +17,12 @@ import json
 import pytest
 
 from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
+    _SPORTS_ENTITY_TO_PIPELINE_MODE,
     PipelineMode,
     is_batch,
     is_live,
     pipeline_mode_for_source,
+    pipeline_mode_for_sports_entity,
     source_string_for,
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import SOURCE_PRIORITY
@@ -214,3 +216,67 @@ def test_six_new_enum_members_present_in_pipeline_mode() -> None:
         PipelineMode.BATCH_CHAINLINK,
     }
     assert new_members.issubset(set(PipelineMode))
+
+
+# ---------------------------------------------------------------------------
+# pipeline_mode_for_sports_entity — workspace SSOT for sports_reference entities
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "entity,expected",
+    [
+        # API Football
+        ("fixtures", PipelineMode.BATCH_API_FOOTBALL),
+        ("injuries", PipelineMode.BATCH_API_FOOTBALL),
+        ("fixture_stats", PipelineMode.BATCH_API_FOOTBALL),
+        ("fixture_events", PipelineMode.BATCH_API_FOOTBALL),
+        ("fixture_lineups", PipelineMode.BATCH_API_FOOTBALL),
+        ("player_stats", PipelineMode.BATCH_API_FOOTBALL),
+        ("teams", PipelineMode.BATCH_API_FOOTBALL),
+        ("standings", PipelineMode.BATCH_API_FOOTBALL),
+        # FootyStats
+        ("footystats_predictions", PipelineMode.BATCH_FOOTYSTATS),
+        ("footystats_matches", PipelineMode.BATCH_FOOTYSTATS),
+        ("footystats_odds", PipelineMode.BATCH_ODDS_API),
+        # Understat
+        ("understat_xg", PipelineMode.BATCH_UNDERSTAT),
+        ("understat_xg_shots", PipelineMode.BATCH_UNDERSTAT),
+        # Transfermarkt
+        ("player_values", PipelineMode.BATCH_TRANSFERMARKT),
+        # SFI
+        ("progressive_stats", PipelineMode.BATCH_SOCCER_FOOTBALL_INFO),
+        # Open Meteo
+        ("weather", PipelineMode.BATCH_OPEN_METEO),
+    ],
+)
+def test_pipeline_mode_for_sports_entity_known(entity: str, expected: PipelineMode) -> None:
+    """Each known entity maps to the correct PipelineMode — parity with IS _ENTITY_NAME_TO_PIPELINE_MODE."""
+    assert pipeline_mode_for_sports_entity(entity) is expected
+
+
+def test_pipeline_mode_for_sports_entity_unknown_fallback() -> None:
+    """Unknown entity falls back to BATCH_INSTRUMENTS_SERVICE."""
+    assert pipeline_mode_for_sports_entity("unknown_entity_xyz") is PipelineMode.BATCH_INSTRUMENTS_SERVICE
+
+
+def test_pipeline_mode_for_sports_entity_case_insensitive() -> None:
+    """Entity lookup is case-insensitive (normalises to lowercase)."""
+    assert pipeline_mode_for_sports_entity("FIXTURES") is PipelineMode.BATCH_API_FOOTBALL
+    assert pipeline_mode_for_sports_entity("Understat_XG") is PipelineMode.BATCH_UNDERSTAT
+
+
+def test_pipeline_mode_for_sports_entity_closed_set_parity() -> None:
+    """Every entry in _SPORTS_ENTITY_TO_PIPELINE_MODE is reachable via pipeline_mode_for_sports_entity."""
+    for entity, expected_mode in _SPORTS_ENTITY_TO_PIPELINE_MODE.items():
+        assert pipeline_mode_for_sports_entity(entity) is expected_mode, (
+            f"Closed-set parity failed for entity {entity!r}: "
+            f"got {pipeline_mode_for_sports_entity(entity)!r}, expected {expected_mode!r}"
+        )
+
+
+def test_pipeline_mode_for_sports_entity_exported_from_root() -> None:
+    """pipeline_mode_for_sports_entity is importable from the UAC root facade."""
+    from unified_api_contracts import pipeline_mode_for_sports_entity as root_fn
+
+    assert root_fn is pipeline_mode_for_sports_entity

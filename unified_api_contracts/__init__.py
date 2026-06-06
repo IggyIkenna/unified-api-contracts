@@ -155,10 +155,15 @@ from .canonical.crosscutting.live_cluster_registry import (
     get_clusters_for_env,
 )
 from .canonical.crosscutting.pipeline_mode import (
+    _SPORTS_ENTITY_TO_PIPELINE_MODE,
+    Cadence,
+    Mode,
     PipelineMode,
     is_batch,
     is_live,
+    mode_of,
     pipeline_mode_for_source,
+    pipeline_mode_for_sports_entity,
     source_string_for,
 )
 from .canonical.crosscutting.scenario_overlay import (
@@ -192,15 +197,23 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    MOCK_SOURCE,
+    SOURCE_MODE_CAPABILITY,
     default_source,
+    detect_dual_source_conflicts,
     emission_latency_ms_for_source,
     external_sources_for,
+    get_all_sources_with_priority,
     get_primary_source,
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
+    modes_for_source,
     read_with_source_priority,
+    select_primary_available_source,
     source_required,
+    source_supports,
+    sources_supporting,
 )
 from .canonical.crosscutting.strategy_family import (
     STRATEGY_FAMILY_REGISTRY,
@@ -529,6 +542,7 @@ from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
     PreflightOK,
     PreflightResult,
+    PreflightTrigger,
     validate_preflight_for_trigger,
 )
 from .canonical.crosscutting.manifest_schema import (
@@ -1517,6 +1531,7 @@ __all__ = [
     "PreflightFailed",
     "PreflightOK",
     "PreflightResult",
+    "PreflightTrigger",
     "PriceShift",
     "ProbabilityBucket",
     "ProcessRedemptionRequest",
@@ -1677,6 +1692,17 @@ __all__ = [
     "get_primary_source_with_latency",
     "get_provider_availability",
     # Features DAG — UTL point_in_time + features-* consumers
+    "get_all_sources_with_priority",
+    "detect_dual_source_conflicts",
+    "select_primary_available_source",
+    "Mode",
+    "Cadence",
+    "mode_of",
+    "MOCK_SOURCE",
+    "SOURCE_MODE_CAPABILITY",
+    "modes_for_source",
+    "source_supports",
+    "sources_supporting",
     "get_required_inputs",
     "get_required_secrets",
     "get_schedulers_for_env",
@@ -1695,7 +1721,9 @@ __all__ = [
     "needs_candle_processing",
     "non_trading_day_reason",
     "normalize_underlying",
+    "_SPORTS_ENTITY_TO_PIPELINE_MODE",
     "pipeline_mode_for_source",
+    "pipeline_mode_for_sports_entity",
     "policy_is_alert",
     "policy_is_publish_row",
     "read_with_source_priority",

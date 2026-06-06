@@ -249,6 +249,144 @@ SPORTS_FIXTURES = SchemaContract(
             nullable=True,
             description="Away penalty-shootout goals.",
         ),
+        # ------------------------------------------------------------------
+        # Q5 — HT/ET/PEN phase timestamps (fixture-schedule-split Phase 3).
+        # Populated at write-time from the api-football fixture response via
+        # ``unified_trading_library.fixtures.extract_match_lifecycle``. ALL
+        # nullable: regulation matches never reach ET/PEN, and the AF fixtures
+        # endpoint only timestamps the two regulation half starts (HT derives
+        # from ``periods.first + 45'``; ET/PEN have no native AF timestamp so
+        # they stay null even when ``went_to_extra_time`` / ``went_to_penalties``
+        # is true). All tz-aware UTC. SSOT: codex/02-data/sports-fixtures-lifecycle.md.
+        # ------------------------------------------------------------------
+        ColumnSpec(
+            name="halftime_start_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC start of the halftime break (= first-half start + 45'); null pre-match / unplayed.",
+        ),
+        ColumnSpec(
+            name="halftime_end_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC end of the halftime break (= second-half start); null pre-match / unplayed.",
+        ),
+        ColumnSpec(
+            name="extra_time_first_half_start_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC start of ET first half; null unless ET played (AF emits no ET timestamp).",
+        ),
+        ColumnSpec(
+            name="extra_time_first_half_end_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC end of ET first half; null unless ET was played.",
+        ),
+        ColumnSpec(
+            name="extra_time_second_half_start_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC start of ET second half; null unless ET was played.",
+        ),
+        ColumnSpec(
+            name="extra_time_second_half_end_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC end of ET second half; null unless ET was played.",
+        ),
+        ColumnSpec(
+            name="penalty_shootout_start_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC start of the penalty shootout; null unless a shootout occurred.",
+        ),
+        ColumnSpec(
+            name="penalty_shootout_end_time",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC end of the penalty shootout; null unless a shootout occurred.",
+        ),
+        ColumnSpec(
+            name="whistle_full_time_at",
+            dtype="datetime64[ns, UTC]",
+            nullable=True,
+            description="UTC regulation full-time whistle (2H start + 45' or kickoff + 90'); null abandoned/pre-match.",
+        ),
+        # ------------------------------------------------------------------
+        # Q6 — score-distinction columns (fixture-schedule-split Phase 3).
+        # Populated at write-time from the api-football ``score`` block. The
+        # penalty-shootout score is NEVER collapsed: ``*_score_after_penalty_shootout``
+        # is the post-shootout aggregate (AF ``goals``) while
+        # ``*_penalty_shootout_score`` is the shootout tally alone (AF
+        # ``score.penalty``). ALL nullable. ``went_to_*`` default False.
+        # ------------------------------------------------------------------
+        ColumnSpec(
+            name="home_score_regulation",
+            dtype="float64",
+            nullable=True,
+            description="Home goals at end of regulation (AF ``score.fulltime``); null pre-result.",
+        ),
+        ColumnSpec(
+            name="away_score_regulation",
+            dtype="float64",
+            nullable=True,
+            description="Away goals at end of regulation (AF ``score.fulltime``); null pre-result.",
+        ),
+        ColumnSpec(
+            name="home_score_after_extra_time",
+            dtype="float64",
+            nullable=True,
+            description="Home aggregate after extra time (AF ``score.extratime``); null unless ET played.",
+        ),
+        ColumnSpec(
+            name="away_score_after_extra_time",
+            dtype="float64",
+            nullable=True,
+            description="Away aggregate after extra time (AF ``score.extratime``); null unless ET played.",
+        ),
+        ColumnSpec(
+            name="home_score_after_penalty_shootout",
+            dtype="float64",
+            nullable=True,
+            description="Home post-shootout aggregate (AF ``goals``); null unless a shootout occurred.",
+        ),
+        ColumnSpec(
+            name="away_score_after_penalty_shootout",
+            dtype="float64",
+            nullable=True,
+            description="Away post-shootout aggregate; null unless a shootout occurred.",
+        ),
+        ColumnSpec(
+            name="home_penalty_shootout_score",
+            dtype="float64",
+            nullable=True,
+            description="Home shootout tally alone (AF ``score.penalty``); null unless a shootout occurred.",
+        ),
+        ColumnSpec(
+            name="away_penalty_shootout_score",
+            dtype="float64",
+            nullable=True,
+            description="Away shootout tally alone (AF ``score.penalty``); null unless a shootout occurred.",
+        ),
+        ColumnSpec(
+            name="went_to_extra_time",
+            dtype="bool",
+            nullable=True,
+            description="True if the match reached extra time (AF status AET/PEN or non-null ET/pen score).",
+        ),
+        ColumnSpec(
+            name="went_to_penalties",
+            dtype="bool",
+            nullable=True,
+            description="True if decided by a penalty shootout (AF status PEN or non-null penalty score).",
+        ),
+        ColumnSpec(
+            name="match_result",
+            dtype="string",
+            nullable=True,
+            description="Closed-set ``MatchResult`` (home_win / *_after_et / *_after_pens); null pre-result.",
+        ),
         ColumnSpec(
             name="day",
             dtype="string",

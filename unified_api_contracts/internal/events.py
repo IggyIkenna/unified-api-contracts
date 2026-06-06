@@ -131,6 +131,18 @@ class LifecycleEventType(StrEnum):
     INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY = "INSTRUMENTS_LIVE_T1_AUDIT_DISCREPANCY"
     INSTRUMENTS_LIVE_PREFLIGHT_FAILED = "INSTRUMENTS_LIVE_PREFLIGHT_FAILED"
     INSTRUMENTS_LIVE_UPSTREAM_STALE = "INSTRUMENTS_LIVE_UPSTREAM_STALE"
+    # Cross-source fixture-status discrepancy (sports_master Phase 3 — cross-
+    # source verifier). Emitted at the instruments-service FIXTURES commit when
+    # api_football flags a fixture terminal (CANCELLED/POSTPONED) but a cross-
+    # source ground truth (footystats/SFI/understat) presents real match data
+    # (lineups + stats + events). The verifier flips the status to
+    # POSTPONED_RESCHEDULED, stamps status_provenance=cross_source_override, and
+    # records the original mis-flagged row attempted_failed with
+    # RecordFailedReason.REFERENCE_STATUS_DISCREPANCY. Carries fixture_id,
+    # af_status, override_source, corrected_status. Alert immediately (single
+    # instance) — a wrongly-cancelled fixture corrupts downstream sports
+    # features. SSOT: codex/02-data/sports-fixtures-lifecycle.md.
+    FIXTURES_STATUS_DISCREPANCY = "FIXTURES_STATUS_DISCREPANCY"
     # Live-mode connectivity-gap event family (mdps_streaming_and_backpressure
     # 2026-05-07 Phase 1, "Migrated issue 2026-05-08 — Live data recovery
     # self-detect"). Live WebSocket connectivity loss has no upstream

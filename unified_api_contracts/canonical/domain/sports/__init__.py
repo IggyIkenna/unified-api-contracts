@@ -54,6 +54,12 @@ from .feature_upstream import FEATURE_UPSTREAM_REQUIREMENTS as FEATURE_UPSTREAM_
 from .feature_upstream import UpstreamReq as UpstreamReq
 from .feature_upstream import in_coverage as in_coverage
 from .feature_upstream import in_coverage_dt as in_coverage_dt
+from .fixture_lifecycle import FIXTURES_OUTCOMES as FIXTURES_OUTCOMES
+from .fixture_lifecycle import FIXTURES_SCHEDULE as FIXTURES_SCHEDULE
+from .fixture_lifecycle import CanonicalFixtureOutcomes as CanonicalFixtureOutcomes
+from .fixture_lifecycle import CanonicalFixtureSchedule as CanonicalFixtureSchedule
+from .fixture_lifecycle import MatchLifecycle as MatchLifecycle
+from .fixture_lifecycle import MatchResult as MatchResult
 from .fixture_status import AF_COMPLETED_CODES as AF_COMPLETED_CODES
 from .fixture_status import AF_STATUS_SHORT_MAP as AF_STATUS_SHORT_MAP
 from .fixture_status import COMPLETED_STATUSES as COMPLETED_STATUSES
@@ -107,10 +113,12 @@ from .league_registry import LeagueClassification as LeagueClassification
 from .league_registry import LeagueClassificationRegistry as LeagueClassificationRegistry
 from .league_registry import LeagueClassificationType as LeagueClassificationType
 from .league_registry import LeagueDefinition as LeagueDefinition
+from .live import SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY as SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY
 from .live import LiveMatchState as LiveMatchState
 from .live import LiveOddsUpdate as LiveOddsUpdate
 from .live import MatchPeriod as MatchPeriod
 from .live import ScraperVersionMeta as ScraperVersionMeta
+from .live import SportsFeatureCaptureStatus as SportsFeatureCaptureStatus
 from .mapping_resolver import clear_mapping_cache as clear_mapping_cache
 from .mapping_resolver import resolve_fixture_mapping as resolve_fixture_mapping
 from .mapping_resolver import resolve_league_mapping as resolve_league_mapping

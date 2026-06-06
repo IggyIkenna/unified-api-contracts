@@ -2,17 +2,61 @@
 
 Defines the Pub/Sub message schemas that wrap existing canonical types for live
 data flow through the UTS pipeline (MTDS → FSS → strategy → execution).
+
+Also defines the FSS→strategy sports-feature PubSub payload contract for the
+``capture_status`` key, which carries the 4-state honest-absence signal so
+strategy subscribers can gate directly on the manifest state rather than
+using an odds-presence heuristic.
 """
 
 from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Self
+from typing import Final, Literal, Self
 
 from pydantic import BaseModel, ConfigDict
 
 from .odds import CanonicalOdds
+
+# ---------------------------------------------------------------------------
+# FSS → strategy sports-feature PubSub payload — capture_status contract
+#
+# The FSS PubSub subscriber (features_service.sports.app.pubsub.subscriber)
+# publishes a raw JSON dict to ``features-sports-{feature_group}``.  Strategy
+# reads this dict in SportsFeatureSubscriber.  This constant names the key
+# under which the 4-state manifest capture_status is stamped, and the type
+# alias encodes the closed set of valid values.
+#
+# Background: honest-absence lives in the GCS manifest; the FSS subscriber
+# knows the compute outcome at emit-time (process_sports_record returns None
+# for honest-empty payloads). Stamping capture_status directly on the event
+# closes the contract gap — strategy can gate on the real 4-state signal
+# instead of the odds-presence heuristic added in c2793217.
+#
+# Strategy fallback rule: when capture_status is absent (in-flight events
+# pre-rollout) fall back to _is_honest_empty_vector for backward compat.
+# ---------------------------------------------------------------------------
+
+SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY: Final[str] = "capture_status"
+"""JSON key name for ``capture_status`` in FSS→strategy PubSub feature payloads.
+
+Stamp with a :data:`SportsFeatureCaptureStatus` value before publishing.
+"""
+
+SportsFeatureCaptureStatus = Literal[
+    "captured",
+    "empty_confirmed",
+    "attempted_failed",
+    "expected_unattempted",
+]
+"""4-state honest-absence signal stamped on live FSS→strategy feature payloads.
+
+Mirrors the manifest ``capture_status`` column (canonical schema v9).  Strategy
+subscribers gate on this value directly; the heuristic fallback
+(``_is_honest_empty_vector``) only applies when the key is absent (backward
+compat with in-flight events emitted before this contract was added).
+"""
 
 
 class MatchPeriod(StrEnum):

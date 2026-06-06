@@ -329,6 +329,9 @@ from unified_api_contracts.internal.domain.cefi_accounts.schemas import (
     SubAccount,
     WithdrawalRecord,
 )
+from unified_api_contracts.internal.domain.cicd import (
+    GitHubWorkflowEvent,
+)
 from unified_api_contracts.internal.domain.client_lifecycle import (
     ClientApiKeyMaterial,
     ClientKYCStub,
@@ -1303,6 +1306,9 @@ from unified_api_contracts.internal.reference import (
     UniverseSnapshot,
     VenueCircuitBreakerConfig,
     validate_instrument_records,
+)
+from unified_api_contracts.internal.registry import (
+    InternalEndpointSpec,
 )
 from unified_api_contracts.internal.reporting import (
     ClientConfig,
@@ -2608,4 +2614,12 @@ __all__ = [
     "WithdrawalApprovalRule",
     "WithdrawalApprovalSignature",
     "XGFeaturesMixin",
+    # ── 7 classes added 2026-06-02 (cicd + matching_engine + registry domains) ──
+    "BookType",
+    "FeeResult",
+    "GitHubWorkflowEvent",
+    "InternalEndpointSpec",
+    "MatchResult",
+    "MatchingFeeType",
+    "OrderRecord",
 ]

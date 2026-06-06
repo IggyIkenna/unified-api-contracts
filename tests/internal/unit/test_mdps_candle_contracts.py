@@ -165,8 +165,14 @@ def test_defi_pool_swap_candles_include_chain(tf: str) -> None:
     contract = lookup_contract(asset_group="defi", instrument_type="pool", data_type=MDPS_KEY_SWAPS(tf))
     names = {c.name for c in contract.columns}
     assert "chain" in names
-    assert "swap_count" in names
-    assert "volume_quote_usd" in names
+    # swap-count / USD-volume live in the OHLCV-core `trade_count` / `volume`
+    # columns; the old DeFi-specific `swap_count` / `volume_quote_usd` aliases
+    # were exact duplicates and have been dropped from the swaps candle
+    # (DeFi #4 / C0-RD6 — _DEX_EXT split).
+    assert "trade_count" in names
+    assert "volume" in names
+    assert "swap_count" not in names
+    assert "volume_quote_usd" not in names
     assert contract.symbol_column == "pool_id"
 
 
@@ -175,6 +181,10 @@ def test_defi_pool_state_candles_include_chain(tf: str) -> None:
     contract = lookup_contract(asset_group="defi", instrument_type="pool", data_type=MDPS_KEY_POOL_STATE(tf))
     names = {c.name for c in contract.columns}
     assert "chain" in names
+    # state candle legitimately keeps `swap_count` (not a duplicate here) and
+    # never carried `volume_quote_usd`.
+    assert "swap_count" in names
+    assert "volume_quote_usd" not in names
     assert contract.symbol_column == "symbol"
 
 

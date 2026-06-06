@@ -218,20 +218,20 @@ uv venv .venv --python python3.13
 source .venv/bin/activate
 uv pip install -e .
 
-# Install pre-commit hooks
-pre-commit install
+# Install pre-commit hooks (prek is the canonical runner)
+prek install
 ```
 
-### Pre-commit Hooks
+### Pre-commit Hooks (prek)
 
-Install and run pre-commit hooks:
+Install and run hooks via prek (the canonical workspace runner):
 
 ```bash
 # Install hooks (one-time setup)
-pre-commit install
+prek install
 
 # Run hooks on all files
-pre-commit run --all-files
+prek run --all-files
 
 # Hooks run automatically on commit
 git commit -m "your message"
