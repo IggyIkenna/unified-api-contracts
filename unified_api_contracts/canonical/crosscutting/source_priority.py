@@ -442,7 +442,15 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
 def modes_for_source(source: str) -> frozenset[Mode]:
     """Return the set of :class:`Mode`s ``source`` can run. ``mock`` ⇒ all modes
     (a fixture can stand in for any). Unregistered external source ⇒ ``{BATCH}``
-    (the safe default — everything is at least batch-archivable)."""
+    (the safe default — everything is at least batch-archivable).
+
+    ⚠️ COARSE per-source PLACEHOLDER (Phase 0.1). Capability is genuinely per
+    ``(source, data_type)`` — e.g. hyperliquid is LIVE for ``trades``/``l2_book``
+    (``ws_*`` ops) but REST/BATCH-only for ``funding_rates``. This is to be
+    SUPERSEDED by ``modes_for(source, data_type)`` derived from
+    ``registry/capability_declarations`` ``SourceCapability`` (per-operation
+    REST/WS). SSOT: ``pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md``
+    § M2 REFINEMENT."""
     if source == MOCK_SOURCE:
         return frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
     return SOURCE_MODE_CAPABILITY.get(source, frozenset({Mode.BATCH}))
