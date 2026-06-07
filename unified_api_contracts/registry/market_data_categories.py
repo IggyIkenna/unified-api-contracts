@@ -588,21 +588,10 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     ),
     ("tradfi", "currency"): frozenset({"trades", "ohlcv_24h"}),  # UNCERTAIN — tradfi-owner verify
     # ── Sports (league-grain — build_instrument_catalogue.py SPORTS_LEAGUE_INSTRUMENT_TYPE = "league") ──
-    # UNCERTAIN — sports-owner verify all rows below.
-    # Sports data_types used here are the reference-data provider types
-    # (SPORTS_DATA_TYPE_TO_SOURCE keys), NOT the MTDS odds market-data types.
-    ("sports", "league"): frozenset(
-        {
-            "odds",
-            "odds_snapshot",
-            "odds_movement",
-            "markets",
-            "outcomes",
-            "settlements",
-            "odds_horizon_bucket",
-            "arbitrage_opportunity",
-        }
-    ),  # UNCERTAIN — sports-owner verify; league is the canonical grain
+    # ("sports", "league") is NOT in this static dict: it is the live could-exist grain and is
+    # derived dynamically from SPORTS_DATA_TYPE_TO_SOURCE in valid_data_types_for_instrument_type()
+    # (slot-4 verified 2026-06-07 — the prior literal silently dropped "ODDS"). The fixture/odds rows
+    # below are NOT consulted by the league-grain producer (kept as future fixture-grain scaffolding).
     ("sports", "fixture"): frozenset(
         {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
     ),  # UNCERTAIN — sports-owner verify
@@ -626,6 +615,13 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 # Module-level cache for the lazily-built DeFi sub-dict.
 _DEFI_VALID_DATA_TYPES: dict[str, frozenset[str]] | None = None
 
+# Module-level cache for the lazily-built sports league valid-set. Derived from
+# ``SPORTS_DATA_TYPE_TO_SOURCE`` (the reference-data provider data_types) rather
+# than a hand-written literal — a literal had silently dropped ``ODDS`` (it is a
+# SPORTS_DATA_TYPE_TO_SOURCE key AND a DATA_TYPES_BY_ASSET_GROUP["sports"] member,
+# so it failed both arms of the _row_data_types filter). Deriving keeps it in sync.
+_SPORTS_LEAGUE_VALID_DATA_TYPES: frozenset[str] | None = None
+
 
 def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str) -> frozenset[str] | None:
     """Return the valid data_types for ``(asset_group, instrument_type)``.
@@ -645,11 +641,25 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
     ``cap.instrument_type`` → union of ``cap.data_types`` across all protocols
     that use that instrument type.  Cache is module-level.
     """
-    global _DEFI_VALID_DATA_TYPES
+    global _DEFI_VALID_DATA_TYPES, _SPORTS_LEAGUE_VALID_DATA_TYPES
 
     # Normalise instrument_type token.
     normalised = instrument_type.strip().lower() if instrument_type else ""
     normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
+
+    if asset_group.lower() == "sports" and normalised == "league":
+        # League is the canonical sports could-exist grain (build_sports_catalogue_dataframe
+        # → instrument_type="league"). Its valid data_types ARE the reference-data provider
+        # data_types (SPORTS_DATA_TYPE_TO_SOURCE keys: MATCHES/ODDS/STANDINGS/FIXTURES/XG/…),
+        # NOT the MTDS odds market-data types. Derived (not literal) so a future
+        # SPORTS_DATA_TYPE_TO_SOURCE addition can never silently drop out of the could-exist seed.
+        if _SPORTS_LEAGUE_VALID_DATA_TYPES is None:
+            from unified_api_contracts.canonical.domain.sports import (  # noqa: imports-inside-functions
+                SPORTS_DATA_TYPE_TO_SOURCE,
+            )
+
+            _SPORTS_LEAGUE_VALID_DATA_TYPES = frozenset(SPORTS_DATA_TYPE_TO_SOURCE)
+        return _SPORTS_LEAGUE_VALID_DATA_TYPES
 
     if asset_group.lower() == "defi":
         if _DEFI_VALID_DATA_TYPES is None:
