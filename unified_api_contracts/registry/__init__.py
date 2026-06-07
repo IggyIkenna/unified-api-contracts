@@ -190,12 +190,14 @@ from .instruction_constraints import (
     validate_instruction,
 )
 from .market_data_categories import (
+    _INSTRUMENT_TYPE_ALIASES,
     ALL_DATA_TYPES,
     ALL_VENUES,
     DATA_TYPES_BY_ASSET_GROUP,
     NEEDS_CANDLE_PROCESSING,
     TIMEFRAMES,
     TRADFI_TICK_DATA_WINDOWS,
+    VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     VENUE_DATA_TYPE_CAPABILITIES,
     VENUE_DATA_TYPE_COVERAGE_WINDOWS,
     VENUE_TO_ASSET_GROUP,
@@ -212,6 +214,7 @@ from .market_data_categories import (
     is_tradfi_futures_instrument_active,
     needs_candle_processing,
     resolve_data_type_for_feature_group,
+    valid_data_types_for_instrument_type,
     validate_data_type_for_venue,
 )
 from .max_underlying_moves import (
@@ -705,6 +708,7 @@ __all__ = [
     "UNISWAP_V3_FACTORY_BY_CHAIN",
     "UNISWAP_V4_ETH",
     "UPBIT",
+    "VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE",
     "VENUES_BY_ASSET_GROUP",
     "VENUE_AGGREGATOR_TYPE",
     "VENUE_ALPHA_PROFILE",
@@ -889,6 +893,7 @@ __all__ = [
     "time_budget_to_block_offset",
     "to_canonical_venue",
     "token_matches_major_assets",
+    "valid_data_types_for_instrument_type",
     "validate_data_type_for_venue",
     "validate_instruction",
     "validate_mode_env_auth",
