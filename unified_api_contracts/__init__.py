@@ -1082,6 +1082,7 @@ from .internal.strategy_pnl_stream import StrategyPnlStreamEvent
 from .normalize_utils import american_to_decimal, decimal_to_american
 from .registry import (
     ALL_VENUES,
+    BUNDLE_DATA_TYPE_BY_AG_AND_INSTRUMENT_TYPE,
     CEFI_ACCEPTED_QUOTE_ASSETS,
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_BASE_ASSETS,
@@ -1133,6 +1134,7 @@ from .registry import (
     ProviderDataAvailability,
     VenueCoordinates,
     VenueMapping,
+    bundle_data_type_for_instrument_type,
     free_dates_in_range,
     get_databento_symbols_for_venue,
     get_expected_data_types_for_venue,
@@ -1303,6 +1305,7 @@ __all__ = [
     "DATA_TYPE_TO_CLUSTER_REGISTRY",
     "GRAIN_BUNDLE_BY_UNDERLYING",
     "GRAIN_LEAF",
+    "BUNDLE_DATA_TYPE_BY_AG_AND_INSTRUMENT_TYPE",
     "INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE",
     "DEFI_AAVE_V3_LENDING_INDICES",
     "DEFI_DEX_POOL_DEX_POOL_STATE",
@@ -2009,6 +2012,7 @@ __all__ = [
     "get_source_priority",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
+    "bundle_data_type_for_instrument_type",
     "grain_for_instrument_type",
     "has_source_priority",
     "is_batch",

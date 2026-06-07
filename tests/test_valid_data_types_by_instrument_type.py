@@ -266,3 +266,32 @@ class TestInstrumentGrainAxis:
         for itype in ("option", "combo"):
             assert grain_for_instrument_type("cefi", itype) == GRAIN_BUNDLE_BY_UNDERLYING
             assert valid_data_types_for_instrument_type("cefi", itype) == frozenset()
+
+
+from unified_api_contracts.registry.market_data_categories import (
+    bundle_data_type_for_instrument_type,
+)
+
+
+class TestBundleDataTypeForInstrumentType:
+    """bundle_data_type_for_instrument_type() — which bundle data_type a LEAF
+    option/combo rolls up into (G1-ENUM rollup driver)."""
+
+    def test_cefi_option_rolls_to_options_chain(self) -> None:
+        assert bundle_data_type_for_instrument_type("cefi", "OPTION") == "options_chain"
+
+    def test_cefi_combo_rolls_to_options_chain(self) -> None:
+        assert bundle_data_type_for_instrument_type("cefi", "combo") == "options_chain"
+
+    def test_tradfi_option_rolls_to_options_chain(self) -> None:
+        assert bundle_data_type_for_instrument_type("tradfi", "OPTION") == "options_chain"
+
+    def test_bundle_type_itself_returns_none(self) -> None:
+        # options_chain / futures_chain ARE the per-underlying bundle entry — they
+        # do not roll up further (pass through the enumerator unchanged).
+        assert bundle_data_type_for_instrument_type("cefi", "options_chain") is None
+        assert bundle_data_type_for_instrument_type("cefi", "futures_chain") is None
+
+    def test_leaf_non_bundle_returns_none(self) -> None:
+        assert bundle_data_type_for_instrument_type("cefi", "SPOT") is None
+        assert bundle_data_type_for_instrument_type("cefi", "PERP") is None

@@ -648,6 +648,24 @@ INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
     ("cefi", "combo"): GRAIN_BUNDLE_BY_UNDERLYING,
     ("cefi", "options_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
     ("cefi", "futures_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
+    # TradFi options/combos roll up the same way (generalised, NOT special-cased).
+    ("tradfi", "option"): GRAIN_BUNDLE_BY_UNDERLYING,
+    ("tradfi", "combo"): GRAIN_BUNDLE_BY_UNDERLYING,
+    ("tradfi", "options_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
+    ("tradfi", "futures_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
+}
+
+# Which bundle DATA_TYPE a per-contract LEAF instrument_type rolls UP into. Only
+# the LEAF types are keyed here — the bundle TYPES themselves (options_chain /
+# futures_chain) are NOT (they ARE the per-underlying bundle entry and pass
+# through). The enumerator collapses every leaf contract of an underlying into
+# ONE candidate of this data_type, keyed by the underlying. None ⇒ not a
+# roll-up leaf (the default).
+BUNDLE_DATA_TYPE_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
+    ("cefi", "option"): "options_chain",
+    ("cefi", "combo"): "options_chain",
+    ("tradfi", "option"): "options_chain",
+    ("tradfi", "combo"): "options_chain",
 }
 
 
@@ -666,6 +684,20 @@ def grain_for_instrument_type(asset_group: str, instrument_type: str) -> str:
     normalised = instrument_type.strip().lower() if instrument_type else ""
     normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
     return INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised), GRAIN_LEAF)
+
+
+def bundle_data_type_for_instrument_type(asset_group: str, instrument_type: str) -> str | None:
+    """Return the bundle data_type a LEAF instrument_type rolls up into, or None.
+
+    ``("cefi"|"tradfi", "option"|"combo")`` → ``"options_chain"`` (the per-contract
+    leaves collapse into ONE per-underlying options_chain candidate). The bundle
+    TYPES themselves (``options_chain`` / ``futures_chain``) return None — they
+    are already the per-underlying bundle entry and are enumerated as-is. Used by
+    the ``enumerate_expected_universe`` bundle-grain roll-up.
+    """
+    normalised = instrument_type.strip().lower() if instrument_type else ""
+    normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
+    return BUNDLE_DATA_TYPE_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised))
 
 
 # Module-level cache for the lazily-built DeFi sub-dict.
