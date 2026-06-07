@@ -124,6 +124,11 @@ VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "EPRL": "databento",
     "XCHI": "databento",
     "CBOE": "databento",
+    # MASSIVE pseudo-venue — resolves the Massive (rebranded Polygon.io) API key
+    # so ApiKeyReloader fetches MASSIVE_API_KEY when the instruments CLI runs
+    # `--source massive` for TradFi venues. Not a real exchange; TradFi exchanges
+    # (CME/NASDAQ/NYSE/CBOE/ICE/FX) keep their canonical mapping above.
+    "MASSIVE": "massive",
     "ASTER": "aster",
     "HYPERLIQUID": "hyperliquid",
     "UNISWAP_V2-ETHEREUM": "thegraph",
@@ -451,6 +456,9 @@ CONTRACT_SPECS_BY_VENUE: dict[str, ContractSpec] = {
 DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "tardis": "tardis-api-key",
     "databento": "databento-api-key",
+    # Massive (rebranded Polygon.io) — secret stored UPPER_SNAKE in Secret Manager
+    # (matches the MTDS Massive connector MASSIVE_SECRET_NAME).
+    "massive": "MASSIVE_API_KEY",
     "aster": "aster-api-key",
     "hyperliquid": "hyperliquid-trade-key",
     "thegraph": "thegraph-api-key",
