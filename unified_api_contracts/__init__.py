@@ -659,6 +659,23 @@ from .external.kalshi.schemas import (
     KalshiOrderBook,
     KalshiTrade,
 )
+from .external.massive.normalize import (
+    normalize_massive_equity,
+    normalize_massive_futures,
+    normalize_massive_fx,
+    normalize_massive_index,
+    normalize_massive_option,
+)
+from .external.massive.schemas import (
+    MassiveFuturesContract,
+    MassiveFuturesContractsResponse,
+    MassiveFuturesProduct,
+    MassiveFuturesProductsResponse,
+    MassiveOptionContract,
+    MassiveOptionContractsResponse,
+    MassiveTicker,
+    MassiveTickersResponse,
+)
 from .external.okx.schemas import (
     OKXFundingRate,
     OKXInstrumentInfo,
@@ -1522,6 +1539,19 @@ __all__ = [
     "PlayerMapping",
     "PolymarketGammaMarket",
     "PolymarketPosition",
+    "MassiveFuturesContract",
+    "MassiveFuturesContractsResponse",
+    "MassiveFuturesProduct",
+    "MassiveFuturesProductsResponse",
+    "MassiveOptionContract",
+    "MassiveOptionContractsResponse",
+    "MassiveTicker",
+    "MassiveTickersResponse",
+    "normalize_massive_equity",
+    "normalize_massive_futures",
+    "normalize_massive_fx",
+    "normalize_massive_index",
+    "normalize_massive_option",
     "PolygonOptionContract",
     "PolygonOptionContractsResponse",
     "PolygonTicker",

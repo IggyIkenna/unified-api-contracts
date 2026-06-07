@@ -89,6 +89,7 @@ class TestScanProductionReferences:
     are insufficient.
     """
 
+    @pytest.mark.timeout(180)  # repo-wide filesystem scan 17-21s alone; 3x buffer for full-suite I/O load
     def test_returns_venue_aware_dict(self) -> None:
         """Result is a dict mapping (venue, name) -> set of consumer paths."""
         refs = scan_production_cassette_references()
@@ -111,6 +112,7 @@ class TestScanProductionReferences:
 class TestScanTestReferencesLegacy:
     """Legacy backwards-compat wrapper. Deprecated signature still callable."""
 
+    @pytest.mark.timeout(180)  # repo-wide filesystem scan 17-21s alone; 3x buffer for full-suite I/O load
     def test_legacy_wrapper_returns_set_of_names(self) -> None:
         refs = scan_test_cassette_references()
         assert isinstance(refs, set)
@@ -208,6 +210,7 @@ class TestIntegrationOrphanCheck:
     Real orphans (not allowlisted) FAIL the test.
     """
 
+    @pytest.mark.timeout(180)  # repo-wide filesystem scan 17-21s alone; 3x buffer for full-suite I/O load
     def test_no_unallowlisted_orphans(self) -> None:
         # Production consumers of these external-source cassettes live in sibling repos
         # (MTDS / features / instruments adapters). In per-repo CI (workspace-qg renders
