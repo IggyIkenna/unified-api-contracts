@@ -44,10 +44,36 @@ from typing import Final
 class PipelineMode(StrEnum):
     """Closed-set source-and-mode tag for every persisted row.
 
-    Batch values mirror :data:`~unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_PRIORITY`
-    source strings (one batch enum per source). The single live value
-    :attr:`LIVE_WEBSOCKET` covers all websocket-streaming paths — per-venue
-    WS-vs-poll fallback is an operational concern, not a manifest dimension.
+    The canonical form is ``{mode}_{source}[_{transport}]`` (M1) where
+    ``mode ∈ {batch, live, replay}``. ``batch``/``live``/``replay`` are the SAME
+    logical data, same schema, on the same GCS/bus paths — three CAPTURE MODES:
+
+    * ``batch_<source>`` — the T+1 floor (deep history).
+    * ``live_<source>`` — a live-mode generator streamed to disk as it happens.
+    * ``replay_<source>`` — an intraday re-fetch of a window ``live`` missed
+      (cold start / live-service down), written with the SAME schema but tagged
+      ``replay`` purely for the audit trail.
+
+    Read precedence (M4, mode-contextual): a live consumer reads
+    ``live > replay > batch``; a batch consumer reads ``batch > replay > live``;
+    ``replay`` is always the middle (gap-fill) tier. Whether a ``(source,
+    data_type)`` is replay-capable is a FACT encoded in
+    :data:`~unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_MODE_CAPABILITY`
+    (M2) — a source that cannot re-fetch intraday simply means a live-downtime
+    gap waits for batch (honest absence), NOT a decision.
+
+    Closed-set rule: a ``LIVE_<SOURCE>`` / ``REPLAY_<SOURCE>`` member exists iff
+    the source's :data:`SOURCE_MODE_CAPABILITY` set contains :attr:`Mode.LIVE` /
+    :attr:`Mode.REPLAY` — enforced by ``test_source_mode_capability.py``. Every
+    ``BATCH_<SOURCE>`` member still mirrors a ``SOURCE_PRIORITY`` source string.
+
+    :attr:`LIVE_WEBSOCKET` is a TRANSITIONAL alias kept for the not-yet-migrated
+    streaming objects/writers/readers — its migration to ``live_<source>`` is the
+    next tranche (M1 breaking step). Do NOT delete it.
+
+    Source-aware live/replay members are landed per
+    ``pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md``
+    (M1/M2), ratifying ``source_mode_capability_matrix_2026_06_07.md``.
     """
 
     BATCH_API_FOOTBALL = "batch_api_football"
@@ -81,8 +107,76 @@ class PipelineMode(StrEnum):
 
     LIVE_WEBSOCKET = "live_websocket"
 
+    # ------------------------------------------------------------------
+    # M1 source-aware live/replay members — a LIVE_/REPLAY_ member exists iff
+    # SOURCE_MODE_CAPABILITY[source] contains Mode.LIVE / Mode.REPLAY (the
+    # ratified matrix; enforced by test_source_mode_capability.py).
+    # ------------------------------------------------------------------
+    # {batch, live, replay} sources — both live + replay members.
+    LIVE_DATABENTO = "live_databento"
+    REPLAY_DATABENTO = "replay_databento"
+    LIVE_MASSIVE = "live_massive"
+    REPLAY_MASSIVE = "replay_massive"
+    LIVE_PYTH_HERMES = "live_pyth_hermes"
+    REPLAY_PYTH_HERMES = "replay_pyth_hermes"
+    LIVE_HYPERLIQUID_REST = "live_hyperliquid_rest"
+    REPLAY_HYPERLIQUID_REST = "replay_hyperliquid_rest"
+    LIVE_SOLANA_RPC = "live_solana_rpc"
+    REPLAY_SOLANA_RPC = "replay_solana_rpc"
+    LIVE_HELIUS_RPC = "live_helius_rpc"
+    REPLAY_HELIUS_RPC = "replay_helius_rpc"
+    LIVE_ONCHAIN_RPC = "live_onchain_rpc"
+    REPLAY_ONCHAIN_RPC = "replay_onchain_rpc"
+    # onchain_subgraph: live = short-interval poll (no native push), replay ✓.
+    LIVE_ONCHAIN_SUBGRAPH = "live_onchain_subgraph"
+    REPLAY_ONCHAIN_SUBGRAPH = "replay_onchain_subgraph"
+    LIVE_CHAINLINK = "live_chainlink"
+    REPLAY_CHAINLINK = "replay_chainlink"
+    LIVE_POLYMARKET_CLOB = "live_polymarket_clob"
+    REPLAY_POLYMARKET_CLOB = "replay_polymarket_clob"
+    # Internal service sources — batch=live symmetry; re-run = replay.
+    LIVE_INSTRUMENTS_SERVICE = "live_instruments_service"
+    REPLAY_INSTRUMENTS_SERVICE = "replay_instruments_service"
+    LIVE_EXECUTION_SERVICE = "live_execution_service"
+    REPLAY_EXECUTION_SERVICE = "replay_execution_service"
+    LIVE_STRATEGY_SERVICE = "live_strategy_service"
+    REPLAY_STRATEGY_SERVICE = "replay_strategy_service"
+    LIVE_FEATURES_ONCHAIN_SERVICE = "live_features_onchain_service"
+    REPLAY_FEATURES_ONCHAIN_SERVICE = "replay_features_onchain_service"
+    LIVE_CROSS_INSTRUMENT = "live_cross_instrument"
+    REPLAY_CROSS_INSTRUMENT = "replay_cross_instrument"
+    LIVE_MDPS_ODDS_HORIZON_BUCKET = "live_mdps_odds_horizon_bucket"
+    REPLAY_MDPS_ODDS_HORIZON_BUCKET = "replay_mdps_odds_horizon_bucket"
+    # {batch, replay} sources — replay member only (no live stream).
+    REPLAY_ODDS_API = "replay_odds_api"
+    REPLAY_API_FOOTBALL = "replay_api_football"
+    REPLAY_FOOTYSTATS = "replay_footystats"
+    REPLAY_UNDERSTAT = "replay_understat"
+    REPLAY_TRANSFERMARKT = "replay_transfermarkt"
+    REPLAY_SOCCER_FOOTBALL_INFO = "replay_soccer_football_info"
+    REPLAY_OPEN_METEO = "replay_open_meteo"
+    REPLAY_EIA = "replay_eia"
+
 
 _BATCH_PREFIX: Final[str] = "batch_"
+_LIVE_PREFIX: Final[str] = "live_"
+_REPLAY_PREFIX: Final[str] = "replay_"
+
+
+class Mode(StrEnum):
+    """The data-class / reconciliation axis — what a reader unions + prioritises.
+
+    Distinct from :class:`PipelineMode` (which is ``mode``-by-``source``): ``Mode`` is
+    the abstract reconciliation class. The full target ``pipeline_mode`` form is
+    ``{mode}_{source}[_{transport}]`` (M1) — e.g. ``batch_databento`` /
+    ``live_tardis`` / ``replay_onchain_rpc``. Precedence is mode-CONTEXTUAL (M4):
+    a live consumer reads ``live > replay > batch``; a batch consumer reads
+    ``batch > replay > live``; ``replay`` is always the middle (gap-fill) tier.
+    """
+
+    BATCH = "batch"
+    LIVE = "live"
+    REPLAY = "replay"
 
 
 def is_batch(mode: PipelineMode) -> bool:
@@ -92,40 +186,61 @@ def is_batch(mode: PipelineMode) -> bool:
 
 
 def is_live(mode: PipelineMode) -> bool:
-    """True if ``mode`` is the live-websocket value."""
+    """True if ``mode`` is any live value (``LIVE_WEBSOCKET`` or ``live_<source>``)."""
 
-    return mode is PipelineMode.LIVE_WEBSOCKET
+    return mode.value.startswith(_LIVE_PREFIX)
+
+
+def is_replay(mode: PipelineMode) -> bool:
+    """True if ``mode`` is a ``replay_<source>`` value (M1 intraday gap-fill mode)."""
+
+    return mode.value.startswith(_REPLAY_PREFIX)
 
 
 def source_string_for(mode: PipelineMode) -> str | None:
-    """Return the SOURCE_PRIORITY source string this batch mode maps to.
+    """Return the source string this ``pipeline_mode`` maps to.
 
-    Returns ``None`` for :attr:`PipelineMode.LIVE_WEBSOCKET` since live mode
-    is not represented in ``SOURCE_PRIORITY`` — live emission is a runtime
-    concern, not a per-source archival concern.
+    Strips the leading ``{mode}_`` segment (``batch_`` / ``live_`` / ``replay_``)
+    and returns the remaining source string — e.g. ``batch_tardis`` → ``tardis``,
+    ``live_databento`` → ``databento``, ``replay_onchain_rpc`` → ``onchain_rpc``.
+
+    Returns ``None`` for :attr:`PipelineMode.LIVE_WEBSOCKET` alone — the
+    transitional alias has no concrete source (its migration to ``live_<source>``
+    is the next tranche).
     """
 
-    if not is_batch(mode):
+    if mode is PipelineMode.LIVE_WEBSOCKET:
         return None
-    return mode.value.removeprefix(_BATCH_PREFIX)
+    if is_batch(mode):
+        return mode.value.removeprefix(_BATCH_PREFIX)
+    if is_replay(mode):
+        return mode.value.removeprefix(_REPLAY_PREFIX)
+    if is_live(mode):
+        return mode.value.removeprefix(_LIVE_PREFIX)
+    return None
 
 
-def pipeline_mode_for_source(source: str) -> PipelineMode:
-    """Return the batch :class:`PipelineMode` matching a SOURCE_PRIORITY source string.
+def pipeline_mode_for_source(source: str, mode: Mode = Mode.BATCH) -> PipelineMode:
+    """Return the :class:`PipelineMode` for a source string in reconciliation ``mode``.
 
-    Raises :class:`ValueError` if the source has no corresponding batch mode —
-    the closed-set round-trip rule is bidirectional, so an unknown source means
-    either the source string is misspelled or a new ``PipelineMode`` value is
-    needed.
+    Builds the closed-set ``{mode}_{source}`` value and resolves it. ``mode``
+    defaults to :attr:`Mode.BATCH` so existing batch callers are unchanged.
+
+    Raises :class:`ValueError` if no member exists for ``(source, mode)`` — the
+    closed-set round-trip rule is bidirectional, so this means either the source
+    string is misspelled, the source does not support that mode (per
+    :data:`~unified_api_contracts.canonical.crosscutting.source_priority.SOURCE_MODE_CAPABILITY`),
+    or a new ``PipelineMode`` value is needed.
     """
 
-    target = f"{_BATCH_PREFIX}{source}"
-    for mode in PipelineMode:
-        if mode.value == target:
-            return mode
+    target = f"{mode.value}_{source}"
+    for member in PipelineMode:
+        if member.value == target:
+            return member
     raise ValueError(
-        f"No PipelineMode for source {source!r}; "
-        "add a BATCH_<SOURCE> value to PipelineMode (closed-set round-trip required)."
+        f"No PipelineMode for source {source!r} in mode {mode.value!r}; "
+        f"either add a {mode.name}_<SOURCE> value to PipelineMode, or the source "
+        "does not support that mode (closed-set round-trip required)."
     )
 
 
@@ -176,25 +291,9 @@ def pipeline_mode_for_sports_entity(entity_name: str) -> PipelineMode:
 
 
 # ---------------------------------------------------------------------------
-# Reconciliation-class (Mode) + operational-cadence axes
-# (pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md — M1/M8)
+# Operational-cadence axis (Mode lives near the top, beside PipelineMode)
+# (pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md — M8)
 # ---------------------------------------------------------------------------
-
-
-class Mode(StrEnum):
-    """The data-class / reconciliation axis — what a reader unions + prioritises.
-
-    Distinct from :class:`PipelineMode` (which is ``mode``-by-``source``): ``Mode`` is
-    the abstract reconciliation class. The full target ``pipeline_mode`` form is
-    ``{mode}_{source}[_{transport}]`` (M1) — e.g. ``batch_databento`` /
-    ``live_tardis`` / ``replay_onchain_rpc``. Precedence is mode-CONTEXTUAL (M4):
-    a live consumer reads ``live > replay > batch``; a batch consumer reads
-    ``batch > replay > live``; ``replay`` is always the middle (gap-fill) tier.
-    """
-
-    BATCH = "batch"
-    LIVE = "live"
-    REPLAY = "replay"
 
 
 class Cadence(StrEnum):
@@ -239,6 +338,7 @@ __all__ = [
     "PipelineMode",
     "is_batch",
     "is_live",
+    "is_replay",
     "mode_of",
     "pipeline_mode_for_source",
     "pipeline_mode_for_sports_entity",

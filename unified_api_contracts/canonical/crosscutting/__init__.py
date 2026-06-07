@@ -71,6 +71,7 @@ from .live_cluster_registry import get_clusters_for_env as get_clusters_for_env
 from .pipeline_mode import PipelineMode as PipelineMode
 from .pipeline_mode import is_batch as is_batch
 from .pipeline_mode import is_live as is_live
+from .pipeline_mode import is_replay as is_replay
 from .pipeline_mode import pipeline_mode_for_source as pipeline_mode_for_source
 from .pipeline_mode import pipeline_mode_for_sports_entity as pipeline_mode_for_sports_entity
 from .pipeline_mode import source_string_for as source_string_for

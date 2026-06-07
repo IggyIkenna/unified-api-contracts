@@ -14,8 +14,12 @@ from unified_api_contracts import (
     Cadence,
     Mode,
     PipelineMode,
+    is_live,
+    is_replay,
     mode_of,
     modes_for_source,
+    pipeline_mode_for_source,
+    source_string_for,
     source_supports,
     sources_supporting,
 )
@@ -25,6 +29,50 @@ from unified_api_contracts.canonical.crosscutting.source_priority import (
 )
 
 MOCK = "mock"
+
+# The ratified source-mode capability matrix — row-for-row from
+# ``plans/audit/results/source_mode_capability_matrix_2026_06_07.md`` (incl. its
+# "CORRECTED MODEL"). This is the test-side SSOT: SOURCE_MODE_CAPABILITY must
+# equal it EXACTLY. (CeFi per-venue live/replay sources are added in the next unit.)
+_B = frozenset({Mode.BATCH})
+_BR = frozenset({Mode.BATCH, Mode.REPLAY})
+_BLR = frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
+EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
+    # CeFi
+    "tardis": _B,
+    # TradFi
+    "databento": _BLR,
+    "massive": _BLR,
+    "yahoo": _B,
+    "barchart": _B,
+    "eia": _BR,
+    # DeFi
+    "hyperliquid_rest": _BLR,
+    "onchain_rpc": _BLR,
+    "solana_rpc": _BLR,
+    "helius_rpc": _BLR,
+    "onchain_subgraph": _BLR,
+    "chainlink": _BLR,
+    "pyth_hermes": _BLR,
+    # Prediction
+    "polymarket_clob": _BLR,
+    "polymarket_gamma_api": _B,
+    # Sports
+    "api_football": _BR,
+    "footystats": _BR,
+    "odds_api": _BR,
+    "understat": _BR,
+    "transfermarkt": _BR,
+    "soccer_football_info": _BR,
+    "open_meteo": _BR,
+    # Internal service sources
+    "instruments_service": _BLR,
+    "mdps_odds_horizon_bucket": _BLR,
+    "execution_service": _BLR,
+    "strategy_service": _BLR,
+    "features_onchain_service": _BLR,
+    "cross_instrument": _BLR,
+}
 
 
 def _all_external_sources() -> set[str]:
@@ -52,9 +100,10 @@ def test_every_capability_source_is_batch_capable() -> None:
 
 
 def test_capability_keys_are_real_sources() -> None:
-    """No typo'd / phantom source in the registry."""
-    stray = set(SOURCE_MODE_CAPABILITY) - _all_external_sources()
-    assert not stray, f"capability registry has non-SOURCE_PRIORITY sources: {sorted(stray)}"
+    """No typo'd / phantom source in the registry — every key is an external
+    SOURCE_PRIORITY source OR an internal computed/service emitter."""
+    stray = set(SOURCE_MODE_CAPABILITY) - _all_external_sources() - set(COMPUTED_SOURCES)
+    assert not stray, f"capability registry has unrecognised sources: {sorted(stray)}"
 
 
 # ---------------------------------------------------------------------------
@@ -68,9 +117,13 @@ def test_chain_rpcs_are_replay_capable() -> None:
         assert source_supports(src, Mode.REPLAY), f"{src} should be replay-capable"
 
 
-def test_tardis_is_live_but_not_replay() -> None:
-    """Operator: Tardis streams live but does NOT allow tick-replay."""
-    assert source_supports("tardis", Mode.LIVE)
+def test_tardis_is_batch_only() -> None:
+    """Ratified 2026-06-07 (matrix R1 + CORRECTED MODEL): Tardis is the CeFi BATCH
+    (T+1 archive) source ONLY. The academic licence blocks replay, and CeFi
+    live/replay come from the EXCHANGES (the per-venue ``live_<venue>`` sources),
+    not Tardis."""
+    assert modes_for_source("tardis") == frozenset({Mode.BATCH})
+    assert not source_supports("tardis", Mode.LIVE)
     assert not source_supports("tardis", Mode.REPLAY)
 
 
@@ -124,3 +177,116 @@ def test_cadence_values_are_the_agreed_set() -> None:
         "continuous_live",
         "recovery_replay",
     }
+
+
+# ---------------------------------------------------------------------------
+# M2 (b) — SOURCE_MODE_CAPABILITY matches the ratified matrix row-for-row
+# ---------------------------------------------------------------------------
+
+
+def test_source_mode_capability_matches_ratified_matrix_exactly() -> None:
+    """The registry must equal the ratified matrix row-for-row — incl. tardis={batch}
+    (CeFi live/replay from exchanges) and eia/sports={batch,replay}."""
+    assert SOURCE_MODE_CAPABILITY == EXPECTED_SOURCE_MODE_CAPABILITY
+
+
+def test_eia_is_replay_capable_no_live() -> None:
+    """EIA weekly series is re-fetchable by date (replay) but has no live stream."""
+    assert modes_for_source("eia") == frozenset({Mode.BATCH, Mode.REPLAY})
+
+
+def test_sports_sources_are_replay_capable() -> None:
+    """Sports vendors are replay-capable (historical fetch by date/season)."""
+    sports_sources = (
+        "api_football",
+        "footystats",
+        "odds_api",
+        "understat",
+        "transfermarkt",
+        "soccer_football_info",
+        "open_meteo",
+    )
+    for src in sports_sources:
+        assert source_supports(src, Mode.REPLAY), f"{src} should be replay-capable"
+
+
+def test_internal_service_sources_are_full_service_mode() -> None:
+    """Internal service emitters run batch=live symmetry; re-run = replay."""
+    for src in (
+        "instruments_service",
+        "mdps_odds_horizon_bucket",
+        "execution_service",
+        "strategy_service",
+        "features_onchain_service",
+        "cross_instrument",
+    ):
+        assert modes_for_source(src) == frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
+
+
+# ---------------------------------------------------------------------------
+# M1 (a)/(d) — enum ⟺ capability consistency (a LIVE_/REPLAY_ member exists
+# iff the source's capability set contains that mode)
+# ---------------------------------------------------------------------------
+
+
+def test_every_capability_live_or_replay_source_has_its_enum_member() -> None:
+    """(a) Every source whose matrix row has LIVE / REPLAY has the matching member."""
+    for src, modes in SOURCE_MODE_CAPABILITY.items():
+        if Mode.LIVE in modes:
+            assert pipeline_mode_for_source(src, Mode.LIVE).value == f"live_{src}"
+        if Mode.REPLAY in modes:
+            assert pipeline_mode_for_source(src, Mode.REPLAY).value == f"replay_{src}"
+
+
+def test_no_live_or_replay_member_for_a_non_capable_source() -> None:
+    """(d) No ``live_<source>`` / ``replay_<source>`` member exists for a source whose
+    matrix row lacks that mode (e.g. tardis replay, yahoo/barchart live+replay).
+    LIVE_WEBSOCKET (the transitional alias) is exempt — it has no concrete source."""
+    for member in PipelineMode:
+        if member is PipelineMode.LIVE_WEBSOCKET:
+            continue
+        src = source_string_for(member)
+        assert src is not None
+        if is_live(member):
+            assert source_supports(src, Mode.LIVE), f"{member.value} has no LIVE capability for {src!r}"
+        elif is_replay(member):
+            assert source_supports(src, Mode.REPLAY), f"{member.value} has no REPLAY capability for {src!r}"
+
+
+# ---------------------------------------------------------------------------
+# M1 (c) — source_string_for(pm) == source round-trips for batch + live + replay
+# ---------------------------------------------------------------------------
+
+
+def test_source_string_round_trips_for_every_mode() -> None:
+    """(c) For every (source, mode) the capability registry declares, the enum
+    member round-trips both ways: pipeline_mode_for_source(src, mode) → member and
+    source_string_for(member) → src."""
+    for src, modes in SOURCE_MODE_CAPABILITY.items():
+        for mode in modes:
+            member = pipeline_mode_for_source(src, mode)
+            assert member.value == f"{mode.value}_{src}"
+            assert source_string_for(member) == src
+            assert mode_of(member) is mode
+
+
+def test_pipeline_mode_for_source_defaults_to_batch() -> None:
+    """The default mode keeps existing batch callers unchanged."""
+    assert pipeline_mode_for_source("tardis") is PipelineMode.BATCH_TARDIS
+    assert pipeline_mode_for_source("databento") is PipelineMode.BATCH_DATABENTO
+
+
+def test_pipeline_mode_for_source_raises_for_unsupported_mode() -> None:
+    """A source that does not support a mode has no member → ValueError."""
+    import pytest
+
+    with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
+        _ = pipeline_mode_for_source("tardis", Mode.LIVE)  # tardis is batch-only
+    with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
+        _ = pipeline_mode_for_source("yahoo", Mode.REPLAY)  # yahoo is batch-only
+
+
+def test_live_websocket_source_string_is_none() -> None:
+    """The transitional alias has no concrete source."""
+    assert source_string_for(PipelineMode.LIVE_WEBSOCKET) is None
+    assert is_live(PipelineMode.LIVE_WEBSOCKET)
