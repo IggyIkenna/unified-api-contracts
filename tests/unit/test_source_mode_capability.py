@@ -26,6 +26,7 @@ from unified_api_contracts import (
     sources_supporting,
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
+    BATCH_CAPABLE_CEFI_VENUES,
     CEFI_LIVE_VENUES,
     COMPUTED_SOURCES,
     SOURCE_PRIORITY,
@@ -50,7 +51,9 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "barchart": _B,
     "eia": _BR,
     # DeFi
-    "hyperliquid_rest": _BLR,
+    # hyperliquid (unified vendor) is in the CeFi-venue block below with _BLR — it is
+    # the ONE CeFi venue that is also a DeFi batch source (R4 2026-06-07). The
+    # transport-glued ``hyperliquid_rest`` key is retired.
     "onchain_rpc": _BLR,
     "solana_rpc": _BLR,
     "helius_rpc": _BLR,
@@ -75,12 +78,14 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "strategy_service": _BLR,
     "features_onchain_service": _BLR,
     "cross_instrument": _BLR,
-    # CeFi per-venue live/replay sources (NOT batch — Tardis is the CeFi archive)
+    # CeFi per-venue live/replay sources (NOT batch — Tardis is the CeFi archive),
+    # EXCEPT hyperliquid which is ALSO the DeFi perp_funding/solana_defi batch source
+    # (REST candleSnapshot) → {BATCH, LIVE, REPLAY} (the unified vendor, R4).
     "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
     "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
     "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
     "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
-    "hyperliquid": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "hyperliquid": _BLR,
     "bybit": frozenset({Mode.LIVE}),
     "aster": frozenset({Mode.LIVE}),
 }
@@ -114,9 +119,13 @@ def test_every_non_venue_capability_source_is_batch_capable() -> None:
 
 
 def test_cefi_venues_are_not_batch_capable() -> None:
-    """CeFi venue sources serve live/replay only — Tardis is the CeFi batch source."""
+    """CeFi venue sources serve live/replay only — Tardis is the CeFi batch source.
+    Exception: hyperliquid (BATCH_CAPABLE_CEFI_VENUES) is ALSO the DeFi batch source."""
     for venue in CEFI_LIVE_VENUES:
         assert venue in SOURCE_MODE_CAPABILITY, f"{venue} must have a capability entry"
+        if venue in BATCH_CAPABLE_CEFI_VENUES:
+            assert source_supports(venue, Mode.BATCH), f"{venue} is the batch-capable venue exception"
+            continue
         assert not source_supports(venue, Mode.BATCH), f"{venue} must NOT be batch (batch = tardis)"
 
 
@@ -317,11 +326,17 @@ def test_live_websocket_source_string_is_none() -> None:
 
 
 def test_cefi_replay_venues_are_live_and_replay() -> None:
-    """binance/okx/deribit/kraken/hyperliquid re-fetch a same-day window via REST."""
-    for venue in ("binance", "okx", "deribit", "kraken", "hyperliquid"):
+    """binance/okx/deribit/kraken re-fetch a same-day window via REST (live+replay,
+    no batch — CeFi batch = tardis). hyperliquid is live+replay too but ALSO batch
+    (the unified DeFi+CeFi vendor) → asserted as a superset, not exact-equality."""
+    for venue in ("binance", "okx", "deribit", "kraken"):
         assert modes_for_source(venue) == frozenset({Mode.LIVE, Mode.REPLAY})
         assert pipeline_mode_for_source(venue, Mode.LIVE).value == f"live_{venue}"
         assert pipeline_mode_for_source(venue, Mode.REPLAY).value == f"replay_{venue}"
+    # hyperliquid: live + replay (+ batch), the unified vendor exception.
+    assert {Mode.LIVE, Mode.REPLAY} <= modes_for_source("hyperliquid")
+    assert pipeline_mode_for_source("hyperliquid", Mode.LIVE).value == "live_hyperliquid"
+    assert pipeline_mode_for_source("hyperliquid", Mode.REPLAY).value == "replay_hyperliquid"
 
 
 def test_bybit_and_aster_are_live_only_replay_absent() -> None:
@@ -337,8 +352,12 @@ def test_bybit_and_aster_are_live_only_replay_absent() -> None:
 
 
 def test_cefi_venues_have_no_batch_member() -> None:
-    """No ``batch_<venue>`` member — the venue is not a batch/archive source."""
+    """No ``batch_<venue>`` member — the venue is not a batch/archive source. Exception:
+    hyperliquid IS batch-capable (the unified DeFi+CeFi vendor) → BATCH_HYPERLIQUID."""
     for venue in CEFI_LIVE_VENUES:
+        if venue in BATCH_CAPABLE_CEFI_VENUES:
+            assert pipeline_mode_for_source(venue, Mode.BATCH).value == f"batch_{venue}"
+            continue
         with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
             _ = pipeline_mode_for_source(venue, Mode.BATCH)
 

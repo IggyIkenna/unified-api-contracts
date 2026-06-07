@@ -188,8 +188,9 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # derived from MTDS handler survey in
     # ``scratch_codefreeze_phase4_mtds_fanout_2026_05_12.md`` per-source
     # mapping table. Subgraph = EVM The Graph / Messari indexer; RPC = direct
-    # node call or signed transaction event; hyperliquid_rest = Hyperliquid
-    # REST API for Solana-based perp + DEX legs.
+    # node call or signed transaction event; hyperliquid = Hyperliquid (vendor;
+    # REST transport for the Solana-based perp + DEX legs — transport is a column,
+    # never glued to the source name, operator R4 2026-06-07).
     ("defi", "bridge_events"): ["onchain_rpc"],
     ("defi", "dex_pool_state"): ["onchain_subgraph"],
     ("defi", "governance_events"): ["onchain_subgraph"],
@@ -204,11 +205,12 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # Chainlink (EVM aggregator rounds) as secondary; per-row pipeline_mode
     # is resolved at callsite by the MTDS oracle_prices_handler resolver.
     ("defi", "oracle_prices"): ["pyth_hermes", "chainlink"],
-    # perp_funding + solana_defi are Hyperliquid REST legs; the HL REST API
-    # is the primary (and currently only) source for both data_types.
-    ("defi", "perp_funding"): ["hyperliquid_rest"],
+    # perp_funding + solana_defi are Hyperliquid REST legs; Hyperliquid (the vendor,
+    # via its REST transport) is the primary (and currently only) source for both
+    # data_types. source=hyperliquid, transport=rest (a column, not the name).
+    ("defi", "perp_funding"): ["hyperliquid"],
     ("defi", "position_data"): ["onchain_rpc"],
-    ("defi", "solana_defi"): ["hyperliquid_rest"],
+    ("defi", "solana_defi"): ["hyperliquid"],
     ("defi", "staking_yields"): ["onchain_subgraph"],
     ("defi", "token_transfers"): ["onchain_rpc"],
     ("defi", "vault_share_price"): ["onchain_subgraph"],
@@ -408,7 +410,10 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "barchart": frozenset({Mode.BATCH}),
     "eia": frozenset({Mode.BATCH, Mode.REPLAY}),  # weekly series re-fetchable by date
     # ---- DeFi ----
-    "hyperliquid_rest": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # hyperliquid (unified vendor) lives in the CeFi-venue block below — it is the
+    # ONE venue that is ALSO batch-capable (DeFi perp_funding/solana_defi via REST
+    # candleSnapshot), so it carries {BATCH, LIVE, REPLAY}. The former
+    # ``hyperliquid_rest`` key (transport glued into the source) is retired (R4).
     "onchain_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "solana_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "helius_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
@@ -442,11 +447,15 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # binance/okx/deribit/kraken/hyperliquid re-fetch a same-day window via REST
     # (replay ✓); Bybit (public REST recent-only) + Aster (newer venue, unverified)
     # are LIVE-only — a live-downtime gap waits for batch (T+1), replay ABSENT.
+    # hyperliquid is the SOLE batch-capable venue: it is ALSO the DeFi
+    # perp_funding/solana_defi batch source (REST candleSnapshot), so it carries
+    # {BATCH, LIVE, REPLAY} (operator R4 2026-06-07 — the unified ``hyperliquid``
+    # vendor). The other venues stay live/replay-only (CeFi batch = tardis).
     "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
     "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
     "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
     "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
-    "hyperliquid": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "hyperliquid": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "bybit": frozenset({Mode.LIVE}),
     "aster": frozenset({Mode.LIVE}),
 }
@@ -454,6 +463,16 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
 CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
     {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster"}
 )
+
+BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset({"hyperliquid"})
+"""CeFi live venues that are ALSO a batch source (operator R4 2026-06-07).
+
+``hyperliquid`` is the unified vendor: a CeFi/DeFi live+replay venue AND the DeFi
+``perp_funding``/``solana_defi`` BATCH source (REST candleSnapshot). It is the ONE
+:data:`CEFI_LIVE_VENUES` member that carries a ``batch_<venue>`` PipelineMode +
+``Mode.BATCH`` capability — every other CeFi venue is live/replay-only (CeFi batch
+= tardis). Exempts hyperliquid from the "CeFi venues are not batch-capable"
+invariant without weakening it for the rest."""
 """CeFi exchange venues that serve the `live`/`replay` capture modes (M2/M3).
 
 CeFi `batch` data comes from ``tardis`` (the T+1 multi-venue archive); CeFi
@@ -601,7 +620,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # source_emission_latency_calibration_2026_*<TBD>.md.
     "eia": 86_400_000,
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
-    "hyperliquid_rest": 1_000,  # 1s: HL REST API polling cadence
+    "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
@@ -933,6 +952,7 @@ def get_all_sources_with_priority(
 
 
 __all__ = [
+    "BATCH_CAPABLE_CEFI_VENUES",
     "CEFI_LIVE_VENUES",
     "COMPUTED_SOURCES",
     "EMISSION_LATENCY_MS_BY_SOURCE",

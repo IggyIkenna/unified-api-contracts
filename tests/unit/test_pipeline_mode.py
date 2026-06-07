@@ -18,12 +18,17 @@ import pytest
 
 from unified_api_contracts.canonical.crosscutting.pipeline_mode import (
     _SPORTS_ENTITY_TO_PIPELINE_MODE,
+    Mode,
     PipelineMode,
+    Transport,
+    _split_transport,
+    default_transport_for_source,
     is_batch,
     is_live,
     pipeline_mode_for_source,
     pipeline_mode_for_sports_entity,
     source_string_for,
+    transport_of,
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import SOURCE_PRIORITY
 
@@ -192,11 +197,80 @@ def test_batch_footystats_round_trip() -> None:
     assert source_string_for(PipelineMode.BATCH_FOOTYSTATS) == "footystats"
 
 
-def test_batch_hyperliquid_rest_round_trip() -> None:
-    """DEX-perp REST poll for cefi/funding_rate + defi/perp_funding venues."""
-    assert PipelineMode.BATCH_HYPERLIQUID_REST.value == "batch_hyperliquid_rest"
-    assert pipeline_mode_for_source("hyperliquid_rest") is PipelineMode.BATCH_HYPERLIQUID_REST
-    assert source_string_for(PipelineMode.BATCH_HYPERLIQUID_REST) == "hyperliquid_rest"
+def test_batch_hyperliquid_round_trip() -> None:
+    """DeFi perp_funding/solana_defi via Hyperliquid (vendor; REST transport is a
+    column, never glued to the source name — operator R4 2026-06-07)."""
+    assert PipelineMode.BATCH_HYPERLIQUID.value == "batch_hyperliquid"
+    assert pipeline_mode_for_source("hyperliquid") is PipelineMode.BATCH_HYPERLIQUID
+    assert source_string_for(PipelineMode.BATCH_HYPERLIQUID) == "hyperliquid"
+
+
+def test_no_hyperliquid_rest_member_remains() -> None:
+    """The transport-glued ``hyperliquid_rest`` antipattern is fully retired (R4):
+    no PipelineMode value contains it, in any mode."""
+    assert not any("hyperliquid_rest" in m.value for m in PipelineMode)
+
+
+# ---------------------------------------------------------------------------
+# C-TRANSPORT — transport axis (operator R4 2026-06-07): the [_{transport}] suffix
+# appears in the pipeline_mode KEY only for >1-transport sources (none today); the
+# transport COLUMN is always populated via default_transport_for_source.
+# ---------------------------------------------------------------------------
+
+
+def test_transport_enum_is_the_agreed_column_set() -> None:
+    assert {t.value for t in Transport} == {"rest", "websocket", "flat_file"}
+
+
+def test_transport_of_is_none_for_every_current_member() -> None:
+    """No source runs >1 transport per shard today → no member carries a suffix →
+    transport_of is None for all (the suffix-omitted-for-single-transport rule)."""
+    for member in PipelineMode:
+        assert transport_of(member) is None, f"{member.value} unexpectedly carries a transport suffix"
+
+
+def test_transport_of_parses_a_synthetic_multi_transport_suffix() -> None:
+    """When a >1-transport source DOES carry the suffix, source_string_for strips it
+    to the VENDOR and the transport is recoverable (the suffix-present case)."""
+    # _split_transport is the shared parser behind both source_string_for + transport_of.
+    assert _split_transport("tardis_websocket") == ("tardis", "websocket")
+    assert _split_transport("hyperliquid_rest") == ("hyperliquid", "rest")
+    assert _split_transport("databento_flat_file") == ("databento", "flat_file")
+    # A bare source (no transport token) → (source, None).
+    assert _split_transport("hyperliquid") == ("hyperliquid", None)
+    assert _split_transport("onchain_rpc") == ("onchain_rpc", None)
+
+
+def test_default_transport_for_source_follows_the_ratified_matrix() -> None:
+    """tardis batch = flat_file archive; every other batch source is REST-family."""
+    assert default_transport_for_source("tardis") == "flat_file"
+    assert default_transport_for_source("hyperliquid") == "rest"
+    assert default_transport_for_source("databento") == "rest"
+    assert default_transport_for_source("onchain_subgraph") == "rest"  # graphql→http→rest
+    assert default_transport_for_source("pyth_hermes") == "rest"  # sse/rest→rest
+    # Unknown source → safe REST default.
+    assert default_transport_for_source("totally_new_vendor") == "rest"
+
+
+def test_source_string_for_round_trips_with_transport_split() -> None:
+    """Vendor round-trips for batch/live/replay even though source names contain
+    underscores (onchain_rpc, polymarket_clob) — the split only strips a trailing
+    transport token, which no current source name is."""
+    assert source_string_for(PipelineMode.BATCH_HYPERLIQUID) == "hyperliquid"
+    assert source_string_for(PipelineMode.LIVE_HYPERLIQUID) == "hyperliquid"
+    assert source_string_for(PipelineMode.REPLAY_HYPERLIQUID) == "hyperliquid"
+    assert source_string_for(PipelineMode.BATCH_ONCHAIN_RPC) == "onchain_rpc"
+    assert source_string_for(PipelineMode.REPLAY_POLYMARKET_CLOB) == "polymarket_clob"
+
+
+def test_hyperliquid_round_trips_all_three_modes() -> None:
+    """The unified hyperliquid vendor round-trips batch + live + replay (one source,
+    three capture modes) — transport lives in the column, not the source."""
+    for mode in (Mode.BATCH, Mode.LIVE, Mode.REPLAY):
+        member = pipeline_mode_for_source("hyperliquid", mode)
+        assert member.value == f"{mode.value}_hyperliquid"
+        assert source_string_for(member) == "hyperliquid"
+        assert transport_of(member) is None
 
 
 def test_batch_pyth_hermes_round_trip() -> None:
@@ -219,7 +293,7 @@ def test_six_new_enum_members_present_in_pipeline_mode() -> None:
         PipelineMode.BATCH_YAHOO,
         PipelineMode.BATCH_BARCHART,
         PipelineMode.BATCH_FOOTYSTATS,
-        PipelineMode.BATCH_HYPERLIQUID_REST,
+        PipelineMode.BATCH_HYPERLIQUID,
         PipelineMode.BATCH_PYTH_HERMES,
         PipelineMode.BATCH_CHAINLINK,
     }
