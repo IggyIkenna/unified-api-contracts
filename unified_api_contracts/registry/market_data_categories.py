@@ -497,6 +497,176 @@ DERIBIT_MVP_INSTRUMENT_TYPE_DATA_TYPES: dict[str, list[str]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# G1-ENUM: Instrument-shape x data_type validity matrix
+# ---------------------------------------------------------------------------
+# Normalises catalogue ``instrument_type`` tokens (UPPERCASE shorthand used in
+# the catalogue / tests) to canonical lowercase keys before a matrix lookup.
+# An enum value that is already lowercase (e.g. "spot_pair") maps to itself.
+# ``valid_data_types_for_instrument_type`` is the single public accessor.
+# ---------------------------------------------------------------------------
+
+_INSTRUMENT_TYPE_ALIASES: dict[str, str] = {
+    # CeFi / TradFi shorthand tokens → canonical lowercase keys
+    "spot": "spot_pair",
+    "spot_pair": "spot_pair",
+    "perp": "perpetual",
+    "perpetual": "perpetual",
+    "option": "option",
+    "future": "future",
+    "combo": "combo",
+    "etf": "etf",
+    "equity": "equity",
+    "index": "index",
+    "bond": "bond",
+    "cds": "cds",
+    "event_contract": "event_contract",
+    "commodity": "commodity",
+    "currency": "currency",
+    # Bundle-grain types
+    "options_chain": "options_chain",
+    "futures_chain": "futures_chain",
+    # Sports catalogue tokens (SPORTS_LEAGUE_INSTRUMENT_TYPE = "league")
+    "fixture": "fixture",
+    "league": "league",
+    "exchange_odds": "exchange_odds",
+    "fixed_odds": "fixed_odds",
+    "prop": "prop",
+    # DeFi instrument_type values (from InstrumentType enum; already-lowercase
+    # after .strip().lower() → map to themselves)
+    "lending": "lending",
+    "dex": "dex",
+    "pool": "pool",
+    "dex_pool": "dex_pool",
+    "perps": "perps",
+    "staking": "staking",
+    "yield_bearing": "yield_bearing",
+    "spot_asset": "spot_asset",
+    "solana_lending": "solana_lending",
+    "solana_amm_pool": "solana_amm_pool",
+}
+
+
+# (asset_group_lower, canonical_instrument_type) → frozenset[data_type]
+# Rule: ONLY include data_types that appear in DATA_TYPES_BY_ASSET_GROUP for that AG.
+# frozenset() means the instrument type is a roll-up / bundle grain with NO
+# per-leaf rows → the enumerator skips it entirely (yields zero rows).
+# None (returned by the accessor) means "unmapped / unknown → fall back to ALL".
+VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]] = {
+    # ── CeFi ──────────────────────────────────────────────────────────────────
+    ("cefi", "spot_pair"): frozenset({"trades", "book_snapshot_5", "ohlcv_1m"}),
+    ("cefi", "perpetual"): frozenset({"trades", "book_snapshot_5", "derivative_ticker", "liquidations", "ohlcv_1m"}),
+    ("cefi", "future"): frozenset(  # UNCERTAIN — cefi-owner verify
+        {"trades", "book_snapshot_5", "derivative_ticker", "liquidations", "ohlcv_1m"}
+    ),
+    # Leaf options/combos → NO per-leaf rows; roll up to chain bundle grain
+    ("cefi", "option"): frozenset(),
+    ("cefi", "combo"): frozenset(),
+    # Bundle grain: one candidate per underlying
+    ("cefi", "options_chain"): frozenset({"options_chain"}),
+    ("cefi", "futures_chain"): frozenset({"futures_chain"}),
+    # ── TradFi ────────────────────────────────────────────────────────────────
+    ("tradfi", "etf"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
+    ("tradfi", "equity"): frozenset(
+        {
+            "trades",
+            "ohlcv_1m",
+            "ohlcv_15m",
+            "ohlcv_24h",
+            "tbbo",
+            "mbp_10",
+            "corporate_action_confirmed",
+            "earnings_result",
+        }
+    ),
+    ("tradfi", "index"): frozenset({"ohlcv_1m", "ohlcv_15m", "ohlcv_24h"}),
+    ("tradfi", "bond"): frozenset({"trades", "ohlcv_24h"}),  # UNCERTAIN — tradfi-owner verify
+    ("tradfi", "cds"): frozenset({"trades"}),  # UNCERTAIN — tradfi-owner verify
+    ("tradfi", "event_contract"): frozenset({"trades"}),  # UNCERTAIN — tradfi-owner verify
+    ("tradfi", "commodity"): frozenset(  # UNCERTAIN — tradfi-owner verify
+        {"trades", "ohlcv_1m", "ohlcv_24h", "tbbo", "mbp_10"}
+    ),
+    ("tradfi", "currency"): frozenset({"trades", "ohlcv_24h"}),  # UNCERTAIN — tradfi-owner verify
+    # ── Sports (league-grain — build_instrument_catalogue.py SPORTS_LEAGUE_INSTRUMENT_TYPE = "league") ──
+    # UNCERTAIN — sports-owner verify all rows below.
+    # Sports data_types used here are the reference-data provider types
+    # (SPORTS_DATA_TYPE_TO_SOURCE keys), NOT the MTDS odds market-data types.
+    ("sports", "league"): frozenset(
+        {
+            "odds",
+            "odds_snapshot",
+            "odds_movement",
+            "markets",
+            "outcomes",
+            "settlements",
+            "odds_horizon_bucket",
+            "arbitrage_opportunity",
+        }
+    ),  # UNCERTAIN — sports-owner verify; league is the canonical grain
+    ("sports", "fixture"): frozenset(
+        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
+    ),  # UNCERTAIN — sports-owner verify
+    ("sports", "exchange_odds"): frozenset(  # UNCERTAIN — sports-owner verify
+        {"odds", "odds_snapshot", "odds_movement", "trades"}
+    ),
+    ("sports", "fixed_odds"): frozenset(  # UNCERTAIN — sports-owner verify
+        {"odds", "odds_snapshot", "odds_movement", "markets", "outcomes", "settlements"}
+    ),
+    ("sports", "prop"): frozenset(  # UNCERTAIN — sports-owner verify
+        {"odds", "odds_snapshot", "odds_movement"}
+    ),
+    # ── Prediction ────────────────────────────────────────────────────────────
+    # Prediction uses per-row data_type grain binding (instr.data_type field).
+    # The matrix is NOT consulted for prediction (the accessor returns None for
+    # unmapped keys, and _row_data_types falls back to the instr.data_type path
+    # for prediction). Entries below are informational stubs only.
+}
+
+
+# Module-level cache for the lazily-built DeFi sub-dict.
+_DEFI_VALID_DATA_TYPES: dict[str, frozenset[str]] | None = None
+
+
+def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str) -> frozenset[str] | None:
+    """Return the valid data_types for ``(asset_group, instrument_type)``.
+
+    Normalises ``instrument_type`` via ``_INSTRUMENT_TYPE_ALIASES`` (strip +
+    lower, then alias; unknown → the stripped-lower form) so both catalogue
+    UPPERCASE tokens (SPOT, PERP) and canonical lowercase keys (spot_pair,
+    perpetual) resolve correctly.
+
+    Returns:
+        frozenset[str]  — the valid data_types (may be empty → skip all rows).
+        None            — unmapped entry → caller should fall back to ALL
+                          data_types and log a warning.
+
+    DeFi derivation: lazily built from ``PROTOCOL_CAPABILITIES`` (imported
+    inside the function to avoid import cycles); maps each
+    ``cap.instrument_type`` → union of ``cap.data_types`` across all protocols
+    that use that instrument type.  Cache is module-level.
+    """
+    global _DEFI_VALID_DATA_TYPES
+
+    # Normalise instrument_type token.
+    normalised = instrument_type.strip().lower() if instrument_type else ""
+    normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
+
+    if asset_group.lower() == "defi":
+        if _DEFI_VALID_DATA_TYPES is None:
+            from .capability_declarations._defi import PROTOCOL_CAPABILITIES  # noqa: imports-inside-functions
+
+            defi: dict[str, set[str]] = {}
+            for cap in PROTOCOL_CAPABILITIES.values():
+                for it in cap.instrument_types:
+                    it_key = it.strip().lower()
+                    it_key = _INSTRUMENT_TYPE_ALIASES.get(it_key, it_key)
+                    defi.setdefault(it_key, set()).update(cap.data_types)
+            _DEFI_VALID_DATA_TYPES = {k: frozenset(v) for k, v in defi.items()}
+        return _DEFI_VALID_DATA_TYPES.get(normalised)  # None if unmapped
+
+    return VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised))
+
+
 # Override entries needed when:
 # - A venue's data type started later than the venue itself (e.g. Deribit options added later)
 # - A venue only supports a subset of its category's data types (e.g. CBOE has ohlcv_15m only)
