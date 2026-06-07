@@ -159,6 +159,8 @@ from .canonical.crosscutting.pipeline_mode import (
     Cadence,
     Mode,
     PipelineMode,
+    Transport,
+    default_transport_for_source,
     is_batch,
     is_live,
     is_replay,
@@ -166,6 +168,7 @@ from .canonical.crosscutting.pipeline_mode import (
     pipeline_mode_for_source,
     pipeline_mode_for_sports_entity,
     source_string_for,
+    transport_of,
 )
 from .canonical.crosscutting.scenario_overlay import (
     SCENARIO_REGISTRY,
@@ -198,6 +201,7 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    BATCH_CAPABLE_CEFI_VENUES,
     CEFI_LIVE_VENUES,
     MOCK_SOURCE,
     SOURCE_MODE_CAPABILITY,
@@ -1699,7 +1703,11 @@ __all__ = [
     "select_primary_available_source",
     "Mode",
     "Cadence",
+    "Transport",
+    "transport_of",
+    "default_transport_for_source",
     "mode_of",
+    "BATCH_CAPABLE_CEFI_VENUES",
     "CEFI_LIVE_VENUES",
     "MOCK_SOURCE",
     "SOURCE_MODE_CAPABILITY",

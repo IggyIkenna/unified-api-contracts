@@ -85,7 +85,13 @@ class PipelineMode(StrEnum):
     BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
-    BATCH_HYPERLIQUID_REST = "batch_hyperliquid_rest"
+    # hyperliquid is a UNIFIED vendor (operator R4 2026-06-07): the former
+    # ``hyperliquid_rest`` source glued the REST transport into the source name (the
+    # M1 antipattern). source=``hyperliquid``, transport=``rest`` (a column, not the
+    # name). It is BOTH a DeFi batch source (perp_funding/solana_defi via REST
+    # candleSnapshot) AND a CeFi/DeFi live+replay venue — so it carries BATCH here
+    # plus LIVE_HYPERLIQUID / REPLAY_HYPERLIQUID (in the CeFi-venue block below).
+    BATCH_HYPERLIQUID = "batch_hyperliquid"
     BATCH_MASSIVE = "batch_massive"
     BATCH_MDPS_ODDS_HORIZON_BUCKET = "batch_mdps_odds_horizon_bucket"
     BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"
@@ -119,8 +125,10 @@ class PipelineMode(StrEnum):
     REPLAY_MASSIVE = "replay_massive"
     LIVE_PYTH_HERMES = "live_pyth_hermes"
     REPLAY_PYTH_HERMES = "replay_pyth_hermes"
-    LIVE_HYPERLIQUID_REST = "live_hyperliquid_rest"
-    REPLAY_HYPERLIQUID_REST = "replay_hyperliquid_rest"
+    # hyperliquid live/replay members live in the CeFi-venue block below — the same
+    # unified ``hyperliquid`` vendor serves DeFi batch AND CeFi/DeFi live+replay
+    # (transport differs by mode: batch=rest candleSnapshot, live=ws — a column,
+    # never the source name). No ``*_HYPERLIQUID_REST`` members (operator R4).
     LIVE_SOLANA_RPC = "live_solana_rpc"
     REPLAY_SOLANA_RPC = "replay_solana_rpc"
     LIVE_HELIUS_RPC = "live_helius_rpc"
@@ -201,6 +209,49 @@ class Mode(StrEnum):
     REPLAY = "replay"
 
 
+class Transport(StrEnum):
+    """The wire transport a source used to serve a shard — the M1 ``[_{transport}]``
+    segment, a SEPARATE axis from ``source`` (the vendor).
+
+    Operator R4 (2026-06-07): ``source`` is the VENDOR ONLY and transport is NEVER
+    glued into it (the retired ``hyperliquid_rest`` source was that antipattern —
+    now ``source=hyperliquid`` + ``transport=rest``). Two rules:
+
+    * The ``[_{transport}]`` SUFFIX appears in the ``pipeline_mode`` PATH KEY *only*
+      where a source genuinely runs >1 transport for the SAME shard (else OMITTED —
+      no noise). No source does today, so no member carries a suffix yet.
+    * A separate ``transport`` COLUMN is ALWAYS populated on every manifest row,
+      regardless of whether the suffix is in the key (via
+      :func:`default_transport_for_source` unless the writer is passed an explicit
+      value). ``rpc`` / ``graphql`` / ``sse`` all resolve over HTTP → ``rest`` for
+      the column; ``tardis`` T+1 archives are ``flat_file``.
+    """
+
+    REST = "rest"
+    WEBSOCKET = "websocket"
+    FLAT_FILE = "flat_file"
+
+
+# Sources whose PRIMARY (batch/archive) transport is a flat-file download rather
+# than a REST/HTTP call (ratified ``source_mode_capability_matrix_2026_06_07.md``).
+# Tardis ships T+1 archives as flat files; every other batch source is REST-family.
+_FLAT_FILE_SOURCES: Final[frozenset[str]] = frozenset({"tardis"})
+
+
+def _split_transport(remainder: str) -> tuple[str, str | None]:
+    """Split a ``{source}[_{transport}]`` remainder into ``(source, transport|None)``.
+
+    ``transport`` is the trailing ``_rest`` / ``_websocket`` / ``_flat_file`` token
+    when present (the M1 >1-transport suffix), else ``None``. No registered source
+    name ends in a transport token, so the split is unambiguous.
+    """
+    for transport in Transport:
+        suffix = f"_{transport.value}"
+        if remainder.endswith(suffix) and len(remainder) > len(suffix):
+            return remainder[: -len(suffix)], transport.value
+    return remainder, None
+
+
 def is_batch(mode: PipelineMode) -> bool:
     """True if ``mode`` is a batch-source value."""
 
@@ -234,12 +285,54 @@ def source_string_for(mode: PipelineMode) -> str | None:
     if mode is PipelineMode.LIVE_WEBSOCKET:
         return None
     if is_batch(mode):
-        return mode.value.removeprefix(_BATCH_PREFIX)
-    if is_replay(mode):
-        return mode.value.removeprefix(_REPLAY_PREFIX)
-    if is_live(mode):
-        return mode.value.removeprefix(_LIVE_PREFIX)
+        remainder = mode.value.removeprefix(_BATCH_PREFIX)
+    elif is_replay(mode):
+        remainder = mode.value.removeprefix(_REPLAY_PREFIX)
+    elif is_live(mode):
+        remainder = mode.value.removeprefix(_LIVE_PREFIX)
+    else:
+        return None
+    # Strip any trailing transport suffix so ``source`` round-trips to the VENDOR
+    # only (operator R4). No member carries a suffix today, so this is a no-op now;
+    # it keeps the round-trip correct once a >1-transport source adds one.
+    source, _transport = _split_transport(remainder)
+    return source
+
+
+def transport_of(mode: PipelineMode) -> str | None:
+    """Return the explicit transport SUFFIX in ``mode``'s value, or ``None``.
+
+    Per the ratified transport rule (operator R4 2026-06-07) the ``[_{transport}]``
+    suffix appears in a ``pipeline_mode`` value ONLY where a source genuinely runs
+    >1 transport for the SAME shard — no source does today, so this returns ``None``
+    for every current member. The manifest ``transport`` COLUMN is populated
+    regardless, via :func:`default_transport_for_source` (or an explicit writer
+    value). ``None`` for :attr:`PipelineMode.LIVE_WEBSOCKET` (transitional alias —
+    no concrete source/transport).
+    """
+    if mode is PipelineMode.LIVE_WEBSOCKET:
+        return None
+    for prefix in (_BATCH_PREFIX, _LIVE_PREFIX, _REPLAY_PREFIX):
+        if mode.value.startswith(prefix):
+            _source, transport = _split_transport(mode.value.removeprefix(prefix))
+            return transport
     return None
+
+
+def default_transport_for_source(source: str) -> str:
+    """Return the PRIMARY (batch/archive) :class:`Transport` value for ``source``.
+
+    The value the manifest writer stamps in the ``transport`` column when no explicit
+    transport is supplied and the ``pipeline_mode`` carries no transport suffix (the
+    common case — see :func:`transport_of`). Ratified matrix
+    ``source_mode_capability_matrix_2026_06_07.md``: ``tardis`` batch is a flat-file
+    archive; every other batch source is REST-family (``rpc`` / ``graphql`` / ``sse``
+    resolve over HTTP). Live-websocket transport for the gated ``live_<source>``
+    tranche is stamped explicitly by live writers, not defaulted here.
+    """
+    if source in _FLAT_FILE_SOURCES:
+        return Transport.FLAT_FILE.value
+    return Transport.REST.value
 
 
 def pipeline_mode_for_source(source: str, mode: Mode = Mode.BATCH) -> PipelineMode:
@@ -358,6 +451,8 @@ __all__ = [
     "Cadence",
     "Mode",
     "PipelineMode",
+    "Transport",
+    "default_transport_for_source",
     "is_batch",
     "is_live",
     "is_replay",
@@ -365,4 +460,5 @@ __all__ = [
     "pipeline_mode_for_source",
     "pipeline_mode_for_sports_entity",
     "source_string_for",
+    "transport_of",
 ]
