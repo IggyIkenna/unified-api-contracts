@@ -71,12 +71,25 @@ class TestValidDataTypesByAgAndInstrumentType:
         assert result == frozenset()
 
     def test_cefi_options_chain_bundle(self) -> None:
+        # ERA-B: options_chain is an INSTRUMENT_TYPE; its market data_type is trades.
         result = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("cefi", "options_chain")]
-        assert result == frozenset({"options_chain"})
+        assert result == frozenset({"trades"})
 
     def test_cefi_futures_chain_bundle(self) -> None:
+        # ERA-B: futures_chain is an INSTRUMENT_TYPE; its market data_type is trades.
         result = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("cefi", "futures_chain")]
-        assert result == frozenset({"futures_chain"})
+        assert result == frozenset({"trades"})
+
+    def test_tradfi_option_combo_leaf_empty(self) -> None:
+        # ERA-B generalisation: tradfi option/combo leaves carry zero per-contract
+        # rows (was None → over-fanned ~563K false candidates pre-G1-ENUM).
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "option")] == frozenset()
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "combo")] == frozenset()
+
+    def test_tradfi_options_futures_chain_bundle_trades(self) -> None:
+        # ERA-B: tradfi options_chain/futures_chain are instrument_types → trades.
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "options_chain")] == frozenset({"trades"})
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "futures_chain")] == frozenset({"trades"})
 
     def test_tradfi_equity_has_earnings_result(self) -> None:
         result = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "equity")]
@@ -144,8 +157,9 @@ class TestValidDataTypesForInstrumentTypeAccessor:
         assert result == frozenset()
 
     def test_cefi_options_chain_returns_bundle(self) -> None:
+        # ERA-B: the options_chain instrument_type's market data_type is trades.
         result = valid_data_types_for_instrument_type("cefi", "options_chain")
-        assert result == frozenset({"options_chain"})
+        assert result == frozenset({"trades"})
 
     def test_tradfi_etf_uppercase(self) -> None:
         result = valid_data_types_for_instrument_type("tradfi", "ETF")
@@ -269,29 +283,31 @@ class TestInstrumentGrainAxis:
 
 
 from unified_api_contracts.registry.market_data_categories import (
-    bundle_data_type_for_instrument_type,
+    bundle_instrument_type_for_leaf,
 )
 
 
-class TestBundleDataTypeForInstrumentType:
-    """bundle_data_type_for_instrument_type() — which bundle data_type a LEAF
-    option/combo rolls up into (G1-ENUM rollup driver)."""
+class TestBundleInstrumentTypeForLeaf:
+    """bundle_instrument_type_for_leaf() — which bundle INSTRUMENT_TYPE a LEAF
+    option/combo rolls up into (ERA-B G1-ENUM rollup driver). The returned value
+    is the bundle instrument_type (options_chain); the rolled-up candidate's
+    data_type is then trades (resolved via the validity matrix)."""
 
     def test_cefi_option_rolls_to_options_chain(self) -> None:
-        assert bundle_data_type_for_instrument_type("cefi", "OPTION") == "options_chain"
+        assert bundle_instrument_type_for_leaf("cefi", "OPTION") == "options_chain"
 
     def test_cefi_combo_rolls_to_options_chain(self) -> None:
-        assert bundle_data_type_for_instrument_type("cefi", "combo") == "options_chain"
+        assert bundle_instrument_type_for_leaf("cefi", "combo") == "options_chain"
 
     def test_tradfi_option_rolls_to_options_chain(self) -> None:
-        assert bundle_data_type_for_instrument_type("tradfi", "OPTION") == "options_chain"
+        assert bundle_instrument_type_for_leaf("tradfi", "OPTION") == "options_chain"
 
     def test_bundle_type_itself_returns_none(self) -> None:
         # options_chain / futures_chain ARE the per-underlying bundle entry — they
         # do not roll up further (pass through the enumerator unchanged).
-        assert bundle_data_type_for_instrument_type("cefi", "options_chain") is None
-        assert bundle_data_type_for_instrument_type("cefi", "futures_chain") is None
+        assert bundle_instrument_type_for_leaf("cefi", "options_chain") is None
+        assert bundle_instrument_type_for_leaf("cefi", "futures_chain") is None
 
     def test_leaf_non_bundle_returns_none(self) -> None:
-        assert bundle_data_type_for_instrument_type("cefi", "SPOT") is None
-        assert bundle_data_type_for_instrument_type("cefi", "PERP") is None
+        assert bundle_instrument_type_for_leaf("cefi", "SPOT") is None
+        assert bundle_instrument_type_for_leaf("cefi", "PERP") is None

@@ -144,7 +144,9 @@ def test_validate_row_df_venue_scoped_required_column_absent_for_other_venue() -
     contract = SchemaContract(
         asset_group="cefi",
         instrument_type="options_chain",
-        data_type="options_chain",
+        # ERA-B: the options_chain instrument_type is captured as data_type=trades
+        # (matches CEFI_OPTIONS_CHAIN_TRADES; symbol_column=underlying).
+        data_type="trades",
         columns=[
             ColumnSpec(name="instrument_id", dtype="string", nullable=False),
             ColumnSpec(name="underlying", dtype="string", nullable=False),

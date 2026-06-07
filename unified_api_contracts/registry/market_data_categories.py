@@ -562,10 +562,24 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # Leaf options/combos → NO per-leaf rows; roll up to chain bundle grain
     ("cefi", "option"): frozenset(),
     ("cefi", "combo"): frozenset(),
-    # Bundle grain: one candidate per underlying
-    ("cefi", "options_chain"): frozenset({"options_chain"}),
-    ("cefi", "futures_chain"): frozenset({"futures_chain"}),
+    # Bundle grain (ERA-B, operator 2026-06-07): options_chain / futures_chain
+    # are INSTRUMENT_TYPES (one bundle per underlying), whose market data_type is
+    # ``trades`` — matching the live writer (tardis_shared.py Phase 1.6, which
+    # banned the data_type/instrument_type overload) + the on-disk object paths
+    # (data_type=trades) + the CEFI_OPTIONS_CHAIN_TRADES schema (symbol=underlying).
+    # They are NO LONGER data_types here (the legacy data_type=options_chain rows
+    # are relabeled to trades by the per-AG v8→v9 migrators, OUT OF SCOPE here).
+    ("cefi", "options_chain"): frozenset({"trades"}),
+    ("cefi", "futures_chain"): frozenset({"trades"}),
     # ── TradFi ────────────────────────────────────────────────────────────────
+    # TradFi options/combos roll up the same way (Era-B, generalised — NOT
+    # special-cased). Leaf option/combo → frozenset() (zero per-contract rows;
+    # the pre-G1-ENUM None fallback over-fanned ~563K false candidates); the
+    # per-underlying options_chain/futures_chain bundle → trades.
+    ("tradfi", "option"): frozenset(),
+    ("tradfi", "combo"): frozenset(),
+    ("tradfi", "options_chain"): frozenset({"trades"}),
+    ("tradfi", "futures_chain"): frozenset({"trades"}),
     ("tradfi", "etf"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
     ("tradfi", "equity"): frozenset(
         {
@@ -620,14 +634,17 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 # CHAIN BUNDLE (options_chain / futures_chain — one candidate per underlying,
 # carried by the per-underlying bundle catalogue entry).
 #
-# How the two halves compose for an options/futures chain venue (e.g. DERIBIT):
+# How the two halves compose for an options/futures chain venue (e.g. DERIBIT),
+# ERA-B (operator 2026-06-07):
 #   * Leaf OPTION / COMBO entries  → ``frozenset()`` in the validity matrix →
 #     ZERO per-contract candidates (they roll up into the bundle).
-#   * The per-underlying ``options_chain`` / ``futures_chain`` catalogue entry →
-#     ``{options_chain}`` / ``{futures_chain}`` → exactly ONE bundle candidate.
-# Net: one candidate per underlying, never one per leaf contract (the
-# slot-3/slot-6 2026-06-07 over-fan: 72K OPTION + 17K COMBO leaves were each
-# fanned per-contract by the pre-G1-ENUM producer).
+#   * The per-underlying ``options_chain`` / ``futures_chain`` bundle INSTRUMENT
+#     entry → ``{trades}`` in the validity matrix → exactly ONE bundle candidate
+#     with data_type=trades (NOT data_type=options_chain — the chain name is the
+#     instrument_type, the market data_type is trades).
+# Net: one candidate per underlying with data_type=trades, never one per leaf
+# contract (the slot-3/slot-6 2026-06-07 over-fan: 72K OPTION + 17K COMBO leaves
+# were each fanned per-contract by the pre-G1-ENUM producer).
 #
 # GRAIN_BUNDLE_BY_UNDERLYING is the declarative SSOT a consumer can query without
 # re-deriving the rule from the validity matrix's empty-set sentinel. Default is
@@ -655,13 +672,19 @@ INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
     ("tradfi", "futures_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
 }
 
-# Which bundle DATA_TYPE a per-contract LEAF instrument_type rolls UP into. Only
-# the LEAF types are keyed here — the bundle TYPES themselves (options_chain /
-# futures_chain) are NOT (they ARE the per-underlying bundle entry and pass
-# through). The enumerator collapses every leaf contract of an underlying into
-# ONE candidate of this data_type, keyed by the underlying. None ⇒ not a
-# roll-up leaf (the default).
-BUNDLE_DATA_TYPE_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
+# Which bundle INSTRUMENT_TYPE a per-contract LEAF instrument_type rolls UP into
+# (ERA-B). Only the LEAF types are keyed here — the bundle TYPES themselves
+# (options_chain / futures_chain) are NOT (they ARE the per-underlying bundle
+# entry and pass through). The enumerator collapses every leaf contract of an
+# underlying into ONE synthetic catalogue entry of this INSTRUMENT_TYPE, keyed by
+# the underlying; that bundle entry's data_type is then resolved from the
+# validity matrix (options_chain/futures_chain → ``trades``), so the emitted
+# candidate carries data_type=trades, NOT data_type=options_chain. None ⇒ not a
+# roll-up leaf (the default). ``future`` is intentionally absent — FUTURE bundling
+# is venue-specific (DERIBIT/OKX bundle, BYBIT per-contract; F2), so a future leaf
+# stays per-contract and only a per-underlying futures_chain catalogue entry (if
+# present) passes through.
+BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF: dict[tuple[str, str], str] = {
     ("cefi", "option"): "options_chain",
     ("cefi", "combo"): "options_chain",
     ("tradfi", "option"): "options_chain",
@@ -686,18 +709,22 @@ def grain_for_instrument_type(asset_group: str, instrument_type: str) -> str:
     return INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised), GRAIN_LEAF)
 
 
-def bundle_data_type_for_instrument_type(asset_group: str, instrument_type: str) -> str | None:
-    """Return the bundle data_type a LEAF instrument_type rolls up into, or None.
+def bundle_instrument_type_for_leaf(asset_group: str, instrument_type: str) -> str | None:
+    """Return the bundle INSTRUMENT_TYPE a LEAF instrument_type rolls up into (ERA-B).
 
     ``("cefi"|"tradfi", "option"|"combo")`` → ``"options_chain"`` (the per-contract
-    leaves collapse into ONE per-underlying options_chain candidate). The bundle
-    TYPES themselves (``options_chain`` / ``futures_chain``) return None — they
-    are already the per-underlying bundle entry and are enumerated as-is. Used by
-    the ``enumerate_expected_universe`` bundle-grain roll-up.
+    leaves collapse into ONE per-underlying ``options_chain`` bundle entry). The
+    bundle TYPES themselves (``options_chain`` / ``futures_chain``) return None —
+    they are already the per-underlying bundle entry and are enumerated as-is. The
+    returned value is the bundle's INSTRUMENT_TYPE; its data_type is resolved
+    separately via :func:`valid_data_types_for_instrument_type` (→ ``trades``), so
+    the rolled-up candidate carries data_type=trades (Era-B), never
+    data_type=options_chain. Used by the ``enumerate_expected_universe``
+    bundle-grain roll-up.
     """
     normalised = instrument_type.strip().lower() if instrument_type else ""
     normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
-    return BUNDLE_DATA_TYPE_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised))
+    return BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF.get((asset_group.lower(), normalised))
 
 
 # Module-level cache for the lazily-built DeFi sub-dict.

@@ -155,6 +155,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("cefi", "ohlcv_15m"): ["tardis"],
     ("cefi", "book_snapshot"): ["tardis"],
     ("cefi", "liquidations"): ["tardis"],
+    # ERA-B (operator 2026-06-07): options_chain / futures_chain are
+    # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
+    # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
+    # primary, tardis). These data_type-keyed entries are RETAINED only for (a) the
+    # legacy data_type=options_chain rows pending the per-AG v8→v9 relabel
+    # (OUT OF SCOPE here) and (b) the bidirectional SOURCE_PRIORITY ↔
+    # AVAILABILITY_AT_SEMANTICS closed-set round-trip; drop them once the per-AG
+    # migrators relabel the legacy rows to trades.
     ("cefi", "options_chain"): ["tardis"],
     ("cefi", "futures_chain"): ["tardis"],
     ("cefi", "perpetual"): ["tardis"],
@@ -258,6 +266,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # per tradfi_massive_dual_source_2026_05_28.md Phase 1 operator decision. CFE (VX/VIX futures) is NOT
     # covered by Massive — existing yahoo+barchart layering handles those via MTDS routing.
     ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
+    # ERA-B: options_chain / futures_chain are instrument_types captured as
+    # data_type=trades → Era-B source resolves via ``(tradfi, "trades")`` above
+    # (databento, massive). Legacy-data_type keys retained for the pre-migration
+    # rows + the closed-set round-trip (see the cefi note above).
     ("tradfi", "options_chain"): ["databento", "massive"],
     ("tradfi", "futures_chain"): ["databento", "massive"],
     # commodity_signal — emitted by features-service commodity family from
