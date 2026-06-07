@@ -612,6 +612,62 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 }
 
 
+# ── G1-ENUM bundle-grain axis ────────────────────────────────────────────────
+# Per-(asset_group, instrument_type) capture GRAIN — the second half of the
+# G1-ENUM shape-aware producer (validity FILTER above + GRAIN here). It tells the
+# enumerator WHETHER an instrument is captured at per-instrument LEAF grain (one
+# could-exist candidate per instrument_id) or rolled UP into a per-underlying
+# CHAIN BUNDLE (options_chain / futures_chain — one candidate per underlying,
+# carried by the per-underlying bundle catalogue entry).
+#
+# How the two halves compose for an options/futures chain venue (e.g. DERIBIT):
+#   * Leaf OPTION / COMBO entries  → ``frozenset()`` in the validity matrix →
+#     ZERO per-contract candidates (they roll up into the bundle).
+#   * The per-underlying ``options_chain`` / ``futures_chain`` catalogue entry →
+#     ``{options_chain}`` / ``{futures_chain}`` → exactly ONE bundle candidate.
+# Net: one candidate per underlying, never one per leaf contract (the
+# slot-3/slot-6 2026-06-07 over-fan: 72K OPTION + 17K COMBO leaves were each
+# fanned per-contract by the pre-G1-ENUM producer).
+#
+# GRAIN_BUNDLE_BY_UNDERLYING is the declarative SSOT a consumer can query without
+# re-deriving the rule from the validity matrix's empty-set sentinel. Default is
+# LEAF for any unmapped (asset_group, instrument_type).
+#
+# NOTE — venue-specific FUTURE bundling is NOT expressible here (the matrix is
+# venue-agnostic): DERIBIT/OKX capture FUTURE at ``futures_chain`` bundle grain
+# while BYBIT captures per-contract ``future`` (F2, slot-3 2026-06-07). That
+# rollup is a venue-aware catalogue-rollup concern tracked as a gated todo —
+# ``VENUE_DATA_TYPE_CAPABILITIES`` is NOT a sound discriminator (BYBIT lists
+# ``futures_chain`` yet captures per-contract).
+GRAIN_LEAF = "leaf"
+GRAIN_BUNDLE_BY_UNDERLYING = "bundle_by_underlying"
+
+INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
+    # CeFi options/futures chains — captured per-underlying (Deribit etc.).
+    ("cefi", "option"): GRAIN_BUNDLE_BY_UNDERLYING,
+    ("cefi", "combo"): GRAIN_BUNDLE_BY_UNDERLYING,
+    ("cefi", "options_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
+    ("cefi", "futures_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
+}
+
+
+def grain_for_instrument_type(asset_group: str, instrument_type: str) -> str:
+    """Return the capture GRAIN for ``(asset_group, instrument_type)``.
+
+    ``GRAIN_BUNDLE_BY_UNDERLYING`` — captured as a per-underlying chain bundle
+    (options_chain / futures_chain); the enumerator emits ONE candidate per
+    underlying, never one per leaf option/combo contract.
+    ``GRAIN_LEAF`` (default) — one candidate per instrument_id.
+
+    Normalises ``instrument_type`` via the same alias map as
+    :func:`valid_data_types_for_instrument_type` so catalogue UPPERCASE tokens
+    (OPTION, COMBO) and canonical lowercase keys resolve identically.
+    """
+    normalised = instrument_type.strip().lower() if instrument_type else ""
+    normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
+    return INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised), GRAIN_LEAF)
+
+
 # Module-level cache for the lazily-built DeFi sub-dict.
 _DEFI_VALID_DATA_TYPES: dict[str, frozenset[str]] | None = None
 
