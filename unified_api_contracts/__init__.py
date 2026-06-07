@@ -198,6 +198,7 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    CEFI_LIVE_VENUES,
     MOCK_SOURCE,
     SOURCE_MODE_CAPABILITY,
     default_source,
@@ -1699,6 +1700,7 @@ __all__ = [
     "Mode",
     "Cadence",
     "mode_of",
+    "CEFI_LIVE_VENUES",
     "MOCK_SOURCE",
     "SOURCE_MODE_CAPABILITY",
     "modes_for_source",

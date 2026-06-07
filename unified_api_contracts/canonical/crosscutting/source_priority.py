@@ -434,7 +434,35 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "strategy_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "features_onchain_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "cross_instrument": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # ---- CeFi per-venue live/replay sources ----
+    # CeFi `live`/`replay` `source` = the EXCHANGE (CeFi `batch` source = tardis).
+    # The SAME shard carries source=tardis in batch and source=<venue> in live/replay.
+    # These venue sources are NOT batch-capable (Tardis is the CeFi archive) — they
+    # have NO batch_<venue> PipelineMode. Replay-fact table (matrix 2026-06-07):
+    # binance/okx/deribit/kraken/hyperliquid re-fetch a same-day window via REST
+    # (replay ✓); Bybit (public REST recent-only) + Aster (newer venue, unverified)
+    # are LIVE-only — a live-downtime gap waits for batch (T+1), replay ABSENT.
+    "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "hyperliquid": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "bybit": frozenset({Mode.LIVE}),
+    "aster": frozenset({Mode.LIVE}),
 }
+
+CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
+    {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster"}
+)
+"""CeFi exchange venues that serve the `live`/`replay` capture modes (M2/M3).
+
+CeFi `batch` data comes from ``tardis`` (the T+1 multi-venue archive); CeFi
+`live`/`replay` data comes from the exchange itself, so the ``source`` for a CeFi
+shard is mode-dependent: ``tardis`` in batch, the venue here in live/replay. These
+venues are NOT in :data:`SOURCE_PRIORITY` (the batch-priority registry) and are NOT
+batch-capable — they carry only ``live_<venue>`` / ``replay_<venue>`` PipelineMode
+members. The mode-contextual reader that picks the venue source per (shard, mode)
+is the M3/M4 next tranche."""
 
 
 def modes_for_source(source: str) -> frozenset[Mode]:
@@ -905,6 +933,7 @@ def get_all_sources_with_priority(
 
 
 __all__ = [
+    "CEFI_LIVE_VENUES",
     "COMPUTED_SOURCES",
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",

@@ -9,6 +9,8 @@ without breaking CI. SSOT plan:
 
 from __future__ import annotations
 
+import pytest
+
 from unified_api_contracts import (
     SOURCE_MODE_CAPABILITY,
     Cadence,
@@ -24,6 +26,7 @@ from unified_api_contracts import (
     sources_supporting,
 )
 from unified_api_contracts.canonical.crosscutting.source_priority import (
+    CEFI_LIVE_VENUES,
     COMPUTED_SOURCES,
     SOURCE_PRIORITY,
 )
@@ -72,6 +75,14 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "strategy_service": _BLR,
     "features_onchain_service": _BLR,
     "cross_instrument": _BLR,
+    # CeFi per-venue live/replay sources (NOT batch — Tardis is the CeFi archive)
+    "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "hyperliquid": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "bybit": frozenset({Mode.LIVE}),
+    "aster": frozenset({Mode.LIVE}),
 }
 
 
@@ -93,16 +104,26 @@ def test_every_external_source_has_a_capability_entry() -> None:
     assert not missing, f"sources missing a capability entry: {sorted(missing)}"
 
 
-def test_every_capability_source_is_batch_capable() -> None:
-    """BATCH is the certain, round-trip-derivable floor — every source has it."""
+def test_every_non_venue_capability_source_is_batch_capable() -> None:
+    """BATCH is the round-trip-derivable floor for every ARCHIVE source. CeFi venue
+    sources are the exception — they serve only live/replay (CeFi batch = tardis)."""
     for src, modes in SOURCE_MODE_CAPABILITY.items():
+        if src in CEFI_LIVE_VENUES:
+            continue
         assert Mode.BATCH in modes, f"{src} must be batch-capable"
+
+
+def test_cefi_venues_are_not_batch_capable() -> None:
+    """CeFi venue sources serve live/replay only — Tardis is the CeFi batch source."""
+    for venue in CEFI_LIVE_VENUES:
+        assert venue in SOURCE_MODE_CAPABILITY, f"{venue} must have a capability entry"
+        assert not source_supports(venue, Mode.BATCH), f"{venue} must NOT be batch (batch = tardis)"
 
 
 def test_capability_keys_are_real_sources() -> None:
     """No typo'd / phantom source in the registry — every key is an external
-    SOURCE_PRIORITY source OR an internal computed/service emitter."""
-    stray = set(SOURCE_MODE_CAPABILITY) - _all_external_sources() - set(COMPUTED_SOURCES)
+    SOURCE_PRIORITY source, an internal computed/service emitter, or a CeFi venue."""
+    stray = set(SOURCE_MODE_CAPABILITY) - _all_external_sources() - set(COMPUTED_SOURCES) - set(CEFI_LIVE_VENUES)
     assert not stray, f"capability registry has unrecognised sources: {sorted(stray)}"
 
 
@@ -278,8 +299,6 @@ def test_pipeline_mode_for_source_defaults_to_batch() -> None:
 
 def test_pipeline_mode_for_source_raises_for_unsupported_mode() -> None:
     """A source that does not support a mode has no member → ValueError."""
-    import pytest
-
     with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
         _ = pipeline_mode_for_source("tardis", Mode.LIVE)  # tardis is batch-only
     with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
@@ -290,3 +309,43 @@ def test_live_websocket_source_string_is_none() -> None:
     """The transitional alias has no concrete source."""
     assert source_string_for(PipelineMode.LIVE_WEBSOCKET) is None
     assert is_live(PipelineMode.LIVE_WEBSOCKET)
+
+
+# ---------------------------------------------------------------------------
+# M2/M3 — CeFi per-venue live/replay sources
+# ---------------------------------------------------------------------------
+
+
+def test_cefi_replay_venues_are_live_and_replay() -> None:
+    """binance/okx/deribit/kraken/hyperliquid re-fetch a same-day window via REST."""
+    for venue in ("binance", "okx", "deribit", "kraken", "hyperliquid"):
+        assert modes_for_source(venue) == frozenset({Mode.LIVE, Mode.REPLAY})
+        assert pipeline_mode_for_source(venue, Mode.LIVE).value == f"live_{venue}"
+        assert pipeline_mode_for_source(venue, Mode.REPLAY).value == f"replay_{venue}"
+
+
+def test_bybit_and_aster_are_live_only_replay_absent() -> None:
+    """(b) Bybit (public REST recent-only) + Aster (newer venue) are LIVE-only —
+    replay ABSENT (a fact: their live-downtime gaps wait for batch T+1), so no
+    REPLAY_<venue> member exists for them."""
+    for venue in ("bybit", "aster"):
+        assert modes_for_source(venue) == frozenset({Mode.LIVE})
+        assert source_supports(venue, Mode.LIVE)
+        assert not source_supports(venue, Mode.REPLAY)
+        with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
+            _ = pipeline_mode_for_source(venue, Mode.REPLAY)
+
+
+def test_cefi_venues_have_no_batch_member() -> None:
+    """No ``batch_<venue>`` member — the venue is not a batch/archive source."""
+    for venue in CEFI_LIVE_VENUES:
+        with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
+            _ = pipeline_mode_for_source(venue, Mode.BATCH)
+
+
+def test_cefi_venue_pipeline_modes_round_trip() -> None:
+    """source_string_for(live_<venue>) → venue, for every CeFi venue."""
+    assert source_string_for(PipelineMode.LIVE_BINANCE) == "binance"
+    assert source_string_for(PipelineMode.REPLAY_HYPERLIQUID) == "hyperliquid"
+    assert source_string_for(PipelineMode.LIVE_BYBIT) == "bybit"
+    assert source_string_for(PipelineMode.LIVE_ASTER) == "aster"

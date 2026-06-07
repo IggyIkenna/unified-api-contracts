@@ -157,6 +157,28 @@ class PipelineMode(StrEnum):
     REPLAY_OPEN_METEO = "replay_open_meteo"
     REPLAY_EIA = "replay_eia"
 
+    # ------------------------------------------------------------------
+    # CeFi per-venue live/replay sources (M2/M3). CeFi `batch` source = tardis;
+    # CeFi `live`/`replay` source = the EXCHANGE. The SAME shard carries
+    # source=tardis in batch and source=<venue> in live/replay (the row-level
+    # `source` column models this). There is NO batch_<venue> member — the venue
+    # is not a batch/archive source. Bybit/Aster are LIVE-only: their public REST
+    # is recent-only (no time-range tick), so a live-downtime gap waits for batch
+    # (T+1) — replay is ABSENT, a FACT, not a pending decision.
+    # ------------------------------------------------------------------
+    LIVE_BINANCE = "live_binance"
+    REPLAY_BINANCE = "replay_binance"
+    LIVE_OKX = "live_okx"
+    REPLAY_OKX = "replay_okx"
+    LIVE_DERIBIT = "live_deribit"
+    REPLAY_DERIBIT = "replay_deribit"
+    LIVE_KRAKEN = "live_kraken"
+    REPLAY_KRAKEN = "replay_kraken"
+    LIVE_HYPERLIQUID = "live_hyperliquid"
+    REPLAY_HYPERLIQUID = "replay_hyperliquid"
+    LIVE_BYBIT = "live_bybit"
+    LIVE_ASTER = "live_aster"
+
 
 _BATCH_PREFIX: Final[str] = "batch_"
 _LIVE_PREFIX: Final[str] = "live_"
