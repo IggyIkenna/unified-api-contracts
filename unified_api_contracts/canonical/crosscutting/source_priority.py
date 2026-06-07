@@ -374,69 +374,95 @@ MOCK_SOURCE: Final[str] = "mock"
 env-tier bucket split (``-dev-``/`-stg-` vs `-prd-`) so it NEVER touches prod;
 makes test fixtures first-class. Mock implies dev-tier only."""
 
-# Every EXTERNAL source is batch-capable (it has a ``batch_<source>`` PipelineMode
-# by the closed-set round-trip). LIVE = has a real-time stream.
+# RATIFIED source-mode capability (operator 2026-06-07) — encodes
+# ``plans/audit/results/source_mode_capability_matrix_2026_06_07.md`` row-for-row,
+# including its "CORRECTED MODEL" section. These flags are LOAD-BEARING (M2/M3/M4/M6
+# read them), not a draft seed.
 #
-# REPLAY (operator 2026-06-05 — FORMAT-AGNOSTIC): the ability to retrieve a recent
-# window ON DEMAND — specifically "today's data from start-of-day" — to fill an
-# intraday / startup / live-downtime gap. Test: "live was down 09:00-11:00 today;
-# can I fetch that window now and backfill it?" CHAIN sources are ALWAYS replay-
-# capable (any past block is queryable intraday). A vendor that only ships END-OF-DAY
-# archives (no current-day intraday retrieval) is NOT replay-capable. Tardis = live
-# but NOT replay (operator). databento/massive intraday-replay = vendor-doc check
-# (open); seeded conservatively until confirmed.
+# Every EXTERNAL source is batch-capable (the ``batch_<source>`` closed-set floor).
+# LIVE = a real-time stream (or a short-interval poll for push-less sources like
+# onchain_subgraph). REPLAY (format-agnostic) = the ability to re-fetch
+# "today-since-start" ON DEMAND to fill an intraday / startup / live-downtime gap;
+# a source that cannot re-fetch intraday simply means its live-downtime gap waits
+# for batch (honest absence) — NOT a decision.
 #
-# ⚠️ DRAFT SEED — the BATCH flags are certain (round-trip-derivable); the LIVE +
-# REPLAY flags are a best-effort seed pending PER-SOURCE OPERATOR/DOMAIN RATIFY
-# (M2 in the plan). Only the operator-stated facts are load-bearing here: chain
-# RPCs are replay-capable; Tardis is live but NOT replay. Refine the rest on
-# ratification — `test_source_mode_capability_*` asserts only completeness +
-# batch-for-all + those stated facts, so the uncertain flags can change freely.
+# Notes on the ratified rows:
+# * tardis = {batch} ONLY — the academic licence blocks replay AND CeFi live/replay
+#   come from the EXCHANGES (the per-venue ``live_<venue>``/``replay_<venue>`` sources),
+#   not Tardis. Tardis is the CeFi BATCH (T+1 archive) source. (Matrix R1 + CORRECTED
+#   MODEL.) The SAME shard therefore carries source=tardis in batch and source=<venue>
+#   in live/replay — the row-level ``source`` column already models this.
+# * massive (= Polygon.io) = {batch, live, replay}; final live testing is gated on the
+#   paid real-time tier upgrade (a deploy-time gate, not a code gate). Starter-tier
+#   live is 15-min delayed (see EMISSION_LATENCY_MS_BY_SOURCE).
+# * Internal service sources (instruments_service/execution_service/strategy_service/
+#   features_onchain_service/cross_instrument/mdps_odds_horizon_bucket) = service mode:
+#   batch=live symmetry, re-run = replay.
 SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
-    # CeFi
-    "tardis": frozenset({Mode.BATCH, Mode.LIVE}),  # operator: live, NOT tick-replay
-    # NB: `hyperliquid_rest` is the REST funding poller (SOURCE_PRIORITY uses it ONLY
-    # for defi perp_funding) → batch + REST-backfill replay. Hyperliquid's LIVE
-    # capability (ws_trades/ws_l2_book per SourceCapability._HYPERLIQUID) is a SEPARATE
-    # ingestion path/source — capability is per-(source, data_type), see plan M2.
-    "hyperliquid_rest": frozenset({Mode.BATCH, Mode.REPLAY}),
-    # TradFi
-    # databento: live + intraday-replay DOC-CONFIRMED (databento.com dedicated
-    # "Intraday replay" API — fetch the current session via the live API).
+    # ---- CeFi ----
+    "tardis": frozenset({Mode.BATCH}),  # batch (archive) ONLY; live/replay = exchanges
+    # ---- TradFi ----
     "databento": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
-    # massive (= Polygon.io rebrand): live (real-time stream) + intraday-replay INFERRED
-    # (massive.com: real-time + historical tick via REST/ws → today's data retrievable
-    # within a time range). CAVEAT: current Starter tier LIVE is 15-min DELAYED (see
-    # EMISSION_LATENCY_MS_BY_SOURCE) — true real-time needs a tier upgrade; same-day
-    # replay latency not explicitly doc-confirmed → light-verify on ratify.
     "massive": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "yahoo": frozenset({Mode.BATCH}),
     "barchart": frozenset({Mode.BATCH}),
-    "eia": frozenset({Mode.BATCH}),
-    # DeFi — chain RPCs are deterministic ⇒ fully replayable (operator-stated)
+    "eia": frozenset({Mode.BATCH, Mode.REPLAY}),  # weekly series re-fetchable by date
+    # ---- DeFi ----
+    "hyperliquid_rest": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "onchain_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "solana_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "helius_rpc": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
-    "onchain_subgraph": frozenset({Mode.BATCH}),
-    "chainlink": frozenset({Mode.BATCH, Mode.LIVE}),
-    "pyth_hermes": frozenset({Mode.BATCH, Mode.LIVE}),
-    # Prediction
-    "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE}),
-    "polymarket_gamma_api": frozenset({Mode.BATCH}),
-    # Sports / reference. Scheduled batch APIs today; **LIVE sports source is TBD**
-    # (operator 2026-06-05 — undecided; betfair exists as an IS adapter but is NOT a
-    # registered SOURCE_PRIORITY source). Seeded batch-only until a live sports
-    # vendor is chosen, then ratify that source up to {BATCH, LIVE}.
-    "api_football": frozenset({Mode.BATCH}),
-    "footystats": frozenset({Mode.BATCH}),
-    "odds_api": frozenset({Mode.BATCH}),
-    "understat": frozenset({Mode.BATCH}),
-    "transfermarkt": frozenset({Mode.BATCH}),
-    "soccer_football_info": frozenset({Mode.BATCH}),
-    "open_meteo": frozenset({Mode.BATCH}),
-    "mdps_odds_horizon_bucket": frozenset({Mode.BATCH}),
-    "instruments_service": frozenset({Mode.BATCH}),
+    "onchain_subgraph": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),  # live = poll
+    "chainlink": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "pyth_hermes": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # ---- Prediction ----
+    "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "polymarket_gamma_api": frozenset({Mode.BATCH}),  # market metadata; not a tick series
+    # ---- Sports ---- (no in-play live source until a sports live archetype exists;
+    # historical odds + Secret-Manager keys already held → replay-capable now)
+    "api_football": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "footystats": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "odds_api": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "understat": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "transfermarkt": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "soccer_football_info": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "open_meteo": frozenset({Mode.BATCH, Mode.REPLAY}),
+    # ---- Internal service sources (service mode = batch=live symmetry, re-run=replay)
+    "instruments_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "mdps_odds_horizon_bucket": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "execution_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "strategy_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "features_onchain_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "cross_instrument": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # ---- CeFi per-venue live/replay sources ----
+    # CeFi `live`/`replay` `source` = the EXCHANGE (CeFi `batch` source = tardis).
+    # The SAME shard carries source=tardis in batch and source=<venue> in live/replay.
+    # These venue sources are NOT batch-capable (Tardis is the CeFi archive) — they
+    # have NO batch_<venue> PipelineMode. Replay-fact table (matrix 2026-06-07):
+    # binance/okx/deribit/kraken/hyperliquid re-fetch a same-day window via REST
+    # (replay ✓); Bybit (public REST recent-only) + Aster (newer venue, unverified)
+    # are LIVE-only — a live-downtime gap waits for batch (T+1), replay ABSENT.
+    "binance": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "okx": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "deribit": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "hyperliquid": frozenset({Mode.LIVE, Mode.REPLAY}),
+    "bybit": frozenset({Mode.LIVE}),
+    "aster": frozenset({Mode.LIVE}),
 }
+
+CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
+    {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster"}
+)
+"""CeFi exchange venues that serve the `live`/`replay` capture modes (M2/M3).
+
+CeFi `batch` data comes from ``tardis`` (the T+1 multi-venue archive); CeFi
+`live`/`replay` data comes from the exchange itself, so the ``source`` for a CeFi
+shard is mode-dependent: ``tardis`` in batch, the venue here in live/replay. These
+venues are NOT in :data:`SOURCE_PRIORITY` (the batch-priority registry) and are NOT
+batch-capable — they carry only ``live_<venue>`` / ``replay_<venue>`` PipelineMode
+members. The mode-contextual reader that picks the venue source per (shard, mode)
+is the M3/M4 next tranche."""
 
 
 def modes_for_source(source: str) -> frozenset[Mode]:
@@ -444,12 +470,14 @@ def modes_for_source(source: str) -> frozenset[Mode]:
     (a fixture can stand in for any). Unregistered external source ⇒ ``{BATCH}``
     (the safe default — everything is at least batch-archivable).
 
-    ⚠️ COARSE per-source PLACEHOLDER (Phase 0.1). Capability is genuinely per
-    ``(source, data_type)`` — e.g. hyperliquid is LIVE for ``trades``/``l2_book``
-    (``ws_*`` ops) but REST/BATCH-only for ``funding_rates``. This is to be
-    SUPERSEDED by ``modes_for(source, data_type)`` derived from
-    ``registry/capability_declarations`` ``SourceCapability`` (per-operation
-    REST/WS). SSOT: ``pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md``
+    The per-source mode sets are RATIFIED + load-bearing (the
+    ``source_mode_capability_matrix_2026_06_07.md`` rows). The REMAINING
+    refinement (next tranche) is the per-``(source, data_type)`` KEYING — e.g.
+    hyperliquid is LIVE for ``trades``/``l2_book`` (``ws_*`` ops) but REST/BATCH
+    for ``funding_rates`` — to be added as ``modes_for(source, data_type)``
+    derived from ``registry/capability_declarations`` ``SourceCapability``
+    (per-operation REST/WS). SSOT:
+    ``pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md``
     § M2 REFINEMENT."""
     if source == MOCK_SOURCE:
         return frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
@@ -905,6 +933,7 @@ def get_all_sources_with_priority(
 
 
 __all__ = [
+    "CEFI_LIVE_VENUES",
     "COMPUTED_SOURCES",
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",

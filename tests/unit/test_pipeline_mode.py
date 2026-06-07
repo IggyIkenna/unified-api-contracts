@@ -41,11 +41,19 @@ def test_pipeline_mode_has_live_websocket_member() -> None:
     assert PipelineMode.LIVE_WEBSOCKET.value == "live_websocket"
 
 
-def test_pipeline_mode_batch_values_use_batch_prefix() -> None:
-    batch_members = [m for m in PipelineMode if m is not PipelineMode.LIVE_WEBSOCKET]
+def test_pipeline_mode_values_use_a_mode_prefix() -> None:
+    """Every member is ``{mode}_{source}`` — prefixed batch_/live_/replay_ (M1)."""
+    members = list(PipelineMode)
+    assert members, "expected at least one PipelineMode member"
+    for m in members:
+        assert m.value.startswith(("batch_", "live_", "replay_")), (
+            f"PipelineMode {m.name}={m.value!r} does not start with a mode prefix"
+        )
+
+
+def test_pipeline_mode_still_has_batch_members() -> None:
+    batch_members = [m for m in PipelineMode if m.value.startswith("batch_")]
     assert batch_members, "expected at least one batch PipelineMode member"
-    for m in batch_members:
-        assert m.value.startswith("batch_"), f"PipelineMode {m.name}={m.value!r} does not start with 'batch_'"
 
 
 # ---------------------------------------------------------------------------

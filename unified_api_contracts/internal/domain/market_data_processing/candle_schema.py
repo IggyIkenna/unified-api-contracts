@@ -37,19 +37,6 @@ class DataType(StrEnum):
     OHLCV_15M = "ohlcv_15m"
     OHLCV_24H = "ohlcv_24h"
     TBBO = "tbbo"
-    # NOTE (A11c 2026-06-02): these two legacy candle-input members are LEFT on the
-    # pre-collapse values deliberately. The operator-locked canonical pool/swap names
-    # are `dex_pool_state` / `dex_pool_swaps`, but this enum ALSO declares a DISTINCT
-    # Phase-2 member `DEX_POOL_STATE = "dex_pool_state"` (spot-DEX time-series state,
-    # declared below) — renaming DEX_POOLS's VALUE to `dex_pool_state` would
-    # StrEnum-alias-collide the two members. These members are not consumed by
-    # member-name anywhere; the canonical collapse is enforced on the functional
-    # denominator/capability registries (market_data_categories / expected_coverage /
-    # defi_venue_capabilities). Reconciling this enum (merge legacy DEX_POOLS/DEX_SWAPS
-    # into the Phase-2 DEX_POOL_STATE taxonomy, resolving snapshot-vs-timeseries) is the
-    # tracked follow-up A11c-candle-enum in defi_manifest_canonicalisation_2026_06_01.md.
-    DEX_POOLS = "dex_pools"
-    DEX_SWAPS = "dex_swaps"
     LENDING_INDICES = "lending_indices"
     # Per-protocol lending-rate breakouts (folded in from
     # plans/active/defi_recursive_borrow_archetypes_2026_05_10.md Phase 1
@@ -73,14 +60,20 @@ class DataType(StrEnum):
     PERP_TRADES = "perp_trades"
     PERP_MARK_ORACLE = "perp_mark_oracle"
     PERP_OPEN_INTEREST = "perp_open_interest"
-    # Spot DEX time-series state (distinct from the existing `DEX_POOLS`
-    # *snapshot* type already declared above). `DEX_POOL_STATE` carries
-    # reserves OR concentrated-liquidity tick arrays at block heights for
-    # backtest replay. `DEX_ORDERBOOK` is CLOB-style bid/ask levels at
-    # block heights (Phoenix). `DEX_QUOTE` is aggregator-sampled quote
-    # responses (Jupiter). `DEX_TRADES` is per-swap fill events on AMM
-    # venues (Orca/Raydium swap event stream).
+    # Spot DEX time-series state. `DEX_POOL_STATE` carries reserves OR
+    # concentrated-liquidity tick arrays at block heights for backtest
+    # replay; `DEX_POOL_SWAPS` is the canonical pool-swap candle/event type.
+    # A11c — SAME / one-SSOT merge (operator decision 2026-06-05, see A11g):
+    # the legacy snapshot members `DEX_POOLS = "dex_pools"` /
+    # `DEX_SWAPS = "dex_swaps"` were REMOVED in favour of the single
+    # canonical `dex_pool_state` / `dex_pool_swaps` taxonomy — the data-path
+    # collapse shipped in A11g proved the C0 union a lossless superset of the
+    # vault snapshot. `DEX_ORDERBOOK` is CLOB-style bid/ask levels at block
+    # heights (Phoenix). `DEX_QUOTE` is aggregator-sampled quote responses
+    # (Jupiter). `DEX_TRADES` is per-swap fill events on AMM venues
+    # (Orca/Raydium swap event stream).
     DEX_POOL_STATE = "dex_pool_state"
+    DEX_POOL_SWAPS = "dex_pool_swaps"
     DEX_ORDERBOOK = "dex_orderbook"
     DEX_QUOTE = "dex_quote"
     DEX_TRADES = "dex_trades"

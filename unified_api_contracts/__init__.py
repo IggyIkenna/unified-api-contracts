@@ -161,6 +161,7 @@ from .canonical.crosscutting.pipeline_mode import (
     PipelineMode,
     is_batch,
     is_live,
+    is_replay,
     mode_of,
     pipeline_mode_for_source,
     pipeline_mode_for_sports_entity,
@@ -197,6 +198,7 @@ from .canonical.crosscutting.scheduler_registry import (
     get_schedulers_for_env,
 )
 from .canonical.crosscutting.source_priority import (
+    CEFI_LIVE_VENUES,
     MOCK_SOURCE,
     SOURCE_MODE_CAPABILITY,
     default_source,
@@ -1698,6 +1700,7 @@ __all__ = [
     "Mode",
     "Cadence",
     "mode_of",
+    "CEFI_LIVE_VENUES",
     "MOCK_SOURCE",
     "SOURCE_MODE_CAPABILITY",
     "modes_for_source",
@@ -1714,6 +1717,7 @@ __all__ = [
     "is_emission_policy_declared",
     "is_live",
     "is_per_instrument_shard_data_type",
+    "is_replay",
     "linked_question_group",
     "lookup_contract",
     "matrix_cell_count",

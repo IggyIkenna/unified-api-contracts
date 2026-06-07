@@ -317,17 +317,17 @@ class TestCandleSchema:
         assert DataType.PERP_OPEN_INTEREST == "perp_open_interest"
         # Spot DEX time-series state (Phase 2)
         assert DataType.DEX_POOL_STATE == "dex_pool_state"
+        assert DataType.DEX_POOL_SWAPS == "dex_pool_swaps"
         assert DataType.DEX_ORDERBOOK == "dex_orderbook"
         assert DataType.DEX_QUOTE == "dex_quote"
         assert DataType.DEX_TRADES == "dex_trades"
         # Sanity: pre-existing perp_funding remains unchanged
         assert DataType.PERP_FUNDING == "perp_funding"
-        # Sanity: pre-existing dex_pools snapshot type is distinct from the new
-        # dex_pool_state time-series type. (A11c 2026-06-02: legacy DEX_POOLS keeps its
-        # `dex_pools` value to avoid a StrEnum alias-collision with Phase-2 DEX_POOL_STATE;
-        # the canonical pool/swap collapse is enforced on the functional registries.)
-        assert DataType.DEX_POOLS == "dex_pools"
-        assert DataType.DEX_POOLS != DataType.DEX_POOL_STATE
+        # A11c — SAME / one-SSOT merge (operator decision 2026-06-05, see A11g): the
+        # legacy snapshot members DEX_POOLS / DEX_SWAPS were REMOVED; the single
+        # canonical pool/swap taxonomy is dex_pool_state / dex_pool_swaps.
+        assert not hasattr(DataType, "DEX_POOLS")
+        assert not hasattr(DataType, "DEX_SWAPS")
 
     def test_all_exports(self) -> None:
         import unified_api_contracts.internal.domain.market_data_processing.candle_schema as m
