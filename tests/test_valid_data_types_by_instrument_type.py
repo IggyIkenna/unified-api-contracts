@@ -213,3 +213,56 @@ class TestValidDataTypesForInstrumentTypeAccessor:
         second_cache = _mdc._DEFI_VALID_DATA_TYPES
 
         assert first_cache is second_cache
+
+
+# ── G1-ENUM bundle-grain axis (slot-7 2026-06-07) ────────────────────────────
+from unified_api_contracts.registry.market_data_categories import (
+    GRAIN_BUNDLE_BY_UNDERLYING,
+    GRAIN_LEAF,
+    grain_for_instrument_type,
+)
+
+
+class TestInstrumentGrainAxis:
+    """grain_for_instrument_type() — leaf vs bundle-by-underlying (G1-ENUM rollup).
+
+    The bundle-grain SSOT: leaf OPTION/COMBO roll UP into a per-underlying
+    options_chain/futures_chain bundle (one candidate per underlying, NOT one
+    per leaf contract). The validity matrix zeroes the leaf per-contract rows
+    (frozenset()); this axis is the declarative companion so a consumer can ask
+    the grain directly.
+    """
+
+    def test_cefi_option_is_bundle_grain(self) -> None:
+        assert grain_for_instrument_type("cefi", "option") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_option_uppercase_token_normalises(self) -> None:
+        assert grain_for_instrument_type("cefi", "OPTION") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_combo_is_bundle_grain(self) -> None:
+        assert grain_for_instrument_type("cefi", "COMBO") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_options_chain_is_bundle_grain(self) -> None:
+        assert grain_for_instrument_type("cefi", "options_chain") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_futures_chain_is_bundle_grain(self) -> None:
+        assert grain_for_instrument_type("cefi", "futures_chain") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_spot_is_leaf(self) -> None:
+        assert grain_for_instrument_type("cefi", "SPOT") == GRAIN_LEAF
+
+    def test_cefi_perpetual_is_leaf(self) -> None:
+        assert grain_for_instrument_type("cefi", "PERP") == GRAIN_LEAF
+
+    def test_tradfi_equity_is_leaf(self) -> None:
+        assert grain_for_instrument_type("tradfi", "equity") == GRAIN_LEAF
+
+    def test_unmapped_defaults_to_leaf(self) -> None:
+        assert grain_for_instrument_type("tradfi", "totally_unknown_xyz") == GRAIN_LEAF
+
+    def test_bundle_grain_leaf_types_have_empty_valid_set(self) -> None:
+        """A bundle-by-underlying LEAF type (option/combo) must carry zero valid
+        per-contract data_types — the two halves of G1-ENUM agree (no per-leaf fan)."""
+        for itype in ("option", "combo"):
+            assert grain_for_instrument_type("cefi", itype) == GRAIN_BUNDLE_BY_UNDERLYING
+            assert valid_data_types_for_instrument_type("cefi", itype) == frozenset()
