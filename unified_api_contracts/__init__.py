@@ -154,6 +154,16 @@ from .canonical.crosscutting.live_cluster_registry import (
     LiveClusterSpec,
     get_clusters_for_env,
 )
+from .canonical.crosscutting.mvp_scope import (
+    MVP_SCOPE,
+    CeFiMvpRule,
+    DeFiMvpRule,
+    FeaturesModelsMvpStub,
+    PredictionMvpRule,
+    SportsMvpRule,
+    TradFiMvpRule,
+    is_mvp,
+)
 from .canonical.crosscutting.pipeline_mode import (
     _SPORTS_ENTITY_TO_PIPELINE_MODE,
     Cadence,
@@ -2136,6 +2146,15 @@ __all__ = [
     "TransferWindowPeriod",
     "UpstreamReq",
     "VenueTestnetEndpoints",
+    # MVP scope config + predicate (Phase 1)
+    "MVP_SCOPE",
+    "is_mvp",
+    "CeFiMvpRule",
+    "DeFiMvpRule",
+    "TradFiMvpRule",
+    "SportsMvpRule",
+    "PredictionMvpRule",
+    "FeaturesModelsMvpStub",
 ]
 
 # fmt: off
