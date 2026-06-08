@@ -201,6 +201,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # never glued to the source name, operator R4 2026-06-07).
     ("defi", "bridge_events"): ["onchain_rpc"],
     ("defi", "dex_pool_state"): ["onchain_subgraph"],
+    # dex pool SWAPS — canonical data_type ``n`` (the legacy ``dex_pool_swaps``/
+    # ``dex_swaps`` logical keys are retired). Read from The Graph subgraph (the
+    # uniswap_v3 / curve adapters fetch pools + SWAPS + liquidity from the SAME
+    # subgraph — uniswap_v3_adapter.py "primary for pools, swaps, liquidity"), so
+    # the source is ``onchain_subgraph``, matching ``dex_pool_state`` above. Was
+    # previously UNREGISTERED → fell through to the defi asset_group fallback
+    # (``BATCH_ONCHAIN_RPC``), which mis-stamped swaps as ``onchain_rpc`` (F2
+    # registry tidy, slot-7 2026-06-07 — registering it makes the per-shard source
+    # explicit + correct; the v9 migrator now derives ``batch_onchain_subgraph``
+    # for dex-swaps — vm-defi re-verify the dry-run).
+    ("defi", "n"): ["onchain_subgraph"],
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],
@@ -216,6 +227,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # perp_funding + solana_defi are Hyperliquid REST legs; Hyperliquid (the vendor,
     # via its REST transport) is the primary (and currently only) source for both
     # data_types. source=hyperliquid, transport=rest (a column, not the name).
+    # NOTE (F2 registry tidy, slot-7 2026-06-07): non-Hyperliquid perp venues
+    # (e.g. LIGHTER, which reads its perp funding from the Tardis archive) are
+    # deliberately NOT listed here — they are resolved PER-SHARD by the venue
+    # override layer (``pipeline_mode_resolver._VENUE_OVERRIDES["LIGHTER"] →
+    # BATCH_TARDIS``), which runs BEFORE the SOURCE_PRIORITY lookup. Adding tardis
+    # to this list would flip ``source_required(defi, perp_funding)`` to True (a
+    # 2-external-source cell) and break the single-source auto-stamp for the
+    # Hyperliquid-native cells. The venue-override layer is the correct home for a
+    # per-venue source that differs from the data_type default.
     ("defi", "perp_funding"): ["hyperliquid"],
     ("defi", "position_data"): ["onchain_rpc"],
     ("defi", "solana_defi"): ["hyperliquid"],
