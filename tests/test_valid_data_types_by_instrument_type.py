@@ -86,10 +86,19 @@ class TestValidDataTypesByAgAndInstrumentType:
         assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "option")] == frozenset()
         assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "combo")] == frozenset()
 
-    def test_tradfi_options_futures_chain_bundle_trades(self) -> None:
-        # ERA-B: tradfi options_chain/futures_chain are instrument_types → trades.
-        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "options_chain")] == frozenset({"trades"})
-        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "futures_chain")] == frozenset({"trades"})
+    def test_tradfi_options_futures_chain_bundle_data_types(self) -> None:
+        # T-OLD-2b (operator PRESERVE 2026-06-08, tradfi-owner verified vs the present-set, slot-6):
+        # the per-underlying chain bundles admit EXACTLY the captured data_types — NOT just trades.
+        # options_chain carries trades/ohlcv_1m + the schema-backed snapshot data_type=options_chain
+        # (mark_iv/greeks; the 291 Era-A rows migrate to instrument_type=options_chain/data_type=options_chain).
+        # futures_chain carries trades/ohlcv_1m/tbbo (no snapshot data_type observed for futures_chain on
+        # tradfi disk → not admitted, to avoid an over-fan).
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "options_chain")] == frozenset(
+            {"trades", "ohlcv_1m", "options_chain"}
+        )
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "futures_chain")] == frozenset(
+            {"trades", "ohlcv_1m", "tbbo"}
+        )
 
     def test_tradfi_equity_has_earnings_result(self) -> None:
         result = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "equity")]
