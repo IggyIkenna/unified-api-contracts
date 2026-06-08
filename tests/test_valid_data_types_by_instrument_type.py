@@ -129,6 +129,18 @@ class TestValidDataTypesByAgAndInstrumentType:
             "sports", "league"
         )
 
+    def test_prediction_market_slice_present(self) -> None:
+        # Defense-in-depth / slice-parity row (slot-5 2026-06-08). Prediction is
+        # grain-bound (the enumerator short-circuits on instr.data_type and never
+        # consults this matrix), so the row is a WARN-suppressing backstop, not the
+        # grain guard. Its valid set = the canonical prediction data_types — so it
+        # never filters a real cell (all are attachable to a prediction market).
+        result = valid_data_types_for_instrument_type("prediction", "prediction_market")
+        assert result == frozenset(
+            {"trades", "prediction_canonical_question_group", "market_lifecycle", "MARKET_LIFECYCLE"}
+        )
+        assert "prediction_canonical_question_group" in result
+
 
 class TestValidDataTypesForInstrumentTypeAccessor:
     """Public accessor: normalization, matrix look-up, defi derivation, fallback."""

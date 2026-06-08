@@ -627,10 +627,21 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
         {"odds", "odds_snapshot", "odds_movement"}
     ),
     # ── Prediction ────────────────────────────────────────────────────────────
-    # Prediction uses per-row data_type grain binding (instr.data_type field).
-    # The matrix is NOT consulted for prediction (the accessor returns None for
-    # unmapped keys, and _row_data_types falls back to the instr.data_type path
-    # for prediction). Entries below are informational stubs only.
+    # Prediction uses per-row data_type GRAIN BINDING (instr.data_type field): the
+    # enumerator's _row_data_types step-1 returns [instr.data_type] and NEVER
+    # consults this matrix for a grain-bound prediction catalogue row. The grain
+    # guard (per-market leaf vs per-cqg bundle) lives in grain-binding, NOT here —
+    # the matrix filters impossible (instrument_type x data_type) cross-products,
+    # which is orthogonal to grain. The row below is therefore a DEFENSE-IN-DEPTH /
+    # documentation stub (slice-parity with cefi/tradfi/sports): it only takes
+    # effect for a hypothetical NON-grain-bound prediction row, where it suppresses
+    # the "unmapped instrument_type → fall back to all + WARN" path. Valid set =
+    # the canonical prediction data_types (DATA_TYPES_BY_ASSET_GROUP["prediction"]);
+    # all are legitimately attachable to a prediction market, so this never filters
+    # a real cell — it is purely WARN-suppression + an explicit, audited slice.
+    ("prediction", "prediction_market"): frozenset(
+        {"trades", "prediction_canonical_question_group", "market_lifecycle", "MARKET_LIFECYCLE"}
+    ),
 }
 
 
