@@ -574,12 +574,23 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # ── TradFi ────────────────────────────────────────────────────────────────
     # TradFi options/combos roll up the same way (Era-B, generalised — NOT
     # special-cased). Leaf option/combo → frozenset() (zero per-contract rows;
-    # the pre-G1-ENUM None fallback over-fanned ~563K false candidates); the
-    # per-underlying options_chain/futures_chain bundle → trades.
+    # the pre-G1-ENUM None fallback over-fanned ~563K false candidates).
+    # Per-underlying options_chain/futures_chain BUNDLES (T-OLD-2b, operator
+    # 2026-06-08 PRESERVE decision; tradfi-owner verified vs the
+    # `market-data-tick-tradfi` present-set, slot-6): admit EXACTLY the captured
+    # data_types — NOT just `trades` (which marked ~12K real captured chain cells
+    # "impossible"). `options_chain` carries `trades`/`ohlcv_1m` PLUS the
+    # schema-backed snapshot `data_type=options_chain` itself (the mark_iv/greeks
+    # chain snapshot — 291 Era-A rows migrate to instrument_type=options_chain/
+    # data_type=options_chain; `*_OPTIONS_CHAIN_SNAPSHOT`). `futures_chain`
+    # carries `trades`/`ohlcv_1m`/`tbbo` (the present-set shows NO snapshot
+    # data_type for the futures_chain instrument_type on tradfi disk → not
+    # admitted, to avoid an over-fan; cefi futures_chain DOES carry
+    # data_type=options_chain → slot-3 widens that slice).
     ("tradfi", "option"): frozenset(),
     ("tradfi", "combo"): frozenset(),
-    ("tradfi", "options_chain"): frozenset({"trades"}),
-    ("tradfi", "futures_chain"): frozenset({"trades"}),
+    ("tradfi", "options_chain"): frozenset({"trades", "ohlcv_1m", "options_chain"}),
+    ("tradfi", "futures_chain"): frozenset({"trades", "ohlcv_1m", "tbbo"}),
     # Per-contract leaves (grain=leaf; NOT bundled). tradfi-owner verified 2026-06-08 (slot-6) against the
     # `market-data-tick-tradfi` manifest present-set + the databento futures/FX market-data capability: the
     # equity corporate events (`corporate_action_confirmed`/`earnings_result`) + `macro_result` are NOT futures/FX
