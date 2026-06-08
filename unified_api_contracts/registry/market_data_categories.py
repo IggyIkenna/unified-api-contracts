@@ -658,12 +658,18 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
 # re-deriving the rule from the validity matrix's empty-set sentinel. Default is
 # LEAF for any unmapped (asset_group, instrument_type).
 #
-# NOTE — venue-specific FUTURE bundling is NOT expressible here (the matrix is
-# venue-agnostic): DERIBIT/OKX capture FUTURE at ``futures_chain`` bundle grain
-# while BYBIT captures per-contract ``future`` (F2, slot-3 2026-06-07). That
-# rollup is a venue-aware catalogue-rollup concern tracked as a gated todo —
+# NOTE — venue-specific FUTURE bundling (F2, slot-3 2026-06-07) is expressed via
+# the ``FUTURE_BUNDLE_VENUES`` overlay below + the optional ``venue`` argument to
+# ``grain_for_instrument_type`` / ``bundle_instrument_type_for_leaf``: DERIBIT/OKX
+# capture FUTURE as a per-underlying ``futures_chain`` bundle (the same bulk-chain
+# shape as their options_chain) while BYBIT (and any per-contract venue) capture
+# each ``future`` individually (leaf). The static map below is venue-AGNOSTIC and
+# holds only the universally-true rules (option/combo/options_chain/futures_chain
+# bundle everywhere); FUTURE-leaf grain is resolved venue-by-venue (a venue-blind
+# FUTURE bundle would over-seed BYBIT's per-contract futures, and a venue-blind
+# FUTURE leaf over-seeds DERIBIT/OKX with ~700 false per-contract candidates).
 # ``VENUE_DATA_TYPE_CAPABILITIES`` is NOT a sound discriminator (BYBIT lists
-# ``futures_chain`` yet captures per-contract).
+# ``futures_chain`` yet captures per-contract), hence the explicit allow-list.
 GRAIN_LEAF = "leaf"
 GRAIN_BUNDLE_BY_UNDERLYING = "bundle_by_underlying"
 
@@ -680,6 +686,37 @@ INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
     ("tradfi", "futures_chain"): GRAIN_BUNDLE_BY_UNDERLYING,
 }
 
+# Venue-aware FUTURE bundle grain (F2, slot-3/slot-7 2026-06-07). The venues whose
+# bare ``future`` leaf contracts are captured as a per-underlying ``futures_chain``
+# BUNDLE (bulk chain download — DERIBIT/OKX) rather than one shard per contract
+# (BYBIT and every other per-contract venue). Keyed by the BASE venue token (the
+# part before the first ``-``) so ``OKX`` / ``OKX-FUTURES`` / ``OKX-SWAP`` all
+# resolve. The option/combo → options_chain roll-up above is universally true and
+# stays venue-agnostic; only FUTURE leaf grain needs this venue overlay.
+FUTURE_BUNDLE_VENUES: dict[str, frozenset[str]] = {
+    "cefi": frozenset({"DERIBIT", "OKX"}),
+}
+
+
+def _base_venue(venue: str) -> str:
+    """Base venue token (uppercased, before the first ``-``) so ``OKX-FUTURES`` /
+    ``OKX-SWAP`` resolve to ``OKX``. Blank input → ``""``."""
+    return venue.strip().upper().split("-", 1)[0] if venue else ""
+
+
+def _future_bundles_at_venue(asset_group: str, venue: str | None) -> bool:
+    """True when a bare ``future`` leaf at ``venue`` is captured as a per-underlying
+    futures_chain bundle (DERIBIT/OKX) rather than per-contract (BYBIT).
+
+    Venue ``None``/blank → False: with no venue context, keep the per-contract leaf
+    default (the SAFE under-bundle — a genuine bundle venue is corrected once the
+    venue is known; over-bundling would wrongly collapse BYBIT per-contract rows).
+    """
+    if not venue:
+        return False
+    return _base_venue(venue) in FUTURE_BUNDLE_VENUES.get(asset_group.lower(), frozenset())
+
+
 # Which bundle INSTRUMENT_TYPE a per-contract LEAF instrument_type rolls UP into
 # (ERA-B). Only the LEAF types are keyed here — the bundle TYPES themselves
 # (options_chain / futures_chain) are NOT (they ARE the per-underlying bundle
@@ -688,10 +725,10 @@ INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
 # the underlying; that bundle entry's data_type is then resolved from the
 # validity matrix (options_chain/futures_chain → ``trades``), so the emitted
 # candidate carries data_type=trades, NOT data_type=options_chain. None ⇒ not a
-# roll-up leaf (the default). ``future`` is intentionally absent — FUTURE bundling
-# is venue-specific (DERIBIT/OKX bundle, BYBIT per-contract; F2), so a future leaf
-# stays per-contract and only a per-underlying futures_chain catalogue entry (if
-# present) passes through.
+# roll-up leaf (the default). ``future`` is NOT keyed here because its roll-up is
+# VENUE-SPECIFIC (DERIBIT/OKX → futures_chain bundle, BYBIT per-contract leaf; F2)
+# — it is resolved by the ``FUTURE_BUNDLE_VENUES`` overlay when a ``venue`` is
+# passed; with no venue it stays a per-contract leaf (returns None).
 BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF: dict[tuple[str, str], str] = {
     ("cefi", "option"): "options_chain",
     ("cefi", "combo"): "options_chain",
@@ -700,13 +737,20 @@ BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF: dict[tuple[str, str], str] = {
 }
 
 
-def grain_for_instrument_type(asset_group: str, instrument_type: str) -> str:
-    """Return the capture GRAIN for ``(asset_group, instrument_type)``.
+def grain_for_instrument_type(asset_group: str, instrument_type: str, venue: str | None = None) -> str:
+    """Return the capture GRAIN for ``(asset_group, instrument_type[, venue])``.
 
     ``GRAIN_BUNDLE_BY_UNDERLYING`` — captured as a per-underlying chain bundle
     (options_chain / futures_chain); the enumerator emits ONE candidate per
     underlying, never one per leaf option/combo contract.
     ``GRAIN_LEAF`` (default) — one candidate per instrument_id.
+
+    ``venue`` (F2) makes the FUTURE-leaf grain venue-aware: a bare ``future`` at a
+    ``FUTURE_BUNDLE_VENUES`` venue (DERIBIT/OKX) is captured as a per-underlying
+    futures_chain bundle → ``GRAIN_BUNDLE_BY_UNDERLYING``; at any other venue (or
+    with ``venue=None``) it stays per-contract → ``GRAIN_LEAF``. The
+    option/combo/options_chain/futures_chain rules are universally true and ignore
+    ``venue``.
 
     Normalises ``instrument_type`` via the same alias map as
     :func:`valid_data_types_for_instrument_type` so catalogue UPPERCASE tokens
@@ -714,25 +758,41 @@ def grain_for_instrument_type(asset_group: str, instrument_type: str) -> str:
     """
     normalised = instrument_type.strip().lower() if instrument_type else ""
     normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
-    return INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised), GRAIN_LEAF)
+    static = INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised))
+    if static is not None:
+        return static
+    # Venue-aware FUTURE overlay (F2): FUTURE bundles per-underlying only at
+    # DERIBIT/OKX; elsewhere (BYBIT) + venue-unknown it stays a per-contract leaf.
+    if normalised == "future" and _future_bundles_at_venue(asset_group, venue):
+        return GRAIN_BUNDLE_BY_UNDERLYING
+    return GRAIN_LEAF
 
 
-def bundle_instrument_type_for_leaf(asset_group: str, instrument_type: str) -> str | None:
+def bundle_instrument_type_for_leaf(asset_group: str, instrument_type: str, venue: str | None = None) -> str | None:
     """Return the bundle INSTRUMENT_TYPE a LEAF instrument_type rolls up into (ERA-B).
 
     ``("cefi"|"tradfi", "option"|"combo")`` → ``"options_chain"`` (the per-contract
-    leaves collapse into ONE per-underlying ``options_chain`` bundle entry). The
-    bundle TYPES themselves (``options_chain`` / ``futures_chain``) return None —
-    they are already the per-underlying bundle entry and are enumerated as-is. The
-    returned value is the bundle's INSTRUMENT_TYPE; its data_type is resolved
-    separately via :func:`valid_data_types_for_instrument_type` (→ ``trades``), so
-    the rolled-up candidate carries data_type=trades (Era-B), never
-    data_type=options_chain. Used by the ``enumerate_expected_universe``
-    bundle-grain roll-up.
+    leaves collapse into ONE per-underlying ``options_chain`` bundle entry). A bare
+    ``("cefi", "future")`` leaf at a ``FUTURE_BUNDLE_VENUES`` venue (DERIBIT/OKX) →
+    ``"futures_chain"`` (F2 venue overlay); at any other venue (or ``venue=None``)
+    it returns None (per-contract leaf, no roll-up). The bundle TYPES themselves
+    (``options_chain`` / ``futures_chain``) return None — they are already the
+    per-underlying bundle entry and are enumerated as-is. The returned value is the
+    bundle's INSTRUMENT_TYPE; its data_type is resolved separately via
+    :func:`valid_data_types_for_instrument_type` (→ ``trades``), so the rolled-up
+    candidate carries data_type=trades (Era-B), never data_type=options_chain. Used
+    by the ``enumerate_expected_universe`` bundle-grain roll-up.
     """
     normalised = instrument_type.strip().lower() if instrument_type else ""
     normalised = _INSTRUMENT_TYPE_ALIASES.get(normalised, normalised)
-    return BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF.get((asset_group.lower(), normalised))
+    static = BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF.get((asset_group.lower(), normalised))
+    if static is not None:
+        return static
+    # Venue-aware FUTURE overlay (F2): a FUTURE leaf at DERIBIT/OKX rolls up to a
+    # per-underlying futures_chain bundle; at BYBIT (+ venue-unknown) it stays leaf.
+    if normalised == "future" and _future_bundles_at_venue(asset_group, venue):
+        return "futures_chain"
+    return None
 
 
 # Module-level cache for the lazily-built DeFi sub-dict.

@@ -282,6 +282,44 @@ class TestInstrumentGrainAxis:
             assert valid_data_types_for_instrument_type("cefi", itype) == frozenset()
 
 
+class TestFutureVenueAwareGrain:
+    """F2 (slot-7 2026-06-07) — FUTURE leaf grain is VENUE-aware: DERIBIT/OKX
+    capture futures as a per-underlying futures_chain bundle; BYBIT (and every
+    other per-contract venue, and venue-unknown) captures each future per-contract.
+    """
+
+    def test_cefi_future_no_venue_is_leaf(self) -> None:
+        # Venue-unknown → safe per-contract leaf default (never over-bundle).
+        assert grain_for_instrument_type("cefi", "future") == GRAIN_LEAF
+        assert grain_for_instrument_type("cefi", "FUTURE") == GRAIN_LEAF
+
+    def test_cefi_future_deribit_is_bundle(self) -> None:
+        assert grain_for_instrument_type("cefi", "future", "DERIBIT") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_future_okx_is_bundle_with_suffix(self) -> None:
+        # OKX / OKX-FUTURES / OKX-SWAP all resolve via the base venue token.
+        assert grain_for_instrument_type("cefi", "FUTURE", "OKX") == GRAIN_BUNDLE_BY_UNDERLYING
+        assert grain_for_instrument_type("cefi", "future", "OKX-FUTURES") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_future_bybit_stays_leaf(self) -> None:
+        assert grain_for_instrument_type("cefi", "future", "BYBIT") == GRAIN_LEAF
+        assert grain_for_instrument_type("cefi", "future", "BYBIT-FUTURES") == GRAIN_LEAF
+
+    def test_venue_does_not_affect_option_combo_bundle(self) -> None:
+        # option/combo bundle everywhere — venue arg is ignored for them.
+        for venue in ("BYBIT", "DERIBIT", "OKX", None):
+            assert grain_for_instrument_type("cefi", "option", venue) == GRAIN_BUNDLE_BY_UNDERLYING
+            assert grain_for_instrument_type("cefi", "combo", venue) == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_cefi_future_deribit_rolls_to_futures_chain(self) -> None:
+        assert bundle_instrument_type_for_leaf("cefi", "future", "DERIBIT") == "futures_chain"
+        assert bundle_instrument_type_for_leaf("cefi", "FUTURE", "OKX-SWAP") == "futures_chain"
+
+    def test_cefi_future_bybit_no_bundle(self) -> None:
+        assert bundle_instrument_type_for_leaf("cefi", "future", "BYBIT") is None
+        assert bundle_instrument_type_for_leaf("cefi", "future") is None
+
+
 from unified_api_contracts.registry.market_data_categories import (
     bundle_instrument_type_for_leaf,
 )
