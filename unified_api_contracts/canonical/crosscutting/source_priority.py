@@ -201,17 +201,21 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # never glued to the source name, operator R4 2026-06-07).
     ("defi", "bridge_events"): ["onchain_rpc"],
     ("defi", "dex_pool_state"): ["onchain_subgraph"],
-    # dex pool SWAPS — canonical data_type ``n`` (the legacy ``dex_pool_swaps``/
-    # ``dex_swaps`` logical keys are retired). Read from The Graph subgraph (the
-    # uniswap_v3 / curve adapters fetch pools + SWAPS + liquidity from the SAME
-    # subgraph — uniswap_v3_adapter.py "primary for pools, swaps, liquidity"), so
-    # the source is ``onchain_subgraph``, matching ``dex_pool_state`` above. Was
-    # previously UNREGISTERED → fell through to the defi asset_group fallback
-    # (``BATCH_ONCHAIN_RPC``), which mis-stamped swaps as ``onchain_rpc`` (F2
-    # registry tidy, slot-7 2026-06-07 — registering it makes the per-shard source
-    # explicit + correct; the v9 migrator now derives ``batch_onchain_subgraph``
-    # for dex-swaps — vm-defi re-verify the dry-run).
-    ("defi", "n"): ["onchain_subgraph"],
+    # dex pool SWAPS — canonical data_type ``dex_pool_swaps`` (the bucket-spec
+    # ``canonical_dt`` in migrate_defi_full_v9_canonical.py:112 + the on-disk
+    # ``data_type=dex_pool_swaps`` in ``dex-swaps-*``; the legacy ``dex_swaps``
+    # logical key is retired). Read from The Graph subgraph (the uniswap_v3 /
+    # curve adapters fetch pools + SWAPS + liquidity from the SAME subgraph —
+    # uniswap_v3_adapter.py "primary for pools, swaps, liquidity"), so the source
+    # is ``onchain_subgraph``, matching ``dex_pool_state`` above. Was previously
+    # UNREGISTERED → fell through to the defi asset_group fallback
+    # (``BATCH_ONCHAIN_RPC``), which mis-stamped swaps as ``onchain_rpc``. (F2
+    # registry tidy slot-7 2026-06-07 mis-keyed this as ``("defi", "n")`` — a dead
+    # key matching no real shard, so ``dex_pool_swaps`` kept falling to the
+    # onchain_rpc fallback; corrected to the real canonical data_type by the slot-2
+    # pre-apply audit 2026-06-08 so the v9 migrator derives
+    # ``batch_onchain_subgraph`` for dex-swaps.)
+    ("defi", "dex_pool_swaps"): ["onchain_subgraph"],
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],

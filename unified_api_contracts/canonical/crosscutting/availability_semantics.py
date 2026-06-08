@@ -131,11 +131,12 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ``market_tick_data_service/cli/handlers/*.py`` for literal
     # ``record_captured(`` callsites with ``data_type=<literal>``.
     ("defi", "dex_pool_state"): "tick_timestamp",
-    # dex pool SWAPS — canonical data_type ``n`` (per-swap on-chain event reads;
-    # the row's own swap timestamp IS available_at). Keeps the SOURCE_PRIORITY ↔
-    # AVAILABILITY_AT_SEMANTICS symmetry now that ``("defi", "n")`` is registered
-    # (F2 registry tidy, slot-7 2026-06-07).
-    ("defi", "n"): "tick_timestamp",
+    # dex pool SWAPS — canonical data_type ``dex_pool_swaps`` (per-swap on-chain
+    # event reads; the row's own swap timestamp IS available_at). Keeps the
+    # SOURCE_PRIORITY ↔ AVAILABILITY_AT_SEMANTICS symmetry. (F2 registry tidy
+    # slot-7 2026-06-07 mis-keyed this as ``("defi", "n")``; corrected to the real
+    # canonical data_type by the slot-2 pre-apply audit 2026-06-08.)
+    ("defi", "dex_pool_swaps"): "tick_timestamp",
     ("defi", "vault_share_price"): "tick_timestamp",
     ("defi", "solana_defi"): "tick_timestamp",
     ("defi", "oracle_prices"): "tick_timestamp",
