@@ -155,6 +155,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("cefi", "ohlcv_15m"): ["tardis"],
     ("cefi", "book_snapshot"): ["tardis"],
     ("cefi", "liquidations"): ["tardis"],
+    # ERA-B (operator 2026-06-07): options_chain / futures_chain are
+    # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
+    # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
+    # primary, tardis). These data_type-keyed entries are RETAINED only for (a) the
+    # legacy data_type=options_chain rows pending the per-AG v8→v9 relabel
+    # (OUT OF SCOPE here) and (b) the bidirectional SOURCE_PRIORITY ↔
+    # AVAILABILITY_AT_SEMANTICS closed-set round-trip; drop them once the per-AG
+    # migrators relabel the legacy rows to trades.
     ("cefi", "options_chain"): ["tardis"],
     ("cefi", "futures_chain"): ["tardis"],
     ("cefi", "perpetual"): ["tardis"],
@@ -193,6 +201,17 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # never glued to the source name, operator R4 2026-06-07).
     ("defi", "bridge_events"): ["onchain_rpc"],
     ("defi", "dex_pool_state"): ["onchain_subgraph"],
+    # dex pool SWAPS — canonical data_type ``n`` (the legacy ``dex_pool_swaps``/
+    # ``dex_swaps`` logical keys are retired). Read from The Graph subgraph (the
+    # uniswap_v3 / curve adapters fetch pools + SWAPS + liquidity from the SAME
+    # subgraph — uniswap_v3_adapter.py "primary for pools, swaps, liquidity"), so
+    # the source is ``onchain_subgraph``, matching ``dex_pool_state`` above. Was
+    # previously UNREGISTERED → fell through to the defi asset_group fallback
+    # (``BATCH_ONCHAIN_RPC``), which mis-stamped swaps as ``onchain_rpc`` (F2
+    # registry tidy, slot-7 2026-06-07 — registering it makes the per-shard source
+    # explicit + correct; the v9 migrator now derives ``batch_onchain_subgraph``
+    # for dex-swaps — vm-defi re-verify the dry-run).
+    ("defi", "n"): ["onchain_subgraph"],
     ("defi", "governance_events"): ["onchain_subgraph"],
     ("defi", "liquidation_events"): ["onchain_rpc"],
     ("defi", "liquidations"): ["onchain_subgraph"],
@@ -208,6 +227,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # perp_funding + solana_defi are Hyperliquid REST legs; Hyperliquid (the vendor,
     # via its REST transport) is the primary (and currently only) source for both
     # data_types. source=hyperliquid, transport=rest (a column, not the name).
+    # NOTE (F2 registry tidy, slot-7 2026-06-07): non-Hyperliquid perp venues
+    # (e.g. LIGHTER, which reads its perp funding from the Tardis archive) are
+    # deliberately NOT listed here — they are resolved PER-SHARD by the venue
+    # override layer (``pipeline_mode_resolver._VENUE_OVERRIDES["LIGHTER"] →
+    # BATCH_TARDIS``), which runs BEFORE the SOURCE_PRIORITY lookup. Adding tardis
+    # to this list would flip ``source_required(defi, perp_funding)`` to True (a
+    # 2-external-source cell) and break the single-source auto-stamp for the
+    # Hyperliquid-native cells. The venue-override layer is the correct home for a
+    # per-venue source that differs from the data_type default.
     ("defi", "perp_funding"): ["hyperliquid"],
     ("defi", "position_data"): ["onchain_rpc"],
     ("defi", "solana_defi"): ["hyperliquid"],
@@ -258,6 +286,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # per tradfi_massive_dual_source_2026_05_28.md Phase 1 operator decision. CFE (VX/VIX futures) is NOT
     # covered by Massive — existing yahoo+barchart layering handles those via MTDS routing.
     ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
+    # ERA-B: options_chain / futures_chain are instrument_types captured as
+    # data_type=trades → Era-B source resolves via ``(tradfi, "trades")`` above
+    # (databento, massive). Legacy-data_type keys retained for the pre-migration
+    # rows + the closed-set round-trip (see the cefi note above).
     ("tradfi", "options_chain"): ["databento", "massive"],
     ("tradfi", "futures_chain"): ["databento", "massive"],
     # commodity_signal — emitted by features-service commodity family from

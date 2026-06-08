@@ -119,6 +119,10 @@ _BYBIT = SourceCapability(
         "book_snapshot_5": date(2019, 1, 1),
         "derivative_ticker": date(2019, 1, 1),
         "liquidations": date(2019, 1, 1),
+        # ERA-B: futures_chain = instrument_type captured as trades (see Deribit
+        # note); retained for legacy data_type coverage lookups. NOTE — BYBIT
+        # FUTURE is captured per-contract, not bundled (F2, cefi-owner); that
+        # venue-grain question is owned by slot-3, separate from this Era-B re-key.
         "futures_chain": date(2019, 1, 1),
     },
 )
@@ -258,6 +262,12 @@ _DERIBIT = SourceCapability(
     # Tardis archive starts 2019-01-01 for Deribit; venue launched 2016-06-29 but Tardis
     # historical capture began in 2019. All data types (spot trades + options/futures
     # derivatives) from the same Tardis collection start date.
+    # ERA-B (operator 2026-06-07): options_chain / futures_chain are
+    # INSTRUMENT_TYPES (per-underlying chain bundles) captured as data_type=trades,
+    # so the bundle's coverage is the venue ``trades`` start above. The two
+    # chain-keyed entries are retained only for legacy data_type=options_chain /
+    # data_type=futures_chain coverage lookups pending the per-AG v8→v9 relabel
+    # (OUT OF SCOPE here); they carry the same start date as trades.
     coverage_start={
         "trades": date(2019, 1, 1),
         "book_snapshot_5": date(2019, 1, 1),
@@ -704,6 +714,8 @@ _TARDIS = SourceCapability(
     auth_scope=["api_key"],
     auth_environments={"prod": "prod_key"},
     operations={
+        # ERA-B: "options_chain" is the chain-bundle INSTRUMENT_TYPE this Tardis
+        # market op fetches (per-underlying), captured as data_type=trades.
         "market": ["trades", "orderbook", "quotes", "derivative_ticker", "liquidations", "options_chain", "ws_replay"],
         "reference": ["exchanges", "instruments", "data_types"],
     },

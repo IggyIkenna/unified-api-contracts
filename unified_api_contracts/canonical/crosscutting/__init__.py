@@ -29,6 +29,10 @@ from .deployment import ManifestShaDriftError as ManifestShaDriftError
 from .environment_tier import EnvironmentTier as EnvironmentTier
 from .environment_tier import resolve_environment_from_env as resolve_environment_from_env
 from .environment_tier import resolve_environment_from_hostname as resolve_environment_from_hostname
+from .era_b_legacy_purge import ERA_B_LEGACY_ASSET_GROUPS as ERA_B_LEGACY_ASSET_GROUPS
+from .era_b_legacy_purge import ERA_B_LEGACY_DATA_TYPES as ERA_B_LEGACY_DATA_TYPES
+from .era_b_legacy_purge import ERA_B_PURGEABLE_KEYS as ERA_B_PURGEABLE_KEYS
+from .era_b_legacy_purge import assert_era_b_purge_safe as assert_era_b_purge_safe
 from .errors import *
 from .errors import VENUE_ERROR_MAP as VENUE_ERROR_MAP
 from .errors import ErrorAction as ErrorAction

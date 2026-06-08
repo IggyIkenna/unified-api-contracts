@@ -182,6 +182,17 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "YEARN_V3": "2024-03-13",
     # Morpho Vaults (MetaMorpho) — Jan 4 2024 launch.
     "MORPHOVAULTS": "2024-01-04",
+    # On-chain perp DEX venues — the DeFi manifest keys perp_funding rows for
+    # these (A2a). Dates mirror CEFI_VENUE_LAUNCH_DATES above (the same venues
+    # feed the carry archetype's CeFi-perp leg); kept in sync. Added 2026-06-08
+    # (slot-2 A2a) — clear new venues with documented public-launch dates, unlike
+    # the DEX per-chain rows whose uniform 2021-01-01 first-captured date is a
+    # data-quality artefact (see the A2a DEX-investigation todo — NOT added here
+    # per the "do not bulk-add ambiguous dates" instruction).
+    "HYPERLIQUID": "2023-06-14",  # Hyperliquid L1 perp DEX mainnet beta
+    "ASTER": "2024-09-25",  # Aster perp DEX mainnet (post-rebrand from Astherus)
+    "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter perp DEX on zkSync Era
+    "PACIFICA-SOLANA": "2024-04-01",  # Pacifica perp DEX on Solana
     # Pre-2018 venues kept for completeness (no EXPECTED_PRE_VENUE_LAUNCH rows
     # within the default [2018-01-01, today] window):
     "MAKER": "2017-12-19",  # MakerDAO single-collateral DAI launch

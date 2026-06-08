@@ -8,9 +8,12 @@ from __future__ import annotations
 
 import subprocess
 import sys
+from datetime import date
 from pathlib import Path
 from types import ModuleType
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 # sys.path for scripts/ is configured in tests/conftest.py (loaded by pytest before test modules)
 from generate_schema_version_matrix import (
@@ -21,6 +24,30 @@ from generate_schema_version_matrix import (
     write_matrix_md,
     write_svg,
 )
+
+# Reference "today" the mock fixtures below were written against. _compute_status
+# compares last_verified against the real date.today() with a 90-day staleness
+# window, so without pinning the clock these unit tests rot into "yellow" once
+# wall-clock time passes any hardcoded last_verified + 90 days (which began
+# failing ~2026-06-07 as "2026-03-09" crossed the window). Freezing keeps the
+# colour-status assertions deterministic regardless of when CI runs.
+_REFERENCE_TODAY = date(2026, 3, 9)
+
+
+class _FrozenDate(date):
+    """`date` subclass whose .today() is pinned; fromisoformat/arithmetic inherited."""
+
+    @classmethod
+    def today(cls) -> date:
+        return _REFERENCE_TODAY
+
+
+@pytest.fixture(autouse=True)
+def _freeze_schema_matrix_clock(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Pin generate_schema_version_matrix's date.today() to _REFERENCE_TODAY so
+    the 90-day staleness computation is time-independent in tests."""
+    monkeypatch.setattr("generate_schema_version_matrix.date", _FrozenDate)
+
 
 # Module paths — used in integration tests that invoke the script as a subprocess
 _REPO_ROOT = Path(__file__).resolve().parents[2]

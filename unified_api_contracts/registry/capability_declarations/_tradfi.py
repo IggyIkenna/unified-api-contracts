@@ -148,6 +148,9 @@ _YAHOO_FINANCE = SourceCapability(
     auth_scope=["none"],
     auth_environments={},
     operations={
+        # ERA-B (operator 2026-06-07): "options_chain" here is the chain-bundle
+        # INSTRUMENT_TYPE this market op fetches (per-underlying), captured as
+        # data_type=trades downstream — not a standalone data_type.
         "market": ["ohlcv", "options_chain", "streaming_quotes"],
         "reference": ["ticker_info", "balance_sheet", "income_statement", "cash_flow"],
     },
