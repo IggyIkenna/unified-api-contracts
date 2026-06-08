@@ -580,6 +580,14 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     ("tradfi", "combo"): frozenset(),
     ("tradfi", "options_chain"): frozenset({"trades"}),
     ("tradfi", "futures_chain"): frozenset({"trades"}),
+    # Per-contract leaves (grain=leaf; NOT bundled). tradfi-owner verified 2026-06-08 (slot-6) against the
+    # `market-data-tick-tradfi` manifest present-set + the databento futures/FX market-data capability: the
+    # equity corporate events (`corporate_action_confirmed`/`earnings_result`) + `macro_result` are NOT futures/FX
+    # data_types — leaving these UNMAPPED (None) made FUTURE/SPOT_PAIR fall back to all 9 → the residual G1-ENUM
+    # over-fan (FUTURE was 84% of the post-bundle candidate set). `future` = the etf market-data set (databento
+    # derives ohlcv_1m/15m/24h + tbbo/mbp_10 for any tradeable contract); `spot_pair` (FX) = intraday + top-of-book.
+    ("tradfi", "future"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
+    ("tradfi", "spot_pair"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo"}),
     ("tradfi", "etf"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
     ("tradfi", "equity"): frozenset(
         {
