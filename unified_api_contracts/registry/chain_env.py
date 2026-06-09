@@ -502,7 +502,7 @@ PROTOCOL_LAUNCH_DATES: dict[tuple[str, str], str] = {
 }
 
 # ── Canonical underscore-name aliases for protocol names ──
-# Ghost no-underscore protocol tokens (AAVE_V3, UNISWAP_V3, etc.) kept for backward-compat.
+# Ghost no-underscore protocol tokens (AAVE_V3, UNISWAP_V3, etc.) are legacy-name aliases.
 # New MTDS writers use canonical tokens (AAVE_V3, UNISWAP_V3, etc.); these extend
 # PROTOCOL_LAUNCH_DATES so canonical-form ALL_DEFI_VENUES entries resolve correctly.
 _CANONICAL_PROTOCOL_RENAME: dict[str, str] = {

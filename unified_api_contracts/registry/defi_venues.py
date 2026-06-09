@@ -212,7 +212,7 @@ ALL_DEFI_VENUES: list[str] = [
 ]
 
 # ── Canonical underscore-name aliases (additive beside ghost names above) ──
-# Ghost no-underscore names (UNISWAP_V3-*, AAVE_V3-*, etc.) kept for backward-compat
+# Ghost no-underscore names (UNISWAP_V3-*, AAVE_V3-*, etc.) are legacy-name aliases
 # with historical GCS paths. New MTDS writers use canonical underscore names; these
 # entries ensure venue-parity tests pass for both forms.
 ALL_DEFI_VENUES.extend(

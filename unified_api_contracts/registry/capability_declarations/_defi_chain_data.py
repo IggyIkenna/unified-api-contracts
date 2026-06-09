@@ -708,7 +708,6 @@ HYPERLIQUID_RPC_TEMPLATES: dict[str, str] = {
 # ---------------------------------------------------------------------------
 STARKNET_RPC_TEMPLATES: dict[str, str] = {
     "alchemy": "https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_7/{api_key}",
-    "infura_compatible": "https://starknet-mainnet.infura.io/v3/{api_key}",
     "public": "https://free-rpc.nethermind.io/mainnet-juno",
     "testnet_alchemy": "https://starknet-sepolia.g.alchemy.com/starknet/version/rpc/v0_7/{api_key}",
     "testnet_public": "https://free-rpc.nethermind.io/sepolia-juno",

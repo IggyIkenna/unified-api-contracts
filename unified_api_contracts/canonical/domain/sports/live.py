@@ -35,7 +35,7 @@ from .odds import CanonicalOdds
 # instead of the odds-presence heuristic added in c2793217.
 #
 # Strategy fallback rule: when capture_status is absent (in-flight events
-# pre-rollout) fall back to _is_honest_empty_vector for backward compat.
+# pre-rollout) fall back to _is_honest_empty_vector for legacy honest-empty vectors.
 # ---------------------------------------------------------------------------
 
 SPORTS_FEATURE_PAYLOAD_CAPTURE_STATUS_KEY: Final[str] = "capture_status"
