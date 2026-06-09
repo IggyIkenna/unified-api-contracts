@@ -215,7 +215,7 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
 
 
 # ── Canonical underscore-name aliases ──
-# Ghost no-underscore keys (UNISWAP_V3, AAVE_V3, etc.) kept for backward-compat with
+# Ghost no-underscore keys (UNISWAP_V3, AAVE_V3, etc.) are legacy-name aliases for
 # historical GCS paths. New MTDS writes use canonical underscore names. These aliases
 # ensure downstream consumers resolve both forms to identical capability dicts.
 _CANONICAL_ALIASES: dict[str, str] = {

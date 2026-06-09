@@ -182,7 +182,7 @@ class TestingStage(StrEnum):
     """Strategy testing progression stages.
 
     DEPRECATED — use OperationalMode + ExecutionTarget + ExecutionTrigger.
-    Kept for backward-compat with existing 6 consumer call-sites.
+    Retained for active consumers pending migration to the triplet above.
     Collapsed mapping via decompose().
 
     Strategies must pass through stages sequentially:

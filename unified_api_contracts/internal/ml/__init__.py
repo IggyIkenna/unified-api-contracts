@@ -1,6 +1,6 @@
 """Internal ML schemas — model metadata, inference requests/responses, training jobs.
 
-Split into modules for maintainability while maintaining backward compatibility.
+Re-exports the ML schemas from ``ml_backup`` (a proper submodule split is pending — see TODO below).
 """
 
 # Import everything from backup to maintain compatibility temporarily

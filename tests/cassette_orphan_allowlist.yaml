@@ -42,6 +42,10 @@ allowed:
     reason: stub-placeholder
     detail: "Empty interactions stub — Versifi cassette pending."
     acked_by: ikenna 2026-05-20
+  - path: fear_greed/mocks/stub.yaml
+    reason: stub-placeholder
+    detail: "Empty interactions stub — Fear & Greed macro index; contract added (UAC@7ae9daee), adapter cassette pending."
+    acked_by: slot-2 2026-06-09
   # solayer + cambrian + picasso allowlist entries removed 2026-06-02 (operator decision):
   # venues fully removed from UAC — no usable/decodable DeFi data source. SSOT:
   # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md.

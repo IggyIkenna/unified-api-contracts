@@ -1,6 +1,6 @@
 """Synthetic-data generator taxonomy — closed-set workspace SSOT for the mock-data benchmark harness.
 
-Split into modules for maintainability while maintaining backward compatibility.
+Organized into submodules for maintainability; this package re-exports the public API.
 """
 
 # Import everything from backup to maintain compatibility temporarily
