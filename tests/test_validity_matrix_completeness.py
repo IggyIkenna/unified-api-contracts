@@ -43,141 +43,165 @@ from unified_api_contracts.registry.market_data_categories import (
 #
 # EXCLUSION LIST: (asset_group, data_type) pairs that are registered in
 # SOURCE_PRIORITY but whose data_type is NOT a member of ANY instrument_type's
-# valid set because:
+# valid set.  Every exclusion carries a typed reason constant defined below.
 #
-#   (a) COMPUTED / SERVICE emitters — their "data_type" is not a market-data
-#       type enumerated by the catalogue (no instrument yields them).
+# Reason taxonomy (closed set):
 #
-#   (b) REFERENCE-group entries (asset_group="reference") — the reference AG
-#       has no instrument_type matrix row (it is not a market-data category
-#       that the enumerator seeds).
+#   COMPUTED_SERVICE_OUTPUT — data_type is a pipeline/strategy/execution service
+#       output (e.g. execution_fills, hedge_ratio_snapshot).  Not produced by any
+#       market-data instrument_type in the catalogue.
 #
-#   (c) CeFi LEGACY data_type keys retained only for the pre-migration rows —
-#       perpetual / funding_rate / book_snapshot are instrument_type tokens or
-#       aliases, not valid market-data data_types enumerated by the cefi catalogue.
+#   REFERENCE_AG_NO_MATRIX — the "reference" asset_group has no instrument_type
+#       matrix row; it is not a market-data category the enumerator seeds.
 #
-#   (d) ERA-B DATA_TYPE ORPHANS — data_type keys in SOURCE_PRIORITY whose string
-#       matches an INSTRUMENT_TYPE name (options_chain / futures_chain), not a
-#       market-data row type. The Era-B invariant ensures the chain names are
-#       instrument_types; data_type=options_chain / data_type=futures_chain are
-#       pre-Era-B keys that have no instrument_type mapping in the current matrix.
+#   CEFI_LEGACY_KEY — "perpetual", "funding_rate", and "book_snapshot" are
+#       instrument_type tokens or legacy aliases — NOT valid market-data
+#       data_types in DATA_TYPES_BY_ASSET_GROUP["cefi"].  Retained in
+#       SOURCE_PRIORITY for the closed-set pipeline_mode round-trip only.
 #
-#   (e) DeFi DATA_TYPES IN DATA_TYPES_BY_ASSET_GROUP but not yet mapped to any
-#       instrument_type in PROTOCOL_CAPABILITIES — these are DeFi event/state
-#       data types (bridge_events, staking_yields, etc.) that are in the AG
-#       catalogue but have no PROTOCOL_CAPABILITIES instrument_type that
-#       produces them yet (BLOCKED-UPSTREAM gap, not a logic error here).
+#   ERA_B_LEGACY_RETAINED — data_type string matches an INSTRUMENT_TYPE name
+#       (options_chain / futures_chain).  Era-B (operator 2026-06-07) clarified
+#       these are instrument_types, not data_types.  The SOURCE_PRIORITY rows are
+#       RETAINED BY DESIGN for pre-migration manifest rows and SOURCE_PRIORITY ↔
+#       availability round-trips.  SSOT:
+#       master_data_canonicalisation_migration_catalogue_2026_06_07.md.
 #
-#   (f) Sports reference/classification data_types in SOURCE_PRIORITY that are
-#       NOT in SPORTS_DATA_TYPE_TO_SOURCE (the "league" instrument_type's valid
-#       set). These are coarser catalogue types (LEAGUES, PLAYERS, VENUES, etc.)
-#       that are tracked in SOURCE_PRIORITY but not enumerated via the
-#       league-instrument grain.
+#   BLOCKED_UPSTREAM_CAPABILITY — DeFi data_types that exist in
+#       DATA_TYPES_BY_ASSET_GROUP["defi"] but no PROTOCOL_CAPABILITIES
+#       instrument_type declares them as producible yet.  Gap is in the
+#       protocol capability declaration, not in the validity matrix logic.
+#       Re-classify to WIRED (remove from this list) once a protocol's
+#       _ProtocolCapability.data_types list is extended.
 #
-#   (g) TradFi / DeFi computed pipeline outputs (commodity_signal,
-#       commodity_features, energy_data) that are service/pipeline outputs
-#       rather than instrument-day-grain market data types.
+#   REFERENCE_NOT_INSTRUMENT_GRAIN — sports data_types that represent entity
+#       catalogues, competition-level metadata, or aggregated/derived outputs
+#       (LEAGUES, PLAYERS, VENUES, ARBITRAGE, RESULTS, etc.).  Not enumerated
+#       at per-instrument (league) grain via SPORTS_DATA_TYPE_TO_SOURCE;
+#       tracked in SOURCE_PRIORITY for reference-layer provenance only.
+#
+#   CEFI_MATRIX_GAP — data_type exists in SOURCE_PRIORITY for a cefi source
+#       but no cefi instrument_type in the validity matrix produces it.
+#       Not a logic error; marks a gap between SOURCE_PRIORITY and the cefi
+#       matrix that should be resolved by either adding the data_type to
+#       an instrument_type frozenset (if genuinely producible) or demoting the
+#       SOURCE_PRIORITY entry.
 #
 # If a pair is removed from this list without being present in the matrix, the
 # test will fail loudly — that is the point.
 #
-_SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS: frozenset[tuple[str, str]] = frozenset(
-    {
-        # ── (b) Reference AG (no instrument matrix, not a market-data category) ──
-        ("reference", "instruments"),
-        ("reference", "venue_trading_calendar"),
-        # ── (c) CeFi legacy data_type keys (pre-migration / not catalogue data_types) ──
-        # "perpetual" and "funding_rate" are INSTRUMENT_TYPE tokens, not data_types;
-        # "book_snapshot" is a legacy alias for "book_snapshot_5" (not in
-        # DATA_TYPES_BY_ASSET_GROUP["cefi"]). These exist in SOURCE_PRIORITY for
-        # the closed-set pipeline_mode round-trip; they carry no valid matrix entry.
-        ("cefi", "perpetual"),
-        ("cefi", "funding_rate"),
-        ("cefi", "book_snapshot"),
-        # ── (d) Era-B data_type orphans — instrument_type names masquerading as
-        #    data_type keys in SOURCE_PRIORITY. The matrix only maps these as
-        #    instrument_types, never as data_types:
-        #       (cefi, options_chain): instrument_type -> data_type=trades; no cefi
-        #           instrument has data_type=options_chain in its valid set.
-        #       (cefi, futures_chain): same — instrument_type -> data_type=trades.
-        #       (tradfi, futures_chain): instrument_type -> {trades, ohlcv_1m, tbbo};
-        #           no tradfi instrument has data_type=futures_chain in its valid set.
-        #    NOTE: (tradfi, options_chain) IS reachable — the tradfi options_chain
-        #    INSTRUMENT_TYPE's frozenset includes data_type=options_chain per the
-        #    T-OLD-2b PRESERVE decision (291 Era-A mark_iv/greeks snapshot rows).
-        ("cefi", "options_chain"),
-        ("cefi", "futures_chain"),
-        ("tradfi", "futures_chain"),
-        # ── (c) CeFi ohlcv_15m — in SOURCE_PRIORITY (tardis source) but no cefi
-        #    instrument_type in the validity matrix admits ohlcv_15m. This is a
-        #    gap between SOURCE_PRIORITY and the cefi matrix (tradfi has ohlcv_15m
-        #    but cefi does not). Tracked as an exclusion until the cefi matrix
-        #    adds ohlcv_15m to the appropriate instrument_type's valid set.
-        ("cefi", "ohlcv_15m"),
-        # ── (a) CeFi computed service outputs ──
-        ("cefi", "execution_fills"),
-        ("cefi", "cross_instrument"),
-        ("cefi", "cross_instrument_features"),
-        # ── (a) DeFi computed/service outputs (no instrument produces these) ──
-        ("defi", "execution_fills"),
-        ("defi", "hedge_ratio_snapshot"),
-        ("defi", "strategy_decision_context"),
-        ("defi", "feature_observation_snapshot"),
-        ("defi", "cross_instrument_signal"),
-        # ── (e) DeFi data_types in DATA_TYPES_BY_ASSET_GROUP but not yet mapped
-        #    to any PROTOCOL_CAPABILITIES instrument_type (BLOCKED-UPSTREAM gap).
-        #    These are valid DeFi event/state data types that exist in the AG
-        #    catalogue but the instrument_type matrix has not been extended to
-        #    cover them yet. They should be added to the appropriate
-        #    PROTOCOL_CAPABILITIES instrument_type once the mapping is decided.
-        ("defi", "bridge_events"),
-        ("defi", "eigenlayer_rewards"),
-        ("defi", "flash_loan_events"),
-        ("defi", "governance_events"),
-        ("defi", "liquidation_events"),
-        ("defi", "mev_events"),
-        ("defi", "native_staking_rates"),
-        ("defi", "position_data"),
-        ("defi", "staking_yields"),
-        ("defi", "token_transfers"),
-        ("defi", "vault_share_price"),
-        # ── (a) DeFi data_types in SOURCE_PRIORITY but NOT in DATA_TYPES_BY_ASSET_GROUP
-        #    (internal protocol-specific outputs or feature-layer constructs):
-        ("defi", "swap"),
-        ("defi", "fx_rate"),
-        ("defi", "liquidity"),
-        ("defi", "market_state"),
-        ("defi", "lst_yields"),  # canonical name is lst_rates, not lst_yields
-        ("defi", "vault_state"),
-        ("defi", "solana_defi"),
-        # ── (g) TradFi computed / pipeline outputs (not instrument-grain) ──
-        ("tradfi", "commodity_signal"),
-        ("tradfi", "commodity_features"),
-        ("tradfi", "energy_data"),
-        # ── (a) Prediction ──
-        # "book_snapshot" is a legacy/non-canonical key in SOURCE_PRIORITY
-        # (prediction catalogue only carries "trades" and the prediction types).
-        ("prediction", "book_snapshot"),
-        # ── (f) Sports reference/classification data_types in SOURCE_PRIORITY
-        #    that are NOT in SPORTS_DATA_TYPE_TO_SOURCE (not reachable via the
-        #    "league" instrument_type's derived valid set). These are coarser
-        #    catalogue data_types tracked in SOURCE_PRIORITY but not enumerated
-        #    at instrument grain (e.g. competition-level metadata like LEAGUES,
-        #    entity catalogues like PLAYERS/VENUES, computed outputs like ARBITRAGE,
-        #    and temporal variants like ODDS_SNAPSHOT/ODDS_MOVEMENT/WEATHER_FORECAST).
-        ("sports", "ARBITRAGE"),
-        ("sports", "FIXTURE_PLAYER_STATS"),
-        ("sports", "LEAGUES"),
-        ("sports", "ODDS_MOVEMENT"),
-        ("sports", "ODDS_SNAPSHOT"),
-        ("sports", "PLAYERS"),
-        ("sports", "RESULTS"),
-        ("sports", "TRANSFER_RECORDS"),
-        ("sports", "UNDERSTAT_XG"),
-        ("sports", "VENUES"),
-        ("sports", "WEATHER_FORECAST"),
-    }
-)
+
+# Typed reason constants — each exclusion entry cites exactly one.
+_COMPUTED_SERVICE_OUTPUT = "COMPUTED_SERVICE_OUTPUT"
+_REFERENCE_AG_NO_MATRIX = "REFERENCE_AG_NO_MATRIX"
+_CEFI_LEGACY_KEY = "CEFI_LEGACY_KEY"
+_ERA_B_LEGACY_RETAINED = "ERA_B_LEGACY_RETAINED"
+_BLOCKED_UPSTREAM_CAPABILITY = "BLOCKED_UPSTREAM_CAPABILITY"
+_REFERENCE_NOT_INSTRUMENT_GRAIN = "REFERENCE_NOT_INSTRUMENT_GRAIN"
+_CEFI_MATRIX_GAP = "CEFI_MATRIX_GAP"
+
+# Mapping: (asset_group, data_type) → reason constant.
+# Every exclusion MUST carry a reason; the test
+# ``test_every_exclusion_has_typed_reason`` enforces this.
+_SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
+    # ── Reference AG (no instrument matrix, not a market-data category) ──
+    ("reference", "instruments"): _REFERENCE_AG_NO_MATRIX,
+    ("reference", "venue_trading_calendar"): _REFERENCE_AG_NO_MATRIX,
+    # ── CeFi legacy data_type keys (pre-migration / not catalogue data_types) ──
+    # "perpetual" and "funding_rate" are INSTRUMENT_TYPE tokens, not data_types;
+    # "book_snapshot" is a legacy alias for "book_snapshot_5" (not in
+    # DATA_TYPES_BY_ASSET_GROUP["cefi"]). These exist in SOURCE_PRIORITY for
+    # the closed-set pipeline_mode round-trip; they carry no valid matrix entry.
+    ("cefi", "perpetual"): _CEFI_LEGACY_KEY,
+    ("cefi", "funding_rate"): _CEFI_LEGACY_KEY,
+    ("cefi", "book_snapshot"): _CEFI_LEGACY_KEY,
+    # ── Era-B data_type orphans — instrument_type names masquerading as
+    #    data_type keys in SOURCE_PRIORITY. The matrix only maps these as
+    #    instrument_types, never as data_types.
+    #    (cefi, options_chain): instrument_type -> data_type=trades; no cefi
+    #        instrument has data_type=options_chain in its valid set.
+    #    (cefi, futures_chain): same — instrument_type -> data_type=trades.
+    #    (tradfi, futures_chain): instrument_type -> {trades, ohlcv_1m, tbbo};
+    #        no tradfi instrument has data_type=futures_chain in its valid set.
+    #    NOTE: (tradfi, options_chain) IS reachable — the tradfi options_chain
+    #    INSTRUMENT_TYPE's frozenset includes data_type=options_chain per the
+    #    T-OLD-2b PRESERVE decision (291 Era-A mark_iv/greeks snapshot rows).
+    ("cefi", "options_chain"): _ERA_B_LEGACY_RETAINED,
+    ("cefi", "futures_chain"): _ERA_B_LEGACY_RETAINED,
+    ("tradfi", "futures_chain"): _ERA_B_LEGACY_RETAINED,
+    # ── CeFi matrix gap — ohlcv_15m in SOURCE_PRIORITY (tardis) but no cefi
+    #    instrument_type admits ohlcv_15m.  tradfi has ohlcv_15m; cefi does not.
+    #    Resolve by adding ohlcv_15m to the appropriate cefi instrument_type
+    #    frozenset once cefi 15m candle production is confirmed.
+    ("cefi", "ohlcv_15m"): _CEFI_MATRIX_GAP,
+    # ── CeFi computed service outputs ──
+    ("cefi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
+    ("cefi", "cross_instrument"): _COMPUTED_SERVICE_OUTPUT,
+    ("cefi", "cross_instrument_features"): _COMPUTED_SERVICE_OUTPUT,
+    # ── DeFi computed/service outputs (no instrument produces these) ──
+    ("defi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "hedge_ratio_snapshot"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "strategy_decision_context"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "feature_observation_snapshot"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "cross_instrument_signal"): _COMPUTED_SERVICE_OUTPUT,
+    # ── DeFi data_types in DATA_TYPES_BY_ASSET_GROUP but not yet mapped
+    #    to any PROTOCOL_CAPABILITIES instrument_type (BLOCKED-UPSTREAM gap).
+    #    Valid DeFi event/state data types that exist in the AG catalogue but
+    #    the instrument_type matrix has not been extended to cover them yet.
+    #    Remove from this list once a _ProtocolCapability.data_types entry
+    #    is added for the appropriate instrument_type.
+    ("defi", "bridge_events"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "eigenlayer_rewards"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "flash_loan_events"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "governance_events"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "liquidation_events"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "mev_events"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "native_staking_rates"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "position_data"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "staking_yields"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "token_transfers"): _BLOCKED_UPSTREAM_CAPABILITY,
+    ("defi", "vault_share_price"): _BLOCKED_UPSTREAM_CAPABILITY,
+    # ── DeFi data_types in SOURCE_PRIORITY but NOT in DATA_TYPES_BY_ASSET_GROUP
+    #    (internal protocol-specific outputs or feature-layer constructs that
+    #    bypassed the AG catalogue).  These are COMPUTED_SERVICE_OUTPUT or
+    #    protocol-internal aliases.
+    ("defi", "swap"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "fx_rate"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "liquidity"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "market_state"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "lst_yields"): _COMPUTED_SERVICE_OUTPUT,  # canonical name is lst_rates
+    ("defi", "vault_state"): _COMPUTED_SERVICE_OUTPUT,
+    ("defi", "solana_defi"): _COMPUTED_SERVICE_OUTPUT,
+    # ── TradFi computed / pipeline outputs (not instrument-grain market data) ──
+    ("tradfi", "commodity_signal"): _COMPUTED_SERVICE_OUTPUT,
+    ("tradfi", "commodity_features"): _COMPUTED_SERVICE_OUTPUT,
+    ("tradfi", "energy_data"): _COMPUTED_SERVICE_OUTPUT,
+    # ── Prediction ──
+    # "book_snapshot" is a legacy/non-canonical key in SOURCE_PRIORITY
+    # (prediction catalogue only carries "trades" and the prediction types).
+    ("prediction", "book_snapshot"): _CEFI_LEGACY_KEY,
+    # ── Sports reference/classification data_types in SOURCE_PRIORITY
+    #    that are NOT in SPORTS_DATA_TYPE_TO_SOURCE (not reachable via the
+    #    "league" instrument_type's derived valid set).
+    #    These are competition-level metadata (LEAGUES), entity catalogues
+    #    (PLAYERS, VENUES), results/transfer records, computed arbitrage
+    #    outputs, temporal odds variants (ODDS_SNAPSHOT, ODDS_MOVEMENT),
+    #    and weather forecast data — tracked in SOURCE_PRIORITY for
+    #    reference-layer provenance but not enumerated at instrument grain.
+    ("sports", "ARBITRAGE"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "FIXTURE_PLAYER_STATS"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "LEAGUES"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "ODDS_MOVEMENT"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "ODDS_SNAPSHOT"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "PLAYERS"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "RESULTS"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "TRANSFER_RECORDS"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "UNDERSTAT_XG"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "VENUES"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+    ("sports", "WEATHER_FORECAST"): _REFERENCE_NOT_INSTRUMENT_GRAIN,
+}
+
+# Derived frozenset for O(1) membership checks in the reachability test.
+_SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS: frozenset[tuple[str, str]] = frozenset(_SOURCE_PRIORITY_EXCLUSION_REASONS)
 
 
 def _build_reachable_set_for_ag(asset_group: str) -> set[str]:
@@ -279,6 +303,59 @@ class TestSourcePriorityReachability:
             f"Entries in _SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS that are no "
             f"longer in SOURCE_PRIORITY (stale exclusions): {sorted(stale_exclusions)}. "
             "Remove them from the exclusion list."
+        )
+
+    def test_every_exclusion_has_typed_reason(self) -> None:
+        """Every entry in _SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS must have
+        a typed reason in _SOURCE_PRIORITY_EXCLUSION_REASONS.
+
+        Prevents anonymous exclusions (bare frozenset entries with only a
+        comment) from accumulating.  Every (ag, dt) pair that cannot be
+        wired into the validity matrix must carry one of the closed-set
+        reason constants, making the rationale machine-readable and
+        auditable.
+        """
+        _VALID_REASONS = {
+            _COMPUTED_SERVICE_OUTPUT,
+            _REFERENCE_AG_NO_MATRIX,
+            _CEFI_LEGACY_KEY,
+            _ERA_B_LEGACY_RETAINED,
+            _BLOCKED_UPSTREAM_CAPABILITY,
+            _REFERENCE_NOT_INSTRUMENT_GRAIN,
+            _CEFI_MATRIX_GAP,
+        }
+
+        # Every exclusion key must appear in the reasons dict.
+        missing_reason = [
+            key
+            for key in sorted(_SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS)
+            if key not in _SOURCE_PRIORITY_EXCLUSION_REASONS
+        ]
+        assert not missing_reason, (
+            f"Exclusion entries without a typed reason in "
+            f"_SOURCE_PRIORITY_EXCLUSION_REASONS: {missing_reason}. "
+            "Add an entry to _SOURCE_PRIORITY_EXCLUSION_REASONS for each."
+        )
+
+        # Every reason value must be a recognised constant.
+        unknown_reasons = [
+            (key, reason) for key, reason in _SOURCE_PRIORITY_EXCLUSION_REASONS.items() if reason not in _VALID_REASONS
+        ]
+        assert not unknown_reasons, (
+            f"Unrecognised reason values in _SOURCE_PRIORITY_EXCLUSION_REASONS: "
+            f"{unknown_reasons}. "
+            f"Use one of the defined constants: {sorted(_VALID_REASONS)}."
+        )
+
+        # The reasons dict must not have entries missing from the exclusion set
+        # (would indicate a reason entry was added without its matching exclusion).
+        extra_reason_keys = [
+            key for key in _SOURCE_PRIORITY_EXCLUSION_REASONS if key not in _SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS
+        ]
+        assert not extra_reason_keys, (
+            f"Keys in _SOURCE_PRIORITY_EXCLUSION_REASONS not present in "
+            f"_SOURCE_PRIORITY_INSTRUMENT_EXCLUSIONS: {sorted(extra_reason_keys)}. "
+            "Sync both dicts."
         )
 
 
