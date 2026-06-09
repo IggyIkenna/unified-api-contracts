@@ -75,6 +75,7 @@ single primary batch source.
 from __future__ import annotations
 
 import logging
+from collections.abc import Hashable
 from enum import StrEnum
 from typing import Final
 
@@ -845,13 +846,13 @@ def read_with_source_priority(
 
 def detect_dual_source_conflicts(
     source_a: str,
-    keys_a: set[tuple],
+    keys_a: set[tuple[Hashable, ...]],
     source_b: str,
-    keys_b: set[tuple],
+    keys_b: set[tuple[Hashable, ...]],
     *,
     asset_group: str,
     data_type: str,
-) -> list[tuple]:
+) -> list[tuple[Hashable, ...]]:
     """Return row keys present in both source_a and source_b.
 
     Per Phase 2 of ``tradfi_massive_dual_source_2026_05_28.md`` conflict

@@ -241,11 +241,11 @@ class TestValidDataTypesForInstrumentTypeAccessor:
 
         # Warm the cache
         valid_data_types_for_instrument_type("defi", "LENDING")
-        first_cache = _mdc._DEFI_VALID_DATA_TYPES
+        first_cache = _mdc._defi_valid_data_types
 
         # Call again — must return same dict object (not rebuilt)
         valid_data_types_for_instrument_type("defi", "POOL")
-        second_cache = _mdc._DEFI_VALID_DATA_TYPES
+        second_cache = _mdc._defi_valid_data_types
 
         assert first_cache is second_cache
 

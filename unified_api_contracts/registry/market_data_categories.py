@@ -818,14 +818,14 @@ def bundle_instrument_type_for_leaf(asset_group: str, instrument_type: str, venu
 
 
 # Module-level cache for the lazily-built DeFi sub-dict.
-_DEFI_VALID_DATA_TYPES: dict[str, frozenset[str]] | None = None
+_defi_valid_data_types: dict[str, frozenset[str]] | None = None
 
 # Module-level cache for the lazily-built sports league valid-set. Derived from
 # ``SPORTS_DATA_TYPE_TO_SOURCE`` (the reference-data provider data_types) rather
 # than a hand-written literal — a literal had silently dropped ``ODDS`` (it is a
 # SPORTS_DATA_TYPE_TO_SOURCE key AND a DATA_TYPES_BY_ASSET_GROUP["sports"] member,
 # so it failed both arms of the _row_data_types filter). Deriving keeps it in sync.
-_SPORTS_LEAGUE_VALID_DATA_TYPES: frozenset[str] | None = None
+_sports_league_valid_data_types: frozenset[str] | None = None
 
 
 def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str) -> frozenset[str] | None:
@@ -846,7 +846,7 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
     ``cap.instrument_type`` → union of ``cap.data_types`` across all protocols
     that use that instrument type.  Cache is module-level.
     """
-    global _DEFI_VALID_DATA_TYPES, _SPORTS_LEAGUE_VALID_DATA_TYPES
+    global _defi_valid_data_types, _sports_league_valid_data_types
 
     # Normalise instrument_type token.
     normalised = instrument_type.strip().lower() if instrument_type else ""
@@ -858,16 +858,16 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
         # data_types (SPORTS_DATA_TYPE_TO_SOURCE keys: MATCHES/ODDS/STANDINGS/FIXTURES/XG/…),
         # NOT the MTDS odds market-data types. Derived (not literal) so a future
         # SPORTS_DATA_TYPE_TO_SOURCE addition can never silently drop out of the could-exist seed.
-        if _SPORTS_LEAGUE_VALID_DATA_TYPES is None:
+        if _sports_league_valid_data_types is None:
             from unified_api_contracts.canonical.domain.sports import (  # noqa: imports-inside-functions
                 SPORTS_DATA_TYPE_TO_SOURCE,
             )
 
-            _SPORTS_LEAGUE_VALID_DATA_TYPES = frozenset(SPORTS_DATA_TYPE_TO_SOURCE)
-        return _SPORTS_LEAGUE_VALID_DATA_TYPES
+            _sports_league_valid_data_types = frozenset(SPORTS_DATA_TYPE_TO_SOURCE)
+        return _sports_league_valid_data_types
 
     if asset_group.lower() == "defi":
-        if _DEFI_VALID_DATA_TYPES is None:
+        if _defi_valid_data_types is None:
             from .capability_declarations._defi import PROTOCOL_CAPABILITIES  # noqa: imports-inside-functions
 
             defi: dict[str, set[str]] = {}
@@ -876,8 +876,8 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
                     it_key = it.strip().lower()
                     it_key = _INSTRUMENT_TYPE_ALIASES.get(it_key, it_key)
                     defi.setdefault(it_key, set()).update(cap.data_types)
-            _DEFI_VALID_DATA_TYPES = {k: frozenset(v) for k, v in defi.items()}
-        return _DEFI_VALID_DATA_TYPES.get(normalised)  # None if unmapped
+            _defi_valid_data_types = {k: frozenset(v) for k, v in defi.items()}
+        return _defi_valid_data_types.get(normalised)  # None if unmapped
 
     return VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised))
 
