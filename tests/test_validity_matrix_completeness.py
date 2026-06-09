@@ -98,6 +98,14 @@ _ERA_B_LEGACY_RETAINED = "ERA_B_LEGACY_RETAINED"
 _BLOCKED_UPSTREAM_CAPABILITY = "BLOCKED_UPSTREAM_CAPABILITY"
 _REFERENCE_NOT_INSTRUMENT_GRAIN = "REFERENCE_NOT_INSTRUMENT_GRAIN"
 _CEFI_MATRIX_GAP = "CEFI_MATRIX_GAP"
+# PENDING_SNAPSHOT_SLICE — options_chain / futures_chain SOURCE_PRIORITY entries
+#     retained for cefi/tradfi pending the per-AG instrument_type snapshot slice
+#     widening (slot-3 widens cefi futures_chain to admit data_type=options_chain;
+#     tradfi options_chain/futures_chain retain their legacy Era-A snapshot rows).
+#     Supersedes ERA_B_LEGACY_RETAINED for these three pairs: the Era-B context
+#     is accurate but the PENDING framing better conveys the actionable gap
+#     (adding the snapshot data_type to the instrument_type frozenset unblocks them).
+_PENDING_SNAPSHOT_SLICE = "PENDING_SNAPSHOT_SLICE"
 
 # Mapping: (asset_group, data_type) → reason constant.
 # Every exclusion MUST carry a reason; the test
@@ -114,25 +122,19 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("cefi", "perpetual"): _CEFI_LEGACY_KEY,
     ("cefi", "funding_rate"): _CEFI_LEGACY_KEY,
     ("cefi", "book_snapshot"): _CEFI_LEGACY_KEY,
-    # ── Era-B data_type orphans — instrument_type names masquerading as
-    #    data_type keys in SOURCE_PRIORITY. The matrix only maps these as
-    #    instrument_types, never as data_types.
-    #    (cefi, options_chain): instrument_type -> data_type=trades; no cefi
-    #        instrument has data_type=options_chain in its valid set.
-    #    (cefi, futures_chain): same — instrument_type -> data_type=trades.
-    #    (tradfi, futures_chain): instrument_type -> {trades, ohlcv_1m, tbbo};
-    #        no tradfi instrument has data_type=futures_chain in its valid set.
-    #    NOTE: (tradfi, options_chain) IS reachable — the tradfi options_chain
-    #    INSTRUMENT_TYPE's frozenset includes data_type=options_chain per the
-    #    T-OLD-2b PRESERVE decision (291 Era-A mark_iv/greeks snapshot rows).
-    ("cefi", "options_chain"): _ERA_B_LEGACY_RETAINED,
-    ("cefi", "futures_chain"): _ERA_B_LEGACY_RETAINED,
-    ("tradfi", "futures_chain"): _ERA_B_LEGACY_RETAINED,
-    # ── CeFi matrix gap — ohlcv_15m in SOURCE_PRIORITY (tardis) but no cefi
-    #    instrument_type admits ohlcv_15m.  tradfi has ohlcv_15m; cefi does not.
-    #    Resolve by adding ohlcv_15m to the appropriate cefi instrument_type
-    #    frozenset once cefi 15m candle production is confirmed.
-    ("cefi", "ohlcv_15m"): _CEFI_MATRIX_GAP,
+    # ── Pending snapshot slice — options_chain / futures_chain SOURCE_PRIORITY
+    #    entries retained while the per-AG instrument_type snapshot slice widens.
+    #    These are instrument_types in the matrix but the slot-3 scope adds the
+    #    snapshot data_type to the frozenset (e.g. cefi futures_chain admits
+    #    data_type=options_chain for the Deribit greeks snapshot; tradfi
+    #    options_chain/futures_chain retain their Era-A snapshot rows pending
+    #    the per-AG v8→v9 relabel). Remove each once the slice is widened.
+    #    NOTE: (tradfi, options_chain) IS already reachable — the tradfi
+    #    options_chain INSTRUMENT_TYPE's frozenset includes data_type=options_chain
+    #    per the T-OLD-2b PRESERVE decision (291 Era-A mark_iv/greeks rows).
+    ("cefi", "options_chain"): _PENDING_SNAPSHOT_SLICE,
+    ("cefi", "futures_chain"): _PENDING_SNAPSHOT_SLICE,
+    ("tradfi", "futures_chain"): _PENDING_SNAPSHOT_SLICE,
     # ── CeFi computed service outputs ──
     ("cefi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
     ("cefi", "cross_instrument"): _COMPUTED_SERVICE_OUTPUT,
@@ -149,17 +151,15 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     #    the instrument_type matrix has not been extended to cover them yet.
     #    Remove from this list once a _ProtocolCapability.data_types entry
     #    is added for the appropriate instrument_type.
-    ("defi", "bridge_events"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "eigenlayer_rewards"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "flash_loan_events"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "governance_events"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "liquidation_events"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "mev_events"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "native_staking_rates"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "position_data"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "staking_yields"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "token_transfers"): _BLOCKED_UPSTREAM_CAPABILITY,
-    ("defi", "vault_share_price"): _BLOCKED_UPSTREAM_CAPABILITY,
+    #
+    #    Wired 2026-06-09 (operator-directed; venue-evidence in
+    #    DEFI_VENUE_DATA_TYPE_CAPABILITIES for each):
+    #      bridge_events, eigenlayer_rewards, flash_loan_events, governance_events,
+    #      liquidation_events, mev_events, position_data, staking_yields, token_transfers
+    #
+    #    Remaining no-producer gaps (not in DEFI_VENUE_DATA_TYPE_CAPABILITIES):
+    ("defi", "native_staking_rates"): _BLOCKED_UPSTREAM_CAPABILITY,  # Solana RPC not yet a protocol capability
+    ("defi", "vault_share_price"): _BLOCKED_UPSTREAM_CAPABILITY,  # ERC-4626 share-price — no venue evidence
     # ── DeFi data_types in SOURCE_PRIORITY but NOT in DATA_TYPES_BY_ASSET_GROUP
     #    (internal protocol-specific outputs or feature-layer constructs that
     #    bypassed the AG catalogue).  These are COMPUTED_SERVICE_OUTPUT or
@@ -323,6 +323,7 @@ class TestSourcePriorityReachability:
             _BLOCKED_UPSTREAM_CAPABILITY,
             _REFERENCE_NOT_INSTRUMENT_GRAIN,
             _CEFI_MATRIX_GAP,
+            _PENDING_SNAPSHOT_SLICE,
         }
 
         # Every exclusion key must appear in the reasons dict.

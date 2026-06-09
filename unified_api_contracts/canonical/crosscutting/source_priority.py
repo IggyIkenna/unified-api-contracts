@@ -152,7 +152,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # back to Tardis.
     ("cefi", "trades"): ["tardis"],
     ("cefi", "ohlcv_1m"): ["tardis"],
-    ("cefi", "ohlcv_15m"): ["tardis"],
+    # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
+    # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
+    # remains (databento/massive/yahoo/barchart produce it). Exclusion entry in
+    # test_validity_matrix_completeness.py removed alongside.
     ("cefi", "book_snapshot"): ["tardis"],
     ("cefi", "liquidations"): ["tardis"],
     # ERA-B (operator 2026-06-07): options_chain / futures_chain are
