@@ -988,7 +988,7 @@ def canonicalize_league_id(raw: str) -> str:
             if isinstance(pid, int):
                 if pid == num:
                     return base
-            elif isinstance(pid, str) and pid.isdigit() and int(pid) == num:
+            elif pid.isdigit() and int(pid) == num:  # pid is str here (narrowed)
                 return base
 
     # Suffix exists but is NOT a registered provider ID for ``base``

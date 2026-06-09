@@ -39,7 +39,7 @@ SSOT:
   (BL-1..BL-10 block-list groupings surfaced through
   ``archetypes_for_pair``).
 
-Split into modules for maintainability while maintaining backward compatibility.
+Organized into submodules (_enums, _schemas, …) for maintainability; this package re-exports the public API.
 """
 
 # Import all enums

@@ -142,7 +142,7 @@ def sports_bucket_name(project_id: str, *, env: str = "prd") -> str:
     """Return the canonical sports reference bucket name for a project.
 
     Args:
-        project_id: GCP project id (e.g. ``central-element-323112``).
+        project_id: GCP project id (e.g. ``my-gcp-project``).
         env: Deployment environment short form (``"prd"`` / ``"stg"`` /
             ``"dev"``). Defaults to ``"prd"`` — the production env.
             Matches ``DEPLOYMENT_ENV_SHORT`` from cloud-providers.yaml.
@@ -272,7 +272,7 @@ def candidate_parquet_uris(
         data_type: Canonical SPORTS data_type (e.g. ``"FIXTURES"``).
         day: ``YYYY-MM-DD`` partition.
         league_id: Canonical UAC league_id.
-        project_id: GCP project id (e.g. ``central-element-323112``).
+        project_id: GCP project id (e.g. ``my-gcp-project``).
         env: Deployment environment short form (``"prd"`` / ``"stg"`` /
             ``"dev"``). Defaults to ``"prd"``. Passed to
             :func:`sports_bucket_name` to produce the env-tiered bucket name.

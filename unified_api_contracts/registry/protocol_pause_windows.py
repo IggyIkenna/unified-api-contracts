@@ -151,7 +151,7 @@ def _load_cache() -> dict[tuple[str, str], list[tuple[date, date | None]]]:
         raw = cast(dict[str, Any], json.loads(_CACHE_PATH.read_text()))
         raw_windows = cast(dict[str, Any], raw.get("windows", {}))  # noqa: qg-empty-fallback
         result: dict[tuple[str, str], list[tuple[date, date | None]]] = {}
-        for key_str, wins_raw in raw_windows.items():  # type: ignore[reportAny]
+        for key_str, wins_raw in raw_windows.items():  # pyright: ignore[reportAny]
             wins_list = cast(list[dict[str, Any]], wins_raw)
             if "|" not in key_str:
                 continue
