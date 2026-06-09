@@ -93,7 +93,8 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ---- CeFi -----------------------------------------------------------
     ("cefi", "trades"): "tick_timestamp",
     ("cefi", "ohlcv_1m"): "tick_timestamp",
-    ("cefi", "ohlcv_15m"): "tick_timestamp",
+    # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no 15m candles.
+    # tradfi ohlcv_15m at line ~181 is intact.
     ("cefi", "book_snapshot"): "tick_timestamp",
     ("cefi", "liquidations"): "tick_timestamp",
     ("cefi", "options_chain"): "tick_timestamp",

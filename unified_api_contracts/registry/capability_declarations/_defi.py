@@ -274,6 +274,7 @@ class ProtocolClass(StrEnum):
     STAKING = "staking"
     PERPS = "perps"
     RESTAKING = "restaking"
+    INFRASTRUCTURE = "infrastructure"  # chain-level analytics: bridge / governance / MEV / token-transfers
 
 
 class _ProtocolCapability:
@@ -344,8 +345,21 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="AAVE_V3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[
+            *_LENDING_DATA,
+            "liquidation_events",  # LiquidationCall events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
+            "flash_loan_events",  # FlashLoan events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
+            "position_data",  # Top-500 user positions by supplied_usd (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
+            "gas_fees",
+        ],
+        mtds_operations=[
+            "collect-lending-indices",
+            "collect-liquidations",
+            "collect-liquidation-events",
+            "collect-flash-loan-events",
+            "collect-position-data",
+            "collect-gas-fees",
+        ],
         required_tokens=frozenset({"AAVE", "GHO"}),
     ),
     "spark": _ProtocolCapability(
@@ -368,8 +382,18 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="MORPHO",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-liquidations", "collect-gas-fees"],
+        data_types=[
+            *_LENDING_DATA,
+            "liquidation_events",  # LiquidationCall events (MORPHO-ETHEREUM 2024-01-08)
+            "position_data",  # Top user positions (MORPHO-ETHEREUM 2024-01-08)
+            "gas_fees",
+        ],
+        mtds_operations=[
+            "collect-liquidations",
+            "collect-liquidation-events",
+            "collect-position-data",
+            "collect-gas-fees",
+        ],
     ),
     # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
     # NOTE (2026-06-02): gas_fees is NOT a per-venue data_type — gas is collected
@@ -439,8 +463,12 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="UNISWAP_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[
+            *_DEX_DATA,
+            "position_data",  # LP position data — top 1000 by liquidity (UNISWAP_V3-ETHEREUM 2021-05-05)
+            "gas_fees",
+        ],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-position-data", "collect-gas-fees"],
         required_tokens=frozenset({"UNI"}),
     ),
     "uniswap_v4": _ProtocolCapability(
@@ -531,16 +559,26 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="LIDO",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=[*_YIELD_DATA, "rewards", "gas_fees"],
-        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-gas-fees"],
+        data_types=[
+            *_YIELD_DATA,
+            "staking_yields",  # stETH APY daily rate (LIDO-ETHEREUM 2020-12-18)
+            "rewards",
+            "gas_fees",
+        ],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields", "collect-gas-fees"],
         required_tokens=frozenset({"LDO", "STETH", "WSTETH"}),
     ),
     "etherfi": _ProtocolCapability(
         venue_prefix="ETHERFI",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=[*_YIELD_DATA, "rewards", "gas_fees"],
-        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-gas-fees"],
+        data_types=[
+            *_YIELD_DATA,
+            "staking_yields",  # weETH APY (ETHERFI-ETHEREUM 2023-11-01)
+            "rewards",
+            "gas_fees",
+        ],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields", "collect-gas-fees"],
         required_tokens=frozenset({"ETHFI", "EETH", "WEETH"}),
     ),
     "ethena": _ProtocolCapability(
@@ -555,8 +593,19 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="EIGENLAYER",
         protocol_class=ProtocolClass.RESTAKING,
         instrument_types=_RESTAKING,
-        data_types=["rewards", "oracle_prices", "gas_fees"],
-        mtds_operations=["collect-eigenlayer-rewards", "collect-oracle-prices", "collect-gas-fees"],
+        data_types=[
+            "rewards",
+            "eigenlayer_rewards",  # Per-operator restaking rewards (EIGENLAYER-ETHEREUM 2024-08-06)
+            "staking_yields",  # Restaking APY per operator (EIGENLAYER-ETHEREUM 2024-08-06)
+            "oracle_prices",
+            "gas_fees",
+        ],
+        mtds_operations=[
+            "collect-eigenlayer-rewards",
+            "collect-staking-yields",
+            "collect-oracle-prices",
+            "collect-gas-fees",
+        ],
         required_tokens=frozenset({"EIGEN", "ETHFI"}),
     ),
     # ── CeFi-style Perps (API-based, not on-chain) ─────────────
@@ -653,6 +702,151 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
     # NCNs on Jito Restaking, not a DeFi venue (no TVL/pools/rates/program to query). Excluded
     # from the venue registry. SSOT:
     # plans/active/issues/issue_docs_remediation_sweep_2026_06_02.md (venue smoke-test results).
+    # ── DeFi Vault / Yield Optimizer protocols (staking_yields) ──────────────
+    # Evidence in DEFI_VENUE_DATA_TYPE_CAPABILITIES for staking_yields start dates.
+    "yearn_v3": _ProtocolCapability(
+        venue_prefix="YEARN_V3",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=["staking_yields", "oracle_prices"],  # vault APY time-series (YEARN_V3-ETHEREUM 2024-03-20)
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        required_tokens=frozenset({"YFI"}),
+    ),
+    "convex": _ProtocolCapability(
+        venue_prefix="CONVEX",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=["staking_yields"],  # vault APY time-series (CONVEX-ETHEREUM 2021-05-17)
+        mtds_operations=["collect-staking-yields"],
+        required_tokens=frozenset({"CVX", "CRV"}),
+    ),
+    "beefy": _ProtocolCapability(
+        venue_prefix="BEEFY",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=["staking_yields"],  # vault APY time-series (multi-chain; BEEFY-BSC 2020-10-08 earliest)
+        mtds_operations=["collect-staking-yields"],
+    ),
+    "pendle": _ProtocolCapability(
+        venue_prefix="PENDLE",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=["staking_yields", "oracle_prices"],  # yield tokenisation APY (PENDLE-ETHEREUM 2021-06-15)
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        required_tokens=frozenset({"PENDLE"}),
+    ),
+    "idle": _ProtocolCapability(
+        venue_prefix="IDLE",
+        protocol_class=ProtocolClass.YIELD,
+        instrument_types=_YIELD,
+        data_types=["staking_yields"],  # vault APY time-series (IDLE-ETHEREUM 2019-08-13)
+        mtds_operations=["collect-staking-yields"],
+        required_tokens=frozenset({"IDLE"}),
+    ),
+    # ── Restaking protocols (staking_yields + oracle_prices) ──────────────────
+    # EigenLayer restaking wrappers; evidence in DEFI_VENUE_DATA_TYPE_CAPABILITIES.
+    "symbiotic": _ProtocolCapability(
+        venue_prefix="SYMBIOTIC",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_RESTAKING,
+        data_types=["staking_yields", "oracle_prices"],  # SYMBIOTIC-ETHEREUM 2024-06-11
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+    ),
+    "karak": _ProtocolCapability(
+        venue_prefix="KARAK",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_RESTAKING,
+        data_types=["staking_yields", "oracle_prices"],  # KARAK-ETHEREUM/ARBITRUM 2024-04-08
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+    ),
+    "renzo": _ProtocolCapability(
+        venue_prefix="RENZO",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_RESTAKING,
+        data_types=["staking_yields", "oracle_prices"],  # RENZO-ETHEREUM 2024-04-29
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        required_tokens=frozenset({"REZ", "EZETH"}),
+    ),
+    "kelpdao": _ProtocolCapability(
+        venue_prefix="KELPDAO",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_RESTAKING,
+        data_types=["staking_yields", "oracle_prices"],  # KELPDAO-ETHEREUM 2023-11-09
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        required_tokens=frozenset({"RSETH"}),
+    ),
+    "puffer": _ProtocolCapability(
+        venue_prefix="PUFFER",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_RESTAKING,
+        data_types=["staking_yields", "oracle_prices"],  # PUFFER-ETHEREUM 2024-05-09
+        mtds_operations=["collect-staking-yields", "collect-oracle-prices"],
+        required_tokens=frozenset({"PUFETH"}),
+    ),
+    "jitorestaking": _ProtocolCapability(
+        venue_prefix="JITORESTAKING",
+        protocol_class=ProtocolClass.RESTAKING,
+        instrument_types=_STAKING,  # Solana staking context
+        data_types=["staking_yields"],  # JITORESTAKING-SOLANA 2024-08-01
+        mtds_operations=["collect-staking-yields"],
+        required_tokens=frozenset({"JTO"}),
+    ),
+    # ── Cross-chain bridge protocols (bridge_events) ──────────────────────────
+    "across": _ProtocolCapability(
+        venue_prefix="ACROSS",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_RESTAKING,  # SPOT_ASSET — chain-level bridge, not a pool/lending instrument
+        data_types=["bridge_events"],  # Cross-chain bridge transfer events (ACROSS-ETHEREUM 2021-11-08)
+        mtds_operations=["collect-bridge-events"],
+    ),
+    "stargate": _ProtocolCapability(
+        venue_prefix="STARGATE",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_RESTAKING,  # SPOT_ASSET — cross-chain bridge
+        data_types=["bridge_events"],  # Cross-chain bridge transfer events (STARGATE-ETHEREUM 2022-03-17)
+        mtds_operations=["collect-bridge-events"],
+    ),
+    # ── DAO governance protocols (governance_events) ──────────────────────────
+    "compound_governance": _ProtocolCapability(
+        venue_prefix="COMPOUND",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_LENDING,  # governance over lending protocol
+        data_types=["governance_events"],  # DAO proposal + vote events (COMPOUND-ETHEREUM 2020-02-26)
+        mtds_operations=["collect-governance-events"],
+        required_tokens=frozenset({"COMP"}),
+    ),
+    "aave_governance": _ProtocolCapability(
+        venue_prefix="AAVE",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_LENDING,  # governance over lending protocol
+        data_types=["governance_events"],  # DAO proposal + vote events (AAVE-ETHEREUM 2020-07-27)
+        mtds_operations=["collect-governance-events"],
+        required_tokens=frozenset({"AAVE"}),
+    ),
+    "uniswap_governance": _ProtocolCapability(
+        venue_prefix="UNISWAP",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_POOL,  # governance over DEX
+        data_types=["governance_events"],  # DAO proposal + vote events (UNISWAP-ETHEREUM 2020-09-17)
+        mtds_operations=["collect-governance-events"],
+        required_tokens=frozenset({"UNI"}),
+    ),
+    # ── MEV analytics (mev_events) ────────────────────────────────────────────
+    "flashbots": _ProtocolCapability(
+        venue_prefix="FLASHBOTS",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_RESTAKING,  # SPOT_ASSET — chain-level MEV analytics, no pool/lending instrument
+        data_types=["mev_events"],  # MEV-Boost relay builder/relay stats (FLASHBOTS-ETHEREUM 2021-01-01)
+        mtds_operations=["collect-mev-events"],
+    ),
+    # ── Chain-level token transfer analytics (token_transfers) ───────────────
+    "alchemy_onchain": _ProtocolCapability(
+        venue_prefix="ALCHEMY",
+        protocol_class=ProtocolClass.INFRASTRUCTURE,
+        instrument_types=_RESTAKING,  # SPOT_ASSET — chain-level analytics, not a protocol instrument
+        data_types=["token_transfers"],  # ERC-20 transfer events via Alchemy RPC (ALCHEMY-ONCHAIN 2020-01-01)
+        mtds_operations=["collect-token-transfers"],
+    ),
 }
 
 # Chain-native tokens — auto-included in major assets for any protocol on that chain.

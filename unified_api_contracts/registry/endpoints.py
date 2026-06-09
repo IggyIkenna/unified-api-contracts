@@ -53,6 +53,10 @@ BASE_URLS: dict[str, str] = {
     "defillama": "https://api.llama.fi",
     # Macro data
     "fred": "https://api.stlouisfed.org/fred",
+    "cftc": "https://publicreporting.cftc.gov",
+    "eia": "https://api.eia.gov",
+    "baker_hughes": "https://rigcount.bakerhughes.com",
+    "fear_greed": "https://api.alternative.me",
     # CCXT: per-exchange; no single base URL
 }
 

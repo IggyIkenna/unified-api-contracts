@@ -249,6 +249,26 @@ _EIA = SourceCapability(
     kind=None,
 )
 
+_FEAR_GREED = SourceCapability(
+    source="fear_greed",
+    domains=["market"],
+    crosscutting=["errors", "rate_limits"],
+    supports_live=False,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],
+    auth_environments={},
+    operations={
+        "market": ["fear_greed_index"],
+    },
+    base_urls={"mainnet": "https://api.alternative.me"},
+    operation_details={},
+    chain=None,
+    kind=None,
+)
+
 _OPEN_METEO = SourceCapability(
     source="open_meteo",
     domains=["reference"],
@@ -354,6 +374,7 @@ ALTDATA_CAPABILITIES: list[SourceCapability] = [
     _BAKER_HUGHES,
     _CFTC,
     _EIA,
+    _FEAR_GREED,
     _OPEN_METEO,
     # Infrastructure / cloud
     _AWS,
