@@ -190,7 +190,6 @@ from .instruction_constraints import (
     validate_instruction,
 )
 from .market_data_categories import (
-    _INSTRUMENT_TYPE_ALIASES,
     ALL_DATA_TYPES,
     ALL_VENUES,
     BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF,

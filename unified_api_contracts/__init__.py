@@ -165,7 +165,7 @@ from .canonical.crosscutting.mvp_scope import (
     is_mvp,
 )
 from .canonical.crosscutting.pipeline_mode import (
-    _SPORTS_ENTITY_TO_PIPELINE_MODE,
+    _SPORTS_ENTITY_TO_PIPELINE_MODE,  # pyright: ignore[reportPrivateUsage]  # package-internal mapping, intentionally re-exported via __all__
     Cadence,
     Mode,
     PipelineMode,
@@ -515,10 +515,10 @@ from .config.trading_validation import (
 )
 
 # Importing the per-asset_group generator seeds populates SYNTHETIC_GENERATOR_REGISTRY at module load.
-from .registry import generators as _generators_registry  # type: ignore[reportUnusedImport]
+from .registry import generators as _generators_registry  # pyright: ignore[reportUnusedImport]
 
 # Importing the per-asset_group registry seeds populates SCENARIO_REGISTRY at module load.
-from .registry import scenarios as _scenarios_registry  # type: ignore[reportUnusedImport]
+from .registry import scenarios as _scenarios_registry  # pyright: ignore[reportUnusedImport]
 
 # Phase 5.A — per-archetype regression matrix derived from SCENARIO_REGISTRY at module load.
 from .registry.scenario_archetype_matrix import (

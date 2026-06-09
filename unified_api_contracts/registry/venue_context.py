@@ -77,13 +77,13 @@ def _resolve_venue_value(
         # First part must be "self" — the first positional arg
         obj: object = args[0]
         for attr_name in parts[1:]:
-            obj = getattr(obj, attr_name)  # type: ignore[reportAny]
+            obj = getattr(obj, attr_name)  # pyright: ignore[reportAny]
         return str(obj)
 
     if venue_param is not None:
         bound = sig.bind(*args, **kwargs)
         bound.apply_defaults()
-        return str(bound.arguments[venue_param])  # type: ignore[reportAny]
+        return str(bound.arguments[venue_param])  # pyright: ignore[reportAny]
 
     msg = "Either venue_param or venue_attr must be provided"
     raise TypeError(msg)
@@ -99,7 +99,7 @@ def _resolve_env_value(
     """Extract the env string from method arguments."""
     bound = sig.bind(*args, **kwargs)
     bound.apply_defaults()
-    return str(bound.arguments[env_param])  # type: ignore[reportAny]
+    return str(bound.arguments[env_param])  # pyright: ignore[reportAny]
 
 
 def requires_operation_validation(
@@ -168,7 +168,7 @@ def requires_operation_validation(
                         operation_name,
                         exc_info=True,
                     )
-                return await fn(*args, **kwargs)  # type: ignore[reportAny]
+                return await fn(*args, **kwargs)  # pyright: ignore[reportAny]
 
             return cast(_F, async_wrapper)
 

@@ -84,15 +84,15 @@ def _annotation_dtype(annotation: object) -> tuple[str, bool]:
         return _annotation_dtype(cast(object, args[0]))
 
     # Optional[X] = Union[X, None]
-    non_none = [a for a in args if a is not type(None)]  # type: ignore[reportAny]
+    non_none = [a for a in args if a is not type(None)]  # pyright: ignore[reportAny]
     nullable = len(non_none) != len(args)
     if len(non_none) == 1:
-        dtype, _ = _annotation_dtype(non_none[0])  # type: ignore[reportAny]
+        dtype, _ = _annotation_dtype(non_none[0])  # pyright: ignore[reportAny]
         return dtype, nullable
 
     if origin is list:
         if non_none:
-            inner_dtype, _ = _annotation_dtype(non_none[0])  # type: ignore[reportAny]
+            inner_dtype, _ = _annotation_dtype(non_none[0])  # pyright: ignore[reportAny]
             return f"list<{inner_dtype}>", nullable
         return "list<any>", nullable
 

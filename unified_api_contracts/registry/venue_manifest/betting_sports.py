@@ -26,7 +26,7 @@ class VenueContract(TypedDict):
     module: str
 
 
-BETTING_SPORTS_VENUES: dict[str, VenueContract] = {  # type: ignore[reportAssignmentType]
+BETTING_SPORTS_VENUES: dict[str, VenueContract] = {  # pyright: ignore[reportAssignmentType]
     "betfair": {
         "has_rest": True,
         "has_websocket": True,
