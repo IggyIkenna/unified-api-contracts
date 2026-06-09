@@ -13,6 +13,7 @@ MIN_COVERAGE=83
 PYTEST_WORKERS=${PYTEST_WORKERS:-1}  # Reduced from 2 due to 565+ cassette test cases
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
+ENFORCE_NO_TYPE_IGNORE=true  # converted to precise # pyright: ignore[rule] 2026-06-09 (STEP 5.24); 0 # type: ignore in source
 BROAD_EXCEPT_EXTRA_EXCLUDES=("**/venue_context.py" "**/mapping_resolver.py")
 # data_source_continuity.py defines VIX_PROD_BUCKET/VIX_DEV_BUCKET as module-level string constants;
 # defi_prediction_instrument_seeds.py docstring cites live GCS bucket names as provenance for Wave 8G seeds.
