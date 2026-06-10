@@ -9,7 +9,9 @@
 PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
 # Recalibrated from 84→83 after 6fb90b19 added branch=True to coverage config
-MIN_COVERAGE=83
+# Raised 83→87 after Phase 3 stub omit expansion; lowered to 86 while Phase 3 tests land;
+# target 90 in uac_coverage_90pct_2026_06_10.md
+MIN_COVERAGE=90
 PYTEST_WORKERS=${PYTEST_WORKERS:-1}  # Reduced from 2 due to 565+ cassette test cases
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
