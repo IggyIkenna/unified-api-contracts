@@ -11,6 +11,7 @@ Exit code: 0 if all non-exempt schemas have at least one terminal consumer impor
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import subprocess
 import sys
@@ -19,28 +20,16 @@ from pathlib import Path
 
 WORKSPACE = Path(__file__).resolve().parent.parent.parent
 
-TERMINAL_CONSUMER_SERVICES = [
-    "execution-service",
-    "strategy-service",
-    "market-data-processing-service",
-    "market-tick-data-service",
-    "market-data-api",
-    "instruments-service",
-    "alerting-service",
-    # risk-and-exposure-service, position-balance-monitor-service, pnl-attribution-service
-    # are archived — consolidated into strategy-service/{risk,position,pnl}
-    "ml-inference-service",
-    "ml-training-service",
-    "features-delta-one-service",
-    "features-volatility-service",
-    "features-cross-instrument-service",
-    "features-onchain-service",
-    "features-sports-service",
-    "features-calendar-service",
-    # Interface repos — direct UAC consumers for market/sports integration schemas
-    "unified-market-interface",
-    "unified-sports-execution-interface",
-]
+# Manifest-derived consumer set (#375 / sit_uac_orphan_cap_stale_consumer_list_2026_06_07):
+# the terminal-consumer list is NO LONGER hardcoded. It is derived from
+# workspace-manifest.json `repositories` where type ∈ TERMINAL_CONSUMER_TYPES and
+# status == "active" — mirroring smoke-test-gate.yml's own SERVICES derivation. The old
+# hardcoded list had 11 of 17 entries pointing at consolidated/archived repos
+# (features-*-service → features-service, ml-*-service → ml-service,
+# market-data-api/unified-market-interface/unified-sports-execution-interface archived),
+# so every schema whose only importers live in a consolidated repo scored as orphaned →
+# inflated the orphan count to a measurement artifact (~364).
+TERMINAL_CONSUMER_TYPES: frozenset[str] = frozenset({"service", "batch-service", "api-service"})
 
 # Classes exempt from adoption check — not expected to be directly imported by class name.
 # Reason categories:
@@ -108,15 +97,91 @@ EXEMPT_CLASSES = frozenset(
 )
 
 
+def _resolve_uac_init() -> Path:
+    """Locate UAC's __init__.py across both CI and local layouts.
+
+    Local: this script lives at <ws>/unified-api-contracts/scripts/, so UAC's package is
+    a sibling of scripts/ AND under WORKSPACE/unified-api-contracts/. CI: the script is
+    cloned to /tmp/uac-check and invoked with --workspace workspace/ (which holds only the
+    consumer repos, NOT UAC) — so WORKSPACE/unified-api-contracts/ does not exist there.
+    Try, in order: WORKSPACE/unified-api-contracts/ (local), then the script's own repo
+    root (../unified_api_contracts/ relative to scripts/ — works for the CI clone too).
+    """
+    candidates = [
+        WORKSPACE / "unified-api-contracts" / "unified_api_contracts" / "__init__.py",
+        Path(__file__).resolve().parent.parent / "unified_api_contracts" / "__init__.py",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    raise FileNotFoundError(
+        "Could not locate unified_api_contracts/__init__.py — tried: "
+        + ", ".join(str(c) for c in candidates)
+    )
+
+
 def get_uac_all() -> list[str]:
     """Return the list of public UAC names from __all__."""
-    uac_init = WORKSPACE / "unified-api-contracts/unified_api_contracts/__init__.py"
+    uac_init = _resolve_uac_init()
     src = uac_init.read_text()
     all_match = re.search(r"__all__\s*=\s*\[(.*?)\]", src, re.DOTALL)
     if not all_match:
         raise RuntimeError("Could not parse __all__ from UAC __init__.py")
     names = re.findall(r'"(\w+)"', all_match.group(1))
     return sorted(set(names))
+
+
+def _resolve_manifest() -> Path | None:
+    """Locate workspace-manifest.json across CI and local layouts.
+
+    Local: <ws>/unified-trading-pm/workspace-manifest.json. CI: the consumer repos are
+    cloned into workspace/ alongside a sibling unified-trading-pm clone — but the SIT
+    workflow also keeps a fresh PM clone at the parent level. Try WORKSPACE first, then
+    a couple of sibling/parent fallbacks. Returns None if none exist (caller degrades
+    gracefully to scanning an empty consumer set).
+    """
+    candidates = [
+        WORKSPACE / "unified-trading-pm" / "workspace-manifest.json",
+        WORKSPACE.parent / "unified-trading-pm" / "workspace-manifest.json",
+        Path(__file__).resolve().parent.parent.parent / "unified-trading-pm" / "workspace-manifest.json",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def get_terminal_consumer_services() -> list[str]:
+    """Derive the terminal-consumer set from the PM manifest (type+status filter).
+
+    Mirrors smoke-test-gate.yml: repositories where type ∈ TERMINAL_CONSUMER_TYPES AND
+    status == "active". Falls back to an empty list (with a stderr warning) if the
+    manifest cannot be found — adoption then scores every schema as orphaned, which is a
+    LOUD signal that the manifest path resolution is wrong, not a silent false-green.
+    """
+    manifest_path = _resolve_manifest()
+    if manifest_path is None:
+        print(
+            "WARN: workspace-manifest.json not found — cannot derive terminal consumers; "
+            "treating consumer set as empty.",
+            file=sys.stderr,
+        )
+        return []
+    parsed: object = json.loads(manifest_path.read_text())
+    if not isinstance(parsed, dict):
+        return []
+    repositories: object = parsed.get("repositories", {})
+    if not isinstance(repositories, dict):
+        return []
+    services: list[str] = []
+    for name, meta in repositories.items():
+        if not isinstance(name, str) or name.startswith("_") or not isinstance(meta, dict):
+            continue
+        repo_type: object = meta.get("type")
+        repo_status: object = meta.get("status")
+        if repo_type in TERMINAL_CONSUMER_TYPES and repo_status == "active":
+            services.append(name)
+    return sorted(services)
 
 
 def grep_service(service: str, pattern: str) -> bool:
@@ -142,20 +207,19 @@ def grep_service(service: str, pattern: str) -> bool:
     return bool(result.stdout.strip())
 
 
-def build_matrix(classes: list[str]) -> dict[str, list[str]]:
+def build_matrix(classes: list[str], consumer_services: list[str]) -> dict[str, list[str]]:
     """Return {class_name: [service, ...]} for each class."""
     matrix: dict[str, list[str]] = {}
     for cls in classes:
         importers: list[str] = []
-        for service in TERMINAL_CONSUMER_SERVICES:
+        for service in consumer_services:
             if grep_service(service, cls):
                 importers.append(service)
         matrix[cls] = importers
     return matrix
 
 
-def render_markdown(matrix: dict[str, list[str]], classes: list[str]) -> str:
-    [s.replace("-service", "").replace("features-", "feat-") for s in TERMINAL_CONSUMER_SERVICES]
+def render_markdown(matrix: dict[str, list[str]], classes: list[str], consumer_services: list[str]) -> str:
     header = f"# UAC Adoption Matrix\n\nGenerated: {date.today()}\n\n"
     header += "Terminal consumer services are rows; UAC schema classes are columns.\n"
     header += "`✓` = service imports this class. `·` = no import found.\n\n"
@@ -172,8 +236,7 @@ def render_markdown(matrix: dict[str, list[str]], classes: list[str]) -> str:
         header += "\n"
 
     # Build table (non-exempt classes only — exempt are too numerous for readable table)
-    max(len(c) for c in non_exempt) + 2 if non_exempt else 20
-    service_col = max(len(s) for s in TERMINAL_CONSUMER_SERVICES) + 2
+    service_col = (max(len(s) for s in consumer_services) + 2) if consumer_services else 20
 
     rows = ["## Full Adoption Matrix (non-exempt schemas)\n"]
     header_row = f"| {'Service':<{service_col}} |"
@@ -185,7 +248,7 @@ def render_markdown(matrix: dict[str, list[str]], classes: list[str]) -> str:
     rows.append(header_row)
     rows.append(sep_row)
 
-    for service in TERMINAL_CONSUMER_SERVICES:
+    for service in consumer_services:
         row = f"| {service:<{service_col}} |"
         for cls in non_exempt:
             mark = "✓" if service in matrix[cls] else "·"
@@ -209,6 +272,13 @@ def main() -> int:
     classes = get_uac_all()
     print(f"Found {len(classes)} public UAC classes.", file=sys.stderr)
 
+    consumer_services = get_terminal_consumer_services()
+    print(
+        f"Derived {len(consumer_services)} terminal consumer services from manifest "
+        f"(type ∈ {sorted(TERMINAL_CONSUMER_TYPES)}, status=active).",
+        file=sys.stderr,
+    )
+
     non_exempt = [c for c in classes if c not in EXEMPT_CLASSES]
     print(
         f"Checking adoption for {len(non_exempt)} non-exempt classes ({len(classes) - len(non_exempt)} exempt)...",
@@ -216,7 +286,7 @@ def main() -> int:
     )
 
     print("Building adoption matrix (this may take 1-2 minutes)...", file=sys.stderr)
-    matrix = build_matrix(classes)
+    matrix = build_matrix(classes, consumer_services)
 
     orphans = [c for c in non_exempt if not matrix[c]]
 
@@ -230,7 +300,7 @@ def main() -> int:
         output_path = Path(__file__).parent.parent / output_path
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    md = render_markdown(matrix, classes)
+    md = render_markdown(matrix, classes, consumer_services)
     output_path.write_text(md)
     print(f"Written: {output_path}", file=sys.stderr)
 
