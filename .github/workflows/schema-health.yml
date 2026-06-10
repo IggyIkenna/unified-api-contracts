@@ -102,7 +102,7 @@ jobs:
 
       - name: Upload test results artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: schema-health-results
           path: schema-health-results.json
