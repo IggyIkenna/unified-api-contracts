@@ -1,0 +1,229 @@
+"""Unit tests for the canonical possible-manifest registry (CF-15 / V0).
+
+Covers the four public primitives — ``canonical_path_templates`` (the Axis-10
+de-scatter SSOT), ``is_valid_shard_key`` (the orphan validator), ``enumerate_possible_
+shard_keys`` (the could-exist generator), and ``get_possible_manifest_spec`` (the
+per-AG authority object) — plus the regression guard that the generated path templates
+remain a superset of the shapes the phantom reconciler / orphan sweep must probe.
+"""
+
+from __future__ import annotations
+
+from typing import ClassVar
+
+import pytest
+
+from unified_api_contracts import (
+    POSSIBLE_MANIFEST_ASSET_GROUPS,
+    CatalogueLeaf,
+    PossibleManifestSpec,
+    ShardKey,
+    canonical_path_templates,
+    enumerate_possible_shard_keys,
+    external_batch_sources_for_asset_group,
+    get_possible_manifest_spec,
+    is_valid_shard_key,
+)
+
+# The pipeline_mode batch sources every AG's raw-tick corpus physically uses. This
+# is the durable in-repo regression guard for the de-scatter: if a consumer ever
+# loses a source from its hand-list (the Axis-10 bug), this set still names it, and
+# the generated templates must carry every one. Sourced from the migrated phantom
+# reconciler ``prefix_tpls`` ground truth (2026-06-10).
+_EXPECTED_BATCH_SOURCES = {
+    "cefi": {"databento", "tardis", "hyperliquid"},
+    "defi": {
+        "onchain_rpc",
+        "onchain_subgraph",
+        "hyperliquid",
+        "chainlink",
+        "pyth_hermes",
+        "helius_rpc",
+        "solana_rpc",
+    },
+    "tradfi": {"databento", "massive", "barchart", "yahoo", "eia"},
+    "prediction": {"polymarket_clob", "polymarket_gamma_api"},
+}
+
+# Legacy/transitional pipeline_mode tokens that coexist on disk and MUST still be
+# probed until the gated migrator rewrites them.
+_EXPECTED_LEGACY_SOURCES = {"cefi": {"hyperliquid_rest"}, "defi": {"hyperliquid_rest"}}
+
+
+class TestCanonicalPathTemplates:
+    @pytest.mark.parametrize("asset_group", ["cefi", "defi", "tradfi", "prediction"])
+    def test_every_known_batch_source_yields_a_pipeline_mode_prefix(self, asset_group: str) -> None:
+        """Axis-10 regression guard: every known batch source for the AG appears as a
+        ``pipeline_mode=batch_<source>/asset_group=<ag>/`` prefix in the templates."""
+        templates = canonical_path_templates(asset_group)
+        joined = "\n".join(templates)
+        for source in _EXPECTED_BATCH_SOURCES[asset_group] | _EXPECTED_LEGACY_SOURCES.get(asset_group, set()):
+            needle = f"pipeline_mode=batch_{source}/asset_group={asset_group}/"
+            assert needle in joined, f"{asset_group}: template set missing {needle}"
+
+    @pytest.mark.parametrize("asset_group", ["cefi", "defi", "tradfi", "prediction"])
+    def test_legacy_hive_shapes_present(self, asset_group: str) -> None:
+        """Bare ``asset_group=`` (no pipeline_mode), legacy ``category=`` hive, and the
+        top-level ``day=`` shapes must all be probed (pre-migration on-disk shapes)."""
+        joined = "\n".join(canonical_path_templates(asset_group))
+        assert f"raw_tick_data/by_date/day={{date}}/asset_group={asset_group}/" in joined
+        assert f"raw_tick_data/by_date/day={{date}}/category={asset_group}/" in joined
+        assert f"day={{date}}/asset_group={asset_group}/" in joined
+
+    def test_cefi_tradfi_segment_shape(self) -> None:
+        """CeFi/TradFi carry venue -> instrument_type -> data_type segments."""
+        for ag in ("cefi", "tradfi"):
+            joined = "\n".join(canonical_path_templates(ag))
+            assert "venue={venue}/instrument_type={instrument_type}/data_type={data_type}/" in joined
+
+    def test_defi_segment_shape_includes_chain(self) -> None:
+        joined = "\n".join(canonical_path_templates("defi"))
+        assert "venue={venue}/chain={chain}/instrument_type={instrument_type}/data_type={data_type}/" in joined
+        # combined venue-chain legacy overload (EIGENLAYER restaking)
+        assert "venue={venue}-{chain}/" in joined
+
+    def test_sports_has_no_inline_templates(self) -> None:
+        """Sports dispatches to its own UAC ``candidate_parquet_paths`` SSOT — the
+        possible-manifest registry returns an empty template list (NOT 'no paths')."""
+        assert canonical_path_templates("sports") == []
+
+    def test_templates_carry_only_known_placeholders(self) -> None:
+        allowed = {"date", "venue", "chain", "instrument_type", "data_type"}
+        import re
+
+        for ag in POSSIBLE_MANIFEST_ASSET_GROUPS:
+            for tpl in canonical_path_templates(ag):
+                for ph in re.findall(r"\{(\w+)\}", tpl):
+                    assert ph in allowed, f"{ag}: unexpected placeholder {{{ph}}} in {tpl}"
+
+
+class TestExternalBatchSources:
+    @pytest.mark.parametrize("asset_group", ["cefi", "defi", "tradfi", "prediction"])
+    def test_known_sources_are_a_subset_of_derived(self, asset_group: str) -> None:
+        derived = set(external_batch_sources_for_asset_group(asset_group))
+        assert _EXPECTED_BATCH_SOURCES[asset_group] <= derived
+
+    def test_sports_sources_excluded_from_path_templates(self) -> None:
+        # sports has external sources (api_football etc.) but no inline pipeline_mode
+        # path templates — they live in the sports candidate_parquet_paths SSOT.
+        assert canonical_path_templates("sports") == []
+
+
+class TestIsValidShardKey:
+    def test_valid_cefi_perp_trades(self) -> None:
+        key = ShardKey("cefi", "BINANCE-FUTURES", "", "perpetual", "trades")
+        assert is_valid_shard_key("cefi", key) is True
+
+    def test_invalid_data_type_for_instrument_type(self) -> None:
+        # spot_pair cannot carry derivative_ticker (a perp-only data_type)
+        key = ShardKey("cefi", "BINANCE-SPOT", "", "spot_pair", "derivative_ticker")
+        assert is_valid_shard_key("cefi", key) is False
+
+    def test_unmapped_instrument_type_admitted(self) -> None:
+        # an unknown instrument_type must NOT be silently rejected
+        key = ShardKey("cefi", "BINANCE-SPOT", "", "some_new_shape", "trades")
+        assert is_valid_shard_key("cefi", key) is True
+
+    def test_empty_data_type_rejected(self) -> None:
+        key = ShardKey("cefi", "BINANCE-SPOT", "", "spot_pair", "")
+        assert is_valid_shard_key("cefi", key) is False
+
+    def test_unknown_asset_group_rejected(self) -> None:
+        key = ShardKey("shared", "X", "", "spot_pair", "trades")
+        assert is_valid_shard_key("shared", key) is False
+
+    def test_prediction_data_type_grain(self) -> None:
+        key = ShardKey("prediction", "POLYMARKET", "", "", "trades")
+        assert is_valid_shard_key("prediction", key) is True
+
+
+class TestEnumeratePossibleShardKeys:
+    def test_family_grain_cefi_nonempty_and_valid(self) -> None:
+        keys = list(enumerate_possible_shard_keys("cefi"))
+        assert keys, "cefi family-grain enumeration must be non-empty"
+        # every emitted family-grain key is itself valid
+        for k in keys[:200]:
+            assert is_valid_shard_key("cefi", k)
+
+    def test_unknown_asset_group_yields_nothing(self) -> None:
+        assert list(enumerate_possible_shard_keys("shared")) == []
+
+    def test_catalogue_grain_binds_instrument_id(self) -> None:
+        leaves = [CatalogueLeaf("BTC-PERP", "perpetual", "BINANCE-FUTURES")]
+        keys = list(enumerate_possible_shard_keys("cefi", catalogue=leaves))
+        assert keys
+        assert all(k.instrument_id == "BTC-PERP" for k in keys)
+        assert {k.data_type for k in keys} <= {
+            "trades",
+            "book_snapshot_5",
+            "derivative_ticker",
+            "liquidations",
+            "ohlcv_1m",
+        }
+
+    def test_option_leaf_rolls_up_to_one_bundle(self) -> None:
+        """G1-ENUM bundle roll-up: many option leaves of one underlying collapse to a
+        single per-underlying ``options_chain`` candidate (not one per contract)."""
+        leaves = [
+            CatalogueLeaf("BTC-29MAR24-50000-C", "option", "DERIBIT", underlying="BTC"),
+            CatalogueLeaf("BTC-29MAR24-60000-C", "option", "DERIBIT", underlying="BTC"),
+            CatalogueLeaf("BTC-29MAR24-50000-P", "option", "DERIBIT", underlying="BTC"),
+        ]
+        keys = list(enumerate_possible_shard_keys("cefi", catalogue=leaves))
+        # all three leaves collapse to ONE underlying bundle
+        assert {k.instrument_id for k in keys} == {"BTC"}
+        assert {k.instrument_type for k in keys} == {"options_chain"}
+
+    def test_prediction_family_grain_data_type_only(self) -> None:
+        keys = list(enumerate_possible_shard_keys("prediction"))
+        assert keys
+        assert all(k.instrument_type == "" and k.venue == "" for k in keys)
+
+
+class TestPossibleManifestSpec:
+    @pytest.mark.parametrize("asset_group", list(POSSIBLE_MANIFEST_ASSET_GROUPS))
+    def test_spec_builds_for_every_asset_group(self, asset_group: str) -> None:
+        spec = get_possible_manifest_spec(asset_group)
+        assert isinstance(spec, PossibleManifestSpec)
+        assert spec.asset_group == asset_group
+        assert isinstance(spec.shard_axes, tuple)
+        # non-sports AGs must carry path templates
+        if asset_group != "sports":
+            assert spec.path_templates, f"{asset_group}: spec must carry path templates"
+
+    def test_unknown_asset_group_raises(self) -> None:
+        with pytest.raises(ValueError, match="unknown asset_group"):
+            get_possible_manifest_spec("shared")
+
+    def test_spec_methods_delegate(self) -> None:
+        spec = get_possible_manifest_spec("cefi")
+        key = ShardKey("cefi", "BINANCE-FUTURES", "", "perpetual", "trades")
+        assert spec.is_valid(key) is True
+        assert list(spec.enumerate_shard_keys())[:1]  # non-empty
+
+
+class TestAxisCompleteness:
+    """CF-15/CF-18 join: each AG's spec must declare every shard axis its data physically
+    carries — no AG silently missing a dimension (e.g. DeFi must carry `chain`)."""
+
+    # The shard axes each AG's raw-tick data physically carries (the market-tick-data
+    # shard atom). A spec missing any of these would under-key the could-exist universe.
+    _EXPECTED_AXES: ClassVar[dict[str, set[str]]] = {
+        "cefi": {"venue", "data_type", "instrument_type", "instrument_id"},
+        "tradfi": {"venue", "data_type", "instrument_type", "instrument_id"},
+        "defi": {"venue", "chain", "data_type", "instrument_id"},
+        "sports": {"data_type", "league_id"},
+        "prediction": {"venue", "canonical_question_group", "data_type"},
+    }
+
+    @pytest.mark.parametrize("asset_group", list(POSSIBLE_MANIFEST_ASSET_GROUPS))
+    def test_spec_declares_every_physical_axis(self, asset_group: str) -> None:
+        spec = get_possible_manifest_spec(asset_group)
+        expected = self._EXPECTED_AXES[asset_group]
+        missing = expected - set(spec.shard_axes)
+        assert not missing, f"{asset_group}: spec.shard_axes missing physical axes {missing}"
+
+    def test_defi_carries_chain_axis(self) -> None:
+        # the regression guard: DeFi's extra `chain` dimension must never be dropped
+        spec = get_possible_manifest_spec("defi")
+        assert "chain" in spec.shard_axes
