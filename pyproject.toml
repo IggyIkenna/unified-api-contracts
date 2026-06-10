@@ -338,13 +338,23 @@ omit = [
     # Registry data tables (no business logic — pure constant dicts/tuples)
     "unified_api_contracts/registry/stablecoin_peg_history.py",
     "unified_api_contracts/registry/source_data_latency.py",
+    # Phase 5 omit: dev/testing utilities (non-unit-testable; complex OS/HTTP traversal)
+    "unified_api_contracts/testing/cassette_orphan_checker.py",
+    "unified_api_contracts/testing/fault_injection.py",
+    # Sports data tables requiring live CSV/DB files — not unit-testable standalone
+    "unified_api_contracts/canonical/domain/sports/team_mapping_data.py",
+    # Pure cross-provider ID lookup dicts (no business logic — data constants only)
+    "unified_api_contracts/canonical/domain/sports/provider_league_ids.py",
+    # Pure typing.Protocol stubs — abstract method bodies are structurally uncoverable branches
+    "unified_api_contracts/external/gcp/protocols.py",
 ]
 
 [tool.coverage.report]
 # branch=True added by 6fb90b19 lowers coverage vs statement-only baseline; recalibrated to 83
 # Raised 83→90 after Phase 4 tests + stub omit expansion reaching ≥90% combined;
-# target achieved 2026-06-10; tracked in plans/active/uac_coverage_90pct_2026_06_10.md
-fail_under = 90
+# Raised 90→94 after Phase 5 tests + gcp/protocols.py omit reaching 94.62% combined;
+# tracked in plans/active/uac_coverage_90pct_2026_06_10.md
+fail_under = 94
 show_missing = true
 skip_covered = false
 precision = 1

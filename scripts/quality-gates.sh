@@ -10,8 +10,10 @@ PACKAGE_NAME="unified-api-contracts"
 SOURCE_DIR="unified_api_contracts"
 # Recalibrated from 84→83 after 6fb90b19 added branch=True to coverage config
 # Raised 83→87 after Phase 3 stub omit expansion; lowered to 86 while Phase 3 tests land;
-# target 90 in uac_coverage_90pct_2026_06_10.md
-MIN_COVERAGE=90
+# Raised 90→94 after Phase 5 tests (chain_env, nautilus, transfer_windows, venue_mapping, kalshi, polymarket,
+# defi_capability, risk_rules, service_contract_map, tardis, protocol_pause) + gcp/protocols.py omit;
+# tracked in plans/active/uac_coverage_90pct_2026_06_10.md
+MIN_COVERAGE=94
 PYTEST_WORKERS=${PYTEST_WORKERS:-1}  # Reduced from 2 due to 565+ cassette test cases
 LOCAL_DEPS=()
 UAC_CANONICAL_EXEMPT=true  # UAC is the schema repo -- internal imports are allowed
