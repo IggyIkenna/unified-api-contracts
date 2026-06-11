@@ -199,6 +199,23 @@ def get_dxy_daily_source(query_date: date) -> str:
     return "YAHOO_FINANCE"
 
 
+# Empirically confirmed: 6,642 daily bars 2000-01-03 → 2026-06-09 (2026-06-11)
+# for each of ^IRX (3M), ^FVX (5Y), ^TNX (10Y), ^TYX (30Y). These are CBOE
+# interest-rate indices whose daily "close" is the par yield in percent.
+US_TREASURY_YIELD_DAILY_FIRST_DATE: date = date(2000, 1, 3)
+
+
+def get_us_treasury_yield_daily_source(query_date: date) -> str:
+    """Return the source for a CBOE US-treasury-yield index ohlcv_24h on *query_date*.
+
+    Daily yield data is available from Yahoo Finance (^IRX / ^FVX / ^TNX / ^TYX)
+    back to 2000-01-03. Earlier dates are reported as GAP_NO_SOURCE.
+    """
+    if query_date < US_TREASURY_YIELD_DAILY_FIRST_DATE:
+        return "GAP_NO_SOURCE"
+    return "YAHOO_FINANCE"
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # General-purpose temporal source resolution
 # ──────────────────────────────────────────────────────────────────────────────
@@ -208,6 +225,10 @@ def get_dxy_daily_source(query_date: date) -> str:
 _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
     ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
     ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
+    ("CBOE:INDEX:US3M", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US5Y", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US10Y", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US30Y", "ohlcv_24h"): get_us_treasury_yield_daily_source,
 }
 
 

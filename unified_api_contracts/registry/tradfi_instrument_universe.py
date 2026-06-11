@@ -325,6 +325,15 @@ YAHOO_INDICES: list[YahooIndexDef] = [
     # Full history back to 2019-01-02 (1,864 bars empirically confirmed 2026-06-11).
     # 1h is capped to the last 730 days by Yahoo; use daily for long history.
     YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", "fx"),
+    # CBOE interest-rate indices — daily ohlcv_24h via Yahoo. Each "close" is the
+    # par yield in percent (e.g. 4.53 = 4.53%). Full history back to 2000-01-03
+    # (6,642 daily bars empirically confirmed 2026-06-11). Yahoo has no live 2Y
+    # yield (2YY=F is stale, zero-volume futures), so the usable tenors are
+    # 3M / 5Y / 10Y / 30Y — enough to compute curve slopes and forward rates.
+    YahooIndexDef("US3M", "CBOE", "US3M", "^IRX", "fixed_income"),
+    YahooIndexDef("US5Y", "CBOE", "US5Y", "^FVX", "fixed_income"),
+    YahooIndexDef("US10Y", "CBOE", "US10Y", "^TNX", "fixed_income"),
+    YahooIndexDef("US30Y", "CBOE", "US30Y", "^TYX", "fixed_income"),
 ]
 
 # ---------------------------------------------------------------------------
