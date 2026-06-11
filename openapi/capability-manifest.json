@@ -4481,7 +4481,12 @@
       "to_node_id": "data_source:yahoo"
     },
     {
-      "agent_annotation": null,
+      "agent_annotation": {
+        "annotated_at": "2026-06-11 00:00:00+00:00",
+        "annotated_by": "agent",
+        "answer": "Stepper smoke run (csb_staked_basis_eth.json) confirmed that carry_staked_basis entry emission is blocked on-host: the engine requires an LST token to be listed in accepted_perp_collateral for each perp venue, but COLLATERAL_REGISTRY and BROKER_REGISTRY are both honest-empty for all perp venues (Binance, OKX, Deribit, etc.). No broker/collateral declarations exist in the registry; the capability manifest correctly emits not_registered for this dimension. A code-scan backfill must read each perp venue adapter for its accepted collateral list and populate the registries before the carry_staked_basis archetype can proceed to live entry.",
+        "resolved_status": "partial"
+      },
       "from_node_id": "gap_registry:broker",
       "gap_type": "needs_code_scan",
       "readiness": null,
@@ -4531,7 +4536,12 @@
       "to_node_id": "gap_registry:order_semantics"
     },
     {
-      "agent_annotation": null,
+      "agent_annotation": {
+        "annotated_at": "2026-06-11 00:00:00+00:00",
+        "annotated_by": "agent",
+        "answer": "Kill-switch and stop-loss predicates in BaseArchetypeEngineV2 are evaluated at runtime inside the engine's on_kill_switch / on_tick code paths (strategy_service/engine/strategies/v2/base.py).  The engine exposes only post-fire state (self.killed, self.kill_reason) \u2014 it does NOT publish a static declaration of which predicates will fire under which simulation conditions.  The backtest runner therefore cannot derive sim_assumptions (matching-model / fill-mode / predicate evaluation rules) from a static registry constant; a SIM_ASSUMPTIONS_REGISTRY backfill requires a deliberate code-scan of runner.py + base.py to extract and declare those assumptions.  Until that backfill lands the registry remains honest-empty and this edge stays needs_code_scan.",
+        "resolved_status": "partial"
+      },
       "from_node_id": "gap_registry:sim_assumptions",
       "gap_type": "needs_code_scan",
       "readiness": null,
@@ -6632,6 +6642,7 @@
     }
   ],
   "gaps": {
+    "annotation_orphans": 0,
     "logical_dead_end": 19,
     "logical_dead_ends": 16,
     "missing_extraction": 1,
@@ -6641,7 +6652,7 @@
     "orphan_nodes": 124,
     "unbuilt_dead_ends": 25
   },
-  "generated_from_commit": "434e5beffedf400905475c64ca77535e474bd5fb",
+  "generated_from_commit": "3fddfcd24183192016bd7dc4902da27ee57718ed",
   "manifest_version": "1.0.0",
   "nodes": [
     {
