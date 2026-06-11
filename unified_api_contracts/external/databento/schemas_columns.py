@@ -19,7 +19,7 @@ DATABENTO_OHLCV_1M_SCHEMA: list[dict[str, str | bool]] = [
         "name": "ts_event",
         "type": "int64",
         "required": True,
-        "description": "Bar close timestamp in nanoseconds since epoch (UTC)",
+        "description": "Bar OPEN (start-of-period) timestamp in nanoseconds since epoch (UTC)",
     },
     {
         "name": "rtype",
@@ -76,7 +76,7 @@ DATABENTO_OHLCV_1S_SCHEMA: list[dict[str, str | bool]] = [
         "name": "ts_event",
         "type": "int64",
         "required": True,
-        "description": "Bar close timestamp in nanoseconds since epoch (UTC)",
+        "description": "Bar OPEN (start-of-period) timestamp in nanoseconds since epoch (UTC)",
     },
     {
         "name": "rtype",

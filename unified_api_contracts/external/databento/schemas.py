@@ -8,9 +8,19 @@ from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
 
 class DatabentoOhlcvBar(BaseModel):
-    """OHLCV bar (1m or 1s). Prices/volumes as raw int; divide price by 1e9 for float."""
+    """OHLCV bar (1m or 1s). Prices/volumes as raw int; divide price by 1e9 for float.
 
-    ts_event: int = Field(..., description="Bar close timestamp in nanoseconds since epoch (UTC)")
+    Edge convention: ``ts_event`` is the bar OPEN (start-of-period / LEFT edge)
+    — Databento stamps OHLCV aggregates on the start of the interval. The
+    workspace canonical convention is the CLOSE (right) edge; normalization to
+    ``t_close`` happens at MTDS ingestion (``databento_adapter`` converts
+    ``ts_event`` via ``compute_bar_close_boundary`` and stamps the row-level
+    ``bar_edge="close"`` marker), and MDPS ``ohlcv_passthrough`` shifts the
+    pre-conversion open-edge raw corpus source-aware.
+    SSOT: codex/02-data/bar-boundary-candle-edge-convention.md.
+    """
+
+    ts_event: int = Field(..., description="Bar OPEN (start-of-period) timestamp in nanoseconds since epoch (UTC)")
     rtype: int = Field(..., description="Record type (32=OHLCV-1M, 17=OHLCV-1S)")
     publisher_id: int = Field(..., description="Publisher/venue ID")
     instrument_id: int = Field(..., description="Databento internal instrument ID")
