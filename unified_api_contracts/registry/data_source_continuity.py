@@ -199,6 +199,23 @@ def get_dxy_daily_source(query_date: date) -> str:
     return "YAHOO_FINANCE"
 
 
+# Empirically confirmed: 6,642 daily bars 2000-01-03 → 2026-06-09 (2026-06-11)
+# for each of ^IRX (3M), ^FVX (5Y), ^TNX (10Y), ^TYX (30Y). These are CBOE
+# interest-rate indices whose daily "close" is the par yield in percent.
+US_TREASURY_YIELD_DAILY_FIRST_DATE: date = date(2000, 1, 3)
+
+
+def get_us_treasury_yield_daily_source(query_date: date) -> str:
+    """Return the source for a CBOE US-treasury-yield index ohlcv_24h on *query_date*.
+
+    Daily yield data is available from Yahoo Finance (^IRX / ^FVX / ^TNX / ^TYX)
+    back to 2000-01-03. Earlier dates are reported as GAP_NO_SOURCE.
+    """
+    if query_date < US_TREASURY_YIELD_DAILY_FIRST_DATE:
+        return "GAP_NO_SOURCE"
+    return "YAHOO_FINANCE"
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # General-purpose temporal source resolution
 # ──────────────────────────────────────────────────────────────────────────────
@@ -208,6 +225,10 @@ def get_dxy_daily_source(query_date: date) -> str:
 _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
     ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
     ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
+    ("CBOE:INDEX:US3M-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US5Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US10Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US30Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
 }
 
 
@@ -228,6 +249,17 @@ def get_source_for_instrument(
     assert callable(resolver)
     typed_resolver = cast(Callable[[date], str], resolver)
     return typed_resolver(query_date)
+
+
+def data_types_for_instrument(instrument_key: str) -> list[str]:
+    """Return the data_types with a registered temporal source resolver for *instrument_key*.
+
+    Used by the expected-universe enumerator to derive an index instrument's
+    capture data_type(s) (e.g. VIX → ``ohlcv_15m``, treasuries → ``ohlcv_24h``)
+    from the single source-of-truth resolver registry, rather than duplicating
+    the mapping. Returns an empty list when no resolver is registered.
+    """
+    return sorted(dt for key, dt in _SOURCE_RESOLVERS if key == instrument_key)
 
 
 # ──────────────────────────────────────────────────────────────────────────────

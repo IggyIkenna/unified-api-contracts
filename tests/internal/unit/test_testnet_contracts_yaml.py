@@ -14,11 +14,16 @@ Sepolia + Ethereum mainnet — total 7 entries.
 
 from __future__ import annotations
 
+import importlib.resources
 from pathlib import Path
 
 import yaml
 
-YAML_PATH = Path(__file__).resolve().parents[3] / "config" / "testnet_contracts.yaml"
+# testnet_contracts.yaml is packaged inside the unified_api_contracts package
+# (alongside cloud-providers.yaml) so it is always available via
+# importlib.resources — including inside a built wheel / Docker image where the
+# repo-root config/ dir is absent (mirrors bucket_naming's UAC-packaged read).
+YAML_PATH = Path(str(importlib.resources.files("unified_api_contracts") / "config" / "testnet_contracts.yaml"))
 
 
 def _load() -> dict[int, dict[str, dict[str, str]]]:

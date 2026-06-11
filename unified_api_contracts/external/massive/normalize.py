@@ -158,14 +158,19 @@ def normalize_massive_index(raw: MassiveTicker, venue: str = "CBOE") -> Instrume
     if not ticker:
         return None
     symbol = ticker.removeprefix("I:")
+    quote = "USD"
+    # Canonical index key carries the base-quote suffix (CBOE:INDEX:VIX-USD) to
+    # match the data-write key (VIX_INSTRUMENT_KEY), the symbology GCS key and
+    # the data_source_continuity resolver key. A bare {venue}:INDEX:{symbol}
+    # (no -USD) would mismatch the captured-data path → broken data-status.
     return InstrumentRecord(
-        instrument_key=f"{venue}:{InstrumentType.INDEX.value}:{symbol}",
+        instrument_key=f"{venue}:{InstrumentType.INDEX.value}:{symbol}-{quote}",
         venue=venue,
         raw_symbol=ticker,
         instrument_type=InstrumentType.INDEX,
         asset_class=AssetClass.EQUITY,
         base_asset=symbol,
-        quote_asset="USD",
+        quote_asset=quote,
         tick_size=Decimal("0.01"),
         min_size=Decimal("1"),
         contract_size=Decimal("1"),
