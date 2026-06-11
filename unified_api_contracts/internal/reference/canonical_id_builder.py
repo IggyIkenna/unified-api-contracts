@@ -303,9 +303,23 @@ def _build_tradfi_cash(
     venue: str,
     itype: InstrumentType,
     symbol: str,
+    quote_asset: str = "",
 ) -> str:
-    """Build ``VENUE:TYPE:SYMBOL`` for TradFi cash/reference instruments."""
-    return f"{_venue_token(venue, None)}:{itype.value}:{symbol.upper()}"
+    """Build the canonical key for TradFi cash/reference instruments.
+
+    ``INDEX`` carries the base-quote suffix (``CBOE:INDEX:VIX-USD``) to match the
+    data-write key (``VIX_INSTRUMENT_KEY``), the symbology GCS key, the
+    ``data_source_continuity`` resolver keys and what the reference adapters
+    emit — a bare ``VENUE:INDEX:SYMBOL`` mismatches the captured-data path and
+    silently breaks source/data-status resolution. ``quote_asset`` defaults to
+    ``USD`` for indices (all listed index levels are USD-denominated). Other
+    cash types (equity/ETF/bond/…) keep the plain ``VENUE:TYPE:SYMBOL`` form.
+    """
+    base = f"{_venue_token(venue, None)}:{itype.value}:{symbol.upper()}"
+    if itype is InstrumentType.INDEX:
+        quote = (quote_asset or "USD").upper()
+        return f"{base}-{quote}"
+    return base
 
 
 def _build_combo(venue: str, symbol: str) -> str:
@@ -563,7 +577,7 @@ def build_instrument_id(
 
     # TradFi cash / reference
     if instrument_type in _TRADFI_CASH_TYPES:
-        return _build_tradfi_cash(venue, instrument_type, symbol)
+        return _build_tradfi_cash(venue, instrument_type, symbol, quote_asset)
 
     # Multi-leg
     if instrument_type is InstrumentType.COMBO:

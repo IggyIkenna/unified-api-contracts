@@ -251,6 +251,17 @@ def get_source_for_instrument(
     return typed_resolver(query_date)
 
 
+def data_types_for_instrument(instrument_key: str) -> list[str]:
+    """Return the data_types with a registered temporal source resolver for *instrument_key*.
+
+    Used by the expected-universe enumerator to derive an index instrument's
+    capture data_type(s) (e.g. VIX → ``ohlcv_15m``, treasuries → ``ohlcv_24h``)
+    from the single source-of-truth resolver registry, rather than duplicating
+    the mapping. Returns an empty list when no resolver is registered.
+    """
+    return sorted(dt for key, dt in _SOURCE_RESOLVERS if key == instrument_key)
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # GCS bucket constants (referenced by backfill/migration scripts)
 # ──────────────────────────────────────────────────────────────────────────────

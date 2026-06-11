@@ -110,9 +110,15 @@ class TestTradfiHappyPath:
         assert build_instrument_id("nasdaq", InstrumentType.EQUITY, "AAPL") == "NASDAQ:EQUITY:AAPL"
 
     def test_index(self) -> None:
-        assert build_instrument_id("cboe", InstrumentType.INDEX, "SPX") == "CBOE:INDEX:SPX"
+        # INDEX carries the canonical -USD base-quote suffix (matches the
+        # data-write key, symbology GCS key and source-resolver keys).
+        assert build_instrument_id("cboe", InstrumentType.INDEX, "SPX") == "CBOE:INDEX:SPX-USD"
+
+    def test_index_explicit_quote(self) -> None:
+        assert build_instrument_id("cboe", InstrumentType.INDEX, "VIX", quote_asset="USD") == "CBOE:INDEX:VIX-USD"
 
     def test_etf(self) -> None:
+        # Non-index cash types keep the plain VENUE:TYPE:SYMBOL form (no -USD).
         assert build_instrument_id("arca", InstrumentType.ETF, "SPY") == "ARCA:ETF:SPY"
 
     def test_commodity(self) -> None:
