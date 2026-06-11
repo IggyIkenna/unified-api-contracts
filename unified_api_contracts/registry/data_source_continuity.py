@@ -180,6 +180,26 @@ def get_yahoo_vix_15m_start() -> date:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# DXY (US Dollar Index) — ICE/NYBOT, daily bars via Yahoo Finance (DX-Y.NYB)
+# ──────────────────────────────────────────────────────────────────────────────
+
+# Empirically confirmed: 1,864 daily bars 2019-01-03 → 2026-05-30 (2026-06-11).
+# Yahoo's 1h data is capped to the last 730 days; daily is the full-history path.
+DXY_DAILY_FIRST_DATE: date = date(2019, 1, 2)
+
+
+def get_dxy_daily_source(query_date: date) -> str:
+    """Return the source for ICE:INDEX:DXY-USD ohlcv_24h on *query_date*.
+
+    DXY daily data is available from Yahoo Finance (DX-Y.NYB) back to 2019.
+    Earlier dates and future unknown gaps are reported as GAP_NO_SOURCE.
+    """
+    if query_date < DXY_DAILY_FIRST_DATE:
+        return "GAP_NO_SOURCE"
+    return "YAHOO_FINANCE"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # General-purpose temporal source resolution
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -187,6 +207,7 @@ def get_yahoo_vix_15m_start() -> date:
 # Each resolver takes a date and returns a source name string.
 _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
     ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
+    ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
 }
 
 

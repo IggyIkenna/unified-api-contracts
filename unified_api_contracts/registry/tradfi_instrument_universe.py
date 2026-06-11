@@ -321,6 +321,10 @@ class YahooIndexDef:
 
 YAHOO_INDICES: list[YahooIndexDef] = [
     YahooIndexDef("VIX", "CBOE", "VIX", "^VIX", "equity"),
+    # ICE/NYBOT US Dollar Index — daily ohlcv_24h via Yahoo (DX-Y.NYB).
+    # Full history back to 2019-01-02 (1,864 bars empirically confirmed 2026-06-11).
+    # 1h is capped to the last 730 days by Yahoo; use daily for long history.
+    YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", "fx"),
 ]
 
 # ---------------------------------------------------------------------------
