@@ -128,6 +128,40 @@ class CanonicalOhlcvBar(CanonicalBase):
     phase: SessionPhase | None = None
 
 
+class OhlcvAggregation(StrEnum):
+    """How a single OHLCV column aggregates when downsampling bars (finer → coarser timeframe)."""
+
+    FIRST = "first"
+    MAX = "max"
+    MIN = "min"
+    LAST = "last"
+    SUM = "sum"
+    VOLUME_WEIGHTED = "volume_weighted"
+    RECOMPUTE_FROM_RAW = "recompute_from_raw"
+
+
+# Canonical per-column aggregation semantics for resampling ``CanonicalOhlcvBar`` to a COARSER
+# timeframe (e.g. 5m → 15m). The SSOT for "how does this candle column aggregate" — a candle
+# resampler derives its recipe from this mapping rather than hardcoding ``{open:first, …}`` per
+# service (UTL ``feature_calculator`` is the canonical consumer). Identity columns
+# (``timestamp``/``venue``/``symbol``/``session``/``phase``) are NOT aggregated: ``timestamp`` is
+# the bar-open boundary; venue/symbol are constant within a series; session/phase are derived. A
+# column mapped to ``VOLUME_WEIGHTED`` (``vwap``) is ``Σ(price·volume) / Σ(volume)`` over the
+# child bars — and ``RECOMPUTE_FROM_RAW`` when no volume is present (it cannot be naively averaged
+# across child bars). Feature-layer indicators (RSI/MACD/…) are not OHLCV columns and are
+# ``RECOMPUTE_FROM_RAW`` by definition (computed per-timeframe from the resampled candles).
+OHLCV_AGGREGATION: dict[str, OhlcvAggregation] = {
+    "open": OhlcvAggregation.FIRST,
+    "high": OhlcvAggregation.MAX,
+    "low": OhlcvAggregation.MIN,
+    "close": OhlcvAggregation.LAST,
+    "volume": OhlcvAggregation.SUM,
+    "quote_volume": OhlcvAggregation.SUM,
+    "count": OhlcvAggregation.SUM,
+    "vwap": OhlcvAggregation.VOLUME_WEIGHTED,
+}
+
+
 class CanonicalMarketStateEvent(CanonicalBase):
     """Normalized market state transition event."""
 
