@@ -34,8 +34,36 @@ from unified_api_contracts.internal.architecture_v2.artifact_registry import (
 from unified_api_contracts.internal.architecture_v2.capability_claims import (
     CapabilityClaims,
 )
+
+# ---------------------------------------------------------------------------
+# Capability manifest + gap registries (Phase 1 + Phase 2 schemas,
+# capability_wizard_and_manifest_2026_06_11.md).
+# ADDITIVE — no existing exports moved or renamed.
+# ---------------------------------------------------------------------------
+from unified_api_contracts.internal.architecture_v2.capability_manifest import (
+    AgentAnnotation,
+    CapabilityEdge,
+    CapabilityEdgeStatus,
+    CapabilityGapType,
+    CapabilityManifest,
+    CapabilityNode,
+    CapabilityNodeKind,
+    GapSummary,
+)
 from unified_api_contracts.internal.architecture_v2.client_contract import (
     ClientContract,
+)
+from unified_api_contracts.internal.architecture_v2.collateral_registry import (
+    BROKER_REGISTRY,
+    COLLATERAL_REGISTRY,
+    TREASURY_SPLIT_POLICIES,
+    AssetHaircut,
+    BrokerEntry,
+    CollateralAsset,
+    CollateralPolicy,
+    LiquidationProtocol,
+    TreasurySplitPolicy,
+    WalletTier,
 )
 from unified_api_contracts.internal.architecture_v2.compliance import (
     ComplianceEvent,
@@ -124,6 +152,12 @@ from unified_api_contracts.internal.architecture_v2.enums import (
     VenueRoutingMode,
     VenueType,
 )
+from unified_api_contracts.internal.architecture_v2.fees_registry import (
+    FEES_REGISTRY,
+    FeeComponent,
+    FeeSchedule,
+    FeeUnit,
+)
 from unified_api_contracts.internal.architecture_v2.fund_business_unit import (
     FUND_BUSINESS_UNIT_REGISTRY,
     BusinessUnit,
@@ -134,6 +168,12 @@ from unified_api_contracts.internal.architecture_v2.fund_business_unit import (
     fund_for,
     funds_for_business_unit,
     reserving_business_unit_for,
+)
+from unified_api_contracts.internal.architecture_v2.fund_structures import (
+    OFFERED_FUND_STRUCTURES,
+    CadenceKind,
+    FundStructureKind,
+    FundStructureOffering,
 )
 from unified_api_contracts.internal.architecture_v2.leveraged_legs import (
     CashSweepPolicy,
@@ -153,6 +193,13 @@ from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability i
 )
 from unified_api_contracts.internal.architecture_v2.multi_leg_order_capability import (
     VenueNotRegisteredError as MultiLegVenueNotRegisteredError,
+)
+from unified_api_contracts.internal.architecture_v2.order_semantics import (
+    VENUE_ORDER_SEMANTICS,
+    MultiLegDeltaOwner,
+    RefPricingMode,
+    TimeInForce,
+    VenueOrderSemantics,
 )
 from unified_api_contracts.internal.architecture_v2.paired_dispersion_catalog import (
     PAIRED_DISPERSION_CATALOG,
@@ -234,6 +281,12 @@ from unified_api_contracts.internal.architecture_v2.service_family_scope import 
     check_service_family_scope,
     service_family_from_audience,
 )
+from unified_api_contracts.internal.architecture_v2.simulation_assumptions import (
+    MATCHING_MODEL_TO_BENCHMARK_FILL,
+    SIM_ASSUMPTIONS_REGISTRY,
+    MatchingModel,
+    SimulationAssumption,
+)
 from unified_api_contracts.internal.architecture_v2.strategy_availability import (
     ALLOCATION_MIN_MATURITY,
     EXTERNAL_VISIBILITY_MIN_MATURITY,
@@ -250,6 +303,10 @@ from unified_api_contracts.internal.architecture_v2.strategy_availability import
     maturity_rank,
     slots_visible_to,
     validate_allocation_authorised,
+)
+from unified_api_contracts.internal.architecture_v2.trading_agent_capability import (
+    TRADING_AGENT_CAPABILITIES,
+    TradingAgentCapability,
 )
 from unified_api_contracts.internal.architecture_v2.usage_meter import (
     MeterKind,
@@ -284,21 +341,32 @@ __all__ = [
     "ARCHETYPE_CAPABILITY_REGISTRY",
     "ARCHETYPE_TO_FAMILY",
     "BENCHMARK_FILL_MODE_BY_ACTION",
+    # Capability manifest + gap registries (additive, Phase 1+2)
+    "BROKER_REGISTRY",
+    "COLLATERAL_REGISTRY",
     "COMPATIBILITY_SEED",
     "CROSS_VENUE_ROUTING_POLICIES",
     "EXTERNAL_VISIBILITY_MIN_MATURITY",
+    "FEES_REGISTRY",
     "FUND_BUSINESS_UNIT_REGISTRY",
     "KNOWN_VENUE_TOKENS",
     "LST_REWARD_STREAMS",
+    "MATCHING_MODEL_TO_BENCHMARK_FILL",
     "MULTI_LEG_ORDER_CAPABILITY_REGISTRY",
+    "OFFERED_FUND_STRUCTURES",
     "PAIRED_DISPERSION_CATALOG",
     "RESTRICTION_PROFILE_REGISTRY",
     "REWARD_TOKEN_ECONOMICS",
     "SERVICE_FAMILY_SCOPE_RULES",
+    "SIM_ASSUMPTIONS_REGISTRY",
     "STRATEGY_AVAILABILITY_REGISTRY",
+    "TRADING_AGENT_CAPABILITIES",
+    "TREASURY_SPLIT_POLICIES",
+    "VENUE_ORDER_SEMANTICS",
     "AccessDecision",
     "AccountActionV2",
     "AccountInstruction",
+    "AgentAnnotation",
     "AllocationDirective",
     "AllocatorArchetype",
     "ArchetypeCapability",
@@ -308,6 +376,7 @@ __all__ = [
     "ArtifactMetadata",
     "ArtifactPublishedPayload",
     "ArtifactRef",
+    "AssetHaircut",
     "AtomicExecutionMode",
     "AtomicInstruction",
     "AtomicLeg",
@@ -316,15 +385,25 @@ __all__ = [
     "BenchmarkFillMode",
     "BorrowInstruction",
     "BridgeInstructionV2",
+    "BrokerEntry",
     "BusinessUnit",
+    "CadenceKind",
     "CancelInstruction",
     "CapabilityClaims",
+    "CapabilityEdge",
+    "CapabilityEdgeStatus",
+    "CapabilityGapType",
+    "CapabilityManifest",
+    "CapabilityNode",
+    "CapabilityNodeKind",
     "CashSweepPolicy",
     "ChildVenueDecl",
     "ClientAudience",
     "ClientContext",
     "ClientContract",
     "ClientPackage",
+    "CollateralAsset",
+    "CollateralPolicy",
     "CollateralRulesV2",
     "Combo",
     "CommercialPath",
@@ -352,9 +431,15 @@ __all__ = [
     "DustToken",
     "EdgeMethod",
     "Env",
+    "FeeComponent",
+    "FeeSchedule",
+    "FeeUnit",
     "FillSource",
     "FundBusinessUnitEntry",
     "FundNotFoundError",
+    "FundStructureKind",
+    "FundStructureOffering",
+    "GapSummary",
     "HoldPolicy",
     "InstructionActionV2",
     "IntegrationDepth",
@@ -368,14 +453,17 @@ __all__ = [
     "LegSnapshot",
     "LendInstruction",
     "LeveragedLeg",
+    "LiquidationProtocol",
     "ListedComboType",
     "LockState",
     "LstSeasonalRewardRow",
     "LtvAndHaircut",
     "MarginMode",
     "MarginSpec",
+    "MatchingModel",
     "MeterKind",
     "MevSubmissionMode",
+    "MultiLegDeltaOwner",
     "MultiLegOrderCapability",
     "MultiLegVenueNotRegisteredError",
     "NettingRule",
@@ -396,6 +484,7 @@ __all__ = [
     "QuoteInstruction",
     "QuoteLine",
     "RateLimitsV2",
+    "RefPricingMode",
     "RegionalRestrictions",
     "RestrictionProfile",
     "RewardPnLLayer",
@@ -416,6 +505,7 @@ __all__ = [
     "ServiceFamilyScopeRule",
     "ServiceFamilyTag",
     "ShareClass",
+    "SimulationAssumption",
     "SlotFilter",
     "StakeInstruction",
     "StakingMethod",
@@ -434,11 +524,14 @@ __all__ = [
     "StrategyRetiredError",
     "SwapInstruction",
     "TileLockState",
+    "TimeInForce",
     "TokenAddressMetadata",
     "TokenStreamMetadata",
     "TradeInstruction",
+    "TradingAgentCapability",
     "TransferInstructionV2",
     "TransferType",
+    "TreasurySplitPolicy",
     "UnityChildVenue",
     "UnstakeInstruction",
     "Urgency",
@@ -448,9 +541,11 @@ __all__ = [
     "VenueCategoryV2",
     "VenueConstraints",
     "VenueFeature",
+    "VenueOrderSemantics",
     "VenueRoutingMode",
     "VenueType",
     "ViolationCode",
+    "WalletTier",
     "access_control",
     "all_capabilities",
     "allocator_access_control",
