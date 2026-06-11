@@ -78,6 +78,21 @@ exploit_venue_netting: true # when spot + perp on same venue
 
 > **[MACHINE-DERIVED — FINDING F-CLASS: GAP]** No declared exposure-normalization model found for this archetype. Staked-vs-spot equivalence (e.g. stETH/ETH delta-adjusted exposure), base-currency-neutral views, and intra-leg netting rules are `not_registered` in any UAC registry. Gap tracker: `plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md` — `AGENT P1: Exposure normalization location: staked-ETH vs ETH equivalence`.
 
+## Leg Structure
+
+**[MACHINE-DERIVED]** Structural legs from `ARCHETYPE_LEG_STRUCTURES` (F22 leg-truth SSOT) — the exhaustive per-leg restriction surface the flat capability cells cannot express. Execution coupling: `LEADER_HEDGE`.
+
+| Leg | Role | Required | Instrument types | Eligible venues |
+|---|---|---|---|---|
+| `perp` | `perp_short` | true | `perp` | `binance`, `bybit`, `deribit`, `drift`, `gmx_v2`, `hyperliquid`, `okx` |
+| `spot` | `spot_long` | true | `spot` | `binance`, `bybit`, `hyperliquid`, `okx`, `uniswap_v3` |
+
+**Conditional leg constraints:**
+
+| Leg | Constraint (kind / params / fallback) | Condition |
+|---|---|---|
+| `perp` | `leg_constraint:requires_same_venue · other_leg_id=spot` | Single-venue netted basis (spot + perp on one CEX) is the most capital-efficient form (manifest cell note 'single-venue netted'); cross-venue form runs LEADER_HEDGE instead. |
+
 ## 4. Fund Flow
 
 **[MACHINE-DERIVED]** Wallets and venues keyed by venue categories + TREASURY_SPLIT_POLICIES (DeFi 20/80, CeFi 0/100, Sports no-split). Staked-basis leg structure derived from archetype family + capability cells.
@@ -132,12 +147,14 @@ flowchart TD
 
 **NEVER invented numbers are shown here** — this section is honest about the absence.
 
-Metric set: `unified_trading_library.performance_metrics` defines the canonical metric surface (expected: Sharpe ratio, max drawdown, CAGR, Sortino, Calmar, win rate, avg trade PnL). Import was unavailable on this host.
+When backtest results are available, the following metric set will be reported (from `unified_trading_library.performance_metrics`):
+
+- `DAYS_PER_YEAR`
 
 ## 7. Provenance
 
 - `manifest_version`: 1.0.0
-- `generated_from_commit`: `434e5beffedf400905475c64ca77535e474bd5fb`
+- `generated_from_commit`: `c17a6be5b2bbbd7bb306468fcf10c90e6ed4007d`
 - `archetype_id`: `CARRY_BASIS_PERP`
 - `generated_by`: `scripts/openapi/generate_strategy_prospectus.py` (unified-trading-pm generator family)
 

@@ -2,6 +2,56 @@
   "edges": [
     {
       "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_CROSS_DOMAIN_EVENT",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ARBITRAGE_CROSS_DOMAIN_EVENT has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ARBITRAGE_CROSS_DOMAIN_EVENT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_MEV_BACKRUN",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ARBITRAGE_MEV_BACKRUN has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ARBITRAGE_MEV_BACKRUN"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_MEV_JIT_LIQUIDITY",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ARBITRAGE_MEV_JIT_LIQUIDITY has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ARBITRAGE_MEV_JIT_LIQUIDITY"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_MEV_LIQUIDATION_BUNDLE",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ARBITRAGE_MEV_LIQUIDATION_BUNDLE has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ARBITRAGE_MEV_LIQUIDATION_BUNDLE"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_MEV_SANDWICH",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ARBITRAGE_MEV_SANDWICH has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ARBITRAGE_MEV_SANDWICH"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
       "gap_type": null,
       "readiness": null,
@@ -129,6 +179,26 @@
       "relation": "trades_instrument",
       "status": "partial",
       "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ARBITRAGE_PRICE_DISPERSION",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_short; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell"
     },
     {
       "agent_annotation": null,
@@ -485,6 +555,26 @@
       "from_node_id": "CARRY_BASIS_DATED",
       "gap_type": null,
       "readiness": null,
+      "reason": "role=future_short; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_DATED:future"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_DATED",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_DATED:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_DATED",
+      "gap_type": null,
+      "readiness": null,
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -585,6 +675,26 @@
       "from_node_id": "CARRY_BASIS_DATED_INV",
       "gap_type": null,
       "readiness": null,
+      "reason": "role=future_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_DATED_INV:future"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_DATED_INV",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_short; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_DATED_INV:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_DATED_INV",
+      "gap_type": null,
+      "readiness": null,
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -639,6 +749,26 @@
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=perp_short; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_PERP:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_PERP:spot"
     },
     {
       "agent_annotation": null,
@@ -765,6 +895,26 @@
       "from_node_id": "CARRY_BASIS_PERP_INV",
       "gap_type": null,
       "readiness": null,
+      "reason": "role=perp_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_PERP_INV:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_PERP_INV:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_BASIS_PERP_INV",
+      "gap_type": null,
+      "readiness": null,
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -829,6 +979,26 @@
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_RECURSIVE_BORROW_LENDING_ONLY",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=borrow; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_RECURSIVE_BORROW_LENDING_ONLY",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=lend; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral"
     },
     {
       "agent_annotation": null,
@@ -915,6 +1085,36 @@
       "from_node_id": "CARRY_RECURSIVE_STAKED",
       "gap_type": null,
       "readiness": null,
+      "reason": "role=borrow; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_RECURSIVE_STAKED",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=lend; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_RECURSIVE_STAKED",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=stake; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_RECURSIVE_STAKED",
+      "gap_type": null,
+      "readiness": null,
       "reason": null,
       "relation": "supports",
       "status": "available",
@@ -989,6 +1189,46 @@
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=hedge_short; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:hedge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=lend; required=false",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:lend"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=stake; required=false",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:stake"
     },
     {
       "agent_annotation": null,
@@ -1155,6 +1395,46 @@
       "from_node_id": "CARRY_STAKED_BASIS_DATED",
       "gap_type": null,
       "readiness": null,
+      "reason": "role=future_short; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS_DATED",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=lend; required=false",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:lend"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS_DATED",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=spot_long; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS_DATED",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=stake; required=false",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "CARRY_STAKED_BASIS_DATED",
+      "gap_type": null,
+      "readiness": null,
       "reason": null,
       "relation": "supports",
       "status": "partial",
@@ -1212,12 +1492,52 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "DEFI_LP_CONCENTRATED",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "DEFI_LP_CONCENTRATED has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "DEFI_LP_CONCENTRATED"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "DEFI_LP_POOL",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "DEFI_LP_POOL has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "DEFI_LP_POOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "DEFI_LP_VAULT",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "DEFI_LP_VAULT has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "DEFI_LP_VAULT"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "EVENT_DRIVEN",
       "gap_type": null,
       "readiness": null,
       "reason": null,
       "relation": "belongs_to_family",
       "status": "available",
+      "to_node_id": "EVENT_DRIVEN"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "EVENT_DRIVEN",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "EVENT_DRIVEN has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
       "to_node_id": "EVENT_DRIVEN"
     },
     {
@@ -1513,6 +1833,16 @@
     {
       "agent_annotation": null,
       "from_node_id": "LIQUIDATION_CAPTURE",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "LIQUIDATION_CAPTURE has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "LIQUIDATION_CAPTURE"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "LIQUIDATION_CAPTURE",
       "gap_type": null,
       "readiness": null,
       "reason": "Flash-loan receiver contract required per-chain. Aave V3 + Kamino primary.",
@@ -1589,6 +1919,16 @@
       "relation": "belongs_to_family",
       "status": "available",
       "to_node_id": "MARKET_MAKING"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_CONTINUOUS",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_CONTINUOUS has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_CONTINUOUS"
     },
     {
       "agent_annotation": null,
@@ -1913,6 +2253,16 @@
     {
       "agent_annotation": null,
       "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_EVENT_SETTLED has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_EVENT_SETTLED"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_EVENT_SETTLED",
       "gap_type": null,
       "readiness": null,
       "reason": "Primary \u2014 lay-native.",
@@ -2032,6 +2382,56 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_INVENTORY_SKEW",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_INVENTORY_SKEW has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_INVENTORY_SKEW"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_ML_LEAN",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_ML_LEAN has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_ML_LEAN"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_PASSIVE_SPREAD",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_PASSIVE_SPREAD has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_PASSIVE_SPREAD"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_PREDICTION",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_PREDICTION has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_PREDICTION"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "MARKET_MAKING_QUEUE_MICROSTRUCTURE",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "MARKET_MAKING_QUEUE_MICROSTRUCTURE has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "MARKET_MAKING_QUEUE_MICROSTRUCTURE"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": null,
@@ -2039,6 +2439,16 @@
       "relation": "belongs_to_family",
       "status": "available",
       "to_node_id": "ML_DIRECTIONAL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ML_DIRECTIONAL_CONTINUOUS has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ML_DIRECTIONAL_CONTINUOUS"
     },
     {
       "agent_annotation": null,
@@ -2373,6 +2783,16 @@
     {
       "agent_annotation": null,
       "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "ML_DIRECTIONAL_EVENT_SETTLED has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "ML_DIRECTIONAL_EVENT_SETTLED"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "ML_DIRECTIONAL_EVENT_SETTLED",
       "gap_type": null,
       "readiness": null,
       "reason": "Value-betting (edge_method=VALUE_PROB_VS_IMPLIED) is a config axis on this archetype, not a separate archetype. See codex value-betting-archetype-decision.md.",
@@ -2462,6 +2882,46 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "PORTFOLIO_FACTOR_ALLOCATION",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "PORTFOLIO_FACTOR_ALLOCATION has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "PORTFOLIO_FACTOR_ALLOCATION"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "PORTFOLIO_MULTI_STRATEGY",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "PORTFOLIO_MULTI_STRATEGY has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "PORTFOLIO_MULTI_STRATEGY"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "PORTFOLIO_RISK_PARITY",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "PORTFOLIO_RISK_PARITY has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "PORTFOLIO_RISK_PARITY"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "PORTFOLIO_TACTICAL_OVERLAY",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "PORTFOLIO_TACTICAL_OVERLAY has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "PORTFOLIO_TACTICAL_OVERLAY"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
       "gap_type": null,
       "readiness": null,
@@ -2469,6 +2929,16 @@
       "relation": "belongs_to_family",
       "status": "available",
       "to_node_id": "RULES_DIRECTIONAL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "RULES_DIRECTIONAL_CONTINUOUS has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "RULES_DIRECTIONAL_CONTINUOUS"
     },
     {
       "agent_annotation": null,
@@ -2733,6 +3203,16 @@
     {
       "agent_annotation": null,
       "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "RULES_DIRECTIONAL_EVENT_SETTLED has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
       "gap_type": null,
       "readiness": null,
       "reason": "Engine code complete; docs + example instances minor gap.",
@@ -2789,6 +3269,16 @@
       "relation": "supports",
       "status": "partial",
       "to_node_id": "venue:unity"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_CROSS_SECTIONAL",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "STAT_ARB_CROSS_SECTIONAL has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "STAT_ARB_CROSS_SECTIONAL"
     },
     {
       "agent_annotation": null,
@@ -2939,6 +3429,16 @@
       "relation": "belongs_to_family",
       "status": "available",
       "to_node_id": "STAT_ARB_PAIRS"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "STAT_ARB_PAIRS_FIXED",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "STAT_ARB_PAIRS_FIXED has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "STAT_ARB_PAIRS_FIXED"
     },
     {
       "agent_annotation": null,
@@ -3142,6 +3642,176 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "VOL_0DTE_GAMMA_SCALPING",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_0DTE_GAMMA_SCALPING has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_0DTE_GAMMA_SCALPING"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_0DTE_PIN_RISK",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_0DTE_PIN_RISK has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_0DTE_PIN_RISK"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_ARB_RV_IV",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_ARB_RV_IV has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_ARB_RV_IV"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_CARRY",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_CARRY has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_CARRY"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_CROSS_ASSET_SPREAD",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_CROSS_ASSET_SPREAD has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_CROSS_ASSET_SPREAD"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_DISPERSION",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_DISPERSION has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_DISPERSION"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_LEAPS_CONVEXITY",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_LEAPS_CONVEXITY has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_LEAPS_CONVEXITY"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_MARKET_MAKING",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_MARKET_MAKING has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_MARKET_MAKING"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_ML_LEAN",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_ML_LEAN has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_ML_LEAN"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_OVERLAY_COVERED_CALLS",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_OVERLAY_COVERED_CALLS has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_OVERLAY_COVERED_CALLS"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_OVERLAY_PROTECTIVE_PUT",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_OVERLAY_PROTECTIVE_PUT has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_OVERLAY_PROTECTIVE_PUT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_RATIO_SPREAD",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_RATIO_SPREAD has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_RATIO_SPREAD"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_SPREAD_STRUCTURES",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_SPREAD_STRUCTURES has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_SPREAD_STRUCTURES"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_STRADDLE",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_STRADDLE has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_STRADDLE"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_SYNTHETIC_DELTA",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_SYNTHETIC_DELTA has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_SYNTHETIC_DELTA"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TERM_STRUCTURE_ARB",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_TERM_STRUCTURE_ARB has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_TERM_STRUCTURE_ARB"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TERM_STRUCTURE_SLOPE",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_TERM_STRUCTURE_SLOPE has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_TERM_STRUCTURE_SLOPE"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "VOL_TRADING_OPTIONS",
       "gap_type": null,
       "readiness": null,
@@ -3149,6 +3819,16 @@
       "relation": "belongs_to_family",
       "status": "available",
       "to_node_id": "VOL_TRADING"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "VOL_TRADING_OPTIONS",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_TRADING_OPTIONS has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_TRADING_OPTIONS"
     },
     {
       "agent_annotation": null,
@@ -3212,6 +3892,16 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "VOL_VARIANCE_SWAP",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "VOL_VARIANCE_SWAP has no leg structure in ARCHETYPE_LEG_STRUCTURES yet \u2014 structural per-leg restrictions not modelled (F22 leg-truth gap)",
+      "relation": "has_leg:legs",
+      "status": "not_registered",
+      "to_node_id": "VOL_VARIANCE_SWAP"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "YIELD_ROTATION_LENDING",
       "gap_type": null,
       "readiness": null,
@@ -3239,6 +3929,16 @@
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "YIELD_ROTATION_LENDING",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=lend; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:YIELD_ROTATION_LENDING:lend"
     },
     {
       "agent_annotation": null,
@@ -3309,6 +4009,16 @@
       "relation": "trades_instrument",
       "status": "available",
       "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "YIELD_STAKING_SIMPLE",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "role=stake; required=true",
+      "relation": "has_leg",
+      "status": "available",
+      "to_node_id": "leg:YIELD_STAKING_SIMPLE:stake"
     },
     {
       "agent_annotation": null,
@@ -4879,6 +5589,1686 @@
       "relation": "at_risk_layer",
       "status": "available",
       "to_node_id": "risk_layer:VENUE_SIDE"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:event_settled"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "Same-chain pairs execute ATOMIC (multicall / flash-loan); cross-venue non-atomic pairs run LEADER_HEDGE with abort-on-adverse-move.",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=dispersion_pair",
+      "status": "available",
+      "to_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:balancer"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:betfair_direct"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:curve"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:drift"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:gmx_v2"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:polymarket"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:smarkets_direct"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:uniswap_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:unity"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:event_settled"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "Same-chain pairs execute ATOMIC (multicall / flash-loan); cross-venue non-atomic pairs run LEADER_HEDGE with abort-on-adverse-move.",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=dispersion_pair",
+      "status": "available",
+      "to_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:balancer"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:betfair_direct"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:curve"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:drift"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:gmx_v2"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:polymarket"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:smarkets_direct"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:uniswap_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:unity"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:dated_future"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:cme"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:ice"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:coinbase"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:ibkr"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:dated_future"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:cme"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:future",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:ice"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:coinbase"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_DATED_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:ibkr"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "Single-venue netted basis (spot + perp on one CEX) is the most capital-efficient form (manifest cell note 'single-venue netted'); cross-venue form runs LEADER_HEDGE instead.",
+      "relation": "leg_constraint:requires_same_venue|other_leg_id=spot",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_PERP:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:drift"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:gmx_v2"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:uniswap_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "Single-venue netted basis (spot + perp on one CEX) is the most capital-efficient form (manifest cell note 'single-venue netted'); cross-venue form runs LEADER_HEDGE instead.",
+      "relation": "leg_constraint:requires_same_venue|other_leg_id=spot",
+      "status": "available",
+      "to_node_id": "leg:CARRY_BASIS_PERP_INV:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:drift"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:gmx_v2"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:perp",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_BASIS_PERP_INV:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:uniswap_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "Lending-loop iterations execute atomically on-chain.",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=recursive_loop",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:compound_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:morpho"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "Lending-loop iterations execute atomically on-chain.",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=recursive_loop",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:compound_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:morpho"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "All loop iterations execute atomically on-chain (ATOMIC_ON_CHAIN composite call).",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=recursive_loop",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "All loop iterations execute atomically on-chain (ATOMIC_ON_CHAIN composite call).",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=recursive_loop",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "All loop iterations execute atomically on-chain (ATOMIC_ON_CHAIN composite call).",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=recursive_loop",
+      "status": "available",
+      "to_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:jito"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:lido"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:marinade"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:rocketpool"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:perp"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "The SWAP\u2192STAKE\u2192TRANSFER\u2192hedge sequence is coupled (LEADER_HEDGE): the hedge must fill within hedge_deadline_ms of the staked leader or the leader is closed (CompensationPolicy.CLOSE_LEADER_IF_HEDGE_FAILS).",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=staked_basis",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:hedge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "The LST must be accepted as cross-margin at the perp hedge venue (engine gate: accepted_perp_collateral(perp_venue)). On venues that accept the LST \u2192 staked basis (earn staking yield + funding). On venues that do NOT accept the LST as collateral \u2192 the stake leg is dropped and this runs as a straight perp-funding basis (== CARRY_BASIS_PERP) within the same archetype.",
+      "relation": "leg_constraint:requires_collateral_acceptance|asset=lst_token;venue_role=hedge_short|fallback_variant=straight_basis",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:hedge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:drift"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:gmx_v2"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:jupiter"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:uniswap_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "The LST must be accepted as cross-margin at the perp hedge venue (engine gate: accepted_perp_collateral(perp_venue)). On venues that accept the LST \u2192 staked basis (earn staking yield + funding). On venues that do NOT accept the LST as collateral \u2192 the stake leg is dropped and this runs as a straight perp-funding basis (== CARRY_BASIS_PERP) within the same archetype.",
+      "relation": "leg_constraint:requires_collateral_acceptance|asset=lst_token;venue_role=hedge_short|fallback_variant=straight_basis",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS:stake"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:jito"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:lido"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:marinade"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:rocketpool"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:dated_future"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "The SWAP\u2192STAKE\u2192TRANSFER\u2192hedge sequence is coupled (LEADER_HEDGE): the hedge must fill within hedge_deadline_ms of the staked leader or the leader is closed (CompensationPolicy.CLOSE_LEADER_IF_HEDGE_FAILS).",
+      "relation": "leg_constraint:requires_atomic_bundle|bundle_id=staked_basis",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "The LST must be accepted as cross-margin at the perp hedge venue (engine gate: accepted_perp_collateral(perp_venue)). On venues that accept the LST \u2192 staked basis (earn staking yield + funding). On venues that do NOT accept the LST as collateral \u2192 the stake leg is dropped and this runs as a straight perp-funding basis (== CARRY_BASIS_PERP) within the same archetype.",
+      "relation": "leg_constraint:requires_collateral_acceptance|asset=lst_token;venue_role=hedge_short|fallback_variant=straight_basis",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:bybit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:deribit"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:drift"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:gmx_v2"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:hyperliquid"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:okx"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:spot"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:jupiter"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:uniswap_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "The LST must be accepted as cross-margin at the perp hedge venue (engine gate: accepted_perp_collateral(perp_venue)). On venues that accept the LST \u2192 staked basis (earn staking yield + funding). On venues that do NOT accept the LST as collateral \u2192 the stake leg is dropped and this runs as a straight perp-funding basis (== CARRY_BASIS_PERP) within the same archetype.",
+      "relation": "leg_constraint:requires_collateral_acceptance|asset=lst_token;venue_role=hedge_short|fallback_variant=straight_basis",
+      "status": "available",
+      "to_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:jito"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:lido"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:marinade"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:rocketpool"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_ROTATION_LENDING:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:lending"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_ROTATION_LENDING:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:aave_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_ROTATION_LENDING:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:compound_v3"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_ROTATION_LENDING:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:euler"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_ROTATION_LENDING:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:kamino"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_ROTATION_LENDING:lend",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:morpho"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_STAKING_SIMPLE:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "trades_instrument",
+      "status": "available",
+      "to_node_id": "instrument_type:staking"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_STAKING_SIMPLE:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:etherfi"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_STAKING_SIMPLE:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:jito"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_STAKING_SIMPLE:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:lido"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_STAKING_SIMPLE:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:marinade"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:YIELD_STAKING_SIMPLE:stake",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:rocketpool"
     },
     {
       "agent_annotation": null,
@@ -6646,13 +9036,13 @@
     "logical_dead_end": 19,
     "logical_dead_ends": 16,
     "missing_extraction": 1,
-    "missing_registry": 60,
+    "missing_registry": 106,
     "needs_code_scan": 3,
-    "not_registered_total": 63,
-    "orphan_nodes": 124,
-    "unbuilt_dead_ends": 25
+    "not_registered_total": 109,
+    "orphan_nodes": 89,
+    "unbuilt_dead_ends": 54
   },
-  "generated_from_commit": "3fddfcd24183192016bd7dc4902da27ee57718ed",
+  "generated_from_commit": "c17a6be5b2bbbd7bb306468fcf10c90e6ed4007d",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -8084,6 +10474,281 @@
       "node_id": "instrument_type:staking"
     },
     {
+      "kind": "leg",
+      "label": "Arbitrage Price Dispersion \u2014 buy",
+      "metadata": {
+        "archetype": "ARBITRAGE_PRICE_DISPERSION",
+        "execution_coupling": "ATOMIC",
+        "required": "true",
+        "role": "spot_long"
+      },
+      "node_id": "leg:ARBITRAGE_PRICE_DISPERSION:buy"
+    },
+    {
+      "kind": "leg",
+      "label": "Arbitrage Price Dispersion \u2014 sell",
+      "metadata": {
+        "archetype": "ARBITRAGE_PRICE_DISPERSION",
+        "execution_coupling": "ATOMIC",
+        "required": "true",
+        "role": "spot_short"
+      },
+      "node_id": "leg:ARBITRAGE_PRICE_DISPERSION:sell"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Dated \u2014 future",
+      "metadata": {
+        "archetype": "CARRY_BASIS_DATED",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "future_short"
+      },
+      "node_id": "leg:CARRY_BASIS_DATED:future"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Dated \u2014 spot",
+      "metadata": {
+        "archetype": "CARRY_BASIS_DATED",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "spot_long"
+      },
+      "node_id": "leg:CARRY_BASIS_DATED:spot"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Dated Inv \u2014 future",
+      "metadata": {
+        "archetype": "CARRY_BASIS_DATED_INV",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "future_long"
+      },
+      "node_id": "leg:CARRY_BASIS_DATED_INV:future"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Dated Inv \u2014 spot",
+      "metadata": {
+        "archetype": "CARRY_BASIS_DATED_INV",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "spot_short"
+      },
+      "node_id": "leg:CARRY_BASIS_DATED_INV:spot"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Perp \u2014 perp",
+      "metadata": {
+        "archetype": "CARRY_BASIS_PERP",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "perp_short"
+      },
+      "node_id": "leg:CARRY_BASIS_PERP:perp"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Perp \u2014 spot",
+      "metadata": {
+        "archetype": "CARRY_BASIS_PERP",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "spot_long"
+      },
+      "node_id": "leg:CARRY_BASIS_PERP:spot"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Perp Inv \u2014 perp",
+      "metadata": {
+        "archetype": "CARRY_BASIS_PERP_INV",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "perp_long"
+      },
+      "node_id": "leg:CARRY_BASIS_PERP_INV:perp"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Basis Perp Inv \u2014 spot",
+      "metadata": {
+        "archetype": "CARRY_BASIS_PERP_INV",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "spot_long"
+      },
+      "node_id": "leg:CARRY_BASIS_PERP_INV:spot"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Recursive Borrow Lending Only \u2014 loop_borrow",
+      "metadata": {
+        "archetype": "CARRY_RECURSIVE_BORROW_LENDING_ONLY",
+        "execution_coupling": "ATOMIC_ON_CHAIN",
+        "required": "true",
+        "role": "borrow"
+      },
+      "node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_borrow"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Recursive Borrow Lending Only \u2014 loop_collateral",
+      "metadata": {
+        "archetype": "CARRY_RECURSIVE_BORROW_LENDING_ONLY",
+        "execution_coupling": "ATOMIC_ON_CHAIN",
+        "required": "true",
+        "role": "lend"
+      },
+      "node_id": "leg:CARRY_RECURSIVE_BORROW_LENDING_ONLY:loop_collateral"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Recursive Staked \u2014 loop_borrow",
+      "metadata": {
+        "archetype": "CARRY_RECURSIVE_STAKED",
+        "execution_coupling": "ATOMIC_ON_CHAIN",
+        "required": "true",
+        "role": "borrow"
+      },
+      "node_id": "leg:CARRY_RECURSIVE_STAKED:loop_borrow"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Recursive Staked \u2014 loop_collateral",
+      "metadata": {
+        "archetype": "CARRY_RECURSIVE_STAKED",
+        "execution_coupling": "ATOMIC_ON_CHAIN",
+        "required": "true",
+        "role": "lend"
+      },
+      "node_id": "leg:CARRY_RECURSIVE_STAKED:loop_collateral"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Recursive Staked \u2014 loop_stake",
+      "metadata": {
+        "archetype": "CARRY_RECURSIVE_STAKED",
+        "execution_coupling": "ATOMIC_ON_CHAIN",
+        "required": "true",
+        "role": "stake"
+      },
+      "node_id": "leg:CARRY_RECURSIVE_STAKED:loop_stake"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis \u2014 hedge",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "hedge_short"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS:hedge"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis \u2014 lend",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "false",
+        "role": "lend"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS:lend"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis \u2014 spot",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "spot_long"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS:spot"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis \u2014 stake",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "false",
+        "role": "stake"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS:stake"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis Dated \u2014 hedge",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS_DATED",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "future_short"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS_DATED:hedge"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis Dated \u2014 lend",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS_DATED",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "false",
+        "role": "lend"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS_DATED:lend"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis Dated \u2014 spot",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS_DATED",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "true",
+        "role": "spot_long"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS_DATED:spot"
+    },
+    {
+      "kind": "leg",
+      "label": "Carry Staked Basis Dated \u2014 stake",
+      "metadata": {
+        "archetype": "CARRY_STAKED_BASIS_DATED",
+        "execution_coupling": "LEADER_HEDGE",
+        "required": "false",
+        "role": "stake"
+      },
+      "node_id": "leg:CARRY_STAKED_BASIS_DATED:stake"
+    },
+    {
+      "kind": "leg",
+      "label": "Yield Rotation Lending \u2014 lend",
+      "metadata": {
+        "archetype": "YIELD_ROTATION_LENDING",
+        "execution_coupling": "SEQUENCED_WITH_PACING",
+        "required": "true",
+        "role": "lend"
+      },
+      "node_id": "leg:YIELD_ROTATION_LENDING:lend"
+    },
+    {
+      "kind": "leg",
+      "label": "Yield Staking Simple \u2014 stake",
+      "metadata": {
+        "archetype": "YIELD_STAKING_SIMPLE",
+        "execution_coupling": "ATOMIC_ON_CHAIN",
+        "required": "true",
+        "role": "stake"
+      },
+      "node_id": "leg:YIELD_STAKING_SIMPLE:stake"
+    },
+    {
       "kind": "ml_model",
       "label": "ML Model Variant Config",
       "metadata": {
@@ -9452,6 +12117,12 @@
         "asset_group": "DEFI"
       },
       "node_id": "venue:jito"
+    },
+    {
+      "kind": "venue",
+      "label": "Jupiter",
+      "metadata": {},
+      "node_id": "venue:jupiter"
     },
     {
       "kind": "venue",

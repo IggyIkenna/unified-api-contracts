@@ -84,6 +84,25 @@ _...truncated. See codex archetype doc._
 
 > **[MACHINE-DERIVED — FINDING F-CLASS: GAP]** No declared exposure-normalization model found for this archetype. Staked-vs-spot equivalence (e.g. stETH/ETH delta-adjusted exposure), base-currency-neutral views, and intra-leg netting rules are `not_registered` in any UAC registry. Gap tracker: `plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md` — `AGENT P1: Exposure normalization location: staked-ETH vs ETH equivalence`.
 
+## Leg Structure
+
+**[MACHINE-DERIVED]** Structural legs from `ARCHETYPE_LEG_STRUCTURES` (F22 leg-truth SSOT) — the exhaustive per-leg restriction surface the flat capability cells cannot express. Execution coupling: `LEADER_HEDGE`.
+
+| Leg | Role | Required | Instrument types | Eligible venues |
+|---|---|---|---|---|
+| `hedge` | `future_short` | true | `dated_future` | `binance`, `bybit`, `deribit`, `drift`, `gmx_v2`, `hyperliquid`, `okx` |
+| `lend` | `lend` | false | `lending` | `aave_v3`, `kamino` |
+| `spot` | `spot_long` | true | `spot` | `jupiter`, `uniswap_v3` |
+| `stake` | `stake` | false | `staking` | `jito`, `lido`, `marinade`, `rocketpool` |
+
+**Conditional leg constraints:**
+
+| Leg | Constraint (kind / params / fallback) | Condition |
+|---|---|---|
+| `hedge` | `leg_constraint:requires_atomic_bundle · bundle_id=staked_basis` | The SWAP→STAKE→TRANSFER→hedge sequence is coupled (LEADER_HEDGE): the hedge must fill within hedge_deadline_ms of the staked leader or the leader is closed (CompensationPolicy.CLOSE_LEADER_IF_HEDGE_FAILS). |
+| `hedge` | `leg_constraint:requires_collateral_acceptance · asset=lst_token;venue_role=hedge_short · fallback_variant=straight_basis` | The LST must be accepted as cross-margin at the perp hedge venue (engine gate: accepted_perp_collateral(perp_venue)). On venues that accept the LST → staked basis (earn staking yield + funding). On venues that do NOT accept the LST as collateral → the stake leg is dropped and this runs as a straight perp-funding basis (== CARRY_BASIS_PERP) within the same archetype. |
+| `stake` | `leg_constraint:requires_collateral_acceptance · asset=lst_token;venue_role=hedge_short · fallback_variant=straight_basis` | The LST must be accepted as cross-margin at the perp hedge venue (engine gate: accepted_perp_collateral(perp_venue)). On venues that accept the LST → staked basis (earn staking yield + funding). On venues that do NOT accept the LST as collateral → the stake leg is dropped and this runs as a straight perp-funding basis (== CARRY_BASIS_PERP) within the same archetype. |
+
 ## 4. Fund Flow
 
 **[MACHINE-DERIVED]** Wallets and venues keyed by venue categories + TREASURY_SPLIT_POLICIES (DeFi 20/80, CeFi 0/100, Sports no-split). Staked-basis leg structure derived from archetype family + capability cells.
@@ -145,12 +164,14 @@ flowchart TD
 
 **NEVER invented numbers are shown here** — this section is honest about the absence.
 
-Metric set: `unified_trading_library.performance_metrics` defines the canonical metric surface (expected: Sharpe ratio, max drawdown, CAGR, Sortino, Calmar, win rate, avg trade PnL). Import was unavailable on this host.
+When backtest results are available, the following metric set will be reported (from `unified_trading_library.performance_metrics`):
+
+- `DAYS_PER_YEAR`
 
 ## 7. Provenance
 
 - `manifest_version`: 1.0.0
-- `generated_from_commit`: `434e5beffedf400905475c64ca77535e474bd5fb`
+- `generated_from_commit`: `c17a6be5b2bbbd7bb306468fcf10c90e6ed4007d`
 - `archetype_id`: `CARRY_STAKED_BASIS_DATED`
 - `generated_by`: `scripts/openapi/generate_strategy_prospectus.py` (unified-trading-pm generator family)
 
