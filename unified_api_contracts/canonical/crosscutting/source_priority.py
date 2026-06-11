@@ -286,20 +286,24 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # EIA (US Energy Information Administration) — commodity storage + series data.
     # BATCH_EIA manifest mode: features-commodity-service D5 Phase 1.
     ("tradfi", "energy_data"): ["eia"],
-    ("tradfi", "trades"): ["databento", "massive"],
-    ("tradfi", "tbbo"): ["databento", "massive"],
-    ("tradfi", "ohlcv_1m"): ["databento", "massive"],
-    # databento primary; massive secondary (REST batch, delayed tier); yahoo: VIX 15m rolling 60d fallback;
-    # barchart: VIX 15m historical preload 2020-2025. Massive slotted AFTER databento, BEFORE yahoo/barchart
-    # per tradfi_massive_dual_source_2026_05_28.md Phase 1 operator decision. CFE (VX/VIX futures) is NOT
-    # covered by Massive — existing yahoo+barchart layering handles those via MTDS routing.
-    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
+    # MASSIVE-FIRST (operator ratification 2026-06-11, supersedes the 2026-05-28
+    # Phase-1 databento-first ordering): massive is the PRIMARY tradfi source for
+    # MVP catalogue completion — broadest canonically-converted venue x data_type
+    # coverage (s3 flat-files bulk path; "Massive can backfill cells regardless of
+    # Databento state" per tradfi_massive_dual_source_2026_05_28.md). databento
+    # stays the SECONDARY/resilience source (account currently vendor-locked —
+    # unlock is optional, not coverage-blocking). CFE (VX/VIX futures) remains
+    # NOT covered by Massive — yahoo+barchart layering via MTDS routing.
+    ("tradfi", "trades"): ["massive", "databento"],
+    ("tradfi", "tbbo"): ["massive", "databento"],
+    ("tradfi", "ohlcv_1m"): ["massive", "databento"],
+    ("tradfi", "ohlcv_15m"): ["massive", "databento", "yahoo", "barchart"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
     # data_type=trades → Era-B source resolves via ``(tradfi, "trades")`` above
-    # (databento, massive). Legacy-data_type keys retained for the pre-migration
+    # (massive, databento). Legacy-data_type keys retained for the pre-migration
     # rows + the closed-set round-trip (see the cefi note above).
-    ("tradfi", "options_chain"): ["databento", "massive"],
-    ("tradfi", "futures_chain"): ["databento", "massive"],
+    ("tradfi", "options_chain"): ["massive", "databento"],
+    ("tradfi", "futures_chain"): ["massive", "databento"],
     # commodity_signal — emitted by features-service commodity family from
     # EIA (crude oil + natural gas weekly storage) + CFTC + Baker Hughes +
     # Open-Meteo + Yahoo factor inputs. Top entry is EIA per the storage
