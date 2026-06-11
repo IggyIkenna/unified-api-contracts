@@ -154,7 +154,13 @@ QG_MEMORY_CHECK_INTERVAL=${QG_MEMORY_CHECK_INTERVAL:-20}  # More frequent checks
 # pip-audit. All pre-date Phase 4. Goal: ratchet to 0 incrementally.
 # Bumped 6→7 (2026-05-22): broad-except in protocol_pause_windows.py surfaced (pre-existing,
 # predates Phase 4 cassette work). Tracked in uac_qg_preexisting_size_violations_2026_05_14.md.
-CODEX_MAX_VIOLATIONS=7
+# Ratcheted 7→2 (2026-06-11): honest count measured via QG_SLICE=lint-codex --no-fix
+# (plan codex_violations_ratchet_to_five_2026_06_10.md Phase 4). Remaining 2:
+# broad-except (registry/protocol_pause_windows.py) + function-size
+# (external/databento/databento_classifier.py classify_databento_symbol 331L).
+# pip-audit violation (pip 26.1.1 PYSEC-2026-196) fixed in same unit via
+# uv lock --upgrade-package pip → 26.1.2.
+CODEX_MAX_VIOLATIONS=2
 export CODEX_MAX_VIOLATIONS
 # Broadened to tests/ (Wave 3 QG broadening, slot 6 2026-05-22). Previously
 # limited to tests/unit/ + cassette canary files due to 318 pre-existing
