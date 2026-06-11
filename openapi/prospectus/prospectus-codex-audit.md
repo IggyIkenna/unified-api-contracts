@@ -12,7 +12,9 @@ _Machine-generated audit — deterministic output. Do not hand-edit; re-run `aud
 | Archetypes WITHOUT codex doc (a)        | 0     |
 | Codex docs WITHOUT enum entry (b)       | 2     |
 | Venue-category contradictions (c)       | 1     |
+| Legs-in-prose drift (d)                 | 6     |
 | ARCHETYPE_CAPABILITY_REGISTRY available | yes   |
+| ARCHETYPE_LEG_STRUCTURES available      | yes   |
 
 ## (a) StrategyArchetype Enum Values WITHOUT Codex Doc
 
@@ -35,6 +37,19 @@ These are CLEAR STRUCTURED contradictions between the codex `venue_universe` fro
 | Archetype              | Category | Codex Claims                                                                    | Registry Says                                              | Severity |
 | ---------------------- | -------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------- | -------- |
 | `CARRY_BASIS_PERP_INV` | CEFI     | venue_universe field references CEFI venues: [AAVE, MORPHO, HYPERLIQUID, BYBIT] | ARCHETYPE_CAPABILITY_REGISTRY has no CEFI capability cells | WARNING  |
+
+## (d) Legs-in-Prose Drift (F22 — multi-leg structure only as text)
+
+These archetypes have ARCHETYPE_CAPABILITY_REGISTRY cell `notes` that imply a multi-leg structure (match `ATOMIC|hedge|+`) but have NO entry in ARCHETYPE_LEG_STRUCTURES — so the per-leg restriction lives ONLY as prose, not as the queryable leg SSOT the wizard/prospectus can render. Each should get a leg structure (the F22 fix pattern).
+
+| Archetype                         | Cell notes (prose implying legs)                                                           |
+| --------------------------------- | ------------------------------------------------------------------------------------------ |
+| `EVENT_DRIVEN`                    | News-feed + lineup timing model not declared.                                              |
+| `LIQUIDATION_CAPTURE`             | Flash-loan receiver contract required per-chain. Aave V3 + Kamino primary.                 |
+| `MARKET_MAKING_CONTINUOUS`        | Active LP (Uniswap V3/V4, Orca, Raydium) + Passive LP (Curve, Balancer, Uniswap V2).       |
+| `RULES_DIRECTIONAL_EVENT_SETTLED` | Docs + example instances gap. \| Engine code complete; docs + example instances minor gap. |
+| `STAT_ARB_CROSS_SECTIONAL`        | Multi-token atomic basket trade on DeFi is gas-prohibitive; needs specialised router.      |
+| `VOL_TRADING_OPTIONS`             | Full Deribit surface support; multi-leg ATOMIC supported.                                  |
 
 ## Archetypes With Codex Doc (full inventory)
 

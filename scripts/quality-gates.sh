@@ -32,11 +32,31 @@ GCP_PROJECT_ID_EXCLUDE_GLOBS=(
 # SIZE_EXTRA_EXCLUDES: pre-existing oversized declarative/registry/re-export files.
 # These are closed-set enumerations (venue registry, error codes, instrument seeds, facades) —
 # splitting them harms grep-ability. Codex C901 carveout (pyproject.toml) applies to same set.
-# honest_coverage.py + internal/events.py: comprehensive canonical registries; splitting harms
+# internal/events.py: comprehensive canonical registries; splitting harms
 # grep-ability. candidate_manifest.py: from_firestore_dict() function size pre-existing (64L).
 # All tracked as pre-existing violations in CODEX_MAX_VIOLATIONS comment above.
+#
+# >900-line audit 2026-06-11 (codex_violations_ratchet_to_five_2026_06_10.md Phase 1.5 P3):
+# every entry below was AST-audited (declarative-vs-logic line ratio). SPLIT + REMOVED from
+# this list (now <900 behind unchanged-import-path facades): honest_coverage.py (was 1,141 →
+# 788 + _honest_coverage_logic.py), source_priority.py (was 1,018 → 562 + _source_priority_data.py),
+# internal/domain/strategy_service/instruction.py (was 913 → 49 facade + _instruction_base.py +
+# _instruction_specialized.py), internal/testing/synthetic.py (was 930 → 822 + _seed_writer.py;
+# stays under the internal/testing/* glob below). KEPT (measured >80% declarative or pure
+# schema/field declarations — splitting harms grep-ability of closed-set taxonomies):
+# errors/defi.py 90% decl (StrEnum codes + routing tables) · alerting/rules.py 84% decl ·
+# internal/schemas/_sports_match_contracts.py 92% decl · registry/data_type_capability.py 91% decl ·
+# internal/schemas/contracts.py 61% top-level SchemaContract/ColumnSpec instances + small lookup fn ·
+# internal/events.py + internal/domain/ml/schemas.py pure event/Pydantic field declarations
+# (0%/6% function-body lines) · pure data registries per operator list (team_mappings 2,723,
+# market_data_categories 1,619, defi_reserve_params 1,349, capability_declarations _cefi/_defi,
+# provider_league_ids 997, internal/risk.py 1,043) · root/internal/registry __init__.py facades
+# (sanctioned re-export exception). internal/testing/* glob also carries the 4 pre-existing
+# >50L generator methods in synthetic.py (generate_orderbook_snapshots 101L et al. — test-fixture
+# generators, not moved by the split).
 SIZE_EXTRA_EXCLUDES=(
-    # === ORIGINAL EXCLUSIONS (17 files) ===
+    # === ORIGINAL EXCLUSIONS (audited 2026-06-11; honest_coverage / source_priority /
+    # instruction SPLIT + removed) ===
     "./unified_api_contracts/__init__.py"
     "./unified_api_contracts/registry/defi_reserve_params.py"
     "./unified_api_contracts/registry/market_data_categories.py"
@@ -45,13 +65,11 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/registry/capability_declarations/_defi.py"
     "./unified_api_contracts/canonical/crosscutting/alerting/rules.py"
     "./unified_api_contracts/canonical/crosscutting/errors/defi.py"
-    "./unified_api_contracts/canonical/crosscutting/honest_coverage.py"
     "./unified_api_contracts/internal/__init__.py"
     "./unified_api_contracts/internal/events.py"
     "./unified_api_contracts/internal/schemas/contracts.py"
     "./unified_api_contracts/internal/architecture_v2/restaking_rewards.py"
     "./unified_api_contracts/internal/risk.py"
-    "./unified_api_contracts/internal/domain/strategy_service/instruction.py"
     "./unified_api_contracts/internal/domain/ml/schemas.py"
     "./unified_api_contracts/external/api_football/team_mappings.py"
     "./unified_api_contracts/internal/testing/*"
@@ -120,7 +138,6 @@ SIZE_EXTRA_EXCLUDES=(
     # === CROSSCUTTING CONFIGS AND RULES (4 files - legitimate comprehensive configs) ===
     "./unified_api_contracts/canonical/crosscutting/alerting/thresholds.py"
     "./unified_api_contracts/canonical/crosscutting/instruments_preflight_dag.py"
-    "./unified_api_contracts/canonical/crosscutting/source_priority.py"
     # === DOMAIN MODELS (6 files - legitimate comprehensive domain definitions) ===
     "./unified_api_contracts/canonical/domain/derivatives/tradfi_roots.py"
     "./unified_api_contracts/canonical/domain/position/__init__.py"

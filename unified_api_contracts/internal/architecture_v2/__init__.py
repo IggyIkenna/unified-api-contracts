@@ -25,6 +25,24 @@ from unified_api_contracts.internal.architecture_v2.archetype_capability import 
     archetypes_for_venue,
     capability_for,
 )
+
+# ---------------------------------------------------------------------------
+# Archetype leg-spec registry — structural per-leg restriction model (F22,
+# capability_wizard_and_manifest_2026_06_11.md). The NEW SSOT for leg truth;
+# dual-represented alongside ARCHETYPE_CAPABILITY_REGISTRY (see the module
+# docstring). ADDITIVE — no existing exports moved or renamed.
+# ---------------------------------------------------------------------------
+from unified_api_contracts.internal.architecture_v2.archetype_leg_spec import (
+    ARCHETYPE_LEG_STRUCTURES,
+    ArchetypeLegRole,
+    ArchetypeLegSpec,
+    ArchetypeLegStructure,
+    LegConstraint,
+    LegConstraintKind,
+    all_leg_structures,
+    archetypes_without_leg_structures,
+    leg_structure_for,
+)
 from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactKind,
     ArtifactMetadata,
@@ -349,6 +367,7 @@ StrategyInstructionV2 = (
 __all__ = [
     "ALLOCATION_MIN_MATURITY",
     "ARCHETYPE_CAPABILITY_REGISTRY",
+    "ARCHETYPE_LEG_STRUCTURES",
     "ARCHETYPE_TO_FAMILY",
     "BENCHMARK_FILL_MODE_BY_ACTION",
     # Capability manifest + gap registries (additive, Phase 1+2)
@@ -382,6 +401,9 @@ __all__ = [
     "ArchetypeCapability",
     "ArchetypeCapabilityCell",
     "ArchetypeInstrumentType",
+    "ArchetypeLegRole",
+    "ArchetypeLegSpec",
+    "ArchetypeLegStructure",
     "ArtifactKind",
     "ArtifactMetadata",
     "ArtifactPublishedPayload",
@@ -457,6 +479,8 @@ __all__ = [
     "ItemRef",
     "KillSwitchReason",
     "LSTRewardStream",
+    "LegConstraint",
+    "LegConstraintKind",
     "LegDrift",
     "LegPortfolioState",
     "LegSizingStrategy",
@@ -566,9 +590,11 @@ __all__ = [
     "WalletTier",
     "access_control",
     "all_capabilities",
+    "all_leg_structures",
     "allocator_access_control",
     "archetypes_for_pair",
     "archetypes_for_venue",
+    "archetypes_without_leg_structures",
     "availability_for",
     "capability_for",
     "check_service_family_scope",
@@ -580,6 +606,7 @@ __all__ = [
     "funds_for_business_unit",
     "is_venue_token",
     "known_persona_ids",
+    "leg_structure_for",
     "maturity_rank",
     "multi_leg_capability_for",
     "policies_for_settlement_currency",

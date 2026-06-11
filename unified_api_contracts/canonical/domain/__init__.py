@@ -135,6 +135,7 @@ from .instruments_catalog import (
     register_catalog_reader as register_catalog_reader,
 )
 from .market import (
+    OHLCV_AGGREGATION,
     BookLevel,
     CanonicalMarketStateEvent,
     CanonicalOhlcvBar,
@@ -143,6 +144,7 @@ from .market import (
     CanonicalTrade,
     MarketState,
     MarketTrade,
+    OhlcvAggregation,
     OrderBookSnapshot5,
 )
 from .market.spread import (
@@ -319,6 +321,7 @@ __all__ = [
     "IN_PROGRESS_STATUSES",
     "ODDS_API_KEY_TO_VENUE",
     "ODDS_API_KEY_TO_VENUE_CATEGORY",
+    "OHLCV_AGGREGATION",
     "PRE_MATCH_STATUSES",
     "RISK_TYPE_CATEGORIES",
     "SHARE_CLASS_BASE_ASSETS",
@@ -474,6 +477,7 @@ __all__ = [
     "OddsChangedError",
     "OddsFormat",
     "OddsType",
+    "OhlcvAggregation",
     "OpenInterestHistory",
     "OperationType",
     "OptionChainSnapshot",

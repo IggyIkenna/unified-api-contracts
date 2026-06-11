@@ -39,6 +39,16 @@ class CapabilityNodeKind(StrEnum):
     ARCHETYPE = "archetype"
     """A ``StrategyArchetype`` entry (53 total)."""
 
+    LEG = "leg"
+    """A structural leg of a multi-leg archetype (``ArchetypeLegSpec``).
+
+    Sourced from ``ARCHETYPE_LEG_STRUCTURES`` (F22 leg-truth SSOT). An
+    ``archetype --has_leg--> leg`` edge carries the leg ``role`` + ``required``
+    flag; ``leg --trades_instrument--> instrument_type`` and
+    ``leg --supports--> venue`` edges give the per-leg restriction surface the
+    flat ``(asset_group, instrument_type)`` cell model cannot express.
+    """
+
     FAMILY = "family"
     """A ``StrategyFamily`` entry (9 total)."""
 
