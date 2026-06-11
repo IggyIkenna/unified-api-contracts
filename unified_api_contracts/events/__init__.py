@@ -17,6 +17,7 @@ from unified_api_contracts.events.streaming import (
     EmissionOutcome,
     FeaturesComputedEvent,
     InstrumentCacheRefreshTriggerEvent,
+    parse_timeframe,
 )
 
 __all__ = [
@@ -25,4 +26,5 @@ __all__ = [
     "EmissionOutcome",
     "FeaturesComputedEvent",
     "InstrumentCacheRefreshTriggerEvent",
+    "parse_timeframe",
 ]
