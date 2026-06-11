@@ -68,6 +68,7 @@ def test_capability_node_kind_values() -> None:
     """All expected node kinds exist."""
     expected = {
         "archetype",
+        "leg",
         "family",
         "venue",
         "chain",
