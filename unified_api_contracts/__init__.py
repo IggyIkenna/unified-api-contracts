@@ -499,6 +499,7 @@ from .canonical.partition_paths import (
     build_defi_partition_path,
     build_prediction_partition_path,
     build_tradfi_partition_path,
+    candidate_parquet_paths,
 )
 from .config.trading_validation import (
     CONFIG_REQUIRED_FIELDS,
@@ -780,6 +781,15 @@ from .canonical.domain.instruments_catalog import (
 from .canonical.domain.instruments_catalog import (
     InstrumentCatalogReader as InstrumentCatalogReader,
 )
+from .canonical.domain.instruments_catalog import (
+    list_instruments as list_instruments,
+)
+from .canonical.domain.instruments_catalog import (
+    list_not_yet_listed_cefi as list_not_yet_listed_cefi,
+)
+from .canonical.domain.instruments_catalog import (
+    register_catalog_reader as register_catalog_reader,
+)
 from .canonical.domain.prediction.prediction_mapping import (
     PredictionMarketCrossVenueMapping as PredictionMarketCrossVenueMapping,
 )
@@ -819,6 +829,21 @@ from .canonical.domain.sports.gcs_paths import (
 from .canonical.domain.sports.injury import (
     AbsenceType as AbsenceType,
 )
+from .canonical.domain.sports.league_data import (
+    SPORTS_DATA_TYPE_TO_SOURCE as SPORTS_DATA_TYPE_TO_SOURCE,
+)
+from .canonical.domain.sports.league_data import (
+    get_league as get_league,
+)
+from .canonical.domain.sports.league_data import (
+    get_league_by_api_football_id as get_league_by_api_football_id,
+)
+from .canonical.domain.sports.league_data import (
+    get_league_fixture_calendar as get_league_fixture_calendar,
+)
+from .canonical.domain.sports.league_data import (
+    is_in_known_gap as is_in_known_gap,
+)
 from .canonical.domain.sports.league_registry import (
     LeagueClassification as LeagueClassification,
 )
@@ -836,6 +861,9 @@ from .canonical.domain.sports.round_names import (
 )
 from .canonical.domain.sports.season_dates import (
     SeasonBoundary as SeasonBoundary,
+)
+from .canonical.domain.sports.season_dates import (
+    footystats_season_status_for_day as footystats_season_status_for_day,
 )
 from .canonical.domain.sports.transfer_windows import (
     TransferWindowPeriod as TransferWindowPeriod,
@@ -1394,6 +1422,7 @@ __all__ = [
     "SERVICE_EMISSION_STATES",
     "SERVICE_EMISSION_STATE_COLUMN",
     "SHARE_CLASS_BASE_ASSETS",
+    "SPORTS_DATA_TYPE_TO_SOURCE",
     "SPORTS_VENUES",
     "STRATEGY_FAMILY_REGISTRY",
     "SYNTHETIC_GENERATOR_REGISTRY",
@@ -1988,6 +2017,7 @@ __all__ = [
     "build_instrument_id",
     "build_prediction_partition_path",
     "build_tradfi_partition_path",
+    "candidate_parquet_paths",
     "classify_cloud_run_service",
     "classify_experiment_run",
     "classify_scheduled_job",
@@ -2060,6 +2090,7 @@ __all__ = [
     "policy_is_alert",
     "policy_is_publish_row",
     "read_with_source_priority",
+    "register_catalog_reader",
     "register_generator",
     "register_scenario",
     "resolve_environment_from_env",
@@ -2122,6 +2153,8 @@ __all__ = [
     "IncidentState",
     "InputReq",
     "InstrumentCatalogReader",
+    "list_instruments",
+    "list_not_yet_listed_cefi",
     "LeagueClassification",
     "LeagueClassificationRegistry",
     "LeagueClassificationType",
@@ -2157,6 +2190,11 @@ __all__ = [
     "RootMetadata",
     "RoundMatch",
     "SeasonBoundary",
+    "footystats_season_status_for_day",
+    "get_league",
+    "get_league_by_api_football_id",
+    "get_league_fixture_calendar",
+    "is_in_known_gap",
     "SessionWindow",
     "SignoffVerdict",
     "SlippageBudgetTrigger",
