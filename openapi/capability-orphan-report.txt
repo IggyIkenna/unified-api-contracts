@@ -1,6 +1,6 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: 434e5beffedf400905475c64ca77535e474bd5fb
+# generated_from_commit: 3fddfcd24183192016bd7dc4902da27ee57718ed
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
@@ -179,3 +179,10 @@ LOGICAL: STAT_ARB_CROSS_SECTIONAL x dated_future (CEFI) — Cross-sectional bask
 LOGICAL: STAT_ARB_CROSS_SECTIONAL x spot (CEFI) — Multi-token atomic basket trade on DeFi is gas-prohibitive; needs specialised router.
 LOGICAL: VOL_TRADING_OPTIONS x option (CEFI) — No supported DeFi options venue (Lyra / Dopex archived).
 LOGICAL: YIELD_ROTATION_LENDING x lending (CEFI) — CeFi lending out-of-scope: withdrawal lockups + counterparty risk (BL-3).
+
+## Sidecar annotation orphans (0)
+
+# These sidecar entries in capability-annotations.yaml have no matching
+# edge in the current manifest. They are listed here for triage.
+
+# (none)
