@@ -87,10 +87,14 @@ TRADFI_TBBO_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("rtype", "int64", nullable=True),
     ColumnSpec("symbol", "string", nullable=True),
     ColumnSpec("underlying", "string", nullable=True),
-    ColumnSpec("bid_px_00", "float64"),
-    ColumnSpec("ask_px_00", "float64"),
-    ColumnSpec("bid_sz_00", "float64"),
-    ColumnSpec("ask_sz_00", "float64"),
+    # Legacy NYSE/NASDAQ equity tbbo (pre-v9 ``category=tradfi`` corpus) spells the
+    # top-of-book columns ``bid_price``/``ask_price``/``bid_amount``/``ask_amount`` —
+    # carried as renames of the canonical databento level-0 names (R1 orphan backfill
+    # 2026-06-11; CF-18 citadel carry, operator ratification decision #2).
+    ColumnSpec("bid_px_00", "float64", source_aliases=("bid_price",)),
+    ColumnSpec("ask_px_00", "float64", source_aliases=("ask_price",)),
+    ColumnSpec("bid_sz_00", "float64", source_aliases=("bid_amount",)),
+    ColumnSpec("ask_sz_00", "float64", source_aliases=("ask_amount",)),
     ColumnSpec("bid_ct_00", "int64", nullable=True),
     ColumnSpec("ask_ct_00", "int64", nullable=True),
 )
