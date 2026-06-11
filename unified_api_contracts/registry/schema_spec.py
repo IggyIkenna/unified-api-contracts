@@ -8,12 +8,17 @@ opening the file.
 For Pydantic-model-backed parquets (canonical Trade / FundingRate / etc.)
 columns are derived via :func:`_columns_from_pydantic`. For shapes that
 don't have a single canonical model (sports fixtures, DeFi pool snapshots
-that vary per protocol) we hand-write the spec.
+that vary per protocol) we hand-write the spec — the per-asset-group column
+tuples live in ``_schema_spec_defi.py`` / ``_schema_spec_tradfi.py`` /
+``_schema_spec_prediction.py`` (derived from ACTUAL prod parquet footers per
+the CF-18 completeness audit; CITADEL — carry ALL source columns, operator
+ratification 2026-06-11 decision #2). Legacy/raw source column names a
+canonical column carries are declared via ``ColumnSpec.source_aliases``;
+:func:`carried_column_names` is the matching SSOT the CF-18 audit consults.
 """
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Final, cast, get_args, get_origin
 
 from pydantic import BaseModel
@@ -28,24 +33,37 @@ from unified_api_contracts import (
     CanonicalTrade,
 )
 from unified_api_contracts.canonical.gcs_paths import AssetGroup
-
-
-@dataclass(frozen=True)
-class ColumnSpec:
-    name: str
-    dtype: str
-    nullable: bool = False
-    unit: str | None = None
-    description: str | None = None
-
-
-@dataclass(frozen=True)
-class SchemaSpec:
-    asset_group: AssetGroup
-    data_type: str
-    columns: tuple[ColumnSpec, ...]
-    source: str  # "pydantic:<ClassName>" | "manual"
-
+from unified_api_contracts.registry._schema_spec_defi import (
+    DEFI_AAVE_RESERVE_SNAPSHOT_COLUMNS as _DEFI_RISK_UTILIZATION_COLUMNS,
+)
+from unified_api_contracts.registry._schema_spec_defi import (
+    DEFI_DEX_POOLS_COLUMNS,
+    DEFI_DEX_SWAPS_COLUMNS,
+    DEFI_LENDING_INDICES_SOLANA_COLUMNS,
+    DEFI_LST_RATES_COLUMNS,
+    DEFI_ORACLE_PRICES_COLUMNS,
+    DEFI_POOL_WINDOW_COLUMNS,
+    DEFI_RATE_INDICES_COLUMNS,
+    DEFI_REWARDS_COLUMNS,
+)
+from unified_api_contracts.registry._schema_spec_prediction import (
+    PREDICTION_PREDICTION_TRADES_COLUMNS,
+)
+from unified_api_contracts.registry._schema_spec_prediction import (
+    PREDICTION_TRADES_COLUMNS as _PREDICTION_TRADES_COLUMNS,
+)
+from unified_api_contracts.registry._schema_spec_tradfi import (
+    TRADFI_OHLCV_COLUMNS,
+    TRADFI_OPTIONS_CHAIN_LEGACY_BAR_COLUMNS,
+    TRADFI_TBBO_COLUMNS,
+    TRADFI_TRADES_COLUMNS,
+)
+from unified_api_contracts.registry._schema_spec_types import (
+    ColumnSpec,
+    SchemaSpec,
+    carried_column_names,
+    merge_columns,
+)
 
 # ---------------------------------------------------------------------------
 # Pydantic reflection helper
@@ -150,32 +168,40 @@ _SPORTS_ODDS_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("captured_at", "timestamp[us, UTC]"),
 )
 
-_DEFI_LENDING_INDICES_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("instrument_id", "string", description="VENUE-CHAIN:a_token:SYMBOL"),
-    ColumnSpec("venue", "string"),
-    ColumnSpec("chain", "string"),
-    ColumnSpec("symbol", "string"),
-    ColumnSpec("block_number", "int64"),
-    ColumnSpec("liquidity_index", "float64"),
-    ColumnSpec("variable_borrow_index", "float64"),
-    ColumnSpec("supply_apr", "float64", nullable=True),
-    ColumnSpec("borrow_apr", "float64", nullable=True),
-    ColumnSpec("captured_at", "timestamp[us, UTC]"),
+_DEFI_LENDING_INDICES_COLUMNS: tuple[ColumnSpec, ...] = merge_columns(
+    (
+        ColumnSpec("instrument_id", "string", description="VENUE-CHAIN:a_token:SYMBOL"),
+        ColumnSpec("venue", "string"),
+        ColumnSpec("chain", "string"),
+        ColumnSpec("symbol", "string"),
+        ColumnSpec("block_number", "int64", nullable=True),
+        ColumnSpec("liquidity_index", "float64", nullable=True),
+        ColumnSpec("variable_borrow_index", "float64", nullable=True),
+        ColumnSpec("supply_apr", "float64", nullable=True),
+        ColumnSpec("borrow_apr", "float64", nullable=True),
+        ColumnSpec("captured_at", "timestamp[us, UTC]", nullable=True),
+    ),
+    # Solana lenders (KAMINO / MARGINFI / SOLEND) — CF-18 sampled shape.
+    DEFI_LENDING_INDICES_SOLANA_COLUMNS,
 )
 
-_DEFI_DEX_POOL_SWAPS_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("instrument_id", "string"),
-    ColumnSpec("venue", "string"),
-    ColumnSpec("chain", "string"),
-    ColumnSpec("pool_address", "string"),
-    ColumnSpec("token0", "string"),
-    ColumnSpec("token1", "string"),
-    ColumnSpec("amount0", "float64"),
-    ColumnSpec("amount1", "float64"),
-    ColumnSpec("fee_tier_bps", "int64", nullable=True),
-    ColumnSpec("tx_hash", "string"),
-    ColumnSpec("block_number", "int64"),
-    ColumnSpec("captured_at", "timestamp[us, UTC]"),
+_DEFI_DEX_POOL_SWAPS_COLUMNS: tuple[ColumnSpec, ...] = merge_columns(
+    (
+        ColumnSpec("instrument_id", "string"),
+        ColumnSpec("venue", "string"),
+        ColumnSpec("chain", "string"),
+        ColumnSpec("pool_address", "string", nullable=True),
+        ColumnSpec("token0", "string", nullable=True),
+        ColumnSpec("token1", "string", nullable=True),
+        ColumnSpec("amount0", "float64", nullable=True),
+        ColumnSpec("amount1", "float64", nullable=True),
+        ColumnSpec("fee_tier_bps", "int64", nullable=True),
+        ColumnSpec("tx_hash", "string", nullable=True),
+        ColumnSpec("block_number", "int64", nullable=True),
+        ColumnSpec("captured_at", "timestamp[us, UTC]", nullable=True),
+    ),
+    # Legacy subgraph pool window (CURVE / UNISWAP_V2 / V3 / V4) — CF-18.
+    DEFI_POOL_WINDOW_COLUMNS,
 )
 
 _DEFI_AGGREGATOR_ROUTE_COLUMNS: tuple[ColumnSpec, ...] = (
@@ -200,33 +226,25 @@ _TRADFI_RATES_CURVE_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("observed_at", "timestamp[us, UTC]"),
 )
 
-_TRADFI_OPTIONS_CHAIN_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("instrument_id", "string"),
-    ColumnSpec("underlying", "string"),
-    ColumnSpec("expiry", "date"),
-    ColumnSpec("strike", "float64"),
-    ColumnSpec("option_type", "string", description="call | put"),
-    ColumnSpec("bid", "float64", nullable=True),
-    ColumnSpec("ask", "float64", nullable=True),
-    ColumnSpec("last", "float64", nullable=True),
-    ColumnSpec("iv", "float64", nullable=True),
-    ColumnSpec("delta", "float64", nullable=True),
-    ColumnSpec("gamma", "float64", nullable=True),
-    ColumnSpec("vega", "float64", nullable=True),
-    ColumnSpec("theta", "float64", nullable=True),
-    ColumnSpec("captured_at", "timestamp[us, UTC]"),
-)
-
-_PREDICTION_TRADES_COLUMNS: tuple[ColumnSpec, ...] = (
-    ColumnSpec("instrument_id", "string"),
-    ColumnSpec("venue", "string"),
-    ColumnSpec("condition_id", "string"),
-    ColumnSpec("outcome", "string"),
-    ColumnSpec("price", "float64", description="Implied probability 0-1"),
-    ColumnSpec("size", "float64"),
-    ColumnSpec("side", "string"),
-    ColumnSpec("trade_id", "string"),
-    ColumnSpec("captured_at", "timestamp[us, UTC]"),
+_TRADFI_OPTIONS_CHAIN_COLUMNS: tuple[ColumnSpec, ...] = merge_columns(
+    (
+        ColumnSpec("instrument_id", "string"),
+        ColumnSpec("underlying", "string"),
+        ColumnSpec("expiry", "date", nullable=True),
+        ColumnSpec("strike", "float64", nullable=True),
+        ColumnSpec("option_type", "string", nullable=True, description="call | put"),
+        ColumnSpec("bid", "float64", nullable=True),
+        ColumnSpec("ask", "float64", nullable=True),
+        ColumnSpec("last", "float64", nullable=True),
+        ColumnSpec("iv", "float64", nullable=True),
+        ColumnSpec("delta", "float64", nullable=True),
+        ColumnSpec("gamma", "float64", nullable=True),
+        ColumnSpec("vega", "float64", nullable=True),
+        ColumnSpec("theta", "float64", nullable=True),
+        ColumnSpec("captured_at", "timestamp[us, UTC]", nullable=True),
+    ),
+    # Legacy CME per-contract OHLCV bars under data_type=options_chain — CF-18.
+    TRADFI_OPTIONS_CHAIN_LEGACY_BAR_COLUMNS,
 )
 
 _PREDICTION_BOOK_SNAPSHOT_COLUMNS: tuple[ColumnSpec, ...] = (
@@ -305,6 +323,60 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         columns=_DEFI_AGGREGATOR_ROUTE_COLUMNS,
         source="manual",
     ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="dex_pool_state",
+        columns=DEFI_POOL_WINDOW_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="dex_pools",
+        columns=DEFI_DEX_POOLS_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="dex_swaps",
+        columns=DEFI_DEX_SWAPS_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="lst_rates",
+        columns=DEFI_LST_RATES_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="oracle_prices",
+        columns=DEFI_ORACLE_PRICES_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="rate_indices",
+        columns=DEFI_RATE_INDICES_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="rewards",
+        columns=DEFI_REWARDS_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="risk_params",
+        columns=_DEFI_RISK_UTILIZATION_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.DEFI,
+        data_type="utilization",
+        columns=_DEFI_RISK_UTILIZATION_COLUMNS,
+        source="manual",
+    ),
     # =====================================================================
     # TradFi — manual (FRED + OPRA both have idiosyncratic shapes)
     # =====================================================================
@@ -320,6 +392,36 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         columns=_TRADFI_OPTIONS_CHAIN_COLUMNS,
         source="manual",
     ),
+    SchemaSpec(
+        asset_group=AssetGroup.TRADFI,
+        data_type="trades",
+        columns=TRADFI_TRADES_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.TRADFI,
+        data_type="tbbo",
+        columns=TRADFI_TBBO_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_1m",
+        columns=TRADFI_OHLCV_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_15m",
+        columns=TRADFI_OHLCV_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_24h",
+        columns=TRADFI_OHLCV_COLUMNS,
+        source="manual",
+    ),
     # =====================================================================
     # Prediction — manual
     # =====================================================================
@@ -327,6 +429,12 @@ SCHEMA_SPEC_REGISTRY: Final[tuple[SchemaSpec, ...]] = (
         asset_group=AssetGroup.PREDICTION,
         data_type="trades",
         columns=_PREDICTION_TRADES_COLUMNS,
+        source="manual",
+    ),
+    SchemaSpec(
+        asset_group=AssetGroup.PREDICTION,
+        data_type="prediction_trades",
+        columns=PREDICTION_PREDICTION_TRADES_COLUMNS,
         source="manual",
     ),
     SchemaSpec(
@@ -369,5 +477,7 @@ __all__ = [
     "SCHEMA_SPEC_REGISTRY",
     "ColumnSpec",
     "SchemaSpec",
+    "carried_column_names",
     "find_schema",
+    "merge_columns",
 ]

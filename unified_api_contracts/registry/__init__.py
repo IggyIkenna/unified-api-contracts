@@ -550,7 +550,7 @@ from .venue_trading_calendar import (
 # on first attribute access instead — same public surface, no import cycle.
 if TYPE_CHECKING:
     from .client_share_classes import get_share_class_perf_fee_config
-    from .schema_spec import find_schema
+    from .schema_spec import carried_column_names, find_schema
     from .withdrawal_approval_rules import (
         get_approval_rules,
         get_approver_pool,
@@ -558,6 +558,7 @@ if TYPE_CHECKING:
     )
 
 _LAZY_EXPORTS: dict[str, tuple[str, str]] = {
+    "carried_column_names": (".schema_spec", "carried_column_names"),
     "find_schema": (".schema_spec", "find_schema"),
     "get_share_class_perf_fee_config": (
         ".client_share_classes",
@@ -942,6 +943,7 @@ __all__ = [
     "build_defi_venues",
     "bundle_instrument_type_for_leaf",
     "canonical_path_templates",
+    "carried_column_names",
     "clip_dates_to_trading_days",
     "compose_validation",
     "compute_health_factor",
