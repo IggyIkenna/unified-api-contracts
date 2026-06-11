@@ -75,6 +75,7 @@ TRADFI_TRADES_COLUMNS: tuple[ColumnSpec, ...] = (
 TRADFI_TBBO_COLUMNS: tuple[ColumnSpec, ...] = (
     ColumnSpec("timestamp", "timestamp[us, UTC]", nullable=True, description="Canonical trade timestamp"),
     ColumnSpec("ts_event", "int64", nullable=True, description="Legacy databento event stamp (ns) — carried verbatim"),
+    ColumnSpec("ts_init", "int64", nullable=True, description="Databento gateway-received stamp (ns), verbatim"),
     ColumnSpec("action", "string", nullable=True, description="Always T for TBBO"),
     ColumnSpec("side", "string", nullable=True),
     ColumnSpec("price", "float64"),
@@ -93,8 +94,8 @@ TRADFI_TBBO_COLUMNS: tuple[ColumnSpec, ...] = (
     # 2026-06-11; CF-18 citadel carry, operator ratification decision #2).
     ColumnSpec("bid_px_00", "float64", source_aliases=("bid_price",)),
     ColumnSpec("ask_px_00", "float64", source_aliases=("ask_price",)),
-    ColumnSpec("bid_sz_00", "float64", source_aliases=("bid_amount",)),
-    ColumnSpec("ask_sz_00", "float64", source_aliases=("ask_amount",)),
+    ColumnSpec("bid_sz_00", "float64", source_aliases=("bid_amount", "bid_size")),
+    ColumnSpec("ask_sz_00", "float64", source_aliases=("ask_amount", "ask_size")),
     ColumnSpec("bid_ct_00", "int64", nullable=True),
     ColumnSpec("ask_ct_00", "int64", nullable=True),
 )
