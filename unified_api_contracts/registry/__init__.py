@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from ._sports_venue_constants import (
     SPORTS_AUTH_MAP,
     SPORTS_CAPTCHA_RISK,
@@ -11,6 +13,10 @@ from ._sports_venue_constants import (
     SportsAggregatorType,
     SportsAuthMethod,
     SportsVenueType,
+)
+from .archetype_capability_matrix import (
+    ASSET_GROUP_ONTOLOGY,
+    AssetGroupOntology,
 )
 from .capability import (
     CapabilityResolutionError,
@@ -88,12 +94,21 @@ from .cefi_perp_venue_endpoints import (
 from .chain_env import (
     BLOCK_EXPLORER_URLS,
     CHAIN_ENVS,
+    CHAIN_GENESIS_DATES,
     FORK_CHAIN_IDS,
+    GAS_FEE_CHAIN_START_DATES,
     MAINNET_CHAIN_IDS,
+    PROTOCOL_LAUNCH_DATES,
     TESTNET_CHAIN_IDS,
     get_block_explorer_url,
+    get_chain_genesis_date,
+    get_protocol_launch_date,
     resolve_chain_id,
     resolve_rpc_url,
+)
+from .circuit_breakers import (
+    PER_ARCHETYPE_BREAKERS,
+    PER_ARCHETYPE_RECOVERY_RULES,
 )
 from .data_availability import (
     VENUE_DATA_AVAILABILITY,
@@ -160,7 +175,11 @@ from .defi_reserve_params import (
     get_reserve_params,
     get_spark_reserve_params,
 )
-from .defi_venues import to_canonical_venue
+from .defi_venues import (
+    ALL_DEFI_VENUES,
+    LEGACY_DEFI_VENUE_ALIASES,
+    to_canonical_venue,
+)
 from .dex_router_addresses import (
     UNISWAP_QUOTER_V2_BY_CHAIN,
     UNISWAP_SWAP_ROUTER_BY_CHAIN,
@@ -180,8 +199,13 @@ from .endpoint_registry import (
 from .endpoints import BASE_URLS, ENDPOINT_SCHEMA_MAP, get_schema_class_for_endpoint
 from .expected_coverage import (
     EXPECTED_COVERAGE_BY_ASSET_GROUP,
+    ExpectedCoverageResult,
+    ExpectedState,
+    expected_coverage,
+    get_expected_pairs,
     is_expected,
 )
+from .half_day_sessions import is_half_day_session
 from .instruction_constraints import (
     INSTRUCTION_CONSTRAINTS,
     ConstraintOrderType,
@@ -192,13 +216,16 @@ from .instruction_constraints import (
 from .market_data_categories import (
     ALL_DATA_TYPES,
     ALL_VENUES,
+    BASE_GRANULARITY_BY_DATA_TYPE,
     BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF,
     DATA_TYPES_BY_ASSET_GROUP,
+    DERIBIT_MVP_INSTRUMENT_TYPE_DATA_TYPES,
     FUTURE_BUNDLE_VENUES,
     GRAIN_BUNDLE_BY_UNDERLYING,
     GRAIN_LEAF,
     INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE,
     NEEDS_CANDLE_PROCESSING,
+    TIMEFRAME_SECONDS,
     TIMEFRAMES,
     TRADFI_TICK_DATA_WINDOWS,
     VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
@@ -230,6 +257,7 @@ from .max_underlying_moves import (
     compute_max_leverage_from_spread_move,
     get_max_move,
 )
+from .perp_funding_cadence import annualise_funding_rate_bps
 from .possible_manifest import (
     POSSIBLE_MANIFEST_ASSET_GROUPS,
     CatalogueLeaf,
@@ -248,17 +276,26 @@ from .processed_data_dependencies import (
 )
 from .representative_sample import (
     CEFI_BASE_ASSETS,
+    CEFI_PERPETUAL_SPECS,
+    CEFI_SPOT_SPECS,
     CME_MONTH_CODES,
+    DEFI_INSTRUMENT_SPECS,
     DEFI_INSTRUMENTS,
     DEFI_LENDING_ASSETS,
     DEFI_POOL_PAIRS,
     OPTIONS_CHAIN_CONFIG,
     QUARTERLY_MONTHS,
+    SPORTS_INSTRUMENT_SPECS,
     SPORTS_LEAGUES,
     TRADFI_EQUITIES,
+    TRADFI_EQUITY_SPECS,
     TRADFI_FUTURES,
+    TRADFI_FUTURES_SPECS,
 )
 from .reward_schedules import REWARD_SCHEDULES, RewardScheduleEntry
+from .service_contract_map import SERVICE_CONTRACT_MAP, ServiceContract
+from .source_data_latency import SFI_DATA_LAG_P95_SECONDS
+from .sports_per_source_rules import is_expected_for_source
 from .sports_venue_coordinates import (
     VENUE_COORDINATES,
     VenueCoordinates,
@@ -269,6 +306,7 @@ from .tardis_free_coverage import (
     free_dates_in_range,
     is_tardis_free_date,
 )
+from .taxonomy import MarketAssetGroup
 from .token_wrapping import (
     LST_BASE_ASSET,
     PROTOCOL_TOKEN_PREFERENCE,
@@ -315,7 +353,13 @@ from .tradfi_symbology import (
     get_bindings_for_symbol,
     get_primary_binding,
 )
-from .tradfi_ticker_universe import TRADFI_TICKER_UNIVERSE
+from .tradfi_ticker_universe import (
+    ETF_TICKERS,
+    NASDAQ_TICKERS,
+    SP500_TICKERS,
+    TRADFI_FUTURES_PRODUCTS,
+    TRADFI_TICKER_UNIVERSE,
+)
 from .venue_collateral import (
     VENUE_COLLATERAL_MATRIX,
     CollateralAcceptance,
@@ -483,13 +527,60 @@ from .venue_context import (
     resolve_venue_context,
 )
 from .venue_instrument_config import ExchangeInstrumentConfig
+from .venue_launch_dates import (
+    CEFI_VENUE_LAUNCH_DATES,
+    DEFI_VENUE_LAUNCH_DATES,
+    PREDICTION_VENUE_LAUNCH_DATES,
+    get_venue_launch_date,
+)
+from .venue_manifest import BETTING_SPORTS_VENUES
 from .venue_mapping import LST_MARGIN_VENUES, DataTypeConfig, VenueMapping
+from .venue_session_hours import is_within_venue_session_hours
 from .venue_trading_calendar import (
     clip_dates_to_trading_days,
     get_us_market_holidays,
     is_non_trading_day,
     non_trading_day_reason,
 )
+
+# Lazy facade re-exports (PEP 562). These three modules import from the
+# unified_api_contracts root / `.internal` packages, so an EAGER import here
+# would be circular while the root package is mid-initialisation (registry is
+# imported from inside `internal.architecture_v2.archetype_config`). Resolved
+# on first attribute access instead — same public surface, no import cycle.
+if TYPE_CHECKING:
+    from .client_share_classes import get_share_class_perf_fee_config
+    from .schema_spec import find_schema
+    from .withdrawal_approval_rules import (
+        get_approval_rules,
+        get_approver_pool,
+        get_required_approvers,
+    )
+
+_LAZY_EXPORTS: dict[str, tuple[str, str]] = {
+    "find_schema": (".schema_spec", "find_schema"),
+    "get_share_class_perf_fee_config": (
+        ".client_share_classes",
+        "get_share_class_perf_fee_config",
+    ),
+    "get_approval_rules": (".withdrawal_approval_rules", "get_approval_rules"),
+    "get_approver_pool": (".withdrawal_approval_rules", "get_approver_pool"),
+    "get_required_approvers": (
+        ".withdrawal_approval_rules",
+        "get_required_approvers",
+    ),
+}
+
+
+def __getattr__(name: str) -> object:
+    if name in _LAZY_EXPORTS:
+        from importlib import import_module
+        from typing import cast
+
+        module_name, attr = _LAZY_EXPORTS[name]
+        return cast("object", getattr(import_module(module_name, __package__), attr))
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "AAVE_PLASMA",
@@ -503,14 +594,17 @@ __all__ = [
     "AAVE_V3_ETHEREUM_RESERVES",
     "AERODROME_BASE",
     "ALL_DATA_TYPES",
+    "ALL_DEFI_VENUES",
     "ALL_VENUES",
     "API_FOOTBALL",
+    "ASSET_GROUP_ONTOLOGY",
     "ASTER",
     "ATG",
     "BALLYBET",
     "BARCHART_VIX_FILE_COUNT",
     "BARCHART_VIX_FIRST_DATE",
     "BARCHART_VIX_LAST_DATE",
+    "BASE_GRANULARITY_BY_DATA_TYPE",
     "BASE_URLS",
     "BET365",
     "BET888SPORT",
@@ -527,6 +621,7 @@ __all__ = [
     "BETR_AU",
     "BETR_DFS",
     "BETSSON",
+    "BETTING_SPORTS_VENUES",
     "BETUS",
     "BETVICTOR",
     "BETWAY",
@@ -546,9 +641,13 @@ __all__ = [
     "CEFI_BASE_ASSETS",
     "CEFI_BASE_ASSET_UNIVERSE",
     "CEFI_OPTIONS_UNDERLYINGS",
+    "CEFI_PERPETUAL_SPECS",
     "CEFI_PERP_VENUE_API_ENDPOINTS",
+    "CEFI_SPOT_SPECS",
+    "CEFI_VENUE_LAUNCH_DATES",
     "CHAIN_CONFIGS",
     "CHAIN_ENVS",
+    "CHAIN_GENESIS_DATES",
     "CHAIN_REQUIRED_TOKENS",
     "CHAIN_RPC_TEMPLATES",
     "CLOB_VENUES",
@@ -570,15 +669,18 @@ __all__ = [
     "DATA_TYPES_BY_ASSET_GROUP",
     "DEFI_INSTRUMENTS",
     "DEFI_INSTRUMENTS_NOT_YET_COLLECTED",
+    "DEFI_INSTRUMENT_SPECS",
     "DEFI_LENDING_ASSETS",
     "DEFI_MAJOR_ASSET_ADDRESSES",
     "DEFI_MAJOR_ASSET_ADDRESS_LIST",
     "DEFI_MAJOR_ASSET_SYMBOLS",
     "DEFI_POOL_PAIRS",
     "DEFI_PROTOCOLS",
+    "DEFI_VENUE_LAUNCH_DATES",
     "DEFI_VENUE_TO_PROTOCOL",
     "DEPRECATED_DEFI_GHOST_VENUE_NAMES",
     "DERIBIT",
+    "DERIBIT_MVP_INSTRUMENT_TYPE_DATA_TYPES",
     "DEX_FEE_TIERS",
     "DEX_VENUES",
     "DEX_VENUE_KEYWORDS",
@@ -591,6 +693,7 @@ __all__ = [
     "ESPNBET",
     "ES_OPTIONS_CLUSTERS",
     "ES_OPTIONS_DEFAULT_MIN_ROWS_PER_CLUSTER",
+    "ETF_TICKERS",
     "ETHENA",
     "ETHERFI",
     "EVERYGAME",
@@ -604,6 +707,7 @@ __all__ = [
     "FORK_CHAIN_IDS",
     "FUTURE_BUNDLE_VENUES",
     "FX_SPOT_PAIRS",
+    "GAS_FEE_CHAIN_START_DATES",
     "GRAIN_BUNDLE_BY_UNDERLYING",
     "GRAIN_LEAF",
     "GROSVENOR",
@@ -621,6 +725,7 @@ __all__ = [
     "KALSHI",
     "KNOWN_ETFS",
     "LADBROKES",
+    "LEGACY_DEFI_VENUE_ALIASES",
     "LEOVEGAS",
     "LIDO",
     "LIVESCOREBET",
@@ -638,6 +743,7 @@ __all__ = [
     "MRGREEN",
     "MYBOOKIEAG",
     "NASDAQ",
+    "NASDAQ_TICKERS",
     "NEDS",
     "NEEDS_CANDLE_PROCESSING",
     "NETBET",
@@ -657,23 +763,29 @@ __all__ = [
     "OPTIONS_CHAIN_CONFIG",
     "PADDYPOWER",
     "PARIONSSPORT",
+    "PER_ARCHETYPE_BREAKERS",
+    "PER_ARCHETYPE_RECOVERY_RULES",
     "PINNACLE",
     "PLAYUP",
     "PMU",
     "POINTSBET",
     "POLYMARKET",
     "POSSIBLE_MANIFEST_ASSET_GROUPS",
+    "PREDICTION_VENUE_LAUNCH_DATES",
     "PRIMARY_AXIS",
     "PRIZEPICKS",
     "PROCESSED_REQUIRES_RAW",
     "PROPHETX",
     "PROTECTED_RPC_URLS",
     "PROTOCOL_CAPABILITIES",
+    "PROTOCOL_LAUNCH_DATES",
     "PROTOCOL_TOKEN_PREFERENCE",
     "QUARTERLY_MONTHS",
     "REBET",
     "REWARD_SCHEDULES",
     "SBOBET",
+    "SERVICE_CONTRACT_MAP",
+    "SFI_DATA_LAG_P95_SECONDS",
     "SHARD_AXIS_MATRIX",
     "SHARED_WALLET_GROUPS",
     "SHARPAPI",
@@ -683,6 +795,7 @@ __all__ = [
     "SOLANA_MINT_TO_SYMBOL",
     "SOLANA_RPC_TEMPLATES",
     "SOLANA_TOKEN_ADDRESSES",
+    "SP500_TICKERS",
     "SPACE_TO_DOT_SYMBOLS",
     "SPORTSBET_AU",
     "SPORTS_AUTH_MAP",
@@ -693,6 +806,7 @@ __all__ = [
     "SPORTS_DATA_VENUES",
     "SPORTS_DFS_VENUES",
     "SPORTS_EXCHANGE_VENUES",
+    "SPORTS_INSTRUMENT_SPECS",
     "SPORTS_LEAGUES",
     "SPORTS_PREDICTION_MARKET_VENUES",
     "SPORTS_VENUES",
@@ -708,13 +822,17 @@ __all__ = [
     "TBTC_ADDRESSES",
     "TESTNET_CHAIN_IDS",
     "TIMEFRAMES",
+    "TIMEFRAME_SECONDS",
     "TIPICO",
     "TOKEN_EQUIVALENCE_GROUPS",
     "TOKEN_WRAPPING_RULES",
     "TRADFI_DATABENTO_INSTRUMENTS",
     "TRADFI_DATA_BINDINGS",
     "TRADFI_EQUITIES",
+    "TRADFI_EQUITY_SPECS",
     "TRADFI_FUTURES",
+    "TRADFI_FUTURES_PRODUCTS",
+    "TRADFI_FUTURES_SPECS",
     "TRADFI_INSTRUMENTS",
     "TRADFI_INSTRUMENTS_CONFIG",
     "TRADFI_TICKER_UNIVERSE",
@@ -766,6 +884,7 @@ __all__ = [
     "ZERO_ALPHA_VENUES",
     "AccessMode",
     "AlphaProfile",
+    "AssetGroupOntology",
     "CapabilityResolutionError",
     "CassetteStatus",
     "CatalogueLeaf",
@@ -779,8 +898,11 @@ __all__ = [
     "EModeCategory",
     "EndpointSpec",
     "ExchangeInstrumentConfig",
+    "ExpectedCoverageResult",
+    "ExpectedState",
     "InstructionConstraint",
     "InstructionValidationError",
+    "MarketAssetGroup",
     "MaxMoveAssumption",
     "NonEvmChain",
     "OperationDetail",
@@ -792,6 +914,7 @@ __all__ = [
     "ReserveParams",
     "ResponseFormat",
     "RewardScheduleEntry",
+    "ServiceContract",
     "ShardKey",
     "SourceCapability",
     "SourceWindow",
@@ -813,6 +936,7 @@ __all__ = [
     "VenueOrderCapability",
     "YahooIndexDef",
     "accepted_perp_collateral",
+    "annualise_funding_rate_bps",
     "bootstrap_capabilities",
     "build_complete_major_assets",
     "build_defi_venues",
@@ -825,19 +949,24 @@ __all__ = [
     "compute_max_leverage_from_spread_move",
     "derive_expiry_bucket",
     "enumerate_possible_shard_keys",
+    "expected_coverage",
     "external_batch_sources_for_asset_group",
     "extract_es_options_cluster",
     "extract_event_contract_shard_key",
+    "find_schema",
     "free_dates_in_range",
     "get_aave_reserve_params",
     "get_accepted_collateral",
     "get_active_es_options_clusters_for_date",
+    "get_approval_rules",
+    "get_approver_pool",
     "get_balance_tracking_form",
     "get_bindings_for_symbol",
     "get_block_explorer_url",
     "get_breakdown_axes",
     "get_cefi_perp_venue_api_url",
     "get_chain_config",
+    "get_chain_genesis_date",
     "get_collateral_haircut",
     "get_compound_reserve_params",
     "get_coverage_windows",
@@ -849,6 +978,7 @@ __all__ = [
     "get_evm_protocol_rest_url",
     "get_expected_data_types_for_venue",
     "get_expected_instruments_for_venue",
+    "get_expected_pairs",
     "get_lst_base_asset",
     "get_lst_token_genesis",
     "get_lst_venue_genesis",
@@ -862,17 +992,20 @@ __all__ = [
     "get_primary_axis",
     "get_primary_binding",
     "get_protocol_capability",
+    "get_protocol_launch_date",
     "get_protocol_token",
     "get_provider_availability",
     "get_radiant_reserve_params",
     "get_raw_source_data_types",
     "get_raw_source_data_types",
     "get_raw_source_data_types",
+    "get_required_approvers",
     "get_required_tokens_for_protocol",
     "get_required_tokens_for_venue",
     "get_reserve_params",
     "get_schema_class_for_endpoint",
     "get_shard_axes",
+    "get_share_class_perf_fee_config",
     "get_solana_protocol_url",
     "get_solana_rpc_url",
     "get_solana_token_address",
@@ -888,6 +1021,7 @@ __all__ = [
     "get_valid_timeframes_for_data_type",
     "get_venue_coordinates",
     "get_venue_data_type_start_date",
+    "get_venue_launch_date",
     "get_venue_prefix",
     "get_vix_15m_source",
     "get_wrapped_form",
@@ -895,6 +1029,8 @@ __all__ = [
     "grain_for_instrument_type",
     "is_block_finalized",
     "is_expected",
+    "is_expected_for_source",
+    "is_half_day_session",
     "is_in_coverage_window",
     "is_in_tradfi_tick_window",
     "is_lst",
@@ -909,6 +1045,7 @@ __all__ = [
     "is_tradfi_futures_instrument_active",
     "is_valid_shard_key",
     "is_vix_15m_gap_date",
+    "is_within_venue_session_hours",
     "lst_adjusted_value",
     "maintenance_margin_for",
     "needs_candle_processing",
