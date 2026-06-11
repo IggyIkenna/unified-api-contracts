@@ -24,6 +24,7 @@ Architecture
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 
 
 @dataclass(frozen=True, slots=True)
@@ -310,30 +311,39 @@ class YahooIndexDef:
 
     Used for indices that aren't directly tradeable via Databento
     but are needed for features (VIX, DXY, etc.).
+
+    ``first_available_date`` is the empirically-confirmed genesis of the
+    series on Yahoo (the instrument's ``available_from_datetime`` and the
+    data-status could-exist start). It is REQUIRED per entry — never inherit
+    a shared default — so a new index cannot be listed without declaring when
+    its data actually begins (mis-stated genesis silently mis-seeds the
+    expected-universe denominator).
     """
 
     symbol: str
     venue: str
     base_asset: str
     yahoo_ticker: str
+    first_available_date: date
     asset_group: str = "equity"
 
 
 YAHOO_INDICES: list[YahooIndexDef] = [
-    YahooIndexDef("VIX", "CBOE", "VIX", "^VIX", "equity"),
+    # ^VIX daily history back to 1990-01-02 (9,177 bars confirmed 2026-06-11).
+    YahooIndexDef("VIX", "CBOE", "VIX", "^VIX", date(1990, 1, 2), "equity"),
     # ICE/NYBOT US Dollar Index — daily ohlcv_24h via Yahoo (DX-Y.NYB).
     # Full history back to 2019-01-02 (1,864 bars empirically confirmed 2026-06-11).
     # 1h is capped to the last 730 days by Yahoo; use daily for long history.
-    YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", "fx"),
+    YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", date(2019, 1, 2), "fx"),
     # CBOE interest-rate indices — daily ohlcv_24h via Yahoo. Each "close" is the
     # par yield in percent (e.g. 4.53 = 4.53%). Full history back to 2000-01-03
     # (6,642 daily bars empirically confirmed 2026-06-11). Yahoo has no live 2Y
     # yield (2YY=F is stale, zero-volume futures), so the usable tenors are
     # 3M / 5Y / 10Y / 30Y — enough to compute curve slopes and forward rates.
-    YahooIndexDef("US3M", "CBOE", "US3M", "^IRX", "fixed_income"),
-    YahooIndexDef("US5Y", "CBOE", "US5Y", "^FVX", "fixed_income"),
-    YahooIndexDef("US10Y", "CBOE", "US10Y", "^TNX", "fixed_income"),
-    YahooIndexDef("US30Y", "CBOE", "US30Y", "^TYX", "fixed_income"),
+    YahooIndexDef("US3M", "CBOE", "US3M", "^IRX", date(2000, 1, 3), "fixed_income"),
+    YahooIndexDef("US5Y", "CBOE", "US5Y", "^FVX", date(2000, 1, 3), "fixed_income"),
+    YahooIndexDef("US10Y", "CBOE", "US10Y", "^TNX", date(2000, 1, 3), "fixed_income"),
+    YahooIndexDef("US30Y", "CBOE", "US30Y", "^TYX", date(2000, 1, 3), "fixed_income"),
 ]
 
 # ---------------------------------------------------------------------------

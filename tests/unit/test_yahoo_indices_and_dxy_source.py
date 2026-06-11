@@ -115,7 +115,48 @@ def test_get_us_treasury_yield_daily_source_returns_gap_before_coverage() -> Non
 
 @pytest.mark.unit
 def test_get_source_for_instrument_resolves_all_treasury_tenors() -> None:
-    """Every CBOE treasury instrument_key dispatches to the treasury resolver."""
+    """Every CBOE treasury canonical instrument_key dispatches to the treasury resolver."""
     for symbol in _TREASURY_TENORS:
-        result = get_source_for_instrument(f"CBOE:INDEX:{symbol}", "ohlcv_24h", date(2023, 3, 15))
+        result = get_source_for_instrument(f"CBOE:INDEX:{symbol}-USD", "ohlcv_24h", date(2023, 3, 15))
         assert result == "YAHOO_FINANCE", f"{symbol} did not resolve"
+
+
+# ---------------------------------------------------------------------------
+# QG-hardening gate: adding a Yahoo index must be safe-by-construction.
+# Every YAHOO_INDICES entry MUST carry a real genesis date AND have a source
+# resolver registered under its CANONICAL key ({venue}:INDEX:{base}-USD) — so
+# a newly-listed index cannot silently ship without a genesis or a source.
+# ---------------------------------------------------------------------------
+
+_CANONICAL_QUOTE = "USD"
+
+
+@pytest.mark.unit
+def test_every_yahoo_index_has_a_plausible_genesis_date() -> None:
+    """Each entry declares a real first_available_date (1980 < genesis <= today)."""
+    from datetime import date as _date
+
+    floor = _date(1980, 1, 1)
+    today = _date.today()
+    for idx in YAHOO_INDICES:
+        genesis = idx.first_available_date
+        assert isinstance(genesis, _date), f"{idx.symbol} genesis must be a date"
+        assert floor < genesis <= today, f"{idx.symbol} genesis {genesis} implausible"
+
+
+@pytest.mark.unit
+def test_every_yahoo_index_has_a_source_resolver_under_canonical_key() -> None:
+    """Each entry has a _SOURCE_RESOLVERS entry under its canonical -USD key.
+
+    This is the gate that makes adding data safe: list a new index without
+    wiring its data-source-continuity resolver and this test fails.
+    """
+    from unified_api_contracts.registry.data_source_continuity import _SOURCE_RESOLVERS
+
+    resolved_keys = {key for key, _data_type in _SOURCE_RESOLVERS}
+    for idx in YAHOO_INDICES:
+        canonical = f"{idx.venue}:INDEX:{idx.base_asset}-{_CANONICAL_QUOTE}"
+        assert canonical in resolved_keys, (
+            f"{idx.symbol}: no source resolver under canonical key {canonical!r} "
+            f"— add a ({canonical!r}, <data_type>) entry to _SOURCE_RESOLVERS"
+        )

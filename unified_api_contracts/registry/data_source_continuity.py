@@ -225,10 +225,10 @@ def get_us_treasury_yield_daily_source(query_date: date) -> str:
 _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
     ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
     ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
-    ("CBOE:INDEX:US3M", "ohlcv_24h"): get_us_treasury_yield_daily_source,
-    ("CBOE:INDEX:US5Y", "ohlcv_24h"): get_us_treasury_yield_daily_source,
-    ("CBOE:INDEX:US10Y", "ohlcv_24h"): get_us_treasury_yield_daily_source,
-    ("CBOE:INDEX:US30Y", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US3M-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US5Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US10Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    ("CBOE:INDEX:US30Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
 }
 
 
