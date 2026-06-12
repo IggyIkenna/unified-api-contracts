@@ -65,6 +65,14 @@ from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactPublishedPayload,
     ArtifactRef,
 )
+from unified_api_contracts.internal.architecture_v2.broker_routes import (
+    BROKER_ROUTES,
+    BrokerKind,
+    BrokerRoute,
+    broker_for_venue,
+    is_broker,
+    routed_venue_ids,
+)
 from unified_api_contracts.internal.architecture_v2.capability_claims import (
     CapabilityClaims,
 )
@@ -389,6 +397,7 @@ __all__ = [
     "ARCHETYPE_TO_FAMILY",
     "BENCHMARK_FILL_MODE_BY_ACTION",
     "BROKER_REGISTRY",
+    "BROKER_ROUTES",
     "COLLATERAL_REGISTRY",
     "COMPATIBILITY_SEED",
     "CROSS_VENUE_ROUTING_POLICIES",
@@ -440,6 +449,8 @@ __all__ = [
     "BorrowInstruction",
     "BridgeInstructionV2",
     "BrokerEntry",
+    "BrokerKind",
+    "BrokerRoute",
     "BusinessUnit",
     "CadenceKind",
     "CancelInstruction",
@@ -623,6 +634,7 @@ __all__ = [
     "archetypes_for_venue",
     "archetypes_without_leg_structures",
     "availability_for",
+    "broker_for_venue",
     "capability_for",
     "check_service_family_scope",
     "combo",
@@ -632,6 +644,7 @@ __all__ = [
     "fund_for",
     "funds_for_business_unit",
     "instruction_type_for",
+    "is_broker",
     "is_venue_token",
     "known_persona_ids",
     "leg_structure_for",
@@ -643,6 +656,7 @@ __all__ = [
     "registered_leg_structures",
     "reserving_business_unit_for",
     "resolve_profile",
+    "routed_venue_ids",
     "routing_policy_for",
     "service_family_from_audience",
     "slots_visible_to",

@@ -646,6 +646,9 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
     # --- IBKR ---
+    # F38: ``venue="ibkr"`` is a BROKER, not a venue — it routes to CME/ICE/CBOE.
+    # This key is LOAD-BEARING as the tradfi data-pipeline SOURCE id; do NOT rename.
+    # Broker→routed-venue truth: internal.architecture_v2.broker_routes.BROKER_ROUTES.
     EndpointSpec(
         venue="ibkr",
         endpoint_path="reqContractDetails(secType=BAG)",
