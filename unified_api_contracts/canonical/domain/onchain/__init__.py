@@ -5,6 +5,7 @@ from decimal import Decimal
 from pydantic import AwareDatetime, Field
 
 from .._base import CanonicalBase
+from .governance_params import GovernanceParamsRow, governance_params_gcs_prefix
 
 
 class CanonicalOnChainMetric(CanonicalBase):
@@ -20,3 +21,10 @@ class CanonicalOnChainMetric(CanonicalBase):
     chain: str | None = None
     raw: dict[str, float | int | str | None] | None = Field(default=None, description="Original fields as-is")
     schema_version: str = "1.0"
+
+
+__all__ = (
+    "CanonicalOnChainMetric",
+    "GovernanceParamsRow",
+    "governance_params_gcs_prefix",
+)
