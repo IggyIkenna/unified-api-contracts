@@ -82,6 +82,11 @@ class KillSwitchId(StrEnum):
     # Per-archetype halts (cutover archetypes)
     KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS = "KILL_PER_ARCHETYPE_CARRY_STAKED_BASIS"
     KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION = "KILL_PER_ARCHETYPE_ARBITRAGE_PRICE_DISPERSION"
+    KILL_PER_ARCHETYPE_ML_DIRECTIONAL_CONTINUOUS = "KILL_PER_ARCHETYPE_ML_DIRECTIONAL_CONTINUOUS"
+    """Halt ML_DIRECTIONAL_CONTINUOUS across OKX + Binance + Bybit.
+    kill_switch_scope=ARCHETYPE per locked design (a CeFi-ML trip does NOT
+    halt DeFi strategies). Armed by position-limit / drawdown / signal-staleness
+    / model-drift breakers. Added 2026-06-12."""
 
     # Per-venue halts (6 perp hedge venues + DeFi)
     KILL_PER_VENUE_BYBIT = "KILL_PER_VENUE_BYBIT"

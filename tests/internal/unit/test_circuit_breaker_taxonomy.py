@@ -326,11 +326,12 @@ def test_breaker_trigger_extra_forbid() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_registry_has_two_cutover_archetypes() -> None:
+def test_registry_has_registered_archetypes() -> None:
     assert set(PER_ARCHETYPE_BREAKERS.keys()) == {
         "CARRY_STAKED_BASIS",
         "ARBITRAGE_PRICE_DISPERSION",
         "LEVERAGED_FUNDING_ARB",
+        "ML_DIRECTIONAL_CONTINUOUS",
     }
 
 
@@ -542,3 +543,75 @@ def test_oracle_staleness_breaker_severity_is_critical() -> None:
     staleness_configs = [c for c in configs if c.breaker_id == CircuitBreakerId.ORACLE_STALENESS_SECONDS]
     assert staleness_configs, "ORACLE_STALENESS_SECONDS config not found in CARRY_STAKED_BASIS"
     assert staleness_configs[0].alerting_severity == AlertSeverity.CRITICAL
+
+
+# ---------------------------------------------------------------------------
+# ML_DIRECTIONAL_CONTINUOUS circuit-breaker registry — 2026-06-12
+# ---------------------------------------------------------------------------
+
+
+def test_ml_directional_continuous_new_circuit_breaker_ids_present() -> None:
+    """ML_SIGNAL_STALENESS_SECONDS and ML_MODEL_DRIFT_ACCURACY_DROP must be
+    present in the CircuitBreakerId enum (added for ML_DIRECTIONAL_CONTINUOUS)."""
+    assert hasattr(CircuitBreakerId, "ML_SIGNAL_STALENESS_SECONDS")
+    assert hasattr(CircuitBreakerId, "ML_MODEL_DRIFT_ACCURACY_DROP")
+    assert CircuitBreakerId.ML_SIGNAL_STALENESS_SECONDS.value == "ML_SIGNAL_STALENESS_SECONDS"
+    assert CircuitBreakerId.ML_MODEL_DRIFT_ACCURACY_DROP.value == "ML_MODEL_DRIFT_ACCURACY_DROP"
+
+
+def test_ml_directional_continuous_has_four_breakers() -> None:
+    """ML_DIRECTIONAL_CONTINUOUS registry must carry the 4 locked-design breakers."""
+    configs = PER_ARCHETYPE_BREAKERS["ML_DIRECTIONAL_CONTINUOUS"]
+    ids = {c.breaker_id for c in configs}
+    expected = {
+        CircuitBreakerId.POSITION_LIMIT_EXCEEDED,
+        CircuitBreakerId.DRAWDOWN_DAILY_BPS,
+        CircuitBreakerId.ML_SIGNAL_STALENESS_SECONDS,
+        CircuitBreakerId.ML_MODEL_DRIFT_ACCURACY_DROP,
+    }
+    assert expected == ids, f"ML_DIRECTIONAL_CONTINUOUS breaker mismatch: {ids}"
+
+
+def test_ml_directional_continuous_has_matching_recovery_rules() -> None:
+    """Every BreakerConfig for ML_DIRECTIONAL_CONTINUOUS has a BreakerRecoveryRule."""
+    configs = PER_ARCHETYPE_BREAKERS["ML_DIRECTIONAL_CONTINUOUS"]
+    rules = PER_ARCHETYPE_RECOVERY_RULES["ML_DIRECTIONAL_CONTINUOUS"]
+    assert {c.breaker_id for c in configs} == {r.breaker_id for r in rules}
+
+
+def test_ml_directional_continuous_kill_all_has_manual_unkill_recovery() -> None:
+    """DRAWDOWN_DAILY_BPS (KILL_ALL) for ML_DIRECTIONAL_CONTINUOUS must have
+    auto_disarm_after_seconds=None — operator sign-off required per § 7 seam."""
+    rules = {r.breaker_id: r for r in PER_ARCHETYPE_RECOVERY_RULES["ML_DIRECTIONAL_CONTINUOUS"]}
+    drawdown_rule = rules[CircuitBreakerId.DRAWDOWN_DAILY_BPS]
+    assert drawdown_rule.auto_disarm_after_seconds is None
+
+
+def test_ml_directional_continuous_signal_staleness_is_critical() -> None:
+    """ML_SIGNAL_STALENESS_SECONDS must be CRITICAL (trading without fresh signals
+    is unsafe)."""
+    configs = PER_ARCHETYPE_BREAKERS["ML_DIRECTIONAL_CONTINUOUS"]
+    staleness = [c for c in configs if c.breaker_id == CircuitBreakerId.ML_SIGNAL_STALENESS_SECONDS]
+    assert staleness, "ML_SIGNAL_STALENESS_SECONDS not in ML_DIRECTIONAL_CONTINUOUS"
+    assert staleness[0].alerting_severity == AlertSeverity.CRITICAL
+
+
+def test_ml_directional_continuous_drawdown_threshold_matches_locked_design() -> None:
+    """DRAWDOWN_DAILY_BPS threshold must be 500 BPS (kill_switch_drawdown_pct=5)."""
+    from decimal import Decimal
+
+    configs = PER_ARCHETYPE_BREAKERS["ML_DIRECTIONAL_CONTINUOUS"]
+    drawdown = [c for c in configs if c.breaker_id == CircuitBreakerId.DRAWDOWN_DAILY_BPS]
+    assert drawdown, "DRAWDOWN_DAILY_BPS not in ML_DIRECTIONAL_CONTINUOUS"
+    assert drawdown[0].trigger.threshold_value == Decimal("500")
+
+
+def test_ml_kill_switch_id_present() -> None:
+    """KILL_PER_ARCHETYPE_ML_DIRECTIONAL_CONTINUOUS must be in KillSwitchId."""
+    from unified_api_contracts import KillSwitchId
+
+    assert hasattr(KillSwitchId, "KILL_PER_ARCHETYPE_ML_DIRECTIONAL_CONTINUOUS")
+    assert (
+        KillSwitchId.KILL_PER_ARCHETYPE_ML_DIRECTIONAL_CONTINUOUS.value
+        == "KILL_PER_ARCHETYPE_ML_DIRECTIONAL_CONTINUOUS"
+    )
