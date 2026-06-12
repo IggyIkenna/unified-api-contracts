@@ -1,6 +1,6 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: c17a6be5b2bbbd7bb306468fcf10c90e6ed4007d
+# generated_from_commit: f997f3bc334363c3e0e707af47f9a33350e83fab
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
