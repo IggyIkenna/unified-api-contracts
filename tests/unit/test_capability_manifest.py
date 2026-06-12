@@ -290,12 +290,19 @@ def test_treasury_split_sports_policy() -> None:
     assert "no split" in sports.notes.lower() or "no treasury" in sports.notes.lower()
 
 
-def test_collateral_registry_is_empty_honest_gap() -> None:
-    """Collateral numeric entries are intentionally absent (not invented)."""
-    assert COLLATERAL_REGISTRY == []
+def test_collateral_registry_is_backfilled() -> None:
+    """COLLATERAL_REGISTRY backfilled for the MVP venue universe (2026-06-12).
+
+    Was honest-empty; now carries sourced per-venue policies. The exhaustive
+    backfill assertions (per-venue counts, source_of_truth non-empty, missing
+    venues) live in ``test_collateral_registry_backfill.py``.
+    """
+    assert len(COLLATERAL_REGISTRY) >= 9  # 7 perp + 2 lending MVP venues
+    assert all(p.source_of_truth for p in COLLATERAL_REGISTRY)
 
 
 def test_broker_registry_is_empty_honest_gap() -> None:
+    """Brokers remain an honest gap — not in the DeFi/CeFi MVP venue set."""
     assert BROKER_REGISTRY == []
 
 

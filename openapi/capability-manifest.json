@@ -4072,6 +4072,536 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts DAI (haircut=0%, max_ltv=0.77, liq_threshold=0.80) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:DAI"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts USDC (haircut=0%, max_ltv=0.80, liq_threshold=0.825) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts USDT (haircut=0%, max_ltv=0.80, liq_threshold=0.825) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts WBTC (haircut=0%, max_ltv=0.73, liq_threshold=0.78) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:WBTC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts WETH (haircut=0%, max_ltv=0.825, liq_threshold=0.86) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:WETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts cbETH (haircut=0%, max_ltv=0.745, liq_threshold=0.79) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:cbETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts rETH (haircut=0%, max_ltv=0.745, liq_threshold=0.79) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:rETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts weETH (haircut=0%, max_ltv=0.725, liq_threshold=0.775) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:weETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:aave_v3",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "aave_v3 accepts wstETH (haircut=0%, max_ltv=0.795, liq_threshold=0.83) \u2014 unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:binance",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "binance accepts BTC (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:BTC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:binance",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "binance accepts ETH (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:ETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:binance",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "binance accepts USDT (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:binance",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "binance rejects stETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:stETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:binance",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "binance rejects wstETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:bybit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "bybit accepts BTC (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:BTC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:bybit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "bybit accepts USDT (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:bybit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "bybit accepts USDe (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDe"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:bybit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "bybit accepts sUSDe (haircut=7%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:sUSDe"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:bybit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "bybit accepts stETH (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:stETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:bybit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "bybit accepts wstETH (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit accepts BTC (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:BTC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit accepts ETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:ETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit accepts USDC (haircut=2%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit rejects rETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:rETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit accepts stETH (haircut=7.5%) \u2014 https://insights.deribit.com/exchange-updates/portfolio-margin-improvements-for-steth-and-cross-collateral-haircuts/ (stETH 7.5%, eff. 2026-01-13; as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:stETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit rejects weETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:weETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:deribit",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "deribit rejects wstETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:drift",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "drift accepts JitoSOL (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:JitoSOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:drift",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "drift accepts SOL (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:SOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:drift",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "drift accepts USDC (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:drift",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "drift accepts mSOL (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:mSOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:gmx_v2",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "gmx_v2 accepts ETH (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:ETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:gmx_v2",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "gmx_v2 accepts USDC (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:gmx_v2",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "gmx_v2 accepts WBTC (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:WBTC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:gmx_v2",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "gmx_v2 rejects stETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:stETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:gmx_v2",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "gmx_v2 rejects wstETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:hyperliquid",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "hyperliquid rejects ETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:ETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:hyperliquid",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "hyperliquid rejects JitoSOL (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:JitoSOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:hyperliquid",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "hyperliquid accepts USDC (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:hyperliquid",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "hyperliquid rejects mSOL (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:mSOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:hyperliquid",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "hyperliquid rejects stETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:stETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:hyperliquid",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "hyperliquid rejects wstETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:kamino",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "kamino accepts JitoSOL (haircut=15%) \u2014 execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) + https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:JitoSOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:kamino",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "kamino accepts SOL (haircut=0%) \u2014 execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) + https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:SOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:kamino",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "kamino accepts USDC (haircut=0%) \u2014 execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) + https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:kamino",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "kamino accepts USDT (haircut=0%) \u2014 execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) + https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:kamino",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "kamino accepts mSOL (haircut=15%) \u2014 execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) + https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:mSOL"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:okx",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "okx accepts BTC (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:BTC"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:okx",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "okx accepts ETH (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:ETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:okx",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "okx accepts USDT (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:USDT"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:okx",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "okx rejects stETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:stETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:okx",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "okx rejects weETH (haircut=0%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "not_available",
+      "to_node_id": "collateral_asset:weETH"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "collateral:okx",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "okx accepts wstETH (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "relation": "accepts_collateral",
+      "status": "available",
+      "to_node_id": "collateral_asset:wstETH"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "data_source:api_football",
       "gap_type": null,
       "readiness": null,
@@ -5208,11 +5738,11 @@
     {
       "agent_annotation": null,
       "from_node_id": "gap_registry:collateral",
-      "gap_type": "missing_registry",
+      "gap_type": null,
       "readiness": null,
-      "reason": "Collateral policies registry is honest-empty \u2014 per-venue haircut/LTV backfill",
+      "reason": "Collateral policies: 9 entries registered",
       "relation": "registry_gap",
-      "status": "not_registered",
+      "status": "available",
       "to_node_id": "gap_registry:collateral"
     },
     {
@@ -9036,13 +9566,13 @@
     "logical_dead_end": 19,
     "logical_dead_ends": 16,
     "missing_extraction": 1,
-    "missing_registry": 106,
+    "missing_registry": 105,
     "needs_code_scan": 3,
-    "not_registered_total": 109,
+    "not_registered_total": 108,
     "orphan_nodes": 89,
     "unbuilt_dead_ends": 54
   },
-  "generated_from_commit": "c17a6be5b2bbbd7bb306468fcf10c90e6ed4007d",
+  "generated_from_commit": "f997f3bc334363c3e0e707af47f9a33350e83fab",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -9635,6 +10165,114 @@
     },
     {
       "kind": "custody_provider",
+      "label": "Collateral: Aave V3",
+      "metadata": {
+        "maintenance_margin": "",
+        "max_ltv": "0.825",
+        "source_of_truth": "unified_api_contracts/registry/defi_reserve_params.py AAVE_V3_ETHEREUM_RESERVES (on-chain getConfiguration(), 2026-05-15) + https://app.aave.com/reserve-overview/ (as_of 2026-06-12)",
+        "venue_id": "aave_v3",
+        "venue_kind": "lending"
+      },
+      "node_id": "collateral:aave_v3"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Binance",
+      "metadata": {
+        "maintenance_margin": "0.004",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08); unified_api_contracts/registry/cefi_margin_tiers.py CEFI_MARGIN_TIERS (tier-1 MMR, revalidated 2026-05-15)",
+        "venue_id": "binance",
+        "venue_kind": "perp_cex"
+      },
+      "node_id": "collateral:binance"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Bybit",
+      "metadata": {
+        "maintenance_margin": "0.005",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08); unified_api_contracts/registry/cefi_margin_tiers.py CEFI_MARGIN_TIERS (tier-1 MMR, revalidated 2026-05-15)",
+        "venue_id": "bybit",
+        "venue_kind": "perp_cex"
+      },
+      "node_id": "collateral:bybit"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Deribit",
+      "metadata": {
+        "maintenance_margin": "0.01",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08); unified_api_contracts/registry/cefi_margin_tiers.py CEFI_MARGIN_TIERS (tier-1 MMR, revalidated 2026-05-15); https://insights.deribit.com/exchange-updates/portfolio-margin-improvements-for-steth-and-cross-collateral-haircuts/ (stETH 7.5%, eff. 2026-01-13; as_of 2026-06-12)",
+        "venue_id": "deribit",
+        "venue_kind": "perp_cex"
+      },
+      "node_id": "collateral:deribit"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Drift",
+      "metadata": {
+        "maintenance_margin": "",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+        "venue_id": "drift",
+        "venue_kind": "perp_dex"
+      },
+      "node_id": "collateral:drift"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Gmx V2",
+      "metadata": {
+        "maintenance_margin": "",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+        "venue_id": "gmx_v2",
+        "venue_kind": "perp_dex"
+      },
+      "node_id": "collateral:gmx_v2"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Hyperliquid",
+      "metadata": {
+        "maintenance_margin": "0.01",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08); unified_api_contracts/registry/cefi_margin_tiers.py CEFI_MARGIN_TIERS (tier-1 MMR, revalidated 2026-05-15); https://hyperliquid.gitbook.io/hyperliquid-docs/trading/margining (USDC-only margin; MM = \u00bd IM at max leverage; as_of 2026-06-12)",
+        "venue_id": "hyperliquid",
+        "venue_kind": "perp_cex"
+      },
+      "node_id": "collateral:hyperliquid"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Kamino",
+      "metadata": {
+        "maintenance_margin": "",
+        "max_ltv": "",
+        "source_of_truth": "execution-service execution_service/services/lst_collateral_resolver.py _LST_REGISTRY (KAMINO LST haircut) + https://risk.kamino.finance (per-asset LTV on live dashboard; as_of 2026-06-12)",
+        "venue_id": "kamino",
+        "venue_kind": "lending"
+      },
+      "node_id": "collateral:kamino"
+    },
+    {
+      "kind": "custody_provider",
+      "label": "Collateral: Okx",
+      "metadata": {
+        "maintenance_margin": "0.005",
+        "max_ltv": "",
+        "source_of_truth": "unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08); unified_api_contracts/registry/cefi_margin_tiers.py CEFI_MARGIN_TIERS (tier-1 MMR, revalidated 2026-05-15)",
+        "venue_id": "okx",
+        "venue_kind": "perp_cex"
+      },
+      "node_id": "collateral:okx"
+    },
+    {
+      "kind": "custody_provider",
       "label": "TradFi brokers",
       "metadata": {
         "entry_count": "0",
@@ -9646,7 +10284,7 @@
       "kind": "custody_provider",
       "label": "Collateral policies",
       "metadata": {
-        "entry_count": "0",
+        "entry_count": "9",
         "registry": "collateral"
       },
       "node_id": "gap_registry:collateral"
@@ -10306,6 +10944,142 @@
         "max_feature_lookback_bars": "200"
       },
       "node_id": "min_data_to_run:feature_lookback"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: BTC",
+      "metadata": {
+        "asset": "BTC"
+      },
+      "node_id": "collateral_asset:BTC"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: DAI",
+      "metadata": {
+        "asset": "DAI"
+      },
+      "node_id": "collateral_asset:DAI"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: ETH",
+      "metadata": {
+        "asset": "ETH"
+      },
+      "node_id": "collateral_asset:ETH"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: JitoSOL",
+      "metadata": {
+        "asset": "JitoSOL"
+      },
+      "node_id": "collateral_asset:JitoSOL"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: SOL",
+      "metadata": {
+        "asset": "SOL"
+      },
+      "node_id": "collateral_asset:SOL"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: USDC",
+      "metadata": {
+        "asset": "USDC"
+      },
+      "node_id": "collateral_asset:USDC"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: USDT",
+      "metadata": {
+        "asset": "USDT"
+      },
+      "node_id": "collateral_asset:USDT"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: USDe",
+      "metadata": {
+        "asset": "USDe"
+      },
+      "node_id": "collateral_asset:USDe"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: WBTC",
+      "metadata": {
+        "asset": "WBTC"
+      },
+      "node_id": "collateral_asset:WBTC"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: WETH",
+      "metadata": {
+        "asset": "WETH"
+      },
+      "node_id": "collateral_asset:WETH"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: cbETH",
+      "metadata": {
+        "asset": "cbETH"
+      },
+      "node_id": "collateral_asset:cbETH"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: mSOL",
+      "metadata": {
+        "asset": "mSOL"
+      },
+      "node_id": "collateral_asset:mSOL"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: rETH",
+      "metadata": {
+        "asset": "rETH"
+      },
+      "node_id": "collateral_asset:rETH"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: sUSDe",
+      "metadata": {
+        "asset": "sUSDe"
+      },
+      "node_id": "collateral_asset:sUSDe"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: stETH",
+      "metadata": {
+        "asset": "stETH"
+      },
+      "node_id": "collateral_asset:stETH"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: weETH",
+      "metadata": {
+        "asset": "weETH"
+      },
+      "node_id": "collateral_asset:weETH"
+    },
+    {
+      "kind": "instrument_type",
+      "label": "Collateral Asset: wstETH",
+      "metadata": {
+        "asset": "wstETH"
+      },
+      "node_id": "collateral_asset:wstETH"
     },
     {
       "kind": "instrument_type",
