@@ -242,6 +242,66 @@ def test_codex_markdown_family_groupings_match_uac_family_enum() -> None:
     )
 
 
+# ---------------------------------------------------------------------------
+# Verdict-matrix-inputs sanity (Phase 6B — cross-registry)
+# ---------------------------------------------------------------------------
+
+
+def test_verdict_matrix_inputs_algo_compat_covers_all_leg_derived_instruction_types() -> None:
+    """Phase 6B: for every registered leg structure, every InstructionType derivable
+    from its legs is present as a key in ALGOS_BY_INSTRUCTION_TYPE (the verdict-matrix
+    input table).  Catches any leg that references an instrument-type whose selector
+    path has no algo mapping — which would silently produce an empty valid-algo set.
+    """
+
+    from unified_api_contracts.internal.architecture_v2.algo_compatibility import (
+        ALGOS_BY_INSTRUCTION_TYPE,
+    )
+    from unified_api_contracts.internal.architecture_v2.archetype_capability import (
+        ArchetypeInstrumentType,
+    )
+    from unified_api_contracts.internal.architecture_v2.archetype_leg_spec import (
+        registered_leg_structures,
+    )
+    from unified_api_contracts.internal.domain.execution_service.types import InstructionType
+
+    # Instrument-type → possible InstructionType(s) the selector can produce.
+    # EVENT_SETTLED can yield PREDICTION_BET or SPORTS_EXCHANGE (venue-kind splits);
+    # SPOT/PERP can yield TRADE or SWAP (venue-kind splits); all others are 1:1.
+    _ITYPE_TO_INSTRUCTION: dict[ArchetypeInstrumentType, tuple[InstructionType, ...]] = {
+        ArchetypeInstrumentType.STAKING: (InstructionType.ZERO_ALPHA,),
+        ArchetypeInstrumentType.LENDING: (InstructionType.ZERO_ALPHA,),
+        ArchetypeInstrumentType.OPTION: (InstructionType.OPTIONS_COMBO,),
+        ArchetypeInstrumentType.DATED_FUTURE: (InstructionType.FUTURES_ROLL,),
+        ArchetypeInstrumentType.LP: (InstructionType.SWAP,),
+        ArchetypeInstrumentType.EVENT_SETTLED: (InstructionType.PREDICTION_BET, InstructionType.SPORTS_EXCHANGE),
+        ArchetypeInstrumentType.SPOT: (InstructionType.TRADE, InstructionType.SWAP),
+        ArchetypeInstrumentType.PERP: (InstructionType.TRADE, InstructionType.SWAP),
+    }
+
+    missing: list[tuple[str, str, str, str]] = []
+    for struct in registered_leg_structures():
+        for leg in struct.legs:
+            for itype in leg.instrument_types:
+                possible = _ITYPE_TO_INSTRUCTION.get(itype, (InstructionType.TRADE,))
+                for it in possible:
+                    if it not in ALGOS_BY_INSTRUCTION_TYPE:
+                        missing.append(
+                            (
+                                struct.archetype_id.value,
+                                leg.leg_id,
+                                itype.value,
+                                it.value,
+                            )
+                        )
+
+    assert not missing, (
+        "ALGOS_BY_INSTRUCTION_TYPE is missing entries for instruction types "
+        "derived from registered leg structures.  Verdict-matrix would have "
+        f"silent gaps for: {missing}"
+    )
+
+
 def test_codex_markdown_archetype_appears_under_correct_family_section() -> None:
     path = _find_codex_markdown()
     if path is None:
