@@ -184,6 +184,16 @@ class LifecycleEventType(StrEnum):
     # spread_bps rows for that venue pair). Downstream: pairs for that venue
     # are dropped before signal generation — no silent zero-spread signals.
     VENUE_DATA_ABSENT = "VENUE_DATA_ABSENT"
+    # DeFi governance parameter changes (defi_governance_params_refresh Phase 1).
+    # Emitted by GovernanceParamsEventPoller (MTDS) whenever an on-chain
+    # governance event changes a protocol risk/rate parameter (Aave V3
+    # BorrowCapChanged / SupplyCapChanged / LtvChanged /
+    # LiquidationThresholdChanged / LiquidationBonusChanged /
+    # ReserveDataUpdated; Compound V3 SetConfiguration; Morpho
+    # MarketParamsUpdated). Payload: GovernanceParamsChangedDetails.
+    # Downstream: Phase 2 (time-versioned governance_params parquet) + Phase 3
+    # (features-onchain APR calculator asof reads) consume this event.
+    GOVERNANCE_PARAMS_CHANGED = "GOVERNANCE_PARAMS_CHANGED"
 
 
 # Backward-compat alias — LogLevel is the canonical severity enum (modes.py).
@@ -921,3 +931,52 @@ class ResourceMetricsSnapshot(BaseModel):
     shard_id: str | None = Field(default=None, description="batch shard ID if applicable")
     venue_id: str | None = Field(default=None, description="live venue ID if applicable")
     strategy_id: str | None = Field(default=None, description="live strategy ID if applicable")
+
+
+# ---------------------------------------------------------------------------
+# DeFi governance parameter change payload (defi_governance_params_refresh
+# Phase 1 — GovernanceParamsEventPoller in MTDS emits this on every on-chain
+# governance parameter change event detected across Aave V3, Compound V3,
+# and Morpho).
+# ---------------------------------------------------------------------------
+
+
+class GovernanceParamsChangedDetails(BaseModel):
+    """Payload for GOVERNANCE_PARAMS_CHANGED events.
+
+    Emitted by the MTDS GovernanceParamsEventPoller once per detected on-chain
+    governance event. Downstream consumers:
+    - Phase 2: write a time-versioned governance_params parquet row
+    - Phase 3: features-onchain APR calculator asof reads
+    - Phase 4: strategy-service sizing asof reads
+    """
+
+    protocol: str = Field(description="Protocol identifier: AAVE_V3 | COMPOUND_V3 | MORPHO")
+    chain: str = Field(description="Chain identifier matching UAC CHAIN_CONFIGS keys: ETHEREUM | ARBITRUM | …")
+    asset: str = Field(description="Reserve/market address (hex) or market-id (bytes32 hex for Morpho)")
+    param_name: str = Field(
+        description=(
+            "Governance parameter changed: borrow_cap | supply_cap | ltv | "
+            "liquidation_threshold | liquidation_bonus | variable_borrow_rate | "
+            "irm_configuration | market_params"
+        )
+    )
+    old_value: str = Field(
+        default="",
+        description="Previous parameter value as string; empty when not available from the event ABI",
+    )
+    new_value: str = Field(
+        default="",
+        description="New parameter value as string; empty when full ABI decoding is deferred to Phase 2",
+    )
+    asof_block: int = Field(description="Block number at which the event was emitted")
+    governance_tx_hash: str = Field(description="Transaction hash of the governance action")
+
+
+class GovernanceParamsChangedEvent(BaseModel):
+    """Typed wrapper for GOVERNANCE_PARAMS_CHANGED events."""
+
+    event: Literal[LifecycleEventType.GOVERNANCE_PARAMS_CHANGED] = LifecycleEventType.GOVERNANCE_PARAMS_CHANGED
+    service: str
+    timestamp: datetime
+    details: GovernanceParamsChangedDetails
