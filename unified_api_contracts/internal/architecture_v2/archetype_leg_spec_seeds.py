@@ -89,7 +89,18 @@ _LEND_VENUES_STAKED: Final[tuple[str, ...]] = ("aave_v3", "kamino")
 _SPOT_VENUES_STAKED: Final[tuple[str, ...]] = ("uniswap_v3", "jupiter")
 
 # Shared venue tuples for the design-status families (from cells + codex docs).
-_CEFI_CLOB_VENUES: Final[tuple[str, ...]] = ("binance", "okx", "bybit", "hyperliquid", "deribit")
+# F39: added kraken (kraken_rest_adapter.py:159 KRAKEN-FUTURES/SPOT adapter) and
+# bitget (bitget_native.py:125 BITGET-FUTURES/SPOT adapter) — both are real CeFi
+# CLOB venues with execution adapters in execution_service/trade_execution/adapters/.
+_CEFI_CLOB_VENUES: Final[tuple[str, ...]] = (
+    "binance",
+    "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES/SPOT adapter)
+    "bybit",
+    "deribit",
+    "hyperliquid",
+    "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES/SPOT adapter)
+    "okx",
+)
 _OPTIONS_VENUES: Final[tuple[str, ...]] = ("deribit", "okx")
 _OPTIONS_VENUES_WITH_CBOE: Final[tuple[str, ...]] = ("deribit", "okx", "cboe")
 _DEX_SWAP_VENUES: Final[tuple[str, ...]] = ("uniswap_v3", "pancakeswap_v3", "sushiswap_v3")
@@ -233,7 +244,16 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.SPOT,),
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
-                eligible_venue_ids=("binance", "okx", "bybit", "hyperliquid", "uniswap_v3"),
+                eligible_venue_ids=(
+                    "binance",
+                    "bitget",  # F39: bitget_native.py:125 (BITGET-SPOT adapter — spot leg)
+                    "bybit",
+                    "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
+                    "hyperliquid",
+                    "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-SPOT adapter — spot leg)
+                    "okx",
+                    "uniswap_v3",
+                ),
                 source_of_truth=(
                     "manifest cell CARRY_BASIS_PERP (CEFI/DEFI, perp) venue_ids + "
                     "slot labels; strategy-service CarryBasisPerpEngine (basis_perp.py)"
@@ -245,7 +265,17 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.PERP,),
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
-                eligible_venue_ids=("binance", "okx", "bybit", "hyperliquid", "deribit", "gmx_v2", "drift"),
+                eligible_venue_ids=(
+                    "binance",
+                    "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES adapter — perp leg)
+                    "bybit",
+                    "deribit",
+                    "drift",
+                    "gmx_v2",
+                    "hyperliquid",
+                    "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES adapter — perp leg)
+                    "okx",
+                ),
                 signal_variants=("funding_rate_annualised_bps",),
                 constraints=(same_venue,),
                 source_of_truth=(
@@ -273,7 +303,16 @@ def _basis_dated_structure(archetype: StrategyArchetype, *, inverse: bool, notes
                 required=True,
                 instrument_types=(ArchetypeInstrumentType.SPOT,),
                 asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.TRADFI),
-                eligible_venue_ids=("binance", "coinbase", "deribit", "ibkr"),
+                eligible_venue_ids=(
+                    "binance",
+                    "bitget",  # F39: bitget_native.py:125 (BITGET-SPOT adapter — spot leg)
+                    "bybit",  # F39: bybit_native.py:138 (BYBIT-SPOT adapter — spot leg)
+                    "coinbase",
+                    "deribit",
+                    "ibkr",
+                    "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-SPOT adapter — spot leg)
+                    "okx",  # F39: okx_native.py:151 (OKX-SPOT adapter — spot leg)
+                ),
                 source_of_truth=(
                     "strategy-service CarryBasisDatedEngine (basis_dated.py, spot leader); "
                     "manifest cell CARRY_BASIS_DATED (CEFI/TRADFI, dated_future)"
@@ -448,20 +487,23 @@ def _price_dispersion_structure() -> ArchetypeLegStructure:
         "codex/09-strategy/architecture-v2/archetypes/arbitrage-price-dispersion.md"
     )
     venues = (
-        "binance",
-        "okx",
-        "bybit",
-        "hyperliquid",
-        "deribit",
-        "uniswap_v3",
         "balancer",
-        "curve",
-        "gmx_v2",
-        "drift",
-        "unity",
         "betfair_direct",
-        "smarkets_direct",
+        "binance",
+        "bitget",  # F39: bitget_native.py:125 (BITGET-FUTURES/SPOT adapter)
+        "bybit",
+        "coinbase",  # F39: coinbase_ccxt.py:32 (COINBASE-SPOT adapter)
+        "curve",
+        "deribit",
+        "drift",
+        "gmx_v2",
+        "hyperliquid",
+        "kraken",  # F39: kraken_rest_adapter.py:159 (KRAKEN-FUTURES/SPOT adapter)
+        "okx",
         "polymarket",
+        "smarkets_direct",
+        "uniswap_v3",
+        "unity",
     )
     groups = (
         VenueCategoryV2.CEFI,
