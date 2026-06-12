@@ -145,6 +145,24 @@ class CircuitBreakerId(StrEnum):
     default = 30s (same as Ethereum for operational simplicity; per-archetype
     override can tighten). Added 2026-05-13 per simulation_scenarios Day-1."""
 
+    # ── ML_DIRECTIONAL_CONTINUOUS breakers (CeFi ML pipeline family) ─────────
+    ML_SIGNAL_STALENESS_SECONDS = "ML_SIGNAL_STALENESS_SECONDS"
+    """ML inference signal stale (feature or prediction) for >= threshold seconds.
+    Applies to ML_DIRECTIONAL_CONTINUOUS; kill-switch threshold is 86400s (24h)
+    per cefi_ml_directional_continuous_live plan (feature staleness budget: 24h
+    hard / 6h soft). Distinct from ORACLE_STALENESS_SECONDS (DeFi oracle feed)
+    — this guards the ML pipeline's data freshness, not an on-chain price feed.
+    AUTO_COOLDOWN: resumes automatically when fresh features/predictions arrive."""
+
+    ML_MODEL_DRIFT_ACCURACY_DROP = "ML_MODEL_DRIFT_ACCURACY_DROP"
+    """ML model rolling accuracy dropped >= threshold fraction from baseline.
+    Applies to ML_DIRECTIONAL_CONTINUOUS; default 0.05 (5% drop) over a 14-day
+    rolling window, matching InferenceConfig.drift_accuracy_drop_threshold.
+    Armed by DriftMonitor.check_retune() when per-model accuracy degrades.
+    Distinct from BATCH_LIVE_DIVERGENCE_BPS (P&L divergence) — this is a
+    predictive accuracy guard, not a P&L guard. BLOCK_NEW + AUTO_COOLDOWN:
+    resumes after model retrain + hot-reload cycle (~1h cooldown)."""
+
 
 class BreakerScope(StrEnum):
     """Blast-radius scope for a breaker.
