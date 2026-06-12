@@ -9,6 +9,28 @@ Split across enums.py + schemas.py to stay under the 900-line QG limit.
 
 from __future__ import annotations
 
+# ---------------------------------------------------------------------------
+# Archetype leg-spec registry — structural per-leg restriction model (F22,
+# capability_wizard_and_manifest_2026_06_11.md). The NEW SSOT for leg truth;
+# dual-represented alongside ARCHETYPE_CAPABILITY_REGISTRY (see the module
+# docstring). ADDITIVE — no existing exports moved or renamed.
+# ---------------------------------------------------------------------------
+from unified_api_contracts.internal.architecture_v2.algo_compatibility import (
+    ALGOS_BY_INSTRUCTION_TYPE,
+    ARCHETYPE_ALGO_COMPATIBILITY,
+    DEFAULT_ALGO_BY_INSTRUCTION_TYPE,
+    EXECUTION_ALGOS,
+    SELECTOR_CONTRADICTIONS,
+    AlgoVerdict,
+    ArchetypeAlgoCompatibility,
+    ExecutionAlgo,
+    SelectorContradiction,
+    VenueExecutionKind,
+    algo_compatibility_for,
+    all_algo_compatibility,
+    instruction_type_for,
+    venue_kinds_for_asset_group,
+)
 from unified_api_contracts.internal.architecture_v2.allocator_access import (
     allocator_access_control,
     user_context_for_allocator,
@@ -25,13 +47,6 @@ from unified_api_contracts.internal.architecture_v2.archetype_capability import 
     archetypes_for_venue,
     capability_for,
 )
-
-# ---------------------------------------------------------------------------
-# Archetype leg-spec registry — structural per-leg restriction model (F22,
-# capability_wizard_and_manifest_2026_06_11.md). The NEW SSOT for leg truth;
-# dual-represented alongside ARCHETYPE_CAPABILITY_REGISTRY (see the module
-# docstring). ADDITIVE — no existing exports moved or renamed.
-# ---------------------------------------------------------------------------
 from unified_api_contracts.internal.architecture_v2.archetype_leg_spec import (
     ARCHETYPE_LEG_STRUCTURES,
     ArchetypeLegRole,
@@ -42,6 +57,7 @@ from unified_api_contracts.internal.architecture_v2.archetype_leg_spec import (
     all_leg_structures,
     archetypes_without_leg_structures,
     leg_structure_for,
+    registered_leg_structures,
 )
 from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactKind,
@@ -365,16 +381,19 @@ StrategyInstructionV2 = (
 
 
 __all__ = [
+    "ALGOS_BY_INSTRUCTION_TYPE",
     "ALLOCATION_MIN_MATURITY",
+    "ARCHETYPE_ALGO_COMPATIBILITY",
     "ARCHETYPE_CAPABILITY_REGISTRY",
     "ARCHETYPE_LEG_STRUCTURES",
     "ARCHETYPE_TO_FAMILY",
     "BENCHMARK_FILL_MODE_BY_ACTION",
-    # Capability manifest + gap registries (additive, Phase 1+2)
     "BROKER_REGISTRY",
     "COLLATERAL_REGISTRY",
     "COMPATIBILITY_SEED",
     "CROSS_VENUE_ROUTING_POLICIES",
+    "DEFAULT_ALGO_BY_INSTRUCTION_TYPE",
+    "EXECUTION_ALGOS",
     "EXTERNAL_VISIBILITY_MIN_MATURITY",
     "FEES_REGISTRY",
     "FUND_BUSINESS_UNIT_REGISTRY",
@@ -386,6 +405,7 @@ __all__ = [
     "PAIRED_DISPERSION_CATALOG",
     "RESTRICTION_PROFILE_REGISTRY",
     "REWARD_TOKEN_ECONOMICS",
+    "SELECTOR_CONTRADICTIONS",
     "SERVICE_FAMILY_SCOPE_RULES",
     "SIM_ASSUMPTIONS_REGISTRY",
     "STRATEGY_AVAILABILITY_REGISTRY",
@@ -396,8 +416,10 @@ __all__ = [
     "AccountActionV2",
     "AccountInstruction",
     "AgentAnnotation",
+    "AlgoVerdict",
     "AllocationDirective",
     "AllocatorArchetype",
+    "ArchetypeAlgoCompatibility",
     "ArchetypeCapability",
     "ArchetypeCapabilityCell",
     "ArchetypeInstrumentType",
@@ -463,6 +485,7 @@ __all__ = [
     "DustToken",
     "EdgeMethod",
     "Env",
+    "ExecutionAlgo",
     "FeeComponent",
     "FeeSchedule",
     "FeeUnit",
@@ -538,6 +561,7 @@ __all__ = [
     "ScopeAllow",
     "ScopeDecision",
     "ScopeDeny",
+    "SelectorContradiction",
     "ServiceFamily",
     "ServiceFamilyScopeRule",
     "ServiceFamilyTag",
@@ -582,6 +606,7 @@ __all__ = [
     "VenueCapabilityV2",
     "VenueCategoryV2",
     "VenueConstraints",
+    "VenueExecutionKind",
     "VenueFeature",
     "VenueOrderSemantics",
     "VenueRoutingMode",
@@ -589,6 +614,8 @@ __all__ = [
     "ViolationCode",
     "WalletTier",
     "access_control",
+    "algo_compatibility_for",
+    "all_algo_compatibility",
     "all_capabilities",
     "all_leg_structures",
     "allocator_access_control",
@@ -604,6 +631,7 @@ __all__ = [
     "demo_universe",
     "fund_for",
     "funds_for_business_unit",
+    "instruction_type_for",
     "is_venue_token",
     "known_persona_ids",
     "leg_structure_for",
@@ -612,6 +640,7 @@ __all__ = [
     "policies_for_settlement_currency",
     "policies_for_venue_pair",
     "prod_restrictions",
+    "registered_leg_structures",
     "reserving_business_unit_for",
     "resolve_profile",
     "routing_policy_for",
@@ -620,6 +649,7 @@ __all__ = [
     "split_scope_tokens",
     "user_context_for_allocator",
     "validate_allocation_authorised",
+    "venue_kinds_for_asset_group",
     "venues_supporting_combo_type",
     "venues_supporting_legs",
 ]

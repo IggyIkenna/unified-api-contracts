@@ -75,6 +75,11 @@ SIZE_EXTRA_EXCLUDES=(
     "./unified_api_contracts/internal/testing/*"
     "./unified_api_contracts/internal/reference/instrument.py"
     "./unified_api_contracts/internal/domain/strategy_service/candidate_manifest.py"
+    # archetype_leg_spec_seeds.py: pure DECLARATIVE per-archetype leg-structure seeds
+    # for ALL 57 archetypes (Phase 6A; each leg cites its engine/codex/cell source).
+    # Schema lives in archetype_leg_spec.py (<900); this is the closed-set seed
+    # registry — splitting per-family harms grep-ability of the leg-truth SSOT.
+    "./unified_api_contracts/internal/architecture_v2/archetype_leg_spec_seeds.py"
     # === REGISTRIES AND VENUE CONSTANTS (13 files) ===
     "./unified_api_contracts/canonical/domain/bookmaker_registry.py"
     "./unified_api_contracts/canonical/domain/sports/bookmaker_registry.py"

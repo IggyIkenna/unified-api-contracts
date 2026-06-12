@@ -39,10 +39,19 @@ authored source. That derivation + a parity drift-check between the two
 representations is the next tranche — tracked in
 ``plans/active/issues/capability_wizard_analysis_findings_2026_06_11.md`` F22.
 
-LOGIC FREEZE: the seeds below are *citations of* the shipped engine structure +
-codex archetype docs + existing manifest cells. They DO NOT change any engine
-behaviour. Numbers / venues come only from those three sources (cited per leg in
-``source_of_truth``).
+PHASE 6A — EXHAUSTIVE 57-ARCHETYPE COVERAGE: the per-archetype seed builders live
+in the sibling ``archetype_leg_spec_seeds`` module (split out so the full backfill
+fits the file cap). ``ARCHETYPE_LEG_STRUCTURES`` enumerates EVERY one of the 57
+``StrategyArchetype`` values — a real leg structure where derivable from
+engine/doc/cells, an explicit ``not_registered`` structure (``legs=()`` +
+``not_registered_reason``) where genuinely underivable (a meta-allocation overlay
+or an archetype intentionally absent from the strategy factory). There are NO
+absent keys; ``archetypes_without_leg_structures()`` returns the not_registered set.
+
+LOGIC FREEZE: every seeded leg is a *citation of* the shipped engine structure +
+codex archetype docs + existing manifest cells (cited per leg in
+``source_of_truth``). They DO NOT change any engine behaviour. Numbers / venues
+come only from those three sources.
 """
 
 from __future__ import annotations
@@ -50,7 +59,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from unified_api_contracts.internal.architecture_v2.archetype_capability import (
     ArchetypeInstrumentType,
@@ -293,6 +302,57 @@ class ArchetypeLegStructure(BaseModel):
             "SSOT)."
         ),
     )
+    not_registered: bool = Field(
+        default=False,
+        description=(
+            "True when this archetype's leg structure is GENUINELY underivable "
+            "(no engine in the strategy factory AND no structural legs in the "
+            "codex doc — e.g. a pure meta-allocation overlay with no instrument "
+            "legs, or an archetype intentionally absent from the factory pending "
+            "an upstream feed). Such a structure carries ``legs=()`` and a "
+            "``not_registered_reason``. The registry ENUMERATES all 57 archetypes "
+            "(Phase 6A) so a consumer never sees an absent key — it sees an "
+            "explicit not_registered marker instead. A normally-seeded structure "
+            "leaves this ``False``."
+        ),
+    )
+    not_registered_reason: str = Field(
+        default="",
+        description=(
+            "Citation for WHY this archetype is not_registered (the engine-absence "
+            "/ thin-doc / meta-allocation reason + its source). Required whenever "
+            "``not_registered`` is True; empty otherwise. The exhaustive-honesty "
+            "counterpart to ``source_of_truth`` on a real leg."
+        ),
+    )
+
+    @model_validator(mode="after")
+    def _validate_not_registered_invariant(self) -> ArchetypeLegStructure:
+        """Enforce the not_registered ↔ legs/reason invariant (exhaustive honesty).
+
+        A ``not_registered`` structure MUST have empty ``legs`` + a non-empty
+        ``not_registered_reason``; a registered structure MUST have ≥1 leg.
+        This makes the "absent key" antipattern unrepresentable — the registry
+        enumerates all 57 archetypes, and an underivable one is an explicit
+        not_registered marker, never silence.
+        """
+
+        if self.not_registered:
+            if self.legs:
+                raise ValueError(
+                    f"{self.archetype_id.value}: not_registered structure must have legs=() (got {len(self.legs)} legs)"
+                )
+            if not self.not_registered_reason.strip():
+                raise ValueError(
+                    f"{self.archetype_id.value}: not_registered structure must cite a not_registered_reason"
+                )
+        else:
+            if not self.legs:
+                raise ValueError(
+                    f"{self.archetype_id.value}: registered structure must have ≥1 leg "
+                    "(use not_registered=True for an underivable archetype)"
+                )
+        return self
 
     @property
     def required_legs(self) -> tuple[ArchetypeLegSpec, ...]:
@@ -315,564 +375,94 @@ class ArchetypeLegStructure(BaseModel):
         return None
 
 
-# ---------------------------------------------------------------------------
-# Seeds — every leg cites its source (engine path / codex doc / manifest cell)
-# ---------------------------------------------------------------------------
-
-# Citation shorthands reused across seeds (kept as constants so a venue-list
-# update has ONE edit site and the source is unambiguous).
-_ENGINE_STAKED = (
-    "strategy-service CarryStakedBasisEngine._build_legs / _derive_structure "
-    "(staked_basis.py); catalog_staked_basis.py venue tuples"
-)
-_CELL_STAKED = (
-    "manifest cell CARRY_STAKED_BASIS (DEFI, staking) notes '3-leg ATOMIC "
-    "(stake + lending + perp)' + slot labels lido-aave-hyperliquid / "
-    "jito-kamino-drift / lido-aave-{binance,bybit,deribit,okx}"
-)
-_DOC_STAKED = (
-    "codex/09-strategy/architecture-v2/archetypes/carry-staked-basis.md § 'Token / position flow — LST_AS_MARGIN'"
-)
-
-# The staked-basis perp-hedge universe (lowercase manifest ids). Task-specified
-# + manifest cell venue_ids: DeFi perp DEXes (hyperliquid/gmx_v2/drift) + CeFi
-# CLOBs (binance/bybit/deribit/okx). Cross-category by construction.
-_STAKED_HEDGE_VENUES: Final[tuple[str, ...]] = (
-    "hyperliquid",
-    "gmx_v2",
-    "drift",
-    "binance",
-    "bybit",
-    "deribit",
-    "okx",
-)
-# The staked-basis stake protocols (ETH + SOL LSTs) and lend venues.
-_STAKE_PROTOCOLS_ETH_SOL: Final[tuple[str, ...]] = ("lido", "rocketpool", "jito", "marinade")
-_LEND_VENUES_STAKED: Final[tuple[str, ...]] = ("aave_v3", "kamino")
-# The spot/swap (USDC→native) leg venues, per catalog_staked_basis.py.
-_SPOT_VENUES_STAKED: Final[tuple[str, ...]] = ("uniswap_v3", "jupiter")
-
-
-def _staked_basis_collateral_constraint() -> LegConstraint:
-    """The staked-vs-straight-basis conditional (the F22 headline constraint).
-
-    Cites ``CarryStakedBasisEngine._derive_structure`` gating on
-    ``accepted_perp_collateral(perp_venue)``.
-    """
-
-    return LegConstraint(
-        kind=LegConstraintKind.REQUIRES_COLLATERAL_ACCEPTANCE,
-        params={"asset": "lst_token", "venue_role": "hedge_short"},
-        fallback_variant="straight_basis",
-        description=(
-            "The LST must be accepted as cross-margin at the perp hedge venue "
-            "(engine gate: accepted_perp_collateral(perp_venue)). On venues that "
-            "accept the LST → staked basis (earn staking yield + funding). On "
-            "venues that do NOT accept the LST as collateral → the stake leg is "
-            "dropped and this runs as a straight perp-funding basis "
-            "(== CARRY_BASIS_PERP) within the same archetype."
-        ),
-    )
-
-
-def _staked_basis_structure(
-    archetype: StrategyArchetype,
-    *,
-    hedge_role: ArchetypeLegRole,
-    hedge_instrument: ArchetypeInstrumentType,
-    notes: str,
-) -> ArchetypeLegStructure:
-    """Build a CARRY_STAKED_BASIS-family structure (perp or dated hedge).
-
-    Shared between ``CARRY_STAKED_BASIS`` (perp hedge) and
-    ``CARRY_STAKED_BASIS_DATED`` (dated-future hedge — the Deribit dated variant
-    per the manifest cell + catalog_staked_basis dated slots).
-    """
-
-    coll = _staked_basis_collateral_constraint()
-    atomic = LegConstraint(
-        kind=LegConstraintKind.REQUIRES_ATOMIC_BUNDLE,
-        params={"bundle_id": "staked_basis"},
-        description=(
-            "The SWAP→STAKE→TRANSFER→hedge sequence is coupled (LEADER_HEDGE): "
-            "the hedge must fill within hedge_deadline_ms of the staked leader "
-            "or the leader is closed (CompensationPolicy.CLOSE_LEADER_IF_HEDGE_FAILS)."
-        ),
-    )
-    return ArchetypeLegStructure(
-        archetype_id=archetype,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="spot",
-                role=ArchetypeLegRole.SPOT_LONG,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.SPOT,),
-                asset_groups=(VenueCategoryV2.DEFI, VenueCategoryV2.CEFI),
-                eligible_venue_ids=_SPOT_VENUES_STAKED,
-                signal_variants=(),
-                constraints=(),
-                source_of_truth=f"{_ENGINE_STAKED} (SWAP leader leg, role=leader); {_DOC_STAKED}",
-            ),
-            ArchetypeLegSpec(
-                leg_id="stake",
-                role=ArchetypeLegRole.STAKE,
-                required=False,  # dropped in straight-basis fallback
-                instrument_types=(ArchetypeInstrumentType.STAKING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=_STAKE_PROTOCOLS_ETH_SOL,
-                signal_variants=("staking_apy_total",),
-                constraints=(coll,),
-                source_of_truth=f"{_ENGINE_STAKED} (STAKE leg, role=stake); {_CELL_STAKED}",
-            ),
-            ArchetypeLegSpec(
-                leg_id="lend",
-                role=ArchetypeLegRole.LEND,
-                required=False,
-                instrument_types=(ArchetypeInstrumentType.LENDING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=_LEND_VENUES_STAKED,
-                signal_variants=(),
-                constraints=(),
-                source_of_truth=(
-                    f"{_CELL_STAKED} (lend@aave/kamino encoded in slot labels "
-                    "lido-AAVE-hyperliquid / jito-KAMINO-drift)"
-                ),
-            ),
-            ArchetypeLegSpec(
-                leg_id="hedge",
-                role=hedge_role,
-                required=True,
-                instrument_types=(hedge_instrument,),
-                asset_groups=(VenueCategoryV2.DEFI, VenueCategoryV2.CEFI),
-                eligible_venue_ids=_STAKED_HEDGE_VENUES,
-                signal_variants=("dynamic_hedge_ratio",),
-                constraints=(coll, atomic),
-                source_of_truth=(f"{_ENGINE_STAKED} (TRADE hedge leg, role=hedge, leg_type=PERP); {_CELL_STAKED}"),
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.LEADER_HEDGE,
-        notes=notes,
-    )
-
-
-def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes: str) -> ArchetypeLegStructure:
-    """CARRY_BASIS_PERP (+ _INV): spot + perp delta-neutral basis.
-
-    ``CarryBasisPerpEngine`` is perp-side only (hedge wired by orchestrator);
-    the structural pair is spot_long + perp_short (short the basis: hold spot,
-    short perp when funding > 0). ``_INV`` flips: lend/USDC-margined perp + hold
-    spot (manifest enum comment, enums.py CARRY_BASIS_PERP_INV).
-    """
-
-    spot_role = ArchetypeLegRole.SPOT_LONG
-    perp_role = ArchetypeLegRole.PERP_LONG if inverse else ArchetypeLegRole.PERP_SHORT
-    same_venue = LegConstraint(
-        kind=LegConstraintKind.REQUIRES_SAME_VENUE,
-        params={"other_leg_id": "spot"},
-        description=(
-            "Single-venue netted basis (spot + perp on one CEX) is the most "
-            "capital-efficient form (manifest cell note 'single-venue netted'); "
-            "cross-venue form runs LEADER_HEDGE instead."
-        ),
-    )
-    return ArchetypeLegStructure(
-        archetype_id=archetype,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="spot",
-                role=spot_role,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.SPOT,),
-                asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
-                eligible_venue_ids=("binance", "okx", "bybit", "hyperliquid", "uniswap_v3"),
-                source_of_truth=(
-                    "manifest cell CARRY_BASIS_PERP (CEFI/DEFI, perp) venue_ids + "
-                    "slot labels; strategy-service CarryBasisPerpEngine (basis_perp.py)"
-                ),
-            ),
-            ArchetypeLegSpec(
-                leg_id="perp",
-                role=perp_role,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.PERP,),
-                asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
-                eligible_venue_ids=("binance", "okx", "bybit", "hyperliquid", "deribit", "gmx_v2", "drift"),
-                signal_variants=("funding_rate_annualised_bps",),
-                constraints=(same_venue,),
-                source_of_truth=(
-                    "strategy-service CarryBasisPerpEngine.on_tick (basis_perp.py, "
-                    "direction flips on funding sign); manifest cell CARRY_BASIS_PERP"
-                ),
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.LEADER_HEDGE,
-        notes=notes,
-    )
-
-
-def _basis_dated_structure(archetype: StrategyArchetype, *, inverse: bool, notes: str) -> ArchetypeLegStructure:
-    """CARRY_BASIS_DATED (+ _INV): spot + dated future cash-and-carry.
-
-    Cites ``CarryBasisDatedEngine`` (basis_dated.py): contango → long spot /
-    short future; backwardation (``_INV``) flips.
-    """
-
-    future_role = ArchetypeLegRole.FUTURE_LONG if inverse else ArchetypeLegRole.FUTURE_SHORT
-    spot_role = ArchetypeLegRole.SPOT_SHORT if inverse else ArchetypeLegRole.SPOT_LONG
-    return ArchetypeLegStructure(
-        archetype_id=archetype,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="spot",
-                role=spot_role,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.SPOT,),
-                asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.TRADFI),
-                eligible_venue_ids=("binance", "coinbase", "deribit", "ibkr"),
-                source_of_truth=(
-                    "strategy-service CarryBasisDatedEngine (basis_dated.py, spot leader); "
-                    "manifest cell CARRY_BASIS_DATED (CEFI/TRADFI, dated_future)"
-                ),
-            ),
-            ArchetypeLegSpec(
-                leg_id="future",
-                role=future_role,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.DATED_FUTURE,),
-                asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.TRADFI),
-                eligible_venue_ids=("deribit", "cme", "ice", "binance"),
-                source_of_truth=(
-                    "strategy-service CarryBasisDatedEngine (TRADE future leg, "
-                    "leg_type=FUTURE; side flips on basis sign); manifest cell CARRY_BASIS_DATED"
-                ),
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.LEADER_HEDGE,
-        notes=notes,
-    )
-
-
-def _recursive_staked_structure() -> ArchetypeLegStructure:
-    """CARRY_RECURSIVE_STAKED: leveraged LST loop (STAKE->LEND->BORROW) xN atomic.
-
-    Cites ``CarryRecursiveStakedEngine._build_loop_legs`` (recursive_staked.py)
-    emitting the ATOMIC_ON_CHAIN loop.
-    """
-
-    src = (
-        "strategy-service CarryRecursiveStakedEngine._build_loop_legs "
-        "(recursive_staked.py, STAKE→LEND→BORROW loop, ATOMIC_ON_CHAIN); "
-        "manifest cell CARRY_RECURSIVE_STAKED (DEFI, staking)"
-    )
-    atomic = LegConstraint(
-        kind=LegConstraintKind.REQUIRES_ATOMIC_BUNDLE,
-        params={"bundle_id": "recursive_loop"},
-        description="All loop iterations execute atomically on-chain (ATOMIC_ON_CHAIN composite call).",
-    )
-    return ArchetypeLegStructure(
-        archetype_id=StrategyArchetype.CARRY_RECURSIVE_STAKED,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="loop_stake",
-                role=ArchetypeLegRole.STAKE,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.STAKING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("lido", "rocketpool", "jito", "marinade"),
-                constraints=(atomic,),
-                source_of_truth=src,
-            ),
-            ArchetypeLegSpec(
-                leg_id="loop_collateral",
-                role=ArchetypeLegRole.LEND,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.LENDING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "kamino"),
-                constraints=(atomic,),
-                source_of_truth=src,
-            ),
-            ArchetypeLegSpec(
-                leg_id="loop_borrow",
-                role=ArchetypeLegRole.BORROW,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.LENDING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "kamino"),
-                signal_variants=("effective_ltv", "target_leverage"),
-                constraints=(atomic,),
-                source_of_truth=src,
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.ATOMIC_ON_CHAIN,
-        notes="Up to 10 loop iterations (recursive_staked.py max_loops); LTV-gated leverage.",
-    )
-
-
-def _recursive_borrow_lending_only_structure() -> ArchetypeLegStructure:
-    """CARRY_RECURSIVE_BORROW_LENDING_ONLY: pure lending-side recursion (no stake).
-
-    Config sibling of CARRY_RECURSIVE_STAKED (recursive_staked.ALLOWED_ARCHETYPES);
-    the LEND→BORROW loop without the STAKE leg.
-    """
-
-    src = (
-        "strategy-service CarryRecursiveStakedEngine (recursive_staked.py, "
-        "ALLOWED_ARCHETYPES includes CARRY_RECURSIVE_BORROW_LENDING_ONLY, "
-        "LENDING_ONLY = LEND→BORROW loop); enums.py archetype comment"
-    )
-    atomic = LegConstraint(
-        kind=LegConstraintKind.REQUIRES_ATOMIC_BUNDLE,
-        params={"bundle_id": "recursive_loop"},
-        description="Lending-loop iterations execute atomically on-chain.",
-    )
-    return ArchetypeLegStructure(
-        archetype_id=StrategyArchetype.CARRY_RECURSIVE_BORROW_LENDING_ONLY,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="loop_collateral",
-                role=ArchetypeLegRole.LEND,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.LENDING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "kamino", "compound_v3", "morpho"),
-                constraints=(atomic,),
-                source_of_truth=src,
-            ),
-            ArchetypeLegSpec(
-                leg_id="loop_borrow",
-                role=ArchetypeLegRole.BORROW,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.LENDING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "kamino", "compound_v3", "morpho"),
-                signal_variants=("effective_ltv", "target_leverage"),
-                constraints=(atomic,),
-                source_of_truth=src,
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.ATOMIC_ON_CHAIN,
-        notes="Family 2 recursive variant — lending-side only, no LST stake leg.",
-    )
-
-
-def _staking_simple_structure() -> ArchetypeLegStructure:
-    """YIELD_STAKING_SIMPLE: a single stake leg, no hedge."""
-
-    return ArchetypeLegStructure(
-        archetype_id=StrategyArchetype.YIELD_STAKING_SIMPLE,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="stake",
-                role=ArchetypeLegRole.STAKE,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.STAKING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("lido", "rocketpool", "etherfi", "jito", "marinade"),
-                source_of_truth=(
-                    "strategy-service YieldStakingSimpleEngine (staking_simple.py, "
-                    "single STAKE leg); manifest cell YIELD_STAKING_SIMPLE (DEFI, staking) "
-                    "note 'Pure staking, no hedge'"
-                ),
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.ATOMIC_ON_CHAIN,
-        notes="Single-leg archetype — included for leg-model completeness (the trivial structure).",
-    )
-
-
-def _rotation_lending_structure() -> ArchetypeLegStructure:
-    """YIELD_ROTATION_LENDING: a single lend leg, rotated across venues."""
-
-    return ArchetypeLegStructure(
-        archetype_id=StrategyArchetype.YIELD_ROTATION_LENDING,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="lend",
-                role=ArchetypeLegRole.LEND,
-                required=True,
-                instrument_types=(ArchetypeInstrumentType.LENDING,),
-                asset_groups=(VenueCategoryV2.DEFI,),
-                eligible_venue_ids=("aave_v3", "compound_v3", "euler", "morpho", "kamino"),
-                signal_variants=("apy_rotation",),
-                source_of_truth=(
-                    "strategy-service YieldRotationLendingEngine (rotation_lending.py, "
-                    "rotate lent capital to highest-APY venue); manifest cell "
-                    "YIELD_ROTATION_LENDING (DEFI, lending)"
-                ),
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.SEQUENCED_WITH_PACING,
-        notes="Single-leg archetype; rotation across venues is a venue-switch, not a second leg.",
-    )
-
-
-def _price_dispersion_structure() -> ArchetypeLegStructure:
-    """ARBITRAGE_PRICE_DISPERSION: a buy leg + a sell leg cross-venue.
-
-    Cites ``ArbitragePriceDispersionEngine`` (price_dispersion.py): the cheaper
-    venue is the BUY leader (``spot_long``), the richer venue the SELL hedge
-    (``spot_short``); same-chain → ATOMIC, cross-venue → LEADER_HEDGE.
-    """
-
-    src = (
-        "strategy-service ArbitragePriceDispersionEngine (price_dispersion.py, "
-        "BUY leader + SELL hedge AtomicLegs); manifest cell ARBITRAGE_PRICE_DISPERSION; "
-        "codex/09-strategy/architecture-v2/archetypes/arbitrage-price-dispersion.md"
-    )
-    # candidate_venues spans CEFI + DEFI + SPORTS + PREDICTION per the doc venue_universe.
-    venues = (
-        "binance",
-        "okx",
-        "bybit",
-        "hyperliquid",
-        "deribit",
-        "uniswap_v3",
-        "balancer",
-        "curve",
-        "gmx_v2",
-        "drift",
-        "unity",
-        "betfair_direct",
-        "smarkets_direct",
-        "polymarket",
-    )
-    groups = (
-        VenueCategoryV2.CEFI,
-        VenueCategoryV2.DEFI,
-        VenueCategoryV2.SPORTS,
-        VenueCategoryV2.PREDICTION,
-        VenueCategoryV2.TRADFI,
-    )
-    atomic = LegConstraint(
-        kind=LegConstraintKind.REQUIRES_ATOMIC_BUNDLE,
-        params={"bundle_id": "dispersion_pair"},
-        description=(
-            "Same-chain pairs execute ATOMIC (multicall / flash-loan); cross-venue "
-            "non-atomic pairs run LEADER_HEDGE with abort-on-adverse-move."
-        ),
-    )
-    return ArchetypeLegStructure(
-        archetype_id=StrategyArchetype.ARBITRAGE_PRICE_DISPERSION,
-        legs=(
-            ArchetypeLegSpec(
-                leg_id="buy",
-                role=ArchetypeLegRole.SPOT_LONG,
-                required=True,
-                instrument_types=(
-                    ArchetypeInstrumentType.SPOT,
-                    ArchetypeInstrumentType.PERP,
-                    ArchetypeInstrumentType.EVENT_SETTLED,
-                ),
-                asset_groups=groups,
-                eligible_venue_ids=venues,
-                signal_variants=("dispersion_bps",),
-                constraints=(atomic,),
-                source_of_truth=f"{src} (cheaper venue = BUY leader)",
-            ),
-            ArchetypeLegSpec(
-                leg_id="sell",
-                role=ArchetypeLegRole.SPOT_SHORT,
-                required=True,
-                instrument_types=(
-                    ArchetypeInstrumentType.SPOT,
-                    ArchetypeInstrumentType.PERP,
-                    ArchetypeInstrumentType.EVENT_SETTLED,
-                ),
-                asset_groups=groups,
-                eligible_venue_ids=venues,
-                signal_variants=("dispersion_bps",),
-                constraints=(atomic,),
-                source_of_truth=f"{src} (richer venue = SELL hedge)",
-            ),
-        ),
-        execution_coupling=AtomicExecutionMode.ATOMIC,
-        notes="2-leg paired cross-venue arb; same instrument (or equivalent) on two venues.",
-    )
-
-
 def _build_registry() -> dict[StrategyArchetype, ArchetypeLegStructure]:
-    structures: tuple[ArchetypeLegStructure, ...] = (
-        _staked_basis_structure(
-            StrategyArchetype.CARRY_STAKED_BASIS,
-            hedge_role=ArchetypeLegRole.HEDGE_SHORT,
-            hedge_instrument=ArchetypeInstrumentType.PERP,
-            notes=(
-                "3-leg structure (spot_long + stake + lend) + perp hedge_short. "
-                "Conditional: LST accepted as perp collateral on the hedge venue → "
-                "staked basis; not accepted → straight_basis fallback (stake leg dropped)."
-            ),
-        ),
-        _staked_basis_structure(
-            StrategyArchetype.CARRY_STAKED_BASIS_DATED,
-            hedge_role=ArchetypeLegRole.FUTURE_SHORT,
-            hedge_instrument=ArchetypeInstrumentType.DATED_FUTURE,
-            notes=(
-                "Dated-hedge variant of CARRY_STAKED_BASIS — hedge leg is a Deribit "
-                "dated ETH future (manifest cell CARRY_STAKED_BASIS_DATED; "
-                "catalog_staked_basis dated slots). Same collateral conditional."
-            ),
-        ),
-        _basis_perp_structure(
-            StrategyArchetype.CARRY_BASIS_PERP,
-            inverse=False,
-            notes="Spot + perp delta-neutral basis (short the basis when funding > 0).",
-        ),
-        _basis_perp_structure(
-            StrategyArchetype.CARRY_BASIS_PERP_INV,
-            inverse=True,
-            notes="Inverse basis-perp: lend/USDC-margined perp + hold spot (enums.py comment).",
-        ),
-        _basis_dated_structure(
-            StrategyArchetype.CARRY_BASIS_DATED,
-            inverse=False,
-            notes="Spot + dated-future cash-and-carry (contango: long spot, short future).",
-        ),
-        _basis_dated_structure(
-            StrategyArchetype.CARRY_BASIS_DATED_INV,
-            inverse=True,
-            notes="Inverse dated basis (backwardation: short spot, long future).",
-        ),
-        _recursive_staked_structure(),
-        _recursive_borrow_lending_only_structure(),
-        _staking_simple_structure(),
-        _rotation_lending_structure(),
-        _price_dispersion_structure(),
+    """Build the EXHAUSTIVE 57-archetype registry from the seeds module.
+
+    The per-archetype seed builders live in ``archetype_leg_spec_seeds`` (split
+    out so the full Phase 6A backfill fits the 900-line file cap). This function
+    asserts the seeds cover EVERY ``StrategyArchetype`` value exactly once —
+    real structures where derivable, explicit ``not_registered`` structures
+    (legs=() + cited reason) where genuinely underivable. The registry therefore
+    NEVER has an absent key (the exhaustive-enumeration guarantee).
+
+    The import is deferred (inside the function) because the seeds module imports
+    the schema classes from THIS module — a module-level import would be circular.
+    """
+
+    from unified_api_contracts.internal.architecture_v2.archetype_leg_spec_seeds import (
+        build_all_structures,
     )
-    return {s.archetype_id: s for s in structures}
+
+    structures = build_all_structures()
+    registry = {s.archetype_id: s for s in structures}
+    if len(registry) != len(structures):
+        raise ValueError("archetype_leg_spec_seeds emitted a duplicate archetype_id")
+    missing = set(StrategyArchetype) - set(registry)
+    if missing:
+        names = ", ".join(sorted(a.value for a in missing))
+        raise ValueError(
+            f"archetype_leg_spec_seeds does not enumerate all {len(StrategyArchetype)} archetypes "
+            f"(missing: {names}) — the registry must be exhaustive (Phase 6A)"
+        )
+    return registry
 
 
 ARCHETYPE_LEG_STRUCTURES: Final[dict[StrategyArchetype, ArchetypeLegStructure]] = _build_registry()
-"""Registry of structural leg models, keyed by ``StrategyArchetype``.
+"""Registry of structural leg models, keyed by ``StrategyArchetype`` — EXHAUSTIVE.
 
 SSOT for **leg truth** (see module docstring re: dual-representation with
-``ARCHETYPE_CAPABILITY_REGISTRY``). Only the multi-leg + representative
-single-leg archetypes seeded for F22 are present; every other archetype is an
-honest gap (see ``archetypes_without_leg_structures``).
+``ARCHETYPE_CAPABILITY_REGISTRY``). Phase 6A: every one of the 57 archetypes is
+present — real legs where derivable, an explicit ``not_registered`` structure
+(``legs=()`` + ``not_registered_reason``) where genuinely underivable. There are
+NO absent keys (use ``archetypes_without_leg_structures`` for the not_registered
+set).
 """
 
 
 def leg_structure_for(archetype_id: StrategyArchetype) -> ArchetypeLegStructure | None:
-    """Return the leg structure for ``archetype_id`` or ``None`` if not seeded."""
+    """Return the leg structure for ``archetype_id``.
+
+    Always non-``None`` for a valid archetype (the registry is exhaustive); the
+    ``| None`` return is retained for call-site compatibility + dict-miss safety.
+    A ``not_registered`` archetype returns its explicit not_registered structure,
+    never ``None``.
+    """
 
     return ARCHETYPE_LEG_STRUCTURES.get(archetype_id)
 
 
 def all_leg_structures() -> tuple[ArchetypeLegStructure, ...]:
-    """Return every seeded leg structure, sorted by archetype id (deterministic)."""
+    """Return every leg structure (all 57), sorted by archetype id (deterministic)."""
 
     return tuple(ARCHETYPE_LEG_STRUCTURES[a] for a in sorted(ARCHETYPE_LEG_STRUCTURES, key=lambda x: x.value))
 
 
-def archetypes_without_leg_structures() -> tuple[StrategyArchetype, ...]:
-    """The honest-gap set: archetypes with NO leg structure yet.
+def registered_leg_structures() -> tuple[ArchetypeLegStructure, ...]:
+    """The REAL-leg structures (not_registered=False), sorted (deterministic).
 
-    Enumerable so the exporter can emit one ``not_registered`` 'legs' gap edge
-    per archetype (exhaustive honesty) and so a test can assert the gap set is
-    explicit, not silent.
+    These are the archetypes whose leg model is genuinely derivable from
+    engine/doc/cells — the set the wizard renders as leg-aware. Complements
+    ``archetypes_without_leg_structures``.
     """
 
-    return tuple(a for a in sorted(StrategyArchetype, key=lambda x: x.value) if a not in ARCHETYPE_LEG_STRUCTURES)
+    return tuple(s for s in all_leg_structures() if not s.not_registered)
+
+
+def archetypes_without_leg_structures() -> tuple[StrategyArchetype, ...]:
+    """The honest-gap set: archetypes whose structure is ``not_registered``.
+
+    Phase 6A semantics: the registry now ENUMERATES all 57 archetypes, so this is
+    no longer "absent keys" — it is the set of archetypes carrying an explicit
+    ``not_registered`` structure (legs=() + cited reason). The exporter emits one
+    ``not_registered`` 'legs' gap edge per such archetype; a test asserts the gap
+    set is explicit (every member has a ``not_registered_reason``), not silent.
+    """
+
+    return tuple(
+        a
+        for a in sorted(StrategyArchetype, key=lambda x: x.value)
+        if (s := ARCHETYPE_LEG_STRUCTURES.get(a)) is None or s.not_registered
+    )
 
 
 __all__ = [
@@ -885,4 +475,5 @@ __all__ = [
     "all_leg_structures",
     "archetypes_without_leg_structures",
     "leg_structure_for",
+    "registered_leg_structures",
 ]
