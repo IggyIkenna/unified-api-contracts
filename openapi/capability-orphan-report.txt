@@ -1,10 +1,16 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: 180fb56c3cc5397b36113e146dde3c81ab3f3e66
+# generated_from_commit: def855c23947d2692c58f1edd11562baaa2d7642
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
 # Logical dead-ends are registry-blocked combos (correct, not a gap).
+# Broker-classed venues (F38) are venue nodes that are actually brokers
+# (in BROKER_ROUTES) — they should be broker nodes, not peer venues.
+
+## Broker-classed venues (F38) (0)
+
+(none — all declared brokers correctly classified as broker nodes)
 
 ## Orphan nodes (87)
 
@@ -286,9 +292,9 @@ LOGICAL: YIELD_ROTATION_LENDING x lending (CEFI) — CeFi lending out-of-scope: 
 
 === VERDICT MATRIX SUMMARY (Phase 6A) ===
 Exhaustive cross-join: archetype x venue x instrument_type x (instruction_action x algo).
-  total cells:    22448
-  available:      15093 (67.2%)
-  blocked:        7259 (32.3%)
+  total cells:    24752
+  available:      16913 (68.3%)
+  blocked:        7743 (31.3%)
   not_registered: 96 (0.4%)
 Output: openapi/capability-verdict-matrix.json
 === END VERDICT MATRIX SUMMARY ===

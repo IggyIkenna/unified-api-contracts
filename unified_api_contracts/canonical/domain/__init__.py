@@ -158,6 +158,8 @@ from .market.tradfi import (
 )
 from .onchain import (
     CanonicalOnChainMetric,
+    GovernanceParamsRow,
+    governance_params_gcs_prefix,
 )
 from .position import (
     AggregatedPosition,
@@ -447,6 +449,7 @@ __all__ = [
     "FixtureNotFoundError",
     "FundingRateHistory",
     "FuturesContractLifecyclePhase",
+    "GovernanceParamsRow",
     "HealthPingResponse",
     "HttpRateLimitHeaders",
     "InstructionType",
@@ -543,6 +546,7 @@ __all__ = [
     "classify_scheduled_job",
     "classify_vm_name",
     "get_expected_bookmakers",
+    "governance_params_gcs_prefix",
     "resolve_environment_from_env",
     "resolve_environment_from_hostname",
 ]
