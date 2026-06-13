@@ -1,0 +1,366 @@
+{
+  "archetypes": [
+    {
+      "archetype_id": "ARBITRAGE_CROSS_DOMAIN_EVENT",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_BACKRUN",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_JIT_LIQUIDITY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_LIQUIDATION_BUNDLE",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ARBITRAGE_MEV_SANDWICH",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ARBITRAGE_PRICE_DISPERSION",
+      "evidence": "live_cluster_registry:mtds-live-binance",
+      "gate": "D5",
+      "readiness": "live-proven"
+    },
+    {
+      "archetype_id": "CARRY_BASIS_DATED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_BASIS_DATED_INV",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_BASIS_PERP",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_BASIS_PERP_INV",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_RECURSIVE_BORROW_LENDING_ONLY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_RECURSIVE_STAKED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "CARRY_STAKED_BASIS",
+      "evidence": "live_cluster_registry:mtds-live-binance",
+      "gate": "D5",
+      "readiness": "live-proven"
+    },
+    {
+      "archetype_id": "CARRY_STAKED_BASIS_DATED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "DEFI_LP_CONCENTRATED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "DEFI_LP_POOL",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "DEFI_LP_VAULT",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "EVENT_DRIVEN",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "LIQUIDATION_CAPTURE",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_CONTINUOUS",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_EVENT_SETTLED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_INVENTORY_SKEW",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_ML_LEAN",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_PASSIVE_SPREAD",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_PREDICTION",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "MARKET_MAKING_QUEUE_MICROSTRUCTURE",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ML_DIRECTIONAL_CONTINUOUS",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "ML_DIRECTIONAL_EVENT_SETTLED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "PORTFOLIO_FACTOR_ALLOCATION",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "PORTFOLIO_MULTI_STRATEGY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "PORTFOLIO_RISK_PARITY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "PORTFOLIO_TACTICAL_OVERLAY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "RULES_DIRECTIONAL_CONTINUOUS",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "RULES_DIRECTIONAL_EVENT_SETTLED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "STAT_ARB_CROSS_SECTIONAL",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "STAT_ARB_PAIRS_FIXED",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_0DTE_GAMMA_SCALPING",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_0DTE_PIN_RISK",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_ARB_RV_IV",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_CARRY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_CROSS_ASSET_SPREAD",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_DISPERSION",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_LEAPS_CONVEXITY",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_MARKET_MAKING",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_ML_LEAN",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_OVERLAY_COVERED_CALLS",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_OVERLAY_PROTECTIVE_PUT",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_RATIO_SPREAD",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_SPREAD_STRUCTURES",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_STRADDLE",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_SYNTHETIC_DELTA",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_TERM_STRUCTURE_ARB",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_TERM_STRUCTURE_SLOPE",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_TRADING_OPTIONS",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "VOL_VARIANCE_SWAP",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "YIELD_ROTATION_LENDING",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    },
+    {
+      "archetype_id": "YIELD_STAKING_SIMPLE",
+      "evidence": "",
+      "gate": "C2",
+      "readiness": "backtest-only"
+    }
+  ],
+  "evidence_model": "live_cluster_registry (PROD\u2192live-proven, STAGING\u2192staging-proven); absent evidence \u2192 backtest-only (honest default); shadow-observed only via committed override (none on-host today)",
+  "manifest_commit": "553850a242d4f3457f8f721d6cbf7c22332db211",
+  "readiness_tiers": [
+    "backtest-only",
+    "shadow-observed",
+    "staging-proven",
+    "live-proven"
+  ],
+  "readiness_to_gate": {
+    "backtest-only": "C2",
+    "live-proven": "D5",
+    "shadow-observed": "D2",
+    "staging-proven": "D3"
+  },
+  "tier_distribution": {
+    "backtest-only": 55,
+    "live-proven": 2,
+    "shadow-observed": 0,
+    "staging-proven": 0
+  }
+}
