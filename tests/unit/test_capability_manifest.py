@@ -311,8 +311,10 @@ def test_broker_registry_is_empty_honest_gap() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_fees_registry_is_empty_honest_gap() -> None:
-    assert FEES_REGISTRY == []
+def test_fees_registry_backfilled() -> None:
+    """Backfilled 2026-06-13 (MVP venue universe; CeFi official base tiers +
+    code-cited DeFi). See test_order_semantics_sim_backfill.py for coverage."""
+    assert len(FEES_REGISTRY) >= 20
 
 
 def test_fee_component_values_coverage() -> None:
@@ -350,8 +352,10 @@ def test_fee_schedule_construction() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_sim_assumptions_registry_is_empty_honest_gap() -> None:
-    assert SIM_ASSUMPTIONS_REGISTRY == []
+def test_sim_assumptions_registry_backfilled() -> None:
+    """Backfilled 2026-06-13 from the strategy-service backtest-runner scan (F11);
+    see test_order_semantics_sim_backfill.py for full coverage assertions."""
+    assert len(SIM_ASSUMPTIONS_REGISTRY) >= 16
 
 
 def test_matching_model_benchmark_fill_mapping_complete() -> None:
@@ -383,8 +387,9 @@ def test_simulation_assumption_construction() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_offered_fund_structures_is_empty_honest_gap() -> None:
-    assert OFFERED_FUND_STRUCTURES == []
+def test_offered_fund_structures_backfilled() -> None:
+    """Backfilled 2026-06-13 from sma-vs-pooled.md (POOLED + SMA)."""
+    assert len(OFFERED_FUND_STRUCTURES) == 2
 
 
 def test_fund_structure_kind_values() -> None:
@@ -426,8 +431,10 @@ def test_fund_structures_module_share_class_is_same_as_enums_share_class() -> No
 # ---------------------------------------------------------------------------
 
 
-def test_venue_order_semantics_is_empty_honest_gap() -> None:
-    assert VENUE_ORDER_SEMANTICS == []
+def test_venue_order_semantics_backfilled() -> None:
+    """Backfilled 2026-06-13 from the execution-service venue-adapter scan;
+    see test_order_semantics_sim_backfill.py for full coverage assertions."""
+    assert len(VENUE_ORDER_SEMANTICS) >= 9
 
 
 def test_time_in_force_values() -> None:
@@ -478,8 +485,10 @@ def test_order_semantics_atomic_execution_mode_reused() -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_trading_agent_capabilities_is_empty_honest_gap() -> None:
-    assert TRADING_AGENT_CAPABILITIES == []
+def test_trading_agent_capabilities_backfilled() -> None:
+    """Backfilled 2026-06-13 from trading-agent-service (stub, enabled=False)."""
+    assert len(TRADING_AGENT_CAPABILITIES) == 3
+    assert all(not c.enabled for c in TRADING_AGENT_CAPABILITIES)
 
 
 def test_trading_agent_capability_construction() -> None:

@@ -86,10 +86,46 @@ class TradingAgentCapability(BaseModel):
 # ---------------------------------------------------------------------------
 
 #: Per-archetype trading-agent / LLM capability declarations.
-#: Empty: the trading-agent-service ↔ strategy registry link is currently
-#: absent. This is a ``missing_registry`` gap tracked in
-#: ``plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md``.
-TRADING_AGENT_CAPABILITIES: Final[list[TradingAgentCapability]] = []
+#:
+#: BACKFILLED 2026-06-13 from a scan of trading-agent-service. The service is
+#: currently a STUB: ``core/allocation_directive_loop.py`` emits a NO-OP
+#: ``ArchetypeAllocationDirective`` (source="trading-agent-service-stub",
+#: docstring line 5/42) for the lead-pair archetypes
+#: (``_LEAD_PAIR_ARCHETYPES = ("carry_staked_basis", "arbitrage_price_dispersion")``,
+#: line 32) plus ``VOL_TRADING_OPTIONS`` (``_VOL_TRADING_OPTIONS_ARCHETYPE``,
+#: line 38). The default decision model is ``claude-haiku-4-5-20251001``
+#: (``config.py:156``). It is NOT yet operational end-to-end → every entry is
+#: ``enabled=False`` (declared surface, no live agent-driven instruction
+#: generation). All other archetypes are honestly absent (no agent surface).
+TRADING_AGENT_CAPABILITIES: Final[list[TradingAgentCapability]] = [
+    TradingAgentCapability(
+        archetype=StrategyArchetype.CARRY_STAKED_BASIS,
+        allowed_decision_models=["anthropic/claude-haiku-4-5-20251001"],
+        parameter_guidance_scope=(
+            "Allocation-level only: emits ArchetypeAllocationDirective to strategy-service "
+            "(no per-instruction generation). Currently a no-op stub."
+        ),
+        enabled=False,
+    ),
+    TradingAgentCapability(
+        archetype=StrategyArchetype.ARBITRAGE_PRICE_DISPERSION,
+        allowed_decision_models=["anthropic/claude-haiku-4-5-20251001"],
+        parameter_guidance_scope=(
+            "Allocation-level only: emits ArchetypeAllocationDirective to strategy-service "
+            "(no per-instruction generation). Currently a no-op stub."
+        ),
+        enabled=False,
+    ),
+    TradingAgentCapability(
+        archetype=StrategyArchetype.VOL_TRADING_OPTIONS,
+        allowed_decision_models=["anthropic/claude-haiku-4-5-20251001"],
+        parameter_guidance_scope=(
+            "Allocation-level only (trading-agent-service allocation_directive_loop.py:38 "
+            "_VOL_TRADING_OPTIONS_ARCHETYPE). Currently a no-op stub."
+        ),
+        enabled=False,
+    ),
+]
 
 
 __all__ = [
