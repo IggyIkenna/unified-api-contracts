@@ -114,6 +114,16 @@ from unified_api_contracts.internal.architecture_v2.compliance import (
     ViolationCode,
     combo_id_for,
 )
+
+# ---------------------------------------------------------------------------
+# Cost & capacity model (Wave-2 #8, capability_wizard_and_manifest_2026_06_11.md).
+# Consumes FEES_REGISTRY + the lifecycle_class taxonomy. ADDITIVE.
+# ---------------------------------------------------------------------------
+from unified_api_contracts.internal.architecture_v2.cost_capacity import (
+    CostCapacityModel,
+    VenueFeeBreakdown,
+    compute_cost_capacity,
+)
 from unified_api_contracts.internal.architecture_v2.cross_venue_routing_policy import (
     CROSS_VENUE_ROUTING_POLICIES,
     CrossVenueLegRole,
@@ -481,6 +491,7 @@ __all__ = [
     "ComplianceSink",
     "ConvertDustInstruction",
     "ConvertedTokenLeg",
+    "CostCapacityModel",
     "CoverageStatus",
     "CrossVenueLegRole",
     "CrossVenuePolicyNotFoundError",
@@ -619,6 +630,7 @@ __all__ = [
     "VenueConstraints",
     "VenueExecutionKind",
     "VenueFeature",
+    "VenueFeeBreakdown",
     "VenueOrderSemantics",
     "VenueRoutingMode",
     "VenueType",
@@ -639,6 +651,7 @@ __all__ = [
     "check_service_family_scope",
     "combo",
     "combo_id_for",
+    "compute_cost_capacity",
     "cost",
     "demo_universe",
     "fund_for",
