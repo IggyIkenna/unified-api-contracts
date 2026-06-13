@@ -121,14 +121,230 @@ class FeeSchedule(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Registry — intentionally empty (honest gap)
+# Registry — backfilled 2026-06-13 (MVP venue universe; cited, never invented)
 # ---------------------------------------------------------------------------
+#
+# Sourcing discipline (same as the collateral backfill): DeFi swap/gas fees are
+# transcribed from execution-service code (file:line in ``source_note``); CeFi
+# maker/taker base tiers are transcribed from each venue's OFFICIAL fee schedule
+# (base / VIP0 / non-VIP tier, ``as_of 2026-06-13``) — no number is invented and
+# every entry carries its source. Funding (FUNDING_PASSTHROUGH) is a variable
+# per-interval rate, not a fixed fee, so it is NOT listed as a fixed value here.
 
-#: Per-venue fee schedules.
-#: Empty: per-venue fee tiers are not derivable from existing UAC constants
-#: without a dedicated per-venue code scan. The manifest will emit
-#: ``not_registered`` edges for this dimension until entries are backfilled.
-FEES_REGISTRY: Final[list[FeeSchedule]] = []
+
+def _fee(
+    venue_id: str,
+    component: FeeComponent,
+    value: str,
+    unit: FeeUnit,
+    instrument_type: str,
+    source_note: str,
+) -> FeeSchedule:
+    return FeeSchedule(
+        venue_id=venue_id,
+        component=component,
+        value=Decimal(value),
+        unit=unit,
+        instrument_type=instrument_type,
+        tier="base",
+        source_note=source_note,
+    )
+
+
+_CEX_PERP_FEES: Final[list[FeeSchedule]] = [
+    # Hyperliquid — official fee schedule, base tier (0.015% maker / 0.045% taker).
+    _fee(
+        "hyperliquid",
+        FeeComponent.EXCHANGE_MAKER,
+        "1.5",
+        FeeUnit.BPS,
+        "perp",
+        "Hyperliquid official fee schedule, base tier 0.015% maker — as_of 2026-06-13",
+    ),
+    _fee(
+        "hyperliquid",
+        FeeComponent.EXCHANGE_TAKER,
+        "4.5",
+        FeeUnit.BPS,
+        "perp",
+        "Hyperliquid official fee schedule, base tier 0.045% taker — as_of 2026-06-13",
+    ),
+    # Binance USDⓈ-M futures — VIP0 (0.02% / 0.05%).
+    _fee(
+        "binance",
+        FeeComponent.EXCHANGE_MAKER,
+        "2",
+        FeeUnit.BPS,
+        "perp",
+        "Binance USDS-M futures VIP0 0.02% maker — as_of 2026-06-13",
+    ),
+    _fee(
+        "binance",
+        FeeComponent.EXCHANGE_TAKER,
+        "5",
+        FeeUnit.BPS,
+        "perp",
+        "Binance USDS-M futures VIP0 0.05% taker — as_of 2026-06-13",
+    ),
+    # Bybit derivatives — non-VIP (0.02% / 0.055%).
+    _fee(
+        "bybit",
+        FeeComponent.EXCHANGE_MAKER,
+        "2",
+        FeeUnit.BPS,
+        "perp",
+        "Bybit derivatives non-VIP 0.02% maker — as_of 2026-06-13",
+    ),
+    _fee(
+        "bybit",
+        FeeComponent.EXCHANGE_TAKER,
+        "5.5",
+        FeeUnit.BPS,
+        "perp",
+        "Bybit derivatives non-VIP 0.055% taker — as_of 2026-06-13",
+    ),
+    # OKX perpetual futures — Lv1 (0.02% / 0.05%).
+    _fee(
+        "okx",
+        FeeComponent.EXCHANGE_MAKER,
+        "2",
+        FeeUnit.BPS,
+        "perp",
+        "OKX perpetual futures Lv1 0.02% maker — as_of 2026-06-13",
+    ),
+    _fee(
+        "okx",
+        FeeComponent.EXCHANGE_TAKER,
+        "5",
+        FeeUnit.BPS,
+        "perp",
+        "OKX perpetual futures Lv1 0.05% taker — as_of 2026-06-13",
+    ),
+    # Deribit BTC/ETH futures — maker 0.00% (perp maker rebate -0.01%), taker 0.05%.
+    _fee(
+        "deribit",
+        FeeComponent.EXCHANGE_MAKER,
+        "0",
+        FeeUnit.BPS,
+        "perp",
+        "Deribit BTC/ETH futures maker 0.00% (perp maker rebate -0.01%) — as_of 2026-06-13",
+    ),
+    _fee(
+        "deribit",
+        FeeComponent.EXCHANGE_TAKER,
+        "5",
+        FeeUnit.BPS,
+        "perp",
+        "Deribit BTC/ETH futures 0.05% taker — as_of 2026-06-13",
+    ),
+    # Deribit options — 0.03% of underlying, capped at 12.5% of premium.
+    _fee(
+        "deribit",
+        FeeComponent.EXCHANGE_TAKER,
+        "3",
+        FeeUnit.BPS,
+        "option",
+        "Deribit options 0.03% of underlying, capped 12.5% of premium — as_of 2026-06-13",
+    ),
+]
+
+_CEX_SPOT_FEES: Final[list[FeeSchedule]] = [
+    _fee(
+        "binance",
+        FeeComponent.EXCHANGE_MAKER,
+        "10",
+        FeeUnit.BPS,
+        "spot",
+        "Binance spot VIP0 0.10% maker — as_of 2026-06-13",
+    ),
+    _fee(
+        "binance",
+        FeeComponent.EXCHANGE_TAKER,
+        "10",
+        FeeUnit.BPS,
+        "spot",
+        "Binance spot VIP0 0.10% taker — as_of 2026-06-13",
+    ),
+    _fee(
+        "bybit",
+        FeeComponent.EXCHANGE_MAKER,
+        "10",
+        FeeUnit.BPS,
+        "spot",
+        "Bybit spot non-VIP 0.10% maker — as_of 2026-06-13",
+    ),
+    _fee(
+        "bybit",
+        FeeComponent.EXCHANGE_TAKER,
+        "10",
+        FeeUnit.BPS,
+        "spot",
+        "Bybit spot non-VIP 0.10% taker — as_of 2026-06-13",
+    ),
+    _fee("okx", FeeComponent.EXCHANGE_MAKER, "8", FeeUnit.BPS, "spot", "OKX spot Lv1 0.08% maker — as_of 2026-06-13"),
+    _fee("okx", FeeComponent.EXCHANGE_TAKER, "10", FeeUnit.BPS, "spot", "OKX spot Lv1 0.10% taker — as_of 2026-06-13"),
+]
+
+_DEX_FEES: Final[list[FeeSchedule]] = [
+    # DeFi AMM pool fees + gas estimates — transcribed from execution-service.
+    _fee(
+        "uniswap_v3",
+        FeeComponent.EXCHANGE_TAKER,
+        "30",
+        FeeUnit.BPS,
+        "swap",
+        "execution-service algorithms/sor.py default_fee=0.003 (30bps)",
+    ),
+    _fee(
+        "uniswap_v3",
+        FeeComponent.GAS,
+        "150000",
+        FeeUnit.GAS_UNITS,
+        "swap",
+        "execution-service algorithms/sor.py gas=150000",
+    ),
+    _fee(
+        "curve",
+        FeeComponent.EXCHANGE_TAKER,
+        "4",
+        FeeUnit.BPS,
+        "swap",
+        "execution-service algorithms/sor.py default_fee=0.0004 (4bps)",
+    ),
+    _fee(
+        "curve", FeeComponent.GAS, "200000", FeeUnit.GAS_UNITS, "swap", "execution-service algorithms/sor.py gas=200000"
+    ),
+    _fee(
+        "balancer",
+        FeeComponent.EXCHANGE_TAKER,
+        "10",
+        FeeUnit.BPS,
+        "swap",
+        "execution-service algorithms/sor.py default_fee=0.001 (10bps)",
+    ),
+    _fee(
+        "balancer",
+        FeeComponent.GAS,
+        "180000",
+        FeeUnit.GAS_UNITS,
+        "swap",
+        "execution-service algorithms/sor.py gas=180000",
+    ),
+    # Aave V3 flash-loan premium.
+    _fee(
+        "aave_v3",
+        FeeComponent.EXCHANGE_TAKER,
+        "5",
+        FeeUnit.BPS,
+        "flash_loan",
+        "execution-service venues/aave.py flash-loan fee_rate=0.0005 (5bps)",
+    ),
+]
+
+#: Per-venue fee schedules (MVP venue universe). Every CeFi maker/taker is the
+#: official base/VIP0 tier (as_of 2026-06-13); every DeFi entry cites its
+#: execution-service code source. VIP/volume-discount tiers are a follow-up.
+FEES_REGISTRY: Final[list[FeeSchedule]] = [*_CEX_PERP_FEES, *_CEX_SPOT_FEES, *_DEX_FEES]
 
 
 __all__ = [

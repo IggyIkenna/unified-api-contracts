@@ -131,16 +131,46 @@ class FundStructureOffering(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Registry — intentionally empty (honest gap)
+# Registry — backfilled 2026-06-13 from the SMA-vs-Pooled codex SSOT
 # ---------------------------------------------------------------------------
-
-#: Offerable fund-structure configurations.
-#: Empty: the fund-administration-service state machines are the runtime SSOT
-#: for what is actively offered. The wizard registry needs a dedicated extract
-#: pass over fund_administration_service/allocation/capital_router.py and the
-#: subscription/redemption state machines — a ``missing_extraction`` gap tracked
-#: in ``plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md``.
-OFFERED_FUND_STRUCTURES: Final[list[FundStructureOffering]] = []
+#
+# Source: codex/14-customer-journeys/playbook-concepts/sma-vs-pooled.md +
+# fund-org-hierarchy.md (the documented structural decision: org → Pooled/SMA →
+# funds → clients). POOLED + SMA are the two documented offerable structures.
+# PROP (proprietary own-capital) is NOT a documented external offering today →
+# honestly omitted (not invented). The codex does NOT constrain subscription/
+# redemption/rebalance cadence at the STRUCTURE level (cadence is a per-fund
+# configuration), so the cadence lists are left empty here rather than invent
+# values; supports_daily_withdraw_deposit is conservatively False (no
+# structure-level same-day-liquidity guarantee is documented).
+OFFERED_FUND_STRUCTURES: Final[list[FundStructureOffering]] = [
+    FundStructureOffering(
+        kind=FundStructureKind.POOLED,
+        share_classes=list(ShareClass),
+        subscription_cadence=[],
+        redemption_cadence=[],
+        rebalance_cadence=[],
+        supports_daily_withdraw_deposit=False,
+        notes=(
+            "One fund holds multiple clients; each client is a SHARE CLASS with per-share-class NAV via the allocation "
+            "engine (one set of positions / market-data feed / API keys). Source: sma-vs-pooled.md. Subscription/"
+            "redemption/rebalance cadence is per-fund configuration, not constrained at the structure level."
+        ),
+    ),
+    FundStructureOffering(
+        kind=FundStructureKind.SMA,
+        share_classes=list(ShareClass),
+        subscription_cadence=[],
+        redemption_cadence=[],
+        rebalance_cadence=[],
+        supports_daily_withdraw_deposit=False,
+        notes=(
+            "Separately Managed Account — each client has their OWN fund running independently (per-client positions / "
+            "API keys / NAV = actual P&L; no allocation engine). HNW/institutional, bespoke mandate, per-client "
+            "regulatory reporting. Source: sma-vs-pooled.md. Cadence is per-fund configuration."
+        ),
+    ),
+]
 
 
 __all__ = [

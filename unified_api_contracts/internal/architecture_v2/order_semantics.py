@@ -204,15 +204,157 @@ class VenueOrderSemantics(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Registry — intentionally empty (honest gap, needs per-venue adapter scan)
+# Registry — backfilled from the execution-service adapter scan (2026-06-13)
 # ---------------------------------------------------------------------------
 
 #: Per-venue order-semantics declarations.
-#: Empty: per-venue TIF honor matrices, ref-pricing modes, and multi-leg
-#: delta handling require reading each venue's adapter implementation.
-#: This is a ``missing_extraction`` gap tracked in
-#: ``plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md``.
-VENUE_ORDER_SEMANTICS: Final[list[VenueOrderSemantics]] = []
+#:
+#: BACKFILLED 2026-06-13 from a code-scan of the execution-service venue
+#: adapters / connectors (every entry cites its source file:line in ``notes``;
+#: nothing is invented). CeFi perp order placement lives in
+#: ``execution_service/trade_execution/adapters/`` (CCXT + native HMAC
+#: adapters); DeFi/options placement lives in ``execution_service/venues/`` +
+#: ``execution_service/defi_execution/protocols/``. The canonical adapter TIF
+#: enum (``execution_service/trade_execution/order_types.py``) wires only
+#: GTC / IOC / FOK / POST_ONLY — GTD / REDUCE_ONLY are NOT adapter-wired on any
+#: venue today. ``auth_wired=available`` ⟺ the adapter places orders end-to-end;
+#: ``not_registered`` ⟺ scaffold (``NotImplementedError`` on ``place_order``).
+#: Source-scan provenance:
+#: ``plans/active/issues/capability_wizard_gap_discovery_2026_06_11.md`` (the
+#: auto-emitted ``gap_registry:order_semantics`` escalation).
+VENUE_ORDER_SEMANTICS: Final[list[VenueOrderSemantics]] = [
+    VenueOrderSemantics(
+        venue_id="hyperliquid",
+        honored_tif=[TimeInForce.GTC, TimeInForce.IOC, TimeInForce.FOK],
+        post_only=False,
+        make_take_modes=["make", "take"],
+        ref_pricing_modes=[RefPricingMode.FIXED],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
+        notes=(
+            "FULLY WIRED via CCXT (trade_execution/adapters/hyperliquid_ccxt.py:75-76 — "
+            "TIF sent only when != GTC). POST_ONLY not explicitly mapped; no reduce_only; "
+            "no multi-leg. Auth: CCXT apiKey+secret."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="deribit",
+        honored_tif=[TimeInForce.GTC, TimeInForce.IOC, TimeInForce.FOK],
+        post_only=False,
+        make_take_modes=["make", "take"],
+        ref_pricing_modes=[RefPricingMode.FIXED],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
+        notes=(
+            "FULLY WIRED for perps AND options (venues/deribit_orders.py:238-239 — TIF map "
+            "IOC->immediate_or_cancel, FOK->fill_or_kill, default good_til_cancelled; REST via "
+            "httpx). Option instrument classification + integer-contract amount conversion wired."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="drift",
+        honored_tif=[TimeInForce.GTC, TimeInForce.IOC],
+        post_only=False,
+        make_take_modes=["make", "take"],
+        ref_pricing_modes=[RefPricingMode.FIXED],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
+        notes=(
+            "FULLY WIRED Solana CLOB via driftpy (defi_execution/protocols/drift.py:317,346 — "
+            "place_order end-to-end). Perp venue."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="binance",
+        honored_tif=[],
+        post_only=False,
+        make_take_modes=[],
+        ref_pricing_modes=[],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        notes=(
+            "SCAFFOLD — place_order raises NotImplementedError "
+            "(trade_execution/adapters/binance_native.py:326). HMAC-SHA256 signing implemented; "
+            "TIF built into the param body but never sent (HTTP client not injected). "
+            "BLOCKED-CREDENTIALS for live wiring."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="bybit",
+        honored_tif=[],
+        post_only=False,
+        make_take_modes=[],
+        ref_pricing_modes=[],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        notes=(
+            "SCAFFOLD — all methods raise NotImplementedError "
+            "(trade_execution/adapters/bybit_native.py:318). v5 API signing implemented; "
+            "TIF in request body but not sent. BLOCKED-CREDENTIALS."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="okx",
+        honored_tif=[],
+        post_only=False,
+        make_take_modes=[],
+        ref_pricing_modes=[],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        notes=(
+            "SCAFFOLD — place_order raises NotImplementedError "
+            "(trade_execution/adapters/okx_native.py:329). TIF passed through but HTTP client "
+            "not injected. BLOCKED-CREDENTIALS."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="gmx_v2",
+        honored_tif=[],
+        post_only=False,
+        make_take_modes=[],
+        ref_pricing_modes=[],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.NOT_REGISTERED,
+        notes=(
+            "No execution adapter found in execution-service (venues/ or trade_execution/adapters/) as of 2026-06-13."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="aave_v3",
+        honored_tif=[],
+        post_only=False,
+        make_take_modes=[],
+        ref_pricing_modes=[],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[AtomicExecutionMode.ATOMIC_ON_CHAIN],
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
+        notes=(
+            "Lending venue — no CLOB/TIF order semantics. supply/withdraw/borrow/repay/flash_loan "
+            "wired via UDEI AAVEConnector (venues/aave.py). Flash-loan legs execute ATOMIC_ON_CHAIN."
+        ),
+    ),
+    VenueOrderSemantics(
+        venue_id="kamino",
+        honored_tif=[],
+        post_only=False,
+        make_take_modes=[],
+        ref_pricing_modes=[],
+        multi_leg_delta_owner=None,
+        atomic_execution_modes=[],
+        auth_wired=CapabilityEdgeStatus.AVAILABLE,
+        notes=(
+            "Lending-only — no CLOB/TIF order semantics. supply()/withdraw() wired "
+            "(defi_execution/protocols/kamino.py); no perp trading."
+        ),
+    ),
+]
 
 
 __all__ = [
