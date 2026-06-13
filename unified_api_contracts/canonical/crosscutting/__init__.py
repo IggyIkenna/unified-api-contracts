@@ -108,5 +108,6 @@ from .source_priority import select_primary_available_source as select_primary_a
 from .source_priority import source_required as source_required
 from .transfer_events import BusTransferType as BusTransferType
 from .transfer_events import TransferIntent as TransferIntent
+from .transfer_events import TransferPurpose as TransferPurpose
 from .transfer_events import TransferResult as TransferResult
 from .transfer_events import TransferResultStatus as TransferResultStatus

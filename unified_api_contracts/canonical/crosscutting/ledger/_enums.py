@@ -144,6 +144,18 @@ class EventType(StrEnum):
     fill, USDC ↔ USDT bridge-equivalent). Distinct from TRADE/SWAP to make
     margin / quote-currency attribution explicit."""
 
+    COLLATERAL_POSTED = "collateral_posted"
+    """Collateral / margin posted to a venue or protocol to support a position
+    (CeFi margin deposit, DeFi supply-as-collateral). Instruction-driven: the
+    strategy explicitly moves collateral. Margin-traceability event — pairs with
+    a ``TransferIntent`` whose ``transfer_purpose`` is ``MARGIN_DEPOSIT`` /
+    ``COLLATERAL_POSTING`` so posted collateral is traceable end-to-end."""
+
+    MARGIN_RELEASED = "margin_released"
+    """Collateral / margin released back from a venue or protocol after a
+    position closes or de-risks. Pairs with a ``MARGIN_WITHDRAWAL`` /
+    ``COLLATERAL_RELEASE`` ``TransferIntent``. Margin-traceability event."""
+
     LIQUIDATION = "liquidation"
     """Forced liquidation by venue/protocol (partial or full). Counted as
     instruction-driven because the venue's keeper acts as the instructing

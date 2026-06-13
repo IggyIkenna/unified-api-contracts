@@ -255,6 +255,7 @@ from .canonical.crosscutting.synthetic_generator import (
 from .canonical.crosscutting.transfer_events import (
     BusTransferType,
     TransferIntent,
+    TransferPurpose,
     TransferResult,
     TransferResultStatus,
 )
@@ -1977,6 +1978,7 @@ __all__ = [
     "TeamMapping",
     "ThresholdUnit",
     "TransferIntent",
+    "TransferPurpose",
     "TransferResult",
     "TransferResultStatus",
     "TreasuryLedger",

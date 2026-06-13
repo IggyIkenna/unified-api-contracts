@@ -52,6 +52,45 @@ class BusTransferType(StrEnum):
     SUBACCOUNT_MOVE = "SUBACCOUNT_MOVE"
 
 
+class TransferPurpose(StrEnum):
+    """Why a :class:`TransferIntent` is being made — the SEMANTIC reason, distinct
+    from :class:`BusTransferType` (the mechanical route).
+
+    Margin-traceability gap (``capability_wizard_gap_discovery_2026_06_11.md``
+    2026-06-12 § Margin traceability): today a USDC transfer to a perp venue is
+    indistinguishable from any other transfer, so margin posting cannot be traced
+    end-to-end on the CeFi side. Stamping the purpose lets the ledger /
+    margin-health pipeline classify a transfer as collateral movement.
+
+    Closed set; ``GENERAL`` is the non-margin default (back-compatible — existing
+    emitters that omit the field get ``GENERAL``).
+    """
+
+    GENERAL = "general"
+    """Unspecified / non-margin transfer (default)."""
+
+    MARGIN_DEPOSIT = "margin_deposit"
+    """Posting collateral to a venue to support a position (e.g. USDC → Hyperliquid)."""
+
+    MARGIN_WITHDRAWAL = "margin_withdrawal"
+    """Releasing collateral back from a venue after a position closes / de-risks."""
+
+    COLLATERAL_POSTING = "collateral_posting"
+    """Posting an asset as collateral to a lending/borrow protocol (DeFi supply)."""
+
+    COLLATERAL_RELEASE = "collateral_release"
+    """Withdrawing posted collateral from a lending/borrow protocol."""
+
+    REBALANCE = "rebalance"
+    """Intra-client reallocation of capital across strategies / wallets."""
+
+    TREASURY_SWEEP = "treasury_sweep"
+    """Sweeping profit / idle capital to the treasury wallet (per share-class split)."""
+
+    FUNDING = "funding"
+    """Funding a freshly-provisioned venue account ahead of trading."""
+
+
 class TransferResultStatus(StrEnum):
     """Execution outcome for :class:`TransferResult`."""
 
@@ -112,6 +151,12 @@ class TransferIntent(BaseModel):
     dest_chain_id: int = 0
     """Destination chain ID for BRIDGE transfers (0 = same-chain)."""
 
+    transfer_purpose: TransferPurpose = TransferPurpose.GENERAL
+    """SEMANTIC reason for the transfer (distinct from the mechanical
+    :attr:`transfer_type`). Stamped so the ledger / margin-health pipeline can
+    classify margin/collateral movements end-to-end (margin-traceability gap).
+    Defaults to ``GENERAL`` — existing emitters that omit it are unaffected."""
+
     metadata: dict[str, str] = Field(default_factory=dict)
     """Free-form structured context (e.g. ``strategy_id``, ``signal_id``)."""
 
@@ -155,6 +200,7 @@ class TransferResult(BaseModel):
 __all__ = [
     "BusTransferType",
     "TransferIntent",
+    "TransferPurpose",
     "TransferResult",
     "TransferResultStatus",
 ]
