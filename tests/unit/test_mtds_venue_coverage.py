@@ -190,6 +190,25 @@ class TestNormalizeDefiVenue:
         assert vm.normalize_defi_venue("AAVE_V3", chain="ARBITRUM") == "AAVE_V3-ARBITRUM"
         assert vm.normalize_defi_venue("UNISWAP_V3", chain="BASE") == "UNISWAP_V3-BASE"
 
+    def test_no_underscore_ghost_spelling_collapses_to_underscore(self) -> None:
+        """No-underscore protocol-version 'ghost' spellings (legacy GCS paths)
+        must canonicalise to the underscore identity BEFORE membership/alias
+        resolution — otherwise a ghost in ``all_defi_venues`` (AAVEV3-ARBITRUM)
+        short-circuits as-is and never matches the underscore-only
+        VENUE_DATA_TYPE_CAPABILITIES, silently uncrediting its shards."""
+        vm = VenueMapping()
+        # bare no-underscore + chain
+        assert vm.normalize_defi_venue("AAVEV3", chain="ARBITRUM") == "AAVE_V3-ARBITRUM"
+        assert vm.normalize_defi_venue("YEARNV3", chain="ETHEREUM") == "YEARN_V3-ETHEREUM"
+        # hyphenated no-underscore ghost (the short-circuit case)
+        assert vm.normalize_defi_venue("AAVEV3-ARBITRUM", chain="ARBITRUM") == "AAVE_V3-ARBITRUM"
+        assert vm.normalize_defi_venue("UNISWAPV3-BASE", chain="BASE") == "UNISWAP_V3-BASE"
+        # idempotent on already-canonical underscore forms
+        assert vm.normalize_defi_venue("AAVE_V3-ETHEREUM") == "AAVE_V3-ETHEREUM"
+        # non-version / non-DeFi venues untouched (no spurious underscore)
+        assert vm.normalize_defi_venue("BINANCE-PERP") == "BINANCE-PERP"
+        assert vm.normalize_defi_venue("MAKER", chain="ETHEREUM") == "MAKER-ETHEREUM"
+
     def test_is_defi_venue_accepts_legacy(self) -> None:
         vm = VenueMapping()
         assert vm.is_defi_venue("AAVE_V3")
