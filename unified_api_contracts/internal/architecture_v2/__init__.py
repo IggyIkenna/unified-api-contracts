@@ -136,6 +136,19 @@ from unified_api_contracts.internal.architecture_v2.cross_venue_routing_policy i
 from unified_api_contracts.internal.architecture_v2.cross_venue_routing_policy import (
     PolicyNotFoundError as CrossVenuePolicyNotFoundError,
 )
+
+# ---------------------------------------------------------------------------
+# Custody / signing-surface registry (Wave A, F49 re-kind — exporter abused
+# custody_provider as a catch-all). Sibling pattern to collateral_registry /
+# order_semantics. REUSES SigningSurface (no duplicate enum). ADDITIVE.
+# ---------------------------------------------------------------------------
+from unified_api_contracts.internal.architecture_v2.custody_surfaces import (
+    CEFFU_ROUTES_VIA_COPPER_NOTE,
+    OFFERED_SIGNING_SURFACES,
+    SigningSurfacePolicy,
+    SigningSurfaceStatus,
+    surface_policy_for,
+)
 from unified_api_contracts.internal.architecture_v2.derivation import (
     AccessDecision,
     ClientAudience,
@@ -417,6 +430,7 @@ __all__ = [
     "BENCHMARK_FILL_MODE_BY_ACTION",
     "BROKER_REGISTRY",
     "BROKER_ROUTES",
+    "CEFFU_ROUTES_VIA_COPPER_NOTE",
     "COLLATERAL_REGISTRY",
     "COMPATIBILITY_SEED",
     "CROSS_VENUE_ROUTING_POLICIES",
@@ -432,6 +446,7 @@ __all__ = [
     "MATCHING_MODEL_TO_BENCHMARK_FILL",
     "MULTI_LEG_ORDER_CAPABILITY_REGISTRY",
     "OFFERED_FUND_STRUCTURES",
+    "OFFERED_SIGNING_SURFACES",
     "PAIRED_DISPERSION_CATALOG",
     "RESTRICTION_PROFILE_REGISTRY",
     "REWARD_TOKEN_ECONOMICS",
@@ -602,6 +617,8 @@ __all__ = [
     "ServiceFamilyScopeRule",
     "ServiceFamilyTag",
     "ShareClass",
+    "SigningSurfacePolicy",
+    "SigningSurfaceStatus",
     "SimulationAssumption",
     "SlotFilter",
     "StakeInstruction",
@@ -690,6 +707,7 @@ __all__ = [
     "service_family_from_audience",
     "slots_visible_to",
     "split_scope_tokens",
+    "surface_policy_for",
     "user_context_for_allocator",
     "validate_allocation_authorised",
     "venue_kinds_for_asset_group",

@@ -86,7 +86,34 @@ class CapabilityNodeKind(StrEnum):
     """A TradFi broker usable for execution or custody."""
 
     CUSTODY_PROVIDER = "custody_provider"
-    """A custody provider (Copper, CEFFU, CLOUD_KMS_ENCRYPTED, …)."""
+    """A custody provider (Copper, CEFFU, CLOUD_KMS_ENCRYPTED, …).
+
+    Historically abused as a catch-all (F49); the additive kinds below let the
+    PM exporter (Wave B) re-kind the surfaces it was overloading onto this.
+    """
+
+    SIGNING_SURFACE = "signing_surface"
+    """A real custody / transaction-signing surface (``SigningSurface`` enum —
+    CLOUD_KMS_ENCRYPTED / COPPER_MPC / FIREBLOCKS_MPC / LOCAL_KEY / MOCK).
+
+    Sourced from ``custody_surfaces.OFFERED_SIGNING_SURFACES`` (F49 re-kind):
+    these are the HSM/MPC tiers a wallet signs through, NOT the higher-level
+    ``custody_provider`` business relationship. May-23 ships CLOUD_KMS_ENCRYPTED;
+    June-1 flips per-wallet to COPPER_MPC."""
+
+    RISK_GATE_LAYER = "risk_gate_layer"
+    """A risk-gate / pre-flight check layer in the execution pipeline."""
+
+    KILL_SWITCH_REASON = "kill_switch_reason"
+    """A kill-switch / circuit-breaker trigger reason."""
+
+    GAP_REGISTRY = "gap_registry"
+    """A capability gap registry (the forcing-function registries that surface
+    unregistered cells)."""
+
+    COLLATERAL_POLICY = "collateral_policy"
+    """A per-venue collateral / margin / liquidation policy
+    (``collateral_registry.CollateralPolicy``)."""
 
 
 # ---------------------------------------------------------------------------
