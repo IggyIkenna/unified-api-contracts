@@ -372,6 +372,69 @@ the validation hot path only.
 """
 
 
+# ---------------------------------------------------------------------------
+# Coverage-denominator partition (operator direction 2026-06-12) — split the
+# ``empty_confirmed`` reasons into OUT-OF-WINDOW (the (entity, date, scope) tuple
+# is OUTSIDE what could ever have data: chain/venue/source didn't exist yet or
+# stopped, instrument not listed / delisted, league season not started / ended,
+# data_type out-of-MVP-scope / deprecated / out-of-processing-scope, or no fixture
+# that day) vs WITHIN-WINDOW expected absence (entity existed + in scope, cell
+# legitimately empty: weekend / holiday / paused / postponed / ...).
+#
+# Out-of-window cells are NOT coverage gaps — there was nothing to capture — so the
+# data-status completion-% EXCLUDES them. Counting them made defi read 22% when the
+# true in-window coverage was ~2x, and surfaced "731 dates missing (2018-01-01...)" for
+# chains that launched 2021-2023 (operator eyeball 2026-06-12). The raw manifest rows
+# are UNTOUCHED (still honestly ``empty_confirmed`` + reason for ML NaN-fill /
+# feature-window / execution consumers) — only the coverage AGGREGATION reclassifies
+# them into a separate non-counting ``out_of_window`` bucket. Conservative default:
+# calendar-empties (weekend/holiday/half-day/outside-hours/paused/postponed) stay IN
+# the denominator (a covered venue's weekend gap is part of the coverable universe).
+# ---------------------------------------------------------------------------
+
+OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
+    {
+        EmptyConfirmedReason.EXPECTED_PRE_GENESIS_CHAIN.value,
+        EmptyConfirmedReason.EXPECTED_PRE_VENUE_LAUNCH.value,
+        EmptyConfirmedReason.EXPECTED_PRE_SOURCE_COVERAGE_START.value,
+        EmptyConfirmedReason.EXPECTED_PAST_SOURCE_COVERAGE_END.value,
+        EmptyConfirmedReason.EXPECTED_INSTRUMENT_NOT_LISTED.value,
+        EmptyConfirmedReason.EXPECTED_INSTRUMENT_DELISTED.value,
+        EmptyConfirmedReason.EXPECTED_PRE_SEASON.value,
+        EmptyConfirmedReason.EXPECTED_POST_SEASON.value,
+        EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE.value,
+        EmptyConfirmedReason.EXPECTED_OUT_OF_COVERAGE_WINDOW.value,
+        EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value,
+        EmptyConfirmedReason.EXPECTED_OUTSIDE_PROCESSING_SCOPE.value,
+        EmptyConfirmedReason.EXPECTED_NO_FIXTURE.value,
+        EmptyConfirmedReason.EXPECTED_NO_MAPPING.value,
+        EmptyConfirmedReason.EXPECTED_LEGACY_MIGRATION_MISSING_EXPIRY.value,
+    }
+)
+"""``empty_confirmed`` reasons OUTSIDE the coverable window/scope — excluded from the
+data-status completion-% denominator (never collectable). SSOT for the coverage
+``out_of_window`` bucket. See module note above + ``codex/02-data/honest-absence-downstream-handling.md``."""
+
+WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS: Final[frozenset[str]] = frozenset(
+    EMPTY_CONFIRMED_REASONS - OUT_OF_COVERAGE_WINDOW_REASONS
+)
+"""``empty_confirmed`` reasons where the entity existed + was in scope but the cell is a
+legitimate gap (weekend/holiday/paused/postponed/...). These COUNT in the denominator."""
+
+
+def is_out_of_coverage_window(reason: str | None) -> bool:
+    """True if ``reason`` marks a cell OUTSIDE the coverable window/scope (never
+    collectable → excluded from the coverage-% denominator). Blank/None → False (a
+    blank-reason empty is a within-window absence by default, so it counts)."""
+    return bool(reason) and reason in OUT_OF_COVERAGE_WINDOW_REASONS
+
+
+def is_within_window_absence(reason: str | None) -> bool:
+    """Complement of :func:`is_out_of_coverage_window` — the cell IS in the coverable
+    universe and counts in the denominator (blank/None or any non-out-of-window reason)."""
+    return not is_out_of_coverage_window(reason)
+
+
 EXPECTED_EMPTY_REASON_PREFIX: Final[str] = "EXPECTED_"
 """Reason-prefix marker used by ``record_expected_empty`` to distinguish
 calendar-pre-skip writes (``EXPECTED_*``) from honest source-returned-zero
