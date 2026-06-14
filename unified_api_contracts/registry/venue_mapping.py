@@ -7,6 +7,7 @@ concept, not a config concept.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from datetime import date, datetime
 
@@ -452,6 +453,15 @@ class VenueMapping:
 
         SSOT: codex/02-data/mtds-data-source-coverage-matrix.md §4.
         """
+        # Canonicalise the protocol-version spelling FIRST (underscore is the
+        # documented canonical form — ``AAVEV3`` → ``AAVE_V3``, ``YEARNV3`` →
+        # ``YEARN_V3``). The no-underscore "ghost" spellings carry historical
+        # GCS paths but must collapse to the underscore identity before the
+        # membership/alias resolution below; otherwise a ghost that happens to
+        # be in ``all_defi_venues`` (e.g. ``AAVEV3-ARBITRUM``) short-circuits
+        # as-is and never reaches the underscore-only
+        # ``VENUE_DATA_TYPE_CAPABILITIES`` → its shards are silently uncredited.
+        raw_venue = self._canonicalise_defi_protocol_spelling(raw_venue)
         if raw_venue in self.all_defi_venues:
             return raw_venue
         alias = self.legacy_defi_venue_aliases.get(raw_venue)
@@ -461,6 +471,22 @@ class VenueMapping:
         if chain and chain != "ETHEREUM" and alias.endswith("-ETHEREUM"):
             alias = alias[: -len("ETHEREUM")] + chain
         return alias
+
+    @staticmethod
+    def _canonicalise_defi_protocol_spelling(venue: str) -> str:
+        """Insert the canonical underscore before a protocol version token
+        (``AAVEV3`` → ``AAVE_V3``, ``UNISWAPV3`` → ``UNISWAP_V3``,
+        ``YEARNV3`` → ``YEARN_V3``), preserving a ``-CHAIN`` suffix.
+
+        Underscore-before-version is the documented DeFi naming convention
+        (``defi_venues.py`` header); the no-underscore forms are legacy ghosts.
+        Idempotent on already-canonical names (``AAVE_V3`` has no ``letter+V+digit``
+        run to rewrite) and a no-op on non-DeFi / version-less venues."""
+        version_re = r"([A-Za-z])V(\d)"
+        if "-" in venue:
+            protocol, chain = venue.rsplit("-", 1)
+            return f"{re.sub(version_re, r'\1_V\2', protocol)}-{chain}"
+        return re.sub(version_re, r"\1_V\2", venue)
 
     def is_cefi_onchain_clob_venue(self, venue: str) -> bool:
         """Check if venue is an on-chain CLOB (treated as CEFI for data classification)."""
