@@ -299,3 +299,38 @@ def test_was_instrument_alive_accepts_datetime_and_iso_string() -> None:
     assert was_instrument_alive(available_from="2024-01-01", available_to=None, day="2024-06-01T08:00:00Z") is True
     # unparseable day → conservative False
     assert was_instrument_alive(available_from="2024-01-01", available_to=None, day="not-a-date") is False
+
+
+def test_out_of_coverage_window_partition() -> None:
+    """The out-of-window reason set excludes lifecycle/scope cells but keeps calendar gaps."""
+    from unified_api_contracts import (
+        OUT_OF_COVERAGE_WINDOW_REASONS,
+        WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS,
+        is_out_of_coverage_window,
+        is_within_window_absence,
+    )
+
+    # lifecycle / scope → out of window (excluded from coverage denominator)
+    for r in (
+        "EXPECTED_PRE_GENESIS_CHAIN",
+        "EXPECTED_PRE_VENUE_LAUNCH",
+        "EXPECTED_INSTRUMENT_NOT_LISTED",
+        "EXPECTED_INSTRUMENT_DELISTED",
+        "EXPECTED_PRE_SEASON",
+        "EXPECTED_OUT_OF_COVERAGE_WINDOW",
+    ):
+        assert is_out_of_coverage_window(r) is True
+        assert r in OUT_OF_COVERAGE_WINDOW_REASONS
+    # calendar empties → within window (count in the denominator)
+    for r in ("EXPECTED_WEEKEND", "EXPECTED_HOLIDAY", "EXPECTED_PAUSED_LEAGUE"):
+        assert is_out_of_coverage_window(r) is False
+        assert is_within_window_absence(r) is True
+        assert r in WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS
+    # blank/None → within (counts) — a blank-reason empty is a gap by default
+    assert is_out_of_coverage_window(None) is False
+    assert is_out_of_coverage_window("") is False
+    # the two sets partition the full taxonomy with no overlap
+    from unified_api_contracts import EMPTY_CONFIRMED_REASONS
+
+    assert OUT_OF_COVERAGE_WINDOW_REASONS | WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS == EMPTY_CONFIRMED_REASONS
+    assert not (OUT_OF_COVERAGE_WINDOW_REASONS & WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS)
