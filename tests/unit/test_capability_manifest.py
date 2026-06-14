@@ -82,6 +82,11 @@ def test_capability_node_kind_values() -> None:
         "wallet",
         "broker",
         "custody_provider",
+        "signing_surface",
+        "risk_gate_layer",
+        "kill_switch_reason",
+        "gap_registry",
+        "collateral_policy",
     }
     assert set(CapabilityNodeKind) == expected
 
