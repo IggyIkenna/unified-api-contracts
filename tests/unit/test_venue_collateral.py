@@ -160,3 +160,14 @@ def test_f28_held_placeholder_rows_keep_existing_value() -> None:
     assert get_collateral_haircut("BYBIT", "stETH") == Decimal("0.10")
     assert venue_accepts_collateral("DRIFT", "mSOL")
     assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.10")
+
+
+def test_f27_venue_lookup_is_case_insensitive() -> None:
+    """F27 (2026-06-15): venue lookups are case-insensitive — lowercase slot-config
+    venue ids (``'deribit'``) must resolve against the UPPERCASE matrix keys
+    (``'DERIBIT'``), else carry-staked-basis silently no-emits.
+    """
+    assert accepted_perp_collateral("deribit") == accepted_perp_collateral("DERIBIT")
+    assert len(accepted_perp_collateral("deribit")) > 0
+    assert venue_accepts_collateral("deribit", "stETH") is True
+    assert get_collateral_haircut("deribit", "stETH") == Decimal("0.075")
