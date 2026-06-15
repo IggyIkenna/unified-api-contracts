@@ -287,8 +287,8 @@ LOGICAL: YIELD_ROTATION_LENDING x lending (CEFI) — CeFi lending out-of-scope: 
 === VERDICT MATRIX SUMMARY (Phase 6A) ===
 Exhaustive cross-join: archetype x venue x instrument_type x (instruction_action x algo).
   total cells:    21600
-  available:      12977 (60.1%)
-  blocked:        8175 (37.8%)
+  available:      14977 (69.3%)
+  blocked:        6175 (28.6%)
   not_registered: 448 (2.1%)
 Output: openapi/capability-verdict-matrix.json
 === END VERDICT MATRIX SUMMARY ===

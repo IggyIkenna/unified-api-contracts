@@ -72,6 +72,21 @@ _DEFI_DEX_TOKENS: frozenset[str] = frozenset(
         "orca",
         "raydium",
         "velodrome",
+        # 2026-06-15 Phase V venue build-out — versioned/aggregator DEX family
+        # tokens that ``archetype_leg_spec_seeds.py`` already lists as
+        # ``eligible_venue_ids`` (``_DEX_SWAP_VENUES`` / ``_SPOT_VENUES_STAKED``
+        # / DEX_LP seeds) but whose alnum-folded slot tokens were absent here, so
+        # the v2 slot-label parser rejected every cell routing a leg to them
+        # (F47 ``DeadEndReason.UNBUILDABLE_SLOT`` in the verdict matrix). The
+        # family base (``balancer``/``sushiswap``/``pancakeswap``/``joe``) exists
+        # above; the parser requires the EXACT folded token, so the explicit
+        # protocol-version + aggregator forms are added here.
+        "balancerv2",
+        "balancerv3",
+        "sushiswapv3",
+        "pancakeswapv3",
+        "traderjoe",
+        "jupiter",
     }
 )
 
@@ -110,6 +125,12 @@ _DEFI_STAKING_TOKENS: frozenset[str] = frozenset(
         "yearnv3",
         "maker",
         "frax",
+        # 2026-06-15 Phase V — Sommelier ERC-4626 yield-vault venue. Listed in
+        # ``archetype_leg_spec_seeds.py`` DEX_LP yield-vault seed
+        # (``("yearn_v3", "morpho", "sommelier")``) as a leg-eligible venue;
+        # folds to ``sommelier``. Same vault-primitive class as the existing
+        # Yearn / Maker rows.
+        "sommelier",
     }
 )
 
@@ -117,6 +138,11 @@ _DEFI_STAKING_TOKENS: frozenset[str] = frozenset(
 _DEFI_PERP_TOKENS: frozenset[str] = frozenset(
     {
         "gmx",
+        # 2026-06-15 Phase V — GMX-V2 perp DEX. The ``gmx`` family base exists,
+        # but ``archetype_leg_spec_seeds.py`` lists the venue id ``gmx_v2`` as a
+        # hedge-leg ``eligible_venue_id`` (folds to ``gmxv2``); the parser needs
+        # the exact folded token to build a slot routing a perp leg there.
+        "gmxv2",
         # Added 2026-04-19 after operator approval (Phase 7 NEEDS_REVIEW resolution).
         # Drift is Solana-native perps — required for SOL basis + staked-basis
         # strategies that hedge native SOL exposure on the same chain. Forcing
@@ -135,6 +161,17 @@ _SPORTS_TOKENS: frozenset[str] = frozenset(
         "unity",
         "betfair",
         "matchbook",
+        # 2026-06-15 Phase V — direct-exchange sports venue ids. The family
+        # bases (``betfair``/``matchbook``) exist, but ``archetype_leg_spec_seeds.py``
+        # event-leg seeds list the routing-specific venue ids
+        # ``betfair_direct`` / ``smarkets_direct`` / ``matchbook_direct``
+        # (the execution-service ``SportsExecutionRouter`` data-source targets),
+        # which fold to ``betfairdirect`` / ``smarketsdirect`` / ``matchbookdirect``.
+        # ``smarkets`` had no family base either — added so the direct id parses.
+        "smarkets",
+        "betfairdirect",
+        "smarketsdirect",
+        "matchbookdirect",
     }
 )
 
