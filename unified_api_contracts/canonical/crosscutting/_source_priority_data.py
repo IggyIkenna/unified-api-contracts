@@ -96,6 +96,15 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # the cefi rows; the TradFi (Massive/Databento) chains feed the tradfi rows.
     ("cefi", "greeks_snapshot"): ["greeks_service"],
     ("cefi", "implied_vol_surface"): ["greeks_service"],
+    # L2 microstructure (Phase D P2) — order_flow_imbalance / depth_of_book_10 /
+    # queue_position are MTDS-COMPUTED from the canonical book_snapshot_5 (L5 book).
+    # Internal computed source (mtds_microstructure, COMPUTED_SOURCES-exempt from
+    # external provenance); batch==live (same derivation both modes). The upstream
+    # L5 book is sourced via (cefi, book_snapshot) → tardis batch + venue live;
+    # these rows carry the COMPUTED emitter as the provenance, like greeks_snapshot.
+    ("cefi", "order_flow_imbalance"): ["mtds_microstructure"],
+    ("cefi", "depth_of_book_10"): ["mtds_microstructure"],
+    ("cefi", "queue_position"): ["mtds_microstructure"],
     # ---- DeFi -----------------------------------------------------------
     # DeFi has per-protocol on-chain readers; no single canonical source.
     ("defi", "swap"): ["onchain_subgraph"],
@@ -285,6 +294,7 @@ COMPUTED_SOURCES: Final[frozenset[str]] = frozenset(
         "features_onchain_service",  # features-onchain per-tick snapshots
         "cross_instrument",  # features-service cross_instrument family outputs
         "greeks_service",  # greeks-service greeks_snapshot / implied_vol_surface
+        "mtds_microstructure",  # MTDS L2 microstructure (order_flow_imbalance/etc) from book_snapshot_5
     }
 )
 """Source strings denoting internal computed/service emitters (provenance-exempt).
@@ -371,6 +381,7 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "features_onchain_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "cross_instrument": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "greeks_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "mtds_microstructure": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     # ---- CeFi per-venue live/replay sources ----
     # CeFi `live`/`replay` `source` = the EXCHANGE (CeFi `batch` source = tardis).
     # The SAME shard carries source=tardis in batch and source=<venue> in live/replay.
@@ -455,6 +466,9 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # greeks-service greeks_snapshot / implied_vol_surface — computed inline at
     # the options_chain read-event; latency = 0ms (available_at = the chain's).
     "greeks_service": 0,
+    # MTDS L2 microstructure — derived inline at the book_snapshot_5 capture
+    # tick; latency = 0ms (available_at = the source book's tick timestamp).
+    "mtds_microstructure": 0,
     # EIA weekly storage publication — Wednesdays 10:30 AM ET covering the
     # prior Friday → ~5 day publication lag. Conservative 86_400_000 (24h)
     # matches barchart-tier daily-archive sources; tightenable later via

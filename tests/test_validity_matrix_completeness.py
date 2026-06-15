@@ -145,6 +145,12 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("cefi", "implied_vol_surface"): _COMPUTED_SERVICE_OUTPUT,
     ("tradfi", "greeks_snapshot"): _COMPUTED_SERVICE_OUTPUT,
     ("tradfi", "implied_vol_surface"): _COMPUTED_SERVICE_OUTPUT,
+    # MTDS L2 microstructure (order_flow_imbalance / depth_of_book_10 /
+    # queue_position) — derived from book_snapshot_5, not produced by any raw
+    # market-data instrument_type (computed-service output, like greeks_snapshot).
+    ("cefi", "order_flow_imbalance"): _COMPUTED_SERVICE_OUTPUT,
+    ("cefi", "depth_of_book_10"): _COMPUTED_SERVICE_OUTPUT,
+    ("cefi", "queue_position"): _COMPUTED_SERVICE_OUTPUT,
     # ── DeFi computed/service outputs (no instrument produces these) ──
     ("defi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
     ("defi", "hedge_ratio_snapshot"): _COMPUTED_SERVICE_OUTPUT,

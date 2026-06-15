@@ -150,6 +150,10 @@ from .market import (
     OhlcvAggregation,
     OrderBookSnapshot5,
 )
+from .market.microstructure import (
+    CanonicalBookMicrostructure,
+    CanonicalDepthLevel,
+)
 from .market.spread import (
     CanonicalSpread,
     SpreadLeg,
@@ -365,11 +369,13 @@ __all__ = [
     "CanonicalBetMarket",
     "CanonicalBetOrder",
     "CanonicalBondData",
+    "CanonicalBookMicrostructure",
     "CanonicalBookmakerMarket",
     "CanonicalCdsSpread",
     "CanonicalComboBet",
     "CanonicalComboLeg",
     "CanonicalComputeService",
+    "CanonicalDepthLevel",
     "CanonicalDerivativeTicker",
     "CanonicalFeatureRecord",
     "CanonicalFee",

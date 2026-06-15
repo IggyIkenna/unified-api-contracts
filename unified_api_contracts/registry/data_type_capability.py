@@ -248,6 +248,78 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         streaming_protocol="ws",
         liquidity_cutoff_usd=5_000.0,
     ),
+    # ── L2 microstructure data_types (Phase D P2) ────────────────────────
+    # MTDS-COMPUTED from the canonical ``book_snapshot_5`` (L5 book), the SAME
+    # feed in batch (Tardis archive) and live (venue WebSocket). batch==live: one
+    # ``CanonicalBookMicrostructure`` shape both modes emit. SOURCE_PRIORITY for
+    # these data_types resolves via ``(cefi, book_snapshot)`` (the upstream L5
+    # book): tardis BATCH + the venue live/replay override — identical to how
+    # ``book_snapshot_5`` itself resolves source. NOT added to SOURCE_PRIORITY as
+    # raw vendor rows (they are computed-service outputs, like greeks_snapshot).
+    #
+    # ``order_flow_imbalance`` — L5-DERIVABLE NOW (top-of-book + L5-aggregated
+    # bid/ask sizes -> imbalance + microprice). live+batch capable for every venue
+    # that already carries ``book_snapshot_5``. Unblocks MARKET_MAKING_PASSIVE_SPREAD
+    # + MARKET_MAKING_INVENTORY_SKEW at the feed level.
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type="order_flow_imbalance",
+            venue=_venue,
+            instrument_type="",
+            live_capable=True,
+            batch_capable=True,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/cli/handlers/book_microstructure_handler.py",),
+            notes=("Derived from book_snapshot_5 (L5): imbalance + microprice. batch==live."),
+        )
+        for _venue in (
+            "BINANCE-FUTURES",
+            "BINANCE-SPOT",
+            "OKX-FUTURES",
+            "OKX-SPOT",
+            "OKX-SWAP",
+            "BYBIT",
+            "DERIBIT",
+            "COINBASE-SPOT",
+            "UPBIT",
+        )
+    ),
+    # ``depth_of_book_10`` (L10 ladder) + ``queue_position`` (per-level resting
+    # queue / order-by-order) — need a DEEPER book than the captured L5 snapshot.
+    # The canonical ``CanonicalBookMicrostructure`` shape carries the fields, but
+    # they are HONESTLY ABSENT (live_capable=False, batch_capable=False) until an
+    # L10 / full-L2 capture lands. Marked here so the matrix never claims them
+    # available from L5. Honest gap — NOT a hollow capability.
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type=_dt,
+            venue=_venue,
+            instrument_type="",
+            live_capable=False,
+            batch_capable=False,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/cli/handlers/book_microstructure_handler.py",),
+            notes=(
+                "Needs an L10 / full-L2 book capture deeper than book_snapshot_5; "
+                "honest gap until the deeper-book capture lands (scaffolded handler "
+                "marks the shard expected_unattempted, never a silent placeholder)."
+            ),
+        )
+        for _dt in ("depth_of_book_10", "queue_position")
+        for _venue in (
+            "BINANCE-FUTURES",
+            "BINANCE-SPOT",
+            "OKX-FUTURES",
+            "OKX-SPOT",
+            "OKX-SWAP",
+            "BYBIT",
+            "DERIBIT",
+            "COINBASE-SPOT",
+            "UPBIT",
+        )
+    ),
     # Derivative ticker — folds funding_rate, mark_price, index_price, OI
     DataTypeCapability(
         asset_group=AssetGroup.CEFI,
