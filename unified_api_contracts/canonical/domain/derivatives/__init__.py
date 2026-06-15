@@ -8,6 +8,9 @@ from pydantic import AwareDatetime, BaseModel, ConfigDict, Field
 from .._base import CanonicalBase
 from .futures import CanonicalFuturesContract as CanonicalFuturesContract
 from .futures import FuturesContractLifecyclePhase as FuturesContractLifecyclePhase
+from .greeks import CanonicalGreeksSnapshot as CanonicalGreeksSnapshot
+from .greeks import CanonicalImpliedVolSurface as CanonicalImpliedVolSurface
+from .greeks import CanonicalIVSurfacePoint as CanonicalIVSurfacePoint
 
 
 class CanonicalLiquidation(CanonicalBase):

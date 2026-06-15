@@ -78,10 +78,24 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (OUT OF SCOPE here) and (b) the bidirectional SOURCE_PRIORITY ↔
     # AVAILABILITY_AT_SEMANTICS closed-set round-trip; drop them once the per-AG
     # migrators relabel the legacy rows to trades.
+    # Crypto options chain — tardis (T+1 archive) is the BATCH primary; the
+    # LIVE/REPLAY source is the EXCHANGE (deribit), resolved per-shard by the
+    # venue-override layer (same pattern as (cefi, trades) → tardis batch +
+    # deribit live). The SAME shard carries source=tardis in batch and
+    # source=deribit in live/replay — batch==live, one canonical options_chain
+    # data_type. (instruments-service DeribitOptionsReferenceDataAdapter feeds
+    # live; the Tardis historical-crypto adapter SCAFFOLD is BLOCKED-CREDENTIALS.)
     ("cefi", "options_chain"): ["tardis"],
     ("cefi", "futures_chain"): ["tardis"],
     ("cefi", "perpetual"): ["tardis"],
     ("cefi", "funding_rate"): ["tardis"],
+    # greeks_snapshot + implied_vol_surface — computed in-house by greeks-service
+    # from the canonical options_chain (venue mark_iv, else BS-fitted). Internal
+    # computed source (greeks_service, COMPUTED_SOURCES-exempt from external
+    # provenance); batch==live (same kernel both modes). The crypto chains feed
+    # the cefi rows; the TradFi (Massive/Databento) chains feed the tradfi rows.
+    ("cefi", "greeks_snapshot"): ["greeks_service"],
+    ("cefi", "implied_vol_surface"): ["greeks_service"],
     # ---- DeFi -----------------------------------------------------------
     # DeFi has per-protocol on-chain readers; no single canonical source.
     ("defi", "swap"): ["onchain_subgraph"],
@@ -215,6 +229,10 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # rows + the closed-set round-trip (see the cefi note above).
     ("tradfi", "options_chain"): ["massive", "databento"],
     ("tradfi", "futures_chain"): ["massive", "databento"],
+    # TradFi greeks_snapshot + implied_vol_surface — computed by greeks-service
+    # from the Massive/Databento options chain (same kernel as the crypto rows).
+    ("tradfi", "greeks_snapshot"): ["greeks_service"],
+    ("tradfi", "implied_vol_surface"): ["greeks_service"],
     # commodity_signal — emitted by features-service commodity family from
     # EIA (crude oil + natural gas weekly storage) + CFTC + Baker Hughes +
     # Open-Meteo + Yahoo factor inputs. Top entry is EIA per the storage
@@ -266,6 +284,7 @@ COMPUTED_SOURCES: Final[frozenset[str]] = frozenset(
         "strategy_service",  # strategy-service hedge-ratio / decision-context
         "features_onchain_service",  # features-onchain per-tick snapshots
         "cross_instrument",  # features-service cross_instrument family outputs
+        "greeks_service",  # greeks-service greeks_snapshot / implied_vol_surface
     }
 )
 """Source strings denoting internal computed/service emitters (provenance-exempt).
@@ -351,6 +370,7 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "strategy_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "features_onchain_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "cross_instrument": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    "greeks_service": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     # ---- CeFi per-venue live/replay sources ----
     # CeFi `live`/`replay` `source` = the EXCHANGE (CeFi `batch` source = tardis).
     # The SAME shard carries source=tardis in batch and source=<venue> in live/replay.
@@ -432,6 +452,9 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # calculation time; latency = 0ms relative to the upstream multi-asset
     # delta_one/MTDS read-event that triggered it.
     "cross_instrument": 0,
+    # greeks-service greeks_snapshot / implied_vol_surface — computed inline at
+    # the options_chain read-event; latency = 0ms (available_at = the chain's).
+    "greeks_service": 0,
     # EIA weekly storage publication — Wednesdays 10:30 AM ET covering the
     # prior Friday → ~5 day publication lag. Conservative 86_400_000 (24h)
     # matches barchart-tier daily-archive sources; tightenable later via

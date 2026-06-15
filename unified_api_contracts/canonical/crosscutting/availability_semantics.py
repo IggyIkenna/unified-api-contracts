@@ -101,6 +101,11 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("cefi", "futures_chain"): "tick_timestamp",
     ("cefi", "perpetual"): "tick_timestamp",
     ("cefi", "funding_rate"): "tick_timestamp",
+    # greeks_snapshot / implied_vol_surface — greeks-service computes these inline
+    # at the options_chain read-event (latency 0), so the row's own snapshot
+    # timestamp IS available_at — same tick_timestamp semantic as the chain.
+    ("cefi", "greeks_snapshot"): "tick_timestamp",
+    ("cefi", "implied_vol_surface"): "tick_timestamp",
     # ---- DeFi -----------------------------------------------------------
     ("defi", "swap"): "tick_timestamp",
     ("defi", "fx_rate"): "tick_timestamp",
@@ -182,6 +187,10 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("tradfi", "ohlcv_15m"): "tick_timestamp",
     ("tradfi", "options_chain"): "tick_timestamp",
     ("tradfi", "futures_chain"): "tick_timestamp",
+    # greeks_snapshot / implied_vol_surface — greeks-service computes these inline
+    # from the TradFi (Massive/Databento) options chain; row timestamp = available_at.
+    ("tradfi", "greeks_snapshot"): "tick_timestamp",
+    ("tradfi", "implied_vol_surface"): "tick_timestamp",
     # commodity_signal — emitted by features-service commodity family from
     # EIA + CFTC + Baker Hughes + Open-Meteo + Yahoo factor inputs;
     # available_at = write-time per ``fetch_completed_at`` (downstream of
