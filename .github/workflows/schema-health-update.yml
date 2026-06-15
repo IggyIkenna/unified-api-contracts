@@ -169,7 +169,7 @@ jobs:
       # ---------------------------------------------------------------------------
 
       - name: Commit updated schema health SVG
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: update schema health SVG from CI artifacts [skip ci]"
           file_pattern: "docs/schema_health.svg docs/SCHEMA_VERSION_MATRIX.md"
