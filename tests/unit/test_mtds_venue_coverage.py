@@ -12,6 +12,7 @@ Guards the MTDS aggregator's denominator inputs:
 from __future__ import annotations
 
 from collections import Counter
+from typing import ClassVar
 
 from unified_api_contracts import (
     VenueMapping,
@@ -644,3 +645,81 @@ class TestSeedDispatcherVenueClassification:
                 ids = get_expected_instruments_for_venue(venue, dt)
                 assert ids, f"{venue} {dt} regressed to empty"
                 assert "BTC-PERP" in ids, f"{venue} {dt} dropped BTC-PERP"
+
+
+class TestNewlyCapabilitiedDefiVenues:
+    """DATA-001: venues in ALL_DEFI_VENUES that had captured shards in the
+    GCS availability index but were missing from VENUE_DATA_TYPE_CAPABILITIES.
+
+    These entries were added in the live-defi-rollout fix (2026-06-15) so that
+    their captured shards are credited in the honest-coverage denominator
+    (could-exist row count).  Each venue must return a non-empty list from
+    ``get_expected_data_types_for_venue``.
+
+    Captured-row tallies at time of fix (from availability_index.parquet):
+      MAKER-ETHEREUM        vault_share_price  1 221 rows
+      FRAX-ETHEREUM         vault_share_price    947 rows
+      MORPHOVAULTS-ETHEREUM vault_share_price    870 rows
+      SOLEND-SOLANA         lending_indices       30 rows
+      MARGINFI-SOLANA       lending_indices       16 rows
+    Total recovered: 3 084 rows
+    """
+
+    _VENUES_EXPECTED_DT: ClassVar[list[tuple[str, str]]] = [
+        ("MAKER-ETHEREUM", "vault_share_price"),
+        ("FRAX-ETHEREUM", "vault_share_price"),
+        ("MORPHOVAULTS-ETHEREUM", "vault_share_price"),
+        ("SOLEND-SOLANA", "lending_indices"),
+        ("MARGINFI-SOLANA", "lending_indices"),
+    ]
+
+    def test_newly_capabilitied_venues_return_nonempty(self) -> None:
+        """Each newly-added venue must return a non-empty data_type list."""
+        for venue, _ in self._VENUES_EXPECTED_DT:
+            dts = get_expected_data_types_for_venue(venue)
+            assert dts, (
+                f"{venue} still returns [] from get_expected_data_types_for_venue "
+                f"— entry is missing from DEFI_VENUE_DATA_TYPE_CAPABILITIES"
+            )
+
+    def test_newly_capabilitied_venues_declare_captured_data_type(self) -> None:
+        """Each venue must declare the specific data_type observed in the index."""
+        for venue, expected_dt in self._VENUES_EXPECTED_DT:
+            dts = get_expected_data_types_for_venue(venue)
+            assert expected_dt in dts, (
+                f"{venue}: expected '{expected_dt}' in capabilities but got {dts}"
+            )
+
+    def test_vault_is_not_in_all_defi_venues(self) -> None:
+        """VAULT is a generic non-protocol label (0 rows post-dedup).
+
+        It must NOT appear in ALL_DEFI_VENUES — confirming it is correctly
+        excluded from the honest-coverage denominator.
+        """
+        from unified_api_contracts.registry.defi_venues import ALL_DEFI_VENUES
+
+        assert "VAULT" not in ALL_DEFI_VENUES, (
+            "VAULT (generic non-protocol label) must not be in ALL_DEFI_VENUES"
+        )
+
+    def test_sushiswap_arbitrum_classic_has_capabilities(self) -> None:
+        """SUSHISWAP-ARBITRUM (classic v2) is in ALL_DEFI_VENUES and has its
+        own capabilities entry distinct from SUSHISWAP_V3-ETHEREUM.
+
+        The bare 'SUSHISWAP' alias in LEGACY_DEFI_VENUE_ALIASES resolves to
+        SUSHISWAP_V3-ETHEREUM (Ethereum V3 default), not the classic Arbitrum
+        form — this is intentional and must remain unchanged.
+        """
+        from unified_api_contracts.registry.defi_venues import LEGACY_DEFI_VENUE_ALIASES
+
+        classic_dts = get_expected_data_types_for_venue("SUSHISWAP-ARBITRUM")
+        assert classic_dts, "SUSHISWAP-ARBITRUM lost its capabilities entry"
+
+        v3_dts = get_expected_data_types_for_venue("SUSHISWAP_V3-ETHEREUM")
+        assert v3_dts, "SUSHISWAP_V3-ETHEREUM lost its capabilities entry"
+
+        # bare alias must still point to V3-ETHEREUM (do not silently change)
+        assert LEGACY_DEFI_VENUE_ALIASES.get("SUSHISWAP") == "SUSHISWAP_V3-ETHEREUM", (
+            "LEGACY_DEFI_VENUE_ALIASES['SUSHISWAP'] was changed; "
+            "verify downstream normalisation before modifying"
+        )
