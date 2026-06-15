@@ -124,3 +124,39 @@ def test_rejected_rows_have_no_haircut() -> None:
             assert entry.haircut_pct is None, (
                 f"{entry.venue} {entry.token} accepted=False but haircut_pct={entry.haircut_pct}"
             )
+
+
+def test_f28_consolidation_canonical_clear_cut_values() -> None:
+    """F28 (operator-approved 2026-06-15): UAC is the single canonical collateral-haircut SSOT.
+
+    The execution-service ``_LST_REGISTRY`` duplicate is deleted; its resolver now
+    consumes these accessors. Pin the operator-approved clear-cut rows so the
+    consolidated truth cannot drift (haircuts are FRACTIONS, e.g. 0.075 = 7.5%).
+    """
+    # Deribit stETH — official current 7.5% (fraction 0.075).
+    assert venue_accepts_collateral("DERIBIT", "stETH")
+    assert get_collateral_haircut("DERIBIT", "stETH") == Decimal("0.075")
+    # Clear-cut NOT-ACCEPTED rows.
+    for venue, token in [
+        ("HYPERLIQUID", "wstETH"),
+        ("OKX", "stETH"),
+        ("BINANCE", "stETH"),
+        ("DERIBIT", "wstETH"),
+    ]:
+        assert not venue_accepts_collateral(venue, token), f"{venue} {token} must NOT be accepted (F28 clear-cut)"
+        assert get_collateral_haircut(venue, token) is None
+    # Clear-cut accepted-with-haircut rows.
+    assert get_collateral_haircut("BYBIT", "wstETH") == Decimal("0.10")
+    assert get_collateral_haircut("OKX", "wstETH") == Decimal("0.10")
+
+
+def test_f28_held_placeholder_rows_keep_existing_value() -> None:
+    """F28 HOLD rows (Bybit stETH + Drift mSOL) keep UAC's existing value pending a live-API probe.
+
+    The execution-service divergent values were NOT adopted; these stay as the
+    operator-held placeholders (commented ``# PLACEHOLDER — pending live-API probe``).
+    """
+    assert venue_accepts_collateral("BYBIT", "stETH")
+    assert get_collateral_haircut("BYBIT", "stETH") == Decimal("0.10")
+    assert venue_accepts_collateral("DRIFT", "mSOL")
+    assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.10")

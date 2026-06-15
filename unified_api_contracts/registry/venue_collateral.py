@@ -98,6 +98,7 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("GMX", "WBTC", True, Decimal("0.05"), "CROSS", "BTC-margined per-market", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "USDC", True, Decimal("0"), "CROSS", "Primary margin", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "SOL", True, Decimal("0.05"), "CROSS", "5% haircut", "PERP_DEX"),
+    # PLACEHOLDER — pending live-API probe (F28, operator-held 2026-06-15)
     CollateralAcceptance("DRIFT", "mSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Marinade LST", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "JitoSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Jito LST", "PERP_DEX"),
     # Pacifica-Solana — USDC-settled linear perp DEX (Solana). settle_asset=USDC confirmed in
@@ -165,6 +166,7 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # 10% haircut placeholder pending live-API probe; documented haircut ranges
     # vary by collateral tier (5-12%). Stream A flip 2026-05-08.
     # See unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md.
+    # PLACEHOLDER — pending live-API probe (F28, operator-held 2026-06-15)
     CollateralAcceptance(
         "BYBIT", "stETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral since 2024-02", "PERP_CEX"
     ),
