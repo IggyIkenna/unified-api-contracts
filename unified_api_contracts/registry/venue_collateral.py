@@ -237,9 +237,16 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
 
 
 def venue_accepts_collateral(venue: str, token: str) -> bool:
-    """Check if a venue accepts a given token as collateral."""
+    """Check if a venue accepts a given token as collateral.
+
+    Venue lookup is CASE-INSENSITIVE (F27 fix 2026-06-15): callers pass the
+    venue id in mixed case (slot-config/catalog use lowercase ``'deribit'``;
+    the matrix keys UPPERCASE ``'DERIBIT'``) — a case mismatch previously made
+    the accessor silently return the not-accepted answer, so carry-staked-basis
+    never emitted. Normalised here so every caller is protected, not just one.
+    """
     for entry in VENUE_COLLATERAL_MATRIX:
-        if entry.venue == venue and entry.token == token:
+        if entry.venue.upper() == venue.upper() and entry.token == token:
             return entry.accepted
     return False
 
@@ -247,14 +254,14 @@ def venue_accepts_collateral(venue: str, token: str) -> bool:
 def get_collateral_haircut(venue: str, token: str) -> Decimal | None:
     """Get the haircut percentage for a token at a venue, or None if not accepted."""
     for entry in VENUE_COLLATERAL_MATRIX:
-        if entry.venue == venue and entry.token == token and entry.accepted:
+        if entry.venue.upper() == venue.upper() and entry.token == token and entry.accepted:
             return entry.haircut_pct
     return None
 
 
 def get_accepted_collateral(venue: str) -> list[str]:
     """Get list of accepted collateral tokens for a venue."""
-    return [e.token for e in VENUE_COLLATERAL_MATRIX if e.venue == venue and e.accepted]
+    return [e.token for e in VENUE_COLLATERAL_MATRIX if e.venue.upper() == venue.upper() and e.accepted]
 
 
 def accepted_perp_collateral(venue: str) -> list[str]:
@@ -268,5 +275,5 @@ def accepted_perp_collateral(venue: str) -> list[str]:
     return [
         e.token
         for e in VENUE_COLLATERAL_MATRIX
-        if e.venue == venue and e.accepted and e.venue_kind in _PERP_VENUE_KINDS
+        if e.venue.upper() == venue.upper() and e.accepted and e.venue_kind in _PERP_VENUE_KINDS
     ]
