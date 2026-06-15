@@ -139,6 +139,12 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("cefi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
     ("cefi", "cross_instrument"): _COMPUTED_SERVICE_OUTPUT,
     ("cefi", "cross_instrument_features"): _COMPUTED_SERVICE_OUTPUT,
+    # greeks-service computed outputs (in-house BS greeks + IV surface from the
+    # canonical options_chain) — not produced by any market-data instrument_type.
+    ("cefi", "greeks_snapshot"): _COMPUTED_SERVICE_OUTPUT,
+    ("cefi", "implied_vol_surface"): _COMPUTED_SERVICE_OUTPUT,
+    ("tradfi", "greeks_snapshot"): _COMPUTED_SERVICE_OUTPUT,
+    ("tradfi", "implied_vol_surface"): _COMPUTED_SERVICE_OUTPUT,
     # ── DeFi computed/service outputs (no instrument produces these) ──
     ("defi", "execution_fills"): _COMPUTED_SERVICE_OUTPUT,
     ("defi", "hedge_ratio_snapshot"): _COMPUTED_SERVICE_OUTPUT,

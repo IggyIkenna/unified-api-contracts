@@ -314,6 +314,56 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         batch_capable=True,
         streaming_protocol="ws",
     ),
+    # Options chain — LIVE-CAPABLE crypto options (Deribit public REST, no creds).
+    # Live (real-time) chain source for the VOL_* engine family. The
+    # instruments-service DeribitOptionsReferenceDataAdapter enumerates
+    # strikes/expiries -> CanonicalOptionsChain + venue mark IV; Tardis is the
+    # historical-crypto-options source (BLOCKED-CREDENTIALS scaffold). Same
+    # canonical options_chain data_type the TradFi CME row carries — batch==live.
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="options_chain",
+        venue="DERIBIT",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        sources=("instruments_service/reference_data/adapters/cefi/deribit_options_adapter.py",),
+        notes=(
+            "Deribit public REST option chains + mark IV (live, no creds); "
+            "Tardis = historical-crypto source (BLOCKED-CREDENTIALS scaffold). "
+            "Greeks computed in-house by greeks-service -> greeks_snapshot / "
+            "implied_vol_surface (below)."
+        ),
+    ),
+    # greeks_snapshot — per-leg in-house greeks (delta/gamma/vega/theta/rho + IV)
+    # computed by greeks-service from the canonical options_chain. Live-capable:
+    # rides the same live chain feed (batch==live, identical shape both modes).
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="greeks_snapshot",
+        venue="DERIBIT",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        sources=("greeks_service/kernels/black_scholes.py",),
+        notes="In-house BS greeks per option leg; CanonicalGreeksSnapshot wire shape.",
+    ),
+    # implied_vol_surface — assembled IV-by-(strike/moneyness)x(expiry/tenor)
+    # surface from the canonical options_chain (venue mark IV, else BS-fitted).
+    # Live-capable: same live chain feed (batch==live).
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="implied_vol_surface",
+        venue="DERIBIT",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        sources=("greeks_service/kernels/iv_surface.py",),
+        notes="CanonicalImpliedVolSurface of CanonicalIVSurfacePoint; honest-absence empty surface.",
+    ),
     # Futures chain bundle
     DataTypeCapability(
         asset_group=AssetGroup.CEFI,

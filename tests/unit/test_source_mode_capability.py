@@ -78,6 +78,7 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "strategy_service": _BLR,
     "features_onchain_service": _BLR,
     "cross_instrument": _BLR,
+    "greeks_service": _BLR,
     # CeFi per-venue live/replay sources (NOT batch — Tardis is the CeFi archive),
     # EXCEPT hyperliquid which is ALSO the DeFi perp_funding/solana_defi batch source
     # (REST candleSnapshot) → {BATCH, LIVE, REPLAY} (the unified vendor, R4).
@@ -249,6 +250,7 @@ def test_internal_service_sources_are_full_service_mode() -> None:
         "strategy_service",
         "features_onchain_service",
         "cross_instrument",
+        "greeks_service",
     ):
         assert modes_for_source(src) == frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
 

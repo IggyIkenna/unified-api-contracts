@@ -85,6 +85,10 @@ class PipelineMode(StrEnum):
     BATCH_EXECUTION_SERVICE = "batch_execution_service"
     BATCH_FEATURES_ONCHAIN_SERVICE = "batch_features_onchain_service"
     BATCH_FOOTYSTATS = "batch_footystats"
+    # greeks-service computed outputs (greeks_snapshot / implied_vol_surface) —
+    # in-house BS greeks + IV-surface from the canonical options_chain. Internal
+    # computed source: batch=live symmetry (same kernel both modes), re-run=replay.
+    BATCH_GREEKS_SERVICE = "batch_greeks_service"
     # hyperliquid is a UNIFIED vendor (operator R4 2026-06-07): the former
     # ``hyperliquid_rest`` source glued the REST transport into the source name (the
     # M1 antipattern). source=``hyperliquid``, transport=``rest`` (a column, not the
@@ -151,6 +155,8 @@ class PipelineMode(StrEnum):
     REPLAY_STRATEGY_SERVICE = "replay_strategy_service"
     LIVE_FEATURES_ONCHAIN_SERVICE = "live_features_onchain_service"
     REPLAY_FEATURES_ONCHAIN_SERVICE = "replay_features_onchain_service"
+    LIVE_GREEKS_SERVICE = "live_greeks_service"
+    REPLAY_GREEKS_SERVICE = "replay_greeks_service"
     LIVE_CROSS_INSTRUMENT = "live_cross_instrument"
     REPLAY_CROSS_INSTRUMENT = "replay_cross_instrument"
     LIVE_MDPS_ODDS_HORIZON_BUCKET = "live_mdps_odds_horizon_bucket"
