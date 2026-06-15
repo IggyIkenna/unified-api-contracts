@@ -106,6 +106,13 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # timestamp IS available_at — same tick_timestamp semantic as the chain.
     ("cefi", "greeks_snapshot"): "tick_timestamp",
     ("cefi", "implied_vol_surface"): "tick_timestamp",
+    # order_flow_imbalance / depth_of_book_10 / queue_position — MTDS derives
+    # these inline at the book_snapshot_5 capture tick (latency 0), so the row's
+    # own snapshot timestamp IS available_at — same tick_timestamp semantic as
+    # the upstream L5 book.
+    ("cefi", "order_flow_imbalance"): "tick_timestamp",
+    ("cefi", "depth_of_book_10"): "tick_timestamp",
+    ("cefi", "queue_position"): "tick_timestamp",
     # ---- DeFi -----------------------------------------------------------
     ("defi", "swap"): "tick_timestamp",
     ("defi", "fx_rate"): "tick_timestamp",

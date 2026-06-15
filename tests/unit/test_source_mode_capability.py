@@ -79,6 +79,7 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "features_onchain_service": _BLR,
     "cross_instrument": _BLR,
     "greeks_service": _BLR,
+    "mtds_microstructure": _BLR,
     # CeFi per-venue live/replay sources (NOT batch — Tardis is the CeFi archive),
     # EXCEPT hyperliquid which is ALSO the DeFi perp_funding/solana_defi batch source
     # (REST candleSnapshot) → {BATCH, LIVE, REPLAY} (the unified vendor, R4).

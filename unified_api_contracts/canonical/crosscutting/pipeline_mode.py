@@ -97,6 +97,10 @@ class PipelineMode(StrEnum):
     # plus LIVE_HYPERLIQUID / REPLAY_HYPERLIQUID (in the CeFi-venue block below).
     BATCH_HYPERLIQUID = "batch_hyperliquid"
     BATCH_MASSIVE = "batch_massive"
+    # MTDS L2 microstructure computed outputs (order_flow_imbalance /
+    # depth_of_book_10 / queue_position) — derived from the canonical
+    # book_snapshot_5. Internal computed source: batch=live symmetry, re-run=replay.
+    BATCH_MTDS_MICROSTRUCTURE = "batch_mtds_microstructure"
     BATCH_MDPS_ODDS_HORIZON_BUCKET = "batch_mdps_odds_horizon_bucket"
     BATCH_INSTRUMENTS_SERVICE = "batch_instruments_service"
     BATCH_ODDS_API = "batch_odds_api"
@@ -159,6 +163,8 @@ class PipelineMode(StrEnum):
     REPLAY_GREEKS_SERVICE = "replay_greeks_service"
     LIVE_CROSS_INSTRUMENT = "live_cross_instrument"
     REPLAY_CROSS_INSTRUMENT = "replay_cross_instrument"
+    LIVE_MTDS_MICROSTRUCTURE = "live_mtds_microstructure"
+    REPLAY_MTDS_MICROSTRUCTURE = "replay_mtds_microstructure"
     LIVE_MDPS_ODDS_HORIZON_BUCKET = "live_mdps_odds_horizon_bucket"
     REPLAY_MDPS_ODDS_HORIZON_BUCKET = "replay_mdps_odds_horizon_bucket"
     # {batch, replay} sources — replay member only (no live stream).
