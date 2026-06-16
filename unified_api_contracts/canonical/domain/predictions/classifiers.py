@@ -159,6 +159,189 @@ _CATEGORY_UNDERLYING_TO_EVENT_GROUP: Final[dict[tuple[_C, str], CanonicalQuestio
 }
 
 
+# ---------------------------------------------------------------------------
+# decision 338 pass 2 (2026-06-16) — granular sub-type routing.
+#
+# The 4-tuple taxonomy tags (category, underlying) but not the *sub-type*
+# (price-range vs direction, sports bet-type, political approval vs statement,
+# conflict pair). These read the slug in the projection layer (NOT the
+# taxonomy — keeps the stability-hash inputs unchanged; the cqg version bump
+# is the reclassification lever).
+# ---------------------------------------------------------------------------
+
+
+_CRYPTO_PRICE_RANGE_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
+    "BTC": _G.BTC_PRICE_RANGE_DAILY,
+    "ETH": _G.ETH_PRICE_RANGE_DAILY,
+    "SOL": _G.SOL_PRICE_RANGE_DAILY,
+    "XRP": _G.XRP_PRICE_RANGE_DAILY,
+    "DOGE": _G.DOGE_PRICE_RANGE_DAILY,
+    "BNB": _G.BNB_PRICE_RANGE_DAILY,
+    "ADA": _G.ADA_PRICE_RANGE_DAILY,
+    "AVAX": _G.AVAX_PRICE_RANGE_DAILY,
+    "LINK": _G.LINK_PRICE_RANGE_DAILY,
+    "LTC": _G.LTC_PRICE_RANGE_DAILY,
+    "SUI": _G.SUI_PRICE_RANGE_DAILY,
+    "HYPE": _G.HYPE_PRICE_RANGE_DAILY,
+}
+
+_COMMODITY_PRICE_LEVEL_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
+    "GOLD": _G.GOLD_PRICE_LEVEL,
+    "SILVER": _G.SILVER_PRICE_LEVEL,
+    "CRUDE_OIL": _G.CRUDE_OIL_PRICE_LEVEL,
+}
+
+# Conflict event-type tokens — gate GEO_OTHER_BY_DATE so it catches
+# strike/ceasefire/capture markets, NOT intl ELECTION markets.
+_CONFLICT_SLUG_TOKENS: Final[frozenset[str]] = frozenset(
+    {
+        "war",
+        "strike",
+        "airstrike",
+        "ceasefire",
+        "invade",
+        "invasion",
+        "capture",
+        "military",
+        "nuclear",
+        "attack",
+        "missile",
+        "troops",
+        "annex",
+        "occupy",
+    }
+)
+
+
+# Sports (league, bet_type) → group. league = taxonomy underlying; bet_type
+# from the slug. Every league has a MATCH entry so the fallback in
+# _route_pass2_subtype guarantees per-league grouping (never silent OTHER).
+_SPORTS_GROUP: Final[dict[tuple[str, str], CanonicalQuestionGroup]] = {
+    ("MLB", "MATCH"): _G.SPORTS_MLB_MATCH,
+    ("MLB", "SPREAD"): _G.SPORTS_MLB_SPREAD,
+    ("MLB", "TOTAL"): _G.SPORTS_MLB_TOTAL,
+    ("MLB", "NRFI"): _G.SPORTS_MLB_NRFI,
+    ("NFL", "MATCH"): _G.SPORTS_NFL_MATCH,
+    ("NFL", "SPREAD"): _G.SPORTS_NFL_SPREAD,
+    ("NFL", "TOTAL"): _G.SPORTS_NFL_TOTAL,
+    ("NBA", "MATCH"): _G.SPORTS_NBA_MATCH,
+    ("NBA", "SPREAD"): _G.SPORTS_NBA_SPREAD,
+    ("NBA", "TOTAL"): _G.SPORTS_NBA_TOTAL,
+    ("NHL", "MATCH"): _G.SPORTS_NHL_MATCH,
+    ("NHL", "SPREAD"): _G.SPORTS_NHL_SPREAD,
+    ("NHL", "TOTAL"): _G.SPORTS_NHL_TOTAL,
+    ("EPL", "MATCH"): _G.SPORTS_EPL_MATCH,
+    ("EPL", "TOTAL"): _G.SPORTS_EPL_TOTAL,
+    ("UEFA", "MATCH"): _G.SPORTS_UEFA_MATCH,
+    ("UEFA", "TOTAL"): _G.SPORTS_UEFA_TOTAL,
+    ("CHAMPIONS_LEAGUE", "MATCH"): _G.SPORTS_CHAMPIONS_LEAGUE_MATCH,
+    ("LA_LIGA", "MATCH"): _G.SPORTS_LA_LIGA_MATCH,
+    ("SERIE_A", "MATCH"): _G.SPORTS_SERIE_A_MATCH,
+    ("BUNDESLIGA", "MATCH"): _G.SPORTS_BUNDESLIGA_MATCH,
+    ("WORLD_CUP", "MATCH"): _G.SPORTS_WORLD_CUP_MATCH,
+    ("F1", "MATCH"): _G.SPORTS_F1_MATCH,
+    ("F1", "GP_WINNER"): _G.SPORTS_F1_GP_WINNER,
+    ("F1", "CONSTRUCTOR"): _G.SPORTS_F1_CONSTRUCTOR,
+    ("TENNIS", "MATCH"): _G.SPORTS_TENNIS_MATCH,
+    ("GOLF", "MATCH"): _G.SPORTS_GOLF_MATCH,
+    ("UFC", "MATCH"): _G.SPORTS_UFC_MATCH,
+    ("BOXING", "MATCH"): _G.SPORTS_BOXING_MATCH,
+    ("OLYMPICS", "MATCH"): _G.SPORTS_OLYMPICS_MATCH,
+}
+
+
+def _sports_bet_type(slug: str, league: str) -> str:
+    """Detect the sports bet-type from the slug (decision 338 pass 2).
+
+    Returns one of MATCH / SPREAD / TOTAL / NRFI / GP_WINNER / CONSTRUCTOR.
+    Defaults to MATCH (moneyline / 3-way outcome / tournament winner).
+    """
+    if league == "F1":
+        if "constructor" in slug:
+            return "CONSTRUCTOR"
+        if "grand-prix" in slug or "-gp-" in slug or slug.endswith("-gp") or "sprint" in slug:
+            return "GP_WINNER"
+        return "MATCH"
+    if "nrfi" in slug:
+        return "NRFI"
+    if "spread" in slug or "run-line" in slug or "runline" in slug or "puck-line" in slug or "handicap" in slug:
+        return "SPREAD"
+    if "total" in slug or "over-under" in slug or "overunder" in slug or "over-or-under" in slug:
+        return "TOTAL"
+    return "MATCH"
+
+
+def _route_pass2_subtype(
+    category: PredictionShardCategory,
+    underlying: str,
+    slug: str,
+    market_type: PredictionShardMarketType,
+) -> CanonicalQuestionGroup | None:
+    """Category-specific sub-type routing (decision 338 pass 2).
+
+    Returns a :class:`CanonicalQuestionGroup`, or ``None`` to fall through to
+    the generic cadence-map / event-map routing. ``slug`` MUST be lowercased.
+    """
+    und = underlying.upper()
+    s = slug
+
+    # Box-office markets carry a movie title the taxonomy can't tag → category
+    # MISC. Detect category-agnostically by slug token.
+    if "box-office" in s or "opening-weekend" in s:
+        return CanonicalQuestionGroup.BOX_OFFICE_OPENING_WEEKEND
+
+    if category is PredictionShardCategory.CRYPTO_PRICE:
+        # PRICE-RANGE = a price-level market that is NOT a direction bet
+        # ("between $X-$Y" / multistrike / above-below). UP_DOWN falls through
+        # to the cadence map (which carries the {COIN}_UP_DOWN_* groups).
+        if "up-or-down" not in s and (market_type is PredictionShardMarketType.RANGE_BRACKET or "multistrike" in s):
+            return _CRYPTO_PRICE_RANGE_GROUP.get(und)
+        return None
+
+    if category is PredictionShardCategory.COMMODITY:
+        # PRICE-LEVEL = non-direction commodity price market ("gold above $X").
+        if "up-or-down" not in s and (
+            market_type is PredictionShardMarketType.RANGE_BRACKET
+            or any(t in s for t in ("above", "below", "reach", "hit"))
+        ):
+            return _COMMODITY_PRICE_LEVEL_GROUP.get(und)
+        return None
+
+    if category is PredictionShardCategory.POLITICS_US and und == "TRUMP":
+        if "approval" in s:
+            return CanonicalQuestionGroup.TRUMP_APPROVAL_RATING
+        if "executive-order" in s or "exec-order" in s or ("sign" in s and "order" in s):
+            return CanonicalQuestionGroup.TRUMP_EXEC_ORDER
+        if any(t in s for t in ("say", "said", "tweet", "post", "mention")):
+            return CanonicalQuestionGroup.TRUMP_STATEMENTS
+        return None
+
+    if category is PredictionShardCategory.TECH and und == "ELON_MUSK":
+        if "tweet" in s or ("post" in s and "time" in s):
+            return CanonicalQuestionGroup.ELON_TWEET_COUNT
+        if "net-worth" in s or "networth" in s or "wealth" in s:
+            return CanonicalQuestionGroup.ELON_NET_WORTH
+        if any(t in s for t in ("say", "said", "mention")):
+            return CanonicalQuestionGroup.ELON_STATEMENTS
+        return None
+
+    if category is PredictionShardCategory.POLITICS_INTL:
+        if und in ("ISRAEL", "IRAN"):
+            return CanonicalQuestionGroup.GEO_ISRAEL_IRAN
+        if und in ("RUSSIA", "UKRAINE"):
+            return CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE
+        if any(t in s for t in _CONFLICT_SLUG_TOKENS):
+            return CanonicalQuestionGroup.GEO_OTHER_BY_DATE
+        return None  # intl elections etc. → generic fall-through
+
+    if category in (PredictionShardCategory.SPORTS_FOOTBALL, PredictionShardCategory.SPORTS_OTHER):
+        # league x bet-type; per-league MATCH fallback guarantees grouping.
+        bet_type = _sports_bet_type(s, und)
+        return _SPORTS_GROUP.get((und, bet_type)) or _SPORTS_GROUP.get((und, "MATCH"))
+
+    return None
+
+
 def classify_polymarket_to_canonical_group(
     *,
     title: str,
@@ -198,6 +381,21 @@ def classify_polymarket_to_canonical_group(
         outcome=outcome,
     )
 
+    # decision 338 pass 2 — granular sub-type routing (price-range vs direction,
+    # political approval/statements/exec-order, conflict pair, box-office,
+    # commodity price-level). Returns None to fall through to the generic maps.
+    subtype_group = _route_pass2_subtype(category, underlying, (slug or "").lower(), market_type)
+    if subtype_group is not None:
+        return subtype_group
+
+    # Genuinely-uncategorised (taxonomy returned MISC/UNKNOWN) → MISC_NOVELTY,
+    # the explicit novelty residual; categorised-but-ungrouped → OTHER.
+    residual = (
+        CanonicalQuestionGroup.MISC_NOVELTY
+        if category is PredictionShardCategory.MISC
+        else CanonicalQuestionGroup.OTHER
+    )
+
     if market_type == PredictionShardMarketType.RANGE_BRACKET:
         cadence_key = (category, underlying.upper(), resolution_period)
         result = _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(cadence_key)
@@ -213,14 +411,14 @@ def classify_polymarket_to_canonical_group(
             if result is not None:
                 return result
         _log.info("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
-        return CanonicalQuestionGroup.OTHER
+        return residual
 
     event_key = (category, underlying.upper())
     result = _CATEGORY_UNDERLYING_TO_EVENT_GROUP.get(event_key)
     if result is not None:
         return result
     _log.info("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
-    return CanonicalQuestionGroup.OTHER
+    return residual
 
 
 def classify_kalshi_to_canonical_group(
