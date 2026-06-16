@@ -1,9 +1,10 @@
 """CeFi instrument universe — curated base assets for CeFi venue filtering.
 
 SSOT for which crypto assets the instruments-service tracks across CeFi venues.
-URDI Tardis/direct adapters filter to only return instruments where the base
-asset is in this set. Keeps scope manageable (~20 top coins by market cap)
-while covering all asset classes the system needs.
+Tardis/direct adapters filter to only return instruments where the base
+asset is in this set. Curated set (~45 assets — top market-cap coins plus
+operator-requested coverage incl. EigenLayer dust) covering the asset classes
+the system needs while keeping scope manageable.
 
 Includes FTT and LUNA (delisted) to test the system's handling of delistings —
 they will appear with ``is_active=False`` and ``available_to`` set.
@@ -40,6 +41,24 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "OP",       # Optimism
     "HYPE",     # Hyperliquid
     "PEPE",     # Pepe
+    # --- Added 2026-06-16 (operator: full requested CeFi coverage + EigenLayer rewards dust) ---
+    "EIGEN",    # EigenLayer (rewards dust tracking)
+    "AAVE",     # Aave
+    "ALGO",     # Algorand
+    "AXS",      # Axie Infinity
+    "CHZ",      # Chiliz
+    "COMP",     # Compound
+    "DASH",     # Dash
+    "ENJ",      # Enjin
+    "EOS",      # EOS
+    "FIL",      # Filecoin
+    "GALA",     # Gala
+    "ICP",      # Internet Computer
+    "MANA",     # Decentraland
+    "SAND",     # The Sandbox
+    "THETA",    # Theta Network
+    "XLM",      # Stellar
+    "ZEC",      # Zcash
     # --- Stablecoins (as base in stablecoin pairs like USDT/USD) ---
     "USDT",     # Tether
     "USDC",     # USD Coin
