@@ -53,26 +53,26 @@ from __future__ import annotations
 # USDC/WETH 0.05%, USDC/WETH 0.3%, WETH/USDT 0.3%, WBTC/WETH 0.3%, and
 # WBTC/USDC 0.3% pools — aggregate ~$1.2B TVL.
 _UNISWAP_V3_ETHEREUM_TOP_POOLS: tuple[str, ...] = (
-    "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",  # USDC/WETH 0.05%
-    "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",  # USDC/WETH 0.3%
-    "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",  # WETH/USDT 0.3%
-    "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",  # WBTC/WETH 0.3%
-    "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",  # WBTC/USDC 0.3%
-    "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",  # WBTC/WETH 0.05%
-    "0x11b815efb8f581194ae79006d24e0d814b7697f6",  # WETH/USDT 0.05%
-    "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",  # LINK/WETH 0.3%
-    "0x9db9e0e53058c89e5b94e29621a205198648425b",  # WBTC/USDT 0.3%
-    "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",  # DAI/WETH 0.3%
-    "0x5796d7ad51583ae2c7297652edb7006bcd90519d",  # HKDM/USDM 0.01%
-    "0x3416cf6c708da44db2624d63ea0aaef7113527c6",  # USDC/USDT 0.01%
-    "0xe8f7c89c5efa061e340f2d2f206ec78fd8f7e124",  # WBTC/cbBTC 0.01%
-    "0x1d42064fc4beb5f8aaf85f4617ae8b3b5b8bd801",  # UNI/WETH 0.3%
-    "0x11950d141ecb863f01007add7d1a342041227b58",  # PEPE/WETH 0.3%
-    "0xbafead7c60ea473758ed6c6021505e8bbd7e8e5d",  # AUSD/USDC 0.01%
-    "0x56534741cd8b152df6d48adf7ac51f75169a83b2",  # WBTC/USDT 0.05%
-    "0x4a25dbdf9629b1782c3e2c7de3bdce41f1c7f801",  # USDM/USDT 0.05%
-    "0x970a7749ecaa4394c8b2bf5f2471f41fd6b79288",  # wM/USDC 0.01%
-    "0x6546055f46e866a4b9a4a13e81273e3152bae5da",  # XAUt/USDT 0.05%
+    "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",  # USDC/WETH 0.05%  # QG-allow: defi-citation
+    "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",  # USDC/WETH 0.3%  # QG-allow: defi-citation
+    "0x4e68ccd3e89f51c3074ca5072bbac773960dfa36",  # WETH/USDT 0.3%  # QG-allow: defi-citation
+    "0xcbcdf9626bc03e24f779434178a73a0b4bad62ed",  # WBTC/WETH 0.3%  # QG-allow: defi-citation
+    "0x99ac8ca7087fa4a2a1fb6357269965a2014abc35",  # WBTC/USDC 0.3%  # QG-allow: defi-citation
+    "0x4585fe77225b41b697c938b018e2ac67ac5a20c0",  # WBTC/WETH 0.05%  # QG-allow: defi-citation
+    "0x11b815efb8f581194ae79006d24e0d814b7697f6",  # WETH/USDT 0.05%  # QG-allow: defi-citation
+    "0xa6cc3c2531fdaa6ae1a3ca84c2855806728693e8",  # LINK/WETH 0.3%  # QG-allow: defi-citation
+    "0x9db9e0e53058c89e5b94e29621a205198648425b",  # WBTC/USDT 0.3%  # QG-allow: defi-citation
+    "0xc2e9f25be6257c210d7adf0d4cd6e3e881ba25f8",  # DAI/WETH 0.3%  # QG-allow: defi-citation
+    "0x5796d7ad51583ae2c7297652edb7006bcd90519d",  # HKDM/USDM 0.01%  # QG-allow: defi-citation
+    "0x3416cf6c708da44db2624d63ea0aaef7113527c6",  # USDC/USDT 0.01%  # QG-allow: defi-citation
+    "0xe8f7c89c5efa061e340f2d2f206ec78fd8f7e124",  # WBTC/cbBTC 0.01%  # QG-allow: defi-citation
+    "0x1d42064fc4beb5f8aaf85f4617ae8b3b5b8bd801",  # UNI/WETH 0.3%  # QG-allow: defi-citation
+    "0x11950d141ecb863f01007add7d1a342041227b58",  # PEPE/WETH 0.3%  # QG-allow: defi-citation
+    "0xbafead7c60ea473758ed6c6021505e8bbd7e8e5d",  # AUSD/USDC 0.01%  # QG-allow: defi-citation
+    "0x56534741cd8b152df6d48adf7ac51f75169a83b2",  # WBTC/USDT 0.05%  # QG-allow: defi-citation
+    "0x4a25dbdf9629b1782c3e2c7de3bdce41f1c7f801",  # USDM/USDT 0.05%  # QG-allow: defi-citation
+    "0x970a7749ecaa4394c8b2bf5f2471f41fd6b79288",  # wM/USDC 0.01%  # QG-allow: defi-citation
+    "0x6546055f46e866a4b9a4a13e81273e3152bae5da",  # XAUt/USDT 0.05%  # QG-allow: defi-citation
 )
 
 # Aave V3 Ethereum — top 10 reserves by canonical usage + observed
@@ -114,16 +114,16 @@ _ETHENA_ETHEREUM_LST_TOKENS: tuple[str, ...] = ("USDe", "sUSDe")
 # instrument_availability/by_date/day=2026-04-14/market=BTC/
 # venue=POLYMARKET/instruments.parquet``.
 _POLYMARKET_TOP_CONDITION_IDS: tuple[str, ...] = (
-    "0xaeb90563cfa2b094efccc44658f991a39e0687082f1882d7d51c5d709821ba5b",
-    "0xdd1101f985c5649c070c0acc370e72d48a1117a2d4775fd060526771c4c38e41",
-    "0x5778bf2998b76e62ea6a2cfa9dcb070265f2a0b3d37da9736a90f765d04abe52",
-    "0xb4edd1ceca7ae170d1ed632677a8671797b3d47374d38ffac7d410cfb9e9f5c7",
-    "0xedc2c7b97fd9475880d65d875b74ac709093cb9ef50b31245a0f9df73b9f53e7",
-    "0xcaf9ab651cb192c756ce23d15692041d9397cb9983bb55022dc1e3f5525a8a32",
-    "0x53506e5fd3f980c20e9b6683962a1bc72aaa18ad01dcc2b8416b5c606aff9fb9",
-    "0x0047decf5a127be6ec0ba4eee78c9b224eb2d5445aff6241377272eacd42114f",
-    "0x1c2f06de72ad9ecd9a25babc2a908302261686659d642c9d369946ce0d1bfdd3",
-    "0x3c18e248b91adf9f665a07747f0e2ff6727913bdc910f99e93861572b4eb3651",
+    "0xaeb90563cfa2b094efccc44658f991a39e0687082f1882d7d51c5d709821ba5b",  # QG-allow: defi-citation
+    "0xdd1101f985c5649c070c0acc370e72d48a1117a2d4775fd060526771c4c38e41",  # QG-allow: defi-citation
+    "0x5778bf2998b76e62ea6a2cfa9dcb070265f2a0b3d37da9736a90f765d04abe52",  # QG-allow: defi-citation
+    "0xb4edd1ceca7ae170d1ed632677a8671797b3d47374d38ffac7d410cfb9e9f5c7",  # QG-allow: defi-citation
+    "0xedc2c7b97fd9475880d65d875b74ac709093cb9ef50b31245a0f9df73b9f53e7",  # QG-allow: defi-citation
+    "0xcaf9ab651cb192c756ce23d15692041d9397cb9983bb55022dc1e3f5525a8a32",  # QG-allow: defi-citation
+    "0x53506e5fd3f980c20e9b6683962a1bc72aaa18ad01dcc2b8416b5c606aff9fb9",  # QG-allow: defi-citation
+    "0x0047decf5a127be6ec0ba4eee78c9b224eb2d5445aff6241377272eacd42114f",  # QG-allow: defi-citation
+    "0x1c2f06de72ad9ecd9a25babc2a908302261686659d642c9d369946ce0d1bfdd3",  # QG-allow: defi-citation
+    "0x3c18e248b91adf9f665a07747f0e2ff6727913bdc910f99e93861572b4eb3651",  # QG-allow: defi-citation
 )
 
 # Kalshi — no observable bucket in

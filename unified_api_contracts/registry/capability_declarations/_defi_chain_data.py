@@ -419,42 +419,42 @@ CHAIN_NATIVE_GAS_TOKEN: dict[int, str] = {
 # On non-ETH chains, this is the wrapped native token (WBNB, WMATIC, WAVAX).
 # ---------------------------------------------------------------------------
 WETH_ADDRESSES: dict[int, str] = {
-    1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
-    10: "0x4200000000000000000000000000000000000006",
-    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",  # WBNB
-    130: "0x4200000000000000000000000000000000000006",
-    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",  # WMATIC
-    324: "0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91",
-    480: "0x4200000000000000000000000000000000000006",
-    1101: "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9",
-    2741: "0x4200000000000000000000000000000000000006",
-    8453: "0x4200000000000000000000000000000000000006",
-    34443: "0x4200000000000000000000000000000000000006",
-    42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
-    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",  # WAVAX
-    57073: "0x4200000000000000000000000000000000000006",
-    59144: "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",
-    81457: "0x4300000000000000000000000000000000000004",
-    534352: "0x5300000000000000000000000000000000000004",
-    7777777: "0x4200000000000000000000000000000000000006",
-    11155111: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",
+    1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",  # DERIVED canonical wrapped-native (chain per key)
+    10: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",  # WBNB  # DERIVED canonical wrapped-native (chain per key)
+    130: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",  # WMATIC  # DERIVED canonical wrapped-native (chain per key)
+    324: "0x5AEa5775959fBC2557Cc8789bC1bf90A239D9a91",  # DERIVED canonical wrapped-native (chain per key)
+    480: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    1101: "0x4F9A0e7FD2Bf6067db6994CF12E4495Df938E6e9",  # DERIVED canonical wrapped-native (chain per key)
+    2741: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    8453: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    34443: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",  # DERIVED canonical wrapped-native (chain per key)
+    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",  # WAVAX  # DERIVED canonical wrapped-native (chain per key)
+    57073: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    59144: "0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f",  # DERIVED canonical wrapped-native (chain per key)
+    81457: "0x4300000000000000000000000000000000000004",  # DERIVED canonical wrapped-native (chain per key)
+    534352: "0x5300000000000000000000000000000000000004",  # DERIVED canonical wrapped-native (chain per key)
+    7777777: "0x4200000000000000000000000000000000000006",  # DERIVED canonical wrapped-native (chain per key)
+    11155111: "0xfFf9976782d46CC05630D1f6eBAb18b2324d6B14",  # DERIVED canonical wrapped-native (chain per key)
 }
 
 # ---------------------------------------------------------------------------
 # WBTC / cbBTC addresses per chain (BTC on EVM — first-class instruments)
 # ---------------------------------------------------------------------------
 WBTC_ADDRESSES: dict[int, str] = {
-    1: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
-    10: "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
-    137: "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",
-    42161: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",
-    43114: "0x50b7545627a5162F82A992c33b87aDc75187B218",
+    1: "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",  # DERIVED canonical WBTC (chain per key)
+    10: "0x68f180fcCe6836688e9084f035309E29Bf0A2095",  # DERIVED canonical WBTC (chain per key)
+    137: "0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6",  # DERIVED canonical WBTC (chain per key)
+    42161: "0x2f2a2543B76A4166549F7aaB2e75Bef0aefC5B0f",  # DERIVED canonical WBTC (chain per key)
+    43114: "0x50b7545627a5162F82A992c33b87aDc75187B218",  # DERIVED canonical WBTC (chain per key)
 }
 
 CBBTC_ADDRESSES: dict[int, str] = {
-    1: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
-    8453: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
-    42161: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+    1: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",  # DERIVED canonical cbBTC (chain per key)
+    8453: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",  # DERIVED canonical cbBTC (chain per key)
+    42161: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",  # DERIVED canonical cbBTC (chain per key)
 }
 
 
@@ -716,11 +716,11 @@ STARKNET_RPC_TEMPLATES: dict[str, str] = {
 # Wrapped BTC tokens on EVM chains (already in WBTC_ADDRESSES / CBBTC_ADDRESSES above)
 # tBTC is another wrapped BTC option on Ethereum
 TBTC_ADDRESSES: dict[int, str] = {
-    1: "0x18084fbA666a33d37592fA2633fD49a74DD93a88",
-    42161: "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",
-    137: "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",
-    10: "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",
-    8453: "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",
+    1: "0x18084fbA666a33d37592fA2633fD49a74DD93a88",  # DERIVED canonical TBTC (chain per key)
+    42161: "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",  # DERIVED canonical TBTC (chain per key)
+    137: "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",  # DERIVED canonical TBTC (chain per key)
+    10: "0x6c84a8f1c29108F47a79964b5Fe888D4f4D0dE40",  # DERIVED canonical TBTC (chain per key)
+    8453: "0x236aa50979D5f3De3Bd1Eeb40E81137F22ab794b",  # DERIVED canonical TBTC (chain per key)
 }
 
 

@@ -2,7 +2,7 @@
 
 Fixes the silent-Ethereum-only bug surfaced by defi_recursive_borrow Family 1 design
 2026-05-12: ``UniswapConnector.swap_exact_input`` was hardcoding mainnet SwapRouter02
-``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45``, which only resolves on Ethereum.
+``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45``, which only resolves on Ethereum.  # DERIVED ethereum uniswap-docs
 Family 1 + 2 cells on Base + Arbitrum + Optimism need per-chain dispatch.
 
 Plan:
@@ -10,11 +10,11 @@ Plan:
 Family 1 design § "Cross-plan annotations queued".
 
 Provenance: addresses sourced from Uniswap V3 deployments docs:
-- Ethereum mainnet: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45``
-- Base mainnet: SwapRouter02 ``0x2626664c2603336E57B271c5C0b26F421741e481``
-- Arbitrum One: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45`` (same as mainnet)
-- Optimism: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45`` (same as mainnet)
-- Polygon: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45`` (same as mainnet)
+- Ethereum mainnet: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45``  # DERIVED ethereum uniswap-docs
+- Base mainnet: SwapRouter02 ``0x2626664c2603336E57B271c5C0b26F421741e481``  # DERIVED base uniswap-docs
+- Arbitrum One: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45``  # DERIVED arbitrum uniswap
+- Optimism: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45`` (same as mainnet)  # DERIVED optimism uniswap
+- Polygon: SwapRouter02 ``0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45`` (same as mainnet)  # DERIVED polygon uniswap-docs
 """
 
 from __future__ import annotations
@@ -30,22 +30,22 @@ from typing import Final
 # checksum case when constructing tx calldata to avoid downstream Web3 strict-mode
 # validation errors.
 UNISWAP_SWAP_ROUTER_BY_CHAIN: Final[dict[str, str]] = {
-    "ETHEREUM": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
-    "BASE": "0x2626664c2603336E57B271c5C0b26F421741e481",
-    "ARBITRUM": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
-    "OPTIMISM": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
-    "POLYGON": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",
+    "ETHEREUM": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",  # DERIVED ethereum uniswap-docs
+    "BASE": "0x2626664c2603336E57B271c5C0b26F421741e481",  # DERIVED base uniswap-docs
+    "ARBITRUM": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",  # DERIVED arbitrum uniswap-docs
+    "OPTIMISM": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",  # DERIVED optimism uniswap-docs
+    "POLYGON": "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45",  # DERIVED polygon uniswap-docs
 }
 
 
 # Uniswap V3 Factory addresses (added for completeness; consumers needing pool
 # lookup via factory.getPool() use this).
 UNISWAP_V3_FACTORY_BY_CHAIN: Final[dict[str, str]] = {
-    "ETHEREUM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-    "BASE": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",
-    "ARBITRUM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-    "OPTIMISM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
-    "POLYGON": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+    "ETHEREUM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED ethereum uniswap-docs
+    "BASE": "0x33128a8fC17869897dcE68Ed026d694621f6FDfD",  # DERIVED base uniswap-docs
+    "ARBITRUM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED arbitrum uniswap-docs
+    "OPTIMISM": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED optimism uniswap-docs
+    "POLYGON": "0x1F98431c8aD98523631AE4a59f267346ea31F984",  # DERIVED polygon uniswap-docs
 }
 
 
@@ -79,7 +79,7 @@ def get_uniswap_v3_factory(chain: str) -> str | None:
 # Only chains confirmed from deployment docs are populated; consumers must handle
 # None (chain not yet verified).
 UNISWAP_QUOTER_V2_BY_CHAIN: Final[dict[str, str]] = {
-    "ETHEREUM": "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",
+    "ETHEREUM": "0x61fFE014bA17989E743c5F6cB21bF9697530B21e",  # DERIVED ethereum uniswap-docs
 }
 
 
