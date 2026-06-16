@@ -321,33 +321,14 @@ def _expand_two_digit_year(year_token: str) -> int:
 # ---------------------------------------------------------------------------
 
 
-def classify_databento_symbol(
-    raw_symbol: str,
-    asset_class_hint: str | None = None,
-) -> DatabentoClassification:
-    """Classify a raw Databento symbol into a structured record.
+def _classify_databento_combo(symbol: str, asset_class_hint: str | None) -> DatabentoClassification | None:
+    """Combo / multi-leg Databento symbol shapes (decision 338 refactor).
 
-    Args:
-        raw_symbol: The raw symbol string as returned by Databento
-            (e.g. ``ESM6``, ``E2AJ6 C6190``, ``AAPL``).
-        asset_class_hint: Optional hint to disambiguate equity vs ETF vs
-            index for symbols that are ambiguous from shape alone
-            (``SPY``, ``QQQ``). Accepted values: ``"equity"``, ``"etf"``,
-            ``"index"``. Any other value is ignored.
-
-    Returns:
-        A :class:`DatabentoClassification` describing the symbol.
-
-    Raises:
-        ValueError: If the symbol is empty or cannot be classified.
+    Extracted from :func:`classify_databento_symbol` to keep that dispatcher
+    under the function-size limit. Tries, in order, CBOE user-defined
+    strategies, prefix-annotated combos, continuous-contract prefix combos,
+    and generic N-leg combos. Returns ``None`` when no combo shape matches.
     """
-    if not raw_symbol or not raw_symbol.strip():
-        msg = "raw_symbol must be a non-empty string"
-        raise ValueError(msg)
-
-    symbol = raw_symbol.strip().upper()
-    hint = (asset_class_hint or "").strip().lower() or None
-
     # 0-pre. CBOE user-defined strategy (``UD:1V: GN 0113805462``). CBOE
     #         emits these as opaque IDs whose leg breakdown lives in the
     #         Databento definitions feed; we classify as COMBO + CUSTOM
@@ -472,6 +453,16 @@ def classify_databento_symbol(
         if len(legs_raw) >= 2 and all(tok for tok in legs_raw):
             return _build_combo_classification(legs_raw, asset_class_hint, strategy_override=None)
 
+    return None
+
+
+def _classify_databento_option(symbol: str) -> DatabentoClassification | None:
+    """Option Databento symbol shapes (decision 338 refactor).
+
+    Extracted from :func:`classify_databento_symbol`. Tries, in order,
+    OSI-packed equity options, CME event-contract daily options, and CME
+    short-form options. Returns ``None`` when no option shape matches.
+    """
     # 1. OSI-packed option (equity options via OPRA) — check first, very specific.
     osi_match = _OSI_OPTION_RE.match(symbol.replace(" ", ""))
     if osi_match and len(symbol) >= 15:
@@ -539,6 +530,51 @@ def classify_databento_symbol(
             is_continuous=False,
             root_cluster=extract_es_options_cluster(symbol),
         )
+
+    return None
+
+
+def classify_databento_symbol(
+    raw_symbol: str,
+    asset_class_hint: str | None = None,
+) -> DatabentoClassification:
+    """Classify a raw Databento symbol into a structured record.
+
+    Args:
+        raw_symbol: The raw symbol string as returned by Databento
+            (e.g. ``ESM6``, ``E2AJ6 C6190``, ``AAPL``).
+        asset_class_hint: Optional hint to disambiguate equity vs ETF vs
+            index for symbols that are ambiguous from shape alone
+            (``SPY``, ``QQQ``). Accepted values: ``"equity"``, ``"etf"``,
+            ``"index"``. Any other value is ignored.
+
+    Returns:
+        A :class:`DatabentoClassification` describing the symbol.
+
+    Raises:
+        ValueError: If the symbol is empty or cannot be classified.
+
+    Dispatch order (preserved across the 2026-06-16 helper extraction):
+    combo forms → option forms → FX future → dated future → continuous
+    future → index → ICE future → bare continuous → equity/ETF.
+    """
+    if not raw_symbol or not raw_symbol.strip():
+        msg = "raw_symbol must be a non-empty string"
+        raise ValueError(msg)
+
+    symbol = raw_symbol.strip().upper()
+    hint = (asset_class_hint or "").strip().lower() or None
+
+    # 0. Combo / multi-leg shapes (CBOE UD, prefix-combo, continuous-prefix
+    #    combo, generic N-leg) — must precede the single-instrument shapes.
+    combo = _classify_databento_combo(symbol, asset_class_hint)
+    if combo is not None:
+        return combo
+
+    # 1-2. Option shapes (OSI-packed, CME event-daily, CME short-form).
+    option = _classify_databento_option(symbol)
+    if option is not None:
+        return option
 
     # 2b. CME FX future (``6AM4``, ``6EU4``). The 2-char root starts with
     #     ``6`` so it does not match the alpha-only ``_DATED_FUT_RE``. FX
