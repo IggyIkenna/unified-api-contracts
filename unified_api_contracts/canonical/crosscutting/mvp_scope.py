@@ -43,6 +43,16 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Final
 
+from unified_api_contracts.canonical.crosscutting.config_versioning import (
+    ConfigDescriptor,
+    canonical_config_repr,
+    compute_config_content_hash,
+)
+
+# Re-exported (the generic descriptor type now lives in ``config_versioning``;
+# kept importable here + at the package root for backwards compatibility).
+_canonical_repr = canonical_config_repr
+
 # ---------------------------------------------------------------------------
 # Typed, immutable rule structures
 # ---------------------------------------------------------------------------
@@ -477,6 +487,38 @@ MVP_SCOPE: Final[dict[str, object]] = {
         "TODO(mvp-scope): define per-archetype model membership."
     ),
 }
+
+
+# ---------------------------------------------------------------------------
+# Config versioning — monotonic version + deterministic content hash.
+#
+# Per the audit (mvp_scope_catalogue_tagging § "Config versioning"): so a
+# coverage delta in data-status attributes to a SCOPE change vs a DATA change,
+# carry a (config_version, config_content_hash) descriptor. Bump
+# MVP_SCOPE_CONFIG_VERSION whenever MVP_SCOPE content changes; the hash is
+# computed at module load and flips IFF the content flips. NOT a GCS key.
+# ---------------------------------------------------------------------------
+
+
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 1
+"""Monotonic version of :data:`MVP_SCOPE`. Bump on any content change."""
+
+
+def _compute_mvp_scope_content_hash() -> str:
+    """SHA-256 (16-hex prefix) of the canonical MVP_SCOPE content + version."""
+    return compute_config_content_hash(
+        MVP_SCOPE_CONFIG_VERSION,
+        [(asset_group, MVP_SCOPE[asset_group]) for asset_group in sorted(MVP_SCOPE)],
+    )
+
+
+MVP_SCOPE_CONFIG_HASH: Final[str] = _compute_mvp_scope_content_hash()
+"""Content hash of :data:`MVP_SCOPE` — flips IFF the scope content changes."""
+
+
+def mvp_scope_config_descriptor() -> ConfigDescriptor:
+    """Return the :data:`MVP_SCOPE` ``(version, content-hash)`` descriptor."""
+    return ConfigDescriptor(MVP_SCOPE_CONFIG_VERSION, MVP_SCOPE_CONFIG_HASH)
 
 
 # ---------------------------------------------------------------------------
