@@ -40,7 +40,8 @@ SSOT: ``plans/active/mvp_scope_catalogue_tagging_2026_06_08.md``.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import hashlib
+from dataclasses import dataclass, field, fields, is_dataclass
 from typing import Final
 
 # ---------------------------------------------------------------------------
@@ -477,6 +478,69 @@ MVP_SCOPE: Final[dict[str, object]] = {
         "TODO(mvp-scope): define per-archetype model membership."
     ),
 }
+
+
+# ---------------------------------------------------------------------------
+# Config versioning — monotonic version + deterministic content hash.
+#
+# Per the audit (mvp_scope_catalogue_tagging § "Config versioning"): so a
+# coverage delta in data-status attributes to a SCOPE change vs a DATA change,
+# carry a (config_version, config_content_hash) descriptor. Bump
+# MVP_SCOPE_CONFIG_VERSION whenever MVP_SCOPE content changes; the hash is
+# computed at module load and flips IFF the content flips. NOT a GCS key.
+# ---------------------------------------------------------------------------
+
+
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 1
+"""Monotonic version of :data:`MVP_SCOPE`. Bump on any content change."""
+
+
+def _canonical_repr(obj: object) -> str:
+    """Deterministic string for an MVP_SCOPE value.
+
+    Frozensets / sets are SORTED so the hash is stable across processes
+    (independent of ``PYTHONHASHSEED`` string-hash randomisation) — the
+    generators-must-be-deterministic rule.
+    """
+    if is_dataclass(obj) and not isinstance(obj, type):
+        parts = [f"{f.name}={_canonical_repr(getattr(obj, f.name))}" for f in fields(obj)]
+        return f"{type(obj).__name__}({','.join(parts)})"
+    if isinstance(obj, (frozenset, set)):
+        return "{" + ",".join(sorted(_canonical_repr(x) for x in obj)) + "}"
+    if isinstance(obj, (list, tuple)):
+        return "[" + ",".join(_canonical_repr(x) for x in obj) + "]"
+    if isinstance(obj, dict):
+        return "{" + ",".join(f"{k}:{_canonical_repr(v)}" for k, v in sorted(obj.items())) + "}"
+    return repr(obj)
+
+
+def _compute_mvp_scope_content_hash() -> str:
+    """SHA-256 (16-hex prefix) of the canonical MVP_SCOPE content + version."""
+    hasher = hashlib.sha256()
+    hasher.update(str(MVP_SCOPE_CONFIG_VERSION).encode())
+    hasher.update(b"\x00")
+    for asset_group in sorted(MVP_SCOPE):
+        hasher.update(f"{asset_group}={_canonical_repr(MVP_SCOPE[asset_group])}".encode())
+        hasher.update(b"\x00")
+    return hasher.hexdigest()[:16]
+
+
+MVP_SCOPE_CONFIG_HASH: Final[str] = _compute_mvp_scope_content_hash()
+"""Content hash of :data:`MVP_SCOPE` — flips IFF the scope content changes."""
+
+
+@dataclass(frozen=True)
+class ConfigDescriptor:
+    """``(config_version, config_content_hash)`` pair surfaced in data-status
+    so a coverage delta attributes to scope-change vs data-change."""
+
+    config_version: int
+    config_content_hash: str
+
+
+def mvp_scope_config_descriptor() -> ConfigDescriptor:
+    """Return the :data:`MVP_SCOPE` ``(version, content-hash)`` descriptor."""
+    return ConfigDescriptor(MVP_SCOPE_CONFIG_VERSION, MVP_SCOPE_CONFIG_HASH)
 
 
 # ---------------------------------------------------------------------------

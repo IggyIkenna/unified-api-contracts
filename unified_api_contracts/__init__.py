@@ -159,13 +159,17 @@ from .canonical.crosscutting.mode_precedence import (
 )
 from .canonical.crosscutting.mvp_scope import (
     MVP_SCOPE,
+    MVP_SCOPE_CONFIG_HASH,
+    MVP_SCOPE_CONFIG_VERSION,
     CeFiMvpRule,
+    ConfigDescriptor,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
     PredictionMvpRule,
     SportsMvpRule,
     TradFiMvpRule,
     is_mvp,
+    mvp_scope_config_descriptor,
 )
 from .canonical.crosscutting.pipeline_mode import (
     _SPORTS_ENTITY_TO_PIPELINE_MODE,  # pyright: ignore[reportPrivateUsage]  # package-internal mapping, intentionally re-exported via __all__
@@ -2248,7 +2252,11 @@ __all__ = [
     "VenueTestnetEndpoints",
     # MVP scope config + predicate (Phase 1)
     "MVP_SCOPE",
+    "MVP_SCOPE_CONFIG_HASH",
+    "MVP_SCOPE_CONFIG_VERSION",
+    "ConfigDescriptor",
     "is_mvp",
+    "mvp_scope_config_descriptor",
     "CeFiMvpRule",
     "DeFiMvpRule",
     "TradFiMvpRule",

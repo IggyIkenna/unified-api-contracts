@@ -75,9 +75,7 @@ class TestMvpScopeStructure:
             # Narrow the type before accessing .venues — MVP_SCOPE is typed as
             # dict[str, object] so we use isinstance to satisfy the type checker.
             assert isinstance(rule, (CeFiMvpRule, DeFiMvpRule, TradFiMvpRule, PredictionMvpRule))
-            assert isinstance(rule.venues, frozenset), (
-                f"Expected frozenset for {ag}.venues, got {type(rule.venues)}"
-            )
+            assert isinstance(rule.venues, frozenset), f"Expected frozenset for {ag}.venues, got {type(rule.venues)}"
 
 
 # ---------------------------------------------------------------------------
@@ -447,3 +445,69 @@ class TestPureFunctionProperty:
         """is_mvp() is deterministic for the same inputs."""
         results = {is_mvp("defi", "UNISWAP_V3-ETHEREUM", "POOL", "dex_pool_state") for _ in range(5)}
         assert results == {True}
+
+
+# ---------------------------------------------------------------------------
+# Config versioning — monotonic version + deterministic content hash
+# (audit: mvp_scope_catalogue_tagging § "Config versioning")
+# ---------------------------------------------------------------------------
+
+
+def test_config_descriptor_public_surface() -> None:
+    """version + hash + descriptor are importable from the package root."""
+    from unified_api_contracts import (
+        MVP_SCOPE_CONFIG_HASH,
+        MVP_SCOPE_CONFIG_VERSION,
+        mvp_scope_config_descriptor,
+    )
+
+    assert isinstance(MVP_SCOPE_CONFIG_VERSION, int)
+    assert MVP_SCOPE_CONFIG_VERSION >= 1
+    assert isinstance(MVP_SCOPE_CONFIG_HASH, str)
+    assert len(MVP_SCOPE_CONFIG_HASH) == 16
+    int(MVP_SCOPE_CONFIG_HASH, 16)  # raises if non-hex
+    desc = mvp_scope_config_descriptor()
+    assert desc.config_version == MVP_SCOPE_CONFIG_VERSION
+    assert desc.config_content_hash == MVP_SCOPE_CONFIG_HASH
+
+
+def test_config_hash_is_deterministic_across_processes() -> None:
+    """The hash flips IFF content changes — sets are sorted so it is stable
+    across re-computation (PYTHONHASHSEED-independent)."""
+    from unified_api_contracts.canonical.crosscutting.mvp_scope import (
+        MVP_SCOPE_CONFIG_HASH,
+        _compute_mvp_scope_content_hash,
+    )
+
+    assert _compute_mvp_scope_content_hash() == MVP_SCOPE_CONFIG_HASH
+    # Recompute again — identical (no set-iteration-order dependence).
+    assert _compute_mvp_scope_content_hash() == _compute_mvp_scope_content_hash()
+
+
+def test_config_hash_changes_iff_content_changes() -> None:
+    """A content change (different rule membership) yields a different hash;
+    a frozenset reordering (same content) yields the SAME hash."""
+    from unified_api_contracts.canonical.crosscutting.mvp_scope import (
+        CeFiMvpRule,
+        _canonical_repr,
+    )
+
+    rule_a = CeFiMvpRule(
+        venues=frozenset({"BINANCE-FUTURES", "OKX"}),
+        instrument_types=frozenset({"PERPETUAL"}),
+        data_types=frozenset({"trades"}),
+    )
+    # Same content, frozensets built in a different order → identical canonical repr.
+    rule_a_reordered = CeFiMvpRule(
+        venues=frozenset({"OKX", "BINANCE-FUTURES"}),
+        instrument_types=frozenset({"PERPETUAL"}),
+        data_types=frozenset({"trades"}),
+    )
+    assert _canonical_repr(rule_a) == _canonical_repr(rule_a_reordered)
+    # Different content → different canonical repr.
+    rule_b = CeFiMvpRule(
+        venues=frozenset({"BINANCE-FUTURES"}),
+        instrument_types=frozenset({"PERPETUAL"}),
+        data_types=frozenset({"trades"}),
+    )
+    assert _canonical_repr(rule_a) != _canonical_repr(rule_b)
