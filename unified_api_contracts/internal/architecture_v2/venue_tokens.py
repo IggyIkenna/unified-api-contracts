@@ -103,6 +103,13 @@ _DEFI_LENDING_TOKENS: frozenset[str] = frozenset(
         "marginfi",
         "fluid",
         "euler",
+        # 2026-06-16 issue_docs_remediation_sweep-004 — venus/benqi/radiant/euler_v2
+        # added as CARRY_RECURSIVE_STAKED lending-leg options. euler_v2 folds to
+        # ``eulerv2`` via slot_token() (underscore stripped); radiant/venus/benqi direct.
+        "eulerv2",
+        "venus",
+        "radiant",
+        "benqi",
     }
 )
 
