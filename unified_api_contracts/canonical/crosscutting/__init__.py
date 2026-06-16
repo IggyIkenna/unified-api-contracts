@@ -86,6 +86,8 @@ from .scheduler_registry import SCHEDULER_REGISTRY as SCHEDULER_REGISTRY
 from .scheduler_registry import SchedulerSpec as SchedulerSpec
 from .scheduler_registry import SchedulerTargetKind as SchedulerTargetKind
 from .scheduler_registry import get_schedulers_for_env as get_schedulers_for_env
+from .shard_source_availability import could_exist as could_exist
+from .shard_source_availability import sources_for_shard as sources_for_shard
 from .share_class import SHARE_CLASS_BASE_ASSETS as SHARE_CLASS_BASE_ASSETS
 from .share_class import ShareClass as ShareClass
 from .source_priority import CEFI_LIVE_VENUES as CEFI_LIVE_VENUES
@@ -103,9 +105,12 @@ from .source_priority import get_primary_source as get_primary_source
 from .source_priority import get_primary_source_with_latency as get_primary_source_with_latency
 from .source_priority import get_source_priority as get_source_priority
 from .source_priority import has_source_priority as has_source_priority
+from .source_priority import modes_for_source as modes_for_source
 from .source_priority import read_with_source_priority as read_with_source_priority
 from .source_priority import select_primary_available_source as select_primary_available_source
 from .source_priority import source_required as source_required
+from .source_priority import source_supports as source_supports
+from .source_priority import sources_supporting as sources_supporting
 from .transfer_events import BusTransferType as BusTransferType
 from .transfer_events import TransferIntent as TransferIntent
 from .transfer_events import TransferPurpose as TransferPurpose
