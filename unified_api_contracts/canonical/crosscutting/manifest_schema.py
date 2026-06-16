@@ -80,7 +80,7 @@ PIPELINE_MODE_COLUMN: Final[str] = "pipeline_mode"
 Value type: ``str`` — always NOT NULL (Phase 3 backfill complete 2026-05-28).
 Values MUST be members of
 :class:`~unified_api_contracts.canonical.crosscutting.pipeline_mode.PipelineMode`
-(StrEnum, lower-case ``batch_<source>`` / ``live_websocket``).
+(StrEnum, lower-case ``batch_<source>`` / ``live_<source>`` / ``replay_<source>``).
 
 Historical note: pre-2026-05-28 rows carried ``""`` (empty-string sentinel
 from the Phase 1B rollout window). Those rows were backfilled in Phase 3 via

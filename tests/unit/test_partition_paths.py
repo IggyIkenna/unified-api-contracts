@@ -365,7 +365,7 @@ def test_pipeline_mode_path_preserves_all_segments() -> None:
         AssetGroup.DEFI,
         "lending_indices",
         DAY,
-        pipeline_mode="live_websocket",
+        pipeline_mode="live_binance",
         venue="LIDO",
         chain="ETHEREUM",
         instrument_type=InstrumentType.A_TOKEN,
