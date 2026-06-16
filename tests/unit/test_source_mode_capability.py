@@ -19,6 +19,7 @@ from unified_api_contracts import (
     is_live,
     is_replay,
     mode_of,
+    modes_for,
     modes_for_source,
     pipeline_mode_for_source,
     source_string_for,
@@ -371,3 +372,66 @@ def test_cefi_venue_pipeline_modes_round_trip() -> None:
     assert source_string_for(PipelineMode.REPLAY_HYPERLIQUID) == "hyperliquid"
     assert source_string_for(PipelineMode.LIVE_BYBIT) == "bybit"
     assert source_string_for(PipelineMode.LIVE_ASTER) == "aster"
+
+
+# ---------------------------------------------------------------------------
+# M2-REFINEMENT — modes_for(source, data_type): per-(source, data_type) keying
+# derived from SourceCapability.operations (ws ⇒ LIVE, REST ⇒ BATCH; REPLAY = the
+# live-gap-fill tier, drops with LIVE). SSOT plan § M2-REFINEMENT.
+# ---------------------------------------------------------------------------
+
+
+def test_modes_for_hyperliquid_trades_includes_live() -> None:
+    """hyperliquid STREAMS trades (``ws_trades`` op) → LIVE is reachable."""
+    assert Mode.LIVE in modes_for("hyperliquid", "trades")
+
+
+def test_modes_for_hyperliquid_funding_rates_is_batch_only() -> None:
+    """hyperliquid only REST-archives funding (no ``ws_funding*`` op) → exactly {BATCH}.
+
+    The over-approximation fix: the coarse per-source set is {BATCH, LIVE, REPLAY},
+    but funding_rates has no live (ws) path, so LIVE and its REPLAY gap-fill tier
+    drop — leaving the BATCH floor only.
+    """
+    assert modes_for("hyperliquid", "funding_rates") == frozenset({Mode.BATCH})
+    assert modes_for("hyperliquid", "funding_rates") != modes_for_source("hyperliquid")
+
+
+def test_modes_for_hyperliquid_l2_book_includes_live() -> None:
+    """hyperliquid STREAMS the order book (``ws_l2_book`` op) → LIVE reachable."""
+    assert Mode.LIVE in modes_for("hyperliquid", "l2_book")
+
+
+def test_modes_for_live_replay_only_venue_collapses_on_batch_only_data_type() -> None:
+    """A live/replay-only venue (binance) serves NO mode for a data_type it doesn't
+    declare (funding) — it is not a CeFi batch source (tardis is) and has no ws
+    funding op, so it collapses to ``frozenset()`` (honest absence)."""
+    assert modes_for("binance", "funding_rates") == frozenset()
+    # …but it DOES stream trades (ws_trades) → its full live/replay set survives.
+    assert modes_for("binance", "trades") == modes_for_source("binance")
+
+
+def test_modes_for_never_widens_beyond_coarse() -> None:
+    """The refinement only ever NARROWS: modes_for(s, dt) ⊆ modes_for_source(s)."""
+    for source in ("hyperliquid", "binance", "deribit", "bybit", "kraken", "tardis", "databento"):
+        for data_type in ("trades", "funding_rates", "l2_book", "candles", "no_such_data_type"):
+            assert modes_for(source, data_type) <= modes_for_source(source)
+
+
+def test_modes_for_batch_only_source_is_coarse_unchanged() -> None:
+    """A source with no LIVE (tardis) is never refined — its coarse set IS the answer
+    for every data_type (no ohlcv-style regression from incomplete op declarations)."""
+    for data_type in ("trades", "ohlcv_1m", "funding_rate", "no_such_data_type"):
+        assert modes_for("tardis", data_type) == modes_for_source("tardis")
+
+
+def test_modes_for_non_ws_live_source_is_coarse_unchanged() -> None:
+    """A live source that does NOT use the ws/REST op convention (databento vendor
+    feed) can't be refined → its coarse {BATCH, LIVE, REPLAY} survives per data_type."""
+    assert modes_for("databento", "trades") == modes_for_source("databento")
+    assert Mode.REPLAY in modes_for("databento", "trades")
+
+
+def test_modes_for_mock_is_all_modes() -> None:
+    """The mock fixture source stands in for any (source, data_type)."""
+    assert modes_for(MOCK, "anything") == frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})

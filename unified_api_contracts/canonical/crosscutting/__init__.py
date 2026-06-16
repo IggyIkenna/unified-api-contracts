@@ -108,6 +108,7 @@ from .source_priority import get_source_priority as get_source_priority
 from .source_priority import has_source_priority as has_source_priority
 from .source_priority import live_pipeline_mode_for_venue as live_pipeline_mode_for_venue
 from .source_priority import live_source_for_venue as live_source_for_venue
+from .source_priority import modes_for as modes_for
 from .source_priority import modes_for_source as modes_for_source
 from .source_priority import read_with_source_priority as read_with_source_priority
 from .source_priority import select_primary_available_source as select_primary_available_source

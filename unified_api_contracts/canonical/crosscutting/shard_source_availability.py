@@ -12,24 +12,28 @@ enum + ``mode_of``; M2 shipped
 * :func:`could_exist` — whether a ``(shard, mode)`` combination is even *possible*
   to capture, i.e. ``any(mode in modes_for_source(s) for s in sources_for_shard(...))``.
 
-The guardrail composes M2 (per-source mode capability) with the shard→source
-registry (M3) so a writer / manifest-seeder / phantom-auditor can ask "is a
-``live_<source>`` row even reachable for this shard?" before it materialises an
-``expected_unattempted`` cell or flags a phantom. A shard whose only source is
-batch-only (e.g. a Tardis-only CeFi shard reasoned about WITHOUT the venue overlay)
-returns ``False`` for :attr:`Mode.LIVE` — an HONEST absence, not a decision.
+The guardrail composes M2-REFINEMENT (per-``(source, data_type)`` mode capability)
+with the shard→source registry (M3) so a writer / manifest-seeder /
+phantom-auditor can ask "is a ``live_<source>`` row even reachable for this
+shard?" before it materialises an ``expected_unattempted`` cell or flags a
+phantom. A shard whose only source is batch-only (e.g. a Tardis-only CeFi shard
+reasoned about WITHOUT the venue overlay) returns ``False`` for :attr:`Mode.LIVE`
+— an HONEST absence, not a decision.
 
-Shard dimension scope (FOLLOW-ON note)
-======================================
-``data_type`` is the shard dimension HERE. The fuller per-shard feed is keyed by
-``(asset_group, data_type, instrument_type)`` (the IS-catalogue / manifest shard
-key) — e.g. hyperliquid is LIVE for ``trades``/``l2_book`` but REST/BATCH for
-``funding_rates`` — to be derived from the per-operation ``SourceCapability``
-declarations (``registry/capability_declarations``). That refinement is the
-SAME tranche as the M2 ``modes_for(source, data_type)`` refinement noted on
-:func:`~unified_api_contracts.canonical.crosscutting.source_priority.modes_for_source`;
-until it lands, ``could_exist`` is keyed on ``data_type`` and so over-approximates
-a source's mode set for a shard where that source serves only a subset of modes.
+Per-``(source, data_type)`` capability (M2-REFINEMENT — landed)
+==============================================================
+``could_exist`` calls
+:func:`~unified_api_contracts.canonical.crosscutting.source_priority.modes_for`
+(per-``(source, data_type)``), NOT the coarse per-source ``modes_for_source``, so a
+shard where a source serves only a SUBSET of its modes is answered honestly. E.g.
+hyperliquid is LIVE for ``trades``/``l2_book`` (it declares ``ws_*`` ops) but
+REST/BATCH-only for ``funding_rates`` — so ``could_exist("cefi", "funding_rates",
+Mode.LIVE)`` is ``False`` even though hyperliquid is a live source for OTHER
+data_types. The refinement derives from the per-operation
+``SourceCapability.operations`` ws/REST split (``registry/capability_declarations``)
+— see :func:`modes_for`. ``data_type`` remains the shard dimension here; the fuller
+``(asset_group, data_type, instrument_type)`` IS-catalogue shard key is a separate
+follow-on (the ``instrument_type`` axis), tracked in the GATE-0 plan.
 
 Source derivation
 =================
@@ -55,7 +59,7 @@ from unified_api_contracts.canonical.crosscutting._source_priority_data import (
     SOURCE_PRIORITY,
 )
 from unified_api_contracts.canonical.crosscutting.pipeline_mode import Mode
-from unified_api_contracts.canonical.crosscutting.source_priority import modes_for_source
+from unified_api_contracts.canonical.crosscutting.source_priority import modes_for
 
 _CEFI_ASSET_GROUP = "cefi"
 
@@ -96,15 +100,21 @@ def could_exist(asset_group: str, data_type: str, mode: Mode) -> bool:
     """True if ``mode`` is reachable for the ``(asset_group, data_type)`` shard.
 
     The M3 guardrail: a ``(shard, mode)`` combination is POSSIBLE iff at least one
-    source serving the shard can run that mode —
-    ``any(mode in modes_for_source(s) for s in sources_for_shard(...))``. A writer
-    / manifest-seeder / phantom-auditor asks this before materialising a
+    source serving the shard can run that mode FOR THIS data_type —
+    ``any(mode in modes_for(s, data_type) for s in sources_for_shard(...))``. It
+    calls the per-``(source, data_type)``
+    :func:`~unified_api_contracts.canonical.crosscutting.source_priority.modes_for`
+    (M2-REFINEMENT), NOT the coarse per-source ``modes_for_source`` — so a source
+    that is live for SOME data_types but batch-only for this one (hyperliquid for
+    ``funding_rates``) does not falsely make ``LIVE`` reachable. A writer /
+    manifest-seeder / phantom-auditor asks this before materialising a
     ``{mode}_<source>`` cell so it never seeds an impossible row (e.g. a
-    ``live_<source>`` cell for a shard whose only source is batch-only) — an
-    HONEST absence, not a silent placeholder.
+    ``live_<source>`` cell for a shard whose sources only batch-archive that
+    data_type) — an HONEST absence, not a silent placeholder.
 
     Returns ``False`` for an unregistered shard (no sources → nothing can run any
-    mode) and for a registered shard whose every source lacks ``mode``.
+    mode) and for a registered shard whose every source lacks ``mode`` for this
+    data_type.
 
     Args:
         asset_group: ``cefi`` / ``defi`` / ``tradfi`` / ``prediction`` / ``sports``
@@ -114,9 +124,10 @@ def could_exist(asset_group: str, data_type: str, mode: Mode) -> bool:
             ``REPLAY``).
 
     Returns:
-        ``True`` iff some source serving the shard supports ``mode``.
+        ``True`` iff some source serving the shard supports ``mode`` for
+        ``data_type``.
     """
-    return any(mode in modes_for_source(source) for source in sources_for_shard(asset_group, data_type))
+    return any(mode in modes_for(source, data_type) for source in sources_for_shard(asset_group, data_type))
 
 
 __all__ = [

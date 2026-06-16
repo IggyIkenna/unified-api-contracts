@@ -89,3 +89,31 @@ def test_could_exist_unregistered_shard_is_false_for_every_mode() -> None:
     """A shard with no registered source can run no mode."""
     for mode in Mode:
         assert could_exist("tradfi", "no_such_data_type", mode) is False
+
+
+# ---------------------------------------------------------------------------
+# could_exist — per-(source, data_type) refinement (M2-REFINEMENT). The same
+# shard reads a DIFFERENT mode set per data_type now that could_exist composes
+# modes_for(source, data_type) (not the coarse modes_for_source).
+# ---------------------------------------------------------------------------
+
+
+def test_could_exist_cefi_funding_rates_live_is_false() -> None:
+    """No CeFi source STREAMS funding live (none declares a ``ws_funding*`` op): the
+    exchange venues only batch/REST-archive it and tardis is batch-only. The coarse
+    per-source answer would (wrongly) say the live venues make LIVE reachable — the
+    refinement makes this an honest ``False``.
+    """
+    assert could_exist("cefi", "funding_rates", Mode.LIVE) is False
+
+
+def test_could_exist_cefi_funding_rates_batch_is_true() -> None:
+    """Funding IS batch-capturable for cefi (hyperliquid REST-archives it) — only the
+    LIVE axis is narrowed, never the BATCH floor."""
+    assert could_exist("cefi", "funding_rates", Mode.BATCH) is True
+
+
+def test_could_exist_cefi_trades_still_live_after_refinement() -> None:
+    """The refinement must NOT break a genuinely-live data_type: trades stays LIVE
+    (the venues declare ``ws_trades``)."""
+    assert could_exist("cefi", "trades", Mode.LIVE) is True
