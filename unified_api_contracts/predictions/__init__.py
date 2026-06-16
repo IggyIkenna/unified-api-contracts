@@ -13,8 +13,9 @@ Re-exports:
   per-group cadence / expected counts / settlement_lag.
 * :func:`classify_polymarket_to_canonical_group` /
   :func:`classify_kalshi_to_canonical_group` — raw market metadata →
-  canonical group. ``None`` for sub-threshold confidence (caller routes
-  to ``attempted_failed[reason=ClassifierConfidenceLow]``).
+  canonical group. Unmatched markets route to :attr:`CanonicalQuestionGroup.OTHER`
+  (the honest-absence catch-all) and emit ``OTHER_BUCKET_MEMBER_ADDED`` at INFO
+  level for operator audit; never returns ``None``.
 * :data:`CLASSIFIER_STABILITY_HASH` — manifest writers stamp this on
   every captured prediction shard so re-runs skip re-classification when
   unchanged.

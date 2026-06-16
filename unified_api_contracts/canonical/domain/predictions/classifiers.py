@@ -32,11 +32,14 @@ when the hash is unchanged.
 
 from __future__ import annotations
 
+import logging
 from typing import Final
 
 from unified_api_contracts.canonical.domain.predictions.canonical_groups import (
     CanonicalQuestionGroup,
 )
+
+_log = logging.getLogger(__name__)
 from unified_api_contracts.internal.schemas._prediction_market_taxonomy import (
     CLASSIFIER_STABILITY_HASH,
     CLASSIFIER_VERSION,
@@ -132,7 +135,7 @@ def classify_polymarket_to_canonical_group(
     event_slug: str,
     outcome: str,
     condition_id: str | None = None,
-) -> CanonicalQuestionGroup | None:
+) -> CanonicalQuestionGroup:
     """Map a Polymarket market onto a canonical question group.
 
     Override-first: if ``condition_id`` is in
@@ -143,8 +146,12 @@ def classify_polymarket_to_canonical_group(
     :data:`_CATEGORY_UNDERLYING_PERIOD_TO_GROUP` (cadenced markets) or
     :data:`_CATEGORY_UNDERLYING_TO_EVENT_GROUP` (event markets).
 
-    Returns ``None`` for sub-threshold combinations — caller routes to
-    ``attempted_failed[reason=ClassifierConfidenceLow]``.
+    Returns :attr:`~CanonicalQuestionGroup.OTHER` for unmatched combinations
+    and emits ``OTHER_BUCKET_MEMBER_ADDED`` at INFO level so operators can
+    audit the catch-all bucket and promote recurring patterns to first-class
+    groups. Previously returned ``None`` (caller routed to
+    ``attempted_failed[reason=ClassifierConfidenceLow]``) — changed to
+    ``OTHER`` so honest-absence capture replaces silent failure.
 
     The classifier output is stable per ``CLASSIFIER_STABILITY_HASH``;
     re-runs of the same input under the same hash always return the
@@ -171,26 +178,38 @@ def classify_polymarket_to_canonical_group(
         # BTC_UP_DOWN_DAILY / SPX_UP_DOWN_DAILY / CRUDE_OIL_UP_DOWN_DAILY etc.
         if resolution_period == PredictionShardResolutionPeriod.MONTHLY:
             daily_key = (category, underlying.upper(), PredictionShardResolutionPeriod.DAILY)
-            return _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(daily_key)
-        return None
+            result = _CATEGORY_UNDERLYING_PERIOD_TO_GROUP.get(daily_key)
+            if result is not None:
+                return result
+        _log.info("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
+        return CanonicalQuestionGroup.OTHER
 
     event_key = (category, underlying.upper())
-    return _CATEGORY_UNDERLYING_TO_EVENT_GROUP.get(event_key)
+    result = _CATEGORY_UNDERLYING_TO_EVENT_GROUP.get(event_key)
+    if result is not None:
+        return result
+    _log.info("OTHER_BUCKET_MEMBER_ADDED condition_id=%s slug=%s", condition_id, slug)
+    return CanonicalQuestionGroup.OTHER
 
 
 def classify_kalshi_to_canonical_group(
     *,
     ticker: str,
-) -> CanonicalQuestionGroup | None:
+) -> CanonicalQuestionGroup:
     """Map a Kalshi ticker onto a canonical question group.
 
     Currently override-only (the Kalshi rule classifier is a deferred
     follow-up plan slot — the override dict is the single SSOT for
-    headline tickers until the rule classifier lands). Returns ``None``
-    when the ticker is unknown, signalling the caller to route to
-    ``attempted_failed[reason=ClassifierConfidenceLow]``.
+    headline tickers until the rule classifier lands). Returns
+    :attr:`~CanonicalQuestionGroup.OTHER` when the ticker is unknown and
+    emits ``OTHER_BUCKET_MEMBER_ADDED`` at INFO level. Previously returned
+    ``None`` (caller routed to ``attempted_failed``).
     """
-    return KALSHI_TICKER_TO_GROUP.get(ticker)
+    result = KALSHI_TICKER_TO_GROUP.get(ticker)
+    if result is not None:
+        return result
+    _log.info("OTHER_BUCKET_MEMBER_ADDED ticker=%s", ticker)
+    return CanonicalQuestionGroup.OTHER
 
 
 __all__ = [
