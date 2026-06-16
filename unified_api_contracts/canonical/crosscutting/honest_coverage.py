@@ -762,9 +762,11 @@ PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
     "CPI_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
     "ELECTION_PRESIDENT_2028": {"_per_market_min_rows": 100},
     "OSCARS_BEST_PICTURE": {"_per_market_min_rows": 50},
-    # OTHER intentionally absent — markets that classify into OTHER
-    # bypass the cluster gate (no expected market_id set), but the
-    # manifest still records the capture for audit purposes.
+    # OTHER catch-all: cluster validation is count > 0 (any market falls through).
+    # _per_market_min_rows=1 — the gate passes when ≥1 row exists for any market_id
+    # routed here. No per-day expected market_id set is derived from the lifecycle
+    # table (unlike curated groups); the manifest records the capture for auditing.
+    "OTHER": {"_per_market_min_rows": 1},
 }
 """Per-canonical_question_group expected market_id sets.
 

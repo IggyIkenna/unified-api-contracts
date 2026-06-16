@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import datetime as _dt
 
+import pytest
+
 from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     BUNDLED_DATA_TYPES,
     DATA_TYPE_TO_CLUSTER_REGISTRY,
@@ -183,15 +185,15 @@ def test_classify_eth_monthly_falls_back_to_daily_canonical_group() -> None:
     assert group == CanonicalQuestionGroup.ETH_UP_DOWN_DAILY
 
 
-def test_classify_unknown_returns_none() -> None:
-    """A slug the rule classifier can't map → None (caller flags low confidence)."""
+def test_classify_unknown_returns_other() -> None:
+    """A slug the rule classifier can't map → OTHER catch-all bucket."""
     group = classify_polymarket_to_canonical_group(
         title="Will Mars be colonised by 2030?",
         slug="mars-colonised-by-2030",
         event_slug="space-colonisation",
         outcome="Yes",
     )
-    assert group is None
+    assert group == CanonicalQuestionGroup.OTHER
 
 
 def test_classify_polymarket_condition_id_override_wins() -> None:
@@ -211,8 +213,8 @@ def test_classify_polymarket_condition_id_override_wins() -> None:
         del POLYMARKET_CONDITION_ID_TO_GROUP[fake_id]
 
 
-def test_classify_kalshi_unknown_returns_none() -> None:
-    assert classify_kalshi_to_canonical_group(ticker="UNKNOWN-TICKER-001") is None
+def test_classify_kalshi_unknown_returns_other() -> None:
+    assert classify_kalshi_to_canonical_group(ticker="UNKNOWN-TICKER-001") == CanonicalQuestionGroup.OTHER
 
 
 def test_classify_kalshi_override_wins() -> None:
@@ -356,10 +358,9 @@ def test_expected_market_ids_filters_by_canonical_group() -> None:
 
 
 def test_prediction_groups_registry_keys_match_canonical_enum() -> None:
-    """Every PREDICTION_GROUPS key matches an enum value (except OTHER)."""
-    enum_values = {g.value for g in CanonicalQuestionGroup if g != CanonicalQuestionGroup.OTHER}
+    """Every PREDICTION_GROUPS key matches a CanonicalQuestionGroup enum value."""
+    enum_values = {g.value for g in CanonicalQuestionGroup}
     registry_keys = set(PREDICTION_GROUPS.keys())
-    # Registry keys must be a subset of enum values (OTHER intentionally absent).
     assert registry_keys <= enum_values
 
 
@@ -379,6 +380,44 @@ def test_prediction_groups_have_per_market_min_rows() -> None:
 # ---------------------------------------------------------------------------
 # _MONTHLY_TOKENS bug fix — "may" full-name now in the set
 # ---------------------------------------------------------------------------
+
+
+def test_other_bucket_member_added_logged_on_unknown_polymarket(caplog: pytest.LogCaptureFixture) -> None:
+    """Unmatched Polymarket market emits OTHER_BUCKET_MEMBER_ADDED at INFO."""
+    import logging
+
+    with caplog.at_level(logging.INFO, logger="unified_api_contracts.canonical.domain.predictions.classifiers"):
+        group = classify_polymarket_to_canonical_group(
+            title="Will Mars be colonised by 2030?",
+            slug="mars-colonised-by-2030",
+            event_slug="space-colonisation",
+            outcome="Yes",
+            condition_id="0xdeadbeef",
+        )
+    assert group == CanonicalQuestionGroup.OTHER
+    assert any("OTHER_BUCKET_MEMBER_ADDED" in r.message for r in caplog.records)
+
+
+def test_other_bucket_member_added_logged_on_unknown_kalshi(caplog: pytest.LogCaptureFixture) -> None:
+    """Unmatched Kalshi ticker emits OTHER_BUCKET_MEMBER_ADDED at INFO."""
+    import logging
+
+    with caplog.at_level(logging.INFO, logger="unified_api_contracts.canonical.domain.predictions.classifiers"):
+        group = classify_kalshi_to_canonical_group(ticker="UNKNOWN-TICKER-001")
+    assert group == CanonicalQuestionGroup.OTHER
+    assert any("OTHER_BUCKET_MEMBER_ADDED" in r.message for r in caplog.records)
+
+
+def test_other_in_prediction_groups_registry() -> None:
+    """OTHER is a first-class entry in PREDICTION_GROUPS (task -002 gate)."""
+    assert "OTHER" in PREDICTION_GROUPS
+    assert PREDICTION_GROUPS["OTHER"]["_per_market_min_rows"] >= 1
+
+
+def test_other_in_bundled_data_types_coverage() -> None:
+    """prediction_canonical_question_group bundles OTHER like any curated group (task -004 gate)."""
+    assert "prediction_canonical_question_group" in BUNDLED_DATA_TYPES
+    assert "OTHER" in PREDICTION_GROUPS
 
 
 def test_monthly_tokens_includes_may_full_name() -> None:
