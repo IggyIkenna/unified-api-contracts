@@ -179,6 +179,23 @@ INSTRUMENTS_PARQUET_SCHEMA: list[dict[str, str | bool]] = [
         "default": "",
         "description": "Underlying asset for derivatives",
     },
+    # Canonical product identity (additive — aligned 1:1 with InstrumentRecord
+    # .canonical_instrument_id / .product_root; populated by the TradFi/Databento
+    # adapter from the UAC exchange-code registry). raw_symbol stays the raw code.
+    {
+        "name": "canonical_instrument_id",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Human-canonical instrument id (e.g. CME:OPTION:SP500:2025-10:5000C). None when unresolved.",
+    },
+    {
+        "name": "product_root",
+        "type": "string",
+        "required": False,
+        "nullable": True,
+        "description": "Human-canonical product root from the exchange-code registry (e.g. ES → SP500).",
+    },
     {
         "name": "min_size",
         "type": "string",

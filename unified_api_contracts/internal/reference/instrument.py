@@ -119,6 +119,28 @@ class InstrumentRecord(BaseModel):
     raw_symbol: str = ""
     base_asset: str = ""
     quote_asset: str = ""
+    # --- Canonical product identity (additive; populated by TradFi/Databento
+    #     adapters from the UAC exchange-code registry — EXCHANGE_CODE_TO_NAME /
+    #     DatabentoInstrumentDef.base_asset). Optional + additive so existing
+    #     CeFi/DeFi rows and the model_validator are unaffected (non-breaking:
+    #     added-optional-field). ``raw_symbol`` stays the raw exchange contract
+    #     code; these surface the human-canonical product so options/futures can
+    #     bundle by product root even when the raw code is per-contract. ---
+    canonical_instrument_id: str | None = Field(
+        default=None,
+        description=(
+            "Human-canonical instrument identifier derived from the product root "
+            "(e.g. 'CME:OPTION:SP500:2025-10:5000C'). None for instruments whose "
+            "adapter does not resolve a canonical root."
+        ),
+    )
+    product_root: str | None = Field(
+        default=None,
+        description=(
+            "Human-canonical product root from the UAC exchange-code registry "
+            "(e.g. exchange code 'ES' → 'SP500'). None when no registry mapping resolves."
+        ),
+    )
     status: InstrumentStatus = InstrumentStatus.ACTIVE
     available_from_datetime: datetime | None = Field(
         default=None,
