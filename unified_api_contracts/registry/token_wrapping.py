@@ -24,12 +24,12 @@ class TokenWrappingRule:
 
 
 TOKEN_WRAPPING_RULES: list[TokenWrappingRule] = [
-    TokenWrappingRule("ETH", "WETH", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "ETHEREUM", False, True, "wrapped"),
+    TokenWrappingRule("ETH", "WETH", "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "ETHEREUM", False, True, "wrapped"),  # DERIVED etherscan
     TokenWrappingRule(
-        "eETH", "weETH", "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee", "ETHEREUM", True, False, "wrapped"
+        "eETH", "weETH", "0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee", "ETHEREUM", True, False, "wrapped"  # DERIVED etherscan
     ),
     TokenWrappingRule(
-        "stETH", "wstETH", "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0", "ETHEREUM", True, False, "wrapped"
+        "stETH", "wstETH", "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0", "ETHEREUM", True, False, "wrapped"  # DERIVED etherscan
     ),
 ]
 

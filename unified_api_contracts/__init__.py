@@ -210,6 +210,10 @@ from .canonical.crosscutting.scheduler_registry import (
     SchedulerTargetKind,
     get_schedulers_for_env,
 )
+from .canonical.crosscutting.shard_source_availability import (
+    could_exist,
+    sources_for_shard,
+)
 from .canonical.crosscutting.source_priority import (
     BATCH_CAPABLE_CEFI_VENUES,
     CEFI_LIVE_VENUES,
@@ -2092,6 +2096,8 @@ __all__ = [
     "modes_for_source",
     "source_supports",
     "sources_supporting",
+    "could_exist",
+    "sources_for_shard",
     "get_required_inputs",
     "get_required_secrets",
     "get_schedulers_for_env",
