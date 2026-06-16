@@ -169,7 +169,7 @@ def _serialize_uic_deployment_enums() -> dict[str, list[str]]:
     Returns empty dict if unified-internal-contracts is not installed
     (UAC is T0 — cannot depend on UIC).
     """
-    try:
+    try:  # noqa: fallback-import — UAC is T0 and cannot depend on UIC; UIC import is intentionally optional
         from unified_api_contracts.internal.domain.deployment_service import (
             DeploymentCluster,
             DeploymentOperationMode,
