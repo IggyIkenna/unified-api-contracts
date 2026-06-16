@@ -280,15 +280,122 @@ def test_classify_weather_temperature_groups() -> None:
     assert binary_group == CanonicalQuestionGroup.WEATHER_TEMP_DAILY
 
 
-def test_classify_unknown_returns_other() -> None:
-    """A slug the rule classifier can't map → OTHER catch-all bucket."""
+def test_classify_unknown_returns_misc_novelty() -> None:
+    """A genuinely-uncategorised slug (taxonomy → MISC/UNKNOWN) → MISC_NOVELTY.
+
+    Decision 338 pass 2: the explicit novelty residual replaces OTHER for
+    category=MISC so OTHER stops being a silent catch-all.
+    """
     group = classify_polymarket_to_canonical_group(
         title="Will Mars be colonised by 2030?",
         slug="mars-colonised-by-2030",
         event_slug="space-colonisation",
         outcome="Yes",
     )
-    assert group == CanonicalQuestionGroup.OTHER
+    assert group == CanonicalQuestionGroup.MISC_NOVELTY
+
+
+def test_classify_pass2_subtype_routing() -> None:
+    """decision 338 pass 2 — granular sub-type routing across categories."""
+    cases: list[tuple[str, str, str, CanonicalQuestionGroup]] = [
+        # (slug, title, outcome, expected)
+        # Crypto PRICE-RANGE split from UP_DOWN — incl. BTC/ETH retrofit.
+        (
+            "will-the-price-of-bitcoin-be-between-90000-and-95000-on-september-15",
+            "BTC between $90k-$95k?",
+            "Yes",
+            CanonicalQuestionGroup.BTC_PRICE_RANGE_DAILY,
+        ),
+        (
+            "will-the-price-of-solana-be-between-180-and-185-on-september-3",
+            "SOL between $180-$185?",
+            "Yes",
+            CanonicalQuestionGroup.SOL_PRICE_RANGE_DAILY,
+        ),
+        ("sol-multistrike-3h", "SOL multistrike", "Yes", CanonicalQuestionGroup.SOL_PRICE_RANGE_DAILY),
+        # Political-figure split.
+        (
+            "will-trumps-approval-rating-be-between-46-and-47-on-march-21",
+            "Trump approval 46-47%?",
+            "Yes",
+            CanonicalQuestionGroup.TRUMP_APPROVAL_RATING,
+        ),
+        (
+            "will-trump-sign-an-executive-order-on-march-15",
+            "Trump exec order March 15?",
+            "Yes",
+            CanonicalQuestionGroup.TRUMP_EXEC_ORDER,
+        ),
+        (
+            "will-trump-say-epstein-during-doj-appearance",
+            'Trump say "Epstein"?',
+            "Yes",
+            CanonicalQuestionGroup.TRUMP_STATEMENTS,
+        ),
+        (
+            "will-elon-tweet-775-799-times-march-7-14",
+            "Elon tweet 775-799 times?",
+            "Yes",
+            CanonicalQuestionGroup.ELON_TWEET_COUNT,
+        ),
+        (
+            "will-elon-musk-net-worth-be-less-than-330b-on-march-31",
+            "Elon net worth <$330b?",
+            "Yes",
+            CanonicalQuestionGroup.ELON_NET_WORTH,
+        ),
+        # Geopolitics conflict-by-date.
+        (
+            "israeli-military-action-against-iran-by-friday",
+            "Israeli military action vs Iran by Friday?",
+            "Yes",
+            CanonicalQuestionGroup.GEO_ISRAEL_IRAN,
+        ),
+        (
+            "russia-ukraine-ceasefire-in-march",
+            "Russia/Ukraine ceasefire in March?",
+            "Yes",
+            CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE,
+        ),
+        (
+            "will-china-invade-taiwan-before-july",
+            "China invade Taiwan before July?",
+            "Yes",
+            CanonicalQuestionGroup.GEO_OTHER_BY_DATE,
+        ),
+        # Culture box-office + commodity price-level.
+        (
+            "will-superman-opening-weekend-box-office-be-more-than-124m",
+            "Superman opening weekend >$124m?",
+            "Yes",
+            CanonicalQuestionGroup.BOX_OFFICE_OPENING_WEEKEND,
+        ),
+        (
+            "will-gold-be-above-3000-by-end-of-year",
+            "Gold above $3000 by EOY?",
+            "Yes",
+            CanonicalQuestionGroup.GOLD_PRICE_LEVEL,
+        ),
+    ]
+    for slug, title, outcome, expected in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=title,
+            slug=slug,
+            event_slug="",
+            outcome=outcome,
+        )
+        assert group == expected, f"Expected {expected} for slug={slug!r}, got {group!r}"
+
+
+def test_classify_crypto_up_down_still_routes_after_pass2() -> None:
+    """Pass 2 must NOT regress UP_DOWN routing — direction bets stay UP_DOWN."""
+    group = classify_polymarket_to_canonical_group(
+        title="Will BTC be up or down today?",
+        slug="btc-up-or-down-may-22",
+        event_slug="btc-price-daily",
+        outcome="Up",
+    )
+    assert group == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
 
 
 def test_classify_polymarket_condition_id_override_wins() -> None:
@@ -489,7 +596,9 @@ def test_other_bucket_member_added_logged_on_unknown_polymarket(caplog: pytest.L
             outcome="Yes",
             condition_id="0xdeadbeef",
         )
-    assert group == CanonicalQuestionGroup.OTHER
+    # decision 338 pass 2: genuinely-uncategorised → MISC_NOVELTY (the log still
+    # fires so operators can audit the residual).
+    assert group == CanonicalQuestionGroup.MISC_NOVELTY
     assert any("OTHER_BUCKET_MEMBER_ADDED" in r.message for r in caplog.records)
 
 

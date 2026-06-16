@@ -433,7 +433,7 @@ _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
 # classifiers.py (not a stability-hash input), so this version bump is the
 # lever that flips CLASSIFIER_STABILITY_HASH → triggers a reclassification
 # pass over existing OTHER-bucketed prediction rows.
-CLASSIFIER_VERSION = "2026-06-16.1"
+CLASSIFIER_VERSION = "2026-06-16.2"
 
 
 def _compute_classifier_stability_hash() -> str:

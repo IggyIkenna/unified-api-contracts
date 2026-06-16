@@ -113,6 +113,49 @@ class CanonicalQuestionGroup(StrEnum):
     # consumers surface them via the override dicts.
     OSCARS_BEST_PICTURE = "OSCARS_BEST_PICTURE"
 
+    # === decision 338 pass 2 (2026-06-16) — granular split per operator ===
+    # Crypto PRICE-RANGE ("between $X-$Y" / multistrike / above-below) — split
+    # OUT of {COIN}_UP_DOWN (which is direction-only). Retrofits BTC/ETH.
+    BTC_PRICE_RANGE_DAILY = "BTC_PRICE_RANGE_DAILY"
+    ETH_PRICE_RANGE_DAILY = "ETH_PRICE_RANGE_DAILY"
+    SOL_PRICE_RANGE_DAILY = "SOL_PRICE_RANGE_DAILY"
+    XRP_PRICE_RANGE_DAILY = "XRP_PRICE_RANGE_DAILY"
+    DOGE_PRICE_RANGE_DAILY = "DOGE_PRICE_RANGE_DAILY"
+    BNB_PRICE_RANGE_DAILY = "BNB_PRICE_RANGE_DAILY"
+    ADA_PRICE_RANGE_DAILY = "ADA_PRICE_RANGE_DAILY"
+    AVAX_PRICE_RANGE_DAILY = "AVAX_PRICE_RANGE_DAILY"
+    LINK_PRICE_RANGE_DAILY = "LINK_PRICE_RANGE_DAILY"
+    LTC_PRICE_RANGE_DAILY = "LTC_PRICE_RANGE_DAILY"
+    SUI_PRICE_RANGE_DAILY = "SUI_PRICE_RANGE_DAILY"
+    HYPE_PRICE_RANGE_DAILY = "HYPE_PRICE_RANGE_DAILY"
+
+    # Political-figure split (approval / statements / executive-order).
+    TRUMP_APPROVAL_RATING = "TRUMP_APPROVAL_RATING"
+    TRUMP_STATEMENTS = "TRUMP_STATEMENTS"
+    TRUMP_EXEC_ORDER = "TRUMP_EXEC_ORDER"
+    # Tech-personality (Elon) recurring factories.
+    ELON_TWEET_COUNT = "ELON_TWEET_COUNT"
+    ELON_STATEMENTS = "ELON_STATEMENTS"
+    ELON_NET_WORTH = "ELON_NET_WORTH"
+
+    # Geopolitics conflict-by-date — two high-volume pairs + a long-tail catch.
+    GEO_ISRAEL_IRAN = "GEO_ISRAEL_IRAN"
+    GEO_RUSSIA_UKRAINE = "GEO_RUSSIA_UKRAINE"
+    GEO_OTHER_BY_DATE = "GEO_OTHER_BY_DATE"
+
+    # Culture — box-office opening weekend.
+    BOX_OFFICE_OPENING_WEEKEND = "BOX_OFFICE_OPENING_WEEKEND"
+
+    # Commodity price-LEVEL ("gold above $X by DATE") — distinct from the
+    # CME-linked daily-direction {COMMODITY}_UP_DOWN_DAILY groups.
+    GOLD_PRICE_LEVEL = "GOLD_PRICE_LEVEL"
+    SILVER_PRICE_LEVEL = "SILVER_PRICE_LEVEL"
+    CRUDE_OIL_PRICE_LEVEL = "CRUDE_OIL_PRICE_LEVEL"
+
+    # Explicit small residual for genuinely-uncategorised (category=MISC)
+    # novelty markets, so OTHER stops being a silent ~80% catch-all.
+    MISC_NOVELTY = "MISC_NOVELTY"
+
     # Catch-all bucket for low-confidence classifier output. Manifest rows
     # under ``OTHER`` are not blocked from capture but flagged in audits.
     OTHER = "OTHER"
@@ -390,6 +433,115 @@ CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetad
         cadence="daily",
         expected_market_ids_per_day=1,
         resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    # === decision 338 pass 2 metadata ===
+    # Crypto PRICE-RANGE — daily price-level markets (mirror the UP_DOWN daily).
+    **{
+        group: CanonicalGroupMetadata(
+            group=group,
+            cadence="daily",
+            expected_market_ids_per_day=1,
+            resolution_basis="price_threshold",
+            settlement_lag=2 * _HOUR,
+        )
+        for group in (
+            CanonicalQuestionGroup.BTC_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.ETH_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.SOL_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.XRP_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.DOGE_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.BNB_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.ADA_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.AVAX_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.LINK_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.LTC_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.SUI_PRICE_RANGE_DAILY,
+            CanonicalQuestionGroup.HYPE_PRICE_RANGE_DAILY,
+        )
+    },
+    CanonicalQuestionGroup.TRUMP_APPROVAL_RATING: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.TRUMP_APPROVAL_RATING,
+        cadence="daily",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.TRUMP_STATEMENTS: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.TRUMP_STATEMENTS,
+        cadence="irregular",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.TRUMP_EXEC_ORDER: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.TRUMP_EXEC_ORDER,
+        cadence="irregular",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.ELON_TWEET_COUNT: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.ELON_TWEET_COUNT,
+        cadence="weekly",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.ELON_STATEMENTS: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.ELON_STATEMENTS,
+        cadence="irregular",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.ELON_NET_WORTH: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.ELON_NET_WORTH,
+        cadence="irregular",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    **{
+        group: CanonicalGroupMetadata(
+            group=group,
+            cadence="irregular",
+            expected_market_ids_per_day=1,
+            resolution_basis="binary_outcome",
+            settlement_lag=24 * _HOUR,
+        )
+        for group in (
+            CanonicalQuestionGroup.GEO_ISRAEL_IRAN,
+            CanonicalQuestionGroup.GEO_RUSSIA_UKRAINE,
+            CanonicalQuestionGroup.GEO_OTHER_BY_DATE,
+        )
+    },
+    CanonicalQuestionGroup.BOX_OFFICE_OPENING_WEEKEND: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.BOX_OFFICE_OPENING_WEEKEND,
+        cadence="irregular",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    **{
+        group: CanonicalGroupMetadata(
+            group=group,
+            cadence="irregular",
+            expected_market_ids_per_day=1,
+            resolution_basis="price_threshold",
+            settlement_lag=24 * _HOUR,
+        )
+        for group in (
+            CanonicalQuestionGroup.GOLD_PRICE_LEVEL,
+            CanonicalQuestionGroup.SILVER_PRICE_LEVEL,
+            CanonicalQuestionGroup.CRUDE_OIL_PRICE_LEVEL,
+        )
+    },
+    CanonicalQuestionGroup.MISC_NOVELTY: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.MISC_NOVELTY,
+        cadence="irregular",
+        expected_market_ids_per_day=0,
+        resolution_basis="binary_outcome",
         settlement_lag=24 * _HOUR,
     ),
     CanonicalQuestionGroup.OTHER: CanonicalGroupMetadata(

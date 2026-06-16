@@ -784,6 +784,38 @@ PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
     # Weather daily highest-temperature (decision 338). Floor 20 — weather
     # markets are thin per market_id.
     "WEATHER_TEMP_DAILY": {"_per_market_min_rows": 20},
+    # === decision 338 pass 2 (2026-06-16) — granular split ===
+    # Crypto PRICE-RANGE ("between $X-$Y" / multistrike) — split from UP_DOWN.
+    "BTC_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "ETH_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "SOL_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "XRP_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "DOGE_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "BNB_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "ADA_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "AVAX_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "LINK_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "LTC_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "SUI_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    "HYPE_PRICE_RANGE_DAILY": {"_per_market_min_rows": 500},
+    # Political-figure split + tech-personality factories.
+    "TRUMP_APPROVAL_RATING": {"_per_market_min_rows": 100},
+    "TRUMP_STATEMENTS": {"_per_market_min_rows": 50},
+    "TRUMP_EXEC_ORDER": {"_per_market_min_rows": 50},
+    "ELON_TWEET_COUNT": {"_per_market_min_rows": 50},
+    "ELON_STATEMENTS": {"_per_market_min_rows": 50},
+    "ELON_NET_WORTH": {"_per_market_min_rows": 50},
+    # Geopolitics conflict-by-date.
+    "GEO_ISRAEL_IRAN": {"_per_market_min_rows": 50},
+    "GEO_RUSSIA_UKRAINE": {"_per_market_min_rows": 50},
+    "GEO_OTHER_BY_DATE": {"_per_market_min_rows": 50},
+    # Culture + commodity price-level.
+    "BOX_OFFICE_OPENING_WEEKEND": {"_per_market_min_rows": 50},
+    "GOLD_PRICE_LEVEL": {"_per_market_min_rows": 50},
+    "SILVER_PRICE_LEVEL": {"_per_market_min_rows": 50},
+    "CRUDE_OIL_PRICE_LEVEL": {"_per_market_min_rows": 50},
+    # Explicit small residual for genuinely-uncategorised novelty markets.
+    "MISC_NOVELTY": {"_per_market_min_rows": 1},
     "ELECTION_PRESIDENT_2028": {"_per_market_min_rows": 100},
     "OSCARS_BEST_PICTURE": {"_per_market_min_rows": 50},
     # OTHER catch-all: cluster validation is count > 0 (any market falls through).
