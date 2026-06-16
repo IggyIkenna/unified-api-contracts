@@ -449,10 +449,14 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "RADIANT-ARBITRUM": "pipeline",
     "KARAK-ARBITRUM": "pipeline",
     "RENZO-ARBITRUM": "pipeline",
-    # ── Live (Arbitrum MTDS-backfilled lending, added 2026-05-22) ──
-    "EULER_V2-ARBITRUM": "live",
+    # ── Arbitrum lending (MORPHO live; EULER_V2/FLUID re-phased 2026-05-22→pipeline) ──
+    # EULER_V2-ARBITRUM + FLUID-ARBITRUM re-phased live→pipeline 2026-06-16 (249-followup):
+    # no UAC subgraph_id registered → the MTDS evm_defi collector logs "No subgraph ID …
+    # skipping" → 0 captured rows. They are roadmap until a subgraph_id is sourced; keeping
+    # them "live" falsely advertised data + risked inflating the could-exist denominator.
+    "EULER_V2-ARBITRUM": "pipeline",
     "MORPHO-ARBITRUM": "live",
-    "FLUID-ARBITRUM": "live",
+    "FLUID-ARBITRUM": "pipeline",
     # ── Pipeline (Base) ──
     "UNISWAP_V3-BASE": "pipeline",
     "AAVE_V3-BASE": "pipeline",
@@ -496,11 +500,14 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BSC": "pipeline",
     "RADIANT-BSC": "pipeline",
-    # ── Live (MTDS-backfilled multi-chain lending + bridges, added 2026-05-22) ──
-    "VENUS-BSC": "live",
-    "VENUS-ETHEREUM": "live",
-    "RADIANT-ETHEREUM": "live",
-    "BENQI-AVALANCHE": "live",
+    # ── Multi-chain lending + bridges (MORPHO live; VENUS/RADIANT/BENQI re-phased) ──
+    # VENUS-BSC/ETHEREUM + RADIANT-ETHEREUM + BENQI-AVALANCHE re-phased live→pipeline
+    # 2026-06-16 (249-followup): no UAC subgraph_id → evm_defi collector skips → 0 rows.
+    # Roadmap until a subgraph_id is sourced (MORPHO-OPTIMISM/POLYGON keep "live" — sourced).
+    "VENUS-BSC": "pipeline",
+    "VENUS-ETHEREUM": "pipeline",
+    "RADIANT-ETHEREUM": "pipeline",
+    "BENQI-AVALANCHE": "pipeline",
     "MORPHO-OPTIMISM": "live",
     "MORPHO-POLYGON": "live",
     # ── Live (Ethereum analytics / governance / MEV sub-buckets, added 2026-05-22) ──
@@ -510,8 +517,9 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "FLASHBOTS-ETHEREUM": "live",
     "ACROSS-ETHEREUM": "live",
     "STARGATE-ETHEREUM": "live",
-    # ── Live (Euler V2 lending, added 2026-05-22) ──
-    "EULER_V2-ETHEREUM": "live",
+    # ── Euler V2 lending — re-phased live→pipeline 2026-06-16 (249-followup): no UAC
+    #    subgraph_id → evm_defi collector skips → 0 rows. Roadmap until sourced. ──
+    "EULER_V2-ETHEREUM": "pipeline",
     # ── Live (Alchemy multi-chain gas-fee oracles, added 2026-05-22) ──
     "ALCHEMY-ARBITRUM": "live",
     "ALCHEMY-BASE": "live",
