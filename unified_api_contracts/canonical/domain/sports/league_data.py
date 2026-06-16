@@ -64,7 +64,7 @@ _API_FOOTBALL_ID_TO_LEAGUE: dict[int, str] = {
 # or when an existing provider extends backfill (e.g. footystats Pro tier
 # unlocks earlier history).
 SOURCE_COVERAGE_START: dict[str, date] = {
-    "api_football": date(2018, 1, 1),
+    "api_football": date(2015, 1, 1),
     "footystats": date(2019, 1, 1),
     "understat": date(2015, 1, 16),
     "transfermarkt": date(2019, 1, 1),

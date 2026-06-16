@@ -91,8 +91,8 @@ class TestFeatureUpstreamRequirements:
 
 class TestInCoverage:
     def test_pre_launch_date_returns_false(self) -> None:
-        # api_football coverage starts 2018-01-01
-        assert in_coverage("api_football", "FIXTURES", "EPL", "2017-01-01") is False
+        # api_football coverage starts 2015-01-01
+        assert in_coverage("api_football", "FIXTURES", "EPL", "2014-01-01") is False
 
     def test_post_launch_date_in_coverage_league_returns_true(self) -> None:
         # EPL is in api_football's league coverage; 2024 is well past launch
@@ -147,4 +147,4 @@ class TestInCoverageDt:
     def test_pre_launch_via_datetime(self) -> None:
         from datetime import date
 
-        assert in_coverage_dt("api_football", "FIXTURES", "EPL", date(2017, 1, 1)) is False
+        assert in_coverage_dt("api_football", "FIXTURES", "EPL", date(2014, 1, 1)) is False
