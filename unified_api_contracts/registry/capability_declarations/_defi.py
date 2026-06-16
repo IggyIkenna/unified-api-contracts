@@ -422,24 +422,28 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         mtds_operations=["collect-lending-indices"],
         required_tokens=frozenset({"QI"}),
     ),
-    # Radiant: Messari Lending schema — exposes liquidations + risk params
-    # (maximumLTV/liquidationThreshold/liquidationPenalty) + marketDailySnapshots
-    # history → full lending data-type set (gas is per-chain, see note above).
+    # Radiant: Messari Lending schema — exposes liquidations + LTV risk fields
+    # (maximumLTV/liquidationThreshold/liquidationPenalty) in the live ``markets``
+    # entity (already collected as columns in lending_indices rows). The batch
+    # history query (marketDailySnapshots) does NOT include risk-param fields, so
+    # a separate risk_params data_type would break batch/live parity (hard rule).
     "radiant": _ProtocolCapability(
         venue_prefix="RADIANT",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA],
+        data_types=["lending_indices", "liquidations"],
         mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"RDNT"}),
     ),
     # Euler V2: Goldsky subgraph — eulerVaults (live state) + vaultStatuses
-    # (history) + liquidates entity → full lending data-type set (gas per-chain).
+    # (history). The eulerVaults schema exposes borrowCap/supplyCap (capacity
+    # limits) but NOT per-vault LTV/liquidation-threshold/penalty risk params;
+    # those live in vault-controller storage, not the subgraph entities queried.
     "euler_v2": _ProtocolCapability(
         venue_prefix="EULER_V2",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA],
+        data_types=["lending_indices", "liquidations"],
         mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"EUL"}),
     ),
