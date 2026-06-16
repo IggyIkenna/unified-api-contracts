@@ -168,8 +168,9 @@ class TestExpectedCoverageByAssetGroup:
     def test_get_expected_pairs_flattens_correctly(self) -> None:
         pairs = get_expected_pairs("prediction")
         assert ("POLYMARKET", "trades") in pairs
+        assert ("POLYMARKET", "prediction_canonical_question_group") in pairs
         assert ("KALSHI", "trades") in pairs
-        assert len(pairs) == 2
+        assert len(pairs) == 3
 
     def test_returned_list_is_a_copy(self) -> None:
         """Mutating returned lists must not corrupt the registry."""

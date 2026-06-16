@@ -336,13 +336,14 @@ _SPORTS: dict[str, list[str]] = {
 
 # ---------------------------------------------------------------------------
 # Prediction — Polymarket + Kalshi CLOB trades. book_snapshot_5 was retired
-# 2026-04-19 (neither adapter captures order book snapshots). Polymarket
-# "other" categorisation already lives in instruments-service Polymarket
-# adapter — surfaces in the UI via the instrument_type breakdown, no
-# separate data_type needed here.
+# 2026-04-19 (neither adapter captures order book snapshots).
+# prediction_canonical_question_group: bundled CQG bucket written by MTDS
+# (groups prediction_trades rows by canonical question group x day). Added
+# 2026-06-16 — declaring it removes the deployment-ui "out of scope" badge
+# for POLYMARKET on this data_type (badge = manifest data_type not in scope).
 # ---------------------------------------------------------------------------
 _PREDICTION: dict[str, list[str]] = {
-    "POLYMARKET": ["trades"],
+    "POLYMARKET": ["trades", "prediction_canonical_question_group"],
     "KALSHI": ["trades"],
 }
 
