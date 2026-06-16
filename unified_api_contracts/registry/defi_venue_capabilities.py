@@ -141,6 +141,14 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "MARINADE-SOLANA": {"lst_rates": "2021-08-01", "oracle_prices": "2021-08-01"},
     "ORCA-SOLANA": {"dex_pool_swaps": "2021-03-01", "dex_pool_state": "2021-03-01"},
     "RAYDIUM-SOLANA": {"dex_pool_swaps": "2021-02-21", "dex_pool_state": "2021-02-21"},
+    # Solana lending — DATA-001 capability backfill (2026-06-16): declared the
+    # data_type ACTUALLY captured in the prod availability index (lending_indices
+    # only; no oracle_prices captured yet — declaring it would inflate the
+    # could-exist denominator with cells that have no data). Floor = earliest
+    # captured date in projected_index_defi.parquet (best-effort; adapter gates
+    # per-row via get_venue_data_type_start_date).
+    "SOLEND-SOLANA": {"lending_indices": "2022-11-01"},
+    "MARGINFI-SOLANA": {"lending_indices": "2025-01-01"},
     # ── DeFi — LST/Yield protocols ──
     "LIDO-ETHEREUM": {
         "lst_rates": "2020-12-18",
@@ -179,6 +187,16 @@ DEFI_VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     "UNISWAP-ETHEREUM": {"governance_events": "2020-09-17"},
     # ── DeFi — MEV events (MEV-Boost relay stats) ──
     "FLASHBOTS-ETHEREUM": {"mev_events": "2021-01-01"},
+    # ── DeFi — ERC-4626 share-price vaults (vault_share_price) ──
+    # DATA-001 capability backfill (2026-06-16): these venues had captured
+    # vault_share_price shards in the prod availability index but no
+    # VENUE_DATA_TYPE_CAPABILITIES entry → their shards were uncredited in the
+    # could-exist denominator (the universe builder reads this dict directly).
+    # data_type = the one observed in projected_index_defi.parquet; floor =
+    # earliest captured date there (best-effort; adapter gates per-row).
+    "MAKER-ETHEREUM": {"vault_share_price": "2023-01-18"},  # sDAI / DSR share price
+    "FRAX-ETHEREUM": {"vault_share_price": "2023-10-19"},  # sfrxETH / Frax vault share price
+    "MORPHOVAULTS-ETHEREUM": {"vault_share_price": "2024-01-04"},  # MetaMorpho ERC-4626 vaults
     # ── DeFi — Yield vaults (Phase 1A) ──
     # staking_yields = vault APY time-series (daily rate)
     "YEARN_V3-ETHEREUM": {"staking_yields": "2024-03-20"},

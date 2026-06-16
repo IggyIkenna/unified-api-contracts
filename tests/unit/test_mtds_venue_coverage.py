@@ -683,11 +683,28 @@ class TestNewlyCapabilitiedDefiVenues:
             )
 
     def test_newly_capabilitied_venues_declare_captured_data_type(self) -> None:
-        """Each venue must declare the specific data_type observed in the index."""
+        """Each venue must declare the specific data_type observed in the index.
+
+        Asserts against ``VENUE_DATA_TYPE_CAPABILITIES`` DIRECTLY (not
+        ``get_expected_data_types_for_venue``, which falls back to the broad
+        ``get_valid_data_types_for_venue`` list for an unmapped venue and would
+        pass VACUOUSLY) — so this guards the actual registry entry. The
+        could-exist universe builder reads this dict directly, so the entry must
+        exist there for the venue's shards to be credited.
+        """
+        from unified_api_contracts.registry.market_data_categories import (
+            VENUE_DATA_TYPE_CAPABILITIES,
+        )
+
         for venue, expected_dt in self._VENUES_EXPECTED_DT:
-            dts = get_expected_data_types_for_venue(venue)
-            assert expected_dt in dts, (
-                f"{venue}: expected '{expected_dt}' in capabilities but got {dts}"
+            caps = VENUE_DATA_TYPE_CAPABILITIES.get(venue, {})
+            assert caps, (
+                f"{venue}: missing from VENUE_DATA_TYPE_CAPABILITIES — its captured "
+                f"shards are uncredited in the could-exist denominator"
+            )
+            assert expected_dt in caps, (
+                f"{venue}: expected '{expected_dt}' declared in "
+                f"VENUE_DATA_TYPE_CAPABILITIES but got {sorted(caps)}"
             )
 
     def test_vault_is_not_in_all_defi_venues(self) -> None:
