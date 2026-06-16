@@ -5,7 +5,10 @@ from __future__ import annotations
 import pytest
 
 from unified_api_contracts.canonical.crosscutting.availability_semantics import (
+    ANNOUNCEMENT_FLOOR_HOURS,
     AVAILABILITY_AT_SEMANTICS,
+    DEFAULT_ANNOUNCEMENT_FLOOR_HOURS,
+    get_announcement_floor_hours,
     get_availability_semantic,
     has_availability_semantic,
 )
@@ -169,6 +172,45 @@ def test_registry_values_are_known_semantics() -> None:
 def test_registry_has_minimum_seed_size() -> None:
     # Smoke: catch accidental wipe.
     assert len(AVAILABILITY_AT_SEMANTICS) >= 30
+
+
+# ---------------------------------------------------------------------------
+# ANNOUNCEMENT_FLOOR_HOURS — fixture publication floor registry
+# ---------------------------------------------------------------------------
+
+
+def test_default_announcement_floor_is_14_days() -> None:
+    """DEFAULT_ANNOUNCEMENT_FLOOR_HOURS == 336 (14d × 24h)."""
+    assert DEFAULT_ANNOUNCEMENT_FLOOR_HOURS == 14 * 24
+
+
+def test_top5_eu_leagues_seeded_at_14d() -> None:
+    """Top-5 EU leagues are pre-seeded (initial conservative observation seed)."""
+    for league_id in ("EPL", "LA_LIGA", "BUNDESLIGA", "SERIE_A", "LIGUE_1"):
+        assert league_id in ANNOUNCEMENT_FLOOR_HOURS
+        assert ANNOUNCEMENT_FLOOR_HOURS[league_id] == DEFAULT_ANNOUNCEMENT_FLOOR_HOURS
+
+
+def test_all_floor_values_are_positive_hours() -> None:
+    """Every per-league floor must be a positive integer (hours)."""
+    for league_id, hours in ANNOUNCEMENT_FLOOR_HOURS.items():
+        assert isinstance(hours, int) and hours > 0, league_id
+
+
+def test_get_announcement_floor_hours_known_league() -> None:
+    """Known league returns the seeded value."""
+    assert get_announcement_floor_hours("EPL") == ANNOUNCEMENT_FLOOR_HOURS["EPL"]
+
+
+def test_get_announcement_floor_hours_unknown_league_returns_default() -> None:
+    """Unknown league falls back to DEFAULT_ANNOUNCEMENT_FLOOR_HOURS."""
+    assert get_announcement_floor_hours("UNKNOWN_LEAGUE_XYZ") == DEFAULT_ANNOUNCEMENT_FLOOR_HOURS
+
+
+def test_floor_replaces_7d_heuristic() -> None:
+    """The default (14d = 336h) is MORE conservative than the old kickoff−7d (168h) heuristic."""
+    OLD_HEURISTIC_HOURS = 7 * 24
+    assert DEFAULT_ANNOUNCEMENT_FLOOR_HOURS > OLD_HEURISTIC_HOURS
 
 
 def test_no_duplicate_keys_with_different_semantics() -> None:

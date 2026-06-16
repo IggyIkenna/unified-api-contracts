@@ -238,6 +238,96 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
 }
 
 
+# ---------------------------------------------------------------------------
+# Fixture announcement-floor registry — per-league hours before kickoff by
+# which api_football is expected to have published the fixture.
+#
+# Replaces the `kickoff - 7d` flat heuristic with a per-league empirical table
+# sourced from a 2-week observation window (Phase 2 of the FIXTURES schema-split
+# lookahead-bias fix). Default is 14d (336h) — a conservative upper bound that
+# ensures the `available_at = announced_at` stamp never leads to future-leakage
+# for unobserved leagues. Per-league overrides are added here once the 2-week
+# observation data for a league is collected.
+#
+# Usage: instruments-service FIXTURES adapter and the UTL `announced_at` stamper
+# call `get_announcement_floor_hours(league_id)` to derive the per-row
+# `available_at` floor. Keyed by UAC canonical league_id (same strings used in
+# `provider_league_ids.py` and `LEAGUE_REGISTRY`).
+#
+# Plan: `sports_fixtures_schema_split_completion_2026_06_20.md` Phase 2.
+# ---------------------------------------------------------------------------
+
+DEFAULT_ANNOUNCEMENT_FLOOR_HOURS: Final[int] = 14 * 24
+"""Conservative fallback floor (336h = 14 days) for leagues not yet in the
+per-league observation table. Replaces the previous `kickoff - 7d` (168h)
+flat heuristic. The 14-day ceiling accommodates leagues that publish schedules
+well in advance and is safe to use until empirical per-league data is in.
+"""
+
+ANNOUNCEMENT_FLOOR_HOURS: Final[dict[str, int]] = {
+    # ── Top-5 EU leagues ──────────────────────────────────────────────────
+    # api_football typically publishes Top-5 EU fixtures 7-14 days before
+    # kickoff. Initial seed at 14d (336h) = conservative default; tighten
+    # per-league once the 2-week observation window data is available.
+    "EPL": 14 * 24,        # 336h — to be refined from observation data
+    "LA_LIGA": 14 * 24,    # 336h — to be refined from observation data
+    "BUNDESLIGA": 14 * 24, # 336h — to be refined from observation data
+    "SERIE_A": 14 * 24,    # 336h — to be refined from observation data
+    "LIGUE_1": 14 * 24,    # 336h — to be refined from observation data
+    # ── Tier-2 EU leagues currently in the pipeline ───────────────────────
+    "ENG_CHAMPIONSHIP": 14 * 24,
+    "BUNDESLIGA_2": 14 * 24,
+    "SEGUNDA_DIVISION": 14 * 24,
+    "LIGUE_2": 14 * 24,
+    "SERIE_B": 14 * 24,
+    "EREDIVISIE": 14 * 24,
+    "JUPILER_PRO": 14 * 24,
+    "SCOTTISH_PREMIERSHIP": 14 * 24,
+    "PRIMEIRA_LIGA": 14 * 24,
+    "SUPER_LIG": 14 * 24,
+    # ── Other active leagues ──────────────────────────────────────────────
+    "MLS": 14 * 24,
+    "LIGA_MX": 14 * 24,
+    "BRASILEIRAO": 14 * 24,
+    "ARGENTINA_PRIMERA": 14 * 24,
+    "ALLSVENSKAN": 14 * 24,
+    "ELITESERIEN": 14 * 24,
+    "DANISH_SUPERLIGA": 14 * 24,
+    "SWISS_SUPER_LEAGUE": 14 * 24,
+    "AUSTRIAN_BUNDESLIGA": 14 * 24,
+    "EKSTRAKLASA": 14 * 24,
+    "J1_LEAGUE": 14 * 24,
+    "K_LEAGUE_1": 14 * 24,
+    "A_LEAGUE": 14 * 24,
+    "CHILE_PRIMERA": 14 * 24,
+    "GREEK_SUPER_LEAGUE": 14 * 24,
+}
+"""Per-canonical-league-id announcement-floor in hours.
+
+Each entry is the expected maximum hours before kickoff by which
+api_football will have published the fixture. Instruments-service uses
+`get_announcement_floor_hours(league_id)` to derive the per-row
+``available_at`` floor for ``announced_at``-semantic rows.
+
+Keyed by UAC canonical league_id (same strings as
+``unified_api_contracts.canonical.domain.sports.provider_league_ids``).
+Leagues absent from this dict fall back to ``DEFAULT_ANNOUNCEMENT_FLOOR_HOURS``
+(14 days = 336h). Values are refined after the 2-week empirical observation
+window (plan `sports_fixtures_schema_split_completion_2026_06_20.md` Phase 2).
+"""
+
+
+def get_announcement_floor_hours(league_id: str) -> int:
+    """Return the announcement-floor in hours for a canonical league_id.
+
+    Falls back to :data:`DEFAULT_ANNOUNCEMENT_FLOOR_HOURS` (14d = 336h) for
+    leagues not yet in the empirical table. All values are conservative upper
+    bounds: the real floor may be shorter, but using a wider window prevents
+    lookahead bias in the ``available_at = announced_at`` stamp.
+    """
+    return ANNOUNCEMENT_FLOOR_HOURS.get(league_id, DEFAULT_ANNOUNCEMENT_FLOOR_HOURS)
+
+
 def get_availability_semantic(asset_group: str, data_type: str) -> AvailabilitySemantic:
     """Return the ``available_at`` stamping semantic for a shard.
 
@@ -273,8 +363,12 @@ def has_availability_semantic(asset_group: str, data_type: str) -> bool:
 
 
 __all__ = [
+    "ANNOUNCEMENT_FLOOR_HOURS",
     "AVAILABILITY_AT_SEMANTICS",
+    "DEFAULT_ANNOUNCEMENT_FLOOR_HOURS",
     "AvailabilitySemantic",
+    "get_announcement_floor_hours",
     "get_availability_semantic",
     "has_availability_semantic",
 ]
+
