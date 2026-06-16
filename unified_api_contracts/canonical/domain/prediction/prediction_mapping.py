@@ -14,6 +14,11 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict
 
+from unified_api_contracts.canonical.crosscutting.config_versioning import (
+    ConfigDescriptor,
+    compute_config_content_hash,
+)
+
 
 class PredictionMarketCategory(StrEnum):
     """Category of a prediction market question."""
@@ -305,3 +310,38 @@ class OrphanDetector:
     ) -> list[CanonicalPredictionMarket]:
         """Return markets categorized as OTHER (no rule matched)."""
         return [m for m in markets if m.category == PredictionMarketCategory.OTHER]
+
+
+# ---------------------------------------------------------------------------
+# Config versioning — monotonic version + deterministic content hash for the
+# prediction-markets config (the market-group taxonomy
+# :class:`PredictionMarketCategory` + the keyword categorisation
+# :data:`_DEFAULT_RULES`). PER-CONFIG (independent of MVP_SCOPE / sports-
+# leagues), surfaced in data-status so a coverage delta attributes to a
+# market-group scope change (a category added/removed, a rule re-keyed) vs a
+# data change. Metadata only — never a GCS partition key. SSOT:
+# ``plans/active/mvp_scope_catalogue_tagging_2026_06_08.md`` § Config versioning.
+# ---------------------------------------------------------------------------
+
+PREDICTION_MARKETS_CONFIG_VERSION: int = 1
+"""Monotonic version of the prediction-markets config. Bump on content change."""
+
+
+def _compute_prediction_markets_content_hash() -> str:
+    """SHA-256 (16-hex prefix) of the canonical category taxonomy + rules."""
+    return compute_config_content_hash(
+        PREDICTION_MARKETS_CONFIG_VERSION,
+        [
+            ("categories", tuple(sorted(c.value for c in PredictionMarketCategory))),
+            ("rules", _DEFAULT_RULES),
+        ],
+    )
+
+
+PREDICTION_MARKETS_CONFIG_HASH: str = _compute_prediction_markets_content_hash()
+"""Content hash — flips IFF the category taxonomy or mapping rules change."""
+
+
+def prediction_markets_config_descriptor() -> ConfigDescriptor:
+    """Return the prediction-markets ``(version, content-hash)`` descriptor."""
+    return ConfigDescriptor(PREDICTION_MARKETS_CONFIG_VERSION, PREDICTION_MARKETS_CONFIG_HASH)

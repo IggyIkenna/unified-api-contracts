@@ -819,7 +819,16 @@ from .canonical.domain.instruments_catalog import (
     register_catalog_reader as register_catalog_reader,
 )
 from .canonical.domain.prediction.prediction_mapping import (
+    PREDICTION_MARKETS_CONFIG_HASH as PREDICTION_MARKETS_CONFIG_HASH,
+)
+from .canonical.domain.prediction.prediction_mapping import (
+    PREDICTION_MARKETS_CONFIG_VERSION as PREDICTION_MARKETS_CONFIG_VERSION,
+)
+from .canonical.domain.prediction.prediction_mapping import (
     PredictionMarketCrossVenueMapping as PredictionMarketCrossVenueMapping,
+)
+from .canonical.domain.prediction.prediction_mapping import (
+    prediction_markets_config_descriptor as prediction_markets_config_descriptor,
 )
 from .canonical.domain.predictions.canonical_groups import (
     CanonicalGroupMetadata as CanonicalGroupMetadata,
@@ -861,6 +870,12 @@ from .canonical.domain.sports.league_data import (
     SPORTS_DATA_TYPE_TO_SOURCE as SPORTS_DATA_TYPE_TO_SOURCE,
 )
 from .canonical.domain.sports.league_data import (
+    SPORTS_LEAGUES_CONFIG_HASH as SPORTS_LEAGUES_CONFIG_HASH,
+)
+from .canonical.domain.sports.league_data import (
+    SPORTS_LEAGUES_CONFIG_VERSION as SPORTS_LEAGUES_CONFIG_VERSION,
+)
+from .canonical.domain.sports.league_data import (
     get_league as get_league,
 )
 from .canonical.domain.sports.league_data import (
@@ -871,6 +886,9 @@ from .canonical.domain.sports.league_data import (
 )
 from .canonical.domain.sports.league_data import (
     is_in_known_gap as is_in_known_gap,
+)
+from .canonical.domain.sports.league_data import (
+    sports_leagues_config_descriptor as sports_leagues_config_descriptor,
 )
 from .canonical.domain.sports.league_registry import (
     LeagueClassification as LeagueClassification,
@@ -2263,6 +2281,13 @@ __all__ = [
     "SportsMvpRule",
     "PredictionMvpRule",
     "FeaturesModelsMvpStub",
+    # Per-config versioning descriptors (sports-leagues + prediction-markets)
+    "SPORTS_LEAGUES_CONFIG_HASH",
+    "SPORTS_LEAGUES_CONFIG_VERSION",
+    "sports_leagues_config_descriptor",
+    "PREDICTION_MARKETS_CONFIG_HASH",
+    "PREDICTION_MARKETS_CONFIG_VERSION",
+    "prediction_markets_config_descriptor",
 ]
 
 # fmt: off
