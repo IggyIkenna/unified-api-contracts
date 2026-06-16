@@ -152,6 +152,43 @@ class CanonicalQuestionGroup(StrEnum):
     SILVER_PRICE_LEVEL = "SILVER_PRICE_LEVEL"
     CRUDE_OIL_PRICE_LEVEL = "CRUDE_OIL_PRICE_LEVEL"
 
+    # === decision 338 pass 2 sports (per operator: league x market-type;
+    # fixture = the recurring instance/market_id within the group) ===
+    # US team sports — MATCH (moneyline) / SPREAD / TOTAL (+ MLB NRFI).
+    SPORTS_MLB_MATCH = "SPORTS_MLB_MATCH"
+    SPORTS_MLB_SPREAD = "SPORTS_MLB_SPREAD"
+    SPORTS_MLB_TOTAL = "SPORTS_MLB_TOTAL"
+    SPORTS_MLB_NRFI = "SPORTS_MLB_NRFI"
+    SPORTS_NFL_MATCH = "SPORTS_NFL_MATCH"
+    SPORTS_NFL_SPREAD = "SPORTS_NFL_SPREAD"
+    SPORTS_NFL_TOTAL = "SPORTS_NFL_TOTAL"
+    SPORTS_NBA_MATCH = "SPORTS_NBA_MATCH"
+    SPORTS_NBA_SPREAD = "SPORTS_NBA_SPREAD"
+    SPORTS_NBA_TOTAL = "SPORTS_NBA_TOTAL"
+    SPORTS_NHL_MATCH = "SPORTS_NHL_MATCH"
+    SPORTS_NHL_SPREAD = "SPORTS_NHL_SPREAD"
+    SPORTS_NHL_TOTAL = "SPORTS_NHL_TOTAL"
+    # Football — MATCH (3-way: home/draw/away) / TOTAL.
+    SPORTS_EPL_MATCH = "SPORTS_EPL_MATCH"
+    SPORTS_EPL_TOTAL = "SPORTS_EPL_TOTAL"
+    SPORTS_UEFA_MATCH = "SPORTS_UEFA_MATCH"
+    SPORTS_UEFA_TOTAL = "SPORTS_UEFA_TOTAL"
+    SPORTS_CHAMPIONS_LEAGUE_MATCH = "SPORTS_CHAMPIONS_LEAGUE_MATCH"
+    SPORTS_LA_LIGA_MATCH = "SPORTS_LA_LIGA_MATCH"
+    SPORTS_SERIE_A_MATCH = "SPORTS_SERIE_A_MATCH"
+    SPORTS_BUNDESLIGA_MATCH = "SPORTS_BUNDESLIGA_MATCH"
+    SPORTS_WORLD_CUP_MATCH = "SPORTS_WORLD_CUP_MATCH"
+    # F1 — GP winner / constructor / generic-season (MATCH).
+    SPORTS_F1_MATCH = "SPORTS_F1_MATCH"
+    SPORTS_F1_GP_WINNER = "SPORTS_F1_GP_WINNER"
+    SPORTS_F1_CONSTRUCTOR = "SPORTS_F1_CONSTRUCTOR"
+    # Individual / combat sports — MATCH (tournament/bout winner).
+    SPORTS_TENNIS_MATCH = "SPORTS_TENNIS_MATCH"
+    SPORTS_GOLF_MATCH = "SPORTS_GOLF_MATCH"
+    SPORTS_UFC_MATCH = "SPORTS_UFC_MATCH"
+    SPORTS_BOXING_MATCH = "SPORTS_BOXING_MATCH"
+    SPORTS_OLYMPICS_MATCH = "SPORTS_OLYMPICS_MATCH"
+
     # Explicit small residual for genuinely-uncategorised (category=MISC)
     # novelty markets, so OTHER stops being a silent ~80% catch-all.
     MISC_NOVELTY = "MISC_NOVELTY"
@@ -535,6 +572,61 @@ CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetad
             CanonicalQuestionGroup.GOLD_PRICE_LEVEL,
             CanonicalQuestionGroup.SILVER_PRICE_LEVEL,
             CanonicalQuestionGroup.CRUDE_OIL_PRICE_LEVEL,
+        )
+    },
+    # === decision 338 pass 2 sports metadata (event/fixture-driven) ===
+    # MATCH / GP_WINNER / CONSTRUCTOR → multi_outcome (winner-of-field / 3-way).
+    **{
+        group: CanonicalGroupMetadata(
+            group=group,
+            cadence="irregular",
+            expected_market_ids_per_day=1,
+            resolution_basis="multi_outcome",
+            settlement_lag=24 * _HOUR,
+        )
+        for group in (
+            CanonicalQuestionGroup.SPORTS_MLB_MATCH,
+            CanonicalQuestionGroup.SPORTS_NFL_MATCH,
+            CanonicalQuestionGroup.SPORTS_NBA_MATCH,
+            CanonicalQuestionGroup.SPORTS_NHL_MATCH,
+            CanonicalQuestionGroup.SPORTS_EPL_MATCH,
+            CanonicalQuestionGroup.SPORTS_UEFA_MATCH,
+            CanonicalQuestionGroup.SPORTS_CHAMPIONS_LEAGUE_MATCH,
+            CanonicalQuestionGroup.SPORTS_LA_LIGA_MATCH,
+            CanonicalQuestionGroup.SPORTS_SERIE_A_MATCH,
+            CanonicalQuestionGroup.SPORTS_BUNDESLIGA_MATCH,
+            CanonicalQuestionGroup.SPORTS_WORLD_CUP_MATCH,
+            CanonicalQuestionGroup.SPORTS_F1_MATCH,
+            CanonicalQuestionGroup.SPORTS_F1_GP_WINNER,
+            CanonicalQuestionGroup.SPORTS_F1_CONSTRUCTOR,
+            CanonicalQuestionGroup.SPORTS_TENNIS_MATCH,
+            CanonicalQuestionGroup.SPORTS_GOLF_MATCH,
+            CanonicalQuestionGroup.SPORTS_UFC_MATCH,
+            CanonicalQuestionGroup.SPORTS_BOXING_MATCH,
+            CanonicalQuestionGroup.SPORTS_OLYMPICS_MATCH,
+        )
+    },
+    # SPREAD / TOTAL / NRFI → binary_outcome (cover / over-under / yes-no).
+    **{
+        group: CanonicalGroupMetadata(
+            group=group,
+            cadence="irregular",
+            expected_market_ids_per_day=1,
+            resolution_basis="binary_outcome",
+            settlement_lag=24 * _HOUR,
+        )
+        for group in (
+            CanonicalQuestionGroup.SPORTS_MLB_SPREAD,
+            CanonicalQuestionGroup.SPORTS_MLB_TOTAL,
+            CanonicalQuestionGroup.SPORTS_MLB_NRFI,
+            CanonicalQuestionGroup.SPORTS_NFL_SPREAD,
+            CanonicalQuestionGroup.SPORTS_NFL_TOTAL,
+            CanonicalQuestionGroup.SPORTS_NBA_SPREAD,
+            CanonicalQuestionGroup.SPORTS_NBA_TOTAL,
+            CanonicalQuestionGroup.SPORTS_NHL_SPREAD,
+            CanonicalQuestionGroup.SPORTS_NHL_TOTAL,
+            CanonicalQuestionGroup.SPORTS_EPL_TOTAL,
+            CanonicalQuestionGroup.SPORTS_UEFA_TOTAL,
         )
     },
     CanonicalQuestionGroup.MISC_NOVELTY: CanonicalGroupMetadata(

@@ -213,6 +213,64 @@ _CONFLICT_SLUG_TOKENS: Final[frozenset[str]] = frozenset(
 )
 
 
+# Sports (league, bet_type) → group. league = taxonomy underlying; bet_type
+# from the slug. Every league has a MATCH entry so the fallback in
+# _route_pass2_subtype guarantees per-league grouping (never silent OTHER).
+_SPORTS_GROUP: Final[dict[tuple[str, str], CanonicalQuestionGroup]] = {
+    ("MLB", "MATCH"): _G.SPORTS_MLB_MATCH,
+    ("MLB", "SPREAD"): _G.SPORTS_MLB_SPREAD,
+    ("MLB", "TOTAL"): _G.SPORTS_MLB_TOTAL,
+    ("MLB", "NRFI"): _G.SPORTS_MLB_NRFI,
+    ("NFL", "MATCH"): _G.SPORTS_NFL_MATCH,
+    ("NFL", "SPREAD"): _G.SPORTS_NFL_SPREAD,
+    ("NFL", "TOTAL"): _G.SPORTS_NFL_TOTAL,
+    ("NBA", "MATCH"): _G.SPORTS_NBA_MATCH,
+    ("NBA", "SPREAD"): _G.SPORTS_NBA_SPREAD,
+    ("NBA", "TOTAL"): _G.SPORTS_NBA_TOTAL,
+    ("NHL", "MATCH"): _G.SPORTS_NHL_MATCH,
+    ("NHL", "SPREAD"): _G.SPORTS_NHL_SPREAD,
+    ("NHL", "TOTAL"): _G.SPORTS_NHL_TOTAL,
+    ("EPL", "MATCH"): _G.SPORTS_EPL_MATCH,
+    ("EPL", "TOTAL"): _G.SPORTS_EPL_TOTAL,
+    ("UEFA", "MATCH"): _G.SPORTS_UEFA_MATCH,
+    ("UEFA", "TOTAL"): _G.SPORTS_UEFA_TOTAL,
+    ("CHAMPIONS_LEAGUE", "MATCH"): _G.SPORTS_CHAMPIONS_LEAGUE_MATCH,
+    ("LA_LIGA", "MATCH"): _G.SPORTS_LA_LIGA_MATCH,
+    ("SERIE_A", "MATCH"): _G.SPORTS_SERIE_A_MATCH,
+    ("BUNDESLIGA", "MATCH"): _G.SPORTS_BUNDESLIGA_MATCH,
+    ("WORLD_CUP", "MATCH"): _G.SPORTS_WORLD_CUP_MATCH,
+    ("F1", "MATCH"): _G.SPORTS_F1_MATCH,
+    ("F1", "GP_WINNER"): _G.SPORTS_F1_GP_WINNER,
+    ("F1", "CONSTRUCTOR"): _G.SPORTS_F1_CONSTRUCTOR,
+    ("TENNIS", "MATCH"): _G.SPORTS_TENNIS_MATCH,
+    ("GOLF", "MATCH"): _G.SPORTS_GOLF_MATCH,
+    ("UFC", "MATCH"): _G.SPORTS_UFC_MATCH,
+    ("BOXING", "MATCH"): _G.SPORTS_BOXING_MATCH,
+    ("OLYMPICS", "MATCH"): _G.SPORTS_OLYMPICS_MATCH,
+}
+
+
+def _sports_bet_type(slug: str, league: str) -> str:
+    """Detect the sports bet-type from the slug (decision 338 pass 2).
+
+    Returns one of MATCH / SPREAD / TOTAL / NRFI / GP_WINNER / CONSTRUCTOR.
+    Defaults to MATCH (moneyline / 3-way outcome / tournament winner).
+    """
+    if league == "F1":
+        if "constructor" in slug:
+            return "CONSTRUCTOR"
+        if "grand-prix" in slug or "-gp-" in slug or slug.endswith("-gp") or "sprint" in slug:
+            return "GP_WINNER"
+        return "MATCH"
+    if "nrfi" in slug:
+        return "NRFI"
+    if "spread" in slug or "run-line" in slug or "runline" in slug or "puck-line" in slug or "handicap" in slug:
+        return "SPREAD"
+    if "total" in slug or "over-under" in slug or "overunder" in slug or "over-or-under" in slug:
+        return "TOTAL"
+    return "MATCH"
+
+
 def _route_pass2_subtype(
     category: PredictionShardCategory,
     underlying: str,
@@ -275,6 +333,11 @@ def _route_pass2_subtype(
         if any(t in s for t in _CONFLICT_SLUG_TOKENS):
             return CanonicalQuestionGroup.GEO_OTHER_BY_DATE
         return None  # intl elections etc. → generic fall-through
+
+    if category in (PredictionShardCategory.SPORTS_FOOTBALL, PredictionShardCategory.SPORTS_OTHER):
+        # league x bet-type; per-league MATCH fallback guarantees grouping.
+        bet_type = _sports_bet_type(s, und)
+        return _SPORTS_GROUP.get((und, bet_type)) or _SPORTS_GROUP.get((und, "MATCH"))
 
     return None
 

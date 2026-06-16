@@ -387,6 +387,35 @@ def test_classify_pass2_subtype_routing() -> None:
         assert group == expected, f"Expected {expected} for slug={slug!r}, got {group!r}"
 
 
+def test_classify_sports_league_bettype() -> None:
+    """decision 338 pass 2 — sports SPORTS_{LEAGUE}_{BETTYPE} routing.
+
+    league = taxonomy underlying; bet-type from slug; per-league MATCH fallback.
+    """
+    cases: list[tuple[str, str, CanonicalQuestionGroup]] = [
+        # (slug, event_slug, expected)
+        ("mlb-mia-tex-2025-08-15-nrfi", "mlb", CanonicalQuestionGroup.SPORTS_MLB_NRFI),
+        ("mlb-nyy-bos-2025-08-15-spread", "mlb", CanonicalQuestionGroup.SPORTS_MLB_SPREAD),
+        ("nfl-lv-was-2025-week-3-spread", "nfl", CanonicalQuestionGroup.SPORTS_NFL_SPREAD),
+        ("nba-orl-phi-2025-total-220-5", "nba", CanonicalQuestionGroup.SPORTS_NBA_TOTAL),
+        ("nhl-bos-tor-2025-moneyline", "nhl", CanonicalQuestionGroup.SPORTS_NHL_MATCH),
+        ("epl-chelsea-arsenal-2025-winner", "epl", CanonicalQuestionGroup.SPORTS_EPL_MATCH),
+        ("uefa-real-bayern-2025-total-goals", "uefa", CanonicalQuestionGroup.SPORTS_UEFA_TOTAL),
+        ("f1-chinese-grand-prix-winner-2025", "f1", CanonicalQuestionGroup.SPORTS_F1_GP_WINNER),
+        ("f1-australian-gp-constructor-highest-2025", "f1", CanonicalQuestionGroup.SPORTS_F1_CONSTRUCTOR),
+        ("ufc-tybura-vs-parkin-winner", "ufc", CanonicalQuestionGroup.SPORTS_UFC_MATCH),
+        ("golf-masters-2025-winner", "golf", CanonicalQuestionGroup.SPORTS_GOLF_MATCH),
+    ]
+    for slug, event_slug, expected in cases:
+        group = classify_polymarket_to_canonical_group(
+            title="Sports market",
+            slug=slug,
+            event_slug=event_slug,
+            outcome="Yes",
+        )
+        assert group == expected, f"Expected {expected} for slug={slug!r}, got {group!r}"
+
+
 def test_classify_crypto_up_down_still_routes_after_pass2() -> None:
     """Pass 2 must NOT regress UP_DOWN routing — direction bets stay UP_DOWN."""
     group = classify_polymarket_to_canonical_group(
