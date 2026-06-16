@@ -427,7 +427,13 @@ _SLUG_TOKEN_RE: re.Pattern[str] = re.compile(r"[a-z0-9]+")
 # so adding a new entry to ``SLUG_PREFIX_MAP`` (or any other table) flips the
 # hash automatically — no manual sync required.
 
-CLASSIFIER_VERSION = "2026-05-23.3"
+# 2026-06-16 (decision 338): added alt-coin DAILY + macro-release + weather-temp
+# canonical-question-group routing (in classifiers.py) + fixed the dead
+# (MACRO, FED_RATE) event key → FED_FUNDS. The cqg projection maps live in
+# classifiers.py (not a stability-hash input), so this version bump is the
+# lever that flips CLASSIFIER_STABILITY_HASH → triggers a reclassification
+# pass over existing OTHER-bucketed prediction rows.
+CLASSIFIER_VERSION = "2026-06-16.1"
 
 
 def _compute_classifier_stability_hash() -> str:

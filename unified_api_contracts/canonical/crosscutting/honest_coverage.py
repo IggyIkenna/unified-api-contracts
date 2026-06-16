@@ -760,6 +760,30 @@ PREDICTION_GROUPS: Final[dict[str, dict[str, int]]] = {
     "EUR_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
     "FED_RATE_DECISION_PER_FOMC": {"_per_market_min_rows": 100},
     "CPI_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
+    # Alt-coin daily up-or-down — mirror BTC/ETH DAILY (decision 338).
+    # Floor 500: alts thinner than BTC/ETH (1000) on Polymarket.
+    "SOL_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "XRP_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "DOGE_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "BNB_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "ADA_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "AVAX_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "LINK_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "LTC_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "SUI_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    "HYPE_UP_DOWN_DAILY": {"_per_market_min_rows": 500},
+    # Macro economic-release groups (decision 338). Floor 100 (matches
+    # FED/CPI — release-cadence markets, thinner than crypto price tickers).
+    "UNEMPLOYMENT_RATE_PER_MONTH": {"_per_market_min_rows": 100},
+    "NONFARM_PAYROLLS_PER_MONTH": {"_per_market_min_rows": 100},
+    "GDP_PRINT_PER_QUARTER": {"_per_market_min_rows": 100},
+    "PPI_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
+    "PCE_PRINT_PER_MONTH": {"_per_market_min_rows": 100},
+    "TREASURY_YIELD_PER_PRINT": {"_per_market_min_rows": 100},
+    "CRYPTO_FEAR_GREED_INDEX": {"_per_market_min_rows": 100},
+    # Weather daily highest-temperature (decision 338). Floor 20 — weather
+    # markets are thin per market_id.
+    "WEATHER_TEMP_DAILY": {"_per_market_min_rows": 20},
     "ELECTION_PRESIDENT_2028": {"_per_market_min_rows": 100},
     "OSCARS_BEST_PICTURE": {"_per_market_min_rows": 50},
     # OTHER catch-all: cluster validation is count > 0 (any market falls through).
