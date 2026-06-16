@@ -38,12 +38,12 @@ from unified_api_contracts.canonical.crosscutting.source_priority import SOURCE_
 
 
 def test_pipeline_mode_is_str_enum() -> None:
-    assert isinstance(PipelineMode.LIVE_WEBSOCKET, str)
-    assert PipelineMode.LIVE_WEBSOCKET == "live_websocket"
+    assert isinstance(PipelineMode.LIVE_BINANCE, str)
+    assert PipelineMode.LIVE_BINANCE == "live_binance"
 
 
-def test_pipeline_mode_has_live_websocket_member() -> None:
-    assert PipelineMode.LIVE_WEBSOCKET.value == "live_websocket"
+def test_pipeline_mode_has_source_aware_live_member() -> None:
+    assert PipelineMode.LIVE_BINANCE.value == "live_binance"
 
 
 def test_pipeline_mode_values_use_a_mode_prefix() -> None:
@@ -127,11 +127,11 @@ def test_every_batch_pipeline_mode_maps_to_source_priority_source() -> None:
 
 def test_is_batch_distinguishes_live_and_batch() -> None:
     assert is_batch(PipelineMode.BATCH_TARDIS)
-    assert not is_batch(PipelineMode.LIVE_WEBSOCKET)
+    assert not is_batch(PipelineMode.LIVE_BINANCE)
 
 
 def test_is_live_distinguishes_live_and_batch() -> None:
-    assert is_live(PipelineMode.LIVE_WEBSOCKET)
+    assert is_live(PipelineMode.LIVE_BINANCE)
     assert not is_live(PipelineMode.BATCH_TARDIS)
 
 
@@ -140,8 +140,9 @@ def test_source_string_for_batch_mode_returns_underlying_source() -> None:
     assert source_string_for(PipelineMode.BATCH_DATABENTO) == "databento"
 
 
-def test_source_string_for_live_mode_returns_none() -> None:
-    assert source_string_for(PipelineMode.LIVE_WEBSOCKET) is None
+def test_source_string_for_live_mode_returns_source() -> None:
+    assert source_string_for(PipelineMode.LIVE_BINANCE) == "binance"
+    assert transport_of(PipelineMode.LIVE_BINANCE) is None
 
 
 def test_pipeline_mode_for_source_round_trip_for_known_source() -> None:

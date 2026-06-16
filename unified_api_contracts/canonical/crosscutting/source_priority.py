@@ -482,7 +482,7 @@ def read_with_source_priority(
       (matches the partition the migration bundle writes).
     * Stratify batch-vs-live reconciliation in
       ``live_pipeline_mtds_mdps_features_2026_05_08`` Phase 12 — live rows
-      (``pipeline_mode=PipelineMode.LIVE_WEBSOCKET``) win over batch rows
+      (the source-aware ``live_<source>`` pipeline_mode) win over batch rows
       with the same row-key.
 
     Args:
@@ -493,8 +493,8 @@ def read_with_source_priority(
     Returns:
         Tuple of ``(primary_source_string, pipeline_mode)``. ``pipeline_mode``
         is always a batch value (e.g. :attr:`PipelineMode.BATCH_TARDIS`); the
-        live mode :attr:`PipelineMode.LIVE_WEBSOCKET` is set by the streaming
-        writer at write-time, not derived from this registry.
+        source-aware live pipeline_mode (``live_<source>``) is set by the
+        streaming writer at write-time, not derived from this registry.
 
     Raises:
         KeyError: If the ``(asset_group, data_type)`` pair is not registered
@@ -709,8 +709,8 @@ def live_pipeline_mode_for_venue(
     """Resolve the source-aware ``live_<source>`` / ``replay_<source>`` :class:`PipelineMode`
     for a ``(asset_group, venue, data_type)`` shard.
 
-    The M1 migration target for live writers: replaces the single
-    ``PipelineMode.LIVE_WEBSOCKET`` literal with the source-aware value. Composes
+    The live-writer resolver: returns the source-aware live pipeline_mode
+    (``live_<source>``) for a shard. Composes
     :func:`live_source_for_venue` (venue→source) with
     :func:`pipeline_mode_for_source` ``(source, mode)``.
 

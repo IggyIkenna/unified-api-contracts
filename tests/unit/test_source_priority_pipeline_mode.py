@@ -23,8 +23,8 @@ Tests:
 5. The reader's pipeline_mode is always a batch value (live is a write-time
    concern, not a registry concern).
 6. Live-priority-over-batch behaviour at the row-selection layer — synthetic
-   row tagged ``pipeline_mode=LIVE_WEBSOCKET`` wins over a same-key batch
-   row even though the registry returns the batch source.
+   row tagged with a source-aware ``live_<source>`` pipeline_mode wins over a
+   same-key batch row even though the registry returns the batch source.
 7. Public-export surface — :func:`read_with_source_priority` is reachable
    via ``from unified_api_contracts.canonical.crosscutting import ...``.
 """
@@ -200,14 +200,14 @@ def test_live_pipeline_mode_wins_over_batch_at_same_row_key() -> None:
     # construct them to assert the stratification logic.
     candidate_rows = [
         {"source": "tardis", "pipeline_mode": PipelineMode.BATCH_TARDIS, "value": 100},
-        {"source": "binance_ws", "pipeline_mode": PipelineMode.LIVE_WEBSOCKET, "value": 200},
+        {"source": "binance", "pipeline_mode": PipelineMode.LIVE_BINANCE, "value": 200},
     ]
 
     # Caller-side stratification: prefer live row if any live row exists.
-    live_rows = [r for r in candidate_rows if r["pipeline_mode"] is PipelineMode.LIVE_WEBSOCKET]
+    live_rows = [r for r in candidate_rows if r["pipeline_mode"] is PipelineMode.LIVE_BINANCE]
     chosen = live_rows[0] if live_rows else candidate_rows[0]
 
-    assert chosen["pipeline_mode"] is PipelineMode.LIVE_WEBSOCKET
+    assert chosen["pipeline_mode"] is PipelineMode.LIVE_BINANCE
     assert chosen["value"] == 200, "live row's value should win over batch's"
 
 
@@ -219,7 +219,7 @@ def test_batch_only_row_is_chosen_when_no_live_row_exists() -> None:
         {"source": "tardis", "pipeline_mode": PipelineMode.BATCH_TARDIS, "value": 100},
     ]
 
-    live_rows = [r for r in candidate_rows if r["pipeline_mode"] is PipelineMode.LIVE_WEBSOCKET]
+    live_rows = [r for r in candidate_rows if r["pipeline_mode"] is PipelineMode.LIVE_BINANCE]
     chosen = live_rows[0] if live_rows else candidate_rows[0]
 
     # Reader returns the batch source for the (cefi, trades) pair — confirms
@@ -539,7 +539,7 @@ def test_detect_dual_source_conflicts_exposed_from_crosscutting_namespace() -> N
 # ---------------------------------------------------------------------------
 # live_source_for_venue / live_pipeline_mode_for_venue (M1 — source-aware live
 # pipeline_mode for the migrated live path; pipeline_mode_source_batch_live_replay
-# _standardisation_2026_06_05.md). Replaces the LIVE_WEBSOCKET literal.
+# _standardisation_2026_06_05.md). The source-aware live_<source> value.
 # ---------------------------------------------------------------------------
 
 
@@ -562,8 +562,6 @@ def test_live_pipeline_mode_for_cefi_venue_is_source_aware() -> None:
 
     assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades") is PipelineMode.LIVE_BINANCE
     assert live_pipeline_mode_for_venue("cefi", "DERIBIT", "trades") is PipelineMode.LIVE_DERIBIT
-    # Never the transitional alias.
-    assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades") is not PipelineMode.LIVE_WEBSOCKET
     # Result is a live value.
     assert is_live(live_pipeline_mode_for_venue("cefi", "OKX", "trades"))
 

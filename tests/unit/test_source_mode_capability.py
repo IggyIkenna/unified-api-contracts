@@ -199,7 +199,7 @@ def test_mock_source_supports_all_modes() -> None:
 
 def test_mode_of_maps_pipeline_mode_to_reconciliation_class() -> None:
     assert mode_of(PipelineMode.BATCH_DATABENTO) is Mode.BATCH
-    assert mode_of(PipelineMode.LIVE_WEBSOCKET) is Mode.LIVE
+    assert mode_of(PipelineMode.LIVE_BINANCE) is Mode.LIVE
 
 
 def test_cadence_values_are_the_agreed_set() -> None:
@@ -275,10 +275,8 @@ def test_every_capability_live_or_replay_source_has_its_enum_member() -> None:
 def test_no_live_or_replay_member_for_a_non_capable_source() -> None:
     """(d) No ``live_<source>`` / ``replay_<source>`` member exists for a source whose
     matrix row lacks that mode (e.g. tardis replay, yahoo/barchart live+replay).
-    LIVE_WEBSOCKET (the transitional alias) is exempt — it has no concrete source."""
+    Every member has a concrete source — no transitional-alias exemption."""
     for member in PipelineMode:
-        if member is PipelineMode.LIVE_WEBSOCKET:
-            continue
         src = source_string_for(member)
         assert src is not None
         if is_live(member):
@@ -318,10 +316,10 @@ def test_pipeline_mode_for_source_raises_for_unsupported_mode() -> None:
         _ = pipeline_mode_for_source("yahoo", Mode.REPLAY)  # yahoo is batch-only
 
 
-def test_live_websocket_source_string_is_none() -> None:
-    """The transitional alias has no concrete source."""
-    assert source_string_for(PipelineMode.LIVE_WEBSOCKET) is None
-    assert is_live(PipelineMode.LIVE_WEBSOCKET)
+def test_source_aware_live_member_has_concrete_source() -> None:
+    """Every live member maps to a concrete source string."""
+    assert source_string_for(PipelineMode.LIVE_BINANCE) == "binance"
+    assert is_live(PipelineMode.LIVE_BINANCE)
 
 
 # ---------------------------------------------------------------------------

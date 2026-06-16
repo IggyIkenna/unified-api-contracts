@@ -29,9 +29,9 @@ def test_pipeline_mode_values_are_from_enum() -> None:
         ("batch_tardis", True),
         ("batch_databento", True),
         ("batch_onchain_rpc", True),
-        ("live_websocket", True),
+        ("live_binance", True),
         ("batch_invalid", False),  # Not in enum
-        ("live_polling", False),  # Not in enum (only live_websocket exists)
+        ("live_polling", False),  # Not in enum (no such source-aware member)
         ("", False),  # Empty string
         (None, False),  # NULL
     ]
@@ -94,7 +94,7 @@ def test_pipeline_mode_required_for_manifest_writer() -> None:
     # Examples of valid calls (to be enforced by QG grep gate):
     valid_calls = [
         "record_captured(..., pipeline_mode=PipelineMode.BATCH_TARDIS)",
-        "record_captured(..., pipeline_mode=PipelineMode.LIVE_WEBSOCKET)",
+        "record_captured(..., pipeline_mode=PipelineMode.LIVE_BINANCE)",
         "record_captured(..., pipeline_mode=resolve_pipeline_mode(...))",
     ]
 
@@ -119,7 +119,7 @@ def test_all_pipeline_modes_have_test_coverage() -> None:
         PipelineMode.BATCH_TARDIS,
         PipelineMode.BATCH_DATABENTO,
         PipelineMode.BATCH_ONCHAIN_RPC,
-        PipelineMode.LIVE_WEBSOCKET,
+        PipelineMode.LIVE_BINANCE,
     }
 
     all_modes = set(PipelineMode)
@@ -127,7 +127,7 @@ def test_all_pipeline_modes_have_test_coverage() -> None:
     # We don't need to test every single mode explicitly,
     # but we should have representative coverage
     assert len(tested_modes) > 0, "At least some modes must be tested"
-    assert PipelineMode.LIVE_WEBSOCKET in tested_modes, "Live mode must be tested"
+    assert PipelineMode.LIVE_BINANCE in tested_modes, "Live mode must be tested"
 
     # Ensure no modes are completely orphaned (all should be in UAC)
     for mode in all_modes:
