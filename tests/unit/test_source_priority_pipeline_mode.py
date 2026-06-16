@@ -534,3 +534,84 @@ def test_detect_dual_source_conflicts_exposed_from_crosscutting_namespace() -> N
     )
 
     assert facade_fn is detect_dual_source_conflicts
+
+
+# ---------------------------------------------------------------------------
+# live_source_for_venue / live_pipeline_mode_for_venue (M1 — source-aware live
+# pipeline_mode for the migrated live path; pipeline_mode_source_batch_live_replay
+# _standardisation_2026_06_05.md). Replaces the LIVE_WEBSOCKET literal.
+# ---------------------------------------------------------------------------
+
+
+def test_live_source_for_cefi_venue_is_the_exchange() -> None:
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_source_for_venue,
+    )
+
+    # CeFi live source = the EXCHANGE (tardis is the batch archive, never live).
+    assert live_source_for_venue("cefi", "BINANCE", "trades") == "binance"
+    assert live_source_for_venue("cefi", "OKX", "trades") == "okx"
+    # Case-insensitive venue.
+    assert live_source_for_venue("CeFi", "Hyperliquid", "trades") == "hyperliquid"
+
+
+def test_live_pipeline_mode_for_cefi_venue_is_source_aware() -> None:
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+    )
+
+    assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades") is PipelineMode.LIVE_BINANCE
+    assert live_pipeline_mode_for_venue("cefi", "DERIBIT", "trades") is PipelineMode.LIVE_DERIBIT
+    # Never the transitional alias.
+    assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades") is not PipelineMode.LIVE_WEBSOCKET
+    # Result is a live value.
+    assert is_live(live_pipeline_mode_for_venue("cefi", "OKX", "trades"))
+
+
+def test_live_pipeline_mode_for_cefi_replay_mode() -> None:
+    from unified_api_contracts.canonical.crosscutting.pipeline_mode import Mode
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+    )
+
+    assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades", Mode.REPLAY) is PipelineMode.REPLAY_BINANCE
+
+
+def test_live_pipeline_mode_for_non_cefi_uses_source_priority_primary() -> None:
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        get_primary_source,
+        live_pipeline_mode_for_venue,
+        live_source_for_venue,
+    )
+
+    # Non-CeFi: live source = the SOURCE_PRIORITY primary (same vendor batch+live).
+    assert live_source_for_venue("tradfi", "DATABENTO", "trades") == get_primary_source("tradfi", "trades")
+    pm = live_pipeline_mode_for_venue("tradfi", "DATABENTO", "trades")
+    assert is_live(pm)
+
+
+def test_live_pipeline_mode_replay_raises_for_live_only_venue() -> None:
+    from unified_api_contracts.canonical.crosscutting.pipeline_mode import Mode
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+    )
+
+    # Bybit/Aster are LIVE-only (no replay member) — REPLAY mode must fail loud.
+    with pytest.raises(ValueError):
+        live_pipeline_mode_for_venue("cefi", "BYBIT", "trades", Mode.REPLAY)
+
+
+def test_live_pipeline_mode_for_venue_exposed_from_top_level() -> None:
+    from unified_api_contracts import (
+        live_pipeline_mode_for_venue as facade_fn,
+    )
+    from unified_api_contracts import (
+        live_source_for_venue as facade_src,
+    )
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+        live_source_for_venue,
+    )
+
+    assert facade_fn is live_pipeline_mode_for_venue
+    assert facade_src is live_source_for_venue

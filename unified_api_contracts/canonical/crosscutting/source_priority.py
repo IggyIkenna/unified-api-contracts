@@ -539,6 +539,82 @@ def get_all_sources_with_priority(
     return [(source, pipeline_mode_for_source(source)) for source in sources]
 
 
+def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
+    """Resolve the LIVE/REPLAY ``source`` string that serves a ``(asset_group, venue,
+    data_type)`` shard.
+
+    The live writer has ``(asset_group, venue, data_type)`` in scope but stamps the
+    source-aware ``live_<source>`` / ``replay_<source>`` ``pipeline_mode`` — so it
+    needs the SOURCE, not the venue. The mapping is asset-group-shaped (M2/M3 model,
+    ``pipeline_mode.py`` CeFi-venue block):
+
+    * **CeFi**: ``live``/``replay`` source IS the EXCHANGE (the ``venue``) — Tardis is
+      the CeFi *batch* archive, never the live source. So a CeFi venue in
+      :data:`CEFI_LIVE_VENUES` resolves to ``venue`` itself (lowercased).
+    * **Every other asset_group** (defi / tradfi / prediction / sports / reference):
+      the live source is the :data:`SOURCE_PRIORITY` PRIMARY source for the cell —
+      the same vendor serves batch + live (e.g. ``databento`` live ticks). When the
+      pair is unregistered, fall back to the normalised ``venue`` (a vendor venue
+      whose name IS its source, e.g. ``chainlink`` / ``pyth_hermes``).
+
+    The returned string is a VENDOR source (operator R4 — never a transport-glued
+    name). Pair with :func:`pipeline_mode_for_source` ``(source, Mode.LIVE|REPLAY)``
+    to obtain the concrete :class:`PipelineMode`.
+
+    Args:
+        asset_group: ``cefi`` / ``defi`` / ``tradfi`` / ``prediction`` / ``sports`` /
+            ``reference`` (case-insensitive).
+        venue: The shard venue (e.g. ``BINANCE`` / ``DATABENTO`` — any case).
+        data_type: Canonical data_type string.
+
+    Returns:
+        The vendor ``source`` string for the live/replay shard.
+    """
+    venue_norm = venue.lower()
+    ag_norm = asset_group.lower()
+    if ag_norm == "cefi" and venue_norm in CEFI_LIVE_VENUES:
+        return venue_norm
+    if has_source_priority(ag_norm, data_type):
+        return get_primary_source(ag_norm, data_type)
+    # Unregistered pair: the venue name IS the vendor source for the per-vendor
+    # asset_groups (chainlink / pyth_hermes / solana_rpc / ...).
+    return venue_norm
+
+
+def live_pipeline_mode_for_venue(
+    asset_group: str,
+    venue: str,
+    data_type: str,
+    mode: Mode = Mode.LIVE,
+) -> PipelineMode:
+    """Resolve the source-aware ``live_<source>`` / ``replay_<source>`` :class:`PipelineMode`
+    for a ``(asset_group, venue, data_type)`` shard.
+
+    The M1 migration target for live writers: replaces the single
+    ``PipelineMode.LIVE_WEBSOCKET`` literal with the source-aware value. Composes
+    :func:`live_source_for_venue` (venue→source) with
+    :func:`pipeline_mode_for_source` ``(source, mode)``.
+
+    Args:
+        asset_group: ``cefi`` / ``defi`` / ``tradfi`` / ``prediction`` / ``sports`` /
+            ``reference`` (case-insensitive).
+        venue: The shard venue (any case).
+        data_type: Canonical data_type string.
+        mode: :attr:`Mode.LIVE` (default) or :attr:`Mode.REPLAY`.
+
+    Returns:
+        The concrete ``live_<source>`` / ``replay_<source>`` :class:`PipelineMode`.
+
+    Raises:
+        ValueError: when the resolved source has no ``{mode}_<source>``
+            :class:`PipelineMode` member (the source does not support that mode per
+            :data:`SOURCE_MODE_CAPABILITY`, or the source string is misspelled) —
+            delegated from :func:`pipeline_mode_for_source`.
+    """
+    source = live_source_for_venue(asset_group, venue, data_type)
+    return pipeline_mode_for_source(source, mode)
+
+
 __all__ = [
     "BATCH_CAPABLE_CEFI_VENUES",
     "CEFI_LIVE_VENUES",
@@ -556,6 +632,8 @@ __all__ = [
     "get_primary_source_with_latency",
     "get_source_priority",
     "has_source_priority",
+    "live_pipeline_mode_for_venue",
+    "live_source_for_venue",
     "read_with_source_priority",
     "select_primary_available_source",
     "source_required",

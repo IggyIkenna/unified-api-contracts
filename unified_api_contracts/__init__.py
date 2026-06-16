@@ -154,6 +154,9 @@ from .canonical.crosscutting.live_cluster_registry import (
     LiveClusterSpec,
     get_clusters_for_env,
 )
+from .canonical.crosscutting.mode_precedence import (
+    select_for_mode,
+)
 from .canonical.crosscutting.mvp_scope import (
     MVP_SCOPE,
     CeFiMvpRule,
@@ -228,6 +231,8 @@ from .canonical.crosscutting.source_priority import (
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
+    live_pipeline_mode_for_venue,
+    live_source_for_venue,
     modes_for_source,
     read_with_source_priority,
     select_primary_available_source,
@@ -2089,6 +2094,7 @@ __all__ = [
     "transport_of",
     "default_transport_for_source",
     "mode_of",
+    "select_for_mode",
     "BATCH_CAPABLE_CEFI_VENUES",
     "CEFI_LIVE_VENUES",
     "MOCK_SOURCE",
@@ -2109,6 +2115,8 @@ __all__ = [
     "has_source_priority",
     "is_batch",
     "is_emission_policy_declared",
+    "live_pipeline_mode_for_venue",
+    "live_source_for_venue",
     "is_live",
     "is_per_instrument_shard_data_type",
     "is_replay",
