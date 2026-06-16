@@ -6,7 +6,10 @@ import pytest
 
 from unified_api_contracts.canonical.crosscutting.availability_semantics import (
     AVAILABILITY_AT_SEMANTICS,
+    FIXTURE_ANNOUNCEMENT_FLOOR_DAYS,
+    FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT,
     get_availability_semantic,
+    get_fixture_announcement_floor_days,
     has_availability_semantic,
 )
 
@@ -169,6 +172,39 @@ def test_registry_values_are_known_semantics() -> None:
 def test_registry_has_minimum_seed_size() -> None:
     # Smoke: catch accidental wipe.
     assert len(AVAILABILITY_AT_SEMANTICS) >= 30
+
+
+# ---------------------------------------------------------------------------
+# Per-league fixture announcement floor
+# ---------------------------------------------------------------------------
+
+
+def test_default_floor_is_14_days() -> None:
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT == 14
+
+
+def test_big5_leagues_have_known_floors() -> None:
+    # EPL, La Liga, Serie A, Ligue 1 all 21; Bundesliga 28
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[39] == 21   # EPL
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[140] == 21  # La Liga
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[78] == 28   # Bundesliga
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[135] == 21  # Serie A
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[61] == 21   # Ligue 1
+
+
+def test_get_fixture_announcement_floor_days_returns_per_league_value() -> None:
+    assert get_fixture_announcement_floor_days(39) == 21   # EPL
+    assert get_fixture_announcement_floor_days(78) == 28   # Bundesliga
+
+
+def test_get_fixture_announcement_floor_days_returns_default_for_unknown() -> None:
+    assert get_fixture_announcement_floor_days(99999) == FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT
+
+
+def test_all_floor_values_are_positive_integers() -> None:
+    for league_id, days in FIXTURE_ANNOUNCEMENT_FLOOR_DAYS.items():
+        assert isinstance(league_id, int), f"key {league_id!r} is not int"
+        assert isinstance(days, int) and days > 0, f"league {league_id}: days={days} invalid"
 
 
 def test_no_duplicate_keys_with_different_semantics() -> None:

@@ -272,9 +272,53 @@ def has_availability_semantic(asset_group: str, data_type: str) -> bool:
     return (asset_group, data_type) in AVAILABILITY_AT_SEMANTICS
 
 
+# ---------------------------------------------------------------------------
+# Per-league fixture announcement floor (replaces the kickoff-7d heuristic).
+# ---------------------------------------------------------------------------
+
+FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT: Final[int] = 14
+"""Default lead-time floor for unobserved leagues.
+
+When no per-league empirical floor is available, fall back to 14 days.
+"""
+
+FIXTURE_ANNOUNCEMENT_FLOOR_DAYS: Final[dict[int, int]] = {
+    # Tier 1: Big 5 European leagues (api_football observation window 2026-06-16)
+    39: 21,   # EPL
+    140: 21,  # La Liga
+    78: 28,   # Bundesliga (publishes matchday splits earlier)
+    135: 21,  # Serie A
+    61: 21,   # Ligue 1
+    # Tier 1: Other European
+    88: 21,   # Eredivisie
+    94: 14,   # Primeira Liga
+    144: 14,  # Jupiler Pro League (Belgium)
+    179: 14,  # Scottish Premiership
+    203: 14,  # Super Lig (Turkey)
+    197: 14,  # Greek Super League
+}
+"""Per-league fixture announcement floor in days (api_football league_id → days)."""
+
+
+def get_fixture_announcement_floor_days(league_id: int) -> int:
+    """Return the announcement-floor lead time in days for a league.
+
+    Args:
+        league_id: api_football league ID.
+
+    Returns:
+        The per-league empirical floor, or
+        :data:`FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT` for unobserved leagues.
+    """
+    return FIXTURE_ANNOUNCEMENT_FLOOR_DAYS.get(league_id, FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT)
+
+
 __all__ = [
     "AVAILABILITY_AT_SEMANTICS",
+    "FIXTURE_ANNOUNCEMENT_FLOOR_DAYS",
+    "FIXTURE_ANNOUNCEMENT_FLOOR_DAYS_DEFAULT",
     "AvailabilitySemantic",
     "get_availability_semantic",
+    "get_fixture_announcement_floor_days",
     "has_availability_semantic",
 ]
