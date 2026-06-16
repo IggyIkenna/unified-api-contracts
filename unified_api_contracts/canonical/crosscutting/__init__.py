@@ -72,6 +72,7 @@ from .live_cluster_registry import LIVE_CLUSTER_REGISTRY as LIVE_CLUSTER_REGISTR
 from .live_cluster_registry import LiveClusterDeploymentKind as LiveClusterDeploymentKind
 from .live_cluster_registry import LiveClusterSpec as LiveClusterSpec
 from .live_cluster_registry import get_clusters_for_env as get_clusters_for_env
+from .mode_precedence import select_for_mode as select_for_mode
 from .pipeline_mode import PipelineMode as PipelineMode
 from .pipeline_mode import is_batch as is_batch
 from .pipeline_mode import is_live as is_live

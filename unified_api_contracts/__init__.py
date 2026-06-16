@@ -154,6 +154,9 @@ from .canonical.crosscutting.live_cluster_registry import (
     LiveClusterSpec,
     get_clusters_for_env,
 )
+from .canonical.crosscutting.mode_precedence import (
+    select_for_mode,
+)
 from .canonical.crosscutting.mvp_scope import (
     MVP_SCOPE,
     CeFiMvpRule,
@@ -2089,6 +2092,7 @@ __all__ = [
     "transport_of",
     "default_transport_for_source",
     "mode_of",
+    "select_for_mode",
     "BATCH_CAPABLE_CEFI_VENUES",
     "CEFI_LIVE_VENUES",
     "MOCK_SOURCE",
