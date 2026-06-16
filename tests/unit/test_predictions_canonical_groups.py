@@ -185,6 +185,101 @@ def test_classify_eth_monthly_falls_back_to_daily_canonical_group() -> None:
     assert group == CanonicalQuestionGroup.ETH_UP_DOWN_DAILY
 
 
+def test_classify_altcoin_up_down_daily() -> None:
+    """Alt-coin up-or-down markets map to {COIN}_UP_DOWN_DAILY (decision 338).
+
+    Mirrors BTC/ETH: range_bracket + month-token → MONTHLY → DAILY fallback.
+    """
+    cases: list[tuple[str, str, CanonicalQuestionGroup]] = [
+        ("solana-up-or-down-august-15", "Solana", CanonicalQuestionGroup.SOL_UP_DOWN_DAILY),
+        ("xrp-up-or-down-september-3", "XRP", CanonicalQuestionGroup.XRP_UP_DOWN_DAILY),
+        ("dogecoin-up-or-down-july-1", "Dogecoin", CanonicalQuestionGroup.DOGE_UP_DOWN_DAILY),
+        ("bnb-up-or-down-june-12", "BNB", CanonicalQuestionGroup.BNB_UP_DOWN_DAILY),
+        ("link-up-or-down-october-2", "Chainlink", CanonicalQuestionGroup.LINK_UP_DOWN_DAILY),
+    ]
+    for slug, name, expected in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=f"Will {name} be up or down?",
+            slug=slug,
+            event_slug=f"{name.lower()}-price-daily",
+            outcome="Up",
+        )
+        assert group == expected, f"Expected {expected} for slug={slug!r}, got {group!r}"
+
+
+def test_classify_fed_market_groups_not_other() -> None:
+    """FED markets now group (decision 338 — the (MACRO, FED_RATE) key was dead).
+
+    The taxonomy emits underlying ``FED_FUNDS``; the event key was ``FED_RATE``
+    so every FED market fell to OTHER. The corrected ``FED_FUNDS`` key routes
+    them to FED_RATE_DECISION_PER_FOMC.
+    """
+    group = classify_polymarket_to_canonical_group(
+        title="Will the Fed cut rates at the June meeting?",
+        slug="fed-rate-decision-june",
+        event_slug="fomc-june",
+        outcome="Yes",
+    )
+    assert group == CanonicalQuestionGroup.FED_RATE_DECISION_PER_FOMC
+
+
+def test_classify_macro_release_groups() -> None:
+    """Recurring macro prints route to their per-release groups (decision 338)."""
+    cases: list[tuple[str, str, CanonicalQuestionGroup]] = [
+        (
+            "unemployment-rate-may-2025",
+            "May unemployment rate ≥4.6%?",
+            CanonicalQuestionGroup.UNEMPLOYMENT_RATE_PER_MONTH,
+        ),
+        (
+            "nonfarm-payrolls-june",
+            "June nonfarm payrolls above 150k?",
+            CanonicalQuestionGroup.NONFARM_PAYROLLS_PER_MONTH,
+        ),
+        ("ppi-print-march", "March PPI above 0.3%?", CanonicalQuestionGroup.PPI_PRINT_PER_MONTH),
+        (
+            "treasury-10-year-yield-friday",
+            "10-year Treasury yield >4.5% Friday?",
+            CanonicalQuestionGroup.TREASURY_YIELD_PER_PRINT,
+        ),
+        (
+            "fear-greed-index-march-31",
+            'Fear & Greed Index "Fear" on March 31?',
+            CanonicalQuestionGroup.CRYPTO_FEAR_GREED_INDEX,
+        ),
+    ]
+    for slug, title, expected in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=title,
+            slug=slug,
+            event_slug="",
+            outcome="Yes",
+        )
+        assert group == expected, f"Expected {expected} for slug={slug!r}, got {group!r}"
+
+
+def test_classify_weather_temperature_groups() -> None:
+    """Daily highest-temperature markets route to WEATHER_TEMP_DAILY (decision 338).
+
+    Covers both the range_bracket ("between N-Nf") and binary ("Nf or higher")
+    variants — the underlying ``TEMPERATURE`` is matched via the slug-token path.
+    """
+    range_group = classify_polymarket_to_canonical_group(
+        title="Will the highest temperature in London be between 52-53°F on March 16?",
+        slug="will-the-highest-temperature-in-london-be-between-52-53f-on-march-16",
+        event_slug="london-temperature",
+        outcome="Yes",
+    )
+    assert range_group == CanonicalQuestionGroup.WEATHER_TEMP_DAILY
+    binary_group = classify_polymarket_to_canonical_group(
+        title="Will the highest temperature in NYC be 83°F or higher on March 29?",
+        slug="will-the-highest-temperature-in-nyc-be-83f-or-higher-on-march-29",
+        event_slug="nyc-temperature",
+        outcome="Yes",
+    )
+    assert binary_group == CanonicalQuestionGroup.WEATHER_TEMP_DAILY
+
+
 def test_classify_unknown_returns_other() -> None:
     """A slug the rule classifier can't map → OTHER catch-all bucket."""
     group = classify_polymarket_to_canonical_group(

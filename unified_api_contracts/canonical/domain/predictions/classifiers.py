@@ -110,6 +110,22 @@ _CATEGORY_UNDERLYING_PERIOD_TO_GROUP: Final[dict[tuple[_C, str, _P], CanonicalQu
     (_C.COMMODITY, "NAT_GAS", _P.DAILY): _G.NATGAS_UP_DOWN_DAILY,
     # FX — EURUSD: taxonomy underlying uses "EURUSD" (from eur-usd-/usd-eur- prefixes)
     (_C.FX, "EURUSD", _P.DAILY): _G.EUR_UP_DOWN_DAILY,
+    # Alt-coin daily up-or-down — mirror BTC/ETH (decision 338, 2026-06-16).
+    # Observed alt-coin price markets are range_bracket with a month token →
+    # MONTHLY, which the DAILY-fallback below maps onto these DAILY keys.
+    (_C.CRYPTO_PRICE, "SOL", _P.DAILY): _G.SOL_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "XRP", _P.DAILY): _G.XRP_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "DOGE", _P.DAILY): _G.DOGE_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "BNB", _P.DAILY): _G.BNB_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "ADA", _P.DAILY): _G.ADA_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "AVAX", _P.DAILY): _G.AVAX_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "LINK", _P.DAILY): _G.LINK_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "LTC", _P.DAILY): _G.LTC_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "SUI", _P.DAILY): _G.SUI_UP_DOWN_DAILY,
+    (_C.CRYPTO_PRICE, "HYPE", _P.DAILY): _G.HYPE_UP_DOWN_DAILY,
+    # Weather daily highest-temperature — range_bracket "between N-Nf"; the
+    # taxonomy assigns EVENT resolution to WEATHER (decision 338).
+    (_C.WEATHER, "TEMPERATURE", _P.EVENT): _G.WEATHER_TEMP_DAILY,
 }
 """(category, underlying, resolution_period) → canonical group.
 
@@ -121,10 +137,25 @@ override path or ``None``.
 # Macro-event groups: keyed on (category, underlying) only because the
 # resolution_period is event-driven, not clock-driven.
 _CATEGORY_UNDERLYING_TO_EVENT_GROUP: Final[dict[tuple[_C, str], CanonicalQuestionGroup]] = {
-    (_C.MACRO, "FED_RATE"): _G.FED_RATE_DECISION_PER_FOMC,
+    # NOTE: the key underlying MUST match what the taxonomy emits. The FED
+    # slug prefixes (fed-/fed-rate-/fomc-) map to underlying "FED_FUNDS", NOT
+    # "FED_RATE" — the prior "FED_RATE" key was DEAD (no market ever matched),
+    # so every FED market fell to OTHER. Fixed 2026-06-16 (decision 338).
+    (_C.MACRO, "FED_FUNDS"): _G.FED_RATE_DECISION_PER_FOMC,
     (_C.MACRO, "CPI"): _G.CPI_PRINT_PER_MONTH,
+    # Macro economic-release groups — recurring prints (decision 338).
+    (_C.MACRO, "UNEMPLOYMENT"): _G.UNEMPLOYMENT_RATE_PER_MONTH,
+    (_C.MACRO, "NONFARM_PAYROLLS"): _G.NONFARM_PAYROLLS_PER_MONTH,
+    (_C.MACRO, "GDP"): _G.GDP_PRINT_PER_QUARTER,
+    (_C.MACRO, "PPI"): _G.PPI_PRINT_PER_MONTH,
+    (_C.MACRO, "PCE"): _G.PCE_PRINT_PER_MONTH,
+    (_C.MACRO, "TREASURY_YIELDS"): _G.TREASURY_YIELD_PER_PRINT,
+    (_C.MACRO, "FEAR_GREED"): _G.CRYPTO_FEAR_GREED_INDEX,
     (_C.POLITICS_US, "PRESIDENT_2028"): _G.ELECTION_PRESIDENT_2028,
     (_C.CULTURE, "OSCARS_BEST_PICTURE"): _G.OSCARS_BEST_PICTURE,
+    # Weather daily highest-temperature — binary "Nf or higher" variant
+    # (range_bracket "between N-Nf" handled in the cadence map). Decision 338.
+    (_C.WEATHER, "TEMPERATURE"): _G.WEATHER_TEMP_DAILY,
 }
 
 

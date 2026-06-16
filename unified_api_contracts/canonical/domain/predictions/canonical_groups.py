@@ -69,9 +69,41 @@ class CanonicalQuestionGroup(StrEnum):
     NATGAS_UP_DOWN_DAILY = "NATGAS_UP_DOWN_DAILY"  # ECNG (Natural Gas)
     EUR_UP_DOWN_DAILY = "EUR_UP_DOWN_DAILY"  # EC6E (Euro FX)
 
+    # Alt-coin daily up-or-down groups — mirror BTC/ETH (decision 338,
+    # 2026-06-16). The taxonomy already tags these underlyings; only DAILY is
+    # added (data-grounded: the observed alt-coin price markets are
+    # range_bracket/monthly → DAILY-fallback). Intraday/hourly cadences are NOT
+    # pre-built — add per-coin if/when those products list.
+    SOL_UP_DOWN_DAILY = "SOL_UP_DOWN_DAILY"
+    XRP_UP_DOWN_DAILY = "XRP_UP_DOWN_DAILY"
+    DOGE_UP_DOWN_DAILY = "DOGE_UP_DOWN_DAILY"
+    BNB_UP_DOWN_DAILY = "BNB_UP_DOWN_DAILY"
+    ADA_UP_DOWN_DAILY = "ADA_UP_DOWN_DAILY"
+    AVAX_UP_DOWN_DAILY = "AVAX_UP_DOWN_DAILY"
+    LINK_UP_DOWN_DAILY = "LINK_UP_DOWN_DAILY"
+    LTC_UP_DOWN_DAILY = "LTC_UP_DOWN_DAILY"
+    SUI_UP_DOWN_DAILY = "SUI_UP_DOWN_DAILY"
+    HYPE_UP_DOWN_DAILY = "HYPE_UP_DOWN_DAILY"
+
     # Macro events with FOMC / CPI cadence.
     FED_RATE_DECISION_PER_FOMC = "FED_RATE_DECISION_PER_FOMC"
     CPI_PRINT_PER_MONTH = "CPI_PRINT_PER_MONTH"
+
+    # Macro economic-release groups — recurring prints the taxonomy already
+    # tags (decision 338, 2026-06-16). Event-keyed (the resolution_period is
+    # release-driven, not clock-driven). Extends the FED/CPI pair.
+    UNEMPLOYMENT_RATE_PER_MONTH = "UNEMPLOYMENT_RATE_PER_MONTH"
+    NONFARM_PAYROLLS_PER_MONTH = "NONFARM_PAYROLLS_PER_MONTH"
+    GDP_PRINT_PER_QUARTER = "GDP_PRINT_PER_QUARTER"
+    PPI_PRINT_PER_MONTH = "PPI_PRINT_PER_MONTH"
+    PCE_PRINT_PER_MONTH = "PCE_PRINT_PER_MONTH"
+    TREASURY_YIELD_PER_PRINT = "TREASURY_YIELD_PER_PRINT"
+    CRYPTO_FEAR_GREED_INDEX = "CRYPTO_FEAR_GREED_INDEX"
+
+    # Weather — daily highest-temperature markets (London / NYC factories;
+    # decision 338, 2026-06-16). Both range_bracket ("between N-Nf") and binary
+    # ("Nf or higher") route here.
+    WEATHER_TEMP_DAILY = "WEATHER_TEMP_DAILY"
 
     # Election markets with explicit year (no floating; historical readback
     # must remain unambiguous per Phase 0 audit recommendation).
@@ -277,6 +309,87 @@ CANONICAL_GROUP_METADATA: Final[dict[CanonicalQuestionGroup, CanonicalGroupMetad
         cadence="single",
         expected_market_ids_per_day=1,
         resolution_basis="multi_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    # Alt-coin daily up-or-down — mirror BTC/ETH DAILY (decision 338). Floors
+    # set conservatively at 500 (alts thinner than BTC/ETH on Polymarket).
+    **{
+        group: CanonicalGroupMetadata(
+            group=group,
+            cadence="daily",
+            expected_market_ids_per_day=1,
+            resolution_basis="price_threshold",
+            settlement_lag=2 * _HOUR,
+        )
+        for group in (
+            CanonicalQuestionGroup.SOL_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.XRP_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.DOGE_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.BNB_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.ADA_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.AVAX_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.LINK_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.LTC_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.SUI_UP_DOWN_DAILY,
+            CanonicalQuestionGroup.HYPE_UP_DOWN_DAILY,
+        )
+    },
+    # Macro economic-release groups (decision 338).
+    CanonicalQuestionGroup.UNEMPLOYMENT_RATE_PER_MONTH: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.UNEMPLOYMENT_RATE_PER_MONTH,
+        cadence="monthly",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.NONFARM_PAYROLLS_PER_MONTH: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.NONFARM_PAYROLLS_PER_MONTH,
+        cadence="monthly",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.GDP_PRINT_PER_QUARTER: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.GDP_PRINT_PER_QUARTER,
+        cadence="irregular",  # quarterly; no "quarterly" literal in _Cadence
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.PPI_PRINT_PER_MONTH: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.PPI_PRINT_PER_MONTH,
+        cadence="monthly",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.PCE_PRINT_PER_MONTH: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.PCE_PRINT_PER_MONTH,
+        cadence="monthly",
+        expected_market_ids_per_day=1,
+        resolution_basis="binary_outcome",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.TREASURY_YIELD_PER_PRINT: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.TREASURY_YIELD_PER_PRINT,
+        cadence="weekly",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    CanonicalQuestionGroup.CRYPTO_FEAR_GREED_INDEX: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.CRYPTO_FEAR_GREED_INDEX,
+        cadence="daily",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
+        settlement_lag=24 * _HOUR,
+    ),
+    # Weather daily highest-temperature (decision 338).
+    CanonicalQuestionGroup.WEATHER_TEMP_DAILY: CanonicalGroupMetadata(
+        group=CanonicalQuestionGroup.WEATHER_TEMP_DAILY,
+        cadence="daily",
+        expected_market_ids_per_day=1,
+        resolution_basis="price_threshold",
         settlement_lag=24 * _HOUR,
     ),
     CanonicalQuestionGroup.OTHER: CanonicalGroupMetadata(
