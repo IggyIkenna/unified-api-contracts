@@ -31254,10 +31254,256 @@
     },
     {
       "archetype": "CARRY_STAKED_BASIS",
-      "available_count": 468,
-      "blocked_count": 156,
-      "cell_count": 624,
+      "available_count": 612,
+      "blocked_count": 204,
+      "cell_count": 816,
       "cells": [
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "binance",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "binance",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "binance",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "curve",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "curve",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "curve",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
         {
           "available_algos": [
             "ADAPTIVE_TWAP",
@@ -31378,6 +31624,252 @@
           "leg_id": "spot",
           "leg_role": "spot_long",
           "venue": "jupiter",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "orca",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "orca",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "orca",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "raydium",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "raydium",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SPREAD_ROLL",
+              "reason": "SPREAD_ROLL is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "raydium",
           "venue_buildable": true,
           "venue_kind": "onchain_zero_alpha"
         },
@@ -32877,10 +33369,238 @@
     },
     {
       "archetype": "CARRY_STAKED_BASIS_DATED",
-      "available_count": 507,
-      "blocked_count": 117,
-      "cell_count": 624,
+      "available_count": 663,
+      "blocked_count": 153,
+      "cell_count": 816,
       "cells": [
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "binance",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "binance",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "binance",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "curve",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "curve",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "curve",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
         {
           "available_algos": [
             "ADAPTIVE_TWAP",
@@ -32992,6 +33712,234 @@
           "leg_id": "spot",
           "leg_role": "spot_long",
           "venue": "jupiter",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "orca",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "orca",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "orca",
+          "venue_buildable": true,
+          "venue_kind": "onchain_zero_alpha"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action TRADE (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "TRADE",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "raydium",
+          "venue_buildable": true,
+          "venue_kind": "clob"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action SWAP (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "SWAP",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "raydium",
+          "venue_buildable": true,
+          "venue_kind": "dex"
+        },
+        {
+          "available_algos": [
+            "ADAPTIVE_TWAP",
+            "ALMGREN_CHRISS",
+            "BENCHMARK_FILL",
+            "HYBRID_OPTIMAL",
+            "MAX_SLIPPAGE",
+            "PASSIVE_AGGRESSIVE_HYBRID",
+            "POV_DYNAMIC",
+            "SMART_ORDER_ROUTER",
+            "SOR_TWAP",
+            "SPREAD_ROLL",
+            "SWAP_TWAP",
+            "TWAP",
+            "VWAP"
+          ],
+          "blocked_algos": [
+            {
+              "algo": "BEST_PRICE",
+              "reason": "BEST_PRICE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "KELLY_STAKE",
+              "reason": "KELLY_STAKE is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            },
+            {
+              "algo": "SEQUENTIAL_LEGS",
+              "reason": "SEQUENTIAL_LEGS is not valid for instruction_action ZERO_ALPHA (selector ALGORITHMS_BY_INSTRUCTION_TYPE)"
+            }
+          ],
+          "instruction_action": "ZERO_ALPHA",
+          "instrument_type": "spot",
+          "leg_id": "spot",
+          "leg_role": "spot_long",
+          "venue": "raydium",
           "venue_buildable": true,
           "venue_kind": "onchain_zero_alpha"
         },
@@ -57929,17 +58877,17 @@
     "algo_not_valid_for_instruction": "execution algo not valid for the cell's instruction_action",
     "unbuildable_slot_venue": "F47 \u2014 the leg-eligible venue id is rejected by the v2 slot-label venue-token registry (its alnum-folded token is not in KNOWN_VENUE_TOKENS); cell carries venue_buildable=false and zero available_algos (demoted from AVAILABLE)"
   },
-  "generated_from_commit": "c71a762889ca245c70180093b215a3a775a5c938",
+  "generated_from_commit": "f0b66b2659c1843cbd7e4fabad91a66963e3af55",
   "matrix_version": "1.0.0",
   "not_registered_gap_types": {
     "missing_registry": "archetype has no leg structure (ARCHETYPE_LEG_STRUCTURES.not_registered)",
     "no_v2_engine": "F48 \u2014 archetype HAS legs but no registered v2 engine in the strategy-service engine factory ARCHETYPE_ENGINE_REGISTRY (cannot be built; demoted from AVAILABLE)"
   },
   "summary": {
-    "available": 14977,
-    "blocked": 6175,
+    "available": 15277,
+    "blocked": 6259,
     "not_registered": 448,
-    "total_cells": 21600
+    "total_cells": 21984
   },
   "verdicts": ["available", "blocked", "not_registered"]
 }
