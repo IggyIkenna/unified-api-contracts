@@ -86,6 +86,16 @@ class TestFundingsPerYear:
         assert fundings_per_year("BINANCE") == fundings_per_year("binance")
         assert fundings_per_year("Hyperliquid") == fundings_per_year("hyperliquid")
 
+    def test_gcs_venue_dir_form_resolves(self) -> None:
+        # SSOT venue-dir normalisation: callers pass GCS dirs (BINANCE-FUTURES,
+        # OKX-SWAP) directly — no per-consumer dir->key dict (the deleted UTL
+        # FUNDING_PERIODS_PER_DAY anti-pattern).
+        assert fundings_per_year("BINANCE-FUTURES") == fundings_per_year("binance")
+        assert fundings_per_year("OKX-SWAP") == fundings_per_year("okx")
+        assert fundings_per_day("BINANCE-FUTURES") == Decimal("3")
+        assert is_supported_venue("OKX-SWAP")
+        assert annualise_funding_rate_bps(Decimal("0.0001"), "OKX-SWAP") == Decimal("1095.0000")
+
     def test_unknown_venue_raises(self) -> None:
         with pytest.raises(KeyError):
             fundings_per_year("ftx-rip")

@@ -84,14 +84,37 @@ SECONDS_PER_YEAR: Final[int] = 365 * 24 * 3600
 # Convenience: 10000 bps = 100% -> multiplier from rate-fraction to bps
 _BPS_PER_RATE: Final[Decimal] = Decimal("10000")
 
+# Perp instrument-type suffixes carried on GCS venue-dir keys
+# (``BINANCE-FUTURES`` / ``OKX-SWAP`` / ``ETH-PERPETUAL``) that are NOT part of
+# the venue identity for cadence lookup. Stripping them here is the SSOT for
+# the venue-dir -> cadence-key mapping (callers must NOT keep their own dict —
+# that was the bug class of the deleted UTL ``FUNDING_PERIODS_PER_DAY``).
+_VENUE_SUFFIXES: Final[tuple[str, ...]] = ("-futures", "-swap", "-perpetual", "-perp")
+
+
+def _canonical_venue(venue: str) -> str:
+    """Normalise a venue string to a ``FUNDING_CADENCE_SECONDS`` key.
+
+    Accepts both the bare venue name (``binance``) and the GCS venue-dir form
+    (``BINANCE-FUTURES`` / ``OKX-SWAP``): lowercases then strips a single perp
+    instrument-type suffix. So ``fundings_per_year("OKX-SWAP")`` resolves to
+    the ``okx`` cadence.
+    """
+    key = venue.lower()
+    for suffix in _VENUE_SUFFIXES:
+        if key.endswith(suffix):
+            return key[: -len(suffix)]
+    return key
+
 
 def fundings_per_year(venue: str) -> Decimal:
     """Number of funding accruals per year for ``venue``.
 
+    Accepts the bare venue name or the GCS venue-dir form (``BINANCE-FUTURES``).
     Raises ``KeyError`` if the venue isn't in the registry — caller should
-    have validated venue against ``FUNDING_CADENCE_SECONDS.keys()`` already.
+    have validated venue against ``is_supported_venue`` already.
     """
-    cadence = FUNDING_CADENCE_SECONDS[venue.lower()]
+    cadence = FUNDING_CADENCE_SECONDS[_canonical_venue(venue)]
     # Decimal arithmetic to avoid float drift on the high cadences (Drift =
     # 105120 fundings/year would float-round otherwise).
     return Decimal(SECONDS_PER_YEAR) / Decimal(cadence)
@@ -104,9 +127,9 @@ def fundings_per_day(venue: str) -> Decimal:
     UTL ``FUNDING_PERIODS_PER_DAY`` dict, deleted 2026-06-17). Use with the
     generic ``funding_apr_per_day(rate, periods_per_day)`` math helper, or call
     :func:`annualise_funding_rate_bps` directly. Raises ``KeyError`` for an
-    unregistered venue — validate against ``FUNDING_CADENCE_SECONDS`` first.
+    unregistered venue — validate against ``is_supported_venue`` first.
     """
-    return Decimal(86400) / Decimal(FUNDING_CADENCE_SECONDS[venue.lower()])
+    return Decimal(86400) / Decimal(FUNDING_CADENCE_SECONDS[_canonical_venue(venue)])
 
 
 def annualise_funding_rate_bps(rate: Decimal, venue: str) -> Decimal:
@@ -129,8 +152,11 @@ def annualise_funding_rate_bps(rate: Decimal, venue: str) -> Decimal:
 
 
 def is_supported_venue(venue: str) -> bool:
-    """``True`` if ``venue`` has a registered funding cadence."""
-    return venue.lower() in FUNDING_CADENCE_SECONDS
+    """``True`` if ``venue`` has a registered funding cadence.
+
+    Accepts the bare venue name or the GCS venue-dir form (``OKX-SWAP``).
+    """
+    return _canonical_venue(venue) in FUNDING_CADENCE_SECONDS
 
 
 __all__ = [
