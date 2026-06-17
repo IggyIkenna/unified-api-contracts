@@ -536,18 +536,20 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
         venue_kind=VenueCollateralKind.PERP_DEX,
         accepted_collateral=[
             _ah("USDC", "0", src=_SRC_VC),
-            _ah("SOL", "5", src=_SRC_VC),
-            _ah("mSOL", "10", src=_SRC_VC),
-            _ah("JitoSOL", "10", src=_SRC_VC),
+            # Probed on-chain 2026-06-17 (Drift initialAssetWeight via Helius); tracks venue_collateral SSOT.
+            _ah("SOL", "15", src=_SRC_VC),
+            _ah("mSOL", "20", src=_SRC_VC),
+            _ah("JitoSOL", "20", src=_SRC_VC),
         ],
         maintenance_margin=None,  # on-chain per-market; not statically sourced
         margin_modes=[MarginMode.CROSS],
         liquidation_protocol=LiquidationProtocol.KEEPER_AUCTION,
-        liquidation_description="Cross-margin; Solana LST cross-collateral (mSOL/JitoSOL @10%). Keeper liquidation.",
+        liquidation_description="Cross-margin; Solana LST cross-collateral (mSOL/JitoSOL @20%). Keeper liquidation.",
         source_of_truth=_SRC_VC,
         collateral_notes=(
-            "Drift DOES take Solana LSTs as cross-margin (mSOL/JitoSOL @10% haircut) — the SOL-side "
-            "staked-basis capital-efficient path. Maintenance-margin per-market on-chain → None."
+            "Drift DOES take Solana LSTs as cross-margin (mSOL/JitoSOL @20% haircut, SOL @15%) — the SOL-side "
+            "staked-basis capital-efficient path. Haircuts = on-chain INITIAL asset weight (probed 2026-06-17, "
+            "SOL 0.85 / mSOL+JitoSOL 0.80). Maintenance-margin per-market on-chain → None."
         ),
     ),
     # ---- Binance (USDT-M / coin-M perp) ----
@@ -702,7 +704,7 @@ COLLATERAL_REGISTRY: Final[list[CollateralPolicy]] = [
 # NOT a margining/lending venue. Its "collateral" is the staking PRINCIPAL (ETH
 # → stETH/wstETH/rETH; SOL → JitoSOL/mSOL), and the downstream margin/LTV
 # acceptance of the resulting LST lives on the PERP / LENDING venue that takes
-# it (the rows above: Aave wstETH/weETH/rETH/cbETH LTV; Drift mSOL/JitoSOL 10%;
+# it (the rows above: Aave wstETH/weETH/rETH/cbETH LTV; Drift mSOL/JitoSOL 20%;
 # Bybit/OKX/Deribit stETH/wstETH haircuts). So lido/rocketpool/jito/marinade
 # deliberately carry NO CollateralPolicy entry — adding a margin/LTV row for a
 # staking contract would be inventing a number the protocol does not define.

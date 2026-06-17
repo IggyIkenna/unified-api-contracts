@@ -11,6 +11,7 @@ from decimal import Decimal
 import pytest
 
 from unified_api_contracts.registry.venue_collateral import (
+    PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE,
     VENUE_COLLATERAL_MATRIX,
     accepted_perp_collateral,
     get_accepted_collateral,
@@ -150,16 +151,19 @@ def test_f28_consolidation_canonical_clear_cut_values() -> None:
     assert get_collateral_haircut("OKX", "wstETH") == Decimal("0.10")
 
 
-def test_f28_held_placeholder_rows_keep_existing_value() -> None:
-    """F28 HOLD rows (Bybit stETH + Drift mSOL) keep UAC's existing value pending a live-API probe.
+def test_f28_haircuts_live_probed_2026_06_17() -> None:
+    """F28 former-placeholder rows are now LIVE-PROBED (operator-authorised 2026-06-17).
 
-    The execution-service divergent values were NOT adopted; these stay as the
-    operator-held placeholders (commented ``# PLACEHOLDER — pending live-API probe``).
+    Bybit stETH = 0.10 (Bybit UTA ``collateralRatio`` 0.9 via ``/v5/spot-margin-trade/data``);
+    Drift mSOL = 0.20 (Drift on-chain ``initialAssetWeight`` 0.80 — the conservative initial weight;
+    the prior 0.10 placeholder was the maintenance value). ``PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE``
+    is now empty.
     """
     assert venue_accepts_collateral("BYBIT", "stETH")
     assert get_collateral_haircut("BYBIT", "stETH") == Decimal("0.10")
     assert venue_accepts_collateral("DRIFT", "mSOL")
-    assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.10")
+    assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.20")
+    assert not PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE  # empty: no haircut remains a placeholder
 
 
 def test_f27_venue_lookup_is_case_insensitive() -> None:
