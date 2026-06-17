@@ -367,6 +367,7 @@ from .tradfi_ticker_universe import (
     TRADFI_TICKER_UNIVERSE,
 )
 from .venue_collateral import (
+    PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE,
     VENUE_COLLATERAL_MATRIX,
     CollateralAcceptance,
     VenueKind,
@@ -774,6 +775,7 @@ __all__ = [
     "PER_ARCHETYPE_BREAKERS",
     "PER_ARCHETYPE_RECOVERY_RULES",
     "PINNACLE",
+    "PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE",
     "PLAYUP",
     "PMU",
     "POINTSBET",

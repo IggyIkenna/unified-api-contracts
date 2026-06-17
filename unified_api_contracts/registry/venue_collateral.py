@@ -1,4 +1,17 @@
-"""Venue collateral acceptance matrix — which tokens each venue accepts as margin."""
+"""Venue collateral acceptance matrix — which tokens each venue accepts as margin.
+
+⚠️ **PRE-GO-LIVE TODO — TWO HAIRCUTS ARE PLACEHOLDERS, NOT PROBED VALUES** (F28, operator-held 2026-06-15).
+Both default to a conservative ``0.10`` (10%) and **MUST be replaced with the real venue-published value via a
+live-API probe BEFORE trading live capital** — the operator approves the diff before ship (plan decision #3,
+``plans/active/engine_findings_remediation_2026_06_15.md``). They are enumerated machine-readably in
+:data:`PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE` so a go-live preflight can assert they were updated:
+
+- ``("BYBIT", "stETH")`` — UTA collateral; documented tier range 5-12%, 0.10 is the conservative placeholder.
+- ``("DRIFT", "mSOL")`` — Marinade LST on Drift; 0.10 placeholder pending the on-chain/API haircut read.
+
+A conservative-high haircut under-counts collateral (fails safe — never over-claims margin), so the placeholder is
+safe to RUN with; it is NOT safe to treat as accurate for sizing. Update + drop this banner when probed.
+"""
 
 from __future__ import annotations
 
@@ -98,8 +111,17 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("GMX", "WBTC", True, Decimal("0.05"), "CROSS", "BTC-margined per-market", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "USDC", True, Decimal("0"), "CROSS", "Primary margin", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "SOL", True, Decimal("0.05"), "CROSS", "5% haircut", "PERP_DEX"),
-    # PLACEHOLDER — pending live-API probe (F28, operator-held 2026-06-15)
-    CollateralAcceptance("DRIFT", "mSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Marinade LST", "PERP_DEX"),
+    # ⚠️ PLACEHOLDER HAIRCUT — UPDATE WITH REAL PROBED VALUE BEFORE GO-LIVE (F28, operator-held 2026-06-15;
+    # see module docstring + PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE). 0.10 is a conservative stand-in, not probed.
+    CollateralAcceptance(
+        "DRIFT",
+        "mSOL",
+        True,
+        Decimal("0.10"),
+        "CROSS",
+        "PLACEHOLDER 0.10 — update before go-live (Marinade LST)",
+        "PERP_DEX",
+    ),
     CollateralAcceptance("DRIFT", "JitoSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Jito LST", "PERP_DEX"),
     # Pacifica-Solana — USDC-settled linear perp DEX (Solana). settle_asset=USDC confirmed in
     # instruments-service adapter (pacifica.py). No LST cross-margin support documented as of
@@ -166,9 +188,16 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     # 10% haircut placeholder pending live-API probe; documented haircut ranges
     # vary by collateral tier (5-12%). Stream A flip 2026-05-08.
     # See unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md.
-    # PLACEHOLDER — pending live-API probe (F28, operator-held 2026-06-15)
+    # ⚠️ PLACEHOLDER HAIRCUT — UPDATE WITH REAL PROBED VALUE BEFORE GO-LIVE (F28, operator-held 2026-06-15;
+    # see module docstring + PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE). 0.10 is a conservative stand-in, not probed.
     CollateralAcceptance(
-        "BYBIT", "stETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral since 2024-02", "PERP_CEX"
+        "BYBIT",
+        "stETH",
+        True,
+        Decimal("0.10"),
+        "PORTFOLIO",
+        "PLACEHOLDER 0.10 — update before go-live (UTA collateral since 2024-02)",
+        "PERP_CEX",
     ),
     CollateralAcceptance("BYBIT", "wstETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral", "PERP_CEX"),
     CollateralAcceptance("BYBIT", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
@@ -234,6 +263,20 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
         "PACIFICA-SOLANA", "mSOL", False, None, "", "Not accepted; USDC-only margin model", "PERP_DEX"
     ),
 ]
+
+
+PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE: Final[frozenset[tuple[str, str]]] = frozenset(
+    {
+        ("BYBIT", "stETH"),
+        ("DRIFT", "mSOL"),
+    }
+)
+"""(venue, token) pairs whose haircut is a conservative ``0.10`` PLACEHOLDER, not a probed value (F28,
+operator-held 2026-06-15). **MUST be replaced with the real venue-published haircut via a live-API probe BEFORE
+go-live** (operator approves the diff before ship — plan decision #3). A go-live preflight SHOULD assert this set is
+empty (or that every member's haircut was re-probed). Conservative-high under-counts collateral → fails safe to RUN,
+but is NOT accurate for sizing. SSOT: ``plans/active/engine_findings_remediation_2026_06_15.md`` (F28 live-API probe).
+"""
 
 
 def venue_accepts_collateral(venue: str, token: str) -> bool:
