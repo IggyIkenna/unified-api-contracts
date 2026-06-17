@@ -1,30 +1,51 @@
 """Per-venue perp funding-rate cadence + annualisation math.
 
-Different perp venues charge funding at different intervals:
+``FUNDING_CADENCE_SECONDS[venue]`` is the **annualisation period** — the time
+span that the venue's canonical/stored ``funding_rate`` figure represents — NOT
+necessarily the venue's funding *charge* interval. For almost every venue the two
+coincide (the venue publishes a per-charge-cycle rate), so the period is just the
+funding interval:
 
-* CeFi 8h cadence (3 fundings/day): Binance, Bybit, OKX, Aster (perp-CCXT)
-* CeFi 4h cadence (6 fundings/day): Kraken Pro derivatives
-* CeFi 1h cadence (24 fundings/day): Deribit
-* DeFi 1h cadence (24 fundings/day): Hyperliquid, GMX, Pacifica, Lighter
-* DeFi 5min cadence (288 fundings/day): Drift (Solana)
+* 8h period (3 figures/day): Binance, Bybit, OKX, Aster (perp-CCXT), Bitget, Bitfinex
+* 4h period (6 figures/day): Kraken Pro derivatives
+* 1h period (24 figures/day): Hyperliquid, GMX, Pacifica, Lighter
+* 5min period (288 figures/day): Drift (Solana)
+
+**Deribit is the one figure-vs-charge exception (codified 2026-06-17).** Deribit
+*charges* funding hourly, but the canonical ``derivative_ticker.funding_rate`` we
+ingest (Tardis -> MTDS, and UAC ``external/deribit/normalize.py`` which maps the
+``funding_8h`` field) stores the venue's published **8-hour figure**, NOT the
+per-hour rate (empirically verified 2026-06-16/17: the stored value ~= Deribit API
+``interest_8h`` ~ -1e-6, not ``interest_1h`` ~ -1e-8). Since the annualiser does
+``rate x figures_per_year``, and the stored figure is the 8h figure, Deribit's
+annualisation period is **8h** — using 1h over-states Deribit funding APY by 8x.
+We keep the stored ``funding_rate`` equal to the venue's published figure (so it
+matches the exchange API exactly) and annualise at the figure's period. If the
+ingest is ever switched to persist Deribit's per-hour rate, change this entry back
+to ``1 * 3600`` in the same commit. See
+``plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md``
+Finding 1 + ``e2e-testing/scripts/defi/staked_basis_funding_scan.py``.
 
 Reading raw funding_rate from MTDS adapters and feeding it directly into
 strategy features as an annualised rate without venue-aware scaling produces
-~10x under-estimates for the hourly+sub-hourly venues. This module is the
-single source of truth for the conversion. Strategy + features-service +
-risk-and-exposure all consume from here.
+~8x errors for the venues whose figure-period differs from the 8h default. This
+module is the **single source of truth** for the conversion — strategy +
+features-service + execution + risk all consume from here. UTL's former
+``return_metrics.FUNDING_PERIODS_PER_DAY`` was a divergent parallel registry
+(Aster/Deribit inverted, 8x wrong) and was DELETED 2026-06-17 in favour of this.
 
 Single-place rule (Bucket-name SSOT cousin): never inline a `* 3 * 365`
-constant — call ``annualise_funding_rate_bps(rate, venue)``.
+constant — call ``annualise_funding_rate_bps(rate, venue)`` (or
+``fundings_per_day(venue)`` / ``fundings_per_year(venue)`` for the period).
 
-Adding a new venue: pick the cadence in seconds from the venue's funding
-schedule docs (Binance: every 8h on UTC clock; Hyperliquid: every hour;
-Deribit: every hour but settled every 15min of accrual — see Deribit Funding
-docs for the formula). Then add a row + a unit test.
+Adding a new venue: pick the period in seconds = the span the venue's PUBLISHED
+funding figure represents (Binance: 8h; Hyperliquid: 1h; Deribit: 8h figure even
+though it charges hourly — see above). Then add a row + a unit test.
 
 Refs:
 * plans/active/phase5_features_streaming_carry_staked_basis_mvp_2026_05_19.md
   Phase A
+* plans/active/issues/perp_funding_data_semantics_and_cadence_2026_06_16.md
 * features-service/features_service/cefi/calculators/perp_funding_rates.py
 * features-service/features_service/onchain/calculators/perp_funding_rates_defi.py
 """
@@ -37,18 +58,19 @@ from typing import Final
 # ── Per-venue funding cadence in seconds ─────────────────────────────────────
 # Single SSOT — update here, not in any consumer.
 FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
-    # CeFi — 8h cadence (3/day)
+    # CeFi — 8h figure (3/day)
     "binance": 8 * 3600,
     "bybit": 8 * 3600,
     "okx": 8 * 3600,
-    "aster": 8 * 3600,
+    "aster": 8 * 3600,  # Astherus/Aster: 8h funding (fundingTime spacing = 28 800 s, verified 2026-06-16)
     "bitget": 8 * 3600,
     "bitfinex": 8 * 3600,
-    # CeFi — 4h cadence (6/day)
+    # CeFi — 4h figure (6/day)
     "kraken": 4 * 3600,
-    # CeFi — 1h cadence (24/day)
-    "deribit": 1 * 3600,
-    # DeFi — 1h cadence (24/day)
+    # CeFi — Deribit: CHARGES hourly, but the stored funding_rate is the 8h FIGURE
+    # (verified 2026-06-16/17) -> annualise at 8h. Using 1h over-states 8x. See module docstring.
+    "deribit": 8 * 3600,
+    # DeFi — 1h figure (24/day)
     "hyperliquid": 1 * 3600,
     "gmx": 1 * 3600,
     "pacifica": 1 * 3600,
@@ -59,7 +81,7 @@ FUNDING_CADENCE_SECONDS: Final[dict[str, int]] = {
 
 SECONDS_PER_YEAR: Final[int] = 365 * 24 * 3600
 
-# Convenience: 10000 bps = 100% → multiplier from rate-fraction to bps
+# Convenience: 10000 bps = 100% -> multiplier from rate-fraction to bps
 _BPS_PER_RATE: Final[Decimal] = Decimal("10000")
 
 
@@ -75,6 +97,18 @@ def fundings_per_year(venue: str) -> Decimal:
     return Decimal(SECONDS_PER_YEAR) / Decimal(cadence)
 
 
+def fundings_per_day(venue: str) -> Decimal:
+    """Number of funding figures per day for ``venue`` (``fundings_per_year`` / 365).
+
+    The SSOT replacement for any hard-coded ``periods_per_day`` (e.g. the old
+    UTL ``FUNDING_PERIODS_PER_DAY`` dict, deleted 2026-06-17). Use with the
+    generic ``funding_apr_per_day(rate, periods_per_day)`` math helper, or call
+    :func:`annualise_funding_rate_bps` directly. Raises ``KeyError`` for an
+    unregistered venue — validate against ``FUNDING_CADENCE_SECONDS`` first.
+    """
+    return Decimal(86400) / Decimal(FUNDING_CADENCE_SECONDS[venue.lower()])
+
+
 def annualise_funding_rate_bps(rate: Decimal, venue: str) -> Decimal:
     """Convert a raw per-funding-cycle rate fraction into annualised APY bps.
 
@@ -85,7 +119,7 @@ def annualise_funding_rate_bps(rate: Decimal, venue: str) -> Decimal:
     Linear (not compounded) is used because (a) funding is rebated, not
     reinvested — there's no auto-compounding inside the venue; (b) strategy
     comparisons are easier in linear bps; (c) cycle rates are tiny so
-    linear ≈ compounded to 1bp anyway.
+    linear ~= compounded to 1bp anyway.
 
     Example: Binance 0.01% per 8h -> 0.0001 * 3 * 365 * 10000 = 109,500 bps =
     1095% APY (deliberately huge to highlight units in tests; real funding
@@ -103,6 +137,7 @@ __all__ = [
     "FUNDING_CADENCE_SECONDS",
     "SECONDS_PER_YEAR",
     "annualise_funding_rate_bps",
+    "fundings_per_day",
     "fundings_per_year",
     "is_supported_venue",
 ]

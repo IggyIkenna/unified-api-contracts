@@ -10,6 +10,7 @@ from unified_api_contracts.registry.perp_funding_cadence import (
     FUNDING_CADENCE_SECONDS,
     SECONDS_PER_YEAR,
     annualise_funding_rate_bps,
+    fundings_per_day,
     fundings_per_year,
     is_supported_venue,
 )
@@ -44,20 +45,42 @@ class TestCadenceRegistry:
 
 class TestFundingsPerYear:
     def test_binance_eight_hour(self) -> None:
-        # 8h cadence → 3 fundings/day × 365 = 1095/year
+        # 8h cadence -> 3 fundings/day x 365 = 1095/year
         assert fundings_per_year("binance") == Decimal("1095")
 
     def test_hyperliquid_one_hour(self) -> None:
-        # 1h cadence → 24/day × 365 = 8760/year
+        # 1h cadence -> 24/day x 365 = 8760/year
         assert fundings_per_year("hyperliquid") == Decimal("8760")
 
     def test_kraken_four_hour(self) -> None:
-        # 4h cadence → 6/day × 365 = 2190/year
+        # 4h cadence -> 6/day x 365 = 2190/year
         assert fundings_per_year("kraken") == Decimal("2190")
 
     def test_drift_five_minute(self) -> None:
-        # 5min cadence → 12/hour × 24 × 365 = 105120/year
+        # 5min cadence -> 12/hour x 24 x 365 = 105120/year
         assert fundings_per_year("drift") == Decimal("105120")
+
+    def test_aster_eight_hour(self) -> None:
+        # Aster funds every 8h (fundingTime spacing = 28 800 s, verified 2026-06-16),
+        # like Binance — NOT 1h. Regression guard vs the deleted UTL FUNDING_PERIODS_PER_DAY
+        # which had ASTER=24 (1h) and over-stated Aster funding 8x.
+        assert fundings_per_year("aster") == Decimal("1095")
+
+    def test_deribit_annualises_at_eight_hour_figure(self) -> None:
+        # Deribit CHARGES hourly but the stored derivative_ticker.funding_rate is the
+        # 8h FIGURE (verified 2026-06-16/17). The annualisation period must match the
+        # stored figure (8h -> 1095/yr), NOT the 1h charge cadence (8760/yr). Using 1h
+        # over-stated Deribit funding APY by 8x — this is the regression guard.
+        assert FUNDING_CADENCE_SECONDS["deribit"] == 8 * 3600
+        assert fundings_per_year("deribit") == Decimal("1095")
+
+    def test_fundings_per_day(self) -> None:
+        # SSOT replacement for the deleted UTL FUNDING_PERIODS_PER_DAY dict.
+        assert fundings_per_day("binance") == Decimal("3")
+        assert fundings_per_day("aster") == Decimal("3")  # 8h, NOT 24
+        assert fundings_per_day("deribit") == Decimal("3")  # 8h figure, NOT 24
+        assert fundings_per_day("hyperliquid") == Decimal("24")
+        assert fundings_per_day("kraken") == Decimal("6")
 
     def test_case_insensitive_lookup(self) -> None:
         assert fundings_per_year("BINANCE") == fundings_per_year("binance")
@@ -73,22 +96,22 @@ class TestAnnualisation:
 
     def test_binance_one_basis_point_per_cycle(self) -> None:
         # 0.0001 raw rate (= 1bp per 8h cycle = 0.01%)
-        # Annualised: 0.0001 × 1095 × 10000 = 1095 bps APY = 10.95%
+        # Annualised: 0.0001 x 1095 x 10000 = 1095 bps APY = 10.95%
         # This is a typical mid-range ETH-PERP funding.
         result = annualise_funding_rate_bps(Decimal("0.0001"), "binance")
         assert result == Decimal("1095.0000"), f"got {result}"
 
     def test_hyperliquid_one_basis_point_per_cycle(self) -> None:
-        # Same 0.0001 raw rate on Hyperliquid (1h cadence, 8× more accruals)
-        # 0.0001 × 8760 × 10000 = 8760 bps APY = 87.6%
-        # Hourly cadence venues see ~8× the same raw rate's annualised APY
+        # Same 0.0001 raw rate on Hyperliquid (1h cadence, 8x more accruals)
+        # 0.0001 x 8760 x 10000 = 8760 bps APY = 87.6%
+        # Hourly cadence venues see ~8x the same raw rate's annualised APY
         # vs an 8h venue — drives the carry advantage of CeFi-vs-DeFi perps.
         result = annualise_funding_rate_bps(Decimal("0.0001"), "hyperliquid")
         assert result == Decimal("8760.0000")
 
     def test_negative_funding_short_side_receives(self) -> None:
         # When funding < 0, longs PAY shorts. Annualised stays negative.
-        # -0.00005 × 1095 × 10000 = -547.5 bps APY = -5.475%
+        # -0.00005 x 1095 x 10000 = -547.5 bps APY = -5.475%
         result = annualise_funding_rate_bps(Decimal("-0.00005"), "binance")
         assert result == Decimal("-547.50000")
         assert result < 0
@@ -101,9 +124,9 @@ class TestAnnualisation:
         # Strategy sees something like 11% APY funding on ETH-PERP Binance.
         # Reverse derivation:
         #   11% APY = 1100 bps
-        #   rate × 1095 fundings_per_year × 10000 = 1100
-        #   rate = 1100 / (1095 × 10000) = 0.00010046...
-        # Forward verification: 0.0001005 × 1095 × 10000 = 1100.475 bps ≈ 11.00% APY
+        #   rate x 1095 fundings_per_year x 10000 = 1100
+        #   rate = 1100 / (1095 x 10000) = 0.00010046...
+        # Forward verification: 0.0001005 x 1095 x 10000 = 1100.475 bps ~= 11.00% APY
         result = annualise_funding_rate_bps(Decimal("0.0001005"), "binance")
         assert Decimal("1100") < result < Decimal("1101")
 
