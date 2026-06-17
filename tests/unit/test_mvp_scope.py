@@ -111,8 +111,32 @@ class TestCeFiMvp:
         assert not is_mvp("cefi", "COINBASE", "SPOT_PAIR", "trades", base_ccy="BTC")
 
     def test_non_mvp_base_ccy_returns_false(self) -> None:
-        """USDC is not in the MVP base_ccys → False (cefi has non-empty base_ccys)."""
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="USDC")
+        """A base outside the 44-base CEFI_BASE_ASSET_UNIVERSE → False.
+
+        (SUI is a real coin but intentionally NOT in the operator-confirmed
+        44-base CeFi MVP universe; the rule has a non-empty base_ccys set.)
+        """
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="SUI")
+
+    def test_operator_requested_2026_06_16_base_is_mvp(self) -> None:
+        """An operator-requested 2026-06-16 base (EIGEN) is now in the MVP set."""
+        assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="EIGEN")
+
+    def test_deribit_btc_option_is_mvp(self) -> None:
+        """Deribit BTC OPTION → MVP (the options carve-out admits BTC + ETH)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="BTC")
+
+    def test_deribit_eth_option_is_mvp(self) -> None:
+        """Deribit ETH OPTION → MVP (the options carve-out admits BTC + ETH)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="ETH")
+
+    def test_deribit_sol_option_not_mvp(self) -> None:
+        """A non-BTC/ETH OPTION → False even though SOL is in the spot/perp universe.
+
+        The Deribit-options carve-out narrows the OPTION expected universe to
+        BTC + ETH only, so a SOL option is NOT expected (no false-missing).
+        """
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="SOL")
 
     def test_no_base_ccy_with_non_empty_rule_returns_false(self) -> None:
         """When the rule has non-empty base_ccys, None base_ccy → False."""

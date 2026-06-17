@@ -49,6 +49,19 @@ from unified_api_contracts.canonical.crosscutting.config_versioning import (
     compute_config_content_hash,
 )
 
+# The CeFi MVP base-currency universe is the 44-base SSOT
+# ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed 2026-06-16; supersedes the
+# former 4-base BTC/ETH/SOL/USDT set). ``CEFI_OPTIONS_UNDERLYINGS`` is the
+# narrower options carve-out (BTC + ETH only — Deribit is the only CeFi venue
+# with OPTION instruments). Imported from the leaf module (NOT the registry
+# package ``__init__``) to avoid any import-chain timing surprise; the
+# registry → crosscutting direction is acyclic (cefi_instrument_universe.py
+# imports nothing from crosscutting).
+from unified_api_contracts.registry.cefi_instrument_universe import (
+    CEFI_BASE_ASSET_UNIVERSE,
+    CEFI_OPTIONS_UNDERLYINGS,
+)
+
 # Re-exported (the generic descriptor type now lives in ``config_versioning``;
 # kept importable here + at the package root for backwards compatibility).
 _canonical_repr = canonical_config_repr
@@ -72,6 +85,15 @@ class CeFiMvpRule:
         base_ccys: Optional frozenset of base-currency strings. When not
             empty, only cells whose ``base_ccy`` appears here are MVP.
             Empty → all base currencies are in scope for the pair.
+        options_base_ccys: Optional frozenset of base-currency strings that
+            applies ONLY to ``instrument_type == "OPTION"`` cells (the
+            CeFi options expected-universe carve-out). The options universe
+            is intentionally narrower than the spot/perp ``base_ccys`` —
+            Deribit is the only CeFi venue with OPTION instruments and it
+            lists BTC + ETH options only, so expecting the full 44-base set
+            as options would yield false-missing. When non-empty, an OPTION
+            cell is MVP iff ``base_ccy`` is in this set (``base_ccys`` is NOT
+            applied to OPTION cells). Empty → fall back to ``base_ccys``.
         sources: Optional frozenset of source strings. When not empty,
             only cells from one of these sources are MVP.
     """
@@ -80,6 +102,7 @@ class CeFiMvpRule:
     instrument_types: frozenset[str]
     data_types: frozenset[str]
     base_ccys: frozenset[str] = field(default_factory=frozenset)
+    options_base_ccys: frozenset[str] = field(default_factory=frozenset)
     sources: frozenset[str] = field(default_factory=frozenset)
 
 
@@ -199,8 +222,15 @@ MVP_SCOPE: Final[dict[str, object]] = {
     #   TODO(mvp-scope): confirm whether "funding_rate" should alias
     #   "derivative_ticker" here or remain a separate axis.
     #
-    # base_ccys: BTC, ETH, SOL, USDT (the primary carry + arb pairs)
-    #   TODO(mvp-scope): operator sign-off on base_ccy membership.
+    # base_ccys: the 44-base ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed
+    #   2026-06-16 as the CeFi MVP base-currency SSOT — supersedes the former
+    #   4-base BTC/ETH/SOL/USDT set). Spot + perp legs span the full universe.
+    #
+    # options_base_ccys: BTC + ETH ONLY (``CEFI_OPTIONS_UNDERLYINGS``). The
+    #   options expected universe is the Deribit-options carve-out — Deribit is
+    #   the only CeFi venue with OPTION instruments and it lists BTC + ETH
+    #   options only. Expecting the full 44-base set as options on Deribit would
+    #   yield false-missing, so OPTION cells gate on this narrower set.
     #
     # sources: tardis (canonical CeFi archive source per SOURCE_PRIORITY)
     #   + per-venue live source (each venue name is also its live source key
@@ -225,6 +255,7 @@ MVP_SCOPE: Final[dict[str, object]] = {
             {
                 "SPOT_PAIR",  # InstrumentType.SPOT_PAIR
                 "PERPETUAL",  # InstrumentType.PERPETUAL
+                "OPTION",  # InstrumentType.OPTION (Deribit BTC/ETH options)
             }
         ),
         data_types=frozenset(
@@ -239,14 +270,10 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "funding_rate",
             }
         ),
-        base_ccys=frozenset(
-            {
-                "BTC",
-                "ETH",
-                "SOL",
-                "USDT",
-            }
-        ),
+        # 44-base CeFi MVP universe (operator-confirmed SSOT). Spot + perp legs.
+        base_ccys=CEFI_BASE_ASSET_UNIVERSE,
+        # Deribit-options carve-out: BTC + ETH only (the OPTION expected universe).
+        options_base_ccys=CEFI_OPTIONS_UNDERLYINGS,
         # sources: empty → all sources in scope (tardis + per-venue live)
         # TODO(mvp-scope): narrow to ["tardis"] once live-source tagging confirmed.
         sources=frozenset(),
@@ -500,8 +527,15 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 1
-"""Monotonic version of :data:`MVP_SCOPE`. Bump on any content change."""
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 2
+"""Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v2 (2026-06-17): CeFi ``base_ccys`` reconciled from the 4-base BTC/ETH/SOL/USDT
+set to the 44-base ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed SSOT), added
+``OPTION`` to CeFi ``instrument_types``, and added the Deribit-options carve-out
+(``options_base_ccys = CEFI_OPTIONS_UNDERLYINGS`` = BTC+ETH only). The content
+hash flips automatically with the version + content change.
+"""
 
 
 def _compute_mvp_scope_content_hash() -> str:
@@ -615,8 +649,14 @@ def is_mvp(
         # Axis 3: data_type
         if data_type not in rule.data_types:
             return False
-        # Axis 4: base_ccy (optional — if rule has a non-empty set, must match)
-        if rule.base_ccys and base_ccy not in rule.base_ccys:
+        # Axis 4: base_ccy (optional — if rule has a non-empty set, must match).
+        # OPTION cells use the narrower options carve-out (Deribit-options =
+        # BTC+ETH only) when ``options_base_ccys`` is declared; spot/perp legs
+        # use the full ``base_ccys`` universe.
+        if instrument_type == "OPTION" and rule.options_base_ccys:
+            if base_ccy not in rule.options_base_ccys:
+                return False
+        elif rule.base_ccys and base_ccy not in rule.base_ccys:
             return False
         # Axis 5: source (optional)
         return not (rule.sources and source not in rule.sources)

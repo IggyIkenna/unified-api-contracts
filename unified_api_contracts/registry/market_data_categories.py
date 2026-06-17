@@ -1023,15 +1023,18 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "perp_funding": "2023-05-20",  # perp_funding_handler REST /info fundingHistory
     },
     # ASTER — only derivative_ticker (fundingRate REST) and trades (aggTrades
-    # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Both available
-    # since Aster launch (2024-10-01). book_snapshot_5 + liquidations both out
-    # of scope (no wired fetch path).
-    # perp_funding: collected by perp_funding_handler (declared in _defi.py
-    # _ProtocolCapability data_types=["perp_funding"]); start = Aster launch.
+    # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Genesis =
+    # 2023-07-22 (operator-confirmed 2026-06-17 via the Astherus pre-rebrand
+    # venue). book_snapshot_5 + liquidations both out of scope (no wired fetch
+    # path). perp_funding: collected by perp_funding_handler (declared in
+    # _defi.py _ProtocolCapability data_types=["perp_funding"]).
+    # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
+    # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
+    # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
     "ASTER": {
-        "trades": "2024-10-01",
-        "derivative_ticker": "2024-10-01",
-        "perp_funding": "2024-10-01",  # perp_funding_handler REST Aster API
+        "trades": "2023-07-22",
+        "derivative_ticker": "2023-07-22",
+        "perp_funding": "2023-07-22",  # perp_funding_handler REST Aster API
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).

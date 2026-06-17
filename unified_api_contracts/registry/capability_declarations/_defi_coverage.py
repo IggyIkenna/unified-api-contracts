@@ -31,7 +31,7 @@ DEPRECATED_DEFI_GHOST_VENUE_NAMES: frozenset[str] = frozenset(
         "AAVEV3",  # superseded by AAVE_V3
         "CAMELOTV3",  # superseded by CAMELOT_V3
         "COMPOUNDV3",  # superseded by COMPOUND_V3
-        "MORPHOVAULTS",  # superseded by MORPHO_VAULTS
+        "MORPHO_VAULTS",  # underscore legacy form (pre-2026-05-06 manifest) → canonical MORPHOVAULTS
         "PANCAKESWAPV3",  # superseded by PANCAKESWAP_V3
         "SUSHISWAPV3",  # superseded by SUSHISWAP_V3
         "VELODROMEV2",  # superseded by VELODROME_V2

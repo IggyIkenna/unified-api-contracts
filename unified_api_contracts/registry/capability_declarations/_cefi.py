@@ -935,14 +935,16 @@ _ASTER = SourceCapability(
     },
     chain=None,
     kind="perp_cex",
-    # Tardis archive starts at Aster mainnet launch 2024-09-25 (post-rebrand from
-    # Astherus). Venue + Tardis collection both began on this date.
+    # Aster genesis 2023-07-22 (operator-confirmed 2026-06-17 = Astherus pre-rebrand
+    # genesis). IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus
+    # pre-rebrand mirrored Binance funding); imported, NOT Aster-native — label
+    # source honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
     coverage_start={
-        "candles": date(2024, 9, 25),
-        "trades": date(2024, 9, 25),
-        "book_snapshot_5": date(2024, 9, 25),
-        "derivative_ticker": date(2024, 9, 25),
-        "liquidations": date(2024, 9, 25),
+        "candles": date(2023, 7, 22),
+        "trades": date(2023, 7, 22),
+        "book_snapshot_5": date(2023, 7, 22),
+        "derivative_ticker": date(2023, 7, 22),
+        "liquidations": date(2023, 7, 22),
     },
 )
 
