@@ -1243,6 +1243,7 @@ from .registry import (
     non_trading_day_reason,
     resolve_data_type_for_feature_group,
     valid_data_types_for_instrument_type,
+    valid_data_types_for_venue_instrument_type,
     validate_data_type_for_venue,
     venue_has_no_expected_defi_coverage,
 )
@@ -2169,6 +2170,7 @@ __all__ = [
     "source_required",
     "source_string_for",
     "valid_data_types_for_instrument_type",
+    "valid_data_types_for_venue_instrument_type",
     "validate_data_type_for_venue",
     "validate_dataframe",
     "validate_preflight_for_trigger",
