@@ -16,6 +16,7 @@ from unified_api_contracts.registry.market_data_categories import (
     _INSTRUMENT_TYPE_ALIASES,
     VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
     valid_data_types_for_instrument_type,
+    valid_data_types_for_venue_instrument_type,
 )
 
 
@@ -370,3 +371,61 @@ class TestBundleInstrumentTypeForLeaf:
     def test_leaf_non_bundle_returns_none(self) -> None:
         assert bundle_instrument_type_for_leaf("cefi", "SPOT") is None
         assert bundle_instrument_type_for_leaf("cefi", "PERP") is None
+
+
+class TestValidDataTypesForVenueInstrumentType:
+    """DeFi protocol-grain narrowing (G1-ENUM venue/protocol refinement).
+
+    The instrument_type-grain ``valid_data_types_for_instrument_type`` builds
+    the DeFi set as the UNION across every protocol that declares an
+    instrument_type, so a hybrid protocol (GMX = pool + perp_funding) leaks
+    ``perp_funding`` into the valid set for ALL pools. The venue-aware accessor
+    keys validity to the protocol named by the venue id.
+    """
+
+    def test_uniswap_pool_excludes_perp_funding(self) -> None:
+        # UNISWAP_V3 declares POOL with DEX data only — NO perp_funding.
+        valid = valid_data_types_for_venue_instrument_type("defi", "UNISWAP_V3-ETHEREUM", "pool")
+        assert valid is not None
+        assert "dex_pool_state" in valid
+        assert "dex_pool_swaps" in valid
+        assert "perp_funding" not in valid
+
+    def test_gmx_pool_includes_perp_funding(self) -> None:
+        # GMX is a hybrid protocol — its POOL legitimately carries perp_funding.
+        valid = valid_data_types_for_venue_instrument_type("defi", "GMX-ARBITRUM", "pool")
+        assert valid is not None
+        assert "perp_funding" in valid
+        assert "dex_pool_state" in valid
+
+    def test_union_leaks_perp_funding_but_venue_grain_does_not(self) -> None:
+        # Demonstrates the bug the refinement fixes: the instrument_type-grain
+        # union DOES include perp_funding for ``pool`` (from GMX); the
+        # venue-grain accessor removes it for a pure-DEX venue.
+        union = valid_data_types_for_instrument_type("defi", "pool")
+        assert union is not None and "perp_funding" in union
+        uni = valid_data_types_for_venue_instrument_type("defi", "UNISWAP_V3-ETHEREUM", "pool")
+        assert uni is not None and "perp_funding" not in uni
+
+    def test_unmapped_protocol_falls_back_to_union(self) -> None:
+        # An unknown protocol must NOT under-report — it delegates to the union.
+        unknown = valid_data_types_for_venue_instrument_type("defi", "NOTAPROTOCOL-ETHEREUM", "pool")
+        union = valid_data_types_for_instrument_type("defi", "pool")
+        assert unknown == union
+
+    def test_non_defi_delegates_unchanged(self) -> None:
+        # For every non-DeFi asset_group the venue-aware accessor is identical
+        # to the instrument_type-grain matrix (venue is ignored).
+        for ag, venue, it in (
+            ("cefi", "BINANCE-FUTURES", "perpetual"),
+            ("tradfi", "CME", "future"),
+        ):
+            assert valid_data_types_for_venue_instrument_type(ag, venue, it) == valid_data_types_for_instrument_type(
+                ag, it
+            )
+
+    def test_missing_venue_delegates_to_union(self) -> None:
+        # A blank/None venue on a DeFi row cannot resolve a protocol → union.
+        assert valid_data_types_for_venue_instrument_type("defi", None, "pool") == valid_data_types_for_instrument_type(
+            "defi", "pool"
+        )

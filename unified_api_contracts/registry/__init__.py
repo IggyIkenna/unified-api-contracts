@@ -248,6 +248,7 @@ from .market_data_categories import (
     needs_candle_processing,
     resolve_data_type_for_feature_group,
     valid_data_types_for_instrument_type,
+    valid_data_types_for_venue_instrument_type,
     validate_data_type_for_venue,
 )
 from .max_underlying_moves import (
@@ -257,7 +258,13 @@ from .max_underlying_moves import (
     compute_max_leverage_from_spread_move,
     get_max_move,
 )
-from .perp_funding_cadence import annualise_funding_rate_bps
+from .perp_funding_cadence import (
+    FUNDING_CADENCE_SECONDS,
+    annualise_funding_rate_bps,
+    fundings_per_day,
+    fundings_per_year,
+    is_supported_venue,
+)
 from .possible_manifest import (
     POSSIBLE_MANIFEST_ASSET_GROUPS,
     CatalogueLeaf,
@@ -361,6 +368,7 @@ from .tradfi_ticker_universe import (
     TRADFI_TICKER_UNIVERSE,
 )
 from .venue_collateral import (
+    PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE,
     VENUE_COLLATERAL_MATRIX,
     CollateralAcceptance,
     VenueKind,
@@ -706,6 +714,7 @@ __all__ = [
     "FLUID_PLASMA",
     "FOOTYSTATS",
     "FORK_CHAIN_IDS",
+    "FUNDING_CADENCE_SECONDS",
     "FUTURE_BUNDLE_VENUES",
     "FX_SPOT_PAIRS",
     "GAS_FEE_CHAIN_START_DATES",
@@ -767,6 +776,7 @@ __all__ = [
     "PER_ARCHETYPE_BREAKERS",
     "PER_ARCHETYPE_RECOVERY_RULES",
     "PINNACLE",
+    "PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE",
     "PLAYUP",
     "PMU",
     "POINTSBET",
@@ -957,6 +967,8 @@ __all__ = [
     "extract_event_contract_shard_key",
     "find_schema",
     "free_dates_in_range",
+    "fundings_per_day",
+    "fundings_per_year",
     "get_aave_reserve_params",
     "get_accepted_collateral",
     "get_active_es_options_clusters_for_date",
@@ -1042,6 +1054,7 @@ __all__ = [
     "is_processed_data_type",
     "is_processed_data_type",
     "is_shard_axis",
+    "is_supported_venue",
     "is_tardis_free_date",
     "is_token_equivalent",
     "is_tradfi_futures_instrument_active",
@@ -1066,6 +1079,7 @@ __all__ = [
     "to_canonical_venue",
     "token_matches_major_assets",
     "valid_data_types_for_instrument_type",
+    "valid_data_types_for_venue_instrument_type",
     "validate_data_type_for_venue",
     "validate_instruction",
     "validate_mode_env_auth",

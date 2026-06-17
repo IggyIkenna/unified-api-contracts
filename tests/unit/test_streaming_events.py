@@ -9,7 +9,6 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from unified_api_contracts.canonical.crosscutting.pipeline_mode import PipelineMode
 from unified_api_contracts.canonical.crosscutting.service_emission_policy import (
     ServiceEmissionPolicy,
 )
@@ -290,11 +289,11 @@ def test_computed_event_emission_outcome_closed_set() -> None:
 
 
 # ---------------------------------------------------------------------------
-# pipeline_mode defaulting to LIVE_WEBSOCKET on all 3 event types.
+# pipeline_mode defaulting to None (producer-unset metadata) on all event types.
 # ---------------------------------------------------------------------------
 
 
-def test_pipeline_mode_defaults_to_live_websocket() -> None:
-    assert _boundary_event("1m").pipeline_mode is PipelineMode.LIVE_WEBSOCKET
-    assert _computed_event().pipeline_mode is PipelineMode.LIVE_WEBSOCKET
-    assert _instrument_cache_event().pipeline_mode is PipelineMode.LIVE_WEBSOCKET
+def test_pipeline_mode_defaults_to_none() -> None:
+    assert _boundary_event("1m").pipeline_mode is None
+    assert _computed_event().pipeline_mode is None
+    assert _instrument_cache_event().pipeline_mode is None

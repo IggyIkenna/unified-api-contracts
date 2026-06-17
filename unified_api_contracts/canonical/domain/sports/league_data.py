@@ -19,6 +19,11 @@ from __future__ import annotations
 from collections.abc import Iterable
 from datetime import date, timedelta
 
+from unified_api_contracts.canonical.crosscutting.config_versioning import (
+    ConfigDescriptor,
+    compute_config_content_hash,
+)
+
 from .league_data_other import FEATURES_LEAGUES as FEATURES_LEAGUES
 from .league_data_other import NON_FOOTBALL_LEAGUES as NON_FOOTBALL_LEAGUES
 from .league_data_other import REFERENCE_LEAGUES as REFERENCE_LEAGUES
@@ -520,6 +525,36 @@ def get_expected_leagues_for_source(
     ]
 
 
+# ---------------------------------------------------------------------------
+# Config versioning — monotonic version + deterministic content hash for the
+# sports-leagues config. PER-CONFIG (independent of MVP_SCOPE / prediction-
+# markets), surfaced in data-status so a coverage delta attributes to a
+# leagues-scope change (e.g. an added/removed league) vs a data change.
+# Metadata only — never a GCS partition key. SSOT:
+# ``plans/active/mvp_scope_catalogue_tagging_2026_06_08.md`` § Config versioning.
+# ---------------------------------------------------------------------------
+
+SPORTS_LEAGUES_CONFIG_VERSION: int = 1
+"""Monotonic version of :data:`LEAGUE_REGISTRY`. Bump on any content change."""
+
+
+def _compute_sports_leagues_content_hash() -> str:
+    """SHA-256 (16-hex prefix) of the canonical LEAGUE_REGISTRY content."""
+    return compute_config_content_hash(
+        SPORTS_LEAGUES_CONFIG_VERSION,
+        [(league_id, LEAGUE_REGISTRY[league_id]) for league_id in sorted(LEAGUE_REGISTRY)],
+    )
+
+
+SPORTS_LEAGUES_CONFIG_HASH: str = _compute_sports_leagues_content_hash()
+"""Content hash of :data:`LEAGUE_REGISTRY` — flips IFF the league set/defs change."""
+
+
+def sports_leagues_config_descriptor() -> ConfigDescriptor:
+    """Return the sports-leagues ``(version, content-hash)`` descriptor."""
+    return ConfigDescriptor(SPORTS_LEAGUES_CONFIG_VERSION, SPORTS_LEAGUES_CONFIG_HASH)
+
+
 __all__ = [
     "DATA_TYPE_COVERAGE_START",
     "FEATURES_LEAGUES",
@@ -530,6 +565,8 @@ __all__ = [
     "PREDICTION_LEAGUES",
     "REFERENCE_LEAGUES",
     "SOURCE_COVERAGE_START",
+    "SPORTS_LEAGUES_CONFIG_HASH",
+    "SPORTS_LEAGUES_CONFIG_VERSION",
     "clip_dates_to_source_coverage",
     "get_all_prediction_league_ids",
     "get_expected_leagues_for_source",
@@ -545,4 +582,5 @@ __all__ = [
     "get_prediction_leagues",
     "get_source_coverage_start",
     "is_in_known_gap",
+    "sports_leagues_config_descriptor",
 ]

@@ -159,13 +159,17 @@ from .canonical.crosscutting.mode_precedence import (
 )
 from .canonical.crosscutting.mvp_scope import (
     MVP_SCOPE,
+    MVP_SCOPE_CONFIG_HASH,
+    MVP_SCOPE_CONFIG_VERSION,
     CeFiMvpRule,
+    ConfigDescriptor,
     DeFiMvpRule,
     FeaturesModelsMvpStub,
     PredictionMvpRule,
     SportsMvpRule,
     TradFiMvpRule,
     is_mvp,
+    mvp_scope_config_descriptor,
 )
 from .canonical.crosscutting.pipeline_mode import (
     _SPORTS_ENTITY_TO_PIPELINE_MODE,  # pyright: ignore[reportPrivateUsage]  # package-internal mapping, intentionally re-exported via __all__
@@ -815,7 +819,16 @@ from .canonical.domain.instruments_catalog import (
     register_catalog_reader as register_catalog_reader,
 )
 from .canonical.domain.prediction.prediction_mapping import (
+    PREDICTION_MARKETS_CONFIG_HASH as PREDICTION_MARKETS_CONFIG_HASH,
+)
+from .canonical.domain.prediction.prediction_mapping import (
+    PREDICTION_MARKETS_CONFIG_VERSION as PREDICTION_MARKETS_CONFIG_VERSION,
+)
+from .canonical.domain.prediction.prediction_mapping import (
     PredictionMarketCrossVenueMapping as PredictionMarketCrossVenueMapping,
+)
+from .canonical.domain.prediction.prediction_mapping import (
+    prediction_markets_config_descriptor as prediction_markets_config_descriptor,
 )
 from .canonical.domain.predictions.canonical_groups import (
     CanonicalGroupMetadata as CanonicalGroupMetadata,
@@ -857,6 +870,12 @@ from .canonical.domain.sports.league_data import (
     SPORTS_DATA_TYPE_TO_SOURCE as SPORTS_DATA_TYPE_TO_SOURCE,
 )
 from .canonical.domain.sports.league_data import (
+    SPORTS_LEAGUES_CONFIG_HASH as SPORTS_LEAGUES_CONFIG_HASH,
+)
+from .canonical.domain.sports.league_data import (
+    SPORTS_LEAGUES_CONFIG_VERSION as SPORTS_LEAGUES_CONFIG_VERSION,
+)
+from .canonical.domain.sports.league_data import (
     get_league as get_league,
 )
 from .canonical.domain.sports.league_data import (
@@ -867,6 +886,9 @@ from .canonical.domain.sports.league_data import (
 )
 from .canonical.domain.sports.league_data import (
     is_in_known_gap as is_in_known_gap,
+)
+from .canonical.domain.sports.league_data import (
+    sports_leagues_config_descriptor as sports_leagues_config_descriptor,
 )
 from .canonical.domain.sports.league_registry import (
     LeagueClassification as LeagueClassification,
@@ -1221,6 +1243,7 @@ from .registry import (
     non_trading_day_reason,
     resolve_data_type_for_feature_group,
     valid_data_types_for_instrument_type,
+    valid_data_types_for_venue_instrument_type,
     validate_data_type_for_venue,
     venue_has_no_expected_defi_coverage,
 )
@@ -2147,6 +2170,7 @@ __all__ = [
     "source_required",
     "source_string_for",
     "valid_data_types_for_instrument_type",
+    "valid_data_types_for_venue_instrument_type",
     "validate_data_type_for_venue",
     "validate_dataframe",
     "validate_preflight_for_trigger",
@@ -2248,13 +2272,24 @@ __all__ = [
     "VenueTestnetEndpoints",
     # MVP scope config + predicate (Phase 1)
     "MVP_SCOPE",
+    "MVP_SCOPE_CONFIG_HASH",
+    "MVP_SCOPE_CONFIG_VERSION",
+    "ConfigDescriptor",
     "is_mvp",
+    "mvp_scope_config_descriptor",
     "CeFiMvpRule",
     "DeFiMvpRule",
     "TradFiMvpRule",
     "SportsMvpRule",
     "PredictionMvpRule",
     "FeaturesModelsMvpStub",
+    # Per-config versioning descriptors (sports-leagues + prediction-markets)
+    "SPORTS_LEAGUES_CONFIG_HASH",
+    "SPORTS_LEAGUES_CONFIG_VERSION",
+    "sports_leagues_config_descriptor",
+    "PREDICTION_MARKETS_CONFIG_HASH",
+    "PREDICTION_MARKETS_CONFIG_VERSION",
+    "prediction_markets_config_descriptor",
 ]
 
 # fmt: off

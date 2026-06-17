@@ -347,16 +347,18 @@ class TestVenueCollateral:
                 f"row {entry.venue}/{entry.token} has invalid venue_kind={entry.venue_kind!r}"
             )
 
-    def test_drift_accepts_jitosol_with_10pct_haircut(self) -> None:
+    def test_drift_accepts_jitosol_with_probed_haircut(self) -> None:
         """LST_AS_MARGIN structure (CARRY_STAKED_BASIS) — only DRIFT/JitoSOL +
         DRIFT/mSOL are accepted today. The haircut value is the SSOT input
-        for the per-archetype ranker's effective-notional sizing."""
+        for the per-archetype ranker's effective-notional sizing. Probed 2026-06-17
+        from Drift on-chain initialAssetWeight=0.80 (conservative initial weight)."""
         assert venue_accepts_collateral("DRIFT", "JitoSOL") is True
-        assert get_collateral_haircut("DRIFT", "JitoSOL") == Decimal("0.10")
+        assert get_collateral_haircut("DRIFT", "JitoSOL") == Decimal("0.20")
 
-    def test_drift_accepts_msol_with_10pct_haircut(self) -> None:
+    def test_drift_accepts_msol_with_probed_haircut(self) -> None:
+        # Probed 2026-06-17: Drift on-chain initialAssetWeight=0.80 -> haircut 0.20.
         assert venue_accepts_collateral("DRIFT", "mSOL") is True
-        assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.10")
+        assert get_collateral_haircut("DRIFT", "mSOL") == Decimal("0.20")
 
     def test_no_eth_perp_venue_accepts_eth_lst_today(self) -> None:
         """As of 2026-05-08 the production ETH-perp venues that accept an

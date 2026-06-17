@@ -14845,7 +14845,7 @@
       "from_node_id": "collateral:drift",
       "gap_type": null,
       "readiness": null,
-      "reason": "drift accepts JitoSOL (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "reason": "drift accepts JitoSOL (haircut=20%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
       "relation": "accepts_collateral",
       "status": "available",
       "to_node_id": "collateral_asset:JitoSOL"
@@ -14855,7 +14855,7 @@
       "from_node_id": "collateral:drift",
       "gap_type": null,
       "readiness": null,
-      "reason": "drift accepts SOL (haircut=5%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "reason": "drift accepts SOL (haircut=15%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
       "relation": "accepts_collateral",
       "status": "available",
       "to_node_id": "collateral_asset:SOL"
@@ -14875,7 +14875,7 @@
       "from_node_id": "collateral:drift",
       "gap_type": null,
       "readiness": null,
-      "reason": "drift accepts mSOL (haircut=10%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
+      "reason": "drift accepts mSOL (haircut=20%) \u2014 unified_api_contracts/registry/venue_collateral.py VENUE_COLLATERAL_MATRIX (Stream A audit 2026-05-07/08)",
       "relation": "accepts_collateral",
       "status": "available",
       "to_node_id": "collateral_asset:mSOL"
@@ -15382,6 +15382,46 @@
     },
     {
       "agent_annotation": null,
+      "from_node_id": "data_source:greeks_service",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "default transport for greeks_service",
+      "relation": "over_transport:rest",
+      "status": "available",
+      "to_node_id": "data_source:greeks_service"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:greeks_service",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "batch is the baseline mode for every source",
+      "relation": "supports_mode:batch",
+      "status": "available",
+      "to_node_id": "data_source:greeks_service"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:greeks_service",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "live-mode capability for greeks_service lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "relation": "supports_mode:live",
+      "status": "not_registered",
+      "to_node_id": "data_source:greeks_service"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:greeks_service",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "replay-mode capability for greeks_service lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "relation": "supports_mode:replay",
+      "status": "not_registered",
+      "to_node_id": "data_source:greeks_service"
+    },
+    {
+      "agent_annotation": null,
       "from_node_id": "data_source:helius_rpc",
       "gap_type": null,
       "readiness": null,
@@ -15539,6 +15579,46 @@
       "relation": "supports_mode:replay",
       "status": "not_registered",
       "to_node_id": "data_source:mdps_odds_horizon_bucket"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:mtds_microstructure",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "default transport for mtds_microstructure",
+      "relation": "over_transport:rest",
+      "status": "available",
+      "to_node_id": "data_source:mtds_microstructure"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:mtds_microstructure",
+      "gap_type": null,
+      "readiness": null,
+      "reason": "batch is the baseline mode for every source",
+      "relation": "supports_mode:batch",
+      "status": "available",
+      "to_node_id": "data_source:mtds_microstructure"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:mtds_microstructure",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "live-mode capability for mtds_microstructure lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "relation": "supports_mode:live",
+      "status": "not_registered",
+      "to_node_id": "data_source:mtds_microstructure"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "data_source:mtds_microstructure",
+      "gap_type": "missing_registry",
+      "readiness": null,
+      "reason": "replay-mode capability for mtds_microstructure lives in the manual source-mode-capability-matrix audit, not yet codified in a UAC registry",
+      "relation": "supports_mode:replay",
+      "status": "not_registered",
+      "to_node_id": "data_source:mtds_microstructure"
     },
     {
       "agent_annotation": null,
@@ -24347,13 +24427,13 @@
     "logical_dead_end": 446,
     "logical_dead_ends": 16,
     "missing_extraction": 1,
-    "missing_registry": 150,
+    "missing_registry": 154,
     "needs_code_scan": 1,
-    "not_registered_total": 151,
+    "not_registered_total": 155,
     "orphan_nodes": 81,
     "unbuilt_dead_ends": 159
   },
-  "generated_from_commit": "9b03b3bfdda77361313b0286863a0122d4a99630",
+  "generated_from_commit": "0ef831373a2ae7d8b0823be035cf5b7f126af8b1",
   "manifest_version": "1.0.0",
   "nodes": [
     {
@@ -25141,6 +25221,12 @@
     },
     {
       "kind": "data_source",
+      "label": "Greeks Service",
+      "metadata": {},
+      "node_id": "data_source:greeks_service"
+    },
+    {
+      "kind": "data_source",
       "label": "Helius Rpc",
       "metadata": {},
       "node_id": "data_source:helius_rpc"
@@ -25162,6 +25248,12 @@
       "label": "Mdps Odds Horizon Bucket",
       "metadata": {},
       "node_id": "data_source:mdps_odds_horizon_bucket"
+    },
+    {
+      "kind": "data_source",
+      "label": "Mtds Microstructure",
+      "metadata": {},
+      "node_id": "data_source:mtds_microstructure"
     },
     {
       "kind": "data_source",
@@ -29166,5 +29258,3047 @@
       },
       "node_id": "wallet:sports:treasury"
     }
-  ]
+  ],
+  "param_schema": {
+    "ARBITRAGE_PRICE_DISPERSION": [
+      {
+        "default": "price-dispersion",
+        "enum_values": ["price-dispersion", "funding-rate-dispersion"],
+        "max": null,
+        "min": null,
+        "name": "dispersion_type",
+        "required": false,
+        "source": "price_dispersion.py:107,130",
+        "type": "enum",
+        "units": null
+      },
+      {
+        "default": "0.1",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "price_dispersion.py:205,466",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "5000",
+        "enum_values": [],
+        "max": null,
+        "min": "0",
+        "name": "hedge_deadline_ms",
+        "required": false,
+        "source": "price_dispersion.py:206,467",
+        "type": "int",
+        "units": "ms"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "candidate_venues",
+        "required": true,
+        "source": "price_dispersion.py:109,256",
+        "type": "str",
+        "units": "venue-list"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "dispersion_bps",
+        "required": false,
+        "source": "price_dispersion.py:200",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "cost_bps",
+        "required": false,
+        "source": "price_dispersion.py:201",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "venue_universe",
+        "required": false,
+        "source": "price_dispersion.py:484",
+        "type": "str",
+        "units": "venue-list"
+      },
+      {
+        "default": "single-best",
+        "enum_values": ["single-best", "top-k", "all-above-threshold"],
+        "max": null,
+        "min": null,
+        "name": "pair_selection_mode",
+        "required": false,
+        "source": "price_dispersion.py:358",
+        "type": "enum",
+        "units": null
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "pair_selection_k",
+        "required": false,
+        "source": "price_dispersion.py:359",
+        "type": "int",
+        "units": "count"
+      },
+      {
+        "default": "5.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_spread_threshold_bps",
+        "required": false,
+        "source": "price_dispersion.py:361",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": "1",
+        "name": "max_concurrent_pairs_per_slot",
+        "required": false,
+        "source": "price_dispersion.py:362",
+        "type": "int",
+        "units": "count"
+      },
+      {
+        "default": "5.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "target_leverage",
+        "required": false,
+        "source": "price_dispersion.py:432",
+        "type": "decimal",
+        "units": "ratio"
+      },
+      {
+        "default": "realized_vol_20",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vol_cap_clamp_feature",
+        "required": false,
+        "source": "price_dispersion.py:533",
+        "type": "str",
+        "units": "feature"
+      },
+      {
+        "default": "80.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vol_cap_clamp_threshold_pct",
+        "required": false,
+        "source": "price_dispersion.py:534",
+        "type": "decimal",
+        "units": "pct"
+      },
+      {
+        "default": "vol_regime_zscore_20",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vol_cap_clamp_zscore_feature",
+        "required": false,
+        "source": "price_dispersion.py:535",
+        "type": "str",
+        "units": "feature"
+      },
+      {
+        "default": "2.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vol_cap_clamp_zscore_threshold",
+        "required": false,
+        "source": "price_dispersion.py:536",
+        "type": "decimal",
+        "units": "z"
+      },
+      {
+        "default": "any",
+        "enum_values": ["any", "all"],
+        "max": null,
+        "min": null,
+        "name": "vol_cap_clamp_combine",
+        "required": false,
+        "source": "price_dispersion.py:537",
+        "type": "enum",
+        "units": null
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vol_cap_clamp_target_leverage",
+        "required": false,
+        "source": "price_dispersion.py:538",
+        "type": "decimal",
+        "units": "ratio"
+      }
+    ],
+    "CARRY_BASIS_PERP": [
+      {
+        "default": "0.0001",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_mid_price",
+        "required": false,
+        "source": "basis_perp.py:63",
+        "type": "decimal",
+        "units": "price"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_funding_bps",
+        "required": false,
+        "source": "basis_perp.py:72",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "exit_funding_bps",
+        "required": false,
+        "source": "basis_perp.py:73",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "basis_perp.py:74",
+        "type": "decimal",
+        "units": "fraction"
+      }
+    ],
+    "CARRY_RECURSIVE_STAKED": [
+      {
+        "default": "true",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "staking_yield_enabled",
+        "required": false,
+        "source": "recursive_staked.py:194",
+        "type": "bool",
+        "units": null
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "staking_protocol",
+        "required": false,
+        "source": "recursive_staked.py:96",
+        "type": "str",
+        "units": "protocol"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lending_protocol",
+        "required": false,
+        "source": "recursive_staked.py:97",
+        "type": "str",
+        "units": "protocol"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "native_asset",
+        "required": false,
+        "source": "recursive_staked.py:98",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lst_asset",
+        "required": false,
+        "source": "recursive_staked.py:99",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": "2.5",
+        "enum_values": [],
+        "max": null,
+        "min": "1",
+        "name": "target_leverage",
+        "required": false,
+        "source": "recursive_staked.py:130",
+        "type": "decimal",
+        "units": "ratio"
+      },
+      {
+        "default": "0.15",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "safety_buffer_ltv",
+        "required": false,
+        "source": "recursive_staked.py:131",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "0.75",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "protocol_ltv",
+        "required": false,
+        "source": "recursive_staked.py:132",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_stETH_depeg_bps",
+        "required": false,
+        "source": "recursive_staked.py:86",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "1.25",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_health_factor",
+        "required": false,
+        "source": "recursive_staked.py:90",
+        "type": "decimal",
+        "units": "ratio"
+      },
+      {
+        "default": "150",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_net_apy_bps",
+        "required": false,
+        "source": "recursive_staked.py:160",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "chain",
+        "required": false,
+        "source": "recursive_staked.py:368",
+        "type": "str",
+        "units": "chain"
+      }
+    ],
+    "CARRY_STAKED_BASIS": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "staking_protocol",
+        "required": true,
+        "source": "staked_basis.py:195",
+        "type": "str",
+        "units": "protocol"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "native_asset",
+        "required": true,
+        "source": "staked_basis.py:196",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lst_asset",
+        "required": true,
+        "source": "staked_basis.py:197",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "perp_venue",
+        "required": true,
+        "source": "staked_basis.py:198",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "perp_instrument",
+        "required": true,
+        "source": "staked_basis.py:199",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "spot_venue",
+        "required": true,
+        "source": "staked_basis.py:200",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "USDC",
+        "enum_values": ["USDC", "USDT", "FDUSD"],
+        "max": null,
+        "min": null,
+        "name": "start_token",
+        "required": false,
+        "source": "staked_basis.py:201",
+        "type": "enum",
+        "units": "token"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "staked_basis.py:349",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "0.20",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "margin_buffer_pct",
+        "required": false,
+        "source": "staked_basis.py:219,328",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "1.25",
+        "enum_values": [],
+        "max": null,
+        "min": "0",
+        "name": "min_health_factor",
+        "required": false,
+        "source": "staked_basis.py:357",
+        "type": "decimal",
+        "units": "ratio"
+      },
+      {
+        "default": "200",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_bps",
+        "required": false,
+        "source": "staked_basis.py:387",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "exit_bps",
+        "required": false,
+        "source": "staked_basis.py:388",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "5000",
+        "enum_values": [],
+        "max": null,
+        "min": "0",
+        "name": "hedge_deadline_ms",
+        "required": false,
+        "source": "staked_basis.py:598",
+        "type": "int",
+        "units": "ms"
+      },
+      {
+        "default": "25",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "peg_drift_threshold_bps",
+        "required": false,
+        "source": "staked_basis.py:618",
+        "type": "decimal",
+        "units": "bps"
+      }
+    ],
+    "CARRY_STAKED_BASIS_DATED": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "staking_protocol",
+        "required": true,
+        "source": "staked_basis.py:195",
+        "type": "str",
+        "units": "protocol"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "native_asset",
+        "required": true,
+        "source": "staked_basis.py:196",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lst_asset",
+        "required": true,
+        "source": "staked_basis.py:197",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "perp_venue",
+        "required": true,
+        "source": "staked_basis.py:198",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "perp_instrument",
+        "required": true,
+        "source": "staked_basis.py:199",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "spot_venue",
+        "required": true,
+        "source": "staked_basis.py:200",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "USDC",
+        "enum_values": ["USDC", "USDT", "FDUSD"],
+        "max": null,
+        "min": null,
+        "name": "start_token",
+        "required": false,
+        "source": "staked_basis.py:201",
+        "type": "enum",
+        "units": "token"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "staked_basis.py:349",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "0.20",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "margin_buffer_pct",
+        "required": false,
+        "source": "staked_basis.py:219,328",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "1.25",
+        "enum_values": [],
+        "max": null,
+        "min": "0",
+        "name": "min_health_factor",
+        "required": false,
+        "source": "staked_basis.py:357",
+        "type": "decimal",
+        "units": "ratio"
+      },
+      {
+        "default": "200",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_bps",
+        "required": false,
+        "source": "staked_basis.py:387",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "exit_bps",
+        "required": false,
+        "source": "staked_basis.py:388",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "5000",
+        "enum_values": [],
+        "max": null,
+        "min": "0",
+        "name": "hedge_deadline_ms",
+        "required": false,
+        "source": "staked_basis.py:598",
+        "type": "int",
+        "units": "ms"
+      },
+      {
+        "default": "25",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "peg_drift_threshold_bps",
+        "required": false,
+        "source": "staked_basis.py:618",
+        "type": "decimal",
+        "units": "bps"
+      }
+    ],
+    "DEFI_LP_CONCENTRATED": [
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "pool_address",
+        "required": true,
+        "source": "concentrated.py:233",
+        "type": "str",
+        "units": "address"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "range_pct",
+        "required": false,
+        "source": "concentrated.py:243",
+        "type": "decimal",
+        "units": "pct"
+      },
+      {
+        "default": "3",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "rebalance_band_pct",
+        "required": false,
+        "source": "concentrated.py:244",
+        "type": "decimal",
+        "units": "pct"
+      },
+      {
+        "default": "3600",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_rebalance_interval_seconds",
+        "required": false,
+        "source": "concentrated.py:245",
+        "type": "int",
+        "units": "seconds"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "concentrated.py:246",
+        "type": "decimal",
+        "units": "fraction"
+      }
+    ],
+    "DEFI_LP_POOL": [
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "pool_address",
+        "required": true,
+        "source": "pool.py:106",
+        "type": "str",
+        "units": "address"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "venue",
+        "required": true,
+        "source": "pool.py:107",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "depeg_exit_bps",
+        "required": false,
+        "source": "pool.py:113",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "pool.py:114",
+        "type": "decimal",
+        "units": "fraction"
+      }
+    ],
+    "DEFI_LP_VAULT": [
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vault_address",
+        "required": true,
+        "source": "vault.py:101",
+        "type": "str",
+        "units": "address"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "venue",
+        "required": true,
+        "source": "vault.py:102",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "100",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_apy_bps",
+        "required": false,
+        "source": "vault.py:112",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "500",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_drawdown_bps",
+        "required": false,
+        "source": "vault.py:113",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "vault.py:114",
+        "type": "decimal",
+        "units": "fraction"
+      }
+    ],
+    "MARKET_MAKING_CONTINUOUS": [
+      {
+        "default": "0.0001",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_mid_price",
+        "required": false,
+        "source": "market_making/continuous.py:61",
+        "type": "decimal",
+        "units": "price"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "half_spread_bps",
+        "required": false,
+        "source": "market_making/continuous.py:67",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_inventory_abs",
+        "required": false,
+        "source": "market_making/continuous.py:68",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "1000",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "refresh_cadence_ms",
+        "required": false,
+        "source": "market_making/continuous.py:69",
+        "type": "int",
+        "units": "ms"
+      },
+      {
+        "default": "true",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "skew_on_inventory",
+        "required": false,
+        "source": "market_making/continuous.py:70",
+        "type": "bool",
+        "units": null
+      }
+    ],
+    "MARKET_MAKING_EVENT_SETTLED": [
+      {
+        "default": "0.0001",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_mid_price",
+        "required": false,
+        "source": "market_making/event_settled.py:81",
+        "type": "decimal",
+        "units": "price"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "back_instrument",
+        "required": true,
+        "source": "market_making/event_settled.py:85",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lay_instrument",
+        "required": true,
+        "source": "market_making/event_settled.py:86",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "half_spread_bps",
+        "required": false,
+        "source": "market_making/event_settled.py:90",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "100",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_inventory_abs",
+        "required": false,
+        "source": "market_making/event_settled.py:91",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "5000",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "refresh_cadence_ms",
+        "required": false,
+        "source": "market_making/event_settled.py:92",
+        "type": "int",
+        "units": "ms"
+      },
+      {
+        "default": "true",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "skew_on_inventory",
+        "required": false,
+        "source": "market_making/event_settled.py:93",
+        "type": "bool",
+        "units": null
+      },
+      {
+        "default": "25",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "refresh_threshold_bps",
+        "required": false,
+        "source": "market_making/event_settled.py:145",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "MARKET_MAKING_INVENTORY_SKEW": [
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_half_spread_bps",
+        "required": false,
+        "source": "market_making/inventory_skew.py:80",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "spread_capture_frac",
+        "required": false,
+        "source": "market_making/inventory_skew.py:82",
+        "type": "decimal",
+        "units": "frac"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_instrument",
+        "required": true,
+        "source": "market_making/inventory_skew.py:107",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_size",
+        "required": false,
+        "source": "market_making/inventory_skew.py:111",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_inventory",
+        "required": false,
+        "source": "market_making/inventory_skew.py:112",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "inventory_target",
+        "required": false,
+        "source": "market_making/inventory_skew.py:120",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "inventory_skew",
+        "required": false,
+        "source": "market_making/inventory_skew.py:121",
+        "type": "decimal",
+        "units": "half-spreads"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "imbalance_tilt",
+        "required": false,
+        "source": "market_making/inventory_skew.py:122",
+        "type": "decimal",
+        "units": "half-spreads"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "market_making/inventory_skew.py:175",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "MARKET_MAKING_ML_LEAN": [
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_half_spread_bps",
+        "required": false,
+        "source": "market_making/ml_lean.py:96",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "spread_capture_frac",
+        "required": false,
+        "source": "market_making/ml_lean.py:98",
+        "type": "decimal",
+        "units": "frac"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "mm_model_id",
+        "required": false,
+        "source": "market_making/ml_lean.py:110",
+        "type": "str",
+        "units": "model-id"
+      },
+      {
+        "default": "0.55",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "min_confidence",
+        "required": false,
+        "source": "market_making/ml_lean.py:115",
+        "type": "float",
+        "units": "conf"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_instrument",
+        "required": true,
+        "source": "market_making/ml_lean.py:142",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_size",
+        "required": false,
+        "source": "market_making/ml_lean.py:146",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lean_skew",
+        "required": false,
+        "source": "market_making/ml_lean.py:154",
+        "type": "decimal",
+        "units": "half-spreads"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "lean_size",
+        "required": false,
+        "source": "market_making/ml_lean.py:155",
+        "type": "decimal",
+        "units": "frac"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "market_making/ml_lean.py:202",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "MARKET_MAKING_PASSIVE_SPREAD": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_instrument",
+        "required": true,
+        "source": "market_making/passive_spread.py:112",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_half_spread_bps",
+        "required": false,
+        "source": "market_making/passive_spread.py:84",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "spread_capture_frac",
+        "required": false,
+        "source": "market_making/passive_spread.py:86",
+        "type": "decimal",
+        "units": "frac"
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_size",
+        "required": false,
+        "source": "market_making/passive_spread.py:116",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "market_making/passive_spread.py:155",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "MARKET_MAKING_PREDICTION": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_instrument",
+        "required": true,
+        "source": "market_making/prediction.py:143",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "mm_model_id",
+        "required": false,
+        "source": "market_making/prediction.py:109",
+        "type": "str",
+        "units": "model-id"
+      },
+      {
+        "default": "0.55",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "min_confidence",
+        "required": false,
+        "source": "market_making/prediction.py:114",
+        "type": "float",
+        "units": "conf"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "prediction_skew",
+        "required": false,
+        "source": "market_making/prediction.py:116",
+        "type": "decimal",
+        "units": "half-spreads"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_half_spread_bps",
+        "required": false,
+        "source": "market_making/prediction.py:94",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "spread_capture_frac",
+        "required": false,
+        "source": "market_making/prediction.py:96",
+        "type": "decimal",
+        "units": "frac"
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_size",
+        "required": false,
+        "source": "market_making/prediction.py:147",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "market_making/prediction.py:188",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "MARKET_MAKING_QUEUE_MICROSTRUCTURE": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_instrument",
+        "required": true,
+        "source": "market_making/queue_microstructure.py:115",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "100",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_queue_ahead",
+        "required": false,
+        "source": "market_making/queue_microstructure.py:134",
+        "type": "decimal",
+        "units": "size"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "flow_skew",
+        "required": false,
+        "source": "market_making/queue_microstructure.py:135",
+        "type": "decimal",
+        "units": "half-spreads"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_half_spread_bps",
+        "required": false,
+        "source": "market_making/queue_microstructure.py:88",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "spread_capture_frac",
+        "required": false,
+        "source": "market_making/queue_microstructure.py:90",
+        "type": "decimal",
+        "units": "frac"
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_size",
+        "required": false,
+        "source": "market_making/queue_microstructure.py:127",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "market_making/queue_microstructure.py:196",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_0DTE_GAMMA_SCALPING": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/gamma_scalping_0dte.py:99",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/gamma_scalping_0dte.py:100",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.05",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_gamma_gap",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:105",
+        "type": "decimal",
+        "units": "gamma-frac"
+      },
+      {
+        "default": "0.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "exit_gamma_gap",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:106",
+        "type": "decimal",
+        "units": "gamma-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "gamma_units",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:130",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "0.10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "rehedge_delta",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:169",
+        "type": "decimal",
+        "units": "delta-frac"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hedge_instrument",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:224",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hedge_venue",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:230",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "40",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/gamma_scalping_0dte.py:270",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_ARB_RV_IV": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/arb_rv_iv.py:100",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/arb_rv_iv.py:101",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.03",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_gap",
+        "required": false,
+        "source": "vol_trading/arb_rv_iv.py:106",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vega_budget_per_leg",
+        "required": false,
+        "source": "vol_trading/arb_rv_iv.py:113",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/arb_rv_iv.py:148",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hedge_instrument",
+        "required": false,
+        "source": "vol_trading/arb_rv_iv.py:162",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hedge_venue",
+        "required": false,
+        "source": "vol_trading/arb_rv_iv.py:180",
+        "type": "str",
+        "units": "venue"
+      }
+    ],
+    "VOL_CARRY": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/carry.py:107",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/carry.py:108",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.04",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_vrp",
+        "required": false,
+        "source": "vol_trading/carry.py:113",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "0.01",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "exit_vrp",
+        "required": false,
+        "source": "vol_trading/carry.py:114",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vega_budget_per_leg",
+        "required": false,
+        "source": "vol_trading/carry.py:144",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hedge_instrument",
+        "required": false,
+        "source": "vol_trading/carry.py:167",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hedge_venue",
+        "required": false,
+        "source": "vol_trading/carry.py:170",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/carry.py:190",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_CROSS_ASSET_SPREAD": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "asset_a_call",
+        "required": true,
+        "source": "vol_trading/cross_asset_spread.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "asset_a_put",
+        "required": true,
+        "source": "vol_trading/cross_asset_spread.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "asset_b_call",
+        "required": true,
+        "source": "vol_trading/cross_asset_spread.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "asset_b_put",
+        "required": true,
+        "source": "vol_trading/cross_asset_spread.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "reference_spread",
+        "required": false,
+        "source": "vol_trading/cross_asset_spread.py:98",
+        "type": "float",
+        "units": "vol-frac"
+      },
+      {
+        "default": "0.03",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_spread_gap",
+        "required": false,
+        "source": "vol_trading/cross_asset_spread.py:102",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "spread_vega_units",
+        "required": false,
+        "source": "vol_trading/cross_asset_spread.py:110",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "75",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/cross_asset_spread.py:158",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_DISPERSION": [
+      {
+        "default": "0.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "reference_correlation_iv",
+        "required": false,
+        "source": "vol_trading/dispersion.py:111",
+        "type": "float",
+        "units": "corr"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "index_call",
+        "required": true,
+        "source": "vol_trading/dispersion.py:114",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "index_put",
+        "required": true,
+        "source": "vol_trading/dispersion.py:115",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.03",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_disp_gap",
+        "required": false,
+        "source": "vol_trading/dispersion.py:121",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "disp_vega_units",
+        "required": false,
+        "source": "vol_trading/dispersion.py:128",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "component_call",
+        "required": false,
+        "source": "vol_trading/dispersion.py:152",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "component_put",
+        "required": false,
+        "source": "vol_trading/dispersion.py:153",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "75",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/dispersion.py:187",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_LEAPS_CONVEXITY": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/leaps_convexity.py:91",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/leaps_convexity.py:92",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.02",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_convexity_gap",
+        "required": false,
+        "source": "vol_trading/leaps_convexity.py:97",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "convexity_vega_units",
+        "required": false,
+        "source": "vol_trading/leaps_convexity.py:101",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "60",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/leaps_convexity.py:131",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_MARKET_MAKING": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_instrument",
+        "required": true,
+        "source": "vol_trading/market_making.py:83",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.02",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_half_spread_vol",
+        "required": false,
+        "source": "vol_trading/market_making.py:87",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "0.01",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "inventory_skew_vol",
+        "required": false,
+        "source": "vol_trading/market_making.py:88",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_inventory",
+        "required": false,
+        "source": "vol_trading/market_making.py:89",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "quote_size",
+        "required": false,
+        "source": "vol_trading/market_making.py:90",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "30",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/market_making.py:143",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_ML_LEAN": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/ml_lean.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/ml_lean.py:94",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vol_model_id",
+        "required": false,
+        "source": "vol_trading/ml_lean.py:98",
+        "type": "str",
+        "units": "model-id"
+      },
+      {
+        "default": "0.55",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "min_confidence",
+        "required": false,
+        "source": "vol_trading/ml_lean.py:104",
+        "type": "float",
+        "units": "conf"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vega_budget_per_leg",
+        "required": false,
+        "source": "vol_trading/ml_lean.py:114",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/ml_lean.py:147",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_OVERLAY_COVERED_CALLS": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/overlay_covered_calls.py:82",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.40",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_call_iv",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:86",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_write_units",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:90",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "cover_instrument",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:106",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "false",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "assume_existing_cover",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:107",
+        "type": "bool",
+        "units": null
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "cover_units",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:109",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "cover_venue",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:111",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/overlay_covered_calls.py:129",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_OVERLAY_PROTECTIVE_PUT": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/overlay_protective_put.py:80",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.60",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_put_iv",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:84",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_buy_units",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:88",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hold_instrument",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:104",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "false",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "assume_existing_long",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:105",
+        "type": "bool",
+        "units": null
+      },
+      {
+        "default": "1",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "protected_units",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:107",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "hold_venue",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:109",
+        "type": "str",
+        "units": "venue"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/overlay_protective_put.py:128",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_RATIO_SPREAD": [
+      {
+        "default": "0.02",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_skew",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:82",
+        "type": "decimal",
+        "units": "vol-skew"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "atm_put_instrument",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:90",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "otm_put_instrument",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:91",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "atm_call_instrument",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:94",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "otm_call_instrument",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:95",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "base_units",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:99",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "2",
+        "enum_values": [],
+        "max": null,
+        "min": "1",
+        "name": "ratio",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:100",
+        "type": "decimal",
+        "units": "ratio"
+      },
+      {
+        "default": "60",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/ratio_spread.py:137",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_SPREAD_STRUCTURES": [
+      {
+        "default": "5",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "structure_units",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:112",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "0.03",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "skew_threshold",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:116",
+        "type": "decimal",
+        "units": "vol-skew"
+      },
+      {
+        "default": "0.55",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "rich_iv_threshold",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:117",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "70",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:133",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "atm_put_instrument",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:149",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "otm_put_instrument",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:149",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "atm_call_instrument",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:149",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "otm_call_instrument",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:176",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "far_otm_call_instrument",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:176",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "far_otm_put_instrument",
+        "required": false,
+        "source": "vol_trading/spread_structures.py:176",
+        "type": "str",
+        "units": "instrument"
+      }
+    ],
+    "VOL_STRADDLE": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/straddle.py:115",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/straddle.py:116",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.03",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_vol_gap",
+        "required": false,
+        "source": "vol_trading/straddle.py:120",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/straddle.py:159",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "vega_budget_per_leg",
+        "required": false,
+        "source": "vol_trading/straddle.py:179",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_position_vega",
+        "required": false,
+        "source": "vol_trading/straddle.py:182",
+        "type": "decimal",
+        "units": "vega"
+      }
+    ],
+    "VOL_SYNTHETIC_DELTA": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/synthetic_delta.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/synthetic_delta.py:94",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "min_signal",
+        "required": false,
+        "source": "vol_trading/synthetic_delta.py:97",
+        "type": "float",
+        "units": "signal"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "synthetic_units",
+        "required": false,
+        "source": "vol_trading/synthetic_delta.py:107",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/synthetic_delta.py:143",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_TERM_STRUCTURE_ARB": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "near_instrument",
+        "required": true,
+        "source": "vol_trading/term_structure_arb.py:105",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "far_instrument",
+        "required": true,
+        "source": "vol_trading/term_structure_arb.py:106",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.02",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_term_gap",
+        "required": false,
+        "source": "vol_trading/term_structure_arb.py:111",
+        "type": "decimal",
+        "units": "vol-frac"
+      },
+      {
+        "default": "60",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/term_structure_arb.py:150",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "calendar_vega_units",
+        "required": false,
+        "source": "vol_trading/term_structure_arb.py:170",
+        "type": "decimal",
+        "units": "vega"
+      }
+    ],
+    "VOL_TERM_STRUCTURE_SLOPE": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "near_instrument",
+        "required": true,
+        "source": "vol_trading/term_structure_slope.py:92",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "far_instrument",
+        "required": true,
+        "source": "vol_trading/term_structure_slope.py:93",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "neutral_slope",
+        "required": false,
+        "source": "vol_trading/term_structure_slope.py:96",
+        "type": "float",
+        "units": "vol/time"
+      },
+      {
+        "default": "0.01",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_slope_gap",
+        "required": false,
+        "source": "vol_trading/term_structure_slope.py:100",
+        "type": "decimal",
+        "units": "vol/time"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "slope_vega_units",
+        "required": false,
+        "source": "vol_trading/term_structure_slope.py:111",
+        "type": "decimal",
+        "units": "vega"
+      },
+      {
+        "default": "60",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/term_structure_slope.py:143",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_TRADING_OPTIONS": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_instrument",
+        "required": true,
+        "source": "vol_trading/options.py:71",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_instrument",
+        "required": true,
+        "source": "vol_trading/options.py:72",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "500",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "divergence_bps",
+        "required": false,
+        "source": "vol_trading/options.py:76",
+        "type": "decimal",
+        "units": "bps"
+      },
+      {
+        "default": "1000",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "stake_vega_notional",
+        "required": false,
+        "source": "vol_trading/options.py:81",
+        "type": "decimal",
+        "units": "vega-notional"
+      },
+      {
+        "default": "50",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/options.py:82",
+        "type": "int",
+        "units": "bps"
+      }
+    ],
+    "VOL_VARIANCE_SWAP": [
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_wing_instrument",
+        "required": true,
+        "source": "vol_trading/variance_swap.py:143",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_wing_instrument",
+        "required": true,
+        "source": "vol_trading/variance_swap.py:144",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "atm_straddle_call_instrument",
+        "required": true,
+        "source": "vol_trading/variance_swap.py:145",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": null,
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "atm_straddle_put_instrument",
+        "required": true,
+        "source": "vol_trading/variance_swap.py:146",
+        "type": "str",
+        "units": "instrument"
+      },
+      {
+        "default": "0.5",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "skew_loading",
+        "required": false,
+        "source": "vol_trading/variance_swap.py:151",
+        "type": "float",
+        "units": "weight"
+      },
+      {
+        "default": "0.01",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "entry_var_gap",
+        "required": false,
+        "source": "vol_trading/variance_swap.py:155",
+        "type": "decimal",
+        "units": "var-frac"
+      },
+      {
+        "default": "75",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "max_slippage_bps",
+        "required": false,
+        "source": "vol_trading/variance_swap.py:172",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "variance_notional",
+        "required": false,
+        "source": "vol_trading/variance_swap.py:197",
+        "type": "decimal",
+        "units": "notional"
+      },
+      {
+        "default": "1.10",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "call_wing_moneyness",
+        "required": false,
+        "source": "vol_trading/variance_swap.py:200",
+        "type": "decimal",
+        "units": "moneyness"
+      },
+      {
+        "default": "0.90",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "put_wing_moneyness",
+        "required": false,
+        "source": "vol_trading/variance_swap.py:201",
+        "type": "decimal",
+        "units": "moneyness"
+      }
+    ],
+    "YIELD_ROTATION_LENDING": [
+      {
+        "default": "USDC",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "asset",
+        "required": false,
+        "source": "rotation_lending.py:94,166",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": "25",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_apy_advantage_bps",
+        "required": false,
+        "source": "rotation_lending.py:95",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "100",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_apy_bps",
+        "required": false,
+        "source": "rotation_lending.py:96",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "rotation_lending.py:97,165",
+        "type": "decimal",
+        "units": "fraction"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "candidate_protocols",
+        "required": false,
+        "source": "rotation_lending.py:199",
+        "type": "str",
+        "units": "protocol-list"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "protocol_chains",
+        "required": false,
+        "source": "rotation_lending.py:189",
+        "type": "str",
+        "units": "map"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "current_chain",
+        "required": false,
+        "source": "rotation_lending.py:65",
+        "type": "str",
+        "units": "chain"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "bridge_hint",
+        "required": false,
+        "source": "rotation_lending.py:113",
+        "type": "str",
+        "units": "slug"
+      }
+    ],
+    "YIELD_STAKING_SIMPLE": [
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "staking_protocol",
+        "required": false,
+        "source": "staking_simple.py:58",
+        "type": "str",
+        "units": "protocol"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "asset",
+        "required": false,
+        "source": "staking_simple.py:59",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": "",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "lst_asset",
+        "required": false,
+        "source": "staking_simple.py:62",
+        "type": "str",
+        "units": "token"
+      },
+      {
+        "default": "200",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_apy_bps",
+        "required": false,
+        "source": "staking_simple.py:63",
+        "type": "int",
+        "units": "bps"
+      },
+      {
+        "default": "0",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "min_delta_units",
+        "required": false,
+        "source": "staking_simple.py:64",
+        "type": "decimal",
+        "units": "units"
+      },
+      {
+        "default": "true",
+        "enum_values": [],
+        "max": null,
+        "min": null,
+        "name": "exit_queue_ok",
+        "required": false,
+        "source": "staking_simple.py:65",
+        "type": "bool",
+        "units": null
+      },
+      {
+        "default": "1.0",
+        "enum_values": [],
+        "max": "1",
+        "min": "0",
+        "name": "stake_fraction",
+        "required": false,
+        "source": "staking_simple.py:88,255",
+        "type": "decimal",
+        "units": "fraction"
+      }
+    ]
+  }
 }

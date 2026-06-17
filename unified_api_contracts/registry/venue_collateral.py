@@ -1,4 +1,24 @@
-"""Venue collateral acceptance matrix — which tokens each venue accepts as margin."""
+"""Venue collateral acceptance matrix — which tokens each venue accepts as margin.
+
+F28 haircuts LIVE-PROBED 2026-06-17 (the two former operator-held placeholders are now real, operator-authorised):
+
+- ``("BYBIT", "stETH")`` haircut **0.10** — Bybit public UTA collateral API ``GET /v5/spot-margin-trade/data``
+  ``collateralRatio=0.9`` (base/non-VIP tier, the conservative tier) → ``1 - 0.9 = 0.10``. (Placeholder was correct.)
+- ``("DRIFT", "mSOL")`` haircut **0.20** — Drift mainnet on-chain spot-market (index 2) ``initialAssetWeight=8000``
+  (= 0.80; maintenance 9000/0.90) read via Helius RPC, decode validated against USDC (index 0 = 10000/1.0). The
+  CONSERVATIVE collateral-acceptance haircut is the INITIAL weight → ``1 - 0.80 = 0.20`` (the prior 0.10 placeholder
+  was the maintenance-equivalent — too generous by 2x for posting collateral).
+
+DISCOVERED during the mSOL probe (2026-06-17): the WHOLE Drift collateral block was recorded at the on-chain
+MAINTENANCE weight (or below), which OVER-counts collateral. Corrected to the conservative INITIAL asset weight,
+all on-chain via Helius + decode-validated against USDC (idx0 = 10000/1.0):
+``SOL`` 0.05→**0.15** (idx1 initial 0.85), ``mSOL`` 0.10→**0.20** (idx2 0.80), ``JitoSOL`` 0.10→**0.20** (idx6 0.80).
+Higher haircut = fails safe (counts less collateral). Drift program ``dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH``;
+PDA seed ``[b"spot_market", index.to_bytes(2,"little")]``; weights / SPOT_WEIGHT_PRECISION 10000.
+
+:data:`PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE` is now empty — no haircut remains a placeholder. Re-probe on a venue
+margin-policy change (Bybit tiers / Drift governance can update these).
+"""
 
 from __future__ import annotations
 
@@ -97,10 +117,39 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("GMX", "ETH", True, Decimal("0.05"), "CROSS", "ETH-margined per-market", "PERP_DEX"),
     CollateralAcceptance("GMX", "WBTC", True, Decimal("0.05"), "CROSS", "BTC-margined per-market", "PERP_DEX"),
     CollateralAcceptance("DRIFT", "USDC", True, Decimal("0"), "CROSS", "Primary margin", "PERP_DEX"),
-    CollateralAcceptance("DRIFT", "SOL", True, Decimal("0.05"), "CROSS", "5% haircut", "PERP_DEX"),
-    # PLACEHOLDER — pending live-API probe (F28, operator-held 2026-06-15)
-    CollateralAcceptance("DRIFT", "mSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Marinade LST", "PERP_DEX"),
-    CollateralAcceptance("DRIFT", "JitoSOL", True, Decimal("0.10"), "CROSS", "10% haircut, Jito LST", "PERP_DEX"),
+    # PROBED 2026-06-17: Drift on-chain spot-market idx1 initialAssetWeight=8500 (0.85) -> haircut 0.15
+    # (was 0.05; the whole Drift block was recorded below the on-chain INITIAL weight = collateral over-count).
+    CollateralAcceptance(
+        "DRIFT",
+        "SOL",
+        True,
+        Decimal("0.15"),
+        "CROSS",
+        "haircut 0.15 (Drift initialAssetWeight 0.85, on-chain 2026-06-17)",
+        "PERP_DEX",
+    ),
+    # PROBED 2026-06-17: Drift on-chain spot-market idx2 initialAssetWeight=8000 (0.80) via Helius RPC (decode
+    # validated vs USDC idx0=10000/1.0). Conservative collateral haircut = initial weight -> 1-0.80 = 0.20
+    # (maintenance is 9000/0.90 -> 0.10; the prior 0.10 placeholder was the maintenance value, too generous to post).
+    CollateralAcceptance(
+        "DRIFT",
+        "mSOL",
+        True,
+        Decimal("0.20"),
+        "CROSS",
+        "Marinade LST — haircut 0.20 (Drift initialAssetWeight 0.80, on-chain probe 2026-06-17)",
+        "PERP_DEX",
+    ),
+    # PROBED 2026-06-17: Drift on-chain spot-market idx6 initialAssetWeight=8000 (0.80) -> haircut 0.20 (same as mSOL).
+    CollateralAcceptance(
+        "DRIFT",
+        "JitoSOL",
+        True,
+        Decimal("0.20"),
+        "CROSS",
+        "Jito LST — haircut 0.20 (Drift initialAssetWeight 0.80, on-chain 2026-06-17)",
+        "PERP_DEX",
+    ),
     # Pacifica-Solana — USDC-settled linear perp DEX (Solana). settle_asset=USDC confirmed in
     # instruments-service adapter (pacifica.py). No LST cross-margin support documented as of
     # 2026-05-15 (live probe + docs review). Explicit negatives per audit spec.
@@ -162,13 +211,18 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
     CollateralAcceptance("BINANCE", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
     CollateralAcceptance("BINANCE", "rETH", False, None, "", "Not accepted", "PERP_CEX"),
     # BYBIT — stETH + METH on UTA collateral (Unified Trading Account) since
-    # 2024-02 per Bybit margin-spec page; USDe added 2024-12-19. Conservative
-    # 10% haircut placeholder pending live-API probe; documented haircut ranges
-    # vary by collateral tier (5-12%). Stream A flip 2026-05-08.
+    # 2024-02 per Bybit margin-spec page; USDe added 2024-12-19. Stream A flip 2026-05-08.
     # See unified-trading-pm/codex/16-strategy-playbooks/defi/venue-collateral-2026-05-07.md.
-    # PLACEHOLDER — pending live-API probe (F28, operator-held 2026-06-15)
+    # PROBED 2026-06-17: Bybit public UTA collateral API GET /v5/spot-margin-trade/data reports
+    # collateralRatio=0.9 for STETH (base/non-VIP tier — the conservative tier) -> haircut 1-0.9 = 0.10.
     CollateralAcceptance(
-        "BYBIT", "stETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral since 2024-02", "PERP_CEX"
+        "BYBIT",
+        "stETH",
+        True,
+        Decimal("0.10"),
+        "PORTFOLIO",
+        "UTA collateral since 2024-02 — haircut 0.10 (Bybit collateralRatio 0.9, probed 2026-06-17)",
+        "PERP_CEX",
     ),
     CollateralAcceptance("BYBIT", "wstETH", True, Decimal("0.10"), "PORTFOLIO", "UTA collateral", "PERP_CEX"),
     CollateralAcceptance("BYBIT", "weETH", False, None, "", "Not accepted", "PERP_CEX"),
@@ -234,6 +288,14 @@ VENUE_COLLATERAL_MATRIX: list[CollateralAcceptance] = [
         "PACIFICA-SOLANA", "mSOL", False, None, "", "Not accepted; USDC-only margin model", "PERP_DEX"
     ),
 ]
+
+
+PLACEHOLDER_HAIRCUTS_PENDING_GO_LIVE: Final[frozenset[tuple[str, str]]] = frozenset()
+"""(venue, token) pairs whose haircut is still an un-probed placeholder. **EMPTY since 2026-06-17** — both former
+F28 operator-held placeholders were live-probed + operator-authorised: ``("BYBIT","stETH")`` → 0.10 (Bybit UTA
+``collateralRatio`` 0.9) and ``("DRIFT","mSOL")`` → 0.20 (Drift on-chain ``initialAssetWeight`` 0.80). A go-live
+preflight asserts this set is empty (it is). Re-add a pair here ONLY if a new venue-token ships with an un-probed
+stand-in haircut. SSOT: ``plans/active/engine_findings_remediation_2026_06_15.md`` (F28 live-API probe)."""
 
 
 def venue_accepts_collateral(venue: str, token: str) -> bool:

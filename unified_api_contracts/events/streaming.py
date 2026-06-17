@@ -20,8 +20,9 @@ Schema invariants (enforced by tests in
 ``tests/unit/test_streaming_events.py``):
 
 * Every payload carries ``correlation_id``, ``vm_name``, ``pipeline_mode``
-  (defaulting to :attr:`PipelineMode.LIVE_WEBSOCKET` for live-pipeline
-  streaming), and ``asset_group``.
+  (optional producer-unset metadata, defaulting to ``None``; the manifest
+  stamp is set source-aware by the recorder implementer, not from this field),
+  and ``asset_group``.
 * :class:`CandleBoundaryCrossedEvent.period_end` minus ``period_start``
   exactly equals the duration encoded by ``timeframe`` (``"15s"``,
   ``"1m"``, ``"5m"``, ``"15m"``, ``"1h"``, ``"1d"``).
@@ -146,9 +147,9 @@ class CandleBoundaryCrossedEvent(BaseModel):
     * ``data_freshness`` is one of ``"FRESH"`` (no WS reconnect mid-window)
       or ``"STALE"`` (one or more WS reconnects during the window; tick
       sequence may have gaps).
-    * ``pipeline_mode`` defaults to :attr:`PipelineMode.LIVE_WEBSOCKET`;
-      batch replays of the live cascade override with the matching
-      ``BATCH_<SOURCE>`` value.
+    * ``pipeline_mode`` is optional producer-unset metadata (defaults to
+      ``None``) — forwarded event→event for the audit trail; the manifest
+      stamp is set source-aware by the recorder implementer, NOT this field.
     """
 
     event_type: Literal["CANDLE_BOUNDARY_CROSSED"] = "CANDLE_BOUNDARY_CROSSED"
@@ -181,7 +182,7 @@ class CandleBoundaryCrossedEvent(BaseModel):
         description="When MTDS finalised the window (= period_end + grace).",
     )
     data_freshness: Literal["FRESH", "STALE"] = "FRESH"
-    pipeline_mode: PipelineMode = PipelineMode.LIVE_WEBSOCKET
+    pipeline_mode: PipelineMode | None = None
     correlation_id: str
     vm_name: str
 
@@ -252,7 +253,7 @@ class CandleComputedEvent(BaseModel):
     emission_policy: ServiceEmissionPolicy = ServiceEmissionPolicy.STRICT_FAIL
     emission_outcome: EmissionOutcome = "PUBLISHED_OK"
     policy_decision_reason: str | None = None
-    pipeline_mode: PipelineMode = PipelineMode.LIVE_WEBSOCKET
+    pipeline_mode: PipelineMode | None = None
     correlation_id: str
     vm_name: str
 
@@ -273,8 +274,8 @@ class FeaturesComputedEvent(BaseModel):
     the relevant upstream feature streams without re-walking the v5 shard
     matrix.
 
-    Schema identical between batch (``pipeline_mode=batch_*``) and live
-    (``pipeline_mode=live_websocket``) per CLAUDE.md "Live = batch" rule —
+    Schema identical between batch (``pipeline_mode=batch_<source>``) and live
+    (``pipeline_mode=live_<source>``) per CLAUDE.md "Live = batch" rule —
     only the trigger source differs. Banned: a parallel
     ``BatchFeaturesComputedEvent`` shape.
 
@@ -356,7 +357,7 @@ class FeaturesComputedEvent(BaseModel):
     emission_policy: ServiceEmissionPolicy = ServiceEmissionPolicy.STRICT_FAIL
     emission_outcome: EmissionOutcome = "PUBLISHED_OK"
     policy_decision_reason: str | None = None
-    pipeline_mode: PipelineMode = PipelineMode.LIVE_WEBSOCKET
+    pipeline_mode: PipelineMode | None = None
     correlation_id: str
     vm_name: str
 
@@ -381,8 +382,9 @@ class InstrumentCacheRefreshTriggerEvent(BaseModel):
     * ``catalog_refresh_at`` is when the catalog parquet was finalised.
     * ``row_count_total`` is the canonical full-catalog row count
       post-refresh (snapshot view, not delta).
-    * ``pipeline_mode`` defaults to :attr:`PipelineMode.LIVE_WEBSOCKET`;
-      catalog snapshots refreshed during a batch replay override.
+    * ``pipeline_mode`` is optional producer-unset metadata (defaults to
+      ``None``); the manifest stamp is set source-aware by the recorder
+      implementer, not from this field.
     """
 
     event_type: Literal["INSTRUMENT_CACHE_REFRESH_TRIGGER"] = "INSTRUMENT_CACHE_REFRESH_TRIGGER"
@@ -405,7 +407,7 @@ class InstrumentCacheRefreshTriggerEvent(BaseModel):
         ...,
         ge=0,
     )
-    pipeline_mode: PipelineMode = PipelineMode.LIVE_WEBSOCKET
+    pipeline_mode: PipelineMode | None = None
     correlation_id: str
     vm_name: str
 

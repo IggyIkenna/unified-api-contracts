@@ -882,6 +882,58 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
     return VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE.get((asset_group.lower(), normalised))
 
 
+def valid_data_types_for_venue_instrument_type(
+    asset_group: str, venue: str | None, instrument_type: str
+) -> frozenset[str] | None:
+    """Per-``(venue, instrument_type)`` valid data_types — DeFi protocol-grain.
+
+    :func:`valid_data_types_for_instrument_type` builds the DeFi validity set as
+    the UNION across every protocol that declares an instrument_type, so a
+    hybrid protocol's data_types leak to every instrument of that type — e.g.
+    GMX declares both ``pool`` and ``perp_funding`` → ``perp_funding`` reads as
+    valid for ALL pools incl. Uniswap → residual false ``expected_unattempted``
+    for non-GMX pools.
+
+    This narrows DeFi validity to the SPECIFIC protocol named by ``venue`` (the
+    ``PROTOCOL`` segment of the canonical ``PROTOCOL-CHAIN`` id, e.g.
+    ``UNISWAP_V3-ETHEREUM`` → ``uniswap_v3``): it returns ONLY that protocol's
+    declared data_types. For every NON-DeFi asset_group, a missing ``venue``, an
+    unmapped protocol, OR an instrument_type the protocol does not declare, it
+    DELEGATES to :func:`valid_data_types_for_instrument_type` — i.e. it only ever
+    narrows in the clearly-safe case and never under-reports a real cell.
+
+    Returns:
+        frozenset[str] — the valid data_types (narrowed for a known DeFi protocol).
+        None           — unmapped (delegated) → caller falls back to ALL.
+    """
+    if asset_group.lower() != "defi" or not venue:
+        return valid_data_types_for_instrument_type(asset_group, instrument_type)
+
+    from .capability_declarations._defi import PROTOCOL_CAPABILITIES  # noqa: imports-inside-functions
+
+    # Venue id is ``PROTOCOL-CHAIN``; the protocol segment keys PROTOCOL_CAPABILITIES.
+    protocol = venue.split("-", 1)[0].strip().lower()
+    cap = PROTOCOL_CAPABILITIES.get(protocol)
+    if cap is None:
+        # Belt-and-suspenders: match on the declared ``venue_prefix`` too.
+        for candidate in PROTOCOL_CAPABILITIES.values():
+            if candidate.venue_prefix.strip().lower() == protocol:
+                cap = candidate
+                break
+    if cap is None:
+        # Unmapped protocol → preserve the union behaviour (no regression).
+        return valid_data_types_for_instrument_type(asset_group, instrument_type)
+
+    normalised_it = instrument_type.strip().lower() if instrument_type else ""
+    normalised_it = _INSTRUMENT_TYPE_ALIASES.get(normalised_it, normalised_it)
+    cap_its = {_INSTRUMENT_TYPE_ALIASES.get(_it.strip().lower(), _it.strip().lower()) for _it in cap.instrument_types}
+    if normalised_it not in cap_its:
+        # The protocol does not declare this instrument_type → fall back to the
+        # union rather than risk dropping a real cell on an incomplete cap.
+        return valid_data_types_for_instrument_type(asset_group, instrument_type)
+    return frozenset(cap.data_types)
+
+
 # Override entries needed when:
 # - A venue's data type started later than the venue itself (e.g. Deribit options added later)
 # - A venue only supports a subset of its category's data types (e.g. CBOE has ohlcv_15m only)

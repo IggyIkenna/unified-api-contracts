@@ -67,10 +67,6 @@ class PipelineMode(StrEnum):
     :attr:`Mode.REPLAY` — enforced by ``test_source_mode_capability.py``. Every
     ``BATCH_<SOURCE>`` member still mirrors a ``SOURCE_PRIORITY`` source string.
 
-    :attr:`LIVE_WEBSOCKET` is a TRANSITIONAL alias kept for the not-yet-migrated
-    streaming objects/writers/readers — its migration to ``live_<source>`` is the
-    next tranche (M1 breaking step). Do NOT delete it.
-
     Source-aware live/replay members are landed per
     ``pipeline_mode_source_batch_live_replay_standardisation_2026_06_05.md``
     (M1/M2), ratifying ``source_mode_capability_matrix_2026_06_07.md``.
@@ -118,8 +114,6 @@ class PipelineMode(StrEnum):
     BATCH_TRANSFERMARKT = "batch_transfermarkt"
     BATCH_UNDERSTAT = "batch_understat"
     BATCH_YAHOO = "batch_yahoo"
-
-    LIVE_WEBSOCKET = "live_websocket"
 
     # ------------------------------------------------------------------
     # M1 source-aware live/replay members — a LIVE_/REPLAY_ member exists iff
@@ -271,7 +265,7 @@ def is_batch(mode: PipelineMode) -> bool:
 
 
 def is_live(mode: PipelineMode) -> bool:
-    """True if ``mode`` is any live value (``LIVE_WEBSOCKET`` or ``live_<source>``)."""
+    """True if ``mode`` is any ``live_<source>`` value."""
 
     return mode.value.startswith(_LIVE_PREFIX)
 
@@ -288,14 +282,9 @@ def source_string_for(mode: PipelineMode) -> str | None:
     Strips the leading ``{mode}_`` segment (``batch_`` / ``live_`` / ``replay_``)
     and returns the remaining source string — e.g. ``batch_tardis`` → ``tardis``,
     ``live_databento`` → ``databento``, ``replay_onchain_rpc`` → ``onchain_rpc``.
-
-    Returns ``None`` for :attr:`PipelineMode.LIVE_WEBSOCKET` alone — the
-    transitional alias has no concrete source (its migration to ``live_<source>``
-    is the next tranche).
+    Every member has a concrete source.
     """
 
-    if mode is PipelineMode.LIVE_WEBSOCKET:
-        return None
     if is_batch(mode):
         remainder = mode.value.removeprefix(_BATCH_PREFIX)
     elif is_replay(mode):
@@ -319,11 +308,8 @@ def transport_of(mode: PipelineMode) -> str | None:
     >1 transport for the SAME shard — no source does today, so this returns ``None``
     for every current member. The manifest ``transport`` COLUMN is populated
     regardless, via :func:`default_transport_for_source` (or an explicit writer
-    value). ``None`` for :attr:`PipelineMode.LIVE_WEBSOCKET` (transitional alias —
-    no concrete source/transport).
+    value).
     """
-    if mode is PipelineMode.LIVE_WEBSOCKET:
-        return None
     for prefix in (_BATCH_PREFIX, _LIVE_PREFIX, _REPLAY_PREFIX):
         if mode.value.startswith(prefix):
             _source, transport = _split_transport(mode.value.removeprefix(prefix))
@@ -446,8 +432,8 @@ class Cadence(StrEnum):
 def mode_of(pipeline_mode: PipelineMode) -> Mode:
     """Return the abstract :class:`Mode` for a concrete :class:`PipelineMode`.
 
-    Today only ``batch_*`` and ``live_websocket`` exist; once M1 lands
-    ``live_<source>`` / ``replay_<source>``, this keys off the leading segment.
+    M1 has landed: source-aware ``batch_<source>`` / ``live_<source>`` /
+    ``replay_<source>`` members exist, and this keys off the leading segment.
     """
 
     value = pipeline_mode.value
