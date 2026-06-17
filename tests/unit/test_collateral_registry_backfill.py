@@ -139,7 +139,7 @@ def test_drift_accepts_solana_lsts() -> None:
     accepted = set(drift.accepted_assets())
     assert {"mSOL", "JitoSOL"} <= accepted
     msol = next(ah for ah in drift.accepted_collateral if ah.asset == "mSOL")
-    assert msol.haircut_pct == Decimal("10")
+    assert msol.haircut_pct == Decimal("20")  # probed 2026-06-17: Drift initialAssetWeight 0.80
 
 
 def test_aave_per_asset_ltv() -> None:

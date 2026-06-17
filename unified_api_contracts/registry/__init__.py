@@ -248,6 +248,7 @@ from .market_data_categories import (
     needs_candle_processing,
     resolve_data_type_for_feature_group,
     valid_data_types_for_instrument_type,
+    valid_data_types_for_venue_instrument_type,
     validate_data_type_for_venue,
 )
 from .max_underlying_moves import (
@@ -1078,6 +1079,7 @@ __all__ = [
     "to_canonical_venue",
     "token_matches_major_assets",
     "valid_data_types_for_instrument_type",
+    "valid_data_types_for_venue_instrument_type",
     "validate_data_type_for_venue",
     "validate_instruction",
     "validate_mode_env_auth",
