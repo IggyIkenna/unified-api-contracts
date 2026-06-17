@@ -92,6 +92,17 @@ class PipelineMode(StrEnum):
     # candleSnapshot) AND a CeFi/DeFi live+replay venue — so it carries BATCH here
     # plus LIVE_HYPERLIQUID / REPLAY_HYPERLIQUID (in the CeFi-venue block below).
     BATCH_HYPERLIQUID = "batch_hyperliquid"
+    # aster is a UNIFIED vendor like hyperliquid (perp_funding_data_semantics_and_cadence
+    # _2026_06_16.md §genesis): the Aster native API (fapi.asterdex.com — Binance
+    # Futures-compatible) serves perp funding + premiumIndex over a HISTORICAL
+    # time-range REST endpoint (startTime/endTime), so it is a CeFi BATCH source for
+    # its own venue (NOT Tardis — Aster is reclassified CeFi on-chain CLOB but has its
+    # own native archive). source=``aster``, transport=``rest`` (a column, not the
+    # name). Carries BATCH here + LIVE_ASTER / REPLAY_ASTER (in the CeFi-venue block
+    # below). The Aster derivative_ticker shard resolves to this via the UTL
+    # ``_VENUE_OVERRIDES["ASTER"]`` venue override (the hyperliquid pattern) so only
+    # ASTER — not the Tardis-archived CeFi venues — picks ``batch_aster``.
+    BATCH_ASTER = "batch_aster"
     BATCH_MASSIVE = "batch_massive"
     # MTDS L2 microstructure computed outputs (order_flow_imbalance /
     # depth_of_book_10 / queue_position) — derived from the canonical
@@ -176,9 +187,14 @@ class PipelineMode(StrEnum):
     # CeFi `live`/`replay` source = the EXCHANGE. The SAME shard carries
     # source=tardis in batch and source=<venue> in live/replay (the row-level
     # `source` column models this). There is NO batch_<venue> member — the venue
-    # is not a batch/archive source. Bybit/Aster are LIVE-only: their public REST
-    # is recent-only (no time-range tick), so a live-downtime gap waits for batch
-    # (T+1) — replay is ABSENT, a FACT, not a pending decision.
+    # is not a batch/archive source. Bybit is LIVE-only: its public REST is
+    # recent-only (no time-range tick), so a live-downtime gap waits for batch
+    # (T+1) — replay is ABSENT, a FACT, not a pending decision. **Aster is the ONE
+    # exception** (like hyperliquid): its native ``fapi.asterdex.com`` funding/
+    # premiumIndex REST IS a historical time-range endpoint (verified 2026-06-16,
+    # ``perp_funding_data_semantics_and_cadence_2026_06_16.md``), so it carries
+    # BATCH_ASTER (above) + REPLAY_ASTER here — a self-archiving venue, not
+    # Tardis-archived.
     # ------------------------------------------------------------------
     LIVE_BINANCE = "live_binance"
     REPLAY_BINANCE = "replay_binance"
@@ -192,6 +208,7 @@ class PipelineMode(StrEnum):
     REPLAY_HYPERLIQUID = "replay_hyperliquid"
     LIVE_BYBIT = "live_bybit"
     LIVE_ASTER = "live_aster"
+    REPLAY_ASTER = "replay_aster"
 
 
 _BATCH_PREFIX: Final[str] = "batch_"
