@@ -317,6 +317,36 @@ class GapSummary(BaseModel):
     )
 
 
+class ParamSchemaSpec(BaseModel):
+    """One config parameter of an archetype engine — the flat schema the wizard
+    renders a numeric/enum form field from.
+
+    The exporter sources these from the strategy-service engine SSOT
+    (``strategy_service.engine.strategies.v2.param_schema.PARAM_SCHEMA_REGISTRY``,
+    probed in the service's own venv). Defaults are the ENGINE defaults (never
+    the e2e-smoke constants). One row per param; required params with no literal
+    default carry ``default=None``.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    name: str = Field(description="Param key as read from the flat engine params dict (e.g. ``entry_bps``).")
+    type: str = Field(description="One of ``int`` | ``float`` | ``decimal`` | ``str`` | ``enum`` | ``bool``.")
+    default: str | None = Field(
+        default=None,
+        description="Engine default (stringified). ``None`` for a required param with no literal default.",
+    )
+    required: bool = Field(
+        default=False,
+        description="True iff the engine raises / no-ops (returns ``[]``) when the param is absent.",
+    )
+    units: str | None = Field(default=None, description="Unit label (``bps``/``fraction``/``ms``/``vega``/…).")
+    enum_values: list[str] = Field(default_factory=list, description="Allowed values when ``type == 'enum'``.")
+    min: str | None = Field(default=None, description="Inclusive lower bound (stringified), when known.")
+    max: str | None = Field(default=None, description="Inclusive upper bound (stringified), when known.")
+    source: str | None = Field(default=None, description="Engine ``file:line`` provenance for the default.")
+
+
 class CapabilityManifest(BaseModel):
     """Root capability manifest — the machine-generated SSOT of what the
     system can do, expressed as a typed graph of nodes and edges.
@@ -356,6 +386,17 @@ class CapabilityManifest(BaseModel):
         default_factory=GapSummary,
         description="Aggregate gap counts, recomputed on serialisation.",
     )
+    param_schema: dict[str, list[ParamSchemaSpec]] = Field(
+        default_factory=dict,
+        description=(
+            "Per-archetype flat config PARAM SCHEMA, keyed by archetype node_id "
+            "(``StrategyArchetype`` value, e.g. ``CARRY_STAKED_BASIS``). The wizard "
+            "renders each archetype's numeric/enum param form from this block. "
+            "Sourced from the strategy-service engine SSOT (engine defaults — F4). "
+            "Empty when the strategy-service probe is unavailable (the manifest still "
+            "generates honestly without it)."
+        ),
+    )
 
     def to_canonical_dict(self) -> dict[str, object]:
         """Deterministic serialisation for JSON drift detection.
@@ -390,12 +431,19 @@ class CapabilityManifest(BaseModel):
                 key = str(edge.gap_type)
                 if key in gap_counts:
                     gap_counts[key] += 1
+        # Per-archetype param schema — sorted by archetype id; each param list keeps
+        # the engine's declaration order (stable across runs).
+        sorted_param_schema = {
+            archetype: [spec.model_dump() for spec in self.param_schema[archetype]]
+            for archetype in sorted(self.param_schema)
+        }
         return {
             "manifest_version": self.manifest_version,
             "generated_from_commit": self.generated_from_commit,
             "nodes": sorted_nodes,
             "edges": sorted_edges,
             "gaps": gap_counts,
+            "param_schema": sorted_param_schema,
         }
 
 
@@ -415,4 +463,5 @@ __all__ = [
     "CapabilityNode",
     "CapabilityNodeKind",
     "GapSummary",
+    "ParamSchemaSpec",
 ]
