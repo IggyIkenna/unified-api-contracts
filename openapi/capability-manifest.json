@@ -18638,7 +18638,47 @@
       "reason": null,
       "relation": "supports",
       "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:curve"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
       "to_node_id": "venue:jupiter"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:orca"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:raydium"
     },
     {
       "agent_annotation": null,
@@ -18858,7 +18898,47 @@
       "reason": null,
       "relation": "supports",
       "status": "available",
+      "to_node_id": "venue:binance"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:curve"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
       "to_node_id": "venue:jupiter"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:orca"
+    },
+    {
+      "agent_annotation": null,
+      "from_node_id": "leg:CARRY_STAKED_BASIS_DATED:spot",
+      "gap_type": null,
+      "readiness": null,
+      "reason": null,
+      "relation": "supports",
+      "status": "available",
+      "to_node_id": "venue:raydium"
     },
     {
       "agent_annotation": null,
@@ -24433,7 +24513,7 @@
     "orphan_nodes": 81,
     "unbuilt_dead_ends": 159
   },
-  "generated_from_commit": "0ef831373a2ae7d8b0823be035cf5b7f126af8b1",
+  "generated_from_commit": "f0b66b2659c1843cbd7e4fabad91a66963e3af55",
   "manifest_version": "1.0.0",
   "nodes": [
     {

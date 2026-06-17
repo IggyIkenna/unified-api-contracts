@@ -97,6 +97,32 @@ def test_staked_basis_is_multi_leg_not_single_staking_cell() -> None:
     assert "deribit" in hedge.eligible_venue_ids
 
 
+def test_staked_basis_spot_leg_is_selectable_venue_axis() -> None:
+    """Plan ``defi_collateral_sizing_and_wizard_full_parameterization_2026_06_17``
+    Phase D: the spot leg (USDC→native SWAP) is a SELECTABLE venue axis (Binance
+    vs DEX, liquidity-driven), no longer just {uniswap_v3, jupiter}.
+
+    The SWAP trades USDC↔native (ETH/SOL), so the eligible set is the realistic
+    liquid USDC↔native spot venues across both families: a CEX (binance) + the
+    family DEXes (uniswap_v3/curve for ETH; jupiter/orca/raydium for SOL).
+    """
+
+    struct = leg_structure_for(StrategyArchetype.CARRY_STAKED_BASIS)
+    assert struct is not None
+    spot = struct.leg("spot")
+    assert spot is not None
+    venues = set(spot.eligible_venue_ids)
+    # >2 venues now (was {uniswap_v3, jupiter})
+    assert len(venues) > 2
+    # Binance-spot is now selectable (the operator's headline ask).
+    assert "binance" in venues
+    # The original DEX venues survive.
+    assert "uniswap_v3" in venues
+    assert "jupiter" in venues
+    # The added family DEXes.
+    assert {"curve", "orca", "raydium"}.issubset(venues)
+
+
 def test_staked_basis_collateral_conditional_with_fallback() -> None:
     """The requires_collateral_acceptance constraint + straight_basis fallback."""
 
