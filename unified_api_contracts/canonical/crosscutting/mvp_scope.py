@@ -66,6 +66,35 @@ from unified_api_contracts.registry.cefi_instrument_universe import (
 # kept importable here + at the package root for backwards compatibility).
 _canonical_repr = canonical_config_repr
 
+
+# Venues whose canonical pipeline form is the bare base token but whose MVP rule
+# declares SUB-VENUES (so an unsuffixed caller still resolves). OKX is the only
+# one today: the catalogue + manifest carry ``OKX-SPOT`` / ``OKX-SWAP`` /
+# ``OKX-FUTURES`` but legacy callers (+ some registries) pass the bare ``OKX``.
+# A bare token that base-normalises to a key here matches ANY of that key's
+# sub-venues for the (instrument_type) axis. (mvp_instrument_universe_gap_audit
+# P2 #1, 2026-06-17.)
+_CEFI_SUB_VENUE_BASES: Final[frozenset[str]] = frozenset({"OKX"})
+
+
+def _cefi_venue_in_rule(venue: str, rule_venues: frozenset[str]) -> bool:
+    """Match a CeFi ``venue`` against the rule's venue set, OKX-aware.
+
+    Direct membership first (``OKX-SPOT`` ∈ rule). Then, when the caller passes a
+    BARE base token (``OKX``) whose base is in :data:`_CEFI_SUB_VENUE_BASES`, it
+    matches iff the rule declares ANY sub-venue with that base (``OKX-SPOT`` /
+    ``OKX-SWAP`` / ``OKX-FUTURES``) — so ``is_mvp("cefi", "OKX", …)`` resolves the
+    instrument-grain question "is this OKX instrument in scope" without the caller
+    knowing the exact sub-venue. (mvp_instrument_universe_gap_audit P2 #1.)
+    """
+    if venue in rule_venues:
+        return True
+    base = venue.strip().upper().split("-", 1)[0] if venue else ""
+    if base not in _CEFI_SUB_VENUE_BASES:
+        return False
+    return any(rv.split("-", 1)[0] == base for rv in rule_venues)
+
+
 # ---------------------------------------------------------------------------
 # Typed, immutable rule structures
 # ---------------------------------------------------------------------------
@@ -243,7 +272,17 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "BINANCE-SPOT",
                 "BINANCE-FUTURES",
                 "BYBIT",
-                "OKX",
+                # OKX is captured under canonical SUB-VENUE names in the
+                # instruments-store catalogue + the rest of the pipeline
+                # (OKX-SPOT / OKX-SWAP / OKX-FUTURES — like BINANCE-SPOT /
+                # BINANCE-FUTURES), NOT the bare ``OKX`` token. Declaring the
+                # sub-venues here makes ``is_mvp("cefi", "OKX-SPOT", …)`` etc.
+                # match; the predicate also base-venue-token-normalises so a
+                # bare ``OKX`` caller still resolves (mvp_instrument_universe_gap_audit
+                # P2 #1, 2026-06-17).
+                "OKX-SPOT",
+                "OKX-SWAP",
+                "OKX-FUTURES",
                 "DERIBIT",
                 "HYPERLIQUID",
                 "ASTER",
@@ -527,8 +566,17 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 2
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 3
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v3 (2026-06-17): CeFi venue set reconciled from the bare ``OKX`` token to the
+canonical sub-venues ``OKX-SPOT`` / ``OKX-SWAP`` / ``OKX-FUTURES`` (the form the
+instruments-store catalogue + the rest of the pipeline use), so OKX instruments
+tag MVP. A bare ``OKX`` caller still resolves via the predicate's base-venue-token
+normalisation (``_cefi_venue_in_rule``). Also introduced the unbound-data_type
+convention in ``is_mvp`` (``data_type`` blank → "any MVP data_type") — predicate
+behaviour, not config content, but versioned together. (mvp_instrument_universe_gap_audit
+P2 #1 + #2.)
 
 v2 (2026-06-17): CeFi ``base_ccys`` reconciled from the 4-base BTC/ETH/SOL/USDT
 set to the 44-base ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed SSOT), added
@@ -560,11 +608,29 @@ def mvp_scope_config_descriptor() -> ConfigDescriptor:
 # ---------------------------------------------------------------------------
 
 
+def _data_type_in_rule(data_type: str | None, rule_data_types: frozenset[str]) -> bool:
+    """Match a ``data_type`` against a rule's declared data_types — UNBOUND-aware.
+
+    Convention (mvp_instrument_universe_gap_audit P2 #2, 2026-06-17): a blank
+    ``data_type`` (``""`` / ``None``) means **"any MVP data_type"** — an
+    instrument-grain caller carries no data_type axis (the instrument exists
+    across ALL the AG's data_types), so the membership question is "is this
+    (venue, instrument_type, base) MVP for ANY of the rule's data_types". A blank
+    data_type therefore matches iff the rule declares at least one data_type
+    (always true today). A NON-blank data_type must be an explicit member. This
+    lets every single-grain consumer call ``is_mvp`` cleanly without inventing a
+    fake "representative" data_type locally.
+    """
+    if not data_type:
+        return bool(rule_data_types)
+    return data_type in rule_data_types
+
+
 def is_mvp(
     asset_group: str,
     venue: str,
     instrument_type: str,
-    data_type: str,
+    data_type: str | None = None,
     *,
     base_ccy: str | None = None,
     league: str | None = None,
@@ -577,9 +643,13 @@ def is_mvp(
 
     1. ``asset_group`` is declared in :data:`MVP_SCOPE`.
     2. ``(venue, instrument_type)`` is declared in the rule for that
-       ``asset_group``.
-    3. ``data_type`` is declared in the rule (or the rule has no
-       data_type constraint — impossible today; all rules declare one).
+       ``asset_group``. For CeFi, a BARE ``OKX`` caller resolves to the
+       canonical ``OKX-SPOT`` / ``OKX-SWAP`` / ``OKX-FUTURES`` sub-venues
+       (:func:`_cefi_venue_in_rule`).
+    3. ``data_type`` is declared in the rule, OR ``data_type`` is blank
+       (``""`` / ``None``) — the **unbound / any-MVP-data_type** convention for
+       instrument-grain callers (:func:`_data_type_in_rule`). A blank data_type
+       matches when the rule declares at least one data_type.
     4. If the rule declares ``base_ccys`` (non-empty), ``base_ccy`` must
        be in that set.
     5. If the rule declares ``underliers`` (non-empty, TradFi only), the
@@ -641,13 +711,13 @@ def is_mvp(
         return False
 
     if isinstance(rule, CeFiMvpRule):
-        # Axis 1+2: venue + instrument_type
-        if venue not in rule.venues:
+        # Axis 1+2: venue + instrument_type (OKX bare → sub-venue aware)
+        if not _cefi_venue_in_rule(venue, rule.venues):
             return False
         if instrument_type not in rule.instrument_types:
             return False
-        # Axis 3: data_type
-        if data_type not in rule.data_types:
+        # Axis 3: data_type (blank → any MVP data_type, unbound-grain convention)
+        if not _data_type_in_rule(data_type, rule.data_types):
             return False
         # Axis 4: base_ccy (optional — if rule has a non-empty set, must match).
         # OPTION cells use the narrower options carve-out (Deribit-options =
@@ -666,7 +736,7 @@ def is_mvp(
             return False
         if instrument_type not in rule.instrument_types:
             return False
-        if data_type not in rule.data_types:
+        if not _data_type_in_rule(data_type, rule.data_types):
             return False
         return not (rule.sources and source not in rule.sources)
 
@@ -675,7 +745,7 @@ def is_mvp(
             return False
         if instrument_type not in rule.instrument_types:
             return False
-        if data_type not in rule.data_types:
+        if not _data_type_in_rule(data_type, rule.data_types):
             return False
         # Axis: underlier — base_ccy carries the underlier code for TradFi
         if rule.underliers and base_ccy not in rule.underliers:
@@ -688,12 +758,12 @@ def is_mvp(
         # providers, not instrument classification axes for sports).
         if league not in rule.leagues:
             return False
-        return data_type in rule.data_types
+        return _data_type_in_rule(data_type, rule.data_types)
 
     if isinstance(rule, PredictionMvpRule):
         if venue not in rule.venues:
             return False
-        if data_type not in rule.data_types:
+        if not _data_type_in_rule(data_type, rule.data_types):
             return False
         if rule.market_groups and market_group not in rule.market_groups:
             return False
