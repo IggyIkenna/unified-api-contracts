@@ -219,6 +219,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BYBIT",
         "OKX",
         "DERIBIT",
+        # DERIBIT-COMBO: multi-leg combo/spread instruments fetched from Deribit's
+        # public get_instruments (future_combo + option_combo kinds). Registered as a
+        # DISTINCT venue (instruments-service VENUE_TO_ADAPTER["DERIBIT-COMBO"]="deribit_combo",
+        # its own manifest shard) — the validation registry MUST know it or every fetched
+        # combo is rejected "unknown venue" (the venue had 0 captured days 2026-05-23→06-18
+        # until the kind-split + venue-tag fixes 2026-06-18). instrument_key stays DERIBIT:COMBO:*.
+        "DERIBIT-COMBO",
         "UPBIT",
         "COINBASE",
         # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
