@@ -266,6 +266,17 @@ from .canonical.crosscutting.synthetic_generator import (
     get_generator_spec,
     register_generator,
 )
+from .canonical.crosscutting.total_universe import (
+    TOTAL_UNIVERSE_AXES,
+    TOTAL_UNIVERSE_CONFIG_HASH,
+    TOTAL_UNIVERSE_CONFIG_VERSION,
+    UniverseAxis,
+    UniverseProvenance,
+    UniverseTier,
+    is_total_universe,
+    total_universe_config_descriptor,
+    universe_membership,
+)
 from .canonical.crosscutting.transfer_events import (
     BusTransferType,
     TransferIntent,
@@ -2283,6 +2294,16 @@ __all__ = [
     "SportsMvpRule",
     "PredictionMvpRule",
     "FeaturesModelsMvpStub",
+    # Total-reasonable (could-exist) universe SSOT — distinct from MVP (B2)
+    "TOTAL_UNIVERSE_AXES",
+    "TOTAL_UNIVERSE_CONFIG_HASH",
+    "TOTAL_UNIVERSE_CONFIG_VERSION",
+    "UniverseAxis",
+    "UniverseProvenance",
+    "UniverseTier",
+    "is_total_universe",
+    "total_universe_config_descriptor",
+    "universe_membership",
     # Per-config versioning descriptors (sports-leagues + prediction-markets)
     "SPORTS_LEAGUES_CONFIG_HASH",
     "SPORTS_LEAGUES_CONFIG_VERSION",
