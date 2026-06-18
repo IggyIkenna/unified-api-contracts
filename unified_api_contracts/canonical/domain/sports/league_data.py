@@ -78,11 +78,18 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 }
 
 
-# Per-(source, data_type) override when a specific entity from a source has
-# a later coverage start than the source-wide value. Probed live 2026-04-30:
-# SFI's source-wide coverage is 2019-01-01 (leagues, day-list endpoint), but
-# /matches/view/progressive/ returns empty for every match before 2020-01-01,
-# so SFI_PROGRESSIVE_STATS gets its own later floor here.
+# Per-(source, data_type) override for a specific data_type whose effective
+# coverage start differs from the source-wide value — either an EARLIER date
+# (the source genuinely has data before the source-wide floor; e.g. understat
+# XG data back to 2014 vs the source-wide 2015-01-16) or a LATER date (the
+# specific endpoint only became available / our backfill only starts later;
+# e.g. SFI_PROGRESSIVE_STATS or api_football per-fixture detail endpoints).
+#
+# get_source_coverage_start() checks this dict first and returns the override
+# when present, so both earlier and later values are respected.
+#
+# SFI example: source-wide 2019-01-01, but /matches/view/progressive/ returns
+# empty for every match before 2020-01-01 — probed live 2026-04-30.
 #
 # api_football per-fixture endpoints (events/lineups/statistics/players) all
 # nominally have data going back to 2017-10 per live probes (2026-05-01),
@@ -93,6 +100,12 @@ SOURCE_COVERAGE_START: dict[str, date] = {
 # features can't trade on dates without odds anyway. So we declare
 # 2020-06-06 as the effective coverage start (matches odds_api) and stop
 # counting pre-cutoff dates as missing.
+#
+# understat XG/XG_SHOTS: probed live — earliest rows go back to 2014-01-01,
+# earlier than the source-wide SOURCE_COVERAGE_START["understat"] 2015-01-16.
+# Per-data-type override corrects the phantom-denominator without touching the
+# source-wide floor (d2 pattern — sports_phantom_recon_and_coverage_windows
+# 2026-06-20).
 DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
     ("soccer_football_info", "SFI_PROGRESSIVE_STATS"): date(2020, 1, 1),
     # SFI_LEAGUES retired 2026-05-05 — was a static provider-catalog mapping,
@@ -101,6 +114,9 @@ DATA_TYPE_COVERAGE_START: dict[tuple[str, str], date] = {
     ("api_football", "FIXTURE_LINEUPS"): date(2020, 6, 6),
     ("api_football", "FIXTURE_STATS"): date(2020, 6, 6),
     ("api_football", "PLAYER_STATS"): date(2020, 6, 6),
+    # understat: actual data starts 2014-01-01; source-wide says 2015-01-16.
+    ("understat", "XG"): date(2014, 1, 1),
+    ("understat", "XG_SHOTS"): date(2014, 1, 1),
 }
 
 
