@@ -36,6 +36,7 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "options_chain": "15s",
     "futures_chain": "15s",
     # TradFi — pre-aggregated candles
+    "ohlcv_1s": "1s",  # Databento ohlcv-1s — fetched alongside ohlcv_1m (both L0/free); 15m/1h/24h aggregated
     "ohlcv_1m": "1m",
     "ohlcv_15m": "15m",
     "ohlcv_24h": "24h",
@@ -88,6 +89,7 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
 
 # Timeframe ordering in seconds (used for validation and aggregation)
 TIMEFRAME_SECONDS: dict[str, int] = {
+    "1s": 1,
     "15s": 15,
     "1m": 60,
     "5m": 300,
@@ -131,7 +133,8 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "tradfi": [
         "trades",
-        "ohlcv_1m",  # Databento 1m candles (base timeframe)
+        "ohlcv_1s",  # Databento ohlcv-1s (L0/free 16y) — fetched alongside ohlcv_1m; 15m/1h/24h aggregated
+        "ohlcv_1m",  # Databento 1m candles — fetched (L0/free 16y), completes the existing 1m corpus
         "ohlcv_15m",  # VIX 15m: Barchart CSV (2020-01-07→2021-04-21, discontinued) then Yahoo Finance; KRW rates
         "ohlcv_24h",  # Yahoo Finance daily rates (KRW/USD, etc.)
         "tbbo",  # Top-of-book quotes
@@ -292,6 +295,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "options_chain": True,
     "futures_chain": True,
     # TradFi — pre-aggregated but still processed (timeframe re-aggregation)
+    "ohlcv_1s": True,
     "ohlcv_1m": True,
     "ohlcv_15m": True,
     "ohlcv_24h": True,
@@ -615,7 +619,9 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     ("tradfi", "index"): frozenset({"ohlcv_1m", "ohlcv_15m", "ohlcv_24h"}),
     ("tradfi", "bond"): frozenset({"trades", "ohlcv_24h"}),  # UNCERTAIN — tradfi-owner verify
     ("tradfi", "cds"): frozenset({"trades"}),  # UNCERTAIN — tradfi-owner verify
-    ("tradfi", "event_contract"): frozenset({"trades"}),  # UNCERTAIN — tradfi-owner verify
+    # CME Globex event contracts (EC* series — ECES/ECNQ/ECGC/ECCL/ECNG/EC6E/ECBTC…) on GLBX.MDP3;
+    # captured under the 3-dataset lockdown (ohlcv-1s + ohlcv-1m fetched + trades/tbbo, all on the allowlist).
+    ("tradfi", "event_contract"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"}),
     ("tradfi", "commodity"): frozenset(  # UNCERTAIN — tradfi-owner verify
         {"trades", "ohlcv_1m", "ohlcv_24h", "tbbo", "mbp_10"}
     ),

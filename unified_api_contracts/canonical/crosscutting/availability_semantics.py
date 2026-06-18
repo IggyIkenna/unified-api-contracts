@@ -194,6 +194,7 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",
+    ("tradfi", "ohlcv_1s"): "tick_timestamp",
     ("tradfi", "ohlcv_1m"): "tick_timestamp",
     ("tradfi", "ohlcv_15m"): "tick_timestamp",
     ("tradfi", "options_chain"): "tick_timestamp",
