@@ -244,6 +244,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # NOT covered by Massive — yahoo+barchart layering via MTDS routing.
     ("tradfi", "trades"): ["massive", "databento"],
     ("tradfi", "tbbo"): ["massive", "databento"],
+    ("tradfi", "ohlcv_1s"): ["massive", "databento"],
     ("tradfi", "ohlcv_1m"): ["massive", "databento"],
     ("tradfi", "ohlcv_15m"): ["massive", "databento", "yahoo", "barchart"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
