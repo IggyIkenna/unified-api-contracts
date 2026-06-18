@@ -244,12 +244,20 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "LIGHTER-ZKSYNC",
     ],
     "tradfi": [
-        # Databento venues
+        # Databento venues — 3-dataset subscription lockdown (operator 2026-06-18):
+        # GLBX.MDP3 (CME futures+options+event contracts) + DBEQ.BASIC (NASDAQ/NYSE
+        # equities, consolidated) + CFE (CBOE — VX/VIX futures). The ICE Databento
+        # datasets (IFEU.IMPACT/IFUS.IMPACT) are OUT of the paid subscription so the
+        # ICE Databento *instruments* (Brent/Gasoil/softs/DX) were dropped from
+        # tradfi_instrument_universe.py — but ICE STAYS a venue here because the
+        # ICE/NYBOT US Dollar Index (DXY) is still sourced via Yahoo (non-Databento)
+        # under venue ICE, and the market-session / data-status / source-resolution
+        # registries key off it. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
         "NASDAQ",
         "NYSE",
         "CME",
-        "ICE",
-        "CBOE",
+        "ICE",  # Yahoo-sourced ICE/NYBOT DXY index only (no ICE Databento datasets)
+        "CBOE",  # Cboe Futures Exchange (CFE) — VX / VIX futures
         # External data providers
         "FX",  # FX rates (KRW/USD via Yahoo Finance data provider)
         "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)

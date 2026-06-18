@@ -174,12 +174,18 @@ _CME_CRYPTO_FUTURES: list[DatabentoInstrumentDef] = [
 # date-futures arb archetype needs CME futures + Deribit futures (same expiry
 # day), and CME futures + the BlackRock NASDAQ ETF cover spot exposure.
 # Re-add the BATS/ARCA-listed ETFs only if a new strategy archetype needs them.
+#
+# Dataset = DBEQ.BASIC (3-dataset subscription lockdown, operator 2026-06-18):
+# we pay for the consolidated Databento US Equities feed, NOT the per-venue
+# direct feeds (XNAS.ITCH / ARCX.PILLAR / BATS.PITCH). Every US-equity ETF /
+# stock is fetched from DBEQ.BASIC. SSOT:
+# codex/02-data/tradfi-databento-sourcing-ssot.md + databento_subscription_allowlist.py.
 _BTC_SPOT_ETFS: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("IBIT", "NASDAQ", "ETF", "XNAS.ITCH", "raw_symbol", "BTC", "crypto", "IBIT", "BTC"),
+    DatabentoInstrumentDef("IBIT", "NASDAQ", "ETF", "DBEQ.BASIC", "raw_symbol", "BTC", "crypto", "IBIT", "BTC"),
 ]
 
 _ETH_SPOT_ETFS: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("ETHA", "NASDAQ", "ETF", "XNAS.ITCH", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
+    DatabentoInstrumentDef("ETHA", "NASDAQ", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
 ]
 
 # CME ES options — full E-mini S&P 500 options surface.
@@ -218,35 +224,29 @@ _CME_ES_OPTIONS: list[DatabentoInstrumentDef] = [
 ]
 
 # ---------------------------------------------------------------------------
-# ICE futures — Europe (IFEU.IMPACT)
+# ICE instruments — DROPPED (3-dataset subscription lockdown, operator 2026-06-18)
 # ---------------------------------------------------------------------------
-_ICE_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("BRN.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "BRENT", "commodity", "BRN"),
-    DatabentoInstrumentDef("G.FUT", "ICE", "FUTURE", "IFEU.IMPACT", "parent", "GASOIL", "commodity", "G"),
-]
+# Brent (BRN), Gasoil (G) on IFEU.IMPACT and the US softs (CT/CC/KC/SB/OJ) +
+# ICE Dollar-Index future (DX) on IFUS.IMPACT are OUT of the paid subscription:
+# we pay for ONLY GLBX.MDP3 + DBEQ.BASIC + CFE. Querying IFEU.IMPACT/IFUS.IMPACT
+# would be billed silently, so the universe must not list them and
+# `assert_dataset_allowed` raises if anything tries. Re-adding any of these
+# requires an explicit ICE subscription + adding the dataset to the allowlist.
+# (The Yahoo-sourced DXY cash index in YAHOO_INDICES is a SEPARATE, non-Databento
+# series and is unaffected.) SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
 
 # ---------------------------------------------------------------------------
-# ICE futures — US Softs (IFUS.IMPACT)
-# CT was previously (incorrectly) listed under _CME_COMMODITY_FUTURES with
-# GLBX.MDP3. Cotton No. 2 has traded exclusively on ICE Futures US since ICE
-# acquired NYBOT in 2007; CME/GLBX.MDP3 does not carry it.
+# CBOE / CFE — VX (VIX) futures
 # ---------------------------------------------------------------------------
-_ICE_US_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("CT.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "COTTON", "commodity", "CT"),
-    DatabentoInstrumentDef("CC.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "COCOA", "commodity", "CC"),
-    DatabentoInstrumentDef("KC.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "COFFEE", "commodity", "KC"),
-    DatabentoInstrumentDef("SB.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "SUGAR", "commodity", "SB"),
-    DatabentoInstrumentDef("OJ.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "OJ", "commodity", "OJ"),
-    DatabentoInstrumentDef("DX.FUT", "ICE", "FUTURE", "IFUS.IMPACT", "parent", "DOLLARINDEX", "fx", "DX"),
+# CFE = Cboe Futures Exchange (the third subscribed dataset). VX = VIX futures.
+# Databento CFE parent symbology: "VX.FUT" fetches all listed VX contract months.
+# NOTE: CFE gives VIX *futures* (VX), NOT the VIX *cash index* — the 15m cash
+# index stays on the Barchart+Yahoo path (registry/data_source_continuity.py),
+# unaffected by this entry. Venue token = CBOE (already a tradfi venue with
+# FUTURE capability); CFE is the Databento *dataset*, CBOE is the canonical venue.
+_CFE_FUTURES: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("VX.FUT", "CBOE", "FUTURE", "CFE", "parent", "VIX", "equity", "VX"),
 ]
-
-# ---------------------------------------------------------------------------
-# CBOE / CFE
-# ---------------------------------------------------------------------------
-# CBOE VX futures: XCBF.PITCH only supports stype_in=raw_symbol with explicit
-# contract codes (e.g. "VXH6" for March 2026). Parent/continuous symbology not
-# supported.  TODO: generate front-month VX symbols dynamically from target date.
-_CBOE_INSTRUMENTS: list[DatabentoInstrumentDef] = []
 
 # ---------------------------------------------------------------------------
 # CME Event Contracts — binary YES/NO settlement on macro/financial underliers.
@@ -290,9 +290,7 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CME_CRYPTO_FUTURES,
     *_CME_ES_OPTIONS,
     *_CME_EVENT_CONTRACTS,
-    *_ICE_FUTURES,
-    *_ICE_US_FUTURES,
-    *_CBOE_INSTRUMENTS,
+    *_CFE_FUTURES,
     *_BTC_SPOT_ETFS,
     *_ETH_SPOT_ETFS,
 ]
@@ -334,6 +332,9 @@ YAHOO_INDICES: list[YahooIndexDef] = [
     # ICE/NYBOT US Dollar Index — daily ohlcv_24h via Yahoo (DX-Y.NYB).
     # Full history back to 2019-01-02 (1,864 bars empirically confirmed 2026-06-11).
     # 1h is capped to the last 730 days by Yahoo; use daily for long history.
+    # Venue stays ICE: DXY is the ICE/NYBOT US Dollar Index, sourced via Yahoo
+    # (NOT Databento), so ICE remains a valid tradfi venue for this non-Databento
+    # index even though the ICE Databento datasets are out of the subscription.
     YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", date(2019, 1, 2), "fx"),
     # CBOE interest-rate indices — daily ohlcv_24h via Yahoo. Each "close" is the
     # par yield in percent (e.g. 4.53 = 4.53%). Full history back to 2000-01-03
@@ -382,7 +383,6 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "HG": "COPPER",
     "MHG": "COPPER",
     # Agriculture
-    "CT": "COTTON",
     "ZS": "SOYBEANS",
     "ZC": "CORN",
     "ZW": "WHEAT",
@@ -390,17 +390,8 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "ZM": "SOYBEAN_MEAL",
     "LE": "LIVECATTLE",
     "HE": "LEANHOGS",
-    # VIX
+    # VIX / VX futures (CFE dataset)
     "VX": "VIX",
-    # ICE energy (Europe)
-    "BRN": "BRENT",
-    "G": "GASOIL",
-    # ICE US softs
-    "CC": "COCOA",
-    "KC": "COFFEE",
-    "SB": "SUGAR",
-    "OJ": "OJ",
-    "DX": "DOLLARINDEX",
     # Crypto
     "BTC": "BTC",
     "ETH": "ETH",
