@@ -1,7 +1,7 @@
 """Tests for the archetype → execution-algorithm compatibility registry (Phase 6A).
 
 Covers:
-  - Exhaustive coverage: all 57 archetypes have a compatibility record.
+  - Exhaustive coverage: all 58 archetypes have a compatibility record.
   - The transcribed selector sets match selector.py's valid + default maps.
   - Impossible combinations are BLOCKED (the operator requirement): a ZERO_ALPHA
     archetype (pure staking/lending) admits ONLY BENCHMARK_FILL; a pure-SWAP (LP)
