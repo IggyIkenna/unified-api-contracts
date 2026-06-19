@@ -1326,7 +1326,11 @@ from unified_api_contracts.internal.reference import (
     PrimeBrokerEntity,
     StockSplitRecord,
     UniverseSnapshot,
+    UnknownInstrumentTypeError,
     VenueCircuitBreakerConfig,
+    asset_class_for_instrument_type,
+    derive_ledger_asset_fields,
+    instrument_type_for_action,
     validate_instrument_records,
 )
 from unified_api_contracts.internal.registry import (
@@ -2315,6 +2319,10 @@ __all__ = [
     "TreasurySourceBalance",
     "compute_nav_by_client",
     "compute_unified_nav",
+    "UnknownInstrumentTypeError",
+    "asset_class_for_instrument_type",
+    "derive_ledger_asset_fields",
+    "instrument_type_for_action",
     "validate_instrument_records",
     "validate_unity_child_book",
     # ── 342 classes added 2026-06-02 (SIT test_uic_completeness fix) ──

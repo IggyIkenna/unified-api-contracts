@@ -49,6 +49,12 @@ from unified_api_contracts.internal.reference.instrument import (
 from unified_api_contracts.internal.reference.instrument_definition import InstrumentDefinition
 from unified_api_contracts.internal.reference.instrument_key import InstrumentKey
 from unified_api_contracts.internal.reference.instrument_validation import validate_instrument_records
+from unified_api_contracts.internal.reference.ledger_asset_resolution import (
+    UnknownInstrumentTypeError,
+    asset_class_for_instrument_type,
+    derive_ledger_asset_fields,
+    instrument_type_for_action,
+)
 from unified_api_contracts.internal.reference.onchain_freshness import OnchainDataFreshnessConfig
 from unified_api_contracts.internal.reference.ticker_registry import (
     EXCHANGE_BY_TICKER,
@@ -91,10 +97,14 @@ __all__ = [
     "PrimeBrokerEntity",
     "StockSplitRecord",
     "UniverseSnapshot",
+    "UnknownInstrumentTypeError",
     "VenueCircuitBreakerConfig",
+    "asset_class_for_instrument_type",
     "build_combo_id",
     "build_instrument_id",
+    "derive_ledger_asset_fields",
     "get_instruments_available_on",
+    "instrument_type_for_action",
     "normalize_underlying",
     "resolve_exchange",
     "validate_instrument_records",
