@@ -135,7 +135,11 @@ _CEFI: dict[str, list[str]] = {
 # without editing this policy.
 # ---------------------------------------------------------------------------
 _TRADFI: dict[str, list[str]] = {
-    "CME": ["trades", "ohlcv_1m", "tbbo"],
+    # CME ohlcv_1s added 2026-06-18 (Databento subscription lockdown): we now
+    # fetch BOTH ohlcv-1s AND ohlcv-1m from GLBX.MDP3 (both L0/free 16y), so the
+    # data-status denominator must count 1s cells too. SSOT:
+    # codex/02-data/tradfi-databento-sourcing-ssot.md.
+    "CME": ["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"],
     "ICE": ["trades", "ohlcv_1m", "tbbo"],
     "CBOE": ["ohlcv_15m"],
     # NASDAQ + NYSE equity venues added 2026-05-17 per OHLCV-only MVP scope
