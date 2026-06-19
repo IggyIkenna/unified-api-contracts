@@ -6,8 +6,9 @@
 version: 0.2
 
 env:
-  secrets-manager:
-    GITHUB_TOKEN: github-pat:token
+  # NOTE: no GITHUB_TOKEN secret — UAC only builds/tests/publishes its own wheel (no repo clones).
+  # The prior `secrets-manager: GITHUB_TOKEN: github-pat:token` JSON-parsed the plain-string `github-pat`
+  # secret (starts with `github_pat_`) → "invalid character 'g'" at DOWNLOAD_SOURCE.
   variables:
     SERVICE_NAME: "unified-api-contracts"
     CLOUD_PROVIDER: "aws"
