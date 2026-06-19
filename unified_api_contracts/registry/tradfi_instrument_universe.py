@@ -238,14 +238,17 @@ _CME_ES_OPTIONS: list[DatabentoInstrumentDef] = [
 # ---------------------------------------------------------------------------
 # CBOE / CFE — VX (VIX) futures
 # ---------------------------------------------------------------------------
-# CFE = Cboe Futures Exchange (the third subscribed dataset). VX = VIX futures.
-# Databento CFE parent symbology: "VX.FUT" fetches all listed VX contract months.
-# NOTE: CFE gives VIX *futures* (VX), NOT the VIX *cash index* — the 15m cash
-# index stays on the Barchart+Yahoo path (registry/data_source_continuity.py),
-# unaffected by this entry. Venue token = CBOE (already a tradfi venue with
-# FUTURE capability); CFE is the Databento *dataset*, CBOE is the canonical venue.
+# CFE = Cboe Futures Exchange (the third subscribed feed, operator 2026-06-18).
+# VX = VIX futures. The Databento dataset CODE for the Cboe Futures Exchange is
+# ``XCBF.PITCH`` (a bare "CFE" is rejected by the API with 400 validation_failed;
+# verified live 2026-06-19). Parent symbology "VX.FUT" fetches all listed VX
+# contract months. NOTE: this gives VIX *futures* (VX), NOT the VIX *cash index*
+# — the 15m cash index stays on the Barchart+Yahoo path
+# (registry/data_source_continuity.py), unaffected by this entry. Venue token =
+# CBOE (already a tradfi venue with FUTURE capability); XCBF.PITCH is the Databento
+# *dataset*, CBOE is the canonical venue.
 _CFE_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("VX.FUT", "CBOE", "FUTURE", "CFE", "parent", "VIX", "equity", "VX"),
+    DatabentoInstrumentDef("VX.FUT", "CBOE", "FUTURE", "XCBF.PITCH", "parent", "VIX", "equity", "VX"),
 ]
 
 # ---------------------------------------------------------------------------

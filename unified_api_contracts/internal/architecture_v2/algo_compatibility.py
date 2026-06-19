@@ -434,7 +434,7 @@ def _build_registry() -> dict[StrategyArchetype, ArchetypeAlgoCompatibility]:
 
 
 ARCHETYPE_ALGO_COMPATIBILITY: Final[dict[StrategyArchetype, ArchetypeAlgoCompatibility]] = _build_registry()
-"""Per-archetype execution-algorithm compatibility — EXHAUSTIVE (all 57 archetypes).
+"""Per-archetype execution-algorithm compatibility — EXHAUSTIVE (all 58 archetypes).
 
 Derived from the leg-spec registry x the transcribed selector logic. A consumer
 (the verdict matrix, the wizard) reads this to BLOCK an impossible

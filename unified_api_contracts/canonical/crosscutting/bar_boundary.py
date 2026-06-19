@@ -98,6 +98,7 @@ from datetime import UTC, datetime, timedelta
 from typing import Final, Literal
 
 BarTimeframe = Literal[
+    "1s",
     "15s",
     "1m",
     "5m",
@@ -119,6 +120,7 @@ data-status drill-down, etc.) in the same commit.
 """
 
 BAR_TIMEFRAMES: Final[tuple[BarTimeframe, ...]] = (
+    "1s",
     "15s",
     "1m",
     "5m",
@@ -132,6 +134,7 @@ BAR_TIMEFRAMES: Final[tuple[BarTimeframe, ...]] = (
 at runtime (Literal is a static-type-only construct)."""
 
 BAR_TIMEFRAME_SECONDS: Final[dict[BarTimeframe, int]] = {
+    "1s": 1,
     "15s": 15,
     "1m": 60,
     "5m": 5 * 60,

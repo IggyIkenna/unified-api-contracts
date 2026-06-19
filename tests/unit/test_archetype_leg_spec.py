@@ -69,14 +69,14 @@ def test_not_registered_set_is_explicit_and_cited() -> None:
 
 
 def test_real_and_not_registered_partition_the_enum() -> None:
-    """real ∪ not_registered == all 57, disjoint."""
+    """real ∪ not_registered == all 58, disjoint."""
 
     real = {s.archetype_id for s in registered_leg_structures()}
     gaps = set(archetypes_without_leg_structures())
     assert real.isdisjoint(gaps)
     assert real | gaps == set(StrategyArchetype)
-    # 51 real, 6 not_registered as of Phase 6A.
-    assert len(real) == 51
+    # 52 real, 6 not_registered (CARRY_FUNDING_DISPERSION added 2026-06-19).
+    assert len(real) == 52
     assert len(gaps) == 6
 
 

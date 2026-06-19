@@ -1122,7 +1122,15 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_1m": "2019-01-01",
     },
     "CBOE": {
-        "ohlcv_15m": "2020-01-07",  # VIX — Barchart CSV start
+        "ohlcv_15m": "2020-01-07",  # VIX cash INDEX — Barchart/Yahoo (not Databento)
+        # VX FUTURES (the VIX futures curve) via Databento XCBF.PITCH (the
+        # operator's "CFE" subscription, activated 2026-06-19). Both ohlcv-1s +
+        # ohlcv-1m are L0/free 16y; coarser bars aggregate downstream. XCBF.PITCH
+        # coverage starts 2018-11-04. NOTE: these are the FUTURES, distinct from
+        # the ohlcv_15m VIX cash index above. SSOT:
+        # codex/02-data/tradfi-databento-sourcing-ssot.md.
+        "ohlcv_1s": "2018-11-04",
+        "ohlcv_1m": "2018-11-04",
     },
     "FX": {
         "ohlcv_24h": "2020-01-01",  # KRW/USD daily via Yahoo Finance
