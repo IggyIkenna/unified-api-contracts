@@ -20,26 +20,20 @@ phases:
     runtime-versions:
       python: 3.13
     commands:
+      - echo "=== Installing uv ==="
+      - pip install uv
 
   pre_build:
     commands:
       - echo "=== Installing packages ==="
-      - uv pip install -e "."
-      - uv pip install ruff pytest
+      - uv pip install --system -e "."
+      - uv pip install --system ruff pytest
 
   build:
     commands:
-      - echo "=== Running linting ==="
-      - ruff check --line-length 120 unified_api_contracts/ || exit 1
-
-      - echo "=== Running tests ==="
-      - |
-        if [ -d "tests" ]; then
-          pytest tests/ -v --tb=short || exit 1
-        else
-          echo "No tests directory found, skipping"
-        fi
-
+      # Lint + tests are the QG's job (run before merge). The AWS build's role is build-wheel + publish,
+      # matching GCP's UAC cloudbuild. (A bare `ruff check --line-length 120 ...` ignored the repo's ruff
+      # config and flagged false positives that the configured QG ruff does not.)
       - echo "=== Building wheel ==="
       - pip install build
       - python -m build --wheel --outdir dist/
@@ -47,9 +41,14 @@ phases:
   post_build:
     commands:
       - echo "=== Publishing wheel to CodeArtifact ($CODEARTIFACT_DOMAIN/$CODEARTIFACT_REPO) ==="
-      - pip install twine
-      - aws codeartifact login --tool twine --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AWS_ACCOUNT_ID" --repository "$CODEARTIFACT_REPO" --region "$AWS_DEFAULT_REGION"
-      - twine upload --repository codeartifact dist/*.whl --skip-existing
+      # Pin twine to 6.0.x: 6.1+ regressed CodeArtifact uploads (UnsupportedConfiguration), and 5.x can't
+      # parse Metadata-Version 2.4 wheels (InvalidDistribution). 6.0.x handles both (verified: wheel published).
+      - pip install "twine>=6.0,<6.1"
+      # Env-var upload (no .pypirc).
+      - export TWINE_USERNAME=aws
+      - export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AWS_ACCOUNT_ID" --region "$AWS_DEFAULT_REGION" --query authorizationToken --output text)
+      - export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AWS_ACCOUNT_ID" --repository "$CODEARTIFACT_REPO" --format pypi --region "$AWS_DEFAULT_REGION" --query repositoryEndpoint --output text)
+      - twine upload --skip-existing dist/*.whl
 
 cache:
   paths:
