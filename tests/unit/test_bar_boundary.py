@@ -32,7 +32,7 @@ def _utc(year: int, month: int, day: int, h: int = 0, m: int = 0, s: int = 0) ->
 
 def test_bar_timeframes_is_the_expected_closed_set() -> None:
     """Locking the set itself: adding a timeframe must be deliberate."""
-    assert BAR_TIMEFRAMES == ("15s", "1m", "5m", "15m", "30m", "1h", "4h", "1d")
+    assert BAR_TIMEFRAMES == ("1s", "15s", "1m", "5m", "15m", "30m", "1h", "4h", "1d")
 
 
 def test_bar_timeframe_seconds_aligned_to_day() -> None:
@@ -61,6 +61,8 @@ def test_unknown_timeframe_raises() -> None:
 @pytest.mark.parametrize(
     "timeframe,t_close",
     [
+        ("1s", _utc(2026, 4, 29, 14, 30, 0)),
+        ("1s", _utc(2026, 4, 29, 14, 30, 1)),
         ("15s", _utc(2026, 4, 29, 14, 30, 0)),
         ("15s", _utc(2026, 4, 29, 14, 30, 15)),
         ("1m", _utc(2026, 4, 29, 14, 30, 0)),
