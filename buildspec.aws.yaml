@@ -1,5 +1,7 @@
 # AWS CodeBuild Buildspec for unified-api-contracts
-# Library publishing — lint, test, build wheel (no Docker)
+# Library publishing — lint, test, build wheel (no Docker), publish to CodeArtifact.
+# AWS analogue of the GCP cloudbuild: GCP publishes the UAC wheel to the AR python index;
+# AWS publishes it to the CodeArtifact domain `unified-trading` / repo `unified-libraries`.
 
 version: 0.2
 
@@ -9,6 +11,8 @@ env:
   variables:
     SERVICE_NAME: "unified-api-contracts"
     CLOUD_PROVIDER: "aws"
+    CODEARTIFACT_DOMAIN: "unified-trading"
+    CODEARTIFACT_REPO: "unified-libraries"
 
 phases:
   install:
@@ -38,6 +42,13 @@ phases:
       - echo "=== Building wheel ==="
       - pip install build
       - python -m build --wheel --outdir dist/
+
+  post_build:
+    commands:
+      - echo "=== Publishing wheel to CodeArtifact ($CODEARTIFACT_DOMAIN/$CODEARTIFACT_REPO) ==="
+      - pip install twine
+      - aws codeartifact login --tool twine --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AWS_ACCOUNT_ID" --repository "$CODEARTIFACT_REPO" --region "$AWS_DEFAULT_REGION"
+      - twine upload --repository codeartifact dist/*.whl --skip-existing
 
 cache:
   paths:
