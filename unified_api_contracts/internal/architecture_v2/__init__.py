@@ -65,6 +65,13 @@ from unified_api_contracts.internal.architecture_v2.artifact_registry import (
     ArtifactPublishedPayload,
     ArtifactRef,
 )
+from unified_api_contracts.internal.architecture_v2.benchmark_fill_pricing import (
+    DEFAULT_BENCHMARK_PRICING_FNS,
+    BenchmarkPricingContext,
+    BenchmarkPricingFn,
+    FillPricingResult,
+    benchmark_fill_price,
+)
 from unified_api_contracts.internal.architecture_v2.broker_routes import (
     BROKER_ROUTES,
     BrokerKind,
@@ -435,6 +442,7 @@ __all__ = [
     "COMPATIBILITY_SEED",
     "CROSS_VENUE_ROUTING_POLICIES",
     "DEFAULT_ALGO_BY_INSTRUCTION_TYPE",
+    "DEFAULT_BENCHMARK_PRICING_FNS",
     "EXECUTION_ALGOS",
     "EXTERNAL_VISIBILITY_MIN_MATURITY",
     "FEES_REGISTRY",
@@ -482,6 +490,8 @@ __all__ = [
     "Audience",
     "BacktestGroup",
     "BenchmarkFillMode",
+    "BenchmarkPricingContext",
+    "BenchmarkPricingFn",
     "BorrowInstruction",
     "BridgeInstructionV2",
     "BrokerEntry",
@@ -537,6 +547,7 @@ __all__ = [
     "FeeComponent",
     "FeeSchedule",
     "FeeUnit",
+    "FillPricingResult",
     "FillSource",
     "FundBusinessUnitEntry",
     "FundNotFoundError",
@@ -678,6 +689,7 @@ __all__ = [
     "archetypes_for_venue",
     "archetypes_without_leg_structures",
     "availability_for",
+    "benchmark_fill_price",
     "broker_for_venue",
     "capability_for",
     "check_service_family_scope",
