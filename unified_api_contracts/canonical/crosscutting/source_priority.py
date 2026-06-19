@@ -734,6 +734,112 @@ def live_pipeline_mode_for_venue(
     return pipeline_mode_for_source(source, mode)
 
 
+# ---------------------------------------------------------------------------
+# Venue → source capability (write-time provenance fail-closed validation)
+# ---------------------------------------------------------------------------
+# SOURCE_PRIORITY[(asset_group, data_type)] is the READ-TIME resolution ORDER —
+# never the WRITE-TIME provenance stamp (operator 2026-06-19). A backfill that
+# fetches a shard with a chosen vendor MUST stamp THAT vendor; using
+# SOURCE_PRIORITY[0] to stamp mis-attributes data (the VX/CFE incident: Databento
+# fetched CFE, but priority[0]=massive mis-stamped it batch_massive, and Massive
+# carries NOTHING on CFE).
+#
+# Most venues can be served by any source in SOURCE_PRIORITY for the data_type,
+# but a few are NARROWER than the data_type-level priority list: a venue may have
+# NO coverage from a source that otherwise serves the data_type. This map records
+# the per-venue EXCLUSIONS (source physically cannot serve this venue x data_type),
+# so the ``--source`` selector validator can fail closed before a single byte is
+# fetched-or-mis-stamped. Keys are (UPPER_VENUE, data_type); value = sources that
+# are NOT capable for that cell (subset of SOURCE_PRIORITY[(ag, dt)]).
+#
+# CBOE (Cboe Futures Exchange / VX-VIX futures): Massive carries no CFE data
+# (issue massive_does_not_carry_vix_vx_futures_cfe_2026_06_17.md) → only Databento
+# is capable. This MIRRORS the UTL ``_VENUE_DT_OVERRIDES`` (CBOE ohlcv_1m/1s →
+# batch_databento) so the validator and the write-stamp agree.
+# SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+_VENUE_SOURCE_EXCLUSIONS: dict[tuple[str, str], frozenset[str]] = {
+    ("CBOE", "ohlcv_1m"): frozenset({"massive"}),
+    ("CBOE", "ohlcv_1s"): frozenset({"massive"}),
+    ("CBOE", "trades"): frozenset({"massive"}),
+    ("CBOE", "tbbo"): frozenset({"massive"}),
+}
+
+
+class SourceNotCapableForVenueError(ValueError):
+    """Raised when a chosen ``source`` cannot serve a ``(asset_group, venue,
+    data_type)`` cell — fail-closed before fetch/stamp.
+
+    Two failure modes:
+
+    * the source is not in ``SOURCE_PRIORITY[(asset_group, data_type)]`` at all
+      (the data_type is not served by that vendor), OR
+    * the source is excluded for the SPECIFIC venue via
+      :data:`_VENUE_SOURCE_EXCLUSIONS` (e.g. ``--source massive`` for CBOE/VX
+      futures — Massive carries no CFE).
+    """
+
+
+def is_source_capable_for_venue(asset_group: str, data_type: str, venue: str, source: str) -> bool:
+    """Return whether ``source`` can serve a ``(asset_group, venue, data_type)`` cell.
+
+    Capability = ``source ∈ SOURCE_PRIORITY[(asset_group, data_type)]`` AND
+    ``source`` is not excluded for the venue via
+    :data:`_VENUE_SOURCE_EXCLUSIONS`. Used by the write-time ``--source`` selector
+    to drive both fetch-adapter selection and the provenance stamp; never consults
+    priority ORDER (that is read-time only).
+
+    Returns ``False`` (never raises) when the ``(asset_group, data_type)`` pair is
+    unregistered — call :func:`assert_source_capable_for_venue` to get the loud
+    diagnostic.
+    """
+    ag = asset_group.lower()
+    src = source.lower()
+    if not has_source_priority(ag, data_type):
+        return False
+    if src not in {s.lower() for s in get_source_priority(ag, data_type)}:
+        return False
+    excluded = _VENUE_SOURCE_EXCLUSIONS.get((venue.upper(), data_type), frozenset())
+    return src not in excluded
+
+
+def assert_source_capable_for_venue(asset_group: str, data_type: str, venue: str, source: str) -> None:
+    """Fail-closed: raise :class:`SourceNotCapableForVenueError` if ``source``
+    cannot serve the ``(asset_group, venue, data_type)`` cell.
+
+    The write-time validator behind the MTDS OHLCV backfill ``--source`` selector:
+    the operator picks ``databento`` / ``massive`` and this asserts the choice is
+    physically capable BEFORE any fetch or provenance stamp, so a mis-stamp (the
+    VX/CFE ``batch_massive`` incident) is impossible. SOURCE_PRIORITY stays the
+    READ-time resolution order; this is the WRITE-time gate.
+
+    Raises:
+        SourceNotCapableForVenueError: source not in SOURCE_PRIORITY for the
+            data_type, or excluded for this venue.
+    """
+    ag = asset_group.lower()
+    src = source.lower()
+    if not has_source_priority(ag, data_type):
+        raise SourceNotCapableForVenueError(
+            f"No SOURCE_PRIORITY registered for asset_group={ag!r}, data_type={data_type!r}; "
+            f"cannot validate --source={source!r} for venue={venue!r}."
+        )
+    registered = {s.lower() for s in get_source_priority(ag, data_type)}
+    if src not in registered:
+        raise SourceNotCapableForVenueError(
+            f"--source={source!r} is not a registered source for "
+            f"({ag!r}, {data_type!r}); capable sources: {sorted(registered)}."
+        )
+    excluded = _VENUE_SOURCE_EXCLUSIONS.get((venue.upper(), data_type), frozenset())
+    if src in excluded:
+        raise SourceNotCapableForVenueError(
+            f"--source={source!r} cannot serve venue={venue.upper()!r} for "
+            f"data_type={data_type!r} (the source carries no data for this venue — "
+            f"e.g. Massive has no Cboe/CFE coverage). Use a capable source: "
+            f"{sorted(registered - excluded)}. "
+            f"SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md."
+        )
+
+
 __all__ = [
     "BATCH_CAPABLE_CEFI_VENUES",
     "CEFI_LIVE_VENUES",
@@ -741,7 +847,9 @@ __all__ = [
     "EMISSION_LATENCY_MS_BY_SOURCE",
     "SOURCE_PRIORITY",
     "DivergenceKind",
+    "SourceNotCapableForVenueError",
     "assert_emission_latency_round_trip",
+    "assert_source_capable_for_venue",
     "default_source",
     "detect_dual_source_conflicts",
     "emission_latency_ms_for_source",
@@ -751,6 +859,7 @@ __all__ = [
     "get_primary_source_with_latency",
     "get_source_priority",
     "has_source_priority",
+    "is_source_capable_for_venue",
     "live_pipeline_mode_for_venue",
     "live_source_for_venue",
     "modes_for",
