@@ -244,7 +244,13 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # NOT covered by Massive — yahoo+barchart layering via MTDS routing.
     ("tradfi", "trades"): ["massive", "databento"],
     ("tradfi", "tbbo"): ["massive", "databento"],
-    ("tradfi", "ohlcv_1s"): ["massive", "databento"],
+    # ohlcv_1s is DATABENTO-ONLY: Massive's flat-file connector does NOT serve a
+    # 1s schema (massive_tradfi_rest_connector.SUPPORTED_DATA_TYPES omits it), so
+    # 1s is fetched from Databento GLBX.MDP3 (L0/free 16y, subscription lockdown
+    # 2026-06-18). databento-primary makes derive_pipeline_mode_for_row stamp
+    # pipeline_mode=batch_databento (provenance-correct) instead of batch_massive.
+    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+    ("tradfi", "ohlcv_1s"): ["databento"],
     ("tradfi", "ohlcv_1m"): ["massive", "databento"],
     ("tradfi", "ohlcv_15m"): ["massive", "databento", "yahoo", "barchart"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
