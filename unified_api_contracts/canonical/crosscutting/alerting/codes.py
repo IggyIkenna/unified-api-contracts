@@ -414,6 +414,16 @@ class AlertCode(StrEnum):
     and compare batch vs live fill events for the flagged date. Emitter:
     batch-live-reconciliation-service orchestrator (post stage3)."""
 
+    # ── Citadel paper⟷batch⟷live determinism spine (P6 — daily ledger digest) ──
+    DAILY_LEDGER_DIGEST = "DAILY_LEDGER_DIGEST"
+    """Daily INFO digest of a paper/live run's as-if-filled ledger state:
+    balances per venue/instrument/share_class, the day's InstructionLedger trade
+    tape summary, realised/unrealised P&L, and HWM. Emitter: client-reporting-api
+    ``core/daily_ledger_digest.py`` → alerting-service → ``#uts-live-alerts``.
+    Always INFO (informational operator eyeball surface, never an alert).
+    Composes with ``BATCH_VS_LIVE_RECON_DRIFTED`` (the T+1 determinism verdict).
+    SSOT: ``codex/09-strategy/operational/paper-batch-live-reconciliation.md`` §6."""
+
     # ── QG / infra staleness (2026-05-15, B-018 Phase 4.A monitoring) ────────
     QG_SNAPSHOT_STALE = "QG_SNAPSHOT_STALE"
     """Daily QG snapshot not written to GCS for N consecutive days (default 2).
