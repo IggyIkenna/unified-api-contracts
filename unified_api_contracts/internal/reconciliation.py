@@ -444,8 +444,13 @@ class TradeDeviation(BaseModel):
     present_in_b: bool
 
 
-class WeeklyReconReport(BaseModel):
-    """Trade-by-trade reconciliation over a window.
+class DailyReconReport(BaseModel):
+    """Trade-by-trade reconciliation for ONE T+1 run.
+
+    **Cadence: DAILY T+1.** Each day reconciles the prior trading day's paper vs
+    a batch-rerun of that day (``window_start``/``window_end`` = ``[day, day+1)``)
+    — matching the existing batch-live-reconciliation-service T+1 pipeline. A week
+    is simply 7 of these daily reports; there is no separate "weekly" run.
 
     For a ``DETERMINISM`` verdict (paper↔batch) ``is_deterministic`` is True iff
     every matched trade has ε=0 across (side, qty, fill_price, fees) AND there
@@ -459,8 +464,8 @@ class WeeklyReconReport(BaseModel):
     verdict_type: ReconVerdictType
     run_a_id: str = Field(description="paper (DETERMINISM/EXECUTION) or live (COMPOSITE).")
     run_b_id: str = Field(description="batch (DETERMINISM/COMPOSITE) or paper (EXECUTION).")
-    window_start: datetime
-    window_end: datetime
+    window_start: datetime = Field(description="Inclusive UTC start of the T+1 day.")
+    window_end: datetime = Field(description="Exclusive UTC end (= day + 1).")
     total_trades_a: int
     total_trades_b: int
     matched: int
@@ -479,6 +484,7 @@ __all__ = [
     "AutoReconcileReason",
     "BalanceReconciliationSnapshot",
     "BalanceReconciliationStatus",
+    "DailyReconReport",
     "DeterminismBugClass",
     "DeviationState",
     "DeviationStatus",
@@ -494,6 +500,5 @@ __all__ = [
     "TradeDeviation",
     "TradeFillRecord",
     "TradingMode",
-    "WeeklyReconReport",
     "make_trade_key",
 ]

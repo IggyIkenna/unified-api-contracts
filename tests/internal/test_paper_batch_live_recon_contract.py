@@ -6,7 +6,7 @@ Covers the Phase 0 schemas of
  - make_trade_key — determinism + UTC normalisation (the reconciliation match key)
  - TradeFillRecord — keyed per-trade fill
  - TradingMode / FillModel / ReconVerdictType / DeterminismBugClass — StrEnums
- - TradeDeviation / WeeklyReconReport — the recon report
+ - TradeDeviation / DailyReconReport — the recon report
  - PositionLedgerRow — the derived as-if-filled position view
  - the public import surface (root facade + internal)
 
@@ -24,6 +24,7 @@ from pydantic import ValidationError
 from unified_api_contracts import PositionLedgerRow
 from unified_api_contracts.canonical.crosscutting.ledger import AssetClass
 from unified_api_contracts.internal import (
+    DailyReconReport,
     DeterminismBugClass,
     FillModel,
     ReconVerdictType,
@@ -31,7 +32,6 @@ from unified_api_contracts.internal import (
     TradeDeviation,
     TradeFillRecord,
     TradingMode,
-    WeeklyReconReport,
     make_trade_key,
 )
 
@@ -191,10 +191,10 @@ def test_two_fill_realities_only() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# WeeklyReconReport
+# DailyReconReport
 # --------------------------------------------------------------------------- #
 def test_determinism_report_clean_is_deterministic() -> None:
-    rep = WeeklyReconReport(
+    rep = DailyReconReport(
         verdict_type=ReconVerdictType.DETERMINISM,
         run_a_id="paper-19",
         run_b_id="batch-of-paper-19",
@@ -226,7 +226,7 @@ def test_determinism_report_with_drift_names_bug_class() -> None:
         present_in_a=True,
         present_in_b=True,
     )
-    rep = WeeklyReconReport(
+    rep = DailyReconReport(
         verdict_type=ReconVerdictType.DETERMINISM,
         run_a_id="paper-19",
         run_b_id="batch-of-paper-19",
@@ -249,7 +249,7 @@ def test_determinism_report_with_drift_names_bug_class() -> None:
 
 
 def test_execution_verdict_carries_alpha_rollup() -> None:
-    rep = WeeklyReconReport(
+    rep = DailyReconReport(
         verdict_type=ReconVerdictType.EXECUTION,
         run_a_id="live-19",
         run_b_id="paper-19",
@@ -326,7 +326,7 @@ def test_public_import_surface() -> None:
     for name in (
         "RunManifest",
         "TradeFillRecord",
-        "WeeklyReconReport",
+        "DailyReconReport",
         "TradeDeviation",
         "TradingMode",
         "FillModel",
