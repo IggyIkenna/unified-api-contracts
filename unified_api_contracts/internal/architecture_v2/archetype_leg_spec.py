@@ -310,7 +310,7 @@ class ArchetypeLegStructure(BaseModel):
             "codex doc — e.g. a pure meta-allocation overlay with no instrument "
             "legs, or an archetype intentionally absent from the factory pending "
             "an upstream feed). Such a structure carries ``legs=()`` and a "
-            "``not_registered_reason``. The registry ENUMERATES all 57 archetypes "
+            "``not_registered_reason``. The registry ENUMERATES all 58 archetypes "
             "(Phase 6A) so a consumer never sees an absent key — it sees an "
             "explicit not_registered marker instead. A normally-seeded structure "
             "leaves this ``False``."
@@ -333,7 +333,7 @@ class ArchetypeLegStructure(BaseModel):
         A ``not_registered`` structure MUST have empty ``legs`` + a non-empty
         ``not_registered_reason``; a registered structure MUST have ≥1 leg.
         This makes the "absent key" antipattern unrepresentable — the registry
-        enumerates all 57 archetypes, and an underivable one is an explicit
+        enumerates all 58 archetypes, and an underivable one is an explicit
         not_registered marker, never silence.
         """
 
@@ -411,7 +411,7 @@ ARCHETYPE_LEG_STRUCTURES: Final[dict[StrategyArchetype, ArchetypeLegStructure]] 
 """Registry of structural leg models, keyed by ``StrategyArchetype`` — EXHAUSTIVE.
 
 SSOT for **leg truth** (see module docstring re: dual-representation with
-``ARCHETYPE_CAPABILITY_REGISTRY``). Phase 6A: every one of the 57 archetypes is
+``ARCHETYPE_CAPABILITY_REGISTRY``). Phase 6A: every one of the 58 archetypes is
 present — real legs where derivable, an explicit ``not_registered`` structure
 (``legs=()`` + ``not_registered_reason``) where genuinely underivable. There are
 NO absent keys (use ``archetypes_without_leg_structures`` for the not_registered
@@ -432,7 +432,7 @@ def leg_structure_for(archetype_id: StrategyArchetype) -> ArchetypeLegStructure 
 
 
 def all_leg_structures() -> tuple[ArchetypeLegStructure, ...]:
-    """Return every leg structure (all 57), sorted by archetype id (deterministic)."""
+    """Return every leg structure (all 58), sorted by archetype id (deterministic)."""
 
     return tuple(ARCHETYPE_LEG_STRUCTURES[a] for a in sorted(ARCHETYPE_LEG_STRUCTURES, key=lambda x: x.value))
 
@@ -451,7 +451,7 @@ def registered_leg_structures() -> tuple[ArchetypeLegStructure, ...]:
 def archetypes_without_leg_structures() -> tuple[StrategyArchetype, ...]:
     """The honest-gap set: archetypes whose structure is ``not_registered``.
 
-    Phase 6A semantics: the registry now ENUMERATES all 57 archetypes, so this is
+    Phase 6A semantics: the registry now ENUMERATES all 58 archetypes, so this is
     no longer "absent keys" — it is the set of archetypes carrying an explicit
     ``not_registered`` structure (legs=() + cited reason). The exporter emits one
     ``not_registered`` 'legs' gap edge per such archetype; a test asserts the gap

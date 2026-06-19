@@ -541,7 +541,16 @@ SOLANA_DEFI_PROTOCOLS: dict[str, dict[str, str]] = {
         "name": "Drift Protocol",
         "type": "perps_dex",
         "program_id": "dRiftyHA39MWEi3m9aunc5MzRF1JYuBsbn6VPcn33UH",
+        # api_url (https://data.api.drift.trade) is dead (404/403 CloudFront
+        # as of 2026-06-19). Use sdk_perp_markets_url / sdk_spot_markets_url
+        # to discover the market universe from the public GitHub SDK constants.
         "api_url": "https://data.api.drift.trade",
+        "sdk_perp_markets_url": (
+            "https://raw.githubusercontent.com/drift-labs/protocol-v2/master/sdk/src/constants/perpMarkets.ts"
+        ),
+        "sdk_spot_markets_url": (
+            "https://raw.githubusercontent.com/drift-labs/protocol-v2/master/sdk/src/constants/spotMarkets.ts"
+        ),
         "dlob_url": "https://dlob.drift.trade",
         "ws_url": "wss://dlob.drift.trade/ws",
         "s3_historical_url": (

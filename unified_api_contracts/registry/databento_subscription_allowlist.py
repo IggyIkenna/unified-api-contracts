@@ -10,7 +10,9 @@ request never reaches the vendor, so we can never be billed silently.
 Subscription (operator decision 2026-06-18):
   * ``GLBX.MDP3``  — CME Globex (S&P / BTC+ETH / gold / WTI+NatGas / FX / sector futures + options-on-futures)
   * ``DBEQ.BASIC`` — Databento US Equities (single stocks + ETFs incl. BTC/ETH/gold ETFs)
-  * ``CFE``        — Cboe Futures Exchange (VIX / VX futures)
+  * ``XCBF.PITCH`` — Cboe Futures Exchange (VIX / VX futures); the operator calls
+    this the "CFE" subscription, but Databento's dataset CODE is ``XCBF.PITCH``
+    (a bare ``CFE`` is rejected by the API with 400 validation_failed).
 
 Included-history windows by schema LEVEL (the rolling, trailing-from-today
 allowance — older than this is metered):
@@ -43,7 +45,7 @@ ALLOWED_DATABENTO_DATASETS: frozenset[str] = frozenset(
     {
         "GLBX.MDP3",  # CME Globex
         "DBEQ.BASIC",  # Databento US Equities (single stocks + ETFs)
-        "CFE",  # Cboe Futures Exchange (VIX / VX futures)
+        "XCBF.PITCH",  # Cboe Futures Exchange (VIX / VX futures) — operator calls it "CFE"
     }
 )
 

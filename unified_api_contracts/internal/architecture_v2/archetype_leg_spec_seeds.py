@@ -312,6 +312,56 @@ def _basis_perp_structure(archetype: StrategyArchetype, *, inverse: bool, notes:
     )
 
 
+def _funding_dispersion_structure() -> ArchetypeLegStructure:
+    """CARRY_FUNDING_DISPERSION: dollar-neutral (NOT delta-neutral) cross-sectional funding-rank reversion.
+
+    Long the lowest-funding / short the highest-funding perps — DIFFERENT coins, same arbitraged venue. The
+    two legs are independent directional positions, dollar-neutral in aggregate (residual market beta is hedged
+    at the BOOK level via beta-hedge + vol-target overlays, not leg-vs-leg), so they are paced in, not atomically
+    coupled or leader/hedge. The reversion edge is venue-dependent (Binance/Bybit/OKX/Aster); Hyperliquid is
+    momentum and is excluded at the signal layer.
+    """
+    arbitraged_perp_venues = ("binance", "bitget", "bybit", "kraken", "okx")
+    return ArchetypeLegStructure(
+        archetype_id=StrategyArchetype.CARRY_FUNDING_DISPERSION,
+        legs=(
+            ArchetypeLegSpec(
+                leg_id="perp_long",
+                role=ArchetypeLegRole.PERP_LONG,
+                required=True,
+                instrument_types=(ArchetypeInstrumentType.PERP,),
+                asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
+                eligible_venue_ids=arbitraged_perp_venues,
+                signal_variants=("funding_rank_pct", "funding_rate_annualised_bps"),
+                source_of_truth=(
+                    "strategy-service CarryFundingDispersionEngine.on_tick (funding_dispersion.py — LONG the "
+                    "lowest cross-sectional funding rank)"
+                ),
+            ),
+            ArchetypeLegSpec(
+                leg_id="perp_short",
+                role=ArchetypeLegRole.PERP_SHORT,
+                required=True,
+                instrument_types=(ArchetypeInstrumentType.PERP,),
+                asset_groups=(VenueCategoryV2.CEFI, VenueCategoryV2.DEFI),
+                eligible_venue_ids=arbitraged_perp_venues,
+                signal_variants=("funding_rank_pct", "funding_rate_annualised_bps"),
+                source_of_truth=(
+                    "strategy-service CarryFundingDispersionEngine.on_tick (funding_dispersion.py — SHORT the "
+                    "highest cross-sectional funding rank)"
+                ),
+            ),
+        ),
+        execution_coupling=AtomicExecutionMode.SEQUENCED_WITH_PACING,
+        notes=(
+            "Dollar-neutral (NOT delta-neutral) cross-sectional funding-rank reversion: long lowest-funding / "
+            "short highest-funding PERPS on different coins, same arbitraged venue. Per-coin directional; "
+            "aggregate dollar-neutral; residual BTC-beta hedged at the book level. Venue-dependent (HL excluded "
+            "— momentum). SSOT: carry_staked_basis_funding_scan_experiment_2026_06_16.md."
+        ),
+    )
+
+
 def _basis_dated_structure(archetype: StrategyArchetype, *, inverse: bool, notes: str) -> ArchetypeLegStructure:
     """CARRY_BASIS_DATED (+ _INV): spot + dated future cash-and-carry."""
 
@@ -1063,6 +1113,7 @@ def _carry_yield_seeds() -> tuple[ArchetypeLegStructure, ...]:
             inverse=True,
             notes="Inverse basis-perp: lend/USDC-margined perp + hold spot (enums.py comment).",
         ),
+        _funding_dispersion_structure(),
         _basis_dated_structure(
             StrategyArchetype.CARRY_BASIS_DATED,
             inverse=False,
@@ -1488,7 +1539,7 @@ def _portfolio_seeds() -> tuple[ArchetypeLegStructure, ...]:
 
 
 def build_all_structures() -> tuple[ArchetypeLegStructure, ...]:
-    """Return a leg structure for EVERY one of the 57 archetypes (exhaustive).
+    """Return a leg structure for EVERY one of the 58 archetypes (exhaustive).
 
     Real structures where a leg model is derivable from engine/doc/cells;
     explicit ``not_registered`` structures (legs=() + cited reason) where it is

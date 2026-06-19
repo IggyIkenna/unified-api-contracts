@@ -57,6 +57,29 @@ class StrategyArchetype(StrEnum):
     Capability cells (per-archetype venue/category claims) are currently in
     ``unified-api-contracts/scripts/enumerate_envelope.py``; manifest
     incorporation is a follow-up.
+
+    ──────────────────────────────────────────────────────────────────────────
+    ADDING A NEW ARCHETYPE? Update these downstream consumers (the in-repo /
+    strategy-service ones FAIL LOUDLY in QG; the UI ones are a SILENT cross-repo
+    gap — there is no CI that catches them from here, so they're listed first):
+
+      UI (unified-trading-system-ui — hand-maintained mirror, NOT auto-synced;
+      a UI todo under the playwright gate, NOT optional if the archetype is to be
+      operator-surfaced):
+        • ``lib/architecture-v2/enums.ts`` — add to the ``StrategyArchetype``
+          union + ``STRATEGY_ARCHETYPES_V2`` curated list + ``ARCHETYPE_TO_FAMILY``;
+          bump ``tests/unit/lib/architecture-v2/enums.test.ts`` ``toHaveLength(N)``.
+        • regenerate ``lib/registry/ui-reference-data.json`` via
+          ``unified-api-contracts/scripts/generate_ui_reference_data.py``.
+
+      Same-repo (QG-enforced — these RAISE at import or fail a test, so you can't
+      miss them): ``ARCHETYPE_TO_FAMILY`` (this file) + a leg-spec seed in
+      ``architecture_v2/archetype_leg_spec_seeds.py`` (``ARCHETYPE_LEG_STRUCTURES``
+      raises at import if missing). strategy-service: factory registry,
+      ``carry_and_yield/__init__`` (etc.) export, ``archetype_defaults``
+      (Kelly tier / GREENFIELD), ``target_universe`` catalog builder + registry,
+      the ``test_ml_directional_continuous`` family_map.
+    ──────────────────────────────────────────────────────────────────────────
     """
 
     ML_DIRECTIONAL_CONTINUOUS = "ML_DIRECTIONAL_CONTINUOUS"
@@ -70,6 +93,12 @@ class StrategyArchetype(StrEnum):
     # (lend USDC-margined perp, hold spot). Renamed from CARRY_RECURSIVE_BORROW_PERP_HEDGED
     # per operator decision 2026-05-12 (strategy_archetype_taxonomy_2026_05_12.md §rename).
     CARRY_BASIS_PERP_INV = "CARRY_BASIS_PERP_INV"
+    # Dollar-neutral (NOT delta-neutral) cross-sectional funding-rank REVERSION: long the
+    # lowest-funding / short the highest-funding perps (different coins, same arbitraged
+    # venue). Per-coin directional, aggregate dollar-neutral, residual market beta hedged
+    # at the book level. Venue-dependent (Binance/Bybit/OKX/Aster); HL is momentum,
+    # excluded. SSOT: plans/active/carry_staked_basis_funding_scan_experiment_2026_06_16.md.
+    CARRY_FUNDING_DISPERSION = "CARRY_FUNDING_DISPERSION"
     CARRY_STAKED_BASIS = "CARRY_STAKED_BASIS"
     CARRY_STAKED_BASIS_DATED = "CARRY_STAKED_BASIS_DATED"
     CARRY_RECURSIVE_STAKED = "CARRY_RECURSIVE_STAKED"
@@ -146,6 +175,7 @@ ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
     StrategyArchetype.CARRY_BASIS_DATED_INV: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_BASIS_PERP: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_BASIS_PERP_INV: StrategyFamily.CARRY_AND_YIELD,
+    StrategyArchetype.CARRY_FUNDING_DISPERSION: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_STAKED_BASIS: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_STAKED_BASIS_DATED: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_RECURSIVE_STAKED: StrategyFamily.CARRY_AND_YIELD,

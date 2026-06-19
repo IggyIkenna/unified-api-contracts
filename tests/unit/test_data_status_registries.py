@@ -106,10 +106,13 @@ class TestExpectedCoverageByAssetGroup:
         assert tradfi["NASDAQ"] == ["ohlcv_1m"]
         assert tradfi["NYSE"] == ["ohlcv_1m"]
         assert "BARCHART" not in tradfi
-        # Futures venues unchanged.
-        assert tradfi["CME"] == ["trades", "ohlcv_1m", "tbbo"]
+        # Futures venues: CME gains ohlcv_1s (Databento lockdown 2026-06-18 —
+        # fetches both ohlcv-1s + ohlcv-1m from GLBX.MDP3).
+        assert tradfi["CME"] == ["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"]
         assert tradfi["ICE"] == ["trades", "ohlcv_1m", "tbbo"]
-        assert tradfi["CBOE"] == ["ohlcv_15m"]
+        # CBOE: VX index cash = ohlcv_15m; CBOE Futures Exchange (XCBF.PITCH / Databento
+        # CFE dataset 2026-06-19) adds ohlcv_1s + ohlcv_1m for VX futures.
+        assert tradfi["CBOE"] == ["ohlcv_15m", "ohlcv_1s", "ohlcv_1m"]
 
     def test_sports_excludes_arbitrage_opportunity(self) -> None:
         """arbitrage_opportunity is MDPS-derived; no venue emits it."""
@@ -153,7 +156,7 @@ class TestExpectedCoverageByAssetGroup:
 
     def test_get_expected_data_types_for_venue_in_scope(self) -> None:
         cme = get_expected_data_types_for_venue_in_scope("tradfi", "CME")
-        assert sorted(cme) == sorted(["trades", "ohlcv_1m", "tbbo"])
+        assert sorted(cme) == sorted(["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"])
         # NASDAQ is now in scope (ohlcv_1m only — OHLCV-only MVP 2026-05-17).
         assert get_expected_data_types_for_venue_in_scope("tradfi", "NASDAQ") == ["ohlcv_1m"]
 

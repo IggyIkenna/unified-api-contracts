@@ -616,12 +616,16 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # data_types — leaving these UNMAPPED (None) made FUTURE/SPOT_PAIR fall back to all 9 → the residual G1-ENUM
     # over-fan (FUTURE was 84% of the post-bundle candidate set). `future` = the etf market-data set (databento
     # derives ohlcv_1m/15m/24h + tbbo/mbp_10 for any tradeable contract); `spot_pair` (FX) = intraday + top-of-book.
-    ("tradfi", "future"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
-    ("tradfi", "spot_pair"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo"}),
-    ("tradfi", "etf"): frozenset({"trades", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
+    # ohlcv_1s (Databento L0/free 16y) is fetched alongside ohlcv_1m for every GLBX.MDP3 /
+    # DBEQ.BASIC tradeable instrument_type; 15m/1h/24h aggregate downstream (1s+1m are the
+    # only fetched OHLCV schemas). SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+    ("tradfi", "future"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
+    ("tradfi", "spot_pair"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo"}),
+    ("tradfi", "etf"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "ohlcv_15m", "ohlcv_24h", "tbbo", "mbp_10"}),
     ("tradfi", "equity"): frozenset(
         {
             "trades",
+            "ohlcv_1s",
             "ohlcv_1m",
             "ohlcv_15m",
             "ohlcv_24h",
@@ -1107,13 +1111,26 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "ohlcv_1m": "2023-04-15",
     },
     "CME": {
+        # ohlcv-1s + ohlcv-1m are BOTH fetched from Databento GLBX.MDP3 (both
+        # L0/free 16y) — 1m completes the existing corpus, 1s is the finer add;
+        # 15m/24h are aggregated downstream. SSOT:
+        # codex/02-data/tradfi-databento-sourcing-ssot.md + the lockdown plan.
+        "ohlcv_1s": "2019-01-01",
         "ohlcv_1m": "2019-01-01",
     },
     "ICE": {
         "ohlcv_1m": "2019-01-01",
     },
     "CBOE": {
-        "ohlcv_15m": "2020-01-07",  # VIX — Barchart CSV start
+        "ohlcv_15m": "2020-01-07",  # VIX cash INDEX — Barchart/Yahoo (not Databento)
+        # VX FUTURES (the VIX futures curve) via Databento XCBF.PITCH (the
+        # operator's "CFE" subscription, activated 2026-06-19). Both ohlcv-1s +
+        # ohlcv-1m are L0/free 16y; coarser bars aggregate downstream. XCBF.PITCH
+        # coverage starts 2018-11-04. NOTE: these are the FUTURES, distinct from
+        # the ohlcv_15m VIX cash index above. SSOT:
+        # codex/02-data/tradfi-databento-sourcing-ssot.md.
+        "ohlcv_1s": "2018-11-04",
+        "ohlcv_1m": "2018-11-04",
     },
     "FX": {
         "ohlcv_24h": "2020-01-01",  # KRW/USD daily via Yahoo Finance
@@ -1463,6 +1480,9 @@ _PER_INSTRUMENT_SHARD_DATA_TYPES: frozenset[str] = frozenset(
         # TradFi + CeFi DEX OHLCV (Phase 3.D.5 v2 enumerator — per-equity-ticker
         # and per-pool denominator; TradFi catalog reader provides equity tickers,
         # CeFi catalog reader provides DEX pool instrument IDs for LIGHTER/PACIFICA).
+        # ohlcv_1s shares the SAME per-instrument shard grain as ohlcv_1m (TradFi
+        # Databento 1s fetch) — same shard-key, denominator and Tier-3 fan-out.
+        "ohlcv_1s",
         "ohlcv_1m",
         # DEFI per-pool / per-market / per-asset shards
         "dex_pool_swaps",

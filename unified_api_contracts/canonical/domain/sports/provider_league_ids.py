@@ -670,13 +670,20 @@ ODDS_API_DISPLAY_TO_CANONICAL: dict[str, str] = {
     "Austrian Bundesliga": "AUSTRIAN_BUNDESLIGA",
     "Ekstraklasa": "EKSTRAKLASA",
     "MLS": "MLS",
+    "Major League Soccer": "MLS",
     "Liga MX": "LIGA_MX",
     "Primera Division": "ARGENTINA_PRIMERA",
+    "Liga Profesional Argentina": "ARGENTINA_PRIMERA",
     "Brasileirão": "BRASILEIRAO",
     "A-League": "A_LEAGUE",
     "J1 League": "J1_LEAGUE",
     "K League 1": "K_LEAGUE_1",
     "Chile Primera División": "CHILE_PRIMERA",
+    # Bare "Primera División" (accented) appears in the legacy odds-api GCS paths
+    # as the CHILEAN top flight (verified by team content: Palestino, Unión
+    # Española). The unaccented "Primera Division" above is the Argentine one.
+    "Primera División": "CHILE_PRIMERA",
+    "Superliga": "DANISH_SUPERLIGA",
 }
 
 # Reverse lookup: canonical → Odds API display name

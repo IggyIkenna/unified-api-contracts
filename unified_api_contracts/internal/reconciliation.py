@@ -14,11 +14,11 @@ Includes:
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from decimal import Decimal
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # ---------------------------------------------------------------------------
 # Resolution workflow
@@ -280,16 +280,225 @@ class ReconciliationAgeFields(BaseModel):
     oldest_unreconciled_position_age_seconds: int | None = None
 
 
+# ---------------------------------------------------------------------------
+# Citadel paper ⟷ batch ⟷ live determinism spine (2026-06-19)
+#
+# SSOT: codex/09-strategy/operational/paper-batch-live-reconciliation.md
+# Plan: plans/active/citadel_paper_batch_live_reconciliation_2026_06_19.md
+#
+# The three trading modes are the same program. paper(W) MUST equal
+# batch-rerun(W) trade-for-trade (same code + same inputs + same fill model);
+# the only intentional divergence is real venue fills at the LIVE boundary. So
+# paper↔batch reconciliation is a DETERMINISM PROOF (ε=0), not a tolerance
+# check, and live↔paper is the execution-quality measurement.
+# ---------------------------------------------------------------------------
+
+
+class TradingMode(StrEnum):
+    """Which of the three operational modes produced a run."""
+
+    PAPER = "PAPER"
+    BATCH = "BATCH"
+    LIVE = "LIVE"
+
+
+class FillModel(StrEnum):
+    """The two — and ONLY two — fill realities.
+
+    ``BENCHMARK`` is the canonical simulation fill model used by BOTH batch and
+    paper (so paper↔batch can be byte-identical). ``LIVE_VENUE`` is real venue
+    fills, used by live only — the single intentional divergence. A third fill
+    model on the batch/paper path is review-blocking (it re-creates the
+    paper-vs-batch divergence the determinism spine eliminates).
+    """
+
+    BENCHMARK = "BENCHMARK"
+    LIVE_VENUE = "LIVE_VENUE"
+
+
+class RunManifest(BaseModel):
+    """As-of snapshot pinning everything a deterministic rerun needs.
+
+    A paper run writes this once. A batch rerun takes the paper run's manifest,
+    asserts the ``code_shas``, replays ``captured_tick_stream`` (the exact
+    market-state snapshots the paper run consumed) under the pinned
+    ``feature_group_versions``, and writes its own ledger under a new ``run_id``
+    with ``parent_run_id`` back-referencing the paper run. Given identical code +
+    inputs + fill model, the emitted instructions AND simulated fills are a
+    deterministic function of the snapshot — trade-for-trade identical.
+
+    All datetime fields are tz-aware UTC. All GCS refs are immutable object
+    prefixes (the point-in-time guarantee).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    run_id: str = Field(description="Unique id for this run (paper/batch/live).")
+    window_start: datetime = Field(description="Inclusive UTC window start.")
+    window_end: datetime = Field(description="Exclusive UTC window end.")
+    mode: TradingMode
+    client_id: str = Field(description="Single client_id — never cross-client.")
+    strategy_ids: tuple[str, ...] = Field(description="Strategies active in this run.")
+    code_shas: dict[str, str] = Field(
+        description="repo name -> git sha on the decision+fill path "
+        "(strategy-service / execution-service / unified-api-contracts / "
+        "unified-trading-library / features-service). A batch rerun asserts these.",
+    )
+    market_data_days: tuple[str, ...] = Field(
+        description="Immutable GCS object refs / day partitions the run replayed.",
+    )
+    feature_group_versions: dict[str, int] = Field(
+        description="feature_group -> pinned feature_group_version hive key.",
+    )
+    captured_tick_stream: str = Field(
+        description="gs:// prefix of the exact MarketStateSnapshots consumed "
+        "per tick (the as-of input snapshot a batch rerun replays).",
+    )
+    fill_model: FillModel
+    ledger_root: str = Field(
+        description="gs:// root of the four ledgers for this run (ledger_type=instruction/passive/position/pricing).",
+    )
+    parent_run_id: str | None = Field(
+        default=None,
+        description="A batch rerun back-references the paper run_id it reproduces.",
+    )
+
+
+def make_trade_key(
+    instrument_key: str,
+    strategy_instruction_id: str,
+    tick_timestamp: datetime,
+) -> str:
+    """Deterministic per-trade identity — the reconciliation match key.
+
+    The SAME ``(instrument_key, strategy_instruction_id, tick_timestamp)`` in
+    paper and batch yields the SAME key, enabling trade-for-trade matching.
+    Timestamp is normalised to UTC ISO-8601 microseconds so a tz-naive vs
+    tz-aware mismatch can never split a key (a naive timestamp is assumed UTC —
+    the workspace stores all timestamps in UTC).
+    """
+
+    ts = tick_timestamp
+    if ts.tzinfo is None:
+        ts = ts.replace(tzinfo=UTC)
+    iso = ts.astimezone(UTC).isoformat(timespec="microseconds")
+    return f"{instrument_key}|{strategy_instruction_id}|{iso}"
+
+
+class TradeFillRecord(BaseModel):
+    """A keyed per-trade fill — the unit the reconciliation matches on.
+
+    Carried on the execution event AND mirrored to ``LedgerRow`` with
+    ``event_type=TRADE`` (``trade_id`` = ``trade_key``). ``side`` maps to the
+    ledger ``Direction`` enum value (kept as a string here to avoid coupling the
+    reconciliation contract to the ledger module).
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    trade_key: str = Field(description="make_trade_key(...) — the match key.")
+    instrument_key: str = Field(description="VENUE:INSTRUMENT_TYPE:SYMBOL.")
+    strategy_instruction_id: str
+    tick_timestamp: datetime
+    venue: str
+    side: str = Field(description="Ledger Direction value (BUY/SELL/LONG/SHORT/…).")
+    qty: Decimal
+    fill_price: Decimal
+    fees_in_quote: Decimal
+    fill_model: FillModel
+    correlation_id: str | None = None
+    client_order_id: str | None = None
+
+
+class ReconVerdictType(StrEnum):
+    """Which leg of the determinism decomposition a report covers."""
+
+    DETERMINISM = "DETERMINISM"  # paper ↔ batch: expect ε = 0
+    EXECUTION = "EXECUTION"  # live ↔ paper: execution alpha (expected non-zero)
+    COMPOSITE = "COMPOSITE"  # live ↔ batch: = determinism(≈0) + execution
+
+
+class DeterminismBugClass(StrEnum):
+    """Classification of a non-zero paper↔batch diff (which is always a BUG)."""
+
+    NONE = "NONE"
+    NON_DETERMINISM = "NON_DETERMINISM"  # the decision path is not deterministic
+    INPUT_CAPTURE_GAP = "INPUT_CAPTURE_GAP"  # the rerun saw different inputs
+    FILL_MODEL_DRIFT = "FILL_MODEL_DRIFT"  # paper/batch used different fill code
+
+
+class TradeDeviation(BaseModel):
+    """Per-trade diff between two runs, keyed on ``trade_key``."""
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    trade_key: str
+    instrument_key: str
+    venue: str
+    side_match: bool
+    qty_delta: Decimal
+    fill_price_delta_bps: Decimal
+    fees_delta: Decimal
+    timing_delta_ms: float
+    present_in_a: bool
+    present_in_b: bool
+
+
+class DailyReconReport(BaseModel):
+    """Trade-by-trade reconciliation for ONE T+1 run.
+
+    **Cadence: DAILY T+1.** Each day reconciles the prior trading day's paper vs
+    a batch-rerun of that day (``window_start``/``window_end`` = ``[day, day+1)``)
+    — matching the existing batch-live-reconciliation-service T+1 pipeline. A week
+    is simply 7 of these daily reports; there is no separate "weekly" run.
+
+    For a ``DETERMINISM`` verdict (paper↔batch) ``is_deterministic`` is True iff
+    every matched trade has ε=0 across (side, qty, fill_price, fees) AND there
+    are no unmatched trades on either side; otherwise ``determinism_bug_class``
+    names the failure mode. For an ``EXECUTION`` verdict (live↔paper) the
+    fill-price-delta rollups carry the execution alpha.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    verdict_type: ReconVerdictType
+    run_a_id: str = Field(description="paper (DETERMINISM/EXECUTION) or live (COMPOSITE).")
+    run_b_id: str = Field(description="batch (DETERMINISM/COMPOSITE) or paper (EXECUTION).")
+    window_start: datetime = Field(description="Inclusive UTC start of the T+1 day.")
+    window_end: datetime = Field(description="Exclusive UTC end (= day + 1).")
+    total_trades_a: int
+    total_trades_b: int
+    matched: int
+    unmatched_a: int
+    unmatched_b: int
+    deviations: tuple[TradeDeviation, ...]
+    is_deterministic: bool = Field(
+        description="DETERMINISM verdict only: True iff ε=0 and no unmatched trades.",
+    )
+    determinism_bug_class: DeterminismBugClass = DeterminismBugClass.NONE
+    mean_fill_price_delta_bps: Decimal = Decimal("0")
+    p99_fill_price_delta_bps: Decimal = Decimal("0")
+
+
 __all__ = [
     "AutoReconcileReason",
     "BalanceReconciliationSnapshot",
     "BalanceReconciliationStatus",
+    "DailyReconReport",
+    "DeterminismBugClass",
     "DeviationState",
     "DeviationStatus",
     "DeviationType",
+    "FillModel",
     "PnLReconciliationSnapshot",
+    "ReconVerdictType",
     "ReconciliationAction",
     "ReconciliationAgeFields",
     "ReconciliationDimension",
     "ReconciliationResolution",
+    "RunManifest",
+    "TradeDeviation",
+    "TradeFillRecord",
+    "TradingMode",
+    "make_trade_key",
 ]
