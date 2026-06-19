@@ -41,9 +41,10 @@ phases:
   post_build:
     commands:
       - echo "=== Publishing wheel to CodeArtifact ($CODEARTIFACT_DOMAIN/$CODEARTIFACT_REPO) ==="
-      - pip install twine
-      # Env-var upload (no .pypirc) — robust across twine versions; `aws codeartifact login` + twine 6.x
-      # produce an UnsupportedConfiguration error.
+      # Pin twine to 6.0.x: 6.1+ regressed CodeArtifact uploads (UnsupportedConfiguration), and 5.x can't
+      # parse Metadata-Version 2.4 wheels (InvalidDistribution). 6.0.x handles both (verified: wheel published).
+      - pip install "twine>=6.0,<6.1"
+      # Env-var upload (no .pypirc).
       - export TWINE_USERNAME=aws
       - export TWINE_PASSWORD=$(aws codeartifact get-authorization-token --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AWS_ACCOUNT_ID" --region "$AWS_DEFAULT_REGION" --query authorizationToken --output text)
       - export TWINE_REPOSITORY_URL=$(aws codeartifact get-repository-endpoint --domain "$CODEARTIFACT_DOMAIN" --domain-owner "$AWS_ACCOUNT_ID" --repository "$CODEARTIFACT_REPO" --format pypi --region "$AWS_DEFAULT_REGION" --query repositoryEndpoint --output text)
