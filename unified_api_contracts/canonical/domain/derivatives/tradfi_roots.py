@@ -73,7 +73,10 @@ CATEGORY_EVENT_CONTRACT = "event_contract"
 DATASET_CME = "GLBX.MDP3"
 DATASET_ICE_EUROPE = "IFEU.IMPACT"
 DATASET_ICE_US = "IFUS.IMPACT"
-DATASET_CBOE_CFE = "XCBF.PITCH"
+# CFE = Cboe Futures Exchange (the subscribed dataset for VX/VIX futures under the
+# 3-dataset subscription lockdown, operator 2026-06-18). XCBF.PITCH/XCBF.MDP3 are
+# NOT in the paid subscription (assert_dataset_allowed would reject them).
+DATASET_CBOE_CFE = "CFE"
 
 
 TRADFI_ROOTS: dict[str, RootMetadata] = {
@@ -246,9 +249,7 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
     "OJ": RootMetadata("OJ", CATEGORY_ICE_FUTURES, "OJ", "ICE", DATASET_ICE_US, "commodity"),
     "DX": RootMetadata("DX", CATEGORY_ICE_FUTURES, "DOLLARINDEX", "ICE", DATASET_ICE_US, "fx"),
     # ── CBOE / CFE Volatility ──────────────────────────────────────────────
-    # VX: VIX futures on CBOE Futures Exchange (CFE). XCBF.PITCH supports only
-    # raw_symbol stype_in (explicit contract codes like VXH6); parent symbology
-    # not available. Front-month symbols must be generated from target date.
+    # VX: VIX futures on CBOE Futures Exchange (CFE dataset, the subscribed feed).
     "VX": RootMetadata(
         "VX",
         CATEGORY_VOLATILITY_FUTURES,
