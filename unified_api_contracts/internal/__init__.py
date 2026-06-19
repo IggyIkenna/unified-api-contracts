@@ -1279,6 +1279,7 @@ from unified_api_contracts.internal.reconciliation import (
     AutoReconcileReason,
     BalanceReconciliationSnapshot,
     BalanceReconciliationStatus,
+    DailyReconReport,
     DeterminismBugClass,
     DeviationState,
     DeviationStatus,
@@ -1294,7 +1295,6 @@ from unified_api_contracts.internal.reconciliation import (
     TradeDeviation,
     TradeFillRecord,
     TradingMode,
-    WeeklyReconReport,
     make_trade_key,
 )
 from unified_api_contracts.internal.reference import (
@@ -2070,7 +2070,7 @@ __all__ = [
     "TradeDeviation",
     "TradeFillRecord",
     "TradingMode",
-    "WeeklyReconReport",
+    "DailyReconReport",
     "make_trade_key",
     "RedemptionStatus",
     "RefereeRecord",
