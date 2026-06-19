@@ -99,11 +99,11 @@ DATABENTO_VALID_PARENT_SYMBOLS: dict[str, tuple[str, str]] = {
     "HE": ("HE.FUT", "GLBX.MDP3"),
     "LEANHOGS": ("HE.FUT", "GLBX.MDP3"),
     # CFE (CBOE Futures Exchange) - Volatility (VX/VIX) Futures.
-    # Dataset = CFE: the 3-dataset subscription lockdown (operator 2026-06-18)
-    # subscribes to CFE for VX futures (XCBF.MDP3/XCBF.PITCH are NOT in the paid
-    # set and would be billed / rejected by assert_dataset_allowed).
-    "VX": ("VX.FUT", "CFE"),
-    "VIX_FUT": ("VX.FUT", "CFE"),
+    # The Databento dataset code for the Cboe Futures Exchange (the operator's "CFE"
+    # subscription, 2026-06-18) is XCBF.PITCH — a bare "CFE" is rejected by the API
+    # (400 validation_failed; verified live 2026-06-19). XCBF.PITCH is in the paid set.
+    "VX": ("VX.FUT", "XCBF.PITCH"),
+    "VIX_FUT": ("VX.FUT", "XCBF.PITCH"),
     # ICE Futures US (IFUS.IMPACT)
     "CT": ("CT.FUT", "IFUS.IMPACT"),
     "COTTON": ("CT.FUT", "IFUS.IMPACT"),
@@ -308,8 +308,8 @@ TRADFI_INSTRUMENTS: list[TradFiInstrumentDef] = [
         base_asset="VIX",
         data_source="yahoo_finance",
     ),
-    # CFE — Volatility Futures (traded on CBOE Futures Exchange)
-    _fut("VX.FUT", "CFE", "VIX"),
+    # CFE — Volatility Futures (traded on CBOE Futures Exchange; Databento dataset XCBF.PITCH)
+    _fut("VX.FUT", "XCBF.PITCH", "VIX"),
     # Options
     _opt("ES.OPT", "CME", "SP500"),
     _opt("NQ.OPT", "CME", "NASDAQ100"),
@@ -397,9 +397,9 @@ TRADFI_DATA_BINDINGS: dict[str, list[ProviderBinding]] = {
             series="VIXCLS",
         ),
     ],
-    # VX futures (CBOE Futures Exchange via Databento) — dataset CFE (3-dataset
-    # subscription lockdown 2026-06-18; XCBF.* is out of the paid set).
-    "VX.FUT": [_db("CFE", "parent", "VX")],
+    # VX futures (CBOE Futures Exchange via Databento) — dataset XCBF.PITCH (the
+    # operator's "CFE" subscription, 2026-06-18; a bare "CFE" is rejected by the API).
+    "VX.FUT": [_db("XCBF.PITCH", "parent", "VX")],
     # Options (CME via Databento)
     "ES.OPT": [_db("GLBX.MDP3", "parent", "ES")],
     "NQ.OPT": [_db("GLBX.MDP3", "parent", "NQ")],
