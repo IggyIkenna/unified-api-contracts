@@ -90,7 +90,10 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
     "hyperliquid": _BLR,
     "bybit": frozenset({Mode.LIVE}),
-    "aster": frozenset({Mode.LIVE}),
+    # aster self-archives funding/premiumIndex over a historical REST range → _BLR
+    # (perp_funding_data_semantics_and_cadence_2026_06_16.md). Like hyperliquid, it is
+    # a BATCH_CAPABLE_CEFI_VENUES exception.
+    "aster": _BLR,
 }
 
 
@@ -341,16 +344,26 @@ def test_cefi_replay_venues_are_live_and_replay() -> None:
     assert pipeline_mode_for_source("hyperliquid", Mode.REPLAY).value == "replay_hyperliquid"
 
 
-def test_bybit_and_aster_are_live_only_replay_absent() -> None:
-    """(b) Bybit (public REST recent-only) + Aster (newer venue) are LIVE-only —
-    replay ABSENT (a fact: their live-downtime gaps wait for batch T+1), so no
-    REPLAY_<venue> member exists for them."""
-    for venue in ("bybit", "aster"):
-        assert modes_for_source(venue) == frozenset({Mode.LIVE})
-        assert source_supports(venue, Mode.LIVE)
-        assert not source_supports(venue, Mode.REPLAY)
-        with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
-            _ = pipeline_mode_for_source(venue, Mode.REPLAY)
+def test_bybit_is_live_only_replay_absent() -> None:
+    """(b) Bybit (public REST recent-only) is LIVE-only — replay ABSENT (a fact: its
+    live-downtime gaps wait for batch T+1), so no REPLAY_BYBIT member exists."""
+    assert modes_for_source("bybit") == frozenset({Mode.LIVE})
+    assert source_supports("bybit", Mode.LIVE)
+    assert not source_supports("bybit", Mode.REPLAY)
+    with pytest.raises(ValueError, match="does not support that mode|No PipelineMode"):
+        _ = pipeline_mode_for_source("bybit", Mode.REPLAY)
+
+
+def test_aster_self_archives_all_three_modes() -> None:
+    """Aster (reclassified CeFi on-chain CLOB) is a UNIFIED vendor like hyperliquid:
+    its native fapi.asterdex.com funding/premiumIndex REST is a HISTORICAL time-range
+    endpoint (verified 2026-06-16, perp_funding_data_semantics_and_cadence_2026_06_16),
+    so it SELF-ARCHIVES → {batch, live, replay}, batch_aster/live_aster/replay_aster all
+    resolve, and it is a BATCH_CAPABLE_CEFI_VENUES exception (NOT Tardis-archived)."""
+    assert modes_for_source("aster") == frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY})
+    assert "aster" in BATCH_CAPABLE_CEFI_VENUES
+    for mode in (Mode.BATCH, Mode.LIVE, Mode.REPLAY):
+        assert pipeline_mode_for_source("aster", mode).value == f"{mode.value}_aster"
 
 
 def test_cefi_venues_have_no_batch_member() -> None:

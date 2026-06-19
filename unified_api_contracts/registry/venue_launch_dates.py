@@ -55,6 +55,11 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "BINANCE-FUTURES": "2019-09-08",  # USDT-M futures launch
     "OKX": "2017-01-01",  # OKEx founded; rebranded OKX 2022
     "DERIBIT": "2016-06-29",  # mainnet
+    # Deribit combo/spread instruments (future_combo + option_combo) — distinct
+    # manifest venue; combos rode the options product. Conservative launch ≈ when
+    # combo/strategy quoting became broadly available. Informational (pre-2018
+    # default window) — keeps the venue list ↔ launch-date registry consistent.
+    "DERIBIT-COMBO": "2019-01-01",
     "UPBIT": "2017-10-24",  # KRW market launch
     "COINBASE": "2014-12-08",  # GDAX launch (rebranded Coinbase Pro 2018)
     "BITFINEX-SPOT": "2012-12-27",  # founded
@@ -67,7 +72,9 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # EXPECTED_PRE_VENUE_LAUNCH rows in the [2018-01-01, today] window.
     "BYBIT": "2018-12-01",  # founded Mar 2018, public trading Dec 2018
     "HYPERLIQUID": "2023-06-14",  # mainnet beta
-    "ASTER": "2024-09-25",  # mainnet (post-rebrand from Astherus)
+    # Astherus pre-rebrand genesis (operator-confirmed 2026-06-17);
+    # pre-2024 funding is Binance-proxied (imported, not Aster-native).
+    "ASTER": "2023-07-22",
     "PACIFICA-SOLANA": "2024-04-01",  # Pacifica perp DEX on Solana
     "EXTENDED-STARKNET": "2024-09-01",  # Extended on Starknet
     "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter on zkSync Era
@@ -190,7 +197,9 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # data-quality artefact (see the A2a DEX-investigation todo — NOT added here
     # per the "do not bulk-add ambiguous dates" instruction).
     "HYPERLIQUID": "2023-06-14",  # Hyperliquid L1 perp DEX mainnet beta
-    "ASTER": "2024-09-25",  # Aster perp DEX mainnet (post-rebrand from Astherus)
+    # Astherus pre-rebrand genesis (operator-confirmed 2026-06-17);
+    # pre-2024 funding is Binance-proxied (imported, not Aster-native).
+    "ASTER": "2023-07-22",
     "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter perp DEX on zkSync Era
     "PACIFICA-SOLANA": "2024-04-01",  # Pacifica perp DEX on Solana
     # Pre-2018 venues kept for completeness (no EXPECTED_PRE_VENUE_LAUNCH rows

@@ -36,6 +36,7 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
     "options_chain": "15s",
     "futures_chain": "15s",
     # TradFi — pre-aggregated candles
+    "ohlcv_1s": "1s",  # Databento ohlcv-1s — fetched alongside ohlcv_1m (both L0/free); 15m/1h/24h aggregated
     "ohlcv_1m": "1m",
     "ohlcv_15m": "15m",
     "ohlcv_24h": "24h",
@@ -88,6 +89,7 @@ BASE_GRANULARITY_BY_DATA_TYPE: dict[str, str] = {
 
 # Timeframe ordering in seconds (used for validation and aggregation)
 TIMEFRAME_SECONDS: dict[str, int] = {
+    "1s": 1,
     "15s": 15,
     "1m": 60,
     "5m": 300,
@@ -131,7 +133,8 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
     ],
     "tradfi": [
         "trades",
-        "ohlcv_1m",  # Databento 1m candles (base timeframe)
+        "ohlcv_1s",  # Databento ohlcv-1s (L0/free 16y) — fetched alongside ohlcv_1m; 15m/1h/24h aggregated
+        "ohlcv_1m",  # Databento 1m candles — fetched (L0/free 16y), completes the existing 1m corpus
         "ohlcv_15m",  # VIX 15m: Barchart CSV (2020-01-07→2021-04-21, discontinued) then Yahoo Finance; KRW rates
         "ohlcv_24h",  # Yahoo Finance daily rates (KRW/USD, etc.)
         "tbbo",  # Top-of-book quotes
@@ -216,6 +219,13 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "BYBIT",
         "OKX",
         "DERIBIT",
+        # DERIBIT-COMBO: multi-leg combo/spread instruments fetched from Deribit's
+        # public get_instruments (future_combo + option_combo kinds). Registered as a
+        # DISTINCT venue (instruments-service VENUE_TO_ADAPTER["DERIBIT-COMBO"]="deribit_combo",
+        # its own manifest shard) — the validation registry MUST know it or every fetched
+        # combo is rejected "unknown venue" (the venue had 0 captured days 2026-05-23→06-18
+        # until the kind-split + venue-tag fixes 2026-06-18). instrument_key stays DERIBIT:COMBO:*.
+        "DERIBIT-COMBO",
         "UPBIT",
         "COINBASE",
         # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
@@ -234,12 +244,20 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "LIGHTER-ZKSYNC",
     ],
     "tradfi": [
-        # Databento venues
+        # Databento venues — 3-dataset subscription lockdown (operator 2026-06-18):
+        # GLBX.MDP3 (CME futures+options+event contracts) + DBEQ.BASIC (NASDAQ/NYSE
+        # equities, consolidated) + CFE (CBOE — VX/VIX futures). The ICE Databento
+        # datasets (IFEU.IMPACT/IFUS.IMPACT) are OUT of the paid subscription so the
+        # ICE Databento *instruments* (Brent/Gasoil/softs/DX) were dropped from
+        # tradfi_instrument_universe.py — but ICE STAYS a venue here because the
+        # ICE/NYBOT US Dollar Index (DXY) is still sourced via Yahoo (non-Databento)
+        # under venue ICE, and the market-session / data-status / source-resolution
+        # registries key off it. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
         "NASDAQ",
         "NYSE",
         "CME",
-        "ICE",
-        "CBOE",
+        "ICE",  # Yahoo-sourced ICE/NYBOT DXY index only (no ICE Databento datasets)
+        "CBOE",  # Cboe Futures Exchange (CFE) — VX / VIX futures
         # External data providers
         "FX",  # FX rates (KRW/USD via Yahoo Finance data provider)
         "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)
@@ -292,6 +310,7 @@ NEEDS_CANDLE_PROCESSING: dict[str, bool] = {
     "options_chain": True,
     "futures_chain": True,
     # TradFi — pre-aggregated but still processed (timeframe re-aggregation)
+    "ohlcv_1s": True,
     "ohlcv_1m": True,
     "ohlcv_15m": True,
     "ohlcv_24h": True,
@@ -615,7 +634,9 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     ("tradfi", "index"): frozenset({"ohlcv_1m", "ohlcv_15m", "ohlcv_24h"}),
     ("tradfi", "bond"): frozenset({"trades", "ohlcv_24h"}),  # UNCERTAIN — tradfi-owner verify
     ("tradfi", "cds"): frozenset({"trades"}),  # UNCERTAIN — tradfi-owner verify
-    ("tradfi", "event_contract"): frozenset({"trades"}),  # UNCERTAIN — tradfi-owner verify
+    # CME Globex event contracts (EC* series — ECES/ECNQ/ECGC/ECCL/ECNG/EC6E/ECBTC…) on GLBX.MDP3;
+    # captured under the 3-dataset lockdown (ohlcv-1s + ohlcv-1m fetched + trades/tbbo, all on the allowlist).
+    ("tradfi", "event_contract"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"}),
     ("tradfi", "commodity"): frozenset(  # UNCERTAIN — tradfi-owner verify
         {"trades", "ohlcv_1m", "ohlcv_24h", "tbbo", "mbp_10"}
     ),
@@ -1023,15 +1044,18 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "perp_funding": "2023-05-20",  # perp_funding_handler REST /info fundingHistory
     },
     # ASTER — only derivative_ticker (fundingRate REST) and trades (aggTrades
-    # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Both available
-    # since Aster launch (2024-10-01). book_snapshot_5 + liquidations both out
-    # of scope (no wired fetch path).
-    # perp_funding: collected by perp_funding_handler (declared in _defi.py
-    # _ProtocolCapability data_types=["perp_funding"]); start = Aster launch.
+    # REST, ~30-day rolling depth) are wired in _fetch_aster_rest. Genesis =
+    # 2023-07-22 (operator-confirmed 2026-06-17 via the Astherus pre-rebrand
+    # venue). book_snapshot_5 + liquidations both out of scope (no wired fetch
+    # path). perp_funding: collected by perp_funding_handler (declared in
+    # _defi.py _ProtocolCapability data_types=["perp_funding"]).
+    # IMPORTANT — pre-2024 Aster funding is BINANCE-PROXIED (Astherus pre-rebrand
+    # mirrored Binance funding); it is imported, NOT Aster-native — label `source`
+    # honestly. SSOT: perp_funding_data_semantics_and_cadence_2026_06_16.md §GAP 2.
     "ASTER": {
-        "trades": "2024-10-01",
-        "derivative_ticker": "2024-10-01",
-        "perp_funding": "2024-10-01",  # perp_funding_handler REST Aster API
+        "trades": "2023-07-22",
+        "derivative_ticker": "2023-07-22",
+        "perp_funding": "2023-07-22",  # perp_funding_handler REST Aster API
     },
     # Tier-3 CeFi (2026-05-01) — spot=trades+book; perp=+ derivative_ticker
     # +liquidations. None carry chain bundles (perps are individual syms).

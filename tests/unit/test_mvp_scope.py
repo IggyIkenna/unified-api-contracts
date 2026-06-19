@@ -111,8 +111,32 @@ class TestCeFiMvp:
         assert not is_mvp("cefi", "COINBASE", "SPOT_PAIR", "trades", base_ccy="BTC")
 
     def test_non_mvp_base_ccy_returns_false(self) -> None:
-        """USDC is not in the MVP base_ccys → False (cefi has non-empty base_ccys)."""
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="USDC")
+        """A base outside the 44-base CEFI_BASE_ASSET_UNIVERSE → False.
+
+        (SUI is a real coin but intentionally NOT in the operator-confirmed
+        44-base CeFi MVP universe; the rule has a non-empty base_ccys set.)
+        """
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="SUI")
+
+    def test_operator_requested_2026_06_16_base_is_mvp(self) -> None:
+        """An operator-requested 2026-06-16 base (EIGEN) is now in the MVP set."""
+        assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="EIGEN")
+
+    def test_deribit_btc_option_is_mvp(self) -> None:
+        """Deribit BTC OPTION → MVP (the options carve-out admits BTC + ETH)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="BTC")
+
+    def test_deribit_eth_option_is_mvp(self) -> None:
+        """Deribit ETH OPTION → MVP (the options carve-out admits BTC + ETH)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="ETH")
+
+    def test_deribit_sol_option_not_mvp(self) -> None:
+        """A non-BTC/ETH OPTION → False even though SOL is in the spot/perp universe.
+
+        The Deribit-options carve-out narrows the OPTION expected universe to
+        BTC + ETH only, so a SOL option is NOT expected (no false-missing).
+        """
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="SOL")
 
     def test_no_base_ccy_with_non_empty_rule_returns_false(self) -> None:
         """When the rule has non-empty base_ccys, None base_ccy → False."""
@@ -127,8 +151,57 @@ class TestCeFiMvp:
         assert not is_mvp("cefi", "BINANCE-FUTURES", "FUTURE", "trades", base_ccy="BTC")
 
     def test_book_snapshot_5_is_mvp(self) -> None:
-        """book_snapshot_5 is a CeFi MVP data_type."""
+        """book_snapshot_5 is a CeFi MVP data_type (bare OKX → sub-venue normalised)."""
         assert is_mvp("cefi", "OKX", "PERPETUAL", "book_snapshot_5", base_ccy="ETH")
+
+    def test_okx_spot_is_mvp(self) -> None:
+        """Canonical OKX-SPOT (catalogue/pipeline form) → MVP.
+
+        Regression: the rule used to carry the bare ``OKX`` token, so
+        ``is_mvp("cefi", "OKX-SPOT", …)`` returned False and OKX-SPOT catalogue
+        instruments were mis-tagged non-MVP (mvp_instrument_universe_gap_audit
+        P2 #1).
+        """
+        assert is_mvp("cefi", "OKX-SPOT", "SPOT_PAIR", "trades", base_ccy="BTC")
+
+    def test_okx_swap_is_mvp(self) -> None:
+        """Canonical OKX-SWAP (perp leg) → MVP."""
+        assert is_mvp("cefi", "OKX-SWAP", "PERPETUAL", "trades", base_ccy="ETH")
+
+    def test_okx_futures_is_mvp(self) -> None:
+        """Canonical OKX-FUTURES → MVP."""
+        assert is_mvp("cefi", "OKX-FUTURES", "PERPETUAL", "derivative_ticker", base_ccy="SOL")
+
+    def test_bare_okx_still_resolves_to_sub_venues(self) -> None:
+        """A bare ``OKX`` caller resolves to the canonical sub-venues (back-compat)."""
+        assert is_mvp("cefi", "OKX", "SPOT_PAIR", "trades", base_ccy="BTC")
+        assert is_mvp("cefi", "OKX", "PERPETUAL", "trades", base_ccy="ETH")
+
+    def test_okx_unknown_sub_venue_form_resolves(self) -> None:
+        """A not-yet-declared OKX sub-venue form still resolves via base-token match.
+
+        Defensive: any ``OKX-*`` base-normalises to OKX, which is in the
+        sub-venue-base set → matches an MVP OKX sub-venue.
+        """
+        assert is_mvp("cefi", "OKX-PERP", "PERPETUAL", "trades", base_ccy="BTC")
+
+    def test_cefi_unbound_data_type_is_mvp(self) -> None:
+        """An instrument-grain caller with NO data_type (blank) → "any MVP data_type".
+
+        Regression for the all-zero MVP-column bug: the catalogue carries
+        ``data_type=None`` for single-grain rows; a blank data_type must match
+        when the venue/instrument_type/base are MVP (mvp_instrument_universe_gap_audit
+        P2 #2). Both "" and None are blank.
+        """
+        assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "", base_ccy="BTC")
+        assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", None, base_ccy="BTC")
+        # data_type defaults to None now — positional-only call also works.
+        assert is_mvp("cefi", "OKX-SPOT", "SPOT_PAIR", base_ccy="ETH")
+
+    def test_cefi_bound_data_type_still_gated(self) -> None:
+        """A NON-blank data_type is still checked against the rule set (not bypassed)."""
+        assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="BTC")
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "positions", base_ccy="BTC")
 
     def test_return_type_is_bool(self) -> None:
         """is_mvp() returns exactly bool, not a truthy/falsy value."""
@@ -393,6 +466,37 @@ class TestAbsentPairs:
             assert not is_mvp(ag, "ANY_VENUE", "SPOT_PAIR", "trades"), (
                 f"Expected is_mvp=False for stub asset_group: {ag}"
             )
+
+
+# ---------------------------------------------------------------------------
+# Unbound-data_type convention across asset groups (P2 #2, 2026-06-17)
+# ---------------------------------------------------------------------------
+
+
+class TestUnboundDataType:
+    """A blank (``""``/``None``) data_type means "any MVP data_type" for every AG."""
+
+    def test_defi_unbound_data_type_is_mvp(self) -> None:
+        """DeFi LST instrument with no data_type → MVP (any-data_type)."""
+        assert is_mvp("defi", "LIDO-ETHEREUM", "LST", "")
+        assert is_mvp("defi", "LIDO-ETHEREUM", "LST", None)
+
+    def test_tradfi_unbound_data_type_is_mvp(self) -> None:
+        """TradFi CME future ES with no data_type → MVP (any-data_type)."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "", base_ccy="ES")
+        assert is_mvp("tradfi", "CME", "FUTURE", None, base_ccy="ES")
+
+    def test_prediction_unbound_data_type_is_mvp(self) -> None:
+        """Prediction Polymarket with no data_type → MVP (any-data_type)."""
+        assert is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", "", market_group="crypto")
+        assert is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", None, market_group="crypto")
+
+    def test_unbound_data_type_still_gates_other_axes(self) -> None:
+        """Blank data_type relaxes ONLY the data_type axis — venue/base still gate."""
+        # Non-MVP venue: blank data_type does NOT make it MVP.
+        assert not is_mvp("cefi", "UPBIT", "SPOT_PAIR", "", base_ccy="BTC")
+        # Non-MVP base: blank data_type does NOT make it MVP.
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "", base_ccy="SUI")
 
 
 # ---------------------------------------------------------------------------

@@ -86,7 +86,30 @@ _STAKED_HEDGE_VENUES: Final[tuple[str, ...]] = (
 )
 _STAKE_PROTOCOLS_ETH_SOL: Final[tuple[str, ...]] = ("lido", "rocketpool", "jito", "marinade")
 _LEND_VENUES_STAKED: Final[tuple[str, ...]] = ("aave_v3", "kamino")
-_SPOT_VENUES_STAKED: Final[tuple[str, ...]] = ("uniswap_v3", "jupiter")
+# Spot-leg (USDC→native SWAP) venues for CARRY_STAKED_BASIS — operator-
+# selectable, NOT hardcoded per-LST (operator directive 2026-06-17; plan
+# ``defi_collateral_sizing_and_wizard_full_parameterization_2026_06_17`` Phase
+# D + issue ``e2e_defi_config_taxonomy_wizard_roundtrip`` D3). The SWAP leg
+# trades the START STABLE → NATIVE asset (USDC→ETH / USDC→SOL), NOT the LST
+# (that is the downstream STAKE leg), so the eligibility test is "does this
+# venue trade USDC↔{ETH,SOL} spot" — the realistic liquid set spans a CEX
+# (Binance-spot) and the family DEXes, each more liquid for different pairs.
+# Every id is a registered venue (CARRY_BASIS_PERP spot leg + KNOWN_VENUE_TOKENS
+# / venue catalog) that genuinely lists the native USDC pair:
+#   * ETH (USDC↔ETH): ``uniswap_v3`` (deepest USDC/WETH pool), ``curve``
+#     (tricrypto USDC↔ETH), ``binance`` (BINANCE-SPOT ETH/USDC).
+#   * SOL (USDC↔SOL): ``jupiter`` (Solana DEX aggregator), ``orca`` (SOL/USDC
+#     whirlpool), ``raydium`` (SOL/USDC AMM), ``binance`` (BINANCE-SPOT SOL/USDC).
+# Union (sorted) — the engine catalog (catalog_staked_basis.py) emits one slot
+# per (LST x spot_venue), and the wizard renders these as the spot-leg picker.
+_SPOT_VENUES_STAKED: Final[tuple[str, ...]] = (
+    "binance",
+    "curve",
+    "jupiter",
+    "orca",
+    "raydium",
+    "uniswap_v3",
+)
 
 # Shared venue tuples for the design-status families (from cells + codex docs).
 # F39: added kraken (kraken_rest_adapter.py:159 KRAKEN-FUTURES/SPOT adapter) and

@@ -1,6 +1,6 @@
 # Capability Manifest — Orphan + Dead-End Report
 # manifest_version: 1.0.0
-# generated_from_commit: 9b03b3bfdda77361313b0286863a0122d4a99630
+# generated_from_commit: f0b66b2659c1843cbd7e4fabad91a66963e3af55
 #
 # Orphan nodes have no edges. Unbuilt dead-ends are registry-available
 # archetype/instrument combos with no supporting venue (build gap).
@@ -286,9 +286,9 @@ LOGICAL: YIELD_ROTATION_LENDING x lending (CEFI) — CeFi lending out-of-scope: 
 
 === VERDICT MATRIX SUMMARY (Phase 6A) ===
 Exhaustive cross-join: archetype x venue x instrument_type x (instruction_action x algo).
-  total cells:    21600
-  available:      14977 (69.3%)
-  blocked:        6175 (28.6%)
-  not_registered: 448 (2.1%)
+  total cells:    21984
+  available:      15277 (69.5%)
+  blocked:        6259 (28.5%)
+  not_registered: 448 (2.0%)
 Output: openapi/capability-verdict-matrix.json
 === END VERDICT MATRIX SUMMARY ===

@@ -97,6 +97,10 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # tradfi ohlcv_15m at line ~181 is intact.
     ("cefi", "book_snapshot"): "tick_timestamp",
     ("cefi", "liquidations"): "tick_timestamp",
+    # derivative_ticker — perp mark/index/OI/funding tick (tardis archive + the Aster
+    # self-archived shard). available_at = the tick's own settlement/observation
+    # timestamp (perp_funding_data_semantics_and_cadence_2026_06_16.md §genesis).
+    ("cefi", "derivative_ticker"): "tick_timestamp",
     ("cefi", "options_chain"): "tick_timestamp",
     ("cefi", "futures_chain"): "tick_timestamp",
     ("cefi", "perpetual"): "tick_timestamp",
@@ -190,6 +194,7 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # ---- TradFi ---------------------------------------------------------
     ("tradfi", "trades"): "tick_timestamp",
     ("tradfi", "tbbo"): "tick_timestamp",
+    ("tradfi", "ohlcv_1s"): "tick_timestamp",
     ("tradfi", "ohlcv_1m"): "tick_timestamp",
     ("tradfi", "ohlcv_15m"): "tick_timestamp",
     ("tradfi", "options_chain"): "tick_timestamp",
@@ -284,14 +289,14 @@ When no per-league empirical floor is available, fall back to 14 days.
 
 FIXTURE_ANNOUNCEMENT_FLOOR_DAYS: Final[dict[int, int]] = {
     # Tier 1: Big 5 European leagues (api_football observation window 2026-06-16)
-    39: 21,   # EPL
+    39: 21,  # EPL
     140: 21,  # La Liga
-    78: 28,   # Bundesliga (publishes matchday splits earlier)
+    78: 28,  # Bundesliga (publishes matchday splits earlier)
     135: 21,  # Serie A
-    61: 21,   # Ligue 1
+    61: 21,  # Ligue 1
     # Tier 1: Other European
-    88: 21,   # Eredivisie
-    94: 14,   # Primeira Liga
+    88: 21,  # Eredivisie
+    94: 14,  # Primeira Liga
     144: 14,  # Jupiler Pro League (Belgium)
     179: 14,  # Scottish Premiership
     203: 14,  # Super Lig (Turkey)

@@ -70,6 +70,20 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # test_validity_matrix_completeness.py removed alongside.
     ("cefi", "book_snapshot"): ["tardis"],
     ("cefi", "liquidations"): ["tardis"],
+    # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
+    # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/
+    # bybit/deribit → batch_tardis, resolved via this index-0 entry). **aster** is the
+    # SECOND source: Aster (reclassified CeFi on-chain CLOB) self-archives funding +
+    # premiumIndex over its native Binance-Futures-compatible REST and is routed to
+    # ``batch_aster`` by the UTL ``_VENUE_OVERRIDES["ASTER"]`` venue override (which
+    # runs BEFORE this lookup), so ASTER never resolves through index-0 tardis. This
+    # 2-source registration (a) closes the SOURCE_PRIORITY↔PipelineMode closed-set
+    # round-trip for ``batch_aster``, and (b) lets the MTDS orchestrator stamp the
+    # correct per-venue ``source`` (tardis for Tardis venues, aster for the
+    # venue-override Aster shard). source_required becomes True, but every
+    # derivative_ticker writer already passes an explicit source. SSOT:
+    # ``perp_funding_data_semantics_and_cadence_2026_06_16.md`` §genesis.
+    ("cefi", "derivative_ticker"): ["tardis", "aster"],
     # ERA-B (operator 2026-06-07): options_chain / futures_chain are
     # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
     # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
@@ -230,6 +244,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # NOT covered by Massive — yahoo+barchart layering via MTDS routing.
     ("tradfi", "trades"): ["massive", "databento"],
     ("tradfi", "tbbo"): ["massive", "databento"],
+    ("tradfi", "ohlcv_1s"): ["massive", "databento"],
     ("tradfi", "ohlcv_1m"): ["massive", "databento"],
     ("tradfi", "ohlcv_15m"): ["massive", "databento", "yahoo", "barchart"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
@@ -400,22 +415,31 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "kraken": frozenset({Mode.LIVE, Mode.REPLAY}),
     "hyperliquid": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "bybit": frozenset({Mode.LIVE}),
-    "aster": frozenset({Mode.LIVE}),
+    # aster, like hyperliquid, is a UNIFIED vendor: its native ``fapi.asterdex.com``
+    # funding/premiumIndex REST is a HISTORICAL time-range endpoint (startTime/endTime,
+    # verified 2026-06-16 — ``perp_funding_data_semantics_and_cadence_2026_06_16.md``
+    # §genesis), so Aster SELF-ARCHIVES its derivative_ticker (perp funding) → batch +
+    # replay capable. It is NOT Tardis-archived; the Aster derivative_ticker shard
+    # resolves to ``batch_aster`` via the UTL ``_VENUE_OVERRIDES["ASTER"]`` override.
+    "aster": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
 }
 
 CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
     {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster"}
 )
 
-BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset({"hyperliquid"})
-"""CeFi live venues that are ALSO a batch source (operator R4 2026-06-07).
+BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset({"hyperliquid", "aster"})
+"""CeFi live venues that are ALSO a batch source (operator R4 2026-06-07 + Aster
+2026-06-16).
 
 ``hyperliquid`` is the unified vendor: a CeFi/DeFi live+replay venue AND the DeFi
-``perp_funding``/``solana_defi`` BATCH source (REST candleSnapshot). It is the ONE
-:data:`CEFI_LIVE_VENUES` member that carries a ``batch_<venue>`` PipelineMode +
-``Mode.BATCH`` capability — every other CeFi venue is live/replay-only (CeFi batch
-= tardis). Exempts hyperliquid from the "CeFi venues are not batch-capable"
-invariant without weakening it for the rest."""
+``perp_funding``/``solana_defi`` BATCH source (REST candleSnapshot). ``aster`` is the
+second such venue: its native Binance-Futures-compatible REST serves perp funding +
+premiumIndex over a historical time-range, so it SELF-ARCHIVES its derivative_ticker
+(``perp_funding_data_semantics_and_cadence_2026_06_16.md`` §genesis). Both carry a
+``batch_<venue>`` PipelineMode + ``Mode.BATCH`` capability — every OTHER CeFi venue is
+live/replay-only (CeFi batch = tardis). Exempts these two from the "CeFi venues are not
+batch-capable" invariant without weakening it for the rest."""
 """CeFi exchange venues that serve the `live`/`replay` capture modes (M2/M3).
 
 CeFi `batch` data comes from ``tardis`` (the T+1 multi-venue archive); CeFi
@@ -476,6 +500,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "eia": 86_400_000,
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
+    "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).

@@ -235,13 +235,19 @@ class VenueMapping:
             "BITGET-SPOT": "2024-11-08",
             "BITGET-FUTURES": "2024-11-08",
             "KRAKEN-SPOT": "2020-01-01",
-            # Tardis cryptofacilities (Kraken Futures) available from 2019-03-30.
-            "KRAKEN-FUTURES": "2019-03-30",
+            # Kraken Futures: earliest CAPTURED manifest data = 2020-01-01
+            # (operator-confirmed 2026-06-17 "per the manifest"; the
+            # cryptofacilities Tardis archive reaches 2019-03-30 but our
+            # captured market-data-tick rows begin 2020-01-01, so the
+            # IS-catalogue enumeration floor is 2020-01-01).
+            "KRAKEN-FUTURES": "2020-01-01",
             # CEFI on-chain CLOBs. HYPERLIQUID earliest = book_snapshot_5 S3
             # archive 2023-04-15; see VENUE_DATA_TYPE_CAPABILITIES for per-
             # data-type starts (trades only from 2025-03-22, no liquidations).
             "HYPERLIQUID": "2023-04-15",
-            "ASTER": "2024-10-01",
+            # Astherus pre-rebrand genesis (operator-confirmed 2026-06-17);
+            # pre-2024 funding is Binance-proxied (imported, not Aster-native).
+            "ASTER": "2023-07-22",
             "PACIFICA-SOLANA": "2025-06-01",
             "EXTENDED-STARKNET": "2024-10-01",
             "LIGHTER-ZKSYNC": "2024-08-01",
