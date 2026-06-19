@@ -43,7 +43,7 @@ ALLOWED_DATABENTO_DATASETS: frozenset[str] = frozenset(
     {
         "GLBX.MDP3",  # CME Globex
         "DBEQ.BASIC",  # Databento US Equities (single stocks + ETFs)
-        "CFE",  # Cboe Futures Exchange (VIX / VX futures)
+        "XCBF.PITCH",  # Cboe Futures Exchange (VIX / VX futures) — operator calls it "CFE"
     }
 )
 

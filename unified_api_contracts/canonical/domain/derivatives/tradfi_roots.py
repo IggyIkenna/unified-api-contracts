@@ -73,10 +73,14 @@ CATEGORY_EVENT_CONTRACT = "event_contract"
 DATASET_CME = "GLBX.MDP3"
 DATASET_ICE_EUROPE = "IFEU.IMPACT"
 DATASET_ICE_US = "IFUS.IMPACT"
-# CFE = Cboe Futures Exchange (the subscribed dataset for VX/VIX futures under the
-# 3-dataset subscription lockdown, operator 2026-06-18). XCBF.PITCH/XCBF.MDP3 are
-# NOT in the paid subscription (assert_dataset_allowed would reject them).
-DATASET_CBOE_CFE = "CFE"
+# CFE = Cboe Futures Exchange — the third subscribed feed (operator 2026-06-18),
+# carrying VX/VIX futures. Databento's dataset CODE for the Cboe Futures Exchange
+# is ``XCBF.PITCH`` (verified live 2026-06-19 via metadata.get_dataset_range — a
+# bare ``CFE`` is rejected by the Databento API with 400 validation_failed; the
+# operator's "CFE subscription" is the entitlement to XCBF.PITCH, which covers
+# 2018-11-04→now and exposes definition/ohlcv-1s/ohlcv-1m). The constant name keeps
+# the CFE label (the exchange) while the value is the Databento dataset id.
+DATASET_CBOE_CFE = "XCBF.PITCH"
 
 
 TRADFI_ROOTS: dict[str, RootMetadata] = {
