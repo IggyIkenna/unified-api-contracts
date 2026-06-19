@@ -57,6 +57,29 @@ class StrategyArchetype(StrEnum):
     Capability cells (per-archetype venue/category claims) are currently in
     ``unified-api-contracts/scripts/enumerate_envelope.py``; manifest
     incorporation is a follow-up.
+
+    ──────────────────────────────────────────────────────────────────────────
+    ADDING A NEW ARCHETYPE? Update these downstream consumers (the in-repo /
+    strategy-service ones FAIL LOUDLY in QG; the UI ones are a SILENT cross-repo
+    gap — there is no CI that catches them from here, so they're listed first):
+
+      UI (unified-trading-system-ui — hand-maintained mirror, NOT auto-synced;
+      a UI todo under the playwright gate, NOT optional if the archetype is to be
+      operator-surfaced):
+        • ``lib/architecture-v2/enums.ts`` — add to the ``StrategyArchetype``
+          union + ``STRATEGY_ARCHETYPES_V2`` curated list + ``ARCHETYPE_TO_FAMILY``;
+          bump ``tests/unit/lib/architecture-v2/enums.test.ts`` ``toHaveLength(N)``.
+        • regenerate ``lib/registry/ui-reference-data.json`` via
+          ``unified-api-contracts/scripts/generate_ui_reference_data.py``.
+
+      Same-repo (QG-enforced — these RAISE at import or fail a test, so you can't
+      miss them): ``ARCHETYPE_TO_FAMILY`` (this file) + a leg-spec seed in
+      ``architecture_v2/archetype_leg_spec_seeds.py`` (``ARCHETYPE_LEG_STRUCTURES``
+      raises at import if missing). strategy-service: factory registry,
+      ``carry_and_yield/__init__`` (etc.) export, ``archetype_defaults``
+      (Kelly tier / GREENFIELD), ``target_universe`` catalog builder + registry,
+      the ``test_ml_directional_continuous`` family_map.
+    ──────────────────────────────────────────────────────────────────────────
     """
 
     ML_DIRECTIONAL_CONTINUOUS = "ML_DIRECTIONAL_CONTINUOUS"
