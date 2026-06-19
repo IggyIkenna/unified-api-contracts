@@ -23,6 +23,7 @@ from ._ledger_row import (
     TreasuryLedger,
     assert_no_cross_client_transfer,
 )
+from ._position_ledger import PositionLedgerRow
 
 __all__ = [
     "AssetClass",
@@ -34,6 +35,7 @@ __all__ = [
     "LedgerRow",
     "OptionRight",
     "PassiveLedger",
+    "PositionLedgerRow",
     "PricingLedger",
     "TreasuryLedger",
     "assert_no_cross_client_transfer",

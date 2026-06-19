@@ -59,6 +59,7 @@ from .ledger import InstructionLedger as InstructionLedger
 from .ledger import LedgerRow as LedgerRow
 from .ledger import OptionRight as OptionRight
 from .ledger import PassiveLedger as PassiveLedger
+from .ledger import PositionLedgerRow as PositionLedgerRow
 from .ledger import PricingLedger as PricingLedger
 from .ledger import TreasuryLedger as TreasuryLedger
 from .ledger import assert_no_cross_client_transfer as assert_no_cross_client_transfer
