@@ -26,8 +26,8 @@ phases:
   pre_build:
     commands:
       - echo "=== Installing packages ==="
-      - uv pip install -e "."
-      - uv pip install ruff pytest
+      - uv pip install --system -e "."
+      - uv pip install --system ruff pytest
 
   build:
     commands:
