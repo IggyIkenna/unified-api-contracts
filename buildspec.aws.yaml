@@ -31,17 +31,9 @@ phases:
 
   build:
     commands:
-      - echo "=== Running linting ==="
-      - ruff check --line-length 120 unified_api_contracts/ || exit 1
-
-      - echo "=== Running tests ==="
-      - |
-        if [ -d "tests" ]; then
-          pytest tests/ -v --tb=short || exit 1
-        else
-          echo "No tests directory found, skipping"
-        fi
-
+      # Lint + tests are the QG's job (run before merge). The AWS build's role is build-wheel + publish,
+      # matching GCP's UAC cloudbuild. (A bare `ruff check --line-length 120 ...` ignored the repo's ruff
+      # config and flagged false positives that the configured QG ruff does not.)
       - echo "=== Building wheel ==="
       - pip install build
       - python -m build --wheel --outdir dist/
