@@ -20,6 +20,8 @@ phases:
     runtime-versions:
       python: 3.13
     commands:
+      - echo "=== Installing uv ==="
+      - pip install uv
 
   pre_build:
     commands:
