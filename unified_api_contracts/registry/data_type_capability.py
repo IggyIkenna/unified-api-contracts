@@ -672,6 +672,24 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         live_capable=False,
         batch_capable=True,
     ),
+    # CBOE VX FUTURES — ohlcv_1s + ohlcv_1m via Databento XCBF.PITCH (operator's
+    # "CFE" subscription, 2026-06-19). Distinct from the ohlcv_15m VIX cash index.
+    DataTypeCapability(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_1s",
+        venue="CBOE",
+        instrument_type="future",
+        live_capable=False,
+        batch_capable=True,
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.TRADFI,
+        data_type="ohlcv_1m",
+        venue="CBOE",
+        instrument_type="future",
+        live_capable=False,
+        batch_capable=True,
+    ),
     DataTypeCapability(
         asset_group=AssetGroup.TRADFI,
         data_type="trades",

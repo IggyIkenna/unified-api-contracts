@@ -141,7 +141,11 @@ _TRADFI: dict[str, list[str]] = {
     # codex/02-data/tradfi-databento-sourcing-ssot.md.
     "CME": ["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"],
     "ICE": ["trades", "ohlcv_1m", "tbbo"],
-    "CBOE": ["ohlcv_15m"],
+    # CBOE: ohlcv_15m = VIX cash INDEX (Barchart/Yahoo). ohlcv_1s + ohlcv_1m =
+    # VX FUTURES via Databento XCBF.PITCH (operator's "CFE" subscription, 2026-06-19;
+    # both L0/free 16y). The denominator must count the futures 1s/1m cells too.
+    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+    "CBOE": ["ohlcv_15m", "ohlcv_1s", "ohlcv_1m"],
     # NASDAQ + NYSE equity venues added 2026-05-17 per OHLCV-only MVP scope
     # (operator direction 2026-05-15 — see
     # plans/active/tradfi_ohlcv_only_mvp_backfill_2026_05_15.md). Phase 7

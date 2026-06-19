@@ -71,6 +71,41 @@ def test_dated_future_two_digit_year_classifies() -> None:
 
 
 # ---------------------------------------------------------------------------
+# Cboe VX (VIX) futures — XCBF.PITCH slash-delimited parent symbology
+# ---------------------------------------------------------------------------
+
+
+def test_vx_future_outright_classifies_with_vix_settlement_expiry() -> None:
+    # VX/M6 = VIX June-2026. VX settles 30d before the NEXT month's third Friday
+    # (July 2026 third Friday = 2026-07-17; minus 30d = 2026-06-17).
+    cls = classify_databento_symbol("VX/M6")
+    assert cls.instrument_type is InstrumentType.FUTURE
+    assert cls.underlying == "VX"
+    assert cls.is_continuous is False
+    assert cls.expiry_date == _dt.date(2026, 6, 17)
+    assert cls.strike is None
+    assert cls.option_right is None
+
+
+def test_vx_future_december_rolls_year_for_expiry() -> None:
+    # VX/Z6 = VIX Dec-2026. Next month is Jan-2027 (third Friday 2027-01-15);
+    # minus 30d = 2026-12-16.
+    cls = classify_databento_symbol("VX/Z6")
+    assert cls.instrument_type is InstrumentType.FUTURE
+    assert cls.underlying == "VX"
+    assert cls.expiry_date == _dt.date(2026, 12, 16)
+
+
+def test_vx_calendar_spread_is_not_classifiable() -> None:
+    # Calendar-spread legs carry the ``:1:S``/``:1:B`` qualifier — not outright
+    # contracts; classification must reject them (the OHLCV adapter then drops them).
+    import pytest
+
+    with pytest.raises(ValueError):
+        classify_databento_symbol("VX/N6:1:S - VX/Q6:1:B")
+
+
+# ---------------------------------------------------------------------------
 # CME short-form options
 # ---------------------------------------------------------------------------
 

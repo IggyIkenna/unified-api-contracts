@@ -107,6 +107,14 @@ _DATED_FUT_RE: Final[re.Pattern[str]] = re.compile(r"^([A-Z]{2,4})([FGHJKMNQUVXZ
 # Example: ``6AM4`` = AUD Jun-2024, ``6EU4`` = EUR Sep-2024.
 _CME_FX_FUT_RE: Final[re.Pattern[str]] = re.compile(r"^(6[A-Z])([FGHJKMNQUVXZ])(\d{1,2})$")
 
+# Cboe VX (VIX) future outright shape: ``VX/{MONTH}{YEAR}`` — the slash-delimited
+# parent-resolved symbology Databento returns on the XCBF.PITCH dataset.
+# Example: ``VX/M6`` = VX Jun-2026, ``VX/Z6`` = VX Dec-2026. Calendar spreads
+# (``VX/N6:1:S - VX/Q6:1:B``) carry the ``:`` qualifier + ` - ` join — they are
+# NOT outrights and fall through to the combo splitter (and are then dropped as
+# non-classifiable legs, which is the intended behaviour for OHLCV capture).
+_VX_FUTURE_RE: Final[re.Pattern[str]] = re.compile(r"^VX/([FGHJKMNQUVXZ])(\d{1,2})$")
+
 # Calendar spread / combo: two or more valid Databento leg tokens joined
 # by ``-``. Examples:
 #   ``6AH5-6AM4``                   (2-leg calendar spread)
@@ -301,6 +309,21 @@ def _third_wednesday(year: int, month: int) -> _dt.date:
     # weekday(): Mon=0 ... Wed=2 ... Sun=6
     first_wednesday_day = 1 + (2 - first.weekday()) % 7
     return _dt.date(year, month, first_wednesday_day + 14)
+
+
+def _vx_future_expiry(year: int, month: int) -> _dt.date:
+    """Return the VIX-future (VX) final-settlement date for a contract month.
+
+    Cboe VX futures settle on the Wednesday that is **30 days before** the third
+    Friday of the calendar month **immediately following** the contract month
+    (i.e. 30 days before the standard SPX-option expiration of the next month).
+    This is the canonical listed expiry the instruments-service catalogue records
+    for VX contracts, so the classifier MUST reproduce it for the instrument_id to
+    match (a naive third-Friday would mint a mismatched id).
+    """
+    nxt_year = year + 1 if month == 12 else year
+    nxt_month = 1 if month == 12 else month + 1
+    return _third_friday(nxt_year, nxt_month) - _dt.timedelta(days=30)
 
 
 def _expand_two_digit_year(year_token: str) -> int:
@@ -588,6 +611,22 @@ def classify_databento_symbol(
             instrument_type=InstrumentType.FUTURE,
             underlying=fx_root,
             expiry_date=_third_wednesday(fx_year, fx_month),
+            strike=None,
+            option_right=None,
+            is_continuous=False,
+        )
+
+    # 2c. Cboe VX (VIX) future outright (``VX/M6``, ``VX/Z6``) on XCBF.PITCH.
+    #     Slash-delimited so it never matches the alpha-only _DATED_FUT_RE; VX
+    #     settles 30 days before the next month's third Friday (not third Friday).
+    vx_match = _VX_FUTURE_RE.match(symbol)
+    if vx_match:
+        vx_month = _CME_MONTH_MAP[vx_match.group(1)]
+        vx_year = _expand_two_digit_year(vx_match.group(2))
+        return DatabentoClassification(
+            instrument_type=InstrumentType.FUTURE,
+            underlying="VX",
+            expiry_date=_vx_future_expiry(vx_year, vx_month),
             strike=None,
             option_right=None,
             is_continuous=False,
