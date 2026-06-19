@@ -236,6 +236,20 @@ VENUE_ERRORS_TRADFI: dict[str, list[VenueErrorClassification]] = {
             action=ErrorAction.FAIL,
             desc="Payment Required from error message (insufficient credit / quota exceeded)",
         ),
+        ve(
+            "databento",
+            "DATABENTO_ENTITLEMENT",
+            retry=False,
+            reconnect=False,
+            action=ErrorAction.FAIL,
+            desc=(
+                "Subscription-entitlement breach (403, NOT 402/PAYG) — request's "
+                "(dataset, schema, start) fell outside the paid 3-dataset subscription "
+                "or the schema's free included-history window. Pre-request guard refused "
+                "it before it reached the vendor (would have been metered). DO NOT retry; "
+                "fix the request scope. SSOT: registry/databento_subscription_allowlist.py."
+            ),
+        ),
     ],
     "barchart": [
         ve(

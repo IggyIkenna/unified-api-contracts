@@ -98,9 +98,12 @@ DATABENTO_VALID_PARENT_SYMBOLS: dict[str, tuple[str, str]] = {
     "LIVECATTLE": ("LE.FUT", "GLBX.MDP3"),
     "HE": ("HE.FUT", "GLBX.MDP3"),
     "LEANHOGS": ("HE.FUT", "GLBX.MDP3"),
-    # CFE (CBOE Futures Exchange) - Volatility Futures
-    "VX": ("VX.FUT", "XCBF.MDP3"),
-    "VIX_FUT": ("VX.FUT", "XCBF.MDP3"),
+    # CFE (CBOE Futures Exchange) - Volatility (VX/VIX) Futures.
+    # Dataset = CFE: the 3-dataset subscription lockdown (operator 2026-06-18)
+    # subscribes to CFE for VX futures (XCBF.MDP3/XCBF.PITCH are NOT in the paid
+    # set and would be billed / rejected by assert_dataset_allowed).
+    "VX": ("VX.FUT", "CFE"),
+    "VIX_FUT": ("VX.FUT", "CFE"),
     # ICE Futures US (IFUS.IMPACT)
     "CT": ("CT.FUT", "IFUS.IMPACT"),
     "COTTON": ("CT.FUT", "IFUS.IMPACT"),
@@ -394,8 +397,9 @@ TRADFI_DATA_BINDINGS: dict[str, list[ProviderBinding]] = {
             series="VIXCLS",
         ),
     ],
-    # VX futures (CBOE Futures Exchange via Databento)
-    "VX.FUT": [_db("XCBF.MDP3", "parent", "VX")],
+    # VX futures (CBOE Futures Exchange via Databento) — dataset CFE (3-dataset
+    # subscription lockdown 2026-06-18; XCBF.* is out of the paid set).
+    "VX.FUT": [_db("CFE", "parent", "VX")],
     # Options (CME via Databento)
     "ES.OPT": [_db("GLBX.MDP3", "parent", "ES")],
     "NQ.OPT": [_db("GLBX.MDP3", "parent", "NQ")],
