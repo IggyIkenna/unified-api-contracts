@@ -12,6 +12,7 @@ from __future__ import annotations
 import pytest
 
 from unified_api_contracts.internal.reference.data_freshness import (
+    ACCOUNT_STATE_FRESHNESS,
     ALL_FRESHNESS_CONTRACTS,
     FEATURE_FRESHNESS,
     MARKET_TICK_FRESHNESS,
@@ -101,6 +102,7 @@ class TestDataFreshnessContractModel:
             "sports",
             "feature",
             "ml",
+            "execution",
         ]
         for ac in asset_groupes:
             c = DataFreshnessContract(
@@ -261,23 +263,93 @@ def test_ml_freshness_count() -> None:
 
 
 def test_all_freshness_contracts_is_union() -> None:
-    expected_count = len(MARKET_TICK_FRESHNESS) + len(FEATURE_FRESHNESS) + len(ML_FRESHNESS)
+    expected_count = (
+        len(MARKET_TICK_FRESHNESS) + len(FEATURE_FRESHNESS) + len(ML_FRESHNESS) + len(ACCOUNT_STATE_FRESHNESS)
+    )
     assert len(ALL_FRESHNESS_CONTRACTS) == expected_count
 
 
 def test_all_freshness_contracts_no_duplicates() -> None:
-    # Each source key should appear in exactly one of the three sub-dicts
+    # Each source key should appear in exactly one of the sub-dicts
     market_keys = set(MARKET_TICK_FRESHNESS)
     feature_keys = set(FEATURE_FRESHNESS)
     ml_keys = set(ML_FRESHNESS)
+    account_keys = set(ACCOUNT_STATE_FRESHNESS)
     assert market_keys.isdisjoint(feature_keys)
     assert market_keys.isdisjoint(ml_keys)
+    assert market_keys.isdisjoint(account_keys)
     assert feature_keys.isdisjoint(ml_keys)
+    assert feature_keys.isdisjoint(account_keys)
+    assert ml_keys.isdisjoint(account_keys)
 
 
 def test_all_freshness_contracts_contains_known_sources() -> None:
-    for key in ("binance", "features-service", "ml-inference-api"):
+    for key in ("binance", "features-service", "ml-inference-api", "account_snapshot"):
         assert key in ALL_FRESHNESS_CONTRACTS
+
+
+# ---------------------------------------------------------------------------
+# refetch_action — Phase-2 self-healing binding (optional, defaults None)
+# ---------------------------------------------------------------------------
+
+
+def test_refetch_action_defaults_none() -> None:
+    c = DataFreshnessContract(
+        source="x",
+        asset_group="crypto_cefi",
+        max_age_seconds=10,
+        warn_age_seconds=5,
+        expected_cadence_seconds=1,
+        criticality="critical",
+    )
+    assert c.refetch_action is None
+
+
+def test_refetch_action_settable() -> None:
+    c = DataFreshnessContract(
+        source="x",
+        asset_group="execution",
+        max_age_seconds=120,
+        warn_age_seconds=60,
+        expected_cadence_seconds=60,
+        criticality="critical",
+        refetch_action="refetch-feed:account_snapshot",
+    )
+    assert c.refetch_action == "refetch-feed:account_snapshot"
+
+
+# ---------------------------------------------------------------------------
+# ACCOUNT_STATE_FRESHNESS — the critical account/position/recon feeds
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("source", ["account_snapshot", "positions_snapshot", "reconciliation_age"])
+def test_account_state_feeds_are_critical_execution(source: str) -> None:
+    c = ACCOUNT_STATE_FRESHNESS[source]
+    assert c.source == source
+    assert c.asset_group == "execution"
+    assert c.criticality == "critical"
+    # warn must precede max for a meaningful staleness band
+    assert c.warn_age_seconds < c.max_age_seconds
+
+
+def test_reconciliation_age_bands_match_sev_thresholds() -> None:
+    # warn = SEV1 (20min), max = SEV0 (40min) — mirrors the shipped recon-age escalation
+    recon = ACCOUNT_STATE_FRESHNESS["reconciliation_age"]
+    assert recon.warn_age_seconds == 1200
+    assert recon.max_age_seconds == 2400
+
+
+def test_execution_asset_group_accepted() -> None:
+    c = DataFreshnessContract(
+        source="positions_snapshot",
+        asset_group="execution",
+        max_age_seconds=120,
+        warn_age_seconds=60,
+        expected_cadence_seconds=60,
+        criticality="critical",
+    )
+    assert c.asset_group == "execution"
 
 
 # ---------------------------------------------------------------------------

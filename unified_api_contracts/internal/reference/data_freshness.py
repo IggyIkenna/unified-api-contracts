@@ -42,7 +42,13 @@ class DataFreshnessContract(BaseModel):
         "sports",
         "feature",
         "ml",
-    ] = Field(description="Asset group that determines the data domain.")
+        "execution",
+    ] = Field(
+        description=(
+            "Data domain. Market-data domains (crypto_cefi/crypto_defi/tradfi/onchain/sports) plus the derived "
+            "feature/ml domains, and 'execution' for account/position/reconciliation STATE feeds (not a market domain)."
+        )
+    )
     max_age_seconds: int = Field(
         description=(
             "Maximum acceptable data age in seconds. Data older than this triggers "
@@ -70,6 +76,14 @@ class DataFreshnessContract(BaseModel):
             "'important' sources trigger alerts but do not block; "
             "'informational' sources log only."
         )
+    )
+    refetch_action: str | None = Field(
+        default=None,
+        description=(
+            "Optional binding to a deterministic re-fetch recovery action (Layer-0 of the autonomous-recovery-matrix). "
+            "When set, a stale feed can be actively self-healed by invoking the named action before/while escalating. "
+            "Left None for 'informational' feeds and any feed with no automated re-fetch path."
+        ),
     )
 
 
@@ -308,6 +322,42 @@ ML_FRESHNESS: dict[str, DataFreshnessContract] = {
 }
 
 # ---------------------------------------------------------------------------
+# Account / execution state — the most trading-critical freshness signals.
+# These are account/position/reconciliation STATE, not a market-data domain;
+# staleness here directly gates order flow (a stale balance or position view
+# must block new orders). Thresholds: account/positions snapshots = 120s
+# (operations cadence); reconciliation_age warn/max = 1200s/2400s, mirroring
+# the shipped recon-age SEV1 (20min) / SEV0 (40min) escalation bands.
+# ---------------------------------------------------------------------------
+
+ACCOUNT_STATE_FRESHNESS: dict[str, DataFreshnessContract] = {
+    "account_snapshot": DataFreshnessContract(
+        source="account_snapshot",
+        asset_group="execution",
+        max_age_seconds=120,
+        warn_age_seconds=60,
+        expected_cadence_seconds=60,
+        criticality="critical",
+    ),
+    "positions_snapshot": DataFreshnessContract(
+        source="positions_snapshot",
+        asset_group="execution",
+        max_age_seconds=120,
+        warn_age_seconds=60,
+        expected_cadence_seconds=60,
+        criticality="critical",
+    ),
+    "reconciliation_age": DataFreshnessContract(
+        source="reconciliation_age",
+        asset_group="execution",
+        max_age_seconds=2400,  # SEV0 band — 40min
+        warn_age_seconds=1200,  # SEV1 band — 20min
+        expected_cadence_seconds=300,
+        criticality="critical",
+    ),
+}
+
+# ---------------------------------------------------------------------------
 # Aggregate — all sources in a single flat dict for O(1) lookup
 # ---------------------------------------------------------------------------
 
@@ -315,6 +365,7 @@ ALL_FRESHNESS_CONTRACTS: dict[str, DataFreshnessContract] = {
     **MARKET_TICK_FRESHNESS,
     **FEATURE_FRESHNESS,
     **ML_FRESHNESS,
+    **ACCOUNT_STATE_FRESHNESS,
 }
 
 
