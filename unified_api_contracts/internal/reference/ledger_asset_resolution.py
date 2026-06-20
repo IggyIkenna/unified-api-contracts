@@ -55,6 +55,11 @@ _INSTRUMENT_TYPE_TO_LEDGER_ASSET_CLASS: dict[InstrumentType, LedgerAssetClass] =
     InstrumentType.OPTION: LedgerAssetClass.OPTION,
     InstrumentType.ETF: LedgerAssetClass.ETF,
     InstrumentType.EQUITY: LedgerAssetClass.SPOT_TOKEN,
+    # Crypto-venue equity instruments: equity perps resolve as PERP (they carry
+    # funding rates like any perpetual); tokenized stocks resolve as SPOT_TOKEN
+    # (they track share price without a funding mechanism).
+    InstrumentType.EQUITY_PERP: LedgerAssetClass.PERP,
+    InstrumentType.TOKENIZED_EQUITY: LedgerAssetClass.SPOT_TOKEN,
     InstrumentType.COMMODITY: LedgerAssetClass.FUTURE,
     InstrumentType.CURRENCY: LedgerAssetClass.CURRENCY,
     InstrumentType.INDEX: LedgerAssetClass.SPOT_TOKEN,

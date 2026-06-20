@@ -413,6 +413,8 @@ INSTRUMENT_TYPES_BY_VENUE.update({v: {"PROP"} for v in SPORTS_DFS_VENUES})
 
 INSTRUMENT_TYPE_FOLDER_MAP: dict[str, str] = {
     "PERPETUAL": "perpetuals",
+    "EQUITY_PERP": "equity_perps",
+    "TOKENIZED_EQUITY": "tokenized_equities",
     "SPOT_PAIR": "spot_pairs",
     "ETF": "etf",
     "EQUITY": "equities",
