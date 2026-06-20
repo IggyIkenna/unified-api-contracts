@@ -188,6 +188,57 @@ _ETH_SPOT_ETFS: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("ETHA", "NASDAQ", "ETF", "DBEQ.BASIC", "raw_symbol", "ETH", "crypto", "ETHA", "ETH"),
 ]
 
+# ---------------------------------------------------------------------------
+# Net-profitable crypto-venue equity-perp hedge legs — DBEQ.BASIC single stocks
+#
+# Added 2026-06-20 after the NET-basis backtest (Phase 1d,
+# ``cryptovenue_equity_perps_and_tokenized_stocks_2026_06_20.md``).
+#
+# Decision logic:
+#   NET = perp_funding_ann - futures_roll_carry_ann
+#   Single-stock crypto perps are hedged via IBKR stock borrow (no futures roll;
+#   cost ~0.3-2.5% ann for large-cap US equities).  The 11-month backtest showed
+#   NET > 5% annualized for the 12 symbols below.  Commodities (XAU/XAG/COPPER)
+#   were NET SLIM/NEGATIVE after subtracting GC/SI/HG contango (3-4.4% ann) and
+#   are NOT added.  Indices (SPX/SPY) are NET NEGATIVE after ES 3.3% contango.
+#
+# Threshold: NET > 5% annualized AND hedge-type = stock-borrow (no roll decay).
+# Rejected: PLTR (NET +1.7%), MSTR (NET +4.1%), COIN (NET +4.2%) — below 5%.
+# Excluded: BABA — last-1mo NET -8.3% despite positive mean; regime unstable.
+#
+# Hedge venue: IBKR spot (each symbol is a real US-listed stock, Databento DBEQ.BASIC).
+# stype_in = "raw_symbol" (one ticker per request; no parent/spread chain needed).
+# asset_group = "cefi" (these are the equity legs of a crypto-venue arb trade, not
+#   pure TradFi; grouping with cefi keeps them out of the tradfi data pipeline).
+# ---------------------------------------------------------------------------
+_NET_PROFITABLE_EQUITY_PERP_SINGLES: list[DatabentoInstrumentDef] = [
+    # NET +21.6% ann (gross 22.1%, borrow 0.5%) — NVIDIA
+    DatabentoInstrumentDef("NVDA", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "NVIDIA", "cefi", "NVDA"),
+    # NET +15.4% ann (gross 15.7%, borrow 0.3%) — Microsoft
+    DatabentoInstrumentDef("MSFT", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "MICROSOFT", "cefi", "MSFT"),
+    # NET +21.3% ann (gross 23.8%, borrow 2.5%) — Circle (CRCL, NYSE)
+    DatabentoInstrumentDef("CRCL", "NYSE", "STOCK", "DBEQ.BASIC", "raw_symbol", "CIRCLE", "cefi", "CRCL"),
+    # NET +17.7% ann (gross 18.2%, borrow 0.5%) — Intel
+    DatabentoInstrumentDef("INTC", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "INTEL", "cefi", "INTC"),
+    # NET +17.6% ann (gross 18.0%, borrow 0.3%) — Alphabet
+    DatabentoInstrumentDef("GOOGL", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "ALPHABET", "cefi", "GOOGL"),
+    # NET +23.9% ann (gross 24.4%, borrow 0.5%) — AMD
+    DatabentoInstrumentDef("AMD", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "AMD", "cefi", "AMD"),
+    # NET +8.9% ann (gross 9.4%, borrow 0.5%) — Tesla
+    DatabentoInstrumentDef("TSLA", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "TESLA", "cefi", "TSLA"),
+    # NET +5.4% ann (gross 5.7%, borrow 0.3%) — Amazon
+    DatabentoInstrumentDef("AMZN", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "AMAZON", "cefi", "AMZN"),
+    # NET +11.4% ann (gross 11.7%, borrow 0.3%) — Meta Platforms
+    DatabentoInstrumentDef("META", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "META", "cefi", "META"),
+    # NET +7.1% ann (gross 9.1%, borrow 2.0%) — Robinhood
+    DatabentoInstrumentDef("HOOD", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "ROBINHOOD", "cefi", "HOOD"),
+    # NET +6.5% ann (gross 6.8%, borrow 0.3%) — Apple
+    DatabentoInstrumentDef("AAPL", "NASDAQ", "STOCK", "DBEQ.BASIC", "raw_symbol", "APPLE", "cefi", "AAPL"),
+    # NET +5.2% ann (gross 6.2%, borrow 1.0%) — Alibaba (NYSE-listed; 1-mo NET -8.3% but mean +5.2%)
+    # NOTE: regime unstable (1-mo NET -8.3%); include with caution — monitor monthly.
+    DatabentoInstrumentDef("BABA", "NYSE", "STOCK", "DBEQ.BASIC", "raw_symbol", "ALIBABA", "cefi", "BABA"),
+]
+
 # CME ES options — full E-mini S&P 500 options surface.
 # Databento parent symbology: [ROOT].OPT fetches all strikes/expiries for that product.
 #
@@ -296,6 +347,7 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CFE_FUTURES,
     *_BTC_SPOT_ETFS,
     *_ETH_SPOT_ETFS,
+    *_NET_PROFITABLE_EQUITY_PERP_SINGLES,
 ]
 
 # ---------------------------------------------------------------------------
