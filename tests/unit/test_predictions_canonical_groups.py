@@ -19,6 +19,7 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
 from unified_api_contracts.predictions import (
     CANONICAL_GROUP_METADATA,
     CLASSIFIER_STABILITY_HASH,
+    KALSHI_TICKER_PREFIX_TO_GROUP,
     KALSHI_TICKER_TO_GROUP,
     POLYMARKET_CONDITION_ID_TO_GROUP,
     CanonicalGroupMetadata,
@@ -663,3 +664,238 @@ def test_monthly_tokens_includes_may_full_name() -> None:
     # Sanity: full names alongside "may"
     assert "april" in _MONTHLY_TOKENS
     assert "june" in _MONTHLY_TOKENS
+
+
+# ---------------------------------------------------------------------------
+# Kalshi prefix-rule classifier (2026-06-20)
+# ---------------------------------------------------------------------------
+
+
+def test_kalshi_prefix_table_exported_from_facade() -> None:
+    """KALSHI_TICKER_PREFIX_TO_GROUP is re-exported from the public facade."""
+    assert isinstance(KALSHI_TICKER_PREFIX_TO_GROUP, dict)
+    assert len(KALSHI_TICKER_PREFIX_TO_GROUP) >= 50  # sanity floor
+
+
+def test_kalshi_prefix_table_all_valid_groups() -> None:
+    """Every value in the prefix table is a valid CanonicalQuestionGroup member."""
+    for prefix, group in KALSHI_TICKER_PREFIX_TO_GROUP.items():
+        assert isinstance(group, CanonicalQuestionGroup), (
+            f"prefix {prefix!r} maps to {group!r} which is not a CanonicalQuestionGroup"
+        )
+
+
+def test_kalshi_prefix_rule_btc_daily_directional() -> None:
+    """KXBTCD-* → BTC_UP_DOWN_DAILY (shared arb target with Polymarket)."""
+    assert classify_kalshi_to_canonical_group(ticker="KXBTCD-26JUN20") == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXBTCD-B") == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
+
+
+def test_kalshi_prefix_rule_btc_price_range() -> None:
+    """KXBTC-DDMMMYYHH → BTC_PRICE_RANGE_DAILY (date-keyed range bracket)."""
+    # The generic KXBTC prefix beats the absent KXBTCD-specific ticker for a range contract
+    assert classify_kalshi_to_canonical_group(ticker="KXBTC-26JUN2617") == CanonicalQuestionGroup.BTC_PRICE_RANGE_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXBTC-26JUN2006") == CanonicalQuestionGroup.BTC_PRICE_RANGE_DAILY
+
+
+def test_kalshi_prefix_rule_btc_15m() -> None:
+    """KXBTC15M-* → BTC_UP_DOWN_15MIN (longer prefix wins over KXBTC)."""
+    assert classify_kalshi_to_canonical_group(ticker="KXBTC15M-26JUN2014") == CanonicalQuestionGroup.BTC_UP_DOWN_15MIN
+
+
+def test_kalshi_prefix_rule_eth() -> None:
+    """KXETH* family correctly disambiguated."""
+    assert classify_kalshi_to_canonical_group(ticker="KXETHD-26JUN20") == CanonicalQuestionGroup.ETH_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXETH15M-26JUN2014") == CanonicalQuestionGroup.ETH_UP_DOWN_15MIN
+    assert classify_kalshi_to_canonical_group(ticker="KXETH-26JUN2017") == CanonicalQuestionGroup.ETH_PRICE_RANGE_DAILY
+
+
+def test_kalshi_prefix_rule_sol() -> None:
+    """KXSOL* — daily directional and range bracket."""
+    assert classify_kalshi_to_canonical_group(ticker="KXSOLD-26JUN20") == CanonicalQuestionGroup.SOL_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXSOL15M-26JUN20") == CanonicalQuestionGroup.SOL_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXSOL-26JUN20") == CanonicalQuestionGroup.SOL_PRICE_RANGE_DAILY
+
+
+def test_kalshi_prefix_rule_xrp() -> None:
+    """KXXRP* — daily directional and range bracket."""
+    assert classify_kalshi_to_canonical_group(ticker="KXXRPD-26JUN20") == CanonicalQuestionGroup.XRP_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXXRP15M-26JUN20") == CanonicalQuestionGroup.XRP_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXXRP-26JUN20") == CanonicalQuestionGroup.XRP_PRICE_RANGE_DAILY
+
+
+def test_kalshi_prefix_rule_doge() -> None:
+    """KXDOGE* — directional and range bracket."""
+    assert classify_kalshi_to_canonical_group(ticker="KXDOGED-26JUN20") == CanonicalQuestionGroup.DOGE_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXDOGE15M-26JUN") == CanonicalQuestionGroup.DOGE_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXDOGE-26JUN20") == CanonicalQuestionGroup.DOGE_PRICE_RANGE_DAILY
+
+
+def test_kalshi_prefix_rule_spx_inx() -> None:
+    """KXINX* → SPX_UP_DOWN_DAILY — same group as Polymarket (cross-venue arb)."""
+    assert classify_kalshi_to_canonical_group(ticker="KXINX-26JUN20") == CanonicalQuestionGroup.SPX_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXINXI-26JUN20") == CanonicalQuestionGroup.SPX_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXINXU-26JUN20") == CanonicalQuestionGroup.SPX_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXINXB-26JUN20") == CanonicalQuestionGroup.SPX_UP_DOWN_DAILY
+
+
+def test_kalshi_prefix_rule_nasdaq_ndx() -> None:
+    """KXNASDAQ100* → NDX_UP_DOWN_DAILY — shared with Polymarket."""
+    assert classify_kalshi_to_canonical_group(ticker="KXNASDAQ100-26JUN20") == CanonicalQuestionGroup.NDX_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXNASDAQ100U-26JUN") == CanonicalQuestionGroup.NDX_UP_DOWN_DAILY
+
+
+def test_kalshi_prefix_rule_djia() -> None:
+    """KXDJIA-* → DJIA_UP_DOWN_DAILY."""
+    assert classify_kalshi_to_canonical_group(ticker="KXDJIA-26JUN20") == CanonicalQuestionGroup.DJIA_UP_DOWN_DAILY
+
+
+def test_kalshi_prefix_rule_rut() -> None:
+    """KXRUT-* → RUT_UP_DOWN_DAILY."""
+    assert classify_kalshi_to_canonical_group(ticker="KXRUT-26JUN20") == CanonicalQuestionGroup.RUT_UP_DOWN_DAILY
+
+
+def test_kalshi_prefix_rule_gold() -> None:
+    """KXGOLDD → daily; KXGOLD generic → price level."""
+    assert classify_kalshi_to_canonical_group(ticker="KXGOLDD-26JUN20") == CanonicalQuestionGroup.GOLD_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXGOLD-26JUN20") == CanonicalQuestionGroup.GOLD_PRICE_LEVEL
+
+
+def test_kalshi_prefix_rule_macro_fed() -> None:
+    """KXFED* → FED_RATE_DECISION_PER_FOMC — shared with Polymarket (cross-venue arb)."""
+    assert (
+        classify_kalshi_to_canonical_group(ticker="KXFEDDECISION-25DEC")
+        == CanonicalQuestionGroup.FED_RATE_DECISION_PER_FOMC
+    )
+    assert classify_kalshi_to_canonical_group(ticker="KXFED-25JAN") == CanonicalQuestionGroup.FED_RATE_DECISION_PER_FOMC
+
+
+def test_kalshi_prefix_rule_macro_cpi() -> None:
+    """KXCPI* → CPI_PRINT_PER_MONTH — shared with Polymarket (cross-venue arb)."""
+    assert classify_kalshi_to_canonical_group(ticker="KXCPI-26JUN") == CanonicalQuestionGroup.CPI_PRINT_PER_MONTH
+    assert classify_kalshi_to_canonical_group(ticker="KXCPIYOY-26JUN") == CanonicalQuestionGroup.CPI_PRINT_PER_MONTH
+    assert classify_kalshi_to_canonical_group(ticker="KXCPICORE-26JUN") == CanonicalQuestionGroup.CPI_PRINT_PER_MONTH
+
+
+def test_kalshi_prefix_rule_macro_payrolls() -> None:
+    """KXPAYROLLS-* → NONFARM_PAYROLLS_PER_MONTH — shared with Polymarket."""
+    assert (
+        classify_kalshi_to_canonical_group(ticker="KXPAYROLLS-26JUN")
+        == CanonicalQuestionGroup.NONFARM_PAYROLLS_PER_MONTH
+    )
+
+
+def test_kalshi_prefix_rule_macro_gdp() -> None:
+    """KXGDP-* → GDP_PRINT_PER_QUARTER — shared with Polymarket."""
+    assert classify_kalshi_to_canonical_group(ticker="KXGDP-26Q2") == CanonicalQuestionGroup.GDP_PRINT_PER_QUARTER
+
+
+def test_kalshi_prefix_rule_macro_pce() -> None:
+    """KXPCECORE-* → PCE_PRINT_PER_MONTH."""
+    assert classify_kalshi_to_canonical_group(ticker="KXPCECORE-26JUN") == CanonicalQuestionGroup.PCE_PRINT_PER_MONTH
+
+
+def test_kalshi_prefix_rule_treasury_yields() -> None:
+    """KX10Y* → TREASURY_YIELD_PER_PRINT — shared with Polymarket."""
+    assert (
+        classify_kalshi_to_canonical_group(ticker="KX10YUSTSRY-26JUN20")
+        == CanonicalQuestionGroup.TREASURY_YIELD_PER_PRINT
+    )
+    assert (
+        classify_kalshi_to_canonical_group(ticker="KX10Y2Y-26JUN20") == CanonicalQuestionGroup.TREASURY_YIELD_PER_PRINT
+    )
+
+
+def test_kalshi_prefix_rule_oil() -> None:
+    """KXOIL* → CRUDE_OIL_PRICE_LEVEL."""
+    assert classify_kalshi_to_canonical_group(ticker="KXOIL-26JUN") == CanonicalQuestionGroup.CRUDE_OIL_PRICE_LEVEL
+    assert classify_kalshi_to_canonical_group(ticker="KXOILW-26JUN") == CanonicalQuestionGroup.CRUDE_OIL_PRICE_LEVEL
+
+
+def test_kalshi_prefix_rule_natgas() -> None:
+    """KXGAS* → NATGAS_UP_DOWN_DAILY."""
+    assert classify_kalshi_to_canonical_group(ticker="KXGAS-26JUN") == CanonicalQuestionGroup.NATGAS_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXGASD-26JUN") == CanonicalQuestionGroup.NATGAS_UP_DOWN_DAILY
+
+
+def test_kalshi_prefix_longest_prefix_wins() -> None:
+    """Longest-prefix wins: KXBTCD beats KXBTC; KXBTC15M beats KXBTC."""
+    # KXBTCD (len 6) > KXBTC (len 5)
+    assert classify_kalshi_to_canonical_group(ticker="KXBTCD-26JUN20") == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
+    # KXBTC15M (len 8) > KXBTC (len 5)
+    assert classify_kalshi_to_canonical_group(ticker="KXBTC15M-26JUN2014") == CanonicalQuestionGroup.BTC_UP_DOWN_15MIN
+    # KXFEDDECISION (len 13) > KXFED (len 5)
+    assert (
+        classify_kalshi_to_canonical_group(ticker="KXFEDDECISION-25MAR")
+        == CanonicalQuestionGroup.FED_RATE_DECISION_PER_FOMC
+    )
+
+
+def test_kalshi_override_wins_over_prefix_rule() -> None:
+    """Exact-override dict beats the prefix rule for the same ticker."""
+    # Temporarily inject a BTC-range ticker into the override dict pointing to ETH_UP_DOWN_DAILY
+    # (nonsensical semantically but tests the priority order).
+    fake_ticker = "KXBTC-OVERRIDETEST"
+    KALSHI_TICKER_TO_GROUP[fake_ticker] = CanonicalQuestionGroup.ETH_UP_DOWN_DAILY
+    try:
+        result = classify_kalshi_to_canonical_group(ticker=fake_ticker)
+        assert result == CanonicalQuestionGroup.ETH_UP_DOWN_DAILY, "override dict should win over the KXBTC prefix rule"
+    finally:
+        del KALSHI_TICKER_TO_GROUP[fake_ticker]
+
+
+def test_kalshi_prefix_rule_case_insensitive() -> None:
+    """Lower-case ticker input is handled — function upper-cases internally."""
+    assert classify_kalshi_to_canonical_group(ticker="kxbtcd-26jun20") == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="kxcpi-26jun") == CanonicalQuestionGroup.CPI_PRINT_PER_MONTH
+
+
+def test_kalshi_shared_group_equals_polymarket_group() -> None:
+    """Kalshi+Polymarket same real-world questions → identical CanonicalQuestionGroup value.
+
+    This is the cross-venue arb invariant: the ``arbitrage_price_dispersion``
+    strategy can compare fair-value by looking up the canonical group on both
+    sides without any translation layer.
+    """
+    # BTC daily up/down
+    kalshi_btc = classify_kalshi_to_canonical_group(ticker="KXBTCD-26JUN20")
+    poly_btc = classify_polymarket_to_canonical_group(
+        title="Will BTC be up or down today?",
+        slug="btc-up-or-down-may-22",
+        event_slug="btc-price-daily",
+        outcome="Up",
+    )
+    assert kalshi_btc == poly_btc == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
+
+    # FED rate decision
+    kalshi_fed = classify_kalshi_to_canonical_group(ticker="KXFED-25JAN")
+    poly_fed = classify_polymarket_to_canonical_group(
+        title="Will the Fed cut rates at the June meeting?",
+        slug="fed-rate-decision-june",
+        event_slug="fomc-june",
+        outcome="Yes",
+    )
+    assert kalshi_fed == poly_fed == CanonicalQuestionGroup.FED_RATE_DECISION_PER_FOMC
+
+    # CPI monthly print
+    kalshi_cpi = classify_kalshi_to_canonical_group(ticker="KXCPI-26JUN")
+    poly_cpi = classify_polymarket_to_canonical_group(
+        title="Will US CPI be above 3.5% YoY?",
+        slug="cpi-above-3-5-june",
+        event_slug="cpi-june",
+        outcome="Yes",
+    )
+    assert kalshi_cpi == poly_cpi == CanonicalQuestionGroup.CPI_PRINT_PER_MONTH
+
+
+def test_kalshi_copper_routes_to_other() -> None:
+    """KXCOPPERD has no dedicated group yet → OTHER (copper group is a TODO)."""
+    result = classify_kalshi_to_canonical_group(ticker="KXCOPPERD-26JUN20")
+    assert result == CanonicalQuestionGroup.OTHER
+
+
+def test_kalshi_novel_ticker_routes_to_other() -> None:
+    """Completely unknown tickers (KXELONMARS, pop-culture, etc.) → OTHER."""
+    for ticker in ("KXELONMARS-99", "KXNEWPOPE-70", "KXMRBEASTVIDEOLENGTH", "KXFUSION"):
+        result = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert result == CanonicalQuestionGroup.OTHER, f"Expected OTHER for {ticker!r}, got {result!r}"

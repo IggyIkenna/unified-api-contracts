@@ -16,6 +16,10 @@ Re-exports:
   canonical group. Unmatched markets route to :attr:`CanonicalQuestionGroup.OTHER`
   (the honest-absence catch-all) and emit ``OTHER_BUCKET_MEMBER_ADDED`` at INFO
   level for operator audit; never returns ``None``.
+* :data:`KALSHI_TICKER_PREFIX_TO_GROUP` — rule table mapping ``KX*`` event-ticker
+  prefixes to canonical groups; shared real-world questions (BTC daily, SPX,
+  Fed rate, CPI …) resolve to the **same** :class:`CanonicalQuestionGroup`
+  value as the equivalent Polymarket market, enabling cross-venue arbitrage.
 * :data:`CLASSIFIER_STABILITY_HASH` — manifest writers stamp this on
   every captured prediction shard so re-runs skip re-classification when
   unchanged.
@@ -38,6 +42,7 @@ from unified_api_contracts.canonical.domain.predictions.canonical_groups import 
 from unified_api_contracts.canonical.domain.predictions.classifiers import (
     CLASSIFIER_STABILITY_HASH,
     CLASSIFIER_VERSION,
+    KALSHI_TICKER_PREFIX_TO_GROUP,
     KALSHI_TICKER_TO_GROUP,
     POLYMARKET_CONDITION_ID_TO_GROUP,
     classify_kalshi_to_canonical_group,
@@ -53,6 +58,7 @@ __all__ = [
     "CANONICAL_GROUP_METADATA",
     "CLASSIFIER_STABILITY_HASH",
     "CLASSIFIER_VERSION",
+    "KALSHI_TICKER_PREFIX_TO_GROUP",
     "KALSHI_TICKER_TO_GROUP",
     "POLYMARKET_CONDITION_ID_TO_GROUP",
     "CanonicalGroupMetadata",
