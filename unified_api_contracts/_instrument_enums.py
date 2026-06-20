@@ -32,6 +32,15 @@ class InstrumentType(StrEnum):
     PERPETUAL = "PERPETUAL"
     FUTURE = "FUTURE"
     OPTION = "OPTION"
+    # Crypto-venue equity instruments — perpetual contracts or tokenized shares
+    # that track a real underlying equity (e.g. Binance METAUSDT, OKX AAPL-USDT-SWAP,
+    # Bybit AAPLX). The cross-venue canonical link (tracks_equity) maps each symbol
+    # to its Databento DBEQ.BASIC real-equity ticker, enabling basis/dispersion arb.
+    # Pre-IPO symbols (e.g. SPCXUSDT — SpaceX) have no real-equity twin and are
+    # standalone (dispersion-only across crypto venues).
+    # See: unified_api_contracts.canonical.crosscutting.crypto_equity_link
+    EQUITY_PERP = "EQUITY_PERP"
+    TOKENIZED_EQUITY = "TOKENIZED_EQUITY"
     # DeFi
     POOL = "POOL"
     # DeFi — DEX-pool instrument type (Solana basis trading MVP Phase 2,

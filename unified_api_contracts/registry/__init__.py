@@ -84,6 +84,7 @@ from .capability_declarations import (
 from .cefi_instrument_universe import (
     CEFI_ACCEPTED_QUOTE_ASSETS,
     CEFI_BASE_ASSET_UNIVERSE,
+    CEFI_EQUITY_PERP_BASE_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
 )
 from .cefi_margin_tiers import maintenance_margin_for
@@ -671,6 +672,7 @@ __all__ = [
     "CEFI_ACCEPTED_QUOTE_ASSETS",
     "CEFI_BASE_ASSETS",
     "CEFI_BASE_ASSET_UNIVERSE",
+    "CEFI_EQUITY_PERP_BASE_UNIVERSE",
     "CEFI_OPTIONS_UNDERLYINGS",
     "CEFI_PERPETUAL_SPECS",
     "CEFI_PERP_VENUE_API_ENDPOINTS",
