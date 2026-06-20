@@ -83,6 +83,9 @@ SUPPORTED_INSTRUMENT_TYPES: Final[frozenset[InstrumentType]] = frozenset(
         InstrumentType.PERPETUAL,
         InstrumentType.FUTURE,
         InstrumentType.OPTION,
+        # Crypto-venue equity instruments (2026-06-20)
+        InstrumentType.EQUITY_PERP,
+        InstrumentType.TOKENIZED_EQUITY,
         # DeFi
         InstrumentType.POOL,
         # DEX_POOL: spot-DEX orderbook + quote + per-swap shards (Solana
@@ -560,8 +563,13 @@ def build_instrument_id(
         )
         raise ValueError(msg)
 
-    # CeFi simple (spot + perpetual)
-    if instrument_type in (InstrumentType.SPOT_PAIR, InstrumentType.PERPETUAL):
+    # CeFi simple (spot + perpetual + crypto-venue equity instruments)
+    if instrument_type in (
+        InstrumentType.SPOT_PAIR,
+        InstrumentType.PERPETUAL,
+        InstrumentType.EQUITY_PERP,
+        InstrumentType.TOKENIZED_EQUITY,
+    ):
         return _build_cefi_simple(venue, instrument_type, symbol)
 
     # Dated CeFi/TradFi derivatives

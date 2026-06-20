@@ -59,6 +59,7 @@ from unified_api_contracts.canonical.crosscutting.config_versioning import (
 # imports nothing from crosscutting).
 from unified_api_contracts.registry.cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
+    CEFI_EQUITY_PERP_BASE_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
 )
 
@@ -295,6 +296,9 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "SPOT_PAIR",  # InstrumentType.SPOT_PAIR
                 "PERPETUAL",  # InstrumentType.PERPETUAL
                 "OPTION",  # InstrumentType.OPTION (Deribit BTC/ETH options)
+                # Crypto-venue equity instruments (2026-06-20):
+                "EQUITY_PERP",  # InstrumentType.EQUITY_PERP — single-stock perps (Binance/OKX/Bybit)
+                "TOKENIZED_EQUITY",  # InstrumentType.TOKENIZED_EQUITY — tokenized stocks (e.g. Bybit AAPLX)
             }
         ),
         data_types=frozenset(
@@ -310,7 +314,10 @@ MVP_SCOPE: Final[dict[str, object]] = {
             }
         ),
         # 44-base CeFi MVP universe (operator-confirmed SSOT). Spot + perp legs.
-        base_ccys=CEFI_BASE_ASSET_UNIVERSE,
+        # EQUITY_PERP/TOKENIZED_EQUITY cells use CEFI_EQUITY_PERP_BASE_UNIVERSE as
+        # their base_ccys (equity tickers like META, NVDA, AAPL — not crypto coins).
+        # The combined union covers both crypto-perp and equity-perp families.
+        base_ccys=CEFI_BASE_ASSET_UNIVERSE | CEFI_EQUITY_PERP_BASE_UNIVERSE,
         # Deribit-options carve-out: BTC + ETH only (the OPTION expected universe).
         options_base_ccys=CEFI_OPTIONS_UNDERLYINGS,
         # sources: empty → all sources in scope (tardis + per-venue live)

@@ -79,4 +79,37 @@ CEFI_OPTIONS_UNDERLYINGS: frozenset[str] = frozenset({
     "BTC",
     "ETH",
 })
+
+# Equity base assets for crypto-venue single-stock perps + tokenized stocks.
+# These are the UNDERLYING real-equity tickers (as used by Databento DBEQ.BASIC),
+# NOT the full crypto-venue symbol (e.g. META not METAUSDT). Each entry here
+# indicates a family of crypto-venue instruments (e.g. Binance METAUSDT,
+# OKX META-USDT-SWAP, Bybit METAUSDT) that track the real equity.
+# Pre-IPO / no-real-twin symbols (SPACEX, etc.) are tracked separately in the
+# crypto_equity_link module (STANDALONE_EQUITY_PERP_SYMBOLS).
+# Operator-seeded 2026-06-20: OKX 17 US equity perps + Binance/Bybit reps.
+CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
+    # --- US equities (OKX 17-perp universe + Binance/Bybit verified coverage) ---
+    "AAPL",     # Apple
+    "TSLA",     # Tesla
+    "AMZN",     # Amazon
+    "MSFT",     # Microsoft
+    "GOOGL",    # Alphabet (Google)
+    "META",     # Meta Platforms (Facebook)
+    "NVDA",     # NVIDIA
+    "NFLX",     # Netflix
+    "AMD",      # AMD
+    "INTC",     # Intel
+    "BABA",     # Alibaba
+    "COIN",     # Coinbase
+    "MSTR",     # MicroStrategy
+    "PLTR",     # Palantir
+    "GME",      # GameStop
+    "AMC",      # AMC Entertainment
+    "MARA",     # Marathon Digital
+    # --- Korean equities (OKX confirmed) ---
+    "005930",   # Samsung Electronics (KRX code)
+    "000660",   # SK Hynix (KRX code)
+    "005380",   # Hyundai Motor (KRX code)
+})
 # fmt: on
