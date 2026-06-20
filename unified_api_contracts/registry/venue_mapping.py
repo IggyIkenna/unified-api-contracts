@@ -251,6 +251,11 @@ class VenueMapping:
             "PACIFICA-SOLANA": "2025-06-01",
             "EXTENDED-STARKNET": "2024-10-01",
             "LIGHTER-ZKSYNC": "2024-08-01",
+            # Prediction-platform PERPETUAL FUTURES — crypto perps treated as cefi.
+            # Start dates = venue launch dates (no pre-launch data exists).
+            # SSOT: plans/active/prediction_venue_perps_and_live_clob_depth_2026_06_20.md
+            "KALSHI-PERP": "2026-05-29",  # Kalshi CFTC crypto perp launch
+            "POLYMARKET-PERP": "2026-04-21",  # Polymarket perp beta launch
             # TradFi - Databento
             # Start dates = earliest manifest data
             "CME": "2020-01-01",

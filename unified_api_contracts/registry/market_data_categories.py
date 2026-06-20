@@ -242,6 +242,15 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "PACIFICA-SOLANA",
         "EXTENDED-STARKNET",
         "LIGHTER-ZKSYNC",
+        # 2026-06-20 prediction-platform perp CLOBs — CFTC-regulated crypto perps
+        # with funding (NOT prediction YES/NO markets; those stay in "prediction").
+        # Kalshi: 13 crypto perp contracts, CFTC-approved, launched 2026-05-29.
+        # Polymarket: crypto+stock perps, beta 2026-04-21. Share canonical perp
+        # instrument universe (BTC-PERP etc.) alongside CeFi venues for funding-
+        # rate arb / basis / cross-venue dispersion. SSOT: prediction_venue_perps_
+        # and_live_clob_depth_2026_06_20.md
+        "KALSHI-PERP",
+        "POLYMARKET-PERP",
     ],
     "tradfi": [
         # Databento venues — 3-dataset subscription lockdown (operator 2026-06-18):

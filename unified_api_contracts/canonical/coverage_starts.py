@@ -53,6 +53,13 @@ CEFI_SOURCE_COVERAGE_START: dict[str, date] = {
     # (910 perpetuals, all gated by exchange-wide 2024-11-08T00:00:00Z floor).
     # Pre-cutoff dates → EXPECTED_PRE_SOURCE_COVERAGE_START.
     "BITGET": date(2024, 11, 8),
+    # Prediction-platform PERPETUAL FUTURES — CFTC-regulated crypto perps with
+    # funding. Coverage start = venue launch date (no pre-launch data exists).
+    # Distinct from POLYMARKET/KALSHI prediction YES/NO markets (in
+    # PREDICTION_SOURCE_COVERAGE_START). Treated as cefi for bucket/path logic.
+    # SSOT: plans/active/prediction_venue_perps_and_live_clob_depth_2026_06_20.md
+    "KALSHI-PERP": date(2026, 5, 29),  # Kalshi CFTC crypto perp launch
+    "POLYMARKET-PERP": date(2026, 4, 21),  # Polymarket perp beta launch
     # Tardis multi-venue feed — earliest cross-venue tick coverage.
     "TARDIS": date(2017, 6, 1),  # TODO verify
 }

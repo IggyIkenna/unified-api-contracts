@@ -80,6 +80,13 @@ CEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     "LIGHTER-ZKSYNC": "2024-09-01",  # Lighter on zkSync Era
     "GMX": "2021-09-01",  # GMX V1 on Arbitrum (V2 launched 2023-08)
     "DRIFT": "2021-11-08",  # Drift V1 mainnet on Solana
+    # Prediction-platform PERPETUAL FUTURES — crypto perps with funding. NOT
+    # the same as KALSHI/POLYMARKET prediction YES/NO markets (those are in
+    # PREDICTION_VENUE_LAUNCH_DATES). These are CFTC-regulated crypto perps in
+    # the CeFi perp universe. SSOT:
+    # plans/active/prediction_venue_perps_and_live_clob_depth_2026_06_20.md
+    "KALSHI-PERP": "2026-05-29",  # Kalshi CFTC crypto perp futures launch
+    "POLYMARKET-PERP": "2026-04-21",  # Polymarket perp beta launch
 }
 """CeFi venue → public-launch date (ISO YYYY-MM-DD).
 
