@@ -16,7 +16,9 @@ from unified_api_contracts.registry.venue_constants import (
     BYBIT_FUTURES,
     DERIBIT,
     HYPERLIQUID,
+    KALSHI_PERP,
     OKX_FUTURES,
+    POLYMARKET_PERP,
     VENUE_CAPABILITIES,
     VenueCapability,
 )
@@ -38,6 +40,8 @@ class TestGetPerpVenues:
             DERIBIT,
             HYPERLIQUID,
             ASTER,
+            KALSHI_PERP,
+            POLYMARKET_PERP,
         ):
             assert expected in perp_venues, f"{expected!r} missing from get_perp_venues()"
 

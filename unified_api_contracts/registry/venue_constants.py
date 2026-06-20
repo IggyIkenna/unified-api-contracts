@@ -65,6 +65,16 @@ NOVIG = "NOVIG"
 BETOPENLY = "BETOPENLY"
 PROPHETX = "PROPHETX"
 
+# Prediction-platform PERPETUAL FUTURES — crypto perps with funding launched by
+# Kalshi (CFTC-approved, 2026-05-29, 13 BTC+alt contracts) and Polymarket
+# (beta 2026-04-21, crypto+stocks, 10-20x leverage). These are CFTC-regulated
+# crypto perpetual futures, NOT prediction YES/NO markets — they share the
+# canonical perp instrument universe (BTC-PERP, ETH-PERP, …) alongside CeFi
+# perp venues. Distinct venue tokens from KALSHI/POLYMARKET (prediction Q&A).
+# SSOT: plans/active/prediction_venue_perps_and_live_clob_depth_2026_06_20.md
+KALSHI_PERP = "KALSHI-PERP"
+POLYMARKET_PERP = "POLYMARKET-PERP"
+
 # Sports Bookmaker APIs — proper REST API for bet placement
 PINNACLE = "PINNACLE"
 ONEXBET = "ONEXBET"
@@ -292,6 +302,9 @@ CLOB_VENUES: set[str] = {
     CME,
     ICE,
     CBOE,
+    # Prediction-platform perp CLOBs (crypto perpetuals, not YES/NO markets)
+    KALSHI_PERP,
+    POLYMARKET_PERP,
 }
 
 ZERO_ALPHA_VENUES: set[str] = {
@@ -343,6 +356,9 @@ VENUE_CATEGORY_MAP: dict[str, str] = {
     LIDO: "defi",
     ETHERFI: "defi",
     ETHENA: "defi",
+    # Prediction-platform perp CLOBs — treated as cefi (CFTC-regulated crypto perps)
+    KALSHI_PERP: "cefi",
+    POLYMARKET_PERP: "cefi",
 }
 VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 
@@ -385,6 +401,9 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     LIDO: {"STAKING"},
     ETHERFI: {"STAKING"},
     ETHENA: {"STAKING"},
+    # Prediction-platform perp CLOBs — CFTC-regulated crypto perpetual futures
+    KALSHI_PERP: {"PERPETUAL"},
+    POLYMARKET_PERP: {"PERPETUAL"},
 }
 INSTRUMENT_TYPES_BY_VENUE.update({v: {"EXCHANGE_ODDS"} for v in SPORTS_EXCHANGE_VENUES})
 INSTRUMENT_TYPES_BY_VENUE.update({v: {"PREDICTION_MARKET"} for v in SPORTS_PREDICTION_MARKET_VENUES})
@@ -491,6 +510,9 @@ VENUE_CAPABILITIES: dict[str, set[VenueCapability]] = {
     LIDO: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
     ETHERFI: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
     ETHENA: {VenueCapability.STAKE, VenueCapability.UNSTAKE},
+    # Prediction-platform perp CLOBs — CFTC-regulated crypto perpetual futures
+    KALSHI_PERP: {VenueCapability.PERP_TRADE},
+    POLYMARKET_PERP: {VenueCapability.PERP_TRADE},
 }
 VENUE_CAPABILITIES.update({v: {VenueCapability.SPORTS_EXCHANGE} for v in SPORTS_EXCHANGE_VENUES})
 VENUE_CAPABILITIES.update({v: {VenueCapability.PREDICTION_MARKET} for v in SPORTS_PREDICTION_MARKET_VENUES})
@@ -645,6 +667,9 @@ VENUE_ORDER_CAPABILITIES: dict[str, frozenset[VenueOrderCapability]] = {
     LIDO: _DEFI_STAKING,
     ETHERFI: _DEFI_STAKING,
     ETHENA: _DEFI_STAKING,
+    # Prediction-platform perp CLOBs — basic order caps pending live API verification
+    KALSHI_PERP: _CEFI_BASIC,
+    POLYMARKET_PERP: _CEFI_BASIC,
 }
 # Sports exchanges
 VENUE_ORDER_CAPABILITIES.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, _SPORTS_EXCHANGE))
@@ -756,6 +781,9 @@ VENUE_FEE_MODEL_MAP: dict[str, VenueFeeModel] = {
     LIDO: VenueFeeModel.RATE_BASED,
     ETHERFI: VenueFeeModel.RATE_BASED,
     ETHENA: VenueFeeModel.RATE_BASED,
+    # Prediction-platform perp CLOBs — maker/taker fee model (crypto perps)
+    KALSHI_PERP: VenueFeeModel.MAKER_TAKER,
+    POLYMARKET_PERP: VenueFeeModel.MAKER_TAKER,
 }
 VENUE_FEE_MODEL_MAP.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, VenueFeeModel.COMMISSION))
 VENUE_FEE_MODEL_MAP.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, VenueFeeModel.COMMISSION))
@@ -858,6 +886,9 @@ VENUE_ALPHA_PROFILE: dict[str, AlphaProfile] = {
     LIDO: AlphaProfile.ZERO_ALPHA,
     ETHERFI: AlphaProfile.ZERO_ALPHA,
     ETHENA: AlphaProfile.ZERO_ALPHA,
+    # Prediction-platform perp CLOBs — alpha-seeking (funding arb / dispersion)
+    KALSHI_PERP: AlphaProfile.ALPHA_SEEKING,
+    POLYMARKET_PERP: AlphaProfile.ALPHA_SEEKING,
 }
 VENUE_ALPHA_PROFILE.update(dict.fromkeys(SPORTS_EXCHANGE_VENUES, AlphaProfile.ALPHA_SEEKING))
 VENUE_ALPHA_PROFILE.update(dict.fromkeys(SPORTS_PREDICTION_MARKET_VENUES, AlphaProfile.ALPHA_SEEKING))

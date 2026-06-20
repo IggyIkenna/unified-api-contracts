@@ -70,6 +70,156 @@ KALSHI_TICKER_TO_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
 
 
 # ---------------------------------------------------------------------------
+# Kalshi ticker-prefix → CanonicalQuestionGroup (rule-based fallback).
+#
+# Kalshi event tickers follow a ``KXSERIES[-DATE][-STRIKESUFFIX]`` schema.
+# The *series prefix* (the letters before the first digit or trailing dash
+# that identifies a concrete contract) determines the market family.
+#
+# Key design notes:
+# - Longer / more-specific prefixes take precedence.  The lookup in
+#   ``classify_kalshi_to_canonical_group`` tries prefixes from longest to
+#   shortest so ``KXBTCD`` (daily directional) wins over ``KXBTC`` (generic
+#   range) when a ticker starts with the longer string.
+# - Where a Kalshi market family represents the SAME real-world question as
+#   a Polymarket group, both venues map to the IDENTICAL
+#   ``CanonicalQuestionGroup`` value.  This enables the
+#   ``arbitrage_price_dispersion`` strategy to compare fair-value across
+#   venues without any venue-translation layer.
+# - Prefixes are upper-cased; callers must ensure ``ticker.upper()`` is
+#   passed (``classify_kalshi_to_canonical_group`` does this automatically).
+#
+# Derived from the full Kalshi series catalogue (v2/series, 2026-06-20)
+# and cross-referenced against ``_CATEGORY_UNDERLYING_PERIOD_TO_GROUP`` so
+# the same ``CanonicalQuestionGroup`` values are assigned on both sides.
+# ---------------------------------------------------------------------------
+
+_G = CanonicalQuestionGroup  # local shorthand, matches the Polymarket side
+
+KALSHI_TICKER_PREFIX_TO_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
+    # ── Crypto: BTC ─────────────────────────────────────────────────────────
+    # More-specific prefixes listed first; the classifier iterates
+    # longest-to-shortest so these always beat the bare "KXBTC" fallback.
+    "KXBTC15M": _G.BTC_UP_DOWN_15MIN,  # 15-minute up/down (KXBTC15M-*)
+    "KXBTCD": _G.BTC_UP_DOWN_DAILY,  # daily directional above/below (KXBTCD-*)
+    "KXBTCI": _G.BTC_UP_DOWN_HOURLY,  # hourly intraday (KXBTCI-*)
+    "KXBTCMAXD": _G.BTC_UP_DOWN_DAILY,  # daily max/one-touch
+    "KXBTC": _G.BTC_PRICE_RANGE_DAILY,  # generic BTC range (KXBTC-DDMMMYY*)
+    # ── Crypto: ETH ─────────────────────────────────────────────────────────
+    "KXETH15M": _G.ETH_UP_DOWN_15MIN,
+    "KXETHD": _G.ETH_UP_DOWN_DAILY,
+    "KXETHI": _G.ETH_UP_DOWN_HOURLY,
+    "KXETH": _G.ETH_PRICE_RANGE_DAILY,
+    # ── Crypto: SOL ─────────────────────────────────────────────────────────
+    "KXSOL15M": _G.SOL_UP_DOWN_DAILY,
+    "KXSOLD": _G.SOL_UP_DOWN_DAILY,
+    "KXSOL": _G.SOL_PRICE_RANGE_DAILY,
+    # ── Crypto: XRP ─────────────────────────────────────────────────────────
+    "KXXRP15M": _G.XRP_UP_DOWN_DAILY,
+    "KXXRPD": _G.XRP_UP_DOWN_DAILY,
+    "KXXRP": _G.XRP_PRICE_RANGE_DAILY,
+    # ── Crypto: DOGE ────────────────────────────────────────────────────────
+    "KXDOGE15M": _G.DOGE_UP_DOWN_DAILY,
+    "KXDOGED": _G.DOGE_UP_DOWN_DAILY,
+    "KXDOGE": _G.DOGE_PRICE_RANGE_DAILY,
+    # ── Crypto: BNB ─────────────────────────────────────────────────────────
+    "KXBNB15M": _G.BNB_UP_DOWN_DAILY,
+    "KXBNBD": _G.BNB_UP_DOWN_DAILY,
+    "KXBNB": _G.BNB_PRICE_RANGE_DAILY,
+    # ── Crypto: ADA ─────────────────────────────────────────────────────────
+    "KXADA15M": _G.ADA_UP_DOWN_DAILY,
+    "KXADAD": _G.ADA_UP_DOWN_DAILY,
+    "KXADA": _G.ADA_PRICE_RANGE_DAILY,
+    # ── Crypto: AVAX ────────────────────────────────────────────────────────
+    "KXAVAXD": _G.AVAX_UP_DOWN_DAILY,
+    "KXAVAX": _G.AVAX_PRICE_RANGE_DAILY,
+    # ── Crypto: LINK (Chainlink) ─────────────────────────────────────────────
+    "KXLINKD": _G.LINK_UP_DOWN_DAILY,
+    "KXLINK": _G.LINK_PRICE_RANGE_DAILY,
+    # ── Crypto: LTC (Litecoin) ───────────────────────────────────────────────
+    "KXLTCD": _G.LTC_UP_DOWN_DAILY,
+    "KXLTC": _G.LTC_PRICE_RANGE_DAILY,
+    # ── Crypto: HYPE ────────────────────────────────────────────────────────
+    "KXHYPE15M": _G.HYPE_UP_DOWN_DAILY,
+    "KXHYPED": _G.HYPE_UP_DOWN_DAILY,
+    "KXHYPE": _G.HYPE_PRICE_RANGE_DAILY,
+    # ── Equity indices ───────────────────────────────────────────────────────
+    # INX = S&P 500; shared with Polymarket's SPX_UP_DOWN_DAILY group.
+    # All KXINX* variants (daily, weekly, hourly, range-bracket) map to
+    # SPX_UP_DOWN_DAILY — no SPX-specific range group exists in the enum yet.
+    "KXINXI": _G.SPX_UP_DOWN_DAILY,  # hourly S&P range (KXINXI-*)
+    "KXINXU": _G.SPX_UP_DOWN_DAILY,  # daily above/below (KXINXU-*)
+    "KXINXAB": _G.SPX_UP_DOWN_DAILY,  # daily close above/below
+    "KXINXB": _G.SPX_UP_DOWN_DAILY,  # bracketed range (KXINXB-*)
+    "KXINXW": _G.SPX_UP_DOWN_DAILY,  # weekly range
+    "KXINXM": _G.SPX_UP_DOWN_DAILY,  # monthly range
+    "KXINX": _G.SPX_UP_DOWN_DAILY,  # generic S&P range (KXINX-*)
+    # NASDAQ-100 → NDX_UP_DOWN_DAILY (shared with Polymarket)
+    "KXNASDAQ100U": _G.NDX_UP_DOWN_DAILY,
+    "KXNASDAQ100W": _G.NDX_UP_DOWN_DAILY,
+    "KXNASDAQ100M": _G.NDX_UP_DOWN_DAILY,
+    "KXNASDAQ100": _G.NDX_UP_DOWN_DAILY,
+    # DJIA → DJIA_UP_DOWN_DAILY
+    "KXDJIA": _G.DJIA_UP_DOWN_DAILY,
+    # Russell 2000 → RUT_UP_DOWN_DAILY
+    "KXRUT": _G.RUT_UP_DOWN_DAILY,
+    # ── Commodities ──────────────────────────────────────────────────────────
+    # Gold — daily directional gets GOLD_UP_DOWN_DAILY; level/range → GOLD_PRICE_LEVEL.
+    "KXGOLDD": _G.GOLD_UP_DOWN_DAILY,
+    "KXGOLDW": _G.GOLD_PRICE_LEVEL,
+    "KXGOLDMON": _G.GOLD_PRICE_LEVEL,
+    "KXGOLD": _G.GOLD_PRICE_LEVEL,
+    # Silver — all Kalshi KXSILVER* series are price-level markets.
+    "KXSILVERD": _G.SILVER_PRICE_LEVEL,
+    "KXSILVERW": _G.SILVER_PRICE_LEVEL,
+    "KXSILVERMON": _G.SILVER_PRICE_LEVEL,
+    # Oil (WTI — weekly/monthly price range)
+    "KXOILW": _G.CRUDE_OIL_PRICE_LEVEL,
+    "KXOIL": _G.CRUDE_OIL_PRICE_LEVEL,
+    # Copper — no dedicated group exists yet; route to OTHER (operator note:
+    # add COPPER_PRICE_LEVEL to the enum when a Polymarket counterpart lands).
+    # Keys deliberately omitted so the ticker falls through to OTHER.
+    # ── FX ───────────────────────────────────────────────────────────────────
+    # EUR/USD → EUR_UP_DOWN_DAILY (shared with Polymarket)
+    "KXEUROIMF": _G.EUR_UP_DOWN_DAILY,
+    "KXEURO": _G.EUR_UP_DOWN_DAILY,
+    # ── Macro releases ───────────────────────────────────────────────────────
+    # Fed funds rate decision → FED_RATE_DECISION_PER_FOMC (shared Polymarket)
+    "KXFEDDECISION": _G.FED_RATE_DECISION_PER_FOMC,
+    "KXFED": _G.FED_RATE_DECISION_PER_FOMC,
+    # CPI → CPI_PRINT_PER_MONTH (shared with Polymarket)
+    "KXCPIYOY": _G.CPI_PRINT_PER_MONTH,
+    "KXCPICORE": _G.CPI_PRINT_PER_MONTH,
+    "KXCPICOREYOY": _G.CPI_PRINT_PER_MONTH,
+    "KXCPICOMBO": _G.CPI_PRINT_PER_MONTH,
+    "KXCPI": _G.CPI_PRINT_PER_MONTH,
+    # Non-farm payrolls → NONFARM_PAYROLLS_PER_MONTH (shared with Polymarket)
+    "KXPAYROLLS": _G.NONFARM_PAYROLLS_PER_MONTH,
+    # GDP → GDP_PRINT_PER_QUARTER (shared with Polymarket)
+    "KXGDP": _G.GDP_PRINT_PER_QUARTER,
+    # PCE → PCE_PRINT_PER_MONTH (shared with Polymarket)
+    "KXPCECORE": _G.PCE_PRINT_PER_MONTH,
+    # Natural gas (EIA weekly/daily/monthly price) → NATGAS_UP_DOWN_DAILY
+    "KXGASD": _G.NATGAS_UP_DOWN_DAILY,
+    "KXGAS": _G.NATGAS_UP_DOWN_DAILY,
+    # Treasury yields → TREASURY_YIELD_PER_PRINT (shared with Polymarket)
+    "KX10YUSTSRY": _G.TREASURY_YIELD_PER_PRINT,  # 10Y UST yield
+    "KX10Y2Y": _G.TREASURY_YIELD_PER_PRINT,  # 10Y-2Y spread
+    "KX10Y3M": _G.TREASURY_YIELD_PER_PRINT,  # 10Y-3M spread
+}
+"""Kalshi event-ticker prefix → canonical group (rule-based fallback layer).
+
+The classifier tries prefixes from **longest to shortest** so a
+series-specific prefix (e.g. ``KXBTCD``) always wins over the generic
+family prefix (``KXBTC``).  Shared real-world questions (BTC daily,
+SPX, Fed rate, CPI, etc.) are deliberately assigned the **same**
+:class:`CanonicalQuestionGroup` value as their Polymarket counterpart —
+this enables cross-venue arbitrage detection in the
+``arbitrage_price_dispersion`` strategy without any translation layer.
+"""
+
+
+# ---------------------------------------------------------------------------
 # (category, underlying, resolution_period) → CanonicalQuestionGroup
 #
 # Mapping table for the rule-based fallback path. Only RANGE_BRACKET +
@@ -425,18 +575,40 @@ def classify_kalshi_to_canonical_group(
     *,
     ticker: str,
 ) -> CanonicalQuestionGroup:
-    """Map a Kalshi ticker onto a canonical question group.
+    """Map a Kalshi ticker (event_ticker or market ticker) onto a canonical group.
 
-    Currently override-only (the Kalshi rule classifier is a deferred
-    follow-up plan slot — the override dict is the single SSOT for
-    headline tickers until the rule classifier lands). Returns
-    :attr:`~CanonicalQuestionGroup.OTHER` when the ticker is unknown and
-    emits ``OTHER_BUCKET_MEMBER_ADDED`` at INFO level. Previously returned
-    ``None`` (caller routed to ``attempted_failed``).
+    Three-tier lookup — first match wins:
+
+    1. **Override dict** (:data:`KALSHI_TICKER_TO_GROUP`) — exact-match on the
+       full ticker string.  Use this to pin a specific contract when the
+       prefix rule would disagree.
+    2. **Prefix rules** (:data:`KALSHI_TICKER_PREFIX_TO_GROUP`) — iterate
+       candidate prefixes from *longest to shortest* so a more-specific
+       series (e.g. ``KXBTCD`` — daily directional) always beats the generic
+       family prefix (``KXBTC`` — plain range).
+    3. **OTHER catch-all** — emits ``OTHER_BUCKET_MEMBER_ADDED`` at INFO so
+       operators can audit the residual bucket and promote recurring patterns
+       to first-class groups.
+
+    Where a Kalshi series represents the **same real-world question** as a
+    Polymarket group (BTC daily up/down, SPX daily range, Fed rate, CPI …),
+    both venues resolve to the *identical* :class:`CanonicalQuestionGroup`
+    value — enabling the ``arbitrage_price_dispersion`` strategy to compare
+    fair-value across venues without any translation layer.
     """
-    result = KALSHI_TICKER_TO_GROUP.get(ticker)
+    upper_ticker = ticker.upper()
+
+    # 1 — exact override wins
+    result = KALSHI_TICKER_TO_GROUP.get(upper_ticker)
     if result is not None:
         return result
+
+    # 2 — prefix rules, longest-prefix first
+    for prefix in sorted(KALSHI_TICKER_PREFIX_TO_GROUP, key=len, reverse=True):
+        if upper_ticker.startswith(prefix):
+            return KALSHI_TICKER_PREFIX_TO_GROUP[prefix]
+
+    # 3 — fallback
     _log.info("OTHER_BUCKET_MEMBER_ADDED ticker=%s", ticker)
     return CanonicalQuestionGroup.OTHER
 
@@ -444,6 +616,7 @@ def classify_kalshi_to_canonical_group(
 __all__ = [
     "CLASSIFIER_STABILITY_HASH",
     "CLASSIFIER_VERSION",
+    "KALSHI_TICKER_PREFIX_TO_GROUP",
     "KALSHI_TICKER_TO_GROUP",
     "POLYMARKET_CONDITION_ID_TO_GROUP",
     "classify_kalshi_to_canonical_group",
