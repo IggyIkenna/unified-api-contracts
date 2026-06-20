@@ -100,6 +100,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=2,
         expected_cadence_seconds=1,
         criticality="critical",
+        refetch_action="refetch-feed:binance",
     ),
     "bybit": DataFreshnessContract(
         source="bybit",
@@ -108,6 +109,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=2,
         expected_cadence_seconds=1,
         criticality="critical",
+        refetch_action="refetch-feed:bybit",
     ),
     "okx": DataFreshnessContract(
         source="okx",
@@ -116,6 +118,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=2,
         expected_cadence_seconds=1,
         criticality="critical",
+        refetch_action="refetch-feed:okx",
     ),
     "coinbase": DataFreshnessContract(
         source="coinbase",
@@ -124,6 +127,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=2,
         expected_cadence_seconds=1,
         criticality="critical",
+        refetch_action="refetch-feed:coinbase",
     ),
     "hyperliquid": DataFreshnessContract(
         source="hyperliquid",
@@ -132,6 +136,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=2,
         expected_cadence_seconds=1,
         criticality="critical",
+        refetch_action="refetch-feed:hyperliquid",
     ),
     # CeFi — options venue with slightly higher latency (10s max)
     "deribit": DataFreshnessContract(
@@ -141,6 +146,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=3,
         expected_cadence_seconds=1,
         criticality="critical",
+        refetch_action="refetch-feed:deribit",
     ),
     # DeFi — on-chain AMMs / lending (12s cadence, 15s max)
     "uniswap_v3": DataFreshnessContract(
@@ -150,6 +156,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=6,
         expected_cadence_seconds=12,
         criticality="critical",
+        refetch_action="refetch-feed:uniswap_v3",
     ),
     "aave_v3": DataFreshnessContract(
         source="aave_v3",
@@ -158,6 +165,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=6,
         expected_cadence_seconds=12,
         criticality="critical",
+        refetch_action="refetch-feed:aave_v3",
     ),
     "curve": DataFreshnessContract(
         source="curve",
@@ -166,6 +174,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=6,
         expected_cadence_seconds=12,
         criticality="critical",
+        refetch_action="refetch-feed:curve",
     ),
     "balancer": DataFreshnessContract(
         source="balancer",
@@ -174,6 +183,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=6,
         expected_cadence_seconds=12,
         criticality="critical",
+        refetch_action="refetch-feed:balancer",
     ),
     # TradFi — intraday (60s cadence)
     "databento_intraday": DataFreshnessContract(
@@ -183,6 +193,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=30,
         expected_cadence_seconds=60,
         criticality="important",
+        refetch_action="refetch-feed:databento_intraday",
     ),
     # TradFi — EOD (daily cadence)
     "databento_eod": DataFreshnessContract(
@@ -192,6 +203,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=43200,
         expected_cadence_seconds=86400,
         criticality="important",
+        refetch_action="refetch-feed:databento_eod",
     ),
     "yahoo_finance": DataFreshnessContract(
         source="yahoo_finance",
@@ -200,6 +212,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=43200,
         expected_cadence_seconds=86400,
         criticality="important",
+        refetch_action="refetch-feed:yahoo_finance",
     ),
     # Alt data — daily (informational)
     "openbb": DataFreshnessContract(
@@ -242,6 +255,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=60,
         expected_cadence_seconds=30,
         criticality="important",
+        refetch_action="refetch-feed:pinnacle",
     ),
     "odds_api": DataFreshnessContract(
         source="odds_api",
@@ -250,6 +264,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=60,
         expected_cadence_seconds=30,
         criticality="important",
+        refetch_action="refetch-feed:odds_api",
     ),
     "betfair": DataFreshnessContract(
         source="betfair",
@@ -258,6 +273,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=15,
         expected_cadence_seconds=5,
         criticality="important",
+        refetch_action="refetch-feed:betfair",
     ),
     # On-chain analytics — hourly cadence
     "glassnode": DataFreshnessContract(
@@ -267,6 +283,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=1800,
         expected_cadence_seconds=3600,
         criticality="important",
+        refetch_action="refetch-feed:glassnode",
     ),
     "coinglass": DataFreshnessContract(
         source="coinglass",
@@ -275,6 +292,7 @@ MARKET_TICK_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=1800,
         expected_cadence_seconds=3600,
         criticality="important",
+        refetch_action="refetch-feed:coinglass",
     ),
 }
 
@@ -294,6 +312,7 @@ FEATURE_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=150,
         expected_cadence_seconds=60,
         criticality="critical",
+        refetch_action="refetch-feed:features-service",
     ),
 }
 
@@ -309,6 +328,7 @@ ML_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=60,
         expected_cadence_seconds=60,
         criticality="critical",
+        refetch_action="refetch-feed:ml-inference-api",
     ),
     "ml-training-api": DataFreshnessContract(
         source="ml-training-api",
@@ -338,6 +358,7 @@ ACCOUNT_STATE_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=60,
         expected_cadence_seconds=60,
         criticality="critical",
+        refetch_action="refetch-feed:account_snapshot",
     ),
     "positions_snapshot": DataFreshnessContract(
         source="positions_snapshot",
@@ -346,6 +367,7 @@ ACCOUNT_STATE_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=60,
         expected_cadence_seconds=60,
         criticality="critical",
+        refetch_action="refetch-feed:positions_snapshot",
     ),
     "reconciliation_age": DataFreshnessContract(
         source="reconciliation_age",
@@ -354,6 +376,7 @@ ACCOUNT_STATE_FRESHNESS: dict[str, DataFreshnessContract] = {
         warn_age_seconds=1200,  # SEV1 band — 20min
         expected_cadence_seconds=300,
         criticality="critical",
+        refetch_action="refetch-feed:reconciliation_age",
     ),
 }
 

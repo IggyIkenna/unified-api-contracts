@@ -1298,6 +1298,7 @@ from unified_api_contracts.internal.reconciliation import (
     make_trade_key,
 )
 from unified_api_contracts.internal.reference import (
+    ACCOUNT_STATE_FRESHNESS,
     ALL_FRESHNESS_CONTRACTS,
     FEATURE_FRESHNESS,
     MARKET_TICK_FRESHNESS,
@@ -1530,6 +1531,7 @@ from unified_api_contracts.internal.validation.instruction._validator import (
 )
 
 __all__ = [
+    "ACCOUNT_STATE_FRESHNESS",
     "ALLOCATION_MIN_MATURITY",
     "ALL_FRESHNESS_CONTRACTS",
     "ArchetypeAllocationDirective",
