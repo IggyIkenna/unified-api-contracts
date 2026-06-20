@@ -17,7 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class ActionType(StrEnum):
-    """Closed set of 10 Layer-0 recovery actions.
+    """Closed set of 11 Layer-0 recovery actions.
 
     Adding a new action requires (1) appending here, (2) registering in
     ``unified_trading_library.recovery.RecoveryScriptRegistry``, (3) shipping
@@ -36,6 +36,11 @@ class ActionType(StrEnum):
     DISABLE_VENUE = "disable_venue"
     ENTER_SAFE_MODE = "enter_safe_mode"
     ENTER_READONLY_RECON_MODE = "enter_readonly_recon_mode"
+    # Active self-healing: re-fetch a stale data feed via its owning service CLI
+    # before/while escalating. Keyed off the DataFreshnessContract.refetch_action
+    # binding (``refetch-feed:<source>``). FAILOVER_FEED flips primary→backup;
+    # REFETCH_FEED re-pulls the SAME feed (the feed has no backup, just gaps).
+    REFETCH_FEED = "refetch_feed"
 
 
 class ActionStatus(StrEnum):

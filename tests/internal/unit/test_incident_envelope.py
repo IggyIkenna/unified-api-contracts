@@ -71,10 +71,13 @@ def test_immediate_sev0_override_has_7_members() -> None:
     assert len(list(ImmediateSev0Override)) == 7
 
 
-def test_action_type_has_10_members() -> None:
-    """10 Layer-0 deterministic recovery actions per
-    `plans/active/agent_recovery_controller_layer0_deterministic_2026_05_23.md`."""
-    assert len(list(ActionType)) == 10
+def test_action_type_has_11_members() -> None:
+    """11 Layer-0 deterministic recovery actions: the original 10 per
+    `plans/active/agent_recovery_controller_layer0_deterministic_2026_05_23.md`
+    plus REFETCH_FEED (active feed self-healing, per
+    `plans/active/data_feed_sla_registry_and_active_self_healing_2026_06_19.md`)."""
+    assert len(list(ActionType)) == 11
+    assert ActionType.REFETCH_FEED in set(ActionType)
 
 
 def test_signoff_verdict_has_4_members() -> None:

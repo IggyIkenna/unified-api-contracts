@@ -319,6 +319,47 @@ def test_refetch_action_settable() -> None:
 
 
 # ---------------------------------------------------------------------------
+# refetch_action binding contract (Phase-2 self-healing)
+#
+# Binding scheme: every critical/important feed binds to a stable action id
+# ``refetch-feed:<source>``; informational feeds leave it None (no automated
+# re-fetch path). The deployment-service ``refetch-feed`` Layer-0 action keys
+# off this id (it parses ``<source>`` back out and looks up ALL_FRESHNESS_CONTRACTS).
+# ---------------------------------------------------------------------------
+
+
+def test_every_critical_or_important_feed_has_refetch_action() -> None:
+    missing = [
+        key
+        for key, c in ALL_FRESHNESS_CONTRACTS.items()
+        if c.criticality in ("critical", "important") and c.refetch_action is None
+    ]
+    assert missing == [], f"critical/important feeds missing refetch_action: {missing}"
+
+
+def test_informational_feeds_have_no_refetch_action() -> None:
+    bound = [
+        key
+        for key, c in ALL_FRESHNESS_CONTRACTS.items()
+        if c.criticality == "informational" and c.refetch_action is not None
+    ]
+    assert bound == [], f"informational feeds must NOT bind a refetch_action: {bound}"
+
+
+@pytest.mark.parametrize(
+    "key,contract",
+    sorted(ALL_FRESHNESS_CONTRACTS.items()),
+)
+def test_refetch_action_id_scheme_matches_source(key: str, contract: DataFreshnessContract) -> None:
+    # Bound feeds use the canonical ``refetch-feed:<source>`` id so the Layer-0
+    # action can round-trip <source> back to ALL_FRESHNESS_CONTRACTS[key].
+    if contract.refetch_action is None:
+        return
+    assert contract.refetch_action == f"refetch-feed:{contract.source}"
+    assert contract.source == key
+
+
+# ---------------------------------------------------------------------------
 # ACCOUNT_STATE_FRESHNESS — the critical account/position/recon feeds
 # ---------------------------------------------------------------------------
 
