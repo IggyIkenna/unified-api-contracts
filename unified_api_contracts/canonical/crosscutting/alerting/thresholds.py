@@ -337,6 +337,11 @@ ALERT_THRESHOLDS: Final[dict[str, AlertThreshold]] = {
     # the TICK_STALENESS event fires. 300s (5min) is the conservative default;
     # high-frequency CeFi venues may override per-venue once Phase 7 baseline
     # tuning lands.
+    # Cross-validation enforcement (agreement with MARKET_TICK_FRESHNESS per-venue
+    # max_age_seconds): tests/internal/unit/test_freshness_ssot_agreement.py —
+    # test_tick_staleness_threshold_gte_all_market_tick_max_ages asserts this
+    # ceiling is >= every per-venue SLA so the alert is always a conservative
+    # fallback, never a false-positive gate tighter than the SLA.
     "tick_staleness_seconds": AlertThreshold(
         key="tick_staleness_seconds",
         unit=ThresholdUnit.SECONDS,

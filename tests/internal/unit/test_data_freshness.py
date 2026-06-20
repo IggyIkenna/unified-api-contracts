@@ -365,6 +365,9 @@ def test_uic_init_exports_data_freshness_contract() -> None:
 
 def test_uic_init_exports_dicts() -> None:
     from unified_api_contracts.internal import (
+        ACCOUNT_STATE_FRESHNESS as ASF,
+    )
+    from unified_api_contracts.internal import (
         ALL_FRESHNESS_CONTRACTS as AFC,
     )
     from unified_api_contracts.internal import (
@@ -381,3 +384,4 @@ def test_uic_init_exports_dicts() -> None:
     assert FF is FEATURE_FRESHNESS
     assert MLF is ML_FRESHNESS
     assert AFC is ALL_FRESHNESS_CONTRACTS
+    assert ASF is ACCOUNT_STATE_FRESHNESS
