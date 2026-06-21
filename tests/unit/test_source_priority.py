@@ -174,7 +174,13 @@ def test_computed_sources_are_exempt_from_external() -> None:
 
 def test_external_sources_for_external_vendors() -> None:
     """External-vendor cells return their full source list."""
-    assert external_sources_for("cefi", "trades") == ["tardis", "aster", "hyperliquid"]  # HL/ASTER cefi onchain perps
+    assert external_sources_for("cefi", "trades") == [
+        "tardis",
+        "aster",
+        "hyperliquid",
+        "kalshi_perp",
+        "polymarket_perp",
+    ]  # HL/ASTER cefi onchain perps + kalshi_perp/polymarket_perp CFTC perp venues
     assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink"]
     assert external_sources_for("prediction", "trades") == ["polymarket_clob", "kalshi"]
 

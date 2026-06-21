@@ -68,7 +68,13 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # {batch,live}_<source> + source carry provenance (Live=batch). tardis stays the
     # index-0 batch primary for Tardis-covered venues. Mirrors the derivative_ticker
     # 2-source registration below (closed-set round-trip + per-venue source stamp).
-    ("cefi", "trades"): ["tardis", "aster", "hyperliquid"],
+    # kalshi_perp + polymarket_perp: CFTC-regulated crypto perp venues (launched
+    # 2026-05-29 and 2026-04-21 respectively), each self-archiving their own trade
+    # tape via public-read REST (cursor-paginated). They stamp their own per-venue
+    # source on batch rows (like aster/hyperliquid — native REST, not Tardis).
+    # polymarket_perp is BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21); scaffold
+    # registered for when the endpoint recovers. SSOT: prediction-perps-sourcing.md.
+    ("cefi", "trades"): ["tardis", "aster", "hyperliquid", "kalshi_perp", "polymarket_perp"],
     ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid"],
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
     # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
@@ -109,6 +115,12 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("cefi", "futures_chain"): ["tardis"],
     ("cefi", "perpetual"): ["tardis"],
     ("cefi", "funding_rate"): ["tardis"],
+    # perp_funding (periodic funding settlements) for the new CFTC-regulated crypto
+    # perp venues. kalshi_perp + polymarket_perp each expose a dedicated
+    # /markets/{ticker}/funding_rates endpoint (cursor-paginated, public-read).
+    # polymarket_perp is BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21).
+    # SSOT: prediction-perps-sourcing.md.
+    ("cefi", "perp_funding"): ["kalshi_perp", "polymarket_perp"],
     # greeks_snapshot + implied_vol_surface — computed in-house by greeks-service
     # from the canonical options_chain (venue mark_iv, else BS-fitted). Internal
     # computed source (greeks_service, COMPUTED_SOURCES-exempt from external
@@ -444,13 +456,23 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # replay capable. It is NOT Tardis-archived; the Aster derivative_ticker shard
     # resolves to ``batch_aster`` via the UTL ``_VENUE_OVERRIDES["ASTER"]`` override.
     "aster": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # Kalshi-perp (CFTC crypto perps, launched 2026-05-29): public-read REST
+    # (GET /markets/{ticker}/trades + /funding_rates, cursor-paginated).
+    # Self-archives its own trade + funding tape → batch + replay capable.
+    # WS live stream confirmed. SSOT: prediction-perps-sourcing.md.
+    "kalshi_perp": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # Polymarket-perp (CFTC crypto perps, launched 2026-04-21):
+    # BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN for perps-api.polymarket.com, 2026-06-21).
+    # Scaffold registered for {BATCH, LIVE} recovery (no replay confirmed yet).
+    # SSOT: prediction_venue_perps_and_live_clob_depth_2026_06_20.md.
+    "polymarket_perp": frozenset({Mode.BATCH, Mode.LIVE}),
 }
 
 CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
-    {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster"}
+    {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster", "kalshi_perp", "polymarket_perp"}
 )
 
-BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset({"hyperliquid", "aster"})
+BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset({"hyperliquid", "aster", "kalshi_perp", "polymarket_perp"})
 """CeFi live venues that are ALSO a batch source (operator R4 2026-06-07 + Aster
 2026-06-16).
 
@@ -479,6 +501,8 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "databento": 10,  # CME direct feed, microsecond-grade infra
     "polymarket_clob": 200,  # HTTPS CLOB polling
     "kalshi": 200,  # HTTPS/WS CLOB polling (same class as polymarket_clob)
+    "kalshi_perp": 200,  # HTTPS/WS CLOB polling (same latency class as kalshi)
+    "polymarket_perp": 200,  # HTTPS/WS CLOB polling (BLOCKED-UPSTREAM-OUTAGE 2026-06-21)
     "onchain_rpc": 200,  # direct RPC, block-time bounded
     # Subgraph / indexer — block-confirmation latency dominates.
     "onchain_subgraph": 60_000,  # 1 min: block confirmation + Graph indexing

@@ -130,6 +130,11 @@ DATA_TYPES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # manifest records as empty_confirmed (honest absence per workspace
         # "honest absence vs fake placeholders" rule).
         "ohlcv_1m",
+        # 2026-06-21: periodic funding settlements for CFTC-regulated crypto perp venues.
+        # kalshi_perp (launched 2026-05-29) + polymarket_perp (launched 2026-04-21) expose
+        # a dedicated /markets/{ticker}/funding_rates REST endpoint (cursor-paginated,
+        # public-read). Source priority: ("cefi", "perp_funding"). SSOT: prediction-perps-sourcing.md.
+        "perp_funding",
     ],
     "tradfi": [
         "trades",
@@ -583,7 +588,12 @@ _INSTRUMENT_TYPE_ALIASES: dict[str, str] = {
 VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]] = {
     # ── CeFi ──────────────────────────────────────────────────────────────────
     ("cefi", "spot_pair"): frozenset({"trades", "book_snapshot_5", "ohlcv_1m"}),
-    ("cefi", "perpetual"): frozenset({"trades", "book_snapshot_5", "derivative_ticker", "liquidations", "ohlcv_1m"}),
+    ("cefi", "perpetual"): frozenset(
+        # perp_funding: periodic funding settlements emitted by CFTC-regulated crypto perp
+        # venues (kalshi_perp / polymarket_perp). Added 2026-06-21 alongside the new
+        # ("cefi", "perp_funding") SOURCE_PRIORITY entry. See prediction-perps-sourcing.md.
+        {"trades", "book_snapshot_5", "derivative_ticker", "liquidations", "ohlcv_1m", "perp_funding"}
+    ),
     ("cefi", "future"): frozenset(  # UNCERTAIN — cefi-owner verify
         {"trades", "book_snapshot_5", "derivative_ticker", "liquidations", "ohlcv_1m"}
     ),
