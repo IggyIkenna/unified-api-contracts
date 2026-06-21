@@ -62,14 +62,20 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # Tardis is the canonical CeFi tick source (multi-venue archive).
     # Per-venue REST/WS adapters serve live-time updates; archive falls
     # back to Tardis.
-    ("cefi", "trades"): ["tardis"],
-    ("cefi", "ohlcv_1m"): ["tardis"],
+    # hyperliquid/aster (cefi on-chain perps, reclassified to cefi in UAC 0.30.0)
+    # stamp their own per-venue source on BOTH live (exchange WS) and batch (S3
+    # archive / native REST) rows — same shard, same schema; pipeline_mode
+    # {batch,live}_<source> + source carry provenance (Live=batch). tardis stays the
+    # index-0 batch primary for Tardis-covered venues. Mirrors the derivative_ticker
+    # 2-source registration below (closed-set round-trip + per-venue source stamp).
+    ("cefi", "trades"): ["tardis", "aster", "hyperliquid"],
+    ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid"],
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
     # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
     # remains (databento/massive/yahoo/barchart produce it). Exclusion entry in
     # test_validity_matrix_completeness.py removed alongside.
-    ("cefi", "book_snapshot"): ["tardis"],
-    ("cefi", "liquidations"): ["tardis"],
+    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid"],
+    ("cefi", "liquidations"): ["tardis", "aster", "hyperliquid"],
     # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
     # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/
     # bybit/deribit → batch_tardis, resolved via this index-0 entry). **aster** is the
@@ -83,7 +89,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # venue-override Aster shard). source_required becomes True, but every
     # derivative_ticker writer already passes an explicit source. SSOT:
     # ``perp_funding_data_semantics_and_cadence_2026_06_16.md`` §genesis.
-    ("cefi", "derivative_ticker"): ["tardis", "aster"],
+    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid"],
     # ERA-B (operator 2026-06-07): options_chain / futures_chain are
     # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
     # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
@@ -391,11 +397,15 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "polymarket_gamma_api": frozenset({Mode.BATCH}),  # market metadata; not a tick series
     "kalshi": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),  # REST historical + WS live + re-fetch replay
-    # ---- Sports ---- (no in-play live source until a sports live archetype exists;
-    # historical odds + Secret-Manager keys already held → replay-capable now)
+    # ---- Sports ----
+    # odds_api (The Odds API) is the FIRST live sports source: a polling live-odds
+    # stream (the ``odds_api_ws`` WSFeedConnector) makes the Live==Batch sports
+    # archetype real → {BATCH, LIVE, REPLAY} (it also historical-re-fetches, so
+    # replay survives). The other sports vendors stay batch+replay until a live
+    # source lands for each (historical odds + Secret-Manager keys already held).
     "api_football": frozenset({Mode.BATCH, Mode.REPLAY}),
     "footystats": frozenset({Mode.BATCH, Mode.REPLAY}),
-    "odds_api": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "odds_api": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "understat": frozenset({Mode.BATCH, Mode.REPLAY}),
     "transfermarkt": frozenset({Mode.BATCH, Mode.REPLAY}),
     "soccer_football_info": frozenset({Mode.BATCH, Mode.REPLAY}),

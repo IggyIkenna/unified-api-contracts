@@ -65,10 +65,12 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "polymarket_clob": _BLR,
     "polymarket_gamma_api": _B,
     "kalshi": _BLR,
-    # Sports
+    # Sports — odds_api is the first LIVE sports source (polling live-odds stream,
+    # the odds_api_ws WSFeedConnector → Live==Batch sports archetype); the rest stay
+    # batch+replay until a live source lands for each.
     "api_football": _BR,
     "footystats": _BR,
-    "odds_api": _BR,
+    "odds_api": _BLR,
     "understat": _BR,
     "transfermarkt": _BR,
     "soccer_football_info": _BR,
@@ -174,10 +176,13 @@ def test_massive_and_databento_are_live_and_replay_capable() -> None:
         assert source_supports(src, Mode.REPLAY)
 
 
-def test_no_sports_source_is_live_yet() -> None:
-    """Operator 2026-06-05: the live sports source is undecided — seeded batch-only
-    until a vendor is chosen. (Change deliberately when a live sports source lands.)"""
-    for src in ("api_football", "footystats", "odds_api", "understat"):
+def test_odds_api_is_the_first_live_sports_source() -> None:
+    """odds_api (The Odds API) is the FIRST live sports source — a polling live-odds
+    stream (the ``odds_api_ws`` WSFeedConnector) makes the Live==Batch sports
+    archetype real (operator-directed 2026-06-21). The other sports vendors stay
+    batch-only-for-live until a live source lands for each."""
+    assert source_supports("odds_api", Mode.LIVE)
+    for src in ("api_football", "footystats", "understat"):
         assert not source_supports(src, Mode.LIVE)
 
 
