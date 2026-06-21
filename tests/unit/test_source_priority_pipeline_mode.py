@@ -253,7 +253,7 @@ def test_read_with_source_priority_exposed_from_crosscutting_namespace() -> None
 
 def test_get_all_sources_single_source_cell_returns_list_of_one() -> None:
     """Single-source cells return a one-element list."""
-    results = get_all_sources_with_priority("cefi", "trades")
+    results = get_all_sources_with_priority("cefi", "options_chain")  # (cefi,trades) is multi-source now
     assert len(results) == 1
     source, mode = results[0]
     assert source == "tardis"
