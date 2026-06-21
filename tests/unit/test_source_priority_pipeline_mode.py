@@ -582,8 +582,12 @@ def test_live_pipeline_mode_for_non_cefi_uses_source_priority_primary() -> None:
         live_source_for_venue,
     )
 
-    # Non-CeFi: live source = the SOURCE_PRIORITY primary (same vendor batch+live).
-    assert live_source_for_venue("tradfi", "DATABENTO", "trades") == get_primary_source("tradfi", "trades")
+    # TradFi: live source = databento (the ONLY tradfi Live WS producer), NOT the batch
+    # SOURCE_PRIORITY primary `massive` (a flat-file archive with no live feed). Resolving
+    # via the batch primary mis-stamped live shards `live_massive` (fixed 2026-06-21).
+    assert live_source_for_venue("tradfi", "DATABENTO", "trades") == "databento"
+    assert live_source_for_venue("tradfi", "CME", "trades") == "databento"
+    assert get_primary_source("tradfi", "trades") == "massive"  # batch primary unchanged
     pm = live_pipeline_mode_for_venue("tradfi", "DATABENTO", "trades")
     assert is_live(pm)
 
