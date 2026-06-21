@@ -105,6 +105,9 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("cefi", "futures_chain"): "tick_timestamp",
     ("cefi", "perpetual"): "tick_timestamp",
     ("cefi", "funding_rate"): "tick_timestamp",
+    # perp_funding — periodic funding settlements for CFTC-regulated crypto perp venues
+    # (Kalshi-perp + Polymarket-perp). available_at = the settlement's own tick timestamp.
+    ("cefi", "perp_funding"): "tick_timestamp",
     # greeks_snapshot / implied_vol_surface — greeks-service computes these inline
     # at the options_chain read-event (latency 0), so the row's own snapshot
     # timestamp IS available_at — same tick_timestamp semantic as the chain.

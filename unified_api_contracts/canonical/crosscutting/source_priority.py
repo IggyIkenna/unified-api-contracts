@@ -668,6 +668,18 @@ _PREDICTION_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
     "polymarket_gamma": "polymarket_gamma_api",
 }
 
+# CeFi crypto-perp venue → vendor source. The venue token is hyphenated (``KALSHI-PERP``)
+# but its source token is underscored (``kalshi_perp``); ``CEFI_LIVE_VENUES`` holds the
+# UNDERSCORE source form, so the hyphen venue never matches it and would fall through to
+# the (cefi, book_snapshot) SOURCE_PRIORITY primary ``tardis`` — a BATCH-only flat-file
+# archive with no LIVE_ PipelineMode → ``live_pipeline_mode_for_venue`` would raise. The
+# live source for a perp venue IS its own dedicated WS feed (kalshi_perp / polymarket_perp).
+# Consulted by live_source_for_venue in the cefi branch BEFORE the CEFI_LIVE_VENUES check.
+_CEFI_PERP_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
+    "kalshi-perp": "kalshi_perp",
+    "polymarket-perp": "polymarket_perp",
+}
+
 
 def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     """Resolve the LIVE/REPLAY ``source`` string that serves a ``(asset_group, venue,
@@ -702,6 +714,11 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     """
     venue_norm = venue.lower()
     ag_norm = asset_group.lower()
+    # CeFi crypto-perp venues (KALSHI-PERP/POLYMARKET-PERP): hyphen venue → underscore
+    # source token (their own WS feed). Checked before CEFI_LIVE_VENUES so the perp venue
+    # is never mis-resolved to the batch-only `tardis` book_snapshot primary.
+    if ag_norm == "cefi" and venue_norm in _CEFI_PERP_LIVE_SOURCE_FOR_VENUE:
+        return _CEFI_PERP_LIVE_SOURCE_FOR_VENUE[venue_norm]
     if ag_norm == "cefi" and venue_norm in CEFI_LIVE_VENUES:
         return venue_norm
     # Prediction is venue-disambiguated like CeFi: the data VENDOR IS the venue. The
@@ -710,6 +727,14 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     # by venue first. POLYMARKET falls through to the priority primary (polymarket_clob).
     if ag_norm == "prediction" and venue_norm in _PREDICTION_LIVE_SOURCE_FOR_VENUE:
         return _PREDICTION_LIVE_SOURCE_FOR_VENUE[venue_norm]
+    # TradFi live/replay is served by databento's Live streaming gateway for EVERY
+    # venue (CME/NASDAQ/NYSE/CBOE -> databento_tradfi_ws, the ONLY tradfi WS producer).
+    # The batch SOURCE_PRIORITY primary is `massive` (a flat-file archive - batch-canonical,
+    # with NO live WS producer), so resolving a live shard through the batch primary
+    # mis-stamps it `live_massive`. databento is the actual streaming vendor; massive
+    # stays the batch primary (via get_primary_source / select_primary_available_source).
+    if ag_norm == "tradfi":
+        return "databento"
     if has_source_priority(ag_norm, data_type):
         return get_primary_source(ag_norm, data_type)
     # Unregistered pair: the venue name IS the vendor source for the per-vendor

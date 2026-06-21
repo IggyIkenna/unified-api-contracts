@@ -97,6 +97,12 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # (perp_funding_data_semantics_and_cadence_2026_06_16.md). Like hyperliquid, it is
     # a BATCH_CAPABLE_CEFI_VENUES exception.
     "aster": _BLR,
+    # Kalshi-perp (CFTC crypto perps, launched 2026-05-29): public-read REST + WS live.
+    # Self-archives trade tape + funding_rates → {BATCH, LIVE, REPLAY}.
+    "kalshi_perp": _BLR,
+    # Polymarket-perp (CFTC crypto perps, launched 2026-04-21):
+    # BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21). {BATCH, LIVE} until verified.
+    "polymarket_perp": frozenset({Mode.BATCH, Mode.LIVE}),
 }
 
 

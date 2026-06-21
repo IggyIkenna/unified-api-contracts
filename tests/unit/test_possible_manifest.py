@@ -159,6 +159,8 @@ class TestEnumeratePossibleShardKeys:
             "derivative_ticker",
             "liquidations",
             "ohlcv_1m",
+            # 2026-06-21: perp_funding added to cefi/perpetual for CFTC-regulated venues
+            "perp_funding",
         }
 
     def test_option_leaf_rolls_up_to_one_bundle(self) -> None:
