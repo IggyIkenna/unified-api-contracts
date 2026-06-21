@@ -322,6 +322,14 @@ from .representative_sample import (
 from .reward_schedules import REWARD_SCHEDULES, RewardScheduleEntry
 from .service_contract_map import SERVICE_CONTRACT_MAP, ServiceContract
 from .source_data_latency import SFI_DATA_LAG_P95_SECONDS
+from .sports_bookmaker_league_coverage import (
+    BOOKMAKER_LEAGUE_COVERAGE,
+    COVERED_BOOKMAKERS,
+    PREDICTION_MARKET_VENUES,
+    is_bookmaker_league_covered,
+    is_bookmaker_observed,
+    is_prediction_market_venue,
+)
 from .sports_per_source_rules import is_expected_for_source
 from .sports_venue_coordinates import (
     VENUE_COORDINATES,
@@ -659,6 +667,7 @@ __all__ = [
     "BETWAY",
     "BITCOIN_RPC_TEMPLATES",
     "BLOCK_EXPLORER_URLS",
+    "BOOKMAKER_LEAGUE_COVERAGE",
     "BOVADA",
     "BOYLESPORTS",
     "BREAKDOWN_AXES",
@@ -695,6 +704,7 @@ __all__ = [
     "COMPOUND_V3_ETHEREUM_RESERVES",
     "COOLBET",
     "CORAL",
+    "COVERED_BOOKMAKERS",
     "CURVE_ETH",
     "DABBLE",
     "DATABENTO_SCHEMA_LEVEL",
@@ -808,6 +818,7 @@ __all__ = [
     "POINTSBET",
     "POLYMARKET",
     "POSSIBLE_MANIFEST_ASSET_GROUPS",
+    "PREDICTION_MARKET_VENUES",
     "PREDICTION_VENUE_LAUNCH_DATES",
     "PRIMARY_AXIS",
     "PRIZEPICKS",
@@ -1080,6 +1091,8 @@ __all__ = [
     "get_yahoo_vix_15m_start",
     "grain_for_instrument_type",
     "is_block_finalized",
+    "is_bookmaker_league_covered",
+    "is_bookmaker_observed",
     "is_expected",
     "is_expected_for_source",
     "is_half_day_session",
@@ -1088,6 +1101,7 @@ __all__ = [
     "is_lst",
     "is_non_trading_day",
     "is_per_instrument_shard_data_type",
+    "is_prediction_market_venue",
     "is_processed_data_type",
     "is_processed_data_type",
     "is_processed_data_type",
