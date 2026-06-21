@@ -121,6 +121,19 @@ class PipelineMode(StrEnum):
     # (WebSocket live + historical re-fetch replay) → LIVE_/REPLAY_ members below per the
     # closed-set rule. SSOT: prediction_venue_perps_and_live_clob_depth_2026_06_20.md.
     BATCH_KALSHI = "batch_kalshi"
+    # Kalshi-perp (CFTC-regulated crypto perpetuals on Kalshi, launched 2026-05-29) —
+    # distinct from the KALSHI binary prediction-market source above. Public-read REST
+    # (no auth for market data); batch-capable via GET /markets/{ticker}/trades +
+    # /funding_rates (cursor-paginated). {BATCH,LIVE,REPLAY}-capable (WS live + REST
+    # re-fetch replay). SSOT: prediction_venue_perps_and_live_clob_depth_2026_06_20.md.
+    BATCH_KALSHI_PERP = "batch_kalshi_perp"
+    # Polymarket-perp (CFTC-regulated crypto perpetuals on Polymarket, launched 2026-04-21) —
+    # distinct from POLYMARKET_CLOB / POLYMARKET_GAMMA_API prediction-market sources.
+    # BLOCKED-UPSTREAM-OUTAGE as of 2026-06-21 (DNS NXDOMAIN for perps-api.polymarket.com).
+    # Scaffold registered for when the endpoint recovers. Batch-capable (REST public-read).
+    # {BATCH,LIVE}-capable (WS live). No REPLAY_POLYMARKET_PERP until endpoint verified.
+    # SSOT: prediction_venue_perps_and_live_clob_depth_2026_06_20.md.
+    BATCH_POLYMARKET_PERP = "batch_polymarket_perp"
     BATCH_HELIUS_RPC = "batch_helius_rpc"
     BATCH_PYTH_HERMES = "batch_pyth_hermes"
     BATCH_SOCCER_FOOTBALL_INFO = "batch_soccer_football_info"
@@ -163,6 +176,12 @@ class PipelineMode(StrEnum):
     # Kalshi — WebSocket live + historical re-fetch replay (capability {BATCH,LIVE,REPLAY}).
     LIVE_KALSHI = "live_kalshi"
     REPLAY_KALSHI = "replay_kalshi"
+    # Kalshi-perp — WebSocket live + REST replay (capability {BATCH,LIVE,REPLAY}).
+    LIVE_KALSHI_PERP = "live_kalshi_perp"
+    REPLAY_KALSHI_PERP = "replay_kalshi_perp"
+    # Polymarket-perp — BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21). Scaffold only.
+    # Live/replay capability pending endpoint recovery. BATCH-only until then.
+    LIVE_POLYMARKET_PERP = "live_polymarket_perp"
     # Internal service sources — batch=live symmetry; re-run = replay.
     LIVE_INSTRUMENTS_SERVICE = "live_instruments_service"
     REPLAY_INSTRUMENTS_SERVICE = "replay_instruments_service"

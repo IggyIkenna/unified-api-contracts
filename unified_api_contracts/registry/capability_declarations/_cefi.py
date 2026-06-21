@@ -1120,6 +1120,144 @@ _KRAKEN_FUTURES = SourceCapability(
 
 
 # ---------------------------------------------------------------------------
+# CFTC-regulated crypto perp venues (kalshi_perp + polymarket_perp)
+# ---------------------------------------------------------------------------
+
+_KALSHI_PERP = SourceCapability(
+    source="kalshi_perp",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=True,
+    supports_batch=True,
+    supports_historical=True,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],  # public-read for market data (no auth required)
+    auth_environments={"prod": "none"},
+    operations={
+        # REST ops (no ws_ prefix → BATCH; rest_ ops are cursor-paginated REST).
+        # trades: also streams via WS (ws_trades → LIVE reachable for trades).
+        # funding_rates / perp_funding: REST-ONLY (periodic settlements, no WS stream).
+        "market": [
+            "markets",  # GET /markets?category=CRYPTO&status=active (universe)
+            "trades",  # GET /markets/{ticker}/trades (cursor-paginated REST + WS)
+            "ws_trades",  # WS live trade stream (confirms LIVE capability for trades)
+            "funding_rates",  # GET /markets/{ticker}/funding_rates (cursor-paginated REST ONLY)
+        ],
+        "reference": [
+            "market_detail",  # GET /markets/{ticker} (single-instrument detail)
+        ],
+    },
+    base_urls={"mainnet": "https://api.elections.kalshi.com/trade-api/v2"},
+    operation_details={
+        "markets": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Public read — no auth. Launched 2026-05-29. CFTC-regulated crypto perps.",
+                ),
+            }
+        ),
+        "trades": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Cursor-paginated; ≤1000 per call. Also available via WS (ws_trades).",
+                ),
+            }
+        ),
+        "ws_trades": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes="Live WS trade stream. Makes LIVE mode reachable for data_type=trades.",
+                ),
+            }
+        ),
+        "funding_rates": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes=(
+                        "Cursor-paginated periodic funding settlements (REST ONLY — no WS stream). "
+                        "modes_for(kalshi_perp, funding_rates) → {BATCH} (no ws_funding_rates op)."
+                    ),
+                ),
+            }
+        ),
+    },
+    chain=None,
+    kind="perp_cex",
+    coverage_start={"trades": date(2026, 5, 29), "funding_rates": date(2026, 5, 29)},
+)
+
+_POLYMARKET_PERP = SourceCapability(
+    source="polymarket_perp",
+    domains=["market", "reference"],
+    crosscutting=["errors", "rate_limits", "latency", "connectivity"],
+    supports_live=False,  # BLOCKED-UPSTREAM-OUTAGE: DNS NXDOMAIN 2026-06-21
+    supports_batch=False,  # BLOCKED-UPSTREAM-OUTAGE: DNS NXDOMAIN 2026-06-21
+    supports_historical=False,
+    supports_testnet=False,
+    supports_mainnet=True,
+    auth_scope=["none"],  # public-read expected when endpoint recovers
+    auth_environments={"prod": "none"},
+    operations={
+        # BLOCKED-UPSTREAM-OUTAGE: endpoint (perps-api.polymarket.com) is DNS NXDOMAIN
+        # as of 2026-06-21. Operations scaffolded based on the expected API surface
+        # (mirrors Polymarket CLOB API patterns); verify when endpoint recovers.
+        # trades: REST + WS stream expected (ws_trades declared → LIVE reachable for trades).
+        # funding_rates: REST-ONLY (periodic settlements, no WS stream — like kalshi_perp).
+        "market": [
+            "markets",  # GET /markets (universe listing)
+            "trades",  # GET /markets/{ticker}/trades (expected cursor-paginated REST)
+            "ws_trades",  # Expected WS live trade stream (scaffold; verify on recovery)
+            "funding_rates",  # GET /markets/{ticker}/funding_rates (expected REST ONLY)
+        ],
+        "reference": [
+            "market_detail",  # GET /markets/{ticker}
+        ],
+    },
+    base_urls={"mainnet": "https://perps-api.polymarket.com"},
+    operation_details={
+        "markets": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes=(
+                        "BLOCKED-UPSTREAM-OUTAGE: DNS NXDOMAIN 2026-06-21. "
+                        "Polymarket-perp CFTC crypto perps, launched 2026-04-21. "
+                        "Scaffold registered; verify when endpoint recovers."
+                    ),
+                ),
+            }
+        ),
+        "ws_trades": OperationDetail(
+            environments={
+                "mainnet": OperationEnvDetail(
+                    signing_scheme="none",
+                    required_credential="none",
+                    notes=(
+                        "Expected WS live trade stream (scaffold — BLOCKED-UPSTREAM-OUTAGE 2026-06-21). "
+                        "Makes LIVE mode reachable for data_type=trades when endpoint recovers. "
+                        "funding_rates has no ws_funding_rates op → {BATCH} only for that data_type."
+                    ),
+                ),
+            }
+        ),
+    },
+    chain=None,
+    kind="perp_cex",
+    coverage_start={"trades": date(2026, 4, 21), "funding_rates": date(2026, 4, 21)},
+)
+
+
+# ---------------------------------------------------------------------------
 # Ordered list -- CeFi
 # ---------------------------------------------------------------------------
 
@@ -1148,4 +1286,7 @@ CEFI_CAPABILITIES: list[SourceCapability] = [
     # FIX protocol / trading connectors
     _FIX,
     _NAUTILUS,
+    # CFTC-regulated crypto perp venues (kalshi_perp + polymarket_perp)
+    _KALSHI_PERP,
+    _POLYMARKET_PERP,
 ]
