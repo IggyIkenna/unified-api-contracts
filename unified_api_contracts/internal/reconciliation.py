@@ -399,6 +399,13 @@ class TradeFillRecord(BaseModel):
     trade_key: str = Field(description="make_trade_key(...) — the match key.")
     instrument_key: str = Field(description="VENUE:INSTRUMENT_TYPE:SYMBOL.")
     strategy_instruction_id: str
+    strategy_id: str | None = Field(
+        default=None,
+        description=(
+            "Canonical @-qualified strategy id (ARCHETYPE@slot-label) the fill belongs to, "
+            "mirrored onto the LedgerRow for cross-ledger grouping. None for non-strategy fills."
+        ),
+    )
     tick_timestamp: datetime
     venue: str
     side: str = Field(description="Ledger Direction value (BUY/SELL/LONG/SHORT/…).")
