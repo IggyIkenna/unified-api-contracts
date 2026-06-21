@@ -710,6 +710,14 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     # by venue first. POLYMARKET falls through to the priority primary (polymarket_clob).
     if ag_norm == "prediction" and venue_norm in _PREDICTION_LIVE_SOURCE_FOR_VENUE:
         return _PREDICTION_LIVE_SOURCE_FOR_VENUE[venue_norm]
+    # TradFi live/replay is served by databento's Live streaming gateway for EVERY
+    # venue (CME/NASDAQ/NYSE/CBOE -> databento_tradfi_ws, the ONLY tradfi WS producer).
+    # The batch SOURCE_PRIORITY primary is `massive` (a flat-file archive - batch-canonical,
+    # with NO live WS producer), so resolving a live shard through the batch primary
+    # mis-stamps it `live_massive`. databento is the actual streaming vendor; massive
+    # stays the batch primary (via get_primary_source / select_primary_available_source).
+    if ag_norm == "tradfi":
+        return "databento"
     if has_source_priority(ag_norm, data_type):
         return get_primary_source(ag_norm, data_type)
     # Unregistered pair: the venue name IS the vendor source for the per-vendor
