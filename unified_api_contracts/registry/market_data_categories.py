@@ -1125,9 +1125,11 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # 2023-04-15 — keep that floor since Databento's coverage starts there).
     "NASDAQ": {
         "ohlcv_1m": "2023-04-15",
+        "ohlcv_1s": "2023-04-15",  # DBEQ.BASIC serves equity 1s (L0/free); operator 2026-06-21 in-scope
     },
     "NYSE": {
         "ohlcv_1m": "2023-04-15",
+        "ohlcv_1s": "2023-04-15",  # DBEQ.BASIC serves equity 1s (L0/free); operator 2026-06-21 in-scope
     },
     "CME": {
         # ohlcv-1s + ohlcv-1m are BOTH fetched from Databento GLBX.MDP3 (both
