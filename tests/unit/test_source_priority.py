@@ -135,10 +135,13 @@ def test_source_required_false_for_single_source_cells() -> None:
     assert source_required("sports", "FIXTURE_EVENTS") is False
 
 
-def test_source_required_false_for_prediction() -> None:
-    """Prediction is multi-source-N/A by design (venue != source)."""
-    assert source_required("prediction", "trades") is False
-    assert source_required("prediction", "book_snapshot") is False
+def test_source_required_true_for_prediction_multi_source() -> None:
+    """Prediction trades/book are multi-source (polymarket_clob + kalshi) since the Kalshi source
+    registration — the writer cannot auto-disambiguate, so an explicit source stamp is REQUIRED.
+    The single-source MARKET_LIFECYCLE cell (polymarket_gamma_api) stays auto-stampable."""
+    assert source_required("prediction", "trades") is True
+    assert source_required("prediction", "book_snapshot") is True
+    assert source_required("prediction", "MARKET_LIFECYCLE") is False
 
 
 def test_source_required_false_for_unregistered_pair() -> None:
@@ -172,7 +175,7 @@ def test_external_sources_for_external_vendors() -> None:
     """External-vendor cells return their full source list."""
     assert external_sources_for("cefi", "trades") == ["tardis"]
     assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink"]
-    assert external_sources_for("prediction", "trades") == ["polymarket_clob"]
+    assert external_sources_for("prediction", "trades") == ["polymarket_clob", "kalshi"]
 
 
 def test_computed_cells_not_source_required() -> None:
@@ -190,13 +193,15 @@ def test_computed_cells_not_source_required() -> None:
 def test_default_source_single_external_returns_that_source() -> None:
     assert default_source("cefi", "trades") == "tardis"
     assert default_source("defi", "swap") == "onchain_subgraph"
-    assert default_source("prediction", "trades") == "polymarket_clob"
+    # Prediction MARKET_LIFECYCLE stays single-source (Gamma metadata); trades/cqg are now multi-source.
+    assert default_source("prediction", "MARKET_LIFECYCLE") == "polymarket_gamma_api"
 
 
 def test_default_source_multi_external_returns_none() -> None:
     """Multi external-source cells cannot be auto-stamped (ambiguous)."""
     assert default_source("tradfi", "trades") is None
     assert default_source("defi", "oracle_prices") is None
+    assert default_source("prediction", "trades") is None  # polymarket_clob + kalshi
     assert default_source("sports", "FIXTURES") is None
 
 
