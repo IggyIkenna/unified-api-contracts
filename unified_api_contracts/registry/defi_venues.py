@@ -94,10 +94,6 @@ ALL_DEFI_VENUES: list[str] = [
     #    added 2026-05-22 — no MTDS tick data yet; pipeline phase) ──
     "AAVE-PLASMA",
     "FLUID-PLASMA",
-    # ── Chain-agnostic perp/hybrid venues (own L1 or multi-chain settlement;
-    #    added 2026-05-22 per protocol registry audit) ──
-    "HYPERLIQUID",
-    "ASTER",
     # ── Arbitrum ──
     "UNISWAP_V3-ARBITRUM",
     "AAVE_V3-ARBITRUM",
@@ -529,9 +525,6 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     # ── Pipeline (Plasma chain variants — no MTDS tick data yet, added 2026-05-22) ──
     "AAVE-PLASMA": "pipeline",
     "FLUID-PLASMA": "pipeline",
-    # ── Pipeline (chain-agnostic perp/hybrid — own L1 settlement, added 2026-05-22) ──
-    "HYPERLIQUID": "pipeline",
-    "ASTER": "pipeline",
     # ── Pipeline (Linea / Scroll / zkSync) ──
     "AAVE_V3-LINEA": "pipeline",
     "AAVE_V3-SCROLL": "pipeline",

@@ -14,8 +14,6 @@ from __future__ import annotations
 # protocol_adapter_key matches the key used by UMI factory.py get_adapter().
 # chain is the L1/L2 network or None for chain-agnostic protocols.
 DEFI_VENUE_TO_PROTOCOL: dict[str, tuple[str, str | None]] = {
-    "HYPERLIQUID": ("hyperliquid", None),
-    "ASTER": ("aster", None),
     "UNISWAP_V2-ETHEREUM": ("uniswap_v2", "ETHEREUM"),
     "UNISWAP_V3-ETHEREUM": ("uniswap_v3", "ETHEREUM"),
     "UNISWAP_V4-ETHEREUM": ("uniswap_v4", "ETHEREUM"),
