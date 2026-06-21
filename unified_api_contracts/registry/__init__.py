@@ -330,6 +330,12 @@ from .sports_bookmaker_league_coverage import (
     is_bookmaker_observed,
     is_prediction_market_venue,
 )
+from .sports_league_entity_coverage import (
+    COVERED_ENTITIES,
+    LEAGUE_ENTITY_COVERAGE,
+    LEAGUE_ENTITY_COVERAGE_ENTITIES,
+    is_league_entity_covered,
+)
 from .sports_per_source_rules import is_expected_for_source
 from .sports_venue_coordinates import (
     VENUE_COORDINATES,
@@ -705,6 +711,7 @@ __all__ = [
     "COOLBET",
     "CORAL",
     "COVERED_BOOKMAKERS",
+    "COVERED_ENTITIES",
     "CURVE_ETH",
     "DABBLE",
     "DATABENTO_SCHEMA_LEVEL",
@@ -770,6 +777,8 @@ __all__ = [
     "KALSHI",
     "KNOWN_ETFS",
     "LADBROKES",
+    "LEAGUE_ENTITY_COVERAGE",
+    "LEAGUE_ENTITY_COVERAGE_ENTITIES",
     "LEGACY_DEFI_VENUE_ALIASES",
     "LEOVEGAS",
     "LEVEL_MAX_LOOKBACK_DAYS",
@@ -1098,6 +1107,7 @@ __all__ = [
     "is_half_day_session",
     "is_in_coverage_window",
     "is_in_tradfi_tick_window",
+    "is_league_entity_covered",
     "is_lst",
     "is_non_trading_day",
     "is_per_instrument_shard_data_type",

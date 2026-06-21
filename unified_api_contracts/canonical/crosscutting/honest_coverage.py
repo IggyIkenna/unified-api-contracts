@@ -180,6 +180,23 @@ class EmptyConfirmedReason(StrEnum):
     ``attempted_failed`` via the live-instrument guard. SSOT:
     ``unified_api_contracts.registry.sports_bookmaker_league_coverage.is_bookmaker_league_covered``."""
 
+    EXPECTED_NO_PROVIDER_COVERAGE = "EXPECTED_NO_PROVIDER_COVERAGE"
+    """Sports per-(league, per-fixture-entity): API-Football legitimately doesn't provide this enrichment
+    entity (``PLAYER_STATS`` / ``FIXTURE_LINEUPS`` / ``FIXTURE_EVENTS`` / ``FIXTURE_STATS`` / ``TEAMS`` /
+    ``STANDINGS`` / ``INJURIES``) for this league — the OBSERVED captured corpus shows the (league, entity)
+    pair has NEVER produced a row, so the per-fixture enrichment for that (league, entity) is honest absence
+    (a zero-row fixture there is NOT a fetch failure). Old/lower-division leagues commonly have no
+    player-stats / lineups coverage in API-Football (measured: ~57% of ``/fixtures/players`` calls return 0,
+    729 of 790 leagues never yield PLAYER_STATS). The instruments-service enrichment SKIPS the API call for
+    an out-of-coverage (league, entity) entirely (kills the wasted fan-out) and records this reason so the
+    cell reads honest-empty instead of the live-instrument guard forcing ``attempted_failed``.
+
+    Distinct from ``EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE`` (per-BOOKMAKER, source=Odds-API odds) and
+    ``EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE`` (a whole feed *source* like Understat with a fixed league
+    whitelist): here the source is API-Football and the axis is per-(league, ENTITY) observed-coverage — the
+    SAME source covers some entities but not others for the same league. SSOT:
+    ``unified_api_contracts.registry.sports_league_entity_coverage.is_league_entity_covered``."""
+
     EXPECTED_OUT_OF_COVERAGE_WINDOW = "EXPECTED_OUT_OF_COVERAGE_WINDOW"
     """Data_type still valid + restorable post-cutover, but currently OUT of the
     operator-acked MVP coverage scope. Distinct from
@@ -420,6 +437,7 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_PRE_SEASON.value,
         EmptyConfirmedReason.EXPECTED_POST_SEASON.value,
         EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE.value,
+        EmptyConfirmedReason.EXPECTED_NO_PROVIDER_COVERAGE.value,
         EmptyConfirmedReason.EXPECTED_OUT_OF_COVERAGE_WINDOW.value,
         EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value,
         EmptyConfirmedReason.EXPECTED_OUTSIDE_PROCESSING_SCOPE.value,
