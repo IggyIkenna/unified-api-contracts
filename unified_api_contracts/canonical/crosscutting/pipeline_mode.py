@@ -116,6 +116,11 @@ class PipelineMode(StrEnum):
     BATCH_OPEN_METEO = "batch_open_meteo"
     BATCH_POLYMARKET_CLOB = "batch_polymarket_clob"
     BATCH_POLYMARKET_GAMMA_API = "batch_polymarket_gamma_api"
+    # Kalshi (prediction market) — REST historical batch; the vendor IS the venue (like a
+    # CeFi exchange / hyperliquid): KALSHI venue → kalshi source. {BATCH,LIVE,REPLAY}-capable
+    # (WebSocket live + historical re-fetch replay) → LIVE_/REPLAY_ members below per the
+    # closed-set rule. SSOT: prediction_venue_perps_and_live_clob_depth_2026_06_20.md.
+    BATCH_KALSHI = "batch_kalshi"
     BATCH_HELIUS_RPC = "batch_helius_rpc"
     BATCH_PYTH_HERMES = "batch_pyth_hermes"
     BATCH_SOCCER_FOOTBALL_INFO = "batch_soccer_football_info"
@@ -155,6 +160,9 @@ class PipelineMode(StrEnum):
     REPLAY_CHAINLINK = "replay_chainlink"
     LIVE_POLYMARKET_CLOB = "live_polymarket_clob"
     REPLAY_POLYMARKET_CLOB = "replay_polymarket_clob"
+    # Kalshi — WebSocket live + historical re-fetch replay (capability {BATCH,LIVE,REPLAY}).
+    LIVE_KALSHI = "live_kalshi"
+    REPLAY_KALSHI = "replay_kalshi"
     # Internal service sources — batch=live symmetry; re-run = replay.
     LIVE_INSTRUMENTS_SERVICE = "live_instruments_service"
     REPLAY_INSTRUMENTS_SERVICE = "replay_instruments_service"
