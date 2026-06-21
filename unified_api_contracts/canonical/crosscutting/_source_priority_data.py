@@ -272,9 +272,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # PipelineMode.BATCH_EIA closed-set round-trip with SOURCE_PRIORITY.
     ("tradfi", "commodity_signal"): ["eia"],
     # ---- Prediction -----------------------------------------------------
-    ("prediction", "trades"): ["polymarket_clob"],
-    ("prediction", "book_snapshot"): ["polymarket_clob"],
-    ("prediction", "prediction_canonical_question_group"): ["polymarket_clob"],
+    # Prediction is venue-disambiguated: Polymarket data comes from polymarket_clob, Kalshi
+    # data from kalshi (the vendor IS the venue). Both serve the same data_types — the
+    # READ-TIME priority order is polymarket-first, but the WRITE-TIME stamp is venue-resolved
+    # (live_source_for_venue / _VENUE_OVERRIDES), never priority[0]. Kalshi registration:
+    # prediction_venue_perps_and_live_clob_depth_2026_06_20.md (deep-history bulk seed + live).
+    ("prediction", "trades"): ["polymarket_clob", "kalshi"],
+    ("prediction", "book_snapshot"): ["polymarket_clob", "kalshi"],
+    ("prediction", "prediction_canonical_question_group"): ["polymarket_clob", "kalshi"],
     # MARKET_LIFECYCLE source — instruments-service reads from Polymarket
     # gamma API ``/markets/{conditionId}`` for created/resolution/settlement
     # timestamps. Phase 1B writes top entry only; Kalshi metadata source is
@@ -385,6 +390,7 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # ---- Prediction ----
     "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "polymarket_gamma_api": frozenset({Mode.BATCH}),  # market metadata; not a tick series
+    "kalshi": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),  # REST historical + WS live + re-fetch replay
     # ---- Sports ---- (no in-play live source until a sports live archetype exists;
     # historical odds + Secret-Manager keys already held → replay-capable now)
     "api_football": frozenset({Mode.BATCH, Mode.REPLAY}),
@@ -462,6 +468,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "tardis": 50,  # multi-venue WS aggregator
     "databento": 10,  # CME direct feed, microsecond-grade infra
     "polymarket_clob": 200,  # HTTPS CLOB polling
+    "kalshi": 200,  # HTTPS/WS CLOB polling (same class as polymarket_clob)
     "onchain_rpc": 200,  # direct RPC, block-time bounded
     # Subgraph / indexer — block-confirmation latency dominates.
     "onchain_subgraph": 60_000,  # 1 min: block confirmation + Graph indexing

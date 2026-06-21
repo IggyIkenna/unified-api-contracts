@@ -42,7 +42,7 @@ _EXPECTED_BATCH_SOURCES = {
         "solana_rpc",
     },
     "tradfi": {"databento", "massive", "barchart", "yahoo", "eia"},
-    "prediction": {"polymarket_clob", "polymarket_gamma_api"},
+    "prediction": {"polymarket_clob", "polymarket_gamma_api", "kalshi"},
 }
 
 # Legacy/transitional pipeline_mode tokens that coexist on disk and MUST still be

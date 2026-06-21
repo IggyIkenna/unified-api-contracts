@@ -64,6 +64,7 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # Prediction
     "polymarket_clob": _BLR,
     "polymarket_gamma_api": _B,
+    "kalshi": _BLR,
     # Sports
     "api_football": _BR,
     "footystats": _BR,

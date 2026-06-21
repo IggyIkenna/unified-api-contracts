@@ -658,6 +658,17 @@ def get_all_sources_with_priority(
     return [(source, pipeline_mode_for_source(source)) for source in sources]
 
 
+# Prediction venue → vendor source (the vendor IS the venue, like CeFi exchanges). KALSHI
+# data comes from kalshi, Polymarket from polymarket_clob (Gamma metadata via its explicit
+# venue). Consulted by live_source_for_venue BEFORE the data_type-level SOURCE_PRIORITY
+# primary so a KALSHI shard is never mis-attributed to polymarket_clob (priority[0]).
+_PREDICTION_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
+    "kalshi": "kalshi",
+    "polymarket": "polymarket_clob",
+    "polymarket_gamma": "polymarket_gamma_api",
+}
+
+
 def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     """Resolve the LIVE/REPLAY ``source`` string that serves a ``(asset_group, venue,
     data_type)`` shard.
@@ -693,6 +704,12 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     ag_norm = asset_group.lower()
     if ag_norm == "cefi" and venue_norm in CEFI_LIVE_VENUES:
         return venue_norm
+    # Prediction is venue-disambiguated like CeFi: the data VENDOR IS the venue. The
+    # data_type-level SOURCE_PRIORITY primary (polymarket_clob) would mis-attribute KALSHI
+    # live/replay data to polymarket — so resolve KALSHI→kalshi (and the explicit Gamma venue)
+    # by venue first. POLYMARKET falls through to the priority primary (polymarket_clob).
+    if ag_norm == "prediction" and venue_norm in _PREDICTION_LIVE_SOURCE_FOR_VENUE:
+        return _PREDICTION_LIVE_SOURCE_FOR_VENUE[venue_norm]
     if has_source_priority(ag_norm, data_type):
         return get_primary_source(ag_norm, data_type)
     # Unregistered pair: the venue name IS the vendor source for the per-vendor
