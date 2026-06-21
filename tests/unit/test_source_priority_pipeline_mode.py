@@ -566,6 +566,26 @@ def test_live_pipeline_mode_for_cefi_venue_is_source_aware() -> None:
     assert is_live(live_pipeline_mode_for_venue("cefi", "OKX", "trades"))
 
 
+def test_live_source_for_cefi_crypto_perp_venue_is_its_own_ws_feed() -> None:
+    """CeFi crypto-perp venues (hyphen) resolve to their underscore WS source token, NOT
+    the batch-only ``tardis`` book_snapshot primary (regression: live_pipeline_mode raised
+    ``No PipelineMode for source 'tardis' in mode 'live'`` before the perp venue override)."""
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+        live_source_for_venue,
+    )
+
+    assert live_source_for_venue("cefi", "KALSHI-PERP", "book_snapshot") == "kalshi_perp"
+    assert live_source_for_venue("cefi", "POLYMARKET-PERP", "trades") == "polymarket_perp"
+    # case-insensitive venue
+    assert live_source_for_venue("CeFi", "Kalshi-Perp", "book_snapshot") == "kalshi_perp"
+    # the live pipeline_mode resolves (no ValueError) to the venue's own live_ member
+    assert live_pipeline_mode_for_venue("cefi", "KALSHI-PERP", "book_snapshot") is PipelineMode.LIVE_KALSHI_PERP
+    assert live_pipeline_mode_for_venue("cefi", "POLYMARKET-PERP", "book_snapshot") is PipelineMode.LIVE_POLYMARKET_PERP
+    # non-perp cefi venue still resolves to the exchange (no regression)
+    assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades") is PipelineMode.LIVE_BINANCE
+
+
 def test_live_pipeline_mode_for_cefi_replay_mode() -> None:
     from unified_api_contracts.canonical.crosscutting.pipeline_mode import Mode
     from unified_api_contracts.canonical.crosscutting.source_priority import (

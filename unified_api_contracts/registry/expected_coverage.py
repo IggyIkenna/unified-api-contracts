@@ -152,8 +152,8 @@ _TRADFI: dict[str, list[str]] = {
     # backfill captured 33,672 NASDAQ + 122,494 NYSE ohlcv_1m rows from
     # 2023-04-15+ via Databento XNAS.ITCH + XNYS.PILLAR. Before this entry
     # the venues were silently out_of_scope in the data-status denominator.
-    "NASDAQ": ["ohlcv_1m"],
-    "NYSE": ["ohlcv_1m"],
+    "NASDAQ": ["ohlcv_1m", "ohlcv_1s"],  # DBEQ.BASIC serves equity 1s (L0/free); operator 2026-06-21 in-scope
+    "NYSE": ["ohlcv_1m", "ohlcv_1s"],  # DBEQ.BASIC serves equity 1s (L0/free); operator 2026-06-21 in-scope
     "FX": ["ohlcv_24h"],
     "YAHOO_FINANCE": ["ohlcv_15m", "ohlcv_24h"],
 }

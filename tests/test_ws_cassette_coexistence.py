@@ -70,6 +70,7 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "hyperliquid_ws": "hyperliquid",
     "hyperliquid_l2book_ws": "hyperliquid",
     "hyperliquid_ticker_ws": "hyperliquid",
+    "kalshi_perp_ws": "kalshi",
     "kalshi_ws": "kalshi",
     "kraken_futures_book_ticker_ws": "kraken_futures",
     "kraken_futures_ws": "kraken_futures",
@@ -77,6 +78,8 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "okx_futures_book_ticker_ws": "okx",
     "okx_ws": "okx",
     "okx_spot_ws": "okx",
+    "polymarket_perp_ws": "polymarket",
+    "tardis_machine_ws": "tardis",
     "upbit_spot_ws": "upbit",
 }
 
@@ -123,8 +126,10 @@ def test_ws_cassette_has_ws_url(cassette_path: Path) -> None:
         "If this is a REST cassette, rename it without _ws suffix."
     )
     ws_url = parsed["ws_url"]
-    assert isinstance(ws_url, str) and ws_url.startswith("wss://"), (
-        f"{cassette_path.name}: ws_url must start with wss://, got {ws_url!r}"
+    # ws://localhost is allowed for local-sidecar connectors (e.g. tardis-machine).
+    # All external endpoints must use wss:// (TLS).
+    assert isinstance(ws_url, str) and (ws_url.startswith("wss://") or ws_url.startswith("ws://localhost")), (
+        f"{cassette_path.name}: ws_url must start with wss:// (or ws://localhost for local sidecars), got {ws_url!r}"
     )
 
 
