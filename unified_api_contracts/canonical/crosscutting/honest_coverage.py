@@ -170,6 +170,16 @@ class EmptyConfirmedReason(StrEnum):
     ``unified_api_contracts.canonical.domain.sports.understat_coverage.UNDERSTAT_COVERED_LEAGUES``. Operator
     msg 9 audit dimension #7."""
 
+    EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE = "EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE"
+    """Sports ODDS per-(bookmaker, league): an Odds-API bookmaker legitimately doesn't price this league —
+    the OBSERVED captured corpus shows the (book, league) pair has never produced an odds row, so a zero-row
+    fixture there is honest absence, not a fetch failure. Distinct from ``EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE``
+    (a feed *source* like Understat with a fixed league whitelist): here the *source* is Odds-API and the axis is
+    the per-BOOKMAKER (book x league) observed-coverage map. Closes the ~72% ``attempted_failed`` over-count
+    where the per-bookmaker x per-fixture sentinel fan-out forced every niche book's no-coverage zero-row to
+    ``attempted_failed`` via the live-instrument guard. SSOT:
+    ``unified_api_contracts.registry.sports_bookmaker_league_coverage.is_bookmaker_league_covered``."""
+
     EXPECTED_OUT_OF_COVERAGE_WINDOW = "EXPECTED_OUT_OF_COVERAGE_WINDOW"
     """Data_type still valid + restorable post-cutover, but currently OUT of the
     operator-acked MVP coverage scope. Distinct from
