@@ -397,11 +397,15 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "polymarket_clob": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "polymarket_gamma_api": frozenset({Mode.BATCH}),  # market metadata; not a tick series
     "kalshi": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),  # REST historical + WS live + re-fetch replay
-    # ---- Sports ---- (no in-play live source until a sports live archetype exists;
-    # historical odds + Secret-Manager keys already held → replay-capable now)
+    # ---- Sports ----
+    # odds_api (The Odds API) is the FIRST live sports source: a polling live-odds
+    # stream (the ``odds_api_ws`` WSFeedConnector) makes the Live==Batch sports
+    # archetype real → {BATCH, LIVE, REPLAY} (it also historical-re-fetches, so
+    # replay survives). The other sports vendors stay batch+replay until a live
+    # source lands for each (historical odds + Secret-Manager keys already held).
     "api_football": frozenset({Mode.BATCH, Mode.REPLAY}),
     "footystats": frozenset({Mode.BATCH, Mode.REPLAY}),
-    "odds_api": frozenset({Mode.BATCH, Mode.REPLAY}),
+    "odds_api": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "understat": frozenset({Mode.BATCH, Mode.REPLAY}),
     "transfermarkt": frozenset({Mode.BATCH, Mode.REPLAY}),
     "soccer_football_info": frozenset({Mode.BATCH, Mode.REPLAY}),

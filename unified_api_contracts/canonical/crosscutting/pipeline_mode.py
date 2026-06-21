@@ -180,6 +180,12 @@ class PipelineMode(StrEnum):
     REPLAY_MTDS_MICROSTRUCTURE = "replay_mtds_microstructure"
     LIVE_MDPS_ODDS_HORIZON_BUCKET = "live_mdps_odds_horizon_bucket"
     REPLAY_MDPS_ODDS_HORIZON_BUCKET = "replay_mdps_odds_horizon_bucket"
+    # odds_api (The Odds API) is the FIRST live sports source — polling live odds
+    # stream (the ``odds_api_ws`` WSFeedConnector) makes the Live==Batch sports
+    # archetype real. It polls a live snapshot endpoint AND re-fetches history
+    # (the batch backfill uses the same vendor) → {batch, live, replay}. So it
+    # carries LIVE_ODDS_API here alongside the existing REPLAY_ODDS_API.
+    LIVE_ODDS_API = "live_odds_api"
     # {batch, replay} sources — replay member only (no live stream).
     REPLAY_ODDS_API = "replay_odds_api"
     REPLAY_API_FOOTBALL = "replay_api_football"
