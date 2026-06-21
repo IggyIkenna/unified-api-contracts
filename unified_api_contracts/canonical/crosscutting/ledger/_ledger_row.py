@@ -172,6 +172,13 @@ class LedgerRow(BaseModel):
         default=None,
         description="Logical strategy/structure group (e.g. carry trade pair id).",
     )
+    strategy_id: str | None = Field(
+        default=None,
+        description=(
+            "Canonical @-qualified strategy id (ARCHETYPE@slot-label) for cross-ledger "
+            "grouping/drilldown. None for non-strategy rows."
+        ),
+    )
     leg_id: str | None = Field(
         default=None,
         description="Leg within a trade_id (e.g. 'long_leg', 'hedge_leg').",
