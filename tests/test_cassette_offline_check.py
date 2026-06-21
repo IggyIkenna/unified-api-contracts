@@ -118,13 +118,22 @@ def test_vcr_cassette_interactions_have_required_fields(cassette_path: Path) -> 
 
 
 def test_ws_cassette_has_wss_url(cassette_path: Path) -> None:
-    """WS cassettes: ws_url must start with wss://."""
+    """WS cassettes: ws_url must start with wss:// (or ws://localhost for local sidecars).
+
+    Local-sidecar connectors (e.g. tardis-machine at ws://localhost:8001) run over
+    plaintext ws:// by design — TLS enforcement only applies to external endpoints.
+    """
     data = _load_cassette(cassette_path)
     if not _is_ws(data):
         pytest.skip("not a WS cassette")
     ws_url = data.get("ws_url", "")
-    if not isinstance(ws_url, str) or not ws_url.startswith("wss://"):
-        pytest.fail(f"{_cassette_id(cassette_path)}: ws_url must start with wss://, got {ws_url!r}")
+    if not isinstance(ws_url, str):
+        pytest.fail(f"{_cassette_id(cassette_path)}: ws_url must be a string, got {ws_url!r}")
+    if not (ws_url.startswith("wss://") or ws_url.startswith("ws://localhost")):
+        pytest.fail(
+            f"{_cassette_id(cassette_path)}: ws_url must start with wss:// "
+            f"(or ws://localhost for local sidecars), got {ws_url!r}"
+        )
 
 
 def test_ws_cassette_frames_valid_json(cassette_path: Path) -> None:
