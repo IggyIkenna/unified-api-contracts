@@ -131,7 +131,8 @@ def test_source_required_true_for_sports_multi_source() -> None:
 def test_source_required_false_for_single_source_cells() -> None:
     """Single-entry SOURCE_PRIORITY lists → no source required."""
     assert source_required("defi", "swap") is False
-    assert source_required("cefi", "trades") is False
+    # (cefi,trades) is multi-source now (hyperliquid/aster); options_chain stays single.
+    assert source_required("cefi", "options_chain") is False
     assert source_required("sports", "FIXTURE_EVENTS") is False
 
 
@@ -173,7 +174,7 @@ def test_computed_sources_are_exempt_from_external() -> None:
 
 def test_external_sources_for_external_vendors() -> None:
     """External-vendor cells return their full source list."""
-    assert external_sources_for("cefi", "trades") == ["tardis"]
+    assert external_sources_for("cefi", "trades") == ["tardis", "aster", "hyperliquid"]  # HL/ASTER cefi onchain perps
     assert external_sources_for("defi", "oracle_prices") == ["pyth_hermes", "chainlink"]
     assert external_sources_for("prediction", "trades") == ["polymarket_clob", "kalshi"]
 
@@ -191,7 +192,7 @@ def test_computed_cells_not_source_required() -> None:
 
 
 def test_default_source_single_external_returns_that_source() -> None:
-    assert default_source("cefi", "trades") == "tardis"
+    assert default_source("cefi", "options_chain") == "tardis"  # (cefi,trades) multi-source now → no auto-stamp
     assert default_source("defi", "swap") == "onchain_subgraph"
     # Prediction MARKET_LIFECYCLE stays single-source (Gamma metadata); trades/cqg are now multi-source.
     assert default_source("prediction", "MARKET_LIFECYCLE") == "polymarket_gamma_api"
