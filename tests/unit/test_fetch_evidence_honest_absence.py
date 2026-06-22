@@ -139,3 +139,150 @@ def test_error_without_evidence() -> None:
     msg = str(err)
     assert "no FetchEvidence supplied" in msg
     assert "record_failed" in msg
+
+
+# ---------------------------------------------------------------------------
+# build_fetch_evidence + fetch_error_signal_for_* — the adapter-side mapping
+# helpers (Phase 1 keystone threading; TradFi DP-FETCH-005 et al).
+# ---------------------------------------------------------------------------
+
+
+def test_build_evidence_clean_2xx_proves_honest_absence() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    ev = build_fetch_evidence(
+        source="databento",
+        endpoint="GLBX.MDP3/ohlcv_1m",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        http_status=200,
+    )
+    assert ev.error_signal == ""
+    assert ev.proves_honest_absence() is True
+
+
+def test_build_evidence_rows_present_not_honest_absence() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    ev = build_fetch_evidence(
+        source="massive",
+        endpoint="cme/ES/ohlcv_1m",
+        attempted_at=_NOW,
+        rows_in_response=37,
+        http_status=200,
+    )
+    assert ev.proves_honest_absence() is False
+
+
+@pytest.mark.parametrize(
+    ("status", "expected_signal"),
+    [
+        (200, ""),
+        (204, ""),
+        (401, FetchErrorSignal.AUTH_401.value),
+        (403, FetchErrorSignal.AUTH_403.value),
+        (429, FetchErrorSignal.RATE_LIMITED_429.value),
+        (500, FetchErrorSignal.SERVER_5XX.value),
+        (503, FetchErrorSignal.SERVER_5XX.value),
+        (404, FetchErrorSignal.HTTP_NON_2XX.value),
+        (302, FetchErrorSignal.HTTP_NON_2XX.value),
+    ],
+)
+def test_fetch_error_signal_for_status(status: int, expected_signal: str) -> None:
+    from unified_api_contracts import fetch_error_signal_for_status
+
+    assert fetch_error_signal_for_status(status) == expected_signal
+
+
+def test_build_evidence_non_2xx_disqualifies() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    # The DP-FETCH-005 class: Databento WS key unresolved → not honest absence.
+    for status in (401, 403, 429, 500, 404):
+        ev = build_fetch_evidence(
+            source="databento",
+            endpoint="XCBF.PITCH/ohlcv_1s",
+            attempted_at=_NOW,
+            rows_in_response=0,
+            http_status=status,
+        )
+        assert ev.error_signal in DISQUALIFYING_FETCH_SIGNALS
+        assert ev.proves_honest_absence() is False
+
+
+def test_build_evidence_missing_credential() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    ev = build_fetch_evidence(
+        source="databento",
+        endpoint="live.databento.com",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        missing_credential=True,
+    )
+    assert ev.error_signal == FetchErrorSignal.MISSING_CREDENTIAL.value
+    assert ev.proves_honest_absence() is False
+
+
+def test_build_evidence_exception_paths() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    timeout_ev = build_fetch_evidence(
+        source="massive",
+        endpoint="s3://massive/cme",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        response_received=False,
+        exception=TimeoutError("read timed out"),
+    )
+    assert timeout_ev.error_signal == FetchErrorSignal.TIMEOUT.value
+    assert timeout_ev.proves_honest_absence() is False
+
+    conn_ev = build_fetch_evidence(
+        source="massive",
+        endpoint="s3://massive/cme",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        response_received=False,
+        exception=ConnectionError("DNS failure"),
+    )
+    assert conn_ev.error_signal == FetchErrorSignal.CONNECT_ERROR.value
+
+    generic_ev = build_fetch_evidence(
+        source="databento",
+        endpoint="GLBX.MDP3",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        response_received=False,
+        exception=ValueError("bad symbology"),
+    )
+    assert generic_ev.error_signal == FetchErrorSignal.ADAPTER_EXCEPTION.value
+
+
+def test_build_evidence_no_response_unreachable() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    ev = build_fetch_evidence(
+        source="databento",
+        endpoint="GLBX.MDP3",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        response_received=False,
+    )
+    assert ev.error_signal == FetchErrorSignal.SOURCE_UNREACHABLE.value
+    assert ev.proves_honest_absence() is False
+
+
+def test_build_evidence_explicit_signal_wins() -> None:
+    from unified_api_contracts import build_fetch_evidence
+
+    ev = build_fetch_evidence(
+        source="databento",
+        endpoint="GLBX.MDP3",
+        attempted_at=_NOW,
+        rows_in_response=0,
+        http_status=200,
+        error_signal=FetchErrorSignal.RATE_LIMITED_429.value,
+    )
+    assert ev.error_signal == FetchErrorSignal.RATE_LIMITED_429.value
+    assert ev.proves_honest_absence() is False
