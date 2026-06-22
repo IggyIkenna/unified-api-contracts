@@ -29,7 +29,7 @@ class StrategyFamily(StrEnum):
 
 
 class StrategyArchetype(StrEnum):
-    """53 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
+    """59 archetypes. No category prefixes (no CEFI_/DEFI_/SPORTS_/TRADFI_).
 
     v1 ``StrategyArchetype`` was deleted on 2026-04-21 per
     ``plans/active/ui_unification_v2_sanitisation_2026_04_20``.
@@ -86,6 +86,14 @@ class StrategyArchetype(StrEnum):
     ML_DIRECTIONAL_EVENT_SETTLED = "ML_DIRECTIONAL_EVENT_SETTLED"
     RULES_DIRECTIONAL_CONTINUOUS = "RULES_DIRECTIONAL_CONTINUOUS"
     RULES_DIRECTIONAL_EVENT_SETTLED = "RULES_DIRECTIONAL_EVENT_SETTLED"
+    # BTC-level time-series-momentum / trend-following (CTA) leg -- a single
+    # directional perp leg (long-or-short) sized by the mean SIGN of trailing
+    # returns x inverse-vol scaling. Rules-directional family member; the
+    # research engine proved it a true diversifier (positive in both the 2023
+    # +1.4 and the 2026 -29% selloff +2.3, corr to BTC buy&hold +0.00/-0.85).
+    # SSOT: plans/active/citadel_paper_batch_live_reconciliation_2026_06_19.md
+    # section P2.11.14.
+    TSMOM_BTC_CTA = "TSMOM_BTC_CTA"
     CARRY_BASIS_DATED = "CARRY_BASIS_DATED"
     CARRY_BASIS_DATED_INV = "CARRY_BASIS_DATED_INV"
     CARRY_BASIS_PERP = "CARRY_BASIS_PERP"
@@ -171,6 +179,7 @@ ARCHETYPE_TO_FAMILY: dict[StrategyArchetype, StrategyFamily] = {
     StrategyArchetype.ML_DIRECTIONAL_EVENT_SETTLED: StrategyFamily.ML_DIRECTIONAL,
     StrategyArchetype.RULES_DIRECTIONAL_CONTINUOUS: StrategyFamily.RULES_DIRECTIONAL,
     StrategyArchetype.RULES_DIRECTIONAL_EVENT_SETTLED: StrategyFamily.RULES_DIRECTIONAL,
+    StrategyArchetype.TSMOM_BTC_CTA: StrategyFamily.RULES_DIRECTIONAL,
     StrategyArchetype.CARRY_BASIS_DATED: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_BASIS_DATED_INV: StrategyFamily.CARRY_AND_YIELD,
     StrategyArchetype.CARRY_BASIS_PERP: StrategyFamily.CARRY_AND_YIELD,

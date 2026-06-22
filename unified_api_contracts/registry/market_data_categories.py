@@ -955,6 +955,14 @@ def valid_data_types_for_instrument_type(asset_group: str, instrument_type: str)
                     it_key = it.strip().lower()
                     it_key = _INSTRUMENT_TYPE_ALIASES.get(it_key, it_key)
                     defi.setdefault(it_key, set()).update(cap.data_types)
+            # gas_fees is CHAIN-LEVEL (collected once per chain at the synthetic
+            # venue=ALCHEMY, instrument_type=spot_asset — never per protocol), so
+            # it is intentionally NOT declared on any protocol in
+            # PROTOCOL_CAPABILITIES. Inject it onto the chain-level spot_asset set
+            # so the SOURCE_PRIORITY pair ("defi","gas_fees") stays reachable from
+            # the validity matrix. (token_transfers / mev_events remain reachable
+            # via their synthetic ALCHEMY-ONCHAIN / FLASHBOTS pseudo-protocols.)
+            defi.setdefault("spot_asset", set()).add("gas_fees")
             _defi_valid_data_types = {k: frozenset(v) for k, v in defi.items()}
         return _defi_valid_data_types.get(normalised)  # None if unmapped
 

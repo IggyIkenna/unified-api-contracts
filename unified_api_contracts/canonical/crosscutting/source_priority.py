@@ -374,6 +374,88 @@ def default_source(asset_group: str, data_type: str) -> str | None:
     return external[0] if len(external) == 1 else None
 
 
+@cache
+def _live_vendors_for_asset_group(asset_group: str) -> frozenset[str]:
+    """Return the live/replay-capable VENDOR sources that serve ``asset_group``.
+
+    The WRITE-TIME provenance gate (:func:`is_valid_manifest_source`) must accept
+    a vendor that genuinely serves the asset_group LIVE even though it is absent
+    from the cell's batch :data:`SOURCE_PRIORITY` list (bug#14: a CeFi CEX live
+    capture stamps ``source=binance``, but ``binance`` ∉
+    ``SOURCE_PRIORITY[("cefi","trades")]`` because that list is the BATCH
+    read-priority — CeFi batch = ``tardis``; the live vendor IS the exchange).
+
+    DATA-DRIVEN — reuses the EXISTING venue→vendor resolution maps consulted by
+    :func:`live_source_for_venue` (no hardcoded duplication):
+
+    * **CeFi**: the bare exchange vendors from :data:`_CEFI_CEX_VENDOR_FOR_VENUE_PREFIX`
+      (bug#9 — binance/okx/bybit/kraken/deribit), the crypto-perp WS-feed sources
+      from :data:`_CEFI_PERP_LIVE_SOURCE_FOR_VENUE` (kalshi_perp/polymarket_perp),
+      and the bare-vendor live venues in :data:`CEFI_LIVE_VENUES`
+      (adds hyperliquid/aster).
+    * **prediction**: the venue-disambiguated vendors from
+      :data:`_PREDICTION_LIVE_SOURCE_FOR_VENUE` (kalshi / polymarket_clob /
+      polymarket_gamma_api).
+    * every other asset_group has no per-venue live-vendor override map → no
+      extra live vendors (its live source already IS the
+      :data:`SOURCE_PRIORITY` primary, so the batch list covers it).
+
+    A candidate qualifies ONLY when :data:`SOURCE_MODE_CAPABILITY` marks it
+    live-OR-replay-capable (so a batch-only entry like ``polymarket_gamma_api``
+    is dropped — it can never legitimately stamp a row the batch list does not
+    already permit).
+
+    Memoised — the maps are immutable at runtime.
+    """
+    ag = asset_group.lower()
+    candidates: set[str] = set()
+    if ag == "cefi":
+        candidates.update(_CEFI_CEX_VENDOR_FOR_VENUE_PREFIX.values())
+        candidates.update(_CEFI_PERP_LIVE_SOURCE_FOR_VENUE.values())
+        candidates.update(CEFI_LIVE_VENUES)
+    elif ag == "prediction":
+        candidates.update(_PREDICTION_LIVE_SOURCE_FOR_VENUE.values())
+    return frozenset(
+        src for src in candidates if SOURCE_MODE_CAPABILITY.get(src, frozenset()) & {Mode.LIVE, Mode.REPLAY}
+    )
+
+
+def valid_manifest_sources(asset_group: str, data_type: str) -> frozenset[str]:
+    """Return the full set of sources a manifest WRITE may stamp for a cell.
+
+    The WRITE-TIME provenance set =
+    ``SOURCE_PRIORITY[(asset_group, data_type)]`` (the batch read-priority
+    sources) UNION :func:`_live_vendors_for_asset_group` (the live/replay
+    vendors that serve the asset_group). :data:`SOURCE_PRIORITY` itself is UNCHANGED —
+    it stays the READ-time batch resolution order; this UNION is the broader
+    write-validation surface (a live shard stamps the EXCHANGE vendor, which is
+    not in the batch list — bug#14).
+
+    Returns ``frozenset()`` when the pair is unregistered AND the asset_group has
+    no live vendors (nothing to validate against).
+    """
+    batch_sources: frozenset[str] = frozenset(SOURCE_PRIORITY.get((asset_group.lower(), data_type), ()))
+    return batch_sources | _live_vendors_for_asset_group(asset_group)
+
+
+def is_valid_manifest_source(asset_group: str, data_type: str, source: str) -> bool:
+    """Return whether ``source`` is a legitimate WRITE-TIME provenance stamp for a cell.
+
+    The write-gate predicate behind the UTL ``ManifestWriter`` source validation
+    (replaces the bare ``source in get_source_priority(...)`` membership check,
+    which rejected a CeFi CEX live vendor — bug#14). ``True`` iff ``source`` is in
+    :func:`valid_manifest_sources` (the batch read-priority list UNION the
+    asset_group's live/replay vendors). Case-insensitive on the source string.
+
+    This is ADDITIVE — it accepts live vendors that genuinely serve the
+    asset_group live; an unregistered / unknown source is still rejected (the
+    mis-stamp protection from the VX/CFE incident is preserved: an unknown source
+    never validates). Never consults priority ORDER (read-time only).
+    """
+    valid = {s.lower() for s in valid_manifest_sources(asset_group, data_type)}
+    return source.lower() in valid
+
+
 def emission_latency_ms_for_source(source: str) -> int:
     """Return the live-emission latency (ms) for ``source``.
 
@@ -658,26 +740,38 @@ def get_all_sources_with_priority(
     return [(source, pipeline_mode_for_source(source)) for source in sources]
 
 
-# Prediction venue → vendor source (the vendor IS the venue, like CeFi exchanges). KALSHI
-# data comes from kalshi, Polymarket from polymarket_clob (Gamma metadata via its explicit
-# venue). Consulted by live_source_for_venue BEFORE the data_type-level SOURCE_PRIORITY
-# primary so a KALSHI shard is never mis-attributed to polymarket_clob (priority[0]).
+# Per-venue LIVE/REPLAY source overrides consulted by live_source_for_venue BEFORE the
+# data_type-level SOURCE_PRIORITY primary (so a shard is never mis-attributed to priority[0]).
+# Prediction: vendor IS the venue; KALSHI→kalshi, Polymarket→polymarket_clob (Gamma metadata
+# via its explicit venue). The data_type primary polymarket_clob would mis-stamp KALSHI.
 _PREDICTION_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
     "kalshi": "kalshi",
     "polymarket": "polymarket_clob",
     "polymarket_gamma": "polymarket_gamma_api",
 }
 
-# CeFi crypto-perp venue → vendor source. The venue token is hyphenated (``KALSHI-PERP``)
-# but its source token is underscored (``kalshi_perp``); ``CEFI_LIVE_VENUES`` holds the
-# UNDERSCORE source form, so the hyphen venue never matches it and would fall through to
-# the (cefi, book_snapshot) SOURCE_PRIORITY primary ``tardis`` — a BATCH-only flat-file
-# archive with no LIVE_ PipelineMode → ``live_pipeline_mode_for_venue`` would raise. The
-# live source for a perp venue IS its own dedicated WS feed (kalshi_perp / polymarket_perp).
-# Consulted by live_source_for_venue in the cefi branch BEFORE the CEFI_LIVE_VENUES check.
+# CeFi crypto-perp venue (hyphen) → its own underscore WS-feed source token. The hyphen venue
+# never matches CEFI_LIVE_VENUES (underscore form) so it would fall through to the batch-only
+# `tardis` book_snapshot primary (no LIVE_ PipelineMode → live_pipeline_mode_for_venue raises).
 _CEFI_PERP_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
     "kalshi-perp": "kalshi_perp",
     "polymarket-perp": "polymarket_perp",
+}
+
+# CeFi CEX venue → bare exchange VENDOR (the live source), keyed by the venue's vendor PREFIX
+# (segment before the first ``-``). The live/replay writer venue carries a market-type suffix
+# (``BINANCE-FUTURES`` / ``OKX-SWAP`` / ``BYBIT-LINEAR`` …) but the live source is the bare
+# vendor, which is what CEFI_LIVE_VENUES + SOURCE_MODE_CAPABILITY + LIVE_<vendor> hold. Unlike
+# hyperliquid (venue == vendor), a CEX venue ≠ its vendor, so the bare CEFI_LIVE_VENUES check
+# missed ``binance-futures`` → fell through to batch-only ``tardis`` (no ``live_`` PipelineMode
+# → raised "No PipelineMode for source 'tardis' in mode 'live'"; bug#9: no CEX live capture).
+# tardis stays the index-0 BATCH source for these venues; this map is LIVE/REPLAY only.
+_CEFI_CEX_VENDOR_FOR_VENUE_PREFIX: dict[str, str] = {
+    "binance": "binance",
+    "okx": "okx",
+    "bybit": "bybit",
+    "kraken": "kraken",
+    "deribit": "deribit",
 }
 
 
@@ -711,6 +805,15 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
         return _CEFI_PERP_LIVE_SOURCE_FOR_VENUE[venue_norm]
     if ag_norm == "cefi" and venue_norm in CEFI_LIVE_VENUES:
         return venue_norm
+    # CeFi CEX venue → vendor source by PREFIX (the segment before the first ``-``): the
+    # live/replay writer venue carries a market-type suffix (``BINANCE-FUTURES`` /
+    # ``OKX-SWAP`` / ``BYBIT-LINEAR`` …) but the live source is the bare exchange vendor.
+    # tardis remains the index-0 BATCH source for these venues; this resolves LIVE/REPLAY
+    # only (the (cefi, …) SOURCE_PRIORITY primary ``tardis`` has no ``live_`` PipelineMode).
+    if ag_norm == "cefi":
+        vendor = _CEFI_CEX_VENDOR_FOR_VENUE_PREFIX.get(venue_norm.split("-", 1)[0])
+        if vendor is not None:
+            return vendor
     # Prediction is venue-disambiguated like CeFi: the data VENDOR IS the venue. The
     # data_type-level SOURCE_PRIORITY primary (polymarket_clob) would mis-attribute KALSHI
     # live/replay data to polymarket — so resolve KALSHI→kalshi (and the explicit Gamma venue)
@@ -888,10 +991,12 @@ __all__ = [
     "get_source_priority",
     "has_source_priority",
     "is_source_capable_for_venue",
+    "is_valid_manifest_source",
     "live_pipeline_mode_for_venue",
     "live_source_for_venue",
     "modes_for",
     "read_with_source_priority",
     "select_primary_available_source",
     "source_required",
+    "valid_manifest_sources",
 ]

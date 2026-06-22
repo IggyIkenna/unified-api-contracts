@@ -49,6 +49,8 @@ functions for type-checked single-asset-group code.
 from __future__ import annotations
 
 import datetime as _dt
+import re
+from typing import Final
 
 from unified_api_contracts._instrument_enums import InstrumentType
 from unified_api_contracts.canonical.gcs_paths import AssetGroup
@@ -566,6 +568,154 @@ def _coerce_instrument_type(value: object) -> InstrumentType:
     raise TypeError(msg)
 
 
+# ---------------------------------------------------------------------------
+# Path-canonicality validator (failure class C3 —
+# data_pipeline_hardening_self_monitoring_2026_06_22.md Phase 3 / Phase 4).
+#
+# The ``build_*_partition_path`` builders above CONSTRUCT canonical paths;
+# :func:`is_canonical` is the inverse — it parses an arbitrary GCS path and
+# asserts it matches the canonical shape, catching the documented drift
+# classes that have silently corrupted the manifest:
+#   - ``day-YYYY-MM-DD`` hyphen dir instead of ``day=YYYY-MM-DD``
+#   - a glued ``VENUE-CHAIN`` venue token instead of separate
+#     ``venue=.../chain=...`` segments (the legacy PROTOCOL-CHAIN overload)
+#   - a glued ``V{N}`` version inside the venue token (e.g. ``AAVEV3`` vs
+#     ``AAVE_V3``)
+#   - an ``asset_group=`` value outside the closed set
+#   - a missing ``pipeline_mode={mode}_{source}/`` segment (only when
+#     ``require_pipeline_mode=True`` — bare back-compat paths the builders
+#     still emit are accepted by default)
+#
+# Pragmatic, not a full grammar: it catches the documented drift shapes, and
+# round-trips against every ``build_*_partition_path`` output (see the unit
+# tests). Used by the Phase 3 hygiene orchestrator and the Phase 4 writer-side
+# assert. Registry SSOT: DP-PATH-001..004.
+# ---------------------------------------------------------------------------
+
+_CANONICAL_ASSET_GROUPS: Final[frozenset[str]] = frozenset(member.value for member in AssetGroup)
+"""Closed set of ``asset_group=`` hive values: {cefi, defi, tradfi, sports, prediction}."""
+
+# A canonical ``day=`` partition value is an ISO date ``YYYY-MM-DD``.
+_DAY_VALUE_RE: Final[re.Pattern[str]] = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+# Canonical pipeline_mode value is ``{mode}_{source}`` (mode ∈ batch/live/replay),
+# optionally ``{mode}_{source}_{transport}``. The vendor source token may itself
+# carry underscores, so we only assert the leading mode + at least one source
+# segment separated by ``_``.
+_PIPELINE_MODE_VALUE_RE: Final[re.Pattern[str]] = re.compile(r"^(batch|live|replay)_[a-z0-9]+(?:_[a-z0-9]+)*$")
+
+# A glued ``V{N}`` version suffix directly fused onto an alphanumeric token
+# (e.g. ``AAVEV3`` / ``UNISWAPV3``) — the canonical form separates it with an
+# underscore (``AAVE_V3`` / ``UNISWAP_V3``).
+_GLUED_VERSION_RE: Final[re.Pattern[str]] = re.compile(r"[A-Za-z0-9]V\d")
+
+
+def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False) -> list[str]:
+    """Return the list of canonical-form violations for ``path`` (empty == canonical).
+
+    Parses a bucket-relative GCS partition path (the full
+    ``raw_tick_data/by_date/...`` shape the ``build_*_partition_path`` builders
+    emit) and returns one human-readable violation string per documented
+    drift class found. An empty list means the path is canonical.
+
+    Args:
+        path: Bucket-relative path (no ``gs://bucket/`` prefix). A leading
+            slash is tolerated and stripped.
+        require_pipeline_mode: When True, a path lacking the
+            ``pipeline_mode={mode}_{source}/`` segment left of ``asset_group=``
+            is a violation. Default False accepts the back-compat bare paths
+            the builders still emit (the segment is canonical-but-optional for
+            CeFi/Prediction and back-compat for DeFi/TradFi).
+    """
+    violations: list[str] = []
+    cleaned = path.lstrip("/")
+
+    if not cleaned.startswith(RAW_TICK_DATA_PREFIX):
+        violations.append(f"path does not start with the canonical prefix {RAW_TICK_DATA_PREFIX!r}")
+        return violations
+
+    remainder = cleaned[len(RAW_TICK_DATA_PREFIX) :]
+    segments = remainder.split("/")
+    # Last segment is the file name; the rest are hive ``key=value`` partitions.
+    partition_segments = segments[:-1]
+
+    # ── day= segment (must be the first partition, value YYYY-MM-DD) ──────────
+    if not partition_segments:
+        violations.append("no partition segments after the prefix")
+        return violations
+
+    day_seg = partition_segments[0]
+    if day_seg.startswith("day-"):
+        violations.append(f"legacy hyphen day segment {day_seg!r} — must be 'day=YYYY-MM-DD'")
+    elif not day_seg.startswith("day="):
+        violations.append(f"first partition is {day_seg!r}, expected 'day=YYYY-MM-DD'")
+    elif not _DAY_VALUE_RE.match(day_seg[len("day=") :]):
+        violations.append(f"day value {day_seg[len('day=') :]!r} is not ISO YYYY-MM-DD")
+
+    # ── locate the keyed partition map (key=value segments) ──────────────────
+    kv: dict[str, str] = {}
+    has_pipeline_mode = False
+    for seg in partition_segments[1:]:
+        if "=" not in seg:
+            violations.append(f"non-canonical partition segment {seg!r} (expected 'key=value')")
+            continue
+        key, _, value = seg.partition("=")
+        if key == "pipeline_mode":
+            has_pipeline_mode = True
+            if not _PIPELINE_MODE_VALUE_RE.match(value):
+                violations.append(
+                    f"pipeline_mode value {value!r} is not canonical '{{mode}}_{{source}}' "
+                    "(mode ∈ batch/live/replay, source = vendor token)"
+                )
+        kv[key] = value
+
+    # ── asset_group= (must be present + in the closed set) ───────────────────
+    asset_group_value = kv.get(ASSET_GROUP_HIVE_KEY)
+    if asset_group_value is None:
+        violations.append(f"missing '{ASSET_GROUP_HIVE_KEY}=' partition segment")
+    elif asset_group_value not in _CANONICAL_ASSET_GROUPS:
+        violations.append(
+            f"{ASSET_GROUP_HIVE_KEY}={asset_group_value!r} is outside the canonical set "
+            f"{sorted(_CANONICAL_ASSET_GROUPS)}"
+        )
+
+    # ── pipeline_mode required-but-missing (opt-in) ──────────────────────────
+    if require_pipeline_mode and not has_pipeline_mode:
+        violations.append(
+            "missing 'pipeline_mode={mode}_{source}/' segment left of "
+            f"'{ASSET_GROUP_HIVE_KEY}=' (required for this check)"
+        )
+
+    # ── venue= (glued VENUE-CHAIN overload / glued V{N} version) ─────────────
+    venue_value = kv.get("venue")
+    if venue_value is not None:
+        # A hyphen in the venue token is the legacy PROTOCOL-CHAIN glue
+        # (e.g. ``AAVE_V3-ETHEREUM``); chain MUST be its own ``chain=`` segment.
+        if "-" in venue_value:
+            violations.append(
+                f"venue={venue_value!r} carries a glued 'VENUE-CHAIN' token — chain must be a separate 'chain=' segment"
+            )
+        if _GLUED_VERSION_RE.search(venue_value):
+            violations.append(
+                f"venue={venue_value!r} carries a glued 'V{{N}}' version — canonical form separates "
+                "it with an underscore (e.g. 'AAVE_V3', 'UNISWAP_V3')"
+            )
+
+    return violations
+
+
+def is_canonical(path: str, *, require_pipeline_mode: bool = False) -> bool:
+    """True iff ``path`` is a canonical GCS partition path (no drift violations).
+
+    Thin boolean wrapper over :func:`canonical_path_violations` — accepts the
+    output of every ``build_*_partition_path`` builder and rejects the
+    documented non-canonical drift shapes (hyphen ``day-``, glued
+    ``VENUE-CHAIN`` / ``V{N}``, out-of-set ``asset_group=``, and — when
+    ``require_pipeline_mode=True`` — a missing ``pipeline_mode=`` segment).
+    """
+    return not canonical_path_violations(path, require_pipeline_mode=require_pipeline_mode)
+
+
 __all__ = [
     "ASSET_GROUP_HIVE_KEY",
     "CEFI_CHAIN_INSTRUMENT_TYPES",
@@ -575,4 +725,6 @@ __all__ = [
     "build_prediction_partition_path",
     "build_tradfi_partition_path",
     "candidate_parquet_paths",
+    "canonical_path_violations",
+    "is_canonical",
 ]

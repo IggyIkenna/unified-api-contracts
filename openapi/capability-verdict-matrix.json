@@ -58864,11 +58864,36 @@
       "instruction_actions": ["ZERO_ALPHA"],
       "not_registered": false,
       "valid_algos": ["BENCHMARK_FILL"]
+    },
+    {
+      "archetype": "TSMOM_BTC_CTA",
+      "cell_count": 0,
+      "gap_type": "no_v2_engine",
+      "not_registered": true,
+      "not_registered_algos": [
+        "ADAPTIVE_TWAP",
+        "ALMGREN_CHRISS",
+        "BENCHMARK_FILL",
+        "BEST_PRICE",
+        "HYBRID_OPTIMAL",
+        "KELLY_STAKE",
+        "MAX_SLIPPAGE",
+        "PASSIVE_AGGRESSIVE_HYBRID",
+        "POV_DYNAMIC",
+        "SEQUENTIAL_LEGS",
+        "SMART_ORDER_ROUTER",
+        "SOR_TWAP",
+        "SPREAD_ROLL",
+        "SWAP_TWAP",
+        "TWAP",
+        "VWAP"
+      ],
+      "reason": "archetype TSMOM_BTC_CTA has no registered v2 engine in the strategy-service engine factory ARCHETYPE_ENGINE_REGISTRY — implementation in progress (CTA rules on BTC time-series momentum)."
     }
   ],
   "axes": {
     "algo": "every key in EXECUTION_ALGOS (selector ALGORITHMS_BY_INSTRUCTION_TYPE)",
-    "archetype": "all 57 StrategyArchetype values",
+    "archetype": "all 58 StrategyArchetype values",
     "instruction_action": "InstructionType induced by (venue_kind, instrument_type) \u2014 the selector axis",
     "instrument_type": "per-leg ArchetypeInstrumentType",
     "venue": "per-archetype leg-eligible venues (ARCHETYPE_LEG_STRUCTURES)"

@@ -586,6 +586,32 @@ def test_live_source_for_cefi_crypto_perp_venue_is_its_own_ws_feed() -> None:
     assert live_pipeline_mode_for_venue("cefi", "BINANCE", "trades") is PipelineMode.LIVE_BINANCE
 
 
+def test_live_source_for_cefi_cex_venue_with_market_type_suffix() -> None:
+    """CeFi CEX venues carry a market-type SUFFIX (``BINANCE-FUTURES`` / ``OKX-SWAP`` /
+    ``BYBIT-LINEAR`` …) but the live source is the bare exchange vendor (bug#9: the
+    suffix made the bare ``CEFI_LIVE_VENUES`` check miss → fell through to batch-only
+    ``tardis`` → ``No PipelineMode for source 'tardis' in mode 'live'``)."""
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+        live_source_for_venue,
+    )
+
+    # Vendor-prefix resolution across the market-type suffixes the live writer emits.
+    assert live_source_for_venue("cefi", "BINANCE-FUTURES", "trades") == "binance"
+    assert live_source_for_venue("cefi", "BINANCE-SPOT", "trades") == "binance"
+    assert live_source_for_venue("cefi", "OKX-SWAP", "trades") == "okx"
+    assert live_source_for_venue("cefi", "OKX-FUTURES", "trades") == "okx"
+    assert live_source_for_venue("cefi", "BYBIT-LINEAR", "trades") == "bybit"
+    assert live_source_for_venue("cefi", "KRAKEN-FUTURES", "trades") == "kraken"
+    # Case-insensitive venue.
+    assert live_source_for_venue("CeFi", "Binance-Futures", "trades") == "binance"
+    # The live pipeline_mode resolves (no ValueError) to the venue's own live_ member.
+    assert live_pipeline_mode_for_venue("cefi", "BINANCE-FUTURES", "trades") is PipelineMode.LIVE_BINANCE
+    assert live_pipeline_mode_for_venue("cefi", "OKX-SWAP", "book_snapshot") is PipelineMode.LIVE_OKX
+    assert live_pipeline_mode_for_venue("cefi", "BYBIT-LINEAR", "trades") is PipelineMode.LIVE_BYBIT
+    assert live_pipeline_mode_for_venue("cefi", "KRAKEN-FUTURES", "trades") is PipelineMode.LIVE_KRAKEN
+
+
 def test_live_pipeline_mode_for_cefi_replay_mode() -> None:
     from unified_api_contracts.canonical.crosscutting.pipeline_mode import Mode
     from unified_api_contracts.canonical.crosscutting.source_priority import (

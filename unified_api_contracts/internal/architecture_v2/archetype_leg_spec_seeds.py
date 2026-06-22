@@ -1261,6 +1261,20 @@ def _directional_seeds() -> tuple[ArchetypeLegStructure, ...]:
             ),
             notes="1-leg always-LONG bet per fired rule (one-sided).",
         ),
+        _single_directional_structure(
+            StrategyArchetype.TSMOM_BTC_CTA,
+            role=ArchetypeLegRole.PERP_LONG,
+            instrument_types=(ArchetypeInstrumentType.PERP,),
+            asset_groups=cefi_defi_tradfi,
+            venues=continuous_venues,
+            engine_desc=(
+                "strategy-service TsmomBtcCtaEngine (rules_directional/tsmom_btc_cta.py, "
+                "TradeInstruction LONG/SHORT from the mean SIGN of trailing returns "
+                "x inverse-vol scaling); plans/active/"
+                "citadel_paper_batch_live_reconciliation_2026_06_19.md P2.11.14"
+            ),
+            notes="1-leg BTC trend-following (CTA) perp; long-or-short, vol-target-scaled.",
+        ),
     )
 
 
@@ -1539,7 +1553,7 @@ def _portfolio_seeds() -> tuple[ArchetypeLegStructure, ...]:
 
 
 def build_all_structures() -> tuple[ArchetypeLegStructure, ...]:
-    """Return a leg structure for EVERY one of the 58 archetypes (exhaustive).
+    """Return a leg structure for EVERY one of the 59 archetypes (exhaustive).
 
     Real structures where a leg model is derivable from engine/doc/cells;
     explicit ``not_registered`` structures (legs=() + cited reason) where it is
