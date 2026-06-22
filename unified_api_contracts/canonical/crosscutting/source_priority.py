@@ -685,23 +685,13 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     """Resolve the LIVE/REPLAY ``source`` string that serves a ``(asset_group, venue,
     data_type)`` shard.
 
-    The live writer has ``(asset_group, venue, data_type)`` in scope but stamps the
-    source-aware ``live_<source>`` / ``replay_<source>`` ``pipeline_mode`` — so it
-    needs the SOURCE, not the venue. The mapping is asset-group-shaped (M2/M3 model,
-    ``pipeline_mode.py`` CeFi-venue block):
-
-    * **CeFi**: ``live``/``replay`` source IS the EXCHANGE (the ``venue``) — Tardis is
-      the CeFi *batch* archive, never the live source. So a CeFi venue in
-      :data:`CEFI_LIVE_VENUES` resolves to ``venue`` itself (lowercased).
-    * **Every other asset_group** (defi / tradfi / prediction / sports / reference):
-      the live source is the :data:`SOURCE_PRIORITY` PRIMARY source for the cell —
-      the same vendor serves batch + live (e.g. ``databento`` live ticks). When the
-      pair is unregistered, fall back to the normalised ``venue`` (a vendor venue
-      whose name IS its source, e.g. ``chainlink`` / ``pyth_hermes``).
-
-    The returned string is a VENDOR source (operator R4 — never a transport-glued
-    name). Pair with :func:`pipeline_mode_for_source` ``(source, Mode.LIVE|REPLAY)``
-    to obtain the concrete :class:`PipelineMode`.
+    The live writer stamps the source-aware ``live_<source>``/``replay_<source>``
+    pipeline_mode, so it needs the SOURCE. **CeFi**: source IS the exchange (the venue;
+    Tardis is batch-only) → a venue in :data:`CEFI_LIVE_VENUES` resolves to itself.
+    **Every other asset_group** (defi/tradfi/prediction/sports/reference): the
+    :data:`SOURCE_PRIORITY` PRIMARY (same vendor batch+live), else the normalised venue
+    (vendor venue whose name IS its source, e.g. ``chainlink``). Returns a VENDOR source
+    (operator R4); pair with :func:`pipeline_mode_for_source`.
 
     Args:
         asset_group: ``cefi`` / ``defi`` / ``tradfi`` / ``prediction`` / ``sports`` /
@@ -727,12 +717,8 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
     # by venue first. POLYMARKET falls through to the priority primary (polymarket_clob).
     if ag_norm == "prediction" and venue_norm in _PREDICTION_LIVE_SOURCE_FOR_VENUE:
         return _PREDICTION_LIVE_SOURCE_FOR_VENUE[venue_norm]
-    # TradFi live/replay is served by databento's Live streaming gateway for EVERY
-    # venue (CME/NASDAQ/NYSE/CBOE -> databento_tradfi_ws, the ONLY tradfi WS producer).
-    # The batch SOURCE_PRIORITY primary is `massive` (a flat-file archive - batch-canonical,
-    # with NO live WS producer), so resolving a live shard through the batch primary
-    # mis-stamps it `live_massive`. databento is the actual streaming vendor; massive
-    # stays the batch primary (via get_primary_source / select_primary_available_source).
+    # TradFi live = databento (sole tradfi WS producer); batch primary `massive` has no live
+    # feed → routing live via it mis-stamps `live_massive`. Batch path unchanged (get_primary_source).
     if ag_norm == "tradfi":
         return "databento"
     if has_source_priority(ag_norm, data_type):

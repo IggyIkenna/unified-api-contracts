@@ -626,9 +626,21 @@ VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], frozenset[str]
     # admitted, to avoid an over-fan; cefi futures_chain DOES carry
     # data_type=options_chain → slot-3 widens that slice).
     ("tradfi", "option"): frozenset(),
-    ("tradfi", "combo"): frozenset(),
+    # TradFi COMBO rolls up to its OWN per-underlying ``instrument_type=combo`` bundle
+    # (BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF[("tradfi","combo")]="combo", 2026-06-22),
+    # so — unlike option/option_chain — the ``combo`` row IS consulted (it drives the
+    # synthetic bundle entry's data_types). CME spread/combo cells are the SAME OHLCV
+    # stream as the outright futures the legs reference, so the captured set mirrors
+    # ``futures_chain`` + ``ohlcv_1s`` (fetched alongside ohlcv_1m for every GLBX.MDP3
+    # tradeable; SSOT codex/02-data/tradfi-databento-sourcing-ssot.md). Kept tight
+    # (no mbp_10/24h) to avoid over-fanning cells the writer never captures.
+    ("tradfi", "combo"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"}),
     ("tradfi", "options_chain"): frozenset({"trades", "ohlcv_1m", "options_chain"}),
-    ("tradfi", "futures_chain"): frozenset({"trades", "ohlcv_1m", "tbbo"}),
+    # ohlcv_1s added 2026-06-22 (writer-grain alignment): the MTDS writer captures
+    # CME/ICE futures_chain cells with ohlcv_1s alongside ohlcv_1m (both L0/free,
+    # fetched for every GLBX.MDP3 tradeable) — the prior set omitted it, marking the
+    # real ohlcv_1s chain cells phantom-``expected_unattempted``.
+    ("tradfi", "futures_chain"): frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"}),
     # Per-contract leaves (grain=leaf; NOT bundled). tradfi-owner verified 2026-06-08 (slot-6) against the
     # `market-data-tick-tradfi` manifest present-set + the databento futures/FX market-data capability: the
     # equity corporate events (`corporate_action_confirmed`/`earnings_result`) + `macro_result` are NOT futures/FX
@@ -759,8 +771,21 @@ INSTRUMENT_GRAIN_BY_AG_AND_INSTRUMENT_TYPE: dict[tuple[str, str], str] = {
 # part before the first ``-``) so ``OKX`` / ``OKX-FUTURES`` / ``OKX-SWAP`` all
 # resolve. The option/combo → options_chain roll-up above is universally true and
 # stays venue-agnostic; only FUTURE leaf grain needs this venue overlay.
+#
+# ── TradFi (CME / ICE) — writer-grain alignment 2026-06-22 ──────────────────────
+# The MTDS writer (``symbol_rules._VENUE_INSTRUMENT_TYPE``) stamps EVERY CME/ICE
+# captured cell ``instrument_type=futures_chain`` (a per-underlying chain bundle),
+# NOT per-contract ``future`` — its grain comes from the venue default + the dated
+# -future symbol regex, NOT from this map (MTDS never imports it), so adding TradFi
+# here only re-grains the IS expected-universe SEED to match what the writer
+# already captures. Without this, a CME ``FUTURE`` leaf seeded ``future`` (passthrough)
+# and matched only the ~2K per-contract cells, leaving the ~144K real ``futures_chain``
+# cells phantom-``expected_unattempted``. CME/ICE are the ONLY TradFi futures venues
+# (databento ``_DATASET_TO_VENUE``: GLBX.MDP3→CME, IFEU/IFUS.IMPACT→ICE); equities
+# (NASDAQ/NYSE→equity), FX (→spot_pair) and CBOE (→index) are unaffected.
 FUTURE_BUNDLE_VENUES: dict[str, frozenset[str]] = {
     "cefi": frozenset({"DERIBIT", "OKX"}),
+    "tradfi": frozenset({"CME", "ICE"}),
 }
 
 
@@ -799,7 +824,17 @@ BUNDLE_INSTRUMENT_TYPE_BY_AG_AND_LEAF: dict[tuple[str, str], str] = {
     ("cefi", "option"): "options_chain",
     ("cefi", "combo"): "options_chain",
     ("tradfi", "option"): "options_chain",
-    ("tradfi", "combo"): "options_chain",
+    # TradFi COMBO (CME calendar / inter-commodity spreads + UD_1V_* user-defined
+    # combos — databento class ``T``) rolls up per-underlying like options/futures,
+    # but the MTDS writer keeps its OWN ``instrument_type=combo`` partition (it is
+    # in ``symbol_rules._UNDERLYING_PARTITIONED_TYPES`` and ``manifest_finalize``
+    # routes ``itype != "combo"`` away from the options_chain bundle row, so combo
+    # captured cells carry ``instrument_type=combo``, NOT ``options_chain``). Seeding
+    # ``options_chain`` here (the pre-2026-06-22 value) mis-grained the largest TradFi
+    # bundle bucket (~53K combo cells) → phantom-``expected_unattempted``. The bundle
+    # TYPE is therefore ``combo`` (roll-up to one per-underlying entry, instrument_type
+    # preserved); its data_types come from the ``("tradfi", "combo")`` validity row.
+    ("tradfi", "combo"): "combo",
 }
 
 
