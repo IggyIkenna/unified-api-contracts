@@ -316,6 +316,57 @@ class FillModel(StrEnum):
     LIVE_VENUE = "LIVE_VENUE"
 
 
+class ExecutionIntent(StrEnum):
+    """The strategy's DECLARED per-leg execution urgency — the fill model the
+    shared candle-replay engine measures against post-signal 1m candles.
+
+    A strategy declares ONE intent per leg (e.g. a patient ext-REVERT fade leg →
+    ``LIMIT_MAKER``; an urgent ext-CONTINUE with-trend leg → ``IOC_TAKER``); the
+    execution-service candle-fill engine (``replay_candle_fill``) measures it on
+    the captured candles, so the per-leg fill is uniform across batch + paper (the
+    determinism spine). The names ARE the operator's universe (operator
+    2026-06-22). This is the strategy DECLARATION; the venue-side
+    ``order_semantics.TimeInForce`` (GTC/IOC/POST_ONLY/…) is the separate adapter
+    placement concept.
+
+    SSOT: ``codex/09-strategy/operational/paper-batch-live-reconciliation.md`` §4.2.
+    """
+
+    IOC_TAKER = "IOC_TAKER"
+    """Cross the book — full immediate fill at the marketable cross on the signal
+    bar, never rests, never misses. The URGENT leg (ext-CONTINUE / a reversion
+    that must fill now)."""
+
+    RESTING_LIMIT_TAKER = "RESTING_LIMIT_TAKER"
+    """Marketable, but the residual RESTS at the cross and books on a later bar
+    that trades back through it; never misses (it already committed to cross)."""
+
+    LIMIT_MAKER = "LIMIT_MAKER"
+    """A passive limit posted ``improve_bps`` INSIDE the cross (tick-rounded away),
+    filled at the exact posted price on the first bar trading through it, and
+    MISSED (adverse selection) if price runs away. The PATIENT fade leg
+    (carry/basis/trend/on-chain names)."""
+
+
+# The MEASURED default mapping (research style-sweep on real 1m candles, operator
+# 2026-06-22): patient legs save ~3.5 bps posting LIMIT_MAKER ~2 bp inside (~99%
+# fill) vs an IOC at 2bp-inside; urgent legs take with IOC. ``default_improve_bps``
+# is the inside-offset for the patient default; a strategy overrides either.
+DEFAULT_LIMIT_MAKER_IMPROVE_BPS: Decimal = Decimal("2")
+
+
+def default_execution_intent(*, urgent: bool) -> ExecutionIntent:
+    """The MEASURED default execution intent for a leg's urgency.
+
+    ``urgent`` (the leg must fill now — ext-CONTINUE / a reversion that must take)
+    → :attr:`ExecutionIntent.IOC_TAKER`; otherwise (a patient fade — carry / basis
+    / trend / on-chain) → :attr:`ExecutionIntent.LIMIT_MAKER` posted
+    ``DEFAULT_LIMIT_MAKER_IMPROVE_BPS`` inside. A strategy may override the
+    per-leg declaration; this is only the default when none is declared.
+    """
+    return ExecutionIntent.IOC_TAKER if urgent else ExecutionIntent.LIMIT_MAKER
+
+
 class RunManifest(BaseModel):
     """As-of snapshot pinning everything a deterministic rerun needs.
 
@@ -413,6 +464,22 @@ class TradeFillRecord(BaseModel):
     fill_price: Decimal
     fees_in_quote: Decimal
     fill_model: FillModel
+    execution_intent: ExecutionIntent | None = Field(
+        default=None,
+        description=(
+            "The strategy's DECLARED per-leg execution intent (IOC_TAKER / "
+            "RESTING_LIMIT_TAKER / LIMIT_MAKER). When set, the smart-fill candle "
+            "engine replays this intent against the post-signal 1m candles. None "
+            "= the engine applies the measured default via default_execution_intent."
+        ),
+    )
+    execution_improve_bps: Decimal | None = Field(
+        default=None,
+        description=(
+            "Override for the LIMIT_MAKER inside-offset (bps). None → the measured "
+            "DEFAULT_LIMIT_MAKER_IMPROVE_BPS. Ignored for taker intents."
+        ),
+    )
     correlation_id: str | None = None
     client_order_id: str | None = None
 
@@ -488,6 +555,7 @@ class DailyReconReport(BaseModel):
 
 
 __all__ = [
+    "DEFAULT_LIMIT_MAKER_IMPROVE_BPS",
     "AutoReconcileReason",
     "BalanceReconciliationSnapshot",
     "BalanceReconciliationStatus",
@@ -496,6 +564,7 @@ __all__ = [
     "DeviationState",
     "DeviationStatus",
     "DeviationType",
+    "ExecutionIntent",
     "FillModel",
     "PnLReconciliationSnapshot",
     "ReconVerdictType",
