@@ -217,7 +217,7 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     # listing). The semantic here is the per-row stamp; lifecycle clipping
     # lives in instruments-service + MTDS pre-flight.
     ("prediction", "trades"): "tick_timestamp",
-    ("prediction", "book_snapshot"): "tick_timestamp",
+    ("prediction", "book_snapshot_5"): "tick_timestamp",
     ("prediction", "prediction_canonical_question_group"): "tick_timestamp",
     # MARKET_LIFECYCLE rows are written by instruments-service per
     # market_id (Polymarket conditionId / Kalshi ticker) and stamp the
