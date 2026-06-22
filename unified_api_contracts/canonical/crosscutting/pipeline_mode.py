@@ -425,7 +425,16 @@ _SPORTS_ENTITY_TO_PIPELINE_MODE: dict[str, PipelineMode] = {
     # FootyStats entities
     "footystats_predictions": PipelineMode.BATCH_FOOTYSTATS,
     "footystats_matches": PipelineMode.BATCH_FOOTYSTATS,
-    "footystats_odds": PipelineMode.BATCH_ODDS_API,
+    # footystats_odds is FETCHED by the FootyStats adapter (_fetch_footystats_odds),
+    # so its upstream source is ``footystats`` (UAC SPORTS_DATA_TYPE_TO_SOURCE[ODDS]
+    # == "footystats"). It MUST stamp BATCH_FOOTYSTATS so the GCS pipeline_mode path
+    # key (batch_footystats) and the record_captured source= (footystats) agree —
+    # the prior BATCH_ODDS_API value made the writer's source↔pipeline_mode
+    # coherence check fail_fast (``source=footystats disagrees with
+    # pipeline_mode=batch_odds_api`` → expected source=odds_api), so FS odds rows
+    # were FETCHED + written to GCS but NEVER manifested (predictions+matches landed
+    # fine; only odds failed). Fixed 2026-06-22 (data_pipeline_hardening_self_monitoring).
+    "footystats_odds": PipelineMode.BATCH_FOOTYSTATS,
     # Understat entities
     "understat_xg": PipelineMode.BATCH_UNDERSTAT,
     "understat_xg_shots": PipelineMode.BATCH_UNDERSTAT,

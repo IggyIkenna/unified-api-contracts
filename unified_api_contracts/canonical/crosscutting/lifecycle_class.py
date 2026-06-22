@@ -52,6 +52,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass
 from enum import StrEnum
+from typing import Final
 
 
 class LifecycleClass(StrEnum):
@@ -217,3 +218,120 @@ def classify_experiment_run(run_id: str) -> LifecycleClass:
     """
     del run_id  # Reserved for future per-run overrides.
     return LifecycleClass.EPHEMERAL_EXPERIMENT
+
+
+# ===========================================================================
+# Deployment-observability umbrella model
+# ===========================================================================
+#
+# The umbrella is the deployment-observability classification the whole
+# /deployments surface hangs off (deployment-api ``/api/deployments``,
+# deployment-ui Deployments page, the Slack deployment notifier). Every
+# compute unit (a GCE/EC2 **VM** or a Cloud Run **job execution**) classifies
+# to exactly one umbrella x cloud x service x asset_group.
+#
+# Umbrella vs lifecycle_class: the 4-class :class:`LifecycleClass` taxonomy is
+# the VM-level Monitor sub-tab classification (batch / experiment / scheduled /
+# live). The umbrella is the higher-level deployment grouping the operator
+# reasons about — ``live`` / ``batch`` / ``paper`` / ``experiment``. The mapping
+# is :data:`UMBRELLA_FOR_LIFECYCLE_CLASS`, with PAPER as an explicit override
+# (paper crons are ``SCHEDULED_RECURRING`` by lifecycle but ``paper`` by
+# umbrella). SSOT: ``deployment_observability_parity_live_batch_paper_2026_06_22``
+# plan, Phase 0.
+
+
+class DeploymentUmbrella(StrEnum):
+    """Closed-set 4-umbrella deployment-observability classification.
+
+    Each compute unit (VM or Cloud Run job execution) belongs to exactly one
+    umbrella. The operator's /deployments surface tabs on Live / Batch / Paper
+    (Experiment folds under Batch in the UI by default).
+    """
+
+    LIVE = "LIVE"
+    """Long-lived continuous deployments — live capture / trading / risk /
+    execution clusters. Derives from :attr:`LifecycleClass.LONG_LIVED_LIVE`."""
+
+    BATCH = "BATCH"
+    """Bounded data/pricing pipeline jobs + recurring infra jobs — backfills,
+    forward-polls, Cloud Run audits / consolidator / catalogue / expected-universe.
+    Derives from :attr:`LifecycleClass.EPHEMERAL_BATCH` +
+    :attr:`LifecycleClass.SCHEDULED_RECURRING`."""
+
+    PAPER = "PAPER"
+    """Paper-trading deployments (paper VMs + paper crons). Has NO single
+    lifecycle_class — an explicit override carried on ``VmPrefixSpec.umbrella``
+    or passed as ``is_paper`` to :func:`classify_deployment_target`, because a
+    paper cron is ``SCHEDULED_RECURRING`` by lifecycle yet ``paper`` by
+    umbrella."""
+
+    EXPERIMENT = "EXPERIMENT"
+    """Research jobs (ML training / strategy backtest / execution backtest).
+    Derives from :attr:`LifecycleClass.EPHEMERAL_EXPERIMENT`. Folded under Batch
+    in the UI by default."""
+
+
+class DeploymentCloud(StrEnum):
+    """Cloud a deployment runs on. GCP first (operator), then AWS."""
+
+    GCP = "GCP"
+    AWS = "AWS"
+
+
+class DeploymentKind(StrEnum):
+    """The runtime kind of a compute unit.
+
+    A ``VM`` is a GCE / EC2 instance; a ``CLOUD_RUN_JOB`` is a GCP Cloud Run
+    job (AWS equivalent is Batch Fargate, also modelled as a job kind).
+    """
+
+    VM = "VM"
+    CLOUD_RUN_JOB = "CLOUD_RUN_JOB"
+
+
+@dataclass(frozen=True)
+class DeploymentTarget:
+    """A classified compute unit on the deployment-observability surface.
+
+    Built by :func:`classify_deployment_target` (deployment-service) and read by
+    every observability surface (deployment-api ``/api/deployments``,
+    deployment-ui Deployments page, the Slack deployment notifier). Carries the
+    full classification so no surface re-derives it.
+
+    Attributes:
+        name: The VM-name prefix-match target, full VM name, or Cloud Run job
+            name being classified.
+        kind: Whether this is a VM or a Cloud Run job.
+        umbrella: The Live / Batch / Paper / Experiment grouping.
+        cloud: GCP or AWS.
+        service: The owning logical service (e.g. ``market-tick-data-service``,
+            ``strategy-service``, ``manifest-consolidator``).
+        asset_group: The asset_group (``cefi`` / ``defi`` / ``tradfi`` /
+            ``sports`` / ``prediction``), or ``""`` for cross-asset infra
+            (audits / consolidator / catalogue).
+        lifecycle_class: The canonical lifecycle-class string this target maps
+            to (a :class:`LifecycleClass` value), or ``""`` for Cloud Run jobs
+            that have no VM lifecycle class.
+    """
+
+    name: str
+    kind: DeploymentKind
+    umbrella: DeploymentUmbrella
+    cloud: DeploymentCloud
+    service: str
+    asset_group: str
+    lifecycle_class: str
+
+
+UMBRELLA_FOR_LIFECYCLE_CLASS: Final[Mapping[str, DeploymentUmbrella]] = {
+    LifecycleClass.EPHEMERAL_BATCH.value: DeploymentUmbrella.BATCH,
+    LifecycleClass.SCHEDULED_RECURRING.value: DeploymentUmbrella.BATCH,
+    LifecycleClass.LONG_LIVED_LIVE.value: DeploymentUmbrella.LIVE,
+    LifecycleClass.EPHEMERAL_EXPERIMENT.value: DeploymentUmbrella.EXPERIMENT,
+}
+"""Umbrella for each lifecycle_class.
+
+Note PAPER is absent — paper deployments have no lifecycle_class of their own
+(a paper cron is ``SCHEDULED_RECURRING``), so PAPER is always an explicit
+override (``VmPrefixSpec.umbrella`` or the ``is_paper`` arg to
+:func:`classify_deployment_target`)."""
