@@ -315,8 +315,11 @@ def test_carry_staked_basis_declares_lst_and_lending_legs(required_venue: str) -
 
 
 def test_capability_registry_loaded_with_22_archetypes() -> None:
-    """Manifest declares 22 archetypes — adding to MAY_23 must not regress."""
-    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 22
+    """Manifest declares 23 archetypes — adding to MAY_23 must not regress.
+
+    Updated 2026-06-22: 22 → 23 with TSMOM_BTC_CTA (RULES_DIRECTIONAL CeFi BTC trend CTA).
+    """
+    assert len(ARCHETYPE_CAPABILITY_REGISTRY) == 23
 
 
 def test_strategy_registry_non_empty() -> None:

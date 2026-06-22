@@ -1,7 +1,7 @@
 {
   "schema_version": "1.0.0",
   "source": "unified_api_contracts.internal.architecture_v2.archetype_capability",
-  "archetype_count": 22,
+  "archetype_count": 23,
   "archetypes": [
     {
       "archetype_id": "ML_DIRECTIONAL_CONTINUOUS",
@@ -471,6 +471,55 @@
             "RULES_DIRECTIONAL_EVENT_SETTLED@polymarket-btc-price-band-rule-usdc-prod"
           ],
           "notes": "Docs + example instances gap."
+        }
+      ]
+    },
+    {
+      "archetype_id": "TSMOM_BTC_CTA",
+      "family": "RULES_DIRECTIONAL",
+      "uses_rolling_futures": false,
+      "cells": [
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "perp",
+          "status": "SUPPORTED",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid",
+            "deribit"
+          ],
+          "signal_variants": [
+            "price"
+          ],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [
+            "TSMOM_BTC_CTA@binance-btc-perp-1d-tsmom-usdt-prod",
+            "TSMOM_BTC_CTA@hyperliquid-btc-perp-1d-tsmom-usdt-prod"
+          ],
+          "notes": "Single directional trend-following (time-series-momentum) perp leg sized by mean sign of trailing returns x inverse-vol; long-or-short."
+        },
+        {
+          "asset_group": "CEFI",
+          "instrument_type": "spot",
+          "status": "SUPPORTED",
+          "venue_ids": [
+            "binance",
+            "okx",
+            "bybit",
+            "hyperliquid"
+          ],
+          "signal_variants": [
+            "price"
+          ],
+          "roll_mode": "n/a",
+          "block_list_refs": [],
+          "representative_slot_labels": [
+            "TSMOM_BTC_CTA@binance-btc-usdt-1d-tsmom-usdt-prod"
+          ],
+          "notes": "Spot expression of the BTC-level trend leg (long-only when spot-constrained)."
         }
       ]
     },
