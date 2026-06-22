@@ -13,7 +13,21 @@ from dataclasses import FrozenInstanceError
 
 import pytest
 
+from unified_api_contracts import (
+    UMBRELLA_FOR_LIFECYCLE_CLASS as ROOT_UMBRELLA_FOR_LIFECYCLE_CLASS,
+)
+from unified_api_contracts import (
+    DeploymentTarget as RootDeploymentTarget,
+)
+from unified_api_contracts import (
+    DeploymentUmbrella as RootDeploymentUmbrella,
+)
 from unified_api_contracts.canonical.crosscutting.lifecycle_class import (
+    UMBRELLA_FOR_LIFECYCLE_CLASS,
+    DeploymentCloud,
+    DeploymentKind,
+    DeploymentTarget,
+    DeploymentUmbrella,
     LifecycleClass,
     VmPrefixSpec,
     classify_cloud_run_service,
@@ -173,3 +187,79 @@ def test_classify_scheduled_job_returns_scheduled_recurring_for_any_name() -> No
 def test_classify_experiment_run_returns_ephemeral_experiment_for_any_run_id() -> None:
     assert classify_experiment_run("018f3a4b-c5d6-7e89-abcd-ef0123456789") is LifecycleClass.EPHEMERAL_EXPERIMENT
     assert classify_experiment_run("exp-strategy-carry-basis-20260508") is LifecycleClass.EPHEMERAL_EXPERIMENT
+
+
+# ---------------------------------------------------------------------------
+# Deployment-observability umbrella model
+# ---------------------------------------------------------------------------
+
+
+def test_deployment_umbrella_has_exactly_four_members() -> None:
+    """Closed-set 4-umbrella taxonomy; a 5th umbrella must be a deliberate UAC change."""
+    assert {member.name for member in DeploymentUmbrella} == {"LIVE", "BATCH", "PAPER", "EXPERIMENT"}
+
+
+def test_deployment_umbrella_values_equal_names() -> None:
+    for member in DeploymentUmbrella:
+        assert member.value == member.name
+
+
+def test_deployment_cloud_members() -> None:
+    assert {member.name for member in DeploymentCloud} == {"GCP", "AWS"}
+
+
+def test_deployment_kind_members() -> None:
+    assert {member.name for member in DeploymentKind} == {"VM", "CLOUD_RUN_JOB"}
+
+
+def test_umbrella_for_lifecycle_class_maps_all_four_lifecycle_classes() -> None:
+    """Every lifecycle_class resolves to an umbrella (no UNCLASSIFIED gap)."""
+    assert set(UMBRELLA_FOR_LIFECYCLE_CLASS) == {member.value for member in LifecycleClass}
+
+
+def test_umbrella_for_lifecycle_class_mapping() -> None:
+    assert UMBRELLA_FOR_LIFECYCLE_CLASS[LifecycleClass.EPHEMERAL_BATCH.value] is DeploymentUmbrella.BATCH
+    assert UMBRELLA_FOR_LIFECYCLE_CLASS[LifecycleClass.SCHEDULED_RECURRING.value] is DeploymentUmbrella.BATCH
+    assert UMBRELLA_FOR_LIFECYCLE_CLASS[LifecycleClass.LONG_LIVED_LIVE.value] is DeploymentUmbrella.LIVE
+    assert UMBRELLA_FOR_LIFECYCLE_CLASS[LifecycleClass.EPHEMERAL_EXPERIMENT.value] is DeploymentUmbrella.EXPERIMENT
+
+
+def test_umbrella_for_lifecycle_class_has_no_paper_entry() -> None:
+    """PAPER has no lifecycle_class — it is always an explicit override."""
+    assert DeploymentUmbrella.PAPER not in UMBRELLA_FOR_LIFECYCLE_CLASS.values()
+
+
+def test_deployment_target_is_frozen() -> None:
+    target = DeploymentTarget(
+        name="cefi-binance-",
+        kind=DeploymentKind.VM,
+        umbrella=DeploymentUmbrella.BATCH,
+        cloud=DeploymentCloud.GCP,
+        service="market-tick-data-service",
+        asset_group="cefi",
+        lifecycle_class=LifecycleClass.EPHEMERAL_BATCH.value,
+    )
+    with pytest.raises(FrozenInstanceError):
+        target.umbrella = DeploymentUmbrella.LIVE  # type: ignore[misc]  # frozen-dataclass mutation is the assertion
+
+
+def test_deployment_target_allows_empty_lifecycle_class_for_cloud_run_jobs() -> None:
+    """Cloud Run jobs have no VM lifecycle class; "" is the canonical sentinel."""
+    target = DeploymentTarget(
+        name="cf-manifest-audit",
+        kind=DeploymentKind.CLOUD_RUN_JOB,
+        umbrella=DeploymentUmbrella.BATCH,
+        cloud=DeploymentCloud.GCP,
+        service="manifest-audit",
+        asset_group="",
+        lifecycle_class="",
+    )
+    assert target.lifecycle_class == ""
+    assert target.asset_group == ""
+
+
+def test_deployment_symbols_exported_from_uac_root() -> None:
+    """The root UAC import surface re-exports the umbrella contracts (same objects)."""
+    assert RootDeploymentUmbrella is DeploymentUmbrella
+    assert RootDeploymentTarget is DeploymentTarget
+    assert ROOT_UMBRELLA_FOR_LIFECYCLE_CLASS is UMBRELLA_FOR_LIFECYCLE_CLASS

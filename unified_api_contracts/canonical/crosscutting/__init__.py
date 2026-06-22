@@ -67,6 +67,11 @@ from .ledger import PositionLedgerRow as PositionLedgerRow
 from .ledger import PricingLedger as PricingLedger
 from .ledger import TreasuryLedger as TreasuryLedger
 from .ledger import assert_no_cross_client_transfer as assert_no_cross_client_transfer
+from .lifecycle_class import UMBRELLA_FOR_LIFECYCLE_CLASS as UMBRELLA_FOR_LIFECYCLE_CLASS
+from .lifecycle_class import DeploymentCloud as DeploymentCloud
+from .lifecycle_class import DeploymentKind as DeploymentKind
+from .lifecycle_class import DeploymentTarget as DeploymentTarget
+from .lifecycle_class import DeploymentUmbrella as DeploymentUmbrella
 from .lifecycle_class import LifecycleClass as LifecycleClass
 from .lifecycle_class import VmPrefixSpec as VmPrefixSpec
 from .lifecycle_class import classify_cloud_run_service as classify_cloud_run_service
