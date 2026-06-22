@@ -1177,6 +1177,7 @@ class DataPipelineAlertCategory(StrEnum):
     MANIFEST = "MANIFEST"
     CATALOG = "CATALOG"
     WATCHER = "WATCHER"
+    DIGEST = "DIGEST"
 
 
 class DataPipelineEscalation(StrEnum):
@@ -1331,4 +1332,7 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     _dp_rule("DP-CATALOG-001", _C.CATALOG, "DP_CATALOG_NOT_RUNNING", _S.CRITICAL, _E.PAGE_OPERATOR),
     _dp_rule("DP-WATCHER-001", _C.WATCHER, "DP_ZOMBIE_WATCHDOG_DOWN", _S.CRITICAL, _E.PAGE_OPERATOR),
     _dp_rule("DP-WATCHER-002", _C.WATCHER, "DP_CRON_DID_NOT_FIRE", _S.CRITICAL, _E.PAGE_OPERATOR),
+    # ── DP-DIGEST (daily summaries, INFO) ───────────────────────────────────
+    _dp_rule("DP-DIGEST-001", _C.DIGEST, "DP_DAILY_DIGEST", _S.INFO, _E.FILE_ISSUE),
+    _dp_rule("DP-DIGEST-002", _C.DIGEST, "DP_HYGIENE_SUMMARY", _S.INFO, _E.FILE_ISSUE),
 )
