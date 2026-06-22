@@ -658,26 +658,38 @@ def get_all_sources_with_priority(
     return [(source, pipeline_mode_for_source(source)) for source in sources]
 
 
-# Prediction venue → vendor source (the vendor IS the venue, like CeFi exchanges). KALSHI
-# data comes from kalshi, Polymarket from polymarket_clob (Gamma metadata via its explicit
-# venue). Consulted by live_source_for_venue BEFORE the data_type-level SOURCE_PRIORITY
-# primary so a KALSHI shard is never mis-attributed to polymarket_clob (priority[0]).
+# Per-venue LIVE/REPLAY source overrides consulted by live_source_for_venue BEFORE the
+# data_type-level SOURCE_PRIORITY primary (so a shard is never mis-attributed to priority[0]).
+# Prediction: vendor IS the venue; KALSHI→kalshi, Polymarket→polymarket_clob (Gamma metadata
+# via its explicit venue). The data_type primary polymarket_clob would mis-stamp KALSHI.
 _PREDICTION_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
     "kalshi": "kalshi",
     "polymarket": "polymarket_clob",
     "polymarket_gamma": "polymarket_gamma_api",
 }
 
-# CeFi crypto-perp venue → vendor source. The venue token is hyphenated (``KALSHI-PERP``)
-# but its source token is underscored (``kalshi_perp``); ``CEFI_LIVE_VENUES`` holds the
-# UNDERSCORE source form, so the hyphen venue never matches it and would fall through to
-# the (cefi, book_snapshot) SOURCE_PRIORITY primary ``tardis`` — a BATCH-only flat-file
-# archive with no LIVE_ PipelineMode → ``live_pipeline_mode_for_venue`` would raise. The
-# live source for a perp venue IS its own dedicated WS feed (kalshi_perp / polymarket_perp).
-# Consulted by live_source_for_venue in the cefi branch BEFORE the CEFI_LIVE_VENUES check.
+# CeFi crypto-perp venue (hyphen) → its own underscore WS-feed source token. The hyphen venue
+# never matches CEFI_LIVE_VENUES (underscore form) so it would fall through to the batch-only
+# `tardis` book_snapshot primary (no LIVE_ PipelineMode → live_pipeline_mode_for_venue raises).
 _CEFI_PERP_LIVE_SOURCE_FOR_VENUE: dict[str, str] = {
     "kalshi-perp": "kalshi_perp",
     "polymarket-perp": "polymarket_perp",
+}
+
+# CeFi CEX venue → bare exchange VENDOR (the live source), keyed by the venue's vendor PREFIX
+# (segment before the first ``-``). The live/replay writer venue carries a market-type suffix
+# (``BINANCE-FUTURES`` / ``OKX-SWAP`` / ``BYBIT-LINEAR`` …) but the live source is the bare
+# vendor, which is what CEFI_LIVE_VENUES + SOURCE_MODE_CAPABILITY + LIVE_<vendor> hold. Unlike
+# hyperliquid (venue == vendor), a CEX venue ≠ its vendor, so the bare CEFI_LIVE_VENUES check
+# missed ``binance-futures`` → fell through to batch-only ``tardis`` (no ``live_`` PipelineMode
+# → raised "No PipelineMode for source 'tardis' in mode 'live'"; bug#9: no CEX live capture).
+# tardis stays the index-0 BATCH source for these venues; this map is LIVE/REPLAY only.
+_CEFI_CEX_VENDOR_FOR_VENUE_PREFIX: dict[str, str] = {
+    "binance": "binance",
+    "okx": "okx",
+    "bybit": "bybit",
+    "kraken": "kraken",
+    "deribit": "deribit",
 }
 
 
@@ -711,6 +723,15 @@ def live_source_for_venue(asset_group: str, venue: str, data_type: str) -> str:
         return _CEFI_PERP_LIVE_SOURCE_FOR_VENUE[venue_norm]
     if ag_norm == "cefi" and venue_norm in CEFI_LIVE_VENUES:
         return venue_norm
+    # CeFi CEX venue → vendor source by PREFIX (the segment before the first ``-``): the
+    # live/replay writer venue carries a market-type suffix (``BINANCE-FUTURES`` /
+    # ``OKX-SWAP`` / ``BYBIT-LINEAR`` …) but the live source is the bare exchange vendor.
+    # tardis remains the index-0 BATCH source for these venues; this resolves LIVE/REPLAY
+    # only (the (cefi, …) SOURCE_PRIORITY primary ``tardis`` has no ``live_`` PipelineMode).
+    if ag_norm == "cefi":
+        vendor = _CEFI_CEX_VENDOR_FOR_VENUE_PREFIX.get(venue_norm.split("-", 1)[0])
+        if vendor is not None:
+            return vendor
     # Prediction is venue-disambiguated like CeFi: the data VENDOR IS the venue. The
     # data_type-level SOURCE_PRIORITY primary (polymarket_clob) would mis-attribute KALSHI
     # live/replay data to polymarket — so resolve KALSHI→kalshi (and the explicit Gamma venue)
