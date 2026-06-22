@@ -183,7 +183,8 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     # decentralized net 2026-06-02 (BSC isolated + core + Ethereum all live,
     # ``markets`` returns data, ``_meta.block.timestamp`` at head). No daily
     # snapshot history entity and no dedicated liquidation/risk-param entity
-    # exists → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    # exists → live-only, ``lending_indices`` ONLY (gas is chain-level, not
+    # per-protocol — collected once per chain at venue=ALCHEMY).
     "venus": {
         "BSC": "H2a3D64RV4NNxyJqx9jVFQRBpQRzD6zNZjLDotgdCrTC",  # isolated pools
         "ETHEREUM": "Htf6Hh1qgkvxQxqbcv4Jp5AatsaiY5dNLVcySkpCaxQ8",
@@ -192,7 +193,8 @@ SUBGRAPH_IDS: dict[str, dict[str, str]] = {
     # ``supplyRate``/``borrowRate`` are decimal APY, ``borrowIndex``/
     # ``exchangeRate`` decimal; ``blockTimestamp`` per market). Verified
     # GREEN via The Graph (AVALANCHE) 2026-06-02. No snapshot history /
-    # liquidation entity → live-only, ``lending_indices`` + ``gas_fees`` ONLY.
+    # liquidation entity → live-only, ``lending_indices`` ONLY (gas is
+    # chain-level, not per-protocol — collected once per chain at venue=ALCHEMY).
     "benqi": {
         "AVALANCHE": "HcTvZi3fwucvRJvVmtFzNDTnomvMBk64xCLNQQg6GPAV",
     },
@@ -350,7 +352,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "liquidation_events",  # LiquidationCall events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
             "flash_loan_events",  # FlashLoan events via subgraph (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
             "position_data",  # Top-500 user positions by supplied_usd (AAVE_V3-ETHEREUM/ARBITRUM/POLYGON)
-            "gas_fees",
         ],
         mtds_operations=[
             "collect-lending-indices",
@@ -358,7 +359,6 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "collect-liquidation-events",
             "collect-flash-loan-events",
             "collect-position-data",
-            "collect-gas-fees",
         ],
         required_tokens=frozenset({"AAVE", "GHO"}),
     ),
@@ -366,16 +366,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="SPARK",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"MKR", "DAI"}),
     ),
     "compound_v3": _ProtocolCapability(
         venue_prefix="COMPOUND_V3",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-lending-indices", "collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-lending-indices", "collect-liquidations"],
         required_tokens=frozenset({"COMP"}),
     ),
     "morpho": _ProtocolCapability(
@@ -386,13 +386,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             *_LENDING_DATA,
             "liquidation_events",  # LiquidationCall events (MORPHO-ETHEREUM 2024-01-08)
             "position_data",  # Top user positions (MORPHO-ETHEREUM 2024-01-08)
-            "gas_fees",
         ],
         mtds_operations=[
             "collect-liquidations",
             "collect-liquidation-events",
             "collect-position-data",
-            "collect-gas-fees",
         ],
     ),
     # ── Green-venue lending adapters (2026-06-02 smoke tests; slot 7) ──
@@ -447,16 +445,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="FLUID",
         protocol_class=ProtocolClass.LENDING,
         instrument_types=_LENDING,
-        data_types=[*_LENDING_DATA, "gas_fees"],
-        mtds_operations=["collect-liquidations", "collect-gas-fees"],
+        data_types=[*_LENDING_DATA],
+        mtds_operations=["collect-liquidations"],
     ),
     # ── EVM DEX — Native schema ─────────────────────────────────
     "uniswap_v2": _ProtocolCapability(
         venue_prefix="UNISWAP_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"UNI"}),
     ),
     "uniswap_v3": _ProtocolCapability(
@@ -466,33 +464,32 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         data_types=[
             *_DEX_DATA,
             "position_data",  # LP position data — top 1000 by liquidity (UNISWAP_V3-ETHEREUM 2021-05-05)
-            "gas_fees",
         ],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-position-data", "collect-gas-fees"],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-position-data"],
         required_tokens=frozenset({"UNI"}),
     ),
     "uniswap_v4": _ProtocolCapability(
         venue_prefix="UNISWAP_V4",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"UNI"}),
     ),
     "balancer": _ProtocolCapability(
         venue_prefix="BALANCER",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"BAL"}),
     ),
     "curve": _ProtocolCapability(
         venue_prefix="CURVE",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"CRV", "CRVUSD"}),
     ),
     # ── EVM DEX — Forks (reuse uniswap_v3 adapter) ─────────────
@@ -500,59 +497,59 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
         venue_prefix="PANCAKESWAP_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
     ),
     "sushiswap_v3": _ProtocolCapability(
         venue_prefix="SUSHISWAP_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"SUSHI"}),
     ),
     "sushiswap": _ProtocolCapability(
         venue_prefix="SUSHISWAP",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
         required_tokens=frozenset({"SUSHI"}),
     ),
     "aerodrome_v3": _ProtocolCapability(
         venue_prefix="AERODROME_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
     ),
     "camelot_v3": _ProtocolCapability(
         venue_prefix="CAMELOT_V3",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
     ),
     "velodrome_v2": _ProtocolCapability(
         venue_prefix="VELODROME_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
     ),
     "trader_joe_v2": _ProtocolCapability(
         venue_prefix="TRADER_JOE_V2",
         protocol_class=ProtocolClass.DEX,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-dex-swaps", "collect-gas-fees"],
+        data_types=[*_DEX_DATA],
+        mtds_operations=["collect-dex-pools", "collect-dex-swaps"],
     ),
     "gmx": _ProtocolCapability(
         venue_prefix="GMX",
         protocol_class=ProtocolClass.PERPS,
         instrument_types=_POOL,
-        data_types=[*_DEX_DATA, *_PERPS_DATA, "liquidations", "gas_fees"],
-        mtds_operations=["collect-dex-pools", "collect-perp-funding", "collect-gas-fees"],
+        data_types=[*_DEX_DATA, *_PERPS_DATA, "liquidations"],
+        mtds_operations=["collect-dex-pools", "collect-perp-funding"],
     ),
     # ── EVM Yield/Staking (static adapters, no subgraph) ────────
     "lido": _ProtocolCapability(
@@ -563,9 +560,8 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             *_YIELD_DATA,
             "staking_yields",  # stETH APY daily rate (LIDO-ETHEREUM 2020-12-18)
             "rewards",
-            "gas_fees",
         ],
-        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields", "collect-gas-fees"],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields"],
         required_tokens=frozenset({"LDO", "STETH", "WSTETH"}),
     ),
     "etherfi": _ProtocolCapability(
@@ -576,17 +572,16 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             *_YIELD_DATA,
             "staking_yields",  # weETH APY (ETHERFI-ETHEREUM 2023-11-01)
             "rewards",
-            "gas_fees",
         ],
-        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields", "collect-gas-fees"],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-staking-yields"],
         required_tokens=frozenset({"ETHFI", "EETH", "WEETH"}),
     ),
     "ethena": _ProtocolCapability(
         venue_prefix="ETHENA",
         protocol_class=ProtocolClass.YIELD,
         instrument_types=_YIELD,
-        data_types=[*_YIELD_DATA, "gas_fees"],
-        mtds_operations=["collect-lst-rates", "collect-oracle-prices", "collect-gas-fees"],
+        data_types=[*_YIELD_DATA],
+        mtds_operations=["collect-lst-rates", "collect-oracle-prices"],
         required_tokens=frozenset({"USDE", "SUSDE"}),
     ),
     "eigenlayer": _ProtocolCapability(
@@ -598,13 +593,11 @@ PROTOCOL_CAPABILITIES: dict[str, _ProtocolCapability] = {
             "eigenlayer_rewards",  # Per-operator restaking rewards (EIGENLAYER-ETHEREUM 2024-08-06)
             "staking_yields",  # Restaking APY per operator (EIGENLAYER-ETHEREUM 2024-08-06)
             "oracle_prices",
-            "gas_fees",
         ],
         mtds_operations=[
             "collect-eigenlayer-rewards",
             "collect-staking-yields",
             "collect-oracle-prices",
-            "collect-gas-fees",
         ],
         required_tokens=frozenset({"EIGEN", "ETHFI"}),
     ),
