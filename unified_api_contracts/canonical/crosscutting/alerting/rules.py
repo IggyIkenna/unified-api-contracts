@@ -16,6 +16,7 @@ these at CI time.
 from __future__ import annotations
 
 import fnmatch
+from enum import StrEnum
 from typing import Final
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -1134,4 +1135,200 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             "Catch-all for events not matched above. Nothing is silent — every event reaches at least Telegram."
         ),
     ),
+)
+
+
+# ---------------------------------------------------------------------------
+# DATA_PIPELINE_ALERT_RULES — data-pipeline self-monitoring routing contract.
+#
+# Parallel to :data:`LIVE_ALERT_RULES`, but for the data-pipeline failure-mode
+# registry (``codex/05-infrastructure/data-pipeline-alerts.registry.yaml``,
+# ~40 DP-* modes across FETCH/COVERAGE/PATH/VM/RATE/ENV/ORDER/MANIFEST/CATALOG/
+# WATCHER). The registry yaml is the HUMAN SSOT mirror; THIS tuple is the
+# CONTRACT — the alerting-service router + the emitters share it (UAC does NOT
+# read the yaml at runtime; the entries are transcribed here, with a closed-set
+# sanity test asserting they stay in sync).
+#
+# The DP_* events are NOT :class:`AlertCode` members (they are a distinct,
+# runtime-data-pipeline event family in UTL ``events/event_types.py``), so they
+# CANNOT reuse :class:`AlertRule` (its validator requires an AlertCode-matching
+# ``event_pattern``). :class:`DataPipelineAlertRule` mirrors AlertRule's field
+# shape (``event_pattern → severity + channels``) and adds the registry's
+# ``category`` + ``escalation`` axes.
+#
+# Routing (per the registry ``severity_routing`` block + the plan): every rule
+# mirrors to the ``#data-pipeline-alerts`` Slack channel
+# (:data:`AlertChannel.SLACK`); CRITICAL additionally pages via Telegram +
+# PagerDuty (incident gateway). Plan:
+# ``data_pipeline_hardening_self_monitoring_2026_06_22.md`` Phase 0.
+# ---------------------------------------------------------------------------
+
+
+class DataPipelineAlertCategory(StrEnum):
+    """Closed set of data-pipeline failure-mode categories (registry ``category``)."""
+
+    FETCH = "FETCH"
+    COVERAGE = "COVERAGE"
+    PATH = "PATH"
+    VM = "VM"
+    RATE = "RATE"
+    ENV = "ENV"
+    ORDER = "ORDER"
+    MANIFEST = "MANIFEST"
+    CATALOG = "CATALOG"
+    WATCHER = "WATCHER"
+
+
+class DataPipelineEscalation(StrEnum):
+    """Closed set of escalation tiers (registry ``escalation``), mirroring the
+    CI-failure-watcher auto-recover-vs-escalate model."""
+
+    AUTO_RECOVER = "auto_recover"
+    FILE_ISSUE = "file_issue"
+    PAGE_OPERATOR = "page_operator"
+
+
+# The Slack channel token for #data-pipeline-alerts (SM webhook secret
+# DATA_PIPELINE_ALERTS_SLACK_WEBHOOK). Mirrors the registry ``channel`` field.
+DATA_PIPELINE_SLACK_CHANNEL: Final[str] = "data_pipeline_slack"
+
+
+class DataPipelineAlertRule(BaseModel):
+    """A single data-pipeline routing rule — ``event`` → severity + channels.
+
+    Parallel to :class:`AlertRule` but for the DP-* event family, which is not
+    in the closed :class:`AlertCode` set. Frozen + ``extra="forbid"`` for the
+    same fail-loud discipline. ``channels`` always includes
+    :data:`AlertChannel.SLACK` (the ``#data-pipeline-alerts`` mirror); CRITICAL
+    rules also carry Telegram + PagerDuty per the registry severity-routing.
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    registry_id: str
+    """Stable ``DP-<CATEGORY>-<NNN>`` id from the registry yaml."""
+
+    category: DataPipelineAlertCategory
+    """Failure-mode category (registry ``category``)."""
+
+    event: str
+    """The DP_* event name emitters produce (registry ``event``); the router
+    matches incoming event names against this exactly."""
+
+    severity: AlertSeverity
+    """CRITICAL / WARN / INFO (HIGH unused for data-pipeline)."""
+
+    channels: tuple[AlertChannel, ...]
+    """Dispatch channels. Always includes :data:`AlertChannel.SLACK` (the
+    #data-pipeline-alerts mirror); CRITICAL adds Telegram + PagerDuty."""
+
+    escalation: DataPipelineEscalation
+    """Escalation tier (registry ``escalation``)."""
+
+    @field_validator("event", "registry_id")
+    @classmethod
+    def _non_empty(cls, value: str) -> str:
+        if not value:
+            raise ValueError("DataPipelineAlertRule.event / registry_id must be non-empty")
+        return value
+
+    @field_validator("channels")
+    @classmethod
+    def _channels_include_slack(cls, value: tuple[AlertChannel, ...]) -> tuple[AlertChannel, ...]:
+        if AlertChannel.SLACK not in value:
+            raise ValueError(
+                "DataPipelineAlertRule.channels MUST include AlertChannel.SLACK "
+                "(the #data-pipeline-alerts mirror) for every rule"
+            )
+        return value
+
+    @model_validator(mode="after")
+    def _critical_pages(self) -> DataPipelineAlertRule:
+        if self.severity is AlertSeverity.CRITICAL:
+            missing = {AlertChannel.TELEGRAM, AlertChannel.PAGERDUTY} - set(self.channels)
+            if missing:
+                raise ValueError(
+                    f"CRITICAL DataPipelineAlertRule {self.registry_id} must page "
+                    f"(Telegram + PagerDuty); missing {sorted(c.value for c in missing)}"
+                )
+        return self
+
+
+def _dp_channels(severity: AlertSeverity) -> tuple[AlertChannel, ...]:
+    """Registry severity → channels: SLACK mirror always; CRITICAL also pages."""
+    if severity is AlertSeverity.CRITICAL:
+        return (AlertChannel.SLACK, AlertChannel.TELEGRAM, AlertChannel.PAGERDUTY)
+    return (AlertChannel.SLACK,)
+
+
+def _dp_rule(
+    registry_id: str,
+    category: DataPipelineAlertCategory,
+    event: str,
+    severity: AlertSeverity,
+    escalation: DataPipelineEscalation,
+) -> DataPipelineAlertRule:
+    return DataPipelineAlertRule(
+        registry_id=registry_id,
+        category=category,
+        event=event,
+        severity=severity,
+        channels=_dp_channels(severity),
+        escalation=escalation,
+    )
+
+
+# Transcribed from data-pipeline-alerts.registry.yaml (version 1). One rule per
+# `event:`. Keep IN SYNC with the yaml — the closed-set test asserts parity.
+_C = DataPipelineAlertCategory
+_S = AlertSeverity
+_E = DataPipelineEscalation
+
+DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
+    # ── DP-FETCH (class C1, keystone) ───────────────────────────────────────
+    _dp_rule("DP-FETCH-001", _C.FETCH, "DP_UNPROVEN_HONEST_ABSENCE", _S.CRITICAL, _E.FILE_ISSUE),
+    _dp_rule("DP-FETCH-002", _C.FETCH, "DP_AUTH_ERROR_NOT_FAILED", _S.CRITICAL, _E.FILE_ISSUE),
+    _dp_rule("DP-FETCH-003", _C.FETCH, "DP_RATELIMIT_AS_EMPTY", _S.WARN, _E.AUTO_RECOVER),
+    _dp_rule("DP-FETCH-004", _C.FETCH, "DP_SERVER_ERROR_AS_EMPTY", _S.CRITICAL, _E.FILE_ISSUE),
+    _dp_rule("DP-FETCH-005", _C.FETCH, "DP_MISSING_CREDENTIAL", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-FETCH-006", _C.FETCH, "DP_EMPTY_REPROBE_DISAGREEMENT", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-FETCH-007", _C.FETCH, "DP_RUN_MOSTLY_EMPTY", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-FETCH-008", _C.FETCH, "DP_CATALOG_FRESH_ASSERT_FALSE", _S.CRITICAL, _E.FILE_ISSUE),
+    # ── DP-COVERAGE (class C2) ──────────────────────────────────────────────
+    _dp_rule("DP-COVERAGE-001", _C.COVERAGE, "DP_FAILED_BEFORE_GENESIS", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-COVERAGE-002", _C.COVERAGE, "DP_WRONG_ASSET_GROUP", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-COVERAGE-003", _C.COVERAGE, "DP_VENUE_NOT_IN_ORACLE", _S.INFO, _E.FILE_ISSUE),
+    _dp_rule("DP-COVERAGE-004", _C.COVERAGE, "DP_EXPECTED_GRAIN_NONCANONICAL", _S.WARN, _E.AUTO_RECOVER),
+    # ── DP-PATH (class C3) ──────────────────────────────────────────────────
+    _dp_rule("DP-PATH-001", _C.PATH, "DP_NONCANONICAL_WRITE_PATH", _S.CRITICAL, _E.FILE_ISSUE),
+    _dp_rule("DP-PATH-002", _C.PATH, "DP_NONCANONICAL_PATH_ON_DISK", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-PATH-003", _C.PATH, "DP_PIPELINE_MODE_DRIFT", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-PATH-004", _C.PATH, "DP_LEGACY_SPELLING", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-PATH-005", _C.PATH, "DP_WRONG_BUCKET", _S.CRITICAL, _E.PAGE_OPERATOR),
+    # ── DP-VM (class C4) ────────────────────────────────────────────────────
+    _dp_rule("DP-VM-001", _C.VM, "DP_VM_EXIT_NONZERO", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-VM-002", _C.VM, "DP_VM_GONE_NO_CAPTURE", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-VM-003", _C.VM, "DP_VM_STALL", _S.WARN, _E.AUTO_RECOVER),
+    _dp_rule("DP-VM-004", _C.VM, "DP_EVENT_LOOP_STARVED", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-VM-005", _C.VM, "DP_NO_EARLY_PROGRESS", _S.INFO, _E.FILE_ISSUE),
+    _dp_rule("DP-VM-006", _C.VM, "DP_GCS_429_THRASH", _S.CRITICAL, _E.AUTO_RECOVER),
+    # ── DP-RATE (class C5) ──────────────────────────────────────────────────
+    _dp_rule("DP-RATE-001", _C.RATE, "DP_SOURCE_RATE_LIMITED", _S.WARN, _E.AUTO_RECOVER),
+    _dp_rule("DP-RATE-002", _C.RATE, "DP_KEY_POOL_EXHAUSTED", _S.CRITICAL, _E.PAGE_OPERATOR),
+    # ── DP-ENV (class C6) ───────────────────────────────────────────────────
+    _dp_rule("DP-ENV-001", _C.ENV, "DP_READER_WRITER_BUCKET_MISMATCH", _S.CRITICAL, _E.FILE_ISSUE),
+    _dp_rule("DP-ENV-002", _C.ENV, "DP_STALENESS_BELOW_CADENCE", _S.WARN, _E.AUTO_RECOVER),
+    # ── DP-ORDER (class C7) ─────────────────────────────────────────────────
+    _dp_rule("DP-ORDER-001", _C.ORDER, "DP_DOWNSTREAM_BEFORE_UPSTREAM", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-ORDER-002", _C.ORDER, "DP_LIVE_BATCH_SCHEMA_SKEW", _S.CRITICAL, _E.FILE_ISSUE),
+    _dp_rule("DP-ORDER-003", _C.ORDER, "DP_NULL_EMPTY_DOUBLE_COUNT", _S.WARN, _E.AUTO_RECOVER),
+    # ── DP-MANIFEST / DP-CATALOG / DP-WATCHER (infra meta) ──────────────────
+    _dp_rule("DP-MANIFEST-001", _C.MANIFEST, "CONSOLIDATOR_DOWN", _S.CRITICAL, _E.AUTO_RECOVER),
+    _dp_rule("DP-MANIFEST-002", _C.MANIFEST, "DP_NOT_V9", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-MANIFEST-003", _C.MANIFEST, "DP_PHANTOM_ROWS", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-MANIFEST-004", _C.MANIFEST, "DP_DIVERGENT_EMPTY", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-MANIFEST-005", _C.MANIFEST, "DP_SHARD_PILLAR_FAIL", _S.WARN, _E.FILE_ISSUE),
+    _dp_rule("DP-CATALOG-001", _C.CATALOG, "DP_CATALOG_NOT_RUNNING", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-WATCHER-001", _C.WATCHER, "DP_ZOMBIE_WATCHDOG_DOWN", _S.CRITICAL, _E.PAGE_OPERATOR),
+    _dp_rule("DP-WATCHER-002", _C.WATCHER, "DP_CRON_DID_NOT_FIRE", _S.CRITICAL, _E.PAGE_OPERATOR),
 )

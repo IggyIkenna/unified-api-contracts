@@ -24,8 +24,13 @@ from .codes import (
     KillSwitchScope,
 )
 from .rules import (
+    DATA_PIPELINE_ALERT_RULES,
+    DATA_PIPELINE_SLACK_CHANNEL,
     LIVE_ALERT_RULES,
     AlertRule,
+    DataPipelineAlertCategory,
+    DataPipelineAlertRule,
+    DataPipelineEscalation,
     UnknownAlertCodeError,
     UnknownThresholdKeyError,
 )
@@ -39,6 +44,8 @@ from .thresholds import (
 __all__ = [
     "ALERT_CODES",
     "ALERT_THRESHOLDS",
+    "DATA_PIPELINE_ALERT_RULES",
+    "DATA_PIPELINE_SLACK_CHANNEL",
     "LIVE_ALERT_RULES",
     "RECON_GREEN_THRESHOLDS",
     "AlertChannel",
@@ -46,6 +53,9 @@ __all__ = [
     "AlertRule",
     "AlertSeverity",
     "AlertThreshold",
+    "DataPipelineAlertCategory",
+    "DataPipelineAlertRule",
+    "DataPipelineEscalation",
     "KillSwitchScope",
     "ThresholdUnit",
     "UnknownAlertCodeError",
