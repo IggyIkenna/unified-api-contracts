@@ -109,10 +109,20 @@ class VmPrefixSpec:
             for heartbeat-only VMs (e.g. the watchdog itself, the
             manifest consolidator).
         lifecycle_class: Which Monitor sub-tab this VM appears under.
+        umbrella: Optional deployment-observability umbrella override.
+            ``None`` (default) means the umbrella derives from
+            ``lifecycle_class`` via :data:`UMBRELLA_FOR_LIFECYCLE_CLASS`.
+            Set explicitly to :attr:`DeploymentUmbrella.PAPER` on the
+            paper-launcher prefixes (``defi-paper-`` /
+            ``funding-ensemble-paper-`` / ``strategy-paper-``) — a paper
+            cron is ``SCHEDULED_RECURRING`` / ``LONG_LIVED_LIVE`` by
+            lifecycle yet ``paper`` by umbrella, so the lifecycle_class
+            mapping would mis-classify it without this override.
     """
 
     bucket: str | None
     lifecycle_class: LifecycleClass
+    umbrella: DeploymentUmbrella | None = None
 
 
 def classify_vm_name(
