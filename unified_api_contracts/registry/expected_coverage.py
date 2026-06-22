@@ -427,10 +427,31 @@ def _resolve_capability_for_venue(venue: str) -> SourceCapability | None:
 def get_source_coverage_start_for_data_type(venue: str, data_type: str) -> _date | None:
     """Return the earliest date a venue has data for a specific data_type.
 
-    Reads from SourceCapability.coverage_start[data_type]. Returns None if
-    the venue has no capability record, no coverage_start dict, or no entry
-    for this data_type. Callers treat None as "no clip".
+    Resolution order (first match wins):
+
+    1. **DeFi per-(venue, data_type) measured floor** — the data-driven
+       ``DEFI_DATA_TYPE_COVERAGE_START`` registry (the earliest captured date
+       per pair, read from the prod manifest). DeFi data_types are only
+       materialised from the date our subgraph/RPC adapter began collecting
+       them, which is later than protocol launch; this floor stops the oracle
+       expecting pre-collection dates (the DIVERGENT_EMPTY residual).
+    2. **SourceCapability.coverage_start[data_type]** — the legacy
+       capability-declaration floor (cefi/tradfi venues, plus the original
+       6 defi capabilities keyed on legacy data_type names).
+
+    Returns None if neither matches — callers treat None as "no clip" (the
+    expected denominator runs from the start of the query window). Per-pair +
+    data-driven by design: there is **no flat default** (operator HARD POINT).
     """
+    from unified_api_contracts.canonical.coverage_starts import (  # noqa: imports-inside-functions
+        DEFI_DATA_TYPE_COVERAGE_START,
+    )
+
+    defi_venue = DEFI_DATA_TYPE_COVERAGE_START.get(venue.upper())
+    if defi_venue is not None:
+        defi_start = defi_venue.get(data_type)
+        if defi_start is not None:
+            return defi_start
     cap = _resolve_capability_for_venue(venue)
     if cap is None or cap.coverage_start is None:
         return None
