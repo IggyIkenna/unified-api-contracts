@@ -829,6 +829,113 @@ class UnprovenHonestAbsenceError(ValueError):
         )
 
 
+def fetch_error_signal_for_status(http_status: int) -> str:
+    """Map an HTTP status code to the matching :class:`FetchErrorSignal` value.
+
+    Returns ``""`` (the empty / honest-absence-compatible signal) for any 2xx
+    status. Outside 2xx, returns the most specific disqualifying signal:
+    ``AUTH_401`` / ``AUTH_403`` / ``RATE_LIMITED_429`` / ``SERVER_5XX`` /
+    ``HTTP_NON_2XX`` (the catch-all for 3xx + other 4xx). Threaded from an
+    adapter's HTTP layer into :func:`build_fetch_evidence` so a non-2xx zero-row
+    response is provably NOT honest absence (keystone class C1).
+    """
+    if 200 <= http_status < 300:
+        return ""
+    if http_status == 401:
+        return FetchErrorSignal.AUTH_401.value
+    if http_status == 403:
+        return FetchErrorSignal.AUTH_403.value
+    if http_status == 429:
+        return FetchErrorSignal.RATE_LIMITED_429.value
+    if 500 <= http_status < 600:
+        return FetchErrorSignal.SERVER_5XX.value
+    return FetchErrorSignal.HTTP_NON_2XX.value
+
+
+def fetch_error_signal_for_exception(exc: BaseException) -> str:
+    """Map an adapter-fetch exception to the matching :class:`FetchErrorSignal`.
+
+    A timeout-shaped exception (``TimeoutError`` / asyncio timeout / a class name
+    containing ``Timeout``) maps to ``TIMEOUT``; a connection-level failure
+    (``ConnectionError`` / DNS / TCP / TLS) maps to ``CONNECT_ERROR``; everything
+    else is the generic ``ADAPTER_EXCEPTION``. Any of these DISQUALIFIES the
+    fetch from proving honest absence — the adapter must ``record_failed``.
+    """
+    if isinstance(exc, TimeoutError) or "timeout" in type(exc).__name__.lower():
+        return FetchErrorSignal.TIMEOUT.value
+    if isinstance(exc, ConnectionError) or any(
+        token in type(exc).__name__.lower() for token in ("connect", "dns", "socket", "tls", "ssl")
+    ):
+        return FetchErrorSignal.CONNECT_ERROR.value
+    return FetchErrorSignal.ADAPTER_EXCEPTION.value
+
+
+def build_fetch_evidence(
+    *,
+    source: str,
+    endpoint: str,
+    attempted_at: datetime,
+    rows_in_response: int = 0,
+    http_status: int | None = None,
+    response_received: bool = True,
+    exception: BaseException | None = None,
+    error_signal: str | None = None,
+    missing_credential: bool = False,
+) -> FetchEvidence:
+    """Construct a :class:`FetchEvidence` from what an adapter knows at a fetch site.
+
+    The single mapping every adapter reuses so the keystone gate
+    (``record_empty(reason=SOURCE_RETURNED_ZERO)``) sees a value-object that
+    truthfully reflects the HTTP outcome. The ``error_signal`` is resolved with
+    this precedence (first non-empty wins):
+
+    1. an explicit ``error_signal`` argument (the adapter already classified);
+    2. ``MISSING_CREDENTIAL`` when ``missing_credential`` is True (DP-FETCH-005);
+    3. ``SOURCE_UNREACHABLE`` when ``response_received`` is False;
+    4. the exception-derived signal when ``exception`` is not None
+       (:func:`fetch_error_signal_for_exception`);
+    5. the HTTP-status-derived signal when ``http_status`` is not None
+       (:func:`fetch_error_signal_for_status`);
+    6. ``""`` (clean — only a genuine 2xx + 0-rows reaches here).
+
+    A clean call ``build_fetch_evidence(source=..., endpoint=..., attempted_at=...,
+    rows_in_response=0, http_status=200)`` yields evidence that
+    :meth:`FetchEvidence.proves_honest_absence` accepts. Anything else (auth /
+    rate-limit / 5xx / timeout / exception / missing-credential / unreachable /
+    non-2xx / rows>0) yields evidence that the writer REJECTS, steering the
+    adapter to ``record_failed``. Keystone plan:
+    ``data_pipeline_hardening_self_monitoring_2026_06_22.md`` Phase 1.
+    """
+    resolved_status = (
+        http_status if http_status is not None else (200 if (response_received and exception is None) else 0)
+    )
+    if error_signal:
+        signal = error_signal
+    elif missing_credential:
+        signal = FetchErrorSignal.MISSING_CREDENTIAL.value
+    elif exception is not None:
+        # An exception is MORE SPECIFIC than the generic "no response" — a
+        # TimeoutError/ConnectionError naturally has response_received=False, so
+        # the exception-derived signal (TIMEOUT/CONNECT_ERROR/ADAPTER_EXCEPTION)
+        # MUST win over SOURCE_UNREACHABLE (fixed 2026-06-22: precedence bug).
+        signal = fetch_error_signal_for_exception(exception)
+    elif not response_received:
+        signal = FetchErrorSignal.SOURCE_UNREACHABLE.value
+    elif http_status is not None:
+        signal = fetch_error_signal_for_status(http_status)
+    else:
+        signal = ""
+    return FetchEvidence(
+        http_status=resolved_status,
+        response_received=response_received and exception is None,
+        rows_in_response=rows_in_response,
+        source=source,
+        endpoint=endpoint,
+        attempted_at=attempted_at,
+        error_signal=signal,
+    )
+
+
 __all__ = [
     "BUNDLED_DATA_TYPES",
     "DATA_TYPE_TO_CLUSTER_REGISTRY",
@@ -849,8 +956,11 @@ __all__ = [
     "FetchEvidence",
     "LegacyBlankErrorReasonError",
     "UnprovenHonestAbsenceError",
+    "build_fetch_evidence",
     "compute_honest_coverage",
     "extract_es_options_cluster",
+    "fetch_error_signal_for_exception",
+    "fetch_error_signal_for_status",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
     "parse_futures_expiry",
