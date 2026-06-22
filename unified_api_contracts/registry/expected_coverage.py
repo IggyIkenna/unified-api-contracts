@@ -652,7 +652,33 @@ def _venue_launch_date_for(asset_group: str, source: str) -> _date | None:
     table = table_by_group.get(asset_group.lower())
     if table is None:
         return None
-    return _parse_iso_date(table.get(source))
+    exact = _parse_iso_date(table.get(source))
+    if exact is not None:
+        return exact
+    # DeFi flat-protocol fallback (closes the chain-blind divergence class,
+    # 2026-06-22): the manifest writes FLAT venue names (``UNISWAP_V4``,
+    # ``CURVE``, ``AAVE_V3``, ``ETHERFI`` …) but ``DEFI_VENUE_LAUNCH_DATES`` is
+    # keyed mostly by ``PROTOCOL-CHAIN`` (``UNISWAP_V4-ETHEREUM`` = 2025-01-31),
+    # so the exact lookup misses → the pre-launch gate never fires → the oracle
+    # wrongly returns SHOULD_HAVE_DATA for every date back to the default
+    # window start (2018), producing tens of thousands of spurious
+    # DIVERGENT_EMPTY rows on dates BEFORE the protocol existed. Resolve a flat
+    # protocol to the EARLIEST launch among its ``PROTOCOL-*`` chain entries —
+    # the conservative floor (a protocol cannot have data on ANY chain before
+    # its first chain deployment), so this never marks real data as pre-launch,
+    # it only gates dates before the protocol launched anywhere. Same
+    # flat-vs-VENUE-CHAIN mismatch the scope-policy dict already fixed for
+    # ``EXPECTED_COVERAGE_BY_ASSET_GROUP``; this extends it to the launch gate.
+    if asset_group.lower() == "defi" and "-" not in source:
+        prefix = f"{source.upper()}-"
+        chain_dates = [
+            parsed
+            for key, value in table.items()
+            if key.upper().startswith(prefix) and (parsed := _parse_iso_date(value)) is not None
+        ]
+        if chain_dates:
+            return min(chain_dates)
+    return None
 
 
 def _chain_genesis_date_for(chain: str) -> _date | None:

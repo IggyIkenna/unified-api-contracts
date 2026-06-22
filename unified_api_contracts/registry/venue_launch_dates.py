@@ -212,6 +212,29 @@ DEFI_VENUE_LAUNCH_DATES: dict[str, str] = {
     # Pre-2018 venues kept for completeness (no EXPECTED_PRE_VENUE_LAUNCH rows
     # within the default [2018-01-01, today] window):
     "MAKER": "2017-12-19",  # MakerDAO single-collateral DAI launch
+    # ---------------------------------------------------------------------------
+    # Bare-protocol launch dates for the LST / lending / DEX / restaking venues
+    # that are in EXPECTED_COVERAGE_BY_ASSET_GROUP["defi"] (flat venue keys) but
+    # had NO launch-date entry — the dominant residual DIVERGENT_EMPTY class
+    # after the flat-protocol fallback landed (2026-06-22). Without these the
+    # oracle returns SHOULD_HAVE_DATA for every date back to the 2018 window
+    # start, flagging tens of thousands of honest pre-launch empties as
+    # divergent. Conservative EARLIEST documented mainnet launch (per the
+    # "prefer LATER when uncertain" rule these are well-documented dates).
+    "MORPHO": "2022-06-16",  # Morpho Optimizer mainnet (Morpho Blue 2024-01; earliest = Optimizer)
+    "MORPHOVAULTS-ETHEREUM": "2024-01-04",  # MetaMorpho vaults (sister of bare MORPHOVAULTS above)
+    "AERODROME_V3": "2023-08-28",  # Aerodrome Finance launch on Base
+    "CAMELOT_V3": "2023-05-15",  # Camelot V3 (Algebra) on Arbitrum
+    "FLUID": "2024-01-30",  # Fluid (Instadapp) lending/DEX mainnet
+    "SPARK": "2023-05-09",  # Spark Protocol (MakerDAO sub-DAO lending) mainnet
+    "PUFFER": "2024-06-14",  # Puffer Finance pufETH liquid restaking mainnet
+    "SWELL": "2023-04-12",  # Swell Network swETH liquid staking
+    "STAKEWISE": "2021-03-24",  # StakeWise V2 liquid staking
+    "STADER": "2023-01-10",  # Stader ETHx liquid staking (Polygon MaticX earlier; ETH = 2023)
+    "MANTLE": "2024-01-26",  # Mantle mETH liquid staking (Mantle LSP)
+    "ANKR": "2020-12-22",  # Ankr ankrETH liquid staking
+    "COINBASE": "2022-08-24",  # Coinbase cbETH wrapped staked ETH launch
+    "EIGENLAYER": "2023-06-14",  # EigenLayer restaking mainnet stage-1
 }
 """DeFi venue (``PROTOCOL-CHAIN`` or bare ``PROTOCOL``) → public-launch date.
 
