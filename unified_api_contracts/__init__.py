@@ -250,6 +250,7 @@ from .canonical.crosscutting.source_priority import (
     get_source_priority,
     has_source_priority,
     is_source_capable_for_venue,
+    is_valid_manifest_source,
     live_pipeline_mode_for_venue,
     live_source_for_venue,
     modes_for,
@@ -259,6 +260,7 @@ from .canonical.crosscutting.source_priority import (
     source_required,
     source_supports,
     sources_supporting,
+    valid_manifest_sources,
 )
 from .canonical.crosscutting.strategy_family import (
     STRATEGY_FAMILY_REGISTRY,
@@ -2162,6 +2164,7 @@ __all__ = [
     "select_primary_available_source",
     "assert_source_capable_for_venue",
     "is_source_capable_for_venue",
+    "is_valid_manifest_source",
     "SourceNotCapableForVenueError",
     "Mode",
     "Cadence",
@@ -2221,6 +2224,7 @@ __all__ = [
     "resolve_exchange",
     "scenarios_for_archetype",
     "source_required",
+    "valid_manifest_sources",
     "source_string_for",
     "valid_data_types_for_instrument_type",
     "valid_data_types_for_venue_instrument_type",

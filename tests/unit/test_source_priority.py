@@ -19,7 +19,9 @@ from unified_api_contracts.canonical.crosscutting.source_priority import (
     get_primary_source_with_latency,
     get_source_priority,
     has_source_priority,
+    is_valid_manifest_source,
     source_required,
+    valid_manifest_sources,
 )
 
 # ---------------------------------------------------------------------------
@@ -341,3 +343,74 @@ def test_get_primary_source_with_latency_for_prediction_trades() -> None:
 def test_get_primary_source_with_latency_unknown_pair_raises() -> None:
     with pytest.raises(KeyError, match="No source priority registered"):
         get_primary_source_with_latency("nonexistent_asset_group", "nonexistent_data_type")
+
+
+# ---------------------------------------------------------------------------
+# bug#14 — manifest WRITE-validation predicate (SOURCE_PRIORITY ∪ live-vendors)
+# ---------------------------------------------------------------------------
+
+
+def test_is_valid_manifest_source_accepts_cefi_cex_live_vendor() -> None:
+    # bug#14: a CeFi CEX live capture stamps source=binance; binance is NOT in
+    # the batch SOURCE_PRIORITY[("cefi","trades")] list but IS a live vendor.
+    assert is_valid_manifest_source("cefi", "trades", "binance") is True
+    assert "binance" not in get_source_priority("cefi", "trades")
+
+
+def test_is_valid_manifest_source_accepts_all_cefi_cex_vendors() -> None:
+    for vendor in ("binance", "okx", "bybit", "kraken", "deribit"):
+        assert is_valid_manifest_source("cefi", "trades", vendor) is True
+
+
+def test_is_valid_manifest_source_accepts_batch_priority_source() -> None:
+    # tardis is the index-0 batch source — still valid for a write.
+    assert is_valid_manifest_source("cefi", "trades", "tardis") is True
+
+
+def test_is_valid_manifest_source_case_insensitive() -> None:
+    assert is_valid_manifest_source("cefi", "trades", "BINANCE") is True
+    assert is_valid_manifest_source("CEFI", "trades", "binance") is True
+
+
+def test_is_valid_manifest_source_rejects_unknown_source() -> None:
+    # An unregistered/unknown source still raises downstream (mis-stamp guard).
+    assert is_valid_manifest_source("cefi", "trades", "madeup") is False
+
+
+def test_is_valid_manifest_source_rejects_batch_only_non_member() -> None:
+    # yahoo is batch-only and not a cefi source → not a valid cefi write source.
+    assert is_valid_manifest_source("cefi", "trades", "yahoo") is False
+
+
+def test_get_source_priority_cefi_trades_unchanged() -> None:
+    # The batch read-priority list is UNCHANGED — exactly the 5 batch sources.
+    assert get_source_priority("cefi", "trades") == [
+        "tardis",
+        "aster",
+        "hyperliquid",
+        "kalshi_perp",
+        "polymarket_perp",
+    ]
+
+
+def test_valid_manifest_sources_is_superset_of_priority() -> None:
+    batch = set(get_source_priority("cefi", "trades"))
+    valid = valid_manifest_sources("cefi", "trades")
+    assert batch <= valid
+    # binance (live vendor) is in the valid write set but not the batch list.
+    assert "binance" in valid and "binance" not in batch
+
+
+def test_valid_manifest_sources_excludes_batch_only_live_vendor() -> None:
+    # polymarket_gamma_api is batch-only → never added as a prediction live vendor.
+    valid = valid_manifest_sources("prediction", "trades")
+    assert "polymarket_gamma_api" not in valid
+    # kalshi / polymarket_clob (the real prediction vendors) are valid.
+    assert "kalshi" in valid and "polymarket_clob" in valid
+
+
+def test_is_valid_manifest_source_tradfi_unaffected() -> None:
+    # tradfi has no per-venue live-vendor override map → only batch sources valid.
+    assert is_valid_manifest_source("tradfi", "trades", "databento") is True
+    assert is_valid_manifest_source("tradfi", "trades", "massive") is True
+    assert is_valid_manifest_source("tradfi", "trades", "binance") is False

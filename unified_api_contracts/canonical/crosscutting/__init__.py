@@ -114,6 +114,7 @@ from .source_priority import get_primary_source_with_latency as get_primary_sour
 from .source_priority import get_source_priority as get_source_priority
 from .source_priority import has_source_priority as has_source_priority
 from .source_priority import is_source_capable_for_venue as is_source_capable_for_venue
+from .source_priority import is_valid_manifest_source as is_valid_manifest_source
 from .source_priority import live_pipeline_mode_for_venue as live_pipeline_mode_for_venue
 from .source_priority import live_source_for_venue as live_source_for_venue
 from .source_priority import modes_for as modes_for
@@ -123,6 +124,7 @@ from .source_priority import select_primary_available_source as select_primary_a
 from .source_priority import source_required as source_required
 from .source_priority import source_supports as source_supports
 from .source_priority import sources_supporting as sources_supporting
+from .source_priority import valid_manifest_sources as valid_manifest_sources
 from .transfer_events import BusTransferType as BusTransferType
 from .transfer_events import TransferIntent as TransferIntent
 from .transfer_events import TransferPurpose as TransferPurpose
