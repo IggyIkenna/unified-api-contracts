@@ -321,7 +321,7 @@ def test_six_new_enum_members_present_in_pipeline_mode() -> None:
         # FootyStats
         ("footystats_predictions", PipelineMode.BATCH_FOOTYSTATS),
         ("footystats_matches", PipelineMode.BATCH_FOOTYSTATS),
-        ("footystats_odds", PipelineMode.BATCH_FOOTYSTATS),
+        ("footystats_odds", PipelineMode.BATCH_ODDS_API),
         # Understat
         ("understat_xg", PipelineMode.BATCH_UNDERSTAT),
         ("understat_xg_shots", PipelineMode.BATCH_UNDERSTAT),
