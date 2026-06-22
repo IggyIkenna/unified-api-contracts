@@ -99,9 +99,8 @@ class TestExpectedCoverageByAssetGroup:
         }
 
     def test_tradfi_us_equity_venues_ohlcv_only(self) -> None:
-        """NASDAQ + NYSE added 2026-05-17 (OHLCV-only MVP) — ohlcv_1m + ohlcv_1s, no trades/tbbo.
-        Databento lockdown 2026-06-18: DBEQ.BASIC (US Equities) fetches BOTH ohlcv-1s + ohlcv-1m
-        (both L0/free; 15m/1h/24h aggregated downstream). BARCHART remains operator-omitted.
+        """NASDAQ + NYSE OHLCV-only MVP — ohlcv_1m + ohlcv_1s (DBEQ.BASIC L0/free, operator 2026-06-21).
+        BARCHART remains operator-omitted (cost-prohibitive per-symbol tick).
         """
         tradfi = EXPECTED_COVERAGE_BY_ASSET_GROUP["tradfi"]
         assert tradfi["NASDAQ"] == ["ohlcv_1m", "ohlcv_1s"]
@@ -158,7 +157,7 @@ class TestExpectedCoverageByAssetGroup:
     def test_get_expected_data_types_for_venue_in_scope(self) -> None:
         cme = get_expected_data_types_for_venue_in_scope("tradfi", "CME")
         assert sorted(cme) == sorted(["trades", "ohlcv_1s", "ohlcv_1m", "tbbo"])
-        # NASDAQ is now in scope (ohlcv_1m + ohlcv_1s — DBEQ.BASIC fetches both, L0/free).
+        # NASDAQ carries ohlcv_1m + ohlcv_1s via DBEQ.BASIC (L0/free, operator 2026-06-21).
         assert get_expected_data_types_for_venue_in_scope("tradfi", "NASDAQ") == ["ohlcv_1m", "ohlcv_1s"]
 
     def test_get_expected_venues_in_scope(self) -> None:

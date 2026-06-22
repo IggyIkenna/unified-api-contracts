@@ -425,7 +425,7 @@ _SPORTS_ENTITY_TO_PIPELINE_MODE: dict[str, PipelineMode] = {
     # FootyStats entities
     "footystats_predictions": PipelineMode.BATCH_FOOTYSTATS,
     "footystats_matches": PipelineMode.BATCH_FOOTYSTATS,
-    "footystats_odds": PipelineMode.BATCH_ODDS_API,
+    "footystats_odds": PipelineMode.BATCH_FOOTYSTATS,
     # Understat entities
     "understat_xg": PipelineMode.BATCH_UNDERSTAT,
     "understat_xg_shots": PipelineMode.BATCH_UNDERSTAT,

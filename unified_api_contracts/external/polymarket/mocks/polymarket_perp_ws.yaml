@@ -1,0 +1,8 @@
+# STUB — BLOCKED-UPSTREAM-OUTAGE
+# PolymarketPerp live WebSocket (wss://perps-ws.polymarket.com) is NXDOMAIN as of 2026-06-21.
+# Connector: market_tick_data_service/live/connectors/polymarket_perp_ws.py
+# Status: BLOCKED-UPSTREAM-OUTAGE — endpoint DNS dead, no ticks until endpoint recovers.
+ws_url: wss://perps-ws.polymarket.com
+subscription: null
+frames: []
+version: 1
