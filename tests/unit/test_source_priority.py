@@ -141,7 +141,7 @@ def test_source_required_true_for_prediction_multi_source() -> None:
     registration — the writer cannot auto-disambiguate, so an explicit source stamp is REQUIRED.
     The single-source MARKET_LIFECYCLE cell (polymarket_gamma_api) stays auto-stampable."""
     assert source_required("prediction", "trades") is True
-    assert source_required("prediction", "book_snapshot") is True
+    assert source_required("prediction", "book_snapshot_5") is True
     assert source_required("prediction", "MARKET_LIFECYCLE") is False
 
 

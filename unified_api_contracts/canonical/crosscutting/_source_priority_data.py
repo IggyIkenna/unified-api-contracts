@@ -296,7 +296,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # (live_source_for_venue / _VENUE_OVERRIDES), never priority[0]. Kalshi registration:
     # prediction_venue_perps_and_live_clob_depth_2026_06_20.md (deep-history bulk seed + live).
     ("prediction", "trades"): ["polymarket_clob", "kalshi"],
-    ("prediction", "book_snapshot"): ["polymarket_clob", "kalshi"],
+    ("prediction", "book_snapshot_5"): ["polymarket_clob", "kalshi"],
     ("prediction", "prediction_canonical_question_group"): ["polymarket_clob", "kalshi"],
     # MARKET_LIFECYCLE source — instruments-service reads from Polymarket
     # gamma API ``/markets/{conditionId}`` for created/resolution/settlement

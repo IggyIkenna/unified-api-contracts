@@ -388,7 +388,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     ],
     "polymarket_market_microstructure": [
         InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),
-        InputReq(asset_group="prediction", data_type="book_snapshot", available_at_rule="tick_timestamp"),
+        InputReq(asset_group="prediction", data_type="book_snapshot_5", available_at_rule="tick_timestamp"),
     ],
     "polymarket_cross_market": [
         InputReq(asset_group="prediction", data_type="trades", available_at_rule="tick_timestamp"),

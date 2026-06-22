@@ -188,9 +188,9 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("tradfi", "commodity_features"): _COMPUTED_SERVICE_OUTPUT,
     ("tradfi", "energy_data"): _COMPUTED_SERVICE_OUTPUT,
     # ── Prediction ──
-    # "book_snapshot" is a legacy/non-canonical key in SOURCE_PRIORITY
-    # (prediction catalogue only carries "trades" and the prediction types).
-    ("prediction", "book_snapshot"): _CEFI_LEGACY_KEY,
+    # "book_snapshot_5" is the canonical prediction depth key in SOURCE_PRIORITY
+    # (upgraded from the legacy "book_snapshot" bare name — item 69/75-prediction).
+    ("prediction", "book_snapshot_5"): _CEFI_LEGACY_KEY,
     # ── Sports reference/classification data_types in SOURCE_PRIORITY
     #    that are NOT in SPORTS_DATA_TYPE_TO_SOURCE (not reachable via the
     #    "league" instrument_type's derived valid set).
@@ -431,10 +431,13 @@ class TestImpossiblePairsNotEnumerable:
             "(tradfi, option) must be frozenset() — leaf options roll up to the per-underlying options_chain bundle"
         )
 
-    def test_tradfi_combo_leaf_yields_no_rows(self) -> None:
-        """TradFi leaf COMBO — frozenset()."""
+    def test_tradfi_combo_drives_its_own_bundle(self) -> None:
+        """TradFi COMBO rolls up to its OWN per-underlying ``instrument_type=combo``
+        bundle (writer-grain alignment 2026-06-22) — unlike option, the combo row is
+        CONSULTED (it drives the synthetic bundle entry's data_types), so it is NOT
+        the empty frozenset. Mirrors the outright-futures OHLCV stream the legs reference."""
         result = valid_data_types_for_instrument_type("tradfi", "combo")
-        assert result == frozenset()
+        assert result == frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"})
 
     def test_tradfi_index_has_no_trades(self) -> None:
         """TradFi INDEX instruments (e.g. VIX) are OHLCV-only — no trade data."""
@@ -607,11 +610,15 @@ class TestNoSilentFallback:
         None = "unmapped — warn and fall back to all".
         These are semantically different.
         """
+        # NOTE: ("tradfi","combo") is intentionally EXCLUDED (writer-grain alignment
+        # 2026-06-22): tradfi combo now rolls up to its OWN instrument_type=combo
+        # bundle (the writer keeps a distinct combo partition), so its validity row
+        # IS consulted (non-empty) — see test_tradfi_combo_drives_its_own_bundle. The
+        # remaining leaves still collapse into options_chain → zero per-leaf rows.
         leaf_types = [
             ("cefi", "option"),
             ("cefi", "combo"),
             ("tradfi", "option"),
-            ("tradfi", "combo"),
         ]
         for ag, it in leaf_types:
             result = valid_data_types_for_instrument_type(ag, it)

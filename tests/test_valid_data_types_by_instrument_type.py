@@ -14,7 +14,11 @@ from __future__ import annotations
 
 from unified_api_contracts.registry.market_data_categories import (
     _INSTRUMENT_TYPE_ALIASES,
+    GRAIN_BUNDLE_BY_UNDERLYING,
+    GRAIN_LEAF,
     VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE,
+    bundle_instrument_type_for_leaf,
+    grain_for_instrument_type,
     valid_data_types_for_instrument_type,
     valid_data_types_for_venue_instrument_type,
 )
@@ -81,24 +85,33 @@ class TestValidDataTypesByAgAndInstrumentType:
         result = VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("cefi", "futures_chain")]
         assert result == frozenset({"trades"})
 
-    def test_tradfi_option_combo_leaf_empty(self) -> None:
-        # ERA-B generalisation: tradfi option/combo leaves carry zero per-contract
-        # rows (was None → over-fanned ~563K false candidates pre-G1-ENUM).
+    def test_tradfi_option_leaf_empty(self) -> None:
+        # ERA-B generalisation: the tradfi option LEAF carries zero per-contract rows
+        # (was None → over-fanned ~563K false candidates pre-G1-ENUM); it rolls up to
+        # options_chain. (combo is now its OWN bundle type — see test below.)
         assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "option")] == frozenset()
-        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "combo")] == frozenset()
+
+    def test_tradfi_combo_drives_its_own_bundle_data_types(self) -> None:
+        # 2026-06-22 writer-grain alignment: tradfi COMBO rolls up to instrument_type=combo
+        # (the MTDS writer keeps a distinct combo partition), so — unlike option — the
+        # ("tradfi","combo") row IS consulted (it drives the synthetic bundle entry's
+        # data_types). It mirrors the outright-futures OHLCV stream the combo legs reference.
+        assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "combo")] == frozenset(
+            {"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"}
+        )
 
     def test_tradfi_options_futures_chain_bundle_data_types(self) -> None:
         # T-OLD-2b (operator PRESERVE 2026-06-08, tradfi-owner verified vs the present-set, slot-6):
         # the per-underlying chain bundles admit EXACTLY the captured data_types — NOT just trades.
         # options_chain carries trades/ohlcv_1m + the schema-backed snapshot data_type=options_chain
         # (mark_iv/greeks; the 291 Era-A rows migrate to instrument_type=options_chain/data_type=options_chain).
-        # futures_chain carries trades/ohlcv_1m/tbbo (no snapshot data_type observed for futures_chain on
-        # tradfi disk → not admitted, to avoid an over-fan).
+        # futures_chain carries trades/ohlcv_1s/ohlcv_1m/tbbo (ohlcv_1s added 2026-06-22 — the writer
+        # captures CME/ICE chain cells with ohlcv_1s alongside ohlcv_1m; both L0/free GLBX.MDP3 fetches).
         assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "options_chain")] == frozenset(
             {"trades", "ohlcv_1m", "options_chain"}
         )
         assert VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE[("tradfi", "futures_chain")] == frozenset(
-            {"trades", "ohlcv_1m", "tbbo"}
+            {"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"}
         )
 
     def test_tradfi_equity_has_earnings_result(self) -> None:
@@ -205,6 +218,53 @@ class TestValidDataTypesForInstrumentTypeAccessor:
         result = valid_data_types_for_instrument_type("cefi", "UNKNOWN_INSTRUMENT_XYZ")
         assert result is None
 
+
+class TestTradfiBundleGrainWriterAlignment:
+    """The IS expected-universe SEED must roll TradFi FUTURE/COMBO leaves up to the
+    SAME ``instrument_type`` the MTDS writer (``symbol_rules``) captures them at
+    (writer-grain alignment 2026-06-22). The bundle map is NOT shared with the
+    writer — MTDS imports only VENUE_DATA_TYPE_CAPABILITIES / the DERIBIT MVP map —
+    so re-graining here only affects the enumerator seed, never capture behaviour."""
+
+    def test_tradfi_future_at_cme_bundles_to_futures_chain(self) -> None:
+        # CME outright FUTURE leaf → writer stamps instrument_type=futures_chain
+        # (venue default), so the seed must too. Catalogue UPPERCASE token resolves.
+        assert bundle_instrument_type_for_leaf("tradfi", "FUTURE", "CME") == "futures_chain"
+        assert grain_for_instrument_type("tradfi", "FUTURE", "CME") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_tradfi_future_at_ice_bundles_to_futures_chain(self) -> None:
+        assert bundle_instrument_type_for_leaf("tradfi", "FUTURE", "ICE") == "futures_chain"
+        assert grain_for_instrument_type("tradfi", "FUTURE", "ICE") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_tradfi_future_at_non_futures_venue_stays_leaf(self) -> None:
+        # A FUTURE leaf at a NON-CME/ICE venue (or venue-unknown) stays per-contract
+        # (returns None) — the overlay is precisely venue-gated, never a blanket
+        # tradfi FUTURE→futures_chain (which would over-seed any future-typed leaf).
+        assert bundle_instrument_type_for_leaf("tradfi", "FUTURE", "NASDAQ") is None
+        assert bundle_instrument_type_for_leaf("tradfi", "FUTURE", None) is None
+        assert grain_for_instrument_type("tradfi", "FUTURE", "NASDAQ") == GRAIN_LEAF
+
+    def test_tradfi_combo_bundles_to_combo_not_options_chain(self) -> None:
+        # CME spread/combo (databento class T) → writer keeps instrument_type=combo
+        # (a distinct per-underlying partition), NOT options_chain. Venue-agnostic.
+        assert bundle_instrument_type_for_leaf("tradfi", "COMBO", "CME") == "combo"
+        assert bundle_instrument_type_for_leaf("tradfi", "combo", "ICE") == "combo"
+        assert grain_for_instrument_type("tradfi", "COMBO", "CME") == GRAIN_BUNDLE_BY_UNDERLYING
+
+    def test_tradfi_option_still_bundles_to_options_chain(self) -> None:
+        # Regression guard: the option→options_chain roll-up is unchanged.
+        assert bundle_instrument_type_for_leaf("tradfi", "OPTION", "CME") == "options_chain"
+
+    def test_cefi_combo_unchanged_options_chain(self) -> None:
+        # Regression guard: cefi COMBO (Deribit) still rolls into options_chain —
+        # the combo re-grain is TradFi-only.
+        assert bundle_instrument_type_for_leaf("cefi", "COMBO", "DERIBIT") == "options_chain"
+
+    def test_cefi_future_venue_overlay_unchanged(self) -> None:
+        # Regression guard: cefi FUTURE bundling is still DERIBIT/OKX-only, BYBIT leaf.
+        assert bundle_instrument_type_for_leaf("cefi", "FUTURE", "DERIBIT") == "futures_chain"
+        assert bundle_instrument_type_for_leaf("cefi", "FUTURE", "BYBIT") is None
+
     def test_unmapped_asset_group_returns_none(self) -> None:
         """An unknown asset_group + known instrument_type still returns None."""
         result = valid_data_types_for_instrument_type("unknown_ag", "spot_pair")
@@ -252,11 +312,8 @@ class TestValidDataTypesForInstrumentTypeAccessor:
 
 
 # ── G1-ENUM bundle-grain axis (slot-7 2026-06-07) ────────────────────────────
-from unified_api_contracts.registry.market_data_categories import (
-    GRAIN_BUNDLE_BY_UNDERLYING,
-    GRAIN_LEAF,
-    grain_for_instrument_type,
-)
+# (GRAIN_BUNDLE_BY_UNDERLYING / GRAIN_LEAF / grain_for_instrument_type are imported
+# at module top alongside bundle_instrument_type_for_leaf — 2026-06-22.)
 
 
 class TestInstrumentGrainAxis:
@@ -342,9 +399,7 @@ class TestFutureVenueAwareGrain:
         assert bundle_instrument_type_for_leaf("cefi", "future") is None
 
 
-from unified_api_contracts.registry.market_data_categories import (
-    bundle_instrument_type_for_leaf,
-)
+# (bundle_instrument_type_for_leaf is imported at module top — 2026-06-22.)
 
 
 class TestBundleInstrumentTypeForLeaf:
