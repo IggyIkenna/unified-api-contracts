@@ -237,10 +237,12 @@ def test_prediction_book_snapshot_registered() -> None:
         PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT,
     )
 
-    key = ("prediction", "prediction_market", "book_snapshot")
+    key = ("prediction", "prediction_market", "book_snapshot_5")
     assert key in CONTRACT_REGISTRY
     assert CONTRACT_REGISTRY[key] is PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
-    resolved = lookup_contract(asset_group="prediction", instrument_type="prediction_market", data_type="book_snapshot")
+    resolved = lookup_contract(
+        asset_group="prediction", instrument_type="prediction_market", data_type="book_snapshot_5"
+    )
     assert resolved is PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
     # condition_id is the canonical identifier (matches trades contract).
     assert resolved.symbol_column == "condition_id"
@@ -301,7 +303,7 @@ def test_all_three_new_prediction_contracts_use_condition_id() -> None:
     cross-API stitching works without column mapping.
     """
     keys = [
-        ("prediction", "prediction_market", "book_snapshot"),
+        ("prediction", "prediction_market", "book_snapshot_5"),
         ("prediction", "prediction_market", "market_metadata"),
         ("prediction", "prediction_market", "fills"),
         ("prediction", "prediction_market", "trades"),  # incumbent

@@ -72,7 +72,7 @@ def test_market_data_asset_groups_use_tick_timestamp() -> None:
         ("tradfi", "trades"),
         ("tradfi", "options_chain"),
         ("prediction", "trades"),
-        ("prediction", "book_snapshot"),
+        ("prediction", "book_snapshot_5"),
     ]:
         assert get_availability_semantic(asset_group, data_type) == "tick_timestamp"
 
@@ -185,16 +185,16 @@ def test_default_floor_is_14_days() -> None:
 
 def test_big5_leagues_have_known_floors() -> None:
     # EPL, La Liga, Serie A, Ligue 1 all 21; Bundesliga 28
-    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[39] == 21   # EPL
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[39] == 21  # EPL
     assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[140] == 21  # La Liga
-    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[78] == 28   # Bundesliga
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[78] == 28  # Bundesliga
     assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[135] == 21  # Serie A
-    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[61] == 21   # Ligue 1
+    assert FIXTURE_ANNOUNCEMENT_FLOOR_DAYS[61] == 21  # Ligue 1
 
 
 def test_get_fixture_announcement_floor_days_returns_per_league_value() -> None:
-    assert get_fixture_announcement_floor_days(39) == 21   # EPL
-    assert get_fixture_announcement_floor_days(78) == 28   # Bundesliga
+    assert get_fixture_announcement_floor_days(39) == 21  # EPL
+    assert get_fixture_announcement_floor_days(78) == 28  # Bundesliga
 
 
 def test_get_fixture_announcement_floor_days_returns_default_for_unknown() -> None:

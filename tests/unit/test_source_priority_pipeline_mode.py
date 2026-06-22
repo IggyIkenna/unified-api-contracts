@@ -623,6 +623,28 @@ def test_live_pipeline_mode_replay_raises_for_live_only_venue() -> None:
         live_pipeline_mode_for_venue("cefi", "BYBIT", "trades", Mode.REPLAY)
 
 
+def test_live_pipeline_mode_for_prediction_polymarket_book_snapshot_5() -> None:
+    """Prediction POLYMARKET book_snapshot_5 shard resolves via the venue override
+    (polymarket → polymarket_clob) and not through the data_type-level SOURCE_PRIORITY
+    primary — item 69 + prediction-side of item 75 (2026-06-22).
+
+    ``live_source_for_venue("prediction", "POLYMARKET", "book_snapshot_5")`` must
+    return ``"polymarket_clob"`` and the pipeline_mode must be
+    ``PipelineMode.LIVE_POLYMARKET_CLOB``."""
+    from unified_api_contracts.canonical.crosscutting.source_priority import (
+        live_pipeline_mode_for_venue,
+        live_source_for_venue,
+    )
+
+    source = live_source_for_venue("prediction", "POLYMARKET", "book_snapshot_5")
+    assert source == "polymarket_clob", (
+        f"Expected 'polymarket_clob', got {source!r}; "
+        "the venue override for 'polymarket' must resolve before SOURCE_PRIORITY lookup"
+    )
+    pm = live_pipeline_mode_for_venue("prediction", "POLYMARKET", "book_snapshot_5")
+    assert pm is PipelineMode.LIVE_POLYMARKET_CLOB
+
+
 def test_live_pipeline_mode_for_venue_exposed_from_top_level() -> None:
     from unified_api_contracts import (
         live_pipeline_mode_for_venue as facade_fn,

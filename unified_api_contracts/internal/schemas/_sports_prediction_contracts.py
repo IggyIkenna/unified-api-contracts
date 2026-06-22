@@ -309,7 +309,7 @@ SPORTS_ODDS_ARBITRAGE = SchemaContract(
 PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT = SchemaContract(
     asset_group="prediction",
     instrument_type="prediction_market",
-    data_type="book_snapshot",
+    data_type="book_snapshot_5",
     columns=[
         INSTRUMENT_ID_COL,
         TS_EVENT_COL,
@@ -552,7 +552,7 @@ PREDICTION_PREDICTION_MARKET_FILLS = SchemaContract(
 
 CONTRACT_REGISTRY[("sports", "odds", "trades")] = SPORTS_ODDS_TRADES
 CONTRACT_REGISTRY[("prediction", "prediction_market", "trades")] = PREDICTION_PREDICTION_MARKET_TRADES
-CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
+CONTRACT_REGISTRY[("prediction", "prediction_market", "book_snapshot_5")] = PREDICTION_PREDICTION_MARKET_BOOK_SNAPSHOT
 CONTRACT_REGISTRY[("prediction", "prediction_market", "market_metadata")] = PREDICTION_PREDICTION_MARKET_METADATA
 CONTRACT_REGISTRY[("prediction", "prediction_market", "fills")] = PREDICTION_PREDICTION_MARKET_FILLS
 CONTRACT_REGISTRY[("sports", "odds", "sports_odds_snapshot")] = SPORTS_ODDS_SNAPSHOT
