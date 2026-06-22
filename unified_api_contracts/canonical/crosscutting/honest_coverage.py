@@ -172,6 +172,25 @@ class EmptyConfirmedReason(StrEnum):
     ``unified_api_contracts.canonical.domain.sports.understat_coverage.UNDERSTAT_COVERED_LEAGUES``. Operator
     msg 9 audit dimension #7."""
 
+    EXPECTED_SOURCE_DOES_NOT_OFFER_DATA_TYPE = "EXPECTED_SOURCE_DOES_NOT_OFFER_DATA_TYPE"
+    """Per-(venue/source, data_type): the venue's BATCH source structurally does not offer this data_type at
+    all — no historical endpoint / archive prefix / feed exists for it, so a zero-row cell is honest absence by
+    design, NOT a fetch failure and NOT a clean 200+empty (no fetch is even warranted). Distinct from
+    ``EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE`` (a source covers the data_type but not a particular league) and
+    from ``SOURCE_RETURNED_ZERO`` (the source WAS reached and returned 200+empty — proven via FetchEvidence).
+    This is "the source has no way to serve this data_type, ever."
+
+    Reference cases (CeFi on-chain perps, operator-confirmed 2026-06-22):
+    * **ASTER ``book_snapshot_5``** — Aster's Binance-compatible REST exposes only a CURRENT-book ``/fapi/v1/depth``
+      snapshot; there is NO historical order-book endpoint, so batch book_snapshot_5 can never be sourced (live-WS
+      capture only).
+    * **HYPERLIQUID ``liquidations``** — Hyperliquid publishes no public liquidation feed (neither the S3 archive
+      nor the REST API exposes one).
+
+    Coverage: OUT-of-window (never collectable) → excluded from the data-status completion-% denominator (in
+    ``OUT_OF_COVERAGE_WINDOW_REASONS``). SSOT:
+    ``plans/active/issues/cefi_hl_aster_batch_data_gaps_2026_06_22.md`` BUG #3."""
+
     EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE = "EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE"
     """Sports ODDS per-(bookmaker, league): an Odds-API bookmaker legitimately doesn't price this league —
     the OBSERVED captured corpus shows the (book, league) pair has never produced an odds row, so a zero-row
@@ -439,6 +458,7 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_PRE_SEASON.value,
         EmptyConfirmedReason.EXPECTED_POST_SEASON.value,
         EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE.value,
+        EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_OFFER_DATA_TYPE.value,
         EmptyConfirmedReason.EXPECTED_NO_PROVIDER_COVERAGE.value,
         EmptyConfirmedReason.EXPECTED_OUT_OF_COVERAGE_WINDOW.value,
         EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value,
