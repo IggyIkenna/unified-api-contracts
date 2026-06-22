@@ -188,9 +188,9 @@ _SOURCE_PRIORITY_EXCLUSION_REASONS: dict[tuple[str, str], str] = {
     ("tradfi", "commodity_features"): _COMPUTED_SERVICE_OUTPUT,
     ("tradfi", "energy_data"): _COMPUTED_SERVICE_OUTPUT,
     # ── Prediction ──
-    # "book_snapshot" is a legacy/non-canonical key in SOURCE_PRIORITY
-    # (prediction catalogue only carries "trades" and the prediction types).
-    ("prediction", "book_snapshot"): _CEFI_LEGACY_KEY,
+    # "book_snapshot_5" is the canonical prediction depth key in SOURCE_PRIORITY
+    # (upgraded from the legacy "book_snapshot" bare name — item 69/75-prediction).
+    ("prediction", "book_snapshot_5"): _CEFI_LEGACY_KEY,
     # ── Sports reference/classification data_types in SOURCE_PRIORITY
     #    that are NOT in SPORTS_DATA_TYPE_TO_SOURCE (not reachable via the
     #    "league" instrument_type's derived valid set).
