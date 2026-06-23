@@ -16,6 +16,16 @@ extra/league_classification_config.py + mapping/leagues.csv
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+# Direct JSON read avoids triggering registry/__init__.py during the canonical
+# domain sports init chain (which causes a circular import via archetype_config).
+_ENTITY_COV_JSON = (
+    Path(__file__).parent.parent.parent.parent / "registry" / "data" / "sports_league_entity_coverage.json"
+)
+_ENTITY_COVERAGE: dict[str, list[str]] = json.loads(_ENTITY_COV_JSON.read_text())
+
 # Soccer-Football-Info championship IDs (stable hex, never changes)
 SOCCER_FOOTBALL_INFO_IDS: dict[str, str] = {
     "ALLSVENSKAN": "5c67de1074b5a814",
@@ -778,9 +788,11 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "PREDICTIONS": None,  # FootyStats: all leagues
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider catalog
     # mappings live in UAC (TRANSFERMARKT_IDS / SOCCER_FOOTBALL_INFO_IDS).
-    "PLAYER_VALUES": None,  # Transfermarkt: all mapped leagues
+    # PLAYER_VALUES + WEATHER: observed coverage from manifest (≥1 captured row).
+    # Empty frozenset until refresh_sports_league_entity_coverage is run against prod.
+    "PLAYER_VALUES": frozenset(_ENTITY_COVERAGE.get("PLAYER_VALUES") or []),
     "SFI_PROGRESSIVE_STATS": None,  # SFI: all mapped leagues
-    "WEATHER": None,  # Open Meteo: all fixtures with coordinates
+    "WEATHER": frozenset(_ENTITY_COVERAGE.get("WEATHER") or []),
 }
 
 

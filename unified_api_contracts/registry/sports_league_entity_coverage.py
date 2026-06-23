@@ -56,6 +56,8 @@ LEAGUE_ENTITY_COVERAGE_ENTITIES: frozenset[str] = frozenset(
         "TEAMS",
         "STANDINGS",
         "INJURIES",
+        "WEATHER",
+        "PLAYER_VALUES",
     }
 )
 

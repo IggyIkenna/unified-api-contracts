@@ -54,6 +54,7 @@ _REST_POLLER_CONNECTORS: Final[frozenset[str]] = frozenset(
 # Static map: connector stem → (UAC venue dir, at least one expected *_ws.yaml glob).
 # Built from Phase 4 cassette creation — updated when new connectors land.
 _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
+    "aster_book_liq_ws": "aster",
     "aster_ws": "aster",
     "binance_futures_book_ticker_ws": "binance",
     "binance_futures_ws": "binance",

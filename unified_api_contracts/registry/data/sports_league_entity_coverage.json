@@ -562,5 +562,7 @@
     "SUPER_LIG",
     "SWISS_SUPER_LEAGUE",
     "UNKNOWN"
-  ]
+  ],
+  "PLAYER_VALUES": [],
+  "WEATHER": []
 }
