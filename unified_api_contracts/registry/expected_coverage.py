@@ -343,16 +343,24 @@ _SPORTS: dict[str, list[str]] = {
 }
 
 # ---------------------------------------------------------------------------
-# Prediction — Polymarket + Kalshi CLOB trades. book_snapshot_5 was retired
-# 2026-04-19 (neither adapter captures order book snapshots).
+# Prediction — Polymarket + Kalshi CLOB trades + book_snapshot_5.
+# book_snapshot_5 RE-ADDED 2026-06-23: the prior "retired 2026-04-19 (neither
+# adapter captures order book snapshots)" note is STALE — BOTH venues now
+# capture book_snapshot_5: LIVE via the CLOB WS connectors (polymarket_clob_ws /
+# kalshi_clob_ws, top-5 ladder) AND BATCH via the REST /book path
+# (polymarket_adapter.get_books_batch → clob.polymarket.com/book?token_id=,
+# mtds@7c849d7). Declaring it here is REQUIRED so the MTDS batch pre-flight
+# (`get_expected_data_types_for_venue`) does NOT drop book_snapshot_5 before
+# calling the adapter (else the batch book backfill silently writes 0 rows /
+# SHARD_INCOMPLETE), and so the deployment-ui marks the live+batch book rows
+# in-scope (no "out of scope" badge). Batch=live: same canonical data_type.
 # prediction_canonical_question_group: bundled CQG bucket written by MTDS
-# (groups prediction_trades rows by canonical question group x day). Added
-# 2026-06-16 — declaring it removes the deployment-ui "out of scope" badge
-# for POLYMARKET on this data_type (badge = manifest data_type not in scope).
+# (groups prediction_trades rows by canonical question group x day; added
+# 2026-06-16 — POLYMARKET only).
 # ---------------------------------------------------------------------------
 _PREDICTION: dict[str, list[str]] = {
-    "POLYMARKET": ["trades", "prediction_canonical_question_group"],
-    "KALSHI": ["trades"],
+    "POLYMARKET": ["trades", "book_snapshot_5", "prediction_canonical_question_group"],
+    "KALSHI": ["trades", "book_snapshot_5"],
 }
 
 
