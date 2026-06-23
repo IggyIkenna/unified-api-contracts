@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Strategy → instruments resolver.
 
 Joins the combinatoric catalogue envelope (archetype × venue × instrument_type)

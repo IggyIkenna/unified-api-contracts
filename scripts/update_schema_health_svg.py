@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Update docs/schema_health.svg based on pytest JSON report from integration tests.
 
 Usage:

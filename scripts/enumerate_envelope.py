@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Full combinatoric envelope of the strategy catalogue.
 
 Unlike ``enumerate_catalogue.py`` (which prints the 99 curated representative

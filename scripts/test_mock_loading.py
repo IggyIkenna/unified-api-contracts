@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: oneoff
+# Delete-when: 2026-03 demo script superseded by tests/test_cassette_schema_parity.py
 """
 Test script to load and demonstrate Yahoo Finance mock data usage.
 
