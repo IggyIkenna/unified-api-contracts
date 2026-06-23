@@ -49,9 +49,11 @@ from unified_api_contracts.canonical.crosscutting.config_versioning import (
     compute_config_content_hash,
 )
 
-# The CeFi MVP base-currency universe is the 44-base SSOT
-# ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed 2026-06-16; supersedes the
-# former 4-base BTC/ETH/SOL/USDT set). ``CEFI_OPTIONS_UNDERLYINGS`` is the
+# The CeFi base-currency universe is the curated capture SSOT
+# ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed 2026-06-23 — no longer the
+# 44-coin MVP cap; now the survivorship-bias-free union of legacy-44 +
+# top-100-mcap-aggregated-since-2019 + HL/ASTER perp bases, ~490 assets).
+# ``CEFI_OPTIONS_UNDERLYINGS`` is the
 # narrower options carve-out (BTC + ETH only — Deribit is the only CeFi venue
 # with OPTION instruments). Imported from the leaf module (NOT the registry
 # package ``__init__``) to avoid any import-chain timing surprise; the
@@ -120,8 +122,8 @@ class CeFiMvpRule:
             CeFi options expected-universe carve-out). The options universe
             is intentionally narrower than the spot/perp ``base_ccys`` —
             Deribit is the only CeFi venue with OPTION instruments and it
-            lists BTC + ETH options only, so expecting the full 44-base set
-            as options would yield false-missing. When non-empty, an OPTION
+            lists BTC + ETH options only, so expecting the full base-asset
+            universe as options would yield false-missing. When non-empty, an OPTION
             cell is MVP iff ``base_ccy`` is in this set (``base_ccys`` is NOT
             applied to OPTION cells). Empty → fall back to ``base_ccys``.
         sources: Optional frozenset of source strings. When not empty,
@@ -252,15 +254,16 @@ MVP_SCOPE: Final[dict[str, object]] = {
     #   TODO(mvp-scope): confirm whether "funding_rate" should alias
     #   "derivative_ticker" here or remain a separate axis.
     #
-    # base_ccys: the 44-base ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed
-    #   2026-06-16 as the CeFi MVP base-currency SSOT — supersedes the former
-    #   4-base BTC/ETH/SOL/USDT set). Spot + perp legs span the full universe.
+    # base_ccys: the curated ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed
+    #   2026-06-23 as the CeFi capture SSOT — legacy-44 + top-100-mcap-since-2019
+    #   + HL/ASTER perp bases, ~490 assets, survivorship-bias-free; no longer the
+    #   44-coin MVP cap). Spot + perp legs span the full universe.
     #
     # options_base_ccys: BTC + ETH ONLY (``CEFI_OPTIONS_UNDERLYINGS``). The
     #   options expected universe is the Deribit-options carve-out — Deribit is
     #   the only CeFi venue with OPTION instruments and it lists BTC + ETH
-    #   options only. Expecting the full 44-base set as options on Deribit would
-    #   yield false-missing, so OPTION cells gate on this narrower set.
+    #   options only. Expecting the full base-asset universe as options on Deribit
+    #   would yield false-missing, so OPTION cells gate on this narrower set.
     #
     # sources: tardis (canonical CeFi archive source per SOURCE_PRIORITY)
     #   + per-venue live source (each venue name is also its live source key
@@ -313,7 +316,8 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "funding_rate",
             }
         ),
-        # 44-base CeFi MVP universe (operator-confirmed SSOT). Spot + perp legs.
+        # Curated CeFi capture universe (operator-confirmed SSOT, ~490 base assets,
+        # survivorship-bias-free). Spot + perp legs.
         # EQUITY_PERP/TOKENIZED_EQUITY cells use CEFI_EQUITY_PERP_BASE_UNIVERSE as
         # their base_ccys (equity tickers like META, NVDA, AAPL — not crypto coins).
         # The combined union covers both crypto-perp and equity-perp families.
@@ -573,8 +577,14 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 3
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 4
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v4 (2026-06-23): ``CEFI_BASE_ASSET_UNIVERSE`` expanded from the 44-coin MVP cap
+to the curated, survivorship-bias-free capture set (legacy-44 +
+top-100-mcap-aggregated-since-2019 + HL/ASTER perp bases, ~490 assets). CeFi
+``base_ccys`` therefore now spans that wider universe; the content hash flips
+automatically with the constant. ``options_base_ccys`` unchanged (BTC+ETH).
 
 v3 (2026-06-17): CeFi venue set reconciled from the bare ``OKX`` token to the
 canonical sub-venues ``OKX-SPOT`` / ``OKX-SWAP`` / ``OKX-FUTURES`` (the form the
@@ -586,10 +596,10 @@ behaviour, not config content, but versioned together. (mvp_instrument_universe_
 P2 #1 + #2.)
 
 v2 (2026-06-17): CeFi ``base_ccys`` reconciled from the 4-base BTC/ETH/SOL/USDT
-set to the 44-base ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed SSOT), added
-``OPTION`` to CeFi ``instrument_types``, and added the Deribit-options carve-out
-(``options_base_ccys = CEFI_OPTIONS_UNDERLYINGS`` = BTC+ETH only). The content
-hash flips automatically with the version + content change.
+set to the (then) 44-base ``CEFI_BASE_ASSET_UNIVERSE`` (operator-confirmed SSOT),
+added ``OPTION`` to CeFi ``instrument_types``, and added the Deribit-options
+carve-out (``options_base_ccys = CEFI_OPTIONS_UNDERLYINGS`` = BTC+ETH only). The
+content hash flips automatically with the version + content change.
 """
 
 

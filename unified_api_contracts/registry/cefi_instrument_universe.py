@@ -1,71 +1,123 @@
-"""CeFi instrument universe — curated base assets for CeFi venue filtering.
+"""CeFi instrument universe — curated, survivorship-bias-free base-asset capture set.
 
-SSOT for which crypto assets the instruments-service tracks across CeFi venues.
-Tardis/direct adapters filter to only return instruments where the base
-asset is in this set. Curated set (~45 assets — top market-cap coins plus
-operator-requested coverage incl. EigenLayer dust) covering the asset classes
-the system needs while keeping scope manageable.
+SSOT for which crypto assets the instruments-service tracks (and MTDS captures)
+across the Tardis CEX venues (binance-futures / bybit / okx / deribit / kraken /
+coinbase / bitget / bitfinex / …). The CeFi adapters' ``_passes_asset_filter``
+gate returns only instruments whose base asset is in this set — so it deliberately
+KEEPS gating (NOT "everything the venue lists" — that admits thousands of junk /
+wash pairs), but with a much wider, principled universe than the former 44-coin
+MVP cap.
 
-Includes FTT and LUNA (delisted) to test the system's handling of delistings —
-they will appear with ``is_active=False`` and ``available_to`` set.
+``CEFI_BASE_ASSET_UNIVERSE`` is the UNION of three sources (operator decision
+2026-06-23):
+
+1. **Legacy 44** — the prior MVP subset (top-cap majors + operator-requested
+   coverage incl. EigenLayer dust + FTT/LUNA delisting-test coins). All kept.
+
+2. **Top-100-by-market-cap aggregated across TIME since 2019** — the UNION of the
+   coins that were top-100 by market cap at each year-end / cycle-peak snapshot
+   2019 → today. Because top-100 membership churns hard over a cycle, the union is
+   a few hundred unique base assets, and — by construction — it DELIBERATELY
+   captures coins that WERE top-100 but later declined or were delisted (LUNA /
+   LUNC / UST / FTT / SRM / CEL / WAVES / HT / OKB / OMG / …). This is what makes
+   the set **survivorship-bias-free**: a backtest over 2021 must see the assets
+   that mattered in 2021, not just today's survivors. We have NO live market-cap
+   API, so this tranche is CURATED as a checked-in frozenset from well-known
+   historical top-100 rankings rather than fetched.
+
+3. **All HYPERLIQUID + ASTER perp base assets** — the deduped base asset of every
+   perp listed on HL / ASTER (read from the rebuilt instruments catalogue
+   ``prod/catalog.parquet``, venue ∈ {HYPERLIQUID, ASTER}, instrument_type =
+   PERPETUAL; equity / tokenized-stock / macro tickers — tracked separately via
+   ``CEFI_EQUITY_PERP_BASE_UNIVERSE`` + ``crypto_equity_link`` — excluded). HL /
+   ASTER themselves bypass this filter; the point is that a coin tradable as a
+   perp on HL / ASTER is ALSO captured on the CEX venues, so cross-venue price /
+   funding dispersion has both legs.
+
+Curated, not fetched: there is no live market-cap source, so the set is checked
+in and SORTED for deterministic diffs. Bias toward over-inclusion — small-coin
+tick data is cheap and the goal is "set once, stop editing". Quote assets
+(USDT / USDC / USD / BTC / ETH) are NOT filtered by this set — any canonical
+quote is fine as long as the base is here (see ``CEFI_ACCEPTED_QUOTE_ASSETS``).
+
+FTT and LUNA (delisted) remain included so the system's delisting handling is
+exercised — they appear with ``is_active=False`` and ``available_to`` set.
 """
 
 from __future__ import annotations
 
 # fmt: off
 
-# Top coins by market cap + 2 delisted assets for delisting testing.
-# Quote assets (USDT, USDC, USD, BTC, ETH) are not filtered — any quote is fine
-# as long as the base is in this set.
+# Curated union — legacy-44 + top-100-mcap-aggregated-since-2019 + HL/ASTER perp
+# bases. Survivorship-bias-free (retired top-100 coins kept). Sorted for
+# deterministic diffs; see module docstring for the rationale + provenance of
+# each tranche. ~518 base assets.
 CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
-    # --- Top 20 by market cap ---
-    "BTC",      # Bitcoin
-    "ETH",      # Ethereum
-    "BNB",      # BNB Chain
-    "SOL",      # Solana
-    "XRP",      # Ripple
-    "ADA",      # Cardano
-    "DOGE",     # Dogecoin
-    "AVAX",     # Avalanche
-    "DOT",      # Polkadot
-    "LINK",     # Chainlink
-    "TRX",      # Tron
-    "MATIC",    # Polygon
-    "SHIB",     # Shiba Inu
-    "LTC",      # Litecoin
-    "UNI",      # Uniswap
-    "ATOM",     # Cosmos
-    "NEAR",     # NEAR Protocol
-    "APT",      # Aptos
-    "ARB",      # Arbitrum
-    "OP",       # Optimism
-    "HYPE",     # Hyperliquid
-    "PEPE",     # Pepe
-    # --- Added 2026-06-16 (operator: full requested CeFi coverage + EigenLayer rewards dust) ---
-    "EIGEN",    # EigenLayer (rewards dust tracking)
-    "AAVE",     # Aave
-    "ALGO",     # Algorand
-    "AXS",      # Axie Infinity
-    "CHZ",      # Chiliz
-    "COMP",     # Compound
-    "DASH",     # Dash
-    "ENJ",      # Enjin
-    "EOS",      # EOS
-    "FIL",      # Filecoin
-    "GALA",     # Gala
-    "ICP",      # Internet Computer
-    "MANA",     # Decentraland
-    "SAND",     # The Sandbox
-    "THETA",    # Theta Network
-    "XLM",      # Stellar
-    "ZEC",      # Zcash
-    # --- Stablecoins (as base in stablecoin pairs like USDT/USD) ---
-    "USDT",     # Tether
-    "USDC",     # USD Coin
-    "DAI",      # MakerDAO DAI
-    # --- Delisted / collapsed — for delisting testing ---
-    "FTT",      # FTX Token — delisted Nov 2022 (exchange collapse)
-    "LUNA",     # Terra Luna — delisted May 2022 (death spiral)
+    "0G", "1INCH", "2Z", "AAVE", "ABBC", "ACE", "ACH", "ACU",
+    "ACX", "ADA", "AERGO", "AERO", "AEVO", "AGIX", "AGLD", "AI16Z",
+    "AIA", "AIGENSYN", "AIO", "AIOT", "AIXBT", "AKT", "ALCH", "ALGO",
+    "ALICE", "ALLO", "ALT", "ANIME", "ANKR", "APE", "APEX", "API3",
+    "APR", "APT", "AR", "ARB", "ARC", "ARDR", "ARIA", "ARK",
+    "ARKM", "ARPA", "ARX", "ASTER", "ASTEROID", "ASTR", "ATH", "ATOM",
+    "AUCTION", "AVAAI", "AVAX", "AVL", "AVNT", "AWE", "AXL", "AXS",
+    "AZTEC", "B2", "B3", "BABY", "BAL", "BAN", "BANANA", "BANANAS31",
+    "BAND", "BANK", "BASED", "BAT", "BB", "BBX", "BCH", "BEAT",
+    "BEL", "BERA", "BGB", "BICO", "BIGTIME", "BIO", "BIRB", "BLAST",
+    "BLEND", "BLESS", "BLUAI", "BLUR", "BMT", "BNB", "BNT", "BOBA",
+    "BOME", "BONK", "BR", "BRETT", "BREV", "BROCCOLI714", "BSB", "BSV",
+    "BTC", "BTCDOM", "BTG", "BTM", "BTR", "BTS", "BTT", "BTW",
+    "BULLA", "BUSD", "BZ", "CAKE", "CARDS", "CBETH", "CBRS", "CEL",
+    "CELO", "CELR", "CFG", "CFX", "CHEEMS", "CHILLGUY", "CHIP", "CHR",
+    "CHZ", "CLANKER", "CLO", "COAI", "COLLECT", "COMP", "CORE", "COTI",
+    "COW", "CRO", "CRV", "CTR", "CTSI", "CVC", "CVX", "CYBER",
+    "CYS", "DAI", "DASH", "DCR", "DENT", "DEXE", "DGB", "DOGE",
+    "DOGS", "DOLO", "DOOD", "DOT", "DRGN", "DRIFT", "DUSK", "DYDX",
+    "DYM", "EDEN", "EDGE", "EDU", "EGLD", "EIGEN", "ELF", "ENA",
+    "ENJ", "ENS", "ENSO", "EOS", "ESP", "ESPORTS", "ETC", "ETH",
+    "ETHFI", "EUL", "EVAA", "FARTCOIN", "FET", "FF", "FHE", "FIDA",
+    "FIGHT", "FIL", "FLOCK", "FLOKI", "FLOW", "FLUX", "FOGO", "FOLKS",
+    "FORM", "FRAX", "FTT", "FUN", "FXS", "G", "GALA", "GAS",
+    "GENIUS", "GIGGLE", "GLM", "GMT", "GMX", "GNT", "GOAT", "GRASS",
+    "GRIFFAIN", "GRT", "GT", "GTC", "GUN", "GUSD", "GWEI", "HANA",
+    "HBAR", "HBTC", "HEDG", "HEMI", "HFT", "HMSTR", "HNT", "HOLO",
+    "HOME", "HOT", "HT", "HUMA", "HYPE", "HYPER", "ICP", "ICX",
+    "ILV", "IMX", "INIT", "INJ", "IO", "IOTA", "IOTX", "IP",
+    "IRYS", "JASMY", "JCT", "JELLYJELLY", "JTO", "JUP", "KAITO", "KAS",
+    "KAT", "KAVA", "KCS", "KDA", "KGEN", "KING", "KITE", "KMD",
+    "KNC", "KOMA", "KSM", "LAB", "LAYER", "LDO", "LEO", "LIGHT",
+    "LINEA", "LINK", "LISTA", "LIT", "LITE", "LPT", "LQTY", "LRC",
+    "LTC", "LUMIA", "LUNA", "LUNA2", "LUNC", "LYN", "MAGIC", "MAGMA",
+    "MANA", "MANTA", "MANTRA", "MASK", "MATIC", "ME", "MEGA", "MELANIA",
+    "MEME", "MERL", "METIS", "MEW", "MINA", "MITH", "MITO", "MKR",
+    "MMT", "MNT", "MOG", "MON", "MOODENG", "MORPHO", "MOVE", "MOVR",
+    "MX", "MYX", "NANO", "NAORIS", "NEAR", "NEIRO", "NEO", "NEX",
+    "NEXO", "NIGHT", "NIL", "NMR", "NOM", "NOT", "NOW", "NULS",
+    "NXPC", "OCEAN", "OGN", "OKB", "OMG", "ONDO", "ONDS", "ONE",
+    "ONT", "OP", "OPEN", "OPG", "OPN", "ORCA", "ORDI", "OXT",
+    "PARTI", "PAXG", "PAY", "PENDLE", "PENGU", "PENGUIN", "PEOPLE", "PEPE",
+    "PHA", "PIEVERSE", "PIPPIN", "PIXEL", "PLAY", "PLUME", "PNUT", "POL",
+    "POLYX", "POPCAT", "POPMART", "PORTAL", "POWER", "POWR", "PRL", "PROM",
+    "PROMPT", "PROS", "PROVE", "PTB", "PUMP", "PUMPBTC", "PUNDIAI", "PURR",
+    "PYTH", "QNT", "QNTX", "QTUM", "RAD", "RAIL", "RARE", "RAVE",
+    "RAY", "RECALL", "RED", "REN", "RENDER", "REP", "RESOLV", "REZ",
+    "RIF", "RLC", "RNDR", "RONIN", "ROSE", "RPL", "RSR", "RUNE",
+    "RVN", "S", "SAGA", "SAHARA", "SAND", "SAPIEN", "SATS", "SC",
+    "SEI", "SENT", "SHELL", "SHIB", "SIGN", "SIREN", "SKL", "SKR",
+    "SKY", "SKYAI", "SNT", "SNX", "SOL", "SOLV", "SOMI", "SOON",
+    "SOPH", "SPELL", "SPK", "SPX", "SQD", "SRM", "SSV", "STABLE",
+    "STAR", "STBL", "STEEM", "STETH", "STG", "STORJ", "STRAT", "STRK",
+    "STX", "SUI", "SUPER", "SUSHI", "SWARMS", "SYN", "SYRUP", "SYS",
+    "T", "TAC", "TAG", "TAKE", "TAO", "TFUEL", "THETA", "TIA",
+    "TNSR", "TON", "TOSHI", "TOWNS", "TRADOOR", "TRB", "TREE", "TRIA",
+    "TROLL", "TRUMP", "TRUST", "TRUTH", "TRX", "TST", "TURBO", "TURTLE",
+    "TUSD", "TWT", "UAI", "UMA", "UNI", "USAR", "USD1", "USDC",
+    "USDD", "USDP", "USDT", "USELESS", "UST", "USTC", "USUAL", "VANA",
+    "VELO", "VELVET", "VET", "VINE", "VIRTUAL", "VVV", "W", "WAVES",
+    "WBTC", "WCT", "WET", "WIF", "WLD", "WLFI", "WOJAK", "WOO",
+    "WTC", "XAI", "XAN", "XCN", "XEM", "XLM", "XMR", "XPIN",
+    "XPL", "XRP", "XTZ", "XVG", "YB", "YFI", "YGG", "ZAMA",
+    "ZBT", "ZEC", "ZEN", "ZEREBRO", "ZEST", "ZETA", "ZIL", "ZK",
+    "ZKC", "ZKP", "ZM", "ZORA", "ZRO", "ZRX",
 })
 
 # Quote assets we accept. Only USD and major stablecoins — no cross pairs.

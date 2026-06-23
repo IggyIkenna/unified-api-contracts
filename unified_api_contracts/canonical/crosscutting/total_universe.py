@@ -32,9 +32,10 @@ Selection axes (the dimensions that define total-universe membership)
 ---------------------------------------------------------------------
 The total-reasonable universe is selected along these axes (operator 2026-06-18):
 
-* ``base_currency``  — CeFi spot/perp base assets (the 44-base
-  ``CEFI_BASE_ASSET_UNIVERSE`` is the *MVP* subset; TOTAL = every base the venue
-  lists).
+* ``base_currency``  — CeFi spot/perp base assets (the curated
+  ``CEFI_BASE_ASSET_UNIVERSE``, ~490 survivorship-bias-free capture assets =
+  legacy-44 + top-100-mcap-since-2019 + HL/ASTER perp bases, is the *captured*
+  subset; TOTAL = every base the venue lists).
 * ``venue``          — every venue in ``VENUES_BY_ASSET_GROUP[ag]``.
 * ``data_type``      — every data_type in ``DATA_TYPES_BY_ASSET_GROUP[ag]``.
 * ``defi_pool_volume`` — DeFi pools above a liquidity/volume threshold (a pool
@@ -171,7 +172,7 @@ TOTAL_UNIVERSE_AXES: Final[dict[str, tuple[UniverseAxis, ...]]] = {
             "base_currency",
             UniverseProvenance.DOWNLOAD_DERIVED,
             "instruments-service catalogue (build_instrument_catalogue) base_asset column",
-            "Every base asset the venue lists (MVP subset = CEFI_BASE_ASSET_UNIVERSE).",
+            "Every base asset the venue lists (captured subset = CEFI_BASE_ASSET_UNIVERSE).",
         ),
         UniverseAxis(
             "venue",
