@@ -41,6 +41,7 @@ class VenueMapping:
             "okex-futures",
             "okex-swap",  # OKX needs all endpoints for complete data
             "coinbase",  # Coinbase - spot only, for coinbase premium
+            "coinbase-international",  # Coinbase Derivatives (perps) — pairs with COINBASE-SPOT perp-gate
             # Tier 2: Regional / specialist exchanges
             "upbit",  # Upbit (Korean exchange) - spot only, for kimchi premium
             "bitstamp",  # Bitstamp - spot
@@ -162,11 +163,17 @@ class VenueMapping:
             "binance-futures": "BINANCE-FUTURES",
             "deribit": "DERIBIT",
             "bybit": "BYBIT",
-            "bybit-spot": "BYBIT",
+            # Bybit spot is a DISTINCT canonical venue (BYBIT-SPOT) so it
+            # enumerates separately from the BYBIT perp/future endpoint and the
+            # perp-gate pairs the two on the shared ``BYBIT`` entity prefix.
+            "bybit-spot": "BYBIT-SPOT",
             "okex": "OKX-SPOT",
             "okex-swap": "OKX-SWAP",
             "okex-futures": "OKX-FUTURES",
             "coinbase": "COINBASE-SPOT",
+            # Coinbase Derivatives (perps) — distinct canonical venue; entity
+            # prefix COINBASE pairs it with COINBASE-SPOT for the perp-gate.
+            "coinbase-international": "COINBASE-FUTURES",
             # Tier 2
             "upbit": "UPBIT",
             "hyperliquid": "HYPERLIQUID",
@@ -222,6 +229,11 @@ class VenueMapping:
             "BINANCE-FUTURES": "2019-11-17",
             "DERIBIT": "2019-03-30",
             "BYBIT": "2020-01-01",
+            # Bybit spot — Tardis ``bybit-spot`` availableSince 2021-12-04.
+            "BYBIT-SPOT": "2021-12-04",
+            # Coinbase Derivatives (perps) — Tardis ``coinbase-international``
+            # availableSince 2024-10-31.
+            "COINBASE-FUTURES": "2024-10-31",
             "OKX-SPOT": "2020-01-01",
             "OKX-FUTURES": "2020-01-01",
             "OKX-SWAP": "2020-01-01",
@@ -755,6 +767,8 @@ class VenueMapping:
             ("BYBIT", "SPOT_PAIR"): "bybit-spot",
             ("BYBIT", "PERPETUAL"): "bybit",
             ("BYBIT", "FUTURE"): "bybit",
+            # Bybit spot as its own canonical venue
+            ("BYBIT-SPOT", "SPOT_PAIR"): "bybit-spot",
             # Deribit (unified endpoint)
             ("DERIBIT", "SPOT_PAIR"): "deribit",
             ("DERIBIT", "PERPETUAL"): "deribit",
@@ -764,6 +778,10 @@ class VenueMapping:
             ("UPBIT", "SPOT_PAIR"): "upbit",
             # Coinbase (spot only - for coinbase premium)
             ("COINBASE", "SPOT_PAIR"): "coinbase",
+            ("COINBASE-SPOT", "SPOT_PAIR"): "coinbase",
+            # Coinbase Derivatives (perps) via Tardis coinbase-international
+            ("COINBASE-FUTURES", "PERPETUAL"): "coinbase-international",
+            ("COINBASE-FUTURES", "FUTURE"): "coinbase-international",
             # Tier 2 exchanges (spot only)
             ("BITSTAMP-SPOT", "SPOT_PAIR"): "bitstamp",
             # Tier 3 exchanges
@@ -792,6 +810,7 @@ class VenueMapping:
             "bybit-spot": ["SPOT_PAIR"],
             "deribit": ["SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"],
             "coinbase": ["SPOT_PAIR"],
+            "coinbase-international": ["PERPETUAL", "FUTURE"],
             # Tier 2
             "upbit": ["SPOT_PAIR"],
             "bitstamp": ["SPOT_PAIR"],

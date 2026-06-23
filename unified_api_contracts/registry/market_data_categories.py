@@ -233,6 +233,11 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "DERIBIT-COMBO",
         "UPBIT",
         "COINBASE",
+        # 2026-06-23: Bybit spot + Coinbase Derivatives (perps) as DISTINCT
+        # canonical venues so the perp-gate pairs BYBIT-SPOT↔BYBIT perps and
+        # COINBASE-SPOT↔COINBASE-FUTURES (cefi_universe_capture_rule).
+        "BYBIT-SPOT",
+        "COINBASE-FUTURES",
         # 2026-05-01: Tardis Tier-3 expansion (cefi_venue_universe_expansion plan)
         "BITFINEX-SPOT",
         "BITFINEX-FUTURES",
