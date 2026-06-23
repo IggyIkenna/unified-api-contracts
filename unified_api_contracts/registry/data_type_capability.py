@@ -455,6 +455,170 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
         batch_capable=True,
         streaming_protocol="ws",
     ),
+    # ── CeFi venues added 2026-06-23 (cefi full-catalogue dispatch) ───────
+    # The full-universe IS catalogue (18 venues / 230k rows) surfaced these
+    # venues with EMPTY ``venue_data_types`` in the per-venue CSV export
+    # because they had no rows here. Populate the data_types we ACTUALLY
+    # capture per venue, by source, so the data_type axis is non-empty for
+    # EVERY cefi venue (operator 2026-06-23: incl HL/ASTER + small DEX-perps,
+    # even though they are NOT sourced from Tardis). SSOT for the per-venue
+    # capture map: plans/active/issues/cefi_hl_aster_batch_data_gaps_2026_06_22.md
+    # + cefi_universe_capture_rule_2026_06_23.md.
+    #
+    # ── Tardis CEX SPOT venues (KRAKEN-SPOT / BITGET-SPOT / BITFINEX-SPOT) ─
+    # Same Tardis spot capture surface as COINBASE-SPOT/UPBIT above:
+    # trades + book_snapshot_5 + order_flow_imbalance (L5-derived). The two
+    # deeper-book data_types stay honest-absent (depth_of_book_10 /
+    # queue_position need an L10/full-L2 capture, like every existing venue).
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type=_dt,
+            venue=_venue,
+            instrument_type="",
+            live_capable=True,
+            batch_capable=True,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/market_interface/adapters/cefi/tardis_shared.py",),
+        )
+        for _venue in ("KRAKEN-SPOT", "BITGET-SPOT", "BITFINEX-SPOT")
+        for _dt in ("trades", "book_snapshot_5", "order_flow_imbalance")
+    ),
+    # ── Tardis CEX PERP/FUTURES venues (KRAKEN-FUTURES / BITGET-FUTURES /
+    # BITFINEX-FUTURES) — the derivatives complex. Same as the spot surface
+    # PLUS derivative_ticker (funding/mark/index/OI) + liquidations
+    # (Tardis ``liquidations`` channel) + futures_chain (dated quarterlies).
+    # BITFINEX-FUTURES is the canonical venue for the Tardis
+    # ``bitfinex-derivatives`` exchange (parallel to KRAKEN-FUTURES =
+    # ``cryptofacilities``; -FUTURES is the convention-consistent suffix —
+    # see venue_mapping.tardis_to_venue).
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type=_dt,
+            venue=_venue,
+            instrument_type=_itype,
+            live_capable=True,
+            batch_capable=True,
+            streaming_protocol="ws",
+            sources=("market_tick_data_service/market_interface/adapters/cefi/tardis_shared.py",),
+        )
+        for _venue in ("KRAKEN-FUTURES", "BITGET-FUTURES", "BITFINEX-FUTURES")
+        for _dt, _itype in (
+            ("trades", ""),
+            ("book_snapshot_5", ""),
+            ("order_flow_imbalance", ""),
+            ("derivative_ticker", "perpetual"),
+            ("liquidations", "perpetual"),
+            ("futures_chain", ""),
+        )
+    ),
+    # ── HYPERLIQUID derivative_ticker (S3 archive ``asset_ctxs`` =
+    # funding/OI; trades + book_snapshot_5 already declared above). HL
+    # publishes NO liquidation feed anywhere → no liquidations row (DROPPED
+    # as a hard system constraint, BUG#4(A) cefi_hl_aster gaps).
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="derivative_ticker",
+        venue="HYPERLIQUID",
+        instrument_type="perpetual",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        sources=("market_tick_data_service/market_interface/adapters/hyperliquid/",),
+        notes="HL S3 asset_ctxs = funding + open_interest. HL has NO liquidation feed (dropped).",
+    ),
+    # ── ASTER (Astherus) — Binance-Futures-compatible. NOT Tardis-sourced:
+    # batch-historical REST (``fapi`` ``fundingRate`` + ``aggTrades``) serves
+    # derivative_ticker + trades; book_snapshot_5 + liquidations are
+    # LIVE-ONLY via the native asterdex WS (``@depth5@100ms`` +
+    # ``!forceOrder@arr``) — historical REST cannot serve them
+    # (live_capable=True, batch_capable=False). cefi_hl_aster_batch_data_gaps
+    # BUG#4(A): KEEP as live-only, never a batch empty cell.
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="derivative_ticker",
+        venue="ASTER",
+        instrument_type="perpetual",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        sources=("market_tick_data_service/market_interface/adapters/cefi/aster_rest.py",),
+        notes="ASTER fapi fundingRate (Binance-compat) = funding/mark. Batch REST + live WS.",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="trades",
+        venue="ASTER",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        sources=("market_tick_data_service/market_interface/adapters/cefi/aster_rest.py",),
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="book_snapshot_5",
+        venue="ASTER",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=False,
+        streaming_protocol="ws",
+        sources=("market_tick_data_service/live/connectors/aster_book_liq_ws.py",),
+        notes="LIVE-ONLY: asterdex WS @depth5@100ms. Binance-compat REST has no historical depth.",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="liquidations",
+        venue="ASTER",
+        instrument_type="perpetual",
+        live_capable=True,
+        batch_capable=False,
+        streaming_protocol="ws",
+        sources=("market_tick_data_service/live/connectors/aster_book_liq_ws.py",),
+        notes="LIVE-ONLY: asterdex WS !forceOrder@arr. No historical liquidation REST.",
+    ),
+    # ── Small DEX-perp venues (on-chain CLOBs, treated as cefi). Native APIs
+    # (NOT Tardis except LIGHTER post-2026-04-17): trades + book_snapshot_5 +
+    # derivative_ticker (perp funding). Minimum perp surface so the data_type
+    # axis is non-empty (operator 2026-06-23: all venues incl small DEX-perps
+    # are in scope). DERIBIT-COMBO rides Deribit's multi-leg combo feed.
+    *(
+        DataTypeCapability(
+            asset_group=AssetGroup.CEFI,
+            data_type=_dt,
+            venue=_venue,
+            instrument_type=_itype,
+            live_capable=True,
+            batch_capable=True,
+            streaming_protocol="ws",
+        )
+        for _venue in ("PACIFICA-SOLANA", "EXTENDED-STARKNET", "LIGHTER-ZKSYNC")
+        for _dt, _itype in (
+            ("trades", ""),
+            ("book_snapshot_5", ""),
+            ("derivative_ticker", "perpetual"),
+        )
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="trades",
+        venue="DERIBIT-COMBO",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+        notes="Deribit multi-leg combo/spread instruments (distinct venue from DERIBIT).",
+    ),
+    DataTypeCapability(
+        asset_group=AssetGroup.CEFI,
+        data_type="book_snapshot_5",
+        venue="DERIBIT-COMBO",
+        instrument_type="",
+        live_capable=True,
+        batch_capable=True,
+        streaming_protocol="ws",
+    ),
     # =====================================================================
     # DeFi
     # =====================================================================
