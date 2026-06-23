@@ -3,10 +3,10 @@
 override-dependencies = [
     "eth-abi>=5.0.1",
     "gunicorn>=22.0.0",
-    # pin <3.14 until vcrpy ships aiohttp-3.14 support (8.1.1 deadlocks on removed AsyncStreamReaderMixin);
-    # CVE-2026-34993/47265 covered by the sanctioned pip-audit --ignore-vuln. See
+    # aiohttp>=3.14 closes the CVE-2026-34993/47265 cookie cluster; vcrpy>=8.2.1 restored aiohttp-3.14
+    # support (MockStream no longer needs the removed AsyncStreamReaderMixin). See
     # plans/active/issues/aiohttp_cve_2026_34993_vcrpy_deadlock_2026_06_03.md
-    "aiohttp>=3.13.4,<3.14.0",
+    "aiohttp>=3.14.1,<4.0.0",
 ]
 
 [build-system]
@@ -40,7 +40,7 @@ dependencies = [
     "pip-audit>=2.7.0,<3.0.0",
     "bandit>=1.7.0,<2.0.0",
     "vulture>=2.0,<3.0.0",
-    "vcrpy>=8.0.0,<9.0.0",
+    "vcrpy>=8.2.1,<9.0.0",
     "prek>=0.3.0,<1.0.0",
     "hypothesis>=6.0.0,<7.0.0",
     "httpx>=0.28.1,<1.0.0",
