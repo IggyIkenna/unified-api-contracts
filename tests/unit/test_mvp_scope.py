@@ -149,8 +149,17 @@ class TestCeFiMvp:
         assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "positions", base_ccy="BTC")
 
     def test_non_mvp_instrument_type_returns_false(self) -> None:
-        """FUTURE instrument_type is not in the CeFi MVP set → False."""
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "FUTURE", "trades", base_ccy="BTC")
+        """An instrument_type not in the CeFi MVP set → False.
+
+        (FUTURE is now an MVP cefi instrument_type — dated futures are in scope per
+        cefi_universe_capture_rule_2026_06_23 — so this asserts COMBO, which is NOT
+        in the rule.)
+        """
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "COMBO", "trades", base_ccy="BTC")
+
+    def test_dated_future_is_mvp_instrument_type(self) -> None:
+        """FUTURE IS an MVP cefi instrument_type (dated/quarterly futures, 2026-06-23)."""
+        assert is_mvp("cefi", "BINANCE-FUTURES", "FUTURE", "trades", base_ccy="BTC")
 
     def test_book_snapshot_5_is_mvp(self) -> None:
         """book_snapshot_5 is a CeFi MVP data_type (bare OKX → sub-venue normalised)."""
@@ -618,3 +627,98 @@ def test_config_hash_changes_iff_content_changes() -> None:
         data_types=frozenset({"trades"}),
     )
     assert _canonical_repr(rule_a) != _canonical_repr(rule_b)
+
+
+# ---------------------------------------------------------------------------
+# is_in_mvp_capture_universe — the perp-gated CeFi capture predicate
+# (cefi_universe_capture_rule_2026_06_23). The shared SSOT the three capture
+# consumers call: catalogue rollup, MTDS capture-universe, expected enumerator.
+# ---------------------------------------------------------------------------
+
+
+def test_capture_universe_perp_is_mvp_on_base_membership() -> None:
+    """A PERPETUAL for a universe base is in the capture universe (the perp IS the gate)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "PERPETUAL", has_perp_for_base=True)
+    # has_perp_for_base is irrelevant for a perp — the perp self-qualifies.
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "ETH", "PERPETUAL", has_perp_for_base=False)
+
+
+def test_capture_universe_spot_requires_perp_for_base() -> None:
+    """HARD perp-gate: SPOT is in-universe ONLY IF the venue also lists a perp for the base."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    # spot WITH a sibling perp → in universe
+    assert is_in_mvp_capture_universe("BINANCE-SPOT", "BTC", "SPOT_PAIR", has_perp_for_base=True)
+    # spot WITHOUT a sibling perp → DROPPED even for a top-100 base
+    assert not is_in_mvp_capture_universe("BINANCE-SPOT", "BTC", "SPOT_PAIR", has_perp_for_base=False)
+
+
+def test_capture_universe_dated_future_not_perp_gated() -> None:
+    """Dated/quarterly FUTURE sharing a universe base is MVP on base-membership +
+    venue — NOT perp-gated (operator 2026-06-23: part of the futures complex)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    # In-universe regardless of has_perp_for_base.
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "FUTURE", has_perp_for_base=True)
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "FUTURE", has_perp_for_base=False)
+    # A base NOT in the universe is still excluded.
+    assert not is_in_mvp_capture_universe("BINANCE-FUTURES", "NOTACOINXYZ", "FUTURE", has_perp_for_base=True)
+
+
+def test_capture_universe_options_deribit_btc_eth_only() -> None:
+    """OPTION is in-universe ONLY for venue==DERIBIT AND base in {BTC, ETH}; not perp-gated."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    # Deribit BTC/ETH options → in universe (no perp-sibling needed)
+    assert is_in_mvp_capture_universe("DERIBIT", "BTC", "OPTION", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("DERIBIT", "ETH", "OPTION", has_perp_for_base=False)
+    # Deribit SOL option → NOT in universe (only BTC/ETH)
+    assert not is_in_mvp_capture_universe("DERIBIT", "SOL", "OPTION", has_perp_for_base=True)
+    # A non-Deribit venue option → NOT in universe even for BTC with a perp
+    assert not is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "OPTION", has_perp_for_base=True)
+
+
+def test_capture_universe_tradfi_equity_perp() -> None:
+    """TradFi-linked EQUITY_PERP on Binance is in-universe (it IS a perp)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "AAPL", "EQUITY_PERP", has_perp_for_base=True)
+
+
+def test_capture_universe_base_not_in_universe_excluded() -> None:
+    """A base not in the CeFi universe is excluded even with a perp."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert not is_in_mvp_capture_universe("BINANCE-FUTURES", "NOTACOINXYZ", "PERPETUAL", has_perp_for_base=True)
+
+
+def test_capture_universe_non_mvp_venue_excluded() -> None:
+    """A venue outside the cefi MVP rule is excluded."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert not is_in_mvp_capture_universe("UPBIT", "BTC", "SPOT_PAIR", has_perp_for_base=True)
+
+
+def test_capture_universe_okx_bare_token_resolves() -> None:
+    """A bare OKX caller resolves to the OKX sub-venues (is_mvp base-venue normalisation)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert is_in_mvp_capture_universe("OKX", "BTC", "SPOT_PAIR", has_perp_for_base=True)
+
+
+def test_capture_universe_returns_bool() -> None:
+    """The predicate returns an actual bool (not a truthy object)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    result = is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "PERPETUAL", has_perp_for_base=True)
+    assert result is True
+
+
+def test_capture_universe_public_import_surface() -> None:
+    """``is_in_mvp_capture_universe`` is importable from the package root."""
+    import unified_api_contracts
+
+    assert hasattr(unified_api_contracts, "is_in_mvp_capture_universe")
+    assert "is_in_mvp_capture_universe" in unified_api_contracts.__all__
