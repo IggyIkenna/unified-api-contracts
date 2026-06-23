@@ -180,6 +180,7 @@ from .canonical.crosscutting.mvp_scope import (
     PredictionMvpRule,
     SportsMvpRule,
     TradFiMvpRule,
+    is_in_mvp_capture_universe,
     is_mvp,
     mvp_scope_config_descriptor,
 )
@@ -2348,6 +2349,7 @@ __all__ = [
     "MVP_SCOPE_CONFIG_HASH",
     "MVP_SCOPE_CONFIG_VERSION",
     "ConfigDescriptor",
+    "is_in_mvp_capture_universe",
     "is_mvp",
     "mvp_scope_config_descriptor",
     "CeFiMvpRule",
