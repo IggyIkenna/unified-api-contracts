@@ -460,6 +460,60 @@ def test_classify_kalshi_override_wins() -> None:
         del KALSHI_TICKER_TO_GROUP[fake_ticker]
 
 
+def test_classify_kalshi_real_live_tickers_to_shared_groups() -> None:
+    """Representative REAL Kalshi event tickers (from the live /series catalogue,
+    probed 2026-06-23) classify to the SHARED canonical groups — never OTHER for
+    the cross-venue-relevant crypto-daily / macro / equity-index families. This is
+    the cross-venue arb premise: a Kalshi crypto-daily must land in the same group
+    Polymarket's crypto-daily lands in."""
+    cases: list[tuple[str, CanonicalQuestionGroup]] = [
+        # Crypto daily directional — same groups Polymarket BTC/ETH/SOL/XRP/DOGE daily hit.
+        ("KXBTCD-26JUN23", CanonicalQuestionGroup.BTC_UP_DOWN_DAILY),
+        ("KXETHD-26JUN23", CanonicalQuestionGroup.ETH_UP_DOWN_DAILY),
+        ("KXSOLD-26JUN23", CanonicalQuestionGroup.SOL_UP_DOWN_DAILY),
+        ("KXXRPD-26JUN23", CanonicalQuestionGroup.XRP_UP_DOWN_DAILY),
+        ("KXDOGED-26JUN23", CanonicalQuestionGroup.DOGE_UP_DOWN_DAILY),
+        # XRP under Kalshi's legacy "RIPPLE" stem — the 2026-06-23 gap fix.
+        ("KXRIPPLED-26JUN23", CanonicalQuestionGroup.XRP_UP_DOWN_DAILY),
+        ("KXRIPPLE-26JUN23", CanonicalQuestionGroup.XRP_PRICE_RANGE_DAILY),
+        # Macro releases — shared with Polymarket.
+        ("KXCPIYOY-26JUN", CanonicalQuestionGroup.CPI_PRINT_PER_MONTH),
+        ("KXFEDDECISION-26JUL", CanonicalQuestionGroup.FED_RATE_DECISION_PER_FOMC),
+        ("KXGDP-26Q2", CanonicalQuestionGroup.GDP_PRINT_PER_QUARTER),
+        ("KXPAYROLLS-26JUN", CanonicalQuestionGroup.NONFARM_PAYROLLS_PER_MONTH),
+        # Equity indices.
+        ("KXINXU-26JUN23", CanonicalQuestionGroup.SPX_UP_DOWN_DAILY),
+        ("KXNASDAQ100U-26JUN23", CanonicalQuestionGroup.NDX_UP_DOWN_DAILY),
+    ]
+    for ticker, expected in cases:
+        assert classify_kalshi_to_canonical_group(ticker=ticker) == expected, ticker
+
+
+def test_kalshi_polymarket_cross_venue_same_canonical_group() -> None:
+    """The same real-world question on BOTH venues resolves to the IDENTICAL
+    CanonicalQuestionGroup — the cross-venue arb invariant. BTC/ETH daily directional
+    + CPI + Fed-rate trade on both Kalshi and Polymarket; both must agree on the group
+    so arbitrage_price_dispersion compares fair-value without a translation layer."""
+    pairs: list[tuple[str, dict[str, str], CanonicalQuestionGroup]] = [
+        (
+            "KXBTCD-26JUN23",
+            {"title": "Bitcoin price today", "slug": "btc-up-or-down-june-23", "event_slug": "btc", "outcome": "Up"},
+            CanonicalQuestionGroup.BTC_UP_DOWN_DAILY,
+        ),
+        (
+            "KXETHD-26JUN23",
+            {"title": "Ethereum price today", "slug": "eth-up-or-down-june-23", "event_slug": "eth", "outcome": "Up"},
+            CanonicalQuestionGroup.ETH_UP_DOWN_DAILY,
+        ),
+    ]
+    for kalshi_ticker, poly_kwargs, expected in pairs:
+        kalshi_group = classify_kalshi_to_canonical_group(ticker=kalshi_ticker)
+        poly_group = classify_polymarket_to_canonical_group(**poly_kwargs)
+        assert kalshi_group == expected, kalshi_ticker
+        assert poly_group == expected, poly_kwargs["slug"]
+        assert kalshi_group == poly_group  # the cross-venue invariant
+
+
 # ---------------------------------------------------------------------------
 # Stability hash
 # ---------------------------------------------------------------------------
