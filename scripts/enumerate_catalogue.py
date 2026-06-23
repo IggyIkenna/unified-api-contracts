@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Enumerate all strategy instances from STRATEGY_REGISTRY in human-readable form.
 
 Grouped by family → archetype → instances. Outputs a markdown table.

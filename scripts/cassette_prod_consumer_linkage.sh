@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 # STEP 5.86: cassette_prod_consumer_linkage — fail if any cassette has no prod consumer.
 #
 # Delegates to unified_api_contracts.testing.cassette_orphan_checker which:

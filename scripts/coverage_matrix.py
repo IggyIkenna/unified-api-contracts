@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Generate a Domain x Source coverage matrix from registered capabilities.
 
 Reads all registered SourceCapability declarations and prints a matrix

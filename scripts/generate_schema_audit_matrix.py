@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """
 Generate schema audit matrix: Provider x Schema Type -> mapped/gap status.
 

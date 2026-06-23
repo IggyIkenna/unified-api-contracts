@@ -111,12 +111,14 @@ class TestCeFiMvp:
         assert not is_mvp("cefi", "COINBASE", "SPOT_PAIR", "trades", base_ccy="BTC")
 
     def test_non_mvp_base_ccy_returns_false(self) -> None:
-        """A base outside the 44-base CEFI_BASE_ASSET_UNIVERSE → False.
+        """A base outside the curated CEFI_BASE_ASSET_UNIVERSE → False.
 
-        (SUI is a real coin but intentionally NOT in the operator-confirmed
-        44-base CeFi MVP universe; the rule has a non-empty base_ccys set.)
+        (The universe is wide post-2026-06-23 — legacy-44 + top-100-mcap-since-2019
+        + HL/ASTER perp bases, ~490 assets — so a SYNTHETIC non-coin token is used
+        to prove the base_ccys gate still rejects an out-of-universe base; the rule
+        has a non-empty base_ccys set.)
         """
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="SUI")
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="NOTACOINZZZ999")
 
     def test_operator_requested_2026_06_16_base_is_mvp(self) -> None:
         """An operator-requested 2026-06-16 base (EIGEN) is now in the MVP set."""
@@ -495,8 +497,9 @@ class TestUnboundDataType:
         """Blank data_type relaxes ONLY the data_type axis — venue/base still gate."""
         # Non-MVP venue: blank data_type does NOT make it MVP.
         assert not is_mvp("cefi", "UPBIT", "SPOT_PAIR", "", base_ccy="BTC")
-        # Non-MVP base: blank data_type does NOT make it MVP.
-        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "", base_ccy="SUI")
+        # Non-MVP base: blank data_type does NOT make it MVP. (Synthetic
+        # out-of-universe base — the curated universe is now ~490 assets.)
+        assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "", base_ccy="NOTACOINZZZ999")
 
 
 # ---------------------------------------------------------------------------

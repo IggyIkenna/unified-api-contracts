@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Weekly schema-validation canary: replay UAC VCR cassettes against live APIs.
 
 Walks every VCR cassette in `unified_api_contracts/external/*/mocks/*.yaml`,

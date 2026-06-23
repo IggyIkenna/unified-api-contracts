@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Validate live API responses against UAC cassette baselines.
 
 For each `collected_responses/<venue>/<stem>.json` produced by
