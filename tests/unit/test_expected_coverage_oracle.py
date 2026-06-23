@@ -157,6 +157,41 @@ class TestSportsKnownGap:
         assert result.reason != "EXPECTED_KNOWN_SOURCE_GAP"
 
 
+class TestDefiFlatProtocolLaunchFallback:
+    """2026-06-22 — flat-venue manifest rows (UNISWAP_V4, CURVE, AERODROME_V3 …)
+    must resolve a launch date from the PROTOCOL-CHAIN keys in
+    DEFI_VENUE_LAUNCH_DATES so the pre-launch gate fires. Closes the chain-blind
+    DIVERGENT_EMPTY class (the oracle wrongly returned SHOULD_HAVE_DATA for every
+    date back to 2018 on flat venues whose only launch entry was VENUE-CHAIN)."""
+
+    def test_flat_uniswap_v4_pre_launch_is_not_yet_live(self) -> None:
+        # UNISWAP_V4-ETHEREUM launched 2025-01-31; the flat UNISWAP_V4 manifest
+        # rows must inherit that floor — a 2020 date is pre-launch, NOT divergent.
+        result = expected_coverage("defi", "UNISWAP_V4", "dex_pool_state", date(2020, 1, 1))
+        assert result.state is ExpectedState.NOT_YET_LIVE
+        assert result.reason == "EXPECTED_PRE_VENUE_LAUNCH"
+
+    def test_flat_uniswap_v4_post_launch_should_have_data(self) -> None:
+        # Post-launch dates still surface real gaps (no over-suppression).
+        result = expected_coverage("defi", "UNISWAP_V4", "dex_pool_state", date(2025, 3, 1))
+        assert result.state is ExpectedState.SHOULD_HAVE_DATA
+
+    def test_flat_curve_uses_earliest_chain_launch_floor(self) -> None:
+        # CURVE-ETHEREUM = 2020-01-19 is the earliest CURVE entry → the floor.
+        result = expected_coverage("defi", "CURVE", "dex_pool_state", date(2019, 6, 1))
+        assert result.state is ExpectedState.NOT_YET_LIVE
+
+    def test_added_bare_protocol_launch_dates_gate(self) -> None:
+        # AERODROME_V3 launched 2023-08 on Base; a 2022 date is pre-launch.
+        result = expected_coverage("defi", "AERODROME_V3", "dex_pool_state", date(2022, 1, 1))
+        assert result.state is ExpectedState.NOT_YET_LIVE
+
+    def test_exact_venue_chain_key_still_resolves(self) -> None:
+        # Regression: the exact PROTOCOL-CHAIN lookup must keep working.
+        pre = expected_coverage("defi", "AAVE_V3-LINEA", "lending_indices", date(2024, 1, 1))
+        assert pre.state is ExpectedState.NOT_YET_LIVE  # Linea launch 2024-09-26
+
+
 class TestResultShape:
     def test_result_is_frozen(self) -> None:
         result = expected_coverage("cefi", "BINANCE-SPOT", "trades", date(2024, 6, 17))

@@ -108,6 +108,26 @@ def test_reject_glued_venue_chain() -> None:
     assert any("VENUE-CHAIN" in v for v in canonical_path_violations(bad))
 
 
+def test_cefi_hyphenated_venue_is_canonical() -> None:
+    # Regression (2026-06-23): a hyphen in a CEFI venue is a legitimate venue-name
+    # token (BINANCE-FUTURES / OKX-FUTURES / BYBIT-FUTURES / KRAKEN-FUTURES — the
+    # canonical cefi venue tokens), NOT the defi PROTOCOL-CHAIN glue. The VENUE-CHAIN
+    # guard is defi-gated, so these MUST pass. The un-gated guard crashed every cefi
+    # LIVE producer at the writer boundary (live_tick_blob_path) and silently froze the
+    # deribit/hyperliquid/binance live VMs for hours.
+    for venue in ("BINANCE-FUTURES", "OKX-FUTURES", "BYBIT-FUTURES", "KRAKEN-FUTURES"):
+        path = build_cefi_partition_path(
+            venue=venue,
+            instrument_type=InstrumentType.PERPETUAL,
+            data_type="trades",
+            day=_DAY,
+            file_name="BTC-PERPETUAL.parquet",
+        )
+        violations = canonical_path_violations(path)
+        assert is_canonical(path), violations
+        assert not any("VENUE-CHAIN" in v for v in violations)
+
+
 def test_reject_glued_version() -> None:
     bad = _GOOD.replace("venue=AAVE_V3", "venue=AAVEV3")
     assert not is_canonical(bad)
