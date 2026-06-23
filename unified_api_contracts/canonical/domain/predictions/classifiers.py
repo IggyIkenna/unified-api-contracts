@@ -188,9 +188,14 @@ KALSHI_TICKER_PREFIX_TO_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
     # add COPPER_PRICE_LEVEL to the enum when a Polymarket counterpart lands).
     # Keys deliberately omitted so the ticker falls through to OTHER.
     # ── FX ───────────────────────────────────────────────────────────────────
-    # EUR/USD → EUR_UP_DOWN_DAILY (shared with Polymarket)
+    # EUR/USD → EUR_UP_DOWN_DAILY (shared with Polymarket). Kalshi's EUR/USD series
+    # are KXEURUSD* (daily/weekly/quarterly/yearly) + KXEUROIMF. The bare "KXEURO"
+    # prefix was DROPPED 2026-06-23: it greedily caught sports/entertainment series
+    # KXEUROLEAGUE* / KXEUROCUP* (basketball) + KXEUROVISION* → mis-classified them
+    # as FX. "KXEURUSD" was previously MISSING so the real EUR/USD daily markets
+    # (KXEURUSDD etc.) fell to OTHER — now captured.
+    "KXEURUSD": _G.EUR_UP_DOWN_DAILY,
     "KXEUROIMF": _G.EUR_UP_DOWN_DAILY,
-    "KXEURO": _G.EUR_UP_DOWN_DAILY,
     # ── Macro releases ───────────────────────────────────────────────────────
     # Fed funds rate decision → FED_RATE_DECISION_PER_FOMC (shared Polymarket)
     "KXFEDDECISION": _G.FED_RATE_DECISION_PER_FOMC,
@@ -579,6 +584,76 @@ def classify_polymarket_to_canonical_group(
     return residual
 
 
+# ---------------------------------------------------------------------------
+# Kalshi SPORTS ticker → shared SPORTS_{LEAGUE}_{BETTYPE} group (cross-venue).
+#
+# Cross-venue arb premise: a Kalshi per-GAME market (KX{LEAGUE}…GAME / *SPREAD /
+# *TOTAL / *NRFI) is the SAME real-world event (a single game, same settlement +
+# timing) as the Polymarket market for that game, so both must resolve to the
+# IDENTICAL SPORTS_{LEAGUE}_{BETTYPE} group — then the arb engine pairs the exact
+# same-game instruments WITHIN the group. Season-futures / draft / award /
+# within-match props (NO game/spread/total/nrfi token) are NOT cleanly arbable and
+# Polymarket rarely lists an identical contract → they stay OTHER (no false pairs).
+# Only the ~17 leagues that have a canonical group are mapped; the hundreds of
+# minor world leagues (Liiga / KHL / NPB / J-League / Serie B / …) have no
+# Polymarket counterpart → OTHER. Verified vs the live /series?category=Sports
+# catalogue 2026-06-23. Longest prefix first so a longer league name wins.
+# ---------------------------------------------------------------------------
+
+_KALSHI_SPORTS_PREFIX_TO_LEAGUE: Final[tuple[tuple[str, str], ...]] = (
+    ("KXBUNDESLIGA", "BUNDESLIGA"),
+    ("KXLALIGA", "LA_LIGA"),
+    ("KXSERIEA", "SERIE_A"),
+    ("KXNFL", "NFL"),
+    ("KXNBA", "NBA"),
+    ("KXMLB", "MLB"),
+    ("KXNHL", "NHL"),
+    ("KXEPL", "EPL"),
+    ("KXUCL", "CHAMPIONS_LEAGUE"),
+    ("KXWC", "WORLD_CUP"),
+    ("KXATP", "TENNIS"),
+    ("KXWTA", "TENNIS"),
+    ("KXUFC", "UFC"),
+    ("KXWBC", "BOXING"),
+    ("KXLPGA", "GOLF"),
+    ("KXPGA", "GOLF"),
+    ("KXF1", "F1"),
+)
+
+
+def _kalshi_sports_group(upper_ticker: str) -> CanonicalQuestionGroup | None:
+    """Map a Kalshi sports ticker to a shared ``SPORTS_{LEAGUE}_{BETTYPE}`` group.
+
+    Returns a group ONLY for cleanly-arbable per-game markets — a ``GAME`` /
+    ``SPREAD`` / ``TOTAL`` / ``NRFI`` token on a league that has a canonical
+    group. Season-futures, draft, awards and within-match props (no such token)
+    return ``None`` (caller → OTHER) so we never create a false cross-venue pair;
+    a non-MATCH bet-type with no dedicated group also returns ``None`` rather than
+    collapsing to MATCH.
+    """
+    league: str | None = None
+    for prefix, lg in sorted(_KALSHI_SPORTS_PREFIX_TO_LEAGUE, key=lambda kv: len(kv[0]), reverse=True):
+        if upper_ticker.startswith(prefix):
+            league = lg
+            break
+    if league is None:
+        return None
+    if "NRFI" in upper_ticker:
+        bet_type = "NRFI"
+    elif "SPREAD" in upper_ticker:
+        bet_type = "SPREAD"
+    elif "TOTAL" in upper_ticker:
+        bet_type = "TOTAL"
+    elif "GAME" in upper_ticker:
+        bet_type = "MATCH"
+    else:
+        return None  # season / futures / award / within-match prop → not cleanly arbable
+    group = _SPORTS_GROUP.get((league, bet_type))
+    if group is not None:
+        return group
+    return _SPORTS_GROUP.get((league, "MATCH")) if bet_type == "MATCH" else None
+
+
 def classify_kalshi_to_canonical_group(
     *,
     ticker: str,
@@ -610,6 +685,12 @@ def classify_kalshi_to_canonical_group(
     result = KALSHI_TICKER_TO_GROUP.get(upper_ticker)
     if result is not None:
         return result
+
+    # 1.5 — sports per-game markets → shared SPORTS_{LEAGUE}_{BETTYPE} group
+    # (same game, same settlement as the Polymarket market → cross-venue pairable).
+    sports = _kalshi_sports_group(upper_ticker)
+    if sports is not None:
+        return sports
 
     # 2 — prefix rules, longest-prefix first
     for prefix in sorted(KALSHI_TICKER_PREFIX_TO_GROUP, key=len, reverse=True):
