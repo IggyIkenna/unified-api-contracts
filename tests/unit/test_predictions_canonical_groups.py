@@ -514,6 +514,53 @@ def test_kalshi_polymarket_cross_venue_same_canonical_group() -> None:
         assert kalshi_group == poly_group  # the cross-venue invariant
 
 
+def test_classify_kalshi_sports_per_game_markets_to_shared_groups() -> None:
+    """Kalshi per-GAME sports markets (KX{LEAGUE}…GAME / *SPREAD / *TOTAL / *NRFI)
+    map to the SAME SPORTS_{LEAGUE}_{BETTYPE} groups Polymarket uses — so same-game
+    instruments pair cross-venue. Verified ticker stems from the live catalogue."""
+    cases: list[tuple[str, CanonicalQuestionGroup]] = [
+        ("KXNHLGAME-26JUN23", CanonicalQuestionGroup.SPORTS_NHL_MATCH),
+        ("KXNFLGAME-26SEP-X", CanonicalQuestionGroup.SPORTS_NFL_MATCH),
+        ("KXEPLGAME-26AUG-X", CanonicalQuestionGroup.SPORTS_EPL_MATCH),
+        ("KXUCLGAME-26FEB-X", CanonicalQuestionGroup.SPORTS_CHAMPIONS_LEAGUE_MATCH),
+        ("KXMLBGAME-26JUN23", CanonicalQuestionGroup.SPORTS_MLB_MATCH),
+        ("KXNFLTOTAL-26SEP-X", CanonicalQuestionGroup.SPORTS_NFL_TOTAL),
+        ("KXNFLSPREAD-26SEP-X", CanonicalQuestionGroup.SPORTS_NFL_SPREAD),
+        ("KXMLBNRFI-26JUN23", CanonicalQuestionGroup.SPORTS_MLB_NRFI),
+        ("KXNBASPREAD-26JAN-X", CanonicalQuestionGroup.SPORTS_NBA_SPREAD),
+    ]
+    for ticker, expected in cases:
+        assert classify_kalshi_to_canonical_group(ticker=ticker) == expected, ticker
+
+
+def test_classify_kalshi_sports_props_and_minor_leagues_stay_other() -> None:
+    """Season-futures / draft / award / within-match props + minor world leagues are
+    NOT cleanly arbable (Polymarket rarely lists an identical contract) → OTHER, never
+    a false MATCH pairing."""
+    for ticker in [
+        "KXNFLDRAFTQB-26",  # draft prop
+        "KXNFLEXACTWINSLA-26",  # season win total
+        "KXNBADRAFT10-26",  # draft pick
+        "KXMLBWINS-COL-26",  # season wins
+        "KXATPGAMETOTAL-26",  # tennis total-games — no SPORTS_TENNIS_TOTAL group → not forced to MATCH
+        "KXWCMESSIMBAPPE-26",  # within-tournament prop
+        "KXLIIGAGAME-26",  # minor world league (no canonical group)
+        "KXKHLGAME-26",  # minor world league
+    ]:
+        assert classify_kalshi_to_canonical_group(ticker=ticker) == CanonicalQuestionGroup.OTHER, ticker
+
+
+def test_classify_kalshi_euro_basketball_not_misclassified_as_fx() -> None:
+    """Regression: the FX EUR prefix must not catch EuroLeague/EuroCup basketball or
+    Eurovision (the greedy bare 'KXEURO' prefix was dropped 2026-06-23). Real EUR/USD
+    (KXEURUSD*, KXEUROIMF) still maps to EUR_UP_DOWN_DAILY."""
+    assert classify_kalshi_to_canonical_group(ticker="KXEUROLEAGUEGAME-26") == CanonicalQuestionGroup.OTHER
+    assert classify_kalshi_to_canonical_group(ticker="KXEUROCUPTOTAL-26") == CanonicalQuestionGroup.OTHER
+    assert classify_kalshi_to_canonical_group(ticker="KXEUROVISIONISRAELBAN-26") == CanonicalQuestionGroup.OTHER
+    assert classify_kalshi_to_canonical_group(ticker="KXEURUSDD-26") == CanonicalQuestionGroup.EUR_UP_DOWN_DAILY
+    assert classify_kalshi_to_canonical_group(ticker="KXEUROIMF-26") == CanonicalQuestionGroup.EUR_UP_DOWN_DAILY
+
+
 # ---------------------------------------------------------------------------
 # Stability hash
 # ---------------------------------------------------------------------------

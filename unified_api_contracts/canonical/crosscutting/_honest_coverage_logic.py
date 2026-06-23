@@ -132,6 +132,81 @@ def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
     return numerator / denominator
 
 
+# ---------------------------------------------------------------------------
+# Schedule-defining data_types — "empty source response == complete" (operator
+# direction 2026-06-23).
+#
+# A schedule-defining data_type IS the source-of-truth for whether anything
+# exists to capture on a (entity, day). API-Football ``FIXTURES`` is the sports
+# schedule: when its fixtures endpoint returns 200 + zero rows for a
+# (league, day), there genuinely are NO matches that day — that cell is
+# CORRECTLY RESOLVED (complete), not a coverage gap. The 2026-06-23 audit found
+# 233 golden-window FIXTURES cells at ``empty_confirmed(SOURCE_RETURNED_ZERO)``
+# for cup / lower-league competitions (Scottish Cup, Greek Super League 2,
+# Copa Sudamericana, …) on dates they simply didn't play — wrongly counted as
+# gaps, understating FIXTURES coverage to ~93.7% when it is really ~100%.
+#
+# This is DATA-TYPE-AWARE on purpose: ``SOURCE_RETURNED_ZERO`` is NOT blanket-
+# resolved. For an ENRICHMENT data_type (FIXTURE_STATS / PLAYER_STATS / ODDS /
+# MATCHES / …) a zero-row response WHEN A FIXTURE EXISTS may be a real gap, so
+# its ``SOURCE_RETURNED_ZERO`` stays an in-window absence. Only the
+# schedule-DEFINING data_type is definitionally "empty == complete" — because
+# the schedule endpoint IS the universe.
+#
+# NOTE on MATCHES (FootyStats): NOT schedule-defining. FootyStats is
+# fixture-PINNED — it records ``EXPECTED_NO_FIXTURE`` (already out-of-window)
+# when no API-Football fixture exists, and a genuine zero from FootyStats when a
+# fixture DOES exist is a real enrichment gap. So only ``FIXTURES`` qualifies.
+# SSOT: ``codex/02-data/honest-absence-downstream-handling.md`` + the operator
+# directive 2026-06-23.
+# ---------------------------------------------------------------------------
+
+SCHEDULE_DEFINING_DATA_TYPES: Final[frozenset[str]] = frozenset({"FIXTURES"})
+"""Closed set of schedule-DEFINING data_types — the source-of-truth for whether
+anything exists to capture on a (entity, day). For these, a clean
+``SOURCE_RETURNED_ZERO`` (200 + zero rows) means "no matches that day = complete"
+→ RESOLVED, not a gap (see :func:`is_resolved_schedule_empty`). Today only
+sports ``FIXTURES`` (API-Football, the schedule). Enrichment data_types are NOT
+here — their zero-row responses may be real gaps."""
+
+_SCHEDULE_EMPTY_RESOLVED_REASON: Final[str] = "SOURCE_RETURNED_ZERO"
+"""The ONLY ``empty_confirmed`` reason a schedule-defining data_type resolves
+via :func:`is_resolved_schedule_empty`: a proven clean 200+empty fetch (no
+matches that day). ``EXPECTED_*`` calendar reasons are already out-of-window."""
+
+
+def is_resolved_schedule_empty(data_type: str | None, reason: str | None) -> bool:
+    """True iff a schedule-DEFINING data_type's empty cell is RESOLVED (complete).
+
+    A schedule-defining data_type (today only sports ``FIXTURES``, the
+    API-Football schedule) that is ``empty_confirmed`` with reason
+    ``SOURCE_RETURNED_ZERO`` means the fixtures endpoint returned 200 + zero
+    rows → there genuinely were NO matches that (league, day) → the cell is
+    CORRECTLY RESOLVED, NOT a coverage gap. Such cells are OUT-of-coverage-window
+    (nothing was collectable) and MUST be excluded from the completion-%
+    denominator — exactly like the ``EXPECTED_NO_FIXTURE`` lifecycle reason.
+
+    DATA-TYPE-AWARE (operator direction 2026-06-23): returns ``False`` for any
+    NON-schedule-defining data_type even on ``SOURCE_RETURNED_ZERO`` — an
+    enrichment (FIXTURE_STATS / PLAYER_STATS / ODDS / …) returning zero when a
+    fixture exists is a genuine gap, so it stays an in-window absence.
+
+    Args:
+        data_type: The manifest ``data_type`` token (case-insensitive match
+            against :data:`SCHEDULE_DEFINING_DATA_TYPES`).
+        reason: The ``error_reason`` on the ``empty_confirmed`` row.
+
+    Returns:
+        ``True`` only when ``data_type`` is schedule-defining AND ``reason`` is
+        ``SOURCE_RETURNED_ZERO``. Blank/None data_type or reason → ``False``.
+    """
+    if not data_type or not reason:
+        return False
+    return (
+        data_type.strip().upper() in SCHEDULE_DEFINING_DATA_TYPES and reason.strip() == _SCHEDULE_EMPTY_RESOLVED_REASON
+    )
+
+
 HONEST_COVERAGE_GAP_FIELDS: Final[tuple[str, ...]] = (
     "attempted_failed",
     "expected_unattempted_pending_fetch",
