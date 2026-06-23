@@ -722,3 +722,115 @@ def test_capture_universe_public_import_surface() -> None:
 
     assert hasattr(unified_api_contracts, "is_in_mvp_capture_universe")
     assert "is_in_mvp_capture_universe" in unified_api_contracts.__all__
+
+
+# ---------------------------------------------------------------------------
+# STAKING_SPOT_EXCEPTION — the spot-without-perp carve-out (operator 2026-06-23)
+# ---------------------------------------------------------------------------
+
+# The 7 LSTs the cefi_universe_capture_rule says were ABSENT and must be added.
+_NEWLY_ADDED_LSTS = ("WSTETH", "RETH", "WEETH", "EETH", "MSOL", "JITOSOL", "BSOL")
+
+
+def test_staking_spot_exception_members() -> None:
+    """The exception set is exactly the operator's closed allow-list."""
+    from unified_api_contracts import STAKING_SPOT_EXCEPTION
+
+    expected = frozenset(
+        {
+            "EIGEN",
+            "KING",
+            "ETHFI",
+            "STETH",
+            "WSTETH",
+            "RETH",
+            "WEETH",
+            "EETH",
+            "CBETH",
+            "MSOL",
+            "JITOSOL",
+            "JTO",
+            "BSOL",
+        }
+    )
+    assert expected == STAKING_SPOT_EXCEPTION
+
+
+def test_staking_spot_exception_is_frozenset() -> None:
+    """The exception is an immutable frozenset (deterministic constant)."""
+    from unified_api_contracts import STAKING_SPOT_EXCEPTION
+
+    assert isinstance(STAKING_SPOT_EXCEPTION, frozenset)
+
+
+def test_staking_spot_exception_public_import_surface() -> None:
+    """``STAKING_SPOT_EXCEPTION`` is importable from the package root + in __all__."""
+    import unified_api_contracts
+
+    assert hasattr(unified_api_contracts, "STAKING_SPOT_EXCEPTION")
+    assert "STAKING_SPOT_EXCEPTION" in unified_api_contracts.__all__
+
+
+def test_staking_spot_exception_all_members_in_base_universe() -> None:
+    """Every exception base is also in CEFI_BASE_ASSET_UNIVERSE (base-membership leg)."""
+    from unified_api_contracts import (
+        CEFI_BASE_ASSET_UNIVERSE,
+        STAKING_SPOT_EXCEPTION,
+    )
+
+    missing = STAKING_SPOT_EXCEPTION - CEFI_BASE_ASSET_UNIVERSE
+    assert not missing, f"exception bases missing from CEFI_BASE_ASSET_UNIVERSE: {sorted(missing)}"
+
+
+def test_newly_added_lsts_present_in_base_universe() -> None:
+    """The 7 previously-absent LSTs are now in CEFI_BASE_ASSET_UNIVERSE."""
+    from unified_api_contracts import CEFI_BASE_ASSET_UNIVERSE
+
+    for ticker in _NEWLY_ADDED_LSTS:
+        assert ticker in CEFI_BASE_ASSET_UNIVERSE, f"{ticker} missing from CEFI_BASE_ASSET_UNIVERSE"
+
+
+def test_base_universe_is_sorted_deterministic() -> None:
+    """CEFI_BASE_ASSET_UNIVERSE renders sorted/deterministic (frozenset, no dupes)."""
+    from unified_api_contracts import CEFI_BASE_ASSET_UNIVERSE
+
+    assert isinstance(CEFI_BASE_ASSET_UNIVERSE, frozenset)
+    # No duplicates survive a frozenset, but assert the literal is internally consistent.
+    assert len(CEFI_BASE_ASSET_UNIVERSE) == len(set(CEFI_BASE_ASSET_UNIVERSE))
+
+
+def test_capture_universe_staking_spot_mvp_without_perp() -> None:
+    """Each STAKING_SPOT_EXCEPTION base's SPOT is mvp=true even with has_perp_for_base=False."""
+    from unified_api_contracts import STAKING_SPOT_EXCEPTION, is_in_mvp_capture_universe
+
+    for base in STAKING_SPOT_EXCEPTION:
+        assert is_in_mvp_capture_universe(
+            "BINANCE-SPOT", base, "SPOT_PAIR", has_perp_for_base=False
+        ), f"staking-exception base {base} SPOT should be mvp=true with no perp"
+
+
+def test_capture_universe_staking_spot_exception_on_any_venue() -> None:
+    """The carve-out applies on any in-rule venue that lists it — e.g. Kraken spot."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert is_in_mvp_capture_universe("KRAKEN-SPOT", "STETH", "SPOT_PAIR", has_perp_for_base=False)
+
+
+def test_capture_universe_non_exception_spot_no_perp_still_dropped() -> None:
+    """A NON-exception base's spot-without-perp stays mvp=false (the gate holds)."""
+    from unified_api_contracts import STAKING_SPOT_EXCEPTION, is_in_mvp_capture_universe
+
+    # ADA is in the universe but NOT a staking-exception base.
+    assert "ADA" not in STAKING_SPOT_EXCEPTION
+    assert not is_in_mvp_capture_universe("BINANCE-SPOT", "ADA", "SPOT_PAIR", has_perp_for_base=False)
+    # With a perp it's back in.
+    assert is_in_mvp_capture_universe("BINANCE-SPOT", "ADA", "SPOT_PAIR", has_perp_for_base=True)
+
+
+def test_capture_universe_config_version_bumped() -> None:
+    """MVP_SCOPE_CONFIG_VERSION reflects the staking-exception change."""
+    from unified_api_contracts.canonical.crosscutting.mvp_scope import (
+        MVP_SCOPE_CONFIG_VERSION,
+    )
+
+    assert MVP_SCOPE_CONFIG_VERSION >= 6

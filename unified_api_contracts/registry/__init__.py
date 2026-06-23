@@ -86,6 +86,7 @@ from .cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_EQUITY_PERP_BASE_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
+    STAKING_SPOT_EXCEPTION,
 )
 from .cefi_margin_tiers import maintenance_margin_for
 from .cefi_perp_venue_endpoints import (
@@ -868,6 +869,7 @@ __all__ = [
     "SPORTS_PREDICTION_MARKET_VENUES",
     "SPORTS_VENUES",
     "SPORTS_VENUE_TYPE_MAP",
+    "STAKING_SPOT_EXCEPTION",
     "STARKNET_RPC_TEMPLATES",
     "SUBGRAPH_IDS",
     "SUPPORTED_MARKET_TYPES",

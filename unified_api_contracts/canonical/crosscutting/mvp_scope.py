@@ -63,6 +63,7 @@ from unified_api_contracts.registry.cefi_instrument_universe import (
     CEFI_BASE_ASSET_UNIVERSE,
     CEFI_EQUITY_PERP_BASE_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
+    STAKING_SPOT_EXCEPTION,
 )
 
 # Re-exported (the generic descriptor type now lives in ``config_versioning``;
@@ -584,8 +585,18 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 5
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 6
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v6 (2026-06-23): added the **staking-spot exception** to
+:func:`is_in_mvp_capture_universe` — a base in ``STAKING_SPOT_EXCEPTION``
+(EIGEN/KING/ETHFI restaking + STETH/WSTETH/RETH/WEETH/EETH/CBETH ETH-LSTs +
+MSOL/JITOSOL/JTO/BSOL SOL-LSTs) has its SPOT captured on ANY venue that lists it
+REGARDLESS of perp existence (the ONLY spot-without-perp carve-out; operator
+2026-06-23, cefi_universe_capture_rule). Also expanded ``CEFI_BASE_ASSET_UNIVERSE``
+by the 7 previously-absent LSTs (WSTETH/RETH/WEETH/EETH/MSOL/JITOSOL/BSOL) so the
+base-membership leg passes for them — the cefi ``base_ccys`` content-hash flips
+with the constant.
 
 v5 (2026-06-23): added :func:`is_in_mvp_capture_universe` — the perp-gated CeFi
 capture predicate (operator 2026-06-23). It composes the base-membership /
@@ -938,9 +949,14 @@ def is_in_mvp_capture_universe(
             source=source,
         )
 
-    # SPOT: base-membership AND the venue lists a perp for the base (HARD perp-gate).
+    # SPOT: base-membership AND the venue lists a perp for the base (HARD perp-gate)
+    # — EXCEPT the staking/restaking/LST allow-list (STAKING_SPOT_EXCEPTION,
+    # operator 2026-06-23): a base in that set has its SPOT captured on ANY venue
+    # that lists it, REGARDLESS of perp existence (the carry_staked_basis legs).
+    # This is the ONLY spot-without-perp carve-out.
     if itype in _CEFI_PERP_GATED_TYPES:
-        if not has_perp_for_base:
+        base_in_staking_exception = (base or "").strip().upper() in STAKING_SPOT_EXCEPTION
+        if not has_perp_for_base and not base_in_staking_exception:
             return False
         return is_mvp(
             "cefi",

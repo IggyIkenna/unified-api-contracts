@@ -51,7 +51,8 @@ from __future__ import annotations
 # Curated union — legacy-44 + top-100-mcap-aggregated-since-2019 + HL/ASTER perp
 # bases. Survivorship-bias-free (retired top-100 coins kept). Sorted for
 # deterministic diffs; see module docstring for the rationale + provenance of
-# each tranche. ~518 base assets.
+# each tranche. ~525 base assets (incl. the staking/restaking/LST spot-exception
+# set ``STAKING_SPOT_EXCEPTION`` below).
 CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "0G", "1INCH", "2Z", "AAVE", "ABBC", "ACE", "ACH", "ACU",
     "ACX", "ADA", "AERGO", "AERO", "AEVO", "AGIX", "AGLD", "AI16Z",
@@ -66,13 +67,15 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "BLEND", "BLESS", "BLUAI", "BLUR", "BMT", "BNB", "BNT", "BOBA",
     "BOME", "BONK", "BR", "BRETT", "BREV", "BROCCOLI714", "BSB", "BSV",
     "BTC", "BTCDOM", "BTG", "BTM", "BTR", "BTS", "BTT", "BTW",
-    "BULLA", "BUSD", "BZ", "CAKE", "CARDS", "CBETH", "CBRS", "CEL",
+    "BSOL", "BULLA", "BUSD", "BZ", "CAKE", "CARDS", "CBETH", "CBRS",
+    "CEL",
     "CELO", "CELR", "CFG", "CFX", "CHEEMS", "CHILLGUY", "CHIP", "CHR",
     "CHZ", "CLANKER", "CLO", "COAI", "COLLECT", "COMP", "CORE", "COTI",
     "COW", "CRO", "CRV", "CTR", "CTSI", "CVC", "CVX", "CYBER",
     "CYS", "DAI", "DASH", "DCR", "DENT", "DEXE", "DGB", "DOGE",
     "DOGS", "DOLO", "DOOD", "DOT", "DRGN", "DRIFT", "DUSK", "DYDX",
-    "DYM", "EDEN", "EDGE", "EDU", "EGLD", "EIGEN", "ELF", "ENA",
+    "DYM", "EDEN", "EDGE", "EDU", "EETH", "EGLD", "EIGEN", "ELF",
+    "ENA",
     "ENJ", "ENS", "ENSO", "EOS", "ESP", "ESPORTS", "ETC", "ETH",
     "ETHFI", "EUL", "EVAA", "FARTCOIN", "FET", "FF", "FHE", "FIDA",
     "FIGHT", "FIL", "FLOCK", "FLOKI", "FLOW", "FLUX", "FOGO", "FOLKS",
@@ -82,7 +85,8 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "HBAR", "HBTC", "HEDG", "HEMI", "HFT", "HMSTR", "HNT", "HOLO",
     "HOME", "HOT", "HT", "HUMA", "HYPE", "HYPER", "ICP", "ICX",
     "ILV", "IMX", "INIT", "INJ", "IO", "IOTA", "IOTX", "IP",
-    "IRYS", "JASMY", "JCT", "JELLYJELLY", "JTO", "JUP", "KAITO", "KAS",
+    "IRYS", "JASMY", "JCT", "JELLYJELLY", "JITOSOL", "JTO", "JUP", "KAITO",
+    "KAS",
     "KAT", "KAVA", "KCS", "KDA", "KGEN", "KING", "KITE", "KMD",
     "KNC", "KOMA", "KSM", "LAB", "LAYER", "LDO", "LEO", "LIGHT",
     "LINEA", "LINK", "LISTA", "LIT", "LITE", "LPT", "LQTY", "LRC",
@@ -90,7 +94,8 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "MANA", "MANTA", "MANTRA", "MASK", "MATIC", "ME", "MEGA", "MELANIA",
     "MEME", "MERL", "METIS", "MEW", "MINA", "MITH", "MITO", "MKR",
     "MMT", "MNT", "MOG", "MON", "MOODENG", "MORPHO", "MOVE", "MOVR",
-    "MX", "MYX", "NANO", "NAORIS", "NEAR", "NEIRO", "NEO", "NEX",
+    "MSOL", "MX", "MYX", "NANO", "NAORIS", "NEAR", "NEIRO", "NEO",
+    "NEX",
     "NEXO", "NIGHT", "NIL", "NMR", "NOM", "NOT", "NOW", "NULS",
     "NXPC", "OCEAN", "OGN", "OKB", "OMG", "ONDO", "ONDS", "ONE",
     "ONT", "OP", "OPEN", "OPG", "OPN", "ORCA", "ORDI", "OXT",
@@ -99,7 +104,8 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "POLYX", "POPCAT", "POPMART", "PORTAL", "POWER", "POWR", "PRL", "PROM",
     "PROMPT", "PROS", "PROVE", "PTB", "PUMP", "PUMPBTC", "PUNDIAI", "PURR",
     "PYTH", "QNT", "QNTX", "QTUM", "RAD", "RAIL", "RARE", "RAVE",
-    "RAY", "RECALL", "RED", "REN", "RENDER", "REP", "RESOLV", "REZ",
+    "RAY", "RECALL", "RED", "REN", "RENDER", "REP", "RESOLV", "RETH",
+    "REZ",
     "RIF", "RLC", "RNDR", "RONIN", "ROSE", "RPL", "RSR", "RUNE",
     "RVN", "S", "SAGA", "SAHARA", "SAND", "SAPIEN", "SATS", "SC",
     "SEI", "SENT", "SHELL", "SHIB", "SIGN", "SIREN", "SKL", "SKR",
@@ -113,8 +119,9 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "TUSD", "TWT", "UAI", "UMA", "UNI", "USAR", "USD1", "USDC",
     "USDD", "USDP", "USDT", "USELESS", "UST", "USTC", "USUAL", "VANA",
     "VELO", "VELVET", "VET", "VINE", "VIRTUAL", "VVV", "W", "WAVES",
-    "WBTC", "WCT", "WET", "WIF", "WLD", "WLFI", "WOJAK", "WOO",
-    "WTC", "XAI", "XAN", "XCN", "XEM", "XLM", "XMR", "XPIN",
+    "WBTC", "WCT", "WEETH", "WET", "WIF", "WLD", "WLFI", "WOJAK",
+    "WOO", "WSTETH", "WTC", "XAI", "XAN", "XCN", "XEM", "XLM",
+    "XMR", "XPIN",
     "XPL", "XRP", "XTZ", "XVG", "YB", "YFI", "YGG", "ZAMA",
     "ZBT", "ZEC", "ZEN", "ZEREBRO", "ZEST", "ZETA", "ZIL", "ZK",
     "ZKC", "ZKP", "ZM", "ZORA", "ZRO", "ZRX",
@@ -163,5 +170,23 @@ CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     "005930",   # Samsung Electronics (KRX code)
     "000660",   # SK Hynix (KRX code)
     "005380",   # Hyundai Motor (KRX code)
+})
+
+# Staking / restaking / liquid-staking (LST) / liquid-restaking (LRT) tokens
+# whose SPOT we capture EVEN WHEN NO PERP exists for them on the venue — the ONLY
+# spot-without-perp carve-out (operator 2026-06-23, cefi_universe_capture_rule).
+# These are the ``carry_staked_basis`` / DeFi-seasonal-rewards legs: we want their
+# spot liquidity and they often have no perp anywhere. The ordinary CeFi rule
+# (SPOT captured only where the venue also lists a perp for the base) does NOT
+# apply to a base in this set — its SPOT is mvp=true on ANY venue that lists it,
+# regardless of perp existence. Adding a new staking token is a manual UAC edit
+# (like the base universe). Every member is ALSO present in
+# ``CEFI_BASE_ASSET_UNIVERSE`` so the base-membership leg of the predicate passes.
+#   Restaking:   EIGEN, KING, ETHFI
+#   ETH LSTs/LRTs: STETH, WSTETH, RETH, WEETH, EETH, CBETH
+#   SOL LSTs:    MSOL (Marinade), JITOSOL + JTO (Jito), BSOL
+STAKING_SPOT_EXCEPTION: frozenset[str] = frozenset({
+    "BSOL", "CBETH", "EETH", "EIGEN", "ETHFI", "JITOSOL", "JTO", "KING",
+    "MSOL", "RETH", "STETH", "WEETH", "WSTETH",
 })
 # fmt: on
