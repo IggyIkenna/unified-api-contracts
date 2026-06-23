@@ -1258,14 +1258,22 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
     # DEFERRED-INDEFINITELY 2026-05-12 per operator (see VENUES_BY_ASSET_GROUP
     # comment above + sports_master plan).
     # ── Prediction (market data only — metadata is reference data, see below) ──
-    # Prediction CLOBs emit canonical "trades" (same key as CeFi). Legacy
-    # prediction_* names + book_snapshot_5 retired 2026-04-19; book snapshots
-    # phantom-inflated PREDICTION completion_pct (35k vs 5.7k observed).
+    # Prediction CLOBs emit canonical "trades" + "book_snapshot_5" (same keys as
+    # CeFi). book_snapshot_5 RE-ADDED 2026-06-23 (start 2026-06-22 = live-capture
+    # onset): the 2026-04-19 retirement ("phantom-inflated completion_pct") is
+    # superseded — BOTH venues now genuinely emit it (LIVE via the CLOB WS
+    # connectors top-5 ladder, capturing on prd; BATCH via the REST /book path,
+    # mtds@7c849d7). The 2026-06-22 start keeps the denominator honest (pre-onset
+    # dates are EXPECTED_PRE_* not gaps), so no completion_pct phantom-inflation.
+    # This is the gate `get_expected_data_types_for_venue` reads — REQUIRED so the
+    # MTDS batch pre-flight does not drop book_snapshot_5 before the adapter runs.
     "POLYMARKET": {
         "trades": "2024-06-01",
+        "book_snapshot_5": "2026-06-22",
     },
     "KALSHI": {
         "trades": "2024-06-01",
+        "book_snapshot_5": "2026-06-22",
     },
 }
 
