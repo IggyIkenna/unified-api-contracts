@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """STEP 5.87: prod_url_has_cassette — every production HTTP/WS host must have a cassette.
 
 Algorithm:

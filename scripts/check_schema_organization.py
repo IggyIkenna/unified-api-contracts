@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: oneoff
+# Delete-when: reads deleted unified_api_contracts/schemas/ dir — dead no-op; delete after confirming no callers
 """Check schema organization: flag UAC schemas that should be in UIC (internal-only).
 
 Schemas in unified_api_contracts/schemas/ must be used in at least one of:

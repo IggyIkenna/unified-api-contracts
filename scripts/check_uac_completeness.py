@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Check that all public classes defined in UAC core source files are exported in __all__.
 
 Algorithm:

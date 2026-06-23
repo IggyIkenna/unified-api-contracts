@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: oneoff
+# Delete-when: __api_version__ constants added (2026-03); script is a no-op re-run
 """One-shot script: add __api_version__ = "..." to every external schema file.
 
 Reads provider_api_versions.yaml, then for each provider inserts the constant

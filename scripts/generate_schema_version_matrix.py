@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Generate docs/SCHEMA_VERSION_MATRIX.md and docs/schema_health.svg.
 
 Reads unified_api_contracts/provider_api_versions.yaml, imports each provider

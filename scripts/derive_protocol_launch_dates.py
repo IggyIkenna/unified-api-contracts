@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Derive and verify PROTOCOL_LAUNCH_DATES entries from on-chain / The Graph sources.
 
 For each (chain, protocol) pair in ``unified_api_contracts.registry.chain_env.PROTOCOL_LAUNCH_DATES``,

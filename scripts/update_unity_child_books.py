@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: campaign
+# Delete-when: unity_child_books.py data auto-generated from UAC registry (no manual update needed)
 """Apply a YAML/JSON update to ``unity_child_books.py``.
 
 USAGE
