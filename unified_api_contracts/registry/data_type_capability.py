@@ -481,7 +481,10 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
             streaming_protocol="ws",
             sources=("market_tick_data_service/market_interface/adapters/cefi/tardis_shared.py",),
         )
-        for _venue in ("KRAKEN-SPOT", "BITGET-SPOT", "BITFINEX-SPOT")
+        # BYBIT-SPOT added 2026-06-23 (cefi_universe_capture_rule): distinct
+        # canonical venue for the Tardis ``bybit-spot`` endpoint, same spot
+        # capture surface; pairs with BYBIT perps on the entity prefix.
+        for _venue in ("KRAKEN-SPOT", "BITGET-SPOT", "BITFINEX-SPOT", "BYBIT-SPOT")
         for _dt in ("trades", "book_snapshot_5", "order_flow_imbalance")
     ),
     # ── Tardis CEX PERP/FUTURES venues (KRAKEN-FUTURES / BITGET-FUTURES /
@@ -503,7 +506,10 @@ DATA_TYPE_CAPABILITY_REGISTRY: Final[tuple[DataTypeCapability, ...]] = (
             streaming_protocol="ws",
             sources=("market_tick_data_service/market_interface/adapters/cefi/tardis_shared.py",),
         )
-        for _venue in ("KRAKEN-FUTURES", "BITGET-FUTURES", "BITFINEX-FUTURES")
+        # COINBASE-FUTURES added 2026-06-23 (cefi_universe_capture_rule): Coinbase
+        # Derivatives (perps) via Tardis ``coinbase-international``; same perp
+        # capture surface; pairs with COINBASE-SPOT on the entity prefix.
+        for _venue in ("KRAKEN-FUTURES", "BITGET-FUTURES", "BITFINEX-FUTURES", "COINBASE-FUTURES")
         for _dt, _itype in (
             ("trades", ""),
             ("book_snapshot_5", ""),
