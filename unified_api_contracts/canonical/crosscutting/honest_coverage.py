@@ -58,11 +58,13 @@ from unified_api_contracts.canonical.crosscutting._honest_coverage_clusters impo
 from unified_api_contracts.canonical.crosscutting._honest_coverage_logic import (
     FUTURES_CHAIN_BUCKETS,
     HONEST_COVERAGE_GAP_FIELDS,
+    SCHEDULE_DEFINING_DATA_TYPES,
     CaptureStatusCounts,
     EmptyFromLiveInstrumentError,
     LegacyBlankErrorReasonError,
     compute_honest_coverage,
     futures_expiry_bucket,
+    is_resolved_schedule_empty,
     parse_futures_expiry,
     was_instrument_alive,
 )
@@ -494,17 +496,38 @@ WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS: Final[frozenset[str]] = frozenset(
 legitimate gap (weekend/holiday/paused/postponed/...). These COUNT in the denominator."""
 
 
-def is_out_of_coverage_window(reason: str | None) -> bool:
-    """True if ``reason`` marks a cell OUTSIDE the coverable window/scope (never
-    collectable → excluded from the coverage-% denominator). Blank/None → False (a
-    blank-reason empty is a within-window absence by default, so it counts)."""
-    return bool(reason) and reason in OUT_OF_COVERAGE_WINDOW_REASONS
+def is_out_of_coverage_window(reason: str | None, data_type: str | None = None) -> bool:
+    """True if a cell is OUTSIDE the coverable window/scope (never collectable →
+    excluded from the coverage-% denominator).
+
+    Two paths to out-of-window:
+
+    * ``reason`` is one of :data:`OUT_OF_COVERAGE_WINDOW_REASONS` (lifecycle /
+      scope cells: pre-genesis, pre-launch, delisted, no-fixture, …). Blank/None
+      reason → a within-window absence by default (counts).
+    * **schedule-defining empty** (operator direction 2026-06-23): when
+      ``data_type`` is supplied AND it is a schedule-DEFINING data_type (sports
+      ``FIXTURES`` — the API-Football schedule), a ``SOURCE_RETURNED_ZERO`` cell
+      means "no matches that day = complete" → RESOLVED, out-of-window. This is
+      DATA-TYPE-AWARE: ``SOURCE_RETURNED_ZERO`` for an ENRICHMENT data_type stays
+      a within-window gap (its zero may be real). See
+      :func:`is_resolved_schedule_empty`.
+
+    Callers that have the ``data_type`` for the row SHOULD pass it so FIXTURES
+    no-match-day empties stop counting as gaps; callers without it (legacy
+    reason-only scope) get the unchanged reason-set behaviour.
+    """
+    if bool(reason) and reason in OUT_OF_COVERAGE_WINDOW_REASONS:
+        return True
+    return is_resolved_schedule_empty(data_type, reason)
 
 
-def is_within_window_absence(reason: str | None) -> bool:
+def is_within_window_absence(reason: str | None, data_type: str | None = None) -> bool:
     """Complement of :func:`is_out_of_coverage_window` — the cell IS in the coverable
-    universe and counts in the denominator (blank/None or any non-out-of-window reason)."""
-    return not is_out_of_coverage_window(reason)
+    universe and counts in the denominator (blank/None or any non-out-of-window reason).
+    Pass ``data_type`` so a schedule-defining FIXTURES no-match-day empty is correctly
+    treated as out-of-window (resolved), not an in-window absence."""
+    return not is_out_of_coverage_window(reason, data_type)
 
 
 EXPECTED_EMPTY_REASON_PREFIX: Final[str] = "EXPECTED_"
@@ -983,6 +1006,7 @@ __all__ = [
     "FUTURES_CHAIN_BUCKETS",
     "HONEST_COVERAGE_GAP_FIELDS",
     "PREDICTION_GROUPS",
+    "SCHEDULE_DEFINING_DATA_TYPES",
     "SPORTS_FIXTURE_CLUSTERS",
     "CaptureStatusCounts",
     "EmptyConfirmedReason",
@@ -998,6 +1022,7 @@ __all__ = [
     "fetch_error_signal_for_status",
     "futures_expiry_bucket",
     "get_active_es_options_clusters_for_date",
+    "is_resolved_schedule_empty",
     "parse_futures_expiry",
     "was_instrument_alive",
 ]

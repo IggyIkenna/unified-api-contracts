@@ -334,3 +334,50 @@ def test_out_of_coverage_window_partition() -> None:
 
     assert OUT_OF_COVERAGE_WINDOW_REASONS | WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS == EMPTY_CONFIRMED_REASONS
     assert not (OUT_OF_COVERAGE_WINDOW_REASONS & WITHIN_WINDOW_EXPECTED_ABSENCE_REASONS)
+
+
+def test_schedule_defining_fixtures_empty_is_resolved() -> None:
+    """A schedule-defining FIXTURES SOURCE_RETURNED_ZERO is RESOLVED (no-match-day),
+    NOT a coverage gap — but an enrichment's SOURCE_RETURNED_ZERO still IS a gap.
+
+    Operator direction 2026-06-23: FIXTURES (API-Football) IS the schedule
+    source-of-truth, so zero matches = complete, not missing data.
+    """
+    from unified_api_contracts import (
+        SCHEDULE_DEFINING_DATA_TYPES,
+        is_out_of_coverage_window,
+        is_resolved_schedule_empty,
+        is_within_window_absence,
+    )
+
+    # Only the schedule-defining FIXTURES data_type is in the closed set.
+    assert set(SCHEDULE_DEFINING_DATA_TYPES) == {"FIXTURES"}
+
+    # FIXTURES + SOURCE_RETURNED_ZERO → resolved / out-of-window (no matches that day).
+    assert is_resolved_schedule_empty("FIXTURES", "SOURCE_RETURNED_ZERO") is True
+    assert is_out_of_coverage_window("SOURCE_RETURNED_ZERO", "FIXTURES") is True
+    assert is_within_window_absence("SOURCE_RETURNED_ZERO", "FIXTURES") is False
+    # Case-insensitive on the data_type token.
+    assert is_resolved_schedule_empty("fixtures", "SOURCE_RETURNED_ZERO") is True
+
+    # Enrichment data_types: SOURCE_RETURNED_ZERO stays an in-window gap (its zero
+    # may be a real miss when a fixture exists). NOT blanket-excluded.
+    for enrichment in ("FIXTURE_STATS", "PLAYER_STATS", "ODDS", "MATCHES", "FIXTURE_EVENTS"):
+        assert is_resolved_schedule_empty(enrichment, "SOURCE_RETURNED_ZERO") is False
+        assert is_out_of_coverage_window("SOURCE_RETURNED_ZERO", enrichment) is False
+        assert is_within_window_absence("SOURCE_RETURNED_ZERO", enrichment) is True
+
+    # Legacy reason-only call (no data_type): SOURCE_RETURNED_ZERO is still a gap.
+    assert is_out_of_coverage_window("SOURCE_RETURNED_ZERO") is False
+
+    # Only SOURCE_RETURNED_ZERO triggers the schedule-empty resolution — other
+    # reasons on FIXTURES route through the normal reason-set / blank rules.
+    assert is_resolved_schedule_empty("FIXTURES", "EXPECTED_HOLIDAY") is False
+    # EXPECTED_NO_FIXTURE is already an out-of-window lifecycle reason regardless.
+    assert is_out_of_coverage_window("EXPECTED_NO_FIXTURE", "FIXTURES") is True
+    assert is_out_of_coverage_window("EXPECTED_NO_FIXTURE") is True
+
+    # Blank / None guards.
+    assert is_resolved_schedule_empty(None, "SOURCE_RETURNED_ZERO") is False
+    assert is_resolved_schedule_empty("FIXTURES", None) is False
+    assert is_resolved_schedule_empty("FIXTURES", "") is False
