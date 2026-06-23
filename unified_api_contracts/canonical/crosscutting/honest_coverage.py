@@ -133,6 +133,20 @@ class EmptyConfirmedReason(StrEnum):
     EXPECTED_INSTRUMENT_DELISTED = "EXPECTED_INSTRUMENT_DELISTED"
     """Instrument's ``delisted_at`` is on or before the day."""
 
+    EXPECTED_NOT_ENOUGH_TVL = "EXPECTED_NOT_ENOUGH_TVL"
+    """DeFi: a pool/market EXISTS on-chain on the day but its TVL is below the MVP TVL
+    threshold — so it is outside the capture universe for that day (the TVL filter IS the
+    MVP filter; ``defi_instrument_catalogue_and_capture_pipeline_2026_06_23.md``). This is a
+    GENUINE honest-empty (the instrument is real, the source could be reached, but we
+    deliberately do not capture sub-threshold pools), distinct from:
+    ``EXPECTED_INSTRUMENT_NOT_LISTED`` (pool did not exist yet / not in catalogue),
+    ``EXPECTED_INSTRUMENT_DELISTED`` (pool removed AFTER the date), and
+    ``SOURCE_RETURNED_ZERO`` (the source WAS fetched at-threshold and returned 200+0-rows,
+    proven via FetchEvidence). Keystone-exempt: no fetch is warranted for a sub-TVL pool, so
+    NO ``FetchEvidence`` is required (mirrors the ``EXPECTED_*`` no-fetch family).
+    OUT-of-coverage-window (the TVL floor is a deliberate scope boundary, not a gap) →
+    excluded from the completion-% denominator (in ``OUT_OF_COVERAGE_WINDOW_REASONS``)."""
+
     EXPECTED_PARTIAL_HALF_DAY = "EXPECTED_PARTIAL_HALF_DAY"
     """Calendar half-session (Thanksgiving Friday, Christmas Eve early close on US equities). SSOT (NEW Wave 3.X):
     ``unified_api_contracts.registry.half_day_sessions.HALF_DAY_SESSIONS`` — populated per CME / NYSE / NASDAQ /
@@ -455,6 +469,7 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_PAST_SOURCE_COVERAGE_END.value,
         EmptyConfirmedReason.EXPECTED_INSTRUMENT_NOT_LISTED.value,
         EmptyConfirmedReason.EXPECTED_INSTRUMENT_DELISTED.value,
+        EmptyConfirmedReason.EXPECTED_NOT_ENOUGH_TVL.value,
         EmptyConfirmedReason.EXPECTED_PRE_SEASON.value,
         EmptyConfirmedReason.EXPECTED_POST_SEASON.value,
         EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE.value,
