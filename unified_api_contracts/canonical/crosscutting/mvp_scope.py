@@ -293,6 +293,23 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "ASTER",
                 "KRAKEN-SPOT",
                 "KRAKEN-FUTURES",
+                # Additional Tardis CEX venues (cefi_universe_capture_rule
+                # 2026-06-23). Previously ABSENT from the rule → their spot/perp
+                # cells were mvp=0 regardless of the perp-gate. Each spot venue
+                # pairs with its sibling perp venue on the shared entity prefix
+                # (BYBIT-SPOT↔BYBIT, COINBASE-SPOT↔COINBASE-FUTURES,
+                # BITFINEX-SPOT↔BITFINEX-FUTURES, BITGET-SPOT↔BITGET-FUTURES).
+                "BYBIT-SPOT",
+                "COINBASE-SPOT",
+                "COINBASE-FUTURES",
+                "BITFINEX-SPOT",
+                "BITFINEX-FUTURES",
+                "BITGET-SPOT",
+                "BITGET-FUTURES",
+                # UPBIT — spot-only Korean venue (kimchi premium). The ONLY
+                # perp-gate exception (see is_in_mvp_capture_universe): its SPOT
+                # is mvp=true despite no perp on the venue.
+                "UPBIT",
             }
         ),
         instrument_types=frozenset(
@@ -585,8 +602,18 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 7
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 8
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v8 (2026-06-23): added 8 CeFi venues to the cefi rule ``venues`` set
+(BYBIT-SPOT, COINBASE-SPOT, COINBASE-FUTURES, BITFINEX-SPOT, BITFINEX-FUTURES,
+BITGET-SPOT, BITGET-FUTURES, UPBIT) — previously ABSENT so their cells were mvp=0
+regardless of the perp-gate (cefi_universe_capture_rule 2026-06-23). Added the
+**UPBIT venue carve-out** to :func:`is_in_mvp_capture_universe`
+(``_CEFI_SPOT_PERP_GATE_EXEMPT_VENUES``): UPBIT spot is mvp=true REGARDLESS of
+perp existence (the ONE spot-only venue exception — kimchi premium). KRW quote
+acceptance for UPBIT is handled at the IS ``_passes_asset_filter`` gate via the UAC
+``accepted_quotes_for_venue`` SSOT (registry/cefi_instrument_universe.py).
 
 v7 (2026-06-23): expanded ``STAKING_SPOT_EXCEPTION`` from 13 → 28 members to
 cover ALL wrapped + unwrapped LST/LRT equivalents (operator 2026-06-23,
@@ -888,6 +915,14 @@ _CEFI_PERP_TYPES: Final[frozenset[str]] = frozenset(
     }
 )
 
+#: Venue ENTITY prefixes (split on '-') that are exempt from the SPOT perp-gate —
+#: their SPOT is mvp=true REGARDLESS of perp existence (operator 2026-06-23,
+#: cefi_universe_capture_rule). UPBIT is the ONE such venue: it lists NO perps
+#: (Korean spot-only exchange) but we capture all its spot pairs for the kimchi
+#: premium + cross-currency dispersion. This is a VENUE-scoped exception, distinct
+#: from the BASE-scoped ``STAKING_SPOT_EXCEPTION`` (LSTs on any venue).
+_CEFI_SPOT_PERP_GATE_EXEMPT_VENUES: Final[frozenset[str]] = frozenset({"UPBIT"})
+
 
 def is_in_mvp_capture_universe(
     venue: str,
@@ -965,7 +1000,8 @@ def is_in_mvp_capture_universe(
     # This is the ONLY spot-without-perp carve-out.
     if itype in _CEFI_PERP_GATED_TYPES:
         base_in_staking_exception = (base or "").strip().upper() in STAKING_SPOT_EXCEPTION
-        if not has_perp_for_base and not base_in_staking_exception:
+        venue_exempt = (venue or "").strip().upper().split("-", 1)[0] in _CEFI_SPOT_PERP_GATE_EXEMPT_VENUES
+        if not has_perp_for_base and not base_in_staking_exception and not venue_exempt:
             return False
         return is_mvp(
             "cefi",

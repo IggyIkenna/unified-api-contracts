@@ -132,6 +132,35 @@ CEFI_ACCEPTED_QUOTE_ASSETS: frozenset[str] = frozenset({
     "USDT", "USDC", "USD",
 })
 
+# Per-venue accepted-quote EXTENSIONS (operator 2026-06-23, cefi_universe_capture_rule).
+# The default accepted quotes are USDT/USDC/USD fleet-wide. UPBIT is the Korean
+# venue we track for the kimchi premium + cross-currency dispersion; the operator
+# wants "all the KRW pairs that actually exist on Upbit", so KRW is accepted ONLY
+# for the UPBIT entity. KRW is NOT globally added (it would admit thousands of
+# cross pairs on other venues). Keyed on the venue ENTITY prefix (split on '-')
+# so UPBIT / UPBIT-SPOT both resolve.
+_CEFI_VENUE_QUOTE_EXTENSIONS: dict[str, frozenset[str]] = {
+    "UPBIT": frozenset({"KRW"}),
+}
+
+
+def accepted_quotes_for_venue(venue: str | None) -> frozenset[str]:
+    """Return the accepted quote-asset set for ``venue`` (entity-normalized).
+
+    The fleet default is :data:`CEFI_ACCEPTED_QUOTE_ASSETS` (USDT/USDC/USD).
+    A venue whose ENTITY prefix is in :data:`_CEFI_VENUE_QUOTE_EXTENSIONS` (today
+    only ``UPBIT`` → ``KRW``) gets that extension UNIONED in — so an UPBIT KRW
+    spot pair passes the quote gate while KRW stays rejected on every other venue
+    (operator 2026-06-23, cefi_universe_capture_rule).
+    """
+    if not venue:
+        return CEFI_ACCEPTED_QUOTE_ASSETS
+    entity = venue.strip().upper().split("-", 1)[0]
+    extra = _CEFI_VENUE_QUOTE_EXTENSIONS.get(entity)
+    if extra is None:
+        return CEFI_ACCEPTED_QUOTE_ASSETS
+    return CEFI_ACCEPTED_QUOTE_ASSETS | extra
+
 # Options are only tracked for these underlyings. Everything else (SOL, USDC,
 # BNB options on Deribit etc.) is filtered out to keep data volume manageable.
 CEFI_OPTIONS_UNDERLYINGS: frozenset[str] = frozenset({

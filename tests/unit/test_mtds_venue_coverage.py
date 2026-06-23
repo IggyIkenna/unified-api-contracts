@@ -36,9 +36,11 @@ class TestAllCefiVenuesDeduplicated:
         # COINBASE-SPOT, UPBIT) + Tier-3 (2026-05-01: BITFINEX-SPOT/FUTURES, BITGET-SPOT,
         # BITGET-FUTURES, KRAKEN-SPOT, KRAKEN-FUTURES) + on-chain CLOBs (HYPERLIQUID,
         # ASTER, PACIFICA-SOLANA, EXTENDED-STARKNET, LIGHTER-ZKSYNC). HYPERLIQUID is in
-        # both Tardis-backed and CLOB sets so dedupes once. Total = 20.
-        assert len(vm.all_cefi_venues) == 20, (
-            f"expected 20 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
+        # both Tardis-backed and CLOB sets so dedupes once.
+        # 2026-06-23 (cefi_universe_capture_rule): + BYBIT-SPOT (Tardis bybit-spot,
+        # split from BYBIT) + COINBASE-FUTURES (Tardis coinbase-international). Total = 22.
+        assert len(vm.all_cefi_venues) == 22, (
+            f"expected 22 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
         )
 
     def test_includes_all_suffixed_variants(self) -> None:

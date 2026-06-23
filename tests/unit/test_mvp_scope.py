@@ -102,12 +102,18 @@ class TestCeFiMvp:
         """HYPERLIQUID (on-chain CLOB, classified as CeFi) PERPETUAL → MVP."""
         assert is_mvp("cefi", "HYPERLIQUID", "PERPETUAL", "trades", base_ccy="BTC")
 
-    def test_non_mvp_venue_upbit_returns_false(self) -> None:
-        """UPBIT is in VENUES_BY_ASSET_GROUP["cefi"] but NOT in MVP → False."""
-        assert not is_mvp("cefi", "UPBIT", "SPOT_PAIR", "trades", base_ccy="BTC")
+    def test_upbit_spot_is_mvp_in_base_rule(self) -> None:
+        """UPBIT is now an MVP rule venue (cefi_universe_capture_rule 2026-06-23).
 
-    def test_non_mvp_venue_coinbase_returns_false(self) -> None:
-        """COINBASE is in the cefi universe but NOT in the MVP set → False."""
+        ``is_mvp`` (the base rule) returns True for UPBIT spot in-universe; the
+        spot-only-no-perp carve-out lives in ``is_in_mvp_capture_universe``.
+        """
+        assert is_mvp("cefi", "UPBIT", "SPOT_PAIR", "trades", base_ccy="BTC")
+
+    def test_coinbase_spot_is_mvp_in_base_rule(self) -> None:
+        """COINBASE-SPOT is now an MVP rule venue (2026-06-23). Bare ``COINBASE``
+        (no -SPOT suffix, not an OKX sub-venue) still does NOT resolve."""
+        assert is_mvp("cefi", "COINBASE-SPOT", "SPOT_PAIR", "trades", base_ccy="BTC")
         assert not is_mvp("cefi", "COINBASE", "SPOT_PAIR", "trades", base_ccy="BTC")
 
     def test_non_mvp_base_ccy_returns_false(self) -> None:
@@ -504,8 +510,9 @@ class TestUnboundDataType:
 
     def test_unbound_data_type_still_gates_other_axes(self) -> None:
         """Blank data_type relaxes ONLY the data_type axis — venue/base still gate."""
-        # Non-MVP venue: blank data_type does NOT make it MVP.
-        assert not is_mvp("cefi", "UPBIT", "SPOT_PAIR", "", base_ccy="BTC")
+        # Non-MVP venue: blank data_type does NOT make it MVP. (GATEIO is not an
+        # MVP rule venue; UPBIT/COINBASE-SPOT are MVP venues post-2026-06-23.)
+        assert not is_mvp("cefi", "GATEIO-SPOT", "SPOT_PAIR", "", base_ccy="BTC")
         # Non-MVP base: blank data_type does NOT make it MVP. (Synthetic
         # out-of-universe base — the curated universe is now ~490 assets.)
         assert not is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "", base_ccy="NOTACOINZZZ999")
@@ -698,7 +705,35 @@ def test_capture_universe_non_mvp_venue_excluded() -> None:
     """A venue outside the cefi MVP rule is excluded."""
     from unified_api_contracts import is_in_mvp_capture_universe
 
-    assert not is_in_mvp_capture_universe("UPBIT", "BTC", "SPOT_PAIR", has_perp_for_base=True)
+    # GATEIO is not an MVP rule venue → excluded even with a perp sibling.
+    assert not is_in_mvp_capture_universe("GATEIO-SPOT", "BTC", "SPOT_PAIR", has_perp_for_base=True)
+
+
+def test_capture_universe_upbit_spot_no_perp_exempt() -> None:
+    """UPBIT spot is mvp=true REGARDLESS of perp (venue carve-out, 2026-06-23)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    # No perp on UPBIT (spot-only venue) — still mvp via the venue exemption.
+    assert is_in_mvp_capture_universe("UPBIT", "BTC", "SPOT_PAIR", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("UPBIT", "ADA", "SPOT_PAIR", has_perp_for_base=False)
+    # A base outside the universe is still excluded even on UPBIT.
+    assert not is_in_mvp_capture_universe("UPBIT", "NOTACOINXYZ", "SPOT_PAIR", has_perp_for_base=False)
+
+
+def test_capture_universe_new_venues_perp_gated() -> None:
+    """The 2026-06-23 venues gate correctly: spot needs a perp sibling, perp self-qualifies."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    # COINBASE-SPOT BTC: mvp only with a COINBASE perp sibling.
+    assert is_in_mvp_capture_universe("COINBASE-SPOT", "BTC", "SPOT_PAIR", has_perp_for_base=True)
+    assert not is_in_mvp_capture_universe("COINBASE-SPOT", "BTC", "SPOT_PAIR", has_perp_for_base=False)
+    # COINBASE-FUTURES perp self-qualifies on base-membership.
+    assert is_in_mvp_capture_universe("COINBASE-FUTURES", "BTC", "PERPETUAL", has_perp_for_base=False)
+    # BYBIT-SPOT / BITFINEX-SPOT / BITGET-SPOT all perp-gated.
+    assert is_in_mvp_capture_universe("BYBIT-SPOT", "ETH", "SPOT_PAIR", has_perp_for_base=True)
+    assert is_in_mvp_capture_universe("BITFINEX-SPOT", "ETH", "SPOT_PAIR", has_perp_for_base=True)
+    assert is_in_mvp_capture_universe("BITGET-SPOT", "ETH", "SPOT_PAIR", has_perp_for_base=True)
+    assert not is_in_mvp_capture_universe("BITGET-SPOT", "ETH", "SPOT_PAIR", has_perp_for_base=False)
 
 
 def test_capture_universe_okx_bare_token_resolves() -> None:
@@ -877,4 +912,20 @@ def test_capture_universe_config_version_bumped() -> None:
         MVP_SCOPE_CONFIG_VERSION,
     )
 
-    assert MVP_SCOPE_CONFIG_VERSION >= 7
+    assert MVP_SCOPE_CONFIG_VERSION >= 8
+
+
+def test_accepted_quotes_for_venue_upbit_krw() -> None:
+    """KRW is accepted ONLY for UPBIT; default venues stay USDT/USDC/USD."""
+    from unified_api_contracts import accepted_quotes_for_venue
+    from unified_api_contracts.registry.cefi_instrument_universe import (
+        CEFI_ACCEPTED_QUOTE_ASSETS,
+    )
+
+    assert "KRW" in accepted_quotes_for_venue("UPBIT")
+    assert "KRW" in accepted_quotes_for_venue("UPBIT-SPOT")
+    assert {"USDT", "USDC", "USD"} <= accepted_quotes_for_venue("UPBIT")
+    # KRW NOT accepted on any other venue.
+    assert "KRW" not in accepted_quotes_for_venue("BINANCE-SPOT")
+    assert accepted_quotes_for_venue("BINANCE-SPOT") == CEFI_ACCEPTED_QUOTE_ASSETS
+    assert accepted_quotes_for_venue(None) == CEFI_ACCEPTED_QUOTE_ASSETS

@@ -87,6 +87,7 @@ from .cefi_instrument_universe import (
     CEFI_EQUITY_PERP_BASE_UNIVERSE,
     CEFI_OPTIONS_UNDERLYINGS,
     STAKING_SPOT_EXCEPTION,
+    accepted_quotes_for_venue,
 )
 from .cefi_margin_tiers import maintenance_margin_for
 from .cefi_perp_venue_endpoints import (
@@ -1000,6 +1001,7 @@ __all__ = [
     "VenueOrderCapability",
     "YahooIndexDef",
     "accepted_perp_collateral",
+    "accepted_quotes_for_venue",
     "annualise_funding_rate_bps",
     "assert_batch_api_allowed",
     "assert_databento_request_allowed",
