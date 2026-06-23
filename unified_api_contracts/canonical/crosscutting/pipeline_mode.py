@@ -413,8 +413,10 @@ def pipeline_mode_for_source(source: str, mode: Mode = Mode.BATCH) -> PipelineMo
 # key used in sports_reference/by_date/day={D}/entity={E}/ paths.
 # Unknown entity → BATCH_INSTRUMENTS_SERVICE (the instruments-service batch pipeline).
 _SPORTS_ENTITY_TO_PIPELINE_MODE: dict[str, PipelineMode] = {
-    # API Football entities
+    # API Football entities (incl. fixture-schedule-split entity names)
     "fixtures": PipelineMode.BATCH_API_FOOTBALL,
+    "fixtures_schedule": PipelineMode.BATCH_API_FOOTBALL,
+    "fixtures_outcomes": PipelineMode.BATCH_API_FOOTBALL,
     "injuries": PipelineMode.BATCH_API_FOOTBALL,
     "fixture_stats": PipelineMode.BATCH_API_FOOTBALL,
     "fixture_events": PipelineMode.BATCH_API_FOOTBALL,
