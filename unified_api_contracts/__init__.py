@@ -84,6 +84,11 @@ from .canonical.crosscutting.crypto_equity_link import (
 from .canonical.crosscutting.defi import (
     CHAIN_WIRE_VALUE_OVERRIDES,
     ChainKind,
+    DefiPoolIdentity,
+    build_pool_identity,
+    glued_venue_prefix,
+    parse_glued_pool_id,
+    split_glued_venue_chain,
     to_canonical_chain_wire,
 )
 from .canonical.crosscutting.errors import (
@@ -1749,6 +1754,11 @@ __all__ = [
     "CcxtTrade",
     "CHAIN_WIRE_VALUE_OVERRIDES",
     "ChainKind",
+    "DefiPoolIdentity",
+    "build_pool_identity",
+    "glued_venue_prefix",
+    "parse_glued_pool_id",
+    "split_glued_venue_chain",
     "CircuitBreakerId",
     "ClientLifecycleEvent",
     "ClientLifecycleKind",

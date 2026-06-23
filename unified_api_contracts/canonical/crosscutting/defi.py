@@ -18,6 +18,8 @@ Plans:
 
 from __future__ import annotations
 
+import re
+from dataclasses import dataclass
 from enum import StrEnum
 
 
@@ -240,3 +242,191 @@ class LendingProtocol(StrEnum):
 
     MAKER_DSR = "maker_dsr"
     """MakerDAO DAI Savings Rate — single yield stream, no borrow leg."""
+
+
+# ───────────────────────────────────────────────────────────────────────────
+# DUAL-FORM DeFi POOL IDENTITY — canonical (manifest) ↔ glued-pair (UI)
+# (defi_instrument_catalogue_and_capture_pipeline_2026_06_23, operator Refinement 1)
+# ───────────────────────────────────────────────────────────────────────────
+#
+# Every DEX pool carries TWO ids + a bidirectional converter, so the manifest
+# keys on the machine-canonical form while the UI renders the human-readable
+# form — both live in instruments-service (which holds the address↔tokens↔fee
+# mapping), and both ride alongside on every catalogue row.
+#
+#   * CANONICAL (manifest / capture shard atom):
+#       venue = "UNISWAP_V3" (bare protocol), chain = "ARBITRUM" (separate),
+#       instrument_id = pool_address.lower()  (e.g. "0x88e6a0c2...").
+#     This matches MTDS ``_canonical_defi_id`` + the writer's per-pool
+#     ``record_captured(instrument_id=pool_address.lower(), instrument_type="pool")``.
+#
+#   * GLUED-PAIR (human-readable / UI):
+#       "UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100"
+#       = <VENUE_PREFIX>-<CHAIN> : POOL : <TOKEN0>-<TOKEN1> : <FEE>
+#     The venue prefix glues the bare venue with the underscore-before-version
+#     token STRIPPED ("UNISWAP_V3" -> "UNISWAPV3"); the pair is token0-token1
+#     (base-quote, canonical order); the fee is the pool's fee amount.
+#
+# The converter is the SSOT for translating between them. instruments-service's
+# catalogue carries BOTH (``instrument_id`` = canonical; ``glued_pair_id`` =
+# human-readable) so consumers can resolve either; MTDS keys on the canonical.
+
+
+@dataclass(frozen=True)
+class DefiPoolIdentity:
+    """Dual-form identity for a single DeFi DEX pool.
+
+    Holds every field both id forms are built from, so the canonical (manifest)
+    and glued-pair (human-readable / UI) ids are derivable + reversible. Built
+    by :func:`build_pool_identity` from an ``InstrumentRecord``'s fields, or by
+    :func:`parse_glued_pool_id` from a legacy glued-pair string.
+    """
+
+    venue: str
+    """Bare canonical protocol venue, e.g. ``UNISWAP_V3`` (no ``-CHAIN`` suffix)."""
+    chain: str
+    """Canonical chain key, e.g. ``ARBITRUM`` (uppercase)."""
+    pool_address: str
+    """On-chain pool contract address, lowercased — the canonical instrument_id."""
+    base_asset: str = ""
+    """token0 (canonical base) — the first half of the glued-pair PAIR token."""
+    quote_asset: str = ""
+    """token1 (canonical quote) — the second half of the glued-pair PAIR token."""
+    fee: str = ""
+    """Pool fee amount as a string (e.g. ``"100"`` / ``"3000"``); blank when unknown."""
+
+    @property
+    def canonical_instrument_id(self) -> str:
+        """The machine/manifest pool id — ``pool_address.lower()``."""
+        return self.pool_address.lower()
+
+    @property
+    def glued_pair_id(self) -> str:
+        """The human-readable UI pool id — ``UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100``.
+
+        Falls back to the pool address when the pair/fee are unknown
+        (``…:POOL:<pool_address>``) so the id is always non-empty + reversible
+        to the canonical form.
+        """
+        prefix = glued_venue_prefix(self.venue, self.chain)
+        pair = f"{self.base_asset}-{self.quote_asset}" if (self.base_asset and self.quote_asset) else ""
+        if pair and self.fee:
+            symbol = f"{pair}:{self.fee}"
+        elif pair:
+            symbol = pair
+        else:
+            symbol = self.pool_address.lower()
+        return f"{prefix}:POOL:{symbol}"
+
+
+def _strip_version_underscore(protocol: str) -> str:
+    """``UNISWAP_V3`` → ``UNISWAPV3`` (the glued-prefix display form).
+
+    Inverse of ``VenueMapping._canonicalise_defi_protocol_spelling`` — removes
+    the underscore before a version token (``_V3`` → ``V3``). Idempotent on a
+    protocol that already lacks the underscore.
+    """
+    return re.sub(r"_V(\d)", r"V\1", protocol)
+
+
+def _insert_version_underscore(protocol: str) -> str:
+    """``UNISWAPV3`` → ``UNISWAP_V3`` (the canonical bare-venue form).
+
+    Mirror of ``VenueMapping._canonicalise_defi_protocol_spelling`` for a
+    chain-less protocol token — inserts the underscore before a version token.
+    Idempotent on an already-canonical protocol.
+    """
+    return re.sub(r"([A-Za-z])V(\d)", r"\1_V\2", protocol)
+
+
+def glued_venue_prefix(venue: str, chain: str) -> str:
+    """Build the glued venue-chain prefix for the human-readable pool id.
+
+    ``("UNISWAP_V3", "ARBITRUM")`` → ``"UNISWAPV3-ARBITRUM"``. The version
+    underscore is stripped from the protocol (display convention), and the
+    chain is appended uppercase. A ``venue`` already carrying a ``-CHAIN``
+    suffix is split first (defensive — callers should pass the bare venue).
+    """
+    bare = venue
+    if "-" in venue and not chain:
+        bare, _split_chain = venue.rsplit("-", 1)
+        chain = _split_chain
+    return f"{_strip_version_underscore(bare)}-{chain.upper()}"
+
+
+def split_glued_venue_chain(glued_venue: str) -> tuple[str, str]:
+    """Split a glued ``PROTOCOL-CHAIN`` venue into ``(bare_venue, chain)``.
+
+    ``"UNISWAPV3-ARBITRUM"`` → ``("UNISWAP_V3", "ARBITRUM")``. Canonicalises the
+    protocol spelling (inserts the version underscore) so the bare venue matches
+    the MTDS-captured ``venue=`` form. A venue with no ``-`` (already bare) →
+    ``(canonicalised_venue, "")``.
+    """
+    if "-" in glued_venue:
+        protocol, chain = glued_venue.rsplit("-", 1)
+        return _insert_version_underscore(protocol), chain.upper()
+    return _insert_version_underscore(glued_venue), ""
+
+
+def build_pool_identity(
+    *,
+    venue: str,
+    chain: str,
+    pool_address: str,
+    base_asset: str = "",
+    quote_asset: str = "",
+    fee: str | int | None = None,
+) -> DefiPoolIdentity:
+    """Construct a :class:`DefiPoolIdentity` from an instrument's fields.
+
+    ``venue`` may be the bare canonical form (``UNISWAP_V3``) or the glued
+    ``PROTOCOL-CHAIN`` form (``UNISWAPV3-ARBITRUM``) — the latter is split, and
+    the explicit ``chain`` wins when both are present. ``fee`` accepts an int or
+    string (Uniswap feeTier / Balancer fee / …); ``None`` → blank.
+    """
+    bare_venue, derived_chain = split_glued_venue_chain(venue) if "-" in venue else (venue, "")
+    resolved_chain = (chain or derived_chain or "").upper()
+    fee_str = "" if fee is None else str(fee)
+    return DefiPoolIdentity(
+        venue=bare_venue,
+        chain=resolved_chain,
+        pool_address=pool_address.lower(),
+        base_asset=base_asset,
+        quote_asset=quote_asset,
+        fee=fee_str,
+    )
+
+
+def parse_glued_pool_id(glued_pair_id: str) -> DefiPoolIdentity | None:
+    """Parse a legacy glued-pair pool id into a :class:`DefiPoolIdentity`.
+
+    ``"UNISWAPV3-ARBITRUM:POOL:AAVE-USDC:100"`` →
+    ``DefiPoolIdentity(venue="UNISWAP_V3", chain="ARBITRUM", base_asset="AAVE",
+    quote_asset="USDC", fee="100", pool_address="")``.
+
+    The canonical ``pool_address`` is NOT recoverable from the glued-pair string
+    alone (the glued form encodes the PAIR + fee, not the address), so the
+    returned identity carries an empty ``pool_address`` — the caller resolves it
+    from the instruments-store mapping (``raw_symbol``/``pool_address`` column).
+    A ``…:POOL:<0x…>`` glued form (address-as-symbol) DOES recover the address.
+
+    Returns ``None`` for a string that is not a ``PROTOCOL-CHAIN:POOL:…`` triple.
+    """
+    parts = glued_pair_id.split(":")
+    if len(parts) < 3 or parts[1] != "POOL":
+        return None
+    bare_venue, chain = split_glued_venue_chain(parts[0])
+    symbol = parts[2]
+    fee = parts[3] if len(parts) >= 4 else ""
+    # ``…:POOL:<0x…>`` — the symbol IS the pool address (no pair/fee encoded).
+    if symbol.lower().startswith("0x"):
+        return DefiPoolIdentity(venue=bare_venue, chain=chain, pool_address=symbol.lower())
+    base, _sep, quote = symbol.partition("-")
+    return DefiPoolIdentity(
+        venue=bare_venue,
+        chain=chain,
+        pool_address="",
+        base_asset=base,
+        quote_asset=quote,
+        fee=fee,
+    )

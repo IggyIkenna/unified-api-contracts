@@ -118,6 +118,14 @@ KALSHI_TICKER_PREFIX_TO_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
     "KXXRP15M": _G.XRP_UP_DOWN_DAILY,
     "KXXRPD": _G.XRP_UP_DOWN_DAILY,
     "KXXRP": _G.XRP_PRICE_RANGE_DAILY,
+    # Kalshi also lists XRP under the legacy ticker stem "RIPPLE" (KXRIPPLED =
+    # daily directional, KXRIPPLE / KXRIPPLEMAXY / KXRIPPLEMINY = range/min/max).
+    # Verified against the live /series?category=Crypto catalogue 2026-06-23 — these
+    # fell to OTHER before, splitting XRP off its Polymarket counterpart. Route them
+    # to the SAME XRP groups so cross-venue XRP dispersion works. Longest-prefix-first
+    # ensures KXRIPPLED (directional) beats KXRIPPLE (range).
+    "KXRIPPLED": _G.XRP_UP_DOWN_DAILY,
+    "KXRIPPLE": _G.XRP_PRICE_RANGE_DAILY,
     # ── Crypto: DOGE ────────────────────────────────────────────────────────
     "KXDOGE15M": _G.DOGE_UP_DOWN_DAILY,
     "KXDOGED": _G.DOGE_UP_DOWN_DAILY,
