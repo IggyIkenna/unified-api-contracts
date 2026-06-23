@@ -87,6 +87,66 @@ DEFI_SOURCE_COVERAGE_START: dict[str, date] = {
 }
 
 
+# Per-(venue, data_type) DeFi collection-start floor (data-driven, 2026-06-22).
+# DISTINCT from DEFI_SOURCE_COVERAGE_START above (venue-level): the
+# ``expected_coverage()`` availability oracle reads coverage_start PER DATA_TYPE
+# (``get_source_coverage_start_for_data_type``) — venue launch alone does not
+# clip a data_type we only STARTED COLLECTING later. Each value is the MEASURED
+# earliest ``capture_status='captured'`` date for that exact (venue, data_type)
+# pair, read from the prod defi ``_index/availability_index.parquet`` on
+# 2026-06-22 (925,820 captured rows). The data exists on-chain back to protocol
+# launch, but our subgraph/RPC adapter only began materialising this data_type
+# on the date below → dates before it are honestly EXPECTED_PRE_SOURCE_COVERAGE_START,
+# not DIVERGENT_EMPTY. This closed the chain-blind-fix residual divergent tail
+# (the operator's #1 Slack alert): the per-chain venue-launch fix
+# (UAC@c8f4bbd7, 85,900→22,140) cleared pre-launch over-expectation; this clears
+# the pre-COLLECTION-start over-expectation.
+#
+# **PER-PAIR + DATA-DRIVEN, never a flat default** (operator HARD POINT): each
+# entry is its own measured floor; a pair absent here returns None (= no clip,
+# the oracle still expects data). The flat value is the EARLIEST across all
+# chains the pair was captured on (conservative — clips only dates before ANY
+# chain had it), matching the flat (venue, data_type) grain of the divergence
+# oracle (which itself carries no chain axis). When a backfill extends a pair's
+# history backwards, LOWER its value here (or delete it) — never raise it to
+# mask a real gap. SSOT: data_pipeline_hardening_self_monitoring_2026_06_22.md
+# Phase 3.
+DEFI_DATA_TYPE_COVERAGE_START: dict[str, dict[str, date]] = {
+    "AAVE_V3": {
+        "lending_indices": date(2022, 3, 12),
+        "risk_params": date(2024, 5, 2),
+    },
+    "AERODROME_V3": {
+        "dex_pool_state": date(2024, 5, 1),
+        "dex_pool_swaps": date(2024, 7, 1),
+    },
+    "ALCHEMY": {"gas_fees": date(2020, 1, 1)},
+    "BALANCER": {
+        "dex_pool_state": date(2021, 5, 1),
+        "dex_pool_swaps": date(2021, 5, 1),
+    },
+    "CAMELOT_V3": {"dex_pool_state": date(2023, 6, 14)},
+    "COMPOUND_V3": {"lending_indices": date(2022, 8, 13)},
+    "CURVE": {
+        "dex_pool_state": date(2021, 1, 1),
+        "dex_pool_swaps": date(2021, 1, 1),
+    },
+    "PANCAKESWAP_V3": {
+        "dex_pool_state": date(2023, 4, 1),
+        "dex_pool_swaps": date(2024, 1, 1),
+    },
+    "STADER": {"lst_rates": date(2023, 7, 10)},
+    "STAKEWISE": {"lst_rates": date(2023, 11, 28)},
+    "SUSHISWAP": {
+        "dex_pool_state": date(2021, 8, 31),
+        "dex_pool_swaps": date(2021, 8, 31),
+    },
+    "SUSHISWAP_V3": {"dex_pool_swaps": date(2024, 1, 1)},
+    "SWELL": {"lst_rates": date(2023, 4, 17)},
+    "UNISWAP_V3": {"dex_pool_swaps": date(2021, 5, 4)},
+}
+
+
 # ---------------------------------------------------------------------------
 # TradFi
 # ---------------------------------------------------------------------------
@@ -212,6 +272,7 @@ def coverage_start(
 
 __all__ = [
     "CEFI_SOURCE_COVERAGE_START",
+    "DEFI_DATA_TYPE_COVERAGE_START",
     "DEFI_SOURCE_COVERAGE_START",
     "PREDICTION_SOURCE_COVERAGE_START",
     "SPORTS_SOURCE_COVERAGE_START",

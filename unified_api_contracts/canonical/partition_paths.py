@@ -691,7 +691,15 @@ def canonical_path_violations(path: str, *, require_pipeline_mode: bool = False)
     if venue_value is not None:
         # A hyphen in the venue token is the legacy PROTOCOL-CHAIN glue
         # (e.g. ``AAVE_V3-ETHEREUM``); chain MUST be its own ``chain=`` segment.
-        if "-" in venue_value:
+        # This is a DEFI-ONLY concern — ``chain`` is a defi axis. CeFi venue names
+        # legitimately CONTAIN a hyphen (``BINANCE-FUTURES`` / ``OKX-FUTURES`` /
+        # ``BYBIT-FUTURES`` / ``KRAKEN-FUTURES`` — the canonical cefi venue tokens in
+        # registry/data_type_capability.py), so flagging every hyphen crashed the cefi
+        # LIVE producers at the writer boundary (``venue='BINANCE-FUTURES' carries a
+        # glued 'VENUE-CHAIN' token``), silently freezing the deribit/hyperliquid/binance
+        # live VMs for hours (2026-06-23). Gate on defi so the legacy-glue guard still
+        # protects the on-chain paths without false-flagging cefi/tradfi venue names.
+        if asset_group_value == "defi" and "-" in venue_value:
             violations.append(
                 f"venue={venue_value!r} carries a glued 'VENUE-CHAIN' token — chain must be a separate 'chain=' segment"
             )

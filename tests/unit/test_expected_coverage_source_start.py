@@ -14,6 +14,8 @@ import pytest
 from unified_api_contracts.registry.capability import SourceCapability, register_capability
 from unified_api_contracts.registry.capability_data import bootstrap_capabilities
 from unified_api_contracts.registry.expected_coverage import (
+    ExpectedState,
+    expected_coverage,
     get_source_coverage_start_for_data_type,
     is_before_source_coverage_start,
 )
@@ -150,3 +152,53 @@ class TestRealDeclarationSmokeTest:
 
     def test_polymarket_after_launch(self) -> None:
         assert not is_before_source_coverage_start("POLYMARKET", "candles", date(2021, 1, 1))
+
+
+# ---------------------------------------------------------------------------
+# DeFi per-(venue, data_type) collection-start floor (2026-06-22) — closes the
+# DIVERGENT_EMPTY residual. DEFI_DATA_TYPE_COVERAGE_START is the data-driven
+# (measured first-capture) floor the oracle reads BEFORE the capability dict.
+# SSOT: data_pipeline_hardening_self_monitoring_2026_06_22.md Phase 3.
+# ---------------------------------------------------------------------------
+
+
+class TestDefiDataTypeCoverageStart:
+    """The defi per-pair floor clips pre-collection dates as
+    EXPECTED_PRE_SOURCE_COVERAGE_START (not DIVERGENT_EMPTY)."""
+
+    def test_aerodrome_pool_state_before_collection_clipped(self) -> None:
+        # AERODROME_V3 dex_pool_state first captured 2024-05-01.
+        assert is_before_source_coverage_start("AERODROME_V3", "dex_pool_state", date(2024, 4, 30))
+        result = expected_coverage("defi", "AERODROME_V3", "dex_pool_state", date(2024, 4, 30))
+        assert result.state == ExpectedState.EXPECTED_EMPTY
+        assert result.reason == "EXPECTED_PRE_SOURCE_COVERAGE_START"
+
+    def test_aerodrome_pool_state_on_floor_expects_data(self) -> None:
+        # On/after the floor the oracle still expects data (real interior gaps stay divergent).
+        assert not is_before_source_coverage_start("AERODROME_V3", "dex_pool_state", date(2024, 5, 1))
+        result = expected_coverage("defi", "AERODROME_V3", "dex_pool_state", date(2024, 5, 1))
+        assert result.state == ExpectedState.SHOULD_HAVE_DATA
+
+    def test_pancakeswap_swaps_pre_collection_clipped(self) -> None:
+        # PANCAKESWAP_V3 dex_pool_swaps first captured 2024-01-01 (collection late vs 2020 launch).
+        result = expected_coverage("defi", "PANCAKESWAP_V3", "dex_pool_swaps", date(2023, 8, 29))
+        assert result.state == ExpectedState.EXPECTED_EMPTY
+        assert result.reason == "EXPECTED_PRE_SOURCE_COVERAGE_START"
+
+    def test_interior_gap_after_floor_stays_divergent(self) -> None:
+        # UNISWAP_V3 dex_pool_swaps floor 2021-05-04; a 2023 empty is AFTER the floor →
+        # it remains SHOULD_HAVE_DATA (a real interior gap, NOT clipped by coverage_start).
+        result = expected_coverage("defi", "UNISWAP_V3", "dex_pool_swaps", date(2023, 8, 8))
+        assert result.state == ExpectedState.SHOULD_HAVE_DATA
+
+    def test_unregistered_defi_pair_no_clip(self) -> None:
+        # A pair absent from the registry returns None (no flat default).
+        assert get_source_coverage_start_for_data_type("MORPHO", "lending_indices") is None
+
+    def test_per_pair_not_flat(self) -> None:
+        # Two data_types on the same venue have DISTINCT measured floors.
+        ds = get_source_coverage_start_for_data_type("AERODROME_V3", "dex_pool_state")
+        sw = get_source_coverage_start_for_data_type("AERODROME_V3", "dex_pool_swaps")
+        assert ds == date(2024, 5, 1)
+        assert sw == date(2024, 7, 1)
+        assert ds != sw

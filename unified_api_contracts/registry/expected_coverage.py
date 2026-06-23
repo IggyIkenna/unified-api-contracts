@@ -427,10 +427,31 @@ def _resolve_capability_for_venue(venue: str) -> SourceCapability | None:
 def get_source_coverage_start_for_data_type(venue: str, data_type: str) -> _date | None:
     """Return the earliest date a venue has data for a specific data_type.
 
-    Reads from SourceCapability.coverage_start[data_type]. Returns None if
-    the venue has no capability record, no coverage_start dict, or no entry
-    for this data_type. Callers treat None as "no clip".
+    Resolution order (first match wins):
+
+    1. **DeFi per-(venue, data_type) measured floor** — the data-driven
+       ``DEFI_DATA_TYPE_COVERAGE_START`` registry (the earliest captured date
+       per pair, read from the prod manifest). DeFi data_types are only
+       materialised from the date our subgraph/RPC adapter began collecting
+       them, which is later than protocol launch; this floor stops the oracle
+       expecting pre-collection dates (the DIVERGENT_EMPTY residual).
+    2. **SourceCapability.coverage_start[data_type]** — the legacy
+       capability-declaration floor (cefi/tradfi venues, plus the original
+       6 defi capabilities keyed on legacy data_type names).
+
+    Returns None if neither matches — callers treat None as "no clip" (the
+    expected denominator runs from the start of the query window). Per-pair +
+    data-driven by design: there is **no flat default** (operator HARD POINT).
     """
+    from unified_api_contracts.canonical.coverage_starts import (  # noqa: imports-inside-functions
+        DEFI_DATA_TYPE_COVERAGE_START,
+    )
+
+    defi_venue = DEFI_DATA_TYPE_COVERAGE_START.get(venue.upper())
+    if defi_venue is not None:
+        defi_start = defi_venue.get(data_type)
+        if defi_start is not None:
+            return defi_start
     cap = _resolve_capability_for_venue(venue)
     if cap is None or cap.coverage_start is None:
         return None
@@ -652,7 +673,33 @@ def _venue_launch_date_for(asset_group: str, source: str) -> _date | None:
     table = table_by_group.get(asset_group.lower())
     if table is None:
         return None
-    return _parse_iso_date(table.get(source))
+    exact = _parse_iso_date(table.get(source))
+    if exact is not None:
+        return exact
+    # DeFi flat-protocol fallback (closes the chain-blind divergence class,
+    # 2026-06-22): the manifest writes FLAT venue names (``UNISWAP_V4``,
+    # ``CURVE``, ``AAVE_V3``, ``ETHERFI`` …) but ``DEFI_VENUE_LAUNCH_DATES`` is
+    # keyed mostly by ``PROTOCOL-CHAIN`` (``UNISWAP_V4-ETHEREUM`` = 2025-01-31),
+    # so the exact lookup misses → the pre-launch gate never fires → the oracle
+    # wrongly returns SHOULD_HAVE_DATA for every date back to the default
+    # window start (2018), producing tens of thousands of spurious
+    # DIVERGENT_EMPTY rows on dates BEFORE the protocol existed. Resolve a flat
+    # protocol to the EARLIEST launch among its ``PROTOCOL-*`` chain entries —
+    # the conservative floor (a protocol cannot have data on ANY chain before
+    # its first chain deployment), so this never marks real data as pre-launch,
+    # it only gates dates before the protocol launched anywhere. Same
+    # flat-vs-VENUE-CHAIN mismatch the scope-policy dict already fixed for
+    # ``EXPECTED_COVERAGE_BY_ASSET_GROUP``; this extends it to the launch gate.
+    if asset_group.lower() == "defi" and "-" not in source:
+        prefix = f"{source.upper()}-"
+        chain_dates = [
+            parsed
+            for key, value in table.items()
+            if key.upper().startswith(prefix) and (parsed := _parse_iso_date(value)) is not None
+        ]
+        if chain_dates:
+            return min(chain_dates)
+    return None
 
 
 def _chain_genesis_date_for(chain: str) -> _date | None:
