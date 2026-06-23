@@ -585,8 +585,17 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 6
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 7
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v7 (2026-06-23): expanded ``STAKING_SPOT_EXCEPTION`` from 13 → 28 members to
+cover ALL wrapped + unwrapped LST/LRT equivalents (operator 2026-06-23,
+cefi_universe_capture_rule — forward-looking allow-list, harmless extras). Added
+ETH LSTs/LRTs FRXETH/SFRXETH (Frax), ANKRETH (Ankr), OSETH (StakeWise),
+SWETH/RSWETH (Swell), ETHX (Stader), METH (Mantle), RSETH (Kelp), EZETH (Renzo),
+PUFETH (Puffer), RSTETH; + SOL LSTs JSOL, SCNSOL, INF (Sanctum). Each is ALSO
+added to ``CEFI_BASE_ASSET_UNIVERSE`` (subset invariant holds) so the cefi
+``base_ccys`` content-hash flips with the constant.
 
 v6 (2026-06-23): added the **staking-spot exception** to
 :func:`is_in_mvp_capture_universe` — a base in ``STAKING_SPOT_EXCEPTION``

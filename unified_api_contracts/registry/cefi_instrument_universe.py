@@ -51,13 +51,13 @@ from __future__ import annotations
 # Curated union — legacy-44 + top-100-mcap-aggregated-since-2019 + HL/ASTER perp
 # bases. Survivorship-bias-free (retired top-100 coins kept). Sorted for
 # deterministic diffs; see module docstring for the rationale + provenance of
-# each tranche. ~525 base assets (incl. the staking/restaking/LST spot-exception
+# each tranche. ~540 base assets (incl. the staking/restaking/LST spot-exception
 # set ``STAKING_SPOT_EXCEPTION`` below).
 CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "0G", "1INCH", "2Z", "AAVE", "ABBC", "ACE", "ACH", "ACU",
     "ACX", "ADA", "AERGO", "AERO", "AEVO", "AGIX", "AGLD", "AI16Z",
     "AIA", "AIGENSYN", "AIO", "AIOT", "AIXBT", "AKT", "ALCH", "ALGO",
-    "ALICE", "ALLO", "ALT", "ANIME", "ANKR", "APE", "APEX", "API3",
+    "ALICE", "ALLO", "ALT", "ANIME", "ANKR", "ANKRETH", "APE", "APEX", "API3",
     "APR", "APT", "AR", "ARB", "ARC", "ARDR", "ARIA", "ARK",
     "ARKM", "ARPA", "ARX", "ASTER", "ASTEROID", "ASTR", "ATH", "ATOM",
     "AUCTION", "AVAAI", "AVAX", "AVL", "AVNT", "AWE", "AXL", "AXS",
@@ -77,42 +77,42 @@ CEFI_BASE_ASSET_UNIVERSE: frozenset[str] = frozenset({
     "DYM", "EDEN", "EDGE", "EDU", "EETH", "EGLD", "EIGEN", "ELF",
     "ENA",
     "ENJ", "ENS", "ENSO", "EOS", "ESP", "ESPORTS", "ETC", "ETH",
-    "ETHFI", "EUL", "EVAA", "FARTCOIN", "FET", "FF", "FHE", "FIDA",
+    "ETHFI", "ETHX", "EUL", "EVAA", "EZETH", "FARTCOIN", "FET", "FF", "FHE", "FIDA",
     "FIGHT", "FIL", "FLOCK", "FLOKI", "FLOW", "FLUX", "FOGO", "FOLKS",
-    "FORM", "FRAX", "FTT", "FUN", "FXS", "G", "GALA", "GAS",
+    "FORM", "FRAX", "FRXETH", "FTT", "FUN", "FXS", "G", "GALA", "GAS",
     "GENIUS", "GIGGLE", "GLM", "GMT", "GMX", "GNT", "GOAT", "GRASS",
     "GRIFFAIN", "GRT", "GT", "GTC", "GUN", "GUSD", "GWEI", "HANA",
     "HBAR", "HBTC", "HEDG", "HEMI", "HFT", "HMSTR", "HNT", "HOLO",
     "HOME", "HOT", "HT", "HUMA", "HYPE", "HYPER", "ICP", "ICX",
-    "ILV", "IMX", "INIT", "INJ", "IO", "IOTA", "IOTX", "IP",
-    "IRYS", "JASMY", "JCT", "JELLYJELLY", "JITOSOL", "JTO", "JUP", "KAITO",
+    "ILV", "IMX", "INF", "INIT", "INJ", "IO", "IOTA", "IOTX", "IP",
+    "IRYS", "JASMY", "JCT", "JELLYJELLY", "JITOSOL", "JSOL", "JTO", "JUP", "KAITO",
     "KAS",
     "KAT", "KAVA", "KCS", "KDA", "KGEN", "KING", "KITE", "KMD",
     "KNC", "KOMA", "KSM", "LAB", "LAYER", "LDO", "LEO", "LIGHT",
     "LINEA", "LINK", "LISTA", "LIT", "LITE", "LPT", "LQTY", "LRC",
     "LTC", "LUMIA", "LUNA", "LUNA2", "LUNC", "LYN", "MAGIC", "MAGMA",
     "MANA", "MANTA", "MANTRA", "MASK", "MATIC", "ME", "MEGA", "MELANIA",
-    "MEME", "MERL", "METIS", "MEW", "MINA", "MITH", "MITO", "MKR",
+    "MEME", "MERL", "METH", "METIS", "MEW", "MINA", "MITH", "MITO", "MKR",
     "MMT", "MNT", "MOG", "MON", "MOODENG", "MORPHO", "MOVE", "MOVR",
     "MSOL", "MX", "MYX", "NANO", "NAORIS", "NEAR", "NEIRO", "NEO",
     "NEX",
     "NEXO", "NIGHT", "NIL", "NMR", "NOM", "NOT", "NOW", "NULS",
     "NXPC", "OCEAN", "OGN", "OKB", "OMG", "ONDO", "ONDS", "ONE",
-    "ONT", "OP", "OPEN", "OPG", "OPN", "ORCA", "ORDI", "OXT",
+    "ONT", "OP", "OPEN", "OPG", "OPN", "ORCA", "ORDI", "OSETH", "OXT",
     "PARTI", "PAXG", "PAY", "PENDLE", "PENGU", "PENGUIN", "PEOPLE", "PEPE",
     "PHA", "PIEVERSE", "PIPPIN", "PIXEL", "PLAY", "PLUME", "PNUT", "POL",
     "POLYX", "POPCAT", "POPMART", "PORTAL", "POWER", "POWR", "PRL", "PROM",
-    "PROMPT", "PROS", "PROVE", "PTB", "PUMP", "PUMPBTC", "PUNDIAI", "PURR",
+    "PROMPT", "PROS", "PROVE", "PTB", "PUFETH", "PUMP", "PUMPBTC", "PUNDIAI", "PURR",
     "PYTH", "QNT", "QNTX", "QTUM", "RAD", "RAIL", "RARE", "RAVE",
     "RAY", "RECALL", "RED", "REN", "RENDER", "REP", "RESOLV", "RETH",
     "REZ",
-    "RIF", "RLC", "RNDR", "RONIN", "ROSE", "RPL", "RSR", "RUNE",
+    "RIF", "RLC", "RNDR", "RONIN", "ROSE", "RPL", "RSETH", "RSR", "RSTETH", "RSWETH", "RUNE",
     "RVN", "S", "SAGA", "SAHARA", "SAND", "SAPIEN", "SATS", "SC",
-    "SEI", "SENT", "SHELL", "SHIB", "SIGN", "SIREN", "SKL", "SKR",
+    "SCNSOL", "SEI", "SENT", "SFRXETH", "SHELL", "SHIB", "SIGN", "SIREN", "SKL", "SKR",
     "SKY", "SKYAI", "SNT", "SNX", "SOL", "SOLV", "SOMI", "SOON",
     "SOPH", "SPELL", "SPK", "SPX", "SQD", "SRM", "SSV", "STABLE",
     "STAR", "STBL", "STEEM", "STETH", "STG", "STORJ", "STRAT", "STRK",
-    "STX", "SUI", "SUPER", "SUSHI", "SWARMS", "SYN", "SYRUP", "SYS",
+    "STX", "SUI", "SUPER", "SUSHI", "SWARMS", "SWETH", "SYN", "SYRUP", "SYS",
     "T", "TAC", "TAG", "TAKE", "TAO", "TFUEL", "THETA", "TIA",
     "TNSR", "TON", "TOSHI", "TOWNS", "TRADOOR", "TRB", "TREE", "TRIA",
     "TROLL", "TRUMP", "TRUST", "TRUTH", "TRX", "TST", "TURBO", "TURTLE",
@@ -182,11 +182,20 @@ CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
 # regardless of perp existence. Adding a new staking token is a manual UAC edit
 # (like the base universe). Every member is ALSO present in
 # ``CEFI_BASE_ASSET_UNIVERSE`` so the base-membership leg of the predicate passes.
+# Forward-looking allow-list (operator 2026-06-23): ALL wrapped + unwrapped LST/LRT
+# equivalents are included even if no CEX currently lists them (harmless extras —
+# the carve-out only MATTERS for a base a venue actually lists).
 #   Restaking:   EIGEN, KING, ETHFI
-#   ETH LSTs/LRTs: STETH, WSTETH, RETH, WEETH, EETH, CBETH
-#   SOL LSTs:    MSOL (Marinade), JITOSOL + JTO (Jito), BSOL
+#   ETH LSTs/LRTs: STETH, WSTETH, RETH, WEETH, EETH, CBETH, FRXETH, SFRXETH (Frax),
+#                  ANKRETH (Ankr), OSETH (StakeWise), SWETH, RSWETH (Swell),
+#                  ETHX (Stader), METH (Mantle), RSETH (Kelp), EZETH (Renzo),
+#                  PUFETH (Puffer), RSTETH
+#   SOL LSTs:    MSOL (Marinade), JITOSOL + JTO (Jito), BSOL, JSOL, SCNSOL,
+#                INF (Sanctum)
 STAKING_SPOT_EXCEPTION: frozenset[str] = frozenset({
-    "BSOL", "CBETH", "EETH", "EIGEN", "ETHFI", "JITOSOL", "JTO", "KING",
-    "MSOL", "RETH", "STETH", "WEETH", "WSTETH",
+    "ANKRETH", "BSOL", "CBETH", "EETH", "EIGEN", "ETHFI", "ETHX", "EZETH",
+    "FRXETH", "INF", "JITOSOL", "JSOL", "JTO", "KING", "METH", "MSOL",
+    "OSETH", "PUFETH", "RETH", "RSETH", "RSTETH", "RSWETH", "SCNSOL", "SFRXETH",
+    "STETH", "SWETH", "WEETH", "WSTETH",
 })
 # fmt: on

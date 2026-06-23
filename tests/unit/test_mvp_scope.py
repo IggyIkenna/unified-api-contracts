@@ -728,8 +728,33 @@ def test_capture_universe_public_import_surface() -> None:
 # STAKING_SPOT_EXCEPTION — the spot-without-perp carve-out (operator 2026-06-23)
 # ---------------------------------------------------------------------------
 
-# The 7 LSTs the cefi_universe_capture_rule says were ABSENT and must be added.
-_NEWLY_ADDED_LSTS = ("WSTETH", "RETH", "WEETH", "EETH", "MSOL", "JITOSOL", "BSOL")
+# The LSTs the cefi_universe_capture_rule said were ABSENT and must be added.
+# (v6: the original 7 ETH/SOL LSTs; v7: + the 15 wrapped/unwrapped LST/LRT
+# equivalents added 2026-06-23 — forward-looking allow-list.)
+_NEWLY_ADDED_LSTS = (
+    "WSTETH",
+    "RETH",
+    "WEETH",
+    "EETH",
+    "MSOL",
+    "JITOSOL",
+    "BSOL",
+    "FRXETH",
+    "SFRXETH",
+    "ANKRETH",
+    "OSETH",
+    "SWETH",
+    "RSWETH",
+    "ETHX",
+    "METH",
+    "RSETH",
+    "EZETH",
+    "PUFETH",
+    "RSTETH",
+    "JSOL",
+    "SCNSOL",
+    "INF",
+)
 
 
 def test_staking_spot_exception_members() -> None:
@@ -738,22 +763,41 @@ def test_staking_spot_exception_members() -> None:
 
     expected = frozenset(
         {
+            # Restaking
             "EIGEN",
             "KING",
             "ETHFI",
+            # ETH LSTs / LRTs
             "STETH",
             "WSTETH",
             "RETH",
             "WEETH",
             "EETH",
             "CBETH",
+            "FRXETH",
+            "SFRXETH",
+            "ANKRETH",
+            "OSETH",
+            "SWETH",
+            "RSWETH",
+            "ETHX",
+            "METH",
+            "RSETH",
+            "EZETH",
+            "PUFETH",
+            "RSTETH",
+            # SOL LSTs
             "MSOL",
             "JITOSOL",
             "JTO",
             "BSOL",
+            "JSOL",
+            "SCNSOL",
+            "INF",
         }
     )
     assert expected == STAKING_SPOT_EXCEPTION
+    assert len(STAKING_SPOT_EXCEPTION) == 28
 
 
 def test_staking_spot_exception_is_frozenset() -> None:
@@ -804,9 +848,9 @@ def test_capture_universe_staking_spot_mvp_without_perp() -> None:
     from unified_api_contracts import STAKING_SPOT_EXCEPTION, is_in_mvp_capture_universe
 
     for base in STAKING_SPOT_EXCEPTION:
-        assert is_in_mvp_capture_universe(
-            "BINANCE-SPOT", base, "SPOT_PAIR", has_perp_for_base=False
-        ), f"staking-exception base {base} SPOT should be mvp=true with no perp"
+        assert is_in_mvp_capture_universe("BINANCE-SPOT", base, "SPOT_PAIR", has_perp_for_base=False), (
+            f"staking-exception base {base} SPOT should be mvp=true with no perp"
+        )
 
 
 def test_capture_universe_staking_spot_exception_on_any_venue() -> None:
@@ -833,4 +877,4 @@ def test_capture_universe_config_version_bumped() -> None:
         MVP_SCOPE_CONFIG_VERSION,
     )
 
-    assert MVP_SCOPE_CONFIG_VERSION >= 6
+    assert MVP_SCOPE_CONFIG_VERSION >= 7
