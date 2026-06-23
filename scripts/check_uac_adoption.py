@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Generate UAC Adoption Matrix — shows which terminal consumer services import each UAC schema.
 
 Usage:

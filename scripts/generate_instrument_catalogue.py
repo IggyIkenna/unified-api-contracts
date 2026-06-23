@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Instrument catalogue + availability matrix generator.
 
 Joins the static SSOTs (DataTypeCapability registry, SchemaSpec registry,

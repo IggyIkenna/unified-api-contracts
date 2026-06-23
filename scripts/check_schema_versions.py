@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Check that schema_version field defaults match their module-level version constants.
 
 Scans UAC canonical/domain.py and execution.py for:

@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Serialise :data:`ARCHETYPE_CAPABILITY_REGISTRY` to deterministic JSON.
 
 Dual-purpose: ``--write`` rewrites the committed

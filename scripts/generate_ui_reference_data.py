@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Generate ui-reference-data.json from UAC registries.
 
 Extracts all 13 registry categories into a single deterministic JSON file

@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 # STEP 5.7X — Batch-Live WS cassette coexistence check.
 #
 # Enforces: every true WebSocket connector in MTDS live/connectors/*_ws.py must

@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Detect drift in FOOTYSTATS_SEASON_IDS against the live FootyStats /league-list API.
 
 Called weekly from .github/workflows/weekly-validation.yml. Exits 0 if no drift, 1 if

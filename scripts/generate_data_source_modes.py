@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Extract providers with 'modes' from provider_api_versions.yaml and print a markdown table.
 
 Run from unified-api-contracts repo root:

@@ -1,3 +1,6 @@
+# Epic: infrastructure_master
+# Lifecycle: permanent
+# Delete-when: NA
 """Strategy availability + capability rules → JSON for downstream consumers.
 
 Emits the "negative space" of the catalogue: what each archetype is allowed
