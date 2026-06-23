@@ -28,7 +28,12 @@ from .crypto_equity_link import STANDALONE_EQUITY_PERP_SYMBOLS as STANDALONE_EQU
 from .crypto_equity_link import tracks_equity as tracks_equity
 from .defi import CHAIN_BRIDGE_GRAPH as CHAIN_BRIDGE_GRAPH
 from .defi import ChainKind as ChainKind
+from .defi import DefiPoolIdentity as DefiPoolIdentity
 from .defi import LendingProtocol as LendingProtocol
+from .defi import build_pool_identity as build_pool_identity
+from .defi import glued_venue_prefix as glued_venue_prefix
+from .defi import parse_glued_pool_id as parse_glued_pool_id
+from .defi import split_glued_venue_chain as split_glued_venue_chain
 from .deployment import ManifestShaDriftError as ManifestShaDriftError
 from .environment_tier import EnvironmentTier as EnvironmentTier
 from .environment_tier import resolve_environment_from_env as resolve_environment_from_env
