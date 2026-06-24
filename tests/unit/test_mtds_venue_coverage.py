@@ -39,8 +39,10 @@ class TestAllCefiVenuesDeduplicated:
         # both Tardis-backed and CLOB sets so dedupes once.
         # 2026-06-23 (cefi_universe_capture_rule): + BYBIT-SPOT (Tardis bybit-spot,
         # split from BYBIT) + COINBASE-FUTURES (Tardis coinbase-international). Total = 22.
-        assert len(vm.all_cefi_venues) == 22, (
-            f"expected 22 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
+        # 2026-06-24 (cefi_universe_capture_rule): + BINANCE-DELIVERY (COIN-M inverse).
+        # Total = 23.
+        assert len(vm.all_cefi_venues) == 23, (
+            f"expected 23 unique CEFI venues, got {len(vm.all_cefi_venues)}: {sorted(vm.all_cefi_venues)}"
         )
 
     def test_includes_all_suffixed_variants(self) -> None:
@@ -705,8 +707,7 @@ class TestNewlyCapabilitiedDefiVenues:
                 f"shards are uncredited in the could-exist denominator"
             )
             assert expected_dt in caps, (
-                f"{venue}: expected '{expected_dt}' declared in "
-                f"VENUE_DATA_TYPE_CAPABILITIES but got {sorted(caps)}"
+                f"{venue}: expected '{expected_dt}' declared in VENUE_DATA_TYPE_CAPABILITIES but got {sorted(caps)}"
             )
 
     def test_vault_is_not_in_all_defi_venues(self) -> None:
@@ -717,9 +718,7 @@ class TestNewlyCapabilitiedDefiVenues:
         """
         from unified_api_contracts.registry.defi_venues import ALL_DEFI_VENUES
 
-        assert "VAULT" not in ALL_DEFI_VENUES, (
-            "VAULT (generic non-protocol label) must not be in ALL_DEFI_VENUES"
-        )
+        assert "VAULT" not in ALL_DEFI_VENUES, "VAULT (generic non-protocol label) must not be in ALL_DEFI_VENUES"
 
     def test_sushiswap_arbitrum_classic_has_capabilities(self) -> None:
         """SUSHISWAP-ARBITRUM (classic v2) is in ALL_DEFI_VENUES and has its
@@ -739,6 +738,5 @@ class TestNewlyCapabilitiedDefiVenues:
 
         # bare alias must still point to V3-ETHEREUM (do not silently change)
         assert LEGACY_DEFI_VENUE_ALIASES.get("SUSHISWAP") == "SUSHISWAP_V3-ETHEREUM", (
-            "LEGACY_DEFI_VENUE_ALIASES['SUSHISWAP'] was changed; "
-            "verify downstream normalisation before modifying"
+            "LEGACY_DEFI_VENUE_ALIASES['SUSHISWAP'] was changed; verify downstream normalisation before modifying"
         )

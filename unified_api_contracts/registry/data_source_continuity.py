@@ -69,6 +69,79 @@ BARCHART_VIX_FILE_COUNT: int = 12  # source CSV files (each covers ~6 months)
 # No fixed start date; always (today - 59 days) at earliest.
 YAHOO_VIX_15M_WINDOW_DAYS: int = 60
 
+# ── Yahoo Finance intraday granularity / lookback GUARDRAIL (SSOT) ──────────
+# Yahoo's chart API bounds how far back each intraday interval can reach. PROBED
+# LIVE 2026-06-24 (ticker 005930.KS) — the OPERATOR LADDER, confirmed-achievable:
+#   * 1d  : full history (probed 2000-01-31 → today; backfill floor 2019-01-01)
+#   * 1h  : 730d (range=730d OK)
+#   * 15m : 89 CALENDAR days — ACHIEVABLE ONLY via ``range=60d`` (Yahoo returns a
+#           ~89-day span for that param; ``range=89d``/period-window >60d → HTTP
+#           422). So the fetch path MUST use the ``range=60d`` form for 15m, and
+#           the guardrail allows back to 89 calendar days.
+#   * 1m  : 28d — ~7d per period request, chunked back to ~28d (back 21-28d OK;
+#           28-35d → HTTP 422). Chunk in <=7d windows.
+# A request OLDER than the limit for its interval MUST be clamped/rejected
+# (raise), never silently return empty — the durable guardrail consumed by
+# ``YahooFinanceAdapter.download_intraday`` + the centralised venue/source/adapter
+# parity gate. Value = max lookback (calendar days) from "today"; None = unbounded.
+YAHOO_INTRADAY_LOOKBACK_DAYS: dict[str, int | None] = {
+    "1m": 28,  # ~7d/request, chunked back to ~28d (probed; beyond → HTTP 422)
+    "2m": 60,
+    "5m": 60,
+    "15m": 89,  # via range=60d (returns ~89 calendar-day span); period>60d → 422
+    "30m": 60,
+    "60m": 60,
+    "90m": 60,
+    "1h": 730,
+    "1d": None,  # full history (probed: 2000-01-31 → today)
+    "5d": None,
+    "1wk": None,
+    "1mo": None,
+    "3mo": None,
+}
+
+
+class YahooLookbackExceededError(ValueError):
+    """Raised when a Yahoo intraday request reaches FURTHER BACK than the
+    interval's lookback limit (:data:`YAHOO_INTRADAY_LOOKBACK_DAYS`).
+
+    Yahoo silently returns an empty/partial response (or HTTP 422) for an
+    over-the-limit window, which a naive caller mis-reads as "no data". The
+    guardrail fails LOUD instead so the caller clamps the window or routes to a
+    deeper source (FRED/Barchart/databento). The fetch path MUST consult
+    :func:`assert_yahoo_intraday_within_limit` before hitting the API.
+    """
+
+
+def assert_yahoo_intraday_within_limit(interval: str, start_date: date, *, today: date | None = None) -> None:
+    """Fail-closed guardrail: raise :class:`YahooLookbackExceededError` if a
+    Yahoo intraday request for ``interval`` would reach back before the
+    interval's max lookback window.
+
+    Args:
+        interval: Yahoo bar interval (``"1m"`` / ``"15m"`` / ``"1h"`` / …).
+        start_date: The earliest date the request asks for (UTC date).
+        today: Reference "now" date (defaults to ``datetime.now(UTC).date()``).
+
+    Raises:
+        YahooLookbackExceededError: ``start_date`` is older than
+            ``today - YAHOO_INTRADAY_LOOKBACK_DAYS[interval]`` for a bounded
+            interval. Unbounded intervals (daily+) never raise.
+        KeyError: ``interval`` is not a known Yahoo interval.
+    """
+    limit_days = YAHOO_INTRADAY_LOOKBACK_DAYS[interval]
+    if limit_days is None:
+        return
+    ref = today if today is not None else datetime.now(UTC).date()
+    floor = ref - timedelta(days=limit_days)
+    if start_date < floor:
+        raise YahooLookbackExceededError(
+            f"Yahoo intraday {interval!r} cannot reach {start_date} — the lookback "
+            f"limit is {limit_days} days (earliest serveable: {floor}). Clamp the "
+            f"window to >= {floor} or use a deeper source (FRED/Barchart/databento)."
+        )
+
+
 # !! KNOWN GAP: 2025-11-13 → ~(today - 60d) — NO 15m VIX source exists !!
 # This is the first date of the permanent gap. Last gap date is dynamic:
 #   (today - YAHOO_VIX_15M_WINDOW_DAYS) - 1 day

@@ -318,6 +318,13 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # perp-gate exception (see is_in_mvp_capture_universe): its SPOT
                 # is mvp=true despite no perp on the venue.
                 "UPBIT",
+                # Binance COIN-M (inverse/delivery) perps + dated futures
+                # (cefi_universe_capture_rule 2026-06-24). Distinct canonical
+                # venue from BINANCE-FUTURES (USDT-M linear). Inverse perps (e.g.
+                # BTCUSD_PERP) are the more-liquid margin type for BTC/ETH on
+                # Binance's delivery endpoint — captured on base-membership (same
+                # CEFI_BASE_ASSET_UNIVERSE) via the PERPETUAL + FUTURE paths.
+                "BINANCE-DELIVERY",
             }
         ),
         instrument_types=frozenset(
@@ -621,8 +628,13 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 8
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 9
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v9 (2026-06-24): added ``BINANCE-DELIVERY`` (Binance COIN-M inverse/delivery
+perps + dated futures) to the CeFi MVP scope venues. Inverse perps (e.g.
+BTCUSD_PERP) captured on base-membership via PERPETUAL + FUTURE paths, same
+CEFI_BASE_ASSET_UNIVERSE as linear venues. cefi_universe_capture_rule 2026-06-24.
 
 v8 (2026-06-23): added 8 CeFi venues to the cefi rule ``venues`` set
 (BYBIT-SPOT, COINBASE-SPOT, COINBASE-FUTURES, BITFINEX-SPOT, BITFINEX-FUTURES,
