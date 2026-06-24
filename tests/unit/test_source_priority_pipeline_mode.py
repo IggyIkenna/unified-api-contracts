@@ -102,11 +102,11 @@ def test_read_with_source_priority_returns_source_and_pipeline_mode() -> None:
     assert isinstance(mode, PipelineMode)
 
 
-def test_read_with_source_priority_returns_massive_for_tradfi_trades() -> None:
-    """MASSIVE-FIRST per operator ratification 2026-06-11."""
+def test_read_with_source_priority_returns_databento_for_tradfi_trades() -> None:
+    """DATABENTO-FIRST (2026-06-24, supersedes the 2026-06-11 massive-first)."""
     source, mode = read_with_source_priority("tradfi", "trades")
-    assert source == "massive"
-    assert mode is PipelineMode.BATCH_MASSIVE
+    assert source == "databento"
+    assert mode is PipelineMode.BATCH_DATABENTO
 
 
 def test_read_with_source_priority_returns_polymarket_for_prediction_trades() -> None:
@@ -261,17 +261,17 @@ def test_get_all_sources_single_source_cell_returns_list_of_one() -> None:
 
 
 def test_get_all_sources_multi_source_cell_returns_ordered_list() -> None:
-    """Multi-source cells (tradfi trades = massive + databento) return both in priority order.
+    """Multi-source cells (tradfi trades = databento + massive) return both in priority order.
 
-    MASSIVE-FIRST per operator ratification 2026-06-11 (MVP catalogue completion —
-    broadest canonically-converted coverage; databento = secondary/resilience).
+    DATABENTO-FIRST (2026-06-24, supersedes the 2026-06-11 massive-first): databento is
+    the verified-complete primary; massive is the fallback + bulk-backfill path.
     """
     results = get_all_sources_with_priority("tradfi", "trades")
     assert len(results) >= 2
     sources = [s for s, _ in results]
-    assert sources[0] == "massive", "massive is primary for tradfi trades"
-    assert "databento" in sources, "databento is registered for tradfi trades"
-    assert sources.index("massive") < sources.index("databento"), "massive precedes databento"
+    assert sources[0] == "databento", "databento is primary for tradfi trades"
+    assert "massive" in sources, "massive is registered (fallback) for tradfi trades"
+    assert sources.index("databento") < sources.index("massive"), "databento precedes massive"
 
 
 def test_get_all_sources_returns_batch_pipeline_modes() -> None:
@@ -319,8 +319,8 @@ def test_select_primary_available_primary_only() -> None:
 def test_select_primary_available_multi_source_primary_wins() -> None:
     """When all sources are present, the primary (index-0) wins."""
     source, mode = select_primary_available_source("tradfi", "trades", {"databento", "massive"})
-    assert source == "massive", "massive is primary for tradfi trades (operator ratification 2026-06-11)"
-    assert mode is PipelineMode.BATCH_MASSIVE
+    assert source == "databento", "databento is primary for tradfi trades (databento-first 2026-06-24)"
+    assert mode is PipelineMode.BATCH_DATABENTO
 
 
 def test_select_primary_available_fallback_to_secondary() -> None:
@@ -628,12 +628,14 @@ def test_live_pipeline_mode_for_non_cefi_uses_source_priority_primary() -> None:
         live_source_for_venue,
     )
 
-    # TradFi: live source = databento (the ONLY tradfi Live WS producer), NOT the batch
-    # SOURCE_PRIORITY primary `massive` (a flat-file archive with no live feed). Resolving
-    # via the batch primary mis-stamped live shards `live_massive` (fixed 2026-06-21).
+    # TradFi: live source = databento (the ONLY tradfi Live WS producer). As of the
+    # DATABENTO-FIRST flip (2026-06-24) the BATCH SOURCE_PRIORITY primary is ALSO
+    # databento, so live + batch now CONVERGE on databento (cleaner than the prior
+    # massive-batch / databento-live split that mis-stamped live shards `live_massive`,
+    # fixed 2026-06-21). massive remains the batch fallback [1].
     assert live_source_for_venue("tradfi", "DATABENTO", "trades") == "databento"
     assert live_source_for_venue("tradfi", "CME", "trades") == "databento"
-    assert get_primary_source("tradfi", "trades") == "massive"  # batch primary unchanged
+    assert get_primary_source("tradfi", "trades") == "databento"  # batch primary now databento-first
     pm = live_pipeline_mode_for_venue("tradfi", "DATABENTO", "trades")
     assert is_live(pm)
 
