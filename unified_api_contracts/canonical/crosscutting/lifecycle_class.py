@@ -345,3 +345,73 @@ Note PAPER is absent — paper deployments have no lifecycle_class of their own
 (a paper cron is ``SCHEDULED_RECURRING``), so PAPER is always an explicit
 override (``VmPrefixSpec.umbrella`` or the ``is_paper`` arg to
 :func:`classify_deployment_target`)."""
+
+
+class ShardResponsibilityKind(StrEnum):
+    """What kind of data-freshness obligation a deployment carries.
+
+    ``asset_group_capture``
+        A data-pipeline producer (MTDS / MDPS / features / instruments) that
+        captures ticks / OHLCV / features for a specific *asset_group*.  The
+        availability manifest's ``capture_status`` for that asset_group's shards
+        is the freshness SSOT for this deployment.
+
+    ``manifest_consolidation``
+        A manifest-consolidator run that merges per-VM shards into the index
+        for a given *asset_group*.  Its "freshness" is the index's
+        ``last_consolidated_at`` timestamp.
+
+    ``strategy_shard``
+        A strategy / paper / live execution shard.  Freshness is defined by its
+        position / instruction ledger cursor, not the availability manifest.
+
+    ``none``
+        Liveness-only deployments (API gateways, control-plane services,
+        orchestrator, UI).  No per-shard data-freshness expectation; the
+        health-ping callback is the only signal.
+    """
+
+    ASSET_GROUP_CAPTURE = "asset_group_capture"
+    MANIFEST_CONSOLIDATION = "manifest_consolidation"
+    STRATEGY_SHARD = "strategy_shard"
+    NONE = "none"
+
+
+@dataclass(frozen=True)
+class ShardResponsibility:
+    """Binding from a :class:`DeploymentTarget` to the data shards it owns.
+
+    The availability **manifest** (``capture_status`` 4-state +
+    ``available_at`` per venue x data_type x asset_group x pipeline_mode x
+    day shard) is the per-shard freshness SSOT.  This dataclass encodes
+    *which* shards a deployment is responsible for so that freshness can be
+    attributed per-deployment rather than guessed from the health-ping
+    callback.
+
+    Resolved by ``deployment_service.deployment_cluster_registry
+    .responsibility_for_deployment(target)`` — a pure derivation from the
+    target's already-classified ``service`` + ``asset_group`` + ``umbrella``.
+    Consumers (deployment-api ``/api/deployments/{id}/freshness``,
+    deployment-ui cockpit) read this to decide how to display freshness.
+
+    Attributes:
+        kind: The category of data obligation.
+        asset_group: The asset_group this deployment services
+            (``cefi`` / ``defi`` / ``tradfi`` / ``sports`` / ``prediction``),
+            or ``""`` for ``kind=none`` / cross-asset infra.
+        data_types: The specific data_types captured, e.g.
+            ``("book_snapshot_5", "trades")``.  Empty for
+            ``manifest_consolidation`` / ``strategy_shard`` / ``none``.
+        archetype: For ``strategy_shard``: the strategy archetype slug
+            (e.g. ``"carry_staked_basis"``).  Empty otherwise.
+        shard: For ``strategy_shard``: the shard id or name.  Empty otherwise.
+        mode: For ``strategy_shard``: ``"live"`` / ``"paper"`` / ``"batch"``.
+            Empty otherwise.
+    """
+
+    kind: ShardResponsibilityKind
+    asset_group: str = ""
+    data_types: tuple[str, ...] = ()
+    archetype: str = ""
+    shard: str = ""
+    mode: str = ""
