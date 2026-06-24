@@ -435,7 +435,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     # CBOE VIX 15m + 1m OHLCV — the VIX-specific feature calculator
     # (features-service@b3814675 — vix_calculator.py) consumes ohlcv at
     # multiple timeframes. VIX 15m has its own data_type per CLAUDE.md
-    # "VIX 15m" rule (Barchart preload + Yahoo rolling 60d + honest gap).
+    # "VIX 15m" rule (VX futures via Databento XCBF.PITCH; Yahoo rolling 60d cross-check).
     "vix_features": [
         InputReq(asset_group="tradfi", data_type="ohlcv_1m", available_at_rule="tick_timestamp"),
         InputReq(asset_group="tradfi", data_type="ohlcv_15m", available_at_rule="tick_timestamp"),

@@ -170,7 +170,6 @@ from .market_state import (
 )
 from .ohlcv import (
     normalize_aster_kline,
-    normalize_barchart_ohlcv,
     normalize_binance_kline,
     normalize_bybit_kline,
     normalize_ccxt_ohlcv,
@@ -372,7 +371,6 @@ __all__ = [
     "normalize_aster_trade",
     "normalize_aster_ws_close",
     "normalize_aster_ws_subscription",
-    "normalize_barchart_ohlcv",
     "normalize_betfair_error",
     # Market state normalizers (phase6-market-state)
     "normalize_betfair_market_state",

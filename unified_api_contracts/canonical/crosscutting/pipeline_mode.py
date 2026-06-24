@@ -73,7 +73,8 @@ class PipelineMode(StrEnum):
     """
 
     BATCH_API_FOOTBALL = "batch_api_football"
-    BATCH_BARCHART = "batch_barchart"
+    # BATCH_BARCHART RETIRED 2026-06-24 — Barchart removed (VIX 15m now aggregates
+    # from VX futures via databento → BATCH_DATABENTO / batch_yahoo). No shim.
     BATCH_CHAINLINK = "batch_chainlink"
     BATCH_CROSS_INSTRUMENT = "batch_cross_instrument"
     BATCH_DATABENTO = "batch_databento"

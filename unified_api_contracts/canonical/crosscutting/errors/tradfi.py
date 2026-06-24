@@ -251,48 +251,8 @@ VENUE_ERRORS_TRADFI: dict[str, list[VenueErrorClassification]] = {
             ),
         ),
     ],
-    "barchart": [
-        ve(
-            "barchart",
-            "429",
-            retry=True,
-            reconnect=False,
-            action=ErrorAction.RETRY,
-            desc="Rate limit exceeded",
-        ),
-        ve(
-            "barchart",
-            "401",
-            retry=False,
-            reconnect=False,
-            action=ErrorAction.FAIL,
-            desc="Unauthorized — invalid API key",
-        ),
-        ve(
-            "barchart",
-            "400",
-            retry=False,
-            reconnect=False,
-            action=ErrorAction.FAIL,
-            desc="Bad request — invalid symbol or parameter",
-        ),
-        ve(
-            "barchart",
-            "500",
-            retry=True,
-            reconnect=False,
-            action=ErrorAction.RETRY,
-            desc="Internal server error",
-        ),
-        ve(
-            "barchart",
-            "NO_DATA_FOUND",
-            retry=False,
-            reconnect=False,
-            action=ErrorAction.FAIL,
-            desc="No data found for symbol",
-        ),
-    ],
+    # "barchart" error table RETIRED 2026-06-24 — Barchart removed (VIX 15m now
+    # aggregates from VX futures via Databento XCBF.PITCH). No shim.
     "fred": [
         ve(
             "fred",

@@ -57,7 +57,7 @@ _TRADFI_SLAS: list[VenueFreshnessSLA] = [
     VenueFreshnessSLA("databento", VenueCategory.TRADFI, 30),
     VenueFreshnessSLA("tardis", VenueCategory.TRADFI, 30),
     VenueFreshnessSLA("yahoo_finance", VenueCategory.TRADFI, 60),
-    VenueFreshnessSLA("barchart", VenueCategory.TRADFI, 60),
+    # "barchart" SLA retired 2026-06-24 (Barchart removed; VIX 15m → VX futures via databento).
     VenueFreshnessSLA("fred", VenueCategory.TRADFI, 60),
     VenueFreshnessSLA("ecb", VenueCategory.TRADFI, 60),
     VenueFreshnessSLA("ofr", VenueCategory.TRADFI, 60),

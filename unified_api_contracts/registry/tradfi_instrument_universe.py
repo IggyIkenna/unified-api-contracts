@@ -395,6 +395,48 @@ FX_SPOT_PAIRS: list[FxSpotPairDef] = [
 
 
 @dataclass(frozen=True, slots=True)
+class KrxEquityDef:
+    """A static KRX (Korea Exchange) equity definition fetched via Yahoo Finance.
+
+    KRX equities have no Databento dataset in our subscription — they are sourced
+    via Yahoo Finance using the ``.KS`` ticker suffix. Mirrors the basis-arb
+    cash-equity twin pattern of the DBEQ.BASIC US equities (these are the
+    Korean single-stock underliers of the Binance tradfi-perps).
+
+    Attributes:
+        symbol: Canonical bare symbol used as the instrument symbol (e.g.
+            ``005930`` — the KRX numeric code, matching the Yahoo ticker root).
+        name: Human-readable issuer name (Samsung Electronics, Hyundai Motor, …).
+        yahoo_ticker: Yahoo Finance ticker (e.g. ``005930.KS``).
+        first_available_date: Empirically-confirmed Yahoo history floor (the
+            instrument's ``available_from`` + the data-status could-exist start).
+    """
+
+    symbol: str
+    name: str
+    yahoo_ticker: str
+    first_available_date: date
+
+
+# KRX (Korea Exchange) single-stock equities — Yahoo-sourced (source="yahoo",
+# venue="KRX"). The Korean underliers of the Binance tradfi-perps (HYUNDAI /
+# SAMSUNG / SKHYNIX) — added 2026-06-24 to close the equity-perp basis universe
+# (previously BLOCKED-DATA "no US-listed twin"; now sourced DIRECTLY via KRX/Yahoo,
+# not a US ADR twin). Daily history confirmed back to 2019 on all three
+# (probed 2026-06-24: 005930.KS ~1744 daily bars 2019-05→today; 1h/15m/1m intraday
+# also serve within the Yahoo lookback ladder). instrument_type=EQUITY.
+KRX_EQUITIES: list[KrxEquityDef] = [
+    KrxEquityDef("005380", "Hyundai Motor", "005380.KS", date(2019, 1, 2)),
+    KrxEquityDef("005930", "Samsung Electronics", "005930.KS", date(2019, 1, 2)),
+    KrxEquityDef("000660", "SK Hynix", "000660.KS", date(2019, 1, 2)),
+]
+
+# Canonical KRX symbols (the bare numeric codes) — the basis-universe membership
+# keys + the data-status / MVP carve-out lookup. Yahoo tickers append ``.KS``.
+KRX_EQUITY_SYMBOLS: frozenset[str] = frozenset(eq.symbol for eq in KRX_EQUITIES)
+
+
+@dataclass(frozen=True, slots=True)
 class YahooIndexDef:
     """A static index definition fetched via Yahoo Finance (daily close).
 

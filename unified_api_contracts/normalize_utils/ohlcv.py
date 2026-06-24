@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from ..external.aster.normalize import normalize_aster_kline
-from ..external.barchart.normalize import normalize_barchart_ohlcv
 from ..external.binance.normalize import normalize_binance_kline
 from ..external.bybit.normalize import normalize_bybit_kline
 from ..external.ccxt.normalize import normalize_ccxt_ohlcv
@@ -19,7 +18,6 @@ from ..external.yahoo_finance.normalize import (
 
 __all__ = [
     "normalize_aster_kline",
-    "normalize_barchart_ohlcv",
     "normalize_binance_kline",
     "normalize_bybit_kline",
     "normalize_ccxt_ohlcv",

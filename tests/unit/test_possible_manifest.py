@@ -41,7 +41,7 @@ _EXPECTED_BATCH_SOURCES = {
         "helius_rpc",
         "solana_rpc",
     },
-    "tradfi": {"databento", "massive", "barchart", "yahoo", "eia"},
+    "tradfi": {"databento", "massive", "yahoo", "eia"},  # barchart retired 2026-06-24
     "prediction": {"polymarket_clob", "polymarket_gamma_api", "kalshi"},
 }
 

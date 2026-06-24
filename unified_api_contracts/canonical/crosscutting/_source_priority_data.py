@@ -282,11 +282,21 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # FALLBACK [1] + the slot for any future cell databento genuinely lacks (e.g. a
     # non-US venue): add such a cell as a ``_VENUE_SOURCE_EXCLUSIONS`` entry excluding
     # databento for that venue — that is the obvious slot. For the Binance tradfi-perp
-    # BASIS tickers there is NO such gap (databento covers every non-KRX underlying;
-    # KRX-only HYUNDAI/SAMSUNG/SKHYNIX are BLOCKED-DATA, served by neither vendor).
+    # BASIS tickers databento covers every US-listed underlying; the KRX-only Korean
+    # underliers (HYUNDAI 005380 / SAMSUNG 005930 / SKHYNIX 000660, venue=KRX) are now
+    # UNBLOCKED (2026-06-24) and served by ``yahoo`` (the ``.KS`` tickers) — see the
+    # KRX ohlcv entries below + ``_VENUE_SOURCE_EXCLUSIONS`` (KRX excludes databento).
     # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
-    ("tradfi", "ohlcv_1m"): ["databento", "massive"],
-    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
+    ("tradfi", "ohlcv_1m"): ["databento", "massive", "yahoo"],
+    # ohlcv_15m: barchart RETIRED 2026-06-24 (VIX 15m now aggregates from VX futures
+    # via databento XCBF.PITCH). yahoo still serves KRX + the rolling VIX window.
+    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo"],
+    # ohlcv_24h — Yahoo-only daily bars (FX KRW/USD, KRX single stocks, the DXY +
+    # treasury-yield indices). Added 2026-06-24 so the daily provenance resolves
+    # via the registry (default_source auto-stamps source=yahoo) instead of an
+    # ad-hoc fetcher stamp — the venue/source parity gate requires every captured
+    # (asset_group, data_type) cell to have a registered source list.
+    ("tradfi", "ohlcv_24h"): ["yahoo"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
     # data_type=trades → Era-B source resolves via ``(tradfi, "trades")`` above
     # (massive, databento). Legacy-data_type keys retained for the pre-migration
@@ -408,7 +418,7 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     "databento": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "massive": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     "yahoo": frozenset({Mode.BATCH}),
-    "barchart": frozenset({Mode.BATCH}),
+    # "barchart" RETIRED 2026-06-24 (VIX 15m → VX futures via databento XCBF.PITCH).
     "eia": frozenset({Mode.BATCH, Mode.REPLAY}),  # weekly series re-fetchable by date
     # ---- DeFi ----
     # hyperliquid (unified vendor) lives in the CeFi-venue block below — it is the
@@ -592,8 +602,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     "mdps_odds_horizon_bucket": 3_600_000,  # 1h: conservative batch-write cadence (VM-driven)
     # Sports batch-data provider (deferred multi-source merge candidate).
     "footystats": 3_600_000,  # 1h: Footystats batch publication cadence
-    # Historical preload archive — daily publication delay.
-    "barchart": 86_400_000,  # 24h: Barchart VIX 15m historical preload (2020-2025)
+    # "barchart" emission-latency entry retired 2026-06-24 (Barchart removed).
 }
 """Per-source emission latency (ms) — live-pipeline tick-to-pipeline arrival.
 

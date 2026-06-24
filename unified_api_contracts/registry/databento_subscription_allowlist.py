@@ -73,13 +73,29 @@ DATABENTO_SCHEMA_LEVEL: dict[str, str] = {
 }
 
 # ── Included-history window per level (trailing days from today) ─────────────
-# Conservative approximations of Databento's rolling allowance — the real
-# boundary may be calendar-based. If you ever see metered charges, REDUCE these.
+# MEASURED LIVE 2026-06-24 (operator Method B — real timeseries.get_range probes
+# with continuous front-month symbology ``ES.c.0`` on GLBX.MDP3, our paid dataset).
+# FINDING: our FIXED MONTHLY subscription grants FULL HISTORICAL access to every
+# schema level of the subscribed datasets — there is NO PAYG rolling-history edge:
+#   * L1 (trades/tbbo): served OK at 1460d (4y) back — NOT a 1-year window.
+#   * L2 (mbp-10):      served OK at 730d (2y) back — NOT a 1-month window.
+#   * L3 (mbo):         served OK at 730d (2y) back — NOT a 1-month window.
+#   * L0 (ohlcv-1m/1s): bounded only by the DATASET available-start (~2010-06-06
+#                       for GLBX.MDP3 ⇒ ~16y; mbo's own data starts 2017-05-21).
+# The metadata.get_cost probe (Method A) returns $0.0000 regardless of date on our
+# fixed subscription → it does NOT model a rolling free allowance, confirming there
+# isn't one for us. The prior conservative values (L1 365 / L2,L3 30) were
+# PAYG-fail-closed GUESSES that WRONGLY clip valid history we are entitled to.
+# Correction: all levels = full history (16y), the true floor being the dataset
+# available-start (the API already 422s on ``data_start_before_available_start``).
+# If a future plan switches to PAYG metering, REDUCE these back to the free-tier
+# windows. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+_FULL_HISTORY_DAYS: int = 16 * 365  # ~16y — bounded downstream by the dataset start
 LEVEL_MAX_LOOKBACK_DAYS: dict[str, int] = {
-    "L0": 16 * 365,  # ~16 years
-    "L1": 365,  # 1 year
-    "L2": 30,  # 1 month
-    "L3": 30,  # 1 month
+    "L0": _FULL_HISTORY_DAYS,  # ohlcv/defs/stats/status — to dataset start (~16y)
+    "L1": _FULL_HISTORY_DAYS,  # trades/tbbo/mbp-1/bbo — MEASURED full history (≥4y, to dataset start)
+    "L2": _FULL_HISTORY_DAYS,  # mbp-10 — MEASURED full history (≥2y, to dataset start)
+    "L3": _FULL_HISTORY_DAYS,  # mbo — MEASURED full history (≥2y; mbo data starts 2017-05-21)
 }
 
 # ── Schemas we are allowed to FETCH ──────────────────────────────────────────

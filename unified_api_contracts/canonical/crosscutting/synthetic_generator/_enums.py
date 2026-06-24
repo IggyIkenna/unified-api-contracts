@@ -29,7 +29,7 @@ class SyntheticDataDomain(StrEnum):
     DEFI_ORACLE = "DEFI_ORACLE"
     """Oracle-feed rows (Pyth Hermes batches, Chainlink aggregator rounds)."""
     TRADFI_OHLCV = "TRADFI_OHLCV"
-    """TradFi bar rows (Databento / Barchart equities + futures + index)."""
+    """TradFi bar rows (Databento equities + futures + index)."""
 
 
 class SyntheticGeneratorId(StrEnum):
