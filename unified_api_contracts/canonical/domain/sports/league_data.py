@@ -71,7 +71,7 @@ _API_FOOTBALL_ID_TO_LEAGUE: dict[int, str] = {
 SOURCE_COVERAGE_START: dict[str, date] = {
     "api_football": date(2015, 1, 1),
     "footystats": date(2019, 1, 1),
-    "understat": date(2015, 1, 16),
+    "understat": date(2014, 1, 1),
     "transfermarkt": date(2019, 1, 1),
     "soccer_football_info": date(2019, 1, 1),
     "open_meteo": date(2019, 3, 2),

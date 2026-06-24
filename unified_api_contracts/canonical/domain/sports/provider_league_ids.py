@@ -788,11 +788,16 @@ SPORTS_ENTITY_LEAGUE_COVERAGE: dict[str, frozenset[str] | None] = {
     "PREDICTIONS": None,  # FootyStats: all leagues
     # TRANSFERMARKT_LEAGUES + SFI_LEAGUES retired 2026-05-05 — provider catalog
     # mappings live in UAC (TRANSFERMARKT_IDS / SOCCER_FOOTBALL_INFO_IDS).
-    # PLAYER_VALUES + WEATHER: observed coverage from manifest (≥1 captured row).
+    # PLAYER_VALUES: observed coverage from manifest (≥1 captured row).
     # Empty frozenset until refresh_sports_league_entity_coverage is run against prod.
     "PLAYER_VALUES": frozenset(_ENTITY_COVERAGE.get("PLAYER_VALUES") or []),
     "SFI_PROGRESSIVE_STATS": None,  # SFI: all mapped leagues
-    "WEATHER": frozenset(_ENTITY_COVERAGE.get("WEATHER") or []),
+    # WEATHER: open-meteo fetches by GPS coordinates — no league restriction.
+    # The 33-league frozenset from sports_league_entity_coverage.json used string
+    # names (EPL, LA_LIGA) while _fixture_leagues_for_date returns numeric IDs
+    # (39, 140) — the intersection was always empty → weather silently skipped
+    # on every fixture date since 2026-04-29. None = expected on all fixture dates.
+    "WEATHER": None,
 }
 
 
