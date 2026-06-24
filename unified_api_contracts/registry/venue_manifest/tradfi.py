@@ -82,13 +82,6 @@ TRADFI_VENUES: dict[str, VenueContract] = {
             "error_example.json": "YahooError",
         },
     },
-    "barchart": {
-        "has_rest": False,
-        "has_websocket": False,
-        "has_fix": False,
-        "config_secret_field": "",
-        "response_schema_classes": ["BarchartOhlcv15m"],
-        "error_schema_classes": [],
-        "example_schema_map": {"ohlcv_15m_example.json": "BarchartOhlcv15m"},
-    },
+    # "barchart" venue manifest RETIRED 2026-06-24 — Barchart removed (VIX 15m now
+    # aggregates from VX futures via Databento XCBF.PITCH). No shim.
 }

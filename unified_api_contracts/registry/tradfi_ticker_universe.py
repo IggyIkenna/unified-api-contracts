@@ -474,8 +474,11 @@ TRADFI_TICKER_UNIVERSE: dict[str, list[str]] = {
 # are the BASIS-REFERENCE leg of the equity-basis arb archetype and MUST be
 # MVP-scoped (the cash leg the perp is measured against). Index-perps map to
 # their ETF proxy (SPX/SPY→SPY, SOXL→SMH, …). Commodities are roots in
-# TRADFI_FUTURES_PRODUCTS (PA/PL/GC/SI/HG/NG/CL), gated by the futures rule;
-# KRX-only names (HYUNDAI/SAMSUNG/SKHYNIX) are BLOCKED-DATA (no US-listed twin).
+# TRADFI_FUTURES_PRODUCTS (PA/PL/GC/SI/HG/NG/CL), gated by the futures rule.
+# KRX-only names (HYUNDAI 005380 / SAMSUNG 005930 / SKHYNIX 000660) are now
+# UNBLOCKED (2026-06-24): sourced DIRECTLY via venue=KRX / source=yahoo (the
+# ``.KS`` tickers in KRX_EQUITIES) — NOT a US-listed ADR twin. They join the
+# basis universe by their canonical bare symbol (the KRX numeric code).
 # Consumed by the tradfi MVP rule's equity carve-out (mvp_scope.is_mvp).
 # Operator 2026-06-24: every Binance tradfi-perp underlying is captured — NOT LESS.
 TRADFI_EQUITY_PERP_BASIS_UNIVERSE: frozenset[str] = frozenset(
@@ -587,5 +590,11 @@ TRADFI_EQUITY_PERP_BASIS_UNIVERSE: frozenset[str] = frozenset(
         "UNG",
         "IBIT",
         "ETHA",
+        # KRX (Korea Exchange) single stocks — venue=KRX, source=yahoo (2026-06-24).
+        # The Korean underliers of the Binance tradfi-perps, sourced via Yahoo
+        # ``.KS`` tickers (see KRX_EQUITIES). Bare KRX numeric codes; → 103/103.
+        "005380",  # Hyundai Motor (005380.KS)
+        "005930",  # Samsung Electronics (005930.KS)
+        "000660",  # SK Hynix (000660.KS)
     }
 )

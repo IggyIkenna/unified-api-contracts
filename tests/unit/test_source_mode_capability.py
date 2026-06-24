@@ -49,7 +49,7 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     "databento": _BLR,
     "massive": _BLR,
     "yahoo": _B,
-    "barchart": _B,
+    # "barchart" retired 2026-06-24 (VIX 15m → VX futures via databento)
     "eia": _BR,
     # DeFi
     # hyperliquid (unified vendor) is in the CeFi-venue block below with _BLR — it is

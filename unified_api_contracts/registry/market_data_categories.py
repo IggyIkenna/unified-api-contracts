@@ -282,11 +282,15 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         "NYSE",
         "CME",
         "ICE",  # Yahoo-sourced ICE/NYBOT DXY index only (no ICE Databento datasets)
-        "CBOE",  # Cboe Futures Exchange (CFE) — VX / VIX futures
+        "CBOE",  # Cboe Futures Exchange (CFE) — VX / VIX futures (Databento XCBF.PITCH)
+        "KRX",  # Korea Exchange — single stocks via Yahoo Finance (.KS tickers), source=yahoo
         # External data providers
         "FX",  # FX rates (KRW/USD via Yahoo Finance data provider)
-        "BARCHART",  # VIX 15m historical: 2020-01-02→2025-11-12 (CSV download, discontinued; pre-loaded to GCS)
-        "YAHOO_FINANCE",  # VIX 15m ongoing: rolling 60-day window; KRW/USD daily rates
+        # NOTE: BARCHART removed 2026-06-24 (VIX 15m now aggregates from VX futures
+        # via Databento XCBF.PITCH — Barchart CSV preload retired). YAHOO_FINANCE
+        # below is a legacy source-as-venue artifact (pre-existing; flagged by the
+        # venue/source parity gate — not a real venue, kept to avoid manifest churn).
+        "YAHOO_FINANCE",  # legacy source-as-venue (rolling VIX 15m / KRW-USD daily)
     ],
     "defi": list(_ALL_DEFI_VENUES),
     "sports": [

@@ -214,7 +214,7 @@ _KNOWN_BATCH_SOURCES_BY_AG: dict[str, frozenset[str]] = {
     DEFI: frozenset(
         {"onchain_rpc", "onchain_subgraph", "hyperliquid", "chainlink", "pyth_hermes", "helius_rpc", "solana_rpc"}
     ),
-    TRADFI: frozenset({"databento", "massive", "barchart", "yahoo", "eia"}),
+    TRADFI: frozenset({"databento", "massive", "yahoo", "eia"}),  # barchart retired 2026-06-24
     PREDICTION: frozenset({"polymarket_clob", "polymarket_gamma_api"}),
     # sports has its own UAC ``candidate_parquet_paths`` SSOT — no pipeline_mode prefixes here.
     SPORTS: frozenset(),

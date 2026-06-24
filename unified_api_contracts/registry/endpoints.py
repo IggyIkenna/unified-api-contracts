@@ -187,8 +187,7 @@ ENDPOINT_SCHEMA_MAP: dict[tuple[str, str], str] = {
     ("ibkr", "option_greeks"): "IBKROptionGreeks",
     ("ibkr", "historical_volatility"): "IBKRHistoricalVolatility",
     ("ibkr", "real_time_bar"): "IBKRRealTimeBar",
-    # Barchart (CSV only; no API; schema for parsed rows)
-    ("barchart", "ohlcv_15m"): "BarchartOhlcv15m",
+    # Barchart RETIRED 2026-06-24 (VIX 15m → VX futures via Databento XCBF.PITCH).
     # Tardis
     ("tardis", "exchanges"): "TardisExchange",
     ("tardis", "instruments"): "TardisInstrument",
@@ -387,7 +386,6 @@ def get_schema_class_for_endpoint(venue: str, endpoint: str) -> type[BaseModel] 
         "deribit": "deribit",
         "databento": "databento",
         "ibkr": "ibkr",
-        "barchart": "barchart",
         "tardis": "tardis",
         "yahoo_finance": "yahoo_finance",
         "hyperliquid": "hyperliquid",

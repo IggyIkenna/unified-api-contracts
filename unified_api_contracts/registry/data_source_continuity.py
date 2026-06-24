@@ -2,40 +2,25 @@
 
 Documents which data source covers which date range for each instrument/data-type pair.
 Consumed by backfill scripts, feature services, and data pipeline services to know
-which source to query for a given date.
+which source to query for a given date. Also the SSOT for the GENERAL Yahoo Finance
+granularity/lookback guardrail (every Yahoo fetch is bounded — see
+``assert_yahoo_intraday_within_limit`` / ``assert_yahoo_request_width_ok``).
 
 ── Why this file exists ──────────────────────────────────────────────────────
-Several instruments have had their upstream data source change over time:
-- Barchart provided VIX 15m CSV downloads; they are discontinuing this service.
-- Yahoo Finance covers the last 60 days of 15m data via their history API.
-- The transition creates a documented gap that no current source can fill.
-
+Several instruments have had their upstream data source change over time, and
+Yahoo's chart API bounds how far back / how wide each interval can be fetched.
 Backfill scripts and downstream consumers MUST check this registry before
 deciding which source to use for a given (instrument, data_type, date) tuple.
 
-── Barchart note ─────────────────────────────────────────────────────────────
-Barchart is a manual CSV download service, NOT a live API integration.
-Files were downloaded and uploaded to GCS manually. Barchart is discontinuing
-this offering — no new Barchart data will be available after BARCHART_VIX_LAST_DATE.
-Do NOT build automated Barchart fetching; use Yahoo Finance or Databento instead.
-
-!! KNOWN DATA GAP — VIX 15m — MANDATORY CONSUMER CONTRACT !!
-─────────────────────────────────────────────────────────────
-Dates from 2025-11-13 until approximately (today - 60 days) have NO 15-minute
-VIX source anywhere. Neither Barchart nor Yahoo Finance covers this window:
-  - Barchart ended:       2025-11-12 (service discontinued)
-  - Yahoo Finance starts: today - 59 days (hard server-side rolling window)
-  - FRED VIXCLS:          daily only — no intraday
-
-get_vix_15m_source(date) returns "GAP_NO_SOURCE" for these dates.
-
-ALL consumers MUST handle "GAP_NO_SOURCE" by returning:
-  - empty DataFrame (pd.DataFrame())
-  - NaN / None values
-  - zero-length list
-
-NEVER raise an exception for GAP_NO_SOURCE dates. This is expected, permanent,
-and unrecoverable — the data simply does not exist at 15m granularity.
+── VIX 15m (BARCHART RETIRED 2026-06-24) ─────────────────────────────────────
+VIX 15m is now AGGREGATED from the VX FUTURES front contract captured via
+Databento XCBF.PITCH (CFE). The CBOE cash-index was deleted (2026-06-23) and the
+manual-CSV Barchart preload is removed (no shim) — VX futures track the index
+with a small steady contango basis (corr 0.95-0.98). Yahoo's ^VIX rolling 60-day
+window is a recent cross-check only. There is NO honest gap any more (VX futures
+cover the full history), so ``is_vix_15m_gap_date`` always returns ``False`` and
+``get_vix_15m_source`` returns "DATABENTO_VX_FUTURES" (historical) / "YAHOO_FINANCE"
+(rolling). Do NOT build automated Barchart fetching — it is gone.
 """
 
 from __future__ import annotations
@@ -55,145 +40,204 @@ class SourceWindow(NamedTuple):
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# VIX 15-minute OHLCV (CBOE:INDEX:VIX-USD, data_type=ohlcv_15m)
+# VIX 15-minute OHLCV (data_type=ohlcv_15m)
 # ──────────────────────────────────────────────────────────────────────────────
-
-# Barchart CSV download — 12 files downloaded 2025-11-12, uploaded to dev GCS via
-# market-tick-data-service/scripts/upload_vix_barchart_local.py.
-# Local files: /vix/vix_intraday-15min_historical-data-*.csv (~77k bars)
-BARCHART_VIX_FIRST_DATE: date = date(2020, 1, 2)
-BARCHART_VIX_LAST_DATE: date = date(2025, 11, 12)
-BARCHART_VIX_FILE_COUNT: int = 12  # source CSV files (each covers ~6 months)
+#
+# BARCHART RETIRED 2026-06-24. The CBOE cash-index (CBOE:INDEX:VIX-USD) was DELETED
+# (operator 2026-06-23) and VIX 15m is now AGGREGATED from the VX FUTURES front
+# contract captured via Databento XCBF.PITCH (CFE) — the futures track the index
+# with a small steady contango basis (sanity-checked: corr 0.95-0.98). Yahoo's
+# ^VIX rolling window remains a recent-window cross-check source only. The Barchart
+# CSV preload (BARCHART_VIX_FIRST/LAST_DATE/FILE_COUNT) is gone (no shim).
 
 # Yahoo Finance ^VIX — 15m interval, rolling 60-day window only.
 # No fixed start date; always (today - 59 days) at earliest.
 YAHOO_VIX_15M_WINDOW_DAYS: int = 60
 
-# ── Yahoo Finance intraday granularity / lookback GUARDRAIL (SSOT) ──────────
-# Yahoo's chart API bounds how far back each intraday interval can reach. PROBED
-# LIVE 2026-06-24 (ticker 005930.KS) — the OPERATOR LADDER, confirmed-achievable:
-#   * 1d  : full history (probed 2000-01-31 → today; backfill floor 2019-01-01)
-#   * 1h  : 730d (range=730d OK)
-#   * 15m : 89 CALENDAR days — ACHIEVABLE ONLY via ``range=60d`` (Yahoo returns a
-#           ~89-day span for that param; ``range=89d``/period-window >60d → HTTP
-#           422). So the fetch path MUST use the ``range=60d`` form for 15m, and
-#           the guardrail allows back to 89 calendar days.
-#   * 1m  : 28d — ~7d per period request, chunked back to ~28d (back 21-28d OK;
-#           28-35d → HTTP 422). Chunk in <=7d windows.
-# A request OLDER than the limit for its interval MUST be clamped/rejected
+# ── Yahoo Finance granularity / lookback GUARDRAIL (SSOT, GENERAL) ──────────
+# Yahoo's chart API bounds how far back EACH interval can reach AND how wide a
+# single request may be. PROBED LIVE 2026-06-24 (tickers 005930.KS / 005380.KS /
+# 000660.KS) — the MEASURED ladder (the HARD Yahoo error boundaries, not a target
+# where Yahoo caps lower):
+#   * 1d  : UNBOUNDED lookback (probed 2019-05 → today OK on KRX). Backfill FLOOR
+#           is the operator target 2019-01-01 (:data:`YAHOO_DAILY_BACKFILL_FLOOR`)
+#           — a 1d request before it is clamped (Yahoo would serve it; this is our
+#           chosen TradFi history floor, enforced by the GENERAL guardrail).
+#   * 1h  : 730 days. Probed: 365d OK; EXACTLY 730d back already FAILS ("must be
+#           within the last 730 days") → serveable window is strictly < 730d.
+#   * 15m : 60 days (NOT the 89 a prior note assumed). Probed on all 3 KRX tickers:
+#           59d back OK; 60d+ → HTTP 422 "must be within the last 60 days".
+#   * 1m  : 8 days PER REQUEST (Yahoo: "Only 8 days worth of 1m granularity data
+#           are allowed to be fetched per request"). 7d OK; 28d EMPTY. Total 1m
+#           history is ~30d but MUST be chunked in <=8d windows
+#           (:data:`YAHOO_INTRADAY_MAX_REQUEST_DAYS`).
+# A request OLDER/WIDER than the limit for its interval MUST be clamped/rejected
 # (raise), never silently return empty — the durable guardrail consumed by
-# ``YahooFinanceAdapter.download_intraday`` + the centralised venue/source/adapter
-# parity gate. Value = max lookback (calendar days) from "today"; None = unbounded.
+# ``YahooFinanceAdapter.download_daily``/``download_intraday`` (the non-bypassable
+# fetch path) + the centralised venue/source/adapter parity gate.
+# Value = max lookback (calendar days) from "today"; None = unbounded lookback.
 YAHOO_INTRADAY_LOOKBACK_DAYS: dict[str, int | None] = {
-    "1m": 28,  # ~7d/request, chunked back to ~28d (probed; beyond → HTTP 422)
+    "1m": 30,  # ~30d total history; per-request cap 8d (chunked) — see MAX_REQUEST_DAYS
     "2m": 60,
     "5m": 60,
-    "15m": 89,  # via range=60d (returns ~89 calendar-day span); period>60d → 422
+    "15m": 60,  # MEASURED 2026-06-24: 59d OK, 60d+ → 422 "within the last 60 days"
     "30m": 60,
     "60m": 60,
     "90m": 60,
-    "1h": 730,
-    "1d": None,  # full history (probed: 2000-01-31 → today)
+    "1h": 730,  # MEASURED: <730d OK, exactly-730d FAILS → serveable strictly < 730d
+    "1d": None,  # unbounded lookback (Yahoo); backfill floor = YAHOO_DAILY_BACKFILL_FLOOR
     "5d": None,
     "1wk": None,
     "1mo": None,
     "3mo": None,
 }
 
+# Operator backfill floor for unbounded (daily) Yahoo intervals — our chosen
+# TradFi daily history floor (2019-01-01). A 1d request before this is clamped by
+# the GENERAL guardrail (Yahoo would serve it, but we cap our history here).
+YAHOO_DAILY_BACKFILL_FLOOR: date = date(2019, 1, 1)
+
+# Per-REQUEST width cap (calendar days) for intraday intervals where Yahoo bounds
+# a SINGLE request more tightly than the total lookback. MEASURED 2026-06-24: 1m
+# is "8 days per request"; the fetch path MUST chunk 1m windows to <= this width.
+# For intervals whose per-request cap equals the lookback (15m=60, 1h is wide),
+# the value mirrors the lookback (a single request may span the whole window).
+YAHOO_INTRADAY_MAX_REQUEST_DAYS: dict[str, int] = {
+    "1m": 8,  # Yahoo: "Only 8 days worth of 1m granularity data ... per request"
+    "2m": 60,
+    "5m": 60,
+    "15m": 60,
+    "30m": 60,
+    "60m": 60,
+    "90m": 60,
+}
+
 
 class YahooLookbackExceededError(ValueError):
-    """Raised when a Yahoo intraday request reaches FURTHER BACK than the
-    interval's lookback limit (:data:`YAHOO_INTRADAY_LOOKBACK_DAYS`).
+    """Raised when a Yahoo request reaches FURTHER BACK than the interval's
+    lookback limit (:data:`YAHOO_INTRADAY_LOOKBACK_DAYS` /
+    :data:`YAHOO_DAILY_BACKFILL_FLOOR`).
 
     Yahoo silently returns an empty/partial response (or HTTP 422) for an
     over-the-limit window, which a naive caller mis-reads as "no data". The
     guardrail fails LOUD instead so the caller clamps the window or routes to a
-    deeper source (FRED/Barchart/databento). The fetch path MUST consult
+    deeper source (FRED/databento). The fetch path MUST consult
     :func:`assert_yahoo_intraday_within_limit` before hitting the API.
     """
 
 
+class YahooRequestTooWideError(ValueError):
+    """Raised when a SINGLE Yahoo intraday request spans more calendar days than
+    the interval's per-request width cap (:data:`YAHOO_INTRADAY_MAX_REQUEST_DAYS`).
+
+    Yahoo bounds 1m to "8 days per request" — a wider single request 422s. The
+    fetch path MUST chunk the window before hitting the API; this guardrail
+    fails loud if it didn't.
+    """
+
+
 def assert_yahoo_intraday_within_limit(interval: str, start_date: date, *, today: date | None = None) -> None:
-    """Fail-closed guardrail: raise :class:`YahooLookbackExceededError` if a
-    Yahoo intraday request for ``interval`` would reach back before the
-    interval's max lookback window.
+    """Fail-closed GENERAL guardrail: raise if a Yahoo request for ``interval``
+    would reach back before the interval's max lookback window.
+
+    Handles BOTH intraday intervals (bounded lookback) AND the daily/unbounded
+    intervals (clamped to :data:`YAHOO_DAILY_BACKFILL_FLOOR`) — so EVERY Yahoo
+    fetch is bounded, not just intraday.
 
     Args:
-        interval: Yahoo bar interval (``"1m"`` / ``"15m"`` / ``"1h"`` / …).
+        interval: Yahoo bar interval (``"1m"`` / ``"15m"`` / ``"1h"`` / ``"1d"`` / …).
         start_date: The earliest date the request asks for (UTC date).
         today: Reference "now" date (defaults to ``datetime.now(UTC).date()``).
 
     Raises:
-        YahooLookbackExceededError: ``start_date`` is older than
-            ``today - YAHOO_INTRADAY_LOOKBACK_DAYS[interval]`` for a bounded
-            interval. Unbounded intervals (daily+) never raise.
+        YahooLookbackExceededError: ``start_date`` is older than the interval's
+            serveable floor (``today - YAHOO_INTRADAY_LOOKBACK_DAYS[interval]``
+            for a bounded interval, or ``YAHOO_DAILY_BACKFILL_FLOOR`` for an
+            unbounded daily+ interval).
         KeyError: ``interval`` is not a known Yahoo interval.
     """
     limit_days = YAHOO_INTRADAY_LOOKBACK_DAYS[interval]
-    if limit_days is None:
-        return
     ref = today if today is not None else datetime.now(UTC).date()
+    if limit_days is None:
+        # Unbounded lookback (1d/5d/1wk/1mo/3mo): clamp to the operator floor so
+        # even daily fetches are bounded (the GENERAL guardrail).
+        if start_date < YAHOO_DAILY_BACKFILL_FLOOR:
+            raise YahooLookbackExceededError(
+                f"Yahoo {interval!r} cannot reach {start_date} — the TradFi daily "
+                f"backfill floor is {YAHOO_DAILY_BACKFILL_FLOOR}. Clamp the window "
+                f"to >= {YAHOO_DAILY_BACKFILL_FLOOR}."
+            )
+        return
     floor = ref - timedelta(days=limit_days)
     if start_date < floor:
         raise YahooLookbackExceededError(
             f"Yahoo intraday {interval!r} cannot reach {start_date} — the lookback "
             f"limit is {limit_days} days (earliest serveable: {floor}). Clamp the "
-            f"window to >= {floor} or use a deeper source (FRED/Barchart/databento)."
+            f"window to >= {floor} or use a deeper source (FRED/databento)."
         )
 
 
-# !! KNOWN GAP: 2025-11-13 → ~(today - 60d) — NO 15m VIX source exists !!
-# This is the first date of the permanent gap. Last gap date is dynamic:
-#   (today - YAHOO_VIX_15M_WINDOW_DAYS) - 1 day
-# Use get_vix_15m_source(date) → "GAP_NO_SOURCE" to detect. Consumers MUST
-# return empty DataFrame / NaN for gap dates. Do NOT raise.
-VIX_15M_GAP_FIRST_DATE: date = date(2025, 11, 13)
+def assert_yahoo_request_width_ok(interval: str, start_date: date, end_date: date) -> None:
+    """Fail-closed guardrail: raise :class:`YahooRequestTooWideError` if a SINGLE
+    Yahoo intraday request spans more calendar days than the interval's
+    per-request width cap (:data:`YAHOO_INTRADAY_MAX_REQUEST_DAYS`).
+
+    Intervals with no per-request width cap (daily+) never raise. The fetch path
+    MUST chunk a wide intraday window (e.g. 1m → <=8d slices) before calling this.
+
+    Args:
+        interval: Yahoo bar interval.
+        start_date: Request window start (UTC date).
+        end_date: Request window end (UTC date, exclusive or inclusive — span is
+            ``(end_date - start_date).days``).
+
+    Raises:
+        YahooRequestTooWideError: the request span exceeds the per-request cap.
+    """
+    cap = YAHOO_INTRADAY_MAX_REQUEST_DAYS.get(interval)
+    if cap is None:
+        return
+    span_days = (end_date - start_date).days
+    if span_days > cap:
+        raise YahooRequestTooWideError(
+            f"Yahoo {interval!r} single request spans {span_days}d "
+            f"({start_date}→{end_date}) — the per-request cap is {cap}d. "
+            f"Chunk the window into <= {cap}d slices before fetching."
+        )
+
+
+# VIX 15m source history. BARCHART RETIRED 2026-06-24 — the historical 15m series
+# is now AGGREGATED from the VX FUTURES front contract captured via Databento
+# XCBF.PITCH (CFE); Yahoo's ^VIX rolling 60-day window is a recent cross-check.
+# The former Barchart preload window + the 2025-11-13→today-60d "permanent gap"
+# (which only existed because Barchart ended + Yahoo's window is short) are GONE:
+# VX futures via databento cover the full history → no honest gap remains.
+DATABENTO_VX_FUTURES_FIRST_DATE: date = date(2020, 1, 2)  # our captured VX history floor
 
 VIX_15M_SOURCE_HISTORY: list[SourceWindow] = [
     SourceWindow(
-        source="BARCHART_CSV",
-        first_date=BARCHART_VIX_FIRST_DATE,
-        last_date=BARCHART_VIX_LAST_DATE,
+        source="DATABENTO_VX_FUTURES",
+        first_date=DATABENTO_VX_FUTURES_FIRST_DATE,
+        last_date=None,  # ongoing (live VX futures stream)
         note=(
-            "12 Barchart CSV files (6-month chunks) downloaded 2025-11-12. "
-            "Uploaded to dev GCS via scripts/upload_vix_barchart_local.py. "
-            "Barchart is a manual CSV download service (not a live API) — discontinued. "
-            "Time column is US/Eastern bar close time; converted to UTC nanoseconds. "
-            "Schema: NautilusTrader parquet (ts_event/ts_init as int64 UTC ns)."
-        ),
-    ),
-    SourceWindow(
-        # !! KNOWN PERMANENT GAP — NO 15m VIX DATA EXISTS FOR THESE DATES !!
-        # Gap duration: ~2 months as of 2026-03-20; shrinks by 1 day/day as
-        # Yahoo Finance's rolling window advances. Will eventually close to 0.
-        # FRED VIXCLS is daily-only — no 15m granularity available anywhere.
-        # Consumers MUST return empty DataFrame / NaN. Do NOT raise.
-        source="GAP_NO_SOURCE",
-        first_date=VIX_15M_GAP_FIRST_DATE,  # 2025-11-13
-        # last_date is dynamic: (today - YAHOO_VIX_15M_WINDOW_DAYS) - 1 day.
-        # Cannot be a compile-time constant; compute at runtime via is_vix_15m_gap_date().
-        last_date=None,
-        note=(
-            "PERMANENT GAP — NO 15m SOURCE EXISTS. "
-            "Barchart ended 2025-11-12 (service discontinued). "
-            "Yahoo Finance's 60-day rolling window starts ~today-59d. "
-            "Only daily VIXCLS (FRED) is available for this range — no intraday. "
-            "Consumers MUST return empty DataFrame / NaN, never raise."
+            "VIX 15m AGGREGATED from the VX futures front contract captured via "
+            "Databento XCBF.PITCH (CFE). The futures track the cash index with a "
+            "small steady contango basis (sanity-checked corr 0.95-0.98). This "
+            "supersedes the retired Barchart CSV preload + the CBOE cash-index "
+            "(deleted 2026-06-23). No honest gap remains — VX futures cover the "
+            "full history at 15m via downstream aggregation of ohlcv-1m."
         ),
     ),
     SourceWindow(
         source="YAHOO_FINANCE",
         # first_date is dynamic: today - 59 days. Cannot be a compile-time constant.
         # Use get_yahoo_vix_15m_start() at runtime.
-        first_date=date(2026, 1, 18),  # approximate as of 2026-03-18 (today - 59d)
+        first_date=date(2026, 1, 18),  # approximate (today - 59d)
         last_date=None,  # ongoing
         note=(
-            "Yahoo Finance ^VIX, 15m interval. Rolling 60-day window — data older "
-            "than 60 days becomes unavailable. Fetch via yfinance Ticker.history(). "
-            "Volume is always 0.0 (VIX is a calculated index, not traded). "
-            "Timestamps are tz-aware (US/Eastern bar close time); converted to UTC "
-            "nanoseconds to match Barchart ts_event/ts_init convention. "
-            "Run backfill_vix_15m_yahoo.py (no --force) to append to GCS."
+            "Yahoo Finance ^VIX, 15m interval — a RECENT cross-check only (rolling "
+            "60-day window). Volume is always 0.0 (VIX is a calculated index). The "
+            "primary 15m source is now DATABENTO_VX_FUTURES (above)."
         ),
     ),
 ]
@@ -202,49 +246,30 @@ VIX_15M_SOURCE_HISTORY: list[SourceWindow] = [
 def get_vix_15m_source(query_date: date) -> str:
     """Return the canonical data source name for VIX 15m on a given date.
 
-    Returns one of: "BARCHART_CSV", "YAHOO_FINANCE", "GAP_NO_SOURCE".
+    Returns one of: "DATABENTO_VX_FUTURES", "YAHOO_FINANCE".
 
-    !! MANDATORY CONSUMER CONTRACT for "GAP_NO_SOURCE" !!
-    ─────────────────────────────────────────────────────
-    When this function returns "GAP_NO_SOURCE", the queried date falls in the
-    known permanent gap (2025-11-13 → ~today-60d) where NO 15m VIX data exists
-    from ANY source.
-
-    Callers MUST:
-      - return an empty DataFrame (pd.DataFrame())
-      - return NaN / None for scalar lookups
-      - return [] for list-based APIs
-
-    Callers MUST NOT:
-      - raise an exception
-      - retry with a different source
-      - fall back to daily VIXCLS (different granularity)
-
-    This gap is permanent and unrecoverable for 15m granularity. The only
-    available data for this range is daily VIXCLS from FRED — a different
-    data product not covered by this function.
+    BARCHART RETIRED 2026-06-24: VIX 15m is aggregated from VX futures (Databento
+    XCBF.PITCH) for the full history; Yahoo's ^VIX rolling window is a recent
+    cross-check. The former "GAP_NO_SOURCE" range no longer exists (VX futures
+    cover it) — :func:`is_vix_15m_gap_date` always returns ``False`` now.
     """
     today = datetime.now(UTC).date()
     yahoo_start = today - timedelta(days=YAHOO_VIX_15M_WINDOW_DAYS - 1)
-
-    if query_date <= BARCHART_VIX_LAST_DATE:
-        return "BARCHART_CSV"
     if query_date >= yahoo_start:
         return "YAHOO_FINANCE"
-    return "GAP_NO_SOURCE"
+    return "DATABENTO_VX_FUTURES"
 
 
 def is_vix_15m_gap_date(query_date: date) -> bool:
-    """Return True if query_date falls in the known VIX 15m data gap.
+    """Return True if query_date falls in a VIX 15m data gap.
 
-    The gap runs from 2025-11-13 (first date after Barchart ended) until
-    approximately today - 60 days (where Yahoo Finance's rolling window begins).
-    No 15m VIX data exists for gap dates from any source.
-
-    Consumers that check this before querying can log a warning and return
-    empty / NaN without needing to attempt a fetch.
+    BARCHART RETIRED 2026-06-24: VX futures via Databento now cover the full
+    history, so there is NO permanent gap — this always returns ``False``. The
+    MTDS/MDPS callers that branch on it keep the same signature + semantics ("no
+    data for this date"); the answer is simply now always "not a gap".
     """
-    return get_vix_15m_source(query_date) == "GAP_NO_SOURCE"
+    _ = query_date  # no date is a gap any more (VX futures cover the full history)
+    return False
 
 
 def get_yahoo_vix_15m_start() -> date:

@@ -138,6 +138,18 @@ from .canonical.crosscutting.experiment_registry import (
     ExperimentRunSpec,
     ExperimentStatus,
 )
+from .canonical.crosscutting.features_mvp_universe import (
+    FEATURE_FAMILY_UNIVERSE_REGISTRY as FEATURE_FAMILY_UNIVERSE_REGISTRY,
+)
+from .canonical.crosscutting.features_mvp_universe import (
+    FeatureFamilyUniverseConfig as FeatureFamilyUniverseConfig,
+)
+from .canonical.crosscutting.features_mvp_universe import (
+    get_options_underlyings as get_options_underlyings,
+)
+from .canonical.crosscutting.features_mvp_universe import (
+    resolve_universe_for_family as resolve_universe_for_family,
+)
 from .canonical.crosscutting.kill_switch import (
     KillSwitchArmedEvent,
     KillSwitchArmRequest,
@@ -2388,6 +2400,10 @@ __all__ = [
     "UpstreamReq",
     "VenueTestnetEndpoints",
     # MVP scope config + predicate (Phase 1)
+    "FEATURE_FAMILY_UNIVERSE_REGISTRY",
+    "FeatureFamilyUniverseConfig",
+    "get_options_underlyings",
+    "resolve_universe_for_family",
     "MVP_SCOPE",
     "MVP_SCOPE_CONFIG_HASH",
     "MVP_SCOPE_CONFIG_VERSION",
@@ -2430,7 +2446,7 @@ __all__ = [
 
 # fmt: off
 _VENUES = [
-    "alchemy", "api_football", "aster", "barchart", "betfair", "binance",
+    "alchemy", "api_football", "aster", "betfair", "binance",
     "bybit", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
     "deribit", "eigenlayer", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
     "mev", "metabet", "morpho_blue_api", "nautilus", "odds_api", "odds_engine", "okx",

@@ -109,32 +109,8 @@ _FRED = SourceCapability(
     kind=None,
 )
 
-_BARCHART = SourceCapability(
-    source="barchart",
-    domains=["market", "reference"],
-    crosscutting=["errors", "rate_limits"],
-    supports_live=True,
-    supports_batch=True,
-    supports_historical=True,
-    supports_testnet=False,
-    supports_mainnet=True,
-    auth_scope=["api_key"],
-    auth_environments={"prod": "prod_key"},
-    operations={
-        "market": ["ohlcv", "quotes", "dividends", "earnings"],
-        "reference": ["symbols", "sectors", "indices"],
-    },
-    base_urls={"mainnet": "https://ondemand.websol.barchart.com"},
-    operation_details={
-        "ohlcv": OperationDetail(
-            environments={
-                "mainnet": OperationEnvDetail(signing_scheme="api_key_header", required_credential="api_key"),
-            }
-        ),
-    },
-    chain=None,
-    kind=None,
-)
+# _BARCHART capability RETIRED 2026-06-24 — Barchart removed (VIX 15m now aggregates
+# from VX futures via Databento XCBF.PITCH). No shim.
 
 _YAHOO_FINANCE = SourceCapability(
     source="yahoo_finance",
@@ -237,7 +213,6 @@ TRADFI_CAPABILITIES: list[SourceCapability] = [
     _IBKR,
     _DATABENTO,
     _FRED,
-    _BARCHART,
     _YAHOO_FINANCE,
     _ECB,
     _OPENBB,

@@ -31,7 +31,7 @@ class TestVenueFreshnessSLARegistry:
             "databento",
             "tardis",
             "yahoo_finance",
-            "barchart",
+            # "barchart" retired 2026-06-24 (VIX 15m → VX futures via databento)
             "fred",
             "ecb",
             "ofr",
@@ -68,8 +68,8 @@ class TestVenueFreshnessSLARegistry:
             assert venue in VENUE_FRESHNESS_SLAS, f"Missing onchain perps venue: {venue}"
 
     def test_total_venue_count(self) -> None:
-        """Registry should cover all 32 UMI VENUE_REGISTRY venues."""
-        assert len(VENUE_FRESHNESS_SLAS) == 31
+        """Registry should cover all UMI VENUE_REGISTRY venues (barchart retired 2026-06-24)."""
+        assert len(VENUE_FRESHNESS_SLAS) == 30
 
     def test_all_sla_values_positive(self) -> None:
         for venue, sla in VENUE_FRESHNESS_SLAS.items():
@@ -146,7 +146,7 @@ class TestGetSLAsByCategory:
 
     def test_tradfi_count(self) -> None:
         tradfi = get_slas_by_category(VenueCategory.TRADFI)
-        assert len(tradfi) == 9
+        assert len(tradfi) == 8  # barchart retired 2026-06-24 (was 9)
 
     def test_defi_count(self) -> None:
         defi = get_slas_by_category(VenueCategory.DEFI)

@@ -84,14 +84,8 @@ VENUE_DATA_AVAILABILITY: dict[str, ProviderDataAvailability] = {
         is_t_plus_one=True,
         notes="T+1 batch files available shortly after midnight UTC",
     ),
-    "BARCHART": ProviderDataAvailability(
-        venue_name="BARCHART",
-        asset_group="tradfi",
-        availability_lag_hours=0.0,
-        available_after_utc_hour=None,
-        is_t_plus_one=False,
-        notes="Pre-loaded historical CSV; no ongoing fetch",
-    ),
+    # "BARCHART" provider RETIRED 2026-06-24 — Barchart removed (VIX 15m now
+    # aggregates from VX futures via Databento XCBF.PITCH). No shim.
     "YAHOO_FINANCE": ProviderDataAvailability(
         venue_name="YAHOO_FINANCE",
         asset_group="tradfi",
