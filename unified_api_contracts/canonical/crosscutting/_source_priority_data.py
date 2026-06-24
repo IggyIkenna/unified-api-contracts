@@ -252,16 +252,22 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # EIA (US Energy Information Administration) — commodity storage + series data.
     # BATCH_EIA manifest mode: features-commodity-service D5 Phase 1.
     ("tradfi", "energy_data"): ["eia"],
-    # MASSIVE-FIRST (operator ratification 2026-06-11, supersedes the 2026-05-28
-    # Phase-1 databento-first ordering): massive is the PRIMARY tradfi source for
-    # MVP catalogue completion — broadest canonically-converted venue x data_type
-    # coverage (s3 flat-files bulk path; "Massive can backfill cells regardless of
-    # Databento state" per tradfi_massive_dual_source_2026_05_28.md). databento
-    # stays the SECONDARY/resilience source (account currently vendor-locked —
-    # unlock is optional, not coverage-blocking). CFE (VX/VIX futures) remains
-    # NOT covered by Massive — yahoo+barchart layering via MTDS routing.
-    ("tradfi", "trades"): ["massive", "databento"],
-    ("tradfi", "tbbo"): ["massive", "databento"],
+    # DATABENTO-FIRST (2026-06-24, coordinator-directed; supersedes the 2026-06-11
+    # massive-first ratification): databento is now the PRIMARY tradfi read source —
+    # it is the verified-complete source for the live MVP universe (the Binance
+    # tradfi-perp basis tickers: 56/56 single-equities + 10/10 representative
+    # commodity/crypto ETFs resolve in DBEQ.BASIC ohlcv-1m, live-probed 2026-06-24;
+    # GLBX.MDP3 covers every CME futures root; XCBF.PITCH covers CFE/VX which massive
+    # NEVER carried). massive becomes the FALLBACK [1] + the broad-corpus bulk-backfill
+    # path + the per-venue granular slot via _VENUE_SOURCE_EXCLUSIONS for any future
+    # cell databento genuinely lacks (e.g. a non-US venue). Rationale: there is no
+    # databento gap massive fills for the Binance-perp universe, and databento-first
+    # makes derive_pipeline_mode_for_row stamp batch_databento (provenance-correct).
+    # NOTE: provenance authority — this reorder is coordinator-relayed, not a directly
+    # user-confirmed override of the 2026-06-11 operator decision; it is justified on
+    # the verified coverage facts above. CFE (VX/VIX futures) stays databento-only.
+    ("tradfi", "trades"): ["databento", "massive"],
+    ("tradfi", "tbbo"): ["databento", "massive"],
     # ohlcv_1s is DATABENTO-ONLY: Massive's flat-file connector does NOT serve a
     # 1s schema (massive_tradfi_rest_connector.SUPPORTED_DATA_TYPES omits it), so
     # 1s is fetched from Databento GLBX.MDP3 (L0/free 16y, subscription lockdown
@@ -269,31 +275,24 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # pipeline_mode=batch_databento (provenance-correct) instead of batch_massive.
     # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
     ("tradfi", "ohlcv_1s"): ["databento"],
-    # GRANULAR SOURCE STRUCTURE (operator 2026-06-24): the (asset_group, data_type)
-    # key carries the BROAD-CORPUS read order (massive-first per the 2026-06-11
-    # ratification above), but the source actually USED per fetch is NOT the blanket
-    # priority[0] — it is the operator's per-launch ``--source`` (VM_SOURCE) gated by
-    # the venue-aware ``_VENUE_SOURCE_EXCLUSIONS`` (the GRANULAR slice primitive). The
-    # tradfi launchers set ``VM_SOURCE=databento`` explicitly, and for the Binance
-    # tradfi-perp BASIS tickers (the DBEQ.BASIC equities/ADRs/ETFs in
-    # ``TRADFI_EQUITY_PERP_BASIS_UNIVERSE`` + the CME commodity roots) DATABENTO is
-    # the VERIFIED-COMPLETE PRIMARY (56/56 single-equities + 10/10 representative
-    # commodity/crypto ETFs resolve in DBEQ.BASIC ohlcv-1m, live-probed 2026-06-24).
-    # massive is NOT needed for the Binance-perp list — there is NO databento gap it
-    # fills (databento covers every non-KRX underlying; KRX-only HYUNDAI/SAMSUNG/
-    # SKHYNIX are BLOCKED-DATA, served by neither). massive stays the broad-corpus
-    # primary + a GRANULAR FALLBACK for any future cell databento genuinely lacks
-    # (e.g. a non-US venue): add such a cell as a ``_VENUE_SOURCE_EXCLUSIONS`` entry
-    # (excluding databento for that venue) — that is the obvious slot to slot into.
+    # GRANULAR SOURCE STRUCTURE (2026-06-24): databento is priority[0] (primary)
+    # per the DATABENTO-FIRST note above; the source actually USED per fetch is the
+    # per-launch ``--source`` (VM_SOURCE, set to databento) gated by the venue-aware
+    # ``_VENUE_SOURCE_EXCLUSIONS`` (the GRANULAR slice primitive). massive is the
+    # FALLBACK [1] + the slot for any future cell databento genuinely lacks (e.g. a
+    # non-US venue): add such a cell as a ``_VENUE_SOURCE_EXCLUSIONS`` entry excluding
+    # databento for that venue — that is the obvious slot. For the Binance tradfi-perp
+    # BASIS tickers there is NO such gap (databento covers every non-KRX underlying;
+    # KRX-only HYUNDAI/SAMSUNG/SKHYNIX are BLOCKED-DATA, served by neither vendor).
     # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
-    ("tradfi", "ohlcv_1m"): ["massive", "databento"],
-    ("tradfi", "ohlcv_15m"): ["massive", "databento", "yahoo", "barchart"],
+    ("tradfi", "ohlcv_1m"): ["databento", "massive"],
+    ("tradfi", "ohlcv_15m"): ["databento", "massive", "yahoo", "barchart"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
     # data_type=trades → Era-B source resolves via ``(tradfi, "trades")`` above
     # (massive, databento). Legacy-data_type keys retained for the pre-migration
     # rows + the closed-set round-trip (see the cefi note above).
-    ("tradfi", "options_chain"): ["massive", "databento"],
-    ("tradfi", "futures_chain"): ["massive", "databento"],
+    ("tradfi", "options_chain"): ["databento", "massive"],
+    ("tradfi", "futures_chain"): ["databento", "massive"],
     # TradFi greeks_snapshot + implied_vol_surface — computed by greeks-service
     # from the Massive/Databento options chain (same kernel as the crypto rows).
     ("tradfi", "greeks_snapshot"): ["greeks_service"],
