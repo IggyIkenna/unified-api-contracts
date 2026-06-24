@@ -621,6 +621,21 @@ _KALSHI_SPORTS_PREFIX_TO_LEAGUE: Final[tuple[tuple[str, str], ...]] = (
 )
 
 
+def kalshi_sports_league_for_ticker(ticker: str) -> str | None:
+    """Public accessor — the canonical league for a Kalshi sports ticker, or None.
+
+    Longest-prefix match over the cross-venue league map (so ``KXLALIGA`` wins
+    over a hypothetical ``KXLA``). Used by the per-fixture parser
+    (``fixture_parsing``) which needs the league without re-importing the private
+    prefix table. Returns ``None`` for a non-sports / unmapped-league ticker.
+    """
+    upper = ticker.upper()
+    for prefix, lg in sorted(_KALSHI_SPORTS_PREFIX_TO_LEAGUE, key=lambda kv: len(kv[0]), reverse=True):
+        if upper.startswith(prefix):
+            return lg
+    return None
+
+
 def _kalshi_sports_group(upper_ticker: str) -> CanonicalQuestionGroup | None:
     """Map a Kalshi sports ticker to a shared ``SPORTS_{LEAGUE}_{BETTYPE}`` group.
 
