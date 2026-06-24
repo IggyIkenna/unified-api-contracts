@@ -129,15 +129,36 @@ DATABENTO_VALID_PARENT_SYMBOLS: dict[str, tuple[str, str]] = {
 }
 
 # --- Databento options symbol validation ---
+# CME options-on-futures parent roots. CRITICAL: the option root is NOT
+# ``<future-root>.OPT`` — it is the CME OPTION product code (gold options = OG,
+# NOT GC.OPT; crude options = LO, NOT CL.OPT). The prior GC.OPT/CL.OPT entries
+# were PHANTOMS (probed 2026-06-24: GLBX.MDP3 returns symbology_invalid_request
+# for GC.OPT/CL.OPT, but OG.OPT=39476 / LO.OPT=30711 definitions resolve).
+# Every root below probed live (definition + trades resolve). Index ES/NQ DO use
+# <root>.OPT (ES.OPT/NQ.OPT resolve). RTY/YM options have NO GLBX.MDP3 coverage.
 DATABENTO_VALID_OPTIONS_SYMBOLS: dict[str, tuple[str, str]] = {
     "ES": ("ES.OPT", "GLBX.MDP3"),
     "SP500": ("ES.OPT", "GLBX.MDP3"),
     "NQ": ("NQ.OPT", "GLBX.MDP3"),
     "NASDAQ100": ("NQ.OPT", "GLBX.MDP3"),
-    "CL": ("CL.OPT", "GLBX.MDP3"),
-    "CRUDE": ("CL.OPT", "GLBX.MDP3"),
-    "GC": ("GC.OPT", "GLBX.MDP3"),
-    "GOLD": ("GC.OPT", "GLBX.MDP3"),
+    "CL": ("LO.OPT", "GLBX.MDP3"),
+    "CRUDE": ("LO.OPT", "GLBX.MDP3"),
+    "GC": ("OG.OPT", "GLBX.MDP3"),
+    "GOLD": ("OG.OPT", "GLBX.MDP3"),
+    "SI": ("SO.OPT", "GLBX.MDP3"),
+    "SILVER": ("SO.OPT", "GLBX.MDP3"),
+    "PL": ("PO.OPT", "GLBX.MDP3"),
+    "PLATINUM": ("PO.OPT", "GLBX.MDP3"),
+    "PA": ("PAO.OPT", "GLBX.MDP3"),
+    "PALLADIUM": ("PAO.OPT", "GLBX.MDP3"),
+    "HG": ("HXE.OPT", "GLBX.MDP3"),
+    "COPPER": ("HXE.OPT", "GLBX.MDP3"),
+    "NG": ("ON.OPT", "GLBX.MDP3"),
+    "NATGAS": ("ON.OPT", "GLBX.MDP3"),
+    "HO": ("OH.OPT", "GLBX.MDP3"),
+    "HEATING_OIL": ("OH.OPT", "GLBX.MDP3"),
+    "RB": ("OB.OPT", "GLBX.MDP3"),
+    "GASOLINE": ("OB.OPT", "GLBX.MDP3"),
 }
 
 # --- Exchange code to human-readable name ---
@@ -313,11 +334,21 @@ TRADFI_INSTRUMENTS: list[TradFiInstrumentDef] = [
     ),
     # CFE — Volatility Futures (traded on CBOE Futures Exchange; Databento dataset XCBF.PITCH)
     _fut("VX.FUT", "XCBF.PITCH", "VIX"),
-    # Options
+    # Options — index (ES/NQ use <root>.OPT) + commodity options-on-futures
+    # (the CME OPTION product code, NOT <future-root>.OPT — probed live 2026-06-24:
+    # OG/SO/PO/PAO/HXE/LO/ON/OH/OB resolve in GLBX.MDP3; the old CL.OPT/GC.OPT were
+    # phantoms that never resolved). RTY/YM/LN options DROPPED (no GLBX.MDP3 coverage).
     _opt("ES.OPT", "CME", "SP500"),
     _opt("NQ.OPT", "CME", "NASDAQ100"),
-    _opt("CL.OPT", "CME", "CRUDE"),
-    _opt("GC.OPT", "CME", "GOLD"),
+    _opt("OG.OPT", "CME", "GOLD", underlying="GC"),
+    _opt("SO.OPT", "CME", "SILVER", underlying="SI"),
+    _opt("PO.OPT", "CME", "PLATINUM", underlying="PL"),
+    _opt("PAO.OPT", "CME", "PALLADIUM", underlying="PA"),
+    _opt("HXE.OPT", "CME", "COPPER", underlying="HG"),
+    _opt("LO.OPT", "CME", "CRUDE", underlying="CL"),
+    _opt("ON.OPT", "CME", "NATGAS", underlying="NG"),
+    _opt("OH.OPT", "CME", "HEATINGOIL", underlying="HO"),
+    _opt("OB.OPT", "CME", "GASOLINE", underlying="RB"),
     _opt("EW1.OPT", "CME", "SP500", underlying="ES"),
     _opt("EW2.OPT", "CME", "SP500", underlying="ES"),
     _opt("EW3.OPT", "CME", "SP500", underlying="ES"),
