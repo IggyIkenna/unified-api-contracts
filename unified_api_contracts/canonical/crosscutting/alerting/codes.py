@@ -403,6 +403,12 @@ class AlertCode(StrEnum):
     depeg-risk keywords (``incident``, ``freeze``, ``<stable-name>``,
     ``aave``, ``spark``). Operator-page only — NOT auto-action. Payload:
     ``forum``, ``proposal_id``, ``title``, ``tags``, ``posted_at``, ``url``."""
+    GOVERNANCE_PROPOSAL_LIVE = "GOVERNANCE_PROPOSAL_LIVE"
+    """A Snapshot.org governance proposal targeting DeFi protocol parameters
+    (LTV, liquidation threshold, borrow/supply cap, IRM kinks) opened in
+    aavedao, comp-vote, or morpho spaces. Operator-page only — NOT
+    auto-action. Payload: ``space``, ``proposal_id``, ``title``,
+    ``matched_params``, ``posted_at``, ``url``."""
 
     # ── Batch-vs-live recon drift (batch_live_symmetry_2026_05_10 Tab 6) ────
     BATCH_VS_LIVE_RECON_DRIFTED = "BATCH_VS_LIVE_RECON_DRIFTED"
