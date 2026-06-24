@@ -108,6 +108,9 @@ _CME_COMMODITY_FUTURES: list[DatabentoInstrumentDef] = [
     DatabentoInstrumentDef("RB.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "GASOLINE", "commodity", "RB"),
     DatabentoInstrumentDef("SI.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SILVER", "commodity", "SI"),
     DatabentoInstrumentDef("HG.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "COPPER", "commodity", "HG"),
+    # COMEX/NYMEX platinum-group metals — Binance XPT/XPD perp coverage (2026-06-24).
+    DatabentoInstrumentDef("PL.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "PLATINUM", "commodity", "PL"),
+    DatabentoInstrumentDef("PA.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "PALLADIUM", "commodity", "PA"),
     DatabentoInstrumentDef("ZS.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "SOYBEANS", "commodity", "ZS"),
     DatabentoInstrumentDef("ZC.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "CORN", "commodity", "ZC"),
     DatabentoInstrumentDef("ZW.FUT", "CME", "FUTURE", "GLBX.MDP3", "parent", "WHEAT", "commodity", "ZW"),
@@ -437,6 +440,8 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "MSI": "SILVER",
     "HG": "COPPER",
     "MHG": "COPPER",
+    "PL": "PLATINUM",
+    "PA": "PALLADIUM",
     # Agriculture
     "ZS": "SOYBEANS",
     "ZC": "CORN",
