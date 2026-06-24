@@ -99,7 +99,15 @@ _CEFI: dict[str, list[str]] = {
         "futures_chain",
     ],
     "UPBIT": ["trades", "book_snapshot_5"],
+    "BYBIT-SPOT": ["trades", "book_snapshot_5"],
     "COINBASE-SPOT": ["trades", "book_snapshot_5"],
+    "COINBASE-FUTURES": [
+        "trades",
+        "book_snapshot_5",
+        "derivative_ticker",
+        "liquidations",
+        "futures_chain",
+    ],
     "HYPERLIQUID": [
         "trades",
         "book_snapshot_5",
