@@ -163,6 +163,11 @@ _TRADFI: dict[str, list[str]] = {
     "NASDAQ": ["ohlcv_1m", "ohlcv_1s"],  # DBEQ.BASIC serves equity 1s (L0/free); operator 2026-06-21 in-scope
     "NYSE": ["ohlcv_1m", "ohlcv_1s"],  # DBEQ.BASIC serves equity 1s (L0/free); operator 2026-06-21 in-scope
     "FX": ["ohlcv_24h"],
+    # KRX (Korea Exchange) single stocks — Yahoo-sourced (.KS), added 2026-06-24
+    # to close the equity-perp basis universe (HYUNDAI/SAMSUNG/SKHYNIX). Yahoo
+    # serves daily + intraday (1m/15m within the lookback ladder); the denominator
+    # counts these so the KRX cells show as expected. No 1s/trades (Yahoo = bars).
+    "KRX": ["ohlcv_1m", "ohlcv_15m", "ohlcv_24h"],
     "YAHOO_FINANCE": ["ohlcv_15m", "ohlcv_24h"],
 }
 

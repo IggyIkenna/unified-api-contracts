@@ -65,15 +65,17 @@ class VenueMapping:
     )
 
     # Canonical TradFi venues (user-friendly names, not data source names)
-    # Note: Not all are Databento-sourced (e.g. CBOE uses Barchart, FX uses Yahoo Finance)
+    # Note: Not all are Databento-sourced (FX + KRX use Yahoo Finance; CBOE is
+    # Databento XCBF.PITCH for VX/VIX futures).
     all_databento_venues: list[str] = field(
         default_factory=lambda: [
             "CME",  # Chicago Mercantile Exchange (futures, options, treasuries)
-            "CBOE",  # Cboe Global Markets (VIX index only - special treatment)
+            "CBOE",  # CBOE Futures Exchange (CFE) — VX/VIX FUTURES via Databento XCBF.PITCH
             "NASDAQ",  # NASDAQ Stock Market (equities, ETFs)
             "NYSE",  # New York Stock Exchange (equities, ETFs)
             "ICE",  # Intercontinental Exchange (futures, options)
             "FX",  # OTC Foreign Exchange (KRW/USD via Yahoo Finance data provider)
+            "KRX",  # Korea Exchange (single stocks via Yahoo Finance .KS tickers)
         ]
     )
 
@@ -128,7 +130,7 @@ class VenueMapping:
     venue_to_databento: dict[str, str] = field(
         default_factory=lambda: {
             "CME": "GLBX.MDP3",  # CME Globex Market Data Platform 3.0
-            "CBOE": "BARCHART",  # VIX index only (not via Databento OPRA.PILLAR)
+            "CBOE": "XCBF.PITCH",  # CBOE Futures Exchange (CFE) — VX/VIX FUTURES via Databento
             "NASDAQ": "DBEQ.BASIC",  # NASDAQ equities via Databento DBEQ.BASIC
             "NYSE": "DBEQ.BASIC",  # NYSE equities via Databento DBEQ.BASIC
             "ICE": "IFUS.IMPACT",  # ICE Futures US (Cotton, Coffee, Sugar, Cocoa, OJ, Dollar Index)
@@ -199,9 +201,12 @@ class VenueMapping:
     # Map venues to their data providers (for non-Tardis venues)
     venue_to_data_provider: dict[str, str] = field(
         default_factory=lambda: {
-            # TradFi venues with external data providers (not Databento)
-            "CBOE": "barchart",  # VIX via Barchart
+            # TradFi venues with external data providers (not Databento).
+            # CBOE is NOT here: its VX/VIX FUTURES are Databento (XCBF.PITCH) — see
+            # venue_to_databento. (Barchart was retired 2026-06-24; VIX 15m is now
+            # aggregated from VX futures via databento, not a Barchart CSV preload.)
             "FX": "yahoo_finance",  # KRW/USD via Yahoo Finance
+            "KRX": "yahoo_finance",  # Korea Exchange single stocks via Yahoo (.KS tickers)
             # DeFi venues with direct API integration
             "HYPERLIQUID": "hyperliquid_api",
             "ASTER": "aster_api",
@@ -281,11 +286,15 @@ class VenueMapping:
             # TradFi - Databento
             # Start dates = earliest manifest data
             "CME": "2020-01-01",
-            "CBOE": "2020-06-01",  # Barchart historical data available
+            "CBOE": "2020-06-01",  # VX futures (XCBF.PITCH) captured history floor
             "NASDAQ": "2023-04-15",
             "NYSE": "2023-04-15",
             "ICE": "2020-01-01",
             "FX": "2020-01-01",
+            # KRX (Korea Exchange) single stocks — Yahoo-sourced (.KS). Daily
+            # history confirmed back to 2019 (probed 2026-06-24). Floor = our
+            # Yahoo daily backfill floor.
+            "KRX": "2019-01-02",
             # DeFi - DEX protocols (canonical PROTOCOL-CHAIN format)
             # Start dates = earliest manifest data
             "UNISWAP_V2-ETHEREUM": "2020-05-06",  # Uniswap V2 factory deployed May 2020
@@ -432,8 +441,9 @@ class VenueMapping:
         Derived from the authoritative ``all_databento_venues`` field (which, despite its
         name, already contains the full tradfi universe including non-Databento venues):
           - CME, NASDAQ, NYSE, ICE → Databento
-          - CBOE → Barchart (VIX index only; see ``venue_to_data_provider`` line 189)
-          - FX   → Yahoo Finance (KRW/USD; see ``venue_to_data_provider`` line 190)
+          - CBOE → Databento XCBF.PITCH (VX/VIX FUTURES; VIX 15m aggregates from VX)
+          - FX   → Yahoo Finance (KRW/USD; see ``venue_to_data_provider``)
+          - KRX  → Yahoo Finance (Korea single stocks, .KS tickers)
 
         Use this accessor (not ``all_databento_venues``) for any denominator that must
         count ALL expected tradfi coverage cells — e.g. the deployment-api

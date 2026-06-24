@@ -856,11 +856,15 @@ def is_mvp(
         # equity-basis arb archetype → MVP-scoped, gated to the basis universe.
         # This is a SEPARATE gate from the CME futures complex (a flat AND across
         # venues+types+underliers cannot express "(CME x FUTURE x {ES,NQ,VX}) OR
-        # (NASDAQ/NYSE/ARCA x EQUITY/ETF x basis-universe)" — mirrors the cefi
+        # (NASDAQ/NYSE/ARCA/KRX x EQUITY/ETF x basis-universe)" — mirrors the cefi
         # OPTION venue carve-out pattern). data_type is still gated by the rule.
+        # KRX (2026-06-24): the Korean single-stock underliers of the Binance
+        # tradfi-perps are venue=KRX / source=yahoo (no US-listed twin) — added to
+        # the equity-venue set so their basis cells are MVP. ``rule.sources`` is
+        # empty so source=yahoo passes (US equities are databento; both in scope).
         _itype = (instrument_type or "").strip().upper()
         _venue_root = (venue or "").strip().upper().split("-", 1)[0]
-        if _itype in ("EQUITY", "ETF") and _venue_root in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS"):
+        if _itype in ("EQUITY", "ETF") and _venue_root in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX"):
             if not _data_type_in_rule(data_type, rule.data_types):
                 return False
             if (base_ccy or "").strip().upper() not in {t.upper() for t in TRADFI_EQUITY_PERP_BASIS_UNIVERSE}:

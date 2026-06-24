@@ -419,16 +419,8 @@ def test_pipeline_mode_path_preserves_all_segments() -> None:
             "asset_group=tradfi/venue=MASSIVE/instrument_type=future/"
             "data_type=ohlcv/ESM26.parquet",
         ),
-        (
-            "batch_barchart",
-            "BARCHART",
-            InstrumentType.INDEX,
-            "ohlcv",
-            "VIX.parquet",
-            "raw_tick_data/by_date/day=2026-04-17/pipeline_mode=batch_barchart/"
-            "asset_group=tradfi/venue=BARCHART/instrument_type=index/"
-            "data_type=ohlcv/VIX.parquet",
-        ),
+        # batch_barchart/BARCHART case REMOVED 2026-06-24 — Barchart retired
+        # (VIX 15m now aggregates from VX futures via Databento XCBF.PITCH).
         (
             "batch_yahoo",
             "YAHOO",
@@ -465,8 +457,7 @@ def test_tradfi_build_path_with_pipeline_mode_byte_identical_to_old_prepend(
     the old ``candidate_parquet_paths`` used ``_prepend_pipeline_mode`` to do
     a string-replace on the base path; the new UAC builder encodes the segment
     directly.  Both must produce the same string for every live pipeline_mode
-    value (batch_databento / batch_massive / batch_barchart / batch_yahoo /
-    batch_eia).
+    value (batch_databento / batch_massive / batch_yahoo / batch_eia).
     """
     # New UAC builder path (single code path after refactor)
     builder_path = build_tradfi_partition_path(

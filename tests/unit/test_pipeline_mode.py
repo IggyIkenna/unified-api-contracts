@@ -184,11 +184,8 @@ def test_batch_yahoo_round_trip() -> None:
     assert source_string_for(PipelineMode.BATCH_YAHOO) == "yahoo"
 
 
-def test_batch_barchart_round_trip() -> None:
-    """VIX 15m historical preload 2020-01-02 → 2025-11-12 per CLAUDE.md."""
-    assert PipelineMode.BATCH_BARCHART.value == "batch_barchart"
-    assert pipeline_mode_for_source("barchart") is PipelineMode.BATCH_BARCHART
-    assert source_string_for(PipelineMode.BATCH_BARCHART) == "barchart"
+# test_batch_barchart_round_trip REMOVED 2026-06-24 — BATCH_BARCHART retired
+# (Barchart removed; VIX 15m now aggregates from VX futures via Databento XCBF.PITCH).
 
 
 def test_batch_footystats_round_trip() -> None:
@@ -292,7 +289,6 @@ def test_six_new_enum_members_present_in_pipeline_mode() -> None:
     """Phase 4.MTDS Q2=(A) extension landed all 6 new members atomically."""
     new_members = {
         PipelineMode.BATCH_YAHOO,
-        PipelineMode.BATCH_BARCHART,
         PipelineMode.BATCH_FOOTYSTATS,
         PipelineMode.BATCH_HYPERLIQUID,
         PipelineMode.BATCH_PYTH_HERMES,

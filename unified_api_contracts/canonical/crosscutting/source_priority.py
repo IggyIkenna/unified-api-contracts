@@ -893,6 +893,13 @@ _VENUE_SOURCE_EXCLUSIONS: dict[tuple[str, str], frozenset[str]] = {
     ("CBOE", "ohlcv_1s"): frozenset({"massive"}),
     ("CBOE", "trades"): frozenset({"massive"}),
     ("CBOE", "tbbo"): frozenset({"massive"}),
+    # KRX (Korea Exchange) single stocks are Yahoo-ONLY (2026-06-24) — neither
+    # databento nor massive carry KRX. Exclude both so the write-time --source
+    # selector resolves KRX cells to ``yahoo`` and a stray --source databento/
+    # massive fails closed (SourceNotCapableForVenueError) rather than mis-stamping.
+    ("KRX", "ohlcv_1m"): frozenset({"databento", "massive"}),
+    ("KRX", "ohlcv_15m"): frozenset({"databento", "massive"}),
+    ("KRX", "ohlcv_24h"): frozenset({"databento", "massive"}),
 }
 
 

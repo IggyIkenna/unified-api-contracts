@@ -2430,7 +2430,7 @@ __all__ = [
 
 # fmt: off
 _VENUES = [
-    "alchemy", "api_football", "aster", "barchart", "betfair", "binance",
+    "alchemy", "api_football", "aster", "betfair", "binance",
     "bybit", "ccxt", "aws", "gcp", "coinbase", "databento", "defi", "defillama",
     "deribit", "eigenlayer", "footystats", "github", "hyperliquid", "ibkr", "kalshi",
     "mev", "metabet", "morpho_blue_api", "nautilus", "odds_api", "odds_engine", "okx",

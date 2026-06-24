@@ -200,6 +200,9 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("tradfi", "ohlcv_1s"): "tick_timestamp",
     ("tradfi", "ohlcv_1m"): "tick_timestamp",
     ("tradfi", "ohlcv_15m"): "tick_timestamp",
+    # ohlcv_24h — Yahoo daily bars (FX/KRX/DXY/treasury-yield); the bar's
+    # close-edge timestamp is its available_at (added 2026-06-24 with KRX).
+    ("tradfi", "ohlcv_24h"): "tick_timestamp",
     ("tradfi", "options_chain"): "tick_timestamp",
     ("tradfi", "futures_chain"): "tick_timestamp",
     # greeks_snapshot / implied_vol_surface — greeks-service computes these inline

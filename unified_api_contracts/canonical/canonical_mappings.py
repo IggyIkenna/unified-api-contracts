@@ -56,6 +56,7 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "EPRL",
         "XCHI",
         "CBOE",
+        "VIX",  # VIX 15m via VX futures (XCBF.PITCH) — moved from barchart 2026-06-24
     ],
     "ccxt": [
         "BINANCE-SPOT",
@@ -92,7 +93,8 @@ DATA_SOURCE_TO_VENUES: dict[str, list[str]] = {
         "ETHENA-ETHEREUM",
     ],
     "yfinance": ["FX"],
-    "barchart": ["VIX"],
+    # VIX moved to databento 2026-06-24 (VX futures via XCBF.PITCH); barchart retired
+    # — VIX is appended to the existing "databento" venue list above (CME/CBOE/...).
 }
 
 # --- VENUE_TO_DATA_SOURCE (originally in unified-trading-library) ---
@@ -143,7 +145,7 @@ VENUE_TO_DATA_SOURCE: dict[str, str] = {
     "ETHERFI-ETHEREUM": "thegraph",
     "ETHENA-ETHEREUM": "thegraph",
     "FX": "yfinance",
-    "VIX": "barchart",
+    "VIX": "databento",  # VX futures via XCBF.PITCH — moved from barchart 2026-06-24
     # Sports
     "API_FOOTBALL": "api_football",
     "ODDS_API": "odds_api",
@@ -196,10 +198,10 @@ VENUE_TO_DATA_SOURCES: dict[str, list[DataSourceRoute]] = {
         DataSourceRoute(provider="ccxt", use_for="live"),
         DataSourceRoute(provider="ccxt", use_for="execution"),
     ],
-    # CBOE: Databento for some data, Barchart/Yahoo for VIX index
+    # CBOE: Databento (XCBF.PITCH VX futures, incl. VIX 15m via aggregation);
+    # Yahoo ^VIX rolling window as a recent cross-check. Barchart retired 2026-06-24.
     "CBOE": [
         DataSourceRoute(provider="databento", use_for="historical"),
-        DataSourceRoute(provider="barchart", use_for="historical"),
         DataSourceRoute(provider="yahoo_finance", use_for="live"),
     ],
     # TradFi: Databento + IBKR for execution
@@ -464,7 +466,6 @@ DATA_SOURCE_TO_SECRET: dict[str, str | None] = {
     "thegraph": "thegraph-api-key",
     "alchemy": "alchemy-api-key",
     "yfinance": None,
-    "barchart": None,
     "ccxt": None,
     "ibkr": "ibkr-account-credentials",
     "defillama": None,
