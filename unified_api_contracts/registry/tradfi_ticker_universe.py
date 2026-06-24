@@ -290,6 +290,60 @@ NASDAQ_TICKERS: list[str] = [
     "BILL",
     "FIVN",
     "GTLB",
+    # Binance TradFi-perp single stocks listed on NASDAQ (basis-arb superset,
+    # 2026-06-24). Required so BINANCE-FUTURES PERPETUAL tradfi underlyings
+    # each map to a captured/enumerated DBEQ.BASIC equity. NASDAQ listing →
+    # the adapter routes canonical_venue=NASDAQ off this set.
+    "ARM",  # Arm Holdings ADR
+    "ASML",  # ASML ADR
+    "AAOI",  # Applied Optoelectronics
+    "ALAB",  # Astera Labs
+    "ASTS",  # AST SpaceMobile
+    "AXTI",  # AXT Inc
+    "COIN",  # Coinbase
+    "CRDO",  # Credo Technology
+    "CRWV",  # CoreWeave
+    "DKNG",  # DraftKings
+    "EBAY",  # eBay
+    "FLNC",  # Fluence Energy
+    "IREN",  # IREN Limited
+    "LITE",  # Lumentum
+    "MSTR",  # Strategy (MicroStrategy)
+    "NBIS",  # Nebius Group
+    "ONDS",  # Ondas Holdings
+    "PAYP",  # PayPay ADR
+    "PLTR",  # Palantir
+    "RKLB",  # Rocket Lab
+    "SMCI",  # Super Micro
+    "SNDK",  # Sandisk
+    "SPCX",  # SpaceX-tracking vehicle
+    "USAR",  # USA Rare Earth
+    "WDC",  # Western Digital
+]
+
+# Binance TradFi-perp single stocks / ADRs listed on NYSE (basis-arb superset,
+# 2026-06-24). NYSE listing → adapter default routes canonical_venue=NYSE, so
+# these only need to be in the fetched symbol list (added via the universe dict
+# below), not in NASDAQ_TICKERS. Kept as a discrete list for provenance.
+NYSE_TRADFI_PERP_TICKERS: list[str] = [
+    "BE",  # Bloom Energy
+    "BMNR",  # BitMine Immersion
+    "CFG",  # Citizens Financial
+    "CIEN",  # Ciena
+    "COHR",  # Coherent
+    "CRCL",  # Circle Internet
+    "DELL",  # Dell Technologies
+    "DIS",  # Walt Disney
+    "GLW",  # Corning
+    "GME",  # GameStop
+    "HIMS",  # Hims & Hers
+    "HPE",  # Hewlett Packard Enterprise
+    "NOW",  # ServiceNow
+    "BABA",  # Alibaba ADR
+    "NOK",  # Nokia ADR
+    "NVO",  # Novo Nordisk ADR
+    "SONY",  # Sony ADR
+    "TSM",  # TSMC ADR
 ]
 
 ETF_TICKERS: list[str] = [
@@ -363,6 +417,13 @@ ETF_TICKERS: list[str] = [
     "FXI",
     "ASHR",
     "MCHI",
+    # Binance TradFi-perp index/sector ETFs (basis-arb superset, 2026-06-24).
+    "EWT",  # iShares MSCI Taiwan
+    "EWY",  # iShares MSCI South Korea
+    "ROBO",  # ROBO Global Robotics & Automation
+    "SLX",  # VanEck Steel
+    "URNM",  # Sprott Uranium Miners
+    "UVXY",  # ProShares Ultra VIX Short-Term Futures
 ]
 
 TRADFI_FUTURES_PRODUCTS: list[str] = [
@@ -382,12 +443,16 @@ TRADFI_FUTURES_PRODUCTS: list[str] = [
     # COMEX metals
     "GC",
     "MGC",
+    # COMEX platinum-group metals — Binance XPT/XPD perp coverage (2026-06-24).
+    "PL",  # platinum (XPT)
+    "PA",  # palladium (XPD)
 ]
 
 
 TRADFI_TICKER_UNIVERSE: dict[str, list[str]] = {
     "sp500_tickers": SP500_TICKERS,
     "nasdaq_tickers": NASDAQ_TICKERS,
+    "nyse_tradfi_perp_tickers": NYSE_TRADFI_PERP_TICKERS,
     "etf_tickers": ETF_TICKERS,
     "futures_products": TRADFI_FUTURES_PRODUCTS,
 }
