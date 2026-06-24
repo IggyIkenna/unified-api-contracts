@@ -22,6 +22,12 @@ from unified_api_contracts import (
 from unified_api_contracts import (
     DeploymentUmbrella as RootDeploymentUmbrella,
 )
+from unified_api_contracts import (
+    ShardResponsibility as RootShardResponsibility,
+)
+from unified_api_contracts import (
+    ShardResponsibilityKind as RootShardResponsibilityKind,
+)
 from unified_api_contracts.canonical.crosscutting.lifecycle_class import (
     UMBRELLA_FOR_LIFECYCLE_CLASS,
     DeploymentCloud,
@@ -29,6 +35,8 @@ from unified_api_contracts.canonical.crosscutting.lifecycle_class import (
     DeploymentTarget,
     DeploymentUmbrella,
     LifecycleClass,
+    ShardResponsibility,
+    ShardResponsibilityKind,
     VmPrefixSpec,
     classify_cloud_run_service,
     classify_experiment_run,
@@ -263,3 +271,79 @@ def test_deployment_symbols_exported_from_uac_root() -> None:
     assert RootDeploymentUmbrella is DeploymentUmbrella
     assert RootDeploymentTarget is DeploymentTarget
     assert ROOT_UMBRELLA_FOR_LIFECYCLE_CLASS is UMBRELLA_FOR_LIFECYCLE_CLASS
+
+
+# ---------------------------------------------------------------------------
+# ShardResponsibility — data-freshness binding contract
+# ---------------------------------------------------------------------------
+
+
+class TestShardResponsibilityKind:
+    def test_closed_set(self) -> None:
+        assert set(ShardResponsibilityKind) == {
+            ShardResponsibilityKind.ASSET_GROUP_CAPTURE,
+            ShardResponsibilityKind.MANIFEST_CONSOLIDATION,
+            ShardResponsibilityKind.STRATEGY_SHARD,
+            ShardResponsibilityKind.NONE,
+        }
+
+    def test_string_values(self) -> None:
+        assert ShardResponsibilityKind.ASSET_GROUP_CAPTURE == "asset_group_capture"
+        assert ShardResponsibilityKind.MANIFEST_CONSOLIDATION == "manifest_consolidation"
+        assert ShardResponsibilityKind.STRATEGY_SHARD == "strategy_shard"
+        assert ShardResponsibilityKind.NONE == "none"
+
+
+class TestShardResponsibility:
+    def test_asset_group_capture(self) -> None:
+        r = ShardResponsibility(
+            kind=ShardResponsibilityKind.ASSET_GROUP_CAPTURE,
+            asset_group="cefi",
+            data_types=("book_snapshot_5", "trades"),
+        )
+        assert r.kind == ShardResponsibilityKind.ASSET_GROUP_CAPTURE
+        assert r.asset_group == "cefi"
+        assert r.data_types == ("book_snapshot_5", "trades")
+        assert r.archetype == ""
+        assert r.shard == ""
+        assert r.mode == ""
+
+    def test_manifest_consolidation(self) -> None:
+        r = ShardResponsibility(
+            kind=ShardResponsibilityKind.MANIFEST_CONSOLIDATION,
+            asset_group="defi",
+        )
+        assert r.kind == ShardResponsibilityKind.MANIFEST_CONSOLIDATION
+        assert r.asset_group == "defi"
+        assert r.data_types == ()
+
+    def test_strategy_shard(self) -> None:
+        r = ShardResponsibility(
+            kind=ShardResponsibilityKind.STRATEGY_SHARD,
+            archetype="carry_staked_basis",
+            shard="shard-0",
+            mode="live",
+        )
+        assert r.kind == ShardResponsibilityKind.STRATEGY_SHARD
+        assert r.archetype == "carry_staked_basis"
+        assert r.shard == "shard-0"
+        assert r.mode == "live"
+        assert r.asset_group == ""
+
+    def test_none_liveness_only(self) -> None:
+        r = ShardResponsibility(kind=ShardResponsibilityKind.NONE)
+        assert r.kind == ShardResponsibilityKind.NONE
+        assert r.asset_group == ""
+        assert r.data_types == ()
+        assert r.archetype == ""
+
+    def test_frozen(self) -> None:
+        r = ShardResponsibility(
+            kind=ShardResponsibilityKind.NONE,
+        )
+        with pytest.raises((FrozenInstanceError, AttributeError)):
+            r.asset_group = "tradfi"  # type: ignore[misc]
+
+    def test_root_export(self) -> None:
+        assert RootShardResponsibility is ShardResponsibility
+        assert RootShardResponsibilityKind is ShardResponsibilityKind
