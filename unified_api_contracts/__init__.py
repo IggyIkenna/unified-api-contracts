@@ -891,6 +891,27 @@ from .canonical.domain.predictions.canonical_groups import (
 from .canonical.domain.predictions.lifecycle import (
     MarketLifecycle as MarketLifecycle,
 )
+from .canonical.domain.predictions.two_axis import (
+    CANONICAL_GROUP_TO_BET_TYPE as CANONICAL_GROUP_TO_BET_TYPE,
+)
+from .canonical.domain.predictions.two_axis import (
+    CANONICAL_GROUP_TO_UNDERLYING as CANONICAL_GROUP_TO_UNDERLYING,
+)
+from .canonical.domain.predictions.two_axis import (
+    PredictionBetType as PredictionBetType,
+)
+from .canonical.domain.predictions.two_axis import (
+    PredictionUnderlying as PredictionUnderlying,
+)
+from .canonical.domain.predictions.two_axis import (
+    bet_type_for_group as bet_type_for_group,
+)
+from .canonical.domain.predictions.two_axis import (
+    cross_venue_underlying_overlap as cross_venue_underlying_overlap,
+)
+from .canonical.domain.predictions.two_axis import (
+    underlying_for_group as underlying_for_group,
+)
 from .canonical.domain.sports.feature_upstream import (
     CoverageResult as CoverageResult,
 )
@@ -2397,6 +2418,14 @@ __all__ = [
     "PREDICTION_MARKETS_CONFIG_HASH",
     "PREDICTION_MARKETS_CONFIG_VERSION",
     "prediction_markets_config_descriptor",
+    # Two-axis canonical decomposition (Axis-1 underlying / Axis-2 bet-type).
+    "CANONICAL_GROUP_TO_BET_TYPE",
+    "CANONICAL_GROUP_TO_UNDERLYING",
+    "PredictionBetType",
+    "PredictionUnderlying",
+    "bet_type_for_group",
+    "cross_venue_underlying_overlap",
+    "underlying_for_group",
 ]
 
 # fmt: off
