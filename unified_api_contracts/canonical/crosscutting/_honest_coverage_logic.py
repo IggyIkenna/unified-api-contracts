@@ -70,16 +70,44 @@ class CaptureStatusCounts(NamedTuple):
     attempted_failed: int = 0
     expected_unattempted_known_empty: int = 0
     expected_unattempted_pending_fetch: int = 0
+    out_of_window: int = 0
+    """Count of ``empty_confirmed`` cells that are OUTSIDE the coverable
+    window/scope (a SUBSET of :attr:`empty_confirmed`; reason ∈
+    :data:`OUT_OF_COVERAGE_WINDOW_REASONS` — instrument-not-listed / delisted /
+    pre-venue-launch / no-fixture / …, OR a schedule-defining ``FIXTURES``
+    no-match-day). These cells "could never have data" so they are CLIPPED from
+    BOTH the numerator and the denominator by :func:`compute_honest_coverage`
+    (operator direction 2026-06-23 — "better to have blanks where we expected
+    data" than out-of-life empties credited as coverage). Defaults to 0 so
+    callers that don't populate it get the legacy numerator-credit behaviour
+    unchanged; producers that classify reasons (UTL ``read_capture_status_counts``,
+    deployment-api coverage rollup) populate it so out-of-life cells stop
+    inflating the %. MUST satisfy ``0 <= out_of_window <= empty_confirmed``."""
 
 
 def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
     """Canonical honest-coverage ratio. Every caller in the workspace uses this.
 
-    Formula (post-2026-05-19 consolidation):
+    Formula (post-2026-05-19 consolidation; out-of-window clip 2026-06-23):
 
-        numerator   = captured + empty_confirmed + expected_unattempted_known_empty
+        within_window_empty = empty_confirmed - out_of_window
+        numerator   = captured + within_window_empty + expected_unattempted_known_empty
         denominator = numerator + attempted_failed + expected_unattempted_pending_fetch
         coverage    = numerator / denominator     (returns 1.0 if denominator==0)
+
+    ``out_of_window`` (default 0) is the subset of ``empty_confirmed`` whose
+    cells could never have data (instrument not listed / delisted / pre-venue-
+    launch / no-fixture / schedule-defining FIXTURES no-match-day — the
+    :data:`OUT_OF_COVERAGE_WINDOW_REASONS`). These are CLIPPED from both
+    numerator and denominator so an out-of-life cell reads as a BLANK, not a
+    coverage success (operator direction 2026-06-23). Producers that classify
+    reasons populate ``out_of_window`` (UTL ``read_capture_status_counts``,
+    deployment-api coverage rollup); callers that leave it 0 get the legacy
+    numerator-credit behaviour, so this is a back-compatible change. NOTE:
+    clip ≠ numerator-credit whenever ``attempted_failed`` /
+    ``expected_unattempted_pending_fetch`` > 0 — crediting out-of-life empties
+    in BOTH num+denom inflates the % over the true in-window coverage (this is
+    the prediction-POLYMARKET 49.6k-empties inflation the operator flagged).
 
     Semantics in plain English: a slot is **honestly answered** if we have any
     truthful answer for it — data landed, or we confirmed it's empty, or the
@@ -125,7 +153,8 @@ def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
     rows before computing coverage; otherwise a brand-new asset_group reports
     a misleading 100%.
     """
-    numerator = counts.captured + counts.empty_confirmed + counts.expected_unattempted_known_empty
+    within_window_empty = counts.empty_confirmed - counts.out_of_window
+    numerator = counts.captured + within_window_empty + counts.expected_unattempted_known_empty
     denominator = numerator + counts.attempted_failed + counts.expected_unattempted_pending_fetch
     if denominator == 0:
         return 1.0

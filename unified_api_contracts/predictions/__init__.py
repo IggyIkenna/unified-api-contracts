@@ -53,9 +53,20 @@ from unified_api_contracts.canonical.domain.predictions.lifecycle import (
     expected_market_ids_for_canonical_group,
     is_market_active_at,
 )
+from unified_api_contracts.canonical.domain.predictions.two_axis import (
+    CANONICAL_GROUP_TO_BET_TYPE,
+    CANONICAL_GROUP_TO_UNDERLYING,
+    PredictionBetType,
+    PredictionUnderlying,
+    bet_type_for_group,
+    cross_venue_underlying_overlap,
+    underlying_for_group,
+)
 
 __all__ = [
     "CANONICAL_GROUP_METADATA",
+    "CANONICAL_GROUP_TO_BET_TYPE",
+    "CANONICAL_GROUP_TO_UNDERLYING",
     "CLASSIFIER_STABILITY_HASH",
     "CLASSIFIER_VERSION",
     "KALSHI_TICKER_PREFIX_TO_GROUP",
@@ -64,8 +75,13 @@ __all__ = [
     "CanonicalGroupMetadata",
     "CanonicalQuestionGroup",
     "MarketLifecycle",
+    "PredictionBetType",
+    "PredictionUnderlying",
+    "bet_type_for_group",
     "classify_kalshi_to_canonical_group",
     "classify_polymarket_to_canonical_group",
+    "cross_venue_underlying_overlap",
     "expected_market_ids_for_canonical_group",
     "is_market_active_at",
+    "underlying_for_group",
 ]
