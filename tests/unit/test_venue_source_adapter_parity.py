@@ -327,17 +327,18 @@ def test_databento_allowlist_limits_declared_and_enforced() -> None:
     # per-level floors declared
     for level in ("L0", "L1", "L2", "L3"):
         assert level in LEVEL_MAX_LOOKBACK_DAYS
-    # MEASURED 2026-06-24: our fixed subscription grants FULL history (no PAYG
-    # rolling edge) — so L1/L2/L3 floors equal L0 (full history). A request one
-    # day PAST the (now 16y) floor still raises (the gate is non-bypassable); a
-    # request well inside (e.g. 1y back, which the prior 365d L1 window would have
-    # rejected at its edge) is now correctly ALLOWED.
-    floor = earliest_allowed_start("trades")
+    # OPERATOR-AUTHORITATIVE 2026-06-24: databento METERS history fetched outside the
+    # per-level free window (L1 ~1yr, L2/L3 ~1mo); only L0 is free full-history. The
+    # gate FAILS CLOSED to the free window so we never incur a surprise metered charge:
+    # a request one day PAST the L1 floor (outside the free year) RAISES; well inside is allowed.
+    floor = earliest_allowed_start("trades")  # L1 = 1-year free window
     with pytest.raises(DatabentoLookbackExceededError):
         assert_databento_request_allowed("GLBX.MDP3", "trades", floor.date() - timedelta(days=1))
-    # 2 years back is INSIDE the measured full-history entitlement → allowed
-    # (regression guard: the old L1=365d window WRONGLY rejected this).
-    assert_databento_request_allowed("GLBX.MDP3", "trades", date.today() - timedelta(days=730))
+    # 2 years back is OUTSIDE the 1-year free L1 window → REJECTED (would be metered).
+    with pytest.raises(DatabentoLookbackExceededError):
+        assert_databento_request_allowed("GLBX.MDP3", "trades", date.today() - timedelta(days=730))
+    # well inside the free year → allowed.
+    assert_databento_request_allowed("GLBX.MDP3", "trades", date.today() - timedelta(days=300))
 
 
 # ---------------------------------------------------------------------------

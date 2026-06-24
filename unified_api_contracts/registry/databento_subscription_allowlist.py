@@ -73,29 +73,25 @@ DATABENTO_SCHEMA_LEVEL: dict[str, str] = {
 }
 
 # ── Included-history window per level (trailing days from today) ─────────────
-# MEASURED LIVE 2026-06-24 (operator Method B — real timeseries.get_range probes
-# with continuous front-month symbology ``ES.c.0`` on GLBX.MDP3, our paid dataset).
-# FINDING: our FIXED MONTHLY subscription grants FULL HISTORICAL access to every
-# schema level of the subscribed datasets — there is NO PAYG rolling-history edge:
-#   * L1 (trades/tbbo): served OK at 1460d (4y) back — NOT a 1-year window.
-#   * L2 (mbp-10):      served OK at 730d (2y) back — NOT a 1-month window.
-#   * L3 (mbo):         served OK at 730d (2y) back — NOT a 1-month window.
-#   * L0 (ohlcv-1m/1s): bounded only by the DATASET available-start (~2010-06-06
-#                       for GLBX.MDP3 ⇒ ~16y; mbo's own data starts 2017-05-21).
-# The metadata.get_cost probe (Method A) returns $0.0000 regardless of date on our
-# fixed subscription → it does NOT model a rolling free allowance, confirming there
-# isn't one for us. The prior conservative values (L1 365 / L2,L3 30) were
-# PAYG-fail-closed GUESSES that WRONGLY clip valid history we are entitled to.
-# Correction: all levels = full history (16y), the true floor being the dataset
-# available-start (the API already 422s on ``data_start_before_available_start``).
-# If a future plan switches to PAYG metering, REDUCE these back to the free-tier
-# windows. SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
-_FULL_HISTORY_DAYS: int = 16 * 365  # ~16y — bounded downstream by the dataset start
+# DATABENTO ROLLING-HISTORY FREE WINDOWS — BILLING GUARDRAIL (fail-closed).
+# OPERATOR-AUTHORITATIVE (2026-06-24): databento METERS/CHARGES for history fetched
+# OUTSIDE the per-level free window — L1 beyond ~1 year, L2/L3 beyond ~1 month. Only
+# L0 (ohlcv-1s/1m + definitions/statistics/status) is FREE full-history (part of the
+# fixed monthly subscription).
+# NOTE on the 2026-06-24 probe: a timeseries.get_range at 4y/2y back SERVED data and
+# metadata.get_cost returned $0.0000 — but NEITHER proves "free": get_cost does NOT
+# model the rolling metering on our plan, and the charge surfaces in MONTHLY BILLING,
+# not the per-query cost estimate. The data being *available* (it serves) is not the
+# same as it being *free*. So we FAIL-CLOSED to the free windows below — the guardrail
+# rejects out-of-window fetches so we never incur a surprise metered charge.
+# (If monthly billing is later proven to NOT meter these, relax per operator direction.)
+# SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
+_FULL_HISTORY_DAYS: int = 16 * 365  # ~16y (L0 only) — bounded downstream by dataset start
 LEVEL_MAX_LOOKBACK_DAYS: dict[str, int] = {
-    "L0": _FULL_HISTORY_DAYS,  # ohlcv/defs/stats/status — to dataset start (~16y)
-    "L1": _FULL_HISTORY_DAYS,  # trades/tbbo/mbp-1/bbo — MEASURED full history (≥4y, to dataset start)
-    "L2": _FULL_HISTORY_DAYS,  # mbp-10 — MEASURED full history (≥2y, to dataset start)
-    "L3": _FULL_HISTORY_DAYS,  # mbo — MEASURED full history (≥2y; mbo data starts 2017-05-21)
+    "L0": _FULL_HISTORY_DAYS,  # ohlcv/defs/stats/status — FREE full history (~16y, to dataset start)
+    "L1": 365,  # trades/tbbo/mbp-1/bbo — 1-year FREE window; older is METERED (charged)
+    "L2": 30,  # mbp-10 — 1-month FREE window; older is METERED (charged)
+    "L3": 30,  # mbo — 1-month FREE window; older is METERED (charged)
 }
 
 # ── Schemas we are allowed to FETCH ──────────────────────────────────────────
