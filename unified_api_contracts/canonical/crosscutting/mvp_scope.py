@@ -66,6 +66,14 @@ from unified_api_contracts.registry.cefi_instrument_universe import (
     STAKING_SPOT_EXCEPTION,
 )
 
+# The TradFi equity/ETF MVP basis universe — the DBEQ.BASIC cash-equity twins of
+# the Binance tradfi-perp underlyings (the basis-reference leg of the equity-basis
+# arb archetype). Used by the tradfi MVP rule's equity carve-out below so those
+# cash equities/ETFs are MVP-scoped alongside the CME futures complex.
+from unified_api_contracts.registry.tradfi_ticker_universe import (
+    TRADFI_EQUITY_PERP_BASIS_UNIVERSE,
+)
+
 # Re-exported (the generic descriptor type now lives in ``config_versioning``;
 # kept importable here + at the package root for backwards compatibility).
 _canonical_repr = canonical_config_repr
@@ -488,6 +496,17 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "ES",  # S&P 500 e-mini futures/options
                 "NQ",  # Nasdaq 100 e-mini futures/options
                 "VX",  # CBOE VIX futures
+                # Commodity roots backing a Binance tradfi-perp (2026-06-24):
+                # XAU→GC, XAG→SI, XPT→PL, XPD→PA, NATGAS→NG, CL→CL, COPPER→HG.
+                # The cash-commodity twin (CME future) is the basis-reference
+                # leg of the commodity-perp basis arb → MVP-scoped.
+                "GC",  # gold (XAU)
+                "SI",  # silver (XAG)
+                "PL",  # platinum (XPT)
+                "PA",  # palladium (XPD)
+                "NG",  # natural gas (NATGAS)
+                "CL",  # WTI crude (CL)
+                "HG",  # copper (COPPER)
             }
         ),
         # sources: empty → all sources in scope (databento primary + massive secondary)
@@ -820,6 +839,22 @@ def is_mvp(
         return not (rule.sources and source not in rule.sources)
 
     if isinstance(rule, TradFiMvpRule):
+        # Equity-basis carve-out (2026-06-24): the DBEQ.BASIC cash equities/ETFs
+        # that BACK a Binance tradfi-perp are the basis-reference leg of the
+        # equity-basis arb archetype → MVP-scoped, gated to the basis universe.
+        # This is a SEPARATE gate from the CME futures complex (a flat AND across
+        # venues+types+underliers cannot express "(CME x FUTURE x {ES,NQ,VX}) OR
+        # (NASDAQ/NYSE/ARCA x EQUITY/ETF x basis-universe)" — mirrors the cefi
+        # OPTION venue carve-out pattern). data_type is still gated by the rule.
+        _itype = (instrument_type or "").strip().upper()
+        _venue_root = (venue or "").strip().upper().split("-", 1)[0]
+        if _itype in ("EQUITY", "ETF") and _venue_root in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS"):
+            if not _data_type_in_rule(data_type, rule.data_types):
+                return False
+            if (base_ccy or "").strip().upper() not in {t.upper() for t in TRADFI_EQUITY_PERP_BASIS_UNIVERSE}:
+                return False
+            return not (rule.sources and source not in rule.sources)
+        # CME futures complex (ES/NQ/VX) — the original flat-AND rule.
         if venue not in rule.venues:
             return False
         if instrument_type not in rule.instrument_types:
