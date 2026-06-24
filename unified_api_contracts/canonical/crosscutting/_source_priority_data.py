@@ -269,6 +269,23 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # pipeline_mode=batch_databento (provenance-correct) instead of batch_massive.
     # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
     ("tradfi", "ohlcv_1s"): ["databento"],
+    # GRANULAR SOURCE STRUCTURE (operator 2026-06-24): the (asset_group, data_type)
+    # key carries the BROAD-CORPUS read order (massive-first per the 2026-06-11
+    # ratification above), but the source actually USED per fetch is NOT the blanket
+    # priority[0] — it is the operator's per-launch ``--source`` (VM_SOURCE) gated by
+    # the venue-aware ``_VENUE_SOURCE_EXCLUSIONS`` (the GRANULAR slice primitive). The
+    # tradfi launchers set ``VM_SOURCE=databento`` explicitly, and for the Binance
+    # tradfi-perp BASIS tickers (the DBEQ.BASIC equities/ADRs/ETFs in
+    # ``TRADFI_EQUITY_PERP_BASIS_UNIVERSE`` + the CME commodity roots) DATABENTO is
+    # the VERIFIED-COMPLETE PRIMARY (56/56 single-equities + 10/10 representative
+    # commodity/crypto ETFs resolve in DBEQ.BASIC ohlcv-1m, live-probed 2026-06-24).
+    # massive is NOT needed for the Binance-perp list — there is NO databento gap it
+    # fills (databento covers every non-KRX underlying; KRX-only HYUNDAI/SAMSUNG/
+    # SKHYNIX are BLOCKED-DATA, served by neither). massive stays the broad-corpus
+    # primary + a GRANULAR FALLBACK for any future cell databento genuinely lacks
+    # (e.g. a non-US venue): add such a cell as a ``_VENUE_SOURCE_EXCLUSIONS`` entry
+    # (excluding databento for that venue) — that is the obvious slot to slot into.
+    # SSOT: codex/02-data/tradfi-databento-sourcing-ssot.md.
     ("tradfi", "ohlcv_1m"): ["massive", "databento"],
     ("tradfi", "ohlcv_15m"): ["massive", "databento", "yahoo", "barchart"],
     # ERA-B: options_chain / futures_chain are instrument_types captured as
