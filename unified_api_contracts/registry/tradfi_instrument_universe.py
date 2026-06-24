@@ -336,6 +336,37 @@ _CME_EVENT_CONTRACTS: list[DatabentoInstrumentDef] = [
 ]
 
 # ---------------------------------------------------------------------------
+# CME options-on-futures for the COMMODITY + INDEX basis underlyings (2026-06-24).
+# Options on the cash-commodity / index FUTURE are valid basis-arb cash legs for
+# the Binance commodity/index perps (alongside the future + the representative
+# ETF). SCOPE: commodities + indices ONLY — single-stock options are SKIPPED
+# (too many) and equity/ETF options are OPRA (NOT in our 3-dataset databento
+# allowlist GLBX.MDP3 + DBEQ.BASIC + XCBF.PITCH, NOT in massive) → IGNORED.
+# Every root below was PROBED LIVE against GLBX.MDP3 (definition + trades
+# resolve, 2026-06-24); phantom roots that did NOT resolve were DROPPED:
+# LN.OPT (NatGas alt), RTY.OPT (Russell), YM.OPT (Dow) — no GLBX.MDP3 coverage.
+# Source: databento GLBX.MDP3 primary (these are CME options-on-futures; massive
+# carries no options-on-futures, so no massive-primary tag applies here).
+_CME_COMMODITY_OPTIONS: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("OG.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "GOLD", "commodity", "OG"),
+    DatabentoInstrumentDef("SO.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "SILVER", "commodity", "SO"),
+    DatabentoInstrumentDef("PO.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "PLATINUM", "commodity", "PO"),
+    DatabentoInstrumentDef("PAO.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "PALLADIUM", "commodity", "PAO"),
+    DatabentoInstrumentDef("HXE.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "COPPER", "commodity", "HXE"),
+    DatabentoInstrumentDef("LO.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "CRUDE", "commodity", "LO"),
+    DatabentoInstrumentDef("ON.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "NATGAS", "commodity", "ON"),
+    DatabentoInstrumentDef("OH.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "HEATING_OIL", "commodity", "OH"),
+    DatabentoInstrumentDef("OB.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "GASOLINE", "commodity", "OB"),
+]
+
+# CME options-on-futures for the index basis underlyings (2026-06-24). ES options
+# already exist in _CME_ES_OPTIONS; NQ.OPT is the Nasdaq-100 add (probed live —
+# definition + trades resolve). RTY/YM options DROPPED (no GLBX.MDP3 resolve).
+_CME_INDEX_OPTIONS: list[DatabentoInstrumentDef] = [
+    DatabentoInstrumentDef("NQ.OPT", "CME", "OPTION", "GLBX.MDP3", "parent", "NASDAQ100", "equity", "NQ"),
+]
+
+# ---------------------------------------------------------------------------
 # Aggregate: all Databento instruments
 # ---------------------------------------------------------------------------
 TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
@@ -346,6 +377,8 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
     *_CME_FX_FUTURES,
     *_CME_CRYPTO_FUTURES,
     *_CME_ES_OPTIONS,
+    *_CME_COMMODITY_OPTIONS,
+    *_CME_INDEX_OPTIONS,
     *_CME_EVENT_CONTRACTS,
     *_CFE_FUTURES,
     *_BTC_SPOT_ETFS,

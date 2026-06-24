@@ -736,6 +736,25 @@ def test_capture_universe_new_venues_perp_gated() -> None:
     assert not is_in_mvp_capture_universe("BITGET-SPOT", "ETH", "SPOT_PAIR", has_perp_for_base=False)
 
 
+def test_capture_universe_binance_delivery_inverse() -> None:
+    """BINANCE-DELIVERY (COIN-M inverse) perps + futures are in the capture universe.
+
+    cefi_universe_capture_rule 2026-06-24: Binance COIN-M is the most-liquid
+    inverse margin venue for BTC/ETH. PERPETUALs self-qualify on base-membership;
+    FUTUREs also qualify (part of the futures complex). No SPOT on this venue.
+    """
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    # PERPETUAL (e.g. BTCUSD_PERP) self-qualifies on base-membership.
+    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "BTC", "PERPETUAL", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "ETH", "PERPETUAL", has_perp_for_base=False)
+    # FUTURE (dated, e.g. BTCUSD_241227) — part of futures complex, not perp-gated.
+    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "BTC", "FUTURE", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "ETH", "FUTURE", has_perp_for_base=True)
+    # Out-of-universe base: still rejected.
+    assert not is_in_mvp_capture_universe("BINANCE-DELIVERY", "NOTACOINXYZ", "PERPETUAL", has_perp_for_base=True)
+
+
 def test_capture_universe_okx_bare_token_resolves() -> None:
     """A bare OKX caller resolves to the OKX sub-venues (is_mvp base-venue normalisation)."""
     from unified_api_contracts import is_in_mvp_capture_universe
