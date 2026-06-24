@@ -103,6 +103,9 @@ EXPECTED_SOURCE_MODE_CAPABILITY: dict[str, frozenset[Mode]] = {
     # Polymarket-perp (CFTC crypto perps, launched 2026-04-21):
     # BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21). {BATCH, LIVE} until verified.
     "polymarket_perp": frozenset({Mode.BATCH, Mode.LIVE}),
+    # Extended (EXTENDED-STARKNET CeFi on-chain perp CLOB, api.starknet.extended.exchange):
+    # self-archiving native REST → {BATCH, LIVE, REPLAY}. BATCH_CAPABLE_CEFI_VENUES exception.
+    "extended": _BLR,
 }
 
 

@@ -103,6 +103,11 @@ class PipelineMode(StrEnum):
     # ``_VENUE_OVERRIDES["ASTER"]`` venue override (the hyperliquid pattern) so only
     # ASTER — not the Tardis-archived CeFi venues — picks ``batch_aster``.
     BATCH_ASTER = "batch_aster"
+    # EXTENDED-STARKNET (StarkNet on-chain CeFi perp CLOB) uses its own public REST API
+    # (api.starknet.extended.exchange/api/v1 — no Tardis archive). Self-archiving venue
+    # like ASTER/HYPERLIQUID → batch_extended via UTL ``_VENUE_OVERRIDES["EXTENDED-STARKNET"]``.
+    # SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
+    BATCH_EXTENDED = "batch_extended"
     BATCH_MASSIVE = "batch_massive"
     # MTDS L2 microstructure computed outputs (order_flow_imbalance /
     # depth_of_book_10 / queue_position) — derived from the canonical
@@ -242,6 +247,8 @@ class PipelineMode(StrEnum):
     LIVE_BYBIT = "live_bybit"
     LIVE_ASTER = "live_aster"
     REPLAY_ASTER = "replay_aster"
+    LIVE_EXTENDED = "live_extended"
+    REPLAY_EXTENDED = "replay_extended"
 
 
 _BATCH_PREFIX: Final[str] = "batch_"
