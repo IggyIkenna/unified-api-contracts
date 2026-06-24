@@ -63,11 +63,12 @@ def test_cefi_primary_is_tardis() -> None:
     assert get_primary_source("cefi", "options_chain") == "tardis"
 
 
-def test_tradfi_primary_is_massive() -> None:
-    """MASSIVE-FIRST per operator ratification 2026-06-11 (MVP catalogue
-    completion); databento is the secondary/resilience source."""
-    assert get_primary_source("tradfi", "trades") == "massive"
-    assert get_primary_source("tradfi", "options_chain") == "massive"
+def test_tradfi_primary_is_databento() -> None:
+    """DATABENTO-FIRST (2026-06-24, supersedes the 2026-06-11 massive-first): databento
+    is the verified-complete primary for the live MVP universe (Binance tradfi-perp
+    basis tickers + CME futures + CFE); massive is the fallback + bulk-backfill path."""
+    assert get_primary_source("tradfi", "trades") == "databento"
+    assert get_primary_source("tradfi", "options_chain") == "databento"
 
 
 def test_prediction_primary_is_polymarket_clob() -> None:
