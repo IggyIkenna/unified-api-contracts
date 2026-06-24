@@ -5,7 +5,7 @@ cutover archetypes are CeFi + DeFi; TradFi is only touched by the
 cross-asset hedge-overlay path the work-split scope names ("DeFi + CeFi +
 TradFi simulation paths"). So this module ships only two low-cardinality
 OHLCV generators (1-minute + daily bars) sharded ``(venue, instrument)``
-where ``venue`` is the data source (``databento`` / ``barchart``) — enough
+where ``venue`` is the data source (``databento`` / ``yahoo``) — enough
 to exercise the TradFi reader path in the benchmark harness without
 re-deriving the full TradFi universe.
 

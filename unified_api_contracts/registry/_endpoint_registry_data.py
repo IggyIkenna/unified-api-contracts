@@ -191,23 +191,8 @@ ENDPOINT_REGISTRY: list[EndpointSpec] = [
         requires_auth=True,
         cassette_status=CassetteStatus.AUTH_BLOCKED,
     ),
-    # --- Barchart ---
-    EndpointSpec(
-        venue="barchart",
-        endpoint_path="manual_csv_export",
-        http_method=None,
-        schema_class="BarchartOhlcv15m",
-        access_mode=AccessMode.BATCH_FILE,
-        data_availability=DataAvailability.HISTORICAL_ONLY,
-        version=None,
-        response_format=ResponseFormat.CSV,
-        notes=(
-            "No programmatic API. Data sourced via manual Barchart subscription CSV exports. "
-            "Timestamps in US Eastern Time."
-        ),
-        requires_auth=False,
-        cassette_status=CassetteStatus.NOT_APPLICABLE,
-    ),
+    # --- Barchart RETIRED 2026-06-24 (VIX 15m now aggregates from VX futures via
+    #     Databento XCBF.PITCH; the manual-CSV Barchart endpoint is removed). ---
     # --- The Graph / Subgraph ---
     EndpointSpec(
         venue="thegraph",
