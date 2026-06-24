@@ -74,14 +74,14 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # source on batch rows (like aster/hyperliquid — native REST, not Tardis).
     # polymarket_perp is BLOCKED-UPSTREAM-OUTAGE (DNS NXDOMAIN 2026-06-21); scaffold
     # registered for when the endpoint recovers. SSOT: prediction-perps-sourcing.md.
-    ("cefi", "trades"): ["tardis", "aster", "hyperliquid", "kalshi_perp", "polymarket_perp"],
-    ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid"],
+    ("cefi", "trades"): ["tardis", "aster", "hyperliquid", "kalshi_perp", "polymarket_perp", "extended"],
+    ("cefi", "ohlcv_1m"): ["tardis", "aster", "hyperliquid", "extended"],
     # ("cefi", "ohlcv_15m") RETIRED 2026-06-09 (operator-directed): cefi has no
     # 15m candles — the tardis entry was a planning placeholder. tradfi ohlcv_15m
     # remains (databento/massive/yahoo/barchart produce it). Exclusion entry in
     # test_validity_matrix_completeness.py removed alongside.
-    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid"],
-    ("cefi", "liquidations"): ["tardis", "aster", "hyperliquid"],
+    ("cefi", "book_snapshot"): ["tardis", "aster", "hyperliquid", "extended"],
+    ("cefi", "liquidations"): ["tardis", "aster", "hyperliquid", "extended"],
     # derivative_ticker (perp mark/index/OI/funding). tardis is the multi-venue T+1
     # archive BATCH primary for every Tardis-covered CeFi perp venue (binance/okx/
     # bybit/deribit → batch_tardis, resolved via this index-0 entry). **aster** is the
@@ -95,7 +95,7 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     # venue-override Aster shard). source_required becomes True, but every
     # derivative_ticker writer already passes an explicit source. SSOT:
     # ``perp_funding_data_semantics_and_cadence_2026_06_16.md`` §genesis.
-    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid"],
+    ("cefi", "derivative_ticker"): ["tardis", "aster", "hyperliquid", "extended"],
     # ERA-B (operator 2026-06-07): options_chain / futures_chain are
     # INSTRUMENT_TYPES (per-underlying chain bundles), captured as data_type=trades
     # — so the Era-B writer resolves source via ``(cefi, "trades")`` above (same
@@ -456,6 +456,11 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
     # replay capable. It is NOT Tardis-archived; the Aster derivative_ticker shard
     # resolves to ``batch_aster`` via the UTL ``_VENUE_OVERRIDES["ASTER"]`` override.
     "aster": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
+    # Extended (EXTENDED-STARKNET on-chain CeFi perp CLOB) uses its own public REST API
+    # (api.starknet.extended.exchange) — NOT Tardis-archived. Self-archives its trade +
+    # funding tape → batch + replay capable. WS live stream = LIVE capable. Same pattern
+    # as aster. SSOT: data_completion_to_100_all_ag_2026_06_21.md task-085.
+    "extended": frozenset({Mode.BATCH, Mode.LIVE, Mode.REPLAY}),
     # Kalshi-perp (CFTC crypto perps, launched 2026-05-29): public-read REST
     # (GET /markets/{ticker}/trades + /funding_rates, cursor-paginated).
     # Self-archives its own trade + funding tape → batch + replay capable.
@@ -469,10 +474,23 @@ SOURCE_MODE_CAPABILITY: Final[dict[str, frozenset[Mode]]] = {
 }
 
 CEFI_LIVE_VENUES: Final[frozenset[str]] = frozenset(
-    {"binance", "okx", "deribit", "kraken", "hyperliquid", "bybit", "aster", "kalshi_perp", "polymarket_perp"}
+    {
+        "binance",
+        "okx",
+        "deribit",
+        "kraken",
+        "hyperliquid",
+        "bybit",
+        "aster",
+        "kalshi_perp",
+        "polymarket_perp",
+        "extended",
+    }
 )
 
-BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset({"hyperliquid", "aster", "kalshi_perp", "polymarket_perp"})
+BATCH_CAPABLE_CEFI_VENUES: Final[frozenset[str]] = frozenset(
+    {"hyperliquid", "aster", "kalshi_perp", "polymarket_perp", "extended"}
+)
 """CeFi live venues that are ALSO a batch source (operator R4 2026-06-07 + Aster
 2026-06-16).
 
@@ -548,6 +566,7 @@ EMISSION_LATENCY_MS_BY_SOURCE: Final[dict[str, int]] = {
     # DeFi REST APIs — Hyperliquid + oracle aggregators.
     "hyperliquid": 1_000,  # 1s: HL REST API polling cadence (source=hyperliquid, transport=rest)
     "aster": 1_000,  # 1s: Aster native REST polling cadence (source=aster, transport=rest)
+    "extended": 1_000,  # 1s: EXTENDED-STARKNET native REST polling cadence (source=extended, transport=rest)
     "pyth_hermes": 1_000,  # 1s: Pyth Hermes batch endpoint
     "chainlink": 200,  # 200ms: on-chain EVM oracle aggregator round (RPC-style)
     # Solana native-staking sources — epoch-granularity (~2.5 day cadence).
