@@ -424,6 +424,16 @@ ETF_TICKERS: list[str] = [
     "SLX",  # VanEck Steel
     "URNM",  # Sprott Uranium Miners
     "UVXY",  # ProShares Ultra VIX Short-Term Futures
+    # Commodity/crypto REPRESENTATIVE ETFs for the Binance commodity/crypto perps
+    # (operator 2026-06-24): the perp carry trade (short Binance perp + long
+    # underlying) works via an ETF too (ETF ~ underlying), so these are valid
+    # basis-arb underlyings alongside the CME futures roots. All DBEQ.BASIC-covered
+    # (databento primary; verified ohlcv-1m). GLD/SLV/USO/UNG/IBIT/ETHA already
+    # above; IAU/PPLT/PALL/CPER are the missing platinum-group + copper + alt-gold.
+    "IAU",  # iShares Gold (XAU alt to GLD)
+    "PPLT",  # abrdn Physical Platinum (XPT)
+    "PALL",  # abrdn Physical Palladium (XPD)
+    "CPER",  # United States Copper Index (COPPER)
 ]
 
 TRADFI_FUTURES_PRODUCTS: list[str] = [
@@ -456,3 +466,126 @@ TRADFI_TICKER_UNIVERSE: dict[str, list[str]] = {
     "etf_tickers": ETF_TICKERS,
     "futures_products": TRADFI_FUTURES_PRODUCTS,
 }
+
+# ──────────────────────────────────────────────────────────────────────────
+# TradFi equity/ETF MVP basis universe — the cash-equity twins of the Binance
+# (BINANCE-FUTURES PERPETUAL) tradfi-perp underlyings (2026-06-24). These are
+# the DBEQ.BASIC equities/ETFs that BACK a crypto-venue equity-perp, so they
+# are the BASIS-REFERENCE leg of the equity-basis arb archetype and MUST be
+# MVP-scoped (the cash leg the perp is measured against). Index-perps map to
+# their ETF proxy (SPX/SPY→SPY, SOXL→SMH, …). Commodities are roots in
+# TRADFI_FUTURES_PRODUCTS (PA/PL/GC/SI/HG/NG/CL), gated by the futures rule;
+# KRX-only names (HYUNDAI/SAMSUNG/SKHYNIX) are BLOCKED-DATA (no US-listed twin).
+# Consumed by the tradfi MVP rule's equity carve-out (mvp_scope.is_mvp).
+# Operator 2026-06-24: every Binance tradfi-perp underlying is captured — NOT LESS.
+TRADFI_EQUITY_PERP_BASIS_UNIVERSE: frozenset[str] = frozenset(
+    {
+        "AAOI",
+        "AAPL",
+        "ADBE",
+        "ALAB",
+        "AMAT",
+        "AMD",
+        "AMZN",
+        "ARM",
+        "ASML",
+        "ASTS",
+        "AVGO",
+        "AXTI",
+        "BABA",
+        "BE",
+        "BMNR",
+        "BRK.B",
+        "BRKB",
+        "CFG",
+        "CIEN",
+        "COHR",
+        "COIN",
+        "COST",
+        "CRCL",
+        "CRDO",
+        "CRM",
+        "CRWD",
+        "CRWV",
+        "CSCO",
+        "DELL",
+        "DIA",
+        "DIS",
+        "DKNG",
+        "EBAY",
+        "EWJ",
+        "EWT",
+        "EWY",
+        "EWZ",
+        "FLNC",
+        "GLW",
+        "GME",
+        "GOOGL",
+        "HD",
+        "HIMS",
+        "HOOD",
+        "HPE",
+        "IBM",
+        "INTC",
+        "IREN",
+        "IWM",
+        "JPM",
+        "KLAC",
+        "LITE",
+        "LLY",
+        "LRCX",
+        "META",
+        "MRVL",
+        "MSFT",
+        "MSTR",
+        "MU",
+        "NBIS",
+        "NFLX",
+        "NOK",
+        "NOW",
+        "NVDA",
+        "NVO",
+        "ONDS",
+        "ORCL",
+        "PAYP",
+        "PLTR",
+        "QCOM",
+        "QQQ",
+        "RIVN",
+        "RKLB",
+        "ROBO",
+        "SLX",
+        "SMCI",
+        "SMH",
+        "SNDK",
+        "SONY",
+        "SPCX",
+        "SPY",
+        "TSLA",
+        "TSM",
+        "UBER",
+        "URNM",
+        "USAR",
+        "UVXY",
+        "V",
+        "WDC",
+        "WMT",
+        "XLE",
+        "ZM",
+        # Commodity/crypto representative ETFs (operator 2026-06-24) — the perp
+        # carry trade also works long-ETF (ETF ~ underlying), so these are valid
+        # basis-arb cash-leg underlyings for the Binance commodity/crypto perps:
+        # XAU→GLD/IAU, XAG→SLV, XPT→PPLT, XPD→PALL, COPPER→CPER, CL→USO,
+        # NATGAS→UNG, BTC→IBIT, ETH→ETHA. All DBEQ.BASIC-covered (databento primary).
+        "GLD",
+        "IAU",
+        "SLV",
+        "PPLT",
+        "PALL",
+        "CPER",
+        "USO",
+        "UNG",
+        "IBIT",
+        "ETHA",
+    }
+)
