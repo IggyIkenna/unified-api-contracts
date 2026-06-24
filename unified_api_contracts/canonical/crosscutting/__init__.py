@@ -78,6 +78,8 @@ from .lifecycle_class import DeploymentKind as DeploymentKind
 from .lifecycle_class import DeploymentTarget as DeploymentTarget
 from .lifecycle_class import DeploymentUmbrella as DeploymentUmbrella
 from .lifecycle_class import LifecycleClass as LifecycleClass
+from .lifecycle_class import ShardResponsibility as ShardResponsibility
+from .lifecycle_class import ShardResponsibilityKind as ShardResponsibilityKind
 from .lifecycle_class import VmPrefixSpec as VmPrefixSpec
 from .lifecycle_class import classify_cloud_run_service as classify_cloud_run_service
 from .lifecycle_class import classify_experiment_run as classify_experiment_run

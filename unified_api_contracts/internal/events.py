@@ -194,6 +194,10 @@ class LifecycleEventType(StrEnum):
     # Downstream: Phase 2 (time-versioned governance_params parquet) + Phase 3
     # (features-onchain APR calculator asof reads) consume this event.
     GOVERNANCE_PARAMS_CHANGED = "GOVERNANCE_PARAMS_CHANGED"
+    # Phase 5: Snapshot.org space monitoring (proactive, off-chain).
+    # Emitted by the MTDS SnapshotSpaceMonitor when a parameter-change proposal
+    # opens in aavedao, comp-vote, or morpho spaces. Payload: GovernanceProposalLiveDetails.
+    GOVERNANCE_PROPOSAL_LIVE = "GOVERNANCE_PROPOSAL_LIVE"
 
 
 # Backward-compat alias — LogLevel is the canonical severity enum (modes.py).
@@ -980,3 +984,36 @@ class GovernanceParamsChangedEvent(BaseModel):
     service: str
     timestamp: datetime
     details: GovernanceParamsChangedDetails
+
+
+# ---------------------------------------------------------------------------
+# Phase 5 — GOVERNANCE_PROPOSAL_LIVE (Snapshot.org proactive monitoring)
+# Emitted by MTDS SnapshotSpaceMonitor every 6h when a parameter-change
+# proposal opens in the aavedao / comp-vote / morpho Snapshot spaces.
+# ---------------------------------------------------------------------------
+
+
+class GovernanceProposalLiveDetails(BaseModel):
+    """Payload for GOVERNANCE_PROPOSAL_LIVE events."""
+
+    space: str = Field(description="Snapshot space id: aavedao | comp-vote | morpho")
+    proposal_id: str = Field(description="Snapshot proposal id (hex string)")
+    title: str = Field(description="Proposal title as returned by the Snapshot GraphQL API")
+    matched_params: list[str] = Field(
+        description=(
+            "Governance parameter keywords matched in title/body: "
+            "ltv | liquidation_threshold | borrow_cap | supply_cap | irm | interest_rate | kink | slope"
+        )
+    )
+    state: str = Field(description="Snapshot proposal state at detection time: active | pending")
+    posted_at: int = Field(description="Proposal created timestamp (Unix epoch seconds)")
+    url: str = Field(description="Direct Snapshot.org proposal URL")
+
+
+class GovernanceProposalLiveEvent(BaseModel):
+    """Typed wrapper for GOVERNANCE_PROPOSAL_LIVE events."""
+
+    event: Literal[LifecycleEventType.GOVERNANCE_PROPOSAL_LIVE] = LifecycleEventType.GOVERNANCE_PROPOSAL_LIVE
+    service: str
+    timestamp: datetime
+    details: GovernanceProposalLiveDetails

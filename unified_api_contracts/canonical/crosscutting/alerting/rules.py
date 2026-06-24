@@ -1031,6 +1031,19 @@ LIVE_ALERT_RULES: Final[tuple[AlertRule, ...]] = (
             " Operator-page only — NOT auto-action. Investigate before escalating."
         ),
     ),
+    AlertRule(
+        code=AlertCode.GOVERNANCE_PROPOSAL_LIVE,
+        event_pattern="GOVERNANCE_PROPOSAL_LIVE",
+        severity=AlertSeverity.HIGH,
+        channels=(AlertChannel.PAGERDUTY, AlertChannel.TELEGRAM),
+        runbook_doc=_runbook("governance_proposal_live"),
+        description=(
+            "Snapshot.org governance proposal targeting DeFi protocol parameters"
+            " (LTV / liquidation threshold / borrow-supply cap / IRM kink)"
+            " opened in aavedao, comp-vote, or morpho space."
+            " Operator-page only — NOT auto-action. Investigate before escalating."
+        ),
+    ),
     # ── QG / infra staleness (2026-05-15, B-018 Phase 4.A monitoring) ────────
     AlertRule(
         code=AlertCode.QG_SNAPSHOT_STALE,
