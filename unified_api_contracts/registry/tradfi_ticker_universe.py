@@ -424,6 +424,16 @@ ETF_TICKERS: list[str] = [
     "SLX",  # VanEck Steel
     "URNM",  # Sprott Uranium Miners
     "UVXY",  # ProShares Ultra VIX Short-Term Futures
+    # Commodity/crypto REPRESENTATIVE ETFs for the Binance commodity/crypto perps
+    # (operator 2026-06-24): the perp carry trade (short Binance perp + long
+    # underlying) works via an ETF too (ETF ~ underlying), so these are valid
+    # basis-arb underlyings alongside the CME futures roots. All DBEQ.BASIC-covered
+    # (databento primary; verified ohlcv-1m). GLD/SLV/USO/UNG/IBIT/ETHA already
+    # above; IAU/PPLT/PALL/CPER are the missing platinum-group + copper + alt-gold.
+    "IAU",  # iShares Gold (XAU alt to GLD)
+    "PPLT",  # abrdn Physical Platinum (XPT)
+    "PALL",  # abrdn Physical Palladium (XPD)
+    "CPER",  # United States Copper Index (COPPER)
 ]
 
 TRADFI_FUTURES_PRODUCTS: list[str] = [
@@ -562,5 +572,20 @@ TRADFI_EQUITY_PERP_BASIS_UNIVERSE: frozenset[str] = frozenset(
         "WMT",
         "XLE",
         "ZM",
+        # Commodity/crypto representative ETFs (operator 2026-06-24) — the perp
+        # carry trade also works long-ETF (ETF ~ underlying), so these are valid
+        # basis-arb cash-leg underlyings for the Binance commodity/crypto perps:
+        # XAU→GLD/IAU, XAG→SLV, XPT→PPLT, XPD→PALL, COPPER→CPER, CL→USO,
+        # NATGAS→UNG, BTC→IBIT, ETH→ETHA. All DBEQ.BASIC-covered (databento primary).
+        "GLD",
+        "IAU",
+        "SLV",
+        "PPLT",
+        "PALL",
+        "CPER",
+        "USO",
+        "UNG",
+        "IBIT",
+        "ETHA",
     }
 )
