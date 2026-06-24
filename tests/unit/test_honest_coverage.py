@@ -19,7 +19,10 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     EVENT_CONTRACT_ROOT_CLUSTERS,
     EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
+    OUT_OF_COVERAGE_WINDOW_REASONS,
+    CaptureStatusCounts,
     EmptyConfirmedReason,
+    compute_honest_coverage,
     extract_es_options_cluster,
     futures_expiry_bucket,
     parse_futures_expiry,
@@ -381,3 +384,52 @@ def test_schedule_defining_fixtures_empty_is_resolved() -> None:
     assert is_resolved_schedule_empty(None, "SOURCE_RETURNED_ZERO") is False
     assert is_resolved_schedule_empty("FIXTURES", None) is False
     assert is_resolved_schedule_empty("FIXTURES", "") is False
+
+
+# ---------------------------------------------------------------------------
+# compute_honest_coverage — out-of-window clip (43c, 2026-06-23)
+# ---------------------------------------------------------------------------
+
+
+def test_compute_honest_coverage_default_out_of_window_is_zero() -> None:
+    """Unmigrated callers (no out_of_window) keep the legacy numerator-credit
+    behaviour — back-compatible."""
+    counts = CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5)
+    assert counts.out_of_window == 0
+    assert compute_honest_coverage(counts) == pytest.approx(60 / 65)
+
+
+def test_compute_honest_coverage_clips_out_of_window_from_both_num_and_denom() -> None:
+    """Out-of-life empties are clipped from BOTH numerator and denominator so an
+    out-of-window cell reads as a blank, not coverage credit (operator 2026-06-23)."""
+    # 49 of the 50 empties are out-of-life (e.g. EXPECTED_INSTRUMENT_NOT_LISTED).
+    counts = CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5, out_of_window=49)
+    # within_window_empty = 1; numerator = 10 + 1 = 11; denominator = 11 + 5 = 16.
+    assert compute_honest_coverage(counts) == pytest.approx(11 / 16)
+
+
+def test_compute_honest_coverage_clip_differs_from_credit_when_failures_present() -> None:
+    """The clip is materially lower than numerator-credit precisely when there are
+    attempted_failed/pending cells — the prediction-POLYMARKET inflation case."""
+    credit = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5))
+    clip = compute_honest_coverage(
+        CaptureStatusCounts(captured=10, empty_confirmed=50, attempted_failed=5, out_of_window=49)
+    )
+    assert clip < credit
+
+
+def test_compute_honest_coverage_clip_no_effect_without_failures() -> None:
+    """With zero failed/pending cells, clip and credit agree (both 1.0) — the
+    docstring's original equivalence holds only in that case."""
+    credit = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50))
+    clip = compute_honest_coverage(CaptureStatusCounts(captured=10, empty_confirmed=50, out_of_window=49))
+    assert credit == pytest.approx(1.0)
+    assert clip == pytest.approx(1.0)
+
+
+def test_out_of_coverage_window_reasons_carry_lifecycle_reasons() -> None:
+    """The three out-of-life prediction reasons the operator flagged are in the
+    canonical out-of-window set (so producers classify them as clippable)."""
+    assert "EXPECTED_INSTRUMENT_NOT_LISTED" in OUT_OF_COVERAGE_WINDOW_REASONS
+    assert "EXPECTED_INSTRUMENT_DELISTED" in OUT_OF_COVERAGE_WINDOW_REASONS
+    assert "EXPECTED_PRE_VENUE_LAUNCH" in OUT_OF_COVERAGE_WINDOW_REASONS
