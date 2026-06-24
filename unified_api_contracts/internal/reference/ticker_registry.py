@@ -512,6 +512,11 @@ _ARCA: Final[frozenset[str]] = frozenset(
         "SLX",
         "URNM",
         "UVXY",
+        # Commodity/crypto representative ETFs (basis-arb cash leg, 2026-06-24)
+        "IAU",
+        "PPLT",
+        "PALL",
+        "CPER",
     }
 )
 
