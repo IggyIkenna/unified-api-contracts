@@ -224,6 +224,9 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # Centralized exchanges (Tardis API)
         "BINANCE-SPOT",
         "BINANCE-FUTURES",
+        # Binance COIN-M (inverse/delivery) perps + dated futures. Distinct endpoint
+        # from BINANCE-FUTURES (USDT-M linear). cefi_universe_capture_rule 2026-06-24.
+        "BINANCE-DELIVERY",
         "BYBIT",
         "OKX",
         "DERIBIT",

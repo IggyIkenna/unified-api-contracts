@@ -58,6 +58,9 @@ class VenueMapping:
             # 2026-05-12: Lighter (zkSync L2) — Tardis coverage from 2026-04-17.
             # Pre-2026-04-17 falls through to REST /candles in MTDS adapter.
             "lighter-zksync",
+            # 2026-06-24: Binance COIN-M (inverse/delivery) perps + futures.
+            # Distinct Tardis endpoint from ``binance-futures`` (USDT-M linear).
+            "binance-delivery",
         ]
     )
 
@@ -187,6 +190,9 @@ class VenueMapping:
             # 2026-05-12 — Lighter (Tardis coverage from 2026-04-17).
             # MTDS routes pre-2026-04-17 dates to REST /candles; post to Tardis.
             "lighter-zksync": "LIGHTER-ZKSYNC",
+            # 2026-06-24: Binance COIN-M (inverse/delivery) perps + futures.
+            # Distinct canonical venue from BINANCE-FUTURES (USDT-M linear).
+            "binance-delivery": "BINANCE-DELIVERY",
         }
     )
 
@@ -227,6 +233,10 @@ class VenueMapping:
             # Start dates = earliest manifest data, NOT exchange founding dates
             "BINANCE-SPOT": "2020-01-01",
             "BINANCE-FUTURES": "2019-11-17",
+            # Binance COIN-M (inverse/delivery) — Tardis ``binance-delivery``
+            # availableSince 2020-01-01 (Binance COIN-M launched 2019-09-13;
+            # Tardis archive starts 2020-01-01 for this endpoint).
+            "BINANCE-DELIVERY": "2020-01-01",
             "DERIBIT": "2019-03-30",
             "BYBIT": "2020-01-01",
             # Bybit spot — Tardis ``bybit-spot`` availableSince 2021-12-04.
@@ -759,6 +769,11 @@ class VenueMapping:
             ("BINANCE-SPOT", "SPOT_PAIR"): "binance",
             ("BINANCE-FUTURES", "PERPETUAL"): "binance-futures",
             ("BINANCE-FUTURES", "FUTURE"): "binance-futures",
+            # Binance COIN-M (inverse/delivery) — distinct endpoint from USDT-M.
+            # Perps (e.g. BTCUSD_PERP) and dated futures (e.g. BTCUSD_241227)
+            # both live on this endpoint (2026-06-24).
+            ("BINANCE-DELIVERY", "PERPETUAL"): "binance-delivery",
+            ("BINANCE-DELIVERY", "FUTURE"): "binance-delivery",
             # OKX mappings (CRITICAL: instrument_type determines endpoint)
             ("OKX", "SPOT_PAIR"): "okex",
             ("OKX", "PERPETUAL"): "okex-swap",
@@ -817,6 +832,8 @@ class VenueMapping:
             # Tier 3
             "huobi": ["SPOT_PAIR"],
             "huobi-dm": ["PERPETUAL", "FUTURE"],
+            # 2026-06-24: Binance COIN-M (inverse/delivery)
+            "binance-delivery": ["PERPETUAL", "FUTURE"],
         }
     )
 
