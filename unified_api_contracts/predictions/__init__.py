@@ -48,6 +48,16 @@ from unified_api_contracts.canonical.domain.predictions.classifiers import (
     classify_kalshi_to_canonical_group,
     classify_polymarket_to_canonical_group,
 )
+from unified_api_contracts.canonical.domain.predictions.cross_venue_mapping import (
+    build_cross_venue_mapping,
+    match_key,
+)
+from unified_api_contracts.canonical.domain.predictions.fixture_parsing import (
+    SportsFixtureKey,
+    normalize_participant,
+    parse_kalshi_sports_fixture,
+    parse_polymarket_sports_fixture,
+)
 from unified_api_contracts.canonical.domain.predictions.lifecycle import (
     MarketLifecycle,
     expected_market_ids_for_canonical_group,
@@ -77,11 +87,17 @@ __all__ = [
     "MarketLifecycle",
     "PredictionBetType",
     "PredictionUnderlying",
+    "SportsFixtureKey",
     "bet_type_for_group",
+    "build_cross_venue_mapping",
     "classify_kalshi_to_canonical_group",
     "classify_polymarket_to_canonical_group",
     "cross_venue_underlying_overlap",
     "expected_market_ids_for_canonical_group",
     "is_market_active_at",
+    "match_key",
+    "normalize_participant",
+    "parse_kalshi_sports_fixture",
+    "parse_polymarket_sports_fixture",
     "underlying_for_group",
 ]

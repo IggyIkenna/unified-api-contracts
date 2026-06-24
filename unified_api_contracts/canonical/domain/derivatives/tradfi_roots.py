@@ -157,6 +157,7 @@ TRADFI_ROOTS: dict[str, RootMetadata] = {
     "SI": RootMetadata("SI", CATEGORY_METALS_FUTURES, "SILVER", "CME", DATASET_CME, "commodity"),
     "HG": RootMetadata("HG", CATEGORY_METALS_FUTURES, "COPPER", "CME", DATASET_CME, "commodity"),
     "PL": RootMetadata("PL", CATEGORY_METALS_FUTURES, "PLATINUM", "CME", DATASET_CME, "commodity"),
+    "PA": RootMetadata("PA", CATEGORY_METALS_FUTURES, "PALLADIUM", "CME", DATASET_CME, "commodity"),
     # ── CME Grains Futures ─────────────────────────────────────────────────
     "ZC": RootMetadata("ZC", CATEGORY_GRAINS_FUTURES, "CORN", "CME", DATASET_CME, "commodity"),
     "ZW": RootMetadata("ZW", CATEGORY_GRAINS_FUTURES, "WHEAT", "CME", DATASET_CME, "commodity"),

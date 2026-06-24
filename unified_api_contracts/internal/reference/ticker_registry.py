@@ -223,6 +223,30 @@ _NASDAQ: Final[frozenset[str]] = frozenset(
         "XEL",
         "ZM",
         "ZS",
+        # Binance TradFi-perp NASDAQ single stocks (basis-arb superset, 2026-06-24)
+        "ARM",
+        "AAOI",
+        "ALAB",
+        "ASTS",
+        "AXTI",
+        "COIN",
+        "CRDO",
+        "CRWV",
+        "DKNG",
+        "EBAY",
+        "FLNC",
+        "IREN",
+        "LITE",
+        "MSTR",
+        "NBIS",
+        "ONDS",
+        "PAYP",
+        "PLTR",
+        "RKLB",
+        "SMCI",
+        "SNDK",
+        "SPCX",
+        "USAR",
     }
 )
 
@@ -386,6 +410,23 @@ _NYSE: Final[frozenset[str]] = frozenset(
         "YUM",
         "ZBH",
         "ZTS",
+        # Binance TradFi-perp NYSE single stocks / ADRs (basis-arb superset, 2026-06-24)
+        "BE",
+        "BMNR",
+        "CFG",
+        "CIEN",
+        "COHR",
+        "CRCL",
+        "GLW",
+        "GME",
+        "HIMS",
+        "HPE",
+        "NOW",
+        "BABA",
+        "NOK",
+        "NVO",
+        "SONY",
+        "TSM",
     }
 )
 
@@ -464,6 +505,13 @@ _ARCA: Final[frozenset[str]] = frozenset(
         "MCHI",
         "IVV",
         "VOO",
+        # Binance TradFi-perp index/sector ETFs (basis-arb superset, 2026-06-24)
+        "EWT",
+        "EWY",
+        "ROBO",
+        "SLX",
+        "URNM",
+        "UVXY",
     }
 )
 
