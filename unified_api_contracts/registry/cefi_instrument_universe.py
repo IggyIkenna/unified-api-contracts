@@ -176,6 +176,18 @@ CEFI_OPTIONS_UNDERLYINGS: frozenset[str] = frozenset({
 # Pre-IPO / no-real-twin symbols (SPACEX, etc.) are tracked separately in the
 # crypto_equity_link module (STANDALONE_EQUITY_PERP_SYMBOLS).
 # Operator-seeded 2026-06-20: OKX 17 US equity perps + Binance/Bybit reps.
+#
+# FULL BINANCE TRADFI-PERP SYMMETRY (2026-06-24): expanded to cover EVERY
+# BINANCE-FUTURES PERPETUAL tradfi underlying so each Binance tradfi PERP is
+# cefi-MVP, SYMMETRIC with the tradfi MVP list covering the captured UNDERLYING
+# (`TRADFI_EQUITY_PERP_BASIS_UNIVERSE`). The base_asset here is the RAW Binance
+# form (XAU/XAG/NATGAS/COPPER/CL/XPT/XPD for commodities; the ticker for
+# equities/ETFs/indices) — that is the cefi perp's base_ccy axis. This is the
+# CEFI-SIDE of the equity/commodity-basis arc: each Binance tradfi PERP (cefi
+# MVP) <-> its captured tradfi UNDERLYING (tradfi MVP), both MVP. Crypto perps
+# (BTC/ETH/SOL/…) are NOT here — only the tradfi-underlying perps. The 3 KRX
+# names (HYUNDAI/SAMSUNG/SKHYNIX, or the OKX KRX codes below) are perp-side MVP
+# but their tradfi UNDERLYING is BLOCKED-DATA (no US-listed cash twin).
 CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     # --- US equities (OKX 17-perp universe + Binance/Bybit verified coverage) ---
     "AAPL",     # Apple
@@ -199,6 +211,19 @@ CEFI_EQUITY_PERP_BASE_UNIVERSE: frozenset[str] = frozenset({
     "005930",   # Samsung Electronics (KRX code)
     "000660",   # SK Hynix (KRX code)
     "005380",   # Hyundai Motor (KRX code)
+    # --- Binance tradfi-perp single stocks / ADRs (2026-06-24 symmetry) ---
+    "AAOI", "ADBE", "ALAB", "AMAT", "ARM", "ASML", "ASTS", "AVGO", "AXTI",
+    "BE", "BMNR", "BRKB", "CFG", "CIEN", "COHR", "COST", "CRCL", "CRDO", "CRM",
+    "CRWD", "CRWV", "CSCO", "DELL", "DIS", "DKNG", "EBAY", "FLNC", "GLW", "HD",
+    "HIMS", "HOOD", "HPE", "IBM", "IREN", "JPM", "KLAC", "LITE", "LLY", "LRCX",
+    "MRVL", "MU", "NBIS", "NOK", "NOW", "NVO", "ONDS", "ORCL", "PAYP", "QCOM",
+    "RIVN", "RKLB", "SMCI", "SNDK", "SONY", "SPCX", "TSM", "UBER", "USAR",
+    "WDC", "WMT", "V", "ZM",
+    # --- Binance tradfi-perp commodities (RAW base_asset form) ---
+    "XAU", "XAG", "XPT", "XPD", "NATGAS", "COPPER", "CL",
+    # --- Binance tradfi-perp indices / sector + commodity ETFs ---
+    "SPX", "SPY", "QQQ", "IWM", "DIA", "SOXL", "XLE", "EWJ", "EWZ", "EWT",
+    "EWY", "ROBO", "SLX", "URNM", "UVXY", "INX",
 })
 
 # Staking / restaking / liquid-staking (LST) / liquid-restaking (LRT) tokens
