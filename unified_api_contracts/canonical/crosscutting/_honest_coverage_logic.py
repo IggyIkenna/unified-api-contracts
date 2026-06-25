@@ -162,6 +162,84 @@ def compute_honest_coverage(counts: CaptureStatusCounts) -> float:
 
 
 # ---------------------------------------------------------------------------
+# Layered coverage — TWO numbers per (asset_group, venue, ...), BOTH via
+# :func:`compute_honest_coverage` (operator direction 2026-06-24, the
+# instruments-foundation standard §2). The SSOT arithmetic is unchanged: a
+# producer buckets the SAME manifest rows two ways and calls the SAME function,
+# so day vs depth can NEVER diverge from the single formula the deployment-UI
+# renders.
+#
+# * ``day_coverage`` — grain = the venue-DAY cell. Numerator/denominator count
+#   one unit per expected ``(venue, day)`` (the manifest row for an
+#   instruments-capture shard, or the per-day rollup of a market-data shard).
+#   Catches "a day has nothing" — day-gaps that were silently ABSENT (the
+#   2026-06-24 cefi 06-19/20/21 holes) once the expected-universe materialises
+#   them as ``expected_unattempted_pending_fetch``.
+#
+# * ``depth_coverage`` — grain = the INSTRUMENT within a venue-day. The producer
+#   weights each ``CaptureStatusCounts`` field by the instrument count (captured
+#   = Σ ``instrument_count`` of honestly-answered cells; the
+#   ``expected_unattempted_pending_fetch`` / ``attempted_failed`` weight = the
+#   §2.1 oracle's EXPECTED depth for that venue-day). Catches "the day is there
+#   but thin" — a venue-day ``captured`` with 41 of thousands.
+#
+# A green ``day_coverage`` with a low ``depth_coverage`` is the explicit
+# "every day present, but days are under-populated" signal. Both surface
+# together: manifest → ``/data-status`` → deployment-api → deployment-ui.
+# ---------------------------------------------------------------------------
+
+
+class LayeredCoverage(NamedTuple):
+    """The two honest-coverage layers + the counts each was computed from.
+
+    Both :attr:`day_coverage` and :attr:`depth_coverage` are produced by
+    :func:`compute_honest_coverage` over a :class:`CaptureStatusCounts` — the
+    ONLY coverage formula in the workspace — so the deployment-ui drilldown and
+    every CLI/QG read the same two numbers off the same manifest. The
+    `*_counts` fields are carried so a consumer can render the breakdown
+    (captured / empty / failed / pending) behind each %, never recomputing.
+
+    Construct via :func:`compute_layered_coverage` (which guarantees the floats
+    match the counts); the positional NamedTuple shape is for ergonomic
+    destructuring at the call site.
+    """
+
+    day_coverage: float
+    depth_coverage: float
+    day_counts: CaptureStatusCounts
+    depth_counts: CaptureStatusCounts
+
+
+def compute_layered_coverage(
+    day_counts: CaptureStatusCounts,
+    depth_counts: CaptureStatusCounts,
+) -> LayeredCoverage:
+    """Compute the day + depth coverage layers, BOTH through the SSOT formula.
+
+    The single seam every layered-coverage producer (UTL ``read_capture_status_counts``,
+    deployment-api coverage rollup) MUST go through so the two numbers can never
+    drift from :func:`compute_honest_coverage`. ``day_counts`` are venue-day-cell
+    grain (one unit per expected ``(venue, day)``); ``depth_counts`` are
+    instrument-weighted (each field summed over ``instrument_count`` / the §2.1
+    oracle's expected depth). See the module note above + the instruments-
+    foundation standard §2 (``codex/02-data/instruments-foundation-and-catalogue-completeness.md``).
+
+    Args:
+        day_counts: Capture-status counts at venue-day-cell grain.
+        depth_counts: Capture-status counts weighted by instrument depth.
+
+    Returns:
+        A :class:`LayeredCoverage` carrying both ratios + both count tuples.
+    """
+    return LayeredCoverage(
+        day_coverage=compute_honest_coverage(day_counts),
+        depth_coverage=compute_honest_coverage(depth_counts),
+        day_counts=day_counts,
+        depth_counts=depth_counts,
+    )
+
+
+# ---------------------------------------------------------------------------
 # Schedule-defining data_types — "empty source response == complete" (operator
 # direction 2026-06-23).
 #
