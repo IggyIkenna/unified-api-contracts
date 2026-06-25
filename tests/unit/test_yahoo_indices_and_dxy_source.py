@@ -23,7 +23,7 @@ from unified_api_contracts.registry.data_source_continuity import (
 )
 from unified_api_contracts.registry.tradfi_instrument_universe import YAHOO_INDICES
 
-_TREASURY_TENORS = {"US3M": "^IRX", "US5Y": "^FVX", "US10Y": "^TNX", "US30Y": "^TYX"}
+_TREASURY_TENORS = {"US3M": "^IRX", "US2Y": "2YY=F", "US5Y": "^FVX", "US10Y": "^TNX", "US30Y": "^TYX"}
 
 
 @pytest.mark.unit

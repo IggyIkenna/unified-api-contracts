@@ -478,11 +478,16 @@ YAHOO_INDICES: list[YahooIndexDef] = [
     # subscription purge (which retired only ICE *Databento* datasets, e.g. BRN Brent).
     YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", date(2019, 1, 2), "fx"),
     # CBOE interest-rate indices — daily ohlcv_24h via Yahoo. Each "close" is the
-    # par yield in percent (e.g. 4.53 = 4.53%). Full history back to 2000-01-03
-    # (6,642 daily bars empirically confirmed 2026-06-11). Yahoo has no live 2Y
-    # yield (2YY=F is stale, zero-volume futures), so the usable tenors are
-    # 3M / 5Y / 10Y / 30Y — enough to compute curve slopes and forward rates.
+    # par yield in percent (e.g. 4.53 = 4.53%). The cash-yield tenors (3M/5Y/10Y/30Y,
+    # ^IRX/^FVX/^TNX/^TYX) have full history back to 2000-01-03 (6,642 daily bars
+    # empirically confirmed 2026-06-11). US2Y ADDED 2026-06-25 (operator: the target
+    # curve is 3M/2Y/5Y/10Y) via the only Yahoo 2Y series — the 2-Year Yield future
+    # ``2YY=F`` (CME yield-futures; later genesis than the cash tenors). 2YY=F was
+    # previously noted stale/zero-volume; the operator directs including it anyway —
+    # backfill honest-absence surfaces freshness. Genesis 2018-08-13 (CME yield-futures
+    # launch) is a best-estimate — VERIFY the true first bar at backfill.
     YahooIndexDef("US3M", "CBOE", "US3M", "^IRX", date(2000, 1, 3), "fixed_income"),
+    YahooIndexDef("US2Y", "CBOE", "US2Y", "2YY=F", date(2018, 8, 13), "fixed_income"),
     YahooIndexDef("US5Y", "CBOE", "US5Y", "^FVX", date(2000, 1, 3), "fixed_income"),
     YahooIndexDef("US10Y", "CBOE", "US10Y", "^TNX", date(2000, 1, 3), "fixed_income"),
     YahooIndexDef("US30Y", "CBOE", "US30Y", "^TYX", date(2000, 1, 3), "fixed_income"),
