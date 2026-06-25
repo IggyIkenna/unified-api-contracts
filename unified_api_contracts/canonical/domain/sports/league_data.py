@@ -146,15 +146,9 @@ KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 # ``instruments-service/instruments_service/engine/orchestrator.py:1113``
 # but UAC-side so other repos can import it without a circular dep.
 SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
-    # FootyStats — match aggregates + footystats' own in-house prediction model + (for now)
-    #   ODDS. NOTE (#6, 2026-06-25): bookmaker odds are MARKET-TICK-DATA, never
-    #   instruments-service — the canonical sports odds source is odds-api in MTDS
-    #   (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE); the only footystats odds-LIKE IS data_type
-    #   is PREDICTIONS. ODDS is being REMOVED from IS as a COHERENT unit (this map entry +
-    #   SOURCE_PRIORITY[("sports","ODDS")] + the footystats.py orchestrator capture path +
-    #   the validity-matrix + the GCS data wipe must drop together — dropping the map entry
-    #   alone breaks validity-matrix reachability). Tracked: sports_golden_window_…#6 +
-    #   sports_manifest_canonical_form_migration_2026_06_25.
+    # FootyStats — match aggregates + footystats' own in-house prediction model.
+    # NOTE: ODDS was removed 2026-06-25 (#6 coherent unit) — bookmaker odds are
+    # MARKET-TICK-DATA owned by MTDS/odds-api (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE).
     # TEAMS/STANDINGS moved to api_football 2026-06-25 (canonical-form alignment):
     #   footystats writes ONLY footystats_matches/odds/predictions to disk — it does
     #   NOT write teams/standings. Those are written by the api_football handler under
@@ -164,7 +158,6 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
     "MATCHES": "footystats",
     "PREDICTIONS": "footystats",
-    "ODDS": "footystats",  # TODO(#6): remove with the orchestrator + SOURCE_PRIORITY + wipe (coherent unit)
     # Understat — xG model + per-shot xG
     "XG": "understat",
     "XG_SHOTS": "understat",

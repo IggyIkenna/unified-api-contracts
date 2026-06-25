@@ -131,19 +131,20 @@ class TestValidDataTypesByAgAndInstrumentType:
     def test_sports_league_not_in_static_dict(self) -> None:
         # ("sports", "league") is intentionally NOT a static literal — it is derived
         # from SPORTS_DATA_TYPE_TO_SOURCE in the accessor (slot-4 2026-06-07; a literal
-        # had silently dropped "ODDS"). The static dict only holds the dormant
+        # had silently dropped keys). The static dict only holds the dormant
         # fixture-grain scaffolding rows.
         assert ("sports", "league") not in VALID_DATA_TYPES_BY_AG_AND_INSTRUMENT_TYPE
 
     def test_sports_league_valid_is_reference_data_types(self) -> None:
         # Regression: the league could-exist grain must keep EVERY reference-data
-        # provider data_type (SPORTS_DATA_TYPE_TO_SOURCE keys), incl. "ODDS" which a
-        # prior literal dropped. It must NOT contain the MTDS odds market-data types.
+        # provider data_type (SPORTS_DATA_TYPE_TO_SOURCE keys). ODDS was removed from IS
+        # 2026-06-25 (#6 coherent unit) — it must NOT appear here. It must NOT contain
+        # the MTDS odds market-data types either.
         from unified_api_contracts.canonical.domain.sports import SPORTS_DATA_TYPE_TO_SOURCE
 
         result = valid_data_types_for_instrument_type("sports", "league")
         assert result == frozenset(SPORTS_DATA_TYPE_TO_SOURCE)
-        assert "ODDS" in result  # the previously-dropped key
+        assert "ODDS" not in result  # removed from IS 2026-06-25 (#6 coherent unit)
         assert "FIXTURES" in result
         assert "odds" not in result  # lowercase MTDS market-data type — not a league reference type
 

@@ -541,7 +541,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
         InputReq(asset_group="sports", data_type="FIXTURE_LINEUPS", available_at_rule="kickoff_minus_60min"),
     ],
     "odds_calculator": [
-        InputReq(asset_group="sports", data_type="ODDS", available_at_rule="publication_time"),
+        # ODDS (IS footystats) removed 2026-06-25 (#6 coherent unit) — MTDS/odds-api owns raw odds.
         InputReq(asset_group="sports", data_type="ODDS_HORIZON_BUCKET", available_at_rule="publication_time"),
     ],
     "multisource_xg": [
@@ -567,7 +567,7 @@ FEATURE_REQUIRED_INPUTS: Final[dict[str, list[InputReq]]] = {
     "ml_predictions": [
         InputReq(asset_group="sports", data_type="FIXTURES", available_at_rule="announced_at"),
         InputReq(asset_group="sports", data_type="XG", available_at_rule="match_end_time"),
-        InputReq(asset_group="sports", data_type="ODDS", available_at_rule="publication_time"),
+        # ODDS (IS footystats) removed 2026-06-25 (#6 coherent unit).
     ],
     "replacement_model": [
         InputReq(asset_group="sports", data_type="PLAYER_VALUES", available_at_rule="fetch_completed_at"),
