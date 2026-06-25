@@ -1,0 +1,12 @@
+ws_url: wss://ws-subscriptions-clob.polymarket.com/ws/market
+subscription:
+  type: subscribe
+  channel: market
+  assets_ids:
+    - "55820766099035588851009823823718060254617680649820268867074432756490016218380"
+frames:
+  - direction: recv
+    payload: '{"event_type":"last_trade_price","asset_id":"55820766099035588851009823823718060254617680649820268867074432756490016218380","price":"0.62","size":"100","side":"BUY","timestamp":"1716249600000"}'
+  - direction: recv
+    payload: '{"event_type":"last_trade_price","asset_id":"55820766099035588851009823823718060254617680649820268867074432756490016218380","price":"0.63","size":"50","side":"SELL","timestamp":"1716249601000"}'
+version: 1

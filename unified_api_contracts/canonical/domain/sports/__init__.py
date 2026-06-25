@@ -165,6 +165,13 @@ from .season_dates import get_transfer_window_country as get_transfer_window_cou
 from .season_dates import is_any_league_refresh_date as is_any_league_refresh_date
 from .season_dates import is_reference_refresh_date as is_reference_refresh_date
 from .season_dates import is_within_footystats_season as is_within_footystats_season
+from .season_structure import SEASON_STRUCTURE_REGISTRY as SEASON_STRUCTURE_REGISTRY
+from .season_structure import FixtureFormat as FixtureFormat
+from .season_structure import SeasonBreak as SeasonBreak
+from .season_structure import SeasonStructure as SeasonStructure
+from .season_structure import get_all_league_ids as get_all_league_ids
+from .season_structure import get_expected_fixture_count as get_expected_fixture_count
+from .season_structure import get_season_structure as get_season_structure
 from .team_mapping_data import get_all_teams as get_all_teams
 from .team_mapping_data import get_team_by_af_id as get_team_by_af_id
 from .team_mapping_data import get_team_provider_ids as get_team_provider_ids

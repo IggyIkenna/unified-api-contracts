@@ -1,0 +1,15 @@
+ws_url: wss://api.elections.kalshi.com/trade-api/ws/v2
+subscription:
+  id: 1
+  cmd: subscribe
+  params:
+    channels:
+      - trade
+    market_tickers:
+      - BTCZ-23DEC31-T40000
+frames:
+  - direction: recv
+    payload: '{"type":"trade","seq":1,"sid":1,"msg":{"market_ticker":"BTCZ-23DEC31-T40000","yes_price":55,"count":10,"taker_side":"yes","created_time":"2024-05-21T00:00:00Z","trade_id":"t1"}}'
+  - direction: recv
+    payload: '{"type":"trade","seq":2,"sid":1,"msg":{"market_ticker":"BTCZ-23DEC31-T40000","yes_price":54,"count":5,"taker_side":"no","created_time":"2024-05-21T00:00:01Z","trade_id":"t2"}}'
+version: 1

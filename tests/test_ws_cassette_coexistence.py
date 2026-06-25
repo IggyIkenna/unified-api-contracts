@@ -73,6 +73,7 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "hyperliquid_ticker_ws": "hyperliquid",
     "kalshi_clob_ws": "kalshi",
     "kalshi_perp_ws": "kalshi",
+    "kalshi_trades_ws": "kalshi",
     "kalshi_ws": "kalshi",
     "kraken_futures_book_ticker_ws": "kraken_futures",
     "kraken_futures_ws": "kraken_futures",
@@ -82,6 +83,7 @@ _CONNECTOR_TO_VENUE: Final[dict[str, str]] = {
     "okx_spot_ws": "okx",
     "polymarket_clob_ws": "polymarket",
     "polymarket_perp_ws": "polymarket",
+    "polymarket_trades_ws": "polymarket",
     "tardis_machine_ws": "tardis",
     "upbit_spot_ws": "upbit",
 }
