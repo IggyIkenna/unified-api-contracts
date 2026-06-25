@@ -301,8 +301,13 @@ _CME_ES_OPTIONS: list[DatabentoInstrumentDef] = [
 # (registry/data_source_continuity.py), unaffected by this entry. Venue token =
 # CBOE (already a tradfi venue with FUTURE capability); XCBF.PITCH is the Databento
 # *dataset*, CBOE is the canonical venue.
+# asset_group=COMMODITY: VX/VIX is a volatility product, not an equity — within the
+# canonical AssetClass taxonomy (equity/fx/commodity/fixed_income/crypto) volatility maps
+# to COMMODITY (operator 2026-06-25). This is the per-instrument SSOT consumed by the
+# databento adapter's _resolve_asset_group (step 1: underlying "VX" → asset_group), so the
+# 82 cumulative VX FUTURE rows land COMMODITY, not the previous mis-classified EQUITY.
 _CFE_FUTURES: list[DatabentoInstrumentDef] = [
-    DatabentoInstrumentDef("VX.FUT", "CBOE", "FUTURE", "XCBF.PITCH", "parent", "VIX", "equity", "VX"),
+    DatabentoInstrumentDef("VX.FUT", "CBOE", "FUTURE", "XCBF.PITCH", "parent", "VIX", "commodity", "VX"),
 ]
 
 # ---------------------------------------------------------------------------

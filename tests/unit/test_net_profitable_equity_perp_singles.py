@@ -163,3 +163,24 @@ def test_no_duplicate_symbols_in_tradfi_databento_instruments() -> None:
             dups.append(p)
         seen.add(p)
     assert not dups, f"Duplicate (symbol, dataset) pairs: {dups}"
+
+
+# ---------------------------------------------------------------------------
+# CFE / VX (VIX futures) classification — G1.c (instruments-foundation, 2026-06-25)
+# ---------------------------------------------------------------------------
+
+
+def test_vx_future_asset_group_is_commodity() -> None:
+    """VX/VIX futures are a volatility product → COMMODITY in the canonical AssetClass
+    taxonomy (equity/fx/commodity/fixed_income/crypto), NOT the previous mis-classified
+    equity. This per-instrument def is the SSOT consumed by the databento adapter's
+    _resolve_asset_group (step 1: underlying "VX" → asset_group), so the 82 cumulative VX
+    FUTURE rows land COMMODITY instead of EQUITY."""
+    from unified_api_contracts.registry.tradfi_instrument_universe import _CFE_FUTURES
+
+    assert len(_CFE_FUTURES) == 1
+    vx = _CFE_FUTURES[0]
+    assert vx.symbol == "VX.FUT"
+    assert vx.venue == "CBOE"
+    assert vx.dataset == "XCBF.PITCH"
+    assert vx.asset_group == "commodity", f"VX.FUT asset_group should be commodity, got {vx.asset_group!r}"

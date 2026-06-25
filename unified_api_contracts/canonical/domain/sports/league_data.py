@@ -146,22 +146,37 @@ KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 # ``instruments-service/instruments_service/engine/orchestrator.py:1113``
 # but UAC-side so other repos can import it without a circular dep.
 SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
-    # FootyStats — primary stats / odds aggregator
+    # FootyStats — match aggregates + footystats' own in-house prediction model + (for now)
+    #   ODDS. NOTE (#6, 2026-06-25): bookmaker odds are MARKET-TICK-DATA, never
+    #   instruments-service — the canonical sports odds source is odds-api in MTDS
+    #   (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE); the only footystats odds-LIKE IS data_type
+    #   is PREDICTIONS. ODDS is being REMOVED from IS as a COHERENT unit (this map entry +
+    #   SOURCE_PRIORITY[("sports","ODDS")] + the footystats.py orchestrator capture path +
+    #   the validity-matrix + the GCS data wipe must drop together — dropping the map entry
+    #   alone breaks validity-matrix reachability). Tracked: sports_golden_window_…#6 +
+    #   sports_manifest_canonical_form_migration_2026_06_25.
+    # TEAMS/STANDINGS moved to api_football 2026-06-25 (canonical-form alignment):
+    #   footystats writes ONLY footystats_matches/odds/predictions to disk — it does
+    #   NOT write teams/standings. Those are written by the api_football handler under
+    #   pipeline_mode=batch_api_football/entity={teams,standings}. This map was the
+    #   stale outlier vs the canonical SOURCE_PRIORITY[("sports","TEAMS"|"STANDINGS")]
+    #   = ["api_football"] (the writer already raised MissingSourceError on footystats),
+    #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
     "MATCHES": "footystats",
     "PREDICTIONS": "footystats",
-    "ODDS": "footystats",
-    "STANDINGS": "footystats",
-    "TEAMS": "footystats",
+    "ODDS": "footystats",  # TODO(#6): remove with the orchestrator + SOURCE_PRIORITY + wipe (coherent unit)
     # Understat — xG model + per-shot xG
     "XG": "understat",
     "XG_SHOTS": "understat",
-    # API-Football — per-fixture detail
+    # API-Football — fixtures + per-fixture detail + reference (teams / standings)
     "FIXTURES": "api_football",
     "INJURIES": "api_football",
     "FIXTURE_STATS": "api_football",
     "FIXTURE_EVENTS": "api_football",
     "FIXTURE_LINEUPS": "api_football",
     "PLAYER_STATS": "api_football",
+    "TEAMS": "api_football",
+    "STANDINGS": "api_football",
     # Transfermarkt — player values.
     # TRANSFERMARKT_LEAGUES retired 2026-05-05 (was static catalog mapping;
     # lives in UAC TRANSFERMARKT_IDS as provider-id config rather than captured data).

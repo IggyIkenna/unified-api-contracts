@@ -22,7 +22,9 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     OUT_OF_COVERAGE_WINDOW_REASONS,
     CaptureStatusCounts,
     EmptyConfirmedReason,
+    LayeredCoverage,
     compute_honest_coverage,
+    compute_layered_coverage,
     extract_es_options_cluster,
     futures_expiry_bucket,
     parse_futures_expiry,
@@ -433,3 +435,47 @@ def test_out_of_coverage_window_reasons_carry_lifecycle_reasons() -> None:
     assert "EXPECTED_INSTRUMENT_NOT_LISTED" in OUT_OF_COVERAGE_WINDOW_REASONS
     assert "EXPECTED_INSTRUMENT_DELISTED" in OUT_OF_COVERAGE_WINDOW_REASONS
     assert "EXPECTED_PRE_VENUE_LAUNCH" in OUT_OF_COVERAGE_WINDOW_REASONS
+
+
+# ---------------------------------------------------------------------------
+# Layered coverage (day_coverage + depth_coverage) — instruments-foundation §2.
+# ---------------------------------------------------------------------------
+
+
+def test_compute_layered_coverage_both_layers_via_ssot() -> None:
+    """Both layers are exactly the SSOT formula over their own counts — no
+    separate arithmetic, so the deployment-ui can never diverge from one formula."""
+    day = CaptureStatusCounts(captured=18, expected_unattempted_pending_fetch=4)  # 4 missing venue-days
+    depth = CaptureStatusCounts(captured=1200, expected_unattempted_pending_fetch=300)  # thin days
+    layered = compute_layered_coverage(day, depth)
+    assert isinstance(layered, LayeredCoverage)
+    assert layered.day_coverage == pytest.approx(compute_honest_coverage(day))
+    assert layered.depth_coverage == pytest.approx(compute_honest_coverage(depth))
+    assert layered.day_coverage == pytest.approx(18 / 22)
+    assert layered.depth_coverage == pytest.approx(1200 / 1500)
+    # the counts are carried so a consumer renders the breakdown without recompute
+    assert layered.day_counts == day
+    assert layered.depth_counts == depth
+
+
+def test_compute_layered_coverage_day_green_depth_low_is_the_thin_day_signal() -> None:
+    """The explicit 'every day present, but days under-populated' signal:
+    day_coverage high while depth_coverage drags (a venue-day captured with 41
+    of thousands)."""
+    day = CaptureStatusCounts(captured=2640)  # every expected venue-day answered
+    depth = CaptureStatusCounts(captured=41, expected_unattempted_pending_fetch=2599)
+    layered = compute_layered_coverage(day, depth)
+    assert layered.day_coverage == pytest.approx(1.0)
+    assert layered.depth_coverage < 0.05
+    assert layered.day_coverage > layered.depth_coverage
+
+
+def test_compute_layered_coverage_missing_days_drag_day_coverage() -> None:
+    """The 2026-06-24 cefi blind-99.9% fix: once the 4 missing venue-days seed as
+    expected_unattempted_pending_fetch they DRAG day_coverage below the
+    captured-only ratio (instead of being silently absent → falsely ~1.0)."""
+    blind = CaptureStatusCounts(captured=62091, attempted_failed=46)  # gaps ABSENT
+    honest = CaptureStatusCounts(captured=62091, attempted_failed=46, expected_unattempted_pending_fetch=84)
+    assert compute_honest_coverage(blind) > compute_honest_coverage(honest)
+    layered = compute_layered_coverage(honest, honest)
+    assert layered.day_coverage < compute_honest_coverage(blind)
