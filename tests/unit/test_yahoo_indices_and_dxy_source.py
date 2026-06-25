@@ -1,8 +1,7 @@
 """Unit tests for YAHOO_INDICES registry and DXY source resolver.
 
 Tests:
-- YAHOO_INDICES contains both VIX (CBOE) and DXY (ICE)
-- VIX entry fields are correct
+- YAHOO_INDICES EXCLUDES the retired VIX cash-index (removed 2026-06-25) but keeps DXY (ICE)
 - DXY entry fields are correct
 - get_dxy_daily_source: returns YAHOO_FINANCE for a date >= DXY_DAILY_FIRST_DATE
 - get_dxy_daily_source: returns GAP_NO_SOURCE for a date before DXY_DAILY_FIRST_DATE
@@ -28,10 +27,15 @@ _TREASURY_TENORS = {"US3M": "^IRX", "US5Y": "^FVX", "US10Y": "^TNX", "US30Y": "^
 
 
 @pytest.mark.unit
-def test_yahoo_indices_contains_vix() -> None:
-    """YAHOO_INDICES must include the CBOE VIX entry."""
+def test_yahoo_indices_excludes_retired_vix_cash() -> None:
+    """YAHOO_INDICES must NOT include the retired VIX cash-index (removed 2026-06-25).
+
+    The CBOE cash-index is retired (operator 2026-06-23); VIX-15m is aggregated from the
+    VX FUTURES front contract (XCBF.PITCH), and CBOE:INDEX:VIX-USD survives only as the
+    ohlcv_15m source-resolver key in data_source_continuity — never as a Yahoo daily index.
+    """
     symbols = {idx.symbol for idx in YAHOO_INDICES}
-    assert "VIX" in symbols
+    assert "VIX" not in symbols
 
 
 @pytest.mark.unit
@@ -49,14 +53,6 @@ def test_dxy_entry_fields() -> None:
     assert dxy.yahoo_ticker == "DX-Y.NYB"
     assert dxy.base_asset == "DXY"
     assert dxy.asset_group == "fx"
-
-
-@pytest.mark.unit
-def test_vix_entry_fields() -> None:
-    """VIX entry must retain its correct venue and ticker."""
-    (vix,) = [idx for idx in YAHOO_INDICES if idx.symbol == "VIX"]
-    assert vix.venue == "CBOE"
-    assert vix.yahoo_ticker == "^VIX"
 
 
 @pytest.mark.unit

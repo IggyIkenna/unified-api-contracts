@@ -465,14 +465,17 @@ class YahooIndexDef:
 
 
 YAHOO_INDICES: list[YahooIndexDef] = [
-    # ^VIX daily history back to 1990-01-02 (9,177 bars confirmed 2026-06-11).
-    YahooIndexDef("VIX", "CBOE", "VIX", "^VIX", date(1990, 1, 2), "equity"),
+    # VIX cash-index (^VIX daily, ohlcv_24h) REMOVED 2026-06-25 — the CBOE cash-index is
+    # retired (operator 2026-06-23). VIX-15m is now AGGREGATED from the VX FUTURES front
+    # contract (XCBF.PITCH; see VX.FUT above), and CBOE:INDEX:VIX-USD survives ONLY as the
+    # ohlcv_15m source-resolver key in data_source_continuity — NOT as a Yahoo daily index.
     # ICE/NYBOT US Dollar Index — daily ohlcv_24h via Yahoo (DX-Y.NYB).
     # Full history back to 2019-01-02 (1,864 bars empirically confirmed 2026-06-11).
     # 1h is capped to the last 730 days by Yahoo; use daily for long history.
-    # Venue stays ICE: DXY is the ICE/NYBOT US Dollar Index, sourced via Yahoo
-    # (NOT Databento), so ICE remains a valid tradfi venue for this non-Databento
-    # index even though the ICE Databento datasets are out of the subscription.
+    # Venue stays ICE — the ONLY retained ICE exception (operator 2026-06-25): DXY is the
+    # ICE/NYBOT US Dollar Index, sourced via Yahoo (NOT Databento), so ICE here is a valid
+    # Yahoo-sourced tradfi venue and does NOT violate the ICE-Databento-datasets-out-of-
+    # subscription purge (which retired only ICE *Databento* datasets, e.g. BRN Brent).
     YahooIndexDef("DXY", "ICE", "DXY", "DX-Y.NYB", date(2019, 1, 2), "fx"),
     # CBOE interest-rate indices — daily ohlcv_24h via Yahoo. Each "close" is the
     # par yield in percent (e.g. 4.53 = 4.53%). Full history back to 2000-01-03
