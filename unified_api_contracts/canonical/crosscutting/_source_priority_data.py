@@ -49,7 +49,6 @@ SOURCE_PRIORITY: Final[dict[tuple[str, str], list[str]]] = {
     ("sports", "STANDINGS"): ["api_football"],
     ("sports", "WEATHER"): ["open_meteo"],
     ("sports", "PREDICTIONS"): ["footystats"],
-    ("sports", "ODDS"): ["footystats"],
     ("sports", "ODDS_HORIZON_BUCKET"): ["mdps_odds_horizon_bucket"],
     ("sports", "TRANSFER_RECORDS"): ["transfermarkt"],
     # Sports reference tables.
