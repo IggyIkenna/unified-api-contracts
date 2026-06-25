@@ -324,6 +324,10 @@ _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
     ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
     ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
     ("CBOE:INDEX:US3M-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
+    # US2Y added 2026-06-25 (operator: 3M/2Y/5Y/10Y target curve) — Yahoo 2YY=F,
+    # genesis 2018 (the resolver names the source; the YahooIndexDef genesis bounds
+    # the expected-universe to 2018+, so the shared 2000-01-03 floor never over-seeds 2Y).
+    ("CBOE:INDEX:US2Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
     ("CBOE:INDEX:US5Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
     ("CBOE:INDEX:US10Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
     ("CBOE:INDEX:US30Y-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
