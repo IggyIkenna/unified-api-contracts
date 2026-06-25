@@ -81,7 +81,7 @@ AVAILABILITY_AT_SEMANTICS: Final[dict[tuple[str, str], AvailabilitySemantic]] = 
     ("sports", "STANDINGS"): "fetch_completed_at",  # api_football standings; polled
     ("sports", "WEATHER"): "match_end_time",  # open_meteo reanalysis; post-match
     ("sports", "PREDICTIONS"): "announced_at",  # footystats pre-match predictions
-    ("sports", "ODDS"): "publication_time",  # footystats raw odds
+    # ODDS removed 2026-06-25 (#6 coherent unit) — bookmaker odds are MTDS/odds-api owned.
     ("sports", "ODDS_HORIZON_BUCKET"): "publication_time",  # MDPS bucketed odds
     ("sports", "TRANSFER_RECORDS"): "fetch_completed_at",  # transfermarkt transfers
     # Sports reference tables.
