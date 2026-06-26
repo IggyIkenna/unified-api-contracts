@@ -394,7 +394,26 @@ TRADFI_DATABENTO_INSTRUMENTS: list[DatabentoInstrumentDef] = [
 # ---------------------------------------------------------------------------
 # FX spot pairs (Yahoo Finance — static definitions, not Databento)
 # ---------------------------------------------------------------------------
+# G10 FX majors added 2026-06-26 — these are the cash cross rates needed as
+# cefi features (DXY context, polymarket EUR/USD arb, cross-asset macro signals).
+# Tickers use the standard Yahoo Finance ``{BASE}{QUOTE}=X`` format.
+# KRW/USD is retained for kimchi-premium basis computation.
+# USD/MXN included because 6M (MXN CME future) is in the Databento universe.
+# History availability: all G10 crosses available via Yahoo daily back to 2003+
+# (empirically confirmed; backfill floor is the operator target 2019-01-01).
 FX_SPOT_PAIRS: list[FxSpotPairDef] = [
+    # G10 FX majors — daily ohlcv_24h via Yahoo Finance (BATCH_YAHOO path)
+    FxSpotPairDef("EUR", "USD", "EURUSD=X"),
+    FxSpotPairDef("GBP", "USD", "GBPUSD=X"),
+    FxSpotPairDef("USD", "JPY", "USDJPY=X"),
+    FxSpotPairDef("AUD", "USD", "AUDUSD=X"),
+    FxSpotPairDef("USD", "CAD", "USDCAD=X"),
+    FxSpotPairDef("USD", "CHF", "USDCHF=X"),
+    FxSpotPairDef("NZD", "USD", "NZDUSD=X"),
+    FxSpotPairDef("EUR", "GBP", "EURGBP=X"),
+    FxSpotPairDef("EUR", "JPY", "EURJPY=X"),
+    FxSpotPairDef("USD", "MXN", "USDMXN=X"),
+    # KRW/USD — for kimchi-premium basis computation (Binance KRX arb)
     FxSpotPairDef("KRW", "USD", "KRWUSD=X"),
 ]
 

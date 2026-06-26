@@ -125,6 +125,67 @@ def test_get_source_for_instrument_resolves_all_treasury_tenors() -> None:
 
 _CANONICAL_QUOTE = "USD"
 
+# ---------------------------------------------------------------------------
+# FX spot pair enumeration tests (added 2026-06-26)
+# ---------------------------------------------------------------------------
+
+_FX_G10_MAJORS = {
+    "EURUSD=X": ("EUR", "USD"),
+    "GBPUSD=X": ("GBP", "USD"),
+    "USDJPY=X": ("USD", "JPY"),
+    "AUDUSD=X": ("AUD", "USD"),
+    "USDCAD=X": ("USD", "CAD"),
+    "USDCHF=X": ("USD", "CHF"),
+    "NZDUSD=X": ("NZD", "USD"),
+    "EURGBP=X": ("EUR", "GBP"),
+    "EURJPY=X": ("EUR", "JPY"),
+    "USDMXN=X": ("USD", "MXN"),
+    "KRWUSD=X": ("KRW", "USD"),
+}
+
+
+@pytest.mark.unit
+def test_fx_spot_pairs_contains_g10_majors() -> None:
+    """FX_SPOT_PAIRS must enumerate all G10 FX majors + KRW/USD.
+
+    Added 2026-06-26: G10 crosses are cefi features (DXY context, polymarket
+    EUR/USD arb, macro signals). They were missing; only KRW/USD was listed.
+    Codex SSOT: codex/02-data/tradfi-data-types-catalog.md (FX G10 crosses).
+    """
+    from unified_api_contracts.registry.tradfi_instrument_universe import FX_SPOT_PAIRS
+
+    tickers_by_yahoo = {fx.yahoo_ticker: (fx.base, fx.quote) for fx in FX_SPOT_PAIRS}
+    for yahoo_ticker, (expected_base, expected_quote) in _FX_G10_MAJORS.items():
+        assert yahoo_ticker in tickers_by_yahoo, (
+            f"Yahoo ticker {yahoo_ticker!r} missing from FX_SPOT_PAIRS — "
+            f"add FxSpotPairDef({expected_base!r}, {expected_quote!r}, {yahoo_ticker!r})"
+        )
+        actual_base, actual_quote = tickers_by_yahoo[yahoo_ticker]
+        assert actual_base == expected_base, f"{yahoo_ticker}: base mismatch ({actual_base!r} != {expected_base!r})"
+        assert actual_quote == expected_quote, (
+            f"{yahoo_ticker}: quote mismatch ({actual_quote!r} != {expected_quote!r})"
+        )
+
+
+@pytest.mark.unit
+def test_fx_spot_pairs_no_duplicates() -> None:
+    """FX_SPOT_PAIRS must not have duplicate Yahoo tickers."""
+    from unified_api_contracts.registry.tradfi_instrument_universe import FX_SPOT_PAIRS
+
+    tickers = [fx.yahoo_ticker for fx in FX_SPOT_PAIRS]
+    assert len(tickers) == len(set(tickers)), f"Duplicate tickers: {[t for t in tickers if tickers.count(t) > 1]}"
+
+
+@pytest.mark.unit
+def test_fx_spot_pairs_tickers_end_with_equals_x() -> None:
+    """All FX_SPOT_PAIRS tickers must end with '=X' (Yahoo FX pair convention)."""
+    from unified_api_contracts.registry.tradfi_instrument_universe import FX_SPOT_PAIRS
+
+    for fx in FX_SPOT_PAIRS:
+        assert fx.yahoo_ticker.endswith("=X"), (
+            f"FX pair {fx.base}/{fx.quote} ticker {fx.yahoo_ticker!r} must end with '=X'"
+        )
+
 
 @pytest.mark.unit
 def test_every_yahoo_index_has_a_plausible_genesis_date() -> None:
