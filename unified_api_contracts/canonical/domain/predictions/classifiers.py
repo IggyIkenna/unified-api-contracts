@@ -454,10 +454,16 @@ def _route_pass2_subtype(
         return CanonicalQuestionGroup.BOX_OFFICE_OPENING_WEEKEND
 
     if category is PredictionShardCategory.CRYPTO_PRICE:
-        # PRICE-RANGE = a price-level market that is NOT a direction bet
-        # ("between $X-$Y" / multistrike / above-below). UP_DOWN falls through
-        # to the cadence map (which carries the {COIN}_UP_DOWN_* groups).
-        if "up-or-down" not in s and (market_type is PredictionShardMarketType.RANGE_BRACKET or "multistrike" in s):
+        # PRICE-RANGE = a price-level market that is NOT a direction bet:
+        # "between $X-$Y" / multistrike / above-X / below-X / reach-X / hit-X.
+        # "bitcoin-above-95000", "will-bitcoin-reach-100k" etc. carry "above" /
+        # "reach" / "hit" as plain substring tokens so we mirror the commodity
+        # branch's any(t in s …) guard. UP_DOWN falls through to the cadence map.
+        if "up-or-down" not in s and (
+            market_type is PredictionShardMarketType.RANGE_BRACKET
+            or "multistrike" in s
+            or any(t in s for t in ("above", "below", "reach", "hit"))
+        ):
             return _CRYPTO_PRICE_RANGE_GROUP.get(und)
         return None
 

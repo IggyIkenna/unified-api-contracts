@@ -72,6 +72,15 @@ from unified_api_contracts.canonical.domain.predictions.two_axis import (
     cross_venue_underlying_overlap,
     underlying_for_group,
 )
+from unified_api_contracts.canonical.domain.predictions.venue_fee_model import (
+    KALSHI_FEE_COEFF,
+    POLYMARKET_FEE_FRACTION,
+    PREDICTION_VENUE_FEE_MODEL_VERSION,
+    kalshi_fee,
+    net_edge_sell_kalshi,
+    net_edge_sell_polymarket,
+    polymarket_fee,
+)
 
 __all__ = [
     "CANONICAL_GROUP_METADATA",
@@ -79,9 +88,12 @@ __all__ = [
     "CANONICAL_GROUP_TO_UNDERLYING",
     "CLASSIFIER_STABILITY_HASH",
     "CLASSIFIER_VERSION",
+    "KALSHI_FEE_COEFF",
     "KALSHI_TICKER_PREFIX_TO_GROUP",
     "KALSHI_TICKER_TO_GROUP",
     "POLYMARKET_CONDITION_ID_TO_GROUP",
+    "POLYMARKET_FEE_FRACTION",
+    "PREDICTION_VENUE_FEE_MODEL_VERSION",
     "CanonicalGroupMetadata",
     "CanonicalQuestionGroup",
     "MarketLifecycle",
@@ -95,9 +107,13 @@ __all__ = [
     "cross_venue_underlying_overlap",
     "expected_market_ids_for_canonical_group",
     "is_market_active_at",
+    "kalshi_fee",
     "match_key",
+    "net_edge_sell_kalshi",
+    "net_edge_sell_polymarket",
     "normalize_participant",
     "parse_kalshi_sports_fixture",
     "parse_polymarket_sports_fixture",
+    "polymarket_fee",
     "underlying_for_group",
 ]
