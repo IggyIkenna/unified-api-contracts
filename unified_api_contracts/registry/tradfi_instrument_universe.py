@@ -467,8 +467,8 @@ class YahooIndexDef:
 YAHOO_INDICES: list[YahooIndexDef] = [
     # VIX cash-index (^VIX daily, ohlcv_24h) REMOVED 2026-06-25 — the CBOE cash-index is
     # retired (operator 2026-06-23). VIX-15m is now AGGREGATED from the VX FUTURES front
-    # contract (XCBF.PITCH; see VX.FUT above), and CBOE:INDEX:VIX-USD survives ONLY as the
-    # ohlcv_15m source-resolver key in data_source_continuity — NOT as a Yahoo daily index.
+    # contract (XCBF.PITCH; see VX.FUT above). G1.f.2 2026-06-26: the ohlcv_15m index
+    # source-resolver (data_source_continuity) also retired — VX futures is the only source.
     # ICE/NYBOT US Dollar Index — daily ohlcv_24h via Yahoo (DX-Y.NYB).
     # Full history back to 2019-01-02 (1,864 bars empirically confirmed 2026-06-11).
     # 1h is capped to the last 730 days by Yahoo; use daily for long history.

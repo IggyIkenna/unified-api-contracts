@@ -30,9 +30,8 @@ _TREASURY_TENORS = {"US3M": "^IRX", "US2Y": "2YY=F", "US5Y": "^FVX", "US10Y": "^
 def test_yahoo_indices_excludes_retired_vix_cash() -> None:
     """YAHOO_INDICES must NOT include the retired VIX cash-index (removed 2026-06-25).
 
-    The CBOE cash-index is retired (operator 2026-06-23); VIX-15m is aggregated from the
-    VX FUTURES front contract (XCBF.PITCH), and CBOE:INDEX:VIX-USD survives only as the
-    ohlcv_15m source-resolver key in data_source_continuity — never as a Yahoo daily index.
+    The CBOE cash-index is retired (operator 2026-06-23); VIX-15m is now solely the
+    VX FUTURES front contract (XCBF.PITCH / CBOE:FUTURE:VX) aggregated downstream.
     """
     symbols = {idx.symbol for idx in YAHOO_INDICES}
     assert "VIX" not in symbols

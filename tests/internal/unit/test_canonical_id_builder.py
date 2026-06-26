@@ -115,7 +115,7 @@ class TestTradfiHappyPath:
         assert build_instrument_id("cboe", InstrumentType.INDEX, "SPX") == "CBOE:INDEX:SPX-USD"
 
     def test_index_explicit_quote(self) -> None:
-        assert build_instrument_id("cboe", InstrumentType.INDEX, "VIX", quote_asset="USD") == "CBOE:INDEX:VIX-USD"
+        assert build_instrument_id("cboe", InstrumentType.INDEX, "US10Y", quote_asset="USD") == "CBOE:INDEX:US10Y-USD"
 
     def test_etf(self) -> None:
         # Non-index cash types keep the plain VENUE:TYPE:SYMBOL form (no -USD).

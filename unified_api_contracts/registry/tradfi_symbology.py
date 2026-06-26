@@ -240,7 +240,7 @@ class ProviderBinding(BaseModel, frozen=True):
     exchange_code: str | None = None  # Databento exchange code (ES, CL)
     ticker: str | None = None  # Yahoo Finance ticker (^VIX)
     series: str | None = None  # FRED series (VIXCLS)
-    instrument_key: str | None = None  # Canonical GCS key (CBOE:INDEX:VIX-USD)
+    instrument_key: str | None = None  # Canonical GCS key (e.g. CBOE:INDEX:US10Y-USD)
 
 
 def get_bindings_for_symbol(symbol: str) -> list[ProviderBinding]:
@@ -324,14 +324,6 @@ TRADFI_INSTRUMENTS: list[TradFiInstrumentDef] = [
     # CME Livestock
     _fut("LE.FUT", "CME", "LIVECATTLE"),
     _fut("HE.FUT", "CME", "LEANHOGS"),
-    # CBOE — Volatility Index (calculated, not traded)
-    TradFiInstrumentDef(
-        symbol="VIX-USD",
-        venue="CBOE",
-        instrument_type="INDEX",
-        base_asset="VIX",
-        data_source="yahoo_finance",
-    ),
     # CFE — Volatility Futures (traded on CBOE Futures Exchange; Databento dataset XCBF.PITCH)
     _fut("VX.FUT", "XCBF.PITCH", "VIX"),
     # Options — index (ES/NQ use <root>.OPT) + commodity options-on-futures
@@ -413,25 +405,6 @@ TRADFI_DATA_BINDINGS: dict[str, list[ProviderBinding]] = {
     "6M.FUT": [_db("GLBX.MDP3", "parent", "6M")],
     "LE.FUT": [_db("GLBX.MDP3", "parent", "LE")],
     "HE.FUT": [_db("GLBX.MDP3", "parent", "HE")],
-    # VIX index — multiple sources (historical Barchart, ongoing Yahoo, daily FRED)
-    "VIX-USD": [
-        ProviderBinding(
-            provider="barchart",
-            use_for="historical",
-            instrument_key="CBOE:INDEX:VIX-USD",
-        ),
-        ProviderBinding(
-            provider="yahoo_finance",
-            use_for="live",
-            ticker="^VIX",
-            instrument_key="CBOE:INDEX:VIX-USD",
-        ),
-        ProviderBinding(
-            provider="fred",
-            use_for="historical",
-            series="VIXCLS",
-        ),
-    ],
     # VX futures (CBOE Futures Exchange via Databento) — dataset XCBF.PITCH (the
     # operator's "CFE" subscription, 2026-06-18; a bare "CFE" is rejected by the API).
     "VX.FUT": [_db("XCBF.PITCH", "parent", "VX")],
@@ -553,14 +526,6 @@ SPACE_TO_DOT_SYMBOLS: dict[str, str] = {
 # Backward-compatible alias
 TRADFI_INSTRUMENTS_CONFIG: list[dict[str, str | None]] = TRADFI_VENUE_MAPPINGS
 
-# Named constant for the VIX index instrument definition — import this directly
-# rather than scanning TRADFI_VENUE_MAPPINGS.
-VIX_INDEX_INSTRUMENT: dict[str, str | None] = next(
-    d for d in TRADFI_VENUE_MAPPINGS if d.get("instrument_key") == "CBOE:INDEX:VIX-USD"
-)
-
-# Named constant for the VIX instrument identity (typed)
-VIX_INSTRUMENT: TradFiInstrumentDef = next(inst for inst in TRADFI_INSTRUMENTS if inst.symbol == "VIX-USD")
 
 
 # ---------------------------------------------------------------------------

@@ -59,14 +59,14 @@ class TestEquity:
 
 
 class TestIndex:
-    def test_vix_strips_i_prefix(self) -> None:
-        rec = normalize_massive_index(MassiveTicker(ticker="I:VIX", name="Cboe Volatility Index", market="indices"))
+    def test_index_strips_i_prefix(self) -> None:
+        rec = normalize_massive_index(MassiveTicker(ticker="I:SPX", name="S&P 500 Index", market="indices"))
         assert rec is not None
         # Canonical index key carries the -USD base-quote suffix (matches the
-        # data-write key, symbology GCS key and source-resolver key).
-        assert rec.instrument_key == "CBOE:INDEX:VIX-USD"
+        # symbology GCS key and source-resolver key).
+        assert rec.instrument_key == "CBOE:INDEX:SPX-USD"
         assert rec.venue == "CBOE"
-        assert rec.raw_symbol == "I:VIX"
+        assert rec.raw_symbol == "I:SPX"
         assert rec.instrument_type == InstrumentType.INDEX
 
 

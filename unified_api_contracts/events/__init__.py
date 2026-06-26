@@ -9,7 +9,7 @@ Two sub-modules:
 * :mod:`~unified_api_contracts.events.streaming` — legacy Redis-stream event
   shapes (``CandleBoundaryCrossedEvent`` / ``CandleComputedEvent`` / ...).
   These are **in-flight migration** to the canonical envelope below; they
-  remain exported for backward compat during the Plans 04-06 cutover.
+  remain exported during the Plans 04-06 migration phase.
 * :mod:`~unified_api_contracts.events.persist` — canonical
   :class:`CanonicalPersistEnvelope` + :class:`RetentionClass` for the
   Pub/Sub central log. New producers use this shape.

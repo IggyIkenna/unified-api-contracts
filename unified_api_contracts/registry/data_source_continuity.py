@@ -12,15 +12,9 @@ Yahoo's chart API bounds how far back / how wide each interval can be fetched.
 Backfill scripts and downstream consumers MUST check this registry before
 deciding which source to use for a given (instrument, data_type, date) tuple.
 
-── VIX 15m (BARCHART RETIRED 2026-06-24) ─────────────────────────────────────
-VIX 15m is now AGGREGATED from the VX FUTURES front contract captured via
-Databento XCBF.PITCH (CFE). The CBOE cash-index was deleted (2026-06-23) and the
-manual-CSV Barchart preload is removed (no shim) — VX futures track the index
-with a small steady contango basis (corr 0.95-0.98). Yahoo's ^VIX rolling 60-day
-window is a recent cross-check only. There is NO honest gap any more (VX futures
-cover the full history), so ``is_vix_15m_gap_date`` always returns ``False`` and
-``get_vix_15m_source`` returns "DATABENTO_VX_FUTURES" (historical) / "YAHOO_FINANCE"
-(rolling). Do NOT build automated Barchart fetching — it is gone.
+NOTE: VIX-15m ohlcv_15m index was retired 2026-06-26 (G1.f.2). VIX-15m is now
+purely the VX FUTURES front contract (CBOE:FUTURE:VX) captured via Databento
+XCBF.PITCH and aggregated downstream.
 """
 
 from __future__ import annotations
@@ -38,21 +32,6 @@ class SourceWindow(NamedTuple):
     last_date: date | None  # None = ongoing (no known end date)
     note: str = ""
 
-
-# ──────────────────────────────────────────────────────────────────────────────
-# VIX 15-minute OHLCV (data_type=ohlcv_15m)
-# ──────────────────────────────────────────────────────────────────────────────
-#
-# BARCHART RETIRED 2026-06-24. The CBOE cash-index (CBOE:INDEX:VIX-USD) was DELETED
-# (operator 2026-06-23) and VIX 15m is now AGGREGATED from the VX FUTURES front
-# contract captured via Databento XCBF.PITCH (CFE) — the futures track the index
-# with a small steady contango basis (sanity-checked: corr 0.95-0.98). Yahoo's
-# ^VIX rolling window remains a recent-window cross-check source only. The Barchart
-# CSV preload (BARCHART_VIX_FIRST/LAST_DATE/FILE_COUNT) is gone (no shim).
-
-# Yahoo Finance ^VIX — 15m interval, rolling 60-day window only.
-# No fixed start date; always (today - 59 days) at earliest.
-YAHOO_VIX_15M_WINDOW_DAYS: int = 60
 
 # ── Yahoo Finance granularity / lookback GUARDRAIL (SSOT, GENERAL) ──────────
 # Yahoo's chart API bounds how far back EACH interval can reach AND how wide a
@@ -206,77 +185,6 @@ def assert_yahoo_request_width_ok(interval: str, start_date: date, end_date: dat
         )
 
 
-# VIX 15m source history. BARCHART RETIRED 2026-06-24 — the historical 15m series
-# is now AGGREGATED from the VX FUTURES front contract captured via Databento
-# XCBF.PITCH (CFE); Yahoo's ^VIX rolling 60-day window is a recent cross-check.
-# The former Barchart preload window + the 2025-11-13→today-60d "permanent gap"
-# (which only existed because Barchart ended + Yahoo's window is short) are GONE:
-# VX futures via databento cover the full history → no honest gap remains.
-DATABENTO_VX_FUTURES_FIRST_DATE: date = date(2020, 1, 2)  # our captured VX history floor
-
-VIX_15M_SOURCE_HISTORY: list[SourceWindow] = [
-    SourceWindow(
-        source="DATABENTO_VX_FUTURES",
-        first_date=DATABENTO_VX_FUTURES_FIRST_DATE,
-        last_date=None,  # ongoing (live VX futures stream)
-        note=(
-            "VIX 15m AGGREGATED from the VX futures front contract captured via "
-            "Databento XCBF.PITCH (CFE). The futures track the cash index with a "
-            "small steady contango basis (sanity-checked corr 0.95-0.98). This "
-            "supersedes the retired Barchart CSV preload + the CBOE cash-index "
-            "(deleted 2026-06-23). No honest gap remains — VX futures cover the "
-            "full history at 15m via downstream aggregation of ohlcv-1m."
-        ),
-    ),
-    SourceWindow(
-        source="YAHOO_FINANCE",
-        # first_date is dynamic: today - 59 days. Cannot be a compile-time constant.
-        # Use get_yahoo_vix_15m_start() at runtime.
-        first_date=date(2026, 1, 18),  # approximate (today - 59d)
-        last_date=None,  # ongoing
-        note=(
-            "Yahoo Finance ^VIX, 15m interval — a RECENT cross-check only (rolling "
-            "60-day window). Volume is always 0.0 (VIX is a calculated index). The "
-            "primary 15m source is now DATABENTO_VX_FUTURES (above)."
-        ),
-    ),
-]
-
-
-def get_vix_15m_source(query_date: date) -> str:
-    """Return the canonical data source name for VIX 15m on a given date.
-
-    Returns one of: "DATABENTO_VX_FUTURES", "YAHOO_FINANCE".
-
-    BARCHART RETIRED 2026-06-24: VIX 15m is aggregated from VX futures (Databento
-    XCBF.PITCH) for the full history; Yahoo's ^VIX rolling window is a recent
-    cross-check. The former "GAP_NO_SOURCE" range no longer exists (VX futures
-    cover it) — :func:`is_vix_15m_gap_date` always returns ``False`` now.
-    """
-    today = datetime.now(UTC).date()
-    yahoo_start = today - timedelta(days=YAHOO_VIX_15M_WINDOW_DAYS - 1)
-    if query_date >= yahoo_start:
-        return "YAHOO_FINANCE"
-    return "DATABENTO_VX_FUTURES"
-
-
-def is_vix_15m_gap_date(query_date: date) -> bool:
-    """Return True if query_date falls in a VIX 15m data gap.
-
-    BARCHART RETIRED 2026-06-24: VX futures via Databento now cover the full
-    history, so there is NO permanent gap — this always returns ``False``. The
-    MTDS/MDPS callers that branch on it keep the same signature + semantics ("no
-    data for this date"); the answer is simply now always "not a gap".
-    """
-    _ = query_date  # no date is a gap any more (VX futures cover the full history)
-    return False
-
-
-def get_yahoo_vix_15m_start() -> date:
-    """Return the earliest date Yahoo Finance 15m data is available (today - 59 days)."""
-    return datetime.now(UTC).date() - timedelta(days=YAHOO_VIX_15M_WINDOW_DAYS - 1)
-
-
 # ──────────────────────────────────────────────────────────────────────────────
 # DXY (US Dollar Index) — ICE/NYBOT, daily bars via Yahoo Finance (DX-Y.NYB)
 # ──────────────────────────────────────────────────────────────────────────────
@@ -321,7 +229,6 @@ def get_us_treasury_yield_daily_source(query_date: date) -> str:
 # Registry of instrument+data_type → resolver function.
 # Each resolver takes a date and returns a source name string.
 _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
-    ("CBOE:INDEX:VIX-USD", "ohlcv_15m"): get_vix_15m_source,
     ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
     ("CBOE:INDEX:US3M-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
     # US2Y added 2026-06-25 (operator: 3M/2Y/5Y/10Y target curve) — Yahoo 2YY=F,
@@ -362,14 +269,3 @@ def data_types_for_instrument(instrument_key: str) -> list[str]:
     the mapping. Returns an empty list when no resolver is registered.
     """
     return sorted(dt for key, dt in _SOURCE_RESOLVERS if key == instrument_key)
-
-
-# ──────────────────────────────────────────────────────────────────────────────
-# GCS bucket constants (referenced by backfill/migration scripts)
-# ──────────────────────────────────────────────────────────────────────────────
-
-VIX_PROD_BUCKET: str = "market-data-tick-tradfi-central-element-323112"
-VIX_DEV_BUCKET: str = "market-data-tick-tradfi-test-central-element-323112"
-VIX_INSTRUMENT_KEY: str = "CBOE:INDEX:VIX-USD"
-VIX_DATA_TYPE: str = "ohlcv_15m"
-VIX_TYPE_PREFIX: str = "indices"

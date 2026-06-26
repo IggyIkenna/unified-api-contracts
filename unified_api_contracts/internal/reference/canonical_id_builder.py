@@ -310,13 +310,12 @@ def _build_tradfi_cash(
 ) -> str:
     """Build the canonical key for TradFi cash/reference instruments.
 
-    ``INDEX`` carries the base-quote suffix (``CBOE:INDEX:VIX-USD``) to match the
-    data-write key (``VIX_INSTRUMENT_KEY``), the symbology GCS key, the
-    ``data_source_continuity`` resolver keys and what the reference adapters
-    emit — a bare ``VENUE:INDEX:SYMBOL`` mismatches the captured-data path and
-    silently breaks source/data-status resolution. ``quote_asset`` defaults to
-    ``USD`` for indices (all listed index levels are USD-denominated). Other
-    cash types (equity/ETF/bond/…) keep the plain ``VENUE:TYPE:SYMBOL`` form.
+    ``INDEX`` carries the base-quote suffix (e.g. ``CBOE:INDEX:US10Y-USD``) to
+    match the symbology GCS key and the ``data_source_continuity`` resolver keys —
+    a bare ``VENUE:INDEX:SYMBOL`` mismatches the captured-data path and silently
+    breaks source/data-status resolution. ``quote_asset`` defaults to ``USD`` for
+    indices (all listed index levels are USD-denominated). Other cash types
+    (equity/ETF/bond/…) keep the plain ``VENUE:TYPE:SYMBOL`` form.
     """
     base = f"{_venue_token(venue, None)}:{itype.value}:{symbol.upper()}"
     if itype is InstrumentType.INDEX:
