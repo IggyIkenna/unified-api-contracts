@@ -440,7 +440,7 @@ class TestImpossiblePairsNotEnumerable:
         assert result == frozenset({"trades", "ohlcv_1s", "ohlcv_1m", "tbbo"})
 
     def test_tradfi_index_has_no_trades(self) -> None:
-        """TradFi INDEX instruments (e.g. VIX) are OHLCV-only — no trade data."""
+        """TradFi INDEX instruments (e.g. DXY, US10Y) are OHLCV-only — no trade data."""
         result = valid_data_types_for_instrument_type("tradfi", "index")
         assert result is not None
         assert "trades" not in result, (

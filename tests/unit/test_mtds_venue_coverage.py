@@ -123,8 +123,8 @@ class TestAllTradfiVenues:
     def test_includes_non_databento_tradfi_venues(self) -> None:
         vm = VenueMapping()
         all_tradfi = set(vm.all_tradfi_venues)
-        # CBOE uses Barchart (VIX index); FX uses Yahoo Finance — both must be in
-        # the complete tradfi universe so their cells appear in the denominator.
+        # CBOE (VX futures via Databento XCBF.PITCH) and FX (Yahoo Finance) must
+        # be in the complete tradfi universe so their cells appear in the denominator.
         assert "CBOE" in all_tradfi, f"CBOE missing from all_tradfi_venues: {all_tradfi}"
         assert "FX" in all_tradfi, f"FX missing from all_tradfi_venues: {all_tradfi}"
 

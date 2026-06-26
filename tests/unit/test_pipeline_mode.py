@@ -178,7 +178,7 @@ def test_pipeline_mode_is_exposed_from_crosscutting_namespace() -> None:
 
 
 def test_batch_yahoo_round_trip() -> None:
-    """VIX 15m rolling 60d fallback route — Yahoo Finance free-tier intraday."""
+    """Yahoo Finance free-tier intraday pipeline mode round-trip."""
     assert PipelineMode.BATCH_YAHOO.value == "batch_yahoo"
     assert pipeline_mode_for_source("yahoo") is PipelineMode.BATCH_YAHOO
     assert source_string_for(PipelineMode.BATCH_YAHOO) == "yahoo"
