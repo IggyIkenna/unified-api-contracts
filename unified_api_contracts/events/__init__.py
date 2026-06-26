@@ -1,16 +1,34 @@
-"""External streaming-event SSOT for cross-service Redis Stream payloads.
+"""External streaming-event SSOT for the live-pipeline event bus.
 
-This package houses Pydantic models for events that traverse Redis Streams between
-co-located services (MTDS → MDPS → features-service → strategy-service). They are
-distinct from :mod:`unified_api_contracts.internal.events`, which describes the
-GCS-archived structured-logging lifecycle envelope.
+This package houses Pydantic models for events that traverse the live-pipeline
+event bus (currently Redis Streams; migrating to GCP Pub/Sub via
+``live_data_persistence_central_event_log_2026_06_25.md``).
 
-Streaming events are part of the live-pipeline cascade landed by
-``live_pipeline_mtds_mdps_features_2026_05_08`` Phase 1.
+Two sub-modules:
+
+* :mod:`~unified_api_contracts.events.streaming` — legacy Redis-stream event
+  shapes (``CandleBoundaryCrossedEvent`` / ``CandleComputedEvent`` / ...).
+  These are **in-flight migration** to the canonical envelope below; they
+  remain exported during the Plans 04-06 migration phase.
+* :mod:`~unified_api_contracts.events.persist` — canonical
+  :class:`CanonicalPersistEnvelope` + :class:`RetentionClass` for the
+  Pub/Sub central log. New producers use this shape.
+* :mod:`~unified_api_contracts.events.sink_matrix` — :data:`SINK_MATRIX`
+  lookup + :func:`retention_class_for` / :func:`sinks_for` resolvers.
 """
 
 from __future__ import annotations
 
+from unified_api_contracts.events.persist import (
+    CanonicalPersistEnvelope,
+    RetentionClass,
+)
+from unified_api_contracts.events.sink_matrix import (
+    SINK_MATRIX,
+    SinkConfig,
+    retention_class_for,
+    sinks_for,
+)
 from unified_api_contracts.events.streaming import (
     CandleBoundaryCrossedEvent,
     CandleComputedEvent,
@@ -21,10 +39,16 @@ from unified_api_contracts.events.streaming import (
 )
 
 __all__ = [
+    "SINK_MATRIX",
     "CandleBoundaryCrossedEvent",
     "CandleComputedEvent",
+    "CanonicalPersistEnvelope",
     "EmissionOutcome",
     "FeaturesComputedEvent",
     "InstrumentCacheRefreshTriggerEvent",
+    "RetentionClass",
+    "SinkConfig",
     "parse_timeframe",
+    "retention_class_for",
+    "sinks_for",
 ]
