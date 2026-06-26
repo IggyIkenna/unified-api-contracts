@@ -1326,6 +1326,13 @@ DATA_PIPELINE_ALERT_RULES: Final[tuple[DataPipelineAlertRule, ...]] = (
     _dp_rule("DP-VM-004", _C.VM, "DP_EVENT_LOOP_STARVED", _S.WARN, _E.FILE_ISSUE),
     _dp_rule("DP-VM-005", _C.VM, "DP_NO_EARLY_PROGRESS", _S.INFO, _E.FILE_ISSUE),
     _dp_rule("DP-VM-006", _C.VM, "DP_GCS_429_THRASH", _S.CRITICAL, _E.AUTO_RECOVER),
+    # DP-VM-007: Cloud Run job running image older than the latest Artifact Registry
+    # build for its service (stale_cloud_run_image_alert_gap_2026_06_26). A job can
+    # heartbeat healthily on old code with no existing alert — this closes the
+    # static-property gap. WARN / FILE_ISSUE: not an immediate runtime crisis but
+    # a deployment drift that must be resolved before the job is counted as "done".
+    # Route: #data-pipeline-alerts (SLACK only, per WARN severity routing).
+    _dp_rule("DP-VM-007", _C.VM, "DP_CLOUD_RUN_STALE_IMAGE", _S.WARN, _E.FILE_ISSUE),
     # ── DP-RATE (class C5) ──────────────────────────────────────────────────
     _dp_rule("DP-RATE-001", _C.RATE, "DP_SOURCE_RATE_LIMITED", _S.WARN, _E.AUTO_RECOVER),
     _dp_rule("DP-RATE-002", _C.RATE, "DP_KEY_POOL_EXHAUSTED", _S.CRITICAL, _E.PAGE_OPERATOR),
