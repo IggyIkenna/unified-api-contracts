@@ -1000,3 +1000,76 @@ def test_kalshi_novel_ticker_routes_to_other() -> None:
     for ticker in ("KXELONMARS-99", "KXNEWPOPE-70", "KXMRBEASTVIDEOLENGTH", "KXFUSION"):
         result = classify_kalshi_to_canonical_group(ticker=ticker)
         assert result == CanonicalQuestionGroup.OTHER, f"Expected OTHER for {ticker!r}, got {result!r}"
+
+
+def test_classify_polymarket_bitcoin_above_routes_to_btc_price_range() -> None:
+    """Polymarket 'bitcoin-above-<N>' slugs route to BTC_PRICE_RANGE_DAILY.
+
+    These are price-level arb candidates for the Kalshi<->Polymarket cross-venue
+    YES dispersion engine. Previously fell to OTHER because 'above' was not in
+    the CRYPTO_PRICE branch's detection set (unlike the COMMODITY branch which
+    always checked 'above'/'below'/'reach'/'hit').
+    """
+    cases = [
+        ("Will Bitcoin be above $95,000?", "bitcoin-above-95000", "bitcoin-price-level"),
+        ("Will Bitcoin be above $100k by end of June?", "bitcoin-above-100k-june-30", "bitcoin-price"),
+        ("Will Bitcoin be below $80,000?", "bitcoin-below-80000", "bitcoin-price-level"),
+    ]
+    for title, slug, event_slug in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=title,
+            slug=slug,
+            event_slug=event_slug,
+            outcome="Yes",
+        )
+        assert group == CanonicalQuestionGroup.BTC_PRICE_RANGE_DAILY, (
+            f"Expected BTC_PRICE_RANGE_DAILY for slug={slug!r}, got {group!r}"
+        )
+
+
+def test_classify_polymarket_will_bitcoin_reach_routes_to_btc_price_range() -> None:
+    """Polymarket 'will-bitcoin-reach-<N>' slugs route to BTC_PRICE_RANGE_DAILY."""
+    cases = [
+        ("Will Bitcoin reach $95,000?", "will-bitcoin-reach-95000-by-june-24", "bitcoin-price"),
+        ("Will Bitcoin reach $100k in 2025?", "will-bitcoin-reach-100k-in-2025", "crypto-price"),
+        ("Will Bitcoin hit $120,000?", "will-bitcoin-hit-120000-in-2025", "bitcoin-price-level"),
+    ]
+    for title, slug, event_slug in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=title,
+            slug=slug,
+            event_slug=event_slug,
+            outcome="Yes",
+        )
+        assert group == CanonicalQuestionGroup.BTC_PRICE_RANGE_DAILY, (
+            f"Expected BTC_PRICE_RANGE_DAILY for slug={slug!r}, got {group!r}"
+        )
+
+
+def test_classify_polymarket_eth_above_routes_to_eth_price_range() -> None:
+    """Polymarket 'ethereum-above-<N>' and 'eth-above-<N>' slugs route to ETH_PRICE_RANGE_DAILY."""
+    cases = [
+        ("Will Ethereum be above $4,000?", "ethereum-above-4000", "ethereum-price-level"),
+        ("Will ETH reach $5,000 by end of year?", "eth-reach-5000-by-dec-31", "eth-price"),
+    ]
+    for title, slug, event_slug in cases:
+        group = classify_polymarket_to_canonical_group(
+            title=title,
+            slug=slug,
+            event_slug=event_slug,
+            outcome="Yes",
+        )
+        assert group == CanonicalQuestionGroup.ETH_PRICE_RANGE_DAILY, (
+            f"Expected ETH_PRICE_RANGE_DAILY for slug={slug!r}, got {group!r}"
+        )
+
+
+def test_classify_polymarket_btc_up_or_down_not_affected() -> None:
+    """'bitcoin-up-or-down-daily' still routes to BTC_UP_DOWN_DAILY, not PRICE_RANGE."""
+    group = classify_polymarket_to_canonical_group(
+        title="Will Bitcoin be up or down today?",
+        slug="bitcoin-up-or-down-daily",
+        event_slug="bitcoin-price-daily",
+        outcome="Up",
+    )
+    assert group == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
