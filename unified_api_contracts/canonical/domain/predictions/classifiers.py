@@ -219,6 +219,12 @@ KALSHI_TICKER_PREFIX_TO_GROUP: Final[dict[str, CanonicalQuestionGroup]] = {
     "KX10YUSTSRY": _G.TREASURY_YIELD_PER_PRINT,  # 10Y UST yield
     "KX10Y2Y": _G.TREASURY_YIELD_PER_PRINT,  # 10Y-2Y spread
     "KX10Y3M": _G.TREASURY_YIELD_PER_PRINT,  # 10Y-3M spread
+    # Weather highest-temperature → WEATHER_TEMP_DAILY (shared with Polymarket)
+    # Kalshi series: KXHIGH-{CITY}-{DATE} (e.g. KXHIGH-NYC-28JUN, KXHIGHATL-2026-06-30).
+    # Polymarket weather routes via (WEATHER, "TEMPERATURE") → same group. The KXHIGH
+    # prefix was absent from this map so all Kalshi temp markets fell to OTHER. Fix:
+    # axis-1 underlying = WEATHER_TEMP → both venues now share the group.
+    "KXHIGH": _G.WEATHER_TEMP_DAILY,
 }
 """Kalshi event-ticker prefix → canonical group (rule-based fallback layer).
 

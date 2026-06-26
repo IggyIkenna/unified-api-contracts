@@ -1073,3 +1073,23 @@ def test_classify_polymarket_btc_up_or_down_not_affected() -> None:
         outcome="Up",
     )
     assert group == CanonicalQuestionGroup.BTC_UP_DOWN_DAILY
+
+
+def test_classify_kalshi_weather_kxhigh_routes_to_weather_temp_daily() -> None:
+    """KXHIGH* Kalshi tickers (daily highest temp) route to WEATHER_TEMP_DAILY.
+
+    Closes the weather gap: Polymarket weather routes via (WEATHER, TEMPERATURE)
+    to WEATHER_TEMP_DAILY; Kalshi KXHIGH* must reach the same group so both
+    venues share the underlying and the arb detector can compare them.
+    """
+    cases = [
+        "KXHIGH-NYC-28JUN",
+        "KXHIGHATL-2026-06-30",
+        "KXHIGH",  # bare prefix
+        "KXHIGHCHI-30JUN",
+    ]
+    for ticker in cases:
+        group = classify_kalshi_to_canonical_group(ticker=ticker)
+        assert group == CanonicalQuestionGroup.WEATHER_TEMP_DAILY, (
+            f"Expected WEATHER_TEMP_DAILY for ticker={ticker!r}, got {group!r}"
+        )
