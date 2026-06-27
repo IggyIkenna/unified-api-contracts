@@ -186,6 +186,28 @@ def assert_yahoo_request_width_ok(interval: str, start_date: date, end_date: dat
 
 
 # ──────────────────────────────────────────────────────────────────────────────
+# KRX (Korea Exchange) — KOSPI / KOSPI 200 indices, daily bars via Yahoo Finance
+# ──────────────────────────────────────────────────────────────────────────────
+
+# KOSPI (^KS11) and KOSPI 200 (^KS200): daily history available from Yahoo
+# Finance back to at least 2019-01-02 (the operator TradFi backfill floor).
+# Added 2026-06-27: operator directed "daily KOSPI prices from Yahoo Finance".
+KRX_INDEX_DAILY_FIRST_DATE: date = date(2019, 1, 2)
+
+
+def get_krx_index_daily_source(query_date: date) -> str:
+    """Return the source for KRX index ohlcv_24h on *query_date*.
+
+    KOSPI (KRX:INDEX:KOSPI-USD) and KOSPI 200 (KRX:INDEX:KOSPI200-USD) are
+    available from Yahoo Finance (^KS11, ^KS200) back to 2019-01-02.
+    Earlier dates are reported as GAP_NO_SOURCE.
+    """
+    if query_date < KRX_INDEX_DAILY_FIRST_DATE:
+        return "GAP_NO_SOURCE"
+    return "YAHOO_FINANCE"
+
+
+# ──────────────────────────────────────────────────────────────────────────────
 # DXY (US Dollar Index) — ICE/NYBOT, daily bars via Yahoo Finance (DX-Y.NYB)
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -229,6 +251,10 @@ def get_us_treasury_yield_daily_source(query_date: date) -> str:
 # Registry of instrument+data_type → resolver function.
 # Each resolver takes a date and returns a source name string.
 _SOURCE_RESOLVERS: dict[tuple[str, str], object] = {
+    # KRX (Korea Exchange) broad-market indices — daily via Yahoo Finance.
+    # Canonical key = {venue}:INDEX:{base_asset}-USD (matches YahooIndexDef.base_asset).
+    ("KRX:INDEX:KOSPI-USD", "ohlcv_24h"): get_krx_index_daily_source,
+    ("KRX:INDEX:KOSPI200-USD", "ohlcv_24h"): get_krx_index_daily_source,
     ("ICE:INDEX:DXY-USD", "ohlcv_24h"): get_dxy_daily_source,
     ("CBOE:INDEX:US3M-USD", "ohlcv_24h"): get_us_treasury_yield_daily_source,
     # US2Y added 2026-06-25 (operator: 3M/2Y/5Y/10Y target curve) — Yahoo 2YY=F,
