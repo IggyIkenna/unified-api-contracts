@@ -73,7 +73,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Iterable, Mapping, Sequence
-from datetime import datetime
+from datetime import UTC, date, datetime
 from typing import TYPE_CHECKING, Final, NamedTuple
 
 from unified_api_contracts.canonical.domain.prediction.prediction_mapping import (
@@ -151,6 +151,50 @@ _PM_STRIKE_RE: Final[re.Pattern[str]] = re.compile(
 _PM_TRAILING_NUM_RE: Final[re.Pattern[str]] = re.compile(
     r"[-_](?P<num>\d+(?:[.,]\d+)?)(?P<suffix>[km])?$", re.IGNORECASE
 )
+
+# Matches "june-25-2026" or "jun-25-2026" style month-day-year tokens inside a Polymarket slug.
+# Used to extract the ET question-date from UP_DOWN slugs like
+# "bitcoin-up-or-down-june-25-2026-6pm-et" (expiry = midnight UTC ≠ slug date).
+_PM_SLUG_MONTH_DATE_RE: Final[re.Pattern[str]] = re.compile(
+    r"(?P<month>jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
+    r"jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)"
+    r"[-_](?P<day>\d{1,2})[-_](?P<year>\d{4})",
+    re.IGNORECASE,
+)
+_PM_MONTH_MAP: Final[dict[str, int]] = {
+    "jan": 1,
+    "feb": 2,
+    "mar": 3,
+    "apr": 4,
+    "may": 5,
+    "jun": 6,
+    "jul": 7,
+    "aug": 8,
+    "sep": 9,
+    "oct": 10,
+    "nov": 11,
+    "dec": 12,
+}
+
+
+def _polymarket_slug_date(slug: str) -> date | None:
+    """ET question-date from a Polymarket UP/DOWN slug, or None when absent.
+
+    Parses patterns like ``bitcoin-up-or-down-june-25-2026-6pm-et`` →
+    ``date(2026, 6, 25)``.  Returns ``None`` when no parseable month-name date
+    is present (non-UP/DOWN slugs, hex condition-id fallbacks, etc.).
+    """
+    m = _PM_SLUG_MONTH_DATE_RE.search(slug)
+    if m is None:
+        return None
+    month_key = m.group("month").lower()[:3]
+    month = _PM_MONTH_MAP.get(month_key)
+    if month is None:
+        return None
+    try:
+        return date(int(m.group("year")), month, int(m.group("day")))
+    except ValueError:
+        return None
 
 
 class _Classified(NamedTuple):
@@ -395,12 +439,22 @@ def _classify_polymarket(record: InstrumentRecord, titles: Mapping[str, str]) ->
             resolution_date=record.expiry.date() if record.expiry is not None else None,
         )
         sports_key = fixture.pairing_key() if fixture is not None else None
+    # For UP_DOWN markets the IS stores all hourly contracts at midnight UTC of the
+    # PREVIOUS day (expiry = 2026-06-25 00:00 UTC for June 25 ET markets), producing a
+    # systematic 1-day offset vs Kalshi (which uses the actual expiry timestamp).
+    # Parse the ET question-date from the slug ("june-25-2026" token) and use it as
+    # the settlement key so both venues produce the same PRICE::*::UP_DOWN::YYYY-MM-DD::DIR.
+    expiry_for_key = record.expiry
+    if bet_type is PredictionBetType.UP_DOWN:
+        slug_d = _polymarket_slug_date(slug)
+        if slug_d is not None:
+            expiry_for_key = datetime(slug_d.year, slug_d.month, slug_d.day, tzinfo=UTC)
     key = match_key(
         venue=record.venue,
         instrument_key=record.instrument_key,
         raw_symbol=slug,
         symbol=title,
-        expiry=record.expiry,
+        expiry=expiry_for_key,
         underlying=underlying,
         bet_type=bet_type,
         strike=strike,
