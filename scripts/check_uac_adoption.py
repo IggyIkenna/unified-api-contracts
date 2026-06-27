@@ -34,6 +34,14 @@ WORKSPACE = Path(__file__).resolve().parent.parent.parent
 # inflated the orphan count to a measurement artifact (~364).
 TERMINAL_CONSUMER_TYPES: frozenset[str] = frozenset({"service", "batch-service", "api-service"})
 
+# L1482 (sit_uac_orphan): UTL is a T0 library that re-exports dozens of UAC schemas — terminal
+# services consume those schemas transitively through UTL, but the by-class-name grep misses
+# facade imports.  Adding UTL to the scanned set means any UAC schema referenced directly in
+# UTL source is no longer counted as orphaned, dropping the ~328 false-orphan floor toward the
+# genuinely-unused residual.  Only UTL qualifies here — other libraries (agent-orchestrator,
+# system-integration-tests) are not T0 re-export layers for UAC.
+LIBRARY_CONSUMERS: frozenset[str] = frozenset({"unified-trading-library"})
+
 # Classes exempt from adoption check — not expected to be directly imported by class name.
 # Reason categories:
 #   venue-constant: registry/constant accessed programmatically, not by class name
@@ -155,12 +163,15 @@ def _resolve_manifest() -> Path | None:
 
 
 def get_terminal_consumer_services() -> list[str]:
-    """Derive the terminal-consumer set from the PM manifest (type+status filter).
+    """Derive the consumer set from the PM manifest (type+status filter) plus LIBRARY_CONSUMERS.
 
-    Mirrors smoke-test-gate.yml: repositories where type ∈ TERMINAL_CONSUMER_TYPES AND
-    status == "active". Falls back to an empty list (with a stderr warning) if the
-    manifest cannot be found — adoption then scores every schema as orphaned, which is a
-    LOUD signal that the manifest path resolution is wrong, not a silent false-green.
+    Primary set: repositories where type ∈ TERMINAL_CONSUMER_TYPES AND status == "active",
+    mirroring smoke-test-gate.yml.  Also includes LIBRARY_CONSUMERS (UTL) unconditionally,
+    because UTL is a T0 re-export layer for UAC schemas — any schema referenced in UTL
+    source is effectively adopted by the whole service fleet (L1482).
+    Falls back to an empty list (with a stderr warning) if the manifest cannot be found —
+    adoption then scores every schema as orphaned, which is a LOUD signal that the manifest
+    path resolution is wrong, not a silent false-green.
     """
     manifest_path = _resolve_manifest()
     if manifest_path is None:
@@ -184,6 +195,11 @@ def get_terminal_consumer_services() -> list[str]:
         repo_status: object = meta.get("status")
         if repo_type in TERMINAL_CONSUMER_TYPES and repo_status == "active":
             services.append(name)
+    # Add T0 library consumers that re-export UAC schemas (L1482: UTL re-exports are
+    # invisible to the by-class-name grep unless UTL itself is in the scanned set).
+    for lib in sorted(LIBRARY_CONSUMERS):
+        if lib not in services:
+            services.append(lib)
     return sorted(services)
 
 
