@@ -17,6 +17,7 @@ from unified_api_contracts.canonical.crosscutting.honest_coverage import (
     EMPTY_CONFIRMED_REASONS,
     ES_OPTIONS_CLUSTERS,
     EVENT_CONTRACT_ROOT_CLUSTERS,
+    EXPECTED_BOOKMAKER_MARKET_SETS,
     EXPECTED_EMPTY_REASON_PREFIX,
     FUTURES_CHAIN_BUCKETS,
     OUT_OF_COVERAGE_WINDOW_REASONS,
@@ -479,3 +480,54 @@ def test_compute_layered_coverage_missing_days_drag_day_coverage() -> None:
     assert compute_honest_coverage(blind) > compute_honest_coverage(honest)
     layered = compute_layered_coverage(honest, honest)
     assert layered.day_coverage < compute_honest_coverage(blind)
+
+
+# ---------------------------------------------------------------------------
+# EXPECTED_BOOKMAKER_MARKET_SETS
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_expected_bookmaker_market_sets_has_required_tiers() -> None:
+    """The three canonical league tiers must be present."""
+    assert "tier_1_domestic" in EXPECTED_BOOKMAKER_MARKET_SETS
+    assert "tier_1_international" in EXPECTED_BOOKMAKER_MARKET_SETS
+    assert "tier_2_domestic" in EXPECTED_BOOKMAKER_MARKET_SETS
+
+
+@pytest.mark.unit
+def test_expected_bookmaker_market_sets_tier_1_domestic_bookmakers() -> None:
+    """Tier-1 domestic must include pinnacle, betfair_ex_uk, williamhill, unibet_uk."""
+    tier = EXPECTED_BOOKMAKER_MARKET_SETS["tier_1_domestic"]
+    assert "pinnacle" in tier
+    assert "betfair_ex_uk" in tier
+    assert "williamhill" in tier
+    assert "unibet_uk" in tier
+
+
+@pytest.mark.unit
+def test_expected_bookmaker_market_sets_pinnacle_has_asian_handicap_in_tier_1() -> None:
+    """Pinnacle carries asian_handicap for tier-1 domestic and international."""
+    from unified_api_contracts.canonical.domain.sports.odds import OddsType
+
+    assert OddsType.ASIAN_HANDICAP in EXPECTED_BOOKMAKER_MARKET_SETS["tier_1_domestic"]["pinnacle"]
+    assert OddsType.ASIAN_HANDICAP in EXPECTED_BOOKMAKER_MARKET_SETS["tier_1_international"]["pinnacle"]
+
+
+@pytest.mark.unit
+def test_expected_bookmaker_market_sets_all_markets_are_nonempty() -> None:
+    """Every (tier, bookmaker) pair must list at least one market type."""
+    for tier_key, bookmaker_map in EXPECTED_BOOKMAKER_MARKET_SETS.items():
+        assert bookmaker_map, f"tier {tier_key!r} has no bookmakers"
+        for bk, markets in bookmaker_map.items():
+            assert markets, f"tier {tier_key!r} bookmaker {bk!r} has empty market list"
+
+
+@pytest.mark.unit
+def test_expected_bookmaker_market_sets_tier_2_domestic_is_subset_of_tier_1() -> None:
+    """Tier-2 domestic bookmaker set must be a subset of tier-1 domestic."""
+    tier1_bks = set(EXPECTED_BOOKMAKER_MARKET_SETS["tier_1_domestic"])
+    tier2_bks = set(EXPECTED_BOOKMAKER_MARKET_SETS["tier_2_domestic"])
+    assert tier2_bks <= tier1_bks, (
+        f"tier_2_domestic bookmakers {tier2_bks - tier1_bks} not in tier_1_domestic"
+    )
