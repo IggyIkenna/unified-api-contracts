@@ -35,7 +35,7 @@ SSOT: plans/active/tradfi_datasource_closeout_krx_yahoo_parity_2026_06_24.md.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 
 import pytest
 
@@ -303,9 +303,13 @@ def test_yahoo_adapter_limits_declared_and_enforced() -> None:
     assert YAHOO_INTRADAY_MAX_REQUEST_DAYS["1m"] == 8  # measured 2026-06-24
     assert isinstance(YAHOO_DAILY_BACKFILL_FLOOR, date)
 
-    # enforced: a beyond-limit intraday request raises
+    # enforced: a beyond-limit intraday request raises.
+    # Use datetime.now(UTC).date() — the same reference the function uses internally
+    # (it calls datetime.now(UTC).date() when today=None). date.today() returns local
+    # time and can be UTC+1, making start_date equal to the floor instead of before it.
+    _utc_today = datetime.now(UTC).date()
     with pytest.raises(YahooLookbackExceededError):
-        assert_yahoo_intraday_within_limit("15m", date.today() - timedelta(days=61))
+        assert_yahoo_intraday_within_limit("15m", _utc_today - timedelta(days=61))
     # enforced: a pre-floor daily request raises (the GENERAL daily clamp)
     with pytest.raises(YahooLookbackExceededError):
         assert_yahoo_intraday_within_limit("1d", YAHOO_DAILY_BACKFILL_FLOOR - timedelta(days=1))
