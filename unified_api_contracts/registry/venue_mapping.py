@@ -448,10 +448,15 @@ class VenueMapping:
 
         Derived from the authoritative ``all_databento_venues`` field (which, despite its
         name, already contains the full tradfi universe including non-Databento venues):
-          - CME, NASDAQ, NYSE, ICE → Databento
+          - CME, NASDAQ, NYSE → Databento
           - CBOE → Databento XCBF.PITCH (VX/VIX FUTURES; VIX 15m aggregates from VX)
           - FX   → Yahoo Finance (KRW/USD; see ``venue_to_data_provider``)
           - KRX  → Yahoo Finance (Korea single stocks, .KS tickers)
+          - ICE  → Yahoo Finance — DXY index only (DX-Y.NYB). The ICE Databento
+            datasets (IFUS/IFEU = Brent/Gasoil commodity futures) are OUT of our
+            subscription (removed from ``venue_to_databento`` 2026-06-27); those
+            commodity futures remain a genuine Databento subscription ask — only the
+            DXY/index series is sourced today, and it is Yahoo, not Databento.
 
         Use this accessor (not ``all_databento_venues``) for any denominator that must
         count ALL expected tradfi coverage cells — e.g. the deployment-api
