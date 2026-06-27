@@ -46,14 +46,16 @@ class TestPlayerValuesSSOT:
             league_id="BUNDESLIGA",
             season="2024",
         )
-        # Canonical season-partitioned path first; bare-path fallback last.
+        # Canonical season-partitioned path first.
         assert paths[0] == (
             "sports_reference/by_date/day=2024-08-01/entity=player_values/season=2024/player_values.parquet"
         )
-        # league_id is NOT in the path — league filter happens intra-file.
+        # league_id is NOT in the canonical path — league filter happens intra-file.
         assert "league=" not in paths[0]
         # Bare fallback present so historic writes that omitted season still resolve.
-        assert paths[-1] == ("sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet")
+        assert (
+            "sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet" in paths
+        )
 
     def test_no_season_probes_three_year_window(self) -> None:
         """When the caller doesn't know the season, probe year-1 / year / year+1
@@ -65,13 +67,15 @@ class TestPlayerValuesSSOT:
             "2024-08-01",
             league_id="BUNDESLIGA",
         )
-        # Three season candidates + bare fallback = 4 total.
+        # At least three season candidates (year-1, year, year+1) present.
         season_paths = [p for p in paths if "season=" in p]
-        assert len(season_paths) == 3
+        assert len(season_paths) >= 3
         seasons = sorted({p.split("season=")[1].split("/")[0] for p in season_paths})
-        assert seasons == ["2023", "2024", "2025"]
-        bare_paths = [p for p in paths if "season=" not in p]
-        assert len(bare_paths) == 1
+        assert "2023" in seasons and "2024" in seasons and "2025" in seasons
+        # Bare path (no season=) present for legacy fallback.
+        assert (
+            "sports_reference/by_date/day=2024-08-01/entity=player_values/player_values.parquet" in paths
+        )
 
     def test_legacy_per_day_per_league_layout_still_works_for_other_data_types(self) -> None:
         """Sanity: the new PER_DAY_PER_SEASON layout doesn't break the existing
@@ -165,3 +169,96 @@ class TestSportsPipelineModeFallbackChain:
             pipeline_mode="batch_api_football",
         )
         assert any("pipeline_mode=batch_api_football" in u for u in uris)
+
+
+class TestForwardPhantomPathShapes:
+    """Gate tests for the three path shapes missing before 2026-06-27.
+
+    These shapes caused candidate_parquet_paths to under-report real on-disk
+    paths, making the forward phantom pass false-flag ~145k captured rows as
+    phantom. Each test enumerates the shape from candidate_parquet_paths to
+    prove the forward --apply is now safe (#5 fix gate).
+    """
+
+    # (a) fetched_at_hour= sub-partitioning — footystats ODDS + PREDICTIONS
+    def test_odds_fetched_at_hour_wildcard_with_league(self) -> None:
+        """ODDS with pipeline_mode: fetched_at_hour=* wildcard candidate emitted."""
+        paths = candidate_parquet_paths("ODDS", "2025-09-01", "EPL", pipeline_mode="batch_footystats")
+        fah_paths = [p for p in paths if "fetched_at_hour=*" in p]
+        assert fah_paths, "expected fetched_at_hour=* candidates for ODDS"
+        # League-specific wildcard candidate must be present.
+        assert any("league=EPL" in p for p in fah_paths), (
+            "league-specific fetched_at_hour=* candidate missing for ODDS/EPL"
+        )
+        # pipeline_mode-aware candidate must be present.
+        assert any("pipeline_mode=batch_footystats" in p for p in fah_paths), (
+            "pipeline_mode-aware fetched_at_hour=* candidate missing for ODDS"
+        )
+
+    def test_odds_fetched_at_hour_wildcard_bare(self) -> None:
+        """ODDS bare (no league): bare fetched_at_hour=* wildcard emitted."""
+        paths = candidate_parquet_paths("ODDS", "2025-09-01", pipeline_mode="batch_footystats")
+        fah_paths = [p for p in paths if "fetched_at_hour=*" in p]
+        assert fah_paths, "expected fetched_at_hour=* candidates for bare ODDS"
+        # All fetched_at_hour candidates end with footystats_odds.parquet.
+        assert all(p.endswith("footystats_odds.parquet") for p in fah_paths)
+
+    def test_predictions_fetched_at_hour_wildcard(self) -> None:
+        """PREDICTIONS: fetched_at_hour=* wildcard emitted (same hourly-snapshot pattern)."""
+        paths = candidate_parquet_paths("PREDICTIONS", "2025-09-01", "EPL", pipeline_mode="batch_footystats")
+        fah_paths = [p for p in paths if "fetched_at_hour=*" in p]
+        assert fah_paths, "expected fetched_at_hour=* candidates for PREDICTIONS"
+        assert any("league=EPL" in p for p in fah_paths)
+
+    def test_fetched_at_hour_wildcard_not_emitted_for_non_footystats(self) -> None:
+        """Non-footystats PER_DAY_PER_LEAGUE entities do NOT get fetched_at_hour=* paths."""
+        paths_fixtures = candidate_parquet_paths("FIXTURES", "2025-09-01", "EPL")
+        assert not any("fetched_at_hour=*" in p for p in paths_fixtures)
+        paths_xg = candidate_parquet_paths("XG", "2025-09-01")
+        assert not any("fetched_at_hour=*" in p for p in paths_xg)
+
+    # (b) transfermarkt_teams.parquet legacy filename — PLAYER_VALUES
+    def test_player_values_transfermarkt_teams_filename_with_season(self) -> None:
+        """Explicit season: transfermarkt_teams.parquet filename emitted alongside player_values.parquet."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01", season="2024")
+        assert any("season=2024/transfermarkt_teams.parquet" in p for p in paths), (
+            "transfermarkt_teams.parquet + season= candidate missing"
+        )
+
+    def test_player_values_transfermarkt_teams_filename_year_window(self) -> None:
+        """No season: transfermarkt_teams.parquet emitted for all three year-window seasons."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01")
+        tm_paths = [p for p in paths if "transfermarkt_teams.parquet" in p and "season=" in p]
+        seasons = sorted({p.split("season=")[1].split("/")[0] for p in tm_paths})
+        assert "2023" in seasons and "2024" in seasons and "2025" in seasons, (
+            "transfermarkt_teams.parquet not emitted for all three year-window seasons"
+        )
+
+    def test_player_values_transfermarkt_teams_bare_fallback(self) -> None:
+        """Bare (no season) transfermarkt_teams.parquet candidate emitted as final fallback."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01")
+        assert any(
+            p.endswith("entity=player_values/transfermarkt_teams.parquet") for p in paths
+        ), "bare transfermarkt_teams.parquet fallback missing"
+
+    # (c) league= without season= — PLAYER_VALUES
+    def test_player_values_league_without_season_candidate(self) -> None:
+        """league_id provided: entity=player_values/league={L}/player_values.parquet emitted."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01", league_id="BUNDESLIGA")
+        assert any(
+            "league=BUNDESLIGA/player_values.parquet" in p and "season=" not in p for p in paths
+        ), "league-without-season player_values.parquet candidate missing"
+
+    def test_player_values_league_without_season_legacy_name(self) -> None:
+        """league_id provided: transfermarkt_teams.parquet also emitted for the per-league legacy shape."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01", league_id="BUNDESLIGA")
+        assert any(
+            "league=BUNDESLIGA/transfermarkt_teams.parquet" in p and "season=" not in p for p in paths
+        ), "league-without-season transfermarkt_teams.parquet candidate missing"
+
+    def test_player_values_no_league_no_league_candidates(self) -> None:
+        """Without league_id the per-league-without-season candidates are NOT emitted."""
+        paths = candidate_parquet_paths("PLAYER_VALUES", "2024-08-01")
+        assert not any("league=" in p and "season=" not in p for p in paths), (
+            "per-league-without-season candidates should only appear when league_id is provided"
+        )

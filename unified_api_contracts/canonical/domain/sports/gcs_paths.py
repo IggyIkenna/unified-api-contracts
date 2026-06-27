@@ -137,6 +137,13 @@ SPORTS_BUCKET_TEMPLATE = "instruments-store-sports-{env}-{project_id}"
 SPORTS_BY_DATE_PREFIX = "sports_reference/by_date/"
 SPORTS_FLAT_PREFIX = "sports_reference/"
 
+# Entities that write per-hourly-fetch snapshots under a fetched_at_hour= sub-partition.
+# The IS footystats writer adds fetched_at_hour={YYYY-MM-DDTHH} between entity= and
+# league= so each polling run gets its own partition (latest-wins when reading).
+# The hour value is dynamic, so candidate_parquet_paths emits these as wildcard
+# candidates (fetched_at_hour=*) that the reconciler resolves via startswith/endswith.
+_FETCHED_AT_HOUR_FOLDERS: frozenset[str] = frozenset({"footystats_odds", "footystats_predictions"})
+
 
 def sports_bucket_name(project_id: str, *, env: str = "prd") -> str:
     """Return the canonical sports reference bucket name for a project.
@@ -234,6 +241,32 @@ def candidate_parquet_paths(
         if include_legacy_archive:
             archive_base = f"sports_reference_v1_archive/by_date/day={day}/entity={folder}"
             paths.append(f"{archive_base}/{folder}.parquet")
+
+        # (b) Legacy filename: pre-SSOT-realignment writes used transfermarkt_teams.parquet
+        # as the filename even after the entity folder moved to player_values/. Add these as
+        # fallback candidates so the reconciler's forward pass can find historic captures.
+        _legacy_name = "transfermarkt_teams.parquet"
+        if pm_base:
+            if season:
+                paths.append(f"{pm_base}/season={season}/{_legacy_name}")
+            else:
+                for s in year_window:
+                    paths.append(f"{pm_base}/season={s}/{_legacy_name}")
+            paths.append(f"{pm_base}/{_legacy_name}")
+        if season:
+            paths.append(f"{base}/season={season}/{_legacy_name}")
+        else:
+            for s in year_window:
+                paths.append(f"{base}/season={s}/{_legacy_name}")
+        paths.append(f"{base}/{_legacy_name}")
+
+        # (c) Legacy per-league layout without season= (pre-2026-05-05 partial writes used
+        # entity=player_values/league={L}/ without a season= segment — these survive on disk
+        # and the reconciler's forward pass must recognise them as real captures).
+        if league_id:
+            paths.append(f"{base}/league={league_id}/{folder}.parquet")
+            paths.append(f"{base}/league={league_id}/{_legacy_name}")
+
         return paths
 
     # PER_DAY_PER_LEAGUE or PER_DAY_BARE
@@ -252,6 +285,22 @@ def candidate_parquet_paths(
         if league_id:
             paths.append(f"{archive_base}/league={league_id}/{folder}.parquet")
         paths.append(f"{archive_base}/{folder}.parquet")
+
+    # (a) fetched_at_hour= sub-partitioning (footystats ODDS + PREDICTIONS):
+    # Each polling run writes its own hourly snapshot partition between entity= and league=.
+    # The hour value is unknown at query time, so we use fetched_at_hour=* as a wildcard
+    # segment. Callers that do exact path lookup must handle * via startswith/endswith;
+    # the reconciler's _audit_sports function recognises and resolves these candidates.
+    if folder in _FETCHED_AT_HOUR_FOLDERS:
+        _fah = "fetched_at_hour=*"
+        if pm_base:
+            if layout == SportsPathLayout.PER_DAY_PER_LEAGUE and league_id:
+                paths.append(f"{pm_base}/{_fah}/league={league_id}/{folder}.parquet")
+            paths.append(f"{pm_base}/{_fah}/{folder}.parquet")
+        if layout == SportsPathLayout.PER_DAY_PER_LEAGUE and league_id:
+            paths.append(f"{base}/{_fah}/league={league_id}/{folder}.parquet")
+        paths.append(f"{base}/{_fah}/{folder}.parquet")
+
     return paths
 
 
