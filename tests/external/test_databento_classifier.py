@@ -70,6 +70,46 @@ def test_dated_future_two_digit_year_classifies() -> None:
     assert cls.expiry_date.month == 12
 
 
+def test_dated_future_single_digit_year_zero_anchors_to_2020() -> None:
+    # ESM0 = ES June-2020. Single-digit year "0" anchors to 2020+0=2020.
+    # Reproduces the 2020 Q1 CME ohlcv_1m SCHEMA_VALIDATION_FAILED regression.
+    cls = classify_databento_symbol("ESM0")
+    assert cls.instrument_type is InstrumentType.FUTURE
+    assert cls.underlying == "ES"
+    assert cls.is_continuous is False
+    # M = June, year token "0" → 2020+0=2020, third Friday = 2020-06-19.
+    assert cls.expiry_date == _dt.date(2020, 6, 19)
+    assert cls.strike is None
+    assert cls.option_right is None
+
+
+def test_cme_short_option_daily_monday_2020_with_space_classifies() -> None:
+    # E1AG0 C3240 = ES 0DTE Monday option (E1A root), Feb 2020, call, strike 3240.
+    # Space-separated form; year token "0" → 2020.  Reproduces the 2020 Q1
+    # SCHEMA_VALIDATION_FAILED / partition_mismatch regression for CME ohlcv_1m.
+    cls = classify_databento_symbol("E1AG0 C3240")
+    assert cls.instrument_type is InstrumentType.OPTION
+    assert cls.underlying == "ES"  # E1A prefix → ES via _derive_cme_option_underlying
+    assert cls.option_right == "C"
+    assert cls.strike == Decimal("3240")
+    # G = February, year token "0" → 2020, third Friday = 2020-02-21.
+    assert cls.expiry_date == _dt.date(2020, 2, 21)
+    assert cls.is_continuous is False
+
+
+def test_cme_short_option_ew1_weekly_monday_2020_put_classifies() -> None:
+    # EW1G0 P3225 = ES weekly Monday option, Feb 2020, put, strike 3225.
+    # Reproduces the 2020 Q1 CME ohlcv_1m partition_mismatch regression.
+    cls = classify_databento_symbol("EW1G0 P3225")
+    assert cls.instrument_type is InstrumentType.OPTION
+    assert cls.underlying == "ES"  # EW1 prefix → EW → ES
+    assert cls.option_right == "P"
+    assert cls.strike == Decimal("3225")
+    # G = February, year "0" → 2020, third Friday = 2020-02-21.
+    assert cls.expiry_date == _dt.date(2020, 2, 21)
+    assert cls.is_continuous is False
+
+
 # ---------------------------------------------------------------------------
 # Cboe VX (VIX) futures — XCBF.PITCH slash-delimited parent symbology
 # ---------------------------------------------------------------------------

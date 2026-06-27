@@ -126,15 +126,18 @@ class VenueMapping:
         merged = set(self.tardis_to_venue.values()) | set(self.all_cefi_onchain_clob_venues)
         return sorted(merged)
 
-    # Map canonical venues to Databento dataset identifiers
+    # Map canonical venues to Databento dataset identifiers.
+    # ICE is NOT listed here (2026-06-27): ICE Databento datasets (IFUS.IMPACT /
+    # IFEU.IMPACT) are outside our 3-dataset subscription and raise
+    # DatabentoDatasetNotAllowedError. The only retained ICE instrument (DXY) is
+    # Yahoo-sourced (see venue_to_data_provider["ICE"] and YAHOO_INDICES). Any legacy
+    # ICE Databento mapping must NOT be re-added without an explicit ICE subscription.
     venue_to_databento: dict[str, str] = field(
         default_factory=lambda: {
             "CME": "GLBX.MDP3",  # CME Globex Market Data Platform 3.0
             "CBOE": "XCBF.PITCH",  # CBOE Futures Exchange (CFE) — VX/VIX FUTURES via Databento
             "NASDAQ": "DBEQ.BASIC",  # NASDAQ equities via Databento DBEQ.BASIC
             "NYSE": "DBEQ.BASIC",  # NYSE equities via Databento DBEQ.BASIC
-            "ICE": "IFUS.IMPACT",  # ICE Futures US (Cotton, Coffee, Sugar, Cocoa, OJ, Dollar Index)
-            "ICE-EU": "IFEU.IMPACT",  # ICE Europe (Brent, Gas Oil, etc.)
         }
     )
 
@@ -206,7 +209,12 @@ class VenueMapping:
             # venue_to_databento. (Barchart was retired 2026-06-24; VIX 15m is now
             # aggregated from VX futures via databento, not a Barchart CSV preload.)
             "FX": "yahoo_finance",  # KRW/USD via Yahoo Finance
-            "KRX": "yahoo_finance",  # Korea Exchange single stocks via Yahoo (.KS tickers)
+            "ICE": "yahoo_finance",  # ICE/NYBOT DXY index only — Yahoo Finance (DX-Y.NYB);
+            # the ICE Databento datasets (IFUS/IFEU) are OUT of our subscription
+            # (removed from venue_to_databento 2026-06-27). This entry ensures the parity
+            # gate (test_tradfi_venue_resolves_to_a_data_source) sees a valid source for
+            # ICE (DXY via Yahoo), not a "routes nowhere" gap.
+            "KRX": "yahoo_finance",  # Korea Exchange: KOSPI/KOSPI200 indices + single stocks via Yahoo
             # DeFi venues with direct API integration
             "HYPERLIQUID": "hyperliquid_api",
             "ASTER": "aster_api",
