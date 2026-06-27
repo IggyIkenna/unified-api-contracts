@@ -150,9 +150,16 @@ KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 # ``instruments-service/instruments_service/engine/orchestrator.py:1113``
 # but UAC-side so other repos can import it without a circular dep.
 SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
-    # FootyStats — match aggregates + footystats' own in-house prediction model.
-    # NOTE: ODDS was removed 2026-06-25 (#6 coherent unit) — bookmaker odds are
-    # MARKET-TICK-DATA owned by MTDS/odds-api (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE).
+    # FootyStats — match aggregates + footystats' own in-house prediction model
+    # + aggregated pre-match bookmaker odds snapshot.
+    #
+    # ODDS note (operator decision 2026-06-27, #6 REVERSED): footystats ODDS are a
+    # PRE-MATCH SNAPSHOT (68 markets at kickoff-72h, all named books aggregated) — a
+    # PREDICTIVE/reference signal captured by IS, NOT raw intra-day bookmaker ticks.
+    # RAW bookmaker tick data (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE) lives in MTDS
+    # via odds-api. The two coexist: MTDS=tick market data, IS=footystats snapshot.
+    # See codex/02-data/sports-data-source-coverage-matrix.md §2.2 for the full
+    # PREDICTIONS vs ODDS disambiguation.
     # TEAMS/STANDINGS moved to api_football 2026-06-25 (canonical-form alignment):
     #   footystats writes ONLY footystats_matches/odds/predictions to disk — it does
     #   NOT write teams/standings. Those are written by the api_football handler under
@@ -161,6 +168,7 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     #   = ["api_football"] (the writer already raised MissingSourceError on footystats),
     #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
     "MATCHES": "footystats",
+    "ODDS": "footystats",
     "PREDICTIONS": "footystats",
     # Understat — xG model + per-shot xG
     "XG": "understat",
