@@ -3,6 +3,32 @@
 # unified-api-contracts has zero upstream dependencies (pure Pydantic schemas)
 
 steps:
+  # ── fetch-tags: make hatch-vcs (source = "vcs") resolvable in the wheel-build step ──────────
+  # Cloud Build's FETCHSOURCE is a SHALLOW, tag-less /workspace/.git → setuptools-scm cannot detect
+  # the version in the later python:3.13-slim wheel step. This step authenticates with GH_PAT and
+  # fetches tags + full history into the SHARED /workspace/.git so the wheel step resolves it.
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
+    id: "fetch-tags"
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        set -e
+        if [ ! -d /workspace/.git ]; then
+          echo "fetch-tags: /workspace/.git absent (non-trigger build) — skipping (wheel step reports any real error)"
+          exit 0
+        fi
+        GH_PAT=$$(gcloud secrets versions access latest --secret=GH_PAT --project=$PROJECT_ID 2>/dev/null || echo "")
+        REMOTE="https://github.com/IggyIkenna/$REPO_NAME.git"
+        [ -n "$$GH_PAT" ] && REMOTE="https://$$GH_PAT@github.com/IggyIkenna/$REPO_NAME.git"
+        # Unshallow so tagged commits are reachable for setuptools-scm (a plain tag-ref fetch on a
+        # shallow clone leaves git describe unable to compute the version). Fall back to a tags-only
+        # fetch when the repo is already complete (--unshallow errors on a non-shallow repo).
+        git -C /workspace fetch --unshallow --tags --force "$$REMOTE" "+refs/tags/*:refs/tags/*" 2>/dev/null \
+          || git -C /workspace fetch --tags --force "$$REMOTE" "+refs/tags/*:refs/tags/*"
+        echo "fetch-tags: $$(git -C /workspace tag --list 'v*' | wc -l | tr -d ' ') v* tags present"
+    waitFor: ["-"]
+
   # Step 0: Ensure unified-libraries repo exists
   - name: "gcr.io/cloud-builders/gcloud"
     id: "ensure-repo"
@@ -120,7 +146,7 @@ steps:
         uv pip install --system build
         python -m build --wheel --outdir dist/
         ls -lh dist/
-    waitFor: ["quality-gates", "cloud-sdk-isolation-check"]
+    waitFor: ["quality-gates", "cloud-sdk-isolation-check", "fetch-tags"]
 
   # Step 2.5: Store build metadata (version → commit mapping)
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk:alpine"
