@@ -510,6 +510,16 @@ YAHOO_INDICES: list[YahooIndexDef] = [
     YahooIndexDef("US5Y", "CBOE", "US5Y", "^FVX", date(2000, 1, 3), "fixed_income"),
     YahooIndexDef("US10Y", "CBOE", "US10Y", "^TNX", date(2000, 1, 3), "fixed_income"),
     YahooIndexDef("US30Y", "CBOE", "US30Y", "^TYX", date(2000, 1, 3), "fixed_income"),
+    # KRX (Korea Exchange) broad-market indices — daily ohlcv_24h via Yahoo Finance.
+    # Added 2026-06-27: operator directed "daily KOSPI prices from Yahoo Finance".
+    # KOSPI (^KS11) is the Korea Composite Stock Price Index (the KRX benchmark).
+    # KOSPI 200 (^KS200) is the large-cap sub-index used in futures/options.
+    # Daily history confirmed available back to 2019-01-02 on Yahoo (same floor as DXY).
+    # Venue = KRX (Korea Exchange); asset_group = equity; holiday_calendar = XKRX.
+    # These are INDEX instruments (non-tradeable pricing references), distinct from the
+    # 3 KRX single-stock EQUITYs in KRX_EQUITIES (Samsung/Hyundai/SK Hynix).
+    YahooIndexDef("KOSPI", "KRX", "KOSPI", "^KS11", date(2019, 1, 2), "equity"),
+    YahooIndexDef("KOSPI200", "KRX", "KOSPI200", "^KS200", date(2019, 1, 2), "equity"),
 ]
 
 # ---------------------------------------------------------------------------

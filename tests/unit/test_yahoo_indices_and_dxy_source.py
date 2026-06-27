@@ -216,3 +216,125 @@ def test_every_yahoo_index_has_a_source_resolver_under_canonical_key() -> None:
             f"{idx.symbol}: no source resolver under canonical key {canonical!r} "
             f"— add a ({canonical!r}, <data_type>) entry to _SOURCE_RESOLVERS"
         )
+
+
+# ---------------------------------------------------------------------------
+# KRX KOSPI / KOSPI 200 index enumeration (added 2026-06-27)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_yahoo_indices_contains_kospi_and_kospi200() -> None:
+    """YAHOO_INDICES must include the KRX KOSPI and KOSPI200 index entries.
+
+    Added 2026-06-27: operator directed 'daily KOSPI prices from Yahoo Finance'.
+    The KOSPI composite (^KS11) and KOSPI 200 (^KS200) are the KRX benchmark
+    indices; they are INDEX instruments (non-tradeable), distinct from the 3
+    KRX single-stock EQUITYs in KRX_EQUITIES.
+    """
+    by_symbol = {idx.symbol: idx for idx in YAHOO_INDICES}
+    assert "KOSPI" in by_symbol, "KOSPI (^KS11) missing from YAHOO_INDICES"
+    assert "KOSPI200" in by_symbol, "KOSPI200 (^KS200) missing from YAHOO_INDICES"
+
+
+@pytest.mark.unit
+def test_kospi_entry_fields() -> None:
+    """KOSPI entry must have the correct venue, ticker, and asset_group."""
+    (kospi,) = [idx for idx in YAHOO_INDICES if idx.symbol == "KOSPI"]
+    assert kospi.venue == "KRX"
+    assert kospi.yahoo_ticker == "^KS11"
+    assert kospi.base_asset == "KOSPI"
+    assert kospi.asset_group == "equity"
+    assert kospi.first_available_date.year == 2019
+
+
+@pytest.mark.unit
+def test_kospi200_entry_fields() -> None:
+    """KOSPI200 entry must have the correct venue, ticker, and asset_group."""
+    (k200,) = [idx for idx in YAHOO_INDICES if idx.symbol == "KOSPI200"]
+    assert k200.venue == "KRX"
+    assert k200.yahoo_ticker == "^KS200"
+    assert k200.base_asset == "KOSPI200"
+    assert k200.asset_group == "equity"
+    assert k200.first_available_date.year == 2019
+
+
+@pytest.mark.unit
+def test_get_krx_index_daily_source_returns_yahoo_on_covered_date() -> None:
+    """Dates on or after KRX_INDEX_DAILY_FIRST_DATE return YAHOO_FINANCE."""
+    from unified_api_contracts.registry.data_source_continuity import (
+        KRX_INDEX_DAILY_FIRST_DATE,
+        get_krx_index_daily_source,
+    )
+
+    assert get_krx_index_daily_source(KRX_INDEX_DAILY_FIRST_DATE) == "YAHOO_FINANCE"
+    assert get_krx_index_daily_source(date(2024, 6, 1)) == "YAHOO_FINANCE"
+
+
+@pytest.mark.unit
+def test_get_krx_index_daily_source_returns_gap_before_coverage() -> None:
+    """Dates before KRX_INDEX_DAILY_FIRST_DATE return GAP_NO_SOURCE."""
+    from unified_api_contracts.registry.data_source_continuity import get_krx_index_daily_source
+
+    assert get_krx_index_daily_source(date(2018, 12, 31)) == "GAP_NO_SOURCE"
+    assert get_krx_index_daily_source(date(2000, 1, 1)) == "GAP_NO_SOURCE"
+
+
+@pytest.mark.unit
+def test_get_source_for_instrument_resolves_kospi() -> None:
+    """get_source_for_instrument dispatches to get_krx_index_daily_source for KOSPI."""
+    from unified_api_contracts.registry.data_source_continuity import get_source_for_instrument
+
+    result = get_source_for_instrument("KRX:INDEX:KOSPI-USD", "ohlcv_24h", date(2023, 3, 15))
+    assert result == "YAHOO_FINANCE"
+
+
+@pytest.mark.unit
+def test_get_source_for_instrument_resolves_kospi200() -> None:
+    """get_source_for_instrument dispatches to get_krx_index_daily_source for KOSPI200."""
+    from unified_api_contracts.registry.data_source_continuity import get_source_for_instrument
+
+    result = get_source_for_instrument("KRX:INDEX:KOSPI200-USD", "ohlcv_24h", date(2023, 3, 15))
+    assert result == "YAHOO_FINANCE"
+
+
+# ---------------------------------------------------------------------------
+# ICE routing — no Databento dataset (regression guard, 2026-06-27)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.unit
+def test_ice_not_in_venue_to_databento() -> None:
+    """ICE must NOT appear in VenueMapping.venue_to_databento.
+
+    ICE Databento datasets (IFUS.IMPACT / IFEU.IMPACT) are outside the 3-dataset
+    paid subscription. Previously venue_to_databento['ICE'] = 'IFUS.IMPACT' caused
+    DatabentoDatasetNotAllowedError on enumeration → 32 absent ICE days. The fix
+    routes ICE exclusively via Yahoo Finance (DXY index only). Re-adding any ICE
+    Databento dataset without an explicit ICE subscription MUST be review-blocking.
+    """
+    from unified_api_contracts.registry.venue_mapping import VenueMapping
+
+    vm = VenueMapping()
+    assert "ICE" not in vm.venue_to_databento, (
+        "ICE must NOT be in venue_to_databento — IFUS/IFEU datasets are outside the "
+        "paid subscription (would raise DatabentoDatasetNotAllowedError). "
+        "Remove it (done 2026-06-27). Re-adding requires an explicit ICE subscription."
+    )
+
+
+@pytest.mark.unit
+def test_ice_routes_to_yahoo_finance_in_venue_to_data_provider() -> None:
+    """ICE must route to yahoo_finance via venue_to_data_provider (for DXY).
+
+    After removing ICE from venue_to_databento, the parity gate
+    (test_tradfi_venue_resolves_to_a_data_source) must still see ICE as a
+    valid-sourced venue — ensured by venue_to_data_provider['ICE'] = 'yahoo_finance'.
+    """
+    from unified_api_contracts.registry.venue_mapping import VenueMapping
+
+    vm = VenueMapping()
+    assert vm.venue_to_data_provider.get("ICE") == "yahoo_finance", (
+        "ICE must have venue_to_data_provider['ICE'] = 'yahoo_finance' so the DXY "
+        "Yahoo-sourced index is correctly attributed and the parity gate passes."
+    )

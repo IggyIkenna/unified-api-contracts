@@ -119,6 +119,7 @@ from .data_availability import (
     get_provider_availability,
 )
 from .data_source_continuity import (
+    KRX_INDEX_DAILY_FIRST_DATE,
     YAHOO_DAILY_BACKFILL_FLOOR,
     YAHOO_INTRADAY_LOOKBACK_DAYS,
     YAHOO_INTRADAY_MAX_REQUEST_DAYS,
@@ -127,6 +128,7 @@ from .data_source_continuity import (
     YahooRequestTooWideError,
     assert_yahoo_intraday_within_limit,
     assert_yahoo_request_width_ok,
+    get_krx_index_daily_source,
 )
 from .data_status_axis_matrix import (
     BREAKDOWN_AXES,
@@ -771,6 +773,7 @@ __all__ = [
     "KNOWN_ETFS",
     "KRX_EQUITIES",
     "KRX_EQUITY_SYMBOLS",
+    "KRX_INDEX_DAILY_FIRST_DATE",
     "LADBROKES",
     "LEAGUE_ENTITY_COVERAGE",
     "LEAGUE_ENTITY_COVERAGE_ENTITIES",
