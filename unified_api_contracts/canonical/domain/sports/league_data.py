@@ -150,9 +150,16 @@ KNOWN_COVERAGE_GAPS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 # ``instruments-service/instruments_service/engine/orchestrator.py:1113``
 # but UAC-side so other repos can import it without a circular dep.
 SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
-    # FootyStats — match aggregates + footystats' own in-house prediction model.
-    # NOTE: ODDS was removed 2026-06-25 (#6 coherent unit) — bookmaker odds are
-    # MARKET-TICK-DATA owned by MTDS/odds-api (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE).
+    # FootyStats — match aggregates + footystats' own in-house prediction model
+    # + aggregated pre-match bookmaker odds snapshot.
+    #
+    # ODDS note (operator decision 2026-06-27, #6 REVERSED): footystats ODDS are a
+    # PRE-MATCH SNAPSHOT (68 markets at kickoff-72h, all named books aggregated) — a
+    # PREDICTIVE/reference signal captured by IS, NOT raw intra-day bookmaker ticks.
+    # RAW bookmaker tick data (ODDS_SNAPSHOT/ODDS_MOVEMENT/ARBITRAGE) lives in MTDS
+    # via odds-api. The two coexist: MTDS=tick market data, IS=footystats snapshot.
+    # See codex/02-data/sports-data-source-coverage-matrix.md §2.2 for the full
+    # PREDICTIONS vs ODDS disambiguation.
     # TEAMS/STANDINGS moved to api_football 2026-06-25 (canonical-form alignment):
     #   footystats writes ONLY footystats_matches/odds/predictions to disk — it does
     #   NOT write teams/standings. Those are written by the api_football handler under
@@ -161,6 +168,7 @@ SPORTS_DATA_TYPE_TO_SOURCE: dict[str, str] = {
     #   = ["api_football"] (the writer already raised MissingSourceError on footystats),
     #   which produced ~137k mis-sourced/phantom manifest rows. Aligned to the SSOT.
     "MATCHES": "footystats",
+    "ODDS": "footystats",
     "PREDICTIONS": "footystats",
     # Understat — xG model + per-shot xG
     "XG": "understat",
@@ -194,6 +202,73 @@ def get_source_for_data_type(data_type: str) -> str | None:
     """Return the source-key for a sports manifest ``data_type``, or
     ``None`` if unknown (caller should treat as no-clip)."""
     return SPORTS_DATA_TYPE_TO_SOURCE.get(data_type)
+
+
+# ---------------------------------------------------------------------------
+# Structural (league x source) honest-absence gaps (operator 2026-06-27 #6)
+# ---------------------------------------------------------------------------
+# Some (league x source) combinations are STRUCTURALLY UNAVAILABLE — the source
+# simply does not carry that league, at ANY date. These are distinct from
+# ``SOURCE_COVERAGE_START`` (a date floor) and ``KNOWN_COVERAGE_GAPS`` (a date
+# window): a structural gap is "the source NEVER has this league". Encoding it
+# means:
+#   1. the honest-coverage SSOT treats the (league x source) cell as
+#      EXPECTED-ABSENT (it is NOT counted as missing in any denominator), and
+#   2. the IS sports producers / download-attempts SKIP it entirely — no
+#      attempt → no fail → no ``attempted_failed`` noise.
+#
+# Operator-confirmed structural gaps (2026-06-27 #6):
+#   * A_LEAGUE          x footystats   — footystats does not carry the A-League.
+#   * GREEK_SUPER_LEAGUE x transfermarkt — transfermarkt has no market-values
+#                                          coverage for the Greek Super League.
+#   * understat carries ONLY the "big-5" leagues (EPL / LA_LIGA / BUNDESLIGA /
+#     SERIE_A / LIGUE_1). The other 89 football leagues x understat are NOT
+#     carried — encoded as an understat ALLOW-LIST (its complement is structural
+#     absence) so we never attempt understat XG for a non-big-5 league.
+#
+# Two encodings, both consulted by :func:`is_sports_structural_gap`:
+#   * SPORTS_STRUCTURAL_GAPS — explicit (source → {league_ids it does NOT carry}).
+#   * SPORTS_SOURCE_LEAGUE_ALLOWLIST — (source → {ONLY these leagues carried});
+#     any league NOT in the allow-list is a structural gap for that source.
+SPORTS_STRUCTURAL_GAPS: dict[str, frozenset[str]] = {
+    "footystats": frozenset({"A_LEAGUE"}),
+    "transfermarkt": frozenset({"GREEK_SUPER_LEAGUE"}),
+}
+
+#: understat carries ONLY the big-5 European leagues — every other league is a
+#: structural gap for understat (operator 2026-06-27 #6). Keyed by source.
+SPORTS_SOURCE_LEAGUE_ALLOWLIST: dict[str, frozenset[str]] = {
+    "understat": frozenset({"EPL", "LA_LIGA", "BUNDESLIGA", "SERIE_A", "LIGUE_1"}),
+}
+
+
+def is_sports_structural_gap(source_key: str, league_id: str) -> bool:
+    """Return ``True`` iff ``(source_key, league_id)`` is a STRUCTURAL gap.
+
+    A structural gap means the source NEVER carries that league (at any date),
+    so the cell is expected-absent for honest coverage AND the IS sports
+    producers MUST skip it (no attempt → no ``attempted_failed`` noise). This is
+    the SSOT both the coverage denominator and the IS sports adapters consult.
+
+    Two rules (OR-combined):
+      1. ``league_id`` is in the source's explicit gap set
+         (:data:`SPORTS_STRUCTURAL_GAPS`).
+      2. the source has an ALLOW-LIST (:data:`SPORTS_SOURCE_LEAGUE_ALLOWLIST`)
+         AND ``league_id`` is NOT in it (understat big-5-only).
+
+    Args:
+        source_key: source identifier (``footystats`` / ``understat`` /
+            ``transfermarkt`` / …) — the ``SPORTS_DATA_TYPE_TO_SOURCE`` value.
+        league_id: canonical league id (case-insensitive).
+
+    Returns:
+        ``True`` when the (source, league) combo is structurally unavailable.
+    """
+    lid = league_id.upper()
+    if lid in SPORTS_STRUCTURAL_GAPS.get(source_key, frozenset()):
+        return True
+    allow = SPORTS_SOURCE_LEAGUE_ALLOWLIST.get(source_key)
+    return allow is not None and lid not in allow
 
 
 def is_pre_launch_date(data_type: str, iso_date: str) -> bool:
@@ -579,6 +654,8 @@ __all__ = [
     "SOURCE_COVERAGE_START",
     "SPORTS_LEAGUES_CONFIG_HASH",
     "SPORTS_LEAGUES_CONFIG_VERSION",
+    "SPORTS_SOURCE_LEAGUE_ALLOWLIST",
+    "SPORTS_STRUCTURAL_GAPS",
     "clip_dates_to_source_coverage",
     "get_all_prediction_league_ids",
     "get_expected_leagues_for_source",
@@ -594,5 +671,6 @@ __all__ = [
     "get_prediction_leagues",
     "get_source_coverage_start",
     "is_in_known_gap",
+    "is_sports_structural_gap",
     "sports_leagues_config_descriptor",
 ]

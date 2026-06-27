@@ -137,14 +137,16 @@ class TestValidDataTypesByAgAndInstrumentType:
 
     def test_sports_league_valid_is_reference_data_types(self) -> None:
         # Regression: the league could-exist grain must keep EVERY reference-data
-        # provider data_type (SPORTS_DATA_TYPE_TO_SOURCE keys). ODDS was removed from IS
-        # 2026-06-25 (#6 coherent unit) — it must NOT appear here. It must NOT contain
-        # the MTDS odds market-data types either.
+        # provider data_type (SPORTS_DATA_TYPE_TO_SOURCE keys).
+        # ODDS was removed 2026-06-25 (#6) then RESTORED 2026-06-27 (operator reversal):
+        # footystats ODDS = pre-match snapshot reference data (IS); raw bookmaker tick
+        # data = MTDS odds-api. They coexist; see codex sports-data-source-coverage-matrix §4.
+        # It must NOT contain the MTDS odds market-data types.
         from unified_api_contracts.canonical.domain.sports import SPORTS_DATA_TYPE_TO_SOURCE
 
         result = valid_data_types_for_instrument_type("sports", "league")
         assert result == frozenset(SPORTS_DATA_TYPE_TO_SOURCE)
-        assert "ODDS" not in result  # removed from IS 2026-06-25 (#6 coherent unit)
+        assert "ODDS" in result  # footystats pre-match snapshot — IS reference data (#6 REVERSED)
         assert "FIXTURES" in result
         assert "odds" not in result  # lowercase MTDS market-data type — not a league reference type
 

@@ -135,6 +135,17 @@ class CeFiMvpRule:
             universe as options would yield false-missing. When non-empty, an OPTION
             cell is MVP iff ``base_ccy`` is in this set (``base_ccys`` is NOT
             applied to OPTION cells). Empty → fall back to ``base_ccys``.
+        instrument_type_data_types: Optional per-instrument_type data_type
+            OVERRIDE of the flat ``data_types`` set (operator 2026-06-27,
+            decision #2). When an instrument_type key is present, ONLY those
+            data_types are MVP for that instrument_type — the flat ``data_types``
+            set does NOT apply to it. Today the only entry is ``OPTION ->
+            {options_chain}``: a Deribit option's MVP MTDS data_type is the
+            options_chain bundle ONLY (it carries marks + IVs — sufficient);
+            per-strike ``trades`` + ``book_snapshot_5`` are EXCLUDED for options
+            (too heavy / ~12k API calls/day vs 1). An instrument_type ABSENT
+            from this map uses the flat ``data_types`` set unchanged
+            (perps/spot/dated-futures = trades + book_snapshot_5 + funding).
         sources: Optional frozenset of source strings. When not empty,
             only cells from one of these sources are MVP.
     """
@@ -144,6 +155,7 @@ class CeFiMvpRule:
     data_types: frozenset[str]
     base_ccys: frozenset[str] = field(default_factory=frozenset)
     options_base_ccys: frozenset[str] = field(default_factory=frozenset)
+    instrument_type_data_types: dict[str, frozenset[str]] = field(default_factory=dict)
     sources: frozenset[str] = field(default_factory=frozenset)
 
 
@@ -239,6 +251,32 @@ class FeaturesModelsMvpStub:
 
 
 # ---------------------------------------------------------------------------
+# Sports MVP league universe — the canonical 94-league football set.
+# ---------------------------------------------------------------------------
+# operator 2026-06-27 decision #1 (BUG FIX): the sports MVP universe is the
+# **94-league football universe** — EVERY league in ``LEAGUE_REGISTRY`` whose
+# ``sport == "FOOTBALL"`` (33 Prediction + 22 Features + 39 Reference football
+# = 94; the 7 non-football leagues NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE are
+# EXCLUDED). The previous rule MVP-tagged only 2 leagues (EPL + LA_LIGA) — a
+# drift the audit caught. Derived (not a hand-written literal) from the league
+# registry so a future football-league addition is automatically MVP.
+#
+# Import is LOCAL (inside the helper) to avoid an import cycle: ``mvp_scope`` is
+# loaded by the package ``__init__``/crosscutting ``__init__`` chain BEFORE the
+# sports domain, and ``league_data`` transitively re-enters that chain — a
+# top-level import here would deadlock partial init. The helper is invoked ONCE
+# at MVP_SCOPE construction (verified safe: the package __init__ is mid-flight
+# but the sports leaf modules import only stdlib/pydantic + config_versioning).
+def _mvp_football_league_ids() -> frozenset[str]:
+    """Return the canonical 94 football league_ids (``sport == "FOOTBALL"``)."""
+    from unified_api_contracts.canonical.domain.sports.league_data import (
+        LEAGUE_REGISTRY,
+    )
+
+    return frozenset(league.league_id for league in LEAGUE_REGISTRY.values() if league.sport == "FOOTBALL")
+
+
+# ---------------------------------------------------------------------------
 # MVP_SCOPE — the single global config
 # ---------------------------------------------------------------------------
 
@@ -318,13 +356,24 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # perp-gate exception (see is_in_mvp_capture_universe): its SPOT
                 # is mvp=true despite no perp on the venue.
                 "UPBIT",
-                # Binance COIN-M (inverse/delivery) perps + dated futures
-                # (cefi_universe_capture_rule 2026-06-24). Distinct canonical
-                # venue from BINANCE-FUTURES (USDT-M linear). Inverse perps (e.g.
-                # BTCUSD_PERP) are the more-liquid margin type for BTC/ETH on
-                # Binance's delivery endpoint — captured on base-membership (same
-                # CEFI_BASE_ASSET_UNIVERSE) via the PERPETUAL + FUTURE paths.
-                "BINANCE-DELIVERY",
+                # On-chain CLOB perp venues (LIGHTER / EXTENDED / PACIFICA) —
+                # classified as CEFI everywhere (venue_mapping
+                # all_cefi_onchain_clob_venues + VENUES_BY_ASSET_GROUP["cefi"] +
+                # is_cefi_venue), but previously ABSENT from this MVP rule so their
+                # PERPETUAL cells tagged mvp=0 (instruments-vs-MTDS drift). Added
+                # cefi here for BOTH instruments + MTDS (operator 2026-06-27
+                # decision #4). All three are CLOB-based perp DEXs (confirmed: same
+                # CLOB capture surface as HL/ASTER — trades + book_snapshot_5 +
+                # derivative_ticker). PACIFICA is forward-poll-only for tick (no
+                # historical book/trades backfill — see DataTypeCapability notes).
+                "LIGHTER-ZKSYNC",
+                "EXTENDED-STARKNET",
+                "PACIFICA-SOLANA",
+                # NOTE (operator 2026-06-27 decision #3): BINANCE-DELIVERY (Binance
+                # COIN-M inverse/delivery futures) was REMOVED from the cefi MVP
+                # set — the operator accepts COIN-M delivery is NOT MVP. Other
+                # venues' dated/quarterly fixed-delivery futures STAY MVP (the
+                # FUTURE instrument_type below + the dated-future capture path).
             }
         ),
         instrument_types=frozenset(
@@ -344,6 +393,10 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 "TOKENIZED_EQUITY",  # InstrumentType.TOKENIZED_EQUITY — tokenized stocks (e.g. Bybit AAPLX)
             }
         ),
+        # FLAT data_types — apply to SPOT_PAIR / PERPETUAL / FUTURE / EQUITY_PERP
+        # / TOKENIZED_EQUITY (everything EXCEPT the OPTION override below):
+        #   trades + book_snapshot_5 (the spot/perp microstructure pair) +
+        #   derivative_ticker / funding_rate (the perp funding axis).
         data_types=frozenset(
             {
                 "trades",
@@ -351,11 +404,20 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # Perpetual funding: canonical data_type is derivative_ticker
                 # (contains funding_rate field) in most venues;
                 # some venues expose a separate funding_rate data_type.
-                # TODO(mvp-scope): confirm canonical MVP data_type for funding axis.
                 "derivative_ticker",
                 "funding_rate",
             }
         ),
+        # OPTION data_type override (operator 2026-06-27 decision #2 — cost cut):
+        # a Deribit OPTION's MVP MTDS data_type is the ``options_chain`` bundle
+        # ONLY (it carries marks + IVs — sufficient for the VOL_* strategy/ML
+        # family). Per-strike ``trades`` + ``book_snapshot_5`` are EXCLUDED for
+        # options (~12k API calls/day per-strike vs 1 bulk chain call/day; full
+        # per-option tick is only needed for execution-quality analysis). This
+        # OVERRIDES the flat ``data_types`` set for OPTION cells.
+        instrument_type_data_types={
+            "OPTION": frozenset({"options_chain"}),
+        },
         # Curated CeFi capture universe (operator-confirmed SSOT, ~490 base assets,
         # survivorship-bias-free). Spot + perp legs.
         # EQUITY_PERP/TOKENIZED_EQUITY cells use CEFI_EQUITY_PERP_BASE_UNIVERSE as
@@ -365,7 +427,6 @@ MVP_SCOPE: Final[dict[str, object]] = {
         # Deribit-options carve-out: BTC + ETH only (the OPTION expected universe).
         options_base_ccys=CEFI_OPTIONS_UNDERLYINGS,
         # sources: empty → all sources in scope (tardis + per-venue live)
-        # TODO(mvp-scope): narrow to ["tardis"] once live-source tagging confirmed.
         sources=frozenset(),
     ),
     # ------------------------------------------------------------------
@@ -468,33 +529,35 @@ MVP_SCOPE: Final[dict[str, object]] = {
     #   data source per the MVP matrix — ES, NQ, VX futures + options).
     #
     # instrument_types: FUTURE, OPTION
-    #   NOTE: TradFi "option" in InstrumentType is ``OPTION``, not
-    #   ``OPTIONS_CHAIN`` (which was the legacy name). The task spec says
-    #   ``OPTIONS_CHAIN`` but the canonical enum value is ``OPTION``.
-    #   TODO(mvp-scope): confirm whether the plan means the OPTION instrument
-    #   type (individual option contract) or the futures_chain/options_chain
-    #   data_type (the daily chain bundle). Using OPTION for now.
+    #   NOTE: TradFi "option" in InstrumentType is ``OPTION`` (the legacy name was
+    #   ``OPTIONS_CHAIN``). CME OPTION rows are MVP at ohlcv_1m (operator
+    #   2026-06-27 decision #7) — but the catalogue today has 0 CME OPTION
+    #   instrument rows (only futures legs); the actual ingestion of CME option
+    #   instrument-definitions into instruments-service is a SEPARATE agent's job.
+    #   This rule ensures CME options are correctly MVP-tagged ONCE present.
     #
-    # data_types: trades, ohlcv_1m (per DATA_TYPES_BY_ASSET_GROUP["tradfi"])
+    # data_types: ohlcv_1m ONLY (operator 2026-06-27 decision #7 — NO ohlcv_1s,
+    #   NO trades/tbbo in tradfi MVP). 1-minute bars are the tradfi MVP grain.
     #
     # underliers: ES (S&P 500 e-mini), NQ (Nasdaq 100 e-mini), VX (VIX futures)
-    #   These are the exchange_code values in tradfi_instrument_universe.py.
+    #   + the CME commodity roots backing a Binance tradfi-perp. CME OPTIONS on
+    #   these roots are MVP (decision #7: "S&P/ES, and the other CME roots that
+    #   have Binance perps"). These are the exchange_code / underlier values.
     #
-    # sources: databento (primary per SOURCE_PRIORITY), massive (secondary)
+    # sources: databento (primary per SOURCE_PRIORITY)
     # ------------------------------------------------------------------
     "tradfi": TradFiMvpRule(
         venues=frozenset({"CME"}),
         instrument_types=frozenset(
             {
                 "FUTURE",  # InstrumentType.FUTURE
-                "OPTION",  # InstrumentType.OPTION
-                # TODO(mvp-scope): confirm whether ETF (e.g. SPY options) is
-                # in MVP scope — excluded conservatively for now.
+                "OPTION",  # InstrumentType.OPTION — CME options, MVP at ohlcv_1m
             }
         ),
+        # ohlcv_1m ONLY (operator 2026-06-27 decision #7): tradfi MVP is 1-minute
+        # bars — NO ohlcv_1s, NO trades. CME options ride the same ohlcv_1m grain.
         data_types=frozenset(
             {
-                "trades",
                 "ohlcv_1m",
             }
         ),
@@ -526,27 +589,24 @@ MVP_SCOPE: Final[dict[str, object]] = {
     # The MVP sports coverage targets odds arbitrage (arbitrage_price_dispersion)
     # and fixture results (reference data for prediction-market settlement).
     #
-    # Leagues: the prediction-tier leagues from LEAGUE_REGISTRY.
-    #   Core football (soccer): EPL, LA_LIGA, BUNDESLIGA, SERIE_A, LIGUE_1
-    #   US sports: NFL, NBA (from NON_FOOTBALL_LEAGUES / FEATURES_LEAGUES).
-    #   TODO(mvp-scope): confirm exact league set for MVP; using a conservative
-    #   selection of top-tier leagues with full data-source coverage.
+    # Leagues: the canonical 94-league FOOTBALL universe (operator 2026-06-27
+    #   decision #1 — BUG FIX). EVERY ``LEAGUE_REGISTRY`` league with
+    #   ``sport == "FOOTBALL"`` (33 Prediction + 22 Features + 39 Reference = 94);
+    #   the 7 non-football leagues (NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE) are
+    #   EXCLUDED. Derived via ``_mvp_football_league_ids()`` so a future
+    #   football-league addition is automatically MVP — never a hand-written 2-
+    #   league literal (the prior EPL+LA_LIGA drift).
+    #
+    #   Structural honest-absence (decision #6) is a SEPARATE axis from MVP
+    #   membership: a league is MVP for the asset_group, but specific (league x
+    #   source) combos the source structurally does not carry are expected-absent
+    #   — see ``sports_structural_gaps.py`` (SPORTS_STRUCTURAL_GAPS), which the
+    #   coverage SSOT + the IS sports adapters honor (skip-not-attempt).
     #
     # data_types: odds (raw bookmaker odds), markets/outcomes (fixture lifecycle)
     # ------------------------------------------------------------------
     "sports": SportsMvpRule(
-        leagues=frozenset(
-            {
-                # Top-tier football (soccer) — Prediction classification
-                "EPL",  # English Premier League
-                "LA_LIGA",  # Spanish La Liga
-                # TODO(mvp-scope): confirm BUNDESLIGA canonical league_id
-                # (may be BUN or BUNDESLIGA_1 in league_data.py).
-                # US sports (Features/Non-football)
-                "NFL",  # National Football League
-                "NBA",  # National Basketball Association
-            }
-        ),
+        leagues=_mvp_football_league_ids(),
         data_types=frozenset(
             {
                 "odds",  # Raw bookmaker odds (from ODDS_API)
@@ -561,26 +621,32 @@ MVP_SCOPE: Final[dict[str, object]] = {
     # ------------------------------------------------------------------
     # prediction
     #
-    # Venues: POLYMARKET only (MVP per the archetype matrix; Kalshi is
-    #   post-MVP for data ingestion per the SOURCE_PRIORITY registry).
-    #   TODO(mvp-scope): confirm whether Kalshi is in MVP or post-MVP scope.
+    # Venues: POLYMARKET + KALSHI (operator 2026-06-27 decision #5 — TODO
+    #   resolved). The prediction MVP is the **Kalshi ↔ Polymarket arbitrage
+    #   overlap** (``arbitrage_price_dispersion``), which REQUIRES BOTH venues —
+    #   a cross-venue same-market spread cannot be quoted with only one leg. The
+    #   tradeable MVP universe is the cross-venue arb-overlap built by
+    #   ``cross_venue_mapping.build_cross_venue_mapping`` (per-instrument
+    #   same-settlement join). Kalshi was previously a "post-MVP TODO"; flipped
+    #   in. (The venue-membership rule here is the necessary condition; the
+    #   arb-overlap join is the per-instrument refinement applied downstream by
+    #   the strategy/coverage consumers.)
     #
     # market_groups: the PredictionMarketCategory values in scope.
-    #   crypto, politics, sports, financial are the main Polymarket categories.
-    #   TODO(mvp-scope): operator sign-off on market_group membership.
+    #   crypto, politics, sports — the categories the arb-overlap spans.
     #
     # data_types: trades (CLOB fills), prediction_canonical_question_group
     #   (cluster-grain), market_lifecycle (market lifecycle events).
     # ------------------------------------------------------------------
     "prediction": PredictionMvpRule(
-        venues=frozenset({"POLYMARKET"}),
+        venues=frozenset({"POLYMARKET", "KALSHI"}),
         market_groups=frozenset(
             {
                 "crypto",  # PredictionMarketCategory.CRYPTO
                 "politics",  # PredictionMarketCategory.POLITICS
                 "sports",  # PredictionMarketCategory.SPORTS
-                # TODO(mvp-scope): confirm whether "financial" is MVP.
-                # Excluded conservatively for now.
+                # "financial" excluded — the arb-overlap MVP is crypto/politics/
+                # sports cross-venue same-market pairs.
             }
         ),
         data_types=frozenset(
@@ -628,8 +694,31 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 9
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 10
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v10 (2026-06-27): operator's CANONICAL MVP definition (7 decisions reconciling
+the prior audit's drifts):
+  1. SPORTS 94-league FIX — sports MVP leagues = the 94 ``sport == "FOOTBALL"``
+     leagues (``_mvp_football_league_ids()``), not the 2-league EPL+LA_LIGA
+     literal. The 7 non-football leagues (NFL/NBA/MLB/NHL/ATP/WTA/EUROLEAGUE)
+     are no longer MVP.
+  2. CEFI Deribit OPTION → ``options_chain`` ONLY (cost cut) — new
+     ``CeFiMvpRule.instrument_type_data_types`` override (OPTION ->
+     {options_chain}); per-strike trades + book_snapshot_5 EXCLUDED for options.
+     Perps/spot/dated-futures unchanged (trades + book_snapshot_5 + funding).
+  3. DROP ``BINANCE-DELIVERY`` from the cefi MVP venues (COIN-M delivery not
+     MVP). Other venues' dated/quarterly futures STAY MVP (FUTURE type).
+  4. LIGHTER-ZKSYNC / EXTENDED-STARKNET / PACIFICA-SOLANA added to the cefi MVP
+     venues (CLOB perp DEXs, classified cefi everywhere — reconciled vs the
+     instruments-side which already had them cefi).
+  5. PREDICTION KALSHI flipped in-MVP — prediction MVP = the Kalshi↔Polymarket
+     arb-overlap (needs BOTH venues). TODO resolved.
+  7. TRADFI data_types narrowed to ``ohlcv_1m`` ONLY (no ohlcv_1s/trades); CME
+     OPTION stays an MVP instrument_type so CME options tag MVP at ohlcv_1m once
+     ingested.
+(Decision #6 — sports structural honest-absence — is encoded in the sibling
+``sports_structural_gaps.py`` registry, not in MVP_SCOPE membership.)
 
 v9 (2026-06-24): added ``BINANCE-DELIVERY`` (Binance COIN-M inverse/delivery
 perps + dated futures) to the CeFi MVP scope venues. Inverse perps (e.g.
@@ -826,8 +915,16 @@ def is_mvp(
             return False
         if instrument_type not in rule.instrument_types:
             return False
-        # Axis 3: data_type (blank → any MVP data_type, unbound-grain convention)
-        if not _data_type_in_rule(data_type, rule.data_types):
+        # Axis 3: data_type (blank → any MVP data_type, unbound-grain convention).
+        # PER-INSTRUMENT_TYPE OVERRIDE (operator 2026-06-27 decision #2): if the
+        # rule declares a data_type set for THIS instrument_type
+        # (``instrument_type_data_types``), gate on it INSTEAD of the flat
+        # ``data_types`` set — today OPTION -> {options_chain} only (Deribit
+        # options carry marks+IVs in the chain bundle; per-strike trades/book5 are
+        # too heavy and EXCLUDED). Any other instrument_type uses the flat set.
+        _it_norm = (instrument_type or "").strip().upper()
+        _dt_set = rule.instrument_type_data_types.get(_it_norm, rule.data_types)
+        if not _data_type_in_rule(data_type, _dt_set):
             return False
         # Axis 4: base_ccy (optional — if rule has a non-empty set, must match).
         # OPTION cells use the narrower options carve-out (Deribit-options =
@@ -895,7 +992,14 @@ def is_mvp(
             return False
         if not _data_type_in_rule(data_type, rule.data_types):
             return False
-        if rule.market_groups and market_group not in rule.market_groups:
+        # market_group is the UNBOUND axis (mirrors the data_type convention): a
+        # blank/None market_group means "any MVP market_group" — an
+        # instrument-grain catalogue row carries no market_group axis, so the
+        # venue/data_type axes decide membership. Without this, every prediction
+        # catalogue row (the IS rollup never passes market_group) tagged mvp=0
+        # despite POLYMARKET/KALSHI being in-MVP (decision #5). A NON-blank
+        # market_group is still gated against the rule set.
+        if rule.market_groups and market_group and market_group not in rule.market_groups:
             return False
         return not (rule.sources and source not in rule.sources)
 

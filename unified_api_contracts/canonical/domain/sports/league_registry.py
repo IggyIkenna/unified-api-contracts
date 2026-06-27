@@ -107,6 +107,20 @@ PRED_NO_FOOTYSTATS: frozenset[str] = _sources(
     "open_meteo",
 )
 
+# Prediction league — no Understat AND no Transfermarkt (operator 2026-06-27 #6:
+# transfermarkt structurally does not carry this league's market values). Used by
+# GREEK_SUPER_LEAGUE so its ``data_sources`` agrees with the structural-gap SSOT
+# ``SPORTS_STRUCTURAL_GAPS`` (transfermarkt x GREEK_SUPER_LEAGUE). Kept as a
+# dedicated preset (not an edit to the shared ``PRED_NO_UNDERSTAT``) so other
+# leagues using that preset are unaffected.
+PRED_NO_UNDERSTAT_NO_TRANSFERMARKT: frozenset[str] = _sources(
+    "api_football",
+    "soccer_football_info",
+    "footystats",
+    "odds_api",
+    "open_meteo",
+)
+
 # Features leagues — API-Football + FootyStats + Transfermarkt
 FEAT_STANDARD: frozenset[str] = _sources(
     "api_football",
@@ -335,6 +349,7 @@ __all__ = [
     "PRED_FULL",
     "PRED_NO_FOOTYSTATS",
     "PRED_NO_UNDERSTAT",
+    "PRED_NO_UNDERSTAT_NO_TRANSFERMARKT",
     "REF_API_ONLY",
     "SEASON_BY_COUNTRY",
     "LeagueClassification",

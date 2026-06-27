@@ -130,13 +130,26 @@ class TestCeFiMvp:
         """An operator-requested 2026-06-16 base (EIGEN) is now in the MVP set."""
         assert is_mvp("cefi", "BINANCE-FUTURES", "PERPETUAL", "trades", base_ccy="EIGEN")
 
-    def test_deribit_btc_option_is_mvp(self) -> None:
-        """Deribit BTC OPTION → MVP (the options carve-out admits BTC + ETH)."""
-        assert is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="BTC")
+    def test_deribit_btc_option_options_chain_is_mvp(self) -> None:
+        """Deribit BTC OPTION options_chain → MVP (carve-out admits BTC + ETH).
 
-    def test_deribit_eth_option_is_mvp(self) -> None:
-        """Deribit ETH OPTION → MVP (the options carve-out admits BTC + ETH)."""
-        assert is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="ETH")
+        operator 2026-06-27 decision #2: the Deribit OPTION MVP data_type is
+        ``options_chain`` ONLY (it carries marks + IVs); per-strike trades +
+        book_snapshot_5 are EXCLUDED.
+        """
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="BTC")
+
+    def test_deribit_eth_option_options_chain_is_mvp(self) -> None:
+        """Deribit ETH OPTION options_chain → MVP (the options carve-out admits BTC + ETH)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="ETH")
+
+    def test_deribit_option_trades_excluded(self) -> None:
+        """Deribit OPTION trades → NOT MVP (decision #2 — per-strike tick excluded)."""
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="BTC")
+
+    def test_deribit_option_book_snapshot_5_excluded(self) -> None:
+        """Deribit OPTION book_snapshot_5 → NOT MVP (decision #2 — per-strike depth excluded)."""
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "book_snapshot_5", base_ccy="BTC")
 
     def test_deribit_sol_option_not_mvp(self) -> None:
         """A non-BTC/ETH OPTION → False even though SOL is in the spot/perp universe.
@@ -144,7 +157,18 @@ class TestCeFiMvp:
         The Deribit-options carve-out narrows the OPTION expected universe to
         BTC + ETH only, so a SOL option is NOT expected (no false-missing).
         """
-        assert not is_mvp("cefi", "DERIBIT", "OPTION", "trades", base_ccy="SOL")
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="SOL")
+
+    def test_dex_clob_perp_venues_are_cefi_mvp(self) -> None:
+        """LIGHTER / EXTENDED / PACIFICA perps are cefi MVP (decision #4)."""
+        assert is_mvp("cefi", "LIGHTER-ZKSYNC", "PERPETUAL", "trades", base_ccy="BTC")
+        assert is_mvp("cefi", "EXTENDED-STARKNET", "PERPETUAL", "trades", base_ccy="ETH")
+        assert is_mvp("cefi", "PACIFICA-SOLANA", "PERPETUAL", "trades", base_ccy="SOL")
+
+    def test_binance_delivery_dropped_from_mvp(self) -> None:
+        """BINANCE-DELIVERY (COIN-M) dropped from cefi MVP (decision #3)."""
+        assert not is_mvp("cefi", "BINANCE-DELIVERY", "PERPETUAL", "trades", base_ccy="BTC")
+        assert not is_mvp("cefi", "BINANCE-DELIVERY", "FUTURE", "trades", base_ccy="BTC")
 
     def test_no_base_ccy_with_non_empty_rule_returns_false(self) -> None:
         """When the rule has non-empty base_ccys, None base_ccy → False."""
@@ -275,33 +299,37 @@ class TestDeFiMvp:
 class TestTradFiMvp:
     """TradFi MVP rule tests — positive + negative cases."""
 
-    def test_cme_future_es_trades_is_mvp(self) -> None:
-        """CME FUTURE ES trades → MVP."""
-        assert is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="ES")
-
-    def test_cme_future_nq_trades_is_mvp(self) -> None:
-        """CME FUTURE NQ trades → MVP."""
-        assert is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="NQ")
-
-    def test_cme_future_vx_trades_is_mvp(self) -> None:
-        """CME FUTURE VX (VIX futures) trades → MVP."""
-        assert is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="VX")
-
-    def test_cme_option_es_trades_is_mvp(self) -> None:
-        """CME OPTION ES trades → MVP."""
-        assert is_mvp("tradfi", "CME", "OPTION", "trades", base_ccy="ES")
-
-    def test_cme_ohlcv_1m_is_mvp(self) -> None:
-        """CME FUTURE ES ohlcv_1m → MVP."""
+    def test_cme_future_es_ohlcv_1m_is_mvp(self) -> None:
+        """CME FUTURE ES ohlcv_1m → MVP (tradfi MVP grain is ohlcv_1m, decision #7)."""
         assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="ES")
+
+    def test_cme_future_nq_ohlcv_1m_is_mvp(self) -> None:
+        """CME FUTURE NQ ohlcv_1m → MVP."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="NQ")
+
+    def test_cme_future_vx_ohlcv_1m_is_mvp(self) -> None:
+        """CME FUTURE VX (VIX futures) ohlcv_1m → MVP."""
+        assert is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="VX")
+
+    def test_cme_option_es_ohlcv_1m_is_mvp(self) -> None:
+        """CME OPTION ES ohlcv_1m → MVP (decision #7 — CME options MVP at ohlcv_1m)."""
+        assert is_mvp("tradfi", "CME", "OPTION", "ohlcv_1m", base_ccy="ES")
+
+    def test_cme_trades_excluded(self) -> None:
+        """CME trades → NOT MVP (decision #7 — tradfi MVP is ohlcv_1m only)."""
+        assert not is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="ES")
+
+    def test_cme_ohlcv_1s_excluded(self) -> None:
+        """CME ohlcv_1s → NOT MVP (decision #7 — tradfi MVP is ohlcv_1m only, no 1s)."""
+        assert not is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1s", base_ccy="ES")
 
     def test_non_mvp_tradfi_venue_returns_false(self) -> None:
         """NASDAQ is in tradfi venues but NOT in the MVP set → False."""
-        assert not is_mvp("tradfi", "NASDAQ", "EQUITY", "trades")
+        assert not is_mvp("tradfi", "NASDAQ", "EQUITY", "ohlcv_1m")
 
     def test_non_mvp_tradfi_underlier_returns_false(self) -> None:
         """RTY (Russell 2000) underlier is NOT in the MVP set → False."""
-        assert not is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="RTY")
+        assert not is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="RTY")
 
     def test_non_mvp_tradfi_data_type_returns_false(self) -> None:
         """ohlcv_15m is a tradfi data_type but NOT in the MVP set → False."""
@@ -329,9 +357,9 @@ class TestGrainProperty:
         conceptually different contracts both return True.
         """
         # ESH26 (March 2026 expiry)
-        result_esh26 = is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="ES")
+        result_esh26 = is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="ES")
         # ESM26 (June 2026 expiry) — same base_ccy
-        result_esm26 = is_mvp("tradfi", "CME", "FUTURE", "trades", base_ccy="ES")
+        result_esm26 = is_mvp("tradfi", "CME", "FUTURE", "ohlcv_1m", base_ccy="ES")
         assert result_esh26 is True
         assert result_esm26 is True
 
@@ -363,17 +391,32 @@ class TestSportsMvp:
         """EPL league odds data → MVP."""
         assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league="EPL")
 
-    def test_nfl_odds_snapshot_is_mvp(self) -> None:
-        """NFL league odds_snapshot → MVP."""
-        assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds_snapshot", league="NFL")
+    def test_mls_odds_snapshot_is_mvp(self) -> None:
+        """MLS (a football league in the 94) odds_snapshot → MVP (decision #1)."""
+        assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds_snapshot", league="MLS")
 
-    def test_nba_markets_is_mvp(self) -> None:
-        """NBA league markets data → MVP."""
-        assert is_mvp("sports", "BETFAIR", "EXCHANGE_ODDS", "markets", league="NBA")
+    def test_eng_championship_is_mvp(self) -> None:
+        """ENG_CHAMPIONSHIP (football) IS MVP — the 94-league universe is ALL football
+        leagues, not just the top tier (decision #1 BUG FIX)."""
+        assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "markets", league="ENG_CHAMPIONSHIP")
 
-    def test_non_mvp_sports_league_returns_false(self) -> None:
-        """ENG_CHAMPIONSHIP is a real league but NOT in the MVP set → False."""
-        assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league="ENG_CHAMPIONSHIP")
+    def test_full_94_football_universe_is_mvp(self) -> None:
+        """Every ``sport == "FOOTBALL"`` league (the 94) is MVP; non-football are not."""
+        from unified_api_contracts.canonical.domain.sports.league_data import LEAGUE_REGISTRY
+
+        football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport == "FOOTBALL"]
+        non_football = [lg for lg in LEAGUE_REGISTRY.values() if lg.sport != "FOOTBALL"]
+        assert len(football) == 94
+        assert len(non_football) == 7
+        for lg in football:
+            assert is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
+        for lg in non_football:
+            assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league=lg.league_id)
+
+    def test_nfl_nba_excluded(self) -> None:
+        """NFL / NBA (non-football) are NOT MVP (decision #1 — exclude the 7 non-football)."""
+        assert not is_mvp("sports", "ODDS_API", "FIXED_ODDS", "odds", league="NFL")
+        assert not is_mvp("sports", "BETFAIR", "EXCHANGE_ODDS", "markets", league="NBA")
 
     def test_non_mvp_sports_data_type_returns_false(self) -> None:
         """arbitrage_opportunity is a sports data_type but NOT in MVP → False."""
@@ -422,11 +465,22 @@ class TestPredictionMvp:
             market_group="sports",
         )
 
-    def test_kalshi_returns_false(self) -> None:
-        """KALSHI is in prediction venues but NOT in the MVP set → False."""
-        assert not is_mvp(
+    def test_kalshi_is_mvp(self) -> None:
+        """KALSHI is in the prediction MVP set (decision #5 — Kalshi↔Polymarket
+        arb-overlap requires BOTH venues; the post-MVP TODO is resolved)."""
+        assert is_mvp(
             "prediction",
             "KALSHI",
+            "PREDICTION_MARKET",
+            "trades",
+            market_group="crypto",
+        )
+
+    def test_unknown_prediction_venue_returns_false(self) -> None:
+        """A prediction venue outside the MVP set (POLYMARKET/KALSHI) → False."""
+        assert not is_mvp(
+            "prediction",
+            "MANIFOLD",
             "PREDICTION_MARKET",
             "trades",
             market_group="crypto",
@@ -507,6 +561,19 @@ class TestUnboundDataType:
         """Prediction Polymarket with no data_type → MVP (any-data_type)."""
         assert is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", "", market_group="crypto")
         assert is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", None, market_group="crypto")
+
+    def test_prediction_unbound_market_group_is_mvp(self) -> None:
+        """Prediction with no market_group → MVP (any-market_group, decision #5).
+
+        The IS catalogue rollup never passes ``market_group`` (instrument-grain),
+        so a blank market_group must NOT block — POLYMARKET + KALSHI tag mvp=True.
+        A NON-blank non-MVP market_group is still gated out.
+        """
+        assert is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", "trades")
+        assert is_mvp("prediction", "KALSHI", "PREDICTION_MARKET", "trades")
+        assert is_mvp("prediction", "KALSHI", "PREDICTION_MARKET")
+        # NON-blank non-MVP market_group still blocked ("financial" not in set).
+        assert not is_mvp("prediction", "POLYMARKET", "PREDICTION_MARKET", "trades", market_group="financial")
 
     def test_unbound_data_type_still_gates_other_axes(self) -> None:
         """Blank data_type relaxes ONLY the data_type axis — venue/base still gate."""
@@ -736,23 +803,40 @@ def test_capture_universe_new_venues_perp_gated() -> None:
     assert not is_in_mvp_capture_universe("BITGET-SPOT", "ETH", "SPOT_PAIR", has_perp_for_base=False)
 
 
-def test_capture_universe_binance_delivery_inverse() -> None:
-    """BINANCE-DELIVERY (COIN-M inverse) perps + futures are in the capture universe.
+def test_capture_universe_binance_delivery_dropped() -> None:
+    """BINANCE-DELIVERY (COIN-M inverse) is DROPPED from the cefi MVP capture
+    universe (operator 2026-06-27 decision #3 — COIN-M delivery is NOT MVP).
 
-    cefi_universe_capture_rule 2026-06-24: Binance COIN-M is the most-liquid
-    inverse margin venue for BTC/ETH. PERPETUALs self-qualify on base-membership;
-    FUTUREs also qualify (part of the futures complex). No SPOT on this venue.
+    The venue is no longer in the cefi MVP rule, so neither its perps nor its
+    dated futures qualify, regardless of base or perp-gate. Other venues' dated
+    futures stay MVP (the FUTURE instrument_type is unchanged for them).
     """
     from unified_api_contracts import is_in_mvp_capture_universe
 
-    # PERPETUAL (e.g. BTCUSD_PERP) self-qualifies on base-membership.
-    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "BTC", "PERPETUAL", has_perp_for_base=False)
-    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "ETH", "PERPETUAL", has_perp_for_base=False)
-    # FUTURE (dated, e.g. BTCUSD_241227) — part of futures complex, not perp-gated.
-    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "BTC", "FUTURE", has_perp_for_base=False)
-    assert is_in_mvp_capture_universe("BINANCE-DELIVERY", "ETH", "FUTURE", has_perp_for_base=True)
-    # Out-of-universe base: still rejected.
-    assert not is_in_mvp_capture_universe("BINANCE-DELIVERY", "NOTACOINXYZ", "PERPETUAL", has_perp_for_base=True)
+    assert not is_in_mvp_capture_universe("BINANCE-DELIVERY", "BTC", "PERPETUAL", has_perp_for_base=False)
+    assert not is_in_mvp_capture_universe("BINANCE-DELIVERY", "ETH", "PERPETUAL", has_perp_for_base=True)
+    assert not is_in_mvp_capture_universe("BINANCE-DELIVERY", "BTC", "FUTURE", has_perp_for_base=False)
+    # Other venues' dated futures stay MVP (decision #3 — only COIN-M dropped).
+    assert is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "FUTURE", has_perp_for_base=False)
+
+
+def test_capture_universe_dex_clob_perps_in_universe() -> None:
+    """LIGHTER / EXTENDED / PACIFICA perps are in the cefi capture universe (decision #4)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert is_in_mvp_capture_universe("LIGHTER-ZKSYNC", "BTC", "PERPETUAL", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("EXTENDED-STARKNET", "ETH", "PERPETUAL", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("PACIFICA-SOLANA", "SOL", "PERPETUAL", has_perp_for_base=False)
+
+
+def test_capture_universe_deribit_option_in_universe() -> None:
+    """Deribit BTC/ETH OPTION stays in the capture universe (instrument-grain,
+    data_type-agnostic) even though only options_chain is the MVP data_type
+    (decision #2 narrows the data_type, not the instrument's universe membership)."""
+    from unified_api_contracts import is_in_mvp_capture_universe
+
+    assert is_in_mvp_capture_universe("DERIBIT", "BTC", "OPTION", has_perp_for_base=False)
+    assert is_in_mvp_capture_universe("DERIBIT", "ETH", "OPTION", has_perp_for_base=False)
 
 
 def test_capture_universe_okx_bare_token_resolves() -> None:
@@ -931,7 +1015,7 @@ def test_capture_universe_config_version_bumped() -> None:
         MVP_SCOPE_CONFIG_VERSION,
     )
 
-    assert MVP_SCOPE_CONFIG_VERSION >= 8
+    assert MVP_SCOPE_CONFIG_VERSION >= 10
 
 
 def test_accepted_quotes_for_venue_upbit_krw() -> None:
