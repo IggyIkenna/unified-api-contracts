@@ -11,6 +11,14 @@ from __future__ import annotations
 
 from typing import Final
 
+from unified_api_contracts.canonical.domain.sports.odds import OddsType
+
+# Type aliases used in EXPECTED_BOOKMAKER_MARKET_SETS below.
+# LeagueTier  -- string tier label (e.g. "tier_1_domestic").
+# BookmakerKey -- odds_api bookmaker key (matches ODDS_API_KEY_TO_VENUE).
+LeagueTier = str
+BookmakerKey = str
+
 # ---------------------------------------------------------------------------
 # Bundled data_types — referenced by the ManifestWriter cluster-validation guard.
 # ---------------------------------------------------------------------------
@@ -106,6 +114,69 @@ SPORTS_FIXTURE_CLUSTERS: Final[dict[str, dict[str, int]]] = {
 Tier-1 EU football seed only (writegate plan Phase 1B). Tier-2 / tier-3
 expansion deferred to a follow-up plan slot — don't pre-build without a
 real consumer.
+"""
+
+
+# ---------------------------------------------------------------------------
+# EXPECTED_BOOKMAKER_MARKET_SETS — per-league-tier expected bookmaker x market.
+#
+# Output of plan sports_odds_bookmaker_coverage_enumeration_2026_06_20 P1.
+# Defines which (bookmaker, market_type) pairs are expected for each league
+# tier. Consumers (MTDS ODDS NaN-fill, cluster-validation kwargs) use
+# len(EXPECTED_BOOKMAKER_MARKET_SETS[tier]) as the per-fixture cluster floor.
+#
+# Empirical seed 2026-06-27: P1c golden-window audit (2025-09-01..2025-11-30,
+# odds_api source, 51 distinct league_ids, 18,194 captured trades rows).
+# Full 2-week fixture-level baseline requires GCS access (BLOCKED-CREDENTIALS
+# 2026-06-27); this conservative seed is derived from SPORTS_FIXTURE_CLUSTERS
+# corrected to odds_api key convention (ODDS_API_KEY_TO_VENUE).
+#
+# Outer key: LeagueTier string ("tier_1_domestic", "tier_1_international",
+#   "tier_2_domestic"). Aligned with SPORTS_FIXTURE_CLUSTERS tier labels.
+# Inner key: BookmakerKey = odds_api bookmaker key (pinnacle, betfair_ex_uk,
+#   williamhill, unibet_uk). Values are OddsType market types confirmed
+#   available for the tier via odds_api.
+# ---------------------------------------------------------------------------
+
+
+EXPECTED_BOOKMAKER_MARKET_SETS: Final[dict[LeagueTier, dict[BookmakerKey, list[OddsType]]]] = {
+    # Top 5 EU domestic: EPL, LaLiga, Serie A, Bundesliga, Ligue 1.
+    # Pinnacle carries Asian handicap; betfair_ex_uk and UK sportsbooks carry
+    # h2h + over_under consistently across all top-5 EU domestic matchweeks.
+    "tier_1_domestic": {
+        "pinnacle": [OddsType.H2H, OddsType.OVER_UNDER, OddsType.ASIAN_HANDICAP],
+        "betfair_ex_uk": [OddsType.H2H, OddsType.OVER_UNDER],
+        "williamhill": [OddsType.H2H, OddsType.OVER_UNDER],
+        "unibet_uk": [OddsType.H2H, OddsType.OVER_UNDER],
+    },
+    # UCL, UEL and other continental tournaments.
+    # Fewer UK-region bookmakers available; williamhill h2h-only (no OU line
+    # seeded on some UCL matches outside knockout rounds).
+    "tier_1_international": {
+        "pinnacle": [OddsType.H2H, OddsType.OVER_UNDER, OddsType.ASIAN_HANDICAP],
+        "betfair_ex_uk": [OddsType.H2H, OddsType.OVER_UNDER],
+        "williamhill": [OddsType.H2H],
+    },
+    # Second-tier EU domestic: Championship, Bundesliga 2, Serie B, Ligue 2,
+    # Eredivisie, etc. Reduced bookmaker depth; pinnacle + betfair always
+    # present; pinnacle over_under available but asian_handicap coverage thinner.
+    "tier_2_domestic": {
+        "pinnacle": [OddsType.H2H, OddsType.OVER_UNDER],
+        "betfair_ex_uk": [OddsType.H2H],
+    },
+}
+"""Per-league-tier expected bookmaker x market sets (odds_api source).
+
+Keyed by LeagueTier string. Each inner dict maps BookmakerKey -> list[OddsType]
+markets expected for every fully-covered fixture in that tier.
+
+Used by MTDS ODDS NaN-fill and cluster-validation kwargs:
+  expected_root_clusters = {fid: len(EXPECTED_BOOKMAKER_MARKET_SETS[tier])
+                            for fid in ...}
+
+Conservative empirical seed 2026-06-27 (BLOCKED-CREDENTIALS for full
+2-week GCS baseline). Update this set after running the full empirical
+audit from a credentialed VM.
 """
 
 

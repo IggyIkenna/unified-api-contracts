@@ -69,7 +69,11 @@ _API_FOOTBALL_ID_TO_LEAGUE: dict[int, str] = {
 # or when an existing provider extends backfill (e.g. footystats Pro tier
 # unlocks earlier history).
 SOURCE_COVERAGE_START: dict[str, date] = {
-    "api_football": date(2015, 1, 1),
+    # 2015-01-01 was the nominal api_football archive start, but live probes
+    # confirmed the subscription returns empty for seasons 2015-2017 (35,889
+    # all-empty_confirmed across 76 MVP leagues - subscription floor, not a
+    # backfill bug).  2018-01-01 is the earliest season with real data on our plan.
+    "api_football": date(2018, 1, 1),
     "footystats": date(2019, 1, 1),
     "understat": date(2014, 1, 1),
     "transfermarkt": date(2019, 1, 1),
