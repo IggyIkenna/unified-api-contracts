@@ -596,12 +596,44 @@ EXCHANGE_CODE_TO_NAME: dict[str, str] = {
     "ZF": "TREASURY_5Y",
     "ZN": "TREASURY_10Y",
     "ZB": "TREASURY_30Y",
-    # Options on ES
+    # Options on ES (SP500 weekly/daily roots)
+    "EW": "SP500",
     "EW1": "SP500",
     "EW2": "SP500",
     "EW3": "SP500",
     "EW4": "SP500",
     "EW5": "SP500",
+    "E1A": "SP500",
+    "E2A": "SP500",
+    "E3A": "SP500",
+    "E4A": "SP500",
+    "E5A": "SP500",
+    "EOM": "SP500",
+    # Options-on-futures: commodity options (different root codes from the futures)
+    # OG = gold options (underlying GC), LO = crude options (underlying CL),
+    # ON = natgas options (underlying NG), HXE = copper options (underlying HG),
+    # SO = silver options (underlying SI), PO = platinum options (underlying PL),
+    # PAO = palladium options (underlying PA), OH = heating oil options (underlying HO),
+    # OB = gasoline options (underlying RB).
+    "OG": "GOLD",
+    "LO": "CRUDE",
+    "ON": "NATGAS",
+    "HXE": "COPPER",
+    "SO": "SILVER",
+    "PO": "PLATINUM",
+    "PAO": "PALLADIUM",
+    "OH": "HEATING_OIL",
+    "OB": "GASOLINE",
+    # CME Event Contract roots (ECES = SP500 binary, ECNQ = NQ binary, etc.)
+    "ECES": "SP500",
+    "ECNQ": "NASDAQ100",
+    "ECRTY": "RUSSELL2000",
+    "ECYM": "DOW",
+    "ECGC": "GOLD",
+    "ECCL": "CRUDE",
+    "ECNG": "NATGAS",
+    "EC6E": "EUR",
+    "ECBTC": "BTC",
     # ETFs (crypto)
     "IBIT": "BTC_ETF",
     "FBTC": "BTC_ETF",
@@ -627,30 +659,75 @@ def get_required_datasets() -> list[str]:
 
 
 # ---------------------------------------------------------------------------
-# MVP CME exchange codes — only these parent symbols are downloaded in MVP mode.
-# Full TRADFI_TICKER_UNIVERSE is kept for later expansion.
-# ES covers: ES.FUT (quarterly futures), ES.OPT (quarterly options),
-# EW.OPT (weekly), EW1-4.OPT (weekly), E1A-E5A.OPT (daily/0DTE), EOM.OPT (end-of-month)
+# MVP CME exchange codes — the parent symbols downloaded in MVP mode.
+#
+# Scope (operator 2026-06-27): CME roots whose underlying futures have a
+# Binance perp leg (the tradfi-perp basis archetype), including:
+#  - SP500 complex: ES.FUT + all ES option surfaces (ES.OPT, EW/EW1-4/E1A-5A/EOM)
+#  - NQ: NQ.FUT + NQ.OPT (Nasdaq 100 options-on-futures)
+#  - Commodity futures + options-on-futures backing Binance perps:
+#    GC (gold) + OG.OPT, CL (crude) + LO.OPT, NG (natgas) + ON.OPT,
+#    HG (copper) + HXE.OPT, SI (silver) + SO.OPT, PL (platinum) + PO.OPT,
+#    PA (palladium) + PAO.OPT
+#  - CME event contracts for the above underlyings (ECES, ECNQ, ECGC, ECCL, ECNG)
+#
+# NOTE: the options-on-futures use DIFFERENT exchange codes from their
+# underlying futures (e.g. OG ≠ GC, LO ≠ CL). Both the future AND the
+# option root are listed here so get_mvp_databento_symbols_for_venue returns
+# the full options-on-futures universe. The adapter uses TRADFI_DATABENTO_INSTRUMENTS
+# directly (no MVP filter), so this set gates only get_mvp_databento_symbols_for_venue.
 # ---------------------------------------------------------------------------
 MVP_CME_EXCHANGE_CODES: frozenset[str] = frozenset(
     {
-        "ES",
-        "EW",
-        "EW1",
-        "EW2",
-        "EW4",
-        "E1A",
-        "E2A",
-        "E3A",
-        "E4A",
-        "E5A",
-        "EOM",
+        # ----- SP500 complex (ES futures + all option surfaces) -----
+        "ES",  # ES.FUT (quarterly E-mini S&P 500 futures) + ES.OPT (quarterly options)
+        "MES",  # MES.FUT (Micro E-mini S&P 500 futures)
+        "EW",  # EW.OPT  (weekly Friday options)
+        "EW1",  # EW1.OPT (Monday weekly options)
+        "EW2",  # EW2.OPT (Wednesday weekly options)
+        "EW4",  # EW4.OPT (Tuesday weekly options)
+        "E1A",  # E1A.OPT (Monday 0DTE)
+        "E2A",  # E2A.OPT (Tuesday 0DTE)
+        "E3A",  # E3A.OPT (Wednesday 0DTE)
+        "E4A",  # E4A.OPT (Thursday 0DTE)
+        "E5A",  # E5A.OPT (Friday 0DTE)
+        "EOM",  # EOM.OPT (end-of-month options)
+        # ----- Nasdaq 100 (NQ futures + options) -----
+        "NQ",  # NQ.FUT + NQ.OPT (options-on-NQ-futures)
+        # ----- Commodity futures (Binance perp basis) -----
+        "GC",  # GC.FUT (gold futures)
+        "CL",  # CL.FUT (WTI crude futures)
+        "NG",  # NG.FUT (natural gas futures)
+        "HG",  # HG.FUT (copper futures)
+        "SI",  # SI.FUT (silver futures)
+        "PL",  # PL.FUT (platinum futures)
+        "PA",  # PA.FUT (palladium futures)
+        # ----- Commodity options-on-futures (CME GLBX.MDP3, live-probed 2026-06-24) -----
+        "OG",  # OG.OPT (gold options — underlying GC)
+        "LO",  # LO.OPT (crude oil options — underlying CL)
+        "ON",  # ON.OPT (natural gas options — underlying NG)
+        "HXE",  # HXE.OPT (copper options — underlying HG)
+        "SO",  # SO.OPT (silver options — underlying SI)
+        "PO",  # PO.OPT (platinum options — underlying PL)
+        "PAO",  # PAO.OPT (palladium options — underlying PA)
+        # ----- CME event contracts (binary YES/NO on MVP underlyings) -----
+        "ECES",  # ECES.OPT (S&P 500 event contract)
+        "ECNQ",  # ECNQ.OPT (Nasdaq 100 event contract)
+        "ECGC",  # ECGC.OPT (gold event contract)
+        "ECCL",  # ECCL.OPT (crude oil event contract)
+        "ECNG",  # ECNG.OPT (natural gas event contract)
+        "ECBTC",  # ECBTC.OPT (Bitcoin event contract)
     }
 )
 
 
 def get_mvp_databento_symbols_for_venue(venue: str) -> list[DatabentoInstrumentDef]:
-    """Return MVP-filtered instruments for a venue (ES-only for CME)."""
+    """Return MVP-filtered instruments for a venue.
+
+    For CME: gates on ``MVP_CME_EXCHANGE_CODES`` (SP500 complex + NQ + commodity
+    futures + commodity options-on-futures + event contracts for MVP roots).
+    All other venues: return the full curated list unchanged.
+    """
     all_defs = get_databento_symbols_for_venue(venue)
     if venue.upper() == "CME":
         return [d for d in all_defs if d.exchange_code in MVP_CME_EXCHANGE_CODES]

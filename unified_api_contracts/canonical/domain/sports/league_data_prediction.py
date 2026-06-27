@@ -10,6 +10,7 @@ from .league_registry import (
     PRED_FULL,
     PRED_NO_FOOTYSTATS,
     PRED_NO_UNDERSTAT,
+    PRED_NO_UNDERSTAT_NO_TRANSFERMARKT,
     LeagueDefinition,
 )
 
@@ -255,7 +256,11 @@ PREDICTION_LEAGUES: dict[str, LeagueDefinition] = {
         country="GR",
         season_months=(8, 5),
         has_playoffs=True,
-        data_sources=PRED_NO_UNDERSTAT,
+        # operator 2026-06-27 #6: transfermarkt structurally does not carry the
+        # Greek Super League → drop it from data_sources so this field agrees with
+        # SPORTS_STRUCTURAL_GAPS (the structural-gap SSOT). PRED_NO_UNDERSTAT minus
+        # transfermarkt.
+        data_sources=PRED_NO_UNDERSTAT_NO_TRANSFERMARKT,
         api_football_id=197,
         tier=1,
         classification="Prediction",
