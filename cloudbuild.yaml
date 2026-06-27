@@ -184,13 +184,20 @@ steps:
           fi
         fi
 
-        # Version doesn't exist - publish
-        python3 -m twine upload \
-          --repository-url https://asia-northeast1-python.pkg.dev/$PROJECT_ID/unified-libraries/ \
-          --non-interactive \
-          dist/*.whl
-
-        echo "✓ Successfully uploaded version $$VERSION from commit $COMMIT_SHA"
+        # Version doesn't exist - publish. Phase-2/D13 publish-gate: ONLY a clean 3-part X.Y.Z wheel.
+        # Under dynamic hatch-vcs versioning a build OFF the release tag yields X.Y.Z.devN; publishing
+        # that would let a consumer silently resolve a .devN wheel under a <X.0.0 range (fleet dep
+        # breakage). Skip (soft-pass) a dev wheel — the vX.Y.Z release tag build publishes the clean
+        # wheel. Static versions are always plain → always publish (backward-compatible).
+        if printf '%s' "$$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+          python3 -m twine upload \
+            --repository-url https://asia-northeast1-python.pkg.dev/$PROJECT_ID/unified-libraries/ \
+            --non-interactive \
+            dist/*.whl
+          echo "✓ Successfully uploaded version $$VERSION from commit $COMMIT_SHA"
+        else
+          echo "⏭️  Version $$VERSION is a prerelease/dev (build not at a release tag) — NOT publishing the wheel."
+        fi
     waitFor: ["store-metadata"]
 
   # Step 4: Notify deployment-v3 to update stable_versions.yaml (package version)

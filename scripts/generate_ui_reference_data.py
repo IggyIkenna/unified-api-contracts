@@ -57,10 +57,19 @@ from unified_api_contracts.registry.venue_rate_limits import VENUE_RATE_LIMITS
 
 
 def _get_version() -> str:
-    """Read version from pyproject.toml."""
+    """Resolve the package version. Phase-2/D13: the version is dynamic (hatch-vcs from the git tag),
+    so the pyproject has no committed ``version =`` line — read the INSTALLED version via
+    importlib.metadata (resolved from the tag), falling back to a pyproject line (static repos,
+    mid-migration), then "unknown". Mirrors the deployment-api API-1 / deployment-service DS-3 fix."""
+    import importlib.metadata  # noqa: imports-inside-functions — local, stdlib
+
+    try:
+        return importlib.metadata.version("unified-api-contracts")
+    except importlib.metadata.PackageNotFoundError:
+        pass
     pyproject = _repo_root / "pyproject.toml"
     for line in pyproject.read_text().splitlines():
-        if line.strip().startswith("version"):
+        if line.strip().startswith("version") and "=" in line and "dynamic" not in line:
             return line.split("=")[1].strip().strip('"')
     return "unknown"
 
