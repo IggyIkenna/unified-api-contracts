@@ -858,6 +858,9 @@ from .canonical.domain.derivatives.tradfi_etfs import (
     ETFMetadata as ETFMetadata,
 )
 from .canonical.domain.derivatives.tradfi_roots import (
+    TRADFI_ROOTS as TRADFI_ROOTS,
+)
+from .canonical.domain.derivatives.tradfi_roots import (
     RootMetadata as RootMetadata,
 )
 from .canonical.domain.features.registry import (
@@ -2389,6 +2392,7 @@ __all__ = [
     "RiskRuleScope",
     "RiskThresholds",
     "RootMetadata",
+    "TRADFI_ROOTS",
     "RoundMatch",
     "SeasonBoundary",
     "footystats_season_status_for_day",
