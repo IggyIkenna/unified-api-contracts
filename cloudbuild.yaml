@@ -144,6 +144,9 @@ steps:
         set -e
         pip install --quiet uv
         uv pip install --system build
+        # fetch-tags-fix: git for setuptools-scm
+        command -v git >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y --no-install-recommends git; }
+        git config --global --add safe.directory /workspace || true
         python -m build --wheel --outdir dist/
         ls -lh dist/
     waitFor: ["quality-gates", "cloud-sdk-isolation-check", "fetch-tags"]
