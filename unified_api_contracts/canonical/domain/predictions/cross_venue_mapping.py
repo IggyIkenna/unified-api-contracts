@@ -137,7 +137,9 @@ _SPORTS_UNDERLYINGS: Final[frozenset[PredictionUnderlying]] = frozenset(
 # the side, not part of the number — both sides share the same numeric strike so
 # the cap/floor side does NOT enter the key (a YES-above-95000 on Kalshi pairs the
 # Polymarket above-95000 market regardless of the T/B letter).
-_KALSHI_STRIKE_RE: Final[re.Pattern[str]] = re.compile(r"-[TB](?P<strike>\d+(?:\.\d+)?)$")
+# The T/B prefix is OPTIONAL: long-horizon series (e.g. ``KXBTCMAXY-26DEC31-99999.99``)
+# use bare numeric suffixes without a direction letter.
+_KALSHI_STRIKE_RE: Final[re.Pattern[str]] = re.compile(r"-[TB]?(?P<strike>\d+(?:\.\d+)?)$")
 
 # Polymarket slug strike token: a number after an above/below/reach/hit/price verb
 # OR a trailing numeric token, optionally ``k``/``m`` (``90k`` → 90000). Excludes a
@@ -224,11 +226,20 @@ def _normalize_strike(num: str, suffix: str | None) -> float | None:
 
 
 def _parse_kalshi_strike(market_ticker: str) -> float | None:
-    """Strike from a Kalshi MARKET ticker (``KXBTCD-26JUN24-T95000`` → 95000.0)."""
+    """Strike from a Kalshi MARKET ticker (``KXBTCD-26JUN24-T95000`` → 95000.0).
+
+    Kalshi long-horizon series avoid settling exactly on a round number by using
+    a one-cent-below threshold (``KXBTCMAXY-26DEC31-99999.99`` ≈ $100 k). This
+    function rounds those ``.99``-ending values up to the nearest whole number so
+    the strike matches the Polymarket round-number slug (``reach-100000``).
+    """
     m = _KALSHI_STRIKE_RE.search(market_ticker.upper())
     if m is None:
         return None
-    return _normalize_strike(m.group("strike"), None)
+    value = _normalize_strike(m.group("strike"), None)
+    if value is not None and abs(value % 1.0 - 0.99) < 1e-6:
+        value = float(round(value + 0.01))
+    return value
 
 
 def _parse_polymarket_strike(slug: str, title: str) -> float | None:

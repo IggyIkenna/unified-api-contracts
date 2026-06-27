@@ -130,6 +130,54 @@ def test_polymarket_k_suffix_strike_normalises() -> None:
     assert mappings[0].strike == 95000.0
 
 
+def test_kalshi_bare_numeric_suffix_without_t_or_b() -> None:
+    """``KXBTCMAXY-26DEC31-99999.99`` (no T/B prefix) pairs Polymarket 100k market.
+
+    Long-horizon Kalshi series (e.g. yearly max) use bare numeric suffixes without
+    a T/B direction letter. The .99-ending is normalised to the next whole number
+    so it matches the Polymarket round-number slug target.
+    """
+    expiry = datetime(2027, 1, 1, 4, 59, tzinfo=UTC)
+    kalshi = _kalshi(
+        market_ticker="KXBTCMAXY-26DEC31-99999.99",
+        event_ticker="KXBTCMAXY-26DEC31",
+        expiry=expiry,
+    )
+    poly = _polymarket(
+        condition_id="0xBTC100k2026",
+        slug="will-bitcoin-reach-100000-by-december-31-2026",
+        expiry=datetime(2027, 1, 1, 0, 0, tzinfo=UTC),
+    )
+
+    mappings = build_cross_venue_mapping([kalshi], [poly])
+
+    assert len(mappings) == 1
+    row = mappings[0]
+    assert row.strike == 100000.0
+    assert row.kalshi_market_ticker == "KXBTCMAXY-26DEC31-99999.99"
+    assert row.polymarket_condition_id == "0xBTC100k2026"
+
+
+def test_kalshi_dot99_normalises_to_round_number() -> None:
+    """``109999.99`` normalises to ``110000.0`` to match Polymarket 110k target."""
+    expiry = datetime(2027, 1, 1, 4, 59, tzinfo=UTC)
+    kalshi = _kalshi(
+        market_ticker="KXBTCMAXY-26DEC31-109999.99",
+        event_ticker="KXBTCMAXY-26DEC31",
+        expiry=expiry,
+    )
+    poly = _polymarket(
+        condition_id="0xBTC110k2026",
+        slug="will-bitcoin-reach-110000-by-december-31-2026",
+        expiry=datetime(2027, 1, 1, 0, 0, tzinfo=UTC),
+    )
+
+    mappings = build_cross_venue_mapping([kalshi], [poly])
+
+    assert len(mappings) == 1
+    assert mappings[0].strike == 110000.0
+
+
 # ---------------------------------------------------------------------------
 # NON-pair — same underlying (BTC), DIFFERENT strike → NO row (honest absence).
 # ---------------------------------------------------------------------------
