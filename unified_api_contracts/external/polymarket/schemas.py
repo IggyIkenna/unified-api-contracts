@@ -13,7 +13,7 @@ __api_version__ = "v2"  # matches provider_api_versions.yaml
 import json
 from typing import cast
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import AliasChoices, BaseModel, Field, field_validator
 
 from unified_api_contracts.canonical.crosscutting.errors import ErrorAction
 
@@ -300,7 +300,12 @@ class PolymarketGammaMarket(BaseModel):
     question_id: str | None = Field(None, alias="questionId")
     question: str | None = None
     description: str | None = None
-    market_slug: str | None = Field(None, alias="marketSlug")
+    # Gamma API returns "slug"; CLOB API returns "market_slug" (snake_case); alias="marketSlug"
+    # catches any camelCase variant — AliasChoices handles all three field names.
+    market_slug: str | None = Field(
+        None,
+        validation_alias=AliasChoices("marketSlug", "slug", "market_slug"),
+    )
     outcomes: list[str] | None = None  # e.g. ["Yes", "No"] — may arrive as JSON string
     outcome_prices: list[str] | None = Field(None, alias="outcomePrices")
     clob_token_ids: list[str] | None = Field(None, alias="clobTokenIds")
