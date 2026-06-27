@@ -47,10 +47,7 @@ def _collected_names(init_path: Path) -> set[str]:
                 exported = alias.asname if alias.asname else alias.name.split(".")[0]
                 names.add(exported)
         elif isinstance(node, (ast.Assign, ast.AnnAssign)):
-            if isinstance(node, ast.Assign):
-                targets = node.targets
-            else:
-                targets = [node.target]
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
             for t in targets:
                 if isinstance(t, ast.Name):
                     names.add(t.id)
