@@ -82,7 +82,7 @@ class TestClipDatesToSourceCoverage:
 
     @pytest.mark.unit
     def test_api_football_fixture_events_override(self) -> None:
-        """api_football FIXTURE_EVENTS override is 2020-06-06 (later than source-wide 2015-01-01)."""
+        """api_football FIXTURE_EVENTS override is 2020-06-06 (later than source-wide 2018-01-01)."""
         start, end = clip_dates_to_source_coverage(
             "api_football",
             "2019-01-01",
@@ -128,14 +128,14 @@ class TestClipDatesToSourceCoverage:
 
     @pytest.mark.unit
     def test_api_football_no_override_uses_source_wide(self) -> None:
-        """api_football without data_type override uses source-wide 2015-01-01."""
+        """api_football without data_type override uses source-wide 2018-01-01."""
         start, end = clip_dates_to_source_coverage(
             "api_football",
             "2014-01-01",
-            "2015-06-01",
+            "2018-06-01",
         )
-        assert start == "2015-01-01"
-        assert end == "2015-06-01"
+        assert start == "2018-01-01"
+        assert end == "2018-06-01"
 
     @pytest.mark.unit
     def test_range_starting_exactly_at_coverage_is_not_clipped(self) -> None:
