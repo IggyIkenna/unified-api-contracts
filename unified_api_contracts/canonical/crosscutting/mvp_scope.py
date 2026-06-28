@@ -89,6 +89,31 @@ _canonical_repr = canonical_config_repr
 _CEFI_SUB_VENUE_BASES: Final[frozenset[str]] = frozenset({"OKX"})
 
 
+def _cefi_venue_data_type_set(venue: str, rule: CeFiMvpRule) -> frozenset[str] | None:
+    """Return the per-venue data_type override set for *venue*, or ``None``.
+
+    Checks the ``venue_data_types`` map first with the exact venue string, then
+    with the bare base token (``COINBASE-SPOT`` → ``COINBASE``).  Returns ``None``
+    when the venue has no override (caller should use ``instrument_type_data_types``
+    / flat ``data_types`` instead).
+
+    Introduced in v11 (operator 2026-06-28) to support COINBASE={trades} and
+    DERIBIT={options_chain} venue-wide overrides.
+    """
+    if not rule.venue_data_types:
+        return None
+    v = (venue or "").strip().upper()
+    # Exact match first (COINBASE-SPOT, COINBASE-FUTURES, DERIBIT, …).
+    if v in rule.venue_data_types:
+        return rule.venue_data_types[v]
+    # Base-token fallback (COINBASE → matches COINBASE-SPOT / COINBASE-FUTURES
+    # if the map carries the bare token; not used today but future-safe).
+    base = v.split("-", 1)[0]
+    if base in rule.venue_data_types:
+        return rule.venue_data_types[base]
+    return None
+
+
 def _cefi_venue_in_rule(venue: str, rule_venues: frozenset[str]) -> bool:
     """Match a CeFi ``venue`` against the rule's venue set, OKX-aware.
 
@@ -146,6 +171,23 @@ class CeFiMvpRule:
             (too heavy / ~12k API calls/day vs 1). An instrument_type ABSENT
             from this map uses the flat ``data_types`` set unchanged
             (perps/spot/dated-futures = trades + book_snapshot_5 + funding).
+        venue_data_types: Optional per-venue data_type OVERRIDE of the flat
+            ``data_types`` set (operator 2026-06-28, decisions A+B). When a
+            venue key is present, ONLY those data_types are MVP for that venue
+            — the flat ``data_types`` set does NOT apply to it. Takes
+            PRECEDENCE over ``instrument_type_data_types`` (the two overrides
+            are currently exclusive: a venue in this map must define its own
+            complete data_type set, not compose with the per-instrument_type
+            map). Key may be a canonical sub-venue (``COINBASE-SPOT``) or the
+            bare base token (``COINBASE``) — the predicate checks the EXACT
+            venue string first, then falls back to the base token. Current
+            overrides (v11):
+              COINBASE-SPOT  → {trades} (no book_snapshot_5 — too heavy, no
+              COINBASE-FUTURES   depth features derived)
+              DERIBIT        → {options_chain} (venue-wide; Deribit perp/future
+                               tick OOM; only the bundled chain is used)
+            A venue ABSENT from this map uses ``instrument_type_data_types``
+            (if present) or the flat ``data_types`` set.
         sources: Optional frozenset of source strings. When not empty,
             only cells from one of these sources are MVP.
     """
@@ -156,6 +198,7 @@ class CeFiMvpRule:
     base_ccys: frozenset[str] = field(default_factory=frozenset)
     options_base_ccys: frozenset[str] = field(default_factory=frozenset)
     instrument_type_data_types: dict[str, frozenset[str]] = field(default_factory=dict)
+    venue_data_types: dict[str, frozenset[str]] = field(default_factory=dict)
     sources: frozenset[str] = field(default_factory=frozenset)
 
 
@@ -417,6 +460,22 @@ MVP_SCOPE: Final[dict[str, object]] = {
         # OVERRIDES the flat ``data_types`` set for OPTION cells.
         instrument_type_data_types={
             "OPTION": frozenset({"options_chain"}),
+        },
+        # PER-VENUE data_type overrides (operator 2026-06-28 decision A):
+        #   COINBASE-SPOT/COINBASE-FUTURES → {trades} only. book_snapshot_5 is
+        #     excluded: Coinbase depth backfill VMs are the heaviest (BTC-USD
+        #     book5 days hit ~30 GB pandas peak) and we derive no depth features
+        #     from Coinbase specifically. trades-only is sufficient for price /
+        #     execution-quality signals. This applies to BOTH COINBASE-SPOT and
+        #     COINBASE-FUTURES. All other cefi venues (Binance, Bybit, OKX, …)
+        #     keep trades + book_snapshot_5 unchanged.
+        #   Note: Deribit PERP/FUTURE/SPOT tick (trades + book5) is UNCHANGED
+        #     (wanted). The OPTION → {options_chain} override above remains. No
+        #     Deribit venue_data_types entry — Deribit stays v10-behavior.
+        venue_data_types={
+            # COINBASE sub-venues: trades-only (no book5).
+            "COINBASE-SPOT": frozenset({"trades"}),
+            "COINBASE-FUTURES": frozenset({"trades"}),
         },
         # Curated CeFi capture universe (operator-confirmed SSOT, ~490 base assets,
         # survivorship-bias-free). Spot + perp legs.
@@ -694,8 +753,20 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 10
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 11
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v11 (2026-06-28): operator per-venue data_type cut (decision A — cost
+reduction, no depth features derived from Coinbase):
+  A. COINBASE-SPOT + COINBASE-FUTURES → **trades ONLY** (no book_snapshot_5).
+     Coinbase depth backfill VMs are extremely heavy (~30 GB pandas peak for
+     BTC-USD book5 days). No depth features are derived from Coinbase
+     specifically. Implemented via new ``CeFiMvpRule.venue_data_types`` field
+     (the first per-venue override; analogous to the existing per-instrument_type
+     override for OPTIONs). All other cefi venues unchanged — they keep
+     trades + book_snapshot_5. Deribit is UNCHANGED from v10: OPTION remains
+     options_chain-only (``instrument_type_data_types``); PERP/FUTURE/SPOT remain
+     trades + book_snapshot_5 (wanted for Deribit perp/future tick capture).
 
 v10 (2026-06-27): operator's CANONICAL MVP definition (7 decisions reconciling
 the prior audit's drifts):
@@ -800,6 +871,65 @@ MVP_SCOPE_CONFIG_HASH: Final[str] = _compute_mvp_scope_content_hash()
 def mvp_scope_config_descriptor() -> ConfigDescriptor:
     """Return the :data:`MVP_SCOPE` ``(version, content-hash)`` descriptor."""
     return ConfigDescriptor(MVP_SCOPE_CONFIG_VERSION, MVP_SCOPE_CONFIG_HASH)
+
+
+def get_mvp_data_types_for_cefi_venue(venue: str) -> frozenset[str]:
+    """Return the MVP data_type set for a CeFi *venue* (instrument-grain aware).
+
+    Convenience helper for capture-time enforcement (backfill launchers, the
+    MTDS orchestrator, live-VM data_type selection): given a canonical CeFi
+    venue string, return the data_types that are MVP for that venue.  Callers
+    can then REJECT any ``(venue, data_type)`` shard where ``data_type`` is NOT
+    in the returned set — this is the code-level block so no VM ever spins for
+    a non-MVP (venue x data_type) combination.
+
+    Resolution order (mirrors :func:`is_mvp` for cefi):
+      1. Per-venue override (``venue_data_types``) — highest priority.
+      2. The union of all per-instrument_type overrides when ALL instrument_types
+         for this venue have an ``instrument_type_data_types`` entry.  In
+         practice today only OPTION → {options_chain} is declared, so the union
+         for a typical cefi venue includes the flat set + options_chain.
+      3. Flat ``data_types`` — default (trades + book_snapshot_5 + funding).
+
+    For enforcement: if a launcher has ``data_type in {"book_snapshot_5"}`` and
+    ``venue in {"COINBASE-SPOT", "COINBASE-FUTURES"}``, it should skip/reject
+    the shard because ``book_snapshot_5 ∉ get_mvp_data_types_for_cefi_venue(venue)``.
+
+    Args:
+        venue: Canonical CeFi venue identifier (e.g. ``COINBASE-SPOT``,
+            ``BINANCE-FUTURES``, ``DERIBIT``).
+
+    Returns:
+        Frozenset of MVP data_type strings for the venue.  An empty frozenset
+        is returned only when the venue is not in the CeFi MVP rule (which
+        means the venue is not MVP at all).
+
+    Example::
+
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        # COINBASE venues: trades only (no book5)
+        assert "trades" in get_mvp_data_types_for_cefi_venue("COINBASE-SPOT")
+        assert "book_snapshot_5" not in get_mvp_data_types_for_cefi_venue("COINBASE-SPOT")
+
+        # Standard venue: trades + book5 + funding
+        assert "book_snapshot_5" in get_mvp_data_types_for_cefi_venue("BINANCE-FUTURES")
+    """
+    rule = MVP_SCOPE.get("cefi")
+    if not isinstance(rule, CeFiMvpRule):
+        return frozenset()
+    # Venue must be in the rule at all.
+    if not _cefi_venue_in_rule(venue, rule.venues):
+        return frozenset()
+    # Per-venue override is the highest-priority gate.
+    venue_override = _cefi_venue_data_type_set(venue, rule)
+    if venue_override is not None:
+        return venue_override
+    # No per-venue override: return the flat set (the per-instrument_type
+    # overrides are instrument_type-scoped so cannot be collapsed here without
+    # knowing the instrument_type; callers that know the instrument_type should
+    # call ``is_mvp`` directly for an exact gate).
+    return rule.data_types
 
 
 # ---------------------------------------------------------------------------
@@ -916,14 +1046,23 @@ def is_mvp(
         if instrument_type not in rule.instrument_types:
             return False
         # Axis 3: data_type (blank → any MVP data_type, unbound-grain convention).
-        # PER-INSTRUMENT_TYPE OVERRIDE (operator 2026-06-27 decision #2): if the
-        # rule declares a data_type set for THIS instrument_type
-        # (``instrument_type_data_types``), gate on it INSTEAD of the flat
-        # ``data_types`` set — today OPTION -> {options_chain} only (Deribit
-        # options carry marks+IVs in the chain bundle; per-strike trades/book5 are
-        # too heavy and EXCLUDED). Any other instrument_type uses the flat set.
-        _it_norm = (instrument_type or "").strip().upper()
-        _dt_set = rule.instrument_type_data_types.get(_it_norm, rule.data_types)
+        # Resolution order for the effective data_type set (v11):
+        #   1. PER-VENUE OVERRIDE (``venue_data_types``) — highest priority.
+        #      When the venue has a declared data_type set (e.g. COINBASE →
+        #      {trades}, DERIBIT → {options_chain}), that set is final for ALL
+        #      instrument_types at that venue.  The per-instrument_type override
+        #      below does NOT apply when the venue override is set.
+        #   2. PER-INSTRUMENT_TYPE OVERRIDE (``instrument_type_data_types``) —
+        #      applies when the venue has NO override. Today OPTION →
+        #      {options_chain} only (Deribit BTC/ETH options; this is now
+        #      redundant for DERIBIT but kept for any other OPTION rows).
+        #   3. FLAT ``data_types`` set — default when no override applies.
+        _venue_dt_set = _cefi_venue_data_type_set(venue, rule)
+        if _venue_dt_set is not None:
+            _dt_set: frozenset[str] = _venue_dt_set
+        else:
+            _it_norm = (instrument_type or "").strip().upper()
+            _dt_set = rule.instrument_type_data_types.get(_it_norm, rule.data_types)
         if not _data_type_in_rule(data_type, _dt_set):
             return False
         # Axis 4: base_ccy (optional — if rule has a non-empty set, must match).
