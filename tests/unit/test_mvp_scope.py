@@ -1018,6 +1018,114 @@ def test_capture_universe_config_version_bumped() -> None:
     assert MVP_SCOPE_CONFIG_VERSION >= 10
 
 
+# ---------------------------------------------------------------------------
+# v11 — COINBASE venue_data_types override (operator 2026-06-28 decision A)
+# ---------------------------------------------------------------------------
+# COINBASE-SPOT + COINBASE-FUTURES: trades ONLY; book_snapshot_5 EXCLUDED.
+# All other venues (Binance, Bybit, OKX, …) keep trades + book_snapshot_5.
+# Deribit is UNCHANGED from v10: OPTION = options_chain-only;
+# PERP/FUTURE = trades + book_snapshot_5 (still MVP).
+# ---------------------------------------------------------------------------
+
+
+class TestCoinbaseVenueOverrideV11:
+    """v11 per-venue data_type override: COINBASE = trades only."""
+
+    def test_coinbase_spot_trades_is_mvp(self) -> None:
+        """COINBASE-SPOT SPOT_PAIR trades → MVP (unchanged, still in scope)."""
+        assert is_mvp("cefi", "COINBASE-SPOT", "SPOT_PAIR", "trades", base_ccy="BTC")
+
+    def test_coinbase_futures_trades_is_mvp(self) -> None:
+        """COINBASE-FUTURES PERPETUAL trades → MVP."""
+        assert is_mvp("cefi", "COINBASE-FUTURES", "PERPETUAL", "trades", base_ccy="BTC")
+
+    def test_coinbase_spot_book_snapshot_5_not_mvp(self) -> None:
+        """COINBASE-SPOT book_snapshot_5 → NOT MVP (decision A — book5 excluded)."""
+        assert not is_mvp("cefi", "COINBASE-SPOT", "SPOT_PAIR", "book_snapshot_5", base_ccy="BTC")
+
+    def test_coinbase_futures_book_snapshot_5_not_mvp(self) -> None:
+        """COINBASE-FUTURES book_snapshot_5 → NOT MVP (decision A)."""
+        assert not is_mvp("cefi", "COINBASE-FUTURES", "PERPETUAL", "book_snapshot_5", base_ccy="BTC")
+
+    def test_coinbase_spot_book5_eth_not_mvp(self) -> None:
+        """COINBASE-SPOT book_snapshot_5 ETH → NOT MVP (venue override applies to all bases)."""
+        assert not is_mvp("cefi", "COINBASE-SPOT", "SPOT_PAIR", "book_snapshot_5", base_ccy="ETH")
+
+    def test_binance_book_snapshot_5_still_mvp(self) -> None:
+        """BINANCE-SPOT book_snapshot_5 → still MVP (override is Coinbase-only)."""
+        assert is_mvp("cefi", "BINANCE-SPOT", "SPOT_PAIR", "book_snapshot_5", base_ccy="BTC")
+
+    def test_bybit_book_snapshot_5_still_mvp(self) -> None:
+        """BYBIT book_snapshot_5 → still MVP (override is Coinbase-only)."""
+        assert is_mvp("cefi", "BYBIT", "PERPETUAL", "book_snapshot_5", base_ccy="ETH")
+
+    def test_okx_swap_book_snapshot_5_still_mvp(self) -> None:
+        """OKX-SWAP book_snapshot_5 → still MVP."""
+        assert is_mvp("cefi", "OKX-SWAP", "PERPETUAL", "book_snapshot_5", base_ccy="BTC")
+
+    def test_deribit_perp_trades_still_mvp(self) -> None:
+        """Deribit PERPETUAL trades → still MVP (v10 behavior unchanged in v11)."""
+        assert is_mvp("cefi", "DERIBIT", "PERPETUAL", "trades", base_ccy="BTC")
+
+    def test_deribit_perp_book_snapshot_5_still_mvp(self) -> None:
+        """Deribit PERPETUAL book_snapshot_5 → still MVP (v10 behavior unchanged — perp/future tick wanted)."""
+        assert is_mvp("cefi", "DERIBIT", "PERPETUAL", "book_snapshot_5", base_ccy="BTC")
+
+    def test_deribit_future_book_snapshot_5_still_mvp(self) -> None:
+        """Deribit FUTURE book_snapshot_5 → still MVP (v10 behavior unchanged)."""
+        assert is_mvp("cefi", "DERIBIT", "FUTURE", "book_snapshot_5", base_ccy="BTC")
+
+    def test_deribit_option_options_chain_still_mvp(self) -> None:
+        """Deribit OPTION options_chain → still MVP (v10 behavior unchanged)."""
+        assert is_mvp("cefi", "DERIBIT", "OPTION", "options_chain", base_ccy="BTC")
+
+    def test_deribit_option_book_snapshot_5_still_excluded(self) -> None:
+        """Deribit OPTION book_snapshot_5 → NOT MVP (v10 instrument_type override unchanged)."""
+        assert not is_mvp("cefi", "DERIBIT", "OPTION", "book_snapshot_5", base_ccy="BTC")
+
+    def test_get_mvp_data_types_coinbase_spot(self) -> None:
+        """get_mvp_data_types_for_cefi_venue returns trades-only for COINBASE-SPOT."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        dt = get_mvp_data_types_for_cefi_venue("COINBASE-SPOT")
+        assert dt == frozenset({"trades"})
+        assert "book_snapshot_5" not in dt
+
+    def test_get_mvp_data_types_coinbase_futures(self) -> None:
+        """get_mvp_data_types_for_cefi_venue returns trades-only for COINBASE-FUTURES."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        dt = get_mvp_data_types_for_cefi_venue("COINBASE-FUTURES")
+        assert dt == frozenset({"trades"})
+
+    def test_get_mvp_data_types_binance_includes_book5(self) -> None:
+        """get_mvp_data_types_for_cefi_venue returns trades+book5 for BINANCE-FUTURES."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        dt = get_mvp_data_types_for_cefi_venue("BINANCE-FUTURES")
+        assert "trades" in dt
+        assert "book_snapshot_5" in dt
+
+    def test_get_mvp_data_types_non_mvp_venue_empty(self) -> None:
+        """get_mvp_data_types_for_cefi_venue returns empty frozenset for non-MVP venue."""
+        from unified_api_contracts import get_mvp_data_types_for_cefi_venue
+
+        assert get_mvp_data_types_for_cefi_venue("FAKE_VENUE_XYZ") == frozenset()
+
+    def test_config_version_is_v11(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 11 after the COINBASE override."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
+
+        assert MVP_SCOPE_CONFIG_VERSION == 11
+
+    def test_get_mvp_data_types_public_import_surface(self) -> None:
+        """get_mvp_data_types_for_cefi_venue is importable from the package root."""
+        import unified_api_contracts
+
+        assert hasattr(unified_api_contracts, "get_mvp_data_types_for_cefi_venue")
+        assert "get_mvp_data_types_for_cefi_venue" in unified_api_contracts.__all__
+
+
 def test_accepted_quotes_for_venue_upbit_krw() -> None:
     """KRW is accepted ONLY for UPBIT; default venues stay USDT/USDC/USD."""
     from unified_api_contracts import accepted_quotes_for_venue
