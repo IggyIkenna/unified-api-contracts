@@ -1,16 +1,16 @@
 """Cross-repo invariant: deployment-ui API-contract consumption vs deployment-api.
 
-Validates that the deployment-api's registered route modules and route prefixes
-are stable — i.e., a module removal or prefix rename that would break the
-deployment-ui or other consumers is caught before SIT validates the promote.
+Two layers of validation:
 
-Uses static AST analysis of deployment_api/main.py (not installed in UAC venv).
+1. deployment-api surface (AST on deployment_api/main.py): route modules and prefixes
+   that deployment-ui consumes are still registered. A removal / prefix rename breaks
+   deployment-ui's hard-coded API paths silently.
 
-Negative-control contract: removing a route module import from main.py, or removing
-its ``include_router`` call, makes these tests fail — that IS the guard for a
-cross-repo breaking change to the deployment API contract.
+2. deployment-ui TypeScript source (text search on src/api/*.ts): the UI's own API
+   client files reference the correct route paths and key interfaces. A drift between
+   what the UI sends and what deployment-api serves causes silent 404s.
 
-SIT plan: plans/active/cicd_sit_full_coverage_handoff_2026_06_27.md — task -027
+SIT plan: plans/active/cicd_sit_full_coverage_handoff_2026_06_27.md — task -027 / Phase 1
 """
 
 from __future__ import annotations
@@ -241,4 +241,98 @@ def test_deployment_api_route_prefixes_wired() -> None:
         f"from include_router calls:\n  {missing}\n\n"
         "These URL paths are consumed by the deployment-ui and external clients. "
         "Removing or renaming them is a cross-repo BREAKING CHANGE."
+    )
+
+
+# ---------------------------------------------------------------------------
+# Layer 2 — deployment-ui TypeScript source self-check
+# ---------------------------------------------------------------------------
+
+
+def _ui_root() -> Path:
+    return _workspace_root() / "deployment-ui"
+
+
+def _skip_if_ui_absent() -> None:
+    ui_sibling = _workspace_root() / "deployment-ui"
+    if not ui_sibling.is_dir():
+        pytest.skip(
+            f"per-repo CI checkout: deployment-ui not present at {ui_sibling}; "
+            "cross-repo deployment-ui source invariant runs in full-workspace SIT only"
+        )
+
+
+def _all_contain(source_path: Path, needles: list[str]) -> list[str]:
+    """Return any needles missing from source_path."""
+    text = source_path.read_text(encoding="utf-8")
+    return [n for n in needles if n not in text]
+
+
+def test_deployment_ui_deployment_api_client_routes_stable() -> None:
+    """src/api/deploymentApi.ts references the deployment-api route paths it consumes.
+
+    /api/services, /api/deployments, and /api/builds/ are the three primary API
+    surfaces the deployment UI's dashboard calls. If these path strings disappear from
+    deploymentApi.ts (drift from the deployment-api server routes), the dashboard
+    silently 404s on every service-status and deploy-history request.
+    """
+    _skip_if_ui_absent()
+
+    deployment_api_ts = _ui_root() / "src" / "api" / "deploymentApi.ts"
+    assert deployment_api_ts.is_file(), (
+        f"deployment-ui src/api/deploymentApi.ts missing at {deployment_api_ts}.\n\n"
+        "deploymentApi.ts is the primary deployment-api consumption client — "
+        "removing it drops all service-status, deploy-history, and VM observability."
+    )
+
+    required = ["/api/services", "/api/deployments", "/api/builds/"]
+    missing = _all_contain(deployment_api_ts, required)
+    assert not missing, (
+        f"deployment-ui src/api/deploymentApi.ts is MISSING route references:\n"
+        f"  {missing}\n\n"
+        "/api/services / /api/deployments / /api/builds/ are the deployment-api "
+        "endpoints the dashboard depends on — drift here causes silent 404s."
+    )
+
+
+def test_deployment_ui_repo_readiness_client_route_stable() -> None:
+    """src/api/repoReadiness.ts references /api/repos/deploy-ready.
+
+    The repo-readiness check is the gate the deployment-ui shows before allowing
+    a deploy. If the route path drifts from what deployment-api serves, the
+    readiness panel silently fails and users see stale / missing readiness state.
+    """
+    _skip_if_ui_absent()
+
+    readiness_ts = _ui_root() / "src" / "api" / "repoReadiness.ts"
+    assert readiness_ts.is_file(), (
+        f"deployment-ui src/api/repoReadiness.ts missing at {readiness_ts}.\n\n"
+        "repoReadiness.ts is the deploy-readiness gate client — removing it "
+        "drops the readiness check from the deployment panel."
+    )
+
+    required = ["/api/repos/deploy-ready"]
+    missing = _all_contain(readiness_ts, required)
+    assert not missing, (
+        f"deployment-ui src/api/repoReadiness.ts is MISSING route reference:\n"
+        f"  {missing}\n\n"
+        "/api/repos/deploy-ready is served by deployment-api repo_readiness router — "
+        "removing this reference silently breaks the deploy-readiness gate."
+    )
+
+
+def test_deployment_ui_client_api_present() -> None:
+    """src/api/client.ts is present — the client-management API surface.
+
+    client.ts is the API client for client-facing data (client listing, etc.)
+    that the deployment console uses. Removing it drops the client-management
+    surface from the UI without any import errors at the component level.
+    """
+    _skip_if_ui_absent()
+
+    client_ts = _ui_root() / "src" / "api" / "client.ts"
+    assert client_ts.is_file(), (
+        f"deployment-ui src/api/client.ts missing at {client_ts}.\n\n"
+        "client.ts is the client-management API client — removing it drops "
+        "client-data fetching from the deployment console."
     )
