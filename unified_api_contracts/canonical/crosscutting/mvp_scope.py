@@ -97,13 +97,16 @@ def _cefi_venue_data_type_set(venue: str, rule: CeFiMvpRule) -> frozenset[str] |
     when the venue has no override (caller should use ``instrument_type_data_types``
     / flat ``data_types`` instead).
 
-    Introduced in v11 (operator 2026-06-28) to support COINBASE={trades} and
-    DERIBIT={options_chain} venue-wide overrides.
+    Introduced in v11 (operator 2026-06-28) to support the COINBASE={trades}
+    venue-wide override (COINBASE-SPOT / COINBASE-FUTURES drop book_snapshot_5).
+    NOTE: Deribit has NO venue override — its OPTION->{options_chain} cut stays
+    in ``instrument_type_data_types`` (v10), and Deribit perp/future keep
+    trades + book_snapshot_5.
     """
     if not rule.venue_data_types:
         return None
     v = (venue or "").strip().upper()
-    # Exact match first (COINBASE-SPOT, COINBASE-FUTURES, DERIBIT, …).
+    # Exact match first (COINBASE-SPOT, COINBASE-FUTURES, …).
     if v in rule.venue_data_types:
         return rule.venue_data_types[v]
     # Base-token fallback (COINBASE → matches COINBASE-SPOT / COINBASE-FUTURES
@@ -172,7 +175,7 @@ class CeFiMvpRule:
             from this map uses the flat ``data_types`` set unchanged
             (perps/spot/dated-futures = trades + book_snapshot_5 + funding).
         venue_data_types: Optional per-venue data_type OVERRIDE of the flat
-            ``data_types`` set (operator 2026-06-28, decisions A+B). When a
+            ``data_types`` set (operator 2026-06-28, decision A). When a
             venue key is present, ONLY those data_types are MVP for that venue
             — the flat ``data_types`` set does NOT apply to it. Takes
             PRECEDENCE over ``instrument_type_data_types`` (the two overrides
@@ -184,8 +187,9 @@ class CeFiMvpRule:
             overrides (v11):
               COINBASE-SPOT  → {trades} (no book_snapshot_5 — too heavy, no
               COINBASE-FUTURES   depth features derived)
-              DERIBIT        → {options_chain} (venue-wide; Deribit perp/future
-                               tick OOM; only the bundled chain is used)
+            NOTE: Deribit is intentionally ABSENT from this map. Its
+            OPTION->{options_chain} cut lives in ``instrument_type_data_types``
+            (v10), and Deribit perp/future keep trades + book_snapshot_5.
             A venue ABSENT from this map uses ``instrument_type_data_types``
             (if present) or the flat ``data_types`` set.
         sources: Optional frozenset of source strings. When not empty,
