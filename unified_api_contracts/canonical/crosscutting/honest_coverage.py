@@ -123,6 +123,15 @@ class EmptyConfirmedReason(StrEnum):
     honest-empty by design, not a fetch failure. Sister of ``EXPECTED_PRE_SOURCE_COVERAGE_START``.
     SSOT: ``is_mtds_contract_audit_2026_05_20.md`` Phase 1."""
 
+    EXPECTED_SOURCE_DELIVERY_LAG = "EXPECTED_SOURCE_DELIVERY_LAG"
+    """TRADFI NASDAQ/NYSE equity or ETF: Databento returned 0 rows for an in-window trading day
+    (instrument is listed, date is not a holiday/weekend). Indicates a temporary delivery lag —
+    Databento's archive may not have ingested the data yet for dates near the live edge. Distinct
+    from ``SOURCE_RETURNED_ZERO`` (permanent honest absence for a historical date where no data
+    exists) — this reason marks a gap where re-fetching once the archive catches up is expected
+    to yield rows. Operator decision: BLK-d385496b answer B (2026-06-28).
+    Plan: ``nasdaq_nyse_eu_silent_skip_2026_06_28.md``."""
+
     EXPECTED_PRE_GENESIS_CHAIN = "EXPECTED_PRE_GENESIS_CHAIN"
     """DeFi: date precedes the chain's genesis block (Solana 2020-03-16, Arbitrum 2021-08-31, etc.)."""
 
