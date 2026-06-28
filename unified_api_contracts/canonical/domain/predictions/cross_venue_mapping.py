@@ -208,6 +208,7 @@ class _Classified(NamedTuple):
     bet_type: PredictionBetType
     strike: float | None
     canonical_event_id: str
+    title: str  # human-readable label for fungibility alerts
 
 
 def _normalize_strike(num: str, suffix: str | None) -> float | None:
@@ -419,7 +420,7 @@ def _classify_kalshi(record: InstrumentRecord, titles: Mapping[str, str]) -> _Cl
         strike=strike,
         sports_pairing_key=sports_key,
     )
-    return _Classified(record, key, underlying, bet_type, strike, _canonical_event_id(underlying, bet_type, key))
+    return _Classified(record, key, underlying, bet_type, strike, _canonical_event_id(underlying, bet_type, key), title)
 
 
 def _classify_polymarket(record: InstrumentRecord, titles: Mapping[str, str]) -> _Classified:
@@ -471,7 +472,7 @@ def _classify_polymarket(record: InstrumentRecord, titles: Mapping[str, str]) ->
         strike=strike,
         sports_pairing_key=sports_key,
     )
-    return _Classified(record, key, underlying, bet_type, strike, _canonical_event_id(underlying, bet_type, key))
+    return _Classified(record, key, underlying, bet_type, strike, _canonical_event_id(underlying, bet_type, key), title)
 
 
 def _canonical_event_id(
@@ -492,6 +493,14 @@ def _build_mapping(kalshi: _Classified, poly: _Classified) -> PredictionMarketCr
     strike = kalshi.strike if kalshi.strike is not None else poly.strike
     # Settlement: prefer Kalshi expiry (close_time), fall back to Polymarket.
     expiry = kalshi.record.expiry or poly.record.expiry
+    # Settlement method per venue. Kalshi always resolves on the closing price
+    # at settlement time (point-in-time). Polymarket PRICE_LEVEL / PRICE_RANGE
+    # resolve if the price EVER touches the level during the contract lifetime
+    # (path-dependent). Polymarket UP_DOWN / MATCH / SPREAD / TOTAL / PER_MONTH
+    # use the final closing value (point-in-time). The difference matters: two
+    # markets nominally on the same strike may not be fungible when one is
+    # path-dependent and the other is point-in-time.
+    poly_path_dependent = bet_type in {PredictionBetType.PRICE_LEVEL, PredictionBetType.PRICE_RANGE}
     return PredictionMarketCrossVenueMapping(
         canonical_event_id=kalshi.key or poly.canonical_event_id,
         category=_category_for_underlying(underlying),
@@ -502,6 +511,10 @@ def _build_mapping(kalshi: _Classified, poly: _Classified) -> PredictionMarketCr
         kalshi_market_ticker=kalshi.record.instrument_key,
         strike=None if is_sports else strike,
         expiry_utc=expiry,
+        kalshi_settlement_method="point_in_time",
+        polymarket_settlement_method="path_dependent" if poly_path_dependent else "point_in_time",
+        kalshi_title=kalshi.title or None,
+        polymarket_title=poly.title or None,
     )
 
 

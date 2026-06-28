@@ -79,6 +79,17 @@ class PredictionMarketCrossVenueMapping(BaseModel):
     strike: float | None = None  # 95000.0 (BTC), 5800.0 (SPX), None for sports
     expiry_utc: datetime | None = None
 
+    # Settlement semantics — "point_in_time" = resolves on one price snapshot at
+    # close (Kalshi default; Polymarket UP_DOWN daily close); "path_dependent" =
+    # resolves if price touches the level at ANY point during the contract lifetime
+    # (Polymarket PRICE_LEVEL / PRICE_RANGE). Difference matters for fungibility.
+    kalshi_settlement_method: str | None = None
+    polymarket_settlement_method: str | None = None
+
+    # Human-readable labels for manual fungibility verification in alerts.
+    kalshi_title: str | None = None
+    polymarket_title: str | None = None
+
 
 class MappingRule(BaseModel):
     """Rule for keyword-based categorization of prediction markets."""
