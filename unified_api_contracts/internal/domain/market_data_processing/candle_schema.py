@@ -8,6 +8,15 @@ downstream services (features-delta-one, etc.) filter out non-NORMAL candles.
 
 DataType drives schema selection (SCHEMA_BY_DATA_TYPE in models.py) and GCS
 path construction.
+
+Book-microstructure summary columns (added to ``book_snapshot_5`` candles,
+CeFi + prediction only) are specified in the companion SSOT module:
+
+    unified_api_contracts.internal.domain.market_data_processing.book_summary_spec
+
+See ``BOOK_SUMMARY_COLUMNS`` for the full 24-column set with dtypes, null-rules,
+and aggregation formulas.  Plan reference:
+    plans/active/mdps_book_microstructure_precompute_columns_2026_06_28.md
 """
 
 from __future__ import annotations
