@@ -766,6 +766,14 @@ from unified_api_contracts.internal.domain.market_data_processing.adapter_models
     InstrumentInfo,
     InstrumentMetadata,
 )
+from unified_api_contracts.internal.domain.market_data_processing.book_summary_spec import (
+    BOOK_SUMMARY_COLUMN_NAMES,
+    BOOK_SUMMARY_COLUMNS,
+    BOOK_SUMMARY_COLUMNS_BY_NAME,
+    BookColumnGroup,
+    BookColumnSpec,
+    book_summary_column_names_for_group,
+)
 from unified_api_contracts.internal.domain.market_data_processing.candle_schema import (
     DataType,
     MarketState,
@@ -1643,6 +1651,12 @@ __all__ = [
     "BucketMarket",
     "BybitWithdrawRequest",
     "BybitWithdrawResponse",
+    "BOOK_SUMMARY_COLUMNS",
+    "BOOK_SUMMARY_COLUMNS_BY_NAME",
+    "BOOK_SUMMARY_COLUMN_NAMES",
+    "BookColumnGroup",
+    "BookColumnSpec",
+    "book_summary_column_names_for_group",
     "CancelInstruction",
     "CandleOutput",
     "CanonicalBondData",
