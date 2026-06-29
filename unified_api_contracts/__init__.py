@@ -200,6 +200,7 @@ from .canonical.crosscutting.mvp_scope import (
     get_mvp_data_types_for_cefi_venue,
     is_in_mvp_capture_universe,
     is_mvp,
+    mdps_mvp_universe,
     mvp_scope_config_descriptor,
 )
 from .canonical.crosscutting.pipeline_mode import (
@@ -2420,6 +2421,7 @@ __all__ = [
     "get_mvp_data_types_for_cefi_venue",
     "is_in_mvp_capture_universe",
     "is_mvp",
+    "mdps_mvp_universe",
     "mvp_scope_config_descriptor",
     "CeFiMvpRule",
     "DeFiMvpRule",
