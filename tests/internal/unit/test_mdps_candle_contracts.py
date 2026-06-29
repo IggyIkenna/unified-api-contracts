@@ -11,6 +11,9 @@ from __future__ import annotations
 
 import pytest
 
+from unified_api_contracts.internal.domain.market_data_processing import (
+    BOOK_SUMMARY_COLUMN_NAMES,
+)
 from unified_api_contracts.internal.schemas._candle_contracts import (
     MDPS_KEY_BOOK5,
     MDPS_KEY_DERIV,
@@ -80,13 +83,7 @@ def test_cefi_perpetual_trades_candles(tf: str) -> None:
 def test_cefi_perpetual_book5_candles(tf: str) -> None:
     contract = lookup_contract(asset_group="cefi", instrument_type="perpetual", data_type=MDPS_KEY_BOOK5(tf))
     names = {c.name for c in contract.columns}
-    assert {
-        "spread_bps_mean",
-        "depth_bid_mean",
-        "depth_ask_mean",
-        "imbalance_ratio_mean",
-        "mid_price_mean",
-    }.issubset(names)
+    assert set(BOOK_SUMMARY_COLUMN_NAMES).issubset(names)
 
 
 @pytest.mark.parametrize("tf", MDPS_TIMEFRAMES_CEFI)
