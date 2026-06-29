@@ -133,6 +133,11 @@ from .canonical.crosscutting.execution import (
     NORMAL_ALGO_TYPE,
     BatchExecutionMode,
 )
+from .canonical.crosscutting.execution_fidelity import (
+    ExecutionFidelityTier,
+    ExecutionMode,
+    execution_fidelity,
+)
 from .canonical.crosscutting.experiment_registry import (
     ExperimentKind,
     ExperimentRunSpec,
@@ -2433,6 +2438,11 @@ __all__ = [
     "VenueVolumeObservation",
     "execution_spot_representative",
     "feature_perp_representative",
+    # Execution fidelity capability — UAC SSOT for the matcher-tier selection
+    # consumed by execution-service.
+    "ExecutionFidelityTier",
+    "ExecutionMode",
+    "execution_fidelity",
     "CeFiMvpRule",
     "DeFiMvpRule",
     "TradFiMvpRule",
