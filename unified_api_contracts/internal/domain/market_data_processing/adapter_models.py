@@ -148,6 +148,39 @@ class CandleOutput:
     weighted_mid_price_5level: object = None
     effective_spread_5level: object = None
 
+    # Book-microstructure intra-bar summary columns (book_snapshot_5 only).
+    # SSOT: unified_api_contracts.internal.domain.market_data_processing.book_summary_spec
+    # 25 columns produced from L5 book ticks via time-weighted aggregation over the
+    # bar interval (right-edge convention: a sample at exactly t_close belongs to the
+    # next bar). Populated by CefiBookSnapshotAdapter (and the DefiBookSnapshotAdapter
+    # subclass); all other data_types omit them. PROCESSED_CANDLE_SCHEMA scopes via
+    # applies_to={"book_snapshot_5"}.
+    book_spread_bps_tw_mean: object = None
+    book_spread_bps_tw_std: object = None
+    book_spread_bps_max: object = None
+    book_spread_bps_min: object = None
+    book_spread_bps_close: object = None
+    book_mid_open: object = None
+    book_mid_high: object = None
+    book_mid_low: object = None
+    book_mid_close: object = None
+    book_microprice_tw_mean: object = None
+    book_microprice_tilt_bps_tw_mean: object = None
+    book_imbalance_tw_mean: object = None
+    book_imbalance_tw_std: object = None
+    book_imbalance_close: object = None
+    book_imbalance_sign_persist: object = None
+    book_bid_qty_L1_tw_mean: object = None
+    book_bid_qty_L2_tw_mean: object = None
+    book_bid_qty_L3_tw_mean: object = None
+    book_bid_qty_L4_tw_mean: object = None
+    book_bid_qty_L5_tw_mean: object = None
+    book_ask_qty_L1_tw_mean: object = None
+    book_ask_qty_L2_tw_mean: object = None
+    book_ask_qty_L3_tw_mean: object = None
+    book_ask_qty_L4_tw_mean: object = None
+    book_ask_qty_L5_tw_mean: object = None
+
     # Market state (TradFi / TBBO adapters)
     market_state: object = None
     is_halted: object = None
