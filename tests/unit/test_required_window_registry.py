@@ -116,6 +116,8 @@ class TestResolveRequiredWindow:
         # The window comes from the UAC sports league registry — NEVER
         # magic numbers in the caller. The harness gate "sports entries
         # reference real season windows" is met here.
+        # today=2026-06-28 is post-season (EPL 2025-26 ends 2026-05-31),
+        # so min(season_end, today) == season_end — boundary unchanged.
         today = date(2026, 6, 28)
         window = resolve_required_window(
             asset_group="sports",
@@ -131,6 +133,53 @@ class TestResolveRequiredWindow:
         assert window.start.month == 8
         assert window.end.year == 2026
         assert window.end >= window.start
+
+    def test_seasonal_continuous_during_season_clips_end_to_today(self) -> None:
+        # Regression: during-season today < season_end. Before the fix,
+        # end=season_end caused all future-date rows to be counted as
+        # M(missing) → INSUFFICIENT_HISTORY. After the fix, end=today.
+        today = date(2025, 12, 1)
+        window = resolve_required_window(
+            asset_group="sports",
+            data_type="FIXTURES",
+            today=today,
+            league_id="EPL",
+            season_year=2025,
+        )
+        assert window.kind == "seasonal_continuous"
+        assert window.end == today  # clipped to today, not season_end=2026-05-31
+        assert window.start == date(2025, 8, 1)
+        assert window.calendar_days == (today - date(2025, 8, 1)).days + 1
+
+    def test_seasonal_continuous_post_season_end_unchanged(self) -> None:
+        # Post-season today > season_end: min(season_end, today) == season_end.
+        # Behaviour is identical to pre-fix — end stays at the season close.
+        today = date(2026, 7, 1)
+        window = resolve_required_window(
+            asset_group="sports",
+            data_type="FIXTURES",
+            today=today,
+            league_id="EPL",
+            season_year=2025,
+        )
+        assert window.kind == "seasonal_continuous"
+        assert window.end == date(2026, 5, 31)  # season_end, not today
+        assert window.end < today
+
+    def test_seasonal_continuous_early_in_season_clips_to_today(self) -> None:
+        # Tiny window near season start — verifies clipping works on early dates.
+        today = date(2025, 8, 15)
+        window = resolve_required_window(
+            asset_group="sports",
+            data_type="FIXTURES",
+            today=today,
+            league_id="EPL",
+            season_year=2025,
+        )
+        assert window.kind == "seasonal_continuous"
+        assert window.end == today
+        assert window.start == date(2025, 8, 1)
+        assert window.calendar_days == 15  # Aug 1..Aug 15 inclusive
 
     def test_unknown_combo_raises_loudly(self) -> None:
         # The plan's IMPLEMENT P1 gate: "no combo silently skipped

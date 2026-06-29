@@ -391,9 +391,12 @@ def resolve_required_window(
                 "magic numbers in the caller).",
             )
         boundary: SeasonBoundary = get_season_boundary(league_id, season_year)
+        # Clip to today during an active season: future dates have no manifest
+        # rows and would count as M(missing) → INSUFFICIENT_HISTORY. Post-season
+        # behaviour is unchanged (min returns season_end when today ≥ season_end).
         return RequiredWindow(
             start=boundary.start_date,
-            end=boundary.end_date,
+            end=min(boundary.end_date, today),
             kind="seasonal_continuous",
         )
     if spec.kind == "max_daily_aggregation":
