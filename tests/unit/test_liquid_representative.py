@@ -425,3 +425,175 @@ class TestPerpPurity:
             "BYBIT",
             "BTC-USDT",
         )
+
+
+# ---------------------------------------------------------------------------
+# Plan item 005 — cross-AG matrix
+#
+# One consolidated class that exercises the delta-one perp-representative
+# contract across ALL FIVE asset_groups declared in MVP_SCOPE
+# (cefi / defi / tradfi / sports / prediction), so the gate
+# "options/futures excluded from delta-one; non-CeFi pass-through behaviour
+# decided + tested; perp chosen by measured volume not venue hardcode;
+# tie-breaks deterministically" is readable as one test class instead of
+# scattered across the per-AG suites above.
+# ---------------------------------------------------------------------------
+
+
+class TestFiveAssetGroupDeltaOneMatrix:
+    """Cross-AG matrix for the delta-one perp representative contract.
+
+    Each row in the MVP-for-features universe (plan
+    ``mvp_for_mdps_and_features_universe_uac_2026_06_28.md``, Concept 2)
+    asserts one of:
+
+    * ``cefi`` / ``tradfi`` — delta-one IS supported; the selector returns
+      a ``(venue, instrument)`` for an in-MVP perp/future observation, and
+      filters non-linear types (OPTION, dated FUTURE in cefi) out even when
+      their volume dwarfs the legitimate representative.
+    * ``defi`` / ``sports`` / ``prediction`` — delta-one is NOT supported
+      via this selector; the function raises so callers don't silently get
+      ``None`` and proceed without a representative.
+    """
+
+    @pytest.mark.parametrize(
+        ("asset_group", "supported"),
+        [
+            ("cefi", True),
+            ("tradfi", True),
+            ("defi", False),
+            ("sports", False),
+            ("prediction", False),
+        ],
+    )
+    def test_delta_one_support_per_asset_group(self, asset_group: str, supported: bool) -> None:
+        """The supported / unsupported split is the AG contract — supported
+        AGs accept the selector call (returning ``None`` for empty input is
+        the "no rep available" path, not a rejection); unsupported AGs raise."""
+        if supported:
+            assert feature_perp_representative("BTC", asset_group, []) is None
+        else:
+            with pytest.raises(ValueError, match=r"asset_group .* not supported"):
+                feature_perp_representative("BTC", asset_group, [])
+
+    def test_cefi_excludes_option_even_with_dominant_volume(self) -> None:
+        """cefi: ``(DERIBIT, OPTION)`` is in MVP_SCOPE, but the perp filter
+        only admits ``PERPETUAL`` / ``EQUITY_PERP`` — so a DERIBIT OPTION row
+        with overwhelming volume is dropped and the PERPETUAL leg wins.
+        Delta-one features do not run on options."""
+        observations = [
+            _obs("DERIBIT", "BTC-27JUN26-50000-C", "OPTION", "BTC", 9_999_999_999.0),
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "BTC-USDT",
+        )
+
+    def test_cefi_excludes_dated_future_even_with_dominant_volume(self) -> None:
+        """cefi: dated ``FUTURE`` instruments (term-structure leg) are
+        excluded from delta-one — that family is ``futures_basis``, not the
+        delta-one rep. The PERPETUAL leg wins regardless of volume."""
+        observations = [
+            _obs("BINANCE-FUTURES", "BTC-USD_MAR26", "FUTURE", "BTC", 9_999_999_999.0),
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "BTC-USDT",
+        )
+
+    def test_tradfi_excludes_option_picks_future_rep(self) -> None:
+        """tradfi: no perpetual exists, so ``FUTURE`` IS the delta-one rep
+        (the non-CeFi pass-through decision — TradFi reps are chosen, not
+        skipped). ``OPTION`` is still excluded: delta-one features do not
+        run on options regardless of AG."""
+        observations = [
+            _obs("CME", "ESH26-5500-C", "OPTION", "ES", 9_999_999_999.0),
+            _obs("CME", "ESH26", "FUTURE", "ES", 1.0),
+        ]
+        assert feature_perp_representative("ES", "tradfi", observations) == (
+            "CME",
+            "ESH26",
+        )
+
+    def test_tradfi_picks_highest_volume_future_among_curve(self) -> None:
+        """Non-CeFi pass-through (TradFi): given a CME curve, the most-liquid
+        contract is the rep — front-month wins in real markets because its
+        VOLUME is highest, not because the selector hardcodes the month."""
+        observations = [
+            _obs("CME", "ESM26", "FUTURE", "ES", 5_000_000_000.0),  # back-month
+            _obs("CME", "ESH26", "FUTURE", "ES", 80_000_000_000.0),  # front-month
+            _obs("CME", "ESU26", "FUTURE", "ES", 1_000_000_000.0),  # further out
+        ]
+        assert feature_perp_representative("ES", "tradfi", observations) == (
+            "CME",
+            "ESH26",
+        )
+
+    @pytest.mark.parametrize("asset_group", ["defi", "sports", "prediction"])
+    def test_non_perp_supported_asset_groups_raise_loudly(self, asset_group: str) -> None:
+        """Non-CeFi pass-through decision (DeFi / sports / prediction):
+        the selector RAISES rather than silently returning ``None``.
+
+        * ``defi`` — DeFi-native perps (Hyperliquid / Aster / Drift) are
+          classified ``cefi`` everywhere in this codebase, so a caller
+          passing ``defi`` is a programming error, not a no-rep case.
+        * ``sports`` / ``prediction`` — these AGs don't run delta-one
+          features at all (no price-time-series concept).
+
+        Caller getting back a clear ``ValueError`` is the contract; it
+        prevents the silent-fall-through bug where a downstream pipeline
+        proceeds with ``None`` and emits zero rows.
+        """
+        observations = [
+            _obs("ANY-VENUE", "ANY-INSTRUMENT", "PERPETUAL", "BTC", 1.0),
+        ]
+        with pytest.raises(ValueError, match=r"asset_group .* not supported"):
+            feature_perp_representative("BTC", asset_group, observations)
+
+    def test_perp_chosen_by_measured_volume_not_venue_hardcode(self) -> None:
+        """Plan acceptance — 'the perp representative is chosen by measured
+        volume (Binance usually wins for crypto but via volume, not
+        hardcode)'. Same observations with the volume column flipped → the
+        winner flips too. The selector never references a venue by name."""
+        binance_leads = [
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 12_500_000_000.0),
+            _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 4_200_000_000.0),
+        ]
+        bybit_leads = [
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0),
+            _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 9_999_999_999.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", binance_leads) == (
+            "BINANCE-FUTURES",
+            "BTC-USDT",
+        )
+        assert feature_perp_representative("BTC", "cefi", bybit_leads) == (
+            "BYBIT",
+            "BTC-USDT",
+        )
+
+    @pytest.mark.parametrize(
+        ("asset_group", "instrument_type", "base"),
+        [
+            ("cefi", "PERPETUAL", "SOL"),
+            ("tradfi", "FUTURE", "ES"),
+        ],
+    )
+    def test_deterministic_tie_break_is_ag_uniform(
+        self, asset_group: str, instrument_type: str, base: str
+    ) -> None:
+        """Same shape of deterministic tie-break (``venue ASC, instrument
+        ASC``) for both AGs that support delta-one. Equal volume on the same
+        venue collapses to the lexicographically smaller instrument — the
+        same selector behaviour both pipelines depend on."""
+        venue = "BINANCE-FUTURES" if asset_group == "cefi" else "CME"
+        observations = [
+            _obs(venue, "ZZZZ", instrument_type, base, 1.0),
+            _obs(venue, "AAAA", instrument_type, base, 1.0),
+        ]
+        assert feature_perp_representative(base, asset_group, observations) == (
+            venue,
+            "AAAA",
+        )
