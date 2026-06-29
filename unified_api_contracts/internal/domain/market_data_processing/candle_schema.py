@@ -14,8 +14,9 @@ CeFi + prediction only) are specified in the companion SSOT module:
 
     unified_api_contracts.internal.domain.market_data_processing.book_summary_spec
 
-See ``BOOK_SUMMARY_COLUMNS`` for the full 24-column set with dtypes, null-rules,
-and aggregation formulas.  Plan reference:
+See ``BOOK_SUMMARY_COLUMNS`` for the full 25-column set (spread x5, mid OHLC x4,
+microprice x2, imbalance x4, depth x10) with dtypes, null-rules, and aggregation
+formulas.  Plan reference:
     plans/active/mdps_book_microstructure_precompute_columns_2026_06_28.md
 """
 
