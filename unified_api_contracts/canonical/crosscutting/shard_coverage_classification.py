@@ -105,7 +105,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from enum import StrEnum
 from typing import Final, Literal, Protocol
 
@@ -530,22 +530,120 @@ def classify_shard_coverage(
     Raises:
         ValueError: ``manifest_cells`` contains duplicate dates or a row with
             an unknown ``capture_status`` value.
-
-    Note:
-        Implementation is gated behind the IMPLEMENT P1 todo of
-        ``plans/active/honest_coverage_smoke_harness_2026_06_28.md`` —
-        the wrapper is intentionally left as ``NotImplementedError`` until
-        the e2e-testing impl wires the consolidated availability-index
-        read. The decision-table half (:func:`classify_from_capture_counts`
-        + :func:`bucket_capture_status_cell`) IS implemented + tested at
-        the contract level so the IMPLEMENT worker only has to compose the
-        IO around the verified pure-logic core.
     """
-    raise NotImplementedError(
-        "classify_shard_coverage IO half not implemented yet — see plan "
-        "plans/active/honest_coverage_smoke_harness_2026_06_28.md "
-        "IMPLEMENT P1 todo. Pure-logic core is "
-        "classify_from_capture_counts + bucket_capture_status_cell.",
+    window_dates: set[date] = set()
+    cursor = required_window.start
+    while cursor <= required_window.end:
+        window_dates.add(cursor)
+        cursor = cursor + timedelta(days=1)
+
+    captured = 0
+    within_window_empty = 0
+    out_of_coverage_window_empty = 0
+    known_empty_unattempted = 0
+    attempted_failed = 0
+    pending_unattempted = 0
+    hole_dates: list[date] = []
+    seen_dates: set[date] = set()
+
+    for cell in manifest_cells:
+        cell_date = cell.date
+        if cell_date < required_window.start or cell_date > required_window.end:
+            continue
+        if cell_date in seen_dates:
+            raise ValueError(
+                f"classify_shard_coverage: duplicate manifest row for date "
+                f"{cell_date.isoformat()} in shard "
+                f"({asset_group!r}, {venue!r}, {data_type!r}, "
+                f"instrument_id={instrument_id!r}, bundle_key={bundle_key!r}); "
+                "the consolidator's last-writer-wins must dedupe before classification.",
+            )
+        seen_dates.add(cell_date)
+        bucket = bucket_capture_status_cell(
+            capture_status=cell.capture_status,
+            error_reason=cell.error_reason,
+            data_type=data_type,
+        )
+        if bucket == "C":
+            captured += 1
+        elif bucket == "WE":
+            within_window_empty += 1
+        elif bucket == "OOW":
+            out_of_coverage_window_empty += 1
+        elif bucket == "UK":
+            known_empty_unattempted += 1
+        elif bucket == "F":
+            attempted_failed += 1
+            hole_dates.append(cell_date)
+        else:
+            pending_unattempted += 1
+            hole_dates.append(cell_date)
+
+    missing_dates = sorted(window_dates - seen_dates)
+    missing_rows = len(missing_dates)
+    hole_dates.extend(missing_dates)
+    hole_dates.sort()
+
+    counts = WindowCaptureCounts(
+        captured=captured,
+        within_window_empty=within_window_empty,
+        out_of_coverage_window_empty=out_of_coverage_window_empty,
+        known_empty_unattempted=known_empty_unattempted,
+        attempted_failed=attempted_failed,
+        pending_unattempted=pending_unattempted,
+        missing_rows=missing_rows,
+    )
+    classification = classify_from_capture_counts(counts)
+    report_holes: tuple[date, ...] = (
+        tuple(hole_dates[:MAX_HOLES_IN_REPORT])
+        if classification == ShardCoverageClass.INSUFFICIENT_HISTORY
+        else ()
+    )
+    rationale = _build_rationale(classification, counts, report_holes)
+    return ShardCoverageReport(
+        asset_group=asset_group,
+        venue=venue,
+        data_type=data_type,
+        instrument_id=instrument_id,
+        required_window=required_window,
+        classification=classification,
+        counts=counts,
+        bundle_key=bundle_key,
+        holes=report_holes,
+        rationale=rationale,
+    )
+
+
+def _build_rationale(
+    classification: ShardCoverageClass,
+    counts: WindowCaptureCounts,
+    holes: tuple[date, ...],
+) -> str:
+    """Human-readable one-liner explaining the window verdict."""
+    if classification == ShardCoverageClass.INSUFFICIENT_HISTORY:
+        parts: list[str] = []
+        if counts.attempted_failed:
+            parts.append(f"{counts.attempted_failed} attempted_failed")
+        if counts.pending_unattempted:
+            parts.append(f"{counts.pending_unattempted} pending_unattempted")
+        if counts.missing_rows:
+            parts.append(f"{counts.missing_rows} missing")
+        holes_blurb = (
+            f" (first holes: {', '.join(d.isoformat() for d in holes)})" if holes else ""
+        )
+        return f"INSUFFICIENT_HISTORY: {' + '.join(parts)} day(s) in window{holes_blurb}"
+    if classification == ShardCoverageClass.RUNNABLE:
+        return (
+            f"RUNNABLE: {counts.captured} captured day(s); "
+            f"{counts.within_window_empty} within-window-empty, "
+            f"{counts.out_of_coverage_window_empty} out-of-coverage-window, "
+            f"{counts.known_empty_unattempted} known-empty unattempted"
+        )
+    return (
+        f"HONEST_EMPTY: 0 captured; "
+        f"{counts.out_of_coverage_window_empty} OOW + "
+        f"{counts.known_empty_unattempted} UK + "
+        f"{counts.within_window_empty} WE day(s) — legitimately empty over the full window"
     )
 
 

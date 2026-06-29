@@ -265,24 +265,189 @@ class TestWindowCaptureCountsTotal:
         assert WindowCaptureCounts().total() == 0
 
 
-class TestClassifyShardCoverageWrapper:
-    """The manifest-walking wrapper is intentionally NotImplementedError today.
+class _Cell:
+    """Tiny ShardManifestCell-compatible row used by the wrapper tests."""
 
-    Locks the contract — IMPLEMENT P1 of the smoke-harness plan turns this
-    into a positive integration test once the e2e-testing impl lands.
+    def __init__(self, d: date, status: str, reason: str | None = None) -> None:
+        self._date = d
+        self._status = status
+        self._reason = reason
+
+    @property
+    def date(self) -> date:
+        return self._date
+
+    @property
+    def capture_status(self) -> str:
+        return self._status
+
+    @property
+    def error_reason(self) -> str | None:
+        return self._reason
+
+
+class TestClassifyShardCoverageWrapper:
+    """Integration tests for the manifest-walking wrapper.
+
+    The wrapper composes the per-day bucketer with missing-row detection
+    and the verdict decision table — see the module docstring's decision
+    table for the property tested here.
     """
 
-    def test_wrapper_raises_not_implemented(self) -> None:
+    def test_empty_cells_over_full_window_is_insufficient_history(self) -> None:
+        # Zero rows over a 3-day window → all 3 days are missing-row → the
+        # half-window safety property fires (writer-bug class, never silent
+        # placeholders per data-pipeline-correctness HARD RULE).
+        window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 3), kind="lookback_n")
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="BINANCE-FUTURES",
+            data_type="trades",
+            instrument_id="BTCUSDT",
+            required_window=window,
+            manifest_cells=(),
+        )
+        assert report.classification == ShardCoverageClass.INSUFFICIENT_HISTORY
+        assert report.counts.missing_rows == 3
+        assert report.holes == (date(2026, 6, 1), date(2026, 6, 2), date(2026, 6, 3))
+        assert "INSUFFICIENT_HISTORY" in report.rationale
+
+    def test_continuous_captured_window_is_runnable(self) -> None:
+        window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 3), kind="lookback_n")
+        cells = [
+            _Cell(date(2026, 6, 1), "captured"),
+            _Cell(date(2026, 6, 2), "captured"),
+            _Cell(date(2026, 6, 3), "captured"),
+        ]
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="BINANCE-FUTURES",
+            data_type="trades",
+            instrument_id="BTCUSDT",
+            required_window=window,
+            manifest_cells=cells,
+        )
+        assert report.classification == ShardCoverageClass.RUNNABLE
+        assert report.counts.captured == 3
+        assert report.holes == ()
+        assert report.bundle_key == ()
+
+    def test_full_window_honest_empty_does_not_collapse_to_insufficient(self) -> None:
+        # The adversarial property the harness exists to enforce: a fully
+        # OOW/UK/WE window with zero F+U+M is HONEST_EMPTY, NOT
+        # INSUFFICIENT_HISTORY (codex/02-data/shard-coverage-classification.md).
+        window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 3), kind="lookback_n")
+        cells = [
+            _Cell(date(2026, 6, 1), "empty_confirmed", "EXPECTED_PRE_VENUE_LAUNCH"),
+            _Cell(date(2026, 6, 2), "empty_confirmed", "EXPECTED_PRE_VENUE_LAUNCH"),
+            _Cell(date(2026, 6, 3), "expected_unattempted", "EXPECTED_NOT_LISTED"),
+        ]
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="HYPERLIQUID",
+            data_type="trades",
+            instrument_id="OBSCURE-PERP",
+            required_window=window,
+            manifest_cells=cells,
+        )
+        assert report.classification == ShardCoverageClass.HONEST_EMPTY
+        assert report.counts.missing_rows == 0
+        assert report.counts.captured == 0
+
+    def test_one_attempted_failed_in_runnable_window_flips_to_insufficient(self) -> None:
+        # The safety property: one F day inside a window that is otherwise
+        # full of captured days flips the verdict to INSUFFICIENT_HISTORY.
+        window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 4), kind="lookback_n")
+        cells = [
+            _Cell(date(2026, 6, 1), "captured"),
+            _Cell(date(2026, 6, 2), "captured"),
+            _Cell(date(2026, 6, 3), "attempted_failed", "HTTP_429"),
+            _Cell(date(2026, 6, 4), "captured"),
+        ]
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="BINANCE-FUTURES",
+            data_type="trades",
+            instrument_id="BTCUSDT",
+            required_window=window,
+            manifest_cells=cells,
+        )
+        assert report.classification == ShardCoverageClass.INSUFFICIENT_HISTORY
+        assert report.counts.attempted_failed == 1
+        assert report.holes == (date(2026, 6, 3),)
+
+    def test_cells_outside_window_are_ignored(self) -> None:
+        window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 2), kind="lookback_n")
+        cells = [
+            _Cell(date(2026, 5, 31), "attempted_failed", "HTTP_500"),
+            _Cell(date(2026, 6, 1), "captured"),
+            _Cell(date(2026, 6, 2), "captured"),
+            _Cell(date(2026, 6, 3), "captured"),
+        ]
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="BINANCE-FUTURES",
+            data_type="trades",
+            instrument_id="BTCUSDT",
+            required_window=window,
+            manifest_cells=cells,
+        )
+        assert report.classification == ShardCoverageClass.RUNNABLE
+        assert report.counts.total() == 2
+        assert report.counts.captured == 2
+
+    def test_duplicate_date_in_window_is_writer_invariant_violation(self) -> None:
         window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 1), kind="max_daily_aggregation")
-        with pytest.raises(NotImplementedError, match="IMPLEMENT P1"):
+        cells = [
+            _Cell(date(2026, 6, 1), "captured"),
+            _Cell(date(2026, 6, 1), "attempted_failed", "HTTP_500"),
+        ]
+        with pytest.raises(ValueError, match="duplicate manifest row"):
             classify_shard_coverage(
                 asset_group="cefi",
                 venue="BINANCE-FUTURES",
                 data_type="trades",
-                instrument_id="BTC-USDT-PERP",
+                instrument_id="BTCUSDT",
                 required_window=window,
-                manifest_cells=(),
+                manifest_cells=cells,
             )
+
+    def test_holes_bounded_to_max_holes_in_report(self) -> None:
+        # A fully-failed long window emits at most MAX_HOLES_IN_REPORT hole
+        # dates so the report stays serialisable; the truth-counts live on
+        # counts.missing_rows.
+        span = MAX_HOLES_IN_REPORT + 3
+        window = RequiredWindow(
+            start=date(2026, 6, 1),
+            end=date(2026, 6, 1) + (date(2026, 6, span) - date(2026, 6, 1)),
+            kind="lookback_n",
+        )
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="BINANCE-FUTURES",
+            data_type="trades",
+            instrument_id="BTCUSDT",
+            required_window=window,
+            manifest_cells=(),
+        )
+        assert report.classification == ShardCoverageClass.INSUFFICIENT_HISTORY
+        assert len(report.holes) == MAX_HOLES_IN_REPORT
+        assert report.counts.missing_rows == window.calendar_days
+
+    def test_bundle_key_preserved_for_bundled_shards(self) -> None:
+        window = RequiredWindow(start=date(2026, 6, 1), end=date(2026, 6, 1), kind="max_daily_aggregation")
+        report = classify_shard_coverage(
+            asset_group="cefi",
+            venue="DERIBIT",
+            data_type="options_chain",
+            instrument_id=None,
+            required_window=window,
+            manifest_cells=(_Cell(date(2026, 6, 1), "captured"),),
+            bundle_key=("BTC",),
+        )
+        assert report.bundle_key == ("BTC",)
+        assert report.instrument_id is None
+        assert report.classification == ShardCoverageClass.RUNNABLE
 
 
 class TestModuleConstants:
