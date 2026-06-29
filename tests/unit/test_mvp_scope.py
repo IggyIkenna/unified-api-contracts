@@ -1112,11 +1112,11 @@ class TestCoinbaseVenueOverrideV11:
 
         assert get_mvp_data_types_for_cefi_venue("FAKE_VENUE_XYZ") == frozenset()
 
-    def test_config_version_is_v11(self) -> None:
-        """MVP_SCOPE_CONFIG_VERSION == 11 after the COINBASE override."""
+    def test_config_version_is_v12(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 12 after the DeFi MVP-exclusion (ROCKETPOOL removal)."""
         from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
 
-        assert MVP_SCOPE_CONFIG_VERSION == 11
+        assert MVP_SCOPE_CONFIG_VERSION == 12
 
     def test_get_mvp_data_types_public_import_surface(self) -> None:
         """get_mvp_data_types_for_cefi_venue is importable from the package root."""
@@ -1124,6 +1124,53 @@ class TestCoinbaseVenueOverrideV11:
 
         assert hasattr(unified_api_contracts, "get_mvp_data_types_for_cefi_venue")
         assert "get_mvp_data_types_for_cefi_venue" in unified_api_contracts.__all__
+
+
+# ---------------------------------------------------------------------------
+# v12 — DeFi MVP-exclusion (2026-06-29, Decision D)
+# ---------------------------------------------------------------------------
+# ROCKETPOOL-ETHEREUM removed from DeFiMvpRule.venues — NOT in IS-producible
+# set P per instrument_universe_registry_consolidation_2026_06_29.md.
+# All other DeFiMvpRule venues are confirmed in P.
+# ---------------------------------------------------------------------------
+
+
+class TestDeFiMvpExclusionV12:
+    """v12: ROCKETPOOL-ETHEREUM removed from DeFi MVP (not IS-producible)."""
+
+    def test_rocketpool_ethereum_not_defi_mvp(self) -> None:
+        """ROCKETPOOL-ETHEREUM is NOT in DeFiMvpRule.venues (Decision D, v12)."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import (
+            DeFiMvpRule,
+        )
+
+        rule = MVP_SCOPE["defi"]
+        assert isinstance(rule, DeFiMvpRule)
+        assert "ROCKETPOOL-ETHEREUM" not in rule.venues
+
+    def test_is_mvp_rocketpool_ethereum_returns_false(self) -> None:
+        """is_mvp(defi, ROCKETPOOL-ETHEREUM, ...) → False (not in MVP set, v12)."""
+        assert not is_mvp("defi", "ROCKETPOOL-ETHEREUM", "LST", "lst_rates")
+
+    def test_lido_ethereum_still_defi_mvp(self) -> None:
+        """LIDO-ETHEREUM remains in DeFiMvpRule (IS-producible, in P)."""
+        assert is_mvp("defi", "LIDO-ETHEREUM", "LST", "lst_rates")
+
+    def test_config_version_is_v12(self) -> None:
+        """MVP_SCOPE_CONFIG_VERSION == 12 after DeFi MVP-exclusion."""
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import MVP_SCOPE_CONFIG_VERSION
+
+        assert MVP_SCOPE_CONFIG_VERSION == 12
+
+    def test_defi_identity_with_mds_capture_mvp_v12(self) -> None:
+        """defi: Cartesian-product identity still holds after ROCKETPOOL removal."""
+        from unified_api_contracts import mdps_mvp_universe
+        from unified_api_contracts.canonical.crosscutting.mvp_scope import DeFiMvpRule
+
+        rule = MVP_SCOPE["defi"]
+        assert isinstance(rule, DeFiMvpRule)
+        expected = frozenset((v, it) for v in rule.venues for it in rule.instrument_types)
+        assert mdps_mvp_universe("defi") == expected
 
 
 def test_accepted_quotes_for_venue_upbit_krw() -> None:
@@ -1201,11 +1248,7 @@ class TestMdpsMvpUniverse:
         rule = MVP_SCOPE["tradfi"]
         assert isinstance(rule, TradFiMvpRule)
         cme_cells = {(v, it) for v in rule.venues for it in rule.instrument_types}
-        equity_cells = {
-            (v, it)
-            for v in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX")
-            for it in ("EQUITY", "ETF")
-        }
+        equity_cells = {(v, it) for v in ("NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX") for it in ("EQUITY", "ETF")}
         expected = frozenset(cme_cells | equity_cells)
         assert mdps_mvp_universe("tradfi") == expected
 
@@ -1223,12 +1266,8 @@ class TestMdpsMvpUniverse:
         # Each axis pair the helper returns is reachable via the capture
         # predicate for some base — the per-(venue, base) carve-outs apply
         # at the instrument grain, not at the axis-pair grain.
-        assert is_in_mvp_capture_universe(
-            "DERIBIT", "BTC", "OPTION", has_perp_for_base=False
-        )
-        assert is_in_mvp_capture_universe(
-            "BINANCE-FUTURES", "BTC", "PERPETUAL", has_perp_for_base=True
-        )
+        assert is_in_mvp_capture_universe("DERIBIT", "BTC", "OPTION", has_perp_for_base=False)
+        assert is_in_mvp_capture_universe("BINANCE-FUTURES", "BTC", "PERPETUAL", has_perp_for_base=True)
 
     def test_tradfi_contains_cme_and_equity_basis(self) -> None:
         """Spot-check tradfi cells — CME futures + NASDAQ equity carve-out."""

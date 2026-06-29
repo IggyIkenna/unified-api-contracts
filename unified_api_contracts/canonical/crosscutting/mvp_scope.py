@@ -554,7 +554,8 @@ MVP_SCOPE: Final[dict[str, object]] = {
                 # Add once the canonical entry lands in defi_venues.py.
                 # LST protocols (carry_staked_basis)
                 "LIDO-ETHEREUM",  # stETH
-                "ROCKETPOOL-ETHEREUM",  # rETH
+                # ROCKETPOOL-ETHEREUM removed: not IS-producible (not in P per
+                # instrument_universe_registry_consolidation_2026_06_29.md Decision D).
                 # TODO(mvp-scope): confirm cbETH canonical venue name.
                 # TODO(mvp-scope): confirm JitoSOL (JITO-SOLANA?) and mSOL
                 # (MARINADE-SOLANA?) canonical venue names.
@@ -757,8 +758,14 @@ MVP_SCOPE: Final[dict[str, object]] = {
 # ---------------------------------------------------------------------------
 
 
-MVP_SCOPE_CONFIG_VERSION: Final[int] = 11
+MVP_SCOPE_CONFIG_VERSION: Final[int] = 12
 """Monotonic version of :data:`MVP_SCOPE`. Bump on any content change.
+
+v12 (2026-06-29): DeFi MVP-exclusion (Decision D —
+instrument_universe_registry_consolidation_2026_06_29.md): remove
+``ROCKETPOOL-ETHEREUM`` from ``DeFiMvpRule.venues``. ROCKETPOOL-ETHEREUM is
+NOT in the IS-producible set P (as confirmed by running ``_build_defi_venues()``
+in the IS venv). All other ``DeFiMvpRule.venues`` ARE in P.
 
 v11 (2026-06-28): operator per-venue data_type cut (decision A — cost
 reduction, no depth features derived from Coinbase):
@@ -1369,9 +1376,7 @@ def is_in_mvp_capture_universe(
 #: mirrored here so the MDPS universe derivation matches the predicate's
 #: reachable ``(venue, instrument_type)`` set.  Keep in lockstep with the tuple
 #: in :func:`is_mvp`.
-_TRADFI_EQUITY_BASIS_VENUES: Final[frozenset[str]] = frozenset(
-    {"NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX"}
-)
+_TRADFI_EQUITY_BASIS_VENUES: Final[frozenset[str]] = frozenset({"NASDAQ", "NYSE", "ARCA", "AMEX", "BATS", "KRX"})
 
 #: TradFi equity-basis instrument types — single-name equities + ETFs that back
 #: a Binance tradfi-perp.  Mirrors the ``is_mvp`` tradfi branch's instrument-type
@@ -1430,9 +1435,7 @@ def mdps_mvp_universe(asset_group: str) -> frozenset[tuple[str, str]]:
     """
     rule = MVP_SCOPE.get(asset_group)
     if rule is None:
-        raise ValueError(
-            f"mdps_mvp_universe: unknown asset_group {asset_group!r} (not declared in MVP_SCOPE)"
-        )
+        raise ValueError(f"mdps_mvp_universe: unknown asset_group {asset_group!r} (not declared in MVP_SCOPE)")
     if isinstance(rule, FeaturesModelsMvpStub):
         return frozenset()
     if isinstance(rule, CeFiMvpRule | DeFiMvpRule):

@@ -386,8 +386,10 @@ def to_canonical_venue(venue_id: str) -> str:
 # ---------------------------------------------------------------------------
 
 
+# INVARIANT: phase=="live" ⟺ venue is IS-producible (in _build_defi_venues()).
+# See instrument_universe_registry_consolidation_2026_06_29.md.
 DEFI_VENUE_PHASE: dict[str, str] = {
-    # ── Live (Ethereum DEX / lending) ──
+    # ── Live (Ethereum DEX / lending) — IS-producible per _build_defi_venues() ──
     "UNISWAP_V2-ETHEREUM": "live",
     "UNISWAP_V3-ETHEREUM": "live",
     "UNISWAP_V4-ETHEREUM": "live",
@@ -400,24 +402,26 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "SPARK-ETHEREUM": "live",
     "SUSHISWAP_V3-ETHEREUM": "live",
     "PANCAKESWAP_V3-ETHEREUM": "live",
-    "MORPHOVAULTS-ETHEREUM": "live",
-    "YEARN_V3-ETHEREUM": "live",
-    "FRAX-ETHEREUM": "live",
-    "MAKER-ETHEREUM": "live",
-    # ── Live (Ethereum LST / staking-yield) ──
+    # ── Pipeline (Ethereum vaults / analytics — NOT IS-producible) ──
+    "MORPHOVAULTS-ETHEREUM": "pipeline",
+    "YEARN_V3-ETHEREUM": "pipeline",
+    "FRAX-ETHEREUM": "pipeline",
+    "MAKER-ETHEREUM": "pipeline",
+    # ── Live (Ethereum LST / staking-yield — IS-producible) ──
     "LIDO-ETHEREUM": "live",
     "ETHERFI-ETHEREUM": "live",
     "ETHENA-ETHEREUM": "live",
-    "ANKR-ETHEREUM": "live",
-    "ROCKETPOOL-ETHEREUM": "live",
-    "STADER-ETHEREUM": "live",
-    "STAKEWISE-ETHEREUM": "live",
-    "SWELL-ETHEREUM": "live",
-    "PUFFER-ETHEREUM": "live",
-    "MANTLE-ETHEREUM": "live",
-    # ── Live (Ethereum gas / restaking oracles) ──
-    "ALCHEMY-ETHEREUM": "live",
     "EIGENLAYER-ETHEREUM": "live",
+    # ── Pipeline (Ethereum LST/staking — NOT IS-producible) ──
+    "ANKR-ETHEREUM": "pipeline",
+    "ROCKETPOOL-ETHEREUM": "pipeline",
+    "STADER-ETHEREUM": "pipeline",
+    "STAKEWISE-ETHEREUM": "pipeline",
+    "SWELL-ETHEREUM": "pipeline",
+    "PUFFER-ETHEREUM": "pipeline",
+    "MANTLE-ETHEREUM": "pipeline",
+    # ── Pipeline (Ethereum gas oracles — NOT IS-producible) ──
+    "ALCHEMY-ETHEREUM": "pipeline",
     # ── Pipeline (Ethereum catalogue Phase 1A vault + restaking primitives,
     #    slot 5 2026-05-11) ──
     "CONVEX-ETHEREUM": "pipeline",
@@ -428,15 +432,16 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "KARAK-ETHEREUM": "pipeline",
     "RENZO-ETHEREUM": "pipeline",
     "KELPDAO-ETHEREUM": "pipeline",
-    # ── Pipeline (Arbitrum) — UAC-declared, MTDS backfill not yet shipping ──
-    "UNISWAP_V3-ARBITRUM": "pipeline",
-    "AAVE_V3-ARBITRUM": "pipeline",
-    "COMPOUND_V3-ARBITRUM": "pipeline",
-    "BALANCER-ARBITRUM": "pipeline",
-    "SUSHISWAP-ARBITRUM": "pipeline",
+    # ── Live (Arbitrum — IS-producible per _build_defi_venues()) ──
+    "UNISWAP_V3-ARBITRUM": "live",
+    "AAVE_V3-ARBITRUM": "live",
+    "COMPOUND_V3-ARBITRUM": "live",
+    "BALANCER-ARBITRUM": "live",
+    "SUSHISWAP-ARBITRUM": "live",
+    "CAMELOT_V3-ARBITRUM": "live",
+    "GMX-ARBITRUM": "live",
+    # ── Pipeline (Arbitrum — NOT IS-producible) ──
     "PANCAKESWAP_V3-ARBITRUM": "pipeline",
-    "CAMELOT_V3-ARBITRUM": "pipeline",
-    "GMX-ARBITRUM": "pipeline",
     # ── Pipeline (Arbitrum catalogue Phase 1A, slot 5 2026-05-11) ──
     "YEARN_V3-ARBITRUM": "pipeline",
     "BEEFY-ARBITRUM": "pipeline",
@@ -445,101 +450,99 @@ DEFI_VENUE_PHASE: dict[str, str] = {
     "RADIANT-ARBITRUM": "pipeline",
     "KARAK-ARBITRUM": "pipeline",
     "RENZO-ARBITRUM": "pipeline",
-    # ── Arbitrum lending (MORPHO live; EULER_V2/FLUID re-phased 2026-05-22→pipeline) ──
-    # EULER_V2-ARBITRUM + FLUID-ARBITRUM re-phased live→pipeline 2026-06-16 (249-followup):
-    # no UAC subgraph_id registered → the MTDS evm_defi collector logs "No subgraph ID …
-    # skipping" → 0 captured rows. They are roadmap until a subgraph_id is sourced; keeping
-    # them "live" falsely advertised data + risked inflating the could-exist denominator.
+    # ── Pipeline (Arbitrum lending — not IS-producible) ──
+    # EULER_V2-ARBITRUM + FLUID-ARBITRUM: no UAC subgraph_id registered → 0 captured rows.
+    # MORPHO-ARBITRUM: not in IS-producible set despite having rows (not in _build_defi_venues()).
     "EULER_V2-ARBITRUM": "pipeline",
-    "MORPHO-ARBITRUM": "live",
+    "MORPHO-ARBITRUM": "pipeline",
     "FLUID-ARBITRUM": "pipeline",
-    # ── Pipeline (Base) ──
-    "UNISWAP_V3-BASE": "pipeline",
-    "AAVE_V3-BASE": "pipeline",
-    "COMPOUND_V3-BASE": "pipeline",
-    "BALANCER-BASE": "pipeline",
-    "MORPHO-BASE": "pipeline",
-    "SUSHISWAP_V3-BASE": "pipeline",
-    "PANCAKESWAP_V3-BASE": "pipeline",
-    "AERODROME_V3-BASE": "pipeline",
+    # ── Live (Base — IS-producible per _build_defi_venues()) ──
+    "UNISWAP_V3-BASE": "live",
+    "AAVE_V3-BASE": "live",
+    "COMPOUND_V3-BASE": "live",
+    "BALANCER-BASE": "live",
+    "MORPHO-BASE": "live",
+    "SUSHISWAP_V3-BASE": "live",
+    "PANCAKESWAP_V3-BASE": "live",
+    "AERODROME_V3-BASE": "live",
     # ── Pipeline (Base catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BASE": "pipeline",
-    # ── Pipeline (Optimism) ──
-    "UNISWAP_V3-OPTIMISM": "pipeline",
-    "AAVE_V3-OPTIMISM": "pipeline",
-    "COMPOUND_V3-OPTIMISM": "pipeline",
-    "BALANCER-OPTIMISM": "pipeline",
-    "CURVE-OPTIMISM": "pipeline",
-    "VELODROME_V2-OPTIMISM": "pipeline",
-    # ── Pipeline (Optimism catalogue Phase 1A, slot 5 2026-05-11) ──
+    # ── Live (Optimism — IS-producible per _build_defi_venues()) ──
+    "UNISWAP_V3-OPTIMISM": "live",
+    "AAVE_V3-OPTIMISM": "live",
+    "COMPOUND_V3-OPTIMISM": "live",
+    "BALANCER-OPTIMISM": "live",
+    "CURVE-OPTIMISM": "live",
+    "VELODROME_V2-OPTIMISM": "live",
+    # ── Pipeline (Optimism — NOT IS-producible) ──
     "YEARN_V3-OPTIMISM": "pipeline",
-    # ── Pipeline (Polygon) ──
-    "UNISWAP_V3-POLYGON": "pipeline",
-    "AAVE_V3-POLYGON": "pipeline",
-    "BALANCER-POLYGON": "pipeline",
+    "MORPHO-OPTIMISM": "pipeline",
+    # ── Live (Polygon — IS-producible per _build_defi_venues()) ──
+    "UNISWAP_V3-POLYGON": "live",
+    "AAVE_V3-POLYGON": "live",
+    "BALANCER-POLYGON": "live",
+    # ── Pipeline (Polygon — NOT IS-producible) ──
     "COMPOUND_V3-POLYGON": "pipeline",
     # ── Pipeline (Polygon catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-POLYGON": "pipeline",
     "IDLE-POLYGON": "pipeline",
-    # ── Pipeline (Avalanche) ──
-    "AAVE_V3-AVALANCHE": "pipeline",
-    "BALANCER-AVALANCHE": "pipeline",
-    "CURVE-AVALANCHE": "pipeline",
-    "GMX-AVALANCHE": "pipeline",
-    "SUSHISWAP_V3-AVALANCHE": "pipeline",
-    "TRADER_JOE_V2-AVALANCHE": "pipeline",
+    # ── Pipeline (Polygon lending — NOT IS-producible) ──
+    "MORPHO-POLYGON": "pipeline",
+    # ── Live (Avalanche — IS-producible per _build_defi_venues()) ──
+    "AAVE_V3-AVALANCHE": "live",
+    "BALANCER-AVALANCHE": "live",
+    "CURVE-AVALANCHE": "live",
+    "GMX-AVALANCHE": "live",
+    "SUSHISWAP_V3-AVALANCHE": "live",
+    "TRADER_JOE_V2-AVALANCHE": "live",
     # ── Pipeline (Avalanche catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-AVALANCHE": "pipeline",
-    # ── Pipeline (BSC) ──
-    "AAVE_V3-BSC": "pipeline",
-    "PANCAKESWAP_V3-BSC": "pipeline",
+    # ── Pipeline (Avalanche lending — NOT IS-producible) ──
+    "BENQI-AVALANCHE": "pipeline",
+    # ── Live (BSC — IS-producible per _build_defi_venues()) ──
+    "AAVE_V3-BSC": "live",
+    "PANCAKESWAP_V3-BSC": "live",
     # ── Pipeline (BSC catalogue Phase 1A, slot 5 2026-05-11) ──
     "BEEFY-BSC": "pipeline",
     "RADIANT-BSC": "pipeline",
-    # ── Multi-chain lending + bridges (MORPHO live; VENUS/RADIANT/BENQI re-phased) ──
-    # VENUS-BSC/ETHEREUM + RADIANT-ETHEREUM + BENQI-AVALANCHE re-phased live→pipeline
-    # 2026-06-16 (249-followup): no UAC subgraph_id → evm_defi collector skips → 0 rows.
-    # Roadmap until a subgraph_id is sourced (MORPHO-OPTIMISM/POLYGON keep "live" — sourced).
+    # ── Pipeline (multi-chain — NOT IS-producible) ──
     "VENUS-BSC": "pipeline",
     "VENUS-ETHEREUM": "pipeline",
     "RADIANT-ETHEREUM": "pipeline",
-    "BENQI-AVALANCHE": "pipeline",
-    "MORPHO-OPTIMISM": "live",
-    "MORPHO-POLYGON": "live",
-    # ── Live (Ethereum analytics / governance / MEV sub-buckets, added 2026-05-22) ──
-    "AAVE-ETHEREUM": "live",
-    "COMPOUND-ETHEREUM": "live",
-    "UNISWAP-ETHEREUM": "live",
-    "FLASHBOTS-ETHEREUM": "live",
-    "ACROSS-ETHEREUM": "live",
-    "STARGATE-ETHEREUM": "live",
-    # ── Euler V2 lending — re-phased live→pipeline 2026-06-16 (249-followup): no UAC
-    #    subgraph_id → evm_defi collector skips → 0 rows. Roadmap until sourced. ──
+    # ── Pipeline (Ethereum analytics / governance / MEV — NOT IS-producible) ──
+    "AAVE-ETHEREUM": "pipeline",
+    "COMPOUND-ETHEREUM": "pipeline",
+    "UNISWAP-ETHEREUM": "pipeline",
+    "FLASHBOTS-ETHEREUM": "pipeline",
+    "ACROSS-ETHEREUM": "pipeline",
+    "STARGATE-ETHEREUM": "pipeline",
+    # ── Pipeline (Euler V2 — no UAC subgraph_id → 0 rows) ──
     "EULER_V2-ETHEREUM": "pipeline",
-    # ── Live (Alchemy multi-chain gas-fee oracles, added 2026-05-22) ──
-    "ALCHEMY-ARBITRUM": "live",
-    "ALCHEMY-BASE": "live",
-    "ALCHEMY-ONCHAIN": "live",
-    "ALCHEMY-OPTIMISM": "live",
-    "ALCHEMY-POLYGON": "live",
+    # ── Pipeline (Alchemy multi-chain gas-fee oracles — NOT IS-producible) ──
+    "ALCHEMY-ARBITRUM": "pipeline",
+    "ALCHEMY-BASE": "pipeline",
+    "ALCHEMY-ONCHAIN": "pipeline",
+    "ALCHEMY-OPTIMISM": "pipeline",
+    "ALCHEMY-POLYGON": "pipeline",
     # ── Pipeline (Plasma chain variants — no MTDS tick data yet, added 2026-05-22) ──
     "AAVE-PLASMA": "pipeline",
     "FLUID-PLASMA": "pipeline",
-    # ── Pipeline (Linea / Scroll / zkSync) ──
-    "AAVE_V3-LINEA": "pipeline",
+    # ── Live (Linea — IS-producible per _build_defi_venues()) ──
+    "AAVE_V3-LINEA": "live",
+    # ── Pipeline (Scroll / zkSync — NOT IS-producible) ──
     "AAVE_V3-SCROLL": "pipeline",
     "COMPOUND_V3-SCROLL": "pipeline",
     "AAVE_V3-ZKSYNC": "pipeline",
-    # ── Live (Solana — JITO, MARINADE, ORCA, RAYDIUM, KAMINO actively
-    #    backfilled per memory.project_carry_tracer_session_2026_05_06) ──
+    # ── Live (Solana — IS-producible per _build_defi_venues()) ──
     "KAMINO-SOLANA": "live",
     "MARINADE-SOLANA": "live",
     "ORCA-SOLANA": "live",
     "RAYDIUM-SOLANA": "live",
     "JITO-SOLANA": "live",
-    "MARGINFI-SOLANA": "live",
-    "SOLEND-SOLANA": "live",
     "DRIFT-SOLANA": "live",
+    # ── Pipeline (Solana — NOT IS-producible) ──
+    "MARGINFI-SOLANA": "pipeline",
+    "SOLEND-SOLANA": "pipeline",
     # ── Pipeline (Solana catalogue Phase 1A, slot 5 2026-05-11) ──
     "JUPITER-SOLANA": "pipeline",
     "SOLBLAZE-SOLANA": "pipeline",
