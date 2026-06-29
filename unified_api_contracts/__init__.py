@@ -673,6 +673,14 @@ from .canonical.crosscutting.shard_coverage_classification import (
     classify_from_capture_counts,
     classify_shard_coverage,
 )
+from .canonical.crosscutting.required_window_registry import (
+    MVP_ASSET_GROUPS,
+    MVP_REQUIRED_WINDOW_REGISTRY,
+    RequiredWindowSpec,
+    UnknownRequiredWindowError,
+    registered_data_types_for_asset_group,
+    resolve_required_window,
+)
 from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
     PreflightOK,
@@ -2148,11 +2156,17 @@ __all__ = [
     "ShardRecommendedAction",
     "RequiredWindow",
     "RequiredWindowKind",
+    "RequiredWindowSpec",
     "WindowCaptureCounts",
     "MAX_HOLES_IN_REPORT",
+    "MVP_ASSET_GROUPS",
+    "MVP_REQUIRED_WINDOW_REGISTRY",
+    "UnknownRequiredWindowError",
     "bucket_capture_status_cell",
     "classify_from_capture_counts",
     "classify_shard_coverage",
+    "registered_data_types_for_asset_group",
+    "resolve_required_window",
     "SignalAcknowledgement",
     "SignalEmission",
     "SignalPayload",
