@@ -180,6 +180,7 @@ from .canonical.crosscutting.ledger._enums import AssetClass as LedgerAssetClass
 from .canonical.crosscutting.liquid_representative import (
     VenueVolumeObservation,
     execution_spot_representative,
+    feature_perp_representative,
 )
 from .canonical.crosscutting.live_cluster_registry import (
     LIVE_CLUSTER_REGISTRY,
@@ -2431,6 +2432,7 @@ __all__ = [
     # shared volume-basis contract consumed by execution + features.
     "VenueVolumeObservation",
     "execution_spot_representative",
+    "feature_perp_representative",
     "CeFiMvpRule",
     "DeFiMvpRule",
     "TradFiMvpRule",

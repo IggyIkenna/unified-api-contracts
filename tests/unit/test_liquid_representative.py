@@ -17,6 +17,7 @@ import pytest
 from unified_api_contracts import (
     VenueVolumeObservation,
     execution_spot_representative,
+    feature_perp_representative,
 )
 
 
@@ -236,4 +237,191 @@ class TestPurity:
         assert execution_spot_representative("BTC", "cefi", gen()) == (
             "COINBASE-SPOT",
             "BTC-USD",
+        )
+
+
+# ---------------------------------------------------------------------------
+# feature_perp_representative — item 002. Same shared VenueVolumeObservation
+# basis + deterministic (venue ASC, instrument ASC) tie-break as the spot
+# selector; per-AG filter switches to PERP-class instrument_types (PERPETUAL /
+# EQUITY_PERP for cefi, FUTURE for tradfi-no-perp).
+# ---------------------------------------------------------------------------
+
+
+class TestPerpPublicSurface:
+    def test_importable_from_package_root(self) -> None:
+        import unified_api_contracts
+
+        assert hasattr(unified_api_contracts, "feature_perp_representative")
+        assert "feature_perp_representative" in unified_api_contracts.__all__
+
+
+class TestPerpSelectionCefi:
+    def test_btc_picks_highest_volume_perp(self) -> None:
+        """Highest measured volume wins — Binance-Futures usually but BY VOLUME."""
+        observations = [
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 12_500_000_000.0),
+            _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 4_200_000_000.0),
+            _obs("OKX-SWAP", "BTC-USDT-SWAP", "PERPETUAL", "BTC", 3_100_000_000.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "BTC-USDT",
+        )
+
+    def test_volume_is_the_rule_not_venue_hardcode(self) -> None:
+        """If BYBIT happens to lead on volume, BYBIT wins — selection is by volume."""
+        observations = [
+            _obs("BINANCE-FUTURES", "ETH-USDT", "PERPETUAL", "ETH", 1_000_000_000.0),
+            _obs("BYBIT", "ETH-USDT", "PERPETUAL", "ETH", 9_000_000_000.0),
+        ]
+        assert feature_perp_representative("ETH", "cefi", observations) == (
+            "BYBIT",
+            "ETH-USDT",
+        )
+
+    def test_equity_perp_also_eligible(self) -> None:
+        """EQUITY_PERP (tokenized-stock perps) is also a delta-one feature instrument."""
+        observations = [
+            _obs("BYBIT", "AAPLPERP", "EQUITY_PERP", "AAPL", 5_000_000.0),
+            _obs("OKX-SWAP", "AAPL-PERP", "EQUITY_PERP", "AAPL", 3_000_000.0),
+        ]
+        assert feature_perp_representative("AAPL", "cefi", observations) == (
+            "BYBIT",
+            "AAPLPERP",
+        )
+
+    def test_spot_filtered_out_for_features(self) -> None:
+        """SPOT_PAIR cells are ignored — features run on the PERP representative only."""
+        observations = [
+            # Spot has higher volume but is filtered out — features use perps.
+            _obs("BINANCE-SPOT", "BTCUSDT", "SPOT_PAIR", "BTC", 20_000_000_000.0),
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 12_500_000_000.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "BTC-USDT",
+        )
+
+    def test_excludes_venue_not_in_mvp_scope(self) -> None:
+        """A perp venue NOT in MVP_SCOPE['cefi'].venues is dropped even with leading volume."""
+        observations = [
+            # MEXC-FUTURES not in cefi MVP — must be excluded.
+            _obs("MEXC-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 99_999_999_999.0),
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "BTC-USDT",
+        )
+
+    def test_no_perp_returns_none(self) -> None:
+        """A base with NO perp candidates returns None — fail-loud, no silent default."""
+        observations = [
+            _obs("BINANCE-SPOT", "BTCUSDT", "SPOT_PAIR", "BTC", 1_000_000.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) is None
+
+    def test_empty_returns_none(self) -> None:
+        assert feature_perp_representative("BTC", "cefi", []) is None
+
+    def test_other_bases_dropped(self) -> None:
+        observations = [
+            _obs("BINANCE-FUTURES", "ETH-USDT", "PERPETUAL", "ETH", 99_999_999_999.0),
+            _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 42.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BYBIT",
+            "BTC-USDT",
+        )
+
+
+class TestPerpDeterministicTieBreak:
+    def test_ties_break_on_venue_ascending(self) -> None:
+        """Equal volume → venue ASC — same rule as the spot selector."""
+        observations = [
+            _obs("BYBIT", "SOL-USDT", "PERPETUAL", "SOL", 1.0),
+            _obs("BINANCE-FUTURES", "SOL-USDT", "PERPETUAL", "SOL", 1.0),
+        ]
+        assert feature_perp_representative("SOL", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "SOL-USDT",
+        )
+
+    def test_ties_break_on_instrument_when_venue_equal(self) -> None:
+        observations = [
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0),
+            _obs("BINANCE-FUTURES", "BTC-BUSD", "PERPETUAL", "BTC", 1.0),
+        ]
+        assert feature_perp_representative("BTC", "cefi", observations) == (
+            "BINANCE-FUTURES",
+            "BTC-BUSD",
+        )
+
+    def test_selection_is_stable_across_input_order(self) -> None:
+        a = _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 100.0)
+        b = _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 100.0)
+        assert feature_perp_representative("BTC", "cefi", [a, b]) == feature_perp_representative(
+            "BTC", "cefi", [b, a]
+        )
+
+
+class TestPerpTradFi:
+    def test_tradfi_picks_most_liquid_future(self) -> None:
+        """TradFi has no perp — the perp representative is the most-liquid FUTURE source."""
+        observations = [
+            _obs("CME", "ESH26", "FUTURE", "ES", 80_000_000_000.0),
+            _obs("CME", "ESM26", "FUTURE", "ES", 5_000_000_000.0),
+        ]
+        assert feature_perp_representative("ES", "tradfi", observations) == (
+            "CME",
+            "ESH26",
+        )
+
+    def test_tradfi_excludes_option(self) -> None:
+        """CME OPTION rows are ignored — delta-one features do not run on options."""
+        observations = [
+            _obs("CME", "ES H26 5500 C", "OPTION", "ES", 10_000_000_000.0),
+            _obs("CME", "ESH26", "FUTURE", "ES", 1_000.0),
+        ]
+        assert feature_perp_representative("ES", "tradfi", observations) == (
+            "CME",
+            "ESH26",
+        )
+
+    def test_tradfi_empty_returns_none(self) -> None:
+        assert feature_perp_representative("ES", "tradfi", []) is None
+
+
+class TestPerpUnsupportedAssetGroups:
+    @pytest.mark.parametrize("ag", ["defi", "sports", "prediction"])
+    def test_unsupported_raises(self, ag: str) -> None:
+        with pytest.raises(ValueError, match=r"asset_group .* not supported"):
+            feature_perp_representative("BTC", ag, [])
+
+    def test_unknown_asset_group_raises(self) -> None:
+        with pytest.raises(ValueError, match=r"asset_group .* not supported"):
+            feature_perp_representative("BTC", "not-a-group", [])
+
+
+class TestPerpPurity:
+    def test_does_not_mutate_input(self) -> None:
+        observations = [
+            _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0),
+            _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 2.0),
+        ]
+        snapshot = list(observations)
+        feature_perp_representative("BTC", "cefi", observations)
+        assert observations == snapshot
+
+    def test_accepts_generator(self) -> None:
+        from collections.abc import Iterator
+
+        def gen() -> Iterator[VenueVolumeObservation]:
+            yield _obs("BINANCE-FUTURES", "BTC-USDT", "PERPETUAL", "BTC", 1.0)
+            yield _obs("BYBIT", "BTC-USDT", "PERPETUAL", "BTC", 2.0)
+
+        assert feature_perp_representative("BTC", "cefi", gen()) == (
+            "BYBIT",
+            "BTC-USDT",
         )
