@@ -177,6 +177,10 @@ from .canonical.crosscutting.ledger import (
     assert_no_cross_client_transfer,
 )
 from .canonical.crosscutting.ledger._enums import AssetClass as LedgerAssetClass
+from .canonical.crosscutting.liquid_representative import (
+    VenueVolumeObservation,
+    execution_spot_representative,
+)
 from .canonical.crosscutting.live_cluster_registry import (
     LIVE_CLUSTER_REGISTRY,
     LiveClusterDeploymentKind,
@@ -2423,6 +2427,10 @@ __all__ = [
     "is_mvp",
     "mdps_mvp_universe",
     "mvp_scope_config_descriptor",
+    # Most-liquid representative selectors (volume-based) — UAC home for the
+    # shared volume-basis contract consumed by execution + features.
+    "VenueVolumeObservation",
+    "execution_spot_representative",
     "CeFiMvpRule",
     "DeFiMvpRule",
     "TradFiMvpRule",
