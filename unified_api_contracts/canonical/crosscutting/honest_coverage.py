@@ -219,6 +219,17 @@ class EmptyConfirmedReason(StrEnum):
     ``OUT_OF_COVERAGE_WINDOW_REASONS``). SSOT:
     ``plans/active/issues/cefi_hl_aster_batch_data_gaps_2026_06_22.md`` BUG #3."""
 
+    EXPECTED_CHAIN_AGGREGATE = "EXPECTED_CHAIN_AGGREGATE"
+    """TradFi chain-level aggregate manifest row: ``instrument_type ∈ {options_chain, futures_chain}``
+    with blank ``instrument_id`` written by the IS enumerator for contract-family catalogue entries.
+    No downloadable OHLCV bar data exists at chain-aggregate level (Databento GLBX.MDP3 serves individual
+    contract bars, not chain-level aggregates). These rows are structural IS catalogue artifacts —
+    excluded from the data-status denominator.
+
+    Operator-authorized: BLK-ca110c07 answer A (2026-06-28) — "CME eu=8,424 chain-aggregate meta-rows
+    (blank instrument_id) = NOT downloadable bars, exclude from denominator."
+    Plan: ``mvp_backfill_tradfi_ohlcv1m_v10_2026_06_27.md`` G2 gate."""
+
     EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE = "EXPECTED_BOOKMAKER_NO_LEAGUE_COVERAGE"
     """Sports ODDS per-(bookmaker, league): an Odds-API bookmaker legitimately doesn't price this league —
     the OBSERVED captured corpus shows the (book, league) pair has never produced an odds row, so a zero-row
@@ -488,6 +499,7 @@ OUT_OF_COVERAGE_WINDOW_REASONS: Final[frozenset[str]] = frozenset(
         EmptyConfirmedReason.EXPECTED_POST_SEASON.value,
         EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_COVER_LEAGUE.value,
         EmptyConfirmedReason.EXPECTED_SOURCE_DOES_NOT_OFFER_DATA_TYPE.value,
+        EmptyConfirmedReason.EXPECTED_CHAIN_AGGREGATE.value,
         EmptyConfirmedReason.EXPECTED_NO_PROVIDER_COVERAGE.value,
         EmptyConfirmedReason.EXPECTED_OUT_OF_COVERAGE_WINDOW.value,
         EmptyConfirmedReason.EXPECTED_DEPRECATED_DATA_TYPE.value,

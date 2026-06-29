@@ -38,10 +38,19 @@ class OrderType(StrEnum):
 
 
 class BookType(StrEnum):
-    """Book types that determine matching logic."""
+    """Book types that determine matching logic.
+
+    Ordering by fidelity (descending L2_MBP > CANDLE_BOOK_COLS > L1_MBP > L0_TOB)
+    for the price-discovery tiers; AMM + ALPHA_ZERO are orthogonal protocol-fill
+    paths. ``CANDLE_BOOK_COLS`` is the mid-fidelity tier sourced from the Plan-1
+    intra-bar book-summary columns precomputed on the processed candle (spread
+    TW-mean, mid_close, per-level depth) — sits between L1 OHLC and L2 tick walk
+    in :class:`~unified_api_contracts.ExecutionFidelityTier`.
+    """
 
     L0_TOB = "L0_TOB"
     L1_MBP = "L1_MBP"
+    CANDLE_BOOK_COLS = "CANDLE_BOOK_COLS"
     L2_MBP = "L2_MBP"
     AMM = "AMM"
     ALPHA_ZERO = "ALPHA_ZERO"

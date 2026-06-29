@@ -17,6 +17,7 @@ from datetime import date as _date
 from datetime import timedelta as _timedelta
 
 from unified_api_contracts.registry.defi_venues import ALL_DEFI_VENUES as _ALL_DEFI_VENUES
+from unified_api_contracts.registry.defi_venues import DEFI_VENUE_PHASE as _DEFI_VENUE_PHASE
 
 # Default timeframes for candle processing (used by sharding and CLI)
 TIMEFRAMES: list[str] = ["15s", "1m", "5m", "15m", "1h", "4h", "24h"]
@@ -292,7 +293,14 @@ VENUES_BY_ASSET_GROUP: dict[str, list[str]] = {
         # venue/source parity gate — not a real venue, kept to avoid manifest churn).
         "YAHOO_FINANCE",  # legacy source-as-venue (rolling VIX 15m / KRW-USD daily)
     ],
-    "defi": list(_ALL_DEFI_VENUES),
+    # Honest-coverage denominator: only IS-producible venues (phase=="live").
+    # _ALL_DEFI_VENUES is the full registry (unchanged); _DEFI_VENUE_PHASE gates
+    # which venues count as "could-exist" for honest-coverage purposes.
+    # dict.fromkeys dedups while preserving order (ALL_DEFI_VENUES has duplicates
+    # from the extend() block for alias coverage testing).
+    # Denominator semantics owned by plans/active/honest_coverage_v2_instrument_denominator_2026_06_28.md
+    # (check_enumeration_completeness.py) — do NOT edit that script here.
+    "defi": list(dict.fromkeys(v for v in _ALL_DEFI_VENUES if _DEFI_VENUE_PHASE.get(v) == "live")),
     "sports": [
         # Sports betting exchanges and bookmakers active in the May-23 universe.
         # DEFERRED-INDEFINITELY 2026-05-12 per operator: scraper bookmakers

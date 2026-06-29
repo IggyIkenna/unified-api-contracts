@@ -133,6 +133,11 @@ from .canonical.crosscutting.execution import (
     NORMAL_ALGO_TYPE,
     BatchExecutionMode,
 )
+from .canonical.crosscutting.execution_fidelity import (
+    ExecutionFidelityTier,
+    ExecutionMode,
+    execution_fidelity,
+)
 from .canonical.crosscutting.experiment_registry import (
     ExperimentKind,
     ExperimentRunSpec,
@@ -177,6 +182,11 @@ from .canonical.crosscutting.ledger import (
     assert_no_cross_client_transfer,
 )
 from .canonical.crosscutting.ledger._enums import AssetClass as LedgerAssetClass
+from .canonical.crosscutting.liquid_representative import (
+    VenueVolumeObservation,
+    execution_spot_representative,
+    feature_perp_representative,
+)
 from .canonical.crosscutting.live_cluster_registry import (
     LIVE_CLUSTER_REGISTRY,
     LiveClusterDeploymentKind,
@@ -200,6 +210,7 @@ from .canonical.crosscutting.mvp_scope import (
     get_mvp_data_types_for_cefi_venue,
     is_in_mvp_capture_universe,
     is_mvp,
+    mdps_mvp_universe,
     mvp_scope_config_descriptor,
 )
 from .canonical.crosscutting.pipeline_mode import (
@@ -649,6 +660,26 @@ from .canonical.crosscutting.honest_coverage import (
     futures_expiry_bucket,
     get_active_es_options_clusters_for_date,
     was_instrument_alive,
+)
+from .canonical.crosscutting.shard_coverage_classification import (
+    MAX_HOLES_IN_REPORT,
+    RequiredWindow,
+    RequiredWindowKind,
+    ShardCoverageClass,
+    ShardCoverageReport,
+    ShardManifestCell,
+    WindowCaptureCounts,
+    bucket_capture_status_cell,
+    classify_from_capture_counts,
+    classify_shard_coverage,
+)
+from .canonical.crosscutting.required_window_registry import (
+    MVP_ASSET_GROUPS,
+    MVP_REQUIRED_WINDOW_REGISTRY,
+    RequiredWindowSpec,
+    UnknownRequiredWindowError,
+    registered_data_types_for_asset_group,
+    resolve_required_window,
 )
 from .canonical.crosscutting.instruments_preflight_dag import (
     PreflightFailed,
@@ -2119,7 +2150,23 @@ __all__ = [
     "SettlementEvent",
     "ShareClass",
     "ShardCapacityEvent",
+    "ShardCoverageClass",
+    "ShardCoverageReport",
+    "ShardManifestCell",
     "ShardRecommendedAction",
+    "RequiredWindow",
+    "RequiredWindowKind",
+    "RequiredWindowSpec",
+    "WindowCaptureCounts",
+    "MAX_HOLES_IN_REPORT",
+    "MVP_ASSET_GROUPS",
+    "MVP_REQUIRED_WINDOW_REGISTRY",
+    "UnknownRequiredWindowError",
+    "bucket_capture_status_cell",
+    "classify_from_capture_counts",
+    "classify_shard_coverage",
+    "registered_data_types_for_asset_group",
+    "resolve_required_window",
     "SignalAcknowledgement",
     "SignalEmission",
     "SignalPayload",
@@ -2420,7 +2467,18 @@ __all__ = [
     "get_mvp_data_types_for_cefi_venue",
     "is_in_mvp_capture_universe",
     "is_mvp",
+    "mdps_mvp_universe",
     "mvp_scope_config_descriptor",
+    # Most-liquid representative selectors (volume-based) — UAC home for the
+    # shared volume-basis contract consumed by execution + features.
+    "VenueVolumeObservation",
+    "execution_spot_representative",
+    "feature_perp_representative",
+    # Execution fidelity capability — UAC SSOT for the matcher-tier selection
+    # consumed by execution-service.
+    "ExecutionFidelityTier",
+    "ExecutionMode",
+    "execution_fidelity",
     "CeFiMvpRule",
     "DeFiMvpRule",
     "TradFiMvpRule",

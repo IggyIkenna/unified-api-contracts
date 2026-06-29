@@ -56,6 +56,9 @@ from __future__ import annotations
 
 from typing import cast
 
+from unified_api_contracts.internal.domain.market_data_processing import (
+    BOOK_SUMMARY_COLUMNS,
+)
 from unified_api_contracts.internal.schemas.contracts import (
     CHAIN_COL,
     CONTRACT_REGISTRY,
@@ -101,14 +104,8 @@ _TIMEFRAME_COL = ColumnSpec(
 )
 
 _BOOK5_EXT: list[ColumnSpec] = [
-    ColumnSpec(name="spread_bps_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="depth_bid_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="depth_ask_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="imbalance_ratio_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="bid_vol_0_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="ask_vol_0_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="tob_depth_ratio_mean", dtype="float64", nullable=True),
-    ColumnSpec(name="mid_price_mean", dtype="float64", nullable=True),
+    ColumnSpec(name=spec.name, dtype="float64", nullable=True)
+    for spec in BOOK_SUMMARY_COLUMNS
 ]
 
 _DERIV_EXT: list[ColumnSpec] = [

@@ -135,6 +135,8 @@ max-complexity = 26
 "unified_api_contracts/registry/chain_env.py" = ["E501"]
 "unified_api_contracts/registry/token_wrapping.py" = ["E501"]
 "unified_api_contracts/internal/domain/cefi_accounts/schemas.py" = ["N815"]
+# CandleOutput mirrors the SSOT book_summary_spec column names which include L1-L5 (capital L)
+"unified_api_contracts/internal/domain/market_data_processing/adapter_models.py" = ["N815"]
 "unified_api_contracts/internal/domain/defi/eth_transfers.py" = ["N815"]
 "unified_api_contracts/internal/domain/defi/protocol_sdks.py" = ["N815"]
 "unified_api_contracts/internal/domain/execution_service/cex_withdrawals.py" = ["N815"]
