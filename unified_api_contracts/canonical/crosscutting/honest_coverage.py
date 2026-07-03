@@ -455,6 +455,18 @@ class EmptyConfirmedReason(StrEnum):
 
     Plan: trading_agent_service_architecture_unlock_2026_05_22.md Phase 3."""
 
+    EXPECTED_WRITE_GATE_NAN_THRESHOLD_EXCEEDED = "EXPECTED_WRITE_GATE_NAN_THRESHOLD_EXCEEDED"
+    """Feature computation ran successfully but the resulting DataFrame exceeded the NaN
+    threshold for non-sparse columns — the FeatureWriteGate rejected the write.
+
+    This is expected absence (data is legitimately too sparse for this date/feature_group
+    combination) rather than a pipeline failure. Distinct from SOURCE_RETURNED_ZERO (source
+    returned 200+empty before compute) and attempted_failed (a genuine exception during
+    fetch/compute). No FetchEvidence required (EXPECTED_* exemption).
+
+    Emitted by features_service.sports batch_handler when WriteGateRejectedError propagates
+    from write_sports_table."""
+
 
 EMPTY_CONFIRMED_REASONS: Final[frozenset[str]] = frozenset(member.value for member in EmptyConfirmedReason)
 """String-membership view of :class:`EmptyConfirmedReason` for fast O(1) validation.
