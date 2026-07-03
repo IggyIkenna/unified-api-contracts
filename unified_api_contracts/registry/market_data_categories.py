@@ -1305,6 +1305,27 @@ from unified_api_contracts.registry.defi_venue_capabilities import (
 VENUE_DATA_TYPE_CAPABILITIES.update(DEFI_VENUE_DATA_TYPE_CAPABILITIES)
 
 
+# TradFi venue → the writer-grain instrument_types the MTDS writer stamps for it.
+# Promoted here 2026-07-03 (honest_coverage_uac_writer_matrix_reconciliation) from
+# the instruments-service Layer-1 checker replica so it stops drifting: UAC is the
+# shared contract lib both IS and MTDS may import (service↔service imports are
+# banned). Writer-side counterpart: market-tick-data-service
+# ``symbol_rules._VENUE_INSTRUMENT_TYPE`` holds the per-venue DEFAULT stamp
+# (CME/ICE → futures_chain); the richer sets here add the instrument_type-column
+# overrides the writer also emits (CME/ICE options_chain + combo, CBOE
+# futures/options chains). YAHOO_FINANCE/KRX stamp no instrument_type (legacy
+# source-as-venue) and are deliberately absent — consumers must treat a missing
+# venue as "not gated", never as "cannot exist".
+TRADFI_VENUE_INSTRUMENT_TYPES: dict[str, frozenset[str]] = {
+    "CME": frozenset({"futures_chain", "options_chain", "combo"}),
+    "ICE": frozenset({"futures_chain", "options_chain", "combo"}),
+    "NASDAQ": frozenset({"equity", "etf"}),
+    "NYSE": frozenset({"equity", "etf"}),
+    "CBOE": frozenset({"index", "futures_chain", "options_chain"}),
+    "FX": frozenset({"spot_pair"}),
+}
+
+
 # Reference data capabilities — static/structural data collected by
 # instruments-service.  Separate from market data capabilities above.
 # Market shards (BTC, ETH, SPX, etc.) are emergent from the data and
