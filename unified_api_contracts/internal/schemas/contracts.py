@@ -1096,11 +1096,13 @@ def lookup_contract(
         1. ``VENUE_CONTRACT_OVERRIDES[(asset_group, venue.upper(), instrument_type, data_type)]``
            — only consulted when ``venue`` is supplied.
         2. ``CONTRACT_REGISTRY[(asset_group, instrument_type, data_type)]``.
-        3. Repeat steps 1-2 with ``instrument_type.lower()`` as a normalisation
-           fallback.  Raw tick parquets written by MTDS use uppercase
-           ``instrument_type`` (e.g. ``POOL``, ``DEX_POOL``); the registry uses
-           lowercase (e.g. ``pool``, ``dex_pool``).  The fallback ensures that
-           both cases resolve without requiring a schema-version migration.
+        3. Repeat steps 1-2 with case-normalised ``instrument_type`` AND
+           ``data_type`` as a fallback.  Raw tick parquets written by MTDS use
+           uppercase ``instrument_type`` (e.g. ``POOL``, ``DEX_POOL``) and the
+           sports manifest convention uses uppercase ``data_type`` (e.g. ``XG``,
+           ``XG_SHOTS``); the registry uses lowercase for both (``pool``,
+           ``xg_shots``).  The fallback ensures every case combination resolves
+           without requiring a schema-version migration.
 
     Raises:
         SchemaContractNotFoundError: If no lookup resolves. Callers are
@@ -1115,14 +1117,26 @@ def lookup_contract(
     key = (asset_group, instrument_type, data_type)
     contract = CONTRACT_REGISTRY.get(key)
     if contract is None:
-        # Lowercase normalisation fallback: raw parquets store uppercase
-        # instrument_type (POOL → pool, DEX_POOL → dex_pool).
+        # Case-normalisation fallback on BOTH axes: raw parquets store uppercase
+        # instrument_type (POOL → pool, DEX_POOL → dex_pool) and the sports
+        # manifest convention stores uppercase data_type (XG_SHOTS → xg_shots).
+        # Try each case-normalised variant that differs from the exact key.
         norm_it = instrument_type.lower()
-        if norm_it != instrument_type:
+        norm_dt = data_type.lower()
+        for cand_it, cand_dt in (
+            (instrument_type, norm_dt),
+            (norm_it, data_type),
+            (norm_it, norm_dt),
+        ):
+            if (cand_it, cand_dt) == (instrument_type, data_type):
+                continue
             if venue is not None:
-                contract = VENUE_CONTRACT_OVERRIDES.get((asset_group, venue.upper(), norm_it, data_type))
-            if contract is None:
-                contract = CONTRACT_REGISTRY.get((asset_group, norm_it, data_type))
+                contract = VENUE_CONTRACT_OVERRIDES.get((asset_group, venue.upper(), cand_it, cand_dt))
+                if contract is not None:
+                    break
+            contract = CONTRACT_REGISTRY.get((asset_group, cand_it, cand_dt))
+            if contract is not None:
+                break
     if contract is None:
         raise SchemaContractNotFoundError(
             asset_group=asset_group,

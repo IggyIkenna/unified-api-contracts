@@ -623,6 +623,19 @@ CONTRACT_REGISTRY[("sports", "shot", "xg_shots")] = SPORTS_XG_SHOTS
 CONTRACT_REGISTRY[("sports", "match", "weather")] = SPORTS_WEATHER
 CONTRACT_REGISTRY[("sports", "feature", "fixture_features")] = SPORTS_FIXTURE_FEATURES
 
+# Blank-instrument_type aliases: the sports MANIFEST convention writes
+# ``instrument_type=""`` on every row (shot-vs-match granularity is carried by
+# ``data_type`` — XG vs XG_SHOTS — not this axis; see understat_bulk_download §9.1),
+# so ``record_captured``'s write-time schema lookup queries
+# ``("sports", "", "xg" | "xg_shots")``. Register the SAME contract under the blank
+# key so that lookup resolves (combined with lookup_contract's data_type
+# case-normalisation for the UPPERCASE manifest ``data_type``) instead of emitting
+# MANIFEST_WRITE_SCHEMA_MISSING and skipping validation. The semantic keys above
+# stay for the deployment-api schema-drilldown path (data_type → match/shot).
+# SSOT: plans/active/issues/understat_bulk_download_backfill_2026_06_29 §9.1.
+CONTRACT_REGISTRY[("sports", "", "xg")] = SPORTS_XG
+CONTRACT_REGISTRY[("sports", "", "xg_shots")] = SPORTS_XG_SHOTS
+
 
 __all__ = [
     "SPORTS_FIXTURE_FEATURES",
