@@ -388,6 +388,29 @@ def test_lookup_contract_with_unknown_venue_falls_back_to_base() -> None:
     assert contract is CONTRACT_REGISTRY[("cefi", "perpetual", "trades")]
 
 
+def test_lookup_contract_normalises_uppercase_data_type() -> None:
+    """The sports manifest convention stores UPPERCASE data_type (XG_SHOTS); the
+    registry key is lowercase (xg_shots). lookup_contract must case-normalise
+    data_type (mirroring the instrument_type lowercase fallback).
+    Regression: understat_bulk_download_backfill_2026_06_29 §9.1/§9.2."""
+    assert lookup_contract(asset_group="sports", instrument_type="shot", data_type="XG_SHOTS") is (
+        CONTRACT_REGISTRY[("sports", "shot", "xg_shots")]
+    )
+
+
+def test_lookup_contract_resolves_blank_instrument_type_sports_alias() -> None:
+    """The sports manifest writes ``instrument_type=""`` on every row (§9.1), so
+    record_captured's write-time schema lookup queries ("sports", "", "XG" |
+    "XG_SHOTS"). The blank-instrument_type aliases + data_type case-normalisation
+    must resolve it (else MANIFEST_WRITE_SCHEMA_MISSING skips validation)."""
+    assert lookup_contract(asset_group="sports", instrument_type="", data_type="XG_SHOTS") is (
+        CONTRACT_REGISTRY[("sports", "shot", "xg_shots")]
+    )
+    assert lookup_contract(asset_group="sports", instrument_type="", data_type="XG") is (
+        CONTRACT_REGISTRY[("sports", "match", "xg")]
+    )
+
+
 def test_lookup_contract_missing_raises_with_structured_details() -> None:
     """G3: a missing contract must raise — not warn — with routable details."""
     with pytest.raises(SchemaContractNotFoundError) as exc_info:
