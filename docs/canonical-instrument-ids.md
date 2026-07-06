@@ -180,6 +180,7 @@ docstring calls out UAC as the single source of truth.
 - `ManifestWriter.write_with_zero_fill(...)` uses
   `get_instruments_available_on` to compute the expected universe for the
   day — see `unified-trading-library/docs/data-sink-validation.md`.
-- instruments-service `CatalogueBuilder` populates `instrument_key` via
-  `build_instrument_id(...)` for every record — see
-  `instruments-service/docs/instrument-catalogue.md`.
+- instruments-service reference-data adapters populate `instrument_key` via
+  `unified_api_contracts.build_instrument_id(...)` on every record they emit;
+  `build_instrument_catalogue.py` then walks those per-date snapshots into
+  the daily `prod/catalog.parquet` rollup (the SSOT MTDS + data-status read).
