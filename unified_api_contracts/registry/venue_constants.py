@@ -365,6 +365,16 @@ VENUE_CATEGORY_MAP.update(dict.fromkeys(SPORTS_VENUES, "sports"))
 INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     BINANCE_SPOT: {"SPOT_PAIR"},
     COINBASE_SPOT: {"SPOT_PAIR"},
+    # VENUES_BY_ASSET_GROUP["cefi"] (market_data_categories.py) declares the
+    # BARE "COINBASE" token (not "COINBASE-SPOT") as the canonical cefi spot
+    # venue; the writer stamps "COINBASE-SPOT" (folded back to "COINBASE" by
+    # the Layer-1 checker's _CEFI_VENUE_FOLD for the EXPECTED/ENUMERATED
+    # comparison — check_enumeration_completeness.py). The EXPECTED-side
+    # lookup is keyed by the VENUES_BY_ASSET_GROUP token, i.e. bare
+    # "COINBASE", so it needs its OWN key here too (D2a naming reconciliation,
+    # 2026-07-06) — without it the itype-gate authority switch silently zeroes
+    # COINBASE's entire EXPECTED set.
+    "COINBASE": {"SPOT_PAIR"},
     OKX_SPOT: {"SPOT_PAIR"},
     OKX_FUTURES: {"PERPETUAL", "FUTURE", "OPTION"},
     "OKX": {"SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"},
@@ -373,11 +383,50 @@ INSTRUMENT_TYPES_BY_VENUE: dict[str, set[str]] = {
     "BYBIT": {"SPOT_PAIR", "PERPETUAL", "FUTURE"},
     UPBIT: {"SPOT_PAIR"},
     BINANCE_FUTURES: {"PERPETUAL", "FUTURE"},
-    DERIBIT: {"PERPETUAL", "FUTURE", "OPTION"},
+    # SPOT_PAIR added 2026-07-06 (D2a regression fix): the OLD tardis-routing
+    # authority (VenueMapping.venue_instrument_type_to_tardis) already declared
+    # ("DERIBIT", "SPOT_PAIR"): "deribit" (Tardis's deribit endpoint serves
+    # spot). Missing it here would have made the D2a authority switch silently
+    # DROP a real, previously-EXPECTED (DERIBIT, spot_pair, {trades,
+    # book_snapshot_5}) pair — a regression the itype-gate switch must not
+    # introduce (VENUE_DATA_TYPE_CAPABILITIES["DERIBIT"] already carries trades
+    # / book_snapshot_5 since 2019-03-30, confirming this is real capability,
+    # not a stale routing artifact).
+    DERIBIT: {"SPOT_PAIR", "PERPETUAL", "FUTURE", "OPTION"},
     KRAKEN_SPOT: {"SPOT_PAIR"},
     KRAKEN_FUTURES: {"PERPETUAL", "FUTURE"},
     HYPERLIQUID: {"PERPETUAL"},
     ASTER: {"PERPETUAL"},
+    # D2a (cefi Layer-1 gate-authority fix, honest_coverage_v2, 2026-07-06):
+    # these 10 declared cefi venues (VENUES_BY_ASSET_GROUP["cefi"]) had NO
+    # entry here. check_enumeration_completeness.py's itype-gate authority is
+    # switching FROM VenueMapping.venue_instrument_type_to_tardis (a
+    # tardis-fetch ROUTING table — sourcing) TO this dict (a declarative
+    # existence authority). A declared venue absent from the routing table is
+    # NOT the same as "does not exist"; completing this dict is the fix.
+    # Itypes below are the operator-decided universe (verified against
+    # tardis_exchange_instrument_types / venue_instrument_config.py /
+    # data_type_capability.py DataTypeCapability entries where available; see
+    # honest_coverage_uac_writer_matrix_reconciliation). None of these 10 has
+    # a dedicated module constant (grepped) — string literals match the style
+    # of the other unconstant-ed cefi entries above ("OKX", "BYBIT").
+    "BINANCE-DELIVERY": {"PERPETUAL", "FUTURE"},  # COIN-M inverse perps + dated delivery futures
+    "COINBASE-FUTURES": {"PERPETUAL", "FUTURE"},  # Coinbase Derivatives via Tardis coinbase-international
+    "BITFINEX-FUTURES": {"PERPETUAL", "FUTURE"},
+    "BITGET-FUTURES": {"PERPETUAL", "FUTURE"},
+    "BITFINEX-SPOT": {"SPOT_PAIR"},
+    "BITGET-SPOT": {"SPOT_PAIR"},
+    "PACIFICA-SOLANA": {"PERPETUAL"},  # Solana perp DEX — native pacifica_api, not Tardis
+    "EXTENDED-STARKNET": {"PERPETUAL"},  # Starknet perp DEX — native extended_api, not Tardis
+    "LIGHTER-ZKSYNC": {"PERPETUAL"},  # zkSync perp DEX — Tardis post-2026-04-17, native lighter_api before
+    # DERIBIT-COMBO: multi-leg combo/spread instruments from Deribit's
+    # get_instruments (future_combo + option_combo kinds). Ikenna 2026-07-06:
+    # future_combo is NOT in MVP — only the option_combo kind counts, so this
+    # venue is OPTION-ONLY (it rolls up to the options_chain bundle via
+    # bundle_instrument_type_for_leaf, same universal cefi option roll-up
+    # DERIBIT's own OPTION leaf uses). Do NOT add FUTURE without a new,
+    # explicit operator decision superseding this one.
+    "DERIBIT-COMBO": {"OPTION"},
     NASDAQ: {"EQUITY", "ETF", "INDEX"},
     NYSE: {"EQUITY", "ETF", "INDEX"},
     CME: {"FUTURE", "OPTION", "INDEX", "BOND", "EVENT_CONTRACT"},

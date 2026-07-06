@@ -1178,6 +1178,53 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "derivative_ticker": "2020-01-01",
         "liquidations": "2020-01-01",
     },
+    # ── DEX-perp on-chain CLOBs (D2b, honest_coverage cefi gate-authority fix,
+    # 2026-07-06) — PACIFICA-SOLANA / EXTENDED-STARKNET / LIGHTER-ZKSYNC are
+    # declared cefi venues (VENUES_BY_ASSET_GROUP["cefi"]) whose itype-gate the
+    # D2a fix now admits (INSTRUMENT_TYPES_BY_VENUE, venue_constants.py), but
+    # they had NO entry here — absent from this dict means Carve-out 1 (this
+    # is a cefi/tradfi skip-filter; see check_enumeration_completeness.py
+    # VENUE_CAPABILITY_AGS) zeroes EVERY data_type, independent of the itype
+    # fix. data_types sourced from the existing DataTypeCapability catalogue
+    # entries for these venues (data_type_capability.py — trades +
+    # book_snapshot_5 + derivative_ticker(perpetual); native REST/WS APIs, NOT
+    # Tardis routed pre-2026-04-17). Start dates = VenueMapping.
+    # venue_start_dates (venue_mapping.py — documented "single source of
+    # truth"/"earliest manifest data, NOT exchange founding dates"). No
+    # liquidations/perp_funding feed wired for any of the three (same
+    # minimum-perp-surface note as data_type_capability.py).
+    "PACIFICA-SOLANA": {
+        "trades": "2025-06-01",
+        "book_snapshot_5": "2025-06-01",
+        "derivative_ticker": "2025-06-01",
+    },
+    "EXTENDED-STARKNET": {
+        "trades": "2024-10-01",
+        "book_snapshot_5": "2024-10-01",
+        "derivative_ticker": "2024-10-01",
+    },
+    "LIGHTER-ZKSYNC": {
+        "trades": "2024-08-01",
+        "book_snapshot_5": "2024-08-01",
+        "derivative_ticker": "2024-08-01",
+    },
+    # Coinbase Derivatives (perps) — D2b, 2026-07-06. COINBASE-FUTURES passed
+    # the itype-gate even pre-D2a (it already had a tardis routing entry) but
+    # had NO entry here, so Carve-out 1 zeroed it regardless. Mirrors the
+    # BITGET-FUTURES / BITFINEX-FUTURES Tier-3 perp shape (trades /
+    # book_snapshot_5 / derivative_ticker / liquidations); start date = Tardis
+    # coinbase-international availableSince 2024-10-31 (VenueMapping.
+    # venue_start_dates). NOTE: the MVP override
+    # (mvp_scope.py CeFiMvpRule.venue_data_types["COINBASE-FUTURES"] =
+    # {"trades"}) independently narrows the MVP-scope EXPECTED set to
+    # trades-only — that is a SEPARATE concern (Carve-out 2); this entry
+    # states genuine capture CAPABILITY (Carve-out 1), not MVP scope.
+    "COINBASE-FUTURES": {
+        "trades": "2024-10-31",
+        "book_snapshot_5": "2024-10-31",
+        "derivative_ticker": "2024-10-31",
+        "liquidations": "2024-10-31",
+    },
     # ── TradFi — Databento (OHLCV-only MVP per operator direction 2026-05-15) ──
     # Operator: "lets [do] ohlcv 1m for all the tradfi mvp instruments only please …
     # no need for l1-l3 yet … i want the full period for tradfi thats available …
