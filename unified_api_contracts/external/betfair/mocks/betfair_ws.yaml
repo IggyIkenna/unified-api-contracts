@@ -1,0 +1,9 @@
+# STUB — BLOCKED-CREDENTIALS
+# Betfair live WebSocket (wss://ws.betfair.com).
+# Connector: market_tick_data_service/live/connectors/betfair_ws.py (MTDS 2115f867, 2026-07-07).
+# Status: BLOCKED-CREDENTIALS — cassette stub landed with the Phase-3.5 rollout;
+# real WS frames captured once Betfair app-key + session token are provisioned.
+ws_url: wss://ws.betfair.com
+subscription: null
+frames: []
+version: 1

@@ -553,3 +553,75 @@ allowed:
     reason: recording-template
     detail: "Yahoo Finance US Treasury yield (query1.finance.yahoo.com/v8/finance/chart/^TNX?interval=1d). IS macro adapter calls this for risk-free rate data used in carry calculations. UAC external/yahoo_finance schemas not yet imported. Phase 2 QG task."
     acked_by: slot-1 2026-05-26
+
+  # ---- wsfeedconnector Phase-3.5 stub cassettes (MTDS 2115f867 + a49c0828, 2026-07-07)
+  # Batch=Live SSOT: every venue with a live WS connector must have at least one
+  # *_ws.yaml in unified_api_contracts/external/<venue>/mocks/ (test_ws_cassette_coexistence).
+  # These are stubs (frames: []) landed alongside the MTDS WSFeedConnector rollout so the
+  # coexistence gate does not fleet-block UAC ships; real WS frames captured once each
+  # connector's live-mode smoke reaches a green tick (or credentials are provisioned).
+  # Operator-acked via main-agent BLK-e2a5c57f 2026-07-07 (Option A: adjacent-fix scope).
+  - path: bitfinex/mocks/bitfinex_spot_ws.yaml
+    reason: stub-placeholder
+    detail: "Bitfinex live-WS stub (wss://api-pub.bitfinex.com/ws/2). Serves bitfinex_spot_ws.py + bitfinex_futures_ws.py coexistence check. Real frames post live-mode smoke."
+    acked_by: slot-8 2026-07-07
+  - path: bitget/mocks/bitget_spot_ws.yaml
+    reason: stub-placeholder
+    detail: "Bitget live-WS stub (wss://ws.bitget.com/v2/ws/public). Serves bitget_spot_ws.py + bitget_futures_ws.py coexistence check. Real frames post live-mode smoke."
+    acked_by: slot-8 2026-07-07
+  - path: defi_lending_scaffold/mocks/defi_lending_scaffold_ws.yaml
+    reason: stub-placeholder
+    detail: "DeFi-lending WSFeedConnector Phase-3.5 scaffold — no live endpoint bound yet. Coexistence-only stub; real cassette lands with concrete protocol wiring."
+    acked_by: slot-8 2026-07-07
+  - path: dex_swap_scaffold/mocks/dex_swap_scaffold_ws.yaml
+    reason: stub-placeholder
+    detail: "DEX-swap WSFeedConnector Phase-3.5 scaffold — no live endpoint bound yet. Coexistence-only stub; real cassette lands with concrete protocol wiring."
+    acked_by: slot-8 2026-07-07
+  - path: eigenlayer/mocks/eigenlayer_ethereum_ws.yaml
+    reason: stub-placeholder
+    detail: "EigenLayer Ethereum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: ethena/mocks/ethena_ethereum_ws.yaml
+    reason: stub-placeholder
+    detail: "Ethena Ethereum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: etherfi/mocks/etherfi_ethereum_ws.yaml
+    reason: stub-placeholder
+    detail: "ether.fi Ethereum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: extended/mocks/extended_starknet_perp_ws.yaml
+    reason: stub-placeholder
+    detail: "Extended Starknet-perp live-WS stub (wss://api.extended.exchange/stream.v1). Coexistence-only stub; real frames post live-mode smoke."
+    acked_by: slot-8 2026-07-07
+  - path: fluid/mocks/fluid_ethereum_ws.yaml
+    reason: stub-placeholder
+    detail: "Fluid Ethereum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: gmx/mocks/gmx_arbitrum_ws.yaml
+    reason: stub-placeholder
+    detail: "GMX Arbitrum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: kamino/mocks/kamino_solana_ws.yaml
+    reason: stub-placeholder
+    detail: "Kamino Solana account/log-subscription stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: lido/mocks/lido_ethereum_ws.yaml
+    reason: stub-placeholder
+    detail: "Lido Ethereum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: lighter/mocks/lighter_zksync_perp_ws.yaml
+    reason: stub-placeholder
+    detail: "Lighter zkSync-perp live-WS stub (wss://mainnet.zklighter.elliot.ai). Coexistence-only stub; real frames post live-mode smoke."
+    acked_by: slot-8 2026-07-07
+  - path: marinade/mocks/marinade_solana_ws.yaml
+    reason: stub-placeholder
+    detail: "Marinade Solana account/log-subscription stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07
+  - path: pacifica/mocks/pacifica_solana_perp_ws.yaml
+    reason: stub-placeholder
+    detail: "Pacifica Solana-perp live-WS stub (wss://ws.pacifica.fi/v1). Coexistence-only stub; real frames post live-mode smoke."
+    acked_by: slot-8 2026-07-07
+  - path: spark/mocks/spark_ethereum_ws.yaml
+    reason: stub-placeholder
+    detail: "Spark Ethereum event-stream stub — BLOCKED-CREDENTIALS (RPC-provider key + filter needed). Coexistence-only stub; real frames captured post-credentials."
+    acked_by: slot-8 2026-07-07

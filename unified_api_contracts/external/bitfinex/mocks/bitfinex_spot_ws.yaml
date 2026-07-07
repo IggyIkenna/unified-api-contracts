@@ -1,0 +1,10 @@
+# STUB — pending live capture
+# Bitfinex live WebSocket (public, wss://api-pub.bitfinex.com/ws/2).
+# Connectors: market_tick_data_service/live/connectors/bitfinex_spot_ws.py,
+#             market_tick_data_service/live/connectors/bitfinex_futures_ws.py (MTDS a49c0828, 2026-07-07).
+# Status: cassette stub landed with the Phase-3.5 rollout; real WS frames captured
+# once the connector's live-mode smoke reaches a green tick.
+ws_url: wss://api-pub.bitfinex.com/ws/2
+subscription: null
+frames: []
+version: 1

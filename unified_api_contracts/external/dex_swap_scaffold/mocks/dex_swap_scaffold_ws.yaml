@@ -1,0 +1,9 @@
+# STUB — scaffold placeholder
+# dex_swap_scaffold WSFeedConnector (Phase-3.5 scaffold, no live endpoint bound yet).
+# Connector: market_tick_data_service/live/connectors/dex_swap_scaffold_ws.py (MTDS a49c0828, 2026-07-07).
+# Status: scaffold — this venue is a placeholder for the DEX-swap WSFeedConnector shape;
+# real cassette lands with the concrete protocol wiring (Uniswap/Curve/Balancer/Jupiter).
+ws_url: wss://dex-swap-scaffold.placeholder
+subscription: null
+frames: []
+version: 1

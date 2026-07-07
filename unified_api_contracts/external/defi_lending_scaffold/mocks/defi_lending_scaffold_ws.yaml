@@ -1,0 +1,9 @@
+# STUB — scaffold placeholder
+# defi_lending_scaffold WSFeedConnector (Phase-3.5 scaffold, no live endpoint bound yet).
+# Connector: market_tick_data_service/live/connectors/defi_lending_scaffold_ws.py (MTDS a49c0828, 2026-07-07).
+# Status: scaffold — this venue is a placeholder for the DeFi-lending WSFeedConnector shape;
+# real cassette lands with the concrete protocol wiring (Aave/Morpho/Euler/Compound).
+ws_url: wss://defi-lending-scaffold.placeholder
+subscription: null
+frames: []
+version: 1
