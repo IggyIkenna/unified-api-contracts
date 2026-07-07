@@ -1080,6 +1080,19 @@ VENUE_DATA_TYPE_CAPABILITIES: dict[str, dict[str, str]] = {
         "liquidations": "2020-01-01",
         "futures_chain": "2020-01-01",
     },
+    # BYBIT-SPOT — DISTINCT canonical venue from bare "BYBIT" (perps). Registered
+    # in VENUES_BY_ASSET_GROUP["cefi"] 2026-06-23 (cefi_universe_capture_rule)
+    # so the perp-gate pairs BYBIT-SPOT ↔ BYBIT perps. Start date =
+    # VenueMapping.venue_start_dates["BYBIT-SPOT"] = Tardis ``bybit-spot``
+    # availableSince 2021-12-04. Data types mirror expected_coverage.py
+    # (trades + book_snapshot_5) — SPOT venue, no derivatives feeds.
+    # Populated 2026-07-07 (bybit_spot_manifest_stray_captures-004) — absent
+    # entry previously triggered Carve-out 1 zeroing every data_type at the
+    # cefi Layer-1 EXPECTED denominator.
+    "BYBIT-SPOT": {
+        "trades": "2021-12-04",
+        "book_snapshot_5": "2021-12-04",
+    },
     "OKX": {
         "trades": "2020-01-01",
         "book_snapshot_5": "2020-01-01",
