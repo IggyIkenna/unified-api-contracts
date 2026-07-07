@@ -1,0 +1,10 @@
+# STUB — pending live capture
+# Bitget live WebSocket (public v2, wss://ws.bitget.com/v2/ws/public).
+# Connectors: market_tick_data_service/live/connectors/bitget_spot_ws.py,
+#             market_tick_data_service/live/connectors/bitget_futures_ws.py (MTDS a49c0828, 2026-07-07).
+# Status: cassette stub landed with the Phase-3.5 rollout; real WS frames captured
+# once the connector's live-mode smoke reaches a green tick.
+ws_url: wss://ws.bitget.com/v2/ws/public
+subscription: null
+frames: []
+version: 1

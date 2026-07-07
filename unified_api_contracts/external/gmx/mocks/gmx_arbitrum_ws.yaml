@@ -1,0 +1,9 @@
+# STUB — pending live capture
+# GMX (Arbitrum) live WebSocket via an Arbitrum-mainnet RPC provider (event stream).
+# Connector: market_tick_data_service/live/connectors/gmx_arbitrum_ws.py (MTDS a49c0828, 2026-07-07).
+# Status: BLOCKED-CREDENTIALS — RPC-provider key + subscription filter needed;
+# cassette stub landed with the Phase-3.5 rollout, real frames captured post-credentials.
+ws_url: wss://arbitrum-mainnet-rpc.placeholder/ws
+subscription: null
+frames: []
+version: 1

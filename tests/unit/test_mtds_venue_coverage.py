@@ -624,18 +624,19 @@ class TestSeedDispatcherVenueClassification:
             assert get_expected_instruments_for_venue(venue, "trades"), f"{venue} trades regressed"
             assert get_expected_instruments_for_venue(venue, "book_snapshot_5"), f"{venue} book_snapshot_5 regressed"
 
-    def test_aster_book_snapshot_5_is_empty(self) -> None:
-        """ASTER's adapter only wires trades + derivative_ticker (no
-        book_snapshot_5 / liquidations). Pre-fix the dispatcher emitted
-        book_snapshot_5 perps for ASTER and the Tier-3 sentinel created
-        14 false-miss rows per day. Capability table is the SSOT — if
-        the data_type isn't declared, the seed must be empty.
+    def test_aster_book_snapshot_5_and_liquidations_seeded(self) -> None:
+        """ASTER declares trades + derivative_ticker (batch+live via REST)
+        AND book_snapshot_5 + liquidations (live-only via aster_book_liq_ws
+        WS connector, start_date 2026-06-23). All four perp data_types must
+        seed non-empty; the enumerator's per-(venue,dt) start_date gate
+        keeps pre-2026-06-23 dates as EXPECTED_PRE_SOURCE_COVERAGE_START.
         """
-        # capability-declared data_types remain seeded
+        # all four capability-declared data_types seed non-empty
         assert get_expected_instruments_for_venue("ASTER", "trades")
         assert get_expected_instruments_for_venue("ASTER", "derivative_ticker")
-        # not in ASTER's VENUE_DATA_TYPE_CAPABILITIES → empty
-        assert get_expected_instruments_for_venue("ASTER", "book_snapshot_5") == []
+        assert get_expected_instruments_for_venue("ASTER", "book_snapshot_5")
+        # liquidations is venue-level (not per-instrument) → Tier-2 fallback,
+        # so seed is empty by design even when the capability is declared
         assert get_expected_instruments_for_venue("ASTER", "liquidations") == []
 
     def test_capability_gate_does_not_break_known_venues(self) -> None:

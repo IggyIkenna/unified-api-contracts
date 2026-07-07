@@ -1,0 +1,9 @@
+# STUB — pending live capture
+# Extended (Starknet perp CLOB) live WebSocket (wss://api.extended.exchange/stream.v1).
+# Connector: market_tick_data_service/live/connectors/extended_starknet_perp_ws.py (MTDS a49c0828, 2026-07-07).
+# Status: cassette stub landed with the Phase-3.5 rollout; real WS frames captured
+# once the connector's live-mode smoke reaches a green tick.
+ws_url: wss://api.extended.exchange/stream.v1
+subscription: null
+frames: []
+version: 1
